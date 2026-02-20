@@ -54,8 +54,12 @@ export type ReplacementFunction = (match: string, ...groups: string[]) => string
 export interface PatternMatchResult {
   /** The pattern that was applied */
   patternName: string;
-  /** Number of matches found */
+  /** Number of regex matches found (before replacement) */
   matchCount: number;
+  /** Number of matches that produced actual text changes */
+  replacementsMade: number;
+  /** Number of matches where replacement was a no-op (returned original text) */
+  noopsSkipped: number;
   /** Whether the pattern was successfully applied */
   success: boolean;
   /** The content before transformation */
@@ -186,35 +190,71 @@ export function applyPattern(content: string, pattern: PatternMatcher): PatternM
       return {
         patternName: pattern.name,
         matchCount: 0,
+        replacementsMade: 0,
+        noopsSkipped: 0,
         success: true,
         contentBefore: content,
         contentAfter: content,
       };
     }
 
-    // Apply the replacement
+    // Apply the replacement, tracking actual changes vs no-ops
+    let replacementsMade = 0;
+    let noopsSkipped = 0;
     let result: string;
+
     if (typeof pattern.replacement === 'function') {
-      result = content.replace(pattern.pattern, pattern.replacement as ReplacementFunction);
+      const origFn = pattern.replacement as ReplacementFunction;
+      result = content.replace(pattern.pattern, (match: string, ...args: string[]) => {
+        const replaced = origFn(match, ...args);
+        if (replaced === match) {
+          noopsSkipped++;
+        } else {
+          replacementsMade++;
+        }
+        return replaced;
+      });
     } else {
       result = content.replace(pattern.pattern, pattern.replacement);
+    }
+
+    // Ground truth: did the content actually change?
+    const contentChanged = result !== content;
+
+    // For string replacements, infer counts from whether content changed
+    if (typeof pattern.replacement !== 'function') {
+      if (contentChanged) {
+        replacementsMade = matchCount; // approximate (some may be no-ops)
+      } else {
+        noopsSkipped = matchCount;
+      }
     }
 
     // Validate the transformation
     const isValid = validateTransformation(pattern, content, result);
 
+    // If validation rejected the change, the content reverts — zero actual replacements
+    if (!isValid && contentChanged) {
+      noopsSkipped = matchCount;
+      replacementsMade = 0;
+    }
+
     return {
       patternName: pattern.name,
       matchCount,
+      replacementsMade,
+      noopsSkipped,
       success: isValid,
       contentBefore: content,
-      contentAfter: result,
-      error: isValid ? undefined : 'Validation failed after transformation',
+      contentAfter: isValid ? result : content,
+      error: isValid ? undefined : 'Validation failed: pattern still matches after transformation',
     };
   } catch (error) {
     return {
       patternName: pattern.name,
       matchCount: 0,
+      replacementsMade: 0,
+      noopsSkipped: 0,
       success: false,
       contentBefore: content,
       contentAfter: content,

@@ -12,7 +12,6 @@
  */
 
 import { createPattern, type PatternMatcher } from '../pattern-matcher';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================================================
 // TYPE-ONLY IMPORT PATTERNS (TypeScript 4.5+ syntax)

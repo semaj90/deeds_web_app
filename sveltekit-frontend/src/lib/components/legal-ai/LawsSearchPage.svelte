@@ -1,7 +1,7 @@
 <script lang="ts">
- import RelatedCasesPanel from './RelatedCasesPanel.svelte';
- import StatuteDetail from './StatuteDetail.svelte';
- import StatuteResultsList from './StatuteResultsList.svelte';
+ // ARCHIVED: import RelatedCasesPanel from './RelatedCasesPanel.svelte';
+ // ARCHIVED: import StatuteDetail from './StatuteDetail.svelte';
+ // ARCHIVED: import StatuteResultsList from './StatuteResultsList.svelte';
  import StatuteSearchBar from './StatuteSearchBar.svelte';
 
  interface Statute {

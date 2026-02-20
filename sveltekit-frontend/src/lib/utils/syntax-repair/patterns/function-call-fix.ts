@@ -8,7 +8,6 @@
  */
 
 import { createPattern, type PatternMatcher } from '../pattern-matcher';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Pattern to fix simple function calls with colon-separated arguments
@@ -23,10 +22,9 @@ export const simpleFunctionCallPattern: PatternMatcher = createPattern(
     if (isTypeAnnotation(arg1, arg2)) {
       return match;
     }
-    return `${funcName}(${arg1.trim()},
-	${arg2.trim()})`;
+    return `${funcName}(${arg1.trim()}, ${arg2.trim()})`;
   },
-	{
+  {
     priority: 30,
   }
 );
@@ -43,10 +41,9 @@ export const methodCallPattern: PatternMatcher = createPattern(
     if (isTypeAnnotation(arg1, arg2)) {
       return match;
     }
-    return `.${methodName}(${arg1.trim()},
-	${arg2.trim()})`;
+    return `.${methodName}(${arg1.trim()}, ${arg2.trim()})`;
   },
-	{
+  {
     priority: 32,
   }
 );
@@ -76,10 +73,9 @@ export const drizzleAndPattern: PatternMatcher = createPattern(
     if (isTypeAnnotation(arg1, arg2)) {
       return match;
     }
-    return `and(${arg1.trim()},
-	${arg2.trim()})`;
+    return `and(${arg1.trim()}, ${arg2.trim()})`;
   },
-	{
+  {
     priority: 26,
   }
 );
@@ -95,10 +91,9 @@ export const drizzleOrPattern: PatternMatcher = createPattern(
     if (isTypeAnnotation(arg1, arg2)) {
       return match;
     }
-    return `or(${arg1.trim()},
-	${arg2.trim()})`;
+    return `or(${arg1.trim()}, ${arg2.trim()})`;
   },
-	{
+  {
     priority: 27,
   }
 );
@@ -112,10 +107,9 @@ export const nestedCallPattern: PatternMatcher = createPattern(
   'Fix nested function calls with corrupted arguments',
   /(\w+)\((\w+)\(([^()]+?):\s*([^()]+?)\):\s*([^()]+?)\)/g,
   (match, outer, inner, arg1, arg2, arg3) => {
-    return `${outer}(${inner}(${arg1.trim()},
-	${arg2.trim()}), ${arg3.trim()})`;
+    return `${outer}(${inner}(${arg1.trim()}, ${arg2.trim()}), ${arg3.trim()})`;
   },
-	{
+  {
     priority: 35,
   }
 );
@@ -128,10 +122,9 @@ export const chainedCallPattern: PatternMatcher = createPattern(
   'Fix chained method calls with corrupted arguments',
   /\.(\w+)\(([^()]+?)\)\.(\w+)\(([^()]+?):\s*([^()]+?)\)/g,
   (match, method1, args1, method2, arg2a, arg2b) => {
-    return `.${method1}(${args1}).${method2}(${arg2a.trim()},
-	${arg2b.trim()})`;
+    return `.${method1}(${args1}).${method2}(${arg2a.trim()}, ${arg2b.trim()})`;
   },
-	{
+  {
     priority: 38,
   }
 );
@@ -143,6 +136,16 @@ function isTypeAnnotation(arg1: string, arg2: string): boolean {
   const trimmedArg1 = arg1.trim();
   const trimmedArg2 = arg2.trim();
 
+  // If arg1 ends with `?` it's an optional param — always a type annotation
+  if (trimmedArg1.endsWith('?')) return true;
+
+  // If arg2 contains a comma, this is a multi-param function signature
+  // e.g. fn(_key: string, _value: any) — the regex captured everything after first ':'
+  if (trimmedArg2.includes(',')) return true;
+
+  // If arg1 starts with _ it's a TypeScript unused-param convention
+  if (trimmedArg1.startsWith('_') && /^[a-z_]\w*$/i.test(trimmedArg1)) return true;
+
   // If arg2 starts with uppercase, it's likely a type
   if (/^[A-Z]/.test(trimmedArg2)) {
     // But check if arg1 is a simple identifier (parameter name)
@@ -151,18 +154,18 @@ function isTypeAnnotation(arg1: string, arg2: string): boolean {
     }
   }
 
-  // Common type patterns
+  // Common type patterns — match at start (arg2 may have trailing content)
   const typePatterns = [
-    /^string$/,
-    /^number$/,
-    /^boolean$/,
-    /^void$/,
-    /^null$/,
-    /^undefined$/,
-    /^any$/,
-    /^unknown$/,
-    /^never$/,
-    /^object$/,
+    /^string\b/,
+    /^number\b/,
+    /^boolean\b/,
+    /^void\b/,
+    /^null\b/,
+    /^undefined\b/,
+    /^any\b/,
+    /^unknown\b/,
+    /^never\b/,
+    /^object\b/,
     /^Array</,
     /^Record</,
     /^Map</,
@@ -195,21 +198,38 @@ export function getFunctionCallPatterns(): PatternMatcher[] {
  * Apply function call fixes to content
  */
 export function fixFunctionCalls(content: string): {
-	result: string, fixCount: number } {
+	result: string;
+	fixCount: number;
+	matchesFound: number;
+	replacementsMade: number;
+	noopsSkipped: number;
+} {
   let result = content;
-  let totalFixes = 0;
+  let matchesFound = 0;
+  let replacementsMade = 0;
+  let noopsSkipped = 0;
 
   for (const pattern of getFunctionCallPatterns()) {
     const matches = result.match(pattern.pattern);
     if (matches) {
-      totalFixes += matches.length;
+      matchesFound += matches.length;
       if (typeof pattern.replacement === 'function') {
-        result = result.replace(pattern.pattern, pattern.replacement);
+        const origFn = pattern.replacement;
+        result = result.replace(pattern.pattern, (match: string, ...args: string[]) => {
+          const replaced = origFn(match, ...args);
+          if (replaced === match) {
+            noopsSkipped++;
+          } else {
+            replacementsMade++;
+          }
+          return replaced;
+        });
       } else {
         result = result.replace(pattern.pattern, pattern.replacement);
+        replacementsMade += matches.length;
       }
     }
   }
 
-  return { result, fixCount: totalFixes };
+  return { result, fixCount: replacementsMade, matchesFound, replacementsMade, noopsSkipped };
 }

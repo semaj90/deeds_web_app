@@ -14,7 +14,6 @@
  */
 
 import { createPattern, type PatternMatcher } from '../pattern-matcher';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================================================
 // BITS-UI COMPONENT IMPORT PATTERNS

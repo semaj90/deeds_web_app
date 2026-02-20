@@ -1,5 +1,5 @@
 /** * Chat Components Export * Real-time chat and messaging components */
-export { default as ChatMessage } from './ChatMessage.svelte';
+// // ARCHIVED: export { default as ChatMessage } from './ChatMessage.svelte'; // Session 56: file deleted
 
 export type MessageRole = 'user' | 'assistant' | 'system';
 export type MessageStatus = 'sending' | 'sent' | 'delivered' | 'error';
@@ -12,6 +12,3 @@ export interface ChatMessageData {
  status?: MessageStatus;
  metadata?: { [key: string]: any };
 }
-
-
-

@@ -10,7 +10,6 @@ import { join, extname, relative } from 'path';
 import { existsSync } from 'fs';
 import type {  PatternMatcher, FixResult, PatternMatchResult  } from './pattern-matcher';
 import { applyPatterns } from './pattern-matcher';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Configuration for file processing
@@ -150,8 +149,8 @@ export async function processFile(
     // Apply all applicable patterns
     const { content: fixedContent, results } = applyPatterns(content, applicablePatterns);
 
-    // Calculate total fixes
-    const totalFixes = results.reduce((sum, r) => sum + r.matchCount, 0);
+    // Calculate total fixes (only count actual text changes, not no-ops)
+    const totalFixes = results.reduce((sum, r) => sum + r.replacementsMade, 0);
 
     // If no fixes needed, return early
     if (totalFixes === 0) {

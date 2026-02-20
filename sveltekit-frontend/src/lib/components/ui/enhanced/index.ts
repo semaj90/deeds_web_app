@@ -6,7 +6,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 export { default as Button } from './Button.svelte';
 export { default as Card } from './Card.svelte';
 export { default as Input } from './Input.svelte';
-export { buttonVariants, type ButtonVariants } from './button-variants.js';
+// // ARCHIVED: export { buttonVariants, type ButtonVariants } from './button-variants.js'; // Session 56: file missing
 
 // Re-export commonly used types
 export type { HTMLButtonAttributes } from 'svelte/elements';

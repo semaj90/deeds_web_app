@@ -36,10 +36,8 @@ export {
 // export { default as localStorageFileFallback } from './services/localStorage-file-fallback.js';
 
 // ===== UTILITIES & TYPES =====
-export {
-    cn, copyToClipboard, debounce, downloadFile, formatDate, formatFileSize, formatProcessingTime, generateId, getCaseStatusStyling, getConfidenceLevel, getEvidenceTypeStyling, getInitials, isBrowser, isValidEmail, storage,
-    theme, throttle
-} from './utils/index.js';
+// Session 56: utils/index.js was deleted — these utils are available via direct imports
+// export { cn, copyToClipboard, ... } from './utils/index.js';
 
 // Export type helpers for Svelte 5 compatibility
 export type {
@@ -53,8 +51,8 @@ export type {
 // } from './services/ollama-integration-layer.js';
 
 // ===== SERVER SERVICES (Server-side only) =====
-// Note: These should only be imported on the server side
-export type { AuthService } from './server/auth.js';
+// Session 56: server/auth.js deleted — use '$lib/server/lucia.js' for auth
+// export type { AuthService } from './server/auth.js';
 
 // ===== SERVER DATABASE EXPORTS =====
 // Commented: server-only DB exports must not be in barrel file (leaks into browser bundles)

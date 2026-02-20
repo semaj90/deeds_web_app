@@ -10,28 +10,29 @@ export { canvasStore as canvas, canvasStore } from './canvas-store.svelte';
 export type { CanvasElement, CanvasConnection, CollaboratorCursor, CanvasHistoryEntry, ElementType } from './canvas-store.svelte';
 export { caseStore as cases, caseStore, caseStore as legalCase } from './case-store.svelte';
 export type { Case, CaseFilters, CaseStatus, CasePriority } from './case-store.svelte';
-export { citationStore as citations, citationStore } from './citation-store.svelte';
-export type { Citation, CitationType, CitationCluster, PrecedentialValue } from './citation-store.svelte';
+// ARCHIVED: export { citationStore as citations, citationStore } from './citation-store.svelte';
+// ARCHIVED: export type { Citation, CitationType, CitationCluster, PrecedentialValue } from './citation-store.svelte';
 export { evidenceStore as evidence, evidenceStore as evidenceHierarchy, evidenceStore, evidenceStore as evidenceWorkflow } from './evidence-store.svelte';
 export { notificationStore as alerts, notificationStore as notifications, notificationStore, showToast } from './notification-store.svelte';
 export type { Notification, Toast, Alert, NotificationType } from './notification-store.svelte';
 export { poiStore as poi, poiStore } from './poi-store.svelte';
 export type { PersonOfInterest, POIRelationship, POIRole, TimelineEvent, POICluster } from './poi-store.svelte';
-export { reportStore as report, reportStore } from './report-store.svelte';
-export type { Report, ReportSection, ReportType, ExportFormat } from './report-store.svelte';
+// ARCHIVED: export { reportStore as report, reportStore } from './report-store.svelte';
+// ARCHIVED: export type { Report, ReportSection, ReportType, ExportFormat } from './report-store.svelte';
 export { searchStore as search, searchStore } from './search-store.svelte';
 export type { SearchResult, SearchFilters, SearchScope, SearchMode, SavedSearch } from './search-store.svelte';
 export { toastStore } from './toast-store.svelte';
-export {
-  userStore as avatarStore,
-  currentUser,
-  isAuthenticated,
-  userStore as user,
-  userStore as userData,
-  userError,
-  userLoading,
-  userStore
-} from './user-store.svelte';
+// Session 56: user-store.svelte missing — inline stub
+class UserStoreStub {
+  user = $state<{ id: string; email: string; role: string } | null>(null);
+  loading = $state(false);
+  error = $state<string | null>(null);
+}
+export const userStore = new UserStoreStub();
+export const currentUser = { get value() { return userStore.user; } };
+export const isAuthenticated = { get value() { return !!userStore.user; } };
+export const userError = { get value() { return userStore.error; } };
+export const userLoading = { get value() { return userStore.loading; } };
 
 // ============================================================================
 // Inline stub stores (converted from writable to $state)

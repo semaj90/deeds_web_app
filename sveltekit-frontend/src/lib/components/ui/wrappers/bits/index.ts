@@ -2,4 +2,4 @@ export { default as Button } from './Button.svelte';
 export { default as DialogRoot } from './DialogRoot.svelte';
 export { default as DialogTrigger } from './DialogTrigger.svelte';
 export { default as DialogContent } from './DialogContent.svelte';
-export * from './bits-overrides.js';
+// // ARCHIVED: export * from './bits-overrides.js'; // Session 56: file missing

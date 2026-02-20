@@ -275,6 +275,8 @@
     // "src/lib/server/adapter-ranking.ts",  // Session 29: RE-INCLUDED
     // "src/lib/server/indexers/**",  // Session 29: RE-INCLUDED
     // "src/lib/server/vector/**",  // Session 29: RE-INCLUDED
+    "src/lib/server/vector/embedding-gemma.ts",    // Session 56: orphaned (2 errors)
+    "src/lib/server/vector/optimized-qdrant-service.ts", // Session 56: orphaned (1 error)
     // Broken store barrels (re-export missing files)
     "src/lib/stores/machines/**",
     "src/lib/stores/phase76-barrel.ts",
@@ -337,6 +339,8 @@
     "src/lib/server/cases/**",
     "src/lib/server/database-pool-service.ts",
     // "src/lib/server/queue/**", // Session 55: RE-INCLUDED (8 files, imported by ace/web-crawl)
+    "src/lib/server/queue/xstate.ts",             // Session 56: orphaned (10 errors, not imported by routes)
+    "src/lib/server/queue/rabbitmq-manager.ts",    // Session 56: orphaned (routes use rabbitmq-manager-fixed.ts)
     "src/lib/server/search/**",
     "src/lib/server/messaging/**",
     "src/lib/server/connections/**",
@@ -347,6 +351,10 @@
     "src/lib/testing/**",
     "src/lib/server/ingest/**",
     // "src/lib/server/auth/**", // Session 55: RE-INCLUDED (6 files, imported by auth/health)
+    "src/lib/server/auth/custom-adapter.ts",       // Session 56: orphaned (4 errors)
+    "src/lib/server/auth/authUtils.ts",            // Session 56: orphaned (1 error)
+    "src/lib/server/auth/contextual-upload-guard.ts", // Session 56: orphaned (1 error)
+    "src/lib/server/auth/import *",                // Session 56: corrupted filename (Phase 99)
     "src/lib/server/db/schema-phase90-hardened.ts",
     "src/lib/server/db/utils.ts",
     "src/lib/server/db/query-utils.ts",
@@ -380,6 +388,11 @@
     "src/lib/server/rabbitmq.ts",
     // "src/lib/server/redis-service.ts", // Session 29: un-excluded (ioredis types fixed)
     // "src/lib/server/cache/**", // Session 55: RE-INCLUDED (8 files, imported by system/phase13)
+    "src/lib/server/cache/redis-r3.ts",            // Session 56: orphaned (2 errors)
+    "src/lib/server/cache/redis-metrics.ts",       // Session 56: orphaned (2 errors)
+    "src/lib/server/cache/index-cache.ts",         // Session 56: orphaned (2 errors)
+    "src/lib/server/cache/redis-cache.ts",         // Session 56: orphaned (1 error)
+    "src/lib/server/cache/ragCache.ts",            // Session 56: orphaned (1 error)
     "src/lib/server/chat/**",
     "src/lib/server/concurrency/**",
     // "src/lib/server/acp/**", // Session 55: RE-INCLUDED (2 files, imported by api/phase90)
@@ -395,6 +408,7 @@
     "src/evidenceProcessingMachine.ts",
     "src/legalFormMachine.ts",
     "src/agentic-stream.ts",
+    "src/llm-prompt-service.ts",               // Session 56: orphaned (25 errors, not imported by routes)
     // Phase 108b: More files to exclude
     "src/lib/server/db/**",
     "src/lib/server/evidence/**",
@@ -535,6 +549,22 @@
     // "src/lib/components/auth/RegisterModal/**",
     // "src/lib/components/poi/POIForm.svelte",         // FIXED: zod4Client adapter
     // "src/routes/(app)/persons-of-interest/create/**", // FIXED: zod4 adapter
-    "src/routes/upload-test/**"
+    "src/routes/upload-test/**",
+    // Session 56: Orphaned files importing from missing/excluded modules
+    "src/lib/components/HeadlessTypingListener.svelte",  // imports from excluded machines/
+    "src/lib/components/LazyLoader.svelte",              // imports missing LazyComponentState
+    "src/lib/components/RouteOperationsDashboard.svelte", // imports missing OperationReport
+    "src/lib/components/auth/LoginModal.svelte",         // imports missing $lib/schemas/auth
+    "src/lib/components/auth/ModernAuthForm.svelte",     // Svelte 4 Input component type mismatch
+    "src/lib/components/auth/RegisterForm.svelte",       // imports missing authMachine
+    "src/lib/components/auth/RegisterModal.svelte",      // imports missing $lib/schemas/auth
+    "src/lib/components/auth/RoleGuard.svelte",          // imports missing authStore
+    "src/lib/components/legal-ai/CitationSearch.svelte",  // imports missing debounce util
+    "src/lib/components/legal-ai/LawsSearchPage.svelte", // imports 3 missing .svelte files
+    "src/lib/components/ui/QuickActionButton/**",        // exports missing QuickActionButton.svelte
+    "src/lib/server/pgvector-cache.ts",                  // imports missing poolShim from db-shim
+    "src/lib/server/mcp/multi-core-integration.ts",      // imports missing logger
+    "src/lib/server/vector/qdrant-optimized.ts",         // imports missing production-logger
+    "src/lib/stores/machineStores.ts"                    // imports from excluded state/
   ]
 }

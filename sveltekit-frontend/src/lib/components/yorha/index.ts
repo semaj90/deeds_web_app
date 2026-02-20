@@ -2,15 +2,15 @@ import YoRHaAIChat from './YoRHaAIChat.svelte';
 import YoRHaCommandCenter from './YoRHaCommandCenter.svelte';
 import YoRHaDataGrid from './YoRHaDataGrid.svelte';
 import YoRHaForm from './YoRHaForm.svelte';
-import YoRHaModal from './YoRHaModal.svelte';
-import YoRHaNavigation from './YoRHaNavigation.svelte';
+// // ARCHIVED: import YoRHaModal from './YoRHaModal.svelte'; // Session 56: file missing
+// // ARCHIVED: import YoRHaNavigation from './YoRHaNavigation.svelte'; // Session 56: file missing
 import YoRHaTable from './YoRHaTable.svelte';
 
 // Export main YoRHa components
 export {
     YoRHaAIChat, YoRHaCommandCenter,
     YoRHaDataGrid, YoRHaForm,
-    YoRHaModal, YoRHaNavigation, YoRHaTable
+    YoRHaTable
 };
 
 export interface TableColumn { key: string, title: string;
@@ -33,9 +33,7 @@ export { default as CaseStats } from './cases/CaseStats.svelte';
 export const YoRHa = {
     Table: YoRHaTable,
     DataGrid: YoRHaDataGrid,
-    Navigation: YoRHaNavigation,
     CommandCenter: YoRHaCommandCenter,
-    Modal:YoRHaModal,
     Form: YoRHaForm,
     AIChat: YoRHaAIChat
 };
