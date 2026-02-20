@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-02-18T17-02-04",
+  "base": "http://localhost:5173",
+  "results": [
+    {
+      "name": "-evidence-upload",
+      "url": "http://localhost:5173//evidence/upload",
+      "status": 404,
+      "ok": false,
+      "error": "SvelteKit error page rendered",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-18T17-02-04\\-evidence-upload.png"
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 1,
+    "total": 1
+  }
+}

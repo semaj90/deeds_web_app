@@ -229,7 +229,7 @@
 		<aside class="filter-panel">
 			<div class="search-box">
 				<div class="search-input-wrap">
-					<Search size={16} class="search-icon" />
+					<span class="search-icon"><Search size={16} /></span>
 					<input
 						type="text"
 						placeholder="Search evidence, cases, legal documents..."
@@ -251,7 +251,7 @@
 					class="search-submit"
 				>
 					{#if isSearching}
-						<Loader2 size={16} class="animate-spin" />
+						<span class="animate-spin"><Loader2 size={16} /></span>
 					{:else}
 						SEARCH
 					{/if}
@@ -353,7 +353,7 @@
 				</div>
 			{:else if isSearching}
 				<div class="loading-state">
-					<Loader2 size={32} class="animate-spin" />
+					<span class="animate-spin"><Loader2 size={32} /></span>
 					<p>Running {searchMode === 'evidence' ? 'RAG+KAG+DAG' : 'RAG'} pipeline...</p>
 				</div>
 			{:else if searchMode === 'evidence' && evidenceBundles.length > 0}
@@ -731,9 +731,10 @@
 		padding: 0 8px;
 	}
 
-	.search-input-wrap :global(.search-icon) {
+	.search-input-wrap .search-icon {
 		color: #8a7a5a;
 		flex-shrink: 0;
+		display: flex;
 	}
 
 	.search-input {
@@ -1238,6 +1239,16 @@
 		font-size: 0.75rem;
 		color: #5a5040;
 		line-height: 1.5;
+	}
+
+	.animate-spin {
+		display: inline-flex;
+		animation: spin 1s linear infinite;
+	}
+
+	@keyframes spin {
+		from { transform: rotate(0deg); }
+		to { transform: rotate(360deg); }
 	}
 
 	@media (max-width: 1024px) {

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-02-20T04-35-44",
+  "base": "http://localhost:5173",
+  "results": [
+    {
+      "name": "dashboard",
+      "url": "http://localhost:5173/dashboard",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-20T04-35-44\\dashboard.png"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 0,
+    "total": 1
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-02-20T04-33-46",
+  "base": "http://localhost:5173",
+  "results": [
+    {
+      "name": "C:-Program Files-Git-global-search",
+      "url": "http://localhost:5173C:/Program Files/Git/global-search",
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-20T04-33-46\\C:-Program Files-Git-global-search-ERROR.png"
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 1,
+    "total": 1
+  }
+}

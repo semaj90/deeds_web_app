@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-02-20T04-35-53",
+  "base": "http://localhost:5173",
+  "results": [
+    {
+      "name": "evidence",
+      "url": "http://localhost:5173/evidence",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-20T04-35-53\\evidence.png"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 0,
+    "total": 1
+  }
+}
