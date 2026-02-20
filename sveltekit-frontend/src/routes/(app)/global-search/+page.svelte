@@ -77,7 +77,7 @@
 
 	let searchQuery = $state('');
 	let isSearching = $state(false);
-	let searchMode = $state<'rag' | 'evidence'>('evidence');
+	let searchMode = $state<'rag' | 'evidence' | 'statutes' | 'precedents' | 'glossary'>('evidence');
 	let caseIdFilter = $state('');
 
 	// RAG search results
@@ -88,6 +88,12 @@
 	let evidenceBundles = $state<EvidenceBundle[]>([]);
 	let evidenceResults = $state<any[]>([]);
 	let evidenceTiming = $state<SearchTiming | null>(null);
+
+	// Statutes / precedents / glossary results
+	let statuteResults = $state<any[]>([]);
+	let precedentResults = $state<any[]>([]);
+	let glossaryResults = $state<any[]>([]);
+	let auxTiming = $state<Record<string, number>>({});
 
 	let selectedResult = $state<SearchResult | null>(null);
 	let selectedBundle = $state<EvidenceBundle | null>(null);
@@ -109,12 +115,21 @@
 		ragResults = [];
 		evidenceBundles = [];
 		evidenceResults = [];
+		statuteResults = [];
+		precedentResults = [];
+		glossaryResults = [];
 		selectedResult = null;
 		selectedBundle = null;
 
 		try {
 			if (searchMode === 'evidence') {
 				await searchEvidence();
+			} else if (searchMode === 'statutes') {
+				await searchStatutes();
+			} else if (searchMode === 'precedents') {
+				await searchPrecedents();
+			} else if (searchMode === 'glossary') {
+				await searchGlossary();
 			} else {
 				await searchRAG();
 			}
@@ -168,6 +183,49 @@
 		ragResults = data.chunks ?? [];
 		ragTiming = data;
 		totalFound = data.total_found ?? ragResults.length;
+	}
+
+	async function searchStatutes() {
+		const res = await fetch('/api/statutes/search', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ query: searchQuery, limit: 20 }),
+		});
+		if (!res.ok) throw new Error(`Statutes search failed: ${res.status}`);
+		const data = await res.json();
+		statuteResults = data.results ?? [];
+		auxTiming = data.timing ?? {};
+		totalFound = statuteResults.length;
+	}
+
+	async function searchPrecedents() {
+		const res = await fetch('/api/precedents/search', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				query: searchQuery,
+				caseId: caseIdFilter || undefined,
+				limit: 20,
+			}),
+		});
+		if (!res.ok) throw new Error(`Precedents search failed: ${res.status}`);
+		const data = await res.json();
+		precedentResults = data.results ?? [];
+		auxTiming = data.timing ?? {};
+		totalFound = precedentResults.length;
+	}
+
+	async function searchGlossary() {
+		const res = await fetch('/api/glossary/search', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ query: searchQuery, limit: 20 }),
+		});
+		if (!res.ok) throw new Error(`Glossary search failed: ${res.status}`);
+		const data = await res.json();
+		glossaryResults = data.results ?? [];
+		auxTiming = data.timing ?? {};
+		totalFound = glossaryResults.length;
 	}
 
 	function getConfidenceFromScore(score: number) {
