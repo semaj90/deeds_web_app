@@ -2,7 +2,7 @@
 	import { applyAction, enhance } from '$app/forms';
 	import type { ActionData, PageData } from './$types';
 
-	let { data, form } = $props<{ data: PageData; form: ActionData }>();
+	let { data, form }: { data: PageData; form: ActionData } = $props();
 
 	let isDragging = $state(false);
 	let isUploading = $state(false);
@@ -11,6 +11,13 @@
 	let searchQuery = $state('');
 	let typeFilter = $state('all');
 	let viewMode = $state<'grid' | 'list'>('grid');
+
+	// Backend semantic search state
+	let searchMode = $state<'local' | 'semantic'>('local');
+	let isSearching = $state(false);
+	let semanticResults = $state<any[]>([]);
+	let searchTiming = $state<Record<string, number>>({});
+	let searchDebounceTimer = $state<ReturnType<typeof setTimeout> | null>(null);
 
 	const typeIcons: Record<string, string> = {
 		'application/pdf': '📄',
@@ -101,6 +108,55 @@
 			uploadError = null;
 		}
 	}
+
+	// Debounced semantic search — triggers 500ms after user stops typing (3+ chars)
+	$effect(() => {
+		if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+
+		if (searchQuery.length >= 3) {
+			searchDebounceTimer = setTimeout(() => {
+				runSemanticSearch(searchQuery);
+			}, 500);
+		} else {
+			searchMode = 'local';
+			semanticResults = [];
+		}
+	});
+
+	async function runSemanticSearch(query: string) {
+		isSearching = true;
+		searchMode = 'semantic';
+		try {
+			const res = await fetch('/api/evidence/search', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					query,
+					limit: 30,
+					includeContext: true
+				})
+			});
+			if (!res.ok) {
+				searchMode = 'local';
+				return;
+			}
+			const result = await res.json();
+			semanticResults = result.results ?? result.hits ?? [];
+			searchTiming = result.timing ?? {};
+		} catch {
+			searchMode = 'local';
+		} finally {
+			isSearching = false;
+		}
+	}
+
+	// Display items: semantic results when searching, local filter otherwise
+	let displayEvidence = $derived.by(() => {
+		if (searchMode === 'semantic' && semanticResults.length > 0) {
+			return semanticResults;
+		}
+		return filteredEvidence;
+	});
 </script>
 
 <div class="min-h-screen bg-panel">
@@ -181,9 +237,14 @@
 			<input
 				type="text"
 				bind:value={searchQuery}
-				placeholder="Search evidence..."
+				placeholder="Search evidence (3+ chars for semantic search)..."
 				class="flex-1 min-w-[200px] px-3 py-2 border border-sand/30 bg-panelSoft rounded-lg text-sm text-sand focus:outline-none focus:border-info"
 			/>
+			{#if isSearching}
+				<span class="text-xs text-info">Searching...</span>
+			{:else if searchMode === 'semantic' && semanticResults.length > 0}
+				<span class="text-xs text-accent">{semanticResults.length} semantic results ({searchTiming.total_ms ?? '?'}ms)</span>
+			{/if}
 			<div class="ev-filter-bar">
 				{#each [{ value: 'all', label: 'All' }, { value: 'pdf', label: 'PDF' }, { value: 'image', label: 'Images' }, { value: 'document', label: 'Docs' }] as ft (ft.value)}
 					<button
@@ -212,7 +273,7 @@
 		</div>
 
 		<!-- Evidence Gallery -->
-		{#if filteredEvidence.length === 0}
+		{#if displayEvidence.length === 0}
 			<div class="text-center py-16 bg-panelSoft rounded-lg border border-sand/20">
 				<p class="text-4xl mb-4">📂</p>
 				<p class="text-sand/80 text-lg">
@@ -226,24 +287,31 @@
 			</div>
 		{:else if viewMode === 'grid'}
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-				{#each filteredEvidence as doc (doc.id)}
+				{#each displayEvidence as doc (doc.id)}
 					<div class="bg-panelSoft rounded-lg hover:shadow-md transition p-5 border border-sand/20">
 						<div class="flex items-start gap-3 mb-3">
-							<span class="text-3xl">{getIcon(doc.fileType)}</span>
+							<span class="text-3xl">{getIcon(doc.fileType ?? doc.file_type ?? '')}</span>
 							<div class="flex-1 min-w-0">
-								<h3 class="font-medium text-sand truncate">{doc.title || doc.fileName}</h3>
-								<p class="text-xs text-sand/40 mt-0.5">{getTypeLabel(doc.fileType)} &middot; {formatFileSize(doc.fileSize)}</p>
+								<h3 class="font-medium text-sand truncate">{doc.title || doc.fileName || doc.file_name || ''}</h3>
+								<p class="text-xs text-sand/40 mt-0.5">{getTypeLabel(doc.fileType ?? doc.file_type ?? '')} &middot; {formatFileSize(doc.fileSize ?? doc.file_size ?? 0)}</p>
 							</div>
+							{#if doc.similarity !== undefined}
+								<span class="ev-score" class:high={doc.similarity >= 0.7} class:medium={doc.similarity >= 0.4 && doc.similarity < 0.7} class:low={doc.similarity < 0.4}>
+									{Math.round(doc.similarity * 100)}%
+								</span>
+							{/if}
 						</div>
-						{#if doc.description}
-							<p class="text-sm text-sand/80 line-clamp-2 mb-3">{doc.description}</p>
+						{#if doc.description || doc.content}
+							<p class="text-sm text-sand/80 line-clamp-2 mb-3">{doc.description || doc.content}</p>
 						{/if}
 						<div class="flex items-center justify-between text-xs text-sand/40">
-							<span>{formatDate(doc.createdAt)}</span>
-							<form method="POST" action="?/delete" use:enhance>
-								<input type="hidden" name="evidenceId" value={doc.id} />
-								<button type="submit" class="text-danger/60 hover:text-danger transition" title="Delete">Remove</button>
-							</form>
+							<span>{formatDate(doc.createdAt ?? doc.created_at)}</span>
+							{#if !doc.similarity}
+								<form method="POST" action="?/delete" use:enhance>
+									<input type="hidden" name="evidenceId" value={doc.id} />
+									<button type="submit" class="text-danger/60 hover:text-danger transition" title="Delete">Remove</button>
+								</form>
+							{/if}
 						</div>
 					</div>
 				{/each}
@@ -261,7 +329,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each filteredEvidence as doc (doc.id)}
+						{#each displayEvidence as doc (doc.id)}
 							<tr class="border-b border-sand/10 hover:bg-panel/50">
 								<td class="px-4 py-3">
 									<div class="flex items-center gap-2">
@@ -346,5 +414,24 @@
 	.ev-view-btn.active {
 		background: rgba(212, 199, 163, 0.2);
 		color: #d4c7a3;
+	}
+	.ev-score {
+		flex-shrink: 0;
+		padding: 0.125rem 0.5rem;
+		border-radius: 9999px;
+		font-size: 0.625rem;
+		font-weight: 600;
+	}
+	.ev-score.high {
+		background: rgba(72, 187, 120, 0.15);
+		color: #48bb78;
+	}
+	.ev-score.medium {
+		background: rgba(236, 201, 75, 0.15);
+		color: #ecc94b;
+	}
+	.ev-score.low {
+		background: rgba(245, 101, 101, 0.15);
+		color: #f56565;
 	}
 </style>

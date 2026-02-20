@@ -1039,6 +1039,23 @@ export const legalAnalysisSessions = pgTable('legal_analysis_sessions', {
  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+// Legal glossary terms for search and education
+export const legalGlossary = pgTable('legal_glossary', {
+ id: uuid('id')
+ .default(sql`gen_random_uuid()`)
+ .primaryKey()
+ .notNull(),
+ term: varchar('term', { length: 255 }).notNull(),
+ definition: text('definition').notNull(),
+ category: varchar('category', { length: 100 }),
+ jurisdiction: varchar('jurisdiction', { length: 100 }),
+ relatedTerms: jsonb('related_terms'),
+ sources: jsonb('sources'),
+ embedding: text('embedding'),
+ createdAt: timestamp('created_at').defaultNow().notNull(),
+ updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 export const legalResearch = pgTable('legal_research', {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
