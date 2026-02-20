@@ -10,7 +10,6 @@
  */
 import { Dialog } from "bits-ui";
 import type { Snippet } from 'svelte';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 interface DialogProps {
 	open?: boolean;
@@ -55,8 +54,9 @@ const sizeMap: Record<string, string> = {
 	full: 'max-w-full mx-4'
 };
 
-// Variant classes (UnoCSS-style)
-const variantMap: Record<string, string> = { default: 'bg-white, dark:bg-panelSoft border border-sand/20 dark:border-sand/20 shadow-xl',
+// Variant classes
+const variantMap: Record<string, string> = {
+	default: 'bg-white dark:bg-panelSoft border border-sand/20 dark:border-sand/20 shadow-xl',
 	nes: 'bg-panel border-4 border-white shadow-[4px_4px_0_0_#000] font-mono',
 	glass: 'bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl'
 };
@@ -64,7 +64,6 @@ const variantMap: Record<string, string> = { default: 'bg-white, dark:bg-panelSo
 let sizeClasses = $derived(sizeMap[size] || sizeMap.md);
 let variantClasses = $derived(variantMap[variant] || variantMap.nes);
 
-// Combined overlay classes
 let overlayClasses = $derived([
 	'fixed inset-0 z-50',
 	'bg-black/50 backdrop-blur-sm',
@@ -72,7 +71,6 @@ let overlayClasses = $derived([
 	'p-4'
 ].join(' '));
 
-// Combined content classes
 let contentClasses = $derived([
 	'relative w-full',
 	'rounded-lg',
@@ -91,8 +89,7 @@ function handleOpenChange(newOpen: boolean) {
 			open = newOpen;
 			isAnimating = false;
 			onOpenChange?.(newOpen);
-		},
-	150);
+		}, 150);
 	}
 }
 
@@ -113,15 +110,14 @@ function handleEscapeKeyDown(e: KeyboardEvent) {
 }
 </script>
 
-<!-- Trigger slot -->
-{#if trigger}
-	<Dialog.Trigger asChild>
-		{@render trigger()}
-	</Dialog.Trigger>
-{/if}
-
-<!-- Dialog Portal -->
 <Dialog.Root bind:open onOpenChange={handleOpenChange}>
+	<!-- Trigger -->
+	{#if trigger}
+		<Dialog.Trigger>
+			{@render trigger()}
+		</Dialog.Trigger>
+	{/if}
+
 	<Dialog.Portal>
 		<!-- Overlay with blur -->
 		<Dialog.Overlay class={overlayClasses} />
@@ -136,8 +132,8 @@ function handleEscapeKeyDown(e: KeyboardEvent) {
 			<!-- Close button -->
 			<Dialog.Close
 				class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center
-					   text-sand/60 hover:text-sand/80 dark:text-sand/40 dark: hover text-white
-					   rounded-md hover:bg-sand/10 dark: hover bg-panelSoft
+					   text-sand/60 hover:text-sand/80 dark:text-sand/40 dark:hover:text-white
+					   rounded-md hover:bg-sand/10 dark:hover:bg-panelSoft
 					   transition-colors duration-150"
 				aria-label="Close dialog"
 				onclick={handleClose}
@@ -181,12 +177,12 @@ function handleEscapeKeyDown(e: KeyboardEvent) {
 </Dialog.Root>
 
 <style>
-	/* NES.css dialog fallback styles */
-	:global(.nes-dialog) { position: fixed;
+	:global(.nes-dialog) {
+		position: fixed;
 		padding: 1.5rem;
 		border: 4px solid #fff;
 		background: #212529;
-	color: #fff;
+		color: #fff;
 		image-rendering: pixelated;
 	}
 
@@ -195,11 +191,10 @@ function handleEscapeKeyDown(e: KeyboardEvent) {
 		backdrop-filter: blur(4px);
 	}
 
-	/* Glass morphism variant */
 	:global(.glass-dialog) {
 		background: rgba(255, 255, 255, 0.1);
 		backdrop-filter: blur(20px);
-	border: 1px solid rgba(255, 255, 255, 0.2);
+		border: 1px solid rgba(255, 255, 255, 0.2);
 		border-radius: 1rem;
 	}
 </style>

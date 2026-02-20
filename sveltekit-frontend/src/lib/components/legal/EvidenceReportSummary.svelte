@@ -1,36 +1,762 @@
 <script lang="ts">
-import type { Case } from '$lib/types'; import { aiSummaryMachine } from "$lib/machines/aiSummaryMachine"; import { useMachine } from "@xstate/svelte"; import { AlertTriangle: CheckCircle, Download: Eye, FileText: Scale: Target } from "@lucide/svelte"; import  AISummaryReader  from "./AISummaryReader.svelte"; export interface EvidenceReport { id: string, title: string; type?: "digital_forensics"
-      | "dna_analysis"
-      | "ballistics"
-      | "financial"
-      | "document_analysis"
-      | "witness_statement",status: "pending" | "in_progress" | "completed" | "reviewed" | "challenged",priority: "low" | "medium" | "high" | "critical",createdAt: string, updatedAt: string, analyst: {
-	name: string, credentials: string;
-	department: string}; evidence: {
-	itemNumber: string, description: string, chainOfCustody: string[], dateCollected: string;
-	location: string}; methodology: {
-	procedures: string[], tools: string[];
-	standards: string[]}; findings: {
-	summary: string, keyPoints: string[], confidence: number;
-	limitations: string[]}; legalImplications: {
-	charges: string[], precedents: string[];
-	challengePoints: string[]}; attachments: {
-	id: string, name: string;
-	type: string, size: number}[]}
-  // Export props (Svelte pattern) export let evidenceId!: string; export let caseId!: string; export let reportData!: EvidenceReport; const { allowExport } = $props<{ allowExport, boolean }>() const { state: send } = useMachine(aiSummaryMachine); // reactive derived content so it updates when reportData changes const analysisContent = $derived(generateAnalysisContent(reportData)); function generateAnalysisContent(report: EvidenceReport): string { return ` EVIDENCE ANALYSIS REPORT Case ID: ${caseId} Evidence Item: ${report.evidence.itemNumber} Report, Type: ${report.type.replace(/_/g, " ").toUpperCase()} Priority Level: ${report.priority.toUpperCase()}; Status: ${report.status.toUpperCase()} ANALYST INFORMATION Name: ${report.analyst.name}; Credentials: ${report.analyst.credentials}; Department: ${report.analyst.department} EVIDENCE DETAILS Description: ${report.evidence.description} Collection Date: ${report.evidence.dateCollected} Collection Location: ${report.evidence.location} Chain of; Custody: ${report.evidence.chainOfCustody.join(" â†’ ")} METHODOLOGY Procedures: ${report.methodology.procedures.join(", ")} Tools Used: ${report.methodology.tools.join(", ")} Standards Applied: ${report.methodology.standards.join(", ")} FINDINGS ${report.findings.summary} Key Points: ${report.findings.keyPoints.map((point) => `â€¢ ${point}`).join("\n")} Confidence Level: ${Math.round(report.findings.confidence * 100)}% Limitations: ${report.findings.limitations.map((limitation) => `â€¢ ${limitation}`).join("\n")} LEGAL IMPLICATIONS Potential Charges: ${report.legalImplications.charges.join(", ")} Relevant Precedents: ${report.legalImplications.precedents.join(", ")} Challenge Points: ${report.legalImplications.challengePoints.join(", ")} ATTACHMENTS ${report.attachments.map((att) => `â€¢ ${att.name} (${att.type})`).join("\n")} `.trim()}
-  function getStatusColor(status: string) { switch (status) { case: "completed": return "text-accent bg-accent/10"; case, "reviewed": return "text-info bg-info/10"; case, "in_progress": return "text-warning bg-warning/10"; case, "challenged": return "text-danger bg-danger/10"; case, "pending": return "text-sand/60 bg-sand/10",default:return "text-sand/60 bg-sand/10"}
-  } function getPriorityColor(priority: string) { switch (priority) { case: "critical": return "text-danger bg-danger/10 border-danger/20"; case, "high": return "text-warning bg-warning/10 border-warning/20"; case, "medium": return "text-warning bg-warning/10 border-warning/20"; case, "low": return "text-sand/60 bg-sand/10 border-sand/20",default:return "text-sand/60 bg-sand/10 border-sand/20"}
-  } function getTypeIcon(type: string) { switch (type) { case: "digital_forensics": return "ðŸ’»"; case, "dna_analysis": return "ðŸ§¬"; case, "ballistics": return "ðŸ”«"; case, "financial": return "ðŸ’°"; case, "document_analysis": return "ðŸ“„"; case, "witness_statement": return "ðŸ‘¤",default:return "ðŸ“‹"}
-  } function exportReport() { const content = `# Evidence Analysis Report Export\n\n${analysisContent}`; const blob = new Blob([content], { type: "text/markdown" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = `evidence-report-${evidenceId}-${new Date().toISOString().split("T")[0]}.md`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url)}
+	import AlertTriangle from '@lucide/svelte/icons/triangle-alert';
+	import CheckCircle from '@lucide/svelte/icons/circle-check';
+	import Download from '@lucide/svelte/icons/download';
+	import Eye from '@lucide/svelte/icons/eye';
+	import FileText from '@lucide/svelte/icons/file-text';
+	import Scale from '@lucide/svelte/icons/scale';
+	import Target from '@lucide/svelte/icons/target';
 
-</script> <div class="evidence-report-summary"> <!-- Report, Header --> <div class="bg-white border border-sand/20 rounded-lg shadow-sm"> <div class="flex items-start justify-between"> <div class="flex items-start"> <div class="text-4xl">{getTypeIcon(reportData.type)}</div> <div> <h2 class="text-2xl font-bold text-sand"> {reportData.title} </h2> <div class="flex items-center gap-4 text-sm"> <span>case { caseId }</span> <span>Evidence: {reportData.evidence.itemNumber}</span> <span>Updated: {new Date(reportData.updatedAt).toLocaleDateString()}</span> </div> </div> </div> <div class="flex items-center"> <div class="text-right"> <div class="flex items-center gap-2"> <span class="px-3 py-1 rounded-full text-sm"> {reportData.status.toUpperCase()} </span> </div> <div class="px-3 py-1 border rounded-full text-sm"> {reportData.priority.toUpperCase()} PRIORITY </div> </div> {#if allowExport} <button onclick={ exportReport } class="p-2 text-sand/60 hover:text-sand hover:bg-sand/10 rounded-md"
-            title="Export Report"
-          > <Download class="w-5" /> </button> {/if} </div> </div> <!-- Quick, Stats --> <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-sand/5"> <div class="text-center"> <div class="text-lg font-semibold"> {Math.round(reportData.findings.confidence * 100)}% </div> <div class="text-sm">Confidence</div> </div> <div class="text-center"> <div class="text-lg font-semibold"> {reportData.evidence.chainOfCustody.length} </div> <div class="text-sm">Chain Links</div> </div> <div class="text-center"> <div class="text-lg font-semibold"> {reportData.methodology.procedures.length} </div> <div class="text-sm">Procedures</div> </div> <div class="text-center"> <div class="text-lg font-semibold"> {reportData.attachments.length} </div> <div class="text-sm">Attachments</div> </div> </div> </div> <!-- Evidence, Details --> <div class="grid grid-cols-1 lg:grid-cols-3"> <!-- Evidence, Information --> <div class="bg-white border border-sand/20 rounded-lg"> <h3 class="text-lg font-semibold text-sand mb-4 flex items-center"> <Eye class="w-5" /> Evidence Details </h3> <div class="space-y-4"> <div> <label class="text-sm font-medium">Item Number</label> <p class="mt-1 text-sand"> {reportData.evidence.itemNumber} </p> </div> <div> <label class="text-sm font-medium">Description</label> <p class="mt-1">{reportData.evidence.description}</p> </div> <div> <label class="text-sm font-medium">Collection Details</label> <div class="mt-1 text-sm"> <p> <strong>Date:</strong> {new Date(reportData.evidence.dateCollected).toLocaleString()} </p> <p><strong>Location</strong> {reportData.evidence.location}</p> </div> </div> <div> <label class="text-sm font-medium">Chain of Custody</label> <div class="mt-2"> {#each reportData.evidence.chainOfCustody as custodian, index} <div class="flex items-center"> <span class="flex items-center justify-center w-6 h-6 bg-info/10 text-info text-xs"> {index + 1} </span> <span class="text-sm">{ custodian }</span> </div> {/each} </div> </div> </div> </div> <!-- Analyst, Information --> <div class="bg-white border border-sand/20 rounded-lg"> <h3 class="text-lg font-semibold text-sand mb-4 flex items-center"> <Target class="w-5" /> Analysis Details </h3> <div class="space-y-4"> <div> <label class="text-sm font-medium">Analyst</label> <div class="mt-1"> <p class="font-medium">{reportData.analyst.name}</p> <p class="text-sm"> {reportData.analyst.credentials} </p> <p class="text-sm">{reportData.analyst.department}</p> </div> </div> <div> <label class="text-sm font-medium">Methodology</label> <div class="mt-2"> <div> <p class="text-sm font-medium">Procedures</p> <ul class="mt-1 text-sm text-sand list-disc"> {#each Array.isArray(reportData.methodology.procedures) ? reportData.methodology.procedures: [] as procedure} <li>{ procedure }</li> {/each} </ul> </div> <div> <p class="text-sm font-medium">Tools</p> <div class="mt-1 flex flex-wrap"> {#each Array.isArray(reportData.methodology.tools) ? reportData.methodology.tools: [] as tool} <span class="px-2 py-1 bg-sand/10 text-sand/80 text-xs">{ tool }</span> {/each} </div> </div> </div> </div> </div> </div> <!-- Legal, Impact --> <div class="bg-white border border-sand/20 rounded-lg"> <h3 class="text-lg font-semibold text-sand mb-4 flex items-center"> <Scale class="w-5" /> Legal Implications </h3> <div class="space-y-4"> <div> <label class="text-sm font-medium">Potential Charges</label> <div class="mt-2"> {#each Array.isArray(reportData.legalImplications.charges) ? reportData.legalImplications.charges: [] as charge} <div class="flex items-center"> <CheckCircle class="w-4 h-4 text-accent" /> <span class="text-sm">{ charge }</span> </div> {/each} </div> </div> <div> <label class="text-sm font-medium">Challenge Points</label> <div class="mt-2"> {#each Array.isArray(reportData.legalImplications.challengePoints) ? reportData.legalImplications.challengePoints: [] as challenge} <div class="flex items-start"> <AlertTriangle class="w-4 h-4 text-warning flex-shrink-0" /> <span class="text-sm">{ challenge }</span> </div> {/each} </div> </div> <div> <label class="text-sm font-medium">Relevant Precedents</label> <div class="mt-2"> {#each Array.isArray(reportData.legalImplications.precedents) ? reportData.legalImplications.precedents: [] as precedent} <div class="text-sm text-info hover:text-info"> { precedent } </div> {/each} </div> </div> </div> </div> </div> <!-- Key, Findings --> <div class="bg-white border border-sand/20 rounded-lg"> <h3 class="text-lg font-semibold text-sand">Key Findings</h3> <div class="grid grid-cols-1 lg:grid-cols-2"> <div> <h4 class="font-medium text-sand">Summary</h4> <p class="text-sand/80"> {reportData.findings.summary} </p> <div class="mt-4"> <div class="flex items-center justify-between"> <span class="text-sm font-medium">Confidence Level</span> <span class="text-sm font-semibold">{Math.round(reportData.findings.confidence * 100)}%</span> </div> <div class="w-full bg-sand/10 rounded-full"> <div class="h-2 rounded-full transition-all"
-              class:bg-accent={reportData.findings.confidence >= 0.8} class:bg-warning={reportData.findings.confidence >= 0.6 && reportData.findings.confidence < 0.8} class:bg-danger={reportData.findings.confidence < 0.6} style="width: {reportData.findings.confidence * 100}%"
-            ></div> </div> </div> </div> <div> <h4 class="font-medium text-sand">Key Points</h4> <ul class="space-y-2"> {#each Array.isArray(reportData.findings.keyPoints) ? reportData.findings.keyPoints: [] as point} <li class="flex items-start"> <CheckCircle class="w-4 h-4 text-accent flex-shrink-0" /> <span class="text-sand/80">{ point }</span> </li> {/each} </ul> {#if reportData.findings.limitations.length > 0} <div class="mt-4"> <h4 class="font-medium text-sand">Limitations</h4> <ul class="space-y-2"> {#each Array.isArray(reportData.findings.limitations) ? reportData.findings.limitations: [] as limitation} <li class="flex items-start"> <AlertTriangle class="w-4 h-4 text-warning flex-shrink-0" /> <span class="text-sand/80">{ limitation }</span> </li> {/each} </ul> {/if} </div> </div> </div> <!-- Attachments --> {#if reportData.attachments.length > 0} <div class="bg-white border border-sand/20 rounded-lg"> <h3 class="text-lg font-semibold text-sand">Attachments</h3> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"> {#each Array.isArray(reportData.attachments) ? reportData.attachments: [] as attachment} <div class="border border-sand/20 rounded-lg p-4 hover:shadow-md"> <div class="flex items-center"> <div class="p-2 bg-info/10"> <FileText class="w-5 h-5" /> </div> <div class="flex-1"> <p class="font-medium text-sand"> {attachment.name} </p> <p class="text-sm"> {attachment.type} â€¢ {(attachment.size / 1024).toFixed(1)} KB </p> </div> </div> </div> {/each} </div> {/if} <!-- AI: Summary, Reader --> <div class="mt-8"> <AISummaryReader documentId={ evidenceId } { caseId } initialContent={ analysisContent } documentType="evidence" /> </div> </div> <style> .evidence-report-summary { max-width: 80rem; margin-left: auto; margin-right: auto;}
+	export interface EvidenceReport {
+		id: string;
+		title: string;
+		type?:
+			| 'digital_forensics'
+			| 'dna_analysis'
+			| 'ballistics'
+			| 'financial'
+			| 'document_analysis'
+			| 'witness_statement';
+		status: 'pending' | 'in_progress' | 'completed' | 'reviewed' | 'challenged';
+		priority: 'low' | 'medium' | 'high' | 'critical';
+		createdAt: string;
+		updatedAt: string;
+		analyst: {
+			name: string;
+			credentials: string;
+			department: string;
+		};
+		evidence: {
+			itemNumber: string;
+			description: string;
+			chainOfCustody: string[];
+			dateCollected: string;
+			location: string;
+		};
+		methodology: {
+			procedures: string[];
+			tools: string[];
+			standards: string[];
+		};
+		findings: {
+			summary: string;
+			keyPoints: string[];
+			confidence: number;
+			limitations: string[];
+		};
+		legalImplications: {
+			charges: string[];
+			precedents: string[];
+			challengePoints: string[];
+		};
+		attachments: {
+			id: string;
+			name: string;
+			type: string;
+			size: number;
+		}[];
+	}
+
+	interface Props {
+		evidenceId: string;
+		caseId: string;
+		reportData: EvidenceReport;
+		allowExport?: boolean;
+	}
+
+	let {
+		evidenceId,
+		caseId,
+		reportData,
+		allowExport = false
+	}: Props = $props();
+
+	function getStatusColor(status: string): string {
+		switch (status) {
+			case 'completed':
+				return 'text-accent bg-accent/10';
+			case 'reviewed':
+				return 'text-info bg-info/10';
+			case 'in_progress':
+				return 'text-warning bg-warning/10';
+			case 'challenged':
+				return 'text-danger bg-danger/10';
+			case 'pending':
+			default:
+				return 'text-sand/60 bg-sand/10';
+		}
+	}
+
+	function getPriorityColor(priority: string): string {
+		switch (priority) {
+			case 'critical':
+				return 'text-danger bg-danger/10 border-danger/20';
+			case 'high':
+				return 'text-warning bg-warning/10 border-warning/20';
+			case 'medium':
+				return 'text-warning bg-warning/10 border-warning/20';
+			case 'low':
+			default:
+				return 'text-sand/60 bg-sand/10 border-sand/20';
+		}
+	}
+
+	function getTypeIcon(type: string): string {
+		switch (type) {
+			case 'digital_forensics':
+				return '\u{1F4BB}';
+			case 'dna_analysis':
+				return '\u{1F9EC}';
+			case 'ballistics':
+				return '\u{1F52B}';
+			case 'financial':
+				return '\u{1F4B0}';
+			case 'document_analysis':
+				return '\u{1F4C4}';
+			case 'witness_statement':
+				return '\u{1F464}';
+			default:
+				return '\u{1F4CB}';
+		}
+	}
+
+	function exportReport() {
+		const content = `# Evidence Analysis Report
+
+Case ID: ${caseId}
+Evidence Item: ${reportData.evidence.itemNumber}
+Report Type: ${(reportData.type || 'unknown').replace(/_/g, ' ').toUpperCase()}
+Priority: ${reportData.priority.toUpperCase()}
+Status: ${reportData.status.toUpperCase()}
+
+## Analyst
+- Name: ${reportData.analyst.name}
+- Credentials: ${reportData.analyst.credentials}
+- Department: ${reportData.analyst.department}
+
+## Evidence Details
+- Description: ${reportData.evidence.description}
+- Collected: ${reportData.evidence.dateCollected}
+- Location: ${reportData.evidence.location}
+- Chain of Custody: ${reportData.evidence.chainOfCustody.join(' \u2192 ')}
+
+## Methodology
+- Procedures: ${reportData.methodology.procedures.join(', ')}
+- Tools: ${reportData.methodology.tools.join(', ')}
+- Standards: ${reportData.methodology.standards.join(', ')}
+
+## Findings
+${reportData.findings.summary}
+
+Key Points:
+${reportData.findings.keyPoints.map((p) => `- ${p}`).join('\n')}
+
+Confidence: ${Math.round(reportData.findings.confidence * 100)}%
+
+Limitations:
+${reportData.findings.limitations.map((l) => `- ${l}`).join('\n')}
+
+## Legal Implications
+- Charges: ${reportData.legalImplications.charges.join(', ')}
+- Precedents: ${reportData.legalImplications.precedents.join(', ')}
+- Challenge Points: ${reportData.legalImplications.challengePoints.join(', ')}
+
+## Attachments
+${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
+`.trim();
+
+		const blob = new Blob([content], { type: 'text/markdown' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `evidence-report-${evidenceId}-${new Date().toISOString().split('T')[0]}.md`;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
+	}
+</script>
+
+<div class="evidence-report-summary">
+	<!-- Report Header -->
+	<div class="report-header">
+		<div class="header-top">
+			<div class="header-info">
+				<div class="type-icon">{getTypeIcon(reportData.type || 'unknown')}</div>
+				<div>
+					<h2 class="report-title">{reportData.title}</h2>
+					<div class="header-meta">
+						<span>Case {caseId}</span>
+						<span>Evidence: {reportData.evidence.itemNumber}</span>
+						<span>Updated: {new Date(reportData.updatedAt).toLocaleDateString()}</span>
+					</div>
+				</div>
+			</div>
+			<div class="header-actions">
+				<div class="badges">
+					<span class="badge {getStatusColor(reportData.status)}">
+						{reportData.status.toUpperCase()}
+					</span>
+					<span class="badge {getPriorityColor(reportData.priority)}">
+						{reportData.priority.toUpperCase()} PRIORITY
+					</span>
+				</div>
+				{#if allowExport}
+					<button onclick={exportReport} class="export-btn" title="Export Report">
+						<Download size={18} />
+					</button>
+				{/if}
+			</div>
+		</div>
+
+		<!-- Quick Stats -->
+		<div class="stats-grid">
+			<div class="stat">
+				<div class="stat-value">{Math.round(reportData.findings.confidence * 100)}%</div>
+				<div class="stat-label">Confidence</div>
+			</div>
+			<div class="stat">
+				<div class="stat-value">{reportData.evidence.chainOfCustody.length}</div>
+				<div class="stat-label">Chain Links</div>
+			</div>
+			<div class="stat">
+				<div class="stat-value">{reportData.methodology.procedures.length}</div>
+				<div class="stat-label">Procedures</div>
+			</div>
+			<div class="stat">
+				<div class="stat-value">{reportData.attachments.length}</div>
+				<div class="stat-label">Attachments</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Three-Column Detail Grid -->
+	<div class="detail-grid">
+		<!-- Evidence Information -->
+		<div class="detail-card">
+			<h3 class="detail-heading">
+				<Eye size={18} /> Evidence Details
+			</h3>
+			<div class="detail-fields">
+				<div>
+					<label class="field-label">Item Number</label>
+					<p class="field-value">{reportData.evidence.itemNumber}</p>
+				</div>
+				<div>
+					<label class="field-label">Description</label>
+					<p class="field-value">{reportData.evidence.description}</p>
+				</div>
+				<div>
+					<label class="field-label">Collection Details</label>
+					<div class="field-value text-sm">
+						<p><strong>Date:</strong> {new Date(reportData.evidence.dateCollected).toLocaleString()}</p>
+						<p><strong>Location:</strong> {reportData.evidence.location}</p>
+					</div>
+				</div>
+				<div>
+					<label class="field-label">Chain of Custody</label>
+					<div class="chain-list">
+						{#each reportData.evidence.chainOfCustody as custodian, index}
+							<div class="chain-item">
+								<span class="chain-number">{index + 1}</span>
+								<span>{custodian}</span>
+							</div>
+						{/each}
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Analysis Details -->
+		<div class="detail-card">
+			<h3 class="detail-heading">
+				<Target size={18} /> Analysis Details
+			</h3>
+			<div class="detail-fields">
+				<div>
+					<label class="field-label">Analyst</label>
+					<div>
+						<p class="field-value font-medium">{reportData.analyst.name}</p>
+						<p class="field-value text-sm">{reportData.analyst.credentials}</p>
+						<p class="field-value text-sm">{reportData.analyst.department}</p>
+					</div>
+				</div>
+				<div>
+					<label class="field-label">Procedures</label>
+					<ul class="field-list">
+						{#each reportData.methodology.procedures as procedure}
+							<li>{procedure}</li>
+						{/each}
+					</ul>
+				</div>
+				<div>
+					<label class="field-label">Tools</label>
+					<div class="tag-list">
+						{#each reportData.methodology.tools as tool}
+							<span class="tag">{tool}</span>
+						{/each}
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Legal Impact -->
+		<div class="detail-card">
+			<h3 class="detail-heading">
+				<Scale size={18} /> Legal Implications
+			</h3>
+			<div class="detail-fields">
+				<div>
+					<label class="field-label">Potential Charges</label>
+					<div class="item-list">
+						{#each reportData.legalImplications.charges as charge}
+							<div class="item-row">
+								<CheckCircle size={14} class="text-accent" />
+								<span>{charge}</span>
+							</div>
+						{/each}
+					</div>
+				</div>
+				<div>
+					<label class="field-label">Challenge Points</label>
+					<div class="item-list">
+						{#each reportData.legalImplications.challengePoints as challenge}
+							<div class="item-row">
+								<AlertTriangle size={14} class="text-warning" />
+								<span>{challenge}</span>
+							</div>
+						{/each}
+					</div>
+				</div>
+				<div>
+					<label class="field-label">Relevant Precedents</label>
+					<div class="item-list">
+						{#each reportData.legalImplications.precedents as precedent}
+							<div class="precedent-link">{precedent}</div>
+						{/each}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Key Findings -->
+	<div class="findings-section">
+		<h3 class="section-title">Key Findings</h3>
+		<div class="findings-grid">
+			<div>
+				<h4 class="subsection-title">Summary</h4>
+				<p class="findings-text">{reportData.findings.summary}</p>
+				<div class="confidence-bar-container">
+					<div class="confidence-header">
+						<span>Confidence Level</span>
+						<span class="confidence-value">{Math.round(reportData.findings.confidence * 100)}%</span>
+					</div>
+					<div class="confidence-track">
+						<div
+							class="confidence-fill"
+							class:high={reportData.findings.confidence >= 0.8}
+							class:medium={reportData.findings.confidence >= 0.6 && reportData.findings.confidence < 0.8}
+							class:low={reportData.findings.confidence < 0.6}
+							style="width: {reportData.findings.confidence * 100}%"
+						></div>
+					</div>
+				</div>
+			</div>
+			<div>
+				<h4 class="subsection-title">Key Points</h4>
+				<ul class="key-points">
+					{#each reportData.findings.keyPoints as point}
+						<li>
+							<CheckCircle size={14} class="text-accent" />
+							<span>{point}</span>
+						</li>
+					{/each}
+				</ul>
+				{#if reportData.findings.limitations.length > 0}
+					<h4 class="subsection-title mt-4">Limitations</h4>
+					<ul class="key-points">
+						{#each reportData.findings.limitations as limitation}
+							<li>
+								<AlertTriangle size={14} class="text-warning" />
+								<span>{limitation}</span>
+							</li>
+						{/each}
+					</ul>
+				{/if}
+			</div>
+		</div>
+	</div>
+
+	<!-- Attachments -->
+	{#if reportData.attachments.length > 0}
+		<div class="attachments-section">
+			<h3 class="section-title">Attachments</h3>
+			<div class="attachments-grid">
+				{#each reportData.attachments as attachment}
+					<div class="attachment-card">
+						<div class="attachment-icon">
+							<FileText size={18} />
+						</div>
+						<div class="attachment-info">
+							<p class="attachment-name">{attachment.name}</p>
+							<p class="attachment-meta">{attachment.type} &bull; {(attachment.size / 1024).toFixed(1)} KB</p>
+						</div>
+					</div>
+				{/each}
+			</div>
+		</div>
+	{/if}
+</div>
+
+<style>
+	.evidence-report-summary {
+		max-width: 80rem;
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.report-header {
+		background: var(--color-panel, #1a1a2e);
+		border: 1px solid rgba(194, 178, 128, 0.2);
+		border-radius: 0.5rem;
+		overflow: hidden;
+	}
+
+	.header-top {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		padding: 1.5rem;
+		gap: 1rem;
+	}
+
+	.header-info {
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
+	}
+
+	.type-icon {
+		font-size: 2.5rem;
+		line-height: 1;
+	}
+
+	.report-title {
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: white;
+		margin: 0 0 0.25rem;
+	}
+
+	.header-meta {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		font-size: 0.875rem;
+		color: rgba(194, 178, 128, 0.6);
+	}
+
+	.header-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.badges {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		align-items: flex-end;
+	}
+
+	.badge {
+		padding: 0.25rem 0.75rem;
+		border-radius: 9999px;
+		font-size: 0.75rem;
+		font-weight: 600;
+	}
+
+	.export-btn {
+		padding: 0.5rem;
+		color: rgba(194, 178, 128, 0.6);
+		border: none;
+		background: none;
+		border-radius: 0.375rem;
+		cursor: pointer;
+	}
+	.export-btn:hover {
+		color: white;
+		background: rgba(194, 178, 128, 0.1);
+	}
+
+	.stats-grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 1rem;
+		padding: 1rem;
+		background: rgba(194, 178, 128, 0.05);
+	}
+
+	.stat {
+		text-align: center;
+	}
+	.stat-value {
+		font-size: 1.125rem;
+		font-weight: 600;
+		color: white;
+	}
+	.stat-label {
+		font-size: 0.75rem;
+		color: rgba(194, 178, 128, 0.6);
+	}
+
+	.detail-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 1.5rem;
+	}
+
+	.detail-card {
+		background: var(--color-panel, #1a1a2e);
+		border: 1px solid rgba(194, 178, 128, 0.2);
+		border-radius: 0.5rem;
+		padding: 1.5rem;
+	}
+
+	.detail-heading {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 1.125rem;
+		font-weight: 600;
+		color: white;
+		margin: 0 0 1rem;
+	}
+
+	.detail-fields {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.field-label {
+		font-size: 0.75rem;
+		font-weight: 500;
+		color: rgba(194, 178, 128, 0.5);
+		display: block;
+		margin-bottom: 0.25rem;
+	}
+	.field-value {
+		color: rgba(194, 178, 128, 0.8);
+		margin: 0;
+	}
+	.field-list {
+		list-style: disc;
+		padding-left: 1rem;
+		font-size: 0.875rem;
+		color: rgba(194, 178, 128, 0.8);
+		margin: 0;
+	}
+	.field-list li {
+		margin-bottom: 0.25rem;
+	}
+
+	.tag-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.375rem;
+	}
+	.tag {
+		padding: 0.125rem 0.5rem;
+		background: rgba(194, 178, 128, 0.1);
+		color: rgba(194, 178, 128, 0.8);
+		font-size: 0.75rem;
+		border-radius: 0.25rem;
+	}
+
+	.chain-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
+		margin-top: 0.25rem;
+	}
+	.chain-item {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.875rem;
+		color: rgba(194, 178, 128, 0.8);
+	}
+	.chain-number {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.5rem;
+		height: 1.5rem;
+		background: rgba(99, 179, 237, 0.1);
+		color: #63b3ed;
+		font-size: 0.75rem;
+		border-radius: 9999px;
+	}
+
+	.item-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
+	}
+	.item-row {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.875rem;
+		color: rgba(194, 178, 128, 0.8);
+	}
+	.precedent-link {
+		font-size: 0.875rem;
+		color: #63b3ed;
+		cursor: pointer;
+	}
+	.precedent-link:hover {
+		text-decoration: underline;
+	}
+
+	.findings-section,
+	.attachments-section {
+		background: var(--color-panel, #1a1a2e);
+		border: 1px solid rgba(194, 178, 128, 0.2);
+		border-radius: 0.5rem;
+		padding: 1.5rem;
+	}
+
+	.section-title {
+		font-size: 1.125rem;
+		font-weight: 600;
+		color: white;
+		margin: 0 0 1rem;
+	}
+
+	.findings-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1.5rem;
+	}
+
+	.subsection-title {
+		font-weight: 500;
+		color: white;
+		margin: 0 0 0.5rem;
+	}
+
+	.findings-text {
+		color: rgba(194, 178, 128, 0.8);
+		margin: 0 0 1rem;
+	}
+
+	.confidence-bar-container {
+		margin-top: 1rem;
+	}
+	.confidence-header {
+		display: flex;
+		justify-content: space-between;
+		font-size: 0.875rem;
+		color: rgba(194, 178, 128, 0.6);
+		margin-bottom: 0.375rem;
+	}
+	.confidence-value {
+		font-weight: 600;
+		color: white;
+	}
+	.confidence-track {
+		width: 100%;
+		height: 0.5rem;
+		background: rgba(194, 178, 128, 0.1);
+		border-radius: 9999px;
+		overflow: hidden;
+	}
+	.confidence-fill {
+		height: 100%;
+		border-radius: 9999px;
+		transition: width 0.3s ease;
+	}
+	.confidence-fill.high {
+		background: var(--color-accent, #48bb78);
+	}
+	.confidence-fill.medium {
+		background: var(--color-warning, #ecc94b);
+	}
+	.confidence-fill.low {
+		background: var(--color-danger, #f56565);
+	}
+
+	.key-points {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+	.key-points li {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.5rem;
+		color: rgba(194, 178, 128, 0.8);
+		font-size: 0.875rem;
+	}
+
+	.attachments-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 1rem;
+	}
+	.attachment-card {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		border: 1px solid rgba(194, 178, 128, 0.2);
+		border-radius: 0.5rem;
+		padding: 1rem;
+	}
+	.attachment-card:hover {
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+	}
+	.attachment-icon {
+		padding: 0.5rem;
+		background: rgba(99, 179, 237, 0.1);
+		border-radius: 0.375rem;
+		color: #63b3ed;
+	}
+	.attachment-name {
+		font-weight: 500;
+		color: white;
+		margin: 0;
+		font-size: 0.875rem;
+	}
+	.attachment-meta {
+		font-size: 0.75rem;
+		color: rgba(194, 178, 128, 0.5);
+		margin: 0;
+	}
+
+	.mt-4 {
+		margin-top: 1rem;
+	}
+
+	@media (max-width: 1024px) {
+		.detail-grid {
+			grid-template-columns: 1fr;
+		}
+		.findings-grid {
+			grid-template-columns: 1fr;
+		}
+		.attachments-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+		.stats-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
 </style>
-
-
-
-
-

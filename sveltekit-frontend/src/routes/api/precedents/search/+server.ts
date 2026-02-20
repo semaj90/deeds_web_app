@@ -1,0 +1,205 @@
+/**
+ * POST /api/precedents/search
+ *
+ * Search legal precedents (case opinions, rulings).
+ * Uses PostgreSQL full-text search on title + summary with optional filters.
+ * Also searches Qdrant 'legal_cases' collection for semantic similarity.
+ *
+ * Request body: { query: string, court?: string, caseId?: string, limit?: number }
+ * Response: { results: PrecedentSearchResult[], timing: Timing }
+ */
+import { json, type RequestHandler } from '@sveltejs/kit';
+import db from '$lib/server/db';
+import { sql } from 'drizzle-orm';
+import { ENV } from '$lib/server/env.server.js';
+
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const QDRANT_URL = ENV.QDRANT_URL;
+const EMBEDDING_MODEL = 'embeddinggemma:latest';
+
+interface PrecedentSearchResult {
+	id: string;
+	title: string;
+	summary: string;
+	citation: string | null;
+	court: string | null;
+	caseId: string | null;
+	decisionDate: string | null;
+	similarity: number;
+	source: 'postgres' | 'qdrant';
+}
+
+async function embedQuery(query: string): Promise<number[] | null> {
+	try {
+		const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: query }),
+			signal: AbortSignal.timeout(8000)
+		});
+		if (!res.ok) return null;
+		const data = await res.json();
+		return Array.isArray(data.embedding) ? data.embedding : null;
+	} catch {
+		return null;
+	}
+}
+
+async function searchQdrantCases(
+	vector: number[],
+	limit: number,
+	caseId?: string
+): Promise<PrecedentSearchResult[]> {
+	try {
+		const filter = caseId
+			? { must: [{ key: 'case_id', match: { value: caseId } }] }
+			: undefined;
+
+		const res = await fetch(`${QDRANT_URL}/collections/legal_cases/points/search`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				vector,
+				limit,
+				with_payload: true,
+				score_threshold: 0.30,
+				filter
+			}),
+			signal: AbortSignal.timeout(5000)
+		});
+
+		if (!res.ok) return [];
+		const data = await res.json();
+		const hits = data.result ?? [];
+
+		return hits.map((hit: Record<string, unknown>) => {
+			const payload = hit.payload as Record<string, unknown> | undefined;
+			return {
+				id: String(hit.id),
+				title: String(payload?.title ?? payload?.case_name ?? ''),
+				summary: String(payload?.summary ?? payload?.content ?? payload?.text ?? ''),
+				citation: payload?.citation ? String(payload.citation) : null,
+				court: payload?.court ? String(payload.court) : null,
+				caseId: payload?.case_id ? String(payload.case_id) : null,
+				decisionDate: payload?.decision_date ? String(payload.decision_date) : null,
+				similarity: Number(hit.score ?? 0),
+				source: 'qdrant' as const
+			};
+		});
+	} catch {
+		return [];
+	}
+}
+
+export const POST: RequestHandler = async ({ request }) => {
+	const start = performance.now();
+	const body = await request.json();
+	const query = typeof body.query === 'string' ? body.query.trim() : '';
+	const court = typeof body.court === 'string' ? body.court : null;
+	const caseId = typeof body.caseId === 'string' ? body.caseId : undefined;
+	const limit = Math.min(Math.max(Number(body.limit) || 20, 1), 100);
+
+	if (!query) {
+		return json({ error: 'Missing query' }, { status: 400 });
+	}
+
+	const timing: Record<string, number> = {};
+
+	// Run embedding + text search in parallel
+	const embedStart = performance.now();
+	const [embedding, pgResults] = await Promise.all([
+		embedQuery(query),
+		(async () => {
+			const pgStart = performance.now();
+			try {
+				const sanitizedQuery = query.replace(/'/g, "''");
+				const courtFilter = court
+					? `AND lp.court ILIKE '%${court.replace(/'/g, "''")}%'`
+					: '';
+				const caseFilter = caseId
+					? `AND lp.case_id = '${caseId.replace(/'/g, "''")}'`
+					: '';
+
+				const results = await db.execute(sql.raw(`
+					SELECT
+						lp.id,
+						lp.title,
+						lp.summary,
+						lp.citation,
+						lp.court,
+						lp.case_id,
+						lp.decision_date,
+						ts_rank(
+							to_tsvector('english', lp.title || ' ' || lp.summary),
+							plainto_tsquery('english', '${sanitizedQuery}')
+						) AS similarity
+					FROM legal_precedents lp
+					WHERE to_tsvector('english', lp.title || ' ' || lp.summary)
+						@@ plainto_tsquery('english', '${sanitizedQuery}')
+						${courtFilter}
+						${caseFilter}
+					ORDER BY similarity DESC
+					LIMIT ${limit}
+				`));
+
+				timing.pg_search_ms = Math.round(performance.now() - pgStart);
+				const rows = [...results] as Record<string, unknown>[];
+				return rows.map((r): PrecedentSearchResult => ({
+					id: String(r.id),
+					title: String(r.title ?? ''),
+					summary: String(r.summary ?? ''),
+					citation: r.citation ? String(r.citation) : null,
+					court: r.court ? String(r.court) : null,
+					caseId: r.case_id ? String(r.case_id) : null,
+					decisionDate: r.decision_date ? String(r.decision_date) : null,
+					similarity: Number(r.similarity ?? 0),
+					source: 'postgres'
+				}));
+			} catch (err) {
+				console.error('[Precedents] PostgreSQL search failed:', err);
+				timing.pg_search_ms = Math.round(performance.now() - pgStart);
+				return [];
+			}
+		})()
+	]);
+
+	timing.embed_ms = Math.round(performance.now() - embedStart);
+
+	// Qdrant semantic search (if embedding succeeded)
+	let qdrantResults: PrecedentSearchResult[] = [];
+	if (embedding) {
+		const qdrantStart = performance.now();
+		qdrantResults = await searchQdrantCases(embedding, limit, caseId);
+		timing.qdrant_ms = Math.round(performance.now() - qdrantStart);
+	}
+
+	// Merge and deduplicate: Qdrant results take priority for same IDs
+	const seen = new Set<string>();
+	const merged: PrecedentSearchResult[] = [];
+
+	// Interleave by normalized similarity score
+	const allResults = [...qdrantResults, ...pgResults];
+	allResults.sort((a, b) => b.similarity - a.similarity);
+
+	for (const r of allResults) {
+		const key = r.id || `${r.title}:${r.citation}`;
+		if (!seen.has(key)) {
+			seen.add(key);
+			merged.push(r);
+		}
+		if (merged.length >= limit) break;
+	}
+
+	timing.total_ms = Math.round(performance.now() - start);
+
+	return json({
+		results: merged,
+		count: merged.length,
+		sources: {
+			postgres: pgResults.length,
+			qdrant: qdrantResults.length
+		},
+		timing,
+		model: embedding ? EMBEDDING_MODEL : 'text-search-only'
+	});
+};
