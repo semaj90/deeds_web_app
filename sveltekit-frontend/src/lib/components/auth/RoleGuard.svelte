@@ -10,10 +10,8 @@
     requireAll?: boolean; // For multiple roles, require all or just one
   }
   let { children, roles, fallback, requireAll = false }: Props = $props();
-  let allowedRoles = $derived(() => {
-    return Array.isArray(roles) ? roles : [roles];
-  });
-  let hasAccess = $derived(() => {
+  let allowedRoles = $derived(Array.isArray(roles) ? roles : [roles]);
+  let hasAccess = $derived.by(() => {
     if (!authStore.isAuthenticated || !authStore.session?.user) {
       return false;
     }
@@ -22,13 +20,12 @@
     if (userRole === 'admin') {
       return true;
     }
-    const rolesArray = allowedRoles();
     if (requireAll) {
       // User must have all specified roles (not typical for single role systems)
-      return rolesArray.every(role => userRole === role);
+      return allowedRoles.every(role => userRole === role);
     } else {
       // User must have at least one of the specified roles
-      return rolesArray.includes(userRole);
+      return allowedRoles.includes(userRole);
     }
   });
 </script>

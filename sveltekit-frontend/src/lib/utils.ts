@@ -84,37 +84,37 @@ export function throttle<T extends (...args: unknown[]) => unknown>(
  * Get confidence level styling based on score
  */
 export function getConfidenceLevel(confidence: number) {
-    if (confidence >= 0.9) {
+    if (confidence >= 0.85) {
         return {
             label: 'Very High',
             color: 'text-legal-success',
             bgColor: 'bg-legal-success/10',
             borderColor: 'border-legal-success',
         };
-    } else if (confidence >= 0.8) {
+    } else if (confidence >= 0.70) {
         return {
             label: 'High',
             color: 'text-legal-info',
             bgColor: 'bg-legal-info/10',
             borderColor: 'border-legal-info',
         };
-    } else if (confidence >= 0.7) {
+    } else if (confidence >= 0.50) {
         return {
-            label: 'Good',
+            label: 'Medium',
             color: 'text-legal-warning',
             bgColor: 'bg-legal-warning/10',
             borderColor: 'border-legal-warning',
         };
-    } else if (confidence >= 0.6) {
+    } else if (confidence >= 0.30) {
         return {
-            label: 'Fair',
+            label: 'Low',
             color: 'text-harvard-crimson',
             bgColor: 'bg-harvard-crimson/10',
             borderColor: 'border-harvard-crimson',
         };
     } else {
         return {
-            label: 'Low',
+            label: 'Marginal',
             color: 'text-legal-error',
             bgColor: 'bg-legal-error/10',
             borderColor: 'border-legal-error',

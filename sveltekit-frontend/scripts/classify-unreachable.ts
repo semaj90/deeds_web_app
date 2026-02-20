@@ -144,17 +144,24 @@ function classifyFile(relPath: string): ClassifiedFile {
 		corruptionSignals.push(`${brokenImports.length} broken imports`);
 	}
 
-	// Check for syntax fragments — lines that look like partial expressions
-	const fragmentLines = lines.filter(l => {
+	// Check for $state() rune usage in non-.svelte files (Phase 99 corruption signal)
+	if (ext !== '.svelte' && ext !== '.svelte.ts' && ext !== '.svelte.js') {
+		const runeLines = lines.filter(l => /\$state\s*\(/.test(l) || /\$derived\s*[.(]/.test(l));
+		if (runeLines.length > 3) {
+			corruptionSignals.push(`${runeLines.length} Svelte rune calls in ${ext} file`);
+		}
+	}
+
+	// Check for collapsed multi-statement lines (real minification signal)
+	const collapsedLines = lines.filter(l => {
 		const t = l.trim();
-		return t.length > 0 && (
-			/^[,;:)\]}]/.test(t) ||           // starts with closing punctuation
-			/[({[,]\s*$/.test(t) && t.length < 5 ||  // very short open bracket
-			/^\.\w+/.test(t)                    // starts with .member
-		);
+		// Lines with 3+ semicolons that aren't for-loops = collapsed statements
+		const semis = (t.match(/;/g) || []).length;
+		const hasForLoop = /\bfor\s*\(/.test(t);
+		return semis >= 3 && !hasForLoop && t.length > 100;
 	});
-	if (fragmentLines.length > lines.length * 0.2) {
-		corruptionSignals.push(`${fragmentLines.length} fragment lines`);
+	if (collapsedLines.length > 5) {
+		corruptionSignals.push(`${collapsedLines.length} collapsed multi-statement lines`);
 	}
 
 	// Svelte-specific corruption: script blocks that don't close
@@ -189,10 +196,17 @@ function classifyFile(relPath: string): ClassifiedFile {
 		result.reason = `test + ${corruptionSignals[0]}`;
 		return result;
 	}
+	// Single signal: only CORRUPTED for high-confidence signals
+	// (junk lines, broken imports, malformed types, script tags, collapsed lines, rune misuse)
+	// Non-ASCII alone is too noisy (could be legitimate Unicode)
 	if (corruptionSignals.length === 1) {
-		result.category = 'CORRUPTED';
-		result.reason = corruptionSignals[0];
-		return result;
+		const signal = corruptionSignals[0];
+		const isHighConfidence = !signal.startsWith('non-ASCII') && !signal.startsWith('0 ');
+		if (isHighConfidence) {
+			result.category = 'CORRUPTED';
+			result.reason = signal;
+			return result;
+		}
 	}
 
 	// If it's a test that passed all corruption checks, keep it as TEST

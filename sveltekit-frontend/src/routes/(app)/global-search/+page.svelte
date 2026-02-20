@@ -1,832 +1,1251 @@
 <script lang="ts">
-	// import { getOllamaEndpoint } from '$lib/server/ollama/client'; // Cannot import server code in client
+	import Button from '$lib/components/ui/Button.svelte';
+	import { getConfidenceLevel, formatProcessingTime } from '$lib/utils';
+	import Search from '@lucide/svelte/icons/search';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
+	import FileText from '@lucide/svelte/icons/file-text';
+	import Users from '@lucide/svelte/icons/users';
+	import Scale from '@lucide/svelte/icons/scale';
+	import MessageSquare from '@lucide/svelte/icons/message-square';
+	import Briefcase from '@lucide/svelte/icons/briefcase';
+	import Clock from '@lucide/svelte/icons/clock';
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import Network from '@lucide/svelte/icons/network';
+	import X from '@lucide/svelte/icons/x';
 
-	let searchQuery = $state ('');
-	let searchResults = $state<any[]>([]);
-	let isSearching = $state (false);
-	let webgpuCapabilities = $state({ hasWebGPU: false });
+	interface SearchResult {
+		chunk_id: string;
+		text: string;
+		snippet: string;
+		score: number;
+		confidence: string;
+		source_type: string;
+		source_id: string;
+		source_title: string;
+		source_url?: string;
+		section?: string;
+		related_entities: string[];
+	}
 
- let searchFilters = $state ({
- cases: true, evidence: true, persons: true, documents: true, communications: true
- });
- let searchScope = $state<'all' | 'recent' | 'archived'>('all');
- let selectedResult = $state<any>(null);
+	interface EvidenceBundle {
+		hit: {
+			evidenceId: string;
+			chunkIndex: number;
+			content: string;
+			score: number;
+			metadata: Record<string, unknown>;
+			rerank?: {
+				cosine: number;
+				sharedCitations: number;
+				jurisdictionMatch: number;
+				sectionProximity: number;
+				finalScore: number;
+			};
+		};
+		siblings: Array<{ content: string; chunkIndex: number }>;
+		sectionPath: string[];
+		heading: string;
+		citations: string[];
+		graphNeighbors: Array<{
+			nodeId: string;
+			title: string;
+			evidenceType: string;
+			connectionType: string;
+			strength: number;
+			confidence: number;
+		}>;
+		documentContext?: {
+			evidenceId: string;
+			fileName: string;
+			fileType: string;
+			description: string;
+			aiSummary?: string;
+		};
+	}
 
- // Search scopes
- const searchScopes = [
- { id: 'all', label: 'ALL RECORDS', icon: '🔍' },
-	{ id: 'recent', label: 'RECENT (7 DAYS)', icon: '🕐' },
-	{ id: 'archived', label: 'ARCHIVED', icon: '📦' }
- ] as const;
+	interface SearchTiming {
+		embedMs?: number;
+		searchMs?: number;
+		rerankMs?: number;
+		hopMs?: number;
+		kagMs?: number;
+		dagMs?: number;
+		totalMs?: number;
+		embedding_time_ms?: number;
+		search_time_ms?: number;
+	}
 
- // Mock search data
- let allRecords = $state ([
- {
- id: 'C001',
- type: 'case',
- title: 'Corporate Fraud Investigation',
- content: 'Investigation into embezzlement scheme at TechCorp Inc...',
- timestamp: '2024-01-15T10:30:00Z',
- relevance: 0.95,
- category: 'financial-crime',
- status: 'active'
- },
-	{
- id: 'E001',
- type: 'evidence',
- title: 'Financial Transaction Log',
- content: 'Wire transfer records showing suspicious activity...',
- timestamp: '2024-01-14T14:22:00Z',
- relevance: 0.87,
- category: 'document',
- status: 'verified'
- },
-	{
- id: 'P001',
- type: 'person',
- title: 'John Doe - POI',
- content: 'Person of interest in multiple fraud cases...',
- timestamp: '2024-01-13T09:15:00Z',
- relevance: 0.92,
- category: 'suspect',
- status: 'wanted'
- },
-	{
- id: 'D001',
- type: 'document',
- title: 'Legal Contract Analysis',
- content: 'Review of contract terms and potential violations...',
- timestamp: '2024-01-12T16:45:00Z',
- relevance: 0.78,
- category: 'legal-document',
- status: 'analyzed'
- },
-	{
- id: 'M001',
- type: 'communication',
- title: 'Intercepted Email',
- content: 'Email discussing illegal activities...',
- timestamp: '2024-01-11T11:20:00Z',
- relevance: 0.83,
- category: 'email',
- status: 'flagged'
- }
- ]);
+	let searchQuery = $state('');
+	let isSearching = $state(false);
+	let searchMode = $state<'rag' | 'evidence'>('evidence');
+	let caseIdFilter = $state('');
 
- async function performSearch() {
- if (!searchQuery.trim()) return;
+	// RAG search results
+	let ragResults = $state<SearchResult[]>([]);
+	let ragTiming = $state<SearchTiming | null>(null);
 
- isSearching = true;
- try {
- // Filter records based on active filters
- let filteredRecords = allRecords.filter(record => {
- const typeMatch = Object.entries(searchFilters).some(([type, enabled]) => {
- if (!enabled) return false;
- switch (type) {
- case 'cases': return record.type === 'case';
- case 'evidence': return record.type === 'evidence';
- case 'persons': return record.type === 'person';
- case 'documents': return record.type === 'document';
- case 'communications': return record.type === 'communication';
- default:return false;
- }
- });
+	// Evidence search results (RAG+KAG+DAG)
+	let evidenceBundles = $state<EvidenceBundle[]>([]);
+	let evidenceResults = $state<any[]>([]);
+	let evidenceTiming = $state<SearchTiming | null>(null);
 
- const scopeMatch = (() => {
- const recordDate = new Date(record.timestamp);
- const now = new Date();
- const daysDiff = (now.getTime() - recordDate.getTime()) / (1000 * 60 * 60 * 24);
+	let selectedResult = $state<SearchResult | null>(null);
+	let selectedBundle = $state<EvidenceBundle | null>(null);
+	let searchError = $state<string | null>(null);
+	let totalFound = $state(0);
 
- switch (searchScope) {
- case 'recent': return daysDiff <= 7;
- case 'archived': return daysDiff > 30;
- default:return true;
- }
- })();
+	let searchFilters = $state({
+		cases: true,
+		evidence: true,
+		documents: true,
+		persons: true,
+	});
 
- return typeMatch && scopeMatch;
- });
+	async function performSearch() {
+		if (!searchQuery.trim()) return;
 
-		// const endpoint = await getOllamaEndpoint(); // Server-side only
-		const endpoint = 'http://localhost:11434'; // Fallback for client-side
-		const semanticResults = await Promise.all(
-			filteredRecords.map(async (record) => {
-				try {
-					/*
-					const response = await fetch(`${endpoint}/api/embeddings`, {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({ model: 'embeddinggemma:latest',
-							prompt: `${searchQuery} ${record.content}`
-						})
-					});
+		isSearching = true;
+		searchError = null;
+		ragResults = [];
+		evidenceBundles = [];
+		evidenceResults = [];
+		selectedResult = null;
+		selectedBundle = null;
 
-					const embedding = await response.json();
-					*/
-					// Mock relevance calculation
-					const relevance = Math.random() * 0.3 + 0.7;
-					return { ...record, relevance };
-				} catch (error) {
-					return { ...record, relevance: Math.random() * 0.5 + 0.5 };
-				}
- })
- );
+		try {
+			if (searchMode === 'evidence') {
+				await searchEvidence();
+			} else {
+				await searchRAG();
+			}
+		} catch (err) {
+			console.error('Search failed:', err);
+			searchError = err instanceof Error ? err.message : 'Search failed';
+		} finally {
+			isSearching = false;
+		}
+	}
 
- // Sort by relevance and apply search query matching
- searchResults = semanticResults
- .filter(result =>
- result.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
- result.content.toLowerCase().includes(searchQuery.toLowerCase())
- )
- .sort((a, b) => b.relevance - a.relevance)
- .slice(0, 50); // Limit results
+	async function searchEvidence() {
+		const res = await fetch('/api/evidence/search', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				query: searchQuery,
+				caseId: caseIdFilter || undefined,
+				limit: 20,
+				expandSections: true,
+			}),
+		});
 
- } catch (error) {
- console.error('Search failed:', error);
- // Fallback to basic text search
- searchResults = allRecords
- .filter(result =>
- result.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
- result.content.toLowerCase().includes(searchQuery.toLowerCase())
- )
- .slice(0, 20);
- } finally {
- isSearching = false;
- }
- }
+		if (!res.ok) {
+			throw new Error(`Evidence search failed: ${res.status}`);
+		}
 
- function getTypeIcon(type: string) {
- switch (type) {
- case 'case': return '📋';
- case 'evidence': return '🔍';
- case 'person': return '👤';
- case 'document': return '📄';
- case 'communication': return '💬';
- default:return '📝';
- }
- }
+		const data = await res.json();
+		evidenceResults = data.results ?? [];
+		evidenceBundles = data.bundles ?? [];
+		evidenceTiming = data.timing ?? null;
+		totalFound = evidenceResults.length;
+	}
 
- function getStatusColor(status: string) {
- switch (status) {
- case 'active': return '#10b981';
- case 'verified': return '#34d399';
- case 'wanted': return '#dc2626';
- case 'analyzed': return '#3b82f6';
- case 'flagged': return '#f59e0b';
- default:return '#6b7280';
- }
- }
+	async function searchRAG() {
+		const res = await fetch('/api/rag/search', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				query: searchQuery,
+				top_k: 20,
+				min_score: 0.3,
+			}),
+		});
+
+		if (!res.ok) {
+			throw new Error(`RAG search failed: ${res.status}`);
+		}
+
+		const data = await res.json();
+		ragResults = data.chunks ?? [];
+		ragTiming = data;
+		totalFound = data.total_found ?? ragResults.length;
+	}
+
+	function getConfidenceFromScore(score: number) {
+		return getConfidenceLevel(score);
+	}
+
+	function getTypeIcon(type: string) {
+		switch (type) {
+			case 'case': return Briefcase;
+			case 'evidence': return Search;
+			case 'person': return Users;
+			case 'document': return FileText;
+			case 'legal': return Scale;
+			case 'communication': return MessageSquare;
+			default: return FileText;
+		}
+	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (e.key === 'Enter') performSearch();
+	}
 </script>
 
-<main class="global-search">
- <!-- Header -->
- <header class="search-header">
- <div class="header-title">
- <h1>GLOBAL SEARCH</h1>
- <div class="search-status">
- <span class="status-indicator {webgpuCapabilities?.hasWebGPU ? '' : 'inactive'}">
- {webgpuCapabilities?.hasWebGPU ? 'SEMANTIC SEARCH' : 'TEXT SEARCH'}
- </span>
- </div>
- </div>
- <div class="search-controls">
- <div class="scope-selector">
- {#each searchScopes as scope}
- <button
- class="scope-btn {searchScope === scope.id ? '' : ''}"
- onclick={() => searchScope = scope.id}
- >
- <span class="scope-icon">{scope.icon}</span>
- <span class="scope-label">{scope.label}</span>
- </button>
- {/each}
- </div>
- </div>
- </header>
+<div class="search-page">
+	<!-- Header -->
+	<header class="search-header">
+		<div class="header-content">
+			<div class="header-title">
+				<Search size={28} />
+				<div>
+					<h1>GLOBAL SEARCH</h1>
+					<p class="header-sub">RAG + KAG + DAG Multi-Stage Retrieval Pipeline</p>
+				</div>
+			</div>
 
- <!-- Search Interface -->
- <div class="search-layout">
- <!-- Search Panel -->
- <section class="search-panel">
- <div class="search-input-section">
- <div class="search-input-container">
- <input
- type="text"
- class="search-input"
- placeholder="Enter search query (e.g., 'fraud investigation', 'wire transfer', 'John Doe')..."
- bind:value={searchQuery}
- onkeydown={(e) => e.key === 'Enter' && performSearch()}
- />
- <button
- class="search-btn {isSearching ? '' : ''}"
- onclick={ performSearch }
- disabled={isSearching || !searchQuery.trim()}
- >
- {#if isSearching}
- <span class="loading-spinner"></span>
- SEARCHING...
- {:else}
- SEARCH
- {/if}
- </button>
- </div>
- </div>
+			<div class="mode-toggle">
+				<button
+					class="mode-btn"
+					class:active={searchMode === 'evidence'}
+					onclick={() => searchMode = 'evidence'}
+				>
+					<Network size={14} />
+					Evidence (RAG+KAG+DAG)
+				</button>
+				<button
+					class="mode-btn"
+					class:active={searchMode === 'rag'}
+					onclick={() => searchMode = 'rag'}
+				>
+					<Search size={14} />
+					Knowledge Base (RAG)
+				</button>
+			</div>
+		</div>
+	</header>
 
- <!-- Filters -->
- <div class="filters-section">
- <h3>SEARCH FILTERS</h3>
- <div class="filter-grid">
- <label class="filter-item">
- <input type="checkbox" bind:checked={searchFilters.cases} />
- <span class="filter-label">Cases</span>
- </label>
- <label class="filter-item">
- <input type="checkbox" bind:checked={searchFilters.evidence} />
- <span class="filter-label">Evidence</span>
- </label>
- <label class="filter-item">
- <input type="checkbox" bind:checked={searchFilters.persons} />
- <span class="filter-label">Persons</span>
- </label>
- <label class="filter-item">
- <input type="checkbox" bind:checked={searchFilters.documents} />
- <span class="filter-label">Documents</span>
- </label>
- <label class="filter-item">
- <input type="checkbox" bind:checked={searchFilters.communications} />
- <span class="filter-label">Communications</span>
- </label>
- </div>
- </div>
- </section>
+	<div class="search-layout">
+		<!-- Left Panel: Search + Filters -->
+		<aside class="filter-panel">
+			<div class="search-box">
+				<div class="search-input-wrap">
+					<Search size={16} class="search-icon" />
+					<input
+						type="text"
+						placeholder="Search evidence, cases, legal documents..."
+						bind:value={searchQuery}
+						onkeydown={handleKeydown}
+						class="search-input"
+					/>
+					{#if searchQuery}
+						<button class="clear-btn" onclick={() => { searchQuery = ''; }}>
+							<X size={14} />
+						</button>
+					{/if}
+				</div>
+				<Button
+					variant="default"
+					size="sm"
+					onclick={performSearch}
+					disabled={isSearching || !searchQuery.trim()}
+					class="search-submit"
+				>
+					{#if isSearching}
+						<Loader2 size={16} class="animate-spin" />
+					{:else}
+						SEARCH
+					{/if}
+				</Button>
+			</div>
 
- <!-- Results Panel -->
- <section class="results-panel">
- <div class="results-header">
- <h2>SEARCH RESULTS</h2>
- <span class="results-count">{searchResults.length} MATCHES</span>
- </div>
+			{#if searchMode === 'evidence'}
+				<div class="filter-section">
+					<h3>CASE FILTER</h3>
+					<input
+						type="text"
+						placeholder="Case ID (optional)"
+						bind:value={caseIdFilter}
+						class="filter-input"
+					/>
+				</div>
+			{/if}
 
- <div class="results-list">
-				{#each searchResults as result}
-					<!-- svelte-ignore a11y_no_static_element_interactions -->
-					<div
-						class="result-item {selectedResult?.id === result.id ? 'selected' : ''}"
-						onclick={() => selectedResult = result}
-						onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectedResult = result; } }}
-						role="button"
-						tabindex="0"
+			<div class="filter-section">
+				<h3>CATEGORIES</h3>
+				<div class="filter-grid">
+					{#each Object.entries(searchFilters) as [key, enabled]}
+						<label class="filter-item">
+							<input
+								type="checkbox"
+								checked={enabled}
+								onchange={() => searchFilters[key as keyof typeof searchFilters] = !searchFilters[key as keyof typeof searchFilters]}
+							/>
+							<span>{key.charAt(0).toUpperCase() + key.slice(1)}</span>
+						</label>
+					{/each}
+				</div>
+			</div>
+
+			<!-- Timing Breakdown -->
+			{#if (searchMode === 'evidence' && evidenceTiming) || (searchMode === 'rag' && ragTiming)}
+				{@const timing = searchMode === 'evidence' ? evidenceTiming : ragTiming}
+				<div class="timing-panel">
+					<h3><Clock size={14} /> PIPELINE TIMING</h3>
+					<div class="timing-grid">
+						{#if timing?.embedMs ?? timing?.embedding_time_ms}
+							<div class="timing-row">
+								<span>Embedding</span>
+								<span class="timing-value">{formatProcessingTime(timing?.embedMs ?? timing?.embedding_time_ms ?? 0)}</span>
+							</div>
+						{/if}
+						{#if timing?.searchMs ?? timing?.search_time_ms}
+							<div class="timing-row">
+								<span>Vector Search</span>
+								<span class="timing-value">{formatProcessingTime(timing?.searchMs ?? timing?.search_time_ms ?? 0)}</span>
+							</div>
+						{/if}
+						{#if timing?.rerankMs}
+							<div class="timing-row">
+								<span>Reranking</span>
+								<span class="timing-value">{formatProcessingTime(timing.rerankMs)}</span>
+							</div>
+						{/if}
+						{#if timing?.hopMs}
+							<div class="timing-row">
+								<span>Section Hop</span>
+								<span class="timing-value">{formatProcessingTime(timing.hopMs)}</span>
+							</div>
+						{/if}
+						{#if timing?.kagMs}
+							<div class="timing-row">
+								<span>KAG Graph</span>
+								<span class="timing-value">{formatProcessingTime(timing.kagMs)}</span>
+							</div>
+						{/if}
+						{#if timing?.dagMs}
+							<div class="timing-row">
+								<span>DAG Context</span>
+								<span class="timing-value">{formatProcessingTime(timing.dagMs)}</span>
+							</div>
+						{/if}
+						<div class="timing-row total">
+							<span>Total</span>
+							<span class="timing-value">{formatProcessingTime(timing?.totalMs ?? (timing?.search_time_ms ?? 0))}</span>
+						</div>
+					</div>
+				</div>
+			{/if}
+		</aside>
+
+		<!-- Center: Results -->
+		<main class="results-panel">
+			<div class="results-header">
+				<h2>SEARCH RESULTS</h2>
+				{#if totalFound > 0}
+					<span class="results-count">{totalFound} matches</span>
+				{/if}
+			</div>
+
+			{#if searchError}
+				<div class="error-msg">
+					<p>{searchError}</p>
+					<p class="error-hint">Ensure Qdrant and Ollama services are running.</p>
+				</div>
+			{:else if isSearching}
+				<div class="loading-state">
+					<Loader2 size={32} class="animate-spin" />
+					<p>Running {searchMode === 'evidence' ? 'RAG+KAG+DAG' : 'RAG'} pipeline...</p>
+				</div>
+			{:else if searchMode === 'evidence' && evidenceBundles.length > 0}
+				<!-- Evidence Bundles (RAG+KAG+DAG) -->
+				{#each evidenceBundles as bundle, i}
+					{@const conf = getConfidenceFromScore(bundle.hit.score)}
+					<button
+						class="bundle-card"
+						class:selected={selectedBundle === bundle}
+						onclick={() => { selectedBundle = bundle; selectedResult = null; }}
+						type="button"
 					>
- <div class="result-icon">
- <span class="type-icon">{getTypeIcon(result.type)}</span>
- </div>
- <div class="result-content">
- <div class="result-header">
- <h3 class="result-title">{result.title}</h3>
- <div class="result-meta">
- <span class="result-type">{result.type.toUpperCase()}</span>
- <span class="result-relevance">RELEVANCE: {(result.relevance * 100).toFixed(1)}%</span>
- <span
- class="result-status"
- style="background-color: {getStatusColor(result.status)}"
- >
- {result.status.toUpperCase()}
- </span>
- </div>
- </div>
- <div class="result-preview">
- {result.content.substring(0, 200)}...
- </div>
- <div class="result-details">
- <span class="result-category">{result.category.replace('-', ' ').toUpperCase()}</span>
- <span class="result-timestamp">
- {new Date(result.timestamp).toLocaleString()}
- </span>
- </div>
- </div>
- </div>
- {/each}
- </div>
- </section>
+						<div class="bundle-header">
+							<div class="bundle-rank">#{i + 1}</div>
+							<div class="bundle-title">
+								{bundle.heading || bundle.documentContext?.fileName || `Chunk ${bundle.hit.chunkIndex}`}
+							</div>
+							<div class="confidence-badge" style="color: var(--{conf.color}); background: var(--{conf.bgColor})">
+								{conf.label} ({(bundle.hit.score * 100).toFixed(1)}%)
+							</div>
+						</div>
+						<p class="bundle-preview">{bundle.hit.content.slice(0, 200)}...</p>
+						<div class="bundle-meta">
+							{#if bundle.sectionPath.length > 0}
+								<span class="meta-tag section">{bundle.sectionPath.join(' > ')}</span>
+							{/if}
+							{#if bundle.citations.length > 0}
+								<span class="meta-tag citation">{bundle.citations.length} citations</span>
+							{/if}
+							{#if bundle.siblings.length > 0}
+								<span class="meta-tag sibling">{bundle.siblings.length} siblings</span>
+							{/if}
+							{#if bundle.graphNeighbors.length > 0}
+								<span class="meta-tag graph">{bundle.graphNeighbors.length} graph links</span>
+							{/if}
+						</div>
+						{#if bundle.hit.rerank}
+							<div class="rerank-bar">
+								<span title="Cosine similarity">cos: {(bundle.hit.rerank.cosine * 100).toFixed(0)}%</span>
+								<span title="Shared citations">cite: {bundle.hit.rerank.sharedCitations}</span>
+								<span title="Section proximity">sec: {(bundle.hit.rerank.sectionProximity * 100).toFixed(0)}%</span>
+							</div>
+						{/if}
+					</button>
+				{/each}
+			{:else if searchMode === 'evidence' && evidenceResults.length > 0}
+				<!-- Flat evidence results (no bundles) -->
+				{#each evidenceResults as result, i}
+					{@const conf = getConfidenceFromScore(result.score)}
+					<div class="result-card">
+						<div class="bundle-header">
+							<div class="bundle-rank">#{i + 1}</div>
+							<div class="bundle-title">{result.content?.slice(0, 80) || 'Evidence chunk'}</div>
+							<div class="confidence-badge" style="color: var(--{conf.color}); background: var(--{conf.bgColor})">
+								{conf.label} ({(result.score * 100).toFixed(1)}%)
+							</div>
+						</div>
+					</div>
+				{/each}
+			{:else if searchMode === 'rag' && ragResults.length > 0}
+				<!-- RAG results -->
+				{#each ragResults as result, i}
+					{@const conf = getConfidenceFromScore(result.score)}
+					<button
+						class="result-card"
+						class:selected={selectedResult === result}
+						onclick={() => { selectedResult = result; selectedBundle = null; }}
+						type="button"
+					>
+						<div class="bundle-header">
+							<div class="bundle-rank">#{i + 1}</div>
+							<div class="bundle-title">{result.source_title}</div>
+							<div class="confidence-badge" style="color: var(--{conf.color}); background: var(--{conf.bgColor})">
+								{conf.label} ({(result.score * 100).toFixed(1)}%)
+							</div>
+						</div>
+						<p class="bundle-preview">{result.snippet || result.text?.slice(0, 200)}</p>
+						<div class="bundle-meta">
+							<span class="meta-tag source">{result.source_type}</span>
+							{#if result.confidence}
+								<span class="meta-tag confidence">{result.confidence}</span>
+							{/if}
+							{#if result.section}
+								<span class="meta-tag section">{result.section}</span>
+							{/if}
+							{#if result.related_entities?.length > 0}
+								<span class="meta-tag entity">{result.related_entities.length} entities</span>
+							{/if}
+						</div>
+					</button>
+				{/each}
+			{:else if !isSearching && searchQuery}
+				<div class="empty-state">
+					<Search size={48} />
+					<p>No results found for "{searchQuery}"</p>
+					<p class="empty-hint">Try broader search terms or switch search mode.</p>
+				</div>
+			{:else}
+				<div class="empty-state">
+					<Search size={48} />
+					<p>Enter a query to search</p>
+					<p class="empty-hint">Search across evidence, cases, legal documents, and knowledge base.</p>
+				</div>
+			{/if}
+		</main>
 
- <!-- Detail Panel -->
- <section class="detail-panel">
- {#if selectedResult}
- <div class="detail-header">
- <h2>RECORD DETAILS</h2>
- <div class="detail-actions">
- <button class="action-btn primary">VIEW FULL</button>
- <button class="action-btn secondary">EXPORT</button>
- <button class="action-btn ghost">LINK</button>
- </div>
- </div>
+		<!-- Right Panel: Detail -->
+		<aside class="detail-panel">
+			{#if selectedBundle}
+				{@const conf = getConfidenceFromScore(selectedBundle.hit.score)}
+				<div class="detail-header">
+					<h3>CONTEXT BUNDLE</h3>
+				</div>
+				<div class="detail-body">
+					<div class="detail-section">
+						<h4>CONFIDENCE RANKING</h4>
+						<div class="confidence-display">
+							<div class="confidence-bar-track">
+								<div class="confidence-bar-fill" style="width: {selectedBundle.hit.score * 100}%"></div>
+							</div>
+							<span class="confidence-label">{conf.label} — {(selectedBundle.hit.score * 100).toFixed(1)}%</span>
+						</div>
+						{#if selectedBundle.hit.rerank}
+							<div class="rerank-detail">
+								<div class="rerank-row">
+									<span>Cosine (75%)</span>
+									<span>{(selectedBundle.hit.rerank.cosine * 100).toFixed(1)}%</span>
+								</div>
+								<div class="rerank-row">
+									<span>Citations (15%)</span>
+									<span>{selectedBundle.hit.rerank.sharedCitations} shared</span>
+								</div>
+								<div class="rerank-row">
+									<span>Context (10%)</span>
+									<span>{(selectedBundle.hit.rerank.sectionProximity * 100).toFixed(0)}% section depth</span>
+								</div>
+							</div>
+						{/if}
+					</div>
 
- <div class="detail-content">
- <div class="detail-section">
- <h3>RECORD INFORMATION</h3>
- <div class="detail-grid">
- <div class="detail-row">
- <span class="detail-label">ID:</span>
- <span class="detail-value">{selectedResult.id}</span>
- </div>
- <div class="detail-row">
- <span class="detail-label">TYPE:</span>
- <span class="detail-value">{selectedResult.type.toUpperCase()}</span>
- </div>
- <div class="detail-row">
- <span class="detail-label">CATEGORY:</span>
- <span class="detail-value">{selectedResult.category.replace('-', ' ').toUpperCase()}</span>
- </div>
- <div class="detail-row">
- <span class="detail-label">STATUS:</span>
- <span class="detail-value status" style="color: {getStatusColor(selectedResult.status)}">
- {selectedResult.status.toUpperCase()}
- </span>
- </div>
- <div class="detail-row">
- <span class="detail-label">TIMESTAMP:</span>
- <span class="detail-value">{new Date(selectedResult.timestamp).toLocaleString()}</span>
- </div>
- <div class="detail-row">
- <span class="detail-label">RELEVANCE:</span>
- <span class="detail-value">{(selectedResult.relevance * 100).toFixed(1)}%</span>
- </div>
- </div>
- </div>
+					<!-- Document Context -->
+					{#if selectedBundle.documentContext}
+						<div class="detail-section">
+							<h4>DOCUMENT</h4>
+							<p class="detail-value">{selectedBundle.documentContext.fileName}</p>
+							{#if selectedBundle.documentContext.description}
+								<p class="detail-desc">{selectedBundle.documentContext.description}</p>
+							{/if}
+							{#if selectedBundle.documentContext.aiSummary}
+								<p class="detail-summary">{selectedBundle.documentContext.aiSummary}</p>
+							{/if}
+						</div>
+					{/if}
 
- <div class="detail-section">
- <h3>CONTENT</h3>
- <div class="content-preview">
- {selectedResult.content}
- </div>
- </div>
+					<!-- Content -->
+					<div class="detail-section">
+						<h4>CONTENT</h4>
+						<pre class="detail-content">{selectedBundle.hit.content}</pre>
+					</div>
 
- {#if selectedResult.type === 'person'}
- <div class="detail-section">
- <h3>PERSON PROFILE</h3>
- <div class="profile-info">
- <p><strong>Role:</strong> Suspect in multiple investigations</p>
- <p><strong>Last Known:</strong> Unknown</p>
- <p><strong>Threat Level:</strong> High</p>
- </div>
- </div>
- {/if}
+					<!-- Section Path -->
+					{#if selectedBundle.sectionPath.length > 0}
+						<div class="detail-section">
+							<h4>SECTION PATH</h4>
+							<div class="section-breadcrumb">
+								{#each selectedBundle.sectionPath as seg, i}
+									{#if i > 0}<ChevronRight size={12} />{/if}
+									<span>{seg}</span>
+								{/each}
+							</div>
+						</div>
+					{/if}
 
- {#if selectedResult.type === 'case'}
- <div class="detail-section">
- <h3>CASE DETAILS</h3>
- <div class="case-info">
- <p><strong>Priority:</strong> High</p>
- <p><strong>Assigned:</strong> Detective Unit Alpha</p>
- <p><strong>Progress:</strong> 75% Complete</p>
- </div>
- </div>
- {/if}
- </div>
- {:else}
- <div class="detail-placeholder">
- <div class="placeholder-icon">🔍</div>
- <h3>NO SELECTION</h3>
- <p>Select a search result to view details</p>
- </div>
- {/if}
- </section>
- </div>
-</main>
+					<!-- Citations -->
+					{#if selectedBundle.citations.length > 0}
+						<div class="detail-section">
+							<h4>CITATIONS ({selectedBundle.citations.length})</h4>
+							<ul class="citation-list">
+								{#each selectedBundle.citations as cit}
+									<li>{cit}</li>
+								{/each}
+							</ul>
+						</div>
+					{/if}
+
+					<!-- Siblings -->
+					{#if selectedBundle.siblings.length > 0}
+						<div class="detail-section">
+							<h4>SIBLING CHUNKS ({selectedBundle.siblings.length})</h4>
+							{#each selectedBundle.siblings.slice(0, 3) as sib}
+								<div class="sibling-chunk">
+									<span class="chunk-idx">#{sib.chunkIndex}</span>
+									<p>{sib.content.slice(0, 150)}...</p>
+								</div>
+							{/each}
+						</div>
+					{/if}
+
+					<!-- Graph Neighbors -->
+					{#if selectedBundle.graphNeighbors.length > 0}
+						<div class="detail-section">
+							<h4><Network size={14} /> GRAPH NEIGHBORS ({selectedBundle.graphNeighbors.length})</h4>
+							{#each selectedBundle.graphNeighbors as neighbor}
+								<div class="neighbor-card">
+									<div class="neighbor-header">
+										<span class="neighbor-title">{neighbor.title}</span>
+										<span class="neighbor-type">{neighbor.connectionType}</span>
+									</div>
+									<div class="neighbor-meta">
+										<span>Strength: {neighbor.strength}</span>
+										<span>Confidence: {(neighbor.confidence * 100).toFixed(0)}%</span>
+									</div>
+								</div>
+							{/each}
+						</div>
+					{/if}
+				</div>
+			{:else if selectedResult}
+				{@const conf = getConfidenceFromScore(selectedResult.score)}
+				<div class="detail-header">
+					<h3>RESULT DETAIL</h3>
+				</div>
+				<div class="detail-body">
+					<div class="detail-section">
+						<h4>CONFIDENCE</h4>
+						<div class="confidence-display">
+							<div class="confidence-bar-track">
+								<div class="confidence-bar-fill" style="width: {selectedResult.score * 100}%"></div>
+							</div>
+							<span class="confidence-label">{conf.label} — {(selectedResult.score * 100).toFixed(1)}%</span>
+						</div>
+					</div>
+					<div class="detail-section">
+						<h4>SOURCE</h4>
+						<p class="detail-value">{selectedResult.source_title}</p>
+						<p class="detail-desc">{selectedResult.source_type}</p>
+					</div>
+					<div class="detail-section">
+						<h4>CONTENT</h4>
+						<pre class="detail-content">{selectedResult.text}</pre>
+					</div>
+					{#if selectedResult.related_entities?.length > 0}
+						<div class="detail-section">
+							<h4>ENTITIES</h4>
+							<div class="entity-list">
+								{#each selectedResult.related_entities as entity}
+									<span class="entity-tag">{entity}</span>
+								{/each}
+							</div>
+						</div>
+					{/if}
+				</div>
+			{:else}
+				<div class="detail-placeholder">
+					<Search size={40} />
+					<h3>NO SELECTION</h3>
+					<p>Select a search result to view details, confidence ranking, and graph connections.</p>
+				</div>
+			{/if}
+		</aside>
+	</div>
+</div>
 
 <style>
- .global-search {
- background: linear-gradient(135deg, #0d1117, #161b22);
- min-height: 100vh;
-color: #f0f6fc;
- font-family: 'JetBrains Mono', monospace;
- position: relative;
- }
+	.search-page {
+		display: flex;
+		flex-direction: column;
+		height: 100vh;
+		background: #1a1610;
+		color: #d4c9a9;
+		font-family: 'JetBrains Mono', monospace;
+	}
 
- .global-search::before { content: '';
-		position: fixed;
- top: 0;
-left: 0;
- width: 100%;
-height: 100%;
- background:
- linear-gradient(90deg, rgba(16, 185, 129, 0.1) 1px, transparent 1px),
- linear-gradient(rgba(16, 185, 129, 0.1) 1px, transparent 1px);
- background-size: 20px 20px;
- pointer-events: none;
- z-index: -1;
- }
+	.search-header {
+		padding: 1rem 1.5rem;
+		background: #2a2016;
+		border-bottom: 2px solid #3a3020;
+	}
 
- .search-header {
- background: rgba(0, 0, 0, 0.8);
- border-bottom: 2px solid #10b981;
- padding: 1rem 2rem;
- box-shadow: 0 2px 10px rgba(16, 185, 129, 0.2);
- }
-
- .header-title h1 {
- color: #10b981;
- font-family: 'Press Start 2P', cursive;
- font-size: 2rem;
-margin: 0;
- text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
- }
-
- .search-status {
- margin-top: 0.5rem;
- }
-
- .status-indicator {
- padding: 0.25rem 0.75rem;
- font-size: 0.75rem;
- border-radius: 4px;
- font-weight: bold;
- }
-
- .status-indicator.inactive { background: #6b7280;
-		color: #f9fafb;
- }
-
- .search-controls {
- margin-top: 1rem;
- }
-
- .scope-selector { display: flex;
-		gap: 0.5rem;
- }
-
- .scope-btn {
- display: flex;
- align-items: center;
-gap: 0.5rem;
- padding: 0.75rem 1rem;
- background: rgba(30, 41, 59, 0.8);
- border: 1px solid #6b7280;
- color: #f0f6fc;
- border-radius: 8px;
-cursor: pointer;
- transition: all 0.3s ease;
- }
-
- .scope-btn:hover {
- background: rgba(16, 185, 129, 0.2);
- border-color: #10b981;
- box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
- }
-
- .scope-icon {
- font-size: 1.25rem;
- }
-
- .search-layout {
- display: grid;
- grid-template-columns: 400px 1fr 350px;
- gap: 1rem;
-height: calc(100vh - 140px);
- padding: 1rem;
- }
-
- .search-panel,
- .results-panel,
- .detail-panel {
- background: rgba(13, 17, 23, 0.9);
- border: 2px solid #10b981;
- border-radius: 8px;
-padding: 1rem;
- box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
- }
-
- .search-input-section {
- margin-bottom: 2rem;
- }
-
- .search-input-container { display: flex;
-		gap: 0.5rem;
- }
-
- .search-input { flex: 1;
-		padding: 0.75rem;
- background: rgba(30, 41, 59, 0.8);
- border: 1px solid #6b7280;
- border-radius: 4px;
-color: #f0f6fc;
- font-family: 'JetBrains Mono', monospace;
- font-size: 1rem;
- }
-
- .search-input:focus {
- outline: none;
- border-color: #10b981;
- box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
- }
-
- .search-btn {
- padding: 0.75rem 1.5rem;
- background: linear-gradient(90deg, #10b981, #34d399);
- border: none;
- border-radius: 4px;
-color: #0d1117;
- font-weight: bold;
-cursor: pointer;
- transition: all 0.3s ease;
- }
-
- .search-btn:not(:disabled):hover {
- filter: brightness(0.95);
- box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
- }
-
- .search-btn:disabled { opacity: 0.6;
-		cursor:not-allowed;
- }
-
- .loading-spinner { display: inline-block;
-		width: 16px;
- height: 16px;
-border: 2px solid #0d1117;
- border-radius: 50%;
- border-top-color: transparent;
-animation: spin 1s ease-in-out infinite;
- margin-right: 0.5rem;
- }
-
- @keyframes spin {
- to { transform: rotate(360deg); }
- }
-
- .filters-section h3 {
- color: #10b981;
- font-family: 'Press Start 2P', cursive;
- font-size: 0.875rem;
-margin: 0 0 1rem 0;
- text-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
- }
-
- .filter-grid {
- display: grid;
- grid-template-columns: repeat(2, 1fr);
- gap: 0.75rem;
- }
-
- .filter-item {
- display: flex;
- align-items: center;
-gap: 0.5rem;
- cursor: pointer;
- }
-
- .filter-item input[type="checkbox"] {
- accent-color: #10b981;
- }
-
- .filter-label {
- color: #f0f6fc;
- font-size: 0.875rem;
- }
-
- .results-header h2 {
- color: #10b981;
- font-family: 'Press Start 2P', cursive;
- font-size: 1rem;
-margin: 0 0 1rem 0;
- text-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
- }
-
- .results-count {
- color: #9ca3af;
- font-size: 0.75rem;
- }
-
- .results-list {
- max-height: calc(100vh - 300px);
- overflow-y: auto;
- }
-
- .result-item { display: flex;
+	.header-content {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: wrap;
 		gap: 1rem;
- padding: 1rem;
-background: rgba(30, 41, 59, 0.5);
- border: 1px solid #6b7280;
- border-radius: 8px;
- margin-bottom: 0.75rem;
-cursor: pointer;
- transition: all 0.3s ease;
- }
+	}
 
- .result-item:hover,
- .result-item.selected {
- border-color: #10b981;
- box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
- }
-
- .result-icon {
- display: flex;
- align-items: center;
- justify-content: center;
-width: 40px;
- height: 40px;
-background: rgba(16, 185, 129, 0.2);
- border-radius: 8px;
- }
-
- .type-icon {
- font-size: 1.25rem;
- }
-
- .result-content {
- flex: 1;
- }
-
- .result-header {
- display: flex;
- justify-content: space-between;
- align-items: flex-start;
- margin-bottom: 0.5rem;
- }
-
- .result-title {
- color: #f0f6fc;
- font-size: 1rem;
-margin: 0;
- font-weight: bold;
- }
-
- .result-meta { display: flex;
+	.header-title {
+		display: flex;
+		align-items: center;
 		gap: 0.75rem;
- font-size: 0.75rem;
- }
+	}
 
- .result-type {
- color: #10b981;
- font-weight: bold;
- }
+	.header-title h1 {
+		margin: 0;
+		font-size: 1.25rem;
+		letter-spacing: 0.15em;
+		color: #f8f0d9;
+	}
 
- .result-relevance {
- color: #34d399;
- }
+	.header-sub {
+		margin: 0;
+		font-size: 0.7rem;
+		color: #8a7a5a;
+		letter-spacing: 0.05em;
+	}
 
- .result-status {
- padding: 0.125rem 0.375rem;
- border-radius: 3px;
-color: #0d1117;
- font-weight: bold;
- font-size: 0.625rem;
- }
+	.mode-toggle {
+		display: flex;
+		gap: 4px;
+		background: #1a1610;
+		border-radius: 6px;
+		padding: 3px;
+	}
 
- .result-preview {
- color: #9ca3af;
- font-size: 0.875rem;
- line-height: 1.4;
- margin-bottom: 0.5rem;
- }
+	.mode-btn {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		padding: 0.4rem 0.75rem;
+		font-size: 0.7rem;
+		font-family: inherit;
+		font-weight: 600;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		background: transparent;
+		color: #8a7a5a;
+		transition: all 0.15s;
+		letter-spacing: 0.03em;
+	}
 
- .result-details {
- display: flex;
- justify-content: space-between;
- font-size: 0.75rem;
- }
+	.mode-btn.active {
+		background: #3a3020;
+		color: #f8f0d9;
+	}
 
- .result-category {
- color: #6b7280;
- text-transform: uppercase;
- }
+	.mode-btn:hover:not(.active) {
+		color: #d4c9a9;
+	}
 
- .result-timestamp {
- color: #9ca3af;
- }
+	/* Layout */
+	.search-layout {
+		display: grid;
+		grid-template-columns: 280px 1fr 340px;
+		gap: 0;
+		flex: 1;
+		min-height: 0;
+	}
 
- .detail-header {
- display: flex;
- justify-content: space-between;
- align-items: center;
- margin-bottom: 1rem;
- }
+	/* Filter Panel */
+	.filter-panel {
+		background: #221d15;
+		border-right: 1px solid #3a3020;
+		padding: 1rem;
+		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
 
- .detail-header h2 {
- color: #10b981;
- font-family: 'Press Start 2P', cursive;
- font-size: 1rem;
-margin: 0;
- text-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
- }
+	.search-box {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
 
- .detail-actions { display: flex;
-		gap: 0.5rem;
- }
+	.search-input-wrap {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		background: #1a1610;
+		border: 1px solid #3a3020;
+		border-radius: 4px;
+		padding: 0 8px;
+	}
 
- .action-btn {
- padding: 0.5rem 0.75rem;
- border-radius: 4px;
-border: 1px solid transparent;
- cursor: pointer;
- font-size: 0.75rem;
- font-weight: bold;
-transition: all 0.3s ease;
- }
+	.search-input-wrap :global(.search-icon) {
+		color: #8a7a5a;
+		flex-shrink: 0;
+	}
 
- .action-btn.primary {
- background: linear-gradient(90deg, #10b981, #34d399);
- color: #0d1117;
- }
+	.search-input {
+		flex: 1;
+		background: transparent;
+		border: none;
+		color: #f8f0d9;
+		font-family: inherit;
+		font-size: 0.8rem;
+		padding: 8px 0;
+		outline: none;
+	}
 
- .action-btn.secondary {
- background: linear-gradient(90deg, #6b7280, #9ca3af);
- color: #0d1117;
- }
+	.search-input::placeholder {
+		color: #5a5040;
+	}
 
- .action-btn.ghost { background: transparent;
-		color: #10b981;
- border: 1px dashed rgba(16, 185, 129, 0.25);
- }
+	.clear-btn {
+		background: none;
+		border: none;
+		color: #8a7a5a;
+		cursor: pointer;
+		padding: 2px;
+		display: flex;
+	}
 
- .action-btn:hover {
- filter: brightness(0.95);
- }
+	.clear-btn:hover {
+		color: #f8f0d9;
+	}
 
- .detail-content {
- max-height: calc(100vh - 250px);
- overflow-y: auto;
- }
+	.filter-section h3 {
+		font-size: 0.65rem;
+		letter-spacing: 0.15em;
+		color: #8a7a5a;
+		margin: 0 0 8px;
+		font-weight: 600;
+	}
 
- .detail-section {
- margin-bottom: 1.5rem;
- }
+	.filter-input {
+		width: 100%;
+		padding: 6px 10px;
+		background: #1a1610;
+		border: 1px solid #3a3020;
+		border-radius: 4px;
+		color: #f8f0d9;
+		font-family: inherit;
+		font-size: 0.75rem;
+	}
 
- .detail-section h3 {
- color: #10b981;
- font-family: 'Press Start 2P', cursive;
- font-size: 0.75rem;
-margin: 0 0 0.75rem 0;
- text-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
- }
+	.filter-grid {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
 
- .detail-grid { display: grid;
-		gap: 0.5rem;
- }
+	.filter-item {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 0.75rem;
+		cursor: pointer;
+		color: #d4c9a9;
+	}
 
- .detail-row { display: flex;
-		gap: 0.5rem;
- }
+	.filter-item input[type="checkbox"] {
+		accent-color: #c9a96e;
+	}
 
- .detail-label {
- color: #9ca3af;
- font-weight: bold;
- min-width: 80px;
- }
+	/* Timing Panel */
+	.timing-panel {
+		background: #1a1610;
+		border: 1px solid #3a3020;
+		border-radius: 4px;
+		padding: 10px;
+	}
 
- .detail-value {
- color: #f0f6fc;
- }
+	.timing-panel h3 {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 0.65rem;
+		letter-spacing: 0.15em;
+		color: #c9a96e;
+		margin: 0 0 8px;
+	}
 
- .detail-value.status {
- font-weight: bold;
- }
+	.timing-grid {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
 
- .content-preview {
- color: #e5e7eb;
- font-size: 0.875rem;
- line-height: 1.5;
-background: rgba(30, 41, 59, 0.5);
- padding: 0.75rem;
- border-radius: 4px;
- }
+	.timing-row {
+		display: flex;
+		justify-content: space-between;
+		font-size: 0.7rem;
+		color: #8a7a5a;
+	}
 
- .profile-info p,
- .case-info p {
- color: #e5e7eb;
- font-size: 0.875rem;
-margin: 0.25rem 0;
- }
+	.timing-row.total {
+		border-top: 1px solid #3a3020;
+		padding-top: 4px;
+		margin-top: 2px;
+		color: #f8f0d9;
+		font-weight: 600;
+	}
 
- .detail-placeholder {
- display: flex;
- flex-direction: column;
- align-items: center;
- justify-content: center;
-height: 400px;
- text-align: center;
- }
+	.timing-value {
+		color: #d4c9a9;
+		font-variant-numeric: tabular-nums;
+	}
 
- .placeholder-icon {
- font-size: 3rem;
- margin-bottom: 1rem;
-opacity: 0.5;
- }
+	/* Results Panel */
+	.results-panel {
+		padding: 1rem;
+		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
 
- .detail-placeholder h3 {
- color: #10b981;
- font-family: 'Press Start 2P', cursive;
- font-size: 1rem;
-margin: 0 0 0.5rem 0;
- }
+	.results-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 4px;
+	}
 
- .detail-placeholder p {
- color: #9ca3af;
- font-size: 0.875rem;
-margin: 0;
- }
+	.results-header h2 {
+		margin: 0;
+		font-size: 0.8rem;
+		letter-spacing: 0.15em;
+		color: #c9a96e;
+	}
+
+	.results-count {
+		font-size: 0.7rem;
+		color: #8a7a5a;
+	}
+
+	.bundle-card, .result-card {
+		background: #221d15;
+		border: 1px solid #3a3020;
+		border-radius: 4px;
+		padding: 12px;
+		cursor: pointer;
+		transition: all 0.15s;
+		text-align: left;
+		width: 100%;
+		font-family: inherit;
+		color: #d4c9a9;
+	}
+
+	.bundle-card:hover, .result-card:hover {
+		border-color: #c9a96e;
+	}
+
+	.bundle-card.selected, .result-card.selected {
+		border-color: #c9a96e;
+		background: #2a2418;
+	}
+
+	.bundle-header {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-bottom: 6px;
+	}
+
+	.bundle-rank {
+		font-size: 0.65rem;
+		color: #8a7a5a;
+		font-weight: 700;
+		min-width: 24px;
+	}
+
+	.bundle-title {
+		flex: 1;
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: #f8f0d9;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.confidence-badge {
+		font-size: 0.65rem;
+		font-weight: 600;
+		padding: 2px 8px;
+		border-radius: 3px;
+		white-space: nowrap;
+		background: #2a2016;
+	}
+
+	.bundle-preview {
+		margin: 0 0 8px;
+		font-size: 0.75rem;
+		color: #8a7a5a;
+		line-height: 1.5;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.bundle-meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+	}
+
+	.meta-tag {
+		font-size: 0.6rem;
+		padding: 2px 6px;
+		border-radius: 3px;
+		background: #1a1610;
+		color: #8a7a5a;
+		font-weight: 500;
+	}
+
+	.meta-tag.section { color: #c9a96e; }
+	.meta-tag.citation { color: #6ba3a0; }
+	.meta-tag.sibling { color: #8a9a6a; }
+	.meta-tag.graph { color: #a07a5a; }
+	.meta-tag.source { color: #c9a96e; }
+	.meta-tag.confidence { color: #8a9a6a; }
+	.meta-tag.entity { color: #6ba3a0; }
+
+	.rerank-bar {
+		display: flex;
+		gap: 12px;
+		margin-top: 6px;
+		padding-top: 6px;
+		border-top: 1px solid #2a2418;
+		font-size: 0.6rem;
+		color: #5a5040;
+	}
+
+	/* Loading / Error / Empty states */
+	.loading-state, .empty-state {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 1rem;
+		padding: 4rem 2rem;
+		color: #5a5040;
+		text-align: center;
+	}
+
+	.loading-state p, .empty-state p {
+		margin: 0;
+		font-size: 0.85rem;
+	}
+
+	.empty-hint, .error-hint {
+		font-size: 0.7rem;
+		color: #4a4030;
+	}
+
+	.error-msg {
+		padding: 1rem;
+		background: #2a1515;
+		border: 1px solid #5a2020;
+		border-radius: 4px;
+		text-align: center;
+	}
+
+	.error-msg p {
+		margin: 0 0 4px;
+		color: #d4a0a0;
+		font-size: 0.8rem;
+	}
+
+	/* Detail Panel */
+	.detail-panel {
+		background: #221d15;
+		border-left: 1px solid #3a3020;
+		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.detail-header {
+		padding: 1rem;
+		border-bottom: 1px solid #3a3020;
+	}
+
+	.detail-header h3 {
+		margin: 0;
+		font-size: 0.7rem;
+		letter-spacing: 0.15em;
+		color: #c9a96e;
+	}
+
+	.detail-body {
+		padding: 1rem;
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.detail-section h4 {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		margin: 0 0 8px;
+		font-size: 0.65rem;
+		letter-spacing: 0.12em;
+		color: #8a7a5a;
+	}
+
+	.confidence-display {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.confidence-bar-track {
+		height: 6px;
+		background: #1a1610;
+		border-radius: 3px;
+		overflow: hidden;
+	}
+
+	.confidence-bar-fill {
+		height: 100%;
+		background: linear-gradient(90deg, #8B1521, #B8965A, #2D5F3F);
+		border-radius: 3px;
+		transition: width 0.3s;
+	}
+
+	.confidence-label {
+		font-size: 0.75rem;
+		color: #d4c9a9;
+		font-weight: 600;
+	}
+
+	.rerank-detail {
+		margin-top: 8px;
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.rerank-row {
+		display: flex;
+		justify-content: space-between;
+		font-size: 0.7rem;
+		color: #8a7a5a;
+	}
+
+	.detail-value {
+		font-size: 0.8rem;
+		color: #f8f0d9;
+		font-weight: 500;
+	}
+
+	.detail-desc {
+		font-size: 0.75rem;
+		color: #8a7a5a;
+		margin: 4px 0 0;
+	}
+
+	.detail-summary {
+		font-size: 0.75rem;
+		color: #a09070;
+		margin: 6px 0 0;
+		font-style: italic;
+	}
+
+	.detail-content {
+		font-size: 0.75rem;
+		color: #d4c9a9;
+		line-height: 1.6;
+		white-space: pre-wrap;
+		word-break: break-word;
+		background: #1a1610;
+		padding: 10px;
+		border-radius: 4px;
+		border: 1px solid #2a2418;
+		margin: 0;
+		font-family: inherit;
+		max-height: 300px;
+		overflow-y: auto;
+	}
+
+	.section-breadcrumb {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		font-size: 0.7rem;
+		color: #c9a96e;
+		flex-wrap: wrap;
+	}
+
+	.citation-list {
+		margin: 0;
+		padding: 0 0 0 1rem;
+		list-style: disc;
+		font-size: 0.7rem;
+		color: #6ba3a0;
+	}
+
+	.citation-list li {
+		margin-bottom: 4px;
+	}
+
+	.sibling-chunk {
+		background: #1a1610;
+		padding: 8px;
+		border-radius: 4px;
+		margin-bottom: 6px;
+		border: 1px solid #2a2418;
+	}
+
+	.chunk-idx {
+		font-size: 0.6rem;
+		color: #8a7a5a;
+		font-weight: 700;
+	}
+
+	.sibling-chunk p {
+		margin: 4px 0 0;
+		font-size: 0.7rem;
+		color: #8a7a5a;
+		line-height: 1.4;
+	}
+
+	.neighbor-card {
+		background: #1a1610;
+		padding: 8px;
+		border-radius: 4px;
+		border: 1px solid #2a2418;
+		margin-bottom: 6px;
+	}
+
+	.neighbor-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 4px;
+	}
+
+	.neighbor-title {
+		font-size: 0.75rem;
+		color: #f8f0d9;
+		font-weight: 500;
+	}
+
+	.neighbor-type {
+		font-size: 0.6rem;
+		color: #a07a5a;
+		background: #2a2016;
+		padding: 2px 6px;
+		border-radius: 3px;
+	}
+
+	.neighbor-meta {
+		display: flex;
+		gap: 12px;
+		font-size: 0.65rem;
+		color: #8a7a5a;
+	}
+
+	.entity-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px;
+	}
+
+	.entity-tag {
+		font-size: 0.65rem;
+		padding: 2px 6px;
+		border-radius: 3px;
+		background: #1a2a2a;
+		color: #6ba3a0;
+	}
+
+	.detail-placeholder {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+		padding: 2rem;
+		text-align: center;
+		color: #5a5040;
+	}
+
+	.detail-placeholder h3 {
+		margin: 1rem 0 0.5rem;
+		font-size: 0.8rem;
+		letter-spacing: 0.1em;
+		color: #8a7a5a;
+	}
+
+	.detail-placeholder p {
+		margin: 0;
+		font-size: 0.75rem;
+		color: #5a5040;
+		line-height: 1.5;
+	}
+
+	@media (max-width: 1024px) {
+		.search-layout {
+			grid-template-columns: 1fr;
+		}
+		.filter-panel, .detail-panel {
+			display: none;
+		}
+	}
 </style>
-
-
-
-

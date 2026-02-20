@@ -71,7 +71,7 @@ Write back to L0-L3
 ```
 
 ### Retrieval Pipeline (RAG + KAG + DAG)
-- **RAG** (Retrieval-Augmented Generation): Qdrant vector search → confidence scoring → LLM generation
+- **RAG** (Retrieval-Augmented Generation): Qdrant vector search → confidence ranking → LLM generation
 - **KAG** (Knowledge-Augmented Generation): Schema validation, W3C spec checks, package.json verification
 - **DAG** (Directed Acyclic Graph): Cluster dependency ordering, fix priority scheduling
 - **2-stage codebase retrieval**: Fuse.js fuzzy recall → Qdrant dual-vector rerank (0.6 content + 0.4 signature)

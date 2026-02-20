@@ -4,15 +4,8 @@
  */
 
 // ============================================
-// bits-ui v2 Components - Re-export for convenience
-// Import directly from 'bits-ui' in components for full type support
-// ============================================
-// Note: For bits-ui components, import directly from 'bits-ui' in your components:
-// import { Dialog } from "bits-ui";
-import { Select } from "bits-ui";
-import { Tabs } from "bits-ui";
-// ============================================
-// Custom UI Components
+// Custom UI Components (Svelte 5 runes wrappers)
+// For raw bits-ui: import { Dialog, Select, Tabs } from 'bits-ui';
 // ============================================
 
 // Button
@@ -84,3 +77,10 @@ export { default as PerformanceMonitor } from './PerformanceMonitor.svelte';
 
 // Accessibility
 export { default as AccessibilitySettings } from './AccessibilitySettings.svelte';
+
+// Select (styled bits-ui wrapper)
+export { default as SelectComponent } from './select/Select.svelte';
+export { default as SelectRoot } from './select/SelectRoot.svelte';
+export { default as SelectTrigger } from './select/SelectTrigger.svelte';
+export { default as SelectContent } from './select/SelectContent.svelte';
+export { default as SelectItem } from './select/SelectItem.svelte';

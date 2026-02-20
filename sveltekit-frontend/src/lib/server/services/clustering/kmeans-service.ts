@@ -1,6 +1,6 @@
 /**
  * K-Means Clustering Service
- * Assigns statutes to clusters with confidence scoring
+ * Assigns statutes to clusters with confidence ranking
  */
 
 export interface KMeansConfig {

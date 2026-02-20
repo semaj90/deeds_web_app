@@ -1088,7 +1088,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
               <input type="checkbox" bind:checked={settings.enableInputSynthesis} role="switch" class="toggle-switch" />
             </label>
             <label class="flex items-center justify-between">
-              <span>Confidence Scores</span>
+              <span>Confidence Rankings</span>
               <input type="checkbox" bind:checked={settings.includeConfidenceScores} role="switch" class="toggle-switch" />
             </label>
             <label class="flex items-center justify-between">

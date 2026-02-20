@@ -27,7 +27,7 @@
  </div>
 
  <div>
- <label class="block text-sm font-medium mb-1">Confidence Score</label>
+ <label class="block text-sm font-medium mb-1">Confidence Ranking</label>
  <input type="range" min="0" max="100" class="w-full" bind:value={filters.minConfidence} oninput={onFilterChange}/>
  <span class="text-xs">{filters.minConfidence}%</span>
  </div>

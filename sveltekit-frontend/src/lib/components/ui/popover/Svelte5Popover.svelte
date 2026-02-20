@@ -35,7 +35,7 @@
 	let triggerRef = $state<HTMLButtonElement | null>(null);
 
 	// Position classes
-	let positionClasses = $derived(() => {
+	let positionClasses = $derived.by(() => {
 		const positions = {
 			top: 'bottom-full mb-2',
 			bottom: 'top-full mt-2',
@@ -115,7 +115,7 @@
 	{#if open}
 		<div
 			bind:this={popoverRef}
-			class="absolute z-50 {positionClasses()}
+			class="absolute z-50 {positionClasses}
 				   w-72 p-4
 				   bg-panelSoft text-white
 				   border border-sand/30 rounded-lg shadow-xl

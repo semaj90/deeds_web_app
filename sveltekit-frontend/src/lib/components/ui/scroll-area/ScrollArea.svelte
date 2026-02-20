@@ -65,7 +65,7 @@
 		relative overflow-hidden
 	`.replace(/\s+/g, ' ').trim();
 
-	const viewportClass = $derived(() => {
+	const viewportClass = $derived.by(() => {
 		const baseClass = 'h-full w-full rounded-[inherit]';
 		const orientationClass =
 			orientation === 'vertical' ? 'overflow-y-auto overflow-x-hidden' :
@@ -93,7 +93,7 @@
 	<div
 		bind:this={viewportElement}
 		onscroll={ handleScroll }
-		class={viewportClass()}
+		class={viewportClass}
 	>
 		{#if children}
 			{@render children()}

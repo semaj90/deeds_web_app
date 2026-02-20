@@ -1,7 +1,7 @@
 <script lang="ts">
  /**
  * Phase 74: Suggestion List Component
- * Displays ranked suggestions with confidence scores and actions
+ * Displays ranked suggestions with confidence rankings and actions
  */
  import type { Suggestion } from '$lib/ast/suggestion-engine';
  import ClusterBadge from './ClusterBadge.svelte';

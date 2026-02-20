@@ -3,7 +3,7 @@
  * Phase 72 - Task 5: Group Relative Policy Optimization
  *
  * Features:
- * - Confidence scoring based on embedding similarity
+ * - Confidence ranking based on embedding similarity
  * - Strategy ranking using group performance metrics
  * - Gradient computation for policy updates
  * - Experience replay to prevent catastrophic forgetting

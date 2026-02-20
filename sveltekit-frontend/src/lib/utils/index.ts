@@ -98,10 +98,10 @@ export function throttle<T extends (...args: unknown[]) => unknown>(
 
 // ===== LEGAL AI SPECIFIC UTILITIES =====
 export function getConfidenceLevel(score: number): string {
-    if (score >= 0.9) return 'Very High';
-    if (score >= 0.75) return 'High';
-    if (score >= 0.6) return 'Medium';
-    if (score >= 0.4) return 'Low';
+    if (score >= 0.85) return 'Very High';
+    if (score >= 0.70) return 'High';
+    if (score >= 0.50) return 'Medium';
+    if (score >= 0.30) return 'Low';
     return 'Very Low';
 }
 
