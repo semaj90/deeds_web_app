@@ -11,7 +11,7 @@
  * Client-side: uses LokiJS/IndexedDB cached metadata + Fuse.js
  * Server-side: uses Qdrant dual-vector search
  */
-import { assign, setup, fromPromise } from 'xstate';
+import { assign, fromPromise, createMachine } from 'xstate';
 
 // ── Types ────────────────────────────────────────────────────────────────
 
@@ -91,8 +91,8 @@ const DEFAULT_CONFIG: RetrievalConfig = {
 
 // ── Actor logic (fromPromise) ────────────────────────────────────────────
 
-const recallActor = fromPromise<CandidateChunk[], { query: string; maxCandidates: number }>(
-	async ({ input }) => {
+const recallActor = (fromPromise as any)(
+	async ({ input }: any) => {
 		const start = performance.now();
 
 		// POST to recall API endpoint (Fuse.js server-side)
@@ -113,10 +113,7 @@ const recallActor = fromPromise<CandidateChunk[], { query: string; maxCandidates
 	}
 );
 
-const rerankActor = fromPromise<
-	RankedChunk[],
-	{ query: string; candidates: CandidateChunk[]; config: RetrievalConfig }
->(async ({ input }) => {
+const rerankActor = (fromPromise as any)(async ({ input }: any) => {
 	const start = performance.now();
 
 	// POST to rerank API endpoint (Qdrant dual-vector search)
@@ -140,8 +137,8 @@ const rerankActor = fromPromise<
 	return data.results ?? [];
 });
 
-const assembleActor = fromPromise<AssembledContext, { reranked: RankedChunk[] }>(
-	async ({ input }) => {
+const assembleActor = (fromPromise as any)(
+	async ({ input }: any) => {
 		const start = performance.now();
 		const chunks = input.reranked;
 
@@ -159,17 +156,7 @@ const assembleActor = fromPromise<AssembledContext, { reranked: RankedChunk[] }>
 
 // ── Machine definition ───────────────────────────────────────────────────
 
-export const retrievalMachine = setup({
-	types: {
-		context: {} as RetrievalContext,
-		events: {} as RetrievalEvent
-	},
-	actors: {
-		recall: recallActor,
-		rerank: rerankActor,
-		assemble: assembleActor
-	}
-}).createMachine({
+export const retrievalMachine = createMachine({
 	id: 'retrieval',
 	initial: 'idle',
 	context: {
