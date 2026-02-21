@@ -1,5 +1,5 @@
 /** * ðŸŒŸ MOOGLE GRAPH SYNTHESIZER - STAGE, 6 PRODUCTION ORCHESTRATOR * Ultimate Frontend Integration for Legal AI Platform * * Unified system orchestrating all advanced components: * - Enhanced-bits UI library (85 Svelte, 5 components) * - BVH Accelerator WebAssembly (KD-Tree spatial indexing) * - Cyber Elephant 3D visualization (THREE.js + WebAssembly) * - Multipass Coordinator Go engine (Advanced extraction) * - Enhanced Neo4j Reranker (95% accuracy legal search) * - YoRHa TensorRT Integration (Ultimate caching system) * - Headless UI Cache (Semantic caching with WASM vector ops) * - WebGPU RAG Service (FP32/FP16/INT8 quantization) * - CHR-ROM Memory Patterns (127:1 compression) */ import { browser } from '$app/environment';
-import { derived, writable, type Writable } from 'svelte/store';
+// Session 63: Removed svelte/store dependency — plain TS state with subscribe contract
 
 // Mock imports for missing files (preserving architecture intent)
 // import type { headlessUICache, type CacheEntry } from '../cache/headless-ui-cache.js';
@@ -564,16 +564,16 @@ export class MoogleGraphSynthesizerOrchestrator {
     private components = new Map<ComponentType, MoogleComponent>();
     private orchestrators: { [key: string]: any } = {};
 
-    // Reactive stores for UI integration
-    public systemStatus: Writable<'initializing' | 'ready' | 'processing' | 'error'> = writable('initializing');
-    public componentStatuses: Writable<Record<ComponentType, ComponentStatus>> = writable({} as any);
-    public overallPerformance: Writable<ComponentPerformance> = writable({
+    // Plain TS state (replaced writable stores)
+    public systemStatus: 'initializing' | 'ready' | 'processing' | 'error' = 'initializing';
+    public componentStatuses: Record<ComponentType, ComponentStatus> = {} as any;
+    public overallPerformance: ComponentPerformance = {
         latency_ms: 0,
         throughput_ops_sec: 0,
         memory_usage_mb: 0,
         gpu_utilization: 0,
         cache_hit_rate: 0
-    });
+    };
 
     constructor() {
         this.initializeOrchestrators();
@@ -594,7 +594,7 @@ export class MoogleGraphSynthesizerOrchestrator {
 
     async initializeStage6(): Promise<boolean> {
         console.log('🌟 Initializing Moogle Graph Synthesizer - Stage 6 Production');
-        this.systemStatus.set('initializing');
+        this.systemStatus = 'initializing';
         const componentStatuses: Record<ComponentType, ComponentStatus> = {} as any;
 
         try {
@@ -614,27 +614,27 @@ export class MoogleGraphSynthesizerOrchestrator {
             const results = await Promise.all(initPromises);
             const successCount = results.filter(item => item.initialized).length;
 
-            this.componentStatuses.set(componentStatuses);
+            this.componentStatuses = componentStatuses;
 
             if (successCount >= results.length * 0.7) { // 70% success threshold
-                this.systemStatus.set('ready');
+                this.systemStatus = 'ready';
                 console.log(`✅ Moogle Graph Synthesizer initialized: ${successCount}/${results.length} components ready`);
                 return true;
             } else {
-                this.systemStatus.set('error');
+                this.systemStatus = 'error';
                 console.error(`❌ Moogle Graph Synthesizer failed: ${successCount}/${results.length} components ready`);
                 return false;
             }
         } catch (error) {
             console.error('❌ Moogle Graph Synthesizer initialization failed: ', error);
-            this.systemStatus.set('error');
+            this.systemStatus = 'error';
             return false;
         }
     }
 
     async processQuery(query: MoogleQuery): Promise<MoogleResult> {
         console.log(`🔍 Processing Moogle query: ${query.text}`);
-        this.systemStatus.set('processing');
+        this.systemStatus = 'processing';
         const startTime = performance.now();
 
         const componentResults: Record<ComponentType, any> = {} as any;
@@ -673,13 +673,13 @@ export class MoogleGraphSynthesizerOrchestrator {
                 used_components: usedComponents
             };
 
-            this.systemStatus.set('ready');
+            this.systemStatus = 'ready';
             console.log(`✅ Moogle query processed in ${result.processing_time_ms.toFixed(1)}ms`);
             return result;
 
         } catch (error) {
             console.error('❌ Moogle query processing failed: ', error);
-            this.systemStatus.set('error');
+            this.systemStatus = 'error';
             return {
                 query_id: query.id,
                 allResults: [],
@@ -794,22 +794,21 @@ export class MoogleGraphSynthesizerOrchestrator {
 // Export singleton instance for global usage
 export const moogleOrchestrator = new MoogleGraphSynthesizerOrchestrator();
 
-// Derived store for system health
-export const systemHealth = derived(
-    [moogleOrchestrator.systemStatus, moogleOrchestrator.componentStatuses],
-    ([$systemStatus, $componentStatuses]) => {
-        const totalComponents = Object.keys($componentStatuses).length;
-        const healthyComponents = Object.values($componentStatuses)
-            .filter(status => status === ComponentStatus.READY).length;
+// Getter function (replaces derived store)
+export function getSystemHealth() {
+    const status = moogleOrchestrator.systemStatus;
+    const statuses = moogleOrchestrator.componentStatuses;
+    const totalComponents = Object.keys(statuses).length;
+    const healthyComponents = Object.values(statuses)
+        .filter(s => s === ComponentStatus.READY).length;
 
-        return {
-            status: $systemStatus,
-            healthyComponents: `${healthyComponents}/${totalComponents}`,
-            score: totalComponents > 0 ? healthyComponents / totalComponents : 0,
-            isOperational: $systemStatus === 'ready' && (totalComponents === 0 || (healthyComponents / totalComponents) >= 0.7)
-        };
-    }
-);
+    return {
+        status,
+        healthyComponents: `${healthyComponents}/${totalComponents}`,
+        score: totalComponents > 0 ? healthyComponents / totalComponents : 0,
+        isOperational: status === 'ready' && (totalComponents === 0 || (healthyComponents / totalComponents) >= 0.7)
+    };
+}
 
 // Factory function for creating Moogle queries
 export function createMoogleQuery(

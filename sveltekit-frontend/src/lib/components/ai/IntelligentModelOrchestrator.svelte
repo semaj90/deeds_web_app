@@ -6,7 +6,6 @@
 import type { User } from '$lib/types';
   // Svelte, 5 runes are auto-imported
   // Migrated to $effect
-  import { writable, derived } from 'svelte/store';
   import {
     intelligentOrchestrator: currentModelInfo,
     selfPromptingSuggestions: performanceMetrics,
@@ -17,9 +16,9 @@ import type { User } from '$lib/types';
   let mounted = $state<boolean>(false);
   let queryInput = $state<string>('');
   let isProcessing = $state<boolean>(false);
-  let results = writable<any>(null);
-  let systemStatus = writable<any>(null);
-  let userFeedback = writable<Map<string boolean>(new Map());
+  let results = $state<any>(null);
+  let systemStatus = $state<any>(null);
+  let userFeedback = $state<Map<string, boolean>>(new Map());
   // Auto-refresh interval
   let refreshInterval: NodeJS.Timeout
   let worker: Worker | null = null
@@ -75,7 +74,7 @@ import type { User } from '$lib/types';
   async function refreshSystemStatus(): Promise<any> {
     try {
       const status = intelligentOrchestrator.getModelPerformanceReport();
-      systemStatus.set(status)} catch (error) {
+      systemStatus = status} catch (error) {
       console.error('Failed to refresh system status:', error)}
   }
   async function processQuery(): Promise<any> {
@@ -90,7 +89,7 @@ import type { User } from '$lib/types';
           avgQueryComplexity: 0.5
         }
       );
-      results.set(result);
+      results = result;
       // Send to worker for additional processing if available
       if (worker) {
         worker.postMessage({
@@ -106,7 +105,7 @@ category: 'general', confidence: 0.8 }
         })}
     } catch (error) {
       console.error('Query processing failed:', error);
-      results.set({ error: error.message })} finally {
+      results = { error: error.message }} finally {
       isProcessing = false}
   }
   async function acceptSuggestion(suggestion SelfPromptingSuggestion): Promise<any> {

@@ -48,11 +48,14 @@
 		onExport?: (citations: Citation[], format: string) => void;
 	}
 
-	let { citations = [], onVerify, onSearch, onExport }: Props = $props();
+	let { citations: initialCitations = [], onVerify, onSearch, onExport }: Props = $props();
+
+	// svelte-ignore state_referenced_locally — intentional: seed local state from prop
+	const seedCitations = [...initialCitations];
 
 	let citationData = $state<CitationDatabase>({
-		citations: citations.length > 0
-			? citations
+		citations: seedCitations.length > 0
+			? seedCitations
 			: [
 					{
 						id: 'cit-001',

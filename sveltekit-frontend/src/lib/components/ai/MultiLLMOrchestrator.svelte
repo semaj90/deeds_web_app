@@ -1,5 +1,5 @@
 <!-- Multi-LLM Orchestration Component Provides UI for managing multiple AI workers and orchestrating parallel, processing --> <script lang="ts">
-import type { AIResponse } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { derived, writable } from 'svelte/store'; import Badge from '$lib/components/ui/Badge.svelte';
+import type { AIResponse } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import Badge from '$lib/components/ui/Badge.svelte';
 import Button from '$lib/components/ui/Button.svelte';
 import Card from '$lib/components/ui/Card/Card.svelte';
 import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
