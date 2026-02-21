@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
 	import type { PageData } from './$types';
+	import RouteOperationsDashboard from '$lib/components/RouteOperationsDashboard.svelte';
+	import RouteInspectorModal from '$lib/components/RouteInspectorModal.svelte';
 
 	const { data }: { data: PageData } = $props();
 
@@ -13,6 +14,8 @@
 	let analyzeMode = $state(false);
 	let analyses = $state<any[]>([]);
 	let analyzeLoading = $state(false);
+	let showOpsLog = $state(false);
+	let showInspector = $state(false);
 
 	$effect(() => {
 		routes = Array.isArray(data.routes) ? data.routes : [];
@@ -64,8 +67,17 @@
 		filtered: filteredRoutes.length,
 		healthy: routes.filter((r: any) => r.errorState === 'healthy' || !r.errorState).length,
 		flaky: routes.filter((r: any) => r.errorState === 'flaky').length,
-		broken: routes.filter((r: any) => r.errorState === 'broken').length
+		broken: routes.filter((r: any) => r.errorState === 'broken').length,
+		withLoad: routes.filter((r: any) => r.hasLoad).length,
+		withActions: routes.filter((r: any) => r.hasActions).length,
+		withAi: routes.filter((r: any) => r.hasAiImports).length,
+		pages: routes.filter((r: any) => r.kind === 'page' || !r.kind).length,
+		endpoints: routes.filter((r: any) => r.kind === 'endpoint' || r.kind === 'server').length
 	});
+
+	let errorClusters = $derived(Array.isArray((data as any).errorClusters) ? (data as any).errorClusters : []);
+	let serverStats = $derived((data as any).stats as { totalRoutes: number; totalClusters: number; errorCount: number; warningCount: number } ?? { totalRoutes: 0, totalClusters: 0, errorCount: 0, warningCount: 0 });
+	let showClusters = $state(false);
 
 	// SSE Real-Time Updates
 	let eventSource: EventSource | null = null;
@@ -230,7 +242,61 @@
 			<span class="stat-label">BROKEN</span>
 			<span class="stat-value">{stats.broken}</span>
 		</div>
+		<div class="stat-box stat-feature">
+			<span class="stat-label">PAGES</span>
+			<span class="stat-value">{stats.pages}</span>
+		</div>
+		<div class="stat-box stat-feature">
+			<span class="stat-label">API</span>
+			<span class="stat-value">{stats.endpoints}</span>
+		</div>
+		<div class="stat-box stat-ai">
+			<span class="stat-label">AI</span>
+			<span class="stat-value">{stats.withAi}</span>
+		</div>
 	</div>
+
+	<!-- Capability Bar -->
+	<div class="capability-bar">
+		<span class="cap-item">{stats.withLoad} with load()</span>
+		<span class="cap-item">{stats.withActions} with actions</span>
+		<span class="cap-item cap-ai">{stats.withAi} AI-powered</span>
+		{#if serverStats.totalClusters > 0}
+			<button class="cap-item cap-clusters" onclick={() => (showClusters = !showClusters)}>
+				{serverStats.totalClusters} error clusters ({serverStats.errorCount}E / {serverStats.warningCount}W)
+				{showClusters ? '[-]' : '[+]'}
+			</button>
+		{/if}
+		<button class="cap-item cap-ops" onclick={() => (showOpsLog = !showOpsLog)}>
+			{showOpsLog ? '[-] HIDE OPS LOG' : '[+] OPS LOG'}
+		</button>
+	</div>
+
+	<!-- Error Clusters Panel (collapsible) -->
+	{#if showClusters && errorClusters.length > 0}
+		<div class="clusters-panel">
+			<div class="clusters-header">
+				<span class="clusters-title">ERROR CLUSTERS</span>
+				<span class="clusters-count">{errorClusters.length} clusters</span>
+			</div>
+			{#each errorClusters.slice(0, 20) as cluster}
+				<div class="cluster-row cluster-{cluster.severity}">
+					<span class="cluster-severity">[{cluster.severity.toUpperCase()}]</span>
+					<span class="cluster-tool">{cluster.tool}</span>
+					<span class="cluster-code">{cluster.code}</span>
+					<span class="cluster-message">{cluster.message}</span>
+					<span class="cluster-count">{cluster.count}x</span>
+				</div>
+			{/each}
+		</div>
+	{/if}
+
+	<!-- Operations Log Panel (collapsible) -->
+	{#if showOpsLog}
+		<div class="ops-log-panel">
+			<RouteOperationsDashboard />
+		</div>
+	{/if}
 
 	<!-- Search & Filters -->
 	<div class="filters-bar">
@@ -458,6 +524,9 @@
 						ANALYZE
 					</button>
 				{/if}
+				<button class="nes-btn" onclick={() => { showInspector = true; }}>
+					INSPECT
+				</button>
 				<button class="nes-btn" onclick={closeModal}>
 					CLOSE
 				</button>
@@ -465,6 +534,9 @@
 		</div>
 	</div>
 {/if}
+
+<!-- Route Inspector Modal (YoRHa-themed detail view) -->
+<RouteInspectorModal bind:open={showInspector} route={selectedRoute ? { path: selectedRoute.path, kind: selectedRoute.kind ?? 'page', file: selectedRoute.file ?? '', summary: selectedRoute.summary ?? `Route: ${selectedRoute.path}`, category: selectedRoute.group, health: selectedRoute.errorState === 'healthy' ? 'green' : selectedRoute.errorState === 'flaky' ? 'yellow' : selectedRoute.errorState === 'broken' ? 'red' : undefined, errorCount: selectedRoute.errorCount, lastErrorMessage: selectedRoute.lastErrorMessage } : null} />
 
 <style>
 	/* ── NES Command Center Theme ── */
@@ -530,6 +602,144 @@
 	.stat-box.health-ok { border-color: #33ff33; }
 	.stat-box.health-flaky { border-color: #ffff33; color: #ffff33; }
 	.stat-box.health-broken { border-color: #ff3333; color: #ff3333; }
+	.stat-box.stat-feature { border-color: #3399ff; color: #3399ff; }
+	.stat-box.stat-ai { border-color: #ff33ff; color: #ff33ff; }
+
+	/* ── Capability Bar ── */
+	.capability-bar {
+		display: flex;
+		gap: 1rem;
+		margin-bottom: 1rem;
+		padding: 0.4rem 0.75rem;
+		background: #111;
+		border: 1px solid #1a5a1a;
+		font-size: 0.7rem;
+		flex-wrap: wrap;
+		align-items: center;
+	}
+
+	.cap-item {
+		color: #1a9a1a;
+		letter-spacing: 0.05em;
+	}
+
+	.cap-item.cap-ai {
+		color: #ff33ff;
+	}
+
+	.cap-item.cap-clusters {
+		color: #ffaa33;
+		background: none;
+		border: 1px solid #ffaa33;
+		padding: 0.15rem 0.4rem;
+		cursor: pointer;
+		font-family: inherit;
+		font-size: inherit;
+		letter-spacing: inherit;
+		margin-left: auto;
+	}
+
+	.cap-item.cap-clusters:hover {
+		background: rgba(255, 170, 51, 0.1);
+	}
+
+	.cap-item.cap-ops {
+		color: #3399ff;
+		background: none;
+		border: 1px solid #3399ff;
+		padding: 0.15rem 0.4rem;
+		cursor: pointer;
+		font-family: inherit;
+		font-size: inherit;
+		letter-spacing: inherit;
+	}
+
+	.cap-item.cap-ops:hover {
+		background: rgba(51, 153, 255, 0.1);
+	}
+
+	.ops-log-panel {
+		margin-bottom: 1.5rem;
+		border: 1px solid #3399ff;
+		background: #0c0c0c;
+		max-height: 600px;
+		overflow-y: auto;
+	}
+
+	/* ── Error Clusters ── */
+	.clusters-panel {
+		margin-bottom: 1.5rem;
+		border: 1px solid #664400;
+		background: #0c0c0c;
+	}
+
+	.clusters-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.4rem 0.75rem;
+		background: #1a1000;
+		border-bottom: 1px solid #664400;
+	}
+
+	.clusters-title {
+		font-weight: bold;
+		font-size: 0.8rem;
+		color: #ffaa33;
+		letter-spacing: 0.1em;
+	}
+
+	.clusters-count {
+		font-size: 0.7rem;
+		color: #996600;
+	}
+
+	.cluster-row {
+		display: flex;
+		gap: 0.5rem;
+		padding: 0.3rem 0.75rem;
+		border-bottom: 1px solid #1a1000;
+		font-size: 0.7rem;
+		align-items: baseline;
+	}
+
+	.cluster-row:last-child {
+		border-bottom: none;
+	}
+
+	.cluster-severity {
+		font-weight: bold;
+		flex-shrink: 0;
+		width: 50px;
+	}
+
+	.cluster-row.cluster-error .cluster-severity { color: #ff3333; }
+	.cluster-row.cluster-warning .cluster-severity { color: #ffff33; }
+	.cluster-row.cluster-info .cluster-severity { color: #3399ff; }
+
+	.cluster-tool {
+		color: #666;
+		flex-shrink: 0;
+		width: 70px;
+	}
+
+	.cluster-code {
+		color: #ffaa33;
+		flex-shrink: 0;
+	}
+
+	.cluster-message {
+		color: #999;
+		flex: 1;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.cluster-count {
+		color: #666;
+		flex-shrink: 0;
+	}
 
 	/* ── Filters ── */
 	.filters-bar {

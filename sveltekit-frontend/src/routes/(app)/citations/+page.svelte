@@ -5,8 +5,10 @@
   import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
   import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
   import CitationManager from '$lib/components/legal/CitationManager.svelte';
+  import CitationDetail from '$lib/components/legal-ai/CitationDetail.svelte';
 
   let viewMode = $state<'list' | 'manager'>('list');
+  let selectedCitation = $state<any>(null);
 
   interface Citation {
     id: string;
@@ -127,7 +129,7 @@
   {:else}
     <div class="grid gap-4">
       {#each filteredCitations as citation (citation.id)}
-        <Card class="bg-panel border-sand/10 hover:border-accent/30 transition-colors">
+        <Card class="bg-panel border-sand/10 hover:border-accent/30 transition-colors cursor-pointer" onclick={() => (selectedCitation = selectedCitation?.id === citation.id ? null : { id: citation.id, statute_code: citation.formattedCitation, statute_title: citation.legalPrinciple, jurisdiction: citation.documentTitle, severity: citation.citationType, source_type: 'auto_extracted' as const, highlighted_text: citation.quotedText, notes: '', created_at: new Date().toISOString(), updated_at: new Date().toISOString() })}>
           <CardHeader class="pb-2">
             <div class="flex items-start justify-between gap-4">
               <CardTitle class="text-sm font-mono text-accent">{citation.formattedCitation}</CardTitle>
@@ -165,6 +167,17 @@
         </Card>
       {/each}
     </div>
+
+    {#if selectedCitation}
+      <div class="mt-6">
+        <CitationDetail
+          citation={selectedCitation}
+          onupdated={() => { selectedCitation = null; loadCitations(); }}
+          ondelete={() => { selectedCitation = null; loadCitations(); }}
+          onattachtocase={(c) => { console.log('Attach to case:', c); }}
+        />
+      </div>
+    {/if}
   {/if}
   {/if}
 </div>

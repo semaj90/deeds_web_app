@@ -143,7 +143,7 @@
 			content: '',
 			timestamp: Date.now(),
 			references: [],
-			confidence | undefined,
+			confidence: undefined,
 			metadata: {}
 		};
 

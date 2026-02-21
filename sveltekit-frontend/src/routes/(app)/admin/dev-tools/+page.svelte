@@ -1,5 +1,9 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
+	import EvidenceDrawer from '$lib/components/admin/EvidenceDrawer.svelte';
+	import EvidenceDataGrid from '$lib/components/admin/EvidenceDataGrid.svelte';
+	import CachePerformanceDashboard from '$lib/components/ai/CachePerformanceDashboard.svelte';
+	import CacheDemo from '$lib/components/cache/CacheDemo.svelte';
 
 	let { data } = $props();
 
@@ -12,6 +16,8 @@
 		{ value: 'qdrant', label: 'Qdrant' },
 		{ value: 'docker', label: 'Docker' },
 		{ value: 'tools', label: 'Admin Tools' },
+		{ value: 'evidence', label: 'Evidence' },
+		{ value: 'cache', label: 'Cache' },
 	];
 
 	// Reactive state
@@ -21,6 +27,14 @@
 	let indexingCodebase = $state(false);
 	let indexingErrors = $state(false);
 	let indexingLog = $state<string[]>([]);
+
+	// Evidence drawer state
+	let showEvidenceDrawer = $state(false);
+	let selectedEvidenceFile = $state<any>(null);
+	let isDrawerSaving = $state(false);
+	let evidenceFiles = $state<any[]>([]);
+	let isLoadingEvidence = $state(false);
+	let showDataGrid = $state(false);
 
 	// Derived
 	const healthyCount = $derived(data.services.filter((s: { status: string }) => s.status === 'healthy').length);
@@ -97,6 +111,21 @@
 		await invalidateAll();
 		indexingLog = [...indexingLog, `[${new Date().toLocaleTimeString()}] Health data refreshed`];
 	}
+
+	async function loadEvidenceFiles() {
+		isLoadingEvidence = true;
+		try {
+			const res = await fetch('/api/evidence?limit=50');
+			if (res.ok) {
+				const json = await res.json();
+				evidenceFiles = json.evidence ?? json.items ?? json ?? [];
+			}
+		} catch (e) {
+			console.error('Failed to load evidence files:', e);
+		} finally {
+			isLoadingEvidence = false;
+		}
+	}
 </script>
 
 <div class="mx-auto max-w-[1600px] p-6">
@@ -168,7 +197,7 @@
 			<button
 				class="dt-tab"
 				class:active={activeTab === tab.value}
-				onclick={() => { activeTab = tab.value; }}
+				onclick={() => { activeTab = tab.value; if (tab.value === 'evidence' && evidenceFiles.length === 0) loadEvidenceFiles(); }}
 			>
 				{tab.label}
 			</button>
@@ -397,7 +426,141 @@
 			{/each}
 		</div>
 	{/if}
+
+	<!-- Evidence Tab -->
+	{#if activeTab === 'evidence'}
+		<div class="space-y-4">
+			<div class="flex items-center justify-between">
+				<h3 class="text-lg font-semibold text-sand">Evidence File Manager</h3>
+				<button
+					class="rounded-md border border-info bg-info/10 px-4 py-1.5 text-xs font-mono uppercase tracking-wider text-info transition hover:bg-info/20"
+					onclick={loadEvidenceFiles}
+					disabled={isLoadingEvidence}
+				>
+					{isLoadingEvidence ? 'Loading...' : 'Refresh'}
+				</button>
+			</div>
+
+			{#if evidenceFiles.length > 0}
+				<div class="overflow-hidden rounded-lg border-2 border-sand/20 bg-panel">
+					<table class="w-full border-collapse">
+						<thead>
+							<tr class="border-b-2 border-sand/20 bg-panelSoft">
+								<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-sand/60">File</th>
+								<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-sand/60">Type</th>
+								<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-sand/60">Status</th>
+								<th class="p-3 text-right text-xs font-bold uppercase tracking-wider text-sand/60">Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each evidenceFiles as file (file.id)}
+								<tr class="border-b border-sand/10 transition hover:bg-sand/5">
+									<td class="p-3">
+										<div class="font-medium text-sand text-sm">{file.title ?? file.filename ?? file.fileName ?? 'Untitled'}</div>
+										<div class="text-xs text-sand/40">{file.id}</div>
+									</td>
+									<td class="p-3 text-xs text-sand/60">{file.evidenceType ?? file.file_type ?? file.fileType ?? '—'}</td>
+									<td class="p-3">
+										<span class="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase {(file.processing_status ?? file.status) === 'completed' ? 'bg-accent/20 text-accent' : 'bg-warning/20 text-warning'}">
+											{file.processing_status ?? file.status ?? 'unknown'}
+										</span>
+									</td>
+									<td class="p-3 text-right">
+										<button
+											class="text-xs text-info hover:text-info/80 transition"
+											onclick={() => { selectedEvidenceFile = file; showEvidenceDrawer = true; }}
+										>
+											Inspect
+										</button>
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			{:else if !isLoadingEvidence}
+				<div class="rounded-lg border-2 border-dashed border-sand/20 p-8 text-center text-sand/40">
+					No evidence files loaded. Click Refresh to fetch from the database.
+				</div>
+			{:else}
+				<div class="flex items-center justify-center p-12">
+					<div class="w-6 h-6 border-2 border-info border-t-transparent rounded-full animate-spin"></div>
+					<span class="ml-3 text-sand/60">Loading evidence files...</span>
+				</div>
+			{/if}
+			<!-- Advanced Data Grid -->
+			<div class="mt-4">
+				<button
+					onclick={() => (showDataGrid = !showDataGrid)}
+					class="rounded-md border border-accent/40 bg-accent/10 px-4 py-1.5 text-xs font-mono uppercase tracking-wider text-accent transition hover:bg-accent/20"
+				>
+					{showDataGrid ? 'Hide Data Grid' : 'Advanced Data Grid'}
+				</button>
+				{#if showDataGrid}
+					<div class="mt-3">
+						<EvidenceDataGrid
+							items={evidenceFiles.map((f: any) => ({
+								id: f.id,
+								filename: f.title ?? f.filename ?? f.fileName ?? 'Untitled',
+								file_type: f.evidenceType ?? f.file_type ?? f.fileType ?? '',
+								file_size: f.fileSize ?? f.file_size ?? 0,
+								jurisdiction: f.jurisdiction ?? '',
+								processing_status: f.processing_status ?? f.status ?? 'unknown',
+								created_at: f.createdAt ?? f.created_at ?? '',
+								chunk_count: f.chunk_count ?? 0,
+							}))}
+							total={evidenceFiles.length}
+							page={1}
+							pageSize={50}
+							isLoading={isLoadingEvidence}
+							onRowClick={(item) => { selectedEvidenceFile = evidenceFiles.find((f: any) => f.id === item.id); showEvidenceDrawer = true; }}
+							onPageChange={() => {}}
+							onSearch={() => {}}
+							onFilterChange={() => {}}
+						/>
+					</div>
+				{/if}
+			</div>
+		</div>
+	{/if}
+
+	<!-- Cache Tab -->
+	{#if activeTab === 'cache'}
+		<CachePerformanceDashboard />
+		<div style="margin-top: 2rem;">
+			<CacheDemo />
+		</div>
+	{/if}
 </div>
+
+<EvidenceDrawer
+	isOpen={showEvidenceDrawer}
+	data={selectedEvidenceFile}
+	isLoading={false}
+	isSaving={isDrawerSaving}
+	onClose={() => { showEvidenceDrawer = false; selectedEvidenceFile = null; }}
+	onSave={async (updated) => {
+		isDrawerSaving = true;
+		try {
+			await fetch(`/api/evidence/${updated.id}`, {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(updated)
+			});
+			showEvidenceDrawer = false;
+			await loadEvidenceFiles();
+		} catch (e) { console.error('Save failed:', e); }
+		finally { isDrawerSaving = false; }
+	}}
+	onDelete={async (id) => {
+		try {
+			await fetch(`/api/evidence/${id}`, { method: 'DELETE' });
+			showEvidenceDrawer = false;
+			selectedEvidenceFile = null;
+			await loadEvidenceFiles();
+		} catch (e) { console.error('Delete failed:', e); }
+	}}
+/>
 
 <style>
 	.dt-tab-bar {

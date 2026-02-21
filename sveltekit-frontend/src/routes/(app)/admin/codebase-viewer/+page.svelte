@@ -1,10 +1,13 @@
 <script lang="ts">
+	import TagDetailView from '$lib/components/codebase/TagDetailView.svelte';
+
 	let { data } = $props();
 
 	// Native $state-based tabs (avoids bits-ui Tabs namespace SSR bug)
 	let activeTab = $state<'qdrant' | 'postgres' | 'timeline'>('qdrant');
 	let selectedCollection = $state<string | null>(null);
 	let searchQuery = $state('');
+	let selectedTag = $state<any>(null);
 
 	// Filter embeddings based on search
 	const filteredEmbeddings = $derived(
@@ -148,7 +151,7 @@
 					</thead>
 					<tbody>
 						{#each filteredEmbeddings as embedding}
-							<tr class="border-b border-sand/10 transition hover:bg-sand/5">
+							<tr class="border-b border-sand/10 transition hover:bg-sand/5 cursor-pointer" onclick={() => { selectedTag = { id: embedding.id ?? embedding.source, name: embedding.source?.split('/').pop() ?? 'unknown', filePath: embedding.source ?? '', type: embedding.source?.endsWith('.svelte') ? 'component' : embedding.source?.includes('/routes/') ? 'route' : 'util', category: embedding.source?.includes('/routes/') ? 'route' : 'component', errorCount: embedding.error_count ?? 0, createdAt: embedding.last_indexed ?? new Date().toISOString(), updatedAt: embedding.last_indexed ?? new Date().toISOString() }; }}>
 								<td class="p-3">
 									<code class="rounded bg-sand/10 px-2 py-0.5 text-xs text-sand">{embedding.source}</code>
 								</td>
@@ -181,6 +184,13 @@
 						{/if}
 					</tbody>
 				</table>
+			</div>
+		{/if}
+
+		<!-- Tag Detail Panel -->
+		{#if selectedTag && activeTab === 'postgres'}
+			<div class="mt-4">
+				<TagDetailView tag={selectedTag} onClose={() => { selectedTag = null; }} />
 			</div>
 		{/if}
 

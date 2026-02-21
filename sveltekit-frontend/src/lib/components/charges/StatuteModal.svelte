@@ -8,13 +8,13 @@
 	}
 
 	let { isOpen = false, statute = null, caseId = '', onClose = () => {},
-	onAttach = (_charge: any) => {} } = $props<{
+	onAttach = (_charge: any) => {} }: {
 		isOpen?: boolean;
 		statute?: any;
 		caseId?: string;
 		onClose?: () => void;
 		onAttach?: (charge: any) => void;
-	}>();
+	} = $props();
 
 	let isAttaching = $state(false);
 	let attachError = $state('');

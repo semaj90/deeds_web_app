@@ -11,9 +11,9 @@
  elasticsearch: 'unknown',
  gemma: 'unknown',
  storageCapacity: 0,
- } } = $props<{
+ } }: {
  status?: SystemStatus;
- }>();
+ } = $props();
 
  const getStatusColor = (s: string) => {
  switch (s) {

@@ -8,10 +8,10 @@
 	// Migrated to $effect
 	import { fade, fly } from 'svelte/transition';
 
-	const { routePath = null, onClose = () => {} } = $props<{
+	let { routePath = null, onClose = () => {} }: {
 		routePath?: string | null;
 		onClose?: () => void;
-	}>();
+	} = $props();
 
 	interface Phase72Error {
 		id: string;

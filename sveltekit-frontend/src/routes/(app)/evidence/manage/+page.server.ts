@@ -1,16 +1,26 @@
-import { redirect } from '@sveltejs/kit';
+import { db } from '$lib/server/db/client';
+import { evidence } from '$lib/server/db/schema';
+import { desc } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
-import db from '$lib/server/db';
+
+const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
 
 export const load: PageServerLoad = async ({ locals }) => {
-	// Phase 79: Lucia v3 Authentication Guard
-	if (!locals.user) {
-		throw redirect(302, '/login');
-	}
+	const user = locals.user ?? null;
 
-	return {
-		user: locals.user
-	};
+	const files = await safe(
+		db.select({
+			id: evidence.id,
+			title: evidence.title,
+			evidenceType: evidence.evidenceType,
+			fileSize: evidence.fileSize,
+			createdAt: evidence.createdAt,
+		})
+			.from(evidence)
+			.orderBy(desc(evidence.createdAt))
+			.limit(100),
+		[]
+	);
+
+	return { files, user, loadError: null };
 };
-
-

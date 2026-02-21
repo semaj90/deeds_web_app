@@ -1,34 +1,50 @@
 <script lang="ts">
- import EvidenceFilters from '$lib/components/yorha/evidence/EvidenceFilters.svelte';
- import EvidenceGrid from '$lib/components/yorha/evidence/EvidenceGrid.svelte';
- import EvidenceStats from '$lib/components/yorha/evidence/EvidenceStats.svelte';
- import UploadZone from '$lib/components/yorha/evidence/UploadZone.svelte';
+	import type { PageData } from './$types';
+	import EvidenceAnalysisDashboard from '$lib/components/dashboard/EvidenceAnalysisDashboard.svelte';
+	import PoliceReportGenerator from '$lib/components/yorha/PoliceReportGenerator.svelte';
+
+	let { data }: { data: PageData } = $props();
+	let showReportGenerator = $state(false);
 </script>
 
-<div class="space-y-6">
- <!-- Header -->
- <div class="mb-8">
- <h1 class="text-3xl font-bold text-cyan-400 terminal-glow mb-2">Evidence Library</h1>
- <p class="text-slate-400">Document repository and evidence database management</p>
- </div>
+<EvidenceAnalysisDashboard caseId={data.caseId} />
 
- <!-- Upload Zone -->
- <UploadZone />
-
- <!-- Statistics Overview -->
- <EvidenceStats />
-
- <!-- Filters and Search -->
- <EvidenceFilters />
-
- <!-- Evidence Grid -->
- <EvidenceGrid />
+<div class="report-section">
+	<button
+		class="report-toggle"
+		onclick={() => (showReportGenerator = !showReportGenerator)}
+	>
+		{showReportGenerator ? 'Hide Report Generator' : 'Generate Police Report'}
+	</button>
 </div>
+{#if showReportGenerator}
+	<div class="report-container">
+		<PoliceReportGenerator caseId={data.caseId || null} />
+	</div>
+{/if}
 
 <style>
- .terminal-glow {
- text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
- }
+	.report-section {
+		padding: 1rem 2rem;
+	}
+
+	.report-toggle {
+		padding: 0.6rem 1.2rem;
+		background: rgba(16, 185, 129, 0.15);
+		border: 1px solid #10b981;
+		color: #10b981;
+		border-radius: 4px;
+		cursor: pointer;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 0.85rem;
+		transition: all 0.2s;
+	}
+
+	.report-toggle:hover {
+		background: rgba(16, 185, 129, 0.25);
+	}
+
+	.report-container {
+		padding: 0 2rem 2rem;
+	}
 </style>
-
-

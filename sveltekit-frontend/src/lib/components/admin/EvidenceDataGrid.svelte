@@ -13,10 +13,10 @@
 	page: number;
 	pageSize: number;
 	isLoading: boolean;
-	onRowClick: (item: EvidenceFile) => void;
-		onPageChange: (page: number) => void;
-		onSearch: (query: string) => void;
-		onFilterChange: (filters: Record<string, string>) => void;
+	onRowClick?: (item: EvidenceFile) => void;
+		onPageChange?: (page: number) => void;
+		onSearch?: (query: string) => void;
+		onFilterChange?: (filters: Record<string, string>) => void;
 	}
 
 	let {

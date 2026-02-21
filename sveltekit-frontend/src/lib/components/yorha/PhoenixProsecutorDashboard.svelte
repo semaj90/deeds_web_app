@@ -1,6 +1,7 @@
 <script lang="ts">
-  import LegalHUD from '$lib/components/evidence-graph/LegalHUD.svelte';
-  // WebGPUEvidenceGraphVisualization component file is missing, use placeholder
+  // LegalHUD archived to deeds_labs/svelte4-archive/components/evidence-graph/
+  // import LegalHUD from '$lib/components/evidence-graph/LegalHUD.svelte';
+  // WebGPUEvidenceGraphVisualization archived to deeds_labs/svelte4-archive/components/visualizations/
   // import { WebGPUEvidenceGraphVisualization } from '$lib/components/visualizations/WebGPUEvidenceGraphVisualization';
 // Migrated to $effect
   import ContradictionReveal from './ContradictionReveal.svelte';
@@ -467,8 +468,8 @@
     />
   {/if}
 
-  <!-- HUD Overlay -->
-  <LegalHUD {...{showHUD} as any} />
+  <!-- HUD Overlay (archived) -->
+  <!-- <LegalHUD {...{showHUD} as any} /> -->
 
   <!-- Event Monitor -->
   <PhoenixEventMonitor show={showEventMonitor} />

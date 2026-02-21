@@ -1,16 +1,31 @@
+import { superValidate, message } from 'sveltekit-superforms/server';
+import { zod4 as zod } from 'sveltekit-superforms/adapters';
+import { z } from 'zod';
 import { db } from '$lib/server/db/client';
-import { cases } from '$lib/server/db/schema-postgres';
-import { fail, redirect } from '@sveltejs/kit';
+import { cases } from '$lib/server/db/schema-postgres.js';
+import { redirect, fail } from '@sveltejs/kit';
 import { desc, eq } from 'drizzle-orm';
+import { extractCaseStructureWithGemma } from '$lib/server/llm/gemmaIntake.js';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals }) => {
-	// Phase 79: Lucia v3 Authentication Guard
-	if (!locals.user) {
-		throw redirect(302, '/login');
-	}
+// Intake schema — WHO/WHAT/WHEN/WHERE/WHY/HOW guided prompts + case fields
+export const intakeCaseSchema = z.object({
+	title: z.string().min(1, 'Case title is required').max(255),
+	narrative: z.string().max(10000).default(''),
+	who: z.string().max(1000).default(''),
+	what: z.string().max(1000).default(''),
+	when: z.string().max(500).default(''),
+	where: z.string().max(500).default(''),
+	why: z.string().max(1000).default(''),
+	how: z.string().max(1000).default(''),
+	priority: z.enum(['low', 'medium', 'high', 'critical', 'urgent']).default('medium')
+});
 
-	// Fetch recent cases for context (SSR)
+export const load: PageServerLoad = async ({ locals }) => {
+	if (!locals.user) throw redirect(302, '/login');
+
+	const form = await superValidate(zod(intakeCaseSchema));
+
 	const recentCases = await db
 		.select()
 		.from(cases)
@@ -18,56 +33,90 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.orderBy(desc(cases.createdAt))
 		.limit(5);
 
-	return {
-		user: locals.user,
-		recentCases
-	};
+	return { form, user: locals.user, recentCases };
 };
 
-// Form actions for progressive enhancement
 export const actions = {
-	// Create new case (POST)
+	// Create case via Drizzle ORM 0.44 with Superforms validation
 	create: async ({ request, locals }) => {
-		if (!locals.user) {
-			return fail(401, { error: 'Unauthorized' });
-		}
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 
-		const formData = await request.formData();
-		const title = formData.get('title')?.toString();
-		const narrative = formData.get('narrative')?.toString();
-		const priority = (formData.get('priority')?.toString() ?? 'medium') as 'low' | 'medium' | 'high' | 'urgent';
+		const form = await superValidate(request, zod(intakeCaseSchema));
+		if (!form.valid) return fail(400, { form });
 
-		// Validation
-		if (!title?.trim()) {
-			return fail(400, { error: 'Title is required', title, narrative });
-		}
+		const { title, narrative, who, what, when, where, why, how, priority } = form.data;
 
-		if (!narrative?.trim()) {
-			return fail(400, { error: 'Narrative is required', title, narrative });
-		}
+		// Build structured description from narrative + W-fields
+		const wFields = [
+			who && `WHO: ${who}`,
+			what && `WHAT: ${what}`,
+			when && `WHEN: ${when}`,
+			where && `WHERE: ${where}`,
+			why && `WHY: ${why}`,
+			how && `HOW: ${how}`
+		]
+			.filter(Boolean)
+			.join('\n');
 
+		const description = [narrative, wFields].filter(Boolean).join('\n\n');
+
+		let newCase;
 		try {
-			// Create case in database
-			const newCase = await db
+			[newCase] = await db
 				.insert(cases)
 				.values({
 					title: title.trim(),
-					description: narrative.trim(),
+					description,
 					priority: priority as any,
 					userId: locals.user.id,
-					status: 'open',
-					createdAt: new Date().toISOString(),
+					status: 'open' as any,
 					updatedAt: new Date().toISOString()
 				})
 				.returning();
-
-			// Progressive enhancement: redirect to new case
-			throw redirect(303, `/cases/${newCase[0]?.id}`);
 		} catch (error) {
 			console.error('Failed to create case:', error);
-			return fail(500, { error: 'Failed to create case', title, narrative });
+			return message(form, 'Failed to create case. Please try again.', { status: 500 });
+		}
+
+		redirect(303, `/cases/${newCase.id}/overview`);
+	},
+
+	// AI analysis — calls Gemma3-Legal to extract persons, title, statute from narrative
+	analyze: async ({ request, locals }) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
+
+		const formData = await request.formData();
+		const narrative = formData.get('narrative')?.toString() ?? '';
+		const who = formData.get('who')?.toString() ?? '';
+		const what = formData.get('what')?.toString() ?? '';
+		const when = formData.get('when')?.toString() ?? '';
+		const where = formData.get('where')?.toString() ?? '';
+		const why = formData.get('why')?.toString() ?? '';
+		const how = formData.get('how')?.toString() ?? '';
+
+		if (!narrative.trim() && !what.trim()) {
+			return fail(400, {
+				analysisError: 'Provide a narrative or describe what happened before analyzing.'
+			});
+		}
+
+		try {
+			const extraction = await extractCaseStructureWithGemma({
+				narrative,
+				who,
+				what,
+				when,
+				where,
+				why,
+				how
+			});
+
+			return { extraction };
+		} catch (error) {
+			console.error('AI extraction failed:', error);
+			return fail(500, {
+				analysisError: 'AI analysis unavailable — Ollama may be offline. Create the case manually.'
+			});
 		}
 	}
 } satisfies Actions;
-
-

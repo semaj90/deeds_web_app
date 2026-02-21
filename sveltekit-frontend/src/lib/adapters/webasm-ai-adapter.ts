@@ -148,8 +148,8 @@ export class WebAssemblyAIAdapter {
 		});
 		if (!res.ok) throw new Error('Python error, ' + res.statusText);
 		const data = await res.json();
-		return { content: data?.text|| data?.response ?? '', metadata: {
-	tokensGenerated: data?.tokens_generated|| Math.ceil((data?.text ?? '').length / 4), processingTime: data?.processing_time ?? 0, confidence: data?.confidence ?? 0.85, method: 'python', modelUsed: this.currentModel, fromCache: data?.from_cache|| false, gpuAccelerated: this.gpuAvailable } };
+		return { content: (data?.text || data?.response) ?? '', metadata: {
+	tokensGenerated: data?.tokens_generated || Math.ceil((data?.text ?? '').length / 4), processingTime: data?.processing_time ?? 0, confidence: data?.confidence ?? 0.85, method: 'python', modelUsed: this.currentModel, fromCache: data?.from_cache || false, gpuAccelerated: this.gpuAvailable } };
 	}
 
 	private generateFallback(): WebAssemblyAIResponse {

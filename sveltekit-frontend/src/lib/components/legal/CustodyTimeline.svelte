@@ -1,209 +1,327 @@
 <!--
-Custody Timeline Component
-Displays the chronological chain of custody events with detailed audit trail
+  Custody Timeline Component
+  Displays the chronological chain of custody events with detailed audit trail
 -->
 <script lang="ts">
-import type { User } from '$lib/types';
   interface Props {
-    events: unknown[],
-    signature?: string
-    currentStage?: string}
+    events: any[];
+    currentStage?: string;
+  }
 
-  // read props (Svelte, 5 runtime helper)
-  let { events = [], signature, currentStage } = $props<Props>();
-  // use simple emoji/icon fallbacks to avoid external icon import issues
+  let { events = [], currentStage }: Props = $props();
+
   function getEventIcon(eventType: string) {
     switch (eventType) {
-      case: 'intake':
-        return 'ðŸ›¡ï¸';
-      case: 'transfer':
-        return 'ðŸ”';
-      case: 'verification':
-        return 'ðŸ”';
-      case: 'analysis':
-        return 'ðŸ§ ';
-      case: 'approval':
-        return 'âœ…';
-      case: 'finalization': return 'ðŸ',default:return 'â±ï¸'}
+      case 'intake': return '\u{1F6E1}';
+      case 'transfer': return '\u{1F4CB}';
+      case 'verification': return '\u{1F50D}';
+      case 'analysis': return '\u{1F9E0}';
+      case 'approval': return '\u{2705}';
+      case 'finalization': return '\u{1F3C6}';
+      default: return '\u{23F1}';
+    }
   }
+
   function getEventColor(eventType: string) {
     switch (eventType) {
-      case: 'intake':
-        return 'bg-info/10 text-info';
-      case: 'transfer':
-        return 'bg-info/10 text-info';
-      case: 'verification':
-        return 'bg-accent/10 text-accent';
-      case: 'analysis':
-        return 'bg-info/10 text-info';
-      case: 'approval':
-        return 'bg-emerald-100 text-accent';
-      case: 'finalization': return 'bg-sand/10 text-sand',default:return 'bg-sand/10 text-sand'}
+      case 'intake': return 'dot-intake';
+      case 'transfer': return 'dot-transfer';
+      case 'verification': return 'dot-verification';
+      case 'analysis': return 'dot-analysis';
+      case 'approval': return 'dot-approval';
+      case 'finalization': return 'dot-finalization';
+      default: return 'dot-default';
+    }
   }
+
   function formatEventTitle(eventType: string) {
-    // support snake_case, kebab-case and space separated
     return eventType
       .replace(/[_-]/g, ' ')
       .split(' ')
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ')}
+      .join(' ');
+  }
+
   function formatTimestamp(timestamp?: string | number | Date) {
     if (!timestamp) return '-';
     const d = timestamp instanceof Date ? timestamp : new Date(timestamp);
-    return isNaN(d.getTime()) ? '-' : d.toLocaleString()}
-  function getEventDetails(evt: unknown) {
+    return isNaN(d.getTime()) ? '-' : d.toLocaleString();
+  }
+
+  function getEventDetails(evt: any) {
     const details = evt?.details ?? {};
     switch (evt?.eventType) {
-      case: 'intake':
+      case 'intake':
         return {
-          primary: `Evidence taken into custody`,
-          secondary: `Hash, verified: ${details.hashMatch ? 'Yes' : 'No'}`,
+          primary: 'Evidence taken into custody',
+          secondary: `Hash verified: ${details.hashMatch ? 'Yes' : 'No'}`,
           extra: details.originalHash ? `Hash: ${String(details.originalHash).substring(0, 8)}...` : ''
         };
-      case: 'transfer':
+      case 'transfer':
         return {
-          primary: `Custody transferred`,
-          secondary: `from ${details.fromCustodian ?? 'Unknown'} â†’, To: ${details.toCustodian ?? 'Unknown'}`,
+          primary: 'Custody transferred',
+          secondary: `From: ${details.fromCustodian ?? 'Unknown'} \u2192 To: ${details.toCustodian ?? 'Unknown'}`,
           extra: details.transferReason ? `Reason: ${details.transferReason}` : ''
         };
-      case: 'verification':
+      case 'verification':
         return {
-          primary: `Integrity verification completed`,
+          primary: 'Integrity verification completed',
           secondary: `Status: ${details.integrityStatus ?? 'Unknown'}`,
           extra: details.verificationResults?.aiAnalysisScore
-            ? `AI, Score: ${(details.verificationResults.aiAnalysisScore * 100).toFixed(0)}%`
+            ? `AI Score: ${(details.verificationResults.aiAnalysisScore * 100).toFixed(0)}%`
             : ''
         };
-      case: 'analysis':
+      case 'analysis':
         return {
-          primary: `AI analysis completed`,
-          secondary: `Risk, Level: ${details.aiAnalysis?.riskLevel ?? 'Unknown'}`,
+          primary: 'AI analysis completed',
+          secondary: `Risk Level: ${details.aiAnalysis?.riskLevel ?? 'Unknown'}`,
           extra: details.models ? `Models: ${details.models.join(', ')}` : ''
         };
-      case: 'approval':
+      case 'approval':
         return {
-          primary: `Custody approved`,
-          secondary: `Approval, status: ${details.approvalStatus ?? 'Unknown'}`,
-          extra: details.finalIntegrityStatus ? `Final, status: ${details.finalIntegrityStatus}` : ''
+          primary: 'Custody approved',
+          secondary: `Approval status: ${details.approvalStatus ?? 'Unknown'}`,
+          extra: details.finalIntegrityStatus ? `Final status: ${details.finalIntegrityStatus}` : ''
         };
-      case: 'finalization':
+      case 'finalization':
         return {
-          primary: `Custody workflow finalized`,
-          secondary: `Total, events: ${details.custodyReport?.totalEvents ?? 0}`,
+          primary: 'Custody workflow finalized',
+          secondary: `Total events: ${details.custodyReport?.totalEvents ?? 0}`,
           extra: details.custodyReport?.totalProcessingTime
-            ? `Duration ${Math.round(details.custodyReport.totalProcessingTime / 1000)}s`
+            ? `Duration: ${Math.round(details.custodyReport.totalProcessingTime / 1000)}s`
             : ''
         };
-      default:return { primary: formatEventTitle(evt?.eventType ?? 'event'),
+      default:
+        return {
+          primary: formatEventTitle(evt?.eventType ?? 'event'),
           secondary: 'Event processed',
           extra: ''
-        }}
+        };
+    }
   }
 </script>
+
 <div class="custody-timeline">
   {#if events.length === 0}
-    <div class="text-center py-8">
-      <div class="w-12 h-12 mx-auto mb-4 opacity-50">â±ï¸</div>
+    <div class="empty-state">
+      <div class="empty-icon">{'\u{23F1}'}</div>
       <p>No custody events recorded yet</p>
     </div>
   {:else}
-    <div class="relative">
-      <!-- Timeline, line -->
-      <div class="absolute left-6 top-0 bottom-0 w-px"></div>
+    <div class="timeline-container">
+      <div class="timeline-line"></div>
+
       {#each events as event, index}
         {@const details = getEventDetails(event)}
-        {@const isLast = index === events.length - 1}
-        <div class="relative flex items-start space-x-4">
-          <!-- Timeline, dot -->
-          <div
-            class={`relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-4 border-white shadow-lg ${getEventColor(event.eventType)}`}
-          >
-            <span class="text-xl">{getEventIcon(event.eventType)}</span>
+        <div class="timeline-event">
+          <div class="event-dot {getEventColor(event.eventType)}">
+            <span class="event-emoji">{getEventIcon(event.eventType)}</span>
           </div>
-          <!-- Event, content -->
-          <div class="flex-1 min-w-0 bg-white border border-sand/20 rounded-lg shadow-sm">
-            <div class="flex items-start justify-between">
-              <div class="flex-1">
-                <h4 class="font-semibold text-sand">
-                  {details.primary}
-                </h4>
-                <p class="text-sm text-sand/60">
-                  {details.secondary}
-                </p>
+
+          <div class="event-card">
+            <div class="event-header">
+              <div class="event-info">
+                <h4>{details.primary}</h4>
+                <p class="event-secondary">{details.secondary}</p>
                 {#if details.extra}
-                  <p class="text-xs">
-                    {details.extra}
-                  </p>
+                  <p class="event-extra">{details.extra}</p>
                 {/if}
               </div>
-              <!-- Event, badge -->
-              <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10">
+              <span class="event-type-badge">
                 {formatEventTitle(event.eventType)}
               </span>
             </div>
-            <!-- Event, metadata -->
-            <div class="flex items-center justify-between text-xs text-sand/60 pt-2 border-t">
+
+            <div class="event-meta">
               <span>User: {event.userId ?? 'system'}</span>
               <span>{formatTimestamp(event.timestamp)}</span>
             </div>
-            <!-- Digital, signature, indicator -->
+
             {#if event.signature}
-              <div class="mt-2 pt-2 border-t">
-                <div class="flex items-center text-xs">
-                  <span class="mr-1">ðŸ”’</span>
-                  Digitally signed: {String(event.signature).substring(0, 16)}...
-                </div>
-              {/if}
-            <!-- Detailed, information (expandable) -->
+              <div class="event-signature">
+                <span>{'\u{1F512}'}</span>
+                Digitally signed: {String(event.signature).substring(0, 16)}...
+              </div>
+            {/if}
+
             {#if event.details && Object.keys(event.details).length > 0}
-              <details class="mt-2 pt-2 border-t">
-                <summary class="cursor-pointer text-xs text-info">
-                  View detailed information
-                </summary>
-                <div class="mt-2 p-2 bg-sand/5 rounded">
-                  <pre class="whitespace-pre-wrap text-sand/80 font-mono text-xs overflow-auto">
-{JSON.stringify(event.details, null, 2)}
-                  </pre>
+              <details class="event-details-expand">
+                <summary>View detailed information</summary>
+                <div class="details-content">
+                  <pre>{JSON.stringify(event.details, null, 2)}</pre>
                 </div>
               </details>
             {/if}
           </div>
         </div>
       {/each}
-      <!-- Current stage indicator (if workflow, is, active) -->
+
       {#if currentStage && !['completed', 'failed', 'cancelled'].includes(currentStage)}
-        <div class="relative flex items-start">
-          <!-- Active, stage, dot -->
-          <div class="relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-4 border-white shadow-lg bg-info/10 text-info">
-            <div class="text-xl">â±ï¸</div>
+        <div class="timeline-event">
+          <div class="event-dot dot-active pulse-anim">
+            <div class="event-emoji">{'\u{23F1}'}</div>
           </div>
-          <!-- Active, stage, content -->
-          <div class="flex-1 min-w-0 bg-info/5 border border-info/20 rounded-lg">
-            <div class="flex items-center justify-between">
-              <h4 class="font-semibold">Currently: {formatEventTitle(currentStage)}</h4>
-              <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10">In Progress</span>
+          <div class="event-card active-card">
+            <div class="event-header">
+              <h4>Currently: {formatEventTitle(currentStage)}</h4>
+              <span class="event-type-badge">In Progress</span>
             </div>
-            <p class="text-sm">This stage is currently being processed...</p>
+            <p class="event-secondary">This stage is currently being processed...</p>
           </div>
-        {/if}
-    {/if}
+        </div>
+      {/if}
+    </div>
+  {/if}
 </div>
+
 <style>
   .custody-timeline {
     max-height: 600px;
-    overflow-y: auto
-    scroll-behavior: smooth;}
-  .custody-timeline::-webkit-scrollbar {
-    width: 6px;}
-  .custody-timeline::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;}
-  .custody-timeline::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 3px;}
-  .custody-timeline::-webkit-scrollbar-thumb:hover { background: #a8a8a8;}
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #9ca3af;
+  }
+  .empty-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+  .timeline-container {
+    position: relative;
+    padding-left: 1rem;
+  }
+  .timeline-line {
+    position: absolute;
+    left: 2.25rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #333;
+  }
+  .timeline-event {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .event-dot {
+    position: relative;
+    z-index: 10;
+    flex-shrink: 0;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    border: 2px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .dot-intake { border-color: #60a5fa; background: rgba(59, 130, 246, 0.15); }
+  .dot-transfer { border-color: #a78bfa; background: rgba(139, 92, 246, 0.15); }
+  .dot-verification { border-color: #34d399; background: rgba(16, 185, 129, 0.15); }
+  .dot-analysis { border-color: #22d3ee; background: rgba(6, 182, 212, 0.15); }
+  .dot-approval { border-color: #6ee7b7; background: rgba(16, 185, 129, 0.15); }
+  .dot-finalization { border-color: #fbbf24; background: rgba(245, 158, 11, 0.15); }
+  .dot-default { border-color: #9ca3af; background: rgba(156, 163, 175, 0.15); }
+  .dot-active { border-color: #60a5fa; background: rgba(59, 130, 246, 0.15); }
+  .event-emoji { font-size: 1.25rem; }
+  .event-card {
+    flex: 1;
+    min-width: 0;
+    background: #1a1a2e;
+    border: 1px solid #333;
+    border-radius: 0.5rem;
+    padding: 1rem;
+  }
+  .active-card {
+    background: rgba(59, 130, 246, 0.05);
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+  .event-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .event-info { flex: 1; }
+  .event-header h4 {
+    color: #ffffff;
+    font-weight: 600;
+    margin: 0;
+  }
+  .event-secondary {
+    color: #9ca3af;
+    font-size: 0.875rem;
+    margin: 0.25rem 0 0 0;
+  }
+  .event-extra {
+    color: #6b7280;
+    font-size: 0.75rem;
+    margin: 0.25rem 0 0 0;
+  }
+  .event-type-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.05);
+    color: #9ca3af;
+    white-space: nowrap;
+  }
+  .event-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #6b7280;
+    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+    border-top: 1px solid #333;
+  }
+  .event-signature {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #333;
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+  .event-details-expand {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #333;
+  }
+  .event-details-expand summary {
+    cursor: pointer;
+    font-size: 0.75rem;
+    color: #3b82f6;
+  }
+  .details-content {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 0.25rem;
+  }
+  .details-content pre {
+    white-space: pre-wrap;
+    color: #9ca3af;
+    font-family: monospace;
+    font-size: 0.75rem;
+    overflow: auto;
+    margin: 0;
+  }
+  .pulse-anim {
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  .custody-timeline::-webkit-scrollbar { width: 6px; }
+  .custody-timeline::-webkit-scrollbar-track { background: transparent; }
+  .custody-timeline::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
 </style>
-
-
-
-

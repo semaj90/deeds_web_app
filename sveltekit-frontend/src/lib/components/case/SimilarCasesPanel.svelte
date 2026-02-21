@@ -2,9 +2,9 @@
 
  import type { SimilarCase } from '$lib/types/case-summary';
 
- let { cases = [] } = $props<{
+ let { cases = [] }: {
   cases?: SimilarCase[];
- }>();
+ } = $props();
 </script>
 
 <div class="similar-cases-panel">

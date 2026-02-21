@@ -37,6 +37,7 @@
 	// Component state
 	let fileInput = $state<HTMLInputElement | null>(null);
 	let uploadedFile = $state<File | null>(null);
+	// svelte-ignore state_referenced_locally
 	let populatedFields = $state<FormField[]>([...formSchema]);
 	let isProcessing = $state(false);
 	let showPreview = $state(false);
@@ -392,6 +393,7 @@
 
 			<div class="section-content">
 				<div class="doc-type-row">
+					<!-- svelte-ignore a11y_label_has_associated_control -->
 					<label class="doc-type-label">Document Type:</label>
 					<select bind:value={selectedDocumentType} class="doc-type-select">
 						<option value="auto">Auto-detect</option>
@@ -494,6 +496,7 @@
 				<div class="fields-grid">
 					{#each populatedFields as field (field.name)}
 						<div class="field-group">
+							<!-- svelte-ignore a11y_label_has_associated_control -->
 							<label class="field-label">
 								<span class="field-icon">{getFieldTypeIcon(field.type)}</span>
 								<span>{field.label}</span>

@@ -4,6 +4,9 @@
 	import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
 	import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
+	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
+
+	let showCodebaseSearch = $state(false);
 	import { goto } from '$app/navigation';
 	import Activity from '@lucide/svelte/icons/activity';
 	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
@@ -828,9 +831,46 @@ totalCases: 5.2,
 			{/if}
 		</main>
 	</div>
+
+	<!-- Codebase Search Panel -->
+	<div class="codebase-search-toggle">
+		<button class="codebase-toggle-btn" class:active={showCodebaseSearch} onclick={() => (showCodebaseSearch = !showCodebaseSearch)}>
+			{showCodebaseSearch ? '[-] HIDE CODEBASE SEARCH' : '[+] CODEBASE SEARCH (Ctrl+K)'}
+		</button>
+	</div>
+	{#if showCodebaseSearch}
+		<div class="codebase-search-panel">
+			<CodebaseSearch />
+		</div>
+	{/if}
 </div>
 
 <style>
+	.codebase-search-toggle {
+		padding: 0.5rem 1rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.codebase-toggle-btn {
+		background: none;
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		color: rgba(255, 255, 255, 0.5);
+		font-family: inherit;
+		font-size: 0.7rem;
+		padding: 0.3rem 0.75rem;
+		cursor: pointer;
+		letter-spacing: 0.05em;
+		transition: all 0.2s;
+	}
+
+	.codebase-toggle-btn:hover { background: rgba(255, 255, 255, 0.05); color: white; }
+	.codebase-toggle-btn.active { background: rgba(255, 255, 255, 0.05); color: white; border-color: rgba(255, 255, 255, 0.3); }
+
+	.codebase-search-panel {
+		padding: 1rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
 	.command-center {
 		min-height: 100vh;
 	background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);

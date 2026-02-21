@@ -1,7 +1,6 @@
 <!-- DocumentDetails — Document analysis modal with cache-first strategy -->
 <!-- Session 64: Migrated 8 writable stores → $state runes + fixed corrupted template nesting -->
 <script lang="ts">
-	import type { Document, Case } from '$lib/types';
 	import { legalDB } from '$lib/db/client-db.js';
 
 	// Svelte 5 props
@@ -9,12 +8,12 @@
 		documentId = '',
 		isVisible = false,
 		onClose = () => {},
-		relatedDocumentsLoaded = (e: any) => {}
+		relatedDocumentsLoaded = (_e: any) => {}
 	}: {
 		documentId?: string;
 		isVisible?: boolean;
 		onClose?: () => void;
-		relatedDocumentsLoaded?: (e: any) => void;
+		relatedDocumentsLoaded?: (_e: any) => void;
 	} = $props();
 
 	// Reactive state (migrated from writable stores → $state runes)
@@ -51,7 +50,7 @@
 			// THE FAST PATH: Check IndexedDB cache first
 			if (!forceRefresh) {
 				loadingSource = 'cache';
-				const cachedDocument = await legalDB.documentCache.get(docId);
+				const cachedDocument = await legalDB.documentCache.where('documentId').equals(docId).first();
 
 				if (cachedDocument) {
 					cacheHitTime = performance.now() - startTime;
@@ -108,23 +107,19 @@
 
 		const doc: any = data.document ?? data;
 
-		const cacheEntry = {
-			id: doc.id ?? doc.documentId ?? docId,
+		const contentStr = doc.content ?? '';
+		const cacheEntry: import('$lib/db/client-db.js').DocumentCache = {
 			documentId: docId,
 			title: doc.title ?? 'Untitled Document',
-			content: doc.content ?? '',
-			documentType: doc.document_type ?? doc.documentType ?? 'unknown',
+			content: contentStr,
+			contentType: (doc.content_type ?? doc.contentType ?? 'text') as 'text' | 'pdf' | 'docx' | 'md',
+			fileSize: contentStr.length,
 			metadata: {
+				documentType: doc.document_type ?? doc.documentType ?? 'unknown',
 				...(doc.metadata ?? {}),
-				related_documents: data.related_documents ?? [],
-				graph_connections: data.graph_connections ?? [],
-				case_associations: data.case_associations ?? [],
-				gpu_analysis: data.gpu_analysis ?? null,
-				enhanced_metadata: data.enhanced_metadata ?? null
 			},
 			hash: doc.content_hash ?? `hash_${Date.now()}`,
-			lastAccessed: new Date().toISOString(),
-			size: (doc.content && doc.content.length) || 0
+			lastAccessed: new Date(),
 		};
 
 		try {
@@ -524,12 +519,3 @@
 	</div>
 {/if}
 
-<style>
-	.line-clamp-2 {
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		line-clamp: 2;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-	}
-</style>

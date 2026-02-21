@@ -34,11 +34,14 @@
 		{ href: '/command-center', icon: '📡', label: 'COMMAND CENTER' },
 		{ href: '/all-routes', icon: '🗺️', label: 'ALL ROUTES' },
 		{ href: '/terminal', icon: '💻', label: 'TERMINAL' },
+		{ href: '/memory-palace', icon: '🏛️', label: 'MEMORY PALACE' },
+		{ href: '/active-cases', icon: '🔥', label: 'ACTIVE CASES' },
 	];
 
 	const adminItems = [
 		{ href: '/admin', icon: '🔐', label: 'ADMIN' },
 		{ href: '/system-configuration', icon: '⚙️', label: 'SYSTEM CONFIG' },
+		{ href: '/ast-topology', icon: '🕸️', label: 'AST TOPOLOGY' },
 	];
 
 	function isActive(href: string): boolean {

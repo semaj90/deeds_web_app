@@ -10,13 +10,13 @@
  updated_at: string;
  }
 
- let { caseId, showActions = true, ondeleted, onedit, onview } = $props<{
+ let { caseId, showActions = true, ondeleted, onedit, onview }: {
  caseId: string;
  showActions?: boolean;
  ondeleted?: (data: any) => void;
  onedit?: (data: any) => void;
  onview?: (data: any) => void;
- }>();
+ } = $props();
 let links: CaseStatuteLink[] = $state([]);
  let isLoading = $state(true);
  let error: string | null = $state(null);
@@ -44,7 +44,7 @@ let links: CaseStatuteLink[] = $state([]);
  const params = new URLSearchParams();
  if (selectedLinkType) params.set('link_type', selectedLinkType);
 
- const response = await fetch(`/api/cases/${caseId}/laws? ${params}`);
+ const response = await fetch(`/api/cases/${caseId}/laws?${params}`);
  if (response.ok) {
  const data = await response.json();
  if (data.success) {

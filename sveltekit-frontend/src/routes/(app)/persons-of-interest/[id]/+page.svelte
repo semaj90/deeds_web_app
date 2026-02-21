@@ -2,13 +2,16 @@
 	import { poiService } from '$lib/features/poi/services/poi';
 	import type { KnownAssociate } from '$lib/types/poi';
 	import { onMount } from 'svelte';
+	import POIPhotoGrid from '$lib/components/poi/POIPhotoGrid.svelte';
+	import POIQuickActions from '$lib/components/poi/POIQuickActions.svelte';
+	import POIThreatBadge from '$lib/components/poi/POIThreatBadge.svelte';
 
 	let { data } = $props();
 
 	let associates = $state<KnownAssociate[]>([]);
 	let associatesLoading = $state(false);
 	let associatesError = $state<string | null>(null);
-	let activeTab = $state<'details' | 'associates' | 'search'>('details');
+	let activeTab = $state<'details' | 'associates' | 'photos' | 'search'>('details');
 
 	onMount(async () => {
 		if (data.poi?.id) {
@@ -80,12 +83,11 @@
 					<span class="badge status" style="background-color: {getStatusColor(poi.status)}">
 						{poi.status.replace(/_/g, ' ')}
 					</span>
-					<span class="badge threat" style="background-color: {getThreatColor(poi.threatLevel)}">
-						Threat: {poi.threatLevel}
-					</span>
+					<POIThreatBadge threatLevel={poi.threatLevel} size="md" />
 				</div>
 			</div>
-			<div class="header-actions">
+			<div class="header-right">
+				<POIQuickActions caseId={poi.caseId} />
 				<a href="/persons-of-interest" class="btn-secondary">Back</a>
 			</div>
 		</div>
@@ -104,6 +106,13 @@
 				onclick={() => (activeTab = 'associates')}
 			>
 				Known Associates ({associates.length})
+			</button>
+			<button
+				class="tab-button"
+				class:active={activeTab === 'photos'}
+				onclick={() => (activeTab = 'photos')}
+			>
+				Photos ({(poi.photos ?? []).length})
 			</button>
 			<button
 				class="tab-button"
@@ -199,6 +208,8 @@
 						</div>
 					{/if}
 				</div>
+			{:else if activeTab === 'photos'}
+				<POIPhotoGrid photos={poi.photos ?? []} editable={false} />
 			{:else if activeTab === 'search'}
 				<div class="search-section">
 					<p>Similar POIs based on profile analysis</p>
@@ -263,9 +274,11 @@
 		text-transform: capitalize;
 	}
 
-	.header-actions {
+	.header-right {
 		display: flex;
+		flex-direction: column;
 		gap: 1rem;
+		align-items: flex-end;
 	}
 
 	.btn-secondary {

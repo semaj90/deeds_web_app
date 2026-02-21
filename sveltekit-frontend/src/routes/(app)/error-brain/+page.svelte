@@ -6,12 +6,15 @@ import CardDescription from '$lib/components/ui/card/CardDescription.svelte';
 import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
 import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
 import Button from '$lib/components/ui/Button.svelte';
+import Phase72ErrorBrain from '$lib/components/Phase72ErrorBrain.svelte';
 // Migrated to $effect
 
  let status = $state<any>(null);
  let runs = $state<any[]>([]);
  let loading = $state(true);
  let error = $state<string | null>(null);
+ let showErrorBrain = $state(false);
+ let selectedRoute = $state<string | null>(null);
 
  async function fetchStatus() {
  try {
@@ -72,7 +75,12 @@ import Button from '$lib/components/ui/Button.svelte';
  </p>
  </div>
  <Button class="bits-btn" onclick={createRun}>Create New Run</Button>
+	<Button class="bits-btn" onclick={() => (showErrorBrain = true)}>Phase 72 Error Brain</Button>
  </div>
+
+ {#if showErrorBrain}
+	<Phase72ErrorBrain routePath={selectedRoute} onClose={() => (showErrorBrain = false)} />
+ {/if}
 
  {#if error}
  <Card class="border-destructive">
@@ -130,6 +138,17 @@ import Button from '$lib/components/ui/Button.svelte';
  </Card>
  {/if}
  </div>
+
+ <!-- Route Filter for Error Brain -->
+ <Card>
+	<CardContent>
+		<div style="display: flex; gap: 0.75rem; align-items: center; padding-top: 1rem;">
+			<label for="route-filter" style="font-size: 0.875rem; font-weight: 600;">Route Filter:</label>
+			<input id="route-filter" type="text" placeholder="e.g. /dashboard, /cases/[id]" bind:value={selectedRoute} style="flex: 1; padding: 0.5rem; border: 1px solid #ccc; border-radius: 0.25rem; font-family: monospace;" />
+			<Button class="bits-btn" onclick={() => { if (selectedRoute) showErrorBrain = true; }}>Inspect Route</Button>
+		</div>
+	</CardContent>
+ </Card>
 
  <!-- Runs List -->
  <Card>

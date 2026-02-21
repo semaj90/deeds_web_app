@@ -5,11 +5,11 @@
  import CheckCircle from '@lucide/svelte/icons/check-circle';
  import Shield from '@lucide/svelte/icons/shield';
 
- let { threatLevel, size = 'md', showIcon = true } = $props<{
+ let { threatLevel, size = 'md', showIcon = true }: {
   threatLevel: string;
   size?: 'sm' | 'md' | 'lg';
   showIcon?: boolean;
- }>();
+ } = $props();
 
  function getThreatConfig(level: string) {
  switch (level) {

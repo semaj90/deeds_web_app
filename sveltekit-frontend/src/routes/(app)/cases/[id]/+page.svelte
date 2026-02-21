@@ -8,6 +8,16 @@
 	import { onMount } from "svelte";
 import EvidenceUploadPreview from '$lib/components/evidence/EvidenceUploadPreview.svelte';
 import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svelte';
+import WysiwygEditor from '$lib/components/editor/WysiwygEditor.svelte';
+import CaseTheoryConstructor from '$lib/components/yorha/CaseTheoryConstructor.svelte';
+import QuickActionsPanel from '$lib/components/dashboard/QuickActionsPanel.svelte';
+import CaseOutcomePrediction from '$lib/components/CaseOutcomePrediction.svelte';
+import CaseTimeline from '$lib/components/legal/CaseTimeline.svelte';
+import CrossExaminationAssistant from '$lib/components/yorha/CrossExaminationAssistant.svelte';
+import SimilarCasesPanel from '$lib/components/case/SimilarCasesPanel.svelte';
+import StatuteModal from '$lib/components/charges/StatuteModal.svelte';
+import CaseStatuteLinks from '$lib/components/legal-ai/CaseStatuteLinks.svelte';
+import type { SimilarCase } from '$lib/types/case-summary';
  import { CacheStrategies, useCache } from '$lib/cache/cache-service.svelte';
  import NesModal from '$lib/components/nes/NesModal.svelte';
 
@@ -37,6 +47,8 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  let showChatModal = $state(false);
  let isExportingPacket = $state(false);
  let exportPacketError = $state('');
+ let showDescriptionEditor = $state(false);
+ let caseDescription = $state('');
 
  // Citation & Statute state
  interface CitationLink {
@@ -63,13 +75,17 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  let isLoadingCitations = $state(false);
  let isLoadingStatutes = $state(false);
  let showCitationModal = $state(false);
- let activeTab = $state<'evidence' | 'citations'>('evidence');
+ let activeTab = $state<'evidence' | 'citations' | 'theory' | 'cross-exam' | 'prediction' | 'timeline' | 'statutes'>('evidence');
+ let similarCases = $state<SimilarCase[]>([]);
+ let isLoadingSimilar = $state(false);
+ let selectedStatute = $state<any>(null);
+ let showStatuteModal = $state(false);
 
  const caseId = page.params.id;
 
  onMount(async () => {
  await loadCase();
- await Promise.all([loadEvidence(), loadCitations(), loadStatutes()]);
+ await Promise.all([loadEvidence(), loadCitations(), loadStatutes(), loadSimilarCases()]);
  });
 
  const loadCase = async () => {
@@ -96,6 +112,7 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
 
  const data = await response.json();
  caseData = data;
+ caseDescription = data.description ?? '';
 
  // Cache with 5 minute TTL
  await cache.set(cacheKey, data, CacheStrategies.TWO_LAYER);
@@ -103,6 +120,26 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  } catch (err) {
  error = err instanceof Error ? err.message : 'Failed to load case';
  }
+ };
+
+ const loadSimilarCases = async () => {
+   isLoadingSimilar = true;
+   try {
+     const response = await fetch(`/api/cases/${caseId}/similar`);
+     if (!response.ok) return;
+     const data = await response.json();
+     similarCases = (data.cases ?? data ?? []).map((c: any) => ({
+       id: c.id,
+       title: c.title ?? 'Untitled',
+       charges: c.charges ?? [],
+       outcome: c.outcome ?? '',
+       relevanceScore: c.relevanceScore ?? c.similarity ?? 0,
+     }));
+   } catch {
+     // Degrade gracefully — similar cases are optional
+   } finally {
+     isLoadingSimilar = false;
+   }
  };
 
  const loadEvidence = async () => {
@@ -338,6 +375,25 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  </div>
  </div>
  <h1 class="text-3xl font-bold text-gray-900">{caseData?.title ?? 'Loading...'}</h1>
+ <div class="mt-3">
+   <button
+     onclick={() => (showDescriptionEditor = !showDescriptionEditor)}
+     class="text-sm text-blue-600 hover:underline"
+   >
+     {showDescriptionEditor ? 'Hide Description Editor' : 'Edit Case Description'}
+   </button>
+ </div>
+ {#if showDescriptionEditor}
+   <div class="mt-4">
+     <WysiwygEditor
+       content={caseDescription}
+       height="250px"
+       enableAI={true}
+       enableCitation={true}
+       onchange={(detail) => { caseDescription = detail.content; }}
+     />
+   </div>
+ {/if}
  </div>
  </header>
 
@@ -401,6 +457,36 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
      class={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === 'citations' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
    >
      Citations & Laws ({citations.length + statutes.length})
+   </button>
+   <button
+     onclick={() => (activeTab = 'theory')}
+     class={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === 'theory' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+   >
+     Case Theory
+   </button>
+   <button
+     onclick={() => (activeTab = 'cross-exam')}
+     class={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === 'cross-exam' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+   >
+     Cross-Exam
+   </button>
+   <button
+     onclick={() => (activeTab = 'prediction')}
+     class={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === 'prediction' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+   >
+     Prediction
+   </button>
+   <button
+     onclick={() => (activeTab = 'timeline')}
+     class={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === 'timeline' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+   >
+     Timeline
+   </button>
+   <button
+     onclick={() => (activeTab = 'statutes')}
+     class={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === 'statutes' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+   >
+     Statutes
    </button>
  </div>
 
@@ -468,7 +554,7 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  {/if}
  </div>
 
- {:else}
+ {:else if activeTab === 'citations'}
  <!-- Citations & Laws Tab -->
  <div class="bg-white rounded-lg shadow p-6">
    <div class="flex items-center justify-between mb-4">
@@ -522,7 +608,13 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
    {:else}
      <div class="space-y-3">
        {#each statutes as statute (statute.id)}
-         <div class="p-4 rounded-lg border border-gray-200 hover:border-amber-300 transition">
+         <div
+           class="p-4 rounded-lg border border-gray-200 hover:border-amber-300 transition cursor-pointer"
+           onclick={() => { selectedStatute = { id: statute.statuteId, title: statute.statuteTitle, section: statute.statuteSection, jurisdiction: statute.statuteJurisdiction }; showStatuteModal = true; }}
+           role="button"
+           tabindex="0"
+           onkeydown={(e) => { if (e.key === 'Enter') { selectedStatute = { id: statute.statuteId, title: statute.statuteTitle, section: statute.statuteSection, jurisdiction: statute.statuteJurisdiction }; showStatuteModal = true; } }}
+         >
            <div class="flex items-start justify-between">
              <div class="flex-1">
                <p class="font-medium text-gray-900">{statute.statuteTitle || 'Untitled statute'}</p>
@@ -545,6 +637,38 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
      </div>
    {/if}
  </div>
+ {:else if activeTab === 'theory'}
+ <!-- Case Theory Tab -->
+ <QuickActionsPanel {caseId} />
+ <div class="mt-6">
+   <CaseTheoryConstructor />
+ </div>
+ {:else if activeTab === 'cross-exam'}
+ <!-- Cross-Examination Tab -->
+ <CrossExaminationAssistant
+   evidence={evidence.map(e => ({ id: e.id, title: e.fileName, description: e.documentType }))}
+   caseContext={caseData?.title ?? ''}
+ />
+ {:else if activeTab === 'prediction'}
+ <!-- Outcome Prediction Tab -->
+ <CaseOutcomePrediction
+   caseFacts={caseData?.title ?? ''}
+   jurisdiction="general"
+ />
+ {:else if activeTab === 'timeline'}
+ <!-- Case Timeline Tab -->
+ <CaseTimeline
+   {caseId}
+   caseName={caseData?.title ?? ''}
+   events={[]}
+   interactive={true}
+ />
+ {:else if activeTab === 'statutes'}
+ <!-- Linked Statutes Tab -->
+ <CaseStatuteLinks
+   {caseId}
+   onview={(link) => { selectedStatute = { id: link.statute_code, title: link.statute_code, section: link.link_type }; showStatuteModal = true; }}
+ />
  {/if}
 
  </div>
@@ -610,11 +734,28 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  </div>
  </div>
  </div>
+
+ <!-- Similar Cases -->
+ {#if isLoadingSimilar}
+ <div class="bg-white rounded-lg shadow p-6 text-center text-gray-600">
+   <p>Finding similar cases...</p>
+ </div>
+ {:else if similarCases.length > 0}
+ <SimilarCasesPanel cases={similarCases} />
+ {/if}
  </div>
  </div>
  </main>
-</div>
 
-<style>
- /* Additional styles if needed */
-</style>
+
+ <!-- Statute Detail Modal -->
+ {#if showStatuteModal}
+ <StatuteModal
+   isOpen={showStatuteModal}
+   statute={selectedStatute}
+   {caseId}
+   onClose={() => { showStatuteModal = false; selectedStatute = null; }}
+   onAttach={(charge) => { showStatuteModal = false; selectedStatute = null; loadStatutes(); }}
+ />
+ {/if}
+</div>

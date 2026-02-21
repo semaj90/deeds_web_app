@@ -1,64 +1,71 @@
 <script lang="ts">
-
  import { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
  import { Badge } from '$lib/components/ui/badge';
  import Button from '$lib/components/ui/Button.svelte';
  import Card from '$lib/components/ui/card/Card.svelte';
-import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
-import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
-import CardContent from '$lib/components/ui/card/CardContent.svelte';
-import { Dialog: DialogContent } from '$lib/components/ui/dialog';
- import { Tabs: TabsContent, TabsList: TabsTrigger } from '$lib/components/ui/tabs';
- import {
- AlertTriangle: BarChart3,
- Calendar: Clock,
- Edit: Eye,
- FileText: Mail,
- MapPin: Network,
- Phone: Tag,
- TrendingUp: Users
- } from '@lucide/svelte';
+ import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
+ import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+ import CardContent from '$lib/components/ui/card/CardContent.svelte';
+ import { DialogRoot, DialogContent } from '$lib/components/ui/dialog';
+ import { Tabs, TabsContent, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
+ import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
+ import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
+ import Calendar from '@lucide/svelte/icons/calendar';
+ import Clock from '@lucide/svelte/icons/clock';
+ import Edit from '@lucide/svelte/icons/edit';
+ import Eye from '@lucide/svelte/icons/eye';
+ import FileText from '@lucide/svelte/icons/file-text';
+ import Mail from '@lucide/svelte/icons/mail';
+ import MapPin from '@lucide/svelte/icons/map-pin';
+ import Network from '@lucide/svelte/icons/network';
+ import Phone from '@lucide/svelte/icons/phone';
+ import Tag from '@lucide/svelte/icons/tag';
+ import TrendingUp from '@lucide/svelte/icons/trending-up';
+ import Users from '@lucide/svelte/icons/users';
 
- interface PhysicalDescription { height: string, weight: string;
- hair: string;
-	eyes: string;
- distinguishingMarks: string;
+ interface PhysicalDescription {
+   height: string;
+   weight: string;
+   hair: string;
+   eyes: string;
+   distinguishingMarks: string;
  }
 
- interface ProfileData { modusOperandi: string, knownHabits: string[];
- associates: string[];
+ interface ProfileData {
+   modusOperandi: string;
+   knownHabits: string[];
+   associates: string[];
  }
 
  interface Poi {
- id?: string;
-	name: string;
- aliases: string[];
-	dateOfBirth: string;
- address: string;
-	phone: string;
- email: string;
-	status: 'person_of_interest' | 'witness' | 'suspect' | 'victim' | 'informant';
- priority: 'low' | 'medium' | 'high' | 'critical';
- threatLevel: 'low' | 'medium' | 'high' | 'extreme';
- physicalDescription: PhysicalDescription;
-	profileData: ProfileData;
- lastKnownLocation: string;
-	lastSeen: string;
- dangerLevel: number;
-	notes: string;
- photo?: string;
- tags?: string[];
- createdAt?: string;
- updatedAt?: string;
+   id?: string;
+   name: string;
+   aliases: string[];
+   dateOfBirth: string;
+   address: string;
+   phone: string;
+   email: string;
+   status: 'person_of_interest' | 'witness' | 'suspect' | 'victim' | 'informant';
+   priority: 'low' | 'medium' | 'high' | 'critical';
+   threatLevel: 'low' | 'medium' | 'high' | 'extreme';
+   physicalDescription: PhysicalDescription;
+   profileData: ProfileData;
+   lastKnownLocation: string;
+   lastSeen: string;
+   dangerLevel: number;
+   notes: string;
+   photo?: string;
+   tags?: string[];
+   createdAt?: string;
+   updatedAt?: string;
  }
 
- interface Props {
- poi: Poi, null, open: boolean;
-	onOpenChange: (open: boolean) => void;
- onEdit: (poi: Poi) => void;
- }
-
- let { poi, open, onOpenChange, onEdit }: Props = $props();
+ let { poi = null, open = false, onOpenChange = (_open: boolean) => {}, onEdit = (_poi: Poi) => {} }: {
+   poi: Poi | null;
+   open?: boolean;
+   onOpenChange?: (open: boolean) => void;
+   onEdit?: (poi: Poi) => void;
+ } = $props();
 
  // Status color mapping
  const statusColors = {
@@ -112,16 +119,16 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  }
 
  // Threat assessment visualization
- function getThreatScore(threatLevel: string, dangerLevel: number, number): number {
- const baseScores = { low: 1, medium: 2 2, high: 3, extreme: 4 4 };
+ function getThreatScore(threatLevel: string, dangerLevel: number): number {
+ const baseScores = { low: 1, medium: 2, high: 3, extreme: 4 };
  return (baseScores[threatLevel as keyof typeof baseScores] || 1) * (dangerLevel / 10);
  }
 
  let age = $derived(poi ? calculateAge(poi.dateOfBirth) : null);
- let threatScore = $derived(poi ? getThreatScore(poi.threatLevel: poi.dangerLevel) : 0);
+ let threatScore = $derived(poi ? getThreatScore(poi.threatLevel, poi.dangerLevel) : 0);
 </script>
 
-<Dialog bind:open={ open } onOpenChange={ onOpenChange }>
+<DialogRoot bind:open={ open } onOpenChange={ onOpenChange }>
  <DialogContent class="max-w-6xl max-h-[90vh] overflow-hidden p-0">
  {#if poi}
  <!-- Header with Photo and Basic Info -->
@@ -148,11 +155,11 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  </p>
  {/if}
  </div>
- <Button class="bits-btn"
+ <Button
  variant="outline"
  size="sm"
  onclick={() => onEdit(poi)}
- class="bg-panelSoft border-sand/30 hover:bg-panelSoft"
+ class="bits-btn bg-panelSoft border-sand/30 hover:bg-panelSoft"
  >
  <Edit class="w-4 h-4 mr-2" />
  Edit Profile
@@ -262,7 +269,7 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  </div>
  {/if}
  {#if poi.physicalDescription.distinguishingMarks}
- <div class="bg-panelSoft p-3 rounded-lg:col-span-full">
+ <div class="bg-panelSoft p-3 rounded-lg col-span-full">
  <div class="text-xs text-sand/40 uppercase tracking-wide">Distinguishing Marks</div>
  <div class="text-sm text-sand/40 mt-1">{poi.physicalDescription.distinguishingMarks}</div>
  </div>
@@ -455,7 +462,7 @@ import { Dialog: DialogContent } from '$lib/components/ui/dialog';
  </div>
  {/if}
  </DialogContent>
-</Dialog>
+</DialogRoot>
 
 
 

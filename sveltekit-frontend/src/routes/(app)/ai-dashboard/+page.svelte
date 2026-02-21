@@ -4,6 +4,8 @@
   import CardContent from '$lib/components/ui/card/CardContent.svelte';
   import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
   import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+  import AskAI from '$lib/components/ai/AskAI.svelte';
+  import ClientSideAIChat from '$lib/components/ai/ClientSideAIChat.svelte';
 
   interface AIStats {
     activeChats: number;
@@ -37,6 +39,8 @@
   let models = $state<ModelInfo[]>([]);
   let loading = $state(true);
   let error = $state<string | null>(null);
+  let showAskAI = $state(false);
+  let showLocalAI = $state(false);
 
   $effect(() => {
     loadDashboard();
@@ -149,6 +153,36 @@
         </CardContent>
       </Card>
     {/if}
+
+    <!-- AI Chat (Server) -->
+    <div class="mt-6">
+      <button
+        onclick={() => (showAskAI = !showAskAI)}
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/20 rounded-lg text-sand/80 hover:border-accent/40 transition text-sm font-medium"
+      >
+        {showAskAI ? 'Hide AI Chat' : 'Ask AI (Server — Gemma3 Legal)'}
+      </button>
+      {#if showAskAI}
+        <div class="mt-3">
+          <AskAI placeholder="Ask a legal question..." showReferences={true} />
+        </div>
+      {/if}
+    </div>
+
+    <!-- Client-Side AI Chat -->
+    <div class="mt-4">
+      <button
+        onclick={() => (showLocalAI = !showLocalAI)}
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/20 rounded-lg text-sand/80 hover:border-accent/40 transition text-sm font-medium"
+      >
+        {showLocalAI ? 'Hide Local AI' : 'Local AI Chat (Client ONNX — No Server)'}
+      </button>
+      {#if showLocalAI}
+        <div class="mt-3">
+          <ClientSideAIChat showStatus={true} />
+        </div>
+      {/if}
+    </div>
 
     {#if error}
       <Card class="mt-4 bg-panel border-danger/40">

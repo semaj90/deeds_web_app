@@ -12,7 +12,13 @@
   import CollaborationPanel from './CollaborationPanel.svelte';
   import WorkflowProgress from './WorkflowProgress.svelte';
   import Button from '$lib/components/ui/Button.svelte';
-  import { toast } from 'svelte-sonner';
+
+  // Lightweight toast fallback (svelte-sonner not installed)
+  const toast = {
+    success: (msg: string) => console.log('[Custody] \u2705', msg),
+    error: (msg: string) => console.error('[Custody] \u274C', msg),
+    info: (msg: string) => console.info('[Custody] \u2139\uFE0F', msg),
+  };
   import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
   import CheckCircle from '@lucide/svelte/icons/check-circle';
   import Clock from '@lucide/svelte/icons/clock';

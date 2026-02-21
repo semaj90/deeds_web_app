@@ -11,17 +11,16 @@
 		similarCases = [] as string[],
 		onPredictionComplete,
 		onPredictionError
-	} = $props<{
+	}: {
 		caseFacts?: string;
 		caseType?: string;
 		jurisdiction?: string;
 		partyType?: string;
 		historicalData?: string[];
 		similarCases?: string[];
-		onPredictionComplete?: (event: {
-prediction: any }) => void;
-		onPredictionError?: (event: {
-error: string }) => void }>();
+		onPredictionComplete?: (event: { prediction: any }) => void;
+		onPredictionError?: (event: { error: string }) => void;
+	} = $props();
 
 	// Define a type for the prediction outcome part that is stored in history
 	interface OutcomePredictionSummary { success_probability: number, most_likely_outcome: string;

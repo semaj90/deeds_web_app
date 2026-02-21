@@ -1,5 +1,10 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/Button.svelte';
+	import RAGSearchComponent from '$lib/components/RAGSearchComponent.svelte';
+	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
+
+	let showRAGAssistant = $state(false);
+	let showCodebaseSearch = $state(false);
 	import { getConfidenceLevel, formatProcessingTime } from '$lib/utils';
 	import type { RetrievalContext, RankedChunk } from '$lib/machines/retrieval-machine.js';
 	import Search from '@lucide/svelte/icons/search';
@@ -758,9 +763,57 @@
 			{/if}
 		</aside>
 	</div>
+
+	<!-- RAG Assistant Panel -->
+	<div class="rag-toggle">
+		<button class="rag-toggle-btn" class:active={showRAGAssistant} onclick={() => (showRAGAssistant = !showRAGAssistant)}>
+			{showRAGAssistant ? '[-] HIDE RAG ASSISTANT' : '[+] RAG SEARCH ASSISTANT'}
+		</button>
+		<button class="rag-toggle-btn" class:active={showCodebaseSearch} onclick={() => (showCodebaseSearch = !showCodebaseSearch)}>
+			{showCodebaseSearch ? '[-] HIDE CODEBASE SEARCH' : '[+] CODEBASE SEARCH (Ctrl+K)'}
+		</button>
+	</div>
+	{#if showRAGAssistant}
+		<div class="rag-panel">
+			<RAGSearchComponent />
+		</div>
+	{/if}
+	{#if showCodebaseSearch}
+		<div class="rag-panel">
+			<CodebaseSearch />
+		</div>
+	{/if}
 </div>
 
 <style>
+	.rag-toggle {
+		display: flex;
+		gap: 0.5rem;
+		padding: 0.5rem 1rem;
+		border-top: 1px solid #3a3520;
+	}
+
+	.rag-toggle-btn {
+		background: none;
+		border: 1px solid #3a3520;
+		color: #8a7a5a;
+		font-family: inherit;
+		font-size: 0.7rem;
+		padding: 0.3rem 0.75rem;
+		cursor: pointer;
+		letter-spacing: 0.05em;
+		transition: all 0.2s;
+	}
+
+	.rag-toggle-btn:hover { background: #2a2510; color: #d4c9a9; }
+	.rag-toggle-btn.active { background: #2a2510; color: #d4c9a9; border-color: #5a4a30; }
+
+	.rag-panel {
+		padding: 1rem;
+		border-top: 1px solid #3a3520;
+		max-height: 60vh;
+		overflow-y: auto;
+	}
 	.search-page {
 		display: flex;
 		flex-direction: column;

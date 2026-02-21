@@ -5,6 +5,8 @@
   import CardContent from '$lib/components/ui/card/CardContent.svelte';
   import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
   import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+  import WorkspacePanel from '$lib/components/legal/WorkspacePanel.svelte';
+  import SystemStatusPanel from '$lib/components/dashboard/SystemStatusPanel.svelte';
 
   interface DashboardStats {
     activeCases: number;
@@ -151,6 +153,16 @@
         {/if}
       </CardContent>
     </Card>
+
+    <!-- Workspace -->
+    <div class="mt-8">
+      <WorkspacePanel workspaceId="dashboard" />
+    </div>
+
+    <!-- System Status -->
+    <div class="mt-8">
+      <SystemStatusPanel />
+    </div>
 
     {#if error}
       <Card class="mt-4 bg-panel border-danger/40">

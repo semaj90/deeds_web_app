@@ -8,8 +8,10 @@
 		depth = 'comprehensive',
 		research,
 		researchHistory = [],
-		error = null
-	} = $props<{
+		error = null,
+		onresearchcomplete,
+		onresearcherror
+	}: {
 		query?: string;
 		jurisdiction?: string;
 		caseType?: string;
@@ -17,7 +19,9 @@
 		research: Research;
 		researchHistory?: ResearchHistoryItem[];
 		error?: string | null;
-	}>();
+		onresearchcomplete?: (detail: { research: Research }) => void;
+		onresearcherror?: (detail: { error: unknown }) => void;
+	} = $props();
 // Type Definitions
 	interface ResearchMetadata {
 		confidence_level?: 'high' | 'medium' | 'low';
@@ -129,7 +133,8 @@
 			// Add to history
 			currentResearchHistory = [{
 				query: query.trim(),
-				result
+				result,
+				timestamp: new Date().toISOString()
 			},
 	...currentResearchHistory.slice(0, 9)]; // Keep last 10
 

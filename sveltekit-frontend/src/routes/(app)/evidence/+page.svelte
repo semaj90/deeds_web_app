@@ -1,6 +1,11 @@
 <script lang="ts">
 	import { applyAction, enhance } from '$app/forms';
 	import type { ActionData, PageData } from './$types';
+	import SmartDocumentForm from '$lib/components/forms/SmartDocumentForm.svelte';
+	import DocumentDetails from '$lib/components/legal/DocumentDetails.svelte';
+	import DetectiveEvidenceMap from '$lib/components/yorha/DetectiveEvidenceMap.svelte';
+	import EvidenceCRUDModal from '$lib/components/modals/EvidenceCRUDModal.svelte';
+	import EvidenceCustodyFlow from '$lib/components/legal/EvidenceCustodyFlow.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -11,6 +16,17 @@
 	let searchQuery = $state('');
 	let typeFilter = $state('all');
 	let viewMode = $state<'grid' | 'list'>('grid');
+
+	// Component integration state
+	let showAdvancedUpload = $state(false);
+	let showDocumentDetails = $state(false);
+	let selectedDocumentId = $state('');
+	let showEvidenceMap = $state(false);
+	let showCustodyFlow = $state(false);
+	let custodyEvidenceId = $state('');
+	let showCrudModal = $state(false);
+	let crudMode = $state<'create' | 'edit' | 'view'>('create');
+	let crudEvidenceId = $state<string | undefined>(undefined);
 
 	// Backend semantic search state
 	let searchMode = $state<'local' | 'semantic'>('local');
@@ -167,9 +183,14 @@
 				<h1 class="text-3xl font-bold text-sand">Evidence Gallery</h1>
 				<p class="text-sand/60 mt-1">{data.evidence?.length ?? 0} items{data.caseId ? ` for case` : ''}</p>
 			</div>
-			<a href="/evidence/upload" class="px-4 py-2 bg-info text-white rounded-lg hover:bg-info/80 transition text-sm font-medium">
-				+ Upload Evidence
-			</a>
+			<div class="flex gap-2">
+				<button onclick={() => { crudMode = 'create'; crudEvidenceId = undefined; showCrudModal = true; }} class="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/80 transition text-sm font-medium">
+					+ Create with AI
+				</button>
+				<a href="/evidence/upload" class="px-4 py-2 bg-info text-white rounded-lg hover:bg-info/80 transition text-sm font-medium">
+					+ Upload Evidence
+				</a>
+			</div>
 		</div>
 
 		<!-- Upload Drop Zone -->
@@ -230,6 +251,28 @@
 					</div>
 				{/if}
 			</form>
+			<div class="mt-2">
+				<button
+					onclick={() => (showAdvancedUpload = !showAdvancedUpload)}
+					class="text-sm text-info hover:underline"
+				>
+					{showAdvancedUpload ? 'Hide Advanced Upload' : 'Advanced Upload with OCR'}
+				</button>
+			</div>
+
+			{#if showAdvancedUpload}
+				<div class="mt-4">
+					<SmartDocumentForm
+						title="Advanced Evidence Upload"
+						description="Upload with OCR extraction and entity detection"
+						caseId={data.caseId ?? ''}
+						onsubmit={() => {
+							showAdvancedUpload = false;
+							window.location.reload();
+						}}
+					/>
+				</div>
+			{/if}
 		</div>
 
 		<!-- Filters -->
@@ -288,7 +331,14 @@
 		{:else if viewMode === 'grid'}
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 				{#each displayEvidence as doc (doc.id)}
-					<div class="bg-panelSoft rounded-lg hover:shadow-md transition p-5 border border-sand/20">
+					<!-- svelte-ignore a11y_no_static_element_interactions -->
+					<div
+						class="bg-panelSoft rounded-lg hover:shadow-md transition p-5 border border-sand/20 cursor-pointer"
+						role="button"
+						tabindex="0"
+						onclick={() => { selectedDocumentId = doc.id; showDocumentDetails = true; }}
+						onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { selectedDocumentId = doc.id; showDocumentDetails = true; } }}
+					>
 						<div class="flex items-start gap-3 mb-3">
 							<span class="text-3xl">{getIcon(doc.fileType ?? doc.file_type ?? '')}</span>
 							<div class="flex-1 min-w-0">
@@ -307,10 +357,13 @@
 						<div class="flex items-center justify-between text-xs text-sand/40">
 							<span>{formatDate(doc.createdAt ?? doc.created_at)}</span>
 							{#if !doc.similarity}
-								<form method="POST" action="?/delete" use:enhance>
-									<input type="hidden" name="evidenceId" value={doc.id} />
-									<button type="submit" class="text-danger/60 hover:text-danger transition" title="Delete">Remove</button>
-								</form>
+								<div class="flex gap-2">
+									<button onclick={(e) => { e.stopPropagation(); crudMode = 'edit'; crudEvidenceId = doc.id; showCrudModal = true; }} class="text-info/60 hover:text-info transition">Edit</button>
+									<form method="POST" action="?/delete" use:enhance>
+										<input type="hidden" name="evidenceId" value={doc.id} />
+										<button type="submit" class="text-danger/60 hover:text-danger transition" title="Delete">Remove</button>
+									</form>
+								</div>
 							{/if}
 						</div>
 					</div>
@@ -330,7 +383,10 @@
 					</thead>
 					<tbody>
 						{#each displayEvidence as doc (doc.id)}
-							<tr class="border-b border-sand/10 hover:bg-panel/50">
+							<tr
+								class="border-b border-sand/10 hover:bg-panel/50 cursor-pointer"
+								onclick={() => { selectedDocumentId = doc.id; showDocumentDetails = true; }}
+							>
 								<td class="px-4 py-3">
 									<div class="flex items-center gap-2">
 										<span class="text-lg">{getIcon(doc.fileType)}</span>
@@ -346,10 +402,13 @@
 								<td class="px-4 py-3 text-sm text-sand/80">{formatFileSize(doc.fileSize)}</td>
 								<td class="px-4 py-3 text-sm text-sand/60">{formatDate(doc.createdAt)}</td>
 								<td class="px-4 py-3 text-right">
-									<form method="POST" action="?/delete" use:enhance class="inline">
-										<input type="hidden" name="evidenceId" value={doc.id} />
-										<button type="submit" class="text-danger/60 hover:text-danger text-sm transition">Remove</button>
-									</form>
+									<div class="flex gap-2 justify-end">
+										<button onclick={(e) => { e.stopPropagation(); crudMode = 'edit'; crudEvidenceId = doc.id; showCrudModal = true; }} class="text-info/60 hover:text-info text-sm transition">Edit</button>
+										<form method="POST" action="?/delete" use:enhance class="inline">
+											<input type="hidden" name="evidenceId" value={doc.id} />
+											<button type="submit" class="text-danger/60 hover:text-danger text-sm transition">Remove</button>
+										</form>
+									</div>
 								</td>
 							</tr>
 						{/each}
@@ -357,8 +416,58 @@
 				</table>
 			</div>
 		{/if}
+		<!-- Evidence Relationship Map -->
+		<div class="mt-6">
+			<button
+				onclick={() => (showEvidenceMap = !showEvidenceMap)}
+				class="ev-map-toggle"
+			>
+				{showEvidenceMap ? 'Hide Evidence Map' : 'Evidence Relationship Map'}
+			</button>
+		</div>
+		{#if showEvidenceMap}
+			<div class="mt-4">
+				<DetectiveEvidenceMap caseId={data.caseId ?? null} show={showEvidenceMap} />
+			</div>
+		{/if}
+		<!-- Evidence Custody Flow -->
+		<div class="mt-6">
+			<button
+				onclick={() => (showCustodyFlow = !showCustodyFlow)}
+				class="ev-map-toggle"
+			>
+				{showCustodyFlow ? 'Hide Custody Workflow' : 'Chain of Custody Workflow'}
+			</button>
+		</div>
+		{#if showCustodyFlow}
+			<div class="mt-4">
+				<EvidenceCustodyFlow
+					evidenceId={custodyEvidenceId || (filteredEvidence[0]?.id ?? '')}
+					caseId={data.caseId ?? ''}
+					userId={data.user?.id ?? 'anonymous'}
+					originalHash={''}
+					onWorkflowComplete={() => { showCustodyFlow = false; window.location.reload(); }}
+					onWorkflowError={(err) => { uploadError = `Custody error: ${err}`; }}
+				/>
+			</div>
+		{/if}
 	</div>
 </div>
+
+<DocumentDetails
+	documentId={selectedDocumentId}
+	isVisible={showDocumentDetails}
+	onClose={() => (showDocumentDetails = false)}
+/>
+
+<EvidenceCRUDModal
+	bind:isOpen={showCrudModal}
+	mode={crudMode}
+	evidenceId={crudEvidenceId}
+	onClose={() => { showCrudModal = false; }}
+	onSave={() => { window.location.reload(); }}
+	onDelete={() => { window.location.reload(); }}
+/>
 
 <style>
 	.ev-toolbar {
@@ -433,5 +542,18 @@
 	.ev-score.low {
 		background: rgba(245, 101, 101, 0.15);
 		color: #f56565;
+	}
+	.ev-map-toggle {
+		padding: 0.5rem 1rem;
+		background: rgba(59, 130, 246, 0.12);
+		border: 1px solid rgba(59, 130, 246, 0.4);
+		color: #60a5fa;
+		border-radius: 0.375rem;
+		cursor: pointer;
+		font-size: 0.85rem;
+		transition: all 0.15s;
+	}
+	.ev-map-toggle:hover {
+		background: rgba(59, 130, 246, 0.2);
 	}
 </style>
