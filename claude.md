@@ -1,6 +1,6 @@
 # Legal AI Platform — Claude Project Instructions
 
-## Last Updated: February 18, 2026 (Session 54)
+## Last Updated: February 20, 2026 (Session 63)
 ## Status: svelte-check 0 errors, 0 warnings (down from 19,666+)
 
 ---
@@ -158,6 +158,61 @@ let { value, onChange }: Props = $props();
 | `on:click={fn}` | `onclick={fn}` |
 | `<slot>` | `{#snippet children()}{/snippet}` + `{@render children()}` |
 | `writable()` stores | `$state()` in `.svelte.ts` files |
+
+### Store Migration Patterns (Session 63)
+
+**In `.svelte` files** — replace `writable()` inline:
+```typescript
+// Before (Svelte 4)
+import { writable, get } from 'svelte/store';
+const items = writable<Item[]>([]);
+$items.push(newItem);       // auto-subscribed via $ prefix
+items.set([]);               // .set() method
+items.update(i => [...i]);   // .update() method
+
+// After (Svelte 5)
+let items = $state<Item[]>([]);
+items.push(newItem);         // direct mutation (proxied)
+items = [];                  // direct assignment
+items = [...items, newItem]; // spread for new reference
+```
+
+**In `.svelte.ts` files** — class-backed `$state` (preferred for shared stores):
+```typescript
+// src/lib/stores/user.svelte.ts
+class UserStore {
+  user = $state<User | null>(null);
+  isAuthenticated = $derived(this.user !== null);
+
+  login(u: User) { this.user = u; }
+  logout() { this.user = null; }
+}
+export const userStore = new UserStore();
+```
+
+**In plain `.ts` files** — runes do NOT work, use plain TS:
+```typescript
+// Server-side or plain utility .ts files
+export class SimpleStore<T> {
+  private value: T;
+  private subscribers = new Set<(v: T) => void>();
+
+  constructor(initial: T) { this.value = initial; }
+  get() { return this.value; }
+  set(v: T) { this.value = v; this.subscribers.forEach(fn => fn(v)); }
+  subscribe(fn: (v: T) => void) {
+    fn(this.value);
+    this.subscribers.add(fn);
+    return () => this.subscribers.delete(fn);
+  }
+}
+```
+
+**SSR Safety Rules:**
+- Global `$state` in `.svelte.ts` persists across SSR requests — **leaks user data between requests**
+- Server-side per-request state → use `event.locals` in hooks, NOT global `.svelte.ts` stores
+- `.svelte.ts` stores are fine for **client-only** state (auth, UI preferences, chat sessions)
+- Don't export raw `$state` variables — wrap in classes or closures
 
 ---
 
@@ -434,6 +489,10 @@ safelist: [
 - **SvelteKit handleError**: Hides real errors behind generic message. Temporarily expose `error.message + error.stack` in return value to diagnose SSR 500s
 - **Corrupted files <50 lines**: Need complete rewrites, not incremental fixes
 - **IDE linter reverts**: Use Write tool (not Edit) for reliable file modifications
+- **writable() → $state()**: In `.svelte` files: remove import, replace `$store` with `store`, `.set(v)` → `store = v`, `.update(fn)` → direct mutation
+- **Store file naming**: Runes (`$state`/`$derived`) only work in `.svelte`/`.svelte.ts` — plain `.ts` files need `SimpleStore` class or plain TS patterns
+- **Global $state SSR leak**: `.svelte.ts` singletons persist across SSR requests — use `event.locals` for per-request server state
+- **XState v5 fromPromise**: `fromPromise(async (ctx: any) => { const input = ctx.input as T; })` — cast `ctx.input` internally, not in setup types
 
 ---
 
@@ -446,6 +505,8 @@ safelist: [
 - `memory/superforms-reference.md` — Superforms v2 full API patterns
 - `memory/ide-linter-workarounds.md` — VS Code linter revert strategies
 - `memory/session-history.md` — Full session-by-session changelog (sessions 1-35)
+- `memory/svelte5-migration-guide.md` — Store → runes patterns, do's/don'ts, XState v5
+- `memory/docker-sveltekit.md` — Docker SSR deployment, Dockerfile, docker-compose
 - `scripts/tests/test-screenshots.mjs` — Playwright visual regression / 500-error tester
 
 Sources:

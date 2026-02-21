@@ -1,7 +1,12 @@
-import { getContext, setContext } from 'svelte';
-import { writable, get, derived } from 'svelte/store';
-import type { Writable } from 'svelte/store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+/**
+ * Contextual Service — Server-side context management
+ * Plain TS singleton (no svelte/store — server files must not use $state runes)
+ * Rewritten Session 63: Svelte 5 best practices
+ *
+ * Per https://mainmatter.com/blog/2025/03/11/global-state-in-svelte-5/:
+ *   Server-side state must be per-request via event.locals, NOT global singletons.
+ *   This service is safe for single-user dev/CLI usage but must be scoped per-request in production.
+ */
 
 export interface ContextualState {
 	userId?: string;
@@ -9,14 +14,14 @@ export interface ContextualState {
 	evidenceId?: string;
 	sessionId?: string;
 	contextType: 'case' | 'evidence' | 'document' | 'person' | 'general';
-	metadata: Record<string, any>;
+	metadata: Record<string, unknown>;
 	timestamp: Date;
 	version: number;
 }
 
 export interface ContextualAction {
 	type: string;
-	payload: any;
+	payload: unknown;
 	timestamp: Date;
 	userId?: string;
 	sessionId?: string;
@@ -27,7 +32,7 @@ export interface ContextualPrediction {
 	type: 'pattern' | 'risk' | 'recommendation' | 'alert';
 	confidence: number;
 	description: string;
-	data: any;
+	data: unknown;
 	timestamp: Date;
 	context: ContextualState;
 }
@@ -40,114 +45,78 @@ export interface ContextualMemory {
 }
 
 export class ContextualService {
-	private static instance: ContextualService;
 	private memory: ContextualMemory;
-	private currentContext: Writable<ContextualState | null>;
+	private currentContext: ContextualState | null = null;
 
-	private constructor() {
+	constructor() {
 		this.memory = {
 			shortTerm: [],
 			longTerm: new Map(),
 			predictions: [],
 			actions: []
 		};
-		this.currentContext = writable(null);
 	}
 
-	static getInstance(): ContextualService {
-		if (!ContextualService.instance) {
-			ContextualService.instance = new ContextualService();
-		}
-		return ContextualService.instance;
-	}
-
-	/**
-	 * Set the current context
-	 */
 	setContext(context: Partial<ContextualState>): void {
-		const current = get(this.currentContext);
+		const current = this.currentContext;
 		const newContext: ContextualState = {
-			...(current || {}),
-			...context,
+			contextType: context.contextType ?? current?.contextType ?? 'general',
+			metadata: { ...(current?.metadata ?? {}), ...(context.metadata ?? {}) },
 			timestamp: new Date(),
 			version: (current?.version ?? 0) + 1,
-			metadata: {
-				...(current?.metadata || {}),
-				...(context?.metadata || {})
-			},
-	contextType: context?.contextType || current?.contextType ?? 'general'
-		} as ContextualState;
+			userId: context.userId ?? current?.userId,
+			caseId: context.caseId ?? current?.caseId,
+			evidenceId: context.evidenceId ?? current?.evidenceId,
+			sessionId: context.sessionId ?? current?.sessionId
+		};
 
-		// Add to short-term memory
 		this.memory.shortTerm.push(newContext);
 		if (this.memory.shortTerm.length > 100) {
-			this.memory.shortTerm.shift(); // Keep only last 100 states
+			this.memory.shortTerm.shift();
 		}
 
-		// Add to long-term memory if significant
 		if (this.isSignificantContext(newContext)) {
 			const key = `${newContext.contextType}-${newContext.caseId ?? 'general'}`;
 			this.memory.longTerm.set(key, newContext);
 		}
 
-		this.currentContext.set(newContext);
+		this.currentContext = newContext;
 	}
 
-	/**
-	 * Get the current context
-	 */
 	getContext(): ContextualState | null {
-		return get(this.currentContext);
+		return this.currentContext;
 	}
 
-	/**
-	 * Subscribe to context changes
-	 */
-	subscribe(callback: (context: ContextualState | null) => void): () => void {
-		return this.currentContext.subscribe(callback);
-	}
-
-	/**
-	 * Record an action in the current context
-	 */
 	recordAction(action: Omit<ContextualAction, 'timestamp'>): void {
-		const currentContext = get(this.currentContext);
 		const fullAction: ContextualAction = {
 			...action,
 			timestamp: new Date(),
-			sessionId: action.sessionId || currentContext?.sessionId,
-			userId: action.userId || currentContext?.userId
+			sessionId: action.sessionId ?? this.currentContext?.sessionId,
+			userId: action.userId ?? this.currentContext?.userId
 		};
 
 		this.memory.actions.push(fullAction);
 		if (this.memory.actions.length > 1000) {
-			this.memory.actions = this.memory.actions.slice(-500); // Keep last 500 actions
+			this.memory.actions = this.memory.actions.slice(-500);
 		}
 	}
 
-	/**
-	 * Add a prediction to the context
-	 */
 	addPrediction(prediction: Omit<ContextualPrediction, 'id' | 'timestamp' | 'context'>): void {
-		const currentContext = get(this.currentContext);
-		if (!currentContext) return;
+		if (!this.currentContext) return;
 
 		const fullPrediction: ContextualPrediction = {
 			...prediction,
 			id: `pred-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
 			timestamp: new Date(),
-			context: { ...currentContext }
+			context: { ...this.currentContext }
 		};
 
 		this.memory.predictions.push(fullPrediction);
 		if (this.memory.predictions.length > 200) {
-			this.memory.predictions = this.memory.predictions.slice(-100); // Keep last 100 predictions
+			this.memory.predictions = this.memory.predictions.slice(-100);
 		}
 	}
 
-	/**
-	 * Get predictions for current context
-	 */
 	getPredictions(type?: string, minConfidence = 0.5): ContextualPrediction[] {
 		return this.memory.predictions
 			.filter((pred) => pred.confidence >= minConfidence)
@@ -155,13 +124,9 @@ export class ContextualService {
 			.sort((a, b) => b.confidence - a.confidence);
 	}
 
-	/**
-	 * Get relevant context from memory
-	 */
-	getRelevantContext(query: string, limit: number = 10): ContextualState[] {
+	getRelevantContext(query: string, limit = 10): ContextualState[] {
 		const allContexts = [...this.memory.shortTerm, ...Array.from(this.memory.longTerm.values())];
 
-		// Simple relevance scoring based on metadata matching
 		const scored = allContexts.map((context) => ({
 			context,
 			score: this.calculateRelevance(context, query)
@@ -174,16 +139,10 @@ export class ContextualService {
 			.map((item) => item.context);
 	}
 
-	/**
-	 * Get context history
-	 */
-	getContextHistory(limit: number = 50): ContextualState[] {
+	getContextHistory(limit = 50): ContextualState[] {
 		return this.memory.shortTerm.slice(-limit);
 	}
 
-	/**
-	 * Clear context memory
-	 */
 	clearMemory(): void {
 		this.memory = {
 			shortTerm: [],
@@ -191,44 +150,37 @@ export class ContextualService {
 			predictions: [],
 			actions: []
 		};
-		this.currentContext.set(null);
+		this.currentContext = null;
 	}
 
-	/**
-	 * Get memory statistics
-	 */
 	getMemoryStats() {
 		return {
 			shortTermCount: this.memory.shortTerm.length,
 			longTermCount: this.memory.longTerm.size,
 			predictionsCount: this.memory.predictions.length,
 			actionsCount: this.memory.actions.length,
-			currentContext: get(this.currentContext)
+			currentContext: this.currentContext
 		};
 	}
 
 	private isSignificantContext(context: ContextualState): boolean {
-		// Consider context significant if it has important identifiers
-		return !!(context?.caseId || context?.evidenceId || context.userId);
+		return !!(context.caseId || context.evidenceId || context.userId);
 	}
 
 	private calculateRelevance(context: ContextualState, query: string): number {
 		let score = 0;
 		const queryLower = query.toLowerCase();
 
-		// Check metadata for matches
-		for (const [key, value] of Object.entries(context.metadata)) {
+		for (const [, value] of Object.entries(context.metadata)) {
 			if (typeof value === 'string' && value.toLowerCase().includes(queryLower)) {
 				score += 0.5;
 			}
 		}
 
-		// Check context type relevance
 		if (context.contextType === 'case' && queryLower.includes('case')) score += 0.3;
 		if (context.contextType === 'evidence' && queryLower.includes('evidence')) score += 0.3;
 		if (context.contextType === 'document' && queryLower.includes('document')) score += 0.3;
 
-		// Recency bonus
 		const hoursSince = (Date.now() - context.timestamp.getTime()) / (1000 * 60 * 60);
 		if (hoursSince < 1) score += 0.2;
 		else if (hoursSince < 24) score += 0.1;
@@ -236,87 +188,3 @@ export class ContextualService {
 		return score;
 	}
 }
-
-// Svelte context key
-const CONTEXTUAL_SERVICE_KEY = Symbol('contextual-service');
-
-/**
- * Get contextual service from Svelte context
- */
-export function getContextualService(): ContextualService {
-	return getContext(CONTEXTUAL_SERVICE_KEY) || ContextualService.getInstance();
-}
-
-/**
- * Set contextual service in Svelte context
- */
-export function setContextualService(
-	service: ContextualService = ContextualService.getInstance()
-): void {
-	setContext(CONTEXTUAL_SERVICE_KEY, service);
-}
-
-/**
- * Svelte store for current context
- */
-export function createContextStore(): Writable<ContextualState | null> {
-	const service = getContextualService();
-	const store = writable<ContextualState | null>(null);
-
-	// Subscribe to service changes
-	service.subscribe((context) => {
-		store.set(context);
-	});
-
-	return {
-		subscribe: store.subscribe,
-		set: (value) => {
-			store.set(value);
-			if (value) service.setContext(value);
-		},
-	update: store.update
-	};
-}
-
-/**
- * Derived store for context predictions
- */
-export function createPredictionsStore(type?: string, minConfidence = 0.5) {
-	const service = getContextualService();
-	const contextStore = createContextStore();
-
-	return derived(contextStore, ($ctx) => {
-		return service.getPredictions(type, minConfidence);
-	});
-}
-
-/**
- * Context provider component store
- */
-export function createContextProvider() {
-	const service = getContextualService();
-	const context = writable<ContextualState | null>(null);
-	const predictions = writable<ContextualPrediction[]>([]);
-
-	service.subscribe((ctx) => {
-		context.set(ctx);
-		predictions.set(service.getPredictions());
-	});
-
-	return {
-		context: {
-	subscribe: context.subscribe,
-			set: (ctx: ContextualState) => service.setContext(ctx)
-		},
-	predictions: {
-	subscribe: predictions.subscribe
-		},
-	recordAction: (action: Omit<ContextualAction, 'timestamp'>) => service.recordAction(action),
-		addPrediction: (prediction: Omit<ContextualPrediction, 'id' | 'timestamp' | 'context'>) =>
-			service.addPrediction(prediction),
-		getRelevantContext: (query: string, limit?: number) => service.getRelevantContext(query, limit),
-		getMemoryStats: () => service.getMemoryStats(),
-		clearMemory: () => service.clearMemory()
-	};
-}
-

@@ -9,7 +9,7 @@
  * - Retry logic + error handling
  */
 
-import { derived, writable } from 'svelte/store';
+// Session 63: Removed svelte/store dependency — plain TS state
 
 export interface UploadProgress {
  fileSize: number;
@@ -46,21 +46,21 @@ export interface QUICStreamEvent {
  error?: string;
 }
 
-// Stores
-export const uploadProgress = writable<UploadProgress>({
+// State (plain TS — no svelte/store)
+export let uploadProgress: UploadProgress = {
  fileSize: 0,
  uploadedBytes: 0,
  percentage: 0,
  stage: 'uploading',
  message: 'Ready to upload',
  timestamp: Date.now(),
-});
+};
 
-export const mlpTasks = writable<Map<string, MLPTask>>(new Map());
+export const mlpTasks = new Map<string, MLPTask>();
 
-export const isProcessing = derived(uploadProgress, ($progress) => {
- return $progress.stage !== 'complete';
-});
+export function getIsProcessing(): boolean {
+ return uploadProgress.stage !== 'complete';
+}
 
 /**
  * Upload file via QUIC with streaming progress
@@ -89,7 +89,7 @@ export async function uploadFileViaQUIC(
 				message,
 				timestamp: Date.now()
 			};
-			uploadProgress.set(progress);
+			uploadProgress = progress;
 			onProgress?.(progress);
 		}; updateProgress('uploading', 0, 'Starting upload...');
 
@@ -136,14 +136,14 @@ export async function uploadFileViaQUIC(
  return docId;
  } catch (error) {
  const message = error instanceof Error ? error.message : 'Unknown error';
- uploadProgress.set({
+ uploadProgress = {
  fileSize: file.size,
  uploadedBytes: 0,
  percentage: 0,
  stage: 'complete',
  message: `Error: ${message}`,
  timestamp: Date.now()
- });
+ };
  throw error;
  }
 }
@@ -205,7 +205,7 @@ export async function submitMLPTask(
  }
 
  const task: MLPTask = await response.json();
- mlpTasks.update((tasks) => tasks.set(taskId, task));
+ mlpTasks.set(taskId, task);
 
  return taskId;
  } catch (error) {
@@ -226,7 +226,7 @@ export async function pollMLPTaskStatus(taskId: string): Promise<MLPTask | null>
  }
 
  const task: MLPTask = await response.json();
- mlpTasks.update((tasks) => tasks.set(taskId, task));
+ mlpTasks.set(taskId, task);
 
  return task;
  } catch (error) {

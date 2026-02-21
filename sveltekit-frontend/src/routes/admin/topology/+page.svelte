@@ -1,7 +1,4 @@
 <script lang="ts">
-	// Migrated to $effect
-	import { writable } from 'svelte/store';
-
 	interface TopologyNode { id: string, name: string;
 		type: 'file' | 'component' | 'route' | 'lib';
 		errors: number;
@@ -17,12 +14,12 @@
 		type: 'import' | 'error' | 'dependency';
 	}
 
-	const topology = writable<{ nodes: TopologyNode[], edges: Edge[] }>({ nodes: [], edges: [] });
-	const selectedNode = writable<TopologyNode | null>(null);
-	const filterTag = writable<string>('all');
-	const filterAction = writable<string>('all');
-	const loading = writable(true);
-	const searchQuery = writable('');
+	let topology = $state<{ nodes: TopologyNode[], edges: Edge[] }>({ nodes: [], edges: [] });
+	let selectedNode = $state<TopologyNode | null>(null);
+	let filterTag = $state('all');
+	let filterAction = $state('all');
+	let loading = $state(true);
+	let searchQuery = $state('');
 
 	let canvas = $state<HTMLCanvasElement | undefined>(undefined);
 	let ctx: CanvasRenderingContext2D;
@@ -47,37 +44,31 @@
 	};
 
 	$effect(() => {
-
 		const init = async () => {
-			// Initialize canvas
-			const canvasContext = canvas.getContext('2d');
-            if (canvasContext) {
-                ctx = canvasContext;
-                resizeCanvas();
-                window.addEventListener('resize', resizeCanvas);
-                // Load topology data
-                await loadTopology();
-                // Start animation loop
-                animate();
-            }
+			const canvasContext = canvas?.getContext('2d');
+			if (canvasContext) {
+				ctx = canvasContext;
+				resizeCanvas();
+				window.addEventListener('resize', resizeCanvas);
+				await loadTopology();
+				animate();
+			}
 		};
 
 		void init();
 
 		return () => {
-            if (typeof window !== 'undefined') {
-			    window.removeEventListener('resize', resizeCanvas);
-            }
+			if (typeof window !== 'undefined') {
+				window.removeEventListener('resize', resizeCanvas);
+			}
 		};
-
-});
+	});
 
 	async function loadTopology() {
 		try {
 			const response = await fetch('/api/topology');
 			const data = await response.json();
 
-			// Position nodes using force-directed layout
 			const nodes = data.components.map((comp: any, i: number) => ({
 				id: comp.name,
 				name: comp.name,
@@ -92,7 +83,6 @@
 				y: Math.random() * 600
 			}));
 
-			// Create edges from dependencies
 			const edges: Edge[] = [];
 			nodes.forEach((node: TopologyNode) => {
 				node.dependencies.forEach((dep: string) => {
@@ -104,14 +94,13 @@
 				});
 			});
 
-			topology.set({ nodes, edges });
-			loading.set(false);
+			topology = { nodes, edges };
+			loading = false;
 
-			// Apply force-directed layout
 			applyForceLayout(nodes, edges);
 		} catch (error) {
 			console.error('Failed to load topology:', error);
-			loading.set(false);
+			loading = false;
 		}
 	}
 
@@ -122,7 +111,6 @@
 		const damping = 0.85;
 
 		for (let iter = 0; iter < iterations; iter++) {
-			// Repulsion between all nodes
 			nodes.forEach((n1, i) => {
 				let fx = 0, fy = 0;
 
@@ -155,7 +143,6 @@
 			});
 		}
 
-		// Center the graph
 		const avgX = nodes.reduce((sum, n) => sum + n.x, 0) / nodes.length;
 		const avgY = nodes.reduce((sum, n) => sum + n.y, 0) / nodes.length;
 		nodes.forEach(n => {
@@ -165,21 +152,19 @@
 	}
 
 	function animate() {
-		if (!ctx) return;
+		if (!ctx || !canvas) return;
 
 		ctx.save();
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-		// Apply transformations
 		ctx.translate(panX, panY);
 		ctx.scale(scale, scale);
 
-		const { nodes, edges } = $topology;
-		const filter = $filterTag;
-		const action = $filterAction;
-		const query = $searchQuery.toLowerCase();
+		const { nodes, edges } = topology;
+		const filter = filterTag;
+		const action = filterAction;
+		const query = searchQuery.toLowerCase();
 
-		// Filter nodes
 		const filteredNodes = nodes.filter(node => {
 			if (query && !node.name.toLowerCase().includes(query)) return false;
 			if (filter !== 'all' && !node.tags.includes(filter)) return false;
@@ -189,7 +174,6 @@
 
 		const filteredNodeIds = new Set(filteredNodes.map(n => n.id));
 
-		// Draw edges
 		ctx.strokeStyle = 'rgba(100, 116, 139, 0.2)';
 		ctx.lineWidth = 1;
 		edges.forEach(edge => {
@@ -209,20 +193,17 @@
 			const radius = 5 + (node.errors / 5);
 			const color = colors[node.recommended_action as keyof typeof colors] || colors.monitor;
 
-			// Node circle
 			ctx.fillStyle = color;
 			ctx.beginPath();
 			ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
 			ctx.fill();
 
-			// Highlight selected
-			if ($selectedNode?.id === node.id) {
+			if (selectedNode?.id === node.id) {
 				ctx.strokeStyle = '#fff';
 				ctx.lineWidth = 3;
 				ctx.stroke();
 			}
 
-			// Label
 			if (scale > 0.5) {
 				ctx.fillStyle = '#fff';
 				ctx.font = '10px Inter';
@@ -242,11 +223,12 @@
 	}
 
 	function handleMouseDown(e: MouseEvent) {
+		if (!canvas) return;
 		const rect = canvas.getBoundingClientRect();
 		const x = (e.clientX - rect.left - panX) / scale;
 		const y = (e.clientY - rect.top - panY) / scale;
 
-		const node = $topology.nodes.find(n => {
+		const node = topology.nodes.find(n => {
 			const dx = n.x - x;
 			const dy = n.y - y;
 			const radius = 5 + (n.errors / 5);
@@ -258,12 +240,12 @@
 			dragNode = node;
 			offsetX = x - node.x;
 			offsetY = y - node.y;
-			selectedNode.set(node);
+			selectedNode = node;
 		}
 	}
 
 	function handleMouseMove(e: MouseEvent) {
-		if (!isDragging || !dragNode) return;
+		if (!isDragging || !dragNode || !canvas) return;
 
 		const rect = canvas.getBoundingClientRect();
 		const x = (e.clientX - rect.left - panX) / scale;
@@ -287,31 +269,23 @@
 
 	// SSE for real-time updates
 	$effect(() => {
-
 		const eventSource = new EventSource('/api/topology/stream');
 
 		eventSource.addEventListener('node_updated', (event) => {
 			const update = JSON.parse(event.data);
-			topology.update(t => {
-				const node = t.nodes.find(n => n.id === update.id);
-				if (node) {
-					Object.assign(node, update);
-				}
-				return t;
-
-});
+			const node = topology.nodes.find(n => n.id === update.id);
+			if (node) {
+				Object.assign(node, update);
+			}
 		});
 
 		eventSource.addEventListener('error_fixed', (event) => {
 			const data = JSON.parse(event.data);
-			topology.update(t => {
-				const node = t.nodes.find(n => n.id === data.component);
-				if (node) {
-					node.errors = Math.max(0, node.errors - 1);
-					node.recommended_action = recommendAction(node);
-				}
-				return t;
-			});
+			const node = topology.nodes.find(n => n.id === data.component);
+			if (node) {
+				node.errors = Math.max(0, node.errors - 1);
+				node.recommended_action = recommendAction(node);
+			}
 		});
 
 		eventSource.onerror = (error) => {
@@ -333,11 +307,11 @@
 <div class="topology-viewer">
 	<!-- Header -->
 	<div class="header">
-		<h1>🗺️ Codebase Topology</h1>
+		<h1>Codebase Topology</h1>
 		<div class="stats">
-			<span>{$topology.nodes.length} components</span>
-			<span>{$topology.nodes.filter(n => n.recommended_action === 'urgent_refactor').length} urgent</span>
-			<span>{$topology.edges.length} dependencies</span>
+			<span>{topology.nodes.length} components</span>
+			<span>{topology.nodes.filter(n => n.recommended_action === 'urgent_refactor').length} urgent</span>
+			<span>{topology.edges.length} dependencies</span>
 		</div>
 	</div>
 
@@ -346,11 +320,11 @@
 		<input
 			type="text"
 			placeholder="Search components..."
-			bind:value={$searchQuery}
+			bind:value={searchQuery}
 			class="search-input"
 		/>
 
-		<select bind:value={$filterTag} class="filter-select">
+		<select bind:value={filterTag} class="filter-select">
 			<option value="all">All Tags</option>
 			<option value="route">Routes</option>
 			<option value="library">Libraries</option>
@@ -359,7 +333,7 @@
 			<option value="complex">Complex</option>
 		</select>
 
-		<select bind:value={$filterAction} class="filter-select">
+		<select bind:value={filterAction} class="filter-select">
 			<option value="all">All Actions</option>
 			<option value="urgent_refactor">Urgent Refactor</option>
 			<option value="review_errors">Review Errors</option>
@@ -377,7 +351,7 @@
 
 	<!-- Canvas -->
 	<div class="canvas-container">
-		{#if $loading}
+		{#if loading}
 			<div class="loading">Loading topology...</div>
 		{:else}
 			<canvas
@@ -391,51 +365,51 @@
 	</div>
 
 	<!-- Details Panel -->
-	{#if $selectedNode}
+	{#if selectedNode}
 		<div class="details-panel">
-			<h2>{$selectedNode.name}</h2>
+			<h2>{selectedNode.name}</h2>
 
 			<div class="detail-row">
 				<span class="label">Type:</span>
-				<span class="value">{$selectedNode.type}</span>
+				<span class="value">{selectedNode.type}</span>
 			</div>
 
 			<div class="detail-row">
 				<span class="label">Errors:</span>
-				<span class="value error-count" class:high={$selectedNode.errors > 20}>
-					{$selectedNode.errors}
+				<span class="value error-count" class:high={selectedNode.errors > 20}>
+					{selectedNode.errors}
 				</span>
 			</div>
 
 			<div class="detail-row">
 				<span class="label">Complexity:</span>
-				<span class="value">{($selectedNode.complexity * 100).toFixed(1)}%</span>
+				<span class="value">{(selectedNode.complexity * 100).toFixed(1)}%</span>
 			</div>
 
 			<div class="detail-row">
 				<span class="label">Action:</span>
-				<span class="value action-badge" style="--color: {colors[$selectedNode.recommended_action as keyof typeof colors]}">
-					{$selectedNode.recommended_action.replace(/_/g, ' ')}
+				<span class="value action-badge" style="--color: {colors[selectedNode.recommended_action as keyof typeof colors]}">
+					{selectedNode.recommended_action.replace(/_/g, ' ')}
 				</span>
 			</div>
 
 			<div class="tags">
-				{#each $selectedNode.tags as tag}
+				{#each selectedNode.tags as tag}
 					<span class="tag">{tag}</span>
 				{/each}
 			</div>
 
-			{#if $selectedNode.dependencies.length > 0}
+			{#if selectedNode.dependencies.length > 0}
 				<div class="dependencies">
 					<h3>Dependencies</h3>
-					{#each $selectedNode.dependencies as dep}
+					{#each selectedNode.dependencies as dep}
 						<div class="dependency">{dep}</div>
 					{/each}
 				</div>
 			{/if}
 
-			<button class="fix-button" onclick={() => alert('Fix with AI: ' + $selectedNode?.name)}>
-				🤖 Fix with AI
+			<button class="fix-button" onclick={() => alert('Fix with AI: ' + selectedNode?.name)}>
+				Fix with AI
 			</button>
 		</div>
 	{/if}

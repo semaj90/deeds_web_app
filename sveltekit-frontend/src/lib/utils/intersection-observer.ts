@@ -1,9 +1,7 @@
 /**
  * Intersection Observer utilities for lazy loading
+ * Rewritten Session 63: Removed unused imports
  */
-import { writable } from 'svelte/store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface LazyLoadOptions {
   root?: Element | null;
@@ -212,25 +210,34 @@ export interface LazyComponentState {
 }
 
 export function createLazyStore(initialState: Partial<LazyComponentState> = {}) {
-  const { subscribe, set, update } = writable<LazyComponentState>({
+  let state: LazyComponentState = {
     isVisible: false,
     hasBeenVisible: false,
     intersectionRatio: 0,
     ...initialState
-  });
+  };
+  const subscribers = new Set<(v: LazyComponentState) => void>();
+
+  function notify() { subscribers.forEach(fn => fn(state)); }
 
   return {
-    subscribe,
+    subscribe(fn: (v: LazyComponentState) => void) {
+      subscribers.add(fn);
+      fn(state);
+      return () => { subscribers.delete(fn); };
+    },
     setVisible: (isVisible: boolean, intersectionRatio: number = 1) => {
-      update((state) => ({
+      state = {
         ...state,
         isVisible,
         hasBeenVisible: state.hasBeenVisible || isVisible,
         intersectionRatio
-      }));
+      };
+      notify();
     },
-	reset: () => {
-      set({ isVisible: false, hasBeenVisible: false, intersectionRatio: 0 });
+    reset: () => {
+      state = { isVisible: false, hasBeenVisible: false, intersectionRatio: 0 };
+      notify();
     }
   };
 }

@@ -1,7 +1,6 @@
 <script lang="ts">
 
  import Button from '$lib/components/ui/Button.svelte';
- import { get, writable } from 'svelte/store';
  import EvidenceBoardToolbar from './EvidenceBoardToolbar.svelte';
  import EvidenceConnections from './EvidenceConnections.svelte';
  import EvidenceNode from './EvidenceNode.svelte';
@@ -41,12 +40,12 @@
  initialConnections?: EvidenceConnection[]
  } = $props();
 
- // Board modes
- let nodes = writable<EvidenceNodeType[]>(initialNodes);
- let connections = writable<EvidenceConnection[]>(initialConnections);
+ // Board state — Svelte 5 runes (no writable stores)
+ let nodes = $state<EvidenceNodeType[]>(initialNodes);
+ let connections = $state<EvidenceConnection[]>(initialConnections);
  let boardMode = $state<BoardMode>('free');
  let linkMode = $state(false);
- let selectedNodes = writable<Set<string>>(new Set());
+ let selectedNodes = $state<Set<string>>(new Set());
  let pendingLinkSource: string | null = $state(null);
  let selectedEvidenceForInspector = $state<string | null>(null);
  let selectedRelationshipType = $state('supports');
@@ -74,10 +73,6 @@
 	{ value: 'inadmissible', label: 'Inadmissible' }
  ];
 
- // Reactive statements for store values
- let currentNodes = $derived($nodes);
- let currentSelectedNodes = $derived($selectedNodes);
-
  // Grid snapping
  const GRID_SIZE = 50;
  function snapToGrid(x: number, y: number): { x: number, y: number } {
@@ -89,15 +84,12 @@
 
  // Magnetic mode physics
  async function applyMagneticForces() {
- const currentNodes = get(nodes);
- const currentConnections = get(connections);
-
  try {
  const response = await fetch('/api/evidence/ai/magnetize', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-nodes: currentNodes, connections: currentConnections,
+ nodes, connections,
  caseId,
  }),
  });
@@ -105,7 +97,7 @@ nodes: currentNodes, connections: currentConnections,
  const { forces } = await response.json();
 
  // Apply forces to nodes
- nodes.update(current => current.map(node => {
+ nodes = nodes.map(node => {
  const force = forces.find((f: any) => f.id === node.id);
  if (force) {
  return {
@@ -114,7 +106,8 @@ nodes: currentNodes, connections: currentConnections,
  y: node.y + force.dy,
  };
  }
- return node }));
+ return node;
+ });
  } catch (error) {
  console.error('Failed to apply magnetic forces:', error);
  }
@@ -122,8 +115,7 @@ nodes: currentNodes, connections: currentConnections,
 
  // Node selection
  function selectNode(nodeId: string, multiSelect: boolean = false) {
- selectedNodes.update(current => {
- const newSelection = new Set(current);
+ const newSelection = new Set(selectedNodes);
  if (multiSelect) {
  if (newSelection.has(nodeId)) {
  newSelection.delete(nodeId);
@@ -134,10 +126,11 @@ nodes: currentNodes, connections: currentConnections,
  newSelection.clear();
  newSelection.add(nodeId);
  }
- return newSelection });
+ selectedNodes = newSelection;
 
  if (!multiSelect) {
- selectedEvidenceForInspector = nodeId }
+ selectedEvidenceForInspector = nodeId;
+ }
  }
 
  // Node movement
@@ -145,42 +138,40 @@ nodes: currentNodes, connections: currentConnections,
  if (boardMode === 'grid') {
  const snapped = snapToGrid(newX, newY);
  newX = snapped.x;
- newY = snapped.y }
+ newY = snapped.y;
+ }
 
- nodes.update(current =>
- current.map(node =>
+ nodes = nodes.map(node =>
  node.id === nodeId ? { ...node, x: newX, y: newY } : node
- )
  );
 
  // Update position in database
  fetch(`/api/evidence/nodes/${nodeId}`, {
  method: 'PATCH',
  headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-x: newX, y: newY }),
+	body: JSON.stringify({ x: newX, y: newY }),
  });
  }
 
  // Create connection between selected nodes
  async function createConnection() {
- const selected = Array.from(get(selectedNodes));
+ const selected = Array.from(selectedNodes);
  if (selected.length === 2) {
  try {
  const response = await fetch('/api/evidence/connections', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-fromNodeId: selected[0],
+ fromNodeId: selected[0],
  toNodeId: selected[1],
  caseId,
- strength: 0.5, // Default strength
+ strength: 0.5,
  }),
  });
 
  const newConnection = await response.json();
- connections.update(current => [...current, newConnection]);
- selectedNodes.set(new Set()); // Clear selection
+ connections = [...connections, newConnection];
+ selectedNodes = new Set();
  } catch (error) {
  console.error('Failed to create connection:', error);
  }
@@ -194,7 +185,7 @@ fromNodeId: selected[0],
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-caseId,
+ caseId,
  fromEvidenceId,
  toEvidenceId,
  relationshipType,
@@ -206,8 +197,7 @@ caseId,
  if (response.ok) {
  const newRelationship = await response.json();
  console.log('Relationship created:', newRelationship);
- // Could emit an event or update a relationships store here
- pendingLinkSource = null; // Reset pending link
+ pendingLinkSource = null;
  } else {
  const error = await response.json();
  console.error('Failed to create relationship:', error);
@@ -222,23 +212,20 @@ caseId,
  if (!linkMode) return;
 
  if (!pendingLinkSource) {
- // First node selected
  pendingLinkSource = nodeId;
  selectNode(nodeId, false);
  } else if (pendingLinkSource === nodeId) {
- // Same node clicked - cancel
  pendingLinkSource = null;
- selectedNodes.set(new Set());
+ selectedNodes = new Set();
  } else {
- // Second node selected - create relationship
  createRelationship(pendingLinkSource, nodeId);
- selectedNodes.set(new Set());
+ selectedNodes = new Set();
  }
  }
 
  // Delete selected nodes
  async function deleteSelectedNodes() {
- const selected = Array.from(get(selectedNodes));
+ const selected = Array.from(selectedNodes);
  for (const nodeId of selected) {
  try {
  await fetch(`/api/evidence/nodes/${nodeId}`, { method: 'DELETE' });
@@ -247,8 +234,8 @@ caseId,
  }
  }
 
- nodes.update(current => current.filter(node => !selected.includes(node.id)));
- selectedNodes.set(new Set());
+ nodes = nodes.filter(node => !selected.includes(node.id));
+ selectedNodes = new Set();
  }
 
  // Mode change handler
@@ -265,15 +252,15 @@ caseId,
  applyMagneticForces();
  break;
  case 'attach':
- console.log('attach selected nodes', Array.from(get(selectedNodes)));
+ console.log('attach selected nodes', Array.from(selectedNodes));
  break;
  case 'pin':
- console.log('pin selected nodes', Array.from(get(selectedNodes)));
+ console.log('pin selected nodes', Array.from(selectedNodes));
  break;
  case 'connect':
  linkMode = !linkMode;
  pendingLinkSource = null;
- selectedNodes.set(new Set());
+ selectedNodes = new Set();
  break;
  case 'exportPacket':
  if (caseId || activeCaseId) {
@@ -284,19 +271,18 @@ caseId,
  case 'delete':
  deleteSelectedNodes();
  break;
- default:break }
+ default: break;
+ }
  }
 
  let canvasElement: HTMLDivElement;
 
  $effect(() => {
- // Periodic magnetic force application
  const magneticInterval = setInterval(() => {
  if (boardMode === 'magnetic') {
  applyMagneticForces();
  }
- },
-	2000); // Apply forces every 2 seconds
+ }, 2000);
 
  return () => clearInterval(magneticInterval);
  });
@@ -317,7 +303,7 @@ caseId,
  <div class="actions">
  <Button class="bits-btn"
  variant={linkMode ? "default" : "outline"}
- onclick={() => { linkMode = !linkMode; pendingLinkSource = null; selectedNodes.set(new Set()); }}
+ onclick={() => { linkMode = !linkMode; pendingLinkSource = null; selectedNodes = new Set(); }}
  >
  {linkMode ? 'Exit Link Mode' : 'Link Mode'}
  </Button>
@@ -340,14 +326,14 @@ caseId,
  <Button class="bits-btn"
  variant="outline"
  onclick={createConnection}
- disabled={$selectedNodes.size !== 2}
+ disabled={selectedNodes.size !== 2}
  >
  Connect Nodes
  </Button>
  <Button class="bits-btn"
  variant="destructive"
  onclick={deleteSelectedNodes}
- disabled={$selectedNodes.size === 0}
+ disabled={selectedNodes.size === 0}
  >
  Delete Selected
  </Button>
@@ -365,10 +351,10 @@ caseId,
  >
  <!-- Connections Layer -->
  <EvidenceConnections connections={connections} nodes={nodes} />
- {#each currentNodes as evidenceNode (evidenceNode.id)}
+ {#each nodes as evidenceNode (evidenceNode.id)}
  <EvidenceNode
  node={evidenceNode}
- isSelected={currentSelectedNodes.has(evidenceNode.id)}
+ isSelected={selectedNodes.has(evidenceNode.id)}
  isPendingLinkSource={pendingLinkSource === evidenceNode.id}
  linkMode={linkMode}
  onSelect={(data) => selectNode(data.nodeId, data.multiSelect)}
@@ -447,7 +433,3 @@ caseId,
  background: radial-gradient(circle at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
  }
 </style>
-
-
-
-

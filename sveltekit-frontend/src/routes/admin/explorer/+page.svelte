@@ -1,8 +1,4 @@
 <script lang="ts">
-	// Migrated to $effect
-	import { writable } from 'svelte/store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-
 	interface RouteNode { id: string, path: string;
 		type: 'page' | 'layout' | 'server' | 'api' | 'component';
 		errors: number;
@@ -22,14 +18,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		score: number;
 	}
 
-	const routes = writable<RouteNode[]>([]);
-	const selectedRoute = writable<RouteNode | null>(null);
-	const kbEntries = writable<KBEntry[]>([]);
-	const viewMode = writable<'tree' | 'graph' | 'list'>('tree');
-	const filterType = writable<string>('all');
-	const loading = writable(true);
-	const agentStatus = writable<{ active:boolean, current_file: string; progress: number }>({
-		active:false,
+	let routes = $state<RouteNode[]>([]);
+	let selectedRoute = $state<RouteNode | null>(null);
+	let kbEntries = $state<KBEntry[]>([]);
+	let viewMode = $state<'tree' | 'graph' | 'list'>('tree');
+	let filterType = $state('all');
+	let loading = $state(true);
+	let agentStatus = $state<{ active: boolean, current_file: string; progress: number }>({
+		active: false,
 		current_file: '',
 		progress: 0
 	});
@@ -37,67 +33,57 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	let searchQuery = $state('');
 	let expandedPaths = $state(new Set<string>());
 
+	// Load routes on mount
 	$effect(() => {
-  (async () => {
+		void loadRoutes();
+	});
 
-		await loadRoutes();
-		startSSE();
-	
-  })();
-});
+	// SSE for real-time updates
+	$effect(() => {
+		const eventSource = new EventSource('/api/admin/routes/stream');
+
+		eventSource.addEventListener('route_updated', (event) => {
+			const update = JSON.parse(event.data);
+			const route = routes.find(rt => rt.id === update.id);
+			if (route) {
+				Object.assign(route, update);
+			}
+		});
+
+		eventSource.addEventListener('agent_progress', (event) => {
+			const data = JSON.parse(event.data);
+			agentStatus = data;
+		});
+
+		eventSource.addEventListener('kb_synced', (event) => {
+			const data = JSON.parse(event.data);
+			const route = routes.find(rt => rt.path === data.file_path);
+			if (route) {
+				route.kb_vectors = data.vector_count;
+			}
+		});
+
+		return () => eventSource.close();
+	});
 
 	async function loadRoutes() {
 		try {
 			const response = await fetch('/api/admin/routes');
 			const data = await response.json();
-			routes.set(data.routes);
-			loading.set(false);
+			routes = data.routes;
+			loading = false;
 		} catch (error) {
 			console.error('Failed to load routes:', error);
-			loading.set(false);
+			loading = false;
 		}
 	}
 
-	function startSSE() {
-		const eventSource = new EventSource('/api/admin/routes/stream');
-
-		eventSource.addEventListener('route_updated', (event) => {
-			const update = JSON.parse(event.data);
-			routes.update(r => {
-				const route = r.find(rt => rt.id === update.id);
-				if (route) {
-					Object.assign(route, update);
-				}
-				return r;
-			});
-		});
-
-		eventSource.addEventListener('agent_progress', (event) => {
-			const data = JSON.parse(event.data);
-			agentStatus.set(data);
-		});
-
-		eventSource.addEventListener('kb_synced', (event) => {
-			const data = JSON.parse(event.data);
-			routes.update(r => {
-				const route = r.find(rt => rt.path === data.file_path);
-				if (route) {
-					route.kb_vectors = data.vector_count;
-				}
-				return r;
-			});
-		});
-
-		return () => eventSource.close();
-	}
-
 	async function selectRoute(route: RouteNode) {
-		selectedRoute.set(route);
+		selectedRoute = route;
 
-		// Load KB entries for this route
 		const response = await fetch(`/api/admin/knowledge?file=${encodeURIComponent(route.path)}`);
 		const data = await response.json();
-		kbEntries.set(data.entries ?? []);
+		kbEntries = data.entries ?? [];
 	}
 
 	async function fixWithAgent(route: RouteNode) {
@@ -105,8 +91,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			const response = await fetch('/api/admin/agent/fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-                   file_path: route.path,
+				body: JSON.stringify({
+					file_path: route.path,
 					error_count: route.errors
 				})
 			});
@@ -129,10 +115,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		expandedPaths = expandedPaths; // Trigger reactivity
 	}
 
-	function buildTree(routes: RouteNode[]) {
+	function buildTree(routeList: RouteNode[]) {
 		const tree: any = {};
 
-		routes.forEach(route => {
+		routeList.forEach(route => {
 			const parts = route.path.split('/');
 			let current = tree;
 
@@ -143,8 +129,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 					current[part] = {
 						name: part,
 						path: parts.slice(0, idx + 1).join('/'),
-                        children: {},
-	routes: []
+						children: {},
+						routes: []
 					};
 				}
 
@@ -159,8 +145,8 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		return tree;
 	}
 
-	const filteredRoutes = $derived($routes.filter(route => {
-		if ($filterType !== 'all' && route.type !== $filterType) return false;
+	const filteredRoutes = $derived(routes.filter(route => {
+		if (filterType !== 'all' && route.type !== filterType) return false;
 		if (searchQuery && !route.path.toLowerCase().includes(searchQuery.toLowerCase())) return false;
 		return true;
 	}));
@@ -171,12 +157,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 <div class="route-explorer">
 	<!-- Header -->
 	<div class="header">
-		<h1>🗺️ Route Explorer & Agent Control</h1>
-		<div class="agent-status" class:active={$agentStatus.active}>
-			{#if $agentStatus.active}
+		<h1>Route Explorer & Agent Control</h1>
+		<div class="agent-status" class:active={agentStatus.active}>
+			{#if agentStatus.active}
 				<span class="pulse">🤖</span>
-				<span>Fixing: {$agentStatus.current_file}</span>
-				<span class="progress">{$agentStatus.progress}%</span>
+				<span>Fixing: {agentStatus.current_file}</span>
+				<span class="progress">{agentStatus.progress}%</span>
 			{:else}
 				<span>Agent Idle</span>
 			{/if}
@@ -192,7 +178,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 			class="search-input"
 		/>
 
-		<select bind:value={$filterType} class="filter-select">
+		<select bind:value={filterType} class="filter-select">
 			<option value="all">All Types</option>
 			<option value="page">Pages</option>
 			<option value="layout">Layouts</option>
@@ -203,23 +189,23 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 		<div class="view-modes">
 			<button
-				class:active={$viewMode === 'tree'}
-				onclick={() => viewMode.set('tree')}
+				class:active={viewMode === 'tree'}
+				onclick={() => viewMode = 'tree'}
 			>
-				📁 Tree
+				Tree
 			</button>
 			<button
-				class:active={$viewMode === 'list'}
-				onclick={() => viewMode.set('list')}
+				class:active={viewMode === 'list'}
+				onclick={() => viewMode = 'list'}
 			>
-				📋 List
+				List
 			</button>
 		</div>
 
 		<div class="stats">
-			<span>{$routes.length} routes</span>
-			<span>{$routes.reduce((sum, r) => sum + r.errors, 0)} errors</span>
-			<span>{$routes.reduce((sum, r) => sum + r.kb_vectors, 0)} KB vectors</span>
+			<span>{routes.length} routes</span>
+			<span>{routes.reduce((sum, r) => sum + r.errors, 0)} errors</span>
+			<span>{routes.reduce((sum, r) => sum + r.kb_vectors, 0)} KB vectors</span>
 		</div>
 	</div>
 
@@ -227,12 +213,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	<div class="content">
 		<!-- Left Panel, Route Tree/List -->
 		<div class="routes-panel">
-			{#if $loading}
+			{#if loading}
 				<div class="loading">Loading routes...</div>
-			{:else if $viewMode === 'tree'}
+			{:else if viewMode === 'tree'}
 				<div class="tree-view">
 					{#each Object.values(tree) as node}
-						{@render TreeNode(node, expandedPaths, toggleExpanded, selectRoute, $selectedRoute?.path)}
+						{@render TreeNode(node, expandedPaths, toggleExpanded, selectRoute, selectedRoute?.path)}
 					{/each}
 				</div>
 			{:else}
@@ -240,7 +226,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 					{#each filteredRoutes as route}
 						<div
 							class="route-item"
-							class:selected={$selectedRoute?.id === route.id}
+							class:selected={selectedRoute?.id === route.id}
 							class:has-errors={route.errors > 0}
 							role="button"
 							tabindex="0"
@@ -267,12 +253,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 		</div>
 
 		<!-- Right Panel, Details & KB -->
-		{#if $selectedRoute}
+		{#if selectedRoute}
 			<div class="details-panel">
 				<div class="details-header">
-					<h2>{$selectedRoute.path}</h2>
-					<button class="fix-button" onclick={() => fixWithAgent($selectedRoute)}>
-						🤖 Fix with Agent
+					<h2>{selectedRoute.path}</h2>
+					<button class="fix-button" onclick={() => fixWithAgent(selectedRoute!)}>
+						Fix with Agent
 					</button>
 				</div>
 
@@ -280,38 +266,38 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				<div class="metrics-grid">
 					<div class="metric">
 						<span class="metric-label">Type</span>
-						<span class="metric-value">{$selectedRoute.type}</span>
+						<span class="metric-value">{selectedRoute.type}</span>
 					</div>
 					<div class="metric">
 						<span class="metric-label">Errors</span>
-						<span class="metric-value error" class:high={$selectedRoute.errors > 10}>
-							{$selectedRoute.errors}
+						<span class="metric-value error" class:high={selectedRoute.errors > 10}>
+							{selectedRoute.errors}
 						</span>
 					</div>
 					<div class="metric">
 						<span class="metric-label">Complexity</span>
-						<span class="metric-value">{($selectedRoute.complexity * 100).toFixed(1)}%</span>
+						<span class="metric-value">{(selectedRoute.complexity * 100).toFixed(1)}%</span>
 					</div>
 					<div class="metric">
 						<span class="metric-label">Lines</span>
-						<span class="metric-value">{$selectedRoute.lines}</span>
+						<span class="metric-value">{selectedRoute.lines}</span>
 					</div>
 					<div class="metric">
 						<span class="metric-label">Functions</span>
-						<span class="metric-value">{$selectedRoute.functions.length}</span>
+						<span class="metric-value">{selectedRoute.functions.length}</span>
 					</div>
 					<div class="metric">
 						<span class="metric-label">KB Vectors</span>
-						<span class="metric-value kb">{$selectedRoute.kb_vectors}</span>
+						<span class="metric-value kb">{selectedRoute.kb_vectors}</span>
 					</div>
 				</div>
 
 				<!-- Functions -->
-				{#if $selectedRoute.functions.length > 0}
+				{#if selectedRoute.functions.length > 0}
 					<div class="section">
-						<h3>Functions ({$selectedRoute.functions.length})</h3>
+						<h3>Functions ({selectedRoute.functions.length})</h3>
 						<div class="function-list">
-							{#each $selectedRoute.functions as func}
+							{#each selectedRoute.functions as func}
 								<div class="function-item">{func}</div>
 							{/each}
 						</div>
@@ -319,11 +305,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				{/if}
 
 				<!-- Dependencies -->
-				{#if $selectedRoute.dependencies.length > 0}
+				{#if selectedRoute.dependencies.length > 0}
 					<div class="section">
-						<h3>Dependencies ({$selectedRoute.dependencies.length})</h3>
+						<h3>Dependencies ({selectedRoute.dependencies.length})</h3>
 						<div class="dependency-list">
-							{#each $selectedRoute.dependencies as dep}
+							{#each selectedRoute.dependencies as dep}
 								<div class="dependency-item">{dep}</div>
 							{/each}
 						</div>
@@ -331,11 +317,11 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 				{/if}
 
 				<!-- Knowledge Base Entries -->
-				{#if $kbEntries.length > 0}
+				{#if kbEntries.length > 0}
 					<div class="section">
-						<h3>Knowledge Base ({$kbEntries.length} entries)</h3>
+						<h3>Knowledge Base ({kbEntries.length} entries)</h3>
 						<div class="kb-entries">
-							{#each $kbEntries as entry}
+							{#each kbEntries as entry}
 								<div class="kb-entry">
 									<div class="kb-score">{(entry.score * 100).toFixed(1)}%</div>
 									<div class="kb-content">{entry.content.slice(0, 200)}...</div>

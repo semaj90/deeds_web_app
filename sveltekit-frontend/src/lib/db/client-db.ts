@@ -12,9 +12,6 @@
  */
 import Dexie from 'dexie';
 import type { Table } from 'dexie';
-import { writable } from 'svelte/store';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -404,7 +401,7 @@ export class LegalDBUtils {
 }
 
 // ============================================================================
-// REACTIVE STORES FOR SVELTE
+// STORAGE STATS (plain object — no svelte/store dependency)
 // ============================================================================
 
 type StorageTableStat = { name: string;
@@ -412,11 +409,11 @@ type StorageTableStat = { name: string;
 type StorageStats = { totalRecords: number;
 	storageUsed: string; tables: StorageTableStat[] };
 
-export const storageStats = writable<StorageStats>({
+export let storageStats: StorageStats = {
   totalRecords: 0,
   storageUsed: 'Unknown',
   tables: []
-});
+};
 
 // ============================================================================
 // INITIALIZATION & CLEANUP

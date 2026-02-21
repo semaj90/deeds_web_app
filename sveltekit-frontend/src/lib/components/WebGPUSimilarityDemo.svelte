@@ -1,5 +1,5 @@
 <script lang="ts">
- import { getCachedEmbedding, subscribeEmbedding } from '$lib/client/subscribeEmbedding';
+ import { getCachedEmbedding, subscribeEmbedding } from '$lib/client/subscribeEmbedding.svelte';
  import type { QuantizedEmbedding } from '$lib/shared/embedding-types';
  import { webgpuSimilarityService, type SimilaritySearchResult } from '$lib/webgpu/webgpu-similarity-service';
  import Cpu from '@lucide/svelte/icons/cpu';

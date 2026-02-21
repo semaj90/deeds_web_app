@@ -1,25 +1,46 @@
-import { writable } from 'svelte/store';
-import type { User } from '$lib/server/auth/lucia'; // Adjust import path as per your Lucia setup
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+// Plain TypeScript user store — no svelte/store dependency
+// Implements Svelte store contract (subscribe method) for $ prefix compatibility
 
-export const user = writable<User | null>(null);
-export const sessionLoading = writable(true);
-
-export async function loadSession(): Promise<any> {
- try {
- const res = await fetch('/api/auth/session');
- if (res.ok) {
- const data = await res.json();
- user.set(data?.user ?? null);
- } else {
- user.set(null);
- }
- } catch (err) {
- user.set(null);
- console.error('Failed to load session: ', err);
- } finally {
- sessionLoading.set(false);
- }
+interface User {
+	id: string;
+	email: string;
+	firstName?: string;
+	lastName?: string;
+	role: string;
+	permissions?: string[];
+	avatarUrl?: string | null;
 }
 
+function createStore<T>(initial: T) {
+	let value = initial;
+	const subs = new Set<(v: T) => void>();
+	return {
+		get value() { return value; },
+		set(v: T) { value = v; for (const fn of subs) fn(v); },
+		subscribe(run: (v: T) => void) {
+			run(value);
+			subs.add(run);
+			return () => { subs.delete(run); };
+		}
+	};
+}
 
+export const user = createStore<User | null>(null);
+export const sessionLoading = createStore(true);
+
+export async function loadSession(): Promise<void> {
+	try {
+		const res = await fetch('/api/auth/session');
+		if (res.ok) {
+			const data = await res.json();
+			user.set(data?.user ?? null);
+		} else {
+			user.set(null);
+		}
+	} catch (err) {
+		user.set(null);
+		console.error('Failed to load session: ', err);
+	} finally {
+		sessionLoading.set(false);
+	}
+}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getCachedEmbedding, subscribeEmbedding } from '$lib/client/subscribeEmbedding';
+	import { getCachedEmbedding, subscribeEmbedding } from '$lib/client/subscribeEmbedding.svelte';
 	import type { EmbeddingResult } from '$lib/shared/embedding-types';
 	import { quantizedCosineSimilarity } from '$lib/shared/quantize';
 	import Loader from '@lucide/svelte/icons/loader';
