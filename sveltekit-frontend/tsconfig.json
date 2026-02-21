@@ -30,10 +30,7 @@
     "node_modules",
     "build",
     ".svelte-kit",
-    "dist",
     "archives/**",
-    "archived/**",
-    "archived-components/**",
     ".svelte-check-tmp/**",
     "../.rag-metrics/**",
     "src/lib/_archive/**",
@@ -52,8 +49,6 @@
     "**/*.test.ts",
     "**/*.spec.ts",
     "**/*.stories.ts",
-    "src.backup/**",
-    "src.backup.*/**",
     "src_fixed/**",
     ".phase72-backups/**",
     ".codemod-backups/**",
@@ -77,47 +72,9 @@
     "src/**/_disabled/**",
     "src/**/_yorha_legacy/**",
     "**/*.any-backup",
-    "error-files/**",
     "src/lib/stores/_archive/**",
-    // Exclude ai.bak directory - 992 syntax errors from backup files
-    "src/lib/ai.bak/**",
-    // Exclude heavily corrupted files from Dec 15 syntax corruption
-    "src/lib/services/pipeline-visualizer.ts",
-    "src/lib/services/advanced-evidence-analyzer.ts",
-    "src/lib/server/services/background-job-queue.ts",
-    "src/lib/services/unified-gpu-cache-orchestrator.ts",
-    "src/lib/services/context7-orchestration-integration.ts",
-    "src/lib/services/gpu-cache-rpc-client.ts",
-    "src/lib/services/gpu-llm-streaming-pipeline.ts",
-    "src/lib/services/rabbitmq-service.ts",
-    "src/lib/server/db/pgvector-utils.ts",
-    "src/lib/server/ai/vector-search-service.ts",
-    "src/lib/services/ocrService.ts",
-    "src/lib/services/enhanced-ai-analysis.ts",
-    "src/lib/services/kmeans-clustering.ts",
-    "src/lib/services/complete-gpu-error-pipeline.ts",
-    "src/lib/server/storage/minio.ts",
-    "src/lib/services/legal-ai-acceleration-pipeline.ts",
-    "src/lib/services/clientSideGemma270m.ts",
-    "src/lib/services/gpu-ai-service.ts",
-    "src/lib/services/gpu-typescript-error-processor.ts",
-    "src/lib/graph/sora-graph-traversal.ts",
-    "src/lib/api/vector-search-client.ts",
-    // Session 27: routes_parked deleted, archived to github.com/semaj90/deeds_lab
-    // Exclude backup/fixed folders - these inflate error count massively
-    "src_fixed/**",
-    "src.backup/**",
-    "../src_fixed/**",
-    "../src.backup/**",
-    // Phase 99: Exclude heavily corrupted experimental directories
-    // See documents/PHASE99_REINTEGRATION.md for cleanup plan
-    "**/*.*backup*",
-    "**/*.*bak*",
-    "**/*.corruption-backup",
-    "**/*.replaced",
-    // Corrupted services: moved to _corrupted
-    // 9 clean services remain in src/lib/services/ and ARE included
-    "src/lib/services/_corrupted/**",
+    // Corrupted services: blanket-excluded (312/564 corrupted, 20K+ errors if included)
+    // 9 clean services remain in src/lib/services/ and ARE transitively checked via imports
     "src/lib/services/_archive/**",
     "src/lib/services/error-analysis/**",
     "src/lib/services/__tests__/**",
@@ -129,7 +86,6 @@
     "src/lib/wasm/**",
     "src/lib/workers/**",
     "src/lib/cache/**",
-    "src/lib/caching/**",
     "src/lib/gpu/**",
     "src/lib/simd/**",
     "src/lib/integrations/**",
@@ -152,11 +108,7 @@
     "src/lib/components/evidence-graph/**",
     "src/lib/components/feedback/**",
     "src/lib/components/glyph/**",
-    "src/lib/components/keyboard/**",
     "src/lib/components/navigation/**",
-    "src/lib/components/notifications/**",
-    "src/lib/components/observability/**",
-    "src/lib/components/onboarding/**",
     "src/lib/components/prosecutor/**",
     "src/lib/components/rag/**",
     "src/lib/components/subcomponents/**",
@@ -174,22 +126,16 @@
     "src/lib/components/evidence/**",
     "src/lib/components/forms/**",
     "src/lib/components/poi/**",
-    "src/lib/components/notes/**",
     "src/lib/components/bits-ui/**",
     "src/lib/components/ui/accordion/**",
     "src/lib/components/ui/card/**",
     "src/lib/components/ui/input/**",
     "src/lib/components/ui/modal/**",
     "src/lib/components/ui/toast/**",
-    // Corrupted composables
-    "src/lib/composables/**",
     // Keep core routes but exclude test routes
     "src/routes/test-*/**",
     "src/routes/rag-*/**",
-    "src/routes/demo/**",
     // Phase 99b: Additional corrupted files/dirs
-    "src/client-server-sync.ts",
-    "src/routes/phase89/**",
     // "src/routes/api/**", // Session 31: RE-INCLUDED — 124 endpoints, 95%+ clean
     // Session 31: API routes with pre-existing type errors (transitive imports from excluded services)
     // "src/routes/api/phase78/**", // Session 32c: RE-INCLUDED (route monitoring)
@@ -219,7 +165,6 @@
     // "src/routes/api/phase90/**", // Session 32c: RE-INCLUDED (RAG+KAG+DAG tools)
     "src/lib/api/**",
     "src/lib/server/ai/**", // Session 55: RE-EXCLUDED — only ollama-service.ts needed (transitively checked); 334 errors in 10+ broken files
-    "src/lib/server/orchestrator/**",
     "src/lib/server/monitoring/**",
     // "src/lib/server/tools/**", // Session 55: RE-INCLUDED (8 files, imported by api/tools/execute)
     "src/lib/routing/**",
@@ -238,13 +183,10 @@
     "src/lib/embedding/**",
     "src/lib/hooks/**",
     "src/lib/logic/**",
-    "src/lib/memory/**",
-    "src/lib/memory-palace/**",
     "src/lib/messaging/**",
     "src/lib/graph/**",
     "src/lib/headless/**",
     "src/lib/modules/**",
-    "src/lib/observability/**",
     "src/lib/ocr/**",
     "src/lib/performance/**",
     "src/lib/vision/**",
@@ -253,13 +195,8 @@
     "src/lib/evidence/**",
     "src/lib/evidence-canvas/**",
     "src/lib/features/**",
-    "src/lib/polyfills/**",
     "src/lib/websocket/**",
     "src/lib/yorha/**",
-    // Corrupted additional files
-    "src/FixSynthesizer.ts",
-    "src/OllamaService.ts",
-    "src/types.ts",
     // Phase 99c: More corrupted directories
     "src/lib/client/**",
     // "src/lib/stores/**", // Session 29: RE-INCLUDED for production
@@ -297,7 +234,6 @@
     // "src/lib/auth/**",  // Session 31: RE-INCLUDED (4 clean + 1 excluded below)
     "src/lib/auth/session-manager.ts",  // Session 31: Heavily corrupted, needs rewrite
     // "src/lib/actions/**",  // Session 31: RE-INCLUDED (2 files, clean)
-    "src/lib/actors/**",
     "src/lib/adapters/**",
     // "src/lib/schemas/**", // Session 29: RE-INCLUDED for production
     // "src/lib/utils/**",  // Session 31: RE-INCLUDED (36 files, 98% clean)
@@ -305,34 +241,23 @@
     "src/lib/shims/**",
     // Corrupted components (keep only core UI)
     "src/lib/components/canvas/**",
-    "src/lib/components/evidence-board/**",
     "src/lib/components/legal/**",
     "src/lib/components/ai/**",
-    "src/lib/components/charts/**",
-    "src/lib/components/graph/**",
-    "src/lib/components/timeline/**",
+    "src/lib/components/search/**",
+    "src/lib/components/types.ts",
     // Keep only core app routes
     // "src/routes/(app)/command-center/**", // Session 32c: RE-INCLUDED (error dashboard)
-    "src/routes/(app)/settings/**",
     // "src/routes/(app)/admin/**", // Session 31: RE-INCLUDED — dev-tools hub + existing admin pages
     // Session 31: Pre-existing admin pages with bits-ui Tabs namespace issue
     "src/routes/(app)/admin/phase89/**",
     // "src/routes/(app)/admin/knowledge-search/**", // Session 32c: RE-INCLUDED (RAG search)
-    "src/routes/(app)/analytics/**",
     "src/routes/knowledge/**",
     "src/routes/indexing/**",
     // Phase 107: Additional corrupted schema files excluded
-    "src/lib/server/schema/yorha.ts",
-    "src/lib/server/db/schema-production-pipeline.ts",
-    "src/lib/server/db/schemas/cases-schema.ts",
     "src/lib/server/services/langextract-service.ts",
     "src/lib/server/services/**",
-    "src/lib/server/db/drizzle-vector-config.ts",
     "src/lib/server/minio/client.ts",
     "src/lib/server/trt-llm.ts",
-    "src/user-recommendation-service.ts",
-    "src/useRedisOrchestrator.ts",
-    "src/webgpu-langchain-bridge.ts",
     "src/lib/server/db/phase90-helpers.ts",
     "src/lib/server/statute-enrichment.ts",
     "src/lib/server/db/qdrant-sync.ts",
@@ -348,7 +273,6 @@
     "src/lib/server/integrations/**",
     "src/lib/server/api/**",
     "src/lib/rabbitmq/**",
-    "src/lib/testing/**",
     "src/lib/server/ingest/**",
     // "src/lib/server/auth/**", // Session 55: RE-INCLUDED (6 files, imported by auth/health)
     "src/lib/server/auth/custom-adapter.ts",       // Session 56: orphaned (4 errors)
@@ -359,18 +283,13 @@
     "src/lib/server/db/utils.ts",
     "src/lib/server/db/query-utils.ts",
     "src/lib/server/embedding-cache-middleware.ts",
-    "src/lib/server/services/**",
-    "src/lib/server/cases/**",
     "src/lib/db/queries/**",
     "src/lib/db/schema/**",
     // Phase 108: Additional files importing from excluded directories
     "src/lib/server/workflows/**",
-    "src/lib/state-machines/**",
     "src/lib/shared/**",
-    "src/lib/parsers/**",
     "src/lib/sdk/**",
     "src/lib/json/**",
-    "src/lib/demos/**",
     // "src/lib/models/**",  // Session 31: RE-INCLUDED (1 file, clean Svelte 5 runes)
     // "src/lib/constants/**",  // Session 31: RE-INCLUDED (1 file, clean)
     "src/lib/server/clients/**",
@@ -383,6 +302,8 @@
     "src/lib/server/rabbitmq/**",
     "src/lib/server/ssr/**",
     "src/lib/server/vlm-document-analyzer.ts",
+    "src/lib/server/evidence-processing.ts",     // Session 62: orphaned (XState AnyActorLogic type error, no route imports)
+    "src/lib/components/DocumentUploadMachineIntegration.svelte", // Session 62: orphaned (stale state names, no route imports)
     "src/lib/server/workers/**",
     "src/lib/server/ollama.ts",
     "src/lib/server/rabbitmq.ts",
@@ -406,8 +327,6 @@
     "src/lib/mcp-rabbitmq-redis-docs.ts",
     "src/lib/__tests__/**",
     "src/evidenceProcessingMachine.ts",
-    "src/legalFormMachine.ts",
-    "src/agentic-stream.ts",
     "src/llm-prompt-service.ts",               // Session 56: orphaned (25 errors, not imported by routes)
     // Phase 108b: More files to exclude
     "src/lib/server/db/**",
@@ -417,7 +336,6 @@
     "src/lib/server/prompt/**",
     "src/lib/server/rag/**",
     "src/lib/server/rag-sync.ts",
-    "src/lib/server/redisRateLimit.ts",
     "src/lib/server/services.ts",
     "src/lib/server/session.ts",
     "src/lib/server/vector-cache.ts",
@@ -426,11 +344,8 @@
     "src/lib/ui/**",
     "src/mcp-gpu-orchestrator.ts",
     "src/minio.ts",
-    "src/lib/components/search/**",
-    "src/lib/components/types.ts",
     // Phase 108c: Final cleanup excludes
     "src/lib/server/database/**",
-    "src/lib/server/database-api-bridge.ts",
     "src/lib/server/simd.ts",
     "src/lib/server/storage/**",
     "src/lib/server/tensor-acceleration.ts",
@@ -445,53 +360,41 @@
     "src/lib/server/embeddings.ts",
     "src/lib/server/endpoints.ts",
     "src/lib/server/knowledge-cache.ts",
-    "src/lib/server/langextract/**",
     "src/lib/server/logger.ts",
     "src/lib/server/minio-client.ts",
-    "src/lib/server/minio-service.ts",
+    "src/lib/server/langextract/**",
     "src/lib/server/ocr.ts",
     // "src/lib/server/ocr/**", // Session 55: RE-INCLUDED (3 files, imported by evidence/upload)
     "src/lib/server/ollama-utils.ts",
     "src/lib/server/phase72/**",
-    "src/lib/server/rag-query.ts",
     "src/lib/server/rag.ts",
     "src/lib/server/redisPubSub.ts",
     "src/lib/server/pgai/**",
     "src/lib/systems/**",
     "src/lib/tauri.ts",
     "src/lib/themes/**",
-    "src/lib/webasm/**",
-    "src/ollama-local-llm.ts",
-    "src/rabbitmq-dlq-monitor.ts",
-    // Phase 108d: Final remaining files
-    "src/lib/server/logger.ts",
-    "src/lib/server/minio-client.ts",
-    "src/lib/server/services/redis-cache.ts",
-    "src/lib/services/gpu-ai-service.ts",
+    // Phase 99: Exclude backup/corruption patterns
+    "**/*.*backup*",
+    "**/*.*bak*",
+    "**/*.corruption-backup",
+    "**/*.replaced",
     // Session 16: Individual corrupted UI component files
     "src/lib/components/ui/BitsUIDemo.svelte",
     "src/lib/components/ui/CaseForm.svelte",
     "src/lib/components/ui/ComponentValidationTest.svelte",
     "src/lib/components/ui/ContextMenuContent.svelte",
-    "src/lib/components/ui/DataGrid.svelte",
     "src/lib/components/ui/DialogWrapper.svelte",
     "src/lib/components/ui/DragDropZone.svelte",
     "src/lib/components/ui/EvidenceCard.svelte",
     "src/lib/components/ui/FinalFantasyButton.svelte",
     "src/lib/components/ui/FinalFantasyModal.svelte",
     "src/lib/components/ui/GlobalLoadingIndicator.svelte",
-    "src/lib/components/ui/GPUInferenceDemo.svelte",
-    "src/lib/components/ui/GPULoadingProgress.svelte",
-    "src/lib/components/ui/MarkdownRenderer.svelte",
     "src/lib/components/ui/ModalManager.svelte",
     "src/lib/components/ui/NoteViewerModal.svelte",
     "src/lib/components/ui/Notifications.svelte",
     "src/lib/components/ui/RetroModal.svelte",
     "src/lib/components/ui/SearchBar.svelte",
     "src/lib/components/ui/SearchBox.svelte",
-    "src/lib/components/ui/SIMDTiledShaderEmbeds.svelte",
-    "src/lib/components/ui/SimpleDragDrop.svelte",
-    "src/lib/components/ui/SmartTextarea.svelte",
     // Session 16: Other corrupted component files
     // "src/lib/components/chat/SSRQLorAChatInterface.svelte", // Session 30: REMOVED — file doesn't exist
     // "src/lib/components/legal-ai/CitationCollections.svelte", // Session 30: RE-INCLUDED — added missing <script> tag
@@ -540,8 +443,6 @@
     // "src/lib/services/knowledge-search/**", // Session 32c: RE-INCLUDED — 10/11 files clean, ACPToolRegistry has format issues only
     // Session 27: Orphan components importing from deleted _archive
     "src/lib/components/SlideTabs.svelte",
-    // Session 28: Dead layout file referencing non-existent Navigation component
-    "src/routes/layout.complex.svelte",
     // Session 29: Zod 4 fixed — using zod4/zod4Client adapters
     // "src/lib/components/auth/LoginModal.svelte",   // FIXED: zod4 adapter
     // "src/lib/components/auth/RegisterForm.svelte",  // FIXED: zod4Client adapter

@@ -3,8 +3,7 @@
  * Integrates XState: Ollama streaming, PGVector: Qdrant, Redis caching
  */
 
-import { createActor, createMachine, assign } from 'xstate';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { createActor, createMachine, assign, fromPromise } from 'xstate';
 
 // Types
 export interface Evidence {
@@ -177,7 +176,8 @@ const evidenceProcessingMachine = createMachine({
 		},
 	analyzing: {
 	invoke: {
-				src: async ({ context }) => analyzeWithAI(context),
+				src: fromPromise(async ({ input }: { input: WorkflowContext }) => analyzeWithAI(input)),
+			input: ({ context }: { context: WorkflowContext }) => context,
 				onDone: {
 	target: 'embedding',
 					actions: assign({
@@ -197,7 +197,8 @@ const evidenceProcessingMachine = createMachine({
 		},
 	embedding: {
 	invoke: {
-				src: async ({ context }) => generateEmbeddings(context),
+				src: fromPromise(async ({ input }: { input: WorkflowContext }) => generateEmbeddings(input)),
+			input: ({ context }: { context: WorkflowContext }) => context,
 				onDone: {
 	target: 'storing',
 					actions: assign({
@@ -217,7 +218,8 @@ const evidenceProcessingMachine = createMachine({
 		},
 	storing: {
 	invoke: {
-				src: async ({ context }) => storeVectors(context),
+				src: fromPromise(async ({ input }: { input: WorkflowContext }) => storeVectors(input)),
+			input: ({ context }: { context: WorkflowContext }) => context,
 				onDone: {
 	target: 'completed',
 					actions: assign({

@@ -3,49 +3,9 @@
  * Provides proper type support for XState state machines
  */
 
-declare module 'xstate' {
-  // Minimal, forgiving signatures used only to satisfy TypeScript during builds.
-  export function createMachine<Context = any, Event = any>(
-    config: unknown,
-    options?: { actions?: unknown; services?: unknown; guards?: unknown }
-  ): unknown;
-
-  export function assign<T extends Record<string, any> = Record<string, any>>(
-    assignment: Partial<T> | ((ctx: T, evt?: any) => Partial<T>)
-  ): unknown;
-
-  export type DoneInvokeEvent<T = any> = { output: T };
-  export type AnyEventObject = Record<string, unknown>;
-  export type StateMachine<C = any, E = any> = any;
-
-  // XState v5 exports
-  export function createActor(machine: unknown, options?: unknown): any;
-  export function send(action: unknown): unknown;
-  export function sendTo(target: unknown, event: unknown): unknown;
-  export function raise(event: unknown): unknown;
-  export function emit(event: unknown): unknown;
-  export function fromPromise<T>(fn: () => Promise<T>): unknown;
-  export function fromCallback(fn: unknown): unknown;
-  export function fromObservable(observable: unknown): unknown;
-  export function fromEventObservable(observable: unknown): unknown;
-
-  // Types
-  export type State<C = any, E = any> = any;
-  export type ActorRef<E = any, S = any> = any;
-  export type Snapshot<C = any> = any;
-  export type EventFrom<T> = any;
-  export type LogicFrom<T> = any;
-  export type AnyMachineSnapshot = any;
-  export type AnyActorRef = any;
-  export type Observer<T> = {
-    next?: (value: T) => void;
-    error?: (error: Error | unknown) => void;
-    complete?: () => void;
-  };
-  export type Subscription = {
-    unsubscribe(): void;
-  };
-}
+// REMOVED: declare module 'xstate' augmentation was shadowing real XState v5.24 types.
+// XState v5 ships complete types — custom augmentations break fromPromise<TOutput, TInput>,
+// setup(), assign() signatures, etc. (Same issue as ioredis — see MEMORY.md)
 
 // Common state machine types
 export interface MachineContext {

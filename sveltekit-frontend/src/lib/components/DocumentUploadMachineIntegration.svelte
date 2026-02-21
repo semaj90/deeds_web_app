@@ -81,7 +81,7 @@
         Document_Ingestion_System
     </h2>
 
-    {#if snapshot.matches('idle') || snapshot.matches('validating') || snapshot.matches('ready')}
+    {#if snapshot.matches('idle') || snapshot.matches('validating') || snapshot.matches('validated')}
         <div
             role="button"
             tabindex="0"
@@ -152,7 +152,7 @@
             </Button>
             <Button
                 onclick={handleSubmit}
-                disabled={!snapshot.matches('ready')}
+                disabled={!snapshot.matches('validated')}
                 class="px-8"
             >
                 START_UPLOAD
@@ -214,7 +214,7 @@
             </Button>
         </div>
 
-    {:else if snapshot.matches('error')}
+    {:else if snapshot.matches('failed')}
         <div class="error-result p-6 border-2 border-danger bg-danger/5" in:fade>
             <div class="text-danger font-bold text-center mb-4 uppercase">
                 [SYSTEM_CRITICAL_FAILURE]

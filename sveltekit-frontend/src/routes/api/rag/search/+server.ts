@@ -9,6 +9,8 @@ import type {
 } from '$lib/types/rag-source-validation';
 import type { RAGConfig } from '$lib/sdk/rag/index.js';
 import { productionLogger } from '$lib/server/production-logger.js';
+import { apiResponses } from '$lib/server/api/response-helper.js';
+import { chatRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 
 const QDRANT_URL = getQdrantUrl();
 const OLLAMA_URL = getOllamaUrl();
@@ -25,6 +27,14 @@ function toConfidence(score: number): ConfidenceLevel {
  * Step 1: Search knowledge base for relevant chunks via Qdrant + Ollama embeddings
  */
 export const POST: RequestHandler = async ({ request }) => {
+	// Rate limit: 30 requests/min per client
+	const rateCheck = chatRateLimiter.check(request);
+	if (!rateCheck.allowed) {
+		return apiResponses.serviceUnavailable(
+			`Rate limit exceeded. Try again in ${Math.ceil((rateCheck.resetTime - Date.now()) / 1000)}s`
+		);
+	}
+
 	const startTime = performance.now();
 
 	try {
@@ -38,7 +48,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		} = body;
 
 		if (!query?.trim()) {
-			return json({ error: 'query is required' }, { status: 400 });
+			return apiResponses.badRequest('query is required');
 		}
 
 		// 1. Generate embedding via Ollama
@@ -51,7 +61,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		});
 
 		if (!embedResp.ok) {
-			return json({ error: 'Embedding generation failed' }, { status: 502 });
+			return apiResponses.badGateway('Embedding generation failed');
 		}
 
 		const embedData = await embedResp.json();
@@ -59,7 +69,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const embeddingTime = performance.now() - embedStart;
 
 		if (!embedding || !Array.isArray(embedding)) {
-			return json({ error: 'Invalid embedding response' }, { status: 502 });
+			return apiResponses.badGateway('Invalid embedding response');
 		}
 
 		// 2. Search across Qdrant collections
@@ -135,6 +145,6 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json(response);
 	} catch (err) {
 		console.error('[rag/search] Error:', err);
-		return json({ error: 'Search failed' }, { status: 500 });
+		return apiResponses.serverError('Search failed');
 	}
 };

@@ -1,6 +1,6 @@
 // Document Upload State Machine - XState v5 compatible
 // Manages file upload workflow with progress tracking and AI processing
-import { createMachine, assign, fromPromise } from 'xstate';
+import { setup, assign, fromPromise } from 'xstate';
 
 // New small, permissive types for uploaded files and AI results
 type UploadedFile = {
@@ -168,12 +168,18 @@ const processFiles = fromPromise((async ({ input }: { input: DocumentUploadConte
     };
 }) as any);
 
-export const documentUploadMachine = createMachine({
-    id: 'documentUpload',
+export const documentUploadMachine = setup({
     types: {
         context: {} as DocumentUploadContext,
         events: {} as DocUploadEvent
     },
+    actors: {
+        validateFiles,
+        uploadFiles,
+        processFiles
+    }
+}).createMachine({
+    id: 'documentUpload',
     initial: 'idle',
     context: {
         files: [],
@@ -184,11 +190,6 @@ export const documentUploadMachine = createMachine({
         aiResults: null,
         error: null,
         retryCount: 0
-    },
-    actors: {
-        validateFiles,
-        uploadFiles,
-        processFiles
     },
     states: {
         idle: {

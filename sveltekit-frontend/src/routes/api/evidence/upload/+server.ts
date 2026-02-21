@@ -14,6 +14,7 @@ import { detectForensicPatterns } from '$lib/server/analysis/forensics.js';
 import { summarizeDocument } from '$lib/server/analysis/summarizer.js';
 import { createAnalysisJob, updateAnalysisJob, completeAnalysisJob, failAnalysisJob } from '$lib/server/analysis/analysis-jobs.js';
 import { embedGate, entityGate, forensicsGate, summarizeGate, gated } from '$lib/server/analysis/concurrency-gate.js';
+import { heavyRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 
 import { ENV } from '$lib/server/env.server.js';
 const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
@@ -28,6 +29,15 @@ const MIN_PDF_TEXT_LENGTH = 50;
  * Pipeline: MinIO → PostgreSQL → text extraction (pdf-parse + OCR fallback) → chunk → embed → pgvector + Qdrant
  */
 export async function POST({ request }: RequestEvent) {
+	// Rate limit: 10 uploads/min per client (heavy operation)
+	const rateCheck = heavyRateLimiter.check(request);
+	if (!rateCheck.allowed) {
+		return json(
+			{ error: `Rate limit exceeded. Try again in ${Math.ceil((rateCheck.resetTime - Date.now()) / 1000)}s` },
+			{ status: 429 }
+		);
+	}
+
 	const jobId = `job-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
 
 	try {

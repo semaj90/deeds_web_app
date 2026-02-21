@@ -1,10 +1,10 @@
 // XState Svelte 5 Adapter
 // Provides useMachine hook compatible with Svelte 5 runes
 
-import { createActor, type StateMachine } from 'xstate';
+import { createActor, type AnyStateMachine } from 'xstate';
 
-export function useMachine(machine: StateMachine<any, any>) {
-  const actor = createActor(machine);
+export function useMachine(machine: AnyStateMachine) {
+  const actor = createActor(machine as any);
   actor.start();
 
   // Create a simple state store with subscribe method

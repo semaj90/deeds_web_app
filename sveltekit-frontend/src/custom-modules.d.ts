@@ -23,9 +23,6 @@ declare module '$lib/*' {
   export default value;
 }
 
-declare module 'xstate' {
-  const mod: any;
-  export default mod;
-}
+// REMOVED: declare module 'xstate' — shadows real XState v5.24 types
 
 

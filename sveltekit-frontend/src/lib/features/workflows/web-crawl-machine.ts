@@ -34,7 +34,8 @@ type WebCrawlEvent =
 export const webCrawlMachine = setup({
 	types: {
 		context: {} as WebCrawlContext,
-		events: {} as WebCrawlEvent
+		events: {} as WebCrawlEvent,
+		input: {} as WebCrawlContext
 	},
 	actions: {
 		updateProcessed: assign({
@@ -77,7 +78,7 @@ export const webCrawlMachine = setup({
 }).createMachine({
 	id: 'webCrawl',
 	initial: 'idle',
-	context: ({ input }) => input,
+	context: ({ input }: { input: WebCrawlContext }) => input,
 	states: {
 		idle: {
 			on: {
