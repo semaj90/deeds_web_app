@@ -951,7 +951,24 @@ documents/large-files/
 
 ########################################
 # Exceptions: ONNX Runtime WASM for browser inference
+# NOTE: .wasm binaries are >10MB each, blocked by pre-commit hook
+# Keep .mjs loaders tracked; copy .wasm from node_modules after clone
 ########################################
-!sveltekit-frontend/static/ort/*.wasm
 !sveltekit-frontend/static/ort/*.mjs
+
+########################################
+# Playwright screenshot runs (keep latest/ only)
+########################################
+scripts/tests/screenshots/2026-*/
+
+########################################
+# Temporary/one-off files
+########################################
+sveltekit-frontend/codebase-indexing-next-steps.md
+sveltekit-frontend/count-excluded.ps1
+sveltekit-frontend/evidence-upload-result.png
+sveltekit-frontend/evidence-upload-test.png
+sveltekit-frontend/thoughts.md
+sveltekit-frontend/scripts/analyze-unreachable-domains.mjs
+sveltekit-frontend/scripts/cross-ref-imports.mjs
 
