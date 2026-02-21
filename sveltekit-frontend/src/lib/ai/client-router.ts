@@ -9,6 +9,7 @@
  */
 
 import type { InferenceSource } from './model-ids.js';
+import { WASM_WORKER_PATH } from './model-ids.js';
 
 // ── Escalation keywords (trigger server-side legal reasoning) ────────────
 
@@ -119,4 +120,28 @@ export function shouldEscalateToServer(
 		reason: reasons.length > 0 ? `below-threshold(${serverScore.toFixed(2)})` : 'simple-query',
 		confidence: 1.0 - serverScore
 	};
+}
+
+// ── WASM Worker Factory ──────────────────────────────────────────────────
+
+let wasmWorker: Worker | null = null;
+
+/**
+ * Get or create the WASM llama.cpp web worker for client-side inference.
+ * Returns null if Workers are unavailable (SSR / unsupported browser).
+ */
+export function getWasmWorker(): Worker | null {
+	if (typeof Worker === 'undefined') return null;
+	if (!wasmWorker) {
+		wasmWorker = new Worker(WASM_WORKER_PATH);
+	}
+	return wasmWorker;
+}
+
+/**
+ * Terminate the WASM worker and release resources.
+ */
+export function terminateWasmWorker(): void {
+	wasmWorker?.terminate();
+	wasmWorker = null;
 }

@@ -52,4 +52,7 @@ export const ONNX_EXECUTION_PROVIDERS = ['webgpu', 'wasm', 'cpu'] as const;
 
 // ── Inference source tags (for SSE chunk attribution) ────────────────────
 
-export type InferenceSource = 'local-onnx' | 'server-ollama' | 'server-gemini';
+export type InferenceSource = 'local-onnx' | 'local-wasm' | 'server-ollama' | 'server-gemini';
+
+/** WASM llama.cpp worker path (client-side inference via WebAssembly) */
+export const WASM_WORKER_PATH = '/workers/webllama.worker.js';

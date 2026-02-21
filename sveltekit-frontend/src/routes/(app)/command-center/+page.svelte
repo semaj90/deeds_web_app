@@ -4,6 +4,7 @@
 	import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
 	import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
+	import { goto } from '$app/navigation';
 	import Activity from '@lucide/svelte/icons/activity';
 	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
 	import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
@@ -23,7 +24,13 @@
 	import Users from '@lucide/svelte/icons/users';
 	import X from '@lucide/svelte/icons/x';
 	import Zap from '@lucide/svelte/icons/zap';
-	// Migrated to $effect
+	import type { PageData } from './$types';
+
+	interface Props { data: PageData }
+	let { data }: Props = $props();
+
+	// Use SSR health data from legalAIService.healthCheck()
+	let serviceHealth = $derived(data.serviceHealth);
 
 	// Svelte 5 runes state
 	let metrics = $state({
@@ -63,7 +70,7 @@ totalCases: 5.2,
 		read?: boolean;
 	}>>([]);
 
-	let currentView = $state<'dashboard' | 'cases' | 'evidence' | 'ai' | 'persons' | 'analysis' | 'system'>('dashboard');
+	let currentView = $state<'dashboard'>('dashboard');
 	let isDarkTheme = $state(true);
 	let showNotifications = $state(false);
 	let showQuickActions = $state(false);
@@ -122,31 +129,32 @@ totalCases: 5.2,
 
 	async function loadMetrics() {
 		try {
-			// TODO: Replace with actual API calls
-			const baseMetrics = {
-				totalCases: 47,
-				activeCases: 12,
-				evidenceProcessed: 1284,
-				aiQueries: 892,
-				systemHealth: 'operational',
-				gpuStatus: 'active',
-				ragIndexSize: 2500000,
-				ocrAccuracy: 94.2
-			};
+			// Fetch real data from APIs in parallel
+			const [casesRes, healthRes] = await Promise.all([
+				fetch('/api/cases?limit=1000').then(r => r.ok ? r.json() : null).catch(() => null),
+				fetch('/api/health/services').then(r => r.ok ? r.json() : null).catch(() => null)
+			]);
 
-			// Add some randomization for demo purposes
-			const variation = Math.random() * 0.1 - 0.05; // ±5%
+			const allCases = casesRes?.data ?? [];
+			const openCases = allCases.filter((c: any) => c.status === 'open' || c.status === 'active');
+			const healthStatus = healthRes?.status ?? 'unknown';
+			const services = healthRes?.services ?? {};
+			const gpuUp = services.qdrant || services.trtllm;
+
 			metrics = {
-				...baseMetrics,
-				totalCases: Math.round(baseMetrics.totalCases * (1 + variation)),
-			activeCases: Math.round(baseMetrics.activeCases * (1 + variation)),
-			evidenceProcessed: Math.round(baseMetrics.evidenceProcessed * (1 + variation)),
-			aiQueries: Math.round(baseMetrics.aiQueries * (1 + variation)),
-			trends: {
-	totalCases: (Math.random() - 0.5) * 20, // Random trend between -10% and +10%
-					activeCases: (Math.random() - 0.5) * 20,
-					evidenceProcessed: (Math.random() - 0.5) * 20,
-					aiQueries: (Math.random() - 0.5) * 20
+				totalCases: allCases.length,
+				activeCases: openCases.length,
+				evidenceProcessed: allCases.reduce((sum: number, c: any) => sum + (c.evidenceCount ?? 0), 0),
+				aiQueries: 0,
+				systemHealth: healthStatus === 'healthy' ? 'operational' : healthStatus === 'degraded' ? 'warning' : 'error',
+				gpuStatus: gpuUp ? 'active' : 'offline',
+				ragIndexSize: 0,
+				ocrAccuracy: 0,
+				trends: {
+					totalCases: 0,
+					activeCases: 0,
+					evidenceProcessed: 0,
+					aiQueries: 0
 				}
 			};
 		} catch (error) {
@@ -156,69 +164,80 @@ totalCases: 5.2,
 
 	async function loadActiveCases() {
 		try {
-			// TODO: Replace with actual API calls
-			activeCases = [
-				{
-					id: 'CASE-2025-001',
-					title: 'Corporate Espionage Investigation',
-					status: 'active',
-					lastActivity: '2 hours ago',
-					evidenceCount: 47,
-					priority: 'high'
-				},
-	{
-					id: 'CASE-2025-002',
-					title: 'Financial Fraud Case',
-					status: 'critical',
-					lastActivity: '30 minutes ago',
-					evidenceCount: 23,
-					priority: 'urgent'
-				},
-	{
-					id: 'CASE-2025-003',
-					title: 'Intellectual Property Dispute',
-					status: 'active',
-					lastActivity: '1 day ago',
-					evidenceCount: 89,
-					priority: 'medium'
-				},
-	{
-					id: 'CASE-2025-004',
-					title: 'Employment Discrimination Claim',
-					status: 'pending',
-					lastActivity: '3 days ago',
-					evidenceCount: 156,
-					priority: 'medium'
-				}
-			];
+			const res = await fetch('/api/cases?status=active&limit=5');
+			if (!res.ok) return;
+			const json = await res.json();
+			const dbCases = json.data ?? [];
+
+			activeCases = dbCases.map((c: any) => ({
+				id: c.id?.substring(0, 13) ?? 'CASE-???',
+				title: c.title ?? 'Untitled Case',
+				status: c.status === 'open' ? 'active' : (c.priority === 'urgent' ? 'critical' : 'pending'),
+				lastActivity: c.updatedAt ? formatRelativeTime(c.updatedAt) : 'unknown',
+				evidenceCount: c.evidenceCount ?? 0,
+				priority: c.priority ?? 'medium'
+			}));
 		} catch (error) {
 			console.error('Failed to load active cases:', error);
 		}
 	}
 
+	function formatRelativeTime(dateStr: string): string {
+		const diff = Date.now() - new Date(dateStr).getTime();
+		const mins = Math.floor(diff / 60000);
+		if (mins < 60) return `${mins} minutes ago`;
+		const hours = Math.floor(mins / 60);
+		if (hours < 24) return `${hours} hours ago`;
+		const days = Math.floor(hours / 24);
+		return `${days} days ago`;
+	}
+
 	async function loadSystemAlerts() {
 		try {
-			// TODO: Replace with actual API calls
-			systemAlerts = [
-				{
-					id: 'alert-1',
-					type: 'info',
-					message: 'OCR pipeline processing 3 documents',
-					timestamp: '5 minutes ago'
-				},
-	{
-					id: 'alert-2',
-					type: 'warning',
-					message: 'GPU memory usage at 85%',
-					timestamp: '12 minutes ago'
-				},
-	{
-					id: 'alert-3',
+			const res = await fetch('/api/health/services');
+			if (!res.ok) {
+				systemAlerts = [{
+					id: 'alert-health-down',
 					type: 'error',
-					message: 'Database connection pool exhausted',
-					timestamp: '1 hour ago'
+					message: 'Health check endpoint unreachable',
+					timestamp: new Date().toLocaleTimeString()
+				}];
+				return;
+			}
+			const health = await res.json();
+			const alerts: typeof systemAlerts = [];
+			const services = health.services ?? {};
+
+			for (const [name, up] of Object.entries(services)) {
+				if (!up) {
+					alerts.push({
+						id: `alert-${name}`,
+						type: 'error',
+						message: `${name} service is down`,
+						timestamp: new Date().toLocaleTimeString()
+					});
 				}
-			];
+			}
+
+			if (health.status === 'degraded') {
+				alerts.push({
+					id: 'alert-degraded',
+					type: 'warning',
+					message: `System is degraded (${health.responseTimeMs ?? '?'}ms response)`,
+					timestamp: new Date().toLocaleTimeString()
+				});
+			}
+
+			if (alerts.length === 0) {
+				alerts.push({
+					id: 'alert-ok',
+					type: 'info',
+					message: `All services operational (${health.responseTimeMs ?? '?'}ms)`,
+					timestamp: new Date().toLocaleTimeString()
+				});
+			}
+
+			systemAlerts = alerts;
 		} catch (error) {
 			console.error('Failed to load system alerts:', error);
 		}
@@ -226,33 +245,53 @@ totalCases: 5.2,
 
 	async function loadNotifications() {
 		try {
-			// TODO: Replace with actual API calls
-			notifications = [
-				{
-					id: 'notif-1',
-					type: 'success',
-					title: 'Case Analysis Complete',
-					message: 'AI analysis for CASE-2025-001 has been completed',
-					timestamp: '10 minutes ago',
-					read: false
-				},
-	{
-					id: 'notif-2',
+			// Derive notifications from real case data
+			const res = await fetch('/api/cases?limit=10');
+			if (!res.ok) return;
+			const json = await res.json();
+			const cases = json.data ?? [];
+
+			const notifs: typeof notifications = [];
+
+			// Cases with urgent priority
+			const urgentCases = cases.filter((c: any) => c.priority === 'urgent');
+			for (const c of urgentCases) {
+				notifs.push({
+					id: `notif-urgent-${c.id}`,
 					type: 'warning',
-					title: 'Evidence Review Due',
-					message: '23 evidence items require review in CASE-2025-002',
-					timestamp: '1 hour ago',
+					title: 'Urgent Case Attention',
+					message: `"${c.title}" requires immediate attention`,
+					timestamp: c.updatedAt ? formatRelativeTime(c.updatedAt) : 'recently',
 					read: false
-				},
-	{
-					id: 'notif-3',
+				});
+			}
+
+			// Recent cases (updated in last 24h)
+			const dayAgo = Date.now() - 86400000;
+			const recentCases = cases.filter((c: any) => new Date(c.updatedAt).getTime() > dayAgo && c.priority !== 'urgent');
+			for (const c of recentCases.slice(0, 3)) {
+				notifs.push({
+					id: `notif-recent-${c.id}`,
 					type: 'info',
-					title: 'System Update',
-					message: 'OCR accuracy improved to 94.2%',
-					timestamp: '2 hours ago',
+					title: 'Case Updated',
+					message: `"${c.title}" was updated ${formatRelativeTime(c.updatedAt)}`,
+					timestamp: formatRelativeTime(c.updatedAt),
 					read: true
-				}
-			];
+				});
+			}
+
+			if (notifs.length === 0) {
+				notifs.push({
+					id: 'notif-empty',
+					type: 'info',
+					title: 'All Clear',
+					message: 'No pending notifications',
+					timestamp: 'now',
+					read: true
+				});
+			}
+
+			notifications = notifs;
 		} catch (error) {
 			console.error('Failed to load notifications:', error);
 		}
@@ -336,29 +375,25 @@ totalCases: 5.2,
 		}
 	}
 
-	// Quick actions
+	// Quick actions — navigate to real routes (client-side)
 	async function createNewCase() {
-		// TODO: Implement case creation
-		console.log('Creating new case...');
 		showQuickActions = false;
+		await goto('/cases/new');
 	}
 
 	async function uploadEvidence() {
-		// TODO: Implement evidence upload
-		console.log('Uploading evidence...');
 		showQuickActions = false;
+		await goto('/evidence');
 	}
 
 	async function runAIAnalysis() {
-		// TODO: Implement AI analysis
-		console.log('Running AI analysis...');
 		showQuickActions = false;
+		await goto('/analysis-center');
 	}
 
 	async function generateReport() {
-		// TODO: Implement report generation
-		console.log('Generating report...');
 		showQuickActions = false;
+		await goto('/ai-dashboard');
 	}
 
 	// Computed values
@@ -392,7 +427,7 @@ totalCases: 5.2,
 				</Button>
 
 				<!-- Global Search -->
-				<Button class="bits-btn" variant="outline" size="sm">
+				<Button class="bits-btn" variant="outline" size="sm" onclick={() => goto('/global-search')}>
 					<Search class="h-4 w-4 mr-2" />
 					Global Search
 					<span class="keyboard-shortcut">⌘K</span>
@@ -539,26 +574,26 @@ totalCases: 5.2,
 			<div class="nav-section">
 				<h3 class="nav-title">Operations</h3>
 				<ul class="nav-list">
-					<li class="nav-item" class:active={currentView === 'dashboard'}>
+					<li class="nav-item active">
 						<Button class="bits-btn nav-link" onclick={() => currentView = 'dashboard'}>
 							<Activity class="h-4 w-4" />
 							Dashboard
 						</Button>
 					</li>
-					<li class="nav-item" class:active={currentView === 'cases'}>
-						<Button class="bits-btn nav-link" onclick={() => currentView = 'cases'}>
+					<li class="nav-item">
+						<Button class="bits-btn nav-link" onclick={() => goto('/cases')}>
 							<Gavel class="h-4 w-4" />
 							Cases
 						</Button>
 					</li>
-					<li class="nav-item" class:active={currentView === 'evidence'}>
-						<Button class="bits-btn nav-link" onclick={() => currentView = 'evidence'}>
+					<li class="nav-item">
+						<Button class="bits-btn nav-link" onclick={() => goto('/evidence')}>
 							<FileText class="h-4 w-4" />
 							Evidence
 						</Button>
 					</li>
-					<li class="nav-item" class:active={currentView === 'ai'}>
-						<Button class="bits-btn nav-link" onclick={() => currentView = 'ai'}>
+					<li class="nav-item">
+						<Button class="bits-btn nav-link" onclick={() => goto('/ai-dashboard')}>
 							<Brain class="h-4 w-4" />
 							AI Chat
 						</Button>
@@ -569,14 +604,14 @@ totalCases: 5.2,
 			<div class="nav-section">
 				<h3 class="nav-title">Intelligence</h3>
 				<ul class="nav-list">
-					<li class="nav-item" class:active={currentView === 'persons'}>
-						<Button class="bits-btn nav-link" onclick={() => currentView = 'persons'}>
+					<li class="nav-item">
+						<Button class="bits-btn nav-link" onclick={() => goto('/persons-of-interest')}>
 							<Users class="h-4 w-4" />
 							Persons
 						</Button>
 					</li>
-					<li class="nav-item" class:active={currentView === 'analysis'}>
-						<Button class="bits-btn nav-link" onclick={() => currentView = 'analysis'}>
+					<li class="nav-item">
+						<Button class="bits-btn nav-link" onclick={() => goto('/analysis-center')}>
 							<Search class="h-4 w-4" />
 							Analysis
 						</Button>
@@ -587,8 +622,8 @@ totalCases: 5.2,
 			<div class="nav-section">
 				<h3 class="nav-title">System</h3>
 				<ul class="nav-list">
-					<li class="nav-item" class:active={currentView === 'system'}>
-						<Button class="bits-btn nav-link" onclick={() => currentView = 'system'}>
+					<li class="nav-item">
+						<Button class="bits-btn nav-link" onclick={() => goto('/system-configuration')}>
 							<Database class="h-4 w-4" />
 							System
 						</Button>
@@ -790,16 +825,6 @@ totalCases: 5.2,
 						</CardContent>
 					</Card>
 				</div>
-			{:else}
-				<!-- Placeholder for other views -->
-				<Card>
-					<CardContent class="p-8 text-center">
-						<div class="text-muted-foreground">
-							<h3 class="text-lg font-semibold mb-2">{currentView.charAt(0).toUpperCase() + currentView.slice(1)} View</h3>
-							<p>This section is under development. Check back soon!</p>
-						</div>
-					</CardContent>
-				</Card>
 			{/if}
 		</main>
 	</div>

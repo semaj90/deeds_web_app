@@ -1,34 +1,24 @@
-// @ts-nocheck
 /**
  * Unified Legal AI Service
- * Integrates: MinIO storage, Qdrant vectors, PostgreSQL metadata, Redis cache, Neo4j recommendations
+ * Facade over: MinIO storage, Qdrant vectors, PostgreSQL metadata, Redis cache
+ *
+ * Delegates to existing production implementations rather than reimplementing:
+ *   - uploadFile()           → minio-client.ts
+ *   - qdrant.search()        → qdrant-manager.ts
+ *   - generateSingleEmbed()  → grpc/embedding-client.ts
+ *   - getVectorCache/set     → vector-cache.ts
+ *   - db                     → Drizzle PostgreSQL client
  */
+import { randomUUID } from 'node:crypto';
+import { uploadFile } from '$lib/server/minio-client.js';
+import { qdrant } from '$lib/server/vector/qdrant-manager.js';
+import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
+import { getVectorCache, setVectorCache } from '$lib/server/vector-cache.js';
+import db from '$lib/server/db';
+import { sql } from 'drizzle-orm';
+import { ENV } from '$lib/server/env.server.js';
 
-// --- Added types & guards ---
-
-type MinioUploadResult = {
-	objectName: string;
-	size: number;
-	url: string;
-};
-
-function isMinioUploadResult(x: unknown): x is MinioUploadResult {
-	return !!x && typeof x === 'object' && 'objectName' in x && 'size' in x && 'url' in x;
-}
-
-// ADDED: generic async function type used for flexible client adapter casts
-type AsyncFn<T = unknown> = (...args: unknown[]) => Promise<T>;
-
-type QdrantHit = {
-	id: string;
-	score?: number;
-	payload?: Record<string, unknown>;
-};
-
-type SearchHit = QdrantHit & {
-	type: 'evidence' | 'document' | 'unknown';
-	source: string;
-};
+// --- Types ---
 
 export interface DocumentUpload {
 	file: Buffer;
@@ -45,97 +35,240 @@ export interface SearchOptions {
 	limit?: number;
 	threshold?: number;
 	caseId?: string;
-	useRecommendations?: boolean;
 	cacheResults?: boolean;
 }
 
-// Return/result shapes
-type UploadResult = {
+export interface SearchHit {
+	id: string;
+	score: number;
+	content: string;
+	evidenceId?: string;
+	fileName?: string;
+	sectionPath?: string[];
+	heading?: string;
+	citations?: string[];
+}
+
+export interface UploadResult {
 	id: string;
 	fileUrl: string;
-	embeddingId: string;
-	cached: boolean;
-};
+	objectKey: string;
+}
 
-type SearchResults = {
+export interface SearchResults {
 	results: SearchHit[];
-	recommendations: Recommendation[];
 	cached: boolean;
-	sources: string[];
-};
+	queryTimeMs: number;
+}
 
-type FullDocument = {
-	metadata: Record<string, unknown>;
-	fileUrl: string;
-	textContent: string;
-	similarDocuments: QdrantHit[];
-	recommendations: Recommendation[];
-};
-
-type HealthStatus = {
+export interface HealthStatus {
 	postgresql: boolean;
-	redis: boolean;
-	minio: boolean;
 	qdrant: boolean;
-	neo4j: boolean;
-};
+	minio: boolean;
+	overall: 'healthy' | 'degraded' | 'down';
+}
 
-type Recommendation = {
-	id: string;
-	reason?: string;
-};
+// --- Service ---
 
-/**
- * Unified Legal AI Service
- * Integrates: MinIO storage, Qdrant vectors, PostgreSQL metadata, Redis cache, Neo4j recommendations
- */
+const EVIDENCE_BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
+
 export class UnifiedLegalAIService {
 	/**
-	 * Complete document upload pipeline:
-	 * 1. Extract text content (OCR for PDFs/images)
-	 * 2. Store file in MinIO
-	 * 3. Generate embeddings
-	 * 4. Store in Qdrant vector database
-	 * 5. Store metadata in PostgreSQL
-	 * 6. Cache frequently accessed data in Redis
-	 * 7. Update Neo4j relationships
+	 * Upload a document to MinIO and record in PostgreSQL.
+	 * The full embedding pipeline (chunk → embed → Qdrant) runs async
+	 * via /api/evidence/upload — this method handles storage + DB insert.
 	 */
 	async uploadDocument(upload: DocumentUpload): Promise<UploadResult> {
-		const documentId = createId();
+		const documentId = randomUUID();
+		const ext = upload.fileName.split('.').pop() ?? 'bin';
+		const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+		const prefix = upload.documentType === 'evidence' ? 'evidence' : 'documents';
+		const objectKey = `${prefix}/${upload.caseId ?? 'default'}/${timestamp}-${documentId.slice(0, 8)}.${ext}`;
 
-		try {
-			// Step 1: Extract text content (simplified)
-			let textContent = '';
-			if (upload.contentType === 'text/plain') {
-				textContent = upload.file.toString('utf-8');
-			} else {
-				// TODO: Implement OCR for PDFs, images, etc.
-				textContent = upload.fileName; // Placeholder
-			}
+		await uploadFile(EVIDENCE_BUCKET, objectKey, upload.file, {
+			'Content-Type': upload.contentType,
+		});
 
-			// Step 2: Store file in MinIO
-			const minioResult: unknown =
-				upload.documentType === 'evidence'
-					? await minioStorage.uploadEvidence(upload.file, upload.fileName, {
-						contentType: upload.contentType,
-						caseId: upload.caseId,
-						documentType: upload.documentType
-					})
-					: await minioStorage.uploadDocument(upload.file, upload.fileName, {
-						contentType: upload.contentType,
-						documentType: upload.documentType
-					});
+		const fileUrl = `minio://${EVIDENCE_BUCKET}/${objectKey}`;
 
-			// TODO: Steps 3-7 (embeddings, Qdrant, PostgreSQL, Redis, Neo4j)
-			return {
-				id: documentId,
-				fileUrl: isMinioUploadResult(minioResult) ? minioResult.url : '',
-				embeddingId: '',
-				cached: false
-			};
-		} catch (err) {
-			console.error('Upload pipeline failed:', err);
-			throw err;
+		await db.execute(sql`
+			INSERT INTO evidence (case_id, evidence_number, title, type, description,
+				evidence_type, file_type, file_url, file_name, file_size, uploaded_at)
+			VALUES (
+				${upload.caseId ?? '00000000-0000-0000-0000-000000000000'},
+				${'EV-' + Date.now().toString(36).toUpperCase()},
+				${upload.fileName},
+				'document',
+				${(upload.metadata?.description as string) || `Uploaded: ${upload.fileName}`},
+				${upload.documentType},
+				${upload.contentType},
+				${fileUrl},
+				${upload.fileName},
+				${upload.file.length},
+				NOW()
+			)
+			RETURNING id
+		`);
+
+		return { id: documentId, fileUrl, objectKey };
+	}
+
+	/**
+	 * Semantic search across evidence vectors via Qdrant.
+	 * Embeds the query → vector search → returns ranked hits.
+	 * Falls back to pgvector cosine search if Qdrant is unavailable.
+	 */
+	async search(options: SearchOptions): Promise<SearchResults> {
+		const start = performance.now();
+		const { query, limit = 10, threshold = 0.3, caseId, cacheResults = true } = options;
+
+		// Check cache
+		if (cacheResults) {
+			try {
+				const { entry } = await getVectorCache(query, { caseId, limit });
+				if (entry) {
+					return {
+						results: entry.results as unknown as SearchHit[],
+						cached: true,
+						queryTimeMs: performance.now() - start,
+					};
+				}
+			} catch { /* cache miss */ }
 		}
+
+		// Embed query
+		let embedding: number[] | null = null;
+		try {
+			embedding = await generateSingleEmbedding(query);
+		} catch {
+			// gRPC unavailable — try direct Ollama
+			try {
+				const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: query }),
+					signal: AbortSignal.timeout(15_000),
+				});
+				if (res.ok) {
+					const data = await res.json();
+					embedding = data.embedding;
+				}
+			} catch { /* no embedding available */ }
+		}
+
+		if (!embedding || embedding.length === 0) {
+			return { results: [], cached: false, queryTimeMs: performance.now() - start };
+		}
+
+		// Qdrant vector search
+		const filter = caseId
+			? { must: [{ key: 'case_id', match: { value: caseId } }] }
+			: undefined;
+
+		let hits: SearchHit[] = [];
+		try {
+			const qdrantResults = await qdrant.hybridSearch({
+				query,
+				queryEmbedding: embedding,
+				collection: 'evidence',
+				limit,
+				scoreThreshold: threshold,
+				filters: filter,
+			});
+
+			hits = (qdrantResults.results ?? []).map((hit: any) => ({
+				id: String(hit.id),
+				score: hit.score ?? 0,
+				content: hit.payload?.content_preview ?? '',
+				evidenceId: hit.payload?.evidence_id,
+				fileName: hit.payload?.file_name,
+				sectionPath: hit.payload?.section_path,
+				heading: hit.payload?.heading,
+				citations: hit.payload?.citations,
+			}));
+		} catch (err) {
+			console.warn('[UnifiedLegalAI] Qdrant search failed, falling back to pgvector:', err);
+
+			// Fallback: pgvector cosine search
+			const vectorStr = `[${embedding.join(',')}]`;
+			const pgResults = await db.execute(sql`
+				SELECT ev.evidence_id, ev.chunk_index, ev.content,
+					1 - (ev.embedding <=> ${sql.raw(`'${vectorStr}'::vector`)}) AS score
+				FROM evidence_vectors ev
+				WHERE 1 - (ev.embedding <=> ${sql.raw(`'${vectorStr}'::vector`)}) > ${threshold}
+				ORDER BY score DESC
+				LIMIT ${limit}
+			`);
+
+			const rows = (pgResults as any).rows ?? pgResults;
+			hits = (rows ?? []).map((row: any) => ({
+				id: row.evidence_id ?? '',
+				score: parseFloat(row.score) || 0,
+				content: row.content ?? '',
+				evidenceId: row.evidence_id,
+			}));
+		}
+
+		// Cache results (30min TTL)
+		if (cacheResults && hits.length > 0) {
+			setVectorCache(query, hits, {
+				searchTime: performance.now() - start,
+				totalResults: hits.length,
+				model: 'embeddinggemma:latest',
+				distanceMetric: 'cosine',
+				threshold,
+			}, { caseId, limit }).catch(() => {});
+		}
+
+		return {
+			results: hits,
+			cached: false,
+			queryTimeMs: performance.now() - start,
+		};
+	}
+
+	/**
+	 * Health check — pings PostgreSQL, Qdrant, and MinIO.
+	 */
+	async healthCheck(): Promise<HealthStatus> {
+		const status: HealthStatus = {
+			postgresql: false,
+			qdrant: false,
+			minio: false,
+			overall: 'down',
+		};
+
+		// PostgreSQL
+		try {
+			await db.execute(sql`SELECT 1`);
+			status.postgresql = true;
+		} catch { /* down */ }
+
+		// Qdrant
+		try {
+			status.qdrant = Object.keys(qdrant.collections).length > 0;
+		} catch { /* down */ }
+
+		// MinIO
+		try {
+			const { Client } = await import('minio');
+			const client = new Client({
+				endPoint: ENV.MINIO_ENDPOINT.split(':')[0],
+				port: parseInt(ENV.MINIO_PORT, 10),
+				useSSL: ENV.MINIO_USE_SSL === 'true',
+				accessKey: ENV.MINIO_ACCESS_KEY,
+				secretKey: ENV.MINIO_SECRET_KEY,
+			});
+			await client.bucketExists(EVIDENCE_BUCKET);
+			status.minio = true;
+		} catch { /* down */ }
+
+		const upCount = [status.postgresql, status.qdrant, status.minio].filter(Boolean).length;
+		status.overall = upCount === 3 ? 'healthy' : upCount >= 1 ? 'degraded' : 'down';
+
+		return status;
 	}
 }
+
+/** Singleton instance */
+export const legalAIService = new UnifiedLegalAIService();
