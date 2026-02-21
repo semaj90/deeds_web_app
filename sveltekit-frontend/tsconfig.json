@@ -304,6 +304,7 @@
     "src/lib/server/vlm-document-analyzer.ts",
     "src/lib/server/evidence-processing.ts",     // Session 62: orphaned (XState AnyActorLogic type error, no route imports)
     "src/lib/components/DocumentUploadMachineIntegration.svelte", // Session 62: orphaned (stale state names, no route imports)
+    "src/lib/components/ComprehensiveUploadAnalytics.svelte",    // Session 62: orphaned (imports archived machine, no route imports)
     "src/lib/server/workers/**",
     "src/lib/server/ollama.ts",
     "src/lib/server/rabbitmq.ts",
