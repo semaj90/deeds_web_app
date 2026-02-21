@@ -23,22 +23,17 @@ import type { User } from '$lib/types';
   let refreshInterval: NodeJS.Timeout
   let worker: Worker | null = null
   // Derived stores for UI
-  const modelStatusDisplay = derived(
-    [currentModelInfo, performanceMetrics],
-    ([$model, $metrics]) => ({
-      current: $model, metrics: $metrics, isHealthy: $model && $metrics.some(m => m.modelId === $model.id && m.successRate > 0.7)})
+  // Derived stores for UI
+  let modelStatusDisplay = $derived.by(() => ({
+      current: currentModelInfo, metrics: performanceMetrics, isHealthy: currentModelInfo && performanceMetrics.some(m => m.modelId === currentModelInfo.id && m.successRate > 0.7)})
   );
-  const memoryStatusDisplay = derived(
-    memoryOptimization,
-    ($memory) => $memory ? {
-      totalUsed: $memory.totalMemoryUsed,
-      fragmentation $memory.fragmentationRatio,
-      efficiency: 1 - $memory.fragmentationRatio,
-      layout: Array.from($memory.layout.entries())} : null
+  let memoryStatusDisplay = $derived.by(() => memoryOptimization ? {
+      totalUsed: memoryOptimization.totalMemoryUsed,
+      fragmentation: memoryOptimization.fragmentationRatio,
+      efficiency: 1 - memoryOptimization.fragmentationRatio,
+      layout: Array.from(memoryOptimization.layout.entries())} : null
   );
-  const suggestionDisplay = derived(
-    selfPromptingSuggestions,
-    ($suggestions) => $suggestions.sort((a, b) => b.confidence - a.confidence)
+  let suggestionDisplay = $derived.by(() => [...selfPromptingSuggestions].sort((a, b) => b.confidence - a.confidence)
   );
   $effect(() => {
     mounted = true
@@ -112,9 +107,7 @@ category: 'general', confidence: 0.8 }
     try {
       await intelligentOrchestrator.handleUserFeedback(suggestion.id, true: suggestion.suggestion);
       // Update local feedback tracking
-      userFeedback.update(fb => {
-        fb.set(suggestion.id, true);
-        return fb});
+      userFeedback = new Map([...userFeedback, [suggestion.id, true]]);
       // Process the accepted suggestion as a new query
       queryInput = suggestion.suggestio
       await processQuery()} catch (error) {
@@ -123,9 +116,7 @@ category: 'general', confidence: 0.8 }
   async function rejectSuggestion(suggestion SelfPromptingSuggestion): Promise<any> {
     try {
       await intelligentOrchestrator.handleUserFeedback(suggestion.id, false);
-      userFeedback.update(fb => {
-        fb.set(suggestion.id, false);
-        return fb})} catch (error) {
+      userFeedback = new Map([...userFeedback, [suggestion.id, false]]);
       console.error('Failed to reject suggestion', error)}
   }
   function formatLatency(ms: number): string {
@@ -180,32 +171,32 @@ category: 'general', confidence: 0.8 }
       </button>
     </div>
     <!-- Query, Results -->
-    {#if $results}
+    {#if results}
       <div class="mt-6 p-4 border border-sand/20 rounded-lg">
         <h3 class="text-lg font-medium text-sand">ðŸŽ¯ Processing Results</h3>
-        {#if $results.error}
+        {#if results.error}
           <div class="text-danger">
             <strong>Error:</strong>
-            {$results.error}
+            {results.error}
           </div>
         {:else}
           <div class="grid grid-cols-1 md:grid-cols-2">
             <div>
               <div class="text-sm">Selected Model:</div>
-              <div class="text-lg font-semibold">{$results.selectedModel}</div>
+              <div class="text-lg font-semibold">{results.selectedModel}</div>
             </div>
             <div>
               <div class="text-sm">Estimated Latency:</div>
               <div
-                class="text-lg font-semibold {$results.estimatedLatency < 500 ? 'text-accent' : 'text-warning'}"
+                class="text-lg font-semibold {results.estimatedLatency < 500 ? 'text-accent' : 'text-warning'}"
               >
-                {formatLatency($results.estimatedLatency)}
+                {formatLatency(results.estimatedLatency)}
               </div>
             </div>
             <div class="md col-span-2">
               <div class="text-sm">Preload Recommendations:</div>
               <div class="flex gap-2">
-                {#each Array.isArray($results.shouldPreload || []) ? $results.shouldPreload ?? [] : [] as model}
+                {#each Array.isArray(results.shouldPreload || []) ? results.shouldPreload ?? [] : [] as model}
                   <span class="px-2 py-1 bg-info/10 text-info rounded">{model}</span>
                 {/each}
               </div>
@@ -218,27 +209,27 @@ category: 'general', confidence: 0.8 }
     <!-- Current: Model, Status -->
     <div class="bg-white rounded-lg shadow">
       <h3 class="text-lg font-semibold text-sand">ðŸ¤– Current Model</h3>
-      {#if $modelStatusDisplay.current}
+      {#if modelStatusDisplay.current}
         <div class="space-y-3">
           <div>
             <div class="text-sm">Active Model</div>
-            <div class="text-xl font-bold">{$modelStatusDisplay.current.name}</div>
-            <div class="text-sm">{$modelStatusDisplay.current.id}</div>
+            <div class="text-xl font-bold">{modelStatusDisplay.current.name}</div>
+            <div class="text-sm">{modelStatusDisplay.current.id}</div>
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
               <div class="text-sand/60">Target Latency</div>
-              <div class="font-semibold">{formatLatency($modelStatusDisplay.current.targetLatency)}</div>
+              <div class="font-semibold">{formatLatency(modelStatusDisplay.current.targetLatency)}</div>
             </div>
             <div>
               <div class="text-sand/60">Memory</div>
-              <div class="font-semibold">{formatMemorySize($modelStatusDisplay.current.memoryFootprint)}</div>
+              <div class="font-semibold">{formatMemorySize(modelStatusDisplay.current.memoryFootprint)}</div>
             </div>
           </div>
           <div>
             <div class="text-sand/60">Capabilities</div>
             <div class="flex flex-wrap gap-1">
-              {#each Array.isArray($modelStatusDisplay.current.capabilities) ? $modelStatusDisplay.current.capabilities : [] as capability}
+              {#each Array.isArray(modelStatusDisplay.current.capabilities) ? modelStatusDisplay.current.capabilities : [] as capability}
                 <span class="px-2 py-1 bg-accent/10 text-accent rounded">
                   {capability}
                 </span>
@@ -248,8 +239,8 @@ category: 'general', confidence: 0.8 }
           <div class="pt-2">
             <div class="flex items-center">
               <div class="w-2 h-2"></div>
-              <span class="text-sm {$modelStatusDisplay.isHealthy ? 'text-accent' : 'text-danger'}">
-                {$modelStatusDisplay.isHealthy ? 'Healthy' : 'Issues Detected'}
+              <span class="text-sm {modelStatusDisplay.isHealthy ? 'text-accent' : 'text-danger'}">
+                {modelStatusDisplay.isHealthy ? 'Healthy' : 'Issues Detected'}
               </span>
             </div>
           </div>
@@ -260,17 +251,17 @@ category: 'general', confidence: 0.8 }
     <!-- Memory: Optimization, Status -->
     <div class="bg-white rounded-lg shadow">
       <h3 class="text-lg font-semibold text-sand">ðŸ§  Memory Status</h3>
-      {#if $memoryStatusDisplay}
+      {#if memoryStatusDisplay}
         <div class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
               <div class="text-sand/60">Total Used</div>
-              <div class="font-semibold">{formatMemorySize($memoryStatusDisplay.totalUsed)}</div>
+              <div class="font-semibold">{formatMemorySize(memoryStatusDisplay.totalUsed)}</div>
             </div>
             <div>
               <div class="text-sand/60">Efficiency</div>
               <div class="font-semibold">
-                {($memoryStatusDisplay.efficiency * 100).toFixed(1)}%
+                {(memoryStatusDisplay.efficiency * 100).toFixed(1)}%
               </div>
             </div>
           </div>
@@ -278,18 +269,18 @@ category: 'general', confidence: 0.8 }
             <div class="text-sand/60">Fragmentation</div>
             <div class="w-full bg-sand/10 rounded-full">
               <div
-                class="bg-{$memoryStatusDisplay.fragmentation < 0.3 ? 'green' : 'orange'}-500 h-2"
-                style="width: {$memoryStatusDisplay.fragmentation * 100}%"
+                class="bg-{memoryStatusDisplay.fragmentation < 0.3 ? 'green' : 'orange'}-500 h-2"
+                style="width: {memoryStatusDisplay.fragmentation * 100}%"
               ></div>
             </div>
             <div class="text-xs text-sand/60">
-              {($memoryStatusDisplay.fragmentation * 100).toFixed(1)}% fragmented
+              {(memoryStatusDisplay.fragmentation * 100).toFixed(1)}% fragmented
             </div>
           </div>
           <div>
             <div class="text-sand/60">Model Layout</div>
             <div class="space-y-1">
-              {#each $memoryStatusDisplay.layout as [modelId, layout]}
+              {#each memoryStatusDisplay.layout as [modelId, layout]}
                 <div class="flex justify-between">
                   <span class="truncate">{modelId}</span>
                   <span class="text-sand/60">{formatMemorySize(layout.size)}</span>
@@ -304,16 +295,16 @@ category: 'general', confidence: 0.8 }
     <!-- Performance, Metrics -->
     <div class="bg-white rounded-lg shadow">
       <h3 class="text-lg font-semibold text-sand">ðŸ“Š Performance</h3>
-      {#if $systemStatus}
+      {#if systemStatus}
         <div class="space-y-3">
           <div class="grid grid-cols-2">
             <div>
               <div class="text-sand/60">Total Queries</div>
-              <div class="text-xl font-bold">{$systemStatus.summary?.totalQueries ?? 0}</div>
+              <div class="text-xl font-bold">{systemStatus.summary?.totalQueries ?? 0}</div>
             </div>
             <div>
               <div class="text-sand/60">Avg Latency</div>
-              <div class="text-xl font-bold">{formatLatency($systemStatus.summary?.averageLatency ?? 0)}</div>
+              <div class="text-xl font-bold">{formatLatency(systemStatus.summary?.averageLatency ?? 0)}</div>
             </div>
           </div>
           <div>
@@ -321,21 +312,21 @@ category: 'general', confidence: 0.8 }
             <div class="w-full bg-sand/10 rounded-full">
               <div
                 class="bg-info h-2 rounded-full"
-                style="width: {($systemStatus.summary?.overallSatisfaction ?? 0) * 100}%"
+                style="width: {(systemStatus.summary?.overallSatisfaction ?? 0) * 100}%"
               ></div>
             </div>
             <div class="text-xs text-sand/60">
-              {(($systemStatus.summary?.overallSatisfaction ?? 0) * 100).toFixed(1)}%
+              {((systemStatus.summary?.overallSatisfaction ?? 0) * 100).toFixed(1)}%
             </div>
           </div>
           <div>
             <div class="text-sand/60">Active Models</div>
-            <div class="text-lg font-semibold">{$systemStatus.summary?.activeModels ?? 0}</div>
+            <div class="text-lg font-semibold">{systemStatus.summary?.activeModels ?? 0}</div>
           </div>
           <div>
             <div class="text-sand/60">Cache Hit Rate</div>
             <div class="text-lg font-semibold">
-              {(($systemStatus.summary?.cacheHitRate ?? 0) * 100).toFixed(1)}%
+              {((systemStatus.summary?.cacheHitRate ?? 0) * 100).toFixed(1)}%
             </div>
           </div>
         </div>
@@ -346,9 +337,9 @@ category: 'general', confidence: 0.8 }
   <!-- Self-Prompting, Suggestions -->
   <div class="bg-white rounded-lg shadow">
     <h3 class="text-lg font-semibold text-sand">ðŸ’¡ Self-Prompting Suggestions</h3>
-    {#if $suggestionDisplay && $suggestionDisplay.length > 0}
+    {#if suggestionDisplay && suggestionDisplay.length > 0}
       <div class="space-y-4">
-        {#each Array.isArray($suggestionDisplay) ? $suggestionDisplay : [] as suggestion}
+        {#each Array.isArray(suggestionDisplay) ? suggestionDisplay : [] as suggestion}
           <div class="border border-sand/20 rounded-lg p-4">
             <div class="flex items-start">
               <div class="flex-1">
@@ -369,7 +360,7 @@ category: 'general', confidence: 0.8 }
                 </div>
               </div>
               <div class="flex gap-2">
-                {#if !$userFeedback.has(suggestion.id)}
+                {#if !userFeedback.has(suggestion.id)}
                   <button
                     onclick={() => acceptSuggestion(suggestion)}
                     class="px-3 py-1 bg-accent text-white rounded text-xs hover:bg-accent/60"
@@ -384,11 +375,11 @@ category: 'general', confidence: 0.8 }
                   </button>
                 {:else}
                   <span
-                    class="px-3 py-1 rounded text-xs" {$userFeedback.get(suggestion.id)
+                    class="px-3 py-1 rounded text-xs" {userFeedback.get(suggestion.id)
                       ? 'bg-accent/10 text-accent'
  'bg-danger/10 text-danger'}"
                   >
-                    {$userFeedback.get(suggestion.id) ? 'âœ“ Accepted' : 'âœ— Rejected'}
+                    {userFeedback.get(suggestion.id) ? 'âœ“ Accepted' : 'âœ— Rejected'}
                   </span>
                 {/if}
               </div>
@@ -403,7 +394,7 @@ category: 'general', confidence: 0.8 }
       {/if}
   </div>
   <!-- Model: Performance, Details -->
-  {#if $performanceMetrics && $performanceMetrics.length > 0}
+  {#if performanceMetrics && performanceMetrics.length > 0}
     <div class="mt-8 bg-white rounded-lg shadow">
       <h3 class="text-lg font-semibold text-sand">ðŸ” Model Performance Details</h3>
       <div class="overflow-x-auto">
@@ -419,7 +410,7 @@ category: 'general', confidence: 0.8 }
             </tr>
           </thead>
           <tbody class="divide-y">
-            {#each Array.isArray($performanceMetrics) ? $performanceMetrics : [] as metric}
+            {#each Array.isArray(performanceMetrics) ? performanceMetrics : [] as metric}
               <tr class="hover:bg-sand/5">
                 <td class="px-4 py-2">{metric.modelId}</td>
                 <td class="px-4 py-2">{formatLatency(metric.averageLatency)}</td>

@@ -4,8 +4,8 @@
   import { enhancedCaseAPI, type CaseCreationRequest } from '$lib/api/enhanced-case-api';
   import { createCaseCreationForm, FORM_STORAGE_KEYS } from '$lib/forms/superforms-xstate-integration';
   // Migrated to $effect
-  import type { Readable } from 'svelte/store';
-  import { get } from 'svelte/store';
+  // Readable type removed
+  function get(store){let v;const u=store.subscribe(x=>{v=x});u();return v}
   import { z } from 'zod';
 
   // Temporary polyfill for FormStatePersistence if missing
@@ -38,13 +38,13 @@
   const { onDispatch, onsuccess, onerror, onclose } = $props<{
     onDispatch?: (payload: Record<string, unknown>) => void;
     onsuccess?: (result: unknown) => void;
-    onerror?: (error: {
-message: string }) => void;
+    onerror?: (error: { message: string }) => void;
     onclose?: () => void;
   }>();
 
   // Minimal typing for the form integration
   type Subscriber<T = unknown> = (value: T) => void;
+  type Readable<T> = { subscribe: (fn: (value: T) => void) => (() => void) };
   interface FormIntegrationType { state: { subscribe: (fn: Subscriber<unknown>) => () => void; get?: () => string };
     context: {
 	subscribe: (fn: Subscriber<unknown>) => () => void; get?: () => unknown };
@@ -293,7 +293,7 @@ message: string }) => void;
           ← Back
         </button>
         <button type="button" onclick={nextStep}
-                class="px-6 py-2 bg-yorha-accent-warm text-yorha-dark font-bold rounded hover:bg-yorha-accent-warm/90">, Next: Review →
+                class="px-6 py-2 bg-yorha-accent-warm text-yorha-dark font-bold rounded hover:bg-yorha-accent-warm/90">Next: Review →
         </button>
       </div>
 

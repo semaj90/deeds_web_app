@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { writable } from 'svelte/store';
 
 	// Component props
 	let {
@@ -38,12 +37,12 @@ error: string }) => void }>();
 	let isLoading = $state(false);
 	let prediction = $state<any>(null);
 	let error = $state<string | null>(null);
-	let showAdvanced = writable(false);
-	let analysisHistory = writable<AnalysisHistoryItem[]>([]);
-	let exportFormat = writable('json');
+	let showAdvanced = $state(false);
+	let analysisHistory = $state<AnalysisHistoryItem[]>([]);
+	let exportFormat = $state('json');
 
 	// Form data - initialize reactively
-	let formData = writable({
+	let formData = $state({
 		caseFacts: '',
 		caseType: 'civil',
 		jurisdiction: 'general',
@@ -54,14 +53,14 @@ error: string }) => void }>();
 
 	// Update formData when props change
 	$effect(() => {
-		formData.set({
+		formData = {
 			caseFacts,
 			caseType,
 			jurisdiction,
 			partyType,
 			historicalData: historicalData.join('\n'),
 			similarCases: similarCases.join('\n')
-		});
+		};
 	});
 
 	const caseTypes = [
@@ -132,14 +131,14 @@ error: string }) => void }>();
 			prediction = result;
 
 			// Add to history
-			analysisHistory.update(history => [{
+			analysisHistory = [{
 				timestamp: new Date().toISOString(),
 				caseFacts: (data.caseFacts?.toString() ?? '').slice(0, 100) + '...',
 				caseType: data.caseType?.toString() ?? 'unknown',
 				prediction: result.outcome_prediction,
 				id: Date.now()
 			},
-	...history.slice(0, 9)]);
+	...analysisHistory.slice(0, 9)];
 
 			if (onPredictionComplete) {
 				onPredictionComplete({ prediction: result });
@@ -165,17 +164,17 @@ error: string }) => void }>();
 	const data = {
 		export_timestamp: new Date().toISOString(),
 		case_data: {
-			caseFacts: $formData.caseFacts,
-			caseType: $formData.caseType,
-			jurisdiction: $formData.jurisdiction,
-			partyType: $formData.partyType,
-			historicalData: $formData.historicalData.split('\n').filter((line: string) => line.trim()),
-			similarCases: $formData.similarCases.split('\n').filter((line: string) => line.trim())
+			caseFacts: formData.caseFacts,
+			caseType: formData.caseType,
+			jurisdiction: formData.jurisdiction,
+			partyType: formData.partyType,
+			historicalData: formData.historicalData.split('\n').filter((line: string) => line.trim()),
+			similarCases: formData.similarCases.split('\n').filter((line: string) => line.trim())
 		},
 		prediction_results: prediction
 	};		let content, filename, mimeType;
 
-		if ($exportFormat=== 'json') {
+		if (exportFormat=== 'json') {
 			content = JSON.stringify(data, null, 2);
 			filename = `case-prediction-${Date.now()}.json`;
 			mimeType = 'application/json';
@@ -288,11 +287,11 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 	// Load from history
 	function loadFromHistory(historyItem: AnalysisHistoryItem) {
-		formData.update(data => ({
-			...data,
+		formData = {
+			...formData,
 			caseFacts: historyItem.caseFacts,
 			caseType: historyItem.caseType
-		}));
+		};
 	}
 </script>
 
@@ -317,7 +316,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 					<textarea
 						id="caseFacts"
 						name="caseFacts"
-						bind:value={$formData.caseFacts}
+						bind:value={formData.caseFacts}
 						placeholder="Enter detailed case facts, evidence, witness statements, and relevant circumstances..."
 						rows="8"
 						required
@@ -327,7 +326,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 				<div class="form-row">
 					<div class="form-group">
 						<label for="caseType">Case Type</label>
-						<select id="caseType" name="caseType" bind:value={$formData.caseType}>
+						<select id="caseType" name="caseType" bind:value={formData.caseType}>
 							{#each caseTypes as type (type.value)}
 								<option value={type.value}>{type.label}</option>
 							{/each}
@@ -336,7 +335,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 					<div class="form-group">
 						<label for="jurisdiction">Jurisdiction</label>
-						<select id="jurisdiction" name="jurisdiction" bind:value={$formData.jurisdiction}>
+						<select id="jurisdiction" name="jurisdiction" bind:value={formData.jurisdiction}>
 							{#each jurisdictions as juris (juris.value)}
 								<option value={juris.value}>{juris.label}</option>
 							{/each}
@@ -345,7 +344,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 					<div class="form-group">
 						<label for="partyType">Your Role</label>
-						<select id="partyType" name="partyType" bind:value={$formData.partyType}>
+						<select id="partyType" name="partyType" bind:value={formData.partyType}>
 							{#each partyTypes as party (party.value)}
 								<option value={party.value}>{party.label}</option>
 							{/each}
@@ -355,12 +354,12 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 			</div>
 
 			<div class="form-section">
-				<button type="button" class="section-header" onclick={() => showAdvanced.update(v => !v)}>
+				<button type="button" class="section-header" onclick={() => showAdvanced = !showAdvanced}>
 					<h3>Advanced Analysis Options</h3>
-					<span class="toggle-icon">{$showAdvanced ? '▼' : '▶'}</span>
+					<span class="toggle-icon">{showAdvanced ? '▼' : '▶'}</span>
 				</button>
 
-				{#if $showAdvanced}
+				{#if showAdvanced}
 					<div class="advanced-options">
 						<div class="form-group">
 							<label for="historicalData">
@@ -370,7 +369,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 							<textarea
 								id="historicalData"
 								name="historicalData"
-								bind:value={$formData.historicalData}
+								bind:value={formData.historicalData}
 								placeholder="Enter historical case data, one per line..."
 								rows="4"
 							></textarea>
@@ -384,7 +383,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 							<textarea
 								id="similarCases"
 								name="similarCases"
-								bind:value={$formData.similarCases}
+								bind:value={formData.similarCases}
 								placeholder="Enter similar case references, one per line..."
 								rows="4"
 							></textarea>
@@ -424,7 +423,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 			<div class="results-header">
 				<h3>📊 Case Outcome Analysis</h3>
 				<div class="export-controls">
-					<select bind:value={$exportFormat}>
+					<select bind:value={exportFormat}>
 						<option value="json">JSON</option>
 						<option value="txt">Text Report</option>
 					</select>
@@ -637,11 +636,11 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		</div>
 	{/if}
 
-	{#if $analysisHistory.length > 0}
+	{#if analysisHistory.length > 0}
 		<div class="analysis-history">
 			<h3>📚 Recent Analyses</h3>
 			<div class="history-list">
-				{#each $analysisHistory as historyItem (historyItem.id)}
+				{#each analysisHistory as historyItem (historyItem.id)}
 					<button type="button" class="history-item" onclick={() => loadFromHistory(historyItem)}>
 						<div class="history-header">
 							<span class="history-case">{historyItem.caseFacts}</span>

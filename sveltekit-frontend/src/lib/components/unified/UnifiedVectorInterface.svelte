@@ -1,16 +1,15 @@
 <!-- Unified Vector Interface Component - YoRHa-themed interface for all vector systems integration -->
 <script lang="ts">
 	import type { UnifiedVectorRequest, UnifiedVectorResponse } from '$lib/services/unified-vector-orchestrator';
-	import { writable } from 'svelte/store';
 
-	// Stores
-	const isProcessing = writable(false);
-	const results = writable<UnifiedVectorResponse | null>(null);
-	const health = writable<Record<string, boolean>>({});
-	const analytics = writable<Record<string, any>>({});
-	const logs = writable<string[]>([]);
+	// Reactive state (Svelte 5 runes — migrated from writable stores)
+	let isProcessing = $state(false);
+	let results = $state<UnifiedVectorResponse | null>(null);
+	let health = $state<Record<string, boolean>>({});
+	let analytics = $state<Record<string, any>>({});
+	let logs = $state<string[]>([]);
 
-	// Form state - Svelte 5 runes
+	// Form state
 	let selectedOperation = $state<'analyze' | 'search' | 'recommend' | 'visualize' | 'ingest'>('analyze');
 	let inputText = $state<string>('');
 	let userId = $state<string>('demo_user');
@@ -42,21 +41,21 @@
 	];
 
 	function addLog(message: string) {
-		logs.update((currentLogs) => [
+		logs = [
 			`[${new Date().toLocaleTimeString()}] ${message}`,
-			...currentLogs.slice(0, 99) // Keep last 100 logs
-		]);
+			...logs.slice(0, 99)
+		];
 	}
 
 	async function checkHealth() {
 		try {
 			const response = await fetch('/api/health/status');
 			const data = await response.json();
-			health.set(data.health || {});
+			health = data.health || {};
 			const healthStatus = data.allSystemsOperational ? 'All systems operational' : 'Some systems offline';
 			addLog(`Health check: ${healthStatus}`);
-		} catch (error) {
-			addLog(`Health check failed: ${(error as Error).message}`);
+		} catch (err) {
+			addLog(`Health check failed: ${(err as Error).message}`);
 		}
 	}
 
@@ -64,10 +63,10 @@
 		try {
 			const response = await fetch('/api/analytics');
 			const data = await response.json();
-			analytics.set(data.analytics || {});
+			analytics = data.analytics || {};
 			addLog('Analytics updated');
-		} catch (error) {
-			addLog(`Analytics failed: ${(error as Error).message}`);
+		} catch (err) {
+			addLog(`Analytics failed: ${(err as Error).message}`);
 		}
 	}
 
@@ -77,7 +76,7 @@
 			return;
 		}
 
-		isProcessing.set(true);
+		isProcessing = true;
 		addLog(`Starting ${selectedOperation} operation...`);
 
 		try {
@@ -85,8 +84,8 @@
 				type: selectedOperation,
 				payload: {
 					text: inputText || undefined,
-					documents: selectedOperation === 'ingest' ? sampleDocuments  : undefined,
-					query: selectedOperation === 'search' ? inputText  : undefined,
+					documents: selectedOperation === 'ingest' ? sampleDocuments : undefined,
+					query: selectedOperation === 'search' ? inputText : undefined,
 					userId,
 					sessionId,
 					options: {
@@ -110,20 +109,20 @@
 			});
 
 			const data: UnifiedVectorResponse = await response.json();
-			results.set(data);
+			results = data;
 
 			if (data.success) {
-				addLog(`✅ ${selectedOperation} completed in ${data.results.processingTime}ms`);
+				addLog(`${selectedOperation} completed in ${data.results.processingTime}ms`);
 				addLog(`Components used: ${data.metadata.componentsUsed.join(', ')}`);
 				addLog(`Confidence: ${(data.results.confidence * 100).toFixed(1)}%`);
 			} else {
-				addLog(`❌ ${selectedOperation} failed: ${data.metadata.errors?.join(', ') ?? 'Unknown error'}`);
+				addLog(`${selectedOperation} failed: ${data.metadata.errors?.join(', ') ?? 'Unknown error'}`);
 			}
-		} catch (error) {
-			addLog(`❌ Request failed: ${(error as Error).message}`);
-			results.set(null);
+		} catch (err) {
+			addLog(`Request failed: ${(err as Error).message}`);
+			results = null;
 		} finally {
-			isProcessing.set(false);
+			isProcessing = false;
 		}
 	}
 
@@ -135,12 +134,10 @@
 		return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 	}
 
-	// Svelte 5 $effect - runs on mount and cleanup on unmount
 	$effect(() => {
 		checkHealth();
 		loadAnalytics();
 
-		// Refresh health and analytics every 30 seconds
 		const interval = setInterval(() => {
 			checkHealth();
 			loadAnalytics();
@@ -156,7 +153,7 @@
 	<div class="border border-accent/60 p-4 mb-6">
 		<h1 class="text-2xl mb-2">UNIFIED VECTOR ORCHESTRATOR</h1>
 		<div class="text-sm text-center">
-			WebGPU SOM • WebAssembly RAG • PageRank • Glyph Diffusion • Neo4j • Vector Search
+			WebGPU SOM - WebAssembly RAG - PageRank - Glyph Diffusion - Neo4j - Vector Search
 		</div>
 	</div>
 
@@ -166,11 +163,11 @@
 		<div class="border border-accent/60 p-4">
 			<h2 class="text-lg mb-3">SYSTEM STATUS</h2>
 			<div class="space-y-2">
-				{#each Object.entries($health) as [system, status]}
+				{#each Object.entries(health) as [system, status]}
 					<div class="flex justify-between">
 						<span class="capitalize">{system.replace(/([A-Z])/g, ' $1')}</span>
 						<span class={status ? 'text-accent' : 'text-danger/80'}>
-							{status ? '●' : '○'}
+							{status ? '\u25CF' : '\u25CB'}
 						</span>
 					</div>
 				{/each}
@@ -181,7 +178,7 @@
 		<div class="border border-accent/60 p-4">
 			<h2 class="text-lg mb-3">PERFORMANCE</h2>
 			<div class="space-y-2">
-				{#each Object.entries($analytics) as [operation, stats]}
+				{#each Object.entries(analytics) as [operation, stats]}
 					<div class="mb-2">
 						<div class="capitalize">{operation}</div>
 						<div class="text-xs">
@@ -196,7 +193,7 @@
 		<div class="border border-accent/60 p-4">
 			<h2 class="text-lg mb-3">ACTIVITY LOG</h2>
 			<div class="h-32 overflow-y-auto text-xs">
-				{#each $logs as log}
+				{#each logs as log}
 					<div class="text-accent/80">{log}</div>
 				{/each}
 			</div>
@@ -293,20 +290,20 @@
 			<div class="grid grid-cols-3 gap-2">
 				<button
 					onclick={processRequest}
-					disabled={$isProcessing}
-					class="bg-accent/20 border border-accent/60 text-accent p-2 text-sm hover:bg-accent/20 disabled:opacity-50 disabled:cursor-not-allowed"
+					disabled={isProcessing}
+					class="bg-accent/20 border border-accent/60 text-accent p-2 text-sm hover:bg-accent/30 disabled:opacity-50 disabled:cursor-not-allowed"
 				>
-					{$isProcessing ? 'PROCESSING...' : 'EXECUTE'}
+					{isProcessing ? 'PROCESSING...' : 'EXECUTE'}
 				</button>
 				<button
 					onclick={checkHealth}
-					class="bg-info/20 border border-info/80 text-info/80 p-2 text-sm hover:bg-info/20"
+					class="bg-info/20 border border-info/80 text-info/80 p-2 text-sm hover:bg-info/30"
 				>
 					HEALTH CHECK
 				</button>
 				<button
 					onclick={loadAnalytics}
-					class="bg-info/20 border border-info/60 text-info/80 p-2 text-sm hover:bg-info/20"
+					class="bg-info/20 border border-info/60 text-info/80 p-2 text-sm hover:bg-info/30"
 				>
 					ANALYTICS
 				</button>
@@ -317,21 +314,21 @@
 		<div class="border border-accent/60 p-4">
 			<h2 class="text-lg mb-4">RESULTS</h2>
 
-			{#if $results}
+			{#if results}
 				<div class="space-y-4">
 					<!-- Operation Summary -->
 					<div class="border border-accent p-3">
-						<div class="text-accent/40 mb-2">OPERATION: {$results.type.toUpperCase()}</div>
+						<div class="text-accent/40 mb-2">OPERATION: {results.type.toUpperCase()}</div>
 						<div class="grid grid-cols-2 gap-2 text-sm">
 							<div>
 								Status:
-								<span class={$results.success ? 'text-accent' : 'text-danger/80'}>
-									{$results.success ? 'SUCCESS' : 'FAILED'}
+								<span class={results.success ? 'text-accent' : 'text-danger/80'}>
+									{results.success ? 'SUCCESS' : 'FAILED'}
 								</span>
 							</div>
-							<div>Processing: {$results.results.processingTime}ms</div>
-							<div>Confidence: {($results.results.confidence * 100).toFixed(1)}%</div>
-							<div>Components: {$results.metadata.componentsUsed.length}</div>
+							<div>Processing: {results.results.processingTime}ms</div>
+							<div>Confidence: {(results.results.confidence * 100).toFixed(1)}%</div>
+							<div>Components: {results.metadata.componentsUsed.length}</div>
 						</div>
 					</div>
 
@@ -339,7 +336,7 @@
 					<div class="border border-accent p-3">
 						<div class="text-accent/40 mb-2">COMPONENTS USED</div>
 						<div class="flex flex-wrap gap-2">
-							{#each $results.metadata.componentsUsed as component}
+							{#each results.metadata.componentsUsed as component}
 								<span class="bg-accent/20 px-2 py-1 text-xs border border-accent">
 									{component}
 								</span>
@@ -348,10 +345,10 @@
 					</div>
 
 					<!-- Performance Breakdown -->
-					{#if $results.metadata.performance && Object.keys($results.metadata.performance).length > 0}
+					{#if results.metadata.performance && Object.keys(results.metadata.performance).length > 0}
 						<div class="border border-accent p-3">
 							<div class="text-accent/40 mb-2">PERFORMANCE</div>
-							{#each Object.entries($results.metadata.performance) as [component, time]}
+							{#each Object.entries(results.metadata.performance) as [component, time]}
 								<div class="flex justify-between text-sm">
 									<span>{component}</span>
 									<span>{time}ms</span>
@@ -361,19 +358,19 @@
 					{/if}
 
 					<!-- Vector Results -->
-					{#if $results.results.vectorResults}
+					{#if results.results.vectorResults}
 						<div class="border border-accent p-3">
 							<div class="text-accent/40 mb-2">
-								VECTOR RESULTS ({$results.results.vectorResults.length})
+								VECTOR RESULTS ({results.results.vectorResults.length})
 							</div>
 							<div class="space-y-1 text-xs max-h-32 overflow-y-auto">
-								{#each $results.results.vectorResults.slice(0, 5) as result}
+								{#each results.results.vectorResults.slice(0, 5) as vecResult}
 									<div class="border-l-2 border-accent/60 pl-2">
 										<div class="text-accent/80">
-											{result.metadata?.title ?? result.id}
+											{vecResult.metadata?.title ?? vecResult.id}
 										</div>
 										<div class="text-accent">
-											Score: {(result.score * 100).toFixed(1)}%
+											Score: {(vecResult.score * 100).toFixed(1)}%
 										</div>
 									</div>
 								{/each}
@@ -382,13 +379,13 @@
 					{/if}
 
 					<!-- Recommendations -->
-					{#if $results.results.recommendations}
+					{#if results.results.recommendations}
 						<div class="border border-accent p-3">
 							<div class="text-accent/40 mb-2">
-								RECOMMENDATIONS ({$results.results.recommendations.length})
+								RECOMMENDATIONS ({results.results.recommendations.length})
 							</div>
 							<div class="space-y-1 text-xs max-h-32 overflow-y-auto">
-								{#each $results.results.recommendations.slice(0, 3) as rec}
+								{#each results.results.recommendations.slice(0, 3) as rec}
 									<div class="border-l-2 border-accent/60 pl-2">
 										<div class="text-accent/80">{rec.title || rec.id}</div>
 										<div class="text-accent">
@@ -401,12 +398,12 @@
 					{/if}
 
 					<!-- Errors -->
-					{#if $results.metadata.errors && $results.metadata.errors.length > 0}
+					{#if results.metadata.errors && results.metadata.errors.length > 0}
 						<div class="border border-danger p-3">
 							<div class="text-danger/40 mb-2">ERRORS</div>
 							<div class="space-y-1">
-								{#each $results.metadata.errors as error}
-									<div class="text-danger/80">{error}</div>
+								{#each results.metadata.errors as err}
+									<div class="text-danger/80">{err}</div>
 								{/each}
 							</div>
 						</div>
@@ -444,9 +441,3 @@
 		accent-color: theme('colors.green.400');
 	}
 </style>
-
-
-
-
-
-
