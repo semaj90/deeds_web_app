@@ -205,9 +205,9 @@ evidence: 0, connections: 0, analysis: 0 }
   /**
    * Handle analytics updates from typing behavior
    */
-  function handleAnalyticsUpdate(event: CustomEvent<{ analytics: unknown }>) {
+  function handleAnalyticsUpdate(event: CustomEvent<{ data: any }>) {
     if (enableAnalytics) {
-      console.log('[ContextualDetectiveBoard] Analytics update:', event.detail.analytics);
+      console.log('[ContextualDetectiveBoard] Analytics update:', event.detail.data);
     }
   }
 

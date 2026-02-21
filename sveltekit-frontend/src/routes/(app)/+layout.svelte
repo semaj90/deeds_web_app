@@ -42,6 +42,10 @@
 		{ href: '/admin', icon: '🔐', label: 'ADMIN' },
 		{ href: '/system-configuration', icon: '⚙️', label: 'SYSTEM CONFIG' },
 		{ href: '/ast-topology', icon: '🕸️', label: 'AST TOPOLOGY' },
+		{ href: '/gpu-evidence-graph', icon: '🔗', label: 'GPU GRAPH' },
+		{ href: '/error-brain', icon: '🧪', label: 'ERROR BRAIN' },
+		{ href: '/agentic-errors', icon: '🤖', label: 'AGENTIC ERRORS' },
+		{ href: '/codebase-index', icon: '📇', label: 'CODEBASE INDEX' },
 	];
 
 	function isActive(href: string): boolean {

@@ -121,9 +121,6 @@ export const userTypingStateMachine = createMachine({
       contextualPrompts: [],
     },
     initial: 'idle',
-    actors: {
-        processContextualContent
-    },
     states: {
       idle: {
         entry: assign({
@@ -413,4 +410,8 @@ export type TypingState =
   | 'processing_submission'
   | 'contextual_processing';
 
-export default userTypingStateMachine;
+export const userTypingMachineWithActors = userTypingStateMachine.provide({
+  actors: { processContextualContent },
+});
+
+export default userTypingMachineWithActors;

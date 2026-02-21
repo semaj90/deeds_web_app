@@ -2,9 +2,11 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import RAGSearchComponent from '$lib/components/RAGSearchComponent.svelte';
 	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
+	import SearchPanel from '$lib/components/SearchPanel.svelte';
 
 	let showRAGAssistant = $state(false);
 	let showCodebaseSearch = $state(false);
+	let showKagSearch = $state(false);
 	import { getConfidenceLevel, formatProcessingTime } from '$lib/utils';
 	import type { RetrievalContext, RankedChunk } from '$lib/machines/retrieval-machine.js';
 	import Search from '@lucide/svelte/icons/search';
@@ -766,6 +768,9 @@
 
 	<!-- RAG Assistant Panel -->
 	<div class="rag-toggle">
+		<button class="rag-toggle-btn" class:active={showKagSearch} onclick={() => (showKagSearch = !showKagSearch)}>
+			{showKagSearch ? '[-] HIDE KAG SEARCH' : '[+] KAG SEARCH PANEL'}
+		</button>
 		<button class="rag-toggle-btn" class:active={showRAGAssistant} onclick={() => (showRAGAssistant = !showRAGAssistant)}>
 			{showRAGAssistant ? '[-] HIDE RAG ASSISTANT' : '[+] RAG SEARCH ASSISTANT'}
 		</button>
@@ -773,6 +778,11 @@
 			{showCodebaseSearch ? '[-] HIDE CODEBASE SEARCH' : '[+] CODEBASE SEARCH (Ctrl+K)'}
 		</button>
 	</div>
+	{#if showKagSearch}
+		<div class="rag-panel">
+			<SearchPanel />
+		</div>
+	{/if}
 	{#if showRAGAssistant}
 		<div class="rag-panel">
 			<RAGSearchComponent />

@@ -5,13 +5,16 @@
 	import POIPhotoGrid from '$lib/components/poi/POIPhotoGrid.svelte';
 	import POIQuickActions from '$lib/components/poi/POIQuickActions.svelte';
 	import POIThreatBadge from '$lib/components/poi/POIThreatBadge.svelte';
+	import PersonProfile from '$lib/components/PersonProfile.svelte';
+	import PersonStatsPanel from '$lib/components/PersonStatsPanel.svelte';
+	import type { FugitiveDexPerson } from '$lib/components/types';
 
 	let { data } = $props();
 
 	let associates = $state<KnownAssociate[]>([]);
 	let associatesLoading = $state(false);
 	let associatesError = $state<string | null>(null);
-	let activeTab = $state<'details' | 'associates' | 'photos' | 'search'>('details');
+	let activeTab = $state<'details' | 'associates' | 'photos' | 'search' | 'dex'>('details');
 
 	onMount(async () => {
 		if (data.poi?.id) {
@@ -121,6 +124,13 @@
 			>
 				Similar POIs
 			</button>
+			<button
+				class="tab-button"
+				class:active={activeTab === 'dex'}
+				onclick={() => (activeTab = 'dex')}
+			>
+				Dex Profile
+			</button>
 		</div>
 
 		<div class="tab-content">
@@ -214,6 +224,30 @@
 				<div class="search-section">
 					<p>Similar POIs based on profile analysis</p>
 					<p class="placeholder">Search results will appear here</p>
+				</div>
+			{:else if activeTab === 'dex'}
+				{@const dexPerson = {
+					id: poi.id,
+					name: poi.name,
+					alias: poi.aliases?.[0] ?? '',
+					role: poi.status ?? 'unknown',
+					status: poi.status === 'wanted' ? 'WANTED' : poi.status === 'surveillance' ? 'MONITORING' : 'COOPERATIVE',
+					priority: poi.threatLevel === 'critical' || poi.threatLevel === 'high' ? 'HIGH' : poi.threatLevel === 'medium' ? 'MEDIUM' : 'LOW',
+					height: poi.physicalDescription?.height ?? '',
+					age: poi.dateOfBirth ?? '',
+					hair: poi.physicalDescription?.hair ?? '',
+					eyes: poi.physicalDescription?.eyes ?? '',
+					modusOperandi: poi.profileData?.modusOperandi ?? poi.description ?? '',
+					lastSeen: poi.lastKnownLocation ?? '',
+					dangerLevel: poi.threatLevel === 'critical' ? 9 : poi.threatLevel === 'high' ? 7 : poi.threatLevel === 'medium' ? 5 : 2,
+					photo: '',
+					knownAssociates: poi.profileData?.associates ?? [],
+					knownHabits: poi.profileData?.knownHabits ?? [],
+					attributes: { stealth: 50, intelligence: 50, strength: 50, speed: 50, dangerousness: 50 }
+				} satisfies FugitiveDexPerson}
+				<div class="dex-layout" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+					<PersonProfile selectedPerson={dexPerson} onOpenAIModal={() => { console.log('AI report for', poi.name); }} />
+					<PersonStatsPanel selectedPerson={dexPerson} />
 				</div>
 			{/if}
 		</div>

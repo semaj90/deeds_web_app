@@ -6,6 +6,8 @@
   import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
   import AskAI from '$lib/components/ai/AskAI.svelte';
   import ClientSideAIChat from '$lib/components/ai/ClientSideAIChat.svelte';
+  import AIChatAssistant from '$lib/components/AIChatAssistant.svelte';
+  import AgentChat from '$lib/components/agentic/AgentChat.svelte';
 
   interface AIStats {
     activeChats: number;
@@ -41,6 +43,8 @@
   let error = $state<string | null>(null);
   let showAskAI = $state(false);
   let showLocalAI = $state(false);
+  let showCaseAssistant = $state(false);
+  let showAgentChat = $state(false);
 
   $effect(() => {
     loadDashboard();
@@ -180,6 +184,36 @@
       {#if showLocalAI}
         <div class="mt-3">
           <ClientSideAIChat showStatus={true} />
+        </div>
+      {/if}
+    </div>
+
+    <!-- Case-Specific AI Chat -->
+    <div class="mt-4">
+      <button
+        onclick={() => (showCaseAssistant = !showCaseAssistant)}
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/20 rounded-lg text-sand/80 hover:border-accent/40 transition text-sm font-medium"
+      >
+        {showCaseAssistant ? 'Hide Case Assistant' : 'Case AI Assistant (Case-Specific Chat)'}
+      </button>
+      {#if showCaseAssistant}
+        <div class="mt-3">
+          <AIChatAssistant caseId="general" initialContext="AI Dashboard session" />
+        </div>
+      {/if}
+    </div>
+
+    <!-- Agentic Tool Chat -->
+    <div class="mt-4">
+      <button
+        onclick={() => (showAgentChat = !showAgentChat)}
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/20 rounded-lg text-sand/80 hover:border-accent/40 transition text-sm font-medium"
+      >
+        {showAgentChat ? 'Hide Agent Chat' : 'Agentic Tool Chat (MCP Tool Calling)'}
+      </button>
+      {#if showAgentChat}
+        <div class="mt-3">
+          <AgentChat />
         </div>
       {/if}
     </div>

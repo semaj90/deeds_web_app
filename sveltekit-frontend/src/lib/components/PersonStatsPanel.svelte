@@ -1,9 +1,5 @@
 <script lang="ts">
-	// Generated Runes
-
-	let ButtonRoot = $state(undefined);
-
-
+	import Button from '$lib/components/ui/Button.svelte';
 	import type { FugitiveDexPerson } from './types';
 
 	interface Props {
@@ -49,9 +45,9 @@
 		<div class="actions-section">
 			<h4 class="text-warning/80 text-sm mb-3">ACTIONS</h4>
 			<div class="space-y-2">
-				<ButtonRoot class="nes-btn is-primary w-full text-xs bits-btn">UPDATE INTEL</ButtonRoot>
-				<ButtonRoot class="nes-btn is-warning w-full text-xs bits-btn">VIEW TIMELINE</ButtonRoot>
-				<ButtonRoot class="nes-btn w-full text-xs bits-btn">EXPORT PROFILE</ButtonRoot>
+				<Button class="nes-btn is-primary w-full text-xs bits-btn">UPDATE INTEL</Button>
+				<Button class="nes-btn is-warning w-full text-xs bits-btn">VIEW TIMELINE</Button>
+				<Button class="nes-btn w-full text-xs bits-btn">EXPORT PROFILE</Button>
 			</div>
 		</div>
 	</div>

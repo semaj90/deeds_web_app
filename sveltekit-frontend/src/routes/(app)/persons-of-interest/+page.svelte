@@ -5,6 +5,8 @@
 	import PersonForm from '$lib/components/PersonForm.svelte';
 	import PersonOfInterestDetailView from '$lib/components/poi/PersonOfInterestDetailView.svelte';
 	import POICard from '$lib/components/poi/POICard.svelte';
+	import PersonList from '$lib/components/PersonList.svelte';
+	import type { FugitiveDexPerson } from '$lib/components/types';
 
 	let { data } = $props();
 
@@ -15,7 +17,8 @@
 	let showPersonForm = $state(false);
 	let editingPoi = $state<any>(null);
 	let showEditor = $state(false);
-	let viewMode = $state<'list' | 'ai-cards' | 'detail-cards'>('list');
+	let viewMode = $state<'list' | 'ai-cards' | 'detail-cards' | 'fugitive-dex'>('list');
+	let dexSelectedPerson = $state<FugitiveDexPerson | null>(null);
 	let previewPoi = $state<any>(null);
 	let showPreview = $state(false);
 
@@ -169,6 +172,7 @@
 			<button class="toggle-btn" class:active={viewMode === 'list'} onclick={() => (viewMode = 'list')}>List</button>
 			<button class="toggle-btn" class:active={viewMode === 'ai-cards'} onclick={() => (viewMode = 'ai-cards')}>AI Cards</button>
 			<button class="toggle-btn" class:active={viewMode === 'detail-cards'} onclick={() => (viewMode = 'detail-cards')}>Detail Cards</button>
+			<button class="toggle-btn" class:active={viewMode === 'fugitive-dex'} onclick={() => (viewMode = 'fugitive-dex')}>Fugitive Dex</button>
 		</div>
 
 		{#if viewMode === 'ai-cards'}
@@ -192,6 +196,31 @@
 					/>
 				{/each}
 			</div>
+		{:else if viewMode === 'fugitive-dex'}
+			<PersonList
+				persons={filtered.map((poi: any) => ({
+					id: poi.id,
+					name: poi.name,
+					alias: poi.aliases?.[0] ?? poi.description?.slice(0, 30) ?? '',
+					role: poi.status ?? 'unknown',
+					status: poi.status === 'wanted' ? 'WANTED' : poi.status === 'surveillance' ? 'MONITORING' : 'COOPERATIVE',
+					priority: poi.threatLevel === 'critical' || poi.threatLevel === 'high' ? 'HIGH' : poi.threatLevel === 'medium' ? 'MEDIUM' : 'LOW',
+					height: '',
+					age: '',
+					hair: '',
+					eyes: '',
+					modusOperandi: poi.description ?? '',
+					lastSeen: poi.lastLocation ?? '',
+					dangerLevel: poi.threatLevel === 'critical' ? 9 : poi.threatLevel === 'high' ? 7 : poi.threatLevel === 'medium' ? 5 : 2,
+					photo: '',
+					knownAssociates: [],
+					knownHabits: [],
+					attributes: { stealth: 50, intelligence: 50, strength: 50, speed: 50, dangerousness: 50 }
+				}))}
+				selectedPerson={dexSelectedPerson}
+				bind:searchQuery
+				onSelect={(person) => { dexSelectedPerson = person; }}
+			/>
 		{:else}
 			<div class="poi-grid">
 				{#each filtered as poi (poi.id)}

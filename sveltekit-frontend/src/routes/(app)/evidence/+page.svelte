@@ -6,6 +6,9 @@
 	import DetectiveEvidenceMap from '$lib/components/yorha/DetectiveEvidenceMap.svelte';
 	import EvidenceCRUDModal from '$lib/components/modals/EvidenceCRUDModal.svelte';
 	import EvidenceCustodyFlow from '$lib/components/legal/EvidenceCustodyFlow.svelte';
+	import EvidenceReportSummary from '$lib/components/legal/EvidenceReportSummary.svelte';
+	import type { EvidenceReport } from '$lib/components/legal/EvidenceReportSummary.svelte';
+	import EvidenceConnections from '$lib/components/EvidenceConnections.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -27,6 +30,10 @@
 	let showCrudModal = $state(false);
 	let crudMode = $state<'create' | 'edit' | 'view'>('create');
 	let crudEvidenceId = $state<string | undefined>(undefined);
+	let showReportSummary = $state(false);
+	let reportEvidenceId = $state('');
+	let reportData = $state<EvidenceReport | null>(null);
+	let isLoadingReport = $state(false);
 
 	// Backend semantic search state
 	let searchMode = $state<'local' | 'semantic'>('local');
@@ -163,6 +170,40 @@
 			searchMode = 'local';
 		} finally {
 			isSearching = false;
+		}
+	}
+
+	async function loadEvidenceReport(evidenceId: string) {
+		isLoadingReport = true;
+		reportEvidenceId = evidenceId;
+		try {
+			const res = await fetch(`/api/evidence/${evidenceId}/report`);
+			if (res.ok) {
+				reportData = await res.json();
+			} else {
+				// Build a basic report from available evidence data
+				const doc = (data.evidence ?? []).find((e: any) => e.id === evidenceId);
+				reportData = {
+					id: evidenceId,
+					title: doc?.title ?? doc?.fileName ?? 'Evidence Report',
+					type: 'document_analysis',
+					status: 'pending',
+					priority: 'medium',
+					createdAt: doc?.createdAt ?? new Date().toISOString(),
+					updatedAt: new Date().toISOString(),
+					analyst: { name: data.user?.username ?? data.user?.email ?? 'System', credentials: 'AI-Assisted', department: 'Digital Forensics' },
+					evidence: { itemNumber: evidenceId.slice(0, 8), description: doc?.description ?? '', chainOfCustody: [], dateCollected: doc?.createdAt ?? '', location: 'Digital Archive' },
+					methodology: { procedures: ['Automated ingestion', 'Hash verification'], tools: ['SHA-256', 'OCR Pipeline'], standards: ['NIST SP 800-86'] },
+					findings: { summary: doc?.description ?? 'Awaiting analysis', keyPoints: [], confidence: 0, limitations: ['Automated analysis pending'] },
+					legalImplications: { charges: [], precedents: [], challengePoints: [] },
+					attachments: []
+				};
+			}
+			showReportSummary = true;
+		} catch {
+			reportData = null;
+		} finally {
+			isLoadingReport = false;
 		}
 	}
 
@@ -358,6 +399,7 @@
 							<span>{formatDate(doc.createdAt ?? doc.created_at)}</span>
 							{#if !doc.similarity}
 								<div class="flex gap-2">
+									<button onclick={(e) => { e.stopPropagation(); loadEvidenceReport(doc.id); }} class="text-accent/60 hover:text-accent transition">Report</button>
 									<button onclick={(e) => { e.stopPropagation(); crudMode = 'edit'; crudEvidenceId = doc.id; showCrudModal = true; }} class="text-info/60 hover:text-info transition">Edit</button>
 									<form method="POST" action="?/delete" use:enhance>
 										<input type="hidden" name="evidenceId" value={doc.id} />
@@ -403,6 +445,7 @@
 								<td class="px-4 py-3 text-sm text-sand/60">{formatDate(doc.createdAt)}</td>
 								<td class="px-4 py-3 text-right">
 									<div class="flex gap-2 justify-end">
+										<button onclick={(e) => { e.stopPropagation(); loadEvidenceReport(doc.id); }} class="text-accent/60 hover:text-accent text-sm transition">Report</button>
 										<button onclick={(e) => { e.stopPropagation(); crudMode = 'edit'; crudEvidenceId = doc.id; showCrudModal = true; }} class="text-info/60 hover:text-info text-sm transition">Edit</button>
 										<form method="POST" action="?/delete" use:enhance class="inline">
 											<input type="hidden" name="evidenceId" value={doc.id} />
@@ -448,6 +491,21 @@
 					originalHash={''}
 					onWorkflowComplete={() => { showCustodyFlow = false; window.location.reload(); }}
 					onWorkflowError={(err) => { uploadError = `Custody error: ${err}`; }}
+				/>
+			</div>
+		{/if}
+		<!-- Evidence Report Summary -->
+		{#if showReportSummary && reportData}
+			<div class="mt-6">
+				<div class="flex items-center justify-between mb-3">
+					<h3 class="text-lg font-semibold text-sand">Evidence Report</h3>
+					<button onclick={() => { showReportSummary = false; reportData = null; }} class="text-sm text-sand/60 hover:text-sand">Close</button>
+				</div>
+				<EvidenceReportSummary
+					evidenceId={reportEvidenceId}
+					caseId={data.caseId ?? ''}
+					reportData={reportData}
+					allowExport={true}
 				/>
 			</div>
 		{/if}
