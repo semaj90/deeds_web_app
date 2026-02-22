@@ -14,8 +14,16 @@
 	import LegalAnalysisDialog from '$lib/components/LegalAnalysisDialog.svelte';
 	import IntegrityVerification from '$lib/components/legal/IntegrityVerification.svelte';
 	import EnhancedDocumentUploader from '$lib/components/ai/EnhancedDocumentUploader.svelte';
+	import ContextualEvidenceChatModal from '$lib/components/ai/ContextualEvidenceChatModal.svelte';
+	import CaseSelector from '$lib/components/CaseSelector.svelte';
+	import UploadProgress from '$lib/components/UploadProgress.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
+	let showCaseSelector = $state(false);
+	let linkedCaseTitle = $state('');
+	let uploadProgressPercent = $state(0);
+	let uploadProgressStatus = $state('');
+	let uploadProgressDocId = $state('');
 
 	let isDragging = $state(false);
 	let isUploading = $state(false);
@@ -49,6 +57,7 @@
 	let showIntegrity = $state(false);
 	let legalAnalysisTitle = $state('Legal Analysis');
 	let showEnhancedUpload = $state(false);
+	let showEvidenceChat = $state(false);
 
 	// Backend semantic search state
 	let searchMode = $state<'local' | 'semantic'>('local');
@@ -350,7 +359,57 @@
 					/>
 				</div>
 			{/if}
+
+			<div class="mt-2">
+				<button
+					onclick={() => (showEvidenceChat = !showEvidenceChat)}
+					class="text-sm text-accent hover:underline"
+				>
+					{showEvidenceChat ? 'Hide Evidence AI Chat' : 'Evidence AI Chat (Contextual Assistant)'}
+				</button>
+			</div>
+
+			{#if showEvidenceChat}
+				<div class="mt-4">
+					<ContextualEvidenceChatModal
+						defaultCaseId={data.caseId ?? ''}
+						title="Evidence AI Assistant"
+					/>
+				</div>
+			{/if}
 		</div>
+
+		<!-- Case Selector -->
+		<div class="mt-2">
+			<button
+				onclick={() => (showCaseSelector = !showCaseSelector)}
+				class="text-sm text-sand/70 hover:underline"
+			>
+				{showCaseSelector ? 'Hide Case Selector' : 'Link Evidence to Case'}
+				{#if linkedCaseTitle}
+					<span class="text-accent ml-2">({linkedCaseTitle})</span>
+				{/if}
+			</button>
+		</div>
+		{#if showCaseSelector}
+			<div class="mt-3" style="max-width: 400px;">
+				<CaseSelector
+					placeholder="Search and select a case..."
+					onselect={(c) => { linkedCaseTitle = c.title; console.log('Linked to case:', c.id); }}
+				/>
+			</div>
+		{/if}
+
+		<!-- Upload Progress -->
+		{#if uploadProgressStatus && uploadProgressStatus !== 'complete'}
+			<div class="mt-4">
+				<UploadProgress
+					uploadProgress={uploadProgressPercent}
+					uploadStatus={uploadProgressStatus}
+					currentDocId={uploadProgressDocId}
+				/>
+			</div>
+		{/if}
 
 		<!-- Filters -->
 		<div class="ev-toolbar">

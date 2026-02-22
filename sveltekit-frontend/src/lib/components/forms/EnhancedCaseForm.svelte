@@ -1,6 +1,6 @@
 <!-- Enhanced Case Form with proper schema mapping -->
 <script lang="ts">
-  import { notifications } from '$lib/stores/unified';
+  import { notificationStore as notifications } from '$lib/stores/unified/notification-store.svelte.js';
   import type { Case } from '$lib/types/index';
 
   interface Props {

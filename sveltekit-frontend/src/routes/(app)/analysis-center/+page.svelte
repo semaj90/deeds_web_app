@@ -6,6 +6,8 @@
 	import GraphVisualizationGallery from '$lib/components/visualization/GraphVisualizationGallery.svelte';
 	import AutomatedLegalResearch from '$lib/components/ai/AutomatedLegalResearch.svelte';
 	import ContextualDetectiveBoard from '$lib/components/detective/ContextualDetectiveBoard.svelte';
+	import HybridBoard from '$lib/components/canvas/HybridBoard.svelte';
+	import ContractAnalyzer from '$lib/components/legal/ContractAnalyzer.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -25,6 +27,8 @@
 	let showGraphGallery = $state(false);
 	let showLegalResearch = $state(false);
 	let showDetectiveBoard = $state(false);
+	let showHybridBoard = $state(false);
+	let showContractAnalyzer = $state(false);
 	let errorMessage = $state('');
 
 	const analysisModes = [
@@ -462,6 +466,36 @@
 	{#if showDetectiveBoard}
 		<div class="summary-reader-container">
 			<ContextualDetectiveBoard caseId={selectedCaseId || 'default'} initialEvidence={evidencePool} />
+		</div>
+	{/if}
+	<!-- Hybrid Whiteboard -->
+	<div class="section-toggle">
+		<button
+			class="mode-btn {showHybridBoard ? 'active' : ''}"
+			onclick={() => (showHybridBoard = !showHybridBoard)}
+		>
+			<span class="mode-icon">W</span>
+				{showHybridBoard ? 'HIDE WHITEBOARD' : 'EVIDENCE WHITEBOARD'}
+		</button>
+	</div>
+	{#if showHybridBoard}
+		<div class="summary-reader-container" style="height: 500px;">
+			<HybridBoard caseId={selectedCaseId || 'default'} />
+		</div>
+	{/if}
+
+	<div class="section-toggle">
+		<button
+			class="mode-btn {showContractAnalyzer ? 'active' : ''}"
+			onclick={() => (showContractAnalyzer = !showContractAnalyzer)}
+		>
+			<span class="mode-icon">C</span>
+				{showContractAnalyzer ? 'HIDE CONTRACT ANALYZER' : 'CONTRACT ANALYZER'}
+		</button>
+	</div>
+	{#if showContractAnalyzer}
+		<div class="summary-reader-container">
+			<ContractAnalyzer />
 		</div>
 	{/if}
 </main>

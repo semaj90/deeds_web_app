@@ -5,6 +5,8 @@
 	import CachePerformanceDashboard from '$lib/components/ai/CachePerformanceDashboard.svelte';
 	import CacheDemo from '$lib/components/cache/CacheDemo.svelte';
 	import GPUMetrics from '$lib/components/yorha/dashboard/GPUMetrics.svelte';
+	import TerminalWindow from '$lib/components/terminal/TerminalWindow.svelte';
+	import ProgressiveForm from '$lib/components/forms/ProgressiveForm.svelte';
 
 	let { data } = $props();
 
@@ -20,6 +22,8 @@
 		{ value: 'evidence', label: 'Evidence' },
 		{ value: 'cache', label: 'Cache' },
 		{ value: 'gpu', label: 'GPU' },
+		{ value: 'terminal', label: 'Terminal' },
+		{ value: 'forms', label: 'Forms' },
 	];
 
 	// Reactive state
@@ -29,6 +33,29 @@
 	let indexingCodebase = $state(false);
 	let indexingErrors = $state(false);
 	let indexingLog = $state<string[]>([]);
+
+	// Terminal state
+	let terminalHistory = $state<Array<{ id: string; query: string; response: string; timestamp: Date; functionCalls: Array<{ name: string; result: unknown }> }>>([]);
+	let terminalLoading = $state(false);
+
+	async function handleTerminalQuery(query: string) {
+		terminalLoading = true;
+		const entry = { id: crypto.randomUUID(), query, response: '', timestamp: new Date(), functionCalls: [] as Array<{ name: string; result: unknown }> };
+		try {
+			const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: query }) });
+			if (res.ok) {
+				const json = await res.json();
+				entry.response = json.response ?? json.message ?? JSON.stringify(json);
+			} else {
+				entry.response = `Error ${res.status}: ${res.statusText}`;
+			}
+		} catch (e) {
+			entry.response = `Error: ${e instanceof Error ? e.message : String(e)}`;
+		} finally {
+			terminalHistory = [...terminalHistory, entry];
+			terminalLoading = false;
+		}
+	}
 
 	// Evidence drawer state
 	let showEvidenceDrawer = $state(false);
@@ -537,6 +564,27 @@
 	<!-- GPU Tab -->
 	{#if activeTab === 'gpu'}
 		<GPUMetrics />
+	{/if}
+
+	<!-- Terminal Tab -->
+	{#if activeTab === 'terminal'}
+		<TerminalWindow
+			queryHistory={terminalHistory}
+			isLoading={terminalLoading}
+			onquery={handleTerminalQuery}
+		/>
+	{/if}
+
+	<!-- Forms Tab -->
+	{#if activeTab === 'forms'}
+		<div class="tab-content">
+			<h3 class="text-sand/80 text-sm font-semibold mb-4">Progressive Enhancement Form Demo</h3>
+			<ProgressiveForm
+				title="Test Form (Progressive Enhancement)"
+				description="Demo of SvelteKit progressive enhancement with client-side validation"
+				action="/api/submit-form"
+			/>
+		</div>
 	{/if}
 </div>
 

@@ -4,6 +4,7 @@
 	import { intakeCaseSchema } from './+page.server';
 	import type { PageData } from './$types';
 	import LegalCaseForm from '$lib/components/forms/LegalCaseForm.svelte';
+	import EnhancedCaseForm from '$lib/components/forms/EnhancedCaseForm.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -32,7 +33,7 @@
 
 	// Evidence file upload
 	let uploadedFiles = $state<File[]>([]);
-	let showMultiStepForm = $state(false);
+	let formMode = $state<'ai' | 'multistep' | 'enhanced'>('ai');
 
 	// Map severity level to priority
 	function severityToPriority(level: number | null | undefined): string {
@@ -132,13 +133,18 @@
 	</header>
 
 	<div class="form-mode-toggle">
-		<button class="toggle-btn" class:active={!showMultiStepForm} onclick={() => (showMultiStepForm = false)}>AI Intake</button>
-		<button class="toggle-btn" class:active={showMultiStepForm} onclick={() => (showMultiStepForm = true)}>Multi-Step Form</button>
+		<button class="toggle-btn" class:active={formMode === 'ai'} onclick={() => (formMode = 'ai')}>AI Intake</button>
+		<button class="toggle-btn" class:active={formMode === 'multistep'} onclick={() => (formMode = 'multistep')}>Multi-Step Form</button>
+		<button class="toggle-btn" class:active={formMode === 'enhanced'} onclick={() => (formMode = 'enhanced')}>Enhanced Form</button>
 	</div>
 
-	{#if showMultiStepForm}
+	{#if formMode === 'multistep'}
 		<div class="multi-step-container">
 			<LegalCaseForm />
+		</div>
+	{:else if formMode === 'enhanced'}
+		<div class="multi-step-container">
+			<EnhancedCaseForm user={{ id: data.user?.id ?? '', name: data.user?.username ?? data.user?.email ?? '' }} />
 		</div>
 	{:else}
 	<div class="intake-layout">

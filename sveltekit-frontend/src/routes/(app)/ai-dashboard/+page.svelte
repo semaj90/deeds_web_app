@@ -10,6 +10,9 @@
   import AgentChat from '$lib/components/agentic/AgentChat.svelte';
   import ClientGemmaDemo from '$lib/components/ClientGemmaDemo.svelte';
   import ClientGemmaInference from '$lib/components/ClientGemmaInference.svelte';
+  import EnhancedLegalAIChatWithSynthesis from '$lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte';
+  import StreamingResponse from '$lib/components/StreamingResponse.svelte';
+  import ChatMessages from '$lib/components/ChatMessages.svelte';
 
   interface AIStats {
     activeChats: number;
@@ -49,6 +52,16 @@
   let showAgentChat = $state(false);
   let showGemmaDemo = $state(false);
   let showOnnxInference = $state(false);
+  let showLegalSynthesis = $state(false);
+  let showStreamingDemo = $state(false);
+  let streamingText = $state('Analyzing the legal precedent for Smith v. Johnson (2024). The court held that under PC 187, the burden of proof requires...');
+  let showChatHistory = $state(false);
+  let chatHistoryMessages = $state([
+    { id: 'msg-1', role: 'user', content: 'What are the key elements of PC 187?', timestamp: new Date(Date.now() - 300000).toISOString(), citations: [], evidence_references: [] },
+    { id: 'msg-2', role: 'assistant', content: 'Under PC 187, murder is defined as the unlawful killing of a human being with malice aforethought. The key elements are: (1) a human being was killed, (2) the killing was unlawful, and (3) the killing was done with malice aforethought. See Smith v. Johnson for recent precedent.', timestamp: new Date(Date.now() - 240000).toISOString(), citations: ['PC 187', 'Smith v. Johnson'], evidence_references: [] },
+    { id: 'msg-3', role: 'user', content: 'What about Evidence Exhibit A?', timestamp: new Date(Date.now() - 180000).toISOString(), citations: [], evidence_references: ['Exhibit A'] },
+    { id: 'msg-4', role: 'assistant', content: 'Evidence Exhibit A contains forensic analysis supporting the prosecution\'s timeline. The document references USC 18 Section 1111 and CAL 190.2 for sentencing guidelines.', timestamp: new Date(Date.now() - 120000).toISOString(), citations: ['USC 18', 'CAL 190.2'], evidence_references: ['Exhibit A'] },
+  ]);
 
   $effect(() => {
     loadDashboard();
@@ -248,6 +261,21 @@
       {#if showOnnxInference}
         <div class="mt-3">
           <ClientGemmaInference />
+        </div>
+      {/if}
+    </div>
+
+    <!-- Enhanced Legal AI Chat with LegalBERT Synthesis -->
+    <div class="mt-4">
+      <button
+        onclick={() => (showLegalSynthesis = !showLegalSynthesis)}
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/20 rounded-lg text-sand/80 hover:border-accent/40 transition text-sm font-medium"
+      >
+        {showLegalSynthesis ? 'Hide Legal Synthesis Chat' : 'Legal AI Synthesis (LegalBERT + RAG + Streaming)'}
+      </button>
+      {#if showLegalSynthesis}
+        <div class="mt-3">
+          <EnhancedLegalAIChatWithSynthesis />
         </div>
       {/if}
     </div>

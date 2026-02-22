@@ -21,12 +21,14 @@
 
  type CaseOption = { id: string; title: string; status?: string };
 
- const props = $props<{
- visible?: boolean;
- defaultCaseId?: string;
- title?: string }>();
+ interface Props {
+   visible?: boolean;
+   defaultCaseId?: string;
+   title?: string;
+   onclose?: () => void;
+ }
 
- let { visible = true, defaultCaseId = '', title = 'Contextual AI Assistant' } = props;
+ let { visible = true, defaultCaseId = '', title = 'Contextual AI Assistant', onclose }: Props = $props();
 const sessionSeed =
  (() => {
  try {
@@ -105,10 +107,10 @@ const sessionSeed =
  status: item.status
  }));
  if (!reportForm.caseId && (defaultCaseId || caseOptions[0]?.id)) {
- reportForm = { ...reportForm, caseId: defaultCaseId || caseOptions[0]?.id ?? '' };
+ reportForm = { ...reportForm, caseId: defaultCaseId || (caseOptions[0]?.id ?? '') };
  }
  if (!evidenceForm.caseId && (defaultCaseId || caseOptions[0]?.id)) {
- evidenceForm = { ...evidenceForm, caseId: defaultCaseId || caseOptions[0]?.id ?? '' };
+ evidenceForm = { ...evidenceForm, caseId: defaultCaseId || (caseOptions[0]?.id ?? '') };
  }
  } catch (error) {
  casesError = error instanceof Error ? error.message : 'Unable to load cases';
@@ -352,7 +354,7 @@ const sessionSeed =
  ondragover={(e: DragEvent) => { e.preventDefault(); dropActive = true }}
  ondragleave={(e: DragEvent) => {
  e.preventDefault();
- if (!e.currentTarget?.contains(e.relatedTarget as Node)) {
+ if (!(e.currentTarget as HTMLElement)?.contains(e.relatedTarget as Node)) {
  dropActive = false }
  }}
  ondrop={onDrop}
