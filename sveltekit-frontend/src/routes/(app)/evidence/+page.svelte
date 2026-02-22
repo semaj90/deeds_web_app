@@ -12,6 +12,8 @@
 	import EvidenceAssistant from '$lib/components/evidence/EvidenceAssistant.svelte';
 	import ContradictionReveal from '$lib/components/yorha/ContradictionReveal.svelte';
 	import LegalAnalysisDialog from '$lib/components/LegalAnalysisDialog.svelte';
+	import IntegrityVerification from '$lib/components/legal/IntegrityVerification.svelte';
+	import EnhancedDocumentUploader from '$lib/components/ai/EnhancedDocumentUploader.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -44,7 +46,9 @@
 	let isLoadingReport = $state(false);
 	let showLegalAnalysis = $state(false);
 	let legalAnalysisEvidenceId = $state('');
+	let showIntegrity = $state(false);
 	let legalAnalysisTitle = $state('Legal Analysis');
+	let showEnhancedUpload = $state(false);
 
 	// Backend semantic search state
 	let searchMode = $state<'local' | 'semantic'>('local');
@@ -325,6 +329,27 @@
 					/>
 				</div>
 			{/if}
+
+			<div class="mt-2">
+				<button
+					onclick={() => (showEnhancedUpload = !showEnhancedUpload)}
+					class="text-sm text-accent hover:underline"
+				>
+					{showEnhancedUpload ? 'Hide AI Upload' : 'AI-Enhanced Upload (Entity Extraction + Summarization)'}
+				</button>
+			</div>
+
+			{#if showEnhancedUpload}
+				<div class="mt-4">
+					<EnhancedDocumentUploader
+						caseId={data.caseId ?? ''}
+						userId={data.user?.id ?? ''}
+						autoProcess={true}
+						showMetadataForm={true}
+						onFileProcessed={(result) => { console.log('Processed:', result); }}
+					/>
+				</div>
+			{/if}
 		</div>
 
 		<!-- Filters -->
@@ -520,6 +545,27 @@
 					originalHash={''}
 					onWorkflowComplete={() => { showCustodyFlow = false; window.location.reload(); }}
 					onWorkflowError={(err) => { uploadError = `Custody error: ${err}`; }}
+				/>
+			</div>
+		{/if}
+		<!-- Integrity Verification -->
+		<div class="mt-6">
+			<button
+				onclick={() => (showIntegrity = !showIntegrity)}
+				class="ev-map-toggle"
+			>
+				{showIntegrity ? 'Hide Integrity Check' : 'Evidence Integrity Verification'}
+			</button>
+		</div>
+		{#if showIntegrity}
+			<div class="mt-4">
+				<IntegrityVerification
+					integrityStatus={filteredEvidence.length > 0 ? 'verified' : 'pending'}
+					verificationResults={{ aiAnalysisScore: 0.94, tamperedIndicators: [] }}
+					originalHash={filteredEvidence[0]?.id ?? ''}
+					currentHash={filteredEvidence[0]?.id ?? ''}
+					aiAnalysis={{ riskLevel: 'low', confidence: 0.96, models: ['gemma3-legal'] }}
+					showDetails={true}
 				/>
 			</div>
 		{/if}

@@ -6,8 +6,11 @@
   import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
   import CitationManager from '$lib/components/legal/CitationManager.svelte';
   import CitationDetail from '$lib/components/legal-ai/CitationDetail.svelte';
+  import StatuteActionPanel from '$lib/components/legal/StatuteActionPanel.svelte';
+  import SearchBox from '$lib/components/SearchBox.svelte';
 
   let viewMode = $state<'list' | 'manager'>('list');
+  let showGpuSearch = $state(false);
   let selectedCitation = $state<any>(null);
 
   interface Citation {
@@ -79,8 +82,34 @@
     <div class="flex justify-center gap-2 mt-4">
       <Button onclick={() => viewMode = 'list'}>List View</Button>
       <Button onclick={() => viewMode = 'manager'}>Citation Manager</Button>
+      <Button onclick={() => (showGpuSearch = !showGpuSearch)}>{showGpuSearch ? 'Hide GPU Search' : 'GPU Search'}</Button>
     </div>
   </header>
+
+  {#if showGpuSearch}
+    <div class="mb-6">
+      <SearchBox
+        placeholder="GPU-powered legal citation search..."
+        limit={10}
+        onResults={(data) => {
+          const mapped = (data.results ?? []).map((r: any) => ({
+            id: r.id ?? r.task_id ?? crypto.randomUUID(),
+            citationType: r.metadata?.type ?? 'case_law',
+            formattedCitation: r.payload?.slice(0, 120) ?? r.id ?? '',
+            quotedText: r.payload ?? '',
+            legalPrinciple: r.metadata?.principle ?? '',
+            relevanceScore: typeof r.score === 'number' ? 1 - r.score : 0,
+            isKeyAuthority: false,
+            documentTitle: r.metadata?.document ?? '',
+            caseTitle: r.metadata?.case ?? ''
+          }));
+          if (mapped.length > 0) {
+            citations = mapped;
+          }
+        }}
+      />
+    </div>
+  {/if}
 
   {#if viewMode === 'manager'}
     <CitationManager />
@@ -175,6 +204,16 @@
           onupdated={() => { selectedCitation = null; loadCitations(); }}
           ondelete={() => { selectedCitation = null; loadCitations(); }}
           onattachtocase={(c) => { console.log('Attach to case:', c); }}
+        />
+        <StatuteActionPanel
+          statute={{
+            titleNumber: 0,
+            section: selectedCitation.statute_code ?? '',
+            id: selectedCitation.id,
+            fullCitation: selectedCitation.statute_code ?? '',
+            text: selectedCitation.highlighted_text ?? '',
+            heading: selectedCitation.statute_title ?? ''
+          }}
         />
       </div>
     {/if}

@@ -9,6 +9,7 @@
 import EvidenceUploadPreview from '$lib/components/evidence/EvidenceUploadPreview.svelte';
 import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svelte';
 import WysiwygEditor from '$lib/components/editor/WysiwygEditor.svelte';
+import TipTapEditor from '$lib/components/TipTapEditor.svelte';
 import CaseTheoryConstructor from '$lib/components/yorha/CaseTheoryConstructor.svelte';
 import QuickActionsPanel from '$lib/components/dashboard/QuickActionsPanel.svelte';
 import CaseOutcomePrediction from '$lib/components/CaseOutcomePrediction.svelte';
@@ -49,6 +50,7 @@ import type { SimilarCase } from '$lib/types/case-summary';
  let exportPacketError = $state('');
  let showDescriptionEditor = $state(false);
  let caseDescription = $state('');
+ let editorMode = $state<'wysiwyg' | 'tiptap'>('wysiwyg');
 
  // Citation & Statute state
  interface CitationLink {
@@ -384,14 +386,26 @@ import type { SimilarCase } from '$lib/types/case-summary';
    </button>
  </div>
  {#if showDescriptionEditor}
-   <div class="mt-4">
-     <WysiwygEditor
-       content={caseDescription}
-       height="250px"
-       enableAI={true}
-       enableCitation={true}
-       onchange={(detail) => { caseDescription = detail.content; }}
-     />
+   <div class="mt-2 mb-2 flex gap-2">
+     <button onclick={() => (editorMode = 'wysiwyg')} class="text-xs px-2 py-1 rounded {editorMode === 'wysiwyg' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}">Rich Editor</button>
+     <button onclick={() => (editorMode = 'tiptap')} class="text-xs px-2 py-1 rounded {editorMode === 'tiptap' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}">TipTap Editor</button>
+   </div>
+   <div class="mt-2">
+     {#if editorMode === 'wysiwyg'}
+       <WysiwygEditor
+         content={caseDescription}
+         height="250px"
+         enableAI={true}
+         enableCitation={true}
+         onchange={(detail) => { caseDescription = detail.content; }}
+       />
+     {:else}
+       <TipTapEditor
+         content={caseDescription}
+         placeholder="Write case description..."
+         onChange={(html) => { caseDescription = html; }}
+       />
+     {/if}
    </div>
  {/if}
  </div>

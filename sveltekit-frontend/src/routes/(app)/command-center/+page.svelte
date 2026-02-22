@@ -5,8 +5,10 @@
 	import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
+	import YoRHaDetectiveCommandCenter from '$lib/components/yorha/YoRHaDetectiveCommandCenter.svelte';
 
 	let showCodebaseSearch = $state(false);
+	let showDetectiveCenter = $state(false);
 	import { goto } from '$app/navigation';
 	import Activity from '@lucide/svelte/icons/activity';
 	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
@@ -841,6 +843,18 @@ totalCases: 5.2,
 	{#if showCodebaseSearch}
 		<div class="codebase-search-panel">
 			<CodebaseSearch />
+		</div>
+	{/if}
+
+	<!-- Detective Command Center -->
+	<div class="codebase-search-toggle">
+		<button class="codebase-toggle-btn" class:active={showDetectiveCenter} onclick={() => (showDetectiveCenter = !showDetectiveCenter)}>
+			{showDetectiveCenter ? '[-] HIDE DETECTIVE CENTER' : '[+] DETECTIVE COMMAND CENTER'}
+		</button>
+	</div>
+	{#if showDetectiveCenter}
+		<div class="codebase-search-panel">
+			<YoRHaDetectiveCommandCenter currentUser={data.user} />
 		</div>
 	{/if}
 </div>

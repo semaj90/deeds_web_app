@@ -2,9 +2,20 @@
 	import type { PageData } from './$types';
 	import EvidenceAnalysisDashboard from '$lib/components/dashboard/EvidenceAnalysisDashboard.svelte';
 	import PoliceReportGenerator from '$lib/components/yorha/PoliceReportGenerator.svelte';
+	import CustodyTimeline from '$lib/components/legal/CustodyTimeline.svelte';
+	import EvidenceModal from '$lib/components/modals/EvidenceModal.svelte';
 
 	let { data }: { data: PageData } = $props();
 	let showReportGenerator = $state(false);
+	let showTimeline = $state(false);
+	let showEvidenceModal = $state(false);
+	let selectedEvidence = $state<any>({ jsonData: { title: '', description: '', tags: [] } });
+
+	const sampleCustodyEvents = [
+		{ eventType: 'intake', userId: 'officer-1', timestamp: new Date(Date.now() - 86400000 * 3).toISOString(), details: { hashMatch: true, originalHash: 'a1b2c3d4e5f6' } },
+		{ eventType: 'verification', userId: 'forensics-lab', timestamp: new Date(Date.now() - 86400000 * 2).toISOString(), details: { integrityStatus: 'verified', verificationResults: { aiAnalysisScore: 0.97 } } },
+		{ eventType: 'analysis', userId: 'ai-system', timestamp: new Date(Date.now() - 86400000).toISOString(), details: { aiAnalysis: { riskLevel: 'low' }, models: ['gemma3-legal'] } },
+	];
 </script>
 
 <EvidenceAnalysisDashboard caseId={data.caseId} />
@@ -22,6 +33,29 @@
 		<PoliceReportGenerator caseId={data.caseId || null} />
 	</div>
 {/if}
+
+<div class="report-section">
+	<button
+		class="report-toggle"
+		onclick={() => (showTimeline = !showTimeline)}
+	>
+		{showTimeline ? 'Hide Custody Timeline' : 'Chain of Custody Timeline'}
+	</button>
+	<button
+		class="report-toggle"
+		style="margin-left: 0.5rem; border-color: #60a5fa; color: #60a5fa; background: rgba(59,130,246,0.15);"
+		onclick={() => { selectedEvidence = { jsonData: { title: 'Sample Evidence', description: 'Evidence item from library', tags: ['forensic', 'digital'] } }; showEvidenceModal = true; }}
+	>
+		View Evidence Detail
+	</button>
+</div>
+{#if showTimeline}
+	<div class="report-container">
+		<CustodyTimeline events={sampleCustodyEvents} currentStage="analysis" />
+	</div>
+{/if}
+
+<EvidenceModal item={selectedEvidence} bind:open={showEvidenceModal} onSave={(updated) => { selectedEvidence = updated; showEvidenceModal = false; }} />
 
 <style>
 	.report-section {

@@ -9,6 +9,7 @@
   import AIChatAssistant from '$lib/components/AIChatAssistant.svelte';
   import AgentChat from '$lib/components/agentic/AgentChat.svelte';
   import ClientGemmaDemo from '$lib/components/ClientGemmaDemo.svelte';
+  import ClientGemmaInference from '$lib/components/ClientGemmaInference.svelte';
 
   interface AIStats {
     activeChats: number;
@@ -47,6 +48,7 @@
   let showCaseAssistant = $state(false);
   let showAgentChat = $state(false);
   let showGemmaDemo = $state(false);
+  let showOnnxInference = $state(false);
 
   $effect(() => {
     loadDashboard();
@@ -231,6 +233,21 @@
       {#if showGemmaDemo}
         <div class="mt-3">
           <ClientGemmaDemo />
+        </div>
+      {/if}
+    </div>
+
+    <!-- Client ONNX Inference (WebGPU) -->
+    <div class="mt-4">
+      <button
+        onclick={() => (showOnnxInference = !showOnnxInference)}
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/20 rounded-lg text-sand/80 hover:border-accent/40 transition text-sm font-medium"
+      >
+        {showOnnxInference ? 'Hide ONNX Inference' : 'Client ONNX Inference (WebGPU/WASM)'}
+      </button>
+      {#if showOnnxInference}
+        <div class="mt-3">
+          <ClientGemmaInference />
         </div>
       {/if}
     </div>

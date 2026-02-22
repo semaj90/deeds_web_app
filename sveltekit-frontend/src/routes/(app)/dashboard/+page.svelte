@@ -12,6 +12,7 @@
   import DocumentThumbnailTray from '$lib/components/dashboard/DocumentThumbnailTray.svelte';
   import { documentProgressStore } from '$lib/stores/dashboard/DocumentProgressStore.svelte';
   import RecentActivity from '$lib/components/yorha/dashboard/RecentActivity.svelte';
+  import LegalDisclaimer from '$lib/components/LegalDisclaimer.svelte';
 
   interface DashboardStats {
     activeCases: number;
@@ -93,6 +94,8 @@
     }
   }
 </script>
+
+<LegalDisclaimer />
 
 <div class="max-w-6xl mx-auto px-4 py-8">
   <header class="mb-8 text-center">

@@ -3,7 +3,7 @@
 	 * StatuteActionPanel — AI-powered legal statute actions
 	 * Rewritten Session 63c: Svelte 5 runes (removed writable stores)
 	 */
-	import type { LegalIntent } from '$lib/ai/intents';
+	type LegalIntent = 'EXPLAIN_STATUTE' | 'LINK_CASES' | 'HIGHLIGHT_CLAUSE' | 'TAXONOMY_EXPLORE' | 'MEMO_BUILDER';
 
 	interface Props {
 		statute: {
