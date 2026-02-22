@@ -6,7 +6,10 @@
 	import PersonOfInterestDetailView from '$lib/components/poi/PersonOfInterestDetailView.svelte';
 	import POICard from '$lib/components/poi/POICard.svelte';
 	import PersonList from '$lib/components/PersonList.svelte';
+	import FilterPanel from '$lib/components/FilterPanel.svelte';
 	import type { FugitiveDexPerson } from '$lib/components/types';
+
+	let filterPanelFilters = $state<{ status: string; priority: string; tags: string[] }>({ status: '', priority: '', tags: [] });
 
 	let { data } = $props();
 
@@ -168,11 +171,14 @@
 			<a href="/persons-of-interest/create{data.caseId ? `?caseId=${data.caseId}` : ''}" class="btn-primary">Create First POI</a>
 		</div>
 	{:else}
-		<div class="view-toggle">
+		<div class="view-toggle" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
 			<button class="toggle-btn" class:active={viewMode === 'list'} onclick={() => (viewMode = 'list')}>List</button>
 			<button class="toggle-btn" class:active={viewMode === 'ai-cards'} onclick={() => (viewMode = 'ai-cards')}>AI Cards</button>
 			<button class="toggle-btn" class:active={viewMode === 'detail-cards'} onclick={() => (viewMode = 'detail-cards')}>Detail Cards</button>
 			<button class="toggle-btn" class:active={viewMode === 'fugitive-dex'} onclick={() => (viewMode = 'fugitive-dex')}>Fugitive Dex</button>
+			<div style="margin-left: auto;">
+				<FilterPanel filters={filterPanelFilters} onfilter={(f) => { filterPanelFilters = f; if (f.status) selectedStatus = f.status; if (f.priority) selectedThreatLevel = f.priority; }} />
+			</div>
 		</div>
 
 		{#if viewMode === 'ai-cards'}

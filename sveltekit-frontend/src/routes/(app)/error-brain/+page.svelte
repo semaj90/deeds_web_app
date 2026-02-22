@@ -7,7 +7,10 @@ import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
 import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
 import Button from '$lib/components/ui/Button.svelte';
 import Phase72ErrorBrain from '$lib/components/Phase72ErrorBrain.svelte';
+import ErrorStreamMonitor from '$lib/components/ErrorStreamMonitor.svelte';
 // Migrated to $effect
+
+ let showErrorStream = $state(false);
 
  let status = $state<any>(null);
  let runs = $state<any[]>([]);
@@ -76,10 +79,22 @@ import Phase72ErrorBrain from '$lib/components/Phase72ErrorBrain.svelte';
  </div>
  <Button class="bits-btn" onclick={createRun}>Create New Run</Button>
 	<Button class="bits-btn" onclick={() => (showErrorBrain = true)}>Phase 72 Error Brain</Button>
+	<Button class="bits-btn" onclick={() => (showErrorStream = !showErrorStream)}>{showErrorStream ? 'Hide Stream' : 'Error Stream'}</Button>
  </div>
 
  {#if showErrorBrain}
 	<Phase72ErrorBrain routePath={selectedRoute} onClose={() => (showErrorBrain = false)} />
+ {/if}
+
+ {#if showErrorStream}
+	<Card class="mb-4">
+		<CardHeader>
+			<CardTitle>Real-Time Error Stream</CardTitle>
+		</CardHeader>
+		<CardContent>
+			<ErrorStreamMonitor />
+		</CardContent>
+	</Card>
  {/if}
 
  {#if error}

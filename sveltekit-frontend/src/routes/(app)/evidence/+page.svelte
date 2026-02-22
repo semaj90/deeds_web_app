@@ -9,6 +9,9 @@
 	import EvidenceReportSummary from '$lib/components/legal/EvidenceReportSummary.svelte';
 	import type { EvidenceReport } from '$lib/components/legal/EvidenceReportSummary.svelte';
 	import EvidenceConnections from '$lib/components/EvidenceConnections.svelte';
+	import EvidenceAssistant from '$lib/components/evidence/EvidenceAssistant.svelte';
+	import ContradictionReveal from '$lib/components/yorha/ContradictionReveal.svelte';
+	import LegalAnalysisDialog from '$lib/components/LegalAnalysisDialog.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -28,6 +31,10 @@
 	let showCustodyFlow = $state(false);
 	let custodyEvidenceId = $state('');
 	let showConnections = $state(false);
+	let showEvidenceAssistant = $state(false);
+	let assistantNode = $state<{ id: string; title: string; type: string; description?: string; confidence?: number; metadata?: Record<string, unknown> }>({ id: '', title: '', type: 'document' });
+	let showContradiction = $state(false);
+	let contradictionMessage = $state('');
 	let showCrudModal = $state(false);
 	let crudMode = $state<'create' | 'edit' | 'view'>('create');
 	let crudEvidenceId = $state<string | undefined>(undefined);
@@ -35,6 +42,9 @@
 	let reportEvidenceId = $state('');
 	let reportData = $state<EvidenceReport | null>(null);
 	let isLoadingReport = $state(false);
+	let showLegalAnalysis = $state(false);
+	let legalAnalysisEvidenceId = $state('');
+	let legalAnalysisTitle = $state('Legal Analysis');
 
 	// Backend semantic search state
 	let searchMode = $state<'local' | 'semantic'>('local');
@@ -400,7 +410,9 @@
 							<span>{formatDate(doc.createdAt ?? doc.created_at)}</span>
 							{#if !doc.similarity}
 								<div class="flex gap-2">
+									<button onclick={(e) => { e.stopPropagation(); assistantNode = { id: doc.id, title: doc.title || doc.fileName || '', type: doc.fileType?.includes('pdf') ? 'document' : doc.fileType?.startsWith('image') ? 'person' : 'other', description: doc.description }; showEvidenceAssistant = true; }} class="text-warning/60 hover:text-warning transition">Analyze</button>
 									<button onclick={(e) => { e.stopPropagation(); loadEvidenceReport(doc.id); }} class="text-accent/60 hover:text-accent transition">Report</button>
+									<button onclick={(e) => { e.stopPropagation(); legalAnalysisEvidenceId = doc.id; legalAnalysisTitle = `Legal Analysis: ${doc.title || doc.fileName || doc.id}`; showLegalAnalysis = true; }} class="text-info/60 hover:text-info transition">Legal</button>
 									<button onclick={(e) => { e.stopPropagation(); crudMode = 'edit'; crudEvidenceId = doc.id; showCrudModal = true; }} class="text-info/60 hover:text-info transition">Edit</button>
 									<form method="POST" action="?/delete" use:enhance>
 										<input type="hidden" name="evidenceId" value={doc.id} />
@@ -446,7 +458,9 @@
 								<td class="px-4 py-3 text-sm text-sand/60">{formatDate(doc.createdAt)}</td>
 								<td class="px-4 py-3 text-right">
 									<div class="flex gap-2 justify-end">
+										<button onclick={(e) => { e.stopPropagation(); assistantNode = { id: doc.id, title: doc.title || doc.fileName || '', type: 'document', description: doc.description }; showEvidenceAssistant = true; }} class="text-warning/60 hover:text-warning text-sm transition">Analyze</button>
 										<button onclick={(e) => { e.stopPropagation(); loadEvidenceReport(doc.id); }} class="text-accent/60 hover:text-accent text-sm transition">Report</button>
+										<button onclick={(e) => { e.stopPropagation(); legalAnalysisEvidenceId = doc.id; legalAnalysisTitle = `Legal Analysis: ${doc.title || doc.fileName || doc.id}`; showLegalAnalysis = true; }} class="text-info/60 hover:text-info text-sm transition">Legal</button>
 										<button onclick={(e) => { e.stopPropagation(); crudMode = 'edit'; crudEvidenceId = doc.id; showCrudModal = true; }} class="text-info/60 hover:text-info text-sm transition">Edit</button>
 										<form method="POST" action="?/delete" use:enhance class="inline">
 											<input type="hidden" name="evidenceId" value={doc.id} />
@@ -540,6 +554,30 @@
 	onClose={() => { showCrudModal = false; }}
 	onSave={() => { window.location.reload(); }}
 	onDelete={() => { window.location.reload(); }}
+/>
+
+<EvidenceAssistant
+	node={assistantNode}
+	bind:open={showEvidenceAssistant}
+	onupdate={(detail) => {
+		if (detail.updates.description?.toLowerCase().includes('contradict')) {
+			contradictionMessage = `Contradiction found in ${detail.nodeId}: ${detail.updates.description}`;
+			showContradiction = true;
+		}
+	}}
+/>
+
+<ContradictionReveal
+	message={contradictionMessage || 'CONTRADICTION DETECTED IN EVIDENCE!'}
+	show={showContradiction}
+	onhide={() => (showContradiction = false)}
+/>
+
+<LegalAnalysisDialog
+	bind:open={showLegalAnalysis}
+	evidenceId={legalAnalysisEvidenceId}
+	title={legalAnalysisTitle}
+	onClose={() => { showLegalAnalysis = false; }}
 />
 
 <style>

@@ -1,8 +1,13 @@
 <script lang="ts">
  import { Badge } from '$lib/components/ui/badge';
  import Button from '$lib/components/ui/Button.svelte';
- import { Dialog, DialogContent,
- DialogDescription, DialogHeader, DialogTitle } from '$lib/components/ui/dialog';
+ import DialogRoot from '$lib/components/ui/dialog/DialogRoot.svelte';
+ import DialogPortal from '$lib/components/ui/dialog/DialogPortal.svelte';
+ import DialogOverlay from '$lib/components/ui/dialog/DialogOverlay.svelte';
+ import DialogContent from '$lib/components/ui/dialog/DialogContent.svelte';
+ import DialogDescription from '$lib/components/ui/dialog/DialogDescription.svelte';
+ import DialogHeader from '$lib/components/ui/dialog/DialogHeader.svelte';
+ import DialogTitle from '$lib/components/ui/dialog/DialogTitle.svelte';
  import { Textarea } from '$lib/components/ui/textarea';
  // Local EvidenceNode type (schema exports YoRHaEvidenceNode which has a different shape)
  interface EvidenceNode {
@@ -77,7 +82,9 @@ description: suggestion },
  }
 </script>
 
-<Dialog bind:open>
+<DialogRoot bind:open>
+ <DialogPortal>
+ <DialogOverlay />
  <DialogContent class="evidence-dialog">
  <DialogHeader>
  <DialogTitle class="flex items-center gap-2">
@@ -173,7 +180,7 @@ description: suggestion },
  <input
  type="text"
  bind:value={node.title}
- onchange={(e) => updateNode({ title: e.currentTarget.value })}
+ onchange={(e) => updateNode({ title: (e.currentTarget as HTMLInputElement).value })}
  />
  </label>
 
@@ -192,14 +199,15 @@ description: suggestion },
  max="1"
  step="0.1"
  bind:value={node.confidence}
- onchange={(e) => updateNode({ confidence: parseFloat(e.currentTarget.value) })}
+ onchange={(e) => updateNode({ confidence: parseFloat((e.currentTarget as HTMLInputElement).value) })}
  />
  </label>
  </div>
  </div>
  </div>
  </DialogContent>
-</Dialog>
+ </DialogPortal>
+</DialogRoot>
 
 <style>
  .evidence-dialog {

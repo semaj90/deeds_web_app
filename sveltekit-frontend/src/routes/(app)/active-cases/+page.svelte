@@ -3,6 +3,7 @@
 	import CasesList from '$lib/components/yorha/cases/CasesList.svelte';
 	import CaseStats from '$lib/components/yorha/cases/CaseStats.svelte';
 	import CaseCardGrid from '$lib/components/dashboard/CaseCardGrid.svelte';
+	import ErrorAlert from '$lib/components/case/ErrorAlert.svelte';
 	import type { PageData } from './$types';
 
 	const { data }: { data: PageData } = $props();
@@ -44,6 +45,13 @@
 			</div>
 		</div>
 	</div>
+
+	{#if data.loadError}
+		<ErrorAlert
+			error={data.loadError}
+			onRetry={() => window.location.reload()}
+		/>
+	{/if}
 
 	<!-- Priority Stats -->
 	<div class="priority-bar">

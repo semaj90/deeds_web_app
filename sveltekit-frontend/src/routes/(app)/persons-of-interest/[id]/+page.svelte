@@ -10,9 +10,13 @@
 	import POIProfile from '$lib/components/poi/POIProfile.svelte';
 	import POIFaceMatchDialog from '$lib/components/poi/POIFaceMatchDialog.svelte';
 	import POIStats from '$lib/components/poi/POIStats.svelte';
+	import POIPhotoModal from '$lib/components/POIPhotoModal.svelte';
 	import type { FugitiveDexPerson } from '$lib/components/types';
 
 	let { data } = $props();
+
+	let photoModalOpen = $state(false);
+	let photoModalIndex = $state(0);
 
 	let associates = $state<KnownAssociate[]>([]);
 	let associatesLoading = $state(false);
@@ -144,11 +148,6 @@
 
 		<div class="tab-content">
 			{#if activeTab === 'details'}
-				{#if poi.caseId}
-					<div style="margin-bottom: 1.5rem;">
-						<POIStats caseId={poi.caseId} />
-					</div>
-				{/if}
 				<div class="details-grid">
 					{#if poi.description}
 						<div class="detail-item full-width">
@@ -234,6 +233,14 @@
 				</div>
 			{:else if activeTab === 'photos'}
 				<POIPhotoGrid photos={poi.photos ?? []} editable={false} />
+				{#if (poi.photos ?? []).length > 0}
+					<div style="margin-top: 1rem; text-align: center;">
+						<button class="btn-secondary" onclick={() => { photoModalIndex = 0; photoModalOpen = true; }}>
+							View Photos in Lightbox
+						</button>
+					</div>
+					<POIPhotoModal photos={poi.photos ?? []} bind:currentIndex={photoModalIndex} bind:open={photoModalOpen} onclose={() => { photoModalOpen = false; }} />
+				{/if}
 			{:else if activeTab === 'search'}
 				{@const profilePerson = {
 					name: poi.name,

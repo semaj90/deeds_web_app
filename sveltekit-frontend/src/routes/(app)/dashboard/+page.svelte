@@ -7,6 +7,11 @@
   import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
   import WorkspacePanel from '$lib/components/legal/WorkspacePanel.svelte';
   import SystemStatusPanel from '$lib/components/dashboard/SystemStatusPanel.svelte';
+  import FallbackAlert from '$lib/components/dashboard/FallbackAlert.svelte';
+  import ProgressCard from '$lib/components/dashboard/ProgressCard.svelte';
+  import DocumentThumbnailTray from '$lib/components/dashboard/DocumentThumbnailTray.svelte';
+  import { documentProgressStore } from '$lib/stores/dashboard/DocumentProgressStore.svelte';
+  import RecentActivity from '$lib/components/yorha/dashboard/RecentActivity.svelte';
 
   interface DashboardStats {
     activeCases: number;
@@ -95,6 +100,19 @@
     <p class="text-sand/60 text-sm">Case management overview and recent activity</p>
   </header>
 
+  <FallbackAlert />
+
+  {#if documentProgressStore.isProcessing}
+    <div class="mb-6">
+      <ProgressCard />
+      {#if documentProgressStore.pageStatusesArray.length > 0}
+        <div class="mt-3">
+          <DocumentThumbnailTray />
+        </div>
+      {/if}
+    </div>
+  {/if}
+
   {#if loading}
     <div class="text-center py-16 text-sand/50">Loading dashboard...</div>
   {:else}
@@ -153,6 +171,11 @@
         {/if}
       </CardContent>
     </Card>
+
+    <!-- Recent Activity Feed -->
+    <div class="mt-8">
+      <RecentActivity />
+    </div>
 
     <!-- Workspace -->
     <div class="mt-8">

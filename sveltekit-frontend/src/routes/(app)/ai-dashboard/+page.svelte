@@ -8,6 +8,7 @@
   import ClientSideAIChat from '$lib/components/ai/ClientSideAIChat.svelte';
   import AIChatAssistant from '$lib/components/AIChatAssistant.svelte';
   import AgentChat from '$lib/components/agentic/AgentChat.svelte';
+  import ClientGemmaDemo from '$lib/components/ClientGemmaDemo.svelte';
 
   interface AIStats {
     activeChats: number;
@@ -45,6 +46,7 @@
   let showLocalAI = $state(false);
   let showCaseAssistant = $state(false);
   let showAgentChat = $state(false);
+  let showGemmaDemo = $state(false);
 
   $effect(() => {
     loadDashboard();
@@ -214,6 +216,21 @@
       {#if showAgentChat}
         <div class="mt-3">
           <AgentChat />
+        </div>
+      {/if}
+    </div>
+
+    <!-- Gemma Inference Demo (Ollama Direct) -->
+    <div class="mt-4">
+      <button
+        onclick={() => (showGemmaDemo = !showGemmaDemo)}
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/20 rounded-lg text-sand/80 hover:border-accent/40 transition text-sm font-medium"
+      >
+        {showGemmaDemo ? 'Hide Gemma Demo' : 'Gemma Inference Demo (Ollama Direct)'}
+      </button>
+      {#if showGemmaDemo}
+        <div class="mt-3">
+          <ClientGemmaDemo />
         </div>
       {/if}
     </div>

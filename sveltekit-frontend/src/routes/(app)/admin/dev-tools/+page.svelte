@@ -4,6 +4,7 @@
 	import EvidenceDataGrid from '$lib/components/admin/EvidenceDataGrid.svelte';
 	import CachePerformanceDashboard from '$lib/components/ai/CachePerformanceDashboard.svelte';
 	import CacheDemo from '$lib/components/cache/CacheDemo.svelte';
+	import GPUMetrics from '$lib/components/yorha/dashboard/GPUMetrics.svelte';
 
 	let { data } = $props();
 
@@ -18,6 +19,7 @@
 		{ value: 'tools', label: 'Admin Tools' },
 		{ value: 'evidence', label: 'Evidence' },
 		{ value: 'cache', label: 'Cache' },
+		{ value: 'gpu', label: 'GPU' },
 	];
 
 	// Reactive state
@@ -530,6 +532,11 @@
 		<div style="margin-top: 2rem;">
 			<CacheDemo />
 		</div>
+	{/if}
+
+	<!-- GPU Tab -->
+	{#if activeTab === 'gpu'}
+		<GPUMetrics />
 	{/if}
 </div>
 
