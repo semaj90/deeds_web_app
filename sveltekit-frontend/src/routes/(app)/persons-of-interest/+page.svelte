@@ -7,6 +7,7 @@
 	import POICard from '$lib/components/poi/POICard.svelte';
 	import PersonList from '$lib/components/PersonList.svelte';
 	import FilterPanel from '$lib/components/FilterPanel.svelte';
+	import StatsPanel from '$lib/components/StatsPanel.svelte';
 	import type { FugitiveDexPerson } from '$lib/components/types';
 
 	let filterPanelFilters = $state<{ status: string; priority: string; tags: string[] }>({ status: '', priority: '', tags: [] });
@@ -24,6 +25,29 @@
 	let dexSelectedPerson = $state<FugitiveDexPerson | null>(null);
 	let previewPoi = $state<any>(null);
 	let showPreview = $state(false);
+	let showStats = $state(false);
+
+	let poiStats = $derived.by(() => {
+		const all = data.pois ?? [];
+		const total = all.length;
+		const active = all.filter((p: any) => p.status === 'active' || p.status === 'person_of_interest' || p.status === 'suspect').length;
+		const highRisk = all.filter((p: any) => p.threatLevel === 'high' || p.threatLevel === 'critical' || p.threatLevel === 'extreme').length;
+		const aiGenerated = all.filter((p: any) => p.source === 'ai' || p.aiGenerated).length;
+		return {
+			total, active, highRisk, aiGenerated,
+			byPriority: {
+				low: all.filter((p: any) => p.threatLevel === 'low').length,
+				medium: all.filter((p: any) => p.threatLevel === 'medium').length,
+				high: all.filter((p: any) => p.threatLevel === 'high').length,
+				critical: all.filter((p: any) => p.threatLevel === 'critical' || p.threatLevel === 'extreme').length,
+			},
+			byStatus: {
+				active: all.filter((p: any) => p.status === 'active' || p.status === 'person_of_interest' || p.status === 'suspect').length,
+				inactive: all.filter((p: any) => p.status === 'cleared' || p.status === 'inactive').length,
+				archived: all.filter((p: any) => p.status === 'archived').length,
+			}
+		};
+	});
 
 	let filtered = $derived(
 		(data.pois ?? []).filter((poi: any) => {
@@ -96,6 +120,15 @@
 			<a href="/persons-of-interest/create{data.caseId ? `?caseId=${data.caseId}` : ''}" class="btn-create-full">+ Full Form</a>
 		</div>
 	</div>
+
+	<div style="margin-bottom: 1rem;">
+		<button onclick={() => (showStats = !showStats)} class="btn-create-full">
+			{showStats ? 'Hide Statistics' : 'POI Statistics'}
+		</button>
+	</div>
+	{#if showStats}
+		<StatsPanel stats={poiStats} />
+	{/if}
 
 	<AddPoiModal bind:open={showAddModal} />
 

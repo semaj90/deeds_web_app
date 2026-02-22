@@ -280,6 +280,36 @@
       {/if}
     </div>
 
+    <!-- Streaming Response Demo -->
+    <div class="mt-4">
+      <button
+        onclick={() => (showStreamingDemo = !showStreamingDemo)}
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/20 rounded-lg text-sand/80 hover:border-accent/40 transition text-sm font-medium"
+      >
+        {showStreamingDemo ? 'Hide Streaming Demo' : 'Streaming Response Demo (AI Output Preview)'}
+      </button>
+      {#if showStreamingDemo}
+        <div class="mt-3">
+          <StreamingResponse response={streamingText} />
+        </div>
+      {/if}
+    </div>
+
+    <!-- Chat Message History -->
+    <div class="mt-4">
+      <button
+        onclick={() => (showChatHistory = !showChatHistory)}
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/20 rounded-lg text-sand/80 hover:border-accent/40 transition text-sm font-medium"
+      >
+        {showChatHistory ? 'Hide Chat History' : 'Chat Message History (Citation-Aware Renderer)'}
+      </button>
+      {#if showChatHistory}
+        <div class="mt-3">
+          <ChatMessages messages={chatHistoryMessages} />
+        </div>
+      {/if}
+    </div>
+
     {#if error}
       <Card class="mt-4 bg-panel border-danger/40">
         <CardContent class="p-4 text-center">

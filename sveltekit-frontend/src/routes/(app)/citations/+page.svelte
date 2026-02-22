@@ -7,7 +7,10 @@
   import CitationManager from '$lib/components/legal/CitationManager.svelte';
   import CitationDetail from '$lib/components/legal-ai/CitationDetail.svelte';
   import StatuteActionPanel from '$lib/components/legal/StatuteActionPanel.svelte';
+  import RelatedCasesPanel from '$lib/components/legal-ai/RelatedCasesPanel.svelte';
+  import StatuteDetail from '$lib/components/legal-ai/StatuteDetail.svelte';
   import SearchBox from '$lib/components/SearchBox.svelte';
+  import CitationLink from '$lib/components/CitationLink.svelte';
 
   let viewMode = $state<'list' | 'manager'>('list');
   let showGpuSearch = $state(false);
@@ -180,7 +183,7 @@
             {/if}
             {#if citation.quotedText}
               <blockquote class="border-l-2 border-accent/30 pl-3 text-sand/60 text-xs italic">
-                "{citation.quotedText}"
+                <CitationLink text={citation.quotedText} />
               </blockquote>
             {/if}
             <div class="flex items-center gap-4 mt-3 text-xs text-sand/40">
@@ -214,6 +217,15 @@
             text: selectedCitation.highlighted_text ?? '',
             heading: selectedCitation.statute_title ?? ''
           }}
+        />
+        <StatuteDetail
+          statute={{ id: selectedCitation.id, code: selectedCitation.statute_code ?? '', title: selectedCitation.statute_title ?? '', full_text: selectedCitation.highlighted_text ?? '', jurisdiction: selectedCitation.jurisdiction ?? '' }}
+          onattachtocase={() => { console.log('Attach to case:', selectedCitation.id); }}
+          onsavecitation={() => { console.log('Save citation:', selectedCitation.id); }}
+        />
+        <RelatedCasesPanel
+          statuteCode={selectedCitation.statute_code ?? null}
+          onviewcase={(c) => { window.location.href = `/cases/${c.id}`; }}
         />
       </div>
     {/if}

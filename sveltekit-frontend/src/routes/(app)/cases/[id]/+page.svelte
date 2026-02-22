@@ -18,6 +18,8 @@ import CrossExaminationAssistant from '$lib/components/yorha/CrossExaminationAss
 import SimilarCasesPanel from '$lib/components/case/SimilarCasesPanel.svelte';
 import StatuteModal from '$lib/components/charges/StatuteModal.svelte';
 import CaseStatuteLinks from '$lib/components/legal-ai/CaseStatuteLinks.svelte';
+import ContractAnalyzer from '$lib/components/legal/ContractAnalyzer.svelte';
+import LegalDocumentEditor from '$lib/components/editor/LegalDocumentEditor.svelte';
 import type { SimilarCase } from '$lib/types/case-summary';
  import { CacheStrategies, useCache } from '$lib/cache/cache-service.svelte';
  import NesModal from '$lib/components/nes/NesModal.svelte';
@@ -77,7 +79,7 @@ import type { SimilarCase } from '$lib/types/case-summary';
  let isLoadingCitations = $state(false);
  let isLoadingStatutes = $state(false);
  let showCitationModal = $state(false);
- let activeTab = $state<'evidence' | 'citations' | 'theory' | 'cross-exam' | 'prediction' | 'timeline' | 'statutes'>('evidence');
+ let activeTab = $state<'evidence' | 'citations' | 'theory' | 'cross-exam' | 'prediction' | 'timeline' | 'statutes' | 'contract' | 'document'>('evidence');
  let similarCases = $state<SimilarCase[]>([]);
  let isLoadingSimilar = $state(false);
  let selectedStatute = $state<any>(null);
@@ -502,6 +504,18 @@ import type { SimilarCase } from '$lib/types/case-summary';
    >
      Statutes
    </button>
+   <button
+     onclick={() => (activeTab = 'contract')}
+     class={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === 'contract' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+   >
+     Contract
+   </button>
+   <button
+     onclick={() => (activeTab = 'document')}
+     class={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === 'document' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+   >
+     Document
+   </button>
  </div>
 
  {#if activeTab === 'evidence'}
@@ -682,6 +696,19 @@ import type { SimilarCase } from '$lib/types/case-summary';
  <CaseStatuteLinks
    {caseId}
    onview={(link) => { selectedStatute = { id: link.statute_code, title: link.statute_code, section: link.link_type }; showStatuteModal = true; }}
+ />
+ {:else if activeTab === 'contract'}
+ <!-- Contract Analysis Tab -->
+ <ContractAnalyzer
+   onAnalyze={async (id) => { console.log('Analyzing contract:', id); }}
+   onExport={(format) => { console.log('Exporting contract as', format); }}
+ />
+ {:else if activeTab === 'document'}
+ <!-- Legal Document Editor Tab -->
+ <LegalDocumentEditor
+   {caseId}
+   documentType="brief"
+   title={caseData?.title ?? 'Legal Document'}
  />
  {/if}
 

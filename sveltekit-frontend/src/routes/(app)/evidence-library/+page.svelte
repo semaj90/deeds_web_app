@@ -4,9 +4,17 @@
 	import PoliceReportGenerator from '$lib/components/yorha/PoliceReportGenerator.svelte';
 	import CustodyTimeline from '$lib/components/legal/CustodyTimeline.svelte';
 	import EvidenceModal from '$lib/components/modals/EvidenceModal.svelte';
+	import EvidenceCard from '$lib/components/EvidenceCard.svelte';
 
 	let { data }: { data: PageData } = $props();
 	let showReportGenerator = $state(false);
+	let showEvidenceCards = $state(false);
+
+	const sampleEvidenceItems: any[] = [
+		{ id: 'ev-001', file_name: 'Contract_Agreement_2024.pdf', evidence_type: 'document', file_type: 'application/pdf', file_size: 2_400_000, uploaded_at: new Date(Date.now() - 86400000 * 5), ai_summary: 'Employment agreement with non-compete clause. Contains liability provisions in Section 4.', tags: ['contract', 'employment'], ai_tags: ['legal-binding', 'non-compete'] },
+		{ id: 'ev-002', file_name: 'Scene_Photo_001.jpg', evidence_type: 'photograph', file_type: 'image/jpeg', file_size: 3_800_000, uploaded_at: new Date(Date.now() - 86400000 * 2), ai_summary: 'Exterior photograph showing property boundary markers.', tags: ['property', 'boundary'], ai_tags: ['geolocation', 'outdoor'] },
+		{ id: 'ev-003', file_name: 'Witness_Deposition.docx', evidence_type: 'testimony', file_type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', file_size: 156_000, uploaded_at: new Date(Date.now() - 86400000), tags: ['witness', 'deposition'] },
+	];
 	let showTimeline = $state(false);
 	let showEvidenceModal = $state(false);
 	let selectedEvidence = $state<any>({ jsonData: { title: '', description: '', tags: [] } });
@@ -52,6 +60,29 @@
 {#if showTimeline}
 	<div class="report-container">
 		<CustodyTimeline events={sampleCustodyEvents} currentStage="analysis" />
+	</div>
+{/if}
+
+<div class="report-section">
+	<button
+		class="report-toggle"
+		style="border-color: #f59e0b; color: #f59e0b; background: rgba(245,158,11,0.15);"
+		onclick={() => (showEvidenceCards = !showEvidenceCards)}
+	>
+		{showEvidenceCards ? 'Hide Evidence Cards' : 'Evidence Card Gallery'}
+	</button>
+</div>
+{#if showEvidenceCards}
+	<div class="report-container">
+		<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem;">
+			{#each sampleEvidenceItems as item (item.id)}
+				<EvidenceCard
+					evidence={item}
+					onAskAI={(ev) => { console.log('Ask AI about:', ev.file_name); }}
+					onDelete={(id) => { console.log('Delete evidence:', id); }}
+				/>
+			{/each}
+		</div>
 	</div>
 {/if}
 

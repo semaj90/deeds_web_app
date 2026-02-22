@@ -17,8 +17,10 @@
 	import ContextualEvidenceChatModal from '$lib/components/ai/ContextualEvidenceChatModal.svelte';
 	import CaseSelector from '$lib/components/CaseSelector.svelte';
 	import UploadProgress from '$lib/components/UploadProgress.svelte';
+	import ActionPopup from '$lib/components/ActionPopup.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
+	let actionPopupFile = $state<{ name: string } | null>(null);
 	let showCaseSelector = $state(false);
 	let linkedCaseTitle = $state('');
 	let uploadProgressPercent = $state(0);
@@ -134,6 +136,7 @@
 		if (input.files?.[0]) {
 			selectedFile = input.files[0];
 			uploadError = null;
+			actionPopupFile = { name: input.files[0].name };
 		}
 	}
 
@@ -153,6 +156,7 @@
 		if (event.dataTransfer?.files?.[0]) {
 			selectedFile = event.dataTransfer.files[0];
 			uploadError = null;
+			actionPopupFile = { name: event.dataTransfer.files[0].name };
 		}
 	}
 
@@ -684,6 +688,23 @@
 	title={legalAnalysisTitle}
 	onClose={() => { showLegalAnalysis = false; }}
 />
+
+{#if actionPopupFile}
+	<ActionPopup
+		pendingFile={actionPopupFile}
+		onSelect={({ action }) => {
+			if (action === 'analyze') {
+				showAdvancedUpload = true;
+			} else if (action === 'attach') {
+				showCaseSelector = true;
+			} else if (action === 'save') {
+				console.log('Saving to evidence library:', actionPopupFile?.name);
+			}
+			actionPopupFile = null;
+		}}
+		onClose={() => { actionPopupFile = null; }}
+	/>
+{/if}
 
 <style>
 	.ev-toolbar {

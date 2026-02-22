@@ -4,14 +4,28 @@
 	import CaseStats from '$lib/components/yorha/cases/CaseStats.svelte';
 	import CaseCardGrid from '$lib/components/dashboard/CaseCardGrid.svelte';
 	import ErrorAlert from '$lib/components/case/ErrorAlert.svelte';
+	import SearchBar from '$lib/components/SearchBar.svelte';
 	import type { PageData } from './$types';
 
 	const { data }: { data: PageData } = $props();
 
 	let viewMode = $state<'list' | 'cards'>('list');
+	let caseSearchQuery = $state('');
 
-	let cardCases = $state(
-		(data.activeCases ?? []).map((c: any) => ({
+	let filteredActiveCases = $derived.by(() => {
+		const all = data.activeCases ?? [];
+		if (!caseSearchQuery) return all;
+		const q = caseSearchQuery.toLowerCase();
+		return all.filter((c: any) =>
+			(c.title ?? '').toLowerCase().includes(q) ||
+			(c.caseNumber ?? '').toLowerCase().includes(q) ||
+			(c.description ?? '').toLowerCase().includes(q) ||
+			(c.status ?? '').toLowerCase().includes(q)
+		);
+	});
+
+	let cardCases = $derived(
+		filteredActiveCases.map((c: any) => ({
 			id: c.id,
 			title: c.title ?? 'Untitled',
 			status: c.status === 'closed' || c.status === 'archived' ? 'closed' as const : 'active' as const,
@@ -59,6 +73,17 @@
 		<span class="pri pri-med">{data.stats.medium} MEDIUM</span>
 		<span class="pri pri-low">{data.stats.low} LOW</span>
 		<span class="pri pri-closed">{data.stats.closed} CLOSED</span>
+	</div>
+
+	<div class="search-section">
+		<SearchBar
+			placeholder="Search active cases by title, number, or status..."
+			value={caseSearchQuery}
+			onsearch={(q) => { caseSearchQuery = q; }}
+		/>
+		{#if caseSearchQuery}
+			<span class="search-count">{filteredActiveCases.length} of {(data.activeCases ?? []).length} cases</span>
+		{/if}
 	</div>
 
 	<CaseStats />
@@ -168,4 +193,18 @@
 
 	.view-btn:hover { background: rgba(34, 211, 238, 0.1); }
 	.view-btn.active { background: rgba(34, 211, 238, 0.2); color: #22d3ee; }
+
+	.search-section {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		margin-bottom: 1rem;
+	}
+
+	.search-count {
+		font-size: 0.75rem;
+		color: #94a3b8;
+		font-family: monospace;
+		white-space: nowrap;
+	}
 </style>

@@ -3,10 +3,13 @@
 	import RAGSearchComponent from '$lib/components/RAGSearchComponent.svelte';
 	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
 	import SearchPanel from '$lib/components/SearchPanel.svelte';
+	import ContextConfirmModal from '$lib/components/ContextConfirmModal.svelte';
 
 	let showRAGAssistant = $state(false);
 	let showCodebaseSearch = $state(false);
 	let showKagSearch = $state(false);
+	let showContextConfirm = $state(false);
+	let contextConfirmData = $state<{ context_id: string; source: string; score: number; snippet: string; range?: { from_msg_id: number; to_msg_id: number }; timestamp?: string } | null>(null);
 	import { getConfidenceLevel, formatProcessingTime } from '$lib/utils';
 	import type { RetrievalContext, RankedChunk } from '$lib/machines/retrieval-machine.js';
 	import Search from '@lucide/svelte/icons/search';
@@ -777,6 +780,18 @@
 		<button class="rag-toggle-btn" class:active={showCodebaseSearch} onclick={() => (showCodebaseSearch = !showCodebaseSearch)}>
 			{showCodebaseSearch ? '[-] HIDE CODEBASE SEARCH' : '[+] CODEBASE SEARCH (Ctrl+K)'}
 		</button>
+		<button class="rag-toggle-btn" onclick={() => {
+			contextConfirmData = {
+				context_id: 'ctx-' + Date.now(),
+				source: 'chat_history',
+				score: 0.87,
+				snippet: 'Previous search context will appear here when available...',
+				timestamp: new Date().toISOString()
+			};
+			showContextConfirm = true;
+		}}>
+			[?] CONFIRM CONTEXT
+		</button>
 	</div>
 	{#if showKagSearch}
 		<div class="rag-panel">
@@ -794,6 +809,15 @@
 		</div>
 	{/if}
 </div>
+
+{#if showContextConfirm && contextConfirmData}
+	<ContextConfirmModal
+		context={contextConfirmData}
+		hint="Is this the search context you were looking for?"
+		onaccept={({ comment }) => { console.log('Context accepted:', contextConfirmData?.context_id, comment); showContextConfirm = false; }}
+		onreject={({ comment }) => { console.log('Context rejected:', contextConfirmData?.context_id, comment); showContextConfirm = false; }}
+	/>
+{/if}
 
 <style>
 	.rag-toggle {

@@ -2,8 +2,11 @@
 	import type { PageData } from './$types';
 	import RouteOperationsDashboard from '$lib/components/RouteOperationsDashboard.svelte';
 	import RouteInspectorModal from '$lib/components/RouteInspectorModal.svelte';
+	import RouteDecisionModal from '$lib/components/RouteDecisionModal.svelte';
 
 	const { data }: { data: PageData } = $props();
+	let showDecisionModal = $state(false);
+	let decisionRoute = $state<{ path: string; reason: string; decision: 'keep' | 'archive' | 'remove' | null; notes?: string } | null>(null);
 
 	let routes = $state<any[]>([]);
 	let searchQuery = $state('');
@@ -269,6 +272,14 @@
 		{/if}
 		<button class="cap-item cap-ops" onclick={() => (showOpsLog = !showOpsLog)}>
 			{showOpsLog ? '[-] HIDE OPS LOG' : '[+] OPS LOG'}
+		</button>
+		<button class="cap-item cap-ops" onclick={() => {
+			if (selectedRoute) {
+				decisionRoute = { path: selectedRoute.path ?? selectedRoute.id, reason: selectedRoute.errorState === 'broken' ? 'Route is broken' : selectedRoute.errorState === 'flaky' ? 'Route is flaky' : 'Routine review', decision: null };
+				showDecisionModal = true;
+			}
+		}} disabled={!selectedRoute}>
+			DECIDE
 		</button>
 	</div>
 
@@ -537,6 +548,8 @@
 
 <!-- Route Inspector Modal (YoRHa-themed detail view) -->
 <RouteInspectorModal bind:open={showInspector} route={selectedRoute ? { path: selectedRoute.path, kind: selectedRoute.kind ?? 'page', file: selectedRoute.file ?? '', summary: selectedRoute.summary ?? `Route: ${selectedRoute.path}`, category: selectedRoute.group, health: selectedRoute.errorState === 'healthy' ? 'green' : selectedRoute.errorState === 'flaky' ? 'yellow' : selectedRoute.errorState === 'broken' ? 'red' : undefined, errorCount: selectedRoute.errorCount, lastErrorMessage: selectedRoute.lastErrorMessage } : null} />
+
+<RouteDecisionModal bind:open={showDecisionModal} bind:route={decisionRoute} onclose={() => { showDecisionModal = false; decisionRoute = null; }} />
 
 <style>
 	/* ── NES Command Center Theme ── */
