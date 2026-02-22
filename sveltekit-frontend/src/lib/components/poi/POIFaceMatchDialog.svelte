@@ -3,9 +3,11 @@
  import AvatarFallback from '$lib/components/ui/avatar/AvatarFallback.svelte';
  import AvatarImage from '$lib/components/ui/avatar/AvatarImage.svelte';
  import Badge from '$lib/components/ui/badge/Badge.svelte';
- import Card from '$lib/components/ui/Card/Card.svelte';
- import CardContent from '$lib/components/ui/Card/CardContent.svelte';
- import Dialog from '$lib/components/ui/dialog/Dialog.svelte';
+ import Card from '$lib/components/ui/card/Card.svelte';
+ import CardContent from '$lib/components/ui/card/CardContent.svelte';
+ import DialogRoot from '$lib/components/ui/dialog/DialogRoot.svelte';
+ import DialogPortal from '$lib/components/ui/dialog/DialogPortal.svelte';
+ import DialogOverlay from '$lib/components/ui/dialog/DialogOverlay.svelte';
  import DialogContent from '$lib/components/ui/dialog/DialogContent.svelte';
  import DialogDescription from '$lib/components/ui/dialog/DialogDescription.svelte';
  import DialogHeader from '$lib/components/ui/dialog/DialogHeader.svelte';
@@ -45,7 +47,7 @@
 
 
 
- let { open = $bindable(), matches, onClose, onSelect } = $props();
+ let { open = $bindable(), matches, onClose, onSelect }: Props = $props();
 
 
  const handleClose = (): void => {
@@ -81,7 +83,9 @@
  }
 </script>
 
-<Dialog bind:open={ open }>
+<DialogRoot bind:open={ open }>
+ <DialogPortal>
+ <DialogOverlay />
  <DialogContent>
  <div class="max-w-4xl max-h-[80vh] overflow-y-auto">
  <DialogHeader>
@@ -161,7 +165,8 @@
  </div>
  </div>
  </DialogContent>
-</Dialog>
+ </DialogPortal>
+</DialogRoot>
 
 
 

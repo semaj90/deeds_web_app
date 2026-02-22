@@ -7,6 +7,9 @@
 	import POIThreatBadge from '$lib/components/poi/POIThreatBadge.svelte';
 	import PersonProfile from '$lib/components/PersonProfile.svelte';
 	import PersonStatsPanel from '$lib/components/PersonStatsPanel.svelte';
+	import POIProfile from '$lib/components/poi/POIProfile.svelte';
+	import POIFaceMatchDialog from '$lib/components/poi/POIFaceMatchDialog.svelte';
+	import POIStats from '$lib/components/poi/POIStats.svelte';
 	import type { FugitiveDexPerson } from '$lib/components/types';
 
 	let { data } = $props();
@@ -15,6 +18,8 @@
 	let associatesLoading = $state(false);
 	let associatesError = $state<string | null>(null);
 	let activeTab = $state<'details' | 'associates' | 'photos' | 'search' | 'dex'>('details');
+	let faceMatchOpen = $state(false);
+	let faceMatches = $state<any[]>([]);
 
 	onMount(async () => {
 		if (data.poi?.id) {
@@ -95,6 +100,10 @@
 			</div>
 		</div>
 
+		{#if poi.caseId}
+			<POIStats caseId={poi.caseId} />
+		{/if}
+
 		<div class="tabs">
 			<button
 				class="tab-button"
@@ -135,6 +144,11 @@
 
 		<div class="tab-content">
 			{#if activeTab === 'details'}
+				{#if poi.caseId}
+					<div style="margin-bottom: 1.5rem;">
+						<POIStats caseId={poi.caseId} />
+					</div>
+				{/if}
 				<div class="details-grid">
 					{#if poi.description}
 						<div class="detail-item full-width">
@@ -221,10 +235,25 @@
 			{:else if activeTab === 'photos'}
 				<POIPhotoGrid photos={poi.photos ?? []} editable={false} />
 			{:else if activeTab === 'search'}
-				<div class="search-section">
-					<p>Similar POIs based on profile analysis</p>
-					<p class="placeholder">Search results will appear here</p>
+				{@const profilePerson = {
+					name: poi.name,
+					face: poi.photos?.[0]?.url ?? '',
+					alias: poi.aliases?.[0],
+					status: poi.status ?? 'unknown',
+					riskLevel: poi.threatLevel ?? 'low',
+					age: poi.dateOfBirth ? Math.floor((Date.now() - new Date(poi.dateOfBirth).getTime()) / 31557600000) : 0,
+					height: poi.physicalDescription?.heightCm ?? 0,
+					hair: poi.physicalDescription?.hair ?? 'Unknown',
+					modusOperandi: poi.profileData?.modusOperandi ?? poi.description ?? '',
+					knownAssociates: poi.profileData?.associates ?? []
+				}}
+				<POIProfile person={profilePerson} />
+				<div class="search-section" style="margin-top: 1.5rem;">
+					<button class="btn-secondary" onclick={() => (faceMatchOpen = true)}>
+						Run Face Match Analysis
+					</button>
 				</div>
+				<POIFaceMatchDialog bind:open={faceMatchOpen} matches={faceMatches} onSelect={(selected) => { window.location.href = `/persons-of-interest/${selected.id}`; }} />
 			{:else if activeTab === 'dex'}
 				{@const dexPerson = {
 					id: poi.id,

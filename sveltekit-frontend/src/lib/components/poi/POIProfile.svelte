@@ -17,7 +17,7 @@ interface PersonOfInterest {
 		person: PersonOfInterest;
 	}
 
-	let { person } = $props<Props>();
+	let { person }: Props = $props();
 
  let aiOpen = $state(false);
  let aiSummary = $state("…");

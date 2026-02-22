@@ -27,6 +27,7 @@
 	let showEvidenceMap = $state(false);
 	let showCustodyFlow = $state(false);
 	let custodyEvidenceId = $state('');
+	let showConnections = $state(false);
 	let showCrudModal = $state(false);
 	let crudMode = $state<'create' | 'edit' | 'view'>('create');
 	let crudEvidenceId = $state<string | undefined>(undefined);
@@ -471,6 +472,20 @@
 		{#if showEvidenceMap}
 			<div class="mt-4">
 				<DetectiveEvidenceMap caseId={data.caseId ?? null} show={showEvidenceMap} />
+			</div>
+		{/if}
+		<!-- Evidence Connection Lines -->
+		<div class="mt-6">
+			<button
+				onclick={() => (showConnections = !showConnections)}
+				class="ev-map-toggle"
+			>
+				{showConnections ? 'Hide Connection Lines' : 'Evidence Connection Lines'}
+			</button>
+		</div>
+		{#if showConnections}
+			<div class="mt-4 relative" style="height: 400px; border: 1px solid rgba(212,199,163,0.2); border-radius: 0.5rem; background: rgba(0,0,0,0.2);">
+				<EvidenceConnections evidence={filteredEvidence.map((e, i) => ({ id: e.id, x: 80 + (i % 4) * 200, y: 60 + Math.floor(i / 4) * 120, related: [], relation_type: 'related' }))} />
 			</div>
 		{/if}
 		<!-- Evidence Custody Flow -->

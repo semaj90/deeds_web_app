@@ -1,5 +1,5 @@
 <script lang="ts">
- import { poiService } from '$lib/services/poi';
+ import { poiService } from '$lib/features/poi/services/poi';
  import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
  import TrendingUp from '@lucide/svelte/icons/trending-up';
  import Users from '@lucide/svelte/icons/users';
