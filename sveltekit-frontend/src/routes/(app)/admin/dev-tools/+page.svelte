@@ -7,7 +7,9 @@
 	import GPUMetrics from '$lib/components/yorha/dashboard/GPUMetrics.svelte';
 	import TerminalWindow from '$lib/components/terminal/TerminalWindow.svelte';
 	import ProgressiveForm from '$lib/components/forms/ProgressiveForm.svelte';
-
+	import YoRHaForm from '$lib/components/yorha/YoRHaForm.svelte';
+	import AIStatusIndicator from '$lib/components/ai/AIStatusIndicator.svelte';
+	import PerformanceMonitor from '$lib/components/ui/PerformanceMonitor.svelte';
 	let { data } = $props();
 
 	// Tab state
@@ -24,6 +26,8 @@
 		{ value: 'gpu', label: 'GPU' },
 		{ value: 'terminal', label: 'Terminal' },
 		{ value: 'forms', label: 'Forms' },
+		{ value: 'ai-status', label: 'AI Status' },
+		{ value: 'performance', label: 'Performance' },
 	];
 
 	// Reactive state
@@ -584,8 +588,48 @@
 				description="Demo of SvelteKit progressive enhancement with client-side validation"
 				action="/api/submit-form"
 			/>
+			<div class="mt-6">
+				<h3 class="text-sand/80 text-sm font-semibold mb-4">YoRHa-Themed Form Demo</h3>
+				<YoRHaForm
+					title="YoRHa Data Input"
+					subtitle="Theme-consistent form component"
+					fields={[
+						{ id: 'name', label: 'Case Name', type: 'text', placeholder: 'Enter case name...', required: true },
+						{ id: 'priority', label: 'Priority', type: 'select', options: [{ label: 'High', value: 'high' }, { label: 'Medium', value: 'medium' }, { label: 'Low', value: 'low' }] },
+						{ id: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Additional notes...' },
+						{ id: 'urgent', label: 'Mark as Urgent', type: 'checkbox' }
+					]}
+					onsubmit={(data) => { console.log('YoRHa form submitted:', data); }}
+				/>
+			</div>
 		</div>
 	{/if}
+
+	<!-- AI Status Tab -->
+	{#if activeTab === 'ai-status'}
+		<div class="space-y-4">
+			<h3 class="text-lg font-semibold text-sand">AI Backend Status Monitor</h3>
+			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+				<AIStatusIndicator isReady={true} provider="local" model="gemma3-legal:latest" />
+				<AIStatusIndicator isReady={true} provider="local" model="embeddinggemma:latest" />
+				<AIStatusIndicator isLoading={true} provider="cloud" model="vLLM legal-bert" />
+				<AIStatusIndicator provider="hybrid" model="ONNX gemma-270m" />
+			</div>
+			<div class="mt-4">
+				<h4 class="text-sm font-semibold text-sand/80 mb-2">Error State Demo</h4>
+				<AIStatusIndicator error="Connection to Ollama timed out after 30s" provider="local" model="gemma3-legal:latest" />
+			</div>
+		</div>
+	{/if}
+
+	{#if activeTab === 'performance'}
+		<div class="space-y-4">
+			<h3 class="text-lg font-semibold text-sand">Performance Monitor</h3>
+			<p class="text-sm text-sand/60">Real-time FPS, memory, CPU/GPU usage, and response time metrics.</p>
+			<PerformanceMonitor showOverlay={true} autoHide={false} updateInterval={1000} />
+		</div>
+	{/if}
+
 </div>
 
 <EvidenceDrawer

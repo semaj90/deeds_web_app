@@ -11,10 +11,27 @@
   import StatuteDetail from '$lib/components/legal-ai/StatuteDetail.svelte';
   import SearchBox from '$lib/components/SearchBox.svelte';
   import CitationLink from '$lib/components/CitationLink.svelte';
+  import CitationSaveForm from '$lib/components/citations/CitationSaveForm.svelte';
+  import CitationSearch from '$lib/components/legal-ai/CitationSearch.svelte';
+  import CitationCollections from '$lib/components/citations/CitationCollections.svelte';
+  import CitationList from '$lib/components/citations/CitationList.svelte';
+  import CitationInspector from '$lib/components/source-validation/CitationInspector.svelte';
+  import AttachToCaseModal from '$lib/components/legal-ai/AttachToCaseModal.svelte';
+  import CollectionDetail from '$lib/components/legal-ai/CollectionDetail.svelte';
 
   let viewMode = $state<'list' | 'manager'>('list');
   let showGpuSearch = $state(false);
+  let showSaveForm = $state(false);
+  let showAdvancedSearch = $state(false);
+  let showCollections = $state(false);
+  let showCitationBrowser = $state(false);
+  let showCitationInspector = $state(false);
+  let inspectorCitation = $state<any>({ source_file: '', content: '', metadata: {}, confidence_score: 0 });
   let selectedCitation = $state<any>(null);
+  let showAttachModal = $state(false);
+  let attachStatuteCode = $state<string | null>(null);
+  let attachCitationId = $state<string | null>(null);
+  let selectedCollection = $state<any>(null);
 
   interface Citation {
     id: string;
@@ -86,8 +103,34 @@
       <Button onclick={() => viewMode = 'list'}>List View</Button>
       <Button onclick={() => viewMode = 'manager'}>Citation Manager</Button>
       <Button onclick={() => (showGpuSearch = !showGpuSearch)}>{showGpuSearch ? 'Hide GPU Search' : 'GPU Search'}</Button>
+      <Button onclick={() => (showSaveForm = !showSaveForm)}>{showSaveForm ? 'Hide Save Form' : '+ Save Citation'}</Button>
+      <Button onclick={() => (showAdvancedSearch = !showAdvancedSearch)}>{showAdvancedSearch ? 'Hide Search' : 'Advanced Search'}</Button>
+      <Button onclick={() => (showCollections = !showCollections)}>{showCollections ? 'Hide Collections' : 'Collections'}</Button>
+      <Button onclick={() => (showCitationBrowser = !showCitationBrowser)}>{showCitationBrowser ? 'Hide Browser' : 'Citation Browser'}</Button>
     </div>
   </header>
+
+  <!-- Advanced Citation Search -->
+  {#if showAdvancedSearch}
+    <div class="mb-6">
+      <CitationSearch
+        placeholder="Search by statute code, title, or keyword..."
+        onselect={(c) => {
+          selectedCitation = { id: c.id, statute_code: c.statute_code, statute_title: c.statute_title, jurisdiction: c.jurisdiction, severity: c.severity, source_type: c.source_type, highlighted_text: c.notes ?? '', notes: c.notes ?? '', created_at: c.created_at, updated_at: c.created_at };
+          showAdvancedSearch = false;
+        }}
+      />
+    </div>
+  {/if}
+
+  <!-- Save New Citation -->
+  {#if showSaveForm}
+    <div class="mb-6">
+      <CitationSaveForm
+        onsaved={() => { showSaveForm = false; loadCitations(); }}
+      />
+    </div>
+  {/if}
 
   {#if showGpuSearch}
     <div class="mb-6">
@@ -110,6 +153,29 @@
             citations = mapped;
           }
         }}
+      />
+    </div>
+  {/if}
+
+  {#if showCollections}
+    <div class="mb-6">
+      <CitationCollections
+        onSelectCollection={(collection) => {
+          selectedCollection = { id: collection.id, name: collection.name, description: '', is_public: true, citation_count: 0, created_at: new Date().toISOString() };
+          searchQuery = collection.name;
+          showCollections = false;
+        }}
+      />
+    </div>
+  {/if}
+
+  <!-- Citation Browser (API-backed paginated list) -->
+  {#if showCitationBrowser}
+    <div class="mb-6">
+      <CitationList
+        searchQuery={searchQuery}
+        sourceTypeFilter={citationType !== 'all' ? citationType : ''}
+        limit={20}
       />
     </div>
   {/if}
@@ -206,7 +272,7 @@
           citation={selectedCitation}
           onupdated={() => { selectedCitation = null; loadCitations(); }}
           ondelete={() => { selectedCitation = null; loadCitations(); }}
-          onattachtocase={(c) => { console.log('Attach to case:', c); }}
+          onattachtocase={() => { attachStatuteCode = selectedCitation?.statute_code ?? null; attachCitationId = selectedCitation?.id ?? null; showAttachModal = true; }}
         />
         <StatuteActionPanel
           statute={{
@@ -220,7 +286,7 @@
         />
         <StatuteDetail
           statute={{ id: selectedCitation.id, code: selectedCitation.statute_code ?? '', title: selectedCitation.statute_title ?? '', full_text: selectedCitation.highlighted_text ?? '', jurisdiction: selectedCitation.jurisdiction ?? '' }}
-          onattachtocase={() => { console.log('Attach to case:', selectedCitation.id); }}
+          onattachtocase={() => { attachStatuteCode = selectedCitation?.statute_code ?? null; attachCitationId = selectedCitation?.id ?? null; showAttachModal = true; }}
           onsavecitation={() => { console.log('Save citation:', selectedCitation.id); }}
         />
         <RelatedCasesPanel
@@ -232,3 +298,28 @@
   {/if}
   {/if}
 </div>
+
+<!-- Citation Source Inspector Modal -->
+<CitationInspector
+  citation={inspectorCitation}
+  isOpen={showCitationInspector}
+  onClose={() => { showCitationInspector = false; }}
+/>
+
+<!-- Attach to Case Modal -->
+<AttachToCaseModal
+  isOpen={showAttachModal}
+  statuteCode={attachStatuteCode}
+  citationId={attachCitationId}
+  onattached={(data) => { console.log('Attached to case:', data); showAttachModal = false; loadCitations(); }}
+/>
+
+<!-- Collection Detail Panel -->
+{#if selectedCollection}
+  <div class="mt-6">
+    <CollectionDetail
+      collection={selectedCollection}
+      ondeleted={() => { selectedCollection = null; }}
+    />
+  </div>
+{/if}

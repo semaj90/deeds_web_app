@@ -4,11 +4,17 @@
 	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
 	import SearchPanel from '$lib/components/SearchPanel.svelte';
 	import ContextConfirmModal from '$lib/components/ContextConfirmModal.svelte';
+	import SearchResults from '$lib/components/SearchResults.svelte';
+	import ResultDetail from '$lib/components/ResultDetail.svelte';
+	import VectorIntelligenceDemo from '$lib/components/ai/VectorIntelligenceDemo.svelte';
 
 	let showRAGAssistant = $state(false);
 	let showCodebaseSearch = $state(false);
 	let showKagSearch = $state(false);
 	let showContextConfirm = $state(false);
+	let showChunkViewer = $state(false);
+	let showVectorSearch = $state(false);
+	let chunkViewerResult = $state<any>(null);
 	let contextConfirmData = $state<{ context_id: string; source: string; score: number; snippet: string; range?: { from_msg_id: number; to_msg_id: number }; timestamp?: string } | null>(null);
 	import { getConfidenceLevel, formatProcessingTime } from '$lib/utils';
 	import type { RetrievalContext, RankedChunk } from '$lib/machines/retrieval-machine.js';
@@ -780,6 +786,12 @@
 		<button class="rag-toggle-btn" class:active={showCodebaseSearch} onclick={() => (showCodebaseSearch = !showCodebaseSearch)}>
 			{showCodebaseSearch ? '[-] HIDE CODEBASE SEARCH' : '[+] CODEBASE SEARCH (Ctrl+K)'}
 		</button>
+		<button class="rag-toggle-btn" class:active={showChunkViewer} onclick={() => (showChunkViewer = !showChunkViewer)}>
+			{showChunkViewer ? '[-] HIDE CHUNK VIEWER' : '[+] DOCUMENT CHUNK VIEWER'}
+		</button>
+		<button class="rag-toggle-btn" class:active={showVectorSearch} onclick={() => (showVectorSearch = !showVectorSearch)}>
+			{showVectorSearch ? '[-] HIDE VECTOR SEARCH' : '[+] VECTOR INTELLIGENCE'}
+		</button>
 		<button class="rag-toggle-btn" onclick={() => {
 			contextConfirmData = {
 				context_id: 'ctx-' + Date.now(),
@@ -806,6 +818,34 @@
 	{#if showCodebaseSearch}
 		<div class="rag-panel">
 			<CodebaseSearch />
+		</div>
+	{/if}
+	{#if showChunkViewer}
+		<div class="rag-panel">
+			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; min-height: 400px;">
+				<div>
+					<SearchResults
+						results={ragResults.map((r, i) => ({
+							chunk_id: r.chunk_id,
+							doc_id: r.source_id ?? r.source_title ?? 'unknown',
+							page: 1,
+							text: r.text ?? r.snippet ?? '',
+							relevance_score: r.score,
+							semantic_type: r.source_type,
+							rank: i + 1,
+						}))}
+						onselect={(result) => { chunkViewerResult = result; }}
+					/>
+				</div>
+				<div>
+					<ResultDetail result={chunkViewerResult} />
+				</div>
+			</div>
+		</div>
+	{/if}
+	{#if showVectorSearch}
+		<div class="rag-panel">
+			<VectorIntelligenceDemo />
 		</div>
 	{/if}
 </div>

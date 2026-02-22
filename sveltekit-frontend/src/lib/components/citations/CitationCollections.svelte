@@ -2,16 +2,16 @@
  import type { CitationCollection } from '$lib/types/citations';
  // Migrated to $effect
 
- let { onSelectCollection = () => {} } = $props<{
+ let { onSelectCollection = () => {} }: {
  onSelectCollection?: (collection: CitationCollection) => void;
- }>();
+ } = $props();
 
- let collections: CitationCollection[] = [];
- let isLoading = false;
- let error: string | null = null;
- let showCreateForm = false;
- let newCollectionName = '';
- let newCollectionColor = '#8B2332';
+ let collections = $state<CitationCollection[]>([]);
+ let isLoading = $state(false);
+ let error = $state<string | null>(null);
+ let showCreateForm = $state(false);
+ let newCollectionName = $state('');
+ let newCollectionColor = $state('#8B2332');
 
  const colors = [
  '#8B2332', // Burgundy
@@ -52,7 +52,7 @@
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-name: newCollectionName, color: newCollectionColor, newCollectionColor,
+name: newCollectionName, color: newCollectionColor,
  isPublic: false
  })
  });

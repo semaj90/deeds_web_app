@@ -13,6 +13,12 @@
   import EnhancedLegalAIChatWithSynthesis from '$lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte';
   import StreamingResponse from '$lib/components/StreamingResponse.svelte';
   import ChatMessages from '$lib/components/ChatMessages.svelte';
+  import ChatPanel from '$lib/components/ChatPanel.svelte';
+  import YorhaAIAssistant from '$lib/components/ai/YorhaAIAssistant.svelte';
+  import TypewriterResponse from '$lib/components/ai/TypewriterResponse.svelte';
+  import GamingAIButton from '$lib/components/ai/GamingAIButton.svelte';
+  import EnhancedAIChatTest from '$lib/components/ai/EnhancedAIChatTest.svelte';
+  import ContextualChatDemo from '$lib/components/ai/ContextualChatDemo.svelte';
 
   interface AIStats {
     activeChats: number;
@@ -56,6 +62,12 @@
   let showStreamingDemo = $state(false);
   let streamingText = $state('Analyzing the legal precedent for Smith v. Johnson (2024). The court held that under PC 187, the burden of proof requires...');
   let showChatHistory = $state(false);
+  let showEmbeddingChat = $state(false);
+  let showYorhaAssistant = $state(false);
+  let showTypewriter = $state(false);
+  let showGamingButton = $state(false);
+  let showEnhancedChat = $state(false);
+  let showContextualChat = $state(false);
   let chatHistoryMessages = $state([
     { id: 'msg-1', role: 'user', content: 'What are the key elements of PC 187?', timestamp: new Date(Date.now() - 300000).toISOString(), citations: [], evidence_references: [] },
     { id: 'msg-2', role: 'assistant', content: 'Under PC 187, murder is defined as the unlawful killing of a human being with malice aforethought. The key elements are: (1) a human being was killed, (2) the killing was unlawful, and (3) the killing was done with malice aforethought. See Smith v. Johnson for recent precedent.', timestamp: new Date(Date.now() - 240000).toISOString(), citations: ['PC 187', 'Smith v. Johnson'], evidence_references: [] },
@@ -306,6 +318,104 @@
       {#if showChatHistory}
         <div class="mt-3">
           <ChatMessages messages={chatHistoryMessages} />
+        </div>
+      {/if}
+    </div>
+
+    <!-- Embedding Chat (File Upload + Similarity) -->
+    <div class="mt-4">
+      <button
+        onclick={() => (showEmbeddingChat = !showEmbeddingChat)}
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/20 rounded-lg text-sand/80 hover:border-accent/40 transition text-sm font-medium"
+      >
+        {showEmbeddingChat ? 'Hide Embedding Chat' : 'Embedding Chat (File Upload + Similarity Search)'}
+      </button>
+      {#if showEmbeddingChat}
+        <div class="mt-3" style="height: 500px;">
+          <ChatPanel />
+        </div>
+      {/if}
+    </div>
+
+    <!-- YoRHa AI Assistant (WebSocket/SSE) -->
+    <div class="mt-4">
+      <button
+        onclick={() => (showYorhaAssistant = !showYorhaAssistant)}
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/20 rounded-lg text-sand/80 hover:border-accent/40 transition text-sm font-medium"
+      >
+        {showYorhaAssistant ? 'Hide YoRHa Assistant' : 'YoRHa AI Assistant (WebSocket/SSE Transport)'}
+      </button>
+      {#if showYorhaAssistant}
+        <div class="mt-3">
+          <YorhaAIAssistant userID="demo-user" theme="yorha" />
+        </div>
+      {/if}
+    </div>
+
+    <!-- Typewriter Response Demo -->
+    <div class="mt-4">
+      <button
+        onclick={() => (showTypewriter = !showTypewriter)}
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/20 rounded-lg text-sand/80 hover:border-accent/40 transition text-sm font-medium"
+      >
+        {showTypewriter ? 'Hide Typewriter Demo' : 'Typewriter Response (AI Thinking Animation)'}
+      </button>
+      {#if showTypewriter}
+        <div class="mt-3 bg-panel rounded-lg p-4 border border-sand/20">
+          <TypewriterResponse
+            text="Under California Penal Code Section 187, murder is defined as the unlawful killing of a human being, or a fetus, with malice aforethought. The prosecution must prove beyond a reasonable doubt that the defendant acted with either express or implied malice. Express malice exists when the defendant manifests a deliberate intention to take away the life of another. Implied malice exists when the killing results from an intentional act that is dangerous to human life, and the defendant knew the act was dangerous and consciously disregarded that danger."
+            speed={30}
+            enableThinking={true}
+            showControls={true}
+          />
+        </div>
+      {/if}
+    </div>
+
+    <!-- Gaming AI Button Demo -->
+    <div class="mt-4">
+      <button
+        onclick={() => (showGamingButton = !showGamingButton)}
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/20 rounded-lg text-sand/80 hover:border-accent/40 transition text-sm font-medium"
+      >
+        {showGamingButton ? 'Hide Gaming AI Button' : 'Gaming AI Button (YoRHa Mode Toggle)'}
+      </button>
+      {#if showGamingButton}
+        <div class="mt-3 bg-panel rounded-lg p-6 border border-sand/20 min-h-[200px] relative">
+          <p class="text-sand/60 text-sm mb-4">Interactive floating AI mode toggle with quick actions and animation states.</p>
+          <GamingAIButton
+            onSettingsClick={() => console.log('AI settings clicked')}
+          />
+        </div>
+      {/if}
+    </div>
+
+    <!-- Enhanced AI Chat (bits-ui Dialog) -->
+    <div class="mt-4">
+      <button
+        onclick={() => (showEnhancedChat = !showEnhancedChat)}
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/20 rounded-lg text-sand/80 hover:border-accent/40 transition text-sm font-medium"
+      >
+        {showEnhancedChat ? 'Hide Enhanced AI Chat' : 'Enhanced AI Chat (bits-ui Dialog + Streaming)'}
+      </button>
+      {#if showEnhancedChat}
+        <div class="mt-3">
+          <EnhancedAIChatTest bind:open={showEnhancedChat} title="Enhanced Legal AI Chat" />
+        </div>
+      {/if}
+    </div>
+
+    <!-- Contextual Chat Demo (HMM State Machine) -->
+    <div class="mt-4">
+      <button
+        onclick={() => (showContextualChat = !showContextualChat)}
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/20 rounded-lg text-sand/80 hover:border-accent/40 transition text-sm font-medium"
+      >
+        {showContextualChat ? 'Hide Contextual Chat' : 'Contextual Chat (HMM State Machine + Predictions)'}
+      </button>
+      {#if showContextualChat}
+        <div class="mt-3">
+          <ContextualChatDemo />
         </div>
       {/if}
     </div>

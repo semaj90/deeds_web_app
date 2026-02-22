@@ -4,14 +4,14 @@
 	import type { Document } from '$lib/types';
 	import { browser } from '$app/environment';
 	import { tick } from 'svelte';
-	import { Dialog } from "bits-ui";
+	import { DialogRoot, DialogTrigger, DialogPortal, DialogOverlay, DialogContent, DialogTitle, DialogClose } from "$lib/components/ui/dialog";
 import Button from "$lib/components/ui/Button.svelte";
 	import Input from "$lib/components/ui/Input.svelte";
 	import Card from "$lib/components/ui/card/Card.svelte";
 	import CardHeader from "$lib/components/ui/card/CardHeader.svelte";
 	import CardTitle from "$lib/components/ui/card/CardTitle.svelte";
 	import CardContent from "$lib/components/ui/card/CardContent.svelte";
-	import ScrollArea from "$lib/components/ui/scrollarea/ScrollArea.svelte";
+	// ScrollArea is a stub — using plain div with overflow
 	import Bot from '@lucide/svelte/icons/bot';
 	import UserIcon from '@lucide/svelte/icons/user';
 	import Send from '@lucide/svelte/icons/send';
@@ -21,8 +21,10 @@ import Button from "$lib/components/ui/Button.svelte";
 	import MessageCircle from '@lucide/svelte/icons/message-circle';
 	import Download from '@lucide/svelte/icons/download';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
-	import { getOllamaHealthEndpoint } from '$lib/utils/ollama-endpoint';
-	import type { ChatMessage } from '$lib/types/chat';
+	import { getOllamaEndpoint } from '$lib/utils/ollama-endpoint';
+	import type { ChatMessage as BaseChatMessage } from '$lib/types/chat';
+
+	type ChatMessage = BaseChatMessage & { loading?: boolean; error?: boolean };
 
 	// Props using Svelte 5 runes
 	let {
@@ -95,7 +97,7 @@ What would you like to explore today?`,
 				connectionStatus = isConnected ? 'connected' : 'error';
 			} else {
 				// Fallback: try to reach Ollama directly
-				const ollamaResponse = await fetch(getOllamaHealthEndpoint());
+				const ollamaResponse = await fetch(getOllamaEndpoint());
 				if (ollamaResponse.ok) {
 					isConnected = true;
 					connectionStatus = 'connected';
@@ -109,7 +111,7 @@ What would you like to explore today?`,
 
 			// Try direct Ollama connection as fallback
 			try {
-				const ollamaResponse = await fetch(getOllamaHealthEndpoint());
+				const ollamaResponse = await fetch(getOllamaEndpoint());
 				if (ollamaResponse.ok) {
 					isConnected = true;
 					connectionStatus = 'connected';
@@ -336,26 +338,26 @@ What would you like to explore today?`,
 	}
 </script>
 
-<Dialog.Root bind:open>
-	<Dialog.Trigger>
+<DialogRoot bind:open>
+	<DialogTrigger>
 		<Button variant="ghost" class="gap-2">
 			<MessageCircle class="h-4 w-4" />
 			{title}
 		</Button>
-	</Dialog.Trigger>
+	</DialogTrigger>
 
-	<Dialog.Portal>
-		<Dialog.Overlay class="fixed inset-0 bg-black/50" />
-		<Dialog.Content
+	<DialogPortal>
+		<DialogOverlay class="fixed inset-0 bg-black/50" />
+		<DialogContent
 			class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl max-h-[80vh] z-50 flex flex-col bg-white dark:bg-panel rounded-lg shadow-xl"
 		>
 			<!-- Header -->
 			<div class="flex items-center justify-between p-4 border-b dark:border-sand/20">
 				<div class="flex items-center gap-3">
 					<Bot class="h-5 w-5 text-info dark:text-info/80" />
-					<Dialog.Title class="text-lg font-semibold dark:text-white">
+					<DialogTitle class="text-lg font-semibold dark:text-white">
 						{title}
-					</Dialog.Title>
+					</DialogTitle>
 					{#if caseId}
 						<span class="px-2 py-1 bg-info/10 dark:bg-info/20 text-info dark:text-info/60 rounded text-xs font-medium">
 							Case {caseId}
@@ -394,14 +396,14 @@ What would you like to explore today?`,
 						<Trash2 class="h-4 w-4" />
 					</Button>
 
-					<Dialog.Close>
+					<DialogClose>
 						<Button variant="ghost" size="sm">✕</Button>
-					</Dialog.Close>
+					</DialogClose>
 				</div>
 			</div>
 
 			<!-- Messages -->
-			<ScrollArea class="flex-1 p-4">
+			<div class="flex-1 p-4 overflow-y-auto">
 				<div bind:this={messagesContainer} class="space-y-4">
 					{#each messages as message (message.id)}
 						<div class="flex gap-3 {message.role === 'user' ? 'flex-row-reverse' : ''}">
@@ -423,18 +425,19 @@ What would you like to explore today?`,
 								</div>
 
 								{#if message.metadata}
+									{@const meta = message.metadata as Record<string, any>}
 									<div class="flex items-center gap-2 mt-2 pt-2 border-t border-current/20">
 										<span class="px-2 py-1 bg-black/10 rounded text-xs font-medium">
-											{message.metadata.model ?? 'AI'}
+											{meta.model ?? 'AI'}
 										</span>
-										{#if message.metadata.provider}
+										{#if meta.provider}
 											<span class="px-2 py-1 bg-black/10 rounded text-xs font-medium">
-												{message.metadata.provider}
+												{meta.provider}
 											</span>
 										{/if}
-										{#if message.metadata.gpu}
+										{#if meta.gpu}
 											<span class="px-2 py-1 bg-black/10 rounded text-xs font-medium">
-												{message.metadata.gpu}
+												{meta.gpu}
 											</span>
 										{/if}
 									</div>
@@ -453,7 +456,7 @@ What would you like to explore today?`,
 						</div>
 					{/each}
 				</div>
-			</ScrollArea>
+			</div>
 
 			<!-- Input -->
 			<div class="p-4 border-t dark:border-sand/20">
@@ -492,9 +495,9 @@ What would you like to explore today?`,
 					<div class="text-xs text-sand/60">Enter to send • Shift+Enter for new line</div>
 				</div>
 			</div>
-		</Dialog.Content>
-	</Dialog.Portal>
-</Dialog.Root>
+		</DialogContent>
+	</DialogPortal>
+</DialogRoot>
 
 <style>
 	/* Custom styles for enhanced appearance */

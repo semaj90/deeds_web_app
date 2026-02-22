@@ -46,7 +46,7 @@
     /^[a-zA-Z0-9_\-\.]+$/.test(newName)
   );
 
-  let validationMessage = $derived(() => {
+  let validationMessage = $derived.by(() => {
     if (!newName.trim()) return 'Name cannot be empty';
     if (newName === tag?.name) return 'Name must be different';
     if (!/^[a-zA-Z0-9_\-\.]+$/.test(newName)) return 'Only letters, numbers, _, -, . allowed';
@@ -136,8 +136,8 @@
             placeholder="Enter new name..."
             disabled={isRenaming || success}
           />
-          {#if newName && validationMessage()}
-            <span class="validation-message">{validationMessage()}</span>
+          {#if newName && validationMessage}
+            <span class="validation-message">{validationMessage}</span>
           {/if}
         </div>
 

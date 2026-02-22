@@ -6,9 +6,11 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
 	import YoRHaDetectiveCommandCenter from '$lib/components/yorha/YoRHaDetectiveCommandCenter.svelte';
+	import PhoenixProsecutorDashboard from '$lib/components/yorha/PhoenixProsecutorDashboard.svelte';
 
 	let showCodebaseSearch = $state(false);
 	let showDetectiveCenter = $state(false);
+	let showProsecutorDashboard = $state(false);
 	import { goto } from '$app/navigation';
 	import Activity from '@lucide/svelte/icons/activity';
 	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
@@ -855,6 +857,18 @@ totalCases: 5.2,
 	{#if showDetectiveCenter}
 		<div class="codebase-search-panel">
 			<YoRHaDetectiveCommandCenter currentUser={data.user} />
+		</div>
+	{/if}
+
+	<!-- Phoenix Prosecutor Dashboard -->
+	<div class="codebase-search-toggle">
+		<button class="codebase-toggle-btn" class:active={showProsecutorDashboard} onclick={() => (showProsecutorDashboard = !showProsecutorDashboard)}>
+			{showProsecutorDashboard ? '[-] HIDE PROSECUTOR DASHBOARD' : '[+] PHOENIX PROSECUTOR DASHBOARD'}
+		</button>
+	</div>
+	{#if showProsecutorDashboard}
+		<div class="codebase-search-panel">
+			<PhoenixProsecutorDashboard />
 		</div>
 	{/if}
 </div>

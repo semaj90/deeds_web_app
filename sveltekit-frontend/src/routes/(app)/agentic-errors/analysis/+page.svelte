@@ -1,10 +1,12 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import AgenticController from '$lib/components/agentic/AgenticController.svelte';
 
 	const { data } = $props<{ data: PageData }>();
 
 	let generating = $state(false);
 	let selectedCluster = $state<any>(null);
+	let showAgenticController = $state(false);
 
 	async function generateAnalysis() {
 		generating = true;
@@ -45,6 +47,21 @@
 			{/if}
 		</button>
 	</div>
+
+	<!-- Agentic Controller (error query + fix suggestions) -->
+	<div class="mb-4">
+		<button
+			onclick={() => (showAgenticController = !showAgenticController)}
+			class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-600 rounded-lg transition text-sm font-mono"
+		>
+			{showAgenticController ? '[-] Hide Agentic Controller' : '[+] Agentic Error Controller'}
+		</button>
+	</div>
+	{#if showAgenticController}
+		<div class="mb-6">
+			<AgenticController />
+		</div>
+	{/if}
 
 	{#if !data.hasGeminiKey}
 		<div class="p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-lg">

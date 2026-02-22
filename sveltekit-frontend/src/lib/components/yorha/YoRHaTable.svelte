@@ -15,6 +15,19 @@
     [key: string]: any;
   }
 
+  interface Props {
+    columns: TableColumn[];
+    data: TableRow[];
+    loading?: boolean;
+    selectable?: boolean;
+    sortable?: boolean;
+    pagination?: boolean;
+    pageSize?: number;
+    className?: string;
+    dense?: boolean;
+    actionsSnippet?: Snippet<[TableRow, number]>;
+  }
+
   let {
     columns = [],
     data = [],
@@ -26,18 +39,7 @@
     className = '',
     dense = false,
     actionsSnippet
-  } = $props<{
-    columns: TableColumn[];
-	data: TableRow[];
-    loading?: boolean;
-    selectable?: boolean;
-    sortable?: boolean;
-    pagination?: boolean;
-    pageSize?: number;
-    className?: string;
-    dense?: boolean;
-    actionsSnippet?: Snippet<[TableRow, number]>;
-  }>();
+  }: Props = $props();
 
   let selectedRows = $state(new Set<string | number>());
   let sortColumn = $state<string | null>(null);

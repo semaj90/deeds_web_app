@@ -3,6 +3,11 @@
 	import RouteOperationsDashboard from '$lib/components/RouteOperationsDashboard.svelte';
 	import RouteInspectorModal from '$lib/components/RouteInspectorModal.svelte';
 	import RouteDecisionModal from '$lib/components/RouteDecisionModal.svelte';
+	import RoutesList from '$lib/components/RoutesList.svelte';
+	import PhaseStatusPills from '$lib/components/PhaseStatusPills.svelte';
+	import RouteInspectorDetectiveBoard from '$lib/components/RouteInspectorDetectiveBoard.svelte';
+	import NESGraphRenderer from '$lib/components/NESGraphRenderer.svelte';
+	import RouteInspectorWorking from '$lib/components/RouteInspectorWorking.svelte';
 
 	const { data }: { data: PageData } = $props();
 	let showDecisionModal = $state(false);
@@ -19,6 +24,10 @@
 	let analyzeLoading = $state(false);
 	let showOpsLog = $state(false);
 	let showInspector = $state(false);
+	let showSimpleRoutes = $state(false);
+	let showDetectiveBoard = $state(false);
+	let showRouteGraph = $state(false);
+	let showWorkingInspector = $state(false);
 
 	$effect(() => {
 		routes = Array.isArray(data.routes) ? data.routes : [];
@@ -273,6 +282,12 @@
 		<button class="cap-item cap-ops" onclick={() => (showOpsLog = !showOpsLog)}>
 			{showOpsLog ? '[-] HIDE OPS LOG' : '[+] OPS LOG'}
 		</button>
+		<button class="cap-item cap-ops" onclick={() => (showSimpleRoutes = !showSimpleRoutes)}>
+			{showSimpleRoutes ? '[-] HIDE SIMPLE LIST' : '[+] SIMPLE LIST'}
+		</button>
+		<button class="cap-item cap-ops" onclick={() => (showRouteGraph = !showRouteGraph)}>
+			{showRouteGraph ? '[-] HIDE GRAPH' : '[+] ROUTE GRAPH'}
+		</button>
 		<button class="cap-item cap-ops" onclick={() => {
 			if (selectedRoute) {
 				decisionRoute = { path: selectedRoute.path ?? selectedRoute.id, reason: selectedRoute.errorState === 'broken' ? 'Route is broken' : selectedRoute.errorState === 'flaky' ? 'Route is flaky' : 'Routine review', decision: null };
@@ -302,10 +317,47 @@
 		</div>
 	{/if}
 
+	<!-- Phase Status Pills -->
+	<PhaseStatusPills />
+
 	<!-- Operations Log Panel (collapsible) -->
 	{#if showOpsLog}
 		<div class="ops-log-panel">
 			<RouteOperationsDashboard />
+		</div>
+	{/if}
+
+	<!-- Simple Route List (collapsible) -->
+	{#if showSimpleRoutes}
+		<div class="ops-log-panel">
+			<RoutesList />
+		</div>
+	{/if}
+
+	<!-- NES Route Topology Graph (collapsible) -->
+	{#if showRouteGraph}
+		<div class="ops-log-panel" style="height: 500px; overflow: hidden;">
+			<NESGraphRenderer
+				nodes={filteredRoutes.slice(0, 40).map((r, i) => ({
+					id: r.id ?? r.path ?? String(i),
+					x: 100 + (i % 8) * 130,
+					y: 80 + Math.floor(i / 8) * 100,
+					type: r.errorState === 'broken' ? 'error' : r.group ? 'cluster' : 'route',
+					label: r.path ?? r.id ?? 'unknown',
+					data: r
+				}))}
+				edges={filteredRoutes.slice(0, 40).flatMap((r, i) => {
+					const edges = [];
+					if (r.group) {
+						const groupPeer = filteredRoutes.findIndex((o, j) => j !== i && o.group === r.group);
+						if (groupPeer >= 0) edges.push({ from: r.id ?? r.path ?? String(i), to: filteredRoutes[groupPeer].id ?? filteredRoutes[groupPeer].path ?? String(groupPeer), type: 'related' });
+					}
+					if (r.errorState === 'broken' && i > 0) edges.push({ from: r.id ?? r.path ?? String(i), to: filteredRoutes[0].id ?? filteredRoutes[0].path ?? '0', type: 'error' });
+					return edges;
+				})}
+				width={1200}
+				height={480}
+			/>
 		</div>
 	{/if}
 
@@ -538,6 +590,12 @@
 				<button class="nes-btn" onclick={() => { showInspector = true; }}>
 					INSPECT
 				</button>
+				<button class="nes-btn" onclick={() => { showWorkingInspector = true; }}>
+					WORKING
+				</button>
+				<button class="nes-btn" onclick={() => { showDetectiveBoard = true; }}>
+					DETECTIVE
+				</button>
 				<button class="nes-btn" onclick={closeModal}>
 					CLOSE
 				</button>
@@ -548,6 +606,10 @@
 
 <!-- Route Inspector Modal (YoRHa-themed detail view) -->
 <RouteInspectorModal bind:open={showInspector} route={selectedRoute ? { path: selectedRoute.path, kind: selectedRoute.kind ?? 'page', file: selectedRoute.file ?? '', summary: selectedRoute.summary ?? `Route: ${selectedRoute.path}`, category: selectedRoute.group, health: selectedRoute.errorState === 'healthy' ? 'green' : selectedRoute.errorState === 'flaky' ? 'yellow' : selectedRoute.errorState === 'broken' ? 'red' : undefined, errorCount: selectedRoute.errorCount, lastErrorMessage: selectedRoute.lastErrorMessage } : null} />
+
+<RouteInspectorDetectiveBoard bind:open={showDetectiveBoard} route={selectedRoute ? { path: selectedRoute.path ?? selectedRoute.id, kind: selectedRoute.kind ?? 'page', file: selectedRoute.file ?? '', summary: selectedRoute.summary ?? `Route: ${selectedRoute.path}`, category: selectedRoute.group, health: selectedRoute.errorState === 'healthy' ? 'green' : selectedRoute.errorState === 'flaky' ? 'yellow' : selectedRoute.errorState === 'broken' ? 'red' : undefined, errorCount: selectedRoute.errorCount, lastErrorMessage: selectedRoute.lastErrorMessage } : null} />
+
+<RouteInspectorWorking bind:open={showWorkingInspector} route={selectedRoute ? { path: selectedRoute.path, route: selectedRoute.path, file: selectedRoute.file ?? '', category: selectedRoute.group } : null} />
 
 <RouteDecisionModal bind:open={showDecisionModal} bind:route={decisionRoute} onclose={() => { showDecisionModal = false; decisionRoute = null; }} />
 

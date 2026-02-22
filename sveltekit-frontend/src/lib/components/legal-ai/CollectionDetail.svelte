@@ -10,10 +10,12 @@
 	created_at: string;
  }
 
- let { collection, ondeleted } = $props<{
- collection: Collection;
- ondeleted?: (data: any) => void;
- }>();
+ interface Props {
+   collection: Collection;
+   ondeleted?: (data: any) => void;
+ }
+
+ let { collection, ondeleted }: Props = $props();
 let citations: any[] = $state([]);
  let isLoading = $state(true);
  let error: string | null = $state(null);

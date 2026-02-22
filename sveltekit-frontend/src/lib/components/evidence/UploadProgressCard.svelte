@@ -12,7 +12,7 @@
 
   let {filename='',fileSize=0,onCancel,onRetry}:Props=$props();
 
-  let uploadState=$state({filename:'',progress:0,status:'idle'});
+  let uploadState=$state<UploadState>({filename:'',progress:0,status:'idle'});
 
   let pct=$derived(Math.round(uploadState.progress*100));
 

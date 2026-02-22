@@ -5,10 +5,13 @@
 	import CustodyTimeline from '$lib/components/legal/CustodyTimeline.svelte';
 	import EvidenceModal from '$lib/components/modals/EvidenceModal.svelte';
 	import EvidenceCard from '$lib/components/EvidenceCard.svelte';
+	import LazyLoader from '$lib/components/LazyLoader.svelte';
+	import EvidenceStats from '$lib/components/yorha/evidence/EvidenceStats.svelte';
 
 	let { data }: { data: PageData } = $props();
 	let showReportGenerator = $state(false);
 	let showEvidenceCards = $state(false);
+	let showEvidenceStats = $state(false);
 
 	const sampleEvidenceItems: any[] = [
 		{ id: 'ev-001', file_name: 'Contract_Agreement_2024.pdf', evidence_type: 'document', file_type: 'application/pdf', file_size: 2_400_000, uploaded_at: new Date(Date.now() - 86400000 * 5), ai_summary: 'Employment agreement with non-compete clause. Contains liability provisions in Section 4.', tags: ['contract', 'employment'], ai_tags: ['legal-binding', 'non-compete'] },
@@ -26,7 +29,26 @@
 	];
 </script>
 
-<EvidenceAnalysisDashboard caseId={data.caseId} />
+<div class="report-section">
+	<button
+		class="report-toggle"
+		style="border-color: #8b5cf6; color: #8b5cf6; background: rgba(139,92,246,0.15);"
+		onclick={() => (showEvidenceStats = !showEvidenceStats)}
+	>
+		{showEvidenceStats ? 'Hide Evidence Stats' : 'Evidence Processing Stats'}
+	</button>
+</div>
+{#if showEvidenceStats}
+	<div class="report-container">
+		<EvidenceStats />
+	</div>
+{/if}
+
+<LazyLoader placeholderHeight="400px" loadingText="Loading Evidence Dashboard...">
+	{#snippet children()}
+		<EvidenceAnalysisDashboard caseId={data.caseId} />
+	{/snippet}
+</LazyLoader>
 
 <div class="report-section">
 	<button

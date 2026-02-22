@@ -8,9 +8,13 @@ import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
 import Button from '$lib/components/ui/Button.svelte';
 import Phase72ErrorBrain from '$lib/components/Phase72ErrorBrain.svelte';
 import ErrorStreamMonitor from '$lib/components/ErrorStreamMonitor.svelte';
+import ErrorModal from '$lib/components/phase78/ErrorModal.svelte';
+import PhoenixEventMonitor from '$lib/components/yorha/PhoenixEventMonitor.svelte';
 // Migrated to $effect
 
  let showErrorStream = $state(false);
+ let showErrorModal = $state(false);
+ let showPhoenixMonitor = $state(false);
 
  let status = $state<any>(null);
  let runs = $state<any[]>([]);
@@ -80,11 +84,15 @@ import ErrorStreamMonitor from '$lib/components/ErrorStreamMonitor.svelte';
  <Button class="bits-btn" onclick={createRun}>Create New Run</Button>
 	<Button class="bits-btn" onclick={() => (showErrorBrain = true)}>Phase 72 Error Brain</Button>
 	<Button class="bits-btn" onclick={() => (showErrorStream = !showErrorStream)}>{showErrorStream ? 'Hide Stream' : 'Error Stream'}</Button>
+	<Button class="bits-btn" onclick={() => (showPhoenixMonitor = !showPhoenixMonitor)}>{showPhoenixMonitor ? 'Hide Phoenix' : 'Phoenix Events'}</Button>
+	<Button class="bits-btn" onclick={() => { if (selectedRoute) showErrorModal = true; }}>Error Modal</Button>
  </div>
 
  {#if showErrorBrain}
 	<Phase72ErrorBrain routePath={selectedRoute} onClose={() => (showErrorBrain = false)} />
  {/if}
+
+ <ErrorModal bind:open={showErrorModal} routePath={selectedRoute ?? ''} onClose={() => (showErrorModal = false)} />
 
  {#if showErrorStream}
 	<Card class="mb-4">
@@ -93,6 +101,18 @@ import ErrorStreamMonitor from '$lib/components/ErrorStreamMonitor.svelte';
 		</CardHeader>
 		<CardContent>
 			<ErrorStreamMonitor />
+		</CardContent>
+	</Card>
+ {/if}
+
+ {#if showPhoenixMonitor}
+	<Card class="mb-4">
+		<CardHeader>
+			<CardTitle>Phoenix AI Event Monitor</CardTitle>
+			<CardDescription>SSE-based real-time event stream from /agentic/events</CardDescription>
+		</CardHeader>
+		<CardContent>
+			<PhoenixEventMonitor show={showPhoenixMonitor} />
 		</CardContent>
 	</Card>
  {/if}

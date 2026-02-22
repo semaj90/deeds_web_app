@@ -1,6 +1,6 @@
 <script lang="ts">
+  import { toastStore as toast } from '$lib/stores/unified/toast-store.svelte';
   import Button from '$lib/components/ui/Button.svelte';
-  import { toast } from 'svelte-sonner';
   import Upload from '@lucide/svelte/icons/upload';
   import FileText from '@lucide/svelte/icons/file-text';
   import ImageIcon from '@lucide/svelte/icons/image';

@@ -20,7 +20,14 @@ import StatuteModal from '$lib/components/charges/StatuteModal.svelte';
 import CaseStatuteLinks from '$lib/components/legal-ai/CaseStatuteLinks.svelte';
 import ContractAnalyzer from '$lib/components/legal/ContractAnalyzer.svelte';
 import LegalDocumentEditor from '$lib/components/editor/LegalDocumentEditor.svelte';
-import type { SimilarCase } from '$lib/types/case-summary';
+import CanvasEditor from '$lib/components/CanvasEditor.svelte';
+import HeadlessTypingListener from '$lib/components/HeadlessTypingListener.svelte';
+import SummaryEditor from '$lib/components/case/SummaryEditor.svelte';
+import ReportToolbar from '$lib/components/editor/ReportToolbar.svelte';
+import NierRichTextEditor from '$lib/components/editors/NierRichTextEditor.svelte';
+import CaseDocumentWriter from '$lib/components/legal-ai/CaseDocumentWriter.svelte';
+import TiptapWithAIAssistant from '$lib/components/editor/TiptapWithAIAssistant.svelte';
+import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  import { CacheStrategies, useCache } from '$lib/cache/cache-service.svelte';
  import NesModal from '$lib/components/nes/NesModal.svelte';
 
@@ -52,7 +59,9 @@ import type { SimilarCase } from '$lib/types/case-summary';
  let exportPacketError = $state('');
  let showDescriptionEditor = $state(false);
  let caseDescription = $state('');
- let editorMode = $state<'wysiwyg' | 'tiptap'>('wysiwyg');
+ let editorMode = $state<'wysiwyg' | 'tiptap' | 'ai-tiptap' | 'nier'>('wysiwyg');
+ let showDocumentWriter = $state(false);
+ let typingPrompts = $state<string[]>([]);
 
  // Citation & Statute state
  interface CitationLink {
@@ -79,7 +88,18 @@ import type { SimilarCase } from '$lib/types/case-summary';
  let isLoadingCitations = $state(false);
  let isLoadingStatutes = $state(false);
  let showCitationModal = $state(false);
- let activeTab = $state<'evidence' | 'citations' | 'theory' | 'cross-exam' | 'prediction' | 'timeline' | 'statutes' | 'contract' | 'document'>('evidence');
+ let activeTab = $state<'evidence' | 'citations' | 'theory' | 'cross-exam' | 'prediction' | 'timeline' | 'statutes' | 'contract' | 'document' | 'canvas' | 'summary'>('evidence');
+ let caseSummary = $state<CaseSummary>({
+   id: 'summary-1',
+   caseId: '',
+   text: '',
+   citations: [],
+   holding: '',
+   version: 1,
+   createdAt: new Date().toISOString(),
+   createdBy: 'system',
+   isCurrent: true
+ });
  let similarCases = $state<SimilarCase[]>([]);
  let isLoadingSimilar = $state(false);
  let selectedStatute = $state<any>(null);
@@ -391,6 +411,8 @@ import type { SimilarCase } from '$lib/types/case-summary';
    <div class="mt-2 mb-2 flex gap-2">
      <button onclick={() => (editorMode = 'wysiwyg')} class="text-xs px-2 py-1 rounded {editorMode === 'wysiwyg' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}">Rich Editor</button>
      <button onclick={() => (editorMode = 'tiptap')} class="text-xs px-2 py-1 rounded {editorMode === 'tiptap' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}">TipTap Editor</button>
+     <button onclick={() => (editorMode = 'ai-tiptap')} class="text-xs px-2 py-1 rounded {editorMode === 'ai-tiptap' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'}">AI Editor</button>
+     <button onclick={() => (editorMode = 'nier')} class="text-xs px-2 py-1 rounded {editorMode === 'nier' ? 'bg-gray-800 text-green-400' : 'bg-gray-200 text-gray-700'}">NieR Editor</button>
    </div>
    <div class="mt-2">
      {#if editorMode === 'wysiwyg'}
@@ -401,6 +423,16 @@ import type { SimilarCase } from '$lib/types/case-summary';
          enableCitation={true}
          onchange={(detail) => { caseDescription = detail.content; }}
        />
+     {:else if editorMode === 'ai-tiptap'}
+       <TiptapWithAIAssistant
+         initialContent={caseDescription}
+         placeholder="Write case description with AI assistance..."
+         onUpdate={(html) => { caseDescription = html; }}
+       />
+     {:else if editorMode === 'nier'}
+       <div style="height: 250px;">
+         <NierRichTextEditor bind:value={caseDescription} placeholder="Case description..." caseId={caseId} />
+       </div>
      {:else}
        <TipTapEditor
          content={caseDescription}
@@ -409,6 +441,25 @@ import type { SimilarCase } from '$lib/types/case-summary';
        />
      {/if}
    </div>
+   <!-- Headless Typing Listener — contextual AI prompts while editing -->
+   <HeadlessTypingListener
+     bind:text={caseDescription}
+     enableContextualPrompts={true}
+     enableAnalytics={true}
+     oncontextualPrompt={(e) => { typingPrompts = e.detail.prompts; }}
+   />
+   {#if typingPrompts.length > 0}
+     <div class="mt-2 flex flex-wrap gap-2">
+       {#each typingPrompts as prompt}
+         <button
+           class="text-xs px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full hover:bg-blue-100 transition"
+           onclick={() => { console.log('AI prompt:', prompt); typingPrompts = []; }}
+         >
+           {prompt}
+         </button>
+       {/each}
+     </div>
+   {/if}
  {/if}
  </div>
  </header>
@@ -515,6 +566,18 @@ import type { SimilarCase } from '$lib/types/case-summary';
      class={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === 'document' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
    >
      Document
+   </button>
+   <button
+     onclick={() => (activeTab = 'canvas')}
+     class={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === 'canvas' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+   >
+     Canvas
+   </button>
+   <button
+     onclick={() => (activeTab = 'summary')}
+     class={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === 'summary' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+   >
+     Summary
    </button>
  </div>
 
@@ -710,6 +773,23 @@ import type { SimilarCase } from '$lib/types/case-summary';
    documentType="brief"
    title={caseData?.title ?? 'Legal Document'}
  />
+ {:else if activeTab === 'canvas'}
+ <!-- Evidence Canvas Tab -->
+ <CanvasEditor
+   canvasState={null}
+   reportId={caseId}
+   evidence={evidence.map(e => ({ id: e.id, title: e.fileName, evidenceType: e.documentType }))}
+   citationPoints={citations.map(c => ({ id: c.id, source: c.citationText ?? 'Citation' }))}
+   save={async (state) => { console.log('Canvas state saved:', state); }}
+ />
+ {:else if activeTab === 'summary'}
+ <!-- Case Summary Editor Tab -->
+ <div class="bg-white rounded-lg shadow p-6">
+   <ReportToolbar />
+   <div class="mt-4">
+     <SummaryEditor summary={caseSummary} {caseId} />
+   </div>
+ </div>
  {/if}
 
  </div>
@@ -799,4 +879,16 @@ import type { SimilarCase } from '$lib/types/case-summary';
    onAttach={(charge) => { showStatuteModal = false; selectedStatute = null; loadStatutes(); }}
  />
  {/if}
+
+<!-- Case Document Writer Dialog -->
+<CaseDocumentWriter bind:isOpen={showDocumentWriter} />
+
+<!-- Floating Write Document Button -->
+<button
+  onclick={() => (showDocumentWriter = true)}
+  class="fixed bottom-6 right-6 z-40 px-4 py-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition text-sm font-medium"
+  title="Write Case Document"
+>
+  Write Document
+</button>
 </div>

@@ -7,12 +7,14 @@
     timestamp?: string;
   }
 
-  let { evidenceA, evidenceB, show = false, onDismiss } = $props<{
+  interface Props {
     evidenceA: EvidenceItem;
-	evidenceB: EvidenceItem;
+    evidenceB: EvidenceItem;
     show?: boolean;
     onDismiss?: () => void;
-  }>();
+  }
+
+  let { evidenceA, evidenceB, show = false, onDismiss }: Props = $props();
 
   function close() {
     onDismiss?.();

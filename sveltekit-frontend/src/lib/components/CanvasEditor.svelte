@@ -27,13 +27,15 @@
    evidenceType: string;
  }
 
- let { canvasState, reportId, evidence = [], citationPoints = [], save } = $props<{
+ interface Props {
    canvasState: CanvasState | null;
    reportId: string;
-   evidence: EvidenceItem[];
-   citationPoints: CitationPoint[];
+   evidence?: EvidenceItem[];
+   citationPoints?: CitationPoint[];
    save: (canvasState: CanvasState) => Promise<void>;
- }>();
+ }
+
+ let { canvasState, reportId, evidence = [], citationPoints = [], save }: Props = $props();
 
  // Reactive derived value from props
  let currentCanvasElements = $derived(((canvasState?.stateData ?? []) as CanvasElement[]));

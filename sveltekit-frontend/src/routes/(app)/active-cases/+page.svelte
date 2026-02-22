@@ -5,11 +5,14 @@
 	import CaseCardGrid from '$lib/components/dashboard/CaseCardGrid.svelte';
 	import ErrorAlert from '$lib/components/case/ErrorAlert.svelte';
 	import SearchBar from '$lib/components/SearchBar.svelte';
+	import CaseCard from '$lib/components/cases/CaseCard.svelte';
+	import CaseScoringDashboard from '$lib/components/ai/CaseScoringDashboard.svelte';
 	import type { PageData } from './$types';
 
 	const { data }: { data: PageData } = $props();
 
-	let viewMode = $state<'list' | 'cards'>('list');
+	let viewMode = $state<'list' | 'cards' | 'rich'>('list');
+	let showScoring = $state(false);
 	let caseSearchQuery = $state('');
 
 	let filteredActiveCases = $derived.by(() => {
@@ -34,6 +37,21 @@
 			evidence: [],
 		}))
 	);
+
+	let richCaseCards = $derived(
+		filteredActiveCases.map((c: any) => ({
+			id: c.id,
+			title: c.title ?? 'Untitled',
+			description: c.description ?? '',
+			status: (c.status === 'active' || c.status === 'pending' || c.status === 'closed' || c.status === 'archived') ? c.status : 'active' as const,
+			priority: (c.priority === 'critical' || c.priority === 'high' || c.priority === 'medium' || c.priority === 'low') ? c.priority : 'medium' as const,
+			created: c.createdAt ?? new Date().toISOString(),
+			updated: c.updatedAt,
+			stats: { evidence: c.evidenceCount ?? 0, witnesses: c.witnessCount ?? 0, documents: c.documentCount ?? 0 },
+			tags: c.tags ?? [],
+			progress: c.progress,
+		}))
+	);
 </script>
 
 <div class="active-cases-page">
@@ -55,6 +73,9 @@
 				</button>
 				<button onclick={() => (viewMode = 'cards')} class="view-btn" class:active={viewMode === 'cards'}>
 					Cards
+				</button>
+				<button onclick={() => (viewMode = 'rich')} class="view-btn" class:active={viewMode === 'rich'}>
+					Rich
 				</button>
 			</div>
 		</div>
@@ -88,9 +109,35 @@
 
 	<CaseStats />
 
+	<!-- AI Case Scoring Toggle -->
+	<div class="scoring-toggle">
+		<button onclick={() => (showScoring = !showScoring)} class="view-btn" class:active={showScoring}>
+			{showScoring ? 'Hide Scoring' : 'AI Scoring'}
+		</button>
+	</div>
+
+	{#if showScoring}
+		<div style="margin-bottom: 1.25rem;">
+			<CaseScoringDashboard />
+		</div>
+	{/if}
+
 	{#if viewMode === 'list'}
 		<CaseFilters />
 		<CasesList />
+	{:else if viewMode === 'rich'}
+		<div class="rich-cards-grid">
+			{#each richCaseCards as caseItem (caseItem.id)}
+				<CaseCard
+					{caseItem}
+					onView={(id) => { window.location.href = `/cases/${id}`; }}
+					onEdit={(id) => { window.location.href = `/cases/${id}`; }}
+				/>
+			{/each}
+			{#if richCaseCards.length === 0}
+				<p class="empty-msg">No cases found.</p>
+			{/if}
+		</div>
 	{:else}
 		<CaseCardGrid cases={cardCases} isLoading={false} />
 	{/if}
@@ -206,5 +253,24 @@
 		color: #94a3b8;
 		font-family: monospace;
 		white-space: nowrap;
+	}
+
+	.rich-cards-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+		gap: 1.25rem;
+	}
+
+	.scoring-toggle {
+		margin-bottom: 1rem;
+	}
+
+	.empty-msg {
+		color: #94a3b8;
+		font-family: monospace;
+		font-size: 0.85rem;
+		grid-column: 1 / -1;
+		text-align: center;
+		padding: 2rem;
 	}
 </style>

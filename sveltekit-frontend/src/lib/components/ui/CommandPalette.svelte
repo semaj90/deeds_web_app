@@ -17,7 +17,7 @@
   // Define the command item type
   interface CommandItem { id: string, title: string;
     description: string;
-    icon: unknown;
+    icon: any;
     category: string;
     href?: string;
     shortcut?: string[];

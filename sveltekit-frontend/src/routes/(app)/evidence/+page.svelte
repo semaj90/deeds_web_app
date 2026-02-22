@@ -14,12 +14,23 @@
 	import LegalAnalysisDialog from '$lib/components/LegalAnalysisDialog.svelte';
 	import IntegrityVerification from '$lib/components/legal/IntegrityVerification.svelte';
 	import EnhancedDocumentUploader from '$lib/components/ai/EnhancedDocumentUploader.svelte';
+	import EnhancedFileUpload from '$lib/components/forms/EnhancedFileUpload.svelte';
 	import ContextualEvidenceChatModal from '$lib/components/ai/ContextualEvidenceChatModal.svelte';
 	import CaseSelector from '$lib/components/CaseSelector.svelte';
 	import UploadProgress from '$lib/components/UploadProgress.svelte';
 	import ActionPopup from '$lib/components/ActionPopup.svelte';
+	import EvidenceUpload from '$lib/components/evidence/EvidenceUpload.svelte';
+	import EvidenceFilters from '$lib/components/yorha/evidence/EvidenceFilters.svelte';
+	import DocumentUploadMachineIntegration from '$lib/components/DocumentUploadMachineIntegration.svelte';
+	import UploadProgressCard from '$lib/components/evidence/UploadProgressCard.svelte';
+	import LegalDocumentSummarizer from '$lib/components/ai/LegalDocumentSummarizer.svelte';
+	import EnhancedLegalProcessor from '$lib/components/legal/EnhancedLegalProcessor.svelte';
+	import UploadZone from '$lib/components/yorha/evidence/UploadZone.svelte';
+	import EvidenceComparisonOverlay from '$lib/components/yorha/evidence/EvidenceComparisonOverlay.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
+	let uploadCard = $state<UploadProgressCard | undefined>(undefined);
+	let showAdvancedFilters = $state(false);
 	let actionPopupFile = $state<{ name: string } | null>(null);
 	let showCaseSelector = $state(false);
 	let linkedCaseTitle = $state('');
@@ -60,6 +71,15 @@
 	let legalAnalysisTitle = $state('Legal Analysis');
 	let showEnhancedUpload = $state(false);
 	let showEvidenceChat = $state(false);
+	let showEnhancedFileUpload = $state(false);
+	let showBulkUpload = $state(false);
+	let showXStateUpload = $state(false);
+	let showSummarizer = $state(false);
+	let showLegalProcessor = $state(false);
+	let showYorhaUpload = $state(false);
+	let showComparison = $state(false);
+	let comparisonA = $state<{ id: string; fileName: string; extractedText: string; caseId?: string; timestamp?: string }>({ id: '', fileName: '', extractedText: '' });
+	let comparisonB = $state<{ id: string; fileName: string; extractedText: string; caseId?: string; timestamp?: string }>({ id: '', fileName: '', extractedText: '' });
 
 	// Backend semantic search state
 	let searchMode = $state<'local' | 'semantic'>('local');
@@ -256,11 +276,79 @@
 				<button onclick={() => { crudMode = 'create'; crudEvidenceId = undefined; showCrudModal = true; }} class="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/80 transition text-sm font-medium">
 					+ Create with AI
 				</button>
+				<button onclick={() => (showBulkUpload = !showBulkUpload)} class="px-4 py-2 bg-warning text-white rounded-lg hover:bg-warning/80 transition text-sm font-medium">
+					{showBulkUpload ? 'Hide Bulk Upload' : '+ Bulk Upload'}
+				</button>
+				<button onclick={() => (showXStateUpload = !showXStateUpload)} class="px-4 py-2 bg-sand/80 text-white rounded-lg hover:bg-sand/60 transition text-sm font-medium">
+					{showXStateUpload ? 'Hide XState Upload' : 'XState Upload'}
+				</button>
+				<button onclick={() => (showSummarizer = !showSummarizer)} class="px-4 py-2 bg-info/80 text-white rounded-lg hover:bg-info/60 transition text-sm font-medium">
+					{showSummarizer ? 'Hide Summarizer' : 'AI Summarizer'}
+				</button>
+				<button onclick={() => (showYorhaUpload = !showYorhaUpload)} class="px-4 py-2 bg-panelSoft text-sand rounded-lg hover:bg-panel transition text-sm font-medium">
+					{showYorhaUpload ? 'Hide YoRHa Upload' : 'YoRHa Upload'}
+				</button>
+				<button onclick={() => {
+					const items = data.evidence ?? [];
+					if (items.length >= 2) {
+						comparisonA = { id: items[0].id, fileName: items[0].title ?? items[0].filename ?? 'Evidence A', extractedText: items[0].description ?? 'No text extracted yet', caseId: data.caseId ?? undefined };
+						comparisonB = { id: items[1].id, fileName: items[1].title ?? items[1].filename ?? 'Evidence B', extractedText: items[1].description ?? 'No text extracted yet', caseId: data.caseId ?? undefined };
+						showComparison = true;
+					}
+				}} class="px-4 py-2 bg-sand/20 text-sand rounded-lg hover:bg-sand/30 transition text-sm font-medium">
+					Compare
+				</button>
 				<a href="/evidence/upload" class="px-4 py-2 bg-info text-white rounded-lg hover:bg-info/80 transition text-sm font-medium">
 					+ Upload Evidence
 				</a>
 			</div>
 		</div>
+
+		<!-- Bulk Upload (Multi-file with metadata) -->
+		{#if showBulkUpload}
+			<div class="mb-6">
+				<EvidenceUpload caseId={data.caseId ?? ''} onUploadComplete={(uploads) => { showBulkUpload = false; window.location.reload(); }} />
+			</div>
+		{/if}
+
+		<!-- XState Document Upload Machine (state-machine driven upload pipeline) -->
+		{#if showXStateUpload}
+			<div class="mb-6">
+				<DocumentUploadMachineIntegration />
+			</div>
+		{/if}
+
+		<!-- Gemma3 Legal Document Summarizer -->
+		{#if showSummarizer}
+			<div class="mb-6">
+				<LegalDocumentSummarizer />
+			</div>
+		{/if}
+
+		<!-- Enhanced Legal Processor -->
+		<div class="mt-2 mb-4">
+			<button
+				onclick={() => (showLegalProcessor = !showLegalProcessor)}
+				class="text-sm text-accent hover:underline"
+			>
+				{showLegalProcessor ? 'Hide Legal Processor' : 'Quick Upload & Analyze (Multi-Stage Pipeline)'}
+			</button>
+		</div>
+		{#if showLegalProcessor}
+			<div class="mb-6">
+				<EnhancedLegalProcessor />
+			</div>
+		{/if}
+
+		<!-- YoRHa Upload Zone -->
+		{#if showYorhaUpload}
+			<div class="mb-6">
+				<UploadZone
+					onfilesadded={(e) => console.log('Files added:', e.files.length)}
+					onuploadcomplete={(e) => { showYorhaUpload = false; window.location.reload(); }}
+				/>
+			</div>
+		{/if}
 
 		<!-- Upload Drop Zone -->
 		<div class="mb-8">
@@ -366,6 +454,27 @@
 
 			<div class="mt-2">
 				<button
+					onclick={() => (showEnhancedFileUpload = !showEnhancedFileUpload)}
+					class="text-sm text-warning hover:underline"
+				>
+					{showEnhancedFileUpload ? 'Hide Enhanced Upload' : 'Enhanced Upload (Drag & Drop + Preview + Validation)'}
+				</button>
+			</div>
+
+			{#if showEnhancedFileUpload}
+				<div class="mt-4">
+					<EnhancedFileUpload
+						caseId={data.caseId ?? undefined}
+						multiple={true}
+						maxFiles={10}
+						maxSizeMB={100}
+						onupload={(uploadData) => { console.log('Enhanced upload:', uploadData); showEnhancedFileUpload = false; window.location.reload(); }}
+					/>
+				</div>
+			{/if}
+
+			<div class="mt-2">
+				<button
 					onclick={() => (showEvidenceChat = !showEvidenceChat)}
 					class="text-sm text-accent hover:underline"
 				>
@@ -415,6 +524,19 @@
 			</div>
 		{/if}
 
+		<!-- Upload Progress Card (imperative API — cancel/retry support) -->
+		{#if selectedFile}
+			<div class="mt-4">
+				<UploadProgressCard
+					bind:this={uploadCard}
+					filename={selectedFile.name}
+					fileSize={selectedFile.size}
+					onCancel={() => { selectedFile = null; uploadCard?.failUpload('Cancelled by user'); }}
+					onRetry={() => { uploadCard?.startUpload(); }}
+				/>
+			</div>
+		{/if}
+
 		<!-- Filters -->
 		<div class="ev-toolbar">
 			<input
@@ -454,6 +576,21 @@
 				>List</button>
 			</div>
 		</div>
+
+		<!-- Advanced Filters Toggle -->
+		<div class="mt-2">
+			<button
+				onclick={() => (showAdvancedFilters = !showAdvancedFilters)}
+				class="text-sm text-info hover:underline"
+			>
+				{showAdvancedFilters ? 'Hide Advanced Filters' : 'Advanced Filters (Type, Status, Case, Date, AI)'}
+			</button>
+		</div>
+		{#if showAdvancedFilters}
+			<div class="mt-3">
+				<EvidenceFilters onfilter={(filterData) => { console.log('Advanced filter applied:', filterData); }} />
+			</div>
+		{/if}
 
 		<!-- Evidence Gallery -->
 		{#if displayEvidence.length === 0}
@@ -687,6 +824,13 @@
 	evidenceId={legalAnalysisEvidenceId}
 	title={legalAnalysisTitle}
 	onClose={() => { showLegalAnalysis = false; }}
+/>
+
+<EvidenceComparisonOverlay
+	evidenceA={comparisonA}
+	evidenceB={comparisonB}
+	show={showComparison}
+	onDismiss={() => (showComparison = false)}
 />
 
 {#if actionPopupFile}

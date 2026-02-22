@@ -28,11 +28,12 @@
 		lastRun?: string;
 	};
 
-	// ✅ plain props, no runes here
-	let { open = $bindable(false), route = null } = $props<{
+	interface Props {
 		open?: boolean;
-		route?, RouteDetail, null;
-	}>();
+		route?: RouteDetail | null;
+	}
+
+	let { open = $bindable(false), route = null }: Props = $props();
 
 	// ✅ runes only for internal state
 	let phase72Status = $state<Phase72Status>({ errorCount: 0 });

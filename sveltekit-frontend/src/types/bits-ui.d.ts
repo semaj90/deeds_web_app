@@ -19,6 +19,13 @@ declare module 'bits-ui' {
  export const Avatar: ComponentCtor;
  export const Menu: ComponentCtor;
  export const ScrollAreaViewport: ComponentCtor;
+ export const ScrollArea: {
+   Root: ComponentCtor;
+   Viewport: ComponentCtor;
+   Scrollbar: ComponentCtor;
+   Thumb: ComponentCtor;
+   Corner: ComponentCtor;
+ };
 
  // Factory helpers (some bits-ui builds expose factories)
  export function createDropdownMenu(): { Trigger: ComponentCtor;
@@ -35,6 +42,7 @@ declare module 'bits-ui' {
  Toast: ComponentCtor, Popover: ComponentCtor;
  Tooltip: ComponentCtor, Avatar: ComponentCtor;
  Menu: ComponentCtor, ScrollAreaViewport: ComponentCtor;
+   ScrollArea: { Root: ComponentCtor; Viewport: ComponentCtor; Scrollbar: ComponentCtor; Thumb: ComponentCtor; Corner: ComponentCtor; };
  };
  export default _default;
 

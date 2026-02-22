@@ -35,7 +35,7 @@
 	let unreadCount = $state(3);
 	let aiStatus = $state<'idle' | 'processing' | 'listening' | 'connected'>('connected');
 
-	const buttonClasses = $derived(() => {
+	const buttonClasses = $derived.by(() => {
 		const base = 'ai-assistant-btn transition-all duration-300 font-mono';
 		const variants = {
 			floating: 'fixed z-50 rounded-full shadow-2xl hover:shadow-yorha-accent/20 border-2 p-4',
@@ -98,7 +98,7 @@
 {#if variant === 'floating'}
 	<button
 		type="button"
-		class={buttonClasses()}
+		class={buttonClasses}
 		onclick={handleClick}
 		{disabled}
 		aria-label="Open assistant"
@@ -122,7 +122,7 @@
 {:else if variant === 'inline' || variant === 'full'}
 	<button
 		type="button"
-		class={buttonClasses()}
+		class={buttonClasses}
 		onclick={handleClick}
 		{disabled}
 	>
@@ -171,7 +171,7 @@
 {:else if variant === 'compact'}
 	<button
 		type="button"
-		class={buttonClasses()}
+		class={buttonClasses}
 		onclick={handleClick}
 		{disabled}
 		title="AI Assistant"
