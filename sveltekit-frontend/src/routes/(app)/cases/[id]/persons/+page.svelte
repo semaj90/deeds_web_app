@@ -10,9 +10,10 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  async function loadPersons() {
  loading = true;
  try {
- const res = await fetch(`/api/cases/${id}/persons`);
+ const res = await fetch(`/api/persons?caseId=${id}`);
  if (res.ok) {
- persons = await res.json();
+   const result = await res.json();
+   persons = result.data ?? [];
  }
  } catch (err) {
  console.error('Failed to load persons:', err);
