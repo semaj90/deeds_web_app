@@ -7,7 +7,6 @@
 	import SearchIcon from '@lucide/svelte/icons/search';
 	import TagIcon from '@lucide/svelte/icons/tag';
 	import Video from '@lucide/svelte/icons/video';
-	import type { ComponentType } from 'svelte';
 	import { quintOut } from 'svelte/easing';
 	import { scale } from 'svelte/transition';
 
@@ -33,8 +32,7 @@
 		oncompared
 	}: Props = $props();
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const getIcon = (type: Evidence['type']): ComponentType<any> => {
+	const getIcon = (type: Evidence['type']): any => {
 		switch (type) {
 			case 'document':
 				return FileText;
@@ -123,11 +121,9 @@
 		<div
 			class="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium border capitalize {evidenceType === 'document' ? 'bg-info/5 border-info/20' : ''} {evidenceType === 'image' ? 'bg-accent/5 border-accent/20' : ''} {evidenceType === 'video' ? 'bg-info/5 border-info/20' : ''} {evidenceType === 'audio' ? 'bg-warning/5 border-warning/20' : ''} {evidenceType === 'link' ? 'bg-info/5 border-info/20' : ''}"
 			data-type={evidenceType}
-			class:text-info={evidenceType === 'document'}
+			class:text-info={evidenceType === 'document' || evidenceType === 'video' || evidenceType === 'link'}
 			class:text-accent={evidenceType === 'image'}
-			class:text-info={evidenceType === 'video'}
 			class:text-warning={evidenceType === 'audio'}
-			class:text-info={evidenceType === 'link'}
 		>
 			<IconComponent size={16} />
 			<span>{evidenceType}</span>

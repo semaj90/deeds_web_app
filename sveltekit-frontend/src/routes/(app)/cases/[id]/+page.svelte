@@ -30,6 +30,8 @@ import CaseDocumentWriter from '$lib/components/legal-ai/CaseDocumentWriter.svel
 import TiptapWithAIAssistant from '$lib/components/editor/TiptapWithAIAssistant.svelte';
 import EnhancedInlineEditor from '$lib/components/ai/EnhancedInlineEditor.svelte';
 import CollaborationPanel from '$lib/components/legal/CollaborationPanel.svelte';
+import CaseEvidenceOrganizer from '$lib/components/evidence/CaseEvidenceOrganizer.svelte';
+import EvidenceUploadButton from '$lib/components/evidence/EvidenceUploadButton.svelte';
 import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  import { CacheStrategies, useCache } from '$lib/cache/cache-service.svelte';
  import NesModal from '$lib/components/nes/NesModal.svelte';
@@ -144,7 +146,7 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  let isLoadingCitations = $state(false);
  let isLoadingStatutes = $state(false);
  let showCitationModal = $state(false);
- let activeTab = $state<'evidence' | 'citations' | 'theory' | 'cross-exam' | 'prediction' | 'timeline' | 'statutes' | 'contract' | 'document' | 'canvas' | 'summary' | 'collaboration'>('evidence');
+ let activeTab = $state<'evidence' | 'organize' | 'citations' | 'theory' | 'cross-exam' | 'prediction' | 'timeline' | 'statutes' | 'contract' | 'document' | 'canvas' | 'summary' | 'collaboration'>('evidence');
  let caseSummary = $state<CaseSummary>({
    id: 'summary-1',
    caseId: '',
@@ -592,6 +594,12 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
      Evidence ({evidence.length})
    </button>
    <button
+     onclick={() => (activeTab = 'organize')}
+     class={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === 'organize' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+   >
+     Organize
+   </button>
+   <button
      onclick={() => (activeTab = 'citations')}
      class={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === 'citations' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
    >
@@ -662,7 +670,10 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  {#if activeTab === 'evidence'}
  <!-- Upload Section -->
  <div class="bg-white rounded-lg shadow p-6">
- <h2 class="text-lg font-semibold text-gray-900 mb-4">Upload Evidence</h2>
+ <div class="flex items-center justify-between mb-4">
+<h2 class="text-lg font-semibold text-gray-900">Upload Evidence</h2>
+<EvidenceUploadButton {caseId} onSuccess={async () => { await cache.delete(`evidence-list-${caseId}`); await loadEvidence(); }} />
+</div>
 
  <label class="block">
  <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 transition">
@@ -723,7 +734,16 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  {/if}
  </div>
 
- {:else if activeTab === 'citations'}
+ {:else if activeTab === 'organize'}
+<!-- Evidence Organizer Tab -->
+<div class="bg-white rounded-lg shadow p-6">
+  <CaseEvidenceOrganizer
+    {caseId}
+    initialEvidence={evidence.map(e => ({ id: e.id, title: e.fileName, type: e.documentType, status: e.status, confidence: e.inferenceConfidence, createdAt: e.createdAt }))}
+    onselectevidence={(data) => { if (data.evidence.length > 0) { const first = data.evidence[0]; selectedEvidence = evidence.find(e => e.id === first.id) ?? null; } activeTab = 'evidence'; }}
+  />
+</div>
+{:else if activeTab === 'citations'}
  <!-- Citations & Laws Tab -->
  <div class="bg-white rounded-lg shadow p-6">
    <div class="flex items-center justify-between mb-4">

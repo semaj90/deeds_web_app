@@ -7,9 +7,9 @@
  | "exportPacket"
  | "delete";
 
- let { onAction } = $props<{
+ let { onAction }: {
  onAction: (action: ToolbarAction) => void;
- }>();
+ } = $props();
 </script>
 
 <div class="flex flex-wrap items-center gap-2 border-b border-sand/20 bg-panel/40 p-2">

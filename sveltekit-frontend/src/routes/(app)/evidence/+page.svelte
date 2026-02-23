@@ -35,6 +35,7 @@
 	import MarkdownSceneViewer from '$lib/components/ui/MarkdownSceneViewer.svelte';
 	import EvidenceUploadModal from '$lib/components/evidence/EvidenceUploadModal.svelte';
 	import Gemma270MWebAssembly from '$lib/components/ai/Gemma270MWebAssembly.svelte';
+	import VisionImageAnalyzer from '$lib/components/evidence/VisionImageAnalyzer.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	let uploadCard = $state<UploadProgressCard | undefined>(undefined);
@@ -94,6 +95,7 @@
 	let showUploadPipeline = $state(false);
 	let showVlmAnalyzer = $state(false);
 	let showSceneViewer = $state(false);
+	let showVisionPipeline = $state(false);
 	let sampleScene = $state<{
 		id: string; title: string; markdown: string; confidence: number;
 		sourceFiles: string[]; aiGenerated: boolean; validated: boolean;
@@ -348,6 +350,9 @@
 				<button onclick={() => (showVlmAnalyzer = !showVlmAnalyzer)} class="px-4 py-2 bg-emerald-700 text-white rounded-lg hover:bg-emerald-600 transition text-sm font-medium">
 					{showVlmAnalyzer ? 'Hide VLM' : 'VLM Image Analysis'}
 				</button>
+				<button onclick={() => (showVisionPipeline = !showVisionPipeline)} class="px-4 py-2 bg-teal-700 text-white rounded-lg hover:bg-teal-600 transition text-sm font-medium">
+					{showVisionPipeline ? 'Hide Vision' : 'Vision Pipeline'}
+				</button>
 				<a href="/evidence/upload" class="px-4 py-2 bg-info text-white rounded-lg hover:bg-info/80 transition text-sm font-medium">
 					+ Upload Evidence
 				</a>
@@ -432,6 +437,13 @@
 		{#if showVlmAnalyzer}
 			<div class="mb-6">
 				<Gemma270MWebAssembly caseId={data.caseId ?? ''} />
+			</div>
+		{/if}
+
+		<!-- Vision Pipeline (Server-side YOLO + Gemma3 VLM + Redis cache) -->
+		{#if showVisionPipeline}
+			<div class="mb-6">
+				<VisionImageAnalyzer caseId={data.caseId ?? ''} />
 			</div>
 		{/if}
 

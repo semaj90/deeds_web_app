@@ -8,9 +8,9 @@
 	];
 
 	const existingDemos = [
-		{ href: '/evidence-canvas-demo', label: 'Evidence Canvas Demo', description: '6 visualization engines: CanvasBoard, FabricCanvas, EvidenceCanvasEditor, RecursiveVisualization, ProvenanceGraph, EvidenceBoard' },
-		{ href: '/nier-showcase', label: 'NieR Showcase', description: 'YoRHa UI showcase: CommandCenter, Terminal, SystemStatus, Dialogs' },
-		{ href: '/system-status', label: 'System Status', description: 'System health dashboard: StatusCards, SystemStatusPanel, SystemOverview' },
+		{ href: '/evidence-canvas-demo', label: 'Evidence Canvas Demo', description: '8 visualization engines: CanvasEditor, FabricCanvas, EvidenceCanvasEditor, RecursiveVisualization, ProvenanceGraph, EvidenceBoard, CanvasBoard (YoRHa drawing), YoRHa EvidenceBoard (SVG graph)' },
+		{ href: '/nier-showcase', label: 'NieR Showcase', description: 'YoRHa UI showcase: CommandCenter, Terminal, SystemStatus, Dialogs, DiamondModal, BitsUI, DetectiveForm, NES CRT' },
+		{ href: '/system-status', label: 'System Status', description: 'System health dashboard: StatusCards, SystemStatusPanel, SystemOverview, YoRHaSystemStatus' },
 	];
 </script>
 

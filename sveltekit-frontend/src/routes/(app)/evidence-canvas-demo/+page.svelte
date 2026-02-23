@@ -8,8 +8,12 @@
 	import CanvasBoard from '$lib/components/yorha/_simulations/CanvasBoard.svelte';
 	import YoRHaEvidenceBoard from '$lib/components/yorha/EvidenceBoard.svelte';
 	import DraggableEvidenceNode from '$lib/components/evidence/DraggableEvidenceNode.svelte';
+	import EvidenceNode from '$lib/components/evidence/EvidenceNode.svelte';
+	import EvidenceConnections from '$lib/components/evidence/EvidenceConnections.svelte';
+	import EvidenceBoardToolbar from '$lib/components/evidence/EvidenceBoardToolbar.svelte';
+	import EvidenceCanvas from '$lib/components/evidence/EvidenceCanvas.svelte';
 
-	let activeView = $state<'canvas-editor' | 'fabric' | 'evidence-canvas' | 'recursive' | 'provenance' | 'evidence-board' | 'canvas-board' | 'yorha-board' | 'draggable-nodes'>('canvas-editor');
+	let activeView = $state<'canvas-editor' | 'fabric' | 'evidence-canvas' | 'recursive' | 'provenance' | 'evidence-board' | 'canvas-board' | 'yorha-board' | 'draggable-nodes' | 'node-graph' | 'ai-canvas'>('canvas-editor');
 	let showSidebar = $state(true);
 	let selectedEvidenceId = $state<string | null>(null);
 	let canvasWidth = $derived(showSidebar ? 920 : 1200);
@@ -126,8 +130,37 @@
 			desc: 'Interactive draggable evidence nodes with AI analysis, metadata display, connection indicators, and real-time position updates. Each node represents an evidence item with type-specific icons.',
 			tech: ['Drag & Drop', 'AI Analysis', '$bindable()', 'Lucide Icons'],
 			icon: '🧩'
+		},
+		'node-graph': {
+			title: 'Evidence Node Graph',
+			desc: 'Interactive node-based evidence graph with typed nodes (audio/video/document/photo/forensic), confidence badges, canvas-drawn connections with strength indicators, and a board toolbar for actions.',
+			tech: ['Canvas 2D', 'EvidenceNode', 'EvidenceConnections', 'Toolbar'],
+			icon: '🔬'
+		},
+		'ai-canvas': {
+			title: 'AI Evidence Canvas',
+			desc: 'Drag-and-drop evidence workspace with AI-powered cosine similarity analysis via embeddinggemma, connection types (similarity/temporal/causal/reference), SVG path connections, and JSON export.',
+			tech: ['SVG Paths', 'embeddinggemma', 'Cosine Similarity', 'Drag & Drop'],
+			icon: '🧠'
 		}
 	};
+
+	// Node graph data — EvidenceNode + EvidenceConnections
+	const now = new Date().toISOString();
+	let nodeGraphNodes = $state([
+		{ id: 'ev-001', x: 50, y: 30, evidenceType: 'document', title: 'Forensic Report #2024-A1', confidence: 0.95, description: 'Ballistics analysis confirming weapon match', caseId: 'CASE-2024-001', canvasPosition: { x: 50, y: 30 }, uploadedAt: now, updatedAt: now },
+		{ id: 'ev-002', x: 320, y: 30, evidenceType: 'photo', title: 'Crime Scene Photos (Set A)', confidence: 0.88, description: 'Exterior and interior scene documentation', caseId: 'CASE-2024-001', canvasPosition: { x: 320, y: 30 }, uploadedAt: now, updatedAt: now },
+		{ id: 'ev-003', x: 50, y: 250, evidenceType: 'witness_statement', title: 'Witness Statement — S. Johnson', confidence: 0.72, description: 'Eyewitness account of events at 22:15', caseId: 'CASE-2024-001', canvasPosition: { x: 50, y: 250 }, uploadedAt: now, updatedAt: now },
+		{ id: 'ev-004', x: 320, y: 250, evidenceType: 'video', title: 'Surveillance Footage (Cam 3)', confidence: 0.91, description: 'Building entrance camera, 22:00-23:45', caseId: 'CASE-2024-001', canvasPosition: { x: 320, y: 250 }, uploadedAt: now, updatedAt: now },
+		{ id: 'ev-005', x: 590, y: 140, evidenceType: 'forensic', title: 'DNA Analysis — CODIS Match', confidence: 0.99, description: 'Confirmed match to suspect in CODIS database', metadata: { lab: 'State Crime Lab', method: 'STR Analysis' }, caseId: 'CASE-2024-001', canvasPosition: { x: 590, y: 140 }, uploadedAt: now, updatedAt: now },
+	]);
+
+	const nodeGraphConnections = [
+		{ id: 'c1', caseId: 'CASE-2024-001', fromEvidenceId: 'ev-001', toEvidenceId: 'ev-005', connectionType: 'corroborates', label: 'Ballistics → DNA', notes: 'Weapon matched to DNA evidence', strength: 0.92, isVisible: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+		{ id: 'c2', caseId: 'CASE-2024-001', fromEvidenceId: 'ev-002', toEvidenceId: 'ev-004', connectionType: 'temporal', label: 'Scene ↔ Footage', notes: 'Photos match footage timestamp', strength: 0.85, isVisible: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+		{ id: 'c3', caseId: 'CASE-2024-001', fromEvidenceId: 'ev-003', toEvidenceId: 'ev-004', connectionType: 'references', label: 'Witness ↔ Video', notes: 'Witness timeline aligns with video', strength: 0.65, isVisible: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+		{ id: 'c4', caseId: 'CASE-2024-001', fromEvidenceId: 'ev-001', toEvidenceId: 'ev-002', connectionType: 'supports', label: 'Report → Photos', notes: 'Report references scene photos', strength: 0.78, isVisible: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+	];
 
 	let currentView = $derived(views[activeView]);
 
@@ -161,7 +194,7 @@
 	<!-- Header -->
 	<div class="mb-6">
 		<h1 class="text-3xl font-bold text-sand mb-2">Evidence Canvas Demo</h1>
-		<p class="text-sand/60 text-lg">9 visualization engines — Canvas API, Fabric.js, D3.js, SVG, YoRHa Drawing, Evidence Network, Draggable Nodes</p>
+		<p class="text-sand/60 text-lg">11 visualization engines — Canvas API, Fabric.js, D3.js, SVG, YoRHa Drawing, Evidence Network, Draggable Nodes, Node Graph, AI Canvas</p>
 		<div class="mt-2 flex items-center gap-4 text-sm text-sand/40">
 			<span>{sampleEvidence.length} evidence items</span>
 			<span>{sampleCitations.length} citations</span>
@@ -280,6 +313,22 @@
 				<div class="bg-white rounded-lg shadow p-6">
 					<YoRHaEvidenceBoard caseId="CASE-2024-001" />
 				</div>
+			{:else if activeView === 'node-graph'}
+				<div class="bg-white rounded-lg shadow p-2">
+					<EvidenceBoardToolbar onAction={(action) => console.log('Board action:', action)} />
+				</div>
+				<div class="bg-gray-50 rounded-lg shadow p-6 relative mt-2" style="min-height: 500px; position: relative;">
+					<EvidenceConnections nodes={nodeGraphNodes} connections={nodeGraphConnections} />
+					{#each nodeGraphNodes as node (node.id)}
+						<EvidenceNode
+							{node}
+							isSelected={selectedEvidenceId === node.id}
+							onSelect={({ nodeId }) => (selectedEvidenceId = selectedEvidenceId === nodeId ? null : nodeId)}
+							onMove={({ nodeId, x, y }) => { nodeGraphNodes = nodeGraphNodes.map(n => n.id === nodeId ? { ...n, x, y } : n); }}
+							onLink={({ nodeId }) => console.log('Link from:', nodeId)}
+						/>
+					{/each}
+				</div>
 			{:else if activeView === 'draggable-nodes'}
 				<div class="bg-gray-50 rounded-lg shadow p-6 relative" style="min-height: 500px;">
 					<p class="text-xs text-gray-500 mb-4">Drag evidence nodes to rearrange. Click to select, use Analyze to run AI analysis.</p>
@@ -301,6 +350,20 @@
 							/>
 						{/each}
 					</div>
+				</div>
+			{:else if activeView === 'ai-canvas'}
+				<div class="bg-white rounded-lg shadow">
+					<EvidenceCanvas
+						caseId="CASE-2024-001"
+						initialEvidence={sampleEvidence.map((e, i) => ({
+							id: e.id,
+							title: e.title,
+							evidenceType: e.evidenceType,
+							content: `Primary ${e.evidenceType} evidence — Chain of custody verified`,
+							x: 50 + (i % 3) * 300,
+							y: 40 + Math.floor(i / 3) * 160
+						}))}
+					/>
 				</div>
 			{/if}
 		</div>

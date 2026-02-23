@@ -5,6 +5,7 @@
 	import CustodyTimeline from '$lib/components/legal/CustodyTimeline.svelte';
 	import EvidenceModal from '$lib/components/modals/EvidenceModal.svelte';
 	import EvidenceCard from '$lib/components/EvidenceCard.svelte';
+	import RichEvidenceCard from '$lib/components/evidence/EvidenceCard.svelte';
 	import LazyLoader from '$lib/components/LazyLoader.svelte';
 	import EvidenceStats from '$lib/components/yorha/evidence/EvidenceStats.svelte';
 
@@ -12,6 +13,7 @@
 	let showReportGenerator = $state(false);
 	let showEvidenceCards = $state(false);
 	let showEvidenceStats = $state(false);
+	let showRichCards = $state(false);
 
 	const sampleEvidenceItems: any[] = [
 		{ id: 'ev-001', file_name: 'Contract_Agreement_2024.pdf', evidence_type: 'document', file_type: 'application/pdf', file_size: 2_400_000, uploaded_at: new Date(Date.now() - 86400000 * 5), ai_summary: 'Employment agreement with non-compete clause. Contains liability provisions in Section 4.', tags: ['contract', 'employment'], ai_tags: ['legal-binding', 'non-compete'] },
@@ -102,6 +104,47 @@
 					evidence={item}
 					onAskAI={(ev) => { console.log('Ask AI about:', ev.file_name); }}
 					onDelete={(id) => { console.log('Delete evidence:', id); }}
+				/>
+			{/each}
+		</div>
+	</div>
+{/if}
+
+<div class="report-section">
+	<button
+		class="report-toggle"
+		style="border-color: #3b82f6; color: #3b82f6; background: rgba(59,130,246,0.15);"
+		onclick={() => (showRichCards = !showRichCards)}
+	>
+		{showRichCards ? 'Hide Rich Cards' : 'Rich Evidence Cards'}
+	</button>
+</div>
+{#if showRichCards}
+	<div class="report-container">
+		<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">
+			{#each sampleEvidenceItems as item (item.id)}
+				<RichEvidenceCard
+					evidence={{
+						id: item.id,
+						userId: 'system',
+						title: item.file_name,
+						filename: item.file_name,
+						originalName: item.file_name,
+						mimeType: item.file_type,
+						description: item.ai_summary ?? '',
+						type: item.evidence_type === 'photograph' ? 'image' : 'document',
+						evidenceType: item.evidence_type,
+						tags: item.tags ?? [],
+						createdAt: item.uploaded_at?.toISOString?.() ?? '',
+						uploadedAt: item.uploaded_at?.toISOString?.() ?? '',
+						updatedAt: new Date().toISOString(),
+						fileSize: item.file_size,
+						path: `/evidence/${item.id}`,
+						bucket: 'evidence',
+						metadata: { format: item.file_type, size: item.file_size }
+					}}
+					showCompare={true}
+					expandOnHover={true}
 				/>
 			{/each}
 		</div>
