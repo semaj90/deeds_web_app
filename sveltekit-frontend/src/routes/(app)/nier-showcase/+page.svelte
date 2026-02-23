@@ -11,8 +11,9 @@
 	import RetroRecommendationModal from '$lib/components/ui/gaming/modals/RetroRecommendationModal.svelte';
 	import BitsUIDemo from '$lib/components/ui/BitsUIDemo.svelte';
 	import YoRHaCommandInterface from '$lib/components/yorha/_simulations/YoRHaCommandInterface.svelte';
+	import YoRHaDetectiveForm from '$lib/components/yorha/YoRHaDetectiveForm.svelte';
 
-	let activeSection = $state<'command-center' | 'terminal' | 'system-status' | 'dialogs' | 'diamond-modal' | 'gaming-retro' | 'bits-ui' | 'command-interface'>('command-center');
+	let activeSection = $state<'command-center' | 'terminal' | 'system-status' | 'dialogs' | 'diamond-modal' | 'gaming-retro' | 'bits-ui' | 'command-interface' | 'detective-form'>('command-center');
 	let showInfoDialog = $state(false);
 	let showDiamondModal = $state(false);
 	let diamondPalette = $state<'nes' | 'snes' | 'ps1' | 'n64' | 'ps2'>('ps1');
@@ -79,6 +80,12 @@
 			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'command-interface' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
 		>
 			Command Interface
+		</button>
+		<button
+			onclick={() => (activeSection = 'detective-form')}
+			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'detective-form' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
+		>
+			Detective Form
 		</button>
 	</div>
 
@@ -335,6 +342,29 @@
 				Advanced 3D holographic command terminal with WebGL, module monitoring, and AI command routing.
 			</p>
 			<YoRHaCommandInterface />
+		</div>
+	{:else if activeSection === 'detective-form'}
+		<div class="bg-gray-900 rounded-lg shadow-xl p-6 border border-amber-900/30">
+			<h2 class="text-lg font-semibold text-amber-400 mb-4">YoRHa Detective Form</h2>
+			<p class="text-sm text-gray-400 mb-4">
+				Dynamic form builder with YoRHa styling — text, textarea, select, email, number fields with validation.
+			</p>
+			<YoRHaDetectiveForm
+				fields={[
+					{ name: 'caseName', label: 'Case Name', type: 'text', required: true, placeholder: 'Enter case designation...' },
+					{ name: 'suspectEmail', label: 'Suspect Contact Email', type: 'email', placeholder: 'suspect@example.com' },
+					{ name: 'priority', label: 'Priority Level', type: 'select', required: true, options: [
+						{ value: 'low', label: 'Low Priority' },
+						{ value: 'medium', label: 'Medium Priority' },
+						{ value: 'high', label: 'High Priority' },
+						{ value: 'critical', label: 'Critical — Immediate Action' }
+					], defaultValue: 'medium' },
+					{ name: 'evidenceCount', label: 'Evidence Item Count', type: 'number', placeholder: '0' },
+					{ name: 'notes', label: 'Investigation Notes', type: 'textarea', rows: 4, placeholder: 'Enter detailed investigation notes...' }
+				]}
+				onsubmit={async (data) => { console.log('Detective form submitted:', data); }}
+				submitText="SUBMIT REPORT"
+			/>
 		</div>
 	{/if}
 

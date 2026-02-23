@@ -32,6 +32,7 @@
 	import AIFileUpload from '$lib/components/ui/AIFileUpload.svelte';
 	import YorhaEvidenceGrid from '$lib/components/yorha/evidence/EvidenceGrid.svelte';
 	import DocumentDetailModal from '$lib/components/DocumentDetailModal.svelte';
+	import MarkdownSceneViewer from '$lib/components/ui/MarkdownSceneViewer.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	let uploadCard = $state<UploadProgressCard | undefined>(undefined);
@@ -88,6 +89,16 @@
 	let showAIFileUpload = $state(false);
 	let showYorhaGrid = $state(false);
 	let showDetailModal = $state(false);
+	let showSceneViewer = $state(false);
+	let sampleScene = $state({
+		id: 'scene-1',
+		title: 'Crime Scene Analysis — Sector 7',
+		markdown: '## Evidence Summary\n\n**Location**: 742 Evergreen Terrace, Sector 7\n\n### Key Findings\n- Fingerprint match on exhibit B (93% confidence)\n- DNA trace evidence collected from entry point\n- Timeline corroborated by surveillance footage\n\n### Chain of Custody\n1. Evidence collected by **Officer Chen** at 14:32\n2. Logged into evidence locker #A-17\n3. Transferred to forensic lab at 16:00\n\n> **AI Note**: High confidence match with existing case profiles in the database.',
+		confidence: 0.93,
+		sourceFiles: ['exhibit-b.pdf', 'surveillance-cam4.mp4'],
+		aiGenerated: true,
+		validated: false,
+	});
 	let workflowStage = $state('idle');
 	let workflowPercent = $state(0);
 	let comparisonA = $state<{ id: string; fileName: string; extractedText: string; caseId?: string; timestamp?: string }>({ id: '', fileName: '', extractedText: '' });
@@ -657,6 +668,27 @@
 		{#if showYorhaGrid}
 			<div class="mb-6">
 				<YorhaEvidenceGrid />
+			</div>
+		{/if}
+
+		<!-- AI Scene Viewer Toggle -->
+		<div class="mb-2">
+			<button
+				onclick={() => (showSceneViewer = !showSceneViewer)}
+				class="text-sm px-3 py-1 rounded border transition {showSceneViewer ? 'bg-info/20 text-info border-info/30' : 'bg-panelSoft text-sand/60 border-sand/20 hover:border-info/30'}"
+			>
+				{showSceneViewer ? 'Hide Scene Viewer' : 'AI Scene Viewer (Markdown Validation)'}
+			</button>
+		</div>
+		{#if showSceneViewer}
+			<div class="mb-6">
+				<MarkdownSceneViewer
+					scene={sampleScene}
+					editable={true}
+					onValidate={(id) => { sampleScene = { ...sampleScene, validated: true, validatedBy: 'Current User', validatedAt: new Date() }; }}
+					onReject={(id) => { console.log('Scene rejected:', id); showSceneViewer = false; }}
+					onEdit={(id, md) => { sampleScene = { ...sampleScene, markdown: md }; }}
+				/>
 			</div>
 		{/if}
 

@@ -19,6 +19,7 @@
   import GamingAIButton from '$lib/components/ai/GamingAIButton.svelte';
   import EnhancedAIChatTest from '$lib/components/ai/EnhancedAIChatTest.svelte';
   import ContextualChatDemo from '$lib/components/ai/ContextualChatDemo.svelte';
+  import YoRHaAIChat from '$lib/components/yorha/YoRHaAIChat.svelte';
 
   interface AIStats {
     activeChats: number;
@@ -68,6 +69,7 @@
   let showGamingButton = $state(false);
   let showEnhancedChat = $state(false);
   let showContextualChat = $state(false);
+  let showYoRHaChat = $state(false);
   let chatHistoryMessages = $state([
     { id: 'msg-1', role: 'user', content: 'What are the key elements of PC 187?', timestamp: new Date(Date.now() - 300000).toISOString(), citations: [], evidence_references: [] },
     { id: 'msg-2', role: 'assistant', content: 'Under PC 187, murder is defined as the unlawful killing of a human being with malice aforethought. The key elements are: (1) a human being was killed, (2) the killing was unlawful, and (3) the killing was done with malice aforethought. See Smith v. Johnson for recent precedent.', timestamp: new Date(Date.now() - 240000).toISOString(), citations: ['PC 187', 'Smith v. Johnson'], evidence_references: [] },
@@ -416,6 +418,21 @@
       {#if showContextualChat}
         <div class="mt-3">
           <ContextualChatDemo />
+        </div>
+      {/if}
+    </div>
+
+    <!-- YoRHa AI Chat (RAG + Ollama) -->
+    <div class="mt-4">
+      <button
+        onclick={() => (showYoRHaChat = !showYoRHaChat)}
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/20 rounded-lg text-sand/80 hover:border-accent/40 transition text-sm font-medium"
+      >
+        {showYoRHaChat ? 'Hide YoRHa AI Chat' : 'YoRHa AI Chat (RAG + Ollama Direct)'}
+      </button>
+      {#if showYoRHaChat}
+        <div class="mt-3 h-[500px]">
+          <YoRHaAIChat />
         </div>
       {/if}
     </div>

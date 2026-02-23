@@ -36,7 +36,7 @@
 	}: Props = $props();
 
 	let isEditing = $state(false);
-	let editedMarkdown = $derived(scene.markdown);
+	let editedMarkdown = $state(scene.markdown);
 
 	// Parse markdown to HTML
 	const renderedHtml = $derived(typeof marked === 'function' ? marked(scene.markdown) : String(scene.markdown));
