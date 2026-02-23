@@ -780,6 +780,7 @@ cognitive-microservice
 cognitive-service*
 envutil*
 gpu-*
+!sveltekit-frontend/src/lib/gpu/gpu-*
 health-server*
 legal-ai-*
 enhanced-rag*

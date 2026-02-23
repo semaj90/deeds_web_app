@@ -5,33 +5,6 @@
  * with GPU acceleration and legal document analysis.
  */
 
-// WebGPU type declarations for browser environment
-declare global {
-	interface GPU {
-		requestAdapter(): Promise<GPUAdapter | null>;
-	}
-
-	interface GPUAdapter {
-		requestDevice(): Promise<GPUDevice>;
-	}
-
-	interface GPUDevice {
-		createBuffer(descriptor: GPUBufferDescriptor): GPUBuffer;
-	}
-
-	interface GPUBufferDescriptor {
-		size: number;
-	usage: GPUBufferUsageFlags;
-	}
-
-	interface GPUBuffer {
-		size: number;
-		destroy(): void;
-	}
-
-	type GPUBufferUsageFlags = number;
-}
-
 // Runtime optimization configuration
 export const NODE_RUNTIME_CONFIG = {
  // Memory optimizations
@@ -225,7 +198,8 @@ export class GPUMemoryManager {
 
  // Create new buffer
  const buffer = device.createBuffer({
- size: usage,
+ size,
+ usage,
  });
 
  this.allocatedBuffers.push(buffer);

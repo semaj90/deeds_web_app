@@ -1,5 +1,18 @@
 /// <reference types="vite/client" />
-import { default as clampMemoryMB, default as normalizePerformanceProfile } from '$lib/gpu/types';
+/** Clamp GPU memory limit to sane range (64–8192 MB) */
+function clampMemoryMB(mb: number): number {
+	if (isNaN(mb) || mb < 64) return 512;
+	if (mb > 8192) return 8192;
+	return mb;
+}
+
+/** Normalize performance profile string to valid enum value */
+function normalizePerformanceProfile(raw: string | undefined): 'auto' | 'mobile' | 'desktop' | 'high-end' {
+	const valid = ['auto', 'mobile', 'desktop', 'high-end'] as const;
+	const normalized = raw?.toLowerCase().trim();
+	return valid.includes(normalized as typeof valid[number]) ? (normalized as typeof valid[number]) : 'auto';
+}
+
 // Raw environment (unvalidated)
 const RAW_ENV = {
 	OLLAMA_URL: import.meta.env.OLLAMA_URL,

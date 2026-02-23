@@ -1,7 +1,5 @@
 import type { HybridGPUContext } from './hybrid-gpu-context.js';
 import { browser } from '$app/environment';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-
 // Local minimal WebGPU-like types to avoid `any` casts
 type GPUAdapterLike = {
     requestDevice?: () => Promise<GPUDevice | null>
