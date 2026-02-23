@@ -5,11 +5,61 @@
  *   LOCAL  → classification, intent, short answers, UI help, quick summarization
  *   SERVER → legal-critical, long context, citations needed, RAG, low local confidence
  *
+ * Health-aware: polls /api/health/capabilities (30s cache) to know which
+ * server services are actually available before escalating.
+ *
  * Integration: ChatSession.svelte.ts calls shouldEscalateToServer() before fetch.
  */
 
 import type { InferenceSource } from './model-ids.js';
 import { WASM_WORKER_PATH } from './model-ids.js';
+
+// ── Server Capabilities (from /api/health/capabilities) ─────────────────
+
+export interface ServerCapabilities {
+	ollama: boolean;
+	embedding: boolean;
+	rag: boolean;
+	postgres: boolean;
+	redis: boolean;
+	ragEnabled: boolean;
+	serverReady: boolean;
+	models: string[];
+	latencyMs: number;
+	ts: string;
+}
+
+let _cachedCaps: ServerCapabilities | null = null;
+let _capsExpiry = 0;
+const CAPS_TTL = 30_000; // 30s — matches server Cache-Control
+const CAPS_FETCH_TIMEOUT = 3_000;
+
+/**
+ * Fetch server capabilities with 30s client cache.
+ * Safe to call from browser only — returns null during SSR.
+ */
+export async function fetchCapabilities(): Promise<ServerCapabilities | null> {
+	if (typeof fetch === 'undefined') return null;
+	if (_cachedCaps && Date.now() < _capsExpiry) return _cachedCaps;
+
+	try {
+		const res = await fetch('/api/health/capabilities', {
+			signal: AbortSignal.timeout(CAPS_FETCH_TIMEOUT),
+		});
+		if (!res.ok) return _cachedCaps;
+		const data: ServerCapabilities = await res.json();
+		_cachedCaps = data;
+		_capsExpiry = Date.now() + CAPS_TTL;
+		return data;
+	} catch {
+		return _cachedCaps; // stale is better than nothing
+	}
+}
+
+/** Synchronous access to last-fetched capabilities (may be null or stale). */
+export function getCachedCapabilities(): ServerCapabilities | null {
+	return _cachedCaps;
+}
 
 // ── Escalation keywords (trigger server-side legal reasoning) ────────────
 
@@ -60,14 +110,24 @@ export function shouldEscalateToServer(
 		forceLocal?: boolean;
 		/** Case context is loaded (RAG available) */
 		hasCaseContext?: boolean;
+		/** Pre-fetched capabilities (avoids async in sync decision path) */
+		capabilities?: ServerCapabilities | null;
 	}
 ): RouterDecision {
 	// Explicit overrides
-	if (options?.forceServer) {
-		return { source: 'server-ollama', reason: 'user-forced-server', confidence: 1.0 };
-	}
 	if (options?.forceLocal) {
 		return { source: 'local-onnx', reason: 'user-forced-local', confidence: 0.5 };
+	}
+
+	const caps = options?.capabilities ?? _cachedCaps;
+
+	// Health gate: if we know the server is down, don't escalate
+	// (unless user explicitly forced server — honor that even if risky)
+	if (options?.forceServer) {
+		if (caps && !caps.serverReady) {
+			return { source: 'local-onnx', reason: 'forced-server-but-unavailable', confidence: 0.3 };
+		}
+		return { source: 'server-ollama', reason: 'user-forced-server', confidence: 1.0 };
 	}
 
 	const lower = message.toLowerCase();
@@ -106,8 +166,16 @@ export function shouldEscalateToServer(
 		reasons.push('case-context-available');
 	}
 
-	// Decision threshold: 0.5+ → server
+	// Decision threshold: 0.5+ → server (but only if server is available)
 	if (serverScore >= 0.5) {
+		// Health check: if capabilities show server is down, fall back to local
+		if (caps && !caps.ollama) {
+			return {
+				source: 'local-onnx',
+				reason: reasons.join('+') + '+server-unavailable',
+				confidence: 0.3
+			};
+		}
 		return {
 			source: 'server-ollama',
 			reason: reasons.join('+'),

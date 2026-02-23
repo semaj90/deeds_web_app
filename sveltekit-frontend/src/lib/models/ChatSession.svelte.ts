@@ -3,7 +3,7 @@
  * Real SSE streaming via /api/sse/chat with reconnection logic.
  * Client router: lightweight queries → local ONNX, legal/RAG → server Ollama.
  */
-import { shouldEscalateToServer, type RouterDecision } from '$lib/ai/client-router.js';
+import { shouldEscalateToServer, fetchCapabilities, type RouterDecision } from '$lib/ai/client-router.js';
 import { SERVER_CHAT_MODEL, CLIENT_LLM_ONNX_PATH, CLIENT_LLM_TOKENIZER_PATH } from '$lib/ai/model-ids.js';
 import type { InferenceSource } from '$lib/ai/model-ids.js';
 import { clientCache } from '$lib/ai/client-cache.js';
@@ -96,11 +96,13 @@ export class ChatSession {
 		const lastUserMsg = [...this.messages].reverse().find((m) => m.role === 'user');
 		if (!lastUserMsg) return;
 
-		// ── Client Router Decision (check LokiJS cache first) ──────────
+		// ── Client Router Decision (health-aware + LokiJS cache) ───────
+		const capabilities = await fetchCapabilities();
 		const decision = shouldEscalateToServer(lastUserMsg.content, this.messages, {
 			forceServer: options?.forceServer,
 			forceLocal: options?.forceLocal,
-			hasCaseContext: this._hasCaseContext
+			hasCaseContext: this._hasCaseContext,
+			capabilities
 		});
 
 		// Cache the router decision for fast repeated lookups
