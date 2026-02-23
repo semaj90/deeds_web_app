@@ -1,25 +1,12 @@
 import { superValidate, message } from 'sveltekit-superforms/server';
 import { zod4 as zod } from 'sveltekit-superforms/adapters';
-import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { cases } from '$lib/server/db/schema-postgres.js';
 import { redirect, fail } from '@sveltejs/kit';
 import { desc, eq } from 'drizzle-orm';
 import { extractCaseStructureWithGemma } from '$lib/server/llm/gemmaIntake.js';
 import type { Actions, PageServerLoad } from './$types';
-
-// Intake schema — WHO/WHAT/WHEN/WHERE/WHY/HOW guided prompts + case fields
-export const intakeCaseSchema = z.object({
-	title: z.string().min(1, 'Case title is required').max(255),
-	narrative: z.string().max(10000).default(''),
-	who: z.string().max(1000).default(''),
-	what: z.string().max(1000).default(''),
-	when: z.string().max(500).default(''),
-	where: z.string().max(500).default(''),
-	why: z.string().max(1000).default(''),
-	how: z.string().max(1000).default(''),
-	priority: z.enum(['low', 'medium', 'high', 'critical', 'urgent']).default('medium')
-});
+import { intakeCaseSchema } from './schema.js';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) throw redirect(302, '/login');

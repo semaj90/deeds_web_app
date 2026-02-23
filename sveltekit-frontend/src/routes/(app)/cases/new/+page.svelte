@@ -1,7 +1,7 @@
 <script lang="ts">
 	import superForm from 'sveltekit-superforms';
 	import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
-	import { intakeCaseSchema } from './+page.server';
+	import { intakeCaseSchema } from './schema.js';
 	import type { PageData } from './$types';
 	import LegalCaseForm from '$lib/components/forms/LegalCaseForm.svelte';
 	import EnhancedCaseForm from '$lib/components/forms/EnhancedCaseForm.svelte';
