@@ -15,15 +15,17 @@
 	}
 
 	// Props
+	interface Props {
+		systemData?: SystemMetrics;
+		legalSession?: any;
+		holographicMode?: boolean;
+	}
+
 	const {
 		systemData,
 		legalSession,
 		holographicMode = false
-	} = $props<{
-		systemData?: SystemMetrics;
-		legalSession?: any;
-		holographicMode?: boolean;
-	}>();
+	}: Props = $props();
 
 	// Core system state (migrated from writable stores → $state runes)
 	let systemStatus = $state<'ONLINE' | 'DEGRADED' | 'OFFLINE'>('ONLINE');

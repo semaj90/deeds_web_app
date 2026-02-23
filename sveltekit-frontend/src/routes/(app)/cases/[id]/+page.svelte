@@ -25,8 +25,10 @@ import HeadlessTypingListener from '$lib/components/HeadlessTypingListener.svelt
 import SummaryEditor from '$lib/components/case/SummaryEditor.svelte';
 import ReportToolbar from '$lib/components/editor/ReportToolbar.svelte';
 import NierRichTextEditor from '$lib/components/editors/NierRichTextEditor.svelte';
+import YoRHaModal from '$lib/components/yorha/YoRHaModal.svelte';
 import CaseDocumentWriter from '$lib/components/legal-ai/CaseDocumentWriter.svelte';
 import TiptapWithAIAssistant from '$lib/components/editor/TiptapWithAIAssistant.svelte';
+import CollaborationPanel from '$lib/components/legal/CollaborationPanel.svelte';
 import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  import { CacheStrategies, useCache } from '$lib/cache/cache-service.svelte';
  import NesModal from '$lib/components/nes/NesModal.svelte';
@@ -61,7 +63,60 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  let caseDescription = $state('');
  let editorMode = $state<'wysiwyg' | 'tiptap' | 'ai-tiptap' | 'nier'>('wysiwyg');
  let showDocumentWriter = $state(false);
+ let showYoRHaDetails = $state(false);
  let typingPrompts = $state<string[]>([]);
+
+ // Case Intelligence Hub state
+ let ragResults = $state<any[]>([]);
+ let ragLoading = $state(false);
+ let ragQuery = $state('');
+ let evidenceContext = $state<any[]>([]);
+ let knowledgeResults = $state<any[]>([]);
+
+ async function runRAGSearch(query: string) {
+   if (!query.trim()) return;
+   ragLoading = true;
+   try {
+     const res = await fetch('/api/rag/search', {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify({ query, caseId, top_k: 5 })
+     });
+     if (res.ok) {
+       const data = await res.json();
+       ragResults = data.results ?? data.chunks ?? [];
+     }
+   } catch (e) { console.error('RAG search error:', e); }
+   finally { ragLoading = false; }
+ }
+
+ async function loadEvidenceContext() {
+   try {
+     const res = await fetch('/api/evidence/search', {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify({ query: caseData?.title ?? '', caseId, limit: 5 })
+     });
+     if (res.ok) {
+       const data = await res.json();
+       evidenceContext = data.results ?? data.bundles ?? [];
+     }
+   } catch (e) { console.error('Evidence context error:', e); }
+ }
+
+ async function searchKnowledge(query: string) {
+   try {
+     const res = await fetch('/api/knowledge/search', {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify({ query, topK: 5 })
+     });
+     if (res.ok) {
+       const data = await res.json();
+       knowledgeResults = data.results ?? [];
+     }
+   } catch (e) { console.error('Knowledge search error:', e); }
+ }
 
  // Citation & Statute state
  interface CitationLink {
@@ -88,7 +143,7 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  let isLoadingCitations = $state(false);
  let isLoadingStatutes = $state(false);
  let showCitationModal = $state(false);
- let activeTab = $state<'evidence' | 'citations' | 'theory' | 'cross-exam' | 'prediction' | 'timeline' | 'statutes' | 'contract' | 'document' | 'canvas' | 'summary'>('evidence');
+ let activeTab = $state<'evidence' | 'citations' | 'theory' | 'cross-exam' | 'prediction' | 'timeline' | 'statutes' | 'contract' | 'document' | 'canvas' | 'summary' | 'collaboration'>('evidence');
  let caseSummary = $state<CaseSummary>({
    id: 'summary-1',
    caseId: '',
@@ -399,12 +454,18 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  </div>
  </div>
  <h1 class="text-3xl font-bold text-gray-900">{caseData?.title ?? 'Loading...'}</h1>
- <div class="mt-3">
+ <div class="mt-3 flex gap-3">
    <button
      onclick={() => (showDescriptionEditor = !showDescriptionEditor)}
      class="text-sm text-blue-600 hover:underline"
    >
      {showDescriptionEditor ? 'Hide Description Editor' : 'Edit Case Description'}
+   </button>
+   <button
+     onclick={() => (showYoRHaDetails = true)}
+     class="text-sm px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
+   >
+     Case Intelligence Hub
    </button>
  </div>
  {#if showDescriptionEditor}
@@ -578,6 +639,12 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
      class={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === 'summary' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
    >
      Summary
+   </button>
+   <button
+     onclick={() => (activeTab = 'collaboration')}
+     class={`px-4 py-3 text-sm font-medium border-b-2 transition ${activeTab === 'collaboration' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+   >
+     Collaborate
    </button>
  </div>
 
@@ -790,6 +857,14 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
      <SummaryEditor summary={caseSummary} {caseId} />
    </div>
  </div>
+{:else if activeTab === 'collaboration'}
+ <div class="bg-white rounded-lg shadow p-6">
+   <CollaborationPanel
+     userId={caseData?.id ?? 'anonymous'}
+     evidenceId={selectedEvidence?.id ?? ''}
+     onAddAnnotation={(content, position) => { console.log('Annotation:', content, position); }}
+   />
+ </div>
  {/if}
 
  </div>
@@ -879,6 +954,74 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
    onAttach={(charge) => { showStatuteModal = false; selectedStatute = null; loadStatutes(); }}
  />
  {/if}
+
+<!-- Case Intelligence Hub Modal — RAG + KAG + Evidence Context + Knowledge Base -->
+<YoRHaModal open={showYoRHaDetails} title="Case Intelligence Hub" subtitle={caseData?.title ?? caseId} size="xl" type="system" onClose={() => (showYoRHaDetails = false)}>
+  {#snippet children()}
+    <div style="padding: 1rem; max-height: 70vh; overflow-y: auto;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(96,96,96,0.3); border-radius: 4px;">
+        <div><span style="color: #888; font-size: 0.75rem;">CASE ID</span><br/><strong>{caseId}</strong></div>
+        <div><span style="color: #888; font-size: 0.75rem;">CREATED</span><br/>{caseData?.createdAt ?? 'N/A'}</div>
+        <div><span style="color: #888; font-size: 0.75rem;">EVIDENCE</span><br/><strong>{evidence.length}</strong> items</div>
+        <div><span style="color: #888; font-size: 0.75rem;">CITATIONS</span><br/><strong>{citations.length}</strong> linked &bull; <strong>{statutes.length}</strong> statutes</div>
+      </div>
+      <div style="margin-bottom: 1.5rem;">
+        <h3 style="font-size: 0.85rem; color: #aaa; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">RAG + KAG Retrieval</h3>
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <input type="text" bind:value={ragQuery} placeholder="Search case context via RAG pipeline..." style="flex: 1; padding: 0.5rem; background: rgba(0,0,0,0.3); border: 1px solid #606060; color: #e0e0e0; border-radius: 4px; font-size: 0.875rem;" onkeydown={(e) => { if (e.key === 'Enter') runRAGSearch(ragQuery); }} />
+          <button onclick={() => runRAGSearch(ragQuery)} disabled={ragLoading} style="padding: 0.5rem 1rem; background: #3c78d8; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">{ragLoading ? 'Searching...' : 'Search'}</button>
+        </div>
+        {#if ragResults.length > 0}
+          <div style="max-height: 200px; overflow-y: auto; border: 1px solid rgba(96,96,96,0.3); border-radius: 4px;">
+            {#each ragResults as chunk, i}
+              <div style="padding: 0.75rem; border-bottom: 1px solid rgba(96,96,96,0.2); font-size: 0.8rem;">
+                <div style="color: #888; font-size: 0.7rem; margin-bottom: 0.25rem;">Chunk {i + 1} &bull; Score: {typeof chunk.score === 'number' ? chunk.score.toFixed(3) : 'N/A'} &bull; {chunk.confidence ?? chunk.collection ?? ''}</div>
+                <div style="color: #e0e0e0;">{chunk.text ?? chunk.payload ?? chunk.content ?? JSON.stringify(chunk).slice(0, 200)}</div>
+              </div>
+            {/each}
+          </div>
+        {/if}
+      </div>
+      <div style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <h3 style="font-size: 0.85rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em;">Evidence Analysis Context</h3>
+          <button onclick={() => loadEvidenceContext()} style="padding: 0.25rem 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid #606060; color: #ccc; border-radius: 4px; cursor: pointer; font-size: 0.75rem;">Load Context</button>
+        </div>
+        {#if evidenceContext.length > 0}
+          <div style="max-height: 150px; overflow-y: auto; border: 1px solid rgba(96,96,96,0.3); border-radius: 4px;">
+            {#each evidenceContext as ctx}
+              <div style="padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(96,96,96,0.2); font-size: 0.8rem; color: #e0e0e0;">{ctx.text ?? ctx.title ?? ctx.content ?? JSON.stringify(ctx).slice(0, 150)}</div>
+            {/each}
+          </div>
+        {:else}
+          <p style="color: #666; font-size: 0.8rem;">Click "Load Context" to fetch semantic evidence matches.</p>
+        {/if}
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <h3 style="font-size: 0.85rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em;">Knowledge Base / Laws Glossary</h3>
+          <button onclick={() => searchKnowledge(caseData?.title ?? 'legal')} style="padding: 0.25rem 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid #606060; color: #ccc; border-radius: 4px; cursor: pointer; font-size: 0.75rem;">Search KB</button>
+        </div>
+        {#if knowledgeResults.length > 0}
+          <div style="max-height: 150px; overflow-y: auto; border: 1px solid rgba(96,96,96,0.3); border-radius: 4px;">
+            {#each knowledgeResults as kbItem, i}
+              <div style="padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(96,96,96,0.2); font-size: 0.8rem; color: #e0e0e0;">
+                <strong>{kbItem.title ?? kbItem.name ?? `Result ${i + 1}`}</strong>
+                {#if kbItem.content || kbItem.text}<div style="color: #aaa; margin-top: 0.25rem;">{(kbItem.content ?? kbItem.text ?? '').slice(0, 120)}...</div>{/if}
+              </div>
+            {/each}
+          </div>
+        {:else}
+          <p style="color: #666; font-size: 0.8rem;">Click "Search KB" to query the laws glossary.</p>
+        {/if}
+      </div>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; padding-top: 0.75rem; border-top: 1px solid rgba(96,96,96,0.3);">
+        <button onclick={() => { showYoRHaDetails = false; showChatModal = true; }} style="padding: 0.4rem 0.75rem; background: #2d5f2d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">Open AI Chat</button>
+        <button onclick={() => { showYoRHaDetails = false; showDocumentWriter = true; }} style="padding: 0.4rem 0.75rem; background: #3c78d8; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">Write Document</button>
+      </div>
+    </div>
+  {/snippet}
+</YoRHaModal>
 
 <!-- Case Document Writer Dialog -->
 <CaseDocumentWriter bind:isOpen={showDocumentWriter} />

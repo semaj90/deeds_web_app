@@ -7,7 +7,8 @@
  * @see https://en.wikipedia.org/wiki/Golden_ratio
  * @see Context7 best practices for CSS Grid layouts
  */
-export { default as GoldenRatioGrid } from "./GoldenRatioGrid.svelte";
+// ARCHIVED: GoldenRatioGrid moved to deeds_labs/svelte4-archive/
+// export { default as GoldenRatioGrid } from "./GoldenRatioGrid.svelte";
 
 /**
  * Golden Ratio Constants

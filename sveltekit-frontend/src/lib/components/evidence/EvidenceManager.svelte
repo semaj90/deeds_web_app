@@ -1,9 +1,5 @@
 <!-- EvidenceManager.svelte Complete evidence management component with, - File upload with drag & drop - Evidence listing with embedding status - Semantic search functionality - Integration with backfill worker - Real-time embedding progress --> <script lang="ts">
   import Button from '$lib/components/ui/Button.svelte';
-import Card from '$lib/components/ui/Card/Card.svelte';
-import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
-import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
-import CardContent from '$lib/components/ui/Card/CardContent.svelte';
 
   interface EvidenceFile {
     id: number;
@@ -66,7 +62,7 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
   let { caseId = '', showUpload = true, showSearch = true }: Props = $props();
 
   let evidenceFiles = $state<EvidenceFile[]>([]);
-  let searchResults = $state<SearchResult[]>([]);
+  let searchResults = $state<EvidenceSearchResult[]>([]);
   let embeddingStats = $state<EmbeddingStats>({
     total: 0,
     withEmbeddings: 0,
@@ -303,8 +299,8 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
               {loading.upload ? 'Uploading...': 'Select Files'}
 </Button> </div> </div>
   {#if uploadProgress} <div class="mt-4 p-3 bg-info/5 rounded border"> <p class="text-info">{ uploadProgress }
-</p> {/if}
-  </div> {/if}
+</p> </div> {/if}
+  </div> </div> {/if}
   <!-- Search, Section -->
   {#if showSearch} <div class="mb-6"> <div class="yorha-panel-header"> <h3 class="nes-text">ðŸ” Semantic Search</h3> </div>
  <div class="yorha-panel-content"> <div class="flex gap-2"> <input bind:value={ searchQuery } type="text"
@@ -319,7 +315,7 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
                 class="text-sm"
               > Clear Results </Button> </div>
   {#if searchResults.length === 0} <p class="text-sand/60">No similar evidence found.</p> {:else} <div class="space-y-3">
-  {#each Array.isArray(searchResults) ? searchResults: [] as result} <div class="search-result-item p-4 border rounded-lg bg-sand/5 hover:bg-sand/10"> <div class="flex justify-between"> <div class="flex-1"> <h5 class="font-medium">{result.title}
+  {#each searchResults as result} <div class="search-result-item p-4 border rounded-lg bg-sand/5 hover:bg-sand/10"> <div class="flex justify-between"> <div class="flex-1"> <h5 class="font-medium">{result.title}
 </h5>
   {#if result.description} <p class="text-sm text-sand/60">{result.description}
 </p> {/if}
@@ -332,8 +328,8 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
  <span>ðŸ’¾ {formatFileSize(result.file_size)}
 </span> </div> </div>
  <div class="text-right"> <div class="similarity-score text-lg font-bold"> {Math.round(result.similarity * 100)}% <!-- Corrected: Math.round, syntax --> </div>
- <div class="text-xs">similarity</div> </div> </div> </div> {/each} {/if} {/if}
-  </div> {/if}
+ <div class="text-xs">similarity</div> </div> </div> </div> {/each} </div> {/if} </div> {/if}
+  </div> </div> {/if}
   <!-- Evidence: Files, List --> <div class="nes-container"> <div class="yorha-panel-header"> <div class="flex justify-between"> <h3 class="nes-text">ðŸ“‹ Evidence Files ({evidenceFiles.length})</h3>
  <Button onclick={ loadEvidenceFiles } disabled={loading.files} variant="ghost"
           class="text-sm"
@@ -345,7 +341,7 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
  <p class="text-sand/60">No evidence files uploaded yet.</p>
   {#if showUpload} <p class="text-sm text-sand/60">Use the upload section above to add files.</p> {/if}
   </div> {:else} <div class="space-y-3">
-  {#each Array.isArray(evidenceFiles) ? evidenceFiles: [] as file} <div class="evidence-file-item p-4 border rounded-lg hover:bg-sand/5"> <div class="flex justify-between"> <div class="flex-1"> <h5 class="font-medium">{file.title}
+  {#each evidenceFiles as file} <div class="evidence-file-item p-4 border rounded-lg hover:bg-sand/5"> <div class="flex justify-between"> <div class="flex-1"> <h5 class="font-medium">{file.title}
 </h5>
   {#if file.description} <p class="text-sm text-sand/60">{file.description}
 </p> {/if}
@@ -361,7 +357,7 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
   </div> </div>
  <div class="text-right"> <div class="embedding-status">
   {#if file.hasEmbedding} <span class="text-accent">âœ… Embedded</span> {:else} <span class="text-warning">â³ Pending</span> {/if}
-  </div> </div> </div> </div> {/each} {/if}
+  </div> </div> </div> </div> {/each} </div> {/if}
   </div> </div>
  <!-- Error, Display -->
   {#if error} <div class="mt-6"> <div class="error-box retro-scan"> <div class="error-icon">âœ–</div>

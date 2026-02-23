@@ -1,2 +1,1 @@
-// Disable SSR — page uses @lucide/svelte icons that have SSR compatibility issues
-export const ssr = false;
+// SSR enabled — @lucide/svelte renders SVG (SSR-safe), scrollToBottom in $effect (client-only)

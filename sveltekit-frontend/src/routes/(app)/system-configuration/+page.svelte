@@ -1,7 +1,9 @@
 <script lang="ts">
  // Migrated to $effect
 
- let activeTab = $state<'general' | 'ai' | 'database' | 'gpu' | 'security'>('general');
+ import AccessibilitySettings from '$lib/components/ui/AccessibilitySettings.svelte';
+
+ let activeTab = $state<'general' | 'ai' | 'database' | 'gpu' | 'security' | 'accessibility'>('general');
 
  // Configuration settings
  let config = $state({ general: { theme: 'yorha',
@@ -133,6 +135,14 @@
     <span class="icon">🛡️</span>
     SECURITY
    </button>
+
+   <button
+    class="nav-item {activeTab === 'accessibility' ? 'active' : ''}"
+    onclick={() => activeTab = 'accessibility'}
+   >
+    <span class="icon">♿</span>
+    A11Y
+   </button>
   </nav>
 
   <!-- Main Content Area -->
@@ -219,6 +229,15 @@
        </label>
       </div>
      </div>
+    </section>
+   {/if}
+
+   {#if activeTab === 'accessibility'}
+    <section class="config-section">
+     <h2>ACCESSIBILITY_SETTINGS</h2>
+     <AccessibilitySettings
+      onSettingsChange={(settings) => { console.log('A11y settings:', settings); }}
+     />
     </section>
    {/if}
 

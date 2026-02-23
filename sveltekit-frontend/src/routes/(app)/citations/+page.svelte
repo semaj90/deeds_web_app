@@ -18,6 +18,8 @@
   import CitationInspector from '$lib/components/source-validation/CitationInspector.svelte';
   import AttachToCaseModal from '$lib/components/legal-ai/AttachToCaseModal.svelte';
   import CollectionDetail from '$lib/components/legal-ai/CollectionDetail.svelte';
+  import CitationLibraryPage from '$lib/components/legal-ai/CitationLibraryPage.svelte';
+  import LinkMetadataForm from '$lib/components/legal-ai/LinkMetadataForm.svelte';
 
   let viewMode = $state<'list' | 'manager'>('list');
   let showGpuSearch = $state(false);
@@ -32,6 +34,9 @@
   let attachStatuteCode = $state<string | null>(null);
   let attachCitationId = $state<string | null>(null);
   let selectedCollection = $state<any>(null);
+  let showLibraryPage = $state(false);
+  let showLinkEditor = $state(false);
+  let editingLink = $state<any>(null);
 
   interface Citation {
     id: string;
@@ -107,6 +112,7 @@
       <Button onclick={() => (showAdvancedSearch = !showAdvancedSearch)}>{showAdvancedSearch ? 'Hide Search' : 'Advanced Search'}</Button>
       <Button onclick={() => (showCollections = !showCollections)}>{showCollections ? 'Hide Collections' : 'Collections'}</Button>
       <Button onclick={() => (showCitationBrowser = !showCitationBrowser)}>{showCitationBrowser ? 'Hide Browser' : 'Citation Browser'}</Button>
+      <Button onclick={() => (showLibraryPage = !showLibraryPage)}>{showLibraryPage ? 'Hide Library' : 'Citation Library'}</Button>
     </div>
   </header>
 
@@ -129,6 +135,13 @@
       <CitationSaveForm
         onsaved={() => { showSaveForm = false; loadCitations(); }}
       />
+    </div>
+  {/if}
+
+  <!-- Citation Library Page — Full collection management -->
+  {#if showLibraryPage}
+    <div class="mb-6">
+      <CitationLibraryPage />
     </div>
   {/if}
 
@@ -293,6 +306,16 @@
           statuteCode={selectedCitation.statute_code ?? null}
           onviewcase={(c) => { window.location.href = `/cases/${c.id}`; }}
         />
+        <div class="mt-4">
+          <button onclick={() => { editingLink = { id: selectedCitation.id, case_id: '', statute_code: selectedCitation.statute_code ?? '', link_type: 'CITED_IN', notes: selectedCitation.notes ?? '', created_at: selectedCitation.created_at ?? new Date().toISOString(), updated_at: new Date().toISOString() }; showLinkEditor = !showLinkEditor; }} class="text-sm text-accent hover:underline">
+            {showLinkEditor ? 'Hide Link Editor' : 'Edit Link Metadata'}
+          </button>
+        </div>
+        {#if showLinkEditor && editingLink}
+          <div class="mt-2">
+            <LinkMetadataForm link={editingLink} onupdated={() => { showLinkEditor = false; loadCitations(); }} />
+          </div>
+        {/if}
       </div>
     {/if}
   {/if}

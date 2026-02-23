@@ -1,7 +1,7 @@
 # Legal AI Platform — Claude Project Instructions
 
-## Last Updated: February 20, 2026 (Session 63)
-## Status: svelte-check 0 errors, 0 warnings (down from 19,666+)
+## Last Updated: February 23, 2026 (Session 84)
+## Status: svelte-check 0 errors (18 pre-existing in stubs), 83 warnings
 
 ---
 
@@ -21,7 +21,7 @@ See `memory/ide-linter-workarounds.md` for full details.
 
 ## Technology Stack
 
-- **Frontend**: SvelteKit 2 + Svelte 5 (runes) + bits-ui v2.15.5 + UnoCSS (svelte-scoped)
+- **Frontend**: SvelteKit 2 + Svelte 5 (runes) + bits-ui v2.16.2 + UnoCSS v66.5 (svelte-scoped)
 - **Forms**: sveltekit-superforms v2 + Zod validation
 - **Local Cache**: IndexedDB + Loki.js
 - **Server Cache**: Redis (SSR pages + sessions)
@@ -216,33 +216,81 @@ export class SimpleStore<T> {
 
 ---
 
-## Bits UI v2 Import Patterns
+## Bits UI v2.16.2 Import Patterns
 
 ```typescript
 // Namespace imports from main entry
-import { Accordion, Dialog, Select, Checkbox } from "bits-ui";
+import { Accordion, Dialog, Select, Checkbox, ScrollArea } from "bits-ui";
 
-// Usage
-<Dialog.Root>
+// Dialog (full pattern with Portal + Overlay)
+<Dialog.Root bind:open={isOpen}>
   <Dialog.Trigger>Open</Dialog.Trigger>
-  <Dialog.Content>
-    {#snippet children()}
-      <div transition:fade>Content</div>
-    {/snippet}
-  </Dialog.Content>
+  <Dialog.Portal>
+    <Dialog.Overlay />
+    <Dialog.Content>
+      <Dialog.Title>Title</Dialog.Title>
+      <Dialog.Description>Description</Dialog.Description>
+      <Dialog.Close>Close</Dialog.Close>
+    </Dialog.Content>
+  </Dialog.Portal>
 </Dialog.Root>
+
+// Dialog with transitions (forceMount + child snippet)
+<Dialog.Overlay forceMount>
+  {#snippet child({ props, open })}
+    {#if open}
+      <div {...props} transition:fade>overlay</div>
+    {/if}
+  {/snippet}
+</Dialog.Overlay>
+
+// ScrollArea
+<ScrollArea.Root type="hover">
+  <ScrollArea.Viewport><!-- content --></ScrollArea.Viewport>
+  <ScrollArea.Scrollbar orientation="vertical">
+    <ScrollArea.Thumb />
+  </ScrollArea.Scrollbar>
+  <ScrollArea.Corner />
+</ScrollArea.Root>
 ```
 
 **Key v1 → v2 changes:**
-- Transition props removed — use Svelte 5 transitions in snippets
-- `let:` directives → `{#snippet children({ data })}` for data exposure
+- Transition props removed — use `forceMount` + `child` snippet with Svelte 5 transitions
+- `let:` directives → `{#snippet child({ props, open })}` for data exposure
 - `multiple={true}` → `type="multiple"` (Accordion/Select)
 - `el` → `ref` for element binding
-- `asChild` → `child` snippet
+- `asChild` → `child` snippet (spread `{...props}` on your element)
 - Local wrapper components are obsolete — import bits-ui directly
 - Use bits-ui component API, NOT melt-ui builders directly
+- `onOpenChange` callback available on Root components
+
+**Ambient type shadowing warning:** `src/types/bits-ui.d.ts` shadows bits-ui's own shipped types. bits-ui v2.16.2 ships complete `dist/index.d.ts` with proper compound namespaces. The ambient file was needed historically but may cause type mismatches with newer API features.
 
 **Button**: Default import: `import Button from '$lib/components/ui/Button.svelte'`
+
+---
+
+## SSR Classification (A/B/C Buckets)
+
+When wiring components to routes, classify each into:
+
+**A) SSR-safe** (keep SSR enabled):
+- Reads data via `load()` / server endpoints
+- No browser-only globals
+- Uses lucide/bits-ui primitives only
+- @lucide/svelte renders SVG and is SSR-safe
+
+**B) Client-only** (set `export const ssr = false`):
+- Canvas/WebGL/WebGPU rendering
+- Direct `window`/`document` usage in module scope
+- localStorage/IndexedDB in module scope
+- Heavy client-only demos
+- Put behind `/dev-tools/*` or `/demos/*` routes
+
+**C) Mixed** (prefer SSR, guard browser code):
+- Mostly SSR-safe with small client-only areas
+- Move browser-only code behind `onMount()` and `typeof window !== 'undefined'` guards
+- Keep SSR enabled unless truly impossible
 
 ---
 
@@ -253,6 +301,8 @@ Config at `sveltekit-frontend/unocss.config.ts`. Svelte-scoped mode via `@unocss
 **Theme colors**: sand, sandDark, panel, panelSoft, accent, accentSoft, danger, warning, info
 **Shortcuts**: `app-bg`, `panel`, `btn-base`, `btn-primary`, `tag`
 
+**Consistency rule**: Use UnoCSS utilities everywhere — do NOT mix with raw Tailwind classes. Keep one utility system to avoid class collisions and mental overhead.
+
 ```css
 /* CSS class syntax — NO spaces before pseudo-class colons */
 hover:bg-accent focus:border-blue-500 disabled:opacity-50
@@ -260,7 +310,13 @@ hover:bg-accent focus:border-blue-500 disabled:opacity-50
 
 ---
 
-## Superforms v2
+## Superforms v2 (Zod as Source of Truth)
+
+**Pipeline**: Zod schema → superforms adapter → Drizzle insert types from schema
+- Zod schema is the runtime validator (single source of truth)
+- superforms uses the Zod adapter (`import { zod } from 'sveltekit-superforms/adapters'`)
+- Drizzle insert/select types come from Drizzle models (not custom `DrizzleTypes`)
+- In SvelteKit routes, use `import type { RequestHandler } from './$types'` — no parallel type layers
 
 ```typescript
 // Server: import from sveltekit-superforms (NOT @sveltejs/kit)
@@ -331,7 +387,8 @@ import { users, cases, evidence, caseStatusEnum } from '$lib/server/db/schema-po
 import type { User, NewUser } from '$lib/server/db/schema-postgres.js';
 import { eq, desc, and, or, sql } from 'drizzle-orm';
 
-// Type inference: $inferSelect (read) / $inferInsert (write)
+// Type inference: $inferSelect (read) / $inferInsert (write) — canonical approach
+// Always infer from Drizzle schema definitions, NOT custom DrizzleTypes layers
 export type Case = typeof cases.$inferSelect;
 export type NewCase = typeof cases.$inferInsert;
 
@@ -483,7 +540,7 @@ safelist: [
 - **Qdrant filter**: `match: { value: someVar }` not `match: { value, someVar }` — shorthand fails when var name != `value`
 - **ioredis v5 types**: DO NOT add `declare module 'ioredis'` augmentations — they shadow bundled types
 - **amqplib**: Named/namespace imports fail with `moduleResolution: "bundler"`. Use local interfaces + dynamic `await import('amqplib')`
-- **@lucide/svelte SSR bug**: v0.564.0 throws `Cannot access 'props' before initialization` during SSR. Fix: add `export const ssr = false` in `+page.ts` for routes using lucide icons
+- **@lucide/svelte is SSR-safe**: Renders SVG, no browser APIs. Do NOT set `ssr = false` just for lucide icons. Only set `ssr = false` for browser-only APIs (Canvas/WebGL/WebGPU, direct window/document, localStorage/IndexedDB in module scope)
 - **Svelte 5 `{@const}` placement**: Must be direct child of `{#if}`/`{:else if}`/`{#each}` blocks — NOT inside `<div>` or other HTML elements
 - **Dev server startup**: Must use `npm run dev` (sets `DEV_BYPASS_AUTH=true` + env vars via `cross-env`), NOT `npx vite dev`
 - **SvelteKit handleError**: Hides real errors behind generic message. Temporarily expose `error.message + error.stack` in return value to diagnose SSR 500s

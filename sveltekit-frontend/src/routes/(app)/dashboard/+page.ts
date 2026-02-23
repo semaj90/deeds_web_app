@@ -1,1 +1,1 @@
-export const ssr = false;
+// SSR enabled — all components are SSR-safe

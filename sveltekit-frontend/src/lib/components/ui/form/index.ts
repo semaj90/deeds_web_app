@@ -3,7 +3,8 @@
 
 export { default as Form } from '../Form.svelte';
 export { default as FormRoot } from '../Form.svelte';
-export { default as FormStandard } from '../forms/FormStandard.svelte';
+// ARCHIVED: moved to deeds_labs/
+// export { default as FormStandard } from '../forms/FormStandard.svelte';
 
 // Field/component aliases for API compatibility with libraries expecting shadcn-style exports
 export { default as FormField } from '../Form.svelte';

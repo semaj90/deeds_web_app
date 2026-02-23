@@ -1,187 +1,187 @@
 {
-  "timestamp": "2026-02-22T21-00-15",
+  "timestamp": "2026-02-23T01-16-06",
   "base": "http://localhost:5173",
   "results": [
     {
       "name": "evidence",
       "url": "http://localhost:5173/evidence",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\evidence.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/evidence",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\evidence-ERROR.png"
     },
     {
       "name": "persons-of-interest",
       "url": "http://localhost:5173/persons-of-interest/fake-id",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\persons-of-interest.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/persons-of-interest/fake-id",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\persons-of-interest-ERROR.png"
     },
     {
       "name": "cases-overview",
       "url": "http://localhost:5173/cases/test-id/overview",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\cases-overview.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/cases/test-id/overview",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\cases-overview-ERROR.png"
     },
     {
       "name": "agentic-errors-analysis",
       "url": "http://localhost:5173/agentic-errors/analysis",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\agentic-errors-analysis.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/agentic-errors/analysis",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\agentic-errors-analysis-ERROR.png"
     },
     {
       "name": "cases-list",
       "url": "http://localhost:5173/cases",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\cases-list.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/cases",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\cases-list-ERROR.png"
     },
     {
       "name": "dashboard",
       "url": "http://localhost:5173/dashboard",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\dashboard.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/dashboard",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\dashboard-ERROR.png"
     },
     {
       "name": "citations",
       "url": "http://localhost:5173/citations",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\citations.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/citations",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\citations-ERROR.png"
     },
     {
       "name": "evidence-upload",
       "url": "http://localhost:5173/cases/test-id/evidence/upload",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\evidence-upload.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/cases/test-id/evidence/upload",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\evidence-upload-ERROR.png"
     },
     {
       "name": "active-cases",
       "url": "http://localhost:5173/active-cases",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\active-cases.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/active-cases",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\active-cases-ERROR.png"
     },
     {
       "name": "ai-dashboard",
       "url": "http://localhost:5173/ai-dashboard",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\ai-dashboard.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/ai-dashboard",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\ai-dashboard-ERROR.png"
     },
     {
       "name": "all-routes",
       "url": "http://localhost:5173/all-routes",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\all-routes.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/all-routes",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\all-routes-ERROR.png"
     },
     {
       "name": "analysis-center",
       "url": "http://localhost:5173/analysis-center",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\analysis-center.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/analysis-center",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\analysis-center-ERROR.png"
     },
     {
       "name": "command-center",
       "url": "http://localhost:5173/command-center",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\command-center.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/command-center",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\command-center-ERROR.png"
     },
     {
       "name": "error-brain",
       "url": "http://localhost:5173/error-brain",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\error-brain.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/error-brain",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\error-brain-ERROR.png"
     },
     {
       "name": "evidence-library",
       "url": "http://localhost:5173/evidence-library",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\evidence-library.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/evidence-library",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\evidence-library-ERROR.png"
     },
     {
       "name": "global-search",
       "url": "http://localhost:5173/global-search",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\global-search.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/global-search",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\global-search-ERROR.png"
     },
     {
       "name": "admin-dev-tools",
       "url": "http://localhost:5173/admin/dev-tools",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\admin-dev-tools.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/admin/dev-tools",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\admin-dev-tools-ERROR.png"
     },
     {
       "name": "admin-knowledge-search",
       "url": "http://localhost:5173/admin/knowledge-search",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\admin-knowledge-search.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/admin/knowledge-search",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\admin-knowledge-search-ERROR.png"
     },
     {
       "name": "admin-codebase-viewer",
       "url": "http://localhost:5173/admin/codebase-viewer",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\admin-codebase-viewer.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/admin/codebase-viewer",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\admin-codebase-viewer-ERROR.png"
     },
     {
       "name": "system-configuration",
       "url": "http://localhost:5173/system-configuration",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\system-configuration.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/system-configuration",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\system-configuration-ERROR.png"
     },
     {
       "name": "terminal",
       "url": "http://localhost:5173/terminal",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\terminal.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/terminal",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\terminal-ERROR.png"
     },
     {
       "name": "phase78",
       "url": "http://localhost:5173/phase78/monitor",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-22T21-00-15\\phase78.png"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/phase78/monitor",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-23T01-16-06\\phase78-ERROR.png"
     }
   ],
   "summary": {
-    "passed": 22,
-    "failed": 0,
+    "passed": 0,
+    "failed": 22,
     "total": 22
   }
 }

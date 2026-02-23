@@ -5,8 +5,10 @@
 	import RecursiveEvidenceVisualization from '$lib/components/canvas/RecursiveEvidenceVisualization.svelte';
 	import ProvenanceGraph from '$lib/components/source-validation/ProvenanceGraph.svelte';
 	import EvidenceBoard from '$lib/components/evidence/EvidenceBoard.svelte';
+	import CanvasBoard from '$lib/components/yorha/_simulations/CanvasBoard.svelte';
+	import YoRHaEvidenceBoard from '$lib/components/yorha/EvidenceBoard.svelte';
 
-	let activeView = $state<'canvas-editor' | 'fabric' | 'evidence-canvas' | 'recursive' | 'provenance' | 'evidence-board'>('canvas-editor');
+	let activeView = $state<'canvas-editor' | 'fabric' | 'evidence-canvas' | 'recursive' | 'provenance' | 'evidence-board' | 'canvas-board' | 'yorha-board'>('canvas-editor');
 	let showSidebar = $state(true);
 	let selectedEvidenceId = $state<string | null>(null);
 	let canvasWidth = $derived(showSidebar ? 920 : 1200);
@@ -105,6 +107,18 @@
 			desc: 'Canvas-based evidence relationship board with drag-and-drop nodes, connection lines, and spatial evidence organization for case analysis.',
 			tech: ['Canvas API', 'Drag & Drop', 'Relationship Mapping', '$derived()'],
 			icon: '📋'
+		},
+		'canvas-board': {
+			title: 'YoRHa Canvas Board',
+			desc: 'Interactive drawing canvas with YoRHa-styled color palette, brush/eraser tools, adjustable brush size, and device pixel ratio support for crisp rendering.',
+			tech: ['Canvas 2D', 'Drawing Tools', 'YoRHa Palette', 'DPR Scaling'],
+			icon: '🖌'
+		},
+		'yorha-board': {
+			title: 'YoRHa Evidence Network',
+			desc: 'SVG-based evidence node graph with API-backed connections. Drag nodes to rearrange, click to inspect, auto-loads from /api/yorha/evidence endpoints.',
+			tech: ['SVG', 'API Fetch', 'Drag & Drop', '$props()'],
+			icon: '🔗'
 		}
 	};
 
@@ -140,7 +154,7 @@
 	<!-- Header -->
 	<div class="mb-6">
 		<h1 class="text-3xl font-bold text-sand mb-2">Evidence Canvas Demo</h1>
-		<p class="text-sand/60 text-lg">6 visualization engines — Canvas API, Fabric.js, D3.js, SVG, WebGPU-ready</p>
+		<p class="text-sand/60 text-lg">8 visualization engines — Canvas API, Fabric.js, D3.js, SVG, YoRHa Drawing, Evidence Network</p>
 		<div class="mt-2 flex items-center gap-4 text-sm text-sand/40">
 			<span>{sampleEvidence.length} evidence items</span>
 			<span>{sampleCitations.length} citations</span>
@@ -244,6 +258,20 @@
 			{:else if activeView === 'evidence-board'}
 				<div class="bg-white rounded-lg shadow p-6">
 					<EvidenceBoard caseId="CASE-2024-001" />
+				</div>
+			{:else if activeView === 'canvas-board'}
+				<div class="bg-white rounded-lg shadow p-6">
+					<CanvasBoard
+						width={canvasWidth}
+						height={600}
+						enableDrawing={true}
+						showToolbar={true}
+						onClose={() => (activeView = 'canvas-editor')}
+					/>
+				</div>
+			{:else if activeView === 'yorha-board'}
+				<div class="bg-white rounded-lg shadow p-6">
+					<YoRHaEvidenceBoard caseId="CASE-2024-001" />
 				</div>
 			{/if}
 		</div>

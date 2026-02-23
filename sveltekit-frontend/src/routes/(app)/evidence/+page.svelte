@@ -27,6 +27,11 @@
 	import EnhancedLegalProcessor from '$lib/components/legal/EnhancedLegalProcessor.svelte';
 	import UploadZone from '$lib/components/yorha/evidence/UploadZone.svelte';
 	import EvidenceComparisonOverlay from '$lib/components/yorha/evidence/EvidenceComparisonOverlay.svelte';
+	import RelationshipInspector from '$lib/components/evidence/RelationshipInspector.svelte';
+	import WorkflowProgress from '$lib/components/legal/WorkflowProgress.svelte';
+	import AIFileUpload from '$lib/components/ui/AIFileUpload.svelte';
+	import YorhaEvidenceGrid from '$lib/components/yorha/evidence/EvidenceGrid.svelte';
+	import DocumentDetailModal from '$lib/components/DocumentDetailModal.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	let uploadCard = $state<UploadProgressCard | undefined>(undefined);
@@ -78,6 +83,13 @@
 	let showLegalProcessor = $state(false);
 	let showYorhaUpload = $state(false);
 	let showComparison = $state(false);
+	let showRelationshipInspector = $state(false);
+	let showWorkflowProgress = $state(false);
+	let showAIFileUpload = $state(false);
+	let showYorhaGrid = $state(false);
+	let showDetailModal = $state(false);
+	let workflowStage = $state('idle');
+	let workflowPercent = $state(0);
 	let comparisonA = $state<{ id: string; fileName: string; extractedText: string; caseId?: string; timestamp?: string }>({ id: '', fileName: '', extractedText: '' });
 	let comparisonB = $state<{ id: string; fileName: string; extractedText: string; caseId?: string; timestamp?: string }>({ id: '', fileName: '', extractedText: '' });
 
@@ -109,6 +121,10 @@
 		'text/plain': 'Text',
 		default: 'File'
 	};
+
+	let selectedDocument = $derived(
+		selectedDocumentId ? (data.evidence ?? []).find((d: any) => d.id === selectedDocumentId) ?? null : null
+	);
 
 	let filteredEvidence = $derived(
 		(data.evidence ?? []).filter((doc: any) => {
@@ -298,6 +314,15 @@
 				}} class="px-4 py-2 bg-sand/20 text-sand rounded-lg hover:bg-sand/30 transition text-sm font-medium">
 					Compare
 				</button>
+				<button onclick={() => (showRelationshipInspector = !showRelationshipInspector)} class="px-4 py-2 bg-warning/80 text-white rounded-lg hover:bg-warning/60 transition text-sm font-medium">
+					{showRelationshipInspector ? 'Hide Relationships' : 'Relationships'}
+				</button>
+				<button onclick={() => (showWorkflowProgress = !showWorkflowProgress)} class="px-4 py-2 bg-panelSoft text-sand rounded-lg hover:bg-panel transition text-sm font-medium">
+					{showWorkflowProgress ? 'Hide Workflow' : 'Custody Workflow'}
+				</button>
+				<button onclick={() => (showAIFileUpload = !showAIFileUpload)} class="px-4 py-2 bg-accent/70 text-white rounded-lg hover:bg-accent/50 transition text-sm font-medium">
+					{showAIFileUpload ? 'Hide AI Upload' : 'AI File Upload'}
+				</button>
 				<a href="/evidence/upload" class="px-4 py-2 bg-info text-white rounded-lg hover:bg-info/80 transition text-sm font-medium">
 					+ Upload Evidence
 				</a>
@@ -346,6 +371,34 @@
 				<UploadZone
 					onfilesadded={(e) => console.log('Files added:', e.files.length)}
 					onuploadcomplete={(e) => { showYorhaUpload = false; window.location.reload(); }}
+				/>
+			</div>
+		{/if}
+
+		<!-- Relationship Inspector — View evidence relationships -->
+		{#if showRelationshipInspector}
+			<div class="mb-6">
+				<RelationshipInspector caseId={data.caseId ?? 'default'} selectedEvidenceId={data.evidence?.[0]?.id ?? null} />
+			</div>
+		{/if}
+
+		<!-- Workflow Progress — Chain of custody workflow stages -->
+		{#if showWorkflowProgress}
+			<div class="mb-6">
+				<WorkflowProgress progress={workflowPercent} stage={workflowStage} stageName={workflowStage.replace(/-/g, ' ')} />
+			</div>
+		{/if}
+
+		<!-- AI File Upload (drag-drop + auto-detection + AI analysis) -->
+		{#if showAIFileUpload}
+			<div class="mb-6">
+				<AIFileUpload
+					accept=".pdf,image/*,.doc,.docx,.txt"
+					multiple={true}
+					maxSize={100}
+					analyzeEndpoint="/api/evidence/analyze"
+					onUpload={(files) => { console.log('AI Upload complete:', files.length, 'files'); showAIFileUpload = false; window.location.reload(); }}
+					onAnalyze={(file, metadata) => { console.log('AI Analysis:', file.name, 'confidence:', metadata.confidence); }}
 				/>
 			</div>
 		{/if}
@@ -592,6 +645,21 @@
 			</div>
 		{/if}
 
+		<!-- YoRHa Evidence Grid Toggle -->
+		<div class="mt-3 mb-2">
+			<button
+				onclick={() => (showYorhaGrid = !showYorhaGrid)}
+				class="text-sm px-3 py-1 rounded border transition {showYorhaGrid ? 'bg-info/20 text-info border-info/30' : 'bg-panelSoft text-sand/60 border-sand/20 hover:border-info/30'}"
+			>
+				{showYorhaGrid ? 'Hide YoRHa Grid' : 'YoRHa Evidence Grid (Demo)'}
+			</button>
+		</div>
+		{#if showYorhaGrid}
+			<div class="mb-6">
+				<YorhaEvidenceGrid />
+			</div>
+		{/if}
+
 		<!-- Evidence Gallery -->
 		{#if displayEvidence.length === 0}
 			<div class="text-center py-16 bg-panelSoft rounded-lg border border-sand/20">
@@ -635,6 +703,7 @@
 							<span>{formatDate(doc.createdAt ?? doc.created_at)}</span>
 							{#if !doc.similarity}
 								<div class="flex gap-2">
+									<button onclick={(e) => { e.stopPropagation(); selectedDocumentId = doc.id; showDetailModal = true; }} class="text-accent/60 hover:text-accent transition">Detail</button>
 									<button onclick={(e) => { e.stopPropagation(); assistantNode = { id: doc.id, title: doc.title || doc.fileName || '', type: doc.fileType?.includes('pdf') ? 'document' : doc.fileType?.startsWith('image') ? 'person' : 'other', description: doc.description }; showEvidenceAssistant = true; }} class="text-warning/60 hover:text-warning transition">Analyze</button>
 									<button onclick={(e) => { e.stopPropagation(); loadEvidenceReport(doc.id); }} class="text-accent/60 hover:text-accent transition">Report</button>
 									<button onclick={(e) => { e.stopPropagation(); legalAnalysisEvidenceId = doc.id; legalAnalysisTitle = `Legal Analysis: ${doc.title || doc.fileName || doc.id}`; showLegalAnalysis = true; }} class="text-info/60 hover:text-info transition">Legal</button>
@@ -791,6 +860,15 @@
 	documentId={selectedDocumentId}
 	isVisible={showDocumentDetails}
 	onClose={() => (showDocumentDetails = false)}
+/>
+
+<DocumentDetailModal
+	open={showDetailModal}
+	document={selectedDocument}
+	onclose={() => (showDetailModal = false)}
+	ondownload={(doc) => { if (doc.fileUrl || doc.file_url) window.open(doc.fileUrl || doc.file_url, '_blank'); }}
+	onviewcustody={(docId) => { custodyEvidenceId = docId; showCustodyFlow = true; showDetailModal = false; }}
+	onanalyze={(docId) => { assistantNode = { id: docId, title: selectedDocument?.title || '', type: 'document' }; showEvidenceAssistant = true; showDetailModal = false; }}
 />
 
 <EvidenceCRUDModal

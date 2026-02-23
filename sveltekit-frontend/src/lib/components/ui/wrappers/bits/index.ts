@@ -1,5 +1,2 @@
-export { default as Button } from './Button.svelte';
-export { default as DialogRoot } from './DialogRoot.svelte';
-export { default as DialogTrigger } from './DialogTrigger.svelte';
-export { default as DialogContent } from './DialogContent.svelte';
-// // ARCHIVED: export * from './bits-overrides.js'; // Session 56: file missing
+// ARCHIVED: All stub components moved to deeds_labs/svelte4-archive/components/stub-ui-subdirs/wrappers-bits/
+// Use bits-ui directly: import { Dialog, Button } from "bits-ui"

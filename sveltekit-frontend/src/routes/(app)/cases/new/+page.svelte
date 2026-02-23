@@ -5,6 +5,7 @@
 	import type { PageData } from './$types';
 	import LegalCaseForm from '$lib/components/forms/LegalCaseForm.svelte';
 	import EnhancedCaseForm from '$lib/components/forms/EnhancedCaseForm.svelte';
+	import AutoPopulatedCaseForm from '$lib/components/ui/AutoPopulatedCaseForm.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -33,7 +34,7 @@
 
 	// Evidence file upload
 	let uploadedFiles = $state<File[]>([]);
-	let formMode = $state<'ai' | 'multistep' | 'enhanced'>('ai');
+	let formMode = $state<'ai' | 'multistep' | 'enhanced' | 'autofill'>('ai');
 
 	// Map severity level to priority
 	function severityToPriority(level: number | null | undefined): string {
@@ -136,9 +137,18 @@
 		<button class="toggle-btn" class:active={formMode === 'ai'} onclick={() => (formMode = 'ai')}>AI Intake</button>
 		<button class="toggle-btn" class:active={formMode === 'multistep'} onclick={() => (formMode = 'multistep')}>Multi-Step Form</button>
 		<button class="toggle-btn" class:active={formMode === 'enhanced'} onclick={() => (formMode = 'enhanced')}>Enhanced Form</button>
+		<button class="toggle-btn" class:active={formMode === 'autofill'} onclick={() => (formMode = 'autofill')}>AI Auto-Fill</button>
 	</div>
 
-	{#if formMode === 'multistep'}
+	{#if formMode === 'autofill'}
+		<div class="multi-step-container">
+			<AutoPopulatedCaseForm
+				onSubmit={(formData) => { console.log('Auto-filled case submitted:', formData); }}
+				onFieldChange={(field, value) => { console.log('Field changed:', field, value); }}
+				editable={true}
+			/>
+		</div>
+	{:else if formMode === 'multistep'}
 		<div class="multi-step-container">
 			<LegalCaseForm />
 		</div>

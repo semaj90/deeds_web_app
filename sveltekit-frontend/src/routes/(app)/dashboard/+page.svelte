@@ -16,6 +16,7 @@
   import AIAssistantButton from '$lib/components/ai/AIAssistantButton.svelte';
   import CommandPalette from '$lib/components/ui/CommandPalette.svelte';
   import ActiveCasesWidget from '$lib/components/yorha/dashboard/ActiveCasesWidget.svelte';
+  import YoRHaDataViz from '$lib/components/yorha/_simulations/YoRHaDataViz.svelte';
 
   let showCommandPalette = $state(false);
 
@@ -186,6 +187,24 @@
         {/if}
       </CardContent>
     </Card>
+
+    <!-- Data Visualization (YoRHa-themed charts) -->
+    <div class="mt-8">
+      <YoRHaDataViz
+        title="Case Activity Overview"
+        data={[
+          { label: 'Active', value: stats.activeCases, status: 'active', color: '#c8a84b' },
+          { label: 'Pending', value: stats.pendingEvidence, status: 'pending', color: '#ecc94b' },
+          { label: 'Approved', value: stats.approvedEvidence, status: 'completed', color: '#48bb78' },
+          { label: 'POIs', value: stats.personsOfInterest, status: 'active', color: '#60a5fa' },
+          { label: 'Citations', value: stats.totalCitations, status: 'completed', color: '#d4c7a3' },
+          { label: 'Recent', value: stats.recentActivity, status: 'active', color: '#38bdf8' },
+        ]}
+        type="bar"
+        height={250}
+        animated={true}
+      />
+    </div>
 
     <!-- Active Cases Widget -->
     <div class="mt-8">

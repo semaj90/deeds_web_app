@@ -2,11 +2,10 @@
 // Optimized for legal AI application with NieR theming
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
-// Component Exports
-export { default as Button } from './Button.svelte';
-export { default as Card } from './Card.svelte';
-export { default as Input } from './Input.svelte';
-// // ARCHIVED: export { buttonVariants, type ButtonVariants } from './button-variants.js'; // Session 56: file missing
+// ARCHIVED: Button, Card, Input moved to deeds_labs/svelte4-archive/
+// export { default as Button } from './Button.svelte';
+// export { default as Card } from './Card.svelte';
+// export { default as Input } from './Input.svelte';
 
 // Re-export commonly used types
 export type { HTMLButtonAttributes } from 'svelte/elements';

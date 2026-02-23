@@ -3,6 +3,7 @@
 	import type { LayoutData } from './$types';
 	import CaseDocumentWriter from '$lib/components/legal-ai/CaseDocumentWriter.svelte';
 	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
+	import ErrorBoundary from '$lib/components/ui/ErrorBoundary.svelte';
 	import { notificationStore } from '$lib/stores/unified/notification-store.svelte.js';
 
 	interface Props {
@@ -124,7 +125,9 @@
 
 	<!-- Main Content -->
 	<main class="main-content">
-		{@render children?.()}
+		<ErrorBoundary showDetails={data.devBypass}>
+			{@render children?.()}
+		</ErrorBoundary>
 	</main>
 </div>
 
