@@ -1,7 +1,11 @@
 <script lang="ts">
-	import { parseCartridge, type ParsedCartridge, type ParsedRune } from '$lib/shared/chr97-reader.js';
+	import { parseCartridge, type ParsedCartridge } from '$lib/shared/chr97-reader.js';
 	import { quantizeFloat32ToUint8 } from '$lib/shared/quantize.js';
 	import type { QuantizedEmbedding } from '$lib/shared/embedding-types';
+	import { NESMemoryArchitecture, type MemoryStats } from '$lib/memory/nes-memory-architecture.js';
+	import { runeToLegalDocument } from '$lib/memory/rune-to-legal-doc.js';
+	import { GPU_CONFIG } from '$lib/config/env.js';
+	import { NES_PALETTE } from '$lib/themes/retro-console-palettes.js';
 
 	interface PageData {
 		cases: Array<{ id: string; title: string; status: string }>;
@@ -20,13 +24,83 @@
 	let searchResults = $state<Array<{ index: number; score: number }>>([]);
 	let searching = $state(false);
 	let selectedRune = $state<number | null>(null);
-	let runeTexts = $state<string[]>([]);
+	let runeTexts: string[] = [];
 	let canvas: HTMLCanvasElement | undefined = $state();
+
+	// ── NES Memory State ─────────────────────────────────────────────────
+	let nesMemory = $state<NESMemoryArchitecture | null>(null);
+	let nesStats = $state<MemoryStats | null>(null);
+	let nesBanks = $state<Array<{ name: string; size: number; used: number; docs: number }>>([]);
 
 	// ── Derived ──────────────────────────────────────────────────────────
 	let runeCount = $derived(cartridge?.runes.length ?? 0);
 	let hasCartridge = $derived(cartridge !== null);
 	let highlightSet = $derived(new Set(searchResults.map(r => r.index)));
+
+	// ── NES palette colors for canvas ────────────────────────────────────
+	const nesColors = [
+		...NES_PALETTE.colors.accent,
+		NES_PALETTE.colors.primary,
+		NES_PALETTE.colors.secondary,
+		NES_PALETTE.colors.tertiary,
+		NES_PALETTE.colors.evidence,
+		NES_PALETTE.colors.classification,
+		NES_PALETTE.colors.confidence,
+		NES_PALETTE.colors.priority,
+	];
+
+	// ── NES Memory lifecycle ─────────────────────────────────────────────
+	$effect(() => {
+		const mem = new NESMemoryArchitecture();
+		mem.startVBlankCycle();
+		nesMemory = mem;
+		return () => {
+			mem.stopVBlankCycle();
+			nesMemory = null;
+		};
+	});
+
+	// ── Periodic NES stats refresh ───────────────────────────────────────
+	$effect(() => {
+		if (!nesMemory) return;
+		updateNESStats();
+		const id = setInterval(updateNESStats, 2000);
+		return () => clearInterval(id);
+	});
+
+	function updateNESStats() {
+		if (!nesMemory) return;
+		nesStats = nesMemory.getMemoryStats();
+		const banks = nesMemory.getBanks();
+		nesBanks = Array.from(banks.entries()).map(([name, bank]) => ({
+			name,
+			size: bank.size,
+			used: bank.used,
+			docs: bank.documents.size,
+		}));
+	}
+
+	// ── Populate NES memory from cartridge ────────────────────────────────
+	async function populateNESMemory(cart: ParsedCartridge) {
+		if (!nesMemory) return;
+		nesMemory.clear();
+
+		for (let i = 0; i < cart.runes.length; i++) {
+			const rune = cart.runes[i];
+			const tensor = i < cart.tensors.length ? cart.tensors[i] : undefined;
+			const doc = runeToLegalDocument(rune, tensor, {
+				caseId: selectedCaseId,
+				embeddingDim: cart.metadata.embeddingDim,
+				collections: cart.metadata.collections,
+				sources: cart.metadata.sources,
+			});
+
+			const buf = new ArrayBuffer(doc.size);
+			await nesMemory.allocateDocument(doc, buf);
+		}
+
+		updateNESStats();
+	}
 
 	// ── Load cartridge from API ──────────────────────────────────────────
 	async function loadCartridge() {
@@ -58,6 +132,9 @@
 
 			// Extract rune texts from metadata sources
 			runeTexts = cartridge.metadata.sources;
+
+			// Populate NES memory banks from parsed runes
+			await populateNESMemory(cartridge);
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Failed to load cartridge';
 		} finally {
@@ -126,7 +203,13 @@
 		const h = canvas.height;
 		ctx.clearRect(0, 0, w, h);
 
-		ctx.fillStyle = '#1a1a2e';
+		// NES pixel-perfect rendering
+		if (GPU_CONFIG.nesPixelPerfect) {
+			ctx.imageSmoothingEnabled = false;
+		}
+
+		// NES palette background
+		ctx.fillStyle = NES_PALETTE.colors.background;
 		ctx.fillRect(0, 0, w, h);
 
 		const runes = cartridge.runes;
@@ -144,11 +227,6 @@
 		const rangeY = maxY - minY || 1;
 		const pad = 40;
 
-		const colors = [
-			'#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6',
-			'#1abc9c', '#e67e22', '#ecf0f1', '#95a5a6', '#d35400',
-		];
-
 		for (let i = 0; i < runes.length; i++) {
 			const r = runes[i];
 			const x = pad + ((r.manifold[0] - minX) / rangeX) * (w - 2 * pad);
@@ -159,12 +237,12 @@
 
 			ctx.beginPath();
 			ctx.arc(x, y, isSelected ? 8 : isHighlight ? 6 : 3, 0, Math.PI * 2);
-			ctx.fillStyle = isHighlight ? '#ffeb3b' : colors[r.clusterId % colors.length];
+			ctx.fillStyle = isHighlight ? NES_PALETTE.colors.warning : nesColors[r.clusterId % nesColors.length];
 			ctx.globalAlpha = isHighlight ? 1 : 0.7;
 			ctx.fill();
 
 			if (isSelected) {
-				ctx.strokeStyle = '#ffffff';
+				ctx.strokeStyle = NES_PALETTE.colors.foreground;
 				ctx.lineWidth = 2;
 				ctx.stroke();
 			}
@@ -177,7 +255,7 @@
 			const x = pad + ((r.manifold[0] - minX) / rangeX) * (w - 2 * pad);
 			const y = pad + ((r.manifold[1] - minY) / rangeY) * (h - 2 * pad);
 
-			ctx.fillStyle = '#ffffff';
+			ctx.fillStyle = NES_PALETTE.colors.foreground;
 			ctx.font = '12px monospace';
 			ctx.fillText(`Rune #${r.id} (cluster ${r.clusterId})`, x + 12, y - 8);
 		}
@@ -219,6 +297,12 @@
 
 		selectedRune = closest >= 0 ? closest : null;
 	}
+
+	function bankFillColor(pct: number): string {
+		if (pct > 85) return NES_PALETTE.colors.error;
+		if (pct > 60) return NES_PALETTE.colors.warning;
+		return NES_PALETTE.colors.success;
+	}
 </script>
 
 <div class="memory-palace">
@@ -253,6 +337,31 @@
 				<span>{cartridge?.metadata.sources.length} sources</span>
 				<span>{cartridge?.header.version === 256 ? 'v1.0' : `v${cartridge?.header.version}`}</span>
 			</div>
+
+			<!-- NES Memory Bank Utilization -->
+			{#if nesBanks.length > 0}
+				<div class="nes-banks">
+					<h3>NES Memory Banks</h3>
+					{#each nesBanks as bank}
+						{@const pct = bank.size > 0 ? Math.round((bank.used / bank.size) * 100) : 0}
+						<div class="bank-row">
+							<span class="bank-name">{bank.name}</span>
+							<div class="bank-bar">
+								<div class="bank-fill" style="width: {pct}%; background: {bankFillColor(pct)}" />
+							</div>
+							<span class="bank-pct">{pct}%</span>
+							<span class="bank-docs">{bank.docs} docs</span>
+						</div>
+					{/each}
+					{#if nesStats}
+						<div class="nes-summary">
+							<span>{nesStats.documentCount} total docs</span>
+							<span>{nesStats.bankSwitches} bank switches</span>
+							<span>{nesStats.garbageCollections} GC cycles</span>
+						</div>
+					{/if}
+				</div>
+			{/if}
 
 			<div class="search-bar">
 				<input
@@ -345,4 +454,15 @@
 	.rune-id { font-weight: 700; min-width: 40px; }
 	.rune-score { font-family: monospace; color: #2e7d32; font-weight: 600; }
 	.rune-cluster { color: #888; }
+
+	/* NES Memory Banks */
+	.nes-banks { background: #1a1a1a; border: 2px solid #333; border-radius: 4px; padding: 1rem; margin-bottom: 1rem; }
+	.nes-banks h3 { margin: 0 0 0.75rem; font-size: 0.9rem; color: #ccc; font-family: monospace; }
+	.bank-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; font-size: 0.8rem; font-family: monospace; }
+	.bank-name { min-width: 120px; color: #aaa; }
+	.bank-bar { flex: 1; height: 12px; background: #333; border-radius: 2px; overflow: hidden; }
+	.bank-fill { height: 100%; transition: width 0.3s ease; border-radius: 2px; }
+	.bank-pct { min-width: 36px; text-align: right; color: #ccc; }
+	.bank-docs { min-width: 50px; text-align: right; color: #888; }
+	.nes-summary { display: flex; gap: 1.5rem; padding-top: 0.5rem; border-top: 1px solid #333; margin-top: 0.5rem; font-size: 0.75rem; color: #888; font-family: monospace; }
 </style>

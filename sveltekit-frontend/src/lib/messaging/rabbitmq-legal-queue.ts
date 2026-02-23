@@ -10,7 +10,7 @@
  * - Real-time legal analysis workflow orchestration
  * - Persistent message durability for critical legal data
  */
-import { nesMemory, type LegalDocument } from '../memory/nes-memory-architecture.js';
+import { NESMemoryArchitecture, type LegalDocument } from '../memory/nes-memory-architecture.js';
 // import { textureRankingMatrices, type RankingResult } from '../gpu/texture-ranking-matrices.js';
 
 interface RankingResult {
@@ -72,6 +72,7 @@ export interface LegalProcessingResult {
     readonly bankId?: number;
 }
 export class RabbitMQLegalQueue {
+    private nesMemory = new NESMemoryArchitecture();
     private connection: WebSocket | null = null;
     private isConnected = false;
     private reconnectAttempts = 0;
@@ -311,12 +312,12 @@ export class RabbitMQLegalQueue {
             switch (message.operation) {
                 case 'process':
                     // Store document in NES memory
-                    const allocated = await nesMemory.allocateDocument(document, message.payload, {
-                        preferredBank: message.metadata.bankPreference ? parseInt(message.metadata.bankPreference) : undefined,
+                    const allocated = await this.nesMemory.allocateDocument(document, message.payload, {
+                        preferredBank: message.metadata.bankPreference,
                         compress: true
                     });
                     if (allocated) {
-                        const storedDoc = nesMemory.getDocument(document.id);
+                        const storedDoc = this.nesMemory.getDocument(document.id);
                         bankId = storedDoc?.bankId;
                         result = { allocated: true, bankId };
                     }
@@ -335,7 +336,7 @@ export class RabbitMQLegalQueue {
                     break;
                 case 'retrieve':
                     // Retrieve document from memory
-                    const retrieved = nesMemory.getDocument(message.documentId);
+                    const retrieved = this.nesMemory.getDocument(message.documentId);
                     result = retrieved ? { document: retrieved } : null;
                     break;
             }
@@ -444,7 +445,7 @@ export class RabbitMQLegalQueue {
             console.log(`💾 Processing memory allocation event for ${message.documentId}`);
 
             // Update memory statistics
-            const memStats = nesMemory.getMemoryStats();
+            const memStats = this.nesMemory.getMemoryStats();
             this.metrics.nesMemoryEvents++;
 
             // Broadcast memory status update
