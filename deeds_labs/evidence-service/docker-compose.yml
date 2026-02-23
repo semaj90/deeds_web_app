@@ -1,0 +1,201 @@
+# Evidence Service - Production-Ready Legal AI Evidence Processing Pipeline
+# Integrates with existing docker-compose.yml infrastructure
+# Run: docker-compose -f docker-compose.yml -f evidence-service/docker-compose.yml up
+version: '3.8'
+
+services:
+  # Evidence GraphQL API Service
+  evidence-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: legal-ai-evidence-service
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      # Use existing PostgreSQL 17 + pgvector
+      DATABASE_URL: postgresql://legal_admin:123456@postgres:5432/legal_ai_db
+      # Use existing RabbitMQ
+      RABBITMQ_URL: amqp://legal_admin:123456@rabbitmq:5672
+      # Use existing MinIO
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+      MINIO_USE_SSL: false
+      MINIO_BUCKET: legal-documents
+      # Use existing Qdrant
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_COLLECTION: legal_evidence
+      # Connect to Ollama on host (GPU accelerated)
+      OLLAMA_BASE_URL: http://host.docker.internal:11436
+      OLLAMA_EMBEDDING_MODEL: embeddinggemma:latest
+      OLLAMA_CHAT_MODEL: gemma3
+      # Service config
+      PORT: 4000
+      NODE_ENV: production
+      LOG_LEVEL: info
+    volumes:
+      - evidence_uploads:/tmp/evidence-uploads
+      - evidence_data:/app/data
+    networks:
+      - legal-ai-network
+    depends_on:
+      - postgres
+      - rabbitmq
+      - minio
+      - qdrant
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/graphql?query=%7B__typename%7D"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # OCR Worker - GPU Accelerated
+  worker-ocr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: legal-ai-worker-ocr
+    restart: unless-stopped
+    command: ["npm", "run", "worker:ocr"]
+    runtime: nvidia
+    environment:
+      DATABASE_URL: postgresql://legal_admin:123456@postgres:5432/legal_ai_db
+      RABBITMQ_URL: amqp://legal_admin:123456@rabbitmq:5672
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+      MINIO_USE_SSL: false
+      MINIO_BUCKET: legal-documents
+      NODE_ENV: production
+      LOG_LEVEL: info
+      # GPU acceleration for Tesseract
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+    volumes:
+      - evidence_uploads:/tmp/evidence-uploads
+    networks:
+      - legal-ai-network
+    depends_on:
+      evidence-service:
+        condition: service_healthy
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # Embedding Worker - GPU Accelerated (Ollama + Transformers.js)
+  worker-embed:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: legal-ai-worker-embed
+    restart: unless-stopped
+    command: ["npm", "run", "worker:embed"]
+    runtime: nvidia
+    environment:
+      DATABASE_URL: postgresql://legal_admin:123456@postgres:5432/legal_ai_db
+      RABBITMQ_URL: amqp://legal_admin:123456@rabbitmq:5672
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_COLLECTION: legal_evidence
+      # Use GPU-accelerated Ollama on host
+      OLLAMA_BASE_URL: http://host.docker.internal:11436
+      OLLAMA_EMBEDDING_MODEL: embeddinggemma:latest
+      NODE_ENV: production
+      LOG_LEVEL: info
+      # GPU for transformers.js fallback
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+    networks:
+      - legal-ai-network
+    depends_on:
+      evidence-service:
+        condition: service_healthy
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # Entity Extraction Worker - GPU Accelerated (Transformers.js NER)
+  worker-entity:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: legal-ai-worker-entity
+    restart: unless-stopped
+    command: ["npm", "run", "worker:entity"]
+    runtime: nvidia
+    environment:
+      DATABASE_URL: postgresql://legal_admin:123456@postgres:5432/legal_ai_db
+      RABBITMQ_URL: amqp://legal_admin:123456@rabbitmq:5672
+      NODE_ENV: production
+      LOG_LEVEL: info
+      # GPU for NER models
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+    networks:
+      - legal-ai-network
+    depends_on:
+      evidence-service:
+        condition: service_healthy
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # Summarization Worker - GPU Accelerated (Gemma3 via Ollama)
+  worker-summarize:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: legal-ai-worker-summarize
+    restart: unless-stopped
+    command: ["npm", "run", "worker:summarize"]
+    runtime: nvidia
+    environment:
+      DATABASE_URL: postgresql://legal_admin:123456@postgres:5432/legal_ai_db
+      RABBITMQ_URL: amqp://legal_admin:123456@rabbitmq:5672
+      # GPU-accelerated Ollama on host
+      OLLAMA_BASE_URL: http://host.docker.internal:11436
+      OLLAMA_CHAT_MODEL: gemma3
+      NODE_ENV: production
+      LOG_LEVEL: info
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+    networks:
+      - legal-ai-network
+    depends_on:
+      evidence-service:
+        condition: service_healthy
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+# Volumes for evidence service (reuse existing network)
+volumes:
+  evidence_uploads:
+    driver: local
+  evidence_data:
+    driver: local
+
+# Join existing network from main docker-compose.yml
+networks:
+  legal-ai-network:
+    external: true

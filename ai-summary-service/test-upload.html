@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Document Processing Test Interface</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0f0f0f;
+            color: #fff;
+        }
+        .container {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #333;
+        }
+        h1 {
+            color: #00ff88;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ccc;
+            font-weight: 500;
+        }
+        input[type="file"], input[type="text"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 6px;
+            background: #2a2a2a;
+            color: #fff;
+            font-size: 14px;
+        }
+        input[type="file"]::-webkit-file-upload-button {
+            background: #00ff88;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            margin: 15px 0;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        input[type="checkbox"] {
+            width: auto;
+        }
+        button {
+            background: #00ff88;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #00cc6a;
+            transform: translateY(-1px);
+        }
+        button:disabled {
+            background: #555;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            border: 1px solid #444;
+            display: none;
+        }
+        .results.show {
+            display: block;
+        }
+        .loading {
+            text-align: center;
+            color: #00ff88;
+            margin: 20px 0;
+        }
+        .error {
+            color: #ff4444;
+            background: #330000;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .success {
+            color: #00ff88;
+            background: #003300;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .json-output {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: #333;
+            border: none;
+            border-radius: 6px 6px 0 0;
+            color: #ccc;
+            cursor: pointer;
+        }
+        .tab.active {
+            background: #00ff88;
+            color: #000;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-healthy { background: #00ff88; }
+        .status-unhealthy { background: #ff4444; }
+        .status-unknown { background: #ffaa00; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 AI Document Processing Test Interface</h1>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('upload')">Single Upload</button>
+            <button class="tab" onclick="switchTab('batch')">Batch Upload</button>
+            <button class="tab" onclick="switchTab('health')">Health Check</button>
+        </div>
+
+        <!-- Single Upload Tab -->
+        <div id="upload-tab" class="tab-content active">
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="file">Select Document (PDF, TXT, RTF, DOCX, Images)</label>
+                    <input type="file" id="file" name="file" required 
+                           accept=".pdf,.txt,.rtf,.docx,.png,.jpg,.jpeg,.tiff">
+                </div>
+
+                <div class="form-group">
+                    <label for="document_type">Document Type</label>
+                    <select id="document_type" name="document_type">
+                        <option value="legal">Legal Document</option>
+                        <option value="contract">Contract</option>
+                        <option value="case">Case File</option>
+                        <option value="evidence">Evidence</option>
+                        <option value="will">Last Will & Testament</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="case_id">Case ID (optional)</label>
+                    <input type="text" id="case_id" name="case_id" placeholder="CASE-2025-001">
+                </div>
+
+                <div class="form-group">
+                    <label for="practice_area">Practice Area</label>
+                    <select id="practice_area" name="practice_area">
+                        <option value="estate_planning">Estate Planning</option>
+                        <option value="contract_law">Contract Law</option>
+                        <option value="criminal_law">Criminal Law</option>
+                        <option value="corporate_law">Corporate Law</option>
+                        <option value="intellectual_property">Intellectual Property</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="jurisdiction">Jurisdiction</label>
+                    <input type="text" id="jurisdiction" name="jurisdiction" value="US" placeholder="US, UK, CA, etc.">
+                </div>
+
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="enable_ocr" name="enable_ocr" checked>
+                        <label for="enable_ocr">Enable OCR (for images/scanned PDFs)</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="enable_embedding" name="enable_embedding" checked>
+                        <label for="enable_embedding">Generate Vector Embeddings</label>
+                    </div>
+                </div>
+
+                <button type="submit" id="uploadBtn">
+                    🚀 Process Document with AI
+                </button>
+            </form>
+        </div>
+
+        <!-- Batch Upload Tab -->
+        <div id="batch-tab" class="tab-content">
+            <form id="batchForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="batch_files">Select Multiple Documents (max 10)</label>
+                    <input type="file" id="batch_files" name="files" multiple required 
+                           accept=".pdf,.txt,.rtf,.docx,.png,.jpg,.jpeg,.tiff">
+                </div>
+
+                <div class="form-group">
+                    <label for="batch_document_type">Document Type</label>
+                    <select id="batch_document_type" name="document_type">
+                        <option value="legal">Legal Document</option>
+                        <option value="contract">Contract</option>
+                        <option value="case">Case File</option>
+                        <option value="evidence">Evidence</option>
+                    </select>
+                </div>
+
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="batch_enable_ocr" name="enable_ocr" checked>
+                        <label for="batch_enable_ocr">Enable OCR</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="batch_enable_embedding" name="enable_embedding" checked>
+                        <label for="batch_enable_embedding">Generate Embeddings</label>
+                    </div>
+                </div>
+
+                <button type="submit" id="batchBtn">
+                    📊 Process Batch Documents
+                </button>
+            </form>
+        </div>
+
+        <!-- Health Check Tab -->
+        <div id="health-tab" class="tab-content">
+            <button onclick="checkHealth()" style="margin-bottom: 20px;">
+                🔍 Check System Health
+            </button>
+            <div id="healthResults"></div>
+        </div>
+
+        <div id="results" class="results">
+            <h3>Processing Results</h3>
+            <div id="output"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8081/api';
+
+        function switchTab(tab) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tab + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const btn = document.getElementById('uploadBtn');
+            const results = document.getElementById('results');
+            const output = document.getElementById('output');
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Processing...';
+            results.classList.add('show');
+            output.innerHTML = '<div class="loading">Processing document with GPU acceleration...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    output.innerHTML = `
+                        <div class="success">✅ Document processed successfully!</div>
+                        <div class="json-output">${JSON.stringify(result, null, 2)}</div>
+                    `;
+                } else {
+                    output.innerHTML = `
+                        <div class="error">❌ Error: ${result.error || 'Unknown error'}</div>
+                        <div class="json-output">${JSON.stringify(result, null, 2)}</div>
+                    `;
+                }
+            } catch (error) {
+                output.innerHTML = `
+                    <div class="error">❌ Network Error: ${error.message}</div>
+                `;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🚀 Process Document with AI';
+            }
+        });
+
+        document.getElementById('batchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const btn = document.getElementById('batchBtn');
+            const results = document.getElementById('results');
+            const output = document.getElementById('output');
+            
+            const fileCount = document.getElementById('batch_files').files.length;
+            
+            btn.disabled = true;
+            btn.textContent = `⏳ Processing ${fileCount} files...`;
+            results.classList.add('show');
+            output.innerHTML = `<div class="loading">Processing ${fileCount} documents concurrently...</div>`;
+            
+            try {
+                const response = await fetch(`${API_BASE}/batch-upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    const successCount = result.results.filter(r => r.success).length;
+                    output.innerHTML = `
+                        <div class="success">✅ Batch processing completed! ${successCount}/${fileCount} files processed successfully</div>
+                        <div class="json-output">${JSON.stringify(result, null, 2)}</div>
+                    `;
+                } else {
+                    output.innerHTML = `
+                        <div class="error">❌ Batch Error: ${result.error || 'Unknown error'}</div>
+                        <div class="json-output">${JSON.stringify(result, null, 2)}</div>
+                    `;
+                }
+            } catch (error) {
+                output.innerHTML = `
+                    <div class="error">❌ Network Error: ${error.message}</div>
+                `;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📊 Process Batch Documents';
+            }
+        });
+
+        async function checkHealth() {
+            const healthResults = document.getElementById('healthResults');
+            healthResults.innerHTML = '<div class="loading">Checking system health...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const health = await response.json();
+                
+                let statusHtml = '<h4>System Status</h4>';
+                
+                Object.entries(health.services).forEach(([service, status]) => {
+                    const statusClass = status === 'healthy' || status === 'enabled' ? 'status-healthy' : 
+                                      status === 'unhealthy' || status === 'disabled' ? 'status-unhealthy' : 'status-unknown';
+                    statusHtml += `
+                        <div style="margin: 10px 0;">
+                            <span class="status-indicator ${statusClass}"></span>
+                            <strong>${service.toUpperCase()}:</strong> ${status}
+                        </div>
+                    `;
+                });
+                
+                healthResults.innerHTML = `
+                    ${statusHtml}
+                    <div class="json-output">${JSON.stringify(health, null, 2)}</div>
+                `;
+            } catch (error) {
+                healthResults.innerHTML = `
+                    <div class="error">❌ Health Check Failed: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Auto-check health on page load
+        window.addEventListener('load', () => {
+            setTimeout(checkHealth, 1000);
+        });
+    </script>
+</body>
+</html>

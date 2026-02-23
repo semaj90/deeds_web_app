@@ -1,0 +1,19 @@
+{
+  "model_name": "gemma3-legal",
+  "max_batch_size": 2,
+  "max_input_len": 1024,
+  "max_seq_len": 2048,
+  "max_beam_width": 1,
+  "use_gemm_plugin": "auto",
+  "use_gpt_attention_plugin": "float16",
+  "paged_kv_cache": true,
+  "dtype": "float16",
+  "use_weight_only": true,
+  "weight_only_precision": "int4_awq",
+  "per_group": true,
+  "group_size": 128,
+  "int8_kv_cache": true,
+  "gpu_memory_limit": "6GB",
+  "optimization_level": "max",
+  "target_platform": "RTX_3060_Ti"
+}

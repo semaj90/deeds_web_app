@@ -1,0 +1,47 @@
+syntax = "proto3";
+package metrics;
+option go_package = "legal-ai-cuda/proto/metrics;metrics";
+
+message Histogram {
+  repeated double buckets = 1;  // Upper bounds
+  repeated uint64 counts = 2;    // Count per bucket
+}
+
+enum MetricType {
+  METRIC_TYPE_COUNTER = 0;
+  METRIC_TYPE_GAUGE = 1;
+  METRIC_TYPE_HISTOGRAM = 2;
+}
+
+message MetricValue {
+  int64 counter_value = 1;
+  double gauge_value = 2;
+  Histogram histogram_value = 3;
+}
+
+message Metric {
+  string name = 1;
+  MetricType type = 2;
+  map<string,string> labels = 3;
+  MetricValue value = 4;
+}
+
+message ReportMetricsRequest {
+  string service_name = 1;
+  map<string,string> global_labels = 2;
+  repeated Metric metrics = 3;
+}
+
+message ReportMetricsResponse {
+  bool success = 1;
+  string message = 2;
+  int32 metrics_processed = 3;
+  repeated string errors = 4;
+}
+
+message StreamMetricsRequest {}
+
+service MetricsService {
+  rpc ReportMetrics(ReportMetricsRequest) returns (ReportMetricsResponse);
+  rpc StreamMetrics(StreamMetricsRequest) returns (stream ReportMetricsResponse);
+}

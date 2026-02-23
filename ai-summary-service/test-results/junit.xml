@@ -1,0 +1,250 @@
+<testsuites id="" name="" tests="24" failures="8" skipped="0" errors="0" time="134.17586000000003">
+<testsuite name="integration-status-test.spec.js" timestamp="2025-08-12T06:56:07.761Z" hostname="chromium" tests="8" failures="1" skipped="0" time="47.012" errors="0">
+<testcase name="Integration Test HTML - Ollama Status Detection › should correctly detect Ollama status via Go service health endpoint" classname="integration-status-test.spec.js" time="10.303">
+<system-out>
+<![CDATA[Ollama Status Detected: ✅ Running
+]]>
+</system-out>
+</testcase>
+<testcase name="Integration Test HTML - Ollama Status Detection › should verify Go service integration with Ollama" classname="integration-status-test.spec.js" time="8.977">
+</testcase>
+<testcase name="Integration Test HTML - Ollama Status Detection › should test API endpoints through integration interface" classname="integration-status-test.spec.js" time="12.146">
+</testcase>
+<testcase name="Integration Test HTML - Ollama Status Detection › should verify export functionality works" classname="integration-status-test.spec.js" time="5.951">
+<system-out>
+<![CDATA[Export test completed, file saved to: C:/Users/james/Desktop/deeds-web/deeds-web-app/ai-summary-service/test-export-1754981774818.json
+]]>
+</system-out>
+</testcase>
+<testcase name="Integration Test HTML - Ollama Status Detection › should validate navigation between all interfaces" classname="integration-status-test.spec.js" time="3.99">
+<system-out>
+<![CDATA[All navigation buttons validated successfully
+]]>
+</system-out>
+</testcase>
+<testcase name="Integration Test HTML - Ollama Status Detection › should handle document upload simulation" classname="integration-status-test.spec.js" time="3.897">
+<failure message="integration-status-test.spec.js:142:3 should handle document upload simulation" type="FAILURE">
+<![CDATA[  [chromium] › integration-status-test.spec.js:142:3 › Integration Test HTML - Ollama Status Detection › should handle document upload simulation 
+
+    Error: expect: Property 'toBePresent' not found.
+
+      150 |     
+      151 |     // Check file input is present
+    > 152 |     await expect(page.locator('input[type="file"]')).toBePresent();
+          |                                                     ^
+      153 |     
+      154 |     // Check Select Files button
+      155 |     await expect(page.locator('button:has-text("Select Files")')).toBeVisible();
+        at C:\Users\james\Desktop\deeds-web\deeds-web-app\ai-summary-service\tests\integration-status-test.spec.js:152:53
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\test-results\integration-status-test-In-1edbc--document-upload-simulation-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\test-results\integration-status-test-In-1edbc--document-upload-simulation-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\test-results\integration-status-test-In-1edbc--document-upload-simulation-chromium\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|integration-status-test-In-1edbc--document-upload-simulation-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|integration-status-test-In-1edbc--document-upload-simulation-chromium\video.webm]]
+
+[[ATTACHMENT|integration-status-test-In-1edbc--document-upload-simulation-chromium\error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Service Status Verification › should verify actual Ollama service is running" classname="integration-status-test.spec.js" time="0.051">
+<system-out>
+<![CDATA[Go Service Health Response: {
+  status: [32m'healthy'[39m,
+  timestamp: [32m'2025-08-11T23:56:08.8434748-07:00'[39m,
+  services: {
+    ollama: [32m'healthy'[39m,
+    qdrant: [32m'unhealthy'[39m,
+    postgresql: [32m'healthy'[39m,
+    gpu: [32m'enabled'[39m
+  },
+  version: [32m'2.0.0-enhanced'[39m
+}
+]]>
+</system-out>
+</testcase>
+<testcase name="Service Status Verification › should test Ollama embedding endpoint directly" classname="integration-status-test.spec.js" time="1.697">
+<system-out>
+<![CDATA[Ollama embedding test successful, dimension: [33m768[39m
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="integration-status-test.spec.js" timestamp="2025-08-12T06:56:07.761Z" hostname="firefox" tests="8" failures="6" skipped="0" time="720.285" errors="0">
+<testcase name="Integration Test HTML - Ollama Status Detection › should correctly detect Ollama status via Go service health endpoint" classname="integration-status-test.spec.js" time="120.038">
+<failure message="integration-status-test.spec.js:6:3 should correctly detect Ollama status via Go service health endpoint" type="FAILURE">
+<![CDATA[  [firefox] › integration-status-test.spec.js:6:3 › Integration Test HTML - Ollama Status Detection › should correctly detect Ollama status via Go service health endpoint 
+
+    Test timeout of 120000ms exceeded while setting up "page".
+
+    Error: browserContext.newPage: Test timeout of 120000ms exceeded.
+]]>
+</failure>
+</testcase>
+<testcase name="Integration Test HTML - Ollama Status Detection › should verify Go service integration with Ollama" classname="integration-status-test.spec.js" time="120.026">
+<failure message="integration-status-test.spec.js:34:3 should verify Go service integration with Ollama" type="FAILURE">
+<![CDATA[  [firefox] › integration-status-test.spec.js:34:3 › Integration Test HTML - Ollama Status Detection › should verify Go service integration with Ollama 
+
+    Test timeout of 120000ms exceeded while setting up "page".
+
+    Error: browserContext.newPage: Test timeout of 120000ms exceeded.
+]]>
+</failure>
+</testcase>
+<testcase name="Integration Test HTML - Ollama Status Detection › should test API endpoints through integration interface" classname="integration-status-test.spec.js" time="120.026">
+<failure message="integration-status-test.spec.js:60:3 should test API endpoints through integration interface" type="FAILURE">
+<![CDATA[  [firefox] › integration-status-test.spec.js:60:3 › Integration Test HTML - Ollama Status Detection › should test API endpoints through integration interface 
+
+    Test timeout of 120000ms exceeded while setting up "page".
+
+    Error: browserContext.newPage: Test timeout of 120000ms exceeded.
+]]>
+</failure>
+</testcase>
+<testcase name="Integration Test HTML - Ollama Status Detection › should verify export functionality works" classname="integration-status-test.spec.js" time="120.017">
+<failure message="integration-status-test.spec.js:88:3 should verify export functionality works" type="FAILURE">
+<![CDATA[  [firefox] › integration-status-test.spec.js:88:3 › Integration Test HTML - Ollama Status Detection › should verify export functionality works 
+
+    Test timeout of 120000ms exceeded while setting up "page".
+
+    Error: browserContext.newPage: Test timeout of 120000ms exceeded.
+]]>
+</failure>
+</testcase>
+<testcase name="Integration Test HTML - Ollama Status Detection › should validate navigation between all interfaces" classname="integration-status-test.spec.js" time="120.028">
+<failure message="integration-status-test.spec.js:116:3 should validate navigation between all interfaces" type="FAILURE">
+<![CDATA[  [firefox] › integration-status-test.spec.js:116:3 › Integration Test HTML - Ollama Status Detection › should validate navigation between all interfaces 
+
+    Test timeout of 120000ms exceeded while setting up "page".
+
+    Error: browserContext.newPage: Test timeout of 120000ms exceeded.
+]]>
+</failure>
+</testcase>
+<testcase name="Integration Test HTML - Ollama Status Detection › should handle document upload simulation" classname="integration-status-test.spec.js" time="120.031">
+<failure message="integration-status-test.spec.js:142:3 should handle document upload simulation" type="FAILURE">
+<![CDATA[  [firefox] › integration-status-test.spec.js:142:3 › Integration Test HTML - Ollama Status Detection › should handle document upload simulation 
+
+    Test timeout of 120000ms exceeded while setting up "page".
+
+    Error: browserContext.newPage: Test timeout of 120000ms exceeded.
+]]>
+</failure>
+</testcase>
+<testcase name="Service Status Verification › should verify actual Ollama service is running" classname="integration-status-test.spec.js" time="0.07">
+<system-out>
+<![CDATA[Go Service Health Response: {
+  status: [32m'healthy'[39m,
+  timestamp: [32m'2025-08-11T23:56:21.963068-07:00'[39m,
+  services: {
+    ollama: [32m'healthy'[39m,
+    qdrant: [32m'unhealthy'[39m,
+    postgresql: [32m'healthy'[39m,
+    gpu: [32m'enabled'[39m
+  },
+  version: [32m'2.0.0-enhanced'[39m
+}
+]]>
+</system-out>
+</testcase>
+<testcase name="Service Status Verification › should test Ollama embedding endpoint directly" classname="integration-status-test.spec.js" time="0.049">
+<system-out>
+<![CDATA[Ollama embedding test successful, dimension: [33m768[39m
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="integration-status-test.spec.js" timestamp="2025-08-12T06:56:07.761Z" hostname="webkit" tests="8" failures="1" skipped="0" time="38.096" errors="0">
+<testcase name="Integration Test HTML - Ollama Status Detection › should correctly detect Ollama status via Go service health endpoint" classname="integration-status-test.spec.js" time="9.685">
+<system-out>
+<![CDATA[Ollama Status Detected: ✅ Running
+]]>
+</system-out>
+</testcase>
+<testcase name="Integration Test HTML - Ollama Status Detection › should verify Go service integration with Ollama" classname="integration-status-test.spec.js" time="8.935">
+</testcase>
+<testcase name="Integration Test HTML - Ollama Status Detection › should test API endpoints through integration interface" classname="integration-status-test.spec.js" time="10.938">
+</testcase>
+<testcase name="Integration Test HTML - Ollama Status Detection › should verify export functionality works" classname="integration-status-test.spec.js" time="3.658">
+<system-out>
+<![CDATA[Export test completed, file saved to: C:/Users/james/Desktop/deeds-web/deeds-web-app/ai-summary-service/test-export-1754981797875.json
+]]>
+</system-out>
+</testcase>
+<testcase name="Integration Test HTML - Ollama Status Detection › should validate navigation between all interfaces" classname="integration-status-test.spec.js" time="2.448">
+<system-out>
+<![CDATA[All navigation buttons validated successfully
+]]>
+</system-out>
+</testcase>
+<testcase name="Integration Test HTML - Ollama Status Detection › should handle document upload simulation" classname="integration-status-test.spec.js" time="2.364">
+<failure message="integration-status-test.spec.js:142:3 should handle document upload simulation" type="FAILURE">
+<![CDATA[  [webkit] › integration-status-test.spec.js:142:3 › Integration Test HTML - Ollama Status Detection › should handle document upload simulation 
+
+    Error: expect: Property 'toBePresent' not found.
+
+      150 |     
+      151 |     // Check file input is present
+    > 152 |     await expect(page.locator('input[type="file"]')).toBePresent();
+          |                                                     ^
+      153 |     
+      154 |     // Check Select Files button
+      155 |     await expect(page.locator('button:has-text("Select Files")')).toBeVisible();
+        at C:\Users\james\Desktop\deeds-web\deeds-web-app\ai-summary-service\tests\integration-status-test.spec.js:152:53
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\test-results\integration-status-test-In-1edbc--document-upload-simulation-webkit\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\test-results\integration-status-test-In-1edbc--document-upload-simulation-webkit\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\test-results\integration-status-test-In-1edbc--document-upload-simulation-webkit\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|integration-status-test-In-1edbc--document-upload-simulation-webkit\test-failed-1.png]]
+
+[[ATTACHMENT|integration-status-test-In-1edbc--document-upload-simulation-webkit\video.webm]]
+
+[[ATTACHMENT|integration-status-test-In-1edbc--document-upload-simulation-webkit\error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Service Status Verification › should verify actual Ollama service is running" classname="integration-status-test.spec.js" time="0.041">
+<system-out>
+<![CDATA[Go Service Health Response: {
+  status: [32m'healthy'[39m,
+  timestamp: [32m'2025-08-11T23:56:43.9103969-07:00'[39m,
+  services: {
+    ollama: [32m'healthy'[39m,
+    qdrant: [32m'unhealthy'[39m,
+    postgresql: [32m'healthy'[39m,
+    gpu: [32m'enabled'[39m
+  },
+  version: [32m'2.0.0-enhanced'[39m
+}
+]]>
+</system-out>
+</testcase>
+<testcase name="Service Status Verification › should test Ollama embedding endpoint directly" classname="integration-status-test.spec.js" time="0.027">
+<system-out>
+<![CDATA[Ollama embedding test successful, dimension: [33m768[39m
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>
