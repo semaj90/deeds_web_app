@@ -2,7 +2,8 @@ import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db/client';
 import { cases, evidence } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { personsOfInterest } from '$lib/db/schema';
+import { arrayContains, eq } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	if (!locals.user) {
@@ -30,10 +31,24 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		};
 	}
 
-	const evidenceRows = await safe(
-		db.select().from(evidence).where(eq(evidence.caseId, caseId)).limit(50),
-		[]
-	);
+	const [evidenceRows, personRows] = await Promise.all([
+		safe(
+			db.select().from(evidence).where(eq(evidence.caseId, caseId)).limit(50),
+			[]
+		),
+		safe(
+			db.select().from(personsOfInterest)
+				.where(arrayContains(personsOfInterest.caseIds, [caseId]))
+				.limit(20),
+			[]
+		)
+	]);
+
+	// Build WHO from client + opposing party + linked persons
+	const whoParts: string[] = [];
+	if (caseRow.clientName) whoParts.push(caseRow.clientName);
+	if (caseRow.opposingParty) whoParts.push(`vs. ${caseRow.opposingParty}`);
+	if (personRows.length) whoParts.push(`(${personRows.length} persons of interest)`);
 
 	return {
 		user: locals.user,
@@ -44,12 +59,12 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 			status: caseRow.status,
 			description: caseRow.description,
 			narrative: caseRow.description,
-			who: caseRow.clientName ?? null,
+			who: whoParts.length ? whoParts.join(' ') : null,
 			what: caseRow.description ?? null,
 			when: caseRow.filingDate ?? null,
-			where: caseRow.jurisdiction ?? null,
-			why: null,
-			how: null
+			where: caseRow.jurisdiction ? `${caseRow.jurisdiction}${caseRow.court ? ` — ${caseRow.court}` : ''}` : null,
+			why: caseRow.practiceArea ? `Practice area: ${caseRow.practiceArea}` : null,
+			how: evidenceRows.length ? `${evidenceRows.length} evidence items attached` : null
 		},
 		evidence: evidenceRows.map((e) => ({
 			id: e.id,
@@ -59,7 +74,11 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 			mimeType: e.fileType ?? 'unknown',
 			status: 'indexed'
 		})),
-		persons: [] as Array<{ name: string; role: string; riskScore: string }>,
+		persons: personRows.map((p) => ({
+			name: p.name ?? 'Unknown',
+			role: p.relationship ?? 'Person of interest',
+			riskScore: p.threatLevel ?? '—'
+		})),
 		loadError: null
 	};
 };

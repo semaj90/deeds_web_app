@@ -345,18 +345,18 @@ Within each tab, routes are ordered by **priority**:
 | `/cases` | Y | 433 | List, filters, bulk actions, create | **WORKING** |
 | `/cases/new` | Y | 789 | 6W1H wizard, AI charge suggestion | **WORKING** — `analyzeWithAI()` calls `/api/cases/new/ai-analyze` |
 | `/cases/[id]` | Y | 1068 | Case detail, tabs, evidence list | **WORKING** |
-| `/cases/[id]/overview` | Y | 293 | 5W1H display, diagnostics | **PARTIAL** — WHY/HOW null; diagnostics wired (errors/summary + consolidation/status) |
+| `/cases/[id]/overview` | Y | 293 | 5W1H display, diagnostics, persons | **WORKING** — WHY/HOW derived from DB, persons via arrayContains, diagnostics wired |
 | `/cases/[id]/evidence` | N | — | No index route (only /upload subpage) | **MISSING** — use `/cases/[id]` evidence tab |
 | `/cases/[id]/board` | Y | 70 | Drag-and-drop canvas, save/restore | **WORKING** |
 | `/cases/[id]/chat` | Y | 28 | SSE streaming via Ollama | **WORKING** |
 | `/cases/[id]/ai` | Y | 176 | Quick actions UI, SSE streaming | **WORKING** — rewired to `/api/chat/stream` |
 | `/cases/[id]/persons` | Y | 154 | Person card display UI | **WORKING** — rewired to `/api/persons?caseId=X` |
-| `/cases/[id]/reports` | Y | 253 | TipTap editor, generate/save | **PARTIAL** — generate is template-only |
+| `/cases/[id]/reports` | Y | 253 | TipTap editor, AI generate/save | **WORKING** — Ollama gemma3-legal generation with template fallback |
 | `/evidence` | Y | 1090 | Evidence list, upload, semantic search | **WORKING** — debounced semantic search wired to `/api/evidence/search` |
 | `/evidence-board` | N | — | Does not exist | **MISSING** |
 | `/evidence-workspace` | N | — | Does not exist | **MISSING** |
 | `/gpu-evidence-graph` | Y | 445 | WebGPU detection, canvas | **STUB** |
-| `/persons-of-interest` | Y | 584 | List, create, detail view | **PARTIAL** — no AI, associates broken |
+| `/persons-of-interest` | Y | 584 | List, create, detail, associates | **WORKING** — associates via shared caseIds overlap, `/api/persons-of-interest/[id]/associates` |
 | `/dashboard` | Y | 280 | Case list, stats display | **WORKING** — `/api/dashboard/stats` returns live DB counts |
 | `/all-routes` | Y | 1247 | NES Command Center, SSE health | **WORKING** |
 
@@ -424,13 +424,13 @@ Within each tab, routes are ordered by **priority**:
 
 ### Readiness Summary
 
-- **Fully working:** 17 page routes + 23 API endpoints
-- **Partial:** 4 routes (overview, reports, persons-of-interest, error-brain, system-config)
+- **Fully working:** 20 page routes + 24 API endpoints
+- **Partial:** 2 routes (error-brain, system-config)
 - **Broken:** 0 routes
 - **Missing:** 3 claimed page routes (evidence-board, evidence-workspace, cases/[id]/evidence index)
 - **Stub:** 1 route (gpu-evidence-graph)
-- **API directories:** 44 remaining (3 new endpoints added this session)
+- **API directories:** 45 remaining (4 new endpoints added this session)
 
 **Last Updated:** February 23, 2026 (Session 93r6)
-**Status:** ~85% production ready (17/22 existing canonical page routes fully working)
+**Status:** ~91% production ready (20/22 existing canonical page routes fully working)
 **Total routes on disk:** 40+ page routes, 143 API +server.ts files
