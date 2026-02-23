@@ -7,6 +7,8 @@
 	import SearchResults from '$lib/components/SearchResults.svelte';
 	import ResultDetail from '$lib/components/ResultDetail.svelte';
 	import VectorIntelligenceDemo from '$lib/components/ai/VectorIntelligenceDemo.svelte';
+	import type { GPURerankMetrics, GPURankedItem } from '$lib/gpu/gpu-search-reranker.js';
+	import Cpu from '@lucide/svelte/icons/cpu';
 
 	let showRAGAssistant = $state(false);
 	let showCodebaseSearch = $state(false);
@@ -124,6 +126,38 @@
 		persons: true,
 	});
 
+	// GPU reranking state
+	let gpuRerankEnabled = $state(false);
+	let gpuRerankMetrics = $state<GPURerankMetrics | null>(null);
+	let gpuRankedItems = $state<GPURankedItem[]>([]);
+	let isGpuReranking = $state(false);
+
+	async function runGpuRerank() {
+		if (!gpuRerankEnabled) return;
+
+		const chunks = searchMode === 'evidence'
+			? evidenceBundles.map(b => ({ content: b.hit.content, serverScore: b.hit.score }))
+			: searchMode === 'rag'
+				? ragResults.map(r => ({ content: r.text || r.snippet, serverScore: r.score }))
+				: [];
+
+		if (chunks.length === 0) return;
+
+		isGpuReranking = true;
+		try {
+			const { gpuRerank } = await import('$lib/gpu/gpu-search-reranker.js');
+			const result = await gpuRerank(searchQuery, chunks, 10);
+			if (result) {
+				gpuRankedItems = result.items;
+				gpuRerankMetrics = result.metrics;
+			}
+		} catch (err) {
+			console.error('[GPU Rerank] Failed:', err);
+		} finally {
+			isGpuReranking = false;
+		}
+	}
+
 	async function performSearch() {
 		if (!searchQuery.trim()) return;
 
@@ -137,6 +171,8 @@
 		glossaryResults = [];
 		selectedResult = null;
 		selectedBundle = null;
+		gpuRankedItems = [];
+		gpuRerankMetrics = null;
 
 		try {
 			if (searchMode === 'evidence') {
@@ -179,6 +215,11 @@
 		evidenceBundles = data.bundles ?? [];
 		evidenceTiming = data.timing ?? null;
 		totalFound = evidenceResults.length;
+
+		// GPU rerank after server results arrive
+		if (gpuRerankEnabled && evidenceBundles.length > 0) {
+			await runGpuRerank();
+		}
 	}
 
 	async function searchRAG() {
@@ -200,6 +241,11 @@
 		ragResults = data.chunks ?? [];
 		ragTiming = data;
 		totalFound = data.total_found ?? ragResults.length;
+
+		// GPU rerank after server results arrive
+		if (gpuRerankEnabled && ragResults.length > 0) {
+			await runGpuRerank();
+		}
 	}
 
 	async function searchStatutes() {
@@ -360,6 +406,67 @@
 				</div>
 			</div>
 
+			<!-- GPU Rerank Toggle -->
+			{#if searchMode === 'evidence' || searchMode === 'rag'}
+				<div class="filter-section">
+					<h3><Cpu size={14} /> GPU RERANKING</h3>
+					<label class="filter-item">
+						<input
+							type="checkbox"
+							checked={gpuRerankEnabled}
+							onchange={() => { gpuRerankEnabled = !gpuRerankEnabled; }}
+						/>
+						<span>Enable WebGPU rerank</span>
+					</label>
+					{#if gpuRerankEnabled && !gpuRerankMetrics && !isGpuReranking && (evidenceBundles.length > 0 || ragResults.length > 0)}
+						<button class="mode-btn" onclick={runGpuRerank} style="margin-top: 4px; width: 100%">
+							Rerank Now
+						</button>
+					{/if}
+					{#if isGpuReranking}
+						<div class="timing-row">
+							<span class="animate-spin"><Loader2 size={12} /></span>
+							<span>Computing GPU scores...</span>
+						</div>
+					{/if}
+				</div>
+			{/if}
+
+			<!-- GPU Rerank Metrics -->
+			{#if gpuRerankMetrics}
+				<div class="timing-panel">
+					<h3><Cpu size={14} /> GPU RERANK</h3>
+					<div class="timing-grid">
+						<div class="timing-row">
+							<span>Backend</span>
+							<span class="timing-value">{gpuRerankMetrics.backend}</span>
+						</div>
+						<div class="timing-row">
+							<span>Query Embed</span>
+							<span class="timing-value">{gpuRerankMetrics.queryEmbedMs}ms</span>
+						</div>
+						<div class="timing-row">
+							<span>Chunk Embed ({gpuRerankMetrics.chunksProcessed})</span>
+							<span class="timing-value">{gpuRerankMetrics.chunkEmbedMs}ms</span>
+						</div>
+						<div class="timing-row">
+							<span>GPU Compute</span>
+							<span class="timing-value">{gpuRerankMetrics.gpuComputeMs}ms</span>
+						</div>
+						<div class="timing-row total">
+							<span>Total</span>
+							<span class="timing-value">{gpuRerankMetrics.totalMs}ms</span>
+						</div>
+						{#if gpuRerankMetrics.chunksSkipped > 0}
+							<div class="timing-row">
+								<span>Skipped</span>
+								<span class="timing-value">{gpuRerankMetrics.chunksSkipped}</span>
+							</div>
+						{/if}
+					</div>
+				</div>
+			{/if}
+
 			<!-- Timing Breakdown -->
 			{#if (searchMode === 'statutes' || searchMode === 'precedents' || searchMode === 'glossary') && auxTiming.total_ms}
 				<div class="timing-panel">
@@ -483,6 +590,16 @@
 								<span title="Shared citations">cite: {bundle.hit.rerank.sharedCitations}</span>
 								<span title="Section proximity">sec: {(bundle.hit.rerank.sectionProximity * 100).toFixed(0)}%</span>
 							</div>
+						{/if}
+						{#if gpuRankedItems.length > 0}
+							{@const gpuItem = gpuRankedItems.find(g => g.index === i)}
+							{#if gpuItem && gpuItem.gpuScore >= 0}
+								<div class="rerank-bar" style="border-color: rgba(99,179,237,0.3)">
+									<span title="GPU cosine (WebGPU/WASM)"><Cpu size={10} /> gpu: {(gpuItem.gpuScore * 100).toFixed(0)}%</span>
+									<span title="Delta vs server">delta: {(gpuItem.delta * 100).toFixed(1)}%</span>
+									<span title="GPU rerank position">gpu-rank: #{gpuRankedItems.indexOf(gpuItem) + 1}</span>
+								</div>
+							{/if}
 						{/if}
 					</button>
 				{/each}
@@ -650,6 +767,32 @@
 									<span>{(selectedBundle.hit.rerank.sectionProximity * 100).toFixed(0)}% section depth</span>
 								</div>
 							</div>
+						{/if}
+						{#if gpuRankedItems.length > 0}
+							{@const bundleIdx = evidenceBundles.indexOf(selectedBundle)}
+							{@const gpuItem = gpuRankedItems.find(g => g.index === bundleIdx)}
+							{#if gpuItem && gpuItem.gpuScore >= 0}
+								<div class="rerank-detail" style="border-top: 1px solid rgba(99,179,237,0.2); margin-top: 8px; padding-top: 8px">
+									<div class="rerank-row">
+										<span><Cpu size={12} /> GPU Cosine</span>
+										<span>{(gpuItem.gpuScore * 100).toFixed(1)}%</span>
+									</div>
+									<div class="rerank-row">
+										<span>GPU Rank</span>
+										<span>#{gpuRankedItems.indexOf(gpuItem) + 1}</span>
+									</div>
+									<div class="rerank-row">
+										<span>Server-GPU Delta</span>
+										<span>{(gpuItem.delta * 100).toFixed(1)}%</span>
+									</div>
+									{#if gpuRerankMetrics}
+										<div class="rerank-row">
+											<span>Backend</span>
+											<span>{gpuRerankMetrics.backend}</span>
+										</div>
+									{/if}
+								</div>
+							{/if}
 						{/if}
 					</div>
 

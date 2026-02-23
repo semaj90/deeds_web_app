@@ -191,3 +191,45 @@ export function cosineSimilarity(a: number[], b: number[]): number {
 	const denom = Math.sqrt(normA) * Math.sqrt(normB);
 	return denom > 0 ? dot / denom : 0;
 }
+
+/**
+ * Batch cosine similarity — query vs N document vectors via GPU compute pipeline.
+ * Falls back to CPU if WebGPU unavailable.
+ *
+ * @param query - 768-dim query embedding
+ * @param documents - Array of 768-dim document embeddings
+ * @returns Similarity scores + compute backend used
+ */
+export async function batchCosineSimilarity(
+	query: number[],
+	documents: number[][]
+): Promise<{ scores: number[]; backend: string; durationMs: number }> {
+	if (typeof window === 'undefined' || documents.length === 0) {
+		return { scores: [], backend: 'none', durationMs: 0 };
+	}
+
+	const dim = CLIENT_EMBEDDING_DIMS;
+	const queryF32 = new Float32Array(query);
+	const docsF32 = new Float32Array(documents.length * dim);
+
+	for (let i = 0; i < documents.length; i++) {
+		for (let d = 0; d < dim; d++) {
+			docsF32[i * dim + d] = documents[i][d] ?? 0;
+		}
+	}
+
+	try {
+		const { getGPUCompute } = await import('$lib/gpu/gpu-compute-pipeline.js');
+		const gpu = await getGPUCompute();
+		const result = await gpu.cosineSimilarity(queryF32, docsF32, documents.length);
+		return {
+			scores: Array.from(result.data),
+			backend: result.backend,
+			durationMs: result.durationMs
+		};
+	} catch {
+		// Inline CPU fallback
+		const scores = documents.map(doc => cosineSimilarity(query, doc));
+		return { scores, backend: 'cpu-inline', durationMs: 0 };
+	}
+}
