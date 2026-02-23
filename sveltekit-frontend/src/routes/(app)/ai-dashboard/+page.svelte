@@ -23,6 +23,9 @@
   import EnhancedYoRHaAIAssistant from '$lib/components/yorha/EnhancedYoRHaAIAssistant.svelte';
   import IntelligentModelOrchestrator from '$lib/components/ai/IntelligentModelOrchestrator.svelte';
   import Gemma270MWebAssembly from '$lib/components/ai/Gemma270MWebAssembly.svelte';
+  import SourceValidator from '$lib/components/rag/SourceValidator.svelte';
+  import AnswerWithCitations from '$lib/components/rag/AnswerWithCitations.svelte';
+  import type { AnswerWithCitations as AnswerData } from '$lib/types/rag-source-validation';
 
   interface AIStats {
     activeChats: number;
@@ -76,6 +79,12 @@
   let showEnhancedAssistant = $state(false);
   let showOrchestrator = $state(false);
   let showVlmAnalyzer = $state(false);
+  let showRagPipeline = $state(false);
+  let ragQuery = $state('');
+  let ragChunks = $state<any[]>([]);
+  let ragAnswer = $state<AnswerData | null>(null);
+  let ragStep = $state<'search' | 'validate' | 'answer'>('search');
+  let ragLoading = $state(false);
   let chatHistoryMessages = $state([
     { id: 'msg-1', role: 'user', content: 'What are the key elements of PC 187?', timestamp: new Date(Date.now() - 300000).toISOString(), citations: [], evidence_references: [] },
     { id: 'msg-2', role: 'assistant', content: 'Under PC 187, murder is defined as the unlawful killing of a human being with malice aforethought. The key elements are: (1) a human being was killed, (2) the killing was unlawful, and (3) the killing was done with malice aforethought. See Smith v. Johnson for recent precedent.', timestamp: new Date(Date.now() - 240000).toISOString(), citations: ['PC 187', 'Smith v. Johnson'], evidence_references: [] },
@@ -113,6 +122,72 @@
       stats.ollamaStatus = 'error';
     } finally {
       loading = false;
+    }
+  }
+
+  async function runRagSearch() {
+    if (ragQuery.length < 3) return;
+    ragLoading = true;
+    try {
+      const res = await fetch('/api/rag/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: ragQuery, top_k: 10 }),
+      });
+      if (!res.ok) throw new Error(`Search failed: ${res.status}`);
+      const data = await res.json();
+      const chunks = data.chunks ?? data.results ?? [];
+      ragChunks = chunks.map((c: any, i: number) => ({
+        chunk_id: c.chunk_id ?? c.id ?? `chunk-${i}`,
+        confidence: c.score >= 0.85 ? 'high' : c.score >= 0.7 ? 'medium' : c.score >= 0.5 ? 'low' : 'marginal',
+        source_title: c.source_title ?? c.metadata?.fileName ?? c.collection ?? `Source ${i + 1}`,
+        score: c.score ?? 0,
+        text: c.text ?? c.content ?? '',
+        snippet: (c.text ?? c.content ?? '').slice(0, 300),
+        source_type: c.source_type ?? c.metadata?.type ?? 'document',
+        related_entities: c.metadata?.entities ?? [],
+      }));
+      ragStep = 'validate';
+    } catch (err) {
+      console.error('[RAG Search]', err);
+    } finally {
+      ragLoading = false;
+    }
+  }
+
+  async function handleRagValidate(selectedIds: string[]) {
+    ragLoading = true;
+    try {
+      // Step 2: Validate — send approved chunk IDs
+      const valRes = await fetch('/api/rag/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: ragQuery,
+          approved_chunk_ids: selectedIds,
+          rejected_chunk_ids: ragChunks.filter(c => !selectedIds.includes(c.chunk_id)).map(c => c.chunk_id),
+        }),
+      });
+      if (!valRes.ok) throw new Error(`Validate failed: ${valRes.status}`);
+      const context = await valRes.json();
+
+      // Step 3: Generate answer with approved context
+      const ansRes = await fetch('/api/rag/answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: ragQuery,
+          approved_context: context.approved_context ?? context,
+          token_estimate: context.token_estimate ?? 2000,
+        }),
+      });
+      if (!ansRes.ok) throw new Error(`Answer failed: ${ansRes.status}`);
+      ragAnswer = await ansRes.json();
+      ragStep = 'answer';
+    } catch (err) {
+      console.error('[RAG Validate/Answer]', err);
+    } finally {
+      ragLoading = false;
     }
   }
 
@@ -484,6 +559,68 @@
       {#if showVlmAnalyzer}
         <div class="mt-3">
           <Gemma270MWebAssembly />
+        </div>
+      {/if}
+    </div>
+
+    <!-- 20. RAG Source Validation Pipeline (Search → Validate → Answer) -->
+    <div class="mt-4">
+      <button
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/10 rounded-lg hover:border-accent/30 transition text-sm font-medium text-sand/80"
+        onclick={() => (showRagPipeline = !showRagPipeline)}
+      >
+        {showRagPipeline ? 'Hide RAG Validation' : 'RAG Source Validation (Search \u2192 Validate \u2192 Answer)'}
+      </button>
+      {#if showRagPipeline}
+        <div class="mt-3 p-4 bg-panel/50 border border-sand/10 rounded-lg space-y-4">
+          <!-- Step indicator -->
+          <div class="flex items-center gap-2 text-xs text-sand/60">
+            <span class:text-accent={ragStep === 'search'} class:font-bold={ragStep === 'search'}>1. Search</span>
+            <span>→</span>
+            <span class:text-accent={ragStep === 'validate'} class:font-bold={ragStep === 'validate'}>2. Validate Sources</span>
+            <span>→</span>
+            <span class:text-accent={ragStep === 'answer'} class:font-bold={ragStep === 'answer'}>3. Answer</span>
+          </div>
+
+          {#if ragStep === 'search'}
+            <!-- Step 1: Search -->
+            <div class="flex gap-2">
+              <input
+                type="text"
+                class="flex-1 px-3 py-2 bg-panelSoft border border-sand/20 rounded text-sm text-sand placeholder:text-sand/40"
+                placeholder="Enter legal query (e.g. 'elements of PC 187 murder')"
+                bind:value={ragQuery}
+                onkeydown={(e) => e.key === 'Enter' && ragQuery.length >= 3 && runRagSearch()}
+              />
+              <Button
+                onclick={runRagSearch}
+                disabled={ragLoading || ragQuery.length < 3}
+              >
+                {ragLoading ? 'Searching...' : 'Search'}
+              </Button>
+            </div>
+          {:else if ragStep === 'validate'}
+            <!-- Step 2: Validate -->
+            <SourceValidator
+              caseId=""
+              initialQuery={ragQuery}
+              chunks={ragChunks}
+              isLoading={ragLoading}
+              onValidate={handleRagValidate}
+              onCancel={() => { ragStep = 'search'; ragChunks = []; }}
+            />
+          {:else if ragStep === 'answer' && ragAnswer}
+            <!-- Step 3: Answer -->
+            <AnswerWithCitations answer={ragAnswer} />
+            <div class="flex gap-2 mt-3">
+              <Button onclick={() => { ragStep = 'search'; ragAnswer = null; ragChunks = []; ragQuery = ''; }}>
+                New Query
+              </Button>
+              <Button onclick={() => { ragStep = 'validate'; ragAnswer = null; }}>
+                Back to Sources
+              </Button>
+            </div>
+          {/if}
         </div>
       {/if}
     </div>

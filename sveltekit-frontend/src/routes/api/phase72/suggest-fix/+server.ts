@@ -1,79 +1,94 @@
 import { json } from '@sveltejs/kit';
-import { env } from '$env/dynamic/private';
 import type { RequestHandler } from './$types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
+import { ENV } from '$lib/server/env.server.js';
 
-const PHASE72_BACKEND_URL = env?.PHASE72_BACKEND_URL ?? 'http://127.0.0.1:8000';
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 interface SuggestFixRequest {
- route?: string;
- errors?: Array<{ code: string, message: string; severity: string;
- file_path?: string;
- line?: number;
- }>;
- context?: string;
+	route?: string;
+	file_path?: string;
+	code?: string;
+	message?: string;
+	errors?: Array<{ code: string; message: string; severity: string }>;
 }
 
-interface SuggestFixResponse { plan: string, suggestions: string[];
- related_routes: string[];
-}
-
+/**
+ * POST /api/phase72/suggest-fix
+ * AI-powered fix suggestions using local Ollama (gemma3-legal).
+ * Falls back to static suggestions if Ollama is unavailable.
+ */
 export const POST: RequestHandler = async ({ request }) => {
- try {
- const payload: SuggestFixRequest = await request.json();
+	try {
+		const payload: SuggestFixRequest = await request.json();
+		const route = payload.route ?? 'unknown';
+		const errorMsg = payload.message ?? payload.errors?.[0]?.message ?? 'Unknown error';
+		const errorCode = payload.code ?? payload.errors?.[0]?.code ?? 'UNKNOWN';
 
- // If no backend is configured, return placeholder suggestions
- if (!PHASE72_BACKEND_URL || PHASE72_BACKEND_URL === 'http://127.0.0.1:8000') {
- console.warn('Phase72 backend not configured, returning placeholder suggestions');
- return json({
- plan: '### Fix Suggestions\n\n1. **Run svelte-check** to identify type errors\n2. **Update route layout** if component props changed\n3. **Check imports** for missing or misnamed components',
- suggestions: [
- 'Review TypeScript errors in page.ts or layout.ts',
- 'Check component prop compatibility',
- 'Verify all imports are correct'],
- related_routes: payload.route ? [payload.route] : [],
- } as SuggestFixResponse);
- }
+		// Try Ollama for AI-powered suggestions
+		try {
+			const prompt = `You are a SvelteKit 2 + Svelte 5 expert. Analyze this route error and suggest fixes.
 
- // Call Phase 78 brain backend for AI-powered suggestions
- const response = await fetch(`${PHASE72_BACKEND_URL}/api/phase72/suggest-fix`, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(payload),
- });
+Route: ${route}
+File: ${payload.file_path ?? 'unknown'}
+Error Code: ${errorCode}
+Error Message: ${errorMsg}
 
- if (!response.ok) {
- const text = await response.text();
- console.error('Phase72 backend error:', response.status, text);
- return json(
- {
- plan: 'Could not generate fix suggestions. Please try again.',
- suggestions: [],
- related_routes: [],
- } as SuggestFixResponse,
- { status: 502 }
- );
- }
+Provide:
+1. A brief fix plan (markdown, 3-5 steps)
+2. 3 specific suggestions
+3. Related routes that might be affected
 
- const data = (await response.json()) as SuggestFixResponse;
- return json({
- plan: data.plan ?? '',
- suggestions: data.suggestions ?? [],
- related_routes: data.related_routes ?? [],
- });
- } catch (err) {
- console.error('Phase72 suggest-fix error:', err);
- return json(
- {
- plan: 'Error: Could not connect to Phase72 brain service.',
- suggestions: [],
- related_routes: [],
- } as SuggestFixResponse,
- { status: 503 }
- );
- }
+Respond in JSON: {"plan": "...", "suggestions": ["..."], "related_routes": ["..."]}`;
+
+			const res = await fetch(`${OLLAMA_URL}/api/generate`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					model: 'gemma3-legal:latest',
+					prompt,
+					stream: false,
+					options: { temperature: 0.2, num_predict: 512 },
+				}),
+			});
+
+			if (res.ok) {
+				const data = await res.json();
+				const text = data.response ?? '';
+				const jsonMatch = text.match(/\{[\s\S]*\}/);
+				if (jsonMatch) {
+					const parsed = JSON.parse(jsonMatch[0]);
+					return json({
+						plan: parsed.plan ?? text.slice(0, 500),
+						suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],
+						related_routes: Array.isArray(parsed.related_routes) ? parsed.related_routes : [],
+					});
+				}
+				// Raw text fallback
+				return json({
+					plan: text.slice(0, 500),
+					suggestions: [],
+					related_routes: [],
+				});
+			}
+		} catch {
+			// Ollama unavailable — fall through to static suggestions
+		}
+
+		// Static fallback when Ollama is not running
+		return json({
+			plan: `### Fix Suggestions for \`${route}\`\n\n1. **Run svelte-check** to identify type errors\n2. **Update route layout** if component props changed\n3. **Check imports** for missing or misnamed components\n4. **Verify Svelte 5 runes** — replace \`export let\` with \`$props()\``,
+			suggestions: [
+				`Review TypeScript errors in ${route} page.ts or layout.ts`,
+				'Check component prop compatibility with Svelte 5 runes',
+				'Verify all imports use .js extensions (bundler resolves .js → .ts)',
+			],
+			related_routes: [route],
+		});
+	} catch (err) {
+		console.error('[phase72] suggest-fix error:', err);
+		return json(
+			{ plan: 'Error generating suggestions.', suggestions: [], related_routes: [] },
+			{ status: 500 }
+		);
+	}
 };
-
-
-
-

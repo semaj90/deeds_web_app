@@ -16,18 +16,19 @@ export const GET: RequestHandler = async ({ url }) => {
 
 	try {
 		// Try to query phase72_error table — it may not exist
-		const rows = await db.execute(
+		const result = await db.execute(
 			sql`SELECT code, message, occurrence_count as count, last_seen, created_at
 				FROM phase72_error
 				WHERE file_path LIKE ${'%' + route + '%'}
 				ORDER BY last_seen DESC
 				LIMIT 10`
 		);
+		const rows = Array.isArray(result) ? result : [];
 
 		return json({
-			errorCount: rows.rows?.length ?? 0,
-			errors: rows.rows ?? [],
-			lastError: rows.rows?.[0] ?? null,
+			errorCount: rows.length,
+			errors: rows,
+			lastError: rows[0] ?? null,
 		});
 	} catch {
 		// Table doesn't exist or DB unavailable — return empty
