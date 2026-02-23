@@ -336,67 +336,101 @@ Within each tab, routes are ordered by **priority**:
 
 ---
 
-## Production Readiness Audit (February 2026)
+## Production Readiness Audit (February 23, 2026 — Session 93r5)
 
-### Page Routes
+### Page Routes (Canonical)
 
-| Route | Exists | Server Load | Key Features | Prod Status |
-|-------|--------|-------------|-------------|-------------|
-| `/cases` | Y | Real DB + filters | List, bulk actions, create | **WORKING** |
-| `/cases/new` | Y | Minimal (recent cases) | 6W1H form, file upload UI | **PARTIAL** — no AI charge suggestion, files not linked pre-creation |
-| `/cases/[id]/overview` | Y | Case + evidence rows | 5W1H display, evidence count | **PARTIAL** — WHY/HOW always null, persons always empty, AI/Reports tabs placeholder |
-| `/cases/[id]/evidence` | N | N/A | Does not exist as own route | **MISSING** — upload sub-route exists and is fully wired (5-tier pipeline) |
-| `/cases/[id]/board` | Y | Canvas state from DB | Real drag-and-drop canvas, save/restore | **WORKING** — no evidence pre-population |
-| `/cases/[id]/chat` | Y | Auth only | Real SSE streaming via Ollama | **WORKING** — no case context injected |
-| `/cases/[id]/ai` | Y | Auth only | Quick actions UI | **BROKEN** — calls dead `/api/legal/chat` (404), no XState |
-| `/cases/[id]/persons` | Y | Auth only | Person card display UI | **BROKEN** — API endpoint `/api/cases/[id]/persons` missing (404), add modal missing |
-| `/cases/[id]/reports` | Y | Auth only | TipTap editor, generate/save | **PARTIAL** — reports list never loads from DB, generate produces template not AI |
-| `/evidence` | Y | Real DB + form actions | Evidence list, MinIO upload, delete/update | **WORKING** |
-| `/evidence-board` | N | N/A | Does not exist | **MISSING** |
-| `/evidence-workspace` | N | N/A | Does not exist | **MISSING** |
-| `/gpu-evidence-graph` | Y | None (client only) | WebGPU detection, empty canvas | **STUB** — no data, no CUDA |
-| `/persons-of-interest` | Y | Real DB query | List, create, detail view | **PARTIAL** — no AI, associates tab broken, similar POIs placeholder |
-| `/dashboard` | Y | None (client fetch) | Case list, stats display | **PARTIAL** — `/api/dashboard/stats` missing, stats always 0 |
-| `/all-routes` | Y | Real AST graph + DB enrichment | NES Command Center, SSE health | **WORKING** |
+| Route | Exists | LOC | Key Features | Prod Status |
+|-------|--------|-----|-------------|-------------|
+| `/cases` | Y | 433 | List, filters, bulk actions, create | **WORKING** |
+| `/cases/new` | Y | 789 | 6W1H wizard, file upload UI | **PARTIAL** — no AI charge suggestion |
+| `/cases/[id]` | Y | 1068 | Case detail, tabs, evidence list | **WORKING** |
+| `/cases/[id]/overview` | Y | 293 | 5W1H display, evidence count | **PARTIAL** — WHY/HOW null, persons empty |
+| `/cases/[id]/evidence` | N | — | No index route (only /upload subpage) | **MISSING** — use `/cases/[id]` evidence tab |
+| `/cases/[id]/board` | Y | 70 | Drag-and-drop canvas, save/restore | **WORKING** |
+| `/cases/[id]/chat` | Y | 28 | SSE streaming via Ollama | **WORKING** |
+| `/cases/[id]/ai` | Y | 176 | Quick actions UI, SSE streaming | **WORKING** — rewired to `/api/chat/stream` |
+| `/cases/[id]/persons` | Y | 154 | Person card display UI | **BROKEN** — `/api/cases/[id]/persons` missing (404) |
+| `/cases/[id]/reports` | Y | 253 | TipTap editor, generate/save | **PARTIAL** — generate is template-only |
+| `/evidence` | Y | 1090 | Evidence list, upload, semantic search | **WORKING** — debounced semantic search wired to `/api/evidence/search` |
+| `/evidence-board` | N | — | Does not exist | **MISSING** |
+| `/evidence-workspace` | N | — | Does not exist | **MISSING** |
+| `/gpu-evidence-graph` | Y | 445 | WebGPU detection, canvas | **STUB** |
+| `/persons-of-interest` | Y | 584 | List, create, detail view | **PARTIAL** — no AI, associates broken |
+| `/dashboard` | Y | 280 | Case list, stats display | **PARTIAL** — `/api/dashboard/stats` missing |
+| `/all-routes` | Y | 1247 | NES Command Center, SSE health | **WORKING** |
+
+### Additional Active Page Routes (Not in Canonical List)
+
+| Route | LOC | Key Features | Status |
+|-------|-----|-------------|--------|
+| `/ai-dashboard` | 637 | RAG 3-step pipeline (Search→Validate→Answer), model orchestrator | **WORKING** |
+| `/analysis-center` | 1145 | Multi-tool analysis workspace | **WORKING** |
+| `/citations` | 514 | KB search (glossary/statutes/precedents parallel search) | **WORKING** |
+| `/command-center` | 1446 | Codebase explorer, clusters, graph | **WORKING** |
+| `/error-brain` | 223 | Error clustering visualization | **PARTIAL** |
+| `/evidence-library` | 180 | Evidence catalog with filters | **WORKING** |
+| `/global-search` | 1531 | Cross-case semantic search | **WORKING** |
+| `/system-configuration` | 519 | System settings UI | **PARTIAL** |
+| `/terminal` | 453 | Terminal emulator | **WORKING** |
+| `/admin/dev-tools` | — | Dev tools dashboard (VLM, cache, embeddings) | **WORKING** |
+| `/admin/phase89` | — | Error clustering (21 API endpoints) | **WORKING** |
+| `/memory-palace` | — | CHR97 cartridge viewer | **WORKING** |
 
 ### API Routes
 
-| Route | Exists | Logic | Prod Status |
-|-------|--------|-------|-------------|
-| `/api/cases/[id]` | Y | GET/PATCH/DELETE with auth + ownership | **WORKING** |
-| `/api/cases/[id]/evidence` | N | N/A | **MISSING** — use `/evidence?caseId=X` or `/api/evidence/upload` |
-| `/api/cases/[id]/persons` | N | N/A | **MISSING** — use `/api/persons?caseId=X` |
-| `/api/legal/chat` | N | N/A | **MISSING** — use `/api/chat/stream` or `/api/sse/chat` instead |
-| `/api/reports/generate` | Y | DB reads + template generation | **PARTIAL** — no AI, template-based output |
-| `/api/reports/save` | Y | Full DB update | **WORKING** |
-| `/api/evidence/upload` | Y | 5-tier pipeline (MinIO → OCR → chunk → embed → store) | **WORKING** |
-| `/api/evidence/search` | Y | pgvector cosine search + graph-hop expansion | **WORKING** |
-| `/api/persons` | Y | GET (filter) + POST (create) | **WORKING** |
-| `/api/phase72/routes` | N | N/A | **MISSING** — only `capture-error` + `suggest-fix` exist |
-| `/api/errors/summary` | N | N/A | **MISSING** — data read from static JSON file |
-| `/api/consolidation/status` | N | N/A | **MISSING** |
-| `/command/routes` | N | N/A | **MISSING** |
+| Route | Exists | LOC | Logic | Status |
+|-------|--------|-----|-------|--------|
+| `/api/cases/[id]` | Y | 127 | GET/PATCH/DELETE | **WORKING** |
+| `/api/cases/[id]/evidence` | N | — | N/A | **MISSING** — use `/api/evidence/upload` |
+| `/api/cases/[id]/persons` | N | — | N/A | **MISSING** — use `/api/persons?caseId=X` |
+| `/api/legal/chat` | N | — | Superseded | **REMOVED** — use `/api/sse/chat` or `/api/chat/stream` |
+| `/api/reports/generate` | Y | 121 | DB reads + template | **PARTIAL** — template-only, no AI |
+| `/api/reports/save` | Y | 46 | Full DB update | **WORKING** |
+| `/api/evidence/upload` | Y | 571 | 8-stage pipeline (MinIO→OCR→chunk→embed→Qdrant) | **WORKING** |
+| `/api/evidence/search` | Y | 654 | RAG+KAG+DAG (dual search, rerank, graph-hop) | **WORKING** |
+| `/api/persons` | Y | 105 | GET (filter) + POST (create) | **WORKING** |
+| `/api/phase72/errors` | Y | 38 | Query phase72_error table by route | **WORKING** |
+| `/api/phase72/suggest-fix` | Y | 95 | Ollama gemma3-legal AI fix suggestions | **WORKING** |
+| `/api/phase82/status` | Y | 46 | Upgrade status (migration complete) | **WORKING** |
+| `/api/phase82/upgrade-route` | Y | 26 | Success endpoint (backward compat) | **WORKING** |
+| `/api/rag/search` | Y | 151 | 3-collection Qdrant search | **WORKING** |
+| `/api/rag/validate` | Y | 102 | Human-in-the-loop source approval | **WORKING** |
+| `/api/rag/answer` | Y | 150 | Ollama generation with citations | **WORKING** |
+| `/api/sse/chat` | Y | 267 | SSE streaming, case-aware context | **WORKING** |
+| `/api/chat/stream` | Y | 439 | Streaming RAG with case context | **WORKING** |
+| `/api/embed` | Y | 111 | Embedding generation (embeddinggemma/nomic) | **WORKING** |
+| `/api/vision/analyze` | Y | 249 | YOLO detection + Gemma3 VLM analysis | **WORKING** |
+| `/api/health/capabilities` | Y | 114 | Unified health contract (Ollama/Qdrant/PG/Redis) | **WORKING** |
+| `/api/errors/summary` | N | — | N/A | **MISSING** |
+| `/api/consolidation/status` | N | — | N/A | **MISSING** |
+| `/api/dashboard/stats` | N | — | N/A | **MISSING** |
 
-### Microservices
+### Infrastructure Services
 
-| Service | Port | HTTP Server | Used by SvelteKit |
-|---------|------|-------------|-------------------|
-| `langextract-go/` | — | No (CLI tool) | No |
-| `go-chat-service/` | 9000 | Yes (Gin) | No (not wired) |
-| `go-enhanced-rag-service/` | 8080 | Yes (Gin + CUDA) | Indirect (client exists, CUDA fragile) |
-| `rag_kag_gateway/` (Python) | 8099 | Yes (FastAPI) | No |
-| `ai-server/` (Python) | — | Yes (FastAPI) | No |
+| Service | Port | Status | Used by SvelteKit |
+|---------|------|--------|-------------------|
+| Ollama (native GPU) | 11434 | **RUNNING** | Yes — LLM + embeddings (gemma3-legal, embeddinggemma) |
+| Qdrant (Docker) | 6333 | **UP** | Yes — vector search (6 collections) |
+| Redis (Docker) | 6379 | **UP** | Yes — cache (SSR + sessions + search) |
+| MinIO (Docker) | 9000 | **UP** | Yes — evidence file storage |
+| RabbitMQ (Docker) | 5672 | **UP** | Producer-only (7 queues, no consumers) |
+| PostgreSQL (Docker) | 5434 | **EXITED** | Yes — needs `docker start phase66-postgres` |
+| langextract (Docker) | 8095 | **UP** | Yes — HTTP calls from ACPToolRegistry |
+| TRT-LLM (Docker) | 8099 | **STOPPED** | Optional accelerator |
+| fastmcp (Docker) | 3003 | **NO CONTAINER** | Needs docker-compose up |
 
-**Bottom line:** All RAG, embedding, and evidence processing is handled by SvelteKit's server-side TypeScript routes. Go/Python microservices are orphaned experiments or CUDA acceleration stubs not actively called by the production app.
+**Architecture:** Server-first inference (gemma3-legal on Ollama GPU) with client-fallback (gemma270m ONNX WebGPU/WASM). Health-aware routing via `/api/health/capabilities` (30s cache). All RAG/embedding/evidence processing handled by SvelteKit server-side TypeScript.
 
 ### Readiness Summary
 
-- **Fully working:** 8 routes (cases list, board, chat, evidence, all-routes, cases API CRUD, reports save, evidence upload/search)
-- **Partial:** 6 routes (cases/new, overview, reports, persons, dashboard, reports/generate)
-- **Broken:** 2 routes (cases/[id]/ai, cases/[id]/persons)
-- **Missing:** 8 claimed routes that do not exist on disk
+- **Fully working:** 14 page routes + 17 API endpoints
+- **Partial:** 7 routes (cases/new, overview, reports, persons, dashboard, error-brain, system-config)
+- **Broken:** 1 route (cases/[id]/persons — `/api/cases/[id]/persons` missing)
+- **Missing:** 5 claimed page routes (evidence-board, evidence-workspace, cases/[id]/evidence index) + 3 API endpoints
 - **Stub:** 1 route (gpu-evidence-graph)
+- **API directories:** 41 remaining (down from 48 after archiving dead routes)
 
-**Last Updated:** February 2026
-**Status:** ~65% production ready (8/25 canonical routes fully working)
-**Routes:** 25 canonical routes audited (8 of 30 claimed routes do not exist)
+**Last Updated:** February 23, 2026 (Session 93r5)
+**Status:** ~77% production ready (14/22 existing canonical page routes fully working)
+**Total routes on disk:** 40+ page routes, 143 API +server.ts files

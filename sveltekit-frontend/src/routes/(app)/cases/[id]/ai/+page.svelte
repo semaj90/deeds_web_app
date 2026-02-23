@@ -23,23 +23,49 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  loading = true;
 
  try {
- const res = await fetch('/api/legal/chat', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-caseId: id,
- message: messageText,
- context: 'case_analysis'
- })
- });
+   const params = new URLSearchParams({ q: messageText, mode: 'ollama' });
+   if (id) params.set('caseId', id);
 
- if (res.ok) {
- const data = await res.json();
- messages = [...messages, { role: 'assistant', content: data.response }];
- }
+   const res = await fetch(`/api/chat/stream?${params}`);
+   if (!res.ok || !res.body) throw new Error('Stream failed');
+
+   // Add placeholder assistant message for streaming
+   messages = [...messages, { role: 'assistant', content: '' }];
+   const assistantIdx = messages.length - 1;
+
+   const reader = res.body.getReader();
+   const decoder = new TextDecoder();
+   let assistantContent = '';
+   let buffer = '';
+
+   while (true) {
+     const { done, value } = await reader.read();
+     if (done) break;
+     buffer += decoder.decode(value, { stream: true });
+
+     const lines = buffer.split('\n');
+     buffer = lines.pop() ?? '';
+
+     for (const line of lines) {
+       if (!line.startsWith('data: ')) continue;
+       try {
+         const data = JSON.parse(line.slice(6));
+         if (data.type === 'token' && data.content) {
+           assistantContent += data.content;
+           messages[assistantIdx] = { role: 'assistant', content: assistantContent };
+           messages = messages;
+         }
+       } catch { /* skip malformed SSE */ }
+     }
+   }
+
+   if (!assistantContent) {
+     messages[assistantIdx] = { role: 'assistant', content: 'No response received.' };
+     messages = messages;
+   }
  } catch (err) {
  console.error('Failed to send message:', err);
- messages = [...messages, { role: 'assistant', content: 'Error: Failed to get response' }];
+ messages = [...messages, { role: 'assistant', content: 'Error: Failed to get response. Is the AI server running?' }];
  } finally {
  loading = false;
  }
