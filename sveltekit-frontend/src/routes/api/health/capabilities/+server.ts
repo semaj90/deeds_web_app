@@ -1,0 +1,113 @@
+import { json, type RequestHandler } from '@sveltejs/kit';
+import { ENV } from '$lib/server/env.server.js';
+
+/**
+ * GET /api/health/capabilities
+ *
+ * Lightweight health contract for client-router + XState state machines.
+ * Returns which server capabilities are available RIGHT NOW.
+ *
+ * Design: fast (2s timeout per check, parallel), cacheable (30s TTL).
+ * Client polls this to decide local-onnx vs server-ollama routing.
+ *
+ * Contract:
+ * {
+ *   ollama: boolean,        // LLM inference available
+ *   embedding: boolean,     // Embedding generation available
+ *   rag: boolean,           // Full RAG search (Qdrant) available
+ *   postgres: boolean,      // Database available
+ *   redis: boolean,         // Cache available
+ *   ragEnabled: boolean,    // Composite: ollama + embedding + rag + postgres
+ *   serverReady: boolean,   // Composite: ollama + postgres (minimum for server mode)
+ *   models: string[],       // Available Ollama model names
+ *   latencyMs: number,      // Total check time
+ *   ts: string,             // ISO timestamp
+ * }
+ */
+export const GET: RequestHandler = async () => {
+	const start = Date.now();
+	const TIMEOUT = 2000;
+
+	const check = async (url: string): Promise<boolean> => {
+		try {
+			const res = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT) });
+			return res.ok;
+		} catch {
+			return false;
+		}
+	};
+
+	const ollamaUrl = ENV.OLLAMA_BASE_URL;
+	const qdrantUrl = ENV.QDRANT_URL ?? 'http://localhost:6333';
+
+	// Parallel checks — all with 2s timeout
+	const [ollamaRes, qdrantOk, postgresOk, redisOk] = await Promise.all([
+		// Ollama: fetch model list (proves LLM + embedding available)
+		fetch(`${ollamaUrl}/api/tags`, { signal: AbortSignal.timeout(TIMEOUT) })
+			.then(async (r) => {
+				if (!r.ok) return { ok: false, models: [] as string[] };
+				const data = await r.json();
+				const names = (data.models ?? []).map((m: { name: string }) => m.name);
+				return { ok: true, models: names as string[] };
+			})
+			.catch(() => ({ ok: false, models: [] as string[] })),
+
+		// Qdrant: root returns version JSON
+		check(qdrantUrl),
+
+		// Postgres: lightweight query via existing health endpoint
+		check('/api/health/database')
+			.catch(() => false)
+			// Self-fetch fails in SSR — check DB directly
+			.then(async (ok) => {
+				if (ok) return true;
+				try {
+					const { db } = await import('$lib/server/db/index.js');
+					const { sql } = await import('drizzle-orm');
+					await db.execute(sql`SELECT 1`);
+					return true;
+				} catch {
+					return false;
+				}
+			}),
+
+		// Redis: try importing and pinging
+		(async () => {
+			try {
+				const { redis } = await import('$lib/server/redis.js');
+				if (!redis) return false;
+				await redis.ping();
+				return true;
+			} catch {
+				return false;
+			}
+		})(),
+	]);
+
+	const ollama = ollamaRes.ok;
+	const models = ollamaRes.models;
+	const embedding = ollama && models.some((m: string) => m.includes('embed'));
+	const rag = ollama && embedding && qdrantOk;
+	const ragEnabled = rag && postgresOk;
+	const serverReady = ollama && postgresOk;
+
+	return json(
+		{
+			ollama,
+			embedding,
+			rag: qdrantOk,
+			postgres: postgresOk,
+			redis: redisOk,
+			ragEnabled,
+			serverReady,
+			models,
+			latencyMs: Date.now() - start,
+			ts: new Date().toISOString(),
+		},
+		{
+			headers: {
+				'Cache-Control': 'public, max-age=30, stale-while-revalidate=60',
+			},
+		},
+	);
+};
