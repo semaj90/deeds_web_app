@@ -37,6 +37,38 @@
   let showLibraryPage = $state(false);
   let showLinkEditor = $state(false);
   let editingLink = $state<any>(null);
+  let showKnowledgeBase = $state(false);
+  let kbQuery = $state('');
+  let kbSearching = $state(false);
+  let kbResults = $state<{ glossary: any[]; statutes: any[]; precedents: any[] }>({ glossary: [], statutes: [], precedents: [] });
+  let kbTiming = $state<Record<string, number>>({});
+  let kbDebounceTimer = $state<ReturnType<typeof setTimeout> | null>(null);
+
+  function searchKnowledgeBase(query: string) {
+    if (query.length < 2) {
+      kbResults = { glossary: [], statutes: [], precedents: [] };
+      return;
+    }
+    kbSearching = true;
+    const body = JSON.stringify({ query, limit: 10 });
+    const headers = { 'Content-Type': 'application/json' };
+    const start = performance.now();
+
+    Promise.all([
+      fetch('/api/glossary/search', { method: 'POST', headers, body }).then(r => r.ok ? r.json() : { results: [] }).catch(() => ({ results: [] })),
+      fetch('/api/statutes/search', { method: 'POST', headers, body }).then(r => r.ok ? r.json() : { results: [] }).catch(() => ({ results: [] })),
+      fetch('/api/precedents/search', { method: 'POST', headers, body }).then(r => r.ok ? r.json() : { results: [] }).catch(() => ({ results: [] })),
+    ]).then(([g, s, p]) => {
+      kbResults = {
+        glossary: g.results ?? [],
+        statutes: s.results ?? [],
+        precedents: p.results ?? [],
+      };
+      kbTiming = { totalMs: Math.round(performance.now() - start) };
+    }).finally(() => {
+      kbSearching = false;
+    });
+  }
 
   interface Citation {
     id: string;
@@ -113,6 +145,7 @@
       <Button onclick={() => (showCollections = !showCollections)}>{showCollections ? 'Hide Collections' : 'Collections'}</Button>
       <Button onclick={() => (showCitationBrowser = !showCitationBrowser)}>{showCitationBrowser ? 'Hide Browser' : 'Citation Browser'}</Button>
       <Button onclick={() => (showLibraryPage = !showLibraryPage)}>{showLibraryPage ? 'Hide Library' : 'Citation Library'}</Button>
+      <Button onclick={() => (showKnowledgeBase = !showKnowledgeBase)}>{showKnowledgeBase ? 'Hide Knowledge Base' : 'Knowledge Base'}</Button>
     </div>
   </header>
 
@@ -179,6 +212,139 @@
           showCollections = false;
         }}
       />
+    </div>
+  {/if}
+
+  <!-- Knowledge Base Search (Glossary + Statutes + Precedents) -->
+  {#if showKnowledgeBase}
+    <div class="mb-6">
+      <Card class="bg-panel border-accent/30">
+        <CardHeader>
+          <CardTitle class="text-sm text-accent">Knowledge Base Search</CardTitle>
+        </CardHeader>
+        <CardContent class="space-y-4">
+          <div class="flex gap-2">
+            <input
+              type="text"
+              bind:value={kbQuery}
+              placeholder="Search glossary, statutes, and precedents..."
+              oninput={() => {
+                if (kbDebounceTimer) clearTimeout(kbDebounceTimer);
+                kbDebounceTimer = setTimeout(() => searchKnowledgeBase(kbQuery), 400);
+              }}
+              class="flex-1 px-3 py-2 bg-black/30 border border-sand/20 rounded text-sand text-sm placeholder:text-sand/40 focus:border-accent focus:outline-none"
+            />
+            {#if kbSearching}
+              <span class="text-xs text-accent self-center">Searching...</span>
+            {:else if kbTiming.totalMs}
+              <span class="text-xs text-sand/40 self-center">{kbTiming.totalMs}ms</span>
+            {/if}
+          </div>
+
+          {#if kbResults.glossary.length > 0}
+            <div>
+              <h4 class="text-xs font-semibold text-sand/60 uppercase tracking-wider mb-2">Glossary ({kbResults.glossary.length})</h4>
+              <div class="space-y-2">
+                {#each kbResults.glossary as term (term.id ?? term.term)}
+                  <div class="p-3 bg-black/20 rounded border border-sand/10">
+                    <div class="flex items-baseline gap-2">
+                      <span class="font-medium text-accent text-sm">{term.term}</span>
+                      {#if term.category}
+                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-sand/10 text-sand/50">{term.category}</span>
+                      {/if}
+                      <span class="text-[10px] text-sand/30 ml-auto">{Math.round((term.similarity ?? 0) * 100)}%</span>
+                    </div>
+                    <p class="text-xs text-sand/70 mt-1 line-clamp-2">{term.definition}</p>
+                  </div>
+                {/each}
+              </div>
+            </div>
+          {/if}
+
+          {#if kbResults.statutes.length > 0}
+            <div>
+              <h4 class="text-xs font-semibold text-sand/60 uppercase tracking-wider mb-2">Statutes ({kbResults.statutes.length})</h4>
+              <div class="space-y-2">
+                {#each kbResults.statutes as statute (statute.chunkId ?? statute.statuteId)}
+                  <div
+                    class="p-3 bg-black/20 rounded border border-sand/10 cursor-pointer hover:border-accent/30 transition"
+                    onclick={() => {
+                      selectedCitation = {
+                        id: statute.statuteId ?? statute.chunkId,
+                        statute_code: statute.section ?? statute.statuteTitle,
+                        statute_title: statute.statuteTitle,
+                        jurisdiction: statute.jurisdiction ?? '',
+                        severity: statute.category ?? 'statute',
+                        source_type: 'auto_extracted' as const,
+                        highlighted_text: statute.content ?? '',
+                        notes: '',
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                      };
+                    }}
+                  >
+                    <div class="flex items-baseline gap-2">
+                      <span class="font-medium text-sand text-sm">{statute.statuteTitle}</span>
+                      {#if statute.section}
+                        <span class="text-[10px] font-mono text-accent/70">{statute.section}</span>
+                      {/if}
+                      <span class="text-[10px] text-sand/30 ml-auto">{Math.round((statute.similarity ?? 0) * 100)}%</span>
+                    </div>
+                    {#if statute.jurisdiction}
+                      <span class="text-[10px] text-sand/40">{statute.jurisdiction}</span>
+                    {/if}
+                    <p class="text-xs text-sand/70 mt-1 line-clamp-2">{statute.content}</p>
+                  </div>
+                {/each}
+              </div>
+            </div>
+          {/if}
+
+          {#if kbResults.precedents.length > 0}
+            <div>
+              <h4 class="text-xs font-semibold text-sand/60 uppercase tracking-wider mb-2">Precedents ({kbResults.precedents.length})</h4>
+              <div class="space-y-2">
+                {#each kbResults.precedents as prec (prec.id ?? prec.title)}
+                  <div
+                    class="p-3 bg-black/20 rounded border border-sand/10 cursor-pointer hover:border-accent/30 transition"
+                    onclick={() => {
+                      selectedCitation = {
+                        id: prec.id,
+                        statute_code: prec.citation ?? prec.title,
+                        statute_title: prec.title,
+                        jurisdiction: prec.court ?? '',
+                        severity: 'case_law',
+                        source_type: 'auto_extracted' as const,
+                        highlighted_text: prec.summary ?? '',
+                        notes: '',
+                        created_at: prec.decisionDate ?? new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                      };
+                    }}
+                  >
+                    <div class="flex items-baseline gap-2">
+                      <span class="font-medium text-sand text-sm">{prec.title}</span>
+                      <span class="text-[10px] text-sand/30 ml-auto">{Math.round((prec.similarity ?? 0) * 100)}%</span>
+                    </div>
+                    <div class="flex gap-2 text-[10px] text-sand/40 mt-0.5">
+                      {#if prec.court}<span>{prec.court}</span>{/if}
+                      {#if prec.citation}<span class="font-mono">{prec.citation}</span>{/if}
+                      {#if prec.decisionDate}<span>{prec.decisionDate}</span>{/if}
+                    </div>
+                    {#if prec.summary}
+                      <p class="text-xs text-sand/70 mt-1 line-clamp-2">{prec.summary}</p>
+                    {/if}
+                  </div>
+                {/each}
+              </div>
+            </div>
+          {/if}
+
+          {#if !kbSearching && kbQuery.length >= 2 && kbResults.glossary.length === 0 && kbResults.statutes.length === 0 && kbResults.precedents.length === 0}
+            <p class="text-sand/40 text-sm text-center py-4">No results found for "{kbQuery}"</p>
+          {/if}
+        </CardContent>
+      </Card>
     </div>
   {/if}
 

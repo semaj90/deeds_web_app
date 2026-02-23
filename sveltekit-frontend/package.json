@@ -826,6 +826,7 @@
     "eslint-plugin-markdown": "^5.1.0",
     "eslint-plugin-svelte": "3.13.0",
     "estree-walker": "3.0.3",
+    "fast-check": "4.5.3",
     "glob": "11.0.3",
     "inquirer": "^12.9.3",
     "jscodeshift": "^17.3.0",
