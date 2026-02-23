@@ -191,9 +191,13 @@ export class RabbitMQManager extends EventEmitter {
 
         await this.consume(this.queues.cache_invalidate, this.handleCacheInvalidation.bind(this));
         await this.consume(this.queues.document_embed, this.handleDocumentEmbedding.bind(this));
+        await this.consume(this.queues.evidence_process, this.handleEvidenceProcess.bind(this));
+        await this.consume(this.queues.vector_index, this.handleVectorIndex.bind(this));
+        await this.consume(this.queues.chat_context, this.handleChatContext.bind(this));
+        await this.consume(this.queues.analytics_track, this.handleAnalyticsTrack.bind(this));
         await this.consume(this.queues.codebase_index, this.handleCodebaseIndex.bind(this));
 
-        console.log('👂 All RabbitMQ consumers started');
+        console.log('👂 All 7 RabbitMQ consumers started');
     }
 
     private async consume(queue: string, handler: (msg: AmqpMessage) => Promise<void>) {
@@ -209,28 +213,180 @@ export class RabbitMQManager extends EventEmitter {
         try {
             const data = this.parseMessage(msg);
             if (!data) {
-                 this.channel.nack(msg, false, false);
-                 return;
+                this.channel.nack(msg, false, false);
+                return;
             }
-            console.log('🗑️ Cache invalidation received', data);
-            // Logic to invalidate cache
+            console.log('🗑️ Cache invalidation:', data.type, data.key ?? '');
             if (this.redisService) {
-                // await this.redisService...
+                if (data.key) {
+                    await this.redisService.del(data.key);
+                } else if (data.pattern) {
+                    // Pattern-based invalidation (e.g. "evidence:*")
+                    const keys = await this.redisService.keys(data.pattern);
+                    if (keys?.length) {
+                        await Promise.all(keys.map((k: string) => this.redisService.del(k)));
+                    }
+                }
             }
             this.channel.ack(msg);
         } catch (error) {
             console.error('❌ Cache invalidation error:', this.formatError(error));
-            this.channel.nack(msg, false, true); // Requeue
+            this.channel.nack(msg, false, true);
         }
     }
 
     private async handleDocumentEmbedding(msg: AmqpMessage): Promise<void> {
-         if (!msg || !this.channel) return;
+        if (!msg || !this.channel) return;
         try {
-             // Mock processing
-             this.channel.ack(msg);
-        } catch (e) {
-             this.channel.nack(msg, false, true);
+            const data = this.parseMessage(msg);
+            if (!data?.text) {
+                this.channel.nack(msg, false, false);
+                return;
+            }
+            console.log('📐 Embedding document:', data.documentId ?? 'unknown');
+            const { generateSingleEmbedding } = await import('../grpc/embedding-client.js');
+            const embedding = await generateSingleEmbedding(data.text.slice(0, 2048));
+            // Publish vector for indexing
+            if (embedding?.length && data.documentId) {
+                await this.publish(this.exchanges.vector_updates, 'vector.index.document', {
+                    documentId: data.documentId,
+                    embedding,
+                    collection: data.collection ?? 'legal_documents',
+                    metadata: data.metadata ?? {}
+                });
+            }
+            this.channel.ack(msg);
+        } catch (error) {
+            console.error('❌ Document embedding error:', this.formatError(error));
+            this.channel.nack(msg, false, true);
+        }
+    }
+
+    private async handleEvidenceProcess(msg: AmqpMessage): Promise<void> {
+        if (!msg || !this.channel) return;
+        try {
+            const data = this.parseMessage(msg);
+            if (!data?.evidenceId) {
+                this.channel.nack(msg, false, false);
+                return;
+            }
+            console.log('🔬 Processing evidence:', data.evidenceId);
+            const { extractEntities } = await import('../analysis/entity-extraction.js');
+            const { detectForensicPatterns } = await import('../analysis/forensics.js');
+
+            const text = data.text ?? data.content ?? '';
+            const [entities, forensics] = await Promise.all([
+                extractEntities(text).catch(() => []),
+                Promise.resolve(detectForensicPatterns(text))
+            ]);
+
+            console.log(`✅ Evidence ${data.evidenceId}: ${entities.length} entities, ${forensics.length} forensic flags`);
+
+            // Publish for embedding if text is available
+            if (text.length > 0) {
+                await this.publish(this.exchanges.document_processing, 'document.embed', {
+                    documentId: data.evidenceId,
+                    text,
+                    collection: 'evidence_items',
+                    metadata: { entities: entities.length, forensicFlags: forensics.length }
+                });
+            }
+            this.channel.ack(msg);
+        } catch (error) {
+            console.error('❌ Evidence process error:', this.formatError(error));
+            this.channel.nack(msg, false, true);
+        }
+    }
+
+    private async handleVectorIndex(msg: AmqpMessage): Promise<void> {
+        if (!msg || !this.channel) return;
+        try {
+            const data = this.parseMessage(msg);
+            if (!data?.embedding || !data?.documentId) {
+                this.channel.nack(msg, false, false);
+                return;
+            }
+            const collection = data.collection ?? 'documents';
+            console.log('📌 Indexing vector:', data.documentId, '→', collection);
+            const { qdrant } = await import('../vector/qdrant-manager.js');
+
+            await qdrant.batchUpsert({
+                collection: collection as any,
+                points: [{
+                    id: data.documentId,
+                    vector: data.embedding,
+                    payload: {
+                        documentId: data.documentId,
+                        ...(data.metadata ?? {})
+                    }
+                }]
+            });
+
+            console.log(`✅ Vector indexed: ${data.documentId} → ${collection}`);
+            this.channel.ack(msg);
+        } catch (error) {
+            console.error('❌ Vector index error:', this.formatError(error));
+            this.channel.nack(msg, false, true);
+        }
+    }
+
+    private async handleChatContext(msg: AmqpMessage): Promise<void> {
+        if (!msg || !this.channel) return;
+        try {
+            const data = this.parseMessage(msg);
+            if (!data?.sessionId) {
+                this.channel.nack(msg, false, false);
+                return;
+            }
+            console.log('💬 Chat context update:', data.sessionId);
+            // Store chat message embedding for context retrieval
+            if (data.message && data.embedding) {
+                const { qdrant } = await import('../vector/qdrant-manager.js');
+                await qdrant.batchUpsert({
+                    collection: 'chat_history' as any,
+                    points: [{
+                        id: `chat-${data.sessionId}-${Date.now()}`,
+                        vector: data.embedding,
+                        payload: {
+                            sessionId: data.sessionId,
+                            role: data.role ?? 'user',
+                            content: data.message.slice(0, 500),
+                            timestamp: Date.now()
+                        }
+                    }]
+                });
+            }
+            this.channel.ack(msg);
+        } catch (error) {
+            console.error('❌ Chat context error:', this.formatError(error));
+            this.channel.nack(msg, false, true);
+        }
+    }
+
+    private async handleAnalyticsTrack(msg: AmqpMessage): Promise<void> {
+        if (!msg || !this.channel) return;
+        try {
+            const data = this.parseMessage(msg);
+            if (!data?.eventType) {
+                this.channel.nack(msg, false, false);
+                return;
+            }
+            console.log('📊 Analytics:', data.eventType);
+            // Store analytics event in Redis sorted set for time-series queries
+            if (this.redisService) {
+                const key = `analytics:${data.eventType}`;
+                const entry = JSON.stringify({
+                    ...data.payload,
+                    timestamp: data.timestamp ?? Date.now()
+                });
+                await this.redisService.zadd(key, Date.now(), entry);
+                // Trim to last 10000 events per type
+                await this.redisService.zremrangebyrank(key, 0, -10001);
+            }
+            this.channel.ack(msg);
+        } catch (error) {
+            console.error('❌ Analytics track error:', this.formatError(error));
+            this.channel.nack(msg, false, true);
         }
     }
 
