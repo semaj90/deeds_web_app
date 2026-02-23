@@ -31,7 +31,7 @@ export class TRTLLMClient {
  private baseUrl: string;
 
  constructor(baseUrl?: string) {
- this.baseUrl = baseUrl || env?.PUBLIC_TRT_LLM_ENDPOINT ?? 'http://localhost:8090';
+ this.baseUrl = baseUrl || env?.PUBLIC_TRT_LLM_ENDPOINT ?? 'http://localhost:8099';
  }
 
  async generate(request: TRTLLMRequest): Promise<TRTLLMResponse> {
