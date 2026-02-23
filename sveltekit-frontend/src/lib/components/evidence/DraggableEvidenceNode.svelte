@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { evidenceStore } from '$lib/stores/unified';
-  import { toastStore } from '$lib/stores/unified/toast-store';
+  import { evidenceStore } from '$lib/stores/unified/evidence-store.svelte';
+  import { toastStore } from '$lib/stores/unified/toast-store.svelte';
   import Bot from '@lucide/svelte/icons/bot';
   import FileText from '@lucide/svelte/icons/file-text';
   import ImageIcon from '@lucide/svelte/icons/image';
   import Mic from '@lucide/svelte/icons/mic';
   import Video from '@lucide/svelte/icons/video';
   import Zap from '@lucide/svelte/icons/zap';
-  import type { ComponentType } from 'svelte';
+  // lucide Svelte 5 icons use Component type, not legacy ComponentType
 
   // Stub: embeddingsService module is corrupted, use inline fallback
   const embeddingsService = {
@@ -67,8 +67,7 @@
     `evidence-node ${evidence.type} ${selected ? 'selected' : ''} ${highlighted ? 'highlighted' : ''} ${isDragging ? 'dragging' : ''}`
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const iconMap: Record<string, ComponentType<any>> = {
+  const iconMap: Record<string, any> = {
     document: FileText,
     image: ImageIcon,
     video: Video,

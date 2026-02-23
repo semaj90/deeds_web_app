@@ -28,6 +28,7 @@ import NierRichTextEditor from '$lib/components/editors/NierRichTextEditor.svelt
 import YoRHaModal from '$lib/components/yorha/YoRHaModal.svelte';
 import CaseDocumentWriter from '$lib/components/legal-ai/CaseDocumentWriter.svelte';
 import TiptapWithAIAssistant from '$lib/components/editor/TiptapWithAIAssistant.svelte';
+import EnhancedInlineEditor from '$lib/components/ai/EnhancedInlineEditor.svelte';
 import CollaborationPanel from '$lib/components/legal/CollaborationPanel.svelte';
 import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  import { CacheStrategies, useCache } from '$lib/cache/cache-service.svelte';
@@ -61,7 +62,7 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  let exportPacketError = $state('');
  let showDescriptionEditor = $state(false);
  let caseDescription = $state('');
- let editorMode = $state<'wysiwyg' | 'tiptap' | 'ai-tiptap' | 'nier'>('wysiwyg');
+ let editorMode = $state<'wysiwyg' | 'tiptap' | 'ai-tiptap' | 'nier' | 'inline'>('wysiwyg');
  let showDocumentWriter = $state(false);
  let showYoRHaDetails = $state(false);
  let typingPrompts = $state<string[]>([]);
@@ -474,6 +475,7 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
      <button onclick={() => (editorMode = 'tiptap')} class="text-xs px-2 py-1 rounded {editorMode === 'tiptap' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}">TipTap Editor</button>
      <button onclick={() => (editorMode = 'ai-tiptap')} class="text-xs px-2 py-1 rounded {editorMode === 'ai-tiptap' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'}">AI Editor</button>
      <button onclick={() => (editorMode = 'nier')} class="text-xs px-2 py-1 rounded {editorMode === 'nier' ? 'bg-gray-800 text-green-400' : 'bg-gray-200 text-gray-700'}">NieR Editor</button>
+     <button onclick={() => (editorMode = 'inline')} class="text-xs px-2 py-1 rounded {editorMode === 'inline' ? 'bg-emerald-600 text-white' : 'bg-gray-200 text-gray-700'}">Inline AI</button>
    </div>
    <div class="mt-2">
      {#if editorMode === 'wysiwyg'}
@@ -494,6 +496,15 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
        <div style="height: 250px;">
          <NierRichTextEditor bind:value={caseDescription} placeholder="Case description..." caseId={caseId} />
        </div>
+     {:else if editorMode === 'inline'}
+       <EnhancedInlineEditor
+         bind:value={caseDescription}
+         placeholder="Type case description — AI suggestions appear as you type..."
+         aiModel="gemma3-legal"
+         enableAutoComplete={true}
+         enableGrammarCheck={true}
+         enableSemanticSuggestions={true}
+       />
      {:else}
        <TipTapEditor
          content={caseDescription}

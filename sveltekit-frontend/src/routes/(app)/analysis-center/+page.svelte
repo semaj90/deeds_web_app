@@ -8,6 +8,8 @@
 	import ContextualDetectiveBoard from '$lib/components/detective/ContextualDetectiveBoard.svelte';
 	import HybridBoard from '$lib/components/canvas/HybridBoard.svelte';
 	import ContractAnalyzer from '$lib/components/legal/ContractAnalyzer.svelte';
+	import GoldenLayout from '$lib/components/ui/GoldenLayout.svelte';
+	import IntelligentModelOrchestrator from '$lib/components/ai/IntelligentModelOrchestrator.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -29,6 +31,8 @@
 	let showDetectiveBoard = $state(false);
 	let showHybridBoard = $state(false);
 	let showContractAnalyzer = $state(false);
+	let showGoldenLayout = $state(false);
+	let showOrchestrator = $state(false);
 	let errorMessage = $state('');
 
 	const analysisModes = [
@@ -496,6 +500,50 @@
 	{#if showContractAnalyzer}
 		<div class="summary-reader-container">
 			<ContractAnalyzer />
+		</div>
+	{/if}
+
+	<button
+		class="mode-btn {showGoldenLayout ? 'active' : ''}"
+		onclick={() => (showGoldenLayout = !showGoldenLayout)}
+	>
+		<span class="mode-icon">[G]</span>
+		<span class="mode-label">
+			{showGoldenLayout ? 'HIDE GOLDEN LAYOUT' : 'GOLDEN RATIO LAYOUT'}
+		</span>
+	</button>
+	{#if showGoldenLayout}
+		<div class="summary-reader-container">
+			<GoldenLayout ratio="golden" collapsible={true} sidebarPosition="right">
+				{#snippet children()}
+					<div style="padding: 1rem; background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2); border-radius: 8px; min-height: 200px;">
+						<h3 style="color: #10b981; margin-bottom: 0.5rem;">Main Content Area</h3>
+						<p style="color: #9ca3af; font-size: 0.875rem;">This panel uses golden ratio proportions (1.618:1). The sidebar is collapsible with Ctrl+\\ keyboard shortcut.</p>
+						<p style="color: #6b7280; font-size: 0.75rem; margin-top: 0.5rem;">Use this layout for evidence review, document analysis, or case comparison views.</p>
+					</div>
+				{/snippet}
+				{#snippet sidebar()}
+					<div style="padding: 1rem; background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.2); border-radius: 8px; min-height: 200px;">
+						<h4 style="color: #3b82f6; margin-bottom: 0.5rem;">Sidebar Panel</h4>
+						<p style="color: #9ca3af; font-size: 0.75rem;">Context, metadata, or navigation panel. Collapses to preserve main content space.</p>
+					</div>
+				{/snippet}
+			</GoldenLayout>
+		</div>
+	{/if}
+
+	<div class="section-toggle">
+		<button
+			class="mode-btn {showOrchestrator ? 'active' : ''}"
+			onclick={() => (showOrchestrator = !showOrchestrator)}
+		>
+			<span class="mode-icon">R</span>
+				{showOrchestrator ? 'HIDE RAG PIPELINE' : 'RAG + KAG + DAG PIPELINE'}
+		</button>
+	</div>
+	{#if showOrchestrator}
+		<div class="summary-reader-container">
+			<IntelligentModelOrchestrator caseId={selectedCaseId} initialQuery={analysisQuery} />
 		</div>
 	{/if}
 </main>

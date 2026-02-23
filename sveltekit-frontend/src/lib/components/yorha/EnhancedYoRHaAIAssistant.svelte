@@ -1,12 +1,53 @@
 <!-- Enhanced YoRHa AI Assistant with RAG Integration & Evidence Mode -->
 <script lang="ts">
-  import streamRag from '$lib/ai/ragStreamClient';
-  import createRagStreamStore from '$lib/ai/ragStreamStore';
   import { fade, scale } from 'svelte/transition';
+
+  // Inline RAG stream — connects to /api/sse/chat (Qdrant + Ollama + embeddinggemma)
+  async function streamRag(opts: {
+    query: string; model?: string; intent?: string; endpoint?: string;
+    contextIds?: string[]; onToken: (t: string) => void; onDone: () => void; onError: (e: Error) => void;
+  }) {
+    const { query, model = 'gemma3-legal:latest', intent = 'legal-analysis',
+      endpoint = '/api/sse/chat', contextIds = [], onToken, onDone, onError } = opts;
+    try {
+      ragStatus = 'streaming';
+      const res = await fetch(endpoint, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: query, model, intent, contextIds, stream: true })
+      });
+      if (!res.ok) throw new Error(`RAG stream failed: ${res.status}`);
+      const ct = res.headers.get('content-type') || '';
+      if (ct.includes('text/event-stream')) {
+        const reader = res.body?.getReader();
+        if (!reader) throw new Error('No response body');
+        const decoder = new TextDecoder();
+        let buf = '';
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
+          const lines = buf.split('\n'); buf = lines.pop() || '';
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const d = line.slice(6).trim();
+              if (d === '[DONE]') { ragStatus = 'done'; onDone(); return; }
+              try { const p = JSON.parse(d); onToken(p.token || p.response || d); ragTokenCount++; }
+              catch { if (d) { onToken(d); ragTokenCount++; } }
+            }
+          }
+        }
+        ragStatus = 'done'; onDone();
+      } else {
+        const data = await res.json();
+        onToken(data.response || data.answer || JSON.stringify(data));
+        ragStatus = 'done'; onDone();
+      }
+    } catch (e) { ragStatus = 'error'; onError(e instanceof Error ? e : new Error(String(e))); }
+  }
 
   interface AssistantProps {
     isOpen?: boolean;
-	onClose: () => void;
+    onClose: () => void;
     userRole?: 'prosecutor' | 'detective' | 'admin';
   }
 
@@ -20,14 +61,9 @@
   let isProcessing = $state<boolean>(false);
   let contextExpanded = $state<boolean>(false);
 
-  // RAG Integration
-  let ragStore = createRagStreamStore({
-    maxRetries: 3,
-    batching: {
-	enabled:true, intervalMs: 40, adaptive: true },
-	persistence: {
-enabled:true, storage: 'session' }
-  });
+  // RAG state (replaces ragStreamStore)
+  let ragStatus = $state<'idle' | 'streaming' | 'done' | 'error'>('idle');
+  let ragTokenCount = $state(0);
 
   // UI state
   let searchBarRef = $state<HTMLInputElement | null>(null);
@@ -181,8 +217,12 @@ enabled:true, storage: 'session' }
     URL.revokeObjectURL(url);
   }
 
-  let ragStatus = $derived(ragStore.status);
-  let ragTokenCount = $derived(ragStore.tokenCount);
+  function clearSession() {
+    chatMessages = [];
+    evidenceItems = [];
+    ragTokenCount = 0;
+    ragStatus = 'idle';
+  }
 </script>
 
 {#if isOpen}
@@ -387,7 +427,7 @@ enabled:true, storage: 'session' }
           <span class="token-count">{ragTokenCount} tokens</span>
         </div>
         <div class="footer-controls">
-          <button onclick={() => ragStore.clear()}>Clear Session</button>
+          <button onclick={clearSession}>Clear Session</button>
           <button onclick={exportEvidence}>Export All</button>
         </div>
       </footer>

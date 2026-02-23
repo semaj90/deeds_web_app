@@ -2,6 +2,7 @@
  // Migrated to $effect
 
  import AccessibilitySettings from '$lib/components/ui/AccessibilitySettings.svelte';
+ import ThemeSelector from '$lib/components/ui/ThemeSelector.svelte';
 
  let activeTab = $state<'general' | 'ai' | 'database' | 'gpu' | 'security' | 'accessibility'>('general');
 
@@ -167,6 +168,11 @@
         <option value="ja">Japanese</option>
         <option value="es">Spanish</option>
        </select>
+      </div>
+
+      <div class="form-group">
+       <label>Quick Theme Toggle</label>
+       <ThemeSelector />
       </div>
 
       <div class="form-group checkbox">

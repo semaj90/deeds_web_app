@@ -7,8 +7,9 @@
 	import EvidenceBoard from '$lib/components/evidence/EvidenceBoard.svelte';
 	import CanvasBoard from '$lib/components/yorha/_simulations/CanvasBoard.svelte';
 	import YoRHaEvidenceBoard from '$lib/components/yorha/EvidenceBoard.svelte';
+	import DraggableEvidenceNode from '$lib/components/evidence/DraggableEvidenceNode.svelte';
 
-	let activeView = $state<'canvas-editor' | 'fabric' | 'evidence-canvas' | 'recursive' | 'provenance' | 'evidence-board' | 'canvas-board' | 'yorha-board'>('canvas-editor');
+	let activeView = $state<'canvas-editor' | 'fabric' | 'evidence-canvas' | 'recursive' | 'provenance' | 'evidence-board' | 'canvas-board' | 'yorha-board' | 'draggable-nodes'>('canvas-editor');
 	let showSidebar = $state(true);
 	let selectedEvidenceId = $state<string | null>(null);
 	let canvasWidth = $derived(showSidebar ? 920 : 1200);
@@ -119,6 +120,12 @@
 			desc: 'SVG-based evidence node graph with API-backed connections. Drag nodes to rearrange, click to inspect, auto-loads from /api/yorha/evidence endpoints.',
 			tech: ['SVG', 'API Fetch', 'Drag & Drop', '$props()'],
 			icon: '🔗'
+		},
+		'draggable-nodes': {
+			title: 'Draggable Evidence Nodes',
+			desc: 'Interactive draggable evidence nodes with AI analysis, metadata display, connection indicators, and real-time position updates. Each node represents an evidence item with type-specific icons.',
+			tech: ['Drag & Drop', 'AI Analysis', '$bindable()', 'Lucide Icons'],
+			icon: '🧩'
 		}
 	};
 
@@ -154,7 +161,7 @@
 	<!-- Header -->
 	<div class="mb-6">
 		<h1 class="text-3xl font-bold text-sand mb-2">Evidence Canvas Demo</h1>
-		<p class="text-sand/60 text-lg">8 visualization engines — Canvas API, Fabric.js, D3.js, SVG, YoRHa Drawing, Evidence Network</p>
+		<p class="text-sand/60 text-lg">9 visualization engines — Canvas API, Fabric.js, D3.js, SVG, YoRHa Drawing, Evidence Network, Draggable Nodes</p>
 		<div class="mt-2 flex items-center gap-4 text-sm text-sand/40">
 			<span>{sampleEvidence.length} evidence items</span>
 			<span>{sampleCitations.length} citations</span>
@@ -272,6 +279,28 @@
 			{:else if activeView === 'yorha-board'}
 				<div class="bg-white rounded-lg shadow p-6">
 					<YoRHaEvidenceBoard caseId="CASE-2024-001" />
+				</div>
+			{:else if activeView === 'draggable-nodes'}
+				<div class="bg-gray-50 rounded-lg shadow p-6 relative" style="min-height: 500px;">
+					<p class="text-xs text-gray-500 mb-4">Drag evidence nodes to rearrange. Click to select, use Analyze to run AI analysis.</p>
+					<div class="relative" style="height: 450px;">
+						{#each sampleEvidence as item, i (item.id)}
+							<DraggableEvidenceNode
+								evidence={{
+									id: item.id,
+									title: item.title,
+									type: item.evidenceType === 'image' ? 'image' : item.evidenceType === 'video' ? 'video' : 'document',
+									x: 60 + (i % 4) * 220,
+									y: 40 + Math.floor(i / 4) * 180,
+									connections: i > 0 ? [sampleEvidence[i - 1].id] : [],
+									tags: ['case-001', 'primary']
+								}}
+								selected={selectedEvidenceId === item.id}
+								onSelect={(id) => (selectedEvidenceId = selectedEvidenceId === id ? null : id)}
+								onAnalyze={(id) => console.log('Analyze evidence:', id)}
+							/>
+						{/each}
+					</div>
 				</div>
 			{/if}
 		</div>

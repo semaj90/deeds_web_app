@@ -1,6 +1,10 @@
 <script lang="ts">
-	import { debounce } from 'lodash-es';
 	import { tick } from 'svelte';
+
+	function debounce<T extends (...args: any[]) => any>(fn: T, delay: number): T {
+		let timer: ReturnType<typeof setTimeout>;
+		return ((...args: any[]) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), delay); }) as T;
+	}
 
 	// Props using Svelte 5 $props()
 	let {

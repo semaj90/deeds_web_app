@@ -20,6 +20,9 @@
   import EnhancedAIChatTest from '$lib/components/ai/EnhancedAIChatTest.svelte';
   import ContextualChatDemo from '$lib/components/ai/ContextualChatDemo.svelte';
   import YoRHaAIChat from '$lib/components/yorha/YoRHaAIChat.svelte';
+  import EnhancedYoRHaAIAssistant from '$lib/components/yorha/EnhancedYoRHaAIAssistant.svelte';
+  import IntelligentModelOrchestrator from '$lib/components/ai/IntelligentModelOrchestrator.svelte';
+  import Gemma270MWebAssembly from '$lib/components/ai/Gemma270MWebAssembly.svelte';
 
   interface AIStats {
     activeChats: number;
@@ -70,6 +73,9 @@
   let showEnhancedChat = $state(false);
   let showContextualChat = $state(false);
   let showYoRHaChat = $state(false);
+  let showEnhancedAssistant = $state(false);
+  let showOrchestrator = $state(false);
+  let showVlmAnalyzer = $state(false);
   let chatHistoryMessages = $state([
     { id: 'msg-1', role: 'user', content: 'What are the key elements of PC 187?', timestamp: new Date(Date.now() - 300000).toISOString(), citations: [], evidence_references: [] },
     { id: 'msg-2', role: 'assistant', content: 'Under PC 187, murder is defined as the unlawful killing of a human being with malice aforethought. The key elements are: (1) a human being was killed, (2) the killing was unlawful, and (3) the killing was done with malice aforethought. See Smith v. Johnson for recent precedent.', timestamp: new Date(Date.now() - 240000).toISOString(), citations: ['PC 187', 'Smith v. Johnson'], evidence_references: [] },
@@ -433,6 +439,51 @@
       {#if showYoRHaChat}
         <div class="mt-3 h-[500px]">
           <YoRHaAIChat />
+        </div>
+      {/if}
+    </div>
+
+    <!-- 17. Enhanced YoRHa AI Assistant (RAG + Evidence + Analysis) -->
+    <div class="mt-4">
+      <button
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/10 rounded-lg hover:border-accent/30 transition text-sm font-medium text-sand/80"
+        onclick={() => (showEnhancedAssistant = !showEnhancedAssistant)}
+      >
+        {showEnhancedAssistant ? 'Hide Enhanced Assistant' : 'Enhanced YoRHa AI Assistant (RAG + Evidence + Analysis)'}
+      </button>
+    </div>
+    <EnhancedYoRHaAIAssistant
+      isOpen={showEnhancedAssistant}
+      onClose={() => (showEnhancedAssistant = false)}
+      userRole="prosecutor"
+    />
+
+    <!-- 18. RAG + KAG + DAG Pipeline Orchestrator -->
+    <div class="mt-4">
+      <button
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/10 rounded-lg hover:border-accent/30 transition text-sm font-medium text-sand/80"
+        onclick={() => (showOrchestrator = !showOrchestrator)}
+      >
+        {showOrchestrator ? 'Hide Pipeline Orchestrator' : 'RAG + KAG + DAG Pipeline Orchestrator (Search \u2192 Validate \u2192 Answer)'}
+      </button>
+      {#if showOrchestrator}
+        <div class="mt-3">
+          <IntelligentModelOrchestrator />
+        </div>
+      {/if}
+    </div>
+
+    <!-- 19. VLM Image Analysis (Client ONNX + Server YOLO + VLM) -->
+    <div class="mt-4">
+      <button
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/10 rounded-lg hover:border-accent/30 transition text-sm font-medium text-sand/80"
+        onclick={() => (showVlmAnalyzer = !showVlmAnalyzer)}
+      >
+        {showVlmAnalyzer ? 'Hide VLM Analyzer' : 'VLM Image Analysis (Client ONNX + YOLO + Gemma3 Vision)'}
+      </button>
+      {#if showVlmAnalyzer}
+        <div class="mt-3">
+          <Gemma270MWebAssembly />
         </div>
       {/if}
     </div>

@@ -12,8 +12,12 @@
 	import BitsUIDemo from '$lib/components/ui/BitsUIDemo.svelte';
 	import YoRHaCommandInterface from '$lib/components/yorha/_simulations/YoRHaCommandInterface.svelte';
 	import YoRHaDetectiveForm from '$lib/components/yorha/YoRHaDetectiveForm.svelte';
+	import N64ProgressBar from '$lib/components/ui/gaming/n64/ProgressBar.svelte';
+	import NES8BitContainer from '$lib/components/ui/gaming/8bit/NES8BitContainer.svelte';
 
-	let activeSection = $state<'command-center' | 'terminal' | 'system-status' | 'dialogs' | 'diamond-modal' | 'gaming-retro' | 'bits-ui' | 'command-interface' | 'detective-form'>('command-center');
+	let activeSection = $state<'command-center' | 'terminal' | 'system-status' | 'dialogs' | 'diamond-modal' | 'gaming-retro' | 'bits-ui' | 'command-interface' | 'detective-form' | 'n64-progress' | 'nes-crt'>('command-center');
+	let progressValue = $state(0);
+	let progressInterval: ReturnType<typeof setInterval> | null = $state(null);
 	let showInfoDialog = $state(false);
 	let showDiamondModal = $state(false);
 	let diamondPalette = $state<'nes' | 'snes' | 'ps1' | 'n64' | 'ps2'>('ps1');
@@ -86,6 +90,18 @@
 			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'detective-form' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
 		>
 			Detective Form
+		</button>
+		<button
+			onclick={() => (activeSection = 'n64-progress')}
+			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'n64-progress' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
+		>
+			N64 Progress
+		</button>
+		<button
+			onclick={() => (activeSection = 'nes-crt')}
+			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'nes-crt' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
+		>
+			NES CRT
 		</button>
 	</div>
 
@@ -366,6 +382,68 @@
 				submitText="SUBMIT REPORT"
 			/>
 		</div>
+	{:else if activeSection === 'n64-progress'}
+		<div class="bg-gray-900 rounded-lg shadow-xl p-6 border border-amber-900/30">
+			<h2 class="text-lg font-semibold text-amber-400 mb-4">N64 3D Progress Bar</h2>
+			<p class="text-sm text-gray-400 mb-4">
+				Retro N64-themed 3D progress indicator with texture streaming, glow effects, and wave animations.
+			</p>
+			<div class="space-y-6">
+				<N64ProgressBar value={progressValue} max={100} showPercentage={true} label="Processing Evidence" era="n64" variant="default" size="lg" animationStyle="wave" />
+				<N64ProgressBar value={65} max={100} showPercentage={true} label="Upload Complete" era="n64" variant="default" size="md" />
+				<N64ProgressBar indeterminate={true} label="Scanning..." era="n64" size="sm" animationStyle="pulse" />
+				<div class="flex gap-3 mt-4">
+					<button
+						onclick={() => {
+							progressValue = 0;
+							if (progressInterval) clearInterval(progressInterval);
+							progressInterval = setInterval(() => {
+								progressValue += 2;
+								if (progressValue >= 100) { progressValue = 100; if (progressInterval) clearInterval(progressInterval); }
+							}, 100);
+						}}
+						class="px-4 py-2 bg-green-700 text-white text-sm rounded hover:bg-green-600 transition"
+					>
+						Start Progress
+					</button>
+					<button
+						onclick={() => { progressValue = 0; if (progressInterval) clearInterval(progressInterval); }}
+						class="px-4 py-2 bg-red-700 text-white text-sm rounded hover:bg-red-600 transition"
+					>
+						Reset
+					</button>
+				</div>
+			</div>
+		</div>
+	{:else if activeSection === 'nes-crt'}
+		<NES8BitContainer enableScanlines={true} enableCRTEffect={true} enableVignette={true}>
+			{#snippet children()}
+				<div class="p-6">
+					<h2 class="text-lg font-semibold text-green-400 mb-4 font-mono">NES 8-Bit CRT Container</h2>
+					<p class="text-sm text-green-300/70 mb-4 font-mono">
+						Retro CRT display with scanlines, curvature, and vignette effects. Respects prefers-reduced-motion.
+					</p>
+					<div class="grid grid-cols-2 gap-4 text-xs font-mono text-green-200/80">
+						<div class="p-3 border border-green-500/30 rounded">
+							<div class="text-green-400 font-bold mb-1">SCANLINES</div>
+							<div>Horizontal repeating gradient overlay (4px interval)</div>
+						</div>
+						<div class="p-3 border border-green-500/30 rounded">
+							<div class="text-green-400 font-bold mb-1">CRT CURVATURE</div>
+							<div>Radial gradient simulating CRT edge distortion</div>
+						</div>
+						<div class="p-3 border border-green-500/30 rounded">
+							<div class="text-green-400 font-bold mb-1">VIGNETTE</div>
+							<div>Dark edge falloff for authentic CRT look</div>
+						</div>
+						<div class="p-3 border border-green-500/30 rounded">
+							<div class="text-green-400 font-bold mb-1">A11Y SAFE</div>
+							<div>All effects disabled with prefers-reduced-motion</div>
+						</div>
+					</div>
+				</div>
+			{/snippet}
+		</NES8BitContainer>
 	{/if}
 
 	<!-- Tech Stack Info -->

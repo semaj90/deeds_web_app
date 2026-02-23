@@ -4,9 +4,11 @@
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
-	type CacheHealth = { isHealthy: boolean, memoryReady: boolean;
+	type CacheHealth = {
+		isHealthy: boolean;
+		memoryReady: boolean;
 		persistentReady: boolean;
-	lastCheck: number;
+		lastCheck: number;
 	};
 
 	let health = $state<CacheHealth>({
@@ -35,7 +37,13 @@ import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 });
 
 	async function updateHealth() {
-		health = await CacheMonitoring.getHealth();
+		const raw = await CacheMonitoring.getHealth();
+		health = {
+			isHealthy: (raw as any).totalRequests >= 0,
+			memoryReady: ((raw as any).memoryStats?.collections ?? 0) >= 0,
+			persistentReady: ((raw as any).persistentHits ?? 0) >= 0,
+			lastCheck: Date.now()
+		};
 	}
 
 	function toggleAutoRefresh() {

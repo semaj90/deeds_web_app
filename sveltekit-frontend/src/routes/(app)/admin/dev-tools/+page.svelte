@@ -10,6 +10,8 @@
 	import YoRHaForm from '$lib/components/yorha/YoRHaForm.svelte';
 	import AIStatusIndicator from '$lib/components/ai/AIStatusIndicator.svelte';
 	import PerformanceMonitor from '$lib/components/ui/PerformanceMonitor.svelte';
+	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
+	import CacheMonitor from '$lib/components/cache/CacheMonitor.svelte';
 	let { data } = $props();
 
 	// Tab state
@@ -28,6 +30,8 @@
 		{ value: 'forms', label: 'Forms' },
 		{ value: 'ai-status', label: 'AI Status' },
 		{ value: 'performance', label: 'Performance' },
+		{ value: 'spinners', label: 'Spinners' },
+		{ value: 'embeddings', label: 'Embeddings' },
 	];
 
 	// Reactive state
@@ -58,6 +62,60 @@
 		} finally {
 			terminalHistory = [...terminalHistory, entry];
 			terminalLoading = false;
+		}
+	}
+
+	// Embedding test state
+	let embedTestText = $state('');
+	let embedTestResult = $state<{ embedding: number[]; model: string; dims: number; timeMs: number } | null>(null);
+	let isEmbedding = $state(false);
+	let embedError = $state('');
+	let redisHealthy = $state<boolean | null>(null);
+	let redisStats = $state<Record<string, any>>({});
+	let isCheckingRedis = $state(false);
+
+	async function testEmbedding() {
+		if (!embedTestText.trim()) return;
+		isEmbedding = true;
+		embedError = '';
+		embedTestResult = null;
+		const start = performance.now();
+		try {
+			const res = await fetch('/api/embed', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ text: embedTestText, model: 'embeddinggemma' })
+			});
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			const data = await res.json();
+			embedTestResult = {
+				embedding: data.embedding ?? [],
+				model: data.model ?? 'embeddinggemma:latest',
+				dims: data.embedding?.length ?? 0,
+				timeMs: performance.now() - start
+			};
+		} catch (e) {
+			embedError = e instanceof Error ? e.message : String(e);
+		} finally {
+			isEmbedding = false;
+		}
+	}
+
+	async function checkRedisHealth() {
+		isCheckingRedis = true;
+		try {
+			const res = await fetch('/api/health');
+			if (res.ok) {
+				const data = await res.json();
+				redisHealthy = data.redis?.status === 'healthy' || data.redis?.connected === true || data.services?.some?.((s: any) => s.name?.toLowerCase().includes('redis') && s.status === 'healthy');
+				redisStats = data.redis ?? {};
+			} else {
+				redisHealthy = false;
+			}
+		} catch {
+			redisHealthy = false;
+		} finally {
+			isCheckingRedis = false;
 		}
 	}
 
@@ -561,6 +619,9 @@
 	{#if activeTab === 'cache'}
 		<CachePerformanceDashboard />
 		<div style="margin-top: 2rem;">
+			<CacheMonitor />
+		</div>
+		<div style="margin-top: 2rem;">
 			<CacheDemo />
 		</div>
 	{/if}
@@ -627,6 +688,135 @@
 			<h3 class="text-lg font-semibold text-sand">Performance Monitor</h3>
 			<p class="text-sm text-sand/60">Real-time FPS, memory, CPU/GPU usage, and response time metrics.</p>
 			<PerformanceMonitor showOverlay={true} autoHide={false} updateInterval={1000} />
+		</div>
+	{/if}
+
+	<!-- Embeddings Tab — Redis cache + embeddinggemma integration -->
+	{#if activeTab === 'embeddings'}
+		<div class="space-y-6">
+			<h3 class="text-lg font-semibold text-sand">Embedding & Cache Integration</h3>
+			<p class="text-sm text-sand/60">Test embeddinggemma:latest (768d) via Ollama + check Redis cache health.</p>
+
+			<!-- Redis Health -->
+			<div class="rounded-lg border-2 border-sand/20 bg-panel p-4">
+				<div class="flex items-center justify-between mb-3">
+					<h4 class="font-semibold text-sand">Redis Cache Health</h4>
+					<button
+						class="rounded-md border border-info bg-info/10 px-3 py-1 text-xs font-mono uppercase text-info transition hover:bg-info/20 disabled:opacity-50"
+						onclick={checkRedisHealth}
+						disabled={isCheckingRedis}
+					>
+						{isCheckingRedis ? 'Checking...' : 'Check Health'}
+					</button>
+				</div>
+				{#if redisHealthy !== null}
+					<div class="flex items-center gap-2 text-sm">
+						<span class="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase {redisHealthy ? 'bg-accent/20 text-accent' : 'bg-danger/20 text-danger'}">
+							{redisHealthy ? 'Connected' : 'Disconnected'}
+						</span>
+						{#if Object.keys(redisStats).length > 0}
+							<span class="text-sand/40 text-xs font-mono">
+								{JSON.stringify(redisStats).slice(0, 120)}{JSON.stringify(redisStats).length > 120 ? '...' : ''}
+							</span>
+						{/if}
+					</div>
+				{:else}
+					<p class="text-xs text-sand/40">Click "Check Health" to query /api/health for Redis status.</p>
+				{/if}
+			</div>
+
+			<!-- Embedding Test -->
+			<div class="rounded-lg border-2 border-sand/20 bg-panel p-4">
+				<h4 class="font-semibold text-sand mb-3">embeddinggemma:latest (768-dim)</h4>
+				<div class="space-y-3">
+					<textarea
+						bind:value={embedTestText}
+						placeholder="Enter text to embed via Ollama embeddinggemma..."
+						rows={3}
+						class="w-full rounded-lg border-2 border-sand/20 bg-panelSoft px-4 py-2 text-sand text-sm placeholder-sand/40 transition focus:border-accent focus:outline-none resize-vertical"
+					></textarea>
+					<div class="flex gap-2">
+						<button
+							class="flex-1 rounded-md border border-accent bg-accent/10 px-4 py-2 text-sm font-mono uppercase tracking-wider text-accent transition hover:bg-accent/20 disabled:opacity-50"
+							onclick={testEmbedding}
+							disabled={isEmbedding || !embedTestText.trim()}
+						>
+							{isEmbedding ? 'Embedding...' : 'Generate Embedding'}
+						</button>
+						<button
+							class="rounded-md border border-sand/30 bg-panel px-3 py-2 text-xs text-sand/60 transition hover:text-sand"
+							onclick={() => { embedTestText = 'The defendant is charged under California Penal Code Section 187(a) with murder in the first degree.'; }}
+						>
+							Sample
+						</button>
+					</div>
+				</div>
+
+				{#if embedError}
+					<div class="mt-3 p-3 bg-danger/10 border border-danger/30 rounded-lg text-danger text-sm">
+						{embedError}
+					</div>
+				{/if}
+
+				{#if embedTestResult}
+					<div class="mt-3 space-y-2">
+						<div class="flex items-center gap-3 text-sm">
+							<span class="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold text-accent">
+								{embedTestResult.dims}d
+							</span>
+							<span class="text-sand/60">Model: <span class="font-mono text-sand">{embedTestResult.model}</span></span>
+							<span class="text-sand/60">Time: <span class="font-mono text-accent">{embedTestResult.timeMs.toFixed(0)}ms</span></span>
+						</div>
+						<div class="rounded-lg bg-black/40 p-3 font-mono text-xs text-sand/70 max-h-24 overflow-y-auto">
+							[{embedTestResult.embedding.slice(0, 8).map(v => v.toFixed(4)).join(', ')}, ... ({embedTestResult.dims} total)]
+						</div>
+						<div class="text-xs text-sand/40">
+							L2 norm: {Math.sqrt(embedTestResult.embedding.reduce((s, v) => s + v * v, 0)).toFixed(4)}
+							&middot; Min: {Math.min(...embedTestResult.embedding).toFixed(4)}
+							&middot; Max: {Math.max(...embedTestResult.embedding).toFixed(4)}
+						</div>
+					</div>
+				{/if}
+			</div>
+
+			<!-- Architecture Info -->
+			<div class="rounded-lg border-2 border-sand/20 bg-panel p-4">
+				<h4 class="font-semibold text-sand mb-2">Cache → Embedding Pipeline</h4>
+				<div class="text-xs text-sand/60 font-mono space-y-1">
+					<p>L0: LokiJS (in-memory, 5-10min TTL)</p>
+					<p>L1: IndexedDB (persistent, 7-day TTL)</p>
+					<p>L2: Memory Cache (server, 5min TTL)</p>
+					<p>L3: Redis (server, configurable TTL)</p>
+					<p>L4: embeddinggemma:latest → 768d via gRPC/HTTP</p>
+					<p class="mt-2 text-sand/40">Fallback: nomic-embed-text (384d)</p>
+					<p class="text-sand/40">Vector stores: pgvector + Qdrant ANN</p>
+				</div>
+			</div>
+		</div>
+	{/if}
+
+	{#if activeTab === 'spinners'}
+		<div class="space-y-6">
+			<h3 class="text-lg font-semibold text-sand">Loading Spinners</h3>
+			<p class="text-sm text-sand/60">Animated loading indicators with size and color variants.</p>
+			<div class="grid grid-cols-2 gap-6">
+				<div class="p-4 bg-panelSoft rounded-lg border border-sand/10">
+					<p class="text-xs text-sand/40 mb-3 uppercase">Small / Blue</p>
+					<LoadingSpinner size="sm" color="blue" message="Loading..." />
+				</div>
+				<div class="p-4 bg-panelSoft rounded-lg border border-sand/10">
+					<p class="text-xs text-sand/40 mb-3 uppercase">Medium / Green</p>
+					<LoadingSpinner size="md" color="green" message="Processing evidence..." />
+				</div>
+				<div class="p-4 bg-panelSoft rounded-lg border border-sand/10">
+					<p class="text-xs text-sand/40 mb-3 uppercase">Large / Purple</p>
+					<LoadingSpinner size="lg" color="purple" message="Analyzing documents..." />
+				</div>
+				<div class="p-4 bg-panelSoft rounded-lg border border-sand/10">
+					<p class="text-xs text-sand/40 mb-3 uppercase">Medium / Gray (No Message)</p>
+					<LoadingSpinner size="md" color="gray" showMessage={false} />
+				</div>
+			</div>
 		</div>
 	{/if}
 

@@ -83,7 +83,8 @@
 
 <div
   class="golden-layout {className}"
-  class: collapsed class:sidebar-left={sidebarPosition === 'left'}
+  class:collapsed
+  class:sidebar-left={sidebarPosition === 'left'}
 >
   {#if sidebarPosition === 'left' && sidebar}
     <aside

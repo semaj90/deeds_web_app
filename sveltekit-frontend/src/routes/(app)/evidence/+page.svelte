@@ -33,6 +33,8 @@
 	import YorhaEvidenceGrid from '$lib/components/yorha/evidence/EvidenceGrid.svelte';
 	import DocumentDetailModal from '$lib/components/DocumentDetailModal.svelte';
 	import MarkdownSceneViewer from '$lib/components/ui/MarkdownSceneViewer.svelte';
+	import EvidenceUploadModal from '$lib/components/evidence/EvidenceUploadModal.svelte';
+	import Gemma270MWebAssembly from '$lib/components/ai/Gemma270MWebAssembly.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	let uploadCard = $state<UploadProgressCard | undefined>(undefined);
@@ -89,8 +91,14 @@
 	let showAIFileUpload = $state(false);
 	let showYorhaGrid = $state(false);
 	let showDetailModal = $state(false);
+	let showUploadPipeline = $state(false);
+	let showVlmAnalyzer = $state(false);
 	let showSceneViewer = $state(false);
-	let sampleScene = $state({
+	let sampleScene = $state<{
+		id: string; title: string; markdown: string; confidence: number;
+		sourceFiles: string[]; aiGenerated: boolean; validated: boolean;
+		validatedBy?: string; validatedAt?: Date;
+	}>({
 		id: 'scene-1',
 		title: 'Crime Scene Analysis — Sector 7',
 		markdown: '## Evidence Summary\n\n**Location**: 742 Evergreen Terrace, Sector 7\n\n### Key Findings\n- Fingerprint match on exhibit B (93% confidence)\n- DNA trace evidence collected from entry point\n- Timeline corroborated by surveillance footage\n\n### Chain of Custody\n1. Evidence collected by **Officer Chen** at 14:32\n2. Logged into evidence locker #A-17\n3. Transferred to forensic lab at 16:00\n\n> **AI Note**: High confidence match with existing case profiles in the database.',
@@ -334,6 +342,12 @@
 				<button onclick={() => (showAIFileUpload = !showAIFileUpload)} class="px-4 py-2 bg-accent/70 text-white rounded-lg hover:bg-accent/50 transition text-sm font-medium">
 					{showAIFileUpload ? 'Hide AI Upload' : 'AI File Upload'}
 				</button>
+				<button onclick={() => (showUploadPipeline = true)} class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition text-sm font-medium">
+					MinIO Pipeline Upload
+				</button>
+				<button onclick={() => (showVlmAnalyzer = !showVlmAnalyzer)} class="px-4 py-2 bg-emerald-700 text-white rounded-lg hover:bg-emerald-600 transition text-sm font-medium">
+					{showVlmAnalyzer ? 'Hide VLM' : 'VLM Image Analysis'}
+				</button>
 				<a href="/evidence/upload" class="px-4 py-2 bg-info text-white rounded-lg hover:bg-info/80 transition text-sm font-medium">
 					+ Upload Evidence
 				</a>
@@ -411,6 +425,13 @@
 					onUpload={(files) => { console.log('AI Upload complete:', files.length, 'files'); showAIFileUpload = false; window.location.reload(); }}
 					onAnalyze={(file, metadata) => { console.log('AI Analysis:', file.name, 'confidence:', metadata.confidence); }}
 				/>
+			</div>
+		{/if}
+
+		<!-- VLM Image Analysis (Client ONNX embed → YOLO → gemma3 VLM → entity extraction) -->
+		{#if showVlmAnalyzer}
+			<div class="mb-6">
+				<Gemma270MWebAssembly caseId={data.caseId ?? ''} />
 			</div>
 		{/if}
 
@@ -959,6 +980,13 @@
 		onClose={() => { actionPopupFile = null; }}
 	/>
 {/if}
+
+<EvidenceUploadModal
+	caseId={data.evidence?.[0]?.caseId || 'default'}
+	isOpen={showUploadPipeline}
+	onClose={() => (showUploadPipeline = false)}
+	onSuccess={(evidenceId, jobId) => { console.log('Pipeline complete:', evidenceId, jobId); showUploadPipeline = false; window.location.reload(); }}
+/>
 
 <style>
 	.ev-toolbar {
