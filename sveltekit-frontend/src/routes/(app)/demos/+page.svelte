@@ -8,7 +8,8 @@
 	];
 
 	const existingDemos = [
-		{ href: '/evidence-canvas-demo', label: 'Evidence Canvas Demo', description: '8 visualization engines: CanvasEditor, FabricCanvas, EvidenceCanvasEditor, RecursiveVisualization, ProvenanceGraph, EvidenceBoard, CanvasBoard (YoRHa drawing), YoRHa EvidenceBoard (SVG graph)' },
+		{ href: '/evidence-canvas-demo', label: 'Evidence Canvas Demo', description: '11 visualization engines: CanvasEditor, FabricCanvas, EvidenceCanvasEditor, RecursiveVisualization, ProvenanceGraph, EvidenceBoard, CanvasBoard, YoRHa EvidenceBoard, DraggableNodes, Node Graph, AI Canvas (embeddinggemma cosine similarity)' },
+		{ href: '/evidence-library', label: 'Evidence Library', description: 'Evidence analysis dashboard with Rich Evidence Cards, custody timeline, police report generator, stats panel, and modal viewer' },
 		{ href: '/nier-showcase', label: 'NieR Showcase', description: 'YoRHa UI showcase: CommandCenter, Terminal, SystemStatus, Dialogs, DiamondModal, BitsUI, DetectiveForm, NES CRT' },
 		{ href: '/system-status', label: 'System Status', description: 'System health dashboard: StatusCards, SystemStatusPanel, SystemOverview, YoRHaSystemStatus' },
 	];
