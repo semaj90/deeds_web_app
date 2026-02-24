@@ -1,13 +1,6 @@
 <!-- Evidence Canvas - Interactive drag & drop workspace for evidence analysis -->
 <script lang="ts">
-	import Plus from '@lucide/svelte/icons/plus';
-	import Zap from '@lucide/svelte/icons/zap';
-	import Search from '@lucide/svelte/icons/search';
-	import Brain from '@lucide/svelte/icons/brain';
-	import Download from '@lucide/svelte/icons/download';
-	import Link2 from '@lucide/svelte/icons/link-2';
-	import Eye from '@lucide/svelte/icons/eye';
-	import EyeOff from '@lucide/svelte/icons/eye-off';
+	import Icon from '$lib/components/ui/Icon.svelte';
 
 	interface EvidenceItem {
 		id: string;
@@ -299,7 +292,7 @@
 	<!-- Toolbar -->
 	<div class="toolbar">
 		<div class="toolbar-left">
-			<Brain class="w-5 h-5" />
+			<Icon name="brain" class="w-5 h-5" />
 			<span class="toolbar-title">Evidence Canvas</span>
 			<span class="toolbar-stats">{evidenceList.length} items &bull; {connections.length} connections &bull; {selectedNodes.length} selected</span>
 		</div>
@@ -312,23 +305,23 @@
 			</select>
 			{#if selectedNodes.length === 2}
 				<button class="tool-btn connect-btn" onclick={connectSelected} title="Connect selected nodes">
-					<Link2 class="w-4 h-4" /> Connect
+					<Icon name="link-2" class="w-4 h-4" /> Connect
 				</button>
 			{/if}
 			<button class="tool-btn" onclick={() => (showConnections = !showConnections)} title="Toggle connections">
-				{#if showConnections}<EyeOff class="w-4 h-4" />{:else}<Eye class="w-4 h-4" />{/if}
+				{#if showConnections}<Icon name="eye-off" class="w-4 h-4" />{:else}<Icon name="eye" class="w-4 h-4" />{/if}
 				{showConnections ? 'Hide' : 'Show'}
 			</button>
 			<button class="tool-btn" onclick={analyzeAllEvidence} disabled={isAnalyzing || readonly || evidenceList.length < 2} title="AI-analyze all evidence">
 				{#if isAnalyzing}
 					<div class="spinner"></div>
 				{:else}
-					<Search class="w-4 h-4" />
+					<Icon name="search" class="w-4 h-4" />
 				{/if}
 				Analyze
 			</button>
 			<button class="tool-btn" onclick={exportCanvasData} title="Export canvas data">
-				<Download class="w-4 h-4" /> Export
+				<Icon name="download" class="w-4 h-4" /> Export
 			</button>
 		</div>
 	</div>
@@ -403,7 +396,7 @@
 		<!-- Empty State -->
 		{#if evidenceList.length === 0}
 			<div class="empty-state">
-				<Plus class="w-12 h-12" />
+				<Icon name="plus" class="w-12 h-12" />
 				<h3>No evidence on canvas</h3>
 				<p>Drag evidence items here or use the toolbar to add items</p>
 			</div>

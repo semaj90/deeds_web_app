@@ -12,25 +12,7 @@
 	let showDetectiveCenter = $state(false);
 	let showProsecutorDashboard = $state(false);
 	import { goto } from '$app/navigation';
-	import Activity from '@lucide/svelte/icons/activity';
-	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
-	import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
-	import Bell from '@lucide/svelte/icons/bell';
-	import Brain from '@lucide/svelte/icons/brain';
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
-	import Database from '@lucide/svelte/icons/database';
-	import FileText from '@lucide/svelte/icons/file-text';
-	import Gavel from '@lucide/svelte/icons/gavel';
-	import Moon from '@lucide/svelte/icons/moon';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-	import Search from '@lucide/svelte/icons/search';
-	import Settings from '@lucide/svelte/icons/settings';
-	import Sun from '@lucide/svelte/icons/sun';
-	import TrendingDown from '@lucide/svelte/icons/trending-down';
-	import TrendingUp from '@lucide/svelte/icons/trending-up';
-	import Users from '@lucide/svelte/icons/users';
-	import X from '@lucide/svelte/icons/x';
-	import Zap from '@lucide/svelte/icons/zap';
+	import Icon from '$lib/components/ui/Icon.svelte';
 	import type { PageData } from './$types';
 
 	interface Props { data: PageData }
@@ -324,17 +306,17 @@ totalCases: 5.2,
 		}
 	}
 
-	function getAlertIcon(type: string) {
+	function getAlertIcon(type: string): string {
 		switch (type) {
-			case 'error': return AlertTriangle;
-			case 'warning': return AlertTriangle;
-			case 'info': return Activity;
-			default:return Activity;
+			case 'error': return 'alert-triangle';
+			case 'warning': return 'alert-triangle';
+			case 'info': return 'activity';
+			default:return 'activity';
 		}
 	}
 
-	function getTrendIcon(trend: number) {
-		return trend >= 0 ? TrendingUp : TrendingDown;
+	function getTrendIcon(trend: number): string {
+		return trend >= 0 ? 'trending-up' : 'trending-down';
 	}
 
 	function getTrendColor(trend: number) {
@@ -429,13 +411,13 @@ totalCases: 5.2,
 					disabled={isRefreshing}
 					class="refresh-btn bits-btn"
 				>
-					<RefreshCw class={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+					<Icon name="refresh-cw" class={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
 					Refresh
 				</Button>
 
 				<!-- Global Search -->
 				<Button class="bits-btn" variant="outline" size="sm" onclick={() => goto('/global-search')}>
-					<Search class="h-4 w-4 mr-2" />
+					<Icon name="search" class="h-4 w-4 mr-2" />
 					Global Search
 					<span class="keyboard-shortcut">⌘K</span>
 				</Button>
@@ -447,27 +429,27 @@ totalCases: 5.2,
 						size="sm"
 						onclick={() => showQuickActions = !showQuickActions}
 					>
-						<Zap class="h-4 w-4 mr-2" />
+						<Icon name="zap" class="h-4 w-4 mr-2" />
 						Quick Actions
-						<ChevronDown class="h-4 w-4 ml-2" />
+						<Icon name="chevron-down" class="h-4 w-4 ml-2" />
 					</Button>
 
 					{#if showQuickActions}
 						<div class="quick-actions-dropdown">
 							<Button onclick={createNewCase} class="quick-action-item bits-btn">
-								<Gavel class="h-4 w-4" />
+								<Icon name="gavel" class="h-4 w-4" />
 								Create New Case
 							</Button>
 							<Button onclick={uploadEvidence} class="quick-action-item bits-btn">
-								<FileText class="h-4 w-4" />
+								<Icon name="file-text" class="h-4 w-4" />
 								Upload Evidence
 							</Button>
 							<Button onclick={runAIAnalysis} class="quick-action-item bits-btn">
-								<Brain class="h-4 w-4" />
+								<Icon name="brain" class="h-4 w-4" />
 								Run AI Analysis
 							</Button>
 							<Button onclick={generateReport} class="quick-action-item bits-btn">
-								<BarChart3 class="h-4 w-4" />
+								<Icon name="bar-chart-3" class="h-4 w-4" />
 								Generate Report
 							</Button>
 						</div>
@@ -482,7 +464,7 @@ totalCases: 5.2,
 						onclick={() => showNotifications = !showNotifications}
 						class="bits-btn notification-btn"
 					>
-						<Bell class="h-4 w-4 mr-2" />
+						<Icon name="bell" class="h-4 w-4 mr-2" />
 						Notifications
 						{#if unreadNotificationsCount > 0}
 							<span class="notification-badge">{unreadNotificationsCount}</span>
@@ -498,7 +480,7 @@ totalCases: 5.2,
 									size="sm"
 									onclick={() => showNotifications = false}
 								>
-									<X class="h-4 w-4" />
+									<Icon name="x" class="h-4 w-4" />
 								</Button>
 							</div>
 							<div class="notifications-list">
@@ -524,14 +506,14 @@ totalCases: 5.2,
 												size="sm"
 												onclick={() => dismissNotification(notification.id)}
 											>
-												<X class="h-4 w-4" />
+												<Icon name="x" class="h-4 w-4" />
 											</Button>
 										</div>
 									</div>
 								{/each}
 								{#if notifications.length === 0}
 									<div class="no-notifications">
-										<Bell class="h-8 w-8 text-muted-foreground" />
+										<Icon name="bell" class="h-8 w-8 text-muted-foreground" />
 										<p>No notifications</p>
 									</div>
 								{/if}
@@ -543,15 +525,15 @@ totalCases: 5.2,
 				<!-- Theme Toggle -->
 				<Button class="bits-btn" variant="outline" size="sm" onclick={toggleTheme}>
 					{#if isDarkTheme}
-						<Sun class="h-4 w-4" />
+						<Icon name="sun" class="h-4 w-4" />
 					{:else}
-						<Moon class="h-4 w-4" />
+						<Icon name="moon" class="h-4 w-4" />
 					{/if}
 				</Button>
 
 				<!-- Settings -->
 				<Button class="bits-btn" variant="outline" size="sm">
-					<Settings class="h-4 w-4" />
+					<Icon name="settings" class="h-4 w-4" />
 				</Button>
 			</div>
 		</div>
@@ -583,25 +565,25 @@ totalCases: 5.2,
 				<ul class="nav-list">
 					<li class="nav-item active">
 						<Button class="bits-btn nav-link" onclick={() => currentView = 'dashboard'}>
-							<Activity class="h-4 w-4" />
+							<Icon name="activity" class="h-4 w-4" />
 							Dashboard
 						</Button>
 					</li>
 					<li class="nav-item">
 						<Button class="bits-btn nav-link" onclick={() => goto('/cases')}>
-							<Gavel class="h-4 w-4" />
+							<Icon name="gavel" class="h-4 w-4" />
 							Cases
 						</Button>
 					</li>
 					<li class="nav-item">
 						<Button class="bits-btn nav-link" onclick={() => goto('/evidence')}>
-							<FileText class="h-4 w-4" />
+							<Icon name="file-text" class="h-4 w-4" />
 							Evidence
 						</Button>
 					</li>
 					<li class="nav-item">
 						<Button class="bits-btn nav-link" onclick={() => goto('/ai-dashboard')}>
-							<Brain class="h-4 w-4" />
+							<Icon name="brain" class="h-4 w-4" />
 							AI Chat
 						</Button>
 					</li>
@@ -613,13 +595,13 @@ totalCases: 5.2,
 				<ul class="nav-list">
 					<li class="nav-item">
 						<Button class="bits-btn nav-link" onclick={() => goto('/persons-of-interest')}>
-							<Users class="h-4 w-4" />
+							<Icon name="users" class="h-4 w-4" />
 							Persons
 						</Button>
 					</li>
 					<li class="nav-item">
 						<Button class="bits-btn nav-link" onclick={() => goto('/analysis-center')}>
-							<Search class="h-4 w-4" />
+							<Icon name="search" class="h-4 w-4" />
 							Analysis
 						</Button>
 					</li>
@@ -631,7 +613,7 @@ totalCases: 5.2,
 				<ul class="nav-list">
 					<li class="nav-item">
 						<Button class="bits-btn nav-link" onclick={() => goto('/system-configuration')}>
-							<Database class="h-4 w-4" />
+							<Icon name="database" class="h-4 w-4" />
 							System
 						</Button>
 					</li>
@@ -647,15 +629,15 @@ totalCases: 5.2,
 					<Card class="metric-card">
 						<CardHeader class="pb-2">
 							<CardTitle class="text-sm flex items-center">
-								<Gavel class="h-4 w-4 mr-2" />
+								<Icon name="gavel" class="h-4 w-4 mr-2" />
 								Total Cases
 							</CardTitle>
 						</CardHeader>
 						<CardContent>
 							<div class="metric-value">{metrics.totalCases}</div>
-							{@const SvelteComponent = getTrendIcon(metrics.trends.totalCases)}
+							{@const trendIconName = getTrendIcon(metrics.trends.totalCases)}
 							<div class="metric-trend">
-								<SvelteComponent class={`h-3 w-3 mr-1 ${getTrendColor(metrics.trends.totalCases)}`} />
+								<Icon name={trendIconName} class={`h-3 w-3 mr-1 ${getTrendColor(metrics.trends.totalCases)}`} />
 								<span class={`${getTrendColor(metrics.trends.totalCases)}`}>
 									{metrics.trends.totalCases >= 0 ? '+' : ''}{metrics.trends.totalCases.toFixed(1)}%
 								</span>
@@ -667,15 +649,15 @@ totalCases: 5.2,
 					<Card class="metric-card">
 						<CardHeader class="pb-2">
 							<CardTitle class="text-sm flex items-center">
-								<Activity class="h-4 w-4 mr-2" />
+								<Icon name="activity" class="h-4 w-4 mr-2" />
 								Active Cases
 							</CardTitle>
 						</CardHeader>
 						<CardContent>
 							<div class="metric-value">{metrics.activeCases}</div>
-							{@const SvelteComponent_1 = getTrendIcon(metrics.trends.activeCases)}
+							{@const trendIconName1 = getTrendIcon(metrics.trends.activeCases)}
 							<div class="metric-trend">
-								<SvelteComponent_1 class={`h-3 w-3 mr-1 ${getTrendColor(metrics.trends.activeCases)}`} />
+								<Icon name={trendIconName1} class={`h-3 w-3 mr-1 ${getTrendColor(metrics.trends.activeCases)}`} />
 								<span class={`${getTrendColor(metrics.trends.activeCases)}`}>
 									{metrics.trends.activeCases >= 0 ? '+' : ''}{metrics.trends.activeCases.toFixed(1)}%
 								</span>
@@ -687,15 +669,15 @@ totalCases: 5.2,
 					<Card class="metric-card">
 						<CardHeader class="pb-2">
 							<CardTitle class="text-sm flex items-center">
-								<FileText class="h-4 w-4 mr-2" />
+								<Icon name="file-text" class="h-4 w-4 mr-2" />
 								Evidence Processed
 							</CardTitle>
 						</CardHeader>
 						<CardContent>
 							<div class="metric-value">{metrics.evidenceProcessed.toLocaleString()}</div>
-							{@const SvelteComponent_2 = getTrendIcon(metrics.trends.evidenceProcessed)}
+							{@const trendIconName2 = getTrendIcon(metrics.trends.evidenceProcessed)}
 							<div class="metric-trend">
-								<SvelteComponent_2 class={`h-3 w-3 mr-1 ${getTrendColor(metrics.trends.evidenceProcessed)}`} />
+								<Icon name={trendIconName2} class={`h-3 w-3 mr-1 ${getTrendColor(metrics.trends.evidenceProcessed)}`} />
 								<span class={`${getTrendColor(metrics.trends.evidenceProcessed)}`}>
 									{metrics.trends.evidenceProcessed >= 0 ? '+' : ''}{metrics.trends.evidenceProcessed.toFixed(1)}%
 								</span>
@@ -707,15 +689,15 @@ totalCases: 5.2,
 					<Card class="metric-card">
 						<CardHeader class="pb-2">
 							<CardTitle class="text-sm flex items-center">
-								<Brain class="h-4 w-4 mr-2" />
+								<Icon name="brain" class="h-4 w-4 mr-2" />
 								AI Queries
 							</CardTitle>
 						</CardHeader>
 						<CardContent>
 							<div class="metric-value">{metrics.aiQueries.toLocaleString()}</div>
-							{@const SvelteComponent_3 = getTrendIcon(metrics.trends.aiQueries)}
+							{@const trendIconName3 = getTrendIcon(metrics.trends.aiQueries)}
 							<div class="metric-trend">
-								<SvelteComponent_3 class={`h-3 w-3 mr-1 ${getTrendColor(metrics.trends.aiQueries)}`} />
+								<Icon name={trendIconName3} class={`h-3 w-3 mr-1 ${getTrendColor(metrics.trends.aiQueries)}`} />
 								<span class={`${getTrendColor(metrics.trends.aiQueries)}`}>
 									{metrics.trends.aiQueries >= 0 ? '+' : ''}{metrics.trends.aiQueries.toFixed(1)}%
 								</span>
@@ -727,7 +709,7 @@ totalCases: 5.2,
 					<Card class="metric-card system-health-card">
 						<CardHeader class="pb-2">
 							<CardTitle class="text-sm flex items-center">
-								<Database class="h-4 w-4 mr-2" />
+								<Icon name="database" class="h-4 w-4 mr-2" />
 								System Health
 							</CardTitle>
 						</CardHeader>
@@ -748,7 +730,7 @@ totalCases: 5.2,
 					<Card>
 						<CardHeader>
 							<CardTitle class="flex items-center">
-								<Gavel class="h-5 w-5 mr-2" />
+								<Icon name="gavel" class="h-5 w-5 mr-2" />
 								Active Cases
 							</CardTitle>
 						</CardHeader>
@@ -779,7 +761,7 @@ totalCases: 5.2,
 					<Card>
 						<CardHeader>
 							<CardTitle class="flex items-center">
-								<Activity class="h-5 w-5 mr-2" />
+								<Icon name="activity" class="h-5 w-5 mr-2" />
 								System Status
 							</CardTitle>
 						</CardHeader>
@@ -807,16 +789,16 @@ totalCases: 5.2,
 										<h4 class="alerts-title">Recent Alerts</h4>
 										<div class="alerts-list">
 											{#each systemAlerts.filter(a => !a.dismissed) as alert}
-												{@const AlertIcon = getAlertIcon(alert.type)}
+												{@const alertIconName = getAlertIcon(alert.type)}
 												<div class="alert-item alert-{alert.type}">
-													<AlertIcon class="h-4 w-4" />
+													<Icon name={alertIconName} class="h-4 w-4" />
 													<span class="alert-message">{alert.message}</span>
 													<span class="alert-time">{alert.timestamp}</span>
 													<Button class="bits-btn alert-dismiss"
 														onclick={() => dismissAlert(alert.id)}
 														aria-label="Dismiss alert"
 													>
-														<X class="h-3 w-3" />
+														<Icon name="x" class="h-3 w-3" />
 													</Button>
 												</div>
 											{/each}
@@ -824,7 +806,7 @@ totalCases: 5.2,
 									</div>
 								{:else}
 									<div class="no-alerts">
-										<Activity class="h-6 w-6 text-green-400" />
+										<Icon name="activity" class="h-6 w-6 text-green-400" />
 										<span class="text-sm text-muted-foreground">All systems operational</span>
 									</div>
 								{/if}

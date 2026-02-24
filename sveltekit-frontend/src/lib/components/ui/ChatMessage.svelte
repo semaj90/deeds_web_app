@@ -1,7 +1,5 @@
 <script lang="ts">
-	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
-	import Bot from '@lucide/svelte/icons/bot';
-	import User from '@lucide/svelte/icons/user';
+	import Icon from '$lib/components/ui/Icon.svelte';
 
 	interface Props {
 		message: {
@@ -28,11 +26,11 @@
 		{message.role === 'error' ? 'bg-danger/10 text-left' : ''}"
 >
 	{#if message.role === 'user'}
-		<User class="w-5 h-5" />
+		<Icon name="user" class="w-5 h-5" />
 	{:else if message.role === 'assistant'}
-		<Bot class="w-5 h-5" />
+		<Icon name="bot" class="w-5 h-5" />
 	{:else}
-		<AlertTriangle class="w-5 h-5" />
+		<Icon name="alert-triangle" class="w-5 h-5" />
 	{/if}
 	<div class="flex-1">
 		<div class="text-sm">{message.content}</div>

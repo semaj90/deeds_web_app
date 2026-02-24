@@ -2,16 +2,6 @@
 import { Editor } from '@tiptap/core';
 import Placeholder from '@tiptap/extension-placeholder';
 import StarterKit from '@tiptap/starter-kit';
-import Bold from '@lucide/svelte/icons/bold';
-import Check from '@lucide/svelte/icons/check';
-import Heading1 from '@lucide/svelte/icons/heading-1';
-import Heading2 from '@lucide/svelte/icons/heading-2';
-import Italic from '@lucide/svelte/icons/italic';
-import List from '@lucide/svelte/icons/list';
-import ListOrdered from '@lucide/svelte/icons/list-ordered';
-import Loader2 from '@lucide/svelte/icons/loader-2';
-import Save from '@lucide/svelte/icons/save';
-import Wand2 from '@lucide/svelte/icons/wand-2';
 import { slide } from 'svelte/transition';
 
 import Button from '$lib/components/ui/Button.svelte';
@@ -128,13 +118,13 @@ return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 class={isActive.bold ? "bg-muted" : ""}
 onclick={() => editor?.chain().focus().toggleBold().run()}
 >
-<Bold class="w-4 h-4" />
+<span class="i-lucide-bold w-4 h-4 inline-block" />
 </Button>
 <Button variant="ghost" size="sm"
 class={isActive.italic ? "bg-muted" : ""}
 onclick={() => editor?.chain().focus().toggleItalic().run()}
 >
-<Italic class="w-4 h-4" />
+<span class="i-lucide-italic w-4 h-4 inline-block" />
 </Button>
 
 <div class="w-px h-6 bg-border mx-1"></div>
@@ -143,13 +133,13 @@ onclick={() => editor?.chain().focus().toggleItalic().run()}
 class={isActive.h1 ? "bg-muted" : ""}
 onclick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
 >
-<Heading1 class="w-4 h-4" />
+<span class="i-lucide-heading-1 w-4 h-4 inline-block" />
 </Button>
 <Button variant="ghost" size="sm"
 class={isActive.h2 ? "bg-muted" : ""}
 onclick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
 >
-<Heading2 class="w-4 h-4" />
+<span class="i-lucide-heading-2 w-4 h-4 inline-block" />
 </Button>
 
 <div class="w-px h-6 bg-border mx-1"></div>
@@ -158,13 +148,13 @@ onclick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
 class={isActive.bullet ? "bg-muted" : ""}
 onclick={() => editor?.chain().focus().toggleBulletList().run()}
 >
-<List class="w-4 h-4" />
+<span class="i-lucide-list w-4 h-4 inline-block" />
 </Button>
 <Button variant="ghost" size="sm"
 class={isActive.ordered ? "bg-muted" : ""}
 onclick={() => editor?.chain().focus().toggleOrderedList().run()}
 >
-<ListOrdered class="w-4 h-4" />
+<span class="i-lucide-list-ordered w-4 h-4 inline-block" />
 </Button>
 
 <div class="flex-1"></div>
@@ -173,7 +163,7 @@ onclick={() => editor?.chain().focus().toggleOrderedList().run()}
 class="gap-2 text-indigo-400 border-info/30 hover:bg-info/10"
 onclick={() => showAiMenu = !showAiMenu}
 >
-<Wand2 class="w-3.5 h-3.5" />
+<span class="i-lucide-wand-2 w-3.5 h-3.5 inline-block" />
 AI Assistant
 </Button>
 
@@ -183,10 +173,10 @@ onclick={handleSave}
 disabled={isSaving}
 >
 {#if isSaving}
-<Loader2 class="w-3.5 h-3.5 animate-spin" />
+<span class="i-lucide-loader-2 w-3.5 h-3.5 animate-spin inline-block" />
 Saving
 {:else}
-<Save class="w-3.5 h-3.5" />
+<span class="i-lucide-save w-3.5 h-3.5 inline-block" />
 Save
 {/if}
 </Button>
@@ -206,7 +196,7 @@ onkeydown={(e) => e.key === 'Enter' && runAiCommand()}
 />
 <Button size="sm" onclick={runAiCommand} disabled={isGenerating || !aiPrompt}>
 {#if isGenerating}
-<Loader2 class="w-3.5 h-3.5 animate-spin p-0" />
+<span class="i-lucide-loader-2 w-3.5 h-3.5 animate-spin p-0 inline-block" />
 {:else}
 Generate
 {/if}
@@ -226,7 +216,7 @@ Generate
 <span>{wordCount} words</span>
 {#if lastSaved}
 <span class="flex items-center gap-1 text-accent">
-<Check class="w-3 h-3" />
+<span class="i-lucide-check w-3 h-3 inline-block" />
 Saved {formatTime(lastSaved)}
 </span>
 {:else}

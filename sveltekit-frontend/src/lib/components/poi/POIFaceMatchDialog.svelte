@@ -12,11 +12,6 @@
  import DialogDescription from '$lib/components/ui/dialog/DialogDescription.svelte';
  import DialogHeader from '$lib/components/ui/dialog/DialogHeader.svelte';
  import DialogTitle from '$lib/components/ui/dialog/DialogTitle.svelte';
- import Percent from '@lucide/svelte/icons/percent';
- import Search from '@lucide/svelte/icons/search';
- import Users from '@lucide/svelte/icons/users';
- import X from '@lucide/svelte/icons/x';
-
  interface POI {
  id: string;
 	name: string;
@@ -43,12 +38,7 @@
  onSelect?: (poi: POI) => void;
  }
 
-
-
-
-
  let { open = $bindable(), matches, onClose, onSelect }: Props = $props();
-
 
  const handleClose = (): void => {
  open = false;
@@ -90,7 +80,7 @@
  <div class="max-w-4xl max-h-[80vh] overflow-y-auto">
  <DialogHeader>
  <div class="flex items-center gap-2">
- <Search class="w-5 h-5" />
+ <span class="i-lucide-search w-5 h-5 inline-block" />
  <DialogTitle>Face Match Results</DialogTitle>
  </div>
  <DialogDescription>
@@ -101,7 +91,7 @@
  <div class="space-y-4">
  {#if matches.length === 0}
  <div class="text-center py-8">
- <Users class="w-12 h-12 text-sand/40 mx-auto mb-4" />
+ <span class="i-lucide-users w-12 h-12 text-sand/40 mx-auto mb-4 inline-block" />
  <p class="text-sand/60">No face matches found</p>
  </div>
  {:else}
@@ -120,7 +110,7 @@
  {:else}
  <Avatar class="w-16 h-16">
  <AvatarFallback class="bg-sand/10">
- <Users class="w-8 h-8 text-sand/60" />
+ <span class="i-lucide-users w-8 h-8 text-sand/60 inline-block" />
  </AvatarFallback>
  </Avatar>
  {/if}
@@ -143,7 +133,7 @@
  </div>
 
  <div class="flex items-center gap-1 text-sm">
- <Percent class="w-4 h-4" />
+ <span class="i-lucide-percent w-4 h-4 inline-block" />
  <span class={getSimilarityColor(match.similarity)}>
  {Math.round(match.similarity * 100)}% similarity
  </span>
@@ -159,7 +149,7 @@
 
  <div class="flex justify-end pt-4 border-t">
  <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2" onclick={handleClose}>
- <X class="w-4 h-4 mr-2" />
+ <span class="i-lucide-x w-4 h-4 mr-2 inline-block" />
  Close
  </button>
  </div>
@@ -167,7 +157,4 @@
  </DialogContent>
  </DialogPortal>
 </DialogRoot>
-
-
-
 

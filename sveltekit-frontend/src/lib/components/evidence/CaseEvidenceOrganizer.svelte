@@ -1,14 +1,6 @@
 <!-- Case Evidence Organizer — 5 organization modes with AI clustering -->
 <script lang="ts">
-	import Loader from '@lucide/svelte/icons/loader';
-	import FolderTree from '@lucide/svelte/icons/folder-tree';
-	import Calendar from '@lucide/svelte/icons/calendar';
-	import Star from '@lucide/svelte/icons/star';
-	import Brain from '@lucide/svelte/icons/brain';
-	import Link from '@lucide/svelte/icons/link';
-	import Search from '@lucide/svelte/icons/search';
-	import CheckCircle from '@lucide/svelte/icons/check-circle';
-	import AlertCircle from '@lucide/svelte/icons/alert-circle';
+	import Icon from '$lib/components/ui/Icon.svelte';
 
 	import { getOllamaEndpoint } from '$lib/utils/api-endpoints.js';
 
@@ -79,11 +71,11 @@
 	});
 
 	const organizationModes = [
-		{ value: 'category' as const, label: 'Category', icon: FolderTree },
-		{ value: 'timeline' as const, label: 'Timeline', icon: Calendar },
-		{ value: 'priority' as const, label: 'Priority', icon: Star },
-		{ value: 'ai_clusters' as const, label: 'AI Clusters', icon: Brain },
-		{ value: 'chain_custody' as const, label: 'Custody', icon: Link }
+		{ value: 'category' as const, label: 'Category', icon: 'folder-tree' },
+		{ value: 'timeline' as const, label: 'Timeline', icon: 'calendar' },
+		{ value: 'priority' as const, label: 'Priority', icon: 'star' },
+		{ value: 'ai_clusters' as const, label: 'AI Clusters', icon: 'brain' },
+		{ value: 'chain_custody' as const, label: 'Custody', icon: 'link' }
 	];
 
 	let filteredEvidence = $derived.by(() => {
@@ -379,7 +371,7 @@
 					class:active={activeMode === mode.value}
 					onclick={() => changeMode(mode.value)}
 				>
-					<svelte:component this={mode.icon} size={14} />
+					<Icon name={mode.icon} size={14} />
 					<span>{mode.label}</span>
 				</button>
 			{/each}
@@ -399,7 +391,7 @@
 	<!-- Filters -->
 	<div class="ceo-filters">
 		<div class="ceo-search">
-			<Search size={14} />
+			<Icon name="search" size={14} />
 			<input type="text" placeholder="Search evidence..." bind:value={searchQuery} />
 		</div>
 		<select bind:value={filterType}>
@@ -428,7 +420,7 @@
 				<div class="ceo-progress"><div class="ceo-progress-fill" style="width:{clusteringProgress}%"></div></div>
 				<p class="ceo-progress-text">{clusteringProgress}%</p>
 			{:else}
-				<Loader size={24} class="ceo-spinner" />
+				<Icon name="loader" size={24} class="ceo-spinner" />
 				<p>Reorganizing...</p>
 			{/if}
 		</div>
@@ -536,7 +528,7 @@
 							<div class="ceo-card-row">
 								<h4>{ev.title}</h4>
 								<span class="ceo-custody-status" class:complete={ev.custodyStatus === 'complete'} class:missing={ev.custodyStatus === 'missing'}>
-									{#if ev.custodyStatus === 'complete'}<CheckCircle size={12} />{:else}<AlertCircle size={12} />{/if}
+									{#if ev.custodyStatus === 'complete'}<Icon name="check-circle" size={12} />{:else}<Icon name="alert-circle" size={12} />{/if}
 									{ev.custodyStatus}
 								</span>
 							</div>

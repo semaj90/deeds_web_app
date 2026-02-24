@@ -3,12 +3,6 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import Button from '$lib/components/ui/Button.svelte';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card/index.js';
-	import Camera from '@lucide/svelte/icons/camera';
-	import Edit from '@lucide/svelte/icons/edit';
-	import Eye from '@lucide/svelte/icons/eye';
-	import Trash2 from '@lucide/svelte/icons/trash-2';
-	import User from '@lucide/svelte/icons/user';
-
 	interface POI {
 		id: string;
 		name: string;
@@ -75,14 +69,14 @@
 							<div
 								class="absolute -top-1 -right-1 bg-info text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
 							>
-								<Camera class="w-3 h-3" />
+								<span class="i-lucide-camera w-3 h-3 inline-block" />
 							</div>
 						{/if}
 					</div>
 				{:else}
 					<Avatar class="w-12 h-12">
 						<AvatarFallback class="bg-sand/10">
-							<User class="w-6 h-6 text-sand/60" />
+							<span class="i-lucide-user w-6 h-6 text-sand/60 inline-block" />
 						</AvatarFallback>
 					</Avatar>
 				{/if}
@@ -124,7 +118,7 @@
 				}}
 				class="flex-1"
 			>
-				<Eye class="w-4 h-4 mr-1" />
+				<span class="i-lucide-eye w-4 h-4 mr-1 inline-block" />
 				View
 			</Button>
 			<Button
@@ -136,7 +130,7 @@
 				}}
 				class="flex-1"
 			>
-				<Edit class="w-4 h-4 mr-1" />
+				<span class="i-lucide-edit w-4 h-4 mr-1 inline-block" />
 				Edit
 			</Button>
 			<Button
@@ -148,7 +142,7 @@
 				}}
 				class="text-danger hover:text-danger"
 			>
-				<Trash2 class="w-4 h-4" />
+				<span class="i-lucide-trash-2 w-4 h-4 inline-block" />
 			</Button>
 		</div>
 	</CardContent>
@@ -163,7 +157,4 @@
 	overflow: hidden;
  }
 </style>
-
-
-
 

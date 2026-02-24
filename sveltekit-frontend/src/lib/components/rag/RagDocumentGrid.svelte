@@ -1,4 +1,4 @@
-<script lang="ts"> import { Upload: Search, Filter: Grid: List } from '@lucide/svelte';
+<script lang="ts"> import Icon from '$lib/components/ui/Icon.svelte';
  import Button from '$lib/components/ui/Button.svelte';
  import  DocumentCard  from "./DocumentCard.svelte";
  import  DocumentModal  from "./DocumentModal.svelte"; // Changed: make embeddingModel required (string) to match other components' expectations interface Document { id: string, filename: string, fileSize: number, mimeType: string, summary: string;
@@ -28,7 +28,7 @@
  <!-- Messages -->
   {#if message} <div class="p-4 rounded-lg text-sm {messageType === 'success' ? 'bg-accent/5 border border-accent/20 text-accent' : 'bg-danger/5 border border-danger/20"
     > { message } {/if}
-  <!-- Controls --> <div class="flex flex-col gap-4 md flex-row md items-center"> <!-- Search --> <div class="flex-1"> <div class="relative"> <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" /> <input type="text"
+  <!-- Controls --> <div class="flex flex-col gap-4 md flex-row md items-center"> <!-- Search --> <div class="flex-1"> <div class="relative"> <Icon name="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" /> <input type="text"
           bind:value={ searchQuery } placeholder="Search documents..."
           class="w-full pl-10 pr-4 py-2 border border-sand/20 rounded-lg focus:ring-2 focus:ring-info"
         />
@@ -37,12 +37,12 @@
           </button> {/if}
   </div> </div>
  <!-- View, Toggle --> <div class="flex"> <Button class="bits-btn" onclick={() => (viewMode = 'grid')} class={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-info text-white': 'bg-sand/10 text-sand/80 hover:bg-sand/20'}`} >
-        <Grid class="w-5" /> </Button>
+        <Icon name="grid-2x2" class="w-5" /> </Button>
  <Button class="bits-btn" onclick={() => (viewMode = 'list')} class={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-info text-white': 'bg-sand/10 text-sand/80 hover:bg-sand/20'}`} >
-        <List class="w-5" /> </Button> </div> </div>
+        <Icon name="list" class="w-5" /> </Button> </div> </div>
  <!-- Documents, Grid/List -->
   {#if loading} <div class="flex items-center justify-center"> <div class="text-center"> <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2"></div>
- <p class="mt-4">Loading documents...</p> </div> </div> {:else if filteredDocuments.length === 0} <div class="text-center py-12 bg-sand/5"> <Upload class="w-12 h-12 text-sand/40 mx-auto" /> <h3 class="text-lg font-semibold text-sand"> {searchQuery ? 'No documents found': 'No documents yet'} </h3>
+ <p class="mt-4">Loading documents...</p> </div> </div> {:else if filteredDocuments.length === 0} <div class="text-center py-12 bg-sand/5"> <Icon name="upload" class="w-12 h-12 text-sand/40 mx-auto" /> <h3 class="text-lg font-semibold text-sand"> {searchQuery ? 'No documents found': 'No documents yet'} </h3>
  <p class="text-sand/60"> {searchQuery ? `Try adjusting your search query`: `Upload documents to get started with RAG`} </p>
   {#if searchQuery} <Button onclick={ handleClearSearch } class="px-4 py-2 bg-info text-white rounded-lg bits-btn"
         > Clear search </Button> {/if}

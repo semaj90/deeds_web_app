@@ -1,8 +1,5 @@
 <script lang="ts">
  import { poiService } from '$lib/features/poi/services/poi';
- import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
- import TrendingUp from '@lucide/svelte/icons/trending-up';
- import Users from '@lucide/svelte/icons/users';
  // Migrated to $effect
 
  // Props
@@ -48,7 +45,7 @@
 <div class="poi-stats">
  <div class="stat-card">
  <div class="stat-icon">
- <Users size={24} />
+ <span class="i-lucide-users w-6 h-6 inline-block" />
  </div>
  <div class="stat-content">
  <p class="stat-label">Total POIs</p>
@@ -58,7 +55,7 @@
 
  <div class="stat-card">
  <div class="stat-icon active">
- <TrendingUp size={24} />
+ <span class="i-lucide-trending-up w-6 h-6 inline-block" />
  </div>
  <div class="stat-content">
  <p class="stat-label">Active</p>
@@ -68,7 +65,7 @@
 
  <div class="stat-card">
  <div class="stat-icon critical">
- <AlertTriangle size={24} />
+ <span class="i-lucide-alert-triangle w-6 h-6 inline-block" />
  </div>
  <div class="stat-content">
  <p class="stat-label">Critical</p>
@@ -78,7 +75,7 @@
 
  <div class="stat-card">
  <div class="stat-icon recent">
- <Users size={24} />
+ <span class="i-lucide-users w-6 h-6 inline-block" />
  </div>
  <div class="stat-content">
  <p class="stat-label">Recent Activity</p>
@@ -157,6 +154,4 @@
 	margin: 0;
  }
 </style>
-
-
 

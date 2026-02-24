@@ -6,17 +6,9 @@
   import { onMount, tick } from 'svelte';
   import { browser } from '$app/environment';
   import { fade, fly } from 'svelte/transition';
-  import Send from '@lucide/svelte/icons/send';
-  import Brain from '@lucide/svelte/icons/brain';
-  import FileText from '@lucide/svelte/icons/file-text';
-  import Search from '@lucide/svelte/icons/search';
-  import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
-  import CheckCircle from '@lucide/svelte/icons/check-circle';
-  import Loader2 from '@lucide/svelte/icons/loader-2';
-  import SettingsIcon from '@lucide/svelte/icons/settings';
-  import Zap from '@lucide/svelte/icons/zap';
   import Button from '$lib/components/ui/Button.svelte';
   import TypewriterResponse from './TypewriterResponse.svelte';
+  import Icon from '$lib/components/ui/Icon.svelte';
 
   // Props
   interface Props {
@@ -1003,16 +995,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
     return 'text-danger';
   }
 
-  function getStatusIcon(status: string) {
-    switch (status) {
-      case 'active':
-        return CheckCircle;
-      case 'inactive':
-        return AlertTriangle;
-      default:
-        return Loader2;
-    }
-  }
+  function getStatusIcon(status: string): string { switch (status) { case 'active': return 'check-circle'; case 'inactive': return 'alert-triangle'; default: return 'loader-2'; } }
 
   function copyToClipboard(text: string) {
     navigator.clipboard.writeText(text);
@@ -1025,7 +1008,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
     <div class="p-4 pb-2">
       <div class="flex items-center justify-between">
         <h3 class="font-semibold flex items-center gap-2 flex-wrap">
-          <Brain class="w-5 h-5" />
+          <span class="i-lucide-brain w-5 h-5 inline-block" />
           Enhanced Legal AI Assistant
           {#if userRole}
             <span class="px-2 py-0.5 rounded text-xs font-medium bg-sand/10">{userRole}</span>
@@ -1050,9 +1033,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
             {#each Object.entries(systemStatus) as [service, status]}
               {#if service !== 'lastCheck'}
                 <div class="flex items-center gap-1" title="{service}: {status}">
-                  <svelte:component
-                    this={getStatusIcon(status)}
-                    class="w-3 h-3 {getConfidenceColor(status === 'active' ? 1 : 0.3)}" />
+                  <Icon name={getStatusIcon(status)} class="w-3 h-3 {getConfidenceColor(status === 'active' ? 1 : 0.3)}" />
                 </div>
               {/if}
             {/each}
@@ -1060,7 +1041,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
 
           <!-- Settings Toggle -->
           <Button onclick={() => (showSettings = !showSettings)}>
-            <SettingsIcon class="w-4 h-4" />
+            <span class="i-lucide-settings w-4 h-4 inline-block" />
           </Button>
         </div>
       </div>
@@ -1071,7 +1052,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
       <div class="p-4 border-t">
         <details bind:open={settingsExpanded}>
           <summary class="flex items-center gap-2 text-sm font-medium mb-3 cursor-pointer">
-            <Zap class="w-4 h-4" />
+            <span class="i-lucide-zap w-4 h-4 inline-block" />
             Advanced AI Settings
           </summary>
           <div class="grid grid-cols-2 gap-4 text-sm">
@@ -1167,13 +1148,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
               : message.role === 'assistant'
                 ? 'bg-accent'
                 : 'bg-sand/20'}">
-            <svelte:component
-              this={message.role === 'user'
-                ? Send
-                : message.role === 'assistant'
-                  ? Brain
-                  : AlertTriangle}
-              class="w-4 h-4 text-white" />
+            <Icon name={message.role === "user" ? "send" : message.role === "assistant" ? "brain" : "alert-triangle"} class="w-4 h-4 text-white" />
           </div>
 
           <!-- Message Content -->
@@ -1300,7 +1275,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
           <!-- Message Actions -->
           <div class="flex-shrink-0 flex flex-col gap-1">
             <Button onclick={() => copyToClipboard(message.content)}>
-              <FileText class="w-3 h-3" />
+              <span class="i-lucide-file-text w-3 h-3 inline-block" />
             </Button>
           </div>
         </div>
@@ -1310,7 +1285,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
     {#if isProcessing}
       <div class="flex items-center justify-center py-4" transition:fade>
         <div class="flex items-center gap-2 text-sand/60">
-          <Loader2 class="w-4 h-4 animate-spin" />
+          <span class="i-lucide-loader-2 w-4 h-4 animate-spin inline-block" />
           <span>Processing with advanced AI pipeline...</span>
         </div>
       </div>
@@ -1329,9 +1304,9 @@ ${relatedReports.length > 0 ? `**Database Stats:**
     />
     <Button onclick={sendMessage} disabled={!currentInput.trim() || isProcessing}>
       {#if isProcessing}
-        <Loader2 class="w-4 h-4 animate-spin" />
+        <span class="i-lucide-loader-2 w-4 h-4 animate-spin inline-block" />
       {:else}
-        <Send class="w-4 h-4" />
+        <span class="i-lucide-send w-4 h-4 inline-block" />
       {/if}
     </Button>
   </div>

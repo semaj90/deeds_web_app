@@ -5,16 +5,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import Button from '$lib/components/ui/Button.svelte';
-  import AlertCircle from '@lucide/svelte/icons/alert-circle';
-  import FileIcon from '@lucide/svelte/icons/file';
-  import FileText from '@lucide/svelte/icons/file-text';
-  import ImageIcon from '@lucide/svelte/icons/image';
-  import Loader2 from '@lucide/svelte/icons/loader-2';
-  import Music from '@lucide/svelte/icons/music';
-  import Upload from '@lucide/svelte/icons/upload';
-  import Video from '@lucide/svelte/icons/video';
-  import X from '@lucide/svelte/icons/x';
-
   // File upload interface
   interface FileUpload {
     file: File;
@@ -283,7 +273,7 @@
   <div class="border rounded-lg overflow-hidden">
     <div class="px-4 py-3 border-b bg-sand/5">
       <h3 class="font-medium flex items-center gap-2">
-        <Upload class="h-5 w-5" />
+        <span class="i-lucide-upload h-5 w-5 inline-block" />
         {compact ? "Upload Files" : "Evidence Upload"}
       </h3>
     </div>
@@ -306,7 +296,7 @@
       >
         {#if isUploading}
           <div class="flex flex-col items-center gap-4">
-            <Loader2 class="h-8 w-8 animate-spin text-info" />
+            <span class="i-lucide-loader-2 h-8 w-8 animate-spin text-info inline-block" />
             <div class="space-y-2">
               <p class="text-sm font-medium">Uploading {currentUploadFile}...</p>
               {#if uploadProgress[currentUploadFile] !== undefined}
@@ -319,7 +309,7 @@
           </div>
         {:else}
           <div class="space-y-4">
-            <Upload class="h-12 w-12 mx-auto text-sand/40" />
+            <span class="i-lucide-upload h-12 w-12 mx-auto text-sand/40 inline-block" />
             <div>
               <p class="text-lg font-medium">
                 {selectedFiles.length > 0 ? "Add more files" : "Drop files here or click to browse"}
@@ -356,7 +346,7 @@
                 </div>
 
                 <button onclick={() => removeFile(file.name)} disabled={isUploading} class="flex-shrink-0 p-1 hover:bg-sand/10 rounded">
-                  <X class="h-4 w-4" />
+                  <span class="i-lucide-x h-4 w-4 inline-block" />
                 </button>
               </div>
             {/each}
@@ -426,7 +416,7 @@
                   <span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-sand/10 text-sm">
                     <span>{tag}</span>
                     <button type="button" class="ml-1" onclick={() => removeTag(tag)} disabled={isUploading} aria-label="Remove tag">
-                      <X class="h-3 w-3" />
+                      <span class="i-lucide-x h-3 w-3 inline-block" />
                     </button>
                   </span>
                 {/each}
@@ -474,9 +464,9 @@
 
           <Button onclick={handleFormSubmit} disabled={selectedFiles.length === 0 || isUploading || Object.keys(errors).length > 0} class="min-w-24">
             {#if isUploading}
-              <Loader2 class="h-4 w-4 animate-spin mr-2" />Uploading...
+              <span class="i-lucide-loader-2 h-4 w-4 animate-spin mr-2 inline-block" />Uploading...
             {:else}
-              <Upload class="h-4 w-4 mr-2" />Upload {selectedFiles.length} file{selectedFiles.length !== 1 ? "s" : ""}
+              <span class="i-lucide-upload h-4 w-4 mr-2 inline-block" />Upload {selectedFiles.length} file{selectedFiles.length !== 1 ? "s" : ""}
             {/if}
           </Button>
         </div>
@@ -484,7 +474,7 @@
 
       {#if Object.keys(errors).length > 0 && selectedFiles.length > 0}
         <div class="border border-danger/30 bg-danger/5 rounded p-3 flex items-start gap-3">
-          <AlertCircle class="h-4 w-4 text-danger flex-shrink-0 mt-0.5" />
+          <span class="i-lucide-alert-circle h-4 w-4 text-danger flex-shrink-0 mt-0.5 inline-block" />
           <div>
             <p class="font-medium text-danger">Please fix the following errors before uploading:</p>
             <ul class="mt-2 list-disc list-inside text-sm text-danger">

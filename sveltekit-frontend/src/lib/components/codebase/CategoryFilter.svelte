@@ -6,9 +6,7 @@
 	 * Task: 14.2 - Create category filter component
 	 * Purpose: Filter by tag category, cluster, file type
 	 */
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
-	import Filter from '@lucide/svelte/icons/filter';
-	import X from '@lucide/svelte/icons/x';
+	import Icon from '$lib/components/ui/Icon.svelte';
 
 	interface FilterOption {
 		value: string;
@@ -111,7 +109,7 @@
 	<!-- Header -->
 	<div class="filter-header">
 		<div class="header-left">
-			<Filter class="h-4 w-4" />
+			<Icon name="filter" class="h-4 w-4" />
 			<span class="header-title">Filters</span>
 			{#if activeFilterCount > 0}
 				<span class="active-count">{activeFilterCount}</span>
@@ -136,8 +134,8 @@
 					{#if (selected[group.id] || []).length > 0}
 						<span class="group-count">{(selected[group.id] || []).length}</span>
 					{/if}
-					<ChevronDown
-						class="h-4 w-4 chevron {expandedGroups.has(group.id) ? 'expanded' : ''}"
+					<span
+						class="i-lucide-chevron-down inline-block h-4 w-4 chevron {expandedGroups.has(group.id) ? 'expanded' : ''}"
 					/>
 				</button>
 
@@ -158,7 +156,7 @@
 
 						{#if (selected[group.id] ?? []).length > 0}
 							<button class="clear-group-btn" onclick={() => clearGroup(group.id)}>
-								<X class="h-3 w-3" />
+								<Icon name="x" class="h-3 w-3" />
 								Clear {group.label.toLowerCase()}
 							</button>
 						{/if}
@@ -181,7 +179,7 @@
 							onclick={() => toggleOption(groupId, value, group?.multiple ?? true)}
 						>
 							{option.label}
-							<X class="h-3 w-3" />
+							<Icon name="x" class="h-3 w-3" />
 						</button>
 					{/if}
 				{/each}

@@ -9,10 +9,6 @@
 	import CardContent from '$lib/components/ui/card/CardContent.svelte';
 	import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
 	import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
-	import Grid from '@lucide/svelte/icons/grid-2x2';
-	import List from '@lucide/svelte/icons/list';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-
 	interface GraphVisualizationResult {
 		id: string;
 		url: string;
@@ -43,16 +39,16 @@
 		</div>
 		<div class="actions flex gap-2">
 			<Button variant="outline" size="sm" onclick={() => (viewMode = 'grid')}>
-				<Grid class="w-4 h-4" />
+				<span class="i-lucide-grid-2x2 w-4 h-4 inline-block" />
 			</Button>
 			<Button variant="outline" size="sm" onclick={() => (viewMode = 'list')}>
-				<List class="w-4 h-4" />
+				<span class="i-lucide-list w-4 h-4 inline-block" />
 			</Button>
 			<Button disabled={isGenerating} onclick={generateVisualizationsForAllAlgorithms}>
 				{#if isGenerating}
-					<RefreshCw class="w-4 h-4 mr-2 animate-spin" /> Generating...
+					<span class="i-lucide-refresh-cw w-4 h-4 mr-2 animate-spin inline-block" /> Generating...
 				{:else}
-					<RefreshCw class="w-4 h-4 mr-2" /> Generate All
+					<span class="i-lucide-refresh-cw w-4 h-4 mr-2 inline-block" /> Generate All
 				{/if}
 			</Button>
 		</div>

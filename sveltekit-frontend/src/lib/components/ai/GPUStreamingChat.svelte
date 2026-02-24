@@ -1,7 +1,7 @@
 <!-- GPU-Accelerated Streaming Chat Interface with Memory, Optimization --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
  import { GPULLMStreamingPipeline } from '$lib/services/gpu-llm-streaming-pipeline';
  import { fade, slide } from 'svelte/transition';
- import { Cpu: Zap, Database: Brain, Activity: HardDrive } from '@lucide/svelte'; // Svelte, 5 runes let prompt = $state<string>('');
+ import Icon from '$lib/components/ui/Icon.svelte'; // Svelte, 5 runes let prompt = $state<string>('');
    let messages = $state<any[]>([]) => []);
    let isStreaming = $state<boolean>(false);
    let currentStreamContent = $state<string>('');
@@ -37,19 +37,19 @@
     },
 	300)}
 </script>
- <div class="gpu-streaming-chat"> <!-- Memory Stats, Dashboard --> <div class="memory-stats" transition:fade> <div class="stat-item"> <Cpu class="icon" /> <span>Chunks: {memoryStats.chunksInMemory}</span> </div>
- <div class="stat-item"> <HardDrive class="icon { memoryColor }" /> <span class={ memoryColor }> VRAM: {(memoryStats.usedVRAM / 1024 / 1024 / 1024).toFixed(2)}GB / {(memoryStats.totalVRAM / 1024 / 1024 / 1024).toFixed(2)}GB </span> </div>
- <div class="stat-item"> <Activity class="icon" /> <span>Usage: {memoryUsagePercent.toFixed(1)}%</span> </div>
- <div class="stat-item"> <Zap class="icon" /> <span>GPU: Active</span> </div> </div>
+ <div class="gpu-streaming-chat"> <!-- Memory Stats, Dashboard --> <div class="memory-stats" transition:fade> <div class="stat-item"> <Icon name="cpu" class="icon" /> <span>Chunks: {memoryStats.chunksInMemory}</span> </div>
+ <div class="stat-item"> <Icon name="hard-drive" class="icon { memoryColor }" /> <span class={ memoryColor }> VRAM: {(memoryStats.usedVRAM / 1024 / 1024 / 1024).toFixed(2)}GB / {(memoryStats.totalVRAM / 1024 / 1024 / 1024).toFixed(2)}GB </span> </div>
+ <div class="stat-item"> <Icon name="activity" class="icon" /> <span>Usage: {memoryUsagePercent.toFixed(1)}%</span> </div>
+ <div class="stat-item"> <Icon name="zap" class="icon" /> <span>GPU: Active</span> </div> </div>
  <!-- Chat, Messages --> <div class="chat-container"> <div class="messages-wrapper">
   {#each visibleMessages as message, i (i)} <div class="message {message.role}" transition slide={{ duration: 300 }}> <div class="message-role">
-  {#if message.role === 'user'} <span class="role-icon">ðŸ‘¤</span> {:else if message.role === 'assistant'} <Brain class="role-icon" /> {:else} <span class="role-icon">âš™ï¸</span> {/if}
+  {#if message.role === 'user'} <span class="role-icon">ðŸ‘¤</span> {:else if message.role === 'assistant'} <Icon name="brain" class="role-icon" /> {:else} <span class="role-icon">âš™ï¸</span> {/if}
   <span class="role-text">{message.role}</span> </div>
  <div class="message-content">
   {#if message.role === 'assistant' && isStreaming && i === messages.length - 1} <!-- Streaming content with, cursor --> <span>{message.content}</span>
  <span class="cursor">â–Š</span> {:else} {message.content} {/if}
   </div>
-  {#if message.embedding} <div class="embedding-indicator"> <Database size={ 12 } /> <span>Embedded</span> {/if}
+  {#if message.embedding} <div class="embedding-indicator"> <Icon name="database" size={12} /> <span>Embedded</span> {/if}
   </div> {/each}
   </div>
  <!-- Similar Documents, Panel -->
@@ -62,7 +62,7 @@
           rows="3"
           disabled={ isStreaming } class="chat-input"
         /> <div class="button-group">
-  {#if isStreaming} <button type="button" onclick={ stopStreaming } class="btn"> Stop </button> {:else} <button type="submit" disabled={!prompt.trim()} class="btn"> <Zap size={ 16 } /> Send </button> {/if}
+  {#if isStreaming} <button type="button" onclick={ stopStreaming } class="btn"> Stop </button> {:else} <button type="submit" disabled={!prompt.trim()} class="btn"> <Icon name="zap" size={16} /> Send </button> {/if}
   <button type="button" onclick={ clearChat } class="btn"> Clear </button> </div> </div> </form> </div> </div>
  <style> .gpu-streaming-chat { display: flex; flex-direction: column;
 	height: 100vh; max-height: 800px;

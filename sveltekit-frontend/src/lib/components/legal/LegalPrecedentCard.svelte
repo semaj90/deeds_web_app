@@ -2,14 +2,7 @@
 <script lang="ts">
 import type { Case } from '$lib/types';
 
-  import  Scale  from "@lucide/svelte/icons/scale.svelte";
-  import  Calendar  from "@lucide/svelte/icons/calendar.svelte";
-  import  MapPin  from "@lucide/svelte/icons/map-pin.svelte";
-  import  ExternalLink  from "@lucide/svelte/icons/external-link.svelte";
-  import  BookOpen  from "@lucide/svelte/icons/book-open.svelte";
-  import  Star  from "@lucide/svelte/icons/star.svelte";
-  import  TrendingUp  from "@lucide/svelte/icons/trending-up.svelte";
-  import  Users  from "@lucide/svelte/icons/users.svelte";
+  import Icon from '$lib/components/ui/Icon.svelte';
   import { cn } from '$lib/utils';
   export interface LegalPrecedent {
     id: string, caseNumber: string, caseName: string, court: string, jurisdiction: 'federal' | 'state' | 'local' | 'international',date: Date, judge: string, summary: string, keyIssues: string[],
@@ -61,13 +54,13 @@ import type { Case } from '$lib/types';
     }
   };
   // Jurisdiction configurations
-  const jurisdictionConfig = { federal: { label: 'Federal', icon: Scale, color: 'text-info/80' },
+  const jurisdictionConfig = { federal: { label: 'Federal', icon: 'scale', color: 'text-info/80' },
 	state: {
-	label: 'State', icon: MapPin, color: 'text-accent' },
+	label: 'State', icon: 'map-pin', color: 'text-accent' },
 	local: {
-	label: 'Local', icon: MapPin, color: 'text-warning' },
+	label: 'Local', icon: 'map-pin', color: 'text-warning' },
 	international: {
-	label: 'International', icon: Scale, color: 'text-info/80' }
+	label: 'International', icon: 'scale', color: 'text-info/80' }
   };
   // Reactive derived values (avoid using {@const} in template)
   const relevanceLevel = $derived((() => {
@@ -79,8 +72,7 @@ import type { Case } from '$lib/types';
  if (precedent.similarityScore >= 80) return 'high';
     if (precedent.similarityScore >= 60) return 'medium';
     return 'low'})();
-  const jurisdictionInfo = $derived(jurisdictionConfig[precedent.jurisdiction] ?? { label: '', icon: Scale, color: '' });
-  const JurisdictionIcon = $derived(jurisdictionInfo.icon);
+  const jurisdictionInfo = $derived(jurisdictionConfig[precedent.jurisdiction] ?? { label: '', icon: 'scale', color: '' });
   function formatDate(date: Date): string {
     return new Date(date).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -132,16 +124,16 @@ import type { Case } from '$lib/types';
     <div class="flex items-center justify-between text-xs">
       <div class="flex items-center gap-4">
         <div class="flex items-center">
-          <JurisdictionIcon class={cn('w-3, h-3', jurisdictionInfo.color)} />
+          <Icon name={jurisdictionInfo.icon} class={cn('w-3 h-3', jurisdictionInfo.color)} />
           {jurisdictionInfo.label}
         </div>
         <div class="flex items-center">
-          <Calendar class="w-3" />
+          <Icon name="calendar" class="w-3" />
           {formatDate(precedent.date)}
           <span class="text-yorha-text-secondary">({getAgeInYears(precedent.date)} yrs)</span>
         </div>
         <div class="flex items-center">
-          <TrendingUp class="w-3" />
+          <Icon name="trending-up" class="w-3" />
           {precedent.citations} citations
         </div>
       </div>
@@ -165,7 +157,7 @@ import type { Case } from '$lib/types';
           {/if}
         {#if showRelevanceScore}
           <div class="flex items-center">
-            <Star class="w-3 h-3" />
+            <Icon name="star" class="w-3 h-3" />
             <span
               class={cn(
                 'font-medium',
@@ -257,7 +249,7 @@ import type { Case } from '$lib/types';
       <div class="mb-4">
         <h4 class="text-xs font-medium text-yorha-text-secondary font-mono uppercase">Judge</h4>
         <div class="flex items-center gap-2 text-sm">
-          <Users class="w-4 h-4" />
+          <Icon name="users" class="w-4 h-4" />
           <span class="text-yorha-text-primary">{precedent.judge}</span>
         </div>
       {/if}
@@ -265,7 +257,7 @@ import type { Case } from '$lib/types';
     {#if precedent.overruled}
       <div class="mb-4 p-3 bg-danger/10 border border-danger/20">
         <div class="flex items-center gap-2 text-danger/80 text-sm font-mono font-medium">
-          <Scale class="w-4" />
+          <Icon name="scale" class="w-4" />
           This precedent has been overruled
         </div>
         {#if precedent.overruledBy}
@@ -295,7 +287,7 @@ import type { Case } from '$lib/types';
             rel="noopener noreferrer"
             class="inline-flex items-center gap-1 px-2 py-1 text-xs font-mono text-yorha-text-secondary hover:text-yorha-primary transition-colors"
           >
-            <ExternalLink class="w-3" />
+            <Icon name="external-link" class="w-3" />
             Source
           </a>
         {/if}
@@ -306,7 +298,7 @@ import type { Case } from '$lib/types';
             rel="noopener noreferrer"
             class="inline-flex items-center gap-1 px-2 py-1 text-xs font-mono text-yorha-text-secondary hover:text-yorha-primary transition-colors"
           >
-            <BookOpen class="w-3" />
+            <Icon name="book-open" class="w-3" />
             PDF
           </a>
         {/if}

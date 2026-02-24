@@ -1,15 +1,7 @@
 <script lang="ts">
  import type { Evidence } from '$lib/types';
- import Archive from "@lucide/svelte/icons/archive";
- import FileText from "@lucide/svelte/icons/file-text";
- import Image from "@lucide/svelte/icons/image";
- import Music from "@lucide/svelte/icons/music";
- import Target from "@lucide/svelte/icons/target";
- import Video from "@lucide/svelte/icons/video";
- import Zap from "@lucide/svelte/icons/zap";
  // Migrated to $effect
  import EvidenceCard from './EvidenceCard.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  interface Props {
   evidence: Evidence[];
@@ -44,12 +36,12 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	height: number }>>(new Map());
 
  // Calculate icon based on file type
- function getFileIcon(mimeType: string) {
-  if (mimeType.startsWith('image/')) return Image;
-  if (mimeType.startsWith('video/')) return Video;
-  if (mimeType.startsWith('audio/')) return Music;
-  if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('7z')) return Archive;
-  return FileText;
+ function getFileIcon(mimeType: string): string {
+  if (mimeType.startsWith('image/')) return 'image';
+  if (mimeType.startsWith('video/')) return 'video';
+  if (mimeType.startsWith('audio/')) return 'music';
+  if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('7z')) return 'archive';
+  return 'file-text';
  }
 
  // Calculate evidence positions in a grid layout
@@ -217,14 +209,14 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 >
  <!-- Drop zone indicator -->
  <div class="drop-zone-indicator" class:active={dropZoneActive}>
- <Target size={ 48 } />
+ <span class="i-lucide-target inline-block" />
  <p>Drop evidence here for AI detective mode</p>
  </div>
 
  <!-- AI processing indicator -->
  {#if droppedEvidenceIds.length > 0}
  <div class="ai-processing-indicator">
- <Zap size={24} />
+ <span class="i-lucide-zap w-6 h-6 inline-block" />
  <span>AI Detective Mode Active</span>
  <div class="processing-evidence">
  Processing {droppedEvidenceIds.length} evidence item{droppedEvidenceIds.length > 1 ? 's' : ''}...
@@ -260,7 +252,7 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  {#if evidence.length === 0}
  <div class="empty-state">
- <FileText size={48} />
+ <span class="i-lucide-file-text w-12 h-12 inline-block" />
  <p>No evidence items to display</p>
  <p class="empty-hint">Upload evidence above to start building your detective board</p>
  </div>
@@ -390,6 +382,4 @@ import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
  outline-offset: 2px;
  }
 </style>
-
-
 

@@ -1,10 +1,7 @@
 <script lang="ts">
  import Button from '$lib/components/ui/Button.svelte';
  import Textarea from '$lib/components/ui/textarea/Textarea.svelte';
- import Bot from '@lucide/svelte/icons/bot';
- import Loader2 from '@lucide/svelte/icons/loader-2';
- import Send from '@lucide/svelte/icons/send';
- import Users from '@lucide/svelte/icons/users';
+ import Icon from '$lib/components/ui/Icon.svelte';
  import { tick } from 'svelte';
  type ChatMessage = { id: string, role: 'user' | 'assistant';
   content: string;
@@ -107,7 +104,7 @@
 <div class="terminal-container">
  <header class="terminal-header">
   <div class="header-left">
-   <Bot class="icon-lg" />
+   <Icon name="bot" class="icon-lg" />
    <div>
     <h1>YoRHa COMMAND TERMINAL</h1>
     <div class="status">
@@ -127,7 +124,7 @@
  <div class="chat-viewport" bind:this={chatContainer}>
   {#if messages.length === 0}
    <div class="empty-state">
-    <Bot size={48} />
+    <Icon name="bot" size={48} />
     <p>Initialize communication sequence...</p>
     <small>Type a command or query to begin.</small>
    </div>
@@ -137,9 +134,9 @@
    <div class="message-row {msg.role}">
     <div class="avatar">
      {#if msg.role === 'assistant'}
-      <Bot size={20} />
+      <Icon name="bot" size={20} />
      {:else}
-      <Users size={20} />
+      <Icon name="users" size={20} />
      {/if}
     </div>
 
@@ -169,11 +166,11 @@
 
   {#if isTyping}
    <div class="message-row assistant typing">
-    <div class="avatar"><Bot size={20} /></div>
+    <div class="avatar"><Icon name="bot" size={20} /></div>
     <div class="message-content">
      <div class="sender">YoRHa UNIT</div>
      <div class="typing-indicator">
-      <Loader2 class="animate-spin" size={16} />
+      <Icon name="loader-2" class="animate-spin" size={16} />
       <span>Processing input stream...</span>
      </div>
     </div>
@@ -197,7 +194,7 @@
     onclick={sendMessage}
     disabled={isTyping || !currentMessage.trim()}
    >
-    <Send size={18} />
+    <Icon name="send" size={18} />
    </Button>
   </div>
   <div class="disclaimer">

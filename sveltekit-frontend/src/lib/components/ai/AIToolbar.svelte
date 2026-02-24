@@ -3,14 +3,6 @@
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
   import  Input  from "$lib/components/ui/input/Input.svelte";
-  import Loader2 from '@lucide/svelte/icons/loader-2';
-  import Bot from '@lucide/svelte/icons/bot';
-  import MessageSquare from '@lucide/svelte/icons/message-square';
-  import FileText from '@lucide/svelte/icons/file-text';
-  import Search from '@lucide/svelte/icons/search';
-  import Sparkles from '@lucide/svelte/icons/sparkles';
-  import Zap from '@lucide/svelte/icons/zap';
-
   // Exported props (use standard exports to avoid svelte-preprocess type errors)
   const { onAISearch } = $props<{ onAISearch, ((res: any) }>()
   const { onAIChat } = $props<{ onAIChat, ((res: any) }>()
@@ -165,7 +157,7 @@
 <div class="space-y-6">
   <div class="text-center">
     <h2 class="text-2xl font-bold flex items-center justify-center">
-      <Sparkles class="h-6 w-6" />
+      <span class="i-lucide-sparkles h-6 w-6 inline-block" />
       AI Legal Assistant
     </h2>
 
@@ -183,9 +175,9 @@
         onclick={performAISearch}
         disabled={disabled || isAISearching || !aiSearchQuery.trim()}>
         {#if isAISearching}
-          <Loader2 class="h-4 w-4" />
+          <span class="i-lucide-loader-2 h-4 w-4 inline-block" />
         {:else}
-          <Search class="h-4" />
+          <span class="i-lucide-search h-4 inline-block" />
         {/if}
       </button>
     </div>
@@ -208,7 +200,7 @@
   <div class="border-accent/20">
     <div class="yorha-panel-header">
       <h3 class="nes-text is-primary flex items-center gap-2">
-        <MessageSquare class="h-5 w-5" />
+        <span class="i-lucide-message-square h-5 w-5 inline-block" />
         AI Chat
       </h3>
     </div>
@@ -230,10 +222,10 @@
             disabled={disabled || isAIChatting || !aiChatMessage.trim()}
             class="w-full bits-btn text-sm px-3 py-2">
             {#if isAIChatting}
-              <Loader2 aria-hidden="true" class="h-4 w-4 animate-spin" />
+              <span class="i-lucide-loader-2 h-4 w-4 animate-spin inline-block" aria-hidden="true" />
               Thinking...
             {:else}
-              <MessageSquare aria-hidden="true" class="h-4 w-4" />
+              <span class="i-lucide-message-square h-4 w-4 inline-block" aria-hidden="true" />
               Ask AI
             {/if}
           </button>
@@ -253,7 +245,7 @@
   <div class="border-info/20">
     <div class="yorha-panel-header">
       <h3 class="nes-text is-primary flex items-center gap-2">
-        <FileText class="h-5 w-5" />
+        <span class="i-lucide-file-text h-5 w-5 inline-block" />
         AI Summary
       </h3>
     </div>
@@ -271,10 +263,10 @@
           disabled={disabled || isSummarizing || !summarizeText.trim()}
           class="w-full bits-btn text-sm px-3 py-2">
           {#if isSummarizing}
-            <Loader2 class="h-4 w-4 animate-spin" />
+            <span class="i-lucide-loader-2 h-4 w-4 animate-spin inline-block" />
             Summarizing...
           {:else}
-            <Zap class="h-4 w-4" />
+            <span class="i-lucide-zap h-4 w-4 inline-block" />
             Summarize
           {/if}
         </button>
@@ -303,7 +295,7 @@
       class="bits-btn text-sm px-2 py-1"
       onclick={() => { aiSearchQuery = 'California murder laws'; performAISearch()}}
       disabled={disabled || isAISearching}>
-      <Bot class="h-3 w-3" />
+      <span class="i-lucide-bot h-3 w-3 inline-block" />
       Murder Laws
     </button>
 
@@ -312,7 +304,7 @@
       class="bits-btn text-sm px-2 py-1"
       onclick={() => { aiChatMessage = 'What are the elements of a valid contract? '; performAIChat()}}
       disabled={disabled ?? isAIChatting}>
-      <MessageSquare class="h-3 w-3" />
+      <span class="i-lucide-message-square h-3 w-3 inline-block" />
       Contract Elements
     </button>
 
@@ -321,7 +313,7 @@
       class="bits-btn text-sm px-2 py-1"
       onclick={() => { aiSearchQuery = 'evidence admissibility rules'; performAISearch()}}
       disabled={disabled || isAISearching}>
-      <Search class="h-3 w-3" />
+      <span class="i-lucide-search h-3 w-3 inline-block" />
       Evidence Rules
     </button>
   </div>
@@ -330,6 +322,4 @@
   {#if errorMessage}
     <div class="text-center text-sm text-danger">{errorMessage}{/if}
 </div>
-
-
 

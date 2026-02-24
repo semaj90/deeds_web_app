@@ -8,7 +8,7 @@
 	import ResultDetail from '$lib/components/ResultDetail.svelte';
 	import VectorIntelligenceDemo from '$lib/components/ai/VectorIntelligenceDemo.svelte';
 	import type { GPURerankMetrics, GPURankedItem } from '$lib/gpu/gpu-search-reranker.js';
-	import Cpu from '@lucide/svelte/icons/cpu';
+	import Icon from '$lib/components/ui/Icon.svelte';
 
 	let showRAGAssistant = $state(false);
 	let showCodebaseSearch = $state(false);
@@ -20,17 +20,6 @@
 	let contextConfirmData = $state<{ context_id: string; source: string; score: number; snippet: string; range?: { from_msg_id: number; to_msg_id: number }; timestamp?: string } | null>(null);
 	import { getConfidenceLevel, formatProcessingTime } from '$lib/utils';
 	import type { RetrievalContext, RankedChunk } from '$lib/machines/retrieval-machine.js';
-	import Search from '@lucide/svelte/icons/search';
-	import Loader2 from '@lucide/svelte/icons/loader-2';
-	import FileText from '@lucide/svelte/icons/file-text';
-	import Users from '@lucide/svelte/icons/users';
-	import Scale from '@lucide/svelte/icons/scale';
-	import MessageSquare from '@lucide/svelte/icons/message-square';
-	import Briefcase from '@lucide/svelte/icons/briefcase';
-	import Clock from '@lucide/svelte/icons/clock';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import Network from '@lucide/svelte/icons/network';
-	import X from '@lucide/svelte/icons/x';
 
 	interface SearchResult {
 		chunk_id: string;
@@ -295,15 +284,15 @@
 		return getConfidenceLevel(score);
 	}
 
-	function getTypeIcon(type: string) {
+	function getTypeIcon(type: string): string {
 		switch (type) {
-			case 'case': return Briefcase;
-			case 'evidence': return Search;
-			case 'person': return Users;
-			case 'document': return FileText;
-			case 'legal': return Scale;
-			case 'communication': return MessageSquare;
-			default: return FileText;
+			case 'case': return 'briefcase';
+			case 'evidence': return 'search';
+			case 'person': return 'users';
+			case 'document': return 'file-text';
+			case 'legal': return 'scale';
+			case 'communication': return 'message-square';
+			default: return 'file-text';
 		}
 	}
 
@@ -317,7 +306,7 @@
 	<header class="search-header">
 		<div class="header-content">
 			<div class="header-title">
-				<Search size={28} />
+				<Icon name="search" size={28} />
 				<div>
 					<h1>GLOBAL SEARCH</h1>
 					<p class="header-sub">RAG + KAG + DAG Multi-Stage Retrieval Pipeline</p>
@@ -326,19 +315,19 @@
 
 			<div class="mode-toggle">
 				<button class="mode-btn" class:active={searchMode === 'evidence'} onclick={() => searchMode = 'evidence'}>
-					<Network size={14} /> Evidence
+					<Icon name="network" size={14} /> Evidence
 				</button>
 				<button class="mode-btn" class:active={searchMode === 'rag'} onclick={() => searchMode = 'rag'}>
-					<Search size={14} /> Knowledge Base
+					<Icon name="search" size={14} /> Knowledge Base
 				</button>
 				<button class="mode-btn" class:active={searchMode === 'statutes'} onclick={() => searchMode = 'statutes'}>
-					<Scale size={14} /> Statutes
+					<Icon name="scale" size={14} /> Statutes
 				</button>
 				<button class="mode-btn" class:active={searchMode === 'precedents'} onclick={() => searchMode = 'precedents'}>
-					<Briefcase size={14} /> Precedents
+					<Icon name="briefcase" size={14} /> Precedents
 				</button>
 				<button class="mode-btn" class:active={searchMode === 'glossary'} onclick={() => searchMode = 'glossary'}>
-					<FileText size={14} /> Glossary
+					<Icon name="file-text" size={14} /> Glossary
 				</button>
 			</div>
 		</div>
@@ -349,7 +338,7 @@
 		<aside class="filter-panel">
 			<div class="search-box">
 				<div class="search-input-wrap">
-					<span class="search-icon"><Search size={16} /></span>
+					<span class="search-icon"><Icon name="search" size={16} /></span>
 					<input
 						type="text"
 						placeholder="Search evidence, cases, legal documents..."
@@ -359,7 +348,7 @@
 					/>
 					{#if searchQuery}
 						<button class="clear-btn" onclick={() => { searchQuery = ''; }}>
-							<X size={14} />
+							<Icon name="x" size={14} />
 						</button>
 					{/if}
 				</div>
@@ -371,7 +360,7 @@
 					class="search-submit"
 				>
 					{#if isSearching}
-						<span class="animate-spin"><Loader2 size={16} /></span>
+						<span class="animate-spin"><Icon name="loader-2" size={16} /></span>
 					{:else}
 						SEARCH
 					{/if}
@@ -409,7 +398,7 @@
 			<!-- GPU Rerank Toggle -->
 			{#if searchMode === 'evidence' || searchMode === 'rag'}
 				<div class="filter-section">
-					<h3><Cpu size={14} /> GPU RERANKING</h3>
+					<h3><Icon name="cpu" size={14} /> GPU RERANKING</h3>
 					<label class="filter-item">
 						<input
 							type="checkbox"
@@ -425,7 +414,7 @@
 					{/if}
 					{#if isGpuReranking}
 						<div class="timing-row">
-							<span class="animate-spin"><Loader2 size={12} /></span>
+							<span class="animate-spin"><Icon name="loader-2" size={12} /></span>
 							<span>Computing GPU scores...</span>
 						</div>
 					{/if}
@@ -435,7 +424,7 @@
 			<!-- GPU Rerank Metrics -->
 			{#if gpuRerankMetrics}
 				<div class="timing-panel">
-					<h3><Cpu size={14} /> GPU RERANK</h3>
+					<h3><Icon name="cpu" size={14} /> GPU RERANK</h3>
 					<div class="timing-grid">
 						<div class="timing-row">
 							<span>Backend</span>
@@ -470,7 +459,7 @@
 			<!-- Timing Breakdown -->
 			{#if (searchMode === 'statutes' || searchMode === 'precedents' || searchMode === 'glossary') && auxTiming.total_ms}
 				<div class="timing-panel">
-					<h3><Clock size={14} /> TIMING</h3>
+					<h3><Icon name="clock" size={14} /> TIMING</h3>
 					<div class="timing-grid">
 						{#each Object.entries(auxTiming) as [key, ms]}
 							<div class="timing-row">
@@ -484,7 +473,7 @@
 			{#if (searchMode === 'evidence' && evidenceTiming) || (searchMode === 'rag' && ragTiming)}
 				{@const timing = searchMode === 'evidence' ? evidenceTiming : ragTiming}
 				<div class="timing-panel">
-					<h3><Clock size={14} /> PIPELINE TIMING</h3>
+					<h3><Icon name="clock" size={14} /> PIPELINE TIMING</h3>
 					<div class="timing-grid">
 						{#if timing?.embedMs ?? timing?.embedding_time_ms}
 							<div class="timing-row">
@@ -547,7 +536,7 @@
 				</div>
 			{:else if isSearching}
 				<div class="loading-state">
-					<span class="animate-spin"><Loader2 size={32} /></span>
+					<span class="animate-spin"><Icon name="loader-2" size={32} /></span>
 					<p>Running {searchMode === 'evidence' ? 'RAG+KAG+DAG' : 'RAG'} pipeline...</p>
 				</div>
 			{:else if searchMode === 'evidence' && evidenceBundles.length > 0}
@@ -595,7 +584,7 @@
 							{@const gpuItem = gpuRankedItems.find(g => g.index === i)}
 							{#if gpuItem && gpuItem.gpuScore >= 0}
 								<div class="rerank-bar" style="border-color: rgba(99,179,237,0.3)">
-									<span title="GPU cosine (WebGPU/WASM)"><Cpu size={10} /> gpu: {(gpuItem.gpuScore * 100).toFixed(0)}%</span>
+									<span title="GPU cosine (WebGPU/WASM)"><Icon name="cpu" size={10} /> gpu: {(gpuItem.gpuScore * 100).toFixed(0)}%</span>
 									<span title="Delta vs server">delta: {(gpuItem.delta * 100).toFixed(1)}%</span>
 									<span title="GPU rerank position">gpu-rank: #{gpuRankedItems.indexOf(gpuItem) + 1}</span>
 								</div>
@@ -723,13 +712,13 @@
 				{/each}
 			{:else if !isSearching && searchQuery}
 				<div class="empty-state">
-					<Search size={48} />
+					<Icon name="search" size={48} />
 					<p>No results found for "{searchQuery}"</p>
 					<p class="empty-hint">Try broader search terms or switch search mode.</p>
 				</div>
 			{:else}
 				<div class="empty-state">
-					<Search size={48} />
+					<Icon name="search" size={48} />
 					<p>Enter a query to search</p>
 					<p class="empty-hint">Search across evidence, cases, statutes, precedents, and glossary.</p>
 				</div>
@@ -774,7 +763,7 @@
 							{#if gpuItem && gpuItem.gpuScore >= 0}
 								<div class="rerank-detail" style="border-top: 1px solid rgba(99,179,237,0.2); margin-top: 8px; padding-top: 8px">
 									<div class="rerank-row">
-										<span><Cpu size={12} /> GPU Cosine</span>
+										<span><Icon name="cpu" size={12} /> GPU Cosine</span>
 										<span>{(gpuItem.gpuScore * 100).toFixed(1)}%</span>
 									</div>
 									<div class="rerank-row">
@@ -822,7 +811,7 @@
 							<h4>SECTION PATH</h4>
 							<div class="section-breadcrumb">
 								{#each selectedBundle.sectionPath as seg, i}
-									{#if i > 0}<ChevronRight size={12} />{/if}
+									{#if i > 0}<Icon name="chevron-right" size={12} />{/if}
 									<span>{seg}</span>
 								{/each}
 							</div>
@@ -857,7 +846,7 @@
 					<!-- Graph Neighbors -->
 					{#if selectedBundle.graphNeighbors.length > 0}
 						<div class="detail-section">
-							<h4><Network size={14} /> GRAPH NEIGHBORS ({selectedBundle.graphNeighbors.length})</h4>
+							<h4><Icon name="network" size={14} /> GRAPH NEIGHBORS ({selectedBundle.graphNeighbors.length})</h4>
 							{#each selectedBundle.graphNeighbors as neighbor}
 								<div class="neighbor-card">
 									<div class="neighbor-header">
@@ -910,7 +899,7 @@
 				</div>
 			{:else}
 				<div class="detail-placeholder">
-					<Search size={40} />
+					<Icon name="search" size={40} />
 					<h3>NO SELECTION</h3>
 					<p>Select a search result to view details, confidence ranking, and graph connections.</p>
 				</div>

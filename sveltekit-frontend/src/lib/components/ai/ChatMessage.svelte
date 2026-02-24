@@ -1,15 +1,5 @@
 <script lang="ts">
   import Button from '$lib/components/ui/Button.svelte';
-  import Bot from '@lucide/svelte/icons/bot';
-  import Clock from '@lucide/svelte/icons/clock';
-  import Copy from '@lucide/svelte/icons/copy';
-  import Heart from '@lucide/svelte/icons/heart';
-  import MoreVertical from '@lucide/svelte/icons/more-vertical';
-  import Star from '@lucide/svelte/icons/star';
-  import StarOff from '@lucide/svelte/icons/star-off';
-  import ThumbsUp from '@lucide/svelte/icons/thumbs-up';
-  import Users from '@lucide/svelte/icons/users';
-
   interface MessageData {
     id?: string;
     role?: string;
@@ -107,7 +97,7 @@
 >
   {#if !isUser}
     <div class="flex-shrink-0 w-8 h-8 rounded-full bg-sand/10 flex items-center justify-center">
-      <Bot class="w-5 h-5 text-sand/60" />
+      <span class="i-lucide-bot w-5 h-5 text-sand/60 inline-block" />
     </div>
   {/if}
 
@@ -119,7 +109,7 @@
     >
       {#if isProactive}
         <div class="flex items-center gap-1 text-xs opacity-70 mb-1">
-          <Clock class="w-3 h-3" />
+          <span class="i-lucide-clock w-3 h-3 inline-block" />
           <span>Proactive suggestion</span>
         </div>
       {/if}
@@ -131,11 +121,11 @@
       {#if isAssistant && emotionalTone && emotionalTone !== 'neutral'}
         <div class="flex items-center gap-1 text-xs mt-2 {toneColor}">
           {#if emotionalTone === 'encouraging'}
-            <ThumbsUp class="w-3 h-3" />
+            <span class="i-lucide-thumbs-up w-3 h-3 inline-block" />
           {:else if emotionalTone === 'supportive'}
-            <Heart class="w-3 h-3" />
+            <span class="i-lucide-heart w-3 h-3 inline-block" />
           {:else if emotionalTone === 'enthusiastic'}
-            <Star class="w-3 h-3" />
+            <span class="i-lucide-star w-3 h-3 inline-block" />
           {/if}
           <span class="capitalize">{emotionalTone}</span>
         </div>
@@ -155,7 +145,7 @@
             onclick={copyToClipboard}
             title={copied ? 'Copied!' : 'Copy message'}
           >
-            <Copy class="w-3.5 h-3.5" />
+            <span class="i-lucide-copy w-3.5 h-3.5 inline-block" />
           </Button>
 
           <Button
@@ -166,14 +156,14 @@
             title={message.saved ? 'Remove from saved' : 'Save message'}
           >
             {#if message.saved}
-              <Star class="w-3.5 h-3.5 text-warning" />
+              <span class="i-lucide-star w-3.5 h-3.5 text-warning inline-block" />
             {:else}
-              <StarOff class="w-3.5 h-3.5" />
+              <span class="i-lucide-star-off w-3.5 h-3.5 inline-block" />
             {/if}
           </Button>
 
           <Button variant="ghost" size="sm" class="p-1 h-auto w-auto" title="More options">
-            <MoreVertical class="w-3.5 h-3.5" />
+            <span class="i-lucide-more-vertical w-3.5 h-3.5 inline-block" />
           </Button>
         </div>
       {/if}
@@ -197,7 +187,7 @@
 
   {#if isUser}
     <div class="flex-shrink-0 w-8 h-8 rounded-full bg-info/10 flex items-center justify-center">
-      <Users class="w-5 h-5 text-info" />
+      <span class="i-lucide-users w-5 h-5 text-info inline-block" />
     </div>
   {/if}
 </div>

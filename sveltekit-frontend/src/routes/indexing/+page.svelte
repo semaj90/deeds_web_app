@@ -1,13 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/Button.svelte';
-	import Database from '@lucide/svelte/icons/database';
-	import Search from '@lucide/svelte/icons/search';
-	import Loader2 from '@lucide/svelte/icons/loader-2';
-	import FileCode from '@lucide/svelte/icons/file-code';
-	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
-	import HardDrive from '@lucide/svelte/icons/hard-drive';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-	import Clock from '@lucide/svelte/icons/clock';
+	import Icon from '$lib/components/ui/Icon.svelte';
 
 	interface IndexingStatus {
 		success: boolean;
@@ -163,14 +156,14 @@
 	<header class="page-header">
 		<div class="header-content">
 			<div class="header-title">
-				<Database size={24} />
+				<Icon name="database" size={24} />
 				<div>
 					<h1>CODEBASE INDEXER</h1>
 					<p class="header-sub">MinIO + Qdrant + Ollama Embedding Pipeline</p>
 				</div>
 			</div>
 			<button class="refresh-btn" onclick={loadStatus} disabled={loading}>
-				<RefreshCw size={16} class={loading ? 'animate-spin' : ''} />
+				<Icon name="refresh-cw" size={16} class={loading ? 'animate-spin' : ''} />
 				Refresh
 			</button>
 		</div>
@@ -179,15 +172,15 @@
 	<!-- Tabs -->
 	<div class="tab-bar">
 		<button class="tab" class:active={activeTab === 'status'} onclick={() => activeTab = 'status'}>
-			<Database size={14} />
+			<Icon name="database" size={14} />
 			Status
 		</button>
 		<button class="tab" class:active={activeTab === 'index'} onclick={() => activeTab = 'index'}>
-			<FileCode size={14} />
+			<Icon name="file-code" size={14} />
 			Index
 		</button>
 		<button class="tab" class:active={activeTab === 'search'} onclick={() => activeTab = 'search'}>
-			<Search size={14} />
+			<Icon name="search" size={14} />
 			Search
 		</button>
 	</div>
@@ -198,7 +191,7 @@
 			{#if status}
 				<div class="status-grid">
 					<div class="status-card">
-						<div class="card-icon"><FileCode size={24} /></div>
+						<div class="card-icon"><Icon name="file-code" size={24} /></div>
 						<div class="card-body">
 							<h3>Codebase Index</h3>
 							<p class="card-number">{status.collections.codebase.points_count}</p>
@@ -207,7 +200,7 @@
 					</div>
 
 					<div class="status-card">
-						<div class="card-icon"><AlertTriangle size={24} /></div>
+						<div class="card-icon"><Icon name="alert-triangle" size={24} /></div>
 						<div class="card-body">
 							<h3>Error Patterns</h3>
 							<p class="card-number">{status.collections.errors.points_count}</p>
@@ -216,7 +209,7 @@
 					</div>
 
 					<div class="status-card">
-						<div class="card-icon"><HardDrive size={24} /></div>
+						<div class="card-icon"><Icon name="hard-drive" size={24} /></div>
 						<div class="card-body">
 							<h3>Storage</h3>
 							<p class="card-number-sm">MinIO + Qdrant</p>
@@ -225,7 +218,7 @@
 					</div>
 
 					<div class="status-card">
-						<div class="card-icon"><Clock size={24} /></div>
+						<div class="card-icon"><Icon name="clock" size={24} /></div>
 						<div class="card-body">
 							<h3>Last Updated</h3>
 							<p class="card-number-sm">{new Date(status.timestamp).toLocaleTimeString()}</p>
@@ -257,12 +250,12 @@
 				</div>
 			{:else if loading}
 				<div class="loading-state">
-					<Loader2 size={32} class="animate-spin" />
+					<Icon name="loader-2" size={32} class="animate-spin" />
 					<p>Loading status...</p>
 				</div>
 			{:else}
 				<div class="loading-state">
-					<AlertTriangle size={32} />
+					<Icon name="alert-triangle" size={32} />
 					<p>Failed to load status. Ensure Qdrant is running.</p>
 				</div>
 			{/if}
@@ -294,10 +287,10 @@
 						disabled={indexing}
 					>
 						{#if indexing}
-							<Loader2 size={16} class="animate-spin" />
+							<Icon name="loader-2" size={16} class="animate-spin" />
 							Indexing...
 						{:else}
-							<FileCode size={16} />
+							<Icon name="file-code" size={16} />
 							Index Codebase
 						{/if}
 					</Button>
@@ -314,10 +307,10 @@
 						disabled={indexing}
 					>
 						{#if indexing}
-							<Loader2 size={16} class="animate-spin" />
+							<Icon name="loader-2" size={16} class="animate-spin" />
 							Indexing...
 						{:else}
-							<AlertTriangle size={16} />
+							<Icon name="alert-triangle" size={16} />
 							Index Errors
 						{/if}
 					</Button>
@@ -335,7 +328,7 @@
 						<div class="results-list">
 							{#each indexResults as result}
 								<div class="result-row">
-									<FileCode size={14} />
+									<Icon name="file-code" size={14} />
 									<div class="result-info">
 										<span class="result-file">{result.file || result.code}</span>
 										<span class="result-meta">
@@ -365,7 +358,7 @@
 						class:active={searchType === 'codebase'}
 						onclick={() => searchType = 'codebase'}
 					>
-						<FileCode size={14} />
+						<Icon name="file-code" size={14} />
 						Codebase
 					</button>
 					<button
@@ -373,7 +366,7 @@
 						class:active={searchType === 'errors'}
 						onclick={() => searchType = 'errors'}
 					>
-						<AlertTriangle size={14} />
+						<Icon name="alert-triangle" size={14} />
 						Errors
 					</button>
 				</div>
@@ -396,9 +389,9 @@
 						disabled={searching || !searchQuery.trim()}
 					>
 						{#if searching}
-							<Loader2 size={16} class="animate-spin" />
+							<Icon name="loader-2" size={16} class="animate-spin" />
 						{:else}
-							<Search size={16} />
+							<Icon name="search" size={16} />
 						{/if}
 						Search
 					</Button>
@@ -442,7 +435,7 @@
 
 				{#if searchQuery.trim() && !searching && searchResults.length === 0 && searchType === 'codebase'}
 					<div class="no-results">
-						<Search size={32} />
+						<Icon name="search" size={32} />
 						<p>No codebase matches for "{searchQuery}"</p>
 						<p class="hint">Try indexing your codebase first, or use broader terms.</p>
 					</div>
@@ -450,7 +443,7 @@
 
 				{#if searchQuery.trim() && !searching && errorResults.length === 0 && searchType === 'errors'}
 					<div class="no-results">
-						<AlertTriangle size={32} />
+						<Icon name="alert-triangle" size={32} />
 						<p>No error patterns for "{searchQuery}"</p>
 						<p class="hint">Try indexing errors first, or use different keywords.</p>
 					</div>

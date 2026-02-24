@@ -4,9 +4,6 @@
   import Input from '$lib/components/ui/input/Input.svelte';
   import Label from '$lib/components/ui/label/Label.svelte';
   import Textarea from '$lib/components/ui/textarea/Textarea.svelte';
-  import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
-  import Save from '@lucide/svelte/icons/save';
-  import X from '@lucide/svelte/icons/x';
   import POIPhotoGrid from './POIPhotoGrid.svelte';
 
   interface POI { name: string, alias: string;
@@ -79,7 +76,7 @@
 <Card class="w-full max-w-2xl">
   <CardHeader>
     <CardTitle class="flex items-center gap-2">
-      <AlertTriangle class="w-5 h-5" />
+      <span class="i-lucide-alert-triangle w-5 h-5 inline-block" />
       {isNew ? 'Create Person of Interest' : 'Edit Person of Interest'}
     </CardTitle>
   </CardHeader>
@@ -163,11 +160,11 @@
     <!-- Actions -->
     <div class="flex gap-3 pt-4 border-t">
       <Button onclick={handleSave} class="flex-1 bits-btn">
-        <Save class="w-4 h-4 mr-2" />
+        <span class="i-lucide-save w-4 h-4 mr-2 inline-block" />
         {isNew ? 'Create POI' : 'Save Changes'}
       </Button>
       <Button class="bits-btn" onclick={handleCancel} variant="outline">
-        <X class="w-4 h-4 mr-2" />
+        <span class="i-lucide-x w-4 h-4 mr-2 inline-block" />
         Cancel
       </Button>
     </div>

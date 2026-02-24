@@ -1,15 +1,6 @@
 <script lang="ts">
 	import { formatDistanceToNow } from 'date-fns';
-	import Archive from '@lucide/svelte/icons/archive';
-	import Calendar from '@lucide/svelte/icons/calendar';
-	import Download from '@lucide/svelte/icons/download';
-	import Edit from '@lucide/svelte/icons/edit';
-	import Eye from '@lucide/svelte/icons/eye';
-	import FileText from '@lucide/svelte/icons/file-text';
-	import Headphones from '@lucide/svelte/icons/headphones';
-	import Image from '@lucide/svelte/icons/image';
-	import Trash2 from '@lucide/svelte/icons/trash-2';
-	import Video from '@lucide/svelte/icons/video';
+	import Icon from '$lib/components/ui/Icon.svelte';
 
 	interface Props {
 		evidence: any;
@@ -29,16 +20,16 @@
 		ondownload
 	}: Props = $props();
 
-	function getEvidenceIcon(type: string) {
+	function getEvidenceIconName(type: string): string {
 		switch (type) {
-			case 'document': return FileText;
-			case 'photo': return Image;
-			case 'video': return Video;
-			case 'audio': return Headphones;
-			case 'physical': return Archive;
-			case 'digital': return FileText;
-			case 'testimony': return FileText;
-			default: return FileText;
+			case 'document': return 'file-text';
+			case 'photo': return 'image';
+			case 'video': return 'video';
+			case 'audio': return 'headphones';
+			case 'physical': return 'archive';
+			case 'digital': return 'file-text';
+			case 'testimony': return 'file-text';
+			default: return 'file-text';
 		}
 	}
 
@@ -55,7 +46,7 @@
 		}
 	}
 
-	let EvidenceIcon = $derived(getEvidenceIcon(evidence.evidenceType || evidence.type));
+	let evidenceIconName = $derived(getEvidenceIconName(evidence.evidenceType || evidence.type));
 	let formattedDate = $derived(
 		formatDistanceToNow(
 			new Date(evidence.createdAt || evidence.dateCollected || Date.now()),
@@ -87,7 +78,7 @@
 >
 	<div class="flex items-start">
 		<div class="flex-shrink-0">
-			<EvidenceIcon class="h-6 w-6" />
+			<Icon name={evidenceIconName} class="h-6 w-6" />
 		</div>
 
 		<div class="flex-1">
@@ -104,7 +95,7 @@
 			{/if}
 
 			<div class="mt-2 flex items-center text-xs">
-				<Calendar class="h-3 w-3" />
+				<Icon name="calendar" class="h-3 w-3" />
 				{formattedDate}
 			</div>
 		</div>
@@ -117,7 +108,7 @@
 				title="View evidence"
 				{disabled}
 			>
-				<Eye class="h-4" />
+				<Icon name="eye" class="h-4" />
 			</button>
 
 			<button
@@ -126,7 +117,7 @@
 				title="Edit evidence"
 				{disabled}
 			>
-				<Edit class="h-4" />
+				<Icon name="edit" class="h-4" />
 			</button>
 
 			<button
@@ -135,7 +126,7 @@
 				title="Download evidence"
 				{disabled}
 			>
-				<Download class="h-4" />
+				<Icon name="download" class="h-4" />
 			</button>
 
 			<button
@@ -144,7 +135,7 @@
 				title="Delete evidence"
 				{disabled}
 			>
-				<Trash2 class="h-4" />
+				<Icon name="trash-2" class="h-4" />
 			</button>
 		</div>
 	</div>

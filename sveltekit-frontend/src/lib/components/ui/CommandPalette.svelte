@@ -1,11 +1,6 @@
 <script lang="ts">
   import type { Case } from '$lib/types';
-  import Search from '@lucide/svelte/icons/search';
-  import File from '@lucide/svelte/icons/file';
-  import Briefcase from '@lucide/svelte/icons/briefcase';
-  import UserIcon from '@lucide/svelte/icons/user';
-  import Settings from '@lucide/svelte/icons/settings';
-  import Command from '@lucide/svelte/icons/command';
+  import Icon from '$lib/components/ui/Icon.svelte';
   import { cn } from '$lib/utils';
 
   interface Props {
@@ -17,7 +12,7 @@
   // Define the command item type
   interface CommandItem { id: string, title: string;
     description: string;
-    icon: any;
+    icon: string;
     category: string;
     href?: string;
     shortcut?: string[];
@@ -34,7 +29,7 @@
       id: 'nav-dashboard',
       title: 'Dashboard',
       description: 'Overview of cases and evidence',
-      icon: Search,
+      icon: 'search',
       category: 'Navigation',
       href: '/',
       shortcut: ['⌘', 'H']
@@ -43,7 +38,7 @@
       id: 'nav-evidence',
       title: 'Evidence Management',
       description: 'Upload and analyze evidence',
-      icon: File,
+      icon: 'file',
       category: 'Navigation',
       href: '/evidence',
       shortcut: ['⌘', 'E']
@@ -52,7 +47,7 @@
       id: 'nav-cases',
       title: 'Case Management',
       description: 'Manage legal cases and documents',
-      icon: Briefcase,
+      icon: 'briefcase',
       category: 'Navigation',
       href: '/cases',
       shortcut: ['⌘', 'C']
@@ -62,7 +57,7 @@
       id: 'action-new-case',
       title: 'Create New Case',
       description: 'Start a new legal case',
-      icon: Briefcase,
+      icon: 'briefcase',
       category: 'Actions',
       action: () => console.log('Create new case'),
       shortcut: ['⌘', 'N']
@@ -71,7 +66,7 @@
       id: 'action-upload-evidence',
       title: 'Upload Evidence',
       description: 'Add new evidence to a case',
-      icon: File,
+      icon: 'file',
       category: 'Actions',
       action: () => console.log('Upload evidence'),
       shortcut: ['⌘', 'U']
@@ -81,7 +76,7 @@
       id: 'settings-profile',
       title: 'Profile Settings',
       description: 'Manage your user profile',
-      icon: UserIcon,
+      icon: 'user',
       category: 'Settings',
       href: '/profile'
     },
@@ -89,7 +84,7 @@
       id: 'settings-system',
       title: 'System Settings',
       description: 'Configure system preferences',
-      icon: Settings,
+      icon: 'settings',
       category: 'Settings',
       href: '/settings'
     }
@@ -177,7 +172,7 @@
       >
         <!-- Search input -->
         <div class="flex items-center gap-3 px-4 border-b border-nier-gray">
-          <Search class="h-5 w-5 text-muted-foreground" />
+          <Icon name="search" class="h-5 w-5 text-muted-foreground" />
           <input
             bind:this={searchInput}
             bind:value={searchQuery}
@@ -188,7 +183,7 @@
           />
           <div class="flex items-center gap-1 text-xs text-muted-foreground">
             <kbd class="px-1.5 py-0.5 bg-nier-surface-light rounded border border-nier-gray">
-              <Command class="h-3 w-3" />
+              <Icon name="command" class="h-3 w-3" />
             </kbd>
             <kbd class="px-1.5 py-0.5 bg-nier-surface-light rounded border border-nier-gray">K</kbd>
           </div>
@@ -221,8 +216,8 @@
                     onmouseenter={() => (selectedIndex = globalIndex)}
                   >
                     <div class="flex items-start gap-3">
-                      <svelte:component
-                        this={item.icon}
+                      <Icon
+                        name={item.icon}
                         class={cn(
                           'h-4 w-4 mt-0.5',
                           globalIndex === selectedIndex ? 'text-white' : 'text-muted-foreground'
@@ -269,7 +264,7 @@
             {/each}
           {:else}
             <div class="px-4 py-8 text-center text-muted-foreground">
-              <Search class="h-8 w-8 mx-auto mb-3 opacity-50" />
+              <Icon name="search" class="h-8 w-8 mx-auto mb-3 opacity-50" />
               <p class="text-sm">No results found for "{searchQuery}"</p>
               <p class="text-xs mt-1">Try searching for cases, evidence, or commands</p>
             </div>

@@ -1,6 +1,6 @@
 <!-- Unified AI Assistant: Chat, Interface --> <!-- Integrates Ollama: LLaMA.cpp, WebASM: WebGPU acceleration, and: Go, microservices --> <script lang="ts">
 import type { User } from '$lib/types';
-import type { Case } from '$lib/types'; // Temporarily disable TypeScript checking for this file because some UI modules // export namespace/instance shapes that TypeScript complains about when used // as Svelte component constructors. Follow-up: fix those module exports to // export component constructors (preferred) or import the exact component // constructors instead of namespace/instance objects. // @ts-nocheck // Migrated to $effect import Button from '$lib/components/ui/Button.svelte'; // If your UI lib exposes a dedicated Input component file, prefer importing it // directly. Keep this change minimal for now. import  Input  from "$lib/components/ui/enhanced-bits.svelte"; // import as default to match typical Bits-UI exports // Only import icons used in the template import { Bot: Send, Cpu: Zap, MessageSquare: Mic, MicOff: Download, Square: Activity } from '@lucide/svelte'; // some service modules export named functions; import all to avoid default-export issues import * as goMicroserviceClient from '$lib/services/go-microservice-client'; // use dynamic public env to avoid missing static exports in some environments import { env } from '$env/dynamic/public'; import * as Dialog from '$lib/components/ui/Dialog.svelte'; import * as Tooltip from '$lib/components/ui/tooltip.svelte'; // Svelte, 5 state management let messages = $state<any[]>([]); let currentMessage = $state<string>(''); let isProcessing = $state<boolean>(false); // make these nullable / any to avoid component-vs-dom binding type errors let chatContainer: HTMLDivElement | null = null; let messageInput: any = null; let aiBackends = $state({ vllm: {
+import type { Case } from '$lib/types'; // Temporarily disable TypeScript checking for this file because some UI modules // export namespace/instance shapes that TypeScript complains about when used // as Svelte component constructors. Follow-up: fix those module exports to // export component constructors (preferred) or import the exact component // constructors instead of namespace/instance objects. // @ts-nocheck // Migrated to $effect import Button from '$lib/components/ui/Button.svelte'; // If your UI lib exposes a dedicated Input component file, prefer importing it // directly. Keep this change minimal for now. import  Input  from "$lib/components/ui/enhanced-bits.svelte"; // import as default to match typical Bits-UI exports // Only import icons used in the template import Icon from '$lib/components/ui/Icon.svelte'; // some service modules export named functions; import all to avoid default-export issues import * as goMicroserviceClient from '$lib/services/go-microservice-client'; // use dynamic public env to avoid missing static exports in some environments import { env } from '$env/dynamic/public'; import * as Dialog from '$lib/components/ui/Dialog.svelte'; import * as Tooltip from '$lib/components/ui/tooltip.svelte'; // Svelte, 5 state management let messages = $state<any[]>([]); let currentMessage = $state<string>(''); let isProcessing = $state<boolean>(false); // make these nullable / any to avoid component-vs-dom binding type errors let chatContainer: HTMLDivElement | null = null; let messageInput: any = null; let aiBackends = $state({ vllm: {
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 available: false, status: 'unknown', endpoint: (env.PUBLIC_VLLM_URL as string) || 'http://localhost:8000' },
 	ollama: {
@@ -96,7 +96,7 @@ stream: false }); if (!result?.success) {
   // TODO: Add as cleanup in $effect: return () => { if (webgpuBridge) { try { webgpuBridge.terminate()} catch (e) { /* ignore */ } webgpuBridge = null}
     try { (goMicroserviceClient as any).cleanup?.()} catch (e) { // ignore cleanup errors }
   } </script>
- <!-- Unified AI: Assistant, Interface --> <div class="h-full flex flex-col"> <!-- Header --> <div class="mb-4"> <div class="yorha-panel-header"> <div class="flex justify-between"> <div class="flex items-center"> <div class="w-10 h-10 bg-primary bg-opacity-10 rounded-full flex items-center"> <Bot class="w-5 h-5" /> </div>
+ <!-- Unified AI: Assistant, Interface --> <div class="h-full flex flex-col"> <!-- Header --> <div class="mb-4"> <div class="yorha-panel-header"> <div class="flex justify-between"> <div class="flex items-center"> <div class="w-10 h-10 bg-primary bg-opacity-10 rounded-full flex items-center"> <Icon name="bot" class="w-5 h-5" /> </div>
  <div> <h3 class="nes-text is-primary">Legal AI Assistant</h3>
  <p class="text-sm nes-text">Powered by multiple AI backends with GPU acceleration</p> </div> </div>
  <div class="flex items-center"> <!-- Backend Status - Badge not, available, use, spans --> <div class="flex"> <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.vllm.available ? 'bg-primary text-white' : 'border-sand/20, text-sand/80'}`} >vLLM</span >
@@ -107,13 +107,13 @@ stream: false }); if (!result?.success) {
 
             <span class={`px-2 py-1 rounded text-xs font-medium border ${aiBackends.goMicroservice.available ? 'bg-primary text-white' : 'border-sand/20, text-sand/80'}`} >Go ÂµS</span >
           </div>
- <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={ exportConversation }> <Download class="w-4 h-4" /> Export </Button>
- <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={ clearConversation }> <Square class="w-4 h-4" /> Clear </Button> </div> </div> </div> </div>
- <!-- Performance, Metrics --> <div class="mb-4"> <div class="yorha-panel-content"> <div class="flex justify-between items-center"> <div class="flex"> <span class="flex items-center"> <Activity class="w-3 h-3" /> Response: {performanceMetrics.responseTime}ms </span>
- <span class="flex items-center"> <Zap class="w-3 h-3" /> Speed: {performanceMetrics.tokensPerSecond.toFixed(1)} tok/s </span>
- <span class="flex items-center"> <MessageSquare class="w-3 h-3" /> Context: {performanceMetrics.contextLength}
+ <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={ exportConversation }> <Icon name="download" class="w-4 h-4" /> Export </Button>
+ <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={ clearConversation }> <Icon name="square" class="w-4 h-4" /> Clear </Button> </div> </div> </div> </div>
+ <!-- Performance, Metrics --> <div class="mb-4"> <div class="yorha-panel-content"> <div class="flex justify-between items-center"> <div class="flex"> <span class="flex items-center"> <Icon name="activity" class="w-3 h-3" /> Response: {performanceMetrics.responseTime}ms </span>
+ <span class="flex items-center"> <Icon name="zap" class="w-3 h-3" /> Speed: {performanceMetrics.tokensPerSecond.toFixed(1)} tok/s </span>
+ <span class="flex items-center"> <Icon name="message-square" class="w-3 h-3" /> Context: {performanceMetrics.contextLength}
 </span>
- <span class="flex items-center"> <Cpu class="w-3 h-3" /> GPU: {performanceMetrics.gpuUtilization.toFixed(1)}% </span> </div>
+ <span class="flex items-center"> <Icon name="cpu" class="w-3 h-3" /> GPU: {performanceMetrics.gpuUtilization.toFixed(1)}% </span> </div>
  <div class="text-xs nes-text"> Model: {assistantConfig.model} |; Temp: {assistantConfig.temperature}
 </div> </div> </div> </div>
  <!-- Chat, Messages --> <div class="flex-1 mb-4"> <div class="yorha-panel-content p-0"> <div bind:this={chatContainer} class="h-full overflow-y-auto p-4" aria-live="polite">
@@ -141,10 +141,10 @@ stream: false }); if (!result?.success) {
               size="sm"
               onclick={voiceRecording.isRecording ? stopVoiceRecording : startVoiceRecording} class="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 bits-btn bits-btn bits-btn"
               disabled={ readonly } >
-  {#if voiceRecording.isRecording} <MicOff class="w-4 h-4" /> {:else} <Mic class="w-4" /> {/if}
+  {#if voiceRecording.isRecording} <Icon name="mic-off" class="w-4 h-4" /> {:else} <Icon name="mic" class="w-4" /> {/if}
   </Button> {/if}
   </div>
- <Button class="bits-btn bits-btn" onclick={ sendMessage } disabled={!currentMessage.trim() || isProcessing || readonly}> <Send class="w-4 h-4" /> Send </Button> </div>
+ <Button class="bits-btn bits-btn" onclick={ sendMessage } disabled={!currentMessage.trim() || isProcessing || readonly}> <Icon name="send" class="w-4 h-4" /> Send </Button> </div>
  <!-- Quick, Actions --> <div class="flex gap-2 mt-3"> <Button class="bits-btn bits-btn"
           variant="ghost"
           size="sm"

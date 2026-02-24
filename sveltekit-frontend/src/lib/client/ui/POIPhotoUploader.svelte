@@ -1,9 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/Button.svelte';
-	import Camera from '@lucide/svelte/icons/camera';
-	import Upload from '@lucide/svelte/icons/upload';
-
- let { poiId, disabled = false, onUpload, onError } = $props<{ poiId: number; disabled?: boolean;
+	let { poiId, disabled = false, onUpload, onError } = $props<{ poiId: number; disabled?: boolean;
 	onUpload: (data: any) => void, onError: (error: any) => void }>();
 
  let dragging = $state(false);
@@ -101,12 +98,12 @@
  </div>
  {:else if disabled}
  <div class="flex flex-col items-center gap-4">
- <Camera class="w-12 h-12 text-gray-400" />
+ <span class="i-lucide-camera w-12 h-12 text-gray-400 inline-block" />
  <p class="text-gray-500">Photo upload disabled</p>
  </div>
  {:else}
  <div class="flex flex-col items-center gap-4">
- <Upload class="w-12 h-12 text-gray-400" />
+ <span class="i-lucide-upload w-12 h-12 text-gray-400 inline-block" />
  <div>
  <p class="text-lg font-medium text-gray-700">Drop POI photos here</p>
  <p class="text-gray-500">or</p>
@@ -116,7 +113,7 @@
  onclick={triggerFileSelect}
  class="mt-2 bits-btn"
  >
- <Camera class="w-4 h-4 mr-2" />
+ <span class="i-lucide-camera w-4 h-4 mr-2 inline-block" />
  Browse Files
  </Button>
  </div>
@@ -125,6 +122,4 @@
  {/if}
  </div>
 </div>
-
-
 

@@ -1,19 +1,6 @@
 <!-- AI Recommendation Engine — legal case strategy + evidence recommendations -->
 <script lang="ts">
 	import { Dialog } from 'bits-ui';
-	import Loader from '@lucide/svelte/icons/loader';
-	import Target from '@lucide/svelte/icons/target';
-	import Search from '@lucide/svelte/icons/search';
-	import BookOpen from '@lucide/svelte/icons/book-open';
-	import Zap from '@lucide/svelte/icons/zap';
-	import Shield from '@lucide/svelte/icons/shield';
-	import Lightbulb from '@lucide/svelte/icons/lightbulb';
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
-	import ChevronUp from '@lucide/svelte/icons/chevron-up';
-	import X from '@lucide/svelte/icons/x';
-	import CheckCircle from '@lucide/svelte/icons/check-circle';
-	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
-
 	interface ActionStep {
 		id: string;
 		description: string;
@@ -277,7 +264,7 @@
 	<div class="rec-header">
 		<div>
 			<h3 class="rec-title">
-				<Lightbulb class="w-5 h-5" />
+				<span class="i-lucide-lightbulb w-5 h-5 inline-block" />
 				AI Recommendation Engine
 			</h3>
 			<p class="rec-subtitle">Strategy, evidence, and risk analysis</p>
@@ -288,10 +275,10 @@
 			disabled={isGenerating}
 		>
 			{#if isGenerating}
-				<Loader class="w-4 h-4 animate-spin" />
+				<span class="i-lucide-loader w-4 h-4 animate-spin inline-block" />
 				Generating...
 			{:else}
-				<Zap class="w-4 h-4" />
+				<span class="i-lucide-zap w-4 h-4 inline-block" />
 				Generate
 			{/if}
 		</button>
@@ -321,7 +308,7 @@
 
 	{#if errorMessage}
 		<div class="rec-error">
-			<AlertTriangle class="w-4 h-4" />
+			<span class="i-lucide-alert-triangle w-4 h-4 inline-block" />
 			{errorMessage}
 		</div>
 	{/if}
@@ -329,12 +316,12 @@
 	<!-- Recommendations List -->
 	{#if isGenerating}
 		<div class="rec-loading">
-			<Loader class="w-8 h-8 animate-spin" />
+			<span class="i-lucide-loader w-8 h-8 animate-spin inline-block" />
 			<p>Analyzing case context and generating recommendations...</p>
 		</div>
 	{:else if filteredRecommendations.length === 0}
 		<div class="rec-empty">
-			<Lightbulb class="w-8 h-8" />
+			<span class="i-lucide-lightbulb w-8 h-8 inline-block" />
 			<p>No recommendations yet. Click "Generate" to analyze your case.</p>
 		</div>
 	{:else}
@@ -407,7 +394,7 @@
 					<div class="rec-card-actions">
 						<button class="rec-btn-secondary" onclick={() => openDetails(rec)}>Details</button>
 						<button class="rec-btn-primary" onclick={() => applyRecommendation(rec)}>
-							<CheckCircle class="w-3.5 h-3.5" />
+							<span class="i-lucide-check-circle w-3.5 h-3.5 inline-block" />
 							Apply
 						</button>
 					</div>
@@ -514,7 +501,7 @@
 				<div class="rec-dialog-actions">
 					<button class="rec-btn-secondary" onclick={() => (showDetails = false)}>Close</button>
 					<button class="rec-btn-primary" onclick={() => { applyRecommendation(rec); showDetails = false; }}>
-						<CheckCircle class="w-4 h-4" />
+						<span class="i-lucide-check-circle w-4 h-4 inline-block" />
 						Apply Recommendation
 					</button>
 				</div>

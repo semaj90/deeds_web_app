@@ -1,20 +1,6 @@
 <script lang="ts">
   import { slide } from 'svelte/transition';
 // Lucide icons - individual imports
-  import Download from '@lucide/svelte/icons/download';
-  import Eye from '@lucide/svelte/icons/eye';
-  import FileText from '@lucide/svelte/icons/file-text';
-  import Layout from '@lucide/svelte/icons/layout';
-  import Maximize from '@lucide/svelte/icons/maximize';
-  import Minimize from '@lucide/svelte/icons/minimize';
-  import PanelLeft from '@lucide/svelte/icons/panel-left';
-  import Redo from '@lucide/svelte/icons/redo';
-  import Replace from '@lucide/svelte/icons/replace';
-  import Save from '@lucide/svelte/icons/save';
-  import Search from '@lucide/svelte/icons/search';
-  import Undo from '@lucide/svelte/icons/undo';
-  import Upload from '@lucide/svelte/icons/upload';
-
   // State
   let hasUnsavedChanges = $state(false);
   let wordCount = $state(0);
@@ -73,21 +59,21 @@
       {#if fileMenuOpen}
         <div class="dropdown-menu">
           <button class="dropdown-item" onclick={() => { handleSave(); closeAllMenus(); }}>
-            <Save size={16} /> Save Report <span class="shortcut">Ctrl+S</span>
+            <span class="i-lucide-save w-4 h-4 inline-block" /> Save Report <span class="shortcut">Ctrl+S</span>
           </button>
           <button class="dropdown-item" onclick={() => closeAllMenus()}>
-            <FileText size={16} /> New Report <span class="shortcut">Ctrl+N</span>
+            <span class="i-lucide-file-text w-4 h-4 inline-block" /> New Report <span class="shortcut">Ctrl+N</span>
           </button>
           <div class="dropdown-separator"></div>
           <button class="dropdown-item" onclick={() => closeAllMenus()}>
-            <Upload size={16} /> Import
+            <span class="i-lucide-upload w-4 h-4 inline-block" /> Import
           </button>
           <button class="dropdown-item" onclick={() => { handleExport(); closeAllMenus(); }}>
-            <Download size={16} /> Export
+            <span class="i-lucide-download w-4 h-4 inline-block" /> Export
           </button>
           <div class="dropdown-separator"></div>
           <button class="dropdown-item" onclick={() => { handlePreview(); closeAllMenus(); }}>
-            <Eye size={16} /> Preview
+            <span class="i-lucide-eye w-4 h-4 inline-block" /> Preview
           </button>
         </div>
       {/if}
@@ -104,17 +90,17 @@
       {#if editMenuOpen}
         <div class="dropdown-menu">
           <button class="dropdown-item" onclick={() => closeAllMenus()}>
-            <Undo size={16} /> Undo <span class="shortcut">Ctrl+Z</span>
+            <span class="i-lucide-undo w-4 h-4 inline-block" /> Undo <span class="shortcut">Ctrl+Z</span>
           </button>
           <button class="dropdown-item" onclick={() => closeAllMenus()}>
-            <Redo size={16} /> Redo <span class="shortcut">Ctrl+Y</span>
+            <span class="i-lucide-redo w-4 h-4 inline-block" /> Redo <span class="shortcut">Ctrl+Y</span>
           </button>
           <div class="dropdown-separator"></div>
           <button class="dropdown-item" onclick={() => closeAllMenus()}>
-            <Search size={16} /> Find <span class="shortcut">Ctrl+F</span>
+            <span class="i-lucide-search w-4 h-4 inline-block" /> Find <span class="shortcut">Ctrl+F</span>
           </button>
           <button class="dropdown-item" onclick={() => closeAllMenus()}>
-            <Replace size={16} /> Replace <span class="shortcut">Ctrl+H</span>
+            <span class="i-lucide-replace w-4 h-4 inline-block" /> Replace <span class="shortcut">Ctrl+H</span>
           </button>
         </div>
       {/if}
@@ -131,16 +117,16 @@
       {#if viewMenuOpen}
         <div class="dropdown-menu">
           <button class="dropdown-item" onclick={() => { toggleSidebar(); closeAllMenus(); }}>
-            <PanelLeft size={16} /> Toggle Sidebar <span class="shortcut">Ctrl+B</span>
+            <span class="i-lucide-panel-left w-4 h-4 inline-block" /> Toggle Sidebar <span class="shortcut">Ctrl+B</span>
           </button>
           <button class="dropdown-item" onclick={() => { toggleLayout(); closeAllMenus(); }}>
-            <Layout size={16} /> Switch Layout ({currentLayout})
+            <span class="i-lucide-layout w-4 h-4 inline-block" /> Switch Layout ({currentLayout})
           </button>
           <button class="dropdown-item" onclick={() => { toggleFullscreen(); closeAllMenus(); }}>
             {#if fullscreen}
-              <Minimize size={16} /> Exit Fullscreen
+              <span class="i-lucide-minimize w-4 h-4 inline-block" /> Exit Fullscreen
             {:else}
-              <Maximize size={16} /> Fullscreen
+              <span class="i-lucide-maximize w-4 h-4 inline-block" /> Fullscreen
             {/if}
             <span class="shortcut">F11</span>
           </button>
@@ -157,23 +143,23 @@
       onclick={handleSave}
       title="Save Report"
     >
-      <Save size={16} />
+      <span class="i-lucide-save w-4 h-4 inline-block" />
     </button>
 
     <div class="separator"></div>
 
     <button class="action-button" onclick={toggleSidebar} title="Toggle Sidebar">
-      <PanelLeft size={16} />
+      <span class="i-lucide-panel-left w-4 h-4 inline-block" />
     </button>
 
     <button class="action-button" onclick={toggleLayout} title="Switch Layout">
-      <Layout size={16} />
+      <span class="i-lucide-layout w-4 h-4 inline-block" />
     </button>
 
     <div class="separator"></div>
 
     <button class="action-button" onclick={handlePreview} title="Preview Report">
-      <Eye size={16} />
+      <span class="i-lucide-eye w-4 h-4 inline-block" />
     </button>
   </div>
 

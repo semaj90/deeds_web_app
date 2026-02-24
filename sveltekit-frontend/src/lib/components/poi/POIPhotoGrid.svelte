@@ -1,10 +1,5 @@
 <script lang="ts">
   import Button from '$lib/components/ui/Button.svelte';
-  import Camera from '@lucide/svelte/icons/camera';
-  import Eye from '@lucide/svelte/icons/eye';
-  import Trash2 from '@lucide/svelte/icons/trash-2';
-  import Upload from '@lucide/svelte/icons/upload';
-
   interface Photo {
     thumbnailUrl: string;
     ai?: {
@@ -45,28 +40,28 @@
   {#if editable}
     <div class="flex items-center justify-between">
       <h3 class="text-lg font-semibold flex items-center gap-2">
-        <Camera class="w-5 h-5" />
+        <span class="i-lucide-camera w-5 h-5 inline-block" />
         POI Photos ({photos.length})
       </h3>
       <Button class="bits-btn" onclick={handleUpload} variant="outline" size="sm">
-        <Upload class="w-4 h-4 mr-2" />
+        <span class="i-lucide-upload w-4 h-4 mr-2 inline-block" />
         Upload Photo
       </Button>
     </div>
   {:else}
     <h3 class="text-lg font-semibold flex items-center gap-2">
-      <Camera class="w-5 h-5" />
+      <span class="i-lucide-camera w-5 h-5 inline-block" />
       POI Photos ({photos.length})
     </h3>
   {/if}
 
   {#if photos.length === 0}
     <div class="border-2 border-dashed border-sand/20 rounded-lg p-8 text-center">
-      <Camera class="w-12 h-12 text-sand/40 mx-auto mb-4" />
+      <span class="i-lucide-camera w-12 h-12 text-sand/40 mx-auto mb-4 inline-block" />
       <p class="text-sand/60 mb-4">No photos uploaded yet</p>
       {#if editable}
         <Button class="bits-btn" onclick={handleUpload} variant="outline">
-          <Upload class="w-4 h-4 mr-2" />
+          <span class="i-lucide-upload w-4 h-4 mr-2 inline-block" />
           Upload First Photo
         </Button>
       {/if}
@@ -104,7 +99,7 @@
               class="opacity-0 group-hover:opacity-100 transition-opacity bits-btn"
               onclick={() => handlePhotoClick(photo, index)}
             >
-              <Eye class="w-4 h-4" />
+              <span class="i-lucide-eye w-4 h-4 inline-block" />
             </Button>
             {#if editable}
               <Button
@@ -113,7 +108,7 @@
                 class="opacity-0 group-hover:opacity-100 transition-opacity bits-btn"
                 onclick={() => handleDelete(index)}
               >
-                <Trash2 class="w-4 h-4" />
+                <span class="i-lucide-trash-2 w-4 h-4 inline-block" />
               </Button>
             {/if}
           </div>

@@ -1,7 +1,5 @@
 <script lang="ts">
 	import Button from '$lib/ui/Button.svelte';
-	import Loader2 from '@lucide/svelte/icons/loader-2';
-
 	let {
 		loading = false,
 		disabled = false,
@@ -19,9 +17,8 @@
 
 <Button disabled={loading || disabled} class={className} {...rest}>
 	{#if loading}
-		<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+		<span class="i-lucide-loader-2 mr-2 h-4 w-4 animate-spin inline-block" />
 	{/if}
 	{@render children?.()}
 </Button>
-
 

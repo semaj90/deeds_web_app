@@ -6,10 +6,7 @@
 	 * Task: 15.3 - Create cluster visualization
 	 * Purpose: Display clusters as groups, show summaries, navigate between clusters
 	 */
-	import Brain from '@lucide/svelte/icons/brain';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import Layers from '@lucide/svelte/icons/layers';
-	import Users from '@lucide/svelte/icons/users';
+	import Icon from '$lib/components/ui/Icon.svelte';
 
 	interface Cluster {
 		id: string;
@@ -67,7 +64,7 @@
 <div class="cluster-visualization" class:grid-layout={layout === 'grid'} class:list-layout={layout === 'list'}>
 	{#if clusters.length === 0}
 		<div class="empty-state">
-			<Layers class="h-12 w-12" />
+			<Icon name="layers" class="h-12 w-12" />
 			<h3>No Clusters</h3>
 			<p>Run clustering to group similar errors and patterns</p>
 		</div>
@@ -81,7 +78,7 @@
 				<!-- Header -->
 				<div class="cluster-header">
 					<div class="cluster-icon">
-						<Layers class="h-5 w-5" />
+						<Icon name="layers" class="h-5 w-5" />
 					</div>
 					<div class="cluster-title">
 						<h3 class="cluster-name">{cluster.name}</h3>
@@ -89,18 +86,18 @@
 							{cluster.dominantCode}
 						</span>
 					</div>
-					<ChevronRight class="h-5 w-5 chevron" />
+					<Icon name="chevron-right" class="h-5 w-5 chevron" />
 				</div>
 
 				<!-- Member Count -->
 				<div class="member-count">
-					<Users class="h-4 w-4" />
+					<Icon name="users" class="h-4 w-4" />
 					<span>{cluster.memberCount} member{cluster.memberCount !== 1 ? 's' : ''}</span>
 				</div>
 
 				<!-- Summary -->
 				<div class="cluster-summary">
-					<Brain class="h-4 w-4" />
+					<Icon name="brain" class="h-4 w-4" />
 					<p>{cluster.summary}</p>
 				</div>
 

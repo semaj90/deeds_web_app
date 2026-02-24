@@ -1,19 +1,5 @@
 <!-- RAG + KAG + DAG Pipeline Orchestrator — 3-step evidence retrieval + answer generation -->
 <script lang="ts">
-	import Search from '@lucide/svelte/icons/search';
-	import CheckCircle from '@lucide/svelte/icons/check-circle';
-	import Brain from '@lucide/svelte/icons/brain';
-	import Loader from '@lucide/svelte/icons/loader';
-	import AlertCircle from '@lucide/svelte/icons/alert-circle';
-	import Database from '@lucide/svelte/icons/database';
-	import Network from '@lucide/svelte/icons/network';
-	import Zap from '@lucide/svelte/icons/zap';
-	import FileText from '@lucide/svelte/icons/file-text';
-	import ThumbsUp from '@lucide/svelte/icons/thumbs-up';
-	import ThumbsDown from '@lucide/svelte/icons/thumbs-down';
-	import Copy from '@lucide/svelte/icons/copy';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-
 	interface Props {
 		caseId?: string;
 		initialQuery?: string;
@@ -264,11 +250,11 @@
 			<div class="pipeline-step {status}">
 				<div class="step-icon">
 					{#if status === 'active'}
-						<Loader size={16} class="animate-spin" />
+						<span class="i-lucide-loader animate-spin w-4 h-4 inline-block" />
 					{:else if status === 'done'}
-						<CheckCircle size={16} />
+						<span class="i-lucide-check-circle w-4 h-4 inline-block" />
 					{:else if status === 'error'}
-						<AlertCircle size={16} />
+						<span class="i-lucide-alert-circle w-4 h-4 inline-block" />
 					{:else}
 						<svelte:component this={step.icon} size={16} />
 					{/if}
@@ -301,9 +287,9 @@
 				disabled={!query.trim() || pipelineStep === 'searching' || pipelineStep === 'generating'}
 			>
 				{#if pipelineStep === 'searching'}
-					<Loader size={16} class="animate-spin" /> Searching...
+					<span class="i-lucide-loader animate-spin w-4 h-4 inline-block" /> Searching...
 				{:else}
-					<Search size={16} /> Search
+					<span class="i-lucide-search w-4 h-4 inline-block" /> Search
 				{/if}
 			</button>
 		</div>
@@ -333,15 +319,15 @@
 			</label>
 			<button class="health-btn" onclick={checkHealth} disabled={isCheckingHealth}>
 				{#if isCheckingHealth}
-					<Loader size={14} class="animate-spin" />
+					<span class="i-lucide-loader animate-spin w-3.5 h-3.5 inline-block" />
 				{:else}
-					<Database size={14} />
+					<span class="i-lucide-database w-3.5 h-3.5 inline-block" />
 				{/if}
 				Health
 			</button>
 			{#if pipelineStep !== 'idle'}
 				<button class="reset-btn" onclick={resetPipeline}>
-					<RefreshCw size={14} /> Reset
+					<span class="i-lucide-refresh-cw w-3.5 h-3.5 inline-block" /> Reset
 				</button>
 			{/if}
 		</div>
@@ -376,7 +362,7 @@
 	<!-- Error Message -->
 	{#if errorMessage}
 		<div class="error-bar">
-			<AlertCircle size={16} />
+			<span class="i-lucide-alert-circle w-4 h-4 inline-block" />
 			<span>{errorMessage}</span>
 			<button onclick={() => (errorMessage = '')}>dismiss</button>
 		</div>
@@ -388,9 +374,9 @@
 			{#if searchTiming.embedMs}<span>Embed: {searchTiming.embedMs}ms</span>{/if}
 			{#if searchTiming.searchMs}<span>Search: {searchTiming.searchMs}ms</span>{/if}
 			{#if searchTiming.rerankMs}<span>Rerank: {searchTiming.rerankMs}ms</span>{/if}
-			{#if searchTiming.hopMs}<span><Network size={12} /> DAG-hop: {searchTiming.hopMs}ms</span>{/if}
-			{#if searchTiming.kagMs}<span><Zap size={12} /> KAG: {searchTiming.kagMs}ms</span>{/if}
-			{#if searchTiming.dagMs}<span><FileText size={12} /> DAG: {searchTiming.dagMs}ms</span>{/if}
+			{#if searchTiming.hopMs}<span><span class="i-lucide-network w-3 h-3 inline-block" /> DAG-hop: {searchTiming.hopMs}ms</span>{/if}
+			{#if searchTiming.kagMs}<span><span class="i-lucide-zap w-3 h-3 inline-block" /> KAG: {searchTiming.kagMs}ms</span>{/if}
+			{#if searchTiming.dagMs}<span><span class="i-lucide-file-text w-3 h-3 inline-block" /> DAG: {searchTiming.dagMs}ms</span>{/if}
 			<span class="timing-total">Total: {searchTiming.totalMs ?? 0}ms</span>
 			{#if searchTiming.cacheSource}<span class="cache-tag">{searchTiming.cacheSource}</span>{/if}
 		</div>
@@ -431,9 +417,9 @@
 							{#if pipelineStep === 'validating'}
 								<button class="validation-btn" onclick={() => toggleValidation(chunkId)}>
 									{#if status === 'approved'}
-										<ThumbsUp size={14} />
+										<span class="i-lucide-thumbs-up w-3.5 h-3.5 inline-block" />
 									{:else if status === 'rejected'}
-										<ThumbsDown size={14} />
+										<span class="i-lucide-thumbs-down w-3.5 h-3.5 inline-block" />
 									{:else}
 										<span class="unset">?</span>
 									{/if}
@@ -491,7 +477,7 @@
 	{#if pipelineStep === 'complete' && answer}
 		<div class="answer-section">
 			<div class="answer-header">
-				<h3><Brain size={18} /> Generated Answer</h3>
+				<h3><span class="i-lucide-brain w-4.5 h-4.5 inline-block" /> Generated Answer</h3>
 				<div class="answer-meta">
 					<span class="confidence" title="Answer confidence">
 						{(answerConfidence * 100).toFixed(0)}% confidence
@@ -499,7 +485,7 @@
 					<span class="model-tag">{answerModel}</span>
 					<span class="gen-time">{generationTimeMs}ms</span>
 					<button class="copy-btn" onclick={() => copyToClipboard(answer)}>
-						<Copy size={14} /> Copy
+						<span class="i-lucide-copy w-3.5 h-3.5 inline-block" /> Copy
 					</button>
 				</div>
 			</div>

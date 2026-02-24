@@ -1,12 +1,6 @@
 <script lang="ts">
 	import type { Evidence } from '$lib/types/evidence';
-	import FileText from '@lucide/svelte/icons/file-text';
-	import Headphones from '@lucide/svelte/icons/headphones';
-	import ImageIcon from '@lucide/svelte/icons/image';
-	import LinkIcon from '@lucide/svelte/icons/link';
-	import SearchIcon from '@lucide/svelte/icons/search';
-	import TagIcon from '@lucide/svelte/icons/tag';
-	import Video from '@lucide/svelte/icons/video';
+	import Icon from '$lib/components/ui/Icon.svelte';
 	import { quintOut } from 'svelte/easing';
 	import { scale } from 'svelte/transition';
 
@@ -32,19 +26,19 @@
 		oncompared
 	}: Props = $props();
 
-	const getIcon = (type: Evidence['type']): any => {
+	const getIconName = (type: Evidence['type']): string => {
 		switch (type) {
 			case 'document':
-				return FileText;
+				return 'file-text';
 			case 'image':
-				return ImageIcon;
+				return 'image';
 			case 'video':
-				return Video;
+				return 'video';
 			case 'audio':
-				return Headphones;
+				return 'headphones';
 			case 'link':
-				return LinkIcon;
-			default:return FileText;
+				return 'link';
+			default:return 'file-text';
 		}
 	};
 
@@ -62,7 +56,7 @@
 	let compareError: string | null = $state(null);
 
 	const evidenceType = $derived(evidence?.evidenceType ?? evidence?.type ?? 'document');
-	const IconComponent = $derived(getIcon(evidenceType));
+	const iconName = $derived(getIconName(evidenceType));
 
 	function handleMouseEnter() {
 		if (expandOnHover) isHovered = true;
@@ -125,7 +119,7 @@
 			class:text-accent={evidenceType === 'image'}
 			class:text-warning={evidenceType === 'audio'}
 		>
-			<IconComponent size={16} />
+			<Icon name={iconName} size={16} />
 			<span>{evidenceType}</span>
 		</div>
 		<div class="flex items-center gap-1 opacity-0 group-hover:opacity-100">
@@ -137,7 +131,7 @@
 					aria-busy={comparing}
 					disabled={comparing}
 				>
-					<SearchIcon size={14} />
+					<Icon name="search" size={14} />
 				</button>
 			{/if}
 		</div>
@@ -162,7 +156,7 @@
 					<track kind="captions" />
 				</video>
 				<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/60 rounded-full p-3">
-					<Video size={24} />
+					<Icon name="video" size={24} />
 				</div>
 			</div>
 		{/if}
@@ -202,7 +196,7 @@
 				<div class="flex flex-wrap gap-1 mt-2">
 					{#each (Array.isArray(evidence.tags) ? evidence.tags.slice(0, 3) : []) as tag}
 						<span class="flex items-center gap-1 text-xs bg-info/10 text-info px-2 py-0.5 rounded border border-info/20">
-							<TagIcon size={10} />
+							<Icon name="tag" size={10} />
 							{tag}
 						</span>
 					{/each}
@@ -223,7 +217,7 @@
 				rel="noopener noreferrer"
 				class="flex items-center gap-1 text-info hover:text-info text-sm font-medium"
 			>
-				<LinkIcon size={14} />
+				<Icon name="link" size={14} />
 				Open Link
 			</a>
 		</div>

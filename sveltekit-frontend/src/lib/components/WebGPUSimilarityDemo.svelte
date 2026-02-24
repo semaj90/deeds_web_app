@@ -2,11 +2,6 @@
  import { getCachedEmbedding, subscribeEmbedding } from '$lib/client/subscribeEmbedding.svelte';
  import type { QuantizedEmbedding } from '$lib/shared/embedding-types';
  import { webgpuSimilarityService, type SimilaritySearchResult } from '$lib/webgpu/webgpu-similarity-service';
- import Cpu from '@lucide/svelte/icons/cpu';
- import Loader from '@lucide/svelte/icons/loader';
- import Search from '@lucide/svelte/icons/search';
- import Zap from '@lucide/svelte/icons/zap';
-
  let queryText = $state('');
  let searchResults = $state<SimilaritySearchResult | null>(null);
  let isSearching = $state(false);
@@ -95,7 +90,7 @@
  <!-- Header -->
  <header class="mb-6">
  <h2 class="text-xl font-bold flex items-center gap-2">
- <Zap class="w-6 h-6 text-info" />
+ <span class="i-lucide-zap w-6 h-6 text-info inline-block" />
  WebGPU Similarity Search
  </h2>
  <p class="text-sm opacity-70 mt-1">
@@ -118,9 +113,9 @@
  disabled={isSearching || documentEmbeddings.length === 0}
  >
  {#if isSearching}
- <Loader class="animate-spin w-4 h-4" />
+ <span class="i-lucide-loader animate-spin w-4 h-4 inline-block" />
  {:else}
- <Search class="w-4 h-4" />
+ <span class="i-lucide-search w-4 h-4 inline-block" />
  {/if}
  Search
  </button>
@@ -133,10 +128,10 @@
  <span>Documents: {documentEmbeddings.length}/10</span>
  <span class="flex items-center gap-1">
  {#if webgpuSimilarityService.getStats().webgpuSupported}
- <Zap class="w-3 h-3 text-accent" />
+ <span class="i-lucide-zap w-3 h-3 text-accent inline-block" />
  WebGPU
  {:else}
- <Cpu class="w-3 h-3 text-warning" />
+ <span class="i-lucide-cpu w-3 h-3 text-warning inline-block" />
  CPU Fallback
  {/if}
  </span>
@@ -189,7 +184,7 @@
  {#if documentEmbeddings.length === 0}
  <div class="flex-1 flex items-center justify-center text-center">
  <div>
- <Loader class="animate-spin w-8 h-8 mx-auto mb-4 text-info" />
+ <span class="i-lucide-loader animate-spin w-8 h-8 mx-auto mb-4 text-info inline-block" />
  <p class="text-sm opacity-70">Initializing sample embeddings...</p>
  <p class="text-xs opacity-50 mt-2">This may take a moment for first-time setup</p>
  </div>
@@ -202,5 +197,4 @@
  .bg-noir { background-color: #1a1a1a; }
  .text-beige { color: #f5f5dc; }
 </style>
-
 

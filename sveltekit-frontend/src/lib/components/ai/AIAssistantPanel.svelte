@@ -1,9 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/Button.svelte';
 	import { aiAssistantStore } from '$lib/stores/unified/ai-assistant-store.svelte.js';
-	import Loader2 from '@lucide/svelte/icons/loader-2';
-	import Zap from '@lucide/svelte/icons/zap';
-
 	let {
 		caseId = 'case-001',
 		selectedEvidenceIds = [],
@@ -54,7 +51,7 @@
 		{#if isAssistantLoading || isLoading}
 			<div class="flex justify-start">
 				<div class="nes-balloon from-left">
-					<Loader2 class="animate-spin" />
+					<span class="i-lucide-loader-2 animate-spin inline-block" />
 				</div>
 			</div>
 		{/if}
@@ -69,7 +66,7 @@
 			onkeydown={(e) => e.key === 'Enter' && handleSendMessage()}
 		/>
 		<Button onclick={handleSendMessage} disabled={isLoading || !userInput.trim()}>
-			<Zap size={16} />
+			<span class="i-lucide-zap w-4 h-4 inline-block" />
 		</Button>
 	</div>
 </div>
@@ -77,9 +74,4 @@
 <style>
 	.hidden { display: none;}
 </style>
-
-
-
-
-
 

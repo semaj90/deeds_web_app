@@ -1,1 +1,1 @@
-// SSR enabled — @lucide/svelte is SSR-safe, no browser-only APIs in module scope
+// SSR enabled — icons use UnoCSS CSS classes (no JS components)

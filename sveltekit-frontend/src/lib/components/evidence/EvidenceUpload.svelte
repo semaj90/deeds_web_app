@@ -1,15 +1,7 @@
 <script lang="ts">
   import { toastStore as toast } from '$lib/stores/unified/toast-store.svelte';
   import Button from '$lib/components/ui/Button.svelte';
-  import Upload from '@lucide/svelte/icons/upload';
-  import FileText from '@lucide/svelte/icons/file-text';
-  import ImageIcon from '@lucide/svelte/icons/image';
-  import Video from '@lucide/svelte/icons/video';
-  import Music from '@lucide/svelte/icons/music';
-  import FileIcon from '@lucide/svelte/icons/file';
-  import X from '@lucide/svelte/icons/x';
-  import CheckCircle from '@lucide/svelte/icons/check-circle';
-  import AlertCircle from '@lucide/svelte/icons/alert-circle';
+  import Icon from '$lib/components/ui/Icon.svelte';
 
   // Props
   interface Props {
@@ -42,28 +34,28 @@
     admissibilityNotes: ''
   });
 
-  // File type icons
-  const fileTypeIcons: Record<string, any> = {
-    'image/jpeg': ImageIcon,
-    'image/png': ImageIcon,
-    'image/gif': ImageIcon,
-    'image/webp': ImageIcon,
-    'video/mp4': Video,
-    'video/avi': Video,
-    'video/mov': Video,
-    'video/wmv': Video,
-    'audio/mp3': Music,
-    'audio/wav': Music,
-    'audio/m4a': Music,
-    'application/pdf': FileText,
-    'text/plain': FileText,
-    'application/msword': FileText,
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': FileText
+  // File type icon names
+  const fileTypeIcons: Record<string, string> = {
+    'image/jpeg': 'image',
+    'image/png': 'image',
+    'image/gif': 'image',
+    'image/webp': 'image',
+    'video/mp4': 'video',
+    'video/avi': 'video',
+    'video/mov': 'video',
+    'video/wmv': 'video',
+    'audio/mp3': 'music',
+    'audio/wav': 'music',
+    'audio/m4a': 'music',
+    'application/pdf': 'file-text',
+    'text/plain': 'file-text',
+    'application/msword': 'file-text',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'file-text'
   };
 
-  // Get file type icon
-  function getFileIcon(file: File) {
-    return fileTypeIcons[file.type] || FileIcon;
+  // Get file type icon name
+  function getFileIconName(file: File): string {
+    return fileTypeIcons[file.type] || 'file';
   }
 
   // Format file size
@@ -225,7 +217,7 @@
 <div class="evidence-upload-container">
   <!-- Upload Button -->
   <Button onclick={() => showUploadDialog = true} class="w-full">
-    <Upload class="w-4 h-4 mr-2" />
+    <Icon name="upload" class="w-4 h-4 mr-2" />
     Upload Evidence
   </Button>
 
@@ -245,7 +237,7 @@
             role="button"
             tabindex="0"
           >
-            <Upload class="w-12 h-12 text-sand/40 mx-auto mb-4" />
+            <Icon name="upload" class="w-12 h-12 text-sand/40 mx-auto mb-4" />
             <p class="text-lg font-medium text-sand mb-2">
               Drop files here or click to select
             </p>
@@ -276,7 +268,7 @@
                   <div class="border rounded-lg p-4">
                     <div class="flex items-start gap-3">
                       <div class="flex-shrink-0">
-                        <svelte:component this={getFileIcon(fileData.file)} class="w-8 h-8 text-sand/40" />
+                        <Icon name={getFileIconName(fileData.file)} class="w-8 h-8 text-sand/40" />
                       </div>
 
                       <div class="flex-1 min-w-0">
@@ -288,7 +280,7 @@
                             onclick={() => removeFile(fileData.id)}
                             class="p-1 hover:bg-sand/10 rounded"
                           >
-                            <X class="w-4 h-4" />
+                            <Icon name="x" class="w-4 h-4" />
                           </button>
                         </div>
 
@@ -380,7 +372,7 @@
               {#if completedUploads.length > 0}
                 <div class="mb-4">
                   <div class="flex items-center gap-2 mb-2">
-                    <CheckCircle class="w-4 h-4 text-accent" />
+                    <Icon name="check-circle" class="w-4 h-4 text-accent" />
                     <span class="text-sm font-medium text-accent">
                       Successfully uploaded ({completedUploads.length})
                     </span>
@@ -388,7 +380,7 @@
                   <div class="space-y-1">
                     {#each completedUploads as upload}
                       <div class="flex items-center gap-2 text-sm text-accent">
-                        <CheckCircle class="w-3 h-3" />
+                        <Icon name="check-circle" class="w-3 h-3" />
                         <span>{upload.title}</span>
                       </div>
                     {/each}
@@ -399,7 +391,7 @@
               {#if failedUploads.length > 0}
                 <div>
                   <div class="flex items-center gap-2 mb-2">
-                    <AlertCircle class="w-4 h-4 text-danger" />
+                    <Icon name="alert-circle" class="w-4 h-4 text-danger" />
                     <span class="text-sm font-medium text-danger">
                       Failed uploads ({failedUploads.length})
                     </span>
@@ -407,7 +399,7 @@
                   <div class="space-y-1">
                     {#each failedUploads as upload}
                       <div class="flex items-center gap-2 text-sm text-danger">
-                        <AlertCircle class="w-3 h-3" />
+                        <Icon name="alert-circle" class="w-3 h-3" />
                         <span>{upload.title}: {upload.error}</span>
                       </div>
                     {/each}

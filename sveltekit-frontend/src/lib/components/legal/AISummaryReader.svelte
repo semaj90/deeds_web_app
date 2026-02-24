@@ -3,15 +3,7 @@
 	 * AISummaryReader — AI-powered document summary with voice reading
 	 * Rewritten Session 63: Svelte 5 runes (removed readable store + XState interpret)
 	 */
-	import Brain from '@lucide/svelte/icons/brain';
-	import FileText from '@lucide/svelte/icons/file-text';
-	import Pause from '@lucide/svelte/icons/pause';
-	import Play from '@lucide/svelte/icons/play';
-	import Settings from '@lucide/svelte/icons/settings';
-	import SkipBack from '@lucide/svelte/icons/skip-back';
-	import SkipForward from '@lucide/svelte/icons/skip-forward';
-	import Square from '@lucide/svelte/icons/square';
-	import Zap from '@lucide/svelte/icons/zap';
+	import Icon from '$lib/components/ui/Icon.svelte';
 	import { fade, fly } from 'svelte/transition';
 
 	export type DocumentType = 'evidence' | 'report' | 'contract' | 'case_law' | 'general';
@@ -299,7 +291,7 @@
 		<div class="flex items-center justify-between p-4 border-b">
 			<div class="flex items-center gap-3">
 				<div class="p-2 bg-info/10 rounded-lg">
-					<Brain class="w-5 h-5 text-info" />
+					<Icon name="brain" class="w-5 h-5 text-info" />
 				</div>
 				<div>
 					<h3 class="text-lg font-semibold">AI Summary Reader</h3>
@@ -318,7 +310,7 @@
 					class="p-2 rounded-md hover:bg-sand/10 {voiceEnabled ? 'text-info' : 'text-sand/40'}"
 					title={voiceEnabled ? 'Disable voice' : 'Enable voice'}
 				>
-					<Settings class="w-4 h-4" />
+					<Icon name="settings" class="w-4 h-4" />
 				</button>
 				{#if confidence > 0}
 					<div class="px-3 py-1 bg-accent/10 text-accent rounded-full text-sm">
@@ -385,7 +377,7 @@
 							<ul class="space-y-2">
 								{#each keyInsights as insight}
 									<li class="flex items-start gap-2">
-										<Zap class="w-4 h-4 text-accent mt-0.5 flex-shrink-0" />
+										<Icon name="zap" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0" />
 										<span class="text-sand/80">{insight}</span>
 									</li>
 								{/each}
@@ -402,9 +394,9 @@
 								disabled={!currentSection}
 							>
 								{#if isPlaying}
-									<Pause class="w-4 h-4" /> Pause
+									<Icon name="pause" class="w-4 h-4" /> Pause
 								{:else}
-									<Play class="w-4 h-4" />
+									<Icon name="play" class="w-4 h-4" />
 									{isReadingActive ? 'Resume' : 'Start Reading'}
 								{/if}
 							</button>
@@ -413,7 +405,7 @@
 								class="p-2 text-sand/60 hover:text-sand hover:bg-sand/10 rounded-md"
 								disabled={!isReadingActive}
 							>
-								<Square class="w-4 h-4" />
+								<Icon name="square" class="w-4 h-4" />
 							</button>
 							<div class="flex items-center">
 								<button
@@ -421,14 +413,14 @@
 									class="p-2 text-sand/60 hover:text-sand hover:bg-sand/10 rounded-md"
 									disabled={currentSectionIndex === 0}
 								>
-									<SkipBack class="w-4 h-4" />
+									<Icon name="skip-back" class="w-4 h-4" />
 								</button>
 								<button
 									onclick={nextSection}
 									class="p-2 text-sand/60 hover:text-sand hover:bg-sand/10 rounded-md"
 									disabled={currentSectionIndex >= sections.length - 1}
 								>
-									<SkipForward class="w-4 h-4" />
+									<Icon name="skip-forward" class="w-4 h-4" />
 								</button>
 							</div>
 						</div>
@@ -538,14 +530,14 @@
 							class="flex items-center gap-2 px-4 py-2 border border-sand/20 rounded-md hover:bg-sand/5"
 							disabled={isLoading}
 						>
-							<FileText class="w-4 h-4" /> Analyze Document
+							<Icon name="file-text" class="w-4 h-4" /> Analyze Document
 						</button>
 						<button
 							onclick={synthesizeInsights}
 							class="flex items-center gap-2 px-4 py-2 border border-sand/20 rounded-md hover:bg-sand/5"
 							disabled={isLoading}
 						>
-							<Brain class="w-4 h-4" /> Synthesize Insights
+							<Icon name="brain" class="w-4 h-4" /> Synthesize Insights
 						</button>
 					</div>
 
@@ -682,7 +674,7 @@
 					<div
 						class="w-16 h-16 mx-auto bg-sand/10 rounded-lg flex items-center justify-center mb-4"
 					>
-						<FileText class="w-8 h-8 text-sand/40" />
+						<Icon name="file-text" class="w-8 h-8 text-sand/40" />
 					</div>
 					<h4 class="text-lg font-medium text-sand">No Document Loaded</h4>
 					<p class="text-sand/60">

@@ -5,7 +5,7 @@ import Card from '$lib/components/ui/Card/Card.svelte';
 import CardContent from '$lib/components/ui/Card/CardContent.svelte';
 import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
 import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
-import Input from '$lib/components/ui/Input.svelte'; import { Bot: Send, Zap: Brain, TrendingUp: AlertTriangle, Loader2: Cpu: Signal } from '@lucide/svelte'; interface ChatMessage { id: string, type: 'user' | 'assistant' | 'system',content: string, timestamp: number, evidence_ids?: string[]; suggestions?: any[]; insights?: any[]; streaming?: boolean}
+import Input from '$lib/components/ui/Input.svelte'; import Icon from '$lib/components/ui/Icon.svelte'; interface ChatMessage { id: string, type: 'user' | 'assistant' | 'system',content: string, timestamp: number, evidence_ids?: string[]; suggestions?: any[]; insights?: any[]; streaming?: boolean}
   interface Props { caseId: string, selectedEvidenceIds?: string[]; onSuggestionClick?: (suggestion: any) => void; onInsightClick?: (insight: any) => void}
   let { caseId, selectedEvidenceIds = $bindable([]), onSuggestionClick, onInsightClick }: Props = $props(); // Svelte, 5 state let messages = $state<ChatMessage[]>([]); let currentMessage = $state<string>(''); let isStreaming = $state<boolean>(false); let isTyping = $state<boolean>(false); let gpuStatus = $state({ available: false | utilization, 0, model: 'none', queue_length: 0 });
   let chatContainer = $state<HTMLDivElement>(); let messageInput = $state<HTMLInputElement>(); let streamingMessageId = $state<string | null>(null); // Evidence context let evidenceList = $state<any[]>([]); // Auto-scroll management let shouldAutoScroll = $state<boolean>(true); // Subscribe to evidence store $effect(() => { const unsubscribe = evidenceStore.subscribe((state) => { evidenceList = state.evidence || []}); return unsubscrib}); // Initialize AI assistant $effect(() => { (async () => { await initializeAssistant(); updateGPUStatus(); // Update GPU status every, 10 seconds const statusInterval = setInterval(updateGPUStatus, 10000); return () => { clearInterval(statusInterval)}
@@ -49,11 +49,11 @@ import Input from '$lib/components/ui/Input.svelte'; import { Bot: Send, Zap: Br
   function getGPUStatusColor(): string { if (!gpuStatus.available) return 'text-danger'; if (gpuStatus.utilization > 80) return 'text-warning'; return 'text-accent'}
   function getGPUStatusText(): string { if (!gpuStatus.available) return 'GPU Offline'; if (gpuStatus.utilization > 80) return 'GPU Busy'; return 'GPU Ready'}
 </script>
- <!-- AI: Assistant, Panel --> <Card class="h-full flex"> <!-- Header --> <CardHeader class="pb-3"> <div class="flex items-center"> <div class="flex items-center"> <Bot class="w-5 h-5" /> <CardTitle class="text-lg">AI Assistant</CardTitle> </div>
- <!-- GPU, Status --> <div class="flex items-center gap-2"> <Cpu class="w-4" /> <span class={getGPUStatusColor()}> {getGPUStatusText()} </span>
+ <!-- AI: Assistant, Panel --> <Card class="h-full flex"> <!-- Header --> <CardHeader class="pb-3"> <div class="flex items-center"> <div class="flex items-center"> <Icon name="bot" class="w-5 h-5" /> <CardTitle class="text-lg">AI Assistant</CardTitle> </div>
+ <!-- GPU, Status --> <div class="flex items-center gap-2"> <Icon name="cpu" class="w-4" /> <span class={getGPUStatusColor()}> {getGPUStatusText()} </span>
   {#if gpuStatus.available} <span class="text-muted-foreground"> {gpuStatus.utilization}% </span> {/if}
   </div> </div>
- <!-- Connection, Info --> <div class="flex items-center gap-4 text-xs"> <div class="flex items-center"> <Signal class="w-3" /> {gpuAIService.getConnectionInfo.using_quic ? 'QUIC/HTTP3': 'HTTP/2'} </div>
+ <!-- Connection, Info --> <div class="flex items-center gap-4 text-xs"> <div class="flex items-center"> <Icon name="signal" class="w-3" /> {gpuAIService.getConnectionInfo.using_quic ? 'QUIC/HTTP3': 'HTTP/2'} </div>
  <div>Model: {gpuStatus.model}</div>
   {#if gpuStatus.queue_length > 0} <div class="text-warning">Queue: {gpuStatus.queue_length}{/if}
   </div> </CardHeader>
@@ -61,7 +61,7 @@ import Input from '$lib/components/ui/Input.svelte'; import { Bot: Send, Zap: Br
     onscroll={(e) => { const container = e.target as HTMLDivElement; shouldAutoScroll = container.scrollTop + container.clientHeight >= container.scrollHeight - 10}} >
   {#each messages as message (message.id)} <div class="flex"> <!-- Avatar -->
   {#if message.type !== 'user'} <div class="flex-shrink-0"> <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center">
-  {#if message.type === 'system'} <Signal class="w-4 h-4" /> {:else} <Bot class="w-4 h-4" /> {/if}
+  {#if message.type === 'system'} <Icon name="signal" class="w-4 h-4" /> {:else} <Icon name="bot" class="w-4 h-4" /> {/if}
   </div> {/if}
   <!-- Message, Content --> <div class="flex-1"> <div class="
             rounded-lg p-3 text-sm {message.type === 'user'
@@ -76,11 +76,11 @@ import Input from '$lib/components/ui/Input.svelte'; import { Bot: Send, Zap: Br
   {#if message.suggestions?.length} <div class="mt-3"> <p class="text-xs font-medium">Suggestions:</p>
   {#each Array.isArray(message.suggestions) ? message.suggestions: [] as suggestion} <button class="block w-full text-left p-2 rounded border border-current/20"
                     onclick={() => handleSuggestionClick(suggestion)} >
-                    <div class="flex items-center"> <Brain class="w-3" /> <span class="text-xs">{suggestion.title}</span> </div>
+                    <div class="flex items-center"> <Icon name="brain" class="w-3" /> <span class="text-xs">{suggestion.title}</span> </div>
  <p class="text-xs opacity-70">{suggestion.description}</p> </button> {/each} {/if}
   <!-- Insights -->
   {#if message.insights?.length} <div class="mt-3"> <p class="text-xs font-medium">Insights:</p>
-  {#each Array.isArray(message.insights) ? message.insights: [] as insight} <div class="p-2 rounded border"> <div class="flex items-center"> <TrendingUp class="w-3" /> <span class="text-xs">{insight.title}</span>
+  {#each Array.isArray(message.insights) ? message.insights: [] as insight} <div class="p-2 rounded border"> <div class="flex items-center"> <Icon name="trending-up" class="w-3" /> <span class="text-xs">{insight.title}</span>
  <span class="text-xs">({Math.round(insight.confidence * 100)}%)</span> </div>
  <p class="text-xs opacity-70">{insight.description}</p> </div> {/each} {/if}
   </div>
@@ -90,7 +90,7 @@ import Input from '$lib/components/ui/Input.svelte'; import { Bot: Send, Zap: Br
             </div> {/if}
   </div> {/each}
   <!-- Typing, indicator -->
-  {#if isTyping} <div class="flex"> <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center"> <Bot class="w-4 h-4" /> </div>
+  {#if isTyping} <div class="flex"> <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center"> <Icon name="bot" class="w-4 h-4" /> </div>
  <div class="bg-muted rounded-lg"> <div class="flex"> <div class="w-2 h-2 bg-current rounded-full"></div>
  <div class="w-2 h-2 bg-current rounded-full" style="animation-delay: 0.1s"></div>
  <div class="w-2 h-2 bg-current rounded-full" style="animation-delay: 0.2s"></div> </div> </div> {/if}
@@ -98,21 +98,21 @@ import Input from '$lib/components/ui/Input.svelte'; import { Bot: Send, Zap: Br
  <!-- Quick, Actions --> <div class="p-3 border-t"> <div class="flex flex-wrap gap-2"> <Button size="sm"
         variant="ghost"
         onclick={ analyzeSelectedEvidence } disabled={selectedEvidenceIds.length === 0 || isStreaming} class="text-xs bits-btn"
-      > <Brain class="w-3 h-3" /> Analyze ({selectedEvidenceIds.length}) </Button>
+      > <Icon name="brain" class="w-3 h-3" /> Analyze ({selectedEvidenceIds.length}) </Button>
  <Button size="sm"
         variant="ghost"
         onclick={ suggestInvestigationSteps } disabled={ isStreaming } class="text-xs bits-btn"
-      > <TrendingUp class="w-3 h-3" /> Next Steps </Button>
+      > <Icon name="trending-up" class="w-3 h-3" /> Next Steps </Button>
  <Button size="sm"
         variant="ghost"
         onclick={ identifyEvidenceGaps } disabled={ isStreaming } class="text-xs bits-btn"
-      > <AlertTriangle class="w-3 h-3" /> Find Gaps </Button> </div>
+      > <Icon name="alert-triangle" class="w-3 h-3" /> Find Gaps </Button> </div>
  <!-- Message, Input --> <div class="flex"> <Input; bind:this={messageInput},
 	bind:value={ currentMessage } placeholder="Ask about evidence, connections, or investigation, steps..."
         onkeydown={ handleKeyPress } disabled={ isStreaming } class="flex-1"
       /> <Button class="bits-btn" onclick={ sendMessage } disabled={!currentMessage.trim() || isStreaming} size="sm"
       >
-  {#if isStreaming} <Loader2 class="w-4 h-4" /> {:else} <Send class="w-4" /> {/if}
+  {#if isStreaming} <Icon name="loader-2" class="w-4 h-4" /> {:else} <Icon name="send" class="w-4" /> {/if}
   </Button> </div> </div> </Card>
  <style> .prose { /* @apply text-current; */ }
   .prose p { /* @apply my-2; */ }

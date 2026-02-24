@@ -1,5 +1,5 @@
 <script lang="ts">
-import X from '@lucide/svelte/icons/x';
+import Icon from '$lib/components/ui/Icon.svelte';
 import type { Snippet } from 'svelte';
 
 interface Props {
@@ -66,7 +66,7 @@ function handleBackdropClick(e: MouseEvent) {
 					onclick={handleClose}
 					aria-label="Close dialog"
 				>
-					<X class="w-5 h-5" />
+					<Icon name="x" class="w-5 h-5" />
 				</button>
 			</div>
 

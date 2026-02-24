@@ -1,13 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { scale, fly, fade } from 'svelte/transition';
-  import Bot from '@lucide/svelte/icons/bot';
-  import MessageCircle from '@lucide/svelte/icons/message-circle';
-  import Sparkles from '@lucide/svelte/icons/sparkles';
-  import Brain from '@lucide/svelte/icons/brain';
-  import ChevronUp from '@lucide/svelte/icons/chevron-up';
-  import Settings from '@lucide/svelte/icons/settings';
-
+  import Icon from '$lib/components/ui/Icon.svelte';
   interface Props {
     isVisible?: boolean;
     onToggle?: () => void;
@@ -43,9 +37,9 @@
   };
 
   const quickActions = [
-    { id: 'analyze', label: 'Analyze Case', icon: Brain, color: 'hover:bg-info/20' },
-    { id: 'search', label: 'Search Evidence', icon: MessageCircle, color: 'hover:bg-info/20' },
-    { id: 'assist', label: 'AI Assistant', icon: Sparkles, color: 'hover:bg-accent/20' }
+    { id: 'analyze', label: 'Analyze Case', icon: 'brain', color: 'hover:bg-info/20' },
+    { id: 'search', label: 'Search Evidence', icon: 'message-circle', color: 'hover:bg-info/20' },
+    { id: 'assist', label: 'AI Assistant', icon: 'sparkles', color: 'hover:bg-accent/20' }
   ];
 
   const handleQuickAction = (actionId: string) => {
@@ -91,9 +85,9 @@
             aria-label={action.label}
           >
             <div class="relative">
-              <svelte:component this={action.icon} class="w-5 h-5 text-sand/40 group-hover:text-white transition-colors" />
+              <Icon name={action.icon} class="w-5 h-5 text-sand/40 group-hover:text-white transition-colors" />
               <div class="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity">
-                <svelte:component this={action.icon} class="w-5 h-5 text-white blur-sm" />
+                <Icon name={action.icon} class="w-5 h-5 text-white blur-sm" />
               </div>
             </div>
             <span class="text-sm font-medium text-sand/40 group-hover:text-white whitespace-nowrap">
@@ -111,7 +105,7 @@
         in:scale={{ duration: 200, delay: 300 }}
         aria-label="AI Assistant Settings"
       >
-        <Settings class="w-5 h-5 text-sand/40 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
+        <span class="i-lucide-settings w-5 h-5 text-sand/40 group-hover:text-white group-hover:rotate-90 transition-all duration-300 inline-block" />
       </button>
     {/if}
 
@@ -135,10 +129,10 @@
 
       <div class="relative flex items-center justify-center w-12 h-12">
         {#if isExpanded}
-          <ChevronUp class="w-6 h-6 {getModeColor(aiMode)} transition-all duration-300 group-hover:scale-110" />
+          <span class="i-lucide-chevron-up w-6 h-6 {getModeColor(aiMode)} transition-all duration-300 group-hover:scale-110 inline-block" />
         {:else}
           <div class="relative">
-            <Bot class="w-7 h-7 {getModeColor(aiMode)} transition-all duration-300 group-hover:scale-110" />
+            <span class="i-lucide-bot w-7 h-7 {getModeColor(aiMode)} transition-all duration-300 group-hover:scale-110 inline-block" />
             {#if aiMode === 'thinking' || aiMode === 'active'}
               <div class="absolute -top-1 -right-1 w-3 h-3 bg-current rounded-full {pulseClasses[aiMode]}"></div>
             {/if}

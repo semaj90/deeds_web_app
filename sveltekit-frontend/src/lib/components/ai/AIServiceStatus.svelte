@@ -5,11 +5,6 @@
 		checkAIServices,
 		type ServiceStatus
 	} from '$lib/services/ai-pipeline-client';
-	import CheckCircle from '@lucide/svelte/icons/check-circle';
-	import XCircle from '@lucide/svelte/icons/x-circle';
-	import AlertCircle from '@lucide/svelte/icons/alert-circle';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-
 	let serviceStatus = $state<ServiceStatus | null>(null);
 	let isChecking = $state(false);
 	let lastUpdate = $state<Date | null>(null);
@@ -88,7 +83,7 @@
 			class="refresh-button"
 			class:spinning={isChecking}
 		>
-			<RefreshCw class="w-4" />
+			<span class="i-lucide-refresh-cw w-4 inline-block" />
 			{isChecking ? 'Checking...' : 'Refresh'}
 		</button>
 	</div>
@@ -101,13 +96,13 @@
 		class:offline={getOverallStatus() === 'offline'}
 	>
 		{#if getOverallStatus() === 'healthy'}
-			<CheckCircle class="w-5" />
+			<span class="i-lucide-check-circle w-5 inline-block" />
 			<span>All Systems Operational</span>
 		{:else if getOverallStatus() === 'degraded'}
-			<AlertCircle class="w-5" />
+			<span class="i-lucide-alert-circle w-5 inline-block" />
 			<span>Limited Functionality (Offline Mode Active)</span>
 		{:else}
-			<XCircle class="w-5" />
+			<span class="i-lucide-x-circle w-5 inline-block" />
 			<span>Offline Mode (Using Cached Data)</span>
 		{/if}
 	</div>
@@ -117,9 +112,9 @@
 		<div class="service-list">
 			<div class="service-item">
 				{#if serviceStatus.ollama}
-					<CheckCircle class="w-5 h-5 text-accent" />
+					<span class="i-lucide-check-circle w-5 h-5 text-accent inline-block" />
 				{:else}
-					<XCircle class="w-5 h-5 text-danger" />
+					<span class="i-lucide-x-circle w-5 h-5 text-danger inline-block" />
 				{/if}
 				<div class="service-info">
 					<div class="service-name">Ollama AI</div>
@@ -132,9 +127,9 @@
 
 			<div class="service-item">
 				{#if serviceStatus.embedding}
-					<CheckCircle class="w-5 h-5 text-accent" />
+					<span class="i-lucide-check-circle w-5 h-5 text-accent inline-block" />
 				{:else}
-					<XCircle class="w-5 h-5 text-danger" />
+					<span class="i-lucide-x-circle w-5 h-5 text-danger inline-block" />
 				{/if}
 				<div class="service-info">
 					<div class="service-name">Embedding Service</div>
@@ -147,9 +142,9 @@
 
 			<div class="service-item">
 				{#if serviceStatus.qdrant}
-					<CheckCircle class="w-5 h-5 text-accent" />
+					<span class="i-lucide-check-circle w-5 h-5 text-accent inline-block" />
 				{:else}
-					<XCircle class="w-5 h-5 text-danger" />
+					<span class="i-lucide-x-circle w-5 h-5 text-danger inline-block" />
 				{/if}
 				<div class="service-info">
 					<div class="service-name">Qdrant Vector DB</div>
@@ -162,9 +157,9 @@
 
 			<div class="service-item">
 				{#if serviceStatus.rag}
-					<CheckCircle class="w-5 h-5 text-accent" />
+					<span class="i-lucide-check-circle w-5 h-5 text-accent inline-block" />
 				{:else}
-					<XCircle class="w-5 h-5 text-danger" />
+					<span class="i-lucide-x-circle w-5 h-5 text-danger inline-block" />
 				{/if}
 				<div class="service-info">
 					<div class="service-name">RAG Pipeline</div>
@@ -180,7 +175,7 @@
 	<!-- Offline Queue Info -->
 	{#if offlineQueueCount > 0}
 		<div class="offline-queue">
-			<AlertCircle class="w-4 h-4" />
+			<span class="i-lucide-alert-circle w-4 h-4 inline-block" />
 			<span>
 				{offlineQueueCount} operation{offlineQueueCount > 1 ? 's' : ''} queued for retry
 			</span>

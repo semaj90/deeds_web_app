@@ -1,8 +1,5 @@
 <script lang="ts">
 	import { evidenceStore } from '$lib/stores/unified/evidence-store.svelte';
-	import FileUp from '@lucide/svelte/icons/file-up';
-	import Loader2 from '@lucide/svelte/icons/loader-2';
-
 	let {
 		caseId = 'case-001',
 		onUploadComplete = (result: any) => {}
@@ -56,11 +53,11 @@
 	aria-label="File drop zone"
 >
 	{#if isUploading}
-		<Loader2 class="animate-spin mb-2" size={32} />
+		<span class="i-lucide-loader-2 animate-spin mb-2 w-8 h-8 inline-block" />
 		<p class="text-xs">UPLOADING DATA...</p>
 		<progress class="nes-progress is-primary w-full max-w-[200px]" value={uploadProgress} max="100"></progress>
 	{:else}
-		<FileUp class="mb-2" size={32} />
+		<span class="i-lucide-file-up mb-2 w-8 h-8 inline-block" />
 		<p class="text-xs text-center">DROP INTEL HERE<br/>OR CLICK TO SCAN</p>
 		<label class="mt-2">
 			<span class="nes-btn is-primary text-xs">SELECT FILES</span>
@@ -72,9 +69,4 @@
 <style>
 	.hidden { display: none;}
 </style>
-
-
-
-
-
 

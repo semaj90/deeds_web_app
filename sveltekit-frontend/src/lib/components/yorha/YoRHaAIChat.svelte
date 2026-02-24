@@ -1,8 +1,5 @@
 <!-- YoRHa AI Chat Component with Enhanced RAG Integration --> <script lang="ts">
   import { Button } from '$lib/components/ui/button/index.js';
-  import Activity from '@lucide/svelte/icons/activity';
-  import BotIcon from '@lucide/svelte/icons/bot';
-  import SendIcon from '@lucide/svelte/icons/send';
   // Migrated to $effect
 
   // Svelte 5 state management
@@ -206,7 +203,7 @@ message: trimmed, history: messages })
   <div class="p-3 border-b border-[#3a3a3a] flex items-center justify-between bg-[#222]">
     <div class="flex items-center gap-2">
       <div class="w-8 h-8 rounded-full bg-panelSoft border border-sand/20 flex items-center justify-center flex-shrink-0">
-        <BotIcon class="w-5 h-5 text-info" />
+        <span class="i-lucide-bot w-5 h-5 text-info inline-block" />
       </div>
       <span class="font-bold tracking-tighter uppercase">YoRHa AI Interface</span>
     </div>
@@ -233,7 +230,7 @@ message: trimmed, history: messages })
     {/each}
     {#if isTyping}
       <div class="flex gap-2 items-center text-xs text-sand/60 animate-pulse">
-        <Activity class="w-4 h-4" /> <span>YoRHa processing...</span>
+        <span class="i-lucide-activity w-4 h-4 inline-block" /> <span>YoRHa processing...</span>
       </div>
     {/if}
   </div>
@@ -249,7 +246,7 @@ message: trimmed, history: messages })
         rows="2"
       ></textarea>
       <Button variant="outline" class="h-auto px-6 border-sand/20 bg-black hover:bg-panel" onclick={sendMessage}>
-        <SendIcon class="w-5 h-5" />
+        <span class="i-lucide-send w-5 h-5 inline-block" />
       </Button>
     </div>
     <div class="mt-2 flex justify-between text-[9px] text-sand/60">
@@ -268,9 +265,4 @@ message: trimmed, history: messages })
     border-radius: 10px;
   }
 </style>
-
-
-
-
-
 

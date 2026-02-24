@@ -1,12 +1,7 @@
 <script lang="ts">
   import Badge from "$lib/components/ui/Badge.svelte";
   import { formatDistanceToNow } from "date-fns";
-  import Archive from "@lucide/svelte/icons/archive";
-  import Calendar from "@lucide/svelte/icons/calendar";
-  import CheckCircle from "@lucide/svelte/icons/check-circle";
-  import Clock from "@lucide/svelte/icons/clock";
-  import FileText from "@lucide/svelte/icons/file-text";
-  import User from "@lucide/svelte/icons/user";
+  import Icon from '$lib/components/ui/Icon.svelte';
 
   interface CaseData {
     id: string;
@@ -76,21 +71,21 @@
     }
   }
 
-  function getStatusIcon(status: string) {
+  function getStatusIconName(status: string): string {
     switch (status) {
       case "open":
-        return CheckCircle;
+        return 'check-circle';
       case "in_progress":
-        return Clock;
+        return 'clock';
       case "closed":
-        return Archive;
+        return 'archive';
       case "archived":
-        return Archive;
-      default:return FileText;
+        return 'archive';
+      default:return 'file-text';
     }
   }
 
-  let StatusIcon = $derived(getStatusIcon(caseData.status));
+  let statusIconName = $derived(getStatusIconName(caseData.status));
   let formattedDate = $derived(
     formatDistanceToNow(new Date(caseData.openedAt), { addSuffix: true })
   );
@@ -108,7 +103,7 @@
   <div class="space-y-3">
     <!-- Case Title and Number -->
     <div class="flex items-center gap-2">
-      <StatusIcon class="w-5 h-5 text-sand/60" />
+      <Icon name={statusIconName} class="w-5 h-5 text-sand/60" />
       <h3 class="font-semibold text-lg truncate">
         {caseData.title}
       </h3>
@@ -136,18 +131,18 @@
     <!-- Metadata -->
     <div class="flex flex-wrap gap-4 text-sm text-sand/60">
       <div class="flex items-center gap-1">
-        <Calendar class="w-4 h-4" />
+        <Icon name="calendar" class="w-4 h-4" />
         <span>{formattedDate}</span>
       </div>
       {#if caseData.defendantName}
         <div class="flex items-center gap-1">
-          <User class="w-4 h-4" />
+          <Icon name="user" class="w-4 h-4" />
           <span>{caseData.defendantName}</span>
         </div>
       {/if}
       {#if caseData.evidenceCount && caseData.evidenceCount > 0}
         <div class="flex items-center gap-1">
-          <FileText class="w-4 h-4" />
+          <Icon name="file-text" class="w-4 h-4" />
           <span>{caseData.evidenceCount} evidence</span>
         </div>
       {/if}
@@ -156,7 +151,7 @@
     <!-- Court Date if available -->
     {#if caseData.courtDate}
       <div class="flex items-center gap-1 text-sm text-sand/60">
-        <Calendar class="w-4 h-4" />
+        <Icon name="calendar" class="w-4 h-4" />
         <span>Court: {new Date(caseData.courtDate).toLocaleDateString()}</span>
       </div>
     {/if}

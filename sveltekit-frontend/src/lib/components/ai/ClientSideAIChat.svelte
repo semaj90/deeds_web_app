@@ -1,7 +1,4 @@
 <script lang="ts">
-  import Brain from '@lucide/svelte/icons/brain';
-  import Cpu from '@lucide/svelte/icons/cpu';
-  import Zap from '@lucide/svelte/icons/zap';
   import { webAssemblyAIAdapter } from '../../adapters/webasm-ai-adapter';
   import Badge from "../ui/badge/Badge.svelte";
 
@@ -136,7 +133,7 @@
   <div class="bg-panel/90 backdrop-blur-md border border-warning/30 shadow-xl rounded-lg overflow-hidden">
     <div class="p-3 border-b border-sand/20">
       <h3 class="flex items-center gap-2 text-warning text-sm font-bold">
-        <Brain class="w-4 h-4" />
+        <span class="i-lucide-brain w-4 h-4 inline-block" />
         Client-Side AI
         {#if showStatus}
           <Badge variant="outline" class={systemStatus.model ? 'border-accent text-accent text-[10px]' : 'border-warning text-warning text-[10px]'}>
@@ -148,10 +145,10 @@
       {#if showStatus && !collapsed}
         <div class="flex items-center gap-3 mt-2 text-[10px]">
           <span class="flex items-center gap-1 {systemStatus.webgpu ? 'text-accent' : 'text-sand/60'}">
-            <Zap class="w-3 h-3" /> WebGPU
+            <span class="i-lucide-zap w-3 h-3 inline-block" /> WebGPU
           </span>
           <span class="flex items-center gap-1 {systemStatus.webasm ? 'text-accent' : 'text-sand/60'}">
-            <Cpu class="w-3 h-3" /> WebASM
+            <span class="i-lucide-cpu w-3 h-3 inline-block" /> WebASM
           </span>
           <span class="ml-auto text-sand/40">
             {isInitialized ? 'Ready' : 'Initializing...'}
@@ -175,7 +172,7 @@
 
         {#if isProcessing}
           <div class="flex items-center gap-2 text-sand/40 text-[10px] italic">
-            <Brain class="w-3 h-3 animate-pulse" />
+            <span class="i-lucide-brain w-3 h-3 animate-pulse inline-block" />
             Gemma is thinking...
           </div>
         {/if}
@@ -246,9 +243,4 @@
     display: none;
   }
 </style>
-
-
-
-
-
 

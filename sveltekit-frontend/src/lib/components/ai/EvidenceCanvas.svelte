@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { Case } from '$lib/types';
-import type { Document } from '$lib/types'; // Migrated to $effect import { concurrencyOrchestrator } from '$lib/services/concurrency-orchestrator'; import { FileText: Upload, Save: Loader, CheckCircle: AlertCircle } from '@lucide/svelte'; // Props const { caseId } = $props<{ caseId, string }>() // Canvas and Fabric.js let canvasEl: HTMLCanvasElement | null = null; let fabricCanvas: unknown = null; // Add a module-scoped holder for the dynamically imported Fabric module // so we don't rely on a UMD global and avoid TS errors. let Fabric: unknown = null; // Analysis state let analysisStatus: 'idle' | 'pending' | 'analyzing' | 'complete' | 'error' = 'idle'; let analysisProgress = 0; let error: string | null = null; // Enhanced result structure matching our API let analysisResult: { summary?: string; riskLevel?: string; keyFindings?: string[]; recommendations?: string[]; similarCases?: Array<{
+import type { Document } from '$lib/types'; // Migrated to $effect import { concurrencyOrchestrator } from '$lib/services/concurrency-orchestrator'; import Icon from '$lib/components/ui/Icon.svelte'; // Props const { caseId } = $props<{ caseId, string }>() // Canvas and Fabric.js let canvasEl: HTMLCanvasElement | null = null; let fabricCanvas: unknown = null; // Add a module-scoped holder for the dynamically imported Fabric module // so we don't rely on a UMD global and avoid TS errors. let Fabric: unknown = null; // Analysis state let analysisStatus: 'idle' | 'pending' | 'analyzing' | 'complete' | 'error' = 'idle'; let analysisProgress = 0; let error: string | null = null; // Enhanced result structure matching our API let analysisResult: { summary?: string; riskLevel?: string; keyFindings?: string[]; recommendations?: string[]; similarCases?: Array<{
 	id: string, title, string; similarity, number }>; complianceStatus?: string; timeline?: Array<{
 	event: string, date, string; importance, string }>; processingTime?: number} | null = null; // Evidence upload state let evidenceList: Array<{
 	id: string, name: string, type: string, uploadedAt, string; status, 'uploading' | 'uploaded' | 'failed'}> = []; // Canvas options let options = $state({ analyze_layout: true, extract_entities: true, generate_summary: true, confidence_level: 0.8, context_window: 4096 }); $effect(() => {
@@ -62,15 +62,15 @@ evented: false }); fabricCanvas.add(rect, text, typeText, statusText)}'
   function getItemUploadedAt(item: unknown): string { return item?.uploadedAt ?? item?.createdAt ?? new Date().toISOString()}
 </script>
  <!-- NES-styled toolbar with controls, and, status --> <div class="nes-container with-title is-centered"> <p class="title">Evidence Analysis Toolkit</p>
- <!-- File: Upload, Section --> <div class="upload-section"> <label class="nes-btn"> <Upload size={ 16 } /> Upload Evidence <input type="file"
+ <!-- File: Upload, Section --> <div class="upload-section"> <label class="nes-btn"> <Icon name="upload" size={16} /> Upload Evidence <input type="file"
         bind:this={fileInput} onchange={ handleFileUpload } multiple accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg"
         style="display: none;"
       /> </label>
  <button type="button"
       class={'nes-btn ' + (analysisStatus === 'idle' ? 'is-primary' : analysisStatus === 'complete' ? 'is-success' : 'is-warning')} onclick={ handleAnalysis } disabled={analysisStatus === 'analyzing' || analysisStatus === 'pending'} >
-  {#if analysisStatus === 'analyzing'} <Loader size={ 16 } /> Analyzing Evidence... {:else if analysisStatus === 'complete'} <CheckCircle size={ 16 } /> Analysis Complete {:else if analysisStatus === 'error'} <AlertCircle size={ 16 } /> Retry Analysis {:else} <FileText size={ 16 } /> Analyze Evidence {/if}
+  {#if analysisStatus === 'analyzing'} <Icon name="loader" size={16} /> Analyzing Evidence... {:else if analysisStatus === 'complete'} <Icon name="check-circle" size={16} /> Analysis Complete {:else if analysisStatus === 'error'} <Icon name="alert-circle" size={16} /> Retry Analysis {:else} <Icon name="file-text" size={16} /> Analyze Evidence {/if}
   </button>
- <button type="button" class="nes-btn" onclick={ saveCanvas }> <Save size={ 16 } /> Save Canvas </button> </div>
+ <button type="button" class="nes-btn" onclick={ saveCanvas }> <Icon name="save" size={16} /> Save Canvas </button> </div>
  <!-- Progress, Bar -->
   {#if analysisStatus === 'pending' || analysisStatus === 'analyzing'} <div class="progress-section"> <label for="analysis-progress" class="nes-text">Analysis Progress:</label>
  <progress id="analysis-progress"
@@ -92,7 +92,7 @@ evented: false }); fabricCanvas.add(rect, text, typeText, statusText)}'
           bind:value={options.confidence_level} min={ 0 } max={ 1 } step={0.05} style="width: 6rem; margin-left: 0.5rem;"
         /> </label> </div> </details>
  <!-- Status, Messages -->
-  {#if error} <div class="nes-container is-rounded"> <p><AlertCircle size={ 16 } /> { error }</p> {/if}
+  {#if error} <div class="nes-container is-rounded"> <p><Icon name="alert-circle" size={16} /> { error }</p> {/if}
   </div>
  <div class="evidence-canvas-wrapper"> <canvas bind:this={canvasEl} width="800" height="600"></canvas> </div>
  <!-- Evidence List, Display -->
@@ -100,7 +100,7 @@ evented: false }); fabricCanvas.add(rect, text, typeText, statusText)}'
  <div class="evidence-grid">
   {#each Array.isArray(evidenceList) ? evidenceList: [] as item} <div class={'nes-container is-rounded, evidence-item, ' + getItemStatus(item)}> <div class="evidence-header"> <span class="evidence-name">{getItemName(item)}</span>
  <span class="evidence-status">
-  {#if getItemStatus(item) === 'uploaded'} <CheckCircle size={ 14 } /> {:else if getItemStatus(item) === 'uploading'} <Loader size={ 14 } /> {:else} <AlertCircle size={ 14 } /> {/if} {getItemStatus(item)} </span> </div>
+  {#if getItemStatus(item) === 'uploaded'} <Icon name="check-circle" size={14} /> {:else if getItemStatus(item) === 'uploading'} <Icon name="loader" size={14} /> {:else} <Icon name="alert-circle" size={14} /> {/if} {getItemStatus(item)} </span> </div>
  <div class="evidence-details"> <small>Type: {getItemType(item)}</small>
  <small>Added: {new Date(getItemUploadedAt(item)).toLocaleDateString()}</small> </div> </div> {/each}
   </div> {/if}

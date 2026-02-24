@@ -7,15 +7,7 @@
 	 * Task: 15.1 - Create tag detail view
 	 * Purpose: Display all tag metadata, embedding visualization, cluster assignment
 	 */
-	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
-	import Brain from '@lucide/svelte/icons/brain';
-	import Calendar from '@lucide/svelte/icons/calendar';
-	import Code from '@lucide/svelte/icons/code';
-	import FileCode from '@lucide/svelte/icons/file-code';
-	import Hash from '@lucide/svelte/icons/hash';
-	import Layers from '@lucide/svelte/icons/layers';
-	import Tag from '@lucide/svelte/icons/tag';
-	import X from '@lucide/svelte/icons/x';
+	import Icon from '$lib/components/ui/Icon.svelte';
 
 	interface EnhancedTag { id: string, name: string;
 		filePath: string;
@@ -88,7 +80,7 @@
 		<header class="detail-header">
 			<div class="header-content">
 				<div class="tag-icon">
-					<Tag class="h-5 w-5" />
+					<Icon name="tag" class="h-5 w-5" />
 				</div>
 				<div class="header-text">
 					<h2 class="tag-name">{tag.name}</h2>
@@ -98,7 +90,7 @@
 				</div>
 			</div>
 			<button class="close-btn" onclick={onClose}>
-				<X class="h-5 w-5" />
+				<Icon name="x" class="h-5 w-5" />
 			</button>
 		</header>
 
@@ -107,7 +99,7 @@
 			<!-- File Path -->
 			<section class="detail-section">
 				<h3 class="section-title">
-					<FileCode class="h-4 w-4" />
+					<Icon name="file-code" class="h-4 w-4" />
 					File Path
 				</h3>
 				<code class="file-path">{tag.filePath}</code>
@@ -117,7 +109,7 @@
 			{#if tag.summary}
 				<section class="detail-section">
 					<h3 class="section-title">
-						<Brain class="h-4 w-4" />
+						<Icon name="brain" class="h-4 w-4" />
 						AI Summary
 					</h3>
 					<p class="summary-text">{tag.summary}</p>
@@ -128,7 +120,7 @@
 			{#if tag.errorCount > 0}
 				<section class="detail-section">
 					<h3 class="section-title">
-						<AlertTriangle class="h-4 w-4 text-danger/80" />
+						<Icon name="alert-triangle" class="h-4 w-4 text-danger/80" />
 						Errors
 					</h3>
 					<div class="error-badge">
@@ -141,7 +133,7 @@
 			{#if tag.cluster}
 				<section class="detail-section">
 					<h3 class="section-title">
-						<Layers class="h-4 w-4" />
+						<Icon name="layers" class="h-4 w-4" />
 						Cluster
 					</h3>
 					<button class="cluster-card" onclick={() => onViewCluster(tag.cluster!.id)}>
@@ -155,7 +147,7 @@
 			{#if tag.imports && tag.imports.length > 0}
 				<section class="detail-section">
 					<h3 class="section-title">
-						<Code class="h-4 w-4" />
+						<Icon name="code" class="h-4 w-4" />
 						Imports ({tag.imports.length})
 					</h3>
 					<div class="code-list">
@@ -173,7 +165,7 @@
 			{#if tag.exports && tag.exports.length > 0}
 				<section class="detail-section">
 					<h3 class="section-title">
-						<Hash class="h-4 w-4" />
+						<Icon name="hash" class="h-4 w-4" />
 						Exports ({tag.exports.length})
 					</h3>
 					<div class="code-list">
@@ -188,7 +180,7 @@
 			{#if tag.functions && tag.functions.length > 0}
 				<section class="detail-section">
 					<h3 class="section-title">
-						<Code class="h-4 w-4" />
+						<Icon name="code" class="h-4 w-4" />
 						Functions ({tag.functions.length})
 					</h3>
 					<div class="code-list">
@@ -203,7 +195,7 @@
 			{#if tag.embedding && tag.embedding.length > 0}
 				<section class="detail-section">
 					<h3 class="section-title">
-						<Brain class="h-4 w-4" />
+						<Icon name="brain" class="h-4 w-4" />
 						Embedding ({tag.embedding.length}D)
 					</h3>
 					<div class="embedding-viz">
@@ -224,11 +216,11 @@
 			<!-- Timestamps -->
 			<section class="detail-section timestamps">
 				<div class="timestamp">
-					<Calendar class="h-3 w-3" />
+					<Icon name="calendar" class="h-3 w-3" />
 					<span>Created: {formatDate(tag.createdAt)}</span>
 				</div>
 				<div class="timestamp">
-					<Calendar class="h-3 w-3" />
+					<Icon name="calendar" class="h-3 w-3" />
 					<span>Updated: {formatDate(tag.updatedAt)}</span>
 				</div>
 			</section>

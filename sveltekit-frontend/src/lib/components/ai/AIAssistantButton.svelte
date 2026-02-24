@@ -2,11 +2,6 @@
 	import { goto } from '$app/navigation';
 	import Badge from '$lib/components/ui/badge/Badge.svelte';
 	import { cn } from '$lib/utils';
-	import Brain from '@lucide/svelte/icons/brain';
-	import Mic from '@lucide/svelte/icons/mic';
-	import MicOff from '@lucide/svelte/icons/mic-off';
-	import Sparkles from '@lucide/svelte/icons/sparkles';
-
 	interface Props {
 		variant?: 'floating' | 'inline' | 'compact' | 'full';
 		position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
@@ -104,7 +99,7 @@
 		aria-label="Open assistant"
 	>
 		<div class="relative">
-			<Brain class="w-8 h-8" />
+			<span class="i-lucide-brain w-8 h-8 inline-block" />
 			{#if showStatus}
 				<div
 					class="absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-sand/20 {statusConfig[aiStatus].color} {statusConfig[aiStatus].pulse ? 'animate-pulse' : ''}"
@@ -128,7 +123,7 @@
 	>
 		<div class="flex items-center gap-3 w-full">
 			<div class="relative">
-				<Brain class="w-6 h-6" />
+				<span class="i-lucide-brain w-6 h-6 inline-block" />
 				{#if showStatus}
 					<div
 						class="absolute -bottom-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-sand/20 {statusConfig[aiStatus].color} {statusConfig[aiStatus].pulse ? 'animate-pulse' : ''}"
@@ -151,9 +146,9 @@
 					aria-label={isListening ? 'Stop listening' : 'Start voice input'}
 				>
 					{#if isListening}
-						<MicOff size={16} />
+						<span class="i-lucide-mic-off w-4 h-4 inline-block" />
 					{:else}
-						<Mic size={16} />
+						<span class="i-lucide-mic w-4 h-4 inline-block" />
 					{/if}
 				</button>
 			{/if}
@@ -163,7 +158,7 @@
 			{/if}
 
 			{#if variant === 'full'}
-				<Sparkles class="w-4 h-4 text-warning animate-pulse" />
+				<span class="i-lucide-sparkles w-4 h-4 text-warning animate-pulse inline-block" />
 			{/if}
 		</div>
 	</button>
@@ -177,7 +172,7 @@
 		title="AI Assistant"
 	>
 		<div class="relative">
-			<Brain class="w-5 h-5" />
+			<span class="i-lucide-brain w-5 h-5 inline-block" />
 			{#if showStatus}
 				<div
 					class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full {statusConfig[aiStatus].color}"
@@ -207,9 +202,4 @@
 		left: 100%;
 	}
 </style>
-
-
-
-
-
 

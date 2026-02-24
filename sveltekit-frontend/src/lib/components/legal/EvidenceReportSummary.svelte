@@ -1,12 +1,4 @@
 <script lang="ts">
-	import AlertTriangle from '@lucide/svelte/icons/triangle-alert';
-	import CheckCircle from '@lucide/svelte/icons/circle-check';
-	import Download from '@lucide/svelte/icons/download';
-	import Eye from '@lucide/svelte/icons/eye';
-	import FileText from '@lucide/svelte/icons/file-text';
-	import Scale from '@lucide/svelte/icons/scale';
-	import Target from '@lucide/svelte/icons/target';
-
 	export interface EvidenceReport {
 		id: string;
 		title: string;
@@ -203,7 +195,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 				</div>
 				{#if allowExport}
 					<button onclick={exportReport} class="export-btn" title="Export Report">
-						<Download size={18} />
+						<span class="i-lucide-download w-4.5 h-4.5 inline-block" />
 					</button>
 				{/if}
 			</div>
@@ -235,7 +227,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 		<!-- Evidence Information -->
 		<div class="detail-card">
 			<h3 class="detail-heading">
-				<Eye size={18} /> Evidence Details
+				<span class="i-lucide-eye w-4.5 h-4.5 inline-block" /> Evidence Details
 			</h3>
 			<div class="detail-fields">
 				<div>
@@ -270,7 +262,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 		<!-- Analysis Details -->
 		<div class="detail-card">
 			<h3 class="detail-heading">
-				<Target size={18} /> Analysis Details
+				<span class="i-lucide-target w-4.5 h-4.5 inline-block" /> Analysis Details
 			</h3>
 			<div class="detail-fields">
 				<div>
@@ -303,7 +295,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 		<!-- Legal Impact -->
 		<div class="detail-card">
 			<h3 class="detail-heading">
-				<Scale size={18} /> Legal Implications
+				<span class="i-lucide-scale w-4.5 h-4.5 inline-block" /> Legal Implications
 			</h3>
 			<div class="detail-fields">
 				<div>
@@ -311,7 +303,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 					<div class="item-list">
 						{#each reportData.legalImplications.charges as charge}
 							<div class="item-row">
-								<CheckCircle size={14} class="text-accent" />
+								<span class="i-lucide-circle-check text-accent w-3.5 h-3.5 inline-block" />
 								<span>{charge}</span>
 							</div>
 						{/each}
@@ -322,7 +314,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 					<div class="item-list">
 						{#each reportData.legalImplications.challengePoints as challenge}
 							<div class="item-row">
-								<AlertTriangle size={14} class="text-warning" />
+								<span class="i-lucide-triangle-alert text-warning w-3.5 h-3.5 inline-block" />
 								<span>{challenge}</span>
 							</div>
 						{/each}
@@ -368,7 +360,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 				<ul class="key-points">
 					{#each reportData.findings.keyPoints as point}
 						<li>
-							<CheckCircle size={14} class="text-accent" />
+							<span class="i-lucide-circle-check text-accent w-3.5 h-3.5 inline-block" />
 							<span>{point}</span>
 						</li>
 					{/each}
@@ -378,7 +370,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 					<ul class="key-points">
 						{#each reportData.findings.limitations as limitation}
 							<li>
-								<AlertTriangle size={14} class="text-warning" />
+								<span class="i-lucide-triangle-alert text-warning w-3.5 h-3.5 inline-block" />
 								<span>{limitation}</span>
 							</li>
 						{/each}
@@ -396,7 +388,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 				{#each reportData.attachments as attachment}
 					<div class="attachment-card">
 						<div class="attachment-icon">
-							<FileText size={18} />
+							<span class="i-lucide-file-text w-4.5 h-4.5 inline-block" />
 						</div>
 						<div class="attachment-info">
 							<p class="attachment-name">{attachment.name}</p>

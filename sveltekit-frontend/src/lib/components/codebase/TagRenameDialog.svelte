@@ -6,11 +6,7 @@
    * Task: 15.2 - Create tag rename dialog
    * Purpose: Input validation, confirmation, progress indicator
    */
-  import AlertCircle from '@lucide/svelte/icons/alert-circle';
-  import Check from '@lucide/svelte/icons/check';
-  import Loader2 from '@lucide/svelte/icons/loader-2';
-  import Tag from '@lucide/svelte/icons/tag';
-  import X from '@lucide/svelte/icons/x';
+  import Icon from '$lib/components/ui/Icon.svelte';
 
   interface TagInfo {
     id: string;
@@ -101,14 +97,14 @@
       <!-- Header -->
       <header class="dialog-header">
         <div class="header-icon">
-          <Tag class="h-5 w-5" />
+          <Icon name="tag" class="h-5 w-5" />
         </div>
         <div class="header-text">
           <h2 class="dialog-title">Rename Tag</h2>
           <p class="dialog-subtitle">Update the tag name across all databases</p>
         </div>
         <button class="close-btn" onclick={onClose} disabled={isRenaming}>
-          <X class="h-5 w-5" />
+          <Icon name="x" class="h-5 w-5" />
         </button>
       </header>
 
@@ -149,14 +145,14 @@
 
         <!-- Warning -->
         <div class="warning-box">
-          <AlertCircle class="h-4 w-4" />
+          <Icon name="alert-circle" class="h-4 w-4" />
           <span>This will update the tag in Qdrant, PostgreSQL, Neo4j, and CouchDB atomically.</span>
         </div>
 
         <!-- Error Message -->
         {#if error}
           <div class="error-box">
-            <AlertCircle class="h-4 w-4" />
+            <Icon name="alert-circle" class="h-4 w-4" />
             <span>{error}</span>
           </div>
         {/if}
@@ -164,7 +160,7 @@
         <!-- Success Message -->
         {#if success}
           <div class="success-box">
-            <Check class="h-4 w-4" />
+            <Icon name="check" class="h-4 w-4" />
             <span>Tag renamed successfully!</span>
           </div>
         {/if}
@@ -185,10 +181,10 @@
           disabled={!isValid || isRenaming || success}
         >
           {#if isRenaming}
-            <Loader2 class="h-4 w-4 animate-spin" />
+            <Icon name="loader-2" class="h-4 w-4 animate-spin" />
             Renaming...
           {:else if success}
-            <Check class="h-4 w-4" />
+            <Icon name="check" class="h-4 w-4" />
             Done
           {:else}
             Rename Tag

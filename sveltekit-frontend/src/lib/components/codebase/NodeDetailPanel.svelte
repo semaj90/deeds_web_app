@@ -6,12 +6,7 @@
    * Task: 13.3 - Add node interaction handlers
    * Purpose: Display detailed metadata for selected graph nodes
    */
-  import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
-  import Code from '@lucide/svelte/icons/code';
-  import FileCode from '@lucide/svelte/icons/file-code';
-  import GitBranch from '@lucide/svelte/icons/git-branch';
-  import Layers from '@lucide/svelte/icons/layers';
-  import X from '@lucide/svelte/icons/x';
+  import Icon from '$lib/components/ui/Icon.svelte';
 
   interface GraphNode {
     id: string;
@@ -49,15 +44,15 @@
     util: 'bg-sand/20 text-sand/40 border-sand/30'
   };
 
-  function getTypeIcon(type: string) {
+  function getTypeIcon(type: string): string {
     switch (type) {
       case 'route':
-        return GitBranch;
+        return 'git-branch';
       case 'component':
-        return Code;
+        return 'code';
       case 'store':
-        return Layers;
-      default:return FileCode;
+        return 'layers';
+      default:return 'file-code';
     }
   }
 </script>
@@ -72,7 +67,7 @@
         <h3 class="node-name">{node.label}</h3>
       </div>
       <button class="close-btn" onclick={onClose}>
-        <X class="h-4 w-4" />
+        <Icon name="x" class="h-4 w-4" />
       </button>
     </header>
 
@@ -81,7 +76,7 @@
       <div class="detail-section">
         <span class="section-label">File Path</span>
         <button class="file-path" onclick={() => onViewFile(node.filePath)}>
-          <FileCode class="h-4 w-4" />
+          <Icon name="file-code" class="h-4 w-4" />
           <span>{node.filePath}</span>
         </button>
       </div>
@@ -91,7 +86,7 @@
         <div class="detail-section">
           <span class="section-label">Errors</span>
           <button class="error-badge" onclick={() => onViewErrors(node.filePath)}>
-            <AlertTriangle class="h-4 w-4" />
+            <Icon name="alert-triangle" class="h-4 w-4" />
             <span>{node.errorCount} error{node.errorCount !== 1 ? 's' : ''}</span>
             <span class="view-link">View →</span>
           </button>
@@ -103,7 +98,7 @@
         <div class="detail-section">
           <span class="section-label">Cluster</span>
           <div class="cluster-badge">
-            <Layers class="h-4 w-4" />
+            <Icon name="layers" class="h-4 w-4" />
             <span>{node.cluster}</span>
           </div>
         </div>

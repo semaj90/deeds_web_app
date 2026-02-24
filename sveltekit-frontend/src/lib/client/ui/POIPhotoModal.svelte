@@ -1,18 +1,6 @@
 <script lang="ts">
 
-	import Brain from '@lucide/svelte/icons/brain';
-	import Calendar from '@lucide/svelte/icons/calendar';
-	import Camera from '@lucide/svelte/icons/camera';
-	import Download from '@lucide/svelte/icons/download';
-	import Eye from '@lucide/svelte/icons/eye';
-	import MapPin from '@lucide/svelte/icons/map-pin';
-	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
-	import Tag from '@lucide/svelte/icons/tag';
-	import X from '@lucide/svelte/icons/x';
-	import ZoomIn from '@lucide/svelte/icons/zoom-in';
-	import ZoomOut from '@lucide/svelte/icons/zoom-out';
-
- let {
+	let {
  open,
  photo,
  onClose
@@ -95,27 +83,27 @@
  <!-- Header -->
  <div class="flex items-center justify-between p-4 border-b">
  <h2 class="text-xl font-semibold flex items-center gap-2">
- <Eye class="w-5 h-5" />
+ <span class="i-lucide-eye w-5 h-5 inline-block" />
  POI Photo Analysis
  </h2>
  <div class="flex items-center gap-2">
  <button class="nio-btn" type="button" onclick={zoomOut}>
- <ZoomOut class="w-4 h-4" />
+ <span class="i-lucide-zoom-out w-4 h-4 inline-block" />
  </button>
  <span class="text-sm text-gray-600 min-w-[60px] text-center">
  {Math.round(zoom * 100)}%
  </span>
  <button class="nio-btn" type="button" onclick={zoomIn}>
- <ZoomIn class="w-4 h-4" />
+ <span class="i-lucide-zoom-in w-4 h-4 inline-block" />
  </button>
  <button class="nio-btn" type="button" onclick={resetView}>
- <RotateCcw class="w-4 h-4" />
+ <span class="i-lucide-rotate-ccw w-4 h-4 inline-block" />
  </button>
  <button class="nio-btn" type="button" onclick={downloadImage}>
- <Download class="w-4 h-4" />
+ <span class="i-lucide-download w-4 h-4 inline-block" />
  </button>
  <button class="nio-btn ghost" type="button" onclick={handleClose}>
- <X class="w-4 h-4" />
+ <span class="i-lucide-x w-4 h-4 inline-block" />
  </button>
  </div>
  </div>
@@ -148,21 +136,21 @@
  <div class="analysis-card-body space-y-3">
  {#if photo.metadata?.timestamp}
  <div class="flex items-center gap-2">
- <Calendar class="w-4 h-4 text-gray-500" />
+ <span class="i-lucide-calendar w-4 h-4 text-gray-500 inline-block" />
  <span class="text-sm">{formatTimestamp(photo.metadata.timestamp)}</span>
  </div>
  {/if}
 
  {#if photo.metadata?.gps}
  <div class="flex items-center gap-2">
- <MapPin class="w-4 h-4 text-gray-500" />
+ <span class="i-lucide-map-pin w-4 h-4 text-gray-500 inline-block" />
  <span class="text-sm">{formatGPS(photo.metadata.gps)}</span>
  </div>
  {/if}
 
  {#if photo.metadata?.device}
  <div class="flex items-center gap-2">
- <Camera class="w-4 h-4 text-gray-500" />
+ <span class="i-lucide-camera w-4 h-4 text-gray-500 inline-block" />
  <span class="text-sm">{photo.metadata.device}</span>
  </div>
  {/if}
@@ -181,7 +169,7 @@
  <section class="analysis-card">
  <header class="analysis-card-header">
  <h3 class="analysis-card-title text-lg flex items-center gap-2">
- <Tag class="w-4 h-4" /> EXIF Metadata
+ <span class="i-lucide-tag w-4 h-4 inline-block" /> EXIF Metadata
  </h3>
  </header>
  <div class="analysis-card-body">
@@ -203,7 +191,7 @@
  <section class="analysis-card">
  <header class="analysis-card-header">
  <h3 class="analysis-card-title text-lg flex items-center gap-2">
- <Brain class="w-4 h-4" /> AI Analysis
+ <span class="i-lucide-brain w-4 h-4 inline-block" /> AI Analysis
  </h3>
  </header>
  <div class="analysis-card-body space-y-4">
@@ -286,7 +274,4 @@
 	color: #6b7280;
  }
 </style>
-
-
-
 

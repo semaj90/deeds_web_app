@@ -1,12 +1,7 @@
 <script lang="ts">
   import { cn } from "$lib";
   import { DropdownMenu } from "bits-ui";
-import Brain from "@lucide/svelte/icons/brain";
-  import ChevronDown from "@lucide/svelte/icons/chevron-down";
-  import FileText from "@lucide/svelte/icons/file-text";
-  import Keyboard from "@lucide/svelte/icons/keyboard";
-  import Sparkles from "@lucide/svelte/icons/sparkles";
-  import Wand2 from "@lucide/svelte/icons/wand-2";
+import Icon from '$lib/components/ui/Icon.svelte';
   // Migrated to $effect
   import { fly } from "svelte/transition";
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
@@ -37,28 +32,28 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     {
       id: "case-summary",
       name: "Case Summary Report",
-      icon: FileText,
+      icon: "file-text",
       shortcut: "Ctrl+Shift+C",
       description: "Comprehensive case overview and analysis",
     },
 	{
       id: "evidence-analysis",
       name: "Evidence Analysis",
-      icon: Brain,
+      icon: "brain",
       shortcut: "Ctrl+Shift+E",
       description: "Detailed evidence evaluation and admissibility",
     },
 	{
       id: "legal-brief",
       name: "Legal Brief",
-      icon: Wand2,
+      icon: "wand-2",
       shortcut: "Ctrl+Shift+L",
       description: "Structured legal arguments with precedents",
     },
 	{
       id: "investigation-report",
       name: "Investigation Report",
-      icon: Sparkles,
+      icon: "sparkles",
       shortcut: "Ctrl+Shift+I",
       description: "Investigation documentation and findings",
     }];
@@ -67,7 +62,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     {
       id: "summarize",
       name: "Summarize Content",
-      icon: FileText,
+      icon: "file-text",
       shortcut: "Ctrl+Shift+S",
       description: "Generate AI summary of current content",
       requiresContent: true,
@@ -75,7 +70,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	{
       id: "analyze",
       name: "Analyze Report",
-      icon: Brain,
+      icon: "brain",
       shortcut: "Ctrl+Shift+A",
       description: "Comprehensive AI analysis with insights",
       requiresContent: true,
@@ -142,9 +137,9 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     )}
     disabled={disabled || isGenerating}
   >
-    <Sparkles size={16} />
+    <Icon name="sparkles" size={16} />
     <span>AI Actions</span>
-    <ChevronDown
+    <Icon name="chevron-down"
       size={12}
       class={cn("transition-transform duration-200", open && "rotate-180")}
     />
@@ -167,7 +162,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
         <DropdownMenu.Label
           class="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b"
         >
-          <FileText size={14} />
+          <Icon name="file-text" size={14} />
           Generate Report
         </DropdownMenu.Label>
 
@@ -182,7 +177,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
             disabled={disabled || isGenerating}
           >
             <div class="flex items-center gap-3 min-w-0">
-              <report.icon size={14} class="text-muted-foreground shrink-0" />
+              <Icon name={report.icon} size={14} class="text-muted-foreground shrink-0" />
               <div class="flex flex-col min-w-0">
                 <span class="text-sm font-medium truncate">{report.name}</span>
                 <span class="text-xs text-muted-foreground truncate"
@@ -202,7 +197,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
         <DropdownMenu.Label
           class="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b"
         >
-          <Brain size={14} />
+          <Icon name="brain" size={14} />
           AI Analysis
         </DropdownMenu.Label>
 
@@ -223,7 +218,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
               : ""}
           >
             <div class="flex items-center gap-3 min-w-0">
-              <tool.icon size={14} class="text-muted-foreground shrink-0" />
+              <Icon name={tool.icon} size={14} class="text-muted-foreground shrink-0" />
               <div class="flex flex-col min-w-0">
                 <span class="text-sm font-medium truncate">{tool.name}</span>
                 <span class="text-xs text-muted-foreground truncate"
@@ -240,7 +235,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
       <DropdownMenu.Separator class="h-px bg-muted my-1" />
 
       <div class="px-3 py-2 flex items-center gap-2 text-[10px] text-muted-foreground">
-        <Keyboard size={12} />
+        <Icon name="keyboard" size={12} />
         <span>Use shortcuts (Ctrl+Shift+Letter) for quick actions</span>
       </div>
     </DropdownMenu.Content>

@@ -2,14 +2,6 @@
 	import { tick } from 'svelte';
 	import { browser } from '$app/environment';
 	import Button from '$lib/components/ui/Button.svelte';
-	import Bot from '@lucide/svelte/icons/bot';
-	import Send from '@lucide/svelte/icons/send';
-	import Wifi from '@lucide/svelte/icons/wifi';
-	import WifiOff from '@lucide/svelte/icons/wifi-off';
-	import Loader2 from '@lucide/svelte/icons/loader-2';
-	import X from '@lucide/svelte/icons/x';
-	import Radio from '@lucide/svelte/icons/radio';
-
 	type ChatMessage = {
 		id: string;
 		role: 'user' | 'assistant' | 'system';
@@ -390,7 +382,7 @@
 <!-- Floating trigger button -->
 {#if !isOpen}
 	<button class="trigger-btn" onclick={togglePanel} aria-label="Open YoRHa AI Assistant">
-		<Bot size={24} />
+		<span class="i-lucide-bot w-6 h-6 inline-block" />
 	</button>
 {/if}
 
@@ -402,21 +394,21 @@
 		<!-- Header -->
 		<div class="panel-header">
 			<div class="header-title">
-				<Bot size={20} />
+				<span class="i-lucide-bot w-5 h-5 inline-block" />
 				<span>YoRHa AI Assistant</span>
 			</div>
 			<div class="header-status">
 				{#if isConnecting}
-					<span class="status connecting"><Loader2 size={14} /> Connecting...</span>
+					<span class="status connecting"><span class="i-lucide-loader-2 w-3.5 h-3.5 inline-block" /> Connecting...</span>
 				{:else if transport === 'websocket'}
-					<span class="status connected"><Wifi size={14} /> WebSocket</span>
+					<span class="status connected"><span class="i-lucide-wifi w-3.5 h-3.5 inline-block" /> WebSocket</span>
 				{:else if transport === 'sse'}
-					<span class="status sse"><Radio size={14} /> SSE</span>
+					<span class="status sse"><span class="i-lucide-radio w-3.5 h-3.5 inline-block" /> SSE</span>
 				{:else}
-					<span class="status disconnected"><WifiOff size={14} /> Offline</span>
+					<span class="status disconnected"><span class="i-lucide-wifi-off w-3.5 h-3.5 inline-block" /> Offline</span>
 				{/if}
 				<button class="close-btn" onclick={togglePanel} aria-label="Close">
-					<X size={18} />
+					<span class="i-lucide-x w-4.5 h-4.5 inline-block" />
 				</button>
 			</div>
 		</div>
@@ -430,7 +422,7 @@
 					<div class="msg-row" class:user={message.role === 'user'}>
 						{#if message.role === 'assistant'}
 							<div class="avatar">
-								<Bot size={16} />
+								<span class="i-lucide-bot w-4 h-4 inline-block" />
 							</div>
 						{/if}
 						<div
@@ -461,10 +453,10 @@
 			{#if isStreaming && !chatSession.messages.some((m) => m.streaming)}
 				<div class="msg-row">
 					<div class="avatar">
-						<Bot size={16} />
+						<span class="i-lucide-bot w-4 h-4 inline-block" />
 					</div>
 					<div class="bubble assistant-bubble">
-						<span class="typing-indicator"><Loader2 size={16} /></span>
+						<span class="typing-indicator"><span class="i-lucide-loader-2 w-4 h-4 inline-block" /></span>
 					</div>
 				</div>
 			{/if}
@@ -485,7 +477,7 @@
 					class="send-btn"
 					disabled={!isConnected || isConnecting || !currentMessage.trim()}
 				>
-					<Send size={16} />
+					<span class="i-lucide-send w-4 h-4 inline-block" />
 				</Button>
 			</form>
 		</div>

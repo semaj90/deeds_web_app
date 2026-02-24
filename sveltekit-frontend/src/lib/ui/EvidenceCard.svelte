@@ -8,18 +8,8 @@ https, //svelte.dev/e/tag_invalid_name -->
 https, //svelte.dev/e/tag_invalid_name -->
 <script lang="ts">
  import type { Evidence } from '$lib/types/evidence';
- import Archive from "@lucide/svelte/icons/archive";
- import Download from "@lucide/svelte/icons/download";
- import Eye from "@lucide/svelte/icons/eye";
- import FileText from "@lucide/svelte/icons/file-text";
- import Image from "@lucide/svelte/icons/image";
- import Music from "@lucide/svelte/icons/music";
- import Trash2 from "@lucide/svelte/icons/trash-2";
- import Video from "@lucide/svelte/icons/video";
- import Zap from "@lucide/svelte/icons/zap";
  import Tooltip from './Tooltip.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
+ import Icon from '$lib/components/ui/Icon.svelte';
 
  interface Props {
   evidence: Evidence;
@@ -45,15 +35,15 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  }: Props = $props();
 
  // Calculate icon based on file type
- function getFileIcon(mimeType: string) {
-  if (mimeType?.startsWith('image/')) return Image;
-  if (mimeType?.startsWith('video/')) return Video;
-  if (mimeType?.startsWith('audio/')) return Music;
-  if (mimeType?.includes('zip') || mimeType?.includes('rar') || mimeType?.includes('7z')) return Archive;
-  return FileText;
+ function getFileIcon(mimeType: string): string {
+  if (mimeType?.startsWith('image/')) return 'image';
+  if (mimeType?.startsWith('video/')) return 'video';
+  if (mimeType?.startsWith('audio/')) return 'music';
+  if (mimeType?.includes('zip') || mimeType?.includes('rar') || mimeType?.includes('7z')) return 'archive';
+  return 'file-text';
  }
 
- let Icon = $derived(getFileIcon(evidence.mimeType || 'application/octet-stream'));
+ let fileIconName = $derived(getFileIcon(evidence.mimeType || 'application/octet-stream'));
 
  // Format file size
  function formatFileSize(bytes: number): string {
@@ -106,12 +96,12 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 >
  <div class="card-header">
  <div class="file-icon">
-  <Icon size={24} />
+  <Icon name={fileIconName} size={24} />
  </div>
 
  {#if isTagged}
  <div class="ai-indicator">
-  <Zap size={16} />
+  <span class="i-lucide-zap w-4 h-4 inline-block" />
   <span>AI Tagged</span>
  </div>
  {/if}
@@ -124,7 +114,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  aria-label="Download {evidence.title}"
  title="Download"
  >
- <Download size={14} />
+ <span class="i-lucide-download w-3.5 h-3.5 inline-block" />
  </button>
 
  <button
@@ -133,7 +123,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  aria-label="Delete {evidence.title}"
  title="Delete"
  >
- <Trash2 size={14} />
+ <span class="i-lucide-trash-2 w-3.5 h-3.5 inline-block" />
  </button>
  </div>
  {/if}
@@ -148,13 +138,13 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
  <div class="evidence-meta">
  <div class="meta-item nes-text is-disabled">
- <FileText size={12} />
+ <span class="i-lucide-file-text w-3 h-3 inline-block" />
  <span>{evidence.evidenceType}</span>
  </div>
 
  {#if evidence.fileSize}
  <div class="meta-item nes-text is-disabled">
- <Archive size={12} />
+ <span class="i-lucide-archive w-3 h-3 inline-block" />
  <span>{formatFileSize(evidence.fileSize)}</span>
  </div>
  {/if}
@@ -179,7 +169,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	{#if evidence.summary}
 		<div class="ai-summary nes-container is-rounded">
 			<div class="summary-header nes-text is-primary">
-				<Eye size={12} />
+				<span class="i-lucide-eye w-3 h-3 inline-block" />
 				<span>AI Summary</span>
 			</div>
 			<Tooltip text={evidence.summary}>
@@ -420,6 +410,4 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
  }
  }
 </style>
-
-
 

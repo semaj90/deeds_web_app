@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import WifiOff from '@lucide/svelte/icons/wifi-off';
-
 	let isOnline = $state(browser && navigator.onLine);
 	let showOfflineBanner = $state(false);
 
@@ -40,7 +38,7 @@
 		role="alert"
 	>
 		<div class="container mx-auto flex items-center gap-3">
-			<WifiOff class="w-5 h-5" />
+			<span class="i-lucide-wifi-off w-5 h-5 inline-block" />
 			<div class="flex-1">
 				<p class="font-semibold">You are currently offline</p>
 				<p class="text-sm">Some features may be limited. Cached data is available.</p>
@@ -61,7 +59,7 @@
 	<div
 		class="fixed bottom-4 right-4 bg-warning text-panel px-3 py-2 rounded-md shadow-lg flex items-center gap-2"
 	>
-		<WifiOff class="w-4 h-4" />
+		<span class="i-lucide-wifi-off w-4 h-4 inline-block" />
 		<span class="text-sm font-medium">Offline</span>
 	</div>
 {/if}

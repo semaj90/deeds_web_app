@@ -2,11 +2,6 @@
 <script lang="ts">
   import { Dialog } from "bits-ui";
 import Button from '$lib/components/ui/Button.svelte';
-  import X from '@lucide/svelte/icons/x';
-  import FileText from '@lucide/svelte/icons/file-text';
-  import Edit from '@lucide/svelte/icons/edit';
-  import Save from '@lucide/svelte/icons/save';
-
   // Props interface
   interface EvidenceItem {
     jsonData: {
@@ -91,7 +86,7 @@ import Button from '$lib/components/ui/Button.svelte';
       <!-- Header -->
       <div class="flex items-center justify-between p-4 border-b border-sand/20">
         <div class="flex items-center gap-2">
-          <FileText class="h-5 w-5 text-info/80" />
+          <span class="i-lucide-file-text h-5 w-5 text-info/80 inline-block" />
           <Dialog.Title class="text-lg font-semibold text-white">
             Evidence Details
           </Dialog.Title>
@@ -103,7 +98,7 @@ import Button from '$lib/components/ui/Button.svelte';
             class="p-1 hover:bg-panelSoft rounded transition-colors"
             aria-label="Close"
           >
-            <X class="h-5 w-5 text-sand/40" />
+            <span class="i-lucide-x h-5 w-5 text-sand/40 inline-block" />
           </button>
         </Dialog.Close>
       </div>
@@ -148,7 +143,7 @@ import Button from '$lib/components/ui/Button.svelte';
               Close
             </Button>
             <Button variant="default" onclick={handleEdit} class="gap-2">
-              <Edit class="h-4 w-4" />
+              <span class="i-lucide-edit h-4 w-4 inline-block" />
               Edit
             </Button>
           </div>
@@ -213,7 +208,7 @@ import Button from '$lib/components/ui/Button.svelte';
                 Cancel
               </Button>
               <Button type="submit" variant="default" class="gap-2 bg-accent hover:bg-accent/60">
-                <Save class="h-4 w-4" />
+                <span class="i-lucide-save h-4 w-4 inline-block" />
                 Save Changes
               </Button>
             </div>

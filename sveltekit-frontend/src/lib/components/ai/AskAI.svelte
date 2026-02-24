@@ -1,12 +1,5 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import AlertCircle from '@lucide/svelte/icons/alert-circle';
-	import Brain from '@lucide/svelte/icons/brain';
-	import Loader2 from '@lucide/svelte/icons/loader-2';
-	import MessageCircle from '@lucide/svelte/icons/message-circle';
-	import Mic from '@lucide/svelte/icons/mic';
-	import MicOff from '@lucide/svelte/icons/mic-off';
-
 	interface AIResponse {
 		answer: string;
 		references?: Array<{ id: string, title: string; relevance: number }>;
@@ -226,7 +219,7 @@
 	<div bind:this={messagesContainer} class="messages-container">
 		{#if conversation.length === 0}
 			<div class="empty-state">
-				<MessageCircle size={48} class="text-sand/40" />
+				<span class="i-lucide-message-circle text-sand/40 w-12 h-12 inline-block" />
 				<p class="text-sand/60">Ask a question to get started</p>
 			</div>
 		{/if}
@@ -235,9 +228,9 @@
 			<div class="message {message.type}">
 				<div class="message-icon">
 					{#if message.type === 'user'}
-						<MessageCircle size={20} />
+						<span class="i-lucide-message-circle w-5 h-5 inline-block" />
 					{:else}
-						<Brain size={20} />
+						<span class="i-lucide-brain w-5 h-5 inline-block" />
 					{/if}
 				</div>
 
@@ -267,7 +260,7 @@
 		{#if isLoading}
 			<div class="message ai loading">
 				<div class="message-icon">
-					<Loader2 size={20} class="animate-spin" />
+					<span class="i-lucide-loader-2 animate-spin w-5 h-5 inline-block" />
 				</div>
 				<div class="message-content">
 					<p>Thinking...</p>
@@ -279,7 +272,7 @@
 	<!-- Error message -->
 	{#if error}
 		<div class="error-banner">
-			<AlertCircle size={16} />
+			<span class="i-lucide-alert-circle w-4 h-4 inline-block" />
 			<span>{error}</span>
 		</div>
 	{/if}
@@ -304,9 +297,9 @@
 					aria-label={isListening ? 'Stop listening' : 'Start voice input'}
 				>
 					{#if isListening}
-						<MicOff size={20} />
+						<span class="i-lucide-mic-off w-5 h-5 inline-block" />
 					{:else}
-						<Mic size={20} />
+						<span class="i-lucide-mic w-5 h-5 inline-block" />
 					{/if}
 				</button>
 			{/if}
@@ -318,7 +311,7 @@
 				disabled={!query.trim() || isLoading}
 			>
 				{#if isLoading}
-					<Loader2 size={20} class="animate-spin" />
+					<span class="i-lucide-loader-2 animate-spin w-5 h-5 inline-block" />
 				{:else}
 					Send
 				{/if}
@@ -542,9 +535,4 @@
 		border-radius: 0.25rem;
 	}
 </style>
-
-
-
-
-
 

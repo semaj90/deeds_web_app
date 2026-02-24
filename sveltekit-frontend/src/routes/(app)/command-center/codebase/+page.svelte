@@ -9,19 +9,7 @@
 	 */
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui';
 	import Button from '$lib/components/ui/Button.svelte';
-	import Activity from '@lucide/svelte/icons/activity';
-	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
-	import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
-	import Brain from '@lucide/svelte/icons/brain';
-	import Code from '@lucide/svelte/icons/code';
-	import FileCode from '@lucide/svelte/icons/file-code';
-	import FolderTree from '@lucide/svelte/icons/folder-tree';
-	import GitBranch from '@lucide/svelte/icons/git-branch';
-	import Layers from '@lucide/svelte/icons/layers';
-	import Network from '@lucide/svelte/icons/network';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-	import Search from '@lucide/svelte/icons/search';
-	import Zap from '@lucide/svelte/icons/zap';
+	import Icon from '$lib/components/ui/Icon.svelte';
 	// Migrated to $effect
 
 	// State
@@ -131,18 +119,18 @@
 	<header class="dashboard-header">
 		<div class="header-left">
 			<h1 class="page-title">
-				<Code class="h-6 w-6" />
+				<Icon name="code" class="h-6 w-6" />
 				Codebase Intelligence
 			</h1>
 			<p class="page-subtitle">Error analysis, clustering, and fix recommendations</p>
 		</div>
 		<div class="header-actions">
 			<a href="/command-center/codebase/graph" class="graph-link">
-				<Network class="h-4 w-4" />
+				<Icon name="network" class="h-4 w-4" />
 				View Graph
 			</a>
 			<div class="search-box">
-				<Search class="h-4 w-4 search-icon" />
+				<Icon name="search" class="h-4 w-4 search-icon" />
 				<input
 					type="text"
 					placeholder="Search errors, files, patterns..."
@@ -151,7 +139,7 @@
 				/>
 			</div>
 			<Button class="bits-btn" variant="outline" onclick={triggerReindex} disabled={isLoading}>
-				<RefreshCw class={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+				<Icon name="refresh-cw" class={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
 				Reindex
 			</Button>
 		</div>
@@ -159,7 +147,7 @@
 
 	{#if isLoading}
 		<div class="loading-state">
-			<RefreshCw class="h-8 w-8 animate-spin text-cyan-400" />
+			<Icon name="refresh-cw" class="h-8 w-8 animate-spin text-cyan-400" />
 			<p>Loading codebase intelligence...</p>
 		</div>
 	{:else}
@@ -168,7 +156,7 @@
 			<Card class="metric-card">
 				<CardHeader class="pb-2">
 					<CardTitle class="text-sm flex items-center">
-						<FileCode class="h-4 w-4 mr-2 text-cyan-400" />
+						<Icon name="file-code" class="h-4 w-4 mr-2 text-cyan-400" />
 						Indexed Files
 					</CardTitle>
 				</CardHeader>
@@ -181,7 +169,7 @@
 			<Card class="metric-card">
 				<CardHeader class="pb-2">
 					<CardTitle class="text-sm flex items-center">
-						<AlertTriangle class="h-4 w-4 mr-2 text-red-400" />
+						<Icon name="alert-triangle" class="h-4 w-4 mr-2 text-red-400" />
 						Total Errors
 					</CardTitle>
 				</CardHeader>
@@ -194,7 +182,7 @@
 			<Card class="metric-card">
 				<CardHeader class="pb-2">
 					<CardTitle class="text-sm flex items-center">
-						<Layers class="h-4 w-4 mr-2 text-purple-400" />
+						<Icon name="layers" class="h-4 w-4 mr-2 text-purple-400" />
 						Error Clusters
 					</CardTitle>
 				</CardHeader>
@@ -207,7 +195,7 @@
 			<Card class="metric-card">
 				<CardHeader class="pb-2">
 					<CardTitle class="text-sm flex items-center">
-						<Activity class="h-4 w-4 mr-2 text-green-400" />
+						<Icon name="activity" class="h-4 w-4 mr-2 text-green-400" />
 						Last Indexed
 					</CardTitle>
 				</CardHeader>
@@ -225,7 +213,7 @@
 				<CardHeader>
 					<CardTitle class="flex items-center justify-between">
 						<span class="flex items-center">
-							<BarChart3 class="h-5 w-5 mr-2" />
+							<Icon name="bar-chart-3" class="h-5 w-5 mr-2" />
 							Top Error Codes
 						</span>
 						<a href="/command-center/codebase/errors" class="view-all-link">View All</a>
@@ -247,7 +235,7 @@
 						{/each}
 						{#if metrics.topErrorCodes.length === 0}
 							<div class="empty-state">
-								<Zap class="h-6 w-6 text-green-400" />
+								<Icon name="zap" class="h-6 w-6 text-green-400" />
 								<p>No errors detected!</p>
 							</div>
 						{/if}
@@ -260,7 +248,7 @@
 				<CardHeader>
 					<CardTitle class="flex items-center justify-between">
 						<span class="flex items-center">
-							<Brain class="h-5 w-5 mr-2" />
+							<Icon name="brain" class="h-5 w-5 mr-2" />
 							Recent Error Clusters
 						</span>
 					</CardTitle>
@@ -284,7 +272,7 @@
 						{/each}
 						{#if recentClusters.length === 0}
 							<div class="empty-state">
-								<Layers class="h-6 w-6 text-gray-400" />
+								<Icon name="layers" class="h-6 w-6 text-gray-400" />
 								<p>No clusters yet. Run indexing to generate clusters.</p>
 							</div>
 						{/if}
@@ -296,7 +284,7 @@
 			<Card class="breakdown-card">
 				<CardHeader>
 					<CardTitle class="flex items-center">
-						<FolderTree class="h-5 w-5 mr-2" />
+						<Icon name="folder-tree" class="h-5 w-5 mr-2" />
 						Errors by Surface
 					</CardTitle>
 				</CardHeader>
@@ -321,7 +309,7 @@
 			<Card class="breakdown-card">
 				<CardHeader>
 					<CardTitle class="flex items-center">
-						<GitBranch class="h-5 w-5 mr-2" />
+						<Icon name="git-branch" class="h-5 w-5 mr-2" />
 						Errors by Technology
 					</CardTitle>
 				</CardHeader>

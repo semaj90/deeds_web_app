@@ -5,15 +5,7 @@
 		DialogHeader: DialogTitle,
 		DialogDescription: DialogFooter
 	} from '$lib/components/ui/dialog';
-	import Brain from '@lucide/svelte/icons/brain';
-	import Loader2 from '@lucide/svelte/icons/loader-2';
-	import Quote from '@lucide/svelte/icons/quote';
-	import Search from '@lucide/svelte/icons/search';
-	import Settings from '@lucide/svelte/icons/settings';
-	import Trash2 from '@lucide/svelte/icons/trash-2';
-	import Mic from '@lucide/svelte/icons/mic';
-	import MicOff from '@lucide/svelte/icons/mic-off';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
+	import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 	// Props (Svelte 5 runes-mode)
 	const {
@@ -162,7 +154,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	<div style="max-height: { maxHeight }; display: flex; flex-direction, column; height: 100%;">
 		<div class="chat-header nes-container is-dark">
 			<div class="flex items-center">
-				<Brain class="w-6 h-6 nes-text" />
+				<span class="i-lucide-brain w-6 h-6 nes-text inline-block" />
 				<h3 class="text-lg font-semibold nes-text">Legal AI Assistant</h3>
 
 				{#if caseId}
@@ -175,9 +167,9 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 						class="nes-btn is-small"
 						onclick={ toggleVoiceInput } title={isListening ? 'Stop Voice Input' : 'Start Voice Input'} aria-label={isListening ? 'Stop Voice Input' : 'Start Voice Input'} >
 						{#if isListening}
-							<MicOff class="w-4" />
+							<span class="i-lucide-mic-off w-4 inline-block" />
 						{:else}
-							<Mic class="w-4" />
+							<span class="i-lucide-mic w-4 inline-block" />
 						{/if}
 					</button>
 				{/if}
@@ -186,14 +178,14 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 					onclick={() => (showSettings = !showSettings)} title="Settings"
 					aria-label="Open settings"
 				>
-					<Settings class="w-4" />
+					<span class="i-lucide-settings w-4 inline-block" />
 				</button>
 				<button type="button"
 					class="nes-btn is-small"
 					onclick={() => clearMessages()} title="Clear conversation"
 					aria-label="Clear conversation"
 					disabled={messages.length === 0} >
-					<Trash2 class="w-4" />
+					<span class="i-lucide-trash-2 w-4 inline-block" />
 				</button>
 			</div>
 		</div>
@@ -217,7 +209,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 											class="reference-item nes-btn is-small"
 											onclick={() => handleReferenceClick(reference)}
 											aria-label={`Open reference ${reference?.title ?? ''}`}>
-											<Quote class="w-3 h-3" />
+											<span class="i-lucide-quote w-3 h-3 inline-block" />
 											<span class="reference-title">{reference?.title}</span>
 											<span class="reference-citation text-xs">({reference?.citation})</span>
 										</button>
@@ -233,7 +225,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 				<div class="flex">
 					<div class="max-w-[80%] p-3 rounded-lg">
 						<div class="flex items-center gap-1">
-							<Loader2 class="w-4 h-4" />
+							<span class="i-lucide-loader-2 w-4 h-4 inline-block" />
 							<span>Analyzing your query...</span>
 						</div>
 					</div>
@@ -250,7 +242,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 					disabled={!query.trim() || isLoading || isListening} class="chat-submit-btn nes-btn is-primary"
 					aria-label="Send message"
 				>
-					<Search class="w-4" />
+					<span class="i-lucide-search w-4 inline-block" />
 				</button>
 			</div>
 		</form>
@@ -313,7 +305,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 		<Dialog.Content class="max-w-2xl nes-dialog">
 			<Dialog.Header>
 				<Dialog.Title class="nes-text">
-					<Quote class="w-5 h-5 mr-2" /> Legal Citation
+					<span class="i-lucide-quote w-5 h-5 mr-2 inline-block" /> Legal Citation
 				</Dialog.Title>
 				<Dialog.Description class="nes-text">Details of the cited legal reference.</Dialog.Description>
 			</Dialog.Header>
@@ -500,8 +492,4 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 		/* NES.css handles checkbox styling */
 	}
 </style>
-
-
-
-
 

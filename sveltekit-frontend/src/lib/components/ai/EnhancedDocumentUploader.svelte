@@ -3,15 +3,6 @@
 	import { Dialog } from 'bits-ui';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Progress from '$lib/components/ui/Progress.svelte';
-	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
-	import CheckCircle from '@lucide/svelte/icons/check-circle';
-	import FileIcon from '@lucide/svelte/icons/file';
-	import FileImage from '@lucide/svelte/icons/file-image';
-	import FileText from '@lucide/svelte/icons/file-text';
-	import Loader2 from '@lucide/svelte/icons/loader-2';
-	import Upload from '@lucide/svelte/icons/upload';
-	import X from '@lucide/svelte/icons/x';
-
 	// Types
 	interface UploadFile {
 		id: string;
@@ -395,7 +386,7 @@
 		onkeydown={(e) => e.key === 'Enter' && fileInput?.click()}
 	>
 		<div class="drop-zone-content">
-			<Upload class="drop-zone-icon" size={48} />
+			<span class="i-lucide-upload drop-zone-icon w-12 h-12 inline-block" />
 			<h3 class="drop-zone-title">
 				{isDragging ? 'Drop files here' : 'Upload Legal Documents'}
 			</h3>
@@ -429,11 +420,11 @@
 							{#if file.preview}
 								<img src={file.preview} alt="Preview" class="preview-image" />
 							{:else if file.file.type.startsWith('image/')}
-								<FileImage size={24} />
+								<span class="i-lucide-file-image w-6 h-6 inline-block" />
 							{:else if file.file.type.includes('pdf')}
-								<FileText size={24} />
+								<span class="i-lucide-file-text w-6 h-6 inline-block" />
 							{:else}
-								<FileIcon size={24} />
+								<span class="i-lucide-file w-6 h-6 inline-block" />
 							{/if}
 						</div>
 
@@ -458,7 +449,7 @@
 							<!-- Error Message -->
 							{#if file.error}
 								<p class="error-message">
-									<AlertTriangle size={16} />
+									<span class="i-lucide-alert-triangle w-4 h-4 inline-block" />
 									{file.error}
 								</p>
 							{/if}
@@ -468,11 +459,11 @@
 						<div class="file-actions">
 							<span class="status-badge status-{getStatusColor(file.status)}">
 								{#if file.status === 'processing'}
-									<Loader2 class="badge-icon spinning" size={12} />
+									<span class="i-lucide-loader-2 badge-icon spinning w-3 h-3 inline-block" />
 								{:else if file.status === 'completed'}
-									<CheckCircle class="badge-icon" size={12} />
+									<span class="i-lucide-check-circle badge-icon w-3 h-3 inline-block" />
 								{:else if file.status === 'error'}
-									<AlertTriangle class="badge-icon" size={12} />
+									<span class="i-lucide-alert-triangle badge-icon w-3 h-3 inline-block" />
 								{/if}
 								{file.status}
 							</span>
@@ -495,7 +486,7 @@
 									disabled={file.status === 'uploading' ||
 										file.status === 'processing'}
 								>
-									<X size={16} />
+									<span class="i-lucide-x w-4 h-4 inline-block" />
 								</Button>
 							</div>
 						</div>
@@ -511,10 +502,10 @@
 				disabled={isProcessing || pendingCount === 0}
 			>
 				{#if isProcessing}
-					<Loader2 class="mr-2 spinning" size={16} />
+					<span class="i-lucide-loader-2 mr-2 spinning w-4 h-4 inline-block" />
 					Processing...
 				{:else}
-					<Upload class="mr-2" size={16} />
+					<span class="i-lucide-upload mr-2 w-4 h-4 inline-block" />
 					Upload &amp; Process ({pendingCount} files)
 				{/if}
 			</Button>

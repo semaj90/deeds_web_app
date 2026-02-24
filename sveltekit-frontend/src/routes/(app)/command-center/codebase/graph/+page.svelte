@@ -11,12 +11,7 @@
 	import { NodeDetailPanel, RouteGraph } from '$lib/components/codebase';
 	import { Card, CardContent } from '$lib/components/ui';
 	import Button from '$lib/components/ui/Button.svelte';
-	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
-	import Filter from '@lucide/svelte/icons/filter';
-	import GitBranch from '@lucide/svelte/icons/git-branch';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-	import Search from '@lucide/svelte/icons/search';
-	import X from '@lucide/svelte/icons/x';
+	import Icon from '$lib/components/ui/Icon.svelte';
 	// Migrated to $effect
 
 	// Types
@@ -181,17 +176,17 @@
 	<header class="page-header">
 		<div class="header-left">
 			<a href="/command-center/codebase" class="back-link">
-				<ArrowLeft class="h-4 w-4" />
+				<Icon name="arrow-left" class="h-4 w-4" />
 				Back to Dashboard
 			</a>
 			<h1 class="page-title">
-				<GitBranch class="h-6 w-6" />
+				<Icon name="git-branch" class="h-6 w-6" />
 				Dependency Graph
 			</h1>
 		</div>
 		<div class="header-actions">
 			<div class="search-box">
-				<Search class="h-4 w-4 search-icon" />
+				<Icon name="search" class="h-4 w-4 search-icon" />
 				<input
 					type="text"
 					placeholder="Search nodes..."
@@ -200,19 +195,19 @@
 				/>
 				{#if searchQuery}
 					<button class="clear-search" onclick={() => searchQuery = ''}>
-						<X class="h-3 w-3" />
+						<Icon name="x" class="h-3 w-3" />
 					</button>
 				{/if}
 			</div>
 			<Button class="bits-btn" variant="outline" onclick={() => showFilters = !showFilters}>
-				<Filter class="h-4 w-4 mr-2" />
+				<Icon name="filter" class="h-4 w-4 mr-2" />
 				Filters
 				{#if filters.types.length > 0 || filters.hasErrors || filters.cluster}
 					<span class="filter-badge">{filters.types.length + (filters.hasErrors ? 1 : 0) + (filters.cluster ? 1 : 0)}</span>
 				{/if}
 			</Button>
 			<Button class="bits-btn" variant="outline" onclick={ loadGraphData } disabled={isLoading}>
-				<RefreshCw class={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+				<Icon name="refresh-cw" class={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
 				Refresh
 			</Button>
 		</div>
@@ -285,7 +280,7 @@
 	<div class="graph-container">
 		{#if isLoading}
 			<div class="loading-state">
-				<RefreshCw class="h-8 w-8 animate-spin text-cyan-400" />
+				<Icon name="refresh-cw" class="h-8 w-8 animate-spin text-cyan-400" />
 				<p>Loading dependency graph...</p>
 			</div>
 		{:else}

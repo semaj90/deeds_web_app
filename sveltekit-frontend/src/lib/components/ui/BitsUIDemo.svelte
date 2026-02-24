@@ -5,7 +5,7 @@
   import SelectItem from "./select/SelectItem.svelte";
   import Input from "./input/Input.svelte";
   import Button from "./button/Button.svelte";
-  import { Search, FileText, Users, Scale, Plus, Edit, Eye } from '@lucide/svelte';
+  import Icon from '$lib/components/ui/Icon.svelte';
 
   // Demo state
   let showDialog = $state<boolean>(false);
@@ -58,7 +58,7 @@
     <div class="max-w-md">
       <label class="block text-sm font-medium text-yorha-text-primary mb-1">Global Search</label>
       <div class="relative">
-        <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yorha-text-secondary" />
+        <Icon name="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yorha-text-secondary" />
         <Input
           bind:value={searchQuery}
           placeholder="Search cases, clients, documents..."
@@ -81,7 +81,7 @@
           Case Name <span class="text-yorha-accent">*</span>
         </label>
         <div class="relative">
-          <FileText class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yorha-text-secondary" />
+          <Icon name="file-text" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yorha-text-secondary" />
           <Input
             bind:value={caseName}
             placeholder="Enter case name"
@@ -125,7 +125,7 @@
       variant="default"
       onclick={() => showDialog = true}
     >
-      <Plus class="w-4 h-4" />
+      <Icon name="plus" class="w-4 h-4" />
       Create New Case
     </Button>
 
@@ -141,7 +141,7 @@
           <div class="space-y-2">
             <label class="block text-sm font-medium text-yorha-text-primary">Case Name</label>
             <div class="relative">
-              <FileText class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yorha-text-secondary" />
+              <Icon name="file-text" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yorha-text-secondary" />
               <Input
                 bind:value={caseName}
                 placeholder="e.g., Smith vs. Johnson"
@@ -153,7 +153,7 @@
           <div class="space-y-2">
             <label class="block text-sm font-medium text-yorha-text-primary">Client Name</label>
             <div class="relative">
-              <Users class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yorha-text-secondary" />
+              <Icon name="users" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yorha-text-secondary" />
               <Input
                 bind:value={clientName}
                 placeholder="e.g., John Smith"
@@ -221,10 +221,10 @@
             </div>
             <div class="flex gap-2">
               <Button variant="ghost" size="sm">
-                <Eye class="w-4 h-4" />
+                <Icon name="eye" class="w-4 h-4" />
               </Button>
               <Button variant="ghost" size="sm">
-                <Edit class="w-4 h-4" />
+                <Icon name="edit" class="w-4 h-4" />
               </Button>
             </div>
           </div>

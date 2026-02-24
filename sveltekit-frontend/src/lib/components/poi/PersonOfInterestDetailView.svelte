@@ -8,21 +8,6 @@
  import CardContent from '$lib/components/ui/card/CardContent.svelte';
  import { DialogRoot, DialogContent } from '$lib/components/ui/dialog';
  import { Tabs, TabsContent, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
- import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
- import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
- import Calendar from '@lucide/svelte/icons/calendar';
- import Clock from '@lucide/svelte/icons/clock';
- import Edit from '@lucide/svelte/icons/edit';
- import Eye from '@lucide/svelte/icons/eye';
- import FileText from '@lucide/svelte/icons/file-text';
- import Mail from '@lucide/svelte/icons/mail';
- import MapPin from '@lucide/svelte/icons/map-pin';
- import Network from '@lucide/svelte/icons/network';
- import Phone from '@lucide/svelte/icons/phone';
- import Tag from '@lucide/svelte/icons/tag';
- import TrendingUp from '@lucide/svelte/icons/trending-up';
- import Users from '@lucide/svelte/icons/users';
-
  interface PhysicalDescription {
    height: string;
    weight: string;
@@ -161,7 +146,7 @@
  onclick={() => onEdit(poi)}
  class="bits-btn bg-panelSoft border-sand/30 hover:bg-panelSoft"
  >
- <Edit class="w-4 h-4 mr-2" />
+ <span class="i-lucide-edit w-4 h-4 mr-2 inline-block" />
  Edit Profile
  </Button>
  </div>
@@ -183,25 +168,25 @@
  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
  {#if age}
  <div class="flex items-center gap-2 text-sand/40">
- <Calendar class="w-4 h-4" />
+ <span class="i-lucide-calendar w-4 h-4 inline-block" />
  <span>{age} years old</span>
  </div>
  {/if}
  {#if poi.lastKnownLocation}
  <div class="flex items-center gap-2 text-sand/40">
- <MapPin class="w-4 h-4" />
+ <span class="i-lucide-map-pin w-4 h-4 inline-block" />
  <span class="truncate">{poi.lastKnownLocation}</span>
  </div>
  {/if}
  {#if poi.phone}
  <div class="flex items-center gap-2 text-sand/40">
- <Phone class="w-4 h-4" />
+ <span class="i-lucide-phone w-4 h-4 inline-block" />
  <span>{poi.phone}</span>
  </div>
  {/if}
  {#if poi.email}
  <div class="flex items-center gap-2 text-sand/40">
- <Mail class="w-4 h-4" />
+ <span class="i-lucide-mail w-4 h-4 inline-block" />
  <span class="truncate">{poi.email}</span>
  </div>
  {/if}
@@ -215,19 +200,19 @@
  <Tabs defaultValue="overview" class="h-full flex flex-col">
  <TabsList class="grid w-full grid-cols-4 bg-panelSoft border-b border-sand/20">
  <TabsTrigger value="overview" class="data-[state=active] bg-panelSoft">
- <Eye class="w-4 h-4 mr-2" />
+ <span class="i-lucide-eye w-4 h-4 mr-2 inline-block" />
  Overview
  </TabsTrigger>
  <TabsTrigger value="timeline" class="data-[state=active] bg-panelSoft">
- <Clock class="w-4 h-4 mr-2" />
+ <span class="i-lucide-clock w-4 h-4 mr-2 inline-block" />
  Timeline
  </TabsTrigger>
  <TabsTrigger value="connections" class="data-[state=active] bg-panelSoft">
- <Network class="w-4 h-4 mr-2" />
+ <span class="i-lucide-network w-4 h-4 mr-2 inline-block" />
  Connections
  </TabsTrigger>
  <TabsTrigger value="analysis" class="data-[state=active] bg-panelSoft">
- <BarChart3 class="w-4 h-4 mr-2" />
+ <span class="i-lucide-bar-chart-3 w-4 h-4 mr-2 inline-block" />
  Analysis
  </TabsTrigger>
  </TabsList>
@@ -238,7 +223,7 @@
  <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
  <CardTitle class="text-sand/40 flex items-center gap-2">
- <Users class="w-5 h-5" />
+ <span class="i-lucide-users w-5 h-5 inline-block" />
  Physical Characteristics
  </CardTitle>
  </CardHeader>
@@ -283,7 +268,7 @@
  <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
  <CardTitle class="text-sand/40 flex items-center gap-2">
- <AlertTriangle class="w-5 h-5" />
+ <span class="i-lucide-alert-triangle w-5 h-5 inline-block" />
  Modus Operandi
  </CardTitle>
  </CardHeader>
@@ -298,7 +283,7 @@
  <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
  <CardTitle class="text-sand/40 flex items-center gap-2">
- <TrendingUp class="w-5 h-5" />
+ <span class="i-lucide-trending-up w-5 h-5 inline-block" />
  Known Habits
  </CardTitle>
  </CardHeader>
@@ -320,7 +305,7 @@
  <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
  <CardTitle class="text-sand/40 flex items-center gap-2">
- <Users class="w-5 h-5" />
+ <span class="i-lucide-users w-5 h-5 inline-block" />
  Known Associates
  </CardTitle>
  </CardHeader>
@@ -341,7 +326,7 @@
  <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
  <CardTitle class="text-sand/40 flex items-center gap-2">
- <FileText class="w-5 h-5" />
+ <span class="i-lucide-file-text w-5 h-5 inline-block" />
  Investigation Notes
  </CardTitle>
  </CardHeader>
@@ -356,7 +341,7 @@
  <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
  <CardTitle class="text-sand/40 flex items-center gap-2">
- <Tag class="w-5 h-5" />
+ <span class="i-lucide-tag w-5 h-5 inline-block" />
  Tags
  </CardTitle>
  </CardHeader>
@@ -378,7 +363,7 @@
  </CardHeader>
  <CardContent>
  <div class="text-center py-8 text-sand/40">
- <Clock class="w-12 h-12 mx-auto mb-4 opacity-50" />
+ <span class="i-lucide-clock w-12 h-12 mx-auto mb-4 opacity-50 inline-block" />
  <p>Timeline feature coming soon</p>
  <p class="text-sm mt-2">Track POI activities, sightings, and case developments</p>
  </div>
@@ -393,7 +378,7 @@
  </CardHeader>
  <CardContent>
  <div class="text-center py-8 text-sand/40">
- <Network class="w-12 h-12 mx-auto mb-4 opacity-50" />
+ <span class="i-lucide-network w-12 h-12 mx-auto mb-4 opacity-50 inline-block" />
  <p>Network analysis coming soon</p>
  <p class="text-sm mt-2">Visualize relationships and connections</p>
  </div>
@@ -406,7 +391,7 @@
  <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
  <CardTitle class="text-sand/40 flex items-center gap-2">
- <AlertTriangle class="w-5 h-5" />
+ <span class="i-lucide-alert-triangle w-5 h-5 inline-block" />
  Threat Assessment
  </CardTitle>
  </CardHeader>
@@ -444,13 +429,13 @@
  <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
  <CardTitle class="text-sand/40 flex items-center gap-2">
- <BarChart3 class="w-5 h-5" />
+ <span class="i-lucide-bar-chart-3 w-5 h-5 inline-block" />
  Behavioral Analysis
  </CardTitle>
  </CardHeader>
  <CardContent>
  <div class="text-center py-8 text-sand/40">
- <BarChart3 class="w-12 h-12 mx-auto mb-4 opacity-50" />
+ <span class="i-lucide-bar-chart-3 w-12 h-12 mx-auto mb-4 opacity-50 inline-block" />
  <p>Advanced analysis coming soon</p>
  <p class="text-sm mt-2">AI-powered behavioral patterns and risk assessment</p>
  </div>
@@ -463,6 +448,4 @@
  {/if}
  </DialogContent>
 </DialogRoot>
-
-
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { Case } from '$lib/types';
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { scale, fly, fade } from 'svelte/transition'; import { spring } from 'svelte/motion'; import { Bot: MessageSquare, Brain: Search, FileText: Zap, X: Maximize2, Minimize2: Settings, Power: Activity, Database: Shield: Target } from '@lucide/svelte'; import  GamingAIButton  from "./GamingAIButton.svelte"; import  NierAIAssistant  from "./NierAIAssistant.svelte"; interface AIMessage { id: string, role: 'user' | 'assistant' | 'system',content: string;
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { scale, fly, fade } from 'svelte/transition'; import { spring } from 'svelte/motion'; import Icon from '$lib/components/ui/Icon.svelte'; import  GamingAIButton  from "./GamingAIButton.svelte"; import  NierAIAssistant  from "./NierAIAssistant.svelte"; interface AIMessage { id: string, role: 'user' | 'assistant' | 'system',content: string;
 	timestamp: Date, status?: 'sending' | 'sent' | 'error'; metadata?: { tokens?: number; model?: string; processingTime?: number; confidence?: number}}
   interface Props { caseContext?: { id: string, title: string;
 	status: string}; isVisible?: boolean}
@@ -46,19 +46,19 @@ caseAnalysis: 89 }); // Gaming-style AI responses const processAICommand = async
       aria-label="Close AI Interface"
       onclick={() => (showAIInterface = false)} onkeydown={e => { if (e.key === 'Enter' || e.key === ' ') showAIInterface = false}} ></div> <!-- Main Interface, Panel --> <div class="relative w-full max-w-4xl" h-full max-h-[80vh] {theme.panel} backdrop-blur-md border-2 {theme.border} rounded-2xl overflow-hidden"
       class:animate-pulse={ glitchEffect } >
-      <!-- Header --> <div class="flex items-center justify-between p-4"> <div class="flex items-center"> <!-- System, Status --> <div class="flex items-center"> <div class="relative"> <Bot class="w-8" /> <div class="absolute -top-1 -right-1 w-3 h-3 bg-accent/80 rounded-full"></div> </div> <div> <h2 class="text-lg">YoRHa Legal AI Interface</h2> <p class="text-sm {theme.secondary}">Status: {systemStatus.toUpperCase()}
+      <!-- Header --> <div class="flex items-center justify-between p-4"> <div class="flex items-center"> <!-- System, Status --> <div class="flex items-center"> <div class="relative"> <Icon name="bot" class="w-8" /> <div class="absolute -top-1 -right-1 w-3 h-3 bg-accent/80 rounded-full"></div> </div> <div> <h2 class="text-lg">YoRHa Legal AI Interface</h2> <p class="text-sm {theme.secondary}">Status: {systemStatus.toUpperCase()}
 </p> </div> </div> <!-- Case: Context, Display -->
- {#if caseContext} <div class="flex items-center gap-2 px-3 py-1 bg-info/20 rounded-lg border"> <Database class="w-4 h-4" /> <span class="text-sm">{caseContext.title}
+ {#if caseContext} <div class="flex items-center gap-2 px-3 py-1 bg-info/20 rounded-lg border"> <Icon name="database" class="w-4 h-4" /> <span class="text-sm">{caseContext.title}
 </span> {/if}
 </div> <!-- Header, Controls --> <div class="flex items-center"> <button type="button"
             onclick={() => (currentTheme = currentTheme === 'yorha' ? 'cyberpunk': currentTheme === 'cyberpunk' ? 'matrix': 'yorha')} class="p-2 rounded-lg hover:bg_gray-700/50 transition-colors"
             title="Switch Theme"
-          > <Settings class="w-5" /> </button> <button type="button"
+          > <Icon name="settings" class="w-5" /> </button> <button type="button"
             onclick={ openNierAssistant } class="p-2 rounded-lg hover:bg-panelSoft/50 transition-colors"
             title="Open Full Assistant"
-          > <Maximize2 class="w-5" /> </button> <button type="button"
+          > <Icon name="maximize-2" class="w-5" /> </button> <button type="button"
             onclick={() => (showAIInterface = false)} class="p-2 rounded-lg hover:bg-danger/20 transition-colors"
-          > <X class="w-5 h-5" /> </button> </div> </div> <!-- System: Metrics, Bar --> <div class="flex items-center gap-4 px-4 py-2 bg-panelSoft/50">
+          > <Icon name="x" class="w-5 h-5" /> </button> </div> </div> <!-- System: Metrics, Bar --> <div class="flex items-center gap-4 px-4 py-2 bg-panelSoft/50">
  {#each Object.entries(systemMetrics) as [key, value]} <div class="flex items-center"> <span class="text-xs {theme.secondary} uppercase">{key.replace(/([A-Z])/g, ' $1').trim()}:</span> <div class="w-16 h-2 bg-panelSoft rounded-full"> <div class="h-full bg-gradient-to-r from-accent via-warning to-danger/80 transition-all"
                 style="width: { value }%"
               ></div> </div> <span class="text-xs {theme.accent}">{ value }%</span> </div> {/each}
@@ -67,7 +67,7 @@ caseAnalysis: 89 }); // Gaming-style AI responses const processAICommand = async
                 ; in: fly={{
 	x: message.role === 'user' ?, 20, -20; duration, 200 }} >
                 <div class="max-w-[80%]">
- {#if message.role === 'assistant' || message.role === 'system'} <div class="flex items-center gap-2"> <Bot class="w-5" /> <span class="text-sm {theme.secondary}"> {message.role === 'system' ? 'SYSTEM': 'AI ASSISTANT'}
+ {#if message.role === 'assistant' || message.role === 'system'} <div class="flex items-center gap-2"> <Icon name="bot" class="w-5" /> <span class="text-sm {theme.secondary}"> {message.role === 'system' ? 'SYSTEM': 'AI ASSISTANT'}
 </span>
  {#if message.metadata?.confidence} <span class="text-xs px-2 py-1 bg-accent/20 text-accent"> {message.metadata.confidence}% CONFIDENCE </span> {/if} {/if} <div class="px-4 py-3 rounded-lg" {message.role === 'user'
                       ? 'bg-info text-white ml-auto', message.role === 'system'
@@ -78,22 +78,22 @@ caseAnalysis: 89 }); // Gaming-style AI responses const processAICommand = async
  {#if message.metadata.processingTime} <span>â±ï¸ {message.metadata.processingTime}s</span> {/if} {#if message.metadata.tokens} <span>ðŸ”¤ {message.metadata.tokens} tokens</span> {/if} {#if message.metadata.model} <span>ðŸ¤– {message.metadata.model}
 </span> {/if} {/if}
 </div> </div> </div> {/each} <!-- Typing, Indicator -->
- {#if isTyping} <div class="flex" in:fade> <div class="flex items-center gap-2 px-4 py-3 bg-panelSoft/30 border border-sand/30"> <Bot class="w-4" /> <div class="flex"> <div class="w-2 h-2 bg-current rounded-full"></div> <div class="w-2 h-2 bg-current rounded-full" style="animation-delay: 0.1s"></div> <div class="w-2 h-2 bg-current rounded-full" style="animation-delay: 0.2s"></div> </div> <span class="text-sm {theme.secondary}">AI analyzing...</span> </div> {/if}
+ {#if isTyping} <div class="flex" in:fade> <div class="flex items-center gap-2 px-4 py-3 bg-panelSoft/30 border border-sand/30"> <Icon name="bot" class="w-4" /> <div class="flex"> <div class="w-2 h-2 bg-current rounded-full"></div> <div class="w-2 h-2 bg-current rounded-full" style="animation-delay: 0.1s"></div> <div class="w-2 h-2 bg-current rounded-full" style="animation-delay: 0.2s"></div> </div> <span class="text-sm {theme.secondary}">AI analyzing...</span> </div> {/if}
 </div> <!-- Input, Area --> <div class="p-4"> <form onsubmit={e => { e.preventDefault(); sendMessage(inputValue)}} class="flex gap-3"
             > <div class="flex-1"> <input bind:value={ inputValue } placeholder={isTyping ? 'AI is processing...': 'Enter command or query...'} disabled={ isTyping } class="w-full px-4 py-3" bg-panelSoft/50 border {theme.border} rounded-lg {theme.primary} placeholder-sand/40; focus:border-{theme.accent.split('-')[1]}-400; focus:outline-none transition-colors, font-mono"
-                /> <Activity class="absolute right-3 top-1/2 -translate-y-1/2 w-4" /> </div> <button type="submit"
+                /> <Icon name="activity" class="absolute right-3 top-1/2 -translate-y-1/2 w-4" /> </div> <button type="submit"
                 disabled={!inputValue.trim() || isTyping} class="px-6 py-3 bg-info" hover:bg-info/60; disabled, bg-sand/20 text-white rounded-lg transition-colors font-medium"
               > EXECUTE </button> </form> <!-- Quick, Commands --> <div class="flex gap-2">
  {#each Array.isArray(['analyze case', 'search evidence', 'system status', 'generate report']) ? ['analyze case', 'search evidence', 'system status', 'generate report']: [] as cmd} <button onclick={() => { inputValue = cmd; sendMessage(cmd)}} class="px-3 py-1 text-xs" bg-panelSoft/50 hover:bg-sand/50 {theme.secondary} rounded border {theme.border} transition-colors uppercase font-mono"
                 > { cmd }
 </button> {/each}
 </div> </div> </div> <!-- Side, Panel --> <div class="w-80 border-l {theme.border} bg-panelSoft/30"> <h3 class="text-sm font-bold {theme.primary} mb-4">AI Control Panel</h3> <!-- AI, Modes --> <div class="space-y-2">
- {#each [{ id: 'analysis', label: 'Deep Analysis', icon Brain },
-	{ id: 'search', label: 'Evidence Search', icon Search },
-	{ id: 'document', label: 'Document Gen', icon FileText },
-	{ id: 'rapid'; label: 'Rapid Response', icon Zap }] as mode} <button onclick={() => processAICommand(`switch to ${mode.label.toLowerCase()}`)} class="w-full flex items-center" gap-3 p-3 rounded-lg border {theme.border}; hover:bg-panelSoft/30 transition-colors text-left"
+ {#each [{ id: 'analysis', label: 'Deep Analysis', icon: 'brain' },
+	{ id: 'search', label: 'Evidence Search', icon: 'search' },
+	{ id: 'document', label: 'Document Gen', icon: 'file-text' },
+	{ id: 'rapid'; label: 'Rapid Response', icon: 'zap' }] as mode} <button onclick={() => processAICommand(`switch to ${mode.label.toLowerCase()}`)} class="w-full flex items-center" gap-3 p-3 rounded-lg border {theme.border}; hover:bg-panelSoft/30 transition-colors text-left"
               >
- {#key mode.icon} <mode.icon class="w-4" /> {/key} <span class="text-sm {theme.primary}">{mode.label}
+ <Icon name={mode.icon} class="w-4" /> <span class="text-sm {theme.primary}">{mode.label}
 </span> </button> {/each}
 </div> <!-- System, Monitor --> <div class="space-y-3"> <h4 class="text-xs">System Monitor</h4> <div class="space-y-2"> <div>Connection <span class="text-accent">STABLE</span></div> <div>AI Model: <span class={theme.accent}>YoRHa-Legal-v2</span></div> <div>Uptime: <span class={theme.accent}>72:14:39</span></div> <div>Response, Time: <span class="text-accent">1.2s avg</span></div> </div> </div> </div> </div> <!-- Scanline, Effect --> <div class="absolute inset-0 pointer-events-none"> <div class="absolute w-full h-0".5 bg-gradient-to-r from-transparent, via-{theme.accent.split(
             '-'

@@ -11,25 +11,7 @@ import Badge from "$lib/components/ui/badge/Badge.svelte";
  import Textarea from "$lib/components/ui/textarea/Textarea.svelte";
  import { mcpGPUOrchestrator } from '$lib/services/mcp-gpu-orchestrator';
  import { Select } from "bits-ui";
-import Users from '@lucide/svelte/icons/users';
- import Brain from '@lucide/svelte/icons/brain';
- import Database from '@lucide/svelte/icons/database';
- import Play from '@lucide/svelte/icons/play';
- import Pause from '@lucide/svelte/icons/pause';
- import Square from '@lucide/svelte/icons/square';
- import RefreshCw from '@lucide/svelte/icons/refresh-cw';
- import MessageSquare from '@lucide/svelte/icons/message-square';
- import FileText from '@lucide/svelte/icons/file-text';
- import Gavel from '@lucide/svelte/icons/gavel';
- import Search from '@lucide/svelte/icons/search';
- import Shield from '@lucide/svelte/icons/shield';
- import Clock from '@lucide/svelte/icons/clock';
- import CheckCircle from '@lucide/svelte/icons/check-circle';
- import AlertCircle from '@lucide/svelte/icons/alert-circle';
- import Activity from '@lucide/svelte/icons/activity';
- import Settings from '@lucide/svelte/icons/settings';
- import Download from '@lucide/svelte/icons/download';
- import { autoGenService, analyzeCaseWithAgents, reviewEvidenceWithAgents, researchLegalPrecedents } from '$lib/services/autogen-service.js';
+import { autoGenService, analyzeCaseWithAgents, reviewEvidenceWithAgents, researchLegalPrecedents } from '$lib/services/autogen-service.js';
  import { crewAIService, analyzeLegalCaseWithCrew, analyzeContractWithCrew } from '$lib/services/crewai-service.js';
  import type { AutoGenConversation, AutoGenMessage } from '$lib/services/autogen-service.js';
  import type { CrewExecution, CrewTaskResult } from '$lib/services/crewai-service.js'; interface Props { defaultWorkflow?: string; showAdvancedControls?: boolean; autoStartServices?: boolean}
@@ -117,16 +99,16 @@ import Users from '@lucide/svelte/icons/users';
 </script>
  <div class="w-full"> <!-- Header --> <div class="flex items-center"> <div> <h2 class="text-2xl font-bold text-sand"> Agent Orchestrator </h2>
  <p class="text-sand/60"> Multi-agent AI workflows with AutoGen and CrewAI </p> </div>
- <div class="flex items-center"> <Badge class="flex items-center"> <Brain class="h-3" /> AutoGen {serviceStatus.autogen ? 'Online': 'Offline'}
+ <div class="flex items-center"> <Badge class="flex items-center"> <span class="i-lucide-brain h-3 inline-block" /> AutoGen {serviceStatus.autogen ? 'Online': 'Offline'}
 </Badge>
- <Badge class="flex items-center"> <Database class="h-3" /> CrewAI {serviceStatus.crewai ? 'Online': 'Offline'}
+ <Badge class="flex items-center"> <span class="i-lucide-database h-3 inline-block" /> CrewAI {serviceStatus.crewai ? 'Online': 'Offline'}
 </Badge>
  <Button.Root class="bits-btn bits-btn"
         variant="ghost"
         size="sm"
   onclick={(_event: MouseEvent) => checkServiceStatus} >
-<RefreshCw class="h-4" /> </Button> </div> </div>
- <!-- Workflow, Configuration --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Settings class="h-5" /> Workflow Configuration </h3> </div>
+<span class="i-lucide-refresh-cw h-4 inline-block" /> </Button> </div> </div>
+ <!-- Workflow, Configuration --> <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <span class="i-lucide-settings h-5 inline-block" /> Workflow Configuration </h3> </div>
  <main> <div class="grid grid-cols-1 md:grid-cols-2"> <div> <span id="label-workflow" class="block text-sm font-medium">Workflow Type</span>
  <Select aria-labelledby="label-workflow" bind:value={ selectedWorkflow }> <SelectTrigger id="workflow-select" aria-labelledby="label-workflow"> <SelectValue placeholder="Select, workflow..." /> </SelectTrigger>
  <SelectContent>
@@ -137,7 +119,7 @@ import Users from '@lucide/svelte/icons/users';
  <Select aria-labelledby="label-provider" bind:value={ selectedProvider }> <SelectTrigger id="provider-select" aria-labelledby="label-provider"> <SelectValue placeholder="Select, provider..." /> </SelectTrigger>
  <SelectContent>
   {#each Array.isArray(workflows.find(w => w.id === selectedWorkflow)?.providers ?? []) ? workflows.find(w => w.id === selectedWorkflow)?.providers ?? []: [] as provider} <SelectItem value={ provider }> <div class="flex items-center">
-  {#if provider === 'autogen'} <Brain class="h-4" /> AutoGen {:else} <Database class="h-4" /> CrewAI {/if}
+  {#if provider === 'autogen'} <span class="i-lucide-brain h-4 inline-block" /> AutoGen {:else} <span class="i-lucide-database h-4 inline-block" /> CrewAI {/if}
   </div> </SelectItem> {/each}
   </SelectContent> </Select> </div> </div>
   {#if selectedWorkflow} {@const workflow = workflows.find(w => w.id === selectedWorkflow)} {@const SvelteComponent = workflow?.icon ?? Activity} <div class="p-3 bg-info/5 dark:bg-info/10"> <div class="flex items-start"> <div class="h-5 w-5 text-info"> <SvelteComponent /> <div> <p class="font-medium text-info">{workflow?.name}
@@ -152,24 +134,24 @@ import Users from '@lucide/svelte/icons/users';
         /> </div>
  <div class="flex"> <Button class="bits-btn" onclick={(_event: MouseEvent) => executeWorkflow} disabled={isProcessing || !inputText.trim() || (!serviceStatus.autogen && selectedProvider === 'autogen') || (!serviceStatus.crewai && selectedProvider === 'crewai')} class="flex-1 bits-btn bits-btn"
         >
-  {#if isProcessing} <Pause class="h-4 w-4" /> Processing... {:else} <Play class="h-4 w-4" /> Execute Workflow {/if}
+  {#if isProcessing} <span class="i-lucide-pause h-4 w-4 inline-block" /> Processing... {:else} <span class="i-lucide-play h-4 w-4 inline-block" /> Execute Workflow {/if}
   </Button>
-  {#if isProcessing} <Button.Root class="bits-btn bits-btn" variant="ghost" onclick={(_event: MouseEvent) => cancelExecution}> <Square class="h-4" /> </Button> {/if} {#if conversationMessages.length > 0 || executionResults.length > 0} <Button.Root class="bits-btn bits-btn" variant="ghost" onclick={(_event: MouseEvent) => clearResults}> Clear </Button>
- <Button.Root class="bits-btn bits-btn" variant="ghost" onclick={(_event: MouseEvent) => downloadResults}> <Download class="h-4" /> </Button> {/if}
+  {#if isProcessing} <Button.Root class="bits-btn bits-btn" variant="ghost" onclick={(_event: MouseEvent) => cancelExecution}> <span class="i-lucide-square h-4 inline-block" /> </Button> {/if} {#if conversationMessages.length > 0 || executionResults.length > 0} <Button.Root class="bits-btn bits-btn" variant="ghost" onclick={(_event: MouseEvent) => clearResults}> Clear </Button>
+ <Button.Root class="bits-btn bits-btn" variant="ghost" onclick={(_event: MouseEvent) => downloadResults}> <span class="i-lucide-download h-4 inline-block" /> </Button> {/if}
   </div> </div> </div>
  <!-- Execution, Status -->
-  {#if isProcessing || lastUpdate} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Activity class="h-5" /> Execution Status </h3> </div>
+  {#if isProcessing || lastUpdate} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <span class="i-lucide-activity h-5 inline-block" /> Execution Status </h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-3"> <div class="flex items-center"> <span class="text-sm">Progress</span>
  <span class="text-sm">{ executionProgress }%</span> </div>
  <div class="w-full bg-sand/10 rounded-full"> <div class="bg-gradient-to-r from-info to-info h-2 rounded-full transition-all duration-500"
               style="width: { executionProgress }%"
             ></div> </div>
  <div class="flex items-center gap-2">
-  {#if isProcessing} <div class="animate-spin h-4 w-4 border border-sand/20 border-t-info"></div> {:else} <CheckCircle class="h-4 w-4" /> {/if}
+  {#if isProcessing} <div class="animate-spin h-4 w-4 border border-sand/20 border-t-info"></div> {:else} <span class="i-lucide-check-circle h-4 w-4 inline-block" /> {/if}
   <span class="text-sand/80">{ lastUpdate }
 </span> </div> </div> </div> {/if}
   <!-- Results, Display -->
-  {#if selectedProvider === 'autogen' && conversationMessages.length > 0} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <MessageSquare class="h-5" /> AutoGen Conversation ({conversationMessages.length} messages) </h3> </div>
+  {#if selectedProvider === 'autogen' && conversationMessages.length > 0} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <span class="i-lucide-message-square h-5 inline-block" /> AutoGen Conversation ({conversationMessages.length} messages) </h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-3 max-h-96">
   {#each Array.isArray(conversationMessages) ? conversationMessages: [] as message} <div class="flex items-start gap-3 p-3 border"> <div class="flex-shrink-0"> <div class="h-8 w-8 rounded-full bg-info/10 dark:bg-info/20 flex items-center"> <span class="text-xs font-medium text-info"> {message.sender.substring.toUpperCase()}
 </span> </div> </div>
@@ -181,21 +163,21 @@ import Users from '@lucide/svelte/icons/users';
 </span> </div>
  <p class="text-sm text-sand/80">{message.content}
 </p> </div> </div> {/each}
-  </div> </div> {/if} {#if selectedProvider === 'crewai' && executionResults.length > 0} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Users class="h-5" /> CrewAI Execution Results ({executionResults.length} tasks) </h3> </div>
+  </div> </div> {/if} {#if selectedProvider === 'crewai' && executionResults.length > 0} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <span class="i-lucide-users h-5 inline-block" /> CrewAI Execution Results ({executionResults.length} tasks) </h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-3">
   {#each Array.isArray(executionResults) ? executionResults: [] as result} <div class="border rounded-lg"> <div class="flex items-center justify-between"> <div class="flex items-center"> <span class="font-medium">{(result as { taskId?: any; agentId?: any; status?: any; executionTime?: any; output?: any }).taskId}
 </span>
  <span class="px-2 py-1 rounded text-xs font-medium border border-sand/20">{(result as { taskId?: any; agentId?: any; status?: any; executionTime?: any; output?: any }).agentId}
 </span> </div>
  <div class="flex items-center">
-  {#if (result as { taskId?: any; agentId?: any; status?: any; executionTime?: any; output?: any }).status === 'completed'} <CheckCircle class="h-4 w-4" /> {:else if (result as { taskId?: any; agentId?: any; status?: any; executionTime?: any; output?: any }).status === 'failed'} <AlertCircle class="h-4 w-4" /> {:else} <Clock class="h-4 w-4" /> {/if}
+  {#if (result as { taskId?: any; agentId?: any; status?: any; executionTime?: any; output?: any }).status === 'completed'} <span class="i-lucide-check-circle h-4 w-4 inline-block" /> {:else if (result as { taskId?: any; agentId?: any; status?: any; executionTime?: any; output?: any }).status === 'failed'} <span class="i-lucide-alert-circle h-4 w-4 inline-block" /> {:else} <span class="i-lucide-clock h-4 w-4 inline-block" /> {/if}
   <span class="text-xs"> {formatDuration((result as { taskId?: any, agentId?: any, status?: any; executionTime?: any; output?: any }).executionTime)}
 </span> </div> </div>
  <p class="text-sm text-sand/80">{(result as { taskId?: any; agentId?: any; status?: any; executionTime?: any; output?: any }).output}
 </p> </div> {/each}
   </div> </div> {/if}
   <!-- Workflow, Templates -->
-  {#if showAdvancedControls} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <FileText class="h-5" /> Quick Start Templates </h3> </div>
+  {#if showAdvancedControls} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <span class="i-lucide-file-text h-5 inline-block" /> Quick Start Templates </h3> </div>
  <div class="yorha-panel-content"> <div class="grid grid-cols-1 md:grid-cols-2"> <Button variant="ghost"
             class="h-auto p-4 justify-start bits-btn bits-btn bits-btn"
             onclick={(_event: MouseEvent) => ) => {

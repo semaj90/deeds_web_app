@@ -8,8 +8,6 @@
   // UI Components
   import * as ContextMenu from '$lib/components/ui/context-menu.svelte';
   // Icons
-  import Link from '@lucide/svelte/icons/link';
-  import Sparkles from '@lucide/svelte/icons/sparkles';
   let nodeElement: HTMLDivElement | null = null
   let isDragging = $state<boolean>(false);
   let dragStartX = $state<number>(0);
@@ -74,11 +72,11 @@
   </ContextMenu.Trigger>
   <ContextMenu.Content menu={true}>
     <ContextMenu.Item select={() => saveCitation(window.getSelection()?.toString() ?? '')}>
-      <Link class="space-y-4" />
+      <span class="i-lucide-link space-y-4 inline-block" />
       Save as Citation
     </ContextMenu.Item>
     <ContextMenu.Item select={summarizeReport}>
-      <Sparkles class="space-y-4" />
+      <span class="i-lucide-sparkles space-y-4 inline-block" />
       AI Summary
     </ContextMenu.Item>
   </ContextMenu.Content>
@@ -87,5 +85,4 @@
 <style>
   /* @unocss-include */
 </style>
-
 

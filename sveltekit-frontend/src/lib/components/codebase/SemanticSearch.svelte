@@ -6,11 +6,7 @@
 	 * Task: 14.1 - Create semantic search component
 	 * Purpose: Search input with autocomplete and real-time results
 	 */
-	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
-	import FileCode from '@lucide/svelte/icons/file-code';
-	import Loader2 from '@lucide/svelte/icons/loader-2';
-	import Search from '@lucide/svelte/icons/search';
-	import X from '@lucide/svelte/icons/x';
+	import Icon from '$lib/components/ui/Icon.svelte';
 	// Migrated to $effect
 
 	interface SearchResult { id: string, filePath: string;
@@ -146,7 +142,7 @@
 
 <div class="semantic-search">
 	<div class="search-input-container">
-		<Search class="search-icon h-4 w-4" />
+		<Icon name="search" class="search-icon h-4 w-4" />
 		<input
 			bind:this={inputElement} bind:value={query}
 			oninput={ handleInput }
@@ -159,10 +155,10 @@
 			autocomplete="off"
 		/>
 		{#if isLoading}
-			<Loader2 class="loading-icon h-4 w-4 animate-spin" />
+			<Icon name="loader-2" class="loading-icon h-4 w-4 animate-spin" />
 		{:else if query}
 			<button class="clear-btn" onclick={ clearSearch }>
-				<X class="h-3 w-3" />
+				<Icon name="x" class="h-3 w-3" />
 			</button>
 		{/if}
 	</div>
@@ -178,9 +174,9 @@
 				>
 					<div class="result-icon">
 						{#if result.type === 'error'}
-							<AlertTriangle class="h-4 w-4 text-danger/80" />
+							<Icon name="alert-triangle" class="h-4 w-4 text-danger/80" />
 						{:else}
-							<FileCode class={`h-4 w-4 ${typeColors[result.type] || 'text-sand/40'}`} />
+							<Icon name="file-code" class={`h-4 w-4 ${typeColors[result.type] || 'text-sand/40'}`} />
 						{/if}
 					</div>
 					<div class="result-content">

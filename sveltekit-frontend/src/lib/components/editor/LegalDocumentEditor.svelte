@@ -11,20 +11,6 @@
   import { Textarea } from '$lib/components/ui/textarea';
 
   // Icons
-  import AlertCircle from '@lucide/svelte/icons/alert-circle';
-  import BookOpen from '@lucide/svelte/icons/book-open';
-  import ChevronDown from '@lucide/svelte/icons/chevron-down';
-  import FileText from '@lucide/svelte/icons/file-text';
-  import Loader2 from '@lucide/svelte/icons/loader-2';
-  import Save from '@lucide/svelte/icons/save';
-  import Scale from '@lucide/svelte/icons/scale';
-  import Search from '@lucide/svelte/icons/search';
-  import Settings from '@lucide/svelte/icons/settings';
-  import Share2 from '@lucide/svelte/icons/share-2';
-  import X from '@lucide/svelte/icons/x';
-  import Brain from '@lucide/svelte/icons/brain';
-  import Eye from '@lucide/svelte/icons/eye';
-
   interface Props {
     caseId?: string;
     documentId?: string;
@@ -277,7 +263,7 @@
             <Tooltip.Root>
                 <Tooltip.Trigger>
                     <Button variant="ghost" size="sm">
-                        <AlertCircle class="h-5 w-5" />
+                        <span class="i-lucide-alert-circle h-5 w-5 inline-block" />
                     </Button>
                 </Tooltip.Trigger>
                 <Tooltip.Content>
@@ -288,28 +274,28 @@
             <DropdownMenu.Root>
                 <DropdownMenu.Trigger>
                     <Button variant="outline" class="gap-2">
-                        <Settings class="h-4 w-4" /> Actions <ChevronDown class="h-4 w-4" />
+                        <span class="i-lucide-settings h-4 w-4 inline-block" /> Actions <span class="i-lucide-chevron-down h-4 w-4 inline-block" />
                     </Button>
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Content>
                     <DropdownMenu.Item onclick={() => console.log('Preview')}>
-                        <Eye class="mr-2 h-4 w-4" /> Preview
+                        <span class="i-lucide-eye mr-2 h-4 w-4 inline-block" /> Preview
                     </DropdownMenu.Item>
                     <DropdownMenu.Item onclick={() => console.log('Share')}>
-                        <Share2 class="mr-2 h-4 w-4" /> Share
+                        <span class="i-lucide-share-2 mr-2 h-4 w-4 inline-block" /> Share
                     </DropdownMenu.Item>
                     <DropdownMenu.Separator />
                     <DropdownMenu.Item onclick={() => console.log('Delete')}>
-                        <span class="text-danger flex items-center"><X class="mr-2 h-4 w-4" /> Delete</span>
+                        <span class="text-danger flex items-center"><span class="i-lucide-x mr-2 h-4 w-4 inline-block" /> Delete</span>
                     </DropdownMenu.Item>
                 </DropdownMenu.Content>
             </DropdownMenu.Root>
 
             <Button onclick={manualSaveDocument} disabled={readonly || loadingDocument || isSaving} class="gap-2">
                 {#if isSaving}
-                    <Loader2 class="h-4 w-4 animate-spin" /> Saving...
+                    <span class="i-lucide-loader-2 h-4 w-4 animate-spin inline-block" /> Saving...
                 {:else}
-                    <Save class="h-4 w-4" /> Save
+                    <span class="i-lucide-save h-4 w-4 inline-block" /> Save
                 {/if}
             </Button>
         </div>
@@ -328,18 +314,18 @@
                         <div class="w-px h-6 bg-border mx-2"></div>
                         <Button variant="ghost" size="sm" title="Insert Citation"
                                 onclick={() => insertCitation({ id: crypto.randomUUID(), text: 'Sample Citation', source: 'Smith v. Jones, 123 F.3d 456', type: 'case' })}>
-                            <BookOpen class="h-4 w-4" />
+                            <span class="i-lucide-book-open h-4 w-4 inline-block" />
                         </Button>
 
                         <Button variant="ghost" size="sm" title="AI Assistant" onclick={() => aiDialogOpen = true}>
-                            <Brain class="h-5 w-5 text-info" />
+                            <span class="i-lucide-brain h-5 w-5 text-info inline-block" />
                         </Button>
 
                         <Dialog.Root bind:open={aiDialogOpen}>
                             <Dialog.Content class="sm:max-w-[500px]">
                                 <div class="flex flex-col space-y-1.5 text-center sm:text-left">
                                     <Dialog.Title class="flex items-center gap-2">
-                                        <Brain class="h-6 w-6 text-info" /> AI Legal Assistant
+                                        <span class="i-lucide-brain h-6 w-6 text-info inline-block" /> AI Legal Assistant
                                     </Dialog.Title>
                                     <Dialog.Description>
                                         Ask for help drafting, researching, or refining your document.
@@ -348,7 +334,7 @@
 
                                 {#if error}
                                     <div class="bg-danger/5 text-danger p-3 rounded text-sm flex gap-2 items-center">
-                                        <AlertCircle class="h-4 w-4" /> {error}
+                                        <span class="i-lucide-alert-circle h-4 w-4 inline-block" /> {error}
                                     </div>
                                 {/if}
 
@@ -363,9 +349,9 @@
                                     <Button variant="secondary" onclick={() => aiDialogOpen = false}>Cancel</Button>
                                     <Button onclick={handleAIRequest} disabled={!query.trim() || isProcessingAI} class="gap-2">
                                         {#if isProcessingAI}
-                                            <Loader2 class="h-4 w-4 animate-spin" /> Processing...
+                                            <span class="i-lucide-loader-2 h-4 w-4 animate-spin inline-block" /> Processing...
                                         {:else}
-                                            <Brain class="h-4 w-4" /> Get Help
+                                            <span class="i-lucide-brain h-4 w-4 inline-block" /> Get Help
                                         {/if}
                                     </Button>
                                 </div>
@@ -381,12 +367,12 @@
                 <div class="relative min-h-[600px]">
                     {#if loadingDocument}
                         <div class="absolute inset-0 flex flex-col items-center justify-center bg-background/80 z-10">
-                            <Loader2 class="h-8 w-8 animate-spin text-primary" />
+                            <span class="i-lucide-loader-2 h-8 w-8 animate-spin text-primary inline-block" />
                             <p class="mt-2 text-sm text-muted-foreground">Loading...</p>
                         </div>
                     {:else if documentLoadError}
                          <div class="absolute inset-0 flex flex-col items-center justify-center bg-background/80 z-10">
-                            <AlertCircle class="h-8 w-8 text-danger" />
+                            <span class="i-lucide-alert-circle h-8 w-8 text-danger inline-block" />
                             <p class="mt-2 text-sm font-medium">Failed to load</p>
                             <Button variant="outline" size="sm" class="mt-2" onclick={loadDocument}>Retry</Button>
                         </div>
@@ -407,7 +393,7 @@
             <!-- Citations -->
             <div class="rounded-lg border bg-background p-4 shadow-sm">
                 <div class="mb-4 flex items-center gap-2 border-b pb-2">
-                    <BookOpen class="h-5 w-5 text-primary" />
+                    <span class="i-lucide-book-open h-5 w-5 text-primary inline-block" />
                     <h3 class="font-semibold">Citations</h3>
                 </div>
 
@@ -426,7 +412,7 @@
                     {/if}
 
                     <Button variant="outline" class="w-full gap-2" onclick={() => insertCitation({ id: crypto.randomUUID(), text: 'New Citation', source: 'Source Needed', type: 'other' })}>
-                        <BookOpen class="h-4 w-4" /> Add Citation
+                        <span class="i-lucide-book-open h-4 w-4 inline-block" /> Add Citation
                     </Button>
                 </div>
             </div>
@@ -434,7 +420,7 @@
             <!-- Info -->
             <div class="rounded-lg border bg-background p-4 shadow-sm">
                 <div class="mb-4 flex items-center gap-2 border-b pb-2">
-                    <FileText class="h-5 w-5 text-primary" />
+                    <span class="i-lucide-file-text h-5 w-5 text-primary inline-block" />
                     <h3 class="font-semibold">Document Info</h3>
                 </div>
                 <div class="space-y-2 text-sm">

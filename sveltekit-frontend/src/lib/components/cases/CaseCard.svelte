@@ -1,17 +1,7 @@
 <script lang="ts">
   import Badge from "$lib/components/ui/Badge.svelte";
   import Button from '$lib/components/ui/Button.svelte';
-  import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
-  import Archive from '@lucide/svelte/icons/archive';
-  import Calendar from '@lucide/svelte/icons/calendar';
-  import CheckCircle from '@lucide/svelte/icons/check-circle';
-  import Clock from '@lucide/svelte/icons/clock';
-  import Edit from '@lucide/svelte/icons/edit';
-  import Eye from '@lucide/svelte/icons/eye';
-  import FileText from '@lucide/svelte/icons/file-text';
-  import MoreVertical from '@lucide/svelte/icons/more-vertical';
-  import Trash2 from '@lucide/svelte/icons/trash-2';
-  import Users from '@lucide/svelte/icons/users';
+  import Icon from '$lib/components/ui/Icon.svelte';
   import { scale } from 'svelte/transition';
 
   interface CaseData { id: string, title: string;
@@ -45,13 +35,13 @@
 
   let open = $state(false);
 
-  const statusConfig = { active: { label: 'Active', class: 'bg-accent/10 text-accent', icon: CheckCircle },
+  const statusConfig = { active: { label: 'Active', class: 'bg-accent/10 text-accent', icon: 'check-circle' },
 	pending: {
-	label: 'Pending', class: 'bg-warning/10 text-warning', icon: Clock },
+	label: 'Pending', class: 'bg-warning/10 text-warning', icon: 'clock' },
 	closed: {
-	label: 'Closed', class: 'bg-info/10 text-info', icon: Archive },
+	label: 'Closed', class: 'bg-info/10 text-info', icon: 'archive' },
 	archived: {
-	label: 'Archived', class: 'bg-sand/10 text-sand', icon: Archive }
+	label: 'Archived', class: 'bg-sand/10 text-sand', icon: 'archive' }
   };
 
   const priorityConfig = { critical: { icon: '🔴', color: 'text-danger' },
@@ -108,8 +98,7 @@
       <div class="flex items-center gap-2">
         <Badge variant="outline" class={currentStatus.class}>
           {#if currentStatus.icon}
-            {@const StatusIcon = currentStatus.icon}
-            <StatusIcon class="w-3 h-3 mr-1" />
+            <Icon name={currentStatus.icon} class="w-3 h-3 mr-1" />
           {/if}
           {currentStatus.label}
         </Badge>
@@ -120,7 +109,7 @@
           aria-label="More options"
           onclick={() => open = !open}
         >
-          <MoreVertical class="w-5 h-5 text-nier-gray" />
+          <Icon name="more-vertical" class="w-5 h-5 text-nier-gray" />
         </Button>
       </div>
     </div>
@@ -129,7 +118,7 @@
     <div class="grid grid-cols-3 gap-4 mb-4">
       <div class="text-center p-3 rounded-lg bg-nier-white/50">
         <div class="flex items-center justify-center gap-1">
-          <FileText class="w-4 h-4 text-nier-gray" />
+          <Icon name="file-text" class="w-4 h-4 text-nier-gray" />
           <p class="text-xl font-bold text-harvard-crimson">
             {caseData.stats.documents}
           </p>
@@ -139,7 +128,7 @@
 
       <div class="text-center p-3 rounded-lg bg-nier-white/50">
         <div class="flex items-center justify-center gap-1">
-          <AlertTriangle class="w-4 h-4 text-nier-gray" />
+          <Icon name="alert-triangle" class="w-4 h-4 text-nier-gray" />
           <p class="text-xl font-bold text-harvard-crimson">
             {caseData.stats.evidence}
           </p>
@@ -149,7 +138,7 @@
 
       <div class="text-center p-3 rounded-lg bg-nier-white/50">
         <div class="flex items-center justify-center gap-1">
-          <Users class="w-4 h-4 text-nier-gray" />
+          <Icon name="users" class="w-4 h-4 text-nier-gray" />
           <p class="text-xl font-bold text-harvard-crimson">
             {caseData.stats.witnesses}
           </p>
@@ -209,7 +198,7 @@
       </div>
 
       <div class="flex items-center gap-2 text-xs text-nier-gray">
-        <Calendar class="w-3 h-3" />
+        <Icon name="calendar" class="w-3 h-3" />
         <span title={formatDate(caseData.created)}>
           {daysAgo(caseData.created)}
         </span>
@@ -223,7 +212,7 @@
         class="flex-1"
         size="sm"
       >
-        <Eye class="w-4 h-4 mr-1" />
+        <Icon name="eye" class="w-4 h-4 mr-1" />
         View Details
       </Button>
       <Button
@@ -231,7 +220,7 @@
         variant="ghost"
         size="sm"
       >
-        <Edit class="w-4 h-4" />
+        <Icon name="edit" class="w-4 h-4" />
       </Button>
     </div>
   </div>
@@ -253,7 +242,7 @@
       class="w-full justify-start"
       size="sm"
     >
-      <Eye class="w-4 h-4 mr-2" />
+      <Icon name="eye" class="w-4 h-4 mr-2" />
       View Details
     </Button>
     <Button
@@ -262,7 +251,7 @@
       class="w-full justify-start"
       size="sm"
     >
-      <Edit class="w-4 h-4 mr-2" />
+      <Icon name="edit" class="w-4 h-4 mr-2" />
       Edit Case
     </Button>
     <div class="h-px bg-nier-light-gray dark:bg-nier-gray/30 my-1"></div>
@@ -272,7 +261,7 @@
       class="w-full justify-start text-warning hover:bg-warning/5"
       size="sm"
     >
-      <Archive class="w-4 h-4 mr-2" />
+      <Icon name="archive" class="w-4 h-4 mr-2" />
       Archive
     </Button>
     <Button
@@ -281,7 +270,7 @@
       class="w-full justify-start text-danger hover:bg-danger/5"
       size="sm"
     >
-      <Trash2 class="w-4 h-4 mr-2" />
+      <Icon name="trash-2" class="w-4 h-4 mr-2" />
       Delete
     </Button>
   </div>

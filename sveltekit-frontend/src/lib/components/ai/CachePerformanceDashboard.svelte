@@ -1,18 +1,5 @@
 <!-- Cache Performance Dashboard for Legal AI System -->
 <script lang="ts">
-  import Database from '@lucide/svelte/icons/database';
-  import Zap from '@lucide/svelte/icons/zap';
-  import TrendingUp from '@lucide/svelte/icons/trending-up';
-  import DollarSign from '@lucide/svelte/icons/dollar-sign';
-  import Clock from '@lucide/svelte/icons/clock';
-  import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
-  import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-  import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
-  import CheckCircle from '@lucide/svelte/icons/check-circle';
-  import Target from '@lucide/svelte/icons/target';
-  import Cpu from '@lucide/svelte/icons/cpu';
-  import HardDrive from '@lucide/svelte/icons/hard-drive';
-
   // Cache metrics state
   let cacheMetrics = $state({
     retrieval: {
@@ -256,9 +243,9 @@
       <div class="header-controls">
         <div class="system-health {systemHealth}">
           {#if systemHealth === 'healthy'}
-            <CheckCircle size={20} class={healthColor} />
+            <span class="i-lucide-check-circle w-5 h-5 inline-block" />
           {:else}
-            <AlertTriangle size={20} class={healthColor} />
+            <span class="i-lucide-alert-triangle w-5 h-5 inline-block" />
           {/if}
           <span>System {systemHealth.toUpperCase()}</span>
         </div>
@@ -269,7 +256,7 @@
             disabled={isRefreshing}
             class="refresh-btn"
           >
-            <RefreshCw size={16} class={isRefreshing ? 'animate-spin' : ''} />
+            <span class="i-lucide-refresh-cw w-4 h-4 inline-block" />
             Refresh
           </button>
           <button
@@ -277,7 +264,7 @@
             onclick={toggleAutoRefresh}
             class="auto-refresh-btn {autoRefresh ? 'active' : ''}"
           >
-            <Target size={16} />
+            <span class="i-lucide-target w-4 h-4 inline-block" />
             Auto: {autoRefresh ? 'ON' : 'OFF'}
           </button>
           <button
@@ -285,7 +272,7 @@
             onclick={clearCache}
             class="clear-cache-btn"
           >
-            <Database size={16} />
+            <span class="i-lucide-database w-4 h-4 inline-block" />
             Clear Cache
           </button>
         </div>
@@ -298,7 +285,7 @@
     <!-- Key Metrics Row -->
     <section class="metrics-overview">
       <div class="metric-card">
-        <div class="metric-icon"><TrendingUp size={24} /></div>
+        <div class="metric-icon"><span class="i-lucide-trending-up w-6 h-6 inline-block" /></div>
         <div class="metric-content">
           <h3>Overall Hit Rate</h3>
           <div class="metric-value {performanceGrade.color}">
@@ -308,21 +295,21 @@
         </div>
       </div>
       <div class="metric-card">
-        <div class="metric-icon"><Clock size={24} /></div>
+        <div class="metric-icon"><span class="i-lucide-clock w-6 h-6 inline-block" /></div>
         <div class="metric-content">
           <h3>Avg Response</h3>
           <div class="metric-value">{cacheMetrics.performance.averageQueryTime.toFixed(0)}ms</div>
         </div>
       </div>
       <div class="metric-card">
-        <div class="metric-icon"><DollarSign size={24} /></div>
+        <div class="metric-icon"><span class="i-lucide-dollar-sign w-6 h-6 inline-block" /></div>
         <div class="metric-content">
           <h3>Cost Savings</h3>
           <div class="metric-value">${cacheMetrics.embedding.costSavings}</div>
         </div>
       </div>
       <div class="metric-card">
-        <div class="metric-icon"><BarChart3 size={24} /></div>
+        <div class="metric-icon"><span class="i-lucide-bar-chart-3 w-6 h-6 inline-block" /></div>
         <div class="metric-content">
           <h3>Throughput</h3>
           <div class="metric-value">{cacheMetrics.performance.throughputQPS.toFixed(1)} QPS</div>
@@ -415,15 +402,15 @@
           </div>
           <div class="bank-info">
             <div class="bank-item">
-              <Cpu size={16} />
+              <span class="i-lucide-cpu w-4 h-4 inline-block" />
               <span>Active Bank: {nintendoStats.activeBankId}</span>
             </div>
             <div class="bank-item">
-              <HardDrive size={16} />
+              <span class="i-lucide-hard-drive w-4 h-4 inline-block" />
               <span>Textures: {nintendoStats.textureCount}</span>
             </div>
             <div class="bank-item">
-              <Zap size={16} />
+              <span class="i-lucide-zap w-4 h-4 inline-block" />
               <span>Streams: {nintendoStats.activeStreams}</span>
             </div>
           </div>

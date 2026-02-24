@@ -19,12 +19,7 @@
     error: (msg: string) => console.error('[Custody] \u274C', msg),
     info: (msg: string) => console.info('[Custody] \u2139\uFE0F', msg),
   };
-  import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
-  import CheckCircle from '@lucide/svelte/icons/check-circle';
-  import Clock from '@lucide/svelte/icons/clock';
-  import Users from '@lucide/svelte/icons/users';
-  import FileCheck from '@lucide/svelte/icons/file-check';
-  import Shield from '@lucide/svelte/icons/shield';
+  import Icon from '$lib/components/ui/Icon.svelte';
 
   // Props
   interface Props {
@@ -213,17 +208,17 @@
     }
   }
 
-  function getStatusIcon(status: string) {
+  function getStatusIconName(status: string): string {
     switch (status) {
       case 'verified':
-        return CheckCircle;
+        return 'check-circle';
       case 'compromised':
-        return AlertTriangle;
+        return 'alert-triangle';
       case 'pending':
       case 'requires-attention':
-        return Clock;
+        return 'clock';
       default:
-        return Clock;
+        return 'clock';
     }
   }
 
@@ -263,14 +258,14 @@
     <div class="flex items-center space-x-4">
       {#if integrityStatus}
         <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium {integrityStatus === 'verified' ? 'bg-accent/10 text-accent' : integrityStatus === 'compromised' ? 'bg-danger/10 text-danger' : 'bg-sand/10 text-sand'}">
-          <svelte:component this={getStatusIcon(integrityStatus)} class="w-4 h-4" />
+          <Icon name={getStatusIconName(integrityStatus)} class="w-4 h-4" />
           {integrityStatus.toUpperCase()}
         </span>
       {/if}
 
       {#if activeCollaborators.length > 0}
         <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-sand/10 text-sand border border-sand/20">
-          <Users class="w-4 h-4" />
+          <Icon name="users" class="w-4 h-4" />
           {activeCollaborators.length} Collaborator{activeCollaborators.length > 1 ? 's' : ''}
         </span>
       {/if}
@@ -289,7 +284,7 @@
   <!-- Error Messages -->
   {#if error}
     <div class="border border-danger/30 bg-danger/5 rounded-lg p-4 flex items-start gap-3">
-      <AlertTriangle class="w-5 h-5 text-danger flex-shrink-0 mt-0.5" />
+      <Icon name="alert-triangle" class="w-5 h-5 text-danger flex-shrink-0 mt-0.5" />
       <div>
         <h4 class="font-medium text-danger">Workflow Error</h4>
         <p class="text-danger text-sm">{error}</p>
@@ -300,7 +295,7 @@
   <!-- Warnings -->
   {#if warnings.length > 0}
     <div class="border border-warning/30 bg-warning/5 rounded-lg p-4 flex items-start gap-3">
-      <AlertTriangle class="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
+      <Icon name="alert-triangle" class="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
       <div>
         <h4 class="font-medium text-warning">Warnings</h4>
         <ul class="list-disc list-inside mt-2 text-sm text-warning">
@@ -321,7 +316,7 @@
         <div class="border rounded-lg overflow-hidden">
           <div class="px-4 py-3 border-b bg-sand/5">
             <h3 class="font-medium flex items-center gap-2">
-              <Shield class="w-5 h-5" />
+              <Icon name="shield" class="w-5 h-5" />
               Start Custody Workflow
             </h3>
           </div>
@@ -342,7 +337,7 @@
         <div class="border rounded-lg overflow-hidden">
           <div class="px-4 py-3 border-b bg-sand/5 flex items-center justify-between">
             <h3 class="font-medium flex items-center gap-2">
-              <FileCheck class="w-5 h-5" />
+              <Icon name="file-check" class="w-5 h-5" />
               Integrity Verification
             </h3>
             <button
@@ -370,7 +365,7 @@
         <div class="border rounded-lg overflow-hidden">
           <div class="px-4 py-3 border-b bg-sand/5">
             <h3 class="font-medium flex items-center gap-2">
-              <Clock class="w-5 h-5" />
+              <Icon name="clock" class="w-5 h-5" />
               Custody Timeline
             </h3>
           </div>

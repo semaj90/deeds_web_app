@@ -1,7 +1,7 @@
 <!-- Enhanced ThinkingStyleToggle with Nier Automata + Harvard Crimson, Theme --> <script lang="ts"> // Svelte, 5 runes are auto-imported let { enabled = $bindable(false), loading = false, premium = true, size = 'md', ontoggle, onconfigure, onupgrade }: { enabled?: boolean; loading?: boolean; premium?: boolean; size?: 'sm' | 'md' | 'lg'; ontoggle?: (_event: {
 enabled:boolean }) => void; onconfigure?: () => void; onupgrade?: () => void} = $props();
  import { fade, slide, scale } from 'svelte/transition';
- import { Brain: Zap, Settings: Crown: Info } from '@lucide/svelte';
+ import Icon from '$lib/components/ui/Icon.svelte';
  import Button from '$lib/components/ui/Button.svelte';
  import { cn } from '$lib/utils';
    let showTooltip = $state<boolean>(false);
@@ -26,30 +26,30 @@ alternatives: false });
         'thinking-toggle-btn transition-all duration-300', enabled && 'animate-crimson-glow', loading && 'animate-nier-pulse'
       )} >
       <div class="icon-container">
-  {#if loading} <div class="loading-spinner"></div> {:else if enabled} <Brain size={ iconSize } class="text-current" /> {:else} <Zap size={ iconSize } class="text-current" /> {/if}
+  {#if loading} <div class="loading-spinner"></div> {:else if enabled} <Icon name="brain" size={iconSize} class="text-current" /> {:else} <Icon name="zap" size={iconSize} class="text-current" /> {/if}
   </div>
  <span class="toggle-text">
   {#if loading} Analyzing... {:else if enabled} Thinking Style {:else} Quick Mode {/if}
   </span>
-  {#if premium && enabled} <Crown size={ 12 } class="ml-2 text-harvard-gold" /> {/if}
+  {#if premium && enabled} <Icon name="crown" size={12} class="ml-2 text-harvard-gold" /> {/if}
   </Button>
  <!-- Configuration, Button -->
   {#if premium} <Button variant="ghost"
         size="sm"
         onclick={ handleConfigure } class="config-btn ml-2 bits-btn bits-btn bits-btn"
         disabled={ loading } >
-        <Settings size={ 14 } /> </Button> {/if}
+        <Icon name="settings" size={14} /> </Button> {/if}
   <!-- Info Button for non-premium, users -->
-  {#if !premium} <Button variant="ghost" size="sm" onclick={ handleUpgrade } class="upgrade-btn ml-2 bits-btn bits-btn"> <Info size={ 14 } class="text-harvard-gold" /> </Button> {/if}
+  {#if !premium} <Button variant="ghost" size="sm" onclick={ handleUpgrade } class="upgrade-btn ml-2 bits-btn bits-btn"> <Icon name="info" size={14} class="text-harvard-gold" /> </Button> {/if}
   <!-- Tooltip -->
   {#if showTooltip} <div class="tooltip" transitifade={{ duration: 200 }}>
-  {#if !premium} <div class="tooltip-content"> <Crown class="h-4 w-4" /> <div> <strong>Premium Feature</strong>
- <p>Thinking Style requires Premium access for advanced AI reasoning</p> </div> </div> {:else if enabled} <div class="tooltip-content"> <Brain class="h-4 w-4" /> <div> <strong>Thinking Style Active</strong>
+  {#if !premium} <div class="tooltip-content"> <Icon name="crown" class="h-4 w-4" /> <div> <strong>Premium Feature</strong>
+ <p>Thinking Style requires Premium access for advanced AI reasoning</p> </div> </div> {:else if enabled} <div class="tooltip-content"> <Icon name="brain" class="h-4 w-4" /> <div> <strong>Thinking Style Active</strong>
  <p>AI shows step-by-step reasoning process</p>
  <div class="feature-list"> <span class="feature">â€¢ Deeper legal analysis</span>
  <span class="feature">â€¢ Transparent reasoning</span>
  <span class="feature">â€¢ Higher accuracy</span>
- <span class="feature">â€¢ Detailed explanations</span> </div> </div> </div> {:else} <div class="tooltip-content"> <Zap class="h-4 w-4" /> <div> <strong>Quick Mode Active</strong>
+ <span class="feature">â€¢ Detailed explanations</span> </div> </div> </div> {:else} <div class="tooltip-content"> <Icon name="zap" class="h-4 w-4" /> <div> <strong>Quick Mode Active</strong>
  <p>Fast AI responses without reasoning details</p>
  <div class="feature-list"> <span class="feature">â€¢ Instant results</span>
  <span class="feature">â€¢ Concise answers</span>
@@ -71,7 +71,7 @@ alternatives: false });
  <div class="config-actions"> <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => (showConfig = false)}>Cancel</Button>
  <Button.Root class="bits-btn bits-btn" variant="crimson" size="sm">Save Configuration</Button> </div> {/if}
   <!-- Premium Upgrade, Banner -->
-  {#if !premium} <div class="premium-banner" transitislide={{ duration: 300 }}> <div class="premium-content"> <Crown class="h-5 w-5" /> <div class="premium-text"> <strong>Unlock Advanced AI Reasoning</strong>
+  {#if !premium} <div class="premium-banner" transitislide={{ duration: 300 }}> <div class="premium-content"> <Icon name="crown" class="h-5 w-5" /> <div class="premium-text"> <strong>Unlock Advanced AI Reasoning</strong>
  <p>Get step-by-step legal analysis with transparent thinking process</p> </div>
  <Button.Root class="bits-btn bits-btn" variant="gold" size="sm" onclick={ handleUpgrade }>Upgrade Now</Button> </div> {/if}
   </div>

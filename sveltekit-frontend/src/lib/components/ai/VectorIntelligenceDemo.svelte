@@ -1,12 +1,4 @@
 <script lang="ts">
-	import Search from '@lucide/svelte/icons/search';
-	import Database from '@lucide/svelte/icons/database';
-	import Brain from '@lucide/svelte/icons/brain';
-	import FileText from '@lucide/svelte/icons/file-text';
-	import AlertCircle from '@lucide/svelte/icons/alert-circle';
-	import Loader2 from '@lucide/svelte/icons/loader-2';
-	import Clock from '@lucide/svelte/icons/clock';
-
 	type SearchResult = {
 		id: string;
 		title: string;
@@ -161,7 +153,7 @@
 	<!-- Header -->
 	<div class="text-center mb-6">
 		<div class="flex items-center justify-center gap-2 text-2xl font-bold text-sand">
-			<Brain class="h-6 w-6 text-accent" />
+			<span class="i-lucide-brain h-6 w-6 text-accent inline-block" />
 			Vector Intelligence Demo
 		</div>
 		<p class="text-sm text-sand/60 mt-1">
@@ -184,10 +176,10 @@
 			class="px-4 py-2 rounded-lg bg-accent text-white font-medium flex items-center gap-2 hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed transition"
 		>
 			{#if isSearching}
-				<Loader2 class="h-4 w-4 animate-spin" />
+				<span class="i-lucide-loader-2 h-4 w-4 animate-spin inline-block" />
 				Searching
 			{:else}
-				<Search class="h-4 w-4" />
+				<span class="i-lucide-search h-4 w-4 inline-block" />
 				Search
 			{/if}
 		</button>
@@ -210,7 +202,7 @@
 	<!-- Error Display -->
 	{#if error}
 		<div class="mb-4 p-3 bg-danger/5 border border-danger/20 rounded-lg flex items-center gap-2">
-			<AlertCircle class="h-4 w-4 text-danger" />
+			<span class="i-lucide-alert-circle h-4 w-4 text-danger inline-block" />
 			<span class="text-sm text-danger">{error}</span>
 		</div>
 	{/if}
@@ -289,7 +281,7 @@
 								{/if}
 								{#if result.metadata?.uploadDate}
 									<div class="flex items-center gap-1">
-										<Clock class="h-3 w-3 text-sand/40" />
+										<span class="i-lucide-clock h-3 w-3 text-sand/40 inline-block" />
 										<span class="text-sand/60">{result.metadata.uploadDate}</span>
 									</div>
 								{/if}

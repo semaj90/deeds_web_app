@@ -4,15 +4,7 @@
 	import { Dialog, DialogContent } from '$lib/components/ui/dialog';
 	import Button from '$lib/components/ui/Button.svelte';
 	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
-	import Camera from '@lucide/svelte/icons/camera';
-	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import Download from '@lucide/svelte/icons/download';
-	import Eye from '@lucide/svelte/icons/eye';
-	import X from '@lucide/svelte/icons/x';
-	import ZoomIn from '@lucide/svelte/icons/zoom-in';
-	import ZoomOut from '@lucide/svelte/icons/zoom-out';
- // Migrated from createEventDispatcher to callback props;
+	// Migrated from createEventDispatcher to callback props;
 
  let { photos = [], currentIndex = $bindable(0), open = $bindable(false), onclose } = $props<{
  photos?: any[];
@@ -107,27 +99,27 @@
  onclick={ prevPhoto }
  disabled={currentIndex === 0}
  >
- <ChevronLeft class="w-6 h-6" />
+ <span class="i-lucide-chevron-left w-6 h-6 inline-block" />
  </button>
  <button
  class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
  onclick={ nextPhoto }
  disabled={currentIndex === photos.length - 1}
  >
- <ChevronRight class="w-6 h-6" />
+ <span class="i-lucide-chevron-right w-6 h-6 inline-block" />
  </button>
  {/if}
 
  <!-- Zoom Controls -->
  <div class="absolute top-4 right-4 flex gap-2">
  <Button class="bits-btn" variant="secondary" size="sm" onclick={zoomOut} disabled={zoomLevel <= 0.5}>
- <ZoomOut class="w-4 h-4" />
+ <span class="i-lucide-zoom-out w-4 h-4 inline-block" />
  </Button>
  <Button class="bits-btn" variant="secondary" size="sm" onclick={zoomIn} disabled={zoomLevel >= 3}>
- <ZoomIn class="w-4 h-4" />
+ <span class="i-lucide-zoom-in w-4 h-4 inline-block" />
  </Button>
  <Button class="bits-btn" variant="secondary" size="sm" onclick={downloadPhoto}>
- <Download class="w-4 h-4" />
+ <span class="i-lucide-download w-4 h-4 inline-block" />
  </Button>
  </div>
 
@@ -146,7 +138,7 @@
  <div class="flex items-center justify-between mb-4">
  <h3 class="text-lg font-semibold">Photo Analysis</h3>
  <Button class="bits-btn" variant="ghost" size="sm" onclick={close}>
- <X class="w-4 h-4" />
+ <span class="i-lucide-x w-4 h-4 inline-block" />
  </Button>
  </div>
 
@@ -162,7 +154,7 @@
  <Card>
  <CardHeader class="pb-3">
  <CardTitle class="text-sm flex items-center gap-2">
- <Camera class="w-4 h-4" />
+ <span class="i-lucide-camera w-4 h-4 inline-block" />
  Photo Details
  </CardTitle>
  </CardHeader>
@@ -214,7 +206,7 @@
  <Card>
  <CardHeader class="pb-3">
  <CardTitle class="text-sm flex items-center gap-2">
- <Eye class="w-4 h-4" />
+ <span class="i-lucide-eye w-4 h-4 inline-block" />
  AI Caption
  </CardTitle>
  </CardHeader>
@@ -269,7 +261,7 @@
  <Card>
  <CardHeader class="pb-3">
  <CardTitle class="text-sm flex items-center gap-2">
- <Camera class="w-4 h-4" />
+ <span class="i-lucide-camera w-4 h-4 inline-block" />
  EXIF Data
  </CardTitle>
  </CardHeader>
@@ -285,7 +277,7 @@
  {:else}
  <Card>
  <CardContent class="text-center py-8 text-sand/60">
- <Camera class="w-8 h-8 mx-auto mb-2 opacity-50" />
+ <span class="i-lucide-camera w-8 h-8 mx-auto mb-2 opacity-50 inline-block" />
  <p>No EXIF data available</p>
  </CardContent>
  </Card>
@@ -324,5 +316,4 @@
  background: #a0aec0;
  }
 </style>
-
 

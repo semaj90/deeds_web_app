@@ -6,11 +6,7 @@
 	 * Task: 14.3 - Create graph export component
 	 * Purpose: Export graph data to JSON, PNG/SVG, CSV
 	 */
-	import Check from '@lucide/svelte/icons/check';
-	import Download from '@lucide/svelte/icons/download';
-	import FileJson from '@lucide/svelte/icons/file-json';
-	import FileSpreadsheet from '@lucide/svelte/icons/file-spreadsheet';
-	import Image from '@lucide/svelte/icons/image';
+	import Icon from '$lib/components/ui/Icon.svelte';
 
 	interface GraphNode {
 		id: string;
@@ -169,7 +165,7 @@
 
 <div class="graph-export">
 	<div class="export-header">
-		<Download class="h-4 w-4" />
+		<Icon name="download" class="h-4 w-4" />
 		<span>Export</span>
 	</div>
 
@@ -179,10 +175,10 @@
 			onclick={exportJSON}
 			disabled={isExporting}
 		>
-			<FileJson class="h-4 w-4" />
+			<Icon name="file-json" class="h-4 w-4" />
 			<span>JSON</span>
 			{#if exportSuccess === 'JSON'}
-				<span class="success-icon"><Check class="h-3 w-3" /></span>
+				<span class="success-icon"><Icon name="check" class="h-3 w-3" /></span>
 			{/if}
 		</button>
 
@@ -191,10 +187,10 @@
 			onclick={exportCSV}
 			disabled={isExporting}
 		>
-			<FileSpreadsheet class="h-4 w-4" />
+			<Icon name="file-spreadsheet" class="h-4 w-4" />
 			<span>CSV</span>
 			{#if exportSuccess === 'CSV'}
-				<span class="success-icon"><Check class="h-3 w-3" /></span>
+				<span class="success-icon"><Icon name="check" class="h-3 w-3" /></span>
 			{/if}
 		</button>
 
@@ -204,10 +200,10 @@
 			disabled={isExporting || !svgElement}
 			title={!svgElement ? 'SVG element not available' : ''}
 		>
-			<Image class="h-4 w-4" />
+			<Icon name="image" class="h-4 w-4" />
 			<span>SVG</span>
 			{#if exportSuccess === 'SVG'}
-				<span class="success-icon"><Check class="h-3 w-3" /></span>
+				<span class="success-icon"><Icon name="check" class="h-3 w-3" /></span>
 			{/if}
 		</button>
 
@@ -217,10 +213,10 @@
 			disabled={isExporting || !svgElement}
 			title={!svgElement ? 'SVG element not available' : ''}
 		>
-			<Image class="h-4 w-4" />
+			<Icon name="image" class="h-4 w-4" />
 			<span>PNG</span>
 			{#if exportSuccess === 'PNG'}
-				<span class="success-icon"><Check class="h-3 w-3" /></span>
+				<span class="success-icon"><Icon name="check" class="h-3 w-3" /></span>
 			{/if}
 		</button>
 	</div>

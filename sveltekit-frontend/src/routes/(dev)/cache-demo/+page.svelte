@@ -3,12 +3,7 @@
 	import CacheMonitor from '$lib/components/cache/CacheMonitor.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card/index';
-	import Activity from '@lucide/svelte/icons/activity';
-	import Database from '@lucide/svelte/icons/database';
-	import Download from '@lucide/svelte/icons/download';
-	import Trash2 from '@lucide/svelte/icons/trash-2';
-	import Upload from '@lucide/svelte/icons/upload';
-	import Zap from '@lucide/svelte/icons/zap';
+	import Icon from '$lib/components/ui/Icon.svelte';
 
 	const cache = useCache();
 
@@ -68,7 +63,7 @@
 
 <div class="container mx-auto p-6 space-y-6">
 	<div class="flex items-center gap-3 mb-8">
-		<Database class="w-8 h-8 text-blue-500" />
+		<Icon name="database" class="w-8 h-8 text-blue-500" />
 		<h1 class="text-3xl font-bold">Cache System Demo</h1>
 	</div>
 
@@ -76,7 +71,7 @@
 	<Card>
 		<CardHeader>
 			<CardTitle class="flex items-center gap-2">
-				<Activity class="w-5 h-5" />
+				<Icon name="activity" class="w-5 h-5" />
 				System Health
 			</CardTitle>
 		</CardHeader>
@@ -108,7 +103,7 @@
 	<Card>
 		<CardHeader>
 			<CardTitle class="flex items-center gap-2">
-				<Zap class="w-5 h-5" />
+				<Icon name="zap" class="w-5 h-5" />
 				Performance Statistics
 			</CardTitle>
 		</CardHeader>
@@ -203,16 +198,16 @@
 
 			<div class="flex flex-wrap gap-2">
 				<Button onclick={testMemoryCache}>
-					<Zap class="w-4 h-4 mr-2" />
+					<Icon name="zap" class="w-4 h-4 mr-2" />
 					Memory Only
 				</Button>
 				<Button onclick={testPersistentCache}>
-					<Database class="w-4 h-4 mr-2" />
+					<Icon name="database" class="w-4 h-4 mr-2" />
 					Persistent Only
 				</Button>
 				<Button onclick={testTwoLayerCache}>
-					<Zap class="w-4 h-4 mr-2" />
-					<Database class="w-4 h-4 mr-2" />
+					<Icon name="zap" class="w-4 h-4 mr-2" />
+					<Icon name="database" class="w-4 h-4 mr-2" />
 					Two-Layer
 				</Button>
 			</div>
@@ -222,7 +217,7 @@
 					Retrieve
 				</Button>
 				<Button onclick={clearAllCaches} variant="destructive">
-					<Trash2 class="w-4 h-4 mr-2" />
+					<Icon name="trash-2" class="w-4 h-4 mr-2" />
 					Clear All
 				</Button>
 			</div>
@@ -247,11 +242,11 @@
 			</p>
 			<div class="flex gap-2">
 				<Button onclick={persistSnapshot}>
-					<Download class="w-4 h-4 mr-2" />
+					<Icon name="download" class="w-4 h-4 mr-2" />
 					Persist Snapshot
 				</Button>
 				<Button onclick={restoreSnapshot} variant="outline">
-					<Upload class="w-4 h-4 mr-2" />
+					<Icon name="upload" class="w-4 h-4 mr-2" />
 					Restore Snapshot
 				</Button>
 			</div>

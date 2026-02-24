@@ -1,11 +1,5 @@
 <script lang="ts">
-  import AlertCircle from '@lucide/svelte/icons/alert-circle';
-  import Brain from '@lucide/svelte/icons/brain';
-  import CheckCircle from '@lucide/svelte/icons/check-circle';
-  import Clock from '@lucide/svelte/icons/clock';
-  import Cpu from '@lucide/svelte/icons/cpu';
-  import XCircle from '@lucide/svelte/icons/x-circle';
-  import Zap from '@lucide/svelte/icons/zap';
+  import Icon from '$lib/components/ui/Icon.svelte';
   import { cubicOut } from 'svelte/easing';
   import { tweened } from 'svelte/motion';
 
@@ -58,21 +52,21 @@
     lg: 'w-6 h-6'
   };
 
-  function getOperationIcon(op: string) {
+  function getOperationIcon(op: string): string {
     switch (op) {
-      case 'ai': return Brain;
-      case 'gpu': return Zap;
-      case 'cpu': return Cpu;
-      case 'upload': return CheckCircle;
-      default:return Brain;
+      case 'ai': return 'brain';
+      case 'gpu': return 'zap';
+      case 'cpu': return 'cpu';
+      case 'upload': return 'check-circle';
+      default:return 'brain';
     }
   }
 
-  function getStatusIcon(st: string) {
+  function getStatusIcon(st: string): string {
     switch (st) {
-      case 'success': return CheckCircle;
-      case 'error': return XCircle;
-      case 'warning': return AlertCircle;
+      case 'success': return 'check-circle';
+      case 'error': return 'x-circle';
+      case 'warning': return 'alert-circle';
       default:return getOperationIcon(operation);
     }
   }
@@ -132,16 +126,14 @@
       <!-- Icon -->
       <div class="flex-shrink-0">
         {#if status === 'loading'}
-          {@const OperationIcon = getOperationIcon(operation)}
           <div class="relative">
-            <OperationIcon class="{iconSizes[size]} {getStatusColor(status)} animate-pulse" />
+            <Icon name={getOperationIcon(operation)} class="{iconSizes[size]} {getStatusColor(status)} animate-pulse" />
             {#if operation === 'ai' || operation === 'gpu'}
               <div class="absolute -inset-1 rounded-full border-2 border-current opacity-20 animate-spin border-r-transparent"></div>
             {/if}
           </div>
         {:else}
-          {@const StatusIcon = getStatusIcon(status)}
-          <StatusIcon class="{iconSizes[size]} {getStatusColor(status)}" />
+          <Icon name={getStatusIcon(status)} class="{iconSizes[size]} {getStatusColor(status)}" />
         {/if}
       </div>
 
@@ -172,7 +164,7 @@
           <div class="mt-2 flex items-center gap-4 text-xs text-sand/60">
             {#if elapsedTime > 0}
               <span class="flex items-center gap-1">
-                <Clock class="w-3 h-3" />
+                <Icon name="clock" class="w-3 h-3" />
                 Elapsed: {formatTime(elapsedTime)}
               </span>
             {/if}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { AlertTriangle, BarChart3, TrendingUp, Shield, RefreshCw, ChevronDown, ChevronUp, Search } from '@lucide/svelte/icons';
+	import Icon from '$lib/components/ui/Icon.svelte';
 
 	interface ScoreFactor {
 		category: string;
@@ -168,12 +168,12 @@
 <div class="scoring-dashboard">
 	<div class="scoring-header">
 		<div class="scoring-title">
-			<BarChart3 size={18} />
+			<Icon name="bar-chart-3" size={18} />
 			<h3>AI Case Scoring</h3>
 		</div>
 		<div class="scoring-controls">
 			<div class="search-box">
-				<Search size={14} />
+				<Icon name="search" size={14} />
 				<input type="text" placeholder="Search cases..." bind:value={searchQuery} />
 			</div>
 			<select bind:value={scoreFilter}>
@@ -183,14 +183,14 @@
 				<option value="low">Low (&lt;40)</option>
 			</select>
 			<button onclick={loadScores} class="refresh-btn" disabled={isLoading}>
-				<RefreshCw size={14} class={isLoading ? 'spin' : ''} />
+				<Icon name="refresh-cw" size={14} class={isLoading ? "spin" : ""} />
 			</button>
 		</div>
 	</div>
 
 	{#if errorMessage}
 		<div class="error-bar">
-			<AlertTriangle size={14} />
+			<Icon name="alert-triangle" size={14} />
 			<span>{errorMessage}</span>
 		</div>
 	{/if}
@@ -217,14 +217,14 @@
 							</div>
 							<span class="case-desc">{caseItem.description}</span>
 							<div class="case-meta">
-								<span><Shield size={12} /> {caseItem.confidence}% confidence</span>
-								<span><TrendingUp size={12} /> {caseItem.riskLevel} risk</span>
+								<span><Icon name="shield" size={12} /> {caseItem.confidence}% confidence</span>
+								<span><Icon name="trending-up" size={12} /> {caseItem.riskLevel} risk</span>
 							</div>
 						</div>
 						{#if expanded}
-							<ChevronUp size={16} />
+							<Icon name="chevron-up" size={16} />
 						{:else}
-							<ChevronDown size={16} />
+							<Icon name="chevron-down" size={16} />
 						{/if}
 					</button>
 

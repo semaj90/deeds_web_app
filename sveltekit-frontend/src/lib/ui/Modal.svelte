@@ -1,10 +1,6 @@
 
 <script lang="ts">
- import AlertCircle from "@lucide/svelte/icons/alert-circle";
- import AlertTriangle from "@lucide/svelte/icons/alert-triangle";
- import CheckCircle from "@lucide/svelte/icons/check-circle";
- import Info from "@lucide/svelte/icons/info";
- import X from "@lucide/svelte/icons/x";
+ import Icon from '$lib/components/ui/Icon.svelte';
 
  interface Props {
   open: boolean;
@@ -42,17 +38,17 @@
  let previousFocus = $state<HTMLElement | null>(null);
 
  // Get icon based on variant
- function getVariantIcon() {
+ function getVariantIcon(): string | null {
   switch (variant) {
-  case 'destructive': return AlertTriangle;
-  case 'success': return CheckCircle;
-  case 'warning': return AlertCircle;
-  case 'info': return Info;
+  case 'destructive': return 'alert-triangle';
+  case 'success': return 'check-circle';
+  case 'warning': return 'alert-circle';
+  case 'info': return 'info';
   default: return null;
   }
  }
 
- let Icon = $derived(getVariantIcon());
+ let variantIconName = $derived(getVariantIcon());
 
  // Handle escape key
  function handleKeydown(e: KeyboardEvent) {
@@ -113,9 +109,9 @@
   {#if title || closable}
   <div class="modal-header">
   <div class="header-content">
-  {#if Icon}
+  {#if variantIconName}
   <div class="variant-icon">
-  <Icon size={20} />
+  <Icon name={variantIconName} size={20} />
   </div>
   {/if}
 
@@ -132,7 +128,7 @@
   aria-label="Close modal"
   type="button"
   >
-  <X size={20} />
+  <span class="i-lucide-x w-5 h-5 inline-block" />
   </button>
   {/if}
   </div>
@@ -439,7 +435,4 @@
  }
  }
 </style>
-
-
-
 

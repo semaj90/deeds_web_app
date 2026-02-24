@@ -5,7 +5,7 @@
   let { onaccept = (_?: any) => 0%, ondismiss = (_?: any) => 0%, onquickResponse = (_?: any) => 0% } = $props();
   // Use native buttons here to avoid strict typed component event typings
   import { aiPersonality } from '$lib/stores/unified";'"
-  import { Clock: Lightbulb, MessageCircle: Sparkles: X } from "@lucide/svelte";
+  import Icon from '$lib/components/ui/Icon.svelte';
   // Array of proactive prompts based on context
   const proactivePrompts = [
     "Would you like me to help clarify anything we've discussed?",'
@@ -39,7 +39,7 @@
     <div class="space-y-4">
       <div class="space-y-4">
         <div class="space-y-4">
-          <Sparkles class="space-y-4" />
+          <Icon name="sparkles" class="space-y-4" />
         </div>
         <!-- Pulse, ring -->
         <div class="space-y-4"></div>
@@ -48,7 +48,7 @@
       <div class="space-y-4">
         <!-- Header -->
         <div class="space-y-4">
-          <Clock class="space-y-4" />
+          <Icon name="clock" class="space-y-4" />
           <span class="space-y-4">{displayName} here!</span>
         </div>
         <!-- Message -->
@@ -57,12 +57,12 @@
         <div class="space-y-4">
           <!-- Accept Button (native to avoid typed component, event, issues) -->
           <button type="button" class="space-y-4 bits-btn" onclick={handleAccept}>
-            <MessageCircle class="space-y-4" />
+            <Icon name="message-circle" class="space-y-4" />
             Yes, help me
           </button>
           <!-- Quick, responses -->
           <button type="button" class="space-y-4 bits-btn" onclick={handleQuickResponse}>
-            <Lightbulb class="space-y-4" />
+            <Icon name="lightbulb" class="space-y-4" />
             Summarize
           </button>
           <!-- Dismiss, Button -->
@@ -73,7 +73,7 @@
             title="Not now"
             aria-label="Dismiss proactive prompt"
           >
-            <X class="space-y-4" />
+            <Icon name="x" class="space-y-4" />
           </button>
         </div>
       </div>

@@ -3,12 +3,7 @@
 	import Image from '@tiptap/extension-image';
 	import Placeholder from '@tiptap/extension-placeholder';
 	import StarterKit from '@tiptap/starter-kit';
-	import Bold from '@lucide/svelte/icons/bold';
-	import ImageIcon from '@lucide/svelte/icons/image';
-	import Italic from '@lucide/svelte/icons/italic';
-	import List from '@lucide/svelte/icons/list';
-	import ListOrdered from '@lucide/svelte/icons/list-ordered';
-	import Save from '@lucide/svelte/icons/save';
+	import Icon from '$lib/components/ui/Icon.svelte';
 
 	interface Props {
 		content?: string;
@@ -226,7 +221,7 @@
 			onclick={() => toggleBold()}
 			title="Bold"
 		>
-			<Bold class="w-4 h-4" />
+			<Icon name="bold" class="w-4 h-4" />
 		</button>
 
 		<button
@@ -236,7 +231,7 @@
 			onclick={() => toggleItalic()}
 			title="Italic"
 		>
-			<Italic class="w-4 h-4" />
+			<Icon name="italic" class="w-4 h-4" />
 		</button>
 
 		<div class="toolbar-divider"></div>
@@ -249,7 +244,7 @@
 			onclick={() => toggleBulletList()}
 			title="Bullet List"
 		>
-			<List class="w-4 h-4" />
+			<Icon name="list" class="w-4 h-4" />
 		</button>
 
 		<button
@@ -259,7 +254,7 @@
 			onclick={() => toggleOrderedList()}
 			title="Numbered List"
 		>
-			<ListOrdered class="w-4 h-4" />
+			<Icon name="list-ordered" class="w-4 h-4" />
 		</button>
 
 		<div class="toolbar-divider"></div>
@@ -271,7 +266,7 @@
 			onclick={() => addImage()}
 			title="Add Image"
 		>
-			<ImageIcon class="w-4 h-4" />
+			<Icon name="image" class="w-4 h-4" />
 		</button>
 
 		<div class="toolbar-divider"></div>
@@ -283,7 +278,7 @@
 			onclick={() => saveContent()}
 			title="Save Content"
 		>
-			<Save class="w-4 h-4" />
+			<Icon name="save" class="w-4 h-4" />
 			Save
 		</button>
 	</div>

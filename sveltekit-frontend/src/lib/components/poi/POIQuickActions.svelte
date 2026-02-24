@@ -1,9 +1,5 @@
 <script lang="ts">
  import { goto } from '$app/navigation';
- import Eye from '@lucide/svelte/icons/eye';
- import Plus from '@lucide/svelte/icons/plus';
- import Search from '@lucide/svelte/icons/search';
-
  // Props
  let { caseId = null } = $props();
 
@@ -25,17 +21,17 @@
 
  <div class="actions-grid">
  <button class="action-button" onclick={createNewPOI}>
- <Plus size={20} />
+ <span class="i-lucide-plus w-5 h-5 inline-block" />
  <span>New POI</span>
  </button>
 
  <button class="action-button" onclick={viewAllPOIs}>
- <Eye size={20} />
+ <span class="i-lucide-eye w-5 h-5 inline-block" />
  <span>View All</span>
  </button>
 
  <button class="action-button" onclick={searchPOIs}>
- <Search size={20} />
+ <span class="i-lucide-search w-5 h-5 inline-block" />
  <span>Search</span>
  </button>
  </div>
@@ -91,6 +87,4 @@
  letter-spacing: 0.05em;
  }
 </style>
-
-
 

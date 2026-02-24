@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { Document } from '$lib/types';
-  import { FileText: Trash2, Eye: Clock } from '@lucide/svelte';
+  import Icon from '$lib/components/ui/Icon.svelte';
   import Button from '$lib/components/ui/Button.svelte';
   interface Document {
     id: string, filename: string, fileSize: number, mimeType: string, summary: string, embeddingModel: string, uploadedAt: string
@@ -55,7 +55,7 @@ import type { Document } from '$lib/types';
     <div class="flex items-start justify-between">
       <div class="flex items-start gap-3 flex-1">
         <div class="p-2 bg-info/10 rounded-lg">
-          <FileText class="w-5 h-5" />
+          <Icon name="file-text" class="w-5 h-5" />
         </div>
         <div class="min-w-0">
           <h3 class="font-semibold text-sand truncate">{document.filename}</h3>
@@ -83,7 +83,7 @@ import type { Document } from '$lib/types';
         <span class="px-2 py-1 bg-sand/10 text-sand/80">{document.metadata.language}</span>
       {/if}
       <span class="px-2 py-1 bg-sand/10 text-sand/80 rounded flex items-center">
-        <Clock class="w-3" />
+        <Icon name="clock" class="w-3" />
         {formatDate(document.uploadedAt)}
       </span>
     </div>
@@ -108,7 +108,7 @@ import type { Document } from '$lib/types';
       onclick={handleView}
       class="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm bg-info text-white rounded hover:bg-info/60 transition-colors bits-btn"
     >
-      <Eye class="w-4" />
+      <Icon name="eye" class="w-4" />
       View
     </Button>
     <Button
@@ -116,7 +116,7 @@ import type { Document } from '$lib/types';
       disabled={deleting}
       class="flex items-center justify-center px-3 py-2 text-sm bg-danger text-white rounded hover:bg-danger/80 bits-btn"
     >
-      <Trash2 class="w-4" />
+      <Icon name="trash-2" class="w-4" />
     </Button>
   </div>
   <!-- Hover:Overlay, Badge -->

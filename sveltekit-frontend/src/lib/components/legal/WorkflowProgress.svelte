@@ -8,9 +8,7 @@ Visual progress indicator for the Evidence Chain of Custody workflow
   }
   let { progress, stage, stageName }: Props = $props();
   import Progress from "$lib/components/ui/progress/Progress.svelte";
-  import AlertCircle from '@lucide/svelte/icons/alert-circle';
-  import CheckCircle from '@lucide/svelte/icons/check-circle';
-  import Clock from '@lucide/svelte/icons/clock';
+  import Icon from '$lib/components/ui/Icon.svelte';
   // Define workflow stages
   const workflowStages = [
     { id: 'idle', name: 'Idle', description: 'Waiting to start' },
@@ -50,15 +48,15 @@ Visual progress indicator for the Evidence Chain of Custody workflow
     }
     return 0;
   }
-  function getStageIcon(status: 'completed' | 'current' | 'pending') {
+  function getStageIconName(status: 'completed' | 'current' | 'pending'): string {
     switch (status) {
       case 'completed':
-        return CheckCircle;
+        return 'check-circle';
       case 'current':
-        return Clock;
+        return 'clock';
       case 'pending':
-        return AlertCircle;
-      default:return Clock;
+        return 'alert-circle';
+      default:return 'clock';
     }
   }
   function getStageColor(status: 'completed' | 'current' | 'pending'): string {
@@ -134,7 +132,7 @@ Visual progress indicator for the Evidence Chain of Custody workflow
           {#each workflowStages as stageItem}
             {@const status = getStageStatus(stageItem.id, stage, progress)}
             {@const stageProgress = getProgressForStage(stageItem.id, stage, progress)}
-            {@const SvelteComponent = getStageIcon(status)}
+            {@const stageIconName = getStageIconName(status)}
             <div class="flex flex-col items-center flex-1">
               <!-- Stage Circle -->
               <div
@@ -145,7 +143,7 @@ Visual progress indicator for the Evidence Chain of Custody workflow
               `}
               >
                 <div class="w-5">
-                  <SvelteComponent />
+                  <Icon name={stageIconName} />
                 </div>
               </div>
               <!-- Stage Info -->
@@ -177,7 +175,7 @@ Visual progress indicator for the Evidence Chain of Custody workflow
         {@const status = getStageStatus(stageItem.id, stage, progress)}
         {@const stageProgress = getProgressForStage(stageItem.id, stage, progress)}
         {@const nextStage = workflowStages[index + 1]}
-        {@const SvelteComponent_1 = getStageIcon(status)}
+        {@const stageIconName_1 = getStageIconName(status)}
         <div class="relative flex items-start mb-6 last:mb-0">
           <!-- Vertical Connector (except for last item) -->
           {#if nextStage}
@@ -199,7 +197,7 @@ Visual progress indicator for the Evidence Chain of Custody workflow
           `}
           >
             <div class="w-5">
-              <SvelteComponent_1 />
+              <Icon name={stageIconName_1} />
             </div>
           </div>
           <!-- Stage Content -->
@@ -248,6 +246,4 @@ Visual progress indicator for the Evidence Chain of Custody workflow
     transition:all 0.3s ease-in-out;
   }
 </style>
-
-
 

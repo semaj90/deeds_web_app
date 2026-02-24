@@ -2,9 +2,6 @@
 	import { getCachedEmbedding, subscribeEmbedding } from '$lib/client/subscribeEmbedding.svelte';
 	import type { EmbeddingResult } from '$lib/shared/embedding-types';
 	import { quantizedCosineSimilarity } from '$lib/shared/quantize';
-	import Loader from '@lucide/svelte/icons/loader';
-	import Paperclip from '@lucide/svelte/icons/paperclip';
-	import Send from '@lucide/svelte/icons/send';
 	import ActionPopup from './ActionPopup.svelte';
 
 	interface Message {
@@ -123,14 +120,14 @@
 
 		{#if uploading}
 			<div class="flex items-center gap-2 text-xs opacity-70 font-mono">
-				<Loader class="animate-spin w-3 h-3" />
+				<span class="i-lucide-loader animate-spin w-3 h-3 inline-block" />
 				[processing] uploading and embedding…
 			</div>
 		{/if}
 
 		{#if embeddingStream}
 			<div class="flex items-center gap-2 text-xs opacity-70 font-mono">
-				<Loader class="animate-spin w-3 h-3" />
+				<span class="i-lucide-loader animate-spin w-3 h-3 inline-block" />
 				[stream] processing embedding pipeline…
 			</div>
 		{/if}
@@ -139,7 +136,7 @@
 	<!-- Input Bar -->
 	<footer class="p-3 border-t border-beige flex items-center gap-2">
 		<label class="cursor-pointer opacity-70 hover:opacity-100">
-			<Paperclip class="w-5 h-5" />
+			<span class="i-lucide-paperclip w-5 h-5 inline-block" />
 			<input type="file" class="hidden" onchange={handleFile} />
 		</label>
 
@@ -154,7 +151,7 @@
 			class="px-3 py-2 border border-beige text-sm hover:bg-beige hover:text-noir"
 			onclick={sendMessage}
 		>
-			<Send class="w-4 h-4" />
+			<span class="i-lucide-send w-4 h-4 inline-block" />
 		</button>
 	</footer>
 </section>

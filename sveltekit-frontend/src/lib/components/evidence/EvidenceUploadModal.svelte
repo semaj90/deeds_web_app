@@ -1,18 +1,7 @@
 <!-- Enhanced Evidence Upload Modal — Direct MinIO + 8-stage pipeline -->
 <script lang="ts">
 	import { fade } from 'svelte/transition';
-	import Upload from '@lucide/svelte/icons/upload';
-	import FileText from '@lucide/svelte/icons/file-text';
-	import Image from '@lucide/svelte/icons/image';
-	import Video from '@lucide/svelte/icons/video';
-	import CheckCircle from '@lucide/svelte/icons/check-circle';
-	import AlertCircle from '@lucide/svelte/icons/alert-circle';
-	import Loader from '@lucide/svelte/icons/loader';
-	import X from '@lucide/svelte/icons/x';
-	import Database from '@lucide/svelte/icons/database';
-	import Search from '@lucide/svelte/icons/search';
-	import Brain from '@lucide/svelte/icons/brain';
-	import Shield from '@lucide/svelte/icons/shield';
+	import Icon from '$lib/components/ui/Icon.svelte';
 
 	interface Props {
 		caseId: string;
@@ -32,14 +21,14 @@
 
 	// Pipeline stages (8-stage evidence pipeline)
 	const pipelineStages = [
-		{ id: 'upload', label: 'MinIO Upload', icon: Upload, desc: 'SHA-256 hash + object storage' },
-		{ id: 'db-insert', label: 'Database Record', icon: Database, desc: 'PostgreSQL evidence row' },
-		{ id: 'ocr', label: 'Text Extraction', icon: FileText, desc: 'pdf-parse → OCR fallback' },
-		{ id: 'chunking', label: 'Legal Chunking', icon: FileText, desc: 'ARTICLE/SECTION/§ hierarchy' },
-		{ id: 'embedding', label: 'Embedding (768d)', icon: Brain, desc: 'embeddinggemma:latest via gRPC' },
-		{ id: 'vector-store', label: 'Dual Vector Storage', icon: Database, desc: 'pgvector + Qdrant upsert' },
-		{ id: 'entities', label: 'Entity Extraction', icon: Search, desc: 'LLM + regex (PERSON/ORG/STATUTE)' },
-		{ id: 'forensics', label: 'Forensics + Summary', icon: Shield, desc: 'PII detection + summarization' }
+		{ id: 'upload', label: 'MinIO Upload', icon: 'upload', desc: 'SHA-256 hash + object storage' },
+		{ id: 'db-insert', label: 'Database Record', icon: 'database', desc: 'PostgreSQL evidence row' },
+		{ id: 'ocr', label: 'Text Extraction', icon: 'file-text', desc: 'pdf-parse → OCR fallback' },
+		{ id: 'chunking', label: 'Legal Chunking', icon: 'file-text', desc: 'ARTICLE/SECTION/§ hierarchy' },
+		{ id: 'embedding', label: 'Embedding (768d)', icon: 'brain', desc: 'embeddinggemma:latest via gRPC' },
+		{ id: 'vector-store', label: 'Dual Vector Storage', icon: 'database', desc: 'pgvector + Qdrant upsert' },
+		{ id: 'entities', label: 'Entity Extraction', icon: 'search', desc: 'LLM + regex (PERSON/ORG/STATUTE)' },
+		{ id: 'forensics', label: 'Forensics + Summary', icon: 'shield', desc: 'PII detection + summarization' }
 	];
 
 	let currentStage = $state(-1);
@@ -67,9 +56,9 @@
 		return file.type.startsWith('image/') || /\.(png|jpe?g|tiff?|bmp|webp)$/i.test(file.name);
 	}
 
-	let fileTypeIcon = $derived(
-		selectedFile && isImageFile(selectedFile) ? Image :
-		selectedFile?.type.startsWith('video/') ? Video : FileText
+	let fileTypeIconName = $derived(
+		selectedFile && isImageFile(selectedFile) ? 'image' :
+		selectedFile?.type.startsWith('video/') ? 'video' : 'file-text'
 	);
 
 	const handleDragOver = (e: DragEvent) => { e.preventDefault(); isDragging = true; };
@@ -197,7 +186,7 @@
 					<p class="text-xs text-sand/50 mt-0.5">MinIO + embeddinggemma + Qdrant + pgvector</p>
 				</div>
 				<button class="text-sand/40 hover:text-sand transition p-1" onclick={handleCancel}>
-					<X size={20} />
+					<Icon name="x" size={20} />
 				</button>
 			</div>
 
@@ -211,7 +200,7 @@
 						ondragleave={handleDragLeave}
 						ondrop={handleDrop}
 					>
-						<Upload size={48} class="mx-auto text-sand/30 mb-3" />
+						<Icon name="upload" size={48} class="mx-auto text-sand/30 mb-3" />
 						<p class="text-sand/80 font-medium">Drag and drop evidence file</p>
 						<p class="text-sand/40 text-sm mt-1">or</p>
 						<label class="inline-block mt-2 px-4 py-2 bg-accent/80 text-white rounded-lg cursor-pointer hover:bg-accent transition text-sm font-medium">
@@ -224,7 +213,7 @@
 					<!-- Selected File Info -->
 					<div class="bg-panelSoft rounded-lg p-4 mb-4">
 						<div class="flex items-center gap-3">
-							<svelte:component this={fileTypeIcon} size={28} class="text-accent/70 shrink-0" />
+							<Icon name={fileTypeIconName} size={28} class="text-accent/70 shrink-0" />
 							<div class="min-w-0 flex-1">
 								<p class="text-sand font-medium text-sm truncate">{selectedFile.name}</p>
 								<p class="text-sand/40 text-xs">{(selectedFile.size / (1024 * 1024)).toFixed(2)} MB &middot; {selectedFile.type || 'unknown type'}</p>
@@ -261,11 +250,11 @@
 									 stageStatuses[i] === 'error' ? 'bg-red-900/10' : 'opacity-40'}">
 									<div class="shrink-0 w-5 h-5 flex items-center justify-center">
 										{#if stageStatuses[i] === 'running'}
-											<Loader size={16} class="text-accent animate-spin" />
+											<Icon name="loader" size={16} class="text-accent animate-spin" />
 										{:else if stageStatuses[i] === 'done'}
-											<CheckCircle size={16} class="text-green-500" />
+											<Icon name="check-circle" size={16} class="text-green-500" />
 										{:else if stageStatuses[i] === 'error'}
-											<AlertCircle size={16} class="text-red-500" />
+											<Icon name="alert-circle" size={16} class="text-red-500" />
 										{:else}
 											<span class="w-2 h-2 rounded-full bg-sand/20"></span>
 										{/if}
@@ -284,7 +273,7 @@
 					{#if uploadResult}
 						<div class="bg-green-900/10 border border-green-800/20 rounded-lg p-4 text-sm">
 							<div class="flex items-center gap-2 text-green-400 font-medium mb-2">
-								<CheckCircle size={16} />
+								<Icon name="check-circle" size={16} />
 								Upload Complete — Pipeline Processed
 							</div>
 							<div class="grid grid-cols-2 gap-2 text-xs text-sand/50">
@@ -308,7 +297,7 @@
 					<!-- Error -->
 					{#if uploadError}
 						<div class="flex items-center gap-2 bg-red-900/10 border border-red-800/20 rounded-lg p-3 text-sm text-red-400 mt-3">
-							<AlertCircle size={16} class="shrink-0" />
+							<Icon name="alert-circle" size={16} class="shrink-0" />
 							<span>{uploadError}</span>
 						</div>
 					{/if}
@@ -328,7 +317,7 @@
 					>
 						{#if isUploading}
 							<span class="flex items-center gap-2">
-								<Loader size={14} class="animate-spin" />
+								<Icon name="loader" size={14} class="animate-spin" />
 								Processing...
 							</span>
 						{:else}

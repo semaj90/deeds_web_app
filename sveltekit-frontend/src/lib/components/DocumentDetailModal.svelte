@@ -6,12 +6,6 @@
    */
   import { Dialog } from 'bits-ui';
   import { fade } from 'svelte/transition';
-  import X from '@lucide/svelte/icons/x';
-  import FileText from '@lucide/svelte/icons/file-text';
-  import Download from '@lucide/svelte/icons/download';
-  import Link from '@lucide/svelte/icons/link';
-  import Clock from '@lucide/svelte/icons/clock';
-  import Shield from '@lucide/svelte/icons/shield';
   import type { Snippet } from 'svelte';
 
   interface DocumentDetail {
@@ -127,39 +121,39 @@
                 </div>
               </div>
               <Dialog.Close class="close-btn" aria-label="Close">
-                <X size={18} />
+                <span class="i-lucide-x w-4.5 h-4.5 inline-block" />
               </Dialog.Close>
             </div>
 
             <!-- Metadata Grid -->
             <div class="meta-grid">
               <div class="meta-item">
-                <FileText size={14} class="meta-icon" />
+                <span class="i-lucide-file-text meta-icon w-3.5 h-3.5 inline-block" />
                 <span class="meta-label">Type</span>
                 <span class="meta-value">{fileType}</span>
               </div>
               <div class="meta-item">
-                <Clock size={14} class="meta-icon" />
+                <span class="i-lucide-clock meta-icon w-3.5 h-3.5 inline-block" />
                 <span class="meta-label">Created</span>
                 <span class="meta-value">{formatDate(createdAt)}</span>
               </div>
               {#if updatedAt}
                 <div class="meta-item">
-                  <Clock size={14} class="meta-icon" />
+                  <span class="i-lucide-clock meta-icon w-3.5 h-3.5 inline-block" />
                   <span class="meta-label">Updated</span>
                   <span class="meta-value">{formatDate(updatedAt)}</span>
                 </div>
               {/if}
               {#if caseId}
                 <div class="meta-item">
-                  <Link size={14} class="meta-icon" />
+                  <span class="i-lucide-link meta-icon w-3.5 h-3.5 inline-block" />
                   <span class="meta-label">Case</span>
                   <span class="meta-value">{caseId}</span>
                 </div>
               {/if}
               {#if doc.status}
                 <div class="meta-item">
-                  <Shield size={14} class="meta-icon" />
+                  <span class="i-lucide-shield meta-icon w-3.5 h-3.5 inline-block" />
                   <span class="meta-label">Status</span>
                   <span class="meta-value status-badge {doc.status}">{doc.status}</span>
                 </div>
@@ -205,13 +199,13 @@
             <div class="actions">
               {#if ondownload}
                 <button class="action-btn primary" onclick={() => doc && ondownload?.(doc)}>
-                  <Download size={16} />
+                  <span class="i-lucide-download w-4 h-4 inline-block" />
                   Download
                 </button>
               {/if}
               {#if onviewcustody}
                 <button class="action-btn" onclick={() => doc && onviewcustody?.(doc.id)}>
-                  <Shield size={16} />
+                  <span class="i-lucide-shield w-4 h-4 inline-block" />
                   Chain of Custody
                 </button>
               {/if}

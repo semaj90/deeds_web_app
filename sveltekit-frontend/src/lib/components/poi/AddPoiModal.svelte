@@ -4,7 +4,6 @@
 	 * Rewritten Session 63: Svelte 5 snippets (replaced <slot>)
 	 */
 	import type { Snippet } from 'svelte';
-	import X from '@lucide/svelte/icons/x';
 	import PoiImageUpload from './PoiImageUpload.svelte';
 
 	interface Props {
@@ -86,7 +85,7 @@
 		<div class="flex items-center justify-between">
 			<h2 class="text-2xl font-bold">Add Person of Interest</h2>
 			<button onclick={closeModal} class="p-2 hover:bg-sand/10 rounded-lg transition-colors">
-				<X class="w-5 h-5" />
+				<span class="i-lucide-x w-5 h-5 inline-block" />
 			</button>
 		</div>
 

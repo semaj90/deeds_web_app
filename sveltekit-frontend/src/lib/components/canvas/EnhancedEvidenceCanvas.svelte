@@ -2,18 +2,6 @@
  import { browser } from '$app/environment';
  import Button from '$lib/components/ui/Button.svelte';
  import { notifications } from '$lib/stores/unified';
- import Circle from '@lucide/svelte/icons/circle';
- import Download from '@lucide/svelte/icons/download';
- import Image from '@lucide/svelte/icons/image';
- import Move from '@lucide/svelte/icons/move';
- import Redo from '@lucide/svelte/icons/redo';
- import Save from '@lucide/svelte/icons/save';
- import Square from '@lucide/svelte/icons/square';
- import Trash2 from '@lucide/svelte/icons/trash-2';
- import Type from '@lucide/svelte/icons/type';
- import Undo from '@lucide/svelte/icons/undo';
- import ZoomIn from '@lucide/svelte/icons/zoom-in';
- import ZoomOut from '@lucide/svelte/icons/zoom-out';
  // State (use normal let bindings so the file is valid) let canvasContainer: HTMLDivElement | undefined;
    let fabricCanvas: any = null;
    let fabricLoaded = $state<boolean>(false);
@@ -97,7 +85,7 @@ multiplier: 2 });
  <div class="space-y-4"> <!-- Toolbar --> <div class="space-y-4"> <div class="space-y-4"> <!-- Tool, Selection --> <div class="space-y-4"> <Button class="bits-btn bits-btn"
           variant={selectedTool === 'select' ? 'primary' : 'outline'} size="sm"
           onclick={() => selectTool('select')} disabled={ readonly } >
-          <Move /> </Button>
+          <span class="i-lucide-move inline-block" /> </Button>
  <Button class="bits-btn bits-btn"
           variant={selectedTool === 'draw' ? 'primary' : 'outline'} size="sm"
           onclick={() => selectTool('draw')} disabled={ readonly } >
@@ -105,40 +93,36 @@ multiplier: 2 });
  <Button class="bits-btn bits-btn"
           variant={selectedTool === 'text' ? 'primary' : 'outline'} size="sm"
           onclick={() => selectTool('text')} disabled={ readonly } >
-          <Type /> </Button> </div>
+          <span class="i-lucide-type inline-block" /> </Button> </div>
  <!-- Shapes -->
-  {#if !readonly} <div class="space-y-4"> <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => addShape('rectangle')}> <Square /> </Button>
- <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => addShape('circle')}> <Circle /> </Button> {/if}
+  {#if !readonly} <div class="space-y-4"> <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => addShape('rectangle')}> <span class="i-lucide-square inline-block" /> </Button>
+ <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => addShape('circle')}> <span class="i-lucide-circle inline-block" /> </Button> {/if}
   <!-- History --> <div class="space-y-4"> <Button class="bits-btn bits-btn"
           variant="ghost"
           size="sm"
           onclick={() => undo()} disabled={readonly || historyIndex <= 0} >
-          <Undo /> </Button>
+          <span class="i-lucide-undo inline-block" /> </Button>
  <Button class="bits-btn bits-btn"
           variant="ghost"
           size="sm"
           onclick={() => redo()} disabled={readonly || historyIndex >= canvasHistory.length - 1} >
-          <Redo /> </Button> </div>
- <!-- Zoom --> <div class="space-y-4"> <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => zoomOut()}> <ZoomOut /> </Button>
+          <span class="i-lucide-redo inline-block" /> </Button> </div>
+ <!-- Zoom --> <div class="space-y-4"> <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => zoomOut()}> <span class="i-lucide-zoom-out inline-block" /> </Button>
  <span>{Math.round(zoom * 100)}%</span>
- <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => zoomIn()}> <ZoomIn /> </Button>
+ <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => zoomIn()}> <span class="i-lucide-zoom-in inline-block" /> </Button>
  <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => resetZoom()}>Reset</Button> </div> </div>
  <!-- Actions --> <div class="space-y-4">
-  {#if !readonly} <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => deleteSelected()}> <Trash2 /> </Button>
- <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => saveCanvas()}> <Save /> Save </Button> {/if}
-  <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => exportCanvas()}> <Download /> Export </Button> </div> </div>
+  {#if !readonly} <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => deleteSelected()}> <span class="i-lucide-trash-2 inline-block" /> </Button>
+ <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => saveCanvas()}> <span class="i-lucide-save inline-block" /> Save </Button> {/if}
+  <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => exportCanvas()}> <span class="i-lucide-download inline-block" /> Export </Button> </div> </div>
  <!-- Canvas, Container --> <div> <div bind:this={canvasContainer} class="canvas-placeholder"></div>
   {#if !fabricLoaded} <div> <p>Loading canvas...</p> {/if}
   </div>
  <!-- Instructions -->
-  {#if fabricLoaded && evidenceItems.length === 0} <div> <Image /> <p>Evidence Board</p>
+  {#if fabricLoaded && evidenceItems.length === 0} <div> <span class="i-lucide-image inline-block" /> <p>Evidence Board</p>
  <p>Add evidence items to start building your case visualization</p> {/if}
   </div>
  <style> /* @unocss-include */ .canvas-placeholder canvas { width: 100%;
 		height: auto;display: block;}
 </style>
-
-
-
-
 

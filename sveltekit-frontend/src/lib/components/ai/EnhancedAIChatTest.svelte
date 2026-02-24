@@ -7,20 +7,12 @@
 	import { DialogRoot, DialogTrigger, DialogPortal, DialogOverlay, DialogContent, DialogTitle, DialogClose } from "$lib/components/ui/dialog";
 import Button from "$lib/components/ui/Button.svelte";
 	import Input from "$lib/components/ui/Input.svelte";
+	import Icon from '$lib/components/ui/Icon.svelte';
 	import Card from "$lib/components/ui/card/Card.svelte";
 	import CardHeader from "$lib/components/ui/card/CardHeader.svelte";
 	import CardTitle from "$lib/components/ui/card/CardTitle.svelte";
 	import CardContent from "$lib/components/ui/card/CardContent.svelte";
 	// ScrollArea is a stub — using plain div with overflow
-	import Bot from '@lucide/svelte/icons/bot';
-	import UserIcon from '@lucide/svelte/icons/user';
-	import Send from '@lucide/svelte/icons/send';
-	import Loader2 from '@lucide/svelte/icons/loader-2';
-	import CheckCircle from '@lucide/svelte/icons/check-circle';
-	import XCircle from '@lucide/svelte/icons/x-circle';
-	import MessageCircle from '@lucide/svelte/icons/message-circle';
-	import Download from '@lucide/svelte/icons/download';
-	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import { getOllamaEndpoint } from '$lib/utils/ollama-endpoint';
 	import type { ChatMessage as BaseChatMessage } from '$lib/types/chat';
 
@@ -311,18 +303,7 @@ What would you like to explore today?`,
 	}
 
 	// Connection status helpers
-	function getStatusIcon() {
-		switch (connectionStatus) {
-			case 'checking':
-				return Loader2;
-			case 'connected':
-				return CheckCircle;
-			case 'error':
-				return XCircle;
-			default:
-				return XCircle;
-		}
-	}
+	function getStatusIcon(): string { switch (connectionStatus) { case 'checking': return 'loader-2'; case 'connected': return 'check-circle'; case 'error': return 'x-circle'; default: return 'x-circle'; } }
 
 	function getStatusColor() {
 		switch (connectionStatus) {
@@ -341,7 +322,7 @@ What would you like to explore today?`,
 <DialogRoot bind:open>
 	<DialogTrigger>
 		<Button variant="ghost" class="gap-2">
-			<MessageCircle class="h-4 w-4" />
+			<span class="i-lucide-message-circle h-4 w-4 inline-block" />
 			{title}
 		</Button>
 	</DialogTrigger>
@@ -354,7 +335,7 @@ What would you like to explore today?`,
 			<!-- Header -->
 			<div class="flex items-center justify-between p-4 border-b dark:border-sand/20">
 				<div class="flex items-center gap-3">
-					<Bot class="h-5 w-5 text-info dark:text-info/80" />
+					<span class="i-lucide-bot h-5 w-5 text-info dark:text-info/80 inline-block" />
 					<DialogTitle class="text-lg font-semibold dark:text-white">
 						{title}
 					</DialogTitle>
@@ -369,8 +350,7 @@ What would you like to explore today?`,
 					<!-- Status Indicator -->
 					<div class="flex items-center gap-2 px-2 py-1 bg-sand/10 dark:bg-panelSoft rounded-md">
 						{#snippet statusIndicator()}
-							{@const StatusIcon = getStatusIcon()}
-							<StatusIcon class="h-4 w-4 {getStatusColor()}" />
+							<Icon name={getStatusIcon()} class="h-4 w-4 {getStatusColor()}" />
 							<span class="text-xs {getStatusColor()}">
 								{connectionStatus === 'checking'
 									? 'Checking...'
@@ -389,11 +369,11 @@ What would you like to explore today?`,
 						onclick={downloadConversation}
 						disabled={messages.length <= 1}
 					>
-						<Download class="h-4 w-4" />
+						<span class="i-lucide-download h-4 w-4 inline-block" />
 					</Button>
 
 					<Button variant="ghost" size="sm" onclick={clearMessages} disabled={messages.length <= 1}>
-						<Trash2 class="h-4 w-4" />
+						<span class="i-lucide-trash-2 h-4 w-4 inline-block" />
 					</Button>
 
 					<DialogClose>
@@ -409,7 +389,7 @@ What would you like to explore today?`,
 						<div class="flex gap-3 {message.role === 'user' ? 'flex-row-reverse' : ''}">
 							{#if message.role === 'assistant'}
 								<div class="flex-shrink-0 w-8 h-8 rounded-full bg-info/10 dark:bg-info/20 flex items-center justify-center">
-									<Bot class="h-4 w-4 text-info dark:text-info/80" />
+									<span class="i-lucide-bot h-4 w-4 text-info dark:text-info/80 inline-block" />
 								</div>
 							{/if}
 
@@ -450,7 +430,7 @@ What would you like to explore today?`,
 
 							{#if message.role === 'user'}
 								<div class="flex-shrink-0 w-8 h-8 rounded-full bg-info flex items-center justify-center">
-									<UserIcon class="h-4 w-4 text-white" />
+									<span class="i-lucide-user h-4 w-4 text-white inline-block" />
 								</div>
 							{/if}
 						</div>
@@ -477,9 +457,9 @@ What would you like to explore today?`,
 						class="px-4"
 					>
 						{#if isLoading}
-							<Loader2 class="h-4 w-4 animate-spin" />
+							<span class="i-lucide-loader-2 h-4 w-4 animate-spin inline-block" />
 						{:else}
-							<Send class="h-4 w-4" />
+							<span class="i-lucide-send h-4 w-4 inline-block" />
 						{/if}
 					</Button>
 				</div>

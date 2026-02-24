@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Search, Upload, Image, Loader, AlertCircle, Tag, Eye, Clock, Database, CheckCircle, XCircle } from '@lucide/svelte';
 
   interface Props {
     caseId?: string;
@@ -154,7 +153,7 @@
         class="hidden"
       />
       <div class="drop-content">
-        <Upload class="w-10 h-10 text-sand/40" />
+        <span class="i-lucide-upload inline-block w-10 h-10 text-sand/40" />
         <p class="text-sand/70 text-sm font-medium mt-3">
           {isDragOver ? 'Drop image here' : 'Drag & drop an evidence image'}
         </p>
@@ -208,10 +207,10 @@
         <div class="controls">
           <button class="btn-analyze" onclick={analyze} disabled={analyzing}>
             {#if analyzing}
-              <Loader class="w-4 h-4 animate-spin" />
+              <span class="i-lucide-loader inline-block w-4 h-4 animate-spin" />
               Analyzing...
             {:else}
-              <Search class="w-4 h-4" />
+              <span class="i-lucide-search inline-block w-4 h-4" />
               Analyze Image
             {/if}
           </button>
@@ -219,13 +218,13 @@
           {#if result}
             <label class="toggle-boxes">
               <input type="checkbox" bind:checked={showBoxes} />
-              <Eye class="w-3 h-3" />
+              <span class="i-lucide-eye inline-block w-3 h-3" />
               Boxes
             </label>
           {/if}
 
           <button class="btn-clear" onclick={clear}>
-            <XCircle class="w-4 h-4" />
+            <span class="i-lucide-x-circle inline-block w-4 h-4" />
             Clear
           </button>
         </div>

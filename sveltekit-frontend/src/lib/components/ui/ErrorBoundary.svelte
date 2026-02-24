@@ -5,10 +5,7 @@
    */
   // Migrated to $effect
   import Button from '$lib/components/ui/Button.svelte';
-  import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
-  import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-  import Home from '@lucide/svelte/icons/home';
-  import Bug from '@lucide/svelte/icons/bug';
+  import Icon from '$lib/components/ui/Icon.svelte';
   import type { Snippet } from 'svelte';
 
   interface Props {
@@ -102,7 +99,7 @@
         <!-- Header -->
         <div class="bg-danger dark:bg-danger text-white p-6">
           <div class="flex items-center gap-4">
-            <AlertTriangle class="w-8 h-8" />
+            <Icon name="alert-triangle" class="w-8 h-8" />
             <div>
               <h1 class="text-2xl font-bold">Something went wrong</h1>
               <p class="text-danger/20">We encountered an unexpected error. Don't worry, your data is safe.</p>
@@ -136,15 +133,15 @@
           <!-- Actions -->
           <div class="flex flex-wrap gap-3">
             <Button onclick={retry} class="flex items-center gap-2">
-              <RefreshCw class="w-4 h-4" />
+              <Icon name="refresh-cw" class="w-4 h-4" />
               {isRetrying ? 'Retrying...' : 'Try Again'}
             </Button>
             <Button variant="ghost" onclick={goHome} class="flex items-center gap-2">
-              <Home class="w-4 h-4" />
+              <Icon name="home" class="w-4 h-4" />
               Go Home
             </Button>
             <Button variant="ghost" onclick={reportError} class="flex items-center gap-2">
-              <Bug class="w-4 h-4" />
+              <Icon name="bug" class="w-4 h-4" />
               Report Issue
             </Button>
           </div>

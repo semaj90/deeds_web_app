@@ -6,16 +6,6 @@
   import { Input } from '$lib/components/ui/input/index.js';
   import * as Progress from '$lib/components/ui/progress/index.js';
   import * as Tabs from '$lib/components/ui/tabs/index.js';
-  import Activity from '@lucide/svelte/icons/activity';
-  import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
-  import CheckCircle from '@lucide/svelte/icons/check-circle';
-  import CircleX from '@lucide/svelte/icons/circle-x';
-  import Database from '@lucide/svelte/icons/database';
-  import HardDrive from '@lucide/svelte/icons/hard-drive';
-  import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-  import Trash2 from '@lucide/svelte/icons/trash-2';
-  import XCircle from '@lucide/svelte/icons/x-circle';
-  import Zap from '@lucide/svelte/icons/zap';
   // Migrated to $effect
 
   // State management (Svelte 5)
@@ -309,7 +299,7 @@ ttl: 60000 } })
   <!-- Header -->
   <div class="bg-panelSoft border border-sand/20 rounded-lg p-6">
     <h3 class="text-xl font-bold text-info/80 flex items-center gap-2">
-      <Database size={24} /> Multi-Layer Cache System Demo
+      <span class="i-lucide-database w-6 h-6 inline-block" /> Multi-Layer Cache System Demo
       <span class="text-xs font-medium bg-panelSoft text-sand/40 px-2 py-1 rounded"
         >Loki.js + Redis + PostgreSQL</span
       >
@@ -405,10 +395,10 @@ ttl: 60000 } })
                 disabled={isLoading}
                 class="bg-info hover:bg-info/60 flex-1"
               >
-                <Database class="mr-2" size={16} /> Set
+                <span class="i-lucide-database mr-2 w-4 h-4 inline-block" /> Set
               </Button>
               <Button onclick={getCacheValue} disabled={isLoading} variant="secondary" class="flex-1">
-                <RefreshCw class="mr-2" size={16} /> Get
+                <span class="i-lucide-refresh-cw mr-2 w-4 h-4 inline-block" /> Get
               </Button>
               <Button
                 onclick={deleteCacheValue}
@@ -416,10 +406,10 @@ ttl: 60000 } })
                 variant="destructive"
                 class="flex-1"
               >
-                <Trash2 class="mr-2" size={16} /> Delete
+                <span class="i-lucide-trash-2 mr-2 w-4 h-4 inline-block" /> Delete
               </Button>
               <Button onclick={clearCache} disabled={isLoading} variant="destructive" class="flex-1">
-                <CircleX class="mr-2" size={16} /> Clear All
+                <span class="i-lucide-circle-x mr-2 w-4 h-4 inline-block" /> Clear All
               </Button>
             </div>
           </div>
@@ -502,7 +492,7 @@ ttl: 60000 } })
         </div>
       {:else}
         <div class="text-center py-20 text-sand/60">
-          <Activity class="mx-auto mb-4 animate-pulse" size={48} />
+          <span class="i-lucide-activity mx-auto mb-4 animate-pulse w-12 h-12 inline-block" />
           Loading statistics...
         </div>
       {/if}
@@ -514,9 +504,9 @@ ttl: 60000 } })
           <div class="bg-panelSoft border border-sand/20 rounded-lg p-6">
             <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
               {#if healthStatus.healthy}
-                <CheckCircle class="text-accent" /> System Healthy
+                <span class="i-lucide-check-circle text-accent inline-block" /> System Healthy
               {:else}
-                <XCircle class="text-danger" /> Issues Detected
+                <span class="i-lucide-x-circle text-danger inline-block" /> Issues Detected
               {/if}
             </h3>
             <div class="space-y-3">
@@ -551,7 +541,7 @@ ttl: 60000 } })
               </div>
             {:else}
               <div class="text-center py-8 text-accent">
-                <CheckCircle class="mx-auto mb-2" size={32} />
+                <span class="i-lucide-check-circle mx-auto mb-2 w-8 h-8 inline-block" />
                 All systems operational
               </div>
             {/if}
@@ -559,7 +549,7 @@ ttl: 60000 } })
         </div>
       {:else}
         <div class="text-center py-20 text-sand/60">
-          <HardDrive class="mx-auto mb-4 animate-pulse" size={48} />
+          <span class="i-lucide-hard-drive mx-auto mb-4 animate-pulse w-12 h-12 inline-block" />
           Checking system health...
         </div>
       {/if}
@@ -571,7 +561,7 @@ ttl: 60000 } })
           <h3 class="text-lg font-bold mb-4">Toolbox</h3>
           <div class="space-y-3">
             <Button onclick={runPerformanceTest} disabled={isLoading} class="w-full justify-start">
-              <Zap class="mr-2" size={16} /> Run Performance Benchmark
+              <span class="i-lucide-zap mr-2 w-4 h-4 inline-block" /> Run Performance Benchmark
             </Button>
             <Button
               onclick={testCacheHitMiss}
@@ -579,7 +569,7 @@ ttl: 60000 } })
               variant="secondary"
               class="w-full justify-start"
             >
-              <BarChart3 class="mr-2" size={16} /> Verify Hit/Miss Logic
+              <span class="i-lucide-bar-chart-3 mr-2 w-4 h-4 inline-block" /> Verify Hit/Miss Logic
             </Button>
             <Button
               onclick={refreshStats}
@@ -587,7 +577,7 @@ ttl: 60000 } })
               variant="ghost"
               class="w-full justify-start"
             >
-              <RefreshCw class="mr-2" size={16} /> Refresh Metrics
+              <span class="i-lucide-refresh-cw mr-2 w-4 h-4 inline-block" /> Refresh Metrics
             </Button>
           </div>
         </div>

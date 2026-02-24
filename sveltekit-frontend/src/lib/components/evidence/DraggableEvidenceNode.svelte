@@ -1,13 +1,7 @@
 <script lang="ts">
   import { evidenceStore } from '$lib/stores/unified/evidence-store.svelte';
   import { toastStore } from '$lib/stores/unified/toast-store.svelte';
-  import Bot from '@lucide/svelte/icons/bot';
-  import FileText from '@lucide/svelte/icons/file-text';
-  import ImageIcon from '@lucide/svelte/icons/image';
-  import Mic from '@lucide/svelte/icons/mic';
-  import Video from '@lucide/svelte/icons/video';
-  import Zap from '@lucide/svelte/icons/zap';
-  // lucide Svelte 5 icons use Component type, not legacy ComponentType
+  import Icon from '$lib/components/ui/Icon.svelte';
 
   // Stub: embeddingsService module is corrupted, use inline fallback
   const embeddingsService = {
@@ -67,15 +61,15 @@
     `evidence-node ${evidence.type} ${selected ? 'selected' : ''} ${highlighted ? 'highlighted' : ''} ${isDragging ? 'dragging' : ''}`
   );
 
-  const iconMap: Record<string, any> = {
-    document: FileText,
-    image: ImageIcon,
-    video: Video,
-    audio: Mic,
-    transcript: FileText
+  const iconMap: Record<string, string> = {
+    document: 'file-text',
+    image: 'image',
+    video: 'video',
+    audio: 'mic',
+    transcript: 'file-text'
   };
 
-  let IconComponent = $derived(iconMap[evidence.type] || FileText);
+  let iconName = $derived(iconMap[evidence.type] || 'file-text');
 
   let confidenceColor = $derived.by(() => {
     const confidence = evidence.metadata?.confidence ?? 0;
@@ -243,7 +237,7 @@ evidenceId: evidence.id,
     <!-- Header with drag handle -->
     <div class="flex items-center justify-between p-3 border-b bg-sand/5">
       <div class="flex items-center gap-2 drag-handle cursor-grab">
-        <IconComponent class="w-4 h-4" />
+        <Icon name={iconName} class="w-4 h-4" />
         <span class="text-sm font-medium truncate">{evidence.title}</span>
       </div>
 
@@ -266,7 +260,7 @@ evidenceId: evidence.id,
           {#if isAnalyzing}
             <div class="animate-spin w-3 h-3 border border-info border-t-transparent rounded-full"></div>
           {:else}
-            <Bot class="w-3 h-3" />
+            <Icon name="bot" class="w-3 h-3" />
           {/if}
         </button>
       </div>
@@ -324,7 +318,7 @@ evidenceId: evidence.id,
       <!-- Connections indicator -->
       {#if evidence.connections?.length}
         <div class="flex items-center gap-1 text-xs text-sand/60">
-          <Zap class="w-3 h-3" />
+          <Icon name="zap" class="w-3 h-3" />
           <span>{evidence.connections.length} connections</span>
         </div>
       {/if}

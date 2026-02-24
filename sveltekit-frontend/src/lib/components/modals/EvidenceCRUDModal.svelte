@@ -2,17 +2,6 @@
 <script lang="ts">
   import Button from '$lib/components/ui/Button.svelte';
   import Input from '$lib/components/ui/Input.svelte';
-  import X from '@lucide/svelte/icons/x';
-  import Save from '@lucide/svelte/icons/save';
-  import Trash2 from '@lucide/svelte/icons/trash-2';
-  import Upload from '@lucide/svelte/icons/upload';
-  import Brain from '@lucide/svelte/icons/brain';
-  import Tag from '@lucide/svelte/icons/tag';
-  import FileText from '@lucide/svelte/icons/file-text';
-  import ImageIcon from '@lucide/svelte/icons/image';
-  import VideoIcon from '@lucide/svelte/icons/video';
-  import Mic from '@lucide/svelte/icons/mic';
-
   interface Evidence {
     id?: string;
     title: string;
@@ -344,18 +333,18 @@
         <div class="flex items-center justify-between px-6 py-4 border-b">
           <div class="flex items-center gap-2">
             {#if evidence.type === 'image'}
-              <ImageIcon class="w-5 h-5 text-sand/60" />
+              <span class="i-lucide-image w-5 h-5 text-sand/60 inline-block" />
             {:else if evidence.type === 'video'}
-              <VideoIcon class="w-5 h-5 text-sand/60" />
+              <span class="i-lucide-video w-5 h-5 text-sand/60 inline-block" />
             {:else if evidence.type === 'audio'}
-              <Mic class="w-5 h-5 text-sand/60" />
+              <span class="i-lucide-mic w-5 h-5 text-sand/60 inline-block" />
             {:else}
-              <FileText class="w-5 h-5 text-sand/60" />
+              <span class="i-lucide-file-text w-5 h-5 text-sand/60 inline-block" />
             {/if}
             <h2 class="text-lg font-semibold text-sand">{modalTitle}</h2>
           </div>
           <Button variant="ghost" size="sm" onclick={handleClose} class="rounded-full p-1">
-            <X class="w-4 h-4" />
+            <span class="i-lucide-x w-4 h-4 inline-block" />
           </Button>
         </div>
 
@@ -445,7 +434,7 @@
                         onclick={addTag}
                         disabled={!tagInput.trim()}
                       >
-                        <Tag class="w-4 h-4" />
+                        <span class="i-lucide-tag w-4 h-4 inline-block" />
                       </Button>
                     </div>
                   {/if}
@@ -459,7 +448,7 @@
                               onclick={() => removeTag(tag)}
                               class="hover:text-danger transition-colors"
                             >
-                              <X class="w-3 h-3" />
+                              <span class="i-lucide-x w-3 h-3 inline-block" />
                             </button>
                           {/if}
                         </span>
@@ -487,7 +476,7 @@
                   >
                     {#if uploadedFile}
                       <div class="space-y-2">
-                        <Upload class="w-8 h-8 mx-auto text-sand/40" />
+                        <span class="i-lucide-upload w-8 h-8 mx-auto text-sand/40 inline-block" />
                         <p class="font-medium text-sm text-sand">{uploadedFile.name}</p>
                         <p class="text-xs text-sand/60">
                           {(uploadedFile.size / 1024).toFixed(1)} KB
@@ -503,7 +492,7 @@
                       </div>
                     {:else}
                       <div class="space-y-2">
-                        <Upload class="w-8 h-8 mx-auto text-sand/40" />
+                        <span class="i-lucide-upload w-8 h-8 mx-auto text-sand/40 inline-block" />
                         <p class="text-sm text-sand/60">Drop file here or click to browse</p>
                         <input
                           type="file"
@@ -531,7 +520,7 @@
                       {#if isAnalyzing}
                         <div class="animate-spin w-4 h-4 mr-1 border-2 border-current border-t-transparent rounded-full"></div>
                       {:else}
-                        <Brain class="w-4 h-4 mr-1" />
+                        <span class="i-lucide-brain w-4 h-4 mr-1 inline-block" />
                       {/if}
                       Analyze
                     </Button>
@@ -602,7 +591,7 @@
                 {#if isDeleting}
                   <div class="animate-spin w-4 h-4 mr-1 border-2 border-current border-t-transparent rounded-full"></div>
                 {:else}
-                  <Trash2 class="w-4 h-4 mr-1" />
+                  <span class="i-lucide-trash-2 w-4 h-4 mr-1 inline-block" />
                 {/if}
                 Delete
               </Button>
@@ -617,7 +606,7 @@
                 {#if isSaving}
                   <div class="animate-spin w-4 h-4 mr-1 border-2 border-white border-t-transparent rounded-full"></div>
                 {:else}
-                  <Save class="w-4 h-4 mr-1" />
+                  <span class="i-lucide-save w-4 h-4 mr-1 inline-block" />
                 {/if}
                 {mode === 'create' ? 'Create' : 'Save'}
               </Button>

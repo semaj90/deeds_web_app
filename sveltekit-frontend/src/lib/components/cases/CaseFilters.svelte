@@ -3,10 +3,7 @@
   import { Input } from "$lib/components/ui/input";
   import { Select } from "bits-ui";
 import Button from '$lib/components/ui/Button.svelte';
-  import Search from '@lucide/svelte/icons/search';
-  import Filter from '@lucide/svelte/icons/filter';
-  import SortAsc from '@lucide/svelte/icons/sort-asc';
-  import SortDesc from '@lucide/svelte/icons/sort-desc';
+  import Icon from '$lib/components/ui/Icon.svelte';
 
   interface Props {
     cases?: Case[];
@@ -67,7 +64,7 @@ import Button from '$lib/components/ui/Button.svelte';
 
 <div class="flex flex-wrap gap-4 p-4 bg-white dark:bg-panelSoft rounded-lg shadow-sm">
   <div class="flex items-center gap-2 flex-1">
-    <Search class="w-4 h-4 text-muted-foreground" />
+    <Icon name="search" class="w-4 h-4 text-muted-foreground" />
     <Input
       bind:value={searchQuery}
       placeholder="Search cases..."
@@ -76,7 +73,7 @@ import Button from '$lib/components/ui/Button.svelte';
   </div>
 
   <div class="flex items-center gap-2">
-    <Filter class="w-4 h-4 text-muted-foreground" />
+    <Icon name="filter" class="w-4 h-4 text-muted-foreground" />
     <Select.Root bind:value={statusFilter} type="single">
       <Select.Trigger class="w-[140px]">
         {#if statusFilter === 'all'}
@@ -128,10 +125,10 @@ import Button from '$lib/components/ui/Button.svelte';
     onclick={toggleSortOrder}
   >
     {#if sortOrder === 'asc'}
-      <SortAsc class="w-4 h-4" />
+      <Icon name="sort-asc" class="w-4 h-4" />
       Ascending
     {:else}
-      <SortDesc class="w-4 h-4" />
+      <Icon name="sort-desc" class="w-4 h-4" />
       Descending
     {/if}
   </Button>

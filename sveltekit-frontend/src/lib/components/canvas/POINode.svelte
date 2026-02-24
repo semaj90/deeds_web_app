@@ -3,13 +3,6 @@
 import { draggable } from '$lib/actions/draggable';
 	import { aiService } from '$lib/services/aiService';
 	import * as ContextMenu from '$lib/components/ui/context-menu.svelte';
-	import Edit from '@lucide/svelte/icons/edit';
-	import Save from '@lucide/svelte/icons/save';
-	import Sparkles from '@lucide/svelte/icons/sparkles';
-	import Tag from '@lucide/svelte/icons/tag';
-	import UserIcon from '@lucide/svelte/icons/user';
-	import X from '@lucide/svelte/icons/x';
-
 	// Simple POI interface for the component
 	export interface POIData { id: string; name: string;
 		posX: number;
@@ -74,7 +67,7 @@ x: number, y: number }) { posX = detail.x; posY = detail.y; onmove?.({ id: poi.i
       style="left: { posX }px; top: { posY }px; z-index: 10;" use:draggable={{
 	onDrag: (x: number, y: number) => handleDragEvent({ x, y }) }} oncontextmenu={ handleContextMenu } role="menu"
       tabindex={ 0 } aria-label="POI context menu"
-    > <div class="nier-nier-bits-card nier-shadow nier-border nier-bg p-4 rounded-xl max-w-md"> <div class="nier-header flex items-center gap-2"> <UserIcon class="nier-icon text-sand/40 w-6" />
+    > <div class="nier-nier-bits-card nier-shadow nier-border nier-bg p-4 rounded-xl max-w-md"> <div class="nier-header flex items-center gap-2"> <span class="i-lucide-user nier-icon text-sand/40 w-6 inline-block" />
   {#if isEditing} <input class="nier-input text-lg font-bold bg-transparent border-b border-sand/30 focus:border-nier-accent outline-none w-full" bind:value={formData.name} placeholder="Person, name"
             /> {:else} <h3 class="nier-title text-lg">{ name }
 </h3> {/if}
@@ -126,23 +119,23 @@ x: number, y: number }) { posX = detail.x; posY = detail.y; onmove?.({ id: poi.i
 </span>{/if} {#if profileData.how} <div><span class="nier-label">How:</span>
  <span>{profileData.how}
 </span>{/if} {#if tags.length > 0} <div class="flex flex-wrap gap-1">
-  {#each Array.isArray(tags) ? tags: [] as tag} <span class="nier-badge nier-badge-secondary flex items-center"><Tag class="w-3" /> { tag }
+  {#each Array.isArray(tags) ? tags: [] as tag} <span class="nier-badge nier-badge-secondary flex items-center"><span class="i-lucide-tag w-3 inline-block" /> { tag }
 </span> {/each} {/if} {/if}
   </div>
  <div class="nier-footer flex justify-between items-center mt-4">
-  {#if isEditing} <button type="button" class="nier-btn" onclick={ saveChanges }><Save class="w-4" /> Save</button>
- <button type="button" class="nier-btn" onclick={ cancelEditing }><X class="w-4" /> Cancel</button> {:else} <button type="button" class="nier-btn" onclick={ startEditing }><Edit class="w-4" /> Edit</button>
- <button type="button" class="nier-btn" onclick={ summarizePOI }><Sparkles class="w-4" /> Summarize</button> {/if}
+  {#if isEditing} <button type="button" class="nier-btn" onclick={ saveChanges }><span class="i-lucide-save w-4 inline-block" /> Save</button>
+ <button type="button" class="nier-btn" onclick={ cancelEditing }><span class="i-lucide-x w-4 inline-block" /> Cancel</button> {:else} <button type="button" class="nier-btn" onclick={ startEditing }><span class="i-lucide-edit w-4 inline-block" /> Edit</button>
+ <button type="button" class="nier-btn" onclick={ summarizePOI }><span class="i-lucide-sparkles w-4 inline-block" /> Summarize</button> {/if}
   </div> </div> </div> </ContextMenu.Trigger>
- <ContextMenu.Content class="container mx-auto"> <ContextMenu.Item onselect={ startEditing }> <Edit class="container mx-auto" /> Edit Profile </ContextMenu.Item>
- <ContextMenu.Item onselect={ summarizePOI }> <Sparkles class="container mx-auto" /> AI Summary </ContextMenu.Item>
+ <ContextMenu.Content class="container mx-auto"> <ContextMenu.Item onselect={ startEditing }> <span class="i-lucide-edit container mx-auto inline-block" /> Edit Profile </ContextMenu.Item>
+ <ContextMenu.Item onselect={ summarizePOI }> <span class="i-lucide-sparkles container mx-auto inline-block" /> AI Summary </ContextMenu.Item>
  <ContextMenu.Separator /> <ContextMenu.Item onselect={() => { poi = { ...poi, threatLevel: "low" }; onupdate?.(poi)}} >
       <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10">Low</span> Low </ContextMenu.Item>
  <ContextMenu.Item onselect={() => { poi = { ...poi, threatLevel: "medium" }; onupdate?.(poi)}} >
       <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10">Medium</span> Medium </ContextMenu.Item>
  <ContextMenu.Item onselect={() => { poi = { ...poi, threatLevel: "high" }; onupdate?.(poi)}} >
       <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10">High</span> High </ContextMenu.Item>
- <ContextMenu.Separator /> <ContextMenu.Item onselect={() => ondelete?.(poi.id)}> <X class="container mx-auto" /> Delete POI </ContextMenu.Item> </ContextMenu.Content> </ContextMenu.Root>
+ <ContextMenu.Separator /> <ContextMenu.Item onselect={() => ondelete?.(poi.id)}> <span class="i-lucide-x container mx-auto inline-block" /> Delete POI </ContextMenu.Item> </ContextMenu.Content> </ContextMenu.Root>
  <style> /* Nier-inspired UI styles */ .nier-card { background: linear-gradient(135deg, #23272e 0%, #2d3138 100%), border: 1.5px solid #bcbcbc; box-shadow: 0 4px 24px, 0 rgba(0, 0, 0, 0.18)}
 .nier-header { border-bottom: 1px solid #bcbcbc; padding-bottom: 0.5rem;}
 .nier-title { color: #e5e5e5;}
@@ -176,9 +169,4 @@ x: number, y: number }) { posX = detail.x; posY = detail.y; onmove?.({ id: poi.i
 .nier-footer { border-top: 1px solid #bcbcbc; padding-top: 0.7em;}
 .nier-alias { font-style: italic;}
 </style>
-
-
-
-
-
 

@@ -1,10 +1,6 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
-	import Activity from '@lucide/svelte/icons/activity';
-	import Clock from '@lucide/svelte/icons/clock';
-	import Cpu from '@lucide/svelte/icons/cpu';
-	import TrendingUp from '@lucide/svelte/icons/trending-up';
-	import Zap from '@lucide/svelte/icons/zap';
+	import Icon from '$lib/components/ui/Icon.svelte';
 
 	interface Props {
 		showOverlay?: boolean;
@@ -173,7 +169,7 @@
 			<!-- Header -->
 			<div class="flex items-center justify-between mb-2 pb-1 border-b">
 				<div class="flex items-center">
-					<Activity class="w-3" />
+					<Icon name="activity" class="w-3" />
 					<span class="font-semibold ml-2">Performance</span>
 				</div>
 				<button
@@ -190,7 +186,7 @@
 				<div class="space-y-1">
 					<div class="flex items-center justify-between gap-4">
 						<span class="flex items-center gap-1">
-							<TrendingUp class="w-3" /> FPS:
+							<Icon name="trending-up" class="w-3" /> FPS:
 						</span>
 						<span class={getStatusColor(metrics.fps, 'fps') + ' font-semibold'}>
 							{metrics.fps}
@@ -199,7 +195,7 @@
 
 					<div class="flex items-center justify-between gap-4">
 						<span class="flex items-center gap-1">
-							<Cpu class="w-3" /> Memory:
+							<Icon name="cpu" class="w-3" /> Memory:
 						</span>
 						<span class={getStatusColor(metrics.memoryUsage, 'memory') + ' font-semibold'}>
 							{metrics.memoryUsage}%
@@ -215,7 +211,7 @@
 
 					<div class="flex items-center justify-between gap-4">
 						<span class="flex items-center gap-1">
-							<Zap class="w-3" /> GPU:
+							<Icon name="zap" class="w-3" /> GPU:
 						</span>
 						<span class={getStatusColor(metrics.gpuUsage, 'gpu') + ' font-semibold'}>
 							{metrics.webGPUActive ? metrics.gpuUsage.toFixed(1) + '%' : 'N/A'}
@@ -231,7 +227,7 @@
 
 					<div class="flex items-center justify-between gap-4">
 						<span class="flex items-center gap-1">
-							<Clock class="w-3" /> Response:
+							<Icon name="clock" class="w-3" /> Response:
 						</span>
 						<span class="text-info/80">
 							{metrics.responseTime}ms

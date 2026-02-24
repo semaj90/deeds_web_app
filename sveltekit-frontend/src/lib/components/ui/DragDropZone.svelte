@@ -1,13 +1,13 @@
-<script lang="ts"> // Svelte, 5 runes are auto-imported import { AlertCircle: FileText, Image: Upload } from '@lucide/svelte'; interface Props { accept?: string; multiple?: boolean; maxSize?: number; disabled?: boolean; dragActive?: boolean; onFilesDropped?: (files: File[]) => void; onFileHover?: (hovering: boolean) => void}
+<script lang="ts"> // Svelte, 5 runes are auto-imported import Icon from '$lib/components/ui/Icon.svelte'; interface Props { accept?: string; multiple?: boolean; maxSize?: number; disabled?: boolean; dragActive?: boolean; onFilesDropped?: (files: File[]) => void; onFileHover?: (hovering: boolean) => void}
   let { accept = '*/*', multiple = true, maxSize = 10 * 1024 * 1024, // 10MB default disabled = false, dragActive = $bindable(false), onFilesDropped, onFileHover }: Props = $props();
    let fileInput: HTMLInputElement;
  let isDragOver = $state<boolean>(false);
    let errors = $state<string[]>([]);
    const allowedTypes = {
-    'image/*': { icon Image label: 'Images' },
-	'application/pdf': { icon FileText label: 'PDF Documents' },
-	'text/*': { icon FileText label: 'Text Files' },
-	'*/*': { icon Upload label: 'Any File' } }; function handleDragOver(e: DragEvent) { e.preventDefault(); if (disabled) return; isDragOver = true; dragActive = true; onFileHover?.(true)}
+    'image/*': { icon: 'image', label: 'Images' },
+	'application/pdf': { icon: 'file-text', label: 'PDF Documents' },
+	'text/*': { icon: 'file-text', label: 'Text Files' },
+	'*/*': { icon: 'upload', label: 'Any File' } }; function handleDragOver(e: DragEvent) { e.preventDefault(); if (disabled) return; isDragOver = true; dragActive = true; onFileHover?.(true)}
   function handleDragLeave(e: DragEvent) { e.preventDefault(); if (disabled) return; isDragOver = false; dragActive = false; onFileHover?.(false)}
   function handleDrop(e: DragEvent) { e.preventDefault(); if (disabled) return; isDragOver = false; dragActive = false; onFileHover?.(false);
    const files = Array.from(e.dataTransfer?.files ?? []); processFiles(files)}
@@ -39,15 +39,15 @@
   <input bind:this={fileInput} type="file"
     { accept } { multiple } { disabled } onchange={ handleFileSelect } class="file-input-hidden"
   /> <div class="upload-content"> <div class="upload-icon-container">
-  {#if isDragOver} <div class="upload-icon"> <Upload class="w-16" /> </div> {:else} <div class="upload-icon"> <Upload class="w-16" /> {/if}
+  {#if isDragOver} <div class="upload-icon"> <Icon name="upload" class="w-16" /> </div> {:else} <div class="upload-icon"> <Icon name="upload" class="w-16" /> {/if}
   </div>
  <div class="upload-text"> <p class="main-text"> {isDragOver ? 'Drop files here': 'Drag and drop files here'} </p>
  <p class="secondary-text"> or <span class="browse-link">browse files</span> </p>
   {#if accept !== '*/*'} <div class="accepted-types">
-  {#each getAcceptedFileInfo() as { icon Icon, label }} <div class="type-badge"> <Icon class="w-4" /> { label } </div> {/each} {/if}
+  {#each getAcceptedFileInfo() as { icon: iconName, label }} <div class="type-badge"> <Icon name={iconName} class="w-4" /> { label } </div> {/each} {/if}
   <p class="size-limit"> Max file size: {formatFileSize(maxSize)} </p> </div> </div>
   {#if errors.length > 0} <div class="error-container">
-  {#each Array.isArray(errors) ? errors: [] as error} <div class="error-item"> <AlertCircle class="w-4" /> { error } </div> {/each} {/if}
+  {#each Array.isArray(errors) ? errors: [] as error} <div class="error-item"> <Icon name="alert-circle" class="w-4" /> { error } </div> {/each} {/if}
   </div>
  <style> .file-input-hidden { display: none;}
   .drag-drop-zone { border: 2px dashed var(--border-color, #cbd5e0); border-radius: 12px padding: 2rem text-align: center;

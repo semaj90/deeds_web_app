@@ -1,7 +1,5 @@
 <script lang="ts">
-  import Upload from '@lucide/svelte/icons/upload';
-  import X from '@lucide/svelte/icons/x';
-  import FileText from '@lucide/svelte/icons/file-text';
+  import Icon from '$lib/components/ui/Icon.svelte';
 
   interface UploadFile {
     id: string;
@@ -168,7 +166,7 @@
     ondrop={handleDrop}
     onclick={openFilePicker}
   >
-    <Upload class="h-8 w-8 text-muted-foreground mb-2" />
+    <Icon name="upload" class="h-8 w-8 text-muted-foreground mb-2" />
     <p class="text-sm text-muted-foreground">{dragDropText}</p>
     <span class="browse-btn">{browseText}</span>
     {#if supportedFormats.length > 0}
@@ -198,7 +196,7 @@
     <ul class="file-list">
       {#each files as file (file.id)}
         <li class="file-item">
-          <FileText class="h-4 w-4 shrink-0 text-muted-foreground" />
+          <Icon name="file-text" class="h-4 w-4 shrink-0 text-muted-foreground" />
           <div class="file-info">
             <span class="file-name">{file.name}</span>
             <span class="file-size">{formatSize(file.size)}</span>
@@ -213,7 +211,7 @@
             <span class="text-xs text-danger">{file.error ?? 'Error'}</span>
           {/if}
           <button type="button" class="remove-btn" onclick={() => removeFile(file.id)}>
-            <X class="h-3 w-3" />
+            <Icon name="x" class="h-3 w-3" />
           </button>
         </li>
       {/each}
