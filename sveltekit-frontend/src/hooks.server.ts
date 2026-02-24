@@ -98,6 +98,13 @@ export const handle: Handle = async ({ event, resolve }) => {
 export const handleError: HandleServerError = ({ error, event }) => {
 	const errorId = crypto.randomUUID();
 
+	// Debug: log full stack trace to file for diagnosis
+	if (dev) {
+		const errMsg = error instanceof Error ? `${error.message}\n${error.stack}` : String(error);
+		const debugLine = `[${new Date().toISOString()}] ${event.url.pathname}: ${errMsg}\n---\n`;
+		import('node:fs').then(fs => fs.appendFileSync('ssr-errors.log', debugLine)).catch(() => {});
+	}
+
 	productionLogger.error(
 		`[${errorId}] Unhandled error in ${event.url.pathname}`,
 		error instanceof Error ? error : new Error(String(error)),
@@ -105,7 +112,7 @@ export const handleError: HandleServerError = ({ error, event }) => {
 	);
 
 	return {
-		message: 'An unexpected error occurred',
+		message: dev ? `${error instanceof Error ? error.message : String(error)}` : 'An unexpected error occurred',
 		code: errorId
 	};
 };

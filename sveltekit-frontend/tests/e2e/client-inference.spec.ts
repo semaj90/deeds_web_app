@@ -55,24 +55,20 @@ test.describe('Client-Side ONNX Inference Pipeline', () => {
   });
 
   test('2. Page loads and exposes __deedsClientInference hook', async ({ page }) => {
-    // Navigate to ai-dashboard — it imports client AI modules
-    await page.goto('/ai-dashboard');
+    // Navigate to any page (dashboard is lightest)
+    await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
 
-    await captureNumberedStep(page, 1, 'ai-dashboard-loaded', {
+    await captureNumberedStep(page, 1, 'dashboard-loaded', {
       directory: SCREENSHOT_DIR,
       fullPage: true
     });
 
-    // The hook is installed when client-embed.ts is imported
-    // Wait for it to appear (module may load async)
+    // Dynamically import client-embed to install the hook
+    // (it self-registers on window.__deedsClientInference when loaded)
     const hookExists = await page.evaluate(async () => {
-      // Give modules time to load
-      for (let i = 0; i < 30; i++) {
-        if ((window as any).__deedsClientInference) return true;
-        await new Promise(r => setTimeout(r, 1000));
-      }
-      return false;
+      await import('/src/lib/ai/client-embed.ts');
+      return !!(window as any).__deedsClientInference;
     });
 
     console.log(`__deedsClientInference hook found: ${hookExists}`);
@@ -84,29 +80,71 @@ test.describe('Client-Side ONNX Inference Pipeline', () => {
   });
 
   test('3. Preload embedding model via hook', async ({ page }) => {
-    await page.goto('/ai-dashboard');
-    await page.waitForLoadState('networkidle');
+    // Capture all browser console messages for WASM diagnostics
+    const consoleLogs: string[] = [];
+    page.on('console', msg => {
+      consoleLogs.push(`[${msg.type()}] ${msg.text()}`);
+    });
+    page.on('pageerror', err => {
+      consoleLogs.push(`[PAGE_ERROR] ${err.message}`);
+    });
 
-    // Wait for hook
-    await page.waitForFunction(
-      () => !!(window as any).__deedsClientInference,
-      { timeout: 30_000 }
-    );
+    await page.goto('/dashboard');
+    await page.waitForLoadState('networkidle');
 
     await captureNumberedStep(page, 3, 'before-preload', {
       directory: SCREENSHOT_DIR
     });
 
-    // Preload model + tokenizer
+    // Import module, install hook, and preload — all in one evaluate
     const preloadResult = await page.evaluate(async () => {
-      const hook = (window as any).__deedsClientInference;
       const start = performance.now();
-      const result = await hook.preload();
-      const loadTimeMs = Math.round(performance.now() - start);
-      return { ...result, loadTimeMs };
+      try {
+        // Dynamic import installs the hook on window
+        await import('/src/lib/ai/client-embed.ts');
+        const hook = (window as any).__deedsClientInference;
+        if (!hook) {
+          return {
+            ready: false, backend: 'failed', loadTimeMs: 0,
+            error: 'Hook not installed after import',
+            crossOriginIsolated: (self as any).crossOriginIsolated,
+            hasSharedArrayBuffer: typeof SharedArrayBuffer !== 'undefined',
+            hasWebGPU: 'gpu' in navigator
+          };
+        }
+        const result = await hook.preload();
+        const loadTimeMs = Math.round(performance.now() - start);
+        return { ...result, loadTimeMs, error: null };
+      } catch (err: any) {
+        const loadTimeMs = Math.round(performance.now() - start);
+        return {
+          ready: false,
+          backend: 'failed',
+          loadTimeMs,
+          error: err?.message || String(err),
+          crossOriginIsolated: (self as any).crossOriginIsolated,
+          hasSharedArrayBuffer: typeof SharedArrayBuffer !== 'undefined',
+          hasWebGPU: 'gpu' in navigator
+        };
+      }
     });
 
     console.log(`Preload result: ready=${preloadResult.ready}, backend=${preloadResult.backend}, loadTime=${preloadResult.loadTimeMs}ms`);
+
+    if (preloadResult.error) {
+      console.log(`Preload ERROR: ${preloadResult.error}`);
+      console.log(`crossOriginIsolated: ${preloadResult.crossOriginIsolated}`);
+      console.log(`SharedArrayBuffer available: ${preloadResult.hasSharedArrayBuffer}`);
+      console.log(`WebGPU available: ${preloadResult.hasWebGPU}`);
+      console.log(`--- Browser Console (last 30 lines) ---`);
+      consoleLogs.slice(-30).forEach(l => console.log(l));
+    }
+
+    // Save diagnostics regardless of pass/fail
+    fs.writeFileSync(
+      path.join(ARTIFACTS_DIR, '03-preload-result.json'),
+      JSON.stringify({ ...preloadResult, consoleLogs: consoleLogs.slice(-50) }, null, 2)
+    );
 
     expect(preloadResult.ready).toBe(true);
     expect(preloadResult.backend).not.toBe('not loaded');
@@ -114,25 +152,17 @@ test.describe('Client-Side ONNX Inference Pipeline', () => {
     await captureNumberedStep(page, 4, 'model-preloaded', {
       directory: SCREENSHOT_DIR
     });
-
-    fs.writeFileSync(
-      path.join(ARTIFACTS_DIR, '03-preload-result.json'),
-      JSON.stringify(preloadResult, null, 2)
-    );
   });
 
   test('4. Run embedding inference and validate output', async ({ page }) => {
-    await page.goto('/ai-dashboard');
+    await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
 
-    // Wait for hook
-    await page.waitForFunction(
-      () => !!(window as any).__deedsClientInference,
-      { timeout: 30_000 }
-    );
-
-    // Preload first (memoized if already loaded)
-    await page.evaluate(() => (window as any).__deedsClientInference.preload());
+    // Import module to install hook, then preload
+    await page.evaluate(async () => {
+      await import('/src/lib/ai/client-embed.ts');
+      await (window as any).__deedsClientInference.preload();
+    });
 
     await captureNumberedStep(page, 5, 'ready-for-inference', {
       directory: SCREENSHOT_DIR

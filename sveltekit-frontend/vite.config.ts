@@ -277,6 +277,17 @@ export default defineConfig(({ mode }) => {
       ],
       esbuildOptions: {
         target: 'ES2022',
+        // Keep worker_threads as external during pre-bundling so Vite's alias resolves it at serve time
+        plugins: [
+          {
+            name: 'worker-threads-shim',
+            setup(build: any) {
+              build.onResolve({ filter: /^worker_threads$/ }, () => ({
+                path: path.resolve('src/lib/shims/worker-threads-browser-shim.js'),
+              }));
+            },
+          },
+        ],
       },
     },
     esbuild: {
@@ -291,17 +302,14 @@ export default defineConfig(({ mode }) => {
     },
     clearScreen: false,
     ssr: {
-      external: ['canvas', '@napi-rs/canvas', 'simdjson-wasm'],
+      external: ['canvas', '@napi-rs/canvas', 'simdjson-wasm', 'onnxruntime-web'],
     },
     resolve: {
       alias: {
         __SERVER__: serverInternals,
         __PUBLIC__: publicInternals,
-        // Shim node-postgres imports to use postgres-js adapter (conservative)
-        // 'drizzle-orm/node-postgres': path.resolve(
-        //   __dirname,
-        //   'src/lib/shims/drizzle-node-postgres.ts'
-        // ),
+        // Shim worker_threads for onnxruntime-web (Emscripten WASM loaders import it at module level)
+        'worker_threads': path.resolve('src/lib/shims/worker-threads-browser-shim.js'),
       },
       dedupe: ['svelte'],
     },
