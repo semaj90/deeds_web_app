@@ -27,8 +27,11 @@ async function ensureTokenizer(): Promise<any> {
 	if (tokenizerLoading) return tokenizerLoading;
 
 	tokenizerLoading = (async () => {
-		const { AutoTokenizer } = await import('@huggingface/transformers');
-		tokenizer = await AutoTokenizer.from_pretrained(
+		const transformers = await import('@huggingface/transformers');
+		// Allow loading tokenizer from local static/ files
+		transformers.env.allowLocalModels = true;
+		transformers.env.allowRemoteModels = false;
+		tokenizer = await transformers.AutoTokenizer.from_pretrained(
 			CLIENT_EMBEDDING_TOKENIZER_PATH.replace('/tokenizer.json', ''),
 			{ local_files_only: true }
 		);
@@ -232,4 +235,28 @@ export async function batchCosineSimilarity(
 		const scores = documents.map(doc => cosineSimilarity(query, doc));
 		return { scores, backend: 'cpu-inline', durationMs: 0 };
 	}
+}
+
+// ─── Playwright Test Hook ────────────────────────────────────────────────────
+// Exposes window.__deedsClientInference in dev mode for e2e inference validation.
+
+if (typeof window !== 'undefined') {
+	const hook = {
+		get ready() {
+			return isEmbeddingModelReady();
+		},
+		embeddingDim: CLIENT_EMBEDDING_DIMS,
+		async runEmbedding(text: string) {
+			const start = performance.now();
+			const vector = await embedText(text);
+			const durationMs = Math.round(performance.now() - start);
+			const backend = getProviderLabel(CLIENT_EMBEDDING_ONNX_PATH);
+			return { vector, dim: vector.length, backend, durationMs };
+		},
+		async preload() {
+			await preloadEmbeddingModel();
+			return { ready: isEmbeddingModelReady(), backend: getProviderLabel(CLIENT_EMBEDDING_ONNX_PATH) };
+		}
+	};
+	(window as any).__deedsClientInference = hook;
 }

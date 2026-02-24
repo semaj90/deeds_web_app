@@ -88,11 +88,20 @@ export default defineConfig({
         },
       },
     },
-    // Firefox disabled to reduce memory usage
-    // {
-    //   name: 'firefox',
-    //   use: { ...devices['Desktop Firefox'] },
-    // },
+    {
+      name: 'chromium-webgpu',
+      testMatch: '**/client-inference*',
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: {
+          args: [
+            '--enable-features=WebAssemblySimd',
+            '--enable-unsafe-webgpu',
+            '--no-sandbox',
+          ],
+        },
+      },
+    },
   ],
 
   // Web server configuration

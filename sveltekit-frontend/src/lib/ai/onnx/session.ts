@@ -31,6 +31,8 @@ async function ensureOrt(): Promise<typeof import('onnxruntime-web')> {
 	ort = await import('onnxruntime-web');
 	// Point WASM loader at static/ort/ so it finds .wasm files
 	ort.env.wasm.wasmPaths = '/ort/';
+	// Force single-threaded WASM to avoid SharedArrayBuffer issues in headless browsers
+	ort.env.wasm.numThreads = 1;
 	return ort;
 }
 
