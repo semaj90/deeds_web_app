@@ -3,7 +3,8 @@ import { cases } from '$lib/server/db/schema';
 import { eq, desc, sql, and, ne } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 
-const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
+const safe = <T>(p: Promise<T>, fallback: T, timeoutMs = 5000): Promise<T> =>
+	Promise.race([p, new Promise<T>((resolve) => setTimeout(() => resolve(fallback), timeoutMs))]).catch(() => fallback);
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const user = locals.user ?? null;

@@ -5,7 +5,8 @@ import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types.js';
 
 export const load: PageServerLoad = async ({ params }) => {
-	const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
+	const safe = <T>(p: Promise<T>, fallback: T, timeoutMs = 5000): Promise<T> =>
+		Promise.race([p, new Promise<T>((resolve) => setTimeout(() => resolve(fallback), timeoutMs))]).catch(() => fallback);
 
 	const results = await safe(
 		db.select().from(personsOfInterest).where(eq(personsOfInterest.id, params.id)).limit(1),

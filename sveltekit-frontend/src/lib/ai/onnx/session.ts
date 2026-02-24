@@ -28,6 +28,22 @@ const sessionCache = new Map<string, Promise<any>>();
  */
 async function ensureOrt(): Promise<typeof import('onnxruntime-web')> {
 	if (ort) return ort;
+
+	// Provide global require polyfill for onnxruntime-web's CJS compatibility code.
+	// ORT's minified bundle checks `typeof require<"u"` — if require is undefined it
+	// falls through to a Proxy that throws "Dynamic require not supported". By providing
+	// a real require that returns shims for Node.js builtins, ORT initializes cleanly.
+	if (typeof globalThis.require === 'undefined') {
+		const shims: Record<string, unknown> = {
+			worker_threads: { Worker: undefined, parentPort: null, isMainThread: true, workerData: undefined, threadId: 0 },
+			module: { createRequire: () => () => ({}) },
+			path: { join: (...a: string[]) => a.join('/'), resolve: (...a: string[]) => a.join('/'), dirname: () => '' },
+			fs: { readFileSync: () => null, existsSync: () => false },
+			os: { cpus: () => [{}] },
+		};
+		(globalThis as any).require = (id: string) => shims[id] || {};
+	}
+
 	ort = await import('onnxruntime-web');
 	// Point WASM loader at static/ort/ so it finds .wasm files
 	ort.env.wasm.wasmPaths = '/ort/';

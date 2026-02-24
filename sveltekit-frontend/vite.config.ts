@@ -274,6 +274,8 @@ export default defineConfig(({ mode }) => {
         'drizzle-orm',
         'svelte',
         '@sveltejs/kit',
+        'onnxruntime-web',
+        '@huggingface/transformers',
       ],
       esbuildOptions: {
         target: 'ES2022',

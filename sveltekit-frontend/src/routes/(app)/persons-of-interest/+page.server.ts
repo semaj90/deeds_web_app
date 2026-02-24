@@ -6,12 +6,15 @@ import type { PageServerLoad } from './$types.js';
 export const load: PageServerLoad = async ({ url }) => {
 	const caseId = url.searchParams.get('caseId') || null;
 
+	const safe = <T>(p: Promise<T>, fallback: T, timeoutMs = 5000): Promise<T> =>
+		Promise.race([p, new Promise<T>((resolve) => setTimeout(() => resolve(fallback), timeoutMs))]).catch(() => fallback);
+
 	try {
 		const query = caseId
 			? db.select().from(personsOfInterest).where(eq(personsOfInterest.caseId, caseId))
 			: db.select().from(personsOfInterest);
 
-		const pois = await query.orderBy(desc(personsOfInterest.createdAt)).limit(100);
+		const pois = await safe(query.orderBy(desc(personsOfInterest.createdAt)).limit(100), []);
 
 		return {
 			caseId,

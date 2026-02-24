@@ -20,7 +20,8 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 		};
 	}
 
-	const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
+	const safe = <T>(p: Promise<T>, fallback: T, timeoutMs = 5000): Promise<T> =>
+		Promise.race([p, new Promise<T>((resolve) => setTimeout(() => resolve(fallback), timeoutMs))]).catch(() => fallback);
 
 	let evidenceData;
 	let loadError: string | null = null;

@@ -79,6 +79,26 @@ test.describe('Client-Side ONNX Inference Pipeline', () => {
     });
   });
 
+  test('2b. Can fetch model binary from browser', async ({ page }) => {
+    await page.goto('/dashboard');
+    await page.waitForLoadState('networkidle');
+
+    const fetchResult = await page.evaluate(async () => {
+      try {
+        const res = await fetch('/embeddinggemma_300m_onnx/model.onnx');
+        if (!res.ok) return { ok: false, status: res.status, error: `HTTP ${res.status}` };
+        const buf = await res.arrayBuffer();
+        return { ok: true, status: res.status, sizeBytes: buf.byteLength };
+      } catch (err: any) {
+        return { ok: false, status: 0, error: err?.message || String(err) };
+      }
+    });
+
+    console.log(`Model fetch: ${JSON.stringify(fetchResult)}`);
+    expect(fetchResult.ok).toBe(true);
+    expect(fetchResult.sizeBytes).toBeGreaterThan(200_000_000);
+  });
+
   test('3. Preload embedding model via hook', async ({ page }) => {
     // Capture all browser console messages for WASM diagnostics
     const consoleLogs: string[] = [];
