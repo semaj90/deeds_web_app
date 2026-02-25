@@ -43,8 +43,8 @@
       error = null;
 
       // Detect real WebGPU capabilities from browser
-      if (typeof navigator !== 'undefined' && 'gpu' in navigator) {
-        const gpu = (navigator as any).gpu;
+      if (typeof navigator !== 'undefined' && navigator.gpu) {
+        const gpu = navigator.gpu as GPU;
         const adapter = await gpu.requestAdapter({ powerPreference: 'high-performance' });
 
         if (adapter) {

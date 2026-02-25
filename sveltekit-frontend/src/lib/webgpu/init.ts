@@ -42,8 +42,10 @@ export async function initWebGPU(
   options: WebGPUInitOptions = {}
 ): Promise<WebGPUContext | null> {
   // SSR Guard: Must run in browser with WebGPU support
-  if (!browser || typeof navigator === 'undefined' || !('gpu' in navigator)) {
-    console.warn('[WebGPU] Not available (SSR or unsupported browser)');
+  // NOTE: 'gpu' in navigator can be true even when navigator.gpu is null (WSL2).
+  // Always check navigator.gpu directly to avoid null-dereference crashes.
+  if (!browser || typeof navigator === 'undefined' || !navigator.gpu) {
+    console.warn('[WebGPU] Not available (SSR, unsupported browser, or WSL2 without GPU passthrough)');
     return null;
   }
 
@@ -182,7 +184,8 @@ export function cpuCompute<T extends Float32Array | Uint8Array>(
  * Check WebGPU availability (SSR-safe)
  */
 export function isWebGPUAvailable(): boolean {
-  return browser && typeof navigator !== 'undefined' && 'gpu' in navigator;
+  // 'gpu' in navigator can be true when navigator.gpu is null (WSL2 edge case)
+  return browser && typeof navigator !== 'undefined' && !!navigator.gpu;
 }
 
 /**

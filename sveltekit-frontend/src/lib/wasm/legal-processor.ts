@@ -89,7 +89,7 @@ export class WasmLegalProcessor {
             this.wasmModule = await this.createMockWasmModule();
 
             // Initialize WebGPU components if available
-            if (typeof navigator !== 'undefined' && 'gpu' in navigator) {
+            if (typeof navigator !== 'undefined' && navigator.gpu) {
                 try {
                      this.gemmaClient = new WebGPUGemmaClient();
                      await this.gemmaClient.initialize();

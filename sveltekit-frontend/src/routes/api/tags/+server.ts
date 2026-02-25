@@ -1,0 +1,39 @@
+import type { RequestHandler } from './$types';
+import { json } from '@sveltejs/kit';
+import { db } from '$lib/server/db/client';
+import { sql } from 'drizzle-orm';
+
+/** GET /api/tags — List all unique tags from evidence and cases */
+export const GET: RequestHandler = async () => {
+	try {
+		// Extract unique tags from evidence metadata JSONB
+		const result = await db.execute(sql`
+			SELECT DISTINCT jsonb_array_elements_text(metadata->'tags') AS tag
+			FROM evidence
+			WHERE metadata->'tags' IS NOT NULL
+			ORDER BY tag
+			LIMIT 200
+		`).catch(() => ({ rows: [] }));
+
+		const tags = (result.rows as Array<{ tag: string }>).map((r) => r.tag);
+
+		// If no DB tags, return common legal tags
+		if (tags.length === 0) {
+			return json({
+				tags: [
+					'contract', 'litigation', 'evidence', 'testimony', 'discovery',
+					'motion', 'brief', 'deposition', 'ruling', 'settlement',
+					'criminal', 'civil', 'corporate', 'employment', 'ip',
+					'urgent', 'reviewed', 'pending', 'archived'
+				]
+			});
+		}
+
+		return json({ tags });
+	} catch (err) {
+		console.error('[/api/tags]', err);
+		return json({
+			tags: ['contract', 'litigation', 'evidence', 'testimony', 'motion', 'brief', 'urgent', 'pending']
+		});
+	}
+};

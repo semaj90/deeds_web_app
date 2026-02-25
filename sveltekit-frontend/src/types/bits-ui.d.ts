@@ -14,6 +14,11 @@ declare module 'bits-ui' {
  export const Select: ComponentCtor;
  export const Tabs: ComponentCtor;
  export const Toast: ComponentCtor;
+ export const Collapsible: {
+   Root: ComponentCtor;
+   Trigger: ComponentCtor;
+   Content: ComponentCtor;
+ };
  export const Popover: ComponentCtor;
  export const Tooltip: ComponentCtor;
  export const Avatar: ComponentCtor;

@@ -58,7 +58,7 @@
 			}
 		}
 
-		const webGPUActive = typeof navigator !== 'undefined' && 'gpu' in navigator;
+		const webGPUActive = typeof navigator !== 'undefined' && !!navigator.gpu;
 		let responseTime = 0;
 		try {
 			const entries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];

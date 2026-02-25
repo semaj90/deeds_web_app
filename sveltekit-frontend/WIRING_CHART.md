@@ -11,8 +11,8 @@
 | Layouts | 10 |
 | .svelte files | 909 |
 | .ts files | 1,610 |
-| SSR Disabled | 7 |
-| SSR Enabled | 17 |
+| SSR Disabled | 10 |
+| SSR Enabled | 14 |
 
 ---
 
@@ -156,7 +156,7 @@ SSR: ON | OFF        Server load: YES | NO
   ├── Response:    (StreamingResponse) (TypewriterResponse)
   ├── Panel:       (ChatMessages) (ChatPanel) (GamingAIButton)
   ├── Orchestr:    (IntelligentModelOrchestrator)
-  ├── RAG:         (SourceValidator) (AnswerWithCitations) (RAGPipelineChart)
+  ├── RAG:         (SourceValidator) (AnswerWithCitations) (RAGPipelineChart) (ACEContextBubble)
   ├──> {GET /api/ai/stats}
   ├──> {GET /api/ai/models}
   ├──> {POST /api/rag/search}           3-step RAG pipeline
@@ -226,9 +226,9 @@ SSR: ON | OFF        Server load: YES | NO
 
 ### 19. `/error-brain` — SSR: ON
 ### 20. `/agentic-errors` — SSR: ON
-### 21. `/gpu-evidence-graph` — SSR: ON
-### 22. `/ast-topology` — SSR: ON
-### 23. `/codebase-index` — SSR: ON
+### 21. `/gpu-evidence-graph` — SSR: OFF (Canvas 2D)
+### 22. `/ast-topology` — SSR: OFF (D3.js DOM refs)
+### 23. `/codebase-index` — SSR: OFF (window.location.reload)
 ### 24. `/evidence-canvas-demo` — SSR: OFF
 
 ---
@@ -258,6 +258,9 @@ SSR: ON | OFF        Server load: YES | NO
 | `/api/evidence/upload` | POST | evidence (action) | WIRED |
 | `/api/evidence/realtime` | GET SSE | evidence | WIRED |
 | `/api/embed` | POST | 15+ components | WIRED |
+| `/api/ai/stats` | GET | ai-dashboard | WIRED |
+| `/api/ai/models` | GET | ai-dashboard | WIRED |
+| `/api/ai/yorha/context-chat` | POST | terminal | WIRED |
 
 ---
 
@@ -303,7 +306,7 @@ SSR: ON | OFF        Server load: YES | NO
 
 ## SSR Classification
 
-### OFF (7 routes) — Reason
+### OFF (10 routes) — Reason
 | Route | Reason |
 |-------|--------|
 | `/evidence` | bits-ui Dialog TDZ in Svelte 5.46.0 SSR |
@@ -313,5 +316,8 @@ SSR: ON | OFF        Server load: YES | NO
 | `/terminal` | Browser-only terminal emulator |
 | `/evidence-canvas-demo` | Canvas/WebGL rendering |
 | `/cases/[id]/ai` | AI inference components |
+| `/gpu-evidence-graph` | Canvas 2D rendering requires browser DOM |
+| `/ast-topology` | D3.js force simulation with HTMLDivElement refs |
+| `/codebase-index` | Uses `window.location.reload()` in module scope |
 
-### ON (17 routes) — All others use server-side rendering
+### ON (14 routes) — All others use server-side rendering

@@ -26,7 +26,7 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
   async function testConnection(): Promise<void> {
     connectionStatus = 'testing';
     try {
-      const response = await fetch('/api/chat-test', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
@@ -54,7 +54,7 @@ import CardContent from '$lib/components/ui/Card/CardContent.svelte';
     isLoading = true
     try {
       console.log('ðŸš€ Sending to CUDA AI:', currentInput);
-      const response = await fetch('/api/chat-test', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({

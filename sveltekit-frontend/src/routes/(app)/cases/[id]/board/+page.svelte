@@ -1,7 +1,6 @@
 <script lang="ts">
     import HybridBoard from '$lib/components/canvas/HybridBoard.svelte';
     import type { PageData } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
     // Props
     let { data }: {

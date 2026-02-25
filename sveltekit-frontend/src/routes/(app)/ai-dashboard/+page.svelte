@@ -26,6 +26,7 @@
   import SourceValidator from '$lib/components/rag/SourceValidator.svelte';
   import AnswerWithCitations from '$lib/components/rag/AnswerWithCitations.svelte';
   import RAGPipelineChart from '$lib/components/ai/RAGPipelineChart.svelte';
+  import ACEContextBubble from '$lib/components/ai/ACEContextBubble.svelte';
   import type { AnswerWithCitations as AnswerData } from '$lib/types/rag-source-validation';
 
   interface AIStats {
@@ -82,6 +83,7 @@
   let showVlmAnalyzer = $state(false);
   let showRagPipeline = $state(false);
   let showPipelineChart = $state(false);
+  let showACEBubble = $state(false);
   let ragQuery = $state('');
   let ragChunks = $state<any[]>([]);
   let ragAnswer = $state<AnswerData | null>(null);
@@ -638,6 +640,65 @@
       {#if showPipelineChart}
         <div class="mt-3 bg-panel/50 border border-sand/10 rounded-lg">
           <RAGPipelineChart />
+        </div>
+      {/if}
+    </div>
+
+    <!-- 22. ACE Context Bubble (Pipeline Metadata) -->
+    <div class="mt-4">
+      <button
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/10 rounded-lg hover:border-accent/30 transition text-sm font-medium text-sand/80"
+        onclick={() => (showACEBubble = !showACEBubble)}
+      >
+        {showACEBubble ? 'Hide ACE Bubble' : 'ACE Context Bubble (Expandable Pipeline Metadata)'}
+      </button>
+      {#if showACEBubble}
+        <div class="mt-3 p-4 bg-panel/50 border border-sand/10 rounded-lg space-y-4">
+          <p class="text-xs text-sand/50 mb-3">Click each bubble to expand the full ACE pipeline breakdown.</p>
+          <div class="flex flex-wrap gap-3 items-start">
+            <!-- High confidence with full context -->
+            <ACEContextBubble
+              confidence={0.85}
+              source="server-ollama"
+              confidenceFactors={{
+                caseContext: true,
+                ragHits: 4,
+                topScore: 0.87,
+                embeddingModel: 'embeddinggemma:latest',
+                codebaseHits: 0,
+                kagNeighbors: 3
+              }}
+              citations={[
+                { sourceNum: 1, documentId: 'evidence_items:abc123', similarity: 0.87 },
+                { sourceNum: 3, documentId: 'legal_cases:def456', similarity: 0.72 }
+              ]}
+              contextUsed={['evidence_items:abc123', 'legal_documents:xyz789']}
+              conversationTurns={4}
+              routerDecision={{ source: 'server-ollama', reason: 'legal-keywords(3)+case-context-available', confidence: 0.85 }}
+            />
+            <!-- Low confidence local -->
+            <ACEContextBubble
+              confidence={0.35}
+              source="local-onnx"
+              cacheHit="idb"
+              routerDecision={{ source: 'local-onnx', reason: 'simple-query', confidence: 0.9 }}
+            />
+            <!-- Medium with KAG -->
+            <ACEContextBubble
+              confidence={0.62}
+              source="server-ollama"
+              confidenceFactors={{
+                caseContext: false,
+                ragHits: 2,
+                topScore: 0.58,
+                embeddingModel: 'embeddinggemma:latest',
+                codebaseHits: 5,
+                kagNeighbors: 1
+              }}
+              conversationTurns={1}
+              routerDecision={{ source: 'server-ollama', reason: 'rag-trigger+long-message', confidence: 0.62 }}
+            />
+          </div>
         </div>
       {/if}
     </div>

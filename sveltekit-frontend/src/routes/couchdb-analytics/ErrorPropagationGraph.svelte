@@ -1,6 +1,5 @@
 <script lang="ts">
 	import * as d3Import from 'd3';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any

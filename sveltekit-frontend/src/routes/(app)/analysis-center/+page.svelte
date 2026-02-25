@@ -41,7 +41,7 @@
 		{ id: 'prediction' as const, label: 'PREDICTION', icon: 'T' }
 	] as const;
 
-	let webgpuCapable = $derived(typeof navigator !== 'undefined' && 'gpu' in navigator);
+	let webgpuCapable = $derived(typeof navigator !== 'undefined' && !!navigator.gpu);
 
 	let evidencePool = $derived(data.recentEvidence ?? []);
 	let caseStats = $derived(data.caseStats ?? { total: 0, open: 0, closed: 0 });

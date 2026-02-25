@@ -81,8 +81,8 @@ export class WebAssemblyAIAdapter {
 	private async detectGPU(): Promise<boolean> {
 		if (!browser) return false;
 		try {
-			if ('gpu' in navigator) {
-				const gpu = navigator.gpu as GPU | undefined;
+			if (navigator.gpu) {
+				const gpu = navigator.gpu as GPU;
 				if (gpu) {
 					const adapter = await gpu.requestAdapter();
 					if (adapter) return true;

@@ -45,6 +45,20 @@ async function embedQuery(query: string): Promise<number[] | null> {
 	}
 }
 
+function mapRow(r: Record<string, unknown>, matchType: GlossaryResult['matchType']): GlossaryResult {
+	return {
+		id: String(r.id),
+		term: String(r.term ?? ''),
+		definition: String(r.definition ?? ''),
+		category: r.category ? String(r.category) : null,
+		jurisdiction: r.jurisdiction ? String(r.jurisdiction) : null,
+		relatedTerms: Array.isArray(r.related_terms) ? r.related_terms as string[] : [],
+		sources: Array.isArray(r.sources) ? r.sources as string[] : [],
+		similarity: Number(r.similarity ?? 0),
+		matchType
+	};
+}
+
 export const POST: RequestHandler = async ({ request }) => {
 	const start = performance.now();
 	const body = await request.json();
@@ -57,14 +71,11 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 
 	const timing: Record<string, number> = {};
-	const sanitizedQuery = query.replace(/'/g, "''");
-	const categoryFilter = category
-		? `AND lg.category ILIKE '%${category.replace(/'/g, "''")}%'`
-		: '';
+	const categoryPattern = category ? `%${category}%` : null;
 
 	// Check if the table exists (graceful degradation)
 	try {
-		await db.execute(sql.raw(`SELECT 1 FROM legal_glossary LIMIT 0`));
+		await db.execute(sql`SELECT 1 FROM legal_glossary LIMIT 0`);
 	} catch {
 		return json({
 			results: [],
@@ -86,16 +97,28 @@ export const POST: RequestHandler = async ({ request }) => {
 		const vectorLiteral = `[${embedding.join(',')}]`;
 		try {
 			const semanticStart = performance.now();
-			const semanticResults = await db.execute(sql.raw(`
-				SELECT
-					lg.id, lg.term, lg.definition, lg.category, lg.jurisdiction,
-					lg.related_terms, lg.sources,
-					1 - (lg.embedding::vector <=> '${vectorLiteral}'::vector) AS similarity
-				FROM legal_glossary lg
-				WHERE lg.embedding IS NOT NULL ${categoryFilter}
-				ORDER BY lg.embedding::vector <=> '${vectorLiteral}'::vector
-				LIMIT ${limit}
-			`));
+			const semanticResults = categoryPattern
+				? await db.execute(sql`
+					SELECT
+						lg.id, lg.term, lg.definition, lg.category, lg.jurisdiction,
+						lg.related_terms, lg.sources,
+						1 - (lg.embedding::vector <=> ${vectorLiteral}::vector) AS similarity
+					FROM legal_glossary lg
+					WHERE lg.embedding IS NOT NULL
+						AND lg.category ILIKE ${categoryPattern}
+					ORDER BY lg.embedding::vector <=> ${vectorLiteral}::vector
+					LIMIT ${limit}
+				`)
+				: await db.execute(sql`
+					SELECT
+						lg.id, lg.term, lg.definition, lg.category, lg.jurisdiction,
+						lg.related_terms, lg.sources,
+						1 - (lg.embedding::vector <=> ${vectorLiteral}::vector) AS similarity
+					FROM legal_glossary lg
+					WHERE lg.embedding IS NOT NULL
+					ORDER BY lg.embedding::vector <=> ${vectorLiteral}::vector
+					LIMIT ${limit}
+				`);
 			timing.semantic_ms = Math.round(performance.now() - semanticStart);
 
 			const rows = [...semanticResults] as Record<string, unknown>[];
@@ -103,17 +126,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				const id = String(r.id);
 				if (!seen.has(id)) {
 					seen.add(id);
-					results.push({
-						id,
-						term: String(r.term ?? ''),
-						definition: String(r.definition ?? ''),
-						category: r.category ? String(r.category) : null,
-						jurisdiction: r.jurisdiction ? String(r.jurisdiction) : null,
-						relatedTerms: Array.isArray(r.related_terms) ? r.related_terms as string[] : [],
-						sources: Array.isArray(r.sources) ? r.sources as string[] : [],
-						similarity: Number(r.similarity ?? 0),
-						matchType: 'semantic'
-					});
+					results.push(mapRow(r, 'semantic'));
 				}
 			}
 		} catch {
@@ -126,21 +139,36 @@ export const POST: RequestHandler = async ({ request }) => {
 		const remaining = limit - results.length;
 		try {
 			const ftsStart = performance.now();
-			const ftsResults = await db.execute(sql.raw(`
-				SELECT
-					lg.id, lg.term, lg.definition, lg.category, lg.jurisdiction,
-					lg.related_terms, lg.sources,
-					ts_rank(
-						to_tsvector('english', lg.term || ' ' || lg.definition),
-						plainto_tsquery('english', '${sanitizedQuery}')
-					) AS similarity
-				FROM legal_glossary lg
-				WHERE to_tsvector('english', lg.term || ' ' || lg.definition)
-					@@ plainto_tsquery('english', '${sanitizedQuery}')
-					${categoryFilter}
-				ORDER BY similarity DESC
-				LIMIT ${remaining}
-			`));
+			const ftsResults = categoryPattern
+				? await db.execute(sql`
+					SELECT
+						lg.id, lg.term, lg.definition, lg.category, lg.jurisdiction,
+						lg.related_terms, lg.sources,
+						ts_rank(
+							to_tsvector('english', lg.term || ' ' || lg.definition),
+							plainto_tsquery('english', ${query})
+						) AS similarity
+					FROM legal_glossary lg
+					WHERE to_tsvector('english', lg.term || ' ' || lg.definition)
+						@@ plainto_tsquery('english', ${query})
+						AND lg.category ILIKE ${categoryPattern}
+					ORDER BY similarity DESC
+					LIMIT ${remaining}
+				`)
+				: await db.execute(sql`
+					SELECT
+						lg.id, lg.term, lg.definition, lg.category, lg.jurisdiction,
+						lg.related_terms, lg.sources,
+						ts_rank(
+							to_tsvector('english', lg.term || ' ' || lg.definition),
+							plainto_tsquery('english', ${query})
+						) AS similarity
+					FROM legal_glossary lg
+					WHERE to_tsvector('english', lg.term || ' ' || lg.definition)
+						@@ plainto_tsquery('english', ${query})
+					ORDER BY similarity DESC
+					LIMIT ${remaining}
+				`);
 			timing.fulltext_ms = Math.round(performance.now() - ftsStart);
 
 			const rows = [...ftsResults] as Record<string, unknown>[];
@@ -148,17 +176,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				const id = String(r.id);
 				if (!seen.has(id)) {
 					seen.add(id);
-					results.push({
-						id,
-						term: String(r.term ?? ''),
-						definition: String(r.definition ?? ''),
-						category: r.category ? String(r.category) : null,
-						jurisdiction: r.jurisdiction ? String(r.jurisdiction) : null,
-						relatedTerms: Array.isArray(r.related_terms) ? r.related_terms as string[] : [],
-						sources: Array.isArray(r.sources) ? r.sources as string[] : [],
-						similarity: Number(r.similarity ?? 0),
-						matchType: 'fulltext'
-					});
+					results.push(mapRow(r, 'fulltext'));
 				}
 			}
 		} catch {
@@ -169,19 +187,31 @@ export const POST: RequestHandler = async ({ request }) => {
 	// Strategy 3: Prefix match (for autocomplete / short queries)
 	if (results.length < limit && query.length >= 2) {
 		const remaining = limit - results.length;
+		const prefixPattern = `${query}%`;
 		try {
 			const prefixStart = performance.now();
-			const prefixResults = await db.execute(sql.raw(`
-				SELECT
-					lg.id, lg.term, lg.definition, lg.category, lg.jurisdiction,
-					lg.related_terms, lg.sources,
-					0.5 AS similarity
-				FROM legal_glossary lg
-				WHERE lg.term ILIKE '${sanitizedQuery}%'
-					${categoryFilter}
-				ORDER BY lg.term
-				LIMIT ${remaining}
-			`));
+			const prefixResults = categoryPattern
+				? await db.execute(sql`
+					SELECT
+						lg.id, lg.term, lg.definition, lg.category, lg.jurisdiction,
+						lg.related_terms, lg.sources,
+						0.5 AS similarity
+					FROM legal_glossary lg
+					WHERE lg.term ILIKE ${prefixPattern}
+						AND lg.category ILIKE ${categoryPattern}
+					ORDER BY lg.term
+					LIMIT ${remaining}
+				`)
+				: await db.execute(sql`
+					SELECT
+						lg.id, lg.term, lg.definition, lg.category, lg.jurisdiction,
+						lg.related_terms, lg.sources,
+						0.5 AS similarity
+					FROM legal_glossary lg
+					WHERE lg.term ILIKE ${prefixPattern}
+					ORDER BY lg.term
+					LIMIT ${remaining}
+				`);
 			timing.prefix_ms = Math.round(performance.now() - prefixStart);
 
 			const rows = [...prefixResults] as Record<string, unknown>[];
@@ -189,17 +219,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				const id = String(r.id);
 				if (!seen.has(id)) {
 					seen.add(id);
-					results.push({
-						id,
-						term: String(r.term ?? ''),
-						definition: String(r.definition ?? ''),
-						category: r.category ? String(r.category) : null,
-						jurisdiction: r.jurisdiction ? String(r.jurisdiction) : null,
-						relatedTerms: Array.isArray(r.related_terms) ? r.related_terms as string[] : [],
-						sources: Array.isArray(r.sources) ? r.sources as string[] : [],
-						similarity: 0.5,
-						matchType: 'prefix'
-					});
+					results.push(mapRow(r, 'prefix'));
 				}
 			}
 		} catch {

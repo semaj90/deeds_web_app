@@ -28,6 +28,20 @@ interface StatuteSearchResult {
 	similarity: number;
 }
 
+function mapRow(r: Record<string, unknown>): StatuteSearchResult {
+	return {
+		chunkId: String(r.chunk_id),
+		statuteId: String(r.statute_id),
+		statuteTitle: String(r.statute_title ?? ''),
+		section: r.section ? String(r.section) : null,
+		jurisdiction: r.jurisdiction ? String(r.jurisdiction) : null,
+		category: r.category ? String(r.category) : null,
+		chunkIndex: Number(r.chunk_index),
+		content: String(r.content ?? ''),
+		similarity: Number(r.similarity ?? 0)
+	};
+}
+
 async function embedQuery(query: string): Promise<number[] | null> {
 	try {
 		const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
@@ -57,6 +71,8 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 
 	const timing: Record<string, number> = {};
+	const jurisdictionPattern = jurisdiction ? `%${jurisdiction}%` : null;
+	const categoryPattern = category ? `%${category}%` : null;
 
 	// 1. Embed the query
 	const embedStart = performance.now();
@@ -67,107 +83,145 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json({ error: 'Embedding service unavailable' }, { status: 503 });
 	}
 
-	// 2. Build pgvector cosine similarity query with optional filters
+	// 2. Build pgvector cosine similarity query with parameterized filters
 	const searchStart = performance.now();
-
 	const vectorLiteral = `[${embedding.join(',')}]`;
 
-	// Build WHERE clause dynamically
-	const conditions: string[] = ['sc.embedding IS NOT NULL'];
-	if (jurisdiction) {
-		conditions.push(`s.jurisdiction ILIKE '%' || ${sql.raw(`'${jurisdiction.replace(/'/g, "''")}'`)} || '%'`);
-	}
-	if (category) {
-		conditions.push(`s.category ILIKE '%' || ${sql.raw(`'${category.replace(/'/g, "''")}'`)} || '%'`);
-	}
-	const whereClause = conditions.join(' AND ');
-
 	try {
-		const results = await db.execute(sql.raw(`
-			SELECT
-				sc.id AS chunk_id,
-				sc.statute_id,
-				s.title AS statute_title,
-				s.section,
-				s.jurisdiction,
-				s.category,
-				sc.chunk_index,
-				sc.content,
-				1 - (sc.embedding::vector <=> '${vectorLiteral}'::vector) AS similarity
-			FROM statute_chunks sc
-			JOIN statutes s ON s.id = sc.statute_id
-			WHERE ${whereClause}
-			ORDER BY sc.embedding::vector <=> '${vectorLiteral}'::vector
-			LIMIT ${limit}
-		`));
+		// Build query with conditional filters using parameterized values
+		let results;
+		if (jurisdictionPattern && categoryPattern) {
+			results = await db.execute(sql`
+				SELECT
+					sc.id AS chunk_id, sc.statute_id, s.title AS statute_title,
+					s.section, s.jurisdiction, s.category, sc.chunk_index, sc.content,
+					1 - (sc.embedding::vector <=> ${vectorLiteral}::vector) AS similarity
+				FROM statute_chunks sc
+				JOIN statutes s ON s.id = sc.statute_id
+				WHERE sc.embedding IS NOT NULL
+					AND s.jurisdiction ILIKE ${jurisdictionPattern}
+					AND s.category ILIKE ${categoryPattern}
+				ORDER BY sc.embedding::vector <=> ${vectorLiteral}::vector
+				LIMIT ${limit}
+			`);
+		} else if (jurisdictionPattern) {
+			results = await db.execute(sql`
+				SELECT
+					sc.id AS chunk_id, sc.statute_id, s.title AS statute_title,
+					s.section, s.jurisdiction, s.category, sc.chunk_index, sc.content,
+					1 - (sc.embedding::vector <=> ${vectorLiteral}::vector) AS similarity
+				FROM statute_chunks sc
+				JOIN statutes s ON s.id = sc.statute_id
+				WHERE sc.embedding IS NOT NULL
+					AND s.jurisdiction ILIKE ${jurisdictionPattern}
+				ORDER BY sc.embedding::vector <=> ${vectorLiteral}::vector
+				LIMIT ${limit}
+			`);
+		} else if (categoryPattern) {
+			results = await db.execute(sql`
+				SELECT
+					sc.id AS chunk_id, sc.statute_id, s.title AS statute_title,
+					s.section, s.jurisdiction, s.category, sc.chunk_index, sc.content,
+					1 - (sc.embedding::vector <=> ${vectorLiteral}::vector) AS similarity
+				FROM statute_chunks sc
+				JOIN statutes s ON s.id = sc.statute_id
+				WHERE sc.embedding IS NOT NULL
+					AND s.category ILIKE ${categoryPattern}
+				ORDER BY sc.embedding::vector <=> ${vectorLiteral}::vector
+				LIMIT ${limit}
+			`);
+		} else {
+			results = await db.execute(sql`
+				SELECT
+					sc.id AS chunk_id, sc.statute_id, s.title AS statute_title,
+					s.section, s.jurisdiction, s.category, sc.chunk_index, sc.content,
+					1 - (sc.embedding::vector <=> ${vectorLiteral}::vector) AS similarity
+				FROM statute_chunks sc
+				JOIN statutes s ON s.id = sc.statute_id
+				WHERE sc.embedding IS NOT NULL
+				ORDER BY sc.embedding::vector <=> ${vectorLiteral}::vector
+				LIMIT ${limit}
+			`);
+		}
 
 		timing.search_ms = Math.round(performance.now() - searchStart);
 		timing.total_ms = Math.round(performance.now() - start);
 
 		const rows = [...results] as Record<string, unknown>[];
-		const searchResults: StatuteSearchResult[] = rows.map((r) => ({
-			chunkId: String(r.chunk_id),
-			statuteId: String(r.statute_id),
-			statuteTitle: String(r.statute_title ?? ''),
-			section: r.section ? String(r.section) : null,
-			jurisdiction: r.jurisdiction ? String(r.jurisdiction) : null,
-			category: r.category ? String(r.category) : null,
-			chunkIndex: Number(r.chunk_index),
-			content: String(r.content ?? ''),
-			similarity: Number(r.similarity ?? 0)
-		}));
-
 		return json({
-			results: searchResults,
-			count: searchResults.length,
+			results: rows.map(mapRow),
+			count: rows.length,
 			timing,
 			model: EMBEDDING_MODEL
 		});
 	} catch (err) {
 		console.error('[Statutes Search] Query failed:', err);
 
-		// Fallback: text search if pgvector fails (e.g. no embeddings indexed yet)
+		// Fallback: text search if pgvector fails
 		try {
-			const textResults = await db.execute(sql.raw(`
-				SELECT
-					sc.id AS chunk_id,
-					sc.statute_id,
-					s.title AS statute_title,
-					s.section,
-					s.jurisdiction,
-					s.category,
-					sc.chunk_index,
-					sc.content,
-					ts_rank(to_tsvector('english', sc.content), plainto_tsquery('english', '${query.replace(/'/g, "''")}')) AS similarity
-				FROM statute_chunks sc
-				JOIN statutes s ON s.id = sc.statute_id
-				WHERE to_tsvector('english', sc.content) @@ plainto_tsquery('english', '${query.replace(/'/g, "''")}')
-				${jurisdiction ? `AND s.jurisdiction ILIKE '%${jurisdiction.replace(/'/g, "''")}%'` : ''}
-				${category ? `AND s.category ILIKE '%${category.replace(/'/g, "''")}%'` : ''}
-				ORDER BY similarity DESC
-				LIMIT ${limit}
-			`));
+			let textResults;
+			if (jurisdictionPattern && categoryPattern) {
+				textResults = await db.execute(sql`
+					SELECT
+						sc.id AS chunk_id, sc.statute_id, s.title AS statute_title,
+						s.section, s.jurisdiction, s.category, sc.chunk_index, sc.content,
+						ts_rank(to_tsvector('english', sc.content), plainto_tsquery('english', ${query})) AS similarity
+					FROM statute_chunks sc
+					JOIN statutes s ON s.id = sc.statute_id
+					WHERE to_tsvector('english', sc.content) @@ plainto_tsquery('english', ${query})
+						AND s.jurisdiction ILIKE ${jurisdictionPattern}
+						AND s.category ILIKE ${categoryPattern}
+					ORDER BY similarity DESC
+					LIMIT ${limit}
+				`);
+			} else if (jurisdictionPattern) {
+				textResults = await db.execute(sql`
+					SELECT
+						sc.id AS chunk_id, sc.statute_id, s.title AS statute_title,
+						s.section, s.jurisdiction, s.category, sc.chunk_index, sc.content,
+						ts_rank(to_tsvector('english', sc.content), plainto_tsquery('english', ${query})) AS similarity
+					FROM statute_chunks sc
+					JOIN statutes s ON s.id = sc.statute_id
+					WHERE to_tsvector('english', sc.content) @@ plainto_tsquery('english', ${query})
+						AND s.jurisdiction ILIKE ${jurisdictionPattern}
+					ORDER BY similarity DESC
+					LIMIT ${limit}
+				`);
+			} else if (categoryPattern) {
+				textResults = await db.execute(sql`
+					SELECT
+						sc.id AS chunk_id, sc.statute_id, s.title AS statute_title,
+						s.section, s.jurisdiction, s.category, sc.chunk_index, sc.content,
+						ts_rank(to_tsvector('english', sc.content), plainto_tsquery('english', ${query})) AS similarity
+					FROM statute_chunks sc
+					JOIN statutes s ON s.id = sc.statute_id
+					WHERE to_tsvector('english', sc.content) @@ plainto_tsquery('english', ${query})
+						AND s.category ILIKE ${categoryPattern}
+					ORDER BY similarity DESC
+					LIMIT ${limit}
+				`);
+			} else {
+				textResults = await db.execute(sql`
+					SELECT
+						sc.id AS chunk_id, sc.statute_id, s.title AS statute_title,
+						s.section, s.jurisdiction, s.category, sc.chunk_index, sc.content,
+						ts_rank(to_tsvector('english', sc.content), plainto_tsquery('english', ${query})) AS similarity
+					FROM statute_chunks sc
+					JOIN statutes s ON s.id = sc.statute_id
+					WHERE to_tsvector('english', sc.content) @@ plainto_tsquery('english', ${query})
+					ORDER BY similarity DESC
+					LIMIT ${limit}
+				`);
+			}
 
 			timing.search_ms = Math.round(performance.now() - searchStart);
 			timing.total_ms = Math.round(performance.now() - start);
 			timing.fallback = 1;
 
 			const rows = [...textResults] as Record<string, unknown>[];
-			const searchResults: StatuteSearchResult[] = rows.map((r) => ({
-				chunkId: String(r.chunk_id),
-				statuteId: String(r.statute_id),
-				statuteTitle: String(r.statute_title ?? ''),
-				section: r.section ? String(r.section) : null,
-				jurisdiction: r.jurisdiction ? String(r.jurisdiction) : null,
-				category: r.category ? String(r.category) : null,
-				chunkIndex: Number(r.chunk_index),
-				content: String(r.content ?? ''),
-				similarity: Number(r.similarity ?? 0)
-			}));
-
 			return json({
-				results: searchResults,
-				count: searchResults.length,
+				results: rows.map(mapRow),
+				count: rows.length,
 				timing,
 				model: 'text-search-fallback'
 			});

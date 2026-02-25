@@ -69,8 +69,8 @@
  window.__webgpuSupported = false;
  window.__webgpuError = null;
 
- // Check for WebGPU support
- if ('gpu' in navigator) {
+ // Check for WebGPU support (navigator.gpu can be null on WSL2)
+ if (navigator.gpu) {
  navigator.gpu
  .requestAdapter()
  .then(function (adapter) {

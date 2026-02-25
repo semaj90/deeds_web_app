@@ -91,6 +91,20 @@ async function searchQdrantCases(
 	}
 }
 
+function mapPgRow(r: Record<string, unknown>): PrecedentSearchResult {
+	return {
+		id: String(r.id),
+		title: String(r.title ?? ''),
+		summary: String(r.summary ?? ''),
+		citation: r.citation ? String(r.citation) : null,
+		court: r.court ? String(r.court) : null,
+		caseId: r.case_id ? String(r.case_id) : null,
+		decisionDate: r.decision_date ? String(r.decision_date) : null,
+		similarity: Number(r.similarity ?? 0),
+		source: 'postgres'
+	};
+}
+
 export const POST: RequestHandler = async ({ request }) => {
 	const start = performance.now();
 	const body = await request.json();
@@ -104,6 +118,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 
 	const timing: Record<string, number> = {};
+	const courtPattern = court ? `%${court}%` : null;
 
 	// Run embedding + text search in parallel
 	const embedStart = performance.now();
@@ -112,49 +127,76 @@ export const POST: RequestHandler = async ({ request }) => {
 		(async () => {
 			const pgStart = performance.now();
 			try {
-				const sanitizedQuery = query.replace(/'/g, "''");
-				const courtFilter = court
-					? `AND lp.court ILIKE '%${court.replace(/'/g, "''")}%'`
-					: '';
-				const caseFilter = caseId
-					? `AND lp.case_id = '${caseId.replace(/'/g, "''")}'`
-					: '';
-
-				const results = await db.execute(sql.raw(`
-					SELECT
-						lp.id,
-						lp.title,
-						lp.summary,
-						lp.citation,
-						lp.court,
-						lp.case_id,
-						lp.decision_date,
-						ts_rank(
-							to_tsvector('english', lp.title || ' ' || lp.summary),
-							plainto_tsquery('english', '${sanitizedQuery}')
-						) AS similarity
-					FROM legal_precedents lp
-					WHERE to_tsvector('english', lp.title || ' ' || lp.summary)
-						@@ plainto_tsquery('english', '${sanitizedQuery}')
-						${courtFilter}
-						${caseFilter}
-					ORDER BY similarity DESC
-					LIMIT ${limit}
-				`));
+				let results;
+				if (courtPattern && caseId) {
+					results = await db.execute(sql`
+						SELECT
+							lp.id, lp.title, lp.summary, lp.citation, lp.court,
+							lp.case_id, lp.decision_date,
+							ts_rank(
+								to_tsvector('english', lp.title || ' ' || lp.summary),
+								plainto_tsquery('english', ${query})
+							) AS similarity
+						FROM legal_precedents lp
+						WHERE to_tsvector('english', lp.title || ' ' || lp.summary)
+							@@ plainto_tsquery('english', ${query})
+							AND lp.court ILIKE ${courtPattern}
+							AND lp.case_id = ${caseId}
+						ORDER BY similarity DESC
+						LIMIT ${limit}
+					`);
+				} else if (courtPattern) {
+					results = await db.execute(sql`
+						SELECT
+							lp.id, lp.title, lp.summary, lp.citation, lp.court,
+							lp.case_id, lp.decision_date,
+							ts_rank(
+								to_tsvector('english', lp.title || ' ' || lp.summary),
+								plainto_tsquery('english', ${query})
+							) AS similarity
+						FROM legal_precedents lp
+						WHERE to_tsvector('english', lp.title || ' ' || lp.summary)
+							@@ plainto_tsquery('english', ${query})
+							AND lp.court ILIKE ${courtPattern}
+						ORDER BY similarity DESC
+						LIMIT ${limit}
+					`);
+				} else if (caseId) {
+					results = await db.execute(sql`
+						SELECT
+							lp.id, lp.title, lp.summary, lp.citation, lp.court,
+							lp.case_id, lp.decision_date,
+							ts_rank(
+								to_tsvector('english', lp.title || ' ' || lp.summary),
+								plainto_tsquery('english', ${query})
+							) AS similarity
+						FROM legal_precedents lp
+						WHERE to_tsvector('english', lp.title || ' ' || lp.summary)
+							@@ plainto_tsquery('english', ${query})
+							AND lp.case_id = ${caseId}
+						ORDER BY similarity DESC
+						LIMIT ${limit}
+					`);
+				} else {
+					results = await db.execute(sql`
+						SELECT
+							lp.id, lp.title, lp.summary, lp.citation, lp.court,
+							lp.case_id, lp.decision_date,
+							ts_rank(
+								to_tsvector('english', lp.title || ' ' || lp.summary),
+								plainto_tsquery('english', ${query})
+							) AS similarity
+						FROM legal_precedents lp
+						WHERE to_tsvector('english', lp.title || ' ' || lp.summary)
+							@@ plainto_tsquery('english', ${query})
+						ORDER BY similarity DESC
+						LIMIT ${limit}
+					`);
+				}
 
 				timing.pg_search_ms = Math.round(performance.now() - pgStart);
 				const rows = [...results] as Record<string, unknown>[];
-				return rows.map((r): PrecedentSearchResult => ({
-					id: String(r.id),
-					title: String(r.title ?? ''),
-					summary: String(r.summary ?? ''),
-					citation: r.citation ? String(r.citation) : null,
-					court: r.court ? String(r.court) : null,
-					caseId: r.case_id ? String(r.case_id) : null,
-					decisionDate: r.decision_date ? String(r.decision_date) : null,
-					similarity: Number(r.similarity ?? 0),
-					source: 'postgres'
-				}));
+				return rows.map(mapPgRow);
 			} catch (err) {
 				console.error('[Precedents] PostgreSQL search failed:', err);
 				timing.pg_search_ms = Math.round(performance.now() - pgStart);

@@ -59,7 +59,7 @@ async function ensureOrt(): Promise<typeof import('onnxruntime-web')> {
 function getAvailableProviders(): string[] {
 	const available: string[] = [];
 	for (const ep of ONNX_EXECUTION_PROVIDERS) {
-		if (ep === 'webgpu' && typeof navigator !== 'undefined' && 'gpu' in navigator) {
+		if (ep === 'webgpu' && typeof navigator !== 'undefined' && navigator.gpu != null) {
 			available.push('webgpu');
 		} else if (ep === 'wasm') {
 			available.push('wasm');
