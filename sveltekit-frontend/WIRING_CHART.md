@@ -1,6 +1,6 @@
 # Codebase Wiring Chart — AST Route Graph
 
-## Last Updated: February 24, 2026 (Session 93r15)
+## Last Updated: February 24, 2026 (Session 93r17)
 
 ## Metrics Summary
 
@@ -33,6 +33,7 @@ SSR: ON | OFF        Server load: YES | NO
 [LAYOUT] ──> (CaseDocumentWriter)
          ──> (CodebaseSearch)
          ──> (ErrorBoundary)
+         ──> (OfflineIndicator)
          ──> notificationStore
          ──> 14 primary nav links + 7 admin links
 ```

@@ -1,76 +1,102 @@
-# Pipeline Status — Broken Endpoints + Cache Components + Agent Architecture
+# Pipeline Status — Cache Components + Endpoints + Agent Architecture
 
-**Last Updated:** February 24, 2026 (Session 93r15)
-
----
-
-## Broken API Endpoint Audit (27 references, 13 unique endpoints)
-
-### Already Working (3)
-| Endpoint | Callers | Status |
-|----------|---------|--------|
-| `/api/ai/stats` | ai-dashboard/+page.svelte:106 | WORKING |
-| `/api/ai/models` | ai-dashboard/+page.svelte:107 | WORKING (proxies Ollama /api/tags) |
-| `/api/ai/yorha/context-chat` | terminal/+page.svelte:53 | WORKING |
-
-### Clear Rewire Targets (4 endpoints, 12 references)
-| Broken Endpoint | Rewire To | Callers | Status |
-|-----------------|-----------|---------|--------|
-| `/api/ai/chat` | `/api/sse/chat` | AIChatWidget:21, AIToolbar:92, Enhanced3DLegalAIInterface:342, EnhancedAIChat:46, GamingAIInterface:13, IntegratedAIChat:19+37 | TODO |
-| `/api/chat` | `/api/chat/stream` | dev-tools/+page.svelte:53, SimpleWorkingChat:29+57 | TODO |
-| `/api/v1/evidence/analyze` | `/api/evidence/analysis` | evidence/analyze/+page.svelte:106, EnhancedEvidenceBoard:40+113, EvidenceCanvas:58 | TODO |
-| `/api/agents/chat` | `/api/sse/chat` | AgentChat.svelte:29 | TODO |
-
-### Missing Endpoints — Need Creation (6 endpoints, 9 references)
-| Missing Endpoint | Callers | Plan |
-|------------------|---------|------|
-| `/api/ai/feedback` | AIChatWidget:37 | CREATE: Store feedback in chatMessages table |
-| `/api/ai/case-prediction` | CaseOutcomePrediction:114 | CREATE: Ollama gemma3-legal prediction prompt |
-| `/api/ai/case-scoring` | CaseScoringDashboard:124 | CREATE: Evidence-weighted case scoring |
-| `/api/internal/error-brain/status` | error-brain/+page.svelte:28 | CREATE: Aggregate error stats from phase72_error |
-| `/api/internal/error-brain/runs` | error-brain/+page.svelte:41+52, runs/+page.svelte:15+28 | CREATE: Error analysis run history |
-| `/api/tags` | TagSelector:60 | CREATE: CRUD for evidence/case tags |
+**Last Updated:** February 24, 2026 (Session 93r17)
 
 ---
 
-## Frontend Cache Components (21 files, 6,346L + 5 Svelte components, 1,942L)
+## Frontend Cache Components — Full Audit
 
-### Core Cache Pipeline (ACTIVE)
-| File | Lines | Purpose | Wired? |
-|------|-------|---------|--------|
-| `lib/ai/client-cache.ts` | 354 | LokiJS + IndexedDB dual-tier | YES — ChatSession.svelte.ts |
-| `lib/cache/loki-cache.svelte.ts` | 356 | LokiJS with Svelte 5 runes | YES — client-cache.ts |
-| `lib/cache/indexdb-cache.svelte.ts` | 194 | IndexedDB with Svelte 5 runes | YES — client-cache.ts |
-| `lib/cache/semantic-cache.ts` | 244 | Embedding-based cache (cosine) | PARTIAL — imported but not called |
-| `lib/cache/cache-invalidation.ts` | 187 | TTL + pattern invalidation | YES — RabbitMQ consumer |
-| `lib/cache/offline-fetch.ts` | 183 | Offline-first fetch wrapper | NOT WIRED |
-| `lib/cache/ssr-legal-api-cache.ts` | 144 | SSR response cache | NOT WIRED |
+### Cache Tier Architecture
+```
+L0: LokiJS         (client, 5-10min TTL, session-scoped)
+L1: IndexedDB       (client, 7-day TTL, persistent, CHR-ROM97 cartridges)
+L2: Memory Cache    (server, 5min TTL, in-process Map)
+L3: Redis           (server, configurable TTL, cross-request, pub/sub sync)
+L4: Service Logic   (DB/Qdrant/Ollama) → write back L0-L3
+```
 
-### Cache Infrastructure (REFERENCE)
-| File | Lines | Purpose | Wired? |
-|------|-------|---------|--------|
-| `lib/cache/multi-layer-cache.ts` | 282 | L0-L3 cache chain | NOT WIRED |
-| `lib/cache/MultiLayerCacheSystem.ts` | 474 | L0-L4 with Redis | NOT WIRED |
-| `lib/cache/parallel-cache-orchestrator.ts` | 712 | Parallel multi-layer | NOT WIRED |
-| `lib/cache/loki-redis-integration.ts` | 885 | LokiJS ↔ Redis sync | NOT WIRED |
-| `lib/cache/xstate-cache-integration.ts` | 477 | XState cache FSM | NOT WIRED |
-| `lib/cache/chr-rom-pattern-cache.ts` | 573 | CH-ROM97 pattern cache | YES — memory-palace |
-| `lib/cache/headless-ui-cache.ts` | 426 | UI component cache | NOT WIRED |
-| `lib/cache/glyph-shader-cache-bridge.ts` | 404 | Glyph/shader bridge | NOT WIRED |
-| `lib/ai/unified-cache-enhanced-orchestrator.ts` | 177 | Unified orchestrator | NOT WIRED |
+### Core Cache Pipeline (ACTIVE — wired into production)
+| File | Lines | Tier | Importers | Purpose |
+|------|-------|------|-----------|---------|
+| `lib/ai/client-cache.ts` | 354 | L0+L1 | 3 | **PRIMARY** — LokiJS + IndexedDB for AI replies/embeddings/chat/cartridges |
+| `lib/cache/cache-service.svelte.ts` | 280 | L0+L1 | 3 | Unified cache service coordinating Loki + IDB. Svelte 5 runes |
+| `lib/cache/loki-cache.svelte.ts` | 357 | L0 | 1 | LokiJS session cache, 5min TTL, MongoDB-like queries. Svelte 5 |
+| `lib/cache/indexdb-cache.svelte.ts` | 195 | L1 | 1 | IndexedDB persistent, 7-day TTL, idb-keyval wrapper. Svelte 5 |
+| `lib/cache/cache-invalidation.ts` | 188 | Utility | 2 | Cache key patterns + invalidation for cases/users/search |
+| `lib/cache/chr-rom-pattern-cache.ts` | 574 | L1+L3 | 1 | CHR-ROM 8-bank NES pattern cache with Redis L2 |
+| `lib/cache/offline-fetch.ts` | 184 | Offline | 1 | Offline-first fetch wrapper with pending mutation queue |
+| `lib/cache/headless-ui-cache.ts` | 427 | L0-L3 | 2 | Semantic cache with server sync, LRU eviction |
+| `lib/cache/nes-cache-orchestrator.ts` | 39 | L0 | 1 | Minimal TTL Map cache |
+| `lib/api/services/cache-service.ts` | 242 | L2+L3 | varies | **SERVER** Redis cache with gzip compression |
 
-### Cache Svelte Components (ALL UNWIRED)
-| Component | Lines | Best Route Target |
-|-----------|-------|-------------------|
-| `CachePerformanceDashboard.svelte` | 870 | /admin/dev-tools |
-| `CacheDemo.svelte` | 602 | /admin/dev-tools |
-| `CacheMonitor.svelte` | 335 | /admin/dev-tools |
-| `CachePerformanceMonitor.svelte` | 70 | /dashboard |
-| `OfflineIndicator.svelte` | 65 | Root layout |
+### Cache Orchestration (ACTIVE — wired but complex)
+| File | Lines | Tier | Importers | Purpose |
+|------|-------|------|-----------|---------|
+| `lib/cache/parallel-cache-orchestrator.ts` | 713 | All | 2 | Parallel L1-L4 + GPU/XState/CHR-ROM/RAG. Circuit breaker |
+| `lib/cache/xstate-cache-integration.ts` | 478 | XState | 2 | XState v5 cache actor with guards/actions for FSM |
+| `lib/cache/loki-redis-integration.ts` | 886 | L0+L3 | 1 | Server-only Loki+Redis hybrid with pub/sub sync |
+| `lib/cache/glyph-shader-cache-bridge.ts` | 405 | GPU | 1 | WebGPU glyph shader cache with CHR-ROM patterns |
+| `lib/ai/unified-cache-enhanced-orchestrator.ts` | 177 | L0 | 1 | AI inference orchestrator with 5min TTL Map |
+
+### Cache Files — ORPHANED (0 importers)
+| File | Lines | Tier | Notes |
+|------|-------|------|-------|
+| `lib/cache/MultiLayerCacheSystem.ts` | 475 | All | Complex LRU/LFU/FIFO eviction. Superseded by parallel-cache-orchestrator |
+| `lib/cache/multi-layer-cache.ts` | 283 | Themed | Console-themed (NES/SNES/N64) memory tiers. Design experiment |
+| `lib/cache/semantic-cache.ts` | 245 | Semantic | Cosine similarity 0.8 threshold. Has syntax errors |
+| `lib/cache/stack-cache.ts` | 73 | L2+L3 | Simple Redis+memory dual. Legacy |
+
+### Cache Files — CORRUPTED
+| File | Lines | Issue |
+|------|-------|-------|
+| `lib/cache/ssr-legal-api-cache.ts` | 145 | Truncated mid-function (file ends abruptly) |
+| `lib/cache/semantic-cache.ts` | 245 | Syntax errors at line 187 (`$1?.$2`) |
+
+### Cache Svelte Components
+| Component | Lines | Route | Status |
+|-----------|-------|-------|--------|
+| `components/ai/CachePerformanceDashboard.svelte` | 870 | /admin/dev-tools | WIRED (Cache tab) |
+| `components/cache/CacheDemo.svelte` | 602 | /demos/cache, /admin/dev-tools | WIRED |
+| `components/cache/CacheMonitor.svelte` | 335 | /cache-demo, /admin/dev-tools | WIRED |
+| `components/cache/OfflineIndicator.svelte` | 66 | **(app) layout** | **WIRED (Session 93r17)** |
+| `components/dashboard/CachePerformanceMonitor.svelte` | 70 | — | ORPHANED (stub, TODO) |
+| `components/ui/gaming/demo/GPUCacheIntegrationDemo.svelte` | 150 | /demos/gpu-cache | WIRED (mock data) |
+| `components/ui/gaming/n64/N64TextureFilteringCache.svelte` | 72 | — | ORPHANED |
+| `components/ai/webgpu/CacheOptimizerDemo.svelte` | 17 | — | DEAD (placeholder) |
+
+### Cache Component Consumers (use cache but aren't cache-focused)
+| Consumer | Cache File Used | Purpose |
+|----------|----------------|---------|
+| `ChatSession.svelte.ts` | client-cache.ts | AI reply + embedding caching |
+| `Gemma270MWebAssembly.svelte` | client-cache.ts | ONNX embedding caching |
+| `RichTextEditor.svelte` | loki-redis-integration.ts | Draft auto-save |
+| `CacheMonitor.svelte` | cache-service + cache-invalidation | Health monitoring |
+| `CacheDemo.svelte` | /api/cache endpoint | Interactive testing |
 
 ---
 
-## Inference Pipeline Architecture (Target)
+## API Endpoint Status
+
+### Working Endpoints (13 — created this session + prior)
+| Endpoint | Method | Callers | Status |
+|----------|--------|---------|--------|
+| `/api/ai/stats` | GET | ai-dashboard | WORKING |
+| `/api/ai/models` | GET | ai-dashboard | WORKING (proxies Ollama /api/tags) |
+| `/api/ai/yorha/context-chat` | POST | terminal | WORKING |
+| `/api/ai/chat` | POST | 6 components | CREATED — Ollama gemma3-legal JSON |
+| `/api/chat` | POST | dev-tools, SimpleWorkingChat | CREATED |
+| `/api/v1/evidence/analyze` | POST | evidence, EvidenceCanvas | CREATED |
+| `/api/agents/chat` | POST | AgentChat | CREATED |
+| `/api/ai/feedback` | POST | AIChatWidget | CREATED |
+| `/api/ai/case-prediction` | POST | CaseOutcomePrediction | CREATED |
+| `/api/ai/case-scoring` | POST | CaseScoringDashboard | CREATED |
+| `/api/tags` | GET | TagSelector | CREATED |
+| `/api/internal/error-brain/status` | GET | error-brain | CREATED |
+| `/api/internal/error-brain/runs` | GET/POST | error-brain | CREATED |
+
+---
+
+## Inference Pipeline Architecture
 
 ```
                     PRIMARY                 FALLBACK
@@ -92,13 +118,36 @@ Document Parse:     langextract :8095 (running)
 Vision:             YOLO object detection → Ollama VLM
 ```
 
-### Cache Hierarchy
+### RAG + KAG + DAG Pipeline
 ```
-L0: LokiJS         (client, 5-10min TTL, session-scoped)
-L1: IndexedDB       (client, 7-day TTL, persistent, CHR-ROM97)
-L2: Memory Cache    (server, 5min TTL, in-process Map)
-L3: Redis           (server, configurable TTL, cross-request)
-L4: Service Logic   (DB/Qdrant/Ollama) → write back L0-L3
+User Query
+  │
+  ├─ Client Router (client-router.ts)
+  │   ├─ Simple → LOCAL ONNX (gemma270m via WebGPU/WASM)
+  │   └─ Complex → SERVER Ollama (gemma3-legal via SSE)
+  │
+  ├─ Embedding (768-dim)
+  │   ├─ Client: ONNX embeddinggemma_300m (cached in IndexedDB)
+  │   └─ Server: embeddinggemma:latest via Ollama
+  │
+  ├─ RAG Search (Qdrant + pgvector)
+  │   ├─ /api/rag/search (simple, 2 routes)
+  │   └─ /api/evidence/search (full RAG+KAG+DAG)
+  │
+  ├─ KAG Graph (1-hop traversal)
+  │   └─ graph-context.ts → yorha_evidence_connections table
+  │
+  ├─ GPU Reranking (optional, /global-search)
+  │   └─ gpu-search-reranker.ts → WebGPU cosine similarity
+  │
+  ├─ Multi-turn Memory (last 10 messages)
+  │   └─ chatMessages PostgreSQL table
+  │
+  ├─ Citation Extraction
+  │   └─ [Source N] regex → mapped to RAG source documents
+  │
+  └─ ACE Context Bubble (per-response metadata)
+      └─ ACEContextBubble.svelte → shows confidence/source/RAG/KAG/citations
 ```
 
 ### Vector + Knowledge Base
@@ -107,7 +156,6 @@ embeddinggemma:latest (768-dim)
   → Qdrant (6 collections, ANN, auto-tags, cosine ranked)
   → pgvector (mirror, cross-validation)
   → Redis (embedding cache, 24h TTL)
-  → CouchDB (future: document versioning, audit trail)
 ```
 
 ### Multi-Agent Architecture (Planned)
@@ -124,23 +172,45 @@ CrewAI Sidecar :8096 (Python)
 
 ## Progress Tracker
 
+### Completed
 - [x] Audit broken endpoints (27 refs, 13 unique)
-- [ ] Rewire /api/ai/chat → /api/sse/chat (7 components)
-- [ ] Rewire /api/chat → /api/chat/stream (3 refs)
-- [ ] Rewire /api/v1/evidence/analyze → /api/evidence/analysis (4 refs)
-- [ ] Rewire /api/agents/chat → /api/sse/chat (1 ref)
-- [ ] Create /api/ai/feedback endpoint
-- [ ] Create /api/ai/case-prediction endpoint
-- [ ] Create /api/ai/case-scoring endpoint
-- [ ] Create /api/internal/error-brain/status endpoint
-- [ ] Create /api/internal/error-brain/runs endpoint
-- [ ] Create /api/tags endpoint
-- [ ] Wire CacheMonitor → /admin/dev-tools
-- [ ] Wire CachePerformanceDashboard → /admin/dev-tools
-- [ ] Wire OfflineIndicator → root layout
+- [x] Create /api/ai/chat endpoint (Ollama proxy)
+- [x] Create /api/chat endpoint (message + messages[])
+- [x] Create /api/v1/evidence/analyze endpoint
+- [x] Create /api/agents/chat endpoint
+- [x] Create /api/ai/feedback endpoint
+- [x] Create /api/ai/case-prediction endpoint
+- [x] Create /api/ai/case-scoring endpoint
+- [x] Create /api/internal/error-brain/status endpoint
+- [x] Create /api/internal/error-brain/runs endpoint
+- [x] Create /api/tags endpoint
+- [x] Wire OfflineIndicator → root layout
+- [x] Audit all frontend cache components (21 files + 8 components)
+- [x] Create ACEContextBubble.svelte (pipeline metadata display)
+- [x] Wire ACEContextBubble into ai-dashboard
+- [x] Archive 42 dead files to deeds_labs/
+
+### Remaining
 - [ ] Wire semantic-cache.ts into RAG search pipeline
 - [ ] Wire offline-fetch.ts into client-router.ts
+- [ ] Clean up corrupted ssr-legal-api-cache.ts
+- [ ] Clean up corrupted semantic-cache.ts syntax errors
+- [ ] Archive 4 orphaned cache files (MultiLayerCacheSystem, multi-layer-cache, stack-cache, semantic-cache)
 - [ ] Restart TRT-LLM containers
 - [ ] Scaffold CrewAI Python sidecar
 - [ ] Add docling-258m to sidecar
 - [ ] Qdrant auto-tagging pipeline
+
+---
+
+## File Inventory Summary
+
+| Category | Count | Total Lines |
+|----------|-------|-------------|
+| Active cache .ts files | 15 | ~5,500 |
+| Orphaned cache .ts files | 4 | ~1,076 |
+| Corrupted cache files | 2 | ~390 |
+| Cache Svelte components (wired) | 4 | ~2,023 |
+| Cache Svelte components (orphaned) | 3 | ~159 |
+| Cache Svelte components (dead) | 1 | ~17 |
+| **Total cache system** | **29** | **~9,165** |

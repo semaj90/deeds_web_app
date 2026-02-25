@@ -5,6 +5,7 @@
 	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
 	import ErrorBoundary from '$lib/components/ui/ErrorBoundary.svelte';
 	import { notificationStore } from '$lib/stores/unified/notification-store.svelte.js';
+	import OfflineIndicator from '$lib/components/cache/OfflineIndicator.svelte';
 
 	interface Props {
 		data: LayoutData;
@@ -133,6 +134,7 @@
 
 <CaseDocumentWriter bind:isOpen={showDocumentWriter} />
 <CodebaseSearch />
+<OfflineIndicator />
 
 <!-- Toast Notifications Overlay -->
 {#if notificationStore.toasts.length > 0}
