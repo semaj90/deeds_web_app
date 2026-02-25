@@ -5,6 +5,7 @@
 		{ href: '/demos/nes-elements', label: 'NES Elements Showcase', description: 'All NES.css HTML elements styled with retro gaming theme', lines: 233 },
 		{ href: '/demos/gpu-cache', label: 'GPU Cache Integration', description: 'Multi-tier cache visualization (L0-L4) with GPU metrics', lines: 150 },
 		{ href: '/demos/icons', label: 'Icon Container Demo', description: 'Dynamic icon loading and container component showcase', lines: 65 },
+		{ href: '/demos/ace-pipeline', label: 'ACE Pipeline Demo', description: 'ACE Context Bubble + RAG Pipeline Chart — expandable pipeline metadata with confidence scoring', lines: 188 },
 	];
 
 	const existingDemos = [
@@ -12,6 +13,8 @@
 		{ href: '/evidence-library', label: 'Evidence Library', description: 'Evidence analysis dashboard with Rich Evidence Cards, custody timeline, police report generator, stats panel, and modal viewer' },
 		{ href: '/nier-showcase', label: 'NieR Showcase', description: 'YoRHa UI showcase: CommandCenter, Terminal, SystemStatus, Dialogs, DiamondModal, BitsUI, DetectiveForm, NES CRT' },
 		{ href: '/system-status', label: 'System Status', description: 'System health dashboard: StatusCards, SystemStatusPanel, SystemOverview, YoRHaSystemStatus' },
+		{ href: '/ai-dashboard', label: 'AI Dashboard', description: 'Full AI inference demo: 20+ components, RAG pipeline chart, ACE context bubbles, ONNX/Ollama chat, source validation' },
+		{ href: '/admin/dev-tools', label: 'Dev Tools (Cache Tab)', description: 'CachePerformanceDashboard + CacheMonitor + CacheDemo — real-time Redis stats, NES memory banks, cache CRUD operations' },
 	];
 </script>
 

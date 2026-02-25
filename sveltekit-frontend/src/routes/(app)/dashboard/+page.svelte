@@ -237,6 +237,8 @@
               { href: '/evidence-canvas-demo', label: 'Evidence Canvas', desc: '6 visualization engines + architecture panel', count: 1 },
               { href: '/nier-showcase', label: 'NieR Showcase', desc: 'YoRHa Command Center, Terminal, Dialogs', count: 4 },
               { href: '/system-status', label: 'System Status', desc: 'Health dashboard with 6 StatusCards', count: 3 },
+              { href: '/demos/ace-pipeline', label: 'ACE Pipeline', desc: 'Context bubbles, RAG chart, cache tiers', count: 3 },
+              { href: '/demos', label: 'All Demos', desc: 'Cache, Bits UI, NES, GPU, Icons, ACE', count: 6 },
             ] as demo}
               <a href={demo.href} class="block px-3 py-2.5 bg-black/20 rounded text-left hover:bg-black/30 transition-colors">
                 <div class="flex items-center justify-between mb-1">

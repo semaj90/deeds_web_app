@@ -12,13 +12,14 @@ export const POST: RequestHandler = async ({ request }) => {
 			return json({ error: 'messageId and rating are required' }, { status: 400 });
 		}
 
-		// Store feedback in chatMessages metadata if table exists
+		// Store feedback in chatMessages metadata JSONB if table exists
 		try {
 			const { chatMessages } = await import('$lib/server/db/schema');
-			const { eq } = await import('drizzle-orm');
+			const { eq, sql } = await import('drizzle-orm');
+			const feedbackJson = JSON.stringify({ rating, comment, timestamp: new Date().toISOString() });
 			await db
 				.update(chatMessages)
-				.set({ metadata: { feedback: { rating, comment, timestamp: new Date().toISOString() } } })
+				.set({ metadata: sql`COALESCE(metadata, '{}'::jsonb) || jsonb_build_object('feedback', ${feedbackJson}::jsonb)` })
 				.where(eq(chatMessages.id, messageId));
 		} catch {
 			// Table may not exist — log and continue

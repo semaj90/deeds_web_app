@@ -22,7 +22,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const [poiCount] = await db
 			.select({ count: count() })
 			.from(personsOfInterest)
-			.where(sql`${caseId} = ANY(${personsOfInterest.caseIds})`);
+			.where(eq(personsOfInterest.caseId, caseId));
 
 		const evCount = Number(evidenceCount?.count || 0);
 		const persons = Number(poiCount?.count || 0);
@@ -31,7 +31,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		const evidenceScore = Math.min(evCount * 10, 40); // max 40 pts
 		const witnessScore = Math.min(persons * 8, 24);    // max 24 pts
 		const documentationScore = caseRow.description ? 15 : 5;
-		const statusBonus = caseRow.status === 'active' ? 10 : 0;
+		const isActive = caseRow.status === 'open' || caseRow.status === 'in_progress';
+		const statusBonus = isActive ? 10 : 0;
 		const totalScore = Math.min(evidenceScore + witnessScore + documentationScore + statusBonus, 100);
 
 		return json({
@@ -42,7 +43,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				evidence: { count: evCount, score: evidenceScore, max: 40 },
 				witnesses: { count: persons, score: witnessScore, max: 24 },
 				documentation: { score: documentationScore, max: 15 },
-				statusBonus: { active: caseRow.status === 'active', score: statusBonus, max: 10 }
+				statusBonus: { active: isActive, score: statusBonus, max: 10 }
 			},
 			grade: totalScore >= 80 ? 'A' : totalScore >= 60 ? 'B' : totalScore >= 40 ? 'C' : totalScore >= 20 ? 'D' : 'F'
 		});

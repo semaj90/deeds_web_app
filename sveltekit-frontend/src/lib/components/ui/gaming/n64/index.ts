@@ -25,7 +25,6 @@ export { default as N64Slider } from './N64Slider.svelte';
 export { default as N64Surface } from './N64Surface.svelte';
 export { default as N64TextArea } from './N64TextArea.svelte';
 export { default as N64TextField } from './N64TextField.svelte';
-export { default as N64TextureFilteringCache } from './N64TextureFilteringCache.svelte';
 export { default as N64Toaster } from './N64Toaster.svelte';
 export { default as N64Toggle } from './N64Toggle.svelte';
 export { default as ProgressBar } from './ProgressBar.svelte';
