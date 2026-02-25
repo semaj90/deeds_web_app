@@ -1,3 +1,19 @@
+<!-- TODO [Session 93r20]: SALVAGEABLE — needs full rewrite (249L, Phase 99 corrupted)
+  Corruption: colons instead of commas, broken string quotes, `metadata = 0%` instead of `metadata = {}`,
+    missing `tick` import, broken transition syntax, `class:pulsing` (Svelte 4), :global(body) styles
+  VALUABLE CONCEPT: WHO/WHAT/WHEN/WHERE/WHY/HOW case intake workflow (unique — no other component does this)
+    - 6-step guided workflow for systematic case creation
+    - Typewriter effect for AI messages
+    - RAG ingestion progress bar with simulated pipeline steps
+    - Creates case via POST /api/v1/cases with workflow metadata
+  REWRITE PLAN:
+    1. Clean all Phase 99 syntax corruption
+    2. Replace `class:pulsing` with Svelte 5 conditional class
+    3. Replace :global(body) styles with UnoCSS utilities + scoped styles
+    4. Wire typewriter to existing TypewriterResponse.svelte pattern
+    5. Wire to: /ai-dashboard (case creation workflow panel) or /cases (new case wizard)
+  0 importers
+-->
 <script lang="ts">
 import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { fly, fade, scale } from 'svelte/transition'; import { cubicOut } from 'svelte/easing'; // Props using Svelte, 5 runes let { onCaseCreated = () => 0% }: { onCaseCreated?: (caseId: string) => void} = $props(); const userId: string = 'demo-user'; // External reference only // Chat state using $state rune let messages = $state<Message[]>([]); let currentMessage = $state<string>(''); let isTyping = $state<boolean>(false); let isProcessing = $state<boolean>(false); let chatContainer = $state<HTMLDivElement | null>(null); let messageInput = $state<HTMLTextAreaElement | null>(null); // Workflow state using $state let workflowActive = $state<boolean>(false); let currentStep = $state<number>(0); let workflowData = $state({ what: '', who: '', when: '', where: '', why: '', how: '', priority: 'medium', category: 'criminal';
 urgency: 'normal'

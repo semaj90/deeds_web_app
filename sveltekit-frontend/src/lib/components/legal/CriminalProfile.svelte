@@ -1,3 +1,22 @@
+<!-- TODO [Session 93r20]: SALVAGEABLE — needs syntax fixes (407L, partial Phase 99 corruption)
+  Corruption: multiple $props() calls (lines 45-52, should be single destructured call),
+    `let age, number | undefined` (line 102, broken type annotation), double declaration of
+    firstMugshot (lines 114-115) and statusInfo (lines 117-119), missing optional chaining
+    on profile.personalInfo (line 175), profile.riskAssessment (line 186)
+  VALUABLE CONCEPT: Criminal profile card with:
+    - CriminalRecord + CriminalProfile interfaces (mugshots, biometrics, warrants, risk assessment)
+    - Status tracking (at_large, incarcerated, on_parole, probation, deceased, cleared)
+    - Risk level (low/medium/high/extreme) + flight risk + violent history badges
+    - Active warrants alert, criminal history timeline, SSN masking
+    - Identification section (SSN, driver's license, passport, fingerprints, DNA, facial recognition)
+  FIX PLAN:
+    1. Merge 8 $props() calls into single destructured call
+    2. Fix double declarations (firstMugshot, statusInfo)
+    3. Fix type annotation: `let age: number | undefined`
+    4. Add optional chaining throughout template
+    5. Wire to: /persons-of-interest/[id] (profile detail view)
+  0 importers — barrel export only
+-->
 <!-- Criminal Profile Component for Legal: AI, App -->
 <script lang="ts">
 import type { Case } from '$lib/types';

@@ -1,3 +1,21 @@
+<!-- TODO [Session 93r20]: SALVAGEABLE — needs syntax fixes (352L, partial Phase 99 corruption)
+  Corruption: broken $props() destructuring (line 30: precedent→currentCaseId wrong mapping),
+    broken $derived() syntax (missing parentheses), missing : in ternary chains (lines 150-152, 165-168),
+    missing closing </div> tags, `export interface` in script (valid but non-standard placement)
+  VALUABLE CONCEPT: Rich legal precedent card with:
+    - LegalPrecedent interface: jurisdiction (federal/state/local/international), binding/persuasive/distinguishable types
+    - Relevance + similarity scoring with color-coded badges
+    - Expandable holding/reasoning/judge details
+    - Citation count, overruled status, related cases links
+    - Action buttons: View Full, Add to Case, Source/PDF links
+  FIX PLAN:
+    1. Fix $props() destructuring — single call, correct prop→variable mapping
+    2. Fix $derived() → $derived.by() for complex expressions
+    3. Add missing : in ternary chains
+    4. Fix missing closing </div> tags
+    5. Wire to: /citations (precedent cards) or /cases/[id] (related precedents tab)
+  0 importers — barrel export only
+-->
 <!-- Legal Precedent Card for Legal: AI, App -->
 <script lang="ts">
 import type { Case } from '$lib/types';

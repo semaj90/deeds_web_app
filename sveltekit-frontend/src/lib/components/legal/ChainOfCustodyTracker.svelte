@@ -1,3 +1,16 @@
+<!-- TODO [Session 93r20]: SALVAGEABLE — needs full rewrite (55L minified, Phase 99 corrupted)
+  Corruption: <script context="module"> (Svelte 4), multiple $props<>() calls (invalid),
+    {@html: ''} (invalid), broken closing tags, minified single-line code
+  VALUABLE CONCEPT: Evidence custody chain tracking — CustodyTransfer + EvidenceItem interfaces,
+    timeline visualization, condition tracking, compromised evidence warnings, signature/witness fields
+  REWRITE PLAN:
+    1. Split into proper <script lang="ts"> with Svelte 5 single $props() destructure
+    2. Move interfaces to $lib/types or keep inline
+    3. Replace emoji icons with Icon.svelte (i-lucide-shield, i-lucide-lock, etc.)
+    4. Fix template: proper {#if}/{/if} nesting, add missing </div> tags
+    5. Wire to: /evidence (per-item custody view) or /cases/[id] (evidence tab)
+  0 importers — barrel export only
+-->
 <!-- Chain of Custody Tracker for Legal: AI, App --> <script context="module" lang="ts"> // Type declarations must live in module context to avoid: "Modifiers cannot appear here"
   export interface CustodyTransfer { id: string, timestamp: Date, fromPerson: string, toPerson: string, location: string, reason: string, condition: 'excellent' | 'good' | 'fair' | 'poor' | 'damaged'; photos?: string[],signature: string, witnessSignature?: string; notes?: string,verified: boolean}
 
