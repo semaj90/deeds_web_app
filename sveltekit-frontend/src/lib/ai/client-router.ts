@@ -9,6 +9,14 @@
  * server services are actually available before escalating.
  *
  * Integration: ChatSession.svelte.ts calls shouldEscalateToServer() before fetch.
+ *
+ * TODO [Session 93r18]: TRT-LLM/Triton integration
+ *   - Add 'tensorrt' to InferenceSource type
+ *   - Check gpu-arbiter.ts lease status before routing
+ *   - TRT-LLM primary (port 8099, /v2/health/ready) → Ollama fallback
+ *   - GPU Arbiter manages VRAM mutex (RTX 3060 Ti 8GB, can't coexist)
+ *   - ServerCapabilities should include tensorrt: boolean field
+ *   - See: src/lib/server/inference/gpu-arbiter.ts for lease logic
  */
 
 import type { InferenceSource } from './model-ids.js';

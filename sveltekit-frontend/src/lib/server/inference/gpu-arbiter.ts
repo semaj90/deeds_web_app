@@ -4,6 +4,13 @@
  * RTX 3060 Ti has 8GB VRAM. Ollama uses ~5.2GB when loaded.
  * TRT-LLM and Ollama cannot coexist at full model load.
  * This arbiter manages exclusive GPU lease via Redis.
+ *
+ * TODO [Session 93r18]: Wire into inference pipeline
+ *   - /api/chat (and /api/agents/chat) should call acquireGpuLease('ollama') before Ollama
+ *   - /api/inference/tensorrt endpoint should call acquireGpuLease('tensorrt')
+ *   - Expose lease status via /api/health/capabilities (tensorrt: boolean)
+ *   - Admin GPU panel: show current lease holder, remaining TTL, manual release button
+ *   - LLM eval dashboard: A/B compare TRT-LLM vs Ollama latency/quality
  */
 import { redis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';

@@ -10,7 +10,8 @@ export class QdrantManager {
         cases: 'legal_cases',
         evidence: 'evidence_items',
         chat_history: 'chat_messages',
-        embeddings_cache: 'embedding_cache'
+        embeddings_cache: 'embedding_cache',
+        document_tags: 'document_tags'
     };
 
     constructor(url = ENV.QDRANT_URL) {
@@ -49,6 +50,12 @@ export class QdrantManager {
                 name: this.collections.embeddings_cache,
                 vectors: {
 	embedding: { size: 768, distance: 'Cosine' }
+                }
+            },
+	{
+                name: this.collections.document_tags,
+                vectors: {
+	size: 768, distance: 'Cosine'
                 }
             }
         ];

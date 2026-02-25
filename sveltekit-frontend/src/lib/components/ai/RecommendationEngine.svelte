@@ -221,14 +221,14 @@
 		return results;
 	}
 
-	function getCategoryIcon(category: string) {
+	function getCategoryIconName(category: string): string {
 		switch (category) {
-			case 'strategy': return Target;
-			case 'evidence': return Search;
-			case 'legal_research': return BookOpen;
-			case 'next_action': return Zap;
-			case 'risk_mitigation': return Shield;
-			default: return Lightbulb;
+			case 'strategy': return 'target';
+			case 'evidence': return 'search';
+			case 'legal_research': return 'book-open';
+			case 'next_action': return 'zap';
+			case 'risk_mitigation': return 'shield';
+			default: return 'lightbulb';
 		}
 	}
 
@@ -327,11 +327,10 @@
 	{:else}
 		<div class="rec-grid">
 			{#each filteredRecommendations as rec (rec.id)}
-				{@const IconComponent = getCategoryIcon(rec.category)}
 				<div class="rec-card">
 					<div class="rec-card-header">
 						<div class="rec-card-title-row">
-							<IconComponent class="w-5 h-5 shrink-0" />
+							<span class="i-lucide-{getCategoryIconName(rec.category)} inline-block w-5 h-5 shrink-0"></span>
 							<div class="rec-card-title-text">
 								<h4 class="rec-card-title">{rec.title}</h4>
 								<div class="rec-badges">

@@ -27,6 +27,7 @@
   import AnswerWithCitations from '$lib/components/rag/AnswerWithCitations.svelte';
   import RAGPipelineChart from '$lib/components/ai/RAGPipelineChart.svelte';
   import ACEContextBubble from '$lib/components/ai/ACEContextBubble.svelte';
+  import RecommendationEngine from '$lib/components/ai/RecommendationEngine.svelte';
   import type { AnswerWithCitations as AnswerData } from '$lib/types/rag-source-validation';
 
   interface AIStats {
@@ -84,6 +85,7 @@
   let showRagPipeline = $state(false);
   let showPipelineChart = $state(false);
   let showACEBubble = $state(false);
+  let showRecommendations = $state(false);
   let ragQuery = $state('');
   let ragChunks = $state<any[]>([]);
   let ragAnswer = $state<AnswerData | null>(null);
@@ -699,6 +701,21 @@
               routerDecision={{ source: 'server-ollama', reason: 'rag-trigger+long-message', confidence: 0.62 }}
             />
           </div>
+        </div>
+      {/if}
+    </div>
+
+    <!-- 23. AI Recommendation Engine (RAG-powered legal strategy) -->
+    <div class="mt-4">
+      <button
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/10 rounded-lg hover:border-accent/30 transition text-sm font-medium text-sand/80"
+        onclick={() => (showRecommendations = !showRecommendations)}
+      >
+        {showRecommendations ? 'Hide Recommendations' : 'AI Recommendation Engine (Legal Strategy + Evidence Analysis)'}
+      </button>
+      {#if showRecommendations}
+        <div class="mt-3">
+          <RecommendationEngine contextQuery="Generate legal case strategy recommendations" />
         </div>
       {/if}
     </div>

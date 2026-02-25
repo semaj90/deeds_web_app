@@ -190,16 +190,26 @@ CrewAI Sidecar :8096 (Python)
 - [x] Wire ACEContextBubble into ai-dashboard
 - [x] Archive 42 dead files to deeds_labs/
 
+### Completed (Session 93r17 Continued)
+- [x] Archive 7 corrupted/orphaned cache files (semantic-cache, ssr-legal-api-cache, MultiLayerCacheSystem, multi-layer-cache, stack-cache, CachePerformanceMonitor, Enhanced3DEvidenceBoard)
+- [x] Archive 9 "page-repair" stubs (WebGPUProcessor, WebGPUWebAssemblyBridge, NeuralPerformanceDashboard, WebGPUVisualization, BriefEditor, CaseAutomation, CaseManager, CaseManagerXState, SimpleCaseManager)
+- [x] Remove empty ai/webgpu/ and ai/cognitive/ directories
+- [x] Verify all 4 production cache components wired (CachePerformanceDashboard, CacheDemo, CacheMonitor, OfflineIndicator)
+- [x] Deep orphan audit: 87 orphaned components (45 wire-ready, 34 need fixes, 8 archived)
+
 ### Remaining
-- [ ] Wire semantic-cache.ts into RAG search pipeline
 - [ ] Wire offline-fetch.ts into client-router.ts
-- [ ] Clean up corrupted ssr-legal-api-cache.ts
-- [ ] Clean up corrupted semantic-cache.ts syntax errors
-- [ ] Archive 4 orphaned cache files (MultiLayerCacheSystem, multi-layer-cache, stack-cache, semantic-cache)
 - [ ] Restart TRT-LLM containers
 - [ ] Scaffold CrewAI Python sidecar
 - [ ] Add docling-258m to sidecar
 - [ ] Qdrant auto-tagging pipeline
+
+### GPU Dev Metrics Page (Planned)
+- [ ] WebGPU Compute Status: DeedsGPUCompute pipeline (shaders, buffers, dispatches)
+- [ ] ONNX Inference Monitor: Model load time, latency, token/s, backend
+- [ ] Triton/TRT-LLM Panel: Port 8099 health, batch depth, INT4 throughput
+- [ ] LLM Eval Dashboard: Response quality metrics, hallucination rate, citation accuracy
+- [ ] Admin Testing: One-click benchmarks, A/B model comparison, GPU memory profiling
 
 ---
 
@@ -207,10 +217,18 @@ CrewAI Sidecar :8096 (Python)
 
 | Category | Count | Total Lines |
 |----------|-------|-------------|
-| Active cache .ts files | 15 | ~5,500 |
-| Orphaned cache .ts files | 4 | ~1,076 |
-| Corrupted cache files | 2 | ~390 |
+| Active cache .ts files | 11 | ~4,100 |
 | Cache Svelte components (wired) | 4 | ~2,023 |
-| Cache Svelte components (orphaned) | 3 | ~159 |
-| Cache Svelte components (dead) | 1 | ~17 |
-| **Total cache system** | **29** | **~9,165** |
+| Archived cache files | 7 | ~1,466 |
+| Archived stub components | 9 | ~145 |
+| Archived evidence component | 1 | ~198 |
+| **Total active cache system** | **15** | **~6,123** |
+
+## Component Orphan Summary (Session 93r17 Audit)
+
+| Status | Count | Action |
+|--------|-------|--------|
+| Wire-ready (clean Svelte 5) | 45 | Wire to routes in future sessions |
+| Needs corruption fix first | 34 | Restore from backup or rewrite |
+| Archived (stubs/dead) | 17 | Moved to deeds_labs/ |
+| **Total orphaned** | **87** | 47% of 185 components |

@@ -1,9 +1,12 @@
 /**
- * LLM Router - Multi-provider streaming with web search
+ * LLM Router - Multi-provider streaming with web search + GPU acceleration
  *
  * Providers:
- *   - ollama: Local Gemma3-legal model (default)
+ *   - tensorrt: TensorRT-LLM on GPU (primary, requires GPU arbiter lease)
+ *   - ollama: Local Gemma3-legal model (fallback)
  *   - gemini: Google Gemini API with web search grounding
+ *
+ * Auto-fallback: tensorrt → ollama → gemini (if keys available)
  *
  * Usage:
  *   const stream = await llmRouter.generateStream({ prompt, provider, model });
@@ -18,7 +21,7 @@ const GEMINI_MODEL = process.env.GEMINI_MODEL ?? 'gemini-2.0-flash-exp';
 
 interface StreamRequest {
   prompt: string;
-  provider?: 'ollama' | 'gemini';
+  provider?: 'ollama' | 'gemini' | 'tensorrt';
   model?: string;
   systemPrompt?: string;
   temperature?: number;
@@ -212,11 +215,56 @@ async function* streamGemini(request: StreamRequest): AsyncGenerator<StreamChunk
   };
 }
 
+async function* streamTensorRT(request: StreamRequest): AsyncGenerator<StreamChunk> {
+  const { streamLLM } = await import('$lib/server/trt-llm.js');
+  const { acquireGpuLease, releaseGpuLease } = await import('$lib/server/inference/gpu-arbiter.js');
+
+  // Acquire GPU lease (unloads Ollama models)
+  const leased = await acquireGpuLease('tensorrt', 120);
+  if (!leased) {
+    throw new Error('GPU busy — cannot acquire TensorRT lease');
+  }
+
+  try {
+    const fullPrompt = request.systemPrompt
+      ? `${request.systemPrompt}\n\nUser: ${request.prompt}`
+      : request.prompt;
+
+    for await (const chunk of streamLLM({
+      prompt: fullPrompt,
+      maxTokens: request.maxTokens,
+      temperature: request.temperature
+    })) {
+      yield {
+        content: chunk.content,
+        text: chunk.content,
+        done: chunk.done,
+        metadata: { provider: 'tensorrt', model: 'trt-llm' }
+      };
+    }
+  } finally {
+    await releaseGpuLease('tensorrt');
+  }
+}
+
 export const llmRouter = {
   async *generateStream(request: StreamRequest): AsyncGenerator<StreamChunk> {
     const provider = request.provider ?? 'ollama';
 
-    if (provider === 'gemini') {
+    if (provider === 'tensorrt') {
+      // TensorRT with auto-fallback to Ollama
+      try {
+        const { healthCheck } = await import('$lib/server/trt-llm.js');
+        if (await healthCheck()) {
+          yield* streamTensorRT(request);
+          return;
+        }
+      } catch {
+        // Fall through to Ollama
+      }
+      console.warn('[LLM Router] TensorRT unavailable, falling back to Ollama');
+      yield* streamOllama(request);
+    } else if (provider === 'gemini') {
       yield* streamGemini(request);
     } else {
       yield* streamOllama(request);

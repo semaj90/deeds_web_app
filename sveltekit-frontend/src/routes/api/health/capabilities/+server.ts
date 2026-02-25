@@ -41,7 +41,7 @@ export const GET: RequestHandler = async () => {
 	const qdrantUrl = ENV.QDRANT_URL ?? 'http://localhost:6333';
 
 	// Parallel checks — all with 2s timeout
-	const [ollamaRes, qdrantOk, postgresOk, redisOk] = await Promise.all([
+	const [ollamaRes, qdrantOk, postgresOk, redisOk, tensorrtOk] = await Promise.all([
 		// Ollama: fetch model list (proves LLM + embedding available)
 		fetch(`${ollamaUrl}/api/tags`, { signal: AbortSignal.timeout(TIMEOUT) })
 			.then(async (r) => {
@@ -82,6 +82,9 @@ export const GET: RequestHandler = async () => {
 				return false;
 			}
 		})(),
+
+		// TensorRT-LLM: check /health endpoint
+		check(ENV.TENSORRT_URL ?? 'http://localhost:8000'),
 	]);
 
 	const ollama = ollamaRes.ok;
@@ -98,6 +101,7 @@ export const GET: RequestHandler = async () => {
 			rag: qdrantOk,
 			postgres: postgresOk,
 			redis: redisOk,
+			tensorrt: tensorrtOk,
 			ragEnabled,
 			serverReady,
 			models,

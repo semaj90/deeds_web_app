@@ -1,5 +1,26 @@
-
-<!-- Consider wrapping this component in an ErrorBoundary for better, error, handling --> <!-- import  ErrorBoundary, from "$lib/components/ErrorBoundary.svelte"; --> <!-- Agent Orchestrator Component Manages AutoGen and CrewAI multi-agent, workflows --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
+<!-- TODO [Session 93r18]: SALVAGEABLE — needs full rewrite, NOT incremental fixes
+  Phase 99 corruption: 13+ syntax errors (minified lines, double arrows, broken switch/case,
+  icon-as-component, Svelte 4 Select pattern, service imports from blanket-excluded dir).
+  CONCEPT IS VALUABLE: AutoGen + CrewAI multi-agent workflow orchestration with 4 workflow
+  types, progress tracking, cancellation, conversation/task views, and quick-start templates.
+  REWRITE PLAN:
+  1. De-minify and reformat all single-line statements
+  2. Replace $lib/services/ imports with fetch() to /api/agents/chat endpoint
+  3. Replace icon components with UnoCSS i-lucide-* classes (partially done)
+  4. Replace Svelte 4 Select with bits-ui v2 Select.Root/Trigger/Content/Item
+  5. Fix double-arrow onclick handlers: onclick={(_event) => ) => {  →  onclick={() => {
+  6. Fix switch/case syntax: case: 'x': → case 'x':
+  7. Wire to /ai-dashboard or /admin/dev-tools when agent backends are ready
+  8. TRT-LLM/Triton: Use as orchestration UI for TRT-LLM primary + Ollama fallback inference
+  NOTE: AutoGen is DEPRECATED by Microsoft (Q1 2026). Replace with:
+    - Microsoft Agent Framework (AutoGen successor, graph workflows, pause/resume)
+    - OR CrewAI (still active, simpler role-based agents)
+    - OR LangGraph (stateful agent workflows)
+  Remove autogen-service.js imports, replace with fetch() to /api/agents/ endpoints
+  LangChain is NOT used in codebase — only dead type stubs + UI mode strings
+-->
+<!-- Agent Orchestrator Component — Manages AutoGen and CrewAI multi-agent workflows -->
+<script lang="ts"> // Svelte 5 runes are auto-imported // Migrated to $effect
  
  import Button from '$lib/components/ui/Button.svelte';
  import Card from '$lib/components/ui/card/Card.svelte';
