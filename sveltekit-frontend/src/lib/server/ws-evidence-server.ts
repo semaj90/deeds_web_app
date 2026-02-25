@@ -1,6 +1,5 @@
 import type { EvidenceAnalysisResult, AnalysisUpdate } from '$lib/types/evidence';
 import type { Actor } from 'xstate'; // Import Actor type from xstate
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 class WsEvidenceServer {
  private actors = new Map<string, Actor<any>>(); // Map fileId to XState Actor

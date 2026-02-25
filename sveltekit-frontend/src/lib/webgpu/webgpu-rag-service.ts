@@ -1,5 +1,4 @@
 import type { ensureFloat32Array,
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
     batchProcessArrays,
     adaptiveQuantization, QuantizationConfig, ArrayConversionResult } from '$lib/utils/webgpu-array-utils';

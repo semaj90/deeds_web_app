@@ -1,7 +1,6 @@
 import { env } from '$env/dynamic/private';
 import { createClient } from 'redis'; // Use actual redis client, shim might be for browser
 import { WebSocket, WebSocketServer } from 'ws';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ClientConnection {
     ws: WebSocket;

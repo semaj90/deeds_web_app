@@ -1,5 +1,4 @@
 import pool from '$lib/server/db/drizzle';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export type Citation = {
     id: string;

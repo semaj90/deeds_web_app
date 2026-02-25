@@ -1,6 +1,5 @@
 // Database connection management with role separation
 import pkg from 'pg';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 const { Pool } = pkg;
 
 import { ENV } from '$lib/server/env.server.js';

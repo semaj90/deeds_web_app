@@ -13,7 +13,6 @@
 import os from 'os';
 import path from 'path';
 import type { Worker } from 'worker_threads';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Define the expected successful result structure from a worker job
 interface JobResult {

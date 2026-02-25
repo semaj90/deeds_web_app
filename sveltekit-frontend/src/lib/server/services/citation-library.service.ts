@@ -7,7 +7,6 @@ import { db } from '$lib/server/db';
 import { redis } from '$lib/server/redis';
 import { auditService } from './audit.service.js';
 import { sql } from 'drizzle-orm';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface CitationCollection {
 	id: string;

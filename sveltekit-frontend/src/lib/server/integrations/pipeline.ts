@@ -12,7 +12,6 @@ import { getOllamaService, type OllamaService } from './ollama.js';
 import { getRedisCache, type RedisCacheService } from './redis.js';
 import { getQdrantService, type QdrantVectorService } from './qdrant.js';
 import { getMinIOStorage, type MinIOStorageService } from './minio.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface PipelineConfig {
   ollama?: {

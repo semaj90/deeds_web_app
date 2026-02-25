@@ -3,7 +3,6 @@
 import { createHash } from 'crypto';
 import { getRedisClient, isRedisAvailable } from '../redis.js';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Cache TTL configuration from environment (in seconds)
 const CACHE_TTL_SEARCH = parseInt(process.env.RAG_CACHE_TTL_SEARCH ?? '300'); // 5 minutes

@@ -1,7 +1,6 @@
 import { sql } from '$lib/db/connection';
 import { randomUUID } from 'crypto';
 import { advisoryLocks, LOCK_MODES, type LockMode, type LockType } from './advisory-locks.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Transaction Manager with Advisory Locks for Legal AI Platform

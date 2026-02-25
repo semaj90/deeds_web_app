@@ -6,7 +6,6 @@
 
 import type { Citation } from '$lib/types/case-summary';
 import { verificationService } from './verification.service.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface SummaryContext {
   caseId: string;

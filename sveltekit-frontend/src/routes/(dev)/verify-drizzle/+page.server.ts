@@ -1,6 +1,5 @@
 
 import { eq } from 'drizzle-orm';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const load = async () => {
     console.log('Verifying Drizzle Runtime Import...');

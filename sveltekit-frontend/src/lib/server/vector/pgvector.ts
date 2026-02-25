@@ -5,7 +5,6 @@
 
 import type { Pool } from 'pg';
 import pg from 'pg';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Centralized Party role/type defaults
 const DEFAULT_PARTY_ROLE = 'other' as const;

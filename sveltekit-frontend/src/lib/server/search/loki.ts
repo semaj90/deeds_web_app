@@ -1,5 +1,4 @@
 import Loki from 'lokijs';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface LokiCollectionOptions {
     indices?: readonly string[];

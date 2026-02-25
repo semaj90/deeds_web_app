@@ -1,5 +1,4 @@
 import { index, integer, jsonb, pgTable, text, timestamp, uuid, vector } from 'drizzle-orm/pg-core';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Error Clusters

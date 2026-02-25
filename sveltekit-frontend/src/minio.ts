@@ -6,7 +6,6 @@
  */
 
 import * as Minio from 'minio';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface MinIOConfig {
     endPoint: string;

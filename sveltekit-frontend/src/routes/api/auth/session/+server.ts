@@ -5,7 +5,6 @@
 
 import { deleteSessionCookie, setSessionCookie, validateSession } from '$lib/server/lucia';
 import { json, type RequestHandler } from '@sveltejs/kit';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * GET /api/auth/session

@@ -7,7 +7,6 @@ import { fail } from '@sveltejs/kit';
 import { redis } from '$lib/server/redis';
 import { getOllamaUrl } from '$lib/config/env.server.js';
 import type { Actions, PageServerLoad } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const OLLAMA_URL = getOllamaUrl();
 const OLLAMA_MODEL = process.env?.OLLAMA_MODEL ?? 'gemma3-legal:latest';

@@ -9,7 +9,6 @@
  */
 
 import type { QdrantClient } from '@qdrant/js-client-rest';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================================================
 // TYPES

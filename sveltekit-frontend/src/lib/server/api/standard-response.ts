@@ -4,7 +4,6 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ApiResponse<T = unknown> {
 	success: boolean;

@@ -10,7 +10,6 @@
  */
 
 import type { Project } from 'ts-morph';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // WebGPU type extensions - using module augmentation

@@ -1,5 +1,4 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 import { ENV } from '$lib/server/env.server.js';
 

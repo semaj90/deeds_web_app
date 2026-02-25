@@ -5,7 +5,6 @@
  */
 
 import { createClient } from 'redis';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface RedisJSONConfig {
     url?: string;

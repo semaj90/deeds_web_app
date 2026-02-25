@@ -9,7 +9,6 @@ import type { CaseSummary, CaseSummaryVersion } from '$lib/types/case-summary';
 import { and, desc, eq } from 'drizzle-orm';
 import { cacheService } from './cache.service.js';
 import { verificationService } from './verification.service.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export class CaseSummaryService {
     /**

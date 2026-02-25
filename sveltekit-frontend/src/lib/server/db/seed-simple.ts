@@ -2,7 +2,6 @@ import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
 import { db } from './drizzle';
 import { cases, users } from './schema';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 async function seed() {
 	console.log('🌱 Starting database seed...');

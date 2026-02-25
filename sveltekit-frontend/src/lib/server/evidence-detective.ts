@@ -5,7 +5,6 @@
 import { eq } from 'drizzle-orm';
 import { db } from './db/unified-client.js'; // Use unified client
 import * as schema from './db/schema-postgres.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Assuming OllamaService is exported from an ai folder or similar
 // Stubbing local import or usage if path is ambiguous

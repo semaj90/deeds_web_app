@@ -13,7 +13,6 @@
 import { db } from '../db/index.js';
 import { sql } from 'drizzle-orm';
 import Redis from 'ioredis';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================================================
 // TYPE DEFINITIONS

@@ -6,7 +6,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import pdfParse from 'pdf-parse';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface RawDocument {
     id: string;

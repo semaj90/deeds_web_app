@@ -9,7 +9,6 @@
  */
 
 import { redis } from './cache/redis';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 interface GPUMetrics {

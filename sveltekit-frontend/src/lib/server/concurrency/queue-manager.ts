@@ -8,7 +8,6 @@ import { transactionManager } from './transaction-manager.js';
 import type { LockType } from './advisory-locks.js';
 import { randomUUID } from 'crypto';
 import { z } from 'zod';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Zod schemas for type safety with Superforms
 export const QueueJobSchema = z.object({

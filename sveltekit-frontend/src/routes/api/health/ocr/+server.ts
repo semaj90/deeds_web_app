@@ -1,6 +1,5 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface OCRHealthDetails { service: string, status: 'operational' | 'degraded' | 'offline';
  port?: number; endpoint: string;

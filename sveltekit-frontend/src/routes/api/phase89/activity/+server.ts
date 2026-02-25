@@ -7,7 +7,6 @@ import { json } from '@sveltejs/kit';
 import { createClient } from 'redis';
 import { getRedisUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 let redis: ReturnType<typeof createClient> | null = null;
 

@@ -1,7 +1,6 @@
 // Charge bundling service with HMM-inspired penalty classification and victim inference
 
 import { type RequestEvent } from "@sveltejs/kit";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface BundledCharge {
 	statuteCode: string;

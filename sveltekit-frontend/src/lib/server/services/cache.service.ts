@@ -4,7 +4,6 @@
  */
 
 import { redis } from '$lib/server/redis';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface CacheOptions {
 	ttl?: number; // Time to live in seconds

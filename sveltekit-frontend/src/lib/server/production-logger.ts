@@ -1,6 +1,5 @@
 import type { LoggingConfig } from '../config/unified-config.js';
 import { getConfig } from '../config/unified-config.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const dev = process.env.NODE_ENV === 'development';
 

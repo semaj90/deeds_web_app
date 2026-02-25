@@ -1,6 +1,5 @@
 import { pgTable, text, jsonb, timestamp, integer, uuid, index, vector } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Document embeddings for semantic search
 export const documentEmbeddings = pgTable('document_embeddings', {

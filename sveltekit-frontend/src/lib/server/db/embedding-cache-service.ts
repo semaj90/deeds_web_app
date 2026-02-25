@@ -3,7 +3,6 @@ import { embeddingCache } from './schema-postgres.js';
 import { packEmbedding } from './embedding-cache-utils.js';
 import { eq } from 'drizzle-orm';
 import { db } from './client.js'; // Assuming db client export
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // DB stores the packed as a string (base64 or similar), the 'embedding' is null.
 export interface EmbeddingCacheDbRow {

@@ -12,7 +12,6 @@
  */
 
 import { parse as simdParse } from 'simdjson-node';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface FastJSONResult<T = any> {
     ok: boolean;

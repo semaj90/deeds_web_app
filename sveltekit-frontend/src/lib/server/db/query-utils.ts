@@ -1,6 +1,5 @@
 // Production database query utilities with type safety
 import { and, asc, count, desc, eq, like, or, type AnyColumn, type SQL } from 'drizzle-orm'; // Corrected import path for Drizzle functions and added AnyColumn, SQL
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface QueryFilters {
  search?: string;

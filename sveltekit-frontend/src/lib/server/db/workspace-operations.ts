@@ -16,7 +16,6 @@ import {
     statutes,
 } from './schema-postgres.js';
 import { eq, desc } from 'drizzle-orm';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface WorkspaceContext {
     workspaceId: string;

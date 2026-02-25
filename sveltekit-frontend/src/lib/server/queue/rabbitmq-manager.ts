@@ -12,7 +12,6 @@
 
 import { rabbitmqService } from '$lib/server/messaging/rabbitmq-service';
 import type { Channel, Connection } from 'amqplib';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface QueueConfig {
     name: string;

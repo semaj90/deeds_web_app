@@ -7,7 +7,6 @@
  */
 import { query } from '$lib/server/db/client.js';
 import { minioService } from '$lib/server/storage/minio-service.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // import { embeddingService } from '$lib/services/embedding-service.js'; // Not used directly, using fetch
 
 interface EvidenceFile {

@@ -8,7 +8,6 @@ import { ingestionWorkflowMachine } from '$lib/machines/ingestion-workflow-machi
 import { setupQueues } from '$lib/server/rabbitmq.js';
 import { jobTracker } from '$lib/services/job-tracker.js';
 import { createActor, type ActorRefFrom } from 'xstate';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // New: explicit minimal actor type to avoid `any` type
 type WorkflowActor = ActorRefFrom<typeof ingestionWorkflowMachine>;

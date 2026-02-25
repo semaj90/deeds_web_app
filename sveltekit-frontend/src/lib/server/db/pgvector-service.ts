@@ -6,7 +6,6 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { sql } from 'drizzle-orm';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { ENV } from '$lib/server/env.server.js';
 
 const DATABASE_URL = ENV.DATABASE_URL;

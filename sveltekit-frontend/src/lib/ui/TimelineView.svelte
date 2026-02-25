@@ -1,7 +1,6 @@
 <script lang="ts">
  import Button from './Button.svelte';
  import Tag from './Tag.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  type TimelineEvent = {
  id: string;

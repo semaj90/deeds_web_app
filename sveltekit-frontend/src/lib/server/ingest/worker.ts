@@ -1,5 +1,4 @@
 import { parentPort } from 'worker_threads';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Stub extractors and embedders since we are in a worker context
 // Real implementation would import these, assuming they are worker-safe (no DOM)

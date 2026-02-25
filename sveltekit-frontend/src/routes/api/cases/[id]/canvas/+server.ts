@@ -5,7 +5,6 @@ import { canvasStates } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { boardSnapshotSchema } from '$lib/schemas/board';
 import { verifyCanvasStatesTable } from '$lib/server/db/verify-canvas-table';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const POST: RequestHandler = async ({ params, request, locals }) => {
     const { id } = params; // Changed from caseId to id

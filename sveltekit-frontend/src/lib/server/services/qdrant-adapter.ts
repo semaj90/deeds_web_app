@@ -1,5 +1,4 @@
 import { QdrantVectorService } from './qdrant-vector.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Minimal adapter that normalizes various Qdrant client method names.
 // It uses `any` and runtime checks so callers don't need to know the exact client API.

@@ -11,7 +11,6 @@
 import { execSync, spawn } from 'child_process';
 import fs from 'fs/promises';
 import path from 'path';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface PipelineResult {
  success: boolean;

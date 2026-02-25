@@ -1,5 +1,4 @@
 import type { RedisCacheService as RedisCacheServiceType } from './redis-cache.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Simple helper to persist an embedding under a key.
 // Uses hset (field-per-dimension) if available, otherwise stores JSON via set.

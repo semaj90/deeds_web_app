@@ -1,6 +1,5 @@
 import { env } from '$lib/env';
 import { Client } from 'minio';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const MINIO_ENDPOINT = env?.MINIO_ENDPOINT ?? 'localhost:9000';
 const MINIO_ACCESS_KEY = env?.MINIO_ACCESS_KEY ?? 'minioadmin';

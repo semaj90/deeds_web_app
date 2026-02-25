@@ -1,7 +1,6 @@
 import { createHash } from 'crypto';
 import { existsSync, mkdirSync, writeFileSync, unlinkSync } from 'fs';
 import { join } from 'path';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface UploadConfig {
     uploadDir: string;

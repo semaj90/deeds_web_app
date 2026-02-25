@@ -3,7 +3,6 @@ import * as crypto from 'crypto';
 import type { Redis } from 'ioredis';
 import { LRUCache } from 'lru-cache';
 import { logger } from './logger.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface CacheOptions {
     ttl?: number; // Time to live in seconds

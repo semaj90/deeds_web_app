@@ -9,7 +9,6 @@ import path from 'path';
 import postgres from 'postgres';
 import { getDatabaseUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const sql = postgres(getDatabaseUrl());
 

@@ -6,7 +6,6 @@
 import { PGVectorSearch, type VectorSearchResult } from './pgvector-search.js';
 import { ElasticsearchSearch, type KeywordSearchResult } from './elasticsearch-search.js';
 import { RerankerClient } from './reranker-client.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface SearchQuery {
 	text: string;

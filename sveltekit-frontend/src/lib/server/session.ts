@@ -3,7 +3,6 @@ import { getUserById } from './db/queries.js';
 // Use namespace import to tolerate different export shapes in authUtils
 import * as authUtils from './authUtils.js';
 import { db } from './db/client.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface Session {
     id: string;

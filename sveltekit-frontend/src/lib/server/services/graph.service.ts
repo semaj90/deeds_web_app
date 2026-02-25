@@ -5,7 +5,6 @@
 
 import neo4j, { type Driver, type Session } from 'neo4j-driver';
 import type { SimilarCase } from '$lib/types/case-summary';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export class GraphService {
 	private driver: Driver;

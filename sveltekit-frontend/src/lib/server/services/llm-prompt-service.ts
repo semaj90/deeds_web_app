@@ -8,7 +8,6 @@
 
 import { BaseService } from '$lib/services/error-analysis/base-service';
 import type { LLMPrompt, LLMResponse, ServiceConfig } from '$lib/services/error-analysis/types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ILLMPromptService {
 	storePrompt(errorId: string, prompt: string, response: LLMResponse): Promise<LLMPrompt>;

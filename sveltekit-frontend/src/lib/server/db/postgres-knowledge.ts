@@ -13,7 +13,6 @@
 
 import { db } from '$lib/server/db/index-clean.js'; // Assuming this is where db export is
 import { sql } from 'drizzle-orm';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface KnowledgeDocument {
 	id?: number;

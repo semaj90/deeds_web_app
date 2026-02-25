@@ -5,7 +5,7 @@ import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 /**
  * Superior Drizzle ORM types for legal_ai_db
  */
-export type DrizzleTypes = {
+export interface DrizzleTypes {
 	Database: PostgresJsDatabase<typeof schema>;
 	Schema: typeof schema;
 	// Inferred table types
@@ -15,16 +15,16 @@ export type DrizzleTypes = {
 	NewCase: typeof schema.cases.$inferInsert;
 	Evidence: typeof schema.evidence.$inferSelect;
 	NewEvidence: typeof schema.evidence.$inferInsert;
-};
+}
 
 export interface CachingTypes {
-  ttl: number;
-  strategy: 'memory' | 'redis' | 'hybrid';
+	ttl: number;
+	strategy: 'memory' | 'redis' | 'hybrid';
 }
 
 export const detectEnvironment = () => {
-  if (browser) return 'browser';
-  return 'server';
+	if (browser) return 'browser';
+	return 'server';
 };
 
 export type BitsUI = any;

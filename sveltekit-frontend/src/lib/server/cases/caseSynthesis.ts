@@ -8,7 +8,6 @@
 import { db } from '$lib/server/db';
 import { caseNotes, evidenceFiles, chatTurns } from '$lib/server/db/schema-postgres'; // Updated import based on files
 import { eq, desc, limit } from 'drizzle-orm';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 // import { title } from "process"; // Removed unused import
 
 export interface CaseSynthesis {

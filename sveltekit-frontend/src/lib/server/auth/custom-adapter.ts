@@ -4,7 +4,6 @@ import type { Adapter, DatabaseSession, DatabaseUser } from 'lucia';
 import { db } from '$lib/server/db'; // Corrected import path for db
 import { sessions, users } from '$lib/server/db/schema-postgres'; // Corrected import for sessions and users
 import { eq, sql } from 'drizzle-orm'; // Import eq and sql from drizzle-orm
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // --- new/adjusted DB row types for safer casting ---
 type UserRow = {

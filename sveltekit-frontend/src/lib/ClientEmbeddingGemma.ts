@@ -1,5 +1,4 @@
 import * as ort from 'onnxruntime-web';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Client-side EmbeddingGemma service using ONNX Runtime Web

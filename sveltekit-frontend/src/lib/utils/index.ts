@@ -4,7 +4,6 @@ import type { Document } from '$lib/types';
  * SvelteKit 2 + Svelte 5 + TypeScript Compatible
  */
 import { clsx, type ClassValue } from 'clsx';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 // ===== CLASS NAME UTILITIES =====

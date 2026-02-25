@@ -1,6 +1,5 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { productionLogger as logger } from '../production-logger.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export class QdrantApiWrapper {
     private client: QdrantClient;

@@ -3,7 +3,6 @@ import { autoFixUIContradiction } from '../contradictionEngine/mcp/autoPatchGene
 import { extractTextFromImage } from '../ocr/extractText.js';
 import { searchEvidence } from '../rag/evidenceRag.js';
 import { fetchUISpecForRoute } from '../rag/uiComplianceRag.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface CrewTask {
 	type: 'ocr' | 'rag-ui' | 'rag-evidence' | 'contrast' | 'auto-heal';

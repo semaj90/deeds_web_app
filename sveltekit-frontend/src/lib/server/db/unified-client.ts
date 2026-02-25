@@ -19,7 +19,6 @@ import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import path from 'path';
 import postgres from 'postgres';
 import * as schema from './schema-unified.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Define DocumentMetadata locally since it may not be exported from schema-unified
 interface DocumentMetadata {

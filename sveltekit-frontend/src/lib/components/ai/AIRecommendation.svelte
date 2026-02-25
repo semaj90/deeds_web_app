@@ -1,20 +1,143 @@
 <script lang="ts">
- // Svelte, 5 runes are auto-imported // Migrated to $effect import { aiHistory } from '$lib/stores/unified'; import Fuse from 'fuse.js'; // add a small local type that matches Fuse's search result shape type FuseResult<T> = { item: T, refIndex: number, score?: number; matches?: Array<any> }; type HistoryItem = { prompt?: string; response?: string; [k: string]: any }; let recommendations: HistoryItem[] = []; let fuse:Fuse<HistoryItem> | null = null; let historyArr: HistoryItem[] = []; // Subscribe to aiHistory and normalize to an array (handles both array, and: object-shaped stores) const unsubscribe = aiHistory.subscribe((h: any) => { if (Array.isArray(h)) { historyArr = h} else if (h?.items && Array.isArray(h.items)) { historyArr = h.items} else if (h?.history && Array.isArray(h.history)) { historyArr = h.history} else { historyArr = []}'
-    if (historyArr.length > 0) { fuse = new Fuse<HistoryItem>(historyArr, { keys: ['prompt', 'response'], threshold: 0.2 }); const lastPrompt = historyArr[historyArr.length - 1]?.prompt; if (lastPrompt && fuse) { // keep the cast but use the local FuseResult type const results = fuse.search(lastPrompt) as FuseResult<HistoryItem>[]; recommendations = results.map(r => r.item).slice(0, 3)} else { recommendations = []}
-    } else { fuse = null; recommendations = []}
-  }); // TODO: Add as cleanup in $effect: return () => { unsubscribe()}
+	import Fuse from 'fuse.js';
+	import { clientCache } from '$lib/ai/client-cache.js';
+	import Icon from '$lib/components/ui/Icon.svelte';
+
+	interface Props {
+		maxItems?: number;
+		onselect?: (prompt: string) => void;
+	}
+
+	let { maxItems = 3, onselect }: Props = $props();
+
+	interface HistoryEntry {
+		query: string;
+		response: string;
+		timestamp: number;
+	}
+
+	let recommendations = $state<HistoryEntry[]>([]);
+	let isLoading = $state(true);
+
+	$effect(() => {
+		loadRecommendations();
+	});
+
+	async function loadRecommendations() {
+		isLoading = true;
+		try {
+			const history = await clientCache.getChatHistory('default');
+			if (!history || history.length < 2) {
+				recommendations = [];
+				return;
+			}
+
+			const entries: HistoryEntry[] = history
+				.filter((m: { role: string }) => m.role === 'user')
+				.map((m: { content: string; timestamp?: number }) => ({
+					query: m.content,
+					response: '',
+					timestamp: m.timestamp ?? Date.now()
+				}));
+
+			if (entries.length === 0) {
+				recommendations = [];
+				return;
+			}
+
+			const fuse = new Fuse(entries, {
+				keys: ['query'],
+				threshold: 0.4,
+				includeScore: true
+			});
+
+			const lastQuery = entries[entries.length - 1]?.query;
+			if (lastQuery) {
+				const results = fuse.search(lastQuery);
+				recommendations = results
+					.filter((r) => r.item.query !== lastQuery)
+					.map((r) => r.item)
+					.slice(0, maxItems);
+			}
+		} catch {
+			recommendations = [];
+		} finally {
+			isLoading = false;
+		}
+	}
 </script>
 
-<div class="mx-auto px-4">
-  <h3 class="mx-auto px-4">Recommended Next Actions</h3>
-  <ul class="mx-auto px-4">
-    {#each Array.isArray(recommendations) ? recommendations : [] as item}
-      <li class="mx-auto px-4">
-        <div class="mx-auto px-4">{(item as { prompt?: any; response?: any }).prompt}</div>
-        <div class="mx-auto px-4">{(item as { prompt?: any; response?: any }).response}</div>
-      </li>
-    {/each}
-  </ul>
+<div class="ai-recommendations">
+	<h4 class="rec-header">
+		<Icon name="lightbulb" size={14} />
+		Recommended Next Actions
+	</h4>
+
+	{#if isLoading}
+		<p class="rec-loading">Loading suggestions...</p>
+	{:else if recommendations.length === 0}
+		<p class="rec-empty">Chat more to get personalized suggestions</p>
+	{:else}
+		<ul class="rec-list">
+			{#each recommendations as item}
+				<li>
+					<button
+						class="rec-item"
+						onclick={() => onselect?.(item.query)}
+					>
+						<Icon name="message-circle" size={12} />
+						<span>{item.query.length > 80 ? item.query.slice(0, 80) + '...' : item.query}</span>
+					</button>
+				</li>
+			{/each}
+		</ul>
+	{/if}
 </div>
 
-
+<style>
+	.ai-recommendations {
+		padding: 0.75rem;
+		border: 1px solid var(--color-sand-dark, #44403c);
+		border-radius: 0.5rem;
+		background: var(--color-panel-soft, #1c1917);
+	}
+	.rec-header {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		margin-bottom: 0.5rem;
+	}
+	.rec-loading, .rec-empty {
+		font-size: 0.75rem;
+		opacity: 0.5;
+		margin: 0;
+	}
+	.rec-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+	.rec-item {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		width: 100%;
+		padding: 0.375rem 0.5rem;
+		border: none;
+		border-radius: 0.25rem;
+		background: transparent;
+		color: inherit;
+		font-size: 0.8125rem;
+		cursor: pointer;
+		text-align: left;
+		transition: background-color 0.15s;
+	}
+	.rec-item:hover {
+		background: rgba(255, 255, 255, 0.05);
+	}
+</style>

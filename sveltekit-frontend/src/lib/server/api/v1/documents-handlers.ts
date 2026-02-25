@@ -5,7 +5,6 @@ import type { MinIOService } from '$lib/server/minio';
 import type { OCRService } from '$lib/server/ocr';
 import { db } from "$lib/server/db";
 import * as schema from '$lib/server/db/schema-postgres';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 interface UserType {
@@ -35,7 +34,6 @@ export async function getDocuments(user: UserType, request: Request, _deps: any)
 export async function getDocument(
 	user: UserType,
 	documentId: string,
-	_db: DrizzleTypes.DatabaseConfig,
 	_deps: any,
 	minioService: any // Placeholder type
 ) {
@@ -64,7 +62,6 @@ export async function getDocument(
 export async function getDocumentOCR(
 	user: UserType,
 	documentId: string,
-	_db: DrizzleTypes.DatabaseConfig,
 	_deps: any,
 	ocrService: any // Placeholder type
 ) {
@@ -93,7 +90,6 @@ export async function getDocumentOCR(
 export async function handleDocumentUpload(
 	user: UserType,
 	request: Request,
-	_db: DrizzleTypes.DatabaseConfig,
 	_deps: any,
 	minioService: any // Placeholder type
 ) {

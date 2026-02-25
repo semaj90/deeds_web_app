@@ -1,6 +1,5 @@
 import { vector } from 'drizzle-orm-pgvector';
 import { integer, pgTable, timestamp, text } from 'drizzle-orm/pg-core';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const webPages = pgTable('web_pages', {
     id: text('id').primaryKey(), // hash(url + path)

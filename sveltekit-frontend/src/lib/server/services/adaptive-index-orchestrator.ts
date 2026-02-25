@@ -6,7 +6,6 @@ import { redis } from '$lib/server/redis';
 import { getOllamaEndpoint } from '$lib/utils/ollama-utils';
 import { WebASMLlamaCppEngine, type InferenceResult } from '$lib/webasm/llama-cpp-engine';
 import { VectorSearchService } from '$lib/server/db/drizzle-vector-config';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Define routing decision types
 export type RoutingDecision = 'gpu' | 'quic' | 'cache' | 'cpu';

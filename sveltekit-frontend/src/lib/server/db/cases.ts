@@ -6,7 +6,6 @@
 import { eq } from 'drizzle-orm';
 import { db } from './index.ts';
 import { wardenCases } from './warden-schema.ts';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Auto-create case for prosecutor

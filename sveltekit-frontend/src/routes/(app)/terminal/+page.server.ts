@@ -1,10 +1,10 @@
 import type { PageServerLoad } from './$types';
-import db from '$lib/server/db/client.js';
+import { db } from '$lib/server/db/index.js';
 import { chatMessages } from '$lib/server/db/schema.js';
 import { desc, like } from 'drizzle-orm';
 
 const safe = <T>(p: Promise<T>, fb: T): Promise<T> =>
-	Promise.race([p, new Promise<T>((r) => setTimeout(() => r(fb), 5000))]);
+	Promise.race([p.catch(() => fb), new Promise<T>((r) => setTimeout(() => r(fb), 5000))]);
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const user = locals.user;

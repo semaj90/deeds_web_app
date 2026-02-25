@@ -3,7 +3,6 @@ import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { RAGService } from '$lib/server/rag';
 import { db } from "$lib/server/db";
 import * as schema from '$lib/server/db/schema-postgres';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface UserType {
 	id: string;

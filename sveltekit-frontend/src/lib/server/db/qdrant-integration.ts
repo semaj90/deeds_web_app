@@ -3,7 +3,6 @@ import { QdrantClient } from '@qdrant/js-client-rest';
 import { db } from './index.js';
 import * as schema from './schema.js';
 import { eq, sql } from 'drizzle-orm';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface QdrantConfig {
     host: string;

@@ -1,5 +1,4 @@
 import { jsonb, pgTable, real, text, timestamp, uuid, vector } from 'drizzle-orm/pg-core';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const personsOfInterest = pgTable('persons', {
  id: uuid('id').defaultRandom().primaryKey(),

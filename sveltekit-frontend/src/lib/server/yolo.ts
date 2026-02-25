@@ -94,7 +94,6 @@ import json
 import cv2
 import numpy as np
 import onnxruntime as ort
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 from pathlib import Path
 
 def load_yolo_model(model_path):

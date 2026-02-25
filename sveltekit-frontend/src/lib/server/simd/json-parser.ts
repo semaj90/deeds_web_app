@@ -8,7 +8,6 @@
 import { Worker } from 'worker_threads';
 import path from 'path';
 import os from 'os';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface ParseTask {
     id: string;

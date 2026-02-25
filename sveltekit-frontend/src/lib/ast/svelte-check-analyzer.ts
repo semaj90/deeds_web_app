@@ -5,7 +5,6 @@
  */
 
 import { Project, SyntaxKind, type Diagnostic, type Node, type SourceFile } from 'ts-morph';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ASTError {
   id: string, line: number, column: number, endLine: number, endColumn: number, message: string, severity: 'error' | 'warning' | 'info' | 'hint';

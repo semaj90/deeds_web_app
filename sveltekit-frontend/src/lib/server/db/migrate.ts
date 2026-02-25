@@ -8,7 +8,6 @@ import postgres from 'postgres'; // derive runtime client type
 import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import { sql } from 'drizzle-orm';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Minimal pool shape used by this script
 type PoolLike = {

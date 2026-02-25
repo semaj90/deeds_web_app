@@ -5,7 +5,6 @@
 
 // featureLogger module not yet created — use console fallback
 const featureLogger = { warn: console.warn, error: console.error, info: console.info };
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Feature error types

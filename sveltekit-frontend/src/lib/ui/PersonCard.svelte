@@ -1,7 +1,6 @@
 <script lang="ts">
  import Button from './Button.svelte';
  import Tag from './Tag.svelte';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
  let { id, name, role = 'witness', riskLevel = 'medium', photo, summary, lastSeen = 'Unknown', connections = 0, verified = false, onclick } = $props<{
  id: string;

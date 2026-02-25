@@ -5,7 +5,6 @@
 
 import type { ErrorBrainEvent } from '../types.js';
 import type { ErrorBrainTransport } from './interface.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 type Listener = (evt: ErrorBrainEvent) => void;
 

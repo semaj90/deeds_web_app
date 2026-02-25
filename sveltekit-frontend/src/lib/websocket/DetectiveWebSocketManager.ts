@@ -4,7 +4,6 @@
  */
 
 import type { TypingState, TypingContext } from '$lib/machines/userTypingStateMachine';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface DetectiveWebSocketMessage {
   type?:

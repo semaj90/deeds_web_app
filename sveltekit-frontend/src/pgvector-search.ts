@@ -4,7 +4,6 @@
  */
 
 import { Pool } from 'pg';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface SearchResult {
     id: string; title: string;

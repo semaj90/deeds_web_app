@@ -9,7 +9,6 @@ import { promises as fs } from 'node:fs';
 import { readFile, unlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export type DoclingBlock = {
     type: 'paragraph' | 'heading' | 'table' | 'list' | 'equation' | 'image' | 'other';

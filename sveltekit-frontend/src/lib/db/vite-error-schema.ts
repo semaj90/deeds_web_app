@@ -1,6 +1,5 @@
 import { pgTable, uuid, text, integer, boolean, timestamp, jsonb, serial, vector } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Vite Error Storage Schema with pgvector Integration

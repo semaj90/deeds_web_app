@@ -1,5 +1,4 @@
 import type { WebGPUComputeShader } from '$lib/types/vector-jobs';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 // (removed the static import of shader-cache-manager to avoid mismatched export errors)
 

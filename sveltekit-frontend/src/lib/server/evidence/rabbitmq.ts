@@ -1,5 +1,4 @@
 import amqp from 'amqplib';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL ?? 'amqp://localhost';
 

@@ -9,7 +9,6 @@ import { redis } from '$lib/server/redis';
 import { graphService } from './graph.service.js';
 import { auditService } from './audit.service.js';
 import crypto from 'crypto';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface CaseStatuteLink {
 	id: string;

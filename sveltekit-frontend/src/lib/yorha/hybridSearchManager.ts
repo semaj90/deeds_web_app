@@ -1,7 +1,6 @@
 import { ensureLocalIndex, addOrUpdateDocuments } from './localSearch.js';
 import type { LocalLegalDoc } from './localSearch.js';
 import { browser } from '$app/environment';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 let lokiDb: any = null;
 let lokiCollection: any = null;

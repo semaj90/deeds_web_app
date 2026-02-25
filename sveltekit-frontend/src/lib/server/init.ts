@@ -9,7 +9,6 @@
 
 import { initializeCommonServices, getServiceDiscovery } from '$lib/server/helpers/service-discovery';
 import { verifyServiceEndpoint } from '$lib/server/helpers/docker-discovery';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ServerServices {
     minio: {

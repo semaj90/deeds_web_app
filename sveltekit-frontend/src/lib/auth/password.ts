@@ -1,5 +1,4 @@
 import bcrypt from 'bcryptjs';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Password hashing utilities using bcrypt
 // Salt rounds for bcrypt (higher = more secure but slower)

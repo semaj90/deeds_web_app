@@ -4,7 +4,6 @@
  * Flow: Node.js → Redis Cache → Postgres → Python GPU Worker
  */
 import crypto from 'crypto';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { ENV } from '$lib/server/env.server.js';
 
 // Stub imports - these may not exist or have different signatures

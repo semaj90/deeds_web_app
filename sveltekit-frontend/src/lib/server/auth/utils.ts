@@ -5,7 +5,6 @@
  * and development bypass functionality across API endpoints.
  */
 import { dev } from '$app/environment';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Typed environment access for import.meta.env

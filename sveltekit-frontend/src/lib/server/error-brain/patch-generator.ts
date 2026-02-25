@@ -11,7 +11,6 @@ import fs from 'fs/promises';
 import path from 'path';
 import { db } from '../db/drizzle.js';
 import { errorBrainDiffs } from '../db/schema-postgres.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface LLMCodeFix {
 	filePath: string;

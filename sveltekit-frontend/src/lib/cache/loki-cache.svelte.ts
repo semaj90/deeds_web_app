@@ -7,7 +7,6 @@ import { browser } from '$app/environment';
 import type { Collection } from 'lokijs';
 import Loki from 'lokijs';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface CacheOptions {
 	ttl?: number; // Time to live in milliseconds

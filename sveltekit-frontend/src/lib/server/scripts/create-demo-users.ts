@@ -7,7 +7,6 @@ import type { User } from '$lib/types';
  * - user@example.com / User@123456
  */
 import type { AuthService } from '../auth.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export async function createDemoUsers(): Promise<any> {
     // Dynamically import AuthService to avoid circular dependencies

@@ -1,6 +1,5 @@
 import { encoding_for_model } from 'js-tiktoken';
 import type { LangExtractSection, SectionType } from './langextract-service.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Chunk configuration

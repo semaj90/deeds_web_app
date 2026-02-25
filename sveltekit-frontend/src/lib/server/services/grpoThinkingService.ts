@@ -7,7 +7,6 @@ import { db, sql } from '$lib/server/db';
 import { createHash } from 'crypto';
 import { generateEmbedding } from './vectorDBService.js';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // GRPO Thinking Response interface
 export interface GrpoThinkingResponse {

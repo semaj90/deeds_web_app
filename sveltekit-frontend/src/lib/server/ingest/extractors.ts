@@ -13,7 +13,6 @@ import fs from 'fs/promises';
 import path from 'path';
 import { spawn } from 'child_process';
 import { tmpdir } from 'os';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Types
 export interface ExtractionResult {

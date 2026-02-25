@@ -1,6 +1,5 @@
 import type { QdrantClient } from '@qdrant/js-client-rest';
 import { QdrantClient as QdrantClientImpl } from '@qdrant/js-client-rest';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { ENV } from '$lib/server/env.server.js';
 
 // Correct dimensions for modern embeddings

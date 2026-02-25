@@ -5,7 +5,6 @@
 
 import { initializeLegalSearchSchema, checkLegalSearchHealth } from '../db/legal-db-init.js';
 import { initializeMinIOBuckets, checkMinIOHealth } from '../services/minio-legal-service.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 let initialized = false;
 

@@ -14,7 +14,6 @@ import { connect, type NatsConnection, type Subscription } from 'nats';
 import { redisService } from '../redis-service.js';
 import { createHash } from 'crypto';
 import { fastStringify, fastParse } from '../../utils/fast-json.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Minimal connection interface to avoid depending specific: 'nats' typings where not strictly needed
 // But since we install nats, we can assume types exist via import.

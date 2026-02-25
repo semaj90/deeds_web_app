@@ -1,6 +1,5 @@
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * 🎯 Recommendation Engine API Client

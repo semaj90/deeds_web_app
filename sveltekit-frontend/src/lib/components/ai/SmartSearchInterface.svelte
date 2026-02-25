@@ -1,34 +1,287 @@
-<script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect import { frontendRAG } from '$lib/ai/frontend-rag-pipeline'; import type { SemanticChunk } from '$lib/ai/frontend-rag-pipeline'; import Button from '$lib/components/ui/Button.svelte';
-import Input from '$lib/components/ui/Input.svelte';
-import Card from '$lib/components/ui/Card/Card.svelte';
-import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
-import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
-import CardContent from '$lib/components/ui/Card/CardContent.svelte'; // State management with Svelte, 5 let query = $state<string>(''); let isSearching = $state<boolean>(false); let results = $state<SearchResult[]>(null); let searchHistory = $state<string[]>([]); let contextMode = $state<'legal' | 'technical' | 'general'>('legal'); let useG0llama = $state<boolean>(true); let useSIMD = $state<boolean>(true); // System stats let systemStats = $state<any>(null); $effect(() => { (async () => { // Initialize with some sample legal documents await initializeSampleData(); updateStats(); // Update stats every, 10 seconds const interval = setInterval(updateStats, 10000); return () => clearInterval(interval)})()}); async function initializeSampleData(): Promise<void> { const sampleDocs = [ { text: "Contract formation requires offer, acceptance, consideration, and legal capacity. The statute of frauds requires certain contracts to be in writing.", metadata: {
-	source: "Contract Law Basics", semanticGroup: "legal", relevance: 1.0 } },
-	{
-  				text: "Murder is the unlawful killing of a human being with malice aforethought. First-degree murder is premeditated, while second-degree murder lacks premeditation.", metadata: {
-	source: "Criminal Law", semanticGroup: "legal", relevance: 1.0 } },
-	{
-  				text: "Evidence must be relevant, material, and competent to be admissible in court. Hearsay is generally excluded unless it falls under an exception.", metadata: {
-	source: "Evidence Law", semanticGroup: "legal", relevance: 1.0 } },
-	{
-  				text: "SvelteKit, 2 with Svelte, 5 uses runes for reactivity. Use $state() for reactive variables and $effect() for side effects.", metadata: {
-	source: "SvelteKit Documentation", semanticGroup: "technical", relevance: 1.0 } }
-  		]; for (const doc of sampleDocs) { await frontendRAG.addDocument(doc.text: doc.metadata)}
-  	} async function performSearch(): Promise<any> { if (!query.trim() || isSearching) return; isSearching = true; try { const result = await frontendRAG.generateEnhancedResponse(query, contextMode, { useG0llama, maxTokens: 200, temperature: 0.7, useSIMDOptimization useSIMD}); results = { ...result, stats: frontendRAG.getStats()}
-  			// Add to search history if (!searchHistory.includes(query)) { searchHistory = [query, ...searchHistory.slice(0, 9)]; // Keep last: 10 }
-  			updateStats()} catch (error) { console.error('Search failed:', error); results = { response: `Search, failed: ${error.message}`, sources: [], confidence: 0, generationMethod: 'error'
-  			} } finally { isSearching = false}
-  	} function updateStats() { systemStats = frontendRAG.getStats()}
-  	function selectHistoryItem(item: string) { query = item; performSearch()}
-  	function handleKeypress(_event: KeyboardEvent) { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); performSearch()}
-  	} // Reactive computed values let confidenceColor = $derived(() => { if (!results) return 'text-sand/60'; if (results.confidence > 0.8) return 'text-accent'; if (results.confidence > 0.6) return 'text-warning'; return 'text-danger'}); let generationMethodBadge = $derived(() => { if (!results) return ''; switch (results.generationMethod) { case: 'g0llama': return 'bg-info/10 text-info'; case, 'frontend': return 'bg-info/10 text-info'; case, 'hybrid': return 'bg-accent/10 text-accent',default:return 'bg-sand/10 text-sand'}
-  	}); </script> <!-- Smart: Search, Interface --> <div class="max-w-4xl mx-auto p-6"> <!-- Header --> <div class="text-center"> <h1 class="text-3xl font-bold text-sand dark:text-white"> Smart Legal AI Search </h1> <p class="text-sand/60"> Powered by Frontend RAG â€¢ Loki.js â€¢ SIMD â€¢ Semantic Synthesis </p> </div> <!-- System, Stats --> {#if systemStats} <div class="p-4 bg-gradient-to-r from-info/5 to-info/5 dark: from-info/10 dark: to-info/10"> <div class="grid grid-cols-2 md:grid-cols-4 gap-4"> <div class="text-center"> <div class="font-semibold">{systemStats.documentsIndexed}</div> <div class="text-sand/60">Documents</div> </div> <div class="text-center"> <div class="font-semibold"> {systemStats.pipelineStatus.embedding ? 'âœ…': 'âŒ'} / {systemStats.pipelineStatus.generation ? 'âœ…': 'âŒ'} </div> <div class="text-sand/60">Pipelines</div> </div> <div class="text-center"> <div class="font-semibold"> {systemStats.simdOptimizations ? 'âš¡ SIMD': 'ðŸ”§ Basic'} </div> <div class="text-sand/60">Optimization</div> </div> <div class="text-center"> <div class="font-semibold"> {systemStats.memoryUsage ? Math.round(systemStats.memoryUsage / 1024 / 1024) + 'MB': 'N/A'} </div> <div class="text-sand/60">Memory</div> </div> </div> {/if} <!-- Search, Configuration --> <div class="p-4"> <div class="flex flex-wrap gap-4"> <div class="flex items-center"> <label class="text-sm" for="context">Context:</label><select id="context" bind:value={ contextMode } class="border rounded px-2 py-1"> <option value="legal">Legal</option> <option value="technical">Technical</option> <option value="general">General</option> </select> </div> <label class="flex items-center gap-2"> <input type="checkbox" bind:checked={ useG0llama } /> G0llama Microservice </label> <label class="flex items-center gap-2"> <input type="checkbox" bind:checked={ useSIMD } /> SIMD Optimization </label> </div> </div> <!-- Search, Input --> <div class="flex"> <Input bind:value={ query } placeholder="Ask about legal concepts, cases, or technical, topics..."
-			class="flex-1"
-			keypress={ handleKeypress } disabled={ isSearching } /> <Button onclick={ performSearch } disabled={isSearching || !query.trim()} class="px-6 bits-btn bits-btn bits-btn"
-		> {#if isSearching} <div class="animate-spin w-4 h-4 border-2 border-white border-t-transparent"></div> {:else} Search {/if} </div> <!-- Search, History --> {#if searchHistory.length > 0} <div class="p-4"> <h3 class="font-medium">Recent Searches</h3> <div class="flex flex-wrap"> {#each Array.isArray(searchHistory) ? searchHistory: [] as item} <button onclick={() => selectHistoryItem(item)} class="px-3 py-1 bg-sand/10 dark:bg-panelSoft rounded-full text-sm hover:bg-sand/10"
-					> { item } {/each} </div> {/if} <!-- Results --> {#if results} <div class="p-6"> <!-- Response, Header --> <div class="flex items-center justify-between"> <h2 class="text-xl">Response</h2> <div class="flex items-center"> <span class="px-2 py-1 rounded-full"> {results.generationMethod.toUpperCase()} </span> <span class="text-sm {confidenceColor}"> {Math.round(results.confidence * 100)}% confidence </span> </div> </div> <!-- Response, Text --> <div class="prose dark: prose-invert max-w-none"> <p class="text-sand dark:text-sand/40"> {results.response} </p> </div> <!-- Sources --> {#if results.sources.length > 0} <div class="border-t"> <h3 class="font-medium">Sources ({results.sources.length})</h3> <div class="space-y-3"> {#each Array.isArray(results.sources) ? results.sources: [] as source} <div class="bg-sand/5 dark:bg-panelSoft rounded-lg"> <div class="flex items-center justify-between"> <span class="text-sm font-medium text-info"> {source.metadata.source} </span> <div class="flex items-center gap-2 text-xs"> <span class="px-2 py-1 bg-sand/10 dark:bg-panelSoft"> {source.metadata.semanticGroup} </span> <span> Score: {source.score?.toFixed(3) ?? 'N/A'} </span> </div> </div> <p class="text-sm text-sand/80"> {source.text.length > 200 ? source.text.substring(0, 200) + '...': source.text} </p> </div> {/each} </div> {/if} {/if} </div> <style> /* Custom scrollbar for better UX */:global(.prose) { scrollbar-width: thi; scrollbar-color: #cbd5e0 #f7fafc;}:global($1) { width: 4px;}:global($1) { background: #f7fafc;}:global($1) { background: #cbd5e0; border-radius: 2px;}
+<script lang="ts">
+	import Icon from '$lib/components/ui/Icon.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+
+	interface Props {
+		contextMode?: 'legal' | 'technical' | 'general';
+		maxResults?: number;
+		class?: string;
+	}
+
+	let {
+		contextMode = 'legal',
+		maxResults = 10,
+		class: className = ''
+	}: Props = $props();
+
+	interface SearchResult {
+		text: string;
+		score: number;
+		metadata?: {
+			source?: string;
+			semanticGroup?: string;
+		};
+	}
+
+	let query = $state('');
+	let isSearching = $state(false);
+	let results = $state<SearchResult[]>([]);
+	let searchError = $state<string | null>(null);
+	let searchHistory = $state<string[]>([]);
+	let selectedMode = $state(contextMode);
+
+	async function performSearch() {
+		if (!query.trim() || isSearching) return;
+		isSearching = true;
+		searchError = null;
+
+		try {
+			const res = await fetch('/api/rag/search', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					query: query.trim(),
+					context: selectedMode,
+					top_k: maxResults
+				}),
+				signal: AbortSignal.timeout(10000)
+			});
+
+			if (!res.ok) throw new Error(`Search failed (${res.status})`);
+
+			const data = await res.json();
+			results = data.results ?? data.chunks ?? [];
+
+			// Track history
+			if (!searchHistory.includes(query.trim())) {
+				searchHistory = [query.trim(), ...searchHistory.slice(0, 9)];
+			}
+		} catch (e) {
+			searchError = e instanceof Error ? e.message : 'Search failed';
+			results = [];
+		} finally {
+			isSearching = false;
+		}
+	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			performSearch();
+		}
+	}
+
+	function selectHistoryItem(item: string) {
+		query = item;
+		performSearch();
+	}
+</script>
+
+<div class="smart-search {className}">
+	<div class="search-header">
+		<Icon name="search" size={16} />
+		<h3>Smart Legal AI Search</h3>
+	</div>
+
+	<!-- Mode selector -->
+	<div class="search-config">
+		<label class="mode-label" for="search-context">Context:</label>
+		<select id="search-context" bind:value={selectedMode} class="mode-select">
+			<option value="legal">Legal</option>
+			<option value="technical">Technical</option>
+			<option value="general">General</option>
+		</select>
+	</div>
+
+	<!-- Search input -->
+	<div class="search-input-row">
+		<input
+			type="text"
+			bind:value={query}
+			placeholder="Search legal concepts, cases, evidence..."
+			class="search-input"
+			onkeydown={handleKeydown}
+			disabled={isSearching}
+		/>
+		<Button
+			size="sm"
+			onclick={performSearch}
+			disabled={isSearching || !query.trim()}
+		>
+			{isSearching ? 'Searching...' : 'Search'}
+		</Button>
+	</div>
+
+	<!-- Search history -->
+	{#if searchHistory.length > 0}
+		<div class="search-history">
+			{#each searchHistory.slice(0, 5) as item}
+				<button class="history-chip" onclick={() => selectHistoryItem(item)}>
+					{item.length > 30 ? item.slice(0, 30) + '...' : item}
+				</button>
+			{/each}
+		</div>
+	{/if}
+
+	<!-- Error -->
+	{#if searchError}
+		<p class="search-error">{searchError}</p>
+	{/if}
+
+	<!-- Results -->
+	{#if results.length > 0}
+		<div class="search-results">
+			<div class="results-header">
+				<span>{results.length} results found</span>
+			</div>
+			{#each results as result, i}
+				<div class="result-item">
+					<div class="result-meta">
+						<span class="result-rank">#{i + 1}</span>
+						{#if result.metadata?.source}
+							<span class="result-source">{result.metadata.source}</span>
+						{/if}
+						<span class="result-score">
+							{(result.score * 100).toFixed(1)}%
+						</span>
+					</div>
+					<p class="result-text">
+						{result.text.length > 300 ? result.text.slice(0, 300) + '...' : result.text}
+					</p>
+				</div>
+			{/each}
+		</div>
+	{:else if !isSearching && query.trim() && !searchError}
+		<p class="no-results">No results found. Try a different query.</p>
+	{/if}
+</div>
+
+<style>
+	.smart-search {
+		padding: 1rem;
+		border: 1px solid var(--color-sand-dark, #44403c);
+		border-radius: 0.5rem;
+		background: var(--color-panel-soft, #1c1917);
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+	.search-header {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	.search-header h3 {
+		font-size: 0.9375rem;
+		font-weight: 600;
+		margin: 0;
+	}
+	.search-config {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	.mode-label {
+		font-size: 0.8125rem;
+		opacity: 0.7;
+	}
+	.mode-select {
+		padding: 0.25rem 0.5rem;
+		border: 1px solid var(--color-sand-dark, #44403c);
+		border-radius: 0.25rem;
+		background: var(--color-panel, #0c0a09);
+		color: inherit;
+		font-size: 0.8125rem;
+	}
+	.search-input-row {
+		display: flex;
+		gap: 0.5rem;
+	}
+	.search-input {
+		flex: 1;
+		padding: 0.5rem 0.75rem;
+		border: 1px solid var(--color-sand-dark, #44403c);
+		border-radius: 0.375rem;
+		background: var(--color-panel, #0c0a09);
+		color: inherit;
+		font-size: 0.875rem;
+	}
+	.search-input:focus {
+		outline: none;
+		border-color: var(--color-accent, #a51c30);
+	}
+	.search-history {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+	}
+	.history-chip {
+		padding: 0.125rem 0.5rem;
+		border: 1px solid var(--color-sand-dark, #44403c);
+		border-radius: 1rem;
+		background: transparent;
+		color: inherit;
+		font-size: 0.75rem;
+		cursor: pointer;
+		opacity: 0.6;
+		transition: opacity 0.15s;
+	}
+	.history-chip:hover {
+		opacity: 1;
+	}
+	.search-error {
+		font-size: 0.8125rem;
+		color: var(--color-danger, #ef4444);
+		margin: 0;
+	}
+	.no-results {
+		font-size: 0.8125rem;
+		opacity: 0.5;
+		margin: 0;
+	}
+	.search-results {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+	.results-header {
+		font-size: 0.75rem;
+		opacity: 0.6;
+	}
+	.result-item {
+		padding: 0.5rem;
+		border-radius: 0.375rem;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.04);
+	}
+	.result-meta {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 0.25rem;
+	}
+	.result-rank {
+		font-size: 0.6875rem;
+		font-weight: 600;
+		opacity: 0.5;
+	}
+	.result-source {
+		font-size: 0.6875rem;
+		padding: 0.0625rem 0.375rem;
+		border-radius: 0.25rem;
+		background: rgba(59, 130, 246, 0.1);
+		color: var(--color-info, #3b82f6);
+	}
+	.result-score {
+		margin-left: auto;
+		font-size: 0.6875rem;
+		font-weight: 500;
+		color: var(--color-accent, #22c55e);
+	}
+	.result-text {
+		font-size: 0.8125rem;
+		line-height: 1.5;
+		margin: 0;
+		opacity: 0.9;
+	}
 </style>
-
-
-

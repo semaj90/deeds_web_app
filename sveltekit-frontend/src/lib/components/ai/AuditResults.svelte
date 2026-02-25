@@ -1,20 +1,170 @@
-<!-- Phase 10: Audit Results UI, Scaffold (Context7) This Svelte component displays semantic audit results and TODOs from the backend. TODO: After initial test, wire up real Context7 audit API, agent triggers, and live updates. --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
- import type { SemanticAuditResult } from '$lib/ai/types';
-   let auditResults: SemanticAuditResult[] = $state([]);
-   let loading = $state<boolean>(true);
-   let isLoading = $state<boolean>(false);
-   let error: string | null = null; // Fetch audit results from backend async function fetchAuditResults(): Promise<Response> { loading = true; error = null; try { const res = await fetch('/api/audit/semantic', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-query: 'Context7 pipeline audit' }) }); if (!res.ok) throw new Error('Failed to fetch audit results');
-   const data = await res.json(); auditResults = (data as { results?: any }).results || []} catch (e: any) { error = (e instanceof Error ? e.message: String(e)) || 'Unknown error'} finally { loading = false}
-  } $effect(fetchAuditResults); // TODO: Add actions to trigger agent fixes, mark TODOs as resolved, and live update from backend </script> <div class="space-y-6"> <h2 class="text-xl">Pipeline Audit Results</h2> {#if loading} <div>Loading audit results...</div> {:else if error} <div class="text-danger">{ error }</div> {:else if auditResults.length === 0} <div>No audit results found.</div> {:else} <ul class="space-y-2"> {#each Array.isArray(auditResults) ? auditResults: [] as result} <li class="border rounded p-3 flex flex-col"> <div class="font-semibold"> {( result as { step?: any; message?: any; suggestedFix?: any; status?: any; agentTriggered?: any}
-            ).step} </div> <div class="text-sm"> {( result as { step?: any; message?: any; suggestedFix?: any; status?: any; agentTriggered?: any}
-            ).message} </div> {#if (result as { step?: any; message?: any; suggestedFix?: any; status?: any; agentTriggered?: any }).suggestedFix} <div class="text-warning"> Suggested fix: {( result as { step?: any; message?: any; suggestedFix?: any; status?: any; agentTriggered?: any}
-              ).suggestedFix} {/if} <div class="flex gap-2"> <span class="text-xs px-2 py-1 rounded"
-              >{( result as { step?: any; message?: any; suggestedFix?: any; status?: any; agentTriggered?: any}
-              ).status}</span >
-            {#if (result as { step?: any; message?: any; suggestedFix?: any; status?: any; agentTriggered?: any }).agentTriggered} <span class="text-xs px-2 py-1 rounded">Agent triggered</span> {/if} <!-- TODO: Add button to trigger agent action for, this, TODO --> </div> </li> {/each} </ul> {/if} </div> <!-- #context7 #Phase10 #todo: Wire up agent trigger, improve UI, connect to real backend, after, test --> <!-- TODO: After initial test, wire up agent action buttons, live updates, and best, practice, docs. --> <style> /* Uses Yorha/Phase10/Context7 design system classes */ </style>
+<script lang="ts">
+	import Icon from '$lib/components/ui/Icon.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
 
+	interface ErrorSummary {
+		file_path: string;
+		error_count: number;
+		latest_error?: string;
+	}
 
+	let results = $state<ErrorSummary[]>([]);
+	let loading = $state(true);
+	let error = $state<string | null>(null);
 
+	$effect(() => {
+		fetchResults();
+	});
 
+	async function fetchResults() {
+		loading = true;
+		error = null;
+		try {
+			const res = await fetch('/api/errors/summary', {
+				signal: AbortSignal.timeout(5000)
+			});
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			const data = await res.json();
+			results = data.errors ?? data ?? [];
+		} catch (e) {
+			error = e instanceof Error ? e.message : 'Failed to load audit results';
+			results = [];
+		} finally {
+			loading = false;
+		}
+	}
+
+	let totalErrors = $derived(results.reduce((sum, r) => sum + r.error_count, 0));
+</script>
+
+<div class="audit-results">
+	<div class="audit-header">
+		<Icon name="alert-triangle" size={16} />
+		<h3>Pipeline Audit Results</h3>
+		<Button variant="ghost" size="sm" onclick={fetchResults} disabled={loading}>
+			{loading ? 'Loading...' : 'Refresh'}
+		</Button>
+	</div>
+
+	{#if loading}
+		<p class="audit-status">Loading audit results...</p>
+	{:else if error}
+		<p class="audit-error">{error}</p>
+	{:else if results.length === 0}
+		<div class="audit-empty">
+			<Icon name="check-circle" size={20} />
+			<span>No errors found</span>
+		</div>
+	{:else}
+		<div class="audit-summary">
+			<span class="error-total">{totalErrors} errors</span>
+			<span class="file-count">across {results.length} files</span>
+		</div>
+		<ul class="audit-list">
+			{#each results as item}
+				<li class="audit-item">
+					<div class="item-header">
+						<Icon name="file" size={12} />
+						<span class="file-path">{item.file_path}</span>
+						<span class="error-badge">{item.error_count}</span>
+					</div>
+					{#if item.latest_error}
+						<p class="latest-error">{item.latest_error}</p>
+					{/if}
+				</li>
+			{/each}
+		</ul>
+	{/if}
+</div>
+
+<style>
+	.audit-results {
+		padding: 0.75rem;
+		border: 1px solid var(--color-sand-dark, #44403c);
+		border-radius: 0.5rem;
+		background: var(--color-panel-soft, #1c1917);
+	}
+	.audit-header {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 0.75rem;
+	}
+	.audit-header h3 {
+		flex: 1;
+		font-size: 0.875rem;
+		font-weight: 600;
+		margin: 0;
+	}
+	.audit-status,
+	.audit-error {
+		font-size: 0.8125rem;
+		margin: 0;
+	}
+	.audit-error {
+		color: var(--color-danger, #ef4444);
+	}
+	.audit-empty {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.8125rem;
+		opacity: 0.6;
+	}
+	.audit-summary {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 0.5rem;
+		font-size: 0.75rem;
+	}
+	.error-total {
+		font-weight: 600;
+		color: var(--color-danger, #ef4444);
+	}
+	.file-count {
+		opacity: 0.6;
+	}
+	.audit-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
+	}
+	.audit-item {
+		padding: 0.5rem;
+		border-radius: 0.25rem;
+		background: rgba(255, 255, 255, 0.03);
+	}
+	.item-header {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		font-size: 0.8125rem;
+	}
+	.file-path {
+		flex: 1;
+		font-family: monospace;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.error-badge {
+		font-size: 0.6875rem;
+		font-weight: 600;
+		padding: 0.125rem 0.375rem;
+		border-radius: 0.25rem;
+		background: rgba(239, 68, 68, 0.15);
+		color: var(--color-danger, #ef4444);
+	}
+	.latest-error {
+		font-size: 0.75rem;
+		opacity: 0.6;
+		margin: 0.25rem 0 0 1.25rem;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+</style>

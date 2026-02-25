@@ -1,5 +1,4 @@
 import { createClient, type RedisClientType } from 'redis';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { ENV } from '$lib/server/env.server.js';
 
 const REDIS_URL = ENV.REDIS_URL;

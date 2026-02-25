@@ -7,7 +7,6 @@ import Redis from 'ioredis';
 import Loki, { type Collection } from 'lokijs';
 import neo4j, { type Driver } from 'neo4j-driver';
 import { Pool } from 'pg';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 type FuseOptionKey<T> = (keyof T & string) | { name: (keyof T & string) | string; weight?: number };
 

@@ -1,6 +1,5 @@
 import { env } from '$lib/env';
 import { Client } from 'minio';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface MinioS3ClientConfig {
   endPoint: string;

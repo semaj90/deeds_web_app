@@ -1,6 +1,5 @@
 import type { PageServerLoad } from './$types';
 import { getQdrantUrl } from '$lib/config/env.server.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface FileProfile { file_path: string, role: string;
     surface: string[];

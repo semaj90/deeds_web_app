@@ -8,7 +8,6 @@
 import IORedis from 'ioredis';
 import { getRedisUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const REDIS_URL = getRedisUrl();
 

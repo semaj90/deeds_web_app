@@ -5,7 +5,6 @@
 
 import { appendFile, mkdir, readFile } from 'fs/promises';
 import * as path from 'path';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface LogEntry {
 	id: string;

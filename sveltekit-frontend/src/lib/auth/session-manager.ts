@@ -1,7 +1,6 @@
 // Enhanced Session Management with Redis Integration
 // Handles secure session storage, management, and cleanup
 import { UserRole } from './roles.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface SessionData {
 	id: string;

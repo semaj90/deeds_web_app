@@ -1,6 +1,5 @@
 import { ollamaService } from '$lib/services/providers/ollama/ollama-client';
 import { legalBertONNXService } from './legal-bert-onnx-service.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * ONNX Integration Example for Legal-BERT

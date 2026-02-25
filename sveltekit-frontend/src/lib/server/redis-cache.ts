@@ -4,7 +4,6 @@
 
 import crypto from 'crypto';
 import { redis } from '$lib/server/redis'; // Use centralized redis client
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Cache configuration
 const SEARCH_CACHE_PREFIX = 'search:pgvector:';

@@ -2,7 +2,6 @@ import { spawn } from 'child_process';
 import { promises as fs } from 'fs';
 import { tmpdir } from 'os';
 import path from 'path';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface OcrResult {
     text: string;

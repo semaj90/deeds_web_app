@@ -29,7 +29,6 @@ export async function waitForDb(retries = 8, delayMs = 500): Promise<boolean> {
 
 // UUID helper
 import { randomUUID } from 'crypto';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 export function genRandomUUID(): string {
     return randomUUID();
 }

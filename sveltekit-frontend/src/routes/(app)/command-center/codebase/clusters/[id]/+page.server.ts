@@ -1,6 +1,5 @@
 import type { PageServerLoad } from './$types';
 import { getQdrantUrl } from '$lib/config/env.server.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface ClusterCard { id: string, name: string;
     cluster_id: string;

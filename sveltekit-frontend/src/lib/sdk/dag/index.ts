@@ -9,7 +9,6 @@
  */
 
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================================================
 // TYPES

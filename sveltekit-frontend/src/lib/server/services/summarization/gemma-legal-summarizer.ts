@@ -5,7 +5,6 @@
  */
 
 import { getOllamaUrl, generateText } from '$lib/server/config/ollama';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface LegalSummary {
 	issue: string;

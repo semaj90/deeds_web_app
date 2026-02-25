@@ -7,7 +7,6 @@ export type { RedisClient };
 // Define connection options interface locally or import if available,
 // assuming standard ioredis options
 import type { RedisOptions } from 'ioredis';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 export type RedisConnectionOptions = RedisOptions;
 
 // Env vars

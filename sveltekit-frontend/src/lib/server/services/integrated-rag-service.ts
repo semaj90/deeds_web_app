@@ -13,7 +13,6 @@ import { createClient } from 'redis';
 import * as Minio from 'minio';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import type { SearchResult } from '$lib/types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Environment Configuration
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';

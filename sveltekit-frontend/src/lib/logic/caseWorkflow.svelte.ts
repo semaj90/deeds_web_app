@@ -1,5 +1,4 @@
 import { createActor, setup } from 'xstate';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // 1. Define the State Machine
 const machine = setup({

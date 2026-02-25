@@ -13,7 +13,6 @@
 import { env } from '$lib/env';
 import db from '$lib/server/db';
 import { sql } from 'drizzle-orm';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Types
 export interface ErrorPattern {

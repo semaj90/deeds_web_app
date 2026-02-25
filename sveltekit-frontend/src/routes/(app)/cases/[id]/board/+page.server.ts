@@ -2,7 +2,6 @@ import { db } from '$lib/server/db';
 import { canvasStates } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export const load: PageServerLoad = async ({ params }) => {
     const { id } = params; // Changed from caseId to id to match [id] route

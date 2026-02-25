@@ -1,5 +1,4 @@
 import { createEmbedding } from './ollama-client.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Extract text from a buffer based on mime type

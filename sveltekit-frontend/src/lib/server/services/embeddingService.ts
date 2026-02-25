@@ -1,6 +1,5 @@
 import axios from "axios";
 import { getOptimalModel } from '../ai/ollama-config.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // This function calls your local Ollama server to get an embedding
 export async function getEmbedding(text: string): Promise<number[]> {

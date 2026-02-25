@@ -5,7 +5,6 @@
 
 import { sql } from 'drizzle-orm';
 import { index, integer, jsonb, pgTable, real, text, timestamp, uuid, vector } from 'drizzle-orm/pg-core';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * ace_sources: Tracks discovered URLs from web search

@@ -4,7 +4,6 @@ import type { ensureRedisReady } from '$lib/server/redis-client';
  * Tracks cache performance for optimization insights
  */
 import { createClient, type RedisClientType } from 'redis';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface CacheMetrics {
 	hits: number;

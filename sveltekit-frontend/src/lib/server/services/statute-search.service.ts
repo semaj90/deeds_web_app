@@ -7,7 +7,6 @@ import db from '$lib/server/db';
 import { redis } from '$lib/server/redis';
 import { ragService } from './rag.service.js';
 import { graphService } from './graph.service.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface Statute {
 	id: string;

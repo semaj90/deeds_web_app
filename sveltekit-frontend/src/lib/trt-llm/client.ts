@@ -1,5 +1,4 @@
 import { env } from '$env/dynamic/public';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface TRTLLMRequest {
  prompt: string;

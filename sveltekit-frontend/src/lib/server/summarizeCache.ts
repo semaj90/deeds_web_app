@@ -1,7 +1,6 @@
 import { redis } from '$lib/server/redis';
 import crypto from 'crypto';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Centralized cache utilities for summarize endpoint (memory + optional Redis)
 // Provides LRU + TTL eviction and write-through to Redis if available.

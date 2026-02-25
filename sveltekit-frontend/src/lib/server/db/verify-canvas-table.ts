@@ -1,6 +1,5 @@
 import { db } from '$lib/server/db';
 import { sql } from 'drizzle-orm';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Cache the check result for 60 seconds to avoid repeated DB hits
 let canvasStatesExists: boolean | null = null;

@@ -21,7 +21,6 @@ import {
     type KnowledgeDocument
 } from './postgres-knowledge.js';
 import { sql } from 'drizzle-orm';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Qdrant Configuration
 const QDRANT_URL = CONFIG?.QDRANT_URL ?? 'http://localhost:6333';

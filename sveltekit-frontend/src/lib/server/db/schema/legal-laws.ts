@@ -1,6 +1,5 @@
 import { relations } from 'drizzle-orm';
 import { jsonb, pgTable, text, timestamp, uuid, vector } from 'drizzle-orm/pg-core';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Laws table: stores statute/code metadata

@@ -7,7 +7,6 @@ import { cacheEmbedding, getCachedEmbedding } from './cache/redis.js';
 import { gpuCoordinator } from './gpu-thread-coordinator.js';
 import { threadSafePostgres } from './thread-safe-postgres.js';
 import { optimizedCache } from './webgpu-redis-optimizer.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface EmbeddingCacheConfig {
     redisUrl?: string;

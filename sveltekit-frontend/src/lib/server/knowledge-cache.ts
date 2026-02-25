@@ -4,7 +4,6 @@
 import type { QdrantSearchResult } from '$lib/types/qdrant';
 import crypto from 'crypto';
 import Redis from 'ioredis';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { ENV } from '$lib/server/env.server.js';
 
 // Redis connection

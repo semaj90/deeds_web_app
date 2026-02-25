@@ -1,7 +1,6 @@
 import { userEmbeddings } from '$lib/server/database/vector-schema-simple';
 import { eq, desc } from 'drizzle-orm';
 import { db } from '../db/index.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface EmbeddingOptions {
 	contentType?: string;

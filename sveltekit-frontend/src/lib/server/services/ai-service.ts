@@ -5,7 +5,6 @@ import type { NewUserAiQuery, NewAutoTag, NewDocumentChunk } from '../db/schema-
 import { generateIdFromEntropySize } from 'lucia';
 import crypto from 'crypto';
 import { db } from '../database/index.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 /**
  * Add a minimal local type for the Ollama client shape we expect

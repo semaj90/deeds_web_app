@@ -3,7 +3,6 @@ import { evidence } from '$lib/server/db/schema-postgres';
 import { db } from '$lib/server/db/client.js';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const FASTAPI_BASE_URL = env?.FASTAPI_BASE_URL ?? 'http://localhost:8005';
 

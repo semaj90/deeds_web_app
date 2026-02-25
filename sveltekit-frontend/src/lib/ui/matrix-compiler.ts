@@ -1,7 +1,6 @@
 // JSON UI Compiler with Matrix Transforms
 // Builds on UnoCSS + Svelte 5 for GPU-accelerated layouts
 import { mat4, vec4 } from 'gl-matrix';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface MatrixUINode {

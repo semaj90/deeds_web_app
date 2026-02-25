@@ -18,7 +18,6 @@
  */
 
 import { vi } from 'vitest';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ═══════════════════════════════════════════════════════════════════════
 // Types

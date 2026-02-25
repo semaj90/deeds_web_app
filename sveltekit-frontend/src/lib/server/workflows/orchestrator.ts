@@ -4,7 +4,6 @@ import { documentProcessingMachine, type DocumentProcessingContext } from './doc
 import { legalCaseManagementMachine, type LegalCaseContext } from './legal-case-management.js';
 import type { WorkflowActor } from './shared-types.js';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Types for workflow orchestration
 export interface WorkflowInstance {

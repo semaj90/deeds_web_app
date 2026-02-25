@@ -5,7 +5,6 @@
 
 import { dev } from '$app/environment';
 import type { HandleClientError } from '@sveltejs/kit';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 /**

@@ -3,7 +3,6 @@
  * Smooth transitions between gaming themes with easing and effects
  */
 import { CONSOLE_PALETTES, type ConsolePaletteName } from './retro-console-palettes.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface AnimationOptions {

@@ -1,5 +1,4 @@
 import { formatErrorResponse } from './errors.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Redis client type - using any to avoid import issues with redis package
 let _redis: any | null = null;

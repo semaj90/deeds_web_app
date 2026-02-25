@@ -1,6 +1,5 @@
 import { Project, SourceFile, SyntaxKind, Node, TypeChecker } from 'ts-morph';
 import { getOllamaEndpoint } from '$lib/utils/ollama-endpoints';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ASTNode {
     id: string;

@@ -4,7 +4,6 @@
  */
 
 import { fetchWithStreaming, type StreamingOptions } from './streaming-handler.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface SearchQuery {
  query: string;

@@ -3,7 +3,6 @@
  */
 import type { IQdrantVectorService, VectorSearchOptions, VectorSearchResult } from '$lib/types/external-services';
 import type { Filter, PointStruct, SearchRequest, SearchResponse, UpsertPoints } from '$lib/types/qdrant';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 interface QdrantConfig {
     url?: string;

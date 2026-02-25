@@ -6,7 +6,6 @@ import { caseScores } from '../db/schema.js';
 import type { CaseScoringRequest, CaseScoringResult, ScoringCriteria, } from '../../../lib/types/scoring.js';
 import { ollamaService } from '../ai/ollama-adapter.js';
 import { cognitiveCache } from '../ai/cache.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Logger implementation
 const logger = {

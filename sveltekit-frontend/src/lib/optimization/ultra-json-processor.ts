@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface JSONOptimizationConfig {
     compressionLevel: 1 | 2 | 3 | 4 | 5;

@@ -3,7 +3,6 @@
 
 import { sql } from 'drizzle-orm';
 import { boolean, index, integer, jsonb, pgTable, real, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Table 1: Auto-Approval Rules (Task 3.2)
 export const autoApprovalRules = pgTable('auto_approval_rules', {

@@ -9,7 +9,6 @@
 
 import { pgTable, text, integer, timestamp, jsonb, boolean, doublePrecision, uuid, serial, varchar } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // ============================================================
 // Knowledge Graph Tables

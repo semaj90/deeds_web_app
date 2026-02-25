@@ -5,7 +5,6 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export interface ProcessedDocument {
 	id: string;

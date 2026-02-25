@@ -1,5 +1,4 @@
 import { vector } from "neo4j-driver";
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Define types locally since they are not exported from external-services
 type QdrantVectorPayload = {

@@ -9,7 +9,6 @@ import { Client as MinioClient } from 'minio';
 import lazyDb from './client.js';
 import * as schema from './schema.js';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 const _CFG: Record<string, any> =
   typeof globalThis !== 'undefined' && (globalThis as any)._CFG ? (globalThis as any)._CFG : {};

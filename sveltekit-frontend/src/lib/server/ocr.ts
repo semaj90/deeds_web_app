@@ -1,5 +1,4 @@
 import * as pdfParse from 'pdf-parse';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 export class OCRService {
  async extractText(file: File) {

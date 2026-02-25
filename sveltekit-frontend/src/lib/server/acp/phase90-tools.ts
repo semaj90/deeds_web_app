@@ -11,7 +11,6 @@
 
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { createClient } from 'redis';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
 
 // Redis client type
 type RedisClient = ReturnType<typeof createClient>;
