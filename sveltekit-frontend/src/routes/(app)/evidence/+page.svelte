@@ -36,6 +36,7 @@
 	import EvidenceUploadModal from '$lib/components/evidence/EvidenceUploadModal.svelte';
 	import Gemma270MWebAssembly from '$lib/components/ai/Gemma270MWebAssembly.svelte';
 	import VisionImageAnalyzer from '$lib/components/evidence/VisionImageAnalyzer.svelte';
+	import ChainOfCustodyTracker from '$lib/components/legal/ChainOfCustodyTracker.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	let uploadCard = $state<UploadProgressCard | undefined>(undefined);
@@ -96,6 +97,7 @@
 	let showVlmAnalyzer = $state(false);
 	let showSceneViewer = $state(false);
 	let showVisionPipeline = $state(false);
+	let showCustodyTracker = $state(false);
 	let sampleScene = $state<{
 		id: string; title: string; markdown: string; confidence: number;
 		sourceFiles: string[]; aiGenerated: boolean; validated: boolean;
@@ -879,6 +881,34 @@
 					originalHash={''}
 					onWorkflowComplete={() => { showCustodyFlow = false; window.location.reload(); }}
 					onWorkflowError={(err) => { uploadError = `Custody error: ${err}`; }}
+				/>
+			</div>
+		{/if}
+		<!-- Chain of Custody Tracker -->
+		<div class="mt-6">
+			<button
+				onclick={() => (showCustodyTracker = !showCustodyTracker)}
+				class="ev-map-toggle"
+			>
+				{showCustodyTracker ? 'Hide Custody Tracker' : 'Chain of Custody Tracker'}
+			</button>
+		</div>
+		{#if showCustodyTracker}
+			<div class="mt-4">
+				<ChainOfCustodyTracker
+					evidence={{
+						id: filteredEvidence[0]?.id ?? '',
+						itemNumber: filteredEvidence[0]?.id?.slice(0, 8) ?? 'N/A',
+						description: filteredEvidence[0]?.title ?? 'No evidence selected',
+						category: 'document',
+						collectedBy: data.user?.username ?? 'Unknown',
+						currentCustodian: data.user?.username ?? 'Unknown',
+						location: 'Evidence Locker',
+						condition: 'good',
+						sealed: true,
+						chainOfCustody: [],
+						compromised: false
+					}}
 				/>
 			</div>
 		{/if}

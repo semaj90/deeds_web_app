@@ -28,6 +28,7 @@
   import RAGPipelineChart from '$lib/components/ai/RAGPipelineChart.svelte';
   import ACEContextBubble from '$lib/components/ai/ACEContextBubble.svelte';
   import RecommendationEngine from '$lib/components/ai/RecommendationEngine.svelte';
+  import RAGAssistantChat from '$lib/components/ai/RAGAssistantChat.svelte';
   import type { AnswerWithCitations as AnswerData } from '$lib/types/rag-source-validation';
 
   interface AIStats {
@@ -86,6 +87,7 @@
   let showPipelineChart = $state(false);
   let showACEBubble = $state(false);
   let showRecommendations = $state(false);
+  let showCaseWorkflow = $state(false);
   let ragQuery = $state('');
   let ragChunks = $state<any[]>([]);
   let ragAnswer = $state<AnswerData | null>(null);
@@ -716,6 +718,21 @@
       {#if showRecommendations}
         <div class="mt-3">
           <RecommendationEngine contextQuery="Generate legal case strategy recommendations" />
+        </div>
+      {/if}
+    </div>
+
+    <!-- 24. Case Intake Workflow -->
+    <div>
+      <button
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/10 rounded-lg hover:border-accent/30 transition text-sm font-medium text-sand/80"
+        onclick={() => (showCaseWorkflow = !showCaseWorkflow)}
+      >
+        {showCaseWorkflow ? 'Hide Case Workflow' : 'RAG Case Intake Workflow (WHO/WHAT/WHEN/WHERE/WHY/HOW)'}
+      </button>
+      {#if showCaseWorkflow}
+        <div class="mt-3">
+          <RAGAssistantChat onCaseCreated={(id) => console.log('[Case Created]', id)} />
         </div>
       {/if}
     </div>
