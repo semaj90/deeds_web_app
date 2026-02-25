@@ -29,6 +29,9 @@
   import ACEContextBubble from '$lib/components/ai/ACEContextBubble.svelte';
   import RecommendationEngine from '$lib/components/ai/RecommendationEngine.svelte';
   import RAGAssistantChat from '$lib/components/ai/RAGAssistantChat.svelte';
+  import SmartSearchInterface from '$lib/components/ai/SmartSearchInterface.svelte';
+  import QLoRAMonitoringDashboard from '$lib/components/ai/QLoRAMonitoringDashboard.svelte';
+  import AuditResults from '$lib/components/ai/AuditResults.svelte';
   import type { AnswerWithCitations as AnswerData } from '$lib/types/rag-source-validation';
 
   interface AIStats {
@@ -88,6 +91,9 @@
   let showACEBubble = $state(false);
   let showRecommendations = $state(false);
   let showCaseWorkflow = $state(false);
+  let showSmartSearch = $state(false);
+  let showQLoRA = $state(false);
+  let showAuditResults = $state(false);
   let ragQuery = $state('');
   let ragChunks = $state<any[]>([]);
   let ragAnswer = $state<AnswerData | null>(null);
@@ -733,6 +739,51 @@
       {#if showCaseWorkflow}
         <div class="mt-3">
           <RAGAssistantChat onCaseCreated={(id) => console.log('[Case Created]', id)} />
+        </div>
+      {/if}
+    </div>
+
+    <!-- 25. Smart Search Interface -->
+    <div>
+      <button
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/10 rounded-lg hover:border-accent/30 transition text-sm font-medium text-sand/80"
+        onclick={() => (showSmartSearch = !showSmartSearch)}
+      >
+        {showSmartSearch ? 'Hide Smart Search' : 'Smart Legal AI Search (RAG Context Modes)'}
+      </button>
+      {#if showSmartSearch}
+        <div class="mt-3">
+          <SmartSearchInterface contextMode="legal" maxResults={10} />
+        </div>
+      {/if}
+    </div>
+
+    <!-- 26. QLoRA Training Monitor -->
+    <div>
+      <button
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/10 rounded-lg hover:border-accent/30 transition text-sm font-medium text-sand/80"
+        onclick={() => (showQLoRA = !showQLoRA)}
+      >
+        {showQLoRA ? 'Hide QLoRA Monitor' : 'QLoRA Training Monitor (GPU + Epoch Tracking)'}
+      </button>
+      {#if showQLoRA}
+        <div class="mt-3">
+          <QLoRAMonitoringDashboard />
+        </div>
+      {/if}
+    </div>
+
+    <!-- 27. Pipeline Audit Results -->
+    <div>
+      <button
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/10 rounded-lg hover:border-accent/30 transition text-sm font-medium text-sand/80"
+        onclick={() => (showAuditResults = !showAuditResults)}
+      >
+        {showAuditResults ? 'Hide Audit Results' : 'Pipeline Audit Results (Error Summary by File)'}
+      </button>
+      {#if showAuditResults}
+        <div class="mt-3">
+          <AuditResults />
         </div>
       {/if}
     </div>
