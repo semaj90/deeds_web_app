@@ -20,6 +20,7 @@
   import CollectionDetail from '$lib/components/legal-ai/CollectionDetail.svelte';
   import CitationLibraryPage from '$lib/components/legal-ai/CitationLibraryPage.svelte';
   import LinkMetadataForm from '$lib/components/legal-ai/LinkMetadataForm.svelte';
+  import LegalPrecedentCard from '$lib/components/legal/LegalPrecedentCard.svelte';
 
   let viewMode = $state<'list' | 'manager'>('list');
   let showGpuSearch = $state(false);
@@ -303,38 +304,45 @@
           {#if kbResults.precedents.length > 0}
             <div>
               <h4 class="text-xs font-semibold text-sand/60 uppercase tracking-wider mb-2">Precedents ({kbResults.precedents.length})</h4>
-              <div class="space-y-2">
+              <div class="space-y-3">
                 {#each kbResults.precedents as prec (prec.id ?? prec.title)}
-                  <div
-                    class="p-3 bg-black/20 rounded border border-sand/10 cursor-pointer hover:border-accent/30 transition"
-                    onclick={() => {
+                  {@const precedentData = {
+                    id: prec.id ?? crypto.randomUUID(),
+                    caseNumber: prec.citation ?? '',
+                    caseName: prec.title ?? 'Unknown',
+                    court: prec.court ?? '',
+                    jurisdiction: (prec.jurisdiction === 'federal' || prec.jurisdiction === 'state' || prec.jurisdiction === 'local' || prec.jurisdiction === 'international') ? prec.jurisdiction : 'federal',
+                    date: prec.decisionDate ? new Date(prec.decisionDate) : new Date(),
+                    judge: prec.judge ?? '',
+                    summary: prec.summary ?? '',
+                    keyIssues: prec.keyIssues ?? [],
+                    holding: prec.holding ?? '',
+                    reasoning: prec.reasoning ?? [],
+                    legalAreas: prec.legalAreas ?? [],
+                    citations: prec.citationCount ?? 0,
+                    relevanceScore: Math.round((prec.similarity ?? 0) * 100),
+                    precedentType: 'persuasive' as const
+                  }}
+                  <LegalPrecedentCard
+                    precedent={precedentData}
+                    showRelevanceScore={true}
+                    expandable={true}
+                    interactive={true}
+                    onViewFull={(p) => {
                       selectedCitation = {
-                        id: prec.id,
-                        statute_code: prec.citation ?? prec.title,
-                        statute_title: prec.title,
-                        jurisdiction: prec.court ?? '',
+                        id: p.id,
+                        statute_code: p.caseNumber || p.caseName,
+                        statute_title: p.caseName,
+                        jurisdiction: p.court,
                         severity: 'case_law',
                         source_type: 'auto_extracted' as const,
-                        highlighted_text: prec.summary ?? '',
+                        highlighted_text: p.summary,
                         notes: '',
-                        created_at: prec.decisionDate ?? new Date().toISOString(),
+                        created_at: p.date.toISOString(),
                         updated_at: new Date().toISOString(),
                       };
                     }}
-                  >
-                    <div class="flex items-baseline gap-2">
-                      <span class="font-medium text-sand text-sm">{prec.title}</span>
-                      <span class="text-[10px] text-sand/30 ml-auto">{Math.round((prec.similarity ?? 0) * 100)}%</span>
-                    </div>
-                    <div class="flex gap-2 text-[10px] text-sand/40 mt-0.5">
-                      {#if prec.court}<span>{prec.court}</span>{/if}
-                      {#if prec.citation}<span class="font-mono">{prec.citation}</span>{/if}
-                      {#if prec.decisionDate}<span>{prec.decisionDate}</span>{/if}
-                    </div>
-                    {#if prec.summary}
-                      <p class="text-xs text-sand/70 mt-1 line-clamp-2">{prec.summary}</p>
-                    {/if}
-                  </div>
+                  />
                 {/each}
               </div>
             </div>

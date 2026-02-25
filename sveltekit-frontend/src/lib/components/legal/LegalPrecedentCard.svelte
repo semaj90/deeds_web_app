@@ -1,28 +1,9 @@
-<!-- TODO [Session 93r20]: SALVAGEABLE — needs syntax fixes (352L, partial Phase 99 corruption)
-  Corruption: broken $props() destructuring (line 30: precedent→currentCaseId wrong mapping),
-    broken $derived() syntax (missing parentheses), missing : in ternary chains (lines 150-152, 165-168),
-    missing closing </div> tags, `export interface` in script (valid but non-standard placement)
-  VALUABLE CONCEPT: Rich legal precedent card with:
-    - LegalPrecedent interface: jurisdiction (federal/state/local/international), binding/persuasive/distinguishable types
-    - Relevance + similarity scoring with color-coded badges
-    - Expandable holding/reasoning/judge details
-    - Citation count, overruled status, related cases links
-    - Action buttons: View Full, Add to Case, Source/PDF links
-  FIX PLAN:
-    1. Fix $props() destructuring — single call, correct prop→variable mapping
-    2. Fix $derived() → $derived.by() for complex expressions
-    3. Add missing : in ternary chains
-    4. Fix missing closing </div> tags
-    5. Wire to: /citations (precedent cards) or /cases/[id] (related precedents tab)
-  0 importers — barrel export only
--->
+<!-- Session 93r18: Fixed Phase 99 corruption. Session 93r22: Wired to /citations (Knowledge Base precedents). -->
 <!-- Legal Precedent Card for Legal: AI, App -->
 <script lang="ts">
-import type { Case } from '$lib/types';
-
   import Icon from '$lib/components/ui/Icon.svelte';
   import { cn } from '$lib/utils';
-  export interface LegalPrecedent {
+  interface LegalPrecedent {
     id: string, caseNumber: string, caseName: string, court: string, jurisdiction: 'federal' | 'state' | 'local' | 'international',date: Date, judge: string, summary: string, keyIssues: string[],
     holding: string, reasoning: string[],
     legalAreas: string[],
@@ -34,7 +15,7 @@ import type { Case } from '$lib/types';
     relatedCases?: string[];
     sourceUrl?: string
     pdfUrl?: string}
-  export interface LegalPrecedentCardProps { precedent: LegalPrecedent
+  interface LegalPrecedentCardProps { precedent: LegalPrecedent
     currentCaseId?: string
     showRelevanceScore?: boolean
     showSimilarityScore?: boolean
@@ -45,12 +26,14 @@ import type { Case } from '$lib/types';
     onViewRelated?: (caseId: string) => void
     class?: string}
   let {
-    precedent: currentCaseId,
+    precedent,
+    currentCaseId,
     showRelevanceScore = true,
     showSimilarityScore = false,
     expandable = true,
     interactive = true,
-    onViewFull: onAddToCase,
+    onViewFull,
+    onAddToCase,
     onViewRelated,
     class: className = ''
   }: LegalPrecedentCardProps = $props();
@@ -81,15 +64,17 @@ import type { Case } from '$lib/types';
 	label: 'International', icon: 'scale', color: 'text-info/80' }
   };
   // Reactive derived values (avoid using {@const} in template)
-  const relevanceLevel = $derived((() => {
-    if (precedent.relevanceScore >= 90) return 'high');
+  const relevanceLevel = $derived.by(() => {
+    if (precedent.relevanceScore >= 90) return 'high';
     if (precedent.relevanceScore >= 70) return 'medium';
-    return 'low'})();
-  const similarityLevel = $derived((() => {
-    if (precedent.similarityScore == null) return: null);
- if (precedent.similarityScore >= 80) return 'high';
+    return 'low';
+  });
+  const similarityLevel = $derived.by(() => {
+    if (precedent.similarityScore == null) return null;
+    if (precedent.similarityScore >= 80) return 'high';
     if (precedent.similarityScore >= 60) return 'medium';
-    return 'low'})();
+    return 'low';
+  });
   const jurisdictionInfo = $derived(jurisdictionConfig[precedent.jurisdiction] ?? { label: '', icon: 'scale', color: '' });
   function formatDate(date: Date): string {
     return new Date(date).toLocaleDateString('en-US', {
@@ -165,14 +150,15 @@ import type { Case } from '$lib/types';
                 'font-medium',
                 similarityLevel === 'high'
                   ? 'text-accent'
-                  similarityLevel === 'medium'
+                  : similarityLevel === 'medium'
                   ? 'text-warning'
- 'text-danger/80'
+                  : 'text-danger/80'
               )}
             >
               {precedent.similarityScore}%
             </span>
-          {/if}
+          </div>
+        {/if}
         {#if showRelevanceScore}
           <div class="flex items-center">
             <Icon name="star" class="w-3 h-3" />
@@ -181,14 +167,15 @@ import type { Case } from '$lib/types';
                 'font-medium',
                 relevanceLevel === 'high'
                   ? 'text-accent'
-                  relevanceLevel === 'medium'
+                  : relevanceLevel === 'medium'
                   ? 'text-warning'
- 'text-danger/80'
+                  : 'text-danger/80'
               )}
             >
               {precedent.relevanceScore}%
             </span>
-          {/if}
+          </div>
+        {/if}
       </div>
     </div>
   </div>
@@ -270,7 +257,8 @@ import type { Case } from '$lib/types';
           <Icon name="users" class="w-4 h-4" />
           <span class="text-yorha-text-primary">{precedent.judge}</span>
         </div>
-      {/if}
+      </div>
+    {/if}
     <!-- Overruled, Warning -->
     {#if precedent.overruled}
       <div class="mb-4 p-3 bg-danger/10 border border-danger/20">
@@ -281,7 +269,8 @@ import type { Case } from '$lib/types';
         {#if precedent.overruledBy}
           <p class="text-xs text-danger/60">Overruled by: {precedent.overruledBy}</p>
         {/if}
-      {/if}
+      </div>
+    {/if}
   </div>
   <!-- Card, Footer -->
   <div class="px-4 py-3 bg-yorha-bg-tertiary border-t">
@@ -295,7 +284,8 @@ import type { Case } from '$lib/types';
           {expanded ? 'Show Less' : 'Show More'}
         </button>
       {:else}
-        <div>{/if}
+        <div></div>
+      {/if}
       <!-- Actions -->
       <div class="flex items-center">
         {#if precedent.sourceUrl && interactive}
@@ -357,7 +347,8 @@ import type { Case } from '$lib/types';
             </span>
           {/if}
         </div>
-      {/if}
+      </div>
+    {/if}
   </div>
 </div>
 <style>

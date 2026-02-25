@@ -11,6 +11,7 @@
 	import POIFaceMatchDialog from '$lib/components/poi/POIFaceMatchDialog.svelte';
 	import POIStats from '$lib/components/poi/POIStats.svelte';
 	import POIPhotoModal from '$lib/components/POIPhotoModal.svelte';
+	import CriminalProfile from '$lib/components/legal/CriminalProfile.svelte';
 	import type { FugitiveDexPerson } from '$lib/components/types';
 
 	let { data } = $props();
@@ -21,7 +22,7 @@
 	let associates = $state<KnownAssociate[]>([]);
 	let associatesLoading = $state(false);
 	let associatesError = $state<string | null>(null);
-	let activeTab = $state<'details' | 'associates' | 'photos' | 'search' | 'dex'>('details');
+	let activeTab = $state<'details' | 'associates' | 'photos' | 'search' | 'dex' | 'criminal'>('details');
 	let faceMatchOpen = $state(false);
 	let faceMatches = $state<any[]>([]);
 
@@ -144,6 +145,13 @@
 			>
 				Dex Profile
 			</button>
+			<button
+				class="tab-button"
+				class:active={activeTab === 'criminal'}
+				onclick={() => (activeTab = 'criminal')}
+			>
+				Criminal Record
+			</button>
 		</div>
 
 		<div class="tab-content">
@@ -261,6 +269,41 @@
 					</button>
 				</div>
 				<POIFaceMatchDialog bind:open={faceMatchOpen} matches={faceMatches} onSelect={(selected) => { window.location.href = `/persons-of-interest/${selected.id}`; }} />
+			{:else if activeTab === 'criminal'}
+				{@const criminalData = {
+					id: poi.id,
+					personalInfo: {
+						firstName: poi.name?.split(' ')[0] ?? '',
+						lastName: poi.name?.split(' ').slice(1).join(' ') ?? '',
+						dateOfBirth: poi.dateOfBirth,
+						aliases: poi.aliases ?? [],
+						gender: poi.physicalDescription?.gender,
+						height: poi.physicalDescription?.height ?? poi.physicalDescription?.heightCm ? `${poi.physicalDescription?.heightCm}cm` : undefined,
+						weight: poi.physicalDescription?.weight,
+						eyeColor: poi.physicalDescription?.eyes,
+						hairColor: poi.physicalDescription?.hair,
+						distinguishingMarks: poi.physicalDescription?.distinguishingMarks ?? []
+					},
+					identification: {
+						mugshots: (poi.photos ?? []).map((p: any) => p.url).filter(Boolean)
+					},
+					currentStatus: poi.status === 'wanted' ? 'at_large' as const
+						: poi.status === 'cleared' ? 'cleared' as const
+						: poi.status === 'surveillance' ? 'on_parole' as const
+						: undefined,
+					riskAssessment: {
+						riskLevel: poi.threatLevel === 'critical' ? 'extreme' as const
+							: poi.threatLevel === 'high' ? 'high' as const
+							: poi.threatLevel === 'medium' ? 'medium' as const
+							: 'low' as const,
+						flightRisk: poi.threatLevel === 'critical' || poi.threatLevel === 'high',
+						violentHistory: poi.profileData?.violentHistory ?? false
+					},
+					warrants: poi.profileData?.warrants ?? [],
+					criminalHistory: poi.profileData?.criminalHistory ?? [],
+					notes: poi.description
+				}}
+				<CriminalProfile profile={criminalData} viewMode="full" />
 			{:else if activeTab === 'dex'}
 				{@const dexPerson = {
 					id: poi.id,
