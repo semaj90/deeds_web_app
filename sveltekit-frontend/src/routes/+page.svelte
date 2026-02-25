@@ -227,6 +227,9 @@
  <a href="/chat" class="nav-item">
  <span class="nav-icon">🤖</span> AI ASSISTANT
  </a>
+ <a href="/demos" class="nav-item">
+ <span class="nav-icon">🎮</span> DEMOS
+ </a>
  <a href="/terminal" class="nav-item">
  <span class="nav-icon">🔧</span> TERMINAL
  </a>

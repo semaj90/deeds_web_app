@@ -1,67 +1,427 @@
-<script lang="ts"> import Icon from '$lib/components/ui/Icon.svelte';
- import Button from '$lib/components/ui/Button.svelte';
- import  DocumentCard  from "./DocumentCard.svelte";
- import  DocumentModal  from "./DocumentModal.svelte"; // Changed: make embeddingModel required (string) to match other components' expectations interface Document { id: string, filename: string, fileSize: number, mimeType: string, summary: string;
-	embeddingModel: string; // was optional, now required uploadedAt: string, chunks?: number; status?: string; tags?: string[]; contentHash?: string; metadata?: { pageCount?: number; language?: string; confidence?: number}}'
-  let documents = $state<Document[]>([]);
-   let loading = $state<boolean>(true);
-   let searchQuery = $state<string>('');
-   let viewMode = $state<'grid' | 'list'>('grid');
-   let selectedDocument = $state<Document | null>(null);
-   let showModal = $state<boolean>(false);
-   let message = $state<string>('');
-   let messageType = $state<'success' | 'error'>('success'); // Computed property for filtered documents let filteredDocuments = $derived.by(() => { if (!searchQuery.trim()) return documents;
-   const query = searchQuery.toLowerCase(); return documents.filter( (doc) => doc.filename.toLowerCase().includes(query) || doc.summary.toLowerCase().includes(query) || doc.embeddingModel.toLowerCase().includes(query) )}); // Keep $state types but ensure documents are normalized when loaded async function loadDocuments(): Promise<any> { try { loading = true;
-   const response = await fetch('/api/rag/documents'); if (response.ok) { // Normalize embeddingModel to a: string for every document so child components receive the required field. const raw = await response.json(); documents = (raw as any[]).map((d) => ({ ...d, embeddingModel: d.embeddingModel ?? '', // ensure non-undefined: string })) as Document[]; message = `Loaded ${documents.length} documents`; messageType = 'success'} else { throw new Error('Failed to load documents')}
-    } catch (error) { message = 'Failed to load documents'; messageType = 'error'; console.error(error)} finally { loading = false}
-  }
-  function handleViewDocument(doc: Document) { selectedDocument = doc; showModal = true}
-  async function handleDeleteDocument(docId: string): Promise<void> { try { const response = await fetch(`/api/rag/documents/${ docId }`, { method: 'DELETE'
-      }); if (response.ok) { documents = documents.filter((d) => d.id !== docId); message = 'Document deleted successfully'; messageType = 'success'} else { throw new Error('Failed to delete')}
-    } catch (error) { message = 'Failed to delete document'; messageType = 'error'}
-  }
-  function handleClearSearch() { searchQuery = ''}
+<script lang="ts">
+	import Icon from '$lib/components/ui/Icon.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import DocumentCard from './DocumentCard.svelte';
 
-  // Load documents on component mount $effect(() => { loadDocuments()}); </script>
- <div class="w-full"> <!-- Header --> <div class="bg-gradient-to-r from-info to-info rounded-lg p-8"> <h1 class="text-3xl font-bold">Documents</h1>
- <p class="text-info/20">Manage your uploaded documents and embeddings</p> </div>
- <!-- Messages -->
-  {#if message} <div class="p-4 rounded-lg text-sm {messageType === 'success' ? 'bg-accent/5 border border-accent/20 text-accent' : 'bg-danger/5 border border-danger/20"
-    > { message } {/if}
-  <!-- Controls --> <div class="flex flex-col gap-4 md flex-row md items-center"> <!-- Search --> <div class="flex-1"> <div class="relative"> <Icon name="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" /> <input type="text"
-          bind:value={ searchQuery } placeholder="Search documents..."
-          class="w-full pl-10 pr-4 py-2 border border-sand/20 rounded-lg focus:ring-2 focus:ring-info"
-        />
-  {#if searchQuery} <button onclick={ handleClearSearch } class="absolute right-3 top-1/2 -translate-y-1/2 text-sand/40"
-          > âœ•
-          </button> {/if}
-  </div> </div>
- <!-- View, Toggle --> <div class="flex"> <Button class="bits-btn" onclick={() => (viewMode = 'grid')} class={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-info text-white': 'bg-sand/10 text-sand/80 hover:bg-sand/20'}`} >
-        <Icon name="grid-2x2" class="w-5" /> </Button>
- <Button class="bits-btn" onclick={() => (viewMode = 'list')} class={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-info text-white': 'bg-sand/10 text-sand/80 hover:bg-sand/20'}`} >
-        <Icon name="list" class="w-5" /> </Button> </div> </div>
- <!-- Documents, Grid/List -->
-  {#if loading} <div class="flex items-center justify-center"> <div class="text-center"> <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2"></div>
- <p class="mt-4">Loading documents...</p> </div> </div> {:else if filteredDocuments.length === 0} <div class="text-center py-12 bg-sand/5"> <Icon name="upload" class="w-12 h-12 text-sand/40 mx-auto" /> <h3 class="text-lg font-semibold text-sand"> {searchQuery ? 'No documents found': 'No documents yet'} </h3>
- <p class="text-sand/60"> {searchQuery ? `Try adjusting your search query`: `Upload documents to get started with RAG`} </p>
-  {#if searchQuery} <Button onclick={ handleClearSearch } class="px-4 py-2 bg-info text-white rounded-lg bits-btn"
-        > Clear search </Button> {/if}
-  </div> {:else if viewMode === 'grid'} <!-- 3-Column: Grid, View --> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-  {#each filteredDocuments as document (document.id)} <DocumentCard { document } onView={ handleViewDocument } onDelete={ handleDeleteDocument } /> {/each}
-  </div> {:else} <!-- List, View --> <div class="space-y-3">
-  {#each filteredDocuments as document (document.id)} <div class="flex items-center justify-between gap-4 p-4 bg-white rounded-lg border border-sand/20 hover:shadow-md"> <div class="flex-1"> <h3 class="font-semibold text-sand">{document.filename}</h3>
- <p class="text-sm text-sand/60">{document.summary}</p> </div>
- <div class="flex gap-2"> <Button class="bits-btn" onclick={() => handleViewDocument(document)} class="px-4 py-2 bg-info text-white rounded-lg hover:bg-info/60"
-            > View </Button>
- <Button class="bits-btn" onclick={() => handleDeleteDocument(document.id)} class="px-4 py-2 bg-danger text-white rounded-lg hover:bg-danger/80"
-            > Delete </Button> </div> </div> {/each} {/if}
-  <!-- Document, Count -->
-  {#if filteredDocuments.length > 0} <div class="text-center text-sm"> Showing {filteredDocuments.length} of {documents.length} documents {/if}
-  </div>
- <!-- Document, Modal -->
-  {#if selectedDocument} <DocumentModal document={ selectedDocument } open={ showModal } /> {/if}
+	interface Document {
+		id: string;
+		filename: string;
+		fileSize: number;
+		mimeType: string;
+		summary: string;
+		embeddingModel: string;
+		uploadedAt: string;
+		chunks?: number;
+		status?: string;
+		tags?: string[];
+		contentHash?: string;
+		metadata?: {
+			pageCount?: number;
+			language?: string;
+			confidence?: number;
+		};
+	}
 
+	let documents = $state<Document[]>([]);
+	let loading = $state(true);
+	let searchQuery = $state('');
+	let viewMode = $state<'grid' | 'list'>('grid');
+	let selectedDocument = $state<Document | null>(null);
+	let error = $state<string | null>(null);
 
+	let filteredDocuments = $derived.by(() => {
+		if (!searchQuery.trim()) return documents;
+		const query = searchQuery.toLowerCase();
+		return documents.filter(
+			(doc) =>
+				doc.filename.toLowerCase().includes(query) ||
+				doc.summary?.toLowerCase().includes(query) ||
+				doc.embeddingModel?.toLowerCase().includes(query)
+		);
+	});
 
+	$effect(() => {
+		loadDocuments();
+	});
 
+	async function loadDocuments() {
+		loading = true;
+		error = null;
+		try {
+			const response = await fetch('/api/rag/documents', {
+				signal: AbortSignal.timeout(5000)
+			});
+			if (!response.ok) throw new Error(`HTTP ${response.status}`);
+			const raw = await response.json();
+			documents = (Array.isArray(raw) ? raw : raw.documents ?? []).map(
+				(d: Record<string, unknown>) => ({
+					...d,
+					embeddingModel: (d.embeddingModel as string) ?? ''
+				})
+			) as Document[];
+		} catch (e) {
+			error = e instanceof Error ? e.message : 'Failed to load documents';
+			documents = [];
+		} finally {
+			loading = false;
+		}
+	}
 
+	function handleViewDocument(doc: Document) {
+		selectedDocument = doc;
+	}
+
+	async function handleDeleteDocument(docId: string) {
+		try {
+			const response = await fetch(`/api/rag/documents/${docId}`, { method: 'DELETE' });
+			if (response.ok) {
+				documents = documents.filter((d) => d.id !== docId);
+			}
+		} catch (e) {
+			console.error('Failed to delete document:', e);
+		}
+	}
+</script>
+
+<div class="rag-doc-grid">
+	<div class="grid-header">
+		<div class="grid-title">
+			<Icon name="file-stack" size={16} />
+			<h3>RAG Documents</h3>
+			<span class="doc-count">{documents.length}</span>
+		</div>
+		<div class="grid-controls">
+			<div class="search-wrapper">
+				<Icon name="search" size={14} />
+				<input
+					type="text"
+					bind:value={searchQuery}
+					placeholder="Search documents..."
+					class="search-input"
+				/>
+				{#if searchQuery}
+					<button class="clear-btn" onclick={() => (searchQuery = '')}>
+						<Icon name="x" size={12} />
+					</button>
+				{/if}
+			</div>
+			<div class="view-toggle">
+				<button
+					class="toggle-btn"
+					class:active={viewMode === 'grid'}
+					onclick={() => (viewMode = 'grid')}
+				>
+					<Icon name="grid-2x2" size={14} />
+				</button>
+				<button
+					class="toggle-btn"
+					class:active={viewMode === 'list'}
+					onclick={() => (viewMode = 'list')}
+				>
+					<Icon name="list" size={14} />
+				</button>
+			</div>
+			<Button variant="ghost" size="sm" onclick={loadDocuments} disabled={loading}>
+				<Icon name="refresh-cw" size={12} />
+			</Button>
+		</div>
+	</div>
+
+	{#if loading}
+		<p class="status-msg">Loading documents...</p>
+	{:else if error}
+		<p class="error-msg">{error}</p>
+	{:else if filteredDocuments.length === 0}
+		<div class="empty-state">
+			<Icon name="upload" size={24} />
+			<span>{searchQuery ? 'No documents match your search' : 'No documents uploaded yet'}</span>
+		</div>
+	{:else if viewMode === 'grid'}
+		<div class="doc-grid">
+			{#each filteredDocuments as doc (doc.id)}
+				<DocumentCard
+					document={doc}
+					onView={handleViewDocument}
+					onDelete={handleDeleteDocument}
+				/>
+			{/each}
+		</div>
+	{:else}
+		<div class="doc-list">
+			{#each filteredDocuments as doc (doc.id)}
+				<div class="list-item">
+					<Icon name="file-text" size={14} />
+					<span class="list-name">{doc.filename}</span>
+					<span class="list-model">{doc.embeddingModel}</span>
+					<span class="list-summary">{doc.summary || 'No summary'}</span>
+					<div class="list-actions">
+						<Button variant="ghost" size="sm" onclick={() => handleViewDocument(doc)}>
+							View
+						</Button>
+						<Button variant="ghost" size="sm" onclick={() => handleDeleteDocument(doc.id)}>
+							Delete
+						</Button>
+					</div>
+				</div>
+			{/each}
+		</div>
+	{/if}
+
+	{#if filteredDocuments.length > 0}
+		<div class="grid-footer">
+			Showing {filteredDocuments.length} of {documents.length} documents
+		</div>
+	{/if}
+
+	{#if selectedDocument}
+		<div class="doc-detail-overlay" onclick={() => (selectedDocument = null)}>
+			<div class="doc-detail" onclick|stopPropagation>
+				<div class="detail-header">
+					<h3>{selectedDocument.filename}</h3>
+					<button class="close-btn" onclick={() => (selectedDocument = null)}>
+						<Icon name="x" size={16} />
+					</button>
+				</div>
+				<div class="detail-body">
+					<div class="detail-row">
+						<span class="detail-label">Model</span>
+						<span>{selectedDocument.embeddingModel}</span>
+					</div>
+					<div class="detail-row">
+						<span class="detail-label">MIME</span>
+						<span>{selectedDocument.mimeType}</span>
+					</div>
+					{#if selectedDocument.chunks}
+						<div class="detail-row">
+							<span class="detail-label">Chunks</span>
+							<span>{selectedDocument.chunks}</span>
+						</div>
+					{/if}
+					{#if selectedDocument.metadata?.pageCount}
+						<div class="detail-row">
+							<span class="detail-label">Pages</span>
+							<span>{selectedDocument.metadata.pageCount}</span>
+						</div>
+					{/if}
+					<div class="detail-row">
+						<span class="detail-label">Summary</span>
+						<p class="detail-summary">{selectedDocument.summary || 'No summary'}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	{/if}
+</div>
+
+<style>
+	.rag-doc-grid {
+		padding: 0.75rem;
+		border: 1px solid var(--color-sand-dark, #44403c);
+		border-radius: 0.5rem;
+		background: var(--color-panel-soft, #1c1917);
+	}
+	.grid-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		margin-bottom: 0.75rem;
+		flex-wrap: wrap;
+	}
+	.grid-title {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	.grid-title h3 {
+		font-size: 0.875rem;
+		font-weight: 600;
+		margin: 0;
+	}
+	.doc-count {
+		font-size: 0.6875rem;
+		padding: 0.125rem 0.375rem;
+		background: rgba(255, 255, 255, 0.08);
+		border-radius: 0.25rem;
+		opacity: 0.6;
+	}
+	.grid-controls {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	.search-wrapper {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.25rem 0.5rem;
+		border: 1px solid var(--color-sand-dark, #44403c);
+		border-radius: 0.375rem;
+		background: rgba(255, 255, 255, 0.03);
+	}
+	.search-input {
+		border: none;
+		background: transparent;
+		font-size: 0.75rem;
+		color: inherit;
+		outline: none;
+		width: 140px;
+	}
+	.clear-btn {
+		background: none;
+		border: none;
+		cursor: pointer;
+		opacity: 0.5;
+		color: inherit;
+		padding: 0;
+	}
+	.view-toggle {
+		display: flex;
+		border: 1px solid var(--color-sand-dark, #44403c);
+		border-radius: 0.375rem;
+		overflow: hidden;
+	}
+	.toggle-btn {
+		padding: 0.25rem 0.5rem;
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		opacity: 0.5;
+		color: inherit;
+	}
+	.toggle-btn.active {
+		background: rgba(255, 255, 255, 0.08);
+		opacity: 1;
+	}
+	.status-msg {
+		font-size: 0.8125rem;
+		opacity: 0.5;
+		margin: 0;
+		text-align: center;
+		padding: 2rem;
+	}
+	.error-msg {
+		font-size: 0.8125rem;
+		color: var(--color-danger, #ef4444);
+		margin: 0;
+		text-align: center;
+		padding: 2rem;
+	}
+	.empty-state {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 2rem;
+		opacity: 0.5;
+		font-size: 0.8125rem;
+	}
+	.doc-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+		gap: 0.75rem;
+	}
+	.doc-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
+	}
+	.list-item {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem;
+		border-radius: 0.375rem;
+		background: rgba(255, 255, 255, 0.03);
+		font-size: 0.8125rem;
+	}
+	.list-name {
+		font-weight: 500;
+		min-width: 120px;
+	}
+	.list-model {
+		font-size: 0.6875rem;
+		opacity: 0.5;
+		min-width: 80px;
+	}
+	.list-summary {
+		flex: 1;
+		font-size: 0.75rem;
+		opacity: 0.5;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.list-actions {
+		display: flex;
+		gap: 0.25rem;
+	}
+	.grid-footer {
+		text-align: center;
+		font-size: 0.6875rem;
+		opacity: 0.4;
+		padding-top: 0.5rem;
+		margin-top: 0.75rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.05);
+	}
+	.doc-detail-overlay {
+		position: fixed;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.6);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 50;
+	}
+	.doc-detail {
+		background: var(--color-panel, #292524);
+		border: 1px solid var(--color-sand-dark, #44403c);
+		border-radius: 0.5rem;
+		max-width: 480px;
+		width: 90%;
+		max-height: 80vh;
+		overflow-y: auto;
+	}
+	.detail-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.75rem;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+	}
+	.detail-header h3 {
+		font-size: 0.875rem;
+		font-weight: 600;
+		margin: 0;
+	}
+	.close-btn {
+		background: none;
+		border: none;
+		cursor: pointer;
+		opacity: 0.5;
+		color: inherit;
+		padding: 0.25rem;
+	}
+	.detail-body {
+		padding: 0.75rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+	.detail-row {
+		display: flex;
+		gap: 0.5rem;
+		font-size: 0.8125rem;
+	}
+	.detail-label {
+		font-weight: 500;
+		min-width: 60px;
+		opacity: 0.6;
+	}
+	.detail-summary {
+		margin: 0;
+		font-size: 0.75rem;
+		opacity: 0.7;
+		line-height: 1.4;
+	}
+</style>

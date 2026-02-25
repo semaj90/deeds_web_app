@@ -23,9 +23,8 @@ export * from './ui/slider';
 export * from './ui/textarea';
 
 // Business Components
-export { default as CaseCard } from './+CaseCard.svelte';
-export { default as AIChat } from './AIChat.svelte';
-export { default as EnhancedLegalChat } from './EnhancedLegalChat.svelte';
+// ARCHIVED: export { default as AIChat } from './AIChat.svelte';
+// ARCHIVED: export { default as EnhancedLegalChat } from './EnhancedLegalChat.svelte';
 // ARCHIVED: export { default as EvidenceCard } from './EvidenceCard.svelte';
 export { default as EvidencePanel } from './EvidencePanel.svelte';
 // ARCHIVED: export { default as LegalCaseManager } from './LegalCaseManager.svelte';
