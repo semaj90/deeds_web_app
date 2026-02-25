@@ -54,6 +54,11 @@
 		}
 	});
 
+	// Try loading persisted history from IndexedDB on mount
+	$effect(() => {
+		session.loadHistory();
+	});
+
 	onDestroy(() => {
 		session.destroy();
 	});

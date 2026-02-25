@@ -278,7 +278,7 @@ When wiring components to routes, classify each into:
 - Reads data via `load()` / server endpoints
 - No browser-only globals
 - Uses lucide/bits-ui primitives only
-- @lucide/svelte renders SVG and is SSR-safe
+- Icons use UnoCSS `i-lucide-*` classes via `<Icon name="..." />` wrapper (SSR-safe, pure CSS)
 
 **B) Client-only** (set `export const ssr = false`):
 - Canvas/WebGL/WebGPU rendering
@@ -540,7 +540,8 @@ safelist: [
 - **Qdrant filter**: `match: { value: someVar }` not `match: { value, someVar }` — shorthand fails when var name != `value`
 - **ioredis v5 types**: DO NOT add `declare module 'ioredis'` augmentations — they shadow bundled types
 - **amqplib**: Named/namespace imports fail with `moduleResolution: "bundler"`. Use local interfaces + dynamic `await import('amqplib')`
-- **@lucide/svelte is SSR-safe**: Renders SVG, no browser APIs. Do NOT set `ssr = false` just for lucide icons. Only set `ssr = false` for browser-only APIs (Canvas/WebGL/WebGPU, direct window/document, localStorage/IndexedDB in module scope)
+- **Icons**: `@lucide/svelte` REMOVED (Session 93r14). Use `import Icon from '$lib/components/ui/Icon.svelte'` + `<Icon name="kebab-name" />`. UnoCSS `i-lucide-*` CSS classes, SSR-safe. Dynamic names need safelist in `unocss.config.ts`
+- **bits-ui Dialog SSR TDZ**: bits-ui v2.16.2 Dialog uses `let props = $props()` which triggers TDZ in Svelte 5.46.0 SSR. Routes rendering Dialog at SSR time need `export const ssr = false`
 - **Svelte 5 `{@const}` placement**: Must be direct child of `{#if}`/`{:else if}`/`{#each}` blocks — NOT inside `<div>` or other HTML elements
 - **Dev server startup**: Must use `npm run dev` (sets `DEV_BYPASS_AUTH=true` + env vars via `cross-env`), NOT `npx vite dev`
 - **SvelteKit handleError**: Hides real errors behind generic message. Temporarily expose `error.message + error.stack` in return value to diagnose SSR 500s

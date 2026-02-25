@@ -7,6 +7,8 @@
 
     // Initialize once — intentionally capture initial data only (not reactive)
     const chat = untrack(() => new ChatSession($page.params.id, data?.history ?? []));
+    // Load persisted history from IndexedDB if no server history provided
+    if (!data?.history?.length) chat.loadHistory();
 
     // ?local=1 forces local ONNX, ?server=1 forces server SSE (dev verification)
     const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;

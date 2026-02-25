@@ -67,12 +67,26 @@ export class ChatSession {
 		return this._chatId;
 	}
 
+	/** Load persisted chat history from IndexedDB into this session */
+	async loadHistory(): Promise<void> {
+		if (this.messages.length > 0) return; // already has history (e.g. from server load)
+		const history = await clientCache.getChatHistory(this._chatId);
+		if (history.length > 0) {
+			this.messages = history.map((h) => ({
+				role: h.role as ChatRole,
+				content: h.content,
+				timestamp: new Date(h.timestamp).toISOString()
+			}));
+		}
+	}
+
 	addOptimistic(content: string) {
 		this.messages.push({
 			role: 'user',
 			content,
 			timestamp: new Date().toISOString()
 		});
+		clientCache.saveChatMessage(this._chatId, 'user', content);
 	}
 
 	addMessage(role: ChatRole, content: string) {
@@ -81,6 +95,7 @@ export class ChatSession {
 			content,
 			timestamp: new Date().toISOString()
 		});
+		clientCache.saveChatMessage(this._chatId, role, content);
 	}
 
 	/**
@@ -232,8 +247,9 @@ export class ChatSession {
 				metadata: { routerDecision: decision }
 			});
 
-			// Cache in IndexedDB
+			// Cache in IndexedDB (reply cache + chat history)
 			await clientCache.putReply(message, content, 'local-onnx');
+			clientCache.saveChatMessage(this._chatId, 'assistant', content, { source: 'local-onnx' });
 
 			this.status = 'idle';
 			this.lastSource = 'local-onnx';
@@ -353,6 +369,15 @@ export class ChatSession {
 				this.status = 'idle';
 			}
 			this.debugInfo = { ...this.debugInfo, cacheHit: 'none', latencyMs: Math.round(performance.now() - t0), provider: 'server-ollama' };
+
+			// Persist completed assistant message to IndexedDB
+			const finalMsg = this.messages[assistantIdx];
+			if (finalMsg?.content) {
+				clientCache.saveChatMessage(this._chatId, 'assistant', finalMsg.content, {
+					source: decision.source,
+					confidence: finalMsg.metadata?.confidence
+				});
+			}
 		} catch (err: any) {
 			if (err.name === 'AbortError') return;
 			console.error('ChatSession.sendMessage error:', err);

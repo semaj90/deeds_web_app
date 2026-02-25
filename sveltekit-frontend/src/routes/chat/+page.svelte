@@ -3,6 +3,7 @@
     import CitationHighlighter from '$lib/components/legal-ai/CitationHighlighter.svelte';
 
     const room = new ChatSession('case-101');
+    room.loadHistory();
 
     // ?local=1 forces local ONNX, ?server=1 forces server SSE (dev verification)
     const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;

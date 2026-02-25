@@ -79,6 +79,7 @@ const STORES = {
 const TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 let dbPromise: Promise<IDBPDatabase> | null = null;
+let evictionScheduled = false;
 
 function getDB(): Promise<IDBPDatabase> {
 	if (!dbPromise) {
@@ -97,6 +98,13 @@ function getDB(): Promise<IDBPDatabase> {
 				}
 			}
 		});
+		// Auto-evict expired entries once per session (deferred, non-blocking)
+		if (!evictionScheduled) {
+			evictionScheduled = true;
+			dbPromise.then(() => {
+				setTimeout(() => clientCache.evictExpired(), 5000);
+			});
+		}
 	}
 	return dbPromise;
 }
@@ -282,7 +290,7 @@ export const clientCache = {
 		}
 	},
 
-	/** Evict expired entries across all stores */
+	/** Evict expired entries across all stores. Called automatically on first cache access. */
 	async evictExpired(): Promise<number> {
 		if (typeof window === 'undefined') return 0;
 		let evicted = 0;
