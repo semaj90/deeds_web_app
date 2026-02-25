@@ -68,11 +68,12 @@ function ensureLoki(): { replies: Collection<LokiReplyEntry>; router: Collection
 // ── IndexedDB: Persistent Cache ──────────────────────────────────────────
 
 const DB_NAME = 'deeds-ai-cache';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORES = {
 	replies: 'replies',
 	embeddings: 'embeddings',
-	chatHistory: 'chatHistory'
+	chatHistory: 'chatHistory',
+	cartridges: 'cartridges'
 } as const;
 
 /** 7-day TTL for persistent cache entries */
@@ -95,6 +96,9 @@ function getDB(): Promise<IDBPDatabase> {
 					const store = db.createObjectStore(STORES.chatHistory, { keyPath: 'id', autoIncrement: true });
 					store.createIndex('chatId', 'chatId', { unique: false });
 					store.createIndex('timestamp', 'timestamp', { unique: false });
+				}
+				if (!db.objectStoreNames.contains(STORES.cartridges)) {
+					db.createObjectStore(STORES.cartridges, { keyPath: 'caseId' });
 				}
 			}
 		});
@@ -285,6 +289,40 @@ export const clientCache = {
 			const hit = router.findOne({ promptHash: key });
 			if (!hit) return null;
 			return { source: hit.source, reason: hit.reason, confidence: hit.confidence };
+		} catch {
+			return null;
+		}
+	},
+
+	/** Cache a CHR-ROM97 cartridge binary for a case (FP16 embeddings + graph metadata) */
+	async putCartridge(caseId: string, data: Uint8Array): Promise<void> {
+		if (typeof window === 'undefined') return;
+		try {
+			const db = await getDB();
+			await db.put(STORES.cartridges, {
+				caseId,
+				data,
+				size: data.byteLength,
+				timestamp: Date.now()
+			});
+		} catch {
+			// Non-critical — cartridge caching is an optimization
+		}
+	},
+
+	/** Retrieve a cached CHR-ROM97 cartridge for a case */
+	async getCartridge(caseId: string): Promise<Uint8Array | null> {
+		if (typeof window === 'undefined') return null;
+		try {
+			const db = await getDB();
+			const entry = await db.get(STORES.cartridges, caseId);
+			if (!entry) return null;
+			// Cartridges expire after 7 days (same as other cache entries)
+			if (Date.now() - entry.timestamp > TTL_MS) {
+				await db.delete(STORES.cartridges, caseId);
+				return null;
+			}
+			return entry.data;
 		} catch {
 			return null;
 		}

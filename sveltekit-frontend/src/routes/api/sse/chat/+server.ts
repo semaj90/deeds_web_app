@@ -1,9 +1,10 @@
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { chatMessages } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { loadCodebaseContext } from '$lib/server/retrieval/codebase-context.js';
+import { getGraphContext } from '$lib/server/retrieval/graph-context.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const QDRANT_URL = ENV.QDRANT_URL;
@@ -19,6 +20,9 @@ const RAG_MAX_CHUNKS = 5;
 // Qdrant uses cosine distance — score is already 0..1 similarity.
 // For cosine with embeddinggemma, useful hits typically score > 0.30.
 const RAG_SCORE_THRESHOLD = 0.30;
+
+// Conversation memory: load last N messages for multi-turn context
+const CONVERSATION_HISTORY_LIMIT = 10;
 
 // Strict caseId format: "case-" followed by a UUID
 const CASE_ID_PATTERN = /^case-([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
@@ -36,6 +40,7 @@ interface ConfidenceFactors {
 	topScore: number | null;
 	embeddingModel: string;
 	codebaseHits: number;
+	kagNeighbors: number;
 }
 
 /**
@@ -250,6 +255,25 @@ export const POST: RequestHandler = async ({ request }) => {
 		console.error('Failed to save user message', e);
 	}
 
+	// Load conversation history for multi-turn context
+	let conversationHistory: Array<{ role: string; content: string }> = [];
+	try {
+		const historyRows = await db
+			.select({ role: chatMessages.role, content: chatMessages.content })
+			.from(chatMessages)
+			.where(eq(chatMessages.chatId, conversationId))
+			.orderBy(desc(chatMessages.timestamp))
+			.limit(CONVERSATION_HISTORY_LIMIT + 1); // +1 because we just inserted the current message
+
+		// Reverse to chronological order, exclude the current message (already sent separately)
+		conversationHistory = historyRows
+			.reverse()
+			.slice(0, -1) // remove last entry (current user message, added above)
+			.map(r => ({ role: r.role, content: r.content }));
+	} catch {
+		// DB may be unavailable — continue without history
+	}
+
 	const stream = new ReadableStream({
 		async start(controller) {
 			const encoder = new TextEncoder();
@@ -272,12 +296,22 @@ export const POST: RequestHandler = async ({ request }) => {
 			const CODE_HINT = /(svelte|sveltekit|drizzle|ts-morph|playwright|hooks\.server|schema-postgres|route|endpoint|api\/|\.ts\b|\.svelte\b|stack trace|error|typescrip|build|vite|qdrant|rabbitmq|proto|grpc|function|handler|component|database|query|schema|migration|server)/i;
 			const wantsCode = CODE_HINT.test(message) || message.includes('in this repo') || message.includes('codebase');
 
-			// RAG + Codebase: retrieve both context sources in parallel
+			// RAG + Codebase + KAG: retrieve all context sources in parallel
+			const caseUuid = caseMatch ? caseMatch[1] : undefined;
 			const [contextDocs, codebaseResult] = await Promise.all([
 				retrieveContext(message),
 				wantsCode ? loadCodebaseContext(message).catch(() => null) : Promise.resolve(null)
 			]);
 			const contextUsed = contextDocs.map((d) => d.documentId);
+
+			// KAG: 1-hop graph traversal for related evidence (non-blocking)
+			let graphContext: { context: string; neighbors: Array<{ nodeId: string; title: string }> } | null = null;
+			if (contextDocs.length > 0) {
+				const evidenceIds = contextDocs
+					.map(d => d.documentId.split(':').pop())
+					.filter((id): id is string => !!id);
+				graphContext = await getGraphContext(evidenceIds, caseUuid).catch(() => null);
+			}
 
 			let systemPrompt =
 				'You are a legal AI assistant specialized in prosecutor and detective workflows. ' +
@@ -300,6 +334,11 @@ export const POST: RequestHandler = async ({ request }) => {
 				systemPrompt += `\n\nRelevant evidence from the knowledge base:\n${contextText}\n\nUse this context to inform your response. Cite source numbers when referencing specific evidence.`;
 			}
 
+			// Inject KAG graph neighbors (related evidence from knowledge graph)
+			if (graphContext) {
+				systemPrompt += `\n${graphContext.context}`;
+			}
+
 			// Inject codebase context (recall→rerank pipeline)
 			if (codebaseResult) {
 				systemPrompt += `\n\n${codebaseResult.context}`;
@@ -308,14 +347,20 @@ export const POST: RequestHandler = async ({ request }) => {
 			let fullResponse = '';
 
 			try {
-				// Stream from Ollama with RAG-enriched system prompt
-				const ollamaRes = await fetch(`${OLLAMA_URL}/api/generate`, {
+				// Build multi-turn messages array for Ollama /api/chat
+				const ollamaMessages = [
+					{ role: 'system', content: systemPrompt },
+					...conversationHistory,
+					{ role: 'user', content: message }
+				];
+
+				// Stream from Ollama with RAG-enriched system prompt + conversation history
+				const ollamaRes = await fetch(`${OLLAMA_URL}/api/chat`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
 						model: model ?? 'gemma3-legal:latest',
-						system: systemPrompt,
-						prompt: message,
+						messages: ollamaMessages,
 						stream: true
 					})
 				});
@@ -335,8 +380,10 @@ export const POST: RequestHandler = async ({ request }) => {
 					for (const line of text.split('\n').filter(Boolean)) {
 						try {
 							const parsed = JSON.parse(line);
-							if (parsed.response) {
-								fullResponse += parsed.response;
+							// Ollama /api/chat returns message.content; /api/generate returns response
+							const chunk = parsed.message?.content ?? parsed.response;
+							if (chunk) {
+								fullResponse += chunk;
 								send({
 									id,
 									role: 'assistant',
@@ -361,7 +408,8 @@ export const POST: RequestHandler = async ({ request }) => {
 					ragHits: contextDocs.length,
 					topScore,
 					embeddingModel: EMBEDDING_MODEL,
-					codebaseHits: codebaseResult?.chunks.length ?? 0
+					codebaseHits: codebaseResult?.chunks.length ?? 0,
+					kagNeighbors: graphContext?.neighbors.length ?? 0
 				};
 
 				// Confidence: base 0.4, +0.15 for case context, +0.05 per RAG hit, +0.15 for high-quality top hit
@@ -376,7 +424,30 @@ export const POST: RequestHandler = async ({ request }) => {
 				if (codebaseResult && codebaseResult.chunks.length > 0) {
 					confidence += Math.min(codebaseResult.chunks.length * 0.03, 0.1);
 				}
+				if (graphContext && graphContext.neighbors.length > 0) {
+					confidence += Math.min(graphContext.neighbors.length * 0.02, 0.1);
+				}
 				confidence = Math.min(confidence, 0.95);
+
+				// Extract [Source N] citations from the LLM response
+				const extractedCitations: Array<{ sourceNum: number; documentId: string; similarity: number }> = [];
+				const sourceRefs = fullResponse.match(/\[Source\s+(\d+)[^\]]*\]/g) ?? [];
+				for (const ref of sourceRefs) {
+					const match = ref.match(/\[Source\s+(\d+)/);
+					if (match) {
+						const sourceNum = parseInt(match[1]) - 1;
+						if (sourceNum >= 0 && sourceNum < contextDocs.length) {
+							const doc = contextDocs[sourceNum];
+							if (!extractedCitations.some(c => c.documentId === doc.documentId)) {
+								extractedCitations.push({
+									sourceNum: sourceNum + 1,
+									documentId: doc.documentId,
+									similarity: doc.similarity
+								});
+							}
+						}
+					}
+				}
 
 				// Persist assistant message with context metadata
 				const assistantMetadata = JSON.stringify({
@@ -392,8 +463,10 @@ export const POST: RequestHandler = async ({ request }) => {
 							path: c.relativePath,
 							symbol: c.symbol,
 							score: c.score
-						})) ?? []
+						})) ?? [],
+						citations: extractedCitations
 					},
+					conversationTurns: conversationHistory.length,
 					model: model ?? 'gemma3-legal:latest'
 				});
 
@@ -412,7 +485,9 @@ export const POST: RequestHandler = async ({ request }) => {
 					status: 'done',
 					confidence,
 					confidenceFactors,
-					contextUsed
+					contextUsed,
+					citations: extractedCitations,
+					conversationTurns: conversationHistory.length
 				});
 			} catch (error) {
 				console.error('Generation error:', error);

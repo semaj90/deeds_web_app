@@ -25,6 +25,7 @@
   import Gemma270MWebAssembly from '$lib/components/ai/Gemma270MWebAssembly.svelte';
   import SourceValidator from '$lib/components/rag/SourceValidator.svelte';
   import AnswerWithCitations from '$lib/components/rag/AnswerWithCitations.svelte';
+  import RAGPipelineChart from '$lib/components/ai/RAGPipelineChart.svelte';
   import type { AnswerWithCitations as AnswerData } from '$lib/types/rag-source-validation';
 
   interface AIStats {
@@ -80,6 +81,7 @@
   let showOrchestrator = $state(false);
   let showVlmAnalyzer = $state(false);
   let showRagPipeline = $state(false);
+  let showPipelineChart = $state(false);
   let ragQuery = $state('');
   let ragChunks = $state<any[]>([]);
   let ragAnswer = $state<AnswerData | null>(null);
@@ -621,6 +623,21 @@
               </Button>
             </div>
           {/if}
+        </div>
+      {/if}
+    </div>
+
+    <!-- 21. RAG+KAG+DAG Pipeline Chart -->
+    <div class="mt-4">
+      <button
+        class="w-full text-left px-4 py-3 bg-panel border border-sand/10 rounded-lg hover:border-accent/30 transition text-sm font-medium text-sand/80"
+        onclick={() => (showPipelineChart = !showPipelineChart)}
+      >
+        {showPipelineChart ? 'Hide Pipeline Chart' : 'RAG + KAG + DAG Pipeline Chart (Architecture Visualization)'}
+      </button>
+      {#if showPipelineChart}
+        <div class="mt-3 bg-panel/50 border border-sand/10 rounded-lg">
+          <RAGPipelineChart />
         </div>
       {/if}
     </div>

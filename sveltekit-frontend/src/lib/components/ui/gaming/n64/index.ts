@@ -34,5 +34,5 @@ export { default as Switch } from './Switch.svelte';
 
 // Utils
 export { default as N64ToastStore } from './N64ToastStore';
-export { default as retroPerformanceGuard } from './retroPerformanceGuard';
+
 export { default as tokens } from './tokens';

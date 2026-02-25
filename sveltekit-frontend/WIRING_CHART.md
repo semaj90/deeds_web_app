@@ -156,7 +156,7 @@ SSR: ON | OFF        Server load: YES | NO
   ├── Response:    (StreamingResponse) (TypewriterResponse)
   ├── Panel:       (ChatMessages) (ChatPanel) (GamingAIButton)
   ├── Orchestr:    (IntelligentModelOrchestrator)
-  ├── RAG:         (SourceValidator) (AnswerWithCitations)
+  ├── RAG:         (SourceValidator) (AnswerWithCitations) (RAGPipelineChart)
   ├──> {GET /api/ai/stats}
   ├──> {GET /api/ai/models}
   ├──> {POST /api/rag/search}           3-step RAG pipeline

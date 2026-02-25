@@ -41,6 +41,8 @@ export interface SSEChunk {
 	confidence?: number;
 	confidenceFactors?: ConfidenceFactors;
 	contextUsed?: string[];
+	citations?: Array<{ sourceNum: number; documentId: string; similarity: number }>;
+	conversationTurns?: number;
 }
 
 export class ChatSession {
@@ -55,6 +57,7 @@ export class ChatSession {
 	private abortController: AbortController | null = null;
 	private _chatId: string;
 	private _hasCaseContext: boolean;
+	private _cartridgePreFetched = false;
 
 	constructor(chatId: string, initialHistory: ChatMessage[] = [], hasCaseContext = false) {
 		this._chatId = chatId;
@@ -282,6 +285,20 @@ export class ChatSession {
 		this.abortController?.abort();
 		this.abortController = new AbortController();
 
+		// Pre-fetch CHR-ROM97 cartridge for case context (fire-and-forget)
+		if (this._hasCaseContext && !this._cartridgePreFetched) {
+			this._cartridgePreFetched = true;
+			const caseId = this._chatId.replace(/^case-/, '');
+			fetch('/api/cartridge/export', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ caseId })
+			})
+				.then(r => r.ok ? r.arrayBuffer() : null)
+				.then(buf => buf ? clientCache.putCartridge(caseId, new Uint8Array(buf)) : null)
+				.catch(() => { /* non-critical optimization */ });
+		}
+
 		try {
 			const res = await fetch('/api/sse/chat', {
 				method: 'POST',
@@ -342,7 +359,8 @@ export class ChatSession {
 									...this.messages[assistantIdx].metadata,
 									confidence: chunk.confidence,
 									confidenceFactors: chunk.confidenceFactors,
-									citations: chunk.contextUsed
+									citations: chunk.contextUsed,
+									...(chunk.citations && { extractedCitations: chunk.citations })
 								}
 							};
 						}
