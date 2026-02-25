@@ -1,222 +1,377 @@
-<!-- Simple Working Chat Component for CUDA: AI, Backend -->
 <script lang="ts">
-  import { Input } from '$lib/components/ui/input';
-  // Svelte, 5 runes are auto-imported
-  // Migrated to $effect
-  import Button from '$lib/components/ui/Button.svelte';
-  import 
-    Input
-   from "$lib/components/ui/enhanced-bits.svelte";
-  import Card from '$lib/components/ui/Card/Card.svelte';
-import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
-import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
-import CardContent from '$lib/components/ui/Card/CardContent.svelte';
-  import  Badge  from "$lib/components/ui/badge/Badge.svelte";
-  import  Separator  from "$lib/components/ui/separator/Separator.svelte";
-  import  ScrollArea  from "$lib/components/ui/scroll-area/ScrollArea.svelte";
-  // Svelte, 5 runes for state management
-  let messages = $state<any[]>([]);
-  let inputMessage = $state<string>('');
-  let isLoading = $state<boolean>(false);
-  let connectionStatus = $state<'connected' | 'disconnected' | 'testing'>('testing');
-  let lastResponse = $state<any>(null);
-  // Test connection to CUDA service on mount
-  $effect(() => {
-    testConnection()});
-  async function testConnection(): Promise<void> {
-    connectionStatus = 'testing';
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	messages: [{
-	role: 'user', content: 'Connection test' }]
-        })
-      });
-      if (response.ok) {
-        connectionStatus = 'connected';
-        console.log('âœ… CUDA AI service connected')} else {
-        connectionStatus = 'disconnected';
-        console.error('âŒ CUDA AI service not responding')}
-    } catch (error) {
-      connectionStatus = 'disconnected';
-      console.error('âŒ Connection failed:', error)}
-  }
-  async function sendMessage(): Promise<any> {
-    if (!inputMessage.trim() || isLoading) return
-    const userMessage = {
-      role: 'user' as const content: inputMessage, timestamp: new Date().toLocaleTimeString()}
-    // Add user message immediately
-    messages = [...messages, userMessage];
-    const currentInput = inputMessag
-    inputMessage = '';
-    isLoading = true
-    try {
-      console.log('ðŸš€ Sending to CUDA AI:', currentInput);
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	messages: [{
-	role: 'user', content: currentInput }]
-        })
-      });
-      const data = await response.json();
-      lastResponse = data
-      console.log('ðŸ¤– CUDA AI response:', data);
-      if (response.ok && data.message) {
-        const assistantMessage = {
-          role: 'assistant' as const content: data.message,
-          timestamp: new Date().toLocaleTimeString(): data.confidence,
-          tokensPerSecond: data.tokensPerSecond,
-          taskId: data.taskId}
-        messages = [...messages, assistantMessage]} else {
-        // Error response
-        const errorMessage = {
-          role: 'assistant' as const content: `Error: ${data.error || 'Unknown error'}`,
-          timestamp: new Date().toLocaleTimeString()}
-        messages = [...messages, errorMessage]}
-    } catch (error) {
-      console.error('âŒ Chat error:', error);
-'
-      const errorMessage = {
-        role: 'assistant' as const content: `Network, error: ${error.message}`,
-        timestamp: new Date().toLocaleTimeString()}
-      messages = [...messages, errorMessage]} finally {
-      isLoading = false}
-  }
-  function handleKeyPress(_event: KeyboardEvent) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      sendMessage()}
-  }
-  function clearMessages() {
-    messages = []}
-  function getStatusColor() {
-    switch (connectionStatus) {
-      case: 'connected': return 'bg-accent';
-      case: 'disconnected': return 'bg-danger';
-      case: 'testing': return 'bg-warning',default:return 'bg-sand/20'}
-  }
-  function getStatusText() {
-    switch (connectionStatus) {
-      case: 'connected': return 'CUDA AI Connected';
-      case: 'disconnected': return 'CUDA AI Disconnected';
-      case: 'testing': return 'Testing Connection...',default:return 'Unknown Status'}
-  }
+	import { ChatSession, type ChatMessage } from '$lib/models/ChatSession.svelte.js';
+	import TypewriterResponse from '$lib/components/ai/TypewriterResponse.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import { ScrollArea } from 'bits-ui';
+	import Icon from '$lib/components/ui/Icon.svelte';
+	import { tick } from 'svelte';
+
+	interface Props {
+		chatId?: string;
+		hasCaseContext?: boolean;
+		height?: string;
+		class?: string;
+	}
+
+	let {
+		chatId = 'chat-' + Date.now(),
+		hasCaseContext = false,
+		height = '500px',
+		class: className = ''
+	}: Props = $props();
+
+	let session = $state<ChatSession | null>(null);
+	let currentMessage = $state('');
+	let viewport: HTMLElement | undefined = $state(undefined);
+	let lastCompletedIdx = $state<number | null>(null);
+
+	// Create session on mount
+	$effect(() => {
+		const s = new ChatSession(chatId, [], hasCaseContext);
+		s.loadHistory();
+		session = s;
+		return () => { s.destroy(); };
+	});
+
+	// Auto-scroll
+	$effect(() => {
+		const len = session?.messages?.length;
+		if (len && len > 0) {
+			tick().then(() => {
+				if (viewport) viewport.scrollTop = viewport.scrollHeight;
+			});
+		}
+	});
+
+	// Track streaming completion for typewriter
+	let prevStatus = $state<string>('idle');
+	$effect(() => {
+		const status = session?.status ?? 'idle';
+		if (prevStatus === 'streaming' && status === 'idle' && session) {
+			const msgs = session.messages;
+			for (let i = msgs.length - 1; i >= 0; i--) {
+				if (msgs[i].role === 'assistant') {
+					lastCompletedIdx = i;
+					break;
+				}
+			}
+		}
+		prevStatus = status;
+	});
+
+	async function sendMessage() {
+		if (!currentMessage.trim() || !session || session.status !== 'idle') return;
+		const msg = currentMessage.trim();
+		currentMessage = '';
+		lastCompletedIdx = null;
+		await session.sendMessage(msg);
+	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			sendMessage();
+		}
+	}
+
+	function formatTime(ts?: string) {
+		if (!ts) return '';
+		return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+	}
 </script>
-<div class="w-full max-w-4xl mx-auto h-[600px] flex flex-col">
-  <div class="yorha-panel-header">
-    <div class="flex items-center">
-      <h3 class="nes-text is-primary flex items-center">
-        ðŸ¤– Legal AI Chat
-        <Badge variant="ghost" class="text-xs">
-          <div class="w-2 h-2"></div>
-          {getStatusText()}
-        </Badge>
-      </h3>
-      <Button.Root, class="bits-btn bits-btn" variant="ghost" size="sm" onclick={clearMessages}>Clear Chat</Button>
-    </div>
-  </div>
-  <div class="yorha-panel-content flex-1 flex flex-col gap-4">
-    <!-- Messages, Area -->
-    <ScrollArea class="flex-1 p-4 border rounded-lg">
-      <div class="space-y-4">
-        {#each Array.isArray(messages) ? messages : [] as message}
-          <div class="flex {message.role === 'user' ? 'justify-end' : 'justify-start'}">
-            <div
-              class="max-w-[70%] p-3 rounded-lg" {message.role === 'user'
-                ? 'bg-primary text-primary-foreground ml-auto'
- 'bg-muted text-muted-foreground'}"
-            >
-              <div class="text-sm font-medium">
-                {message.role === 'user' ? 'ðŸ‘¤ You' : 'ðŸ¤– AI Assistant'}
-                <span class="text-xs opacity-70">{message.timestamp}</span>
-              </div>
-              <div class="whitespace-pre-wrap">{message.content}</div>
-              {#if message.role === 'assistant' && message.confidence}
-                <div class="flex gap-2 mt-2 text-xs">
-                  <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10"
-                    >Confidence: {Math.round(message.confidence * 100)}%</span
-                  >
-                  {#if message.tokensPerSecond}
-                    <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10"
-                      >{Math.round(message.tokensPerSecond)} tok/s</span
-                    >
-                  {/if}
-                  {#if message.taskId}
-                    <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10"
-                      >Task: {message.taskId.slice(-8)}</span
-                    >
-                  {/if}
-                {/if}
-            </div>
-          </div>
-        {/each}
-        {#if isLoading}
-          <div class="flex">
-            <div class="max-w-[70%] p-3 rounded-lg bg-muted nes-text">
-              <div class="text-sm font-medium">ðŸ¤– AI Assistant</div>
-              <div class="flex items-center">
-                <div class="animate-pulse">Thinking...</div>
-                <div class="flex">
-                  <div class="w-2 h-2 bg-current rounded-full"></div>
-                  <div class="w-2 h-2 bg-current rounded-full" style="animation-delay: 0.1s"></div>
-                  <div class="w-2 h-2 bg-current rounded-full" style="animation-delay: 0.2s"></div>
-                </div>
-              </div>
-            </div>
-          {/if}
-      </div>
-    </ScrollArea>
-    <Separator />
-    <!-- Input, Area -->
-    <div class="flex">
-      <Input
-        bind:value={inputMessage}
-        placeholder="Ask the AI about legal matters..."
-        onkeypress={handleKeyPress}
-        disabled={isLoading || connectionStatus !== 'connected'}
-        class="flex-1"
-      />
-      <Button
-        class="bits-btn bits-btn"
-        onclick={sendMessage}
-        disabled={!inputMessage.trim() || isLoading || connectionStatus !== 'connected'}
-      >
-        {isLoading ? 'â³' : 'ðŸ“¤'} Send
-      </Button>
-    </div>
-    <!-- Status, Info -->
-    <div class="text-xs nes-text is-disabled flex justify-between">
-      <span> GPU: RTX, 3060 Ti â€¢ Model: Gemma3-Legal â€¢, Port: 8096 </span>
-      <span>
-        {messages.length} messages
-      </span>
-    </div>
-  </div>
+
+<div class="chat-panel {className}" style="height: {height};">
+	<!-- Messages -->
+	<ScrollArea.Root class="chat-messages-root">
+		<ScrollArea.Viewport class="chat-messages-viewport" bind:ref={viewport}>
+			{#if !session || session.messages.length === 0}
+				<div class="chat-empty">
+					<Icon name="message-circle" size={32} />
+					<p>Start a conversation</p>
+				</div>
+			{:else}
+				<div class="messages-list">
+					{#each session.messages as msg, idx (idx)}
+						<div class="msg {msg.role}">
+							<div class="msg-avatar {msg.role}">
+								<Icon name={msg.role === 'user' ? 'user' : 'bot'} size={14} />
+							</div>
+							<div class="msg-content">
+								<div class="msg-header">
+									<span class="msg-role">{msg.role === 'user' ? 'You' : 'AI'}</span>
+									<span class="msg-time">{formatTime(msg.timestamp)}</span>
+									{#if msg.source}
+										<span class="msg-source">{msg.source === 'local-onnx' ? 'Local' : 'Server'}</span>
+									{/if}
+								</div>
+								<div class="msg-text">
+									{#if msg.role === 'assistant' && idx === lastCompletedIdx}
+										<TypewriterResponse
+											text={msg.content}
+											speed={40}
+											enableThinking={true}
+											oncomplete={() => lastCompletedIdx = null}
+										/>
+									{:else}
+										{msg.content}
+									{/if}
+								</div>
+								{#if msg.role === 'assistant' && msg.metadata?.confidence}
+									<div class="msg-meta">
+										<span>Confidence: {Math.round((msg.metadata.confidence ?? 0) * 100)}%</span>
+									</div>
+								{/if}
+							</div>
+						</div>
+					{/each}
+
+					{#if session.status === 'thinking'}
+						<div class="msg assistant">
+							<div class="msg-avatar assistant">
+								<Icon name="bot" size={14} />
+							</div>
+							<div class="msg-content">
+								<div class="thinking-dots">
+									<Icon name="loader-2" size={14} class="animate-spin" />
+									<span>Thinking...</span>
+								</div>
+							</div>
+						</div>
+					{/if}
+				</div>
+			{/if}
+		</ScrollArea.Viewport>
+		<ScrollArea.Scrollbar orientation="vertical" class="chat-scrollbar">
+			<ScrollArea.Thumb class="chat-scrollbar-thumb" />
+		</ScrollArea.Scrollbar>
+	</ScrollArea.Root>
+
+	<!-- Error -->
+	{#if session?.error}
+		<div class="chat-error">
+			<Icon name="alert-triangle" size={12} />
+			{session.error}
+		</div>
+	{/if}
+
+	<!-- Input -->
+	<div class="chat-input-row">
+		<textarea
+			bind:value={currentMessage}
+			onkeydown={handleKeydown}
+			placeholder="Type a message..."
+			rows={1}
+			disabled={!session || session.status === 'thinking'}
+			class="chat-input"
+		></textarea>
+		<Button
+			onclick={sendMessage}
+			disabled={!session || session.status !== 'idle' || !currentMessage.trim()}
+			class="chat-send-btn"
+		>
+			<Icon name="send" size={16} />
+		</Button>
+	</div>
 </div>
-<!-- Debug, Panel (Development: Only) -->
-{#if lastResponse && process.env.NODE_ENV === 'development'}
-  <details class="mt-4 p-4 bg-muted rounded-lg">
-    <summary class="cursor-pointer">ðŸ” Debug Info</summary>
-    <pre class="mt-2">{JSON.stringify(lastResponse, null, 2)}</pre>
-  </details>
-{/if}
+
 <style>
-  .animate-bounce {
-    animation: bounce 1s infinite;}
-  @keyframes bounce {
-    0%; } 100% {
-      transform: translateY(-25%);
-      animation-timing-function cubic-bezier(0.8, 0, 1, 1)}
-    50% {
-      transform: none
-      animation-timing-function cubic-bezier(0, 0: 0.2, 1)}
-  }
+	.chat-panel {
+		display: flex;
+		flex-direction: column;
+		border: 1px solid var(--color-sand-20, #44403c);
+		border-radius: 8px;
+		overflow: hidden;
+		background: var(--color-panel, #1c1917);
+	}
+
+	:global(.chat-messages-root) {
+		flex: 1;
+		min-height: 0;
+	}
+
+	:global(.chat-messages-viewport) {
+		height: 100%;
+		padding: 1rem;
+	}
+
+	:global(.chat-scrollbar) {
+		width: 4px;
+		padding: 1px;
+	}
+
+	:global(.chat-scrollbar-thumb) {
+		background: var(--color-sand-40, #78716c);
+		border-radius: 2px;
+	}
+
+	.chat-empty {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		color: var(--color-sand-60, #57534e);
+		gap: 0.5rem;
+	}
+
+	.chat-empty p {
+		margin: 0;
+		font-size: 0.9rem;
+	}
+
+	.messages-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.msg {
+		display: flex;
+		gap: 0.5rem;
+		max-width: 85%;
+	}
+
+	.msg.user {
+		margin-left: auto;
+		flex-direction: row-reverse;
+	}
+
+	.msg-avatar {
+		width: 28px;
+		height: 28px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+	.msg-avatar.user {
+		background: var(--color-info, #2563eb);
+		color: white;
+	}
+
+	.msg-avatar.assistant {
+		background: var(--color-sand-20, #44403c);
+		color: var(--color-sand-80, #d6d3d1);
+	}
+
+	.msg-content {
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
+		min-width: 0;
+	}
+
+	.msg-header {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 0.7rem;
+		color: var(--color-sand-60, #78716c);
+	}
+
+	.msg-source {
+		font-size: 0.6rem;
+		padding: 0.05rem 0.3rem;
+		background: var(--color-sand-10, #292524);
+		border: 1px solid var(--color-sand-20, #44403c);
+		border-radius: 3px;
+	}
+
+	.msg-text {
+		padding: 0.5rem 0.75rem;
+		border-radius: 6px;
+		font-size: 0.85rem;
+		line-height: 1.5;
+		white-space: pre-wrap;
+		word-break: break-word;
+		background: var(--color-sand-10, #292524);
+		color: var(--color-sand-80, #d6d3d1);
+	}
+
+	.msg.user .msg-text {
+		background: var(--color-info, #2563eb);
+		color: white;
+	}
+
+	.msg-meta {
+		font-size: 0.65rem;
+		color: var(--color-sand-60, #78716c);
+	}
+
+	.thinking-dots {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.8rem;
+		color: var(--color-sand-60, #78716c);
+		padding: 0.5rem 0.75rem;
+		background: var(--color-sand-10, #292524);
+		border-radius: 6px;
+		border: 1px dashed var(--color-sand-20, #44403c);
+	}
+
+	.chat-error {
+		padding: 0.4rem 1rem;
+		background: rgba(239, 68, 68, 0.1);
+		border-top: 1px solid rgba(239, 68, 68, 0.3);
+		color: #fca5a5;
+		font-size: 0.75rem;
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		flex-shrink: 0;
+	}
+
+	.chat-input-row {
+		display: flex;
+		gap: 0.5rem;
+		padding: 0.75rem;
+		border-top: 1px solid var(--color-sand-20, #44403c);
+		background: var(--color-panel, #1c1917);
+		flex-shrink: 0;
+	}
+
+	.chat-input {
+		flex: 1;
+		background: var(--color-sand-5, #0c0a09);
+		border: 1px solid var(--color-sand-20, #44403c);
+		color: var(--color-sand-80, #d6d3d1);
+		font-family: inherit;
+		font-size: 0.85rem;
+		padding: 0.5rem 0.75rem;
+		border-radius: 6px;
+		resize: none;
+		min-height: 38px;
+		outline: none;
+	}
+
+	.chat-input:focus {
+		border-color: var(--color-info, #2563eb);
+	}
+
+	.chat-input:disabled {
+		opacity: 0.5;
+	}
+
+	:global(.chat-send-btn) {
+		height: 38px !important;
+		width: 38px !important;
+		flex-shrink: 0;
+		background: var(--color-info, #2563eb) !important;
+		border-radius: 6px !important;
+		display: flex !important;
+		align-items: center !important;
+		justify-content: center !important;
+	}
+
+	:global(.animate-spin) {
+		animation: spin 1s linear infinite;
+	}
+
+	@keyframes spin {
+		from { transform: rotate(0deg); }
+		to { transform: rotate(360deg); }
+	}
 </style>
-
-
-
-

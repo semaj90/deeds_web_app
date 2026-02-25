@@ -1,450 +1,665 @@
 <script lang="ts">
- import Button from '$lib/components/ui/Button.svelte';
- import Textarea from '$lib/components/ui/textarea/Textarea.svelte';
- import Icon from '$lib/components/ui/Icon.svelte';
- import { tick } from 'svelte';
- type ChatMessage = { id: string, role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-  keywords?: string[];
-  keyPhrases?: string[];
-  suggestions?: string[];
- };
+	import { ChatSession, type ChatMessage } from '$lib/models/ChatSession.svelte.js';
+	import TypewriterResponse from '$lib/components/ai/TypewriterResponse.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import { ScrollArea } from 'bits-ui';
+	import Icon from '$lib/components/ui/Icon.svelte';
+	import { tick } from 'svelte';
+	import { page } from '$app/state';
 
- let messages = $state<ChatMessage[]>([]);
- let currentMessage = $state('');
- let isTyping = $state(false);
- let sessionId = $state('local-session-' + Date.now());
- let caseId = $state<string | null>(null);
- let chatContainer: HTMLElement;
+	// Chat session — tied to user via server-provided userId
+	let session = $state<ChatSession | null>(null);
+	let currentMessage = $state('');
+	let showSettings = $state(false);
+	let chatContainer: HTMLElement | undefined = $state(undefined);
 
- // Auto-scroll to bottom of chat
- $effect(() => {
-  if (messages.length) {
-   scrollToBottom();
-  }
- });
+	// Track which message just completed streaming (for typewriter animation)
+	let lastCompletedIdx = $state<number | null>(null);
 
- function scrollToBottom() {
-  if (chatContainer) {
-   chatContainer.scrollTop = chatContainer.scrollHeight;
-  }
- }
+	// localStorage preferences
+	let prefs = $state({
+		enableThinking: true,
+		typewriterSpeed: 40,
+		autoScroll: true,
+		forceServer: false
+	});
 
- // Send message function
- async function sendMessage() {
-  if (!currentMessage.trim() || isTyping) return;
+	// Initialize session and load prefs
+	$effect(() => {
+		// Load persisted prefs
+		try {
+			const saved = localStorage.getItem('terminal-prefs');
+			if (saved) Object.assign(prefs, JSON.parse(saved));
+		} catch { /* localStorage unavailable */ }
 
-  const userMessage = currentMessage.trim();
-  currentMessage = '';
+		// Create chat session linked to user
+		const userId = page.data?.user?.id ?? 'anonymous';
+		const chatId = `terminal-${userId}`;
+		const s = new ChatSession(chatId, [], false);
+		s.loadHistory();
+		session = s;
+		return () => { s.destroy(); };
+	});
 
-  // Add user message
-  const userMsgId = crypto.randomUUID();
-  messages = [...messages, {
-   id: userMsgId,
-   role: 'user',
-   content: userMessage,
-   timestamp: new Date()
-  }];
+	// Persist prefs to localStorage
+	$effect(() => {
+		try {
+			localStorage.setItem('terminal-prefs', JSON.stringify(prefs));
+		} catch { /* localStorage unavailable */ }
+	});
 
-  // Call backend API
-  isTyping = true;
-  try {
-   const response = await fetch('/api/ai/yorha/context-chat', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-	body: JSON.stringify({
-     sessionId,
-     userId: 'test-user-001',
-     caseId,
-     message: userMessage
-    })
-   });
+	// Auto-scroll on new messages
+	$effect(() => {
+		const len = session?.messages?.length;
+		if (len && len > 0 && prefs.autoScroll) {
+			tick().then(() => {
+				if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
+			});
+		}
+	});
 
-   if (!response.ok) {
-    throw new Error('Failed to send message');
-   }
+	// Track when streaming completes to trigger typewriter on last message
+	let prevStatus = $state<string>('idle');
+	$effect(() => {
+		const status = session?.status ?? 'idle';
+		if (prevStatus === 'streaming' && status === 'idle' && session) {
+			// Streaming just completed — mark last assistant message for typewriter
+			const msgs = session.messages;
+			for (let i = msgs.length - 1; i >= 0; i--) {
+				if (msgs[i].role === 'assistant') {
+					lastCompletedIdx = i;
+					break;
+				}
+			}
+		}
+		prevStatus = status;
+	});
 
-   const data = await response.json();
+	async function sendMessage() {
+		if (!currentMessage.trim() || !session || session.status !== 'idle') return;
+		const msg = currentMessage.trim();
+		currentMessage = '';
+		lastCompletedIdx = null;
+		await session.sendMessage(msg, { forceServer: prefs.forceServer });
+	}
 
-   // Add assistant message
-   messages = [...messages, {
-    id: crypto.randomUUID(),
-    role: 'assistant',
-    content: data.response || 'No response generated.',
-    timestamp: new Date(),
-    keywords: data.context?.keywords,
-    keyPhrases: data.context?.keyPhrases,
-    suggestions: data.context?.suggestions
-   }];
+	function handleKeydown(e: KeyboardEvent) {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			sendMessage();
+		}
+	}
 
-  } catch (error) {
-   console.error('Chat error:', error);
-   messages = [...messages, {
-    id: crypto.randomUUID(),
-    role: 'assistant',
-    content: 'Error: Could not connect to the AI service. Please try again.',
-    timestamp: new Date()
-   }];
-  } finally {
-   isTyping = false;
-   await tick();
-   scrollToBottom();
-  }
- }
+	function clearChat() {
+		if (!session) return;
+		const userId = page.data?.user?.id ?? 'anonymous';
+		const chatId = `terminal-${userId}-${Date.now()}`;
+		session.destroy();
+		const s = new ChatSession(chatId, [], false);
+		session = s;
+		lastCompletedIdx = null;
+	}
 
- function handleKeydown(e: KeyboardEvent) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-   e.preventDefault();
-   sendMessage();
-  }
- }
+	function formatTime(ts?: string) {
+		if (!ts) return '';
+		return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+	}
+
+	let confidenceColor = $derived.by(() => {
+		if (!session) return '';
+		const c = session.lastConfidence;
+		if (c > 0.8) return 'text-green-400';
+		if (c > 0.6) return 'text-yellow-400';
+		return 'text-red-400';
+	});
 </script>
 
 <div class="terminal-container">
- <header class="terminal-header">
-  <div class="header-left">
-   <Icon name="bot" class="icon-lg" />
-   <div>
-    <h1>YoRHa COMMAND TERMINAL</h1>
-    <div class="status">
-     <span class="status-dot"></span>
-     SYSTEM ONLINE
-    </div>
-   </div>
-  </div>
+	<!-- Header -->
+	<header class="terminal-header">
+		<div class="header-left">
+			<Icon name="bot" size={24} />
+			<div>
+				<h1>YoRHa COMMAND TERMINAL</h1>
+				<div class="status">
+					<span class="status-dot" class:offline={session?.connectionStatus === 'disconnected'}></span>
+					{session?.connectionStatus === 'connected' ? 'SYSTEM ONLINE' : 'OFFLINE MODE'}
+				</div>
+			</div>
+		</div>
 
-  <div class="header-right">
-   <div class="session-info">
-    SESSION: {sessionId.slice(0, 8)}
-   </div>
-  </div>
- </header>
+		<div class="header-controls">
+			{#if session}
+				<div class="session-chip">
+					<Icon name="cpu" size={12} />
+					{session.lastSource === 'local-onnx' ? 'LOCAL' : 'SERVER'}
+				</div>
+				{#if session.lastConfidence < 1}
+					<span class="confidence-chip {confidenceColor}">
+						{Math.round(session.lastConfidence * 100)}%
+					</span>
+				{/if}
+			{/if}
+			<button class="settings-btn" onclick={() => showSettings = !showSettings}>
+				<Icon name="settings" size={18} />
+			</button>
+		</div>
+	</header>
 
- <div class="chat-viewport" bind:this={chatContainer}>
-  {#if messages.length === 0}
-   <div class="empty-state">
-    <Icon name="bot" size={48} />
-    <p>Initialize communication sequence...</p>
-    <small>Type a command or query to begin.</small>
-   </div>
-  {/if}
+	<!-- Settings Panel -->
+	{#if showSettings}
+		<div class="settings-panel">
+			<div class="settings-row">
+				<label>
+					<input type="checkbox" bind:checked={prefs.enableThinking} />
+					Thinking animation
+				</label>
+			</div>
+			<div class="settings-row">
+				<label>
+					Typewriter speed
+					<input type="range" min="10" max="100" bind:value={prefs.typewriterSpeed} />
+					<span>{prefs.typewriterSpeed}ms</span>
+				</label>
+			</div>
+			<div class="settings-row">
+				<label>
+					<input type="checkbox" bind:checked={prefs.autoScroll} />
+					Auto-scroll
+				</label>
+			</div>
+			<div class="settings-row">
+				<label>
+					<input type="checkbox" bind:checked={prefs.forceServer} />
+					Force server (Ollama)
+				</label>
+			</div>
+			<div class="settings-row">
+				<Button onclick={clearChat} class="clear-btn">
+					<Icon name="trash-2" size={14} />
+					Clear chat
+				</Button>
+			</div>
+		</div>
+	{/if}
 
-  {#each messages as msg (msg.id)}
-   <div class="message-row {msg.role}">
-    <div class="avatar">
-     {#if msg.role === 'assistant'}
-      <Icon name="bot" size={20} />
-     {:else}
-      <Icon name="users" size={20} />
-     {/if}
-    </div>
+	<!-- Chat Viewport -->
+	<ScrollArea.Root class="chat-scroll-root">
+		<ScrollArea.Viewport class="chat-viewport" bind:ref={chatContainer}>
+			{#if !session || session.messages.length === 0}
+				<div class="empty-state">
+					<Icon name="bot" size={48} />
+					<p>Initialize communication sequence...</p>
+					<small>Type a command or query to begin.</small>
+				</div>
+			{:else}
+				{#each session.messages as msg, idx (idx)}
+					<div class="message-row {msg.role}">
+						<div class="avatar {msg.role}">
+							{#if msg.role === 'assistant'}
+								<Icon name="bot" size={18} />
+							{:else}
+								<Icon name="user" size={18} />
+							{/if}
+						</div>
 
-    <div class="message-content">
-     <div class="sender">{msg.role === 'user' ? 'OPERATOR' : 'YoRHa UNIT'}</div>
-     <div class="text">{msg.content}</div>
+						<div class="message-body">
+							<div class="sender-line">
+								<span class="sender">{msg.role === 'user' ? 'OPERATOR' : 'YoRHa UNIT'}</span>
+								<span class="time">{formatTime(msg.timestamp)}</span>
+								{#if msg.source}
+									<span class="source-badge">{msg.source === 'local-onnx' ? 'LOCAL' : 'SERVER'}</span>
+								{/if}
+							</div>
 
-     {#if msg.role === 'assistant' && msg.suggestions?.length}
-      <div class="suggestions">
-       {#each msg.suggestions as suggestion}
-        <button class="suggestion-chip" onclick={() => {
-         currentMessage = suggestion;
-         // Optional:Auto-send
-        }}>
-         {suggestion}
-        </button>
-       {/each}
-      </div>
-     {/if}
-    </div>
+							<div class="message-text">
+								{#if msg.role === 'assistant' && idx === lastCompletedIdx && prefs.enableThinking}
+									<TypewriterResponse
+										text={msg.content}
+										speed={prefs.typewriterSpeed}
+										enableThinking={prefs.enableThinking}
+										showCursor={true}
+										oncomplete={() => lastCompletedIdx = null}
+									/>
+								{:else}
+									{msg.content}
+								{/if}
+							</div>
 
-    <div class="timestamp">
-     {msg.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-    </div>
-   </div>
-  {/each}
+							{#if msg.role === 'assistant' && msg.metadata?.confidence}
+								<div class="meta-badges">
+									<span class="meta-badge">
+										Confidence: {Math.round((msg.metadata.confidence ?? 0) * 100)}%
+									</span>
+									{#if msg.metadata.citations?.length}
+										<span class="meta-badge">
+											{msg.metadata.citations.length} sources
+										</span>
+									{/if}
+								</div>
+							{/if}
+						</div>
+					</div>
+				{/each}
 
-  {#if isTyping}
-   <div class="message-row assistant typing">
-    <div class="avatar"><Icon name="bot" size={20} /></div>
-    <div class="message-content">
-     <div class="sender">YoRHa UNIT</div>
-     <div class="typing-indicator">
-      <Icon name="loader-2" class="animate-spin" size={16} />
-      <span>Processing input stream...</span>
-     </div>
-    </div>
-   </div>
-  {/if}
- </div>
+				{#if session.status === 'thinking'}
+					<div class="message-row assistant">
+						<div class="avatar assistant">
+							<Icon name="bot" size={18} />
+						</div>
+						<div class="message-body">
+							<div class="thinking-indicator">
+								<Icon name="loader-2" size={16} class="animate-spin" />
+								<span>Processing input stream...</span>
+							</div>
+						</div>
+					</div>
+				{/if}
+			{/if}
+		</ScrollArea.Viewport>
+		<ScrollArea.Scrollbar orientation="vertical" class="chat-scrollbar">
+			<ScrollArea.Thumb class="chat-scrollbar-thumb" />
+		</ScrollArea.Scrollbar>
+	</ScrollArea.Root>
 
- <footer class="input-area">
-  <div class="input-wrapper">
-   <Textarea
-    placeholder="Enter command execution parameters..."
-    bind:value={currentMessage}
-    onkeydown={handleKeydown}
-    class="terminal-input"
-    rows={1}
-   />
-   <Button
-    variant="default"
-    size="sm"
-    class="send-btn"
-    onclick={sendMessage}
-    disabled={isTyping || !currentMessage.trim()}
-   >
-    <Icon name="send" size={18} />
-   </Button>
-  </div>
-  <div class="disclaimer">
-   CAUTION: System responses generated by AI models. Verify critical legal information manually.
-  </div>
- </footer>
+	<!-- Error Display -->
+	{#if session?.error}
+		<div class="error-bar">
+			<Icon name="alert-triangle" size={14} />
+			<span>{session.error}</span>
+		</div>
+	{/if}
+
+	<!-- Input Area -->
+	<footer class="input-area">
+		<div class="input-wrapper">
+			<textarea
+				placeholder="Enter command execution parameters..."
+				bind:value={currentMessage}
+				onkeydown={handleKeydown}
+				class="terminal-input"
+				rows={1}
+				disabled={!session || session.status === 'thinking'}
+			></textarea>
+			<Button
+				onclick={sendMessage}
+				disabled={!session || session.status !== 'idle' || !currentMessage.trim()}
+				class="send-btn"
+			>
+				<Icon name="send" size={18} />
+			</Button>
+		</div>
+		<div class="disclaimer">
+			CAUTION: System responses generated by AI models. Verify critical legal information manually.
+		</div>
+	</footer>
 </div>
 
 <style>
- :global(body) {
-  margin: 0;
-  background-color: #0c0a09;
-  color: #e7e5e4;
- }
-
- .terminal-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  font-family: 'JetBrains Mono', monospace;
-  background-color: #0c0a09;
-  background-image: linear-gradient(rgba(12, 10, 9, 0.9), rgba(12, 10, 9, 0.9)),
-        url('/grid-pattern.png');
- }
-
- .terminal-header {
-  padding: 1rem 1.5rem;
-  background: #1c1917;
-  border-bottom: 2px solid #44403c;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-  z-index: 10;
- }
-
- .header-left {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
- }
-
- h1 {
-  font-size: 1.25rem;
-  margin: 0;
-  letter-spacing: 0.1em;
-  color: #fafaf9;
- }
-
- .status {
-  font-size: 0.75rem;
-  color: #10b981;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.25rem;
- }
-
- .status-dot { width: 8px;
-		height: 8px;
-  background: #10b981;
-  border-radius: 50%;
-  box-shadow: 0 0 8px #10b981;
- }
-
- .session-info {
-  font-size: 0.75rem;
-  color: #78716c;
-  border: 1px solid #44403c;
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
- }
-
- .chat-viewport {
-  flex: 1;
-  overflow-y: auto;
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  scroll-behavior: smooth;
- }
-
- .empty-state {
-  margin: auto;
-  text-align: center;
-  color: #57534e;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
- }
-
- .empty-state p {
-  font-size: 1.5rem;
-  margin: 0;
- }
-
- .message-row { display: flex;
-		gap: 1rem;
-  max-width: 80%;
-  animation: fadeIn 0.3s ease-out;
- }
-
- .message-row.user {
-  margin-left: auto;
-  flex-direction: row-reverse;
- }
-
- .message-row.assistant {
-  margin-right: auto;
- }
-
- @keyframes fadeIn {
-  from { opacity: 0;
-		transform: translateY(10px); }
-  to { opacity: 1;
-		transform: translateY(0); }
- }
-
- .avatar { width: 36px;
-		height: 36px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
- }
-
- .user .avatar { background: #2563eb;
-		color: white;
- }
-
- .assistant .avatar { background: #44403c;
+	.terminal-container {
+		display: flex;
+		flex-direction: column;
+		height: 100vh;
+		font-family: 'JetBrains Mono', 'Monaco', 'Menlo', monospace;
+		background-color: #0c0a09;
 		color: #e7e5e4;
-  border: 1px solid #57534e;
- }
+	}
 
- .message-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  min-width: 0;
- }
-
- .sender {
-  font-size: 0.7rem;
-  color: #78716c;
- }
-
- .user .sender {
-  text-align: right;
- }
-
- .text { background: #1c1917;
-		padding: 1rem;
-  border-radius: 4px;
-  border: 1px solid #292524;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  color: #d6d3d1;
- }
-
- .user .text {
-  background: #1e3a8a;
-  border-color: #1e40af;
-  color: white;
- }
-
- .timestamp {
-  font-size: 0.7rem;
-  color: #44403c;
-  align-self: flex-end;
-  margin-bottom: 0.5rem;
- }
-
- .typing-indicator {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  color: #78716c;
-  font-size: 0.875rem;
-  padding: 1rem;
-  background: #1c1917;
-  border: 1px dashed #44403c;
-  border-radius: 4px;
- }
-
- .suggestions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
- }
-
- .suggestion-chip { background: #292524;
-		border: 1px solid #44403c;
-  color: #a8a29e;
-  padding: 0.25rem 0.75rem;
-  font-size: 0.75rem;
-  font-family: 'JetBrains Mono', monospace;
-  cursor: pointer;
-  transition: all 0.2s;
- }
-
- .suggestion-chip:hover { background: #44403c;
-		color: white;
-  border-color: #78716c;
- }
-
- .input-area { padding: 1.5rem;
+	.terminal-header {
+		padding: 1rem 1.5rem;
 		background: #1c1917;
-  border-top: 1px solid #292524;
- }
+		border-bottom: 2px solid #44403c;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+		z-index: 10;
+		flex-shrink: 0;
+	}
 
- .input-wrapper { display: flex;
+	.header-left {
+		display: flex;
+		align-items: center;
 		gap: 1rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  align-items: flex-end;
- }
+	}
 
- :global(.terminal-input) {
-  background: #0c0a09 !important;
-  border: 1px solid #44403c !important;
-  color: #e7e5e4 !important;
-  font-family: 'JetBrains Mono', monospace !important;
-  resize: none;
-  min-height: 50px;
- }
+	h1 {
+		font-size: 1.25rem;
+		margin: 0;
+		letter-spacing: 0.1em;
+		color: #fafaf9;
+	}
 
- :global(.terminal-input:focus) {
-  border-color: #2563eb !important;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
- }
+	.status {
+		font-size: 0.75rem;
+		color: #10b981;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-top: 0.25rem;
+	}
 
- .send-btn { height: 50px;
-		width: 50px;
-  flex-shrink: 0;
-  background: #2563eb;
- }
+	.status-dot {
+		width: 8px;
+		height: 8px;
+		background: #10b981;
+		border-radius: 50%;
+		box-shadow: 0 0 8px #10b981;
+	}
 
- .send-btn:hover {
-  background: #1d4ed8;
- }
+	.status-dot.offline {
+		background: #ef4444;
+		box-shadow: 0 0 8px #ef4444;
+	}
 
- .disclaimer {
-  text-align: center;
-  font-size: 0.7rem;
-  color: #44403c;
-  margin-top: 1rem;
- }
+	.header-controls {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.session-chip {
+		font-size: 0.7rem;
+		color: #78716c;
+		border: 1px solid #44403c;
+		padding: 0.2rem 0.6rem;
+		border-radius: 4px;
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+	}
+
+	.confidence-chip {
+		font-size: 0.7rem;
+		padding: 0.2rem 0.5rem;
+		border-radius: 4px;
+		border: 1px solid #44403c;
+	}
+
+	.settings-btn {
+		background: none;
+		border: 1px solid #44403c;
+		color: #78716c;
+		padding: 0.35rem;
+		border-radius: 4px;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+	}
+
+	.settings-btn:hover {
+		color: #e7e5e4;
+		border-color: #78716c;
+	}
+
+	.settings-panel {
+		background: #1c1917;
+		border-bottom: 1px solid #292524;
+		padding: 0.75rem 1.5rem;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+		font-size: 0.8rem;
+		color: #a8a29e;
+		flex-shrink: 0;
+	}
+
+	.settings-row {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.settings-row label {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		cursor: pointer;
+	}
+
+	.settings-row input[type="checkbox"] {
+		accent-color: #2563eb;
+	}
+
+	.settings-row input[type="range"] {
+		width: 80px;
+		accent-color: #2563eb;
+	}
+
+	:global(.clear-btn) {
+		font-size: 0.75rem !important;
+		padding: 0.25rem 0.5rem !important;
+		background: #292524 !important;
+		color: #a8a29e !important;
+		border: 1px solid #44403c !important;
+	}
+
+	:global(.chat-scroll-root) {
+		flex: 1;
+		min-height: 0;
+	}
+
+	:global(.chat-viewport) {
+		height: 100%;
+		padding: 1.5rem;
+	}
+
+	:global(.chat-scrollbar) {
+		width: 6px;
+		padding: 2px;
+	}
+
+	:global(.chat-scrollbar-thumb) {
+		background: #44403c;
+		border-radius: 3px;
+	}
+
+	.empty-state {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		color: #57534e;
+		gap: 1rem;
+		text-align: center;
+	}
+
+	.empty-state p {
+		font-size: 1.25rem;
+		margin: 0;
+	}
+
+	.message-row {
+		display: flex;
+		gap: 0.75rem;
+		max-width: 85%;
+		margin-bottom: 1.25rem;
+		animation: fadeIn 0.3s ease-out;
+	}
+
+	.message-row.user {
+		margin-left: auto;
+		flex-direction: row-reverse;
+	}
+
+	.message-row.assistant {
+		margin-right: auto;
+	}
+
+	@keyframes fadeIn {
+		from { opacity: 0; transform: translateY(8px); }
+		to { opacity: 1; transform: translateY(0); }
+	}
+
+	.avatar {
+		width: 32px;
+		height: 32px;
+		border-radius: 4px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+	.avatar.user {
+		background: #2563eb;
+		color: white;
+	}
+
+	.avatar.assistant {
+		background: #44403c;
+		color: #e7e5e4;
+		border: 1px solid #57534e;
+	}
+
+	.message-body {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		min-width: 0;
+	}
+
+	.sender-line {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.7rem;
+		color: #78716c;
+	}
+
+	.source-badge {
+		font-size: 0.6rem;
+		padding: 0.1rem 0.4rem;
+		border-radius: 3px;
+		background: #292524;
+		border: 1px solid #44403c;
+		color: #a8a29e;
+	}
+
+	.message-text {
+		background: #1c1917;
+		padding: 0.75rem 1rem;
+		border-radius: 4px;
+		border: 1px solid #292524;
+		line-height: 1.6;
+		white-space: pre-wrap;
+		word-break: break-word;
+		color: #d6d3d1;
+		font-size: 0.9rem;
+	}
+
+	.user .message-text {
+		background: #1e3a8a;
+		border-color: #1e40af;
+		color: white;
+	}
+
+	.meta-badges {
+		display: flex;
+		gap: 0.4rem;
+		margin-top: 0.25rem;
+	}
+
+	.meta-badge {
+		font-size: 0.65rem;
+		padding: 0.15rem 0.4rem;
+		border-radius: 3px;
+		background: #292524;
+		border: 1px solid #44403c;
+		color: #78716c;
+	}
+
+	.thinking-indicator {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		color: #78716c;
+		font-size: 0.875rem;
+		padding: 0.75rem 1rem;
+		background: #1c1917;
+		border: 1px dashed #44403c;
+		border-radius: 4px;
+	}
+
+	.error-bar {
+		padding: 0.5rem 1.5rem;
+		background: #450a0a;
+		border-top: 1px solid #7f1d1d;
+		color: #fca5a5;
+		font-size: 0.8rem;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-shrink: 0;
+	}
+
+	.input-area {
+		padding: 1.25rem 1.5rem;
+		background: #1c1917;
+		border-top: 1px solid #292524;
+		flex-shrink: 0;
+	}
+
+	.input-wrapper {
+		display: flex;
+		gap: 0.75rem;
+		max-width: 1200px;
+		margin: 0 auto;
+		align-items: flex-end;
+	}
+
+	.terminal-input {
+		flex: 1;
+		background: #0c0a09;
+		border: 1px solid #44403c;
+		color: #e7e5e4;
+		font-family: 'JetBrains Mono', 'Monaco', 'Menlo', monospace;
+		font-size: 0.9rem;
+		padding: 0.75rem 1rem;
+		border-radius: 4px;
+		resize: none;
+		min-height: 48px;
+		outline: none;
+	}
+
+	.terminal-input:focus {
+		border-color: #2563eb;
+		box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+	}
+
+	.terminal-input:disabled {
+		opacity: 0.5;
+	}
+
+	:global(.send-btn) {
+		height: 48px !important;
+		width: 48px !important;
+		flex-shrink: 0;
+		background: #2563eb !important;
+		border-radius: 4px !important;
+		display: flex !important;
+		align-items: center !important;
+		justify-content: center !important;
+	}
+
+	:global(.send-btn:hover:not(:disabled)) {
+		background: #1d4ed8 !important;
+	}
+
+	.disclaimer {
+		text-align: center;
+		font-size: 0.65rem;
+		color: #44403c;
+		margin-top: 0.75rem;
+	}
+
+	:global(.animate-spin) {
+		animation: spin 1s linear infinite;
+	}
+
+	@keyframes spin {
+		from { transform: rotate(0deg); }
+		to { transform: rotate(360deg); }
+	}
 </style>

@@ -28,7 +28,7 @@ export { default as AIChat } from './AIChat.svelte';
 export { default as EnhancedLegalChat } from './EnhancedLegalChat.svelte';
 // ARCHIVED: export { default as EvidenceCard } from './EvidenceCard.svelte';
 export { default as EvidencePanel } from './EvidencePanel.svelte';
-export { default as LegalCaseManager } from './LegalCaseManager.svelte';
+// ARCHIVED: export { default as LegalCaseManager } from './LegalCaseManager.svelte';
 export { default as LLMAssistant } from './LLMAssistant.svelte';
 
 // Layout
