@@ -877,7 +877,6 @@
     "@langchain/openai": "1.1.0",
     "@langchain/textsplitters": "1.0.0",
     "@lucia-auth/adapter-drizzle": "^1.1.0",
-    "@lucide/svelte": "0.575.0",
     "@modelcontextprotocol/sdk": "^1.20.0",
     "@node-rs/argon2": "^2.0.2",
     "@paralleldrive/cuid2": "^2.2.2",

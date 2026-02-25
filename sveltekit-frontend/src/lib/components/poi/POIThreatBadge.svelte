@@ -11,30 +11,30 @@
  case 'critical':
  return {
  color: 'bg-danger text-white border-danger',
- icon: AlertTriangle,
+ icon: 'alert-triangle',
  label: 'CRITICAL'
  };
  case 'high':
  return {
  color: 'bg-warning text-white border-warning/60',
- icon: AlertCircle,
+ icon: 'alert-circle',
  label: 'HIGH'
  };
  case 'medium':
  return {
  color: 'bg-warning text-black border-warning/60',
- icon: Shield,
+ icon: 'shield',
  label: 'MEDIUM'
  };
  case 'low':
  return {
  color: 'bg-accent text-white border-accent',
- icon: CheckCircle,
+ icon: 'check-circle',
  label: 'LOW'
  };
  default:return {
  color: 'bg-sand/20 text-white border-sand/30',
- icon: Shield,
+ icon: 'shield',
  label: 'UNKNOWN'
  };
  }
@@ -52,7 +52,7 @@ let config = $derived(getThreatConfig(threatLevel));
 
 <Badge class="{config.color} border font-semibold {getSizeClasses(size)}">
  {#if showIcon}
- <config.icon class="w-3 h-3 mr-1" />
+ <span class="i-lucide-{config.icon} w-3 h-3 mr-1 inline-block"></span>
  {/if}
  {config.label}
 </Badge>

@@ -184,12 +184,12 @@
     delete uploadProgress[fileName];
   }
 
-  function getFileIcon(file: File) {
-    if (file.type.startsWith("image/")) return ImageIcon;
-    if (file.type.startsWith("video/")) return Video;
-    if (file.type.startsWith("audio/")) return Music;
-    if (file.type.includes("pdf") || file.type.includes("document")) return FileText;
-    return FileIcon;
+  function getFileIcon(file: File): string {
+    if (file.type.startsWith("image/")) return 'image';
+    if (file.type.startsWith("video/")) return 'video';
+    if (file.type.startsWith("audio/")) return 'music';
+    if (file.type.includes("pdf") || file.type.includes("document")) return 'file-text';
+    return 'file';
   }
 
   async function handleFormSubmit() {
@@ -333,7 +333,7 @@
                   {#if previews[file.name]}
                     <img src={previews[file.name]} alt={file.name} class="h-12 w-12 object-cover rounded" />
                   {:else}
-                    <svelte:component this={getFileIcon(file)} class="h-12 w-12 text-sand/40" />
+                    <span class="i-lucide-{getFileIcon(file)} h-12 w-12 text-sand/40 inline-block"></span>
                   {/if}
                 </div>
 

@@ -225,9 +225,9 @@
 
 	// Pipeline steps config
 	const pipelineSteps = [
-		{ id: 'searching', label: 'RAG Search', desc: 'Embed → Dual Search → Rerank', icon: Search },
-		{ id: 'validating', label: 'Source Validation', desc: 'Approve/reject retrieved chunks', icon: CheckCircle },
-		{ id: 'generating', label: 'LLM Generation', desc: 'gemma3-legal with citations', icon: Brain }
+		{ id: 'searching', label: 'RAG Search', desc: 'Embed → Dual Search → Rerank', icon: 'search' },
+		{ id: 'validating', label: 'Source Validation', desc: 'Approve/reject retrieved chunks', icon: 'check-circle' },
+		{ id: 'generating', label: 'LLM Generation', desc: 'gemma3-legal with citations', icon: 'brain' }
 	] as const;
 
 	function getStepStatus(stepId: string): 'pending' | 'active' | 'done' | 'error' {
@@ -256,7 +256,7 @@
 					{:else if status === 'error'}
 						<span class="i-lucide-alert-circle w-4 h-4 inline-block" />
 					{:else}
-						<svelte:component this={step.icon} size={16} />
+						<span class="i-lucide-{step.icon} w-4 h-4 inline-block"></span>
 					{/if}
 				</div>
 				<div class="step-info">

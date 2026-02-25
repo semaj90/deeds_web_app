@@ -182,13 +182,13 @@
     return "All changes saved";
   }
 
-  function getDocumentTypeIcon() {
+  function getDocumentTypeIcon(): string {
     switch (documentType) {
-        case "brief": return FileText;
-        case "contract": return BookOpen;
-        case "motion": return Scale;
-        case "evidence": return Search;
-        default:return FileText;
+        case "brief": return 'file-text';
+        case "contract": return 'book-open';
+        case "motion": return 'scale';
+        case "evidence": return 'search';
+        default: return 'file-text';
     }
   }
 
@@ -248,7 +248,7 @@
     <!-- Header -->
     <header class="mb-6 flex items-center justify-between">
         <div class="flex items-center gap-4">
-            <svelte:component this={getDocumentTypeIcon()} class="h-8 w-8 text-primary" />
+            <span class="i-lucide-{getDocumentTypeIcon()} h-8 w-8 text-primary inline-block"></span>
             <div>
                 <h1 class="text-3xl font-bold">{title}</h1>
                 <p class="text-sm text-muted-foreground flex items-center gap-2">

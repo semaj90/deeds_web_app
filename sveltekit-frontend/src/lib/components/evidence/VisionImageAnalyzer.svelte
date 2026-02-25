@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '$lib/components/ui/Icon.svelte';
 
   interface Props {
     caseId?: string;
@@ -234,14 +235,14 @@
       <div class="results-panel">
         {#if analyzing}
           <div class="loading-state">
-            <Loader class="w-8 h-8 animate-spin text-accent" />
+            <span class="i-lucide-loader w-8 h-8 animate-spin text-accent inline-block"></span>
             <p class="text-sand/60 text-sm mt-2">Running YOLO + Gemma3 VLM pipeline...</p>
           </div>
         {:else if result}
           <!-- Cache indicator -->
           {#if result.cacheHit}
             <div class="cache-badge">
-              <Database class="w-3 h-3" />
+              <span class="i-lucide-database w-3 h-3 inline-block"></span>
               Cached result
             </div>
           {/if}
@@ -249,7 +250,7 @@
           <!-- Summary -->
           <div class="result-section">
             <h4 class="section-title">
-              <Image class="w-4 h-4" />
+              <span class="i-lucide-image w-4 h-4 inline-block"></span>
               Summary
             </h4>
             <p class="text-sand/80 text-sm">{result.analysis.summary}</p>
@@ -259,7 +260,7 @@
           {#if result.analysis.keyFindings.length > 0}
             <div class="result-section">
               <h4 class="section-title">
-                <CheckCircle class="w-4 h-4" />
+                <span class="i-lucide-check-circle w-4 h-4 inline-block"></span>
                 Key Findings
               </h4>
               <ul class="findings-list">
@@ -274,7 +275,7 @@
           {#if result.analysis.suggestedTags.length > 0}
             <div class="result-section">
               <h4 class="section-title">
-                <Tag class="w-4 h-4" />
+                <span class="i-lucide-tag w-4 h-4 inline-block"></span>
                 Suggested Tags
               </h4>
               <div class="tags-row">
@@ -289,7 +290,7 @@
           {#if result.boxes.length > 0}
             <div class="result-section">
               <h4 class="section-title">
-                <Eye class="w-4 h-4" />
+                <span class="i-lucide-eye w-4 h-4 inline-block"></span>
                 Detections ({result.boxes.length})
               </h4>
               <div class="detections-grid">
@@ -306,7 +307,7 @@
           <!-- Timings -->
           <div class="result-section">
             <h4 class="section-title">
-              <Clock class="w-4 h-4" />
+              <span class="i-lucide-clock w-4 h-4 inline-block"></span>
               Pipeline Timings
             </h4>
             <div class="timings-grid">
@@ -328,7 +329,7 @@
           </div>
         {:else if error}
           <div class="error-state">
-            <AlertCircle class="w-6 h-6 text-danger" />
+            <span class="i-lucide-alert-circle w-6 h-6 text-danger inline-block"></span>
             <p class="text-danger text-sm mt-2">{error}</p>
           </div>
         {:else}

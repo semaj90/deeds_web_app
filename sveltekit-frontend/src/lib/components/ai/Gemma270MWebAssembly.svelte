@@ -280,11 +280,11 @@
 
 	// Pipeline steps
 	const analysisSteps = [
-		{ id: 'embedding', label: 'Client Embed', desc: 'ONNX 768d', icon: Cpu },
-		{ id: 'uploading', label: 'MinIO Upload', desc: 'SHA-256 hash', icon: Upload },
-		{ id: 'yolo', label: 'YOLO', desc: 'Object detect', icon: Scan },
-		{ id: 'vlm', label: 'VLM', desc: 'gemma3-legal', icon: Brain },
-		{ id: 'entities', label: 'Entities', desc: 'LLM + regex', icon: FileText }
+		{ id: 'embedding', label: 'Client Embed', desc: 'ONNX 768d', icon: 'cpu' },
+		{ id: 'uploading', label: 'MinIO Upload', desc: 'SHA-256 hash', icon: 'upload' },
+		{ id: 'yolo', label: 'YOLO', desc: 'Object detect', icon: 'scan' },
+		{ id: 'vlm', label: 'VLM', desc: 'gemma3-legal', icon: 'brain' },
+		{ id: 'entities', label: 'Entities', desc: 'LLM + regex', icon: 'file-text' }
 	] as const;
 
 	function getStepStatus(stepId: string): 'pending' | 'active' | 'done' | 'error' {
@@ -342,7 +342,7 @@
 						{:else if status === 'error'}
 							<span class="i-lucide-alert-circle w-[11px] h-[11px] inline-block" />
 						{:else}
-							<svelte:component this={step.icon} size={11} />
+							<span class="i-lucide-{step.icon} w-[11px] h-[11px] inline-block"></span>
 						{/if}
 					</div>
 					<div class="step-info">

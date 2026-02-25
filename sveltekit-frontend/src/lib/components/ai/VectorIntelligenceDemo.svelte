@@ -72,13 +72,13 @@
 		}
 	}
 
-	function getTypeIcon(type: SearchResult['documentType']) {
+	function getTypeIcon(type: SearchResult['documentType']): string {
 		switch (type) {
-			case 'deed': return FileText;
-			case 'contract': return FileText;
-			case 'evidence': return Database;
-			case 'case_law': return Brain;
-			default: return FileText;
+			case 'deed': return 'file-text';
+			case 'contract': return 'file-text';
+			case 'evidence': return 'database';
+			case 'case_law': return 'brain';
+			default: return 'file-text';
 		}
 	}
 
@@ -238,14 +238,14 @@
 
 		<div class="space-y-3">
 			{#each results as result (result.id)}
-				{@const TypeIcon = getTypeIcon(result.documentType)}
+				{@const typeIcon = getTypeIcon(result.documentType)}
 				<button
 					class="w-full text-left rounded-lg border-2 bg-panel p-4 transition hover:border-accent/40 hover:shadow-md {selectedResult?.id === result.id ? 'border-accent bg-accent/5' : 'border-sand/20'}"
 					onclick={() => (selectedResult = selectedResult?.id === result.id ? null : result)}
 				>
 					<div class="flex items-start gap-3">
 						<div class="p-2 rounded-lg {getTypeColor(result.documentType)}">
-							<TypeIcon class="h-5 w-5" />
+							<span class="i-lucide-{typeIcon} h-5 w-5 inline-block"></span>
 						</div>
 						<div class="flex-1 min-w-0">
 							<div class="flex items-center justify-between gap-2 mb-1">
