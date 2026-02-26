@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import type { PageData } from './$types';
+	import LegalDocumentDrafting from '$lib/components/ai/LegalDocumentDrafting.svelte';
+	import EvidenceManager from '$lib/components/evidence/EvidenceManager.svelte';
 
 	type TabId = 'overview' | 'evidence' | 'persons' | 'ai' | 'reports';
 
@@ -18,6 +20,8 @@
 	let { data } = $props<{ data: PageData }>();
 
 	let activeTab = $state<TabId>('overview');
+	let showDraftingTool = $state(false);
+	let showEvidenceManager = $state(false);
 
 	let errorSummary = $state<ErrorSummary | null>(null);
 	let consolidationStatus = $state<ConsolidationStatus | null>(null);
@@ -222,6 +226,20 @@
 					<p class="text-sm text-neutral-400">No evidence attached yet.</p>
 				{/if}
 			</section>
+
+			<div class="mt-4">
+				<button
+					class="px-3 py-2 rounded-lg border border-neutral-700 hover:border-neutral-500 transition-colors text-xs"
+					onclick={() => (showEvidenceManager = !showEvidenceManager)}
+				>
+					{showEvidenceManager ? 'Hide Evidence Manager' : 'Evidence Manager'}
+				</button>
+			</div>
+			{#if showEvidenceManager}
+				<div class="mt-3">
+					<EvidenceManager caseId={data.caseData?.id?.toString()} />
+				</div>
+			{/if}
 		{:else if activeTab === 'persons'}
 			<section class="rounded-xl border border-neutral-800 bg-neutral-900/70 p-4">
 				<h2 class="text-sm font-semibold mb-3">Persons of Interest</h2>
@@ -244,12 +262,21 @@
 			<section class="rounded-xl border border-neutral-800 bg-neutral-900/70 p-4 space-y-3 text-sm">
 				<h2 class="text-sm font-semibold">AI analysis</h2>
 				<p class="text-neutral-400">
-					This tab will surface AI suggestions, risk analysis, and Phase 72 error insights for this case.
+					AI-powered document drafting and case analysis via Gemma3 legal model.
 				</p>
-				<p class="text-xs text-neutral-500">
-					Hook this into your existing Gemma3 legal analysis endpoints and Phase 72 error vectors.
-				</p>
+
+				<button
+					class="px-3 py-2 rounded-lg border border-neutral-700 hover:border-neutral-500 transition-colors text-xs"
+					onclick={() => (showDraftingTool = !showDraftingTool)}
+				>
+					{showDraftingTool ? 'Hide Document Drafting' : 'Legal Document Drafting'}
+				</button>
 			</section>
+			{#if showDraftingTool}
+				<div class="mt-3">
+					<LegalDocumentDrafting />
+				</div>
+			{/if}
 		{:else if activeTab === 'reports'}
 			<section class="rounded-xl border border-neutral-800 bg-neutral-900/70 p-4 space-y-3 text-sm">
 				<h2 class="text-sm font-semibold">Reports</h2>

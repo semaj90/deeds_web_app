@@ -1,6 +1,15 @@
 <script lang="ts">
-	import { formatDistanceToNow } from 'date-fns';
 	import Icon from '$lib/components/ui/Icon.svelte';
+
+	const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+	function formatDistanceToNow(date: Date): string {
+		const diffSec = Math.round((date.getTime() - Date.now()) / 1000);
+		const absSec = Math.abs(diffSec);
+		if (absSec < 60) return rtf.format(diffSec, 'second');
+		if (absSec < 3600) return rtf.format(Math.round(diffSec / 60), 'minute');
+		if (absSec < 86400) return rtf.format(Math.round(diffSec / 3600), 'hour');
+		return rtf.format(Math.round(diffSec / 86400), 'day');
+	}
 
 	interface Props {
 		evidence: any;
@@ -49,8 +58,7 @@
 	let evidenceIconName = $derived(getEvidenceIconName(evidence.evidenceType || evidence.type));
 	let formattedDate = $derived(
 		formatDistanceToNow(
-			new Date(evidence.createdAt || evidence.dateCollected || Date.now()),
-			{ addSuffix: true }
+			new Date(evidence.createdAt || evidence.dateCollected || Date.now())
 		)
 	);
 

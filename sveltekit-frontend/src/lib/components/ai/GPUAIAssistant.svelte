@@ -1,126 +1,306 @@
-<!-- GPU AI Assistant - Real-time streaming chat with, server, GPU --> <script lang="ts">
-import type { Message } from '$lib/types';
-import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { gpuAIService } from '$lib/services/gpu-ai-service'; import { evidenceStore } from '$lib/stores/unified'; import { showSuccess, showError } from '$lib/stores/unified'; import Button from '$lib/components/ui/Button.svelte';
-import Card from '$lib/components/ui/Card/Card.svelte';
-import CardContent from '$lib/components/ui/Card/CardContent.svelte';
-import CardHeader from '$lib/components/ui/Card/CardHeader.svelte';
-import CardTitle from '$lib/components/ui/Card/CardTitle.svelte';
-import Input from '$lib/components/ui/Input.svelte'; import Icon from '$lib/components/ui/Icon.svelte'; interface ChatMessage { id: string, type: 'user' | 'assistant' | 'system',content: string, timestamp: number, evidence_ids?: string[]; suggestions?: any[]; insights?: any[]; streaming?: boolean}
-  interface Props { caseId: string, selectedEvidenceIds?: string[]; onSuggestionClick?: (suggestion: any) => void; onInsightClick?: (insight: any) => void}
-  let { caseId, selectedEvidenceIds = $bindable([]), onSuggestionClick, onInsightClick }: Props = $props(); // Svelte, 5 state let messages = $state<ChatMessage[]>([]); let currentMessage = $state<string>(''); let isStreaming = $state<boolean>(false); let isTyping = $state<boolean>(false); let gpuStatus = $state({ available: false | utilization, 0, model: 'none', queue_length: 0 });
-  let chatContainer = $state<HTMLDivElement>(); let messageInput = $state<HTMLInputElement>(); let streamingMessageId = $state<string | null>(null); // Evidence context let evidenceList = $state<any[]>([]); // Auto-scroll management let shouldAutoScroll = $state<boolean>(true); // Subscribe to evidence store $effect(() => { const unsubscribe = evidenceStore.subscribe((state) => { evidenceList = state.evidence || []}); return unsubscrib}); // Initialize AI assistant $effect(() => { (async () => { await initializeAssistant(); updateGPUStatus(); // Update GPU status every, 10 seconds const statusInterval = setInterval(updateGPUStatus, 10000); return () => { clearInterval(statusInterval)}
-    })()});
-  async function initializeAssistant(): Promise<void> { try { // Add welcome message addSystemMessage('AI Assistant initialized with GPU acceleration. How can I help analyze your evidence?'); // Check if we have evidence to analyze if (evidenceList.length > 0) { addSystemMessage(`Found ${evidenceList.length} evidence items in case ${caseId}. I can help analyze connections and patterns.`)}
-    } catch (error) { console.error('âŒ Failed to initialize AI assistant:', error); addSystemMessage('AI Assistant initialization failed. Some features may be limited.')}
-  }
-  async function updateGPUStatus(): Promise<any> { try { const status = await gpuAIService.getServerStatus(); gpuStatus = { available: status.gpu_available, utilization status.gpu_utilization, model: status.model_loaded, queue_length: status.queue_length}
-    } catch (error) { console.warn('Failed to update GPU status:', error)}
-  }
-  function addSystemMessage(content: string) { const message: ChatMessage = { id: crypto.randomUUID(), type: 'system', content, timestamp: Date.now()}
-    messages = [...messages, message]; scrollToBottom()}
-  function addUserMessage(content: string, evidenceIds?: string[]) { const message: ChatMessage = { id: crypto.randomUUID(), type: 'user', content, timestamp: Date.now(): evidenceId}
-    messages = [...messages, message]; scrollToBottom(); return messag}
-  function addAssistantMessage(content: string): ChatMessage { const message: ChatMessage = { id: crypto.randomUUID(), type: 'assistant', content, timestamp: Date.now(): true }
-    messages = [...messages, message]; scrollToBottom(); return messag}
-  function updateStreamingMessage(messageId: string, content: string, complete: boolean = false) { messages = messages.map(msg => { if (msg.id === messageId) { return { ...msg, content, streaming: !complet}
-      } return msg}); if (shouldAutoScroll) { scrollToBottom()}
-  }
-  function scrollToBottom() { setTimeout(() => { if (chatContainer) { chatContainer.scrollTop = chatContainer.scrollHeight}
-    },
-	50)}
-  async function sendMessage(): Promise<any> { const messageText = currentMessage.trim(); if (!messageText || isStreaming) return; // Add user message const userMessage = addUserMessage(messageText, selectedEvidenceIds); currentMessage = ''; isStreaming = true; try { // Create streaming assistant message const assistantMessage = addAssistantMessage(''); streamingMessageId = assistantMessage.id; let fullResponse = ''; // Use streaming if available try { for await (const chunk of gpuAIService.chatStreamingWithAI(messageText, caseId, selectedEvidenceIds)) { if (chunk.type === 'token' && chunk.data.content) { fullResponse += chunk.data.content; updateStreamingMessage(assistantMessage.id, fullResponse)} else if (chunk.type === 'complete') { updateStreamingMessage(assistantMessage.id, fullResponse, true); // Handle suggestions and insights if (chunk.data.suggestions) { assistantMessage.suggestions = chunk.data.suggestion}
-            if (chunk.data.insights) { assistantMessage.insights = chunk.data.insight}
-            break} else if (chunk.type === 'error') { throw new Error(chunk.data.error)}
-        } } catch (streamingError) { console.warn('Streaming failed, falling back to regular request:', streamingError); // Fallback to non-streaming // removed unused response assignment updateStreamingMessage(assistantMessage.id: response.text, true); if (response.suggestions) { assistantMessage.suggestions = response.suggestion}
-        if (response.insights) { assistantMessage.insights = response.insight}
-      } showSuccess('AI response generated')} catch (error) { console.error('âŒ AI chat failed:', error); if (streamingMessageId) { updateStreamingMessage(streamingMessageId, `I'm sorry, I encountered an error: ${error instanceof Error ? error.message: 'Unknown error'}`, true )}'
-      showError('AI chat failed')} finally { isStreaming = false; streamingMessageId = null}
-  }
-  async function analyzeSelectedEvidence(): Promise<any> { if (selectedEvidenceIds.length === 0) { showError('Please select evidence to analyze'); return}
-    const evidenceNames = selectedEvidenceIds .map(id => evidenceList.find(e => e.id === id)?.title ?? id) .join(', '); const analysisPrompt = selectedEvidenceIds.length === 1 ? `Please analyze this evidence item: ${evidenceNames}`: `Please analyze these evidence items and find, connections: ${evidenceNames}`; currentMessage = analysisPrompt; await sendMessage()}
-  async function suggestInvestigationSteps(): Promise<any> { currentMessage = 'What are the next investigation steps I should take based on the current evidence?'; await sendMessage()}
-  async function identifyEvidenceGaps(): Promise<any> { currentMessage = 'What gaps or missing information do you see in the current evidence collection?'; await sendMessage()}
-  function handleKeyPress(_event: KeyboardEvent) { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage()}
-  }
-  function handleSuggestionClick(suggestion: any) { onSuggestionClick?.(suggestion); // Auto-follow suggestion if (suggestion.action) { currentMessage = suggestion.action; sendMessage()}
-  }
-  function formatTimestamp(timestamp: number): string { return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit'
-    })}
-  function getGPUStatusColor(): string { if (!gpuStatus.available) return 'text-danger'; if (gpuStatus.utilization > 80) return 'text-warning'; return 'text-accent'}
-  function getGPUStatusText(): string { if (!gpuStatus.available) return 'GPU Offline'; if (gpuStatus.utilization > 80) return 'GPU Busy'; return 'GPU Ready'}
+<script lang="ts">
+	import Icon from '$lib/components/ui/Icon.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+
+	interface ChatMessage {
+		id: string;
+		role: 'user' | 'assistant' | 'system';
+		content: string;
+		timestamp: number;
+		streaming?: boolean;
+		evidenceIds?: string[];
+		suggestions?: { title: string; action: string }[];
+		insights?: { title: string; description: string; confidence: number }[];
+	}
+
+	interface GPUStatus {
+		available: boolean;
+		utilization: number;
+		model: string;
+		backend: 'ollama' | 'tensorrt' | 'onnx' | 'none';
+	}
+
+	interface Props {
+		caseId?: string;
+		evidenceIds?: string[];
+		onSuggestionClick?: (action: string) => void;
+	}
+
+	let { caseId = '', evidenceIds = [], onSuggestionClick }: Props = $props();
+
+	let messages = $state<ChatMessage[]>([]);
+	let input = $state('');
+	let isStreaming = $state(false);
+	let gpuStatus = $state<GPUStatus>({ available: false, utilization: 0, model: 'none', backend: 'none' });
+	let chatContainer: HTMLDivElement | undefined = $state();
+
+	const quickActions = [
+		{ label: 'Analyze Evidence', icon: 'search', action: 'Analyze the selected evidence items and identify key findings, patterns, and connections.' },
+		{ label: 'Next Steps', icon: 'list-checks', action: 'Based on the current evidence, what are the recommended next investigation steps?' },
+		{ label: 'Find Gaps', icon: 'alert-triangle', action: 'What gaps or missing information exist in the current evidence collection?' },
+		{ label: 'Timeline', icon: 'clock', action: 'Construct a chronological timeline of events from the available evidence.' },
+	];
+
+	$effect(() => {
+		checkGPUStatus();
+		const interval = setInterval(checkGPUStatus, 30000);
+		addSystemMessage('Detective Mode active. GPU-accelerated evidence analysis ready. Select evidence and ask questions.');
+		return () => clearInterval(interval);
+	});
+
+	async function checkGPUStatus() {
+		try {
+			const res = await fetch('/api/health/capabilities', { signal: AbortSignal.timeout(3000) });
+			if (res.ok) {
+				const data = await res.json();
+				gpuStatus = {
+					available: data.ollama || data.tensorrt || false,
+					utilization: 0,
+					model: data.models?.[0] ?? 'gemma3-legal:latest',
+					backend: data.tensorrt ? 'tensorrt' : data.ollama ? 'ollama' : 'none',
+				};
+			}
+		} catch {
+			gpuStatus = { available: false, utilization: 0, model: 'none', backend: 'none' };
+		}
+	}
+
+	function addSystemMessage(content: string) {
+		messages = [...messages, {
+			id: crypto.randomUUID(),
+			role: 'system',
+			content,
+			timestamp: Date.now(),
+		}];
+	}
+
+	async function sendMessage(text?: string) {
+		const msg = (text ?? input).trim();
+		if (!msg || isStreaming) return;
+		input = '';
+
+		// Add user message
+		messages = [...messages, {
+			id: crypto.randomUUID(),
+			role: 'user',
+			content: msg,
+			timestamp: Date.now(),
+			evidenceIds: evidenceIds.length > 0 ? [...evidenceIds] : undefined,
+		}];
+
+		// Create assistant placeholder
+		const assistantId = crypto.randomUUID();
+		messages = [...messages, {
+			id: assistantId,
+			role: 'assistant',
+			content: '',
+			timestamp: Date.now(),
+			streaming: true,
+		}];
+
+		isStreaming = true;
+		scrollToBottom();
+
+		try {
+			// Build context with evidence IDs
+			const contextParts = [msg];
+			if (caseId) contextParts.push(`[Case: ${caseId}]`);
+			if (evidenceIds.length > 0) contextParts.push(`[Evidence: ${evidenceIds.join(', ')}]`);
+
+			const query = contextParts.join(' ');
+
+			// SSE streaming via /api/sse/chat
+			const url = `/api/sse/chat?query=${encodeURIComponent(query)}&caseId=${encodeURIComponent(caseId)}`;
+			const eventSource = new EventSource(url);
+			let fullText = '';
+
+			eventSource.onmessage = (event) => {
+				try {
+					const data = JSON.parse(event.data);
+					if (data.token) {
+						fullText += data.token;
+						updateMessage(assistantId, fullText, true);
+					}
+					if (data.done) {
+						updateMessage(assistantId, fullText, false);
+						eventSource.close();
+						isStreaming = false;
+					}
+				} catch {
+					// Non-JSON text token
+					fullText += event.data;
+					updateMessage(assistantId, fullText, true);
+				}
+			};
+
+			eventSource.onerror = () => {
+				eventSource.close();
+				if (!fullText) {
+					// Fallback to non-streaming
+					fallbackChat(assistantId, query);
+				} else {
+					updateMessage(assistantId, fullText, false);
+					isStreaming = false;
+				}
+			};
+		} catch (err) {
+			updateMessage(assistantId, `Error: ${err instanceof Error ? err.message : 'Unknown error'}`, false);
+			isStreaming = false;
+		}
+	}
+
+	async function fallbackChat(messageId: string, query: string) {
+		try {
+			const res = await fetch('/api/ai/chat', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ message: query, model: 'gemma3-legal:latest' }),
+			});
+			if (!res.ok) throw new Error(`${res.status}`);
+			const data = await res.json();
+			updateMessage(messageId, data.response ?? data.message ?? 'No response', false);
+		} catch (err) {
+			updateMessage(messageId, `Fallback failed: ${err instanceof Error ? err.message : 'Unknown'}`, false);
+		}
+		isStreaming = false;
+	}
+
+	function updateMessage(id: string, content: string, streaming: boolean) {
+		messages = messages.map((m) => m.id === id ? { ...m, content, streaming } : m);
+		scrollToBottom();
+	}
+
+	function scrollToBottom() {
+		setTimeout(() => {
+			if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
+		}, 50);
+	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			sendMessage();
+		}
+	}
+
+	function getStatusColor(): string {
+		if (!gpuStatus.available) return 'text-danger';
+		return 'text-green-500';
+	}
 </script>
- <!-- AI: Assistant, Panel --> <Card class="h-full flex"> <!-- Header --> <CardHeader class="pb-3"> <div class="flex items-center"> <div class="flex items-center"> <Icon name="bot" class="w-5 h-5" /> <CardTitle class="text-lg">AI Assistant</CardTitle> </div>
- <!-- GPU, Status --> <div class="flex items-center gap-2"> <Icon name="cpu" class="w-4" /> <span class={getGPUStatusColor()}> {getGPUStatusText()} </span>
-  {#if gpuStatus.available} <span class="text-muted-foreground"> {gpuStatus.utilization}% </span> {/if}
-  </div> </div>
- <!-- Connection, Info --> <div class="flex items-center gap-4 text-xs"> <div class="flex items-center"> <Icon name="signal" class="w-3" /> {gpuAIService.getConnectionInfo.using_quic ? 'QUIC/HTTP3': 'HTTP/2'} </div>
- <div>Model: {gpuStatus.model}</div>
-  {#if gpuStatus.queue_length > 0} <div class="text-warning">Queue: {gpuStatus.queue_length}{/if}
-  </div> </CardHeader>
- <!-- Chat, Messages --> <div bind:this={chatContainer} class="flex-1 overflow-y-auto p-4 space-y-4"
-    onscroll={(e) => { const container = e.target as HTMLDivElement; shouldAutoScroll = container.scrollTop + container.clientHeight >= container.scrollHeight - 10}} >
-  {#each messages as message (message.id)} <div class="flex"> <!-- Avatar -->
-  {#if message.type !== 'user'} <div class="flex-shrink-0"> <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center">
-  {#if message.type === 'system'} <Icon name="signal" class="w-4 h-4" /> {:else} <Icon name="bot" class="w-4 h-4" /> {/if}
-  </div> {/if}
-  <!-- Message, Content --> <div class="flex-1"> <div class="
-            rounded-lg p-3 text-sm {message.type === 'user'
-              ? 'bg-primary text-primary-foreground ml-auto' message.type === 'system'
-              ? 'bg-muted/50 text-muted-foreground border' : 'bg-muted'}
-          "> <!-- Message, text --> <div class="prose prose-sm"> {message.content} {#if message.streaming} <span class="inline-block w-2 h-4 bg-current animate-pulse"></span> {/if}
-  </div>
- <!-- Evidence, tags -->
-  {#if message.evidence_ids?.length} <div class="flex flex-wrap gap-1">
-  {#each Array.isArray(message.evidence_ids) ? message.evidence_ids: [] as evidenceId} {@const evidence = evidenceList.find(e => e.id === evidenceId)} <span class="px-2 py-1 text-xs bg-primary/20"> {evidence?.title ?? evidenceId} </span> {/each} {/if}
-  <!-- Suggestions -->
-  {#if message.suggestions?.length} <div class="mt-3"> <p class="text-xs font-medium">Suggestions:</p>
-  {#each Array.isArray(message.suggestions) ? message.suggestions: [] as suggestion} <button class="block w-full text-left p-2 rounded border border-current/20"
-                    onclick={() => handleSuggestionClick(suggestion)} >
-                    <div class="flex items-center"> <Icon name="brain" class="w-3" /> <span class="text-xs">{suggestion.title}</span> </div>
- <p class="text-xs opacity-70">{suggestion.description}</p> </button> {/each} {/if}
-  <!-- Insights -->
-  {#if message.insights?.length} <div class="mt-3"> <p class="text-xs font-medium">Insights:</p>
-  {#each Array.isArray(message.insights) ? message.insights: [] as insight} <div class="p-2 rounded border"> <div class="flex items-center"> <Icon name="trending-up" class="w-3" /> <span class="text-xs">{insight.title}</span>
- <span class="text-xs">({Math.round(insight.confidence * 100)}%)</span> </div>
- <p class="text-xs opacity-70">{insight.description}</p> </div> {/each} {/if}
-  </div>
- <!-- Timestamp --> <div class="text-xs text-muted-foreground"> {formatTimestamp(message.timestamp)} </div> </div>
- <!-- User, avatar -->
-  {#if message.type === 'user'} <div class="flex-shrink-0"> <div class="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm"> U
-            </div> {/if}
-  </div> {/each}
-  <!-- Typing, indicator -->
-  {#if isTyping} <div class="flex"> <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center"> <Icon name="bot" class="w-4 h-4" /> </div>
- <div class="bg-muted rounded-lg"> <div class="flex"> <div class="w-2 h-2 bg-current rounded-full"></div>
- <div class="w-2 h-2 bg-current rounded-full" style="animation-delay: 0.1s"></div>
- <div class="w-2 h-2 bg-current rounded-full" style="animation-delay: 0.2s"></div> </div> </div> {/if}
-  </div>
- <!-- Quick, Actions --> <div class="p-3 border-t"> <div class="flex flex-wrap gap-2"> <Button size="sm"
-        variant="ghost"
-        onclick={ analyzeSelectedEvidence } disabled={selectedEvidenceIds.length === 0 || isStreaming} class="text-xs bits-btn"
-      > <Icon name="brain" class="w-3 h-3" /> Analyze ({selectedEvidenceIds.length}) </Button>
- <Button size="sm"
-        variant="ghost"
-        onclick={ suggestInvestigationSteps } disabled={ isStreaming } class="text-xs bits-btn"
-      > <Icon name="trending-up" class="w-3 h-3" /> Next Steps </Button>
- <Button size="sm"
-        variant="ghost"
-        onclick={ identifyEvidenceGaps } disabled={ isStreaming } class="text-xs bits-btn"
-      > <Icon name="alert-triangle" class="w-3 h-3" /> Find Gaps </Button> </div>
- <!-- Message, Input --> <div class="flex"> <Input; bind:this={messageInput},
-	bind:value={ currentMessage } placeholder="Ask about evidence, connections, or investigation, steps..."
-        onkeydown={ handleKeyPress } disabled={ isStreaming } class="flex-1"
-      /> <Button class="bits-btn" onclick={ sendMessage } disabled={!currentMessage.trim() || isStreaming} size="sm"
-      >
-  {#if isStreaming} <Icon name="loader-2" class="w-4 h-4" /> {:else} <Icon name="send" class="w-4" /> {/if}
-  </Button> </div> </div> </Card>
- <style> .prose { /* @apply text-current; */ }
-  .prose p { /* @apply my-2; */ }
-  .prose ul, .prose ol { /* @apply my-2 pl-4; */ }
-  .prose strong { /* @apply font-semibold; */ }
-  .prose code { /* @apply bg-current/10 px-1 rounded text-sm; */ }
-</style>
 
+<div class="flex flex-col h-full border border-sand-dark rounded-lg overflow-hidden">
+	<!-- Header -->
+	<div class="flex items-center justify-between px-3 py-2 border-b border-sand-dark bg-panel-soft">
+		<div class="flex items-center gap-2">
+			<Icon name="shield" size={18} />
+			<span class="text-sm font-semibold">Detective Mode</span>
+		</div>
+		<div class="flex items-center gap-2 text-[11px]">
+			<span class={getStatusColor()}>
+				<Icon name="cpu" size={12} />
+				{gpuStatus.backend === 'none' ? 'Offline' : gpuStatus.backend.toUpperCase()}
+			</span>
+			{#if gpuStatus.available}
+				<span class="opacity-50">{gpuStatus.model}</span>
+			{/if}
+			{#if evidenceIds.length > 0}
+				<span class="px-1.5 py-0.5 rounded bg-accent/20 text-accent">
+					{evidenceIds.length} evidence
+				</span>
+			{/if}
+		</div>
+	</div>
 
+	<!-- Messages -->
+	<div bind:this={chatContainer} class="flex-1 overflow-y-auto p-3 space-y-3 min-h-[200px] max-h-[400px]">
+		{#each messages as msg (msg.id)}
+			<div class="flex gap-2" class:flex-row-reverse={msg.role === 'user'}>
+				{#if msg.role !== 'user'}
+					<div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 {msg.role === 'assistant' ? 'bg-accent-soft' : 'bg-panel-soft'}">
+						<Icon name={msg.role === 'assistant' ? 'bot' : 'info'} size={14} />
+					</div>
+				{/if}
 
+				<div class="max-w-[80%] rounded-lg px-3 py-2 text-sm {msg.role === 'user' ? 'bg-accent-soft' : msg.role === 'system' ? 'bg-panel-soft opacity-60 text-xs' : 'bg-panel'}">
+					<p class="m-0 whitespace-pre-wrap">{msg.content}{#if msg.streaming}<span class="inline-block w-1.5 h-3.5 bg-accent ml-0.5 animate-pulse"></span>{/if}</p>
 
+					{#if msg.evidenceIds?.length}
+						<div class="flex flex-wrap gap-1 mt-1.5">
+							{#each msg.evidenceIds as eid}
+								<span class="px-1.5 py-0.5 text-[10px] rounded bg-info/15 text-info">{eid}</span>
+							{/each}
+						</div>
+					{/if}
+
+					{#if msg.suggestions?.length}
+						<div class="mt-2 space-y-1">
+							{#each msg.suggestions as s}
+								<button
+									onclick={() => { onSuggestionClick?.(s.action); sendMessage(s.action); }}
+									class="block w-full text-left px-2 py-1.5 text-xs border border-accent/20 rounded bg-transparent hover:bg-accent/10 cursor-pointer transition-colors"
+								>
+									<Icon name="lightbulb" size={10} /> {s.title}
+								</button>
+							{/each}
+						</div>
+					{/if}
+
+					{#if msg.insights?.length}
+						<div class="mt-2 space-y-1">
+							{#each msg.insights as insight}
+								<div class="px-2 py-1.5 text-xs border border-sand-dark rounded">
+									<div class="flex items-center gap-1">
+										<Icon name="trending-up" size={10} />
+										<span class="font-medium">{insight.title}</span>
+										<span class="opacity-50">({Math.round(insight.confidence * 100)}%)</span>
+									</div>
+									<p class="m-0 mt-0.5 opacity-70">{insight.description}</p>
+								</div>
+							{/each}
+						</div>
+					{/if}
+				</div>
+
+				{#if msg.role === 'user'}
+					<div class="w-7 h-7 rounded-full bg-accent/20 flex items-center justify-center shrink-0 text-xs font-bold">
+						U
+					</div>
+				{/if}
+			</div>
+		{/each}
+	</div>
+
+	<!-- Quick Actions -->
+	<div class="px-3 py-1.5 border-t border-sand-dark flex flex-wrap gap-1.5">
+		{#each quickActions as qa}
+			<button
+				onclick={() => sendMessage(qa.action)}
+				disabled={isStreaming}
+				class="flex items-center gap-1 px-2 py-1 text-[11px] border border-sand-dark rounded bg-transparent hover:border-accent cursor-pointer transition-colors disabled:opacity-40"
+			>
+				<Icon name={qa.icon} size={11} />
+				{qa.label}
+			</button>
+		{/each}
+	</div>
+
+	<!-- Input -->
+	<div class="flex items-center gap-2 px-3 py-2 border-t border-sand-dark">
+		<input
+			type="text"
+			bind:value={input}
+			onkeydown={handleKeydown}
+			disabled={isStreaming}
+			placeholder="Ask about evidence, connections, or investigation steps..."
+			class="flex-1 p-2 text-sm border border-sand-dark rounded-lg bg-panel-soft focus:border-accent focus:outline-none disabled:opacity-50"
+		/>
+		<Button onclick={() => sendMessage()} disabled={!input.trim() || isStreaming} size="sm" class="bits-btn">
+			{#if isStreaming}
+				<Icon name="loader-2" size={16} />
+			{:else}
+				<Icon name="send" size={16} />
+			{/if}
+		</Button>
+	</div>
+</div>

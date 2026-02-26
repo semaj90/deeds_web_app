@@ -8,12 +8,14 @@
 	import RichEvidenceCard from '$lib/components/evidence/EvidenceCard.svelte';
 	import LazyLoader from '$lib/components/LazyLoader.svelte';
 	import EvidenceStats from '$lib/components/yorha/evidence/EvidenceStats.svelte';
+	import RagDocumentGrid from '$lib/components/rag/RagDocumentGrid.svelte';
 
 	let { data }: { data: PageData } = $props();
 	let showReportGenerator = $state(false);
 	let showEvidenceCards = $state(false);
 	let showEvidenceStats = $state(false);
 	let showRichCards = $state(false);
+	let showRagDocuments = $state(false);
 
 	const sampleEvidenceItems: any[] = [
 		{ id: 'ev-001', file_name: 'Contract_Agreement_2024.pdf', evidence_type: 'document', file_type: 'application/pdf', file_size: 2_400_000, uploaded_at: new Date(Date.now() - 86400000 * 5), ai_summary: 'Employment agreement with non-compete clause. Contains liability provisions in Section 4.', tags: ['contract', 'employment'], ai_tags: ['legal-binding', 'non-compete'] },
@@ -151,7 +153,24 @@
 	</div>
 {/if}
 
-<EvidenceModal item={selectedEvidence} bind:open={showEvidenceModal} onSave={(updated) => { selectedEvidence = updated; showEvidenceModal = false; }} />
+<div class="report-section">
+	<button
+		class="report-toggle"
+		style="border-color: #06b6d4; color: #06b6d4; background: rgba(6,182,212,0.15);"
+		onclick={() => (showRagDocuments = !showRagDocuments)}
+	>
+		{showRagDocuments ? 'Hide RAG Documents' : 'RAG Document Grid'}
+	</button>
+</div>
+{#if showRagDocuments}
+	<div class="report-container">
+		<RagDocumentGrid />
+	</div>
+{/if}
+
+{#if showEvidenceModal}
+	<EvidenceModal item={selectedEvidence} bind:open={showEvidenceModal} onSave={(updated) => { selectedEvidence = updated; showEvidenceModal = false; }} />
+{/if}
 
 <style>
 	.report-section {

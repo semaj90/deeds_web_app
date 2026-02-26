@@ -32,6 +32,11 @@
   import SmartSearchInterface from '$lib/components/ai/SmartSearchInterface.svelte';
   import QLoRAMonitoringDashboard from '$lib/components/ai/QLoRAMonitoringDashboard.svelte';
   import AuditResults from '$lib/components/ai/AuditResults.svelte';
+  import LocalImageGenerator from '$lib/components/ai/LocalImageGenerator.svelte';
+  import GPUAIAssistant from '$lib/components/ai/GPUAIAssistant.svelte';
+  import LLMSelector from '$lib/components/ai/LLMSelector.svelte';
+  import ProactiveAIAssistant from '$lib/components/ai/ProactiveAIAssistant.svelte';
+  import DeedAnalysis from '$lib/components/ai/DeedAnalysis.svelte';
   import type { AnswerWithCitations as AnswerData } from '$lib/types/rag-source-validation';
 
   interface AIStats {
@@ -94,6 +99,11 @@
   let showSmartSearch = $state(false);
   let showQLoRA = $state(false);
   let showAuditResults = $state(false);
+  let showImageGen = $state(false);
+  let showDetective = $state(false);
+  let showLLMSelector = $state(false);
+  let showDeedAnalysis = $state(false);
+  let selectedLLM = $state<any>(null);
   let ragQuery = $state('');
   let ragChunks = $state<any[]>([]);
   let ragAnswer = $state<AnswerData | null>(null);
@@ -260,6 +270,11 @@
           </CardContent>
         </Card>
       {/each}
+    </div>
+
+    <!-- Proactive Suggestions -->
+    <div class="mb-6">
+      <ProactiveAIAssistant context="general" />
     </div>
 
     <!-- Models -->
@@ -784,6 +799,66 @@
       {#if showAuditResults}
         <div class="mt-3">
           <AuditResults />
+        </div>
+      {/if}
+    </div>
+
+    <!-- Detective Mode (GPU Evidence Analysis) -->
+    <div class="mb-4">
+      <button
+        class="w-full text-left px-4 py-3 rounded-lg border border-sand/10 bg-panel hover:bg-panel-soft transition-colors text-sm text-sand/80"
+        onclick={() => (showDetective = !showDetective)}
+      >
+        {showDetective ? 'Hide Detective Mode' : 'Detective Mode (GPU Evidence Analysis + Streaming Chat)'}
+      </button>
+      {#if showDetective}
+        <div class="mt-3" style="height: 500px;">
+          <GPUAIAssistant />
+        </div>
+      {/if}
+    </div>
+
+    <!-- AI Image Generation -->
+    <div class="mb-4">
+      <button
+        class="w-full text-left px-4 py-3 rounded-lg border border-sand/10 bg-panel hover:bg-panel-soft transition-colors text-sm text-sand/80"
+        onclick={() => (showImageGen = !showImageGen)}
+      >
+        {showImageGen ? 'Hide Image Generator' : 'AI Image Generation (Legal Templates + SD/ComfyUI/Ollama)'}
+      </button>
+      {#if showImageGen}
+        <div class="mt-3 p-4 border border-sand/10 rounded-lg bg-panel">
+          <LocalImageGenerator />
+        </div>
+      {/if}
+    </div>
+
+    <!-- LLM Model Selector -->
+    <div class="mb-4">
+      <button
+        class="w-full text-left px-4 py-3 rounded-lg border border-sand/10 bg-panel hover:bg-panel-soft transition-colors text-sm text-sand/80"
+        onclick={() => (showLLMSelector = !showLLMSelector)}
+      >
+        {showLLMSelector ? 'Hide LLM Selector' : 'LLM Model Selector (Ollama Status + Pull + Metrics)'}
+      </button>
+      {#if showLLMSelector}
+        <div class="mt-3 p-4 border border-sand/10 rounded-lg bg-panel">
+          <LLMSelector bind:selectedModel={selectedLLM} />
+        </div>
+      {/if}
+    </div>
+
+    <!-- Deed / Document Semantic Analysis -->
+    <div class="mb-4">
+      <button
+        class="w-full text-left px-4 py-3 rounded-lg border border-sand/10 bg-panel hover:bg-panel-soft transition-colors text-sm text-sand/80"
+        onclick={() => (showDeedAnalysis = !showDeedAnalysis)}
+      >
+        {showDeedAnalysis ? 'Hide Deed Analysis' : 'Deed Analysis (Semantic Document Search + Similarity Scoring)'}
+      </button>
+      {#if showDeedAnalysis}
+        <div class="mt-3 p-4 border border-sand/10 rounded-lg bg-panel">
+          <DeedAnalysis />
         </div>
       {/if}
     </div>

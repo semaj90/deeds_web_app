@@ -54,5 +54,4 @@ export const ONNX_EXECUTION_PROVIDERS = ['webgpu', 'wasm', 'cpu'] as const;
 
 export type InferenceSource = 'local-onnx' | 'local-wasm' | 'server-ollama' | 'server-gemini';
 
-/** WASM llama.cpp worker path (client-side inference via WebAssembly) */
-export const WASM_WORKER_PATH = '/workers/webllama.worker.js';
+// WASM llama.cpp worker ARCHIVED → deeds_labs/wasm-archive/ (ONNX Runtime WebGPU is superior path)

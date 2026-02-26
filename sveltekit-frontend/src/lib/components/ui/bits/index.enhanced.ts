@@ -25,7 +25,6 @@ export { default as NESModal } from './NESModal.svelte';
 
 // AI & Legal Components
 export { default as AIDialog } from './AIDialog.svelte';
-export { default as AIChatMessage } from './AIChatMessage.svelte';
 export { default as AISearchBar } from './AISearchBar.svelte';
 export { default as DocumentCard } from './DocumentCard.svelte';
 export { default as EvidenceBoard } from './EvidenceBoard.svelte';

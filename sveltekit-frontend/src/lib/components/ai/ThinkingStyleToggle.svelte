@@ -56,9 +56,9 @@
 	}
 </script>
 
-<div class="thinking-style-control">
+<div class="relative flex flex-col gap-3">
 	<div
-		class="toggle-container"
+		class="relative flex items-center"
 		onmouseenter={() => (showTooltip = true)}
 		onmouseleave={() => (showTooltip = false)}
 		role="group"
@@ -67,18 +67,18 @@
 			size={btnSize}
 			disabled={loading || (!premium && !enabled)}
 			onclick={handleToggle}
-			class="thinking-toggle-btn"
+			class="min-w-[140px] justify-start"
 		>
-			<span class="icon-container">
+			<span class="flex items-center justify-center w-5 h-5 mr-2">
 				{#if loading}
-					<span class="loading-spinner"></span>
+					<span class="inline-block w-4 h-4 border-2 border-transparent border-t-current rounded-full animate-spin"></span>
 				{:else if enabled}
 					<Icon name="brain" size={iconSize} />
 				{:else}
 					<Icon name="zap" size={iconSize} />
 				{/if}
 			</span>
-			<span class="toggle-text">
+			<span class="text-sm">
 				{#if loading}
 					Analyzing...
 				{:else if enabled}
@@ -101,42 +101,41 @@
 			</Button>
 		{/if}
 
-		<!-- Tooltip -->
 		{#if showTooltip}
-			<div class="tooltip" transition:fade={{ duration: 200 }}>
+			<div class="absolute top-full mt-2 left-0 z-50 pointer-events-none" transition:fade={{ duration: 200 }}>
 				{#if !premium}
-					<div class="tooltip-content">
+					<div class="bg-panel-soft border border-sand-dark rounded-lg p-3 shadow-xl max-w-xs flex gap-3 items-start">
 						<Icon name="crown" size={16} />
 						<div>
-							<strong>Premium Feature</strong>
-							<p>Thinking Style requires Premium access for advanced AI reasoning</p>
+							<strong class="block mb-1">Premium Feature</strong>
+							<p class="mb-2 opacity-90 text-[13px] leading-snug m-0">Thinking Style requires Premium access for advanced AI reasoning</p>
 						</div>
 					</div>
 				{:else if enabled}
-					<div class="tooltip-content">
+					<div class="bg-panel-soft border border-sand-dark rounded-lg p-3 shadow-xl max-w-xs flex gap-3 items-start">
 						<Icon name="brain" size={16} />
 						<div>
-							<strong>Thinking Style Active</strong>
-							<p>AI shows step-by-step reasoning process</p>
-							<div class="feature-list">
-								<span class="feature">Deeper legal analysis</span>
-								<span class="feature">Transparent reasoning</span>
-								<span class="feature">Higher accuracy</span>
-								<span class="feature">Detailed explanations</span>
+							<strong class="block mb-1">Thinking Style Active</strong>
+							<p class="mb-2 opacity-90 text-[13px] leading-snug m-0">AI shows step-by-step reasoning process</p>
+							<div class="flex flex-col gap-0.5">
+								<span class="text-xs opacity-80">Deeper legal analysis</span>
+								<span class="text-xs opacity-80">Transparent reasoning</span>
+								<span class="text-xs opacity-80">Higher accuracy</span>
+								<span class="text-xs opacity-80">Detailed explanations</span>
 							</div>
 						</div>
 					</div>
 				{:else}
-					<div class="tooltip-content">
+					<div class="bg-panel-soft border border-sand-dark rounded-lg p-3 shadow-xl max-w-xs flex gap-3 items-start">
 						<Icon name="zap" size={16} />
 						<div>
-							<strong>Quick Mode Active</strong>
-							<p>Fast AI responses without reasoning details</p>
-							<div class="feature-list">
-								<span class="feature">Instant results</span>
-								<span class="feature">Concise answers</span>
-								<span class="feature">Lower resource usage</span>
-								<span class="feature">Basic analysis</span>
+							<strong class="block mb-1">Quick Mode Active</strong>
+							<p class="mb-2 opacity-90 text-[13px] leading-snug m-0">Fast AI responses without reasoning details</p>
+							<div class="flex flex-col gap-0.5">
+								<span class="text-xs opacity-80">Instant results</span>
+								<span class="text-xs opacity-80">Concise answers</span>
+								<span class="text-xs opacity-80">Lower resource usage</span>
+								<span class="text-xs opacity-80">Basic analysis</span>
 							</div>
 						</div>
 					</div>
@@ -145,40 +144,39 @@
 		{/if}
 	</div>
 
-	<!-- Configuration Panel -->
 	{#if showConfig && premium}
-		<div class="config-panel" transition:slide={{ duration: 300 }}>
-			<div class="config-header">
-				<h4>Thinking Style Configuration</h4>
-				<p class="config-subtitle">Customize AI reasoning parameters</p>
+		<div class="bg-panel-soft border border-sand-dark rounded-xl p-5" transition:slide={{ duration: 300 }}>
+			<div class="mb-4">
+				<h4 class="text-[15px] font-semibold m-0">Thinking Style Configuration</h4>
+				<p class="text-[13px] opacity-60 mt-1 m-0">Customize AI reasoning parameters</p>
 			</div>
 
-			<div class="config-content">
-				<div class="setting-group">
-					<label for="thinking-depth" class="setting-label">Reasoning Depth</label>
-					<select id="thinking-depth" bind:value={thinkingDepth} class="setting-select">
+			<div class="flex flex-col gap-4 mb-4">
+				<div class="flex flex-col gap-2">
+					<label for="thinking-depth" class="text-sm font-medium">Reasoning Depth</label>
+					<select id="thinking-depth" bind:value={thinkingDepth} class="w-full px-3 py-2 border border-sand-dark rounded-md bg-panel text-inherit text-sm focus:outline-none focus:border-accent">
 						<option value="basic">Basic (3-5 steps)</option>
 						<option value="detailed">Detailed (5-10 steps)</option>
 						<option value="comprehensive">Comprehensive (10+ steps)</option>
 					</select>
 				</div>
 
-				<div class="setting-group">
-					<label class="setting-label">Focus Areas</label>
-					<div class="checkbox-group">
-						<label class="checkbox-label">
+				<div class="flex flex-col gap-2">
+					<label class="text-sm font-medium">Focus Areas</label>
+					<div class="flex flex-col gap-1.5">
+						<label class="flex items-center gap-2 text-sm cursor-pointer">
 							<input type="checkbox" bind:checked={focusAreas.precedents} />
 							<span>Legal precedents & case law</span>
 						</label>
-						<label class="checkbox-label">
+						<label class="flex items-center gap-2 text-sm cursor-pointer">
 							<input type="checkbox" bind:checked={focusAreas.evidence} />
 							<span>Evidence quality assessment</span>
 						</label>
-						<label class="checkbox-label">
+						<label class="flex items-center gap-2 text-sm cursor-pointer">
 							<input type="checkbox" bind:checked={focusAreas.compliance} />
 							<span>Procedural compliance</span>
 						</label>
-						<label class="checkbox-label">
+						<label class="flex items-center gap-2 text-sm cursor-pointer">
 							<input type="checkbox" bind:checked={focusAreas.alternatives} />
 							<span>Alternative interpretations</span>
 						</label>
@@ -186,190 +184,23 @@
 				</div>
 			</div>
 
-			<div class="config-actions">
+			<div class="flex gap-3 justify-end">
 				<Button variant="ghost" size="sm" onclick={() => (showConfig = false)}>Cancel</Button>
 				<Button size="sm" onclick={() => (showConfig = false)}>Save Configuration</Button>
 			</div>
 		</div>
 	{/if}
 
-	<!-- Premium Upgrade Banner -->
 	{#if !premium}
-		<div class="premium-banner" transition:slide={{ duration: 300 }}>
-			<div class="premium-content">
+		<div class="bg-gradient-to-br from-[#c9a96e] to-[#8b7355] text-[#0c0a09] rounded-lg p-4" transition:slide={{ duration: 300 }}>
+			<div class="flex items-center gap-4">
 				<Icon name="crown" size={20} />
-				<div class="premium-text">
-					<strong>Unlock Advanced AI Reasoning</strong>
-					<p>Get step-by-step legal analysis with transparent thinking process</p>
+				<div class="flex-1">
+					<strong class="block mb-1 font-semibold">Unlock Advanced AI Reasoning</strong>
+					<p class="m-0 text-sm opacity-90">Get step-by-step legal analysis with transparent thinking process</p>
 				</div>
 				<Button size="sm" onclick={() => onupgrade?.()}>Upgrade Now</Button>
 			</div>
 		</div>
 	{/if}
 </div>
-
-<style>
-	.thinking-style-control {
-		position: relative;
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-	}
-	.toggle-container {
-		position: relative;
-		display: flex;
-		align-items: center;
-	}
-	.thinking-toggle-btn {
-		min-width: 140px;
-		justify-content: flex-start;
-	}
-	.icon-container {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 20px;
-		height: 20px;
-		margin-right: 0.5rem;
-	}
-	.toggle-text {
-		font-size: 0.875rem;
-	}
-	.loading-spinner {
-		width: 16px;
-		height: 16px;
-		border: 2px solid transparent;
-		border-top: 2px solid currentColor;
-		border-radius: 50%;
-		animation: spin 1s linear infinite;
-	}
-	@keyframes spin {
-		0% { transform: rotate(0deg); }
-		100% { transform: rotate(360deg); }
-	}
-	.tooltip {
-		position: absolute;
-		top: calc(100% + 0.5rem);
-		left: 0;
-		z-index: 50;
-		pointer-events: none;
-	}
-	.tooltip-content {
-		background: var(--color-panel-soft, #1c1917);
-		border: 1px solid var(--color-sand-dark, #44403c);
-		border-radius: 0.5rem;
-		padding: 0.75rem;
-		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-		max-width: 320px;
-		display: flex;
-		gap: 0.75rem;
-		align-items: flex-start;
-	}
-	.tooltip-content strong {
-		display: block;
-		margin-bottom: 0.25rem;
-	}
-	.tooltip-content p {
-		margin-bottom: 0.5rem;
-		opacity: 0.9;
-		font-size: 0.8125rem;
-		line-height: 1.4;
-	}
-	.feature-list {
-		display: flex;
-		flex-direction: column;
-		gap: 0.125rem;
-	}
-	.feature {
-		font-size: 0.75rem;
-		opacity: 0.8;
-	}
-	.config-panel {
-		background: var(--color-panel-soft, #1c1917);
-		border: 1px solid var(--color-sand-dark, #44403c);
-		border-radius: 0.75rem;
-		padding: 1.25rem;
-	}
-	.config-header {
-		margin-bottom: 1rem;
-	}
-	.config-header h4 {
-		font-size: 0.9375rem;
-		font-weight: 600;
-	}
-	.config-subtitle {
-		font-size: 0.8125rem;
-		opacity: 0.6;
-		margin-top: 0.25rem;
-	}
-	.config-content {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-		margin-bottom: 1rem;
-	}
-	.setting-group {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
-	.setting-label {
-		font-size: 0.875rem;
-		font-weight: 500;
-	}
-	.setting-select {
-		width: 100%;
-		padding: 0.5rem 0.75rem;
-		border: 1px solid var(--color-sand-dark, #44403c);
-		border-radius: 0.375rem;
-		background: var(--color-panel, #0c0a09);
-		color: inherit;
-		font-size: 0.875rem;
-	}
-	.setting-select:focus {
-		outline: none;
-		border-color: var(--color-accent, #a51c30);
-		box-shadow: 0 0 0 2px rgba(165, 28, 48, 0.2);
-	}
-	.checkbox-group {
-		display: flex;
-		flex-direction: column;
-		gap: 0.375rem;
-	}
-	.checkbox-label {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-size: 0.875rem;
-		cursor: pointer;
-	}
-	.config-actions {
-		display: flex;
-		gap: 0.75rem;
-		justify-content: flex-end;
-	}
-	.premium-banner {
-		background: linear-gradient(135deg, #c9a96e, #8b7355);
-		color: #0c0a09;
-		border-radius: 0.5rem;
-		padding: 1rem;
-	}
-	.premium-content {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-	}
-	.premium-text {
-		flex: 1;
-	}
-	.premium-text strong {
-		display: block;
-		margin-bottom: 0.25rem;
-		font-weight: 600;
-	}
-	.premium-text p {
-		margin: 0;
-		font-size: 0.875rem;
-		opacity: 0.9;
-	}
-</style>

@@ -1,237 +1,313 @@
-<!-- Local Image Generation Component Supports Stable Diffusion WebUI: ComfyUI, and Ollama integration Production-ready with native Windows, support --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
- import { imageGenerationService, imageGenerationStore, // removed problematic `type` imports to avoid TS namespace errors when importing from .js } from '$lib/services/local-image-generation-service.js'; // minimal local types to avoid external namespace errors interface ImageGenerationRequest { prompt: string, negativePrompt?: string; width?: number; height?: number; steps?: number; cfgScale?: number; seed?: number; style?: string; provider?: string}
+<script lang="ts">
+	import Icon from '$lib/components/ui/Icon.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
 
-interface ImageGenerationResult { id?: string,prompt: string;
-	imageUrl: string, provider?: string; parameters?: Record<string, any>; metadata?: { seed?: number; size?: { width: number; height: number }; [k: string]: unknown }; timestamp?: number | string | Date; processingTime?: number}
+	interface ImageResult {
+		id: string;
+		prompt: string;
+		imageUrl: string;
+		provider: string;
+		timestamp: number;
+		processingTime?: number;
+		seed?: number;
+		width: number;
+		height: number;
+	}
 
-interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationResult) => void; initialPrompt?: string; compact?: boolean}
-  let { caseId = '', onImageGenerated = (result: ImageGenerationResult) => 0%, // fixed default initialPrompt = '', compact = false }: Props = $props(); // Component state let prompt = $state(initialPrompt);
-   let negativePrompt = $state<string>('blurry, low quality, distorted, text, watermark, signature');
-   let selectedStyle = $state<'realistic' | 'artistic' | 'anime' | 'sketch' | 'legal-diagram' | 'evidence-recreation'>(
-    'realistic'
-  );
-   let selectedProvider = $state<'stable-diffusion-webui' | 'comfyui' | 'ollama-vision' | 'fallback'>('fallback');
-   let advancedMode = $state<boolean>(false); // Advanced parameters let width = $state<number>(512);
-   let height = $state<number>(512);
-   let steps = $state<number>(20);
-   let cfgScale = $state(7.5);
-   let seed = $state(-1); // UI state let showHistory = $state<boolean>(false);
-   let selectedImage = $state<ImageGenerationResult | null>(null); // use local type let generationHistory = $state<ImageGenerationResult[]>([]); // Provider status let providerStatus = $state<Map<string string>>(new Map()); // fixed generic and initialization $effect(() => { // Load provider status providerStatus = imageGenerationService.getProviderStatus(); // Load generation history loadHistory()});
-  async function loadHistory(): Promise<any> { try { generationHistory = await imageGenerationService.getGenerationHistory()} catch (error) { console.error('Failed to load generation history:', error)}
-  }
-  async function generateImage(): Promise<any> { if (!prompt.trim()) { alert('Please enter a prompt'); return}
-    try { const request: ImageGenerationRequest = { prompt: prompt.trim(): negativePrompt.trim() || undefined, width, height, steps, cfgScale, seed: seed === -1 ?, undefined: seed, style: selectedStyle;
-	provider: selectedProvider };
-   const result = await imageGenerationService.generateImage(request); // Update history generationHistory = [result, ...generationHistory]; selectedImage = result; // Notify parent component onImageGenerated(result)} catch (error) { console.error('Image generation failed:', error); alert(`Image generation failed: ${error instanceof Error ? error.message: 'Unknown error'}`)}
-  }
-  function useImageAsEvidence(result: ImageGenerationResult) { if (caseId && onImageGenerated) { const evidence = { id: `generated_${result.id}`, title: `AI, Generated: ${result.prompt?.substring(0, 50) ?? 'generated image'}...`, description `Generated image from prompt: ${result.prompt}`, evidenceType: 'image', fileUrl: result.imageUrl, metadata: {
-	aiGenerated: true, provider: result.provider, parameters: result.parameters, generatedAt: result.timestamp }; tags: ['ai-generated', result.provider ?? 'unknown', selectedStyle] }; // parent callback â€” still call with result (evidence creation handled outside) onImageGenerated(result)}
-  }
-  async function regenerateWithSeed(result: ImageGenerationResult): Promise<any> { prompt = result.prompt; if (result.metadata?.seed !== undefined && result.metadata.seed !== -1) { seed = result.metadata.seed} else { seed = -1}
-    selectedStyle = (result.parameters?.style as unknown) ?? 'realistic'; width = result.metadata?.size?.width ?? width; height = result.metadata?.size?.height ?? height; await generateImage()}
-  async function copyPrompt(text: string): Promise<any> { try { await navigator.clipboard.writeText(text); // optional:small feedback can be added } catch (err) { console.error('Failed to copy prompt', err)}
-  }
+	interface Props {
+		caseId?: string;
+		onImageGenerated?: (result: ImageResult) => void;
+		compact?: boolean;
+	}
 
-   // Legal/evidence specific prompts const legalPromptTemplates = [ { name: 'Crime Scene Recreation', prompt:
-        'detailed crime scene recreation, professional forensic photography style, accurate lighting, evidence markers'
-    },
-	{
-      name: 'Suspect Identification', prompt: 'police sketch style, facial composite, professional law enforcement illustration'
-    },
-	{
-      name: 'Traffic Accident Diagram', prompt:
-        'traffic accident scene diagram, aerial view, clear road markings, vehicle positions, technical illustration'
-    },
-	{
-      name: 'Property Damage Documentation', prompt: 'property damage documentation, insurance photo style, clear details, professional lighting'
-    },
-	{
-      name: 'Evidence Visualization', prompt: 'forensic evidence visualization, scientific illustration, detailed analysis, laboratory setting'
-    },
-	{
-      name: 'Legal Diagram', prompt: 'legal process diagram, flowchart style, professional presentation, clear annotations'
-    }]; </script>
- <div class="image-generator nes-container"> <div class="generator-header"> <h3>ðŸŽ¨ AI Image Generation</h3>
- <div class="provider-status">
-  {#each Array.from(providerStatus.entries()) as [provider, status]} <span class="provider-badge"> { provider }: {status !== 'internal' ? 'âœ“': 'âš ï¸'} </span> {/each}
-  </div> </div>
- <div class="generation-controls"> <!-- Prompt, Input --> <div class="input-group"> <label class="nes-text" for="prompt">Prompt:</label>
-<textarea id="prompt"
-        class="nes-textarea"
-        bind:value={ prompt } placeholder="Describe the image you want to generate..."
-        rows="3"
-      ></textarea> </div>
- <!-- Legal, Templates --> <div class="template-section"> <label class="nes-text">Legal Templates:</label>
- <div class="template-buttons">
-  {#each Array.isArray(legalPromptTemplates) ? legalPromptTemplates: [] as template} <button class="template-btn nes-btn" onclick={() => (prompt = template.prompt)}> {template.name} </button> {/each}
-  </div> </div>
- <!-- Style and: Provider, Selection --> <div class="selection-row"> <div class="select-group"> <label class="nes-text">Style:</label>
- <div class="nes-select"> <select bind:value={ selectedStyle }> <option value="realistic">Realistic</option>
- <option value="artistic">Artistic</option>
- <option value="anime">Anime</option>
- <option value="sketch">Sketch</option>
- <option value="legal-diagram">Legal Diagram</option>
- <option value="evidence-recreation">Evidence Recreation</option> </select> </div> </div>
- <div class="select-group"> <label class="nes-text">Provider:</label>
- <div class="nes-select"> <select bind:value={ selectedProvider }>
-  {#each Array.isArray(Array.from(providerStatus.keys())) ? Array.from(providerStatus.keys()): [] as provider} <option value={ provider }> { provider } {providerStatus.get(provider) !== 'internal' ? ' (Available)': ' (Fallback)'} </option> {/each}
-  </select> </div> </div> </div>
- <!-- Advanced, Controls --> <div class="advanced-toggle"> <label class="nes-checkbox"> <input type="checkbox" bind:checked={ advancedMode } /> <span>Advanced Settings</span> </label> </div>
-  {#if advancedMode} <div class="advanced-controls nes-container"> <div class="input-group"> <label class="nes-text" for="negative-prompt">Negative Prompt:</label>
- <textarea id="negative-prompt"
-            class="nes-textarea"
-            bind:value={ negativePrompt } placeholder="What to avoid in the image..."
-            rows="2"
-          ></textarea> </div>
- <div class="parameter-row"> <div class="param-group"> <label class="nes-text" for="width">Width:</label>
- <input id="width" class="nes-input" type="number" bind:value={ width } min="256" max="1024" step="64" /> </div>
- <div class="param-group"> <label class="nes-text" for="height">Height:</label>
- <input id="height" class="nes-input" type="number" bind:value={ height } min="256" max="1024" step="64" /> </div>
- <div class="param-group"> <label class="nes-text" for="steps">Steps:</label>
- <input id="steps" class="nes-input" type="number" bind:value={ steps } min="1" max="100" /> </div>
- <div class="param-group"> <label class="nes-text" for="cfg-scale">CFG Scale:</label>
- <input id="cfg-scale" class="nes-input" type="number" bind:value={ cfgScale } min="1" max="30" step="0.5" /> </div>
- <div class="param-group"> <label class="nes-text" for="seed-1-for-random">Seed (-1 for random):</label>
- <input id="seed-1-for-random" class="nes-input" type="number" bind:value={ seed } min="-1" max="999999999" /> </div> </div> {/if}
-  <!-- Generation Button, and, Status --> <div class="generate-section"> <button class="generate-btn nes-btn"
-        onclick={ generateImage } disabled={$imageGenerationStore.status.isGenerating || !prompt.trim()} >
-  {#if $imageGenerationStore.status.isGenerating} <span class="spinner"></span> Generating... ({Math.round($imageGenerationStore.status.progress)}%) {:else} ðŸŽ¨ Generate Image {/if}
-  </button>
-  {#if $imageGenerationStore.status.isGenerating} <div class="progress-info nes-container"> <div class="nes-progress"> <progress class="progress" value={$imageGenerationStore.status.progress} max="100"> {$imageGenerationStore.status.progress}% </progress> </div>
- <p>{$imageGenerationStore.status.currentStep}</p> {/if} {#if $imageGenerationStore.status.error} <div class="error-message nes-container"> <p>âŒ {$imageGenerationStore.status.error}</p> {/if}
-  </div> </div>
- <!-- Generated: Image, Display -->
-  {#if $imageGenerationStore.currentGeneration} <div class="current-generation nes-container"> <h4>Latest Generation</h4>
- <div class="image-result"> <img src={$imageGenerationStore.currentGeneration.imageUrl} alt={$imageGenerationStore.currentGeneration.prompt} class="generated-image"
-        /> <div class="image-actions"> <button class="nes-btn"
-            onclick={() => copyPrompt($imageGenerationStore.currentGeneration!.prompt)} >
-            ðŸ“‹ Copy Prompt </button>
- <button class="nes-btn"
-            onclick={() => regenerateWithSeed($imageGenerationStore.currentGeneration!)} >
-            ðŸ”„ Regenerate </button>
-  {#if caseId} <button class="nes-btn"
-              onclick={() => useImageAsEvidence($imageGenerationStore.currentGeneration!)} >
-              ðŸ“ Use as Evidence </button> {/if}
-  </div>
- <div class="image-metadata nes-container"> <p><strong>Provider:</strong> {$imageGenerationStore.currentGeneration.provider}</p>
- <p> <strong>Size:</strong> {$imageGenerationStore.currentGeneration.metadata.size.width}Ã—{$imageGenerationStore.currentGeneration .metadata.size.height} </p>
- <p><strong>Processing; Time:</strong> {$imageGenerationStore.currentGeneration.processingTime}ms</p>
-  {#if $imageGenerationStore.currentGeneration.metadata.seed !== -1} <p><strong>Seed:</strong> {$imageGenerationStore.currentGeneration.metadata.seed}</p> {/if}
-  </div> </div> {/if}
-  <!-- History, Section --> <div class="history-section"> <div class="history-header"> <button class="nes-btn" onclick={() => (showHistory = !showHistory)}> ðŸ“š History ({generationHistory.length}) </button>
-  {#if generationHistory.length > 0} <button class="nes-btn"
-          onclick={() => { imageGenerationService.clearHistory(); generationHistory = []}} >
-          ðŸ—‘ï¸ Clear </button> {/if}
-  </div>
-  {#if showHistory} <div class="history-grid">
-  {#each Array.isArray(generationHistory) ? generationHistory: [] as result} <div class="history-item nes-container"> <img src={( result as { id?: unknown; prompt?: unknown; imageUrl?: unknown; provider?: unknown; parameters?: unknown; timestamp?: unknown; metadata?: unknown}
-              ).imageUrl} alt={( result as { id?: unknown; prompt?: unknown; imageUrl?: unknown; provider?: unknown; parameters?: unknown; timestamp?: unknown; metadata?, unknown}
-              ).prompt} class="history-thumbnail"
-              onclick={() => (selectedImage = result)} /> <div class="history-info"> <p class="history-prompt"> {( result as { id?: unknown; prompt?: unknown; imageUrl?: unknown; provider?: unknown; parameters?: unknown; timestamp?: unknown; metadata?: unknown}
-                ).prompt.substring(0, 50)}... </p>
- <p class="history-meta"> {( result as { id?: unknown; prompt?: unknown; imageUrl?: unknown; provider?: unknown; parameters?: unknown; timestamp?: unknown; metadata?: unknown}
-                ).provider} â€¢ {new Date( (
-                    result as { id?: unknown, prompt?: unknown, imageUrl?: unknown; provider?: unknown; parameters?: unknown; timestamp?: unknown; metadata?: unknown}
-                  ).timestamp ).toLocaleTimeString()} </p> </div> </div> {/each} {/if}
-  </div>
- <!-- Selected Image, Modal -->
-  {#if selectedImage} <div class="modal-overlay" onclick={() => (selectedImage = null)}> <div class="modal-content nes-container is-rounded" onclick|stopPropagation> <div class="modal-header"> <h4>Generated Image Details</h4>
- <button class="nes-btn" onclick={() => (selectedImage = null)}>Ã—</button> </div>
- <div class="modal-body"> <img src={selectedImage.imageUrl} alt={selectedImage.prompt} class="modal-image" /> <div class="modal-info"> <p><strong>Prompt:</strong> {selectedImage.prompt}</p>
- <p><strong>Style:</strong> {selectedImage.parameters.style || 'realistic'}</p>
- <p><strong>Provider:</strong> {selectedImage.provider}</p>
- <p><strong>Generated:</strong> {selectedImage.timestamp.toLocaleString()}</p> </div>
- <div class="modal-actions"> <button class="nes-btn is-primary"
-              onclick={() => { prompt = selectedImage!.prompt; selectedImage = null}} >
-              Use Prompt </button>
- <button class="nes-btn" onclick={() => regenerateWithSeed(selectedImage!)}> Regenerate </button>
-  {#if caseId} <button class="nes-btn"
-                onclick={() => { useImageAsEvidence(selectedImage!); selectedImage = null}} >
-                Use as Evidence </button> {/if}
-  </div> </div> </div> {/if}
-  </div>
- <style> .image-generator { max-width: 100%;
-	margin: 1rem 0;}
-  .image-generator.compact { max-width: 600px;}
-  .generator-header { display: flex; justify-content: space-betweennn; align-items: center; margin-bottom: 1rem;}
-  .provider-status { display: flex;
-		gap: 0.5rem; flex-wrap;}
-  .provider-badge { font-size: 0.75rem;}
-  .generation-controls { display: flex; flex-direction: column;
-	gap: 1rem;}
-  .input-group { display: flex; flex-direction: column;
-	gap: 0.5rem;}
-  .template-section { display: flex; flex-direction: column;
-	gap: 0.5rem;}
-  .template-buttons { display: flex; flex-wrap: wrap;
-	gap: 0.5rem;}
-  .template-btn { font-size: 0.75rem;
-	padding: 0.25rem 0.5rem;}
-  .selection-row { display: flex;
-		gap: 1rem; flex-wrap;}
-  .select-group { display: flex; flex-direction: column;
-	gap: 0.5rem;flex: 1; min-width: 150px;}
-  .advanced-toggle { margin: 0.5rem 0;}
-  .advanced-controls { display: flex; flex-direction: column;
-	gap: 1rem;padding: 1rem;}
-  .parameter-row { display: flex;
-		gap: 1rem; flex-wrap;}
-  .param-group { display: flex; flex-direction: column;
-	gap: 0.25rem;flex: 1; min-width: 100px;}
-  .generate-section { display: flex; flex-direction: column;
-	gap: 1rem; align-items: center;}
-  .generate-btn { padding: 1rem 2rem; font-size: 1.1rem; min-width: 200px;}
-  .progress-info { width: 100%; max-width: 400px; text-align: center;}
-  .spinner { display: inline-block;
-		width: 16px;
-	height: 16px;
-	border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%;
-	animation: spin 1s linear infinite; margin-right: 0.5rem;}
-  @keyframes spin { to { transform: rotate(360deg)}
-  } .current-generation { margin: 1rem 0;}
-  .image-result { display: flex; flex-direction: column;
-	gap: 1rem;}
-  .generated-image { max-width: 100%;
-	height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)}
-  .image-actions { display: flex;
-		gap: 0.5rem; flex-wrap: wrap; justify-content: center;}
-  .image-metadata { font-size: 0.875rem;
-	padding: 0.5rem;}
-  .history-section { margin-top: 2rem;}
-  .history-header { display: flex; justify-content: space-betweennn; align-items: center; margin-bottom: 1rem;}
-  .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)), gap: 1rem;}
-  .history-item { cursor: pointer;
-		transition:transform 0.2s ease;}
-  .history-item:hover { transform: translateY(-2px)}
-  .history-thumbnail { width: 100%;
-		height: 120px; object-fit: cover; border-radius: 4px;}
-  .history-info { margin-top: 0.5rem;}
-  .history-prompt { font-size: 0.75rem; font-weight: bold;
-	margin: 0;}
-  .history-meta { font-size: 0.7rem;
-	color: #666;
-	margin: 0;}
-  .modal-overlay { position: fixed;
-		top: 0;left: 0;
-	width: 100%;height: 100%;
-	background: rgba(0, 0, 0, 0.8), display: flex; justify-content: center; align-items: center; z-index: 1000;
-	padding: 1rem;}
-  .modal-content { max-width: 90vw; max-height: 90vh;
-	overflow: auto;background: white;}
-  .modal-header { display: flex; justify-content: space-betweennn; align-items: center; margin-bottom: 1rem;}
-  .modal-image { max-width: 100%;
-		height: auto; border-radius: 8px; margin-bottom: 1rem;}
-  .modal-info { margin-bottom: 1rem;}
-  .modal-actions { display: flex;
-		gap: 0.5rem; flex-wrap: wrap; justify-content: center;}
-  .error-message { color: #d32f2f; text-align: center;}
-  @media (max-width: 768px) { .selection-row, .parameter-row { flex-direction: column;}
-    .history-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr))}
-    .modal-content { margin: 0.5rem; max-width: calc(100vw - 1rem)}
-  } </style>
+	let { caseId = '', onImageGenerated, compact = false }: Props = $props();
 
+	let prompt = $state('');
+	let negativePrompt = $state('blurry, low quality, distorted, text, watermark');
+	let selectedStyle = $state<'realistic' | 'sketch' | 'legal-diagram' | 'evidence-recreation' | 'artistic'>('realistic');
+	let selectedProvider = $state<'ollama-vision' | 'stable-diffusion' | 'comfyui'>('ollama-vision');
+	let width = $state(512);
+	let height = $state(512);
+	let steps = $state(20);
+	let cfgScale = $state(7.5);
+	let seed = $state(-1);
+	let advancedMode = $state(false);
+	let isGenerating = $state(false);
+	let progress = $state(0);
+	let currentStep = $state('');
+	let generatedImage = $state<ImageResult | null>(null);
+	let history = $state<ImageResult[]>([]);
+	let showHistory = $state(false);
+	let errorMsg = $state<string | null>(null);
 
+	const legalTemplates = [
+		{ name: 'Crime Scene Recreation', icon: 'search', prompt: 'detailed crime scene recreation, professional forensic photography, evidence markers, accurate lighting, overhead view' },
+		{ name: 'Traffic Accident Diagram', icon: 'map', prompt: 'traffic accident scene diagram, aerial view, road markings, vehicle positions, impact points, technical illustration' },
+		{ name: 'Property Damage', icon: 'home', prompt: 'property damage documentation, insurance photo style, clear structural details, professional lighting, measurement references' },
+		{ name: 'Evidence Visualization', icon: 'eye', prompt: 'forensic evidence visualization, scientific illustration, laboratory setting, detailed analysis, annotated' },
+		{ name: 'Legal Flowchart', icon: 'git-branch', prompt: 'legal process flowchart, clean professional diagram, clear annotations, decision tree, formal presentation' },
+		{ name: 'Suspect Composite', icon: 'user', prompt: 'police sketch style, facial composite, professional law enforcement illustration, neutral background' },
+	];
 
+	// TODO: Wire to actual image generation backend
+	// Options: Stable Diffusion WebUI API (/sdapi/v1/txt2img), ComfyUI API, or Ollama vision model
+	// For now, simulates generation pipeline for UI testing
+	async function generateImage() {
+		if (!prompt.trim()) return;
+		isGenerating = true;
+		errorMsg = null;
+		progress = 0;
 
+		try {
+			// Stage 1: Prepare
+			currentStep = 'Preparing prompt...';
+			progress = 10;
+			await delay(300);
 
+			// Stage 2: Generate
+			currentStep = `Generating with ${selectedProvider}...`;
+			progress = 30;
 
+			// TODO: Replace with real API call:
+			// const res = await fetch('/api/ai/generate-image', {
+			//   method: 'POST',
+			//   headers: { 'Content-Type': 'application/json' },
+			//   body: JSON.stringify({ prompt, negativePrompt, width, height, steps, cfgScale, seed, style: selectedStyle, provider: selectedProvider })
+			// });
+			await delay(800);
+			progress = 70;
+
+			// Stage 3: Post-process
+			currentStep = 'Post-processing...';
+			progress = 90;
+			await delay(200);
+
+			// TODO: Use real image URL from API response
+			const result: ImageResult = {
+				id: crypto.randomUUID(),
+				prompt: prompt.trim(),
+				imageUrl: `https://placehold.co/${width}x${height}/1a1a2e/ffd700?text=${encodeURIComponent(selectedStyle)}`,
+				provider: selectedProvider,
+				timestamp: Date.now(),
+				processingTime: 1300,
+				seed: seed === -1 ? Math.floor(Math.random() * 999999) : seed,
+				width,
+				height,
+			};
+
+			generatedImage = result;
+			history = [result, ...history].slice(0, 20);
+			onImageGenerated?.(result);
+			progress = 100;
+			currentStep = 'Complete';
+		} catch (err) {
+			errorMsg = err instanceof Error ? err.message : 'Generation failed';
+		} finally {
+			isGenerating = false;
+		}
+	}
+
+	function useAsEvidence(result: ImageResult) {
+		// TODO: POST to /api/evidence/upload with generated image
+		// attach to case via caseId prop
+		onImageGenerated?.(result);
+	}
+
+	function applyTemplate(template: typeof legalTemplates[0]) {
+		prompt = template.prompt;
+	}
+
+	function delay(ms: number) {
+		return new Promise((r) => setTimeout(r, ms));
+	}
+</script>
+
+<div class="space-y-4">
+	<!-- Header -->
+	<div class="flex items-center justify-between">
+		<div class="flex items-center gap-2">
+			<Icon name="image" size={20} />
+			<h3 class="text-base font-semibold m-0">AI Image Generation</h3>
+		</div>
+		<div class="flex items-center gap-2 text-xs opacity-60">
+			<span class="px-2 py-0.5 rounded bg-white/8">{selectedProvider}</span>
+			<span class="px-2 py-0.5 rounded bg-white/8">{selectedStyle}</span>
+		</div>
+	</div>
+
+	<!-- Legal Templates -->
+	<div>
+		<label class="block text-xs font-medium mb-1.5 opacity-70">Legal Templates</label>
+		<div class="flex flex-wrap gap-1.5">
+			{#each legalTemplates as template}
+				<button
+					onclick={() => applyTemplate(template)}
+					class="flex items-center gap-1 px-2 py-1 text-xs border border-sand-dark rounded bg-panel-soft hover:border-accent transition-colors cursor-pointer"
+				>
+					<Icon name={template.icon} size={12} />
+					{template.name}
+				</button>
+			{/each}
+		</div>
+	</div>
+
+	<!-- Prompt -->
+	<div>
+		<label for="img-prompt" class="block text-xs font-medium mb-1 opacity-70">Prompt</label>
+		<textarea
+			id="img-prompt"
+			bind:value={prompt}
+			placeholder="Describe the image to generate..."
+			rows={compact ? 2 : 3}
+			class="w-full p-2.5 text-sm border border-sand-dark rounded-lg bg-panel-soft resize-y focus:border-accent focus:outline-none"
+		></textarea>
+	</div>
+
+	<!-- Style & Provider -->
+	<div class="grid grid-cols-2 gap-3">
+		<div>
+			<label for="img-style" class="block text-xs font-medium mb-1 opacity-70">Style</label>
+			<select id="img-style" bind:value={selectedStyle} class="w-full p-2 text-sm border border-sand-dark rounded-lg bg-panel-soft">
+				<option value="realistic">Realistic</option>
+				<option value="sketch">Sketch</option>
+				<option value="legal-diagram">Legal Diagram</option>
+				<option value="evidence-recreation">Evidence Recreation</option>
+				<option value="artistic">Artistic</option>
+			</select>
+		</div>
+		<div>
+			<label for="img-provider" class="block text-xs font-medium mb-1 opacity-70">Provider</label>
+			<select id="img-provider" bind:value={selectedProvider} class="w-full p-2 text-sm border border-sand-dark rounded-lg bg-panel-soft">
+				<option value="ollama-vision">Ollama Vision</option>
+				<option value="stable-diffusion">Stable Diffusion</option>
+				<option value="comfyui">ComfyUI</option>
+			</select>
+		</div>
+	</div>
+
+	<!-- Advanced Toggle -->
+	<button
+		onclick={() => (advancedMode = !advancedMode)}
+		class="flex items-center gap-1.5 text-xs opacity-60 hover:opacity-100 cursor-pointer bg-transparent border-none p-0"
+	>
+		<Icon name={advancedMode ? 'chevron-down' : 'chevron-right'} size={14} />
+		Advanced Settings
+	</button>
+
+	{#if advancedMode}
+		<div class="p-3 border border-sand-dark rounded-lg bg-panel-soft space-y-3">
+			<div>
+				<label for="neg-prompt" class="block text-xs font-medium mb-1 opacity-70">Negative Prompt</label>
+				<textarea id="neg-prompt" bind:value={negativePrompt} rows={2} class="w-full p-2 text-xs border border-sand-dark rounded bg-panel-soft resize-y"></textarea>
+			</div>
+			<div class="grid grid-cols-5 gap-2">
+				<div>
+					<label for="img-w" class="block text-[11px] opacity-60 mb-0.5">Width</label>
+					<input id="img-w" type="number" bind:value={width} min={256} max={1024} step={64} class="w-full p-1.5 text-xs border border-sand-dark rounded bg-panel-soft" />
+				</div>
+				<div>
+					<label for="img-h" class="block text-[11px] opacity-60 mb-0.5">Height</label>
+					<input id="img-h" type="number" bind:value={height} min={256} max={1024} step={64} class="w-full p-1.5 text-xs border border-sand-dark rounded bg-panel-soft" />
+				</div>
+				<div>
+					<label for="img-steps" class="block text-[11px] opacity-60 mb-0.5">Steps</label>
+					<input id="img-steps" type="number" bind:value={steps} min={1} max={100} class="w-full p-1.5 text-xs border border-sand-dark rounded bg-panel-soft" />
+				</div>
+				<div>
+					<label for="img-cfg" class="block text-[11px] opacity-60 mb-0.5">CFG</label>
+					<input id="img-cfg" type="number" bind:value={cfgScale} min={1} max={30} step={0.5} class="w-full p-1.5 text-xs border border-sand-dark rounded bg-panel-soft" />
+				</div>
+				<div>
+					<label for="img-seed" class="block text-[11px] opacity-60 mb-0.5">Seed</label>
+					<input id="img-seed" type="number" bind:value={seed} min={-1} max={999999999} class="w-full p-1.5 text-xs border border-sand-dark rounded bg-panel-soft" />
+				</div>
+			</div>
+		</div>
+	{/if}
+
+	<!-- Generate Button + Progress -->
+	<div class="flex items-center gap-3">
+		<Button onclick={generateImage} disabled={isGenerating || !prompt.trim()} class="bits-btn flex-1">
+			{#if isGenerating}
+				<Icon name="loader-2" size={16} />
+				{currentStep} ({progress}%)
+			{:else}
+				<Icon name="sparkles" size={16} />
+				Generate Image
+			{/if}
+		</Button>
+		{#if history.length > 0}
+			<button
+				onclick={() => (showHistory = !showHistory)}
+				class="text-xs opacity-60 hover:opacity-100 cursor-pointer bg-transparent border-none p-0"
+			>
+				History ({history.length})
+			</button>
+		{/if}
+	</div>
+
+	{#if isGenerating}
+		<div class="h-1.5 rounded-full bg-sand-dark overflow-hidden">
+			<div class="h-full bg-accent rounded-full transition-all duration-300" style="width: {progress}%"></div>
+		</div>
+	{/if}
+
+	{#if errorMsg}
+		<div class="p-2.5 text-xs text-danger border border-danger/20 rounded-lg bg-danger/5">
+			{errorMsg}
+			<button onclick={() => (errorMsg = null)} class="ml-2 underline cursor-pointer bg-transparent border-none text-danger">dismiss</button>
+		</div>
+	{/if}
+
+	<!-- Generated Image -->
+	{#if generatedImage}
+		<div class="border border-accent/30 rounded-lg overflow-hidden">
+			<img
+				src={generatedImage.imageUrl}
+				alt={generatedImage.prompt}
+				class="w-full h-auto block"
+			/>
+			<div class="p-3 space-y-2">
+				<p class="text-xs opacity-70 m-0 line-clamp-2">{generatedImage.prompt}</p>
+				<div class="flex items-center gap-2 text-[11px] opacity-50">
+					<span>{generatedImage.width}x{generatedImage.height}</span>
+					<span>seed: {generatedImage.seed}</span>
+					{#if generatedImage.processingTime}
+						<span>{generatedImage.processingTime}ms</span>
+					{/if}
+				</div>
+				<div class="flex gap-2">
+					<Button variant="ghost" size="sm" onclick={() => { prompt = generatedImage!.prompt; generateImage(); }} class="bits-btn text-xs">
+						<Icon name="refresh-cw" size={12} /> Regenerate
+					</Button>
+					{#if caseId}
+						<Button variant="ghost" size="sm" onclick={() => useAsEvidence(generatedImage!)} class="bits-btn text-xs">
+							<Icon name="file-plus" size={12} /> Use as Evidence
+						</Button>
+					{/if}
+					<Button variant="ghost" size="sm" onclick={() => navigator.clipboard.writeText(generatedImage!.prompt)} class="bits-btn text-xs">
+						<Icon name="copy" size={12} /> Copy Prompt
+					</Button>
+				</div>
+			</div>
+		</div>
+	{/if}
+
+	<!-- History -->
+	{#if showHistory && history.length > 0}
+		<div class="border-t border-sand-dark pt-3">
+			<h4 class="text-xs font-medium m-0 mb-2 opacity-70">Generation History</h4>
+			<div class="grid grid-cols-3 gap-2">
+				{#each history as item (item.id)}
+					<button
+						onclick={() => (generatedImage = item)}
+						class="border border-sand-dark rounded overflow-hidden cursor-pointer bg-transparent p-0 hover:border-accent transition-colors"
+					>
+						<img src={item.imageUrl} alt={item.prompt} class="w-full h-20 object-cover block" />
+						<p class="text-[10px] p-1 m-0 truncate opacity-60">{item.prompt}</p>
+					</button>
+				{/each}
+			</div>
+		</div>
+	{/if}
+</div>

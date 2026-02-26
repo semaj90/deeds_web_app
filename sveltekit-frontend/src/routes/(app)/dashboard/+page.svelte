@@ -17,6 +17,7 @@
   import CommandPalette from '$lib/components/ui/CommandPalette.svelte';
   import ActiveCasesWidget from '$lib/components/yorha/dashboard/ActiveCasesWidget.svelte';
   import YoRHaDataViz from '$lib/components/yorha/_simulations/YoRHaDataViz.svelte';
+  import Icon from '$lib/components/ui/Icon.svelte';
 
   let showCommandPalette = $state(false);
 
@@ -27,6 +28,13 @@
     }
   }
 
+  interface KBStats {
+    glossary: number;
+    statutes: number;
+    precedents: number;
+    total: number;
+  }
+
   interface DashboardStats {
     activeCases: number;
     pendingEvidence: number;
@@ -34,6 +42,7 @@
     personsOfInterest: number;
     totalCitations: number;
     recentActivity: number;
+    knowledgeBase: KBStats;
   }
 
   interface RecentCase {
@@ -45,6 +54,95 @@
     updatedAt: string;
   }
 
+  // KB search state
+  interface KBResult {
+    type: 'glossary' | 'statute' | 'precedent';
+    title: string;
+    snippet: string;
+    similarity?: number;
+  }
+
+  let kbQuery = $state('');
+  let kbResults = $state<KBResult[]>([]);
+  let kbSearching = $state(false);
+  let kbSearchTimer: ReturnType<typeof setTimeout> | undefined;
+
+  function handleKBSearch(query: string) {
+    kbQuery = query;
+    if (kbSearchTimer) clearTimeout(kbSearchTimer);
+    if (query.length < 2) { kbResults = []; return; }
+    kbSearchTimer = setTimeout(() => runKBSearch(query), 400);
+  }
+
+  async function runKBSearch(query: string) {
+    kbSearching = true;
+    try {
+      const [glossaryRes, statutesRes, precedentsRes] = await Promise.all([
+        fetch('/api/glossary/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query, limit: 3 }),
+        }).catch(() => null),
+        fetch('/api/statutes/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query, limit: 3 }),
+        }).catch(() => null),
+        fetch('/api/precedents/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query, limit: 3 }),
+        }).catch(() => null),
+      ]);
+
+      const results: KBResult[] = [];
+
+      if (glossaryRes?.ok) {
+        const data = await glossaryRes.json();
+        for (const item of (data.results ?? data ?? []).slice(0, 3)) {
+          results.push({
+            type: 'glossary',
+            title: item.term ?? item.title ?? '',
+            snippet: (item.definition ?? item.content ?? '').slice(0, 120),
+            similarity: item.similarity,
+          });
+        }
+      }
+
+      if (statutesRes?.ok) {
+        const data = await statutesRes.json();
+        for (const item of (data.results ?? data ?? []).slice(0, 3)) {
+          results.push({
+            type: 'statute',
+            title: item.section ? `${item.jurisdiction ?? ''} ${item.section}` : (item.title ?? ''),
+            snippet: (item.content ?? item.chunk_content ?? '').slice(0, 120),
+            similarity: item.similarity,
+          });
+        }
+      }
+
+      if (precedentsRes?.ok) {
+        const data = await precedentsRes.json();
+        for (const item of (data.results ?? data ?? []).slice(0, 3)) {
+          results.push({
+            type: 'precedent',
+            title: item.title ?? item.case_title ?? '',
+            snippet: (item.summary ?? item.content ?? '').slice(0, 120),
+            similarity: item.similarity,
+          });
+        }
+      }
+
+      // Sort by similarity if available
+      results.sort((a, b) => (b.similarity ?? 0) - (a.similarity ?? 0));
+      kbResults = results;
+    } catch {
+      kbResults = [];
+    } finally {
+      kbSearching = false;
+    }
+  }
+
   let stats = $state<DashboardStats>({
     activeCases: 0,
     pendingEvidence: 0,
@@ -52,6 +150,7 @@
     personsOfInterest: 0,
     totalCitations: 0,
     recentActivity: 0,
+    knowledgeBase: { glossary: 0, statutes: 0, precedents: 0, total: 0 },
   });
   let recentCases = $state<RecentCase[]>([]);
   let loading = $state(true);
@@ -151,6 +250,78 @@
       {/each}
     </div>
 
+    <!-- Knowledge Base -->
+    <Card class="bg-panel border-sand/10 mb-8">
+      <CardHeader>
+        <div class="flex items-center justify-between">
+          <CardTitle class="text-sm text-sand/80">Knowledge Base</CardTitle>
+          <div class="flex items-center gap-3 text-xs text-sand/50">
+            <span>{stats.knowledgeBase.glossary} terms</span>
+            <span>{stats.knowledgeBase.statutes} statutes</span>
+            <span>{stats.knowledgeBase.precedents} precedents</span>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div class="relative mb-4">
+          <Icon name="search" size={16} class="absolute left-3 top-1/2 -translate-y-1/2 text-sand/40" />
+          <input
+            type="text"
+            placeholder="Search glossary, statutes, precedents..."
+            value={kbQuery}
+            oninput={(e) => handleKBSearch((e.target as HTMLInputElement).value)}
+            class="w-full pl-10 pr-4 py-2.5 bg-black/30 border border-sand/10 rounded text-sm text-sand placeholder:text-sand/30 focus:outline-none focus:border-accent/40"
+          />
+          {#if kbSearching}
+            <Icon name="loader-2" size={14} class="absolute right-3 top-1/2 -translate-y-1/2 text-sand/40 animate-spin" />
+          {/if}
+        </div>
+
+        {#if kbResults.length > 0}
+          <div class="grid gap-2 max-h-80 overflow-y-auto">
+            {#each kbResults as result}
+              <button
+                class="flex items-start gap-3 w-full px-3 py-2.5 bg-black/20 rounded text-left hover:bg-black/30 transition-colors"
+                onclick={() => goto(result.type === 'glossary' ? '/citations' : result.type === 'statute' ? '/citations' : '/citations')}
+              >
+                <span class="shrink-0 mt-0.5 px-1.5 py-px rounded text-[10px] font-mono uppercase {
+                  result.type === 'glossary' ? 'bg-accent/10 text-accent' :
+                  result.type === 'statute' ? 'bg-info/10 text-info' :
+                  'bg-warning/10 text-warning'
+                }">
+                  {result.type === 'glossary' ? 'GLO' : result.type === 'statute' ? 'STT' : 'PRE'}
+                </span>
+                <div class="min-w-0">
+                  <p class="text-sm text-sand font-medium truncate">{result.title}</p>
+                  <p class="text-xs text-sand/40 line-clamp-2">{result.snippet}...</p>
+                </div>
+                {#if result.similarity}
+                  <span class="shrink-0 text-[10px] text-sand/30 font-mono">{(result.similarity * 100).toFixed(0)}%</span>
+                {/if}
+              </button>
+            {/each}
+          </div>
+        {:else if kbQuery.length >= 2 && !kbSearching}
+          <p class="text-sand/30 text-xs text-center py-4">No results for "{kbQuery}"</p>
+        {:else}
+          <div class="grid grid-cols-3 gap-3">
+            <button onclick={() => goto('/citations')} class="px-3 py-2 bg-black/20 rounded text-left hover:bg-black/30 transition-colors">
+              <p class="text-lg font-bold text-accent">{stats.knowledgeBase.glossary}</p>
+              <p class="text-xs text-sand/40">Glossary Terms</p>
+            </button>
+            <button onclick={() => goto('/citations')} class="px-3 py-2 bg-black/20 rounded text-left hover:bg-black/30 transition-colors">
+              <p class="text-lg font-bold text-info">{stats.knowledgeBase.statutes}</p>
+              <p class="text-xs text-sand/40">Statutes</p>
+            </button>
+            <button onclick={() => goto('/citations')} class="px-3 py-2 bg-black/20 rounded text-left hover:bg-black/30 transition-colors">
+              <p class="text-lg font-bold text-warning">{stats.knowledgeBase.precedents}</p>
+              <p class="text-xs text-sand/40">Precedents</p>
+            </button>
+          </div>
+        {/if}
+      </CardContent>
+    </Card>
+
     <!-- Recent Cases -->
     <Card class="bg-panel border-sand/10">
       <CardHeader>
@@ -198,7 +369,7 @@
           { label: 'Approved', value: stats.approvedEvidence, status: 'completed', color: '#48bb78' },
           { label: 'POIs', value: stats.personsOfInterest, status: 'active', color: '#60a5fa' },
           { label: 'Citations', value: stats.totalCitations, status: 'completed', color: '#d4c7a3' },
-          { label: 'Recent', value: stats.recentActivity, status: 'active', color: '#38bdf8' },
+          { label: 'KB', value: stats.knowledgeBase.total, status: 'completed', color: '#a78bfa' },
         ]}
         type="bar"
         height={250}

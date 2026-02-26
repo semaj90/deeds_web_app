@@ -103,8 +103,8 @@
 		class:dragging={isDragging}
 		role="button"
 		tabindex="0"
-		ondragover|preventDefault
-		ondragenter|preventDefault={() => (isDragging = true)}
+		ondragover={(e) => e.preventDefault()}
+		ondragenter={(e) => { e.preventDefault(); isDragging = true; }}
 		ondragleave={() => (isDragging = false)}
 		ondrop={handleDrop}
 		onclick={() => fileInput?.click()}

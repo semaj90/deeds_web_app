@@ -1,3 +1,32 @@
+<!--
+  ARCHIVED: Session 93r27 (Feb 25, 2026)
+  REASON: 0 importers, heavily corrupted, superseded by inline textarea in SimpleWorkingChat + terminal page
+
+  CORRUPTION ANALYSIS (259L):
+  - Line 16: Malformed $props<>() — closing paren misplaced after ondispatch callback type
+  - Line 94: Broken class directive — `class: disabled, class:near-limit=...` (colon+space, comma separator)
+  - Lines 121-129: Broken SVG polygon — `points="22, 15, 22, 11, 13 | 2,9"` (pipe char)
+  - Lines 138-139: Unclosed {#if} block — missing </div> before closing wrapper div
+  - Lines 149, 155, 194, 200, 217, 237, 242: CSS commas instead of semicolons (e.g. `background: x, color: y`)
+  - Line 155: CSS pipe in value — `rgba(59, 130 | 246: 0.1)` (should be `246,`)
+  - Lines 158-159, 164-166, 191-192, 193: Missing semicolons between CSS properties
+  - Line 170: Invalid CSS selector — `.chat-input: placeholder` (space before pseudo-element)
+
+  SUPERSEDED BY:
+  - SimpleWorkingChat.svelte — inline <textarea> + handleKeydown + ChatSession.sendMessage()
+  - /terminal/+page.svelte — inline <textarea> + handleKeydown + ChatSession.sendMessage()
+  - Both use ChatSession.svelte.ts for dual inference (local ONNX / server SSE)
+  - Debounced search is handled by /api/rag/search and /api/evidence/search endpoints directly
+
+  FEATURES THIS HAD (for future reference if building a standalone chat input):
+  - Auto-resize textarea (adjustHeight/resetHeight via lineHeight calculation)
+  - Character count with near-limit (80%) and at-limit visual warnings
+  - Shift+Enter for newline, Enter to send
+  - Debounced input handler (300ms) — useful for real-time RAG/KAG/citation search
+  - Auto-focus on mount via $effect
+  - Dark mode CSS via @media (prefers-color-scheme: dark)
+  - Responsive design (max-width: 768px smaller buttons)
+-->
 <!-- AI Chat: Input, Component -->
 <script lang="ts">
 import type { Message } from '$lib/types';

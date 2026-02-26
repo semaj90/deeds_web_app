@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
-	import Button from '$lib/components/ui/Button.svelte';
 
 	interface Suggestion {
 		id: string;
@@ -33,7 +32,6 @@
 	});
 
 	function generateSuggestions() {
-		// Context-aware suggestions based on current page/case state
 		const contextSuggestions: Record<string, Suggestion[]> = {
 			general: [
 				{ id: 'new-case', label: 'Create New Case', description: 'Start a guided case intake workflow', icon: 'plus-circle', action: 'new-case' },
@@ -62,24 +60,24 @@
 </script>
 
 {#if !dismissed && suggestions.length > 0}
-	<div class="proactive-assistant {className}">
-		<div class="assistant-header">
+	<div class="p-3 border border-sand-dark rounded-lg bg-panel-soft {className}">
+		<div class="flex items-center gap-1.5 mb-2 text-[13px] font-semibold">
 			<Icon name="lightbulb" size={14} />
-			<span class="header-text">Suggested Actions</span>
-			<button class="dismiss-btn" onclick={() => (dismissed = true)} aria-label="Dismiss">
+			<span class="flex-1">Suggested Actions</span>
+			<button class="bg-transparent border-none text-inherit opacity-40 cursor-pointer p-0.5 hover:opacity-100" onclick={() => (dismissed = true)} aria-label="Dismiss">
 				<Icon name="x" size={12} />
 			</button>
 		</div>
-		<div class="suggestion-list">
+		<div class="flex flex-col gap-1">
 			{#each suggestions as suggestion}
 				<button
-					class="suggestion-item"
+					class="flex items-center gap-2 w-full p-2 border-none rounded-md bg-transparent text-inherit cursor-pointer text-left hover:bg-white/5"
 					onclick={() => handleAction(suggestion.action)}
 				>
 					<Icon name={suggestion.icon} size={14} />
-					<div class="suggestion-text">
-						<span class="suggestion-label">{suggestion.label}</span>
-						<span class="suggestion-desc">{suggestion.description}</span>
+					<div class="flex-1 flex flex-col">
+						<span class="text-[13px] font-medium">{suggestion.label}</span>
+						<span class="text-[11px] opacity-50">{suggestion.description}</span>
 					</div>
 					<Icon name="chevron-right" size={12} />
 				</button>
@@ -87,69 +85,3 @@
 		</div>
 	</div>
 {/if}
-
-<style>
-	.proactive-assistant {
-		padding: 0.75rem;
-		border: 1px solid var(--color-sand-dark, #44403c);
-		border-radius: 0.5rem;
-		background: var(--color-panel-soft, #1c1917);
-	}
-	.assistant-header {
-		display: flex;
-		align-items: center;
-		gap: 0.375rem;
-		margin-bottom: 0.5rem;
-		font-size: 0.8125rem;
-		font-weight: 600;
-	}
-	.header-text {
-		flex: 1;
-	}
-	.dismiss-btn {
-		background: none;
-		border: none;
-		color: inherit;
-		opacity: 0.4;
-		cursor: pointer;
-		padding: 0.125rem;
-	}
-	.dismiss-btn:hover {
-		opacity: 1;
-	}
-	.suggestion-list {
-		display: flex;
-		flex-direction: column;
-		gap: 0.25rem;
-	}
-	.suggestion-item {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		width: 100%;
-		padding: 0.5rem;
-		border: none;
-		border-radius: 0.375rem;
-		background: transparent;
-		color: inherit;
-		cursor: pointer;
-		text-align: left;
-		transition: background-color 0.15s;
-	}
-	.suggestion-item:hover {
-		background: rgba(255, 255, 255, 0.05);
-	}
-	.suggestion-text {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-	}
-	.suggestion-label {
-		font-size: 0.8125rem;
-		font-weight: 500;
-	}
-	.suggestion-desc {
-		font-size: 0.6875rem;
-		opacity: 0.5;
-	}
-</style>

@@ -67,22 +67,22 @@
 	}
 </script>
 
-<div class="ai-recommendations">
-	<h4 class="rec-header">
+<div class="p-3 border border-sand-dark rounded-lg bg-panel-soft">
+	<h4 class="flex items-center gap-2 text-[13px] font-semibold mb-2 m-0">
 		<Icon name="lightbulb" size={14} />
 		Recommended Next Actions
 	</h4>
 
 	{#if isLoading}
-		<p class="rec-loading">Loading suggestions...</p>
+		<p class="text-xs opacity-50 m-0">Loading suggestions...</p>
 	{:else if recommendations.length === 0}
-		<p class="rec-empty">Chat more to get personalized suggestions</p>
+		<p class="text-xs opacity-50 m-0">Chat more to get personalized suggestions</p>
 	{:else}
-		<ul class="rec-list">
+		<ul class="list-none p-0 m-0 flex flex-col gap-1">
 			{#each recommendations as item}
 				<li>
 					<button
-						class="rec-item"
+						class="flex items-center gap-2 w-full py-1.5 px-2 border-none rounded bg-transparent text-inherit text-[13px] cursor-pointer text-left hover:bg-white/5"
 						onclick={() => onselect?.(item.query)}
 					>
 						<Icon name="message-circle" size={12} />
@@ -93,51 +93,3 @@
 		</ul>
 	{/if}
 </div>
-
-<style>
-	.ai-recommendations {
-		padding: 0.75rem;
-		border: 1px solid var(--color-sand-dark, #44403c);
-		border-radius: 0.5rem;
-		background: var(--color-panel-soft, #1c1917);
-	}
-	.rec-header {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-size: 0.8125rem;
-		font-weight: 600;
-		margin-bottom: 0.5rem;
-	}
-	.rec-loading, .rec-empty {
-		font-size: 0.75rem;
-		opacity: 0.5;
-		margin: 0;
-	}
-	.rec-list {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 0.25rem;
-	}
-	.rec-item {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		width: 100%;
-		padding: 0.375rem 0.5rem;
-		border: none;
-		border-radius: 0.25rem;
-		background: transparent;
-		color: inherit;
-		font-size: 0.8125rem;
-		cursor: pointer;
-		text-align: left;
-		transition: background-color 0.15s;
-	}
-	.rec-item:hover {
-		background: rgba(255, 255, 255, 0.05);
-	}
-</style>

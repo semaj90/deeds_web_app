@@ -15,9 +15,9 @@ export function getMinioConfig(): MinioS3ClientConfig {
     endPoint: env.MINIO_HOST ?? 'localhost',
     port: parseInt(env.MINIO_PORT ?? '9000', 10),
     useSSL: env.MINIO_USE_SSL === 'true',
-    accessKey: env.MINIO_ACCESS_KEY ?? 'minioadmin',
-    secretKey: env.MINIO_SECRET_KEY ?? 'minioadmin',
-    bucket: env.MINIO_BUCKET ?? 'legal-docs',
+    accessKey: env.MINIO_ACCESS_KEY ?? 'minio',
+    secretKey: env.MINIO_SECRET_KEY ?? 'minio123',
+    bucket: env.MINIO_BUCKET ?? 'legal-evidence',
   };
 }
 

@@ -32,8 +32,8 @@ const AI_CHAT_IMAGES_BUCKET = process.env.MINIO_AI_CHAT_IMAGES_BUCKET ?? 'ai-cha
 function createMinioClient(): Client {
 	const endPoint = env?.MINIO_ENDPOINT ?? 'localhost';
 	const port = parseInt(env?.MINIO_PORT ?? '9000', 10);
-	const accessKey = env?.MINIO_ACCESS_KEY ?? 'minioadmin';
-	const secretKey = env?.MINIO_SECRET_KEY ?? 'minioadmin';
+	const accessKey = env?.MINIO_ACCESS_KEY ?? 'minio';
+	const secretKey = env?.MINIO_SECRET_KEY ?? 'minio123';
 	const useSSL = env?.MINIO_USE_SSL === 'true';
 
 	return new Client({

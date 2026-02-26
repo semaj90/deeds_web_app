@@ -1,65 +1,42 @@
 <script lang="ts">
-	let Search = $state<any>(undefined);
-	let User = $state<any>(undefined);
-	let Settings = $state<any>(undefined);
-	let Home = $state<any>(undefined);
-	let Star = $state<any>(undefined);
+	import Icon from '$lib/components/ui/Icon.svelte';
 
- import IconContainer from '$lib/components/ui/IconContainer.svelte';
+	const icons = ['search', 'user', 'settings', 'home', 'star'] as const;
+	const sizes = [
+		{ label: 'Small (16px)', px: 16 },
+		{ label: 'Medium (20px)', px: 20 },
+		{ label: 'Large (24px)', px: 24 },
+		{ label: 'Extra Large (32px)', px: 32 },
+	];
 </script>
 
-<div class="p-8 space-y-8">
- <h1 class="text-2xl font-bold mb-6">Container Query Icon Demo</h1>
+<div class="max-w-2xl p-8">
+	<h1 class="text-xl font-bold mb-1">Icon System Demo</h1>
+	<p class="text-xs text-sand/50 mb-6">UnoCSS i-lucide-* icons via Icon.svelte wrapper — pure CSS, SSR-safe</p>
 
- <!-- Small Container -->
- <div class="border rounded-lg p-4 w-32">
- <h3 class="text-sm font-semibold mb-2">Small Container (128px)</h3>
- <div class="flex gap-2">
- <IconContainer icon={Search} size="sm" />
- <IconContainer icon={User} size="sm" />
- <IconContainer icon={Settings} size="sm" />
- </div>
- </div>
+	{#each sizes as size}
+		<section class="mb-6">
+			<h3 class="text-sm font-semibold mb-2 pb-1.5 border-b border-sand/10">{size.label}</h3>
+			<div class="flex flex-wrap gap-4">
+				{#each icons as name}
+					<div class="flex flex-col items-center gap-1">
+						<Icon {name} size={size.px} />
+						<span class="text-[10px] text-sand/40 font-mono">{name}</span>
+					</div>
+				{/each}
+			</div>
+		</section>
+	{/each}
 
- <!-- Medium Container -->
- <div class="border rounded-lg p-4 w-64">
- <h3 class="text-sm font-semibold mb-2">Medium Container (256px)</h3>
- <div class="flex gap-2">
- <IconContainer icon={Home} size="md" />
- <IconContainer icon={Star} size="md" />
- <IconContainer icon={Search} size="md" />
- </div>
- </div>
-
- <!-- Large Container -->
- <div class="border rounded-lg p-4 w-96">
- <h3 class="text-sm font-semibold mb-2">Large Container (384px)</h3>
- <div class="flex gap-3">
- <IconContainer icon={User} size="lg" />
- <IconContainer icon={Settings} size="lg" />
- <IconContainer icon={Home} size="lg" />
- </div>
- </div>
-
- <!-- Extra Large Container -->
- <div class="border rounded-lg p-4 w-full max-w-lg">
- <h3 class="text-sm font-semibold mb-2">Extra Large Container (512px+)</h3>
- <div class="flex gap-4">
- <IconContainer icon={Star} size="xl" />
- <IconContainer icon={Search} size="xl" />
- <IconContainer icon={User} size="xl" />
- <IconContainer icon={Settings} size="xl" />
- </div>
- </div>
-
- <!-- Responsive Grid Demo -->
- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
- {#each Array(8) as _, i}
- <div class="border rounded-lg p-4">
- <h4 class="text-xs font-medium mb-2">Card {i + 1}</h4>
- <IconContainer icon={Search} size="md" class="text-info" />
- </div>
- {/each}
- </div>
+	<section class="mb-6">
+		<h3 class="text-sm font-semibold mb-2 pb-1.5 border-b border-sand/10">Responsive Grid</h3>
+		<div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+			{#each ['file-text', 'folder', 'shield', 'scale', 'brain', 'cpu', 'database', 'activity'] as name}
+				<div class="flex flex-col items-center gap-1.5 p-3 border border-sand/10 rounded-md bg-panel-soft">
+					<Icon {name} size={20} />
+					<span class="text-[10px] text-sand/40 font-mono">{name}</span>
+				</div>
+			{/each}
+		</div>
+	</section>
 </div>
-

@@ -2,8 +2,6 @@
 <script lang="ts">
 import { Badge } from "$lib/components/ui/badge";
 import * as Card from "$lib/components/ui/card/index.js";
-import { formatDistanceToNow } from "date-fns";
-
 let { item, onview } = $props<{
     item: {
 	id: string;
@@ -14,6 +12,21 @@ let { item, onview } = $props<{
         tags: string[];
         url?: string };
     onview?: () => void }>();
+
+function timeAgo(date: Date): string {
+    const seconds = Math.round((Date.now() - date.getTime()) / 1000);
+    const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+    if (seconds < 60) return rtf.format(-seconds, 'second');
+    const minutes = Math.round(seconds / 60);
+    if (minutes < 60) return rtf.format(-minutes, 'minute');
+    const hours = Math.round(minutes / 60);
+    if (hours < 24) return rtf.format(-hours, 'hour');
+    const days = Math.round(hours / 24);
+    if (days < 30) return rtf.format(-days, 'day');
+    const months = Math.round(days / 30);
+    if (months < 12) return rtf.format(-months, 'month');
+    return rtf.format(-Math.round(days / 365), 'year');
+}
 
 const typeIcon = $derived(() => {
     switch (item.evidenceType) {
@@ -51,7 +64,7 @@ function formatSize(bytes?: number) {
             <div class="flex justify-between items-center text-[10px] opacity-60">
                 <span>{formatSize(item.fileSize)}</span>
                 {#if item.createdAt}
-                    <span>{formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}</span>
+                    <span>{timeAgo(new Date(item.createdAt))}</span>
                 {/if}
             </div>
         </div>

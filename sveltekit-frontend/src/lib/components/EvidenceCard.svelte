@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Evidence } from '$lib/schemas/evidence';
-	import { formatDistanceToNow } from 'date-fns';
 
  interface Props {
  evidence: Evidence;
@@ -10,9 +9,15 @@
 
  let { evidence, onAskAI, onDelete }: Props = $props();
 
+ const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
  const formatDate = (date: Date | undefined) => {
- if (!date) return 'Unknown';
- return formatDistanceToNow(new Date(date), { addSuffix: true });
+	if (!date) return 'Unknown';
+	const diffSec = Math.round((new Date(date).getTime() - Date.now()) / 1000);
+	const absSec = Math.abs(diffSec);
+	if (absSec < 60) return rtf.format(diffSec, 'second');
+	if (absSec < 3600) return rtf.format(Math.round(diffSec / 60), 'minute');
+	if (absSec < 86400) return rtf.format(Math.round(diffSec / 3600), 'hour');
+	return rtf.format(Math.round(diffSec / 86400), 'day');
  };
 
  const formatFileSize = (bytes: number | undefined) => {

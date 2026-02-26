@@ -3,6 +3,7 @@
 	import type { LayoutData } from './$types';
 	import CaseDocumentWriter from '$lib/components/legal-ai/CaseDocumentWriter.svelte';
 	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
+	import LegalCorpusSearch from '$lib/components/LegalCorpusSearch.svelte';
 	import ErrorBoundary from '$lib/components/ui/ErrorBoundary.svelte';
 	import { notificationStore } from '$lib/stores/unified/notification-store.svelte.js';
 	import OfflineIndicator from '$lib/components/cache/OfflineIndicator.svelte';
@@ -38,6 +39,7 @@
 		{ href: '/terminal', icon: '💻', label: 'TERMINAL' },
 		{ href: '/memory-palace', icon: '🏛️', label: 'MEMORY PALACE' },
 		{ href: '/active-cases', icon: '🔥', label: 'ACTIVE CASES' },
+		{ href: '/demos', icon: '🎮', label: 'DEMOS' },
 	];
 
 	const adminItems = [
@@ -134,6 +136,7 @@
 
 <CaseDocumentWriter bind:isOpen={showDocumentWriter} />
 <CodebaseSearch />
+<LegalCorpusSearch />
 <OfflineIndicator />
 
 <!-- Toast Notifications Overlay -->

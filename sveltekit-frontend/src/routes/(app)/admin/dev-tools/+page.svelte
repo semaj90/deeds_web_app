@@ -12,6 +12,7 @@
 	import PerformanceMonitor from '$lib/components/ui/PerformanceMonitor.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import CacheMonitor from '$lib/components/cache/CacheMonitor.svelte';
+	import DocumentUploadSimulator from '$lib/components/ai/DocumentUploadSimulator.svelte';
 	let { data } = $props();
 
 	// Tab state
@@ -32,6 +33,8 @@
 		{ value: 'performance', label: 'Performance' },
 		{ value: 'spinners', label: 'Spinners' },
 		{ value: 'embeddings', label: 'Embeddings' },
+		{ value: 'upload-sim', label: 'Upload Sim' },
+		{ value: 'knowledge', label: 'Knowledge Base' },
 	];
 
 	// Reactive state
@@ -116,6 +119,52 @@
 			redisHealthy = false;
 		} finally {
 			isCheckingRedis = false;
+		}
+	}
+
+	// Knowledge base seed state
+	let seedStatus = $state<'idle' | 'seeding' | 'embedding' | 'indexing' | 'done' | 'error'>('idle');
+	let seedResult = $state<Record<string, unknown> | null>(null);
+	let seedError = $state('');
+
+	async function seedKnowledge(withEmbed = false) {
+		seedStatus = withEmbed ? 'embedding' : 'seeding';
+		seedResult = null;
+		seedError = '';
+		try {
+			const url = withEmbed ? '/api/admin/seed-knowledge?embed=true' : '/api/admin/seed-knowledge';
+			const res = await fetch(url, { method: 'POST' });
+			const json = await res.json();
+			if (res.ok) {
+				seedResult = json;
+				seedStatus = 'done';
+			} else {
+				seedError = json.error ?? `HTTP ${res.status}`;
+				seedStatus = 'error';
+			}
+		} catch (e) {
+			seedError = e instanceof Error ? e.message : String(e);
+			seedStatus = 'error';
+		}
+	}
+
+	async function indexPdfs() {
+		seedStatus = 'indexing';
+		seedResult = null;
+		seedError = '';
+		try {
+			const res = await fetch('/api/admin/seed-knowledge?action=index-pdfs');
+			const json = await res.json();
+			if (res.ok) {
+				seedResult = json;
+				seedStatus = 'done';
+			} else {
+				seedError = json.error ?? `HTTP ${res.status}`;
+				seedStatus = 'error';
+			}
+		} catch (e) {
+			seedError = e instanceof Error ? e.message : String(e);
+			seedStatus = 'error';
 		}
 	}
 
@@ -790,6 +839,85 @@
 					<p>L4: embeddinggemma:latest → 768d via gRPC/HTTP</p>
 					<p class="mt-2 text-sand/40">Fallback: nomic-embed-text (384d)</p>
 					<p class="text-sand/40">Vector stores: pgvector + Qdrant ANN</p>
+				</div>
+			</div>
+		</div>
+	{/if}
+
+	{#if activeTab === 'upload-sim'}
+		<div class="space-y-4">
+			<h3 class="text-lg font-semibold text-sand">Upload Pipeline Simulator</h3>
+			<p class="text-sm text-sand/60">Simulates the 4-stage evidence processing pipeline (upload → extract → chunk → embed).</p>
+			<DocumentUploadSimulator />
+		</div>
+	{/if}
+
+	{#if activeTab === 'knowledge'}
+		<div class="space-y-6">
+			<h3 class="text-lg font-semibold text-sand">Legal Knowledge Base</h3>
+			<p class="text-sm text-sand/60">Seed glossary terms, statutes, and legal precedents into PostgreSQL. Generate 768-dim embeddings via Ollama embeddinggemma for cosine similarity search. Index lawpdfs/ through the 8-stage RAG pipeline (MinIO → chunking → Qdrant + pgvector).</p>
+
+			<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+				<div class="rounded-lg border-2 border-sand/20 bg-panel p-4">
+					<h4 class="font-semibold text-sand mb-2">Seed Data</h4>
+					<p class="text-xs text-sand/60 mb-3">~60 glossary terms, ~25 statutes, ~20 precedents. Idempotent (skips duplicates).</p>
+					<button
+						class="w-full rounded-md border border-accent bg-accent/10 px-4 py-2 text-sm font-mono uppercase tracking-wider text-accent transition hover:bg-accent/20 disabled:opacity-50"
+						onclick={() => seedKnowledge(false)}
+						disabled={seedStatus !== 'idle' && seedStatus !== 'done' && seedStatus !== 'error'}
+					>
+						{seedStatus === 'seeding' ? 'Seeding...' : 'Seed Knowledge Base'}
+					</button>
+				</div>
+
+				<div class="rounded-lg border-2 border-sand/20 bg-panel p-4">
+					<h4 class="font-semibold text-sand mb-2">Seed + Embed</h4>
+					<p class="text-xs text-sand/60 mb-3">Seed data + generate embeddings via embeddinggemma:latest (768-dim, cosine). Stored in pgvector.</p>
+					<button
+						class="w-full rounded-md border border-info bg-info/10 px-4 py-2 text-sm font-mono uppercase tracking-wider text-info transition hover:bg-info/20 disabled:opacity-50"
+						onclick={() => seedKnowledge(true)}
+						disabled={seedStatus !== 'idle' && seedStatus !== 'done' && seedStatus !== 'error'}
+					>
+						{seedStatus === 'embedding' ? 'Embedding...' : 'Seed + Embed'}
+					</button>
+				</div>
+
+				<div class="rounded-lg border-2 border-sand/20 bg-panel p-4">
+					<h4 class="font-semibold text-sand mb-2">Index PDFs</h4>
+					<p class="text-xs text-sand/60 mb-3">Index 36 lawpdfs/ through evidence upload pipeline (MinIO → OCR → chunk → embed → Qdrant).</p>
+					<button
+						class="w-full rounded-md border border-warning bg-warning/10 px-4 py-2 text-sm font-mono uppercase tracking-wider text-warning transition hover:bg-warning/20 disabled:opacity-50"
+						onclick={indexPdfs}
+						disabled={seedStatus !== 'idle' && seedStatus !== 'done' && seedStatus !== 'error'}
+					>
+						{seedStatus === 'indexing' ? 'Indexing PDFs...' : 'Index lawpdfs/ (36 PDFs)'}
+					</button>
+				</div>
+			</div>
+
+			{#if seedStatus === 'done' && seedResult}
+				<div class="rounded-lg border-2 border-accent/30 bg-accent/5 p-4">
+					<h4 class="font-semibold text-accent mb-2">Result</h4>
+					<pre class="text-xs text-sand/80 font-mono whitespace-pre-wrap overflow-x-auto max-h-48">{JSON.stringify(seedResult, null, 2)}</pre>
+				</div>
+			{/if}
+
+			{#if seedStatus === 'error'}
+				<div class="rounded-lg border-2 border-danger/30 bg-danger/5 p-4">
+					<h4 class="font-semibold text-danger mb-2">Error</h4>
+					<p class="text-sm text-danger/80">{seedError}</p>
+				</div>
+			{/if}
+
+			<div class="rounded-lg border-2 border-sand/20 bg-panel p-4">
+				<h4 class="font-semibold text-sand mb-2">Pipeline Architecture</h4>
+				<div class="text-xs text-sand/60 font-mono space-y-1">
+					<p>RAG: Qdrant vector search → confidence ranking → LLM generation</p>
+					<p>KAG: Schema validation + W3C spec checks</p>
+					<p>DAG: Cluster dependency ordering + fix priority</p>
+					<p class="mt-2 text-sand/40">Storage: pgvector (768-dim text) + Qdrant (Cosine ANN)</p>
+					<p class="text-sand/40">Embedding: embeddinggemma:latest → nomic-embed-text fallback</p>
+					<p class="text-sand/40">Search: /api/glossary/search, /api/statutes/search, /api/precedents/search</p>
 				</div>
 			</div>
 		</div>

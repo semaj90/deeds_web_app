@@ -20,7 +20,7 @@
  */
 
 import type { InferenceSource } from './model-ids.js';
-import { WASM_WORKER_PATH } from './model-ids.js';
+// WASM llama.cpp worker archived — ONNX Runtime WebGPU is the active inference path
 
 // ── Server Capabilities (from /api/health/capabilities) ─────────────────
 
@@ -198,26 +198,15 @@ export function shouldEscalateToServer(
 	};
 }
 
-// ── WASM Worker Factory ──────────────────────────────────────────────────
+// ── WASM Worker Factory (ARCHIVED) ──────────────────────────────────────
+// llama.cpp WASM worker archived to deeds_labs/wasm-archive/
+// ONNX Runtime WebGPU (client-embed.ts + onnx/session.ts) is the active client-side inference path
+// Stubs kept for API compatibility — no-op
 
-let wasmWorker: Worker | null = null;
-
-/**
- * Get or create the WASM llama.cpp web worker for client-side inference.
- * Returns null if Workers are unavailable (SSR / unsupported browser).
- */
 export function getWasmWorker(): Worker | null {
-	if (typeof Worker === 'undefined') return null;
-	if (!wasmWorker) {
-		wasmWorker = new Worker(WASM_WORKER_PATH);
-	}
-	return wasmWorker;
+	return null; // Archived — use ONNX Runtime WebGPU path instead
 }
 
-/**
- * Terminate the WASM worker and release resources.
- */
 export function terminateWasmWorker(): void {
-	wasmWorker?.terminate();
-	wasmWorker = null;
+	// No-op — WASM worker archived
 }

@@ -1,15 +1,13 @@
 import { db } from '$lib/server/db/client';
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { sql } from 'drizzle-orm';
+import { sql, count } from 'drizzle-orm';
+import { legalGlossary, statutes, legalPrecedents } from '$lib/server/db/schema-postgres.js';
 
 /**
  * GET /api/dashboard/stats
- * Aggregate counts for the dashboard overview
+ * Aggregate counts for the dashboard overview + knowledge base
  */
 export const GET: RequestHandler = async () => {
-	const safe = async <T>(p: Promise<T>, fallback: T): Promise<T> =>
-		p.catch(() => fallback);
-
 	const exec = async (query: ReturnType<typeof sql>) => {
 		try {
 			const result = await db.execute(query);
@@ -20,7 +18,7 @@ export const GET: RequestHandler = async () => {
 		}
 	};
 
-	const [cases, evidence, persons, citations] = await Promise.all([
+	const [cases, evidence, persons, citations, glossaryCount, statuteCount, precedentCount] = await Promise.all([
 		exec(sql`SELECT
 			COUNT(*) FILTER (WHERE status IN ('open', 'active', 'investigating')) as active,
 			COUNT(*) as total
@@ -30,7 +28,10 @@ export const GET: RequestHandler = async () => {
 			COUNT(*) FILTER (WHERE status = 'approved') as approved
 			FROM evidence`),
 		exec(sql`SELECT COUNT(*) as total FROM persons_of_interest`),
-		exec(sql`SELECT COUNT(*) as total FROM saved_citations`)
+		exec(sql`SELECT COUNT(*) as total FROM saved_citations`),
+		db.select({ value: count() }).from(legalGlossary).then(r => r[0]?.value ?? 0).catch(() => 0),
+		db.select({ value: count() }).from(statutes).then(r => r[0]?.value ?? 0).catch(() => 0),
+		db.select({ value: count() }).from(legalPrecedents).then(r => r[0]?.value ?? 0).catch(() => 0),
 	]);
 
 	return json({
@@ -39,6 +40,12 @@ export const GET: RequestHandler = async () => {
 		approvedEvidence: Number(evidence.approved ?? 0),
 		personsOfInterest: Number(persons.total ?? 0),
 		totalCitations: Number(citations.total ?? 0),
-		recentActivity: Number(cases.total ?? 0)
+		recentActivity: Number(cases.total ?? 0),
+		knowledgeBase: {
+			glossary: Number(glossaryCount),
+			statutes: Number(statuteCount),
+			precedents: Number(precedentCount),
+			total: Number(glossaryCount) + Number(statuteCount) + Number(precedentCount),
+		},
 	});
 };

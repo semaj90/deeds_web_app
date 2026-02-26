@@ -1,3 +1,33 @@
+<!--
+  ARCHIVED: Session 93r27 (Feb 25, 2026)
+  REASON: 0 real consumers (only barrel re-export in bits/index.enhanced.ts, which itself has 0 importers)
+  Heavily corrupted — compressed to single lines, broken SVG, CSS syntax errors
+
+  CORRUPTION ANALYSIS (156L):
+  - Entire file compressed to ~85 logical lines crammed into single-line blocks
+  - Lines 20-39: SVG paths with pipe chars — `viewBox="0, 0 24 24"` (commas), `points="6, 9, 12, 15 | 18,9"` (pipe)
+  - Line 46: Broken SVG viewBox — `viewBox=" 0 0 | 24, 24"` (pipe + commas)
+  - Line 59: Broken Svelte transition syntax — `transition slide={{ duration: 200 }}` (missing colon `transition:slide`)
+  - Lines 83-84: Unclosed {#if} blocks — missing closing tags for metadata.fromCache and metadata sections
+  - Lines 87-149: CSS commas as semicolons (e.g. `background: val, border: val` instead of `;`)
+  - Lines 92, 131, 139: Typo `space-betweenn` (double n)
+  - Lines 104, 112-116: CSS pipe chars — `rgba(255, 255 | 255: 0.1)` (should be `,`)
+  - Line 138: CSS comma in grid — `grid-template-columns: ..., gap: 8px` (should be `;`)
+
+  SUPERSEDED BY:
+  - ChatMessage.svelte (220L, 10 importers) — clean Svelte 5 message renderer
+  - SimpleWorkingChat.svelte — inline message rendering with TypewriterResponse
+  - /terminal/+page.svelte — inline message rendering with TypewriterResponse + confidence badges
+
+  FEATURES THIS HAD (for future reference):
+  - Role-based styling (user/assistant/system) with SVG icons
+  - Copy-to-clipboard button
+  - Expandable sources section (RAG search results with score + type)
+  - Expandable metadata section (provider, model, confidence, execution time, cache status)
+  - Provider badge (local/cloud/hybrid)
+  - Dark mode CSS + responsive design
+  - Slide transitions for expand/collapse
+-->
 <!-- Consider wrapping this component in an ErrorBoundary for better, error, handling --> <!-- import  ErrorBoundary, from "$lib/components/ErrorBoundary.svelte"; --> <script lang="ts">
 import type { Message } from '$lib/types'; import { browser } from '$app/environment'; import { slide } from 'svelte/transition'; let { message, showSources = false, showMetadata = false }: {
 	message: {

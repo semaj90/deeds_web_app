@@ -2,12 +2,14 @@
 	import { page } from '$app/state';
 	import { onDestroy } from 'svelte';
 	import { CacheInvalidation } from '$lib/cache/cache-invalidation';
+	import { detectSensitiveInfo, type SensitiveInfoHit } from '$lib/utils/sensitive-info-detector.js';
 
 	interface UploadProgress {
 		fileName: string;
 		progress: number;
 		status: 'pending' | 'uploading' | 'processing' | 'completed' | 'error';
 		error?: string;
+		piiWarnings?: SensitiveInfoHit[];
 	}
 
 	let caseId: string;
@@ -51,6 +53,25 @@
 		}
 	}
 
+	/** Scan a text-based file for PII before upload */
+	async function scanForPII(file: File): Promise<SensitiveInfoHit[]> {
+		// Only scan text-extractable files under 2MB
+		if (file.size > 2 * 1024 * 1024) return [];
+		if (!file.type.includes('text') && file.type !== 'application/pdf') return [];
+		try {
+			const text = await file.text();
+			return detectSensitiveInfo(text);
+		} catch {
+			return []; // Binary file or read error — skip scan
+		}
+	}
+
+	let piiDismissed = $state<Set<string>>(new Set());
+
+	function dismissPII(fileName: string) {
+		piiDismissed = new Set([...piiDismissed, fileName]);
+	}
+
 	async function uploadFiles(files: File[]) {
 		isUploading = true;
 
@@ -69,13 +90,17 @@
 				continue;
 			}
 
+			// Pre-upload PII scan
+			const piiHits = await scanForPII(file);
+
 			const uploadIndex = uploads.length;
 			uploads = [
 				...uploads,
 				{
 					fileName: file.name,
 					progress: 0,
-					status: 'pending'
+					status: 'pending',
+					piiWarnings: piiHits.length > 0 ? piiHits : undefined
 				}
 			];
 
@@ -267,6 +292,14 @@
 					>
 						<div class="upload-info">
 							<div class="file-name">{upload.fileName}</div>
+							{#if upload.piiWarnings && upload.piiWarnings.length > 0 && !piiDismissed.has(upload.fileName)}
+								<div class="pii-warning">
+									<strong>Sensitive info detected:</strong>
+									{upload.piiWarnings.length} item{upload.piiWarnings.length > 1 ? 's' : ''} found
+									({upload.piiWarnings.map(h => h.type).filter((v, i, a) => a.indexOf(v) === i).join(', ')})
+									<button class="pii-dismiss" onclick={() => dismissPII(upload.fileName)}>Dismiss</button>
+								</div>
+							{/if}
 							{#if upload.status === 'error'}
 								<div class="error-message">{upload.error}</div>
 							{:else}
@@ -495,6 +528,31 @@
 	.error-message {
 		color: #ff6b6b;
 		font-size: 0.9rem;
+	}
+
+	.pii-warning {
+		background: rgba(255, 165, 0, 0.15);
+		border: 1px solid rgba(255, 165, 0, 0.4);
+		border-radius: 4px;
+		padding: 0.5rem 0.75rem;
+		margin-bottom: 0.5rem;
+		font-size: 0.85rem;
+		color: #ffa500;
+	}
+
+	.pii-dismiss {
+		margin-left: 0.75rem;
+		background: transparent;
+		border: 1px solid rgba(255, 165, 0, 0.4);
+		color: #ffa500;
+		padding: 0.15rem 0.5rem;
+		border-radius: 3px;
+		cursor: pointer;
+		font-size: 0.8rem;
+	}
+
+	.pii-dismiss:hover {
+		background: rgba(255, 165, 0, 0.2);
 	}
 
 	.status-icon {

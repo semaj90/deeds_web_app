@@ -84,20 +84,6 @@
 
 	let onlineCount = $derived(filteredModels.filter((m) => m.status === 'online').length);
 
-	function getProviderIcon(_provider: string): string {
-		return 'cpu';
-	}
-
-	function getStatusColor(status: string): string {
-		switch (status) {
-			case 'online': return 'status-online';
-			case 'offline': return 'status-offline';
-			case 'loading': return 'status-loading';
-			case 'error': return 'status-error';
-			default: return 'status-offline';
-		}
-	}
-
 	function getStatusIcon(status: string): string {
 		switch (status) {
 			case 'online': return 'check-circle';
@@ -163,73 +149,87 @@
 	}
 </script>
 
-<div class="llm-selector">
-	<label class="selector-label">AI Model Selection</label>
+<div class="relative w-full">
+	<label class="block text-sm font-medium mb-1.5 opacity-80">AI Model Selection</label>
 
-	<!-- Trigger -->
 	<button
 		onclick={() => (isOpen = !isOpen)}
-		class="selector-trigger"
+		class="flex items-center justify-between w-full h-12 px-3 py-2 border border-sand-dark rounded-lg bg-panel-soft text-inherit cursor-pointer hover:border-accent transition-colors"
 		aria-label="Select AI Model"
 		aria-expanded={isOpen}
 	>
-		<div class="trigger-content">
+		<div class="flex items-center gap-2">
 			{#if selectedModel}
-				<div class="trigger-model">
-					<Icon name={getProviderIcon(selectedModel.provider)} size={16} />
-					<span class="trigger-name">{selectedModel.displayName}</span>
-					<span class="trigger-status {getStatusColor(selectedModel.status)}">
+				<div class="flex items-center gap-2">
+					<Icon name="cpu" size={16} />
+					<span class="font-medium">{selectedModel.displayName}</span>
+					<span
+						class="text-[11px] font-semibold"
+						class:text-green-500={selectedModel.status === 'online'}
+						class:text-stone-500={selectedModel.status === 'offline'}
+						class:text-warning={selectedModel.status === 'loading'}
+						class:text-danger={selectedModel.status === 'error'}
+					>
 						{selectedModel.status.toUpperCase()}
 					</span>
 				</div>
 			{:else}
-				<span class="trigger-placeholder">Select an AI model...</span>
+				<span class="opacity-50">Select an AI model...</span>
 			{/if}
 		</div>
 		<Icon name="chevron-down" size={16} />
 	</button>
 
-	<!-- Dropdown -->
 	{#if isOpen}
-		<div class="dropdown" transition:fade={{ duration: 150 }}>
-			<div class="dropdown-list">
+		<div class="absolute top-full mt-1 left-0 right-0 z-50 bg-panel-soft border border-sand-dark rounded-lg shadow-xl max-h-96 overflow-auto" transition:fade={{ duration: 150 }}>
+			<div class="py-1">
 				{#each filteredModels as model (model.id)}
-					<button
+					<div
 						onclick={() => selectModel(model)}
-						class="model-option"
-						class:selected={selectedModel?.id === model.id}
+						onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectModel(model); } }}
+						class="flex items-center justify-between w-full px-4 py-3 bg-transparent text-inherit cursor-pointer text-left hover:bg-white/5"
+						style:background={selectedModel?.id === model.id ? 'rgba(59, 130, 246, 0.1)' : 'transparent'}
+						role="option"
+						tabindex="0"
+						aria-selected={selectedModel?.id === model.id}
 					>
-						<div class="model-main">
-							<Icon name={getProviderIcon(model.provider)} size={18} />
-							<div class="model-info">
-								<div class="model-header">
-									<span class="model-name">{model.displayName}</span>
-									<span class="model-spec">{model.specialization}</span>
+						<div class="flex items-start gap-3 flex-1">
+							<Icon name="cpu" size={18} />
+							<div class="flex-1">
+								<div class="flex items-center gap-2">
+									<span class="font-medium">{model.displayName}</span>
+									<span class="text-[11px] px-1.5 py-0.5 rounded bg-white/8 capitalize">{model.specialization}</span>
 								</div>
-								<div class="model-meta">
+								<div class="flex gap-3 mt-1 text-xs opacity-60">
 									<span>{model.size}</span>
 									{#if showMetrics && model.status === 'online'}
 										<span>{model.performance.tokensPerSecond} tok/s</span>
 										<span>{model.performance.responseTime}ms</span>
 									{/if}
 								</div>
-								<div class="model-caps">
+								<div class="flex flex-wrap gap-1 mt-1.5">
 									{#each model.capabilities.slice(0, 3) as cap}
-										<span class="cap-tag">{cap}</span>
+										<span class="text-[11px] px-1.5 py-px rounded bg-blue-500/10 text-info">{cap}</span>
 									{/each}
 								</div>
 							</div>
 						</div>
 
-						<div class="model-actions">
-							<div class="model-status {getStatusColor(model.status)}">
+						<div class="flex items-center gap-2 shrink-0">
+							<div
+								class="flex items-center gap-1 text-[11px] font-semibold"
+								class:text-green-500={model.status === 'online'}
+								class:text-stone-500={model.status === 'offline'}
+								class:text-warning={model.status === 'loading'}
+								class:text-danger={model.status === 'error'}
+							>
 								<Icon name={getStatusIcon(model.status)} size={14} />
 								<span>{model.status.toUpperCase()}</span>
 							</div>
 							{#if model.status === 'offline'}
 								<button
 									onclick={(e: MouseEvent) => { e.stopPropagation(); pullModel(model); }}
-									class="pull-btn"
+									class="px-2 py-1 text-xs bg-info text-white border-none rounded cursor-pointer hover:opacity-80"
 								>
 									Load
 								</button>
@@ -238,198 +238,20 @@
 								<Icon name="check-circle" size={16} />
 							{/if}
 						</div>
-					</button>
+					</div>
 				{/each}
 
 				{#if filteredModels.length === 0}
-					<div class="no-models">No models available for "{filterBy}" filter</div>
+					<div class="p-6 text-center text-sm opacity-50">No models available for "{filterBy}" filter</div>
 				{/if}
 			</div>
 
-			<!-- Footer -->
-			<div class="dropdown-footer">
+			<div class="flex items-center justify-between px-4 py-2 border-t border-sand-dark">
 				<Button variant="ghost" size="sm" onclick={refreshModelStatuses} disabled={isRefreshing}>
 					{isRefreshing ? 'Refreshing...' : 'Refresh Status'}
 				</Button>
-				<span class="online-count">{onlineCount} / {filteredModels.length} online</span>
+				<span class="text-xs opacity-60">{onlineCount} / {filteredModels.length} online</span>
 			</div>
 		</div>
 	{/if}
 </div>
-
-<style>
-	.llm-selector {
-		position: relative;
-		width: 100%;
-	}
-	.selector-label {
-		display: block;
-		font-size: 0.875rem;
-		font-weight: 500;
-		margin-bottom: 0.375rem;
-		opacity: 0.8;
-	}
-	.selector-trigger {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		width: 100%;
-		height: 3rem;
-		padding: 0.5rem 0.75rem;
-		border: 1px solid var(--color-sand-dark, #44403c);
-		border-radius: 0.5rem;
-		background: var(--color-panel-soft, #1c1917);
-		color: inherit;
-		cursor: pointer;
-		transition: border-color 0.2s;
-	}
-	.selector-trigger:hover {
-		border-color: var(--color-accent, #a51c30);
-	}
-	.trigger-content {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-	.trigger-model {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-	.trigger-name {
-		font-weight: 500;
-	}
-	.trigger-placeholder {
-		opacity: 0.5;
-	}
-	.trigger-status {
-		font-size: 0.6875rem;
-		font-weight: 600;
-	}
-	.dropdown {
-		position: absolute;
-		top: calc(100% + 0.25rem);
-		left: 0;
-		right: 0;
-		z-index: 50;
-		background: var(--color-panel-soft, #1c1917);
-		border: 1px solid var(--color-sand-dark, #44403c);
-		border-radius: 0.5rem;
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-		max-height: 24rem;
-		overflow: auto;
-	}
-	.dropdown-list {
-		padding: 0.25rem 0;
-	}
-	.model-option {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		width: 100%;
-		padding: 0.75rem 1rem;
-		border: none;
-		background: transparent;
-		color: inherit;
-		cursor: pointer;
-		text-align: left;
-		transition: background-color 0.15s;
-	}
-	.model-option:hover {
-		background: rgba(255, 255, 255, 0.05);
-	}
-	.model-option.selected {
-		background: rgba(59, 130, 246, 0.1);
-	}
-	.model-main {
-		display: flex;
-		align-items: flex-start;
-		gap: 0.75rem;
-		flex: 1;
-	}
-	.model-info {
-		flex: 1;
-	}
-	.model-header {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-	.model-name {
-		font-weight: 500;
-	}
-	.model-spec {
-		font-size: 0.6875rem;
-		padding: 0.125rem 0.375rem;
-		border-radius: 0.25rem;
-		background: rgba(255, 255, 255, 0.08);
-		text-transform: capitalize;
-	}
-	.model-meta {
-		display: flex;
-		gap: 0.75rem;
-		margin-top: 0.25rem;
-		font-size: 0.75rem;
-		opacity: 0.6;
-	}
-	.model-caps {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.25rem;
-		margin-top: 0.375rem;
-	}
-	.cap-tag {
-		font-size: 0.6875rem;
-		padding: 0.0625rem 0.375rem;
-		border-radius: 0.25rem;
-		background: rgba(59, 130, 246, 0.1);
-		color: var(--color-info, #3b82f6);
-	}
-	.model-actions {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		flex-shrink: 0;
-	}
-	.model-status {
-		display: flex;
-		align-items: center;
-		gap: 0.25rem;
-		font-size: 0.6875rem;
-		font-weight: 600;
-	}
-	.status-online { color: var(--color-accent, #22c55e); }
-	.status-offline { color: rgba(255, 255, 255, 0.4); }
-	.status-loading { color: var(--color-warning, #eab308); }
-	.status-error { color: var(--color-danger, #ef4444); }
-	.pull-btn {
-		padding: 0.25rem 0.5rem;
-		font-size: 0.75rem;
-		background: var(--color-info, #3b82f6);
-		color: white;
-		border: none;
-		border-radius: 0.25rem;
-		cursor: pointer;
-		transition: opacity 0.15s;
-	}
-	.pull-btn:hover {
-		opacity: 0.8;
-	}
-	.no-models {
-		padding: 1.5rem;
-		text-align: center;
-		font-size: 0.875rem;
-		opacity: 0.5;
-	}
-	.dropdown-footer {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 0.5rem 1rem;
-		border-top: 1px solid var(--color-sand-dark, #44403c);
-	}
-	.online-count {
-		font-size: 0.75rem;
-		opacity: 0.6;
-	}
-</style>

@@ -64,6 +64,13 @@
       "when": 1770940340724,
       "tag": "0008_black_tigra",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1772063582840,
+      "tag": "0009_wakeful_shen",
+      "breakpoints": true
     }
   ]
 }

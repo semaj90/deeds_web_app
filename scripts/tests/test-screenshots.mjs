@@ -48,6 +48,9 @@ const ALL_ROUTES = [
 // SSE / long-poll pages that never reach networkidle
 const SSE_PAGES = new Set(['all-routes', 'cases-overview', 'dashboard', 'command-center', 'error-brain', 'phase78']);
 
+// CSR-only pages (ssr = false) need extra wait for client JS to render
+const CSR_PAGES = new Set(['evidence-library', 'evidence', 'ai-dashboard', 'terminal']);
+
 // ── CLI args ───────────────────────────────────────────────────────
 const args = process.argv.slice(2);
 const port = args.includes('--port') ? args[args.indexOf('--port') + 1] : '5173';
@@ -88,6 +91,11 @@ for (const route of routes) {
     // For domcontentloaded pages, give extra render time
     if (waitUntil === 'domcontentloaded') {
       await tab.waitForTimeout(2000);
+    }
+
+    // CSR-only pages (ssr=false) need extra wait for client JS bundle to render
+    if (CSR_PAGES.has(route.name)) {
+      await tab.waitForTimeout(3000);
     }
 
     result.status = response?.status() ?? 0;

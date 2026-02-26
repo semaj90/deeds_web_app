@@ -175,7 +175,7 @@
 
 	{#if selectedDocument}
 		<div class="doc-detail-overlay" onclick={() => (selectedDocument = null)}>
-			<div class="doc-detail" onclick|stopPropagation>
+			<div class="doc-detail" onclick={(e) => e.stopPropagation()}>
 				<div class="detail-header">
 					<h3>{selectedDocument.filename}</h3>
 					<button class="close-btn" onclick={() => (selectedDocument = null)}>
