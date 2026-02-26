@@ -1,24 +1,33 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 
-	const { data }: { data: PageData } = $props();
+	const { data }: { data: PageData & { connections?: Array<{ source: string; target: string; type: string; strength: number }> } } = $props();
 
 	let canvas: HTMLCanvasElement;
 	let hasWebGPU = $state(false);
-	let selectedNode = $state<number | null>(null);
-	let hoveredNode = $state<number | null>(null);
+	let selectedNode = $state<string | number | null>(null);
+	let hoveredNode = $state<string | number | null>(null);
 
 	// Build graph nodes from server evidence data
 	interface GraphNode {
-		id: number;
+		id: number | string;
 		title: string;
 		type: string;
 		size: number;
 		x: number;
 		y: number;
+		z: number;
 		vx: number;
 		vy: number;
+		vz: number;
 		color: string;
+	}
+
+	interface GraphEdge {
+		source: number | string;
+		target: number | string;
+		type: string;
+		strength: number;
 	}
 
 	const typeColors: Record<string, string> = {
@@ -33,7 +42,9 @@
 	};
 
 	let graphNodes = $state<GraphNode[]>([]);
+	let graphEdges = $state<GraphEdge[]>([]);
 	let animFrame = $state(0);
+	let depthMode = $state(true);
 
 	function initNodes() {
 		const items = data.evidenceItems ?? [];
@@ -49,40 +60,65 @@
 				size: Math.max(8, Math.min(24, (item.fileSize ?? 1000) / 50000)),
 				x: w / 2 + Math.cos(angle) * radius + (Math.random() - 0.5) * 80,
 				y: h / 2 + Math.sin(angle) * radius + (Math.random() - 0.5) * 80,
+				z: (Math.random() - 0.5) * 200,
 				vx: 0,
 				vy: 0,
+				vz: 0,
 				color: typeColors[(item.evidenceType ?? 'document').toLowerCase()] ?? '#22d3ee',
 			};
 		});
+		// Load real graph connections from server
+		graphEdges = (data.connections ?? []) as GraphEdge[];
 	}
 
 	function simulate() {
 		const centerX = (canvas?.width ?? 1920) / 2;
 		const centerY = (canvas?.height ?? 1080) / 2;
+		const nodeMap = new Map(graphNodes.map(n => [String(n.id), n]));
 
 		for (const node of graphNodes) {
 			// Gentle pull toward center
 			node.vx += (centerX - node.x) * 0.0003;
 			node.vy += (centerY - node.y) * 0.0003;
+			if (depthMode) node.vz += (0 - node.z) * 0.001;
 
 			// Repulsion between nodes
 			for (const other of graphNodes) {
 				if (other.id === node.id) continue;
 				const dx = node.x - other.x;
 				const dy = node.y - other.y;
-				const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-				if (dist < 120) {
+				const dz = depthMode ? (node.z - other.z) : 0;
+				const dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 1;
+				if (dist < 150) {
 					const force = 0.5 / dist;
 					node.vx += dx * force;
 					node.vy += dy * force;
+					if (depthMode) node.vz += dz * force;
 				}
 			}
 
 			// Damping
 			node.vx *= 0.92;
 			node.vy *= 0.92;
+			node.vz *= 0.92;
 			node.x += node.vx;
 			node.y += node.vy;
+			if (depthMode) node.z += node.vz;
+		}
+
+		// Edge attraction: connected nodes pull toward each other
+		for (const edge of graphEdges) {
+			const a = nodeMap.get(String(edge.source));
+			const b = nodeMap.get(String(edge.target));
+			if (!a || !b) continue;
+			const dx = b.x - a.x;
+			const dy = b.y - a.y;
+			const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+			const strength = 0.0005 * (edge.strength / 100);
+			a.vx += dx * strength;
+			a.vy += dy * strength;
+			b.vx -= dx * strength;
+			b.vy -= dy * strength;
 		}
 	}
 
@@ -114,36 +150,55 @@
 			ctx.stroke();
 		}
 
-		// Edges: connect nodes of same type
-		ctx.lineWidth = 0.5;
-		for (let i = 0; i < graphNodes.length; i++) {
-			for (let j = i + 1; j < graphNodes.length; j++) {
-				if (graphNodes[i].type === graphNodes[j].type) {
-					const dx = graphNodes[i].x - graphNodes[j].x;
-					const dy = graphNodes[i].y - graphNodes[j].y;
-					const dist = Math.sqrt(dx * dx + dy * dy);
-					if (dist < 250) {
-						ctx.strokeStyle = graphNodes[i].color.replace(')', ', 0.15)').replace('rgb', 'rgba').replace('#', '');
-						// Convert hex to rgba for edge
-						const c = graphNodes[i].color;
-						const r = parseInt(c.slice(1, 3), 16);
-						const g = parseInt(c.slice(3, 5), 16);
-						const b = parseInt(c.slice(5, 7), 16);
-						ctx.strokeStyle = `rgba(${r},${g},${b},${0.15 * (1 - dist / 250)})`;
-						ctx.beginPath();
-						ctx.moveTo(graphNodes[i].x, graphNodes[i].y);
-						ctx.lineTo(graphNodes[j].x, graphNodes[j].y);
-						ctx.stroke();
+		// Draw real graph edges from DB connections
+		const nodeMap = new Map(graphNodes.map(n => [String(n.id), n]));
+		for (const edge of graphEdges) {
+			const a = nodeMap.get(String(edge.source));
+			const b = nodeMap.get(String(edge.target));
+			if (!a || !b) continue;
+			const alpha = Math.min(0.6, (edge.strength / 100) * 0.5 + 0.1);
+			ctx.strokeStyle = `rgba(34, 211, 238, ${alpha})`;
+			ctx.lineWidth = Math.max(0.5, edge.strength / 50);
+			ctx.beginPath();
+			ctx.moveTo(a.x, a.y);
+			ctx.lineTo(b.x, b.y);
+			ctx.stroke();
+		}
+
+		// Fallback: proximity edges for same-type nodes when no DB edges
+		if (graphEdges.length === 0) {
+			ctx.lineWidth = 0.5;
+			for (let i = 0; i < graphNodes.length; i++) {
+				for (let j = i + 1; j < graphNodes.length; j++) {
+					if (graphNodes[i].type === graphNodes[j].type) {
+						const dx = graphNodes[i].x - graphNodes[j].x;
+						const dy = graphNodes[i].y - graphNodes[j].y;
+						const dist = Math.sqrt(dx * dx + dy * dy);
+						if (dist < 250) {
+							const c = graphNodes[i].color;
+							const r = parseInt(c.slice(1, 3), 16);
+							const g = parseInt(c.slice(3, 5), 16);
+							const bv = parseInt(c.slice(5, 7), 16);
+							ctx.strokeStyle = `rgba(${r},${g},${bv},${0.15 * (1 - dist / 250)})`;
+							ctx.beginPath();
+							ctx.moveTo(graphNodes[i].x, graphNodes[i].y);
+							ctx.lineTo(graphNodes[j].x, graphNodes[j].y);
+							ctx.stroke();
+						}
 					}
 				}
 			}
 		}
 
-		// Nodes
-		for (const node of graphNodes) {
+		// Sort nodes by z-depth (draw far nodes first for depth ordering)
+		const sorted = [...graphNodes].sort((a, b) => a.z - b.z);
+		for (const node of sorted) {
 			const isSelected = selectedNode === node.id;
 			const isHovered = hoveredNode === node.id;
-			const r = node.size + (isSelected ? 4 : 0) + (isHovered ? 2 : 0);
+			// Z-depth scaling: nodes closer to viewer (z > 0) appear larger
+			const depthScale = depthMode ? 0.7 + 0.3 * ((node.z + 100) / 200) : 1;
+			const depthAlpha = depthMode ? 0.4 + 0.6 * ((node.z + 100) / 200) : 1;
+			const r = (node.size + (isSelected ? 4 : 0) + (isHovered ? 2 : 0)) * depthScale;
 
 			// Glow
 			if (isSelected || isHovered) {
@@ -151,20 +206,24 @@
 				ctx.shadowBlur = 20;
 			}
 
+			ctx.globalAlpha = depthAlpha;
 			ctx.fillStyle = node.color;
 			ctx.beginPath();
 			ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
 			ctx.fill();
 
 			ctx.shadowBlur = 0;
+			ctx.globalAlpha = 1;
 
 			// Label
 			if (isSelected || isHovered || node.size > 14) {
 				ctx.fillStyle = '#e2e8f0';
-				ctx.font = '11px monospace';
+				ctx.globalAlpha = depthAlpha;
+				ctx.font = `${Math.round(11 * depthScale)}px monospace`;
 				ctx.textAlign = 'center';
 				const label = node.title.length > 24 ? node.title.slice(0, 22) + '..' : node.title;
 				ctx.fillText(label, node.x, node.y - r - 6);
+				ctx.globalAlpha = 1;
 			}
 		}
 	}
@@ -247,9 +306,13 @@
 		{/if}
 		<div class="stats-grid">
 			<span>Nodes</span><span class="val">{graphNodes.length}</span>
+			<span>Edges</span><span class="val">{graphEdges.length}</span>
 			<span>DB Total</span><span class="val">{data.stats?.total ?? 0}</span>
-			<span>Loaded</span><span class="val">{data.stats?.loaded ?? 0}</span>
+			<span>Depth</span><span class="val">{depthMode ? '3D' : '2D'}</span>
 		</div>
+		<button class="depth-toggle" onclick={() => depthMode = !depthMode}>
+			{depthMode ? 'Switch to 2D' : 'Switch to 3D'}
+		</button>
 	</div>
 
 	<!-- Overlay: Legend -->
@@ -441,6 +504,21 @@
 	}
 
 	.empty-link:hover {
+		background: rgba(34, 211, 238, 0.1);
+	}
+
+	.depth-toggle {
+		margin-top: 0.5rem;
+		font-family: monospace;
+		font-size: 0.65rem;
+		color: #22d3ee;
+		background: transparent;
+		border: 1px solid rgba(34, 211, 238, 0.3);
+		padding: 0.2rem 0.5rem;
+		cursor: pointer;
+	}
+
+	.depth-toggle:hover {
 		background: rgba(34, 211, 238, 0.1);
 	}
 </style>

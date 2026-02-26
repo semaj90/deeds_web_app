@@ -98,6 +98,34 @@ export async function getOnnxSession(
 	return promise;
 }
 
+/**
+ * Run a dummy inference to warm up the session's GPU/WASM pipeline.
+ * Ported from Python embedding_service_cuda.py — primes GPU caches and JIT
+ * compilation so the first real inference doesn't pay the cold-start penalty.
+ */
+async function warmupSession(session: any, runtime: typeof import('onnxruntime-web')): Promise<void> {
+	try {
+		const inputNames = session.inputNames as string[];
+		if (inputNames.length === 0) return;
+
+		// Create minimal dummy tensors for each input
+		const feeds: Record<string, any> = {};
+		for (const name of inputNames) {
+			// Use a small [1, 1] tensor of zeros — just enough to trigger pipeline init
+			feeds[name] = new runtime.Tensor('float32', new Float32Array(1), [1, 1]);
+		}
+
+		const warmupStart = performance.now();
+		await session.run(feeds);
+		const warmupMs = Math.round(performance.now() - warmupStart);
+		console.info(`[ONNX] Warmup complete in ${warmupMs}ms`);
+	} catch {
+		// Warmup is best-effort — model shape mismatch on dummy tensor is expected
+		// for some architectures. The session is still valid.
+		console.info('[ONNX] Warmup skipped (model requires specific input shape)');
+	}
+}
+
 async function _createSession(modelUrl: string, preferredEps?: string[]): Promise<any> {
 	const runtime = await ensureOrt();
 	const eps = preferredEps ?? getAvailableProviders();
@@ -122,7 +150,11 @@ async function _createSession(modelUrl: string, preferredEps?: string[]): Promis
 			);
 			providerMap.set(modelUrl, ep);
 			const label = ep === 'webgpu' ? 'WebGPU (Dawn)' : ep.toUpperCase();
-			console.info(`[ONNX] ✅ Model loaded with provider: ${label}`);
+			console.info(`[ONNX] Model loaded with provider: ${label}`);
+
+			// Warmup: run dummy inference to prime GPU/WASM pipeline
+			await warmupSession(session, runtime);
+
 			return session;
 		} catch (err) {
 			console.warn(`[ONNX] Provider "${ep}" failed, trying next...`, err);

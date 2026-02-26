@@ -19,6 +19,8 @@ import { TOKEN_BUDGET } from './types.js';
 import { selectPracticeTemplate } from './practice-templates.js';
 import { extractLegalTags } from '$lib/server/rag/tag-extractor.js';
 import { getTopQueryPatterns, getWeeklySummary } from '$lib/server/analytics/event-logger.js';
+import { applyStyle, type LegalPersona } from './style-adapter.js';
+import { webSearch, formatWebResultsAsContext } from '$lib/server/retrieval/web-search.js';
 
 /**
  * Assemble a complete ACE context from all data sources.
@@ -30,6 +32,8 @@ export async function assembleACEContext(opts: {
 	caseId?: string;
 	conversationId?: string;
 	maxTokens?: number;
+	persona?: LegalPersona;
+	enableWebSearch?: boolean;
 }): Promise<ACEContext> {
 	const { query, userId, caseId, conversationId } = opts;
 
@@ -43,13 +47,14 @@ export async function assembleACEContext(opts: {
 		dates: [] as string[]
 	};
 
-	// Run all data fetches in parallel
-	const [userProfile, caseContext, ragChunks, kagNeighbors, chatHistory] = await Promise.all([
+	// Run all data fetches in parallel (includes optional web search)
+	const [userProfile, caseContext, ragChunks, kagNeighbors, chatHistory, webResults] = await Promise.all([
 		userId ? fetchUserProfile(userId) : Promise.resolve(null),
 		caseId ? fetchCaseContext(caseId) : Promise.resolve(null),
 		fetchRAGChunks(query),
 		caseId ? fetchKAGNeighbors(caseId) : Promise.resolve([]),
-		conversationId ? fetchChatHistory(conversationId) : Promise.resolve([])
+		conversationId ? fetchChatHistory(conversationId) : Promise.resolve([]),
+		opts.enableWebSearch ? webSearch(query, 3).catch(() => null) : Promise.resolve(null)
 	]);
 
 	// Determine practice area from case or user profile
@@ -71,7 +76,9 @@ export async function assembleACEContext(opts: {
 		chatHistory,
 		entities,
 		practiceTemplate,
-		queryTags
+		queryTags,
+		webSearchContext: webResults ? formatWebResultsAsContext(webResults) : null,
+		persona: opts.persona ?? 'neutral'
 	};
 }
 
@@ -152,13 +159,24 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
 		confidenceFactors.entities = 0.85;
 	}
 
-	// 9. Self-prompting instructions
+	// 9. Web search results (if available)
+	if (context.webSearchContext) {
+		lines.push(`\n${context.webSearchContext}`);
+		confidenceFactors.webSearch = 0.6;
+	}
+
+	// 10. Self-prompting instructions
 	const selfPrompt =
 		'After answering, briefly assess: Did you cite specific statutes/precedents? ' +
 		'Is the answer jurisdiction-appropriate? Flag any uncertainty.';
 
+	// Apply persona style to the assembled prompt
+	const persona = (context as ACEContext & { persona?: LegalPersona }).persona ?? 'neutral';
+	const rawPrompt = lines.join('\n');
+	const styledPrompt = persona !== 'neutral' ? applyStyle(rawPrompt, persona) : rawPrompt;
+
 	return {
-		systemPrompt: lines.join('\n'),
+		systemPrompt: styledPrompt,
 		contextWindow: lines.slice(1).join('\n'), // everything after system instruction
 		maxTokenBudget: TOKEN_BUDGET.total,
 		confidenceFactors,

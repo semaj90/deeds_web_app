@@ -85,9 +85,9 @@
             aria-label={action.label}
           >
             <div class="relative">
-              <Icon name={action.icon} class="w-5 h-5 text-sand/40 group-hover:text-white transition-colors" />
+              <span class={`i-lucide-${action.icon} w-5 h-5 text-sand/40 group-hover:text-white transition-colors inline-block`} />
               <div class="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity">
-                <Icon name={action.icon} class="w-5 h-5 text-white blur-sm" />
+                <span class={`i-lucide-${action.icon} w-5 h-5 text-white blur-sm inline-block`} />
               </div>
             </div>
             <span class="text-sm font-medium text-sand/40 group-hover:text-white whitespace-nowrap">

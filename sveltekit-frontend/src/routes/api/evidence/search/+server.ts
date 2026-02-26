@@ -31,6 +31,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { searchEvidenceViaGrpc } from '$lib/server/grpc/retrieval-client.js';
 import type { VectorSearchResult, VectorSearchOptions } from '$lib/server/db/pgvector-utils.js';
 import { productionLogger } from '$lib/server/production-logger.js';
+import { legalPageRank } from '$lib/server/retrieval/legal-pagerank.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
@@ -108,12 +109,13 @@ interface ContextBundle {
 export async function POST({ request, locals }: RequestEvent) {
 	try {
 		const body = await request.json();
-		const { query, caseId, limit = 10, expandSections = true, jurisdiction } = body as {
+		const { query, caseId, limit = 10, expandSections = true, jurisdiction, useLegalPageRank: useLPR = false } = body as {
 			query: string;
 			caseId?: string;
 			limit?: number;
 			expandSections?: boolean;
 			jurisdiction?: string;
+			useLegalPageRank?: boolean;
 		};
 
 		if (!query || typeof query !== 'string') {
@@ -175,7 +177,18 @@ export async function POST({ request, locals }: RequestEvent) {
 
 		// 3. Legal-aware rerank: cosine 75% + citations 15% + jurisdiction/section 10%
 		const rerankStart = performance.now();
-		const reranked = rerankEvidence(rawHits, query, jurisdiction);
+		let reranked = rerankEvidence(rawHits, query, jurisdiction);
+
+		// 3b. Optional Legal PageRank: 40% vector + 30% citation + 20% court + 10% recency
+		if (useLPR) {
+			const lprItems = reranked.map((h) => ({ id: h.evidenceId, score: h.score, metadata: h.metadata as Record<string, unknown>, content: h.content }));
+			const ranked = legalPageRank(lprItems);
+			reranked = ranked.map((r) => {
+				const orig = reranked.find((h) => h.evidenceId === r.id);
+				return { ...(orig ?? reranked[0]), score: r.score, rerank: { ...((orig ?? reranked[0]).rerank!), finalScore: r.score, legalPageRank: r.legalRank } };
+			}) as typeof reranked;
+		}
+
 		const hits = reranked.slice(0, limit);
 		const rerankMs = performance.now() - rerankStart;
 

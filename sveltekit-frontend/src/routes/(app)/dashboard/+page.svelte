@@ -37,8 +37,7 @@
 
   interface DashboardStats {
     activeCases: number;
-    pendingEvidence: number;
-    approvedEvidence: number;
+    totalEvidence: number;
     personsOfInterest: number;
     totalCitations: number;
     recentActivity: number;
@@ -145,8 +144,7 @@
 
   let stats = $state<DashboardStats>({
     activeCases: 0,
-    pendingEvidence: 0,
-    approvedEvidence: 0,
+    totalEvidence: 0,
     personsOfInterest: 0,
     totalCitations: 0,
     recentActivity: 0,
@@ -235,11 +233,11 @@
     <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
       {#each [
         { label: 'Active Cases', value: stats.activeCases, color: 'text-accent' },
-        { label: 'Pending Evidence', value: stats.pendingEvidence, color: 'text-warning' },
-        { label: 'Approved Evidence', value: stats.approvedEvidence, color: 'text-info' },
+        { label: 'Total Evidence', value: stats.totalEvidence, color: 'text-warning' },
         { label: 'Persons of Interest', value: stats.personsOfInterest, color: 'text-sand' },
         { label: 'Citations', value: stats.totalCitations, color: 'text-accent' },
-        { label: 'Recent Activity', value: stats.recentActivity, color: 'text-info' },
+        { label: 'Knowledge Base', value: stats.knowledgeBase.total, color: 'text-info' },
+        { label: 'Total Cases', value: stats.recentActivity, color: 'text-sand/60' },
       ] as stat}
         <Card class="bg-panel border-sand/10">
           <CardContent class="p-4 text-center">
@@ -364,12 +362,12 @@
       <YoRHaDataViz
         title="Case Activity Overview"
         data={[
-          { label: 'Active', value: stats.activeCases, status: 'active', color: '#c8a84b' },
-          { label: 'Pending', value: stats.pendingEvidence, status: 'pending', color: '#ecc94b' },
-          { label: 'Approved', value: stats.approvedEvidence, status: 'completed', color: '#48bb78' },
+          { label: 'Active Cases', value: stats.activeCases, status: 'active', color: '#c8a84b' },
+          { label: 'Evidence', value: stats.totalEvidence, status: 'pending', color: '#ecc94b' },
           { label: 'POIs', value: stats.personsOfInterest, status: 'active', color: '#60a5fa' },
           { label: 'Citations', value: stats.totalCitations, status: 'completed', color: '#d4c7a3' },
           { label: 'KB', value: stats.knowledgeBase.total, status: 'completed', color: '#a78bfa' },
+          { label: 'Total Cases', value: stats.recentActivity, status: 'active', color: '#38bdf8' },
         ]}
         type="bar"
         height={250}

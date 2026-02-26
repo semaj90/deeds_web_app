@@ -27,11 +27,30 @@ export const load: PageServerLoad = async ({ locals }) => {
 		[{ count: 0 }]
 	);
 
+	// Fetch graph connections between evidence items
+	const connections = await safe(
+		db.execute(sql`
+			SELECT source_node_id, target_node_id, connection_type, strength
+			FROM yorha_evidence_connections
+			WHERE status = 'active'
+			ORDER BY strength DESC
+			LIMIT 200
+		`).then((r: any) => (r.rows ?? [...r]).map((row: any) => ({
+			source: row.source_node_id,
+			target: row.target_node_id,
+			type: row.connection_type,
+			strength: row.strength ?? 50
+		}))),
+		[]
+	);
+
 	return {
 		evidenceItems,
+		connections,
 		stats: {
 			total: totalCount[0]?.count ?? 0,
 			loaded: evidenceItems.length,
+			edges: connections.length,
 		},
 		user,
 	};

@@ -22,7 +22,9 @@
 		enableThinking: true,
 		typewriterSpeed: 40,
 		autoScroll: true,
-		forceServer: false
+		forceServer: false,
+		persona: 'neutral' as string,
+		enableWebSearch: false
 	});
 
 	// Initialize session and load prefs
@@ -165,6 +167,18 @@
 				class="px-3 py-1.5 rounded text-xs font-mono tracking-wider border border-red-800 text-red-400 hover:bg-red-950 transition-colors"
 				onclick={clearChat}
 			>CLEAR</button>
+			{#if prefs.persona !== 'neutral'}
+				<div class="text-[11px] text-amber-400 border border-amber-800 bg-amber-950/50 px-2.5 py-1 rounded flex items-center gap-1.5">
+					<Icon name="user-cog" size={12} />
+					{prefs.persona.toUpperCase()}
+				</div>
+			{/if}
+			{#if prefs.enableWebSearch}
+				<div class="text-[11px] text-blue-400 border border-blue-800 bg-blue-950/50 px-2 py-1 rounded flex items-center gap-1">
+					<Icon name="globe" size={12} />
+					WEB
+				</div>
+			{/if}
 			{#if session}
 				<div class="text-[11px] text-stone-500 border border-[#44403c] px-2.5 py-1 rounded flex items-center gap-1.5 ml-1">
 					<Icon name="cpu" size={12} />
@@ -204,6 +218,20 @@
 			<label class="flex items-center gap-1.5 cursor-pointer">
 				<input type="checkbox" bind:checked={prefs.forceServer} style:accent-color="#10b981" />
 				Force server (Ollama)
+			</label>
+			<label class="flex items-center gap-1.5 cursor-pointer">
+				<input type="checkbox" bind:checked={prefs.enableWebSearch} style:accent-color="#10b981" />
+				Web search
+			</label>
+			<label class="flex items-center gap-1.5 cursor-pointer">
+				Persona
+				<select bind:value={prefs.persona} class="bg-[#0c0a09] border border-stone-700 text-stone-300 text-xs px-2 py-1 rounded">
+					<option value="neutral">Neutral Analyst</option>
+					<option value="prosecutor">Prosecution Focus</option>
+					<option value="defense">Defense Focus</option>
+					<option value="plain-language">Plain Language</option>
+					<option value="academic">Academic / Research</option>
+				</select>
 			</label>
 			<Button onclick={clearChat} class="text-xs px-2 py-1">
 				<Icon name="trash-2" size={14} />

@@ -25,10 +25,67 @@
 	let activeTab = $state<'details' | 'associates' | 'photos' | 'search' | 'dex' | 'criminal'>('details');
 	let faceMatchOpen = $state(false);
 	let faceMatches = $state<any[]>([]);
+	let similarPOIs = $state<any[]>([]);
+	let similarLoading = $state(false);
+	let similarError = $state<string | null>(null);
+	let similarMethod = $state('');
+	let searchQuery = $state('');
+	let searchResults = $state<any[]>([]);
+	let searchLoading = $state(false);
+	let searchError = $state<string | null>(null);
+
+	async function loadSimilarPOIs() {
+		if (!data.poi?.id) return;
+		similarLoading = true;
+		similarError = null;
+		try {
+			const res = await fetch(`/api/persons-of-interest/${data.poi.id}/similar`);
+			if (!res.ok) throw new Error("Failed to fetch similar POIs");
+			const json = await res.json();
+			similarPOIs = json.similar || [];
+			similarMethod = json.method || "";
+		} catch (err) {
+			similarError = err instanceof Error ? err.message : "Failed to load";
+			similarPOIs = [];
+		} finally {
+			similarLoading = false;
+		}
+	}
+
+	
+	async function searchSimilarPOIs(query?: string) {
+		const q = query ?? searchQuery.trim();
+		if (!q) return;
+		searchLoading = true;
+		searchError = null;
+		try {
+			const res = await fetch('/api/persons-of-interest/search', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ query: q, excludeId: data.poi?.id, limit: 10 })
+			});
+			if (!res.ok) throw new Error('Search failed');
+			searchResults = await res.json();
+		} catch (err) {
+			searchError = err instanceof Error ? err.message : 'Search failed';
+			searchResults = [];
+		} finally {
+			searchLoading = false;
+		}
+	}
+
+	function autoSearchFromProfile() {
+		if (data.poi?.name) {
+			const parts = data.poi.name.split(' ');
+			searchQuery = parts.length > 1 ? parts[parts.length - 1] : data.poi.name;
+			searchSimilarPOIs();
+		}
+	}
 
 	onMount(async () => {
 		if (data.poi?.id) {
 			await loadAssociates();
+			loadSimilarPOIs();
 		}
 	});
 
@@ -250,23 +307,102 @@
 					<POIPhotoModal photos={poi.photos ?? []} bind:currentIndex={photoModalIndex} bind:open={photoModalOpen} onclose={() => { photoModalOpen = false; }} />
 				{/if}
 			{:else if activeTab === 'search'}
-				{@const profilePerson = {
-					name: poi.name,
-					face: poi.photos?.[0]?.url ?? '',
-					alias: poi.aliases?.[0],
-					status: poi.status ?? 'unknown',
-					riskLevel: poi.threatLevel ?? 'low',
-					age: poi.dateOfBirth ? Math.floor((Date.now() - new Date(poi.dateOfBirth).getTime()) / 31557600000) : 0,
-					height: poi.physicalDescription?.heightCm ?? 0,
-					hair: poi.physicalDescription?.hair ?? 'Unknown',
-					modusOperandi: poi.profileData?.modusOperandi ?? poi.description ?? '',
-					knownAssociates: poi.profileData?.associates ?? []
-				}}
-				<POIProfile person={profilePerson} />
-				<div class="search-section" style="margin-top: 1.5rem;">
-					<button class="btn-secondary" onclick={() => (faceMatchOpen = true)}>
-						Run Face Match Analysis
-					</button>
+				<div class="similar-panel">
+					<h3 class="similar-heading">Similar Persons <span class="method-tag">{similarMethod}</span></h3>
+					{#if similarLoading}
+						<p class="empty-message">Finding similar persons...</p>
+					{:else if similarError}
+						<div class="search-error">{similarError}
+							<button class="btn-retry" onclick={loadSimilarPOIs}>Retry</button>
+						</div>
+					{:else if similarPOIs.length === 0}
+						<p class="empty-message">No similar persons found</p>
+					{:else}
+						<div class="search-results">
+							{#each similarPOIs as sp (sp.poiId)}
+								<a href="/persons-of-interest/{sp.poiId}" class="result-card">
+									<div class="result-header">
+										<span class="result-name">{sp.name}</span>
+										<span class="result-score" style="opacity: {0.4 + sp.similarity * 0.6}">
+											{Math.round(sp.similarity * 100)}% match
+										</span>
+									</div>
+									<div class="result-meta">
+										<span class="badge status" style="background-color: {getStatusColor(sp.status)}; font-size: 0.75rem; padding: 0.25rem 0.5rem;">
+											{sp.status}
+										</span>
+										<span class="badge" style="background-color: {getThreatColor(sp.threatLevel)}; font-size: 0.75rem; padding: 0.25rem 0.5rem;">
+											{sp.threatLevel}
+										</span>
+										{#if sp.lastLocation}
+											<span class="result-location">{sp.lastLocation}</span>
+										{/if}
+									</div>
+									{#if sp.description}
+										<p class="result-desc">{sp.description}</p>
+									{/if}
+								</a>
+							{/each}
+						</div>
+					{/if}
+				</div>
+				<hr style="border-color: #333; margin: 1.5rem 0;" />
+				<h3 class="results-heading">MANUAL SEARCH</h3>
+
+				<div class="search-section">
+					<div class="search-bar">
+						<input
+							type="text"
+							bind:value={searchQuery}
+							placeholder="Search by name, alias, description, location..."
+							class="search-input"
+							onkeydown={(e) => { if (e.key === 'Enter') searchSimilarPOIs(); }}
+						/>
+						<button class="btn-search" onclick={() => searchSimilarPOIs()} disabled={searchLoading || !searchQuery.trim()}>
+							{searchLoading ? 'Searching...' : 'Search'}
+						</button>
+						<button class="btn-secondary btn-auto" onclick={autoSearchFromProfile} disabled={searchLoading}>
+							Find Similar
+						</button>
+					</div>
+
+					{#if searchError}
+						<div class="search-error">{searchError}</div>
+					{/if}
+
+					{#if searchResults.length > 0}
+						<div class="search-results">
+							<h3 class="results-heading">{searchResults.length} result{searchResults.length !== 1 ? 's' : ''}</h3>
+							{#each searchResults as result (result.poiId)}
+								<a href="/persons-of-interest/{result.poiId}" class="result-card">
+									<div class="result-header">
+										<span class="result-name">{result.name}</span>
+										<span class="result-score" style="opacity: {0.4 + result.similarityScore * 0.6}">
+											{Math.round(result.similarityScore * 100)}% match
+										</span>
+									</div>
+									<div class="result-meta">
+										<span class="badge status" style="background-color: {getStatusColor(result.status)}; font-size: 0.75rem; padding: 0.25rem 0.5rem;">
+											{result.status}
+										</span>
+										<span class="badge" style="background-color: {getThreatColor(result.threatLevel)}; font-size: 0.75rem; padding: 0.25rem 0.5rem;">
+											{result.threatLevel}
+										</span>
+										{#if result.lastLocation}
+											<span class="result-location">{result.lastLocation}</span>
+										{/if}
+									</div>
+									{#if result.description}
+										<p class="result-desc">{result.description}</p>
+									{/if}
+								</a>
+							{/each}
+						</div>
+					{:else if !searchLoading && searchQuery.trim()}
+						<p class="empty-message">No matching persons found</p>
+					{:else if !searchQuery.trim()}
+						<p class="empty-message">Enter a search term or click "Find Similar" to search by this person's name</p>
+					{/if}
 				</div>
 				<POIFaceMatchDialog bind:open={faceMatchOpen} matches={faceMatches} onSelect={(selected) => { window.location.href = `/persons-of-interest/${selected.id}`; }} />
 			{:else if activeTab === 'criminal'}
@@ -554,16 +690,160 @@
 		background: #991b1b;
 	}
 
-	.empty-message,
-	.placeholder {
+	.empty-message {
 		color: #9ca3af;
 		text-align: center;
 		padding: 2rem;
 	}
 
 	.search-section {
-		text-align: center;
+		color: #d1d5db;
+	}
+
+	.search-bar {
+		display: flex;
+		gap: 0.75rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.search-input {
+		flex: 1;
+		padding: 0.75rem 1rem;
+		background: #0f0f23;
+		border: 1px solid #333;
+		border-radius: 0.375rem;
+		color: #ffffff;
+		font-size: 0.9rem;
+	}
+
+	.search-input:focus {
+		outline: none;
+		border-color: #dc2626;
+	}
+
+	.btn-search {
+		padding: 0.75rem 1.5rem;
+		background: #dc2626;
+		color: #ffffff;
+		border: none;
+		border-radius: 0.375rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background-color 0.2s;
+	}
+
+	.btn-search:hover:not(:disabled) {
+		background: #b91c1c;
+	}
+
+	.btn-search:disabled,
+	.btn-auto:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.btn-auto {
+		white-space: nowrap;
+	}
+
+	.search-error {
+		padding: 0.75rem;
+		background: #7f1d1d;
+		border: 1px solid #dc2626;
+		border-radius: 0.375rem;
+		color: #fecaca;
+		margin-bottom: 1rem;
+	}
+
+	.results-heading {
 		color: #9ca3af;
-		padding: 2rem;
+		font-size: 0.875rem;
+		font-weight: 600;
+		margin: 0 0 1rem 0;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.search-results {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.result-card {
+		display: block;
+		padding: 1rem;
+		background: #0f0f23;
+		border: 1px solid #333;
+		border-radius: 0.375rem;
+		text-decoration: none;
+		transition: border-color 0.2s;
+	}
+
+	.result-card:hover {
+		border-color: #dc2626;
+	}
+
+	.result-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 0.5rem;
+	}
+
+	.result-name {
+		color: #ffffff;
+		font-weight: 600;
+		font-size: 1rem;
+	}
+
+	.result-score {
+		color: #10b981;
+		font-size: 0.8rem;
+		font-weight: 600;
+	}
+
+	.result-meta {
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+		flex-wrap: wrap;
+	}
+
+	.result-location {
+		color: #9ca3af;
+		font-size: 0.8rem;
+	}
+
+	.result-desc {
+		color: #9ca3af;
+		font-size: 0.85rem;
+		margin: 0.5rem 0 0 0;
+		line-height: 1.4;
+	}
+
+	.similar-panel {
+		margin-bottom: 1.5rem;
+	}
+
+	.similar-heading {
+		color: #ffffff;
+		font-size: 1rem;
+		font-weight: 600;
+		margin: 0 0 1rem 0;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.method-tag {
+		font-size: 0.7rem;
+		padding: 0.2rem 0.5rem;
+		background: #1e293b;
+		border: 1px solid #334155;
+		border-radius: 0.25rem;
+		color: #94a3b8;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 </style>

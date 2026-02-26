@@ -50,4 +50,7 @@ export const ENV = {
 	NEO4J_PASSWORD: privateEnv.NEO4J_PASSWORD ?? privateEnv.NEO4J_PASS ?? 'password',
 	// CouchDB document store
 	COUCHDB_URL: privateEnv.COUCHDB_URL ?? 'http://admin:password@localhost:5984',
+	// Google Custom Search (optional — web search falls back to DuckDuckGo)
+	GOOGLE_SEARCH_API_KEY: privateEnv.GOOGLE_SEARCH_API_KEY ?? '',
+	GOOGLE_SEARCH_CX: privateEnv.GOOGLE_SEARCH_CX ?? '',
 };

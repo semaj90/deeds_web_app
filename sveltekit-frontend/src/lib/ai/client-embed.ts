@@ -196,6 +196,24 @@ export function cosineSimilarity(a: number[], b: number[]): number {
 }
 
 /**
+ * Numerically stable softmax — converts raw scores to probability distribution.
+ * Ported from Go feature-vector-scorer.go — subtracts max(x) before exp() to
+ * prevent floating-point overflow on large scores.
+ *
+ * @param scores - Raw score array
+ * @returns Probability distribution summing to 1.0
+ */
+export function stableSoftmax(scores: number[]): number[] {
+	if (scores.length === 0) return [];
+	if (scores.length === 1) return [1.0];
+
+	const max = Math.max(...scores);
+	const exps = scores.map(s => Math.exp(s - max));
+	const sum = exps.reduce((a, b) => a + b, 0);
+	return sum > 0 ? exps.map(e => e / sum) : exps.map(() => 1 / scores.length);
+}
+
+/**
  * Batch cosine similarity — query vs N document vectors via GPU compute pipeline.
  * Falls back to CPU if WebGPU unavailable.
  *

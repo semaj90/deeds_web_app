@@ -1033,7 +1033,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
             {#each Object.entries(systemStatus) as [service, status]}
               {#if service !== 'lastCheck'}
                 <div class="flex items-center gap-1" title="{service}: {status}">
-                  <Icon name={getStatusIcon(status)} class="w-3 h-3 {getConfidenceColor(status === 'active' ? 1 : 0.3)}" />
+                  <span class={`i-lucide-${getStatusIcon(status)} w-3 h-3 ${getConfidenceColor(status === 'active' ? 1 : 0.3)} inline-block`} />
                 </div>
               {/if}
             {/each}
@@ -1148,7 +1148,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
               : message.role === 'assistant'
                 ? 'bg-accent'
                 : 'bg-sand/20'}">
-            <Icon name={message.role === "user" ? "send" : message.role === "assistant" ? "brain" : "alert-triangle"} class="w-4 h-4 text-white" />
+            <span class={`i-lucide-${message.role === "user" ? "send" : message.role === "assistant" ? "brain" : "alert-triangle"} w-4 h-4 text-white inline-block`} />
           </div>
 
           <!-- Message Content -->

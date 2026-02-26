@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/client';
-import { caseNotes } from '$lib/server/db/schema';
+import { caseNotes, caseNoteVersions } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, sql, desc, count } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
 /**
@@ -30,6 +30,7 @@ export const GET: RequestHandler = async ({ params }) => {
 /**
  * PATCH /api/cases/[id]/notes/[noteId]
  * Update a note's title, content, or isPinned status
+ * Auto-saves previous content as a version snapshot
  */
 export const PATCH: RequestHandler = async ({ params, request }) => {
 	try {
@@ -39,6 +40,32 @@ export const PATCH: RequestHandler = async ({ params, request }) => {
 		if (body.title !== undefined) updates.title = body.title;
 		if (body.content !== undefined) updates.content = body.content;
 		if (body.isPinned !== undefined) updates.isPinned = body.isPinned;
+
+		// If content is changing, save the old version first
+		if (body.content !== undefined) {
+			const [oldNote] = await db
+				.select()
+				.from(caseNotes)
+				.where(and(eq(caseNotes.id, params.noteId), eq(caseNotes.caseId, params.id)))
+				.limit(1);
+
+			if (oldNote && oldNote.content !== body.content) {
+				// Get next version number
+				const [versionCount] = await db
+					.select({ value: count() })
+					.from(caseNoteVersions)
+					.where(eq(caseNoteVersions.noteId, params.noteId));
+
+				const nextVersion = (versionCount?.value ?? 0) + 1;
+
+				await db.insert(caseNoteVersions).values({
+					noteId: params.noteId,
+					title: oldNote.title,
+					content: oldNote.content,
+					versionNumber: nextVersion,
+				});
+			}
+		}
 
 		const [note] = await db
 			.update(caseNotes)

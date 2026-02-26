@@ -538,16 +538,20 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  </div>
  </header>
 
- <!-- Notes Panel (Slide-out) -->
+ <!-- Notes Modal (NES-styled) -->
  {#if showNotesPanel}
- <div class="fixed inset-y-0 right-0 w-[600px] bg-gray-900 shadow-2xl z-50 transform transition-transform">
- <CaseNotesEditor {caseId} onClose={() => showNotesPanel = false} />
+ <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm" onclick={() => (showNotesPanel = false)} role="dialog" aria-modal="true" aria-label="Case Notes">
+   <div class="relative w-[750px] max-w-[90vw] h-[85vh] bg-[#0c0a09] border-2 border-[#3a3a3a] rounded shadow-2xl flex flex-col overflow-hidden" onclick={(e) => e.stopPropagation()}>
+     <div class="flex items-center justify-between px-4 py-2 bg-[#1a1a2e] border-b border-[#3a3a3a]">
+       <span class="font-mono text-xs text-[#9ca3af] tracking-widest uppercase">[CASE_NOTES::TERMINAL]</span>
+       <span class="font-mono text-[10px] text-[#6b7280]">{caseId.slice(0, 8)}</span>
+       <button class="text-[#9ca3af] hover:text-white text-lg font-bold leading-none" onclick={() => (showNotesPanel = false)}>×</button>
+     </div>
+     <div class="flex-1 overflow-hidden">
+       <CaseNotesEditor {caseId} onClose={() => showNotesPanel = false} />
+     </div>
+   </div>
  </div>
- <button
- class="fixed inset-0 bg-black/50 z-40"
- onclick={() => (showNotesPanel = false)}
- aria-label="Close notes panel"
- ></button>
  {/if}
 
  <!-- Export Error Message -->

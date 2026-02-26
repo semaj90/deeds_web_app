@@ -49,6 +49,7 @@ export interface RetrieveCandidatesRequest {
   source_types?: SourceType[];
   use_hybrid?: boolean;
   use_rerank?: boolean;
+  scoring_method?: string;
   include_neighbors?: boolean;
 }
 
@@ -62,6 +63,8 @@ export interface RetrievedChunk {
   bm25_score?: number;
   dense_score?: number;
   rerank_score?: number;
+  vector_score?: number;
+  tfidf_score?: number;
 	confidence: ConfidenceLevel;
 
   // Source metadata
@@ -95,6 +98,7 @@ export interface RetrieveCandidatesResponse {
   rerank_time_ms?: number;
 	embedding_model: string;
   rerank_model?: string;
+  scoring_method?: string;
 	timestamp: string;
 }
 

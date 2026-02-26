@@ -40,6 +40,10 @@ export interface ACEContext {
 	practiceTemplate: string | null;
 	/** Auto-generated tags for the current query */
 	queryTags: string[];
+	/** Web search results formatted as context (optional) */
+	webSearchContext: string | null;
+	/** Active persona for style adaptation */
+	persona: string;
 }
 
 export interface ACEPrompt {

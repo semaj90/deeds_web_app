@@ -1,6 +1,20 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
+import { createHash } from 'crypto';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 import { ENV } from '$lib/server/env.server.js';
+
+/**
+ * Generate a deterministic integer point ID from a string key.
+ * Ported from Python qdrant_gpu_client.py — MD5 hash → first 4 bytes → int % 2^31.
+ * Ensures idempotent upserts: same chunk_id always maps to the same Qdrant point ID.
+ */
+export function deterministicPointId(key: string): number {
+    const hash = createHash('md5').update(key).digest();
+    // Read first 4 bytes as unsigned 32-bit integer (big-endian)
+    const raw = hash.readUInt32BE(0);
+    // Mod by 2^31 to stay within signed 32-bit integer range (Qdrant requirement)
+    return raw % 2147483648;
+}
 
 export class QdrantManager {
     private client: QdrantClient;

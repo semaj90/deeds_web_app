@@ -1,0 +1,1 @@
+const d=require("./fix-data.json");const fs=require("fs");const path=require("path");const B="c:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components";for(const item of d){const fp=path.join(B,item.file);let c=fs.readFileSync(fp,"utf8");for(const[f,t]of item.reps){c=c.replace(f,t);}fs.writeFileSync(fp,c);console.log("done:"+item.file);}

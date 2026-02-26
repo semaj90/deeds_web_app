@@ -48,12 +48,16 @@
 
 		isLoading = true;
 		try {
-			const response = await fetch('/api/citations', {
+			const response = await fetch('/api/citations/saved', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-					...formData,
-					caseId: caseId || undefined
+					statute_code: formData.citationText,
+					statute_title: formData.statuteTitle,
+					source_type: formData.sourceType,
+					highlighted_text: formData.contextText,
+					notes: formData.notes,
+					case_id: caseId || undefined,
 				})
 			});
 

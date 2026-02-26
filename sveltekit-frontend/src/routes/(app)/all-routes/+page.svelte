@@ -28,6 +28,24 @@
 	let showDetectiveBoard = $state(false);
 	let showRouteGraph = $state(false);
 	let showWorkingInspector = $state(false);
+	let showErrorBrainHistory = $state(false);
+	let errorBrainStatus = $state<{ totalErrors: number; affectedFiles: number; recentErrors: number; fixedCount: number; fixRate: number } | null>(null);
+	let errorBrainRuns = $state<any[]>([]);
+	let errorBrainLoading = $state(false);
+
+	async function loadErrorBrainHistory() {
+		if (errorBrainLoading) return;
+		errorBrainLoading = true;
+		try {
+			const [statusRes, runsRes] = await Promise.all([
+				fetch('/api/internal/error-brain/status').then(r => r.ok ? r.json() : null).catch(() => null),
+				fetch('/api/internal/error-brain/runs?limit=20').then(r => r.ok ? r.json() : null).catch(() => null)
+			]);
+			if (statusRes) errorBrainStatus = statusRes;
+			if (runsRes?.runs) errorBrainRuns = runsRes.runs;
+		} catch { /* fail silently */ }
+		finally { errorBrainLoading = false; }
+	}
 
 	$effect(() => {
 		routes = Array.isArray(data.routes) ? data.routes : [];
@@ -288,6 +306,9 @@
 		<button class="cap-item cap-ops" onclick={() => (showRouteGraph = !showRouteGraph)}>
 			{showRouteGraph ? '[-] HIDE GRAPH' : '[+] ROUTE GRAPH'}
 		</button>
+		<button class="cap-item cap-eb" onclick={() => { showErrorBrainHistory = !showErrorBrainHistory; if (showErrorBrainHistory && errorBrainRuns.length === 0) loadErrorBrainHistory(); }}>
+			{showErrorBrainHistory ? '[-] HIDE ERROR BRAIN' : '[+] ERROR BRAIN'}
+		</button>
 		<button class="cap-item cap-ops" onclick={() => {
 			if (selectedRoute) {
 				decisionRoute = { path: selectedRoute.path ?? selectedRoute.id, reason: selectedRoute.errorState === 'broken' ? 'Route is broken' : selectedRoute.errorState === 'flaky' ? 'Route is flaky' : 'Routine review', decision: null };
@@ -358,6 +379,49 @@
 				width={1200}
 				height={480}
 			/>
+		</div>
+	{/if}
+
+	<!-- Error Brain History Panel (collapsible) -->
+	{#if showErrorBrainHistory}
+		<div class="eb-panel">
+			<div class="eb-header">
+				<span class="eb-title">ERROR BRAIN HISTORY</span>
+				{#if errorBrainStatus}
+					<span class="eb-stats">
+						{errorBrainStatus.totalErrors} total | {errorBrainStatus.affectedFiles} files | {errorBrainStatus.fixRate}% fix rate
+					</span>
+				{/if}
+				<button class="eb-refresh" onclick={loadErrorBrainHistory} disabled={errorBrainLoading}>
+					{errorBrainLoading ? 'LOADING...' : 'REFRESH'}
+				</button>
+			</div>
+			{#if errorBrainStatus}
+				<div class="eb-summary">
+					<div class="eb-stat-row">
+						<span class="eb-stat"><span class="eb-stat-label">TOTAL</span> <span class="eb-stat-val">{errorBrainStatus.totalErrors}</span></span>
+						<span class="eb-stat"><span class="eb-stat-label">FILES</span> <span class="eb-stat-val">{errorBrainStatus.affectedFiles}</span></span>
+						<span class="eb-stat"><span class="eb-stat-label">RECENT (24H)</span> <span class="eb-stat-val eb-recent">{errorBrainStatus.recentErrors}</span></span>
+						<span class="eb-stat"><span class="eb-stat-label">FIXED</span> <span class="eb-stat-val eb-fixed">{errorBrainStatus.fixedCount}</span></span>
+						<span class="eb-stat"><span class="eb-stat-label">FIX RATE</span> <span class="eb-stat-val eb-rate">{errorBrainStatus.fixRate}%</span></span>
+					</div>
+				</div>
+			{/if}
+			{#if errorBrainRuns.length > 0}
+				<div class="eb-runs">
+					{#each errorBrainRuns as run}
+						<div class="eb-run-row" class:eb-run-fixed={run.status === 'fixed'}>
+							<span class="eb-run-status">[{(run.status || 'open').toUpperCase()}]</span>
+							<span class="eb-run-code">{run.error_code || '—'}</span>
+							<span class="eb-run-file">{run.file_path?.replace('src/', '') || '—'}</span>
+							<span class="eb-run-msg">{run.message?.slice(0, 80) || '—'}</span>
+							<span class="eb-run-date">{run.created_at ? new Date(run.created_at).toLocaleDateString() : '—'}</span>
+						</div>
+					{/each}
+				</div>
+			{:else if !errorBrainLoading}
+				<div class="eb-empty">NO ERROR HISTORY — Database may be offline</div>
+			{/if}
 		</div>
 	{/if}
 
@@ -733,6 +797,21 @@
 		background: rgba(51, 153, 255, 0.1);
 	}
 
+	.cap-item.cap-eb {
+		color: #ff6633;
+		background: none;
+		border: 1px solid #ff6633;
+		padding: 0.15rem 0.4rem;
+		cursor: pointer;
+		font-family: inherit;
+		font-size: inherit;
+		letter-spacing: inherit;
+	}
+
+	.cap-item.cap-eb:hover {
+		background: rgba(255, 102, 51, 0.1);
+	}
+
 	.ops-log-panel {
 		margin-bottom: 1.5rem;
 		border: 1px solid #3399ff;
@@ -814,6 +893,143 @@
 	.cluster-count {
 		color: #666;
 		flex-shrink: 0;
+	}
+
+	/* ── Error Brain Panel ── */
+	.eb-panel {
+		margin-bottom: 1.5rem;
+		border: 1px solid #663300;
+		background: #0c0c0c;
+	}
+
+	.eb-header {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		padding: 0.5rem 0.75rem;
+		background: #1a0c00;
+		border-bottom: 1px solid #663300;
+	}
+
+	.eb-title {
+		font-weight: bold;
+		font-size: 0.8rem;
+		color: #ff6633;
+		letter-spacing: 0.1em;
+	}
+
+	.eb-stats {
+		font-size: 0.7rem;
+		color: #996633;
+		flex: 1;
+	}
+
+	.eb-refresh {
+		background: none;
+		border: 1px solid #663300;
+		color: #ff6633;
+		font-family: inherit;
+		font-size: 0.65rem;
+		padding: 0.15rem 0.4rem;
+		cursor: pointer;
+		letter-spacing: 0.05em;
+	}
+
+	.eb-refresh:hover { background: rgba(255, 102, 51, 0.1); }
+	.eb-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
+
+	.eb-summary {
+		padding: 0.5rem 0.75rem;
+		border-bottom: 1px solid #331a00;
+	}
+
+	.eb-stat-row {
+		display: flex;
+		gap: 1.5rem;
+		flex-wrap: wrap;
+	}
+
+	.eb-stat {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.eb-stat-label {
+		font-size: 0.6rem;
+		color: #664422;
+		letter-spacing: 0.1em;
+	}
+
+	.eb-stat-val {
+		font-size: 1rem;
+		font-weight: bold;
+		color: #ff6633;
+	}
+
+	.eb-stat-val.eb-recent { color: #ffaa33; }
+	.eb-stat-val.eb-fixed { color: #33ff33; }
+	.eb-stat-val.eb-rate { color: #33aaff; }
+
+	.eb-runs {
+		max-height: 400px;
+		overflow-y: auto;
+	}
+
+	.eb-run-row {
+		display: flex;
+		gap: 0.5rem;
+		padding: 0.3rem 0.75rem;
+		border-bottom: 1px solid #1a0c00;
+		font-size: 0.7rem;
+		align-items: baseline;
+	}
+
+	.eb-run-row:last-child { border-bottom: none; }
+	.eb-run-row.eb-run-fixed { opacity: 0.6; }
+
+	.eb-run-status {
+		font-weight: bold;
+		flex-shrink: 0;
+		width: 60px;
+		color: #ff6633;
+	}
+
+	.eb-run-row.eb-run-fixed .eb-run-status { color: #33ff33; }
+
+	.eb-run-code {
+		color: #ffaa33;
+		flex-shrink: 0;
+		width: 60px;
+	}
+
+	.eb-run-file {
+		color: #996633;
+		flex-shrink: 0;
+		max-width: 200px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.eb-run-msg {
+		color: #999;
+		flex: 1;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.eb-run-date {
+		color: #666;
+		flex-shrink: 0;
+	}
+
+	.eb-empty {
+		padding: 1rem;
+		text-align: center;
+		color: #663300;
+		font-size: 0.75rem;
 	}
 
 	/* ── Filters ── */

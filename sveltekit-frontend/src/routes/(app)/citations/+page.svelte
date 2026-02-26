@@ -21,6 +21,7 @@
   import CitationLibraryPage from '$lib/components/legal-ai/CitationLibraryPage.svelte';
   import LinkMetadataForm from '$lib/components/legal-ai/LinkMetadataForm.svelte';
   import LegalPrecedentCard from '$lib/components/legal/LegalPrecedentCard.svelte';
+  import CitationsSaveButton from '$lib/components/citations/CitationsSaveButton.svelte';
 
   let viewMode = $state<'list' | 'manager'>('list');
   let showGpuSearch = $state(false);
@@ -41,6 +42,54 @@
   let showKnowledgeBase = $state(false);
   let kbQuery = $state('');
   let kbSearching = $state(false);
+
+  // Citation tags
+  let citationTagsMap = $state<Record<string, { tag: string; color: string }[]>>({});
+  let addingTagFor = $state<string | null>(null);
+  let newTagInput = $state('');
+  const TAG_PRESETS = [
+    { tag: 'key authority', color: '#eab308' },
+    { tag: 'supporting', color: '#22c55e' },
+    { tag: 'opposing', color: '#ef4444' },
+    { tag: 'distinguished', color: '#a855f7' },
+    { tag: 'overruled', color: '#dc2626' },
+    { tag: 'cited', color: '#3b82f6' },
+  ];
+
+  async function loadTagsForCitation(citationId: string) {
+    try {
+      const res = await fetch(`/api/citations/${citationId}/tags`);
+      if (res.ok) {
+        const data = await res.json();
+        citationTagsMap[citationId] = data.tags ?? [];
+      }
+    } catch { /* ignore */ }
+  }
+
+  async function addTagToCitation(citationId: string, tag: string, color: string) {
+    try {
+      await fetch(`/api/citations/${citationId}/tags`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tag, color }),
+      });
+      await loadTagsForCitation(citationId);
+    } catch { /* ignore */ }
+    newTagInput = '';
+    addingTagFor = null;
+  }
+
+  async function removeTagFromCitation(citationId: string, tag: string) {
+    try {
+      await fetch(`/api/citations/${citationId}/tags`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tag }),
+      });
+      citationTagsMap[citationId] = (citationTagsMap[citationId] ?? []).filter(t => t.tag !== tag);
+    } catch { /* ignore */ }
+  }
+
   let kbResults = $state<{ glossary: any[]; statutes: any[]; precedents: any[] }>({ glossary: [], statutes: [], precedents: [] });
   let kbTiming = $state<Record<string, number>>({});
   let kbDebounceTimer = $state<ReturnType<typeof setTimeout> | null>(null);
@@ -419,6 +468,10 @@
             <div class="flex items-start justify-between gap-4">
               <CardTitle class="text-sm font-mono text-accent">{citation.formattedCitation}</CardTitle>
               <div class="flex items-center gap-2 shrink-0">
+                <CitationsSaveButton
+                  citation={{ statute_code: citation.formattedCitation, statute_title: citation.legalPrinciple, jurisdiction: citation.documentTitle, severity: citation.citationType, highlighted_text: citation.quotedText, source_type: 'auto_extracted' }}
+                  size="sm"
+                />
                 <span class="px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-mono bg-sand/10 text-sand/70">
                   {citation.citationType.replace('_', ' ')}
                 </span>
@@ -448,6 +501,42 @@
               {/if}
               <span>Relevance: {Math.round(citation.relevanceScore * 100)}%</span>
             </div>
+            <!-- Tags row -->
+            <div class="flex items-center gap-1.5 mt-2 flex-wrap">
+              {#each citationTagsMap[citation.id] ?? [] as t (t.tag)}
+                <span
+                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium text-white cursor-pointer"
+                  style="background-color: {t.color}"
+                  onclick={(e) => { e.stopPropagation(); removeTagFromCitation(citation.id, t.tag); }}
+                  title="Click to remove"
+                >
+                  {t.tag} ×
+                </span>
+              {/each}
+              {#if addingTagFor === citation.id}
+                <div class="flex items-center gap-1" onclick={(e) => e.stopPropagation()}>
+                  {#each TAG_PRESETS as preset}
+                    <button
+                      class="px-1.5 py-0.5 rounded text-[9px] text-white hover:opacity-80"
+                      style="background-color: {preset.color}"
+                      onclick={(e) => { e.stopPropagation(); addTagToCitation(citation.id, preset.tag, preset.color); }}
+                    >{preset.tag}</button>
+                  {/each}
+                  <input
+                    type="text"
+                    bind:value={newTagInput}
+                    placeholder="custom..."
+                    class="w-16 px-1 py-0.5 text-[10px] bg-black/30 border border-sand/20 rounded text-sand"
+                    onkeydown={(e) => { if (e.key === 'Enter' && newTagInput.trim()) addTagToCitation(citation.id, newTagInput.trim(), '#6b7280'); }}
+                  />
+                </div>
+              {:else}
+                <button
+                  class="px-1.5 py-0.5 rounded text-[10px] text-sand/40 border border-sand/15 hover:border-sand/30 hover:text-sand/60"
+                  onclick={(e) => { e.stopPropagation(); addingTagFor = citation.id; loadTagsForCitation(citation.id); }}
+                >+ tag</button>
+              {/if}
+            </div>
           </CardContent>
         </Card>
       {/each}
@@ -455,6 +544,13 @@
 
     {#if selectedCitation}
       <div class="mt-6">
+        <div class="flex items-center gap-3 mb-4">
+          <h3 class="text-sm font-semibold text-sand">Selected Citation</h3>
+          <CitationsSaveButton
+            citation={{ statute_code: selectedCitation.statute_code, statute_title: selectedCitation.statute_title, jurisdiction: selectedCitation.jurisdiction, severity: selectedCitation.severity, highlighted_text: selectedCitation.highlighted_text, source_type: selectedCitation.source_type }}
+            size="md"
+          />
+        </div>
         <CitationDetail
           citation={selectedCitation}
           onupdated={() => { selectedCitation = null; loadCitations(); }}

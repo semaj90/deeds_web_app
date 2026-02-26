@@ -26,18 +26,18 @@ export * from './ui/textarea';
 // ARCHIVED: export { default as AIChat } from './AIChat.svelte';
 // ARCHIVED: export { default as EnhancedLegalChat } from './EnhancedLegalChat.svelte';
 // ARCHIVED: export { default as EvidenceCard } from './EvidenceCard.svelte';
-export { default as EvidencePanel } from './EvidencePanel.svelte';
+// ARCHIVED: export { default as EvidencePanel } from './EvidencePanel.svelte';
 // ARCHIVED: export { default as LegalCaseManager } from './LegalCaseManager.svelte';
-export { default as LLMAssistant } from './LLMAssistant.svelte';
+// ARCHIVED: export { default as LLMAssistant } from './LLMAssistant.svelte';
 
 // Layout
-export { default as Header } from './Header.svelte';
-export { default as NierNavigation } from './NierNavigation.svelte';
-export { default as Sidebar } from './Sidebar.svelte';
+// ARCHIVED: export { default as Header } from './Header.svelte';
+// ARCHIVED: export { default as NierNavigation } from './NierNavigation.svelte';
+// ARCHIVED: export { default as Sidebar } from './Sidebar.svelte';
 
 // Utilities
-export { default as HeadlessDemo } from './HeadlessDemo.svelte';
-export { default as KeyboardShortcutProvider } from './KeyboardShortcutProvider.svelte';
+// ARCHIVED: export { default as HeadlessDemo } from './HeadlessDemo.svelte';
+// ARCHIVED: export { default as KeyboardShortcutProvider } from './KeyboardShortcutProvider.svelte';
 export { default as LoadingSpinner } from './LoadingSpinner.svelte';
-export { default as Typewriter } from './Typewriter.svelte';
+// ARCHIVED: export { default as Typewriter } from './Typewriter.svelte';
 

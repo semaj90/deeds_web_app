@@ -706,6 +706,30 @@ export const citations = pgTable('citations', {
  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
+// === CITATION TAGS ===
+// User-defined labels on citations (e.g., "key authority", "opposing", "supporting")
+export const citationTags = pgTable('citation_tags',
+ {
+ id: uuid('id')
+ .default(sql`gen_random_uuid()`)
+ .primaryKey()
+ .notNull(),
+ citationId: uuid('citation_id')
+ .notNull()
+ .references(() => citations.id, { onDelete: 'cascade' }),
+ tag: varchar('tag', { length: 100 }).notNull(),
+ color: varchar('color', { length: 7 }).default('#6b7280'),
+ createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
+ createdAt: timestamp('created_at', { withTimezone: true })
+ .default(sql`now()`)
+ .notNull(),
+ },
+	(table) => ({
+ citationIdIdx: index('citation_tags_citation_id_idx').on(table.citationId),
+ uniqueTag: unique('citation_tags_unique').on(table.citationId, table.tag),
+ })
+);
+
 export const reports = pgTable('reports', {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -1393,6 +1417,31 @@ export const caseNotes = pgTable('case_notes',
  caseIdIdx: index('case_notes_case_id_idx').on(table.caseId),
  isPinnedIdx: index('case_notes_is_pinned_idx').on(table.isPinned),
  createdAtIdx: index('case_notes_created_at_idx').on(table.createdAt),
+ })
+);
+
+// === CASE NOTE VERSIONS ===
+// Tracks edit history for case notes (snapshot before each update)
+export const caseNoteVersions = pgTable('case_note_versions',
+ {
+ id: uuid('id')
+ .default(sql`gen_random_uuid()`)
+ .primaryKey()
+ .notNull(),
+ noteId: uuid('note_id')
+ .notNull()
+ .references(() => caseNotes.id, { onDelete: 'cascade' }),
+ title: varchar('title', { length: 255 }),
+ content: text('content').notNull(),
+ versionNumber: integer('version_number').notNull(),
+ editedBy: integer('edited_by').references(() => users.id, { onDelete: 'set null' }),
+ createdAt: timestamp('created_at', { withTimezone: true })
+ .default(sql`now()`)
+ .notNull(),
+ },
+	(table) => ({
+ noteIdIdx: index('case_note_versions_note_id_idx').on(table.noteId),
+ versionIdx: index('case_note_versions_version_idx').on(table.noteId, table.versionNumber),
  })
 );
 

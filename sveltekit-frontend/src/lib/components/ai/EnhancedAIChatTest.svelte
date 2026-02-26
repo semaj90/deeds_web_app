@@ -7,7 +7,6 @@
 	import { DialogRoot, DialogTrigger, DialogPortal, DialogOverlay, DialogContent, DialogTitle, DialogClose } from "$lib/components/ui/dialog";
 import Button from "$lib/components/ui/Button.svelte";
 	import Input from "$lib/components/ui/Input.svelte";
-	import Icon from '$lib/components/ui/Icon.svelte';
 	import Card from "$lib/components/ui/card/Card.svelte";
 	import CardHeader from "$lib/components/ui/card/CardHeader.svelte";
 	import CardTitle from "$lib/components/ui/card/CardTitle.svelte";
@@ -350,7 +349,7 @@ What would you like to explore today?`,
 					<!-- Status Indicator -->
 					<div class="flex items-center gap-2 px-2 py-1 bg-sand/10 dark:bg-panelSoft rounded-md">
 						{#snippet statusIndicator()}
-							<Icon name={getStatusIcon()} class="h-4 w-4 {getStatusColor()}" />
+							<span class={`i-lucide-${getStatusIcon()} h-4 w-4 ${getStatusColor()} inline-block`} />
 							<span class="text-xs {getStatusColor()}">
 								{connectionStatus === 'checking'
 									? 'Checking...'

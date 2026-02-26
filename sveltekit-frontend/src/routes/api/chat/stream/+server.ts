@@ -16,10 +16,11 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	const mode = url.searchParams.get('mode') ?? 'ollama';
 	const sessionId = url.searchParams.get('sessionId');
 	const caseId = url.searchParams.get('caseId');
+	const persona = url.searchParams.get('persona') ?? 'neutral';
 
 	// Query mode: Simple streaming without authentication/session
 	if (query && !sessionId) {
-		return handleQueryMode(query, mode, caseId);
+		return handleQueryMode(query, mode, caseId, persona);
 	}
 
 	// Session mode: Requires authentication
@@ -120,7 +121,7 @@ async function loadCaseContext(caseId: string): Promise<string | null> {
 /**
  * Query Mode: Simple streaming with optional case context
  */
-function handleQueryMode(query: string, mode: string, caseId: string | null): Response {
+function handleQueryMode(query: string, mode: string, caseId: string | null, persona: string = 'neutral'): Response {
 	const stream = new ReadableStream({
 		async start(controller) {
 			const encoder = new TextEncoder();
@@ -143,10 +144,18 @@ function handleQueryMode(query: string, mode: string, caseId: string | null): Re
 					}
 				}
 
-				// Build prompt with case context
-				const prompt = caseContext
+				// Apply persona styling to prompt
+				let systemPrefix = '';
+				if (persona && persona !== 'neutral') {
+					const { getPersona } = await import('$lib/server/ace/style-adapter.js');
+					const config = getPersona(persona as any);
+					systemPrefix = config.systemPrefix + '\n\n';
+				}
+
+				// Build prompt with case context + persona
+				const prompt = systemPrefix + (caseContext
 					? `${caseContext}\n\n## User Question\n${query}`
-					: query;
+					: query);
 
 				// Import LLM router dynamically
 				const { llmRouter } = await import('$lib/server/llm-router');

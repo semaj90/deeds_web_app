@@ -3,6 +3,7 @@
 	import type { PageData } from './$types';
 	import LegalDocumentDrafting from '$lib/components/ai/LegalDocumentDrafting.svelte';
 	import EvidenceManager from '$lib/components/evidence/EvidenceManager.svelte';
+	import Icon from '$lib/components/ui/Icon.svelte';
 
 	type TabId = 'overview' | 'evidence' | 'persons' | 'ai' | 'reports';
 
@@ -26,6 +27,8 @@
 	let errorSummary = $state<ErrorSummary | null>(null);
 	let consolidationStatus = $state<ConsolidationStatus | null>(null);
 	let loadingDiagnostics = $state(false);
+	let isExportingPacket = $state(false);
+	let exportPacketError = $state<string | null>(null);
 
 	$effect(() => {
 		if (!browser) return;
@@ -61,6 +64,35 @@
 			console.error('[CaseOverview] diagnostics error', err);
 		} finally {
 			loadingDiagnostics = false;
+		}
+	}
+
+
+	async function handleExportPacket() {
+		const caseId = data.caseData?.id ?? data.caseId;
+		if (!caseId) return;
+		isExportingPacket = true;
+		exportPacketError = null;
+		try {
+			const res = await fetch(`/api/cases/${caseId}/export/pdf`, { method: 'POST' });
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({ error: 'Export failed' }));
+				exportPacketError = err.error || 'Export failed';
+				return;
+			}
+			const blob = await res.blob();
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = `case-${caseId}-packet.html`;
+			document.body.appendChild(a);
+			a.click();
+			setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+		} catch (err) {
+			exportPacketError = 'Network error during export';
+			console.error('[CaseOverview] export error', err);
+		} finally {
+			isExportingPacket = false;
 		}
 	}
 
@@ -127,6 +159,18 @@
 			>
 				Refresh
 			</button>
+
+			<button
+				class="px-3 py-2 rounded-lg border border-emerald-700 bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors text-xs text-emerald-300 flex items-center gap-1.5"
+				disabled={isExportingPacket}
+				onclick={handleExportPacket}
+			>
+				<Icon name="download" size={14} />
+				{isExportingPacket ? 'Exporting...' : 'Export PDF'}
+			</button>
+			{#if exportPacketError}
+				<span class="text-rose-400 text-xs">{exportPacketError}</span>
+			{/if}
 		</section>
 	</header>
 

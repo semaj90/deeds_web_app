@@ -108,7 +108,7 @@ export default defineConfig({
     'i-lucide-eye-off', 'i-lucide-file', 'i-lucide-file-check', 'i-lucide-file-code',
     'i-lucide-file-image', 'i-lucide-file-json', 'i-lucide-file-spreadsheet', 'i-lucide-file-text',
     'i-lucide-file-up', 'i-lucide-filter', 'i-lucide-folder-tree', 'i-lucide-gavel',
-    'i-lucide-git-branch', 'i-lucide-grid-2x2', 'i-lucide-hard-drive', 'i-lucide-hash',
+    'i-lucide-git-branch', 'i-lucide-git-compare', 'i-lucide-grid-2x2', 'i-lucide-hard-drive', 'i-lucide-hash',
     'i-lucide-heading-1', 'i-lucide-heading-2', 'i-lucide-headphones', 'i-lucide-heart',
     'i-lucide-home', 'i-lucide-image', 'i-lucide-info', 'i-lucide-italic',
     'i-lucide-keyboard', 'i-lucide-layers', 'i-lucide-layout', 'i-lucide-library',
@@ -131,5 +131,6 @@ export default defineConfig({
     'i-lucide-users', 'i-lucide-video', 'i-lucide-wand-2', 'i-lucide-wifi',
     'i-lucide-wifi-off', 'i-lucide-x', 'i-lucide-x-circle', 'i-lucide-zap',
     'i-lucide-zoom-in', 'i-lucide-zoom-out',
+    'i-lucide-user-cog', 'i-lucide-globe', 'i-lucide-pause-circle',
   ],
 })

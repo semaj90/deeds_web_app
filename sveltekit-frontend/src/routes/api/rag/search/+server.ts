@@ -11,6 +11,7 @@ import type { RAGConfig } from '$lib/sdk/rag/index.js';
 import { productionLogger } from '$lib/server/production-logger.js';
 import { apiResponses } from '$lib/server/api/response-helper.js';
 import { chatRateLimiter } from '$lib/server/middleware/rate-limiter.js';
+import { computeTFIDF } from '$lib/server/retrieval/tfidf-scorer.js';
 
 const QDRANT_URL = getQdrantUrl();
 const OLLAMA_URL = getOllamaUrl();
@@ -20,6 +21,73 @@ function toConfidence(score: number): ConfidenceLevel {
 	if (score >= 0.70) return 'medium';
 	if (score >= 0.50) return 'low';
 	return 'marginal';
+}
+
+/**
+ * Extract simple keyword tags from a query string.
+ * Used for tag-based score boosting (ported from Python rag_search.py).
+ */
+function extractQueryTags(query: string): string[] {
+	const stopWords = new Set([
+		'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+		'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
+		'should', 'may', 'might', 'shall', 'can', 'to', 'of', 'in', 'for',
+		'on', 'with', 'at', 'by', 'from', 'as', 'into', 'about', 'between',
+		'through', 'after', 'before', 'above', 'below', 'and', 'or', 'not',
+		'but', 'if', 'then', 'than', 'so', 'no', 'nor', 'too', 'very',
+		'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those',
+		'how', 'when', 'where', 'why', 'all', 'each', 'every', 'both',
+		'few', 'more', 'most', 'other', 'some', 'such', 'only', 'own',
+		'same', 'just', 'also', 'any', 'me', 'my', 'i', 'you', 'your',
+		'he', 'she', 'it', 'we', 'they', 'them', 'his', 'her', 'its', 'our'
+	]);
+	return query
+		.toLowerCase()
+		.replace(/[^\w\s]/g, '')
+		.split(/\s+/)
+		.filter(w => w.length > 2 && !stopWords.has(w));
+}
+
+/**
+ * Apply tag-based score boosting to search results.
+ * Ported from Python rag_search.py — chunks whose payload tags/entities
+ * overlap with query keywords get a multiplicative score boost.
+ *
+ * @param chunks - Search results with score and payload
+ * @param queryTags - Extracted query keywords
+ * @param boostFactor - Multiplier per matched tag (default 1.15 = 15% boost)
+ * @param maxBoost - Cap on total boost multiplier (default 1.5 = 50% max)
+ */
+function applyTagBoost(
+	chunks: RetrievedChunk[],
+	queryTags: string[],
+	boostFactor = 1.15,
+	maxBoost = 1.5
+): void {
+	if (queryTags.length === 0) return;
+
+	const tagSet = new Set(queryTags);
+
+	for (const chunk of chunks) {
+		// Collect tags from payload fields that might contain relevant keywords
+		const chunkTags: string[] = [
+			...(chunk.related_entities ?? []),
+			...(chunk.section ? [chunk.section] : []),
+			...(chunk.source_title ? chunk.source_title.toLowerCase().split(/\s+/) : [])
+		].map(t => String(t).toLowerCase());
+
+		// Count overlapping tags
+		let matchCount = 0;
+		for (const ct of chunkTags) {
+			if (tagSet.has(ct)) matchCount++;
+		}
+
+		if (matchCount > 0) {
+			const boost = Math.min(Math.pow(boostFactor, matchCount), maxBoost);
+			chunk.score = Math.min(chunk.score * boost, 1.0);
+			chunk.confidence = toConfidence(chunk.score);
+		}
+	}
 }
 
 /**
@@ -44,7 +112,8 @@ export const POST: RequestHandler = async ({ request }) => {
 			top_k = 10,
 			min_score = 0.3,
 			use_hybrid = false,
-			use_rerank = false
+			use_rerank = false,
+			scoring_method = "hybrid"
 		} = body;
 
 		if (!query?.trim()) {
@@ -124,7 +193,26 @@ export const POST: RequestHandler = async ({ request }) => {
 			}
 		}
 
-		// Sort by score descending and limit
+		// Apply tag-based score boosting before final sort
+		const queryTags = extractQueryTags(query);
+		applyTagBoost(allChunks, queryTags);
+		const tfidfMap = new Map();
+		if (scoring_method !== "vector_only") {
+			const tR = computeTFIDF(query, allChunks.map(ch => ({ id: ch.chunk_id, text: ch.text })));
+			for (const t of tR) { tfidfMap.set(t.id, t.tfidfScore); }
+		}
+
+		// Sort by boosted score descending and limit
+		// 4. Combine scores: hybrid = 0.7*vector + 0.3*tfidf
+		for (const chunk of allChunks) {
+			const vs = chunk.score;
+			const ts = tfidfMap.get(chunk.chunk_id) || 0;
+			chunk.vector_score = vs;
+			chunk.tfidf_score = ts;
+			if (scoring_method === "tfidf_only") { chunk.score = ts; }
+			else if (scoring_method === "hybrid") { chunk.score = 0.7 * vs + 0.3 * ts; }
+			chunk.confidence = toConfidence(chunk.score);
+		}
 		allChunks.sort((a, b) => b.score - a.score);
 		const topChunks = allChunks.slice(0, top_k);
 
@@ -139,6 +227,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			rerank_time_ms: use_rerank ? 0 : undefined,
 			embedding_model: 'embeddinggemma:latest',
 			rerank_model: use_rerank ? 'none' : undefined,
+			scoring_method: scoring_method,
 			timestamp: new Date().toISOString()
 		};
 

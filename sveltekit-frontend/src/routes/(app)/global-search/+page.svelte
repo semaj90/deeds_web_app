@@ -33,6 +33,8 @@
 		source_url?: string;
 		section?: string;
 		related_entities: string[];
+		vector_score?: number;
+		tfidf_score?: number;
 	}
 
 	interface EvidenceBundle {
@@ -86,6 +88,7 @@
 	let searchQuery = $state('');
 	let isSearching = $state(false);
 	let searchMode = $state<'rag' | 'evidence' | 'statutes' | 'precedents' | 'glossary'>('evidence');
+	let scoringMethod = $state<"vector_only" | "hybrid" | "tfidf_only">("hybrid");
 	let caseIdFilter = $state('');
 
 	// RAG search results
@@ -219,6 +222,7 @@
 				query: searchQuery,
 				top_k: 20,
 				min_score: 0.3,
+				scoring_method: scoringMethod,
 			}),
 		});
 
@@ -396,7 +400,22 @@
 			</div>
 
 			<!-- GPU Rerank Toggle -->
-			{#if searchMode === 'evidence' || searchMode === 'rag'}
+			
+			<!-- Scoring Method Toggle -->
+			{#if searchMode === "rag"}
+				<div class="filter-section">
+					<h3><Icon name="bar-chart-2" size={14} /> SCORING METHOD</h3>
+					<div class="scoring-toggle">
+						<button class="mode-btn" class:active={scoringMethod === "vector_only"} onclick={() => scoringMethod = "vector_only"}>Vector Only</button>
+						<button class="mode-btn" class:active={scoringMethod === "hybrid"} onclick={() => scoringMethod = "hybrid"}>Hybrid</button>
+						<button class="mode-btn" class:active={scoringMethod === "tfidf_only"} onclick={() => scoringMethod = "tfidf_only"}>TF-IDF Only</button>
+					</div>
+					<p class="scoring-hint">
+						{#if scoringMethod === "hybrid"}70% vector + 30% TF-IDF{:else if scoringMethod === "vector_only"}Semantic similarity only{:else}Term frequency matching only{/if}
+					</p>
+				</div>
+			{/if}
+{#if searchMode === 'evidence' || searchMode === 'rag'}
 				<div class="filter-section">
 					<h3><Icon name="cpu" size={14} /> GPU RERANKING</h3>
 					<label class="filter-item">
@@ -636,6 +655,21 @@
 								<span class="meta-tag entity">{result.related_entities.length} entities</span>
 							{/if}
 						</div>
+						{#if scoringMethod !== "vector_only" && result.vector_score !== undefined}
+							<div class="score-breakdown">
+								<div class="score-bar-wrap">
+									<div class="score-bar-track">
+										<div class="score-bar-vector" style="width: {(result.vector_score ?? result.score) * 100}%"></div>
+										<div class="score-bar-tfidf" style="width: {(result.tfidf_score ?? 0) * 100}%"></div>
+									</div>
+								</div>
+								<div class="score-labels">
+									<span class="score-vec">vec: {((result.vector_score ?? result.score) * 100).toFixed(0)}%</span>
+									<span class="score-tfidf">tfidf: {((result.tfidf_score ?? 0) * 100).toFixed(0)}%</span>
+									<span class="score-combined">combined: {(result.score * 100).toFixed(0)}%</span>
+								</div>
+							</div>
+						{/if}
 					</button>
 				{/each}
 			{:else if searchMode === 'statutes' && statuteResults.length > 0}
@@ -877,7 +911,32 @@
 							<span class="confidence-label">{conf.label} — {(selectedResult.score * 100).toFixed(1)}%</span>
 						</div>
 					</div>
-					<div class="detail-section">
+						{#if scoringMethod !== "vector_only" && selectedResult.vector_score !== undefined}
+						<div class="detail-section">
+							<h4>SCORING BREAKDOWN</h4>
+							<div class="rerank-detail">
+								<div class="rerank-row">
+									<span>Vector Similarity (70%)</span>
+									<span>{((selectedResult.vector_score ?? selectedResult.score) * 100).toFixed(1)}%</span>
+								</div>
+								<div class="rerank-row">
+									<span>TF-IDF Score (30%)</span>
+									<span>{((selectedResult.tfidf_score ?? 0) * 100).toFixed(1)}%</span>
+								</div>
+								<div class="rerank-row" style="border-top: 1px solid #3a3020; padding-top: 4px; margin-top: 2px; color: #f8f0d9; font-weight: 600">
+									<span>Combined Score</span>
+									<span>{(selectedResult.score * 100).toFixed(1)}%</span>
+								</div>
+							</div>
+							<div class="score-bar-wrap" style="margin-top: 8px">
+								<div class="score-bar-track">
+									<div class="score-bar-vector" style="width: {(selectedResult.vector_score ?? selectedResult.score) * 100}%"></div>
+									<div class="score-bar-tfidf" style="width: {(selectedResult.tfidf_score ?? 0) * 100}%"></div>
+								</div>
+							</div>
+						</div>
+					{/if}
+<div class="detail-section">
 						<h4>SOURCE</h4>
 						<p class="detail-value">{selectedResult.source_title}</p>
 						<p class="detail-desc">{selectedResult.source_type}</p>
@@ -1661,4 +1720,65 @@
 			display: none;
 		}
 	}
+
+
+	/* Scoring Toggle */
+	.scoring-toggle {
+		display: flex;
+		gap: 4px;
+		background: #1a1610;
+		border-radius: 4px;
+		padding: 3px;
+	}
+
+	.scoring-hint {
+		margin: 6px 0 0;
+		font-size: 0.6rem;
+		color: #5a5040;
+		font-style: italic;
+	}
+
+	/* Score Breakdown */
+	.score-breakdown {
+		margin-top: 8px;
+		padding-top: 6px;
+		border-top: 1px solid #2a2418;
+	}
+
+	.score-bar-wrap {
+		margin-bottom: 4px;
+	}
+
+	.score-bar-track {
+		display: flex;
+		height: 4px;
+		background: #1a1610;
+		border-radius: 2px;
+		overflow: hidden;
+		gap: 1px;
+	}
+
+	.score-bar-vector {
+		height: 100%;
+		background: #6ba3a0;
+		border-radius: 2px 0 0 2px;
+		transition: width 0.3s;
+	}
+
+	.score-bar-tfidf {
+		height: 100%;
+		background: #c9a96e;
+		border-radius: 0 2px 2px 0;
+		transition: width 0.3s;
+	}
+
+	.score-labels {
+		display: flex;
+		gap: 10px;
+		font-size: 0.6rem;
+	}
+
+	.score-vec { color: #6ba3a0; }
+	.score-tfidf { color: #c9a96e; }
+	.score-combined { color: #d4c9a9; margin-left: auto; font-weight: 600; }
 </style>

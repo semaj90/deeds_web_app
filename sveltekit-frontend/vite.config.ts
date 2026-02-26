@@ -253,6 +253,7 @@ export default defineConfig(({ mode }) => {
       minify: 'esbuild',
       sourcemap: false,
       rollupOptions: {
+        external: ['@xenova/transformers'],
         output: {
           manualChunks: {
             // webgpuAi, cognitiveRouter, gpuInference — corrupted/unused, fix later
@@ -304,7 +305,7 @@ export default defineConfig(({ mode }) => {
     },
     clearScreen: false,
     ssr: {
-      external: ['canvas', '@napi-rs/canvas', 'simdjson-wasm', 'onnxruntime-web'],
+      external: ['canvas', '@napi-rs/canvas', 'simdjson-wasm', 'onnxruntime-web', '@xenova/transformers'],
     },
     resolve: {
       alias: {

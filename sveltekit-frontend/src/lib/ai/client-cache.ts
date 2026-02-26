@@ -68,12 +68,13 @@ function ensureLoki(): { replies: Collection<LokiReplyEntry>; router: Collection
 // ── IndexedDB: Persistent Cache ──────────────────────────────────────────
 
 const DB_NAME = 'deeds-ai-cache';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 const STORES = {
 	replies: 'replies',
 	embeddings: 'embeddings',
 	chatHistory: 'chatHistory',
-	cartridges: 'cartridges'
+	cartridges: 'cartridges',
+	gpuResults: 'gpuResults'
 } as const;
 
 /** 7-day TTL for persistent cache entries */
@@ -99,6 +100,9 @@ function getDB(): Promise<IDBPDatabase> {
 				}
 				if (!db.objectStoreNames.contains(STORES.cartridges)) {
 					db.createObjectStore(STORES.cartridges, { keyPath: 'caseId' });
+				}
+				if (!db.objectStoreNames.contains(STORES.gpuResults)) {
+					db.createObjectStore(STORES.gpuResults, { keyPath: 'computeHash' });
 				}
 			}
 		});
@@ -328,6 +332,53 @@ export const clientCache = {
 		}
 	},
 
+	/** Cache a GPU computation result (reranking, similarity, etc.) */
+	async putGPUResult(key: string, result: unknown, backend: string): Promise<void> {
+		if (typeof window === 'undefined') return;
+		try {
+			const db = await getDB();
+			await db.put(STORES.gpuResults, {
+				computeHash: simpleHash(key),
+				result,
+				backend,
+				timestamp: Date.now()
+			});
+		} catch { /* non-critical */ }
+	},
+
+	/** Retrieve a cached GPU computation result */
+	async getGPUResult(key: string): Promise<{ result: unknown; backend: string } | null> {
+		if (typeof window === 'undefined') return null;
+		try {
+			const db = await getDB();
+			const entry = await db.get(STORES.gpuResults, simpleHash(key));
+			if (!entry) return null;
+			// GPU results expire after 1 hour (shorter TTL for computation results)
+			if (Date.now() - entry.timestamp > 3_600_000) {
+				await db.delete(STORES.gpuResults, simpleHash(key));
+				return null;
+			}
+			return { result: entry.result, backend: entry.backend };
+		} catch {
+			return null;
+		}
+	},
+
+	/** Get GPU cache stats */
+	async getGPUCacheStats(): Promise<{ count: number; oldestMs: number }> {
+		if (typeof window === 'undefined') return { count: 0, oldestMs: 0 };
+		try {
+			const db = await getDB();
+			const tx = db.transaction(STORES.gpuResults, 'readonly');
+			const all = await tx.store.getAll();
+			if (all.length === 0) return { count: 0, oldestMs: 0 };
+			const oldest = Math.min(...all.map((e: any) => e.timestamp));
+			return { count: all.length, oldestMs: Date.now() - oldest };
+		} catch {
+			return { count: 0, oldestMs: 0 };
+		}
+	},
+
 	/** Evict expired entries across all stores. Called automatically on first cache access. */
 	async evictExpired(): Promise<number> {
 		if (typeof window === 'undefined') return 0;
@@ -335,7 +386,7 @@ export const clientCache = {
 		const cutoff = Date.now() - TTL_MS;
 		try {
 			const db = await getDB();
-			for (const storeName of [STORES.replies, STORES.embeddings]) {
+			for (const storeName of [STORES.replies, STORES.embeddings, STORES.gpuResults]) {
 				const tx = db.transaction(storeName, 'readwrite');
 				let cursor = await tx.store.openCursor();
 				while (cursor) {
