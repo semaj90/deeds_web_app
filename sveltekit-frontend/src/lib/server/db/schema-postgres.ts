@@ -2281,6 +2281,64 @@ export const auditLog = pgTable('audit_log', {
 	createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });
 
+// === TOPIC MODELING & RECOMMENDATIONS ===
+
+/**
+ * document_topics: Maps documents to k-means topic clusters
+ * One document can belong to multiple topics with varying membership probability
+ * Indexed by both documentId and topicId for efficient filtering
+ */
+export const documentTopics = pgTable(
+	'document_topics',
+	{
+		id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+		documentId: uuid('document_id').notNull(),
+		topicId: integer('topic_id').notNull(), // 0-14 (k=15 clusters)
+		membershipProbability: real('membership_probability').notNull(), // 0.0-1.0, sum across topics ≤ 1.0
+		centroidDistance: real('centroid_distance').notNull(), // Euclidean distance to cluster centroid
+		createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+		updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	},
+	(table) => ({
+		documentIdIdx: index('document_topics_document_id_idx').on(table.documentId),
+		topicIdIdx: index('document_topics_topic_id_idx').on(table.topicId),
+		uniqueDocTopic: unique('document_topics_document_id_topic_id_unique').on(table.documentId, table.topicId),
+	})
+);
+
+export type DocumentTopic = typeof documentTopics.$inferSelect;
+export type NewDocumentTopic = typeof documentTopics.$inferInsert;
+
+/**
+ * user_interaction_history: Tracks clicks, views, and saves for recommendation ranking
+ * Used for collaborative filtering + content-based scoring (7-day exponential decay window)
+ */
+export const userInteractionHistory = pgTable(
+	'user_interaction_history',
+	{
+		id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+		userId: uuid('user_id').notNull(),
+		recommendationId: uuid('recommendation_id'), // Reference to earlier /api/recommendations response
+		documentId: uuid('document_id'),
+		caseId: uuid('case_id'),
+		interactionType: varchar('interaction_type', { length: 50 }).notNull(), // 'view', 'click', 'save', 'share', 'dismiss'
+		durationSeconds: integer('duration_seconds'), // How long user viewed the recommendation
+		searchContext: text('search_context'), // User's search query at time of interaction
+		topicPreferences: jsonb('topic_preferences').default([]).notNull(), // Array of { topicId, affinity } inferred from interaction
+		metadata: jsonb('metadata').default({}).notNull(), // Custom interaction data
+		createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	},
+	(table) => ({
+		userIdIdx: index('user_interaction_history_user_id_idx').on(table.userId),
+		documentIdIdx: index('user_interaction_history_document_id_idx').on(table.documentId),
+		caseIdIdx: index('user_interaction_history_case_id_idx').on(table.caseId),
+		createdAtIdx: index('user_interaction_history_created_at_idx').on(table.createdAt),
+	})
+);
+
+export type UserInteractionHistory = typeof userInteractionHistory.$inferSelect;
+export type NewUserInteractionHistory = typeof userInteractionHistory.$inferInsert;
+
 
 
 

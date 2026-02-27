@@ -24,7 +24,8 @@ export class QdrantManager {
         evidence: 'evidence_items',
         chat_history: 'chat_messages',
         embeddings_cache: 'embedding_cache',
-        document_tags: 'document_tags'
+        document_tags: 'document_tags',
+        topic_clusters: 'topic_clusters'
     };
 
     constructor(url = ENV.QDRANT_URL) {
@@ -67,6 +68,12 @@ export class QdrantManager {
             },
 	{
                 name: this.collections.document_tags,
+                vectors: {
+	size: 768, distance: 'Cosine'
+                }
+            },
+	{
+                name: this.collections.topic_clusters,
                 vectors: {
 	size: 768, distance: 'Cosine'
                 }
