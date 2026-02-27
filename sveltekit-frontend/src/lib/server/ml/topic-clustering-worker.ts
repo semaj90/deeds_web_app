@@ -16,13 +16,12 @@
  *   - All document_topics records persisted
  */
 
-import { setup, assign, createMachine, fromPromise, enqueueActions } from 'xstate';
+import { setup, assign, fromPromise } from 'xstate';
 import { KMeansClusterer } from './topic-cluster.js';
 import { db } from '$lib/server/db/client';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { documentTopics } from '$lib/server/db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
-import { sql } from 'drizzle-orm';
 
 export interface ClusteringContext {
 	jobId: string;
@@ -341,7 +340,10 @@ export const clusteringMachine = setup({
 				onError: {
 					target: 'failed',
 					actions: assign({
-						error: ({ event }) => event.error,
+						error: ({ event }) => {
+							const err = event.error as any;
+							return typeof err === 'string' ? err : err?.message || 'Clustering failed';
+						},
 						status: () => 'failed'
 					})
 				}
@@ -365,7 +367,10 @@ export const clusteringMachine = setup({
 				onError: {
 					target: 'failed',
 					actions: assign({
-						error: ({ event }) => event.error,
+						error: ({ event }) => {
+							const err = event.error as any;
+							return typeof err === 'string' ? err : err?.message || 'Persistence failed';
+						},
 						status: () => 'failed'
 					})
 				}
