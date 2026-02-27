@@ -43,7 +43,7 @@
 
 {#if open}
   <div class="modal-backdrop" onclick={() => { if (onclose) onclose(); }} role="presentation">
-    <div class="modal-container" onclick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+    <div class="modal-container" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()} role="dialog" aria-modal="true" tabindex="-1">
       <div class="modal-scanlines"></div>
 
       <div class="modal-header">

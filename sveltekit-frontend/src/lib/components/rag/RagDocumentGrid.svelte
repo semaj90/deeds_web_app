@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Icon from '$lib/components/ui/Icon.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
+	import Icon from '$lib/components/ui/Icon.svelte';
 	import DocumentCard from './DocumentCard.svelte';
 
 	interface Document {
@@ -174,8 +174,8 @@
 	{/if}
 
 	{#if selectedDocument}
-		<div class="doc-detail-overlay" onclick={() => (selectedDocument = null)}>
-			<div class="doc-detail" onclick={(e) => e.stopPropagation()}>
+		<div class="doc-detail-overlay" onclick={() => (selectedDocument = null)} onkeydown={(e) => { if (e.key === 'Escape') selectedDocument = null; }} role="presentation" tabindex="-1">
+			<div class="doc-detail" onclick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
 				<div class="detail-header">
 					<h3>{selectedDocument.filename}</h3>
 					<button class="close-btn" onclick={() => (selectedDocument = null)}>

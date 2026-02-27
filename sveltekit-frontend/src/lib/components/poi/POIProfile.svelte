@@ -41,7 +41,7 @@ interface PersonOfInterest {
 
  <!-- Header -->
  <div class="flex gap-6">
- <img src={person.face} class="w-40 h-40 rounded-xl shadow-xl" />
+ <img src={person.face} alt="{person.name} profile photo" class="w-40 h-40 rounded-xl shadow-xl" />
 
  <div>
  <h1 class="text-3xl font-bold">{person.name}</h1>

@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { parseCartridge, type ParsedCartridge } from '$lib/shared/chr97-reader.js';
-	import { quantizeFloat32ToUint8 } from '$lib/shared/quantize.js';
-	import type { QuantizedEmbedding } from '$lib/shared/embedding-types';
+	import { GPU_CONFIG } from '$lib/config/env.js';
 	import { NESMemoryArchitecture, type MemoryStats } from '$lib/memory/nes-memory-architecture.js';
 	import { runeToLegalDocument } from '$lib/memory/rune-to-legal-doc.js';
-	import { GPU_CONFIG } from '$lib/config/env.js';
+	import { parseCartridge, type ParsedCartridge } from '$lib/shared/chr97-reader.js';
+	import type { QuantizedEmbedding } from '$lib/shared/embedding-types';
+	import { quantizeFloat32ToUint8 } from '$lib/shared/quantize.js';
 	import { NES_PALETTE } from '$lib/themes/retro-console-palettes.js';
 
 	interface PageData {
@@ -347,7 +347,7 @@
 						<div class="bank-row">
 							<span class="bank-name">{bank.name}</span>
 							<div class="bank-bar">
-								<div class="bank-fill" style="width: {pct}%; background: {bankFillColor(pct)}" />
+								<div class="bank-fill" style="width: {pct}%; background: {bankFillColor(pct)}"></div>
 							</div>
 							<span class="bank-pct">{pct}%</span>
 							<span class="bank-docs">{bank.docs} docs</span>

@@ -108,7 +108,7 @@
     "geminicodeassist.updateChannel": "Default",
     "geminicodeassist.inlineSuggestions.suggestionSpeed": "Slow",
     "geminicodeassist.inlineSuggestions.enableAuto": false,
-    "chat.detectParticipant.enabled": false,
+    "chat.detectParticipant.enabled": true,
     "terminal.integrated.customGlyphs": true,
     "github.copilot.chat.agent.autoFix": true,
     "github.copilot.chat.anthropic.contextEditing.enabled": true,

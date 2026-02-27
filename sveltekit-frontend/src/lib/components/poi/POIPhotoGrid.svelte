@@ -40,28 +40,28 @@
   {#if editable}
     <div class="flex items-center justify-between">
       <h3 class="text-lg font-semibold flex items-center gap-2">
-        <span class="i-lucide-camera w-5 h-5 inline-block" />
+        <span class="i-lucide-camera w-5 h-5 inline-block"></span>
         POI Photos ({photos.length})
       </h3>
       <Button class="bits-btn" onclick={handleUpload} variant="outline" size="sm">
-        <span class="i-lucide-upload w-4 h-4 mr-2 inline-block" />
+        <span class="i-lucide-upload w-4 h-4 mr-2 inline-block"></span>
         Upload Photo
       </Button>
     </div>
   {:else}
     <h3 class="text-lg font-semibold flex items-center gap-2">
-      <span class="i-lucide-camera w-5 h-5 inline-block" />
+      <span class="i-lucide-camera w-5 h-5 inline-block"></span>
       POI Photos ({photos.length})
     </h3>
   {/if}
 
   {#if photos.length === 0}
     <div class="border-2 border-dashed border-sand/20 rounded-lg p-8 text-center">
-      <span class="i-lucide-camera w-12 h-12 text-sand/40 mx-auto mb-4 inline-block" />
+      <span class="i-lucide-camera w-12 h-12 text-sand/40 mx-auto mb-4 inline-block"></span>
       <p class="text-sand/60 mb-4">No photos uploaded yet</p>
       {#if editable}
         <Button class="bits-btn" onclick={handleUpload} variant="outline">
-          <span class="i-lucide-upload w-4 h-4 mr-2 inline-block" />
+          <span class="i-lucide-upload w-4 h-4 mr-2 inline-block"></span>
           Upload First Photo
         </Button>
       {/if}
@@ -99,7 +99,7 @@
               class="opacity-0 group-hover:opacity-100 transition-opacity bits-btn"
               onclick={() => handlePhotoClick(photo, index)}
             >
-              <span class="i-lucide-eye w-4 h-4 inline-block" />
+              <span class="i-lucide-eye w-4 h-4 inline-block"></span>
             </Button>
             {#if editable}
               <Button
@@ -108,7 +108,7 @@
                 class="opacity-0 group-hover:opacity-100 transition-opacity bits-btn"
                 onclick={() => handleDelete(index)}
               >
-                <span class="i-lucide-trash-2 w-4 h-4 inline-block" />
+                <span class="i-lucide-trash-2 w-4 h-4 inline-block"></span>
               </Button>
             {/if}
           </div>

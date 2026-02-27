@@ -1,7 +1,7 @@
 <!-- Evidence Modal Component - Svelte 5 + bits-ui v2 -->
 <script lang="ts">
+  import Button from '$lib/components/ui/Button.svelte';
   import { Dialog } from "bits-ui";
-import Button from '$lib/components/ui/Button.svelte';
   // Props interface
   interface EvidenceItem {
     jsonData: {
@@ -109,22 +109,22 @@ import Button from '$lib/components/ui/Button.svelte';
           <!-- View Mode -->
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-sand/40 mb-1">Title</label>
+              <span class="block text-sm font-medium text-sand/40 mb-1">Title</span>
               <div class="text-white font-medium">{title || 'Untitled'}</div>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-sand/40 mb-1">Description</label>
+              <span class="block text-sm font-medium text-sand/40 mb-1">Description</span>
               <div class="text-sand/40">{description || 'No description'}</div>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-sand/40 mb-1">Type</label>
+              <span class="block text-sm font-medium text-sand/40 mb-1">Type</span>
               <div class="text-sand/40">{type || 'Not specified'}</div>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-sand/40 mb-1">Tags</label>
+              <span class="block text-sm font-medium text-sand/40 mb-1">Tags</span>
               <div class="flex flex-wrap gap-1">
                 {#if tagsString}
                   {#each tagsString.split(',').map(t => t.trim()).filter(Boolean) as tag}
@@ -143,7 +143,7 @@ import Button from '$lib/components/ui/Button.svelte';
               Close
             </Button>
             <Button variant="default" onclick={handleEdit} class="gap-2">
-              <span class="i-lucide-edit h-4 w-4 inline-block" />
+              <span class="i-lucide-edit h-4 w-4 inline-block"></span>
               Edit
             </Button>
           </div>
@@ -208,7 +208,7 @@ import Button from '$lib/components/ui/Button.svelte';
                 Cancel
               </Button>
               <Button type="submit" variant="default" class="gap-2 bg-accent hover:bg-accent/60">
-                <span class="i-lucide-save h-4 w-4 inline-block" />
+                <span class="i-lucide-save h-4 w-4 inline-block"></span>
                 Save Changes
               </Button>
             </div>

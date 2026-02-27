@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Evidence } from '$lib/types/evidence';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import type { Evidence } from '$lib/types/evidence';
 	import { quintOut } from 'svelte/easing';
 	import { scale } from 'svelte/transition';
 
@@ -50,7 +50,7 @@
 		return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 	};
 
-	const fileSize: number = Number(evidence?.metadata?.size ?? evidence?.fileSize ?? 0);
+	const fileSize: number = $derived(Number(evidence?.metadata?.size ?? evidence?.fileSize ?? 0));
 	let isHovered = $state<boolean>(false);
 	let comparing = $state<boolean>(false);
 	let compareError: string | null = $state(null);

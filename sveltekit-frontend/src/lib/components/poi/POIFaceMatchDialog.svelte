@@ -5,12 +5,12 @@
  import Badge from '$lib/components/ui/badge/Badge.svelte';
  import Card from '$lib/components/ui/card/Card.svelte';
  import CardContent from '$lib/components/ui/card/CardContent.svelte';
- import DialogRoot from '$lib/components/ui/dialog/DialogRoot.svelte';
- import DialogPortal from '$lib/components/ui/dialog/DialogPortal.svelte';
- import DialogOverlay from '$lib/components/ui/dialog/DialogOverlay.svelte';
  import DialogContent from '$lib/components/ui/dialog/DialogContent.svelte';
  import DialogDescription from '$lib/components/ui/dialog/DialogDescription.svelte';
  import DialogHeader from '$lib/components/ui/dialog/DialogHeader.svelte';
+ import DialogOverlay from '$lib/components/ui/dialog/DialogOverlay.svelte';
+ import DialogPortal from '$lib/components/ui/dialog/DialogPortal.svelte';
+ import DialogRoot from '$lib/components/ui/dialog/DialogRoot.svelte';
  import DialogTitle from '$lib/components/ui/dialog/DialogTitle.svelte';
  interface POI {
  id: string;
@@ -80,7 +80,7 @@
  <div class="max-w-4xl max-h-[80vh] overflow-y-auto">
  <DialogHeader>
  <div class="flex items-center gap-2">
- <span class="i-lucide-search w-5 h-5 inline-block" />
+ <span class="i-lucide-search w-5 h-5 inline-block"></span>
  <DialogTitle>Face Match Results</DialogTitle>
  </div>
  <DialogDescription>
@@ -91,7 +91,7 @@
  <div class="space-y-4">
  {#if matches.length === 0}
  <div class="text-center py-8">
- <span class="i-lucide-users w-12 h-12 text-sand/40 mx-auto mb-4 inline-block" />
+ <span class="i-lucide-users w-12 h-12 text-sand/40 mx-auto mb-4 inline-block"></span>
  <p class="text-sand/60">No face matches found</p>
  </div>
  {:else}
@@ -99,7 +99,7 @@
  {#each matches as match (match.poi.id)}
  <Card>
  <CardContent class="p-4">
- <div class="flex items-center gap-4 cursor-pointer hover:shadow-md transition-shadow" onclick={() => handleSelectPOI(match.poi)}>
+ <div class="flex items-center gap-4 cursor-pointer hover:shadow-md transition-shadow" role="button" tabindex="0" onclick={() => handleSelectPOI(match.poi)} onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { handleSelectPOI(match.poi); e.preventDefault(); } }}>
  <!-- POI Photo -->
  <div class="flex-shrink-0">
  {#if match.poi.photos && match.poi.photos.length > 0}
@@ -110,7 +110,7 @@
  {:else}
  <Avatar class="w-16 h-16">
  <AvatarFallback class="bg-sand/10">
- <span class="i-lucide-users w-8 h-8 text-sand/60 inline-block" />
+ <span class="i-lucide-users w-8 h-8 text-sand/60 inline-block"></span>
  </AvatarFallback>
  </Avatar>
  {/if}
@@ -133,7 +133,7 @@
  </div>
 
  <div class="flex items-center gap-1 text-sm">
- <span class="i-lucide-percent w-4 h-4 inline-block" />
+ <span class="i-lucide-percent w-4 h-4 inline-block"></span>
  <span class={getSimilarityColor(match.similarity)}>
  {Math.round(match.similarity * 100)}% similarity
  </span>
@@ -149,7 +149,7 @@
 
  <div class="flex justify-end pt-4 border-t">
  <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2" onclick={handleClose}>
- <span class="i-lucide-x w-4 h-4 mr-2 inline-block" />
+ <span class="i-lucide-x w-4 h-4 mr-2 inline-block"></span>
  Close
  </button>
  </div>

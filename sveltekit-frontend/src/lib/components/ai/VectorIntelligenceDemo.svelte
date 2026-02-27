@@ -17,16 +17,32 @@
 		searchTime: number;
 		vectorDimensions: number;
 		similarityThreshold: number;
+		avgSimilarity?: number;
+		maxSimilarity?: number;
+		minSimilarity?: number;
 	};
 
 	let query = $state('');
 	let isSearching = $state(false);
 	let results = $state<SearchResult[]>([]);
+	let filteredResults = $state<SearchResult[]>([]);
 	let metrics = $state<SearchMetrics | null>(null);
 	let error = $state<string | null>(null);
 	let selectedResult = $state<SearchResult | null>(null);
+	let filterType = $state<'all' | 'deed' | 'contract' | 'evidence' | 'case_law'>('all');
+	let sortBy = $state<'similarity' | 'date' | 'title'>('similarity');
+	let selectedResults = $state<Set<string>>(new Set());
 
 	let hasResults = $derived(results.length > 0);
+	let displayResults = $derived.by(() => {
+		let display = results.filter(r => filterType === 'all' || r.documentType === filterType);
+
+		if (sortBy === 'similarity') display.sort((a, b) => b.similarity - a.similarity);
+		else if (sortBy === 'date') display.sort((a, b) => new Date(b.metadata?.uploadDate || 0).getTime() - new Date(a.metadata?.uploadDate || 0).getTime());
+		else if (sortBy === 'title') display.sort((a, b) => a.title.localeCompare(b.title));
+
+		return display;
+	});
 
 	const exampleQueries = [
 		'property ownership transfer',
@@ -153,7 +169,7 @@
 	<!-- Header -->
 	<div class="text-center mb-6">
 		<div class="flex items-center justify-center gap-2 text-2xl font-bold text-sand">
-			<span class="i-lucide-brain h-6 w-6 text-accent inline-block" />
+			<span class="i-lucide-brain h-6 w-6 text-accent inline-block"></span>
 			Vector Intelligence Demo
 		</div>
 		<p class="text-sm text-sand/60 mt-1">
@@ -176,10 +192,10 @@
 			class="px-4 py-2 rounded-lg bg-accent text-white font-medium flex items-center gap-2 hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed transition"
 		>
 			{#if isSearching}
-				<span class="i-lucide-loader-2 h-4 w-4 animate-spin inline-block" />
+				<span class="i-lucide-loader-2 h-4 w-4 animate-spin inline-block"></span>
 				Searching
 			{:else}
-				<span class="i-lucide-search h-4 w-4 inline-block" />
+				<span class="i-lucide-search h-4 w-4 inline-block"></span>
 				Search
 			{/if}
 		</button>
@@ -202,7 +218,7 @@
 	<!-- Error Display -->
 	{#if error}
 		<div class="mb-4 p-3 bg-danger/5 border border-danger/20 rounded-lg flex items-center gap-2">
-			<span class="i-lucide-alert-circle h-4 w-4 text-danger inline-block" />
+			<span class="i-lucide-alert-circle h-4 w-4 text-danger inline-block"></span>
 			<span class="text-sm text-danger">{error}</span>
 		</div>
 	{/if}
@@ -281,7 +297,7 @@
 								{/if}
 								{#if result.metadata?.uploadDate}
 									<div class="flex items-center gap-1">
-										<span class="i-lucide-clock h-3 w-3 text-sand/40 inline-block" />
+										<span class="i-lucide-clock h-3 w-3 text-sand/40 inline-block"></span>
 										<span class="text-sand/60">{result.metadata.uploadDate}</span>
 									</div>
 								{/if}

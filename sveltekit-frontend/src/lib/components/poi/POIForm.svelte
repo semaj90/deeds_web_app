@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
   import superForm from 'sveltekit-superforms';
+  import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
   import { z } from 'zod';
 
   const poiSchema = z.object({
@@ -21,9 +21,9 @@
     formData: any;
   }
 
-  let props: Props = $props();
+  let { formData }: Props = $props();
 
-  const { form, errors, enhance, submitting, message } = superForm(props.formData, {
+  const { form, errors, enhance, submitting, message } = superForm(formData, {
     validators: zodClient(poiSchema),
     resetForm: false
   });

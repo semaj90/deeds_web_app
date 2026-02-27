@@ -21,17 +21,17 @@
 
  <div class="actions-grid">
  <button class="action-button" onclick={createNewPOI}>
- <span class="i-lucide-plus w-5 h-5 inline-block" />
+ <span class="i-lucide-plus w-5 h-5 inline-block"></span>
  <span>New POI</span>
  </button>
 
  <button class="action-button" onclick={viewAllPOIs}>
- <span class="i-lucide-eye w-5 h-5 inline-block" />
+ <span class="i-lucide-eye w-5 h-5 inline-block"></span>
  <span>View All</span>
  </button>
 
  <button class="action-button" onclick={searchPOIs}>
- <span class="i-lucide-search w-5 h-5 inline-block" />
+ <span class="i-lucide-search w-5 h-5 inline-block"></span>
  <span>Search</span>
  </button>
  </div>

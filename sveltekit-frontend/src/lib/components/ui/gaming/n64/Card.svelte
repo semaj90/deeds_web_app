@@ -3,10 +3,9 @@
   Advanced 3D card container with depth layering
 -->
 <script lang="ts">
-  import { onMount } from 'svelte';
   import type { Snippet } from 'svelte';
-  import type { GamingComponentProps, N64RenderingOptions } from '../types/gaming-types';
   import { N64_TEXTURE_PRESETS } from '../constants/gaming-constants';
+  import type { N64RenderingOptions } from '../types/gaming-types';
 
   interface Props {
     era?: string;
@@ -91,13 +90,13 @@
   let mouseY = $state(0);
   let cardElement = $state<HTMLElement | null>(null);
 
-  const effectiveRenderOptions = {
+  const effectiveRenderOptions = $derived({
     ...N64_TEXTURE_PRESETS.balanced,
     enableTextureFiltering,
     enableMipMapping,
     enableFog,
     ...renderOptions
-  };
+  });
 
   function handleMouseMove(e: MouseEvent) {
     if (!cardElement || disabled) return;

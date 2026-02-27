@@ -75,7 +75,7 @@
   }
 
   return () => clearInterval(interval);
- 
+
   })();
 });
 
@@ -171,7 +171,7 @@
       </div>
 
       <div class="form-group">
-       <label>Quick Theme Toggle</label>
+       <span class="form-label">Quick Theme Toggle</span>
        <ThemeSelector />
       </div>
 

@@ -45,7 +45,7 @@
 <div class="poi-stats">
  <div class="stat-card">
  <div class="stat-icon">
- <span class="i-lucide-users w-6 h-6 inline-block" />
+ <span class="i-lucide-users w-6 h-6 inline-block"></span>
  </div>
  <div class="stat-content">
  <p class="stat-label">Total POIs</p>
@@ -55,7 +55,7 @@
 
  <div class="stat-card">
  <div class="stat-icon active">
- <span class="i-lucide-trending-up w-6 h-6 inline-block" />
+ <span class="i-lucide-trending-up w-6 h-6 inline-block"></span>
  </div>
  <div class="stat-content">
  <p class="stat-label">Active</p>
@@ -65,7 +65,7 @@
 
  <div class="stat-card">
  <div class="stat-icon critical">
- <span class="i-lucide-alert-triangle w-6 h-6 inline-block" />
+ <span class="i-lucide-alert-triangle w-6 h-6 inline-block"></span>
  </div>
  <div class="stat-content">
  <p class="stat-label">Critical</p>
@@ -75,7 +75,7 @@
 
  <div class="stat-card">
  <div class="stat-icon recent">
- <span class="i-lucide-users w-6 h-6 inline-block" />
+ <span class="i-lucide-users w-6 h-6 inline-block"></span>
  </div>
  <div class="stat-content">
  <p class="stat-label">Recent Activity</p>
