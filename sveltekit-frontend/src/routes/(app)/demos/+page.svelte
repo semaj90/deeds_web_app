@@ -10,7 +10,8 @@
 	}
 
 	const demos: Demo[] = [
-		{ href: '/demos/vector-search', label: 'Vector Intelligence Demo', description: 'Semantic search with pgvector embeddings: filtering, sorting, batch selection, CSV export, similarity metrics', icon: 'brain', lines: 320 },
+		{ href: '/demos/vector-search', label: 'Vector Intelligence Demo', description: 'Semantic search with pgvector embeddings: filtering, sorting, batch selection, CSV export, similarity metrics', icon: 'brain', lines: 370 },
+		{ href: '/demos/retro-recommendations', label: 'Retro Recommendation Engine', description: 'NES-style AI recommendations: category filters, sort controls, signal tokens, multi-modal confidence scoring', icon: 'sparkles', lines: 350 },
 		{ href: '/demos/cache', label: 'Cache Demo', description: 'Multi-layer cache system: LokiJS + Redis + PostgreSQL with real-time stats', icon: 'database', lines: 612 },
 		{ href: '/demos/bits-ui', label: 'Bits UI Demo', description: 'Comprehensive bits-ui v2 Dialog, Select, Input showcase for legal AI', icon: 'layout', lines: 267 },
 		{ href: '/demos/nes-elements', label: 'NES Elements Showcase', description: 'All NES.css HTML elements styled with retro gaming theme', icon: 'gamepad-2', lines: 233 },
