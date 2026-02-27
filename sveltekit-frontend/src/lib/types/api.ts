@@ -34,11 +34,68 @@ export interface AnalysisMetrics {
   accuracyIndicators?: string[];
 }
 
+/**
+ * Enhanced API Response type with metadata
+ * Based on enhanced-rest-architecture.ts (archived)
+ */
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
   error?: string;
   message?: string;
+  metadata?: {
+    timestamp?: string;
+    version?: string;
+    processing_time?: number;
+    [key: string]: unknown;
+  };
+}
+
+/**
+ * Clustering configuration interfaces
+ * Based on enhanced-rest-architecture.ts (archived)
+ */
+export interface ClusteringConfig {
+  k: number;
+  maxIterations: number;
+  tolerance: number;
+  algorithm: 'kmeans' | 'som' | 'hierarchical';
+}
+
+export interface KMeansConfig extends ClusteringConfig {
+  algorithm: 'kmeans';
+  distanceMetric?: 'euclidean' | 'manhattan' | 'cosine';
+  initMethod?: 'random' | 'kmeans++';
+}
+
+export interface SOMConfig extends ClusteringConfig {
+  algorithm: 'som';
+  gridWidth: number;
+  gridHeight: number;
+  learningRate: number;
+  width: number;
+  height: number;
+  dimensions: number;
+  radius?: number;
+  iterations?: number;
+}
+
+export interface DocumentCluster {
+  id: string;
+  centroid: number[];
+  documents: string[];
+  size: number;
+  label?: string;
+  similarity?: number;
+  metadata?: Record<string, any>;
+}
+
+export interface ClusterResult {
+  clusters: DocumentCluster[];
+  clusterId: string;
+  silhouetteScore: number;
+  iterations: number;
+  converged: boolean;
 }
 
 export interface HealthStatus {

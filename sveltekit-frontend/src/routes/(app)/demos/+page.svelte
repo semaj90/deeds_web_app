@@ -18,6 +18,10 @@
 		{ href: '/demos/gpu-cache', label: 'GPU Cache Integration', description: 'Multi-tier cache visualization (L0-L4) with GPU metrics', icon: 'cpu', lines: 150 },
 		{ href: '/demos/icons', label: 'Icon Container Demo', description: 'Dynamic icon loading and container component showcase', icon: 'image', lines: 65 },
 		{ href: '/demos/ace-pipeline', label: 'ACE Pipeline Demo', description: 'ACE Context Bubble + RAG Pipeline Chart with confidence scoring', icon: 'git-branch', lines: 188 },
+		{ href: '/demos/case-scoring', label: 'Case Scoring Dashboard', description: 'AI case risk scoring: dynamic factors, confidence metrics, priority filtering, risk-level visualization', icon: 'shield', lines: 543 },
+		{ href: '/demos/document-summarizer', label: 'Legal Document Summarizer', description: 'AI summarization for contracts, judgments, briefs, statutes: quality metrics, compression ratios, key points', icon: 'file-text', lines: 786 },
+		{ href: '/demos/knowledge-graph', label: 'Knowledge Graph', description: 'D3.js force-directed provenance graph: entity relationships, interactive nodes, RAG source validation', icon: 'git-merge', lines: 280 },
+		{ href: '/demos/rag-documents', label: 'RAG Document Grid', description: 'Multi-document card grid: search, grid/list views, file sizes, embedding model info, document management', icon: 'file-stack', lines: 427 },
 	];
 
 	const showcases: Demo[] = [
