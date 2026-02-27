@@ -35,7 +35,7 @@ export interface ClusteringContext {
 	silhouetteScore?: number;
 	centroidCount: number;
 	documentsProcessed: number;
-	error?: Error;
+	error?: string; // Store error message as string
 	cacheInvalidated: boolean;
 }
 
@@ -208,7 +208,7 @@ async function invalidateCache(jobId: string): Promise<{ invalidated: boolean }>
 		const rabbitmqUrl = process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672';
 
 		// Dynamic import to avoid server-side dependency issues
-		const amqp = await import('amqplib');
+		const amqp = await import('amqplib') as any;
 		const connection = await amqp.connect(rabbitmqUrl);
 		const channel = await connection.createChannel();
 
@@ -316,7 +316,10 @@ export const clusteringMachine = setup({
 				onError: {
 					target: 'failed',
 					actions: assign({
-						error: ({ event }) => event.error,
+						error: ({ event }) => {
+							const err = event.error as any;
+							return typeof err === 'string' ? err : err?.message || 'Unknown error';
+						},
 						status: () => 'failed'
 					})
 				}
