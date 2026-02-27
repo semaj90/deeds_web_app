@@ -21,7 +21,7 @@ import { KMeansClusterer } from './topic-cluster.js';
 import { db } from '$lib/server/db/client';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { documentTopics } from '$lib/server/db/schema-postgres.js';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 export interface ClusteringContext {
 	jobId: string;

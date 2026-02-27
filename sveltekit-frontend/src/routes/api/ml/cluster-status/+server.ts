@@ -48,7 +48,7 @@ export const GET: RequestHandler = async () => {
 				documentsProcessed: status.documentsProcessed,
 				silhouetteScore: status.silhouetteScore ?? null,
 				cacheInvalidated: status.cacheInvalidated,
-				error: status.error ? status.error.message : null
+				error: status.error ?? null
 			},
 			statistics: {
 				totalDocumentsWithTopics: allTopics.length,
