@@ -1,0 +1,65 @@
+# GitHub Copilot Ignore File
+# Prevents Copilot from indexing large directories that cause UI hangs
+
+# Build outputs
+**/build/
+**/dist/
+**/out/
+**/.svelte-kit/
+
+# Dependencies
+**/node_modules/
+
+# Large binary/model files
+**/*.wasm
+**/*.onnx
+**/*.bin
+**/*.safetensors
+**/*.pt
+**/*.pth
+**/*.h5
+**/*.pb
+
+# Archived/legacy code
+deeds_labs/
+**/corrupted-*/
+**/archived-*/
+**/backup-*/
+
+# Logs and cache
+logs/
+**/*.log
+**/.cache/
+**/.tmp/
+
+# Screenshots and media
+scripts/tests/screenshots/
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.gif
+**/*.mp4
+**/*.webm
+
+# ONNX models
+sveltekit-frontend/static/gemma3_270m_onnx/
+sveltekit-frontend/static/embeddinggemma_300m_onnx/
+sveltekit-frontend/static/ort/
+
+# Build artifacts
+**/_deps/
+**/.cmake/
+**/cmake-build-*/
+
+# Git
+**/.git/
+
+# VS Code
+**/.vscode/
+
+# Temporary files
+**/*.bak
+**/*.backup
+**/*.swp
+**/*.swo
+**/*~
