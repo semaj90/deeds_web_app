@@ -56,6 +56,13 @@ export async function POST({ request }: RequestEvent) {
 		const autoType = detectEvidenceType(file.type, file.name);
 		const evidenceType = (userType && userType !== 'UNKNOWN' ? userType : autoType);
 
+		// Validate caseId is a valid UUID (PostgreSQL uuid type required)
+		if (caseId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(caseId)) {
+			return json({
+				error: `Invalid caseId format. Expected UUID, got: "${caseId}". Use crypto.randomUUID() or a valid case ID.`
+			}, { status: 400 });
+		}
+
 		if (file.size > MAX_FILE_SIZE) {
 			return json({ error: `File too large. Maximum ${MAX_FILE_SIZE / 1024 / 1024}MB.` }, { status: 400 });
 		}
