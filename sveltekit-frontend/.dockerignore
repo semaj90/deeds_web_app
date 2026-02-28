@@ -24,3 +24,18 @@ __pycache__/
 # System
 .DS_Store
 Thumbs.db
+
+# Large static assets (exclude from build context)
+static/ort/*.wasm
+static/gemma3_270m_onnx/
+static/embeddinggemma_300m_onnx/
+scripts/tests/screenshots/
+
+# Test files
+*.test.*
+*.spec.*
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
