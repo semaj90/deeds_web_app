@@ -70,16 +70,22 @@ Instead of disabling SSR entirely (`export const ssr = false`), defer Dialog ren
 - Session 93r28g: Re-enabled SSR on evidence routes with browser guards
 - [SSR_CACHING_PARALLELISM_ARCHITECTURE.md Part 17](../../sveltekit-frontend/documentation/SSR_CACHING_PARALLELISM_ARCHITECTURE.md)
 
-## Still SSR-Disabled (11 routes)
+## Still SSR-Disabled (10 routes)
 
-Routes that still have `export const ssr = false`:
-- `/dashboard` — May be SSR-safe now after lucide migration?
-- `/terminal` — Browser-only AI components
-- `/global-search` — ScrollArea TDZ
-- `/indexing` — Browser-only indexing UI
-- `/ai-dashboard` — 28 browser-only AI components
-- 6 demo routes — Various browser-only features
+**Main app routes** (7):
+- `/ai-dashboard` — 28 browser-only AI/inference components (ONNX, WebGPU)
+- `/terminal` — Browser-only terminal emulator
+- `/ast-topology` — D3.js force simulation with DOM manipulation
+- `/codebase-index` — Uses `window.location.reload()` in module scope
+- `/gpu-evidence-graph` — Canvas 2D rendering with HTMLCanvasElement
+- `/nier-showcase` — Browser-only showcase
+- `/evidence-canvas-demo` — Canvas-based demo
 
-**Progress:** 3/14 routes migrated (21%), 11 remaining
+**Demo routes** (3):
+- `/demos/ace-pipeline` — Browser-only demo
+- `/demos/bits-ui` — bits-ui component showcase (Dialog/ScrollArea TDZ)
+- `/demos/cache` — Browser-only cache demo
 
-**Next migration targets:** dashboard (likely safe now), global-search (ScrollArea in search results)
+**Progress:** 3/13 routes migrated (23%), 10 remaining
+
+**Next migration candidate:** None obvious — remaining routes genuinely require browser APIs
