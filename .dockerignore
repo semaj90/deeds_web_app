@@ -25,6 +25,8 @@ dist/
 build/
 .vscode/
 .git/
+.venv*/
+venv/
 *.md
 docs/
 scripts/

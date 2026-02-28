@@ -1,5 +1,5 @@
 <script lang="ts">
-  type Theme = 'light' | 'dark' | 'system';
+  type Theme = 'light' | 'dark' | 'system' | 'yorha-bw';
   const THEME_KEY = 'theme';
   let theme: Theme = $state('system');
   function applyTheme(t: Theme) {
@@ -22,7 +22,7 @@
   $effect(() => {
     try {
       const stored = localStorage.getItem(THEME_KEY) as Theme | null
-      if (stored === 'light' || stored === 'dark' || stored === 'system') {
+      if (stored === 'light' || stored === 'dark' || stored === 'system' || stored === 'yorha-bw') {
         theme = stored}
     } catch {
       // ignore
@@ -46,7 +46,7 @@
     return});
 </script>
 
-<div class="theme-selector" role="group" aria-label="Theme, selector">
+<div class="theme-selector" role="group" aria-label="Theme selector">
   <button
     type="button"
     class="btn"
@@ -54,10 +54,10 @@
     onclick={() => setTheme('light')}
     title="Light theme"
   >
-    â˜€ï¸ Light
+    ☀️ Light
   </button>
   <button type="button" class="btn" aria-pressed={theme === 'dark'} onclick={() => setTheme('dark')} title="Dark theme">
-    ðŸŒ™ Dark
+    🌙 Dark
   </button>
   <button
     type="button"
@@ -66,7 +66,16 @@
     onclick={() => setTheme('system')}
     title="Use system preference"
   >
-    ðŸ–¥ï¸ System
+    🖥️ System
+  </button>
+  <button
+    type="button"
+    class="btn"
+    aria-pressed={theme === 'yorha-bw'}
+    onclick={() => setTheme('yorha-bw')}
+    title="YoRHa Black & White theme"
+  >
+    ⬛ YoRHa B/W
   </button>
 </div>
 
@@ -75,6 +84,7 @@
     display: inline-flex;
     gap: 0.5rem;
     align-items: center;
+    flex-wrap: wrap;
   }
   .btn {
     background: transparent;
@@ -90,7 +100,3 @@
     border-color: transparent;
   }
 </style>
-
-
-
-

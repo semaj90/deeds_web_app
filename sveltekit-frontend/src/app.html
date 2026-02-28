@@ -195,6 +195,58 @@
  --radius: 0.25rem;
  }
 
+ /* YoRHa Black & White Theme - Pure monochrome aesthetic */
+ [data-theme="yorha-bw"] {
+  /* YoRHa B/W Color Scheme - Stark contrast */
+  --yorha-primary: #ffffff;
+  --yorha-primary-dark: #cccccc;
+  --yorha-secondary: #ffffff;
+  --yorha-secondary-dark: #e0e0e0;
+  --yorha-accent: #ffffff;
+  --yorha-accent-dark: #e0e0e0;
+  --yorha-danger: #ffffff;
+  --yorha-danger-dark: #e0e0e0;
+
+  /* YoRHa B/W Background Colors - Pure blacks */
+  --yorha-bg-primary: #000000;
+  --yorha-bg-secondary: #0a0a0a;
+  --yorha-bg-tertiary: #141414;
+  --yorha-bg-overlay: rgba(0, 0, 0, 0.95);
+
+  /* YoRHa B/W Text Colors - Pure whites and grays */
+  --yorha-text-primary: #ffffff;
+  --yorha-text-secondary: #cccccc;
+  --yorha-text-muted: #999999;
+  --yorha-text-accent: #ffffff;
+
+  /* YoRHa Terminal Fonts - Same as default */
+  --yorha-font-primary: 'JetBrains Mono', 'Courier New', monospace;
+  --yorha-font-secondary: 'Orbitron', 'Arial', sans-serif;
+  --yorha-font-ui: 'Rajdhani', 'Arial', sans-serif;
+
+  /* Shadcn-compatible theme variables (B/W variant) */
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 4%;
+  --card-foreground: 0 0% 100%;
+  --popover: 0 0% 2%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 0 0% 100%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 0 0% 80%;
+  --secondary-foreground: 0 0% 0%;
+  --muted: 0 0% 8%;
+  --muted-foreground: 0 0% 60%;
+  --accent: 0 0% 100%;
+  --accent-foreground: 0 0% 0%;
+  --destructive: 0 0% 100%;
+  --destructive-foreground: 0 0% 0%;
+  --border: 0 0% 60%;
+  --input: 0 0% 8%;
+  --ring: 0 0% 100%;
+  --radius: 0.25rem;
+ }
+
  * {
  border-color: hsl(var(--border));
  }
@@ -467,6 +519,29 @@
  -webkit-font-kerning: auto;
  font-kerning: auto;
  }
+ }
+
+ /* YoRHa B/W Theme - Override grid background to white */
+ [data-theme="yorha-bw"] body::before {
+  background-image:
+   linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+   linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+ }
+
+ /* YoRHa B/W Theme - Override scrollbar to monochrome */
+ [data-theme="yorha-bw"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #ffffff 0%, #cccccc 100%);
+  border: 1px solid #999999;
+ }
+
+ [data-theme="yorha-bw"] ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ffffff 0%, #e0e0e0 100%);
+ }
+
+ /* YoRHa B/W Theme - Override heading text-shadow to white */
+ [data-theme="yorha-bw"] h1 {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  border-bottom: 2px solid #ffffff;
  }
  </style>
 

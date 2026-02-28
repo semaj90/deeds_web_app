@@ -75,6 +75,20 @@ Savings: 2GB (21% reduction)
 
 ---
 
+## Docker Build Context
+
+**Current configuration**: ONNX models (~718MB) are **INCLUDED** in Docker build for full client-side inference support.
+
+| Component | Size | Included? | Reason |
+|-----------|------|-----------|--------|
+| ONNX WASM Runtime | ~60MB | ✅ Yes | Required for browser inference |
+| gemma3_270m model | ~418MB | ✅ Yes | Client-side LLM inference |
+| embeddinggemma_300m | ~300MB | ✅ Yes | Client-side embeddings |
+| Screenshots/tests | ~50MB | ❌ No | Not needed in production |
+
+**Build context size**: ~1.2GB (including models)
+**Alternative**: Serve models from CDN (reduces Docker image by ~778MB)
+
 ## Files Overview
 
 | File | Purpose |

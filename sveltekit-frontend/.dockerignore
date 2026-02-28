@@ -26,9 +26,8 @@ __pycache__/
 Thumbs.db
 
 # Large static assets (exclude from build context)
-static/ort/*.wasm
-static/gemma3_270m_onnx/
-static/embeddinggemma_300m_onnx/
+# NOTE: ONNX models are INCLUDED in build for client-side inference support
+# TODO: Move to CDN (S3/CloudFront) in production to reduce image size
 scripts/tests/screenshots/
 
 # Test files
