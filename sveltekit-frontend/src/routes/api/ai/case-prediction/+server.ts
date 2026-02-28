@@ -41,7 +41,8 @@ Provide: 1) Likelihood of favorable outcome (0-100%), 2) Key risk factors, 3) Re
 				],
 				stream: false,
 				options: { temperature: 0.3 }
-			})
+			}),
+			signal: AbortSignal.timeout(30_000)
 		});
 
 		if (!res.ok) return json({ error: 'AI service unavailable' }, { status: 502 });

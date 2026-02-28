@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import type { PageData } from './$types';
 	import EvidenceAnalysisDashboard from '$lib/components/dashboard/EvidenceAnalysisDashboard.svelte';
 	import PoliceReportGenerator from '$lib/components/yorha/PoliceReportGenerator.svelte';
@@ -184,7 +185,7 @@
 	</div>
 {/if}
 
-{#if showEvidenceModal}
+{#if browser && showEvidenceModal}
 	<EvidenceModal item={selectedEvidence} bind:open={showEvidenceModal} onSave={(updated) => { selectedEvidence = updated; showEvidenceModal = false; }} />
 {/if}
 

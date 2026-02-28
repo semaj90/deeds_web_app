@@ -30,7 +30,11 @@ async function run(): Promise<void> {
             backend: res.backend
         };
 
-        parentPort?.postMessage({ ok: true, result: out });
+        const msg = { ok: true, result: out };
+        const transferList = out.embedding instanceof Float32Array
+            ? [out.embedding.buffer]
+            : [];
+        parentPort?.postMessage(msg, transferList as any);
     } catch (e: unknown) {
         const errorMessage = e instanceof Error ? e.message : String(e);
         parentPort?.postMessage({ ok: false, error: errorMessage });

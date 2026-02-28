@@ -31,7 +31,7 @@
 	let errorMessage = $state('');
 
 	// Client-side embedding state
-	let clientEmbedding = $state<number[]>([]);
+	let clientEmbedding = $state<Float32Array | number[]>([]);  // Float32Array from client, number[] from server
 	let embeddingSource = $state<'client-onnx' | 'server-ollama' | 'cache' | ''>('');
 	let embeddingTimeMs = $state(0);
 	let onnxProvider = $state(''); // 'webgpu' | 'wasm' | 'cpu'
@@ -452,7 +452,7 @@
 							[{clientEmbedding.slice(0, 5).map(v => v.toFixed(4)).join(', ')}, ...]
 						</span>
 						<span class="embed-norm">
-							L2={Math.sqrt(clientEmbedding.reduce((s, v) => s + v * v, 0)).toFixed(3)}
+							L2={Math.sqrt(Array.from(clientEmbedding).reduce((s, v) => s + v * v, 0)).toFixed(3)}
 						</span>
 					</div>
 				</div>

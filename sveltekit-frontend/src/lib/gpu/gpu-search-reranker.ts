@@ -75,7 +75,7 @@ export async function gpuRerank(
 		// 2. Embed top-N chunks (limited to avoid long waits)
 		const chunkStart = performance.now();
 		const toProcess = chunks.slice(0, maxChunks);
-		const embeddings: (number[] | null)[] = [];
+		const embeddings: (Float32Array | null)[] = [];  // Float32Array for zero-copy transfer
 		let chunksSkipped = 0;
 
 		for (const chunk of toProcess) {

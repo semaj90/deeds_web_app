@@ -12,6 +12,7 @@ import { productionLogger } from '$lib/server/production-logger.js';
 import { apiResponses } from '$lib/server/api/response-helper.js';
 import { chatRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 import { computeTFIDF } from '$lib/server/retrieval/tfidf-scorer.js';
+import { getVectorCache, setVectorCache, getEmbeddingCache, setEmbeddingCache } from '$lib/server/vector-cache.js';
 
 const QDRANT_URL = getQdrantUrl();
 const OLLAMA_URL = getOllamaUrl();
@@ -124,26 +125,48 @@ export const POST: RequestHandler = async ({ request }) => {
 			return apiResponses.badRequest('query is required');
 		}
 
-		// 1. Generate embedding via Ollama
+		// 0. Check vector result cache (Memory → Redis) for identical query+options
+		const cacheOptions = { limit: top_k, threshold: min_score, documentType: caseId };
+		const { entry: cachedResult } = await getVectorCache(query, cacheOptions);
+		if (cachedResult) {
+			const cached = cachedResult.results[0] as Record<string, unknown>;
+			return json({
+				...cached,
+				cache: { hit: true, source: 'vector-cache', age_ms: Date.now() - cachedResult.ts }
+			});
+		}
+
+		// 1. Generate embedding via Ollama (check embedding cache first)
 		const embedStart = performance.now();
-		const embedResp = await fetch(`${OLLAMA_URL}/api/embeddings`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: query }),
-			signal: AbortSignal.timeout(10000)
-		});
+		let embedding: number[];
 
-		if (!embedResp.ok) {
-			return apiResponses.badGateway('Embedding generation failed');
+		const { entry: cachedEmbed } = await getEmbeddingCache(query, 'embeddinggemma:latest');
+		if (cachedEmbed) {
+			embedding = cachedEmbed.embedding;
+		} else {
+			const embedResp = await fetch(`${OLLAMA_URL}/api/embed`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ model: 'embeddinggemma:latest', input: [query] }),
+				signal: AbortSignal.timeout(10000)
+			});
+
+			if (!embedResp.ok) {
+				return apiResponses.badGateway('Embedding generation failed');
+			}
+
+			const embedData = await embedResp.json();
+			embedding = embedData.embeddings?.[0] ?? embedData.embedding;
+
+			if (!embedding || !Array.isArray(embedding)) {
+				return apiResponses.badGateway('Invalid embedding response');
+			}
+
+			// Cache the embedding (fire-and-forget)
+			setEmbeddingCache(query, embedding, 'embeddinggemma:latest').catch(() => {});
 		}
 
-		const embedData = await embedResp.json();
-		const embedding = embedData.embedding;
 		const embeddingTime = performance.now() - embedStart;
-
-		if (!embedding || !Array.isArray(embedding)) {
-			return apiResponses.badGateway('Invalid embedding response');
-		}
 
 		// 2. Search across Qdrant collections
 		const collections = ['fastmcp_file_profiles', 'phase90_error_cards', 'legal_documents'];
@@ -263,6 +286,14 @@ export const POST: RequestHandler = async ({ request }) => {
 			ace: aceMetadata ?? undefined,
 			timestamp: new Date().toISOString()
 		};
+
+		// Cache the full response (fire-and-forget, 30min TTL via vector-cache config)
+		setVectorCache(query, [response], {
+			searchTime: response.search_time_ms,
+			totalResults: response.total_found,
+			model: 'embeddinggemma:latest',
+			distanceMetric: 'cosine'
+		}, cacheOptions).catch(() => {});
 
 		return json(response);
 	} catch (err) {

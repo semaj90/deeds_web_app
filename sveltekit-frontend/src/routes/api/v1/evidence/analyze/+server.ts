@@ -36,7 +36,8 @@ ${textToAnalyze.slice(0, 2000)}`;
 				],
 				stream: false,
 				options: { temperature: 0.2 }
-			})
+			}),
+			signal: AbortSignal.timeout(30_000)
 		});
 
 		if (!res.ok) {

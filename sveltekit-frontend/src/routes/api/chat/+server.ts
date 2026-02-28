@@ -31,7 +31,8 @@ export const POST: RequestHandler = async ({ request }) => {
 				],
 				stream: false,
 				options: { temperature: body.temperature ?? 0.7 }
-			})
+			}),
+			signal: AbortSignal.timeout(30_000)
 		});
 
 		if (!res.ok) {

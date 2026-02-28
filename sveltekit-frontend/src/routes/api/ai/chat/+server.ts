@@ -32,7 +32,8 @@ export const POST: RequestHandler = async ({ request }) => {
 				],
 				stream: false,
 				options: { temperature }
-			})
+			}),
+			signal: AbortSignal.timeout(30_000)
 		});
 
 		if (!res.ok) {

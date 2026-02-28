@@ -31,7 +31,8 @@ Provide structured, actionable responses.`
 				],
 				stream: false,
 				options: { temperature: 0.5 }
-			})
+			}),
+			signal: AbortSignal.timeout(30_000)
 		});
 
 		if (!res.ok) {

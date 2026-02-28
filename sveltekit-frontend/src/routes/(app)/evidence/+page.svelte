@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { applyAction, enhance } from '$app/forms';
 	import type { ActionData, PageData } from './$types';
 	import SmartDocumentForm from '$lib/components/forms/SmartDocumentForm.svelte';
@@ -957,6 +958,7 @@
 	onClose={() => (showDocumentDetails = false)}
 />
 
+{#if browser}
 <DocumentDetailModal
 	open={showDetailModal}
 	document={selectedDocument}
@@ -985,6 +987,7 @@
 		}
 	}}
 />
+{/if}
 
 <ContradictionReveal
 	message={contradictionMessage || 'CONTRADICTION DETECTED IN EVIDENCE!'}
@@ -992,12 +995,14 @@
 	onhide={() => (showContradiction = false)}
 />
 
+{#if browser}
 <LegalAnalysisDialog
 	bind:open={showLegalAnalysis}
 	evidenceId={legalAnalysisEvidenceId}
 	title={legalAnalysisTitle}
 	onClose={() => { showLegalAnalysis = false; }}
 />
+{/if}
 
 <EvidenceComparisonOverlay
 	evidenceA={comparisonA}

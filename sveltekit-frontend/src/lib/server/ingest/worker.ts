@@ -63,7 +63,16 @@ parentPort.on('message', async (jobData: WorkerJobData) => {
             processingTime: Date.now() - startTime,
             workerId
         };
-        parentPort!.postMessage(response);
+        // Transfer ArrayBuffers if result contains typed arrays (zero-copy)
+        const transferList: ArrayBuffer[] = [];
+        if (result && typeof result === 'object') {
+            for (const val of Object.values(result)) {
+                if (val instanceof Uint8Array || val instanceof Float32Array) {
+                    transferList.push(val.buffer);
+                }
+            }
+        }
+        parentPort!.postMessage(response, transferList);
     } catch (error) {
         const response: WorkerJobResult = {
             success: false,

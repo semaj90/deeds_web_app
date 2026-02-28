@@ -52,17 +52,17 @@ async function ensureTokenizer(): Promise<any> {
  *   5. Cache result in IndexedDB (7-day TTL)
  *
  * @param text - Input text to embed
- * @returns Float32 vector of length 768
+ * @returns Float32Array vector of length 768 (for zero-copy transfer)
  */
-export async function embedText(text: string): Promise<number[]> {
+export async function embedText(text: string): Promise<Float32Array> {
 	if (typeof window === 'undefined') {
 		throw new Error('embedText() is browser-only');
 	}
 
-	// 1. Check cache
+	// 1. Check cache (convert number[] to Float32Array if needed)
 	const cached = await clientCache.getEmbedding(text);
 	if (cached && cached.length === CLIENT_EMBEDDING_DIMS) {
-		return cached;
+		return cached instanceof Float32Array ? cached : new Float32Array(cached);
 	}
 
 	// 2. Load model + tokenizer
@@ -151,21 +151,20 @@ export async function embedText(text: string): Promise<number[]> {
 		}
 	}
 
-	const vector = Array.from(pooled);
-
-	// 9. Validate dimensions
-	if (vector.length !== CLIENT_EMBEDDING_DIMS) {
-		console.error(`[ClientEmbed] Expected ${CLIENT_EMBEDDING_DIMS} dims, got ${vector.length}`);
+	// 9. Validate dimensions (use pooled Float32Array directly, not Array.from)
+	if (pooled.length !== CLIENT_EMBEDDING_DIMS) {
+		console.error(`[ClientEmbed] Expected ${CLIENT_EMBEDDING_DIMS} dims, got ${pooled.length}`);
 	}
 
-	// 10. Cache in IndexedDB
-	await clientCache.putEmbedding(text, vector);
+	// 10. Cache in IndexedDB (convert to number[] for storage)
+	await clientCache.putEmbedding(text, Array.from(pooled));
 
 	console.info(
-		`[ClientEmbed] Generated ${dims}-dim embedding via ${getProviderLabel(CLIENT_EMBEDDING_ONNX_PATH)}`
+		`[ClientEmbed] Generated ${dims}-dim embedding via ${getProviderLabel(CLIENT_EMBEDDING_ONNX_PATH)} (Float32Array for zero-copy transfer)`
 	);
 
-	return vector;
+	// Return Float32Array directly for transferable ArrayBuffer support
+	return pooled;
 }
 
 /** Check if the embedding model is loaded and ready */

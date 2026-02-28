@@ -84,13 +84,19 @@ self.onmessage = async (ev: MessageEvent<WorkerMessage>) => {
                 const result = await worker.initialize(msg.config);
                 self.postMessage({ type: 'INITIALIZED', id: msg.id, data: result });
                 break;
-            case 'PROCESS_TENSOR':
+            case 'PROCESS_TENSOR': {
                 const out = await worker.processGPUTensor(msg.data as MultiDimArray);
-                self.postMessage({ type: 'SUCCESS', id: msg.id, data: out });
+                const transferables = out.data instanceof Float32Array ? [out.data.buffer] : [];
+                self.postMessage({ type: 'SUCCESS', id: msg.id, data: out }, transferables as any);
                 break;
-            case 'PROCESS_BATCH':
+            }
+            case 'PROCESS_BATCH': {
                 const results = await worker.processBatch(msg.data as MultiDimArray[]);
-                self.postMessage({ type: 'SUCCESS', id: msg.id, data: results });
+                const batchTransferables = results
+                    .filter(r => r.data instanceof Float32Array)
+                    .map(r => (r.data as Float32Array).buffer);
+                self.postMessage({ type: 'SUCCESS', id: msg.id, data: results }, batchTransferables as any);
+            }
                 break;
             case 'GET_STATS': self.postMessage({
 	type: 'STATS', id: msg.id, data: worker.getStats() });

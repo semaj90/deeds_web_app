@@ -2,10 +2,12 @@ import { citations, statutes, db } from '$lib/server/db/client';
 import { error, json } from '@sveltejs/kit';
 import { eq, desc } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { getFromMemoryCache, setCache } from '$lib/server/cache.js';
 
 /**
  * GET /api/citations
- * Fetch citations with optional case filter
+ * Fetch citations with optional case filter.
+ * Uses Memory+Redis dual-tier cache (5min TTL) to avoid repeated DB queries.
  */
 export const GET: RequestHandler = async ({ locals, url }) => {
 	if (!locals.user) {
@@ -15,12 +17,22 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	const caseId = url.searchParams.get('case_id');
 	const limit = Number(url.searchParams.get('limit')) || 50;
 
+	// Check cache first (Memory → Redis, keyed by caseId+limit)
+	const cacheKey = `citations:${caseId ?? 'all'}:${limit}`;
+	const cached = getFromMemoryCache(cacheKey);
+	if (cached) {
+		return json({ success: true, citations: cached, cache: true });
+	}
+
 	try {
 		const query = db.select().from(citations).orderBy(desc(citations.createdAt)).limit(limit);
 
 		const results = caseId
 			? await query.where(eq(citations.caseId, caseId))
 			: await query;
+
+		// Cache results (5min TTL)
+		setCache(cacheKey, results, 300_000);
 
 		return json({ success: true, citations: results });
 	} catch (err) {
@@ -73,6 +85,10 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 				createdBy: null, // TODO: map locals.user.id (uuid) to integer FK
 			})
 			.returning();
+
+		// Invalidate citation cache (new data available)
+		setCache(`citations:${body.case_id ?? 'all'}:50`, null, 0);
+		setCache('citations:all:50', null, 0);
 
 		return json(
 			{

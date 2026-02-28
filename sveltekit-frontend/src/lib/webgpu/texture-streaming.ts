@@ -180,13 +180,14 @@ export class WebGPUTextureStreamer {
                 try {
                     // Simple RLE compression for NES-style textures
                     const compressed = compressTexture(textureData, legalContext);
-                    self.postMessage({
+                    const msg = {
                         success: true,
                         compressedData: compressed.data,
                         originalSize: textureData.byteLength,
                         compressedSize: compressed.data.byteLength,
                         compressionRatio: textureData.byteLength / compressed.data.byteLength
-                    });
+                    };
+                    self.postMessage(msg, [compressed.data.buffer]);
                 } catch (error) {
                     self.postMessage({ success: false, error: error.message });
                 }
