@@ -1,19 +1,187 @@
 {
-  "timestamp": "2026-02-28T02-06-08",
+  "timestamp": "2026-02-28T19-00-54",
   "base": "http://localhost:5173",
   "results": [
     {
-      "name": "C:-Program Files-Git-evidence",
-      "url": "http://localhost:5173C:/Program Files/Git/evidence",
-      "status": 0,
-      "ok": false,
-      "error": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL",
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T02-06-08\\C:-Program Files-Git-evidence-ERROR.png"
+      "name": "evidence",
+      "url": "http://localhost:5173/evidence",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\evidence.png"
+    },
+    {
+      "name": "persons-of-interest",
+      "url": "http://localhost:5173/persons-of-interest/fake-id",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\persons-of-interest.png"
+    },
+    {
+      "name": "cases-overview",
+      "url": "http://localhost:5173/cases/test-id/overview",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\cases-overview.png"
+    },
+    {
+      "name": "agentic-errors-analysis",
+      "url": "http://localhost:5173/agentic-errors/analysis",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\agentic-errors-analysis.png"
+    },
+    {
+      "name": "cases-list",
+      "url": "http://localhost:5173/cases",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\cases-list.png"
+    },
+    {
+      "name": "dashboard",
+      "url": "http://localhost:5173/dashboard",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\dashboard.png"
+    },
+    {
+      "name": "citations",
+      "url": "http://localhost:5173/citations",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\citations.png"
+    },
+    {
+      "name": "evidence-upload",
+      "url": "http://localhost:5173/cases/test-id/evidence/upload",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\evidence-upload.png"
+    },
+    {
+      "name": "active-cases",
+      "url": "http://localhost:5173/active-cases",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\active-cases.png"
+    },
+    {
+      "name": "ai-dashboard",
+      "url": "http://localhost:5173/ai-dashboard",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\ai-dashboard.png"
+    },
+    {
+      "name": "all-routes",
+      "url": "http://localhost:5173/all-routes",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\all-routes.png"
+    },
+    {
+      "name": "analysis-center",
+      "url": "http://localhost:5173/analysis-center",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\analysis-center.png"
+    },
+    {
+      "name": "command-center",
+      "url": "http://localhost:5173/command-center",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\command-center.png"
+    },
+    {
+      "name": "error-brain",
+      "url": "http://localhost:5173/error-brain",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\error-brain.png"
+    },
+    {
+      "name": "evidence-library",
+      "url": "http://localhost:5173/evidence-library",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\evidence-library.png"
+    },
+    {
+      "name": "global-search",
+      "url": "http://localhost:5173/global-search",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\global-search.png"
+    },
+    {
+      "name": "admin-dev-tools",
+      "url": "http://localhost:5173/admin/dev-tools",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\admin-dev-tools.png"
+    },
+    {
+      "name": "admin-knowledge-search",
+      "url": "http://localhost:5173/admin/knowledge-search",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\admin-knowledge-search.png"
+    },
+    {
+      "name": "admin-codebase-viewer",
+      "url": "http://localhost:5173/admin/codebase-viewer",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\admin-codebase-viewer.png"
+    },
+    {
+      "name": "system-configuration",
+      "url": "http://localhost:5173/system-configuration",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\system-configuration.png"
+    },
+    {
+      "name": "terminal",
+      "url": "http://localhost:5173/terminal",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\terminal.png"
+    },
+    {
+      "name": "phase78",
+      "url": "http://localhost:5173/phase78/monitor",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-02-28T19-00-54\\phase78.png"
     }
   ],
   "summary": {
-    "passed": 0,
-    "failed": 1,
-    "total": 1
+    "passed": 22,
+    "failed": 0,
+    "total": 22
   }
 }

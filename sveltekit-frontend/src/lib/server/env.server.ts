@@ -11,8 +11,8 @@ const DEV = {
 	PUBLIC_API_URL: 'http://localhost:5173',
 	MINIO_ENDPOINT: 'localhost',
 	MINIO_PORT: '9000',
-	MINIO_ACCESS_KEY: 'minio',
-	MINIO_SECRET_KEY: 'minio123',
+	MINIO_ACCESS_KEY: 'admin',
+	MINIO_SECRET_KEY: 'password',
 	MINIO_USE_SSL: 'false',
 	MINIO_EVIDENCE_BUCKET: 'legal-evidence',
 };
