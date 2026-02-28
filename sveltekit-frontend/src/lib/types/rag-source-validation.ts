@@ -51,6 +51,10 @@ export interface RetrieveCandidatesRequest {
   use_rerank?: boolean;
   scoring_method?: string;
   include_neighbors?: boolean;
+  userId?: string;
+  caseId?: string;
+  conversationId?: string;
+  enableACE?: boolean;
 }
 
 export interface RetrievedChunk {
@@ -99,6 +103,7 @@ export interface RetrieveCandidatesResponse {
 	embedding_model: string;
   rerank_model?: string;
   scoring_method?: string;
+  ace?: Record<string, unknown>;
 	timestamp: string;
 }
 

@@ -9,6 +9,7 @@
 	import LazyLoader from '$lib/components/LazyLoader.svelte';
 	import EvidenceStats from '$lib/components/yorha/evidence/EvidenceStats.svelte';
 	import RagDocumentGrid from '$lib/components/rag/RagDocumentGrid.svelte';
+	import { createViewTracker } from '$lib/utils/tracking';
 
 	let { data }: { data: PageData } = $props();
 	let showReportGenerator = $state(false);
@@ -25,6 +26,21 @@
 	let showTimeline = $state(false);
 	let showEvidenceModal = $state(false);
 	let selectedEvidence = $state<any>({ jsonData: { title: '', description: '', tags: [] } });
+	let viewTracker = $state<ReturnType<typeof createViewTracker> | null>(null);
+
+	// Track evidence views with auto-duration
+	$effect(() => {
+		if (showEvidenceModal && selectedEvidence?.id) {
+			viewTracker = createViewTracker(
+				selectedEvidence.id,
+				data.caseId,
+				'evidence-library'
+			);
+		} else if (!showEvidenceModal && viewTracker) {
+			viewTracker.complete();
+			viewTracker = null;
+		}
+	});
 
 	const sampleCustodyEvents = [
 		{ eventType: 'intake', userId: 'officer-1', timestamp: new Date(Date.now() - 86400000 * 3).toISOString(), details: { hashMatch: true, originalHash: 'a1b2c3d4e5f6' } },

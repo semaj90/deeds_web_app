@@ -113,7 +113,11 @@ export const POST: RequestHandler = async ({ request }) => {
 			min_score = 0.3,
 			use_hybrid = false,
 			use_rerank = false,
-			scoring_method = "hybrid"
+			scoring_method = "hybrid",
+			userId,
+			caseId,
+			conversationId,
+			enableACE = false
 		} = body;
 
 		if (!query?.trim()) {
@@ -213,6 +217,34 @@ export const POST: RequestHandler = async ({ request }) => {
 			else if (scoring_method === "hybrid") { chunk.score = 0.7 * vs + 0.3 * ts; }
 			chunk.confidence = toConfidence(chunk.score);
 		}
+		// ACE context enrichment (opt-in: boosts chunks matching legal entities)
+		let aceMetadata: Record<string, unknown> | null = null;
+		if (enableACE && query) {
+			try {
+				const { assembleACEContext } = await import('$lib/server/ace/context-assembler.js');
+				const aceContext = await assembleACEContext({
+					query,
+					userId: userId || undefined,
+					caseId: caseId || undefined,
+					conversationId: conversationId || undefined
+				});
+				const aceEntityTags = [
+					...(aceContext.entities?.statutes ?? []),
+					...(aceContext.entities?.cases ?? []),
+					...(aceContext.entities?.persons ?? [])
+				].map((e: string) => e.toLowerCase());
+				if (aceEntityTags.length > 0) {
+					applyTagBoost(allChunks, aceEntityTags, 1.10, 1.3);
+				}
+				aceMetadata = {
+					entityCount: aceEntityTags.length,
+					kagNeighborCount: aceContext.kagNeighbors?.length ?? 0
+				};
+			} catch (err) {
+				console.warn('[rag/search] ACE enrichment failed (non-fatal):', err);
+			}
+		}
+
 		allChunks.sort((a, b) => b.score - a.score);
 		const topChunks = allChunks.slice(0, top_k);
 
@@ -228,6 +260,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			embedding_model: 'embeddinggemma:latest',
 			rerank_model: use_rerank ? 'none' : undefined,
 			scoring_method: scoring_method,
+			ace: aceMetadata ?? undefined,
 			timestamp: new Date().toISOString()
 		};
 

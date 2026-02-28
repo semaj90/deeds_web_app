@@ -57,6 +57,9 @@ export async function assembleACEContext(opts: {
 		opts.enableWebSearch ? webSearch(query, 3).catch(() => null) : Promise.resolve(null)
 	]);
 
+	// Fetch evidence metadata separately (avoids hoisting issues)
+	const evidenceMetadata = caseId ? await fetchEvidenceMetadataForCase(caseId) : null;
+
 	// Determine practice area from case or user profile
 	const practiceArea = extractPracticeArea(caseContext, userProfile);
 	const practiceTemplate = selectPracticeTemplate(practiceArea);
@@ -78,7 +81,8 @@ export async function assembleACEContext(opts: {
 		practiceTemplate,
 		queryTags,
 		webSearchContext: webResults ? formatWebResultsAsContext(webResults) : null,
-		persona: opts.persona ?? 'neutral'
+		persona: opts.persona ?? 'neutral',
+		evidenceMetadata
 	};
 }
 
@@ -159,7 +163,25 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
 		confidenceFactors.entities = 0.85;
 	}
 
-	// 9. Web search results (if available)
+	// 9. Evidence metadata (types, forensics, entities)
+	if (context.evidenceMetadata && context.evidenceMetadata.length > 0) {
+		const evidenceLines = context.evidenceMetadata
+			.slice(0, 10)
+			.map((e) => {
+				const type = e.evidenceType?.toUpperCase() || 'UNKNOWN';
+				const flags = e.forensicFlags?.length
+					? e.forensicFlags.some(f => f.severity === 'high') ? 'Forensic: HIGH' : `Forensic: ${e.forensicFlags.length} flags`
+					: 'No forensic flags';
+				const entityCount = e.entities?.length || 0;
+				const summary = e.summary ? truncate(e.summary, 80) : '';
+				return `- [${type}] "${truncate(e.title, 50)}" (${e.fileType || 'unknown'}) | Entities: ${entityCount} | ${flags}${summary ? '\n  ' + summary : ''}`;
+			})
+			.join('\n');
+		lines.push(`\n## Evidence on File (${context.evidenceMetadata.length} items)\n${evidenceLines}`);
+		confidenceFactors.evidenceMetadata = 0.9;
+	}
+
+	// 10. Web search results (if available)
 	if (context.webSearchContext) {
 		lines.push(`\n${context.webSearchContext}`);
 		confidenceFactors.webSearch = 0.6;
@@ -337,6 +359,33 @@ async function fetchChatHistory(
 			}));
 	} catch {
 		return [];
+	}
+}
+
+async function fetchEvidenceMetadataForCase(
+	caseId: string
+): Promise<ACEContext['evidenceMetadata']> {
+	try {
+		const db = (await import('$lib/server/db')).default;
+		const rows = await db.execute(
+			sql`SELECT id, title, evidence_type, file_type, metadata
+				FROM evidence WHERE case_id = ${caseId}
+				ORDER BY created_at DESC LIMIT 10`
+		);
+		return [...rows].map((r: any) => {
+			const meta = (typeof r.metadata === 'string' ? JSON.parse(r.metadata) : r.metadata) || {};
+			return {
+				id: String(r.id ?? ''),
+				title: String(r.title ?? ''),
+				evidenceType: String(r.evidence_type ?? 'document'),
+				fileType: String(r.file_type ?? ''),
+				forensicFlags: Array.isArray(meta.forensicFlags) ? meta.forensicFlags : [],
+				entities: Array.isArray(meta.entities) ? meta.entities.slice(0, 20) : [],
+				summary: meta.summary ? String(meta.summary).slice(0, 200) : undefined,
+			};
+		});
+	} catch {
+		return null;
 	}
 }
 

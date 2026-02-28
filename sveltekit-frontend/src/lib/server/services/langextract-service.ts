@@ -295,6 +295,63 @@ Do NOT use section types outside this list.
 Return JSON with sections array using ONLY allowed section_type values.`;
 }
 
+export interface EvidenceProfile {
+	evidence_type_classification: string;
+	key_entities: Array<{ text: string; label: string; confidence: number }>;
+	legal_relevance: string;
+	admissibility_indicators: string[];
+	suggested_tags: string[];
+}
+
+/**
+ * Extract a structured evidence profile via LangExtract schema validation.
+ * Returns null if LangExtract is unavailable (non-fatal).
+ */
+export async function extractEvidenceProfile(
+	text: string,
+	evidenceType: string
+): Promise<EvidenceProfile | null> {
+	try {
+		const baseUrl = await resolveLangExtractBaseUrl();
+		const response = await fetch(`${baseUrl}/extract`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				text: text.slice(0, 15_000),
+				doc_id: `evidence-profile-${Date.now()}`,
+				prompt: getEvidenceProfilePrompt(evidenceType),
+				extract_metadata: true,
+			}),
+			signal: AbortSignal.timeout(15_000),
+		});
+
+		if (!response.ok) return null;
+
+		const raw = await response.json() as any;
+		return {
+			evidence_type_classification: raw.evidence_type_classification ?? evidenceType,
+			key_entities: Array.isArray(raw.key_entities) ? raw.key_entities : [],
+			legal_relevance: raw.legal_relevance ?? '',
+			admissibility_indicators: Array.isArray(raw.admissibility_indicators) ? raw.admissibility_indicators : [],
+			suggested_tags: Array.isArray(raw.suggested_tags) ? raw.suggested_tags : [],
+		};
+	} catch {
+		return null;
+	}
+}
+
+function getEvidenceProfilePrompt(evidenceType: string): string {
+	return `You are a legal evidence analyzer. Given a ${evidenceType} evidence document, extract:
+
+- evidence_type_classification: one of (document, photo, video, audio, physical, digital, witness_statement, forensic, documentary, testimonial, demonstrative, real, circumstantial, hearsay, expert, scientific)
+- key_entities: array of {text, label, confidence} where label is PERSON/ORG/DATE/STATUTE/CASE/MONEY/LOCATION
+- legal_relevance: brief statement of why this evidence matters legally
+- admissibility_indicators: array of strings (e.g. "chain of custody documented", "hearsay exception applies")
+- suggested_tags: array of tag strings for categorization
+
+Return JSON: { "evidence_type_classification": "...", "key_entities": [...], "legal_relevance": "...", "admissibility_indicators": [...], "suggested_tags": [...] }`;
+}
+
 export async function extractSectionsBatch(
 	documents: Array<{ id: string; text: string; type?: 'statute' | 'case' }>,
 	concurrency = 3

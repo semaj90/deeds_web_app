@@ -22,6 +22,7 @@ import ContractAnalyzer from '$lib/components/legal/ContractAnalyzer.svelte';
 import LegalDocumentEditor from '$lib/components/editor/LegalDocumentEditor.svelte';
 import CanvasEditor from '$lib/components/CanvasEditor.svelte';
 import HeadlessTypingListener from '$lib/components/HeadlessTypingListener.svelte';
+import RecommendationWidget from '$lib/components/recommendations/RecommendationWidget.svelte';
 import SummaryEditor from '$lib/components/case/SummaryEditor.svelte';
 import ReportToolbar from '$lib/components/editor/ReportToolbar.svelte';
 import NierRichTextEditor from '$lib/components/editors/NierRichTextEditor.svelte';
@@ -68,6 +69,8 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  let showDocumentWriter = $state(false);
  let showYoRHaDetails = $state(false);
  let typingPrompts = $state<string[]>([]);
+ let showIdleRecommendations = $state(false);
+ let idleRecommendationQuery = $state('');
 
  // Case Intelligence Hub state
  let ragResults = $state<any[]>([]);
@@ -521,6 +524,14 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
      enableContextualPrompts={true}
      enableAnalytics={true}
      oncontextualPrompt={(e) => { typingPrompts = e.detail.prompts; }}
+     onstateChange={(e) => {
+       if (e.detail.state === 'waiting_user' && caseDescription.length > 30) {
+         showIdleRecommendations = true;
+         idleRecommendationQuery = caseDescription.slice(0, 200);
+       } else if (e.detail.state === 'typing') {
+         showIdleRecommendations = false;
+       }
+     }}
    />
    {#if typingPrompts.length > 0}
      <div class="mt-2 flex flex-wrap gap-2">
@@ -532,6 +543,11 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
            {prompt}
          </button>
        {/each}
+     </div>
+   {/if}
+   {#if showIdleRecommendations && idleRecommendationQuery}
+     <div class="mt-3">
+       <RecommendationWidget query={idleRecommendationQuery} caseId={caseId} limit={3} compact={true} />
      </div>
    {/if}
  {/if}

@@ -72,6 +72,7 @@
   }
 
   $effect(() => {
+    if (!canvas) return;
     ctx = canvas.getContext('2d')!;
     resizeCanvas();
     drawConnections();

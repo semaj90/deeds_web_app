@@ -515,8 +515,4 @@ export class RabbitMQManager extends EventEmitter {
 // Singleton
 export const rabbitmq = new RabbitMQManager();
 
-if (typeof window === 'undefined') {
-    // Auto-init only in server
-    // rabbitmq.initialize().catch(console.error);
-}
 

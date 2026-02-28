@@ -2,8 +2,13 @@
 <script lang="ts">
   import Button from '$lib/components/ui/Button.svelte';
   import { Dialog } from "bits-ui";
+  import RecommendationWidget from '$lib/components/recommendations/RecommendationWidget.svelte';
+  import { createViewTracker } from '$lib/utils/tracking';
+  import CitationHighlighter from '$lib/components/legal-ai/CitationHighlighter.svelte';
+
   // Props interface
   interface EvidenceItem {
+    id?: string;
     jsonData: {
       title: string;
       description: string;
@@ -16,10 +21,11 @@
   interface Props {
     item: EvidenceItem;
     open?: boolean;
+    caseId?: string;
     onSave?: (data: EvidenceItem) => void;
   }
 
-  let { item, open = $bindable(false), onSave }: Props = $props();
+  let { item, open = $bindable(false), caseId = undefined, onSave }: Props = $props();
 
   // State
   let isEditing = $state(false);
@@ -27,6 +33,17 @@
   let description = $state('');
   let tagsString = $state('');
   let type = $state('');
+  let viewTracker: ReturnType<typeof createViewTracker> | null = null;
+
+  // Citation highlighting
+  interface HighlightedCitation {
+    text: string;
+    startIndex: number;
+    endIndex: number;
+    summary?: string;
+    confidence?: number;
+  }
+  let citations = $state<HighlightedCitation[]>([]);
 
   // Initialize form values from item
   $effect(() => {
@@ -35,6 +52,18 @@
       description = item.jsonData.description || '';
       tagsString = item.jsonData.tagsString ?? (item.jsonData.tags ?? []).join(', ');
       type = item.jsonData.type ?? '';
+    }
+  });
+
+  // Track view when modal opens
+  $effect(() => {
+    if (open && item?.id) {
+      // Start tracking view
+      viewTracker = createViewTracker(item.id, caseId);
+    } else if (!open && viewTracker) {
+      // Complete tracking when modal closes
+      viewTracker.complete();
+      viewTracker = null;
     }
   });
 
@@ -77,6 +106,19 @@
     open = false;
     isEditing = false;
   }
+
+  // Citation handlers
+  function handleSaveCitation(citation: HighlightedCitation) {
+    citations = [...citations, citation];
+  }
+
+  function handleRemoveCitation(citation: HighlightedCitation) {
+    citations = citations.filter(c => c.startIndex !== citation.startIndex);
+  }
+
+  function handleSummarize(result: { text: string; summary: string; confidence: number }) {
+    console.log('Citation summarized:', result);
+  }
 </script>
 
 <Dialog.Root bind:open>
@@ -114,8 +156,14 @@
             </div>
 
             <div>
-              <span class="block text-sm font-medium text-sand/40 mb-1">Description</span>
-              <div class="text-sand/40">{description || 'No description'}</div>
+              <span class="block text-sm font-medium text-sand/40 mb-1">Description (Select text to highlight & cite)</span>
+              <CitationHighlighter
+                content={description || 'No description'}
+                citations={citations}
+                onsave={handleSaveCitation}
+                onremove={handleRemoveCitation}
+                onsummarize={handleSummarize}
+              />
             </div>
 
             <div>
@@ -135,6 +183,18 @@
                 {/if}
               </div>
             </div>
+
+            <!-- Recommendations Section -->
+            {#if title}
+              <div class="pt-4 border-t border-sand/20">
+                <RecommendationWidget
+                  query={title + ' ' + (description || '')}
+                  tags={tagsString ? tagsString.split(',').map(t => t.trim()).filter(Boolean) : []}
+                  limit={3}
+                  compact={true}
+                />
+              </div>
+            {/if}
           </div>
 
           <!-- View Mode Actions -->

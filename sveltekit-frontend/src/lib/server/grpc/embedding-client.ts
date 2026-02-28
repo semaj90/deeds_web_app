@@ -107,7 +107,34 @@ async function generateViaGrpc(texts: string[], timeoutMs = 5000): Promise<numbe
 
 // ── HTTP/Ollama fallback ───────────────────────────────────────────────────
 
+/**
+ * Batch embedding via Ollama /api/embed (input: string[] → embeddings: number[][]).
+ * Falls back to sequential /api/embeddings if batch API is unavailable.
+ */
 async function generateViaHttp(texts: string[]): Promise<number[][]> {
+	try {
+		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, input: texts }),
+			signal: AbortSignal.timeout(60_000)
+		});
+
+		if (res.ok) {
+			const data = await res.json();
+			if (data.embeddings && Array.isArray(data.embeddings) && data.embeddings.length === texts.length) {
+				return data.embeddings;
+			}
+		}
+	} catch {
+		// Batch API unavailable — fall through to sequential
+	}
+
+	return generateViaHttpSingle(texts);
+}
+
+/** Sequential fallback using old /api/embeddings (single prompt per request) */
+async function generateViaHttpSingle(texts: string[]): Promise<number[][]> {
 	const vectors: number[][] = [];
 
 	for (const text of texts) {

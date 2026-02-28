@@ -132,5 +132,6 @@ export default defineConfig({
     'i-lucide-wifi-off', 'i-lucide-x', 'i-lucide-x-circle', 'i-lucide-zap',
     'i-lucide-zoom-in', 'i-lucide-zoom-out',
     'i-lucide-user-cog', 'i-lucide-globe', 'i-lucide-pause-circle',
+    'i-lucide-undo-2', 'i-lucide-redo-2', 'i-lucide-maximize-2', 'i-lucide-map',
   ],
 })

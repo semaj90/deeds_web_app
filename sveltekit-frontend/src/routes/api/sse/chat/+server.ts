@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { chatMessages } from '$lib/server/db/schema';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { loadCodebaseContext } from '$lib/server/retrieval/codebase-context.js';
 import { getGraphContext } from '$lib/server/retrieval/graph-context.js';
@@ -69,19 +69,26 @@ async function loadCaseContext(caseId: string): Promise<string | null> {
 		if (c.status) context += `- **Status**: ${c.status}\n`;
 		if (c.description) context += `- **Description**: ${c.description}\n`;
 
-		// Load recent evidence
+		// Load recent evidence with metadata (type, forensic flags, entities)
 		try {
-			const { evidence } = await import('$lib/server/db/schema');
-			const evidenceRows = await db
-				.select()
-				.from(evidence)
-				.where(eq(evidence.caseId, caseId))
-				.limit(5);
+			const evidenceResult = await db.execute(
+				sql`SELECT title, evidence_type, file_type, file_size, metadata
+					FROM evidence WHERE case_id = ${caseId}
+					ORDER BY created_at DESC LIMIT 10`
+			);
+			const evidenceRows = evidenceResult.rows || [];
 
 			if (evidenceRows.length > 0) {
-				context += `\n## Evidence (${evidenceRows.length} items)\n`;
-				for (const e of evidenceRows) {
-					context += `- ${e.title ?? e.fileType ?? 'Untitled'}: ${e.description ?? ''}\n`;
+				context += `\n## Evidence on File (${evidenceRows.length} items)\n`;
+				for (const e of evidenceRows as any[]) {
+					const type = (e.evidence_type || 'unknown').toUpperCase();
+					const meta = (typeof e.metadata === 'string' ? JSON.parse(e.metadata) : e.metadata) || {};
+					const entityCount = meta.entityCount ?? (Array.isArray(meta.entities) ? meta.entities.length : 0);
+					const flags = Array.isArray(meta.forensicFlags) ? meta.forensicFlags : [];
+					const highFlags = flags.filter((f: any) => f.severity === 'high');
+					const forensicLabel = highFlags.length ? `Forensic: HIGH (${highFlags.length})` : flags.length ? `Forensic: ${flags.length} flags` : 'No forensic flags';
+					const summary = meta.summary ? String(meta.summary).slice(0, 80) : '';
+					context += `- [${type}] "${e.title || 'Untitled'}" (${e.file_type || 'unknown'}) | Entities: ${entityCount} | ${forensicLabel}${summary ? '\n  ' + summary : ''}\n`;
 				}
 			}
 		} catch {

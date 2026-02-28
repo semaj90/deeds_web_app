@@ -209,7 +209,7 @@ export const GET: RequestHandler = async (event) => {
 			topicDistribution
 		};
 
-		return json<ApiResponse<AnalyticsData>>(
+		return json(
 			{
 				success: true,
 				data: analyticsData,
@@ -225,7 +225,7 @@ export const GET: RequestHandler = async (event) => {
 		console.error('[cases-analytics] Request error:', err);
 		const message = err instanceof Error ? err.message : String(err);
 
-		return json<ApiResponse<null>>(
+		return json(
 			{
 				success: false,
 				error: `Analytics fetch failed: ${message}`

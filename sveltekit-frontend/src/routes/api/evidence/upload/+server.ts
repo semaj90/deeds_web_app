@@ -6,15 +6,16 @@ import { sql } from 'drizzle-orm';
 import { createJob, updateJob } from '$lib/server/evidence-progress';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { extractTextHybrid } from '$lib/server/ocr/hybrid.js';
-import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
+import { generateSingleEmbedding, generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { chunkLegalDocument, type LegalChunk } from '$lib/server/indexer/legal-chunker.js';
 import { getEmbeddingCache, setEmbeddingCache } from '$lib/server/vector-cache.js';
 import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
 import { detectForensicPatterns } from '$lib/server/analysis/forensics.js';
 import { summarizeDocument } from '$lib/server/analysis/summarizer.js';
 import { createAnalysisJob, updateAnalysisJob, completeAnalysisJob, failAnalysisJob } from '$lib/server/analysis/analysis-jobs.js';
-import { embedGate, entityGate, forensicsGate, summarizeGate, gated } from '$lib/server/analysis/concurrency-gate.js';
+import { embedGate, entityGate, forensicsGate, summarizeGate, gated, EMBED_BATCH_SIZE } from '$lib/server/analysis/concurrency-gate.js';
 import { heavyRateLimiter } from '$lib/server/middleware/rate-limiter.js';
+import { detectEvidenceType, inferLegalClassification } from '$lib/server/evidence/type-detector.js';
 
 import { ENV } from '$lib/server/env.server.js';
 const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
@@ -43,14 +44,17 @@ export async function POST({ request }: RequestEvent) {
 	try {
 		const formData = await request.formData();
 		const file = formData.get('file') as File | null;
-		const caseId = formData.get('caseId')?.toString() || null;
-		const title = formData.get('title')?.toString() || '';
-		const description = formData.get('description')?.toString() || null;
-		const evidenceType = (formData.get('evidenceType')?.toString() || 'UNKNOWN').toUpperCase();
 
 		if (!file || typeof file.arrayBuffer !== 'function') {
 			return json({ error: 'No file provided' }, { status: 400 });
 		}
+
+		const caseId = formData.get('caseId')?.toString() || null;
+		const title = formData.get('title')?.toString() || '';
+		const description = formData.get('description')?.toString() || null;
+		const userType = formData.get('evidenceType')?.toString();
+		const autoType = detectEvidenceType(file.type, file.name);
+		const evidenceType = (userType && userType !== 'UNKNOWN' ? userType : autoType);
 
 		if (file.size > MAX_FILE_SIZE) {
 			return json({ error: `File too large. Maximum ${MAX_FILE_SIZE / 1024 / 1024}MB.` }, { status: 400 });
@@ -95,7 +99,7 @@ export async function POST({ request }: RequestEvent) {
 				'document',
 				${description || `Uploaded file: ${file.name}`},
 				${description},
-				${evidenceType.toLowerCase()},
+				${evidenceType},
 				${file.type},
 				${minioUrl},
 				${file.name},
@@ -111,7 +115,7 @@ export async function POST({ request }: RequestEvent) {
 		updateJob(jobId, { evidenceId, step: 'db-insert', progress: 60, message: 'Database record created' });
 
 		// 5. Fire off text extraction + chunking + embedding (non-blocking)
-		processAndEmbed(jobId, evidenceId, file.name, buffer, caseId).catch((err) => {
+		processAndEmbed(jobId, evidenceId, file.name, buffer, caseId, evidenceType).catch((err) => {
 			console.error('[Upload] Background processing failed:', err);
 			updateJob(jobId, { step: 'error', progress: 60, message: 'Embedding generation failed (upload succeeded)', error: String(err) });
 		});
@@ -138,11 +142,42 @@ export async function POST({ request }: RequestEvent) {
  * Images: OCR via Tesseract (native CLI) → tesseract.js fallback.
  * Text files: UTF-8 decode.
  */
-async function extractText(fileName: string, buffer: Buffer): Promise<{ text: string; method: string }> {
+async function extractText(fileName: string, buffer: Buffer, mimeType?: string): Promise<{ text: string; method: string; doclingBlocks?: any[] }> {
 	const isPDF = /\.pdf$/i.test(fileName);
 	const isImage = /\.(png|jpg|jpeg|tiff|tif|bmp|webp)$/i.test(fileName);
+	const isAudio = /\.(mp3|wav|m4a|ogg|flac|aac|wma)$/i.test(fileName) || (mimeType?.startsWith('audio/') ?? false);
+
+	// Audio files: transcribe via Docling ASR
+	if (isAudio) {
+		try {
+			const { isDoclingAvailable, transcribeAudio } = await import('$lib/server/docling.js');
+			if (await isDoclingAvailable()) {
+				const result = await transcribeAudio(buffer, mimeType || 'audio/wav');
+				if (result.fullText.trim().length > 0) {
+					return { text: result.fullText, method: 'docling-asr', doclingBlocks: result.blocks };
+				}
+			}
+		} catch (err) {
+			console.warn('[Upload] Audio transcription failed:', err);
+		}
+		return { text: `Audio evidence file: ${fileName}`, method: 'audio-placeholder' };
+	}
 
 	if (isPDF) {
+		// Try Docling first for layout-aware PDF extraction (IBM granite-docling-258m)
+		try {
+			const { isDoclingAvailable, analyzeDocumentWithDocling } = await import('$lib/server/docling.js');
+			if (await isDoclingAvailable()) {
+				const doclingResult = await analyzeDocumentWithDocling({ fileBuffer: buffer, mimeType: 'application/pdf' });
+				if (doclingResult.fullText.trim().length >= MIN_PDF_TEXT_LENGTH) {
+					return { text: doclingResult.fullText, method: 'docling', doclingBlocks: doclingResult.blocks };
+				}
+				console.log(`[Upload] Docling text too short (${doclingResult.fullText.trim().length} chars), falling back`);
+			}
+		} catch (err) {
+			console.warn('[Upload] Docling failed, falling back to pdf-parse:', err);
+		}
+
 		try {
 			const pdfParse = (await import('pdf-parse')).default;
 			const parsed = await pdfParse(buffer);
@@ -174,7 +209,20 @@ async function extractText(fileName: string, buffer: Buffer): Promise<{ text: st
 	}
 
 	if (isImage) {
-		const ocrResult = await extractTextHybrid(buffer, fileName);
+		// Resize large images before OCR (max 1280px for VLM/Docling quality)
+		let processBuffer = buffer;
+		try {
+			const sharp = (await import('sharp')).default;
+			const meta = await sharp(buffer).metadata();
+			if (meta.width && meta.width > 1280) {
+				processBuffer = await sharp(buffer)
+					.resize(1280, null, { fit: 'inside', withoutEnlargement: true })
+					.toBuffer();
+				console.log(`[Upload] Resized image ${meta.width}x${meta.height} -> 1280px for ${fileName}`);
+			}
+		} catch { /* sharp unavailable, use original buffer */ }
+
+		const ocrResult = await extractTextHybrid(processBuffer, fileName);
 		return { text: ocrResult.text, method: `ocr-${ocrResult.method}` };
 	}
 
@@ -194,11 +242,12 @@ async function processAndEmbed(
 	evidenceId: string,
 	fileName: string,
 	buffer: Buffer,
-	caseId: string | null
+	caseId: string | null,
+	evidenceType: string = 'document'
 ): Promise<void> {
 	updateJob(jobId, { step: 'embedding', progress: 65, message: 'Extracting text...' });
 
-	const { text: fullText, method: extractionMethod } = await extractText(fileName, buffer);
+	const { text: fullText, method: extractionMethod, doclingBlocks } = await extractText(fileName, buffer);
 	if (!fullText.trim()) {
 		updateJob(jobId, { step: 'complete', progress: 100, message: 'Upload complete (no text to embed)' });
 		return;
@@ -223,13 +272,51 @@ async function processAndEmbed(
 	// Track unique sections for graph node creation
 	const sectionsSeen = new Map<string, { heading: string; path: string[]; chunkIds: string[] }>();
 
-	for (const chunk of legalChunks) {
-		try {
-			const embedding = await gated(embedGate, () => embedText(chunk.text.slice(0, 8000)));
-			if (embedding) {
-				const chunkUUID = crypto.randomUUID();
+	// Batch-embed chunks for parallelism (EMBED_BATCH_SIZE chunks per Ollama /api/embed call)
+	for (let batchStart = 0; batchStart < legalChunks.length; batchStart += EMBED_BATCH_SIZE) {
+		const batch = legalChunks.slice(batchStart, batchStart + EMBED_BATCH_SIZE);
+		const texts = batch.map(c => c.text.slice(0, 8000));
 
-				// Store in pgvector with full legal metadata
+		let batchEmbeddings: (number[] | null)[] = new Array(batch.length).fill(null);
+		try {
+			// Check cache first, collect misses
+			const cacheResults = await Promise.all(
+				texts.map(t => getEmbeddingCache(t, 'embeddinggemma:latest').catch(() => ({ entry: null })))
+			);
+			const needEmbed: { idx: number; text: string }[] = [];
+			for (let i = 0; i < cacheResults.length; i++) {
+				if (cacheResults[i].entry) {
+					batchEmbeddings[i] = cacheResults[i].entry!.embedding;
+				} else {
+					needEmbed.push({ idx: i, text: texts[i] });
+				}
+			}
+
+			// Batch-embed cache misses through concurrency gate
+			if (needEmbed.length > 0) {
+				const result = await gated(embedGate, () =>
+					generateEmbeddings(needEmbed.map(n => n.text))
+				);
+				for (let j = 0; j < needEmbed.length; j++) {
+					batchEmbeddings[needEmbed[j].idx] = result.vectors[j] ?? null;
+					if (result.vectors[j]) {
+						setEmbeddingCache(needEmbed[j].text, result.vectors[j], 'embeddinggemma:latest').catch(() => {});
+					}
+				}
+			}
+		} catch (err) {
+			console.warn(`[Upload] Batch embedding failed at offset ${batchStart}:`, err);
+		}
+
+		// Store results for each chunk in this batch
+		for (let i = 0; i < batch.length; i++) {
+			const chunk = batch[i];
+			const embedding = batchEmbeddings[i];
+			if (!embedding || embedding.length === 0) continue;
+
+			const chunkUUID = crypto.randomUUID();
+
+			try {
 				await storeChunkVector(evidenceId, chunk.chunkIndex, chunk.text.slice(0, 4000), embedding, {
 					model: 'embeddinggemma:latest',
 					extractionMethod,
@@ -241,45 +328,43 @@ async function processAndEmbed(
 					endOffset: chunk.endOffset,
 					tokenCount: chunk.tokenCount,
 				});
-
-				// Collect for Qdrant batch upsert
-				qdrantPoints.push({
-					id: chunkUUID,
-					vector: { content: embedding },
-					payload: {
-						evidence_id: evidenceId,
-						case_id: caseId,
-						chunk_index: chunk.chunkIndex,
-						file_name: fileName,
-						content_preview: chunk.text.slice(0, 500),
-						extraction_method: extractionMethod,
-						section_path: chunk.sectionPath,
-						heading: chunk.heading,
-						citations: chunk.citations,
-						token_count: chunk.tokenCount,
-						created_at: new Date().toISOString(),
-					},
-				});
-
-				// Track section for graph
-				if (chunk.sectionPath.length > 0) {
-					const sectionKey = chunk.sectionPath.join(' > ');
-					const existing = sectionsSeen.get(sectionKey);
-					if (existing) {
-						existing.chunkIds.push(chunkUUID);
-					} else {
-						sectionsSeen.set(sectionKey, {
-							heading: chunk.heading,
-							path: chunk.sectionPath,
-							chunkIds: [chunkUUID],
-						});
-					}
-				}
-
-				stored++;
+			} catch (err) {
+				console.warn(`[Upload] Chunk ${chunk.chunkIndex} pgvector store failed:`, err);
 			}
-		} catch (err) {
-			console.warn(`[Upload] Chunk ${chunk.chunkIndex} embedding failed:`, err);
+
+			qdrantPoints.push({
+				id: chunkUUID,
+				vector: { content: embedding },
+				payload: {
+					evidence_id: evidenceId,
+					case_id: caseId,
+					chunk_index: chunk.chunkIndex,
+					file_name: fileName,
+					content_preview: chunk.text.slice(0, 500),
+					extraction_method: extractionMethod,
+					section_path: chunk.sectionPath,
+					heading: chunk.heading,
+					citations: chunk.citations,
+					token_count: chunk.tokenCount,
+					created_at: new Date().toISOString(),
+				},
+			});
+
+			if (chunk.sectionPath.length > 0) {
+				const sectionKey = chunk.sectionPath.join(' > ');
+				const existing = sectionsSeen.get(sectionKey);
+				if (existing) {
+					existing.chunkIds.push(chunkUUID);
+				} else {
+					sectionsSeen.set(sectionKey, {
+						heading: chunk.heading,
+						path: chunk.sectionPath,
+						chunkIds: [chunkUUID],
+					});
+				}
+			}
+
+			stored++;
 		}
 
 		const pct = 70 + Math.round((stored / legalChunks.length) * 15);
@@ -354,6 +439,56 @@ async function processAndEmbed(
 		});
 	} catch { /* non-fatal */ }
 
+	// 6b. VLM image analysis via /api/vision/analyze (non-fatal)
+	let visionAnalysis: { summary?: string; keyFindings?: string[]; suggestedTags?: string[] } | null = null;
+	const isImage = /\.(png|jpg|jpeg|tiff|tif|bmp|webp)$/i.test(fileName);
+	if (isImage) {
+		try {
+			const formDataVLM = new FormData();
+			formDataVLM.append('file', new Blob([new Uint8Array(buffer)]), fileName);
+			const visionRes = await fetch('http://localhost:5173/api/vision/analyze', {
+				method: 'POST',
+				body: formDataVLM,
+				signal: AbortSignal.timeout(30_000),
+			});
+			if (visionRes.ok) {
+				visionAnalysis = await visionRes.json() as any;
+				console.log(`[Upload] VLM analysis complete for ${fileName}: ${visionAnalysis?.keyFindings?.length ?? 0} findings`);
+			}
+		} catch (err) {
+			console.warn('[Upload] VLM analysis skipped:', err);
+		}
+	}
+
+	// 6c. LangExtract evidence profile (non-fatal)
+	let evidenceProfile: any = null;
+	if (fullText.trim().length > 100) {
+		try {
+			const { extractEvidenceProfile } = await import('$lib/server/services/langextract-service.js');
+			evidenceProfile = await extractEvidenceProfile(fullText, evidenceType);
+			if (evidenceProfile) {
+				console.log(`[Upload] LangExtract profile: ${evidenceProfile.suggested_tags?.length ?? 0} tags, type=${evidenceProfile.evidence_type_classification}`);
+			}
+		} catch (err) {
+			console.warn('[Upload] LangExtract profile skipped:', err);
+		}
+	}
+
+	// 6d. Post-analysis evidence type refinement
+	const refinedType = inferLegalClassification(evidenceType, fullText, entities, forensicFlags);
+	// Also consider LangExtract classification if available
+	const finalType = (evidenceProfile?.evidence_type_classification && evidenceProfile.evidence_type_classification !== evidenceType)
+		? evidenceProfile.evidence_type_classification
+		: refinedType;
+	if (finalType !== evidenceType) {
+		try {
+			await db.execute(sql`UPDATE evidence SET evidence_type = ${finalType} WHERE id = ${evidenceId}`);
+			console.log(`[Upload] Refined evidence_type: ${evidenceType} → ${finalType} for ${fileName}`);
+		} catch (err) {
+			console.warn('[Upload] Evidence type refinement failed (non-fatal):', err);
+		}
+	}
+
 	// 7. Summarization via Ollama (non-fatal — skipped if Ollama unavailable)
 	let summary = '';
 	updateJob(jobId, { step: 'embedding', progress: 95, message: 'Generating summary...' });
@@ -374,6 +509,48 @@ async function processAndEmbed(
 		}
 	}
 
+	// 7b. Embed summary for vector retrieval in Qdrant legal_documents (non-fatal)
+	if (summary && summary.length > 50) {
+		try {
+			const summaryEmbedding = await gated(embedGate, () =>
+				generateEmbeddings([summary.slice(0, 4000)])
+			);
+			if (summaryEmbedding.vectors[0]?.length === 768) {
+				await qdrant.storeDocument({
+					id: evidenceId,
+					title: fileName,
+					content: summary,
+					contentEmbedding: summaryEmbedding.vectors[0],
+					metadata: {
+						document_type: 'evidence-summary',
+						case_id: caseId,
+						evidence_type: finalType,
+						chunk_count: stored,
+						entity_count: entities.length,
+					}
+				});
+				console.log(`[Upload] Summary embedded in Qdrant legal_documents for ${fileName}`);
+			}
+		} catch (err) {
+			console.warn('[Upload] Summary embedding failed (non-fatal):', err);
+		}
+	}
+
+	// 7c. Auto-tag and mirror to pgvector + Qdrant + CouchDB (non-fatal)
+	if (fullText.trim().length > 100) {
+		try {
+			const { autoTagDocument } = await import('$lib/server/ace/auto-tagger.js');
+			const tagResult = await autoTagDocument({
+				documentId: evidenceId,
+				text: fullText.slice(0, 15_000),
+				maxTags: 20
+			});
+			console.log(`[Upload] Auto-tagged ${fileName}: ${tagResult.tags.length} tags, ${tagResult.mirrored} mirrored`);
+		} catch (err) {
+			console.warn('[Upload] Auto-tagging failed (non-fatal):', err);
+		}
+	}
+
 	// 8. Persist analysis results to evidence.metadata
 	try {
 		await db.execute(sql`
@@ -382,6 +559,16 @@ async function processAndEmbed(
 				forensicFlags,
 				summary: summary.slice(0, 5000),
 				entityCount: entities.length,
+				extractionMethod,
+				refinedEvidenceType: finalType,
+				doclingBlocks: doclingBlocks?.slice(0, 50) ?? null,
+				visionAnalysis: visionAnalysis ?? null,
+				evidenceProfile: evidenceProfile ?? null,
+				admissibilityIndicators: evidenceProfile?.admissibility_indicators ?? null,
+				suggestedTags: [
+					...(evidenceProfile?.suggested_tags ?? []),
+					...(visionAnalysis?.suggestedTags ?? []),
+				].filter(Boolean),
 				analysisTimestamp: new Date().toISOString(),
 			})}::jsonb
 			WHERE id = ${evidenceId}

@@ -63,6 +63,29 @@ function setupToolHandlers() {
           required: ["action"],
         },
       },
+      {
+        name: "transcribe_audio",
+        description: "Transcribe audio evidence files (WAV, MP3, M4A) using Docling ASR. Returns transcript text with word count and duration.",
+        inputSchema: { type: "object",
+          properties: {
+            evidenceId: { type: "string", description: "Evidence record ID in PostgreSQL" },
+            audioUrl: { type: "string", description: "MinIO object key or URL for the audio file" },
+          },
+          required: ["evidenceId", "audioUrl"],
+        },
+      },
+      {
+        name: "evidence:analyze",
+        description: "Analyze evidence text: extract entities, detect forensic patterns, auto-tag with 3-store mirroring (pgvector + Qdrant + CouchDB)",
+        inputSchema: { type: "object",
+          properties: {
+            evidenceId: { type: "string", description: "Evidence record ID" },
+            text: { type: "string", description: "Evidence text content (max 50000 chars)" },
+            evidenceType: { type: "string", description: "Evidence type classification" },
+          },
+          required: ["evidenceId", "text"],
+        },
+      },
     ],
   }));
 
@@ -98,6 +121,70 @@ function setupToolHandlers() {
             id: Math.random().toString(36).substring(7)
           };
           return { content: [{ type: "text", text: JSON.stringify(mockResult) }] };
+        }
+
+        case "transcribe_audio": {
+          const { evidenceId, audioUrl } = args as { evidenceId: string; audioUrl: string };
+          const { transcribeAudio, isDoclingAvailable } = await import('../lib/server/docling.js');
+
+          if (!(await isDoclingAvailable())) {
+            return { content: [{ type: "text", text: JSON.stringify({ error: "Docling ASR unavailable — python/docling_analyze.py not found", evidenceId }) }], isError: true };
+          }
+
+          // Fetch audio from MinIO via minio npm client
+          const { Client } = await import('minio');
+          const minio = new Client({
+            endPoint: process.env.MINIO_ENDPOINT?.split(':')[0] || 'localhost',
+            port: parseInt(process.env.MINIO_PORT || '9000', 10),
+            useSSL: process.env.MINIO_USE_SSL === 'true',
+            accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
+            secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
+          });
+          const bucketName = process.env.MINIO_EVIDENCE_BUCKET || 'evidence';
+          const chunks: Buffer[] = [];
+          const stream = await minio.getObject(bucketName, audioUrl);
+          for await (const chunk of stream) {
+            chunks.push(Buffer.from(chunk));
+          }
+          const audioBuffer = Buffer.concat(chunks);
+
+          // Detect MIME from extension
+          const ext = audioUrl.split('.').pop()?.toLowerCase() || '';
+          const mimeMap: Record<string, string> = { mp3: 'audio/mpeg', wav: 'audio/wav', m4a: 'audio/mp4', ogg: 'audio/ogg', flac: 'audio/flac' };
+          const mimeType = mimeMap[ext] || 'audio/wav';
+
+          const result = await transcribeAudio(audioBuffer, mimeType);
+          const wordCount = result.fullText.split(/\s+/).filter(Boolean).length;
+
+          return { content: [{ type: "text", text: JSON.stringify({
+            evidenceId,
+            transcript: result.fullText,
+            wordCount,
+            blocks: result.blocks,
+            processingTimeMs: result.processingTimeMs,
+          }) }] };
+        }
+
+        case "evidence:analyze": {
+          const { evidenceId, text, evidenceType } = args as { evidenceId: string; text: string; evidenceType?: string };
+          const { extractEntities } = await import('../lib/server/analysis/entity-extraction.js');
+          const { detectForensicPatterns } = await import('../lib/server/analysis/forensics.js');
+          const { autoTagDocument } = await import('../lib/server/ace/auto-tagger.js');
+
+          const [entities, forensics, tags] = await Promise.all([
+            extractEntities(text.slice(0, 50_000)).catch(() => []),
+            Promise.resolve(detectForensicPatterns(text.slice(0, 50_000))),
+            autoTagDocument({ documentId: evidenceId, text: text.slice(0, 15_000), maxTags: 20 }).catch(() => ({ tags: [], mirrored: 0 })),
+          ]);
+
+          return { content: [{ type: "text", text: JSON.stringify({
+            evidenceId,
+            entities: entities.length,
+            forensicFlags: forensics.length,
+            highSeverityFlags: forensics.filter((f: any) => f.severity === 'high').length,
+            tags: (tags as any).tags?.length ?? 0,
+            tagsMirrored: (tags as any).mirrored ?? 0,
+          }) }] };
         }
 
         default:

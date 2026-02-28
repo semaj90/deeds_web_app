@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { browser } from '$app/environment';
 	import type { LayoutData } from './$types';
 	import CaseDocumentWriter from '$lib/components/legal-ai/CaseDocumentWriter.svelte';
 	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
@@ -7,6 +8,7 @@
 	import ErrorBoundary from '$lib/components/ui/ErrorBoundary.svelte';
 	import { notificationStore } from '$lib/stores/unified/notification-store.svelte.js';
 	import OfflineIndicator from '$lib/components/cache/OfflineIndicator.svelte';
+	import { initTypingDetector } from '$lib/tracking/telemetry.js';
 
 	interface Props {
 		data: LayoutData;
@@ -16,6 +18,16 @@
 	let { data, children }: Props = $props();
 	let sidebarOpen = $state(true);
 	let showDocumentWriter = $state(false);
+
+	// Initialize user activity telemetry (typing/idle detection)
+	$effect(() => {
+		if (browser) {
+			let sid = sessionStorage.getItem('yorha-session-id');
+			if (!sid) { sid = crypto.randomUUID(); sessionStorage.setItem('yorha-session-id', sid); }
+			const sessionId = sid;
+			initTypingDetector(() => sessionId, () => data.user?.id ?? undefined);
+		}
+	});
 
 	function handleGlobalKeydown(e: KeyboardEvent) {
 		if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'd') {

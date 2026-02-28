@@ -11,8 +11,8 @@
 
 import pLimit from 'p-limit';
 
-/** GPU-bound: only 1 embedding at a time (Ollama single-model) */
-export const embedGate = pLimit(1);
+/** GPU-bound: 3 concurrent embedding batches (Ollama queues internally) */
+export const embedGate = pLimit(3);
 
 /** GPU-bound: only 1 summarization at a time (shares Ollama GPU) */
 export const summarizeGate = pLimit(1);
@@ -22,6 +22,9 @@ export const entityGate = pLimit(2);
 
 /** CPU-only: regex forensics is fast — allow 4 concurrent */
 export const forensicsGate = pLimit(4);
+
+/** Batch size for embedding requests (Ollama /api/embed supports array input) */
+export const EMBED_BATCH_SIZE = 8;
 
 /**
  * Run a function through the appropriate gate.

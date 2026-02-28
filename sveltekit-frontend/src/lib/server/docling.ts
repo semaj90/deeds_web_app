@@ -11,10 +11,11 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 export type DoclingBlock = {
-    type: 'paragraph' | 'heading' | 'table' | 'list' | 'equation' | 'image' | 'other';
+    type: 'paragraph' | 'heading' | 'table' | 'list' | 'equation' | 'image' | 'transcription' | 'other';
     text: string;
 	page: number;
     bbox?: [number, number, number, number];
+	timestampMs?: number;
 };
 
 export type DoclingResult = {
@@ -76,6 +77,14 @@ export async function analyzeDocumentWithDocling(args: AnalyzeArgs): Promise<Doc
         await unlink(tmpInput).catch(() => {});
         await unlink(tmpOutput).catch(() => {});
     }
+}
+
+/**
+ * Transcribe audio using Docling's ASR pipeline.
+ * Supports WAV, MP3, M4A via Granite-Docling ASR.
+ */
+export async function transcribeAudio(audioBuffer: Buffer, mimeType: string): Promise<DoclingResult> {
+	return analyzeDocumentWithDocling({ fileBuffer: audioBuffer, mimeType });
 }
 
 export async function isDoclingAvailable(): Promise<boolean> {

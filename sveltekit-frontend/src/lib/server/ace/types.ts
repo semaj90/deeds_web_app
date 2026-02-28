@@ -44,6 +44,16 @@ export interface ACEContext {
 	webSearchContext: string | null;
 	/** Active persona for style adaptation */
 	persona: string;
+	/** Evidence metadata from case (types, forensic flags, entities, summaries) */
+	evidenceMetadata: Array<{
+		id: string;
+		title: string;
+		evidenceType: string;
+		fileType: string;
+		forensicFlags: Array<{ type: string; severity: string }>;
+		entities: Array<{ text: string; label: string }>;
+		summary?: string;
+	}> | null;
 }
 
 export interface ACEPrompt {
@@ -87,7 +97,8 @@ export interface GeneratedTag {
 export const TOKEN_BUDGET = {
 	system: 200,
 	caseContext: 300,
-	ragChunks: 600,
+	ragChunks: 400,
+	evidenceMetadata: 200,
 	kagNeighbors: 200,
 	chatHistory: 400,
 	userProfile: 100,

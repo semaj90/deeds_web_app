@@ -7,6 +7,8 @@
 	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
 	import YoRHaDetectiveCommandCenter from '$lib/components/yorha/YoRHaDetectiveCommandCenter.svelte';
 	import PhoenixProsecutorDashboard from '$lib/components/yorha/PhoenixProsecutorDashboard.svelte';
+	import { StatsCard, SystemStatus, QuickActions } from '$lib/components/dashboard';
+	import type { Alert, QuickAction } from '$lib/components/dashboard';
 
 	let showCodebaseSearch = $state(false);
 	let showDetectiveCenter = $state(false);
@@ -46,11 +48,7 @@ totalCases: 5.2,
 		priority: 'low' | 'medium' | 'high' | 'urgent';
 	}>>([]);
 
-	let systemAlerts = $state<Array<{ id: string, type: 'info' | 'warning' | 'error';
-		message: string;
-	timestamp: string;
-		dismissed?: boolean;
-	}>>([]);
+	let systemAlerts = $state<Alert[]>([]);
 
 	let notifications = $state<Array<{ id: string, type: 'info' | 'success' | 'warning' | 'error';
 		title: string;
@@ -388,6 +386,34 @@ totalCases: 5.2,
 	// Computed values
 	let unreadNotificationsCount = $derived(notifications.filter(n => !n.read).length);
 	let activeAlertsCount = $derived(systemAlerts.filter(a => !a.dismissed).length);
+
+	// Quick actions configuration
+	const quickActions: QuickAction[] = [
+		{
+			id: 'new-case',
+			icon: 'gavel',
+			label: 'New Case',
+			description: 'Create a new legal case',
+			variant: 'primary',
+			onClick: createNewCase
+		},
+		{
+			id: 'upload-evidence',
+			icon: 'upload',
+			label: 'Upload Evidence',
+			description: 'Add evidence documents',
+			variant: 'default',
+			onClick: uploadEvidence
+		},
+		{
+			id: 'ai-analysis',
+			icon: 'brain',
+			label: 'AI Analysis',
+			description: 'Run case analysis',
+			variant: 'success',
+			onClick: runAIAnalysis
+		}
+	];
 </script>
 
 <svelte:head>
@@ -558,170 +584,102 @@ totalCases: 5.2,
 	</header>
 
 	<div class="main-content">
-		<!-- Sidebar Navigation -->
-		<nav class="sidebar">
-			<div class="nav-section">
-				<h3 class="nav-title">Operations</h3>
-				<ul class="nav-list">
-					<li class="nav-item active">
-						<Button class="bits-btn nav-link" onclick={() => currentView = 'dashboard'}>
-							<Icon name="activity" class="h-4 w-4" />
-							Dashboard
-						</Button>
-					</li>
-					<li class="nav-item">
-						<Button class="bits-btn nav-link" onclick={() => goto('/cases')}>
-							<Icon name="gavel" class="h-4 w-4" />
-							Cases
-						</Button>
-					</li>
-					<li class="nav-item">
-						<Button class="bits-btn nav-link" onclick={() => goto('/evidence')}>
-							<Icon name="file-text" class="h-4 w-4" />
-							Evidence
-						</Button>
-					</li>
-					<li class="nav-item">
-						<Button class="bits-btn nav-link" onclick={() => goto('/ai-dashboard')}>
-							<Icon name="brain" class="h-4 w-4" />
-							AI Chat
-						</Button>
-					</li>
-				</ul>
+		<!-- Sidebar with Quick Actions -->
+		<aside class="sidebar">
+			<!-- Quick Actions Panel -->
+			<div class="sidebar-section">
+				<QuickActions actions={quickActions} layout="list" compact={true} />
 			</div>
 
-			<div class="nav-section">
-				<h3 class="nav-title">Intelligence</h3>
-				<ul class="nav-list">
-					<li class="nav-item">
-						<Button class="bits-btn nav-link" onclick={() => goto('/persons-of-interest')}>
-							<Icon name="users" class="h-4 w-4" />
-							Persons
-						</Button>
-					</li>
-					<li class="nav-item">
-						<Button class="bits-btn nav-link" onclick={() => goto('/analysis-center')}>
-							<Icon name="search" class="h-4 w-4" />
-							Analysis
-						</Button>
-					</li>
-				</ul>
-			</div>
+			<!-- Navigation -->
+			<div class="sidebar-section">
+				<div class="nav-section">
+					<h3 class="nav-title">Operations</h3>
+					<ul class="nav-list">
+						<li class="nav-item active">
+							<Button class="bits-btn nav-link" onclick={() => currentView = 'dashboard'}>
+								<Icon name="activity" class="h-4 w-4" />
+								Dashboard
+							</Button>
+						</li>
+						<li class="nav-item">
+							<Button class="bits-btn nav-link" onclick={() => goto('/cases')}>
+								<Icon name="gavel" class="h-4 w-4" />
+								Cases
+							</Button>
+						</li>
+						<li class="nav-item">
+							<Button class="bits-btn nav-link" onclick={() => goto('/evidence')}>
+								<Icon name="file-text" class="h-4 w-4" />
+								Evidence
+							</Button>
+						</li>
+					</ul>
+				</div>
 
-			<div class="nav-section">
-				<h3 class="nav-title">System</h3>
-				<ul class="nav-list">
-					<li class="nav-item">
-						<Button class="bits-btn nav-link" onclick={() => goto('/system-configuration')}>
-							<Icon name="database" class="h-4 w-4" />
-							System
-						</Button>
-					</li>
-				</ul>
+				<div class="nav-section">
+					<h3 class="nav-title">Intelligence</h3>
+					<ul class="nav-list">
+						<li class="nav-item">
+							<Button class="bits-btn nav-link" onclick={() => goto('/persons-of-interest')}>
+								<Icon name="users" class="h-4 w-4" />
+								Persons
+							</Button>
+						</li>
+						<li class="nav-item">
+							<Button class="bits-btn nav-link" onclick={() => goto('/ai-dashboard')}>
+								<Icon name="brain" class="h-4 w-4" />
+								AI Chat
+							</Button>
+						</li>
+					</ul>
+				</div>
 			</div>
-		</nav>
+		</aside>
 
 		<!-- Main Dashboard Content -->
 		<main class="dashboard-content">
 			{#if currentView === 'dashboard'}
-				<!-- Metrics Grid -->
+				<!-- Metrics Grid - Using New StatsCard Components -->
 				<div class="metrics-grid">
-					<Card class="metric-card">
-						<CardHeader class="pb-2">
-							<CardTitle class="text-sm flex items-center">
-								<Icon name="gavel" class="h-4 w-4 mr-2" />
-								Total Cases
-							</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<div class="metric-value">{metrics.totalCases}</div>
-							{@const trendIconName = getTrendIcon(metrics.trends.totalCases)}
-							<div class="metric-trend">
-								<Icon name={trendIconName} class={`h-3 w-3 mr-1 ${getTrendColor(metrics.trends.totalCases)}`} />
-								<span class={`${getTrendColor(metrics.trends.totalCases)}`}>
-									{metrics.trends.totalCases >= 0 ? '+' : ''}{metrics.trends.totalCases.toFixed(1)}%
-								</span>
-								<span class="text-xs text-muted-foreground ml-2">vs last month</span>
-							</div>
-						</CardContent>
-					</Card>
+					<StatsCard
+						icon="gavel"
+						label="Total Cases"
+						value={metrics.totalCases}
+						trend={metrics.trends.totalCases}
+						trendLabel="vs last month"
+					/>
 
-					<Card class="metric-card">
-						<CardHeader class="pb-2">
-							<CardTitle class="text-sm flex items-center">
-								<Icon name="activity" class="h-4 w-4 mr-2" />
-								Active Cases
-							</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<div class="metric-value">{metrics.activeCases}</div>
-							{@const trendIconName1 = getTrendIcon(metrics.trends.activeCases)}
-							<div class="metric-trend">
-								<Icon name={trendIconName1} class={`h-3 w-3 mr-1 ${getTrendColor(metrics.trends.activeCases)}`} />
-								<span class={`${getTrendColor(metrics.trends.activeCases)}`}>
-									{metrics.trends.activeCases >= 0 ? '+' : ''}{metrics.trends.activeCases.toFixed(1)}%
-								</span>
-								<span class="text-xs text-muted-foreground ml-2">vs last week</span>
-							</div>
-						</CardContent>
-					</Card>
+					<StatsCard
+						icon="activity"
+						label="Active Cases"
+						value={metrics.activeCases}
+						trend={metrics.trends.activeCases}
+						trendLabel="vs last week"
+					/>
 
-					<Card class="metric-card">
-						<CardHeader class="pb-2">
-							<CardTitle class="text-sm flex items-center">
-								<Icon name="file-text" class="h-4 w-4 mr-2" />
-								Evidence Processed
-							</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<div class="metric-value">{metrics.evidenceProcessed.toLocaleString()}</div>
-							{@const trendIconName2 = getTrendIcon(metrics.trends.evidenceProcessed)}
-							<div class="metric-trend">
-								<Icon name={trendIconName2} class={`h-3 w-3 mr-1 ${getTrendColor(metrics.trends.evidenceProcessed)}`} />
-								<span class={`${getTrendColor(metrics.trends.evidenceProcessed)}`}>
-									{metrics.trends.evidenceProcessed >= 0 ? '+' : ''}{metrics.trends.evidenceProcessed.toFixed(1)}%
-								</span>
-								<span class="text-xs text-muted-foreground ml-2">{metrics.ocrAccuracy}% OCR accuracy</span>
-							</div>
-						</CardContent>
-					</Card>
+					<StatsCard
+						icon="file-text"
+						label="Evidence Items"
+						value={metrics.evidenceProcessed}
+						trend={metrics.trends.evidenceProcessed}
+						trendLabel="this month"
+					/>
 
-					<Card class="metric-card">
-						<CardHeader class="pb-2">
-							<CardTitle class="text-sm flex items-center">
-								<Icon name="brain" class="h-4 w-4 mr-2" />
-								AI Queries
-							</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<div class="metric-value">{metrics.aiQueries.toLocaleString()}</div>
-							{@const trendIconName3 = getTrendIcon(metrics.trends.aiQueries)}
-							<div class="metric-trend">
-								<Icon name={trendIconName3} class={`h-3 w-3 mr-1 ${getTrendColor(metrics.trends.aiQueries)}`} />
-								<span class={`${getTrendColor(metrics.trends.aiQueries)}`}>
-									{metrics.trends.aiQueries >= 0 ? '+' : ''}{metrics.trends.aiQueries.toFixed(1)}%
-								</span>
-								<span class="text-xs text-muted-foreground ml-2">this month</span>
-							</div>
-						</CardContent>
-					</Card>
+					<StatsCard
+						icon="brain"
+						label="AI Queries"
+						value={metrics.aiQueries}
+						trend={metrics.trends.aiQueries}
+						trendLabel="this month"
+					/>
 
-					<Card class="metric-card system-health-card">
-						<CardHeader class="pb-2">
-							<CardTitle class="text-sm flex items-center">
-								<Icon name="database" class="h-4 w-4 mr-2" />
-								System Health
-							</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<div class="metric-value {getStatusColor(metrics.systemHealth)}">
-								{metrics.systemHealth}
-							</div>
-							<div class="text-xs text-muted-foreground">
-								GPU: {metrics.gpuStatus}
-							</div>
-						</CardContent>
-					</Card>
+					<StatsCard
+						icon="database"
+						label="System Health"
+						value={metrics.systemHealth}
+						variant={metrics.systemHealth === 'operational' ? 'success' : 'warning'}
+					/>
 				</div>
 
 				<!-- Active Cases & System Status -->
@@ -757,62 +715,13 @@ totalCases: 5.2,
 						</CardContent>
 					</Card>
 
-					<!-- System Status & Alerts -->
-					<Card>
-						<CardHeader>
-							<CardTitle class="flex items-center">
-								<Icon name="activity" class="h-5 w-5 mr-2" />
-								System Status
-							</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<div class="space-y-4">
-								<!-- System Metrics -->
-								<div class="system-metrics">
-									<div class="metric-item">
-										<span class="metric-label">RAG Index Size</span>
-										<span class="metric-value">{(metrics.ragIndexSize / 1000000).toFixed(1)}M vectors</span>
-									</div>
-									<div class="metric-item">
-										<span class="metric-label">GPU Memory</span>
-										<span class="metric-value">RTX 3060Ti Active</span>
-									</div>
-									<div class="metric-item">
-										<span class="metric-label">OCR Workers</span>
-										<span class="metric-value">4 workers online</span>
-									</div>
-								</div>
-
-								<!-- System Alerts -->
-								{#if systemAlerts.filter(a => !a.dismissed).length > 0}
-									<div class="alerts-section">
-										<h4 class="alerts-title">Recent Alerts</h4>
-										<div class="alerts-list">
-											{#each systemAlerts.filter(a => !a.dismissed) as alert}
-												{@const alertIconName = getAlertIcon(alert.type)}
-												<div class="alert-item alert-{alert.type}">
-													<Icon name={alertIconName} class="h-4 w-4" />
-													<span class="alert-message">{alert.message}</span>
-													<span class="alert-time">{alert.timestamp}</span>
-													<Button class="bits-btn alert-dismiss"
-														onclick={() => dismissAlert(alert.id)}
-														aria-label="Dismiss alert"
-													>
-														<Icon name="x" class="h-3 w-3" />
-													</Button>
-												</div>
-											{/each}
-										</div>
-									</div>
-								{:else}
-									<div class="no-alerts">
-										<Icon name="activity" class="h-6 w-6 text-green-400" />
-										<span class="text-sm text-muted-foreground">All systems operational</span>
-									</div>
-								{/if}
-							</div>
-						</CardContent>
-					</Card>
+					<!-- System Status - Using New SystemStatus Component -->
+					<SystemStatus
+						alerts={systemAlerts}
+						title="System Status"
+						maxHeight="500px"
+						onDismiss={dismissAlert}
+					/>
 				</div>
 			{/if}
 		</main>
@@ -1109,13 +1018,21 @@ totalCases: 5.2,
 	}
 
 	.sidebar {
-		width: 280px;
+		width: 320px;
 		flex-shrink: 0;
-	background: rgba(255, 255, 255, 0.05);
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.sidebar-section {
+		background: rgba(255, 255, 255, 0.05);
 		border-radius: 12px;
-	padding: 1.5rem;
-		height: fit-content;
 		backdrop-filter: blur(10px);
+	}
+
+	.sidebar-section:has(.nav-section) {
+		padding: 1.5rem;
 	}
 
 	.nav-section {

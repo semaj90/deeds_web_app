@@ -1,0 +1,1 @@
+export { default as RecommendationWidget } from './RecommendationWidget.svelte';

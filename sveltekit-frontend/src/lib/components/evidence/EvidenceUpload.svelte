@@ -115,13 +115,15 @@
     }))];
   }
 
-  // Get evidence type from MIME type
+  // Get evidence type from MIME type — maps to unified 16-value enum
   function getEvidenceTypeFromMimeType(mimeType: string) {
-    if (mimeType.startsWith('image/')) return 'image';
+    if (mimeType.startsWith('image/')) return 'photo';
     if (mimeType.startsWith('video/')) return 'video';
     if (mimeType.startsWith('audio/')) return 'audio';
-    if (mimeType === 'application/pdf') return 'document';
-    if (mimeType.includes('word') || mimeType.includes('text')) return 'document';
+    if (mimeType === 'application/pdf') return 'documentary';
+    if (mimeType.includes('word') || mimeType.includes('opendocument')) return 'documentary';
+    if (mimeType.includes('spreadsheet') || mimeType === 'text/csv') return 'digital';
+    if (mimeType.startsWith('text/')) return 'documentary';
     return 'document';
   }
 
@@ -307,11 +309,34 @@
                               bind:value={fileData.evidenceType}
                               class="mt-1 block w-full rounded-md border border-sand/20 px-3 py-2 text-sm"
                             >
-                              <option value="document">Document</option>
-                              <option value="image">Image</option>
-                              <option value="video">Video</option>
-                              <option value="audio">Audio</option>
-                              <option value="physical">Physical</option>
+                              <optgroup label="Media">
+                                <option value="photo">Photograph</option>
+                                <option value="video">Video Recording</option>
+                                <option value="audio">Audio Recording</option>
+                              </optgroup>
+                              <optgroup label="Documents">
+                                <option value="document">Document</option>
+                                <option value="documentary">Documentary Evidence</option>
+                              </optgroup>
+                              <optgroup label="Legal">
+                                <option value="testimonial">Testimonial</option>
+                                <option value="demonstrative">Demonstrative</option>
+                                <option value="witness_statement">Witness Statement</option>
+                              </optgroup>
+                              <optgroup label="Forensic">
+                                <option value="forensic">Forensic</option>
+                                <option value="scientific">Scientific</option>
+                                <option value="expert">Expert Opinion</option>
+                              </optgroup>
+                              <optgroup label="Physical">
+                                <option value="physical">Physical</option>
+                                <option value="real">Real Evidence</option>
+                                <option value="digital">Digital</option>
+                              </optgroup>
+                              <optgroup label="Context">
+                                <option value="circumstantial">Circumstantial</option>
+                                <option value="hearsay">Hearsay</option>
+                              </optgroup>
                             </select>
                           </div>
 

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import CitationHighlighter from './CitationHighlighter.svelte';
+
   interface Statute {
     id: string;
     code: string;
@@ -22,6 +24,16 @@
   let context: string[] = $state([]);
   let relatedCases: any[] = $state([]);
   let contextLoading = $state(false);
+
+  // Citation highlighting
+  interface HighlightedCitation {
+    text: string;
+    startIndex: number;
+    endIndex: number;
+    summary?: string;
+    confidence?: number;
+  }
+  let citations = $state<HighlightedCitation[]>([]);
 
   $effect(() => {
     if (statute) {
@@ -56,6 +68,19 @@
 
   function saveCitation() {
     onsavecitation?.(statute);
+  }
+
+  // Citation highlighting handlers
+  function handleSaveCitation(citation: HighlightedCitation) {
+    citations = [...citations, citation];
+  }
+
+  function handleRemoveCitation(citation: HighlightedCitation) {
+    citations = citations.filter(c => c.startIndex !== citation.startIndex);
+  }
+
+  function handleSummarize(result: { text: string; summary: string; confidence: number }) {
+    console.log('Citation summarized:', result);
   }
 </script>
 
@@ -105,9 +130,15 @@
 
  {#if statute.full_text}
  <div class="section">
- <h4>Full Text</h4>
+ <h4>Full Text (Select text to highlight & cite)</h4>
  <div class="full-text">
- {statute.full_text}
+ <CitationHighlighter
+   content={statute.full_text}
+   citations={citations}
+   onsave={handleSaveCitation}
+   onremove={handleRemoveCitation}
+   onsummarize={handleSummarize}
+ />
  </div>
  </div>
  {/if}

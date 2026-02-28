@@ -9,6 +9,7 @@
 	import VectorIntelligenceDemo from '$lib/components/ai/VectorIntelligenceDemo.svelte';
 	import type { GPURerankMetrics, GPURankedItem } from '$lib/gpu/gpu-search-reranker.js';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import { trackClick } from '$lib/utils/tracking';
 
 	let showRAGAssistant = $state(false);
 	let showCodebaseSearch = $state(false);
@@ -565,7 +566,17 @@
 					<button
 						class="bundle-card"
 						class:selected={selectedBundle === bundle}
-						onclick={() => { selectedBundle = bundle; selectedResult = null; }}
+						onclick={() => {
+						selectedBundle = bundle;
+						selectedResult = null;
+						// Track click on evidence bundle
+						trackClick({
+							documentId: bundle.hit.evidenceId,
+							recommendationId: `evidence-${bundle.hit.chunkIndex}`,
+							caseId: caseIdFilter || undefined,
+							searchContext: searchQuery
+						});
+					}}
 						type="button"
 					>
 						<div class="bundle-header">
@@ -632,7 +643,17 @@
 					<button
 						class="result-card"
 						class:selected={selectedResult === result}
-						onclick={() => { selectedResult = result; selectedBundle = null; }}
+						onclick={() => {
+						selectedResult = result;
+						selectedBundle = null;
+						// Track click on RAG result
+						trackClick({
+							documentId: result.source_id || result.chunk_id,
+							recommendationId: `rag-${result.chunk_id}`,
+							caseId: caseIdFilter || undefined,
+							searchContext: searchQuery
+						});
+					}}
 						type="button"
 					>
 						<div class="bundle-header">

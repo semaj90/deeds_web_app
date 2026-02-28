@@ -12,6 +12,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import type { ApiResponse, ClusteringConfig, DocumentCluster, ClusterResult } from '$lib/types/api.js';
 import { KMeansClusterer } from '$lib/server/ml/topic-cluster.js';
+import { SOMClusterer } from '$lib/server/ml/som-cluster.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { requireAuth } from '$lib/server/auth-helpers.js';
 
@@ -40,7 +41,7 @@ export const POST: RequestHandler = async (event) => {
 
 		// Validate algorithm
 		if (!['kmeans', 'som', 'hierarchical'].includes(algorithm)) {
-			return json<ApiResponse<null>>(
+			return json(
 				{
 					success: false,
 					error: `Unsupported algorithm: ${algorithm}. Use 'kmeans', 'som', or 'hierarchical'`
@@ -51,7 +52,7 @@ export const POST: RequestHandler = async (event) => {
 
 		// Validate k
 		if (k < 2 || k > 50) {
-			return json<ApiResponse<null>>(
+			return json(
 				{
 					success: false,
 					error: 'k must be between 2 and 50'
@@ -109,7 +110,7 @@ export const POST: RequestHandler = async (event) => {
 			console.log(`[cases-cluster] Fetched ${embeddings.length} embeddings from Qdrant`);
 		} catch (qdrantError) {
 			console.error('[cases-cluster] Qdrant fetch error:', qdrantError);
-			return json<ApiResponse<null>>(
+			return json(
 				{
 					success: false,
 					error: 'Failed to fetch embeddings from Qdrant'
@@ -119,7 +120,7 @@ export const POST: RequestHandler = async (event) => {
 		}
 
 		if (embeddings.length === 0) {
-			return json<ApiResponse<ClusterResult>>(
+			return json(
 				{
 					success: true,
 					data: {
@@ -188,17 +189,28 @@ export const POST: RequestHandler = async (event) => {
 				`[cases-cluster] k-means complete: silhouette=${result.silhouetteScore.toFixed(4)}, iterations=${result.iterations}`
 			);
 		} else if (algorithm === 'som') {
-			// TODO: Implement SOM clustering
-			return json<ApiResponse<null>>(
-				{
-					success: false,
-					error: 'SOM clustering not yet implemented. Use algorithm=kmeans for now.'
-				},
-				{ status: 501 }
+			console.log(`[cases-cluster] Running SOM clustering with grid size ${k}×${k}...`);
+
+			// Determine grid dimensions from k (e.g., k=5 → 5×5 grid = 25 neurons)
+			const gridSize = Math.ceil(Math.sqrt(k));
+			const som = new SOMClusterer(
+				gridSize,
+				gridSize,
+				768, // dimensions
+				100, // iterations
+				0.5, // learning rate
+				undefined // radius (auto-calculated)
+			);
+
+			const somResult = await som.train(embeddings);
+			clusterResult = SOMClusterer.toClusterResult(somResult, documentIds, includeEmbeddings);
+
+			console.log(
+				`[cases-cluster] SOM complete: quantizationError=${somResult.quantizationError.toFixed(4)}, topographicError=${(somResult.topographicError * 100).toFixed(2)}%`
 			);
 		} else {
 			// hierarchical
-			return json<ApiResponse<null>>(
+			return json(
 				{
 					success: false,
 					error: 'Hierarchical clustering not yet implemented. Use algorithm=kmeans for now.'
@@ -209,7 +221,7 @@ export const POST: RequestHandler = async (event) => {
 
 		const processingTime = Date.now() - startTime;
 
-		return json<ApiResponse<ClusterResult>>(
+		return json(
 			{
 				success: true,
 				data: {
@@ -228,7 +240,7 @@ export const POST: RequestHandler = async (event) => {
 		console.error('[cases-cluster] Request error:', err);
 		const message = err instanceof Error ? err.message : String(err);
 
-		return json<ApiResponse<null>>(
+		return json(
 			{
 				success: false,
 				error: `Clustering failed: ${message}`

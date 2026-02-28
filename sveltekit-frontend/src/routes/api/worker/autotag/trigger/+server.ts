@@ -48,7 +48,7 @@ export const POST: RequestHandler = async (event) => {
 
 		// Validate request
 		if (!body.type || !body.action) {
-			return json<ApiResponse<null>>(
+			return json(
 				{
 					success: false,
 					error: 'Missing required fields: type, action'
@@ -59,7 +59,7 @@ export const POST: RequestHandler = async (event) => {
 
 		// Validate IDs based on type
 		if (body.type === 'evidence_uploaded' && !body.evidenceId) {
-			return json<ApiResponse<null>>(
+			return json(
 				{
 					success: false,
 					error: 'evidenceId required for type=evidence_uploaded'
@@ -129,7 +129,7 @@ export const POST: RequestHandler = async (event) => {
 				`[autotag-trigger] Published message to ${queueName}: type=${body.type}, id=${body.evidenceId || body.caseId || body.documentId}`
 			);
 
-			return json<ApiResponse<WorkerTriggerResponse>>(
+			return json(
 				{
 					success: true,
 					data: {
@@ -154,7 +154,7 @@ export const POST: RequestHandler = async (event) => {
 
 			// Fallback: log to console but return success
 			// In production, you might want to queue this in a fallback system
-			return json<ApiResponse<WorkerTriggerResponse>>(
+			return json(
 				{
 					success: true,
 					data: {
@@ -180,7 +180,7 @@ export const POST: RequestHandler = async (event) => {
 		console.error('[autotag-trigger] Request error:', err);
 		const message = err instanceof Error ? err.message : String(err);
 
-		return json<ApiResponse<null>>(
+		return json(
 			{
 				success: false,
 				error: `Worker trigger failed: ${message}`
