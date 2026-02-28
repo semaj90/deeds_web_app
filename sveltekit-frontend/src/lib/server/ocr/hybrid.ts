@@ -43,14 +43,26 @@ function calculateOcrConfidence(text: string): number {
 }
 
 /**
+ * Sanitize filename for filesystem safety (matches tesseract.ts)
+ * Prevents issues with spaces, special characters in filenames.
+ */
+function sanitizeFilename(filename: string): string {
+    const basename = filename.replace(/^.*[\\/]/, '');
+    const safe = basename.replace(/[^a-zA-Z0-9._-]/g, '_');
+    return safe.substring(0, 255);
+}
+
+/**
  * Hybrid OCR service that tries native Tesseract first, then falls back to tesseract.js
  */
 export async function extractTextHybrid(imageBuffer: Buffer, filename: string): Promise<OcrResult> {
+    const safeFilename = sanitizeFilename(filename);
+
     // Try native Tesseract first
     try {
         const nativeAvailable = await isTesseractAvailable();
         if (nativeAvailable) {
-            const result = await extractTextFromImageNative(imageBuffer, filename);
+            const result = await extractTextFromImageNative(imageBuffer, safeFilename);
             return {
                 text: result.text,
                 method: 'native',
@@ -65,7 +77,7 @@ export async function extractTextHybrid(imageBuffer: Buffer, filename: string): 
     // Fallback to tesseract.js
     try {
         const tempDir = os.tmpdir();
-        const tempFile = path.join(tempDir, `ocr-js-${Date.now()}-${filename}`);
+        const tempFile = path.join(tempDir, `ocr-js-${Date.now()}-${safeFilename}`);
 
         // Write buffer to temp file for tesseract.js
         await fs.writeFile(tempFile, imageBuffer);

@@ -10,6 +10,20 @@ export interface OcrResult {
 }
 
 /**
+ * Sanitize filename for filesystem safety.
+ * Fixes: OCR extraction error with filenames containing spaces, special chars.
+ * Prevents: "Error in fopenReadStream: failed to open locally with tail..." bug.
+ */
+function sanitizeFilename(filename: string): string {
+    // Remove directory traversal attempts
+    const basename = filename.replace(/^.*[\\/]/, '');
+    // Replace unsafe characters with underscores (keeps: a-z, A-Z, 0-9, ., _, -)
+    const safe = basename.replace(/[^a-zA-Z0-9._-]/g, '_');
+    // Limit length to 255 characters (filesystem limit)
+    return safe.substring(0, 255);
+}
+
+/**
  * Extract text from an image file using Tesseract OCR
  */
 export async function extractTextFromImage(
@@ -17,7 +31,8 @@ export async function extractTextFromImage(
     filename: string
 ): Promise<OcrResult> {
     const tempDir = tmpdir();
-    const tempFile = path.join(tempDir, `ocr-${Date.now()}-${filename}`);
+    const safeFilename = sanitizeFilename(filename);
+    const tempFile = path.join(tempDir, `ocr-${Date.now()}-${safeFilename}`);
     const outputFile = tempFile.replace(path.extname(tempFile), '');
 
     try {
