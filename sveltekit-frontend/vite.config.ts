@@ -248,17 +248,23 @@ export default defineConfig(({ mode }) => {
       port: 4173,
       host: '0.0.0.0',
     },
+    css: {
+      transformer: 'postcss',  // Disable lightningcss for Vite 8
+    },
     build: {
       target: 'ES2022',
       minify: 'esbuild',
+      cssMinify: 'esbuild',  // Use esbuild for CSS (lightningcss has issues with @apply and malformed var())
       sourcemap: false,
       rollupOptions: {
         external: ['@xenova/transformers'],
         output: {
-          manualChunks: {
-            // webgpuAi, cognitiveRouter, gpuInference — corrupted/unused, fix later
-            bitsUi: ['bits-ui'],
-            // drizzle-orm, langchain — server-only (externalized by SvelteKit, cannot be in manualChunks)
+          manualChunks: (id) => {
+            // Rolldown requires manualChunks to be a function, not an object
+            if (id.includes('node_modules/bits-ui')) {
+              return 'bitsUi';
+            }
+            // drizzle-orm, langchain — server-only (externalized by SvelteKit)
           },
         },
       },
