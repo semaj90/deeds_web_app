@@ -64,8 +64,10 @@ const singleRoute = args.includes('--route') ? args[args.indexOf('--route') + 1]
 
 let routes;
 if (singleRoute) {
-  const name = singleRoute.replace(/^\//, '').replace(/\//g, '-') || 'home';
-  routes = [{ name, path: singleRoute }];
+  // Normalize route path (handle Git Bash MSYS path conversion)
+  const normalizedPath = singleRoute.startsWith('/') ? singleRoute : '/' + singleRoute;
+  const name = normalizedPath.replace(/^\//, '').replace(/\//g, '-') || 'home';
+  routes = [{ name, path: normalizedPath }];
 } else {
   routes = useAll ? ALL_ROUTES : QUICK_ROUTES;
 }

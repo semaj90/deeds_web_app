@@ -1,14 +1,14 @@
 {
-  "timestamp": "2026-03-01T20-53-34",
+  "timestamp": "2026-03-01T21-12-18",
   "base": "http://localhost:5173",
   "results": [
     {
-      "name": "command-center",
-      "url": "http://localhost:5173command-center",
-      "status": 0,
+      "name": "cases-test-id-board",
+      "url": "http://localhost:5173/cases/test-id/board",
+      "status": 500,
       "ok": false,
-      "error": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL",
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-01T20-53-34\\command-center-ERROR.png"
+      "error": "SvelteKit error page rendered",
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-01T21-12-18\\cases-test-id-board.png"
     }
   ],
   "summary": {

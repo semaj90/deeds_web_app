@@ -21,6 +21,7 @@ Original 1,345-line command-center page rendered blank (tan/beige screen)
 | 3b | + SystemStatus (with props) | ❌ FAIL | **TDZ error** - bits-ui ScrollArea has `let props = $props()` bug |
 | 3c | + SystemStatus (plain div scrolling) | ✅ PASS | **3 alerts rendering**, badge shows "1 WARNINGS", dismiss buttons work |
 | 4 | + QuickActions | ✅ PASS | **4 action buttons** (New Case, Upload Evidence, Global Search, Analytics) |
+| 5 | + CodebaseSearch | ✅ PASS | **Native `<dialog>` element**, no bits-ui, Ctrl/Cmd+K keyboard shortcut |
 
 ## Root Cause Analysis
 
@@ -68,6 +69,7 @@ import { ScrollArea } from 'bits-ui';
 ✅ `StatsCard` - Renders beautifully with metrics, trends, icons
 ✅ `SystemStatus` - **FIXED** - Now works with plain div scrolling (3 alerts, dismiss buttons)
 ✅ `QuickActions` - 4 action buttons with icons, labels, onClick handlers
+✅ `CodebaseSearch` - Native dialog element, 2-stage MCP search (Fuse→Qdrant)
 
 ## Next Steps
 

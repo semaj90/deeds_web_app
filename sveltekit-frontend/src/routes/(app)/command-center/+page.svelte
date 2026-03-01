@@ -7,6 +7,7 @@
 	import type { Alert, QuickAction } from '$lib/components/dashboard';
 	import type { PageData } from './$types';
 	import { goto } from '$app/navigation';
+	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -129,4 +130,7 @@
 
 		<QuickActions actions={quickActions} title="Quick Actions" layout="grid" compact={true} />
 	</div>
+
+	<!-- CodebaseSearch (Ctrl/Cmd+K to open) -->
+	<CodebaseSearch />
 </div>
