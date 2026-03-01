@@ -272,7 +272,7 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks: (id) => {
             // Rolldown requires manualChunks to be a function, not an object
-            // Split vendor chunks for better caching and parallel processing
+            // Split only vendor chunks - avoid splitting src/ code due to dynamic imports
             if (id.includes('node_modules/bits-ui')) {
               return 'vendor-bits-ui';
             }
@@ -281,19 +281,6 @@ export default defineConfig(({ mode }) => {
             }
             if (id.includes('node_modules/@internationalized')) {
               return 'vendor-i18n';
-            }
-            if (id.includes('node_modules/onnxruntime-web')) {
-              return 'vendor-onnx';
-            }
-            // Group large components by feature
-            if (id.includes('/components/ai/')) {
-              return 'features-ai';
-            }
-            if (id.includes('/components/evidence/')) {
-              return 'features-evidence';
-            }
-            if (id.includes('/components/legal/')) {
-              return 'features-legal';
             }
             // drizzle-orm, langchain — server-only (externalized by SvelteKit)
           },
