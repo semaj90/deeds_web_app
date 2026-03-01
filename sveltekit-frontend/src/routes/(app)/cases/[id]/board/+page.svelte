@@ -1146,4 +1146,261 @@ Format as: "Item N: position (x%, y%), group: [name], connect to: [items]"`;
 		color: #1f2937;
 		white-space: nowrap;
 	}
+
+	/* AI Chat Panel */
+	.ai-chat-panel {
+		position: fixed;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		width: 400px;
+		background: white;
+		border-left: 1px solid #e5e7eb;
+		display: flex;
+		flex-direction: column;
+		z-index: 100;
+		box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+	}
+
+	.chat-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 1rem 1.5rem;
+		border-bottom: 1px solid #e5e7eb;
+		background: #f9fafb;
+	}
+
+	.chat-title {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.chat-title h3 {
+		font-size: 1rem;
+		font-weight: 700;
+		color: #1f2937;
+		margin: 0;
+	}
+
+	.chat-status {
+		font-size: 0.75rem;
+		color: #6b7280;
+		padding: 0.25rem 0.5rem;
+		background: #e5e7eb;
+		border-radius: 0.25rem;
+	}
+
+	.chat-status.connected {
+		background: #d1fae5;
+		color: #065f46;
+	}
+
+	.close-btn {
+		padding: 0.25rem;
+		background: transparent;
+		border: none;
+		color: #6b7280;
+		cursor: pointer;
+		border-radius: 0.25rem;
+		transition: all 0.15s;
+	}
+
+	.close-btn:hover {
+		background: #e5e7eb;
+		color: #1f2937;
+	}
+
+	.chat-messages {
+		flex: 1;
+		overflow-y: auto;
+		padding: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.chat-welcome {
+		text-align: center;
+		padding: 2rem 1rem;
+		color: #6b7280;
+	}
+
+	.welcome-title {
+		font-size: 1.125rem;
+		font-weight: 600;
+		color: #1f2937;
+		margin: 1rem 0 0.5rem;
+	}
+
+	.welcome-text {
+		font-size: 0.875rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.quick-actions {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.quick-btn {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.75rem;
+		background: #f3f4f6;
+		border: 1px solid #e5e7eb;
+		border-radius: 0.5rem;
+		color: #1f2937;
+		font-size: 0.875rem;
+		cursor: pointer;
+		transition: all 0.15s;
+		text-align: left;
+	}
+
+	.quick-btn:hover {
+		background: #e5e7eb;
+		border-color: #3b82f6;
+	}
+
+	.chat-message {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.chat-message.user .message-content {
+		background: #eff6ff;
+		border: 1px solid #bfdbfe;
+		margin-left: 2rem;
+	}
+
+	.chat-message.assistant .message-content {
+		background: #f3f4f6;
+		border: 1px solid #e5e7eb;
+		margin-right: 2rem;
+	}
+
+	.message-content {
+		display: flex;
+		gap: 0.75rem;
+		padding: 0.75rem 1rem;
+		border-radius: 0.5rem;
+		font-size: 0.875rem;
+		line-height: 1.5;
+	}
+
+	.streaming-content {
+		color: #1f2937;
+	}
+
+	.message-meta {
+		display: flex;
+		gap: 1rem;
+		font-size: 0.75rem;
+		color: #6b7280;
+		padding-left: 2.5rem;
+	}
+
+	.confidence {
+		font-weight: 600;
+	}
+
+	.source {
+		color: #9ca3af;
+	}
+
+	.thinking-indicator {
+		display: flex;
+		gap: 0.25rem;
+		align-items: center;
+	}
+
+	.thinking-indicator .dot {
+		width: 0.5rem;
+		height: 0.5rem;
+		background: #9ca3af;
+		border-radius: 50%;
+		animation: thinking 1.4s infinite;
+	}
+
+	.thinking-indicator .dot:nth-child(2) {
+		animation-delay: 0.2s;
+	}
+
+	.thinking-indicator .dot:nth-child(3) {
+		animation-delay: 0.4s;
+	}
+
+	@keyframes thinking {
+		0%, 60%, 100% {
+			opacity: 0.3;
+			transform: scale(0.8);
+		}
+		30% {
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+
+	.chat-input {
+		display: flex;
+		gap: 0.75rem;
+		padding: 1rem 1.5rem;
+		border-top: 1px solid #e5e7eb;
+		background: white;
+	}
+
+	.chat-input textarea {
+		flex: 1;
+		padding: 0.75rem;
+		border: 1px solid #e5e7eb;
+		border-radius: 0.5rem;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 0.875rem;
+		resize: none;
+		outline: none;
+		transition: border-color 0.15s;
+	}
+
+	.chat-input textarea:focus {
+		border-color: #3b82f6;
+	}
+
+	.send-btn {
+		padding: 0.75rem 1rem;
+		background: #3b82f6;
+		border: none;
+		border-radius: 0.5rem;
+		color: white;
+		cursor: pointer;
+		transition: all 0.15s;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.send-btn:hover:not(:disabled) {
+		background: #2563eb;
+	}
+
+	.send-btn:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.action-btn.active {
+		background: #3b82f6;
+		color: white;
+	}
+
+	@keyframes spin {
+		to { transform: rotate(360deg); }
+	}
+
+	.action-btn [class*="loader"] {
+		animation: spin 1s linear infinite;
+	}
 </style>
