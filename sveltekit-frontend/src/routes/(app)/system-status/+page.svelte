@@ -18,25 +18,25 @@
 	<div class="flex gap-2 mb-6">
 		<button
 			onclick={() => (activeTab = 'overview')}
-			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeTab === 'overview' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
+			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeTab === 'overview' ? 'bg-accent text-black' : 'bg-panelSoft text-sand hover:bg-panel'}"
 		>
 			System Overview
 		</button>
 		<button
 			onclick={() => (activeTab = 'ai-services')}
-			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeTab === 'ai-services' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
+			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeTab === 'ai-services' ? 'bg-accent text-black' : 'bg-panelSoft text-sand hover:bg-panel'}"
 		>
 			AI Services
 		</button>
 		<button
 			onclick={() => (activeTab = 'live-metrics')}
-			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeTab === 'live-metrics' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
+			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeTab === 'live-metrics' ? 'bg-accent text-black' : 'bg-panelSoft text-sand hover:bg-panel'}"
 		>
 			Live Metrics
 		</button>
 		<button
 			onclick={() => (activeTab = 'init-status')}
-			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeTab === 'init-status' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
+			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeTab === 'init-status' ? 'bg-accent text-black' : 'bg-panelSoft text-sand hover:bg-panel'}"
 		>
 			Init Status
 		</button>
@@ -84,7 +84,7 @@
 			}} />
 		</div>
 	{:else if activeTab === 'live-metrics'}
-		<div class="bg-gray-900 rounded-lg shadow-xl p-6 border border-amber-900/30">
+		<div class="bg-panel rounded-lg shadow-xl p-6 border border-amber-900/30">
 			<h2 class="text-lg font-semibold text-amber-400 mb-4">Live System Metrics</h2>
 			<p class="text-sm text-gray-400 mb-4">
 				Real-time system load, GPU utilization, memory, and network metrics with simulated fluctuations.
@@ -97,7 +97,7 @@
 			/>
 		</div>
 	{:else if activeTab === 'init-status'}
-		<div class="bg-gray-900 rounded-lg shadow-xl p-6 border border-amber-900/30">
+		<div class="bg-panel rounded-lg shadow-xl p-6 border border-amber-900/30">
 			<h2 class="text-lg font-semibold text-amber-400 mb-4">System Initialization Status</h2>
 			<p class="text-sm text-gray-400 mb-4">
 				6-stage GPU/ML pipeline readiness (GPU Init, SIMD Parser, vLLM/Triton, Neo4j, XState, Ready).

@@ -207,7 +207,7 @@ evidenceId: crypto.randomUUID(),
 	}
 </script>
 
-<main class="container mx-auto p-6 bg-gray-900 text-white min-h-screen">
+<main class="container mx-auto p-6 bg-panel text-black min-h-screen">
 	<h1 class="text-3xl font-bold mb-6 text-yellow-400">Evidence Analysis</h1>
 
 	<Card class="mb-6">
@@ -223,7 +223,7 @@ evidenceId: crypto.randomUUID(),
 				</div>
 				<div>
 					<Label htmlFor="evidenceType">Evidence Type</Label>
-					<select id="evidenceType" bind:value={evidenceType} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus:border-[#ffd700] focus:outline-none">
+					<select id="evidenceType" bind:value={evidenceType} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-black focus:border-[#ffd700] focus:outline-none">
 						<option value="" disabled>Select type</option>
 						{#each evidenceTypes as type}
 							<option value={type.value}>{type.label}</option>
@@ -233,7 +233,7 @@ evidenceId: crypto.randomUUID(),
 			</div>
 			<div class="mb-4">
 			<Label htmlFor="evidenceFile">Upload File (optional)</Label>
-				<input type="file" id="evidenceFile" onchange={handleFileUpload} class="w-full p-3 my-2 bg-[#0a0d10] border-2 border-dashed border-gray-700 rounded-lg text-white cursor-pointer transition-all duration-300 hover:border-[#ffd700]" />
+				<input type="file" id="evidenceFile" onchange={handleFileUpload} class="w-full p-3 my-2 bg-[#0a0d10] border-2 border-dashed border-gray-700 rounded-lg text-black cursor-pointer transition-all duration-300 hover:border-[#ffd700]" />
 			</div>
 			<div class="mb-4">
 			<Label htmlFor="evidenceContent">Evidence Content</Label>
@@ -241,7 +241,7 @@ evidenceId: crypto.randomUUID(),
 			</div>
 			<div class="mb-4">
 			<Label htmlFor="priority">Priority</Label>
-				<select id="priority" bind:value={priority} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus:border-[#ffd700] focus:outline-none">
+				<select id="priority" bind:value={priority} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-black focus:border-[#ffd700] focus:outline-none">
 					<option value="" disabled>Select priority</option>
 					{#each priorityOptions as option}
 						<option value={option.value}>{option.label}</option>

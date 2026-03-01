@@ -6,7 +6,7 @@
 
 <section class="p-4 space-y-4">
 	<div class="flex items-center justify-between gap-2">
-		<h2 class="text-sm uppercase tracking-[0.25em] text-slate-400">Evidence Canvas</h2>
+		<h2 class="text-sm uppercase tracking-[0.25em] text-black/60">Evidence Canvas</h2>
 		<button
 			class="text-xs px-3 py-1 rounded-full border border-amber-400/60
  hover:bg-amber-400/10 transition-colors"
@@ -16,7 +16,7 @@
 	</div>
 
 	<div
-		class="relative border border-slate-800 rounded-2xl bg-slate-900/60
+		class="relative border border-slate-800 rounded-2xl bg-panel/60
  min-h-[420px] overflow-hidden"
 	>
 		<!-- Placeholder grid background -->
@@ -30,19 +30,19 @@
 			{#if evidence?.length}
 				{#each evidence as item (item.id)}
 					<div
-						class="border border-slate-700 rounded-xl bg-slate-950/80
- px-3 py-2 max-w-xs text-xs text-slate-100"
+						class="border border-black/20 rounded-xl /80
+ px-3 py-2 max-w-xs text-xs text-black"
 					>
 						<div class="font-semibold truncate mb-1">
 							{item.label ?? item.filename ?? `Evidence #${item.id}`}
 						</div>
-						<div class="line-clamp-3 text-slate-400">
+						<div class="line-clamp-3 text-black/60">
 							{item.summary ?? item.description ?? 'No summary yet.'}
 						</div>
 					</div>
 				{/each}
 			{:else}
-				<div class="text-xs text-slate-400">
+				<div class="text-xs text-black/60">
 					No evidence linked to this case yet. Upload documents or photos to populate the canvas.
 				</div>
 			{/if}

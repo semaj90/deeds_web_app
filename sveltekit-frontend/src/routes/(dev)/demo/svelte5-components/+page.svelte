@@ -72,10 +72,10 @@ const tabs = [
 	<title>Svelte 5 Components Demo</title>
 </svelte:head>
 
-<div class="min-h-screen bg-slate-900 text-white p-8">
+<div class="min-h-screen bg-panel text-black p-8">
 	<header class="max-w-4xl mx-auto mb-8">
 		<h1 class="text-3xl font-bold mb-2">🎮 Svelte 5 Components Demo</h1>
-		<p class="text-slate-400">Testing all new Svelte 5 runes-based UI components</p>
+		<p class="text-black/60">Testing all new Svelte 5 runes-based UI components</p>
 	</header>
 
 	<main class="max-w-4xl mx-auto space-y-8">
@@ -104,7 +104,7 @@ const tabs = [
 
 			<Svelte5Tabs bind:value={activeTab} {tabs} variant="nes">
 				<Svelte5TabPanel value="form">
-					<div class="space-y-4 p-4 bg-slate-800 rounded-lg">
+					<div class="space-y-4 p-4 bg-sand/10 rounded-lg">
 						<div>
 							<label class="block text-sm font-medium text-slate-300 mb-1">Document Name</label>
 							<Svelte5Input
@@ -187,7 +187,7 @@ const tabs = [
 							/>
 							<div>
 								<h3 class="font-bold">John Doe</h3>
-								<p class="text-slate-400">Senior Attorney</p>
+								<p class="text-black/60">Senior Attorney</p>
 								<div class="flex gap-2 mt-2">
 									<Svelte5Badge variant="success" dot>Active</Svelte5Badge>
 									<Svelte5Badge variant="default">Legal</Svelte5Badge>
@@ -238,7 +238,7 @@ const tabs = [
 		<p class="text-slate-300 mb-4">
 			This action will process the document with the following settings:
 		</p>
-		<ul class="list-disc pl-6 text-slate-400 space-y-1">
+		<ul class="list-disc pl-6 text-black/60 space-y-1">
 			<li>Document: {inputValue || 'Untitled'}</li>
 			<li>Type: {selectValue || 'Not selected'}</li>
 			<li>AI Analysis: {checkboxChecked ? 'Enabled' : 'Disabled'}</li>

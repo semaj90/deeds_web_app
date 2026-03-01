@@ -13,7 +13,7 @@
 
 <div class="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 p-8">
   <div class="max-w-4xl mx-auto">
-    <h1 class="text-4xl font-bold text-white mb-4">
+    <h1 class="text-4xl font-bold text-black mb-4">
       bits-ui + UnoCSS Demo
     </h1>
     <p class="text-gray-300 mb-8">
@@ -22,10 +22,10 @@
 
     <!-- Dialog Example -->
     <div class="mb-8">
-      <h2 class="text-2xl font-semibold text-white mb-4">Dialog Component</h2>
+      <h2 class="text-2xl font-semibold text-black mb-4">Dialog Component</h2>
 
       <Button.Root
-        class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
+        class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-black rounded-lg font-medium transition-colors"
         onclick={() => open = true}
       >
         Open Dialog
@@ -36,10 +36,10 @@
           <Dialog.Overlay class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
           <Dialog.Content
             class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50
-                   w-full max-w-md p-6 bg-gray-800 rounded-xl shadow-2xl
+                   w-full max-w-md p-6 bg-sand/10 rounded-xl shadow-2xl
                    border border-gray-700"
           >
-            <Dialog.Title class="text-2xl font-bold text-white mb-2">
+            <Dialog.Title class="text-2xl font-bold text-black mb-2">
               Welcome to bits-ui!
             </Dialog.Title>
             <Dialog.Description class="text-gray-300 mb-6">
@@ -72,14 +72,14 @@
 
             <div class="flex gap-3">
               <Button.Root
-                class="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg
+                class="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-black rounded-lg
                        transition-colors"
                 onclick={() => open = false}
               >
                 Cancel
               </Button.Root>
               <Button.Root
-                class="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg
+                class="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-black rounded-lg
                        font-medium transition-colors"
                 onclick={() => {
                   open = false;
@@ -102,7 +102,7 @@
 
     <!-- Select Example -->
     <div class="mb-8">
-      <h2 class="text-2xl font-semibold text-white mb-4">Select Component</h2>
+      <h2 class="text-2xl font-semibold text-black mb-4">Select Component</h2>
 
       <div class="max-w-xs">
         <label class="block text-sm font-medium text-gray-300 mb-2">
@@ -110,8 +110,8 @@
         </label>
         <div class="relative">
           <button
-            class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg
-                   text-left text-white hover:bg-gray-750 transition-colors
+            class="w-full px-4 py-3 bg-sand/10 border border-gray-700 rounded-lg
+                   text-left text-black hover:bg-gray-750 transition-colors
                    flex items-center justify-between"
           >
             <span class="capitalize">{selectedValue}</span>
@@ -123,11 +123,11 @@
 
     <!-- Button Examples -->
     <div class="mb-8">
-      <h2 class="text-2xl font-semibold text-white mb-4">Button Variants</h2>
+      <h2 class="text-2xl font-semibold text-black mb-4">Button Variants</h2>
 
       <div class="flex flex-wrap gap-3">
         <Button.Root
-          class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg
+          class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-black rounded-lg
                  font-medium transition-colors shadow-lg shadow-purple-500/20"
         >
           Primary Button
@@ -141,14 +141,14 @@
         </Button.Root>
 
         <Button.Root
-          class="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg
+          class="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-black rounded-lg
                  font-medium transition-colors"
         >
           Secondary Button
         </Button.Root>
 
         <Button.Root
-          class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg
+          class="px-6 py-3 bg-red-600 hover:bg-red-700 text-black rounded-lg
                  font-medium transition-colors shadow-lg shadow-red-500/20"
         >
           Danger Button
@@ -158,9 +158,9 @@
 
     <!-- Separator Examples -->
     <div class="mb-8">
-      <h2 class="text-2xl font-semibold text-white mb-4">Separators</h2>
+      <h2 class="text-2xl font-semibold text-black mb-4">Separators</h2>
 
-      <div class="space-y-4 p-6 bg-gray-800/50 rounded-lg border border-gray-700">
+      <div class="space-y-4 p-6 bg-sand/10/50 rounded-lg border border-gray-700">
         <div class="text-gray-300">Section 1</div>
         <hr class="h-px bg-gray-700 border-0" />
         <div class="text-gray-300">Section 2</div>
@@ -171,43 +171,43 @@
 
     <!-- UnoCSS Features -->
     <div class="mb-8">
-      <h2 class="text-2xl font-semibold text-white mb-4">UnoCSS Features</h2>
+      <h2 class="text-2xl font-semibold text-black mb-4">UnoCSS Features</h2>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="p-6 bg-gray-800/50 rounded-lg border border-gray-700">
+        <div class="p-6 bg-sand/10/50 rounded-lg border border-gray-700">
           <div class="flex items-center gap-3 mb-3">
             <div class="i-carbon-data-view-alt text-2xl text-purple-400"></div>
-            <h3 class="text-lg font-semibold text-white">Utility-First</h3>
+            <h3 class="text-lg font-semibold text-black">Utility-First</h3>
           </div>
           <p class="text-gray-400 text-sm">
             Compose designs directly in your markup using utility classes.
           </p>
         </div>
 
-        <div class="p-6 bg-gray-800/50 rounded-lg border border-gray-700">
+        <div class="p-6 bg-sand/10/50 rounded-lg border border-gray-700">
           <div class="flex items-center gap-3 mb-3">
             <div class="i-carbon-flash text-2xl text-purple-400"></div>
-            <h3 class="text-lg font-semibold text-white">Lightning Fast</h3>
+            <h3 class="text-lg font-semibold text-black">Lightning Fast</h3>
           </div>
           <p class="text-gray-400 text-sm">
             On-demand atomic CSS generation with zero runtime.
           </p>
         </div>
 
-        <div class="p-6 bg-gray-800/50 rounded-lg border border-gray-700">
+        <div class="p-6 bg-sand/10/50 rounded-lg border border-gray-700">
           <div class="flex items-center gap-3 mb-3">
             <div class="i-carbon-code text-2xl text-purple-400"></div>
-            <h3 class="text-lg font-semibold text-white">Icon System</h3>
+            <h3 class="text-lg font-semibold text-black">Icon System</h3>
           </div>
           <p class="text-gray-400 text-sm">
             Use icons as classes with the `i-` prefix (Carbon, Lucide, etc.).
           </p>
         </div>
 
-        <div class="p-6 bg-gray-800/50 rounded-lg border border-gray-700">
+        <div class="p-6 bg-sand/10/50 rounded-lg border border-gray-700">
           <div class="flex items-center gap-3 mb-3">
             <div class="i-carbon-accessibility text-2xl text-purple-400"></div>
-            <h3 class="text-lg font-semibold text-white">Accessible</h3>
+            <h3 class="text-lg font-semibold text-black">Accessible</h3>
           </div>
           <p class="text-gray-400 text-sm">
             bits-ui handles ARIA attributes and keyboard navigation automatically.
@@ -218,9 +218,9 @@
 
     <!-- Code Example -->
     <div class="mb-8">
-      <h2 class="text-2xl font-semibold text-white mb-4">Usage Example</h2>
+      <h2 class="text-2xl font-semibold text-black mb-4">Usage Example</h2>
 
-      <pre class="p-6 bg-gray-900 rounded-lg border border-gray-700 overflow-x-auto text-sm">
+      <pre class="p-6 bg-panel rounded-lg border border-gray-700 overflow-x-auto text-sm">
         <code class="text-gray-300">{`<script lang="ts">
   import { Dialog, Button } from "bits-ui";
   let open = $state(false);
@@ -228,7 +228,7 @@
 
 <Button.Root
   class="px-6 py-3 bg-purple-600 hover:bg-purple-700
-         text-white rounded-lg transition-colors"
+         text-black rounded-lg transition-colors"
   onclick={() => open = true}
 >
   Open Dialog
@@ -239,8 +239,8 @@
     <Dialog.Overlay class="fixed inset-0 bg-black/50" />
     <Dialog.Content class="fixed left-1/2 top-1/2
                            -translate-x-1/2 -translate-y-1/2
-                           bg-gray-800 rounded-xl p-6">
-      <Dialog.Title class="text-2xl font-bold text-white">
+                           bg-sand/10 rounded-xl p-6">
+      <Dialog.Title class="text-2xl font-bold text-black">
         Title
       </Dialog.Title>
       <Dialog.Description class="text-gray-300">

@@ -120,7 +120,7 @@ suggestionsByRisk: Record<string, Suggestion[]>;
 					<button
 						onclick={ loadData }
 						disabled={isLoading}
-						class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 disabled bg-gray-400 transition"
+						class="px-4 py-2 bg-blue-600 text-black font-semibold rounded hover:bg-blue-700 disabled bg-gray-400 transition"
 					>
 						{isLoading ? 'Loading...' : 'Refresh'}
 					</button>
@@ -202,7 +202,7 @@ suggestionsByRisk: Record<string, Suggestion[]>;
 								<p class="text-gray-700 leading-relaxed mb-6">{suggestion.summary}</p>
 
 								<h3 class="font-semibold text-gray-900 mb-3">Suggested Fix</h3>
-								<pre class="bg-gray-900 text-green-400 p-5 rounded-lg overflow-x-auto text-sm font-mono leading-relaxed"><code>{extractCodePreview(suggestion.patch)}</code></pre>
+								<pre class="bg-panel text-green-400 p-5 rounded-lg overflow-x-auto text-sm font-mono leading-relaxed"><code>{extractCodePreview(suggestion.patch)}</code></pre>
 							</div>
 
 							<!-- Actions -->
@@ -225,7 +225,7 @@ suggestionsByRisk: Record<string, Suggestion[]>;
 									</button>
 									{#if !suggestion.applied}
 										<button
-											class="px-5 py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700 shadow-sm disabled bg-gray-400 transition"
+											class="px-5 py-2 bg-indigo-600 text-black text-sm font-semibold rounded hover:bg-indigo-700 shadow-sm disabled bg-gray-400 transition"
 											onclick={() => applyPatch(suggestion.id)}
 											disabled={applyingPatch === suggestion.id}
 										>

@@ -437,14 +437,14 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  <div class="flex gap-2">
  <button
  onclick={() => (showNotesPanel = !showNotesPanel)}
- class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+ class="px-4 py-2 bg-blue-600 text-black rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
  title="Open case notes editor"
  >
  📝 {showNotesPanel ? 'Hide Notes' : 'Case Notes'}
  </button>
  <button
  onclick={() => (showChatModal = true)}
- class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center gap-2"
+ class="px-4 py-2 bg-purple-600 text-black rounded-lg hover:bg-purple-700 transition flex items-center gap-2"
  title="Open AI chat with case context"
  >
  🧠 AI Chat
@@ -452,7 +452,7 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  <button
  onclick={handleExportPacket}
  disabled={isExportingPacket}
- class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 disabled:opacity-50"
+ class="px-4 py-2 bg-green-600 text-black rounded-lg hover:bg-green-700 transition flex items-center gap-2 disabled:opacity-50"
  title="Export case packet as PDF"
  >
  📄 {isExportingPacket ? 'Exporting...' : 'Export Packet'}
@@ -469,18 +469,18 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
    </button>
    <button
      onclick={() => (showYoRHaDetails = true)}
-     class="text-sm px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
+     class="text-sm px-3 py-1 bg-indigo-600 text-black rounded hover:bg-indigo-700 transition"
    >
      Case Intelligence Hub
    </button>
  </div>
  {#if showDescriptionEditor}
    <div class="mt-2 mb-2 flex gap-2">
-     <button onclick={() => (editorMode = 'wysiwyg')} class="text-xs px-2 py-1 rounded {editorMode === 'wysiwyg' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}">Rich Editor</button>
-     <button onclick={() => (editorMode = 'tiptap')} class="text-xs px-2 py-1 rounded {editorMode === 'tiptap' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}">TipTap Editor</button>
-     <button onclick={() => (editorMode = 'ai-tiptap')} class="text-xs px-2 py-1 rounded {editorMode === 'ai-tiptap' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'}">AI Editor</button>
-     <button onclick={() => (editorMode = 'nier')} class="text-xs px-2 py-1 rounded {editorMode === 'nier' ? 'bg-gray-800 text-green-400' : 'bg-gray-200 text-gray-700'}">NieR Editor</button>
-     <button onclick={() => (editorMode = 'inline')} class="text-xs px-2 py-1 rounded {editorMode === 'inline' ? 'bg-emerald-600 text-white' : 'bg-gray-200 text-gray-700'}">Inline AI</button>
+     <button onclick={() => (editorMode = 'wysiwyg')} class="text-xs px-2 py-1 rounded {editorMode === 'wysiwyg' ? 'bg-blue-600 text-black' : 'bg-gray-200 text-gray-700'}">Rich Editor</button>
+     <button onclick={() => (editorMode = 'tiptap')} class="text-xs px-2 py-1 rounded {editorMode === 'tiptap' ? 'bg-blue-600 text-black' : 'bg-gray-200 text-gray-700'}">TipTap Editor</button>
+     <button onclick={() => (editorMode = 'ai-tiptap')} class="text-xs px-2 py-1 rounded {editorMode === 'ai-tiptap' ? 'bg-indigo-600 text-black' : 'bg-gray-200 text-gray-700'}">AI Editor</button>
+     <button onclick={() => (editorMode = 'nier')} class="text-xs px-2 py-1 rounded {editorMode === 'nier' ? 'bg-sand/10 text-green-400' : 'bg-gray-200 text-gray-700'}">NieR Editor</button>
+     <button onclick={() => (editorMode = 'inline')} class="text-xs px-2 py-1 rounded {editorMode === 'inline' ? 'bg-emerald-600 text-black' : 'bg-gray-200 text-gray-700'}">Inline AI</button>
    </div>
    <div class="mt-2">
      {#if editorMode === 'wysiwyg'}
@@ -561,7 +561,7 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
      <div class="flex items-center justify-between px-4 py-2 bg-[#1a1a2e] border-b border-[#3a3a3a]">
        <span class="font-mono text-xs text-[#9ca3af] tracking-widest uppercase">[CASE_NOTES::TERMINAL]</span>
        <span class="font-mono text-[10px] text-[#6b7280]">{caseId.slice(0, 8)}</span>
-       <button class="text-[#9ca3af] hover:text-white text-lg font-bold leading-none" onclick={() => (showNotesPanel = false)}>×</button>
+       <button class="text-[#9ca3af] hover:text-black text-lg font-bold leading-none" onclick={() => (showNotesPanel = false)}>×</button>
      </div>
      <div class="flex-1 overflow-hidden">
        <CaseNotesEditor {caseId} onClose={() => showNotesPanel = false} />
@@ -572,7 +572,7 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
 
  <!-- Export Error Message -->
  {#if exportPacketError}
- <div class="fixed top-4 right-4 bg-red-600 text-white px-4 py-3 rounded-lg shadow-lg z-50">
+ <div class="fixed top-4 right-4 bg-red-600 text-black px-4 py-3 rounded-lg shadow-lg z-50">
  <p>{exportPacketError}</p>
  </div>
  {/if}
@@ -770,7 +770,7 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
      <h2 class="text-lg font-semibold text-gray-900">Citations</h2>
      <button
        onclick={() => (showCitationModal = true)}
-       class="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition"
+       class="px-3 py-1.5 bg-blue-600 text-black text-sm rounded-lg hover:bg-blue-700 transition"
      >
        + Add Citation
      </button>
@@ -1080,7 +1080,7 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
 <!-- Floating Write Document Button -->
 <button
   onclick={() => (showDocumentWriter = true)}
-  class="fixed bottom-6 right-6 z-40 px-4 py-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition text-sm font-medium"
+  class="fixed bottom-6 right-6 z-40 px-4 py-3 bg-blue-600 text-black rounded-full shadow-lg hover:bg-blue-700 transition text-sm font-medium"
   title="Write Case Document"
 >
   Write Document

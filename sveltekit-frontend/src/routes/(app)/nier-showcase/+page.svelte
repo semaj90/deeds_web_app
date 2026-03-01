@@ -39,67 +39,67 @@
 	<div class="flex flex-wrap gap-2 mb-6">
 		<button
 			onclick={() => (activeSection = 'command-center')}
-			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'command-center' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
+			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'command-center' ? 'bg-accent text-black' : 'bg-panelSoft text-sand hover:bg-panel'}"
 		>
 			Command Center
 		</button>
 		<button
 			onclick={() => (activeSection = 'terminal')}
-			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'terminal' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
+			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'terminal' ? 'bg-accent text-black' : 'bg-panelSoft text-sand hover:bg-panel'}"
 		>
 			Terminal
 		</button>
 		<button
 			onclick={() => (activeSection = 'system-status')}
-			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'system-status' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
+			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'system-status' ? 'bg-accent text-black' : 'bg-panelSoft text-sand hover:bg-panel'}"
 		>
 			System Status
 		</button>
 		<button
 			onclick={() => (activeSection = 'dialogs')}
-			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'dialogs' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
+			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'dialogs' ? 'bg-accent text-black' : 'bg-panelSoft text-sand hover:bg-panel'}"
 		>
 			Dialogs
 		</button>
 		<button
 			onclick={() => (activeSection = 'diamond-modal')}
-			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'diamond-modal' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
+			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'diamond-modal' ? 'bg-accent text-black' : 'bg-panelSoft text-sand hover:bg-panel'}"
 		>
 			Diamond Modal
 		</button>
 		<button
 			onclick={() => (activeSection = 'gaming-retro')}
-			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'gaming-retro' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
+			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'gaming-retro' ? 'bg-accent text-black' : 'bg-panelSoft text-sand hover:bg-panel'}"
 		>
 			Gaming Retro
 		</button>
 		<button
 			onclick={() => (activeSection = 'bits-ui')}
-			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'bits-ui' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
+			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'bits-ui' ? 'bg-accent text-black' : 'bg-panelSoft text-sand hover:bg-panel'}"
 		>
 			Bits UI
 		</button>
 		<button
 			onclick={() => (activeSection = 'command-interface')}
-			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'command-interface' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
+			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'command-interface' ? 'bg-accent text-black' : 'bg-panelSoft text-sand hover:bg-panel'}"
 		>
 			Command Interface
 		</button>
 		<button
 			onclick={() => (activeSection = 'detective-form')}
-			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'detective-form' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
+			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'detective-form' ? 'bg-accent text-black' : 'bg-panelSoft text-sand hover:bg-panel'}"
 		>
 			Detective Form
 		</button>
 		<button
 			onclick={() => (activeSection = 'n64-progress')}
-			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'n64-progress' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
+			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'n64-progress' ? 'bg-accent text-black' : 'bg-panelSoft text-sand hover:bg-panel'}"
 		>
 			N64 Progress
 		</button>
 		<button
 			onclick={() => (activeSection = 'nes-crt')}
-			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'nes-crt' ? 'bg-accent text-white' : 'bg-panelSoft text-sand hover:bg-panel'}"
+			class="px-4 py-2 rounded-lg text-sm font-medium transition {activeSection === 'nes-crt' ? 'bg-accent text-black' : 'bg-panelSoft text-sand hover:bg-panel'}"
 		>
 			NES CRT
 		</button>
@@ -107,7 +107,7 @@
 
 	<!-- Content Sections -->
 	{#if activeSection === 'command-center'}
-		<div class="bg-gray-900 rounded-lg shadow-xl p-6 border border-amber-900/30">
+		<div class="bg-panel rounded-lg shadow-xl p-6 border border-amber-900/30">
 			<h2 class="text-lg font-semibold text-amber-400 mb-4">YoRHa Command Center</h2>
 			<p class="text-sm text-gray-400 mb-4">
 				Cluster health monitoring with real-time metrics from /api/yorha/cluster-health.
@@ -115,7 +115,7 @@
 			<YoRHaCommandCenter />
 		</div>
 	{:else if activeSection === 'terminal'}
-		<div class="bg-gray-900 rounded-lg shadow-xl p-6 border border-amber-900/30">
+		<div class="bg-panel rounded-lg shadow-xl p-6 border border-amber-900/30">
 			<h2 class="text-lg font-semibold text-amber-400 mb-4">YoRHa Legal Terminal</h2>
 			<p class="text-sm text-gray-400 mb-4">
 				Interactive terminal. Type "help" for commands.
@@ -127,7 +127,7 @@
 			/>
 		</div>
 	{:else if activeSection === 'system-status'}
-		<div class="bg-gray-900 rounded-lg shadow-xl p-6 border border-amber-900/30">
+		<div class="bg-panel rounded-lg shadow-xl p-6 border border-amber-900/30">
 			<h2 class="text-lg font-semibold text-amber-400 mb-4">System Status Monitor</h2>
 			<p class="text-sm text-gray-400 mb-4">
 				Live system metrics with simulated fluctuations (CPU, GPU, memory, network).
@@ -140,7 +140,7 @@
 			/>
 		</div>
 	{:else if activeSection === 'dialogs'}
-		<div class="bg-gray-900 rounded-lg shadow-xl p-6 border border-amber-900/30">
+		<div class="bg-panel rounded-lg shadow-xl p-6 border border-amber-900/30">
 			<h2 class="text-lg font-semibold text-amber-400 mb-4">YoRHa Dialog System</h2>
 			<p class="text-sm text-gray-400 mb-6">
 				Themed modal dialogs for confirmations, alerts, and prompts.
@@ -149,25 +149,25 @@
 			<div class="flex flex-wrap gap-3">
 				<button
 					onclick={() => (showInfoDialog = true)}
-					class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 text-sm"
+					class="px-4 py-2 bg-blue-600 text-black rounded hover:bg-blue-500 text-sm"
 				>
 					Info Dialog
 				</button>
 				<button
 					onclick={() => (showConfirmDialog = true)}
-					class="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-500 text-sm"
+					class="px-4 py-2 bg-amber-600 text-black rounded hover:bg-amber-500 text-sm"
 				>
 					Confirm Dialog
 				</button>
 				<button
 					onclick={() => (showWarningDialog = true)}
-					class="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-500 text-sm"
+					class="px-4 py-2 bg-orange-600 text-black rounded hover:bg-orange-500 text-sm"
 				>
 					Warning Dialog
 				</button>
 				<button
 					onclick={() => (showErrorDialog = true)}
-					class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 text-sm"
+					class="px-4 py-2 bg-red-600 text-black rounded hover:bg-red-500 text-sm"
 				>
 					Error Dialog
 				</button>
@@ -207,7 +207,7 @@
 			/>
 		</div>
 	{:else if activeSection === 'diamond-modal'}
-		<div class="bg-gray-900 rounded-lg shadow-xl p-6 border border-amber-900/30">
+		<div class="bg-panel rounded-lg shadow-xl p-6 border border-amber-900/30">
 			<h2 class="text-lg font-semibold text-amber-400 mb-4">Diamond Modal System</h2>
 			<p class="text-sm text-gray-400 mb-4">
 				Retro gaming-themed modal with animated diamond canvas pattern, glass effect, and card-corner decorations.
@@ -219,7 +219,7 @@
 					{#each ['nes', 'snes', 'ps1', 'n64', 'ps2'] as p}
 						<button
 							onclick={() => (diamondPalette = p as typeof diamondPalette)}
-							class="px-3 py-1 rounded text-xs font-mono transition {diamondPalette === p ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}"
+							class="px-3 py-1 rounded text-xs font-mono transition {diamondPalette === p ? 'bg-purple-600 text-black' : 'bg-sand/10 text-gray-400 hover:bg-gray-700'}"
 						>
 							{p.toUpperCase()}
 						</button>
@@ -233,7 +233,7 @@
 					{#each ['small', 'medium', 'large'] as s}
 						<button
 							onclick={() => (diamondSize = s as typeof diamondSize)}
-							class="px-3 py-1 rounded text-xs font-mono transition {diamondSize === s ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}"
+							class="px-3 py-1 rounded text-xs font-mono transition {diamondSize === s ? 'bg-purple-600 text-black' : 'bg-sand/10 text-gray-400 hover:bg-gray-700'}"
 						>
 							{s.toUpperCase()}
 						</button>
@@ -243,7 +243,7 @@
 
 			<button
 				onclick={() => (showDiamondModal = true)}
-				class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-500 text-sm"
+				class="px-4 py-2 bg-purple-600 text-black rounded hover:bg-purple-500 text-sm"
 			>
 				Open Diamond Modal
 			</button>
@@ -264,7 +264,7 @@
 			</DiamondModal>
 		</div>
 	{:else if activeSection === 'gaming-retro'}
-		<div class="bg-gray-900 rounded-lg shadow-xl p-6 border border-amber-900/30">
+		<div class="bg-panel rounded-lg shadow-xl p-6 border border-amber-900/30">
 			<h2 class="text-lg font-semibold text-amber-400 mb-4">Gaming Retro Components</h2>
 			<p class="text-sm text-gray-400 mb-6">
 				Retro gaming-era UI — SNES buttons, progressive era theming, GPU cache visualization, LOD processing, recommendation modals.
@@ -299,7 +299,7 @@
 					{#each ['8bit', '16bit', '32bit', '64bit', 'modern'] as era}
 						<button
 							onclick={() => (selectedGamingEra = era as typeof selectedGamingEra)}
-							class="px-3 py-1 rounded text-xs font-mono transition {selectedGamingEra === era ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}"
+							class="px-3 py-1 rounded text-xs font-mono transition {selectedGamingEra === era ? 'bg-purple-600 text-black' : 'bg-sand/10 text-gray-400 hover:bg-gray-700'}"
 						>
 							{era.toUpperCase()}
 						</button>
@@ -332,7 +332,7 @@
 				<h3 class="text-sm font-medium text-gray-300 mb-3">Retro Recommendation Modal</h3>
 				<button
 					onclick={() => (showRetroModal = true)}
-					class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500 text-sm"
+					class="px-4 py-2 bg-indigo-600 text-black rounded hover:bg-indigo-500 text-sm"
 				>
 					Open AI Recommendations
 				</button>
@@ -344,7 +344,7 @@
 			</div>
 		</div>
 	{:else if activeSection === 'bits-ui'}
-		<div class="bg-gray-900 rounded-lg shadow-xl p-6 border border-amber-900/30">
+		<div class="bg-panel rounded-lg shadow-xl p-6 border border-amber-900/30">
 			<h2 class="text-lg font-semibold text-amber-400 mb-4">Bits UI Component Library</h2>
 			<p class="text-sm text-gray-400 mb-4">
 				bits-ui v2.16.2 headless primitives — Dialog, Select, Button, Input with YoRHa styling.
@@ -352,7 +352,7 @@
 			<BitsUIDemo />
 		</div>
 	{:else if activeSection === 'command-interface'}
-		<div class="bg-gray-900 rounded-lg shadow-xl border border-amber-900/30 overflow-hidden">
+		<div class="bg-panel rounded-lg shadow-xl border border-amber-900/30 overflow-hidden">
 			<h2 class="text-lg font-semibold text-amber-400 p-6 pb-2">YoRHa Command Interface</h2>
 			<p class="text-sm text-gray-400 px-6 pb-4">
 				Advanced 3D holographic command terminal with WebGL, module monitoring, and AI command routing.
@@ -360,7 +360,7 @@
 			<YoRHaCommandInterface />
 		</div>
 	{:else if activeSection === 'detective-form'}
-		<div class="bg-gray-900 rounded-lg shadow-xl p-6 border border-amber-900/30">
+		<div class="bg-panel rounded-lg shadow-xl p-6 border border-amber-900/30">
 			<h2 class="text-lg font-semibold text-amber-400 mb-4">YoRHa Detective Form</h2>
 			<p class="text-sm text-gray-400 mb-4">
 				Dynamic form builder with YoRHa styling — text, textarea, select, email, number fields with validation.
@@ -383,7 +383,7 @@
 			/>
 		</div>
 	{:else if activeSection === 'n64-progress'}
-		<div class="bg-gray-900 rounded-lg shadow-xl p-6 border border-amber-900/30">
+		<div class="bg-panel rounded-lg shadow-xl p-6 border border-amber-900/30">
 			<h2 class="text-lg font-semibold text-amber-400 mb-4">N64 3D Progress Bar</h2>
 			<p class="text-sm text-gray-400 mb-4">
 				Retro N64-themed 3D progress indicator with texture streaming, glow effects, and wave animations.
@@ -402,13 +402,13 @@
 								if (progressValue >= 100) { progressValue = 100; if (progressInterval) clearInterval(progressInterval); }
 							}, 100);
 						}}
-						class="px-4 py-2 bg-green-700 text-white text-sm rounded hover:bg-green-600 transition"
+						class="px-4 py-2 bg-green-700 text-black text-sm rounded hover:bg-green-600 transition"
 					>
 						Start Progress
 					</button>
 					<button
 						onclick={() => { progressValue = 0; if (progressInterval) clearInterval(progressInterval); }}
-						class="px-4 py-2 bg-red-700 text-white text-sm rounded hover:bg-red-600 transition"
+						class="px-4 py-2 bg-red-700 text-black text-sm rounded hover:bg-red-600 transition"
 					>
 						Reset
 					</button>

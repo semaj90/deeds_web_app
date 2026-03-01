@@ -91,7 +91,7 @@
 
 <section class="p-4 space-y-4">
 	<div class="flex items-center justify-between gap-2">
-		<h2 class="text-sm uppercase tracking-[0.25em] text-slate-400">Reports</h2>
+		<h2 class="text-sm uppercase tracking-[0.25em] text-black/60">Reports</h2>
 		<div class="flex gap-2">
 			<button
 				class="text-xs px-3 py-1 rounded-full border border-amber-400/60
@@ -111,13 +111,13 @@
 		</div>
 	</div>
 
-	<div class="border border-slate-800 rounded-2xl bg-slate-900/60 p-4 space-y-2">
+	<div class="border border-slate-800 rounded-2xl bg-panel/60 p-4 space-y-2">
 		{#if reports?.length}
 			{#each reports as report (report.id)}
 				<button
 					type="button"
 					class="w-full text-left px-3 py-2 rounded-xl border border-slate-800/60
-                 hover:border-amber-400/60 hover:bg-slate-800/60 transition-colors
+                 hover:border-amber-400/60 hover:bg-sand/10/60 transition-colors
                  flex items-center justify-between gap-3 text-sm"
 					onclick={() => openResume(report)}
 				>
@@ -125,7 +125,7 @@
 						<span class="font-semibold">
 							{report.title ?? 'Untitled report'}
 						</span>
-						<span class="text-xs text-slate-400">
+						<span class="text-xs text-black/60">
 							{report.type ?? 'Draft'} • Last updated {report.updated_at ?? '—'}
 						</span>
 					</div>
@@ -135,7 +135,7 @@
 				</button>
 			{/each}
 		{:else}
-			<div class="text-xs text-slate-400">
+			<div class="text-xs text-black/60">
 				No reports created for this case yet.
 			</div>
 		{/if}
@@ -147,34 +147,34 @@
 			<!-- Modal -->
 			<div
 				class="w-full max-w-xl border border-amber-400/40 rounded-3xl
-                  bg-slate-950/95 shadow-2xl shadow-amber-500/20 p-4 space-y-4"
+                  /95 shadow-2xl shadow-amber-500/20 p-4 space-y-4"
 			>
 				<header class="flex items-center justify-between gap-2">
 					<div>
 						<div class="text-[10px] uppercase tracking-[0.35em] text-amber-300">
 							Resume Draft
 						</div>
-						<div class="text-sm font-semibold text-slate-50">
+						<div class="text-sm font-semibold text-black">
 							{selectedReport?.title ?? 'Untitled report'}
 						</div>
 					</div>
 					<button
-						class="text-xs px-2 py-1 rounded-full border border-slate-700
-                   hover:bg-slate-800/80"
+						class="text-xs px-2 py-1 rounded-full border border-black/20
+                   hover:bg-sand/10/80"
 						onclick={() => (showResumeModal = false)}
 					>
 						Close
 					</button>
 				</header>
 
-				<div class="text-xs text-slate-300 max-h-64 overflow-auto border border-slate-800 rounded-2xl p-3 bg-slate-900/60">
+				<div class="text-xs text-slate-300 max-h-64 overflow-auto border border-slate-800 rounded-2xl p-3 bg-panel/60">
 					{selectedReport?.preview ?? 'Report body preview will appear here once wired to the reports API.'}
 				</div>
 
 				<footer class="flex justify-end gap-2">
 					<button
 						class="text-xs px-3 py-1 rounded-full border border-slate-600
-                   hover:bg-slate-800/80"
+                   hover:bg-sand/10/80"
 						onclick={() => (showResumeModal = false)}
 					>
 						Cancel
@@ -198,7 +198,7 @@
 		<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
 			<div
 				class="w-full max-w-6xl h-[90vh] border border-amber-400/40 rounded-3xl
-                  bg-slate-950/95 shadow-2xl shadow-amber-500/20 p-6 space-y-4 flex flex-col"
+                  /95 shadow-2xl shadow-amber-500/20 p-6 space-y-4 flex flex-col"
 			>
 				<header class="flex items-center justify-between gap-4">
 					<div class="flex-1">
@@ -207,7 +207,7 @@
 						</div>
 						<input
 							type="text"
-							class="text-lg font-semibold text-slate-50 bg-transparent border-0 border-b border-slate-700
+							class="text-lg font-semibold text-black bg-transparent border-0 border-b border-black/20
                          focus:border-amber-400/60 outline-none w-full"
 							value={selectedReport?.title || 'Untitled Report'}
 							oninput={(e) => {
@@ -221,7 +221,7 @@
 					<div class="flex gap-2">
 						<button
 							class="text-xs px-3 py-1 rounded-full border border-slate-600
-                         hover:bg-slate-800/80"
+                         hover:bg-sand/10/80"
 							onclick={closeEditor}
 						>
 							Cancel

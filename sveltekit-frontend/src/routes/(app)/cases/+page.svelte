@@ -50,7 +50,7 @@
 			case 'high': return 'border-yellow-600 bg-yellow-500/20 text-yellow-100';
 			case 'medium': return 'border-blue-600 bg-blue-500/20 text-blue-100';
 			case 'low': return 'border-green-600 bg-green-500/20 text-green-100';
-			default:return 'border-slate-600 bg-slate-500/20 text-slate-100';
+			default:return 'border-slate-600 bg-slate-500/20 text-black';
 		}
 	}
 
@@ -59,9 +59,9 @@
 			case 'open': return 'border-green-500 bg-green-500/20 text-green-100';
 			case 'in_progress': return 'border-blue-500 bg-blue-500/20 text-blue-100';
 			case 'pending_review': return 'border-yellow-500 bg-yellow-500/20 text-yellow-100';
-			case 'closed': return 'border-slate-500 bg-slate-500/20 text-slate-100';
-			case 'archived': return 'border-slate-700 bg-slate-700/20 text-slate-300';
-			default:return 'border-slate-500 bg-slate-500/20 text-slate-100';
+			case 'closed': return 'border-slate-500 bg-slate-500/20 text-black';
+			case 'archived': return 'border-black/20 bg-slate-700/20 text-slate-300';
+			default:return 'border-slate-500 bg-slate-500/20 text-black';
 		}
 	}
 
@@ -94,13 +94,13 @@
 	<title>Cases | YoRHa Legal AI</title>
 </svelte:head>
 
-<div class="flex h-screen flex-col bg-slate-950 text-slate-100">
+<div class="flex h-screen flex-col  text-black">
 	<!-- Header -->
-	<header class="border-b border-slate-700 bg-black/60 backdrop-blur-sm">
+	<header class="border-b border-black/20 bg-black/60 backdrop-blur-sm">
 		<div class="container mx-auto flex max-w-7xl items-center justify-between py-4 px-6">
 			<div>
 				<h1 class="text-2xl font-bold">Cases</h1>
-				<p class="text-sm text-slate-400">Manage your legal cases and investigations</p>
+				<p class="text-sm text-black/60">Manage your legal cases and investigations</p>
 			</div>
 			<button
 				class="rounded border border-emerald-500/60 bg-emerald-500/20 px-6 py-2 text-sm font-semibold text-emerald-100 hover:bg-emerald-500/30 transition-colors"
@@ -112,7 +112,7 @@
 	</header>
 
 	<!-- Filters Bar -->
-	<div class="border-b border-slate-700 bg-slate-900/50 py-4 px-6">
+	<div class="border-b border-black/20 bg-panel/50 py-4 px-6">
 		<div class="container mx-auto max-w-7xl flex flex-wrap gap-4 items-center">
 			<div class="flex-1 min-w-[200px]">
 				<input
@@ -120,13 +120,13 @@
 					placeholder="Search cases..."
 					bind:value={searchQuery}
 					onkeydown={(e) => e.key === 'Enter' && applyFilters()}
-					class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+					class="w-full rounded border border-slate-600 bg-sand/10 px-4 py-2 text-sm focus:border-emerald-500 focus:outline-none"
 				/>
 			</div>
 			<select
 				bind:value={statusFilter}
 				onchange={applyFilters}
-				class="rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+				class="rounded border border-slate-600 bg-sand/10 px-4 py-2 text-sm focus:border-emerald-500 focus:outline-none"
 			>
 				<option value="all">All Status</option>
 				<option value="open">Open</option>
@@ -138,7 +138,7 @@
 			<select
 				bind:value={priorityFilter}
 				onchange={applyFilters}
-				class="rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+				class="rounded border border-slate-600 bg-sand/10 px-4 py-2 text-sm focus:border-emerald-500 focus:outline-none"
 			>
 				<option value="">All Priorities</option>
 				<option value="critical">Critical</option>
@@ -188,7 +188,7 @@
 					<button
 						type="button"
 						onclick={clearSelection}
-						class="rounded border border-slate-600 px-4 py-1 text-sm hover:bg-slate-800"
+						class="rounded border border-slate-600 px-4 py-1 text-sm hover:bg-sand/10"
 					>
 						Clear
 					</button>
@@ -210,7 +210,7 @@
 				<div class="flex flex-col items-center justify-center py-20 text-center">
 					<div class="text-6xl mb-4">📂</div>
 					<h2 class="text-xl font-semibold mb-2">No Cases Found</h2>
-					<p class="text-slate-400 mb-6">
+					<p class="text-black/60 mb-6">
 						{#if searchQuery || statusFilter !== 'all' || priorityFilter}
 							No cases match your current filters. Try adjusting your search criteria.
 						{:else}
@@ -230,14 +230,14 @@
 				<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 					{#each data.cases as caseItem (caseItem.id)}
 						<div
-							class="group relative rounded-lg border border-slate-700 bg-slate-900/50 p-5 transition-all hover:border-emerald-500/50 hover:bg-slate-900"
+							class="group relative rounded-lg border border-black/20 bg-panel/50 p-5 transition-all hover:border-emerald-500/50 hover:bg-panel"
 						>
 							<!-- Selection Checkbox -->
 							<input
 								type="checkbox"
 								checked={selectedCases.has(caseItem.id)}
 								onchange={() => toggleCaseSelection(caseItem.id)}
-								class="absolute top-3 right-3 h-4 w-4 rounded border-slate-600 bg-slate-800 cursor-pointer"
+								class="absolute top-3 right-3 h-4 w-4 rounded border-slate-600 bg-sand/10 cursor-pointer"
 							/>
 
 							<!-- Case Header -->
@@ -249,7 +249,7 @@
 									{caseItem.title}
 								</h3>
 								{#if caseItem.caseNumber}
-									<p class="text-xs text-slate-400 mb-3">Case #{caseItem.caseNumber}</p>
+									<p class="text-xs text-black/60 mb-3">Case #{caseItem.caseNumber}</p>
 								{/if}
 								{#if caseItem.description}
 									<p class="text-sm text-slate-300 line-clamp-2 mb-4">
@@ -268,7 +268,7 @@
 								</div>
 
 								<!-- Metadata -->
-								<div class="text-xs text-slate-400 space-y-1">
+								<div class="text-xs text-black/60 space-y-1">
 									{#if caseItem.practiceArea}
 										<div>📋 {caseItem.practiceArea}</div>
 									{/if}
@@ -276,7 +276,7 @@
 										<div>⚖️ {caseItem.jurisdiction}</div>
 									{/if}
 									{#if caseItem.updatedAt}
-										<div class="text-slate-500">
+										<div class="text-black0">
 											Updated: {new Date(caseItem.updatedAt).toLocaleDateString()}
 										</div>
 									{/if}
@@ -305,8 +305,8 @@
 <!-- New Case Modal -->
 {#if showNewCaseModal}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-		<div class="w-full max-w-2xl rounded-lg border border-slate-700 bg-slate-900 shadow-2xl">
-			<div class="border-b border-slate-700 px-6 py-4">
+		<div class="w-full max-w-2xl rounded-lg border border-black/20 bg-panel shadow-2xl">
+			<div class="border-b border-black/20 px-6 py-4">
 				<h2 class="text-xl font-bold">Create New Case</h2>
 			</div>
 
@@ -327,7 +327,7 @@
 						id="title"
 						name="title"
 						required
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus:border-emerald-500 focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-sand/10 px-4 py-2 focus:border-emerald-500 focus:outline-none"
 						placeholder="e.g., State v. Smith"
 					/>
 				</div>
@@ -341,7 +341,7 @@
 					name="description"
 					required
 					rows="4"
-					class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus:border-emerald-500 focus:outline-none resize-none"
+					class="w-full rounded border border-slate-600 bg-sand/10 px-4 py-2 focus:border-emerald-500 focus:outline-none resize-none"
 					placeholder="Brief overview of the case..."
 				></textarea>
 				</div>
@@ -352,7 +352,7 @@
 					<select
 						id="priority"
 						name="priority"
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus:border-emerald-500 focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-sand/10 px-4 py-2 focus:border-emerald-500 focus:outline-none"
 					>
 							<option value="low">Low</option>
 							<option value="medium">Medium</option>
@@ -368,7 +368,7 @@
 						type="text"
 						id="caseNumber"
 						name="caseNumber"
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus:border-emerald-500 focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-sand/10 px-4 py-2 focus:border-emerald-500 focus:outline-none"
 						placeholder="e.g., 2026-CR-0042"
 					/>
 					</div>
@@ -381,7 +381,7 @@
 						type="text"
 						id="practiceArea"
 						name="practiceArea"
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus:border-emerald-500 focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-sand/10 px-4 py-2 focus:border-emerald-500 focus:outline-none"
 						placeholder="e.g., Criminal Law"
 					/>
 					</div>
@@ -392,7 +392,7 @@
 						type="text"
 						id="jurisdiction"
 						name="jurisdiction"
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus:border-emerald-500 focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-sand/10 px-4 py-2 focus:border-emerald-500 focus:outline-none"
 						placeholder="e.g., Federal District Court"
 					/>
 					</div>
@@ -402,7 +402,7 @@
 					<button
 						type="button"
 						onclick={closeModal}
-						class="rounded border border-slate-600 px-6 py-2 text-sm font-medium hover:bg-slate-800 transition-colors"
+						class="rounded border border-slate-600 px-6 py-2 text-sm font-medium hover:bg-sand/10 transition-colors"
 					>
 						Cancel
 					</button>

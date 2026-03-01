@@ -505,7 +505,7 @@
             <div class="flex items-center gap-1.5 mt-2 flex-wrap">
               {#each citationTagsMap[citation.id] ?? [] as t (t.tag)}
                 <span
-                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium text-white cursor-pointer"
+                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium text-black cursor-pointer"
                   style="background-color: {t.color}"
                   onclick={(e) => { e.stopPropagation(); removeTagFromCitation(citation.id, t.tag); }}
                   title="Click to remove"
@@ -517,7 +517,7 @@
                 <div class="flex items-center gap-1" onclick={(e) => e.stopPropagation()}>
                   {#each TAG_PRESETS as preset}
                     <button
-                      class="px-1.5 py-0.5 rounded text-[9px] text-white hover:opacity-80"
+                      class="px-1.5 py-0.5 rounded text-[9px] text-black hover:opacity-80"
                       style="background-color: {preset.color}"
                       onclick={(e) => { e.stopPropagation(); addTagToCitation(citation.id, preset.tag, preset.color); }}
                     >{preset.tag}</button>
