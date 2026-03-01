@@ -7,6 +7,7 @@
 	let { data }: { data: PageData } = $props();
 	let caseId = $derived(data.caseId);
 	let initialState = $derived(data.initialState);
+	let evidenceItems = $derived(data.evidence || []);
 
 	// State
 	let board: HybridBoard = $state() as HybridBoard;
@@ -15,6 +16,80 @@
 	let activeView = $state<'wall' | 'line' | 'file' | 'list'>('wall');
 	let selectedEvidence = $state<any>(null);
 	let showAddEvidence = $state(false);
+	let activeTool = $state<'select' | 'evidence' | 'connection' | 'note'>('select');
+
+	// Undo/Redo stack (from CollaborativeEvidenceCanvas)
+	let undoStack = $state<any[]>([]);
+	let redoStack = $state<any[]>([]);
+	const MAX_UNDO = 50;
+
+	// Keyboard shortcuts (from CollaborativeEvidenceCanvas analysis)
+	function handleKeyboard(e: KeyboardEvent) {
+		// Save: Ctrl/Cmd + S
+		if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+			e.preventDefault();
+			save();
+		}
+		// Undo: Ctrl/Cmd + Z
+		else if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+			e.preventDefault();
+			undo();
+		}
+		// Redo: Ctrl/Cmd + Shift + Z or Ctrl/Cmd + Y
+		else if ((e.ctrlKey || e.metaKey) && (e.shiftKey && e.key === 'z' || e.key === 'y')) {
+			e.preventDefault();
+			redo();
+		}
+		// Tool shortcuts
+		else if (e.key === 'v') {
+			activeTool = 'select';
+		} else if (e.key === 'e') {
+			activeTool = 'evidence';
+		} else if (e.key === 'c') {
+			activeTool = 'connection';
+		} else if (e.key === 'n') {
+			activeTool = 'note';
+		}
+		// View shortcuts
+		else if (e.key === '1') {
+			activeView = 'wall';
+		} else if (e.key === '2') {
+			activeView = 'line';
+		} else if (e.key === '3') {
+			activeView = 'file';
+		} else if (e.key === '4') {
+			activeView = 'list';
+		}
+	}
+
+	function undo() {
+		if (undoStack.length === 0) return;
+		const action = undoStack.pop();
+		if (action && board) {
+			redoStack.push(board.serialize());
+			// Apply undo action to board
+			isDirty = true;
+		}
+	}
+
+	function redo() {
+		if (redoStack.length === 0) return;
+		const action = redoStack.pop();
+		if (action && board) {
+			undoStack.push(board.serialize());
+			// Apply redo action to board
+			isDirty = true;
+		}
+	}
+
+	function recordAction(action: any) {
+		undoStack.push(action);
+		if (undoStack.length > MAX_UNDO) {
+			undoStack.shift();
+		}
+		redoStack = []; // Clear redo stack on new action
+		isDirty = true;
+	}
 
 	async function save() {
 		if (!board) return;
@@ -40,19 +115,9 @@
 			isSaving = false;
 		}
 	}
-
-	// Mock evidence data - replace with real data from API
-	let evidenceItems = [
-		{
-			id: 1,
-			title: 'Security Camera Feed',
-			type: 'video',
-			date: '2024-03-15',
-			location: 'Main Street, Downtown',
-			thumbnail: null,
-		},
-	];
 </script>
+
+<svelte:window onkeydown={handleKeyboard} />
 
 <div class="evidence-board-container">
 	<!-- Header -->
@@ -129,6 +194,67 @@
 			<Icon name="save" />
 			{isSaving ? 'Saving...' : 'Save Board'}
 		</button>
+	</div>
+
+	<!-- Tools Toolbar (inspired by CollaborativeEvidenceCanvas) -->
+	<div class="tools-toolbar">
+		<div class="tool-group">
+			<button
+				class="tool-btn"
+				class:active={activeTool === 'select'}
+				onclick={() => (activeTool = 'select')}
+				title="Select Tool (V)"
+			>
+				<Icon name="mouse-pointer-2" />
+			</button>
+			<button
+				class="tool-btn"
+				class:active={activeTool === 'evidence'}
+				onclick={() => (activeTool = 'evidence')}
+				title="Add Evidence (E)"
+			>
+				<Icon name="file-plus" />
+			</button>
+			<button
+				class="tool-btn"
+				class:active={activeTool === 'connection'}
+				onclick={() => (activeTool = 'connection')}
+				title="Draw Connection (C)"
+			>
+				<Icon name="git-branch" />
+			</button>
+			<button
+				class="tool-btn"
+				class:active={activeTool === 'note'}
+				onclick={() => (activeTool = 'note')}
+				title="Add Note (N)"
+			>
+				<Icon name="sticky-note" />
+			</button>
+		</div>
+
+		<div class="tool-group">
+			<button
+				class="tool-btn"
+				onclick={undo}
+				disabled={undoStack.length === 0}
+				title="Undo (Ctrl+Z)"
+			>
+				<Icon name="undo" />
+			</button>
+			<button
+				class="tool-btn"
+				onclick={redo}
+				disabled={redoStack.length === 0}
+				title="Redo (Ctrl+Shift+Z)"
+			>
+				<Icon name="redo" />
+			</button>
+		</div>
+
+		<div class="keyboard-hint">
+			<span class="hint-text">Shortcuts: V=Select • E=Evidence • C=Connect • N=Note • 1-4=Views</span>
+		</div>
 	</div>
 
 	<!-- Main Content Area -->
@@ -242,19 +368,32 @@
 	<div class="timeline-section">
 		<div class="timeline-header">
 			<span class="timeline-label">TIMELINE VIEW</span>
+			<span class="timeline-count">{evidenceItems.length} items</span>
 		</div>
 		<div class="timeline-track">
-			<!-- Timeline nodes - replace with real data -->
-			<div class="timeline-node" style="left: 25%">
-				<div class="node-dot orange"></div>
-			</div>
-			<div class="timeline-node" style="left: 50%">
-				<div class="node-dot green"></div>
-			</div>
-			<div class="timeline-node active" style="left: 75%">
-				<div class="node-dot blue"></div>
-				<div class="node-label">Security Feed</div>
-			</div>
+			{#if evidenceItems.length > 0}
+				{#each evidenceItems.slice(0, 10) as item, idx (item.id)}
+					{@const position = ((idx + 1) / (Math.min(evidenceItems.length, 10) + 1)) * 100}
+					{@const colors = ['orange', 'green', 'blue', 'purple', 'red']}
+					{@const color = colors[idx % colors.length]}
+					<div
+						class="timeline-node"
+						class:active={selectedEvidence?.id === item.id}
+						style="left: {position}%"
+						onclick={() => (selectedEvidence = item)}
+						role="button"
+						tabindex="0"
+						onkeydown={(e) => e.key === 'Enter' && (selectedEvidence = item)}
+					>
+						<div class="node-dot {color}"></div>
+						{#if selectedEvidence?.id === item.id}
+							<div class="node-label">{item.title}</div>
+						{/if}
+					</div>
+				{/each}
+			{:else}
+				<div class="timeline-empty">No evidence items to display</div>
+			{/if}
 		</div>
 	</div>
 </div>
@@ -444,6 +583,68 @@
 	.save-btn:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
+	}
+
+	/* Tools Toolbar */
+	.tools-toolbar {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		padding: 0.75rem 1.5rem;
+		background: #f9fafb;
+		border-bottom: 1px solid #e5e7eb;
+	}
+
+	.tool-group {
+		display: flex;
+		gap: 0.25rem;
+		padding: 0.25rem;
+		background: white;
+		border: 1px solid #e5e7eb;
+		border-radius: 0.5rem;
+	}
+
+	.tool-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		background: transparent;
+		border: none;
+		border-radius: 0.375rem;
+		color: #6b7280;
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+
+	.tool-btn:hover:not(:disabled) {
+		background: #f3f4f6;
+		color: #1f2937;
+	}
+
+	.tool-btn.active {
+		background: #3b82f6;
+		color: white;
+	}
+
+	.tool-btn:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+	}
+
+	.keyboard-hint {
+		margin-left: auto;
+		padding: 0.5rem 1rem;
+		background: white;
+		border: 1px solid #e5e7eb;
+		border-radius: 0.5rem;
+	}
+
+	.hint-text {
+		font-size: 0.75rem;
+		color: #6b7280;
+		font-weight: 500;
 	}
 
 	/* Main Content */

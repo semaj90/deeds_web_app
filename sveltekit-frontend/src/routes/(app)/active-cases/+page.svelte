@@ -15,6 +15,9 @@
 	let viewMode = $state<'list' | 'cards' | 'rich'>('list');
 	let showScoring = $state(false);
 	let caseSearchQuery = $state('');
+	let analyzingCaseId = $state<string | null>(null);
+	let analysisResult = $state<any>(null);
+	let analysisError = $state<string | null>(null);
 
 	let filteredActiveCases = $derived.by(() => {
 		const all = data.activeCases ?? [];
@@ -53,6 +56,52 @@
 			progress: c.progress,
 		}))
 	);
+
+	async function analyzeCase(caseId: string, caseTitle: string) {
+		analyzingCaseId = caseId;
+		analysisError = null;
+		analysisResult = null;
+
+		try {
+			const response = await fetch('/api/orchestrator/analyze', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					task: 'analyze-case',
+					payload: {
+						caseId,
+						query: `Analyze case "${caseTitle}" and provide:
+1. Case strength assessment
+2. Key legal issues identified
+3. Evidence gaps or weaknesses
+4. Recommended next steps
+5. Potential legal precedents`
+					}
+				})
+			});
+
+			const result = await response.json();
+
+			if (result.success) {
+				analysisResult = {
+					caseId,
+					caseTitle,
+					...result.data
+				};
+			} else {
+				analysisError = result.error || 'Analysis failed';
+			}
+		} catch (error) {
+			analysisError = error instanceof Error ? error.message : 'Network error';
+		} finally {
+			analyzingCaseId = null;
+		}
+	}
+
+	function closeAnalysis() {
+		analysisResult = null;
+		analysisError = null;
+	}
 </script>
 
 <div class="terminal-page">
@@ -196,6 +245,18 @@
 								</span>
 							</td>
 							<td class="case-actions">
+								<button
+									onclick={() => analyzeCase(caseItem.id, caseItem.title ?? 'Untitled')}
+									class="action-icon"
+									title="AI Analysis"
+									disabled={analyzingCaseId === caseItem.id}
+								>
+									{#if analyzingCaseId === caseItem.id}
+										<Icon name="loader-2" class="animate-spin" />
+									{:else}
+										<Icon name="brain" />
+									{/if}
+								</button>
 								<a href="/cases/{caseItem.id}" class="action-icon" title="View">
 									<Icon name="eye" />
 								</a>
@@ -228,6 +289,88 @@
 		</div>
 	{:else}
 		<CaseCardGrid cases={cardCases} isLoading={false} />
+	{/if}
+
+	<!-- AI Analysis Modal -->
+	{#if analysisResult || analysisError}
+		<div class="analysis-modal-overlay" onclick={closeAnalysis}>
+			<div class="analysis-modal" onclick={(e) => e.stopPropagation()}>
+				<div class="modal-header">
+					<div class="modal-title">
+						<Icon name="brain" />
+						LEGAL AI ANALYSIS
+					</div>
+					<button onclick={closeAnalysis} class="close-btn">
+						<Icon name="x" />
+					</button>
+				</div>
+
+				{#if analysisError}
+					<div class="modal-body">
+						<div class="error-message">
+							<Icon name="alert-triangle" />
+							<div>
+								<div class="error-title">ANALYSIS FAILED</div>
+								<div class="error-detail">{analysisError}</div>
+							</div>
+						</div>
+						<div class="service-info">
+							<strong>Service:</strong> Legal AI Orchestrator (Port 8102)<br/>
+							<strong>Backend:</strong> Ollama gemma3-legal:latest
+						</div>
+					</div>
+				{:else if analysisResult}
+					<div class="modal-body">
+						<div class="case-info">
+							<div class="info-label">CASE ANALYZED:</div>
+							<div class="info-value">{analysisResult.caseTitle}</div>
+							<div class="info-meta">ID: {analysisResult.caseId}</div>
+						</div>
+
+						<div class="analysis-content">
+							<div class="analysis-section">
+								<div class="section-header">
+									<Icon name="activity" />
+									<span>ANALYSIS RESPONSE</span>
+								</div>
+								<div class="section-content">
+									{#if typeof analysisResult.result === 'string'}
+										<pre class="analysis-text">{analysisResult.result}</pre>
+									{:else if analysisResult.response}
+										<pre class="analysis-text">{JSON.stringify(analysisResult.response, null, 2)}</pre>
+									{:else}
+										<pre class="analysis-text">{JSON.stringify(analysisResult, null, 2)}</pre>
+									{/if}
+								</div>
+							</div>
+
+							<div class="analysis-metadata">
+								<div class="meta-item">
+									<Icon name="cpu" size={14} />
+									<span>Provider: {analysisResult.provider || 'legal-orchestrator'}</span>
+								</div>
+								<div class="meta-item">
+									<Icon name="clock" size={14} />
+									<span>Timestamp: {new Date(analysisResult.timestamp || Date.now()).toLocaleString()}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				{/if}
+
+				<div class="modal-footer">
+					<button onclick={closeAnalysis} class="btn-modal btn-secondary">
+						CLOSE
+					</button>
+					{#if analysisResult}
+						<a href="/cases/{analysisResult.caseId}" class="btn-modal btn-primary">
+							VIEW FULL CASE
+							<Icon name="arrow-right" />
+						</a>
+					{/if}
+				</div>
+			</div>
+		</div>
 	{/if}
 
 	<!-- Terminal Footer -->
@@ -585,10 +728,20 @@
 		color: #666;
 		transition: color 0.2s;
 		cursor: pointer;
+		background: none;
+		border: none;
+		padding: 0;
+		display: inline-flex;
+		align-items: center;
 	}
 
 	.action-icon:hover {
 		color: #4ade80;
+	}
+
+	.action-icon:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 
 	.empty-state {
@@ -638,5 +791,228 @@
 		font-size: 0.65rem;
 		letter-spacing: 0.15em;
 		color: #666;
+	}
+
+	/* AI Analysis Modal */
+	.analysis-modal-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.85);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 1000;
+		padding: 2rem;
+	}
+
+	.analysis-modal {
+		background: #0f0f0f;
+		border: 2px solid #1a1a1a;
+		max-width: 900px;
+		width: 100%;
+		max-height: 90vh;
+		display: flex;
+		flex-direction: column;
+		box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+	}
+
+	.modal-header {
+		background: #000;
+		border-bottom: 2px solid #1a1a1a;
+		padding: 1rem 1.5rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.modal-title {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		font-size: 0.9rem;
+		font-weight: 600;
+		letter-spacing: 0.15em;
+		color: #4ade80;
+	}
+
+	.close-btn {
+		background: none;
+		border: none;
+		color: #666;
+		cursor: pointer;
+		padding: 0.25rem;
+		transition: color 0.2s;
+	}
+
+	.close-btn:hover {
+		color: #fff;
+	}
+
+	.modal-body {
+		flex: 1;
+		overflow-y: auto;
+		padding: 1.5rem;
+	}
+
+	.case-info {
+		background: #0a0a0a;
+		border: 1px solid #1a1a1a;
+		padding: 1rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.info-label {
+		font-size: 0.7rem;
+		letter-spacing: 0.1em;
+		color: #666;
+		margin-bottom: 0.5rem;
+	}
+
+	.info-value {
+		font-size: 1rem;
+		color: #fff;
+		font-weight: 600;
+		margin-bottom: 0.25rem;
+	}
+
+	.info-meta {
+		font-size: 0.75rem;
+		color: #999;
+		font-family: 'JetBrains Mono', monospace;
+	}
+
+	.analysis-content {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.analysis-section {
+		background: #0a0a0a;
+		border: 1px solid #1a1a1a;
+		overflow: hidden;
+	}
+
+	.section-header {
+		background: #0f0f0f;
+		border-bottom: 1px solid #1a1a1a;
+		padding: 0.75rem 1rem;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.75rem;
+		letter-spacing: 0.1em;
+		color: #4ade80;
+		font-weight: 600;
+	}
+
+	.section-content {
+		padding: 1rem;
+	}
+
+	.analysis-text {
+		font-family: 'JetBrains Mono', 'Courier New', monospace;
+		font-size: 0.85rem;
+		line-height: 1.6;
+		color: #e0e0e0;
+		white-space: pre-wrap;
+		margin: 0;
+	}
+
+	.analysis-metadata {
+		display: flex;
+		gap: 1.5rem;
+		padding: 1rem;
+		background: #0a0a0a;
+		border: 1px solid #1a1a1a;
+		font-size: 0.75rem;
+		color: #999;
+	}
+
+	.meta-item {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.error-message {
+		display: flex;
+		gap: 1rem;
+		padding: 1.5rem;
+		background: rgba(239, 68, 68, 0.1);
+		border: 1px solid rgba(239, 68, 68, 0.3);
+		color: #ef4444;
+		margin-bottom: 1rem;
+	}
+
+	.error-title {
+		font-weight: 600;
+		font-size: 0.9rem;
+		letter-spacing: 0.1em;
+		margin-bottom: 0.5rem;
+	}
+
+	.error-detail {
+		font-size: 0.8rem;
+		color: #fca5a5;
+	}
+
+	.service-info {
+		padding: 1rem;
+		background: #0a0a0a;
+		border: 1px solid #1a1a1a;
+		font-size: 0.75rem;
+		line-height: 1.8;
+		color: #999;
+	}
+
+	.modal-footer {
+		background: #000;
+		border-top: 2px solid #1a1a1a;
+		padding: 1rem 1.5rem;
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.75rem;
+	}
+
+	.btn-modal {
+		padding: 0.6rem 1.25rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		font-family: 'JetBrains Mono', monospace;
+		cursor: pointer;
+		transition: all 0.2s;
+		border: 1px solid;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		text-decoration: none;
+	}
+
+	.btn-modal.btn-secondary {
+		background: #1a1a1a;
+		border-color: #333;
+		color: #999;
+	}
+
+	.btn-modal.btn-secondary:hover {
+		background: #222;
+		border-color: #555;
+		color: #fff;
+	}
+
+	.btn-modal.btn-primary {
+		background: #1a3a1a;
+		border-color: #2a5a2a;
+		color: #4ade80;
+	}
+
+	.btn-modal.btn-primary:hover {
+		background: #2a4a2a;
+		border-color: #3a6a3a;
 	}
 </style>
