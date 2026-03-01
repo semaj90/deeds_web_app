@@ -1,67 +1,19 @@
 {
-  "timestamp": "2026-03-01T02-31-38",
+  "timestamp": "2026-03-01T03-33-59",
   "base": "http://localhost:5173",
   "results": [
     {
-      "name": "evidence",
-      "url": "http://localhost:5173/evidence",
+      "name": "C:-Program Files-Git-dashboard",
+      "url": "http://localhost:5173C:/Program Files/Git/dashboard",
       "status": 0,
       "ok": false,
-      "error": "page.goto: Timeout 15000ms exceeded.",
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-01T02-31-38\\evidence-ERROR.png"
-    },
-    {
-      "name": "persons-of-interest",
-      "url": "http://localhost:5173/persons-of-interest/fake-id",
-      "status": 0,
-      "ok": false,
-      "error": "page.goto: Timeout 15000ms exceeded.",
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-01T02-31-38\\persons-of-interest-ERROR.png"
-    },
-    {
-      "name": "cases-overview",
-      "url": "http://localhost:5173/cases/test-id/overview",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-01T02-31-38\\cases-overview.png"
-    },
-    {
-      "name": "agentic-errors-analysis",
-      "url": "http://localhost:5173/agentic-errors/analysis",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-01T02-31-38\\agentic-errors-analysis.png"
-    },
-    {
-      "name": "cases-list",
-      "url": "http://localhost:5173/cases",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-01T02-31-38\\cases-list.png"
-    },
-    {
-      "name": "dashboard",
-      "url": "http://localhost:5173/dashboard",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-01T02-31-38\\dashboard.png"
-    },
-    {
-      "name": "citations",
-      "url": "http://localhost:5173/citations",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-01T02-31-38\\citations.png"
+      "error": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL",
+      "file": "c:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-01T03-33-59\\C:-Program Files-Git-dashboard-ERROR.png"
     }
   ],
   "summary": {
-    "passed": 5,
-    "failed": 2,
-    "total": 7
+    "passed": 0,
+    "failed": 1,
+    "total": 1
   }
 }

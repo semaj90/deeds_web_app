@@ -3,6 +3,7 @@
     import type { Snippet } from 'svelte';
     import { onMount } from 'svelte';
     import CaseDocumentWriter from '$lib/components/legal-ai/CaseDocumentWriter.svelte';
+    import YorhaSidebar from '$lib/components/layout/YorhaSidebar.svelte';
 
     let { children }: { children: Snippet } = $props();
     let showDocumentWriter = $state(false);
@@ -56,29 +57,15 @@
 
 <svelte:window onkeydown={handleGlobalKeydown} />
 
-<div class="app-shell" class:dark={userPrefs.theme === 'dark'}>
-    <aside class:closed={!appState.isSidebarOpen}>
-        <div class="status-panel">
-            <h3>Legal AI Status</h3>
-            <p>Tokens: {tokenTracker.percentageUsed.toFixed(1)}% used</p>
-            <progress value={tokenTracker.percentageUsed} max="100"></progress>
-        </div>
+<!-- YoRHa Detective Sidebar -->
+<YorhaSidebar />
 
-        <button onclick={() => userPrefs.toggleTheme()}>
-            Toggle {userPrefs.theme === 'light' ? 'Dark' : 'Light'} Mode
-        </button>
-    </aside>
-
-    <main>
-        <header>
-            <button onclick={() => appState.toggleSidebar()}>☰</button>
-            {#if appState.globalError}
-                <div class="error-toast">{appState.globalError}</div>
-            {/if}
-            <div class="header-title">
-                <a href="/" class="home-link">YoRHa Legal AI</a>
-            </div>
-        </header>
+<!-- Main Content Area -->
+<div class="app-shell">
+    <main class="main-content">
+        {#if appState.globalError}
+            <div class="error-toast">{appState.globalError}</div>
+        {/if}
 
         <div class="content">
             {@render children()}
@@ -91,35 +78,38 @@
 {/if}
 
 <style>
-    .app-shell { display: flex;
-		height: 100vh; font-family: monospace; }
-    aside { width: 250px;
-		background: #f0f0f0; padding: 1rem;
-		transition: width 0.3s; border-right: 1px solid #ccc; }
-    aside.closed { width: 0;
-		padding: 0; overflow: hidden;
-		border: none; }
-    main { flex: 1;
-		display: flex; flex-direction: column; }
-    header { padding: 1rem;
-		background: #e0e0e0; display: flex; align-items: center;
-		gap: 1rem; border-bottom: 1px solid #ccc; }
-    .content { flex: 1;
-		overflow: auto; padding: 1rem; }
+    .app-shell {
+        min-height: 100vh;
+        padding-left: 210px; /* Sidebar width */
+        transition: padding-left 0.3s ease;
+    }
 
-    .dark { background: #1a1a1a;
-		color: #e0e0e0; }
-    .dark aside { background: #2a2a2a; border-color: #444; }
-    .dark header { background: #333; border-color: #444; }
-    .dark button { background: #444;
-		color: white; border: 1px solid #555; }
+    /* Adjust for collapsed sidebar */
+    :global(body:has(.yorha-sidebar.collapsed)) .app-shell {
+        padding-left: 60px;
+    }
 
-    .status-panel { margin-bottom: 2rem; }
-    progress { width: 100%; }
-    button { padding: 0.5rem 1rem;
-		cursor: pointer; }
-    .error-toast { background: #ff4444;
-		color: white; padding: 0.5rem; border-radius: 4px; }
-    .home-link { text-decoration: none;
-		color: inherit; font-weight: bold; }
+    .main-content {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .content {
+        flex: 1;
+        padding: 2rem;
+        max-width: 100%;
+    }
+
+    .error-toast {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        background: #ff4444;
+        color: white;
+        padding: 1rem;
+        border-radius: 4px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 9999;
+    }
 </style>
