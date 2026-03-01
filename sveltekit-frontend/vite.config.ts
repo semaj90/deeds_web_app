@@ -177,6 +177,15 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       strictPort: true,
       host: '0.0.0.0',
+      // Performance: Exclude large binary assets from file watching
+      watch: {
+        ignored: [
+          '**/static/models/**',
+          '**/static/gemma3_270m_onnx/**',
+          '**/static/embeddinggemma_300m_onnx/**',
+          '**/static/ort/*.wasm', // Keep .mjs/.d.ts but ignore large .wasm files
+        ],
+      },
       // Proxy gRPC and API requests
       proxy: {
         '/grpc': {
@@ -256,15 +265,45 @@ export default defineConfig(({ mode }) => {
       minify: 'esbuild',
       cssMinify: 'esbuild',  // Use esbuild for CSS (lightningcss has issues with @apply and malformed var())
       sourcemap: false,
+      // Skip processing large binary assets (ONNX models, WASM files)
+      assetsInlineLimit: 0, // Don't inline any assets (keeps them as separate files)
       rollupOptions: {
         external: ['@xenova/transformers', 'piper-wasm'],
         output: {
           manualChunks: (id) => {
             // Rolldown requires manualChunks to be a function, not an object
+            // Split vendor chunks for better caching and parallel processing
             if (id.includes('node_modules/bits-ui')) {
-              return 'bitsUi';
+              return 'vendor-bits-ui';
+            }
+            if (id.includes('node_modules/svelte')) {
+              return 'vendor-svelte';
+            }
+            if (id.includes('node_modules/@internationalized')) {
+              return 'vendor-i18n';
+            }
+            if (id.includes('node_modules/onnxruntime-web')) {
+              return 'vendor-onnx';
+            }
+            // Group large components by feature
+            if (id.includes('/components/ai/')) {
+              return 'features-ai';
+            }
+            if (id.includes('/components/evidence/')) {
+              return 'features-evidence';
+            }
+            if (id.includes('/components/legal/')) {
+              return 'features-legal';
             }
             // drizzle-orm, langchain — server-only (externalized by SvelteKit)
+          },
+          // Exclude large binary assets from the bundle
+          assetFileNames: (assetInfo) => {
+            // Keep ONNX models and large binaries in their original location
+            if (assetInfo.name?.match(/\.(onnx|onnx_data|wasm|bin)$/)) {
+              return 'assets/[name][extname]';
+            }
+            return 'assets/[name]-[hash][extname]';
           },
         },
       },
