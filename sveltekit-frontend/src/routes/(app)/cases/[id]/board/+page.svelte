@@ -1,13 +1,16 @@
 <script lang="ts">
 	import HybridBoard from '$lib/components/canvas/HybridBoard.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import { ChatSession } from '$lib/models/ChatSession.svelte.js';
+	import TypewriterResponse from '$lib/components/ai/TypewriterResponse.svelte';
 	import type { PageData } from './$types';
+	import { onMount } from 'svelte';
 
 	// Props
 	let { data }: { data: PageData } = $props();
 	let caseId = $derived(data.caseId);
 	let initialState = $derived(data.initialState);
-	let evidenceItems = $derived(data.evidence || []);
+	let evidenceItems = $derived((data as any).evidence || []);
 
 	// State
 	let board: HybridBoard = $state() as HybridBoard;
@@ -17,6 +20,21 @@
 	let selectedEvidence = $state<any>(null);
 	let showAddEvidence = $state(false);
 	let activeTool = $state<'select' | 'evidence' | 'connection' | 'note'>('select');
+	let showAIChat = $state(false);
+	let isGeneratingLayout = $state(false);
+
+	// AI Chat session (contextual to this case)
+	let chatSession: ChatSession | null = $state(null);
+	let currentMessage = $state('');
+	let chatContainer: HTMLElement | null = null;
+
+	onMount(() => {
+		// Initialize chat session with case context
+		chatSession = new ChatSession(`board-${caseId}`, [], true);
+		return () => {
+			chatSession?.destroy();
+		};
+	});
 
 	// Undo/Redo stack (from CollaborativeEvidenceCanvas)
 	let undoStack = $state<any[]>([]);
@@ -91,6 +109,43 @@
 		isDirty = true;
 	}
 
+	// AI-powered layout generation
+	async function generateAILayout() {
+		if (!chatSession || evidenceItems.length === 0) return;
+
+		isGeneratingLayout = true;
+		const layoutPrompt = `You are analyzing ${evidenceItems.length} evidence items for case ${caseId}.
+
+Evidence summary:
+${evidenceItems.slice(0, 20).map((e: any, i: number) => `${i + 1}. "${e.title}" (${e.type}) - ${e.date}`).join('\n')}
+
+Generate an optimal canvas layout strategy. For each evidence item, suggest:
+1. X/Y position (0-100% of canvas width/height)
+2. Grouping strategy (chronological, by type, by importance)
+3. Connection suggestions between related items
+
+Format as: "Item N: position (x%, y%), group: [name], connect to: [items]"`;
+
+		await chatSession.sendMessage(layoutPrompt);
+		isGeneratingLayout = false;
+	}
+
+	// Send chat message
+	async function sendChatMessage() {
+		if (!chatSession || !currentMessage.trim()) return;
+
+		const msg = currentMessage.trim();
+		currentMessage = '';
+		await chatSession.sendMessage(msg);
+
+		// Auto-scroll chat
+		setTimeout(() => {
+			if (chatContainer) {
+				chatContainer.scrollTop = chatContainer.scrollHeight;
+			}
+		}, 100);
+	}
+
 	async function save() {
 		if (!board) return;
 		isSaving = true;
@@ -135,11 +190,26 @@
 		</div>
 
 		<div class="header-actions">
+			<button
+				class="action-btn"
+				onclick={generateAILayout}
+				disabled={isGeneratingLayout || evidenceItems.length === 0}
+				title="AI-Powered Layout Generation"
+			>
+				<Icon name={isGeneratingLayout ? 'loader' : 'sparkles'} />
+				{isGeneratingLayout ? '' : 'AI Layout'}
+			</button>
+			<button
+				class="action-btn"
+				class:active={showAIChat}
+				onclick={() => (showAIChat = !showAIChat)}
+				title="AI Assistant Chat"
+			>
+				<Icon name="message-circle" />
+				Chat
+			</button>
 			<button class="action-btn" title="Active Investigation">
 				<Icon name="activity" />
-			</button>
-			<button class="action-btn" title="Library">
-				<Icon name="book-open" />
 			</button>
 			<button class="btn-primary" onclick={() => (showAddEvidence = true)}>
 				<Icon name="plus" />
@@ -396,6 +466,106 @@
 			{/if}
 		</div>
 	</div>
+
+	<!-- AI Chat Panel (SSE Streaming) -->
+	{#if showAIChat && chatSession}
+		<aside class="ai-chat-panel">
+			<div class="chat-header">
+				<div class="chat-title">
+					<Icon name="bot" />
+					<h3>AI Assistant</h3>
+					<span class="chat-status" class:connected={chatSession.connectionStatus === 'connected'}>
+						{chatSession.connectionStatus === 'connected' ? 'Ready' : 'Connecting...'}
+					</span>
+				</div>
+				<button class="close-btn" onclick={() => (showAIChat = false)}>
+					<Icon name="x" />
+				</button>
+			</div>
+
+			<div class="chat-messages" bind:this={chatContainer}>
+				{#if chatSession.messages.length === 0}
+					<div class="chat-welcome">
+						<Icon name="sparkles" />
+						<p class="welcome-title">Evidence Board AI Assistant</p>
+						<p class="welcome-text">Ask about evidence connections, generate layouts, or get case insights.</p>
+						<div class="quick-actions">
+							<button class="quick-btn" onclick={() => currentMessage = 'What connections do you see between evidence items?'}>
+								<Icon name="git-branch" />
+								Analyze Connections
+							</button>
+							<button class="quick-btn" onclick={() => currentMessage = 'Suggest an optimal timeline arrangement'}>
+								<Icon name="clock" />
+								Timeline Suggestions
+							</button>
+						</div>
+					</div>
+				{:else}
+					{#each chatSession.messages as msg, idx (idx)}
+						<div class="chat-message" class:user={msg.role === 'user'} class:assistant={msg.role === 'assistant'}>
+							{#if msg.role === 'user'}
+								<div class="message-content">
+									<Icon name="user" />
+									<p>{msg.content}</p>
+								</div>
+							{:else}
+								<div class="message-content">
+									<Icon name="bot" />
+									{#if idx === chatSession.messages.length - 1 && chatSession.status === 'streaming'}
+										<div class="streaming-content">{msg.content}</div>
+									{:else}
+										<TypewriterResponse text={msg.content} speed={60} enableThinking={false} />
+									{/if}
+								</div>
+								{#if msg.metadata?.confidence}
+									<div class="message-meta">
+										<span class="confidence">Confidence: {Math.round(msg.metadata.confidence * 100)}%</span>
+										{#if msg.source}
+											<span class="source">{msg.source}</span>
+										{/if}
+									</div>
+								{/if}
+							{/if}
+						</div>
+					{/each}
+
+					{#if chatSession.status === 'thinking'}
+						<div class="chat-message assistant">
+							<div class="message-content">
+								<Icon name="bot" />
+								<div class="thinking-indicator">
+									<span class="dot"></span>
+									<span class="dot"></span>
+									<span class="dot"></span>
+								</div>
+							</div>
+						</div>
+					{/if}
+				{/if}
+			</div>
+
+			<div class="chat-input">
+				<textarea
+					bind:value={currentMessage}
+					placeholder="Ask about evidence, connections, or layouts..."
+					rows="2"
+					onkeydown={(e) => {
+						if (e.key === 'Enter' && !e.shiftKey) {
+							e.preventDefault();
+							sendChatMessage();
+						}
+					}}
+				></textarea>
+				<button
+					class="send-btn"
+					onclick={sendChatMessage}
+					disabled={!currentMessage.trim() || chatSession.status !== 'idle'}
+				>
+					<Icon name="send" />
+				</button>
+			</div>
+		</aside>
+	{/if}
 </div>
 
 <style>
