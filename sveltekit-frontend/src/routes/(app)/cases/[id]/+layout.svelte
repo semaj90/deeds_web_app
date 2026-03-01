@@ -6,28 +6,28 @@
 
 	const tabs = [
 		{ slug: 'overview', label: 'Overview' },
-	{ slug: 'canvas', label: 'Evidence Canvas' },
-	{ slug: 'reports', label: 'Reports' }
+		{ slug: 'canvas', label: 'Evidence Canvas' },
+		{ slug: 'reports', label: 'Reports' }
 	];
 </script>
 
-<div class="min-h-screen flex flex-col bg-slate-950 text-slate-50">
+<div class="min-h-screen flex flex-col bg-panel text-black">
 	<!-- Header -->
-	<header class="border-b border-slate-800 px-4 py-3 flex items-center justify-between">
+	<header class="border-b-2 border-black/20 px-4 py-3 flex items-center justify-between">
 		<div>
-			<div class="text-xs uppercase tracking-[0.25em] text-slate-400">Case File</div>
-			<div class="text-lg font-semibold">
+			<div class="text-xs uppercase tracking-[0.25em] text-black/60 font-bold">Case File</div>
+			<div class="text-lg font-semibold text-black">
 				{caseData?.title ?? `Case #${caseData?.id ?? '…'}`}
 			</div>
 			{#if caseData?.status}
-				<div class="text-xs mt-1 text-slate-400">
-					Status: <span class="uppercase">{caseData.status}</span>
+				<div class="text-xs mt-1 text-black/60">
+					Status: <span class="uppercase font-bold">{caseData.status}</span>
 				</div>
 			{/if}
 		</div>
 
 		<div class="flex gap-2">
-			<span class="text-xs text-slate-400">
+			<span class="text-xs text-black/60">
 				Jurisdiction: {caseData?.jurisdiction ?? 'N/A'}
 			</span>
 		</div>
@@ -61,8 +61,9 @@
 		display: flex;
 		gap: 4px;
 		padding: 0 1rem;
-		border-bottom: 1px solid #1e293b;
+		border-bottom: 2px solid rgba(0, 0, 0, 0.2);
 		overflow-x: auto;
+		background: rgba(212, 199, 163, 0.1);
 	}
 	.cl-tab {
 		position: relative;
@@ -70,13 +71,14 @@
 		font-size: 0.75rem;
 		text-transform: uppercase;
 		letter-spacing: 0.2em;
-		color: #94a3b8;
+		color: rgba(0, 0, 0, 0.6);
 		text-decoration: none;
 		transition: color 0.15s;
+		font-weight: 600;
 	}
 	.cl-tab:hover, .cl-tab.active {
-		color: #fcd34d;
-		font-weight: 600;
+		color: #4ade80;
+		font-weight: 700;
 	}
 	.cl-tab-underline {
 		position: absolute;
@@ -84,6 +86,6 @@
 		bottom: 0;
 		height: 2px;
 		width: 100%;
-		background: #fbbf24;
+		background: #4ade80;
 	}
 </style>

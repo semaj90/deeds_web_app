@@ -272,15 +272,15 @@
 	<!-- Header -->
 	<header class="mb-6 flex items-center justify-between">
 		<div>
-			<h1 class="text-2xl font-bold text-sand">Dev Tools Hub</h1>
-			<p class="mt-1 text-sm text-sand/60">
+			<h1 class="text-2xl font-bold text-black uppercase tracking-wide">Dev Tools Hub</h1>
+			<p class="mt-1 text-sm text-black/60">
 				Codebase indexing &bull; Service health &bull; Admin tools
 			</p>
 		</div>
 		<div class="flex items-center gap-3">
-			<span class="text-xs text-sand/40">Updated: {new Date(data.timestamp).toLocaleTimeString()}</span>
+			<span class="text-xs text-black/40">Updated: {new Date(data.timestamp).toLocaleTimeString()}</span>
 			<button
-				class="rounded-md border border-sand/30 bg-panel px-3 py-1.5 text-xs font-mono uppercase tracking-wider text-sand transition hover:border-accent hover:text-accent"
+				class="rounded-md border-2 border-black/30 bg-panel px-3 py-1.5 text-xs font-mono uppercase tracking-wider text-black transition hover:border-accent hover:text-accent"
 				onclick={refreshHealth}
 			>
 				Refresh
@@ -290,43 +290,43 @@
 
 	<!-- Top Stats Row -->
 	<div class="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-		<div class="flex items-center gap-3 rounded-lg border-2 bg-panel p-4 {healthyCount === totalServices ? 'border-accent/40' : 'border-warning/40'}">
+		<div class="flex items-center gap-3 rounded-lg border-2 bg-panel p-4 {healthyCount === totalServices ? 'border-accent' : 'border-warning'}">
 			<span class="text-2xl">{healthyCount === totalServices ? '✅' : '⚠️'}</span>
 			<div>
-				<div class="text-xl font-bold text-sand">{healthyCount}/{totalServices}</div>
-				<div class="text-[10px] uppercase tracking-wide text-sand/60">Services Up</div>
+				<div class="text-xl font-bold text-black">{healthyCount}/{totalServices}</div>
+				<div class="text-[10px] uppercase tracking-wide text-black/60">Services Up</div>
 			</div>
 		</div>
 
-		<div class="flex items-center gap-3 rounded-lg border-2 border-info/40 bg-panel p-4">
+		<div class="flex items-center gap-3 rounded-lg border-2 border-info bg-panel p-4">
 			<span class="text-2xl">🔢</span>
 			<div>
-				<div class="text-xl font-bold text-sand">{totalVectors.toLocaleString()}</div>
-				<div class="text-[10px] uppercase tracking-wide text-sand/60">Qdrant Vectors</div>
+				<div class="text-xl font-bold text-black">{totalVectors.toLocaleString()}</div>
+				<div class="text-[10px] uppercase tracking-wide text-black/60">Qdrant Vectors</div>
 			</div>
 		</div>
 
-		<div class="flex items-center gap-3 rounded-lg border-2 border-accent/40 bg-panel p-4">
+		<div class="flex items-center gap-3 rounded-lg border-2 border-accent bg-panel p-4">
 			<span class="text-2xl">📁</span>
 			<div>
-				<div class="text-xl font-bold text-sand">{codebaseIndexed.toLocaleString()}</div>
-				<div class="text-[10px] uppercase tracking-wide text-sand/60">Code Indexed</div>
+				<div class="text-xl font-bold text-black">{codebaseIndexed.toLocaleString()}</div>
+				<div class="text-[10px] uppercase tracking-wide text-black/60">Code Indexed</div>
 			</div>
 		</div>
 
-		<div class="flex items-center gap-3 rounded-lg border-2 border-warning/40 bg-panel p-4">
+		<div class="flex items-center gap-3 rounded-lg border-2 border-warning bg-panel p-4">
 			<span class="text-2xl">🐛</span>
 			<div>
-				<div class="text-xl font-bold text-sand">{errorsIndexed.toLocaleString()}</div>
-				<div class="text-[10px] uppercase tracking-wide text-sand/60">Errors Indexed</div>
+				<div class="text-xl font-bold text-black">{errorsIndexed.toLocaleString()}</div>
+				<div class="text-[10px] uppercase tracking-wide text-black/60">Errors Indexed</div>
 			</div>
 		</div>
 
-		<div class="flex items-center gap-3 rounded-lg border-2 border-info/40 bg-panel p-4">
+		<div class="flex items-center gap-3 rounded-lg border-2 border-info bg-panel p-4">
 			<span class="text-2xl">🐳</span>
 			<div>
-				<div class="text-xl font-bold text-sand">{data.docker.length}</div>
-				<div class="text-[10px] uppercase tracking-wide text-sand/60">Containers</div>
+				<div class="text-xl font-bold text-black">{data.docker.length}</div>
+				<div class="text-[10px] uppercase tracking-wide text-black/60">Containers</div>
 			</div>
 		</div>
 	</div>
@@ -350,7 +350,7 @@
 			{#each data.services as service}
 				<div class="rounded-lg border-2 bg-panel p-4 {service.status === 'healthy' ? 'border-accent/30' : 'border-danger/30'}">
 					<div class="mb-2 flex items-center justify-between">
-						<h3 class="font-semibold text-sand">{service.name}</h3>
+						<h3 class="font-semibold text-black">{service.name}</h3>
 						<span class="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider {service.status === 'healthy' ? 'bg-accent/20 text-accent' : 'bg-danger/20 text-danger'}">
 							{service.status}
 						</span>
@@ -358,14 +358,14 @@
 					<div class="space-y-1 text-sm">
 						{#if service.latencyMs !== undefined}
 							<div class="flex justify-between">
-								<span class="text-sand/60">Latency:</span>
-								<span class="font-mono text-sand">{service.latencyMs}ms</span>
+								<span class="text-black/60">Latency:</span>
+								<span class="font-mono text-black">{service.latencyMs}ms</span>
 							</div>
 						{/if}
 						{#if service.details}
 							<div class="flex justify-between">
-								<span class="text-sand/60">Details:</span>
-								<span class="font-mono text-xs text-sand/80">{service.details}</span>
+								<span class="text-black/60">Details:</span>
+								<span class="font-mono text-xs text-black/80">{service.details}</span>
 							</div>
 						{/if}
 					</div>
@@ -378,20 +378,20 @@
 	{#if activeTab === 'indexing'}
 		<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 			<div class="space-y-4">
-				<h3 class="text-lg font-semibold text-sand">Codebase Indexing</h3>
+				<h3 class="text-lg font-semibold text-black uppercase tracking-wide">Codebase Indexing</h3>
 
-				<div class="rounded-lg border-2 border-sand/20 bg-panel p-4">
+				<div class="rounded-lg border-2 border-black/20 bg-panel p-4">
 					<div class="mb-3 flex items-center justify-between">
 						<div>
-							<div class="font-semibold text-sand">Code Index</div>
-							<div class="text-xs text-sand/60">TypeScript + Svelte files → Qdrant + MinIO</div>
+							<div class="font-semibold text-black">Code Index</div>
+							<div class="text-xs text-black/60">TypeScript + Svelte files → Qdrant + MinIO</div>
 						</div>
 						<span class="rounded-full bg-info/20 px-2 py-0.5 text-xs font-bold text-info">
 							{codebaseIndexed} points
 						</span>
 					</div>
 					<button
-						class="w-full rounded-md border border-accent bg-accent/10 px-4 py-2 text-sm font-mono uppercase tracking-wider text-accent transition hover:bg-accent/20 disabled:opacity-50"
+						class="w-full rounded-md border-2 border-accent bg-accent/10 px-4 py-2 text-sm font-mono uppercase tracking-wider text-accent transition hover:bg-accent/20 disabled:opacity-50"
 						onclick={() => triggerIndexing('codebase')}
 						disabled={indexingCodebase}
 					>
@@ -399,18 +399,18 @@
 					</button>
 				</div>
 
-				<div class="rounded-lg border-2 border-sand/20 bg-panel p-4">
+				<div class="rounded-lg border-2 border-black/20 bg-panel p-4">
 					<div class="mb-3 flex items-center justify-between">
 						<div>
-							<div class="font-semibold text-sand">Error Index</div>
-							<div class="text-xs text-sand/60">Error patterns → Qdrant for semantic search</div>
+							<div class="font-semibold text-black">Error Index</div>
+							<div class="text-xs text-black/60">Error patterns → Qdrant for semantic search</div>
 						</div>
 						<span class="rounded-full bg-warning/20 px-2 py-0.5 text-xs font-bold text-warning">
 							{errorsIndexed} points
 						</span>
 					</div>
 					<button
-						class="w-full rounded-md border border-warning bg-warning/10 px-4 py-2 text-sm font-mono uppercase tracking-wider text-warning transition hover:bg-warning/20 disabled:opacity-50"
+						class="w-full rounded-md border-2 border-warning bg-warning/10 px-4 py-2 text-sm font-mono uppercase tracking-wider text-warning transition hover:bg-warning/20 disabled:opacity-50"
 						onclick={() => triggerIndexing('errors')}
 						disabled={indexingErrors}
 					>
@@ -420,10 +420,10 @@
 			</div>
 
 			<div>
-				<h3 class="mb-2 text-lg font-semibold text-sand">Activity Log</h3>
-				<div class="h-64 overflow-y-auto rounded-lg border-2 border-sand/20 bg-black/40 p-3 font-mono text-xs text-sand/80">
+				<h3 class="mb-2 text-lg font-semibold text-black uppercase tracking-wide">Activity Log</h3>
+				<div class="h-64 overflow-y-auto rounded-lg border-2 border-black/20 bg-black/40 p-3 font-mono text-xs text-black/80">
 					{#if indexingLog.length === 0}
-						<span class="text-sand/30">No activity yet. Trigger an indexing operation to see logs.</span>
+						<span class="text-black/30">No activity yet. Trigger an indexing operation to see logs.</span>
 					{:else}
 						{#each indexingLog as line}
 							<div class="mb-1">{line}</div>
@@ -442,11 +442,11 @@
 					type="text"
 					bind:value={searchQuery}
 					placeholder="Search indexed codebase (semantic search via Qdrant)..."
-					class="flex-1 rounded-lg border-2 border-sand/20 bg-panel px-4 py-2 text-sand placeholder-sand/40 transition focus:border-accent focus:outline-none"
+					class="flex-1 rounded-lg border-2 border-black/20 bg-panel px-4 py-2 text-black placeholder-black/40 transition focus:border-accent focus:outline-none"
 					onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter') searchCodebase(); }}
 				/>
 				<button
-					class="rounded-lg border border-accent bg-accent/10 px-6 py-2 text-sm font-mono uppercase tracking-wider text-accent transition hover:bg-accent/20 disabled:opacity-50"
+					class="rounded-lg border-2 border-accent bg-accent/10 px-6 py-2 text-sm font-mono uppercase tracking-wider text-accent transition hover:bg-accent/20 disabled:opacity-50"
 					onclick={searchCodebase}
 					disabled={searching || !searchQuery.trim()}
 				>
@@ -457,7 +457,7 @@
 			{#if searchResults.length > 0}
 				<div class="space-y-2">
 					{#each searchResults as result}
-						<div class="rounded-lg border-2 border-sand/20 bg-panel p-4 transition hover:border-info/40">
+						<div class="rounded-lg border-2 border-black/20 bg-panel p-4 transition hover:border-info">
 							<div class="mb-2 flex items-center justify-between">
 								<code class="rounded bg-sand/10 px-2 py-0.5 text-xs text-info">{result.file}</code>
 								<span class="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold text-accent">
@@ -465,13 +465,13 @@
 								</span>
 							</div>
 							{#if result.snippet}
-								<pre class="overflow-x-auto whitespace-pre-wrap text-xs text-sand/70">{result.snippet}</pre>
+								<pre class="overflow-x-auto whitespace-pre-wrap text-xs text-black/70">{result.snippet}</pre>
 							{/if}
 						</div>
 					{/each}
 				</div>
 			{:else if searchQuery && !searching}
-				<div class="rounded-lg border-2 border-dashed border-sand/20 p-8 text-center text-sand/40">
+				<div class="rounded-lg border-2 border-dashed border-black/20 p-8 text-center text-black/40">
 					No results. Try a different query or index the codebase first.
 				</div>
 			{/if}
@@ -482,28 +482,28 @@
 	{#if activeTab === 'qdrant'}
 		<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
 			{#each data.qdrant.collections as collection}
-				<div class="rounded-lg border-2 border-sand/20 bg-panel p-4 transition hover:border-info/40">
+				<div class="rounded-lg border-2 border-black/20 bg-panel p-4 transition hover:border-info">
 					<div class="mb-3 flex items-center justify-between">
-						<h3 class="font-semibold text-sand">{collection.name}</h3>
+						<h3 class="font-semibold text-black">{collection.name}</h3>
 						<span class="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent">
 							{collection.status}
 						</span>
 					</div>
 					<div class="space-y-1 text-sm">
 						<div class="flex justify-between">
-							<span class="text-sand/60">Points:</span>
-							<span class="font-semibold text-sand">{collection.pointsCount.toLocaleString()}</span>
+							<span class="text-black/60">Points:</span>
+							<span class="font-semibold text-black">{collection.pointsCount.toLocaleString()}</span>
 						</div>
 						<div class="flex justify-between">
-							<span class="text-sand/60">Vector Size:</span>
-							<span class="font-semibold text-sand">{collection.vectorSize}d</span>
+							<span class="text-black/60">Vector Size:</span>
+							<span class="font-semibold text-black">{collection.vectorSize}d</span>
 						</div>
 					</div>
 				</div>
 			{/each}
 
 			{#if data.qdrant.collections.length === 0}
-				<div class="col-span-full rounded-lg border-2 border-dashed border-sand/20 p-8 text-center text-sand/40">
+				<div class="col-span-full rounded-lg border-2 border-dashed border-black/20 p-8 text-center text-black/40">
 					No Qdrant collections found. Is Qdrant running on port 6333?
 				</div>
 			{/if}
@@ -513,36 +513,36 @@
 	<!-- Docker Tab -->
 	{#if activeTab === 'docker'}
 		{#if data.docker.length > 0}
-			<div class="overflow-hidden rounded-lg border-2 border-sand/20 bg-panel">
+			<div class="overflow-hidden rounded-lg border-2 border-black/20 bg-panel">
 				<table class="w-full border-collapse">
 					<thead>
-						<tr class="border-b-2 border-sand/20 bg-panelSoft">
-							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-sand/60">Container</th>
-							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-sand/60">Status</th>
-							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-sand/60">Image</th>
-							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-sand/60">Ports</th>
+						<tr class="border-b-2 border-black/20 bg-sand/10">
+							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-black/60">Container</th>
+							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-black/60">Status</th>
+							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-black/60">Image</th>
+							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-black/60">Ports</th>
 						</tr>
 					</thead>
 					<tbody>
 						{#each data.docker as container}
-							<tr class="border-b border-sand/10 transition hover:bg-sand/5">
+							<tr class="border-b border-black/10 transition hover:bg-sand/5">
 								<td class="p-3">
-									<code class="text-xs text-sand">{container.name}</code>
+									<code class="text-xs text-black">{container.name}</code>
 								</td>
 								<td class="p-3">
 									<span class="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase {container.status === 'running' ? 'bg-accent/20 text-accent' : 'bg-danger/20 text-danger'}">
 										{container.status}
 									</span>
 								</td>
-								<td class="p-3 text-xs text-sand/60">{container.image}</td>
-								<td class="p-3 font-mono text-xs text-sand/60">{container.ports || '—'}</td>
+								<td class="p-3 text-xs text-black/60">{container.image}</td>
+								<td class="p-3 font-mono text-xs text-black/60">{container.ports || '—'}</td>
 							</tr>
 						{/each}
 					</tbody>
 				</table>
 			</div>
 		{:else}
-			<div class="rounded-lg border-2 border-dashed border-sand/20 p-8 text-center text-sand/40">
+			<div class="rounded-lg border-2 border-dashed border-black/20 p-8 text-center text-black/40">
 				No Docker containers detected. Docker Engine API may not be exposed on port 2375,
 				or Docker Desktop is not running.
 			</div>
@@ -555,13 +555,13 @@
 			{#each adminTools as tool}
 				<a
 					href={tool.href}
-					class="group rounded-lg border-2 border-sand/20 bg-panel p-4 transition hover:border-accent/40 hover:-translate-y-0.5 hover:shadow-md"
+					class="group rounded-lg border-2 border-black/20 bg-panel p-4 transition hover:border-accent hover:-translate-y-0.5 hover:shadow-md"
 				>
 					<div class="mb-2 flex items-center gap-2">
 						<span class="text-xl">{tool.icon}</span>
-						<h3 class="font-semibold text-sand group-hover:text-accent">{tool.name}</h3>
+						<h3 class="font-semibold text-black group-hover:text-accent">{tool.name}</h3>
 					</div>
-					<p class="text-xs text-sand/60">{tool.desc}</p>
+					<p class="text-xs text-black/60">{tool.desc}</p>
 				</a>
 			{/each}
 		</div>
@@ -571,9 +571,9 @@
 	{#if activeTab === 'evidence'}
 		<div class="space-y-4">
 			<div class="flex items-center justify-between">
-				<h3 class="text-lg font-semibold text-sand">Evidence File Manager</h3>
+				<h3 class="text-lg font-semibold text-black uppercase tracking-wide">Evidence File Manager</h3>
 				<button
-					class="rounded-md border border-info bg-info/10 px-4 py-1.5 text-xs font-mono uppercase tracking-wider text-info transition hover:bg-info/20"
+					class="rounded-md border-2 border-info bg-info/10 px-4 py-1.5 text-xs font-mono uppercase tracking-wider text-info transition hover:bg-info/20"
 					onclick={loadEvidenceFiles}
 					disabled={isLoadingEvidence}
 				>
@@ -582,24 +582,24 @@
 			</div>
 
 			{#if evidenceFiles.length > 0}
-				<div class="overflow-hidden rounded-lg border-2 border-sand/20 bg-panel">
+				<div class="overflow-hidden rounded-lg border-2 border-black/20 bg-panel">
 					<table class="w-full border-collapse">
 						<thead>
-							<tr class="border-b-2 border-sand/20 bg-panelSoft">
-								<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-sand/60">File</th>
-								<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-sand/60">Type</th>
-								<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-sand/60">Status</th>
-								<th class="p-3 text-right text-xs font-bold uppercase tracking-wider text-sand/60">Actions</th>
+							<tr class="border-b-2 border-black/20 bg-sand/10">
+								<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-black/60">File</th>
+								<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-black/60">Type</th>
+								<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-black/60">Status</th>
+								<th class="p-3 text-right text-xs font-bold uppercase tracking-wider text-black/60">Actions</th>
 							</tr>
 						</thead>
 						<tbody>
 							{#each evidenceFiles as file (file.id)}
-								<tr class="border-b border-sand/10 transition hover:bg-sand/5">
+								<tr class="border-b border-black/10 transition hover:bg-sand/5">
 									<td class="p-3">
-										<div class="font-medium text-sand text-sm">{file.title ?? file.filename ?? file.fileName ?? 'Untitled'}</div>
-										<div class="text-xs text-sand/40">{file.id}</div>
+										<div class="font-medium text-black text-sm">{file.title ?? file.filename ?? file.fileName ?? 'Untitled'}</div>
+										<div class="text-xs text-black/40">{file.id}</div>
 									</td>
-									<td class="p-3 text-xs text-sand/60">{file.evidenceType ?? file.file_type ?? file.fileType ?? '—'}</td>
+									<td class="p-3 text-xs text-black/60">{file.evidenceType ?? file.file_type ?? file.fileType ?? '—'}</td>
 									<td class="p-3">
 										<span class="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase {(file.processing_status ?? file.status) === 'completed' ? 'bg-accent/20 text-accent' : 'bg-warning/20 text-warning'}">
 											{file.processing_status ?? file.status ?? 'unknown'}
@@ -619,20 +619,20 @@
 					</table>
 				</div>
 			{:else if !isLoadingEvidence}
-				<div class="rounded-lg border-2 border-dashed border-sand/20 p-8 text-center text-sand/40">
+				<div class="rounded-lg border-2 border-dashed border-black/20 p-8 text-center text-black/40">
 					No evidence files loaded. Click Refresh to fetch from the database.
 				</div>
 			{:else}
 				<div class="flex items-center justify-center p-12">
 					<div class="w-6 h-6 border-2 border-info border-t-transparent rounded-full animate-spin"></div>
-					<span class="ml-3 text-sand/60">Loading evidence files...</span>
+					<span class="ml-3 text-black/60">Loading evidence files...</span>
 				</div>
 			{/if}
 			<!-- Advanced Data Grid -->
 			<div class="mt-4">
 				<button
 					onclick={() => (showDataGrid = !showDataGrid)}
-					class="rounded-md border border-accent/40 bg-accent/10 px-4 py-1.5 text-xs font-mono uppercase tracking-wider text-accent transition hover:bg-accent/20"
+					class="rounded-md border-2 border-accent/40 bg-accent/10 px-4 py-1.5 text-xs font-mono uppercase tracking-wider text-accent transition hover:bg-accent/20"
 				>
 					{showDataGrid ? 'Hide Data Grid' : 'Advanced Data Grid'}
 				</button>
@@ -692,14 +692,14 @@
 	<!-- Forms Tab -->
 	{#if activeTab === 'forms'}
 		<div class="tab-content">
-			<h3 class="text-sand/80 text-sm font-semibold mb-4">Progressive Enhancement Form Demo</h3>
+			<h3 class="text-black/80 text-sm font-semibold mb-4 uppercase tracking-wide">Progressive Enhancement Form Demo</h3>
 			<ProgressiveForm
 				title="Test Form (Progressive Enhancement)"
 				description="Demo of SvelteKit progressive enhancement with client-side validation"
 				action="/api/submit-form"
 			/>
 			<div class="mt-6">
-				<h3 class="text-sand/80 text-sm font-semibold mb-4">YoRHa-Themed Form Demo</h3>
+				<h3 class="text-black/80 text-sm font-semibold mb-4 uppercase tracking-wide">YoRHa-Themed Form Demo</h3>
 				<YoRHaForm
 					title="YoRHa Data Input"
 					subtitle="Theme-consistent form component"
@@ -718,7 +718,7 @@
 	<!-- AI Status Tab -->
 	{#if activeTab === 'ai-status'}
 		<div class="space-y-4">
-			<h3 class="text-lg font-semibold text-sand">AI Backend Status Monitor</h3>
+			<h3 class="text-lg font-semibold text-black uppercase tracking-wide">AI Backend Status Monitor</h3>
 			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 				<AIStatusIndicator isReady={true} provider="local" model="gemma3-legal:latest" />
 				<AIStatusIndicator isReady={true} provider="local" model="embeddinggemma:latest" />
@@ -726,7 +726,7 @@
 				<AIStatusIndicator provider="hybrid" model="ONNX gemma-270m" />
 			</div>
 			<div class="mt-4">
-				<h4 class="text-sm font-semibold text-sand/80 mb-2">Error State Demo</h4>
+				<h4 class="text-sm font-semibold text-black/80 mb-2 uppercase tracking-wide">Error State Demo</h4>
 				<AIStatusIndicator error="Connection to Ollama timed out after 30s" provider="local" model="gemma3-legal:latest" />
 			</div>
 		</div>
@@ -734,8 +734,8 @@
 
 	{#if activeTab === 'performance'}
 		<div class="space-y-4">
-			<h3 class="text-lg font-semibold text-sand">Performance Monitor</h3>
-			<p class="text-sm text-sand/60">Real-time FPS, memory, CPU/GPU usage, and response time metrics.</p>
+			<h3 class="text-lg font-semibold text-black uppercase tracking-wide">Performance Monitor</h3>
+			<p class="text-sm text-black/60">Real-time FPS, memory, CPU/GPU usage, and response time metrics.</p>
 			<PerformanceMonitor showOverlay={true} autoHide={false} updateInterval={1000} />
 		</div>
 	{/if}
@@ -743,15 +743,15 @@
 	<!-- Embeddings Tab — Redis cache + embeddinggemma integration -->
 	{#if activeTab === 'embeddings'}
 		<div class="space-y-6">
-			<h3 class="text-lg font-semibold text-sand">Embedding & Cache Integration</h3>
-			<p class="text-sm text-sand/60">Test embeddinggemma:latest (768d) via Ollama + check Redis cache health.</p>
+			<h3 class="text-lg font-semibold text-black uppercase tracking-wide">Embedding & Cache Integration</h3>
+			<p class="text-sm text-black/60">Test embeddinggemma:latest (768d) via Ollama + check Redis cache health.</p>
 
 			<!-- Redis Health -->
-			<div class="rounded-lg border-2 border-sand/20 bg-panel p-4">
+			<div class="rounded-lg border-2 border-black/20 bg-panel p-4">
 				<div class="flex items-center justify-between mb-3">
-					<h4 class="font-semibold text-sand">Redis Cache Health</h4>
+					<h4 class="font-semibold text-black uppercase tracking-wide">Redis Cache Health</h4>
 					<button
-						class="rounded-md border border-info bg-info/10 px-3 py-1 text-xs font-mono uppercase text-info transition hover:bg-info/20 disabled:opacity-50"
+						class="rounded-md border-2 border-info bg-info/10 px-3 py-1 text-xs font-mono uppercase text-info transition hover:bg-info/20 disabled:opacity-50"
 						onclick={checkRedisHealth}
 						disabled={isCheckingRedis}
 					>
@@ -764,36 +764,36 @@
 							{redisHealthy ? 'Connected' : 'Disconnected'}
 						</span>
 						{#if Object.keys(redisStats).length > 0}
-							<span class="text-sand/40 text-xs font-mono">
+							<span class="text-black/40 text-xs font-mono">
 								{JSON.stringify(redisStats).slice(0, 120)}{JSON.stringify(redisStats).length > 120 ? '...' : ''}
 							</span>
 						{/if}
 					</div>
 				{:else}
-					<p class="text-xs text-sand/40">Click "Check Health" to query /api/health for Redis status.</p>
+					<p class="text-xs text-black/40">Click "Check Health" to query /api/health for Redis status.</p>
 				{/if}
 			</div>
 
 			<!-- Embedding Test -->
-			<div class="rounded-lg border-2 border-sand/20 bg-panel p-4">
-				<h4 class="font-semibold text-sand mb-3">embeddinggemma:latest (768-dim)</h4>
+			<div class="rounded-lg border-2 border-black/20 bg-panel p-4">
+				<h4 class="font-semibold text-black mb-3 uppercase tracking-wide">embeddinggemma:latest (768-dim)</h4>
 				<div class="space-y-3">
 					<textarea
 						bind:value={embedTestText}
 						placeholder="Enter text to embed via Ollama embeddinggemma..."
 						rows={3}
-						class="w-full rounded-lg border-2 border-sand/20 bg-panelSoft px-4 py-2 text-sand text-sm placeholder-sand/40 transition focus:border-accent focus:outline-none resize-vertical"
+						class="w-full rounded-lg border-2 border-black/20 bg-sand/10 px-4 py-2 text-black text-sm placeholder-black/40 transition focus:border-accent focus:outline-none resize-vertical"
 					></textarea>
 					<div class="flex gap-2">
 						<button
-							class="flex-1 rounded-md border border-accent bg-accent/10 px-4 py-2 text-sm font-mono uppercase tracking-wider text-accent transition hover:bg-accent/20 disabled:opacity-50"
+							class="flex-1 rounded-md border-2 border-accent bg-accent/10 px-4 py-2 text-sm font-mono uppercase tracking-wider text-accent transition hover:bg-accent/20 disabled:opacity-50"
 							onclick={testEmbedding}
 							disabled={isEmbedding || !embedTestText.trim()}
 						>
 							{isEmbedding ? 'Embedding...' : 'Generate Embedding'}
 						</button>
 						<button
-							class="rounded-md border border-sand/30 bg-panel px-3 py-2 text-xs text-sand/60 transition hover:text-sand"
+							class="rounded-md border-2 border-black/30 bg-panel px-3 py-2 text-xs text-black/60 transition hover:text-black"
 							onclick={() => { embedTestText = 'The defendant is charged under California Penal Code Section 187(a) with murder in the first degree.'; }}
 						>
 							Sample
@@ -802,7 +802,7 @@
 				</div>
 
 				{#if embedError}
-					<div class="mt-3 p-3 bg-danger/10 border border-danger/30 rounded-lg text-danger text-sm">
+					<div class="mt-3 p-3 bg-danger/10 border-2 border-danger rounded-lg text-danger text-sm">
 						{embedError}
 					</div>
 				{/if}
@@ -813,13 +813,13 @@
 							<span class="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold text-accent">
 								{embedTestResult.dims}d
 							</span>
-							<span class="text-sand/60">Model: <span class="font-mono text-sand">{embedTestResult.model}</span></span>
-							<span class="text-sand/60">Time: <span class="font-mono text-accent">{embedTestResult.timeMs.toFixed(0)}ms</span></span>
+							<span class="text-black/60">Model: <span class="font-mono text-black">{embedTestResult.model}</span></span>
+							<span class="text-black/60">Time: <span class="font-mono text-accent">{embedTestResult.timeMs.toFixed(0)}ms</span></span>
 						</div>
-						<div class="rounded-lg bg-black/40 p-3 font-mono text-xs text-sand/70 max-h-24 overflow-y-auto">
+						<div class="rounded-lg bg-black/40 p-3 font-mono text-xs text-black/70 max-h-24 overflow-y-auto">
 							[{embedTestResult.embedding.slice(0, 8).map(v => v.toFixed(4)).join(', ')}, ... ({embedTestResult.dims} total)]
 						</div>
-						<div class="text-xs text-sand/40">
+						<div class="text-xs text-black/40">
 							L2 norm: {Math.sqrt(embedTestResult.embedding.reduce((s, v) => s + v * v, 0)).toFixed(4)}
 							&middot; Min: {Math.min(...embedTestResult.embedding).toFixed(4)}
 							&middot; Max: {Math.max(...embedTestResult.embedding).toFixed(4)}
@@ -829,16 +829,16 @@
 			</div>
 
 			<!-- Architecture Info -->
-			<div class="rounded-lg border-2 border-sand/20 bg-panel p-4">
-				<h4 class="font-semibold text-sand mb-2">Cache → Embedding Pipeline</h4>
-				<div class="text-xs text-sand/60 font-mono space-y-1">
+			<div class="rounded-lg border-2 border-black/20 bg-panel p-4">
+				<h4 class="font-semibold text-black mb-2 uppercase tracking-wide">Cache → Embedding Pipeline</h4>
+				<div class="text-xs text-black/60 font-mono space-y-1">
 					<p>L0: LokiJS (in-memory, 5-10min TTL)</p>
 					<p>L1: IndexedDB (persistent, 7-day TTL)</p>
 					<p>L2: Memory Cache (server, 5min TTL)</p>
 					<p>L3: Redis (server, configurable TTL)</p>
 					<p>L4: embeddinggemma:latest → 768d via gRPC/HTTP</p>
-					<p class="mt-2 text-sand/40">Fallback: nomic-embed-text (384d)</p>
-					<p class="text-sand/40">Vector stores: pgvector + Qdrant ANN</p>
+					<p class="mt-2 text-black/40">Fallback: nomic-embed-text (384d)</p>
+					<p class="text-black/40">Vector stores: pgvector + Qdrant ANN</p>
 				</div>
 			</div>
 		</div>
@@ -846,23 +846,23 @@
 
 	{#if activeTab === 'upload-sim'}
 		<div class="space-y-4">
-			<h3 class="text-lg font-semibold text-sand">Upload Pipeline Simulator</h3>
-			<p class="text-sm text-sand/60">Simulates the 4-stage evidence processing pipeline (upload → extract → chunk → embed).</p>
+			<h3 class="text-lg font-semibold text-black uppercase tracking-wide">Upload Pipeline Simulator</h3>
+			<p class="text-sm text-black/60">Simulates the 4-stage evidence processing pipeline (upload → extract → chunk → embed).</p>
 			<DocumentUploadSimulator />
 		</div>
 	{/if}
 
 	{#if activeTab === 'knowledge'}
 		<div class="space-y-6">
-			<h3 class="text-lg font-semibold text-sand">Legal Knowledge Base</h3>
-			<p class="text-sm text-sand/60">Seed glossary terms, statutes, and legal precedents into PostgreSQL. Generate 768-dim embeddings via Ollama embeddinggemma for cosine similarity search. Index lawpdfs/ through the 8-stage RAG pipeline (MinIO → chunking → Qdrant + pgvector).</p>
+			<h3 class="text-lg font-semibold text-black uppercase tracking-wide">Legal Knowledge Base</h3>
+			<p class="text-sm text-black/60">Seed glossary terms, statutes, and legal precedents into PostgreSQL. Generate 768-dim embeddings via Ollama embeddinggemma for cosine similarity search. Index lawpdfs/ through the 8-stage RAG pipeline (MinIO → chunking → Qdrant + pgvector).</p>
 
 			<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-				<div class="rounded-lg border-2 border-sand/20 bg-panel p-4">
-					<h4 class="font-semibold text-sand mb-2">Seed Data</h4>
-					<p class="text-xs text-sand/60 mb-3">~60 glossary terms, ~25 statutes, ~20 precedents. Idempotent (skips duplicates).</p>
+				<div class="rounded-lg border-2 border-black/20 bg-panel p-4">
+					<h4 class="font-semibold text-black mb-2 uppercase tracking-wide">Seed Data</h4>
+					<p class="text-xs text-black/60 mb-3">~60 glossary terms, ~25 statutes, ~20 precedents. Idempotent (skips duplicates).</p>
 					<button
-						class="w-full rounded-md border border-accent bg-accent/10 px-4 py-2 text-sm font-mono uppercase tracking-wider text-accent transition hover:bg-accent/20 disabled:opacity-50"
+						class="w-full rounded-md border-2 border-accent bg-accent/10 px-4 py-2 text-sm font-mono uppercase tracking-wider text-accent transition hover:bg-accent/20 disabled:opacity-50"
 						onclick={() => seedKnowledge(false)}
 						disabled={seedStatus !== 'idle' && seedStatus !== 'done' && seedStatus !== 'error'}
 					>
@@ -870,11 +870,11 @@
 					</button>
 				</div>
 
-				<div class="rounded-lg border-2 border-sand/20 bg-panel p-4">
-					<h4 class="font-semibold text-sand mb-2">Seed + Embed</h4>
-					<p class="text-xs text-sand/60 mb-3">Seed data + generate embeddings via embeddinggemma:latest (768-dim, cosine). Stored in pgvector.</p>
+				<div class="rounded-lg border-2 border-black/20 bg-panel p-4">
+					<h4 class="font-semibold text-black mb-2 uppercase tracking-wide">Seed + Embed</h4>
+					<p class="text-xs text-black/60 mb-3">Seed data + generate embeddings via embeddinggemma:latest (768-dim, cosine). Stored in pgvector.</p>
 					<button
-						class="w-full rounded-md border border-info bg-info/10 px-4 py-2 text-sm font-mono uppercase tracking-wider text-info transition hover:bg-info/20 disabled:opacity-50"
+						class="w-full rounded-md border-2 border-info bg-info/10 px-4 py-2 text-sm font-mono uppercase tracking-wider text-info transition hover:bg-info/20 disabled:opacity-50"
 						onclick={() => seedKnowledge(true)}
 						disabled={seedStatus !== 'idle' && seedStatus !== 'done' && seedStatus !== 'error'}
 					>
@@ -882,11 +882,11 @@
 					</button>
 				</div>
 
-				<div class="rounded-lg border-2 border-sand/20 bg-panel p-4">
-					<h4 class="font-semibold text-sand mb-2">Index PDFs</h4>
-					<p class="text-xs text-sand/60 mb-3">Index 36 lawpdfs/ through evidence upload pipeline (MinIO → OCR → chunk → embed → Qdrant).</p>
+				<div class="rounded-lg border-2 border-black/20 bg-panel p-4">
+					<h4 class="font-semibold text-black mb-2 uppercase tracking-wide">Index PDFs</h4>
+					<p class="text-xs text-black/60 mb-3">Index 36 lawpdfs/ through evidence upload pipeline (MinIO → OCR → chunk → embed → Qdrant).</p>
 					<button
-						class="w-full rounded-md border border-warning bg-warning/10 px-4 py-2 text-sm font-mono uppercase tracking-wider text-warning transition hover:bg-warning/20 disabled:opacity-50"
+						class="w-full rounded-md border-2 border-warning bg-warning/10 px-4 py-2 text-sm font-mono uppercase tracking-wider text-warning transition hover:bg-warning/20 disabled:opacity-50"
 						onclick={indexPdfs}
 						disabled={seedStatus !== 'idle' && seedStatus !== 'done' && seedStatus !== 'error'}
 					>
@@ -897,27 +897,27 @@
 
 			{#if seedStatus === 'done' && seedResult}
 				<div class="rounded-lg border-2 border-accent/30 bg-accent/5 p-4">
-					<h4 class="font-semibold text-accent mb-2">Result</h4>
-					<pre class="text-xs text-sand/80 font-mono whitespace-pre-wrap overflow-x-auto max-h-48">{JSON.stringify(seedResult, null, 2)}</pre>
+					<h4 class="font-semibold text-accent mb-2 uppercase tracking-wide">Result</h4>
+					<pre class="text-xs text-black/80 font-mono whitespace-pre-wrap overflow-x-auto max-h-48">{JSON.stringify(seedResult, null, 2)}</pre>
 				</div>
 			{/if}
 
 			{#if seedStatus === 'error'}
 				<div class="rounded-lg border-2 border-danger/30 bg-danger/5 p-4">
-					<h4 class="font-semibold text-danger mb-2">Error</h4>
+					<h4 class="font-semibold text-danger mb-2 uppercase tracking-wide">Error</h4>
 					<p class="text-sm text-danger/80">{seedError}</p>
 				</div>
 			{/if}
 
-			<div class="rounded-lg border-2 border-sand/20 bg-panel p-4">
-				<h4 class="font-semibold text-sand mb-2">Pipeline Architecture</h4>
-				<div class="text-xs text-sand/60 font-mono space-y-1">
+			<div class="rounded-lg border-2 border-black/20 bg-panel p-4">
+				<h4 class="font-semibold text-black mb-2 uppercase tracking-wide">Pipeline Architecture</h4>
+				<div class="text-xs text-black/60 font-mono space-y-1">
 					<p>RAG: Qdrant vector search → confidence ranking → LLM generation</p>
 					<p>KAG: Schema validation + W3C spec checks</p>
 					<p>DAG: Cluster dependency ordering + fix priority</p>
-					<p class="mt-2 text-sand/40">Storage: pgvector (768-dim text) + Qdrant (Cosine ANN)</p>
-					<p class="text-sand/40">Embedding: embeddinggemma:latest → nomic-embed-text fallback</p>
-					<p class="text-sand/40">Search: /api/glossary/search, /api/statutes/search, /api/precedents/search</p>
+					<p class="mt-2 text-black/40">Storage: pgvector (768-dim text) + Qdrant (Cosine ANN)</p>
+					<p class="text-black/40">Embedding: embeddinggemma:latest → nomic-embed-text fallback</p>
+					<p class="text-black/40">Search: /api/glossary/search, /api/statutes/search, /api/precedents/search</p>
 				</div>
 			</div>
 		</div>
@@ -925,23 +925,23 @@
 
 	{#if activeTab === 'spinners'}
 		<div class="space-y-6">
-			<h3 class="text-lg font-semibold text-sand">Loading Spinners</h3>
-			<p class="text-sm text-sand/60">Animated loading indicators with size and color variants.</p>
+			<h3 class="text-lg font-semibold text-black uppercase tracking-wide">Loading Spinners</h3>
+			<p class="text-sm text-black/60">Animated loading indicators with size and color variants.</p>
 			<div class="grid grid-cols-2 gap-6">
-				<div class="p-4 bg-panelSoft rounded-lg border border-sand/10">
-					<p class="text-xs text-sand/40 mb-3 uppercase">Small / Blue</p>
+				<div class="p-4 bg-sand/10 rounded-lg border-2 border-black/10">
+					<p class="text-xs text-black/40 mb-3 uppercase">Small / Blue</p>
 					<LoadingSpinner size="sm" color="blue" message="Loading..." />
 				</div>
-				<div class="p-4 bg-panelSoft rounded-lg border border-sand/10">
-					<p class="text-xs text-sand/40 mb-3 uppercase">Medium / Green</p>
+				<div class="p-4 bg-sand/10 rounded-lg border-2 border-black/10">
+					<p class="text-xs text-black/40 mb-3 uppercase">Medium / Green</p>
 					<LoadingSpinner size="md" color="green" message="Processing evidence..." />
 				</div>
-				<div class="p-4 bg-panelSoft rounded-lg border border-sand/10">
-					<p class="text-xs text-sand/40 mb-3 uppercase">Large / Purple</p>
+				<div class="p-4 bg-sand/10 rounded-lg border-2 border-black/10">
+					<p class="text-xs text-black/40 mb-3 uppercase">Large / Purple</p>
 					<LoadingSpinner size="lg" color="purple" message="Analyzing documents..." />
 				</div>
-				<div class="p-4 bg-panelSoft rounded-lg border border-sand/10">
-					<p class="text-xs text-sand/40 mb-3 uppercase">Medium / Gray (No Message)</p>
+				<div class="p-4 bg-sand/10 rounded-lg border-2 border-black/10">
+					<p class="text-xs text-black/40 mb-3 uppercase">Medium / Gray (No Message)</p>
 					<LoadingSpinner size="md" color="gray" showMessage={false} />
 				</div>
 			</div>
@@ -985,25 +985,27 @@
 		flex-wrap: wrap;
 		gap: 4px;
 		margin-bottom: 1rem;
-		border-bottom: 2px solid rgba(212, 199, 163, 0.2);
+		border-bottom: 2px solid rgba(0, 0, 0, 0.2);
 	}
 	.dt-tab {
 		padding: 0.5rem 1rem;
 		border-radius: 0.375rem 0.375rem 0 0;
 		font-size: 0.875rem;
 		text-transform: uppercase;
-		color: rgba(212, 199, 163, 0.6);
-		background: rgba(36, 33, 27, 0.4);
+		color: rgba(0, 0, 0, 0.6);
+		background: rgba(212, 199, 163, 0.2);
 		cursor: pointer;
 		transition: all 0.15s;
+		font-weight: 600;
 	}
 	.dt-tab:hover {
-		color: #d4c7a3;
-		background: rgba(36, 33, 27, 0.6);
+		color: #000;
+		background: rgba(212, 199, 163, 0.3);
 	}
 	.dt-tab.active {
 		border-bottom: 2px solid #4ade80;
 		color: #4ade80;
-		background: rgba(36, 33, 27, 0.7);
+		background: rgba(212, 199, 163, 0.4);
+		font-weight: 700;
 	}
 </style>

@@ -156,8 +156,8 @@
 <div class="mx-auto max-w-[1400px] p-6">
 	<!-- Header -->
 	<header class="mb-6">
-		<h1 class="text-2xl font-bold text-sand">Codebase Viewer</h1>
-		<p class="mt-1 text-sm text-sand/60">
+		<h1 class="text-2xl font-bold text-black uppercase tracking-wide">Codebase Viewer</h1>
+		<p class="mt-1 text-sm text-black/60">
 			Indexed embeddings &bull; Tagged files &bull; Vector database explorer
 		</p>
 		<div class="flex gap-2 mt-3">
@@ -199,8 +199,8 @@
 	{/if}
 
 	{#if showTagSelector}
-		<div class="mb-6 p-4 rounded-lg border-2 border-sand/20 bg-panel">
-			<h3 class="text-sm font-bold text-sand mb-3">Tag Selector (Jurisdiction-based)</h3>
+		<div class="mb-6 p-4 rounded-lg border-2 border-black/20 bg-panel">
+			<h3 class="text-sm font-bold text-black mb-3 uppercase tracking-wide">Tag Selector (Jurisdiction-based)</h3>
 			<TagSelector
 				selectedTags={selectedTagIds}
 				jurisdiction="US-Federal"
@@ -211,37 +211,37 @@
 
 	<!-- Stats Grid -->
 	<div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-		<div class="flex items-center gap-3 rounded-lg border-2 border-info/40 bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+		<div class="flex items-center gap-3 rounded-lg border-2 border-info bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
 			<span class="text-3xl">🔢</span>
 			<div>
-				<div class="text-xl font-bold text-sand">{totalPoints.toLocaleString()}</div>
-				<div class="text-xs uppercase tracking-wide text-sand/60">Qdrant Vectors</div>
+				<div class="text-xl font-bold text-black">{totalPoints.toLocaleString()}</div>
+				<div class="text-xs uppercase tracking-wide text-black/60">Qdrant Vectors</div>
 			</div>
 		</div>
 
-		<div class="flex items-center gap-3 rounded-lg border-2 border-accent/40 bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+		<div class="flex items-center gap-3 rounded-lg border-2 border-accent bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
 			<span class="text-3xl">📁</span>
 			<div>
-				<div class="text-xl font-bold text-sand">{stats.total_files || 0}</div>
-				<div class="text-xs uppercase tracking-wide text-sand/60">Indexed Files</div>
+				<div class="text-xl font-bold text-black">{stats.total_files || 0}</div>
+				<div class="text-xs uppercase tracking-wide text-black/60">Indexed Files</div>
 			</div>
 		</div>
 
-		<div class="flex items-center gap-3 rounded-lg border-2 border-warning/40 bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+		<div class="flex items-center gap-3 rounded-lg border-2 border-warning bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
 			<span class="text-3xl">🧬</span>
 			<div>
-				<div class="text-xl font-bold text-sand">{stats.total_errors || 0}</div>
-				<div class="text-xs uppercase tracking-wide text-sand/60">Total Errors</div>
+				<div class="text-xl font-bold text-black">{stats.total_errors || 0}</div>
+				<div class="text-xs uppercase tracking-wide text-black/60">Total Errors</div>
 			</div>
 		</div>
 
-		<div class="flex items-center gap-3 rounded-lg border-2 border-info/40 bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+		<div class="flex items-center gap-3 rounded-lg border-2 border-info bg-panel p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
 			<span class="text-3xl">📊</span>
 			<div>
-				<div class="text-xl font-bold text-sand">
+				<div class="text-xl font-bold text-black">
 					{(stats.embedding_coverage || 0).toFixed(1)}%
 				</div>
-				<div class="text-xs uppercase tracking-wide text-sand/60">Embedding Coverage</div>
+				<div class="text-xs uppercase tracking-wide text-black/60">Embedding Coverage</div>
 			</div>
 		</div>
 	</div>
@@ -268,11 +268,11 @@
 				{#each qdrantCollections as collection}
 					<button
 						type="button"
-						class="w-full rounded-lg border-2 bg-panel p-4 text-left transition hover:border-info/60 hover:shadow-md {selectedCollection === collection.name ? 'border-info bg-info/10' : 'border-sand/20'}"
+						class="w-full rounded-lg border-2 bg-panel p-4 text-left transition hover:border-info hover:shadow-md {selectedCollection === collection.name ? 'border-info bg-info/10' : 'border-black/20'}"
 						onclick={() => selectedCollection = collection.name}
 					>
 						<div class="mb-3 flex items-center justify-between">
-							<h3 class="font-semibold text-sand">{collection.name}</h3>
+							<h3 class="font-semibold text-black">{collection.name}</h3>
 							<span class="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent">
 								{collection.status}
 							</span>
@@ -280,19 +280,19 @@
 
 						<div class="space-y-1 text-sm">
 							<div class="flex justify-between">
-								<span class="text-sand/60">Points:</span>
-								<span class="font-semibold text-sand">{collection.pointsCount.toLocaleString()}</span>
+								<span class="text-black/60">Points:</span>
+								<span class="font-semibold text-black">{collection.pointsCount.toLocaleString()}</span>
 							</div>
 							<div class="flex justify-between">
-								<span class="text-sand/60">Vector Size:</span>
-								<span class="font-semibold text-sand">{collection.vectorSize}d</span>
+								<span class="text-black/60">Vector Size:</span>
+								<span class="font-semibold text-black">{collection.vectorSize}d</span>
 							</div>
 						</div>
 					</button>
 				{/each}
 
 				{#if qdrantCollections.length === 0}
-					<div class="col-span-full rounded-lg border-2 border-dashed border-sand/20 p-8 text-center text-sand/40">
+					<div class="col-span-full rounded-lg border-2 border-dashed border-black/20 p-8 text-center text-black/40">
 						No Qdrant collections found. Is Qdrant running on port 6333?
 					</div>
 				{/if}
@@ -307,7 +307,7 @@
 					type="text"
 					bind:value={searchQuery}
 					placeholder="Search files..."
-					class="flex-1 rounded-lg border-2 border-sand/20 bg-panel px-4 py-2 text-sand placeholder-sand/40 transition focus:border-accent focus:outline-none"
+					class="flex-1 rounded-lg border-2 border-black/20 bg-panel px-4 py-2 text-black placeholder-black/40 transition focus:border-accent focus:outline-none"
 				/>
 				<button
 					onclick={() => (showFilters = !showFilters)}
@@ -329,23 +329,23 @@
 				</div>
 			{/if}
 
-			<div class="mb-2 text-xs text-sand/40">{filteredEmbeddings.length} files shown</div>
+			<div class="mb-2 text-xs text-black/40">{filteredEmbeddings.length} files shown</div>
 
-			<div class="overflow-hidden rounded-lg border-2 border-sand/20 bg-panel">
+			<div class="overflow-hidden rounded-lg border-2 border-black/20 bg-panel">
 				<table class="w-full border-collapse">
 					<thead>
-						<tr class="border-b-2 border-sand/20 bg-panelSoft">
-							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-sand/60">File Path</th>
-							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-sand/60">Error Count</th>
-							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-sand/60">Error Codes</th>
-							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-sand/60">Last Indexed</th>
+						<tr class="border-b-2 border-black/20 bg-sand/10">
+							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-black/60">File Path</th>
+							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-black/60">Error Count</th>
+							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-black/60">Error Codes</th>
+							<th class="p-3 text-left text-xs font-bold uppercase tracking-wider text-black/60">Last Indexed</th>
 						</tr>
 					</thead>
 					<tbody>
 						{#each filteredEmbeddings as embedding}
-							<tr class="border-b border-sand/10 transition hover:bg-sand/5 cursor-pointer" onclick={() => { selectedTag = { id: embedding.id ?? embedding.source, name: embedding.source?.split('/').pop() ?? 'unknown', filePath: embedding.source ?? '', type: embedding.source?.endsWith('.svelte') ? 'component' : embedding.source?.includes('/routes/') ? 'route' : 'util', category: embedding.source?.includes('/routes/') ? 'route' : 'component', errorCount: embedding.error_count ?? 0, createdAt: embedding.last_indexed ?? new Date().toISOString(), updatedAt: embedding.last_indexed ?? new Date().toISOString() }; }}>
+							<tr class="border-b border-black/10 transition hover:bg-sand/5 cursor-pointer" onclick={() => { selectedTag = { id: embedding.id ?? embedding.source, name: embedding.source?.split('/').pop() ?? 'unknown', filePath: embedding.source ?? '', type: embedding.source?.endsWith('.svelte') ? 'component' : embedding.source?.includes('/routes/') ? 'route' : 'util', category: embedding.source?.includes('/routes/') ? 'route' : 'component', errorCount: embedding.error_count ?? 0, createdAt: embedding.last_indexed ?? new Date().toISOString(), updatedAt: embedding.last_indexed ?? new Date().toISOString() }; }}>
 								<td class="p-3">
-									<code class="rounded bg-sand/10 px-2 py-0.5 text-xs text-sand">{embedding.source}</code>
+									<code class="rounded bg-sand/10 px-2 py-0.5 text-xs text-black">{embedding.source}</code>
 								</td>
 								<td class="p-3">
 									<span class="rounded-full bg-warning/20 px-2 py-0.5 text-xs font-bold text-warning">
@@ -359,7 +359,7 @@
 										</span>
 									{/each}
 								</td>
-								<td class="p-3 text-xs text-sand/60">
+								<td class="p-3 text-xs text-black/60">
 									{embedding.last_indexed
 										? new Date(embedding.last_indexed).toLocaleString()
 										: 'Never'}
@@ -369,7 +369,7 @@
 
 						{#if filteredEmbeddings.length === 0}
 							<tr>
-								<td colspan="4" class="p-8 text-center text-sand/40">
+								<td colspan="4" class="p-8 text-center text-black/40">
 									{searchQuery ? `No files matching "${searchQuery}"` : 'No embeddings found. Is PostgreSQL running?'}
 								</td>
 							</tr>
@@ -418,12 +418,12 @@
 
 						<!-- Line -->
 						{#if i < timelineItems.length - 1}
-							<div class="absolute left-[5px] top-5 bottom--4 w-0.5 bg-sand/20"></div>
+							<div class="absolute left-[5px] top-5 bottom--4 w-0.5 bg-black/20"></div>
 						{/if}
 
 						<!-- Content -->
-						<div class="rounded-lg border-2 border-sand/20 bg-panel p-4">
-							<h4 class="mb-2 font-semibold text-sand">{item.file_path}</h4>
+						<div class="rounded-lg border-2 border-black/20 bg-panel p-4">
+							<h4 class="mb-2 font-semibold text-black">{item.file_path}</h4>
 							<div class="flex flex-wrap gap-2">
 								{#if item.indexed_at}
 									<span class="rounded-md bg-info/20 px-3 py-1 text-xs font-medium text-info">
@@ -451,7 +451,7 @@
 				{/each}
 
 				{#if timelineItems.length === 0}
-					<div class="rounded-lg border-2 border-dashed border-sand/20 p-8 text-center text-sand/40">
+					<div class="rounded-lg border-2 border-dashed border-black/20 p-8 text-center text-black/40">
 						No timeline data available.
 					</div>
 				{/if}
@@ -475,18 +475,18 @@
 
 <!-- Diff Viewer -->
 {#if showDiffViewer}
-	<div class="mb-6 p-4 rounded-lg border-2 border-sand/20 bg-panel">
-		<h3 class="text-sm font-bold text-sand mb-3">Code Diff Viewer</h3>
+	<div class="mb-6 p-4 rounded-lg border-2 border-black/20 bg-panel">
+		<h3 class="text-sm font-bold text-black mb-3 uppercase tracking-wide">Code Diff Viewer</h3>
 		<div class="flex gap-2 mb-3">
 			<textarea
 				bind:value={diffOriginal}
 				placeholder="Paste original code here..."
-				class="flex-1 min-h-[120px] p-2 bg-black/30 border border-sand/20 rounded text-sand text-xs font-mono placeholder:text-sand/30 focus:border-accent focus:outline-none"
+				class="flex-1 min-h-[120px] p-2 bg-black/30 border-2 border-black/20 rounded text-black text-xs font-mono placeholder:text-black/30 focus:border-accent focus:outline-none"
 			></textarea>
 			<textarea
 				bind:value={diffModified}
 				placeholder="Paste modified code here..."
-				class="flex-1 min-h-[120px] p-2 bg-black/30 border border-sand/20 rounded text-sand text-xs font-mono placeholder:text-sand/30 focus:border-accent focus:outline-none"
+				class="flex-1 min-h-[120px] p-2 bg-black/30 border-2 border-black/20 rounded text-black text-xs font-mono placeholder:text-black/30 focus:border-accent focus:outline-none"
 			></textarea>
 		</div>
 		{#if diffOriginal || diffModified}
@@ -497,8 +497,8 @@
 
 <!-- Graph Export -->
 {#if showGraphExport}
-	<div class="mb-6 p-4 rounded-lg border-2 border-sand/20 bg-panel">
-		<h3 class="text-sm font-bold text-sand mb-3">Graph Export</h3>
+	<div class="mb-6 p-4 rounded-lg border-2 border-black/20 bg-panel">
+		<h3 class="text-sm font-bold text-black mb-3 uppercase tracking-wide">Graph Export</h3>
 		<GraphExport
 			nodes={(data.postgres?.embeddings ?? []).map((e: any) => ({ id: e.id ?? String(Math.random()), label: (e.source ?? '').split('/').pop() ?? 'unknown', type: (e.source ?? '').split('.').pop() ?? 'file', errorCount: e.error_count ?? 0, filePath: e.source ?? '' }))}
 			edges={[]}
@@ -521,25 +521,27 @@
 		flex-wrap: wrap;
 		gap: 4px;
 		margin-bottom: 1rem;
-		border-bottom: 2px solid rgba(212, 199, 163, 0.2);
+		border-bottom: 2px solid rgba(0, 0, 0, 0.2);
 	}
 	.cv-tab {
 		padding: 0.5rem 1rem;
 		border-radius: 0.375rem 0.375rem 0 0;
 		font-size: 0.875rem;
 		text-transform: uppercase;
-		color: rgba(212, 199, 163, 0.6);
-		background: rgba(36, 33, 27, 0.4);
+		color: rgba(0, 0, 0, 0.6);
+		background: rgba(212, 199, 163, 0.2);
 		cursor: pointer;
 		transition: all 0.15s;
+		font-weight: 600;
 	}
 	.cv-tab:hover {
-		color: #d4c7a3;
-		background: rgba(36, 33, 27, 0.6);
+		color: #000;
+		background: rgba(212, 199, 163, 0.3);
 	}
 	.cv-tab.active {
 		border-bottom: 2px solid #4ade80;
 		color: #4ade80;
-		background: rgba(36, 33, 27, 0.7);
+		background: rgba(212, 199, 163, 0.4);
+		font-weight: 700;
 	}
 </style>
