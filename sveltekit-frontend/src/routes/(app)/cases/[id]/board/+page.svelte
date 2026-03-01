@@ -221,11 +221,12 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		if (!chatSession || chatSession.messages.length === 0) return;
 
 		try {
+			const chatId = `board-${caseId}`;
 			const response = await fetch(`/api/cases/${caseId}/chat`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					chatId: chatSession._chatId,
+					chatId,
 					messages: chatSession.messages,
 					metadata: {
 						evidenceCount: evidenceItems.length,
@@ -652,9 +653,19 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 						{chatSession.connectionStatus === 'connected' ? 'Ready' : 'Connecting...'}
 					</span>
 				</div>
-				<button class="close-btn" onclick={() => (showAIChat = false)}>
-					<Icon name="x" />
-				</button>
+				<div class="chat-header-actions">
+					<button
+						class="header-action-btn"
+						onclick={exportChatPDF}
+						disabled={chatSession.messages.length === 0}
+						title="Export Transcript"
+					>
+						<Icon name="download" />
+					</button>
+					<button class="close-btn" onclick={() => (showAIChat = false)}>
+						<Icon name="x" />
+					</button>
+				</div>
 			</div>
 
 			<div class="chat-messages" bind:this={chatContainer}>
@@ -730,13 +741,23 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 						}
 					}}
 				></textarea>
-				<button
-					class="send-btn"
-					onclick={sendChatMessage}
-					disabled={!currentMessage.trim() || chatSession.status !== 'idle'}
-				>
-					<Icon name="send" />
-				</button>
+				<div class="input-actions">
+					<button
+						class="voice-btn"
+						class:recording={isRecording}
+						onclick={isRecording ? stopVoiceInput : startVoiceInput}
+						title={isRecording ? 'Stop Recording' : 'Voice Input'}
+					>
+						<Icon name={isRecording ? 'mic-off' : 'mic'} />
+					</button>
+					<button
+						class="send-btn"
+						onclick={sendChatMessage}
+						disabled={!currentMessage.trim() || chatSession.status !== 'idle'}
+					>
+						<Icon name="send" />
+					</button>
+				</div>
 			</div>
 		</aside>
 	{/if}
@@ -1371,6 +1392,36 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		color: #065f46;
 	}
 
+	.chat-header-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.header-action-btn {
+		padding: 0.5rem;
+		background: transparent;
+		border: 1px solid #e5e7eb;
+		color: #6b7280;
+		cursor: pointer;
+		border-radius: 0.375rem;
+		transition: all 0.15s;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.header-action-btn:hover:not(:disabled) {
+		background: #f3f4f6;
+		color: #1f2937;
+		border-color: #3b82f6;
+	}
+
+	.header-action-btn:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+	}
+
 	.close-btn {
 		padding: 0.25rem;
 		background: transparent;
@@ -1541,6 +1592,45 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 
 	.chat-input textarea:focus {
 		border-color: #3b82f6;
+	}
+
+	.input-actions {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	.voice-btn {
+		padding: 0.75rem;
+		background: #f3f4f6;
+		border: 1px solid #e5e7eb;
+		border-radius: 0.5rem;
+		color: #6b7280;
+		cursor: pointer;
+		transition: all 0.15s;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.voice-btn:hover {
+		background: #e5e7eb;
+		color: #1f2937;
+	}
+
+	.voice-btn.recording {
+		background: #fee2e2;
+		border-color: #ef4444;
+		color: #dc2626;
+		animation: pulse-red 1.5s infinite;
+	}
+
+	@keyframes pulse-red {
+		0%, 100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.7;
+		}
 	}
 
 	.send-btn {
