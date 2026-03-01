@@ -40,42 +40,120 @@ export class QdrantManager {
 	content: { size: 768, distance: 'Cosine' },
 	summary: {
 	size: 768, distance: 'Cosine' }
+                },
+                // INT8 scalar quantization for 4x memory savings
+                quantization_config: {
+                    scalar: {
+                        type: 'int8',
+                        quantile: 0.99,
+                        always_ram: true
+                    }
+                },
+                hnsw_config: {
+                    m: 16,
+                    ef_construct: 100
                 }
             },
 	{
                 name: this.collections.cases,
                 vectors: {
 	description: { size: 768, distance: 'Cosine' }
+                },
+                quantization_config: {
+                    scalar: {
+                        type: 'int8',
+                        quantile: 0.99,
+                        always_ram: true
+                    }
+                },
+                hnsw_config: {
+                    m: 16,
+                    ef_construct: 100
                 }
             },
 	{
                 name: this.collections.evidence,
                 vectors: {
 	content: { size: 768, distance: 'Cosine' }
+                },
+                quantization_config: {
+                    scalar: {
+                        type: 'int8',
+                        quantile: 0.99,
+                        always_ram: true
+                    }
+                },
+                hnsw_config: {
+                    m: 16,
+                    ef_construct: 100
                 }
             },
 	{
                 name: this.collections.chat_history,
                 vectors: {
 	message: { size: 768, distance: 'Cosine' }
+                },
+                quantization_config: {
+                    scalar: {
+                        type: 'int8',
+                        quantile: 0.99,
+                        always_ram: true
+                    }
+                },
+                hnsw_config: {
+                    m: 16,
+                    ef_construct: 100
                 }
             },
 	{
                 name: this.collections.embeddings_cache,
                 vectors: {
 	embedding: { size: 768, distance: 'Cosine' }
+                },
+                quantization_config: {
+                    scalar: {
+                        type: 'int8',
+                        quantile: 0.99,
+                        always_ram: true
+                    }
+                },
+                hnsw_config: {
+                    m: 16,
+                    ef_construct: 100
                 }
             },
 	{
                 name: this.collections.document_tags,
                 vectors: {
 	size: 768, distance: 'Cosine'
+                },
+                quantization_config: {
+                    scalar: {
+                        type: 'int8',
+                        quantile: 0.99,
+                        always_ram: true
+                    }
+                },
+                hnsw_config: {
+                    m: 16,
+                    ef_construct: 100
                 }
             },
 	{
                 name: this.collections.topic_clusters,
                 vectors: {
 	size: 768, distance: 'Cosine'
+                },
+                quantization_config: {
+                    scalar: {
+                        type: 'int8',
+                        quantile: 0.99,
+                        always_ram: true
+                    }
+                },
+                hnsw_config: {
+                    m: 16,
+                    ef_construct: 100
                 }
             }
         ];
@@ -83,7 +161,7 @@ export class QdrantManager {
         for (const config of collectionConfigs) {
             try {
                 await this.client.createCollection(config.name, config as any);
-                console.log(`✅ Qdrant collection created: ${config.name}`);
+                console.log(`✅ Qdrant collection created: ${config.name} (INT8 quantized)`);
             } catch (error: any) {
                 if (!error?.message?.includes('already exists')) {
                     console.error(`❌ Failed to create collection ${config.name}:`, error);

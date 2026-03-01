@@ -10,6 +10,7 @@
 	}
 
 	const demos: Demo[] = [
+		{ href: '/demos/webgpu-memory-palace', label: 'WebGPU Memory Palace', description: 'GPU-accelerated 3D legal knowledge visualization: WGSL shaders, force-directed layout, 7-bit compression, WebGPU→CPU fallback', icon: 'box', lines: 354 },
 		{ href: '/demos/vector-search', label: 'Vector Intelligence Demo', description: 'Semantic search with pgvector embeddings: filtering, sorting, batch selection, CSV export, similarity metrics', icon: 'brain', lines: 370 },
 		{ href: '/demos/retro-recommendations', label: 'Retro Recommendation Engine', description: 'NES-style AI recommendations: category filters, sort controls, signal tokens, multi-modal confidence scoring', icon: 'sparkles', lines: 350 },
 		{ href: '/demos/cache', label: 'Cache Demo', description: 'Multi-layer cache system: LokiJS + Redis + PostgreSQL with real-time stats', icon: 'database', lines: 612 },

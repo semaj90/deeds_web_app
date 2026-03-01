@@ -1,83 +1,159 @@
-import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
-import db from '$lib/server/db';
-import { sql } from 'drizzle-orm';
-
 /**
+ * QLoRA Training Dataset Generator
+ *
  * GET /api/qlora/generate?caseId=xxx&limit=100
- * Generates JSONL training data from evidence analysis results.
- * Format: tool-calling JSONL compatible with Unsloth QLoRA trainer.
+ *
+ * Generates JSONL training data compatible with deeds_labs/python-middleware/qlora_legal_training.py.
+ * Two training formats per evidence record:
+ *   1. Analysis Q&A: system + user question + assistant answer with entities tool_call
+ *   2. Forensic detection: system + user prompt + assistant findings with forensic flags tool_call
+ *
+ * Returns: application/jsonl download (max 500 records)
  */
+
+import { error, json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types.js';
+import db from '$lib/server/db/client.js';
+import { evidence } from '$lib/server/db/schema-postgres.js';
+import { sql, eq, and, isNotNull } from 'drizzle-orm';
+
+interface TrainingRecord {
+	messages: Array<{
+		role: 'system' | 'user' | 'assistant';
+		content: string;
+		tool_calls?: Array<{ id: string; type: 'function'; function: { name: string; arguments: string } }>;
+	}>;
+}
+
 export const GET: RequestHandler = async ({ url }) => {
 	const caseId = url.searchParams.get('caseId');
-	const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '100'), 500);
+	const limit = Math.min(parseInt(url.searchParams.get('limit') || '100', 10), 500);
 
 	try {
-		const rows = await db.execute(sql`
-			SELECT e.id, e.title, e.evidence_type, e.file_name,
-				e.metadata->>'summary' as summary,
-				e.metadata->'entities' as entities,
-				e.metadata->'forensicFlags' as forensic_flags,
-				e.metadata->>'refinedEvidenceType' as refined_type
-			FROM evidence e
-			WHERE e.metadata IS NOT NULL
-			${caseId ? sql`AND e.case_id = ${caseId}` : sql``}
-			ORDER BY e.uploaded_at DESC
-			LIMIT ${limit}
-		`);
+		// Query evidence with rich metadata (entities, summary, forensics)
+		const conditions = [
+			isNotNull(evidence.metadata),
+			sql`${evidence.metadata}->>'summary' IS NOT NULL`,
+			sql`jsonb_array_length(COALESCE(${evidence.metadata}->'entities', '[]'::jsonb)) > 0`
+		];
 
-		const records = [...(rows as any)] as any[];
-		const jsonlLines: string[] = [];
+		if (caseId) {
+			conditions.push(eq(evidence.caseId, caseId));
+		}
 
-		for (const rec of records) {
-			if (!rec.summary || rec.summary.length < 20) continue;
+		const rows = await db
+			.select({
+				id: evidence.id,
+				fileName: evidence.fileName,
+				evidenceType: evidence.evidenceType,
+				metadata: evidence.metadata
+			})
+			.from(evidence)
+			.where(and(...conditions))
+			.limit(limit);
 
-			const entities = typeof rec.entities === 'string' ? JSON.parse(rec.entities) : (rec.entities ?? []);
-			const flags = typeof rec.forensic_flags === 'string' ? JSON.parse(rec.forensic_flags) : (rec.forensic_flags ?? []);
+		// Generate JSONL records (2 per evidence item: analysis + forensics)
+		const records: TrainingRecord[] = [];
 
-			// Format 1: Analysis Q&A pair
-			const analysisMsg: any = {
+		for (const row of rows) {
+			const metadata = row.metadata as any;
+			const entities = metadata?.entities ?? [];
+			const summary = metadata?.summary ?? '';
+			const forensicFlags = metadata?.forensicFlags ?? [];
+			const entityCount = metadata?.entityCount ?? 0;
+
+			// Record 1: Analysis Q&A with entities tool_call
+			records.push({
 				messages: [
-					{ role: 'system', content: 'You are a legal evidence analysis AI. Analyze evidence and provide structured findings.' },
-					{ role: 'user', content: `Analyze this ${rec.evidence_type ?? 'document'} evidence: "${rec.title ?? rec.file_name}"` },
-					{ role: 'assistant', content: rec.summary }
+					{
+						role: 'system',
+						content: 'You are a legal AI assistant specialized in evidence analysis. Extract entities from legal documents using the extractEntities tool.'
+					},
+					{
+						role: 'user',
+						content: `Analyze this ${row.evidenceType} document: "${row.fileName}"\n\nSummary: ${summary.slice(0, 500)}`
+					},
+					{
+						role: 'assistant',
+						content: '',
+						tool_calls: [
+							{
+								id: `call_${row.id.slice(0, 8)}`,
+								type: 'function',
+								function: {
+									name: 'extractEntities',
+									arguments: JSON.stringify({
+										document_id: row.id,
+										entity_count: entityCount,
+										entities: entities.slice(0, 20).map((e: any) => ({
+											type: e.type,
+											value: e.value,
+											confidence: e.confidence ?? 0.9
+										}))
+									})
+								}
+							}
+						]
+					}
 				]
-			};
-			if (entities.length > 0) {
-				analysisMsg.messages[2].tool_calls = [{
-					name: 'extract_entities',
-					arguments: { entities: entities.slice(0, 10).map((e: any) => ({ label: e.label, text: e.text, type: e.type })) }
-				}];
-			}
-			jsonlLines.push(JSON.stringify(analysisMsg));
+			});
 
-			// Format 2: Forensic detection pair (only if flags exist)
-			if (flags.length > 0) {
-				jsonlLines.push(JSON.stringify({
+			// Record 2: Forensic detection with forensic flags tool_call
+			if (forensicFlags.length > 0) {
+				const highSeverity = forensicFlags.filter((f: any) => f.severity === 'high');
+				records.push({
 					messages: [
-						{ role: 'system', content: 'You are a forensic analysis AI. Detect patterns and flag concerns in legal evidence.' },
-						{ role: 'user', content: `Run forensic analysis on evidence "${rec.title ?? rec.file_name}" (type: ${rec.refined_type ?? rec.evidence_type ?? 'document'})` },
-						{ role: 'assistant', content: `Found ${flags.length} forensic indicators.`, tool_calls: [{
-							name: 'detect_forensic_patterns',
-							arguments: { flags: flags.slice(0, 5) }
-						}] }
+						{
+							role: 'system',
+							content: 'You are a legal AI assistant specialized in forensic pattern detection. Identify sensitive information and legal keywords using the detectForensicPatterns tool.'
+						},
+						{
+							role: 'user',
+							content: `Scan this ${row.evidenceType} for forensic patterns: "${row.fileName}"`
+						},
+						{
+							role: 'assistant',
+							content: '',
+							tool_calls: [
+								{
+									id: `call_${row.id.slice(0, 8)}_forensic`,
+									type: 'function',
+									function: {
+										name: 'detectForensicPatterns',
+										arguments: JSON.stringify({
+											document_id: row.id,
+											total_flags: forensicFlags.length,
+											high_severity_count: highSeverity.length,
+											patterns: forensicFlags.slice(0, 15).map((f: any) => ({
+												type: f.type,
+												pattern: f.pattern,
+												severity: f.severity,
+												context: f.context?.slice(0, 100)
+											}))
+										})
+									}
+								}
+							]
+						}
 					]
-				}));
+				});
 			}
 		}
 
-		if (jsonlLines.length === 0) {
-			return json({ error: 'No evidence with analysis metadata found', recordsScanned: records.length }, { status: 404 });
-		}
+		// Return as JSONL (newline-delimited JSON)
+		const jsonl = records.map(r => JSON.stringify(r)).join('\n');
 
-		return new Response(jsonlLines.join('\n'), {
+		return new Response(jsonl, {
+			status: 200,
 			headers: {
 				'Content-Type': 'application/jsonl',
-				'Content-Disposition': `attachment; filename="qlora-training-${Date.now()}.jsonl"`,
+				'Content-Disposition': `attachment; filename="qlora_training_${caseId || 'all'}_${Date.now()}.jsonl"`,
+				'X-Record-Count': records.length.toString(),
+				'X-Evidence-Count': rows.length.toString()
 			}
 		});
 	} catch (err) {
-		console.error('[QLoRA] Dataset generation failed:', err);
-		return json({ error: 'Dataset generation failed' }, { status: 500 });
+		console.error('[QLoRA Generate] Error:', err);
+		throw error(500, `Failed to generate training dataset: ${(err as Error).message}`);
 	}
 };

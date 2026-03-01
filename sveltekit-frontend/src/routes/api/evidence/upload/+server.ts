@@ -7,6 +7,7 @@ import { createJob, updateJob } from '$lib/server/evidence-progress';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { extractTextHybrid } from '$lib/server/ocr/hybrid.js';
 import { generateSingleEmbedding, generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
+import { embedTexts } from '$lib/server/batch-embedder.js';
 import { chunkLegalDocument, type LegalChunk } from '$lib/server/indexer/legal-chunker.js';
 import { getEmbeddingCache, setEmbeddingCache } from '$lib/server/vector-cache.js';
 import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
@@ -299,15 +300,16 @@ async function processAndEmbed(
 				}
 			}
 
-			// Batch-embed cache misses through concurrency gate
+			// Batch-embed cache misses through concurrency gate (with auto binary Redis cache)
 			if (needEmbed.length > 0) {
-				const result = await gated(embedGate, () =>
-					generateEmbeddings(needEmbed.map(n => n.text))
+				const embeddings = await gated(embedGate, () =>
+					embedTexts(needEmbed.map(n => n.text))
 				);
 				for (let j = 0; j < needEmbed.length; j++) {
-					batchEmbeddings[needEmbed[j].idx] = result.vectors[j] ?? null;
-					if (result.vectors[j]) {
-						setEmbeddingCache(needEmbed[j].text, result.vectors[j], 'embeddinggemma:latest').catch(() => {});
+					const embedding = embeddings[j] ? Array.from(embeddings[j]) : null;
+					batchEmbeddings[needEmbed[j].idx] = embedding;
+					if (embedding) {
+						setEmbeddingCache(needEmbed[j].text, embedding, 'embeddinggemma:latest').catch(() => {});
 					}
 				}
 			}
@@ -516,18 +518,19 @@ async function processAndEmbed(
 		}
 	}
 
-	// 7b. Embed summary for vector retrieval in Qdrant legal_documents (non-fatal)
+	// 7b. Embed summary for vector retrieval in Qdrant legal_documents (with auto binary cache)
 	if (summary && summary.length > 50) {
 		try {
-			const summaryEmbedding = await gated(embedGate, () =>
-				generateEmbeddings([summary.slice(0, 4000)])
+			const embeddings = await gated(embedGate, () =>
+				embedTexts([summary.slice(0, 4000)])
 			);
-			if (summaryEmbedding.vectors[0]?.length === 768) {
+			if (embeddings[0]?.length === 768) {
+				const summaryEmbedding = Array.from(embeddings[0]);
 				await qdrant.storeDocument({
 					id: evidenceId,
 					title: fileName,
 					content: summary,
-					contentEmbedding: summaryEmbedding.vectors[0],
+					contentEmbedding: summaryEmbedding,
 					metadata: {
 						document_type: 'evidence-summary',
 						case_id: caseId,

@@ -13,6 +13,7 @@ import { apiResponses } from '$lib/server/api/response-helper.js';
 import { chatRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 import { computeTFIDF } from '$lib/server/retrieval/tfidf-scorer.js';
 import { getVectorCache, setVectorCache, getEmbeddingCache, setEmbeddingCache } from '$lib/server/vector-cache.js';
+import { embedText } from '$lib/server/batch-embedder.js';
 
 const QDRANT_URL = getQdrantUrl();
 const OLLAMA_URL = getOllamaUrl();
@@ -136,34 +137,18 @@ export const POST: RequestHandler = async ({ request }) => {
 			});
 		}
 
-		// 1. Generate embedding via Ollama (check embedding cache first)
+		// 1. Generate embedding with auto binary Redis cache (batch-embedder)
 		const embedStart = performance.now();
 		let embedding: number[];
 
-		const { entry: cachedEmbed } = await getEmbeddingCache(query, 'embeddinggemma:latest');
-		if (cachedEmbed) {
-			embedding = cachedEmbed.embedding;
-		} else {
-			const embedResp = await fetch(`${OLLAMA_URL}/api/embed`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ model: 'embeddinggemma:latest', input: [query] }),
-				signal: AbortSignal.timeout(10000)
-			});
+		try {
+			const embeddingArray = await embedText(query);
+			embedding = Array.from(embeddingArray);
 
-			if (!embedResp.ok) {
-				return apiResponses.badGateway('Embedding generation failed');
-			}
-
-			const embedData = await embedResp.json();
-			embedding = embedData.embeddings?.[0] ?? embedData.embedding;
-
-			if (!embedding || !Array.isArray(embedding)) {
-				return apiResponses.badGateway('Invalid embedding response');
-			}
-
-			// Cache the embedding (fire-and-forget)
+			// Also cache in vector-cache for backward compatibility
 			setEmbeddingCache(query, embedding, 'embeddinggemma:latest').catch(() => {});
+		} catch (err) {
+			return apiResponses.badGateway('Embedding generation failed');
 		}
 
 		const embeddingTime = performance.now() - embedStart;
