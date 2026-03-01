@@ -886,6 +886,9 @@
 	}
 
 	.timeline-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 		margin-bottom: 0.5rem;
 	}
 
@@ -896,11 +899,26 @@
 		color: #6b7280;
 	}
 
+	.timeline-count {
+		font-size: 0.75rem;
+		color: #9ca3af;
+	}
+
 	.timeline-track {
 		position: relative;
 		height: 2rem;
 		background: #f3f4f6;
 		border-radius: 0.25rem;
+	}
+
+	.timeline-empty {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		font-size: 0.75rem;
+		color: #9ca3af;
+		font-style: italic;
 	}
 
 	.timeline-node {
@@ -925,6 +943,21 @@
 	}
 	.node-dot.blue {
 		background: #3b82f6;
+	}
+	.node-dot.purple {
+		background: #8b5cf6;
+	}
+	.node-dot.red {
+		background: #ef4444;
+	}
+
+	.timeline-node {
+		cursor: pointer;
+		transition: transform 0.2s;
+	}
+
+	.timeline-node:hover .node-dot {
+		transform: scale(1.2);
 	}
 
 	.timeline-node.active .node-dot {

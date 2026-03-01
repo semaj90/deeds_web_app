@@ -31,17 +31,20 @@ export const load: PageServerLoad = async ({ params }) => {
 		return {
 			caseId: id,
 			initialState: savedState ? savedState.stateData : null,
-			evidence: evidenceItems.map((item) => ({
-				id: item.id,
-				title: item.title || 'Untitled Evidence',
-				type: item.type || 'document',
-				date: item.uploadedAt?.toISOString().split('T')[0] || '',
-				location: item.metadata?.location || '',
-				thumbnail: item.thumbnailUrl || null,
-				description: item.description || '',
-				fileType: item.fileType || '',
-				confidence: item.metadata?.confidence || 0
-			}))
+			evidence: evidenceItems.map((item) => {
+				const meta = (item.metadata || {}) as Record<string, any>;
+				return {
+					id: item.id,
+					title: item.title || 'Untitled Evidence',
+					type: item.evidenceType || 'document',
+					date: item.uploadedAt?.split('T')[0] || '',
+					location: meta.location || '',
+					thumbnail: item.fileUrl || null,
+					description: item.description || '',
+					fileType: item.fileType || '',
+					confidence: meta.confidence || 0
+				};
+			})
 		};
 	} catch (e) {
 		console.error('Failed to load board data:', e);
