@@ -7,6 +7,7 @@
 	import { tick } from 'svelte';
 	import { browser } from '$app/environment';
 	import { ttsService } from '$lib/services/tts.js';
+	import { voiceCommands, COMMAND_PATTERNS, type CommandFeedback } from '$lib/services/voice-commands.js';
 
 	interface Props {
 		chatId?: string;
@@ -16,6 +17,7 @@
 		enableVoice?: boolean;
 		handsFree?: boolean; // NEW: Start in hands-free mode
 		silenceThreshold?: number; // NEW: Auto-send after N ms of silence
+		enableCommands?: boolean; // NEW: Enable voice command recognition
 	}
 
 	let {
@@ -25,7 +27,8 @@
 		class: className = '',
 		enableVoice = true,
 		handsFree = false,
-		silenceThreshold = 2000
+		silenceThreshold = 2000,
+		enableCommands = true
 	}: Props = $props();
 
 	let session = $state<ChatSession | null>(null);
@@ -33,6 +36,10 @@
 	let chatContainer: HTMLElement | undefined = $state(undefined);
 	let lastCompletedIdx = $state<number | null>(null);
 	let prevStatus = $state<string>('idle');
+
+	// Voice command feedback
+	let commandFeedback = $state<CommandFeedback | null>(null);
+	let showCommandHelp = $state(false);
 
 	$effect(() => {
 		const s = new ChatSession(chatId, [], hasCaseContext);
@@ -99,6 +106,34 @@
 			copiedIdx = idx;
 			setTimeout(() => { copiedIdx = null; }, 2000);
 		} catch { /* clipboard unavailable */ }
+	}
+
+	// Clear chat conversation
+	function clearChat() {
+		if (session) {
+			session.messages = [];
+			currentMessage = '';
+			showFeedback('success', 'Chat cleared');
+		}
+	}
+
+	// Repeat last AI message
+	function repeatLastMessage() {
+		if (!session) return;
+		const lastAI = session.messages.filter(m => m.role === 'assistant').pop();
+		if (lastAI) {
+			const idx = session.messages.indexOf(lastAI);
+			speakMessage(lastAI.content, idx);
+			showFeedback('info', 'Repeating last response');
+		} else {
+			showFeedback('error', 'No AI response to repeat');
+		}
+	}
+
+	// Show command feedback toast
+	function showFeedback(type: CommandFeedback['type'], message: string, duration = 2000) {
+		commandFeedback = { type, message, duration };
+		setTimeout(() => { commandFeedback = null; }, duration);
 	}
 
 	// ═══════════════════════════════════════════════════════════════
@@ -174,7 +209,7 @@
 				recognition.interimResults = true;
 				recognition.lang = 'en-US';
 
-				recognition.onresult = (event: any) => {
+				recognition.onresult = async (event: any) => {
 					let interim = '';
 					let final = '';
 
@@ -188,6 +223,17 @@
 					}
 
 					if (final) {
+						// Check for voice commands first
+						if (enableCommands) {
+							const commandExecuted = await voiceCommands.execute(final);
+							if (commandExecuted) {
+								// Command was recognized — don't add to message
+								interimTranscript = '';
+								return;
+							}
+						}
+
+						// No command matched — treat as regular speech
 						currentMessage = (currentMessage + ' ' + final).trim();
 						interimTranscript = '';
 
@@ -342,6 +388,103 @@
 			speakingIdx = null;
 			conversationState = 'listening';
 		}
+	});
+
+	// ═══════════════════════════════════════════════════════════════
+	// VOICE COMMAND REGISTRATION
+	// ═══════════════════════════════════════════════════════════════
+	$effect(() => {
+		if (!browser || !enableCommands) return;
+
+		voiceCommands.clear(); // Clear existing commands
+		voiceCommands.setEnabled(true);
+
+		// Control commands
+		voiceCommands.register({
+			pattern: COMMAND_PATTERNS.SEND,
+			action: () => {
+				sendMessage();
+				showFeedback('success', 'Message sent');
+			},
+			label: 'Send message',
+			category: 'control'
+		});
+
+		voiceCommands.register({
+			pattern: COMMAND_PATTERNS.CLEAR,
+			action: () => clearChat(),
+			label: 'Clear chat',
+			category: 'control'
+		});
+
+		voiceCommands.register({
+			pattern: COMMAND_PATTERNS.CANCEL,
+			action: () => {
+				currentMessage = '';
+				showFeedback('info', 'Input cleared');
+			},
+			label: 'Cancel input',
+			category: 'control'
+		});
+
+		// TTS commands
+		voiceCommands.register({
+			pattern: COMMAND_PATTERNS.STOP_SPEAKING,
+			action: () => {
+				ttsService.stop();
+				speakingIdx = null;
+				showFeedback('info', 'Stopped speaking');
+			},
+			label: 'Stop speaking',
+			category: 'tts'
+		});
+
+		voiceCommands.register({
+			pattern: COMMAND_PATTERNS.REPEAT,
+			action: () => repeatLastMessage(),
+			label: 'Repeat last response',
+			category: 'tts'
+		});
+
+		// STT commands
+		voiceCommands.register({
+			pattern: COMMAND_PATTERNS.START_LISTENING,
+			action: () => {
+				if (!isListening) {
+					toggleListening();
+					showFeedback('success', 'Listening started');
+				}
+			},
+			label: 'Start listening',
+			category: 'stt'
+		});
+
+		voiceCommands.register({
+			pattern: COMMAND_PATTERNS.STOP_LISTENING,
+			action: () => {
+				if (isListening) {
+					toggleListening();
+					showFeedback('info', 'Listening stopped');
+				}
+			},
+			label: 'Stop listening',
+			category: 'stt'
+		});
+
+		// Help command
+		voiceCommands.register({
+			pattern: COMMAND_PATTERNS.HELP,
+			action: () => {
+				showCommandHelp = !showCommandHelp;
+				showFeedback('info', showCommandHelp ? 'Showing commands' : 'Hiding commands');
+			},
+			label: 'Show/hide help',
+			category: 'control'
+		});
+
+		return () => {
+			voiceCommands.clear();
+		};
 	});
 
 	// Sample legal prompts
@@ -583,11 +726,53 @@
 					Voice input unavailable (Chrome/Edge only)
 				</span>
 			{/if}
-			{#if handsFreeEnabled}
-				<span class="px-1 py-px rounded bg-green-900/30 text-green-400 text-[9px]">
-					🔴 Hands-Free Active
-				</span>
+			{#if enableCommands}
+				<button
+					class="px-1 py-px rounded bg-purple-900/30 text-purple-400 text-[9px] hover:bg-purple-800/40 cursor-pointer border-none transition-colors"
+					onclick={() => showCommandHelp = !showCommandHelp}
+					title="Show/hide voice commands"
+				>
+					{showCommandHelp ? '🎙️ Hide Commands' : '🎙️ Commands'}
+				</button>
 			{/if}
 		</div>
+
+		<!-- Command Help Panel -->
+		{#if showCommandHelp && enableCommands}
+			<div class="mt-2 px-3 py-2 rounded bg-purple-950/40 border border-purple-800/30 text-xs">
+				<div class="font-bold text-purple-300 mb-1.5">Voice Commands:</div>
+				<div class="grid grid-cols-2 gap-x-4 gap-y-1 text-purple-200/80">
+					<div>"send message" → Send</div>
+					<div>"clear chat" → Reset</div>
+					<div>"stop speaking" → Stop TTS</div>
+					<div>"repeat that" → Re-speak</div>
+					<div>"start listening" → Enable STT</div>
+					<div>"stop listening" → Disable STT</div>
+				</div>
+			</div>
+		{/if}
 	</div>
+
+	<!-- Command Feedback Toast -->
+	{#if commandFeedback}
+		<div
+			class="fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 text-sm animate-in fade-in slide-in-from-bottom-2 duration-200"
+			style:background={
+				commandFeedback.type === 'success' ? 'rgba(34,197,94,0.9)' :
+				commandFeedback.type === 'error' ? 'rgba(239,68,68,0.9)' :
+				'rgba(59,130,246,0.9)'
+			}
+			style:color="#fff"
+		>
+			<Icon
+				name={
+					commandFeedback.type === 'success' ? 'check-circle' :
+					commandFeedback.type === 'error' ? 'x-circle' :
+					'info'
+				}
+				size={16}
+			/>
+			<span>{commandFeedback.message}</span>
+		</div>
+	{/if}
 </div>

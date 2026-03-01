@@ -257,7 +257,7 @@ export default defineConfig(({ mode }) => {
       cssMinify: 'esbuild',  // Use esbuild for CSS (lightningcss has issues with @apply and malformed var())
       sourcemap: false,
       rollupOptions: {
-        external: ['@xenova/transformers'],
+        external: ['@xenova/transformers', 'piper-wasm'],
         output: {
           manualChunks: (id) => {
             // Rolldown requires manualChunks to be a function, not an object
@@ -311,7 +311,7 @@ export default defineConfig(({ mode }) => {
     },
     clearScreen: false,
     ssr: {
-      external: ['canvas', '@napi-rs/canvas', 'simdjson-wasm', 'onnxruntime-web', '@xenova/transformers'],
+      external: ['canvas', '@napi-rs/canvas', 'simdjson-wasm', 'onnxruntime-web', '@xenova/transformers', 'piper-wasm'],
     },
     resolve: {
       alias: {
