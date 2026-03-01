@@ -551,9 +551,7 @@
 				<Button
 					onclick={toggleListening}
 					disabled={!session || session.status !== 'idle'}
-					class="h-10 w-10 shrink-0 rounded-lg flex items-center justify-center"
-					class:bg-red-600={isListening}
-					class:hover:bg-red-700={isListening}
+					class="{isListening ? 'bg-red-600 hover:bg-red-700' : ''} h-10 w-10 shrink-0 rounded-lg flex items-center justify-center"
 					title={isListening ? 'Stop listening' : 'Voice input'}
 				>
 					<Icon name={isListening ? 'mic-off' : 'mic'} size={16} />
