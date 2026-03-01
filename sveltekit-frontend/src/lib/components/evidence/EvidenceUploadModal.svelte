@@ -174,7 +174,21 @@
 		currentStage = -1;
 		stageStatuses = Array(8).fill('pending');
 	};
+
+	// Keyboard shortcuts
+	function handleKeydown(e: KeyboardEvent) {
+		if (!isOpen) return;
+
+		if (e.key === 'Escape') {
+			handleCancel();
+		} else if (e.key === 'Enter' && selectedFile && !isUploading && !uploadResult) {
+			e.preventDefault();
+			handleUpload();
+		}
+	}
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 {#if isOpen}
 	<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50" transition:fade={{ duration: 150 }} onclick={handleCancel}>

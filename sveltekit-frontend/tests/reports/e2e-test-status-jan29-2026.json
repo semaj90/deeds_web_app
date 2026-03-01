@@ -1,0 +1,37 @@
+{
+  "timestamp": "2026-01-29T00:00:00.000Z",
+  "testType": "e2e",
+  "framework": "playwright",
+  "browser": "chromium",
+  "results": {
+    "totalTests": 54,
+    "filesChecked": 5,
+    "status": "tests_listed_not_executed"
+  },
+  "testFiles": [
+    "tests/e2e/chat.spec.ts",
+    "tests/e2e/rag-sync.spec.ts",
+    "tests/e2e/route-verification.spec.ts",
+    "tests/e2e/user-flows.spec.ts",
+    "tests/e2e-workflow.spec.ts"
+  ],
+  "testCategories": {
+    "chatInterface": 9,
+    "ragSync": 1,
+    "routeVerification": 15,
+    "userFlows": 24,
+    "e2eWorkflow": 5
+  },
+  "notes": [
+    "E2E tests configured with route mocking to avoid OOM issues",
+    "Firefox tests disabled to reduce memory usage",
+    "Timeout reduced from 60s to 10s for mocked responses",
+    "Tests not executed due to dev server instability in WSL environment",
+    "Recommend running tests manually: npx playwright test tests/e2e"
+  ],
+  "recommendations": [
+    "Run E2E tests in a fresh terminal session",
+    "Ensure dev server is stable before running tests",
+    "Consider increasing WSL memory allocation if OOM persists"
+  ]
+}

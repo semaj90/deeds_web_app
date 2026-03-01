@@ -21,7 +21,7 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { db } from '$lib/server/db/client.js';
+import db from '$lib/server/db/client.js';
 import { cases, evidence } from '$lib/server/db/schema-postgres.js';
 import { eq, sql, desc } from 'drizzle-orm';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';

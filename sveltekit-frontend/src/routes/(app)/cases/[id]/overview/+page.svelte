@@ -342,11 +342,98 @@
 				</div>
 			{/if}
 		{:else if activeTab === 'reports'}
-			<section class="rounded-xl border border-neutral-800 bg-neutral-900/70 p-4 space-y-3 text-sm">
-				<h2 class="text-sm font-semibold">Reports</h2>
-				<p class="text-neutral-400">
-					Use the dedicated reports page to generate and edit charging memos, discovery lists, and hearing prep.
-				</p>
+			<section class="rounded-xl border border-neutral-800 bg-neutral-900/70 p-4 space-y-4 text-sm">
+				<!-- Header with Actions -->
+				<div class="flex items-center justify-between">
+					<h2 class="text-sm font-semibold">Reports & Documents</h2>
+					<div class="flex items-center gap-2">
+						<a
+							href="/reports/new?caseId={data.caseId}"
+							class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-accent/30 bg-accent/10 text-accent hover:bg-accent/20 transition-colors text-xs"
+						>
+							<Icon name="plus" class="w-3 h-3" />
+							<span>New Report</span>
+						</a>
+						<a
+							href="/cases/{data.caseId}/reports"
+							class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-neutral-700 hover:bg-neutral-800 transition-colors text-xs"
+						>
+							<Icon name="folder-open" class="w-3 h-3" />
+							<span>View All</span>
+						</a>
+					</div>
+				</div>
+
+				<!-- Quick Actions -->
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+					<a
+						href="/cases/{data.caseId}/reports"
+						class="flex items-start gap-3 p-3 rounded-lg border border-neutral-800 hover:border-accent/30 hover:bg-neutral-800/50 transition-all group"
+					>
+						<Icon name="scale" class="w-5 h-5 text-accent mt-0.5" />
+						<div class="flex-1 min-w-0">
+							<div class="font-semibold text-neutral-100 group-hover:text-accent transition-colors">
+								Charging Memorandum
+							</div>
+							<div class="text-xs text-neutral-400 mt-0.5">
+								AI-generated charging recommendation with legal analysis
+							</div>
+						</div>
+					</a>
+
+					<a
+						href="/cases/{data.caseId}/reports"
+						class="flex items-start gap-3 p-3 rounded-lg border border-neutral-800 hover:border-accent/30 hover:bg-neutral-800/50 transition-all group"
+					>
+						<Icon name="file-text" class="w-5 h-5 text-accent mt-0.5" />
+						<div class="flex-1 min-w-0">
+							<div class="font-semibold text-neutral-100 group-hover:text-accent transition-colors">
+								Discovery List
+							</div>
+							<div class="text-xs text-neutral-400 mt-0.5">
+								Comprehensive inventory of evidence and materials
+							</div>
+						</div>
+					</a>
+
+					<a
+						href="/cases/{data.caseId}/reports"
+						class="flex items-start gap-3 p-3 rounded-lg border border-neutral-800 hover:border-accent/30 hover:bg-neutral-800/50 transition-all group"
+					>
+						<Icon name="presentation" class="w-5 h-5 text-accent mt-0.5" />
+						<div class="flex-1 min-w-0">
+							<div class="font-semibold text-neutral-100 group-hover:text-accent transition-colors">
+								Hearing Preparation
+							</div>
+							<div class="text-xs text-neutral-400 mt-0.5">
+								Arguments, exhibits, and witness examination notes
+							</div>
+						</div>
+					</a>
+
+					<a
+						href="/cases/{data.caseId}/reports"
+						class="flex items-start gap-3 p-3 rounded-lg border border-neutral-800 hover:border-accent/30 hover:bg-neutral-800/50 transition-all group"
+					>
+						<Icon name="book-open" class="w-5 h-5 text-accent mt-0.5" />
+						<div class="flex-1 min-w-0">
+							<div class="font-semibold text-neutral-100 group-hover:text-accent transition-colors">
+								Legal Memorandum
+							</div>
+							<div class="text-xs text-neutral-400 mt-0.5">
+								Research memo on legal issues and precedents
+							</div>
+						</div>
+					</a>
+				</div>
+
+				<!-- Info -->
+				<div class="flex items-start gap-2 p-3 rounded-lg border border-blue-800/30 bg-blue-950/20 text-blue-300 text-xs">
+					<Icon name="info" class="w-4 h-4 mt-0.5 shrink-0" />
+					<div>
+						<strong>TipTap Editor with AI Assistant:</strong> All reports use the TipTap rich text editor with integrated AI assistance powered by Ollama gemma3-legal. Generate content, get suggestions, and refine your legal documents in real-time.
+					</div>
+				</div>
 			</section>
 		{/if}
 	</main>

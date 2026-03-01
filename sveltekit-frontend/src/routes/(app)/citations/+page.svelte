@@ -4,6 +4,7 @@
   import CardContent from '$lib/components/ui/card/CardContent.svelte';
   import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
   import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+  import Skeleton from '$lib/components/ui/Skeleton.svelte';
   import CitationManager from '$lib/components/legal/CitationManager.svelte';
   import CitationDetail from '$lib/components/legal-ai/CitationDetail.svelte';
   import StatuteActionPanel from '$lib/components/legal/StatuteActionPanel.svelte';
@@ -445,7 +446,31 @@
   </Card>
 
   {#if loading}
-    <div class="text-center py-16 text-sand/50">Loading citations...</div>
+    <div class="grid gap-4">
+      {#each Array(6) as _, i}
+        <Card class="bg-panel border-sand/10">
+          <CardHeader class="pb-2">
+            <div class="flex items-start justify-between gap-4">
+              <Skeleton variant="text" width="40%" height="1.2em" />
+              <div class="flex items-center gap-2">
+                <Skeleton variant="rect" width="80px" height="24px" />
+                <Skeleton variant="rect" width="60px" height="24px" />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent class="pt-0">
+            <Skeleton variant="text" width="90%" height="1em" className="mb-2" />
+            <Skeleton variant="text" width="95%" height="0.875em" className="mb-1" />
+            <Skeleton variant="text" width="85%" height="0.875em" className="mb-3" />
+            <div class="flex items-center gap-4">
+              <Skeleton variant="text" width="120px" height="0.75em" />
+              <Skeleton variant="text" width="100px" height="0.75em" />
+              <Skeleton variant="text" width="80px" height="0.75em" />
+            </div>
+          </CardContent>
+        </Card>
+      {/each}
+    </div>
   {:else if error}
     <Card class="bg-panel border-danger/40">
       <CardContent class="p-6 text-center">

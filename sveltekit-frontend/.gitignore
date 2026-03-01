@@ -54,7 +54,8 @@ reports/latest/vscode-problems.json
 reports/phase76/consolidated-knowledge-base.json
 reports/phase76/error-analysis/error-knowledge-graph.json
 svelte-check-current.json
-reports/
+/reports/
+# NOTE: /reports/ ignores top-level reports dir (test outputs), NOT src/routes/(app)/reports/ (app routes)
 .kiro/backup-consolidation-manifest*.json
 .kiro/*.sh
 

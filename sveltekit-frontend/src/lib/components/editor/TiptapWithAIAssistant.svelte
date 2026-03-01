@@ -91,12 +91,44 @@ if (!aiPrompt.trim() || !editor) return;
 
 isGenerating = true;
 try {
-// Mock AI generation
-await new Promise(r => setTimeout(r, 1500));
+// Get current editor context for better AI responses
+const currentText = editor.getText().slice(0, 2000);
+const contextPrompt = currentText.length > 50
+	? `Legal document context:\n${currentText}\n\nUser request: ${aiPrompt}`
+	: `Legal writing request: ${aiPrompt}`;
 
-const generatedText = `\n\n[AI Generated section based on "${aiPrompt}"]: \nLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.`;
+// Call Ollama API
+const res = await fetch('/api/chat', {
+	method: 'POST',
+	headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify({
+		model: 'gemma3-legal:latest',
+		prompt: contextPrompt,
+		stream: false,
+		options: { temperature: 0.7, num_predict: 512 }
+	}),
+	signal: AbortSignal.timeout(30000)
+});
 
-editor.chain().focus().insertContent(generatedText).run();
+if (res.ok) {
+	const data = await res.json();
+	const generatedText = data.response?.trim() ?? '';
+
+	if (generatedText.length > 0) {
+		editor.chain().focus().insertContent(`\n\n${generatedText}\n\n`).run();
+	}
+} else {
+	// Fallback if Ollama unavailable
+	const fallbackText = `\n\n[AI assistant temporarily unavailable. Original request: "${aiPrompt}"]\n\n`;
+	editor.chain().focus().insertContent(fallbackText).run();
+}
+
+aiPrompt = '';
+showAiMenu = false;
+} catch (err) {
+console.error('[TiptapAI] Error:', err);
+// Insert placeholder on error
+editor?.chain().focus().insertContent(`\n\n[AI generation failed. Please try again.]\n\n`).run();
 aiPrompt = '';
 showAiMenu = false;
 } finally {

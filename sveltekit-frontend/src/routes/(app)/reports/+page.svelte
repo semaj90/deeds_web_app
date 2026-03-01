@@ -5,6 +5,9 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 
+	type ReportType = 'charging_memo' | 'intake_summary' | 'discovery_list' | 'hearing_prep' |
+		'analysis' | 'summary' | 'timeline' | 'evidence_review' | 'legal_memo' | 'custom';
+
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 
@@ -64,8 +67,8 @@
 		return labels[type] || type;
 	}
 
-	function formatDate(dateStr: string | Date): string {
-		const d = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
+	function formatDate(dateStr: string | Date | number): string {
+		const d = typeof dateStr === 'string' || typeof dateStr === 'number' ? new Date(dateStr) : dateStr;
 		return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 	}
 </script>

@@ -22,8 +22,21 @@
   let isLoading = $state(true);
   let error: string | null = $state(null);
   let isSaving = $state(false);
+  let searchQuery = $state('');
 
   const linkTypes = ['CHARGED_UNDER', 'CITED_IN', 'RELATED_TO', 'OVERRULED_BY', 'AFFIRMED_BY'];
+
+  // Filter cases based on search query
+  let filteredCases = $derived.by(() => {
+    if (!searchQuery.trim()) return cases;
+    const query = searchQuery.toLowerCase();
+    return cases.filter(
+      (c) =>
+        c.title.toLowerCase().includes(query) ||
+        c.number.toLowerCase().includes(query) ||
+        c.status.toLowerCase().includes(query)
+    );
+  });
 
   $effect(() => {
     (async () => {
@@ -54,7 +67,8 @@
     }
   }
 
-  async function handleSubmit() {
+  async function handleSubmit(e?: Event) {
+    e?.preventDefault();
     error = null;
 
     if (!selectedCaseId) {
@@ -104,11 +118,41 @@
     linkType = 'CHARGED_UNDER';
     notes = '';
     error = null;
+    searchQuery = '';
   }
 
   function handleKeydown(e: KeyboardEvent) {
     if (e.key === 'Escape') {
       closeModal();
+    }
+  }
+
+  // Keyboard navigation for case list
+  function handleListKeydown(e: KeyboardEvent) {
+    const items = filteredCases;
+    const currentIndex = items.findIndex((c) => c.id === selectedCaseId);
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        if (currentIndex < items.length - 1) {
+          selectedCaseId = items[currentIndex + 1].id;
+        } else if (currentIndex === -1 && items.length > 0) {
+          selectedCaseId = items[0].id;
+        }
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        if (currentIndex > 0) {
+          selectedCaseId = items[currentIndex - 1].id;
+        }
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedCaseId) {
+          handleSubmit();
+        }
+        break;
     }
   }
 </script>
@@ -136,21 +180,48 @@
             <p>Loading cases...</p>
           </div>
         {:else}
+          <!-- Search Input -->
           <div class="form-group">
-            <label for="case-select">Select Case *</label>
-            <select
-              id="case-select"
-              bind:value={selectedCaseId}
+            <label for="case-search">Select Case *</label>
+            <input
+              type="text"
+              id="case-search"
+              bind:value={searchQuery}
+              placeholder="Search by case number or title..."
+              class="search-input"
               disabled={isSaving}
-              required
-            >
-              <option value="">Choose a case...</option>
-              {#each cases as caseItem}
-                <option value={caseItem.id}>
-                  {caseItem.number} - {caseItem.title}
-                </option>
-              {/each}
-            </select>
+              onkeydown={handleListKeydown}
+            />
+          </div>
+
+          <!-- Searchable Case List -->
+          <div class="case-list-container">
+            <div class="case-list" onkeydown={handleListKeydown} role="listbox" tabindex="0">
+              {#if filteredCases.length === 0}
+                <div class="no-results">
+                  <p>No cases found matching "{searchQuery}"</p>
+                </div>
+              {:else}
+                {#each filteredCases as caseItem}
+                  <button
+                    type="button"
+                    class="case-item"
+                    class:selected={selectedCaseId === caseItem.id}
+                    onclick={() => (selectedCaseId = caseItem.id)}
+                    disabled={isSaving}
+                    role="option"
+                    aria-selected={selectedCaseId === caseItem.id}
+                  >
+                    <div class="case-number">{caseItem.number}</div>
+                    <div class="case-title">{caseItem.title}</div>
+                    <div class="case-status">{caseItem.status}</div>
+                  </button>
+                {/each}
+              {/if}
+            </div>
+            <div class="case-count">
+              {filteredCases.length} of {cases.length} {cases.length === 1 ? 'case' : 'cases'}
+            </div>
           </div>
 
           <div class="form-group">
@@ -177,7 +248,7 @@
             <button type="button" class="btn-cancel" onclick={closeModal} disabled={isSaving}>
               Cancel
             </button>
-            <button type="submit" class="btn-attach" disabled={isSaving}>
+            <button type="submit" class="btn-attach" disabled={isSaving || !selectedCaseId}>
               {isSaving ? 'Attaching...' : 'Attach'}
             </button>
           </div>
@@ -294,6 +365,111 @@
     font-weight: 600;
     color: #2c2c2c;
     font-size: 0.9rem;
+  }
+
+  .search-input {
+    padding: 0.75rem;
+    border: 1px solid #d4a574;
+    border-radius: 4px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: #8b4513;
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+  }
+
+  .search-input:disabled {
+    background-color: #f0ebe0;
+    color: #999;
+  }
+
+  .case-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .case-list {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid #d4a574;
+    border-radius: 4px;
+    background-color: white;
+  }
+
+  .case-list:focus {
+    outline: none;
+    border-color: #8b4513;
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+  }
+
+  .case-item {
+    width: 100%;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-bottom: 1px solid #e0d5c7;
+    background-color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .case-item:last-child {
+    border-bottom: none;
+  }
+
+  .case-item:hover:not(:disabled) {
+    background-color: #f5f1e8;
+  }
+
+  .case-item.selected {
+    background-color: #e8dcc5;
+    border-left: 3px solid #8b4513;
+  }
+
+  .case-item:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .case-number {
+    font-weight: 600;
+    color: #8b4513;
+    font-size: 0.85rem;
+  }
+
+  .case-title {
+    color: #2c2c2c;
+    font-size: 0.95rem;
+  }
+
+  .case-status {
+    font-size: 0.8rem;
+    color: #666;
+    text-transform: capitalize;
+  }
+
+  .case-count {
+    text-align: right;
+    font-size: 0.8rem;
+    color: #666;
+  }
+
+  .no-results {
+    padding: 2rem;
+    text-align: center;
+    color: #666;
+  }
+
+  .no-results p {
+    margin: 0;
   }
 
   .form-group select,

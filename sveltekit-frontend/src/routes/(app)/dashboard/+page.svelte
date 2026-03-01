@@ -5,6 +5,7 @@
   import CardContent from '$lib/components/ui/card/CardContent.svelte';
   import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
   import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
+  import Skeleton from '$lib/components/ui/Skeleton.svelte';
   import WorkspacePanel from '$lib/components/legal/WorkspacePanel.svelte';
   import SystemStatusPanel from '$lib/components/dashboard/SystemStatusPanel.svelte';
   import FallbackAlert from '$lib/components/dashboard/FallbackAlert.svelte';
@@ -227,7 +228,55 @@
   {/if}
 
   {#if loading}
-    <div class="text-center py-16 text-sand/50">Loading dashboard...</div>
+    <!-- Stats Grid Skeletons -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+      {#each Array(6) as _, i}
+        <Card class="bg-panel border-sand/10">
+          <CardContent class="p-4 text-center">
+            <Skeleton variant="text" width="60%" height="2rem" className="mb-2 mx-auto" />
+            <Skeleton variant="text" width="80%" height="0.75rem" className="mx-auto" />
+          </CardContent>
+        </Card>
+      {/each}
+    </div>
+
+    <!-- Knowledge Base Skeleton -->
+    <Card class="bg-panel border-sand/10 mb-8">
+      <CardHeader>
+        <div class="flex items-center justify-between">
+          <Skeleton variant="text" width="120px" height="1em" />
+          <div class="flex items-center gap-3">
+            <Skeleton variant="text" width="60px" height="0.75em" />
+            <Skeleton variant="text" width="70px" height="0.75em" />
+            <Skeleton variant="text" width="80px" height="0.75em" />
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <Skeleton variant="rect" height="42px" className="mb-4" />
+      </CardContent>
+    </Card>
+
+    <!-- Recent Cases Skeleton -->
+    <Card class="bg-panel border-sand/10 mb-8">
+      <CardHeader>
+        <CardTitle class="text-sm text-sand/80">
+          <Skeleton variant="text" width="100px" height="1em" />
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div class="space-y-3">
+          {#each Array(5) as _, i}
+            <div class="flex items-center gap-3">
+              <Skeleton variant="text" width="80px" height="0.875em" />
+              <Skeleton variant="text" width="40%" height="0.875em" className="flex-1" />
+              <Skeleton variant="text" width="60px" height="0.75em" />
+              <Skeleton variant="text" width="50px" height="0.75em" />
+            </div>
+          {/each}
+        </div>
+      </CardContent>
+    </Card>
   {:else}
     <!-- Stats Grid -->
     <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
