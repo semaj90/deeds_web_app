@@ -16,7 +16,7 @@
 	}
 
 	let { data, children }: Props = $props();
-	let sidebarOpen = $state(true);
+	let sidebarOpen = $state(false); // Default to collapsed for cleaner UI
 	let showDocumentWriter = $state(false);
 
 	// Initialize user activity telemetry (typing/idle detection)

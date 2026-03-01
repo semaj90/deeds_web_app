@@ -8,7 +8,7 @@
  * - Better GPU utilization
  */
 
-import { OLLAMA_BASE_URL } from './env.server.js';
+import { ENV } from './env.server.js';
 import { getCachedEmbedding, cacheEmbedding, batchGetCachedEmbeddings, batchCacheEmbeddings } from './embedding-cache.js';
 
 const BATCH_SIZE = 32;
@@ -138,7 +138,7 @@ class BatchEmbedder {
 	 * Fetch embeddings from Ollama (no caching)
 	 */
 	private async fetchFromOllama(texts: string[]): Promise<Float32Array[]> {
-		const response = await fetch(`${OLLAMA_BASE_URL}/api/embed`, {
+		const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

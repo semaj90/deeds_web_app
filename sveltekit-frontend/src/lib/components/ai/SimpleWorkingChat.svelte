@@ -6,19 +6,22 @@
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { tick } from 'svelte';
 	import { browser } from '$app/environment';
+	import { ttsService } from '$lib/services/tts.js';
 
 	interface Props {
 		chatId?: string;
 		hasCaseContext?: boolean;
 		height?: string;
 		class?: string;
+		enableVoice?: boolean; // NEW: Enable voice features
 	}
 
 	let {
 		chatId = 'chat-' + Date.now(),
 		hasCaseContext = false,
 		height = '500px',
-		class: className = ''
+		class: className = '',
+		enableVoice = true
 	}: Props = $props();
 
 	let session = $state<ChatSession | null>(null);
@@ -88,6 +91,110 @@
 		} catch { /* clipboard unavailable */ }
 	}
 
+	// ═══════════════════════════════════════════════════════════════
+	// TTS (Text-to-Speech) — Speak AI responses
+	// ═══════════════════════════════════════════════════════════════
+	let speakingIdx = $state<number | null>(null);
+	let ttsInitializing = $state(false);
+
+	async function speakMessage(content: string, idx: number) {
+		if (speakingIdx === idx) {
+			// Stop current speech
+			ttsService.stop();
+			speakingIdx = null;
+			return;
+		}
+
+		try {
+			// Initialize TTS on first use
+			if (!ttsService.isReady()) {
+				ttsInitializing = true;
+			}
+
+			speakingIdx = idx;
+			await ttsService.speak(content, { rate: 1.0, volume: 0.8 });
+			speakingIdx = null;
+		} catch (err) {
+			console.error('[SimpleWorkingChat] TTS error:', err);
+			speakingIdx = null;
+		} finally {
+			ttsInitializing = false;
+		}
+	}
+
+	// ═══════════════════════════════════════════════════════════════
+	// STT (Speech-to-Text) — Voice input via Web Speech API
+	// ═══════════════════════════════════════════════════════════════
+	let isListening = $state(false);
+	let interimTranscript = $state('');
+	let recognition: any = $state(null);
+	let sttSupported = $state(false);
+
+	$effect(() => {
+		if (browser && enableVoice) {
+			// Check for Web Speech API support
+			const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+			sttSupported = !!SpeechRecognition;
+
+			if (sttSupported) {
+				recognition = new SpeechRecognition();
+				recognition.continuous = false;
+				recognition.interimResults = true;
+				recognition.lang = 'en-US';
+
+				recognition.onresult = (event: any) => {
+					let interim = '';
+					let final = '';
+
+					for (let i = event.resultIndex; i < event.results.length; i++) {
+						const transcript = event.results[i][0].transcript;
+						if (event.results[i].isFinal) {
+							final += transcript;
+						} else {
+							interim += transcript;
+						}
+					}
+
+					if (final) {
+						currentMessage = (currentMessage + ' ' + final).trim();
+						interimTranscript = '';
+					} else {
+						interimTranscript = interim;
+					}
+				};
+
+				recognition.onend = () => {
+					isListening = false;
+					interimTranscript = '';
+				};
+
+				recognition.onerror = (event: any) => {
+					console.error('[STT] Recognition error:', event.error);
+					isListening = false;
+					interimTranscript = '';
+				};
+			}
+		}
+
+		return () => {
+			if (recognition) {
+				recognition.abort();
+			}
+		};
+	});
+
+	function toggleListening() {
+		if (!recognition || !session || session.status !== 'idle') return;
+
+		if (isListening) {
+			recognition.stop();
+			isListening = false;
+		} else {
+			recognition.start();
+			isListening = true;
+		}
+	}
+
 	// Sample legal prompts
 	const samplePrompts = [
 		{ label: 'Analyze Evidence', text: 'Analyze the key evidence in this case and identify any inconsistencies.' },
@@ -144,12 +251,29 @@
 									</span>
 								{/if}
 								<button
-									class="ml-auto p-0.5 rounded bg-transparent border-none opacity-60 hover:opacity-100 cursor-pointer transition-opacity"
+									class="p-0.5 rounded bg-transparent border-none opacity-60 hover:opacity-100 cursor-pointer transition-opacity"
 									onclick={() => copyMessage(msg.content, idx)}
 									title={copiedIdx === idx ? 'Copied!' : 'Copy message'}
 								>
 									<Icon name={copiedIdx === idx ? 'check' : 'copy'} size={11} />
 								</button>
+								<!-- TTS Speak Button (Assistant messages only) -->
+								{#if msg.role === 'assistant' && enableVoice}
+									<button
+										class="p-0.5 rounded bg-transparent border-none opacity-60 hover:opacity-100 cursor-pointer transition-opacity"
+										onclick={() => speakMessage(msg.content, idx)}
+										title={speakingIdx === idx ? 'Stop speaking' : 'Speak response'}
+										disabled={ttsInitializing}
+									>
+										{#if ttsInitializing && speakingIdx === idx}
+											<Icon name="loader-2" size={11} class="animate-spin" />
+										{:else if speakingIdx === idx}
+											<Icon name="volume-x" size={11} />
+										{:else}
+											<Icon name="volume-2" size={11} />
+										{/if}
+									</button>
+								{/if}
 							</div>
 
 							<div
@@ -207,15 +331,41 @@
 
 	<!-- Input -->
 	<div class="p-3 border-t border-sand-dark">
+		<!-- Interim transcript indicator (while listening) -->
+		{#if isListening && interimTranscript}
+			<div class="mb-2 px-3 py-1.5 rounded bg-blue-950/40 border border-blue-800/30 text-xs text-blue-200 flex items-center gap-2">
+				<Icon name="mic" size={12} class="animate-pulse" />
+				<span class="opacity-60">Listening:</span>
+				<span class="italic">{interimTranscript}</span>
+			</div>
+		{/if}
+
 		<div class="flex gap-2 items-end">
 			<textarea
-				placeholder="Type a message..."
+				placeholder={isListening ? "Listening... speak now" : "Type a message..."}
 				bind:value={currentMessage}
 				onkeydown={handleKeydown}
 				class="flex-1 bg-panel border border-sand-dark text-inherit text-sm px-3 py-2 rounded-lg resize-none min-h-10 outline-none focus:border-accent"
+				class:border-blue-500={isListening}
 				rows={1}
 				disabled={!session || session.status === 'thinking'}
 			></textarea>
+
+			<!-- Voice Input Button (STT) -->
+			{#if enableVoice && sttSupported}
+				<Button
+					onclick={toggleListening}
+					disabled={!session || session.status !== 'idle'}
+					class="h-10 w-10 shrink-0 rounded-lg flex items-center justify-center"
+					class:bg-red-600={isListening}
+					class:hover:bg-red-700={isListening}
+					title={isListening ? 'Stop listening' : 'Voice input'}
+				>
+					<Icon name={isListening ? 'mic-off' : 'mic'} size={16} />
+				</Button>
+			{/if}
+
+			<!-- Send Button -->
 			<Button
 				onclick={sendMessage}
 				disabled={!session || session.status !== 'idle' || !currentMessage.trim()}
@@ -233,6 +383,11 @@
 			{#if session?.lastSource}
 				<span class="px-1 py-px rounded bg-white/5 text-[9px]">
 					{session.lastSource === 'local-onnx' ? 'LOCAL' : 'SERVER'}
+				</span>
+			{/if}
+			{#if enableVoice && !sttSupported}
+				<span class="px-1 py-px rounded bg-orange-900/30 text-orange-400 text-[9px]">
+					Voice input unavailable (Chrome/Edge only)
 				</span>
 			{/if}
 		</div>
