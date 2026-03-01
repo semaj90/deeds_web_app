@@ -467,6 +467,50 @@
 		};
 	}
 
+	// Add evidence item to canvas at specific position
+	export function addEvidenceNode(evidenceId: string, title: string, x: number, y: number) {
+		const nodeId = `ev_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+		const newNode: BoardNode = {
+			id: nodeId,
+			kind: 'evidence',
+			x,
+			y,
+			w: 280,
+			h: 160,
+			title,
+			evidenceId,
+			body: ''
+		};
+		nodes.push(newNode);
+		dirty = true;
+		scheduleDraw();
+		return nodeId;
+	}
+
+	// Update position of existing node
+	export function updateNodePosition(nodeId: string, x: number, y: number) {
+		const node = nodes.find(n => n.id === nodeId || n.evidenceId === nodeId);
+		if (node) {
+			node.x = x;
+			node.y = y;
+			dirty = true;
+			scheduleDraw();
+		}
+	}
+
+	// Clear all nodes
+	export function clearNodes() {
+		nodes = [];
+		edges = [];
+		dirty = true;
+		scheduleDraw();
+	}
+
+	// Get current nodes (for external reference)
+	export function getNodes(): BoardNode[] {
+		return [...nodes];
+	}
+
 	$effect(() => {
 
 		if (!canvasEl) return;

@@ -26,7 +26,9 @@
 	// AI Chat session (contextual to this case)
 	let chatSession: ChatSession | null = $state(null);
 	let currentMessage = $state('');
-	let chatContainer: HTMLElement | null = null;
+	let chatContainer: HTMLElement | null = $state(null);
+	let isRecording = $state(false);
+	let mediaRecorder: MediaRecorder | null = null;
 
 	onMount(() => {
 		// Initialize chat session with case context
@@ -109,11 +111,56 @@
 		isDirty = true;
 	}
 
+	// Parse AI layout suggestions and apply to canvas
+	function parseAndApplyLayout(aiResponse: string) {
+		if (!board) return;
+
+		// Parse format: "Item N: position (x%, y%)"
+		const regex = /Item (\d+):\s*position\s*\((\d+)%?,?\s*(\d+)%?\)/gi;
+		let match;
+		const positions: Array<{ itemIndex: number; x: number; y: number }> = [];
+
+		while ((match = regex.exec(aiResponse)) !== null) {
+			positions.push({
+				itemIndex: parseInt(match[1]) - 1, // 0-indexed
+				x: parseInt(match[2]),
+				y: parseInt(match[3])
+			});
+		}
+
+		if (positions.length === 0) {
+			console.warn('No layout positions found in AI response');
+			return;
+		}
+
+		// Clear existing nodes and apply new layout
+		board.clearNodes();
+
+		// Canvas dimensions (approximate, will scale with viewport)
+		const canvasWidth = 2000;
+		const canvasHeight = 1500;
+
+		positions.forEach(({ itemIndex, x, y }) => {
+			const item = evidenceItems[itemIndex];
+			if (item) {
+				// Convert percentage to canvas coordinates
+				const posX = (x / 100) * canvasWidth;
+				const posY = (y / 100) * canvasHeight;
+				board.addEvidenceNode(item.id, item.title, posX, posY);
+			}
+		});
+
+		// Mark as dirty to trigger save prompt
+		isDirty = true;
+	}
+
 	// AI-powered layout generation
 	async function generateAILayout() {
 		if (!chatSession || evidenceItems.length === 0) return;
 
 		isGeneratingLayout = true;
+		showAIChat = true; // Auto-open chat to show progress
+
 		const layoutPrompt = `You are analyzing ${evidenceItems.length} evidence items for case ${caseId}.
 
 Evidence summary:
@@ -124,9 +171,29 @@ Generate an optimal canvas layout strategy. For each evidence item, suggest:
 2. Grouping strategy (chronological, by type, by importance)
 3. Connection suggestions between related items
 
-Format as: "Item N: position (x%, y%), group: [name], connect to: [items]"`;
+Format as: "Item N: position (x%, y%), group: [name], connect to: [items]"
+
+IMPORTANT: Always include position coordinates for each item in the exact format shown above.`;
 
 		await chatSession.sendMessage(layoutPrompt);
+
+		// Watch for the AI's response to auto-apply layout
+		const checkResponse = setInterval(() => {
+			if (chatSession && chatSession.status === 'idle' && chatSession.messages.length > 0) {
+				const lastMsg = chatSession.messages[chatSession.messages.length - 1];
+				if (lastMsg.role === 'assistant') {
+					parseAndApplyLayout(lastMsg.content);
+					clearInterval(checkResponse);
+				}
+			}
+		}, 500);
+
+		// Cleanup after 30 seconds
+		setTimeout(() => {
+			clearInterval(checkResponse);
+			isGeneratingLayout = false;
+		}, 30000);
+
 		isGeneratingLayout = false;
 	}
 
@@ -138,12 +205,119 @@ Format as: "Item N: position (x%, y%), group: [name], connect to: [items]"`;
 		currentMessage = '';
 		await chatSession.sendMessage(msg);
 
+		// Save to database
+		await saveChatToDatabase();
+
 		// Auto-scroll chat
 		setTimeout(() => {
 			if (chatContainer) {
 				chatContainer.scrollTop = chatContainer.scrollHeight;
 			}
 		}, 100);
+	}
+
+	// Save chat history to database
+	async function saveChatToDatabase() {
+		if (!chatSession || chatSession.messages.length === 0) return;
+
+		try {
+			const response = await fetch(`/api/cases/${caseId}/chat`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					chatId: chatSession._chatId,
+					messages: chatSession.messages,
+					metadata: {
+						evidenceCount: evidenceItems.length,
+						timestamp: new Date().toISOString()
+					}
+				})
+			});
+
+			if (!response.ok) {
+				console.error('Failed to save chat history');
+			}
+		} catch (e) {
+			console.error('Error saving chat:', e);
+		}
+	}
+
+	// Export chat transcript as PDF
+	async function exportChatPDF() {
+		if (!chatSession || chatSession.messages.length === 0) return;
+
+		const transcript = chatSession.messages
+			.map((msg, idx) => {
+				const role = msg.role === 'user' ? 'You' : 'AI Assistant';
+				const timestamp = msg.timestamp ? new Date(msg.timestamp).toLocaleString() : '';
+				return `${idx + 1}. ${role} ${timestamp ? `(${timestamp})` : ''}\n${msg.content}\n`;
+			})
+			.join('\n---\n\n');
+
+		const blob = new Blob([
+			`Evidence Board Chat Transcript\n`,
+			`Case ID: ${caseId}\n`,
+			`Generated: ${new Date().toLocaleString()}\n`,
+			`\n${'='.repeat(80)}\n\n`,
+			transcript
+		], { type: 'text/plain' });
+
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `evidence-board-chat-${caseId.substring(0, 8)}-${Date.now()}.txt`;
+		a.click();
+		URL.revokeObjectURL(url);
+	}
+
+	// Voice input with Whisper STT
+	async function startVoiceInput() {
+		if (!navigator.mediaDevices || isRecording) return;
+
+		try {
+			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+			const chunks: Blob[] = [];
+
+			mediaRecorder = new MediaRecorder(stream);
+			mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+			mediaRecorder.onstop = async () => {
+				const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+				const formData = new FormData();
+				formData.append('audio', audioBlob, 'voice.webm');
+
+				try {
+					const response = await fetch('/api/whisper/transcribe', {
+						method: 'POST',
+						body: formData
+					});
+
+					if (response.ok) {
+						const data = await response.json();
+						currentMessage = (currentMessage ? currentMessage + ' ' : '') + data.text;
+					} else {
+						console.error('Transcription failed');
+					}
+				} catch (e) {
+					console.error('Error transcribing audio:', e);
+				}
+
+				stream.getTracks().forEach(track => track.stop());
+			};
+
+			mediaRecorder.start();
+			isRecording = true;
+		} catch (e) {
+			console.error('Error accessing microphone:', e);
+			alert('Unable to access microphone. Please check permissions.');
+		}
+	}
+
+	function stopVoiceInput() {
+		if (mediaRecorder && isRecording) {
+			mediaRecorder.stop();
+			isRecording = false;
+			mediaRecorder = null;
+		}
 	}
 
 	async function save() {
