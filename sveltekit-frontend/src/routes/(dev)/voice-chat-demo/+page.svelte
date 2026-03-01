@@ -1,6 +1,8 @@
 <script lang="ts">
 import SimpleWorkingChat from '$lib/components/ai/SimpleWorkingChat.svelte';
 import Icon from '$lib/components/ui/Icon.svelte';
+
+let demoMode = $state<'basic' | 'handsfree'>('basic');
 </script>
 
 <svelte:head>
@@ -10,44 +12,103 @@ import Icon from '$lib/components/ui/Icon.svelte';
 <div class="voice-chat-demo-page">
 	<header class="page-header">
 		<h1>VOICE_ENABLED_CHAT</h1>
-		<p class="subtitle">Bidirectional voice conversation with AI — Speech-to-Text + Text-to-Speech</p>
+		<p class="subtitle">Bidirectional voice conversation with AI — Speech-to-Text + Text-to-Speech + Hands-Free Mode</p>
 	</header>
 
 	<div class="demo-container">
-		<div class="features-grid">
-			<div class="feature-card">
-				<Icon name="mic" size={24} />
-				<h3>Voice Input</h3>
-				<p>Web Speech API for real-time speech recognition. Click the microphone to speak your question.</p>
-			</div>
-			<div class="feature-card">
-				<Icon name="volume-2" size={24} />
-				<h3>TTS Output</h3>
-				<p>Piper neural TTS speaks AI responses. Click the volume icon on any assistant message.</p>
-			</div>
-			<div class="feature-card">
-				<Icon name="message-circle" size={24} />
-				<h3>Dual Mode</h3>
-				<p>Switch between typing and voice seamlessly. Interim transcripts show live as you speak.</p>
-			</div>
+		<!-- Mode Selector -->
+		<div class="mode-selector">
+			<button
+				class="mode-btn"
+				class:active={demoMode === 'basic'}
+				onclick={() => demoMode = 'basic'}
+			>
+				<Icon name="mic" size={18} />
+				<span>Basic Mode</span>
+			</button>
+			<button
+				class="mode-btn"
+				class:active={demoMode === 'handsfree'}
+				onclick={() => demoMode = 'handsfree'}
+			>
+				<Icon name="radio" size={18} />
+				<span>🔴 Hands-Free Mode</span>
+			</button>
 		</div>
 
+		<!-- Features Grid -->
+		<div class="features-grid">
+			{#if demoMode === 'basic'}
+				<div class="feature-card">
+					<Icon name="mic" size={24} />
+					<h3>Voice Input</h3>
+					<p>Web Speech API for real-time speech recognition. Click the microphone to speak your question.</p>
+				</div>
+				<div class="feature-card">
+					<Icon name="volume-2" size={24} />
+					<h3>TTS Output</h3>
+					<p>Piper neural TTS speaks AI responses. Click the volume icon on any assistant message.</p>
+				</div>
+				<div class="feature-card">
+					<Icon name="message-circle" size={24} />
+					<h3>Dual Mode</h3>
+					<p>Switch between typing and voice seamlessly. Interim transcripts show live as you speak.</p>
+				</div>
+			{:else}
+				<div class="feature-card">
+					<Icon name="radio" size={24} />
+					<h3>Auto-Listen</h3>
+					<p>AI automatically listens for your next question after speaking its response. No buttons needed.</p>
+				</div>
+				<div class="feature-card">
+					<Icon name="zap" size={24} />
+					<h3>Auto-Send</h3>
+					<p>Your speech auto-sends after 2 seconds of silence. Speak naturally without clicking.</p>
+				</div>
+				<div class="feature-card">
+					<Icon name="shield" size={24} />
+					<h3>Interrupt</h3>
+					<p>Start speaking while AI talks to interrupt and ask a new question immediately.</p>
+				</div>
+			{/if}
+		</div>
+
+		<!-- Chat Wrapper with Conditional Hands-Free -->
 		<div class="chat-wrapper">
 			<SimpleWorkingChat
-				chatId="voice-demo-chat"
+				chatId={demoMode === 'handsfree' ? 'voice-demo-handsfree' : 'voice-demo-basic'}
 				height="600px"
 				enableVoice={true}
+				handsFree={demoMode === 'handsfree'}
+				silenceThreshold={2000}
 			/>
 		</div>
 
+		<!-- Mode-Specific Instructions -->
 		<div class="info-panel">
-			<h3><Icon name="info" size={16} /> How to Use</h3>
-			<ol>
-				<li><strong>Voice Input:</strong> Click the <Icon name="mic" size={12} /> microphone button, speak your question, then click <Icon name="mic-off" size={12} /> to stop or wait for auto-detection. Your speech appears as you talk.</li>
-				<li><strong>Speak Response:</strong> After the AI responds, click the <Icon name="volume-2" size={12} /> volume icon next to any assistant message to hear it spoken aloud.</li>
-				<li><strong>Mixed Mode:</strong> Type and speak interchangeably. Voice input appends to the text box, allowing you to edit before sending.</li>
-				<li><strong>Browser Support:</strong> Voice input requires Chrome, Edge, or Safari. TTS works in all modern browsers.</li>
-			</ol>
+			{#if demoMode === 'basic'}
+				<h3><Icon name="info" size={16} /> Basic Mode — Manual Control</h3>
+				<ol>
+					<li><strong>Voice Input:</strong> Click the <Icon name="mic" size={12} /> microphone button, speak your question, then click <Icon name="mic-off" size={12} /> to stop or wait for auto-detection. Your speech appears as you talk.</li>
+					<li><strong>Speak Response:</strong> After the AI responds, click the <Icon name="volume-2" size={12} /> volume icon next to any assistant message to hear it spoken aloud.</li>
+					<li><strong>Mixed Mode:</strong> Type and speak interchangeably. Voice input appends to the text box, allowing you to edit before sending.</li>
+					<li><strong>Browser Support:</strong> Voice input requires Chrome, Edge, or Safari. TTS works in all modern browsers.</li>
+				</ol>
+			{:else}
+				<h3><Icon name="radio" size={16} /> 🔴 Hands-Free Mode — True Conversation</h3>
+				<ol>
+					<li><strong>Enable:</strong> Click the "🎧 Hands-Free" button in the chat header. It turns into "🔴 Live" when active.</li>
+					<li><strong>Speak Naturally:</strong> Just talk — the AI listens continuously. After 2 seconds of silence, your message auto-sends.</li>
+					<li><strong>AI Auto-Speaks:</strong> The AI automatically speaks its response via TTS. No volume button needed.</li>
+					<li><strong>AI Auto-Listens:</strong> After the AI finishes speaking, it automatically starts listening for your next question (500ms delay).</li>
+					<li><strong>Interrupt Anytime:</strong> Start speaking while the AI is talking — it stops immediately and listens to you.</li>
+					<li><strong>No Clicks Required:</strong> After enabling hands-free, have an entire conversation without touching your keyboard or mouse.</li>
+				</ol>
+				<div class="warning-box">
+					<Icon name="alert-circle" size={14} />
+					<span><strong>Note:</strong> Hands-free mode works best in a quiet environment. Background noise may trigger false positives.</span>
+				</div>
+			{/if}
 		</div>
 	</div>
 
@@ -58,6 +119,7 @@ import Icon from '$lib/components/ui/Icon.svelte';
 			<span class="tech-badge">ONNX Runtime</span>
 			<span class="tech-badge">ChatSession Router</span>
 			<span class="tech-badge">SSE Streaming</span>
+			<span class="tech-badge">Voice Activity Detection</span>
 		</div>
 	</footer>
 </div>
@@ -98,6 +160,41 @@ import Icon from '$lib/components/ui/Icon.svelte';
 		margin: 0 auto;
 	}
 
+	.mode-selector {
+		display: flex;
+		gap: 1rem;
+		justify-content: center;
+		margin-bottom: 2rem;
+	}
+
+	.mode-btn {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.75rem 1.5rem;
+		background: var(--yorha-bg-secondary, #1a1a1a);
+		border: 2px solid var(--yorha-border-primary, #333);
+		color: var(--yorha-text-secondary, #b8b8b8);
+		border-radius: 8px;
+		font-family: var(--yorha-font-primary, 'JetBrains Mono', monospace);
+		font-size: 0.875rem;
+		cursor: pointer;
+		transition: all 0.2s;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.mode-btn:hover {
+		border-color: var(--yorha-accent, #ffd700);
+		color: var(--yorha-accent, #ffd700);
+	}
+
+	.mode-btn.active {
+		background: rgba(255, 215, 0, 0.1);
+		border-color: var(--yorha-accent, #ffd700);
+		color: var(--yorha-accent, #ffd700);
+	}
+
 	.features-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -115,7 +212,10 @@ import Icon from '$lib/components/ui/Icon.svelte';
 
 	.feature-card :global(.i-lucide-mic),
 	.feature-card :global(.i-lucide-volume-2),
-	.feature-card :global(.i-lucide-message-circle) {
+	.feature-card :global(.i-lucide-message-circle),
+	.feature-card :global(.i-lucide-radio),
+	.feature-card :global(.i-lucide-zap),
+	.feature-card :global(.i-lucide-shield) {
 		color: var(--yorha-accent, #ffd700);
 		margin-bottom: 1rem;
 	}
@@ -174,9 +274,29 @@ import Icon from '$lib/components/ui/Icon.svelte';
 	.info-panel :global(.i-lucide-mic),
 	.info-panel :global(.i-lucide-mic-off),
 	.info-panel :global(.i-lucide-volume-2),
-	.info-panel :global(.i-lucide-info) {
+	.info-panel :global(.i-lucide-info),
+	.info-panel :global(.i-lucide-radio),
+	.info-panel :global(.i-lucide-alert-circle) {
 		display: inline-block;
 		vertical-align: middle;
+	}
+
+	.warning-box {
+		margin-top: 1rem;
+		padding: 1rem;
+		background: rgba(255, 165, 0, 0.1);
+		border: 1px solid rgba(255, 165, 0, 0.3);
+		border-radius: 6px;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		font-size: 0.875rem;
+		color: var(--yorha-text-secondary, #b8b8b8);
+	}
+
+	.warning-box :global(.i-lucide-alert-circle) {
+		color: #ffa500;
+		flex-shrink: 0;
 	}
 
 	.page-footer {

@@ -13,7 +13,9 @@
 		hasCaseContext?: boolean;
 		height?: string;
 		class?: string;
-		enableVoice?: boolean; // NEW: Enable voice features
+		enableVoice?: boolean;
+		handsFree?: boolean; // NEW: Start in hands-free mode
+		silenceThreshold?: number; // NEW: Auto-send after N ms of silence
 	}
 
 	let {
@@ -21,7 +23,9 @@
 		hasCaseContext = false,
 		height = '500px',
 		class: className = '',
-		enableVoice = true
+		enableVoice = true,
+		handsFree = false,
+		silenceThreshold = 2000
 	}: Props = $props();
 
 	let session = $state<ChatSession | null>(null);
@@ -65,6 +69,12 @@
 		const msg = currentMessage.trim();
 		currentMessage = '';
 		lastCompletedIdx = null;
+
+		// Update conversation state
+		if (handsFreeEnabled) {
+			conversationState = 'ai-thinking';
+		}
+
 		await session.sendMessage(msg);
 	}
 
@@ -102,6 +112,10 @@
 			// Stop current speech
 			ttsService.stop();
 			speakingIdx = null;
+			if (handsFreeEnabled) {
+				conversationState = 'listening';
+				toggleListening(); // Restart listening after manual stop
+			}
 			return;
 		}
 
@@ -112,11 +126,28 @@
 			}
 
 			speakingIdx = idx;
+			if (handsFreeEnabled) {
+				conversationState = 'ai-speaking';
+			}
+
 			await ttsService.speak(content, { rate: 1.0, volume: 0.8 });
 			speakingIdx = null;
+
+			// In hands-free mode, restart listening after TTS finishes
+			if (handsFreeEnabled && conversationState === 'ai-speaking') {
+				conversationState = 'listening';
+				setTimeout(() => {
+					if (handsFreeEnabled && !isListening) {
+						toggleListening();
+					}
+				}, 500); // 500ms delay before listening
+			}
 		} catch (err) {
 			console.error('[SimpleWorkingChat] TTS error:', err);
 			speakingIdx = null;
+			if (handsFreeEnabled) {
+				conversationState = 'idle';
+			}
 		} finally {
 			ttsInitializing = false;
 		}
@@ -129,6 +160,7 @@
 	let interimTranscript = $state('');
 	let recognition: any = $state(null);
 	let sttSupported = $state(false);
+	let silenceTimer: NodeJS.Timeout | null = null;
 
 	$effect(() => {
 		if (browser && enableVoice) {
@@ -158,20 +190,58 @@
 					if (final) {
 						currentMessage = (currentMessage + ' ' + final).trim();
 						interimTranscript = '';
+
+						// VAD: Reset silence timer on final speech
+						if (handsFreeEnabled) {
+							clearTimeout(silenceTimer!);
+							silenceTimer = setTimeout(() => {
+								if (currentMessage.trim() && handsFreeEnabled) {
+									conversationState = 'processing';
+									sendMessage();
+								}
+							}, silenceThreshold);
+						}
 					} else {
 						interimTranscript = interim;
+
+						// VAD: Clear and reset silence timer on interim speech
+						if (handsFreeEnabled) {
+							clearTimeout(silenceTimer!);
+						}
 					}
 				};
 
 				recognition.onend = () => {
 					isListening = false;
 					interimTranscript = '';
+					clearTimeout(silenceTimer!);
+
+					// In hands-free mode, restart listening unless we're done
+					if (handsFreeEnabled && conversationState === 'listening') {
+						setTimeout(() => {
+							if (handsFreeEnabled && !isListening && conversationState === 'listening') {
+								recognition.start();
+								isListening = true;
+							}
+						}, 200);
+					}
 				};
 
 				recognition.onerror = (event: any) => {
 					console.error('[STT] Recognition error:', event.error);
 					isListening = false;
 					interimTranscript = '';
+					clearTimeout(silenceTimer!);
+
+					// Don't restart on permission denied or other fatal errors
+					if (event.error === 'no-speech' && handsFreeEnabled) {
+						// Restart on no-speech timeout in hands-free mode
+						setTimeout(() => {
+							if (handsFreeEnabled && !isListening) {
+								toggleListening();
+							}
+						}, 500);
+					}
 				};
 			}
 		}
@@ -180,6 +250,7 @@
 			if (recognition) {
 				recognition.abort();
 			}
+			clearTimeout(silenceTimer!);
 		};
 	});
 
@@ -189,11 +260,89 @@
 		if (isListening) {
 			recognition.stop();
 			isListening = false;
+			clearTimeout(silenceTimer!);
+			if (handsFreeEnabled) {
+				conversationState = 'idle';
+			}
 		} else {
 			recognition.start();
 			isListening = true;
+			if (handsFreeEnabled) {
+				conversationState = 'listening';
+			}
 		}
 	}
+
+	// ═══════════════════════════════════════════════════════════════
+	// HANDS-FREE CONVERSATION MODE
+	// ═══════════════════════════════════════════════════════════════
+	type ConversationState = 'idle' | 'listening' | 'processing' | 'ai-thinking' | 'ai-speaking';
+	let conversationState = $state<ConversationState>('idle');
+	let handsFreeEnabled = $state(handsFree);
+
+	// Persist hands-free preference
+	$effect(() => {
+		if (browser) {
+			const saved = localStorage.getItem(`handsFree-${chatId}`);
+			if (saved !== null) {
+				handsFreeEnabled = saved === 'true';
+			}
+		}
+	});
+
+	$effect(() => {
+		if (browser && handsFreeEnabled !== undefined) {
+			localStorage.setItem(`handsFree-${chatId}`, String(handsFreeEnabled));
+		}
+	});
+
+	function toggleHandsFree() {
+		handsFreeEnabled = !handsFreeEnabled;
+
+		if (handsFreeEnabled) {
+			// Start listening when enabling hands-free
+			conversationState = 'listening';
+			if (!isListening) {
+				toggleListening();
+			}
+		} else {
+			// Stop everything when disabling hands-free
+			conversationState = 'idle';
+			if (isListening) {
+				toggleListening();
+			}
+			if (speakingIdx !== null) {
+				ttsService.stop();
+				speakingIdx = null;
+			}
+			clearTimeout(silenceTimer!);
+		}
+	}
+
+	// Auto-speak AI responses in hands-free mode
+	$effect(() => {
+		if (handsFreeEnabled && session?.status === 'idle' && conversationState === 'ai-thinking') {
+			const lastMsg = session.messages[session.messages.length - 1];
+			if (lastMsg?.role === 'assistant') {
+				// Wait for typewriter to finish before speaking
+				setTimeout(() => {
+					if (handsFreeEnabled && conversationState === 'ai-thinking') {
+						speakMessage(lastMsg.content, session.messages.length - 1);
+					}
+				}, 500);
+			}
+		}
+	});
+
+	// Interrupt detection: Stop TTS if user starts speaking
+	$effect(() => {
+		if (handsFreeEnabled && isListening && speakingIdx !== null) {
+			// User started speaking while AI is talking → interrupt
+			ttsService.stop();
+			speakingIdx = null;
+			conversationState = 'listening';
+		}
+	});
 
 	// Sample legal prompts
 	const samplePrompts = [
@@ -207,9 +356,46 @@
 	function useSamplePrompt(text: string) {
 		currentMessage = text;
 	}
+
+	// Conversation state labels for UI
+	const stateLabels: Record<ConversationState, string> = {
+		idle: 'Idle',
+		listening: 'Listening...',
+		processing: 'Processing speech...',
+		'ai-thinking': 'AI thinking...',
+		'ai-speaking': 'AI speaking...'
+	};
 </script>
 
 <div class="flex flex-col border border-sand-dark rounded-lg bg-panel-soft overflow-hidden {className}" style:height>
+	<!-- Header with Hands-Free Toggle -->
+	{#if enableVoice && sttSupported}
+		<div class="flex items-center justify-between px-3 py-2 border-b border-sand-dark bg-panel">
+			<div class="flex items-center gap-2 text-xs">
+				{#if handsFreeEnabled}
+					<span
+						class="flex items-center gap-1.5 px-2 py-1 rounded-full animate-pulse"
+						style:background={conversationState === 'ai-speaking' ? 'rgba(255,215,0,0.15)' : conversationState === 'listening' ? 'rgba(34,197,94,0.15)' : 'rgba(100,100,100,0.1)'}
+						style:color={conversationState === 'ai-speaking' ? '#ffd700' : conversationState === 'listening' ? '#22c55e' : '#888'}
+					>
+						<span class="w-1.5 h-1.5 rounded-full" style:background={conversationState === 'ai-speaking' ? '#ffd700' : conversationState === 'listening' ? '#22c55e' : '#888'}></span>
+						<span>{stateLabels[conversationState]}</span>
+					</span>
+				{/if}
+			</div>
+			<button
+				onclick={toggleHandsFree}
+				class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs bg-panel border border-sand-dark hover:border-accent transition-colors cursor-pointer"
+				class:bg-accent-soft={handsFreeEnabled}
+				class:border-accent={handsFreeEnabled}
+				title={handsFreeEnabled ? 'Disable hands-free mode' : 'Enable hands-free mode'}
+			>
+				<Icon name={handsFreeEnabled ? 'radio' : 'headphones'} size={12} />
+				<span>{handsFreeEnabled ? '🔴 Live' : '🎧 Hands-Free'}</span>
+			</button>
+		</div>
+	{/if}
+
 	<!-- Messages -->
 	<ScrollArea.Root class="flex-1 min-h-0">
 		<ScrollArea.Viewport class="h-full p-4" bind:ref={chatContainer}>
@@ -340,19 +526,28 @@
 			</div>
 		{/if}
 
+		<!-- Hands-free hint -->
+		{#if handsFreeEnabled && conversationState === 'listening' && !currentMessage.trim()}
+			<div class="mb-2 px-3 py-1.5 rounded bg-green-950/40 border border-green-800/30 text-xs text-green-200 flex items-center gap-2">
+				<Icon name="radio" size={12} class="animate-pulse" />
+				<span>Speak now — will auto-send after {silenceThreshold/1000}s of silence</span>
+			</div>
+		{/if}
+
 		<div class="flex gap-2 items-end">
 			<textarea
-				placeholder={isListening ? "Listening... speak now" : "Type a message..."}
+				placeholder={isListening ? "Listening... speak now" : handsFreeEnabled ? "Voice mode active..." : "Type a message..."}
 				bind:value={currentMessage}
 				onkeydown={handleKeydown}
 				class="flex-1 bg-panel border border-sand-dark text-inherit text-sm px-3 py-2 rounded-lg resize-none min-h-10 outline-none focus:border-accent"
 				class:border-blue-500={isListening}
+				class:border-green-500={handsFreeEnabled && !isListening}
 				rows={1}
 				disabled={!session || session.status === 'thinking'}
 			></textarea>
 
 			<!-- Voice Input Button (STT) -->
-			{#if enableVoice && sttSupported}
+			{#if enableVoice && sttSupported && !handsFreeEnabled}
 				<Button
 					onclick={toggleListening}
 					disabled={!session || session.status !== 'idle'}
@@ -388,6 +583,11 @@
 			{#if enableVoice && !sttSupported}
 				<span class="px-1 py-px rounded bg-orange-900/30 text-orange-400 text-[9px]">
 					Voice input unavailable (Chrome/Edge only)
+				</span>
+			{/if}
+			{#if handsFreeEnabled}
+				<span class="px-1 py-px rounded bg-green-900/30 text-green-400 text-[9px]">
+					🔴 Hands-Free Active
 				</span>
 			{/if}
 		</div>
