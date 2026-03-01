@@ -8,6 +8,7 @@
 	import PersonList from '$lib/components/PersonList.svelte';
 	import FilterPanel from '$lib/components/FilterPanel.svelte';
 	import StatsPanel from '$lib/components/StatsPanel.svelte';
+	import Icon from '$lib/components/ui/Icon.svelte';
 	import type { FugitiveDexPerson } from '$lib/components/types';
 
 	let filterPanelFilters = $state<{ status: string; priority: string; tags: string[] }>({ status: '', priority: '', tags: [] });
@@ -111,35 +112,262 @@
 	}
 </script>
 
-<div class="poi-list-page">
-	<div class="page-header">
-		<h1>Persons of Interest</h1>
+<div class="yorha-page">
+	<!-- YoRHa Header -->
+	<div class="yorha-header">
+		<div class="header-logo">
+			<div class="logo-icon">YoRHa</div>
+			<div class="logo-subtitle">LEGAL UNIT</div>
+		</div>
+		<div class="header-nav">
+			<button class="nav-item active">POI REGISTRY</button>
+			<button class="nav-item">UNIT REPORTS</button>
+		</div>
 		<div class="header-actions">
-			<button onclick={() => (showAddModal = true)} class="btn-create">+ Quick Add</button>
-			<button onclick={() => (showPersonForm = !showPersonForm)} class="btn-create-full">AI Create</button>
-			<a href="/persons-of-interest/create{data.caseId ? `?caseId=${data.caseId}` : ''}" class="btn-create-full">+ Full Form</a>
+			<button class="header-btn" onclick={() => (showPersonForm = !showPersonForm)}>
+				<Icon name="sparkles" />
+				AI CREATE
+			</button>
+			<button class="header-btn primary" onclick={() => (showAddModal = true)}>
+				<Icon name="plus" />
+				REGISTER
+			</button>
 		</div>
 	</div>
 
-	<div style="margin-bottom: 1rem;">
-		<button onclick={() => (showStats = !showStats)} class="btn-create-full">
-			{showStats ? 'Hide Statistics' : 'POI Statistics'}
-		</button>
-	</div>
-	{#if showStats}
-		<StatsPanel stats={poiStats} />
-	{/if}
+	<div class="yorha-content">
+		<!-- Left Sidebar -->
+		<div class="yorha-sidebar">
+			<div class="sidebar-section">
+				<div class="sidebar-title">PROJECT DEUS</div>
+				<div class="sidebar-menu">
+					<button class="menu-item active">
+						<Icon name="users" />
+						<span>POI LIST</span>
+					</button>
+					<button class="menu-item">
+						<Icon name="target" />
+						<span>GALAXY PROFILE</span>
+					</button>
+					<button class="menu-item">
+						<Icon name="shield" />
+						<span>RESOURCES</span>
+					</button>
+					<button class="menu-item">
+						<Icon name="settings" />
+						<span>SETTINGS</span>
+					</button>
+				</div>
+			</div>
 
+			<!-- Stats Panel -->
+			{#if showStats}
+				<div class="sidebar-section">
+					<div class="sidebar-title">STATISTICS</div>
+					<div class="stats-compact">
+						<div class="stat-row">
+							<span class="stat-label">Total</span>
+							<span class="stat-value">{poiStats.total}</span>
+						</div>
+						<div class="stat-row">
+							<span class="stat-label">Active</span>
+							<span class="stat-value highlight">{poiStats.active}</span>
+						</div>
+						<div class="stat-row">
+							<span class="stat-label">High Risk</span>
+							<span class="stat-value danger">{poiStats.highRisk}</span>
+						</div>
+						<div class="stat-row">
+							<span class="stat-label">AI Generated</span>
+							<span class="stat-value">{poiStats.aiGenerated}</span>
+						</div>
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<!-- Main Content -->
+		<div class="yorha-main">
+			{#if data.error}
+				<div class="error-banner">
+					<Icon name="alert-circle" />
+					<span>{data.error}</span>
+				</div>
+			{/if}
+
+			<!-- Filters & Search -->
+			<div class="filter-section">
+				<div class="search-group">
+					<input
+						type="text"
+						placeholder="Search by name or description..."
+						bind:value={searchQuery}
+						class="yorha-input search-input"
+					/>
+					<button class="filter-btn" onclick={() => (showStats = !showStats)}>
+						<Icon name="bar-chart" />
+						{showStats ? 'HIDE STATS' : 'STATS'}
+					</button>
+				</div>
+
+				<div class="filter-row">
+					<select bind:value={selectedStatus} class="yorha-select">
+						<option value="">All Statuses</option>
+						<option value="person_of_interest">Person of Interest</option>
+						<option value="witness">Witness</option>
+						<option value="suspect">Suspect</option>
+						<option value="victim">Victim</option>
+						<option value="informant">Informant</option>
+						<option value="surveillance">Surveillance</option>
+						<option value="wanted">Wanted</option>
+						<option value="active">Active</option>
+						<option value="cleared">Cleared</option>
+					</select>
+
+					<select bind:value={selectedThreatLevel} class="yorha-select">
+						<option value="">All Threat Levels</option>
+						<option value="low">Low</option>
+						<option value="medium">Medium</option>
+						<option value="high">High</option>
+						<option value="critical">Critical</option>
+					</select>
+
+					<div class="view-toggle">
+						<button class="toggle-btn" class:active={viewMode === 'list'} onclick={() => (viewMode = 'list')}>LIST</button>
+						<button class="toggle-btn" class:active={viewMode === 'detail-cards'} onclick={() => (viewMode = 'detail-cards')}>CARDS</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Content Display -->
+			{#if filtered.length === 0}
+				<div class="empty-state">
+					<div class="empty-icon">
+						<Icon name="user-x" />
+					</div>
+					<p class="empty-title">NO PERSONS OF INTEREST FOUND</p>
+					<p class="empty-subtitle">Try adjusting your filters or create a new entry</p>
+					<a href="/persons-of-interest/create{data.caseId ? `?caseId=${data.caseId}` : ''}" class="btn-yorha primary">CREATE FIRST POI</a>
+				</div>
+			{:else if viewMode === 'detail-cards'}
+				<div class="poi-grid">
+					{#each filtered as poi (poi.id)}
+						<div class="poi-card">
+							<div class="card-header">
+								<div class="card-photo">
+									<Icon name="user" />
+								</div>
+								<div class="card-info">
+									<h3 class="card-name">{poi.name}</h3>
+									<p class="card-status">{poi.status?.replace(/_/g, ' ').toUpperCase() ?? 'UNKNOWN'}</p>
+								</div>
+								<div class="card-threat">
+									<div class="threat-badge threat-{poi.threatLevel ?? 'low'}">
+										{poi.threatLevel?.toUpperCase() ?? 'LOW'}
+									</div>
+								</div>
+							</div>
+
+							<div class="card-body">
+								{#if poi.description}
+									<div class="field-group">
+										<label class="field-label">DESCRIPTION</label>
+										<p class="field-value">{poi.description}</p>
+									</div>
+								{/if}
+								{#if poi.lastLocation}
+									<div class="field-group">
+										<label class="field-label">LAST KNOWN LOCATION</label>
+										<p class="field-value">{poi.lastLocation}</p>
+									</div>
+								{/if}
+								<div class="field-group">
+									<label class="field-label">REGISTERED</label>
+									<p class="field-value">{new Date(poi.createdAt).toLocaleDateString()}</p>
+								</div>
+							</div>
+
+							<div class="card-actions">
+								<button class="action-btn" onclick={(e) => { e.stopPropagation(); openPreview(poi); }}>
+									<Icon name="eye" />
+									VIEW
+								</button>
+								<button class="action-btn" onclick={(e) => { e.stopPropagation(); editingPoi = poi; showEditor = true; }}>
+									<Icon name="pencil" />
+									EDIT
+								</button>
+								<a href="/persons-of-interest/{poi.id}" class="action-btn primary">
+									<Icon name="arrow-right" />
+									DETAILS
+								</a>
+							</div>
+						</div>
+					{/each}
+				</div>
+			{:else}
+				<div class="poi-table-wrapper">
+					<table class="yorha-table">
+						<thead>
+							<tr>
+								<th>NAME</th>
+								<th>STATUS</th>
+								<th>THREAT LEVEL</th>
+								<th>LAST LOCATION</th>
+								<th>REGISTERED</th>
+								<th>ACTIONS</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each filtered as poi (poi.id)}
+								<tr class="table-row">
+									<td class="name-cell">
+										<a href="/persons-of-interest/{poi.id}" class="name-link">
+											{poi.name}
+										</a>
+									</td>
+									<td>
+										<span class="status-pill" style="background-color: {getStatusColor(poi.status)};">
+											{poi.status?.replace(/_/g, ' ').toUpperCase() ?? 'UNKNOWN'}
+										</span>
+									</td>
+									<td>
+										<span class="threat-pill threat-{poi.threatLevel ?? 'low'}">
+											{poi.threatLevel?.toUpperCase() ?? 'LOW'}
+										</span>
+									</td>
+									<td class="location-cell">{poi.lastLocation ?? 'Unknown'}</td>
+									<td class="date-cell">{new Date(poi.createdAt).toLocaleDateString()}</td>
+									<td class="actions-cell">
+										<button class="icon-btn" onclick={(e) => { e.stopPropagation(); openPreview(poi); }}>
+											<Icon name="eye" />
+										</button>
+										<button class="icon-btn" onclick={(e) => { e.stopPropagation(); editingPoi = poi; showEditor = true; }}>
+											<Icon name="pencil" />
+										</button>
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			{/if}
+		</div>
+	</div>
+
+	<!-- Modals -->
 	<AddPoiModal bind:open={showAddModal} />
 
 	{#if showPersonForm}
-		<PersonForm />
+		<div class="modal-overlay" onclick={() => (showPersonForm = false)}>
+			<div class="modal-content" onclick={(e) => e.stopPropagation()}>
+				<PersonForm />
+			</div>
+		</div>
 	{/if}
 
-	<!-- POI Editor Modal -->
 	{#if showEditor && editingPoi}
-		<div class="editor-overlay">
-			<div class="editor-container">
+		<div class="modal-overlay" onclick={() => { showEditor = false; editingPoi = null; }}>
+			<div class="modal-content" onclick={(e) => e.stopPropagation()}>
 				<POIEditor
 					poi={{ name: editingPoi.name ?? '', alias: editingPoi.alias ?? '', threatLevel: editingPoi.threatLevel ?? 'low', photos: [], notes: editingPoi.description ?? '' }}
 					onSave={async (formData) => {
@@ -162,147 +390,6 @@
 		</div>
 	{/if}
 
-	{#if data.error}
-		<div class="error-banner">
-			<p>{data.error}</p>
-		</div>
-	{/if}
-
-	<div class="filters">
-		<input
-			type="text"
-			placeholder="Search by name or description..."
-			bind:value={searchQuery}
-			class="search-input"
-		/>
-
-		<select bind:value={selectedStatus} class="filter-select">
-			<option value="">All Statuses</option>
-			<option value="person_of_interest">Person of Interest</option>
-			<option value="witness">Witness</option>
-			<option value="suspect">Suspect</option>
-			<option value="victim">Victim</option>
-			<option value="informant">Informant</option>
-			<option value="surveillance">Surveillance</option>
-			<option value="wanted">Wanted</option>
-			<option value="active">Active</option>
-			<option value="cleared">Cleared</option>
-		</select>
-
-		<select bind:value={selectedThreatLevel} class="filter-select">
-			<option value="">All Threat Levels</option>
-			<option value="low">Low</option>
-			<option value="medium">Medium</option>
-			<option value="high">High</option>
-			<option value="critical">Critical</option>
-		</select>
-	</div>
-
-	{#if filtered.length === 0}
-		<div class="empty-state">
-			<p>No persons of interest found</p>
-			<a href="/persons-of-interest/create{data.caseId ? `?caseId=${data.caseId}` : ''}" class="btn-primary">Create First POI</a>
-		</div>
-	{:else}
-		<div class="view-toggle" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-			<button class="toggle-btn" class:active={viewMode === 'list'} onclick={() => (viewMode = 'list')}>List</button>
-			<button class="toggle-btn" class:active={viewMode === 'ai-cards'} onclick={() => (viewMode = 'ai-cards')}>AI Cards</button>
-			<button class="toggle-btn" class:active={viewMode === 'detail-cards'} onclick={() => (viewMode = 'detail-cards')}>Detail Cards</button>
-			<button class="toggle-btn" class:active={viewMode === 'fugitive-dex'} onclick={() => (viewMode = 'fugitive-dex')}>Fugitive Dex</button>
-			<div style="margin-left: auto;">
-				<FilterPanel filters={filterPanelFilters} onfilter={(f) => { filterPanelFilters = f; if (f.status) selectedStatus = f.status; if (f.priority) selectedThreatLevel = f.priority; }} />
-			</div>
-		</div>
-
-		{#if viewMode === 'ai-cards'}
-			<div class="poi-grid">
-				{#each filtered as poi (poi.id)}
-					<PersonCard
-						person={{ ...poi, priority: poi.threatLevel, lastUpdated: poi.updatedAt }}
-						onedit={(id) => { editingPoi = filtered.find((p: any) => p.id === id) ?? null; showEditor = true; }}
-						ondelete={(id) => { if (confirm('Delete this person of interest?')) fetch(`/api/persons/${id}`, { method: 'DELETE' }).then(() => window.location.reload()); }}
-					/>
-				{/each}
-			</div>
-		{:else if viewMode === 'detail-cards'}
-			<div class="poi-grid">
-				{#each filtered as poi (poi.id)}
-					<POICard
-						poi={{ id: poi.id, name: poi.name, alias: poi.aliases?.[0], threatLevel: poi.threatLevel ?? 'low', notes: poi.description, createdAt: poi.createdAt }}
-						onView={(p) => openPreview({ ...poi, aliases: poi.aliases ?? [] })}
-						onEdit={(p) => { editingPoi = poi; showEditor = true; }}
-						onDelete={(p) => { if (confirm('Delete this person of interest?')) fetch(`/api/persons/${p.id}`, { method: 'DELETE' }).then(() => window.location.reload()); }}
-					/>
-				{/each}
-			</div>
-		{:else if viewMode === 'fugitive-dex'}
-			<PersonList
-				persons={filtered.map((poi: any) => ({
-					id: poi.id,
-					name: poi.name,
-					alias: poi.aliases?.[0] ?? poi.description?.slice(0, 30) ?? '',
-					role: poi.status ?? 'unknown',
-					status: poi.status === 'wanted' ? 'WANTED' : poi.status === 'surveillance' ? 'MONITORING' : 'COOPERATIVE',
-					priority: poi.threatLevel === 'critical' || poi.threatLevel === 'high' ? 'HIGH' : poi.threatLevel === 'medium' ? 'MEDIUM' : 'LOW',
-					height: '',
-					age: '',
-					hair: '',
-					eyes: '',
-					modusOperandi: poi.description ?? '',
-					lastSeen: poi.lastLocation ?? '',
-					dangerLevel: poi.threatLevel === 'critical' ? 9 : poi.threatLevel === 'high' ? 7 : poi.threatLevel === 'medium' ? 5 : 2,
-					photo: '',
-					knownAssociates: [],
-					knownHabits: [],
-					attributes: { stealth: 50, intelligence: 50, strength: 50, speed: 50, dangerousness: 50 }
-				}))}
-				selectedPerson={dexSelectedPerson}
-				bind:searchQuery
-				onSelect={(person) => { dexSelectedPerson = person; }}
-			/>
-		{:else}
-			<div class="poi-grid">
-				{#each filtered as poi (poi.id)}
-					<a href={`/persons-of-interest/${poi.id}`} class="poi-card">
-						<div class="card-header">
-							<h3>{poi.name}</h3>
-							<div class="badges">
-								<span class="badge status" style="background-color: {getStatusColor(poi.status)}">
-									{poi.status.replace(/_/g, ' ')}
-								</span>
-								<span class="badge threat" style="background-color: {getThreatColor(poi.threatLevel)}">
-									{poi.threatLevel}
-								</span>
-							</div>
-						</div>
-
-						<div class="card-body">
-							{#if poi.description}
-								<p class="description">{poi.description}</p>
-							{/if}
-							{#if poi.lastLocation}
-								<p><strong>Last Location:</strong> {poi.lastLocation}</p>
-							{/if}
-						</div>
-
-						<div class="card-footer">
-							<span class="threat-level" style="color: {getThreatColor(poi.threatLevel)}">
-								Threat: {poi.threatLevel}
-							</span>
-							<div class="footer-right">
-								<button class="btn-preview" onclick={(e) => { e.preventDefault(); e.stopPropagation(); openPreview(poi); }}>Quick View</button>
-								<button class="btn-edit" onclick={(e) => { e.preventDefault(); e.stopPropagation(); editingPoi = poi; showEditor = true; }}>Edit</button>
-								<span class="date">
-									{new Date(poi.createdAt).toLocaleDateString()}
-								</span>
-							</div>
-						</div>
-					</a>
-				{/each}
-			</div>
-		{/if}
-	{/if}
-
 	<PersonOfInterestDetailView
 		poi={previewPoi}
 		bind:open={showPreview}
@@ -312,23 +399,67 @@
 </div>
 
 <style>
-	.poi-list-page {
-		padding: 2rem;
-		background: #0f0f23;
+	.yorha-page {
 		min-height: 100vh;
+		background: #f5f5f5;
+		font-family: 'JetBrains Mono', 'Courier New', monospace;
 	}
 
-	.page-header {
+	/* Header */
+	.yorha-header {
+		background: #fff;
+		border-bottom: 1px solid #e0e0e0;
+		padding: 1rem 2rem;
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 2rem;
+		justify-content: space-between;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 	}
 
-	.page-header h1 {
-		color: #ffffff;
-		font-size: 2rem;
-		margin: 0;
+	.header-logo {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.logo-icon {
+		font-size: 1.25rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		color: #000;
+	}
+
+	.logo-subtitle {
+		font-size: 0.7rem;
+		color: #999;
+		letter-spacing: 0.15em;
+	}
+
+	.header-nav {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	.nav-item {
+		background: transparent;
+		border: none;
+		padding: 0.5rem 1rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		color: #999;
+		cursor: pointer;
+		font-family: 'JetBrains Mono', monospace;
+		transition: all 0.2s;
+	}
+
+	.nav-item:hover {
+		color: #000;
+	}
+
+	.nav-item.active {
+		color: #000;
+		border-bottom: 2px solid #000;
 	}
 
 	.header-actions {
@@ -336,250 +467,619 @@
 		gap: 0.75rem;
 	}
 
-	.btn-create,
-	.btn-create-full {
-		padding: 0.75rem 1.5rem;
-		background: #dc2626;
-		color: #ffffff;
-		text-decoration: none;
-		border: none;
-		border-radius: 0.375rem;
+	.header-btn {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		background: #fff;
+		border: 1px solid #e0e0e0;
+		padding: 0.5rem 1rem;
+		font-size: 0.75rem;
 		font-weight: 600;
+		letter-spacing: 0.1em;
+		color: #666;
 		cursor: pointer;
-		transition: background-color 0.2s;
+		font-family: 'JetBrains Mono', monospace;
+		transition: all 0.2s;
 	}
 
-	.btn-create:hover,
-	.btn-create-full:hover {
-		background: #b91c1c;
+	.header-btn:hover {
+		border-color: #000;
+		color: #000;
 	}
 
-	.btn-create-full {
-		background: #333;
+	.header-btn.primary {
+		background: #000;
+		border-color: #000;
+		color: #fff;
 	}
 
-	.btn-create-full:hover {
-		background: #444;
+	.header-btn.primary:hover {
+		background: #222;
+	}
+
+	/* Content Layout */
+	.yorha-content {
+		display: grid;
+		grid-template-columns: 250px 1fr;
+		min-height: calc(100vh - 65px);
+	}
+
+	/* Sidebar */
+	.yorha-sidebar {
+		background: #fff;
+		border-right: 1px solid #e0e0e0;
+		padding: 1.5rem 0;
+	}
+
+	.sidebar-section {
+		margin-bottom: 2rem;
+		padding: 0 1rem;
+	}
+
+	.sidebar-title {
+		font-size: 0.7rem;
+		font-weight: 700;
+		letter-spacing: 0.15em;
+		color: #999;
+		margin-bottom: 1rem;
+	}
+
+	.sidebar-menu {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	.menu-item {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		background: transparent;
+		border: none;
+		padding: 0.75rem 1rem;
+		font-size: 0.75rem;
+		font-weight: 500;
+		color: #666;
+		cursor: pointer;
+		font-family: 'JetBrains Mono', monospace;
+		text-align: left;
+		transition: all 0.2s;
+	}
+
+	.menu-item:hover {
+		background: #f5f5f5;
+		color: #000;
+	}
+
+	.menu-item.active {
+		background: #f0f0f0;
+		color: #000;
+		border-left: 3px solid #000;
+	}
+
+	.stats-compact {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.stat-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		font-size: 0.75rem;
+	}
+
+	.stat-label {
+		color: #999;
+	}
+
+	.stat-value {
+		font-weight: 600;
+		color: #000;
+	}
+
+	.stat-value.highlight {
+		color: #3b82f6;
+	}
+
+	.stat-value.danger {
+		color: #ef4444;
+	}
+
+	/* Main Content */
+	.yorha-main {
+		padding: 2rem;
+		max-width: 1400px;
 	}
 
 	.error-banner {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
 		padding: 1rem;
-		background: #7f1d1d;
-		border: 1px solid #dc2626;
-		border-radius: 0.375rem;
-		color: #fecaca;
+		background: #fef2f2;
+		border: 1px solid #fecaca;
+		border-radius: 4px;
+		color: #dc2626;
 		margin-bottom: 1.5rem;
+		font-size: 0.85rem;
 	}
 
-	.filters {
+	/* Filters */
+	.filter-section {
+		margin-bottom: 2rem;
+	}
+
+	.search-group {
 		display: flex;
 		gap: 1rem;
-		margin-bottom: 2rem;
-		flex-wrap: wrap;
+		margin-bottom: 1rem;
 	}
 
-	.search-input,
-	.filter-select {
-		padding: 0.75rem;
-		background: #1a1a2e;
-		border: 1px solid #333;
-		border-radius: 0.375rem;
-		color: #ffffff;
-		font-size: 0.875rem;
-	}
-
-	.search-input {
+	.yorha-input {
 		flex: 1;
-		min-width: 200px;
+		padding: 0.75rem 1rem;
+		border: 1px solid #e0e0e0;
+		border-radius: 4px;
+		font-size: 0.85rem;
+		font-family: 'JetBrains Mono', monospace;
+		transition: all 0.2s;
 	}
 
-	.search-input:focus,
-	.filter-select:focus {
+	.yorha-input:focus {
 		outline: none;
-		border-color: #dc2626;
+		border-color: #000;
 	}
 
+	.filter-btn {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.75rem 1rem;
+		background: #fff;
+		border: 1px solid #e0e0e0;
+		border-radius: 4px;
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.05em;
+		color: #666;
+		cursor: pointer;
+		font-family: 'JetBrains Mono', monospace;
+		transition: all 0.2s;
+	}
+
+	.filter-btn:hover {
+		border-color: #000;
+		color: #000;
+	}
+
+	.filter-row {
+		display: flex;
+		gap: 1rem;
+		align-items: center;
+	}
+
+	.yorha-select {
+		padding: 0.75rem 1rem;
+		border: 1px solid #e0e0e0;
+		border-radius: 4px;
+		font-size: 0.85rem;
+		font-family: 'JetBrains Mono', monospace;
+		background: #fff;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.yorha-select:focus {
+		outline: none;
+		border-color: #000;
+	}
+
+	.view-toggle {
+		display: flex;
+		border: 1px solid #e0e0e0;
+		border-radius: 4px;
+		overflow: hidden;
+		margin-left: auto;
+	}
+
+	.toggle-btn {
+		padding: 0.75rem 1.25rem;
+		background: #fff;
+		border: none;
+		border-right: 1px solid #e0e0e0;
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.05em;
+		color: #999;
+		cursor: pointer;
+		font-family: 'JetBrains Mono', monospace;
+		transition: all 0.2s;
+	}
+
+	.toggle-btn:last-child {
+		border-right: none;
+	}
+
+	.toggle-btn:hover {
+		background: #f5f5f5;
+		color: #666;
+	}
+
+	.toggle-btn.active {
+		background: #000;
+		color: #fff;
+	}
+
+	/* Empty State */
 	.empty-state {
 		text-align: center;
-		padding: 3rem;
-		color: #9ca3af;
+		padding: 4rem 2rem;
+		background: #fff;
+		border-radius: 8px;
+		border: 1px solid #e0e0e0;
 	}
 
-	.empty-state .btn-primary {
-		margin-top: 1rem;
+	.empty-icon {
+		font-size: 3rem;
+		color: #e0e0e0;
+		margin-bottom: 1rem;
+	}
+
+	.empty-title {
+		font-size: 1rem;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		color: #666;
+		margin: 0 0 0.5rem 0;
+	}
+
+	.empty-subtitle {
+		font-size: 0.85rem;
+		color: #999;
+		margin: 0 0 1.5rem 0;
+	}
+
+	.btn-yorha {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
 		padding: 0.75rem 1.5rem;
-		background: #dc2626;
-		color: #ffffff;
+		background: #fff;
+		border: 1px solid #e0e0e0;
+		border-radius: 4px;
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		color: #666;
 		text-decoration: none;
-		border-radius: 0.375rem;
-		display: inline-block;
+		cursor: pointer;
+		font-family: 'JetBrains Mono', monospace;
+		transition: all 0.2s;
 	}
 
+	.btn-yorha:hover {
+		border-color: #000;
+		color: #000;
+	}
+
+	.btn-yorha.primary {
+		background: #000;
+		border-color: #000;
+		color: #fff;
+	}
+
+	.btn-yorha.primary:hover {
+		background: #222;
+	}
+
+	/* POI Grid */
 	.poi-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
 		gap: 1.5rem;
 	}
 
 	.poi-card {
-		display: flex;
-		flex-direction: column;
-		background: #1a1a2e;
-		border: 1px solid #333;
-		border-radius: 0.5rem;
-		padding: 1.5rem;
-		text-decoration: none;
-		color: inherit;
+		background: #fff;
+		border: 1px solid #e0e0e0;
+		border-radius: 8px;
+		overflow: hidden;
 		transition: all 0.2s;
 	}
 
 	.poi-card:hover {
-		border-color: #dc2626;
-		box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+		border-color: #ccc;
 	}
 
 	.card-header {
-		margin-bottom: 1rem;
-	}
-
-	.card-header h3 {
-		color: #ffffff;
-		margin: 0 0 0.5rem 0;
-		font-size: 1.125rem;
-	}
-
-	.badges {
 		display: flex;
-		gap: 0.5rem;
-		flex-wrap: wrap;
+		align-items: center;
+		gap: 1rem;
+		padding: 1.5rem;
+		border-bottom: 1px solid #f5f5f5;
 	}
 
-	.badge {
-		padding: 0.25rem 0.75rem;
-		border-radius: 0.25rem;
-		font-size: 0.75rem;
+	.card-photo {
+		width: 60px;
+		height: 60px;
+		background: #f5f5f5;
+		border: 2px solid #e0e0e0;
+		border-radius: 4px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 1.5rem;
+		color: #999;
+	}
+
+	.card-info {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.card-name {
+		font-size: 1rem;
 		font-weight: 600;
-		color: #ffffff;
-		text-transform: capitalize;
+		color: #000;
+		margin: 0 0 0.25rem 0;
+		letter-spacing: 0.05em;
+	}
+
+	.card-status {
+		font-size: 0.7rem;
+		color: #999;
+		margin: 0;
+		letter-spacing: 0.1em;
+	}
+
+	.card-threat {
+		display: flex;
+		align-items: center;
+	}
+
+	.threat-badge {
+		padding: 0.375rem 0.75rem;
+		border-radius: 4px;
+		font-size: 0.65rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+	}
+
+	.threat-badge.threat-low {
+		background: #d1fae5;
+		color: #065f46;
+	}
+
+	.threat-badge.threat-medium {
+		background: #fef3c7;
+		color: #92400e;
+	}
+
+	.threat-badge.threat-high {
+		background: #fee2e2;
+		color: #991b1b;
+	}
+
+	.threat-badge.threat-critical {
+		background: #fecaca;
+		color: #7f1d1d;
 	}
 
 	.card-body {
-		flex: 1;
+		padding: 1.5rem;
+	}
+
+	.field-group {
 		margin-bottom: 1rem;
 	}
 
-	.card-body p {
-		margin: 0.5rem 0;
-		color: #d1d5db;
-		font-size: 0.875rem;
+	.field-group:last-child {
+		margin-bottom: 0;
 	}
 
-	.card-body .description {
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-	}
-
-	.card-body strong {
-		color: #ffffff;
-	}
-
-	.card-footer {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding-top: 1rem;
-		border-top: 1px solid #333;
-		font-size: 0.75rem;
-		color: #9ca3af;
-	}
-
-	.footer-right {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-	}
-
-	.btn-edit,
-	.btn-preview {
-		padding: 0.25rem 0.75rem;
-		background: #333;
-		color: #d1d5db;
-		border: 1px solid #555;
-		border-radius: 0.25rem;
+	.field-label {
+		display: block;
 		font-size: 0.7rem;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		color: #999;
+		margin-bottom: 0.25rem;
+	}
+
+	.field-value {
+		font-size: 0.85rem;
+		color: #333;
+		margin: 0;
+		line-height: 1.5;
+	}
+
+	.card-actions {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		border-top: 1px solid #f5f5f5;
+	}
+
+	.action-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		padding: 0.875rem;
+		background: #fff;
+		border: none;
+		border-right: 1px solid #f5f5f5;
+		font-size: 0.7rem;
+		font-weight: 600;
+		letter-spacing: 0.05em;
+		color: #666;
 		cursor: pointer;
+		font-family: 'JetBrains Mono', monospace;
+		text-decoration: none;
 		transition: all 0.2s;
 	}
 
-	.btn-edit:hover {
-		background: #dc2626;
-		border-color: #dc2626;
-		color: #ffffff;
+	.action-btn:last-child {
+		border-right: none;
 	}
 
-	.btn-preview:hover {
-		background: #3b82f6;
-		border-color: #3b82f6;
-		color: #ffffff;
+	.action-btn:hover {
+		background: #f5f5f5;
+		color: #000;
 	}
 
-	.threat-level {
+	.action-btn.primary {
+		background: #000;
+		color: #fff;
+	}
+
+	.action-btn.primary:hover {
+		background: #222;
+	}
+
+	/* Table */
+	.poi-table-wrapper {
+		background: #fff;
+		border: 1px solid #e0e0e0;
+		border-radius: 8px;
+		overflow: hidden;
+	}
+
+	.yorha-table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+
+	.yorha-table thead {
+		background: #f5f5f5;
+		border-bottom: 1px solid #e0e0e0;
+	}
+
+	.yorha-table th {
+		text-align: left;
+		padding: 1rem 1.5rem;
+		font-size: 0.7rem;
+		font-weight: 700;
+		letter-spacing: 0.15em;
+		color: #666;
+	}
+
+	.table-row {
+		border-bottom: 1px solid #f5f5f5;
+		transition: background 0.15s;
+	}
+
+	.table-row:hover {
+		background: #fafafa;
+	}
+
+	.yorha-table td {
+		padding: 1.25rem 1.5rem;
+		font-size: 0.85rem;
+	}
+
+	.name-cell {
+		font-weight: 500;
+	}
+
+	.name-link {
+		color: #000;
+		text-decoration: none;
+		transition: color 0.2s;
+	}
+
+	.name-link:hover {
+		color: #3b82f6;
+	}
+
+	.status-pill {
+		display: inline-block;
+		padding: 0.25rem 0.75rem;
+		border-radius: 12px;
+		font-size: 0.65rem;
 		font-weight: 600;
-		text-transform: capitalize;
+		letter-spacing: 0.1em;
+		color: #fff;
 	}
 
-	.editor-overlay {
+	.threat-pill {
+		display: inline-block;
+		padding: 0.25rem 0.75rem;
+		border-radius: 12px;
+		font-size: 0.65rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+	}
+
+	.threat-pill.threat-low {
+		background: #d1fae5;
+		color: #065f46;
+	}
+
+	.threat-pill.threat-medium {
+		background: #fef3c7;
+		color: #92400e;
+	}
+
+	.threat-pill.threat-high {
+		background: #fee2e2;
+		color: #991b1b;
+	}
+
+	.threat-pill.threat-critical {
+		background: #fecaca;
+		color: #7f1d1d;
+	}
+
+	.location-cell,
+	.date-cell {
+		color: #666;
+		font-size: 0.8rem;
+	}
+
+	.actions-cell {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	.icon-btn {
+		background: transparent;
+		border: none;
+		color: #999;
+		cursor: pointer;
+		padding: 0.25rem;
+		transition: color 0.2s;
+	}
+
+	.icon-btn:hover {
+		color: #000;
+	}
+
+	/* Modals */
+	.modal-overlay {
 		position: fixed;
 		top: 0;
 		left: 0;
 		right: 0;
 		bottom: 0;
-		background: rgba(0, 0, 0, 0.7);
+		background: rgba(0, 0, 0, 0.5);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		z-index: 50;
+		z-index: 1000;
 	}
 
-	.editor-container {
-		background: #1a1a2e;
-		border: 1px solid #333;
-		border-radius: 0.5rem;
-		padding: 1.5rem;
-		width: 90%;
+	.modal-content {
+		background: #fff;
+		border-radius: 8px;
+		padding: 2rem;
 		max-width: 600px;
+		width: 90%;
 		max-height: 90vh;
 		overflow-y: auto;
-	}
-
-	.view-toggle {
-		display: flex;
-		gap: 0.5rem;
-		margin-bottom: 1.5rem;
-	}
-
-	.toggle-btn {
-		padding: 0.5rem 1.25rem;
-		background: #1a1a2e;
-		border: 1px solid #333;
-		color: #9ca3af;
-		border-radius: 0.375rem;
-		cursor: pointer;
-		font-size: 0.8rem;
-		font-weight: 600;
-		transition: all 0.2s;
-	}
-
-	.toggle-btn:hover {
-		border-color: #dc2626;
-		color: #fff;
-	}
-
-	.toggle-btn.active {
-		background: #dc2626;
-		border-color: #dc2626;
-		color: #fff;
+		box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
 	}
 </style>

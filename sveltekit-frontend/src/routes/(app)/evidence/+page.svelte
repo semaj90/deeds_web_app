@@ -304,15 +304,25 @@
 	});
 </script>
 
-<div class="min-h-screen bg-panel">
-	<div class="max-w-7xl mx-auto px-4 py-8">
-		<!-- Header -->
-		<div class="flex items-center justify-between mb-8">
-			<div>
-				<h1 class="text-3xl font-bold text-sand">Evidence Gallery</h1>
-				<p class="text-sand/60 mt-1">{data.evidence?.length ?? 0} items{data.caseId ? ` for case` : ''}</p>
+<div class="evidence-management-page">
+	<!-- Professional Header -->
+	<div class="page-header-pro">
+		<div class="header-content">
+			<div class="header-left">
+				<div class="header-icon-wrapper">
+					<span class="header-icon">📁</span>
+				</div>
+				<div class="header-info">
+					<h1 class="page-title">EVIDENCE MANAGEMENT</h1>
+					<p class="page-subtitle">
+						{data.evidence?.length ?? 0} items
+						{#if data.caseId}
+							<span class="case-label">CASE #{data.caseId.slice(0, 8)}</span>
+						{/if}
+					</p>
+				</div>
 			</div>
-			<div class="flex gap-2">
+			<div class="header-actions-pro">
 				<button onclick={() => { crudMode = 'create'; crudEvidenceId = undefined; showCrudModal = true; }} class="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/80 transition text-sm font-medium">
 					+ Create with AI
 				</button>
@@ -1036,90 +1046,206 @@
 />
 
 <style>
+	/* Professional Evidence Management Page */
+	.evidence-management-page {
+		min-height: 100vh;
+		background: #f8f9fa;
+		font-family: 'JetBrains Mono', 'Courier New', monospace;
+	}
+
+	/* Professional Header */
+	.page-header-pro {
+		background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+		border-bottom: 2px solid #e5e7eb;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+	}
+
+	.header-content {
+		max-width: 1400px;
+		margin: 0 auto;
+		padding: 1.5rem 2rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.header-left {
+		display: flex;
+		align-items: center;
+		gap: 1.25rem;
+	}
+
+	.header-icon-wrapper {
+		width: 56px;
+		height: 56px;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		border-radius: 12px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+	}
+
+	.header-icon {
+		font-size: 2rem;
+	}
+
+	.header-info {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	.page-title {
+		font-size: 1.5rem;
+		font-weight: 700;
+		letter-spacing: 0.02em;
+		color: #1f2937;
+		margin: 0;
+	}
+
+	.page-subtitle {
+		font-size: 0.9rem;
+		color: #6b7280;
+		margin: 0;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.case-label {
+		display: inline-block;
+		padding: 0.25rem 0.625rem;
+		background: #f3f4f6;
+		border: 1px solid #d1d5db;
+		border-radius: 6px;
+		font-size: 0.7rem;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		color: #4b5563;
+	}
+
+	.header-actions-pro {
+		display: flex;
+		gap: 0.75rem;
+		flex-wrap: wrap;
+	}
+
+	/* Original Styling (Preserved) */
 	.ev-toolbar {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
 		gap: 1rem;
 		margin-bottom: 1.5rem;
+		padding: 1rem 2rem;
+		background: #fff;
+		border-bottom: 1px solid #e5e7eb;
 	}
 	.ev-toolbar input {
 		flex: 1;
 		min-width: 200px;
+		padding: 0.625rem 1rem;
+		border: 1px solid #d1d5db;
+		border-radius: 8px;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 0.875rem;
+		transition: all 0.2s;
+	}
+	.ev-toolbar input:focus {
+		outline: none;
+		border-color: #667eea;
+		box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 	}
 	.ev-filter-bar {
 		display: flex;
-		gap: 6px;
+		gap: 0.5rem;
 	}
 	.ev-filter-btn {
-		padding: 0.375rem 0.75rem;
-		border-radius: 0.5rem;
-		font-size: 0.75rem;
-		font-weight: 500;
-		color: rgba(212, 199, 163, 0.8);
-		background: #2f2a22;
+		padding: 0.5rem 1rem;
+		border-radius: 8px;
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: #6b7280;
+		background: #f9fafb;
+		border: 1px solid #e5e7eb;
 		cursor: pointer;
-		transition: all 0.15s;
+		transition: all 0.2s;
+		letter-spacing: 0.02em;
 	}
 	.ev-filter-btn:hover {
-		background: rgba(212, 199, 163, 0.1);
+		background: #f3f4f6;
+		border-color: #d1d5db;
+		color: #374151;
 	}
 	.ev-filter-btn.active {
-		background: #38bdf8;
+		background: #667eea;
+		border-color: #667eea;
 		color: white;
+		box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
 	}
 	.ev-view-toggle {
 		display: flex;
-		gap: 1px;
-		border: 1px solid rgba(212, 199, 163, 0.2);
-		border-radius: 0.5rem;
+		gap: 0;
+		border: 1px solid #e5e7eb;
+		border-radius: 8px;
 		overflow: hidden;
 	}
 	.ev-view-btn {
-		padding: 0.375rem 0.5rem;
+		padding: 0.5rem 1rem;
 		font-size: 0.75rem;
-		color: rgba(212, 199, 163, 0.6);
-		background: #2f2a22;
+		font-weight: 600;
+		color: #9ca3af;
+		background: #fff;
+		border-right: 1px solid #e5e7eb;
 		cursor: pointer;
-		transition: all 0.15s;
+		transition: all 0.2s;
+	}
+	.ev-view-btn:last-child {
+		border-right: none;
 	}
 	.ev-view-btn:hover {
-		background: rgba(212, 199, 163, 0.1);
+		background: #f9fafb;
+		color: #6b7280;
 	}
 	.ev-view-btn.active {
-		background: rgba(212, 199, 163, 0.2);
-		color: #d4c7a3;
+		background: #f3f4f6;
+		color: #667eea;
 	}
 	.ev-score {
 		flex-shrink: 0;
-		padding: 0.125rem 0.5rem;
-		border-radius: 9999px;
-		font-size: 0.625rem;
-		font-weight: 600;
+		padding: 0.25rem 0.625rem;
+		border-radius: 12px;
+		font-size: 0.7rem;
+		font-weight: 700;
+		letter-spacing: 0.05em;
 	}
 	.ev-score.high {
-		background: rgba(72, 187, 120, 0.15);
-		color: #48bb78;
+		background: #d1fae5;
+		color: #065f46;
 	}
 	.ev-score.medium {
-		background: rgba(236, 201, 75, 0.15);
-		color: #ecc94b;
+		background: #fef3c7;
+		color: #92400e;
 	}
 	.ev-score.low {
-		background: rgba(245, 101, 101, 0.15);
-		color: #f56565;
+		background: #fee2e2;
+		color: #991b1b;
 	}
 	.ev-map-toggle {
-		padding: 0.5rem 1rem;
-		background: rgba(59, 130, 246, 0.12);
-		border: 1px solid rgba(59, 130, 246, 0.4);
-		color: #60a5fa;
-		border-radius: 0.375rem;
+		padding: 0.625rem 1.25rem;
+		background: #f0f9ff;
+		border: 1px solid #bfdbfe;
+		color: #1e40af;
+		border-radius: 8px;
 		cursor: pointer;
 		font-size: 0.85rem;
-		transition: all 0.15s;
+		font-weight: 600;
+		letter-spacing: 0.02em;
+		transition: all 0.2s;
 	}
 	.ev-map-toggle:hover {
-		background: rgba(59, 130, 246, 0.2);
+		background: #dbeafe;
+		border-color: #93c5fd;
 	}
 </style>
