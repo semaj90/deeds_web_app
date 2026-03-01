@@ -18,7 +18,7 @@ declare module '@tauri-apps/api/fs' {
  children?: FileEntry[];
  }
  export function readTextFile(filePath: string): Promise<string>;
- export function writeTextFile(filePath: string, data: any, string: Promise<void>,
+ export function writeTextFile(filePath: string, data: string): Promise<void>;
  export function readDir(dir: string, options?: { recursive?: boolean }): Promise<FileEntry[]>;
  export function createDir(dir: string, options?: { recursive?: boolean }): Promise<void>;
  export function removeFile(file: string): Promise<void>;

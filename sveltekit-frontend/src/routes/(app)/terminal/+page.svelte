@@ -7,6 +7,8 @@
 	import { tick } from 'svelte';
 	import { page } from '$app/state';
 	import { browser } from '$app/environment';
+	import { ttsService } from '$lib/services/tts.js';
+	import { voiceCommands, COMMAND_PATTERNS } from '$lib/services/voice-commands.js';
 
 	// Chat session — tied to user via server-provided userId
 	let session = $state<ChatSession | null>(null);
@@ -17,6 +19,20 @@
 	// Track which message just completed streaming (for typewriter animation)
 	let lastCompletedIdx = $state<number | null>(null);
 
+	// Voice state
+	let enableVoice = $state(true);
+	let isListening = $state(false);
+	let speakingIdx = $state<number | null>(null);
+	let handsFreeEnabled = $state(false);
+	let ttsInitializing = $state(false);
+	let recognition: any = $state(null);
+	let sttSupported = $state(false);
+	let conversationState = $state<'idle' | 'listening' | 'processing' | 'ai-thinking' | 'ai-speaking'>('idle');
+
+	// Voice settings
+	let ttsVolume = $state(1.0);
+	let ttsRate = $state(1.0);
+
 	// localStorage preferences
 	let prefs = $state({
 		enableThinking: true,
@@ -24,14 +40,22 @@
 		autoScroll: true,
 		forceServer: false,
 		persona: 'neutral' as string,
-		enableWebSearch: false
+		enableWebSearch: false,
+		enableVoice: true,
+		ttsVolume: 1.0,
+		ttsRate: 1.0
 	});
 
 	// Initialize session and load prefs
 	$effect(() => {
 		try {
 			const saved = localStorage.getItem('terminal-prefs');
-			if (saved) Object.assign(prefs, JSON.parse(saved));
+			if (saved) {
+				Object.assign(prefs, JSON.parse(saved));
+				enableVoice = prefs.enableVoice ?? true;
+				ttsVolume = prefs.ttsVolume ?? 1.0;
+				ttsRate = prefs.ttsRate ?? 1.0;
+			}
 		} catch { /* localStorage unavailable */ }
 
 		const userId = page.data?.user?.id ?? 'anonymous';
@@ -45,8 +69,39 @@
 	// Persist prefs to localStorage
 	$effect(() => {
 		try {
+			prefs.enableVoice = enableVoice;
+			prefs.ttsVolume = ttsVolume;
+			prefs.ttsRate = ttsRate;
 			localStorage.setItem('terminal-prefs', JSON.stringify(prefs));
 		} catch { /* localStorage unavailable */ }
+	});
+
+	// Initialize voice services
+	$effect(() => {
+		if (!browser) return;
+
+		// Check STT support
+		sttSupported = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+
+		// Register voice commands
+		voiceCommands.register({
+			pattern: COMMAND_PATTERNS.SEND,
+			action: () => sendMessage(),
+			label: 'Send message',
+			category: 'control'
+		});
+		voiceCommands.register({
+			pattern: COMMAND_PATTERNS.CLEAR,
+			action: () => clearChat(),
+			label: 'Clear chat',
+			category: 'control'
+		});
+		voiceCommands.register({
+			pattern: COMMAND_PATTERNS.STOP_SPEAKING,
+			action: () => stopSpeaking(),
+			label: 'Stop speaking',
+			category: 'tts'
+		});
 	});
 
 	// Auto-scroll on new messages
@@ -80,7 +135,25 @@
 		const msg = currentMessage.trim();
 		currentMessage = '';
 		lastCompletedIdx = null;
+
+		// Set conversation state
+		if (handsFreeEnabled) {
+			conversationState = 'ai-thinking';
+		}
+
 		await session.sendMessage(msg, { forceServer: prefs.forceServer });
+
+		// In hands-free mode, speak the AI response after it arrives
+		if (handsFreeEnabled && session.messages.length > 0) {
+			const lastMsg = session.messages[session.messages.length - 1];
+			if (lastMsg.role === 'assistant') {
+				// Wait for typewriter to complete if enabled
+				const delay = prefs.enableThinking ? (lastMsg.content.length * prefs.typewriterSpeed) + 500 : 300;
+				setTimeout(() => {
+					speakMessage(lastMsg.content, session.messages.length - 1);
+				}, delay);
+			}
+		}
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -136,6 +209,153 @@
 	function useSamplePrompt(text: string) {
 		currentMessage = text;
 	}
+
+	// ===== Voice Functions =====
+
+	// TTS: Speak a message
+	async function speakMessage(text: string, idx: number) {
+		if (!enableVoice || !browser) return;
+
+		// If already speaking this message, stop it
+		if (speakingIdx === idx) {
+			stopSpeaking();
+			return;
+		}
+
+		try {
+			ttsInitializing = true;
+			speakingIdx = idx;
+			conversationState = 'ai-speaking';
+
+			await ttsService.speak(text, { rate: ttsRate, volume: ttsVolume });
+
+			speakingIdx = null;
+			if (handsFreeEnabled) {
+				// After AI speaks, start listening again
+				conversationState = 'idle';
+				setTimeout(() => startListening(), 300);
+			} else {
+				conversationState = 'idle';
+			}
+		} catch (err) {
+			console.error('[Terminal] TTS error:', err);
+			speakingIdx = null;
+			conversationState = 'idle';
+		} finally {
+			ttsInitializing = false;
+		}
+	}
+
+	// TTS: Stop speaking
+	function stopSpeaking() {
+		ttsService.stop();
+		speakingIdx = null;
+		conversationState = 'idle';
+	}
+
+	// STT: Start listening
+	function startListening() {
+		if (!sttSupported || !enableVoice || !browser) return;
+
+		if (isListening) {
+			stopListening();
+			return;
+		}
+
+		try {
+			const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+			recognition = new SpeechRecognition();
+			recognition.continuous = false;
+			recognition.interimResults = false;
+			recognition.lang = 'en-US';
+
+			recognition.onstart = () => {
+				isListening = true;
+				conversationState = 'listening';
+			};
+
+			recognition.onresult = async (event: any) => {
+				const transcript = event.results[0][0].transcript;
+				console.log('[Terminal] STT transcript:', transcript);
+
+				conversationState = 'processing';
+
+				// Check for voice commands
+				const isCommand = await voiceCommands.execute(transcript);
+				if (isCommand) {
+					console.log('[Terminal] Voice command executed');
+					stopListening();
+					return;
+				}
+
+				// Add to text input
+				currentMessage = transcript;
+				stopListening();
+
+				// In hands-free mode, auto-send
+				if (handsFreeEnabled) {
+					conversationState = 'ai-thinking';
+					await sendMessage();
+				} else {
+					conversationState = 'idle';
+				}
+			};
+
+			recognition.onerror = (event: any) => {
+				console.error('[Terminal] STT error:', event.error);
+				stopListening();
+			};
+
+			recognition.onend = () => {
+				if (isListening) {
+					isListening = false;
+					if (conversationState === 'listening') {
+						conversationState = 'idle';
+					}
+				}
+			};
+
+			recognition.start();
+		} catch (err) {
+			console.error('[Terminal] Failed to start STT:', err);
+			isListening = false;
+			conversationState = 'idle';
+		}
+	}
+
+	// STT: Stop listening
+	function stopListening() {
+		if (recognition) {
+			try {
+				recognition.stop();
+			} catch { /* already stopped */ }
+		}
+		isListening = false;
+		if (conversationState === 'listening' || conversationState === 'processing') {
+			conversationState = 'idle';
+		}
+	}
+
+	// Toggle hands-free mode
+	function toggleHandsFree() {
+		handsFreeEnabled = !handsFreeEnabled;
+		if (handsFreeEnabled) {
+			startListening();
+		} else {
+			stopListening();
+			stopSpeaking();
+			conversationState = 'idle';
+		}
+	}
+
+	// Conversation state labels for UI
+	const stateLabels: Record<typeof conversationState, string> = {
+		idle: 'IDLE',
+		listening: 'LISTENING...',
+		processing: 'PROCESSING...',
+		'ai-thinking': 'AI ANALYZING...',
+		'ai-speaking': 'AI SPEAKING...'
+	};
 </script>
 
 <div class="flex flex-col h-screen font-mono bg-[#0c0a09] text-stone-200">
@@ -157,6 +377,24 @@
 		</div>
 
 		<div class="flex items-center gap-3">
+			{#if enableVoice && sttSupported}
+				<button
+					onclick={toggleHandsFree}
+					class="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-mono tracking-wider border transition-colors"
+					class:border-red-500={handsFreeEnabled}
+					class:bg-red-950={handsFreeEnabled}
+					class:text-red-400={handsFreeEnabled}
+					class:border-stone-600={!handsFreeEnabled}
+					class:text-stone-400={!handsFreeEnabled}
+					title={handsFreeEnabled ? 'Disable hands-free mode' : 'Enable hands-free mode'}
+				>
+					<Icon name={handsFreeEnabled ? 'radio' : 'headphones'} size={14} />
+					{handsFreeEnabled ? '🔴 LIVE' : '🎧 VOICE'}
+					{#if handsFreeEnabled}
+						<span class="text-[10px] opacity-70">({stateLabels[conversationState]})</span>
+					{/if}
+				</button>
+			{/if}
 			<button
 				class="px-3 py-1.5 rounded text-xs font-mono tracking-wider border border-stone-600 text-stone-400 bg-transparent hover:border-emerald-600 hover:text-emerald-400 transition-colors"
 			>TERMINAL</button>
@@ -233,6 +471,25 @@
 					<option value="academic">Academic / Research</option>
 				</select>
 			</label>
+			<div class="w-px h-6 bg-stone-700"></div>
+			<label class="flex items-center gap-1.5 cursor-pointer">
+				<input type="checkbox" bind:checked={enableVoice} style:accent-color="#fbbf24" />
+				<Icon name="volume-2" size={14} class="text-amber-400" />
+				Voice enabled
+			</label>
+			{#if enableVoice}
+				<label class="flex items-center gap-1.5 cursor-pointer">
+					TTS Volume
+					<input type="range" min="0" max="1" step="0.1" bind:value={ttsVolume} class="w-20" style:accent-color="#fbbf24" />
+					<span>{Math.round(ttsVolume * 100)}%</span>
+				</label>
+				<label class="flex items-center gap-1.5 cursor-pointer">
+					TTS Speed
+					<input type="range" min="0.5" max="2" step="0.1" bind:value={ttsRate} class="w-20" style:accent-color="#fbbf24" />
+					<span>{ttsRate.toFixed(1)}x</span>
+				</label>
+			{/if}
+			<div class="w-px h-6 bg-stone-700"></div>
 			<Button onclick={clearChat} class="text-xs px-2 py-1">
 				<Icon name="trash-2" size={14} />
 				Clear chat
@@ -305,6 +562,22 @@
 								>
 									<Icon name={copiedIdx === idx ? 'check' : 'copy'} size={12} />
 								</button>
+								{#if msg.role === 'assistant' && enableVoice}
+									<button
+										class="p-0.5 rounded bg-transparent border-none text-stone-600 hover:text-amber-400 cursor-pointer transition-colors"
+										onclick={() => speakMessage(msg.content, idx)}
+										title={speakingIdx === idx ? 'Stop speaking' : 'Speak response'}
+										disabled={ttsInitializing}
+									>
+										{#if ttsInitializing && speakingIdx === idx}
+											<Icon name="loader-2" size={12} class="animate-spin" />
+										{:else if speakingIdx === idx}
+											<Icon name="volume-x" size={12} />
+										{:else}
+											<Icon name="volume-2" size={12} />
+										{/if}
+									</button>
+								{/if}
 							</div>
 
 							<div
@@ -376,6 +649,20 @@
 	<!-- Input Area -->
 	<footer class="px-6 py-5 bg-[#1c1917] border-t border-stone-800 shrink-0">
 		<div class="flex gap-3 max-w-[1200px] mx-auto items-end">
+			{#if enableVoice && sttSupported}
+				<button
+					onclick={startListening}
+					disabled={!session || session.status === 'thinking' || handsFreeEnabled}
+					class="{isListening ? 'bg-red-600 hover:bg-red-700 border-red-500' : 'bg-stone-800 hover:bg-stone-700 border-stone-600'} h-12 w-12 shrink-0 rounded-lg flex items-center justify-center border transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+					title={isListening ? 'Listening... (click to stop)' : 'Start voice input'}
+				>
+					{#if isListening}
+						<Icon name="mic" size={20} class="text-white animate-pulse" />
+					{:else}
+						<Icon name="mic" size={20} class="text-stone-300" />
+					{/if}
+				</button>
+			{/if}
 			<textarea
 				placeholder="Ask 9S about your investigation..."
 				bind:value={currentMessage}
