@@ -8,6 +8,8 @@
 	import type { PageData } from './$types';
 	import { goto } from '$app/navigation';
 	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
+	import YoRHaDetectiveCommandCenter from '$lib/components/yorha/YoRHaDetectiveCommandCenter.svelte';
+	import PhoenixProsecutorDashboard from '$lib/components/yorha/PhoenixProsecutorDashboard.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -133,4 +135,10 @@
 
 	<!-- CodebaseSearch (Ctrl/Cmd+K to open) -->
 	<CodebaseSearch />
+
+	<!-- YoRHa Detective Command Center -->
+	<YoRHaDetectiveCommandCenter currentUser={data.user} />
+
+	<!-- Phoenix Prosecutor Dashboard -->
+	<PhoenixProsecutorDashboard />
 </div>

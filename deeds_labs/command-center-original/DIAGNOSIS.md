@@ -22,6 +22,8 @@ Original 1,345-line command-center page rendered blank (tan/beige screen)
 | 3c | + SystemStatus (plain div scrolling) | ✅ PASS | **3 alerts rendering**, badge shows "1 WARNINGS", dismiss buttons work |
 | 4 | + QuickActions | ✅ PASS | **4 action buttons** (New Case, Upload Evidence, Global Search, Analytics) |
 | 5 | + CodebaseSearch | ✅ PASS | **Native `<dialog>` element**, no bits-ui, Ctrl/Cmd+K keyboard shortcut |
+| 6 | + YoRHaDetectiveCommandCenter | ✅ PASS | **YoRHa sidebar navigation**, 24KB component, no bits-ui, full theming |
+| 7 | + PhoenixProsecutorDashboard | ✅ PASS | **21KB component**, all 7 components rendering successfully |
 
 ## Root Cause Analysis
 
@@ -147,11 +149,22 @@ import { ScrollArea } from 'bits-ui';
 </div>
 ```
 
-## Status: FIXED ✅
+## Status: COMPLETE ✅ — All 7 Components Working
 
-**SystemStatus component** is now properly wired with required props. Ready to test Step 3b.
+**Command-center incremental rebuild SUCCESSFUL!**
 
-**Pattern for adding dashboard components**:
-1. Always check what props the component requires
-2. Define $state variables and handlers BEFORE importing component
-3. Test incrementally to catch undefined prop errors early
+### Final Working Components (7/7):
+1. ✅ Card/CardHeader/CardTitle/CardContent
+2. ✅ StatsCard (3 metric cards with trends)
+3. ✅ SystemStatus (fixed TDZ bug - plain div scrolling)
+4. ✅ QuickActions (4 action buttons with navigation)
+5. ✅ CodebaseSearch (native dialog, Ctrl/Cmd+K)
+6. ✅ YoRHaDetectiveCommandCenter (24KB, sidebar navigation, theming)
+7. ✅ PhoenixProsecutorDashboard (21KB, prosecutor features)
+
+### Key Lessons Learned:
+1. **bits-ui TDZ bug**: ScrollArea and Dialog both use `let props = $props()` which breaks in Svelte 5.46.0 SSR
+2. **Incremental testing**: Adding components one-by-one isolated the SystemStatus issue immediately
+3. **Native HTML > Libraries**: CodebaseSearch uses native `<dialog>` - zero SSR issues
+4. **YoRHa components**: Both large YoRHa components (24KB + 21KB) work perfectly - no bits-ui dependencies
+5. **Props are critical**: Always define required props before adding components
