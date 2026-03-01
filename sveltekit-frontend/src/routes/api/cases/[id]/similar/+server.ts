@@ -21,7 +21,7 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import db from '$lib/server/db/client.js';
+import { db } from '$lib/server/db/client.js';
 import { cases, evidence } from '$lib/server/db/schema-postgres.js';
 import { eq, sql, desc } from 'drizzle-orm';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
@@ -337,7 +337,10 @@ async function dualCaseSearch(
 			console.warn('[Case Similarity] Qdrant unavailable:', err instanceof Error ? err.message : err);
 			return [] as SimilarCase[];
 		}),
-		searchPgvectorCases(embedding, excludeCaseId, limit)
+		searchPgvectorCases(embedding, excludeCaseId, limit).catch((err) => {
+			console.warn('[Case Similarity] pgvector unavailable (table may not exist):', err instanceof Error ? err.message : err);
+			return [] as SimilarCase[];
+		})
 	]);
 
 	// Merge and deduplicate by caseId

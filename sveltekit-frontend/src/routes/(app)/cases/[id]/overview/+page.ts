@@ -1,6 +1,9 @@
 import { browser } from '$app/environment';
 import type { PageLoad } from './$types.js';
 
+// Disable SSR — bits-ui ScrollArea has TDZ bug with let props = $props()
+export const ssr = false;
+
 // Dynamically import cache service
 let cacheService: any = null;
 if (browser) {

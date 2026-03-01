@@ -231,6 +231,8 @@ CREATE INDEX idx_case_embeddings_vector ON case_embeddings
 <SimilarCasesPanel caseId={currentCaseId} limit={5} class="h-96" />
 ```
 
+**Wired to**: `/cases/[id]/overview` — Full-width section below narrative/stats grid, shows 5 similar cases with multi-modal ranking explanation
+
 ---
 
 ## Integration Points
@@ -298,6 +300,7 @@ CREATE INDEX idx_case_embeddings_vector ON case_embeddings
 
 | File | Changes |
 |------|---------|
+| `src/routes/(app)/cases/[id]/overview/+page.svelte` | Added SimilarCasesPanel import, new full-width section with 5 similar cases |
 | `memory/MEMORY.md` | Added Session 93r28c entry, updated Current Status |
 
 ---

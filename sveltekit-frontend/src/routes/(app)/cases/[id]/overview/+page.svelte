@@ -3,6 +3,7 @@
 	import type { PageData } from './$types';
 	import LegalDocumentDrafting from '$lib/components/ai/LegalDocumentDrafting.svelte';
 	import EvidenceManager from '$lib/components/evidence/EvidenceManager.svelte';
+	import SimilarCasesPanel from '$lib/components/legal/SimilarCasesPanel.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 
 	type TabId = 'overview' | 'evidence' | 'persons' | 'ai' | 'reports';
@@ -247,6 +248,25 @@
 					</p>
 				</div>
 			</section>
+
+			<!-- Similar Cases Section -->
+			{#if data.caseData?.id || data.caseId}
+				<section class="rounded-xl border border-neutral-800 bg-neutral-900/70 overflow-hidden">
+					<div class="px-4 py-3 border-b border-neutral-800">
+						<h2 class="text-sm font-semibold text-neutral-100">Similar Cases</h2>
+						<p class="text-xs text-neutral-400 mt-1">
+							AI-powered similarity analysis using multi-modal ranking (vector, tags, topics, graph, user preferences)
+						</p>
+					</div>
+					<div class="p-4">
+						<SimilarCasesPanel
+							caseId={data.caseData?.id ?? data.caseId}
+							limit={5}
+							class="h-[500px]"
+						/>
+					</div>
+				</section>
+			{/if}
 		{:else if activeTab === 'evidence'}
 			<section class="rounded-xl border border-neutral-800 bg-neutral-900/70 p-4">
 				<h2 class="text-sm font-semibold mb-3">Evidence</h2>

@@ -1,8 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db/client';
-import { cases, evidence } from '$lib/server/db/schema';
-import { personsOfInterest } from '$lib/db/schema';
+import { cases, evidence, personsOfInterest } from '$lib/server/db/schema-postgres.js';
 import { arrayContains, eq } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
@@ -38,7 +37,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		),
 		safe(
 			db.select().from(personsOfInterest)
-				.where(arrayContains(personsOfInterest.caseIds, [caseId]))
+				.where(arrayContains(personsOfInterest.cases, [caseId]))
 				.limit(20),
 			[]
 		)
@@ -76,7 +75,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		})),
 		persons: personRows.map((p) => ({
 			name: p.name ?? 'Unknown',
-			role: p.relationship ?? 'Person of interest',
+			role: p.status ?? 'Person of interest',
 			riskScore: p.threatLevel ?? '—'
 		})),
 		loadError: null
