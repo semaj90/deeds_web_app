@@ -20,6 +20,7 @@ const QUICK_ROUTES = [
   { name: 'evidence', path: '/evidence' },
   { name: 'persons-of-interest', path: '/persons-of-interest/fake-id' },
   { name: 'cases-overview', path: '/cases/test-id/overview' },
+  { name: 'cases-board', path: '/cases/test-id/board' },
   { name: 'agentic-errors-analysis', path: '/agentic-errors/analysis' },
   { name: 'cases-list', path: '/cases' },
   { name: 'dashboard', path: '/dashboard' },
@@ -50,6 +51,9 @@ const SSE_PAGES = new Set(['all-routes', 'cases-overview', 'dashboard', 'command
 
 // CSR-only pages (ssr = false) need extra wait for client JS to render
 const CSR_PAGES = new Set(['evidence-library', 'evidence', 'ai-dashboard', 'terminal']);
+
+// Pages with complex canvas/WebGL rendering need extra initialization time
+const CANVAS_PAGES = new Set(['cases-board']);
 
 // ── CLI args ───────────────────────────────────────────────────────
 const args = process.argv.slice(2);
@@ -96,6 +100,11 @@ for (const route of routes) {
     // CSR-only pages (ssr=false) need extra wait for client JS bundle to render
     if (CSR_PAGES.has(route.name)) {
       await tab.waitForTimeout(3000);
+    }
+
+    // Canvas/WebGL pages need extra time for canvas initialization
+    if (CANVAS_PAGES.has(route.name)) {
+      await tab.waitForTimeout(2000);
     }
 
     result.status = response?.status() ?? 0;

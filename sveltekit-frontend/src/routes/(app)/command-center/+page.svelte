@@ -3,9 +3,10 @@
 	import CardContent from '$lib/components/ui/card/CardContent.svelte';
 	import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
 	import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
-	import { StatsCard, SystemStatus } from '$lib/components/dashboard';
-	import type { Alert } from '$lib/components/dashboard';
+	import { StatsCard, SystemStatus, QuickActions } from '$lib/components/dashboard';
+	import type { Alert, QuickAction } from '$lib/components/dashboard';
 	import type { PageData } from './$types';
+	import { goto } from '$app/navigation';
 
 	let { data }: { data: PageData } = $props();
 
@@ -45,6 +46,42 @@
 			systemAlerts = [...systemAlerts]; // Trigger reactivity
 		}
 	}
+
+	// Quick actions for QuickActions component
+	let quickActions: QuickAction[] = [
+		{
+			id: 'new-case',
+			icon: 'gavel',
+			label: 'New Case',
+			description: 'Create a new legal case',
+			variant: 'primary',
+			onClick: () => goto('/cases')
+		},
+		{
+			id: 'upload-evidence',
+			icon: 'upload',
+			label: 'Upload Evidence',
+			description: 'Add evidence to existing cases',
+			variant: 'success',
+			onClick: () => goto('/evidence')
+		},
+		{
+			id: 'search',
+			icon: 'search',
+			label: 'Global Search',
+			description: 'Search across all cases and evidence',
+			variant: 'default',
+			onClick: () => goto('/global-search')
+		},
+		{
+			id: 'analytics',
+			icon: 'bar-chart-2',
+			label: 'Analytics',
+			description: 'View case statistics and trends',
+			variant: 'default',
+			onClick: () => goto('/dashboard')
+		}
+	];
 </script>
 
 <svelte:head>
@@ -81,13 +118,15 @@
 		/>
 	</div>
 
-	<!-- User Info Card -->
-	<div style="margin-top: 1rem;">
+	<!-- User Info + Quick Actions Grid -->
+	<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem;">
 		<Card>
 			<CardHeader><CardTitle style="color: white;">User</CardTitle></CardHeader>
 			<CardContent>
 				<p style="color: #e0e0e0;">{data.user ? data.user.email : 'No user'}</p>
 			</CardContent>
 		</Card>
+
+		<QuickActions actions={quickActions} title="Quick Actions" layout="grid" compact={true} />
 	</div>
 </div>

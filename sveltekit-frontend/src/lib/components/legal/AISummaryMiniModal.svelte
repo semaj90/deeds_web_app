@@ -123,14 +123,14 @@
 
 			<!-- Content -->
 			<div class="p-6 max-h-[60vh] overflow-y-auto">
-				{#if state === 'loading'}
+				{#if summaryState === 'loading'}
 					<div class="flex items-center justify-center py-12">
 						<div class="flex flex-col items-center gap-4">
 							<div class="w-8 h-8 border-4 border-info/20 border-t-info rounded-full animate-spin"></div>
 							<p class="text-sand/60">Generating AI summary with ACE context...</p>
 						</div>
 					</div>
-				{:else if state === 'error'}
+				{:else if summaryState === 'error'}
 					<div class="bg-danger/5 border border-danger/20 rounded-lg p-4" in:fade>
 						<div class="flex items-center gap-3 mb-3">
 							<div class="text-danger text-xl">!</div>
@@ -146,7 +146,7 @@
 							Retry
 						</button>
 					</div>
-				{:else if state === 'ready'}
+				{:else if summaryState === 'ready'}
 					<div class="space-y-4">
 						<!-- Executive Summary -->
 						{#if summary}
@@ -236,7 +236,7 @@
 					>
 						Close
 					</button>
-					{#if state === 'ready'}
+					{#if summaryState === 'ready'}
 						<button
 							onclick={retry}
 							class="px-4 py-2 bg-info text-white rounded-md hover:bg-info/80 transition-colors text-sm flex items-center gap-2"
