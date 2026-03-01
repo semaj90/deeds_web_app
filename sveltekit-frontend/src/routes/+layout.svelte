@@ -78,10 +78,20 @@
 {/if}
 
 <style>
+    :global(body) {
+        background: #d4c9a9;
+        color: #0f0f0f;
+        font-family: 'JetBrains Mono', 'Courier New', monospace;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+    }
+
     .app-shell {
         min-height: 100vh;
         padding-left: 210px; /* Sidebar width */
         transition: padding-left 0.3s ease;
+        background: #d4c9a9;
     }
 
     /* Adjust for collapsed sidebar */
@@ -93,12 +103,14 @@
         min-height: 100vh;
         display: flex;
         flex-direction: column;
+        background: #d4c9a9;
     }
 
     .content {
         flex: 1;
         padding: 2rem;
         max-width: 100%;
+        background: #d4c9a9;
     }
 
     .error-toast {
@@ -111,5 +123,92 @@
         border-radius: 4px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         z-index: 9999;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Global YoRHa styling for all child elements */
+    :global(*) {
+        box-sizing: border-box;
+    }
+
+    :global(h1, h2, h3, h4, h5, h6) {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: #0f0f0f;
+    }
+
+    :global(p, span, div) {
+        font-family: 'JetBrains Mono', monospace;
+        color: #0f0f0f;
+    }
+
+    /* Ensure panels and cards inherit the theme */
+    :global(.panel, .card, .container) {
+        background: #b8b5a8;
+        border: 2px solid #000;
+        color: #0f0f0f;
+    }
+
+    /* Input styling */
+    :global(input, textarea, select) {
+        background: #fff;
+        border: 1px solid #000;
+        color: #0f0f0f;
+        font-family: 'JetBrains Mono', monospace;
+        padding: 0.5rem;
+    }
+
+    :global(input:focus, textarea:focus, select:focus) {
+        outline: 2px solid #000;
+        outline-offset: 2px;
+    }
+
+    /* Button base styling */
+    :global(button) {
+        font-family: 'JetBrains Mono', monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border: 1px solid #000;
+        background: #b8b5a8;
+        color: #0f0f0f;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    :global(button:hover) {
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    /* Link styling */
+    :global(a) {
+        color: #0f0f0f;
+        text-decoration: underline;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    :global(a:hover) {
+        text-decoration: none;
+        opacity: 0.8;
+    }
+
+    /* Scrollbar styling */
+    :global(::-webkit-scrollbar) {
+        width: 8px;
+        height: 8px;
+    }
+
+    :global(::-webkit-scrollbar-track) {
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    :global(::-webkit-scrollbar-thumb) {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 4px;
+    }
+
+    :global(::-webkit-scrollbar-thumb:hover) {
+        background: rgba(0, 0, 0, 0.5);
     }
 </style>
