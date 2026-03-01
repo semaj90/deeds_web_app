@@ -79,22 +79,24 @@
 
 <style>
     :global(body) {
-        background: #d4c9a9;
-        color: #0f0f0f;
+        background: linear-gradient(135deg, #d4c9a9 0%, #c9bfa0 100%);
+        color: #1a1a1a;
         font-family: 'JetBrains Mono', 'Courier New', monospace;
         margin: 0;
         padding: 0;
         overflow-x: hidden;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
 
     .app-shell {
         min-height: 100vh;
-        padding-left: 210px; /* Sidebar width */
-        transition: padding-left 0.3s ease;
-        background: #d4c9a9;
+        padding-left: 210px;
+        transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: linear-gradient(135deg, #d4c9a9 0%, #c9bfa0 100%);
     }
 
-    /* Adjust for collapsed sidebar */
     :global(body:has(.yorha-sidebar.collapsed)) .app-shell {
         padding-left: 60px;
     }
@@ -103,112 +105,318 @@
         min-height: 100vh;
         display: flex;
         flex-direction: column;
-        background: #d4c9a9;
     }
 
     .content {
         flex: 1;
-        padding: 2rem;
+        padding: 2.5rem;
         max-width: 100%;
-        background: #d4c9a9;
     }
 
     .error-toast {
         position: fixed;
-        top: 1rem;
-        right: 1rem;
-        background: #ff4444;
+        top: 1.5rem;
+        right: 1.5rem;
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         color: white;
-        padding: 1rem;
-        border-radius: 4px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.1);
         z-index: 9999;
         font-family: 'JetBrains Mono', monospace;
+        font-size: 0.875rem;
+        font-weight: 500;
+        animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Global YoRHa styling for all child elements */
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(2rem);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    /* Global Professional Styling */
     :global(*) {
         box-sizing: border-box;
     }
 
-    :global(h1, h2, h3, h4, h5, h6) {
+    /* Typography Hierarchy */
+    :global(h1) {
         font-family: 'JetBrains Mono', monospace;
+        font-size: 2rem;
         font-weight: 700;
         letter-spacing: 0.05em;
         text-transform: uppercase;
-        color: #0f0f0f;
+        color: #1a1a1a;
+        margin: 0 0 1.5rem 0;
+        line-height: 1.2;
     }
 
-    :global(p, span, div) {
+    :global(h2) {
         font-family: 'JetBrains Mono', monospace;
-        color: #0f0f0f;
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: #1a1a1a;
+        margin: 0 0 1rem 0;
+        line-height: 1.3;
     }
 
-    /* Ensure panels and cards inherit the theme */
-    :global(.panel, .card, .container) {
-        background: #b8b5a8;
-        border: 2px solid #000;
-        color: #0f0f0f;
-    }
-
-    /* Input styling */
-    :global(input, textarea, select) {
-        background: #fff;
-        border: 1px solid #000;
-        color: #0f0f0f;
+    :global(h3) {
         font-family: 'JetBrains Mono', monospace;
-        padding: 0.5rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: #2a2a2a;
+        margin: 0 0 0.75rem 0;
+        line-height: 1.4;
     }
 
-    :global(input:focus, textarea:focus, select:focus) {
-        outline: 2px solid #000;
-        outline-offset: 2px;
+    :global(h4, h5, h6) {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: #2a2a2a;
+        margin: 0 0 0.5rem 0;
     }
 
-    /* Button base styling */
+    :global(p) {
+        font-family: 'JetBrains Mono', monospace;
+        color: #1a1a1a;
+        margin: 0 0 1rem 0;
+        line-height: 1.6;
+    }
+
+    /* Professional Panels & Cards */
+    :global(.panel),
+    :global(.card),
+    :global([class*="panel"]) {
+        background: linear-gradient(135deg, #e8e4d8 0%, #ddd9cd 100%);
+        border: 2px solid rgba(0, 0, 0, 0.15);
+        border-radius: 8px;
+        box-shadow:
+            0 4px 6px rgba(0, 0, 0, 0.1),
+            0 2px 4px rgba(0, 0, 0, 0.06),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        color: #1a1a1a;
+        padding: 1.5rem;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    :global(.panel:hover),
+    :global(.card:hover) {
+        box-shadow:
+            0 10px 15px rgba(0, 0, 0, 0.15),
+            0 4px 6px rgba(0, 0, 0, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        transform: translateY(-1px);
+    }
+
+    /* Professional Input Styling */
+    :global(input),
+    :global(textarea),
+    :global(select) {
+        background: #ffffff;
+        border: 2px solid rgba(0, 0, 0, 0.2);
+        border-radius: 6px;
+        color: #1a1a1a;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.875rem;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    :global(input:focus),
+    :global(textarea:focus),
+    :global(select:focus) {
+        outline: none;
+        border-color: #1a1a1a;
+        box-shadow:
+            0 0 0 3px rgba(26, 26, 26, 0.1),
+            inset 0 2px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    :global(input::placeholder),
+    :global(textarea::placeholder) {
+        color: rgba(26, 26, 26, 0.4);
+    }
+
+    /* Professional Button Styling */
     :global(button) {
         font-family: 'JetBrains Mono', monospace;
+        font-size: 0.8125rem;
+        font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        border: 1px solid #000;
-        background: #b8b5a8;
-        color: #0f0f0f;
+        border: 2px solid rgba(0, 0, 0, 0.2);
+        border-radius: 6px;
+        background: linear-gradient(135deg, #e8e4d8 0%, #ddd9cd 100%);
+        color: #1a1a1a;
+        padding: 0.75rem 1.5rem;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow:
+            0 2px 4px rgba(0, 0, 0, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
 
-    :global(button:hover) {
-        background: rgba(0, 0, 0, 0.1);
+    :global(button:hover:not(:disabled)) {
+        background: linear-gradient(135deg, #d4d0c4 0%, #c9c5b9 100%);
+        border-color: rgba(0, 0, 0, 0.3);
+        box-shadow:
+            0 4px 6px rgba(0, 0, 0, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        transform: translateY(-1px);
     }
 
-    /* Link styling */
+    :global(button:active:not(:disabled)) {
+        transform: translateY(0);
+        box-shadow:
+            0 1px 2px rgba(0, 0, 0, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    :global(button:disabled) {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Primary Button Variant */
+    :global(button.primary),
+    :global(button[class*="btn-primary"]) {
+        background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+        color: #ffffff;
+        border-color: rgba(0, 0, 0, 0.2);
+        font-weight: 700;
+    }
+
+    :global(button.primary:hover:not(:disabled)),
+    :global(button[class*="btn-primary"]:hover:not(:disabled)) {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        box-shadow:
+            0 6px 8px rgba(34, 197, 94, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    /* Link Styling */
     :global(a) {
-        color: #0f0f0f;
-        text-decoration: underline;
+        color: #1a1a1a;
+        text-decoration: none;
         font-family: 'JetBrains Mono', monospace;
+        font-weight: 500;
+        border-bottom: 2px solid rgba(26, 26, 26, 0.2);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     :global(a:hover) {
-        text-decoration: none;
+        border-bottom-color: #1a1a1a;
         opacity: 0.8;
     }
 
-    /* Scrollbar styling */
+    /* Professional Scrollbar */
     :global(::-webkit-scrollbar) {
-        width: 8px;
-        height: 8px;
+        width: 10px;
+        height: 10px;
     }
 
     :global(::-webkit-scrollbar-track) {
-        background: rgba(0, 0, 0, 0.1);
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 5px;
     }
 
     :global(::-webkit-scrollbar-thumb) {
-        background: rgba(0, 0, 0, 0.3);
-        border-radius: 4px;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.2) 100%);
+        border-radius: 5px;
+        border: 2px solid transparent;
+        background-clip: padding-box;
     }
 
     :global(::-webkit-scrollbar-thumb:hover) {
-        background: rgba(0, 0, 0, 0.5);
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.3) 100%);
+        background-clip: padding-box;
+    }
+
+    /* Table Styling */
+    :global(table) {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.875rem;
+    }
+
+    :global(th) {
+        background: linear-gradient(135deg, #d4d0c4 0%, #c9c5b9 100%);
+        color: #1a1a1a;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.75rem 1rem;
+        text-align: left;
+        border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+    }
+
+    :global(td) {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    :global(tr:hover) {
+        background: rgba(0, 0, 0, 0.02);
+    }
+
+    /* Badge/Tag Styling */
+    :global(.badge),
+    :global(.tag),
+    :global([class*="badge"]),
+    :global([class*="tag"]) {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        background: rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Loading/Spinner States */
+    :global(.loading) {
+        opacity: 0.6;
+        pointer-events: none;
+        animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 0.8; }
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .content {
+            padding: 1.5rem;
+        }
+
+        :global(h1) {
+            font-size: 1.5rem;
+        }
+
+        :global(h2) {
+            font-size: 1.25rem;
+        }
     }
 </style>
