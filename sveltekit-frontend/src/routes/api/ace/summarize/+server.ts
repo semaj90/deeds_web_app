@@ -1,0 +1,110 @@
+import { json, type RequestHandler } from '@sveltejs/kit';
+import { assembleACEContext, buildACEPrompt } from '$lib/server/ace/context-assembler.js';
+import { ENV } from '$lib/server/env.server.js';
+
+/**
+ * POST /api/ace/summarize
+ * Generate AI summary with full ACE context for evidence items
+ */
+export const POST: RequestHandler = async ({ request, locals }) => {
+	try {
+		const user = locals.user;
+		if (!user) {
+			return json({ error: 'Unauthorized' }, { status: 401 });
+		}
+
+		const body = await request.json();
+		const { evidenceId, caseId, content, title } = body;
+
+		if (!content && !evidenceId) {
+			return json({ error: 'Must provide either content or evidenceId' }, { status: 400 });
+		}
+
+		// Assemble full ACE context (7 parallel data sources)
+		const context = await assembleACEContext({
+			query: `Summarize this evidence: ${title || 'Evidence item'}`,
+			userId: user.id,
+			caseId,
+			conversationId: caseId ? `board-${caseId}` : undefined,
+			maxTokens: 2000
+		});
+
+		// Build the ACE prompt
+		const summaryPrompt = `${title ? `Evidence: "${title}"\n\n` : ''}${content ? `Content:\n${content.slice(0, 5000)}\n\n` : ''}Provide a concise legal summary with:
+1. Executive summary (2-3 sentences)
+2. Key legal insights (3-5 bullet points)
+3. Confidence assessment
+
+Format as JSON:
+{
+  "summary": "Executive summary text",
+  "keyInsights": ["Insight 1", "Insight 2", ...],
+  "confidence": 0.0-1.0
+}`;
+
+		const acePrompt = buildACEPrompt(context, summaryPrompt);
+
+		// Call Ollama with ACE-enhanced prompt
+		const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				model: 'gemma3-legal:latest',
+				prompt: `${acePrompt.systemPrompt}\n\n${summaryPrompt}`,
+				stream: false,
+				options: {
+					temperature: 0.3,
+					num_predict: 512
+				}
+			}),
+			signal: AbortSignal.timeout(30000)
+		});
+
+		if (!response.ok) {
+			throw new Error('Ollama request failed');
+		}
+
+		const data = await response.json();
+		const rawResponse = data.response || '';
+
+		// Try to extract JSON from response
+		let parsedSummary: any = null;
+		try {
+			// Look for JSON block in markdown
+			const jsonMatch = rawResponse.match(/```json\s*(\{[\s\S]*?\})\s*```/);
+			if (jsonMatch) {
+				parsedSummary = JSON.parse(jsonMatch[1]);
+			} else {
+				// Try direct parsing
+				parsedSummary = JSON.parse(rawResponse);
+			}
+		} catch {
+			// Fallback: treat whole response as summary
+			parsedSummary = {
+				summary: rawResponse.trim(),
+				keyInsights: [],
+				confidence: 0.7
+			};
+		}
+
+		// Return summary + ACE context metadata
+		return json({
+			summary: parsedSummary.summary || rawResponse,
+			keyInsights: parsedSummary.keyInsights || [],
+			confidence: parsedSummary.confidence || 0.75,
+			aceContext: {
+				caseContext: context.caseContext ? true : false,
+				ragChunks: context.ragChunks.length,
+				kagNeighbors: context.kagNeighbors.length,
+				entities: Object.values(context.entities).flat().length,
+				practiceArea: context.practiceTemplate ? true : false
+			}
+		});
+	} catch (e) {
+		console.error('[api/ace/summarize] Failed:', e);
+		return json(
+			{ error: e instanceof Error ? e.message : 'Internal server error' },
+			{ status: 500 }
+		);
+	}
+};

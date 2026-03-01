@@ -14,8 +14,6 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
-	import { ScrollArea } from 'bits-ui';
-	import { browser } from '$app/environment';
 
 	export type AlertType = 'info' | 'warning' | 'error' | 'success';
 
@@ -87,71 +85,40 @@
 		</div>
 	</div>
 
-	{#if browser}
-		<ScrollArea.Root type="hover" class="status-content" style="max-height: {maxHeight}">
-			<ScrollArea.Viewport class="status-viewport">
-				{#if visibleAlerts.length === 0}
-					<div class="no-alerts">
-						<Icon name="check-circle" class="no-alerts-icon" />
-						<p class="no-alerts-text">All systems operational</p>
-						<p class="no-alerts-subtext">No active alerts</p>
-					</div>
-				{:else}
-					<div class="alerts-list">
-						{#each visibleAlerts as alert (alert.id)}
-							<div class="alert-item {getAlertColor(alert.type)}">
-								<Icon name={getAlertIcon(alert.type)} class="alert-icon" />
-								<div class="alert-content">
-									<p class="alert-message">{alert.message}</p>
-									{#if showTimestamps}
-										<span class="alert-timestamp">{alert.timestamp}</span>
-									{/if}
-								</div>
-								{#if onDismiss}
-									<Button
-										variant="ghost"
-										size="sm"
-										onclick={() => handleDismiss(alert.id)}
-										class="alert-dismiss-btn"
-									>
-										<Icon name="x" class="dismiss-icon" />
-									</Button>
-								{/if}
-							</div>
-						{/each}
-					</div>
-				{/if}
-			</ScrollArea.Viewport>
-			<ScrollArea.Scrollbar orientation="vertical">
-				<ScrollArea.Thumb />
-			</ScrollArea.Scrollbar>
-		</ScrollArea.Root>
-	{:else}
-		<!-- SSR fallback: simple scrollable div -->
-		<div class="status-content status-viewport" style="max-height: {maxHeight}; overflow-y: auto;">
-			{#if visibleAlerts.length === 0}
-				<div class="no-alerts">
-					<Icon name="check-circle" class="no-alerts-icon" />
-					<p class="no-alerts-text">All systems operational</p>
-					<p class="no-alerts-subtext">No active alerts</p>
-				</div>
-			{:else}
-				<div class="alerts-list">
-					{#each visibleAlerts as alert (alert.id)}
-						<div class="alert-item {getAlertColor(alert.type)}">
-							<Icon name={getAlertIcon(alert.type)} class="alert-icon" />
-							<div class="alert-content">
-								<p class="alert-message">{alert.message}</p>
-								{#if showTimestamps}
-									<span class="alert-timestamp">{alert.timestamp}</span>
-								{/if}
-							</div>
+	<!-- Plain scrollable div - bits-ui ScrollArea has TDZ bug with Svelte 5.46.0 -->
+	<div class="status-content status-viewport" style="max-height: {maxHeight}; overflow-y: auto;">
+		{#if visibleAlerts.length === 0}
+			<div class="no-alerts">
+				<Icon name="check-circle" class="no-alerts-icon" />
+				<p class="no-alerts-text">All systems operational</p>
+				<p class="no-alerts-subtext">No active alerts</p>
+			</div>
+		{:else}
+			<div class="alerts-list">
+				{#each visibleAlerts as alert (alert.id)}
+					<div class="alert-item {getAlertColor(alert.type)}">
+						<Icon name={getAlertIcon(alert.type)} class="alert-icon" />
+						<div class="alert-content">
+							<p class="alert-message">{alert.message}</p>
+							{#if showTimestamps}
+								<span class="alert-timestamp">{alert.timestamp}</span>
+							{/if}
 						</div>
-					{/each}
-				</div>
-			{/if}
-		</div>
-	{/if}
+						{#if onDismiss}
+							<Button
+								variant="ghost"
+								size="sm"
+								onclick={() => handleDismiss(alert.id)}
+								class="alert-dismiss-btn"
+							>
+								<Icon name="x" class="dismiss-icon" />
+							</Button>
+						{/if}
+					</div>
+				{/each}
+			</div>
+		{/if}
+	</div>
 </div>
 
 <style>
@@ -234,6 +201,26 @@
 	.status-viewport {
 		height: 100%;
 		padding: 0.75rem;
+		scrollbar-width: thin;
+		scrollbar-color: var(--sand-8) var(--sand-4);
+	}
+
+	.status-viewport::-webkit-scrollbar {
+		width: 8px;
+	}
+
+	.status-viewport::-webkit-scrollbar-track {
+		background: var(--sand-4);
+		border-radius: 4px;
+	}
+
+	.status-viewport::-webkit-scrollbar-thumb {
+		background: var(--sand-8);
+		border-radius: 4px;
+	}
+
+	.status-viewport::-webkit-scrollbar-thumb:hover {
+		background: var(--sand-10);
 	}
 
 	.no-alerts {

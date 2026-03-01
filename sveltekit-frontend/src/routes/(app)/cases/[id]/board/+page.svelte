@@ -3,6 +3,7 @@
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { ChatSession } from '$lib/models/ChatSession.svelte.js';
 	import TypewriterResponse from '$lib/components/ai/TypewriterResponse.svelte';
+	import AISummaryMiniModal from '$lib/components/legal/AISummaryMiniModal.svelte';
 	import type { PageData } from './$types';
 	import { onMount } from 'svelte';
 
@@ -29,6 +30,11 @@
 	let chatContainer: HTMLElement | null = $state(null);
 	let isRecording = $state(false);
 	let mediaRecorder: MediaRecorder | null = null;
+
+	// AI Summary Modal
+	let showSummaryModal = $state(false);
+	let summaryEvidenceId = $state<string | null>(null);
+	let summaryEvidenceTitle = $state<string | null>(null);
 
 	onMount(() => {
 		// Initialize chat session with case context
@@ -683,6 +689,16 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 								<Icon name="clock" />
 								Timeline Suggestions
 							</button>
+							<button class="quick-btn" onclick={() => {
+								if (selectedEvidence) {
+									summaryEvidenceId = selectedEvidence.id;
+									summaryEvidenceTitle = selectedEvidence.title;
+									showSummaryModal = true;
+								}
+							}} disabled={!selectedEvidence}>
+								<Icon name="brain" />
+								Summarize Evidence
+							</button>
 						</div>
 					</div>
 				{:else}
@@ -761,6 +777,18 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 			</div>
 		</aside>
 	{/if}
+
+	<!-- AI Summary Mini Modal -->
+	<AISummaryMiniModal
+		bind:open={showSummaryModal}
+		{caseId}
+		evidenceId={summaryEvidenceId}
+		evidenceTitle={summaryEvidenceTitle}
+		onClose={() => {
+			summaryEvidenceId = null;
+			summaryEvidenceTitle = null;
+		}}
+	/>
 </div>
 
 <style>
@@ -1485,9 +1513,14 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		text-align: left;
 	}
 
-	.quick-btn:hover {
+	.quick-btn:hover:not(:disabled) {
 		background: #e5e7eb;
 		border-color: #3b82f6;
+	}
+
+	.quick-btn:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 
 	.chat-message {

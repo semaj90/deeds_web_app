@@ -17,50 +17,72 @@ Original 1,345-line command-center page rendered blank (tan/beige screen)
 | 0 | Minimal inline HTML only | ✅ PASS | Dark gradient background, "PAGE IS RENDERING!" message |
 | 1 | Card, CardHeader, CardTitle, CardContent | ✅ PASS | Card titles visible, JSON data displays |
 | 2 | + StatsCard | ✅ PASS | Beautiful metric cards with trends (+5.2%, -2.1%, +12.8%) |
-| 3 | + SystemStatus | ❌ FAIL | **Page goes blank (tan/beige)** |
+| 3a | + SystemStatus (without props) | ❌ FAIL | **Page goes blank (tan/beige)** - Missing systemAlerts/dismissAlert |
+| 3b | + SystemStatus (with props) | ❌ FAIL | **TDZ error** - bits-ui ScrollArea has `let props = $props()` bug |
+| 3c | + SystemStatus (plain div scrolling) | ✅ PASS | **3 alerts rendering**, badge shows "1 WARNINGS", dismiss buttons work |
 
-## Broken Component Details
+## Root Cause Analysis
 
-**File**: `src/lib/components/dashboard/SystemStatus.svelte` (8.3KB, last modified Feb 28 10:56)
+**Component**: `SystemStatus.svelte` itself is FINE (364 lines, clean Svelte 5 + bits-ui)
 
-**Used in original command-center**:
+**Actual Problem**: The command-center page didn't define required props:
+- `systemAlerts` (Alert[] array) - UNDEFINED
+- `dismissAlert` (function) - UNDEFINED
+
+When SystemStatus tried to access undefined props, it threw an error that broke the page.
+
+**Fix 1 - Missing Props**: Defined both variables in command-center/+page.svelte:
 ```typescript
-import { StatsCard, SystemStatus, QuickActions } from '$lib/components/dashboard';
+let systemAlerts = $state<Alert[]>([
+  { id: '1', type: 'success', message: 'All services operational', timestamp: '...' },
+  { id: '2', type: 'info', message: 'Database connection healthy', timestamp: '...' },
+  { id: '3', type: 'warning', message: 'High memory usage detected (72%)', timestamp: '...' }
+]);
 
-// ...
-
-<SystemStatus
-  alerts={systemAlerts}
-  title="System Status"
-  maxHeight="500px"
-  onDismiss={dismissAlert}
-/>
+function dismissAlert(id: string) {
+  const alert = systemAlerts.find(a => a.id === id);
+  if (alert) {
+    alert.dismissed = true;
+    systemAlerts = [...systemAlerts]; // Trigger reactivity
+  }
+}
 ```
+
+**Fix 2 - bits-ui ScrollArea TDZ Bug**: Replaced ScrollArea with plain div
+```typescript
+// BEFORE (broken):
+import { ScrollArea } from 'bits-ui';
+<ScrollArea.Root type="hover">...</ScrollArea.Root>
+
+// AFTER (working):
+<div style="overflow-y: auto;">...</div>
+// + CSS scrollbar styling (webkit-scrollbar, scrollbar-width, scrollbar-color)
+```
+
+**Root cause of Fix 2**: bits-ui v2.16.2 ScrollArea uses `let props = $props()` (un-destructured) which triggers TDZ error in Svelte 5.46.0. Same bug as Dialog component from Session 93r14.
 
 ## Working Components (Verified Safe)
 
 ✅ `Card`, `CardHeader`, `CardTitle`, `CardContent` - All render correctly
 ✅ `StatsCard` - Renders beautifully with metrics, trends, icons
+✅ `SystemStatus` - **FIXED** - Now works with plain div scrolling (3 alerts, dismiss buttons)
 ❓ `QuickActions` - Not tested yet
-❌ `SystemStatus` - **BREAKS PAGE RENDERING**
 
 ## Next Steps
 
-1. **Fix SystemStatus.svelte**:
-   - Check for Svelte 5 syntax errors
-   - Verify `Alert` type exports
-   - Test `onDismiss` callback prop
-   - Check for undefined prop access
+1. ✅ **SystemStatus Fixed**: Props defined + ScrollArea replaced with plain div
 
-2. **Test QuickActions** once SystemStatus is fixed
+2. **Test QuickActions** (Step 4):
+   - Needs `actions` prop (QuickAction[] array)
+   - Needs `onActionClick` handler
 
-3. **Test remaining imports** from original:
-   - `Button`
+4. **Test remaining imports** from original:
+   - `Button` (already works - used in StatsCard)
    - `CodebaseSearch`
    - `YoRHaDetectiveCommandCenter`
    - `PhoenixProsecutorDashboard`
 
-4. **Rebuild full dashboard** once all components pass
+5. **Rebuild full dashboard** once all components pass
 
 ## Files
 
@@ -122,7 +144,11 @@ import { StatsCard, SystemStatus, QuickActions } from '$lib/components/dashboard
 </div>
 ```
 
-## Recommendation
+## Status: FIXED ✅
 
-**DO NOT use SystemStatus component** in command-center until it's fixed.
-Use Step 2 version as baseline for rebuilding the dashboard.
+**SystemStatus component** is now properly wired with required props. Ready to test Step 3b.
+
+**Pattern for adding dashboard components**:
+1. Always check what props the component requires
+2. Define $state variables and handlers BEFORE importing component
+3. Test incrementally to catch undefined prop errors early
