@@ -6,7 +6,7 @@
 	let collapsed = $state(false);
 	let currentTime = $state(new Date().toLocaleString());
 
-	// Update time every minute
+	// Update time every second
 	$effect(() => {
 		if (!browser) return;
 		const interval = setInterval(() => {
@@ -23,15 +23,34 @@
 		return () => clearInterval(interval);
 	});
 
-	// Sidebar navigation items
+	// Main navigation items (merged from both sidebars)
 	const navItems = [
-		{ label: 'COMMAND CENTER', icon: 'home', href: '/dashboard', hasSubmenu: false },
-		{ label: 'ACTIVE CASES', icon: 'folder', href: '/cases', hasSubmenu: true },
-		{ label: 'EVIDENCE', icon: 'target', href: '/evidence', hasSubmenu: true },
-		{ label: 'PERSONS OF INTEREST', icon: 'users', href: '/persons-of-interest', hasSubmenu: false },
-		{ label: 'ANALYSIS', icon: 'bar-chart-2', href: '/analysis-center', hasSubmenu: true },
-		{ label: 'GLOBAL SEARCH', icon: 'search', href: '/global-search', hasSubmenu: false },
-		{ label: 'TERMINAL', icon: 'terminal', href: '/terminal', hasSubmenu: false }
+		{ label: 'DASHBOARD', icon: 'layout-dashboard', href: '/dashboard' },
+		{ label: 'COMMAND CENTER', icon: 'radio', href: '/command-center' },
+		{ label: 'ACTIVE CASES', icon: 'folder-open', href: '/active-cases' },
+		{ label: 'CASES', icon: 'folder', href: '/cases' },
+		{ label: 'EVIDENCE', icon: 'fingerprint', href: '/evidence' },
+		{ label: 'EVIDENCE LIBRARY', icon: 'library', href: '/evidence-library' },
+		{ label: 'CITATIONS', icon: 'scroll-text', href: '/citations' },
+		{ label: 'PERSONS OF INTEREST', icon: 'users', href: '/persons-of-interest' },
+		{ label: 'ANALYSIS CENTER', icon: 'search', href: '/analysis-center' },
+		{ label: 'GLOBAL SEARCH', icon: 'scan-search', href: '/global-search' },
+		{ label: 'AI DASHBOARD', icon: 'brain', href: '/ai-dashboard' },
+		{ label: 'TERMINAL', icon: 'terminal', href: '/terminal' },
+		{ label: 'MEMORY PALACE', icon: 'landmark', href: '/memory-palace' },
+		{ label: 'ALL ROUTES', icon: 'map', href: '/all-routes' },
+		{ label: 'DEMOS', icon: 'gamepad-2', href: '/demos' },
+	];
+
+	// Admin/System navigation items
+	const adminItems = [
+		{ label: 'ADMIN', icon: 'shield', href: '/admin' },
+		{ label: 'SYSTEM CONFIG', icon: 'settings', href: '/system-configuration' },
+		{ label: 'AST TOPOLOGY', icon: 'network', href: '/ast-topology' },
+		{ label: 'GPU GRAPH', icon: 'share-2', href: '/gpu-evidence-graph' },
+		{ label: 'ERROR BRAIN', icon: 'bug', href: '/error-brain' },
+		{ label: 'AGENTIC ERRORS', icon: 'bot', href: '/agentic-errors' },
+		{ label: 'CODEBASE INDEX', icon: 'database', href: '/codebase-index' },
 	];
 
 	function isActive(href: string): boolean {
@@ -71,6 +90,7 @@
 
 	<!-- Navigation -->
 	<nav class="sidebar-nav">
+		<!-- Main Navigation -->
 		{#each navItems as item}
 			<a
 				href={item.href}
@@ -80,9 +100,6 @@
 				<Icon name={item.icon} size={14} />
 				{#if !collapsed}
 					<span class="nav-label">{item.label}</span>
-					{#if item.hasSubmenu}
-						<Icon name="chevron-right" size={12} class="submenu-arrow" />
-					{/if}
 				{/if}
 			</a>
 		{/each}
@@ -90,13 +107,25 @@
 		<!-- Spacer -->
 		<div class="nav-spacer"></div>
 
-		<!-- System Config -->
-		<a href="/system-configuration" class="nav-item" class:active={isActive('/system-configuration')}>
-			<Icon name="settings" size={14} />
+		<!-- Admin Section -->
+		<div class="section-divider">
 			{#if !collapsed}
-				<span class="nav-label">SYSTEM CONFIG</span>
+				<span class="section-label">SYSTEM</span>
 			{/if}
-		</a>
+		</div>
+
+		{#each adminItems as item}
+			<a
+				href={item.href}
+				class="nav-item admin-item"
+				class:active={isActive(item.href)}
+			>
+				<Icon name={item.icon} size={14} />
+				{#if !collapsed}
+					<span class="nav-label">{item.label}</span>
+				{/if}
+			</a>
+		{/each}
 	</nav>
 
 	<!-- Footer Status -->
@@ -226,18 +255,36 @@
 		border-color: #000;
 	}
 
+	.admin-item {
+		opacity: 0.7;
+	}
+
+	.admin-item:hover,
+	.admin-item.active {
+		opacity: 1;
+	}
+
 	.nav-label {
 		flex: 1;
 		white-space: nowrap;
 	}
 
-	.submenu-arrow {
-		opacity: 0.5;
-	}
-
 	.nav-spacer {
 		flex: 1;
 		min-height: 1rem;
+	}
+
+	.section-divider {
+		padding: 0.5rem 1rem;
+		margin-top: 0.5rem;
+		border-top: 1px solid rgba(0, 0, 0, 0.15);
+	}
+
+	.section-label {
+		font-size: 0.625rem;
+		font-weight: 700;
+		opacity: 0.5;
+		letter-spacing: 0.1em;
 	}
 
 	/* Footer */

@@ -35,3 +35,52 @@ func memcpyDtoH(dst []float32, src unsafe.Pointer) {
 		C.cudaMemcpyDeviceToHost,
 	)
 }
+
+// AllocPinned allocates pinned (page-locked) host memory for faster GPU transfers
+func AllocPinned(size int) (unsafe.Pointer, error) {
+	var ptr unsafe.Pointer
+	err := C.cudaHostAlloc(&ptr, C.size_t(size), C.cudaHostAllocDefault)
+	if err != 0 {
+		return nil, fmt.Errorf("cudaHostAlloc failed: %v", err)
+	}
+	return ptr, nil
+}
+
+// FreePinned frees pinned host memory
+func FreePinned(ptr unsafe.Pointer) error {
+	err := C.cudaFreeHost(ptr)
+	if err != 0 {
+		return fmt.Errorf("cudaFreeHost failed: %v", err)
+	}
+	return nil
+}
+
+// MemcpyPinnedToDevice copies from pinned host memory to device (non-blocking)
+func MemcpyPinnedToDevice(dst unsafe.Pointer, src unsafe.Pointer, size int, stream unsafe.Pointer) error {
+	err := C.cudaMemcpyAsync(
+		dst,
+		src,
+		C.size_t(size),
+		C.cudaMemcpyHostToDevice,
+		(C.cudaStream_t)(stream),
+	)
+	if err != 0 {
+		return fmt.Errorf("cudaMemcpyAsync H2D failed: %v", err)
+	}
+	return nil
+}
+
+// MemcpyDeviceToPinned copies from device to pinned host memory (non-blocking)
+func MemcpyDeviceToPinned(dst unsafe.Pointer, src unsafe.Pointer, size int, stream unsafe.Pointer) error {
+	err := C.cudaMemcpyAsync(
+		dst,
+		src,
+		C.size_t(size),
+		C.cudaMemcpyDeviceToHost,
+		(C.cudaStream_t)(stream),
+	)
+	if err != 0 {
+		return fmt.Errorf("cudaMemcpyAsync D2H failed: %v", err)
+	}
+	return nil
+}

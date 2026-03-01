@@ -7,7 +7,7 @@
  */
 import { ENV } from '$lib/server/env.server.js';
 
-const getEndpoint = () => ENV.TENSORRT_URL ?? 'http://localhost:8000';
+const getEndpoint = () => ENV.TENSORRT_URL ?? 'http://localhost:8099';
 
 export interface TrtLlmRequest {
 	prompt: string;
