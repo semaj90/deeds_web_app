@@ -122,7 +122,7 @@ Output ONLY the HTML content (no markdown, no code fences). Use h1, h2, h3, p, u
 		// Ollama unavailable — fall back to template
 	}
 
-	return generateTemplate(caseData, evidenceData, personsData);
+	return generateTemplate(caseData, evidenceData, personsData, type);
 }
 
 function buildCaseContext(caseData: any, evidenceData: any[], personsData: any[]): string {
@@ -153,9 +153,14 @@ function buildCaseContext(caseData: any, evidenceData: any[], personsData: any[]
 function generateTemplate(
 	caseData: any,
 	evidenceData: any[],
-	personsData: any[]
+	personsData: any[],
+	type: string
 ): { html: string; json: any; raw: string } {
-	const html = `
+	let html = '';
+
+	switch (type) {
+		case 'charging_memo':
+			html = `
 <h1>Charging Memorandum</h1>
 <h2>Case: ${caseData.title || 'Untitled Case'}</h2>
 <h3>Case Summary</h3>
@@ -172,10 +177,101 @@ ${evidenceData.length > 0 ? `<ul>${evidenceData.map((e) => `<li><strong>${e.evid
 <p><em>(AI generation unavailable — complete manually)</em></p>
 <h3>Conclusion and Recommendation</h3>
 <p><em>(AI generation unavailable — complete manually)</em></p>`.trim();
+			break;
+
+		case 'intake_summary':
+			html = `
+<h1>Intake Summary</h1>
+<h2>Case: ${caseData.title || 'Untitled Case'}</h2>
+<p><strong>Date:</strong> ${caseData.createdAt ? new Date(caseData.createdAt).toLocaleDateString() : 'Unknown'}</p>
+<p><strong>Jurisdiction:</strong> ${caseData.jurisdiction || 'N/A'}</p>
+<p><strong>Practice Area:</strong> ${caseData.practiceArea || 'N/A'}</p>
+<h3>Client Information</h3>
+<p><strong>Client:</strong> ${caseData.clientName || 'Not specified'}</p>
+<p><strong>Opposing Party:</strong> ${caseData.opposingParty || 'Not specified'}</p>
+<h3>Initial Assessment</h3>
+<p><strong>Case Description:</strong> ${caseData.description || 'No description provided.'}</p>
+<h3>Persons Involved</h3>
+${personsData.length > 0 ? `<ul>${personsData.map((p) => `<li><strong>${p.name || 'Unknown'}</strong> (${p.relationship ?? p.role ?? 'Unknown role'})</li>`).join('')}</ul>` : '<p>No persons identified yet.</p>'}
+<h3>Initial Evidence</h3>
+${evidenceData.length > 0 ? `<ul>${evidenceData.map((e) => `<li>${e.title ?? e.fileName ?? 'Untitled'} (${e.evidenceType ?? 'Document'})</li>`).join('')}</ul>` : '<p>No evidence uploaded yet.</p>'}
+<h3>Recommended Next Steps</h3>
+<p><em>1. Conduct client interview</em></p>
+<p><em>2. Request additional documentation</em></p>
+<p><em>3. Research applicable law and precedents</em></p>
+<p><em>4. Assess case strengths and weaknesses</em></p>`.trim();
+			break;
+
+		case 'discovery_list':
+			html = `
+<h1>Discovery List</h1>
+<h2>Case: ${caseData.title || 'Untitled Case'}</h2>
+<p><strong>Date Prepared:</strong> ${new Date().toLocaleDateString()}</p>
+<h3>Documents Currently in Possession</h3>
+${evidenceData.length > 0 ? `
+<table border="1" cellpadding="8" cellspacing="0" style="width:100%;border-collapse:collapse;">
+<thead>
+<tr>
+<th>Item #</th>
+<th>Description</th>
+<th>Type</th>
+<th>Date Uploaded</th>
+</tr>
+</thead>
+<tbody>
+${evidenceData.map((e, idx) => `
+<tr>
+<td>${idx + 1}</td>
+<td>${e.title ?? e.fileName ?? 'Untitled'}</td>
+<td>${e.evidenceType ?? 'Document'}</td>
+<td>${e.uploadedAt ? new Date(e.uploadedAt).toLocaleDateString() : 'Unknown'}</td>
+</tr>
+`).join('')}
+</tbody>
+</table>
+` : '<p>No evidence currently in possession.</p>'}
+<h3>Outstanding Discovery Requests</h3>
+<p><em>(List discovery requests and responses here)</em></p>
+<h3>Persons with Relevant Knowledge</h3>
+${personsData.length > 0 ? `<ul>${personsData.map((p) => `<li><strong>${p.name || 'Unknown'}</strong> — ${p.relationship ?? p.role ?? 'Witness'}</li>`).join('')}</ul>` : '<p>No persons identified.</p>'}`.trim();
+			break;
+
+		case 'hearing_prep':
+			html = `
+<h1>Hearing Preparation Summary</h1>
+<h2>Case: ${caseData.title || 'Untitled Case'}</h2>
+<p><strong>Hearing Date:</strong> <em>(Enter hearing date)</em></p>
+<p><strong>Court:</strong> ${caseData.court || 'N/A'}</p>
+<p><strong>Judge:</strong> <em>(Enter judge name)</em></p>
+<h3>Hearing Type & Purpose</h3>
+<p><em>(Describe the type of hearing and objectives)</em></p>
+<h3>Key Arguments</h3>
+<p><strong>1. Primary Argument:</strong> <em>(State main legal argument)</em></p>
+<p><strong>2. Supporting Arguments:</strong> <em>(List supporting points)</em></p>
+<p><strong>3. Anticipated Counterarguments:</strong> <em>(List opposing arguments and rebuttals)</em></p>
+<h3>Evidence to Present</h3>
+${evidenceData.length > 0 ? `<ul>${evidenceData.map((e) => `<li><strong>${e.title ?? e.fileName ?? 'Untitled'}</strong> — Relevance: <em>(Explain relevance)</em></li>`).join('')}</ul>` : '<p>No evidence identified for presentation.</p>'}
+<h3>Witnesses</h3>
+${personsData.length > 0 ? `<ul>${personsData.map((p) => `<li><strong>${p.name || 'Unknown'}</strong> — Testimony focus: <em>(Brief description)</em></li>`).join('')}</ul>` : '<p>No witnesses identified.</p>'}
+<h3>Legal Citations</h3>
+<p><em>(List relevant statutes, cases, and legal authorities)</em></p>
+<h3>Questions to Prepare For</h3>
+<p><em>1. (Potential question from judge)</em></p>
+<p><em>2. (Potential question from opposing counsel)</em></p>
+<h3>Action Items Before Hearing</h3>
+<p><em>□ Review all case files</em></p>
+<p><em>□ Prepare opening statement</em></p>
+<p><em>□ Organize exhibits</em></p>
+<p><em>□ Brief witnesses</em></p>`.trim();
+			break;
+
+		default:
+			html = `<h1>Legal Report</h1><h2>${caseData.title || 'Untitled Case'}</h2><p>Report type: ${type}</p>`;
+	}
 
 	return {
 		html,
 		json: { type: 'doc', content: [] },
-		raw: `Template-generated charging memo for case: ${caseData.title}`
+		raw: `Template-generated ${type} for case: ${caseData.title}`
 	};
 }

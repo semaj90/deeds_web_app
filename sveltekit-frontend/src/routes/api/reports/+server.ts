@@ -7,7 +7,7 @@ import type { RequestHandler } from './$types';
 /**
  * GET /api/reports
  * Fetch reports with optional case filtering
- * Query params: caseId, limit, offset
+ * Query params: caseId, ids (comma-separated), limit, offset
  */
 export const GET: RequestHandler = async ({ locals, url }) => {
 	if (!locals.user) {
@@ -15,10 +15,25 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	}
 
 	const caseId = url.searchParams.get('caseId');
+	const idsParam = url.searchParams.get('ids');
 	const limit = Number(url.searchParams.get('limit')) || 20;
 	const offset = Number(url.searchParams.get('offset')) || 0;
 
 	try {
+		// Filter by specific IDs if provided
+		if (idsParam) {
+			const ids = idsParam.split(',').filter(Boolean);
+			const userReports = await db.select().from(reports)
+				.where(and(
+					inArray(reports.id, ids),
+					eq(reports.createdBy, locals.user.id)
+				))
+				.orderBy(desc(reports.createdAt));
+
+			return json({ success: true, data: userReports });
+		}
+
+		// Filter by case ID if provided
 		if (caseId) {
 			const userReports = await db.select().from(reports)
 				.where(eq(reports.caseId, caseId))
@@ -27,15 +42,16 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 				.offset(offset);
 
 			return json({ success: true, data: userReports });
-		} else {
-			const userReports = await db.select().from(reports)
-				.where(eq(reports.createdBy, locals.user.id))
-				.orderBy(desc(reports.createdAt))
-				.limit(limit)
-				.offset(offset);
-
-			return json({ success: true, data: userReports });
 		}
+
+		// Otherwise return all user's reports
+		const userReports = await db.select().from(reports)
+			.where(eq(reports.createdBy, locals.user.id))
+			.orderBy(desc(reports.createdAt))
+			.limit(limit)
+			.offset(offset);
+
+		return json({ success: true, data: userReports });
 	} catch (err) {
 		console.error('Error fetching reports:', err);
 		throw error(500, 'Failed to fetch reports');
@@ -54,19 +70,18 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	try {
 		const body = await request.json();
 
-		if (!body?.caseId || !body.content) {
-			throw error(400, 'Missing required fields: caseId, content');
+		if (!body?.caseId) {
+			throw error(400, 'Missing required field: caseId');
 		}
 
 		const newReport = await db.insert(reports)
 			.values({
 				caseId: body.caseId,
-				content: body.content,
+				content: body.contentHtml || '<p>Start writing...</p>',
 				title: body?.title ?? 'Untitled Report',
-				metadata: { reportType: body?.reportType ?? 'general' },
+				status: body?.status ?? 'draft',
 				createdBy: locals.user.id,
-				createdAt: new Date(),
-				updatedAt: new Date()
+				metadata: body?.metadata ?? null,
 			})
 			.returning();
 
@@ -98,7 +113,9 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 		}
 
 		const updates: any = { updatedAt: new Date() };
-		if (body.content) updates.content = body.content;
+		if (body.contentHtml) updates.content = body.contentHtml;
+		if (body.title) updates.title = body.title;
+		if (body.status) updates.status = body.status;
 
 		const updated = await db.update(reports)
 			.set(updates)

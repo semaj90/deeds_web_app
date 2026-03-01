@@ -4,9 +4,9 @@ import { json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const { reportId, title, contentHtml, contentJson } = await request.json();
+		const { reportId, title, contentHtml } = await request.json();
 
 		if (!reportId) {
 			return json({ error: 'Report ID is required' }, { status: 400 });
@@ -17,8 +17,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			.update(reports)
 			.set({
 				title: title || 'Untitled Report',
-				content: contentHtml,
-				metadata: contentJson ? { contentJson } : undefined,
+				content: contentHtml || '',
 				updatedAt: new Date()
 			})
 			.where(eq(reports.id, reportId))
