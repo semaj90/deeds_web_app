@@ -147,6 +147,17 @@
 		</div>
 
 		<div class="stat-card">
+			<div class="stat-icon export">
+				<Icon name="download" />
+			</div>
+			<div class="stat-content">
+				<div class="stat-label">Export Cache</div>
+				<div class="stat-value">{stats.export.totalKeys} exports</div>
+				<div class="stat-meta">{formatBytes(stats.export.totalSizeBytes)}</div>
+			</div>
+		</div>
+
+		<div class="stat-card">
 			<div class="stat-icon llm">
 				<Icon name="brain" />
 			</div>
@@ -264,6 +275,74 @@
 					Invalidate All Templates
 				</button>
 			</div>
+		</section>
+
+		<!-- Export Cache -->
+		<section class="cache-section">
+			<h2><Icon name="download" class="inline-block" /> Report Export Cache</h2>
+
+			<div class="section-grid">
+				<div class="metric-card">
+					<div class="metric-label">Total Exports</div>
+					<div class="metric-value">{stats.export.totalKeys}</div>
+					<div class="metric-meta">Cached files</div>
+				</div>
+
+				<div class="metric-card">
+					<div class="metric-label">Total Size</div>
+					<div class="metric-value">{formatBytes(stats.export.totalSizeBytes)}</div>
+					<div class="metric-meta">Disk usage</div>
+				</div>
+
+				<div class="metric-card">
+					<div class="metric-label">Oldest Export</div>
+					<div class="metric-value">
+						{#if stats.export.oldestExport}
+							{new Date(stats.export.oldestExport).toLocaleTimeString()}
+						{:else}
+							None
+						{/if}
+					</div>
+				</div>
+
+				<div class="metric-card">
+					<div class="metric-label">Newest Export</div>
+					<div class="metric-value">
+						{#if stats.export.newestExport}
+							{new Date(stats.export.newestExport).toLocaleTimeString()}
+						{:else}
+							None
+						{/if}
+					</div>
+				</div>
+			</div>
+
+			{#if Object.keys(stats.export.formats).length > 0}
+				<div class="format-breakdown">
+					<h3>Export Formats</h3>
+					<div class="format-grid">
+						{#each Object.entries(stats.export.formats) as [format, count]}
+							<div class="format-badge">
+								<span class="format-name">{format.toUpperCase()}</span>
+								<span class="format-count">{count}</span>
+							</div>
+						{/each}
+					</div>
+				</div>
+			{/if}
+
+			<div class="actions">
+				<button class="action-btn danger" onclick={() => invalidateCache('report:export:*')}>
+					<Icon name="trash-2" />
+					Invalidate All Exports
+				</button>
+			</div>
+
+			<p class="info-note">
+				<Icon name="info" class="inline-block" />
+				Export cache stores generated HTML, Markdown, and JSON report files. Cache invalidation
+				happens automatically when report content changes (Priority #8).
+			</p>
 		</section>
 
 		<!-- LLM Response Cache -->
@@ -462,6 +541,11 @@
 		color: white;
 	}
 
+	.stat-icon.export {
+		background: #ea580c;
+		color: white;
+	}
+
 	.stat-icon.llm {
 		background: #9333ea;
 		color: white;
@@ -576,6 +660,41 @@
 		border-radius: 3px;
 		font-size: 0.85rem;
 		font-family: 'Courier New', monospace;
+	}
+
+	.format-breakdown {
+		margin: 1.5rem 0;
+	}
+
+	.format-grid {
+		display: flex;
+		gap: 0.75rem;
+		flex-wrap: wrap;
+	}
+
+	.format-badge {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 1rem;
+		background: white;
+		border: 1px solid var(--sand-5, #e5e5e5);
+		border-radius: 6px;
+	}
+
+	.format-name {
+		font-weight: 600;
+		font-size: 0.85rem;
+		color: var(--accent, #8b3a3a);
+		text-transform: uppercase;
+	}
+
+	.format-count {
+		font-size: 0.9rem;
+		color: var(--sand-9, #666);
+		padding: 0.125rem 0.5rem;
+		background: var(--sand-3, #f5f5f5);
+		border-radius: 12px;
 	}
 
 	.actions {

@@ -34,6 +34,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			'template:meta:*',
 			'template:ai:*',
 			'template:rendered:*',
+			'report:export:*',
 			'llm:response:*',
 			'case:*',
 			'evidence:*',

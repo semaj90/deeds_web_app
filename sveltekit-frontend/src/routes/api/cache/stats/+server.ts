@@ -5,6 +5,7 @@
  * Returns comprehensive statistics for all cache layers:
  * - Redis (connection, memory, key patterns)
  * - Template Cache (metadata, AI content, rendered)
+ * - Export Cache (report exports - HTML, Markdown, JSON)
  * - LLM Response Cache (hits, misses, hit rate)
  * - Memory Cache (size, TTL, hit rate)
  */
@@ -12,6 +13,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { redisPool } from '$lib/server/redis.js';
 import { getTemplateCacheStats } from '$lib/server/cache/report-template-cache.js';
+import { getExportCacheStats } from '$lib/server/cache/pdf-export-cache.js';
 
 export const GET: RequestHandler = async () => {
 	try {
@@ -23,13 +25,15 @@ export const GET: RequestHandler = async () => {
 			infoStats,
 			infoServer,
 			dbsize,
-			templateStats
+			templateStats,
+			exportStats
 		] = await Promise.all([
 			redis.info('memory'),
 			redis.info('stats'),
 			redis.info('server'),
 			redis.dbsize(),
-			getTemplateCacheStats()
+			getTemplateCacheStats(),
+			getExportCacheStats()
 		]);
 
 		// Parse Redis INFO output
@@ -86,6 +90,7 @@ export const GET: RequestHandler = async () => {
 					keyPatterns
 				},
 				template: templateStats,
+				export: exportStats,
 				llm: {
 					totalResponses: llmKeys.length,
 					hits: llmHits,
@@ -120,6 +125,13 @@ export const GET: RequestHandler = async () => {
 					metadataKeys: 0,
 					aiContentKeys: 0,
 					renderedKeys: 0
+				},
+				export: {
+					totalKeys: 0,
+					formats: {},
+					totalSizeBytes: 0,
+					oldestExport: null,
+					newestExport: null
 				},
 				llm: {
 					totalResponses: 0,
