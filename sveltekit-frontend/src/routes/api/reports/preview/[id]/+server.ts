@@ -12,6 +12,7 @@ import { db } from '$lib/server/db/client';
 import { reports } from '$lib/server/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { auditReportAction } from '$lib/server/reports/audit.js';
+import { CACHE_PATTERNS, cacheInvalidation } from '$lib/server/cache/invalidation.js';
 
 async function generatePreview({ locals, params, format, request }: {
 	locals: App.Locals;
@@ -83,6 +84,12 @@ async function generatePreview({ locals, params, format, request }: {
 		changes: { format, preview: true },
 		request,
 	}).catch(err => console.warn('[Preview] Audit log failed:', err));
+
+	// Invalidate preview cache (allow fresh previews if content changed)
+	await cacheInvalidation.invalidatePattern(
+		CACHE_PATTERNS.REPORT_PREVIEW(report.id),
+		{ type: 'manual', userId: locals.user.id }
+	).catch(err => console.warn('[Preview] Cache invalidation failed:', err));
 
 	return {
 		dataUrl,

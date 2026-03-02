@@ -176,7 +176,7 @@
 	<div id="investigator" class="scroll-mt-6">
 		<AutonomousInvestigator
 			initialQuery={selectedExample}
-			onComplete={(result) => handleComplete(result, result.metadata?.query || selectedExample)}
+			onComplete={(result) => handleComplete(result, selectedExample)}
 		/>
 	</div>
 

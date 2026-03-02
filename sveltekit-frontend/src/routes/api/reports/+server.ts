@@ -4,6 +4,7 @@ import { error, json } from '@sveltejs/kit';
 import { and, desc, eq, inArray } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { auditReportAction } from '$lib/server/reports/audit';
+import { invalidateReportCache, invalidateCaseCache } from '$lib/server/cache/invalidation.js';
 
 /**
  * GET /api/reports
@@ -104,6 +105,12 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			request,
 		});
 
+		// Invalidate report list and case cache
+		await Promise.all([
+			invalidateReportCache(newReport[0].id, 'report_create', locals.user.id),
+			invalidateCaseCache(body.caseId, 'report_create', locals.user.id)
+		]).catch(err => console.warn('[Reports] Cache invalidation failed:', err));
+
 		return json(
 			{ success: true, data: newReport[0], message: 'Report created successfully' },
 			{ status: 201 }
@@ -159,6 +166,11 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 			)
 		);
 
+		// Invalidate cache for all updated reports
+		await Promise.all(
+			updated.map(report => invalidateReportCache(report.id, 'report_update', locals.user.id))
+		).catch(err => console.warn('[Reports] Cache invalidation failed:', err));
+
 		return json({
 			success: true,
 			data: updated.length,
@@ -208,6 +220,11 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 				})
 			)
 		);
+
+		// Invalidate cache for all deleted reports
+		await Promise.all(
+			deleted.map(report => invalidateReportCache(report.id, 'report_delete', locals.user.id))
+		).catch(err => console.warn('[Reports] Cache invalidation failed:', err));
 
 		return json({
 			success: true,

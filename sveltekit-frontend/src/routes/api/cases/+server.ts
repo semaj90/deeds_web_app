@@ -4,6 +4,7 @@ import { and, desc, eq, like, inArray } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { apiResponses, validateRequest } from '$lib/server/api/response-helper.js';
 import { requireAuth } from '$lib/server/auth-helpers.js';
+import { invalidateCaseCache } from '$lib/server/cache/invalidation.js';
 
 /**
  * GET /api/cases
@@ -80,6 +81,10 @@ export const POST: RequestHandler = async (event) => {
 			})
 			.returning();
 
+		// Invalidate case list cache
+		await invalidateCaseCache(newCase[0].id, 'case_update', auth.user.id)
+			.catch(err => console.warn('[Cases] Cache invalidation failed:', err));
+
 		return apiResponses.created({
 			case: newCase[0],
 			message: 'Case created successfully'
@@ -122,6 +127,11 @@ export const PATCH: RequestHandler = async (event) => {
 			)
 			.returning();
 
+		// Invalidate cache for all updated cases
+		await Promise.all(
+			updated.map(c => invalidateCaseCache(c.id, 'case_update', auth.user.id))
+		).catch(err => console.warn('[Cases] Cache invalidation failed:', err));
+
 		return apiResponses.ok({
 			updated: updated.length,
 			message: `Updated ${updated.length} cases`
@@ -159,6 +169,11 @@ export const DELETE: RequestHandler = async (event) => {
 				)
 			)
 			.returning();
+
+		// Invalidate cache for all archived cases
+		await Promise.all(
+			archived.map(c => invalidateCaseCache(c.id, 'case_update', auth.user.id))
+		).catch(err => console.warn('[Cases] Cache invalidation failed:', err));
 
 		return apiResponses.ok({
 			archived: archived.length,

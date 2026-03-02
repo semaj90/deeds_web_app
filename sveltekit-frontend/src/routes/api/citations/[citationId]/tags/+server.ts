@@ -2,6 +2,7 @@ import { db } from '$lib/server/db/client';
 import { json, error } from '@sveltejs/kit';
 import { sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { invalidateCitationCache } from '$lib/server/cache/invalidation.js';
 
 /**
  * GET /api/citations/[citationId]/tags
@@ -44,6 +45,10 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 		const rows = (result as unknown as { rows?: any[] }).rows ?? [];
 		const inserted = rows[0] ?? { tag, color };
 
+		// Invalidate citation cache
+		await invalidateCitationCache(params.citationId, 'citation_update', locals.user.id)
+			.catch(err => console.warn('[Citations] Cache invalidation failed:', err));
+
 		return json({ success: true, tag: inserted }, { status: 201 });
 	} catch (err) {
 		console.error('[citation-tags] POST error:', err);
@@ -66,6 +71,11 @@ export const DELETE: RequestHandler = async ({ params, request, locals }) => {
 		await db.execute(
 			sql`DELETE FROM citation_tag_links WHERE citation_id = ${params.citationId} AND tag = ${body.tag}`
 		);
+
+		// Invalidate citation cache
+		await invalidateCitationCache(params.citationId, 'citation_update', locals.user.id)
+			.catch(err => console.warn('[Citations] Cache invalidation failed:', err));
+
 		return json({ success: true });
 	} catch (err) {
 		console.error('[citation-tags] DELETE error:', err);

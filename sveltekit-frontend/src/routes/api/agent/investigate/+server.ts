@@ -1,7 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createAutonomousAgent } from '$lib/server/agent/autonomous-agent.js';
-import type { InvestigationOptions } from '$lib/server/agent/autonomous-agent.js';
 
 /**
  * POST /api/agent/investigate
@@ -114,10 +113,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			}
 		}
 
-		return error(500, {
-			message: 'Investigation failed',
-			details: err instanceof Error ? err.message : 'Unknown error'
-		});
+		const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+		return error(500, `Investigation failed: ${errorMessage}`);
 	}
 };
 

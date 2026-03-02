@@ -419,7 +419,7 @@ async function searchPgvectorCases(
 		LIMIT ${limit}
 	`;
 
-	const result = await db.execute(sql.raw(query));
+	const result = await db.execute(sql`${sql.raw(query)}`);
 	const rows = (result as any).rows ?? result;
 
 	return rows.map((row: any) => ({

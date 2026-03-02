@@ -4,6 +4,7 @@ import { error, json } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { auditReportAction } from '$lib/server/reports/audit.js';
+import { CACHE_PATTERNS, cacheInvalidation } from '$lib/server/cache/invalidation.js';
 
 /**
  * GET /api/reports/[id]/export?format=pdf|html|markdown|json
@@ -47,6 +48,12 @@ async function handleExport({ locals, params, format, request }: {
 		changes: { format },
 		request,
 	}).catch(err => console.warn('[Export] Audit log failed:', err));
+
+	// Invalidate export cache (allow fresh exports if content changed)
+	await cacheInvalidation.invalidatePattern(
+		CACHE_PATTERNS.REPORT_EXPORT(report.id),
+		{ type: 'manual', userId: locals.user.id }
+	).catch(err => console.warn('[Export] Cache invalidation failed:', err));
 
 	// Export based on format
 	switch (format) {

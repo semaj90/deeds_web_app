@@ -17,6 +17,7 @@ import { createAnalysisJob, updateAnalysisJob, completeAnalysisJob, failAnalysis
 import { embedGate, entityGate, forensicsGate, summarizeGate, gated, EMBED_BATCH_SIZE } from '$lib/server/analysis/concurrency-gate.js';
 import { heavyRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 import { detectEvidenceType, inferLegalClassification } from '$lib/server/evidence/type-detector.js';
+import { invalidateEvidenceCache, invalidateCaseCache } from '$lib/server/cache/invalidation.js';
 
 import { ENV } from '$lib/server/env.server.js';
 const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
@@ -127,6 +128,12 @@ export async function POST({ request }: RequestEvent) {
 			console.error('[Upload] Background processing failed:', err);
 			updateJob(jobId, { step: 'error', progress: 60, message: 'Embedding generation failed (upload succeeded)', error: String(err) });
 		});
+
+		// 6. Invalidate evidence and case caches
+		await Promise.all([
+			invalidateEvidenceCache(evidenceId, caseId, 'evidence_create'),
+			caseId ? invalidateCaseCache(caseId, 'evidence_create') : Promise.resolve()
+		]).catch(err => console.warn('[Upload] Cache invalidation failed:', err));
 
 		return json({
 			id: evidenceId,
