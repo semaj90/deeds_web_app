@@ -13,7 +13,7 @@
 
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
-import { db } from '$lib/server/db/client.js';
+import db from '$lib/server/db/client.js';
 import { evidence } from '$lib/server/db/schema-postgres.js';
 import { sql, eq, and, isNotNull } from 'drizzle-orm';
 
