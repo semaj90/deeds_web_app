@@ -41,7 +41,7 @@ export const GET: RequestHandler = async () => {
 	const qdrantUrl = ENV.QDRANT_URL ?? 'http://localhost:6333';
 
 	// Parallel checks — all with 2s timeout
-	const [ollamaRes, qdrantOk, postgresOk, redisOk, tensorrtOk] = await Promise.all([
+	const [ollamaRes, qdrantHealth, postgresOk, redisOk, tensorrtOk] = await Promise.all([
 		// Ollama: fetch model list (proves LLM + embedding available)
 		fetch(`${ollamaUrl}/api/tags`, { signal: AbortSignal.timeout(TIMEOUT) })
 			.then(async (r) => {
@@ -52,8 +52,28 @@ export const GET: RequestHandler = async () => {
 			})
 			.catch(() => ({ ok: false, models: [] as string[] })),
 
-		// Qdrant: root returns version JSON
-		check(qdrantUrl),
+		// Qdrant: check server + collection health
+		(async () => {
+			try {
+				const { QdrantClient } = await import('@qdrant/js-client-rest');
+				const { checkQdrantHealth } = await import('$lib/server/vector/qdrant-health.js');
+
+				const client = new QdrantClient({ url: qdrantUrl });
+				const health = await checkQdrantHealth(client, {
+					timeout: TIMEOUT,
+					includeVectorCounts: false
+				});
+
+				return {
+					ok: health.healthy,
+					collections: health.collections.length,
+					missing: health.missingCollections.length,
+					schemaIssues: health.schemaIssues.length
+				};
+			} catch {
+				return { ok: false, collections: 0, missing: 8, schemaIssues: 0 };
+			}
+		})(),
 
 		// Postgres: lightweight query via existing health endpoint
 		check('/api/health/database')
@@ -90,7 +110,7 @@ export const GET: RequestHandler = async () => {
 	const ollama = ollamaRes.ok;
 	const models = ollamaRes.models;
 	const embedding = ollama && models.some((m: string) => m.includes('embed'));
-	const rag = ollama && embedding && qdrantOk;
+	const rag = ollama && embedding && qdrantHealth.ok;
 	const ragEnabled = rag && postgresOk;
 	const serverReady = ollama && postgresOk;
 
@@ -98,7 +118,13 @@ export const GET: RequestHandler = async () => {
 		{
 			ollama,
 			embedding,
-			rag: qdrantOk,
+			rag: qdrantHealth.ok,
+			qdrant: {
+				healthy: qdrantHealth.ok,
+				collections: qdrantHealth.collections,
+				missing: qdrantHealth.missing,
+				schemaIssues: qdrantHealth.schemaIssues
+			},
 			postgres: postgresOk,
 			redis: redisOk,
 			tensorrt: tensorrtOk,

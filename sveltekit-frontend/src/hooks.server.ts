@@ -8,6 +8,7 @@ import { deleteSessionCookie, setSessionCookie, validateSession } from '$lib/ser
 import { startWorker } from '$lib/server/analysis/worker.js';
 import { productionLogger } from '$lib/server/production-logger.js';
 import { startRabbitMQPipeline } from '$lib/messaging/rabbitmq-xstate-integration.js';
+import { initializeQdrant } from '$lib/server/startup/qdrant-init.js';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 
 // Start the analysis worker on server boot (idempotent)
@@ -18,6 +19,13 @@ startRabbitMQPipeline().then(() => {
 	console.log('[Boot] RabbitMQ consumers active');
 }).catch((err) => {
 	console.warn('[Boot] RabbitMQ unavailable (non-fatal):', (err as Error).message);
+});
+
+// Initialize Qdrant collections (Priority #2: auto-create missing collections)
+initializeQdrant().then(() => {
+	console.log('[Boot] Qdrant collections verified');
+}).catch((err) => {
+	console.warn('[Boot] Qdrant initialization failed (non-fatal):', (err as Error).message);
 });
 
 /**

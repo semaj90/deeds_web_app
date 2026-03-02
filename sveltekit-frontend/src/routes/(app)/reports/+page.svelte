@@ -98,9 +98,9 @@
 			<div class="text-2xl font-bold text-neutral-100 mt-1">{reports.length}</div>
 		</div>
 		<div class="rounded-lg border border-neutral-800 bg-neutral-900/50 p-4">
-			<div class="text-sm text-neutral-400">Charging Memos</div>
+			<div class="text-sm text-neutral-400">Summaries</div>
 			<div class="text-2xl font-bold text-neutral-100 mt-1">
-				{reportsByType.get('charging_memo')?.length || 0}
+				{reportsByType.get('summary')?.length || 0}
 			</div>
 		</div>
 		<div class="rounded-lg border border-neutral-800 bg-neutral-900/50 p-4">

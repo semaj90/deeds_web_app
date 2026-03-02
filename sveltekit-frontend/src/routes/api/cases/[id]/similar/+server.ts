@@ -407,8 +407,8 @@ async function searchPgvectorCases(
 ): Promise<SimilarCase[]> {
 	const vectorStr = `[${embedding.join(',')}]`;
 
-	// Use parameterized SQL for vector operations
-	const result = await db.execute(sql`
+	// Use raw SQL for pgvector operations (SQL template doesn't support ::vector cast)
+	const query = sql`
 		SELECT
 			c.id, c.title, c.description, c.jurisdiction, c.status, c.priority, c.practice_area,
 			1 - (ce.embedding <=> ${vectorStr}::vector) AS similarity
@@ -417,7 +417,9 @@ async function searchPgvectorCases(
 		WHERE ce.case_id != ${excludeCaseId}
 		ORDER BY ce.embedding <=> ${vectorStr}::vector
 		LIMIT ${limit}
-	`);
+	`;
+
+	const result = await db.execute(query as any);
 	const rows = (result as any).rows ?? result;
 
 	return rows.map((row: any) => ({
