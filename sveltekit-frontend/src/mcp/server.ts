@@ -86,6 +86,58 @@ function setupToolHandlers() {
           required: ["evidenceId", "text"],
         },
       },
+      {
+        name: "evidence:analyze_multimodal",
+        description: "GPU-accelerated multimodal evidence analysis (images/videos/audio): YOLO object detection, Whisper transcription, CLIP embeddings. Returns detected objects, transcript, and 512-dim embeddings for semantic search.",
+        inputSchema: { type: "object",
+          properties: {
+            evidenceId: { type: "string", description: "Evidence record ID in PostgreSQL" },
+            fileUrl: { type: "string", description: "MinIO object key or URL for evidence file" },
+            evidenceType: { type: "string", enum: ["image", "video", "audio"], description: "Evidence file type" },
+            analyzeVision: { type: "boolean", description: "Run YOLO object detection (images/videos)", default: true },
+            analyzeAudio: { type: "boolean", description: "Run Whisper transcription (audio/videos)", default: true },
+            extractEmbeddings: { type: "boolean", description: "Extract CLIP/Whisper embeddings for search", default: true },
+          },
+          required: ["evidenceId", "fileUrl", "evidenceType"],
+        },
+      },
+      {
+        name: "evidence:detect_objects",
+        description: "Detect objects in image evidence using YOLOv8 (GPU). Returns bounding boxes, class names, confidence scores for 80 COCO classes (person, weapon, vehicle, etc).",
+        inputSchema: { type: "object",
+          properties: {
+            evidenceId: { type: "string", description: "Evidence record ID" },
+            imageUrl: { type: "string", description: "MinIO object key or URL for image" },
+            confidenceThreshold: { type: "number", description: "Min detection confidence (0.0-1.0)", default: 0.5 },
+          },
+          required: ["evidenceId", "imageUrl"],
+        },
+      },
+      {
+        name: "evidence:transcribe_gpu",
+        description: "GPU-accelerated audio/video transcription using Whisper. Faster than browser WASM for long recordings (>10s). Returns full transcript with word-level timestamps and language detection.",
+        inputSchema: { type: "object",
+          properties: {
+            evidenceId: { type: "string", description: "Evidence record ID" },
+            audioUrl: { type: "string", description: "MinIO object key or URL for audio/video file" },
+            language: { type: "string", description: "Language code (en, es, etc) or null for auto-detect" },
+            wordTimestamps: { type: "boolean", description: "Enable word-level timestamps", default: false },
+          },
+          required: ["evidenceId", "audioUrl"],
+        },
+      },
+      {
+        name: "evidence:search_similar",
+        description: "Cross-modal semantic search: find visually or acoustically similar evidence using CLIP/Whisper embeddings. Query with text, find matching images/audio.",
+        inputSchema: { type: "object",
+          properties: {
+            query: { type: "string", description: "Text search query (e.g., 'person with weapon')" },
+            modalities: { type: "array", items: { type: "string", enum: ["vision", "audio"] }, description: "Modalities to search", default: ["vision", "audio"] },
+            topK: { type: "number", description: "Number of results to return", default: 10 },
+          },
+          required: ["query"],
+        },
+      },
     ],
   }));
 
@@ -185,6 +237,165 @@ function setupToolHandlers() {
             tags: (tags as any).tags?.length ?? 0,
             tagsMirrored: (tags as any).mirrored ?? 0,
           }) }] };
+        }
+
+        case "evidence:analyze_multimodal": {
+          const { evidenceId, fileUrl, evidenceType, analyzeVision, analyzeAudio, extractEmbeddings } = args as any;
+          const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
+
+          // Fetch file from MinIO
+          const { Client } = await import('minio');
+          const minio = new Client({
+            endPoint: process.env.MINIO_ENDPOINT?.split(':')[0] || 'localhost',
+            port: parseInt(process.env.MINIO_PORT || '9000', 10),
+            useSSL: process.env.MINIO_USE_SSL === 'true',
+            accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
+            secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
+          });
+          const bucketName = process.env.MINIO_EVIDENCE_BUCKET || 'evidence';
+          const chunks: Buffer[] = [];
+          const stream = await minio.getObject(bucketName, fileUrl);
+          for await (const chunk of stream) {
+            chunks.push(Buffer.from(chunk));
+          }
+          const fileBuffer = Buffer.concat(chunks);
+
+          // Call FastAPI multimodal endpoint
+          const FormData = (await import('form-data')).default;
+          const formData = new FormData();
+          formData.append('file', fileBuffer, { filename: fileUrl.split('/').pop() || 'evidence' });
+
+          const url = new URL(`${FASTAPI_URL}/multimodal/analyze`);
+          url.searchParams.set('evidence_id', evidenceId);
+          url.searchParams.set('evidence_type', evidenceType);
+          url.searchParams.set('analyze_vision', String(analyzeVision ?? true));
+          url.searchParams.set('analyze_audio', String(analyzeAudio ?? true));
+          url.searchParams.set('extract_embeddings', String(extractEmbeddings ?? true));
+
+          const response = await fetch(url.toString(), {
+            method: 'POST',
+            body: formData as any,
+            headers: formData.getHeaders(),
+          });
+
+          if (!response.ok) {
+            throw new Error(`Multimodal analysis failed: ${response.status} ${await response.text()}`);
+          }
+
+          const result = await response.json();
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
+        }
+
+        case "evidence:detect_objects": {
+          const { evidenceId, imageUrl, confidenceThreshold } = args as any;
+          const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
+
+          // Fetch image from MinIO
+          const { Client } = await import('minio');
+          const minio = new Client({
+            endPoint: process.env.MINIO_ENDPOINT?.split(':')[0] || 'localhost',
+            port: parseInt(process.env.MINIO_PORT || '9000', 10),
+            useSSL: process.env.MINIO_USE_SSL === 'true',
+            accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
+            secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
+          });
+          const bucketName = process.env.MINIO_EVIDENCE_BUCKET || 'evidence';
+          const chunks: Buffer[] = [];
+          const stream = await minio.getObject(bucketName, imageUrl);
+          for await (const chunk of stream) {
+            chunks.push(Buffer.from(chunk));
+          }
+          const imageBuffer = Buffer.concat(chunks);
+
+          // Call FastAPI vision endpoint
+          const FormData = (await import('form-data')).default;
+          const formData = new FormData();
+          formData.append('file', imageBuffer, { filename: imageUrl.split('/').pop() || 'image' });
+
+          const url = new URL(`${FASTAPI_URL}/vision/analyze`);
+          url.searchParams.set('evidence_id', evidenceId);
+          url.searchParams.set('confidence_threshold', String(confidenceThreshold ?? 0.5));
+
+          const response = await fetch(url.toString(), {
+            method: 'POST',
+            body: formData as any,
+            headers: formData.getHeaders(),
+          });
+
+          if (!response.ok) {
+            throw new Error(`Object detection failed: ${response.status} ${await response.text()}`);
+          }
+
+          const result = await response.json();
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
+        }
+
+        case "evidence:transcribe_gpu": {
+          const { evidenceId, audioUrl, language, wordTimestamps } = args as any;
+          const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
+
+          // Fetch audio from MinIO
+          const { Client } = await import('minio');
+          const minio = new Client({
+            endPoint: process.env.MINIO_ENDPOINT?.split(':')[0] || 'localhost',
+            port: parseInt(process.env.MINIO_PORT || '9000', 10),
+            useSSL: process.env.MINIO_USE_SSL === 'true',
+            accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
+            secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
+          });
+          const bucketName = process.env.MINIO_EVIDENCE_BUCKET || 'evidence';
+          const chunks: Buffer[] = [];
+          const stream = await minio.getObject(bucketName, audioUrl);
+          for await (const chunk of stream) {
+            chunks.push(Buffer.from(chunk));
+          }
+          const audioBuffer = Buffer.concat(chunks);
+
+          // Call FastAPI audio endpoint
+          const FormData = (await import('form-data')).default;
+          const formData = new FormData();
+          formData.append('file', audioBuffer, { filename: audioUrl.split('/').pop() || 'audio' });
+
+          const url = new URL(`${FASTAPI_URL}/audio/transcribe`);
+          url.searchParams.set('evidence_id', evidenceId);
+          if (language) url.searchParams.set('language', language);
+          url.searchParams.set('word_timestamps', String(wordTimestamps ?? false));
+
+          const response = await fetch(url.toString(), {
+            method: 'POST',
+            body: formData as any,
+            headers: formData.getHeaders(),
+          });
+
+          if (!response.ok) {
+            throw new Error(`GPU transcription failed: ${response.status} ${await response.text()}`);
+          }
+
+          const result = await response.json();
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
+        }
+
+        case "evidence:search_similar": {
+          const { query, modalities, topK } = args as any;
+          const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
+
+          const url = new URL(`${FASTAPI_URL}/multimodal/search`);
+          url.searchParams.set('query', query);
+          url.searchParams.set('top_k', String(topK ?? 10));
+          if (modalities) {
+            for (const modality of modalities) {
+              url.searchParams.append('modalities', modality);
+            }
+          }
+
+          const response = await fetch(url.toString(), { method: 'POST' });
+
+          if (!response.ok) {
+            throw new Error(`Cross-modal search failed: ${response.status} ${await response.text()}`);
+          }
+
+          const result = await response.json();
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
         }
 
         default:

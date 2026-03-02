@@ -755,6 +755,31 @@ export const reports = pgTable('reports', {
  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
+export const reportAuditLog = pgTable('report_audit_log', {
+ id: uuid('id')
+ .default(sql`gen_random_uuid()`)
+ .primaryKey()
+ .notNull(),
+ reportId: uuid('report_id')
+ .notNull()
+ .references(() => reports.id, { onDelete: 'cascade' }),
+ userId: uuid('user_id')
+ .notNull()
+ .references(() => users.id, { onDelete: 'set null' }),
+ action: varchar('action', { length: 50 }).notNull(), // 'created', 'updated', 'deleted', 'published', 'exported'
+ changes: jsonb('changes'), // What changed (old vs new values)
+ ipAddress: varchar('ip_address', { length: 45 }),
+ userAgent: text('user_agent'),
+ timestamp: timestamp('timestamp', { withTimezone: true })
+ .default(sql`now()`)
+ .notNull(),
+},
+(table) => ({
+ reportIdIdx: index('report_audit_log_report_id_idx').on(table.reportId),
+ userIdIdx: index('report_audit_log_user_id_idx').on(table.userId),
+ timestampIdx: index('report_audit_log_timestamp_idx').on(table.timestamp),
+}));
+
 export const savedReports = pgTable('saved_reports', {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -1322,6 +1347,12 @@ export const reportsRelations = relations(reports, ({ one, many }) => ({
  case: one(cases, { fields: [reports.caseId], references: [cases.id] }),
  createdBy: one(users, { fields: [reports.createdBy], references: [users.id] }),
  savedReports: many(savedReports),
+ auditLogs: many(reportAuditLog),
+}));
+
+export const reportAuditLogRelations = relations(reportAuditLog, ({ one }) => ({
+ report: one(reports, { fields: [reportAuditLog.reportId], references: [reports.id] }),
+ user: one(users, { fields: [reportAuditLog.userId], references: [users.id] }),
 }));
 
 export const savedReportsRelations = relations(savedReports, ({ one }) => ({

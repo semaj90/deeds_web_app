@@ -60,13 +60,14 @@ export {
 	type DependencyNode
 } from './analyze-imports.js';
 
-// Web Search
+// Web Search (SearXNG + DuckDuckGo + Curated fallback)
 export {
 	webSearch,
 	multiSourceSearch,
 	formatWebSearchResults,
+	isSearXNGAvailable,
 	webSearchSchema,
 	type WebSearchInput,
 	type WebSearchResult,
 	type SearchResult
-} from './web-search.js';
+} from './web-search-searxng.js';

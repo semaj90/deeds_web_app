@@ -4,6 +4,7 @@ import { getTemplate } from '$lib/data/report-templates';
 import { db } from '$lib/server/db/client';
 import { cases, evidence, reports } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
+import { auditReportAction } from '$lib/server/reports/audit';
 
 /**
  * POST /api/reports/generate-from-template
@@ -73,7 +74,7 @@ You are a legal AI assistant generating a ${template.name} for the following cas
 **Status:** ${caseData.status || 'Open'}
 
 **Evidence Items:**
-${evidenceItems.map((e, i) => `${i + 1}. ${e.title || 'Untitled'} (${e.type})`).join('\n')}
+${evidenceItems.map((e, i) => `${i + 1}. ${e.title || 'Untitled'} (${e.fileType})`).join('\n')}
 
 **Instructions:**
 ${template.aiPrompt}
@@ -151,6 +152,21 @@ Generate the complete report content in HTML format, maintaining the structure b
         }
       })
       .returning();
+
+    // Audit log: report created from template
+    await auditReportAction({
+      reportId: newReport.id,
+      userId: locals.user.id,
+      action: 'created',
+      changes: {
+        caseId,
+        title,
+        templateType,
+        templateUsed: template.name,
+        aiGenerated: useAI
+      },
+      request,
+    });
 
     return json({
       success: true,

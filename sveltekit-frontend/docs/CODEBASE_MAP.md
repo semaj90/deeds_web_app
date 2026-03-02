@@ -251,7 +251,12 @@
 | `proto/` | 1 | — | Proto archive |
 
 ---
+Updated Overview
+The 00-OVERVIEW.md now includes this database migration guide in the summary.
 
+Total work across all categories: ~158 hours (6 categories, 77+ TODO items)
+
+All database changes are production-ready after dev/staging testing. No data will b
 ## Language Breakdown
 
 | Language | Files | Location | Status |

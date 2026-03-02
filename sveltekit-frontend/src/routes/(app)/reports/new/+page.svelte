@@ -3,77 +3,23 @@
 	import { page } from '$app/state';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import { getTemplate, getTemplateTypes } from '$lib/data/report-templates';
 
 	// Get caseId from query params if provided
 	let caseId = $derived(page.url.searchParams.get('caseId'));
 
 	let selectedType = $state('charging_memo');
 	let title = $state('');
+	let useAI = $state(true);
+	let useTemplate = $state(true);
 	let isCreating = $state(false);
 	let error = $state<string | null>(null);
 
-	const reportTypes = [
-		{
-			value: 'charging_memo',
-			label: 'Charging Memorandum',
-			description: 'Formal recommendation for charges with legal analysis',
-			icon: 'scale'
-		},
-		{
-			value: 'intake_summary',
-			label: 'Intake Summary',
-			description: 'Initial case assessment and preliminary findings',
-			icon: 'file-text'
-		},
-		{
-			value: 'discovery_list',
-			label: 'Discovery List',
-			description: 'Comprehensive inventory of evidence and materials',
-			icon: 'list'
-		},
-		{
-			value: 'hearing_prep',
-			label: 'Hearing Preparation',
-			description: 'Arguments, exhibits, and witness examination notes',
-			icon: 'presentation'
-		},
-		{
-			value: 'legal_memo',
-			label: 'Legal Memorandum',
-			description: 'Research memo on legal issues and precedents',
-			icon: 'book-open'
-		},
-		{
-			value: 'summary',
-			label: 'Case Summary',
-			description: 'General case overview and status report',
-			icon: 'file'
-		},
-		{
-			value: 'analysis',
-			label: 'Analysis Report',
-			description: 'Detailed analytical assessment',
-			icon: 'bar-chart'
-		},
-		{
-			value: 'timeline',
-			label: 'Timeline Report',
-			description: 'Chronological sequence of events',
-			icon: 'calendar'
-		},
-		{
-			value: 'evidence_review',
-			label: 'Evidence Review',
-			description: 'Systematic review of evidence items',
-			icon: 'folder-open'
-		},
-		{
-			value: 'custom',
-			label: 'Custom Report',
-			description: 'Blank template for custom content',
-			icon: 'edit'
-		}
-	];
+	// Get selected template details
+	let selectedTemplate = $derived(getTemplate(selectedType));
+
+	// Get report types from template system
+	const reportTypes = getTemplateTypes();
 
 	async function createReport() {
 		if (!title.trim()) {
@@ -90,26 +36,52 @@
 		error = null;
 
 		try {
-			const res = await fetch('/api/reports', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				credentials: 'include',
-				body: JSON.stringify({
-					caseId,
-					title: title.trim(),
-					type: selectedType,
-					contentHtml: '<p>Start writing your report...</p>',
-					contentJson: null
-				})
-			});
+			let reportId;
 
-			if (!res.ok) {
+			if (useTemplate) {
+				// Use template generation endpoint
+				const res = await fetch('/api/reports/generate-from-template', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					credentials: 'include',
+					body: JSON.stringify({
+						templateType: selectedType,
+						caseId,
+						customTitle: title.trim(),
+						useAI
+					})
+				});
+
+				if (!res.ok) {
+					const data = await res.json();
+					throw new Error(data.message || 'Failed to generate report');
+				}
+
 				const data = await res.json();
-				throw new Error(data.error || 'Failed to create report');
-			}
+				reportId = data.data?.id;
+			} else {
+				// Create blank report
+				const res = await fetch('/api/reports', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					credentials: 'include',
+					body: JSON.stringify({
+						caseId,
+						title: title.trim(),
+						contentHtml: '<p>Start writing your report...</p>',
+						status: 'draft',
+						metadata: { reportType: selectedType }
+					})
+				});
 
-			const data = await res.json();
-			const reportId = data.data?.id;
+				if (!res.ok) {
+					const data = await res.json();
+					throw new Error(data.message || 'Failed to create report');
+				}
+
+				const data = await res.json();
+				reportId = data.data?.id;
+			}
 
 			if (reportId) {
 				goto(`/reports/${reportId}/edit`);
@@ -195,6 +167,51 @@
 				{/each}
 			</div>
 		</div>
+
+		<!-- Template Options -->
+		{#if selectedTemplate}
+			<div class="mb-6 p-4 rounded-lg border border-neutral-800 bg-neutral-900/50">
+				<h3 class="text-sm font-semibold text-neutral-300 mb-3">Generation Options</h3>
+
+				<!-- Use Template Toggle -->
+				<label class="flex items-center gap-3 mb-3 cursor-pointer">
+					<input
+						type="checkbox"
+						bind:checked={useTemplate}
+						class="w-4 h-4 rounded border-neutral-700 bg-neutral-800 text-accent focus:ring-2 focus:ring-accent focus:ring-offset-0"
+					/>
+					<div class="flex-1">
+						<div class="text-sm text-neutral-200">Use {selectedTemplate.name} template</div>
+						<div class="text-xs text-neutral-500">Pre-fill report with structured template ({selectedTemplate.estimatedTime})</div>
+					</div>
+				</label>
+
+				<!-- AI Enhancement Toggle -->
+				{#if useTemplate}
+					<label class="flex items-center gap-3 cursor-pointer">
+						<input
+							type="checkbox"
+							bind:checked={useAI}
+							class="w-4 h-4 rounded border-neutral-700 bg-neutral-800 text-accent focus:ring-2 focus:ring-accent focus:ring-offset-0"
+						/>
+						<div class="flex-1">
+							<div class="text-sm text-neutral-200 flex items-center gap-2">
+								<span>AI-powered content generation</span>
+								<span class="px-2 py-0.5 text-xs rounded-full bg-accent/20 text-accent">Beta</span>
+							</div>
+							<div class="text-xs text-neutral-500">Generate case-specific content using AI (requires Ollama)</div>
+						</div>
+					</label>
+
+					{#if useAI}
+						<div class="mt-3 p-3 rounded bg-neutral-800/50 text-xs text-neutral-400">
+							<Icon name="sparkles" class="w-3 h-3 inline-block mr-1" />
+							AI will analyze your case evidence and generate tailored content following the template structure.
+						</div>
+					{/if}
+				{/if}
+			</div>
+		{/if}
 
 		<!-- Actions -->
 		<div class="flex items-center gap-3">

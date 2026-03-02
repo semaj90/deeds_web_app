@@ -1,0 +1,60 @@
+# SearXNG - Free Self-Hosted Search Engine
+#
+# Quick Start:
+#   docker-compose -f docker-compose.searxng.yml up -d
+#
+# Access:
+#   http://localhost:8080
+#
+# Add to .env:
+#   SEARXNG_URL=http://localhost:8080
+
+version: '3.8'
+
+services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: deeds-searxng
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./searxng-config:/etc/searxng:rw
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:8080/
+      - SEARXNG_SECRET=${SEARXNG_SECRET:-$(openssl rand -hex 32)}
+    networks:
+      - deeds-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "com.deeds.service=searxng"
+      - "com.deeds.description=Privacy-respecting metasearch engine"
+
+  # Optional: Redis for SearXNG result caching (improves performance)
+  searxng-redis:
+    image: redis:7-alpine
+    container_name: deeds-searxng-redis
+    restart: unless-stopped
+    command: redis-server --save 30 1 --loglevel warning
+    volumes:
+      - searxng-redis-data:/data
+    networks:
+      - deeds-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+networks:
+  deeds-network:
+    driver: bridge
+
+volumes:
+  searxng-redis-data:
+    driver: local

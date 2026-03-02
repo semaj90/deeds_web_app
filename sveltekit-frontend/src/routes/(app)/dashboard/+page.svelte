@@ -23,9 +23,16 @@
   let showCommandPalette = $state(false);
 
   function handleGlobalKeydown(e: KeyboardEvent) {
+    // Ctrl/Cmd + K: Toggle command palette (global search)
     if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
       e.preventDefault();
       showCommandPalette = !showCommandPalette;
+    }
+
+    // Ctrl/Cmd + N: Create new case
+    if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+      e.preventDefault();
+      goto('/cases/new');
     }
   }
 

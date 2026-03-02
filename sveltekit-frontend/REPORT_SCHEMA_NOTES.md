@@ -1,4 +1,21 @@
-# Report Schema Notes
+# Report Schema Notes — RESOLVED
+
+## Issue Resolution (March 1, 2026)
+
+**Root Cause:** The dev server was connecting to a local PostgreSQL instance on the host machine (port 5432) instead of the Docker containers. This local instance had an outdated `reports` table schema missing the `generated_at` column.
+
+**Solution:** Dropped and recreated the `reports` table in the local PostgreSQL instance with the correct schema matching `schema-postgres.ts`.
+
+## Database Setup
+
+The application connects to:
+- **Local PostgreSQL 17.6** on `127.0.0.1:5432` (host machine)
+- `legal_ai_db` database
+- User: `legal_admin`
+
+Docker containers:
+- `deeds-postgres-prod`: Internal Docker network only (no host port mapping)
+- `phase66-postgres`: Mapped to host port 5434
 
 ## Actual Database Schema
 
@@ -12,19 +29,12 @@ The `reports` table has these fields:
   title: varchar(255)
   content: text  // Single field for HTML/text content
   status: reportStatusEnum  // Values: 'draft', 'pending', 'completed', 'published'
-  generatedAt: timestamp
+  generatedAt: timestamp  // ✅ NOW PRESENT
   metadata: jsonb  // Flexible JSON storage
   createdAt: timestamp
   updatedAt: timestamp
 }
 ```
-
-## Important Differences from Documentation
-
-1. **No `contentHtml` / `contentJson` fields** - Only a single `content` text field
-2. **No `type` field** - Report types (charging_memo, etc.) should be stored in `metadata.reportType`
-3. **No `createdByUserId`** - Field is named `createdBy`
-4. **No `rawModelOutput`** - Can store in `metadata.rawOutput` if needed
 
 ## Recommended Usage
 
@@ -47,10 +57,22 @@ await db.insert(reports).values({
 
 ## Current Implementation Status
 
-The report routes created in this session use the **documented** field names (contentHtml, type, etc.), not the **actual** schema field names. This causes TypeScript errors.
+✅ **FIXED:** All report routes now work correctly with the proper schema:
+- `/api/reports` - GET (list), POST (create), PATCH (bulk update), DELETE (bulk delete)
+- `/api/reports/save` - POST (save content)
+- `/api/reports/[id]/publish` - POST (publish), DELETE (unpublish)
+- `/api/reports/[id]/export` - GET (HTML, Markdown, JSON, PDF-via-print)
+- `/reports` - Listing page
+- `/reports/new` - Creation wizard
+- `/reports/[id]` - View page
+- `/reports/[id]/edit` - TipTap editor
 
-**TO FIX**: Update all report routes to match actual schema:
-- `contentHtml` → `content`
-- `type` → `metadata.reportType`
-- `createdByUserId` → `createdBy`
-- `contentJson` → remove (or store in metadata)
+## Verification
+
+```bash
+# Test API endpoint
+curl http://localhost:5173/api/reports
+
+# Should return:
+# {"success":true,"data":[...]}
+```

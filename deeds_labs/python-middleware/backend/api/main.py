@@ -71,6 +71,22 @@ try:
 except ImportError:
     kb_fixing_v2_router = None
 
+# Multimodal routers (vision, audio, multimodal)
+try:
+    from ..routers.vision import router as vision_router
+except ImportError:
+    vision_router = None
+
+try:
+    from ..routers.audio import router as audio_router
+except ImportError:
+    audio_router = None
+
+try:
+    from ..routers.multimodal import router as multimodal_router
+except ImportError:
+    multimodal_router = None
+
 
 # Lifespan context manager for startup/shutdown
 @asynccontextmanager
@@ -169,6 +185,25 @@ if kb_fixing_v2_router:
     logger.info("✅ KB Fixing API V2 registered (auto-approval + agentic)")
 else:
     logger.warning("⚠️  KB Fixing API V2 not available")
+
+# Include Multimodal routers (YOLO + Whisper + CLIP)
+if vision_router:
+    app.include_router(vision_router)
+    logger.info("✅ Vision API registered (YOLO + CLIP)")
+else:
+    logger.warning("⚠️  Vision API not available")
+
+if audio_router:
+    app.include_router(audio_router)
+    logger.info("✅ Audio API registered (Whisper)")
+else:
+    logger.warning("⚠️  Audio API not available")
+
+if multimodal_router:
+    app.include_router(multimodal_router)
+    logger.info("✅ Multimodal API registered (Vision + Audio + Text)")
+else:
+    logger.warning("⚠️  Multimodal API not available")
 
 
 @app.get("/health")

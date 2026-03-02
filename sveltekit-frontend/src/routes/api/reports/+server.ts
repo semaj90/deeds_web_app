@@ -3,6 +3,7 @@ import { reports } from '$lib/server/db/schema';
 import { error, json } from '@sveltejs/kit';
 import { and, desc, eq, inArray } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { auditReportAction } from '$lib/server/reports/audit';
 
 /**
  * GET /api/reports
@@ -54,7 +55,16 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		return json({ success: true, data: userReports });
 	} catch (err) {
 		console.error('Error fetching reports:', err);
-		throw error(500, 'Failed to fetch reports');
+		console.error('Error type:', typeof err);
+		console.error('Error constructor:', err?.constructor?.name);
+		if (err && typeof err === 'object') {
+			console.error('Error keys:', Object.keys(err));
+			console.error('Error cause:', (err as any).cause);
+		}
+		const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+		const errorStack = err instanceof Error ? err.stack : '';
+		console.error('Full error:', errorMessage, errorStack);
+		throw error(500, `Failed to fetch reports: ${errorMessage}`);
 	}
 };
 
@@ -84,6 +94,15 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 				metadata: body?.metadata ?? null,
 			})
 			.returning();
+
+		// Audit log: report created
+		await auditReportAction({
+			reportId: newReport[0].id,
+			userId: locals.user.id,
+			action: 'created',
+			changes: { caseId: body.caseId, title: newReport[0].title, status: newReport[0].status },
+			request,
+		});
 
 		return json(
 			{ success: true, data: newReport[0], message: 'Report created successfully' },
@@ -127,6 +146,19 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 			)
 			.returning();
 
+		// Audit log: report updated (for each updated report)
+		await Promise.all(
+			updated.map(report =>
+				auditReportAction({
+					reportId: report.id,
+					userId: locals.user.id,
+					action: 'updated',
+					changes: updates,
+					request,
+				})
+			)
+		);
+
 		return json({
 			success: true,
 			data: updated.length,
@@ -163,6 +195,19 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 				)
 			)
 			.returning();
+
+		// Audit log: report deleted (for each deleted report)
+		await Promise.all(
+			deleted.map(report =>
+				auditReportAction({
+					reportId: report.id,
+					userId: locals.user.id,
+					action: 'deleted',
+					changes: { title: report.title, status: report.status },
+					request,
+				})
+			)
+		);
 
 		return json({
 			success: true,
