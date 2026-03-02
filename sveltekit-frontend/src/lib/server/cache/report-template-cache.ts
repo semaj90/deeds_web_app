@@ -87,7 +87,7 @@ export interface CachedRenderedTemplate {
  * Get template metadata from cache, falling back to source
  */
 export async function getCachedTemplate(type: string): Promise<ReportTemplate | null> {
-	const redis = await redisPool.acquire();
+	const redis = redisPool.getConnection();
 	try {
 		// Try cache first
 		const cacheKey = TEMPLATE_CACHE_KEYS.metadata(type);
@@ -112,8 +112,6 @@ export async function getCachedTemplate(type: string): Promise<ReportTemplate | 
 		console.error('[TemplateCache] Error getting template:', err);
 		// Fallback to source on cache error
 		return getTemplate(type);
-	} finally {
-		redisPool.release(redis);
 	}
 }
 
@@ -121,7 +119,7 @@ export async function getCachedTemplate(type: string): Promise<ReportTemplate | 
  * Get all templates from cache
  */
 export async function getCachedAllTemplates(): Promise<ReportTemplate[]> {
-	const redis = await redisPool.acquire();
+	const redis = redisPool.getConnection();
 	try {
 		// Try cache first
 		const cacheKey = TEMPLATE_CACHE_KEYS.allTemplates();
@@ -145,8 +143,7 @@ export async function getCachedAllTemplates(): Promise<ReportTemplate[]> {
 		console.error('[TemplateCache] Error getting all templates:', err);
 		// Fallback to source on cache error
 		return Object.values(REPORT_TEMPLATES);
-	} finally {
-		redisPool.release(redis);
+		
 	}
 }
 
@@ -160,7 +157,7 @@ export async function cacheAIContent(
 	model: string = 'gemma3-legal:latest',
 	tokenCount?: number
 ): Promise<void> {
-	const redis = await redisPool.acquire();
+	const redis = redisPool.getConnection();
 	try {
 		const cacheKey = TEMPLATE_CACHE_KEYS.aiContent(templateType, caseId);
 		const data: CachedAIContent = {
@@ -177,8 +174,7 @@ export async function cacheAIContent(
 	} catch (err) {
 		console.error('[TemplateCache] Error caching AI content:', err);
 		// Non-fatal - continue without caching
-	} finally {
-		redisPool.release(redis);
+		
 	}
 }
 
@@ -189,7 +185,7 @@ export async function getCachedAIContent(
 	templateType: string,
 	caseId: string
 ): Promise<CachedAIContent | null> {
-	const redis = await redisPool.acquire();
+	const redis = redisPool.getConnection();
 	try {
 		const cacheKey = TEMPLATE_CACHE_KEYS.aiContent(templateType, caseId);
 		const cached = await redis.get(cacheKey);
@@ -204,8 +200,7 @@ export async function getCachedAIContent(
 	} catch (err) {
 		console.error('[TemplateCache] Error getting AI content:', err);
 		return null;
-	} finally {
-		redisPool.release(redis);
+		
 	}
 }
 
@@ -219,7 +214,7 @@ export async function cacheRenderedTemplate(
 	content: string,
 	title: string
 ): Promise<void> {
-	const redis = await redisPool.acquire();
+	const redis = redisPool.getConnection();
 	try {
 		const cacheKey = TEMPLATE_CACHE_KEYS.rendered(templateType, caseId, paramsHash);
 		const data: CachedRenderedTemplate = {
@@ -236,8 +231,7 @@ export async function cacheRenderedTemplate(
 	} catch (err) {
 		console.error('[TemplateCache] Error caching rendered template:', err);
 		// Non-fatal - continue without caching
-	} finally {
-		redisPool.release(redis);
+		
 	}
 }
 
@@ -249,7 +243,7 @@ export async function getCachedRenderedTemplate(
 	caseId: string,
 	paramsHash: string
 ): Promise<CachedRenderedTemplate | null> {
-	const redis = await redisPool.acquire();
+	const redis = redisPool.getConnection();
 	try {
 		const cacheKey = TEMPLATE_CACHE_KEYS.rendered(templateType, caseId, paramsHash);
 		const cached = await redis.get(cacheKey);
@@ -264,8 +258,7 @@ export async function getCachedRenderedTemplate(
 	} catch (err) {
 		console.error('[TemplateCache] Error getting rendered template:', err);
 		return null;
-	} finally {
-		redisPool.release(redis);
+		
 	}
 }
 
@@ -274,7 +267,7 @@ export async function getCachedRenderedTemplate(
  * Used when templates are updated
  */
 export async function invalidateTemplateCache(templateType: string): Promise<void> {
-	const redis = await redisPool.acquire();
+	const redis = redisPool.getConnection();
 	try {
 		const pattern = `template:*:${templateType}:*`;
 		const keys = await redis.keys(pattern);
@@ -286,8 +279,7 @@ export async function invalidateTemplateCache(templateType: string): Promise<voi
 	} catch (err) {
 		console.error('[TemplateCache] Error invalidating template cache:', err);
 		// Non-fatal
-	} finally {
-		redisPool.release(redis);
+		
 	}
 }
 
@@ -296,7 +288,7 @@ export async function invalidateTemplateCache(templateType: string): Promise<voi
  * Used when case data changes significantly
  */
 export async function invalidateCaseAIContent(caseId: string): Promise<void> {
-	const redis = await redisPool.acquire();
+	const redis = redisPool.getConnection();
 	try {
 		const pattern = `template:ai:*:${caseId}:*`;
 		const keys = await redis.keys(pattern);
@@ -308,8 +300,7 @@ export async function invalidateCaseAIContent(caseId: string): Promise<void> {
 	} catch (err) {
 		console.error('[TemplateCache] Error invalidating case AI content:', err);
 		// Non-fatal
-	} finally {
-		redisPool.release(redis);
+		
 	}
 }
 
@@ -318,7 +309,7 @@ export async function invalidateCaseAIContent(caseId: string): Promise<void> {
  * Used when case data changes
  */
 export async function invalidateCaseRenderedTemplates(caseId: string): Promise<void> {
-	const redis = await redisPool.acquire();
+	const redis = redisPool.getConnection();
 	try {
 		const pattern = `template:rendered:*:${caseId}:*`;
 		const keys = await redis.keys(pattern);
@@ -330,8 +321,7 @@ export async function invalidateCaseRenderedTemplates(caseId: string): Promise<v
 	} catch (err) {
 		console.error('[TemplateCache] Error invalidating case rendered templates:', err);
 		// Non-fatal
-	} finally {
-		redisPool.release(redis);
+		
 	}
 }
 
@@ -349,13 +339,13 @@ export async function invalidateAllCaseTemplates(caseId: string): Promise<void> 
 /**
  * Get cache statistics
  */
-export async function getTemplateCache Stats(): Promise<{
+export async function getTemplateCacheStats(): Promise<{
 	totalKeys: number;
 	metadataKeys: number;
 	aiContentKeys: number;
 	renderedKeys: number;
 }> {
-	const redis = await redisPool.acquire();
+	const redis = redisPool.getConnection();
 	try {
 		const [allKeys, metaKeys, aiKeys, renderedKeys] = await Promise.all([
 			redis.keys(`template:*:${CACHE_VERSION}`),
@@ -378,8 +368,7 @@ export async function getTemplateCache Stats(): Promise<{
 			aiContentKeys: 0,
 			renderedKeys: 0
 		};
-	} finally {
-		redisPool.release(redis);
+		
 	}
 }
 

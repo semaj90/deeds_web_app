@@ -58,6 +58,12 @@ export const CACHE_PATTERNS = {
 	CITATION: (citationId: string) => `citation:${citationId}*`,
 	CITATION_TAGS: (citationId: string) => `citation:tags:${citationId}*`,
 
+	// Report Templates (Priority #9)
+	TEMPLATE_META: (templateType: string) => `template:meta:${templateType}*`,
+	TEMPLATE_AI: (caseId: string) => `template:ai:*:${caseId}:*`,
+	TEMPLATE_RENDERED: (caseId: string) => `template:rendered:*:${caseId}:*`,
+	TEMPLATE_ALL: 'template:*',
+
 	// Global
 	ALL: '*'
 } as const;
@@ -277,7 +283,10 @@ export const invalidateCaseCache = async (caseId: string, type: InvalidationType
 		CACHE_PATTERNS.CASE(caseId),
 		CACHE_PATTERNS.CASE_LIST,
 		CACHE_PATTERNS.CASE_STATS,
-		CACHE_PATTERNS.DASHBOARD_STATS
+		CACHE_PATTERNS.DASHBOARD_STATS,
+		// Invalidate report templates that depend on case data (Priority #9)
+		CACHE_PATTERNS.TEMPLATE_AI(caseId),
+		CACHE_PATTERNS.TEMPLATE_RENDERED(caseId)
 	], { type, userId });
 };
 
