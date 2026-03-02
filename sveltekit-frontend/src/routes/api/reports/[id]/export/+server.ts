@@ -3,85 +3,151 @@ import { reports } from '$lib/server/db/schema';
 import { error, json } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { auditReportAction } from '$lib/server/reports/audit.js';
 
 /**
  * GET /api/reports/[id]/export?format=pdf|html|markdown|json
+ * POST /api/reports/[id]/export with { format: 'pdf' | 'html' | 'markdown' | 'json' }
  * Export report in various formats
  */
-export const GET: RequestHandler = async ({ locals, params, url }) => {
+
+async function handleExport({ locals, params, format, request }: {
+	locals: App.Locals;
+	params: { id: string };
+	format: string;
+	request?: Request;
+}) {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}
 
 	const reportId = params.id;
-	const format = url.searchParams.get('format') || 'html';
 
-	try {
-		// Fetch report and verify ownership
-		const [report] = await db
-			.select()
-			.from(reports)
-			.where(
-				and(
-					eq(reports.id, reportId),
-					eq(reports.createdBy, locals.user.id)
-				)
+	// Fetch report and verify ownership
+	const [report] = await db
+		.select()
+		.from(reports)
+		.where(
+			and(
+				eq(reports.id, reportId),
+				eq(reports.createdBy, locals.user.id)
 			)
-			.limit(1);
+		)
+		.limit(1);
 
-		if (!report) {
-			throw error(404, 'Report not found');
+	if (!report) {
+		throw error(404, 'Report not found');
+	}
+
+	// Audit log: report exported
+	await auditReportAction({
+		reportId: report.id,
+		userId: locals.user.id,
+		action: 'exported',
+		changes: { format },
+		request,
+	}).catch(err => console.warn('[Export] Audit log failed:', err));
+
+	// Export based on format
+	switch (format) {
+		case 'html':
+			return new Response(generateHTML(report), {
+				headers: {
+					'Content-Type': 'text/html',
+					'Content-Disposition': `attachment; filename="${sanitizeFilename(report.title)}.html"`
+				}
+			});
+
+		case 'markdown':
+			return new Response(htmlToMarkdown(report.content || ''), {
+				headers: {
+					'Content-Type': 'text/markdown',
+					'Content-Disposition': `attachment; filename="${sanitizeFilename(report.title)}.md"`
+				}
+			});
+
+		case 'pdf':
+			// PDF generation requires puppeteer or jspdf
+			// For now, return error with instructions
+			return json(
+				{
+					error: 'PDF export requires additional setup',
+					instructions: 'Install puppeteer or use the HTML export and print to PDF',
+					fallback: `/api/reports/${reportId}/export?format=html`
+				},
+				{ status: 501 }
+			);
+
+		case 'docx':
+			// DOCX export not yet implemented
+			return json(
+				{
+					error: 'DOCX export not yet implemented',
+					instructions: 'Use HTML or Markdown export as a workaround',
+					fallback: `/api/reports/${reportId}/export?format=html`
+				},
+				{ status: 501 }
+			);
+
+		case 'json':
+			return new Response(JSON.stringify({
+				id: report.id,
+				title: report.title,
+				type: report.status,
+				content: report.content,
+				metadata: report.metadata,
+				createdAt: report.createdAt,
+				updatedAt: report.updatedAt
+			}, null, 2), {
+				headers: {
+					'Content-Type': 'application/json',
+					'Content-Disposition': `attachment; filename="${sanitizeFilename(report.title)}.json"`
+				}
+			});
+
+		default:
+			throw error(400, 'Invalid format. Supported: html, markdown, json, pdf, docx');
+	}
+}
+
+export const GET: RequestHandler = async ({ locals, params, url }) => {
+	const format = url.searchParams.get('format') || 'html';
+	try {
+		return await handleExport({ locals, params, format });
+	} catch (err) {
+		console.error('Export error:', err);
+		if (err instanceof Error && 'status' in err) throw err;
+		throw error(500, 'Failed to export report');
+	}
+};
+
+export const POST: RequestHandler = async ({ locals, params, request }) => {
+	const body = await request.json();
+	const format = body.format || 'html';
+	try {
+		const result = await handleExport({ locals, params, format, request });
+
+		// For POST, return JSON with download info instead of direct download
+		// This is more MCP-friendly
+		const contentType = result.headers.get('Content-Type') || 'application/octet-stream';
+		const contentDisposition = result.headers.get('Content-Disposition') || '';
+		const filename = contentDisposition.match(/filename="([^"]+)"/)?.[1] || `export.${format}`;
+
+		// For JSON responses (errors), return as-is
+		if (contentType.includes('application/json')) {
+			return result;
 		}
 
-		// Export based on format
-		switch (format) {
-			case 'html':
-				return new Response(generateHTML(report), {
-					headers: {
-						'Content-Type': 'text/html',
-						'Content-Disposition': `attachment; filename="${sanitizeFilename(report.title)}.html"`
-					}
-				});
-
-			case 'markdown':
-				return new Response(htmlToMarkdown(report.content || ''), {
-					headers: {
-						'Content-Type': 'text/markdown',
-						'Content-Disposition': `attachment; filename="${sanitizeFilename(report.title)}.md"`
-					}
-				});
-
-			case 'pdf':
-				// PDF generation requires puppeteer or jspdf
-				// For now, return error with instructions
-				return json(
-					{
-						error: 'PDF export requires additional setup',
-						instructions: 'Install puppeteer or use the HTML export and print to PDF',
-						fallback: `/api/reports/${reportId}/export?format=html`
-					},
-					{ status: 501 }
-				);
-
-			case 'json':
-				return new Response(JSON.stringify({
-					id: report.id,
-					title: report.title,
-					type: report.status,
-					content: report.content,
-					metadata: report.metadata,
-					createdAt: report.createdAt,
-					updatedAt: report.updatedAt
-				}, null, 2), {
-					headers: {
-						'Content-Type': 'application/json',
-						'Content-Disposition': `attachment; filename="${sanitizeFilename(report.title)}.json"`
-					}
-				});
-
-			default:
-				throw error(400, 'Invalid format. Supported: html, markdown, json, pdf');
-		}
+		// For successful exports, return metadata with download URL
+		return json({
+			success: true,
+			format,
+			filename,
+			contentType,
+			message: `Report exported successfully as ${format.toUpperCase()}`,
+			// For MCP tools, provide download URL since we can't return binary data
+			downloadUrl: `/api/reports/${params.id}/export?format=${format}`
+		});
 	} catch (err) {
 		console.error('Export error:', err);
 		if (err instanceof Error && 'status' in err) throw err;

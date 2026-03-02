@@ -138,6 +138,77 @@ function setupToolHandlers() {
           required: ["query"],
         },
       },
+      {
+        name: "reports:list",
+        description: "List reports with optional case filtering. Returns report metadata including title, status, creation date.",
+        inputSchema: { type: "object",
+          properties: {
+            caseId: { type: "string", description: "Filter reports by case ID" },
+            limit: { type: "number", description: "Maximum number of reports to return", default: 20 },
+            offset: { type: "number", description: "Pagination offset", default: 0 },
+          },
+        },
+      },
+      {
+        name: "reports:create",
+        description: "Create a new blank report for a case. Returns report ID and metadata.",
+        inputSchema: { type: "object",
+          properties: {
+            caseId: { type: "string", description: "Case ID to associate report with" },
+            title: { type: "string", description: "Report title", default: "Untitled Report" },
+            contentHtml: { type: "string", description: "Initial HTML content", default: "<p>Start writing...</p>" },
+            status: { type: "string", enum: ["draft", "in_review", "finalized", "published"], description: "Report status", default: "draft" },
+          },
+          required: ["caseId"],
+        },
+      },
+      {
+        name: "reports:generate_from_template",
+        description: "Generate a report from a legal template (charging memo, search warrant affidavit, case summary, evidence inventory, witness interview, plea agreement, motion to suppress, trial brief, sentencing memo, discovery index). Optionally use AI to fill in case-specific analysis.",
+        inputSchema: { type: "object",
+          properties: {
+            templateType: { type: "string", enum: ["charging_memo", "search_warrant", "case_summary", "evidence_inventory", "witness_interview", "plea_agreement", "motion_suppress", "trial_brief", "sentencing_memo", "discovery_index"], description: "Template type to use" },
+            caseId: { type: "string", description: "Case ID to generate report for" },
+            customTitle: { type: "string", description: "Custom report title (overrides template default)" },
+            useAI: { type: "boolean", description: "Use AI (Ollama gemma3-legal) to generate case-specific content", default: false },
+          },
+          required: ["templateType", "caseId"],
+        },
+      },
+      {
+        name: "reports:update",
+        description: "Update an existing report's title, content, or status.",
+        inputSchema: { type: "object",
+          properties: {
+            reportId: { type: "string", description: "Report ID to update" },
+            title: { type: "string", description: "New report title" },
+            contentHtml: { type: "string", description: "Updated HTML content" },
+            status: { type: "string", enum: ["draft", "in_review", "finalized", "published"], description: "New report status" },
+          },
+          required: ["reportId"],
+        },
+      },
+      {
+        name: "reports:delete",
+        description: "Delete a report. Audit log entry will be created for legal compliance.",
+        inputSchema: { type: "object",
+          properties: {
+            reportId: { type: "string", description: "Report ID to delete" },
+          },
+          required: ["reportId"],
+        },
+      },
+      {
+        name: "reports:export",
+        description: "Export a report to PDF, DOCX, or HTML format. Returns download URL.",
+        inputSchema: { type: "object",
+          properties: {
+            reportId: { type: "string", description: "Report ID to export" },
+            format: { type: "string", enum: ["pdf", "docx", "html"], description: "Export format", default: "pdf" },
+          },
+          required: ["reportId", "format"],
+        },
+      },
     ],
   }));
 
@@ -395,6 +466,37 @@ function setupToolHandlers() {
           }
 
           const result = await response.json();
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
+        }
+
+        case "reports:list": {
+          const result = await mcpTools.reports.listReports(args as any);
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
+        }
+
+        case "reports:create": {
+          const result = await mcpTools.reports.createReport(args as any);
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
+        }
+
+        case "reports:generate_from_template": {
+          const result = await mcpTools.reports.generateFromTemplate(args as any);
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
+        }
+
+        case "reports:update": {
+          const result = await mcpTools.reports.updateReport(args as any);
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
+        }
+
+        case "reports:delete": {
+          const { reportId } = args as { reportId: string };
+          const result = await mcpTools.reports.deleteReport(reportId);
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
+        }
+
+        case "reports:export": {
+          const result = await mcpTools.reports.exportReport(args as any);
           return { content: [{ type: "text", text: JSON.stringify(result) }] };
         }
 

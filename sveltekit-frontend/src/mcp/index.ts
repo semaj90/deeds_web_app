@@ -62,9 +62,43 @@ export interface RAGTools {
   clearLangCache(scope?: string): Promise<MCPToolResponse<{ cleared: number }>>;
 }
 
+export interface ReportTools {
+  listReports(params: {
+    caseId?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<MCPToolResponse<any[]>>;
+  createReport(params: {
+    caseId: string;
+    title?: string;
+    contentHtml?: string;
+    status?: 'draft' | 'in_review' | 'finalized' | 'published';
+  }): Promise<MCPToolResponse<any>>;
+  generateFromTemplate(params: {
+    templateType: string;
+    caseId: string;
+    customTitle?: string;
+    useAI?: boolean;
+  }): Promise<MCPToolResponse<any>>;
+  updateReport(params: {
+    reportId: string;
+    title?: string;
+    contentHtml?: string;
+    status?: 'draft' | 'in_review' | 'finalized' | 'published';
+  }): Promise<MCPToolResponse<any>>;
+  deleteReport(reportId: string): Promise<MCPToolResponse<{ deleted: boolean, id: string }>>;
+  exportReport(params: {
+    reportId: string;
+    format: 'pdf' | 'docx' | 'html';
+  }): Promise<MCPToolResponse<{ url: string, filename: string }>>;
+}
+
 export interface MCPTools {
-  cases: CasesTools, evidence: EvidenceTools;
-  users: UserTools, rag: RAGTools;
+  cases: CasesTools;
+  evidence: EvidenceTools;
+  users: UserTools;
+  rag: RAGTools;
+  reports: ReportTools;
   getAnalytics(params: Record<string, string>): Promise<MCPToolResponse<any>>;
   analyzeLegalDocument(document: any): Promise<MCPToolResponse<any>>;
   extractClauses(documentId: string): Promise<MCPToolResponse<any>>;
@@ -161,6 +195,94 @@ export const mcpTools: MCPTools = {
     clearLangCache: async (scope) => {
       try {
         return { success: true, data: { cleared: 0 } };
+      } catch (error) {
+        return { success: false, error: String(error) };
+      }
+    },
+  },
+  reports: {
+    listReports: async (params) => {
+      try {
+        const queryParams = new URLSearchParams();
+        if (params.caseId) queryParams.append('caseId', params.caseId);
+        if (params.limit) queryParams.append('limit', String(params.limit));
+        if (params.offset) queryParams.append('offset', String(params.offset));
+
+        const response = await fetch(`/api/reports?${queryParams}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        });
+        const result = await response.json();
+        return { success: result.success, data: result.data };
+      } catch (error) {
+        return { success: false, error: String(error) };
+      }
+    },
+    createReport: async (params) => {
+      try {
+        const response = await fetch('/api/reports', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(params),
+        });
+        const result = await response.json();
+        return { success: result.success, data: result.data };
+      } catch (error) {
+        return { success: false, error: String(error) };
+      }
+    },
+    generateFromTemplate: async (params) => {
+      try {
+        const response = await fetch('/api/reports/generate-from-template', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(params),
+        });
+        const result = await response.json();
+        return { success: result.success, data: result.data };
+      } catch (error) {
+        return { success: false, error: String(error) };
+      }
+    },
+    updateReport: async (params) => {
+      try {
+        const { reportId, ...updates } = params;
+        const response = await fetch('/api/reports', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ids: [reportId], ...updates }),
+        });
+        const result = await response.json();
+        return { success: result.success, data: result.data };
+      } catch (error) {
+        return { success: false, error: String(error) };
+      }
+    },
+    deleteReport: async (reportId) => {
+      try {
+        const response = await fetch('/api/reports', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ids: [reportId] }),
+        });
+        const result = await response.json();
+        return { success: result.success, data: { deleted: true, id: reportId } };
+      } catch (error) {
+        return { success: false, error: String(error) };
+      }
+    },
+    exportReport: async (params) => {
+      try {
+        const response = await fetch(`/api/reports/${params.reportId}/export`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ format: params.format }),
+        });
+        const result = await response.json();
+        return {
+          success: result.success,
+          data: { url: result.url || '', filename: result.filename || '' }
+        };
       } catch (error) {
         return { success: false, error: String(error) };
       }

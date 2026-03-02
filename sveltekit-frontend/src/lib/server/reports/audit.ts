@@ -7,7 +7,7 @@ import { db } from '$lib/server/db/client';
 import { reportAuditLog } from '$lib/server/db/schema-postgres';
 import { eq, desc } from 'drizzle-orm';
 
-export type ReportAction = 'created' | 'updated' | 'deleted' | 'published' | 'exported';
+export type ReportAction = 'created' | 'updated' | 'deleted' | 'published' | 'exported' | 'previewed';
 
 interface AuditOptions {
 	reportId: string;
