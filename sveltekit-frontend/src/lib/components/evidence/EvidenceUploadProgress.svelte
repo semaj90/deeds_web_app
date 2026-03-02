@@ -203,7 +203,9 @@ onDestroy(() => {
 
 	<!-- Current Stage -->
 	<div class="current-stage" style="border-left-color: {currentStage.color}">
-		<Icon name={currentStage.icon} class="w-6 h-6" style="color: {currentStage.color}" />
+		<span class="stage-icon" style="color: {currentStage.color}">
+			<Icon name={currentStage.icon} class="w-6 h-6" />
+		</span>
 		<div class="stage-details">
 			<div class="stage-label">{currentStage.label}</div>
 			<div class="stage-message">{message}</div>

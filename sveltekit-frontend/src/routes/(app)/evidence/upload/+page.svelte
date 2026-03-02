@@ -1,45 +1,23 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
 	import type { PageData } from './$types';
+	import EvidenceUploadProgress from '$lib/components/evidence/EvidenceUploadProgress.svelte';
 
 	let { data }: { data: PageData } = $props();
 	let user = $derived(data.user);
 
-	interface UploadStatus {
-		status: 'idle' | 'uploading' | 'processing' | 'complete' | 'error';
-		docId?: string;
-		fileName?: string;
-		progress: number;
-		message: string;
-		error?: string;
-	}
-
-	let uploadStatus: UploadStatus = $state({
-		status: 'idle',
-		progress: 0,
-		message: 'Ready to upload',
-	});
-
 	let dragActive = $state(false);
 	let fileInput: HTMLInputElement | undefined = $state();
-	let eventSource: EventSource | null = null;
-
-	onDestroy(() => {
-		if (eventSource) {
-			eventSource.close();
-			eventSource = null;
-		}
-	});
+	let currentJobId = $state<string | null>(null);
+	let currentFileName = $state<string | null>(null);
+	let uploadComplete = $state(false);
+	let completedEvidenceId = $state<string | null>(null);
 
 	async function uploadFile(file: File) {
 		if (!file) return;
 
-		uploadStatus = {
-			status: 'uploading',
-			fileName: file.name,
-			progress: 0,
-			message: 'Uploading file...',
-		};
+		currentFileName = file.name;
+		uploadComplete = false;
+		completedEvidenceId = null;
 
 		if (!user) {
 			await saveToLocalStorage(file);
@@ -62,104 +40,22 @@
 
 			const result = await response.json();
 
-			uploadStatus = {
-				status: 'processing',
-				docId: result.id,
-				fileName: result.fileName,
-				progress: 60,
-				message: 'Uploaded to MinIO. Generating embeddings...',
-			};
-
-			// Connect to SSE for real-time progress
-			connectSSE(result.jobId);
+			// Start SSE progress tracking via component
+			currentJobId = result.jobId;
 		} catch (error) {
-			uploadStatus = {
-				status: 'error',
-				progress: 0,
-				message: 'Upload failed',
-				error: error instanceof Error ? error.message : 'Unknown error',
-			};
+			console.error('[Upload] Error:', error);
+			currentJobId = null;
 		}
 	}
 
-	function connectSSE(jobId: string) {
-		if (eventSource) {
-			eventSource.close();
-		}
-
-		eventSource = new EventSource(`/api/evidence/realtime?jobId=${jobId}`);
-
-		eventSource.onmessage = (event) => {
-			try {
-				const data = JSON.parse(event.data);
-
-				if (data.type === 'progress') {
-					uploadStatus = {
-						status: 'processing',
-						docId: data.evidenceId || uploadStatus.docId,
-						fileName: uploadStatus.fileName,
-						progress: data.progress ?? uploadStatus.progress,
-						message: data.message ?? 'Processing...',
-					};
-				}
-
-				if (data.type === 'complete') {
-					uploadStatus = {
-						status: 'complete',
-						docId: data.evidenceId || uploadStatus.docId,
-						fileName: uploadStatus.fileName,
-						progress: 100,
-						message: data.message ?? 'Upload and embedding complete',
-					};
-					eventSource?.close();
-					eventSource = null;
-				}
-
-				if (data.type === 'error') {
-					uploadStatus = {
-						status: 'error',
-						docId: uploadStatus.docId,
-						fileName: uploadStatus.fileName,
-						progress: uploadStatus.progress,
-						message: data.message ?? 'Processing error',
-						error: data.error,
-					};
-					eventSource?.close();
-					eventSource = null;
-				}
-			} catch {
-				// Ignore parse errors (keep-alive comments etc.)
-			}
-		};
-
-		eventSource.onerror = () => {
-			// SSE connection lost — fall back to polling status endpoint
-			eventSource?.close();
-			eventSource = null;
-			if (uploadStatus.status === 'processing' && uploadStatus.docId) {
-				pollFallback(uploadStatus.docId);
-			}
-		};
+	function handleUploadComplete(evidenceId: string) {
+		console.log('[Upload] Complete:', evidenceId);
+		uploadComplete = true;
+		completedEvidenceId = evidenceId;
 	}
 
-	async function pollFallback(docId: string) {
-		// Simple fallback: poll status endpoint once after SSE drops
-		try {
-			const response = await fetch(`/api/evidence/${docId}/status`);
-			if (response.ok) {
-				const status = await response.json();
-				uploadStatus = {
-					status: status.status === 'complete' ? 'complete' : status.status === 'error' ? 'error' : 'processing',
-					docId,
-					fileName: uploadStatus.fileName,
-					progress: status.progress ?? uploadStatus.progress,
-					message: status.message ?? 'Processing...',
-					error: status.error,
-				};
-			}
-		} catch {
-			// Status check failed silently
-		}
+	function handleUploadError(error: string) {
+		console.error('[Upload] Error:', error);
 	}
 
 	async function saveToLocalStorage(file: File) {
@@ -226,15 +122,10 @@
 	}
 
 	function resetUpload() {
-		if (eventSource) {
-			eventSource.close();
-			eventSource = null;
-		}
-		uploadStatus = {
-			status: 'idle',
-			progress: 0,
-			message: 'Ready to upload',
-		};
+		currentJobId = null;
+		currentFileName = null;
+		uploadComplete = false;
+		completedEvidenceId = null;
 		if (fileInput) {
 			fileInput.value = '';
 		}
@@ -273,41 +164,23 @@
 		style="display: none"
 	/>
 
-	{#if uploadStatus.status !== 'idle'}
-		<div class="status-container">
-			<div class="status-header">
-				<h3>
-					{#if uploadStatus.status === 'uploading'}
-						⬆️ Uploading...
-					{:else if uploadStatus.status === 'processing'}
-						⚙️ Processing...
-					{:else if uploadStatus.status === 'complete'}
-						✅ Complete
-					{:else if uploadStatus.status === 'error'}
-						❌ Error
-					{/if}
-				</h3>
-				{#if uploadStatus.fileName}
-					<p class="filename">{uploadStatus.fileName}</p>
-				{/if}
-			</div>
+	{#if currentJobId}
+		<div class="progress-container">
+			<EvidenceUploadProgress
+				jobId={currentJobId}
+				filename={currentFileName ?? undefined}
+				onComplete={handleUploadComplete}
+				onError={handleUploadError}
+				showStages={true}
+			/>
 
-			<div class="progress-bar">
-				<div class="progress-fill" style="width: {uploadStatus.progress}%"></div>
-			</div>
-
-			<p class="status-message">{uploadStatus.message}</p>
-
-			{#if uploadStatus.docId}
-				<p class="doc-id">Document ID: <code>{uploadStatus.docId}</code></p>
-			{/if}
-
-			{#if uploadStatus.error}
-				<p class="error-message">Error: {uploadStatus.error}</p>
-			{/if}
-
-			{#if uploadStatus.status === 'complete' || uploadStatus.status === 'error'}
-				<button class="reset-button" onclick={resetUpload}>Upload Another File</button>
+			{#if uploadComplete && completedEvidenceId}
+				<div class="completion-actions">
+					<a href="/evidence/{completedEvidenceId}" class="view-button">
+						View Evidence
+					</a>
+					<button class="reset-button" onclick={resetUpload}>Upload Another File</button>
+				</div>
 			{/if}
 		</div>
 	{/if}
@@ -378,67 +251,30 @@
 		margin-top: 1rem;
 	}
 
-	.status-container {
+	.progress-container {
 		margin-top: 2rem;
-	padding: 1.5rem;
-		background-color: #f5f5f5;
-		border-radius: 8px;
-		border-left: 4px solid #8b3a3a;
 	}
 
-	.status-header {
-		margin-bottom: 1rem;
+	.completion-actions {
+		display: flex;
+		gap: 1rem;
+		margin-top: 1.5rem;
+		justify-content: center;
 	}
 
-	.status-header h3 {
-		margin: 0 0 0.5rem 0;
-		color: #2d2d2d;
-	}
-
-	.filename { margin: 0;
-		color: #666;
-		font-size: 0.9rem;
-		word-break: break-all;
-	}
-
-	.progress-bar { width: 100%;
-		height: 8px;
-		background-color: #e0e0e0;
+	.view-button {
+		padding: 0.75rem 1.5rem;
+		background-color: #10b981;
+		color: white;
+		text-decoration: none;
 		border-radius: 4px;
-	overflow: hidden;
-		margin-bottom: 1rem;
+		font-size: 1rem;
+		transition: background-color 0.3s ease;
+		display: inline-block;
 	}
 
-	.progress-fill {
-		height: 100%;
-		background-color: #8b3a3a;
-	transition: width 0.3s ease;
-	}
-
-	.status-message {
-		margin: 0.5rem 0;
-		color: #2d2d2d;
-		font-weight: 500;
-	}
-
-	.doc-id {
-		margin: 0.5rem 0;
-		color: #666;
-		font-size: 0.9rem;
-	}
-
-	.doc-id code {
-		background-color: #e8e8e8;
-	padding: 0.2rem 0.4rem;
-		border-radius: 3px;
-		font-family: monospace;
-	color: #333;
-	}
-
-	.error-message {
-		margin: 0.5rem 0;
-		color: #d32f2f;
-		font-size: 0.9rem;
+	.view-button:hover {
+		background-color: #059669;
 	}
 
 	.reset-button {
