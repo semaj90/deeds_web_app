@@ -75,19 +75,12 @@
 
 			await new Promise((resolve) => setTimeout(resolve, 1000));
 
-			uploadStatus = {
-				status: 'complete',
-				fileName: file.name,
-				progress: 100,
-				message: 'Saved locally (Offline Mode). Will upload when online.',
-			};
+			// Offline mode: mark upload as complete
+			uploadComplete = true;
+			console.log('[Upload] Saved locally (Offline Mode). Will upload when online.');
 		} catch (e) {
-			uploadStatus = {
-				status: 'error',
-				progress: 0,
-				message: 'Local save failed',
-				error: e instanceof Error ? e.message : 'Unknown error',
-			};
+			// Offline mode: show error
+			console.error('[Upload] Local save failed:', e instanceof Error ? e.message : 'Unknown error');
 		}
 	}
 
@@ -153,7 +146,7 @@
 		<div class="upload-icon">📁</div>
 		<h2>Drag and drop your file here</h2>
 		<p>or click to select a file</p>
-		<p class="file-types">Supported: PDF, DOCX: PNG, JPG</p>
+		<p class="file-types">Supported: PDF, DOCX, PNG, JPG</p>
 	</div>
 
 	<input
@@ -189,7 +182,7 @@
 <style>
 	.upload-container {
 		max-width: 600px;
-	margin: 0 auto;
+		margin: 0 auto;
 		padding: 2rem;
 	}
 
@@ -200,20 +193,21 @@
 
 	.upload-header h1 {
 		font-size: 2rem;
-	margin: 0 0 0.5rem 0;
+		margin: 0 0 0.5rem 0;
 		color: #2d2d2d;
 	}
 
-	.upload-header p { color: #666;
+	.upload-header p {
+		color: #666;
 		margin: 0;
 	}
 
 	.upload-zone {
 		border: 2px dashed #ccc;
 		border-radius: 8px;
-	padding: 3rem 2rem;
+		padding: 3rem 2rem;
 		text-align: center;
-	cursor: pointer;
+		cursor: pointer;
 		transition: all 0.3s ease;
 		background-color: #f9f9f9;
 	}
@@ -226,7 +220,7 @@
 	.upload-zone.drag-active {
 		border-color: #8b3a3a;
 		background-color: #f5f0e8;
-	transform: scale(1.02);
+		transform: scale(1.02);
 	}
 
 	.upload-icon {
@@ -247,7 +241,7 @@
 
 	.file-types {
 		font-size: 0.9rem;
-	color: #999;
+		color: #999;
 		margin-top: 1rem;
 	}
 
@@ -279,21 +273,17 @@
 
 	.reset-button {
 		margin-top: 1rem;
-	padding: 0.75rem 1.5rem;
+		padding: 0.75rem 1.5rem;
 		background-color: #8b3a3a;
-	color: white;
+		color: white;
 		border: none;
 		border-radius: 4px;
-	cursor: pointer;
+		cursor: pointer;
 		font-size: 1rem;
-	transition: background-color 0.3s ease;
+		transition: background-color 0.3s ease;
 	}
 
 	.reset-button:hover {
 		background-color: #6b2a2a;
 	}
 </style>
-
-
-
-

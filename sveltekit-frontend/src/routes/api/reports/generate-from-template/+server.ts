@@ -5,6 +5,13 @@ import { db } from '$lib/server/db/client';
 import { cases, evidence, reports } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { auditReportAction } from '$lib/server/reports/audit';
+import {
+	getCachedTemplate,
+	getCachedAIContent,
+	cacheAIContent,
+	hashTemplateParams,
+	invalidateAllCaseTemplates
+} from '$lib/server/cache/report-template-cache.js';
 
 /**
  * POST /api/reports/generate-from-template
@@ -34,8 +41,8 @@ export const POST: RequestHandler = async ({ locals, request, fetch }) => {
       throw error(400, 'Missing required field: caseId');
     }
 
-    // Get the template
-    const template = getTemplate(templateType);
+    // Get the template (with caching)
+    const template = await getCachedTemplate(templateType);
     if (!template) {
       throw error(404, `Template not found: ${templateType}`);
     }
@@ -58,14 +65,23 @@ export const POST: RequestHandler = async ({ locals, request, fetch }) => {
     // If AI enhancement is requested, generate content
     if (useAI) {
       try {
-        // Fetch evidence for context
-        const evidenceItems = await db.select()
-          .from(evidence)
-          .where(eq(evidence.caseId, caseId))
-          .limit(10);
+        // Check cache first
+        const cachedAI = await getCachedAIContent(templateType, caseId);
 
-        // Build AI prompt with context
-        const aiPrompt = `
+        if (cachedAI) {
+          console.log(`[ReportGen] Using cached AI content for ${templateType}/${caseId}`);
+          content = cachedAI.content;
+        } else {
+          console.log(`[ReportGen] Generating new AI content for ${templateType}/${caseId}`);
+
+          // Fetch evidence for context
+          const evidenceItems = await db.select()
+            .from(evidence)
+            .where(eq(evidence.caseId, caseId))
+            .limit(10);
+
+          // Build AI prompt with context
+          const aiPrompt = `
 You are a legal AI assistant generating a ${template.name} for the following case:
 
 **Case Title:** ${caseData.title}
@@ -85,36 +101,46 @@ Generate professional, detailed content following the template structure. Use pr
 ${template.contentTemplate}
 
 Generate the complete report content in HTML format, maintaining the structure but filling in with case-specific analysis and recommendations.
-        `.trim();
+          `.trim();
 
-        // Call Ollama for AI generation
-        const ollamaResponse = await fetch('http://127.0.0.1:11434/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'gemma3-legal:latest',
-            prompt: aiPrompt,
-            stream: false,
-            options: {
-              temperature: 0.7,
-              num_predict: 2000
-            }
-          })
-        });
+          // Call Ollama for AI generation
+          const ollamaResponse = await fetch('http://127.0.0.1:11434/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: 'gemma3-legal:latest',
+              prompt: aiPrompt,
+              stream: false,
+              options: {
+                temperature: 0.7,
+                num_predict: 2000
+              }
+            })
+          });
 
-        if (ollamaResponse.ok) {
-          const aiResult = await ollamaResponse.json();
-          if (aiResult.response) {
-            // Clean up AI response and ensure it's HTML
-            let aiContent = aiResult.response.trim();
+          if (ollamaResponse.ok) {
+            const aiResult = await ollamaResponse.json();
+            if (aiResult.response) {
+              // Clean up AI response and ensure it's HTML
+              let aiContent = aiResult.response.trim();
 
-            // If the AI didn't wrap in HTML tags, use the template with AI-enhanced content
-            if (!aiContent.startsWith('<')) {
-              // Parse AI response and merge with template structure
-              content = template.contentTemplate;
-              // In production, you'd want more sophisticated merging logic here
-            } else {
-              content = aiContent;
+              // If the AI didn't wrap in HTML tags, use the template with AI-enhanced content
+              if (!aiContent.startsWith('<')) {
+                // Parse AI response and merge with template structure
+                content = template.contentTemplate;
+                // In production, you'd want more sophisticated merging logic here
+              } else {
+                content = aiContent;
+              }
+
+              // Cache the AI-generated content for future use
+              await cacheAIContent(
+                templateType,
+                caseId,
+                content,
+                'gemma3-legal:latest',
+                aiResult.eval_count || undefined
+              ).catch(err => console.warn('[ReportGen] Failed to cache AI content:', err));
             }
           }
         }
