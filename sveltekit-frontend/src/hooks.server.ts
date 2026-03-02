@@ -9,6 +9,7 @@ import { startWorker } from '$lib/server/analysis/worker.js';
 import { productionLogger } from '$lib/server/production-logger.js';
 import { startRabbitMQPipeline } from '$lib/messaging/rabbitmq-xstate-integration.js';
 import { initializeQdrant } from '$lib/server/startup/qdrant-init.js';
+import { warmupTemplateCache } from '$lib/server/cache/report-template-cache.js';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 
 // Start the analysis worker on server boot (idempotent)
@@ -26,6 +27,13 @@ initializeQdrant().then(() => {
 	console.log('[Boot] Qdrant collections verified');
 }).catch((err) => {
 	console.warn('[Boot] Qdrant initialization failed (non-fatal):', (err as Error).message);
+});
+
+// Warm up template cache (Priority #10: pre-load all 10 templates on startup)
+warmupTemplateCache().then(() => {
+	console.log('[Boot] Template cache warmed');
+}).catch((err) => {
+	console.warn('[Boot] Template cache warmup failed (non-fatal):', (err as Error).message);
 });
 
 /**

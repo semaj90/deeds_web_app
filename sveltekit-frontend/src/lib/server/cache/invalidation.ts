@@ -255,7 +255,7 @@ export class CacheInvalidationService {
 		}
 
 		try {
-			await this.rabbitMQ.publish('cache.invalidation', 'cache.invalidate', data);
+			await this.rabbitMQ.publishCacheInvalidation(data);
 			return true;
 		} catch (err) {
 			console.error('[CacheInvalidation] Failed to publish to RabbitMQ:', err);
