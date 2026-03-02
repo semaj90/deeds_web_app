@@ -5,6 +5,7 @@ import { eq, desc, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { loadCodebaseContext } from '$lib/server/retrieval/codebase-context.js';
 import { getGraphContext } from '$lib/server/retrieval/graph-context.js';
+import { lookupCachedResponse, storeCachedResponse } from '$lib/server/ai/llm-cache.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const QDRANT_URL = ENV.QDRANT_URL;
@@ -353,6 +354,118 @@ export const POST: RequestHandler = async ({ request }) => {
 
 			let fullResponse = '';
 
+			// LLM Response Cache: Check if we have a cached response for this query + context
+			const cacheResult = await lookupCachedResponse({
+				query: message,
+				context: systemPrompt,
+				model: model ?? 'gemma3-legal:latest'
+			});
+
+			if (cacheResult.hit && cacheResult.response) {
+				// Cache HIT — stream the cached response in chunks to simulate live streaming
+				console.log(`[SSE Chat] Cache HIT — similarity: ${cacheResult.similarity?.toFixed(3)}`);
+				fullResponse = cacheResult.response;
+
+				// Simulate streaming by sending chunks (improves UX, user sees progressive output)
+				const chunkSize = 50; // characters per chunk
+				for (let i = 0; i < fullResponse.length; i += chunkSize) {
+					const chunk = fullResponse.slice(i, i + chunkSize);
+					send({
+						id,
+						role: 'assistant',
+						content: fullResponse.slice(0, i + chunkSize),
+						status: 'streaming'
+					});
+					// Small delay to simulate natural typing speed
+					await new Promise(resolve => setTimeout(resolve, 20));
+				}
+
+				// Build confidence factors (use cached values if available)
+				const topScore =
+					contextDocs.length > 0
+						? Math.max(...contextDocs.map((d) => d.similarity))
+						: null;
+
+				const confidenceFactors: ConfidenceFactors = {
+					caseContext: caseContext !== null,
+					ragHits: contextDocs.length,
+					topScore,
+					embeddingModel: EMBEDDING_MODEL,
+					codebaseHits: codebaseResult?.chunks.length ?? 0,
+					kagNeighbors: graphContext?.neighbors.length ?? 0
+				};
+
+				let confidence = cacheResult.confidence ?? 0.8; // Use cached confidence or default
+
+				// Extract citations
+				const extractedCitations: Array<{ sourceNum: number; documentId: string; similarity: number }> = [];
+				const sourceRefs = fullResponse.match(/\[Source\s+(\d+)[^\]]*\]/g) ?? [];
+				for (const ref of sourceRefs) {
+					const match = ref.match(/\[Source\s+(\d+)/);
+					if (match) {
+						const sourceNum = parseInt(match[1]) - 1;
+						if (sourceNum >= 0 && sourceNum < contextDocs.length) {
+							const doc = contextDocs[sourceNum];
+							if (!extractedCitations.some(c => c.documentId === doc.documentId)) {
+								extractedCitations.push({
+									sourceNum: sourceNum + 1,
+									documentId: doc.documentId,
+									similarity: doc.similarity
+								});
+							}
+						}
+					}
+				}
+
+				// Persist assistant message
+				const assistantMetadata = JSON.stringify({
+					confidenceFactors,
+					contextUsed: {
+						case: caseContext !== null,
+						ragDocIds: contextUsed,
+						ragScores: contextDocs.map((d) => ({
+							id: d.documentId,
+							score: d.similarity
+						})),
+						codebaseChunks: codebaseResult?.chunks.map((c) => ({
+							path: c.relativePath,
+							symbol: c.symbol,
+							score: c.score
+						})) ?? [],
+						citations: extractedCitations
+					},
+					conversationTurns: conversationHistory.length,
+					model: model ?? 'gemma3-legal:latest',
+					cachedResponse: true,
+					cachedAt: cacheResult.cachedAt
+				});
+
+				await db.insert(chatMessages).values({
+					id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+					chatId: conversationId,
+					role: 'assistant',
+					content: fullResponse,
+					metadata: assistantMetadata
+				});
+
+				send({
+					id,
+					role: 'assistant',
+					content: fullResponse,
+					status: 'done',
+					confidence,
+					confidenceFactors,
+					contextUsed,
+					citations: extractedCitations,
+					conversationTurns: conversationHistory.length,
+					cachedResponse: true
+				});
+
+				controller.close();
+				return;
+			}
+
+			// Cache MISS — proceed with Ollama API call
 			try {
 				// Build multi-turn messages array for Ollama /api/chat
 				const ollamaMessages = [
@@ -484,6 +597,29 @@ export const POST: RequestHandler = async ({ request }) => {
 					content: fullResponse,
 					metadata: assistantMetadata
 				});
+
+				// Store response in LLM cache for future lookups (non-blocking)
+				// Generate embedding for caching (reuses embedding from retrieveContext if available)
+				const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: message }),
+					signal: AbortSignal.timeout(8000)
+				}).catch(() => null);
+
+				if (embedRes?.ok) {
+					const embedData = await embedRes.json();
+					if (Array.isArray(embedData.embedding)) {
+						storeCachedResponse({
+							query: message,
+							queryEmbedding: embedData.embedding,
+							context: systemPrompt,
+							response: fullResponse,
+							model: model ?? 'gemma3-legal:latest',
+							confidence
+						}).catch(err => console.warn('[SSE Chat] Cache storage failed:', err));
+					}
+				}
 
 				send({
 					id,

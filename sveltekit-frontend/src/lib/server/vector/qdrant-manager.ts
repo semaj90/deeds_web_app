@@ -17,7 +17,7 @@ export function deterministicPointId(key: string): number {
 }
 
 export class QdrantManager {
-    private client: QdrantClient;
+    public client: QdrantClient;
     public readonly collections = {
         documents: 'legal_documents',
         cases: 'legal_cases',
@@ -25,7 +25,8 @@ export class QdrantManager {
         chat_history: 'chat_messages',
         embeddings_cache: 'embedding_cache',
         document_tags: 'document_tags',
-        topic_clusters: 'topic_clusters'
+        topic_clusters: 'topic_clusters',
+        llm_cache: 'llm_response_cache'
     };
 
     constructor(url = ENV.QDRANT_URL) {
@@ -143,6 +144,23 @@ export class QdrantManager {
                 name: this.collections.topic_clusters,
                 vectors: {
 	size: 768, distance: 'Cosine'
+                },
+                quantization_config: {
+                    scalar: {
+                        type: 'int8',
+                        quantile: 0.99,
+                        always_ram: true
+                    }
+                },
+                hnsw_config: {
+                    m: 16,
+                    ef_construct: 100
+                }
+            },
+	{
+                name: this.collections.llm_cache,
+                vectors: {
+	query: { size: 768, distance: 'Cosine' }
                 },
                 quantization_config: {
                     scalar: {
