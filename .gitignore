@@ -746,3 +746,7 @@ scripts/tests/screenshots/2026-*/
 
 # ONNX Runtime WASM loaders (small .mjs files, not .wasm binaries)
 !sveltekit-frontend/static/ort/*.mjs
+
+# Jupyter notebooks with secrets
+@3_2_26Gemma3_12B_Legal_Production.ipynb
+scripts/unsloth-training/COLAB_PACKAGE/@3_2_26Gemma3_12B_Legal_Production.ipynb
