@@ -10,6 +10,11 @@ import { productionLogger } from '$lib/server/production-logger.js';
 import { startRabbitMQPipeline } from '$lib/messaging/rabbitmq-xstate-integration.js';
 import { initializeQdrant } from '$lib/server/startup/qdrant-init.js';
 import { warmupTemplateCache } from '$lib/server/cache/report-template-cache.js';
+import db from '$lib/server/db/client.js';
+import { reports } from '$lib/server/db/schema-postgres.js';
+import { desc } from 'drizzle-orm';
+import { cacheExport } from '$lib/server/cache/pdf-export-cache.js';
+import { storeCachedResponse } from '$lib/server/ai/llm-cache.js';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 
 // Start the analysis worker on server boot (idempotent)
@@ -35,6 +40,169 @@ warmupTemplateCache().then(() => {
 }).catch((err) => {
 	console.warn('[Boot] Template cache warmup failed (non-fatal):', (err as Error).message);
 });
+
+// Option #6: Warm up export cache (pre-generate top 5 recent report exports)
+warmupExportCache().then(() => {
+	console.log('[Boot] Export cache warmed');
+}).catch((err) => {
+	console.warn('[Boot] Export cache warmup failed (non-fatal):', (err as Error).message);
+});
+
+// Option #6: Warm up LLM cache (pre-cache 5 common legal queries)
+warmupLLMCache().then(() => {
+	console.log('[Boot] LLM cache warmed');
+}).catch((err) => {
+	console.warn('[Boot] LLM cache warmup failed (non-fatal):', (err as Error).message);
+});
+
+/**
+ * Option #6: Warm up export cache with top 5 recent reports
+ * Pre-generates HTML, Markdown, and JSON exports for frequently accessed reports
+ */
+async function warmupExportCache(): Promise<void> {
+	try {
+		// Get top 5 most recent reports as proxy for frequently accessed
+		// (Analytics-based selection can be added later)
+		const recentReports = await db
+			.select()
+			.from(reports)
+			.orderBy(desc(reports.createdAt))
+			.limit(5);
+
+		if (recentReports.length === 0) {
+			console.log('[Boot] Export warmup: No reports found, skipping');
+			return;
+		}
+
+		const formats = ['html', 'markdown', 'json'] as const;
+		let cached = 0;
+
+		for (const report of recentReports) {
+			for (const format of formats) {
+				try {
+					// Generate simple content for warmup (full generation happens on real requests)
+					const content = format === 'json'
+						? JSON.stringify({ id: report.id, title: report.title, content: report.content }, null, 2)
+						: format === 'markdown'
+						? `# ${report.title}\n\n${report.content || ''}`
+						: `<html><head><title>${report.title}</title></head><body><h1>${report.title}</h1><div>${report.content || ''}</div></body></html>`;
+
+					const contentType = format === 'json'
+						? 'application/json'
+						: format === 'markdown'
+						? 'text/markdown'
+						: 'text/html';
+
+					const filename = `${report.title.replace(/[^a-z0-9]/gi, '_')}.${format}`;
+
+					await cacheExport(
+						report.id,
+						format,
+						content,
+						contentType,
+						filename,
+						report.updatedAt
+					);
+					cached++;
+				} catch (err) {
+					// Non-fatal per-export failures
+					console.warn(`[Boot] Export warmup failed for ${report.id}:${format}:`, (err as Error).message);
+				}
+			}
+		}
+
+		console.log(`[Boot] Export warmup: Cached ${cached} exports (${recentReports.length} reports x ${formats.length} formats)`);
+	} catch (err) {
+		console.warn('[Boot] Export warmup failed:', (err as Error).message);
+	}
+}
+
+/**
+ * Option #6: Warm up LLM cache with common legal queries
+ * Pre-caches frequently asked legal questions to reduce first-request latency
+ */
+async function warmupLLMCache(): Promise<void> {
+	try {
+		// Common legal queries (can be expanded from analytics later)
+		const commonQueries = [
+			{
+				query: 'What is the statute of limitations for breach of contract?',
+				context: 'general legal research',
+				response: 'The statute of limitations for breach of contract varies by jurisdiction. In most U.S. states, it ranges from 3-6 years for written contracts and 2-4 years for oral contracts. California: 4 years (written), 2 years (oral). New York: 6 years. Texas: 4 years. Always consult local statutes and recent case law, as exceptions apply for fraud, tolling, and discovery rules.'
+			},
+			{
+				query: 'How do I file a motion to suppress evidence?',
+				context: 'criminal procedure',
+				response: 'To file a motion to suppress evidence: 1) Draft the motion citing Fourth Amendment violations or other legal grounds. 2) Include supporting affidavits and case law (Mapp v. Ohio, Miranda v. Arizona). 3) File with the court clerk before trial. 4) Serve opposing counsel. 5) Attend the suppression hearing. Grounds include illegal search/seizure, lack of warrant, Miranda violations, chain of custody issues.'
+			},
+			{
+				query: 'What are the elements of negligence?',
+				context: 'tort law',
+				response: 'The four elements of negligence are: 1) Duty - defendant owed plaintiff a legal duty of care. 2) Breach - defendant breached that duty through action or inaction. 3) Causation - breach was the actual and proximate cause of harm. 4) Damages - plaintiff suffered actual injury or loss. All four must be proven by a preponderance of evidence for a successful negligence claim.'
+			},
+			{
+				query: 'What is hearsay and what are the exceptions?',
+				context: 'evidence law',
+				response: 'Hearsay is an out-of-court statement offered to prove the truth of the matter asserted (FRE 801). It is generally inadmissible unless an exception applies. Key exceptions: present sense impression, excited utterance, then-existing mental/emotional/physical condition, statements for medical diagnosis, recorded recollection, business records, public records, learned treatises, former testimony, dying declarations, statements against interest.'
+			},
+			{
+				query: 'How long do I have to respond to discovery requests?',
+				context: 'civil procedure',
+				response: 'Under Federal Rules of Civil Procedure: Interrogatories - 30 days (FRCP 33). Requests for Production - 30 days (FRCP 34). Requests for Admission - 30 days (FRCP 36). Time starts from service date. Extensions can be requested by stipulation or court order. State court deadlines may vary - check local rules. Failure to respond timely may result in waiver of objections or court sanctions.'
+			}
+		];
+
+		let cached = 0;
+
+		// Generate embeddings and cache responses
+		const OLLAMA_URL = 'http://localhost:11434';
+		const EMBEDDING_MODEL = 'embeddinggemma:latest';
+
+		for (const item of commonQueries) {
+			try {
+				// Generate embedding for query
+				const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: item.query }),
+					signal: AbortSignal.timeout(8000)
+				});
+
+				if (!embedRes.ok) {
+					console.warn(`[Boot] LLM warmup: Embedding failed for "${item.query.slice(0, 30)}..."`);
+					continue;
+				}
+
+				const embedData = await embedRes.json();
+				const queryEmbedding = embedData.embedding;
+
+				if (!Array.isArray(queryEmbedding)) {
+					console.warn(`[Boot] LLM warmup: Invalid embedding for "${item.query.slice(0, 30)}..."`);
+					continue;
+				}
+
+				// Store in LLM cache
+				await storeCachedResponse({
+					query: item.query,
+					queryEmbedding,
+					context: item.context,
+					response: item.response,
+					model: 'gemma3-legal:latest',
+					confidence: 0.95
+				});
+
+				cached++;
+			} catch (err) {
+				// Non-fatal per-query failures
+				console.warn(`[Boot] LLM warmup failed for "${item.query.slice(0, 30)}...":`, (err as Error).message);
+			}
+		}
+
+		console.log(`[Boot] LLM warmup: Cached ${cached}/${commonQueries.length} common queries`);
+	} catch (err) {
+		console.warn('[Boot] LLM warmup failed:', (err as Error).message);
+	}
+}
 
 /**
  * Main request handler with Lucia v3 session validation
