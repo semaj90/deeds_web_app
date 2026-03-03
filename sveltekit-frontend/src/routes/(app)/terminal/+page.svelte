@@ -7,8 +7,8 @@
 	import { tick } from 'svelte';
 	import { page } from '$app/state';
 	import { browser } from '$app/environment';
-	import { ttsService } from '$lib/services/tts.js';
-	import { voiceCommands, COMMAND_PATTERNS } from '$lib/services/voice-commands.js';
+	import { ttsService } from '$lib/services/tts';
+	import { voiceCommands, COMMAND_PATTERNS } from '$lib/services/voice-commands';
 
 	// Chat session — tied to user via server-provided userId
 	let session = $state<ChatSession | null>(null);
