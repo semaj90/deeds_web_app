@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-03-03T04:27:09.658Z",
+  "totalTests": 1,
+  "passed": 1,
+  "failed": 0,
+  "results": [
+    {
+      "test": "Cache Stats API",
+      "timestamp": "2026-03-03T04:27:08.458Z",
+      "metrics": {
+        "statusCode": 200,
+        "redisConnected": true,
+        "templateKeys": 11,
+        "exportKeys": 0,
+        "llmResponses": 0,
+        "status": "PASS"
+      },
+      "success": true
+    }
+  ]
+}

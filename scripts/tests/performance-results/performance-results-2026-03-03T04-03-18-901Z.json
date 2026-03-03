@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-03-03T04:03:18.902Z",
+  "totalTests": 1,
+  "passed": 0,
+  "failed": 1,
+  "results": [
+    {
+      "test": "Test 6: End-to-End Workflow",
+      "timestamp": "2026-03-03T04:02:47.843Z",
+      "metrics": {},
+      "success": false,
+      "error": "page.fill: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email\"]')\u001b[22m\n"
+    }
+  ]
+}
