@@ -1,7 +1,6 @@
 import { db } from '$lib/server/db/client';
-import { cases, evidence, caseNotes } from '$lib/server/db/schema';
-import { personsOfInterest } from '$lib/db/schema';
-import { arrayContains, eq, desc } from 'drizzle-orm';
+import { cases, evidence, caseNotes, citations, personsOfInterest } from '$lib/server/db/schema';
+import { arrayContains, eq, desc, sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
 const safe = <T>(p: Promise<T>, fallback: T): Promise<T> =>
@@ -52,7 +51,7 @@ export const POST: RequestHandler = async ({ params }) => {
 		});
 	}
 
-	const [evidenceRows, noteRows, personRows] = await Promise.all([
+	const [evidenceRows, noteRows, personRows, citationRows] = await Promise.all([
 		safe(
 			db.select().from(evidence).where(eq(evidence.caseId, caseId)).limit(200),
 			[]
@@ -72,6 +71,23 @@ export const POST: RequestHandler = async ({ params }) => {
 				.from(personsOfInterest)
 				.where(arrayContains(personsOfInterest.caseIds, [caseId]))
 				.limit(50),
+			[]
+		),
+		safe(
+			db
+				.select({
+					id: citations.id,
+					pageNumber: citations.pageNumber,
+					createdAt: citations.createdAt,
+					quotedText: sql<string>`"citations"."quoted_text"`,
+					citationType: sql<string>`"citations"."citation_type"`,
+					relevanceScore: sql<number>`"citations"."relevance_score"`,
+					formattedCitation: sql<string>`"citations"."formatted_citation"`,
+					isKeyAuthority: sql<boolean>`"citations"."is_key_authority"`,
+				})
+				.from(citations)
+				.where(eq(citations.caseId, caseId))
+				.limit(100),
 			[]
 		)
 	]);
@@ -96,6 +112,15 @@ export const POST: RequestHandler = async ({ params }) => {
 				)
 				.join('')
 		: '<tr><td colspan="4" class="empty">No persons of interest recorded.</td></tr>';
+
+	const citRows = citationRows.length
+		? citationRows
+				.map(
+					(c: any) =>
+						`<tr><td>${esc(c.formattedCitation) || '—'}</td><td>${esc(c.citationType) || '—'}</td><td class="quoted">${esc(c.quotedText?.slice(0, 200)) || '—'}${(c.quotedText?.length ?? 0) > 200 ? '...' : ''}</td><td>${c.relevanceScore ? Math.round(c.relevanceScore * 100) + '%' : '—'}</td><td>${c.isKeyAuthority ? 'Yes' : '—'}</td></tr>`
+				)
+				.join('')
+		: '<tr><td colspan="5" class="empty">No citations attached.</td></tr>';
 
 	const notesCards = noteRows.length
 		? noteRows
@@ -135,6 +160,7 @@ export const POST: RequestHandler = async ({ params }) => {
 		'.badge.ai{background:#dbeafe;color:#1e40af}',
 		'.note-date{margin-left:auto;font-size:9pt;color:#999}',
 		'.note-content{font-size:10pt;white-space:pre-line;color:#333}',
+		'.quoted{font-size:9pt;font-style:italic;color:#555;max-width:300px}',
 		'.page-footer{margin-top:3rem;padding-top:.5rem;border-top:1px solid #ccc;font-size:8pt;color:#aaa;text-align:center}',
 		'@media print{body{background:none}.no-print{display:none}}'
 	].join(' ');
@@ -209,6 +235,10 @@ ${descBlock}
 <div class="section">
 <h2 class="section-title">Persons of Interest (${personRows.length})</h2>
 <table><thead><tr><th>Name</th><th>Role / Relationship</th><th>Threat Level</th><th>Status</th></tr></thead><tbody>${poiRows}</tbody></table>
+</div>
+<div class="section">
+<h2 class="section-title">Citations (${citationRows.length})</h2>
+<table><thead><tr><th>Citation</th><th>Type</th><th>Quoted Text</th><th>Relevance</th><th>Key</th></tr></thead><tbody>${citRows}</tbody></table>
 </div>
 <div class="section">
 <h2 class="section-title">Case Notes (${noteRows.length})</h2>

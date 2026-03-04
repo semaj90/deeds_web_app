@@ -413,7 +413,7 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  const url = URL.createObjectURL(blob);
  const a = document.createElement('a');
  a.href = url;
- a.download = `case_${caseId}_packet_${Date.now()}.pdf`;
+ a.download = `case_${caseId}_packet_${Date.now()}.html`;
  document.body.appendChild(a);
  a.click();
  document.body.removeChild(a);
