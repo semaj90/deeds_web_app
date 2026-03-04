@@ -233,11 +233,8 @@ All database changes are production-ready after dev/staging testing. No data wil
 | Proto (.proto) | 345 | proto/, protos/, src/proto/ | LEGACY |
 | Markdown (.md) | 2,751+ | Everywhere | NEEDS CLEANUP |
 | WGSL (.wgsl) | 4 | sveltekit-frontend/src/ | ACTIVE |
-
 ---
-
 ## Key Server Infrastructure Files
-
 | File | Lines | Purpose |
 |------|-------|---------|
 | `lib/server/db/schema-postgres.ts` | 2000+ | 70+ tables, 14 enums |
@@ -266,11 +263,8 @@ All database changes are production-ready after dev/staging testing. No data wil
 | `lib/gpu/gpu-compute-pipeline.ts` | 709 | 3 WGSL shaders, WebGPU compute |
 | `lib/gpu/gpu-search-reranker.ts` | 148 | Client-side GPU reranking |
 | `lib/machines/retrieval-machine.ts` | 200+ | XState v5 2-stage retrieval |
-
 ---
-
 ## Database Tables (Postgres + pgvector)
-
 **70+ tables across these groups:**
 - Auth: users, sessions
 - Cases: cases, caseNotes, caseStatuteLinks
@@ -282,73 +276,166 @@ All database changes are production-ready after dev/staging testing. No data wil
 - Analytics: analyticsEvents
 - Error Tracking: phase72_error, phase72_patch
 - Workspaces, Route Health, and more
-
 **Qdrant Collections (768-dim):**
 - evidence_items, legal_documents, legal_cases
 - codebase_chunks_768, chat_messages, embedding_cache
 - document_tags
-
 **Redis Keys:** Session cache, L3 cache tier, GPU arbiter VRAM mutex, analytics sorted sets
-
 ---
-
 ## Kiro Spec Features — Implementation Gap
+
+**Last Updated: March 4, 2026 (Session 93r28c++++++++++)**
 
 | # | Feature | Planned | Built | Gap |
 |---|---------|---------|-------|-----|
-| 1 | Multi-Source Retrieval (Google+Wiki+RAG+KAG+Graph) | 15 reqs, 31 tasks | 0% | Full feature missing |
-| 2 | YoRHa Detective Screens | 3 screens | 30% | Terminal done, Board partial, Command Center codebase-only |
-| 3 | VLM Legal Vision | 5 subsystems | 10% | Basic YOLO only, no DocLing/TensorRT/fusion |
+| 1 | Multi-Source Retrieval (Google+Wiki+RAG+KAG+Graph) | 15 reqs, 31 tasks | 15% | RAG+KAG+DAG wired, no Google/Wiki/external sources |
+| 2 | YoRHa Detective Screens | 3 screens | 40% | Terminal done, Board partial, Command Center codebase-only |
+| 3 | VLM Legal Vision | 5 subsystems | 35% | YOLO + Gemma3 VLM + LangExtract OCR wired, POI photos pipeline ✅, no fusion/TensorRT |
 | 4 | Self-Healing Error Agent | Auto-patch loop | 5% | Error Brain exists, no auto-patch |
-| 5 | Unified Reasoning Engine | C++ gRPC + CUDA | 0% | Full feature missing |
+| 5 | Unified Reasoning Engine | C++ gRPC + CUDA | 0% | DEFERRED — Ollama + batch embedder covers same ground |
 | 6 | ACE Web Ingestion | Crawl→chunk→embed→KAG | 0% | ACE exists for codebase only |
-| 7 | Citation Intelligence | Collections, tags, export | 60% | Collections API ✅, tags ✅, export (HTML/MD/JSON) ✅, UI rewiring pending |
-| 8 | Agentic Alignment Router | Intent classify + KAG | 10% | Basic routing only |
+| 7 | Citation Intelligence | Collections, tags, export | 75% | Collections API ✅, tags ✅, export ✅, UI rewiring pending |
+| 8 | Agentic Alignment Router | Intent classify + KAG | 25% | Client router ✅, health-aware ✅, but always escalates to server |
 | 9 | Knowledge Search Engine | IDF + HMM + external docs | 40% | Codebase search only |
-| 10 | Case Notes Enhancements | Versioning, FTS, PDF export | 60% | CRUD works, no versioning/FTS/export |
-| 11 | Person of Interest | Vector search UI | 70% | Schema ready, no UI for similarity |
+| 10 | Case Notes Enhancements | Versioning, FTS, PDF export | 80% | Versioning ✅, CRUD ✅, diff view ✅, case packet export ✅, FTS pending |
+| 11 | Person of Interest | Vector search UI + photos | 80% | Schema ✅, photos API ✅, VLM pipeline ✅, UI gallery pending |
 | 12 | Error Brain DB Wiring | History + patches | 90% | Just needs history display |
 | 13 | Infrastructure & Docker | Full stack | 85% | TensorRT/fastmcp/postgres DOWN |
 | 14 | Svelte 5 Migration | Runes + bits-ui | 100% | COMPLETE |
+| 15 | Evidence Pipeline Scaling | Batch embed + summary + tags | 100% | pLimit(3) ✅, batch /api/embed ✅, summary→Qdrant ✅, auto-tag ✅ |
+| 16 | Report Caching | Templates + warmup + exports | 100% | Redis template cache ✅, startup warmup ✅, export cache ✅ |
+| 17 | Cache Infrastructure | Invalidation + monitoring | 100% | Multi-tier invalidation ✅, admin dashboard ✅, Qdrant health ✅ |
 
 ---
 
-## Quick Wins (Most Complete, Least Effort)
+## Quick Wins Status
 
-### 1. Error Brain History UI (90% → 100%)
-- **What exists:** DB tables, 4 API endpoints, ErrorBrainModal component, 91 tests
-- **What's missing:** Display history on /all-routes page
-- **Effort:** ~30 minutes
+| # | Quick Win | Was | Now | Status |
+|---|-----------|-----|-----|--------|
+| 1 | Error Brain History UI | 90% | 90% | Pending — display history on /all-routes |
+| 2 | POI Vector Search UI | 70% | 80% | photos subquery wired, gallery UI pending |
+| 3 | Case Notes Versioning | 60% | 80% | ✅ DONE — DB tables + API + diff view + restore |
+| 4 | Citation Tags | 20% | 40% | ✅ DONE — citation_tag_links M2M + CRUD API |
+| 5 | Infrastructure Restart | 85% | 85% | Pending — postgres/TensorRT/fastmcp DOWN |
+| 6 | Case Packet PDF Export | 60% | 90% | ✅ DONE — HTML export + citations section + download |
+| 7 | NES Modal for Notes | 60% | 60% | Pending — bits-ui Dialog SSR TDZ workaround |
 
-### 2. POI Vector Search UI (70% → 85%)
-- **What exists:** persons_of_interest table with pgvector embeddings, API endpoints
-- **What's missing:** "Find Similar POIs" button + similarity score display
-- **Effort:** ~1 hour
+---
 
-### 3. Case Notes Versioning (60% → 75%)
-- **What exists:** caseNotes table, CRUD endpoints, notes UI
-- **What's missing:** caseNoteVersions table + diff view component
-- **Effort:** ~2 hours
+## What's Left to Implement
 
-### 4. Citation Tags (20% → 40%)
-- **What exists:** citations table, search, KB toggle
-- **What's missing:** citation_tags table + tag UI + filter
-- **Effort:** ~2 hours
+### Client ↔ Server RAG Integration (~4h total)
 
-### 5. Infrastructure Restart (85% → 95%)
-- **What's DOWN:** phase66-postgres (exited), TensorRT (exited 2mo), fastmcp (no container)
-- **Commands:** `docker start phase66-postgres`, rebuild gpu-workers image, `docker-compose up fastmcp`
-- **Effort:** ~30 minutes (restart) to ~2 hours (rebuild)
+The client has all the pieces (ONNX models, embedding, cache, router) but they aren't connected into a working local RAG loop. The server RAG is production-grade.
 
-### 6. Case Packet PDF Export (60% → 80%)
-- **What exists:** All case data accessible (cases, evidence, notes, persons)
-- **What's missing:** PDF generation endpoint + download button
-- **Effort:** ~3 hours (integrate pdfkit or puppeteer-pdf)
+**Current state:**
+```
+Client: gemma270m ONNX (292MB) + embeddinggemma ONNX (329MB) + LokiJS/IndexedDB cache
+        → Router ALWAYS escalates to server (threshold too aggressive)
+Server: gemma3-legal (7.3GB) + embeddinggemma Ollama + Qdrant + pgvector + Redis
+        → Full RAG+KAG+DAG pipeline, 6 routes calling it
+```
 
-### 7. NES Modal for Notes (60% → 70%)
-- **What exists:** Case notes with inline editor
-- **What's missing:** Wrap in Bits-UI Dialog with NES styling
-- **Effort:** ~1 hour (but bits-ui Dialog has SSR TDZ bug, needs ssr=false or {#if})
+**Target architecture:**
+```
+User Query
+  ↓
+Client Router (client-router.ts)
+  ├── SIMPLE (score < 0.3): gemma270m ONNX — instant, no network
+  │   ├── Greetings, UI help, "what is X" lookups
+  │   ├── Client embedding → IndexedDB semantic search
+  │   └── <200ms response, works offline
+  │
+  ├── RETRIEVAL (0.3-0.6): Hybrid client+server
+  │   ├── Client embeds query (ONNX 768-dim, cached)
+  │   ├── Server searches Qdrant+pgvector (returns top-K chunks)
+  │   ├── Client GPU reranks with cosine similarity
+  │   ├── Client gemma270m generates short answer from top-3 chunks
+  │   └── Falls back to server if local answer < confidence threshold
+  │
+  └── COMPLEX (score > 0.6): gemma3-legal server — full pipeline
+      ├── RAG+KAG+DAG (dual search, graph-hop, doc context)
+      ├── Entity extraction + forensic detection
+      ├── Citation-grounded answers
+      └── SSE streaming to client
+```
+
+#### Task A: Tune Client Router Thresholds (~30min)
+- **File:** `src/lib/ai/client-router.ts`
+- Lower escalation threshold for simple/retrieval queries
+- Add `retrieval` routing category (between `local-onnx` and `server-ollama`)
+- Classify: greetings/UI → local, factual lookups → retrieval, legal reasoning → server
+- Keep health-aware fallback (if Ollama down → local + retrieval only)
+
+#### Task B: Wire Client Embedding to RAG Search (~1h)
+- **Files:** `client-embed.ts`, `ChatSession.svelte.ts`
+- Client embeds query via ONNX (already works in `/memory-palace`)
+- POST pre-computed embedding to `/api/rag/search` (avoid double-embedding)
+- Add `precomputedEmbedding: number[]` parameter to search endpoint
+- Client GPU reranks returned chunks via `gpu-search-reranker.ts` (exists, only memory-palace uses it)
+
+#### Task C: Wire 3-Step RAG Pipeline UI (~1.5h)
+- **Endpoints exist, zero UI:** `/api/rag/search` → `/api/rag/validate` → `/api/rag/answer`
+- Create `RAGAnswerPanel.svelte` (Svelte 5 runes):
+  1. User types query → call `/api/rag/search` → show retrieved chunks
+  2. User reviews/approves sources → call `/api/rag/validate`
+  3. Validated context → call `/api/rag/answer` → stream cited answer
+- Wire to `/ai-dashboard` or `/terminal` as toggle mode
+- Server generates answer via gemma3-legal with citation extraction
+
+#### Task D: Wire XState Retrieval Machine (~45min)
+- **File:** `src/lib/machines/retrieval-machine.ts` (275L, clean XState v5, never invoked)
+- Add `useMachine(retrievalMachine)` to `/global-search`
+- Connect 3 actors: recallActor → rerankActor → assembleActor
+- Replace current manual fetch logic with machine-driven flow
+- Show state transitions in UI (idle → recalling → reranking → assembling → done)
+
+#### Task E: Client-Side Answer Generation (~45min)
+- **File:** `ChatSession.svelte.ts` (lines 154-275 — local inference exists but never fires)
+- For retrieval-mode queries: prepend top-3 chunks as context to gemma270m prompt
+- Template: `"Based on these documents:\n{chunks}\n\nAnswer: {query}"`
+- Validate answer length/quality, escalate to server if too short (<50 chars)
+- Cache answer in IndexedDB (7-day TTL)
+
+### Remaining Feature Gaps
+
+#### Multi-Source Retrieval — Feature #1 (~3h)
+- Currently searches 3 Qdrant collections only
+- **Add:** Google Custom Search API → chunk → embed → merge with Qdrant results
+- **Add:** Wikipedia API → chunk → embed → merge
+- **Add:** Cross-source deduplication + unified reranking
+- **Files:** New `src/lib/server/external-search.ts`, modify `/api/rag/search`
+
+#### ACE Web Ingestion — Feature #6 (~2h)
+- ACE context engine exists (7 data sources) but only for internal data
+- **Add:** URL fetch → extract text → legal-chunker → embed → Qdrant `legal_documents`
+- **Add:** KAG graph node creation for web sources
+- **Add:** UI: paste URL → ingest → searchable
+- **Files:** New `src/routes/api/ace/ingest/+server.ts`, modify `context-assembler.ts`
+
+#### VLM Legal Vision — Feature #3 (~2h remaining)
+- YOLO + Gemma3 VLM + LangExtract OCR + POI photos pipeline done
+- **Missing:** DocLing layout-aware analysis for complex legal documents
+- **Missing:** Multi-modal fusion (combine VLM + OCR + entity extraction)
+- **Missing:** POI photo gallery UI + face similarity search UI
+- **Files:** Wire `src/lib/server/docling.ts`, new `PoiPhotoGallery.svelte`
+
+#### Citation Intelligence UI — Feature #7 (~1h remaining)
+- Collections API (8 endpoints) ✅, tags ✅, export (HTML/MD/JSON) ✅
+- **Missing:** Wire `CitationCollections.svelte` + `CollectionDetail.svelte` to `/citations` page
+- Already API-wired with fetch() calls — just need route integration
+
+#### Knowledge Search — Feature #9 (~2h)
+- Codebase search works, no external document search
+- **Add:** `/api/knowledge/search` → parallel query (glossary + statutes + precedents + Qdrant)
+- **Add:** TF-IDF scoring across all sources
+- **Add:** HMM-based query expansion for legal terminology
+
+#### Self-Healing Error Agent — Feature #4 (~3h)
+- Error Brain DB + UI exists, no auto-patch
+- **Add:** Error pattern → LLM suggests fix → apply patch → re-check
+- **Add:** Patch history table + rollback capability
+- Requires careful guardrails (LLM-generated patches are risky)
 
 ---
 
