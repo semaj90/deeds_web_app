@@ -1,37 +1,67 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
-import { db } from '$lib/server/db/index.js';
+import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 
 /**
- * GET /api/phase72/errors?route=<path>
- * Returns recent error snapshot for a given route path.
- * Queries the phase72_error table if it exists, gracefully returns empty if not.
+ * GET /api/phase72/errors?route=<path>&limit=50
+ * Returns errors from phase72_error table for Phase72ErrorBrain modal.
+ * Route filter is optional — returns all errors if omitted.
  */
 export const GET: RequestHandler = async ({ url }) => {
 	const route = url.searchParams.get('route');
-	if (!route) {
-		return json({ error: 'Missing "route" query parameter' }, { status: 400 });
-	}
+	const limit = Math.min(parseInt(url.searchParams.get('limit') || '50', 10), 200);
 
 	try {
-		// Try to query phase72_error table — it may not exist
-		const result = await db.execute(
-			sql`SELECT code, message, occurrence_count as count, last_seen, created_at
-				FROM phase72_error
-				WHERE file_path LIKE ${'%' + route + '%'}
-				ORDER BY last_seen DESC
-				LIMIT 10`
-		);
-		const rows = Array.isArray(result) ? result : [];
+		const whereClause = route
+			? sql`WHERE file_path LIKE ${'%' + route + '%'}`
+			: sql``;
 
-		return json({
-			errorCount: rows.length,
-			errors: rows,
-			lastError: rows[0] ?? null,
-		});
-	} catch {
-		// Table doesn't exist or DB unavailable — return empty
-		return json({ errorCount: 0, errors: [], lastError: null });
+		const errorsResult = await db.execute(sql`
+			SELECT
+				id,
+				error_hash,
+				code AS error_code,
+				file_path,
+				COALESCE(line, 0) AS line_num,
+				COALESCE("column", 0) AS column_num,
+				COALESCE(occurrence_count, 1) AS occurrence_count,
+				message,
+				COALESCE(severity, 'error') AS severity,
+				COALESCE(updated_at, created_at) AS last_seen,
+				cycle,
+				created_at
+			FROM phase72_error
+			${whereClause}
+			ORDER BY updated_at DESC NULLS LAST, created_at DESC
+			LIMIT ${limit}
+		`);
+
+		const errors = (errorsResult as any).rows ?? errorsResult ?? [];
+
+		// Stats aggregation
+		const statsResult = await db.execute(sql`
+			SELECT
+				COUNT(*)::int AS total_errors,
+				COUNT(DISTINCT code)::int AS unique_codes,
+				COUNT(DISTINCT file_path)::int AS affected_files,
+				COALESCE(SUM(COALESCE(occurrence_count, 1)), 0)::int AS total_occurrences
+			FROM phase72_error
+			${whereClause}
+		`);
+
+		const statsRow = ((statsResult as any).rows ?? statsResult ?? [])[0];
+		const stats = statsRow ? {
+			total_errors: statsRow.total_errors ?? 0,
+			unique_codes: statsRow.unique_codes ?? 0,
+			affected_files: statsRow.affected_files ?? 0,
+			total_occurrences: statsRow.total_occurrences ?? 0,
+		} : null;
+
+		return json({ errors, stats });
+	} catch (err) {
+		// Table doesn't exist or DB unavailable — return empty with null stats
+		console.warn('[phase72/errors] Query failed:', (err as Error).message);
+		return json({ errors: [], stats: null });
 	}
 };

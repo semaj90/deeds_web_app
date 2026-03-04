@@ -27,6 +27,34 @@
 	let previewPoi = $state<any>(null);
 	let showPreview = $state(false);
 	let showStats = $state(false);
+	let similarResults = $state<any[]>([]);
+	let similarMethod = $state('');
+	let similarSourceName = $state('');
+	let loadingSimilar = $state(false);
+
+	async function findSimilar(poi: any) {
+		loadingSimilar = true;
+		similarSourceName = poi.name;
+		similarResults = [];
+		try {
+			const res = await fetch(`/api/persons-of-interest/${poi.id}/similar`);
+			const data = await res.json();
+			similarResults = data.similar ?? [];
+			similarMethod = data.method ?? 'unknown';
+		} catch (err) {
+			console.error('Similar search failed:', err);
+			similarResults = [];
+			similarMethod = 'error';
+		} finally {
+			loadingSimilar = false;
+		}
+	}
+
+	function closeSimilar() {
+		similarResults = [];
+		similarMethod = '';
+		similarSourceName = '';
+	}
 
 	let poiStats = $derived.by(() => {
 		const all = data.pois ?? [];
@@ -239,6 +267,45 @@
 				</div>
 			</div>
 
+			<!-- Similar POIs Results Panel -->
+			{#if loadingSimilar || similarResults.length > 0 || similarMethod === 'error'}
+				<div class="similar-panel">
+					<div class="similar-header">
+						<div class="similar-title-group">
+							<Icon name="radar" />
+							<span class="similar-title">SIMILAR TO: {similarSourceName}</span>
+							<span class="similar-method">{similarMethod.toUpperCase()}</span>
+						</div>
+						<button class="close-similar" onclick={closeSimilar}>
+							<Icon name="x" />
+						</button>
+					</div>
+					{#if loadingSimilar}
+						<div class="similar-loading">Searching for similar persons...</div>
+					{:else if similarResults.length === 0}
+						<div class="similar-empty">No similar persons found.</div>
+					{:else}
+						<div class="similar-list">
+							{#each similarResults as sim}
+								<a href="/persons-of-interest/{sim.poiId}" class="similar-item">
+									<div class="sim-score">{(sim.similarity * 100).toFixed(0)}%</div>
+									<div class="sim-info">
+										<span class="sim-name">{sim.name}</span>
+										<span class="sim-meta">
+											<span class="threat-pill threat-{sim.threatLevel ?? 'low'}">{sim.threatLevel?.toUpperCase() ?? 'LOW'}</span>
+											{sim.status?.replace(/_/g, ' ').toUpperCase() ?? ''}
+										</span>
+									</div>
+									{#if sim.description}
+										<p class="sim-desc">{sim.description.slice(0, 120)}{sim.description.length > 120 ? '...' : ''}</p>
+									{/if}
+								</a>
+							{/each}
+						</div>
+					{/if}
+				</div>
+			{/if}
+
 			<!-- Content Display -->
 			{#if filtered.length === 0}
 				<div class="empty-state">
@@ -287,7 +354,7 @@
 								</div>
 							</div>
 
-							<div class="card-actions">
+							<div class="card-actions card-actions-4">
 								<button class="action-btn" onclick={(e) => { e.stopPropagation(); openPreview(poi); }}>
 									<Icon name="eye" />
 									VIEW
@@ -295,6 +362,10 @@
 								<button class="action-btn" onclick={(e) => { e.stopPropagation(); editingPoi = poi; showEditor = true; }}>
 									<Icon name="pencil" />
 									EDIT
+								</button>
+								<button class="action-btn" onclick={(e) => { e.stopPropagation(); findSimilar(poi); }}>
+									<Icon name="radar" />
+									SIMILAR
 								</button>
 								<a href="/persons-of-interest/{poi.id}" class="action-btn primary">
 									<Icon name="arrow-right" />
@@ -343,6 +414,9 @@
 										</button>
 										<button class="icon-btn" onclick={(e) => { e.stopPropagation(); editingPoi = poi; showEditor = true; }}>
 											<Icon name="pencil" />
+										</button>
+										<button class="icon-btn" title="Find similar" onclick={(e) => { e.stopPropagation(); findSimilar(poi); }}>
+											<Icon name="radar" />
 										</button>
 									</td>
 								</tr>
@@ -1081,5 +1155,138 @@
 		max-height: 90vh;
 		overflow-y: auto;
 		box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+	}
+
+	/* 4-column card actions */
+	.card-actions-4 {
+		grid-template-columns: 1fr 1fr 1fr 1fr;
+	}
+
+	/* Similar POIs Panel */
+	.similar-panel {
+		background: #fff;
+		border: 2px solid #000;
+		border-radius: 8px;
+		margin-bottom: 1.5rem;
+		overflow: hidden;
+	}
+
+	.similar-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.875rem 1.25rem;
+		background: #000;
+		color: #fff;
+	}
+
+	.similar-title-group {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.similar-title {
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+	}
+
+	.similar-method {
+		font-size: 0.6rem;
+		padding: 0.2rem 0.5rem;
+		background: rgba(255, 255, 255, 0.2);
+		border-radius: 4px;
+		letter-spacing: 0.05em;
+	}
+
+	.close-similar {
+		background: transparent;
+		border: none;
+		color: #fff;
+		cursor: pointer;
+		padding: 0.25rem;
+		opacity: 0.7;
+		transition: opacity 0.2s;
+	}
+
+	.close-similar:hover {
+		opacity: 1;
+	}
+
+	.similar-loading,
+	.similar-empty {
+		padding: 1.5rem;
+		text-align: center;
+		font-size: 0.85rem;
+		color: #999;
+		letter-spacing: 0.05em;
+	}
+
+	.similar-list {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		gap: 0;
+	}
+
+	.similar-item {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		gap: 0.75rem;
+		padding: 1rem 1.25rem;
+		border-bottom: 1px solid #f0f0f0;
+		text-decoration: none;
+		color: inherit;
+		transition: background 0.15s;
+	}
+
+	.similar-item:hover {
+		background: #fafafa;
+	}
+
+	.similar-item:last-child {
+		border-bottom: none;
+	}
+
+	.sim-score {
+		font-size: 1.25rem;
+		font-weight: 700;
+		color: #000;
+		min-width: 3rem;
+		text-align: center;
+		line-height: 1;
+		padding-top: 0.1rem;
+	}
+
+	.sim-info {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.sim-name {
+		display: block;
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: #000;
+		margin-bottom: 0.25rem;
+	}
+
+	.sim-meta {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.7rem;
+		color: #999;
+		letter-spacing: 0.05em;
+	}
+
+	.sim-desc {
+		width: 100%;
+		margin: 0.25rem 0 0 0;
+		padding-left: 3.75rem;
+		font-size: 0.8rem;
+		color: #666;
+		line-height: 1.4;
 	}
 </style>

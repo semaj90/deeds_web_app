@@ -37,7 +37,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		),
 		safe(
 			db.select().from(personsOfInterest)
-				.where(arrayContains(personsOfInterest.cases, [caseId]))
+				.where(arrayContains(personsOfInterest.caseIds, [caseId]))
 				.limit(20),
 			[]
 		)

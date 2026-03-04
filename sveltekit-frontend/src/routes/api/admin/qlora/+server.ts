@@ -9,7 +9,7 @@ import { json, type RequestEvent } from '@sveltejs/kit';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { redis } from '$lib/server/redis.js';
-import dbClient from '$lib/server/db/client.js';
+import { db } from '$lib/server/db/client';
 
 interface TrainingJob {
 	id: string;
@@ -60,7 +60,7 @@ export async function GET() {
 	// Count available training data files
 	let datasetCount = 0;
 	try {
-		const result = await dbClient.db.execute(sql`
+		const result = await db.execute(sql`
 			SELECT count(*)::int as cnt FROM evidence WHERE status = 'processed' AND content IS NOT NULL
 		`);
 		const rows = (result as any).rows ?? [...(result as any)];

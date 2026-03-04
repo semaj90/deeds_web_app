@@ -258,8 +258,7 @@
     <div class="mb-6">
       <CitationCollections
         onSelectCollection={(collection) => {
-          selectedCollection = { id: collection.id, name: collection.name, description: '', is_public: true, citation_count: 0, created_at: new Date().toISOString() };
-          searchQuery = collection.name;
+          selectedCollection = collection;
           showCollections = false;
         }}
       />
@@ -637,6 +636,7 @@
   <div class="mt-6">
     <CollectionDetail
       collection={selectedCollection}
+      onback={() => { selectedCollection = null; }}
       ondeleted={() => { selectedCollection = null; }}
     />
   </div>

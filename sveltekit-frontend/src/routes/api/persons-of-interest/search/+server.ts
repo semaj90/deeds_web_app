@@ -30,17 +30,16 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 				threatLevel: personsOfInterest.threatLevel,
 				description: personsOfInterest.description,
 				aliases: personsOfInterest.aliases,
-				lastLocation: personsOfInterest.lastLocation,
-				photos: personsOfInterest.photos,
+				relationship: personsOfInterest.relationship,
 			})
 			.from(personsOfInterest)
 			.where(
 				sql`(
 					lower(${personsOfInterest.name}) LIKE ${searchTerm}
 					OR lower(coalesce(${personsOfInterest.description}, '')) LIKE ${searchTerm}
-					OR lower(coalesce(${personsOfInterest.lastLocation}, '')) LIKE ${searchTerm}
+					OR lower(coalesce(${personsOfInterest.relationship}, '')) LIKE ${searchTerm}
 					OR EXISTS (
-						SELECT 1 FROM jsonb_array_elements_text(coalesce(${personsOfInterest.aliases}, '[]'::jsonb)) alias
+						SELECT 1 FROM unnest(${personsOfInterest.aliases}) alias
 						WHERE lower(alias) LIKE ${searchTerm}
 					)
 				)${excludeId ? sql` AND ${personsOfInterest.id} != ${excludeId}` : sql``}`
@@ -55,8 +54,8 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			if (r.name.toLowerCase().includes(q)) score += 0.8;
 			if (r.name.toLowerCase() === q) score += 0.2;
 			if (r.description?.toLowerCase().includes(q)) score += 0.4;
-			if (r.lastLocation?.toLowerCase().includes(q)) score += 0.2;
-			const aliases = (r.aliases as string[]) ?? [];
+			if (r.relationship?.toLowerCase().includes(q)) score += 0.2;
+			const aliases = r.aliases ?? [];
 			if (aliases.some((a) => a.toLowerCase().includes(q))) score += 0.6;
 			return {
 				poiId: r.id,
@@ -64,8 +63,8 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 				status: r.status,
 				threatLevel: r.threatLevel,
 				description: r.description?.slice(0, 200) ?? '',
-				lastLocation: r.lastLocation,
-				photoUrl: (r.photos as any[])?.[0]?.url ?? null,
+				lastLocation: null, // TODO: Add when location column exists
+				photoUrl: null, // TODO: Join poi_photos + VLM analysis
 				similarityScore: Math.min(score, 1.0),
 			};
 		});

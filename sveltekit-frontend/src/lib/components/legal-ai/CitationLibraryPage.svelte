@@ -3,11 +3,15 @@
 	import CitationCollections from './CitationCollections.svelte';
 	import CollectionDetail from './CollectionDetail.svelte';
 
-	interface Collection { id: string, name: string;
+	interface Collection {
+		id: string;
+		name: string;
 		description?: string;
-	is_public: boolean;
-		citation_count?: number;
-	created_at: string;
+		color?: string;
+		isPublic: boolean;
+		citationCount?: number;
+		createdAt: string;
+		updatedAt?: string;
 	}
 
 	let collections: Collection[] = $state([]);
@@ -32,12 +36,7 @@
 		try {
 			const response = await fetch('/api/citations/collections');
 			if (response.ok) {
-				const data = await response.json();
-				if (data.success) {
-					collections = data.collections || [];
-				} else {
-					error = data.error || 'Failed to load collections';
-				}
+				collections = await response.json();
 			} else {
 				error = 'Failed to load collections';
 			}
@@ -61,23 +60,19 @@
 			const response = await fetch('/api/citations/collections', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-name: newCollectionName,
+				body: JSON.stringify({
+					name: newCollectionName,
 					description: newCollectionDescription || undefined,
-					is_public: false
-				})
+					isPublic: false,
+				}),
 			});
 
 			if (response.ok) {
-				const data = await response.json();
-				if (data.success) {
-					collections = [...collections, data.collection];
-					newCollectionName = '';
-					newCollectionDescription = '';
-					showCreateForm = false;
-				} else {
-					error = data.error || 'Failed to create collection';
-				}
+				const newCollection = await response.json();
+				collections = [...collections, newCollection];
+				newCollectionName = '';
+				newCollectionDescription = '';
+				showCreateForm = false;
 			} else {
 				error = 'Failed to create collection';
 			}

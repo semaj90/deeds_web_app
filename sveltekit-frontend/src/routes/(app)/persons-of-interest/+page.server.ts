@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/client';
 import { personsOfInterest } from '$lib/server/db/schema-postgres';
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, arrayContains } from 'drizzle-orm';
 import type { PageServerLoad } from './$types.js';
 
 export const load: PageServerLoad = async ({ url }) => {
@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ url }) => {
 
 	try {
 		const query = caseId
-			? db.select().from(personsOfInterest).where(eq(personsOfInterest.caseId, caseId))
+			? db.select().from(personsOfInterest).where(arrayContains(personsOfInterest.caseIds, [caseId]))
 			: db.select().from(personsOfInterest);
 
 		const pois = await safe(query.orderBy(desc(personsOfInterest.createdAt)).limit(100), []);
@@ -24,8 +24,8 @@ export const load: PageServerLoad = async ({ url }) => {
 				status: p.status,
 				threatLevel: p.threatLevel,
 				description: p.description,
-				lastLocation: p.lastLocation,
-				caseId: p.caseId,
+				relationship: p.relationship,
+				caseIds: p.caseIds,
 				createdAt: p.createdAt?.toISOString() ?? '',
 				updatedAt: p.updatedAt?.toISOString() ?? ''
 			}))

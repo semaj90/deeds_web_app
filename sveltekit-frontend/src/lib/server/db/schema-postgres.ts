@@ -860,60 +860,40 @@ export const themes = pgTable('themes', {
  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-export const personsOfInterest = pgTable('persons', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- caseId: uuid('case_id'),
- createdBy: uuid('created_by'),
- name: text('name').notNull(),
- aliases: jsonb('aliases').$type<string[]>().default([]),
- threatLevel: varchar('threat_level', { enum: ['low', 'medium', 'high', 'critical'] })
- .default('low')
- .notNull(),
- status: varchar('status', { enum: ['surveillance', 'wanted', 'active', 'cleared'] })
- .default('surveillance')
- .notNull(),
- description: text('description').default(''),
- lastSeen: varchar('last_seen'),
- lastLocation: text('last_location'),
- cases: jsonb('cases').$type<string[]>().default([]),
- // Multiple photos with forensic metadata
-  photos: jsonb('photos')
-    .$type<
-      {
-        id: string;
-        url: string;
-        filename: string;
-        uploadedAt: string;
-        metadata: {
-          exif?: Record<string, any>;
-          gps?: { lat: number; lng: number };
-          timestamp?: string;
-          deviceModel?: string;
-          resolution?: { width: number; height: number };
-        };
-        ai: {
-          faceEmbedding?: number[]; // Face recognition vector
-          quality: number; // Photo quality score
-          landmarks?: number[][]; // Facial landmarks
-        };
-      }[]
-    >()
-    .default([]),
-  // Legacy single photo URL for backward compatibility
-  photoUrl: text('photo_url'),
-  ai: jsonb('ai')
-    .$type<{
-      riskScore: number;
-      patterns: string[];
-      recommendations: string[];
-      lastUpdated: string;
-    }>()
-    .default(null),
- createdAt: timestamp('created_at').defaultNow(),
- updatedAt: timestamp('updated_at').defaultNow(),
+export const personsOfInterest = pgTable('persons_of_interest', {
+	id: uuid('id')
+		.default(sql`gen_random_uuid()`)
+		.primaryKey()
+		.notNull(),
+	name: text('name').notNull(),
+	aliases: text('aliases').array(),
+	description: text('description').default(''),
+	threatLevel: varchar('threat_level', { enum: ['low', 'medium', 'high', 'critical'] })
+		.default('low')
+		.notNull(),
+	status: varchar('status', { enum: ['surveillance', 'wanted', 'active', 'cleared'] })
+		.default('surveillance')
+		.notNull(),
+	relationship: text('relationship'),
+	aiProfile: jsonb('ai_profile').$type<{
+		riskScore: number;
+		patterns: string[];
+		recommendations: string[];
+		lastUpdated: string;
+	}>(),
+	who: jsonb('who'),
+	what: jsonb('what'),
+	why: jsonb('why'),
+	how: jsonb('how'),
+	risk: jsonb('risk'),
+	confidence: real('confidence'),
+	modelVersion: text('model_version'),
+	generatedAt: timestamp('generated_at'),
+	lastUpdated: timestamp('last_updated'),
+	caseIds: text('case_ids').array(),
+	createdBy: text('created_by'),
+	createdAt: timestamp('created_at').defaultNow(),
+	updatedAt: timestamp('updated_at').defaultNow(),
 });
 
 // POI Photos table for better organization
@@ -1436,10 +1416,8 @@ export const themesRelations = relations(themes, ({ one }) => ({
  user: one(users, { fields: [themes.userId], references: [users.id] }),
 }));
 
-export const personsOfInterestRelations = relations(personsOfInterest, ({ one, many }) => ({
- case: one(cases, { fields: [personsOfInterest.caseId], references: [cases.id] }),
- createdBy: one(users, { fields: [personsOfInterest.createdBy], references: [users.id] }),
- photos: many(poiPhotos),
+export const personsOfInterestRelations = relations(personsOfInterest, ({ many }) => ({
+	photos: many(poiPhotos),
 }));
 
 export const poiPhotosRelations = relations(poiPhotos, ({ one }) => ({

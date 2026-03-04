@@ -19,10 +19,11 @@ export const POST: RequestHandler = async ({ request }) => {
 			.from(evidence)
 			.where(eq(evidence.caseId, caseId));
 
+		const { arrayContains } = await import('drizzle-orm');
 		const [poiCount] = await db
 			.select({ count: count() })
 			.from(personsOfInterest)
-			.where(eq(personsOfInterest.caseId, caseId));
+			.where(arrayContains(personsOfInterest.caseIds, [caseId]));
 
 		const evCount = Number(evidenceCount?.count || 0);
 		const persons = Number(poiCount?.count || 0);

@@ -3,9 +3,11 @@
     id: string;
     name: string;
     description?: string;
-    is_public: boolean;
-    citation_count?: number;
-    created_at: string;
+    color?: string;
+    isPublic: boolean;
+    citationCount?: number;
+    createdAt: string;
+    updatedAt?: string;
   }
 
   interface Props {
@@ -36,8 +38,8 @@
             <p class="description">{collection.description}</p>
           {/if}
           <div class="card-meta">
-            <span class="count">{collection.citation_count ?? 0} citations</span>
-            <span class="visibility">{collection.is_public ? '🌐' : '🔒'}</span>
+            <span class="count">{collection.citationCount ?? 0} citations</span>
+            <span class="visibility">{collection.isPublic ? '🌐' : '🔒'}</span>
           </div>
         </button>
 

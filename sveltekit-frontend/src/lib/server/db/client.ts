@@ -19,13 +19,13 @@ export const pool = new Pool({ connectionString: getDatabaseUrl() });
 pool.on('error', (err) => {
 	console.error('Database pool error (non-fatal):', err.message);
 });
-export const db = drizzle(pool, { schema: mergedSchema });
+export const db = drizzle(pool, { schema: mergedSchema, casing: 'snake_case' });
 
 const adminPool = new Pool({ connectionString: getAdminDatabaseUrl() });
 adminPool.on('error', (err) => {
 	console.error('Admin database pool error (non-fatal):', err.message);
 });
-export const adminDb = drizzle(adminPool, { schema: mergedSchema });
+export const adminDb = drizzle(adminPool, { schema: mergedSchema, casing: 'snake_case' });
 
 export async function closeConnections(): Promise<void> {
  await pool.end();

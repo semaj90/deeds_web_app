@@ -556,14 +556,14 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
 
  <!-- Notes Modal (NES-styled) -->
  {#if showNotesPanel}
- <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm" onclick={() => (showNotesPanel = false)} role="dialog" aria-modal="true" aria-label="Case Notes">
-   <div class="relative w-[750px] max-w-[90vw] h-[85vh] bg-[#0c0a09] border-2 border-[#3a3a3a] rounded shadow-2xl flex flex-col overflow-hidden" onclick={(e) => e.stopPropagation()}>
-     <div class="flex items-center justify-between px-4 py-2 bg-[#1a1a2e] border-b border-[#3a3a3a]">
-       <span class="font-mono text-xs text-[#9ca3af] tracking-widest uppercase">[CASE_NOTES::TERMINAL]</span>
-       <span class="font-mono text-[10px] text-[#6b7280]">{caseId.slice(0, 8)}</span>
-       <button class="text-[#9ca3af] hover:text-black text-lg font-bold leading-none" onclick={() => (showNotesPanel = false)}>×</button>
+ <div class="nes-modal-backdrop" onclick={() => (showNotesPanel = false)} onkeydown={(e) => e.key === 'Escape' && (showNotesPanel = false)} role="dialog" aria-modal="true" aria-label="Case Notes" tabindex="-1">
+   <div class="nes-modal-container" onclick={(e) => e.stopPropagation()}>
+     <div class="nes-modal-titlebar">
+       <span class="nes-modal-label">[CASE_NOTES::TERMINAL]</span>
+       <span class="nes-modal-id">{caseId.slice(0, 8)}</span>
+       <button class="nes-modal-close" onclick={() => (showNotesPanel = false)}>X</button>
      </div>
-     <div class="flex-1 overflow-hidden">
+     <div class="nes-modal-body">
        <CaseNotesEditor {caseId} onClose={() => showNotesPanel = false} />
      </div>
    </div>
@@ -1086,3 +1086,84 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
   Write Document
 </button>
 </div>
+
+<style>
+  /* NES-styled Notes Modal */
+  .nes-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+  }
+
+  .nes-modal-container {
+    position: relative;
+    width: 750px;
+    max-width: 90vw;
+    height: 85vh;
+    background: #0c0a09;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* NES pixel border effect */
+    border: 4px solid #fff;
+    box-shadow:
+      inset -4px -4px 0 0 #adafbc,
+      inset 4px 4px 0 0 #adafbc,
+      0 0 0 4px #212529,
+      0 8px 32px rgba(0, 0, 0, 0.5);
+    image-rendering: pixelated;
+  }
+
+  .nes-modal-titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    background: #1a1a2e;
+    border-bottom: 4px solid #fff;
+  }
+
+  .nes-modal-label {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .nes-modal-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.625rem;
+    color: #6b7280;
+  }
+
+  .nes-modal-close {
+    background: #e74856;
+    border: 2px solid #fff;
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .nes-modal-close:hover {
+    background: #ff6b6b;
+  }
+
+  .nes-modal-body {
+    flex: 1;
+    overflow: hidden;
+  }
+</style>

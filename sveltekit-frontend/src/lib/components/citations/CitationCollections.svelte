@@ -1,413 +1,636 @@
 <script lang="ts">
- import type { CitationCollection } from '$lib/types/citations';
- // Migrated to $effect
+	import type { CitationCollection } from '$lib/types/citations';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Icon from '$lib/components/ui/Icon.svelte';
 
- let { onSelectCollection = () => {} }: {
- onSelectCollection?: (collection: CitationCollection) => void;
- } = $props();
+	interface Props {
+		onSelectCollection?: (collection: CitationCollection) => void;
+	}
 
- let collections = $state<CitationCollection[]>([]);
- let isLoading = $state(false);
- let error = $state<string | null>(null);
- let showCreateForm = $state(false);
- let newCollectionName = $state('');
- let newCollectionColor = $state('#8B2332');
+	let { onSelectCollection }: Props = $props();
 
- const colors = [
- '#8B2332', // Burgundy
- '#D4A574', // Tan
- '#2C3E50', // Dark
- '#E74C3C', // Red
- '#3498DB', // Blue
- '#2ECC71', // Green
- '#F39C12', // Orange
- '#9B59B6' // Purple
- ];
+	let collections = $state<CitationCollection[]>([]);
+	let isLoading = $state(false);
+	let error = $state<string | null>(null);
+	let showCreateForm = $state(false);
+	let newCollectionName = $state('');
+	let newCollectionDescription = $state('');
+	let newCollectionColor = $state('#8B2332');
 
- async function loadCollections() {
- isLoading = true;
- error = null;
+	// Edit state
+	let editingId = $state<string | null>(null);
+	let editName = $state('');
+	let editDescription = $state('');
+	let editColor = $state('');
 
- try {
- const response = await fetch('/api/citations/collections');
- if (!response.ok) throw new Error('Failed to load collections');
+	// Export state
+	let exportingId = $state<string | null>(null);
+	let exportLoading = $state(false);
 
- collections = await response.json();
- } catch (err) {
- error = err instanceof Error ? err.message : 'Failed to load collections';
- console.error('Error loading collections:', err);
- } finally {
- isLoading = false;
- }
- }
+	const colors = [
+		'#8B2332', '#D4A574', '#2C3E50', '#E74C3C',
+		'#3498DB', '#2ECC71', '#F39C12', '#9B59B6'
+	];
 
- async function handleCreateCollection() {
- if (!newCollectionName.trim()) {
- alert('Collection name is required');
- return;
- }
+	async function loadCollections() {
+		isLoading = true;
+		error = null;
+		try {
+			const res = await fetch('/api/citations/collections');
+			if (!res.ok) throw new Error('Failed to load collections');
+			collections = await res.json();
+		} catch (err) {
+			error = err instanceof Error ? err.message : 'Failed to load collections';
+		} finally {
+			isLoading = false;
+		}
+	}
 
- try {
- const response = await fetch('/api/citations/collections', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-name: newCollectionName, color: newCollectionColor,
- isPublic: false
- })
- });
+	async function handleCreate() {
+		if (!newCollectionName.trim()) return;
+		try {
+			const res = await fetch('/api/citations/collections', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					name: newCollectionName.trim(),
+					description: newCollectionDescription.trim() || null,
+					color: newCollectionColor,
+					isPublic: false
+				})
+			});
+			if (!res.ok) throw new Error('Failed to create collection');
+			const created: CitationCollection = await res.json();
+			collections = [...collections, created];
+			newCollectionName = '';
+			newCollectionDescription = '';
+			newCollectionColor = '#8B2332';
+			showCreateForm = false;
+		} catch (err) {
+			console.error('Error creating collection:', err);
+		}
+	}
 
- if (!response.ok) throw new Error('Failed to create collection');
+	async function handleDelete(id: string) {
+		if (!confirm('Delete this collection? This cannot be undone.')) return;
+		try {
+			const res = await fetch(`/api/citations/collections/${id}`, { method: 'DELETE' });
+			if (!res.ok) throw new Error('Failed to delete');
+			collections = collections.filter(c => c.id !== id);
+		} catch (err) {
+			console.error('Error deleting collection:', err);
+		}
+	}
 
- const newCollection: CitationCollection = await response.json();
- collections = [...collections, newCollection];
+	function startEdit(c: CitationCollection) {
+		editingId = c.id;
+		editName = c.name;
+		editDescription = c.description ?? '';
+		editColor = c.color ?? '#8B2332';
+	}
 
- // Reset form
- newCollectionName = '';
- newCollectionColor = '#8B2332';
- showCreateForm = false;
- } catch (err) {
- console.error('Error creating collection:', err);
- alert('Failed to create collection');
- }
- }
+	async function saveEdit() {
+		if (!editingId || !editName.trim()) return;
+		try {
+			const res = await fetch(`/api/citations/collections/${editingId}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					name: editName.trim(),
+					description: editDescription.trim() || null,
+					color: editColor
+				})
+			});
+			if (!res.ok) throw new Error('Failed to update');
+			const updated = await res.json();
+			collections = collections.map(c =>
+				c.id === editingId ? { ...c, name: updated.name, description: updated.description, color: updated.color } : c
+			);
+			editingId = null;
+		} catch (err) {
+			console.error('Error updating collection:', err);
+		}
+	}
 
- async function handleDeleteCollection(collectionId: string) {
- if (!confirm('Are you sure you want to delete this collection?')) return;
+	async function handleExport(id: string, format: 'html' | 'markdown' | 'json') {
+		exportLoading = true;
+		try {
+			const res = await fetch(`/api/citations/collections/${id}/export?format=${format}`);
+			if (!res.ok) throw new Error('Export failed');
+			const blob = await res.blob();
+			const disposition = res.headers.get('Content-Disposition') ?? '';
+			const match = disposition.match(/filename="(.+?)"/);
+			const filename = match?.[1] ?? `collection.${format === 'markdown' ? 'md' : format}`;
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = filename;
+			a.click();
+			URL.revokeObjectURL(url);
+			exportingId = null;
+		} catch (err) {
+			console.error('Export error:', err);
+		} finally {
+			exportLoading = false;
+		}
+	}
 
- try {
- const response = await fetch(`/api/citations/collections/${collectionId}`, {
- method: 'DELETE'
- });
-
- if (!response.ok) throw new Error('Failed to delete collection');
-
- collections = collections.filter(c => c.id !== collectionId);
- } catch (err) {
- console.error('Error deleting collection:', err);
- alert('Failed to delete collection');
- }
- }
-
- $effect(() => {
-
- loadCollections();
- 
-});
+	$effect(() => {
+		loadCollections();
+	});
 </script>
 
-<div class="citation-collections">
- <div class="collections-header">
- <h3>Collections</h3>
- <button
- onclick={() => (showCreateForm = !showCreateForm)}
- class="btn-create"
- disabled={isLoading}
- >
- {showCreateForm ? '✕' : '+ New'}
- </button>
- </div>
+<div class="collections-panel">
+	<!-- Header -->
+	<div class="collections-header">
+		<h3>
+			<Icon name="folder" size={16} />
+			Collections
+			{#if collections.length > 0}
+				<span class="count-badge">({collections.length})</span>
+			{/if}
+		</h3>
+		<Button
+			onclick={() => { showCreateForm = !showCreateForm; }}
+			disabled={isLoading}
+			class="text-xs px-2.5 py-1"
+		>
+			{#if showCreateForm}
+				<Icon name="x" size={12} />
+				Cancel
+			{:else}
+				<Icon name="plus" size={12} />
+				New
+			{/if}
+		</Button>
+	</div>
 
- <!-- Create Form -->
- {#if showCreateForm}
- <div class="create-form">
- <div class="form-group">
- <label for="collection-name">Collection Name</label>
- <input
- id="collection-name"
- type="text"
- bind:value={newCollectionName}
- placeholder="e.g., Civil Rights Cases"
- onkeydown={(e) => e.key === 'Enter' && handleCreateCollection()}
- />
- </div>
+	<!-- Create Form -->
+	{#if showCreateForm}
+		<div class="create-form">
+			<div class="form-group">
+				<label for="cc-name">Name</label>
+				<input
+					id="cc-name"
+					type="text"
+					bind:value={newCollectionName}
+					placeholder="e.g., Civil Rights Cases"
+					onkeydown={(e) => e.key === 'Enter' && handleCreate()}
+				/>
+			</div>
+			<div class="form-group">
+				<label for="cc-desc">Description</label>
+				<input
+					id="cc-desc"
+					type="text"
+					bind:value={newCollectionDescription}
+					placeholder="Optional description..."
+				/>
+			</div>
+			<div class="form-group">
+				<span class="label-text">Color</span>
+				<div class="color-picker">
+					{#each colors as color}
+						<button
+							type="button"
+							onclick={() => { newCollectionColor = color; }}
+							class="color-option"
+							class:selected={newCollectionColor === color}
+							style:background-color={color}
+						></button>
+					{/each}
+				</div>
+			</div>
+			<div class="form-actions">
+				<Button onclick={handleCreate} class="text-xs px-3 py-1.5 flex-1">Create</Button>
+				<Button onclick={() => { showCreateForm = false; }} class="text-xs px-3 py-1.5 flex-1">Cancel</Button>
+			</div>
+		</div>
+	{/if}
 
- <div class="form-group">
- <label>Color</label>
- <div class="color-picker">
- {#each colors as color}
- <button
- type="button"
- onclick={() => (newCollectionColor = color)}
- class="color-option"
- class:selected={newCollectionColor === color}
- style="background-color: {color}"
- title={color}
-></button>
- {/each}
- </div>
- </div>
+	<!-- Error -->
+	{#if error}
+		<div class="error-msg">
+			<Icon name="alert-triangle" size={12} />
+			{error}
+			<button class="retry-btn" onclick={loadCollections}>Retry</button>
+		</div>
+	{/if}
 
- <div class="form-actions">
- <button onclick={ handleCreateCollection } class="btn-primary">
- Create Collection
- </button>
- <button onclick={() => (showCreateForm = false)} class="btn-secondary">
- Cancel
- </button>
- </div>
- </div>
- {/if}
+	<!-- Loading / Empty / List -->
+	{#if isLoading && collections.length === 0}
+		<div class="empty-state">
+			<Icon name="loader-2" size={16} class="animate-spin" />
+			Loading collections...
+		</div>
+	{:else if collections.length === 0}
+		<div class="empty-state">
+			<Icon name="folder-open" size={24} />
+			<p>No collections yet</p>
+			<small>Create one to organize your citations</small>
+		</div>
+	{:else}
+		<div class="collections-list">
+			{#each collections as collection (collection.id)}
+				{#if editingId === collection.id}
+					<!-- Inline Edit -->
+					<div class="edit-form">
+						<input
+							type="text"
+							bind:value={editName}
+							class="edit-input"
+						/>
+						<input
+							type="text"
+							bind:value={editDescription}
+							placeholder="Description..."
+							class="edit-input"
+						/>
+						<div class="color-picker small">
+							{#each colors as color}
+								<button
+									type="button"
+									onclick={() => { editColor = color; }}
+									class="color-option small"
+									class:selected={editColor === color}
+									style:background-color={color}
+								></button>
+							{/each}
+						</div>
+						<div class="form-actions">
+							<Button onclick={saveEdit} class="text-xs px-2 py-1">Save</Button>
+							<Button onclick={() => { editingId = null; }} class="text-xs px-2 py-1">Cancel</Button>
+						</div>
+					</div>
+				{:else}
+					<!-- Collection Card -->
+					<div class="collection-item">
+						<button
+							onclick={() => onSelectCollection?.(collection)}
+							class="collection-button"
+						>
+							<div class="collection-color" style:background-color={collection.color ?? '#8B2332'}></div>
+							<div class="collection-info">
+								<p class="collection-name">{collection.name}</p>
+								{#if collection.description}
+									<p class="collection-desc">{collection.description}</p>
+								{/if}
+								<p class="collection-count">
+									{collection.citationCount ?? 0} citation{(collection.citationCount ?? 0) !== 1 ? 's' : ''}
+								</p>
+							</div>
+						</button>
 
- <!-- Error Message -->
- {#if error}
- <div class="error-message">
- <p>⚠️ {error}</p>
- </div>
- {/if}
-
- <!-- Loading State -->
- {#if isLoading && collections.length === 0}
- <div class="loading">
- <p>Loading collections...</p>
- </div>
- {:else if collections.length === 0}
- <div class="empty-state">
- <p>No collections yet. Create one to organize your citations!</p>
- </div>
- {:else}
- <div class="collections-list">
- {#each collections as collection (collection.id)}
- <div class="collection-item">
- <button
- onclick={() => onSelectCollection(collection)}
- class="collection-button"
- >
- <div class="collection-color" style="background-color: {collection.color}" ></div>
- <div class="collection-info">
- <p class="collection-name">{collection.name}</p>
- <p class="collection-count">
- {collection.citationCount || 0} citation{collection.citationCount !== 1 ? 's' : ''}
- </p>
- </div>
- </button>
- <button
- onclick={() => handleDeleteCollection(collection.id)}
- class="btn-delete"
- title="Delete collection"
- >
- 🗑️
- </button>
- </div>
- {/each}
- </div>
- {/if}
+						<!-- Actions -->
+						<div class="item-actions">
+							<div class="export-wrapper">
+								<button
+									class="action-btn"
+									onclick={() => { exportingId = exportingId === collection.id ? null : collection.id; }}
+									title="Export collection"
+								>
+									<Icon name="download" size={14} />
+								</button>
+								{#if exportingId === collection.id}
+									<div class="export-menu">
+										<button
+											class="export-option"
+											onclick={() => handleExport(collection.id, 'html')}
+											disabled={exportLoading}
+										>HTML</button>
+										<button
+											class="export-option"
+											onclick={() => handleExport(collection.id, 'markdown')}
+											disabled={exportLoading}
+										>Markdown</button>
+										<button
+											class="export-option"
+											onclick={() => handleExport(collection.id, 'json')}
+											disabled={exportLoading}
+										>JSON</button>
+									</div>
+								{/if}
+							</div>
+							<button
+								class="action-btn"
+								onclick={() => startEdit(collection)}
+								title="Edit collection"
+							>
+								<Icon name="pencil" size={14} />
+							</button>
+							<button
+								class="action-btn delete"
+								onclick={() => handleDelete(collection.id)}
+								title="Delete collection"
+							>
+								<Icon name="trash-2" size={14} />
+							</button>
+						</div>
+					</div>
+				{/if}
+			{/each}
+		</div>
+	{/if}
 </div>
 
 <style>
- .citation-collections { background: var(--color-parchment);
-		border: 1px solid var(--color-tan);
- border-radius: 8px;
-	padding: 16px;
- }
+	.collections-panel {
+		border-radius: 8px;
+		border: 1px solid var(--sand-dark, #44403c);
+		background: var(--panel, #1c1917);
+		padding: 16px;
+	}
 
- .collections-header {
- display: flex;
- justify-content: space-between;
- align-items: center;
- margin-bottom: 16px;
- }
-
- .collections-header h3 { margin: 0;
-		color: var(--color-burgundy);
- font-size: 16px;
- }
-
- .btn-create {
- padding: 6px 12px;
- background: var(--color-burgundy);
-	color: white;
- border: none;
- border-radius: 4px;
-	cursor: pointer;
- font-size: 13px;
- font-weight: 600;
-	transition:all 150ms ease;
- }
-
- .btn-create:hover:not(disabled) {
- background: var(--color-dark-burgundy);
- }
-
- .btn-create:disabled { background: var(--color-light-gray);
-		cursor:not-allowed;
- }
-
- .create-form { background: white;
-		border: 1px solid var(--color-tan);
- border-radius: 4px;
-	padding: 12px;
- margin-bottom: 12px;
-	display: flex;
- flex-direction: column;
-	gap: 12px;
- }
-
- .form-group {
- display: flex;
- flex-direction: column;
-	gap: 6px;
- }
-
- .form-group label {
- font-weight: 600;
-	color: var(--color-burgundy);
- font-size: 13px;
- }
-
- .form-group input {
- padding: 8px 10px;
- border: 1px solid var(--color-tan);
- border-radius: 4px;
- font-size: 13px;
- }
-
- .form-group input:focus {
- outline: none;
- border-color: var(--color-burgundy);
- box-shadow: 0 0 0 3px rgba(139, 35, 50, 0.1);
- }
-
- .color-picker { display: flex;
-		gap: 8px;
- flex-wrap: wrap;
- }
-
- .color-option { width: 32px;
-		height: 32px;
- border: 2px solid transparent;
- border-radius: 4px;
-	cursor: pointer;
- transition:all 150ms ease;
- }
-
- .color-option:hover {
- transform: scale(1.1);
- }
-
- .color-option.selected {
- border-color: var(--color-dark);
- box-shadow: 0 0 0 2px white, 0 0 0 4px var(--color-dark);
- }
-
- .form-actions { display: flex;
-		gap: 8px;
- }
-
- .btn-primary,
- .btn-secondary { flex: 1;
-		padding: 8px 12px;
- border: none;
- border-radius: 4px;
- font-size: 13px;
- font-weight: 600;
-	cursor: pointer;
- transition:all 150ms ease;
- }
-
- .btn-primary { background: var(--color-burgundy);
-		color: white;
- }
-
- .btn-primary:hover {
- background: var(--color-dark-burgundy);
- }
-
- .btn-secondary { background: var(--color-light-gray);
-		color: var(--color-dark);
- }
-
- .btn-secondary:hover {
- background: var(--color-tan);
- }
-
- .error-message { background: #fee;
-		border: 1px solid #fcc;
- border-radius: 4px;
-	padding: 8px 12px;
- color: #c33;
- font-size: 13px;
- margin-bottom: 12px;
- }
-
- .loading,
- .empty-state {
- text-align: center;
-	padding: 20px;
- color: var(--color-medium-gray);
- font-size: 13px;
- }
-
- .collections-list {
- display: flex;
- flex-direction: column;
-	gap: 8px;
- }
-
- .collection-item { display: flex;
-		gap: 8px;
- align-items: center;
- }
-
- .collection-button { flex: 1;
+	.collections-header {
 		display: flex;
- gap: 12px;
- align-items: center;
-	background: white;
- border: 1px solid var(--color-tan);
- border-radius: 4px;
-	padding: 10px 12px;
- cursor: pointer;
-	transition:all 150ms ease;
- text-align: left;
- }
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 16px;
+	}
 
- .collection-button:hover {
- border-color: var(--color-burgundy);
- box-shadow: 0 2px 6px rgba(139, 35, 50, 0.1);
- }
+	.collections-header h3 {
+		margin: 0;
+		font-size: 14px;
+		font-weight: 600;
+		color: var(--sand, #d6d3d1);
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
 
- .collection-color { width: 24px;
-		height: 24px;
- border-radius: 4px;
- flex-shrink: 0;
- }
+	.count-badge {
+		font-size: 11px;
+		font-weight: 400;
+		opacity: 0.4;
+	}
 
- .collection-info {
- flex: 1;
- min-width: 0;
- }
+	/* Create & Edit Forms */
+	.create-form, .edit-form {
+		margin-bottom: 12px;
+		padding: 12px;
+		border-radius: 6px;
+		border: 1px solid rgba(var(--accent-rgb, 139, 35, 50), 0.2);
+		background: rgba(0, 0, 0, 0.2);
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
 
- .collection-name {
- margin: 0;
- font-weight: 600;
-	color: var(--color-dark);
- font-size: 13px;
- white-space: nowrap;
-	overflow: hidden;
- text-overflow: ellipsis;
- }
+	.form-group {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
 
- .collection-count {
- margin: 2px 0 0 0;
- color: var(--color-medium-gray);
- font-size: 12px;
- }
+	.form-group label, .label-text {
+		font-size: 12px;
+		color: rgba(var(--sand-rgb, 214, 211, 209), 0.6);
+	}
 
- .btn-delete { background: none;
+	.form-group input, .edit-input {
+		width: 100%;
+		padding: 8px 12px;
+		background: rgba(0, 0, 0, 0.3);
+		border: 1px solid rgba(var(--sand-rgb, 214, 211, 209), 0.2);
+		border-radius: 4px;
+		color: var(--sand, #d6d3d1);
+		font-size: 13px;
+		outline: none;
+		box-sizing: border-box;
+	}
+
+	.form-group input::placeholder, .edit-input::placeholder {
+		color: rgba(var(--sand-rgb, 214, 211, 209), 0.4);
+	}
+
+	.form-group input:focus, .edit-input:focus {
+		border-color: var(--accent, #8B2332);
+	}
+
+	.color-picker {
+		display: flex;
+		gap: 8px;
+		flex-wrap: wrap;
+	}
+
+	.color-picker.small {
+		gap: 4px;
+	}
+
+	.color-option {
+		width: 28px;
+		height: 28px;
+		border: 2px solid transparent;
+		border-radius: 4px;
+		cursor: pointer;
+		transition: transform 150ms ease;
+	}
+
+	.color-option:hover {
+		transform: scale(1.1);
+	}
+
+	.color-option.selected {
+		border-color: white;
+	}
+
+	.color-option.small {
+		width: 20px;
+		height: 20px;
+	}
+
+	.form-actions {
+		display: flex;
+		gap: 8px;
+	}
+
+	/* Error */
+	.error-msg {
+		margin-bottom: 12px;
+		padding: 8px 12px;
+		border-radius: 4px;
+		background: rgba(127, 29, 29, 0.5);
+		border: 1px solid rgba(127, 29, 29, 0.3);
+		color: #fca5a5;
+		font-size: 12px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.retry-btn {
+		margin-left: auto;
+		background: transparent;
 		border: none;
- cursor: pointer;
- font-size: 14px;
-	padding: 4px;
- opacity: 0.6;
-	transition:opacity 150ms ease;
- }
+		color: #f87171;
+		cursor: pointer;
+		font-size: 12px;
+	}
 
- .btn-delete:hover {
- opacity: 1;
- }
+	.retry-btn:hover {
+		color: #fecaca;
+	}
+
+	/* Empty / Loading */
+	.empty-state {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 4px;
+		padding: 32px;
+		color: rgba(var(--sand-rgb, 214, 211, 209), 0.4);
+		font-size: 13px;
+		text-align: center;
+	}
+
+	.empty-state p {
+		margin: 0;
+	}
+
+	.empty-state small {
+		font-size: 11px;
+	}
+
+	/* Collections List */
+	.collections-list {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.collection-item {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		padding: 4px;
+		border-radius: 6px;
+		border: 1px solid rgba(var(--sand-rgb, 214, 211, 209), 0.1);
+		transition: border-color 150ms ease;
+	}
+
+	.collection-item:hover {
+		border-color: rgba(var(--accent-rgb, 139, 35, 50), 0.3);
+	}
+
+	.collection-button {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		background: transparent;
+		border: none;
+		text-align: left;
+		cursor: pointer;
+		padding: 6px 8px;
+		min-width: 0;
+	}
+
+	.collection-color {
+		width: 20px;
+		height: 20px;
+		border-radius: 4px;
+		flex-shrink: 0;
+	}
+
+	.collection-info {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.collection-name {
+		margin: 0;
+		font-size: 13px;
+		font-weight: 500;
+		color: var(--sand, #d6d3d1);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.collection-desc {
+		margin: 0;
+		font-size: 11px;
+		color: rgba(var(--sand-rgb, 214, 211, 209), 0.4);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.collection-count {
+		margin: 2px 0 0 0;
+		font-size: 10px;
+		color: rgba(var(--sand-rgb, 214, 211, 209), 0.3);
+	}
+
+	/* Item Actions */
+	.item-actions {
+		display: flex;
+		align-items: center;
+		gap: 2px;
+		opacity: 0;
+		transition: opacity 150ms ease;
+	}
+
+	.collection-item:hover .item-actions {
+		opacity: 1;
+	}
+
+	.action-btn {
+		padding: 4px;
+		border-radius: 4px;
+		background: transparent;
+		border: none;
+		color: rgba(var(--sand-rgb, 214, 211, 209), 0.4);
+		cursor: pointer;
+		transition: color 150ms ease;
+	}
+
+	.action-btn:hover {
+		color: var(--accent, #8B2332);
+	}
+
+	.action-btn.delete:hover {
+		color: #f87171;
+	}
+
+	/* Export Menu */
+	.export-wrapper {
+		position: relative;
+	}
+
+	.export-menu {
+		position: absolute;
+		right: 0;
+		top: 100%;
+		margin-top: 4px;
+		z-index: 10;
+		background: var(--panel, #1c1917);
+		border: 1px solid var(--sand-dark, #44403c);
+		border-radius: 6px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+		padding: 4px 0;
+		min-width: 112px;
+	}
+
+	.export-option {
+		display: block;
+		width: 100%;
+		text-align: left;
+		padding: 6px 12px;
+		font-size: 12px;
+		color: var(--sand, #d6d3d1);
+		background: transparent;
+		border: none;
+		cursor: pointer;
+	}
+
+	.export-option:hover {
+		background: rgba(var(--accent-rgb, 139, 35, 50), 0.1);
+	}
+
+	.export-option:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
 </style>
-
-
-
-

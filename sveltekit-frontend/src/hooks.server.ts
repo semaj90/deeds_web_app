@@ -10,7 +10,7 @@ import { productionLogger } from '$lib/server/production-logger.js';
 import { startRabbitMQPipeline } from '$lib/messaging/rabbitmq-xstate-integration.js';
 import { initializeQdrant } from '$lib/server/startup/qdrant-init.js';
 import { warmupTemplateCache } from '$lib/server/cache/report-template-cache.js';
-import db from '$lib/server/db/client.js';
+import { db } from '$lib/server/db/client';
 import { reports } from '$lib/server/db/schema-postgres.js';
 import { desc } from 'drizzle-orm';
 import { cacheExport } from '$lib/server/cache/pdf-export-cache.js';

@@ -32,10 +32,7 @@ export const GET: RequestHandler = async ({ params }) => {
 				threatLevel: personsOfInterest.threatLevel,
 				description: personsOfInterest.description,
 				aliases: personsOfInterest.aliases,
-				lastLocation: personsOfInterest.lastLocation,
-				caseId: personsOfInterest.caseId,
-				cases: personsOfInterest.cases,
-				photos: personsOfInterest.photos,
+				caseIds: personsOfInterest.caseIds,
 			})
 			.from(personsOfInterest)
 			.where(ne(personsOfInterest.id, poiId))
@@ -62,8 +59,7 @@ export const GET: RequestHandler = async ({ params }) => {
 function buildProfile(poi: {
 	name: string;
 	description?: string | null;
-	aliases?: string[] | unknown;
-	lastLocation?: string | null;
+	aliases?: string[] | null;
 	status: string;
 	threatLevel: string;
 }): string {
@@ -71,7 +67,6 @@ function buildProfile(poi: {
 	if (poi.description) parts.push('Description: ' + poi.description);
 	const aliases = Array.isArray(poi.aliases) ? poi.aliases : [];
 	if (aliases.length > 0) parts.push('Aliases: ' + aliases.join(', '));
-	if (poi.lastLocation) parts.push('Location: ' + poi.lastLocation);
 	parts.push('Status: ' + poi.status, 'Threat: ' + poi.threatLevel);
 	return parts.join('. ');
 }
@@ -96,11 +91,8 @@ type Candidate = {
 	status: string;
 	threatLevel: string;
 	description: string | null;
-	aliases: string[] | unknown;
-	lastLocation: string | null;
-	caseId: string | null;
-	cases: string[] | unknown;
-	photos: unknown;
+	aliases: string[] | null;
+	caseIds: string[] | null;
 };
 
 type SimilarPOI = {
@@ -114,16 +106,6 @@ type SimilarPOI = {
 	similarity: number;
 };
 
-function extractPhotoUrl(photos: unknown): string | null {
-	if (!Array.isArray(photos) || photos.length === 0) return null;
-	const first = photos[0];
-	if (typeof first === "string") return first;
-	if (first && typeof first === "object" && "url" in first) {
-		return (first as { url: string }).url;
-	}
-	return null;
-}
-
 function toSimilarPOI(c: Candidate, similarity: number): SimilarPOI {
 	return {
 		poiId: c.id,
@@ -131,8 +113,8 @@ function toSimilarPOI(c: Candidate, similarity: number): SimilarPOI {
 		status: c.status,
 		threatLevel: c.threatLevel,
 		description: c.description ?? "",
-		lastLocation: c.lastLocation,
-		photoUrl: extractPhotoUrl(c.photos),
+		lastLocation: null, // Column doesn't exist in DB yet — poi_photos table used instead
+		photoUrl: null, // Photos managed via separate poi_photos table
 		similarity,
 	};
 }
@@ -199,16 +181,14 @@ function textSimilarity(
 	target: {
 		name: string;
 		description?: string | null;
-		aliases?: string[] | unknown;
-		lastLocation?: string | null;
+		aliases?: string[] | null;
 		status: string;
 		threatLevel: string;
-		caseId?: string | null;
-		cases?: string[] | unknown;
+		caseIds?: string[] | null;
 	},
 	candidates: Candidate[]
 ): SimilarPOI[] {
-	const targetCases = Array.isArray(target.cases) ? target.cases : [];
+	const targetCaseIds = Array.isArray(target.caseIds) ? target.caseIds : [];
 	const targetAliases = Array.isArray(target.aliases) ? target.aliases : [];
 	const targetNameWords = new Set(target.name.toLowerCase().split(/\s+/));
 	const targetKeywords = extractKeywords(target.description ?? '');
@@ -218,15 +198,12 @@ function textSimilarity(
 	for (const c of candidates) {
 		let score = 0;
 
-		if (target.caseId && c.caseId && target.caseId === c.caseId) {
-			score += 0.4;
-		}
-
-		const cCases = Array.isArray(c.cases) ? c.cases : [];
+		const cCaseIds = Array.isArray(c.caseIds) ? c.caseIds : [];
 		let sharedCases = 0;
-		for (const tc of targetCases) {
-			if (cCases.includes(tc)) sharedCases++;
+		for (const tc of targetCaseIds) {
+			if (cCaseIds.includes(tc)) sharedCases++;
 		}
+		if (sharedCases > 0) score += 0.4;
 		score += Math.min(sharedCases * 0.15, 0.3);
 
 		if (target.threatLevel === c.threatLevel) {
