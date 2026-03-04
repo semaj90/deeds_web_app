@@ -1494,7 +1494,7 @@ export const caseNotes = pgTable('case_notes',
  content: text('content').notNull(),
  isAI: boolean('is_ai').default(false),
  isPinned: boolean('is_pinned').default(false),
- createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
+ createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
  createdAt: timestamp('created_at', { withTimezone: true })
  .default(sql`now()`)
  .notNull(),
@@ -1523,7 +1523,7 @@ export const caseNoteVersions = pgTable('case_note_versions',
  title: varchar('title', { length: 255 }),
  content: text('content').notNull(),
  versionNumber: integer('version_number').notNull(),
- editedBy: integer('edited_by').references(() => users.id, { onDelete: 'set null' }),
+ editedBy: uuid('edited_by').references(() => users.id, { onDelete: 'set null' }),
  createdAt: timestamp('created_at', { withTimezone: true })
  .default(sql`now()`)
  .notNull(),

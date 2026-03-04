@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/client';
-import { personsOfInterest } from '$lib/server/db/schema-postgres';
+import { personsOfInterest, poiPhotos } from '$lib/server/db/schema-postgres';
 import { json, error } from '@sveltejs/kit';
-import { sql, ne, desc } from 'drizzle-orm';
+import { sql, desc } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
 /**
@@ -31,6 +31,11 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 				description: personsOfInterest.description,
 				aliases: personsOfInterest.aliases,
 				relationship: personsOfInterest.relationship,
+				photoUrl: sql<string | null>`(
+					SELECT ${poiPhotos.thumbnailUrl} FROM ${poiPhotos}
+					WHERE ${poiPhotos.poiId} = ${personsOfInterest.id}
+					ORDER BY ${poiPhotos.uploadedAt} DESC LIMIT 1
+				)`.as('photo_url'),
 			})
 			.from(personsOfInterest)
 			.where(

@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/client';
-import { personsOfInterest } from '$lib/server/db/schema-postgres';
+import { personsOfInterest, poiPhotos } from '$lib/server/db/schema-postgres';
 import { json } from '@sveltejs/kit';
-import { eq, ne, desc } from 'drizzle-orm';
+import { eq, ne, desc, sql } from 'drizzle-orm';
 import { generateEmbedding } from '$lib/server/ai/embeddings-simple.js';
 import type { RequestHandler } from './$types';
 
@@ -33,6 +33,11 @@ export const GET: RequestHandler = async ({ params }) => {
 				description: personsOfInterest.description,
 				aliases: personsOfInterest.aliases,
 				caseIds: personsOfInterest.caseIds,
+				photoUrl: sql<string | null>`(
+					SELECT ${poiPhotos.thumbnailUrl} FROM ${poiPhotos}
+					WHERE ${poiPhotos.poiId} = ${personsOfInterest.id}
+					ORDER BY ${poiPhotos.uploadedAt} DESC LIMIT 1
+				)`.as('photo_url'),
 			})
 			.from(personsOfInterest)
 			.where(ne(personsOfInterest.id, poiId))
@@ -93,6 +98,7 @@ type Candidate = {
 	description: string | null;
 	aliases: string[] | null;
 	caseIds: string[] | null;
+	photoUrl: string | null;
 };
 
 type SimilarPOI = {
@@ -113,8 +119,8 @@ function toSimilarPOI(c: Candidate, similarity: number): SimilarPOI {
 		status: c.status,
 		threatLevel: c.threatLevel,
 		description: c.description ?? "",
-		lastLocation: null, // Column doesn't exist in DB yet — poi_photos table used instead
-		photoUrl: null, // Photos managed via separate poi_photos table
+		lastLocation: null,
+		photoUrl: c.photoUrl ?? null,
 		similarity,
 	};
 }
