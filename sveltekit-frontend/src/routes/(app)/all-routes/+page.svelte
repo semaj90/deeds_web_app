@@ -8,6 +8,11 @@
 	import RouteInspectorDetectiveBoard from '$lib/components/RouteInspectorDetectiveBoard.svelte';
 	import NESGraphRenderer from '$lib/components/NESGraphRenderer.svelte';
 	import RouteInspectorWorking from '$lib/components/RouteInspectorWorking.svelte';
+	import RouteAPIExplorer from '$lib/components/RouteAPIExplorer.svelte';
+	import RouteTreeView from '$lib/components/RouteTreeView.svelte';
+	import APITesterModal from '$lib/components/APITesterModal.svelte';
+	import ArchivedRoutesPanel from '$lib/components/ArchivedRoutesPanel.svelte';
+	import type { RouteEndpoint } from '$lib/server/api-metadata-extractor';
 
 	const { data }: { data: PageData } = $props();
 	let showDecisionModal = $state(false);
@@ -33,6 +38,34 @@
 	let errorBrainRuns = $state<any[]>([]);
 	let errorBrainLoading = $state(false);
 
+	// New panels for comprehensive route exploration
+	let showAPIExplorer = $state(false);
+	let showRouteTree = $state(false);
+	let showArchivedRoutes = $state(false);
+	let selectedEndpoint = $state<RouteEndpoint | null>(null);
+	let apiTesterOpen = $state(false);
+
+	// Comprehensive route metadata
+	let apiMetadata = $derived((data as any).apiMetadata ?? {
+		allEndpoints: [],
+		activeAPI: [],
+		archived: [],
+		categories: [],
+		stats: {
+			totalRoutes: 0,
+			activeRoutes: 0,
+			archivedRoutes: 0,
+			apiEndpoints: 0,
+			pageServers: 0,
+			pages: 0,
+			categories: 0,
+			methodCounts: { GET: 0, POST: 0, PUT: 0, DELETE: 0, PATCH: 0, load: 0, actions: 0 },
+			groupCounts: { app: 0, dev: 0, admin: 0, api: 0, other: 0, archived: 0 },
+			authRequired: 0,
+			sse: 0
+		}
+	});
+
 	async function loadErrorBrainHistory() {
 		if (errorBrainLoading) return;
 		errorBrainLoading = true;
@@ -46,6 +79,13 @@
 		} catch { /* fail silently */ }
 		finally { errorBrainLoading = false; }
 	}
+
+	// Clear selectedEndpoint when API tester modal closes
+	$effect(() => {
+		if (!apiTesterOpen) {
+			selectedEndpoint = null;
+		}
+	});
 
 	$effect(() => {
 		routes = Array.isArray(data.routes) ? data.routes : [];
@@ -239,6 +279,11 @@
 		if (state === 'flaky') return 'health-flaky';
 		return 'health-ok';
 	}
+
+	function handleTestEndpoint(endpoint: RouteEndpoint) {
+		selectedEndpoint = endpoint;
+		apiTesterOpen = true;
+	}
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -250,15 +295,27 @@
 		<p class="subtitle">// ROUTE MONITORING SYSTEM v2.0</p>
 	</div>
 
-	<!-- Stats Bar -->
+	<!-- Enhanced Stats Bar with Comprehensive Route Counts -->
 	<div class="stats-bar">
-		<div class="stat-box">
-			<span class="stat-label">TOTAL</span>
-			<span class="stat-value">{stats.total}</span>
+		<div class="stat-box stat-primary">
+			<span class="stat-label">TOTAL ROUTES</span>
+			<span class="stat-value">{apiMetadata.stats.totalRoutes}</span>
 		</div>
-		<div class="stat-box">
-			<span class="stat-label">SHOWING</span>
-			<span class="stat-value">{stats.filtered}</span>
+		<div class="stat-box stat-active">
+			<span class="stat-label">ACTIVE</span>
+			<span class="stat-value">{apiMetadata.stats.activeRoutes}</span>
+		</div>
+		<div class="stat-box stat-archived">
+			<span class="stat-label">ARCHIVED</span>
+			<span class="stat-value">{apiMetadata.stats.archivedRoutes}</span>
+		</div>
+		<div class="stat-box stat-feature">
+			<span class="stat-label">API</span>
+			<span class="stat-value">{apiMetadata.stats.apiEndpoints}</span>
+		</div>
+		<div class="stat-box stat-feature">
+			<span class="stat-label">SERVER</span>
+			<span class="stat-value">{apiMetadata.stats.pageServers}</span>
 		</div>
 		<div class="stat-box health-ok">
 			<span class="stat-label">HEALTHY</span>
@@ -272,25 +329,25 @@
 			<span class="stat-label">BROKEN</span>
 			<span class="stat-value">{stats.broken}</span>
 		</div>
-		<div class="stat-box stat-feature">
-			<span class="stat-label">PAGES</span>
-			<span class="stat-value">{stats.pages}</span>
-		</div>
-		<div class="stat-box stat-feature">
-			<span class="stat-label">API</span>
-			<span class="stat-value">{stats.endpoints}</span>
-		</div>
-		<div class="stat-box stat-ai">
-			<span class="stat-label">AI</span>
-			<span class="stat-value">{stats.withAi}</span>
-		</div>
 	</div>
 
-	<!-- Capability Bar -->
+	<!-- Capability Bar with New Component Toggles -->
 	<div class="capability-bar">
 		<span class="cap-item">{stats.withLoad} with load()</span>
 		<span class="cap-item">{stats.withActions} with actions</span>
 		<span class="cap-item cap-ai">{stats.withAi} AI-powered</span>
+
+		<!-- New Component Toggles -->
+		<button class="cap-item cap-api" onclick={() => { showAPIExplorer = !showAPIExplorer; }}>
+			{showAPIExplorer ? '[-]' : '[+]'} API EXPLORER ({apiMetadata.stats.apiEndpoints})
+		</button>
+		<button class="cap-item cap-tree" onclick={() => { showRouteTree = !showRouteTree; }}>
+			{showRouteTree ? '[-]' : '[+]'} ROUTE TREE
+		</button>
+		<button class="cap-item cap-archive" onclick={() => { showArchivedRoutes = !showArchivedRoutes; }}>
+			{showArchivedRoutes ? '[-]' : '[+]'} ARCHIVED ({apiMetadata.stats.archivedRoutes})
+		</button>
+
 		{#if serverStats.totalClusters > 0}
 			<button class="cap-item cap-clusters" onclick={() => (showClusters = !showClusters)}>
 				{serverStats.totalClusters} error clusters ({serverStats.errorCount}E / {serverStats.warningCount}W)
@@ -318,6 +375,34 @@
 			DECIDE
 		</button>
 	</div>
+
+	<!-- API Explorer Panel (collapsible) -->
+	{#if showAPIExplorer}
+		<div class="explorer-panel">
+			<RouteAPIExplorer
+				categories={apiMetadata.categories}
+				onTestEndpoint={handleTestEndpoint}
+			/>
+		</div>
+	{/if}
+
+	<!-- Route Tree View Panel (collapsible) -->
+	{#if showRouteTree}
+		<div class="tree-panel">
+			<RouteTreeView
+				routes={apiMetadata.allEndpoints}
+			/>
+		</div>
+	{/if}
+
+	<!-- Archived Routes Panel (collapsible) -->
+	{#if showArchivedRoutes}
+		<div class="archived-panel-wrapper">
+			<ArchivedRoutesPanel
+				archived={apiMetadata.archived}
+			/>
+		</div>
+	{/if}
 
 	<!-- Error Clusters Panel (collapsible) -->
 	{#if showClusters && errorClusters.length > 0}
@@ -668,6 +753,14 @@
 	</div>
 {/if}
 
+<!-- API Tester Modal -->
+{#if selectedEndpoint}
+	<APITesterModal
+		bind:open={apiTesterOpen}
+		endpoint={selectedEndpoint}
+	/>
+{/if}
+
 <!-- Route Inspector Modal (YoRHa-themed detail view) -->
 <RouteInspectorModal bind:open={showInspector} route={selectedRoute ? { path: selectedRoute.path, kind: selectedRoute.kind ?? 'page', file: selectedRoute.file ?? '', summary: selectedRoute.summary ?? `Route: ${selectedRoute.path}`, category: selectedRoute.group, health: selectedRoute.errorState === 'healthy' ? 'green' : selectedRoute.errorState === 'flaky' ? 'yellow' : selectedRoute.errorState === 'broken' ? 'red' : undefined, errorCount: selectedRoute.errorCount, lastErrorMessage: selectedRoute.lastErrorMessage } : null} />
 
@@ -738,6 +831,9 @@
 		font-weight: bold;
 	}
 
+	.stat-box.stat-primary { border-color: #33ff33; color: #33ff33; }
+	.stat-box.stat-active { border-color: #33aaff; color: #33aaff; }
+	.stat-box.stat-archived { border-color: #ff6633; color: #ff6633; }
 	.stat-box.health-ok { border-color: #33ff33; }
 	.stat-box.health-flaky { border-color: #ffff33; color: #ffff33; }
 	.stat-box.health-broken { border-color: #ff3333; color: #ff3333; }
@@ -764,6 +860,51 @@
 
 	.cap-item.cap-ai {
 		color: #ff33ff;
+	}
+
+	.cap-item.cap-api {
+		color: #3399ff;
+		background: none;
+		border: 1px solid #3399ff;
+		padding: 0.15rem 0.4rem;
+		cursor: pointer;
+		font-family: inherit;
+		font-size: inherit;
+		letter-spacing: inherit;
+	}
+
+	.cap-item.cap-api:hover {
+		background: rgba(51, 153, 255, 0.1);
+	}
+
+	.cap-item.cap-tree {
+		color: #ffaa33;
+		background: none;
+		border: 1px solid #ffaa33;
+		padding: 0.15rem 0.4rem;
+		cursor: pointer;
+		font-family: inherit;
+		font-size: inherit;
+		letter-spacing: inherit;
+	}
+
+	.cap-item.cap-tree:hover {
+		background: rgba(255, 170, 51, 0.1);
+	}
+
+	.cap-item.cap-archive {
+		color: #ff6633;
+		background: none;
+		border: 1px solid #ff6633;
+		padding: 0.15rem 0.4rem;
+		cursor: pointer;
+		font-family: inherit;
+		font-size: inherit;
+		letter-spacing: inherit;
+	}
+
+	.cap-item.cap-archive:hover {
+		background: rgba(255, 102, 51, 0.1);
 	}
 
 	.cap-item.cap-clusters {
@@ -810,6 +951,11 @@
 
 	.cap-item.cap-eb:hover {
 		background: rgba(255, 102, 51, 0.1);
+	}
+
+	/* ── New Component Panels ── */
+	.explorer-panel, .tree-panel, .archived-panel-wrapper {
+		margin-bottom: 1.5rem;
 	}
 
 	.ops-log-panel {

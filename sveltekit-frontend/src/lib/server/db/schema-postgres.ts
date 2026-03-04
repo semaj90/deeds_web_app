@@ -10,6 +10,7 @@ import {
     numeric,
     pgEnum,
     pgTable,
+    primaryKey,
     real,
     serial,
     text,
@@ -739,6 +740,58 @@ export const citationTags = pgTable('citation_tags',
  })
 );
 
+// === CITATION COLLECTIONS ===
+// User-created collections to organize citations
+export const citationCollections = pgTable('citation_collections', {
+	id: uuid('id')
+		.default(sql`gen_random_uuid()`)
+		.primaryKey()
+		.notNull(),
+	userId: uuid('user_id')
+		.notNull()
+		.references(() => users.id, { onDelete: 'cascade' }),
+	name: varchar('name', { length: 255 }).notNull(),
+	description: text('description'),
+	color: varchar('color', { length: 7 }).default('#8B2332'),
+	isPublic: boolean('is_public').default(false).notNull(),
+	createdAt: timestamp('created_at', { withTimezone: true })
+		.default(sql`now()`)
+		.notNull(),
+	updatedAt: timestamp('updated_at', { withTimezone: true })
+		.default(sql`now()`)
+		.notNull(),
+},
+	(table) => ({
+		userIdIdx: index('citation_collections_user_id_idx').on(table.userId),
+	})
+);
+
+// === COLLECTION CITATIONS (M2M) ===
+// Junction table for many-to-many relationship between collections and citations
+export const collectionCitations = pgTable('collection_citations', {
+	collectionId: uuid('collection_id')
+		.notNull()
+		.references(() => citationCollections.id, { onDelete: 'cascade' }),
+	citationId: uuid('citation_id')
+		.notNull()
+		.references(() => citations.id, { onDelete: 'cascade' }),
+	addedAt: timestamp('added_at', { withTimezone: true })
+		.default(sql`now()`)
+		.notNull(),
+},
+	(table) => ({
+		pk: primaryKey({ columns: [table.collectionId, table.citationId] }),
+		collectionIdIdx: index('collection_citations_collection_id_idx').on(table.collectionId),
+		citationIdIdx: index('collection_citations_citation_id_idx').on(table.citationId),
+	})
+);
+
+// Citation Collections Type Exports
+export type CitationCollection = typeof citationCollections.$inferSelect;
+export type NewCitationCollection = typeof citationCollections.$inferInsert;
+export type CollectionCitation = typeof collectionCitations.$inferSelect;
+export type NewCollectionCitation = typeof collectionCitations.$inferInsert;
+
 export const reports = pgTable('reports', {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -1189,6 +1242,7 @@ export const usersRelations = relations(users, ({ many }) => ({
  canvasStatesCreated: many(canvasStates),
  aiReportsCreated: many(aiReports),
  citationsCreated: many(citations),
+ citationCollections: many(citationCollections),
  reportsCreated: many(reports),
  savedReportsCreated: many(savedReports),
  themesCreated: many(themes),
@@ -1334,13 +1388,30 @@ export const aiReportsRelations = relations(aiReports, ({ one }) => ({
  createdBy: one(users, { fields: [aiReports.createdBy], references: [users.id] }),
 }));
 
-export const citationsRelations = relations(citations, ({ one }) => ({
+export const citationsRelations = relations(citations, ({ one, many }) => ({
  document: one(legalDocuments, {
  fields: [citations.documentId],
  references: [legalDocuments.id],
  }),
  case: one(cases, { fields: [citations.caseId], references: [cases.id] }),
  createdBy: one(users, { fields: [citations.createdBy], references: [users.id] }),
+ collectionCitations: many(collectionCitations),
+}));
+
+export const citationCollectionsRelations = relations(citationCollections, ({ one, many }) => ({
+ user: one(users, { fields: [citationCollections.userId], references: [users.id] }),
+ collectionCitations: many(collectionCitations),
+}));
+
+export const collectionCitationsRelations = relations(collectionCitations, ({ one }) => ({
+ collection: one(citationCollections, {
+ fields: [collectionCitations.collectionId],
+ references: [citationCollections.id],
+ }),
+ citation: one(citations, {
+ fields: [collectionCitations.citationId],
+ references: [citations.id],
+ }),
 }));
 
 export const reportsRelations = relations(reports, ({ one, many }) => ({

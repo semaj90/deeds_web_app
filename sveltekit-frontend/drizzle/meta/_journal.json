@@ -71,6 +71,13 @@
       "when": 1772063582840,
       "tag": "0009_wakeful_shen",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1772589320495,
+      "tag": "0010_nifty_sumo",
+      "breakpoints": true
     }
   ]
 }

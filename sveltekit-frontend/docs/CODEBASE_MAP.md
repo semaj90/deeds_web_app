@@ -27,43 +27,7 @@
 
 ## SvelteKit Frontend (src/ — 2,728 files, 705 dirs)
 
-### src/lib/ (2,284 files) — Core Library
 
-| Directory | Files | Purpose | Status |
-|-----------|-------|---------|--------|
-| `components/` | 789 | UI components (Svelte 5 + bits-ui) | ACTIVE — 166 wired, ~60 orphaned |
-| `server/` | 643 | Server-side logic (DB, cache, vector, queue, AI) | ACTIVE — core backend |
-| `utils/` | 151 | Utility functions (formatting, validation, helpers) | ACTIVE |
-| `types/` | 85 | TypeScript type definitions | ACTIVE |
-| `ui/` | 65 | UI primitives (gaming/NES, headless) | MIXED — some orphaned |
-| `services/` | 59 | Service layer (blanket-excluded, 312 corrupted) | EXCLUDED from tsconfig |
-| `stores/` | 36 | State stores (.svelte.ts runes + legacy .ts) | ACTIVE |
-| `api/` | 31 | API client utilities | ACTIVE |
-| `styles/` | 24 | CSS/theme files | ACTIVE |
-| `webgpu/` | 21 | WebGPU compute, WGSL shaders | ACTIVE — 3 WGSL shaders |
-| `db/` | 20 | Database client, schema, migrations | ACTIVE |
-| `schemas/` | 17 | Zod validation schemas | ACTIVE |
-| `machines/` | 16 | XState v5 state machines | ACTIVE |
-| `__tests__/` | 16 | Unit tests | ACTIVE |
-| `shims/` | 14 | Browser compatibility shims (KEEP) | ACTIVE — required |
-| `config/` | 12 | Configuration files | ACTIVE |
-| `workers/` | 11 | Web Workers (embedding, indexing) | ACTIVE |
-| `wasm/` | 11 | WebAssembly integration (ONNX) | ACTIVE |
-| `integrations/` | 11 | External service integrations | ACTIVE |
-| `gpu/` | 11 | GPU compute pipeline, search reranker | ACTIVE |
-| `client/` | 9 | Client-side AI (router, cache, embed) | ACTIVE |
-| `cache/` | 9 | Cache utilities | ACTIVE |
-| `tracking/` | 8 | Telemetry/tracking | ACTIVE |
-| `state/` | 8 | State management | ACTIVE |
-| `phase14/` | 7 | Phase 14 deployment code | LEGACY |
-| `features/` | 7 | Feature flags/POI | ACTIVE (poi/) |
-| `evidence-canvas/` | 7 | Evidence canvas components | ACTIVE |
-| `error-brain/` | 7 | Error analysis system | ACTIVE |
-| `ai/` | 7 | AI client (router, cache, embed, ONNX) | ACTIVE — core |
-| `proto/` | 6 | Protobuf definitions | LEGACY — gRPC abandoned |
-| `headless/` | 6 | Headless UI components | ACTIVE |
-| `auth/` | 6 | Authentication (Lucia) | ACTIVE |
-| 60+ more dirs | 1-5 each | Various utilities and modules | MIXED |
 
 ### src/routes/ (367 files) — Pages + API
 

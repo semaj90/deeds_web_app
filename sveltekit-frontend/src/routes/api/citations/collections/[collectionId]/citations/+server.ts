@@ -1,9 +1,8 @@
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-
-// In-memory store for demo
-// Maps collectionId -> Set<citationId>
-const collectionCitations = new Map<string, Set<string>>();
+import { db } from '$lib/server/db/client';
+import { citationCollections, collectionCitations, citations } from '$lib/server/db/schema-postgres.js';
+import { eq, and, sql } from 'drizzle-orm';
 
 /**
  * POST /api/citations/collections/[collectionId]/citations
@@ -24,21 +23,58 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 			throw error(400, 'Missing required field: citationId');
 		}
 
-		// Get or create citation set for this collection
-		if (!collectionCitations.has(collectionId)) {
-			collectionCitations.set(collectionId, new Set());
+		// Verify collection exists and belongs to user
+		const [collection] = await db
+			.select()
+			.from(citationCollections)
+			.where(
+				and(
+					eq(citationCollections.id, collectionId),
+					eq(citationCollections.userId, locals.user.id)
+				)
+			)
+			.limit(1);
+
+		if (!collection) {
+			throw error(404, 'Collection not found');
 		}
 
-		const citationSet = collectionCitations.get(collectionId)!;
-		citationSet.add(body.citationId);
+		// Verify citation exists
+		const [citation] = await db
+			.select()
+			.from(citations)
+			.where(eq(citations.id, body.citationId))
+			.limit(1);
 
-		return json({
-			success: true,
-			message: 'Citation added to collection',
-			collectionId,
-			citationId: body.citationId,
-			totalCitations: citationSet.size,
-		}, { status: 201 });
+		if (!citation) {
+			throw error(404, 'Citation not found');
+		}
+
+		// Insert into junction table (on conflict do nothing - idempotent)
+		await db
+			.insert(collectionCitations)
+			.values({
+				collectionId,
+				citationId: body.citationId,
+			})
+			.onConflictDoNothing();
+
+		// Get updated citation count
+		const [count] = await db
+			.select({ count: sql<number>`CAST(COUNT(*) AS INTEGER)` })
+			.from(collectionCitations)
+			.where(eq(collectionCitations.collectionId, collectionId));
+
+		return json(
+			{
+				success: true,
+				message: 'Citation added to collection',
+				collectionId,
+				citationId: body.citationId,
+				totalCitations: count?.count || 0,
+			},
+			{ status: 201 }
+		);
 	} catch (err) {
 		console.error('Error adding citation to collection:', err);
 		if (err instanceof Error && 'status' in err) {
@@ -67,20 +103,44 @@ export const DELETE: RequestHandler = async ({ locals, params, request }) => {
 			throw error(400, 'Missing required field: citationId');
 		}
 
-		const citationSet = collectionCitations.get(collectionId);
+		// Verify collection exists and belongs to user
+		const [collection] = await db
+			.select()
+			.from(citationCollections)
+			.where(
+				and(
+					eq(citationCollections.id, collectionId),
+					eq(citationCollections.userId, locals.user.id)
+				)
+			)
+			.limit(1);
 
-		if (!citationSet || !citationSet.has(body.citationId)) {
-			throw error(404, 'Citation not found in collection');
+		if (!collection) {
+			throw error(404, 'Collection not found');
 		}
 
-		citationSet.delete(body.citationId);
+		// Delete from junction table
+		await db
+			.delete(collectionCitations)
+			.where(
+				and(
+					eq(collectionCitations.collectionId, collectionId),
+					eq(collectionCitations.citationId, body.citationId)
+				)
+			);
+
+		// Get updated citation count
+		const [count] = await db
+			.select({ count: sql<number>`CAST(COUNT(*) AS INTEGER)` })
+			.from(collectionCitations)
+			.where(eq(collectionCitations.collectionId, collectionId));
 
 		return json({
 			success: true,
 			message: 'Citation removed from collection',
 			collectionId,
 			citationId: body.citationId,
-			totalCitations: citationSet.size,
+			totalCitations: count?.count || 0,
 		});
 	} catch (err) {
 		console.error('Error removing citation from collection:', err);
@@ -103,12 +163,42 @@ export const GET: RequestHandler = async ({ locals, params }) => {
 	const { collectionId } = params;
 
 	try {
-		const citationSet = collectionCitations.get(collectionId) || new Set();
+		// Verify collection exists and belongs to user
+		const [collection] = await db
+			.select()
+			.from(citationCollections)
+			.where(
+				and(
+					eq(citationCollections.id, collectionId),
+					eq(citationCollections.userId, locals.user.id)
+				)
+			)
+			.limit(1);
+
+		if (!collection) {
+			throw error(404, 'Collection not found');
+		}
+
+		// Fetch citations with details
+		const citationsList = await db
+			.select({
+				citationId: citations.id,
+				citationText: citations.citationText,
+				sourceUrl: citations.sourceUrl,
+				pageNumber: citations.pageNumber,
+				confidence: citations.confidence,
+				createdAt: citations.createdAt,
+				addedAt: collectionCitations.addedAt,
+			})
+			.from(collectionCitations)
+			.innerJoin(citations, eq(collectionCitations.citationId, citations.id))
+			.where(eq(collectionCitations.collectionId, collectionId))
+			.orderBy(collectionCitations.addedAt);
 
 		return json({
 			collectionId,
-			citationIds: Array.from(citationSet),
-			totalCitations: citationSet.size,
+			citations: citationsList,
+			totalCitations: citationsList.length,
 		});
 	} catch (err) {
 		console.error('Error fetching collection citations:', err);
