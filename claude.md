@@ -1,7 +1,7 @@
 # Legal AI Platform — Claude Project Instructions
 
-## Last Updated: February 23, 2026 (Session 84)
-## Status: svelte-check 0 errors (18 pre-existing in stubs), 83 warnings
+## Last Updated: March 3, 2026 (Session 93r28c+++++++)
+## Status: svelte-check 10 pre-existing errors, 412 warnings
 
 ---
 
@@ -551,6 +551,13 @@ safelist: [
 - **Store file naming**: Runes (`$state`/`$derived`) only work in `.svelte`/`.svelte.ts` — plain `.ts` files need `SimpleStore` class or plain TS patterns
 - **Global $state SSR leak**: `.svelte.ts` singletons persist across SSR requests — use `event.locals` for per-request server state
 - **XState v5 fromPromise**: `fromPromise(async (ctx: any) => { const input = ctx.input as T; })` — cast `ctx.input` internally, not in setup types
+- **Drizzle citations schema mismatch**: `citations` table Drizzle schema ≠ actual DB columns (`citationText`→`quoted_text`, `sourceUrl`→N/A, `confidence`→`relevance_score`). Use hybrid: Drizzle for joins + `sql<T>` for actual column names
+- **db client import**: `import { db } from '$lib/server/db/client'` — NO `.js` extension (despite general `.js` convention). `.js` breaks named export resolution for this file
+- **SvelteKit error() in try/catch**: `throw error(404)` inside try/catch → caught → becomes 500. Move not-found checks OUTSIDE try/catch in API routes
+- **Manual migrations**: When `drizzle-kit migrate` fails (pre-existing enums), use `drizzle/manual/*.sql` with `CREATE TABLE IF NOT EXISTS`
+- **Drizzle casing option**: `drizzle(pool, { casing: 'snake_case' })` for auto camelCase→snake_case (v0.34+, NOT currently enabled)
+- **bits-ui v2 Svelte 5**: Use `child` snippet (not `asChild`), `ref` (not `el`), `forceMount` + snippet for transitions, `type="multiple"` (not `multiple={true}`)
+- **Svelte 5 $props**: Don't mutate props — use callback props or `$bindable` rune. `$derived` tracks dependencies at runtime, not compile time
 
 ---
 

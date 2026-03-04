@@ -302,7 +302,7 @@ All database changes are production-ready after dev/staging testing. No data wil
 | 4 | Self-Healing Error Agent | Auto-patch loop | 5% | Error Brain exists, no auto-patch |
 | 5 | Unified Reasoning Engine | C++ gRPC + CUDA | 0% | Full feature missing |
 | 6 | ACE Web Ingestion | Crawl→chunk→embed→KAG | 0% | ACE exists for codebase only |
-| 7 | Citation Intelligence | Collections, tags, export | 20% | Basic citations, no collections/tags/export |
+| 7 | Citation Intelligence | Collections, tags, export | 60% | Collections API ✅, tags ✅, export (HTML/MD/JSON) ✅, UI rewiring pending |
 | 8 | Agentic Alignment Router | Intent classify + KAG | 10% | Basic routing only |
 | 9 | Knowledge Search Engine | IDF + HMM + external docs | 40% | Codebase search only |
 | 10 | Case Notes Enhancements | Versioning, FTS, PDF export | 60% | CRUD works, no versioning/FTS/export |

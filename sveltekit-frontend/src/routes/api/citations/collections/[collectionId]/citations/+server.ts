@@ -180,15 +180,19 @@ export const GET: RequestHandler = async ({ locals, params }) => {
 		}
 
 		// Fetch citations with details
+		// NOTE: citations Drizzle schema has column name mismatches vs actual DB
+		// Use Drizzle for joins + sql`` for actual DB column names
 		const citationsList = await db
 			.select({
 				citationId: citations.id,
-				citationText: citations.citationText,
-				sourceUrl: citations.sourceUrl,
 				pageNumber: citations.pageNumber,
-				confidence: citations.confidence,
 				createdAt: citations.createdAt,
 				addedAt: collectionCitations.addedAt,
+				quotedText: sql<string>`"citations"."quoted_text"`,
+				citationType: sql<string>`"citations"."citation_type"`,
+				relevanceScore: sql<number>`"citations"."relevance_score"`,
+				formattedCitation: sql<string>`"citations"."formatted_citation"`,
+				isKeyAuthority: sql<boolean>`"citations"."is_key_authority"`,
 			})
 			.from(collectionCitations)
 			.innerJoin(citations, eq(collectionCitations.citationId, citations.id))

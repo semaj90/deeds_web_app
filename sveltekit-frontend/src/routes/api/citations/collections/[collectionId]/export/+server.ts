@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/client';
 import { citationCollections, collectionCitations, citations } from '$lib/server/db/schema-postgres.js';
 import { error } from '@sveltejs/kit';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import {
 	getCachedExport,
@@ -63,15 +63,21 @@ async function handleExport({ locals, params, format }: {
 	console.log(`[Collection Export] Cache MISS: Generating ${format} export for collection ${collectionId}`);
 
 	// Fetch all citations in this collection
+	// NOTE: citations Drizzle schema has column name mismatches vs actual DB:
+	//   citationText→quoted_text, sourceUrl→N/A, confidence→relevance_score
+	// Use Drizzle for type-safe joins + sql`` for actual DB column names
 	const collectionCitationsList = await db
 		.select({
 			citationId: citations.id,
-			citationText: citations.citationText,
-			sourceUrl: citations.sourceUrl,
 			pageNumber: citations.pageNumber,
-			confidence: citations.confidence,
 			createdAt: citations.createdAt,
 			addedAt: collectionCitations.addedAt,
+			// Actual DB column names (Drizzle schema mismatch)
+			quotedText: sql<string>`"citations"."quoted_text"`,
+			citationType: sql<string>`"citations"."citation_type"`,
+			relevanceScore: sql<number>`"citations"."relevance_score"`,
+			formattedCitation: sql<string>`"citations"."formatted_citation"`,
+			isKeyAuthority: sql<boolean>`"citations"."is_key_authority"`,
 		})
 		.from(collectionCitations)
 		.innerJoin(citations, eq(collectionCitations.citationId, citations.id))
@@ -128,10 +134,12 @@ async function handleExport({ locals, params, format }: {
 					},
 					citations: collectionCitationsList.map(c => ({
 						id: c.citationId,
-						text: c.citationText,
-						sourceUrl: c.sourceUrl,
+						text: c.quotedText,
+						citationType: c.citationType,
+						formattedCitation: c.formattedCitation,
 						pageNumber: c.pageNumber,
-						confidence: c.confidence,
+						relevanceScore: c.relevanceScore,
+						isKeyAuthority: c.isKeyAuthority,
 						createdAt: c.createdAt,
 						addedToCollectionAt: c.addedAt,
 					})),
@@ -182,10 +190,10 @@ function generateCollectionHTML(collection: any, citationsList: any[]): string {
 	const citationRows = citationsList.map((c, i) => `
 		<tr>
 			<td style="padding: 8px; border: 1px solid #ddd;">${i + 1}</td>
-			<td style="padding: 8px; border: 1px solid #ddd;">${escapeHtml(c.citationText)}</td>
-			<td style="padding: 8px; border: 1px solid #ddd;">${c.sourceUrl ? `<a href="${escapeHtml(c.sourceUrl)}">${escapeHtml(c.sourceUrl)}</a>` : 'N/A'}</td>
+			<td style="padding: 8px; border: 1px solid #ddd;">${escapeHtml(c.quotedText || c.formattedCitation || 'N/A')}</td>
+			<td style="padding: 8px; border: 1px solid #ddd;">${c.citationType || 'N/A'}</td>
 			<td style="padding: 8px; border: 1px solid #ddd;">${c.pageNumber || 'N/A'}</td>
-			<td style="padding: 8px; border: 1px solid #ddd;">${c.confidence ? (c.confidence * 100).toFixed(1) + '%' : 'N/A'}</td>
+			<td style="padding: 8px; border: 1px solid #ddd;">${c.relevanceScore ? (Number(c.relevanceScore) * 100).toFixed(1) + '%' : 'N/A'}</td>
 		</tr>
 	`).join('');
 
@@ -220,7 +228,7 @@ function generateCollectionHTML(collection: any, citationsList: any[]): string {
 			<tr>
 				<th>#</th>
 				<th>Citation Text</th>
-				<th>Source URL</th>
+				<th>Type</th>
 				<th>Page</th>
 				<th>Confidence</th>
 			</tr>
@@ -240,7 +248,8 @@ function generateCollectionHTML(collection: any, citationsList: any[]): string {
 
 function generateCollectionMarkdown(collection: any, citationsList: any[]): string {
 	const citationRows = citationsList.map((c, i) => {
-		return `${i + 1}. **${c.citationText}**\n   - Source: ${c.sourceUrl || 'N/A'}\n   - Page: ${c.pageNumber || 'N/A'}\n   - Confidence: ${c.confidence ? (c.confidence * 100).toFixed(1) + '%' : 'N/A'}\n`;
+		const text = c.quotedText || c.formattedCitation || 'N/A';
+		return `${i + 1}. **${text}**\n   - Type: ${c.citationType || 'N/A'}\n   - Page: ${c.pageNumber || 'N/A'}\n   - Relevance: ${c.relevanceScore ? (Number(c.relevanceScore) * 100).toFixed(1) + '%' : 'N/A'}\n`;
 	}).join('\n');
 
 	return `# ${collection.name}
