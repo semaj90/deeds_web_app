@@ -3,8 +3,12 @@
 
  import AccessibilitySettings from '$lib/components/ui/AccessibilitySettings.svelte';
  import ThemeSelector from '$lib/components/ui/ThemeSelector.svelte';
+ import SystemStatusCard from '$lib/components/ui/SystemStatusCard.svelte';
+ import SystemStatusPanel from '$lib/components/dashboard/SystemStatusPanel.svelte';
+ import SystemOverview from '$lib/components/yorha/dashboard/SystemOverview.svelte';
+ import YoRHaSystemStatus from '$lib/components/yorha/_simulations/YoRHaSystemStatus.svelte';
 
- let activeTab = $state<'general' | 'ai' | 'database' | 'gpu' | 'security' | 'accessibility'>('general');
+ let activeTab = $state<'general' | 'ai' | 'database' | 'gpu' | 'security' | 'accessibility' | 'status'>('general');
 
  // Configuration settings
  let config = $state({ general: { theme: 'yorha',
@@ -144,6 +148,16 @@
     <span class="icon">♿</span>
     A11Y
    </button>
+
+   <div style="border-top: 1px solid #334155; margin: 0.5rem 0;"></div>
+
+   <button
+    class="nav-item {activeTab === 'status' ? 'active' : ''}"
+    onclick={() => activeTab = 'status'}
+   >
+    <span class="icon">📊</span>
+    STATUS
+   </button>
   </nav>
 
   <!-- Main Content Area -->
@@ -244,6 +258,57 @@
      <AccessibilitySettings
       onSettingsChange={(settings) => { console.log('A11y settings:', settings); }}
      />
+    </section>
+   {/if}
+
+   {#if activeTab === 'status'}
+    <section class="config-section">
+     <h2>SYSTEM_STATUS</h2>
+     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      <SystemStatusCard title="PostgreSQL" status="OK" updatedAt={new Date()}>
+       <p class="text-xs text-gray-400 mt-1">70+ tables, pgvector, Drizzle ORM 0.44</p>
+      </SystemStatusCard>
+      <SystemStatusCard title="Redis Cache" status="OK" updatedAt={new Date()}>
+       <p class="text-xs text-gray-400 mt-1">L3 cache layer, configurable TTL</p>
+      </SystemStatusCard>
+      <SystemStatusCard title="Qdrant Vector DB" status="OK" updatedAt={new Date()}>
+       <p class="text-xs text-gray-400 mt-1">768-dim, 6 collections, GPU-accelerated</p>
+      </SystemStatusCard>
+      <SystemStatusCard title="Ollama LLM" status="OK" updatedAt={new Date()}>
+       <p class="text-xs text-gray-400 mt-1">gemma3-legal + embeddinggemma</p>
+      </SystemStatusCard>
+      <SystemStatusCard title="RabbitMQ" status="WARN" updatedAt={new Date()}>
+       <p class="text-xs text-gray-400 mt-1">7 queues, 5 exchanges</p>
+      </SystemStatusCard>
+      <SystemStatusCard title="MinIO Storage" status="OK" updatedAt={new Date()}>
+       <p class="text-xs text-gray-400 mt-1">SHA-256 hash verification, evidence uploads</p>
+      </SystemStatusCard>
+     </div>
+
+     <div class="mb-6">
+      <h3 style="color: #94a3b8; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; margin-bottom: 1rem;">SYSTEM_OVERVIEW</h3>
+      <SystemOverview />
+     </div>
+
+     <div class="mb-6">
+      <h3 style="color: #94a3b8; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; margin-bottom: 1rem;">AI_PIPELINE</h3>
+      <SystemStatusPanel status={{
+       database: 'online',
+       elasticsearch: 'online',
+       gemma: 'online',
+       storageCapacity: 67
+      }} />
+     </div>
+
+     <div>
+      <h3 style="color: #94a3b8; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; margin-bottom: 1rem;">LIVE_METRICS</h3>
+      <YoRHaSystemStatus
+       systemLoad={35}
+       gpuUtilization={72}
+       memoryUsage={61}
+       networkLatency={18}
+      />
+     </div>
     </section>
    {/if}
 

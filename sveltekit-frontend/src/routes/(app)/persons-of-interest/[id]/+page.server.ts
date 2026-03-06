@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/client';
-import { personsOfInterest } from '$lib/server/db/schema-postgres';
-import { eq } from 'drizzle-orm';
+import { personsOfInterest, poiPhotos } from '$lib/server/db/schema-postgres';
+import { eq, desc } from 'drizzle-orm';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types.js';
 
@@ -16,8 +16,13 @@ export const load: PageServerLoad = async ({ params }) => {
 	const poi = results[0];
 
 	if (!poi) {
-		return { poi: null, loadError: 'Person of interest not found or database unavailable' };
+		return { poi: null, photos: [], loadError: 'Person of interest not found or database unavailable' };
 	}
+
+	const photos = await safe(
+		db.select().from(poiPhotos).where(eq(poiPhotos.poiId, params.id)).orderBy(desc(poiPhotos.uploadedAt)),
+		[]
+	);
 
 	return {
 		poi: {
@@ -39,6 +44,15 @@ export const load: PageServerLoad = async ({ params }) => {
 			createdAt: poi.createdAt?.toISOString() ?? '',
 			updatedAt: poi.updatedAt?.toISOString() ?? ''
 		},
+		photos: photos.map(p => ({
+			id: p.id,
+			url: p.url,
+			thumbnailUrl: p.thumbnailUrl,
+			originalName: p.originalName,
+			aiCaption: p.aiCaption,
+			aiTags: p.aiTags,
+			uploadedAt: p.uploadedAt?.toISOString() ?? ''
+		})),
 		loadError: null
 	};
 };

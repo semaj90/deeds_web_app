@@ -275,22 +275,40 @@ async function fetchRAGChunks(
 		const embedding = embedData.embedding as number[];
 		if (!embedding?.length) return [];
 
-		// Search Qdrant evidence_items collection
+		// Search Qdrant evidence_items + legal_documents in parallel
 		const { QdrantClient } = await import('@qdrant/js-client-rest');
 		const qdrant = new QdrantClient({ url: ENV.QDRANT_URL });
 
-		const results = await qdrant.search('evidence_items', {
-			vector: { name: 'content', vector: embedding },
-			limit: 5,
-			score_threshold: 0.5,
-			with_payload: true
-		});
+		const [evidenceResults, docResults] = await Promise.all([
+			qdrant.search('evidence_items', {
+				vector: { name: 'content', vector: embedding },
+				limit: 5,
+				score_threshold: 0.5,
+				with_payload: true
+			}).catch(() => []),
+			qdrant.search('legal_documents', {
+				vector: { name: 'content', vector: embedding },
+				limit: 3,
+				score_threshold: 0.5,
+				with_payload: true
+			}).catch(() => [])
+		]);
 
-		return results.map((r) => ({
-			content: String((r.payload as Record<string, unknown>)?.content ?? ''),
-			score: r.score,
-			source: String((r.payload as Record<string, unknown>)?.source ?? 'evidence')
-		}));
+		const mapped = [
+			...evidenceResults.map((r) => ({
+				content: String((r.payload as Record<string, unknown>)?.content ?? ''),
+				score: r.score,
+				source: String((r.payload as Record<string, unknown>)?.source ?? 'evidence')
+			})),
+			...docResults.map((r) => ({
+				content: String((r.payload as Record<string, unknown>)?.content_preview ?? (r.payload as Record<string, unknown>)?.full_text ?? ''),
+				score: r.score,
+				source: String((r.payload as Record<string, unknown>)?.source_url ?? (r.payload as Record<string, unknown>)?.document_type ?? 'document')
+			}))
+		];
+
+		// Sort by score descending, keep top 5
+		return mapped.sort((a, b) => b.score - a.score).slice(0, 5);
 	} catch {
 		return [];
 	}

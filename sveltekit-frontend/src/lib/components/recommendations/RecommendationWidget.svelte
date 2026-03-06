@@ -14,6 +14,8 @@
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import { ScrollArea } from 'bits-ui';
+	import { browser } from '$app/environment';
+	import type { GPURerankMetrics } from '$lib/gpu/gpu-search-reranker.js';
 
 	interface Props {
 		query: string;
@@ -23,6 +25,7 @@
 		limit?: number;
 		onSelect?: (doc: RecommendedDocument) => void;
 		compact?: boolean; // Compact mode for sidebars
+		enableGPURerank?: boolean; // Enable client-side GPU reranking (default: false)
 	}
 
 	interface RecommendedDocument {
@@ -37,6 +40,7 @@
 			profileMatch: number;
 		};
 		explanationTokens: string[];
+		gpuScore?: number; // Client-side GPU cosine similarity score
 	}
 
 	let {
@@ -46,13 +50,16 @@
 		tags = [],
 		limit = 5,
 		onSelect = undefined,
-		compact = false
+		compact = false,
+		enableGPURerank = false
 	}: Props = $props();
 
 	let recommendations = $state<RecommendedDocument[]>([]);
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 	let expanded = $state<string | null>(null);
+	let gpuMetrics = $state<GPURerankMetrics | null>(null);
+	let gpuReranking = $state(false);
 
 	// Fetch recommendations on mount and when query changes
 	$effect(() => {
@@ -64,6 +71,7 @@
 	async function fetchRecommendations() {
 		loading = true;
 		error = null;
+		gpuMetrics = null;
 
 		try {
 			const response = await fetch('/api/recommendations', {
@@ -89,6 +97,11 @@
 				recommendations = (data.data.recommendations || [])
 					.filter((rec: RecommendedDocument) => rec.documentId !== documentId)
 					.slice(0, limit);
+
+				// Optional: GPU rerank after server results
+				if (enableGPURerank && browser && recommendations.length > 0) {
+					runGPURerank();
+				}
 			} else {
 				throw new Error(data.error || 'Failed to fetch recommendations');
 			}
@@ -98,6 +111,50 @@
 			recommendations = [];
 		} finally {
 			loading = false;
+		}
+	}
+
+	/**
+	 * Run client-side GPU reranking on server results.
+	 * Uses WebGPU cosine similarity to verify/adjust server scores.
+	 */
+	async function runGPURerank() {
+		if (!browser || recommendations.length === 0) return;
+		gpuReranking = true;
+
+		try {
+			const { gpuRerank } = await import('$lib/gpu/gpu-search-reranker.js');
+			const chunks = recommendations.map((rec) => ({
+				content: `${rec.title} ${rec.explanationTokens.join(' ')}`,
+				serverScore: rec.score
+			}));
+
+			const result = await gpuRerank(query, chunks, recommendations.length);
+			if (result) {
+				gpuMetrics = result.metrics;
+
+				// Merge GPU scores into recommendations
+				for (const item of result.items) {
+					if (item.index < recommendations.length && item.gpuScore >= 0) {
+						recommendations[item.index].gpuScore = item.gpuScore;
+					}
+				}
+
+				// Re-sort by blended score (70% server + 30% GPU)
+				recommendations = [...recommendations].sort((a, b) => {
+					const scoreA = a.gpuScore !== undefined ? 0.7 * a.score + 0.3 * a.gpuScore : a.score;
+					const scoreB = b.gpuScore !== undefined ? 0.7 * b.score + 0.3 * b.gpuScore : b.score;
+					return scoreB - scoreA;
+				});
+
+				console.info(
+					`[RecommendationWidget] GPU rerank: ${result.metrics.chunksProcessed} docs via ${result.metrics.backend} in ${result.metrics.totalMs}ms`
+				);
+			}
+		} catch (err) {
+			console.warn('[RecommendationWidget] GPU rerank failed (non-fatal):', err);
+		} finally {
+			gpuReranking = false;
 		}
 	}
 
@@ -154,12 +211,20 @@
 				{compact ? 'Related' : 'Recommended Documents'}
 			</h3>
 		</div>
-		{#if loading}
-			<div class="flex items-center gap-2 text-xs text-sand-11">
-				<Icon name="loader-2" class="animate-spin" />
-				<span>Loading...</span>
-			</div>
-		{/if}
+		<div class="flex items-center gap-2">
+			{#if gpuMetrics}
+				<span class="gpu-badge" title="GPU reranked via {gpuMetrics.backend} in {gpuMetrics.totalMs}ms">
+					<Icon name="cpu" />
+					{gpuMetrics.backend}
+				</span>
+			{/if}
+			{#if loading || gpuReranking}
+				<div class="flex items-center gap-2 text-xs text-sand-11">
+					<Icon name="loader-2" class="animate-spin" />
+					<span>{gpuReranking ? 'GPU reranking...' : 'Loading...'}</span>
+				</div>
+			{/if}
+		</div>
 	</div>
 
 	<!-- Content -->
@@ -233,6 +298,17 @@
 											</div>
 										{/if}
 									{/each}
+									{#if rec.gpuScore !== undefined}
+										<div class="signal-row">
+											<span class="signal-label gpu-label">GPU</span>
+											<div class="signal-bar gpu-bar">
+												<div class="signal-fill gpu-fill" style="width: {rec.gpuScore * 100}%"></div>
+											</div>
+											<span class="signal-value text-emerald-400">
+												{Math.round(rec.gpuScore * 100)}%
+											</span>
+										</div>
+									{/if}
 								</div>
 
 								{#if rec.explanationTokens.length > 2}
@@ -441,6 +517,32 @@
 		font-size: 0.75rem;
 		font-weight: 600;
 		text-align: right;
+	}
+
+	.gpu-badge {
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+		font-size: 0.625rem;
+		padding: 0.125rem 0.375rem;
+		background: rgba(16, 185, 129, 0.15);
+		color: rgb(52, 211, 153);
+		border-radius: 0.25rem;
+		font-weight: 600;
+		text-transform: uppercase;
+	}
+
+	.gpu-label {
+		color: rgb(52, 211, 153);
+		font-weight: 600;
+	}
+
+	.gpu-bar {
+		background: rgba(16, 185, 129, 0.1);
+	}
+
+	.gpu-fill {
+		background: linear-gradient(90deg, rgba(16, 185, 129, 0.4), rgb(16, 185, 129));
 	}
 
 	.error-state,

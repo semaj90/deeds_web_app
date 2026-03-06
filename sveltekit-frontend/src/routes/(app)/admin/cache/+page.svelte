@@ -1,12 +1,38 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import type { BufferPoolStats } from '$lib/gpu/gpu-compute-pipeline';
 
 	let { data }: { data: PageData } = $props();
 
 	let stats = $state(data.stats);
 	let loading = $state(false);
 	let lastUpdate = $state(new Date().toISOString());
+
+	// Client-side GPU Buffer Pool stats (WebGPU runs in browser, not server)
+	let gpuPoolStats = $state<BufferPoolStats | null>(null);
+	let gpuBackend = $state<string>('unknown');
+
+	async function refreshGPUStats() {
+		try {
+			const { getCachedGPUCompute } = await import('$lib/gpu/gpu-compute-pipeline');
+			const gpu = getCachedGPUCompute();
+			if (gpu) {
+				gpuPoolStats = gpu.poolStats;
+				gpuBackend = gpu.backend;
+			} else {
+				gpuPoolStats = null;
+				gpuBackend = 'not initialized';
+			}
+		} catch {
+			gpuPoolStats = null;
+			gpuBackend = 'unavailable';
+		}
+	}
+
+	$effect(() => {
+		refreshGPUStats();
+	});
 
 	// Auto-refresh every 5 seconds
 	let autoRefresh = $state(true);
@@ -29,7 +55,10 @@
 	async function refreshStats() {
 		loading = true;
 		try {
-			const res = await fetch('/api/cache/stats');
+			const [res] = await Promise.all([
+				fetch('/api/cache/stats'),
+				refreshGPUStats()
+			]);
 			if (res.ok) {
 				const json = await res.json();
 				stats = json.data;
@@ -168,6 +197,31 @@
 					Hit rate: <span class={getHitRateColor(stats.llm.hitRate)}
 						>{stats.llm.hitRate.toFixed(1)}%</span
 					>
+				</div>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-icon gpu">
+				<Icon name="monitor" />
+			</div>
+			<div class="stat-content">
+				<div class="stat-label">GPU Buffer Pool</div>
+				<div class="stat-value">
+					{#if gpuPoolStats}
+						{gpuPoolStats.pooledBuffers} buffers
+					{:else}
+						{gpuBackend}
+					{/if}
+				</div>
+				<div class="stat-meta">
+					{#if gpuPoolStats}
+						Hit rate: <span class={getHitRateColor(gpuPoolStats.hitRate * 100)}
+							>{(gpuPoolStats.hitRate * 100).toFixed(1)}%</span
+						>
+					{:else}
+						WebGPU compute pipeline
+					{/if}
 				</div>
 			</div>
 		</div>
@@ -425,6 +479,87 @@
 				In-memory cache is process-local and resets on server restart
 			</p>
 		</section>
+
+		<!-- GPU Buffer Pool -->
+		<section class="cache-section">
+			<h2><Icon name="monitor" class="inline-block" /> GPU Buffer Pool</h2>
+
+			{#if gpuPoolStats}
+				<div class="section-grid">
+					<div class="metric-card">
+						<div class="metric-label">Buffers Acquired</div>
+						<div class="metric-value">{gpuPoolStats.acquired}</div>
+						<div class="metric-meta">Total pool.acquire() calls</div>
+					</div>
+
+					<div class="metric-card">
+						<div class="metric-label">Pool Hits</div>
+						<div class="metric-value">{gpuPoolStats.hits}</div>
+						<div class="metric-meta">Reused existing buffers</div>
+					</div>
+
+					<div class="metric-card">
+						<div class="metric-label">Buffers Created</div>
+						<div class="metric-value">{gpuPoolStats.created}</div>
+						<div class="metric-meta">device.createBuffer() calls</div>
+					</div>
+
+					<div class="metric-card">
+						<div class="metric-label">Hit Rate</div>
+						<div class="metric-value {getHitRateColor(gpuPoolStats.hitRate * 100)}">
+							{(gpuPoolStats.hitRate * 100).toFixed(1)}%
+						</div>
+						<div class="metric-meta">
+							{#if gpuPoolStats.hitRate >= 0.8}
+								Excellent
+							{:else if gpuPoolStats.hitRate >= 0.5}
+								Good
+							{:else if gpuPoolStats.acquired === 0}
+								No dispatches yet
+							{:else}
+								Warming up
+							{/if}
+						</div>
+					</div>
+
+					<div class="metric-card">
+						<div class="metric-label">Pooled Buffers</div>
+						<div class="metric-value">{gpuPoolStats.pooledBuffers}</div>
+						<div class="metric-meta">Available for reuse</div>
+					</div>
+
+					<div class="metric-card">
+						<div class="metric-label">Pooled Memory</div>
+						<div class="metric-value">{formatBytes(gpuPoolStats.pooledBytes)}</div>
+						<div class="metric-meta">GPU VRAM held in pool</div>
+					</div>
+
+					<div class="metric-card">
+						<div class="metric-label">Backend</div>
+						<div class="metric-value gpu-backend">{gpuBackend}</div>
+						<div class="metric-meta">WebGPU → WASM → CPU</div>
+					</div>
+
+					<div class="metric-card">
+						<div class="metric-label">Allocations Saved</div>
+						<div class="metric-value">{gpuPoolStats.hits}</div>
+						<div class="metric-meta">{gpuPoolStats.hits} create + {gpuPoolStats.hits} destroy avoided</div>
+					</div>
+				</div>
+			{:else}
+				<div class="gpu-inactive">
+					<Icon name="monitor-off" class="inline-block" />
+					<span>GPU compute pipeline: <strong>{gpuBackend}</strong></span>
+					<p>The buffer pool initializes when WebGPU is first used (e.g., search reranking).</p>
+				</div>
+			{/if}
+
+			<p class="info-note">
+				<Icon name="info" class="inline-block" />
+				Client-side buffer pool — power-of-2 size-class bucketing, device-lifetime reuse.
+				Buffers cleared on GPU device loss (automatic CPU fallback).
+			</p>
+		</section>
 	</div>
 </div>
 
@@ -548,6 +683,11 @@
 
 	.stat-icon.llm {
 		background: #9333ea;
+		color: white;
+	}
+
+	.stat-icon.gpu {
+		background: #0891b2;
 		color: white;
 	}
 
@@ -741,6 +881,27 @@
 		color: #1e40af;
 		font-size: 0.85rem;
 		margin-top: 1rem;
+	}
+
+	.gpu-backend {
+		font-size: 1.1rem;
+		text-transform: capitalize;
+	}
+
+	.gpu-inactive {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 2rem;
+		color: var(--sand-9, #666);
+		text-align: center;
+	}
+
+	.gpu-inactive p {
+		font-size: 0.85rem;
+		margin: 0;
+		max-width: 400px;
 	}
 
 	.text-green-600 {

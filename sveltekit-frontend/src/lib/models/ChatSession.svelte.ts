@@ -136,6 +136,8 @@ export class ChatSession {
 
 		if (decision.source === 'local-onnx') {
 			await this._handleLocalInference(lastUserMsg.content, decision);
+		} else if (decision.source === 'retrieval-hybrid') {
+			await this._handleRetrievalInference(lastUserMsg.content, decision);
 		} else {
 			await this._handleServerInference(lastUserMsg.content, decision);
 		}
@@ -270,6 +272,140 @@ export class ChatSession {
 				...decision,
 				source: 'server-ollama',
 				reason: `local-fallback(${decision.reason}): ${err.message}`
+			});
+		}
+	}
+
+	/**
+	 * Retrieval-hybrid inference: client embeds query → server RAG search with
+	 * precomputed embedding → GPU rerank chunks → local ONNX generation.
+	 * Falls back to server on any failure.
+	 */
+	private async _handleRetrievalInference(message: string, decision: RouterDecision) {
+		const t0 = performance.now();
+		this.status = 'thinking';
+		this.error = null;
+
+		try {
+			// Step 1: Client-side query embedding (avoids server re-embedding)
+			let precomputedEmbedding: number[] | undefined;
+			try {
+				const { embedText } = await import('$lib/ai/client-embed.js');
+				const embedding = await embedText(message);
+				if (embedding && embedding.length === 768) {
+					precomputedEmbedding = Array.from(embedding);
+					console.info(`[ChatRouter] Client-embedded query in ${Math.round(performance.now() - t0)}ms`);
+				}
+			} catch {
+				// Client embedding failed — server will embed instead
+				console.warn('[ChatRouter] Client embedding failed, server will embed');
+			}
+
+			// Step 2: Fetch RAG chunks from server (with precomputed embedding)
+			const searchRes = await fetch('/api/rag/search', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					query: message,
+					top_k: 5,
+					min_score: 0.3,
+					scoring_method: 'hybrid',
+					precomputedEmbedding
+				}),
+				signal: AbortSignal.timeout(8_000)
+			});
+
+			if (!searchRes.ok) {
+				console.warn('[ChatRouter] RAG search failed, falling back to server');
+				await this._handleServerInference(message, {
+					...decision,
+					source: 'server-ollama',
+					reason: `retrieval-fallback(rag-${searchRes.status})`
+				});
+				return;
+			}
+
+			const ragData = await searchRes.json();
+			const rawChunks: Array<{ text: string; snippet: string; score: number }> =
+				ragData.chunks ?? [];
+
+			if (rawChunks.length === 0) {
+				console.info('[ChatRouter] No RAG chunks, trying local inference');
+				await this._handleLocalInference(message, {
+					...decision,
+					reason: `retrieval(0-chunks)+${decision.reason}`
+				});
+				return;
+			}
+
+			// Step 3: GPU rerank chunks client-side (WebGPU → WASM → CPU fallback)
+			let rankedChunks = rawChunks;
+			try {
+				const { gpuRerank } = await import('$lib/gpu/gpu-search-reranker.js');
+				const rerankResult = await gpuRerank(
+					message,
+					rawChunks.map(c => ({ content: c.text || c.snippet, serverScore: c.score })),
+					5
+				);
+				if (rerankResult) {
+					rankedChunks = rerankResult.items
+						.filter(item => item.gpuScore >= 0)
+						.map(item => rawChunks[item.index]);
+					console.info(`[ChatRouter] GPU reranked ${rerankResult.metrics.chunksProcessed} chunks via ${rerankResult.metrics.backend} in ${rerankResult.metrics.totalMs}ms`);
+				}
+			} catch {
+				// GPU rerank failed — use server-ranked order
+			}
+
+			// Step 4: Build context-augmented prompt for local ONNX
+			const topChunks = rankedChunks.slice(0, 3);
+			const contextBlock = topChunks
+				.map((c, i) => `[Document ${i + 1}]: ${(c.text || c.snippet).slice(0, 800)}`)
+				.join('\n\n');
+			const augmentedMessage =
+				`Based on these legal documents:\n${contextBlock}\n\nAnswer this question concisely: ${message}`;
+
+			console.info(`[ChatRouter] Retrieval-hybrid: ${topChunks.length} chunks, attempting local generation`);
+
+			// Step 5: Local ONNX inference with augmented prompt
+			try {
+				await this._handleLocalInference(augmentedMessage, {
+					...decision,
+					source: 'retrieval-hybrid',
+					reason: `retrieval(${topChunks.length}-chunks)+local-onnx`
+				});
+
+				// Verify answer quality — if too short, escalate to server
+				const lastMsg = this.messages[this.messages.length - 1];
+				if (lastMsg?.role === 'assistant' && lastMsg.content.length < 50) {
+					console.warn('[ChatRouter] Local answer too short, escalating to server');
+					this.messages.pop();
+					await this._handleServerInference(message, {
+						...decision,
+						source: 'server-ollama',
+						reason: `retrieval-escalated(short-answer)`
+					});
+				} else {
+					this.debugInfo = {
+						...this.debugInfo,
+						latencyMs: Math.round(performance.now() - t0),
+						provider: 'retrieval-hybrid'
+					};
+				}
+			} catch {
+				console.warn('[ChatRouter] Retrieval local ONNX failed, escalating to server');
+				await this._handleServerInference(message, {
+					...decision,
+					source: 'server-ollama',
+					reason: `retrieval-fallback(onnx-failed)`
+				});
+			}
+		} catch (err: any) {
+			console.warn('[ChatRouter] Retrieval pipeline error:', err.message);
+			await this._handleServerInference(message, {
+				...decision,
+				source: 'server-ollama',
+				reason: `retrieval-fallback(${err.message})`
 			});
 		}
 	}

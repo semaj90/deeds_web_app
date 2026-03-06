@@ -81,6 +81,12 @@ export const COLLECTION_SCHEMAS = {
 		size: 768,
 		distance: 'Cosine',
 		quantized: true
+	},
+	poi_profiles: {
+		vectors: ['default'],
+		size: 768,
+		distance: 'Cosine',
+		quantized: true
 	}
 } as const;
 

@@ -154,7 +154,7 @@ export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
         },
 	{
             tab: 'evidence',
-            href: '/gpu-evidence-graph',
+            href: '/admin/gpu-evidence-graph',
             label: 'GPU Evidence Graph',
             description: 'GPU-accelerated evidence visualization',
             kind: 'page',
@@ -186,7 +186,7 @@ export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
         },
 	{
             tab: 'system',
-            href: '/all-routes',
+            href: '/admin/all-routes',
             label: 'Route Command Center',
             description: 'NES-style command center for all core routes',
             kind: 'page',

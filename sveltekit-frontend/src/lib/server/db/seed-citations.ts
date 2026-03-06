@@ -73,13 +73,20 @@ async function seedCitations(): Promise<void> {
 			}
 		];
 
-		console.log('[seed-citations] Inserting statutes...');
-		const insertedStatutes = await db.insert(statutes)
-			.values(sampleStatutes)
-			.onConflictDoNothing()
-			.returning();
-
-		console.log(`[seed-citations] ✓ ${insertedStatutes.length} statutes inserted`);
+		console.log('[seed-citations] Upserting statutes...');
+		let statuteCount = 0;
+		for (const statute of sampleStatutes) {
+			const existing = await db.select({ id: statutes.id }).from(statutes)
+				.where(eq(statutes.section, statute.section)).limit(1);
+			if (existing.length === 0) {
+				await db.insert(statutes).values(statute);
+				console.log(`  + Created statute: ${statute.section}`);
+			} else {
+				console.log(`  ~ Exists: ${statute.section}`);
+			}
+			statuteCount++;
+		}
+		console.log(`[seed-citations] ✓ ${statuteCount} statutes processed`);
 
 		// Seed citations (references to statutes)
 		const sampleCitations = [
@@ -133,20 +140,26 @@ async function seedCitations(): Promise<void> {
 			}
 		];
 
-		console.log('[seed-citations] Inserting citations...');
-		const insertedCitations = await db.insert(citations)
-			.values(sampleCitations)
-			.onConflictDoNothing()
-			.returning();
-
-		console.log(`[seed-citations] ✓ ${insertedCitations.length} citations inserted`);
+		console.log('[seed-citations] Upserting citations...');
+		let citationCount = 0;
+		for (const cit of sampleCitations) {
+			const existing = await db.select({ id: citations.id }).from(citations)
+				.where(eq(citations.citationText, cit.citationText)).limit(1);
+			if (existing.length === 0) {
+				await db.insert(citations).values(cit);
+				console.log(`  + Created citation: ${cit.citationText}`);
+			} else {
+				console.log(`  ~ Exists: ${cit.citationText}`);
+			}
+			citationCount++;
+		}
+		console.log(`[seed-citations] ✓ ${citationCount} citations processed`);
 
 		console.log('[seed-citations] ✓ Seed complete!');
 		console.log(`
 Summary:
-  - Statutes: ${insertedStatutes.length}
-  - Citations: ${insertedCitations.length}
-  - Total: ${insertedStatutes.length + insertedCitations.length}
+  - Statutes: ${statuteCount}
+  - Citations: ${citationCount}
 
 Test with:
   curl http://localhost:5173/api/citations
@@ -160,7 +173,6 @@ Test with:
 	}
 }
 
-// Run if called directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-	seedCitations();
-}
+seedCitations()
+	.then(() => process.exit(0))
+	.catch(() => process.exit(1));

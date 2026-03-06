@@ -108,7 +108,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	const startTime = performance.now();
 
 	try {
-		const body: RetrieveCandidatesRequest = await request.json();
+		const body: RetrieveCandidatesRequest & { precomputedEmbedding?: number[] } = await request.json();
 		const {
 			query,
 			top_k = 10,
@@ -119,7 +119,8 @@ export const POST: RequestHandler = async ({ request }) => {
 			userId,
 			caseId,
 			conversationId,
-			enableACE = false
+			enableACE = false,
+			precomputedEmbedding
 		} = body;
 
 		if (!query?.trim()) {
@@ -137,18 +138,24 @@ export const POST: RequestHandler = async ({ request }) => {
 			});
 		}
 
-		// 1. Generate embedding with auto binary Redis cache (batch-embedder)
+		// 1. Generate embedding (use precomputed from client if provided, else server-side)
 		const embedStart = performance.now();
 		let embedding: number[];
+		let embeddingSource = 'server';
 
-		try {
-			const embeddingArray = await embedText(query);
-			embedding = Array.from(embeddingArray);
+		if (precomputedEmbedding && Array.isArray(precomputedEmbedding) && precomputedEmbedding.length === 768) {
+			embedding = precomputedEmbedding;
+			embeddingSource = 'client-precomputed';
+		} else {
+			try {
+				const embeddingArray = await embedText(query);
+				embedding = Array.from(embeddingArray);
 
-			// Also cache in vector-cache for backward compatibility
-			setEmbeddingCache(query, embedding, 'embeddinggemma:latest').catch(() => {});
-		} catch (err) {
-			return apiResponses.badGateway('Embedding generation failed');
+				// Also cache in vector-cache for backward compatibility
+				setEmbeddingCache(query, embedding, 'embeddinggemma:latest').catch(() => {});
+			} catch (err) {
+				return apiResponses.badGateway('Embedding generation failed');
+			}
 		}
 
 		const embeddingTime = performance.now() - embedStart;
@@ -265,7 +272,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			search_time_ms: Math.round(performance.now() - startTime),
 			embedding_time_ms: Math.round(embeddingTime),
 			rerank_time_ms: use_rerank ? 0 : undefined,
-			embedding_model: 'embeddinggemma:latest',
+			embedding_model: embeddingSource === 'client-precomputed' ? 'embeddinggemma-onnx-client' : 'embeddinggemma:latest',
 			rerank_model: use_rerank ? 'none' : undefined,
 			scoring_method: scoring_method,
 			ace: aceMetadata ?? undefined,

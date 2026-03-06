@@ -7,6 +7,7 @@ import type {
 	Citation,
 	ActionItem
 } from '$lib/types/rag-source-validation';
+import { getRedis } from '$lib/server/redis.js';
 
 const OLLAMA_URL = getOllamaUrl();
 
@@ -38,7 +39,22 @@ export const POST: RequestHandler = async ({ request }) => {
 			);
 		}
 
-		// Build the prompt
+		// Fetch approved context from Redis (stored by /api/rag/validate)
+		let combinedContext = '';
+		let contextChunks: { source_title?: string }[] = [];
+		try {
+			const redis = getRedis();
+			const cached = await redis.get(`rag:context:${context_id}`);
+			if (cached) {
+				const parsed = JSON.parse(cached);
+				combinedContext = parsed.combined_context ?? '';
+				contextChunks = parsed.chunks ?? [];
+			}
+		} catch {
+			// Fall through — answer without context (degraded)
+		}
+
+		// Build the prompt with retrieved context
 		let systemPrompt =
 			'You are a legal research assistant. Provide accurate, well-sourced answers based ONLY on the provided context. ' +
 			'If the context does not contain enough information, say so clearly. ' +
@@ -51,7 +67,11 @@ export const POST: RequestHandler = async ({ request }) => {
 			systemPrompt += ` This pertains to ${legal_area} law.`;
 		}
 
-		const prompt = `${systemPrompt}\n\nQuestion: ${query}\n\nProvide a comprehensive legal analysis. Include [Source N] citations where applicable.${include_todos ? ' Also list any recommended action items.' : ''}`;
+		const contextBlock = combinedContext
+			? `\n\nApproved Context:\n${combinedContext}\n\n`
+			: '\n\n';
+
+		const prompt = `${systemPrompt}${contextBlock}Question: ${query}\n\nProvide a comprehensive legal analysis. Include [Source N] citations where applicable.${include_todos ? ' Also list any recommended action items.' : ''}`;
 
 		// Call Ollama for generation
 		const genResp = await fetch(`${OLLAMA_URL}/api/generate`, {
@@ -88,10 +108,12 @@ export const POST: RequestHandler = async ({ request }) => {
 				const match = ref.match(/\[Source\s+(\d+)/);
 				if (match && !seenSources.has(match[1])) {
 					seenSources.add(match[1]);
+					const srcIdx = parseInt(match[1], 10) - 1;
+					const chunk = contextChunks[srcIdx] as Record<string, unknown> | undefined;
 					citations.push({
 						citation_id: crypto.randomUUID(),
-						chunk_id: `source-${match[1]}`,
-						source_title: `Source ${match[1]}`,
+						chunk_id: chunk?.chunk_id ? String(chunk.chunk_id) : `source-${match[1]}`,
+						source_title: chunk?.source_title ? String(chunk.source_title) : `Source ${match[1]}`,
 						quote: ref
 					});
 				}

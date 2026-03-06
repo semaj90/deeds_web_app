@@ -284,7 +284,7 @@ All database changes are production-ready after dev/staging testing. No data wil
 ---
 ## Kiro Spec Features — Implementation Gap
 
-**Last Updated: March 4, 2026 (Session 93r28c++++++++++)**
+**Last Updated: March 5, 2026 (Session 93r28c+++++++++++)**
 
 | # | Feature | Planned | Built | Gap |
 |---|---------|---------|-------|-----|
@@ -293,13 +293,13 @@ All database changes are production-ready after dev/staging testing. No data wil
 | 3 | VLM Legal Vision | 5 subsystems | 35% | YOLO + Gemma3 VLM + LangExtract OCR wired, POI photos pipeline ✅, no fusion/TensorRT |
 | 4 | Self-Healing Error Agent | Auto-patch loop | 5% | Error Brain exists, no auto-patch |
 | 5 | Unified Reasoning Engine | C++ gRPC + CUDA | 0% | DEFERRED — Ollama + batch embedder covers same ground |
-| 6 | ACE Web Ingestion | Crawl→chunk→embed→KAG | 0% | ACE exists for codebase only |
-| 7 | Citation Intelligence | Collections, tags, export | 75% | Collections API ✅, tags ✅, export ✅, UI rewiring pending |
-| 8 | Agentic Alignment Router | Intent classify + KAG | 25% | Client router ✅, health-aware ✅, but always escalates to server |
-| 9 | Knowledge Search Engine | IDF + HMM + external docs | 40% | Codebase search only |
-| 10 | Case Notes Enhancements | Versioning, FTS, PDF export | 80% | Versioning ✅, CRUD ✅, diff view ✅, case packet export ✅, FTS pending |
-| 11 | Person of Interest | Vector search UI + photos | 80% | Schema ✅, photos API ✅, VLM pipeline ✅, UI gallery pending |
-| 12 | Error Brain DB Wiring | History + patches | 90% | Just needs history display |
+| 6 | ACE Web Ingestion | Crawl→chunk→embed→KAG | 75% | POST /api/ace/ingest ✅, context-assembler dual-search ✅, Analysis Center UI ✅, no KAG graph nodes yet |
+| 7 | Citation Intelligence | Collections, tags, export | 100% | Collections API ✅, tags ✅, export ✅, CitationCollections + CollectionDetail wired to /citations ✅ |
+| 8 | Agentic Alignment Router | Intent classify + KAG | 75% | 3-tier routing (LOCAL/RETRIEVAL/SERVER) ✅, health-aware ✅, 6 scoring rules ✅, no KAG intent |
+| 9 | Knowledge Search Engine | IDF + HMM + external docs | 60% | 4-source parallel search (Qdrant+glossary+statutes+precedents) ✅, TF-IDF reranking ✅, no HMM/external docs |
+| 10 | Case Notes Enhancements | Versioning, FTS, PDF export | 100% | Versioning ✅, CRUD ✅, diff view ✅, case packet export ✅, FTS ✅, evidence linking ✅, notes tab route ✅ |
+| 11 | Person of Interest | Vector search UI + photos | 95% | Schema ✅, photos API ✅, VLM pipeline ✅, poi_profiles Qdrant ✅, load function ✅, upload/delete/view UI ✅ |
+| 12 | Error Brain DB Wiring | History + patches | 100% | phase72_error table ✅, status API ✅, runs API ✅, /all-routes panel ✅ |
 | 13 | Infrastructure & Docker | Full stack | 85% | TensorRT/fastmcp/postgres DOWN |
 | 14 | Svelte 5 Migration | Runes + bits-ui | 100% | COMPLETE |
 | 15 | Evidence Pipeline Scaling | Batch embed + summary + tags | 100% | pLimit(3) ✅, batch /api/embed ✅, summary→Qdrant ✅, auto-tag ✅ |
@@ -312,22 +312,17 @@ All database changes are production-ready after dev/staging testing. No data wil
 
 | # | Quick Win | Was | Now | Status |
 |---|-----------|-----|-----|--------|
-| 1 | Error Brain History UI | 90% | 90% | Pending — display history on /all-routes |
-| 2 | POI Vector Search UI | 70% | 80% | photos subquery wired, gallery UI pending |
-| 3 | Case Notes Versioning | 60% | 80% | ✅ DONE — DB tables + API + diff view + restore |
+| 1 | Error Brain History UI | 90% | 100% | ✅ DONE — toggle panel + status stats + run history on /all-routes |
+| 2 | POI Vector Search UI | 70% | 95% | ✅ DONE — photos load + upload/delete/view UI wired |
+| 3 | Case Notes Versioning + FTS | 60% | 100% | ✅ DONE — DB tables + API + diff view + restore + FTS search + evidence linking + notes tab route |
 | 4 | Citation Tags | 20% | 40% | ✅ DONE — citation_tag_links M2M + CRUD API |
 | 5 | Infrastructure Restart | 85% | 85% | Pending — postgres/TensorRT/fastmcp DOWN |
 | 6 | Case Packet PDF Export | 60% | 90% | ✅ DONE — HTML export + citations section + download |
 | 7 | NES Modal for Notes | 60% | 60% | Pending — bits-ui Dialog SSR TDZ workaround |
-
 ---
-
 ## What's Left to Implement
-
 ### Client ↔ Server RAG Integration (~4h total)
-
 The client has all the pieces (ONNX models, embedding, cache, router) but they aren't connected into a working local RAG loop. The server RAG is production-grade.
-
 **Current state:**
 ```
 Client: gemma270m ONNX (292MB) + embeddinggemma ONNX (329MB) + LokiJS/IndexedDB cache
@@ -335,7 +330,6 @@ Client: gemma270m ONNX (292MB) + embeddinggemma ONNX (329MB) + LokiJS/IndexedDB 
 Server: gemma3-legal (7.3GB) + embeddinggemma Ollama + Qdrant + pgvector + Redis
         → Full RAG+KAG+DAG pipeline, 6 routes calling it
 ```
-
 **Target architecture:**
 ```
 User Query
@@ -359,43 +353,27 @@ Client Router (client-router.ts)
       ├── Citation-grounded answers
       └── SSE streaming to client
 ```
+#### Task A: Tune Client Router Thresholds — ✅ DONE
+- 3 routing tiers: LOCAL (<0.3) / RETRIEVAL (0.3-0.6) / SERVER (>0.6)
+- 6 scoring rules + health-aware escalation via `/api/health/capabilities`
 
-#### Task A: Tune Client Router Thresholds (~30min)
-- **File:** `src/lib/ai/client-router.ts`
-- Lower escalation threshold for simple/retrieval queries
-- Add `retrieval` routing category (between `local-onnx` and `server-ollama`)
-- Classify: greetings/UI → local, factual lookups → retrieval, legal reasoning → server
-- Keep health-aware fallback (if Ollama down → local + retrieval only)
+#### Task B: Wire Client Embedding to RAG Search — ✅ DONE
+- `/api/rag/search` accepts `precomputedEmbedding` (768-dim validation)
+- ChatSession pre-computes ONNX embedding → GPU rerank → context-augmented local generation
 
-#### Task B: Wire Client Embedding to RAG Search (~1h)
-- **Files:** `client-embed.ts`, `ChatSession.svelte.ts`
-- Client embeds query via ONNX (already works in `/memory-palace`)
-- POST pre-computed embedding to `/api/rag/search` (avoid double-embedding)
-- Add `precomputedEmbedding: number[]` parameter to search endpoint
-- Client GPU reranks returned chunks via `gpu-search-reranker.ts` (exists, only memory-palace uses it)
+#### Task C: Wire 3-Step RAG Pipeline UI — ✅ DONE
+- Wired in `/ai-dashboard`: Search → SourceValidator → AnswerWithCitations
+- Redis context handoff (`rag:context:{id}`, 10min TTL) between validate → answer
 
-#### Task C: Wire 3-Step RAG Pipeline UI (~1.5h)
-- **Endpoints exist, zero UI:** `/api/rag/search` → `/api/rag/validate` → `/api/rag/answer`
-- Create `RAGAnswerPanel.svelte` (Svelte 5 runes):
-  1. User types query → call `/api/rag/search` → show retrieved chunks
-  2. User reviews/approves sources → call `/api/rag/validate`
-  3. Validated context → call `/api/rag/answer` → stream cited answer
-- Wire to `/ai-dashboard` or `/terminal` as toggle mode
-- Server generates answer via gemma3-legal with citation extraction
+#### Task D: Wire XState Retrieval Machine — ✅ DONE
+- `CodebaseSearch.svelte` uses `useMachine(retrievalMachine)` with timing display
+- Wired to `/global-search`, `/command-center`, app layout (Ctrl+K)
+- XState v5 `setup().createMachine()` with recall → rerank → assemble actors
 
-#### Task D: Wire XState Retrieval Machine (~45min)
-- **File:** `src/lib/machines/retrieval-machine.ts` (275L, clean XState v5, never invoked)
-- Add `useMachine(retrievalMachine)` to `/global-search`
-- Connect 3 actors: recallActor → rerankActor → assembleActor
-- Replace current manual fetch logic with machine-driven flow
-- Show state transitions in UI (idle → recalling → reranking → assembling → done)
-
-#### Task E: Client-Side Answer Generation (~45min)
-- **File:** `ChatSession.svelte.ts` (lines 154-275 — local inference exists but never fires)
-- For retrieval-mode queries: prepend top-3 chunks as context to gemma270m prompt
-- Template: `"Based on these documents:\n{chunks}\n\nAnswer: {query}"`
-- Validate answer length/quality, escalate to server if too short (<50 chars)
-- Cache answer in IndexedDB (7-day TTL)
+#### Task E: Client-Side Answer Generation — ✅ DONE
+- Local ONNX fires for simple queries (128 tokens, greedy decode)
+- Retrieval-hybrid prepends top-3 RAG chunks as context
+- Escalation chain: local → retrieval → server → error (<50 char threshold)
 
 ### Remaining Feature Gaps
 
@@ -406,12 +384,12 @@ Client Router (client-router.ts)
 - **Add:** Cross-source deduplication + unified reranking
 - **Files:** New `src/lib/server/external-search.ts`, modify `/api/rag/search`
 
-#### ACE Web Ingestion — Feature #6 (~2h)
-- ACE context engine exists (7 data sources) but only for internal data
-- **Add:** URL fetch → extract text → legal-chunker → embed → Qdrant `legal_documents`
-- **Add:** KAG graph node creation for web sources
-- **Add:** UI: paste URL → ingest → searchable
-- **Files:** New `src/routes/api/ace/ingest/+server.ts`, modify `context-assembler.ts`
+#### ACE Web Ingestion — Feature #6 (75% done)
+- ✅ POST /api/ace/ingest (186L) — URL fetch → stripHtml → legal-chunker → batch embed → Qdrant `legal_documents`
+- ✅ context-assembler.ts — fetchRAGChunks now searches `evidence_items` + `legal_documents` in parallel
+- ✅ Analysis Center UI — paste URL + optional case ID → ingest → shows chunks/tokens/timing
+- **Remaining:** KAG graph node creation for web sources (Neo4j integration)
+- **Files:** `src/routes/api/ace/ingest/+server.ts` (186L), `context-assembler.ts` (+20L), `analysis-center/+page.svelte` (+60L)
 
 #### VLM Legal Vision — Feature #3 (~2h remaining)
 - YOLO + Gemma3 VLM + LangExtract OCR + POI photos pipeline done

@@ -11,13 +11,26 @@ const coreRoutes = [
   '/',
   '/dashboard',
   '/cases',
-  '/cases/create',
+  '/cases/new',
+  '/active-cases',
+  '/evidence',
   '/evidence/upload',
-  '/chat',
-  '/admin/phase89',
+  '/evidence-library',
+  '/citations',
+  '/persons-of-interest',
+  '/ai-dashboard',
+  '/global-search',
+  '/terminal',
+  '/system-configuration',
+  '/analysis-center',
+  '/all-routes',
+  '/admin/dev-tools',
+  '/admin/cache',
   '/command-center',
-  '/knowledge',
-  '/rag-search',
+  '/reports',
+  '/gpu-evidence-graph',
+  '/error-brain',
+  '/investigate',
 ];
 
 test.describe('Quick Routes Test', () => {
@@ -43,11 +56,14 @@ test.describe('Quick Routes Test', () => {
         networkErrors.push(`${request.url()} - ${request.failure()?.errorText}`);
       });
 
-      // Navigate to route
+      // Navigate to route — use domcontentloaded (networkidle hangs on SSE routes)
       const response = await page.goto(`${BASE_URL}${route}`, {
-        waitUntil: 'networkidle',
+        waitUntil: 'domcontentloaded',
         timeout: 30000,
       });
+
+      // Wait for rendering
+      await page.waitForTimeout(2000);
 
       // Take screenshot
       await page.screenshot({
@@ -60,18 +76,25 @@ test.describe('Quick Routes Test', () => {
 
       // Log errors for debugging
       if (consoleErrors.length > 0) {
-        console.log(`❌ Console errors on ${route}:`);
+        console.log(`Console errors on ${route}:`);
         consoleErrors.forEach((err) => console.log(`  - ${err}`));
       }
 
       if (networkErrors.length > 0) {
-        console.log(`⚠️ Network errors on ${route}:`);
+        console.log(`Network errors on ${route}:`);
         networkErrors.forEach((err) => console.log(`  - ${err}`));
       }
 
-      // Check page loaded
-      const title = await page.title();
-      expect(title).toBeTruthy();
+      // Check page loaded (handle client-side navigations that destroy context)
+      try {
+        const title = await page.title();
+        expect(title).toBeTruthy();
+      } catch {
+        // Context destroyed by client-side navigation — page loaded and redirected, which is OK
+        await page.waitForLoadState('domcontentloaded');
+        const title = await page.title();
+        expect(title).toBeTruthy();
+      }
     });
   }
 });

@@ -1,4 +1,4 @@
-import type { defineConfig, devices  } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
@@ -11,15 +11,21 @@ export default defineConfig({
     timeout: 10000,
   },
   use: {
-    baseURL: 'http://localhost:5174',
+    baseURL: 'http://localhost:5173',
     trace: 'off',
-    screenshot: 'off',
+    screenshot: 'on',
     video: 'off',
+    navigationTimeout: 30000,
   },
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: {
+          args: ['--disable-gpu', '--no-sandbox'],
+        },
+      },
     },
   ],
 });

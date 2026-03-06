@@ -6,6 +6,7 @@ import type {
 	ApprovedContext,
 	RetrievedChunk
 } from '$lib/types/rag-source-validation';
+import { getRedis } from '$lib/server/redis.js';
 
 const QDRANT_URL = getQdrantUrl();
 
@@ -92,6 +93,18 @@ export const POST: RequestHandler = async ({ request }) => {
 			validated_by: user_id,
 			validated_at: new Date().toISOString()
 		};
+
+		// Store approved context in Redis (10min TTL) so /api/rag/answer can retrieve it
+		try {
+			const redis = getRedis();
+			await redis.set(
+				`rag:context:${response.context_id}`,
+				JSON.stringify({ query: body.query_id, combined_context: combinedContext, chunks: approvedChunks }),
+				'EX', 600
+			);
+		} catch {
+			// Non-blocking — answer endpoint can fall back to client-provided context
+		}
 
 		return json(response);
 	} catch (err) {

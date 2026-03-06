@@ -26,7 +26,8 @@ export class QdrantManager {
         embeddings_cache: 'embedding_cache',
         document_tags: 'document_tags',
         topic_clusters: 'topic_clusters',
-        llm_cache: 'llm_response_cache'
+        llm_cache: 'llm_response_cache',
+        poi_profiles: 'poi_profiles'
     };
 
     constructor(url = ENV.QDRANT_URL) {

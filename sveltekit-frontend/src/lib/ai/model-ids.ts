@@ -52,6 +52,6 @@ export const ONNX_EXECUTION_PROVIDERS = ['webgpu', 'wasm', 'cpu'] as const;
 
 // ── Inference source tags (for SSE chunk attribution) ────────────────────
 
-export type InferenceSource = 'local-onnx' | 'local-wasm' | 'server-ollama' | 'server-gemini';
+export type InferenceSource = 'local-onnx' | 'local-wasm' | 'server-ollama' | 'server-gemini' | 'retrieval-hybrid';
 
 // WASM llama.cpp worker ARCHIVED → deeds_labs/wasm-archive/ (ONNX Runtime WebGPU is superior path)

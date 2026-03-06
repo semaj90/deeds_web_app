@@ -7,7 +7,6 @@
 	import POIThreatBadge from '$lib/components/poi/POIThreatBadge.svelte';
 	import PersonProfile from '$lib/components/PersonProfile.svelte';
 	import PersonStatsPanel from '$lib/components/PersonStatsPanel.svelte';
-	import POIProfile from '$lib/components/poi/POIProfile.svelte';
 	import POIFaceMatchDialog from '$lib/components/poi/POIFaceMatchDialog.svelte';
 	import POIStats from '$lib/components/poi/POIStats.svelte';
 	import POIPhotoModal from '$lib/components/POIPhotoModal.svelte';
@@ -25,6 +24,9 @@
 	let activeTab = $state<'details' | 'associates' | 'photos' | 'search' | 'dex' | 'criminal'>('details');
 	let faceMatchOpen = $state(false);
 	let faceMatches = $state<any[]>([]);
+	let photos = $state<any[]>((data as any).photos ?? []);
+	let uploading = $state(false);
+	let uploadError = $state<string | null>(null);
 	let similarPOIs = $state<any[]>([]);
 	let similarLoading = $state(false);
 	let similarError = $state<string | null>(null);
@@ -111,6 +113,66 @@
 		}
 	}
 
+	let fileInputEl = $state<HTMLInputElement | undefined>(undefined);
+
+	async function uploadPhoto(file: File) {
+		if (!data.poi?.id) return;
+		uploading = true;
+		uploadError = null;
+		try {
+			const formData = new FormData();
+			formData.append('file', file);
+			const res = await fetch(`/api/persons-of-interest/${data.poi.id}/photos`, {
+				method: 'POST',
+				body: formData
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({}));
+				throw new Error(err.error ?? `Upload failed (${res.status})`);
+			}
+			const newPhoto = await res.json();
+			photos = [newPhoto, ...photos];
+		} catch (err) {
+			uploadError = err instanceof Error ? err.message : 'Upload failed';
+		} finally {
+			uploading = false;
+		}
+	}
+
+	function handleUploadClick() {
+		fileInputEl?.click();
+	}
+
+	function handleFileSelected(e: Event) {
+		const input = e.target as HTMLInputElement;
+		const file = input.files?.[0];
+		if (file) {
+			uploadPhoto(file);
+			input.value = '';
+		}
+	}
+
+	async function deletePhoto(index: number) {
+		const photo = photos[index];
+		if (!photo?.id || !data.poi?.id) return;
+		if (!confirm(`Delete photo "${photo.originalName ?? 'this photo'}"?`)) return;
+		try {
+			const res = await fetch(`/api/persons-of-interest/${data.poi.id}/photos?photoId=${photo.id}`, {
+				method: 'DELETE'
+			});
+			if (!res.ok) throw new Error('Delete failed');
+			photos = photos.filter((_, i) => i !== index);
+		} catch (err) {
+			console.error('Failed to delete photo:', err);
+		}
+	}
+
+	function viewPhoto(photo: any) {
+		const idx = photos.indexOf(photo);
+		photoModalIndex = idx >= 0 ? idx : 0;
+		photoModalOpen = true;
+	}
+
 	function getStatusColor(status: string): string {
 		const colors: Record<string, string> = {
 			person_of_interest: '#dc2626',
@@ -186,7 +248,7 @@
 				class:active={activeTab === 'photos'}
 				onclick={() => (activeTab = 'photos')}
 			>
-				Photos ({(poi.photos ?? []).length})
+				Photos ({photos.length})
 			</button>
 			<button
 				class="tab-button"
@@ -297,14 +359,22 @@
 					{/if}
 				</div>
 			{:else if activeTab === 'photos'}
-				<POIPhotoGrid photos={poi.photos ?? []} editable={false} />
-				{#if (poi.photos ?? []).length > 0}
-					<div style="margin-top: 1rem; text-align: center;">
-						<button class="btn-secondary" onclick={() => { photoModalIndex = 0; photoModalOpen = true; }}>
-							View Photos in Lightbox
-						</button>
-					</div>
-					<POIPhotoModal photos={poi.photos ?? []} bind:currentIndex={photoModalIndex} bind:open={photoModalOpen} onclose={() => { photoModalOpen = false; }} />
+				{#if uploading}
+					<div class="upload-status">Uploading photo...</div>
+				{/if}
+				{#if uploadError}
+					<div class="upload-error">{uploadError}</div>
+				{/if}
+				<POIPhotoGrid
+					{photos}
+					editable={true}
+					onupload={handleUploadClick}
+					ondelete={deletePhoto}
+					onview={viewPhoto}
+				/>
+				<input type="file" bind:this={fileInputEl} onchange={handleFileSelected} accept="image/*" style="display:none" />
+				{#if photos.length > 0}
+					<POIPhotoModal {photos} bind:currentIndex={photoModalIndex} bind:open={photoModalOpen} onclose={() => { photoModalOpen = false; }} />
 				{/if}
 			{:else if activeTab === 'search'}
 				<div class="similar-panel">
@@ -421,7 +491,7 @@
 						distinguishingMarks: poi.physicalDescription?.distinguishingMarks ?? []
 					},
 					identification: {
-						mugshots: (poi.photos ?? []).map((p: any) => p.url).filter(Boolean)
+						mugshots: photos.map((p: any) => p.url).filter(Boolean)
 					},
 					currentStatus: poi.status === 'wanted' ? 'at_large' as const
 						: poi.status === 'cleared' ? 'cleared' as const
@@ -845,5 +915,24 @@
 		color: #94a3b8;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
+	}
+
+	.upload-status {
+		padding: 0.75rem;
+		background: #1e3a5f;
+		border: 1px solid #3b82f6;
+		border-radius: 0.375rem;
+		color: #93c5fd;
+		margin-bottom: 1rem;
+		text-align: center;
+	}
+
+	.upload-error {
+		padding: 0.75rem;
+		background: #7f1d1d;
+		border: 1px solid #dc2626;
+		border-radius: 0.375rem;
+		color: #fecaca;
+		margin-bottom: 1rem;
 	}
 </style>

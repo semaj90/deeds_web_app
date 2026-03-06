@@ -11,7 +11,7 @@
  * Client-side: uses LokiJS/IndexedDB cached metadata + Fuse.js
  * Server-side: uses Qdrant dual-vector search
  */
-import { assign, fromPromise, createMachine } from 'xstate';
+import { assign, fromPromise, setup } from 'xstate';
 
 // ── Types ────────────────────────────────────────────────────────────────
 
@@ -95,7 +95,6 @@ const recallActor = (fromPromise as any)(
 	async ({ input }: any) => {
 		const start = performance.now();
 
-		// POST to recall API endpoint (Fuse.js server-side)
 		const res = await fetch('/api/codebase/recall', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -107,22 +106,21 @@ const recallActor = (fromPromise as any)(
 
 		if (!res.ok) throw new Error(`Recall failed: ${res.status}`);
 		const data = await res.json();
-		const elapsed = performance.now() - start;
-		console.debug(`[retrieval] recall: ${data.candidates?.length ?? 0} hits in ${elapsed.toFixed(0)}ms`);
-		return data.candidates ?? [];
+		const ms = Math.round(performance.now() - start);
+		console.debug(`[retrieval] recall: ${data.candidates?.length ?? 0} hits in ${ms}ms`);
+		return { candidates: data.candidates ?? [], ms };
 	}
 );
 
 const rerankActor = (fromPromise as any)(async ({ input }: any) => {
 	const start = performance.now();
 
-	// POST to rerank API endpoint (Qdrant dual-vector search)
 	const res = await fetch('/api/codebase/rerank', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
 			query: input.query,
-			candidatePaths: input.candidates.map((c) => c.path),
+			candidatePaths: input.candidates.map((c: any) => c.path),
 			limit: input.config.maxResults,
 			contentWeight: input.config.contentWeight,
 			signatureWeight: input.config.signatureWeight,
@@ -132,9 +130,9 @@ const rerankActor = (fromPromise as any)(async ({ input }: any) => {
 
 	if (!res.ok) throw new Error(`Rerank failed: ${res.status}`);
 	const data = await res.json();
-	const elapsed = performance.now() - start;
-	console.debug(`[retrieval] rerank: ${data.results?.length ?? 0} hits in ${elapsed.toFixed(0)}ms`);
-	return data.results ?? [];
+	const ms = Math.round(performance.now() - start);
+	console.debug(`[retrieval] rerank: ${data.results?.length ?? 0} hits in ${ms}ms`);
+	return { results: data.results ?? [], ms };
 });
 
 const assembleActor = (fromPromise as any)(
@@ -142,21 +140,25 @@ const assembleActor = (fromPromise as any)(
 		const start = performance.now();
 		const chunks = input.reranked;
 
-		// Estimate token count (~4 chars per token)
-		const totalChars = chunks.reduce((acc, c) => acc + c.content.length, 0);
+		const totalChars = chunks.reduce((acc: number, c: any) => acc + c.content.length, 0);
 		const totalTokensEstimate = Math.ceil(totalChars / 4);
-		const sources = [...new Set(chunks.map((c) => c.relativePath))];
+		const sources = [...new Set(chunks.map((c: any) => c.relativePath))] as string[];
 
-		const elapsed = performance.now() - start;
-		console.debug(`[retrieval] assemble: ~${totalTokensEstimate} tokens from ${sources.length} files in ${elapsed.toFixed(0)}ms`);
-
-		return { chunks, totalTokensEstimate, sources };
+		const ms = Math.round(performance.now() - start);
+		console.debug(`[retrieval] assemble: ~${totalTokensEstimate} tokens from ${sources.length} files in ${ms}ms`);
+		return { assembled: { chunks, totalTokensEstimate, sources }, ms };
 	}
 );
 
 // ── Machine definition ───────────────────────────────────────────────────
 
-export const retrievalMachine = createMachine({
+export const retrievalMachine = setup({
+	actors: {
+		recall: recallActor,
+		rerank: rerankActor,
+		assemble: assembleActor,
+	},
+}).createMachine({
 	id: 'retrieval',
 	initial: 'idle',
 	context: {
@@ -174,7 +176,7 @@ export const retrievalMachine = createMachine({
 				SEARCH: {
 					target: 'recalling',
 					actions: assign({
-						query: ({ event }) => event.query,
+						query: ({ event }: any) => event.query,
 						candidates: () => [],
 						reranked: () => [],
 						assembled: () => null,
@@ -184,7 +186,7 @@ export const retrievalMachine = createMachine({
 				},
 				UPDATE_CONFIG: {
 					actions: assign({
-						config: ({ context, event }) => ({ ...context.config, ...event.config })
+						config: ({ context, event }: any) => ({ ...context.config, ...event.config })
 					})
 				}
 			}
@@ -192,26 +194,30 @@ export const retrievalMachine = createMachine({
 		recalling: {
 			invoke: {
 				src: 'recall',
-				input: ({ context }) => ({
+				input: ({ context }: any) => ({
 					query: context.query,
 					maxCandidates: context.config.maxCandidates
 				}),
 				onDone: {
 					target: 'reranking',
 					actions: assign({
-						candidates: ({ event }) => event.output
+						candidates: ({ event }: any) => event.output.candidates,
+						timing: ({ context, event }: any) => ({
+							...context.timing,
+							recallMs: event.output.ms
+						})
 					})
 				},
 				onError: {
 					target: 'error',
-					actions: assign({ error: ({ event }) => String(event.error) })
+					actions: assign({ error: ({ event }: any) => String(event.error) })
 				}
 			}
 		},
 		reranking: {
 			invoke: {
 				src: 'rerank',
-				input: ({ context }) => ({
+				input: ({ context }: any) => ({
 					query: context.query,
 					candidates: context.candidates,
 					config: context.config
@@ -219,28 +225,37 @@ export const retrievalMachine = createMachine({
 				onDone: {
 					target: 'assembling',
 					actions: assign({
-						reranked: ({ event }) => event.output
+						reranked: ({ event }: any) => event.output.results,
+						timing: ({ context, event }: any) => ({
+							...context.timing,
+							rerankMs: event.output.ms
+						})
 					})
 				},
 				onError: {
 					target: 'error',
-					actions: assign({ error: ({ event }) => String(event.error) })
+					actions: assign({ error: ({ event }: any) => String(event.error) })
 				}
 			}
 		},
 		assembling: {
 			invoke: {
 				src: 'assemble',
-				input: ({ context }) => ({ reranked: context.reranked }),
+				input: ({ context }: any) => ({ reranked: context.reranked }),
 				onDone: {
 					target: 'done',
 					actions: assign({
-						assembled: ({ event }) => event.output
+						assembled: ({ event }: any) => event.output.assembled,
+						timing: ({ context, event }: any) => ({
+							...context.timing,
+							assembleMs: event.output.ms,
+							totalMs: context.timing.recallMs + context.timing.rerankMs + event.output.ms
+						})
 					})
 				},
 				onError: {
 					target: 'error',
-					actions: assign({ error: ({ event }) => String(event.error) })
+					actions: assign({ error: ({ event }: any) => String(event.error) })
 				}
 			}
 		},
@@ -249,11 +264,12 @@ export const retrievalMachine = createMachine({
 				SEARCH: {
 					target: 'recalling',
 					actions: assign({
-						query: ({ event }) => event.query,
+						query: ({ event }: any) => event.query,
 						candidates: () => [],
 						reranked: () => [],
 						assembled: () => null,
-						error: () => null
+						error: () => null,
+						timing: () => ({ recallMs: 0, rerankMs: 0, assembleMs: 0, totalMs: 0 })
 					})
 				},
 				RESET: { target: 'idle' }
@@ -264,8 +280,9 @@ export const retrievalMachine = createMachine({
 				SEARCH: {
 					target: 'recalling',
 					actions: assign({
-						query: ({ event }) => event.query,
-						error: () => null
+						query: ({ event }: any) => event.query,
+						error: () => null,
+						timing: () => ({ recallMs: 0, rerankMs: 0, assembleMs: 0, totalMs: 0 })
 					})
 				},
 				RESET: { target: 'idle' }

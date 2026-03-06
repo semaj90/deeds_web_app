@@ -1,5 +1,5 @@
 <script lang="ts">
-	import superForm from 'sveltekit-superforms';
+	import { superForm } from 'sveltekit-superforms';
 	import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
 	import { intakeCaseSchema } from './schema.js';
 	import type { PageData } from './$types';

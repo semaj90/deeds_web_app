@@ -12,6 +12,41 @@
 	let recentCases = $derived(data.recentCases);
 	let recentActivity = $derived(data.recentActivity);
 
+	// Legal search state
+	let searchQuery = $state('');
+	let searchTab = $state<'glossary' | 'statutes' | 'precedents'>('statutes');
+	let searchResults = $state<any[]>([]);
+	let searchLoading = $state(false);
+	let searchTiming = $state<Record<string, number>>({});
+	let jurisdictionFilter = $state('');
+
+	async function handleSearch() {
+		const q = searchQuery.trim();
+		if (!q || q.length < 2) return;
+		searchLoading = true;
+		searchResults = [];
+		searchTiming = {};
+		try {
+			const endpoint = `/api/${searchTab}/search`;
+			const body: Record<string, any> = { query: q, limit: 10 };
+			if (searchTab === 'statutes' && jurisdictionFilter) body.jurisdiction = jurisdictionFilter;
+			const res = await fetch(endpoint, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(body)
+			});
+			if (!res.ok) throw new Error(`${res.status}`);
+			const json = await res.json();
+			searchResults = json.results ?? [];
+			searchTiming = json.timing ?? {};
+		} catch (e) {
+			console.error('Search failed:', e);
+			searchResults = [];
+		} finally {
+			searchLoading = false;
+		}
+	}
+
 	// Local state
 	let aiMode = $state('9S');
 	let assistantMessage = $state('Greetings, Detective! I am 9S, your AI investigation assistant.');
@@ -221,7 +256,7 @@
  <a href="/dashboard" class="nav-item">
  <span class="nav-icon">📈</span> DASHBOARD
  </a>
- <a href="/ai-dashboard" class="nav-item">
+ <a href="/admin/ai-dashboard" class="nav-item">
  <span class="nav-icon">🧠</span> AI DASHBOARD
  </a>
  <a href="/chat" class="nav-item">
@@ -300,6 +335,92 @@
  <div class="stat-value">{stats.recentActivity}</div>
  <div class="stat-icon">📊</div>
  </div>
+ </section>
+
+ <!-- Legal Glossary / Laws Search -->
+ <section class="legal-search-section">
+	<div class="section-header">
+		<h2>LEGAL CORPUS // SEARCH</h2>
+		<div class="search-tabs">
+			<button class="search-tab" class:active={searchTab === 'statutes'} onclick={() => { searchTab = 'statutes'; searchResults = []; }}>
+				STATUTES
+			</button>
+			<button class="search-tab" class:active={searchTab === 'glossary'} onclick={() => { searchTab = 'glossary'; searchResults = []; }}>
+				GLOSSARY
+			</button>
+			<button class="search-tab" class:active={searchTab === 'precedents'} onclick={() => { searchTab = 'precedents'; searchResults = []; }}>
+				PRECEDENTS
+			</button>
+		</div>
+	</div>
+
+	<div class="search-controls">
+		<form class="search-form" onsubmit={(e) => { e.preventDefault(); handleSearch(); }}>
+			<input
+				type="text"
+				bind:value={searchQuery}
+				placeholder={searchTab === 'statutes' ? 'Search statutes, codes, sections (e.g. "18 USC 1001", "fraud")...' : searchTab === 'glossary' ? 'Search legal terms (e.g. "habeas corpus", "mens rea")...' : 'Search case law, precedents (e.g. "Miranda", "due process")...'}
+				class="search-input"
+			/>
+			{#if searchTab === 'statutes'}
+				<select bind:value={jurisdictionFilter} class="jurisdiction-select">
+					<option value="">All Jurisdictions</option>
+					<option value="federal">Federal</option>
+					<option value="state">State</option>
+					<option value="california">California</option>
+					<option value="new_york">New York</option>
+					<option value="texas">Texas</option>
+					<option value="international">International</option>
+				</select>
+			{/if}
+			<button type="submit" class="search-btn" disabled={searchLoading || searchQuery.trim().length < 2}>
+				{searchLoading ? '...' : 'SEARCH'}
+			</button>
+		</form>
+	</div>
+
+	{#if searchLoading}
+		<div class="search-loading">Searching {searchTab}...</div>
+	{/if}
+
+	{#if searchResults.length > 0}
+		<div class="search-results">
+			<div class="results-header">
+				<span>{searchResults.length} result{searchResults.length !== 1 ? 's' : ''}</span>
+				{#if searchTiming.total_ms}
+					<span class="timing">{Math.round(searchTiming.total_ms)}ms</span>
+				{/if}
+			</div>
+			{#each searchResults as result}
+				<div class="result-card">
+					{#if searchTab === 'statutes'}
+						<div class="result-title">{result.statuteTitle ?? result.title ?? 'Statute'}</div>
+						{#if result.section}<div class="result-section">{result.section}</div>{/if}
+						{#if result.jurisdiction}<span class="result-badge jurisdiction">{result.jurisdiction}</span>{/if}
+						{#if result.category}<span class="result-badge category">{result.category}</span>{/if}
+						{#if result.content}<div class="result-content">{result.content.slice(0, 300)}{result.content.length > 300 ? '...' : ''}</div>{/if}
+						{#if result.similarity}<div class="result-score">Relevance: {(result.similarity * 100).toFixed(1)}%</div>{/if}
+					{:else if searchTab === 'glossary'}
+						<div class="result-title">{result.term ?? result.title ?? 'Term'}</div>
+						{#if result.category}<span class="result-badge category">{result.category}</span>{/if}
+						{#if result.jurisdiction}<span class="result-badge jurisdiction">{result.jurisdiction}</span>{/if}
+						<div class="result-content">{result.definition ?? result.content ?? ''}</div>
+						{#if result.relatedTerms?.length}
+							<div class="result-related">Related: {result.relatedTerms.join(', ')}</div>
+						{/if}
+					{:else}
+						<div class="result-title">{result.title ?? 'Precedent'}</div>
+						{#if result.citation}<div class="result-section">{result.citation}</div>{/if}
+						{#if result.court}<span class="result-badge jurisdiction">{result.court}</span>{/if}
+						{#if result.summary}<div class="result-content">{result.summary.slice(0, 300)}{result.summary.length > 300 ? '...' : ''}</div>{/if}
+						{#if result.similarity}<div class="result-score">Relevance: {(result.similarity * 100).toFixed(1)}%</div>{/if}
+					{/if}
+				</div>
+			{/each}
+		</div>
+	{:else if !searchLoading && searchQuery.trim().length >= 2}
+		<div class="search-empty">No results. Try a different query or tab.</div>
+	{/if}
  </section>
 
  <!-- Main Grid -->
@@ -697,6 +818,197 @@
  right: 1rem;
  font-size: 2rem;
 		opacity: 0.2;
+ }
+
+ /* Legal Search Section */
+ .legal-search-section {
+	background: #c4b99a;
+	border: 3px solid #0f0f0f;
+	padding: 1.5rem;
+	margin: 0 2rem;
+ }
+
+ .search-tabs {
+	display: flex;
+	gap: 0;
+ }
+
+ .search-tab {
+	padding: 0.5rem 1rem;
+	background: #1a160f;
+	color: #8a7a5a;
+	border: 2px solid #0f0f0f;
+	font-weight: 700;
+	font-size: 0.7rem;
+	letter-spacing: 1px;
+	cursor: pointer;
+ }
+
+ .search-tab.active {
+	background: #0f0f0f;
+	color: #fdf3d4;
+ }
+
+ .search-controls {
+	margin-top: 1rem;
+ }
+
+ .search-form {
+	display: flex;
+	gap: 0.5rem;
+ }
+
+ .search-input {
+	flex: 1;
+	padding: 0.75rem 1rem;
+	background: #f8f0d9;
+	border: 3px solid #0f0f0f;
+	font-family: inherit;
+	font-size: 0.85rem;
+	color: #0f0f0f;
+ }
+
+ .search-input:focus {
+	outline: none;
+	border-color: #2a2016;
+	background: #fff;
+ }
+
+ .search-input::placeholder {
+	color: #8a7a5a;
+	font-size: 0.8rem;
+ }
+
+ .jurisdiction-select {
+	padding: 0.75rem 0.5rem;
+	background: #f8f0d9;
+	border: 3px solid #0f0f0f;
+	font-family: inherit;
+	font-size: 0.8rem;
+	color: #0f0f0f;
+	min-width: 140px;
+ }
+
+ .search-btn {
+	padding: 0.75rem 1.5rem;
+	background: #2a2016;
+	color: #f8f0d9;
+	border: 3px solid #0f0f0f;
+	font-weight: 900;
+	font-size: 0.8rem;
+	letter-spacing: 1px;
+	cursor: pointer;
+ }
+
+ .search-btn:hover:not(:disabled) {
+	background: #1a160f;
+ }
+
+ .search-btn:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+ }
+
+ .search-loading {
+	padding: 1.5rem;
+	text-align: center;
+	font-size: 0.85rem;
+	color: #5a4a3a;
+	font-weight: 600;
+ }
+
+ .search-results {
+	margin-top: 1rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+ }
+
+ .results-header {
+	display: flex;
+	justify-content: space-between;
+	font-size: 0.75rem;
+	font-weight: 700;
+	color: #5a4a3a;
+	letter-spacing: 0.5px;
+	text-transform: uppercase;
+ }
+
+ .timing {
+	color: #8a7a5a;
+	font-weight: 600;
+ }
+
+ .result-card {
+	background: #f8f0d9;
+	border: 3px solid #0f0f0f;
+	padding: 1rem 1.25rem;
+ }
+
+ .result-title {
+	font-weight: 900;
+	font-size: 0.95rem;
+	letter-spacing: 0.5px;
+	margin-bottom: 0.375rem;
+ }
+
+ .result-section {
+	font-size: 0.8rem;
+	color: #5a4a3a;
+	font-weight: 700;
+	margin-bottom: 0.375rem;
+ }
+
+ .result-badge {
+	display: inline-block;
+	padding: 0.125rem 0.5rem;
+	font-size: 0.65rem;
+	font-weight: 700;
+	letter-spacing: 0.5px;
+	text-transform: uppercase;
+	margin-right: 0.375rem;
+	margin-bottom: 0.375rem;
+ }
+
+ .result-badge.jurisdiction {
+	background: #2a2016;
+	color: #f8f0d9;
+ }
+
+ .result-badge.category {
+	background: #0f0f0f;
+	color: #fdf3d4;
+ }
+
+ .result-content {
+	font-size: 0.8rem;
+	line-height: 1.5;
+	color: #2a2016;
+	margin-top: 0.5rem;
+ }
+
+ .result-score {
+	font-size: 0.7rem;
+	color: #8a7a5a;
+	margin-top: 0.375rem;
+	font-weight: 600;
+ }
+
+ .result-related {
+	font-size: 0.75rem;
+	color: #5a4a3a;
+	margin-top: 0.5rem;
+	font-style: italic;
+ }
+
+ .search-empty {
+	padding: 1.5rem;
+	text-align: center;
+	font-size: 0.85rem;
+	color: #8a7a5a;
+	background: #f8f0d9;
+	border: 2px solid #0f0f0f;
+	margin-top: 1rem;
  }
 
  /* Content Grid */

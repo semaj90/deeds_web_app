@@ -30,6 +30,7 @@ import { assembleACEContext } from '$lib/server/ace/context-assembler.js';
 import { MultiModalRanker } from '$lib/server/ml/multi-modal-ranker.js';
 import { UserHistoryTracker } from '$lib/server/ml/user-history.js';
 import { ENV } from '$lib/server/env.server.js';
+import { computeCentralityForNodes } from '$lib/server/graph/graph-centrality.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
@@ -125,6 +126,13 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 		// Step 4: Multi-modal reranking (5 signals)
 		const rerankStart = performance.now();
 
+		// Enrich candidates with real Neo4j centrality scores
+		const candidateIds = candidates.map((c) => c.caseId);
+		const centralityMap = await computeCentralityForNodes(candidateIds).catch(() => new Map<string, number>());
+		if (centralityMap.size > 0) {
+			console.log(`[Case Similarity] Enriched ${centralityMap.size}/${candidates.length} candidates with Neo4j centrality`);
+		}
+
 		// Convert SimilarCase[] to DocumentCandidate[] for ranker
 		const docCandidates = candidates.map(c => ({
 			id: c.caseId,
@@ -134,7 +142,7 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 			topicMemberships: c.topicCluster !== undefined
 				? [{ topicId: c.topicCluster, probability: 0.8 }]
 				: [],
-			centrality: c.graphConnections ? c.graphConnections / 100 : 0,
+			centrality: centralityMap.get(c.caseId) ?? (c.graphConnections ? c.graphConnections / 100 : 0),
 			caseIds: [c.caseId]
 		}));
 

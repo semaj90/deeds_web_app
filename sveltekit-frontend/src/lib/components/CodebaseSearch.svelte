@@ -2,39 +2,43 @@
 	/**
 	 * Codebase Search — Command Palette / Search Panel
 	 *
-	 * MCP-style 2-stage retrieval: Fuse.js recall → Qdrant re-rank → top hits.
+	 * XState v5 retrieval machine orchestration: Fuse.js recall → Qdrant re-rank → assembly.
 	 * Keyboard shortcut: Ctrl+K or Cmd+K to toggle.
 	 *
 	 * Uses Svelte 5 runes + native <dialog> (no bits-ui Dialog needed).
 	 */
+	import { useMachine } from '$lib/utils/xstate-svelte5.svelte.js';
+	import { retrievalMachine } from '$lib/machines/retrieval-machine.js';
+	import type { RankedChunk } from '$lib/machines/retrieval-machine.js';
+
+	const { snapshot, send } = useMachine(retrievalMachine);
 
 	let query = $state('');
-	let results = $state<SearchResult[]>([]);
-	let isLoading = $state(false);
 	let isOpen = $state(false);
-	let error = $state<string | null>(null);
-	let timing = $state({ recallMs: 0, rerankMs: 0, totalMs: 0 });
 	let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 	let dialogEl: HTMLDialogElement | undefined;
 
-	interface SearchResult {
-		path: string;
-		relativePath: string;
-		symbol: string;
-		kind: string;
-		content: string;
-		signature: string;
-		httpMethod?: string;
-		routeId?: string;
-		tags: string[];
-		score: number;
-		lineStart: number;
-		lineEnd: number;
-	}
+	// Derive state from machine snapshot
+	let isLoading = $derived(
+		snapshot.matches('recalling') ||
+		snapshot.matches('reranking') ||
+		snapshot.matches('assembling')
+	);
 
-	// Grouped results derived from raw results
+	let results = $derived<RankedChunk[]>(snapshot.context.reranked ?? []);
+	let error = $derived<string | null>(snapshot.context.error);
+	let timing = $derived(snapshot.context.timing);
+
+	let currentStage = $derived.by(() => {
+		if (snapshot.matches('recalling')) return 'Recalling...';
+		if (snapshot.matches('reranking')) return 'Reranking...';
+		if (snapshot.matches('assembling')) return 'Assembling...';
+		return '';
+	});
+
+	// Grouped results derived from machine context
 	let groupedResults = $derived.by(() => {
-		const groups: Record<string, SearchResult[]> = {};
+		const groups: Record<string, RankedChunk[]> = {};
 		for (const r of results) {
 			const key = r.kind === 'route-handler' ? 'API Routes'
 				: r.kind === 'table-def' ? 'Schema'
@@ -53,7 +57,6 @@
 	function open() {
 		isOpen = true;
 		dialogEl?.showModal();
-		// Focus input after dialog opens
 		setTimeout(() => {
 			const input = dialogEl?.querySelector('input');
 			input?.focus();
@@ -64,65 +67,21 @@
 		isOpen = false;
 		dialogEl?.close();
 		query = '';
-		results = [];
-		error = null;
+		send({ type: 'RESET' });
 	}
 
-	async function search(q: string) {
-		if (q.length < 2) {
-			results = [];
-			return;
-		}
-
-		isLoading = true;
-		error = null;
-		const start = performance.now();
-
-		try {
-			// Stage A: Cheap recall
-			const recallRes = await fetch('/api/codebase/recall', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ query: q, limit: 100 })
-			});
-
-			if (!recallRes.ok) throw new Error('Recall failed');
-			const recallData = await recallRes.json();
-			const recallMs = recallData.recallMs ?? 0;
-
-			// Stage B: Semantic re-rank
-			const rerankRes = await fetch('/api/codebase/rerank', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					query: q,
-					candidatePaths: recallData.candidates?.map((c: { path: string }) => c.path),
-					limit: 15
-				})
-			});
-
-			if (!rerankRes.ok) throw new Error('Rerank failed');
-			const rerankData = await rerankRes.json();
-
-			results = rerankData.results ?? [];
-			timing = {
-				recallMs,
-				rerankMs: rerankData.timing?.searchMs ?? 0,
-				totalMs: Math.round(performance.now() - start)
-			};
-		} catch (e) {
-			error = e instanceof Error ? e.message : 'Search failed';
-			results = [];
-		} finally {
-			isLoading = false;
-		}
+	function search(q: string) {
+		if (q.length < 2) return;
+		send({ type: 'SEARCH', query: q });
 	}
 
 	// Debounced search on query change
 	$effect(() => {
 		const q = query;
 		clearTimeout(debounceTimer);
-		debounceTimer = setTimeout(() => search(q), 250);
+		if (q.length >= 2) {
+			debounceTimer = setTimeout(() => search(q), 250);
+		}
 	});
 
 	// Global keyboard shortcut: Ctrl+K / Cmd+K
@@ -180,6 +139,7 @@
 			/>
 			{#if isLoading}
 				<div class="search-spinner"></div>
+				<span class="search-stage">{currentStage}</span>
 			{/if}
 			<kbd class="search-kbd">ESC</kbd>
 		</div>
@@ -205,7 +165,6 @@
 							<button
 								class="result-item"
 								onclick={() => {
-									// Copy file path to clipboard for navigation
 									navigator.clipboard.writeText(result.relativePath);
 									close();
 								}}
@@ -296,6 +255,13 @@
 		border-top-color: #10b981;
 		border-radius: 50%;
 		animation: spin 0.6s linear infinite;
+		flex-shrink: 0;
+	}
+	.search-stage {
+		font-size: 11px;
+		color: #10b981;
+		white-space: nowrap;
+		font-family: monospace;
 	}
 	@keyframes spin { to { transform: rotate(360deg); } }
 	.search-kbd {

@@ -33,7 +33,35 @@
 	let showContractAnalyzer = $state(false);
 	let showGoldenLayout = $state(false);
 	let showOrchestrator = $state(false);
+	let showWebIngest = $state(false);
+	let ingestUrl = $state('');
+	let ingestCaseId = $state('');
+	let ingestLoading = $state(false);
+	let ingestResult = $state<any>(null);
+	let ingestError = $state<string | null>(null);
 	let errorMessage = $state('');
+
+	async function ingestWebUrl() {
+		if (!ingestUrl.trim()) return;
+		ingestLoading = true;
+		ingestError = null;
+		ingestResult = null;
+		try {
+			const res = await fetch('/api/ace/ingest', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ url: ingestUrl.trim(), caseId: ingestCaseId || undefined })
+			});
+			const data = await res.json();
+			if (!res.ok) throw new Error(data.error || 'Ingestion failed');
+			ingestResult = data;
+			ingestUrl = '';
+		} catch (e) {
+			ingestError = e instanceof Error ? e.message : 'Unknown error';
+		} finally {
+			ingestLoading = false;
+		}
+	}
 
 	const analysisModes = [
 		{ id: 'pattern' as const, label: 'PATTERN ANALYSIS', icon: 'P' },
@@ -544,6 +572,62 @@
 	{#if showOrchestrator}
 		<div class="summary-reader-container">
 			<IntelligentModelOrchestrator caseId={selectedCaseId} initialQuery={analysisQuery} />
+		</div>
+	{/if}
+
+	<div class="section-toggle">
+		<button
+			class="mode-btn {showWebIngest ? 'active' : ''}"
+			onclick={() => (showWebIngest = !showWebIngest)}
+		>
+			<span class="mode-icon">W</span>
+				{showWebIngest ? 'HIDE WEB INGEST' : 'WEB URL INGEST'}
+		</button>
+	</div>
+	{#if showWebIngest}
+		<div class="summary-reader-container">
+			<div class="web-ingest-panel">
+				<h3 style="margin: 0 0 0.75rem; color: #10b981;">WEB URL INGEST</h3>
+				<p style="color: #8b949e; font-size: 0.85rem; margin-bottom: 1rem;">
+					Paste a URL to fetch, chunk, embed, and store in the knowledge base for RAG search.
+				</p>
+				<div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+					<input
+						type="url"
+						bind:value={ingestUrl}
+						placeholder="https://example.com/legal-document"
+						disabled={ingestLoading}
+						style="flex: 1; padding: 0.5rem 0.75rem; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #f0f6fc; font-family: inherit; font-size: 0.85rem;"
+					/>
+					<input
+						type="text"
+						bind:value={ingestCaseId}
+						placeholder="Case ID (optional)"
+						disabled={ingestLoading}
+						style="width: 150px; padding: 0.5rem 0.75rem; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #f0f6fc; font-family: inherit; font-size: 0.85rem;"
+					/>
+					<button
+						class="mode-btn active"
+						onclick={ingestWebUrl}
+						disabled={ingestLoading || !ingestUrl.trim()}
+						style="white-space: nowrap;"
+					>
+						{ingestLoading ? 'INGESTING...' : 'INGEST'}
+					</button>
+				</div>
+				{#if ingestError}
+					<div style="color: #f85149; background: #f8514920; padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.85rem; margin-bottom: 0.5rem;">
+						{ingestError}
+					</div>
+				{/if}
+				{#if ingestResult}
+					<div style="color: #10b981; background: #10b98120; padding: 0.75rem; border-radius: 6px; font-size: 0.85rem;">
+						<strong>Ingested:</strong> {ingestResult.title}<br/>
+						<strong>Chunks:</strong> {ingestResult.chunksCreated} ({ingestResult.totalTokens} tokens)<br/>
+						<strong>Model:</strong> {ingestResult.embeddingModel} | <strong>Time:</strong> {ingestResult.totalMs}ms
+					</div>
+				{/if}
+			</div>
 		</div>
 	{/if}
 </main>

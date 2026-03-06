@@ -109,6 +109,7 @@
   let ragAnswer = $state<AnswerData | null>(null);
   let ragStep = $state<'search' | 'validate' | 'answer'>('search');
   let ragLoading = $state(false);
+  let ragQueryId = $state('');
   let chatHistoryMessages = $state([
     { id: 'msg-1', role: 'user', content: 'What are the key elements of PC 187?', timestamp: new Date(Date.now() - 300000).toISOString(), citations: [], evidence_references: [] },
     { id: 'msg-2', role: 'assistant', content: 'Under PC 187, murder is defined as the unlawful killing of a human being with malice aforethought. The key elements are: (1) a human being was killed, (2) the killing was unlawful, and (3) the killing was done with malice aforethought. See Smith v. Johnson for recent precedent.', timestamp: new Date(Date.now() - 240000).toISOString(), citations: ['PC 187', 'Smith v. Johnson'], evidence_references: [] },
@@ -160,6 +161,7 @@
       });
       if (!res.ok) throw new Error(`Search failed: ${res.status}`);
       const data = await res.json();
+      ragQueryId = data.query_id ?? '';
       const chunks = data.chunks ?? data.results ?? [];
       ragChunks = chunks.map((c: any, i: number) => ({
         chunk_id: c.chunk_id ?? c.id ?? `chunk-${i}`,
@@ -182,14 +184,19 @@
   async function handleRagValidate(selectedIds: string[]) {
     ragLoading = true;
     try {
-      // Step 2: Validate — send approved chunk IDs
+      // Step 2: Validate — send approved/rejected validations in correct API format
+      const validations = ragChunks.map((c: any) => ({
+        chunk_id: c.chunk_id,
+        status: selectedIds.includes(c.chunk_id) ? 'approved' : 'rejected',
+      }));
+
       const valRes = await fetch('/api/rag/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          query: ragQuery,
-          approved_chunk_ids: selectedIds,
-          rejected_chunk_ids: ragChunks.filter(c => !selectedIds.includes(c.chunk_id)).map(c => c.chunk_id),
+          query_id: ragQueryId,
+          case_id: 'default',
+          validations,
         }),
       });
       if (!valRes.ok) throw new Error(`Validate failed: ${valRes.status}`);
@@ -200,9 +207,11 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          context_id: context.context_id,
           query: ragQuery,
-          approved_context: context.approved_context ?? context,
-          token_estimate: context.token_estimate ?? 2000,
+          case_id: 'default',
+          include_citations: true,
+          include_todos: true,
         }),
       });
       if (!ansRes.ok) throw new Error(`Answer failed: ${ansRes.status}`);

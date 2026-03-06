@@ -32,6 +32,10 @@ import { db } from '$lib/server/db/client';
 import { documentTopics, evidence, legalDocuments } from '$lib/server/db/schema-postgres.js';
 import { eq, sql, inArray } from 'drizzle-orm';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
+import {
+	fetchGraphDocuments,
+	computeCentralityForNodes
+} from '$lib/server/graph/graph-centrality.js';
 
 interface RecommendationRequest {
 	query: string;
@@ -157,6 +161,24 @@ export const POST: RequestHandler = async (event) => {
 			`[recommendations] Fetched candidates in ${Date.now() - fetchStartTime}ms: RAG=${ragResults.length}, graph=${graphResults.length}, tags=${tagResults.length}`
 		);
 
+		// Step 2b: Enrich RAG candidates with graph centrality from Neo4j
+		// (non-blocking — if Neo4j is down, RAG candidates keep centrality=undefined)
+		if (ragResults.length > 0) {
+			const ragIds = ragResults.map((r) => r.id);
+			const centralityMap = await computeCentralityForNodes(ragIds).catch(() => new Map());
+			if (centralityMap.size > 0) {
+				for (const candidate of ragResults) {
+					const c = centralityMap.get(candidate.id);
+					if (c !== undefined) {
+						candidate.centrality = c;
+					}
+				}
+				console.log(
+					`[recommendations] Enriched ${centralityMap.size}/${ragResults.length} RAG candidates with graph centrality`
+				);
+			}
+		}
+
 		// Step 3: Rank combined results using multi-modal ranker
 		const rankStartTime = Date.now();
 
@@ -265,8 +287,10 @@ async function fetchRAGCandidates(
 }
 
 /**
- * Fetch candidates from case context (graph-linked documents)
- * Uses the case_id filter in Qdrant to find related evidence
+ * Fetch candidates from Neo4j graph walking.
+ * Walks 1-2 hops from the case node to find related evidence, persons, statutes.
+ * Computes real degree centrality (# of relationships / max).
+ * Falls back to Qdrant filter-only search when Neo4j is unavailable.
  */
 async function fetchGraphCandidates(
 	caseId: string | undefined,
@@ -275,17 +299,49 @@ async function fetchGraphCandidates(
 	if (!caseId) return [];
 
 	try {
-		// Fetch evidence items linked to this case directly from Qdrant
-		// Using a simple filter query (no vector search needed)
+		// Primary: Neo4j graph walking with real centrality
+		const graphResult = await fetchGraphDocuments(caseId, limit);
+
+		if (graphResult.documents.length > 0) {
+			console.log(
+				`[recommendations] Neo4j graph: ${graphResult.totalNodes} nodes, ${graphResult.totalRelationships} rels, maxDegree=${graphResult.maxDegree}, ${graphResult.durationMs}ms`
+			);
+
+			return graphResult.documents.map((doc) => ({
+				id: doc.id,
+				title: doc.title,
+				embedding: new Array(768).fill(0), // Graph candidates don't need embeddings for vector signal
+				tags: [], // Tags come from metadata, not graph
+				centrality: doc.centrality, // Real degree centrality [0, 1]
+				caseIds: doc.caseIds
+			}));
+		}
+
+		// Fallback: Qdrant filter-only search when Neo4j has no data
+		console.log('[recommendations] Neo4j returned 0 docs, falling back to Qdrant filter');
+		return await fetchGraphCandidatesFromQdrant(caseId, limit);
+	} catch (err) {
+		console.warn('[recommendations] Graph candidate fetch failed, using Qdrant fallback:', err);
+		return await fetchGraphCandidatesFromQdrant(caseId, limit);
+	}
+}
+
+/**
+ * Qdrant fallback for graph candidates when Neo4j is unavailable.
+ * Uses case_id filter to find linked evidence with heuristic centrality.
+ */
+async function fetchGraphCandidatesFromQdrant(
+	caseId: string,
+	limit: number
+): Promise<DocumentCandidate[]> {
+	try {
 		const response = await qdrant.hybridSearch({
 			query: '',
-			queryEmbedding: new Array(768).fill(0), // Dummy embedding (filter-only query)
+			queryEmbedding: new Array(768).fill(0),
 			collection: 'evidence',
-			filters: {
-				case_id: caseId
-			},
+			filters: { case_id: caseId },
 			limit,
-			scoreThreshold: 0 // Accept all matches (filter-only)
+			scoreThreshold: 0
 		});
 
 		const results = response.results || [];
@@ -296,12 +352,12 @@ async function fetchGraphCandidates(
 				title: result.payload?.title || 'Untitled Evidence',
 				embedding: result.payload?.vector || new Array(768).fill(0),
 				tags: (meta?.tags as string[]) ?? [],
-				centrality: 0.8, // High centrality for case-linked documents
+				centrality: 0.5, // Heuristic fallback (lower than hardcoded 0.8 to reflect uncertainty)
 				caseIds: [caseId]
 			};
 		});
 	} catch (err) {
-		console.warn('[recommendations] Graph candidate fetch failed:', err);
+		console.warn('[recommendations] Qdrant fallback also failed:', err);
 		return [];
 	}
 }
