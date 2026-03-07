@@ -737,7 +737,7 @@
 		width: 3rem;
 		height: 3rem;
 		border-radius: 0.5rem;
-		background: #f3f4f6;
+		background: #1a1a2e;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -918,18 +918,18 @@
 	.form-field label {
 		font-size: 0.875rem;
 		font-weight: 500;
-		color: #374151;
+		color: #d1d5db;
 	}
 
 	.form-input {
 		width: 100%;
 		padding: 0.5rem 0.75rem;
-		border: 1px solid #d1d5db;
+		border: 1px solid #555;
 		border-radius: 0.375rem;
 		font-size: 0.875rem;
 		font-family: inherit;
-		background: #ffffff;
-		color: #111827;
+		background: #0f0f23;
+		color: #ffffff;
 		transition: border-color 0.2s;
 	}
 

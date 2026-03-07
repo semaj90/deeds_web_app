@@ -124,46 +124,41 @@ const validateFiles = fromPromise((async ({ input }: { input: DocumentUploadCont
 }) as any);
 
 const uploadFiles = fromPromise((async ({ input }: { input: DocumentUploadContext }) => {
-    const formData = new FormData();
-    input.files.forEach((file, index) => {
-        formData.append(`file_${index}`, file);
-    });
+    const uploadedFiles: UploadedFile[] = [];
 
-    try {
-        const response = await fetch('/api/upload', {
+    for (const file of input.files) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('/api/evidence/upload', {
             method: 'POST',
             body: formData
         });
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error || `HTTP ${response.status}`);
+            throw new Error((errorData as any).error || `HTTP ${response.status}`);
         }
-        return response.json();
-    } catch (error: any) {
-        throw new Error(error.message || 'Unknown upload error');
+        const result = await response.json() as { id: string; jobId: string; fileName: string };
+        uploadedFiles.push({ id: result.id, name: result.fileName, jobId: result.jobId });
     }
+
+    return { files: uploadedFiles };
 }) as any);
 
+// AI processing (entity extraction, summarization, embedding) runs automatically
+// in the background via the evidence upload pipeline — no separate call needed
 const processFiles = fromPromise((async ({ input }: { input: DocumentUploadContext }) => {
-    const processingResults: AIProcessingResult[] = [];
-    for (const file of input.uploadedFiles) {
-        const response = await fetch('/api/ai/process-document', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fileId: file.id, analysisType: 'full' })
-        });
-        if (!response.ok) {
-            throw new Error(`Processing failed for ${file.name}`);
-        }
-        const result = (await response.json()) as AIProcessingResult;
-        processingResults.push(result);
-    }
+    // The /api/evidence/upload pipeline handles all AI processing automatically:
+    // text extraction → chunking → embedding → entity extraction → forensics → summarization
     return {
-        processedFiles: processingResults,
+        processedFiles: input.uploadedFiles.map(f => ({
+            extractedText: '',
+            metadata: { fileId: f.id, status: 'processing-in-background' }
+        })),
         summary: {
             totalFiles: input.uploadedFiles.length,
-            successfulProcessing: processingResults.length,
-            extractedTextLength: processingResults.reduce((acc, r) => acc + (r.extractedText?.length || 0), 0)
+            successfulProcessing: input.uploadedFiles.length,
+            extractedTextLength: 0
         }
     };
 }) as any);
