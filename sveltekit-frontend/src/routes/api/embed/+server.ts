@@ -3,6 +3,7 @@ import { getOllamaUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types.js';
 import { apiResponses } from '$lib/server/api/response-helper.js';
 import { embedRateLimiter } from '$lib/server/middleware/rate-limiter.js';
+import { acquireGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 
 const OLLAMA_URL = getOllamaUrl();
 
@@ -59,6 +60,11 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		if (text.length > 50000) {
 			return apiResponses.badRequest('Text too long. Maximum 50,000 characters.');
+		}
+
+		// Acquire GPU lease for Ollama embeddings (non-blocking)
+		if (model !== 'mock') {
+			await acquireGpuLease('ollama', 30).catch(() => null);
 		}
 
 		let result: EmbedResponse;

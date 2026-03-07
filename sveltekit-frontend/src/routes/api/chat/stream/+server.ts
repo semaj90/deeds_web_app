@@ -2,6 +2,7 @@ import { db } from '$lib/server/db/client';
 import { chatMessages, chatMetadata } from '$lib/server/db/schema';
 import { desc, eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { acquireGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 
 /**
  * Server-Sent Events endpoint for contextual chat streaming
@@ -132,6 +133,9 @@ function handleQueryMode(query: string, mode: string, caseId: string | null, per
 			};
 
 			try {
+				// Acquire GPU lease for Ollama streaming (non-blocking)
+				await acquireGpuLease('ollama', 120).catch(() => null);
+
 				send({ type: 'start', query, mode, caseId, timestamp: new Date().toISOString() });
 
 				// Load case context if available

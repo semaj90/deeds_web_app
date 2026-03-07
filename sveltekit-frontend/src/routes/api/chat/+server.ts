@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 
 /** POST /api/chat — Simple chat endpoint (also handles /api/chat-test callers) */
 export const POST: RequestHandler = async ({ request }) => {
@@ -19,6 +20,9 @@ export const POST: RequestHandler = async ({ request }) => {
 		if (!userContent.trim()) {
 			return json({ message: 'No message provided', response: '' }, { status: 400 });
 		}
+
+		// Acquire GPU lease for Ollama (non-blocking — continue even if lease fails)
+		const lease = await acquireGpuLease('ollama', 60).catch(() => null);
 
 		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
 			method: 'POST',
@@ -45,10 +49,13 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json({
 			message: responseText,
 			response: responseText,
-			model: data.model || 'gemma3-legal:latest'
+			model: data.model || 'gemma3-legal:latest',
+			gpuLease: lease ? { backend: lease.backend, expiresAt: lease.expiresAt } : null
 		});
 	} catch (err) {
 		console.error('[/api/chat]', err);
+		// Release lease on error so TRT-LLM can take over if needed
+		await releaseGpuLease('ollama').catch(() => {});
 		return json({ message: 'Chat service error', response: '' }, { status: 503 });
 	}
 };

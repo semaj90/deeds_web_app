@@ -1,5 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { getGpuLeaseStatus } from '$lib/server/inference/gpu-arbiter.js';
 
 /**
  * GET /api/health/capabilities
@@ -41,7 +42,7 @@ export const GET: RequestHandler = async () => {
 	const qdrantUrl = ENV.QDRANT_URL ?? 'http://localhost:6333';
 
 	// Parallel checks — all with 2s timeout
-	const [ollamaRes, qdrantHealth, postgresOk, redisOk, tensorrtOk] = await Promise.all([
+	const [ollamaRes, qdrantHealth, postgresOk, redisOk, tensorrtOk, gpuLease] = await Promise.all([
 		// Ollama: fetch model list (proves LLM + embedding available)
 		fetch(`${ollamaUrl}/api/tags`, { signal: AbortSignal.timeout(TIMEOUT) })
 			.then(async (r) => {
@@ -105,6 +106,9 @@ export const GET: RequestHandler = async () => {
 
 		// TensorRT-LLM: check /health endpoint
 		check(ENV.TENSORRT_URL ?? 'http://localhost:8000'),
+
+		// GPU lease status
+		getGpuLeaseStatus().catch(() => null),
 	]);
 
 	const ollama = ollamaRes.ok;
@@ -128,6 +132,12 @@ export const GET: RequestHandler = async () => {
 			postgres: postgresOk,
 			redis: redisOk,
 			tensorrt: tensorrtOk,
+			gpu: {
+				leaseHolder: gpuLease?.backend ?? null,
+				leaseFree: !gpuLease,
+				leaseExpiresAt: gpuLease?.expiresAt ?? null,
+				leaseRemainingMs: gpuLease ? Math.max(0, gpuLease.expiresAt - Date.now()) : null
+			},
 			ragEnabled,
 			serverReady,
 			models,

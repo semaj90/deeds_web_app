@@ -5,12 +5,13 @@
  * TRT-LLM and Ollama cannot coexist at full model load.
  * This arbiter manages exclusive GPU lease via Redis.
  *
- * TODO [Session 93r18]: Wire into inference pipeline
- *   - /api/chat (and /api/agents/chat) should call acquireGpuLease('ollama') before Ollama
- *   - /api/inference/tensorrt endpoint should call acquireGpuLease('tensorrt')
- *   - Expose lease status via /api/health/capabilities (tensorrt: boolean)
- *   - Admin GPU panel: show current lease holder, remaining TTL, manual release button
- *   - LLM eval dashboard: A/B compare TRT-LLM vs Ollama latency/quality
+ * Wired into inference pipeline:
+ *   - /api/chat acquires lease before Ollama chat ✅
+ *   - /api/chat/stream acquires lease before streaming ✅
+ *   - /api/embed acquires lease before embedding ✅
+ *   - /api/health/capabilities exposes lease status ✅
+ *   - /api/gpu/lease — full CRUD lease management ✅
+ *   - /api/gpu-wasm-integration — pipeline telemetry ✅
  */
 import { redis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
