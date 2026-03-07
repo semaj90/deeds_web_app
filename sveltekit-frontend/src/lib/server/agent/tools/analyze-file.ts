@@ -19,7 +19,7 @@ export const analyzeFileSchema = z.object({
 	endLine: z.number().optional().describe('Ending line number (inclusive)')
 });
 
-export type AnalyzeFileInput = z.infer<typeof analyzeFileSchema>;
+export type AnalyzeFileInput = z.input<typeof analyzeFileSchema>;
 
 export interface AnalyzeFileResult {
 	filePath: string;

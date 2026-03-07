@@ -21,7 +21,7 @@ export const ripgrepSearchSchema = z.object({
 	maxResults: z.number().optional().default(100).describe('Maximum number of matches to return')
 });
 
-export type RipgrepSearchInput = z.infer<typeof ripgrepSearchSchema>;
+export type RipgrepSearchInput = z.input<typeof ripgrepSearchSchema>;
 
 export interface RipgrepMatch {
 	filePath: string;

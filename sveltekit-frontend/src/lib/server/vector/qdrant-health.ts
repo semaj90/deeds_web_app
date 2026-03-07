@@ -199,7 +199,7 @@ export async function checkQdrantHealth(
 				}
 
 				// Check quantization (non-critical - just log if missing)
-				if (expectedSchema.quantized && !config?.quantization_config) {
+				if (expectedSchema.quantized && !(config as any)?.quantization_config) {
 					issues.push('Quantization not enabled (performance warning)');
 					// Don't mark as invalid - quantization is optional optimization
 				}

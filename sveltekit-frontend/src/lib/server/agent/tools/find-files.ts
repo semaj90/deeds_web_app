@@ -20,7 +20,7 @@ export const findFilesSchema = z.object({
 		.describe('Patterns to exclude from search')
 });
 
-export type FindFilesInput = z.infer<typeof findFilesSchema>;
+export type FindFilesInput = z.input<typeof findFilesSchema>;
 
 export interface FileInfo {
 	path: string;

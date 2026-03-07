@@ -14,6 +14,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		db.select({
 			id: cases.id,
 			title: cases.title,
+			caseNumber: cases.caseNumber,
 			status: cases.status,
 			priority: cases.priority,
 			description: cases.description,

@@ -17,7 +17,7 @@ export const analyzeImportsSchema = z.object({
 	maxFiles: z.number().optional().default(50).describe('Maximum number of files to analyze')
 });
 
-export type AnalyzeImportsInput = z.infer<typeof analyzeImportsSchema>;
+export type AnalyzeImportsInput = z.input<typeof analyzeImportsSchema>;
 
 export interface ImportMatch {
 	filePath: string;
