@@ -60,10 +60,11 @@ class WhisperSTTService {
 				const startTime = performance.now();
 
 				// Dynamically import transformers (browser-safe)
-				const { pipeline } = await import('@xenova/transformers');
+				const transformers = await import('@xenova/transformers');
 
 				// Load Whisper tiny.en model for speech recognition
-				this.pipeline = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny.en', {
+				// pipeline is callable despite TS types showing it as a class
+				this.pipeline = await (transformers.pipeline as any)('automatic-speech-recognition', 'Xenova/whisper-tiny.en', {
 					quantized: true // Use quantized model for faster loading
 				});
 

@@ -230,7 +230,7 @@ export const POST: RequestHandler = async ({ params }) => {
 						matches,
 						method: 'qdrant-vector',
 						queryPhotoId: photosWithEmbeddings[0].id,
-						totalCandidates: results?.length ?? 0,
+						totalCandidates: qdrantMatches?.length ?? 0,
 					});
 				}
 			}
