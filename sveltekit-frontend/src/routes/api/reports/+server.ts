@@ -41,7 +41,8 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 				.where(eq(reports.caseId, caseId))
 				.orderBy(desc(reports.createdAt))
 				.limit(limit)
-				.offset(offset);
+				.offset(offset)
+				.$withCache({ config: { ex: 600 } });
 
 			return json({ success: true, data: userReports });
 		}
@@ -51,7 +52,8 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 			.where(eq(reports.createdBy, locals.user.id))
 			.orderBy(desc(reports.createdAt))
 			.limit(limit)
-			.offset(offset);
+			.offset(offset)
+			.$withCache({ config: { ex: 600 } });
 
 		return json({ success: true, data: userReports });
 	} catch (err) {

@@ -29,10 +29,10 @@ export const GET: RequestHandler = async () => {
 		exec(sql`SELECT COUNT(*) as total FROM evidence`),
 		exec(sql`SELECT COUNT(*) as total FROM persons_of_interest`),
 		exec(sql`SELECT COUNT(*) as total FROM citations`),
-		db.select({ value: count() }).from(legalGlossary).then(r => r[0]?.value ?? 0).catch(() => 0),
-		db.select({ value: count() }).from(statutes).then(r => r[0]?.value ?? 0).catch(() => 0),
-		db.select({ value: count() }).from(legalPrecedents).then(r => r[0]?.value ?? 0).catch(() => 0),
-		db.select({ value: count() }).from(savedCitations).then(r => r[0]?.value ?? 0).catch(() => 0),
+		db.select({ value: count() }).from(legalGlossary).$withCache({ config: { ex: 3600 } }).then(r => r[0]?.value ?? 0).catch(() => 0),
+		db.select({ value: count() }).from(statutes).$withCache({ config: { ex: 3600 } }).then(r => r[0]?.value ?? 0).catch(() => 0),
+		db.select({ value: count() }).from(legalPrecedents).$withCache({ config: { ex: 3600 } }).then(r => r[0]?.value ?? 0).catch(() => 0),
+		db.select({ value: count() }).from(savedCitations).$withCache({ config: { ex: 3600 } }).then(r => r[0]?.value ?? 0).catch(() => 0),
 	]);
 
 	return json({

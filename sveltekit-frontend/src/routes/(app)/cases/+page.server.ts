@@ -51,7 +51,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         .where(and(...filters))
         .orderBy(desc(cases.updatedAt))
         .limit(limit)
-        .offset(offset);
+        .offset(offset)
+        .$withCache({ config: { ex: 300 } });
     },
 	[] // Fallback to empty array if database unavailable
   );

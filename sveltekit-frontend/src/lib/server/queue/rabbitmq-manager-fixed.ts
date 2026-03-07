@@ -101,19 +101,19 @@ export class RabbitMQManager extends EventEmitter {
             // Dynamic imports to avoid circular dependencies
             // Note: Adjust paths as necessary based on project structure
             try {
-                const redisModule = await import('../redis-service.js');
-                this.redisService = redisModule.redisService;
-            } catch (e) { /* ignore */ }
+                const { getRedis } = await import('../redis.js');
+                this.redisService = getRedis();
+            } catch (e) { console.warn('⚠️ Redis failed:', this.formatError(e)); }
 
             try {
-                const lokiModule = await import('../../../lib/cache/loki-redis-integration.js'); // check path
+                const lokiModule = await import('../../../lib/cache/loki-redis-integration.js');
                 this.lokiRedisCache = lokiModule.lokiRedisCache;
-            } catch (e) { /* ignore */ }
+            } catch (e) { console.warn('⚠️ LokiRedis failed:', this.formatError(e)); }
 
              try {
-                const dbModule = await import('../db/client.js'); // Assuming client.ts exports db
+                const dbModule = await import('../db/client.js');
                 this.db = dbModule.db;
-            } catch (e) { /* ignore */ }
+            } catch (e) { console.warn('⚠️ DB failed:', this.formatError(e)); }
 
              // Initialize embeddings if needed (mock or load)
              // this.embeddings = ...
@@ -343,7 +343,7 @@ export class RabbitMQManager extends EventEmitter {
             if (data.message && data.embedding) {
                 const { qdrant } = await import('../vector/qdrant-manager.js');
                 await qdrant.batchUpsert({
-                    collection: 'chat_history' as any,
+                    collection: 'chat_messages' as any,
                     points: [{
                         id: `chat-${data.sessionId}-${Date.now()}`,
                         vector: data.embedding,

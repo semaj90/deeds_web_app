@@ -3,6 +3,7 @@ import { Pool } from 'pg';
 import { canvasAutosaves } from './schema-canvas-autosaves.js';
 import * as schema from './schema.js'; // Changed from schema-postgres to schema
 import { ENV } from '$lib/server/env.server.js';
+import { createDrizzleCache } from './drizzle-cache.js';
 
 function getDatabaseUrl(): string {
  return ENV.DATABASE_URL;
@@ -15,11 +16,15 @@ function getAdminDatabaseUrl(): string {
 // Create merged schema object
 const mergedSchema = { ...schema, canvasAutosaves };
 
+// Query-level cache: ioredis-backed, 5min default TTL
+// Use .$withCache() on any query, or .$withCache({ config: { ex: 3600 } }) for custom TTL
+const cache = createDrizzleCache(300);
+
 export const pool = new Pool({ connectionString: getDatabaseUrl() });
 pool.on('error', (err) => {
 	console.error('Database pool error (non-fatal):', err.message);
 });
-export const db = drizzle(pool, { schema: mergedSchema, casing: 'snake_case' });
+export const db = drizzle(pool, { schema: mergedSchema, casing: 'snake_case', cache });
 
 const adminPool = new Pool({ connectionString: getAdminDatabaseUrl() });
 adminPool.on('error', (err) => {
