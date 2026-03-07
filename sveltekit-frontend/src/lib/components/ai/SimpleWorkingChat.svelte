@@ -2,7 +2,7 @@
 	import { ChatSession } from '$lib/models/ChatSession.svelte.js';
 	import TypewriterResponse from '$lib/components/ai/TypewriterResponse.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
-	import { ScrollArea } from 'bits-ui';
+	// ScrollArea removed — bits-ui ScrollArea triggers $props() TDZ in Svelte 5.46.0
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { tick } from 'svelte';
 	import { browser } from '$app/environment';
@@ -540,8 +540,7 @@
 	{/if}
 
 	<!-- Messages -->
-	<ScrollArea.Root class="flex-1 min-h-0">
-		<ScrollArea.Viewport class="h-full p-4" bind:ref={chatContainer}>
+	<div class="flex-1 min-h-0 overflow-y-auto chat-scrollbar p-4" bind:this={chatContainer}>
 			{#if !session || session.messages.length === 0}
 				<div class="h-full flex flex-col items-center justify-center opacity-40 gap-3 text-center">
 					<Icon name="message-circle" size={32} />
@@ -644,11 +643,7 @@
 					</div>
 				{/if}
 			{/if}
-		</ScrollArea.Viewport>
-		<ScrollArea.Scrollbar orientation="vertical" class="w-1.5 p-0.5">
-			<ScrollArea.Thumb class="bg-white/10 rounded-sm" />
-		</ScrollArea.Scrollbar>
-	</ScrollArea.Root>
+	</div>
 
 	<!-- Error -->
 	{#if session?.error}

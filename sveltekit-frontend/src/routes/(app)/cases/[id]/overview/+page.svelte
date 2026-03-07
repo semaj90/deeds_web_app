@@ -4,6 +4,8 @@
 	import LegalDocumentDrafting from '$lib/components/ai/LegalDocumentDrafting.svelte';
 	import EvidenceManager from '$lib/components/evidence/EvidenceManager.svelte';
 	import SimilarCasesPanel from '$lib/components/legal/SimilarCasesPanel.svelte';
+	import NesModal from '$lib/components/nes/NesModal.svelte';
+	import CaseNotesEditor from '$lib/components/cases/CaseNotesEditor.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 
 	type TabId = 'overview' | 'evidence' | 'persons' | 'ai' | 'reports';
@@ -24,6 +26,7 @@
 	let activeTab = $state<TabId>('overview');
 	let showDraftingTool = $state(false);
 	let showEvidenceManager = $state(false);
+	let showNotesModal = $state(false);
 
 	let errorSummary = $state<ErrorSummary | null>(null);
 	let consolidationStatus = $state<ConsolidationStatus | null>(null);
@@ -159,6 +162,14 @@
 				onclick={loadDiagnostics}
 			>
 				Refresh
+			</button>
+
+			<button
+				class="px-3 py-2 rounded-lg border border-sky-700 bg-sky-500/10 hover:bg-sky-500/20 transition-colors text-xs text-sky-300 flex items-center gap-1.5"
+				onclick={() => (showNotesModal = true)}
+			>
+				<Icon name="notebook-pen" size={14} />
+				Quick Notes
 			</button>
 
 			<button
@@ -438,6 +449,21 @@
 		{/if}
 	</main>
 </div>
+
+<!-- NES Notes Modal (SSR-safe — no bits-ui Dialog) -->
+{#if data.caseData?.id || data.caseId}
+	<NesModal
+		open={showNotesModal}
+		title="Case Notes — #{data.caseData?.id ?? data.caseId}"
+		onClose={() => (showNotesModal = false)}
+		widthClass="w-[1100px]"
+	>
+		<CaseNotesEditor
+			caseId={data.caseData?.id ?? data.caseId}
+			onClose={() => (showNotesModal = false)}
+		/>
+	</NesModal>
+{/if}
 
 <style>
 	.case-tab-bar {

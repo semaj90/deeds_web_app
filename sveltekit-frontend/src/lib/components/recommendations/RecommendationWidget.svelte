@@ -13,7 +13,7 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
-	import { ScrollArea } from 'bits-ui';
+	// ScrollArea removed — bits-ui ScrollArea triggers $props() TDZ in Svelte 5.46.0
 	import { browser } from '$app/environment';
 	import type { GPURerankMetrics } from '$lib/gpu/gpu-search-reranker.js';
 
@@ -240,8 +240,7 @@
 			<p class="text-xs text-sand-11">No recommendations found</p>
 		</div>
 	{:else}
-		<ScrollArea.Root type="hover" class="recommendation-list">
-			<ScrollArea.Viewport class="viewport">
+		<div class="recommendation-list" style="overflow-y: auto;">
 				{#each recommendations as rec (rec.documentId)}
 					<div class="recommendation-item" class:expanded={expanded === rec.documentId}>
 						<!-- Main Row -->
@@ -322,11 +321,7 @@
 						{/if}
 					</div>
 				{/each}
-			</ScrollArea.Viewport>
-			<ScrollArea.Scrollbar orientation="vertical">
-				<ScrollArea.Thumb />
-			</ScrollArea.Scrollbar>
-		</ScrollArea.Root>
+		</div>
 	{/if}
 </div>
 

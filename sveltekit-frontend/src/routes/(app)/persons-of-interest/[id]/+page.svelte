@@ -24,6 +24,8 @@
 	let activeTab = $state<'details' | 'associates' | 'photos' | 'search' | 'dex' | 'criminal'>('details');
 	let faceMatchOpen = $state(false);
 	let faceMatches = $state<any[]>([]);
+	let faceMatchLoading = $state(false);
+	let faceMatchError = $state<string | null>(null);
 	let photos = $state<any[]>((data as any).photos ?? []);
 	let uploading = $state(false);
 	let uploadError = $state<string | null>(null);
@@ -171,6 +173,30 @@
 		const idx = photos.indexOf(photo);
 		photoModalIndex = idx >= 0 ? idx : 0;
 		photoModalOpen = true;
+	}
+
+	async function findFaceMatches() {
+		if (!data.poi?.id) return;
+		faceMatchLoading = true;
+		faceMatchError = null;
+		try {
+			const res = await fetch(`/api/persons-of-interest/${data.poi.id}/face-match`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+			});
+			if (!res.ok) throw new Error(`Face match failed (${res.status})`);
+			const json = await res.json();
+			faceMatches = json.matches ?? [];
+			if (faceMatches.length > 0) {
+				faceMatchOpen = true;
+			} else {
+				faceMatchError = json.message ?? 'No similar faces found';
+			}
+		} catch (err) {
+			faceMatchError = err instanceof Error ? err.message : 'Face match failed';
+		} finally {
+			faceMatchLoading = false;
+		}
 	}
 
 	function getStatusColor(status: string): string {
@@ -359,6 +385,19 @@
 					{/if}
 				</div>
 			{:else if activeTab === 'photos'}
+				<div class="face-match-bar">
+					<button
+						class="btn-face-match"
+						onclick={findFaceMatches}
+						disabled={faceMatchLoading || photos.length === 0}
+					>
+						<span class="i-lucide-scan w-4 h-4 inline-block"></span>
+						{faceMatchLoading ? 'Searching...' : 'Find Similar Faces'}
+					</button>
+					{#if faceMatchError}
+						<span class="face-match-msg">{faceMatchError}</span>
+					{/if}
+				</div>
 				{#if uploading}
 					<div class="upload-status">Uploading photo...</div>
 				{/if}
@@ -376,6 +415,7 @@
 				{#if photos.length > 0}
 					<POIPhotoModal {photos} bind:currentIndex={photoModalIndex} bind:open={photoModalOpen} onclose={() => { photoModalOpen = false; }} />
 				{/if}
+				<POIFaceMatchDialog bind:open={faceMatchOpen} matches={faceMatches} onSelect={(selected) => { window.location.href = `/persons-of-interest/${selected.id}`; }} />
 			{:else if activeTab === 'search'}
 				<div class="similar-panel">
 					<h3 class="similar-heading">Similar Persons <span class="method-tag">{similarMethod}</span></h3>
@@ -474,7 +514,6 @@
 						<p class="empty-message">Enter a search term or click "Find Similar" to search by this person's name</p>
 					{/if}
 				</div>
-				<POIFaceMatchDialog bind:open={faceMatchOpen} matches={faceMatches} onSelect={(selected) => { window.location.href = `/persons-of-interest/${selected.id}`; }} />
 			{:else if activeTab === 'criminal'}
 				{@const criminalData = {
 					id: poi.id,
@@ -915,6 +954,46 @@
 		color: #94a3b8;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
+	}
+
+	.face-match-bar {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin-bottom: 1rem;
+		padding: 0.75rem;
+		background: #0f0f23;
+		border: 1px solid #333;
+		border-radius: 0.375rem;
+	}
+
+	.btn-face-match {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 1rem;
+		background: #7c3aed;
+		color: #ffffff;
+		border: none;
+		border-radius: 0.375rem;
+		font-weight: 600;
+		font-size: 0.875rem;
+		cursor: pointer;
+		transition: background-color 0.2s;
+	}
+
+	.btn-face-match:hover:not(:disabled) {
+		background: #6d28d9;
+	}
+
+	.btn-face-match:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.face-match-msg {
+		color: #9ca3af;
+		font-size: 0.85rem;
 	}
 
 	.upload-status {

@@ -2,7 +2,7 @@
 	import { ChatSession } from '$lib/models/ChatSession.svelte.js';
 	import TypewriterResponse from '$lib/components/ai/TypewriterResponse.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
-	import { ScrollArea } from 'bits-ui';
+	// ScrollArea removed — bits-ui ScrollArea triggers $props() TDZ in Svelte 5.46.0
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { tick } from 'svelte';
 	import { page } from '$app/state';
@@ -507,8 +507,7 @@
 				<p class="text-[10px] text-stone-500 m-0">YoRHa AI Assistant Online — Detective Support System Active</p>
 			</div>
 		</div>
-		<ScrollArea.Root class="flex-1 min-h-0">
-		<ScrollArea.Viewport class="h-full p-6" bind:ref={chatContainer}>
+		<div class="flex-1 min-h-0 overflow-y-auto terminal-scrollbar" bind:this={chatContainer} style="padding: 1.5rem;">
 			{#if !session || session.messages.length === 0}
 				<div class="h-full flex flex-col items-center justify-center text-stone-600 gap-4 text-center">
 					<Icon name="bot" size={48} class="text-emerald-800" />
@@ -631,11 +630,7 @@
 					</div>
 				{/if}
 			{/if}
-		</ScrollArea.Viewport>
-		<ScrollArea.Scrollbar orientation="vertical" class="w-1.5 p-0.5">
-			<ScrollArea.Thumb class="bg-emerald-900/50 rounded-sm" />
-		</ScrollArea.Scrollbar>
-	</ScrollArea.Root>
+	</div>
 	</div>
 
 	<!-- Error Display -->
@@ -701,5 +696,15 @@
 	@keyframes fadeIn {
 		from { opacity: 0; transform: translateY(8px); }
 		to { opacity: 1; transform: translateY(0); }
+	}
+	.terminal-scrollbar::-webkit-scrollbar {
+		width: 6px;
+	}
+	.terminal-scrollbar::-webkit-scrollbar-track {
+		background: transparent;
+	}
+	.terminal-scrollbar::-webkit-scrollbar-thumb {
+		background: rgba(6, 78, 59, 0.5);
+		border-radius: 2px;
 	}
 </style>

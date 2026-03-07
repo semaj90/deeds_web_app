@@ -1,12 +1,11 @@
 <script lang="ts">
   /**
-   * DocumentDetailModal — Svelte 5 + bits-ui Dialog
+   * DocumentDetailModal — Svelte 5 native <dialog>
+   * Replaces bits-ui Dialog to avoid $props() TDZ bug in Svelte 5.46.0.
    * Displays evidence/document details in a modal with metadata,
    * content preview, and action buttons.
    */
-  import { Dialog } from 'bits-ui';
   import { fade } from 'svelte/transition';
-  import type { Snippet } from 'svelte';
 
   interface DocumentDetail {
     id: string;
@@ -42,17 +41,28 @@
     ondownload?: (doc: DocumentDetail) => void;
     onviewcustody?: (docId: string) => void;
     onanalyze?: (docId: string) => void;
-    children?: Snippet;
   }
 
   let {
-    open = false,
+    open = $bindable(false),
     document: doc = null,
     onclose,
     ondownload,
     onviewcustody,
     onanalyze
   }: Props = $props();
+
+  let dialogEl: HTMLDialogElement | undefined = $state(undefined);
+
+  // Sync open prop with native dialog
+  $effect(() => {
+    if (!dialogEl) return;
+    if (open && !dialogEl.open) {
+      dialogEl.showModal();
+    } else if (!open && dialogEl.open) {
+      dialogEl.close();
+    }
+  });
 
   // Normalize field names (snake_case vs camelCase)
   let title = $derived(doc?.title || doc?.fileName || doc?.file_name || 'Untitled');
@@ -94,150 +104,165 @@
   }
 
   function handleClose() {
+    open = false;
     onclose?.();
+  }
+
+  function handleBackdropClick(e: MouseEvent) {
+    if (e.target === dialogEl) {
+      handleClose();
+    }
   }
 </script>
 
-<Dialog.Root bind:open onOpenChange={(isOpen) => { if (!isOpen) handleClose(); }}>
-  <Dialog.Portal>
-    <Dialog.Overlay>
-      {#snippet child({ props: overlayProps })}
-        <div {...overlayProps} class="modal-overlay" transition:fade={{ duration: 150 }}></div>
-      {/snippet}
-    </Dialog.Overlay>
-    <Dialog.Content>
-      {#snippet child({ props: contentProps })}
-        <div {...contentProps} class="modal-content" transition:fade={{ duration: 150 }}>
-          {#if doc}
-            <!-- Header -->
-            <div class="modal-header">
-              <div class="header-info">
-                <span class="type-icon">{getTypeIcon(fileType)}</span>
-                <div>
-                  <Dialog.Title class="modal-title">{title}</Dialog.Title>
-                  <Dialog.Description class="modal-subtitle">
-                    {doc.id} &middot; {formatFileSize(fileSize)}
-                  </Dialog.Description>
-                </div>
-              </div>
-              <Dialog.Close class="close-btn" aria-label="Close">
-                <span class="i-lucide-x w-4.5 h-4.5 inline-block" />
-              </Dialog.Close>
-            </div>
-
-            <!-- Metadata Grid -->
-            <div class="meta-grid">
-              <div class="meta-item">
-                <span class="i-lucide-file-text meta-icon w-3.5 h-3.5 inline-block" />
-                <span class="meta-label">Type</span>
-                <span class="meta-value">{fileType}</span>
-              </div>
-              <div class="meta-item">
-                <span class="i-lucide-clock meta-icon w-3.5 h-3.5 inline-block" />
-                <span class="meta-label">Created</span>
-                <span class="meta-value">{formatDate(createdAt)}</span>
-              </div>
-              {#if updatedAt}
-                <div class="meta-item">
-                  <span class="i-lucide-clock meta-icon w-3.5 h-3.5 inline-block" />
-                  <span class="meta-label">Updated</span>
-                  <span class="meta-value">{formatDate(updatedAt)}</span>
-                </div>
-              {/if}
-              {#if caseId}
-                <div class="meta-item">
-                  <span class="i-lucide-link meta-icon w-3.5 h-3.5 inline-block" />
-                  <span class="meta-label">Case</span>
-                  <span class="meta-value">{caseId}</span>
-                </div>
-              {/if}
-              {#if doc.status}
-                <div class="meta-item">
-                  <span class="i-lucide-shield meta-icon w-3.5 h-3.5 inline-block" />
-                  <span class="meta-label">Status</span>
-                  <span class="meta-value status-badge {doc.status}">{doc.status}</span>
-                </div>
-              {/if}
-              {#if doc.aiAnalyzed}
-                <div class="meta-item">
-                  <span class="meta-label">AI Confidence</span>
-                  <span class="meta-value confidence" class:high={doc.confidence && doc.confidence >= 80} class:medium={doc.confidence && doc.confidence >= 50 && doc.confidence < 80} class:low={doc.confidence !== undefined && doc.confidence < 50}>
-                    {doc.confidence ?? 0}%
-                  </span>
-                </div>
-              {/if}
-            </div>
-
-            <!-- Tags -->
-            {#if doc.tags && doc.tags.length > 0}
-              <div class="tags-section">
-                {#each doc.tags as tag}
-                  <span class="tag">{tag}</span>
-                {/each}
-              </div>
-            {/if}
-
-            <!-- Description -->
-            {#if doc.description}
-              <div class="description-section">
-                <h4 class="section-label">Description</h4>
-                <p class="description-text">{doc.description}</p>
-              </div>
-            {/if}
-
-            <!-- Content Preview -->
-            {#if extractedText}
-              <div class="content-section">
-                <h4 class="section-label">Content Preview</h4>
-                <div class="content-preview">
-                  <pre>{extractedText.slice(0, 2000)}{extractedText.length > 2000 ? '...' : ''}</pre>
-                </div>
-              </div>
-            {/if}
-
-            <!-- Actions -->
-            <div class="actions">
-              {#if ondownload}
-                <button class="action-btn primary" onclick={() => doc && ondownload?.(doc)}>
-                  <span class="i-lucide-download w-4 h-4 inline-block" />
-                  Download
-                </button>
-              {/if}
-              {#if onviewcustody}
-                <button class="action-btn" onclick={() => doc && onviewcustody?.(doc.id)}>
-                  <span class="i-lucide-shield w-4 h-4 inline-block" />
-                  Chain of Custody
-                </button>
-              {/if}
-              {#if onanalyze}
-                <button class="action-btn" onclick={() => doc && onanalyze?.(doc.id)}>
-                  AI Analyze
-                </button>
-              {/if}
-              <button class="action-btn ghost" onclick={handleClose}>
-                Close
-              </button>
-            </div>
-          {/if}
+{#if open}
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<dialog
+  bind:this={dialogEl}
+  class="modal-dialog"
+  onclick={handleBackdropClick}
+  oncancel={(e) => { e.preventDefault(); handleClose(); }}
+  transition:fade={{ duration: 150 }}
+>
+  {#if doc}
+    <div class="modal-content">
+      <!-- Header -->
+      <div class="modal-header">
+        <div class="header-info">
+          <span class="type-icon">{getTypeIcon(fileType)}</span>
+          <div>
+            <h2 class="modal-title">{title}</h2>
+            <p class="modal-subtitle">
+              {doc.id} &middot; {formatFileSize(fileSize)}
+            </p>
+          </div>
         </div>
-      {/snippet}
-    </Dialog.Content>
-  </Dialog.Portal>
-</Dialog.Root>
+        <button class="close-btn" onclick={handleClose} aria-label="Close">
+          <span class="i-lucide-x w-4.5 h-4.5 inline-block" />
+        </button>
+      </div>
+
+      <!-- Metadata Grid -->
+      <div class="meta-grid">
+        <div class="meta-item">
+          <span class="i-lucide-file-text w-3.5 h-3.5 inline-block" style="color: #8a7a5a; flex-shrink: 0;" />
+          <span class="meta-label">Type</span>
+          <span class="meta-value">{fileType}</span>
+        </div>
+        <div class="meta-item">
+          <span class="i-lucide-clock w-3.5 h-3.5 inline-block" style="color: #8a7a5a; flex-shrink: 0;" />
+          <span class="meta-label">Created</span>
+          <span class="meta-value">{formatDate(createdAt)}</span>
+        </div>
+        {#if updatedAt}
+          <div class="meta-item">
+            <span class="i-lucide-clock w-3.5 h-3.5 inline-block" style="color: #8a7a5a; flex-shrink: 0;" />
+            <span class="meta-label">Updated</span>
+            <span class="meta-value">{formatDate(updatedAt)}</span>
+          </div>
+        {/if}
+        {#if caseId}
+          <div class="meta-item">
+            <span class="i-lucide-link w-3.5 h-3.5 inline-block" style="color: #8a7a5a; flex-shrink: 0;" />
+            <span class="meta-label">Case</span>
+            <span class="meta-value">{caseId}</span>
+          </div>
+        {/if}
+        {#if doc.status}
+          <div class="meta-item">
+            <span class="i-lucide-shield w-3.5 h-3.5 inline-block" style="color: #8a7a5a; flex-shrink: 0;" />
+            <span class="meta-label">Status</span>
+            <span class="meta-value status-badge {doc.status}">{doc.status}</span>
+          </div>
+        {/if}
+        {#if doc.aiAnalyzed}
+          <div class="meta-item">
+            <span class="meta-label">AI Confidence</span>
+            <span class="meta-value confidence" class:high={doc.confidence && doc.confidence >= 80} class:medium={doc.confidence && doc.confidence >= 50 && doc.confidence < 80} class:low={doc.confidence !== undefined && doc.confidence < 50}>
+              {doc.confidence ?? 0}%
+            </span>
+          </div>
+        {/if}
+      </div>
+
+      <!-- Tags -->
+      {#if doc.tags && doc.tags.length > 0}
+        <div class="tags-section">
+          {#each doc.tags as tag}
+            <span class="tag">{tag}</span>
+          {/each}
+        </div>
+      {/if}
+
+      <!-- Description -->
+      {#if doc.description}
+        <div class="description-section">
+          <h4 class="section-label">Description</h4>
+          <p class="description-text">{doc.description}</p>
+        </div>
+      {/if}
+
+      <!-- Content Preview -->
+      {#if extractedText}
+        <div class="content-section">
+          <h4 class="section-label">Content Preview</h4>
+          <div class="content-preview">
+            <pre>{extractedText.slice(0, 2000)}{extractedText.length > 2000 ? '...' : ''}</pre>
+          </div>
+        </div>
+      {/if}
+
+      <!-- Actions -->
+      <div class="actions">
+        {#if ondownload}
+          <button class="action-btn primary" onclick={() => doc && ondownload?.(doc)}>
+            <span class="i-lucide-download w-4 h-4 inline-block" />
+            Download
+          </button>
+        {/if}
+        {#if onviewcustody}
+          <button class="action-btn" onclick={() => doc && onviewcustody?.(doc.id)}>
+            <span class="i-lucide-shield w-4 h-4 inline-block" />
+            Chain of Custody
+          </button>
+        {/if}
+        {#if onanalyze}
+          <button class="action-btn" onclick={() => doc && onanalyze?.(doc.id)}>
+            AI Analyze
+          </button>
+        {/if}
+        <button class="action-btn ghost" onclick={handleClose}>
+          Close
+        </button>
+      </div>
+    </div>
+  {/if}
+</dialog>
+{/if}
 
 <style>
-  .modal-overlay {
+  .modal-dialog {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     z-index: 50;
   }
 
+  .modal-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+  }
+
   .modal-content {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     background: #2a2016;
     border: 2px solid #0f0f0f;
     border-radius: 0.5rem;
@@ -245,7 +270,6 @@
     max-width: 700px;
     max-height: 85vh;
     overflow-y: auto;
-    z-index: 51;
     font-family: 'JetBrains Mono', monospace;
     color: #f8f0d9;
   }
@@ -271,19 +295,21 @@
     flex-shrink: 0;
   }
 
-  :global(.modal-title) {
+  .modal-title {
     font-size: 1.125rem;
     font-weight: 600;
     color: #f8f0d9;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    margin: 0;
   }
 
-  :global(.modal-subtitle) {
+  .modal-subtitle {
     font-size: 0.75rem;
     color: #8a7a5a;
     margin-top: 0.25rem;
+    margin-bottom: 0;
   }
 
   .close-btn {
@@ -314,11 +340,6 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.8125rem;
-  }
-
-  :global(.meta-icon) {
-    color: #8a7a5a;
-    flex-shrink: 0;
   }
 
   .meta-label {

@@ -1,6 +1,6 @@
 <!-- Enhanced Document Uploader with AI Processing and Real-time Status -->
+<!-- Native <dialog> replaces bits-ui Dialog to avoid $props() TDZ in Svelte 5.46.0 -->
 <script lang="ts">
-	import { Dialog } from 'bits-ui';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Progress from '$lib/components/ui/Progress.svelte';
 	// Types
@@ -80,6 +80,18 @@
 	// DOM refs
 	let fileInput = $state<HTMLInputElement | undefined>(undefined);
 	let dropZone = $state<HTMLDivElement | undefined>(undefined);
+	let metadataDialogEl: HTMLDialogElement | undefined = $state(undefined);
+
+	// Sync showMetadata with native dialog
+	$effect(() => {
+		if (!metadataDialogEl) return;
+		if (showMetadata && !metadataDialogEl.open) metadataDialogEl.showModal();
+		else if (!showMetadata && metadataDialogEl.open) metadataDialogEl.close();
+	});
+
+	function handleMetadataBackdropClick(e: MouseEvent) {
+		if (e.target === metadataDialogEl) cancelMetadataDialog();
+	}
 
 	// Derived state
 	let totalProgress = $derived(
@@ -220,62 +232,76 @@
 
 		const formData = new FormData();
 		formData.append('file', uploadFile.file);
-		formData.append('caseId', caseId);
-		formData.append('userId', userId);
-		formData.append('metadata', JSON.stringify(uploadFile.metadata));
+		if (caseId) formData.append('caseId', caseId);
+		if (uploadFile.metadata.title) formData.append('title', uploadFile.metadata.title);
+		if (uploadFile.metadata.description) formData.append('description', uploadFile.metadata.description);
+		if (uploadFile.metadata.documentType) formData.append('evidenceType', uploadFile.metadata.documentType);
 
 		try {
-			const uploadResponse = await fetch('/api/documents/upload', {
+			const uploadResponse = await fetch('/api/evidence/upload', {
 				method: 'POST',
 				body: formData
 			});
 
 			if (!uploadResponse.ok) {
-				throw new Error(`Upload failed: ${uploadResponse.statusText}`);
+				const errBody = await uploadResponse.json().catch(() => ({}));
+				throw new Error((errBody as any).error ?? `Upload failed: ${uploadResponse.statusText}`);
 			}
 
 			const uploadResult = (await uploadResponse.json()) as {
-				documentId: string;
-				url?: string;
+				id: string;
+				jobId: string;
+				status: string;
+				fileName: string;
 			};
 
+			// AI processing (entity extraction, summarization, embedding) runs
+			// automatically in the background via the evidence upload pipeline
 			updateFileStatus(uploadFile.id, 'processing', 50);
 
-			if (uploadFile.metadata.autoSummarize || uploadFile.metadata.extractEntities) {
-				const processingResponse = await fetch('/api/ai/process-document', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						documentId: uploadResult.documentId,
-						extractEntities: uploadFile.metadata.extractEntities,
-						generateSummary: uploadFile.metadata.autoSummarize,
-						riskAssessment: true
-					})
-				});
-
-				if (!processingResponse.ok) {
-					throw new Error(`AI processing failed: ${processingResponse.statusText}`);
-				}
-
-				const processingResult = (await processingResponse.json()) as ProcessingResult;
-				updateFileStatus(uploadFile.id, 'completed', 100);
-
-				onFileProcessed?.({ fileId: uploadFile.id, result: processingResult });
-				onFilesUpdated?.({
-					files: [
-						{
+			// Poll job progress via SSE
+			try {
+				const evtSource = new EventSource(`/api/evidence/realtime?jobId=${uploadResult.jobId}`);
+				evtSource.onmessage = (event) => {
+					const data = JSON.parse(event.data);
+					if (data.step === 'complete') {
+						updateFileStatus(uploadFile.id, 'completed', 100);
+						onFileProcessed?.({ fileId: uploadFile.id, result: { summary: data.message, chunks: 0 } });
+						onFilesUpdated?.({
+							files: [{
+								id: uploadFile.id,
+								documentId: uploadResult.id,
+								filename: uploadResult.fileName,
+								size: uploadFile.file.size,
+								type: uploadFile.file.type
+							}]
+						});
+						evtSource.close();
+					} else if (data.step === 'error') {
+						updateFileStatus(uploadFile.id, 'error', 0, data.message);
+						onUploadError?.({ fileId: uploadFile.id, error: data.message });
+						evtSource.close();
+					} else if (data.progress) {
+						updateFileStatus(uploadFile.id, 'processing', data.progress);
+					}
+				};
+				evtSource.onerror = () => {
+					// SSE connection lost — mark complete (upload already succeeded)
+					evtSource.close();
+					updateFileStatus(uploadFile.id, 'completed', 100);
+					onFilesUpdated?.({
+						files: [{
 							id: uploadFile.id,
-							documentId: uploadResult.documentId,
-							filename: uploadFile.file.name,
+							documentId: uploadResult.id,
+							filename: uploadResult.fileName,
 							size: uploadFile.file.size,
-							type: uploadFile.file.type,
-							url: uploadResult.url,
-							thumbnail: uploadFile.preview
-						}
-					]
-				});
-			} else {
-				updateFileStatus(uploadFile.id, 'completed', 100);
+							type: uploadFile.file.type
+						}]
+					});
+				};
+			} catch {
+				// SSE unavailable — mark complete after delay
+				setTimeout(() => updateFileStatus(uploadFile.id, 'completed', 100), 2000);
 			}
 		} catch (err: unknown) {
 			const errMsg = err instanceof Error ? err.message : String(err);
@@ -516,11 +542,18 @@
 		</div>
 	{/if}
 
-	<!-- Metadata Dialog -->
-	<Dialog.Root bind:open={showMetadata}>
-		<Dialog.Content class="max-w-md">
-			<Dialog.Title>Document Metadata</Dialog.Title>
-			<Dialog.Description>Edit document details and AI processing options.</Dialog.Description>
+	<!-- Metadata Dialog — native <dialog> -->
+	{#if showMetadata}
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+	<dialog
+		bind:this={metadataDialogEl}
+		class="metadata-dialog"
+		onclick={handleMetadataBackdropClick}
+		oncancel={(e) => { e.preventDefault(); cancelMetadataDialog(); }}
+	>
+		<div class="metadata-dialog-panel">
+			<h2 class="metadata-dialog-title">Document Metadata</h2>
+			<p class="metadata-dialog-desc">Edit document details and AI processing options.</p>
 
 			{#if metadataDraft}
 				<div class="metadata-form">
@@ -603,8 +636,9 @@
 					</div>
 				</div>
 			{/if}
-		</Dialog.Content>
-	</Dialog.Root>
+		</div>
+	</dialog>
+	{/if}
 </div>
 
 <style>
@@ -613,22 +647,22 @@
 	}
 
 	.drop-zone {
-		border: 2px dashed #d1d5db;
+		border: 2px dashed #555;
 		border-radius: 0.5rem;
 		padding: 2rem;
 		text-align: center;
 		cursor: pointer;
 		transition: border-color 0.2s, background-color 0.2s;
-		background: #f9fafb;
+		background: #1a1a2e;
 	}
 
 	.drop-zone:hover {
-		border-color: #9ca3af;
+		border-color: #888;
 	}
 
 	.drop-zone.dragging {
-		border-color: #2563eb;
-		background: rgba(37, 99, 235, 0.05);
+		border-color: #7c3aed;
+		background: rgba(124, 58, 237, 0.08);
 	}
 
 	.drop-zone-content {
@@ -681,15 +715,15 @@
 	}
 
 	.file-item {
-		border: 1px solid #e5e7eb;
+		border: 1px solid #333;
 		border-radius: 0.5rem;
 		padding: 0.75rem;
-		background: #ffffff;
+		background: #0f0f23;
 		transition: box-shadow 0.2s;
 	}
 
 	.file-item:hover {
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 	}
 
 	.file-info {
@@ -827,7 +861,47 @@
 		margin-right: 0.5rem;
 	}
 
-	/* Metadata Dialog */
+	/* Metadata Dialog — native <dialog> */
+	.metadata-dialog {
+		position: fixed;
+		inset: 0;
+		width: 100vw;
+		height: 100vh;
+		max-width: 100vw;
+		max-height: 100vh;
+		background: transparent;
+		border: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 50;
+	}
+	.metadata-dialog::backdrop {
+		background: rgba(0, 0, 0, 0.5);
+	}
+	.metadata-dialog-panel {
+		width: 100%;
+		max-width: 28rem;
+		background: var(--panel, #1c1917);
+		border: 1px solid var(--sand-dark, rgba(168, 162, 158, 0.2));
+		border-radius: 0.5rem;
+		padding: 1.5rem;
+		box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+		max-height: 90vh;
+		overflow-y: auto;
+	}
+	.metadata-dialog-title {
+		font-size: 1.125rem;
+		font-weight: 600;
+		margin: 0 0 0.25rem;
+	}
+	.metadata-dialog-desc {
+		font-size: 0.8rem;
+		color: #888;
+		margin: 0 0 1rem;
+	}
 	.metadata-form {
 		padding: 1rem 0;
 		display: flex;

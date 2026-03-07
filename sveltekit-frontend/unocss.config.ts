@@ -133,6 +133,6 @@ export default defineConfig({
     'i-lucide-zoom-in', 'i-lucide-zoom-out',
     'i-lucide-user-cog', 'i-lucide-globe', 'i-lucide-pause-circle',
     'i-lucide-undo-2', 'i-lucide-redo-2', 'i-lucide-maximize-2', 'i-lucide-map',
-    'i-lucide-radar', 'i-lucide-arrow-right',
+    'i-lucide-radar', 'i-lucide-arrow-right', 'i-lucide-notebook-pen',
   ],
 })

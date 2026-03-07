@@ -1,6 +1,19 @@
 <!-- AI Recommendation Engine — legal case strategy + evidence recommendations -->
+<!-- Native <dialog> replaces bits-ui Dialog to avoid $props() TDZ in Svelte 5.46.0 -->
 <script lang="ts">
-	import { Dialog } from 'bits-ui';
+	let detailDialogEl: HTMLDialogElement | undefined = $state(undefined);
+
+	// Sync showDetails with native dialog
+	$effect(() => {
+		if (!detailDialogEl) return;
+		if (showDetails && !detailDialogEl.open) detailDialogEl.showModal();
+		else if (!showDetails && detailDialogEl.open) detailDialogEl.close();
+	});
+
+	function handleDetailBackdropClick(e: MouseEvent) {
+		if (e.target === detailDialogEl) { showDetails = false; }
+	}
+
 	interface ActionStep {
 		id: string;
 		description: string;
@@ -403,15 +416,20 @@
 	{/if}
 </div>
 
-<!-- Detail Dialog -->
-<Dialog.Root bind:open={showDetails}>
-	<Dialog.Portal>
-		<Dialog.Overlay class="rec-dialog-overlay" />
-		<Dialog.Content class="rec-dialog-content">
-			{#if selectedRecommendation}
-				{@const rec = selectedRecommendation}
-				<Dialog.Title class="rec-dialog-title">{rec.title}</Dialog.Title>
-				<Dialog.Description class="rec-dialog-desc">Detailed implementation plan</Dialog.Description>
+<!-- Detail Dialog — native <dialog> -->
+{#if showDetails}
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<dialog
+	bind:this={detailDialogEl}
+	class="rec-detail-dialog"
+	onclick={handleDetailBackdropClick}
+	oncancel={(e) => { e.preventDefault(); showDetails = false; }}
+>
+	<div class="rec-dialog-content">
+		{#if selectedRecommendation}
+			{@const rec = selectedRecommendation}
+			<h2 class="rec-dialog-title">{rec.title}</h2>
+			<p class="rec-dialog-desc">Detailed implementation plan</p>
 
 				<div class="rec-detail-grid">
 					<div class="rec-detail-item"><span class="rec-detail-label">Category</span><span>{rec.category.replace(/_/g, ' ')}</span></div>
@@ -505,9 +523,9 @@
 					</button>
 				</div>
 			{/if}
-		</Dialog.Content>
-	</Dialog.Portal>
-</Dialog.Root>
+	</div>
+</dialog>
+{/if}
 
 <style>
 	.rec-engine {
@@ -777,18 +795,27 @@
 		background: #2563eb;
 	}
 
-	/* Dialog styles */
-	:global(.rec-dialog-overlay) {
+	/* Native dialog styles */
+	.rec-detail-dialog {
 		position: fixed;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.5);
+		width: 100vw;
+		height: 100vh;
+		max-width: 100vw;
+		max-height: 100vh;
+		background: transparent;
+		border: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		z-index: 50;
 	}
-	:global(.rec-dialog-content) {
-		position: fixed;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
+	.rec-detail-dialog::backdrop {
+		background: rgba(0, 0, 0, 0.5);
+	}
+	.rec-dialog-content {
 		max-width: 700px;
 		width: 90%;
 		max-height: 85vh;
@@ -797,15 +824,14 @@
 		border: 1px solid rgba(128, 128, 128, 0.3);
 		border-radius: 12px;
 		padding: 1.5rem;
-		z-index: 51;
 		color: #e0e0e0;
 	}
-	:global(.rec-dialog-title) {
+	.rec-dialog-title {
 		font-size: 1.25rem;
 		font-weight: 600;
 		margin: 0 0 0.25rem;
 	}
-	:global(.rec-dialog-desc) {
+	.rec-dialog-desc {
 		font-size: 0.8rem;
 		color: #888;
 		margin: 0 0 1rem;
