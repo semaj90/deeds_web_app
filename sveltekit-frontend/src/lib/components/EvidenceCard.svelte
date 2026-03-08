@@ -1,359 +1,143 @@
+<!-- EvidenceCard.svelte - Basic AI Analysis Display (Svelte 5 + Card/Badge) -->
 <script lang="ts">
+	import Badge from '$lib/components/ui/Badge.svelte';
+	import Card from '$lib/components/ui/Card.svelte';
+	import Icon from '$lib/components/ui/Icon.svelte';
 	import type { Evidence } from '$lib/schemas/evidence';
 
- interface Props {
- evidence: Evidence;
- onAskAI?: (evidence: Evidence) => void;
- onDelete?: (id: string) => void;
- }
+	interface Props {
+		evidence: Evidence;
+		onAskAI?: (evidence: Evidence) => void;
+		onDelete?: (id: string) => void;
+	}
 
- let { evidence, onAskAI, onDelete }: Props = $props();
+	let { evidence, onAskAI, onDelete }: Props = $props();
 
- const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
- const formatDate = (date: Date | undefined) => {
-	if (!date) return 'Unknown';
-	const diffSec = Math.round((new Date(date).getTime() - Date.now()) / 1000);
-	const absSec = Math.abs(diffSec);
-	if (absSec < 60) return rtf.format(diffSec, 'second');
-	if (absSec < 3600) return rtf.format(Math.round(diffSec / 60), 'minute');
-	if (absSec < 86400) return rtf.format(Math.round(diffSec / 3600), 'hour');
-	return rtf.format(Math.round(diffSec / 86400), 'day');
- };
+	const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
 
- const formatFileSize = (bytes: number | undefined) => {
- if (!bytes || bytes === 0) return '0 Bytes';
- const k = 1024;
- const sizes = ['Bytes', 'KB', 'MB', 'GB'];
- const i = Math.floor(Math.log(bytes) / Math.log(k));
- return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
- };
+	function formatDate(date: Date | undefined): string {
+		if (!date) return 'Unknown';
+		const diffSec = Math.round((new Date(date).getTime() - Date.now()) / 1000);
+		const absSec = Math.abs(diffSec);
+		if (absSec < 60) return rtf.format(diffSec, 'second');
+		if (absSec < 3600) return rtf.format(Math.round(diffSec / 60), 'minute');
+		if (absSec < 86400) return rtf.format(Math.round(diffSec / 3600), 'hour');
+		return rtf.format(Math.round(diffSec / 86400), 'day');
+	}
+
+	function formatFileSize(bytes: number | undefined): string {
+		if (!bytes || bytes === 0) return '0 Bytes';
+		const k = 1024;
+		const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+		const i = Math.floor(Math.log(bytes) / Math.log(k));
+		return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+	}
 </script>
 
-<div class="evidence-card">
- <div class="card-header">
- <div class="title-section">
- <h3>{evidence.file_name}</h3>
- <span class="evidence-type">{evidence.evidence_type}</span>
- </div>
- <div class="actions">
- {#if onAskAI}
- <button class="btn-ask-ai" onclick={() => onAskAI(evidence)}>
- Ask AI
- </button>
- {/if}
- {#if onDelete}
- <button class="btn-delete" onclick={() => onDelete?.(evidence.id ?? '')}>
- Delete
- </button>
- {/if}
- </div>
- </div>
+<Card variant="elevated" padding="md" class="hover:shadow-xl transition-shadow">
+	<!-- Header -->
+	<div class="flex justify-between items-start mb-3">
+		<div class="flex-1 min-w-0">
+			<h3 class="text-base font-semibold text-sand truncate">{evidence.file_name}</h3>
+			<Badge variant="default" size="sm" class="mt-1">{evidence.evidence_type}</Badge>
+		</div>
+		<div class="flex gap-2 ml-2">
+			{#if onAskAI}
+				<button class="px-3 py-1.5 bg-info text-white rounded text-xs font-medium hover:bg-info/80 transition" onclick={() => onAskAI(evidence)}>
+					<Icon name="message-circle" size={12} class="inline mr-1" />Ask AI
+				</button>
+			{/if}
+			{#if onDelete}
+				<button class="px-3 py-1.5 bg-danger text-white rounded text-xs font-medium hover:bg-danger/80 transition" onclick={() => onDelete?.(evidence.id ?? '')}>
+					<Icon name="trash-2" size={12} class="inline mr-1" />Delete
+				</button>
+			{/if}
+		</div>
+	</div>
 
- {#if evidence.ai_summary}
- <div class="summary">
- <h4>AI Summary</h4>
- <p>{evidence.ai_summary}</p>
- </div>
- {/if}
+	<!-- AI Summary -->
+	{#if evidence.ai_summary}
+		<div class="mb-3 p-2 bg-info/5 b-l-3 b-info/40 rounded-r">
+			<h4 class="text-xs font-semibold text-sand/60 mb-1">AI Summary</h4>
+			<p class="text-sm leading-relaxed text-sand/80">{evidence.ai_summary}</p>
+		</div>
+	{/if}
 
- <div class="metadata">
- <div class="meta-item">
- <span class="label">File Type:</span>
- <span class="value">{evidence.file_type}</span>
- </div>
- <div class="meta-item">
- <span class="label">Size:</span>
- <span class="value">{formatFileSize(evidence.file_size)}</span>
- </div>
- <div class="meta-item">
- <span class="label">Uploaded:</span>
- <span class="value">{formatDate(evidence.uploaded_at)}</span>
- </div>
- </div>
+	<!-- Metadata Grid -->
+	<div class="grid grid-cols-3 gap-2 mb-3 text-xs">
+		<div>
+			<span class="block font-semibold text-sand/50">File Type</span>
+			<span class="text-sand/80">{evidence.file_type}</span>
+		</div>
+		<div>
+			<span class="block font-semibold text-sand/50">Size</span>
+			<span class="text-sand/80">{formatFileSize(evidence.file_size)}</span>
+		</div>
+		<div>
+			<span class="block font-semibold text-sand/50">Uploaded</span>
+			<span class="text-sand/80">{formatDate(evidence.uploaded_at)}</span>
+		</div>
+	</div>
 
- {#if evidence.tags && evidence.tags.length > 0}
- <div class="tags">
- <h4>Tags</h4>
- <div class="tag-list">
- {#each evidence.tags as tag}
- <span class="tag">{tag}</span>
- {/each}
- </div>
- </div>
- {/if}
+	<!-- Tags -->
+	{#if evidence.tags && evidence.tags.length > 0}
+		<div class="mb-3">
+			<h4 class="text-xs font-semibold text-sand/50 mb-1">Tags</h4>
+			<div class="flex flex-wrap gap-1">
+				{#each evidence.tags as tag}
+					<Badge variant="primary" size="sm">{tag}</Badge>
+				{/each}
+			</div>
+		</div>
+	{/if}
 
- {#if evidence.ai_tags && evidence.ai_tags.length > 0}
- <div class="ai-tags">
- <h4>AI Tags</h4>
- <div class="tag-list">
- {#each evidence.ai_tags as tag}
- <span class="ai-tag">{tag}</span>
- {/each}
- </div>
- </div>
- {/if}
+	<!-- AI Tags -->
+	{#if evidence.ai_tags && evidence.ai_tags.length > 0}
+		<div class="mb-3">
+			<h4 class="text-xs font-semibold text-sand/50 mb-1">AI Tags</h4>
+			<div class="flex flex-wrap gap-1">
+				{#each evidence.ai_tags as tag}
+					<Badge variant="secondary" size="sm">{tag}</Badge>
+				{/each}
+			</div>
+		</div>
+	{/if}
 
- {#if (evidence as any).chat_turns && (evidence as any).chat_turns.length > 0}
- <div class="chat-insights">
- <h4>AI Analysis</h4>
- {#each (evidence as any).chat_turns as turn}
- {#if turn.keywords && turn.keywords.length > 0}
- <div class="keywords">
- <h5>Keywords</h5>
- <div class="keyword-list">
- {#each turn.keywords as keyword}
- <span class="keyword-chip">{keyword}</span>
- {/each}
- </div>
- </div>
- {/if}
- {#if turn.suggestions && turn.suggestions.length > 0}
- <div class="suggestions">
- <h5>AI Suggestions</h5>
- <ul class="suggestion-list">
- {#each turn.suggestions as suggestion}
- <li class="suggestion-item">{suggestion}</li>
- {/each}
- </ul>
- </div>
- {/if}
- {/each}
- </div>
- {/if}
+	<!-- AI Analysis (chat turns) -->
+	{#if (evidence as any).chat_turns && (evidence as any).chat_turns.length > 0}
+		<div class="mb-3 p-2 bg-warning/5 b-l-3 b-warning/40 rounded-r">
+			<h4 class="text-sm font-semibold text-warning mb-2">AI Analysis</h4>
+			{#each (evidence as any).chat_turns as turn}
+				{#if turn.keywords && turn.keywords.length > 0}
+					<div class="mb-2">
+						<h5 class="text-xs font-semibold text-sand/50 mb-1">Keywords</h5>
+						<div class="flex flex-wrap gap-1">
+							{#each turn.keywords as keyword}
+								<Badge variant="warning" size="sm">{keyword}</Badge>
+							{/each}
+						</div>
+					</div>
+				{/if}
+				{#if turn.suggestions && turn.suggestions.length > 0}
+					<div class="mb-2">
+						<h5 class="text-xs font-semibold text-sand/50 mb-1">AI Suggestions</h5>
+						<ul class="list-disc pl-4 text-xs text-sand/70 space-y-0.5">
+							{#each turn.suggestions as suggestion}
+								<li>{suggestion}</li>
+							{/each}
+						</ul>
+					</div>
+				{/if}
+			{/each}
+		</div>
+	{/if}
 
- {#if evidence.file_url}
- <div class="file-link">
- <a href={evidence.file_url} target="_blank" rel="noopener noreferrer">
- View File →
- </a>
- </div>
- {/if}
-</div>
-
-<style>
- .evidence-card {
- border: 1px solid #e0e0e0;
- border-radius: 8px;
-	padding: 16px;
- background: #fff;
- box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
- transition:box-shadow 0.2s;
- }
-
- .evidence-card:hover {
- box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
- }
-
- .card-header {
- display: flex;
- justify-content: space-between;
- align-items: flex-start;
- margin-bottom: 12px;
- }
-
- .title-section {
- flex: 1;
- }
-
- .title-section h3 {
- margin: 0 0 4px 0;
- font-size: 16px;
- font-weight: 600;
- }
-
- .evidence-type {
- display: inline-block;
-	padding: 2px 8px;
- background: #f0f0f0;
- border-radius: 4px;
- font-size: 12px;
-	color: #666;
- }
-
- .actions {
- display: flex;
-	gap: 8px;
- }
-
- .btn-ask-ai,
- .btn-delete {
- padding: 6px 12px;
- border: none;
- border-radius: 4px;
- font-size: 12px;
-	cursor: pointer;
- transition:background 0.2s;
- }
-
- .btn-ask-ai {
- background: #007bff;
-	color: white;
- }
-
- .btn-ask-ai:hover {
- background: #0056b3;
- }
-
- .btn-delete {
- background: #dc3545;
-	color: white;
- }
-
- .btn-delete:hover {
- background: #c82333;
- }
-
- .summary {
- margin-bottom: 12px;
-	padding: 8px;
- background: #f9f9f9;
- border-left: 3px solid #007bff;
- }
-
- .summary h4 {
- margin: 0 0 4px 0;
- font-size: 12px;
- font-weight: 600;
-	color: #666;
- }
-
- .summary p {
- margin: 0;
- font-size: 14px;
- line-height: 1.4;
- }
-
- .metadata {
- display: grid;
- grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
- gap: 8px;
- margin-bottom: 12px;
- font-size: 12px;
- }
-
- .meta-item {
- display: flex;
- flex-direction: column;
- }
-
- .meta-item .label {
- font-weight: 600;
-	color: #666;
- }
-
- .meta-item .value {
- color: #333;
- }
-
- .tags,
- .ai-tags {
- margin-bottom: 12px;
- }
-
- .tags h4,
- .ai-tags h4 {
- margin: 0 0 6px 0;
- font-size: 12px;
- font-weight: 600;
-	color: #666;
- }
-
- .tag-list {
- display: flex;
- flex-wrap: wrap;
-	gap: 6px;
- }
-
- .tag,
- .ai-tag {
- display: inline-block;
-	padding: 4px 8px;
- border-radius: 4px;
- font-size: 12px;
- }
-
- .tag {
- background: #e3f2fd;
-	color: #1976d2;
- }
-
- .ai-tag {
- background: #f3e5f5;
-	color: #7b1fa2;
- }
-
- .chat-insights {
- margin-bottom: 12px;
-	padding: 8px;
- background: #fff3cd;
- border-left: 3px solid #ffc107;
- }
-
- .chat-insights h4 {
- margin: 0 0 8px 0;
- font-size: 14px;
- font-weight: 600;
-	color: #856404;
- }
-
- .keywords,
- .suggestions {
- margin-bottom: 8px;
- }
-
- .keywords h5,
- .suggestions h5 {
- margin: 0 0 4px 0;
- font-size: 12px;
- font-weight: 600;
-	color: #856404;
- }
-
- .keyword-list {
- display: flex;
- flex-wrap: wrap;
-	gap: 4px;
- }
-
- .keyword-chip {
- display: inline-block;
-	padding: 2px 6px;
- border-radius: 3px;
- font-size: 11px;
-	background: #fff;
- color: #856404;
-	border: 1px solid #ffc107;
- }
-
- .suggestion-list {
- margin: 0;
- padding-left: 16px;
- }
-
- .suggestion-item {
- font-size: 12px;
- line-height: 1.4;
-	color: #333;
- margin-bottom: 2px;
- }
-
- .file-link {
- margin-top: 12px;
- padding-top: 12px;
- border-top: 1px solid #e0e0e0;
- }
-
- .file-link a {
- color: #007bff;
- text-decoration: none;
- font-size: 12px;
- font-weight: 600;
- }
-
- .file-link a:hover {
- text-decoration: underline;
- }
-</style>
-
-
-
+	<!-- File Link -->
+	{#if evidence.file_url}
+		<div class="pt-3 b-t b-sand/10">
+			<a href={evidence.file_url} target="_blank" rel="noopener noreferrer" class="text-info text-sm font-medium hover:underline">
+				<Icon name="external-link" size={14} class="inline mr-1" />View File
+			</a>
+		</div>
+	{/if}
+</Card>

@@ -1,8 +1,9 @@
+<!-- EvidenceCard.svelte - Rich Media Preview + Compare (Svelte 5 + Card/Badge) -->
 <script lang="ts">
+	import Badge from '$lib/components/ui/Badge.svelte';
+	import Card from '$lib/components/ui/Card.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import type { Evidence } from '$lib/types/evidence';
-	import { quintOut } from 'svelte/easing';
-	import { scale } from 'svelte/transition';
 
 	interface Props {
 		evidence: Evidence;
@@ -12,7 +13,7 @@
 		showCompare?: boolean;
 		autoCompare?: boolean;
 		oncompare?: (evidence: Evidence) => void;
-		oncompared?: (data: { evidence: Evidence, result: unknown }) => void;
+		oncompared?: (data: { evidence: Evidence; result: unknown }) => void;
 	}
 
 	let {
@@ -28,17 +29,12 @@
 
 	const getIconName = (type: Evidence['type']): string => {
 		switch (type) {
-			case 'document':
-				return 'file-text';
-			case 'image':
-				return 'image';
-			case 'video':
-				return 'video';
-			case 'audio':
-				return 'headphones';
-			case 'link':
-				return 'link';
-			default:return 'file-text';
+			case 'document': return 'file-text';
+			case 'image': return 'image';
+			case 'video': return 'video';
+			case 'audio': return 'headphones';
+			case 'link': return 'link';
+			default: return 'file-text';
 		}
 	};
 
@@ -50,13 +46,23 @@
 		return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 	};
 
-	const fileSize: number = $derived(Number(evidence?.metadata?.size ?? evidence?.fileSize ?? 0));
-	let isHovered = $state<boolean>(false);
-	let comparing = $state<boolean>(false);
+	const fileSize = $derived(Number(evidence?.metadata?.size ?? evidence?.fileSize ?? 0));
+	let isHovered = $state(false);
+	let comparing = $state(false);
 	let compareError: string | null = $state(null);
 
 	const evidenceType = $derived(evidence?.evidenceType ?? evidence?.type ?? 'document');
 	const iconName = $derived(getIconName(evidenceType));
+
+	function getTypeVariant(type: string): 'primary' | 'success' | 'warning' | 'destructive' | 'default' {
+		switch (type) {
+			case 'document': case 'link': return 'primary';
+			case 'image': return 'success';
+			case 'video': return 'primary';
+			case 'audio': return 'warning';
+			default: return 'default';
+		}
+	}
 
 	function handleMouseEnter() {
 		if (expandOnHover) isHovered = true;
@@ -97,129 +103,116 @@
 	}
 </script>
 
-<div
-	role="article"
-	class="bg-white border border-sand/20 rounded-xl overflow-hidden transition-all duration-200 shadow relative"
-	class:text-sm={compact}
-	class:cursor-grab={draggable}
-	class:scale-105={isHovered}
-	class:z-10={isHovered}
-	class:shadow-2xl={isHovered}
-	onmouseenter={handleMouseEnter}
-	onmouseleave={handleMouseLeave}
-	transition:scale={{
-	duration: 200, easing: quintOut }}
+<Card
+	variant="elevated"
+	padding="none"
+	class="overflow-hidden transition-all duration-200 {compact ? 'text-sm' : ''} {draggable ? 'cursor-grab' : ''} {isHovered ? 'scale-105 z-10 shadow-2xl' : ''}"
 >
-	<!-- Header -->
-	<div class="flex items-center justify-between px-3 py-3 bg-sand/5 border-b">
-		<div
-			class="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium border capitalize {evidenceType === 'document' ? 'bg-info/5 border-info/20' : ''} {evidenceType === 'image' ? 'bg-accent/5 border-accent/20' : ''} {evidenceType === 'video' ? 'bg-info/5 border-info/20' : ''} {evidenceType === 'audio' ? 'bg-warning/5 border-warning/20' : ''} {evidenceType === 'link' ? 'bg-info/5 border-info/20' : ''}"
-			data-type={evidenceType}
-			class:text-info={evidenceType === 'document' || evidenceType === 'video' || evidenceType === 'link'}
-			class:text-accent={evidenceType === 'image'}
-			class:text-warning={evidenceType === 'audio'}
-		>
-			<Icon name={iconName} size={16} />
-			<span>{evidenceType}</span>
-		</div>
-		<div class="flex items-center gap-1 opacity-0 group-hover:opacity-100">
-			{#if showCompare}
-				<button
-					class="flex items-center justify-center w-7 h-7 rounded text-sand/60 hover:bg-sand/10"
-					onclick={handleCompareClick}
-					title={comparing ? 'Analyzing...' : 'Analyze & compare'}
-					aria-busy={comparing}
-					disabled={comparing}
-				>
-					<Icon name="search" size={14} />
-				</button>
-			{/if}
-		</div>
-	</div>
-
-	<!-- Content -->
-	<div class="px-3 py-2">
-		<!-- Preview -->
-		{#if evidenceType === 'image' && evidence?.url}
-			<div class="relative w-full mb-3 rounded-lg overflow-hidden">
-				<img
-					src={evidence.url}
-					alt={evidence.title ?? 'evidence'}
-					loading="lazy"
-					class="w-full h-auto max-h-48 object-cover"
-					onerror={handleImageError}
-				/>
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div
+		role="article"
+		onmouseenter={handleMouseEnter}
+		onmouseleave={handleMouseLeave}
+	>
+		<!-- Header -->
+		<div class="flex items-center justify-between px-3 py-3 b-b b-sand/10">
+			<Badge variant={getTypeVariant(evidenceType)} size="sm" class="capitalize">
+				<Icon name={iconName} size={14} class="inline mr-1" />{evidenceType}
+			</Badge>
+			<div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+				{#if showCompare}
+					<button
+						class="flex items-center justify-center w-7 h-7 rounded text-sand/60 hover:bg-sand/10 transition"
+						onclick={handleCompareClick}
+						title={comparing ? 'Analyzing...' : 'Analyze & compare'}
+						aria-busy={comparing}
+						disabled={comparing}
+					>
+						<Icon name="search" size={14} />
+					</button>
+				{/if}
 			</div>
-		{:else if evidenceType === 'video' && evidence?.url}
-			<div class="relative w-full mb-3 rounded-lg overflow-hidden">
-				<video src={evidence.url} preload="metadata" controls={false} muted class="w-full h-auto max-h-48">
-					<track kind="captions" />
-				</video>
-				<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/60 rounded-full p-3">
-					<Icon name="video" size={24} />
+		</div>
+
+		<!-- Content -->
+		<div class="px-3 py-2">
+			<!-- Media Preview -->
+			{#if evidenceType === 'image' && evidence?.url}
+				<div class="relative w-full mb-3 rounded-lg overflow-hidden">
+					<img
+						src={evidence.url}
+						alt={evidence.title ?? 'evidence'}
+						loading="lazy"
+						class="w-full h-auto max-h-48 object-cover"
+						onerror={handleImageError}
+					/>
 				</div>
-			</div>
-		{/if}
-
-		<!-- Title and Description -->
-		<div class="flex flex-col gap-1">
-			<h3 class="font-semibold text-base text-sand leading-tight">
-				{evidence?.title}
-			</h3>
-			{#if evidence?.description && !compact}
-				<p class="text-sm text-sand/60 leading-snug">
-					{evidence.description}
-				</p>
+			{:else if evidenceType === 'video' && evidence?.url}
+				<div class="relative w-full mb-3 rounded-lg overflow-hidden">
+					<video src={evidence.url} preload="metadata" controls={false} muted class="w-full h-auto max-h-48">
+						<track kind="captions" />
+					</video>
+					<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/60 rounded-full p-3">
+						<Icon name="video" size={24} class="text-white" />
+					</div>
+				</div>
 			{/if}
 
-			<!-- Metadata -->
-			<div class="flex flex-wrap gap-2 mt-2">
-				{#if evidence?.metadata?.createdAt || evidence?.createdAt}
-					<span class="text-xs text-sand/40 bg-sand/10 px-2 py-0.5 rounded">
-						{new Date(String(evidence?.metadata?.createdAt ?? evidence?.createdAt ?? '')).toLocaleDateString()}
-					</span>
+			<!-- Title and Description -->
+			<div class="flex flex-col gap-1">
+				<h3 class="font-semibold text-base text-sand leading-tight">{evidence?.title}</h3>
+				{#if evidence?.description && !compact}
+					<p class="text-sm text-sand/60 leading-snug">{evidence.description}</p>
 				{/if}
-				{#if fileSize > 0}
-					<span class="text-xs text-sand/40 bg-sand/10 px-2 py-0.5 rounded">
-						{formatFileSize(fileSize)}
-					</span>
-				{/if}
-				{#if evidence?.metadata?.format}
-					<span class="text-xs text-sand/40 bg-sand/10 px-2 py-0.5 rounded">
-						{String(evidence.metadata.format).toUpperCase()}
-					</span>
-				{/if}
-			</div>
 
-			<!-- Tags -->
-			{#if evidence?.tags && evidence.tags.length > 0}
-				<div class="flex flex-wrap gap-1 mt-2">
-					{#each (Array.isArray(evidence.tags) ? evidence.tags.slice(0, 3) : []) as tag}
-						<span class="flex items-center gap-1 text-xs bg-info/10 text-info px-2 py-0.5 rounded border border-info/20">
-							<Icon name="tag" size={10} />
-							{tag}
-						</span>
-					{/each}
-					{#if evidence.tags.length > 3}
-						<span class="text-xs text-sand/60">+{evidence.tags.length - 3}</span>
+				<!-- Metadata -->
+				<div class="flex flex-wrap gap-2 mt-2">
+					{#if evidence?.metadata?.createdAt || evidence?.createdAt}
+						<Badge variant="default" size="sm">
+							{new Date(String(evidence?.metadata?.createdAt ?? evidence?.createdAt ?? '')).toLocaleDateString()}
+						</Badge>
+					{/if}
+					{#if fileSize > 0}
+						<Badge variant="default" size="sm">{formatFileSize(fileSize)}</Badge>
+					{/if}
+					{#if evidence?.metadata?.format}
+						<Badge variant="default" size="sm">{String(evidence.metadata.format).toUpperCase()}</Badge>
 					{/if}
 				</div>
+
+				<!-- Tags -->
+				{#if evidence?.tags && evidence.tags.length > 0}
+					<div class="flex flex-wrap gap-1 mt-2">
+						{#each (Array.isArray(evidence.tags) ? evidence.tags.slice(0, 3) : []) as tag}
+							<Badge variant="primary" size="sm">
+								<Icon name="tag" size={10} class="inline mr-1" />{tag}
+							</Badge>
+						{/each}
+						{#if evidence.tags.length > 3}
+							<span class="text-xs text-sand/60">+{evidence.tags.length - 3}</span>
+						{/if}
+					</div>
+				{/if}
+			</div>
+
+			<!-- Compare Error -->
+			{#if compareError}
+				<div class="mt-2 p-2 bg-danger/10 text-danger text-xs rounded">{compareError}</div>
 			{/if}
 		</div>
-	</div>
 
-	<!-- Footer link -->
-	{#if evidence?.url && evidenceType === 'link'}
-		<div class="px-3 py-3 border-t border-sand/20">
-			<a
-				href={evidence.url}
-				target="_blank"
-				rel="noopener noreferrer"
-				class="flex items-center gap-1 text-info hover:text-info text-sm font-medium"
-			>
-				<Icon name="link" size={14} />
-				Open Link
-			</a>
-		</div>
-	{/if}
-</div>
+		<!-- Footer link -->
+		{#if evidence?.url && evidenceType === 'link'}
+			<div class="px-3 py-3 b-t b-sand/10">
+				<a
+					href={evidence.url}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="flex items-center gap-1 text-info text-sm font-medium hover:underline"
+				>
+					<Icon name="link" size={14} />Open Link
+				</a>
+			</div>
+		{/if}
+	</div>
+</Card>
