@@ -9,7 +9,7 @@
 A production-ready AI document processing service with:
 
 - ✅ **File Upload & Processing**: PDF, TXT, RTF, DOCX, Images
-- ✅ **OCR Integration**: Text extraction from scanned documents  
+- ✅ **OCR Integration**: Text extraction from scanned documents
 - ✅ **GPU-Accelerated SIMD Parsing**: Concurrent Go routines for performance
 - ✅ **Vector Embeddings**: 384-dimensional embeddings with nomic-embed-text
 - ✅ **AI Summarization**: Legal document analysis with gemma3-legal model
@@ -55,7 +55,7 @@ func (s *EnhancedAIService) chunkTextConcurrent(text string, chunkSize int) ([]D
 // Intelligent file type detection and processing
 func (s *EnhancedAIService) extractTextWithOCR(filePath string, enableOCR bool) (string, *OCRResults, error) {
     fileExt := strings.ToLower(filepath.Ext(filePath))
-    
+
     switch fileExt {
     case ".pdf":
         return s.extractFromPDF(filePath, enableOCR)
@@ -255,7 +255,7 @@ Features:
 
 ### **Successful Test Results:**
 
-✅ **Text Document Processing**: 
+✅ **Text Document Processing**:
 - File: `test-document.txt` (1,332 bytes)
 - Processing Time: 72.37 seconds
 - Chunks Generated: 1 chunk (197 words)
@@ -271,7 +271,7 @@ Features:
 ✅ **Integration Health**:
 - Ollama: Healthy (gemma3-legal model active)
 - GPU Support: Enabled (NVIDIA RTX 3060 Ti detected)
-- Vector Embeddings: Working (nomic-embed-text model)
+- Vector Embeddings: Working (embeddinggemma:latest model)
 
 ---
 
@@ -357,7 +357,7 @@ gpu_utilization: 90%
 ### **Planned Features**
 1. **Enhanced OCR**: Tesseract GPU acceleration
 2. **PDF Parsing**: Advanced PDF libraries (unidoc.io)
-3. **Real-time Processing**: WebSocket streaming
+3. **Real-time Processing**: SSE, quic, WebSocket streaming
 4. **Vector Database**: Qdrant integration for similarity search
 5. **Batch API**: Multiple document processing endpoints
 6. **Analytics Dashboard**: Processing statistics and insights
@@ -375,7 +375,7 @@ gpu_utilization: 90%
 **All requirements successfully implemented:**
 
 - ✅ **File Upload**: Multi-format support (PDF, TXT, RTF, DOCX, Images)
-- ✅ **OCR Parsing**: Text extraction with confidence scoring
+- ✅ **OCR Parsing**: Text extraction with confidence ranking
 - ✅ **JSON Output**: Structured response with comprehensive metadata
 - ✅ **AI Summarization**: Legal document analysis with Ollama
 - ✅ **Vector Embeddings**: 384-dimensional embeddings for similarity search

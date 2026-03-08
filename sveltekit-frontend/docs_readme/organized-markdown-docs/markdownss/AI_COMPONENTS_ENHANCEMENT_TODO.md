@@ -26,7 +26,7 @@ async function enhancedOllamaChat(message: string, context?: any) {
       message,
       context: await ContextService.getCurrentContext(),
       conversationId: $currentConversation?.id,
-      model: "llama3", // or another local model
+      model: "gemma3-legal:latest", // or another local model
       temperature: 0.7,
       maxTokens: 1000,
       systemPrompt: generateLegalSystemPrompt(context),
@@ -184,7 +184,7 @@ async function processVoiceCommand(command: string) {
 #### 5. **Advanced Animation System**
 
 ```svelte
-<!-- ENHANCEMENT: Dynamic animation using Melt UI/Bits UI and SvelteKit best practices -->
+<!-- ENHANCEMENT: Dynamic animation using Bits UI v2 newer api svelte 5 runes uno.css styling and SvelteKit best practices -->
 <script lang="ts">
   import { spring, tweened } from 'svelte/motion';
   import { cubicOut } from 'svelte/easing';
@@ -222,7 +222,7 @@ async function processVoiceCommand(command: string) {
 #### 6. **Accessibility Enhancements**
 
 ```svelte
-<!-- IMPLEMENTATION: Full accessibility support using Melt UI/Bits UI -->
+<!-- IMPLEMENTATION: Full accessibility support using - ENHANCEMENT: Dynamic animation using Bits UI v2 newer api svelte 5 runes uno.css styling and SvelteKit best practices-->
 <Button
   variant="default"
   size="lg"
@@ -380,18 +380,18 @@ async function startCollaborativeSession() {
 ### Phase 2: Advanced Features
 
 1. 🔄 Voice integration (browser/local)
-2. 🔄 Advanced animation system (Melt UI/Bits UI)
+2. 🔄 Advanced animation system (Bits UI v2 newer api svelte 5 runes)
 3. 🔄 Smart notification system
 
 ### Phase 3: Intelligence Layer (Week 5-6)
 
 1. 🔄 ML for user patterns (pgvector, Drizzle)
 2. 🔄 Predictive suggestions
- comment this out for #  // 🔄 Collaborative AI features (socket.io)
+ comment this out for #  // 🔄 Collaborative AI features (sse)
 
 ### Phase 4: Production Polish (Week 7-8)
 
-1. 🔄 Full accessibility compliance (Melt UI/Bits UI)
+1. 🔄 Full accessibility compliance (Bits UI)
 2. 🔄 Performance optimization
 3. 🔄 Error handling and fallbacks
 
@@ -433,7 +433,7 @@ GET / api / analytics / patterns; // User pattern data
 
 ```bash
 npm install drizzle-orm drizzle-kit pg pgvector
-npm install @melt-ui/svelte @bits-ui/svelte
+npm install @bits-ui/svelte
 npm install socket.io-client
 npm install @microsoft/speech-sdk # (optional, for advanced voice)
 ```

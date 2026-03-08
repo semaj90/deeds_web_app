@@ -325,4 +325,76 @@ export class KMeansClusterer {
 	computeMetrics(embeddings: number[][], assignments: number[]): SilhouetteMetrics {
 		return computeSilhouette(embeddings, assignments, this.k);
 	}
+
+	/**
+	 * Count cross-cluster connections — documents that are near the boundary
+	 * between two clusters (within 10% of the distance to 2nd nearest centroid).
+	 * High cross-cluster count indicates topics that blend together.
+	 */
+	crossClusterConnections(
+		embeddings: number[][],
+		assignments: number[],
+		centroids: number[][]
+	): { pairs: Map<string, number>; totalBridgeDocs: number } {
+		const pairs = new Map<string, number>();
+		let totalBridgeDocs = 0;
+
+		for (let i = 0; i < embeddings.length; i++) {
+			const assigned = assignments[i];
+			const assignedDist = euclideanDistance(embeddings[i], centroids[assigned]);
+
+			// Find 2nd nearest centroid
+			let secondDist = Infinity;
+			let secondCluster = -1;
+			for (let c = 0; c < centroids.length; c++) {
+				if (c === assigned) continue;
+				const d = euclideanDistance(embeddings[i], centroids[c]);
+				if (d < secondDist) {
+					secondDist = d;
+					secondCluster = c;
+				}
+			}
+
+			// Bridge document: within 10% distance to 2nd cluster
+			if (secondCluster >= 0 && secondDist < assignedDist * 1.1) {
+				totalBridgeDocs++;
+				const pairKey = `${Math.min(assigned, secondCluster)}-${Math.max(assigned, secondCluster)}`;
+				pairs.set(pairKey, (pairs.get(pairKey) ?? 0) + 1);
+			}
+		}
+
+		return { pairs, totalBridgeDocs };
+	}
+
+	/**
+	 * Contextual pattern update — shift centroids toward high-feedback documents.
+	 * Documents with feedback > 0.5 (positive) pull their cluster centroid slightly
+	 * toward them, biasing future clustering toward user-preferred patterns.
+	 *
+	 * @param embeddings - Document embeddings
+	 * @param assignments - Current cluster assignments
+	 * @param centroids - Current centroids (mutated in-place)
+	 * @param feedbackScores - Map of document index → feedback score [0,1]
+	 * @param learningRate - How much centroids shift (0.04 default)
+	 */
+	contextualPatternUpdate(
+		embeddings: number[][],
+		assignments: number[],
+		centroids: number[][],
+		feedbackScores: Map<number, number>,
+		learningRate = 0.04
+	): void {
+		for (const [docIdx, feedback] of feedbackScores) {
+			if (feedback <= 0.5 || docIdx >= embeddings.length) continue;
+
+			const cluster = assignments[docIdx];
+			const centroid = centroids[cluster];
+			const embedding = embeddings[docIdx];
+			const weight = (feedback - 0.5) * 2 * learningRate; // Scale 0.5-1.0 → 0-learningRate
+
+			for (let d = 0; d < centroid.length; d++) {
+				centroid[d] += weight * (embedding[d] - centroid[d]);
+			}
+		}
+	}
 }

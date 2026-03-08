@@ -196,6 +196,71 @@ export function updateBehavior(metrics: Parameters<typeof detectBehavioralSignal
 	return currentState;
 }
 
+/**
+ * Analyze a webcam frame via the Ollama VLM endpoint (Gemma 3 SigLIP).
+ * Sends a base64 image to the multimodal model, parses the emotion label,
+ * and calls updateFaceEmotion() to update the composite state.
+ *
+ * @param imageBase64 - Base64-encoded webcam frame (JPEG/PNG)
+ * @param ollamaUrl - Ollama API base URL (default: /api/ollama for proxied access)
+ * @returns The updated EmotionState, or null if analysis failed
+ */
+export async function analyzeWebcamFrame(
+	imageBase64: string,
+	ollamaUrl: string = '/api/ollama'
+): Promise<EmotionState | null> {
+	if (!browser) return null;
+
+	const EMOTION_MAP: Record<string, FaceEmotion> = {
+		happy: 'happy', joy: 'happy', smile: 'happy', smiling: 'happy',
+		sad: 'sad', sadness: 'sad', unhappy: 'sad',
+		angry: 'angry', anger: 'angry', furious: 'angry',
+		fear: 'fear', afraid: 'fear', scared: 'fear', fearful: 'fear',
+		surprise: 'surprise', surprised: 'surprise', shocked: 'surprise',
+		disgust: 'disgust', disgusted: 'disgust',
+		neutral: 'neutral', calm: 'neutral',
+	};
+
+	try {
+		const res = await fetch(`${ollamaUrl}/api/chat`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				model: 'gemma3-legal:latest',
+				messages: [
+					{
+						role: 'user',
+						content: 'What emotion is this person expressing? Respond with ONLY one word: happy, sad, angry, fear, surprise, disgust, or neutral.',
+						images: [imageBase64],
+					},
+				],
+				stream: false,
+			}),
+		});
+
+		if (!res.ok) return null;
+
+		const data = await res.json();
+		const responseText = (data?.message?.content ?? '').toLowerCase().trim();
+
+		// Parse emotion from VLM response
+		let detectedEmotion: FaceEmotion = 'neutral';
+		let confidence = 0.6;
+
+		for (const [keyword, emotion] of Object.entries(EMOTION_MAP)) {
+			if (responseText.includes(keyword)) {
+				detectedEmotion = emotion;
+				confidence = 0.8; // VLM detection = higher confidence than keyword heuristic
+				break;
+			}
+		}
+
+		return updateFaceEmotion(detectedEmotion, confidence);
+	} catch {
+		return null;
+	}
+}
+
 /** Get current emotion state */
 export function getEmotionState(): EmotionState {
 	return currentState;

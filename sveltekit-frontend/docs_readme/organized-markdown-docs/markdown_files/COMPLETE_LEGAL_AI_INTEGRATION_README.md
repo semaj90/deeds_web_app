@@ -386,7 +386,7 @@ docker exec local-ollama ollama create gemma3-legal-enhanced -f /models/Gemma3-L
 
 ### Immediate Improvements
 - [ ] Add authentication/authorization system
-- [ ] Implement real-time WebSocket updates
+- [ ] Implement sse, real-time WebSocket updates
 - [ ] Add file upload handling for evidence
 - [ ] Create mobile-responsive design
 - [ ] Add export/import functionality

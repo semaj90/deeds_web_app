@@ -45,6 +45,13 @@ warmupTemplateCache().then(() => {
 // Idle re-engagement scanner (5-min interval, checks user activity → notifications)
 startIdleScanner();
 
+// Start typed RabbitMQ queue workers (concrete consumers for 4 queues)
+startQueueWorkers().then(() => {
+	console.log('[Boot] Queue workers active');
+}).catch((err) => {
+	console.warn('[Boot] Queue workers failed (non-fatal):', (err as Error).message);
+});
+
 // Option #6: Warm up export cache (pre-generate top 5 recent report exports)
 warmupExportCache().then(() => {
 	console.log('[Boot] Export cache warmed');
@@ -205,6 +212,22 @@ async function warmupLLMCache(): Promise<void> {
 		console.log(`[Boot] LLM warmup: Cached ${cached}/${commonQueries.length} common queries`);
 	} catch (err) {
 		console.warn('[Boot] LLM warmup failed:', (err as Error).message);
+	}
+}
+
+/**
+ * Start typed RabbitMQ queue workers via WorkerRegistry.
+ * All 7 queues get consumers. Partial failure = degraded, not crash.
+ */
+async function startQueueWorkers(): Promise<void> {
+	const { createDefaultRegistry } = await import('$lib/server/queue/queue-worker.js');
+
+	const registry = createDefaultRegistry();
+	const result = await registry.startAll();
+	console.log(`[Boot] Queue workers: ${result.started}/${result.started + result.failed} started`);
+
+	if (result.errors.length > 0) {
+		console.warn('[Boot] Queue worker errors:', result.errors.join('; '));
 	}
 }
 

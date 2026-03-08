@@ -4,9 +4,8 @@
 	let { children } = $props();
 
 	const navItems = [
-		{ href: '/error-brain', label: 'Dashboard' },
-		{ href: '/error-brain/runs', label: 'Runs' },
-		{ href: '/error-brain/config', label: 'Configuration' }
+		{ href: '/admin/error-brain', label: 'Dashboard' },
+		{ href: '/admin/error-brain/runs', label: 'Runs' },
 	];
 </script>
 

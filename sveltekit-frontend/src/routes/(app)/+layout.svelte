@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { onMount } from 'svelte';
 	import type { LayoutData } from './$types';
 	import CaseDocumentWriter from '$lib/components/legal-ai/CaseDocumentWriter.svelte';
 	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
@@ -16,6 +17,13 @@
 
 	let { data, children }: Props = $props();
 	let showDocumentWriter = $state(false);
+
+	// Dynamic import AccessibilityPanel to avoid bits-ui Dialog SSR TDZ crash
+	let AccessibilityPanel = $state<typeof import('$lib/components/ui/AccessibilityPanel.svelte').default | null>(null);
+	onMount(async () => {
+		const mod = await import('$lib/components/ui/AccessibilityPanel.svelte');
+		AccessibilityPanel = mod.default;
+	});
 
 	// Initialize user activity telemetry (typing/idle detection)
 	$effect(() => {
@@ -59,6 +67,9 @@
 <CodebaseSearch />
 <LegalCorpusSearch />
 <OfflineIndicator />
+{#if AccessibilityPanel}
+	<svelte:component this={AccessibilityPanel} />
+{/if}
 
 <!-- Toast Notifications Overlay -->
 {#if notificationStore.toasts.length > 0}

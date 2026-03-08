@@ -312,13 +312,13 @@ All database changes are production-ready after dev/staging testing. No data wil
 
 | # | Quick Win | Was | Now | Status |
 |---|-----------|-----|-----|--------|
-| 1 | Error Brain History UI | 90% | 100% | ✅ DONE — toggle panel + status stats + run history on /all-routes |
-| 2 | POI Vector Search UI | 70% | 95% | ✅ DONE — photos load + upload/delete/view UI wired |
-| 3 | Case Notes Versioning + FTS | 60% | 100% | ✅ DONE — DB tables + API + diff view + restore + FTS search + evidence linking + notes tab route |
-| 4 | Citation Tags | 20% | 40% | ✅ DONE — citation_tag_links M2M + CRUD API |
-| 5 | Infrastructure Restart | 85% | 85% | Pending — postgres/TensorRT/fastmcp DOWN |
-| 6 | Case Packet PDF Export | 60% | 90% | ✅ DONE — HTML export + citations section + download |
-| 7 | NES Modal for Notes | 60% | 60% | Pending — bits-ui Dialog SSR TDZ workaround |
+| 1 | Error Brain History UI | 90% | 75% | ⚠️ UI built (toggle panel + stats + run history on /all-routes) but backend API missing (`/api/internal/error-brain/*`) + component imports unresolved |
+| 2 | POI Vector Search UI | 70% | 95% | ✅ DONE — 6 API endpoints, 7-stage VLM pipeline, photo CRUD, vector search, face matching |
+| 3 | Case Notes Versioning + FTS | 60% | 100% | ✅ DONE — 3 DB tables + 8 API endpoints + PostgreSQL FTS + diff view + restore + evidence linking |
+| 4 | Citation Tags | 20% | 80% | ✅ DONE — citationTags table + full CRUD API (GET/POST/DELETE) + cache invalidation |
+| 5 | Infrastructure Restart | 85% | 85% | Pending — health checks work (`/api/health/services`), automated restart scripts missing |
+| 6 | Case Packet PDF Export | 60% | 95% | ✅ DONE — HTML export + citations + evidence + POI + notes sections + Redis caching + pdf-lib generator |
+| 7 | NES Modal for Notes | 60% | 90% | ✅ DONE — custom NesModal.svelte (SSR-safe, avoids bits-ui TDZ) + integrated with case notes editor. One corrupted NoteViewerModal.svelte remains |
 ---
 ## What's Left to Implement
 ### Client ↔ Server RAG Integration (~4h total)

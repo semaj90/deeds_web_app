@@ -257,6 +257,68 @@ export class SOMClusterer {
 	}
 
 	/**
+	 * Compute per-document novelty scores
+	 * Novelty = 1 - similarity to BMU (how far the document is from its cluster center)
+	 * High novelty = document doesn't fit neatly into any cluster = potentially interesting
+	 */
+	computeNovelty(data: number[][], somResult: SOMResult): number[] {
+		const noveltyScores: number[] = [];
+
+		for (let i = 0; i < data.length; i++) {
+			const neuronId = somResult.clusters[i];
+			const x = neuronId % somResult.gridWidth;
+			const y = Math.floor(neuronId / somResult.gridWidth);
+			const bmuDist = this.euclideanDistance(data[i], somResult.grid[x][y]);
+
+			// Normalize novelty: clamp distance to [0, 1]
+			// Typical embedding distances range 0-2 for L2-normed vectors
+			const novelty = Math.min(1, bmuDist / 2);
+			noveltyScores.push(novelty);
+		}
+
+		return noveltyScores;
+	}
+
+	/**
+	 * Count cross-cluster documents — documents whose BMU and 2nd-BMU
+	 * are in different grid regions (distance > 1 on the grid).
+	 * These are "bridge" documents connecting different topic areas.
+	 */
+	crossClusterCount(data: number[][], somResult: SOMResult): {
+		bridgeCount: number;
+		bridgeIndices: number[];
+	} {
+		const bridgeIndices: number[] = [];
+
+		for (let i = 0; i < data.length; i++) {
+			const [bmuX, bmuY] = this.findBMU(data[i]);
+
+			// Find 2nd BMU
+			let secondMinDist = Infinity;
+			let secondX = 0;
+			let secondY = 0;
+			for (let x = 0; x < this.gridWidth; x++) {
+				for (let y = 0; y < this.gridHeight; y++) {
+					if (x === bmuX && y === bmuY) continue;
+					const d = this.euclideanDistance(data[i], this.grid[x][y]);
+					if (d < secondMinDist) {
+						secondMinDist = d;
+						secondX = x;
+						secondY = y;
+					}
+				}
+			}
+
+			const gridDist = this.gridDistance(bmuX, bmuY, secondX, secondY);
+			if (gridDist > 1) {
+				bridgeIndices.push(i);
+			}
+		}
+
+		return { bridgeCount: bridgeIndices.length, bridgeIndices };
+	}
+
+	/**
 	 * Convert SOM result to ClusterResult format for API response
 	 */
 	static toClusterResult(

@@ -24,6 +24,7 @@ export interface RankedItem extends RankableItem {
 		courtScore: number;
 		recencyScore: number;
 		finalScore: number;
+		networkPosition?: 'CORE' | 'BRIDGE' | 'PERIPHERAL';
 	};
 }
 
@@ -73,11 +74,13 @@ const COURT_HIERARCHY: Record<string, number> = {
  *
  * @param items - Raw search results with score + metadata
  * @param citationCounts - Optional map of document ID → inbound citation count
+ * @param citationGraph - Optional CitationGraph for iterative PageRank authority scores
  * @returns Reranked items sorted by finalScore descending
  */
 export function legalPageRank(
 	items: RankableItem[],
-	citationCounts?: Map<string, number>
+	citationCounts?: Map<string, number>,
+	citationGraph?: { getAuthorityScore(id: string): number; getNetworkPosition(id: string): 'CORE' | 'BRIDGE' | 'PERIPHERAL' }
 ): RankedItem[] {
 	if (items.length === 0) return [];
 
@@ -96,9 +99,16 @@ export function legalPageRank(
 			// 1. Vector similarity (already 0-1 from cosine, but normalize across batch)
 			const vectorScore = item.score / maxVector;
 
-			// 2. Citation authority
-			const rawCitations = citationCounts?.get(item.id) ?? countInlineCitations(item);
-			const citationScore = Math.min(rawCitations / maxCitations, 1);
+			// 2. Citation authority — prefer graph PageRank when available
+			let citationScore: number;
+			let networkPosition: 'CORE' | 'BRIDGE' | 'PERIPHERAL' | undefined;
+			if (citationGraph) {
+				citationScore = citationGraph.getAuthorityScore(item.id);
+				networkPosition = citationGraph.getNetworkPosition(item.id);
+			} else {
+				const rawCitations = citationCounts?.get(item.id) ?? countInlineCitations(item);
+				citationScore = Math.min(rawCitations / maxCitations, 1);
+			}
 
 			// 3. Court hierarchy
 			const courtScore = scoreCourtAuthority(item);
@@ -120,7 +130,8 @@ export function legalPageRank(
 					citationScore,
 					courtScore,
 					recencyScore,
-					finalScore
+					finalScore,
+					networkPosition
 				}
 			};
 		})

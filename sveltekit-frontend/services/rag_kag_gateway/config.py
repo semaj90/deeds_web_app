@@ -32,5 +32,5 @@ OLLAMA_CHAT_MODEL = os.getenv("OLLAMA_CHAT_MODEL", "gemma3-legal:latest")
 EMBED_DIM = 768
 
 # API
-API_PORT = int(os.getenv("API_PORT", "8099"))
+API_PORT = int(os.getenv("API_PORT", "8098"))  # 8099 reserved for TRT-LLM Triton
 API_HOST = os.getenv("API_HOST", "0.0.0.0")

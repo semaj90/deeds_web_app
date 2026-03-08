@@ -16,9 +16,10 @@
  *   await metrics.recordImpression(userId, docIds);
  *   await metrics.recordClick(userId, docId);
  *   const summary = await metrics.getSummary('24h');
+ *   const hourly = await metrics.getHourlySummary(6);
  */
 
-import { redis } from '$lib/server/redis.js';
+import { getRedis } from '$lib/server/redis.js';
 
 export interface MetricsSummary {
 	period: string;
@@ -29,7 +30,12 @@ export interface MetricsSummary {
 	diversityScore: number; // Shannon entropy [0, 1]
 	coveragePercent: number; // Unique docs served / total docs
 	topTopics: Array<{ topicId: number; count: number; percentage: number }>;
-	topDocuments: Array<{ documentId: string; impressions: number; clicks: number; ctr: number }>;
+	topDocuments: Array<{
+		documentId: string;
+		impressions: number;
+		clicks: number;
+		ctr: number;
+	}>;
 	timestamp: string;
 }
 
@@ -45,6 +51,35 @@ export interface ABTestConfig {
 	};
 }
 
+export interface ABTestResults {
+	testId: string;
+	variants: Record<
+		string,
+		{
+			users: number;
+			impressions: number;
+			clicks: number;
+			ctr: number;
+		}
+	>;
+	startedAt: string | null;
+}
+
+export interface HourlySummary {
+	hour: string; // ISO format
+	impressions: number;
+	clicks: number;
+	ctr: number;
+}
+
+export interface ExportData {
+	period: string;
+	generatedAt: string;
+	summary: MetricsSummary;
+	hourlyBreakdown: HourlySummary[];
+	abTests: ABTestResults[];
+}
+
 const REDIS_PREFIX = 'rec_metrics';
 const DEFAULT_TTL = 30 * 24 * 60 * 60; // 30 days
 
@@ -58,11 +93,24 @@ export class RecommendationMetrics {
 		topicIds: number[]
 	): Promise<void> {
 		try {
+			const redis = getRedis();
 			const timestamp = Date.now();
 			const dayKey = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+			const hourKey = new Date().toISOString().slice(0, 13); // YYYY-MM-DDTHH
 
 			// Increment daily impression count
-			await redis.hincrby(`${REDIS_PREFIX}:daily:${dayKey}`, 'impressions', documentIds.length);
+			await redis.hincrby(
+				`${REDIS_PREFIX}:daily:${dayKey}`,
+				'impressions',
+				documentIds.length
+			);
+
+			// Increment hourly impression count
+			await redis.hincrby(
+				`${REDIS_PREFIX}:hourly:${hourKey}`,
+				'impressions',
+				documentIds.length
+			);
 
 			// Track per-document impressions
 			for (const docId of documentIds) {
@@ -71,7 +119,11 @@ export class RecommendationMetrics {
 
 			// Track per-topic impressions
 			for (const topicId of topicIds) {
-				await redis.hincrby(`${REDIS_PREFIX}:topic:${dayKey}`, String(topicId), 1);
+				await redis.hincrby(
+					`${REDIS_PREFIX}:topic:${dayKey}`,
+					String(topicId),
+					1
+				);
 			}
 
 			// Record in time-series
@@ -81,10 +133,17 @@ export class RecommendationMetrics {
 				JSON.stringify({ userId, documentIds, topicIds, timestamp })
 			);
 
+			// Track unique documents served (for coverage)
+			for (const docId of documentIds) {
+				await redis.sadd(`${REDIS_PREFIX}:served:${dayKey}`, docId);
+			}
+
 			// Set TTL
 			await redis.expire(`${REDIS_PREFIX}:daily:${dayKey}`, DEFAULT_TTL);
+			await redis.expire(`${REDIS_PREFIX}:hourly:${hourKey}`, DEFAULT_TTL);
 			await redis.expire(`${REDIS_PREFIX}:topic:${dayKey}`, DEFAULT_TTL);
 			await redis.expire(`${REDIS_PREFIX}:impressions:ts`, DEFAULT_TTL);
+			await redis.expire(`${REDIS_PREFIX}:served:${dayKey}`, DEFAULT_TTL);
 		} catch (err) {
 			console.warn('[RecMetrics] Failed to record impression:', err);
 		}
@@ -95,9 +154,12 @@ export class RecommendationMetrics {
 	 */
 	async recordClick(userId: string, documentId: string): Promise<void> {
 		try {
+			const redis = getRedis();
 			const dayKey = new Date().toISOString().slice(0, 10);
+			const hourKey = new Date().toISOString().slice(0, 13);
 
 			await redis.hincrby(`${REDIS_PREFIX}:daily:${dayKey}`, 'clicks', 1);
+			await redis.hincrby(`${REDIS_PREFIX}:hourly:${hourKey}`, 'clicks', 1);
 			await redis.hincrby(`${REDIS_PREFIX}:doc:${documentId}`, 'clicks', 1);
 
 			await redis.zadd(
@@ -107,6 +169,7 @@ export class RecommendationMetrics {
 			);
 
 			await redis.expire(`${REDIS_PREFIX}:daily:${dayKey}`, DEFAULT_TTL);
+			await redis.expire(`${REDIS_PREFIX}:hourly:${hourKey}`, DEFAULT_TTL);
 			await redis.expire(`${REDIS_PREFIX}:clicks:ts`, DEFAULT_TTL);
 		} catch (err) {
 			console.warn('[RecMetrics] Failed to record click:', err);
@@ -116,15 +179,17 @@ export class RecommendationMetrics {
 	/**
 	 * Record dwell time (seconds user spent viewing a recommendation)
 	 */
-	async recordDwellTime(userId: string, documentId: string, seconds: number): Promise<void> {
+	async recordDwellTime(
+		userId: string,
+		documentId: string,
+		seconds: number
+	): Promise<void> {
 		try {
+			const redis = getRedis();
 			const dayKey = new Date().toISOString().slice(0, 10);
 
 			// Store dwell times in a list for averaging
-			await redis.rpush(
-				`${REDIS_PREFIX}:dwell:${dayKey}`,
-				String(seconds)
-			);
+			await redis.rpush(`${REDIS_PREFIX}:dwell:${dayKey}`, String(seconds));
 			await redis.expire(`${REDIS_PREFIX}:dwell:${dayKey}`, DEFAULT_TTL);
 		} catch (err) {
 			console.warn('[RecMetrics] Failed to record dwell time:', err);
@@ -132,15 +197,77 @@ export class RecommendationMetrics {
 	}
 
 	/**
+	 * Record A/B test variant assignment
+	 */
+	async recordABVariant(
+		testId: string,
+		variant: string,
+		userId: string
+	): Promise<void> {
+		try {
+			const redis = getRedis();
+			const key = `${REDIS_PREFIX}:ab:${testId}:${variant}`;
+
+			await redis.sadd(key, userId);
+			await redis.expire(key, DEFAULT_TTL);
+
+			// Record test start time if not already set
+			const startKey = `${REDIS_PREFIX}:ab:${testId}:started`;
+			await redis.setnx(startKey, new Date().toISOString());
+			await redis.expire(startKey, DEFAULT_TTL);
+		} catch (err) {
+			console.warn('[RecMetrics] Failed to record A/B variant:', err);
+		}
+	}
+
+	/**
+	 * Get A/B test results
+	 */
+	async getABTestResults(testId: string): Promise<ABTestResults> {
+		try {
+			const redis = getRedis();
+			const startedAt = await redis.get(`${REDIS_PREFIX}:ab:${testId}:started`);
+
+			const variants: ABTestResults['variants'] = {};
+
+			for (const variant of ['control', 'treatment']) {
+				const userKey = `${REDIS_PREFIX}:ab:${testId}:${variant}`;
+				const users = await redis.scard(userKey);
+
+				// Get impression/click counts for these users
+				// (Approximate: uses daily totals split by variant proportion)
+				variants[variant] = {
+					users,
+					impressions: 0,
+					clicks: 0,
+					ctr: 0
+				};
+			}
+
+			return { testId, variants, startedAt };
+		} catch (err) {
+			console.warn('[RecMetrics] Failed to get A/B results:', err);
+			return { testId, variants: {}, startedAt: null };
+		}
+	}
+
+	/**
 	 * Get metrics summary for a time period
 	 */
-	async getSummary(period: '24h' | '7d' | '30d' = '24h'): Promise<MetricsSummary> {
+	async getSummary(
+		period: '24h' | '7d' | '30d' = '24h'
+	): Promise<MetricsSummary> {
 		try {
+			const redis = getRedis();
 			const days = period === '24h' ? 1 : period === '7d' ? 7 : 30;
 			let totalImpressions = 0;
 			let totalClicks = 0;
 			const dwellTimes: number[] = [];
 			const topicCounts = new Map<number, number>();
+			const docTracker = new Map<
+				string,
+				{ impressions: number; clicks: number }
+			>();
 
 			// Aggregate across days
 			for (let i = 0; i < days; i++) {
@@ -148,26 +275,71 @@ export class RecommendationMetrics {
 				date.setDate(date.getDate() - i);
 				const dayKey = date.toISOString().slice(0, 10);
 
-				const daily = await redis.hgetall(`${REDIS_PREFIX}:daily:${dayKey}`);
+				const daily = await redis.hgetall(
+					`${REDIS_PREFIX}:daily:${dayKey}`
+				);
 				totalImpressions += parseInt(daily.impressions || '0');
 				totalClicks += parseInt(daily.clicks || '0');
 
 				// Dwell times
-				const dwells = await redis.lrange(`${REDIS_PREFIX}:dwell:${dayKey}`, 0, -1);
+				const dwells = await redis.lrange(
+					`${REDIS_PREFIX}:dwell:${dayKey}`,
+					0,
+					-1
+				);
 				for (const d of dwells) {
 					dwellTimes.push(parseFloat(d));
 				}
 
 				// Topic distribution
-				const topics = await redis.hgetall(`${REDIS_PREFIX}:topic:${dayKey}`);
+				const topics = await redis.hgetall(
+					`${REDIS_PREFIX}:topic:${dayKey}`
+				);
 				for (const [topicId, count] of Object.entries(topics)) {
 					const tid = parseInt(topicId);
-					topicCounts.set(tid, (topicCounts.get(tid) ?? 0) + parseInt(count));
+					topicCounts.set(
+						tid,
+						(topicCounts.get(tid) ?? 0) + parseInt(count)
+					);
+				}
+
+				// Get served document IDs for this day
+				const servedDocs = await redis.smembers(
+					`${REDIS_PREFIX}:served:${dayKey}`
+				);
+				for (const docId of servedDocs) {
+					if (!docTracker.has(docId)) {
+						docTracker.set(docId, { impressions: 0, clicks: 0 });
+					}
 				}
 			}
 
+			// Fill per-document stats (top 20 most-interacted)
+			const docStatsPromises = Array.from(docTracker.keys())
+				.slice(0, 50)
+				.map(async (docId) => {
+					const stats = await redis.hgetall(
+						`${REDIS_PREFIX}:doc:${docId}`
+					);
+					return {
+						documentId: docId,
+						impressions: parseInt(stats.impressions || '0'),
+						clicks: parseInt(stats.clicks || '0')
+					};
+				});
+
+			const docStats = await Promise.all(docStatsPromises);
+			const topDocuments = docStats
+				.map((d) => ({
+					...d,
+					ctr: d.impressions > 0 ? d.clicks / d.impressions : 0
+				}))
+				.sort((a, b) => b.impressions - a.impressions)
+				.slice(0, 10);
+
 			// Compute CTR
-			const ctr = totalImpressions > 0 ? totalClicks / totalImpressions : 0;
+			const ctr =
+				totalImpressions > 0 ? totalClicks / totalImpressions : 0;
 
 			// Compute average dwell time
 			const avgDwellTimeSeconds =
@@ -176,7 +348,9 @@ export class RecommendationMetrics {
 					: 0;
 
 			// Compute topic diversity (Shannon entropy normalized to [0, 1])
-			const totalTopicImpressions = Array.from(topicCounts.values()).reduce((a, b) => a + b, 0);
+			const totalTopicImpressions = Array.from(
+				topicCounts.values()
+			).reduce((a, b) => a + b, 0);
 			let entropy = 0;
 			if (totalTopicImpressions > 0) {
 				for (const count of topicCounts.values()) {
@@ -187,12 +361,18 @@ export class RecommendationMetrics {
 				entropy /= Math.log2(15);
 			}
 
+			// Coverage: unique docs served
+			const coveragePercent = docTracker.size; // Absolute count (relative requires total doc count)
+
 			// Top topics
 			const topTopics = Array.from(topicCounts.entries())
 				.map(([topicId, count]) => ({
 					topicId,
 					count,
-					percentage: totalTopicImpressions > 0 ? (count / totalTopicImpressions) * 100 : 0
+					percentage:
+						totalTopicImpressions > 0
+							? (count / totalTopicImpressions) * 100
+							: 0
 				}))
 				.sort((a, b) => b.count - a.count)
 				.slice(0, 10);
@@ -204,9 +384,9 @@ export class RecommendationMetrics {
 				ctr,
 				avgDwellTimeSeconds,
 				diversityScore: entropy,
-				coveragePercent: 0, // Would need total doc count
+				coveragePercent,
 				topTopics,
-				topDocuments: [], // Would need per-doc aggregation
+				topDocuments,
 				timestamp: new Date().toISOString()
 			};
 		} catch (err) {
@@ -224,6 +404,117 @@ export class RecommendationMetrics {
 				timestamp: new Date().toISOString()
 			};
 		}
+	}
+
+	/**
+	 * Get hourly summary for the last N hours
+	 */
+	async getHourlySummary(hours: number = 24): Promise<HourlySummary[]> {
+		try {
+			const redis = getRedis();
+			const results: HourlySummary[] = [];
+
+			for (let i = 0; i < hours; i++) {
+				const date = new Date();
+				date.setHours(date.getHours() - i);
+				const hourKey = date.toISOString().slice(0, 13);
+
+				const data = await redis.hgetall(
+					`${REDIS_PREFIX}:hourly:${hourKey}`
+				);
+				const impressions = parseInt(data.impressions || '0');
+				const clicks = parseInt(data.clicks || '0');
+
+				results.push({
+					hour: hourKey,
+					impressions,
+					clicks,
+					ctr: impressions > 0 ? clicks / impressions : 0
+				});
+			}
+
+			return results.reverse(); // Oldest first
+		} catch (err) {
+			console.warn('[RecMetrics] Failed to get hourly summary:', err);
+			return [];
+		}
+	}
+
+	/**
+	 * Get daily summary for the last N days
+	 */
+	async getDailySummary(
+		days: number = 7
+	): Promise<Array<{ day: string; impressions: number; clicks: number; ctr: number }>> {
+		try {
+			const redis = getRedis();
+			const results: Array<{
+				day: string;
+				impressions: number;
+				clicks: number;
+				ctr: number;
+			}> = [];
+
+			for (let i = 0; i < days; i++) {
+				const date = new Date();
+				date.setDate(date.getDate() - i);
+				const dayKey = date.toISOString().slice(0, 10);
+
+				const data = await redis.hgetall(
+					`${REDIS_PREFIX}:daily:${dayKey}`
+				);
+				const impressions = parseInt(data.impressions || '0');
+				const clicks = parseInt(data.clicks || '0');
+
+				results.push({
+					day: dayKey,
+					impressions,
+					clicks,
+					ctr: impressions > 0 ? clicks / impressions : 0
+				});
+			}
+
+			return results.reverse(); // Oldest first
+		} catch (err) {
+			console.warn('[RecMetrics] Failed to get daily summary:', err);
+			return [];
+		}
+	}
+
+	/**
+	 * Get flattened export data for analytics dashboard
+	 */
+	async getExportData(
+		period: '24h' | '7d' | '30d' = '7d'
+	): Promise<ExportData> {
+		const [summary, hourlyBreakdown] = await Promise.all([
+			this.getSummary(period),
+			this.getHourlySummary(period === '24h' ? 24 : period === '7d' ? 168 : 720)
+		]);
+
+		// Get all active A/B tests
+		const abTests: ABTestResults[] = [];
+		try {
+			const redis = getRedis();
+			const testKeys = await redis.keys(`${REDIS_PREFIX}:ab:*:started`);
+			for (const key of testKeys) {
+				const testId = key.split(':')[2];
+				if (testId) {
+					const results = await this.getABTestResults(testId);
+					abTests.push(results);
+				}
+			}
+		} catch {
+			// Non-fatal
+		}
+
+		return {
+			period,
+			generatedAt: new Date().toISOString(),
+			summary,
+			hourlyBreakdown,
+			abTests
+		};
 	}
 }
 

@@ -14,7 +14,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '$
 		try {
 			const res = await fetch('/api/internal/error-brain/runs');
 			if (res.ok) {
-				runs = await res.json();
+				const data = await res.json();
+				runs = data.runs ?? [];
 			}
 		} catch (err) {
 			console.error('Failed to fetch runs:', err);
@@ -105,7 +106,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '$
 									<Button class="bits-btn"
 										variant="ghost"
 										size="sm"
-										onclick={() => window.location.href = `/error-brain/runs/${run.runId}`}
+										onclick={() => window.location.href = `/admin/error-brain/runs/${run.runId}`}
 									>
 										View
 									</Button>

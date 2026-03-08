@@ -200,7 +200,7 @@ export class RabbitMQManager extends EventEmitter {
         console.log('👂 All 7 RabbitMQ consumers started');
     }
 
-    private async consume(queue: string, handler: (msg: AmqpMessage) => Promise<void>) {
+    async consume(queue: string, handler: (msg: AmqpMessage) => Promise<void>) {
         if (this.channel) {
             await this.channel.consume(queue, (msg) => handler(msg), { noAck: false });
         }
@@ -468,6 +468,16 @@ export class RabbitMQManager extends EventEmitter {
     async publishAnalyticsEvent(data: { eventType: string; payload: Record<string, unknown> }): Promise<void> {
         if (!this.isReady()) return;
         await this.publish(this.exchanges.analytics, `analytics.${data.eventType}`, data);
+    }
+
+    async publishVectorIndex(data: { id: string; vector: number[]; collection: string; payload?: Record<string, unknown> }): Promise<void> {
+        if (!this.isReady()) return;
+        await this.publish(this.exchanges.vector_updates, 'vector.index.document', data);
+    }
+
+    async publishDocumentEmbed(data: { documentId: string; text: string; collection?: string; metadata?: Record<string, unknown> }): Promise<void> {
+        if (!this.isReady()) return;
+        await this.publish(this.exchanges.document_processing, 'document.embed', data);
     }
 
     private async publish(exchange: string, routingKey: string, data: any): Promise<void> {

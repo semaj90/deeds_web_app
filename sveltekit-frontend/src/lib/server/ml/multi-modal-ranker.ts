@@ -1,11 +1,13 @@
 /**
  * Multi-Modal Recommendation Ranker
- * Combines 5 signals for legal document recommendation:
- *   1. Vector Similarity (0.35): Cosine similarity to query embedding
- *   2. Tag Overlap (0.20): Shared statute/entity/practice area tags
- *   3. Topic Affinity (0.20): Document membership in query-related topics
- *   4. Graph Centrality (0.15): Neo4j connection strength to related cases/evidence
- *   5. Profile Match (0.10): User role + practice area alignment
+ * Combines 7 signals for legal document recommendation:
+ *   1. Vector Similarity (0.30): Cosine similarity to query embedding
+ *   2. Tag Overlap (0.18): Shared statute/entity/practice area tags
+ *   3. Topic Affinity (0.18): Document membership in query-related topics
+ *   4. Graph Centrality (0.12): Neo4j connection strength to related cases/evidence
+ *   5. Profile Match (0.07): User role + practice area alignment
+ *   6. Feedback Boost (0.08): User feedback history (running average with decay)
+ *   7. Novelty Score (0.07): Penalizes redundant results similar to already-returned docs
  *
  * All scores normalized to [0, 1] before weighting.
  * Usage:
@@ -17,6 +19,7 @@ import { cosineSimilarity } from '$lib/ai/client-embed.js';
 import { db } from '$lib/server/db/client';
 import { documentTopics, userInteractionHistory } from '$lib/server/db/schema-postgres';
 import { eq, and } from 'drizzle-orm';
+import { feedbackStore } from '$lib/server/ml/feedback-store.js';
 
 export interface RankingSignal {
 	vectorSimilarity: number; // [0, 1] cosine similarity
@@ -24,7 +27,9 @@ export interface RankingSignal {
 	topicAffinity: number; // [0, 1] max topic membership probability
 	graphCentrality: number; // [0, 1] normalized Neo4j centrality
 	profileMatch: number; // [0, 1] user preference alignment
-	finalScore: number; // Weighted combination of 5 signals
+	feedbackBoost: number; // [0, 1] user feedback running average
+	noveltyScore: number; // [0, 1] 1=novel, 0=redundant
+	finalScore: number; // Weighted combination of 7 signals
 }
 
 export interface RankedDocument {
@@ -45,13 +50,15 @@ export interface DocumentCandidate {
 	caseIds?: string[];
 }
 
-// Weights for the 5 signals (sum = 1.0)
+// Weights for the 7 signals (sum = 1.0)
 const SIGNAL_WEIGHTS = {
-	vectorSimilarity: 0.35,
-	tagOverlap: 0.20,
-	topicAffinity: 0.20,
-	graphCentrality: 0.15,
-	profileMatch: 0.10
+	vectorSimilarity: 0.30,
+	tagOverlap: 0.18,
+	topicAffinity: 0.18,
+	graphCentrality: 0.12,
+	profileMatch: 0.07,
+	feedbackBoost: 0.08,
+	noveltyScore: 0.07
 };
 
 /**
@@ -159,13 +166,21 @@ export class MultiModalRanker {
 			this.userTopicPreferences = await inferUserTopicPreferences(this.userId);
 		}
 
+		// Track already-returned embeddings for novelty computation
+		const returnedEmbeddings: number[][] = [];
+
 		// Compute all signals for each candidate
 		const rankedWithSignals = candidates.map((doc) => {
+			// Compute novelty relative to already-processed candidates
+			const similarities = returnedEmbeddings.map(emb => cosineSimilarity(doc.embedding, emb));
+			const noveltyScore = feedbackStore.getNoveltyPenalty(similarities);
+
 			const signals = this.computeSignals(
 				queryEmbedding,
 				queryTags,
 				doc,
-				this.userTopicPreferences!
+				this.userTopicPreferences!,
+				noveltyScore
 			);
 
 			const finalScore =
@@ -173,7 +188,11 @@ export class MultiModalRanker {
 				SIGNAL_WEIGHTS.tagOverlap * signals.tagOverlap +
 				SIGNAL_WEIGHTS.topicAffinity * signals.topicAffinity +
 				SIGNAL_WEIGHTS.graphCentrality * signals.graphCentrality +
-				SIGNAL_WEIGHTS.profileMatch * signals.profileMatch;
+				SIGNAL_WEIGHTS.profileMatch * signals.profileMatch +
+				SIGNAL_WEIGHTS.feedbackBoost * signals.feedbackBoost +
+				SIGNAL_WEIGHTS.noveltyScore * signals.noveltyScore;
+
+			returnedEmbeddings.push(doc.embedding);
 
 			return {
 				documentId: doc.id,
@@ -197,7 +216,8 @@ export class MultiModalRanker {
 		queryEmbedding: number[],
 		queryTags: string[],
 		document: DocumentCandidate,
-		userTopicPreferences: Map<number, number>
+		userTopicPreferences: Map<number, number>,
+		noveltyScore = 1.0
 	): RankingSignal {
 		// Signal 1: Vector Similarity (cosine)
 		const vectorSimilarity = cosineSimilarity(queryEmbedding, document.embedding);
@@ -223,12 +243,19 @@ export class MultiModalRanker {
 		// In production: query user role + practice area vs document case types
 		const profileMatch = 0.5;
 
+		// Signal 6: Feedback Boost (user rating history with decay)
+		const feedbackBoost = feedbackStore.getFeedbackBoost(document.id);
+
+		// Signal 7: Novelty Score (passed in from caller)
+
 		return {
 			vectorSimilarity,
 			tagOverlap,
 			topicAffinity,
 			graphCentrality,
 			profileMatch,
+			feedbackBoost,
+			noveltyScore,
 			finalScore: 0 // Will be computed by caller
 		};
 	}
@@ -260,6 +287,16 @@ export class MultiModalRanker {
 
 		if (signals.profileMatch > 0.6) {
 			tokens.push('Matches Your Practice Area');
+		}
+
+		if (signals.feedbackBoost > 0.7) {
+			tokens.push(`Positively Rated (${(signals.feedbackBoost * 100).toFixed(0)}%)`);
+		}
+
+		if (signals.noveltyScore > 0.8) {
+			tokens.push('Highly Novel Result');
+		} else if (signals.noveltyScore < 0.3) {
+			tokens.push('Similar to Other Results');
 		}
 
 		return tokens.length > 0 ? tokens : ['Document recommended'];

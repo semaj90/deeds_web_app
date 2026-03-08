@@ -35,16 +35,32 @@ export interface EmbeddingCacheEntry {
 	ttlMs: number;
 }
 
+export interface VLMCacheEntry {
+	result: {
+		labels: Array<{ label: string; confidence: number }>;
+		description: string;
+		analysisType: 'emotion' | 'document' | 'evidence' | 'general';
+	};
+	imageHash: string;
+	model: string;
+	ts: number;
+	lastAccess: number;
+	ttlMs: number;
+}
+
 // Configuration
 const VECTOR_CACHE_MAX_ITEMS = Number(process.env.VECTOR_CACHE_MAX_ITEMS ?? 500);
 const VECTOR_TTL_MS = Number(process.env.VECTOR_CACHE_TTL_MS ?? 30 * 60 * 1000);
 const EMBEDDING_TTL_MS = Number(process.env.EMBEDDING_CACHE_TTL_MS ?? 60 * 60 * 1000);
+const VLM_TTL_MS = Number(process.env.VLM_CACHE_TTL_MS ?? 24 * 60 * 60 * 1000); // 24h — VLM results are stable
 const REDIS_VECTOR_PREFIX = 'vector:';
 const REDIS_EMBEDDING_PREFIX = 'embedding:';
+const REDIS_VLM_PREFIX = 'vlm:';
 
 // Memory caches with LRU eviction
 const vectorCache: Map<string, VectorCacheEntry> = new Map();
 const embeddingCache: Map<string, EmbeddingCacheEntry> = new Map();
+const vlmCache: Map<string, VLMCacheEntry> = new Map();
 
 function getRedisClient(): any | null {
 	return ((redisService as any).getClient?.() || (globalThis as any).__REDIS) ?? null;
@@ -292,19 +308,119 @@ export async function setEmbeddingCache(
 	}
 }
 
+// ── VLM Cache ─────────────────────────────────────────────────────────
+
+/**
+ * Generate cache key for VLM analysis results.
+ * Uses SHA256 of image bytes + analysis type for exact-match dedup.
+ */
+function generateVLMKey(imageHash: string, analysisType: string): string {
+	const keyData = { imageHash, analysisType };
+	return crypto.createHash('sha256').update(JSON.stringify(keyData)).digest('hex').substring(0, 16);
+}
+
+function evictVLMCache(): void {
+	const now = Date.now();
+	for (const [k, v] of vlmCache) {
+		if (now - v.ts > v.ttlMs) vlmCache.delete(k);
+	}
+	while (vlmCache.size > VECTOR_CACHE_MAX_ITEMS) {
+		const oldestKey = vlmCache.keys().next().value;
+		if (oldestKey) vlmCache.delete(oldestKey);
+	}
+}
+
+/**
+ * Get cached VLM analysis result.
+ * Cache key = SHA256(image bytes) + analysis type.
+ * Eliminates redundant VLM inference for identical images.
+ */
+export async function getVLMCache(
+	imageHash: string,
+	analysisType: string = 'general'
+): Promise<{ entry: VLMCacheEntry | null; source: string | null }> {
+	const key = generateVLMKey(imageHash, analysisType);
+	const now = Date.now();
+
+	const memEntry = vlmCache.get(key);
+	if (memEntry && now - memEntry.ts < memEntry.ttlMs) {
+		memEntry.lastAccess = now;
+		vlmCache.delete(key);
+		vlmCache.set(key, memEntry);
+		return { entry: memEntry, source: 'memory' };
+	}
+
+	const redis = getRedisClient();
+	if (redis) {
+		try {
+			const redisKey = `${REDIS_VLM_PREFIX}${key}`;
+			const cached = await redis.get(redisKey);
+			if (cached) {
+				const entry: VLMCacheEntry = JSON.parse(cached);
+				entry.lastAccess = now;
+				vlmCache.set(key, entry);
+				evictVLMCache();
+				return { entry, source: 'redis' };
+			}
+		} catch (error) {
+			console.warn('[VLMCache] Redis get failed:', error);
+		}
+	}
+
+	return { entry: null, source: null };
+}
+
+/**
+ * Cache VLM analysis result.
+ * Keyed by image SHA256 hash + analysis type for exact-match dedup.
+ */
+export async function setVLMCache(
+	imageHash: string,
+	result: VLMCacheEntry['result'],
+	model: string = 'gemma3-legal'
+): Promise<void> {
+	const key = generateVLMKey(imageHash, result.analysisType);
+	const now = Date.now();
+
+	const entry: VLMCacheEntry = {
+		result,
+		imageHash,
+		model,
+		ts: now,
+		lastAccess: now,
+		ttlMs: VLM_TTL_MS,
+	};
+
+	vlmCache.set(key, entry);
+	evictVLMCache();
+
+	const redis = getRedisClient();
+	if (redis) {
+		try {
+			const redisKey = `${REDIS_VLM_PREFIX}${key}`;
+			const ttlSeconds = Math.round(VLM_TTL_MS / 1000);
+			await redis.setex(redisKey, ttlSeconds, JSON.stringify(entry));
+		} catch (error) {
+			console.warn('[VLMCache] Redis set failed:', error);
+		}
+	}
+}
+
 /**
  * Clear vector cache
  */
 export async function clearVectorCache(): Promise<void> {
 	vectorCache.clear();
 	embeddingCache.clear();
+	vlmCache.clear();
 
 	const redis = getRedisClient();
 	if (redis) {
 		try {
 			const vectorKeys = await redis.keys(`${REDIS_VECTOR_PREFIX}*`);
 			const embeddingKeys = await redis.keys(`${REDIS_EMBEDDING_PREFIX}*`);
-			const allKeys = [...vectorKeys, ...embeddingKeys];
+			const vlmKeys = await redis.keys(`${REDIS_VLM_PREFIX}*`);
+			const allKeys = [...vectorKeys, ...embeddingKeys, ...vlmKeys];
 			if (allKeys.length > 0) {
 				await redis.del(...allKeys);
 			}
@@ -319,20 +435,22 @@ export async function clearVectorCache(): Promise<void> {
  */
 export function getVectorCacheStats(): {
 	memory: { vectorEntries: number;
-	embeddingEntries: number; maxItems: number };
+	embeddingEntries: number; vlmEntries: number; maxItems: number };
 	config: {
-	vectorTtlMs: number, embeddingTtlMs: number;
+	vectorTtlMs: number; embeddingTtlMs: number; vlmTtlMs: number;
 	redisEnabled: boolean };
 } {
 	return {
 		memory: {
-	vectorEntries: vectorCache.size,
+			vectorEntries: vectorCache.size,
 			embeddingEntries: embeddingCache.size,
+			vlmEntries: vlmCache.size,
 			maxItems: VECTOR_CACHE_MAX_ITEMS
 		},
-	config: {
-	vectorTtlMs: VECTOR_TTL_MS,
+		config: {
+			vectorTtlMs: VECTOR_TTL_MS,
 			embeddingTtlMs: EMBEDDING_TTL_MS,
+			vlmTtlMs: VLM_TTL_MS,
 			redisEnabled: !!getRedisClient()
 		}
 	};

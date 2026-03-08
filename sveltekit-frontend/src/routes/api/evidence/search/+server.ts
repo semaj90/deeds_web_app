@@ -32,6 +32,7 @@ import { searchEvidenceViaGrpc } from '$lib/server/grpc/retrieval-client.js';
 import type { VectorSearchResult, VectorSearchOptions } from '$lib/server/db/pgvector-utils.js';
 import { productionLogger } from '$lib/server/production-logger.js';
 import { legalPageRank } from '$lib/server/retrieval/legal-pagerank.js';
+import { CitationGraph } from '$lib/server/retrieval/citation-graph.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
@@ -180,13 +181,24 @@ export async function POST({ request, locals }: RequestEvent) {
 		let reranked = rerankEvidence(rawHits, query, jurisdiction);
 
 		// 3b. Optional Legal PageRank: 40% vector + 30% citation + 20% court + 10% recency
+		//      Now uses CitationGraph for iterative PageRank authority scoring
 		if (useLPR) {
 			const lprItems = reranked.map((h) => ({ id: h.evidenceId, score: h.score, metadata: h.metadata as Record<string, unknown>, content: h.content }));
-			const ranked = legalPageRank(lprItems);
+
+			// Build citation graph + run PageRank for authority scoring
+			const citationGraph = new CitationGraph();
+			citationGraph.buildFromItems(lprItems);
+			const iterations = citationGraph.runPageRank();
+
+			const ranked = legalPageRank(lprItems, undefined, citationGraph);
 			reranked = ranked.map((r) => {
 				const orig = reranked.find((h) => h.evidenceId === r.id);
 				return { ...(orig ?? reranked[0]), score: r.score, rerank: { ...((orig ?? reranked[0]).rerank!), finalScore: r.score, legalPageRank: r.legalRank } };
 			}) as typeof reranked;
+
+			if (citationGraph.size > 0) {
+				console.log(`[Evidence Search] CitationGraph: ${citationGraph.size} nodes, ${citationGraph.edgeCount} edges, ${iterations} PageRank iterations`);
+			}
 		}
 
 		const hits = reranked.slice(0, limit);

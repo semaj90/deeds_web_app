@@ -39,7 +39,7 @@
 - [x] Implement embedding service (Ollama/nomic-embed integration)
 - [x] Create notes API endpoint with vector search
 - [x] Build saved notes store with IndexedDB + Fuse.js search
-- [x] Create NoteViewerModal with melt-ui integration
+- [x] Create NoteViewerModal with bits-ui v2 newer api svelte 5 runes integration
 - [x] Add MarkdownRenderer for LLM output display
 - [x] Implement Tauri integration for desktop markdown rendering
 - [x] Create demo page at /demo/notes for testing
@@ -160,7 +160,7 @@ cd ../desktop-app/sveltekit-frontend
 - ✅ Development server runs without errors
 - [ ] User can register and login
 - [ ] Cases can be created and managed
-- [ ] Canvas system works with POI functionality
+- [ ] Canvas system works with POI (person of interest) functionality
 - [ ] File upload and evidence management works
 - [ ] AI assistant provides responses
 - [ ] No TypeScript/Svelte errors

@@ -40,7 +40,8 @@ import PhoenixEventMonitor from '$lib/components/yorha/PhoenixEventMonitor.svelt
  try {
  const res = await fetch('/api/internal/error-brain/runs');
  if (res.ok) {
- runs = await res.json();
+ const data = await res.json();
+ runs = data.runs ?? [];
  }
  } catch (err) {
  console.error('Failed to fetch runs:', err);
@@ -199,18 +200,18 @@ import PhoenixEventMonitor from '$lib/components/yorha/PhoenixEventMonitor.svelt
  {#each runs as run}
  <div class="flex items-center justify-between p-4 border rounded-lg">
  <div class="space-y-1">
- <p class="text-sm font-medium">Run {run.runId}</p>
+ <p class="text-sm font-medium font-mono">{run.file_path ?? run.filePath ?? 'Unknown'}</p>
  <div class="flex gap-2 text-xs text-muted-foreground">
- <span>State: {run.state}</span>
- {#if run.filesScanned}
- <span>• Files: {run.filesScanned}</span>
+ <span>Status: {run.status ?? 'pending'}</span>
+ {#if run.error_code}
+ <span>• Code: {run.error_code}</span>
  {/if}
- {#if run.errorsFound}
- <span>• Errors: {run.errorsFound}</span>
+ {#if run.message}
+ <span>• {run.message.slice(0, 80)}</span>
  {/if}
  </div>
  </div>
- <Button class="bits-btn" variant="outline" size="sm">View Details</Button>
+ <Badge variant={run.status === 'fixed' ? 'default' : 'secondary'}>{run.status ?? 'pending'}</Badge>
  </div>
  {/each}
  </div>

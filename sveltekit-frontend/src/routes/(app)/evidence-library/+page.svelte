@@ -12,8 +12,11 @@
 	import RagDocumentGrid from '$lib/components/rag/RagDocumentGrid.svelte';
 	import ExpandGrid from '$lib/components/ui/ExpandGrid.svelte';
 	import { createViewTracker } from '$lib/utils/tracking';
+	import EvidenceRecall from '$lib/components/evidence/EvidenceRecall.svelte';
 
 	let { data }: { data: PageData } = $props();
+	let showRecall = $state(true);
+	let evidenceRecallRef: EvidenceRecall | undefined = $state();
 	let showReportGenerator = $state(false);
 	let showEvidenceCards = $state(false);
 	let showEvidenceStats = $state(false);
@@ -30,7 +33,7 @@
 	let selectedEvidence = $state<any>({ jsonData: { title: '', description: '', tags: [] } });
 	let viewTracker = $state<ReturnType<typeof createViewTracker> | null>(null);
 
-	// Track evidence views with auto-duration
+	// Track evidence views with auto-duration + record to recall history
 	$effect(() => {
 		if (showEvidenceModal && selectedEvidence?.id) {
 			viewTracker = createViewTracker(
@@ -38,6 +41,15 @@
 				data.caseId,
 				'evidence-library'
 			);
+			// Record to Evidence Recall history
+			evidenceRecallRef?.recordAccess({
+				evidenceId: selectedEvidence.id,
+				title: selectedEvidence.jsonData?.title ?? selectedEvidence.file_name ?? 'Evidence',
+				caseId: data.caseId,
+				evidenceType: selectedEvidence.evidence_type ?? 'document',
+				action: 'viewed',
+				timestamp: Date.now()
+			});
 		} else if (!showEvidenceModal && viewTracker) {
 			viewTracker.complete();
 			viewTracker = null;
@@ -112,7 +124,26 @@
 	>
 		View Evidence Detail
 	</button>
+	<button
+		class="report-toggle"
+		style="margin-left: 0.5rem; border-color: #a78bfa; color: #a78bfa; background: rgba(167,139,250,0.15);"
+		onclick={() => (showRecall = !showRecall)}
+	>
+		{showRecall ? 'Hide Recall' : 'Evidence Recall'}
+	</button>
 </div>
+{#if showRecall}
+	<div class="report-container">
+		<EvidenceRecall
+			bind:this={evidenceRecallRef}
+			maxItems={10}
+			onSelect={(item) => {
+				selectedEvidence = { id: item.evidenceId, jsonData: { title: item.title, description: '', tags: [] } };
+				showEvidenceModal = true;
+			}}
+		/>
+	</div>
+{/if}
 {#if showTimeline}
 	<div class="report-container">
 		<CustodyTimeline events={sampleCustodyEvents} currentStage="analysis" />

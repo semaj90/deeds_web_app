@@ -85,9 +85,12 @@
     if (typeof window !== 'undefined') {
       window.addEventListener('error', handleError);
       window.addEventListener('unhandledrejection', handleError);
-    }
 
-    // TODO: Add cleanup: return () => { window.removeEventListener('error', handleError); window.removeEventListener('unhandledrejection', handleError); };
+      return () => {
+        window.removeEventListener('error', handleError);
+        window.removeEventListener('unhandledrejection', handleError);
+      };
+    }
   });
 </script>
 

@@ -9,7 +9,7 @@ import { extractTextHybrid } from '$lib/server/ocr/hybrid.js';
 import { generateSingleEmbedding, generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { embedTexts } from '$lib/server/batch-embedder.js';
 import { chunkLegalDocument, type LegalChunk } from '$lib/server/indexer/legal-chunker.js';
-import { getEmbeddingCache, setEmbeddingCache } from '$lib/server/vector-cache.js';
+import { getEmbeddingCache, setEmbeddingCache, getVLMCache, setVLMCache } from '$lib/server/vector-cache.js';
 import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
 import { detectForensicPatterns } from '$lib/server/analysis/forensics.js';
 import { summarizeDocument } from '$lib/server/analysis/summarizer.js';
@@ -455,21 +455,39 @@ async function processAndEmbed(
 		});
 	} catch { /* non-fatal */ }
 
-	// 6b. VLM image analysis via /api/vision/analyze (non-fatal)
+	// 6b. VLM image analysis via /api/vision/analyze (non-fatal, cached by SHA256)
 	let visionAnalysis: { summary?: string; keyFindings?: string[]; suggestedTags?: string[] } | null = null;
 	const isImage = /\.(png|jpg|jpeg|tiff|tif|bmp|webp)$/i.test(fileName);
 	if (isImage) {
 		try {
-			const formDataVLM = new FormData();
-			formDataVLM.append('file', new Blob([new Uint8Array(buffer)]), fileName);
-			const visionRes = await fetch('http://localhost:5173/api/vision/analyze', {
-				method: 'POST',
-				body: formDataVLM,
-				signal: AbortSignal.timeout(30_000),
-			});
-			if (visionRes.ok) {
-				visionAnalysis = await visionRes.json() as any;
-				console.log(`[Upload] VLM analysis complete for ${fileName}: ${visionAnalysis?.keyFindings?.length ?? 0} findings`);
+			// Check VLM cache first (SHA256 of image bytes → cached result)
+			const imageHash = crypto.createHash('sha256').update(new Uint8Array(buffer)).digest('hex');
+			const { entry: cachedVLM } = await getVLMCache(imageHash, 'evidence');
+			if (cachedVLM) {
+				visionAnalysis = {
+					summary: cachedVLM.result.description,
+					keyFindings: cachedVLM.result.labels.map(l => `${l.label} (${(l.confidence * 100).toFixed(0)}%)`),
+					suggestedTags: cachedVLM.result.labels.map(l => l.label),
+				};
+				console.log(`[Upload] VLM cache HIT for ${fileName} (hash=${imageHash.slice(0, 8)})`);
+			} else {
+				const formDataVLM = new FormData();
+				formDataVLM.append('file', new Blob([new Uint8Array(buffer)]), fileName);
+				const visionRes = await fetch('http://localhost:5173/api/vision/analyze', {
+					method: 'POST',
+					body: formDataVLM,
+					signal: AbortSignal.timeout(30_000),
+				});
+				if (visionRes.ok) {
+					visionAnalysis = await visionRes.json() as any;
+					console.log(`[Upload] VLM analysis complete for ${fileName}: ${visionAnalysis?.keyFindings?.length ?? 0} findings`);
+					// Cache VLM result for future dedup
+					await setVLMCache(imageHash, {
+						labels: (visionAnalysis?.suggestedTags ?? []).map(t => ({ label: t, confidence: 0.8 })),
+						description: visionAnalysis?.summary ?? '',
+						analysisType: 'evidence',
+					}).catch(() => {});
+				}
 			}
 		} catch (err) {
 			console.warn('[Upload] VLM analysis skipped:', err);

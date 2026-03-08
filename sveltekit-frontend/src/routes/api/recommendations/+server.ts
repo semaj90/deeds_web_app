@@ -27,6 +27,8 @@ import type { RankedDocument, DocumentCandidate } from '$lib/server/ml/multi-mod
 import { MultiModalRanker, rankCombinedResults } from '$lib/server/ml/multi-modal-ranker.js';
 import { UserHistoryTracker } from '$lib/server/ml/user-history.js';
 import { requireAuth } from '$lib/server/auth-helpers.js';
+import { recommendationMetrics } from '$lib/server/ml/recommendation-metrics.js';
+import { encodeRecommendations, glyphsToBase64 } from '$lib/server/ml/recommendation-glyph.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { db } from '$lib/server/db/client';
 import { documentTopics, evidence, legalDocuments } from '$lib/server/db/schema-postgres.js';
@@ -196,9 +198,8 @@ export const POST: RequestHandler = async (event) => {
 			`[recommendations] Ranking complete in ${Date.now() - rankStartTime}ms: top ${rankedDocuments.length} selected`
 		);
 
-		// Step 4: Record interaction (view search results) for future recommendations
+		// Step 4: Record interaction + metrics (fire-and-forget)
 		const tracker = new UserHistoryTracker(auth.user.id);
-		// Non-blocking fire-and-forget
 		tracker
 			.recordView(
 				rankedDocuments[0]?.documentId || 'search',
@@ -208,6 +209,15 @@ export const POST: RequestHandler = async (event) => {
 			)
 			.catch((err) => console.warn('[recommendations] Failed to record interaction:', err));
 
+		// Record impression metrics for CTR/diversity tracking
+		const docIds = rankedDocuments.map(d => d.documentId);
+		const topicIds = rankedDocuments
+			.map(d => (d as any).topicId as number | undefined)
+			.filter((t): t is number => t !== undefined);
+		recommendationMetrics
+			.recordImpression(auth.user.id, docIds, topicIds)
+			.catch((err) => console.warn('[recommendations] Metrics recording failed:', err));
+
 		// Step 5: Optionally strip explanations for smaller payload
 		const recommendations = includeExplanations
 			? rankedDocuments
@@ -216,6 +226,10 @@ export const POST: RequestHandler = async (event) => {
 					explanationTokens: undefined
 				}));
 
+		// Step 5b: Encode compact glyph representation (10 bytes per recommendation)
+		const glyphs = encodeRecommendations(rankedDocuments);
+		const glyphsCompact = glyphsToBase64(glyphs);
+
 		const processingTime = Date.now() - startTime;
 
 		return json(
@@ -223,6 +237,7 @@ export const POST: RequestHandler = async (event) => {
 				success: true,
 				data: {
 					recommendations,
+					glyphs: glyphsCompact,
 					query: body.query,
 					topK,
 					totalCandidates: ragResults.length + graphResults.length + tagResults.length

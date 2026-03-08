@@ -1,184 +1,249 @@
 /**
- * Multi-Vector Storage Layer
- * Mirrors vectors across Qdrant, FAISS-GPU, and PostgreSQL pgvector
- * Ensures redundancy and optimized access patterns
+ * MultiVectorStore — Dual-write coordinator for Qdrant + pgvector
+ * Qdrant is PRIMARY. pgvector is secondary (error-isolated, non-blocking).
+ * Provides dual-write, read-fastest, and batch operations.
  */
 
-import { db } from '$lib/server/db/client';
-import { QdrantClient } from '@qdrant/js-client-rest';
-import { sql } from 'drizzle-orm';
-import { ENV } from '$lib/server/env.server.js';
+import { qdrant, deterministicPointId } from '$lib/server/vector/qdrant-manager.js';
+import { pgVectorService, type PgVectorSearchResult } from './PgVectorService.js';
 
-// Initialize Qdrant client
-const qdrant = new QdrantClient({
-	url: ENV.QDRANT_URL
-});
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 
-/**
- * Store vector in Qdrant (primary vector store)
- */
-export async function storeInQdrant(params: {
-	collectionName: string;
+export interface MultiStoreDocument {
 	id: string;
-	vector: number[];
-	payload: Record<string, any>;
-}) {
-	const { collectionName, id, vector, payload } = params;
+	content: string;
+	embedding: number[];
+	source?: string;
+	metadata?: Record<string, unknown>;
+	collection?: string;
+}
 
-	// Ensure collection exists
-	const collections = await qdrant.getCollections();
-	const exists = collections.collections?.some((c: any) => c.name === collectionName) ?? false;
+export interface MultiStoreSearchResult {
+	id: string;
+	score: number;
+	content: string;
+	source: string;
+	metadata: Record<string, unknown>;
+	provider: 'qdrant' | 'pgvector';
+}
 
-	if (!exists) {
-		await qdrant.createCollection(collectionName, {
-			vectors: {
-				size: vector.length,
-				distance: 'Cosine'
-			}
-		});
+export interface DualWriteResult {
+	qdrant: { ok: boolean; error?: string };
+	pgvector: { ok: boolean; error?: string };
+}
+
+export interface ReadFastestResult {
+	results: MultiStoreSearchResult[];
+	provider: 'qdrant' | 'pgvector';
+	latencyMs: number;
+}
+
+// ---------------------------------------------------------------------------
+// Service
+// ---------------------------------------------------------------------------
+
+export class MultiVectorStore {
+	/**
+	 * Write to both Qdrant (primary) + pgvector (secondary).
+	 * Qdrant must succeed. pgvector failure is logged, not thrown.
+	 */
+	async dualWrite(doc: MultiStoreDocument): Promise<DualWriteResult> {
+		const collection = doc.collection ?? qdrant.collections.evidence;
+
+		// Primary: Qdrant (must succeed)
+		let qdrantResult: { ok: boolean; error?: string };
+		try {
+			const pointId = deterministicPointId(doc.id);
+			await qdrant.client.upsert(collection, {
+				wait: true,
+				points: [
+					{
+						id: pointId,
+						vector: { content: doc.embedding },
+						payload: {
+							document_id: doc.id,
+							content: doc.content,
+							source: doc.source ?? 'unknown',
+							...(doc.metadata ?? {})
+						}
+					}
+				]
+			});
+			qdrantResult = { ok: true };
+		} catch (error) {
+			qdrantResult = { ok: false, error: (error as Error).message };
+		}
+
+		// Secondary: pgvector (non-blocking, error-isolated)
+		let pgResult: { ok: boolean; error?: string };
+		try {
+			pgResult = await pgVectorService.upsert({
+				id: doc.id,
+				embedding: doc.embedding,
+				content: doc.content,
+				source: doc.source,
+				metadata: doc.metadata
+			});
+		} catch (error) {
+			pgResult = { ok: false, error: (error as Error).message };
+			console.warn(`[MultiStore] pgvector secondary write failed for ${doc.id}:`, pgResult.error);
+		}
+
+		return { qdrant: qdrantResult, pgvector: pgResult };
 	}
 
-	// Upsert point
-	await qdrant.upsert(collectionName, {
-		wait: true,
-		points: [
-			{
-				id,
-				vector,
-				payload
+	/**
+	 * Race both providers. Return whichever responds first.
+	 * Includes provider metadata so caller can detect inconsistency.
+	 */
+	async readFastest(
+		embedding: number[],
+		topK = 10,
+		collection?: string
+	): Promise<ReadFastestResult> {
+		const coll = collection ?? qdrant.collections.evidence;
+		const start = Date.now();
+
+		const qdrantPromise = this.searchQdrant(embedding, topK, coll).then((results) => ({
+			results,
+			provider: 'qdrant' as const
+		}));
+
+		const pgPromise = pgVectorService
+			.search(embedding, topK)
+			.then((results) => ({
+				results: results.map(
+					(r: PgVectorSearchResult): MultiStoreSearchResult => ({
+						id: r.id,
+						score: r.score,
+						content: r.content,
+						source: r.source,
+						metadata: r.metadata,
+						provider: 'pgvector' as const
+					})
+				),
+				provider: 'pgvector' as const
+			}));
+
+		try {
+			const winner = await Promise.race([qdrantPromise, pgPromise]);
+			return {
+				results: winner.results,
+				provider: winner.provider,
+				latencyMs: Date.now() - start
+			};
+		} catch {
+			// If first-to-respond fails, wait for the other
+			try {
+				const fallback = await Promise.any([qdrantPromise, pgPromise]);
+				return {
+					results: fallback.results,
+					provider: fallback.provider,
+					latencyMs: Date.now() - start
+				};
+			} catch {
+				return { results: [], provider: 'qdrant', latencyMs: Date.now() - start };
 			}
-		]
-	});
+		}
+	}
 
-	return { success: true, id, collection: collectionName };
+	/**
+	 * Batch dual-write with parallelism control.
+	 * Returns aggregate stats.
+	 */
+	async batchDualWrite(
+		docs: MultiStoreDocument[],
+		parallelism = 4
+	): Promise<{
+		total: number;
+		qdrantOk: number;
+		pgvectorOk: number;
+		errors: string[];
+	}> {
+		let qdrantOk = 0;
+		let pgvectorOk = 0;
+		const errors: string[] = [];
+
+		for (let i = 0; i < docs.length; i += parallelism) {
+			const batch = docs.slice(i, i + parallelism);
+			const results = await Promise.allSettled(batch.map((doc) => this.dualWrite(doc)));
+
+			for (const result of results) {
+				if (result.status === 'fulfilled') {
+					if (result.value.qdrant.ok) qdrantOk++;
+					if (result.value.pgvector.ok) pgvectorOk++;
+					if (!result.value.qdrant.ok && result.value.qdrant.error) {
+						if (errors.length < 10) errors.push(`qdrant: ${result.value.qdrant.error}`);
+					}
+				} else {
+					if (errors.length < 10) errors.push((result.reason as Error).message);
+				}
+			}
+		}
+
+		return { total: docs.length, qdrantOk, pgvectorOk, errors };
+	}
+
+	/**
+	 * Health check across both providers
+	 */
+	async healthCheck(): Promise<{
+		qdrant: { healthy: boolean; error?: string };
+		pgvector: { healthy: boolean; error?: string };
+	}> {
+		const [qdrantHealth, pgHealth] = await Promise.allSettled([
+			qdrant.healthCheck(),
+			pgVectorService.healthCheck()
+		]);
+
+		return {
+			qdrant:
+				qdrantHealth.status === 'fulfilled'
+					? { healthy: true }
+					: { healthy: false, error: (qdrantHealth.reason as Error).message },
+			pgvector:
+				pgHealth.status === 'fulfilled' && pgHealth.value.healthy
+					? { healthy: true }
+					: {
+							healthy: false,
+							error:
+								pgHealth.status === 'rejected'
+									? (pgHealth.reason as Error).message
+									: pgHealth.value.error ?? 'Unknown'
+						}
+		};
+	}
+
+	// ---------------------------------------------------------------------------
+	// Private helpers
+	// ---------------------------------------------------------------------------
+
+	private async searchQdrant(
+		embedding: number[],
+		topK: number,
+		collection: string
+	): Promise<MultiStoreSearchResult[]> {
+		const results = await qdrant.client.search(collection, {
+			vector: { name: 'content', vector: embedding },
+			limit: topK,
+			with_payload: true
+		});
+
+		return results.map((r) => ({
+			id: (r.payload?.document_id as string) ?? String(r.id),
+			score: r.score,
+			content: (r.payload?.content as string) ?? '',
+			source: (r.payload?.source as string) ?? 'unknown',
+			metadata: (r.payload ?? {}) as Record<string, unknown>,
+			provider: 'qdrant' as const
+		}));
+	}
+
+	// FAISS-GPU: TODO — requires Python bindings (faiss-gpu via subprocess or gRPC)
+	// Kept as explicit future extension point, not a silent no-op
 }
 
-/**
- * Store vector in FAISS-GPU (RTX 3060 Ti accelerated)
- */
-export async function storeInFAISS(params: {
-	indexName: string;
-	vector: number[];
-	metadata: Record<string, any>;
-	useCUDA?: boolean;
-}) {
-	const { indexName, vector, metadata, useCUDA = true } = params;
-
-	// TODO: Implement FAISS-GPU integration
-	// This requires Python binding or FAISS WASM module
-	// For now, log to indicate where GPU acceleration would occur
-
-	console.log('[FAISS-GPU] Storing vector:', {
-		indexName,
-		vectorDim: vector.length,
-		metadata,
-		device: useCUDA ? 'CUDA (RTX 3060 Ti)' : 'CPU',
-		ptx: useCUDA ? 'Ampere PTX module' : 'N/A'
-	});
-
-	// In production, this would call:
-	// - FAISS IndexFlatIP or IndexIVFFlat on GPU
-	// - Use CUDA streams for parallel insertion
-	// - PTX kernels for custom similarity metrics
-
-	return {
-		success: true,
-		indexName,
-		gpu: useCUDA,
-		device: 'RTX 3060 Ti (Ampere)'
-	};
-}
-
-/**
- * Store vector in PostgreSQL pgvector extension
- */
-export async function storeInPgVector(params: {
-	table: string;
-	vector: number[];
-	metadata: Record<string, any>;
-}) {
-	const { table, vector, metadata } = params;
-
-	// Ensure pgvector extension is enabled
-	await db.execute(sql`CREATE EXTENSION IF NOT EXISTS vector`);
-
-	// Create table if not exists (dynamic schema)
-	await db.execute(sql`
-		CREATE TABLE IF NOT EXISTS ${sql.identifier(table)} (
-			id SERIAL PRIMARY KEY,
-			embedding vector(${vector.length}),
-			metadata JSONB,
-			created_at TIMESTAMP DEFAULT NOW()
-		)
-	`);
-
-	// Insert vector
-	await db.execute(sql`
-		INSERT INTO ${sql.identifier(table)} (embedding, metadata)
-		VALUES (${sql`ARRAY[${vector.join(',')}]::vector`}, ${JSON.stringify(metadata)}::jsonb)
-	`);
-
-	return { success: true, table, vectorDim: vector.length };
-}
-
-/**
- * Query vectors from all stores (mirrored read)
- */
-export async function queryMultiStore(params: {
-	vector: number[];
-	topK?: number;
-	collections?: {
-		qdrant?: string;
-		faiss?: string;
-		pgvector?: string;
-	};
-}) {
-	const { vector, topK = 10, collections = {} } = params;
-
-	const results = await Promise.allSettled([
-		// Qdrant query
-		collections.qdrant ?
-			qdrant.search(collections.qdrant, {
-				vector,
-				limit: topK,
-				with_payload: true
-			}) :
-			Promise.resolve(null),
-
-		// FAISS query (GPU accelerated)
-		collections.faiss ?
-			queryFAISSGPU(collections.faiss, vector, topK) :
-			Promise.resolve(null),
-
-		// pgvector query
-		collections.pgvector ?
-			db.execute(sql`
-				SELECT id, metadata, 1 - (embedding <=> ${sql`ARRAY[${vector.join(',')}]::vector`}) as similarity
-				FROM ${sql.identifier(collections.pgvector)}
-				ORDER BY embedding <=> ${sql`ARRAY[${vector.join(',')}]::vector`}
-				LIMIT ${topK}
-			`) :
-			Promise.resolve(null)
-	]);
-
-	return {
-		qdrant: results[0].status === 'fulfilled' ? results[0].value : null,
-		faiss: results[1].status === 'fulfilled' ? results[1].value : null,
-		pgvector: results[2].status === 'fulfilled' ? results[2].value : null
-	};
-}
-
-/**
- * FAISS GPU query helper
- */
-async function queryFAISSGPU(indexName: string, vector: number[], topK: number) {
-	// TODO: Implement FAISS GPU search
-	console.log('[FAISS-GPU] Searching index:', {
-		indexName,
-		vectorDim: vector.length,
-		topK,
-		device: 'RTX 3060 Ti (Ampere)'
-	});
-
-	return { results: [], gpu: true };
-}
+// Singleton
+export const multiStore = new MultiVectorStore();

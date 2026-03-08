@@ -17,9 +17,10 @@
  * Usage:
  *   const glyphs = encodeRecommendations(rankedDocs);
  *   const decoded = decodeRecommendationGlyph(glyphs[0]);
+ *   const stream = encodeRecommendationsToStream(rankedDocs);
  */
 
-import type { RankedDocument, RankingSignal } from './multi-modal-ranker.js';
+import type { RankedDocument } from './multi-modal-ranker.js';
 
 export interface RecommendationGlyph {
 	bytes: Uint8Array; // 10-byte encoded glyph
@@ -45,6 +46,13 @@ export interface DecodedGlyph {
 		isHighConfidence: boolean;
 	};
 }
+
+export interface GlyphDecodeError {
+	valid: false;
+	error: string;
+}
+
+export type GlyphDecodeResult = (DecodedGlyph & { valid: true }) | GlyphDecodeError;
 
 /**
  * Quantize a float [0, 1] to a byte [0, 255]
@@ -79,7 +87,7 @@ function hashDocumentId(id: string): number {
 		const char = id.charCodeAt(i);
 		hash = ((hash << 5) - hash + char) | 0;
 	}
-	return Math.abs(hash) & 0xFFFF;
+	return Math.abs(hash) & 0xffff;
 }
 
 /**
@@ -91,8 +99,8 @@ function topicToChrRomBank(topicId: number): number {
 	const bankGroups = [
 		0, 0, 0, 0, // Topics 0-3: Legal statutes bank
 		1, 1, 1, 1, // Topics 4-7: Evidence documents bank
-		2, 2, 2,    // Topics 8-10: Procedural bank
-		3, 3, 3, 3  // Topics 11-14: Analytical bank
+		2, 2, 2, // Topics 8-10: Procedural bank
+		3, 3, 3, 3 // Topics 11-14: Analytical bank
 	];
 	return bankGroups[topicId] ?? 0;
 }
@@ -108,7 +116,7 @@ export function encodeRecommendationGlyph(
 	const bytes = new Uint8Array(10);
 
 	// Byte 0: topicId (high 4 bits) + confidence bucket (low 4 bits)
-	bytes[0] = ((topicId & 0x0F) << 4) | (confidenceBucket(doc.score) & 0x0F);
+	bytes[0] = ((topicId & 0x0f) << 4) | (confidenceBucket(doc.score) & 0x0f);
 
 	// Bytes 1-5: Individual signal scores (quantized 0-255)
 	bytes[1] = quantizeScore(signals.vectorSimilarity);
@@ -122,8 +130,8 @@ export function encodeRecommendationGlyph(
 
 	// Bytes 7-8: Document ID hash (16-bit)
 	const idHash = hashDocumentId(doc.documentId);
-	bytes[7] = (idHash >> 8) & 0xFF;
-	bytes[8] = idHash & 0xFF;
+	bytes[7] = (idHash >> 8) & 0xff;
+	bytes[8] = idHash & 0xff;
 
 	// Byte 9: Flags
 	let flags = 0;
@@ -140,12 +148,13 @@ export function encodeRecommendationGlyph(
 }
 
 /**
- * Decode a 10-byte glyph back to readable recommendation data
+ * Decode a 10-byte glyph back to readable recommendation data.
+ * Returns raw DecodedGlyph (legacy API, no validation).
  */
 export function decodeRecommendationGlyph(bytes: Uint8Array): DecodedGlyph {
 	return {
-		topicId: (bytes[0] >> 4) & 0x0F,
-		confidenceBucket: bytes[0] & 0x0F,
+		topicId: (bytes[0] >> 4) & 0x0f,
+		confidenceBucket: bytes[0] & 0x0f,
 		vectorScore: dequantizeScore(bytes[1]),
 		tagScore: dequantizeScore(bytes[2]),
 		topicScore: dequantizeScore(bytes[3]),
@@ -163,6 +172,33 @@ export function decodeRecommendationGlyph(bytes: Uint8Array): DecodedGlyph {
 }
 
 /**
+ * Validated decode — checks byte array length = 10 and returns descriptive error for malformed input.
+ * Non-fatal: returns GlyphDecodeError instead of throwing.
+ */
+export function safeDecodeGlyph(bytes: Uint8Array | number[]): GlyphDecodeResult {
+	const arr = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+
+	if (arr.length !== 10) {
+		return {
+			valid: false,
+			error: `Expected 10-byte glyph, got ${arr.length} bytes`
+		};
+	}
+
+	// Validate topicId range (0-14)
+	const topicId = (arr[0] >> 4) & 0x0f;
+	if (topicId > 14) {
+		return {
+			valid: false,
+			error: `Invalid topicId ${topicId} (expected 0-14)`
+		};
+	}
+
+	const decoded = decodeRecommendationGlyph(arr);
+	return { ...decoded, valid: true };
+}
+
+/**
  * Batch encode recommendations into compact glyph array
  * Returns Uint8Array of N * 10 bytes (one glyph per recommendation)
  */
@@ -170,10 +206,49 @@ export function encodeRecommendations(
 	docs: RankedDocument[],
 	topicAssignments?: Map<string, number>
 ): RecommendationGlyph[] {
-	return docs.map(doc => {
+	return docs.map((doc) => {
 		const topicId = topicAssignments?.get(doc.documentId) ?? 0;
 		return encodeRecommendationGlyph(doc, topicId);
 	});
+}
+
+/**
+ * Streaming encode — encodes recommendations into a ReadableStream of glyph bytes.
+ * Each chunk is a single 10-byte glyph. Useful for SSE/streaming transport.
+ */
+export function encodeRecommendationsToStream(
+	docs: RankedDocument[],
+	topicAssignments?: Map<string, number>
+): ReadableStream<Uint8Array> {
+	let index = 0;
+
+	return new ReadableStream<Uint8Array>({
+		pull(controller) {
+			if (index >= docs.length) {
+				controller.close();
+				return;
+			}
+
+			const doc = docs[index];
+			const topicId = topicAssignments?.get(doc.documentId) ?? 0;
+			const glyph = encodeRecommendationGlyph(doc, topicId);
+			controller.enqueue(glyph.bytes);
+			index++;
+		}
+	});
+}
+
+/**
+ * Convenience one-liner: ranked docs + optional topic map → glyphs + base64.
+ * Returns both the glyph array and the base64 transport string.
+ */
+export function toGlyph(
+	rankedDocs: RankedDocument[],
+	topicMap?: Map<string, number>
+): { glyphs: RecommendationGlyph[]; base64: string } {
+	const glyphs = encodeRecommendations(rankedDocs, topicMap);
+	const base64 = glyphsToBase64(glyphs);
+	return { glyphs, base64 };
 }
 
 /**
@@ -191,7 +266,8 @@ export function glyphsToBase64(glyphs: RecommendationGlyph[]): string {
 }
 
 /**
- * Deserialize base64 back to decoded glyphs
+ * Deserialize base64 back to decoded glyphs.
+ * Uses safe decode for each glyph — malformed entries are skipped with warning.
  */
 export function base64ToGlyphs(base64: string): DecodedGlyph[] {
 	const buffer = Buffer.from(base64, 'base64');
@@ -199,7 +275,15 @@ export function base64ToGlyphs(base64: string): DecodedGlyph[] {
 
 	for (let i = 0; i + 10 <= buffer.length; i += 10) {
 		const bytes = new Uint8Array(buffer.slice(i, i + 10));
-		glyphs.push(decodeRecommendationGlyph(bytes));
+		const result = safeDecodeGlyph(bytes);
+		if (result.valid) {
+			const { valid: _, ...glyph } = result;
+			glyphs.push(glyph);
+		} else {
+			console.warn(
+				`[Glyph] Skipping malformed glyph at offset ${i}: ${result.error}`
+			);
+		}
 	}
 
 	return glyphs;
