@@ -14,6 +14,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { redisPool } from '$lib/server/redis.js';
 import { getTemplateCacheStats } from '$lib/server/cache/report-template-cache.js';
 import { getExportCacheStats } from '$lib/server/cache/pdf-export-cache.js';
+import { getRedisMetricsCache } from '$lib/server/cache/redis-metrics.js';
 
 export const GET: RequestHandler = async () => {
 	try {
@@ -70,12 +71,9 @@ export const GET: RequestHandler = async () => {
 		const llmTotal = llmHits + llmMisses;
 		const llmHitRate = llmTotal > 0 ? (llmHits / llmTotal) * 100 : 0;
 
-		// Memory cache stats (estimate from in-memory Map)
-		// Note: This is a simplified estimate - real implementation would track this
-		const memoryCacheSize = 150; // Placeholder - would be tracked in actual cache
-		const memoryEstimatedSize = memoryCacheSize * 1024; // ~1KB per entry estimate
-		const memoryDefaultTTL = 5 * 60 * 1000; // 5 minutes
-		const memoryHitRate = 75; // Placeholder - would be tracked in actual cache
+		// Real metrics from RedisMetricsCache
+		const metricsCache = getRedisMetricsCache();
+		const metricsInsights = metricsCache.getPerformanceInsights();
 
 		return json({
 			success: true,
@@ -97,12 +95,7 @@ export const GET: RequestHandler = async () => {
 					misses: llmMisses,
 					hitRate: llmHitRate
 				},
-				memory: {
-					size: memoryCacheSize,
-					estimatedSize: memoryEstimatedSize,
-					defaultTTL: memoryDefaultTTL,
-					hitRate: memoryHitRate
-				}
+				metrics: metricsInsights
 			}
 		});
 	} catch (err) {
@@ -139,11 +132,11 @@ export const GET: RequestHandler = async () => {
 					misses: 0,
 					hitRate: 0
 				},
-				memory: {
-					size: 0,
-					estimatedSize: 0,
-					defaultTTL: 300000,
-					hitRate: 0
+				metrics: {
+					overall: { hitRate: '0%', totalRequests: 0, hits: 0, misses: 0, errors: 0, errorRate: '0%' },
+					performance: { averageGetTime: '0ms', averageSetTime: '0ms' },
+					topPatterns: [],
+					recommendations: []
 				}
 			}
 		}, { status: 500 });

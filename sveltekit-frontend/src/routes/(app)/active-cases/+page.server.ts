@@ -27,20 +27,22 @@ export const load: PageServerLoad = async ({ locals }) => {
 				ne(cases.status, 'archived')
 			))
 			.orderBy(desc(cases.updatedAt))
-			.limit(200),
+			.limit(200)
+			.$withCache({ config: { ex: 60 } }),
 		[]
 	);
 
 	// Stats: total active, by priority, by status
 	const totalAll = await safe(
-		db.select({ count: sql<number>`count(*)::int` }).from(cases),
+		db.select({ count: sql<number>`count(*)::int` }).from(cases).$withCache({ config: { ex: 120 } }),
 		[{ count: 0 }]
 	);
 
 	const totalClosed = await safe(
 		db.select({ count: sql<number>`count(*)::int` })
 			.from(cases)
-			.where(eq(cases.status, 'closed')),
+			.where(eq(cases.status, 'closed'))
+			.$withCache({ config: { ex: 120 } }),
 		[{ count: 0 }]
 	);
 

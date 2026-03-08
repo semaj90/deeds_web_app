@@ -1,4 +1,4 @@
-import { getRedisClient } from '$lib/server/cache/redis';
+import { redisPool } from '$lib/server/redis.js';
 import { db } from '$lib/server/db/client';
 import { json } from '@sveltejs/kit';
 import { sql } from 'drizzle-orm';
@@ -16,7 +16,7 @@ export async function GET() {
 
 	try {
 		// Check Redis
-		const redis = await getRedisClient();
+		const redis = redisPool.getConnection();
 		try {
 			const pingResult = await redis.ping();
 			health.services.redis = {

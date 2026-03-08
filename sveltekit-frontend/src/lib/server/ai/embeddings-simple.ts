@@ -1,6 +1,5 @@
 // Lightweight embedding utilities with safe fallbacks and strict typing
 import { createHash } from 'crypto';
-import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
 import { ENV } from '$lib/server/env.server.js';
 
 export interface CacheInterface {

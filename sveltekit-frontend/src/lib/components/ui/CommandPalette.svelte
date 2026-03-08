@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Case } from '$lib/types';
+  import Fuse from 'fuse.js';
   import Icon from '$lib/components/ui/Icon.svelte';
   import { cn } from '$lib/utils';
 
@@ -90,13 +90,20 @@
     }
   ];
 
+  const fuse = new Fuse(allItems, {
+    keys: [
+      { name: 'title', weight: 0.5 },
+      { name: 'description', weight: 0.3 },
+      { name: 'category', weight: 0.2 }
+    ],
+    threshold: 0.4,
+    includeScore: true,
+    minMatchCharLength: 1
+  });
+
   let filteredItems = $derived(
     searchQuery
-      ? allItems.filter(
-          item =>
-            item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.description.toLowerCase().includes(searchQuery.toLowerCase())
-        )
+      ? fuse.search(searchQuery).map(result => result.item)
       : allItems
   );
 

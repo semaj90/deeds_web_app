@@ -42,6 +42,9 @@ export const ENV = {
 	EMBEDDING_GRPC_ENABLED: (privateEnv.EMBEDDING_GRPC_ENABLED ?? 'false') === 'true',
 	RETRIEVAL_GRPC_URL: privateEnv.RETRIEVAL_GRPC_URL ?? '127.0.0.1:50053',
 	RETRIEVAL_GRPC_ENABLED: (privateEnv.RETRIEVAL_GRPC_ENABLED ?? 'false') === 'true',
+	// QUIC/NATS embedding transport
+	EMBEDDING_QUIC_ENABLED: (privateEnv.EMBEDDING_QUIC_ENABLED ?? privateEnv.QUIC_ENABLED ?? 'false') === 'true',
+	NATS_URL: privateEnv.NATS_URL ?? 'nats://127.0.0.1:4222',
 	// TensorRT-LLM inference (primary, port 8000 from existing container)
 	TENSORRT_URL: privateEnv.TENSORRT_URL ?? privateEnv.TENSORRT_SERVICE_URL ?? 'http://localhost:8000',
 	// Neo4j graph database
@@ -56,4 +59,11 @@ export const ENV = {
 	GOOGLE_SEARCH_CX: privateEnv.GOOGLE_SEARCH_CX ?? '',
 	// FastAPI middleware (optional)
 	FASTAPI_URL: privateEnv.FASTAPI_URL ?? 'http://localhost:8001',
+	// Web Push (VAPID) — generate with: npx web-push generate-vapid-keys --json
+	VAPID_PUBLIC_KEY: publicEnv.PUBLIC_VAPID_KEY ?? privateEnv.VAPID_PUBLIC_KEY ?? 'BNtj-Ymwzc6FbcwSeJ46GL2yKLAqMMGj0sDeDPhnQZ3-pbG05UhbUxcZ89q0m7S4bKzEEG5aE-P2WEkCO8DJZ8U',
+	VAPID_PRIVATE_KEY: privateEnv.VAPID_PRIVATE_KEY ?? 'MuusRYO6dkldyhXG_123RBWTB1OhY0pUkA9lkuCZCK8',
+	VAPID_CONTACT: privateEnv.VAPID_CONTACT ?? 'mailto:admin@deeds-legal.ai',
+	// ntfy.sh push notifications
+	NTFY_URL: privateEnv.NTFY_URL ?? 'https://ntfy.sh',
+	NTFY_TOPIC: privateEnv.NTFY_TOPIC ?? 'deeds-legal-alerts',
 };

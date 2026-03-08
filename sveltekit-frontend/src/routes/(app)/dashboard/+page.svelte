@@ -285,6 +285,15 @@
       </CardContent>
     </Card>
   {:else}
+    {#if error}
+      <Card class="mb-4 bg-panel border-danger/40">
+        <CardContent class="p-4 text-center">
+          <p class="text-danger text-sm">{error}</p>
+          <Button onclick={() => loadDashboard()} class="mt-2">Retry</Button>
+        </CardContent>
+      </Card>
+    {/if}
+
     <!-- Stats Grid -->
     <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
       {#each [
@@ -488,14 +497,6 @@
       <SystemStatusPanel />
     </div>
 
-    {#if error}
-      <Card class="mt-4 bg-panel border-danger/40">
-        <CardContent class="p-4 text-center">
-          <p class="text-danger text-sm">{error}</p>
-          <Button onclick={() => loadDashboard()} class="mt-2">Retry</Button>
-        </CardContent>
-      </Card>
-    {/if}
   {/if}
 </div>
 

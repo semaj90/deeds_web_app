@@ -1,9 +1,8 @@
-import type { ensureRedisReady } from '$lib/server/redis-client';
 /**
  * Redis Cache with Hit/Miss Metrics
  * Tracks cache performance for optimization insights
  */
-import { createClient, type RedisClientType } from 'redis';
+import { createClient } from 'redis';
 
 interface CacheMetrics {
 	hits: number;
@@ -24,7 +23,7 @@ interface OperationTiming {
 }
 
 export class RedisMetricsCache {
-	private client: RedisClientType | null = null;
+	private client: ReturnType<typeof createClient> | null = null;
 	private isConnected = false;
 
 	// Metrics counters
@@ -86,7 +85,7 @@ export class RedisMetricsCache {
 		this.metrics.totalRequests++;
 
 		try {
-			const value = await this.client!.get(key);
+			const value = await this.client!.get(key) as string | null;
 			const duration = performance.now() - startTime;
 
             // Record timing
@@ -145,7 +144,7 @@ export class RedisMetricsCache {
 		}
 		try {
 			this.metrics.deletes++;
-			return await this.client!.del(key);
+			return await this.client!.del(key) as number;
 		} catch (error) {
 			this.metrics.errors++;
 			console.error(`Redis DEL error for key ${key}: `, error);
@@ -225,7 +224,7 @@ export class RedisMetricsCache {
 		this.metrics.totalRequests += keys.length;
 
 		try {
-			const values = await this.client!.mGet(keys);
+			const values = await (this.client as any).mGet(keys) as (string | null)[];
 			const duration = performance.now() - startTime;
 
 			// Track hits/misses
@@ -376,7 +375,7 @@ let redisMetricsCache: RedisMetricsCache | null = null;
 
 export function getRedisMetricsCache(url?: string): RedisMetricsCache {
 	if (!redisMetricsCache) {
-		const redisUrl = url || process.env?.REDIS_URL ?? 'redis://:redis@localhost:6379/0';
+		const redisUrl = url || (process.env?.REDIS_URL ?? 'redis://:redis@localhost:6379/0');
 		redisMetricsCache = new RedisMetricsCache(redisUrl);
 	}
 	return redisMetricsCache;

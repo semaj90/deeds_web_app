@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
+	import Skeleton from '$lib/components/ui/Skeleton.svelte';
 	// Migrated to $effect
 	import type { PageProps } from './$types';
 
@@ -200,13 +201,35 @@
 	<!-- Cases List -->
 	<div class="flex-1 overflow-y-auto p-6">
 		<div class="container mx-auto max-w-7xl">
+			{#if data.databaseStatus && !data.databaseStatus.available}
+				<div class="mb-4 rounded border border-amber-500/40 bg-amber-500/10 p-4 text-amber-200 text-sm">
+					Database unavailable — showing cached or empty results. {data.databaseStatus.error ?? ''}
+				</div>
+			{/if}
+
 			{#if form?.success}
 				<div class="mb-4 rounded border border-green-500 bg-green-500/10 p-4 text-green-100">
 					✅ {form.message}
 				</div>
 			{/if}
 
-			{#if !data.cases || data.cases.length === 0}
+			{#if !data.cases}
+				<!-- Loading skeleton -->
+				<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+					{#each Array(6) as _}
+						<div class="rounded-lg border border-black/20 bg-panel/50 p-5">
+							<Skeleton variant="text" width="70%" height="1.25em" />
+							<div class="mt-2"><Skeleton variant="text" width="40%" height="0.75em" /></div>
+							<div class="mt-3"><Skeleton variant="text" width="100%" height="2em" /></div>
+							<div class="mt-3 flex gap-2">
+								<Skeleton variant="rect" width="80px" height="24px" />
+								<Skeleton variant="rect" width="60px" height="24px" />
+							</div>
+							<div class="mt-3"><Skeleton variant="text" width="50%" height="0.75em" /></div>
+						</div>
+					{/each}
+				</div>
+			{:else if data.cases.length === 0}
 				<div class="flex flex-col items-center justify-center py-20 text-center">
 					<div class="text-6xl mb-4">📂</div>
 					<h2 class="text-xl font-semibold mb-2">No Cases Found</h2>

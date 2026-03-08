@@ -4,6 +4,9 @@
     import { onMount } from 'svelte';
     import CaseDocumentWriter from '$lib/components/legal-ai/CaseDocumentWriter.svelte';
     import YorhaSidebar from '$lib/components/layout/YorhaSidebar.svelte';
+    import { Toaster } from 'svelte-sonner';
+    import { notificationStore } from '$lib/stores/notifications.svelte';
+    import { toast } from 'svelte-sonner';
 
     let { children }: { children: Snippet } = $props();
     let showDocumentWriter = $state(false);
@@ -47,6 +50,26 @@
         })();
     });
 
+    // Bridge existing notificationStore → svelte-sonner toasts
+    let lastNotificationCount = 0;
+    $effect(() => {
+        const notifications = notificationStore.notifications;
+        if (notifications.length > lastNotificationCount) {
+            const latest = notifications[notifications.length - 1];
+            if (latest) {
+                const toastFn = latest.type === 'error' ? toast.error
+                    : latest.type === 'success' ? toast.success
+                    : latest.type === 'warning' ? toast.warning
+                    : toast.info;
+                toastFn(latest.message, {
+                    description: latest.title,
+                    duration: latest.duration || 5000,
+                });
+            }
+        }
+        lastNotificationCount = notifications.length;
+    });
+
     onMount(() => {
         mounted = true;
         return () => {
@@ -56,6 +79,16 @@
 </script>
 
 <svelte:window onkeydown={handleGlobalKeydown} />
+
+<!-- Toast notifications (svelte-sonner) -->
+<Toaster
+    position="top-right"
+    richColors
+    closeButton
+    toastOptions={{
+        style: 'font-family: "JetBrains Mono", monospace; font-size: 0.8125rem;'
+    }}
+/>
 
 <!-- YoRHa Detective Sidebar -->
 <YorhaSidebar />

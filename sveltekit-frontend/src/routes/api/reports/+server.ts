@@ -30,7 +30,8 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 					inArray(reports.id, ids),
 					eq(reports.createdBy, locals.user.id)
 				))
-				.orderBy(desc(reports.createdAt));
+				.orderBy(desc(reports.createdAt))
+				.$withCache({ config: { ex: 60 } });
 
 			return json({ success: true, data: userReports });
 		}
@@ -112,6 +113,11 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			invalidateReportCache(newReport[0].id, 'report_create', locals.user.id),
 			invalidateCaseCache(body.caseId, 'report_create', locals.user.id)
 		]).catch(err => console.warn('[Reports] Cache invalidation failed:', err));
+
+		// Track analytics event (non-blocking)
+		import('$lib/server/queue/rabbitmq-manager-fixed.js').then(({ rabbitmq }) =>
+			rabbitmq.publishAnalyticsEvent({ eventType: 'report_create', payload: { reportId: newReport[0].id, caseId: body.caseId, userId: locals.user.id } })
+		).catch(() => {});
 
 		return json(
 			{ success: true, data: newReport[0], message: 'Report created successfully' },

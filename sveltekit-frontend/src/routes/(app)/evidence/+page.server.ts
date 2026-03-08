@@ -30,14 +30,16 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 		evidenceData = await safe(
 			db.select().from(evidence)
 				.where(and(eq(evidence.caseId, caseId), eq(evidence.userId, locals.user.id)))
-				.limit(100),
+				.limit(100)
+				.$withCache({ config: { ex: 60 } }),
 			[]
 		);
 	} else {
 		evidenceData = await safe(
 			db.select().from(evidence)
 				.where(eq(evidence.userId, locals.user.id))
-				.limit(50),
+				.limit(50)
+				.$withCache({ config: { ex: 60 } }),
 			[]
 		);
 	}

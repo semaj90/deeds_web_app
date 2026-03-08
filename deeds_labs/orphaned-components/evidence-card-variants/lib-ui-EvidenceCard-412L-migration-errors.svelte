@@ -1,3 +1,11 @@
+<!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
+https, //svelte.dev/e/tag_invalid_name -->
+<!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
+https, //svelte.dev/e/tag_invalid_name -->
+<!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
+https, //svelte.dev/e/tag_invalid_name -->
+<!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
+https, //svelte.dev/e/tag_invalid_name -->
 <script lang="ts">
  import type { Evidence } from '$lib/types/evidence';
  import Tooltip from './Tooltip.svelte';
@@ -20,8 +28,7 @@
   isTagged = false,
   isDropped = false,
   selected = false,
-  onSelect,
-  onDelete,
+  onSelect: onDelete,
   onDownload,
   readonly = false,
   showActions = true
@@ -71,8 +78,7 @@
 
 <div
  class="evidence-card nes-container is-dark with-title"
- class:selected={selected}
- class:readonly={readonly}
+ class: selected, class:readonly
  class:is-tagged={isTagged}
  class:is-dropped={isDropped}
  draggable={!readonly}

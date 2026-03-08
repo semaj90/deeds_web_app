@@ -43,8 +43,13 @@
 	</div>
 {/if}
 
+<!-- Skip to main content (WCAG 2.4.1) -->
+<a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-accent focus:px-4 focus:py-2 focus:text-white focus:outline-none">
+	Skip to main content
+</a>
+
 <!-- Main Content (Sidebar is in root layout) -->
-<main class="app-content">
+<main id="main-content" class="app-content">
 	<ErrorBoundary showDetails={data.devBypass}>
 		{@render children?.()}
 	</ErrorBoundary>

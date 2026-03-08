@@ -409,13 +409,13 @@
 									<td class="location-cell">{poi.lastLocation ?? 'Unknown'}</td>
 									<td class="date-cell">{new Date(poi.createdAt).toLocaleDateString()}</td>
 									<td class="actions-cell">
-										<button class="icon-btn" onclick={(e) => { e.stopPropagation(); openPreview(poi); }}>
+										<button class="icon-btn" aria-label="View details" onclick={(e) => { e.stopPropagation(); openPreview(poi); }}>
 											<Icon name="eye" />
 										</button>
-										<button class="icon-btn" onclick={(e) => { e.stopPropagation(); editingPoi = poi; showEditor = true; }}>
+										<button class="icon-btn" aria-label="Edit" onclick={(e) => { e.stopPropagation(); editingPoi = poi; showEditor = true; }}>
 											<Icon name="pencil" />
 										</button>
-										<button class="icon-btn" title="Find similar" onclick={(e) => { e.stopPropagation(); findSimilar(poi); }}>
+										<button class="icon-btn" aria-label="Find similar" title="Find similar" onclick={(e) => { e.stopPropagation(); findSimilar(poi); }}>
 											<Icon name="radar" />
 										</button>
 									</td>

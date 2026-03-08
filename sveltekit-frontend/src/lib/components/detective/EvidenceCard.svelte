@@ -28,7 +28,7 @@ function timeAgo(date: Date): string {
     return rtf.format(-Math.round(days / 365), 'year');
 }
 
-const typeIcon = $derived(() => {
+const typeIcon = $derived.by(() => {
     switch (item.evidenceType) {
         case 'image': return '🖼️';
         case 'video': return '🎥';
@@ -50,7 +50,7 @@ function formatSize(bytes?: number) {
 
 <Card.Root class="nes-container is-rounded p-2 bg-background hover:border-primary transition-colors cursor-pointer group">
     <div class="flex items-start gap-3">
-        <div class="text-2xl mt-1">{typeIcon()}</div>
+        <div class="text-2xl mt-1">{typeIcon}</div>
         <div class="flex-1 min-w-0">
             <h3 class="text-sm font-bold uppercase truncate mb-1">{item.title}</h3>
             <div class="flex flex-wrap gap-1 mb-2">

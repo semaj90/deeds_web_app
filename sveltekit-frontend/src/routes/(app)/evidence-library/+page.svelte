@@ -10,6 +10,7 @@
 	import LazyLoader from '$lib/components/LazyLoader.svelte';
 	import EvidenceStats from '$lib/components/yorha/evidence/EvidenceStats.svelte';
 	import RagDocumentGrid from '$lib/components/rag/RagDocumentGrid.svelte';
+	import ExpandGrid from '$lib/components/ui/ExpandGrid.svelte';
 	import { createViewTracker } from '$lib/utils/tracking';
 
 	let { data }: { data: PageData } = $props();
@@ -117,15 +118,17 @@
 </div>
 {#if showEvidenceCards}
 	<div class="report-container">
-		<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem;">
+		<ExpandGrid columns={1} expandedColumns={3} gap="1rem" expandOnHover={true}>
 			{#each sampleEvidenceItems as item (item.id)}
-				<EvidenceCard
-					evidence={item}
-					onAskAI={(ev) => { console.log('Ask AI about:', ev.file_name); }}
-					onDelete={(id) => { console.log('Delete evidence:', id); }}
-				/>
+				<div class="grid-item">
+					<EvidenceCard
+						evidence={item}
+						onAskAI={(ev) => { console.log('Ask AI about:', ev.file_name); }}
+						onDelete={(id) => { console.log('Delete evidence:', id); }}
+					/>
+				</div>
 			{/each}
-		</div>
+		</ExpandGrid>
 	</div>
 {/if}
 

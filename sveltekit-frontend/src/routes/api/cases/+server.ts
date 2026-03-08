@@ -42,7 +42,8 @@ export const GET: RequestHandler = async (event) => {
 			.where(and(...filters))
 			.orderBy(desc(cases.updatedAt))
 			.limit(limit)
-			.offset(offset);
+			.offset(offset)
+			.$withCache({ config: { ex: 30 } });
 
 		return apiResponses.ok({
 			cases: userCases,
@@ -84,6 +85,11 @@ export const POST: RequestHandler = async (event) => {
 		// Invalidate case list cache
 		await invalidateCaseCache(newCase[0].id, 'case_update', auth.user.id)
 			.catch(err => console.warn('[Cases] Cache invalidation failed:', err));
+
+		// Track analytics event (non-blocking)
+		import('$lib/server/queue/rabbitmq-manager-fixed.js').then(({ rabbitmq }) =>
+			rabbitmq.publishAnalyticsEvent({ eventType: 'case_create', payload: { caseId: newCase[0].id, userId: auth.user.id } })
+		).catch(() => {});
 
 		return apiResponses.created({
 			case: newCase[0],

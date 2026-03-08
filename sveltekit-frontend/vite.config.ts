@@ -268,7 +268,7 @@ export default defineConfig(({ mode }) => {
       // Skip processing large binary assets (ONNX models, WASM files)
       assetsInlineLimit: 0, // Don't inline any assets (keeps them as separate files)
       rollupOptions: {
-        external: ['@xenova/transformers', 'piper-wasm'],
+        external: ['@xenova/transformers', 'piper-wasm', 'nats'],
         output: {
           manualChunks: (id) => {
             // Rolldown requires manualChunks to be a function, not an object
@@ -337,7 +337,7 @@ export default defineConfig(({ mode }) => {
     },
     clearScreen: false,
     ssr: {
-      external: ['canvas', '@napi-rs/canvas', 'simdjson-wasm', 'onnxruntime-web', '@xenova/transformers', 'piper-wasm'],
+      external: ['canvas', '@napi-rs/canvas', 'simdjson-wasm', 'onnxruntime-web', '@xenova/transformers', 'piper-wasm', 'nats'],
     },
     resolve: {
       alias: {

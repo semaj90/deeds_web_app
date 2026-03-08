@@ -27,11 +27,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 			recentCasesResult,
 			recentActivityResult
 		] = await Promise.all([
-			safe(db.select({ count: count() }).from(cases).where(eq(cases.assignedAttorney, user.id)), [{ count: 0 }]),
-			safe(db.select({ count: count() }).from(evidence).where(eq(evidence.uploadedBy, user.id)), [{ count: 0 }]),
-			safe(db.select({ count: count() }).from(criminals).where(eq(criminals.createdBy, user.id)), [{ count: 0 }]),
-			safe(db.select().from(cases).where(eq(cases.assignedAttorney, user.id)).orderBy(desc(cases.updatedAt)).limit(5), []),
-			safe(db.select().from(auditLog).where(eq(auditLog.userId, user.id)).orderBy(desc(auditLog.createdAt)).limit(5), [])
+			safe(db.select({ count: count() }).from(cases).where(eq(cases.assignedAttorney, user.id)).$withCache({ config: { ex: 120 } }), [{ count: 0 }]),
+			safe(db.select({ count: count() }).from(evidence).where(eq(evidence.uploadedBy, user.id)).$withCache({ config: { ex: 120 } }), [{ count: 0 }]),
+			safe(db.select({ count: count() }).from(criminals).where(eq(criminals.createdBy, user.id)).$withCache({ config: { ex: 120 } }), [{ count: 0 }]),
+			safe(db.select().from(cases).where(eq(cases.assignedAttorney, user.id)).orderBy(desc(cases.updatedAt)).limit(5).$withCache({ config: { ex: 60 } }), []),
+			safe(db.select().from(auditLog).where(eq(auditLog.userId, user.id)).orderBy(desc(auditLog.createdAt)).limit(5).$withCache({ config: { ex: 30 } }), [])
 		]);
 
 		return {

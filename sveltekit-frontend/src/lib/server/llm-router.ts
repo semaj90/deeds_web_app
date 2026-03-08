@@ -14,6 +14,7 @@
  */
 
 import { getOllamaEndpoint } from '$lib/services/get-ollama-endpoint';
+import { isLegalTask, getOptimalModel, OLLAMA_CONFIG } from '$lib/server/ai/ollama-config.js';
 
 const OLLAMA_URL = getOllamaEndpoint();
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY ?? '';
@@ -43,7 +44,12 @@ interface StreamChunk {
 }
 
 async function* streamOllama(request: StreamRequest): AsyncGenerator<StreamChunk> {
-  const model = request.model ?? 'gemma3-legal:latest';
+  // Dynamic model selection: use ollama-config registry if no explicit model
+  const model = request.model ?? (
+    isLegalTask(request.prompt)
+      ? getOptimalModel('legal-analysis')[0]
+      : getOptimalModel('generation')[0]
+  ) ?? OLLAMA_CONFIG.defaultModel;
   const response = await fetch(OLLAMA_URL + '/api/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
