@@ -38,6 +38,8 @@
 	import Gemma270MWebAssembly from '$lib/components/ai/Gemma270MWebAssembly.svelte';
 	import VisionImageAnalyzer from '$lib/components/evidence/VisionImageAnalyzer.svelte';
 	import ChainOfCustodyTracker from '$lib/components/legal/ChainOfCustodyTracker.svelte';
+	import Dialog from '$lib/components/ui/Dialog.svelte';
+	import DropdownMenu from '$lib/components/ui/DropdownMenu.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	let uploadCard = $state<UploadProgressCard | undefined>(undefined);
@@ -116,6 +118,11 @@
 	let workflowPercent = $state(0);
 	let comparisonA = $state<{ id: string; fileName: string; extractedText: string; caseId?: string; timestamp?: string }>({ id: '', fileName: '', extractedText: '' });
 	let comparisonB = $state<{ id: string; fileName: string; extractedText: string; caseId?: string; timestamp?: string }>({ id: '', fileName: '', extractedText: '' });
+
+	// Delete confirmation state
+	let showDeleteConfirm = $state(false);
+	let deleteEvidenceId = $state('');
+	let deleteEvidenceName = $state('');
 
 	// Backend semantic search state
 	let searchMode = $state<'local' | 'semantic'>('local');
@@ -326,49 +333,37 @@
 				<button onclick={() => { crudMode = 'create'; crudEvidenceId = undefined; showCrudModal = true; }} class="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/80 transition text-sm font-medium">
 					+ Create with AI
 				</button>
+				<a href="/evidence/upload" class="px-4 py-2 bg-info text-white rounded-lg hover:bg-info/80 transition text-sm font-medium inline-block">
+					+ Upload Evidence
+				</a>
 				<button onclick={() => (showBulkUpload = !showBulkUpload)} class="px-4 py-2 bg-warning text-white rounded-lg hover:bg-warning/80 transition text-sm font-medium">
 					{showBulkUpload ? 'Hide Bulk Upload' : '+ Bulk Upload'}
 				</button>
-				<button onclick={() => (showXStateUpload = !showXStateUpload)} class="px-4 py-2 bg-sand/80 text-white rounded-lg hover:bg-sand/60 transition text-sm font-medium">
-					{showXStateUpload ? 'Hide XState Upload' : 'XState Upload'}
-				</button>
-				<button onclick={() => (showSummarizer = !showSummarizer)} class="px-4 py-2 bg-info/80 text-white rounded-lg hover:bg-info/60 transition text-sm font-medium">
-					{showSummarizer ? 'Hide Summarizer' : 'AI Summarizer'}
-				</button>
-				<button onclick={() => (showYorhaUpload = !showYorhaUpload)} class="px-4 py-2 bg-panelSoft text-sand rounded-lg hover:bg-panel transition text-sm font-medium">
-					{showYorhaUpload ? 'Hide YoRHa Upload' : 'YoRHa Upload'}
-				</button>
-				<button onclick={() => {
-					const items = data.evidence ?? [];
-					if (items.length >= 2) {
-						comparisonA = { id: items[0].id, fileName: items[0].title ?? items[0].filename ?? 'Evidence A', extractedText: items[0].description ?? 'No text extracted yet', caseId: data.caseId ?? undefined };
-						comparisonB = { id: items[1].id, fileName: items[1].title ?? items[1].filename ?? 'Evidence B', extractedText: items[1].description ?? 'No text extracted yet', caseId: data.caseId ?? undefined };
-						showComparison = true;
-					}
-				}} class="px-4 py-2 bg-sand/20 text-sand rounded-lg hover:bg-sand/30 transition text-sm font-medium">
-					Compare
-				</button>
-				<button onclick={() => (showRelationshipInspector = !showRelationshipInspector)} class="px-4 py-2 bg-warning/80 text-white rounded-lg hover:bg-warning/60 transition text-sm font-medium">
-					{showRelationshipInspector ? 'Hide Relationships' : 'Relationships'}
-				</button>
-				<button onclick={() => (showWorkflowProgress = !showWorkflowProgress)} class="px-4 py-2 bg-panelSoft text-sand rounded-lg hover:bg-panel transition text-sm font-medium">
-					{showWorkflowProgress ? 'Hide Workflow' : 'Custody Workflow'}
-				</button>
-				<button onclick={() => (showAIFileUpload = !showAIFileUpload)} class="px-4 py-2 bg-accent/70 text-white rounded-lg hover:bg-accent/50 transition text-sm font-medium">
-					{showAIFileUpload ? 'Hide AI Upload' : 'AI File Upload'}
-				</button>
-				<button onclick={() => (showUploadPipeline = true)} class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition text-sm font-medium">
-					MinIO Pipeline Upload
-				</button>
-				<button onclick={() => (showVlmAnalyzer = !showVlmAnalyzer)} class="px-4 py-2 bg-emerald-700 text-white rounded-lg hover:bg-emerald-600 transition text-sm font-medium">
-					{showVlmAnalyzer ? 'Hide VLM' : 'VLM Image Analysis'}
-				</button>
-				<button onclick={() => (showVisionPipeline = !showVisionPipeline)} class="px-4 py-2 bg-teal-700 text-white rounded-lg hover:bg-teal-600 transition text-sm font-medium">
-					{showVisionPipeline ? 'Hide Vision' : 'Vision Pipeline'}
-				</button>
-				<a href="/evidence/upload" class="px-4 py-2 bg-info text-white rounded-lg hover:bg-info/80 transition text-sm font-medium">
-					+ Upload Evidence
-				</a>
+				<DropdownMenu
+					trigger="More Tools"
+					class="px-4 py-2 bg-panelSoft text-sand rounded-lg hover:bg-panel transition text-sm font-medium"
+					items={[
+						{ label: 'XState Upload', onClick: () => (showXStateUpload = !showXStateUpload) },
+						{ label: 'AI Summarizer', onClick: () => (showSummarizer = !showSummarizer) },
+						{ label: 'YoRHa Upload', onClick: () => (showYorhaUpload = !showYorhaUpload) },
+						{ label: 'AI File Upload', onClick: () => (showAIFileUpload = !showAIFileUpload) },
+						{ separator: true, label: '' },
+						{ label: 'Compare Evidence', onClick: () => {
+							const items = data.evidence ?? [];
+							if (items.length >= 2) {
+								comparisonA = { id: items[0].id, fileName: items[0].title ?? items[0].filename ?? 'Evidence A', extractedText: items[0].description ?? 'No text extracted yet', caseId: data.caseId ?? undefined };
+								comparisonB = { id: items[1].id, fileName: items[1].title ?? items[1].filename ?? 'Evidence B', extractedText: items[1].description ?? 'No text extracted yet', caseId: data.caseId ?? undefined };
+								showComparison = true;
+							}
+						}},
+						{ label: 'Relationships', onClick: () => (showRelationshipInspector = !showRelationshipInspector) },
+						{ label: 'Custody Workflow', onClick: () => (showWorkflowProgress = !showWorkflowProgress) },
+						{ separator: true, label: '' },
+						{ label: 'MinIO Pipeline', onClick: () => (showUploadPipeline = true) },
+						{ label: 'VLM Image Analysis', onClick: () => (showVlmAnalyzer = !showVlmAnalyzer) },
+						{ label: 'Vision Pipeline', onClick: () => (showVisionPipeline = !showVisionPipeline) },
+					]}
+				/>
 			</div>
 		</div>
 
@@ -786,10 +781,7 @@
 									<button onclick={(e) => { e.stopPropagation(); loadEvidenceReport(doc.id); }} class="text-accent/60 hover:text-accent transition">Report</button>
 									<button onclick={(e) => { e.stopPropagation(); legalAnalysisEvidenceId = doc.id; legalAnalysisTitle = `Legal Analysis: ${doc.title || doc.fileName || doc.id}`; showLegalAnalysis = true; }} class="text-info/60 hover:text-info transition">Legal</button>
 									<button onclick={(e) => { e.stopPropagation(); crudMode = 'edit'; crudEvidenceId = doc.id; showCrudModal = true; }} class="text-info/60 hover:text-info transition">Edit</button>
-									<form method="POST" action="?/delete" use:enhance>
-										<input type="hidden" name="evidenceId" value={doc.id} />
-										<button type="submit" class="text-danger/60 hover:text-danger transition" title="Delete">Remove</button>
-									</form>
+									<button onclick={(e) => { e.stopPropagation(); deleteEvidenceId = doc.id; deleteEvidenceName = doc.title || doc.fileName || doc.id; showDeleteConfirm = true; }} class="text-danger/60 hover:text-danger transition" title="Delete">Remove</button>
 								</div>
 							{/if}
 						</div>
@@ -834,10 +826,7 @@
 										<button onclick={(e) => { e.stopPropagation(); loadEvidenceReport(doc.id); }} class="text-accent/60 hover:text-accent text-sm transition">Report</button>
 										<button onclick={(e) => { e.stopPropagation(); legalAnalysisEvidenceId = doc.id; legalAnalysisTitle = `Legal Analysis: ${doc.title || doc.fileName || doc.id}`; showLegalAnalysis = true; }} class="text-info/60 hover:text-info text-sm transition">Legal</button>
 										<button onclick={(e) => { e.stopPropagation(); crudMode = 'edit'; crudEvidenceId = doc.id; showCrudModal = true; }} class="text-info/60 hover:text-info text-sm transition">Edit</button>
-										<form method="POST" action="?/delete" use:enhance class="inline">
-											<input type="hidden" name="evidenceId" value={doc.id} />
-											<button type="submit" class="text-danger/60 hover:text-danger text-sm transition">Remove</button>
-										</form>
+										<button onclick={(e) => { e.stopPropagation(); deleteEvidenceId = doc.id; deleteEvidenceName = doc.title || doc.fileName || doc.id; showDeleteConfirm = true; }} class="text-danger/60 hover:text-danger text-sm transition">Remove</button>
 									</div>
 								</td>
 							</tr>
@@ -1044,6 +1033,17 @@
 	onClose={() => (showUploadPipeline = false)}
 	onSuccess={(evidenceId, jobId) => { console.log('Pipeline complete:', evidenceId, jobId); showUploadPipeline = false; window.location.reload(); }}
 />
+
+<Dialog bind:open={showDeleteConfirm} title="Delete Evidence" description="This action cannot be undone.">
+	<p class="text-sm text-sand/80">Are you sure you want to delete <strong>{deleteEvidenceName}</strong>?</p>
+	{#snippet footer()}
+		<button onclick={() => (showDeleteConfirm = false)} class="px-4 py-2 rounded border border-sand/30 text-sm hover:bg-sand/10 transition">Cancel</button>
+		<form method="POST" action="?/delete" use:enhance={() => { return async ({ result }) => { showDeleteConfirm = false; await applyAction(result); window.location.reload(); }; }}>
+			<input type="hidden" name="evidenceId" value={deleteEvidenceId} />
+			<button type="submit" class="px-4 py-2 rounded bg-danger text-white text-sm hover:bg-danger/80 transition">Delete</button>
+		</form>
+	{/snippet}
+</Dialog>
 
 <style>
 	/* Professional Evidence Management Page */

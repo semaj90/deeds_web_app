@@ -10,6 +10,7 @@ import { productionLogger } from '$lib/server/production-logger.js';
 import { startRabbitMQPipeline } from '$lib/messaging/rabbitmq-xstate-integration.js';
 import { initializeQdrant } from '$lib/server/startup/qdrant-init.js';
 import { warmupTemplateCache } from '$lib/server/cache/report-template-cache.js';
+import { startIdleScanner } from '$lib/server/engagement/idle-reengagement.js';
 import { db } from '$lib/server/db/client';
 import { reports } from '$lib/server/db/schema-postgres.js';
 import { desc } from 'drizzle-orm';
@@ -40,6 +41,9 @@ warmupTemplateCache().then(() => {
 }).catch((err) => {
 	console.warn('[Boot] Template cache warmup failed (non-fatal):', (err as Error).message);
 });
+
+// Idle re-engagement scanner (5-min interval, checks user activity → notifications)
+startIdleScanner();
 
 // Option #6: Warm up export cache (pre-generate top 5 recent report exports)
 warmupExportCache().then(() => {

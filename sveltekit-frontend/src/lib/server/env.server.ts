@@ -66,4 +66,10 @@ export const ENV = {
 	// ntfy.sh push notifications
 	NTFY_URL: privateEnv.NTFY_URL ?? 'https://ntfy.sh',
 	NTFY_TOPIC: privateEnv.NTFY_TOPIC ?? 'deeds-legal-alerts',
+	// Email (Nodemailer — Gmail SMTP or custom)
+	SMTP_HOST: privateEnv.SMTP_HOST ?? 'smtp.gmail.com',
+	SMTP_PORT: Number(privateEnv.SMTP_PORT ?? '587'),
+	SMTP_USER: privateEnv.SMTP_USER ?? '',
+	SMTP_PASS: privateEnv.SMTP_PASS ?? '',
+	SMTP_FROM: privateEnv.SMTP_FROM ?? 'Deeds Legal AI <noreply@deeds-legal.ai>',
 };

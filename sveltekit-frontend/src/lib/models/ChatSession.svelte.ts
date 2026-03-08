@@ -7,6 +7,7 @@ import { shouldEscalateToServer, fetchCapabilities, type RouterDecision } from '
 import { SERVER_CHAT_MODEL, CLIENT_LLM_ONNX_PATH, CLIENT_LLM_TOKENIZER_PATH } from '$lib/ai/model-ids.js';
 import type { InferenceSource } from '$lib/ai/model-ids.js';
 import { clientCache } from '$lib/ai/client-cache.js';
+import { updateTextEmotion, getEmotionSystemPrompt, getEmotionState } from '$lib/ai/emotion-context.js';
 
 export type ChatRole = 'user' | 'assistant' | 'system';
 
@@ -113,6 +114,9 @@ export class ChatSession {
 
 		const lastUserMsg = [...this.messages].reverse().find((m) => m.role === 'user');
 		if (!lastUserMsg) return;
+
+		// ── Emotion Context Update ─────────────────────────────────────
+		updateTextEmotion(lastUserMsg.content);
 
 		// ── Client Router Decision (health-aware + LokiJS cache) ───────
 		const capabilities = await fetchCapabilities();
@@ -436,13 +440,19 @@ export class ChatSession {
 		}
 
 		try {
+			// Build emotion-aware request — server uses emotionPrompt to adapt tone
+			const emotionPrompt = getEmotionSystemPrompt();
+			const emotionState = getEmotionState();
+
 			const res = await fetch('/api/sse/chat', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					message,
 					conversationId: this._chatId,
-					model: SERVER_CHAT_MODEL
+					model: SERVER_CHAT_MODEL,
+					emotionPrompt: emotionPrompt || undefined,
+					emotionMood: emotionState.composite.mood
 				}),
 				signal: this.abortController.signal
 			});

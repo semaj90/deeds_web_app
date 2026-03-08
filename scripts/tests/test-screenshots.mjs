@@ -21,7 +21,6 @@ const QUICK_ROUTES = [
   { name: 'persons-of-interest', path: '/persons-of-interest/fake-id' },
   { name: 'cases-overview', path: '/cases/test-id/overview' },
   { name: 'cases-board', path: '/cases/test-id/board' },
-  { name: 'agentic-errors-analysis', path: '/agentic-errors/analysis' },
   { name: 'cases-list', path: '/cases' },
   { name: 'dashboard', path: '/dashboard' },
   { name: 'citations', path: '/citations' },
@@ -31,11 +30,8 @@ const ALL_ROUTES = [
   ...QUICK_ROUTES,
   { name: 'evidence-upload', path: '/cases/test-id/evidence/upload' },
   { name: 'active-cases', path: '/active-cases' },
-  { name: 'ai-dashboard', path: '/ai-dashboard' },
-  { name: 'all-routes', path: '/all-routes', sse: true },
   { name: 'analysis-center', path: '/analysis-center' },
   { name: 'command-center', path: '/command-center' },
-  { name: 'error-brain', path: '/error-brain' },
   { name: 'evidence-library', path: '/evidence-library' },
   { name: 'global-search', path: '/global-search' },
   { name: 'admin-dev-tools', path: '/admin/dev-tools' },
@@ -43,14 +39,15 @@ const ALL_ROUTES = [
   { name: 'admin-codebase-viewer', path: '/admin/codebase-viewer' },
   { name: 'system-configuration', path: '/system-configuration' },
   { name: 'terminal', path: '/terminal' },
-  { name: 'phase78', path: '/phase78/monitor' },
+  { name: 'admin-cache', path: '/admin/cache' },
+  { name: 'analytics', path: '/analytics' },
 ];
 
 // SSE / long-poll pages that never reach networkidle
-const SSE_PAGES = new Set(['all-routes', 'cases-overview', 'dashboard', 'command-center', 'error-brain', 'phase78']);
+const SSE_PAGES = new Set(['cases-overview', 'dashboard', 'command-center']);
 
 // CSR-only pages (ssr = false) need extra wait for client JS to render
-const CSR_PAGES = new Set(['evidence-library', 'evidence', 'ai-dashboard', 'terminal']);
+const CSR_PAGES = new Set(['evidence-library', 'evidence', 'terminal']);
 
 // Pages with complex canvas/WebGL rendering need extra initialization time
 const CANVAS_PAGES = new Set(['cases-board']);

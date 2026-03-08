@@ -32,7 +32,15 @@ function handleBackdropClick(e: MouseEvent) {
 		handleClose();
 	}
 }
+
+function handleKeydown(e: KeyboardEvent) {
+	if (e.key === 'Escape') {
+		handleClose();
+	}
+}
 </script>
+
+<svelte:window onkeydown={open ? handleKeydown : undefined} />
 
 {#if open}
 	<div

@@ -1289,4 +1289,59 @@
 		color: #666;
 		line-height: 1.4;
 	}
+
+	/* Responsive breakpoints */
+	@media (max-width: 1024px) {
+		.poi-grid {
+			grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+			gap: 1rem;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.header-actions {
+			flex-wrap: wrap;
+			gap: 0.5rem;
+		}
+
+		.poi-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.poi-table-wrapper {
+			overflow-x: auto;
+			-webkit-overflow-scrolling: touch;
+		}
+
+		.yorha-table {
+			min-width: 700px;
+		}
+
+		.card-header {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.5rem;
+		}
+
+		.actions-cell {
+			white-space: nowrap;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.header-actions {
+			width: 100%;
+		}
+
+		.header-btn {
+			flex: 1;
+			justify-content: center;
+			font-size: 0.75rem;
+			padding: 0.5rem 0.75rem;
+		}
+
+		.card-header {
+			padding: 1rem;
+		}
+	}
 </style>

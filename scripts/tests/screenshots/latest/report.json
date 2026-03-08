@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-06T00-23-24",
+  "timestamp": "2026-03-08T02-20-53",
   "base": "http://localhost:5173",
   "results": [
     {
@@ -8,7 +8,7 @@
       "status": 0,
       "ok": false,
       "error": "page.goto: Timeout 15000ms exceeded.",
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\evidence-ERROR.png"
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\evidence-ERROR.png"
     },
     {
       "name": "persons-of-interest",
@@ -16,7 +16,7 @@
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\persons-of-interest.png"
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\persons-of-interest.png"
     },
     {
       "name": "cases-overview",
@@ -24,7 +24,7 @@
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\cases-overview.png"
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\cases-overview.png"
     },
     {
       "name": "cases-board",
@@ -32,15 +32,7 @@
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\cases-board.png"
-    },
-    {
-      "name": "agentic-errors-analysis",
-      "url": "http://localhost:5173/agentic-errors/analysis",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\agentic-errors-analysis.png"
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\cases-board.png"
     },
     {
       "name": "cases-list",
@@ -48,7 +40,7 @@
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\cases-list.png"
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\cases-list.png"
     },
     {
       "name": "dashboard",
@@ -56,7 +48,7 @@
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\dashboard.png"
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\dashboard.png"
     },
     {
       "name": "citations",
@@ -64,7 +56,7 @@
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\citations.png"
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\citations.png"
     },
     {
       "name": "evidence-upload",
@@ -72,7 +64,7 @@
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\evidence-upload.png"
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\evidence-upload.png"
     },
     {
       "name": "active-cases",
@@ -80,23 +72,7 @@
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\active-cases.png"
-    },
-    {
-      "name": "ai-dashboard",
-      "url": "http://localhost:5173/ai-dashboard",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\ai-dashboard.png"
-    },
-    {
-      "name": "all-routes",
-      "url": "http://localhost:5173/all-routes",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\all-routes.png"
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\active-cases.png"
     },
     {
       "name": "analysis-center",
@@ -104,7 +80,7 @@
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\analysis-center.png"
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\analysis-center.png"
     },
     {
       "name": "command-center",
@@ -112,15 +88,7 @@
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\command-center.png"
-    },
-    {
-      "name": "error-brain",
-      "url": "http://localhost:5173/error-brain",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\error-brain.png"
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\command-center.png"
     },
     {
       "name": "evidence-library",
@@ -128,7 +96,7 @@
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\evidence-library.png"
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\evidence-library.png"
     },
     {
       "name": "global-search",
@@ -136,7 +104,7 @@
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\global-search.png"
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\global-search.png"
     },
     {
       "name": "admin-dev-tools",
@@ -144,7 +112,7 @@
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\admin-dev-tools.png"
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\admin-dev-tools.png"
     },
     {
       "name": "admin-knowledge-search",
@@ -152,7 +120,7 @@
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\admin-knowledge-search.png"
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\admin-knowledge-search.png"
     },
     {
       "name": "admin-codebase-viewer",
@@ -160,7 +128,7 @@
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\admin-codebase-viewer.png"
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\admin-codebase-viewer.png"
     },
     {
       "name": "system-configuration",
@@ -168,7 +136,7 @@
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\system-configuration.png"
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\system-configuration.png"
     },
     {
       "name": "terminal",
@@ -176,20 +144,28 @@
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\terminal.png"
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\terminal.png"
     },
     {
-      "name": "phase78",
-      "url": "http://localhost:5173/phase78/monitor",
+      "name": "admin-cache",
+      "url": "http://localhost:5173/admin/cache",
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-06T00-23-24\\phase78.png"
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\admin-cache.png"
+    },
+    {
+      "name": "analytics",
+      "url": "http://localhost:5173/analytics",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\tests\\screenshots\\2026-03-08T02-20-53\\analytics.png"
     }
   ],
   "summary": {
-    "passed": 22,
+    "passed": 19,
     "failed": 1,
-    "total": 23
+    "total": 20
   }
 }

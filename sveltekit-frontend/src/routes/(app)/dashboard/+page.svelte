@@ -178,16 +178,18 @@
   };
 
   $effect(() => {
-    loadDashboard();
+    const controller = new AbortController();
+    loadDashboard(controller.signal);
+    return () => controller.abort();
   });
 
-  async function loadDashboard() {
+  async function loadDashboard(signal?: AbortSignal) {
     loading = true;
     error = null;
     try {
       const [casesRes, statsRes] = await Promise.all([
-        fetch('/api/cases?limit=10'),
-        fetch('/api/dashboard/stats').catch(() => null),
+        fetch('/api/cases?limit=10', { signal }),
+        fetch('/api/dashboard/stats', { signal }).catch(() => null),
       ]);
 
       if (casesRes.status === 401) {
@@ -206,6 +208,7 @@
         stats = { ...stats, ...data };
       }
     } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
       error = err instanceof Error ? err.message : 'Failed to load dashboard';
     } finally {
       loading = false;

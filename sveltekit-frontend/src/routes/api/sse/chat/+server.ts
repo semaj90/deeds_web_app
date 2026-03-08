@@ -245,7 +245,7 @@ async function retrieveContext(
 }
 
 export const POST: RequestHandler = async ({ request }) => {
-	const { message, model, conversationId } = await request.json();
+	const { message, model, conversationId, emotionPrompt, emotionMood } = await request.json();
 
 	if (!conversationId) {
 		return new Response('Missing conversationId', { status: 400 });
@@ -350,6 +350,11 @@ export const POST: RequestHandler = async ({ request }) => {
 			// Inject codebase context (recall→rerank pipeline)
 			if (codebaseResult) {
 				systemPrompt += `\n\n${codebaseResult.context}`;
+			}
+
+			// Inject emotion context from client-side detection (text + face + behavioral)
+			if (emotionPrompt) {
+				systemPrompt += `\n${emotionPrompt}`;
 			}
 
 			let fullResponse = '';
