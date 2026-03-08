@@ -1,5 +1,6 @@
 <script lang="ts">
   import Button from '$lib/components/ui/Button.svelte';
+  import DropdownMenu from '$lib/components/ui/DropdownMenu.svelte';
   import Card from '$lib/components/ui/card/Card.svelte';
   import CardContent from '$lib/components/ui/card/CardContent.svelte';
   import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
@@ -187,16 +188,23 @@
   <header class="mb-8 text-center">
     <h1 class="text-3xl font-bold text-sand mb-2">Citation Library</h1>
     <p class="text-sand/60 text-sm">Browse and search legal citations across all cases</p>
-    <div class="flex justify-center gap-2 mt-4">
+    <div class="flex justify-center items-center gap-2 mt-4 flex-wrap">
       <Button onclick={() => viewMode = 'list'}>List View</Button>
       <Button onclick={() => viewMode = 'manager'}>Citation Manager</Button>
-      <Button onclick={() => (showGpuSearch = !showGpuSearch)}>{showGpuSearch ? 'Hide GPU Search' : 'GPU Search'}</Button>
       <Button onclick={() => (showSaveForm = !showSaveForm)}>{showSaveForm ? 'Hide Save Form' : '+ Save Citation'}</Button>
-      <Button onclick={() => (showAdvancedSearch = !showAdvancedSearch)}>{showAdvancedSearch ? 'Hide Search' : 'Advanced Search'}</Button>
-      <Button onclick={() => (showCollections = !showCollections)}>{showCollections ? 'Hide Collections' : 'Collections'}</Button>
-      <Button onclick={() => (showCitationBrowser = !showCitationBrowser)}>{showCitationBrowser ? 'Hide Browser' : 'Citation Browser'}</Button>
-      <Button onclick={() => (showLibraryPage = !showLibraryPage)}>{showLibraryPage ? 'Hide Library' : 'Citation Library'}</Button>
-      <Button onclick={() => (showKnowledgeBase = !showKnowledgeBase)}>{showKnowledgeBase ? 'Hide Knowledge Base' : 'Knowledge Base'}</Button>
+      <DropdownMenu
+        trigger="More Tools"
+        items={[
+          { label: 'GPU Search', onClick: () => { showGpuSearch = !showGpuSearch; } },
+          { label: 'Advanced Search', onClick: () => { showAdvancedSearch = !showAdvancedSearch; } },
+          { separator: true, label: '' },
+          { label: 'Collections', onClick: () => { showCollections = !showCollections; } },
+          { label: 'Citation Browser', onClick: () => { showCitationBrowser = !showCitationBrowser; } },
+          { label: 'Citation Library', onClick: () => { showLibraryPage = !showLibraryPage; } },
+          { separator: true, label: '' },
+          { label: 'Knowledge Base', onClick: () => { showKnowledgeBase = !showKnowledgeBase; } },
+        ]}
+      />
     </div>
   </header>
 

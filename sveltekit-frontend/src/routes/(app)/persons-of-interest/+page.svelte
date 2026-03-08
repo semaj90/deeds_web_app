@@ -390,7 +390,7 @@
 						</thead>
 						<tbody>
 							{#each filtered as poi (poi.id)}
-								<tr class="table-row">
+								<tr class="table-row" tabindex="0">
 									<td class="name-cell">
 										<a href="/persons-of-interest/{poi.id}" class="name-link">
 											{poi.name}

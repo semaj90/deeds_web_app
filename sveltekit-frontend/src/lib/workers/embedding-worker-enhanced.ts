@@ -1,4 +1,3 @@
-import { cacheService } from '$lib/api/services/cache-service';
 import { redis } from '$lib/server/redis';
 import type { Redis } from 'ioredis';
 // globalLoki removed - not exported from global-loki-store
@@ -58,7 +57,7 @@ export class EnhancedEmbeddingWorker {
 
         try {
             // Get Redis client from cache service or fallback global
-            this.redis = cacheService.getClient() || redis;
+            this.redis = redis;
 
             if (this.redis) {
                 // globalLoki removed - not exported

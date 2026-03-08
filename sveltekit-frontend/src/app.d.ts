@@ -49,6 +49,29 @@ declare global {
   }
 }
 
+declare module 'svelte-sonner' {
+  export const toast: {
+    (message: string, data?: any): string | number;
+    success: (message: string, data?: any) => string | number;
+    error: (message: string, data?: any) => string | number;
+    warning: (message: string, data?: any) => string | number;
+    info: (message: string, data?: any) => string | number;
+    dismiss: (id?: string | number) => void;
+  };
+  export function useSonner(): any;
+  export const Toaster: import('svelte').Component<{
+    position?: string;
+    richColors?: boolean;
+    closeButton?: boolean;
+    toastOptions?: Record<string, any>;
+    theme?: string;
+    expand?: boolean;
+    duration?: number;
+    visibleToasts?: number;
+    offset?: string | number;
+  }>;
+}
+
 declare module 'marked' {
   export function marked(src: string, options?: any): string;
   export function parse(src: string, options?: any): string;

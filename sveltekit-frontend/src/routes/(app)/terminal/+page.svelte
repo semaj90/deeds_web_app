@@ -431,6 +431,8 @@
 			<button
 				class="bg-transparent border border-[#44403c] text-stone-500 p-1.5 rounded cursor-pointer flex items-center hover:text-stone-200 hover:border-stone-500"
 				onclick={() => showSettings = !showSettings}
+				aria-label="Toggle settings panel"
+				title="Settings"
 			>
 				<Icon name="settings" size={18} />
 			</button>
@@ -650,6 +652,7 @@
 					disabled={!session || session.status === 'thinking' || handsFreeEnabled}
 					class="{isListening ? 'bg-red-600 hover:bg-red-700 border-red-500' : 'bg-stone-800 hover:bg-stone-700 border-stone-600'} h-12 w-12 shrink-0 rounded-lg flex items-center justify-center border transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
 					title={isListening ? 'Listening... (click to stop)' : 'Start voice input'}
+					aria-label={isListening ? 'Stop voice input' : 'Start voice input'}
 				>
 					{#if isListening}
 						<Icon name="mic" size={20} class="text-white animate-pulse" />

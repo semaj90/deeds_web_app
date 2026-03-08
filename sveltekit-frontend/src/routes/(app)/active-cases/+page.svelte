@@ -16,6 +16,7 @@
 	let showScoring = $state(false);
 	let caseSearchQuery = $state('');
 	let analyzingCaseId = $state<string | null>(null);
+	let lastAnalyzedCase = $state<{ id: string; title: string } | null>(null);
 	let analysisResult = $state<any>(null);
 	let analysisError = $state<string | null>(null);
 
@@ -59,6 +60,7 @@
 
 	async function analyzeCase(caseId: string, caseTitle: string) {
 		analyzingCaseId = caseId;
+		lastAnalyzedCase = { id: caseId, title: caseTitle };
 		analysisError = null;
 		analysisResult = null;
 
@@ -318,6 +320,13 @@
 							<strong>Service:</strong> Legal AI Orchestrator (Port 8102)<br/>
 							<strong>Backend:</strong> Ollama gemma3-legal:latest
 						</div>
+						<button
+							class="retry-btn"
+							onclick={() => { if (lastAnalyzedCase) analyzeCase(lastAnalyzedCase.id, lastAnalyzedCase.title); }}
+						>
+							<Icon name="refresh-cw" />
+							Retry Analysis
+						</button>
 					</div>
 				{:else if analysisResult}
 					<div class="modal-body">
@@ -849,6 +858,26 @@
 
 	.close-btn:hover {
 		color: #fff;
+	}
+
+	.retry-btn {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-top: 1rem;
+		padding: 0.5rem 1rem;
+		background: rgba(16, 185, 129, 0.15);
+		border: 1px solid #10b981;
+		color: #10b981;
+		border-radius: 4px;
+		cursor: pointer;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 0.8rem;
+		transition: background 0.2s;
+	}
+
+	.retry-btn:hover {
+		background: rgba(16, 185, 129, 0.3);
 	}
 
 	.modal-body {

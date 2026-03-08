@@ -97,7 +97,7 @@ function getTTL(priority: PriorityLevel): number {
 // ── Redis Cartridge Cache ────────────────────────────────────────────────
 
 function getRedis(): any | null {
-	return (redisService.getClient() || (globalThis as any).__REDIS) ?? null;
+	return ((redisService as any).getClient?.() || (globalThis as any).__REDIS) ?? null;
 }
 
 /**

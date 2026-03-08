@@ -269,10 +269,24 @@
 						</div>
 					{/if}
 				{:else if prefsLoading}
-					<div class="flex items-center gap-2 text-xs text-sand-11 py-4 justify-center">
-						<Icon name="loader-2" class="animate-spin" />
-						Loading profile...
+				<div class="space-y-3 py-2">
+					<div class="grid grid-cols-2 gap-2">
+						<div class="panel-soft p-2 text-center animate-pulse">
+							<div class="h-6 w-10 mx-auto bg-sand-6 rounded mb-1"></div>
+							<div class="h-3 w-16 mx-auto bg-sand-6 rounded"></div>
+						</div>
+						<div class="panel-soft p-2 text-center animate-pulse">
+							<div class="h-6 w-10 mx-auto bg-sand-6 rounded mb-1"></div>
+							<div class="h-3 w-16 mx-auto bg-sand-6 rounded"></div>
+						</div>
 					</div>
+					<div class="space-y-1.5">
+						<div class="h-3 w-24 bg-sand-6 rounded animate-pulse"></div>
+						<div class="h-1.5 w-full bg-sand-4 rounded animate-pulse"></div>
+						<div class="h-1.5 w-3/4 bg-sand-4 rounded animate-pulse"></div>
+						<div class="h-1.5 w-1/2 bg-sand-4 rounded animate-pulse"></div>
+					</div>
+				</div>
 				{:else}
 					<div class="text-xs text-sand-11 py-4 text-center">
 						No interaction history yet. Start searching to build your profile.

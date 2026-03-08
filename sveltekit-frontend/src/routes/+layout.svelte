@@ -4,13 +4,14 @@
     import { onMount } from 'svelte';
     import CaseDocumentWriter from '$lib/components/legal-ai/CaseDocumentWriter.svelte';
     import YorhaSidebar from '$lib/components/layout/YorhaSidebar.svelte';
-    import { Toaster } from 'svelte-sonner';
     import { notificationStore } from '$lib/stores/notifications.svelte';
     import { toast } from 'svelte-sonner';
+    import { browser } from '$app/environment';
 
     let { children }: { children: Snippet } = $props();
     let showDocumentWriter = $state(false);
     let mounted = $state(false);
+    let Toaster: any = $state(null);
 
     function handleGlobalKeydown(e: KeyboardEvent) {
         if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'd') {
@@ -72,6 +73,10 @@
 
     onMount(() => {
         mounted = true;
+        // Dynamic import avoids SSR TDZ bug (svelte-sonner Toaster triggers "props is not defined")
+        import('svelte-sonner').then((mod) => {
+            Toaster = mod.Toaster;
+        });
         return () => {
             cleanupStores();
         };
@@ -80,15 +85,17 @@
 
 <svelte:window onkeydown={handleGlobalKeydown} />
 
-<!-- Toast notifications (svelte-sonner) -->
-<Toaster
-    position="top-right"
-    richColors
-    closeButton
-    toastOptions={{
-        style: 'font-family: "JetBrains Mono", monospace; font-size: 0.8125rem;'
-    }}
-/>
+<!-- Toast notifications (svelte-sonner) — loaded client-only to avoid SSR TDZ bug -->
+{#if Toaster}
+    <Toaster
+        position="top-right"
+        richColors
+        closeButton
+        toastOptions={{
+            style: 'font-family: "JetBrains Mono", monospace; font-size: 0.8125rem;'
+        }}
+    />
+{/if}
 
 <!-- YoRHa Detective Sidebar -->
 <YorhaSidebar />
