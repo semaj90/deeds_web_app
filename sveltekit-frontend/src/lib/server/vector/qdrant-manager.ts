@@ -174,6 +174,23 @@ export class QdrantManager {
                     m: 16,
                     ef_construct: 100
                 }
+            },
+	{
+                name: this.collections.poi_profiles,
+                vectors: {
+	embedding: { size: 768, distance: 'Cosine' }
+                },
+                quantization_config: {
+                    scalar: {
+                        type: 'int8',
+                        quantile: 0.99,
+                        always_ram: true
+                    }
+                },
+                hnsw_config: {
+                    m: 16,
+                    ef_construct: 100
+                }
             }
         ];
 

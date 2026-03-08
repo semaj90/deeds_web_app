@@ -40,14 +40,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '$
 		}
 	}
 
-	function getStateBadgeVariant(state: string) {
-		switch (state) {
-			case 'done': return 'default';
+	function getStatusVariant(status: string) {
+		switch (status) {
+			case 'fixed': return 'default';
+			case 'error':
 			case 'failed': return 'destructive';
-			case 'analyzing':
-			case 'proposing':
-			case 'applying': return 'secondary';
-			default:return 'outline';
+			case 'open':
+			case 'pending': return 'secondary';
+			default: return 'outline';
 		}
 	}
 
@@ -76,40 +76,28 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '$
 				<Table>
 					<TableHeader>
 						<TableRow>
-							<TableHead>Run ID</TableHead>
-							<TableHead>State</TableHead>
-							<TableHead>Files Scanned</TableHead>
-							<TableHead>Errors Found</TableHead>
-							<TableHead>Patches Proposed</TableHead>
-							<TableHead>Patches Applied</TableHead>
-							<TableHead>Started</TableHead>
-							<TableHead>Actions</TableHead>
+							<TableHead>File</TableHead>
+							<TableHead>Error Code</TableHead>
+							<TableHead>Message</TableHead>
+							<TableHead>Status</TableHead>
+							<TableHead>Suggestion</TableHead>
+							<TableHead>Date</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						{#each runs as run}
 							<TableRow>
-								<TableCell class="font-mono text-sm">{run.runId.slice(0, 8)}</TableCell>
+								<TableCell class="font-mono text-sm max-w-48 truncate">{run.file_path ?? '—'}</TableCell>
+								<TableCell class="font-mono text-sm">{run.error_code ?? '—'}</TableCell>
+								<TableCell class="text-sm max-w-64 truncate">{run.message ?? '—'}</TableCell>
 								<TableCell>
-									<Badge variant={getStateBadgeVariant(run.state)}>
-										{run.state}
+									<Badge variant={getStatusVariant(run.status)}>
+										{run.status ?? 'unknown'}
 									</Badge>
 								</TableCell>
-								<TableCell>{run.filesScanned ?? 0}</TableCell>
-								<TableCell>{run.errorsFound ?? 0}</TableCell>
-								<TableCell>{run.patchesProposed ?? 0}</TableCell>
-								<TableCell>{run.patchesApplied ?? 0}</TableCell>
+								<TableCell class="text-sm max-w-48 truncate">{run.suggestion ?? '—'}</TableCell>
 								<TableCell class="text-sm text-muted-foreground">
-									{new Date(run.startedAt).toLocaleString()}
-								</TableCell>
-								<TableCell>
-									<Button class="bits-btn"
-										variant="ghost"
-										size="sm"
-										onclick={() => window.location.href = `/admin/error-brain/runs/${run.runId}`}
-									>
-										View
-									</Button>
+									{run.created_at ? new Date(run.created_at).toLocaleString() : '—'}
 								</TableCell>
 							</TableRow>
 						{/each}

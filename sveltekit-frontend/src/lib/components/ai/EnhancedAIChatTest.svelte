@@ -321,7 +321,7 @@ What would you like to explore today?`,
 <DialogRoot bind:open>
 	<DialogTrigger>
 		<Button variant="ghost" class="gap-2">
-			<span class="i-lucide-message-circle h-4 w-4 inline-block" />
+			<span class="i-lucide-message-circle h-4 w-4 inline-block"></span>
 			{title}
 		</Button>
 	</DialogTrigger>
@@ -334,7 +334,7 @@ What would you like to explore today?`,
 			<!-- Header -->
 			<div class="flex items-center justify-between p-4 border-b dark:border-sand/20">
 				<div class="flex items-center gap-3">
-					<span class="i-lucide-bot h-5 w-5 text-info dark:text-info/80 inline-block" />
+					<span class="i-lucide-bot h-5 w-5 text-info dark:text-info/80 inline-block"></span>
 					<DialogTitle class="text-lg font-semibold dark:text-white">
 						{title}
 					</DialogTitle>
@@ -349,7 +349,7 @@ What would you like to explore today?`,
 					<!-- Status Indicator -->
 					<div class="flex items-center gap-2 px-2 py-1 bg-sand/10 dark:bg-panelSoft rounded-md">
 						{#snippet statusIndicator()}
-							<span class={`i-lucide-${getStatusIcon()} h-4 w-4 ${getStatusColor()} inline-block`} />
+							<span class={`i-lucide-${getStatusIcon()} h-4 w-4 ${getStatusColor()} inline-block`}></span>
 							<span class="text-xs {getStatusColor()}">
 								{connectionStatus === 'checking'
 									? 'Checking...'
@@ -368,11 +368,11 @@ What would you like to explore today?`,
 						onclick={downloadConversation}
 						disabled={messages.length <= 1}
 					>
-						<span class="i-lucide-download h-4 w-4 inline-block" />
+						<span class="i-lucide-download h-4 w-4 inline-block"></span>
 					</Button>
 
 					<Button variant="ghost" size="sm" onclick={clearMessages} disabled={messages.length <= 1}>
-						<span class="i-lucide-trash-2 h-4 w-4 inline-block" />
+						<span class="i-lucide-trash-2 h-4 w-4 inline-block"></span>
 					</Button>
 
 					<DialogClose>
@@ -388,7 +388,7 @@ What would you like to explore today?`,
 						<div class="flex gap-3 {message.role === 'user' ? 'flex-row-reverse' : ''}">
 							{#if message.role === 'assistant'}
 								<div class="flex-shrink-0 w-8 h-8 rounded-full bg-info/10 dark:bg-info/20 flex items-center justify-center">
-									<span class="i-lucide-bot h-4 w-4 text-info dark:text-info/80 inline-block" />
+									<span class="i-lucide-bot h-4 w-4 text-info dark:text-info/80 inline-block"></span>
 								</div>
 							{/if}
 
@@ -429,7 +429,7 @@ What would you like to explore today?`,
 
 							{#if message.role === 'user'}
 								<div class="flex-shrink-0 w-8 h-8 rounded-full bg-info flex items-center justify-center">
-									<span class="i-lucide-user h-4 w-4 text-white inline-block" />
+									<span class="i-lucide-user h-4 w-4 text-white inline-block"></span>
 								</div>
 							{/if}
 						</div>
@@ -456,9 +456,9 @@ What would you like to explore today?`,
 						class="px-4"
 					>
 						{#if isLoading}
-							<span class="i-lucide-loader-2 h-4 w-4 animate-spin inline-block" />
+							<span class="i-lucide-loader-2 h-4 w-4 animate-spin inline-block"></span>
 						{:else}
-							<span class="i-lucide-send h-4 w-4 inline-block" />
+							<span class="i-lucide-send h-4 w-4 inline-block"></span>
 						{/if}
 					</Button>
 				</div>

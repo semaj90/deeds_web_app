@@ -120,14 +120,14 @@
 
 		{#if uploading}
 			<div class="flex items-center gap-2 text-xs opacity-70 font-mono">
-				<span class="i-lucide-loader animate-spin w-3 h-3 inline-block" />
+				<span class="i-lucide-loader animate-spin w-3 h-3 inline-block"></span>
 				[processing] uploading and embedding…
 			</div>
 		{/if}
 
 		{#if embeddingStream}
 			<div class="flex items-center gap-2 text-xs opacity-70 font-mono">
-				<span class="i-lucide-loader animate-spin w-3 h-3 inline-block" />
+				<span class="i-lucide-loader animate-spin w-3 h-3 inline-block"></span>
 				[stream] processing embedding pipeline…
 			</div>
 		{/if}
@@ -136,7 +136,7 @@
 	<!-- Input Bar -->
 	<footer class="p-3 border-t border-beige flex items-center gap-2">
 		<label class="cursor-pointer opacity-70 hover:opacity-100">
-			<span class="i-lucide-paperclip w-5 h-5 inline-block" />
+			<span class="i-lucide-paperclip w-5 h-5 inline-block"></span>
 			<input type="file" class="hidden" onchange={handleFile} />
 		</label>
 
@@ -151,7 +151,7 @@
 			class="px-3 py-2 border border-beige text-sm hover:bg-beige hover:text-noir"
 			onclick={sendMessage}
 		>
-			<span class="i-lucide-send w-4 h-4 inline-block" />
+			<span class="i-lucide-send w-4 h-4 inline-block"></span>
 		</button>
 	</footer>
 </section>

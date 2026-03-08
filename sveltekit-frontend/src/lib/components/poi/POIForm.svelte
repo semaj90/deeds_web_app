@@ -23,6 +23,7 @@
 
   let { formData }: Props = $props();
 
+  // svelte-ignore state_referenced_locally
   const { form, errors, enhance, submitting, message } = superForm(formData, {
     validators: zodClient(poiSchema),
     resetForm: false

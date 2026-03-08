@@ -41,7 +41,8 @@
 		enableGPUAcceleration = true
 	}: Props = $props();
 
-	let isOpen = $state(initialOpen);
+	let isOpen = $state(false);
+	$effect(() => { isOpen = initialOpen; });
 	let currentMessage = $state('');
 	let chatContainer = $state<HTMLElement | null>(null);
 	let chatSocket = $state<WebSocket | null>(null);
@@ -54,13 +55,16 @@
 
 	let chatSession = $state<ChatSession>({
 		id: `session_${Date.now()}`,
-		userID,
+		userID: '',
 		messages: [],
 		context: {
-			caseID,
 			userIntent: 'general',
 			confidence: 0.8
 		}
+	});
+	$effect(() => {
+		chatSession.userID = userID;
+		chatSession.context.caseID = caseID;
 	});
 
 	// Build conversationId for SSE endpoint (case-scoped if available)
@@ -382,7 +386,7 @@
 <!-- Floating trigger button -->
 {#if !isOpen}
 	<button class="trigger-btn" onclick={togglePanel} aria-label="Open YoRHa AI Assistant">
-		<span class="i-lucide-bot w-6 h-6 inline-block" />
+		<span class="i-lucide-bot w-6 h-6 inline-block"></span>
 	</button>
 {/if}
 
@@ -394,21 +398,21 @@
 		<!-- Header -->
 		<div class="panel-header">
 			<div class="header-title">
-				<span class="i-lucide-bot w-5 h-5 inline-block" />
+				<span class="i-lucide-bot w-5 h-5 inline-block"></span>
 				<span>YoRHa AI Assistant</span>
 			</div>
 			<div class="header-status">
 				{#if isConnecting}
-					<span class="status connecting"><span class="i-lucide-loader-2 w-3.5 h-3.5 inline-block" /> Connecting...</span>
+					<span class="status connecting"><span class="i-lucide-loader-2 w-3.5 h-3.5 inline-block"></span> Connecting...</span>
 				{:else if transport === 'websocket'}
-					<span class="status connected"><span class="i-lucide-wifi w-3.5 h-3.5 inline-block" /> WebSocket</span>
+					<span class="status connected"><span class="i-lucide-wifi w-3.5 h-3.5 inline-block"></span> WebSocket</span>
 				{:else if transport === 'sse'}
-					<span class="status sse"><span class="i-lucide-radio w-3.5 h-3.5 inline-block" /> SSE</span>
+					<span class="status sse"><span class="i-lucide-radio w-3.5 h-3.5 inline-block"></span> SSE</span>
 				{:else}
-					<span class="status disconnected"><span class="i-lucide-wifi-off w-3.5 h-3.5 inline-block" /> Offline</span>
+					<span class="status disconnected"><span class="i-lucide-wifi-off w-3.5 h-3.5 inline-block"></span> Offline</span>
 				{/if}
 				<button class="close-btn" onclick={togglePanel} aria-label="Close">
-					<span class="i-lucide-x w-4.5 h-4.5 inline-block" />
+					<span class="i-lucide-x w-4.5 h-4.5 inline-block"></span>
 				</button>
 			</div>
 		</div>
@@ -422,7 +426,7 @@
 					<div class="msg-row" class:user={message.role === 'user'}>
 						{#if message.role === 'assistant'}
 							<div class="avatar">
-								<span class="i-lucide-bot w-4 h-4 inline-block" />
+								<span class="i-lucide-bot w-4 h-4 inline-block"></span>
 							</div>
 						{/if}
 						<div
@@ -453,10 +457,10 @@
 			{#if isStreaming && !chatSession.messages.some((m) => m.streaming)}
 				<div class="msg-row">
 					<div class="avatar">
-						<span class="i-lucide-bot w-4 h-4 inline-block" />
+						<span class="i-lucide-bot w-4 h-4 inline-block"></span>
 					</div>
 					<div class="bubble assistant-bubble">
-						<span class="typing-indicator"><span class="i-lucide-loader-2 w-4 h-4 inline-block" /></span>
+						<span class="typing-indicator"><span class="i-lucide-loader-2 w-4 h-4 inline-block"></span></span>
 					</div>
 				</div>
 			{/if}
@@ -477,7 +481,7 @@
 					class="send-btn"
 					disabled={!isConnected || isConnecting || !currentMessage.trim()}
 				>
-					<span class="i-lucide-send w-4 h-4 inline-block" />
+					<span class="i-lucide-send w-4 h-4 inline-block"></span>
 				</Button>
 			</form>
 		</div>

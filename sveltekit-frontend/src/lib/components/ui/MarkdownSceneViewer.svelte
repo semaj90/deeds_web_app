@@ -36,7 +36,8 @@
 	}: Props = $props();
 
 	let isEditing = $state(false);
-	let editedMarkdown = $state(scene.markdown);
+	let editedMarkdown = $state('');
+	$effect(() => { editedMarkdown = scene.markdown; });
 
 	// Parse markdown to HTML
 	const renderedHtml = $derived(typeof marked === 'function' ? marked(scene.markdown) : String(scene.markdown));

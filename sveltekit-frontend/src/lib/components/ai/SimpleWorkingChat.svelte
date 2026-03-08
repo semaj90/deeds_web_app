@@ -324,15 +324,13 @@
 	// ═══════════════════════════════════════════════════════════════
 	type ConversationState = 'idle' | 'listening' | 'processing' | 'ai-thinking' | 'ai-speaking';
 	let conversationState = $state<ConversationState>('idle');
-	let handsFreeEnabled = $state(handsFree);
+	let handsFreeEnabled = $state(false);
 
-	// Persist hands-free preference
+	// Initialize hands-free from localStorage (or fall back to prop)
 	$effect(() => {
 		if (browser) {
 			const saved = localStorage.getItem(`handsFree-${chatId}`);
-			if (saved !== null) {
-				handsFreeEnabled = saved === 'true';
-			}
+			handsFreeEnabled = saved !== null ? saved === 'true' : handsFree;
 		}
 	});
 

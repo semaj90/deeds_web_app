@@ -59,21 +59,21 @@
       {#if fileMenuOpen}
         <div class="dropdown-menu">
           <button class="dropdown-item" onclick={() => { handleSave(); closeAllMenus(); }}>
-            <span class="i-lucide-save w-4 h-4 inline-block" /> Save Report <span class="shortcut">Ctrl+S</span>
+            <span class="i-lucide-save w-4 h-4 inline-block"></span> Save Report <span class="shortcut">Ctrl+S</span>
           </button>
           <button class="dropdown-item" onclick={() => closeAllMenus()}>
-            <span class="i-lucide-file-text w-4 h-4 inline-block" /> New Report <span class="shortcut">Ctrl+N</span>
+            <span class="i-lucide-file-text w-4 h-4 inline-block"></span> New Report <span class="shortcut">Ctrl+N</span>
           </button>
           <div class="dropdown-separator"></div>
           <button class="dropdown-item" onclick={() => closeAllMenus()}>
-            <span class="i-lucide-upload w-4 h-4 inline-block" /> Import
+            <span class="i-lucide-upload w-4 h-4 inline-block"></span> Import
           </button>
           <button class="dropdown-item" onclick={() => { handleExport(); closeAllMenus(); }}>
-            <span class="i-lucide-download w-4 h-4 inline-block" /> Export
+            <span class="i-lucide-download w-4 h-4 inline-block"></span> Export
           </button>
           <div class="dropdown-separator"></div>
           <button class="dropdown-item" onclick={() => { handlePreview(); closeAllMenus(); }}>
-            <span class="i-lucide-eye w-4 h-4 inline-block" /> Preview
+            <span class="i-lucide-eye w-4 h-4 inline-block"></span> Preview
           </button>
         </div>
       {/if}
@@ -90,17 +90,17 @@
       {#if editMenuOpen}
         <div class="dropdown-menu">
           <button class="dropdown-item" onclick={() => closeAllMenus()}>
-            <span class="i-lucide-undo w-4 h-4 inline-block" /> Undo <span class="shortcut">Ctrl+Z</span>
+            <span class="i-lucide-undo w-4 h-4 inline-block"></span> Undo <span class="shortcut">Ctrl+Z</span>
           </button>
           <button class="dropdown-item" onclick={() => closeAllMenus()}>
-            <span class="i-lucide-redo w-4 h-4 inline-block" /> Redo <span class="shortcut">Ctrl+Y</span>
+            <span class="i-lucide-redo w-4 h-4 inline-block"></span> Redo <span class="shortcut">Ctrl+Y</span>
           </button>
           <div class="dropdown-separator"></div>
           <button class="dropdown-item" onclick={() => closeAllMenus()}>
-            <span class="i-lucide-search w-4 h-4 inline-block" /> Find <span class="shortcut">Ctrl+F</span>
+            <span class="i-lucide-search w-4 h-4 inline-block"></span> Find <span class="shortcut">Ctrl+F</span>
           </button>
           <button class="dropdown-item" onclick={() => closeAllMenus()}>
-            <span class="i-lucide-replace w-4 h-4 inline-block" /> Replace <span class="shortcut">Ctrl+H</span>
+            <span class="i-lucide-replace w-4 h-4 inline-block"></span> Replace <span class="shortcut">Ctrl+H</span>
           </button>
         </div>
       {/if}
@@ -117,16 +117,16 @@
       {#if viewMenuOpen}
         <div class="dropdown-menu">
           <button class="dropdown-item" onclick={() => { toggleSidebar(); closeAllMenus(); }}>
-            <span class="i-lucide-panel-left w-4 h-4 inline-block" /> Toggle Sidebar <span class="shortcut">Ctrl+B</span>
+            <span class="i-lucide-panel-left w-4 h-4 inline-block"></span> Toggle Sidebar <span class="shortcut">Ctrl+B</span>
           </button>
           <button class="dropdown-item" onclick={() => { toggleLayout(); closeAllMenus(); }}>
-            <span class="i-lucide-layout w-4 h-4 inline-block" /> Switch Layout ({currentLayout})
+            <span class="i-lucide-layout w-4 h-4 inline-block"></span> Switch Layout ({currentLayout})
           </button>
           <button class="dropdown-item" onclick={() => { toggleFullscreen(); closeAllMenus(); }}>
             {#if fullscreen}
-              <span class="i-lucide-minimize w-4 h-4 inline-block" /> Exit Fullscreen
+              <span class="i-lucide-minimize w-4 h-4 inline-block"></span> Exit Fullscreen
             {:else}
-              <span class="i-lucide-maximize w-4 h-4 inline-block" /> Fullscreen
+              <span class="i-lucide-maximize w-4 h-4 inline-block"></span> Fullscreen
             {/if}
             <span class="shortcut">F11</span>
           </button>
@@ -143,23 +143,23 @@
       onclick={handleSave}
       title="Save Report"
     >
-      <span class="i-lucide-save w-4 h-4 inline-block" />
+      <span class="i-lucide-save w-4 h-4 inline-block"></span>
     </button>
 
     <div class="separator"></div>
 
     <button class="action-button" onclick={toggleSidebar} title="Toggle Sidebar">
-      <span class="i-lucide-panel-left w-4 h-4 inline-block" />
+      <span class="i-lucide-panel-left w-4 h-4 inline-block"></span>
     </button>
 
     <button class="action-button" onclick={toggleLayout} title="Switch Layout">
-      <span class="i-lucide-layout w-4 h-4 inline-block" />
+      <span class="i-lucide-layout w-4 h-4 inline-block"></span>
     </button>
 
     <div class="separator"></div>
 
     <button class="action-button" onclick={handlePreview} title="Preview Report">
-      <span class="i-lucide-eye w-4 h-4 inline-block" />
+      <span class="i-lucide-eye w-4 h-4 inline-block"></span>
     </button>
   </div>
 

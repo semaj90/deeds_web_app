@@ -26,7 +26,8 @@
 	let faceMatches = $state<any[]>([]);
 	let faceMatchLoading = $state(false);
 	let faceMatchError = $state<string | null>(null);
-	let photos = $state<any[]>((data as any).photos ?? []);
+	let photos = $state<any[]>([]);
+	$effect(() => { photos = (data as any).photos ?? []; });
 	let uploading = $state(false);
 	let uploadError = $state<string | null>(null);
 	let similarPOIs = $state<any[]>([]);

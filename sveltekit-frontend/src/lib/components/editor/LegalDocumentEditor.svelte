@@ -263,7 +263,7 @@
             <Tooltip.Root>
                 <Tooltip.Trigger>
                     <Button variant="ghost" size="sm">
-                        <span class="i-lucide-alert-circle h-5 w-5 inline-block" />
+                        <span class="i-lucide-alert-circle h-5 w-5 inline-block"></span>
                     </Button>
                 </Tooltip.Trigger>
                 <Tooltip.Content>
@@ -274,28 +274,28 @@
             <DropdownMenu.Root>
                 <DropdownMenu.Trigger>
                     <Button variant="outline" class="gap-2">
-                        <span class="i-lucide-settings h-4 w-4 inline-block" /> Actions <span class="i-lucide-chevron-down h-4 w-4 inline-block" />
+                        <span class="i-lucide-settings h-4 w-4 inline-block"></span> Actions <span class="i-lucide-chevron-down h-4 w-4 inline-block"></span>
                     </Button>
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Content>
                     <DropdownMenu.Item onclick={() => console.log('Preview')}>
-                        <span class="i-lucide-eye mr-2 h-4 w-4 inline-block" /> Preview
+                        <span class="i-lucide-eye mr-2 h-4 w-4 inline-block"></span> Preview
                     </DropdownMenu.Item>
                     <DropdownMenu.Item onclick={() => console.log('Share')}>
-                        <span class="i-lucide-share-2 mr-2 h-4 w-4 inline-block" /> Share
+                        <span class="i-lucide-share-2 mr-2 h-4 w-4 inline-block"></span> Share
                     </DropdownMenu.Item>
                     <DropdownMenu.Separator />
                     <DropdownMenu.Item onclick={() => console.log('Delete')}>
-                        <span class="text-danger flex items-center"><span class="i-lucide-x mr-2 h-4 w-4 inline-block" /> Delete</span>
+                        <span class="text-danger flex items-center"><span class="i-lucide-x mr-2 h-4 w-4 inline-block"></span> Delete</span>
                     </DropdownMenu.Item>
                 </DropdownMenu.Content>
             </DropdownMenu.Root>
 
             <Button onclick={manualSaveDocument} disabled={readonly || loadingDocument || isSaving} class="gap-2">
                 {#if isSaving}
-                    <span class="i-lucide-loader-2 h-4 w-4 animate-spin inline-block" /> Saving...
+                    <span class="i-lucide-loader-2 h-4 w-4 animate-spin inline-block"></span> Saving...
                 {:else}
-                    <span class="i-lucide-save h-4 w-4 inline-block" /> Save
+                    <span class="i-lucide-save h-4 w-4 inline-block"></span> Save
                 {/if}
             </Button>
         </div>
@@ -314,18 +314,18 @@
                         <div class="w-px h-6 bg-border mx-2"></div>
                         <Button variant="ghost" size="sm" title="Insert Citation"
                                 onclick={() => insertCitation({ id: crypto.randomUUID(), text: 'Sample Citation', source: 'Smith v. Jones, 123 F.3d 456', type: 'case' })}>
-                            <span class="i-lucide-book-open h-4 w-4 inline-block" />
+                            <span class="i-lucide-book-open h-4 w-4 inline-block"></span>
                         </Button>
 
                         <Button variant="ghost" size="sm" title="AI Assistant" onclick={() => aiDialogOpen = true}>
-                            <span class="i-lucide-brain h-5 w-5 text-info inline-block" />
+                            <span class="i-lucide-brain h-5 w-5 text-info inline-block"></span>
                         </Button>
 
                         <Dialog.Root bind:open={aiDialogOpen}>
                             <Dialog.Content class="sm:max-w-[500px]">
                                 <div class="flex flex-col space-y-1.5 text-center sm:text-left">
                                     <Dialog.Title class="flex items-center gap-2">
-                                        <span class="i-lucide-brain h-6 w-6 text-info inline-block" /> AI Legal Assistant
+                                        <span class="i-lucide-brain h-6 w-6 text-info inline-block"></span> AI Legal Assistant
                                     </Dialog.Title>
                                     <Dialog.Description>
                                         Ask for help drafting, researching, or refining your document.
@@ -334,7 +334,7 @@
 
                                 {#if error}
                                     <div class="bg-danger/5 text-danger p-3 rounded text-sm flex gap-2 items-center">
-                                        <span class="i-lucide-alert-circle h-4 w-4 inline-block" /> {error}
+                                        <span class="i-lucide-alert-circle h-4 w-4 inline-block"></span> {error}
                                     </div>
                                 {/if}
 
@@ -349,9 +349,9 @@
                                     <Button variant="secondary" onclick={() => aiDialogOpen = false}>Cancel</Button>
                                     <Button onclick={handleAIRequest} disabled={!query.trim() || isProcessingAI} class="gap-2">
                                         {#if isProcessingAI}
-                                            <span class="i-lucide-loader-2 h-4 w-4 animate-spin inline-block" /> Processing...
+                                            <span class="i-lucide-loader-2 h-4 w-4 animate-spin inline-block"></span> Processing...
                                         {:else}
-                                            <span class="i-lucide-brain h-4 w-4 inline-block" /> Get Help
+                                            <span class="i-lucide-brain h-4 w-4 inline-block"></span> Get Help
                                         {/if}
                                     </Button>
                                 </div>
@@ -367,12 +367,12 @@
                 <div class="relative min-h-[600px]">
                     {#if loadingDocument}
                         <div class="absolute inset-0 flex flex-col items-center justify-center bg-background/80 z-10">
-                            <span class="i-lucide-loader-2 h-8 w-8 animate-spin text-primary inline-block" />
+                            <span class="i-lucide-loader-2 h-8 w-8 animate-spin text-primary inline-block"></span>
                             <p class="mt-2 text-sm text-muted-foreground">Loading...</p>
                         </div>
                     {:else if documentLoadError}
                          <div class="absolute inset-0 flex flex-col items-center justify-center bg-background/80 z-10">
-                            <span class="i-lucide-alert-circle h-8 w-8 text-danger inline-block" />
+                            <span class="i-lucide-alert-circle h-8 w-8 text-danger inline-block"></span>
                             <p class="mt-2 text-sm font-medium">Failed to load</p>
                             <Button variant="outline" size="sm" class="mt-2" onclick={loadDocument}>Retry</Button>
                         </div>
@@ -393,7 +393,7 @@
             <!-- Citations -->
             <div class="rounded-lg border bg-background p-4 shadow-sm">
                 <div class="mb-4 flex items-center gap-2 border-b pb-2">
-                    <span class="i-lucide-book-open h-5 w-5 text-primary inline-block" />
+                    <span class="i-lucide-book-open h-5 w-5 text-primary inline-block"></span>
                     <h3 class="font-semibold">Citations</h3>
                 </div>
 
@@ -412,7 +412,7 @@
                     {/if}
 
                     <Button variant="outline" class="w-full gap-2" onclick={() => insertCitation({ id: crypto.randomUUID(), text: 'New Citation', source: 'Source Needed', type: 'other' })}>
-                        <span class="i-lucide-book-open h-4 w-4 inline-block" /> Add Citation
+                        <span class="i-lucide-book-open h-4 w-4 inline-block"></span> Add Citation
                     </Button>
                 </div>
             </div>
@@ -420,7 +420,7 @@
             <!-- Info -->
             <div class="rounded-lg border bg-background p-4 shadow-sm">
                 <div class="mb-4 flex items-center gap-2 border-b pb-2">
-                    <span class="i-lucide-file-text h-5 w-5 text-primary inline-block" />
+                    <span class="i-lucide-file-text h-5 w-5 text-primary inline-block"></span>
                     <h3 class="font-semibold">Document Info</h3>
                 </div>
                 <div class="space-y-2 text-sm">

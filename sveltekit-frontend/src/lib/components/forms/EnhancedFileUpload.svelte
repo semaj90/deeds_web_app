@@ -64,7 +64,7 @@
     title: '',
     description: '',
     tags: [] as string[],
-    caseId: caseId || '',
+    caseId: '',
     evidenceType: '',
     confidentialityLevel: '',
     collectedBy: '',
@@ -75,6 +75,7 @@
     enableSummarization: false,
     isAdmissible: false,
   });
+  $effect(() => { formState.caseId = caseId || ''; });
   let errors = $state<Record<string, string[]>>({});
 
   // Options
@@ -273,7 +274,7 @@
   <div class="border rounded-lg overflow-hidden">
     <div class="px-4 py-3 border-b bg-sand/5">
       <h3 class="font-medium flex items-center gap-2">
-        <span class="i-lucide-upload h-5 w-5 inline-block" />
+        <span class="i-lucide-upload h-5 w-5 inline-block"></span>
         {compact ? "Upload Files" : "Evidence Upload"}
       </h3>
     </div>
@@ -296,11 +297,11 @@
       >
         {#if isUploading}
           <div class="flex flex-col items-center gap-4">
-            <span class="i-lucide-loader-2 h-8 w-8 animate-spin text-info inline-block" />
+            <span class="i-lucide-loader-2 h-8 w-8 animate-spin text-info inline-block"></span>
             <div class="space-y-2">
               <p class="text-sm font-medium">Uploading {currentUploadFile}...</p>
               {#if uploadProgress[currentUploadFile] !== undefined}
-                <progress value={uploadProgress[currentUploadFile]} max="100" class="w-64" />
+                <progress value={uploadProgress[currentUploadFile]} max="100" class="w-64"></progress>
                 <p class="text-xs text-sand/60">
                   {Math.round(uploadProgress[currentUploadFile])}% complete
                 </p>
@@ -309,7 +310,7 @@
           </div>
         {:else}
           <div class="space-y-4">
-            <span class="i-lucide-upload h-12 w-12 mx-auto text-sand/40 inline-block" />
+            <span class="i-lucide-upload h-12 w-12 mx-auto text-sand/40 inline-block"></span>
             <div>
               <p class="text-lg font-medium">
                 {selectedFiles.length > 0 ? "Add more files" : "Drop files here or click to browse"}
@@ -341,12 +342,12 @@
                   <p class="font-medium truncate">{file.name}</p>
                   <p class="text-sm text-sand/60">{formatFileSize(file.size)} &bull; {file.type}</p>
                   {#if uploadProgress[file.name] !== undefined}
-                    <progress value={uploadProgress[file.name]} max="100" class="mt-2 w-full" />
+                    <progress value={uploadProgress[file.name]} max="100" class="mt-2 w-full"></progress>
                   {/if}
                 </div>
 
                 <button onclick={() => removeFile(file.name)} disabled={isUploading} class="flex-shrink-0 p-1 hover:bg-sand/10 rounded">
-                  <span class="i-lucide-x h-4 w-4 inline-block" />
+                  <span class="i-lucide-x h-4 w-4 inline-block"></span>
                 </button>
               </div>
             {/each}
@@ -416,7 +417,7 @@
                   <span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-sand/10 text-sm">
                     <span>{tag}</span>
                     <button type="button" class="ml-1" onclick={() => removeTag(tag)} disabled={isUploading} aria-label="Remove tag">
-                      <span class="i-lucide-x h-3 w-3 inline-block" />
+                      <span class="i-lucide-x h-3 w-3 inline-block"></span>
                     </button>
                   </span>
                 {/each}
@@ -464,9 +465,9 @@
 
           <Button onclick={handleFormSubmit} disabled={selectedFiles.length === 0 || isUploading || Object.keys(errors).length > 0} class="min-w-24">
             {#if isUploading}
-              <span class="i-lucide-loader-2 h-4 w-4 animate-spin mr-2 inline-block" />Uploading...
+              <span class="i-lucide-loader-2 h-4 w-4 animate-spin mr-2 inline-block"></span>Uploading...
             {:else}
-              <span class="i-lucide-upload h-4 w-4 mr-2 inline-block" />Upload {selectedFiles.length} file{selectedFiles.length !== 1 ? "s" : ""}
+              <span class="i-lucide-upload h-4 w-4 mr-2 inline-block"></span>Upload {selectedFiles.length} file{selectedFiles.length !== 1 ? "s" : ""}
             {/if}
           </Button>
         </div>
@@ -474,7 +475,7 @@
 
       {#if Object.keys(errors).length > 0 && selectedFiles.length > 0}
         <div class="border border-danger/30 bg-danger/5 rounded p-3 flex items-start gap-3">
-          <span class="i-lucide-alert-circle h-4 w-4 text-danger flex-shrink-0 mt-0.5 inline-block" />
+          <span class="i-lucide-alert-circle h-4 w-4 text-danger flex-shrink-0 mt-0.5 inline-block"></span>
           <div>
             <p class="font-medium text-danger">Please fix the following errors before uploading:</p>
             <ul class="mt-2 list-disc list-inside text-sm text-danger">

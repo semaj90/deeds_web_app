@@ -28,7 +28,8 @@
 	let results = $state<SearchResult[]>([]);
 	let searchError = $state<string | null>(null);
 	let searchHistory = $state<string[]>([]);
-	let selectedMode = $state(contextMode);
+	let selectedMode = $state<Props['contextMode']>('legal');
+	$effect(() => { selectedMode = contextMode; });
 
 	async function performSearch() {
 		if (!query.trim() || isSearching) return;

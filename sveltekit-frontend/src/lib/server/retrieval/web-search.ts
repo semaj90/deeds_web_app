@@ -10,6 +10,10 @@
 
 import { ENV } from '$lib/server/env.server.js';
 
+// Re-export Wikipedia search for unified retrieval access
+export { searchWikipedia, formatWikipediaAsContext } from './wikipedia-search.js';
+export type { WikipediaResult, WikipediaSearchResponse } from './wikipedia-search.js';
+
 export interface WebSearchResult {
 	title: string;
 	url: string;

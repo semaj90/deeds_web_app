@@ -150,13 +150,13 @@ return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 class={isActive.bold ? "bg-muted" : ""}
 onclick={() => editor?.chain().focus().toggleBold().run()}
 >
-<span class="i-lucide-bold w-4 h-4 inline-block" />
+<span class="i-lucide-bold w-4 h-4 inline-block"></span>
 </Button>
 <Button variant="ghost" size="sm"
 class={isActive.italic ? "bg-muted" : ""}
 onclick={() => editor?.chain().focus().toggleItalic().run()}
 >
-<span class="i-lucide-italic w-4 h-4 inline-block" />
+<span class="i-lucide-italic w-4 h-4 inline-block"></span>
 </Button>
 
 <div class="w-px h-6 bg-border mx-1"></div>
@@ -165,13 +165,13 @@ onclick={() => editor?.chain().focus().toggleItalic().run()}
 class={isActive.h1 ? "bg-muted" : ""}
 onclick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
 >
-<span class="i-lucide-heading-1 w-4 h-4 inline-block" />
+<span class="i-lucide-heading-1 w-4 h-4 inline-block"></span>
 </Button>
 <Button variant="ghost" size="sm"
 class={isActive.h2 ? "bg-muted" : ""}
 onclick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
 >
-<span class="i-lucide-heading-2 w-4 h-4 inline-block" />
+<span class="i-lucide-heading-2 w-4 h-4 inline-block"></span>
 </Button>
 
 <div class="w-px h-6 bg-border mx-1"></div>
@@ -180,13 +180,13 @@ onclick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
 class={isActive.bullet ? "bg-muted" : ""}
 onclick={() => editor?.chain().focus().toggleBulletList().run()}
 >
-<span class="i-lucide-list w-4 h-4 inline-block" />
+<span class="i-lucide-list w-4 h-4 inline-block"></span>
 </Button>
 <Button variant="ghost" size="sm"
 class={isActive.ordered ? "bg-muted" : ""}
 onclick={() => editor?.chain().focus().toggleOrderedList().run()}
 >
-<span class="i-lucide-list-ordered w-4 h-4 inline-block" />
+<span class="i-lucide-list-ordered w-4 h-4 inline-block"></span>
 </Button>
 
 <div class="flex-1"></div>
@@ -195,7 +195,7 @@ onclick={() => editor?.chain().focus().toggleOrderedList().run()}
 class="gap-2 text-indigo-400 border-info/30 hover:bg-info/10"
 onclick={() => showAiMenu = !showAiMenu}
 >
-<span class="i-lucide-wand-2 w-3.5 h-3.5 inline-block" />
+<span class="i-lucide-wand-2 w-3.5 h-3.5 inline-block"></span>
 AI Assistant
 </Button>
 
@@ -205,10 +205,10 @@ onclick={handleSave}
 disabled={isSaving}
 >
 {#if isSaving}
-<span class="i-lucide-loader-2 w-3.5 h-3.5 animate-spin inline-block" />
+<span class="i-lucide-loader-2 w-3.5 h-3.5 animate-spin inline-block"></span>
 Saving
 {:else}
-<span class="i-lucide-save w-3.5 h-3.5 inline-block" />
+<span class="i-lucide-save w-3.5 h-3.5 inline-block"></span>
 Save
 {/if}
 </Button>
@@ -228,7 +228,7 @@ onkeydown={(e) => e.key === 'Enter' && runAiCommand()}
 />
 <Button size="sm" onclick={runAiCommand} disabled={isGenerating || !aiPrompt}>
 {#if isGenerating}
-<span class="i-lucide-loader-2 w-3.5 h-3.5 animate-spin p-0 inline-block" />
+<span class="i-lucide-loader-2 w-3.5 h-3.5 animate-spin p-0 inline-block"></span>
 {:else}
 Generate
 {/if}
@@ -248,7 +248,7 @@ Generate
 <span>{wordCount} words</span>
 {#if lastSaved}
 <span class="flex items-center gap-1 text-accent">
-<span class="i-lucide-check w-3 h-3 inline-block" />
+<span class="i-lucide-check w-3 h-3 inline-block"></span>
 Saved {formatTime(lastSaved)}
 </span>
 {:else}

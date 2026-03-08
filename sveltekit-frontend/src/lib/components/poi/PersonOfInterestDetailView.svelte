@@ -146,7 +146,7 @@
  onclick={() => onEdit(poi)}
  class="bits-btn bg-panelSoft border-sand/30 hover:bg-panelSoft"
  >
- <span class="i-lucide-edit w-4 h-4 mr-2 inline-block" />
+ <span class="i-lucide-edit w-4 h-4 mr-2 inline-block"></span>
  Edit Profile
  </Button>
  </div>
@@ -168,25 +168,25 @@
  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
  {#if age}
  <div class="flex items-center gap-2 text-sand/40">
- <span class="i-lucide-calendar w-4 h-4 inline-block" />
+ <span class="i-lucide-calendar w-4 h-4 inline-block"></span>
  <span>{age} years old</span>
  </div>
  {/if}
  {#if poi.lastKnownLocation}
  <div class="flex items-center gap-2 text-sand/40">
- <span class="i-lucide-map-pin w-4 h-4 inline-block" />
+ <span class="i-lucide-map-pin w-4 h-4 inline-block"></span>
  <span class="truncate">{poi.lastKnownLocation}</span>
  </div>
  {/if}
  {#if poi.phone}
  <div class="flex items-center gap-2 text-sand/40">
- <span class="i-lucide-phone w-4 h-4 inline-block" />
+ <span class="i-lucide-phone w-4 h-4 inline-block"></span>
  <span>{poi.phone}</span>
  </div>
  {/if}
  {#if poi.email}
  <div class="flex items-center gap-2 text-sand/40">
- <span class="i-lucide-mail w-4 h-4 inline-block" />
+ <span class="i-lucide-mail w-4 h-4 inline-block"></span>
  <span class="truncate">{poi.email}</span>
  </div>
  {/if}
@@ -200,19 +200,19 @@
  <Tabs defaultValue="overview" class="h-full flex flex-col">
  <TabsList class="grid w-full grid-cols-4 bg-panelSoft border-b border-sand/20">
  <TabsTrigger value="overview" class="data-[state=active] bg-panelSoft">
- <span class="i-lucide-eye w-4 h-4 mr-2 inline-block" />
+ <span class="i-lucide-eye w-4 h-4 mr-2 inline-block"></span>
  Overview
  </TabsTrigger>
  <TabsTrigger value="timeline" class="data-[state=active] bg-panelSoft">
- <span class="i-lucide-clock w-4 h-4 mr-2 inline-block" />
+ <span class="i-lucide-clock w-4 h-4 mr-2 inline-block"></span>
  Timeline
  </TabsTrigger>
  <TabsTrigger value="connections" class="data-[state=active] bg-panelSoft">
- <span class="i-lucide-network w-4 h-4 mr-2 inline-block" />
+ <span class="i-lucide-network w-4 h-4 mr-2 inline-block"></span>
  Connections
  </TabsTrigger>
  <TabsTrigger value="analysis" class="data-[state=active] bg-panelSoft">
- <span class="i-lucide-bar-chart-3 w-4 h-4 mr-2 inline-block" />
+ <span class="i-lucide-bar-chart-3 w-4 h-4 mr-2 inline-block"></span>
  Analysis
  </TabsTrigger>
  </TabsList>
@@ -223,7 +223,7 @@
  <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
  <CardTitle class="text-sand/40 flex items-center gap-2">
- <span class="i-lucide-users w-5 h-5 inline-block" />
+ <span class="i-lucide-users w-5 h-5 inline-block"></span>
  Physical Characteristics
  </CardTitle>
  </CardHeader>
@@ -268,7 +268,7 @@
  <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
  <CardTitle class="text-sand/40 flex items-center gap-2">
- <span class="i-lucide-alert-triangle w-5 h-5 inline-block" />
+ <span class="i-lucide-alert-triangle w-5 h-5 inline-block"></span>
  Modus Operandi
  </CardTitle>
  </CardHeader>
@@ -283,7 +283,7 @@
  <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
  <CardTitle class="text-sand/40 flex items-center gap-2">
- <span class="i-lucide-trending-up w-5 h-5 inline-block" />
+ <span class="i-lucide-trending-up w-5 h-5 inline-block"></span>
  Known Habits
  </CardTitle>
  </CardHeader>
@@ -305,7 +305,7 @@
  <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
  <CardTitle class="text-sand/40 flex items-center gap-2">
- <span class="i-lucide-users w-5 h-5 inline-block" />
+ <span class="i-lucide-users w-5 h-5 inline-block"></span>
  Known Associates
  </CardTitle>
  </CardHeader>
@@ -326,7 +326,7 @@
  <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
  <CardTitle class="text-sand/40 flex items-center gap-2">
- <span class="i-lucide-file-text w-5 h-5 inline-block" />
+ <span class="i-lucide-file-text w-5 h-5 inline-block"></span>
  Investigation Notes
  </CardTitle>
  </CardHeader>
@@ -341,7 +341,7 @@
  <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
  <CardTitle class="text-sand/40 flex items-center gap-2">
- <span class="i-lucide-tag w-5 h-5 inline-block" />
+ <span class="i-lucide-tag w-5 h-5 inline-block"></span>
  Tags
  </CardTitle>
  </CardHeader>
@@ -363,7 +363,7 @@
  </CardHeader>
  <CardContent>
  <div class="text-center py-8 text-sand/40">
- <span class="i-lucide-clock w-12 h-12 mx-auto mb-4 opacity-50 inline-block" />
+ <span class="i-lucide-clock w-12 h-12 mx-auto mb-4 opacity-50 inline-block"></span>
  <p>Timeline feature coming soon</p>
  <p class="text-sm mt-2">Track POI activities, sightings, and case developments</p>
  </div>
@@ -378,7 +378,7 @@
  </CardHeader>
  <CardContent>
  <div class="text-center py-8 text-sand/40">
- <span class="i-lucide-network w-12 h-12 mx-auto mb-4 opacity-50 inline-block" />
+ <span class="i-lucide-network w-12 h-12 mx-auto mb-4 opacity-50 inline-block"></span>
  <p>Network analysis coming soon</p>
  <p class="text-sm mt-2">Visualize relationships and connections</p>
  </div>
@@ -391,7 +391,7 @@
  <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
  <CardTitle class="text-sand/40 flex items-center gap-2">
- <span class="i-lucide-alert-triangle w-5 h-5 inline-block" />
+ <span class="i-lucide-alert-triangle w-5 h-5 inline-block"></span>
  Threat Assessment
  </CardTitle>
  </CardHeader>
@@ -429,13 +429,13 @@
  <Card class="bg-panelSoft border-sand/20">
  <CardHeader>
  <CardTitle class="text-sand/40 flex items-center gap-2">
- <span class="i-lucide-bar-chart-3 w-5 h-5 inline-block" />
+ <span class="i-lucide-bar-chart-3 w-5 h-5 inline-block"></span>
  Behavioral Analysis
  </CardTitle>
  </CardHeader>
  <CardContent>
  <div class="text-center py-8 text-sand/40">
- <span class="i-lucide-bar-chart-3 w-12 h-12 mx-auto mb-4 opacity-50 inline-block" />
+ <span class="i-lucide-bar-chart-3 w-12 h-12 mx-auto mb-4 opacity-50 inline-block"></span>
  <p>Advanced analysis coming soon</p>
  <p class="text-sm mt-2">AI-powered behavioral patterns and risk assessment</p>
  </div>

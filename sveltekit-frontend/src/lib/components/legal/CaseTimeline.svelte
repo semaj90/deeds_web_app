@@ -1,5 +1,5 @@
 <!-- Case Timeline Component for Legal AI App -->
-<script context="module" lang="ts">
+<script module lang="ts">
   export interface TimelineEvent { id: string, date: Date;
     title: string;
     description?: string;

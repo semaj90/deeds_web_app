@@ -54,11 +54,12 @@ const sessionSeed =
  let casesError = $state<string | null>(null);
 
  let reportForm = $state({
- caseId: defaultCaseId,
+ caseId: '',
  summary: '',
  includeChatTranscript: true,
  deliverables: ['closingOutline', 'investigativeGaps'] as string[]
  });
+ $effect(() => { if (defaultCaseId) reportForm.caseId = defaultCaseId; });
  let reportStatus = $state<{ state: 'idle' | 'running' | 'success' | 'error'; message?: string; output?: any }>({
  state: 'idle'
  });
@@ -74,12 +75,13 @@ const sessionSeed =
  let caseFormStatus = $state<{ state: 'idle' | 'running' | 'success' | 'error'; message?: string }>({ state: 'idle' });
 
  let evidenceForm = $state({
- caseId: defaultCaseId,
+ caseId: '',
  title: '',
  description: '',
  evidenceType: 'document',
  tags: ''
  });
+ $effect(() => { if (defaultCaseId) evidenceForm.caseId = defaultCaseId; });
  let evidenceFile = $state<File | null>(null);
  let evidenceStatus = $state<{ state: 'idle' | 'running' | 'success' | 'error'; message?: string }>({ state: 'idle' });
 

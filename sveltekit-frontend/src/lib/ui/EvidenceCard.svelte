@@ -95,7 +95,7 @@
 
  {#if isTagged}
  <div class="ai-indicator">
-  <span class="i-lucide-zap w-4 h-4 inline-block" />
+  <span class="i-lucide-zap w-4 h-4 inline-block"></span>
   <span>AI Tagged</span>
  </div>
  {/if}
@@ -108,7 +108,7 @@
  aria-label="Download {evidence.title}"
  title="Download"
  >
- <span class="i-lucide-download w-3.5 h-3.5 inline-block" />
+ <span class="i-lucide-download w-3.5 h-3.5 inline-block"></span>
  </button>
 
  <button
@@ -117,7 +117,7 @@
  aria-label="Delete {evidence.title}"
  title="Delete"
  >
- <span class="i-lucide-trash-2 w-3.5 h-3.5 inline-block" />
+ <span class="i-lucide-trash-2 w-3.5 h-3.5 inline-block"></span>
  </button>
  </div>
  {/if}
@@ -132,13 +132,13 @@
 
  <div class="evidence-meta">
  <div class="meta-item nes-text is-disabled">
- <span class="i-lucide-file-text w-3 h-3 inline-block" />
+ <span class="i-lucide-file-text w-3 h-3 inline-block"></span>
  <span>{evidence.evidenceType}</span>
  </div>
 
  {#if evidence.fileSize}
  <div class="meta-item nes-text is-disabled">
- <span class="i-lucide-archive w-3 h-3 inline-block" />
+ <span class="i-lucide-archive w-3 h-3 inline-block"></span>
  <span>{formatFileSize(evidence.fileSize)}</span>
  </div>
  {/if}
@@ -163,7 +163,7 @@
 	{#if evidence.summary}
 		<div class="ai-summary nes-container is-rounded">
 			<div class="summary-header nes-text is-primary">
-				<span class="i-lucide-eye w-3 h-3 inline-block" />
+				<span class="i-lucide-eye w-3 h-3 inline-block"></span>
 				<span>AI Summary</span>
 			</div>
 			<Tooltip text={evidence.summary}>

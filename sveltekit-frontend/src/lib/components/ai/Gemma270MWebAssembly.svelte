@@ -59,7 +59,8 @@
 	}>>([]);
 
 	// Upload + evidence ID
-	let uploadedEvidenceId = $state(evidenceId);
+	let uploadedEvidenceId = $state('');
+	$effect(() => { uploadedEvidenceId = evidenceId; });
 
 	// Config toggles
 	let enableClientEmbed = $state(true);
@@ -303,10 +304,10 @@
 	<!-- Model Status Bar -->
 	<div class="model-bar">
 		<div class="model-item">
-			<span class="i-lucide-cpu w-3 h-3 inline-block" />
+			<span class="i-lucide-cpu w-3 h-3 inline-block"></span>
 			<span class="model-label">ONNX:</span>
 			{#if isCheckingModel}
-				<span class="i-lucide-loader animate-spin w-3 h-3 inline-block" />
+				<span class="i-lucide-loader animate-spin w-3 h-3 inline-block"></span>
 			{:else if embeddingModelReady}
 				<span class="status-ok">{CLIENT_EMBEDDING_MODEL} ({CLIENT_EMBEDDING_DIMS}d)</span>
 				{#if onnxProvider}
@@ -317,12 +318,12 @@
 			{/if}
 		</div>
 		<div class="model-item">
-			<span class="i-lucide-brain w-3 h-3 inline-block" />
+			<span class="i-lucide-brain w-3 h-3 inline-block"></span>
 			<span class="model-label">VLM:</span>
 			<span class="status-ok">gemma3-legal:latest</span>
 		</div>
 		<div class="model-item">
-			<span class="i-lucide-scan w-3 h-3 inline-block" />
+			<span class="i-lucide-scan w-3 h-3 inline-block"></span>
 			<span class="model-label">YOLO:</span>
 			<span class="status-ok">yolov8-doc ONNX</span>
 		</div>
@@ -336,11 +337,11 @@
 				<div class="pipeline-step {status}">
 					<div class="step-dot">
 						{#if status === 'active'}
-							<span class="i-lucide-loader animate-spin w-[11px] h-[11px] inline-block" />
+							<span class="i-lucide-loader animate-spin w-[11px] h-[11px] inline-block"></span>
 						{:else if status === 'done'}
-							<span class="i-lucide-check-circle w-[11px] h-[11px] inline-block" />
+							<span class="i-lucide-check-circle w-[11px] h-[11px] inline-block"></span>
 						{:else if status === 'error'}
-							<span class="i-lucide-alert-circle w-[11px] h-[11px] inline-block" />
+							<span class="i-lucide-alert-circle w-[11px] h-[11px] inline-block"></span>
 						{:else}
 							<span class="i-lucide-{step.icon} w-[11px] h-[11px] inline-block"></span>
 						{/if}
@@ -364,7 +365,7 @@
 					ondragleave={handleDragLeave}
 					ondrop={handleDrop}
 				>
-					<span class="i-lucide-image drop-icon w-10 h-10 inline-block" />
+					<span class="i-lucide-image drop-icon w-10 h-10 inline-block"></span>
 					<p class="drop-text">Drop image for VLM analysis</p>
 					<p class="drop-hint">Client ONNX embed → YOLO → gemma3 VLM → entity extraction</p>
 					<label class="file-label">
@@ -379,7 +380,7 @@
 						<span class="file-name">{selectedFile.name}</span>
 						<span class="file-size">{(selectedFile.size / 1024 / 1024).toFixed(1)}MB</span>
 						<button class="icon-btn" onclick={clearFile} disabled={analysisStep !== 'idle' && analysisStep !== 'complete' && analysisStep !== 'error'}>
-							<span class="i-lucide-x w-3.5 h-3.5 inline-block" />
+							<span class="i-lucide-x w-3.5 h-3.5 inline-block"></span>
 						</button>
 					</div>
 					<div class="image-wrapper">
@@ -403,21 +404,21 @@
 
 					<div class="controls">
 						<div class="config-toggles">
-							<label><input type="checkbox" bind:checked={enableClientEmbed} /> <span class="i-lucide-cpu w-[11px] h-[11px] inline-block" /> Embed</label>
+							<label><input type="checkbox" bind:checked={enableClientEmbed} /> <span class="i-lucide-cpu w-[11px] h-[11px] inline-block"></span> Embed</label>
 							<label><input type="checkbox" bind:checked={enableYolo} /> YOLO</label>
 							<label><input type="checkbox" bind:checked={enableVlm} /> VLM</label>
 							<label><input type="checkbox" bind:checked={enableEntities} /> Entities</label>
 							{#if yoloDetections.length > 0}
-								<label><input type="checkbox" bind:checked={showOverlay} /> <span class="i-lucide-eye w-[11px] h-[11px] inline-block" /> Boxes</label>
+								<label><input type="checkbox" bind:checked={showOverlay} /> <span class="i-lucide-eye w-[11px] h-[11px] inline-block"></span> Boxes</label>
 							{/if}
 						</div>
 						{#if analysisStep === 'idle' || analysisStep === 'complete' || analysisStep === 'error'}
 							<button class="analyze-btn" onclick={runAnalysis}>
-								<span class="i-lucide-zap w-3.5 h-3.5 inline-block" /> {analysisStep === 'complete' ? 'Re-analyze' : 'Analyze'}
+								<span class="i-lucide-zap w-3.5 h-3.5 inline-block"></span> {analysisStep === 'complete' ? 'Re-analyze' : 'Analyze'}
 							</button>
 						{:else}
 							<button class="analyze-btn" disabled>
-								<span class="i-lucide-loader animate-spin w-3.5 h-3.5 inline-block" /> Analyzing...
+								<span class="i-lucide-loader animate-spin w-3.5 h-3.5 inline-block"></span> Analyzing...
 							</button>
 						{/if}
 					</div>
@@ -429,7 +430,7 @@
 		<div class="results-panel">
 			{#if errorMessage}
 				<div class="error-msg">
-					<span class="i-lucide-alert-circle w-3.5 h-3.5 inline-block" />
+					<span class="i-lucide-alert-circle w-3.5 h-3.5 inline-block"></span>
 					<span>{errorMessage}</span>
 				</div>
 			{/if}
@@ -438,7 +439,7 @@
 			{#if clientEmbedding.length > 0}
 				<div class="result-section embedding-section">
 					<div class="section-header">
-						<span class="i-lucide-cpu w-3.5 h-3.5 inline-block" />
+						<span class="i-lucide-cpu w-3.5 h-3.5 inline-block"></span>
 						<h3>Client Embedding ({CLIENT_EMBEDDING_DIMS}d)</h3>
 						<span class="source-tag {embeddingSource}">{embeddingSource}</span>
 						{#if onnxProvider}
@@ -462,7 +463,7 @@
 			{#if yoloDetections.length > 0}
 				<div class="result-section">
 					<div class="section-header">
-						<span class="i-lucide-scan w-3.5 h-3.5 inline-block" />
+						<span class="i-lucide-scan w-3.5 h-3.5 inline-block"></span>
 						<h3>YOLO ({yoloDetections.length})</h3>
 						<span class="timing">{yoloProcessingTime.toFixed(0)}ms</span>
 					</div>
@@ -482,14 +483,14 @@
 			{#if vlmDescription}
 				<div class="result-section">
 					<div class="section-header">
-						<span class="i-lucide-brain w-3.5 h-3.5 inline-block" />
+						<span class="i-lucide-brain w-3.5 h-3.5 inline-block"></span>
 						<h3>VLM Analysis</h3>
 						{#if vlmConfidence > 0}
 							<span class="confidence">{(vlmConfidence * 100).toFixed(0)}%</span>
 						{/if}
 						<span class="timing">{vlmProcessingTime.toFixed(0)}ms</span>
 						<button class="icon-btn" onclick={() => copyToClipboard(vlmDescription)}>
-							<span class="i-lucide-copy w-3 h-3 inline-block" />
+							<span class="i-lucide-copy w-3 h-3 inline-block"></span>
 						</button>
 					</div>
 					<div class="vlm-text">{vlmDescription}</div>
@@ -500,7 +501,7 @@
 			{#if extractedEntities.length > 0}
 				<div class="result-section">
 					<div class="section-header">
-						<span class="i-lucide-file-text w-3.5 h-3.5 inline-block" />
+						<span class="i-lucide-file-text w-3.5 h-3.5 inline-block"></span>
 						<h3>Entities ({extractedEntities.length})</h3>
 					</div>
 					<div class="entity-list">
@@ -527,7 +528,7 @@
 
 			{#if analysisStep === 'idle' && !selectedFile}
 				<div class="empty-state">
-					<span class="i-lucide-eye w-8 h-8 inline-block" />
+					<span class="i-lucide-eye w-8 h-8 inline-block"></span>
 					<p>Upload an image to run the full analysis pipeline.</p>
 					<p class="hint">
 						{embeddingModelReady

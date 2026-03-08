@@ -62,7 +62,7 @@
   let showTransferDialog = $state(false);
 
   // WebSocket for real-time updates
-  let wsConnection: WebSocket | null = null;
+  let wsConnection = $state<WebSocket | null>(null);
 
   onMount(() => {
     // Start the state machine actor

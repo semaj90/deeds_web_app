@@ -10,6 +10,7 @@ import Phase72ErrorBrain from '$lib/components/Phase72ErrorBrain.svelte';
 import ErrorStreamMonitor from '$lib/components/ErrorStreamMonitor.svelte';
 import ErrorModal from '$lib/components/phase78/ErrorModal.svelte';
 import PhoenixEventMonitor from '$lib/components/yorha/PhoenixEventMonitor.svelte';
+import AIDropdown from '$lib/components/ui/AIDropdown.svelte';
 // Migrated to $effect
 
  let showErrorStream = $state(false);
@@ -22,6 +23,34 @@ import PhoenixEventMonitor from '$lib/components/yorha/PhoenixEventMonitor.svelt
  let error = $state<string | null>(null);
  let showErrorBrain = $state(false);
  let selectedRoute = $state<string | null>(null);
+
+ // Auto-patch state
+ let autoPatchTarget = $state('');
+ let autoPatchError = $state('');
+ let autoPatchRunning = $state(false);
+ let autoPatchResult = $state<any>(null);
+
+ async function runAutoPatch() {
+	if (!autoPatchTarget || !autoPatchError) return;
+	autoPatchRunning = true;
+	autoPatchResult = null;
+	try {
+		const res = await fetch('/api/error-brain/auto-patch', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				filePath: autoPatchTarget,
+				errorMessage: autoPatchError,
+				maxAttempts: 2,
+			}),
+		});
+		autoPatchResult = await res.json();
+	} catch (err) {
+		autoPatchResult = { success: false, message: (err as Error).message };
+	} finally {
+		autoPatchRunning = false;
+	}
+ }
 
  async function fetchStatus() {
  try {
@@ -82,7 +111,13 @@ import PhoenixEventMonitor from '$lib/components/yorha/PhoenixEventMonitor.svelt
  Automated TypeScript error analysis and correction system
  </p>
  </div>
- <Button class="bits-btn" onclick={createRun}>Create New Run</Button>
+ <AIDropdown
+		onReportGenerate={(type) => { autoPatchTarget = selectedRoute ?? ''; showErrorBrain = true; }}
+		onSummarize={() => { showErrorBrain = true; }}
+		onAnalyze={() => { showPhoenixMonitor = true; }}
+		hasContent={!!selectedRoute || runs.length > 0}
+	/>
+	<Button class="bits-btn" onclick={createRun}>Create New Run</Button>
 	<Button class="bits-btn" onclick={() => (showErrorBrain = true)}>Phase 72 Error Brain</Button>
 	<Button class="bits-btn" onclick={() => (showErrorStream = !showErrorStream)}>{showErrorStream ? 'Hide Stream' : 'Error Stream'}</Button>
 	<Button class="bits-btn" onclick={() => (showPhoenixMonitor = !showPhoenixMonitor)}>{showPhoenixMonitor ? 'Hide Phoenix' : 'Phoenix Events'}</Button>
@@ -136,43 +171,49 @@ import PhoenixEventMonitor from '$lib/components/yorha/PhoenixEventMonitor.svelt
  </CardContent>
  </Card>
  {:else if status}
- <div class="grid gap-4 md:grid-cols-3">
+ <div class="grid gap-4 md:grid-cols-4">
  <Card>
  <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
  <CardTitle class="text-sm font-medium">System Status</CardTitle>
- <Badge variant={status.enabled ? 'default' : 'secondary'}>
- {status.enabled ? 'Enabled' : 'Disabled'}
+ <Badge variant={status.status === 'operational' ? 'default' : 'secondary'}>
+ {status.status ?? 'unknown'}
  </Badge>
  </CardHeader>
  <CardContent>
- <div class="text-2xl font-bold">{status.enabled ? 'Active' : 'Inactive'}</div>
- <p class="text-xs text-muted-foreground">
- {status.enabled ? 'System is operational' : 'System is disabled'}
- </p>
- </CardContent>
- </Card>
-
- {#if status.config}
- <Card>
- <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
- <CardTitle class="text-sm font-medium">Transport</CardTitle>
- </CardHeader>
- <CardContent>
- <div class="text-2xl font-bold capitalize">{status.config.transport}</div>
- <p class="text-xs text-muted-foreground">Event delivery method</p>
+ <div class="text-2xl font-bold">{status.totalErrors ?? 0}</div>
+ <p class="text-xs text-muted-foreground">Total errors tracked</p>
  </CardContent>
  </Card>
 
  <Card>
  <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
- <CardTitle class="text-sm font-medium">Apply Mode</CardTitle>
+ <CardTitle class="text-sm font-medium">Fixed</CardTitle>
  </CardHeader>
  <CardContent>
- <div class="text-2xl font-bold capitalize">{status.config.applyMode}</div>
- <p class="text-xs text-muted-foreground">Patch application mode</p>
+ <div class="text-2xl font-bold">{status.fixedCount ?? 0}</div>
+ <p class="text-xs text-muted-foreground">{status.fixRate ?? 0}% fix rate</p>
  </CardContent>
  </Card>
- {/if}
+
+ <Card>
+ <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+ <CardTitle class="text-sm font-medium">Recent (24h)</CardTitle>
+ </CardHeader>
+ <CardContent>
+ <div class="text-2xl font-bold">{status.recentErrors ?? 0}</div>
+ <p class="text-xs text-muted-foreground">Errors in last 24 hours</p>
+ </CardContent>
+ </Card>
+
+ <Card>
+ <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+ <CardTitle class="text-sm font-medium">Affected Files</CardTitle>
+ </CardHeader>
+ <CardContent>
+ <div class="text-2xl font-bold">{status.affectedFiles ?? 0}</div>
+ <p class="text-xs text-muted-foreground">Unique files with errors</p>
+ </CardContent>
+ </Card>
  </div>
 
  <!-- Route Filter for Error Brain -->
@@ -182,6 +223,52 @@ import PhoenixEventMonitor from '$lib/components/yorha/PhoenixEventMonitor.svelt
 			<label for="route-filter" style="font-size: 0.875rem; font-weight: 600;">Route Filter:</label>
 			<input id="route-filter" type="text" placeholder="e.g. /dashboard, /cases/[id]" bind:value={selectedRoute} style="flex: 1; padding: 0.5rem; border: 1px solid #ccc; border-radius: 0.25rem; font-family: monospace;" />
 			<Button class="bits-btn" onclick={() => { if (selectedRoute) showErrorBrain = true; }}>Inspect Route</Button>
+		</div>
+	</CardContent>
+ </Card>
+
+ <!-- Auto-Patch Section -->
+ <Card>
+	<CardHeader>
+		<CardTitle>Auto-Patch</CardTitle>
+		<CardDescription>Generate, apply, and verify fixes automatically (with rollback on failure)</CardDescription>
+	</CardHeader>
+	<CardContent>
+		<div style="display: flex; flex-direction: column; gap: 0.75rem;">
+			<div style="display: flex; gap: 0.75rem; align-items: center;">
+				<label for="patch-file" style="font-size: 0.875rem; font-weight: 600; min-width: 80px;">File Path:</label>
+				<input id="patch-file" type="text" placeholder="src/routes/..." bind:value={autoPatchTarget} style="flex: 1; padding: 0.5rem; border: 1px solid #ccc; border-radius: 0.25rem; font-family: monospace;" />
+			</div>
+			<div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+				<label for="patch-error" style="font-size: 0.875rem; font-weight: 600; min-width: 80px; padding-top: 0.5rem;">Error:</label>
+				<textarea id="patch-error" placeholder="Paste the error message..." bind:value={autoPatchError} rows="3" style="flex: 1; padding: 0.5rem; border: 1px solid #ccc; border-radius: 0.25rem; font-family: monospace; resize: vertical;"></textarea>
+			</div>
+			<div style="display: flex; gap: 0.75rem; align-items: center;">
+				<Button class="bits-btn" onclick={runAutoPatch} disabled={autoPatchRunning || !autoPatchTarget || !autoPatchError}>
+					{autoPatchRunning ? 'Patching...' : 'Auto-Fix'}
+				</Button>
+				{#if autoPatchRunning}
+					<span style="font-size: 0.875rem; color: #888;">Generating → Applying → Verifying...</span>
+				{/if}
+			</div>
+			{#if autoPatchResult}
+				<div style="padding: 0.75rem; border-radius: 0.25rem; font-family: monospace; font-size: 0.8rem; background: {autoPatchResult.success ? '#e8f5e9' : '#fff3cd'}; border: 1px solid {autoPatchResult.success ? '#a5d6a7' : '#ffc107'};">
+					<strong>{autoPatchResult.success ? 'Fix Verified' : 'Fix Failed'}</strong>
+					{#if autoPatchResult.message}
+						<div>{autoPatchResult.message}</div>
+					{/if}
+					{#if autoPatchResult.attempts}
+						<div style="margin-top: 0.5rem;">
+							{#each autoPatchResult.attempts as attempt}
+								<div>Attempt {attempt.attempt}: gen={attempt.fixGenerated ? 'ok' : 'fail'} apply={attempt.fixApplied ? 'ok' : 'fail'} verify={attempt.verified ? 'ok' : 'fail'}{attempt.error ? ` (${attempt.error})` : ''}</div>
+							{/each}
+						</div>
+					{/if}
+					{#if autoPatchResult.rollback}
+						<div style="color: #856404; margin-top: 0.25rem;">Original file restored (rollback)</div>
+					{/if}
+				</div>
+			{/if}
 		</div>
 	</CardContent>
  </Card>

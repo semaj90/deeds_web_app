@@ -76,7 +76,7 @@
 <Card class="w-full max-w-2xl">
   <CardHeader>
     <CardTitle class="flex items-center gap-2">
-      <span class="i-lucide-alert-triangle w-5 h-5 inline-block" />
+      <span class="i-lucide-alert-triangle w-5 h-5 inline-block"></span>
       {isNew ? 'Create Person of Interest' : 'Edit Person of Interest'}
     </CardTitle>
   </CardHeader>
@@ -160,11 +160,11 @@
     <!-- Actions -->
     <div class="flex gap-3 pt-4 border-t">
       <Button onclick={handleSave} class="flex-1 bits-btn">
-        <span class="i-lucide-save w-4 h-4 mr-2 inline-block" />
+        <span class="i-lucide-save w-4 h-4 mr-2 inline-block"></span>
         {isNew ? 'Create POI' : 'Save Changes'}
       </Button>
       <Button class="bits-btn" onclick={handleCancel} variant="outline">
-        <span class="i-lucide-x w-4 h-4 mr-2 inline-block" />
+        <span class="i-lucide-x w-4 h-4 mr-2 inline-block"></span>
         Cancel
       </Button>
     </div>

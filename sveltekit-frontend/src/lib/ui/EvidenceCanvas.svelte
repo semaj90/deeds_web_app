@@ -209,14 +209,14 @@
 >
  <!-- Drop zone indicator -->
  <div class="drop-zone-indicator" class:active={dropZoneActive}>
- <span class="i-lucide-target inline-block" />
+ <span class="i-lucide-target inline-block"></span>
  <p>Drop evidence here for AI detective mode</p>
  </div>
 
  <!-- AI processing indicator -->
  {#if droppedEvidenceIds.length > 0}
  <div class="ai-processing-indicator">
- <span class="i-lucide-zap w-6 h-6 inline-block" />
+ <span class="i-lucide-zap w-6 h-6 inline-block"></span>
  <span>AI Detective Mode Active</span>
  <div class="processing-evidence">
  Processing {droppedEvidenceIds.length} evidence item{droppedEvidenceIds.length > 1 ? 's' : ''}...
@@ -252,7 +252,7 @@
 
  {#if evidence.length === 0}
  <div class="empty-state">
- <span class="i-lucide-file-text w-12 h-12 inline-block" />
+ <span class="i-lucide-file-text w-12 h-12 inline-block"></span>
  <p>No evidence items to display</p>
  <p class="empty-hint">Upload evidence above to start building your detective board</p>
  </div>

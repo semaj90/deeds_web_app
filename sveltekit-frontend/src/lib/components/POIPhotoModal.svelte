@@ -99,27 +99,27 @@
  onclick={ prevPhoto }
  disabled={currentIndex === 0}
  >
- <span class="i-lucide-chevron-left w-6 h-6 inline-block" />
+ <span class="i-lucide-chevron-left w-6 h-6 inline-block"></span>
  </button>
  <button
  class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
  onclick={ nextPhoto }
  disabled={currentIndex === photos.length - 1}
  >
- <span class="i-lucide-chevron-right w-6 h-6 inline-block" />
+ <span class="i-lucide-chevron-right w-6 h-6 inline-block"></span>
  </button>
  {/if}
 
  <!-- Zoom Controls -->
  <div class="absolute top-4 right-4 flex gap-2">
  <Button class="bits-btn" variant="secondary" size="sm" onclick={zoomOut} disabled={zoomLevel <= 0.5}>
- <span class="i-lucide-zoom-out w-4 h-4 inline-block" />
+ <span class="i-lucide-zoom-out w-4 h-4 inline-block"></span>
  </Button>
  <Button class="bits-btn" variant="secondary" size="sm" onclick={zoomIn} disabled={zoomLevel >= 3}>
- <span class="i-lucide-zoom-in w-4 h-4 inline-block" />
+ <span class="i-lucide-zoom-in w-4 h-4 inline-block"></span>
  </Button>
  <Button class="bits-btn" variant="secondary" size="sm" onclick={downloadPhoto}>
- <span class="i-lucide-download w-4 h-4 inline-block" />
+ <span class="i-lucide-download w-4 h-4 inline-block"></span>
  </Button>
  </div>
 
@@ -138,7 +138,7 @@
  <div class="flex items-center justify-between mb-4">
  <h3 class="text-lg font-semibold">Photo Analysis</h3>
  <Button class="bits-btn" variant="ghost" size="sm" onclick={close}>
- <span class="i-lucide-x w-4 h-4 inline-block" />
+ <span class="i-lucide-x w-4 h-4 inline-block"></span>
  </Button>
  </div>
 
@@ -154,7 +154,7 @@
  <Card>
  <CardHeader class="pb-3">
  <CardTitle class="text-sm flex items-center gap-2">
- <span class="i-lucide-camera w-4 h-4 inline-block" />
+ <span class="i-lucide-camera w-4 h-4 inline-block"></span>
  Photo Details
  </CardTitle>
  </CardHeader>
@@ -206,7 +206,7 @@
  <Card>
  <CardHeader class="pb-3">
  <CardTitle class="text-sm flex items-center gap-2">
- <span class="i-lucide-eye w-4 h-4 inline-block" />
+ <span class="i-lucide-eye w-4 h-4 inline-block"></span>
  AI Caption
  </CardTitle>
  </CardHeader>
@@ -261,7 +261,7 @@
  <Card>
  <CardHeader class="pb-3">
  <CardTitle class="text-sm flex items-center gap-2">
- <span class="i-lucide-camera w-4 h-4 inline-block" />
+ <span class="i-lucide-camera w-4 h-4 inline-block"></span>
  EXIF Data
  </CardTitle>
  </CardHeader>
@@ -277,7 +277,7 @@
  {:else}
  <Card>
  <CardContent class="text-center py-8 text-sand/60">
- <span class="i-lucide-camera w-8 h-8 mx-auto mb-2 opacity-50 inline-block" />
+ <span class="i-lucide-camera w-8 h-8 mx-auto mb-2 opacity-50 inline-block"></span>
  <p>No EXIF data available</p>
  </CardContent>
  </Card>

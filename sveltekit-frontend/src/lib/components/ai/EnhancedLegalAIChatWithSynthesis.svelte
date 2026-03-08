@@ -1008,7 +1008,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
     <div class="p-4 pb-2">
       <div class="flex items-center justify-between">
         <h3 class="font-semibold flex items-center gap-2 flex-wrap">
-          <span class="i-lucide-brain w-5 h-5 inline-block" />
+          <span class="i-lucide-brain w-5 h-5 inline-block"></span>
           Enhanced Legal AI Assistant
           {#if userRole}
             <span class="px-2 py-0.5 rounded text-xs font-medium bg-sand/10">{userRole}</span>
@@ -1033,7 +1033,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
             {#each Object.entries(systemStatus) as [service, status]}
               {#if service !== 'lastCheck'}
                 <div class="flex items-center gap-1" title="{service}: {status}">
-                  <span class={`i-lucide-${getStatusIcon(status)} w-3 h-3 ${getConfidenceColor(status === 'active' ? 1 : 0.3)} inline-block`} />
+                  <span class={`i-lucide-${getStatusIcon(status)} w-3 h-3 ${getConfidenceColor(status === 'active' ? 1 : 0.3)} inline-block`}></span>
                 </div>
               {/if}
             {/each}
@@ -1041,7 +1041,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
 
           <!-- Settings Toggle -->
           <Button onclick={() => (showSettings = !showSettings)}>
-            <span class="i-lucide-settings w-4 h-4 inline-block" />
+            <span class="i-lucide-settings w-4 h-4 inline-block"></span>
           </Button>
         </div>
       </div>
@@ -1052,7 +1052,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
       <div class="p-4 border-t">
         <details bind:open={settingsExpanded}>
           <summary class="flex items-center gap-2 text-sm font-medium mb-3 cursor-pointer">
-            <span class="i-lucide-zap w-4 h-4 inline-block" />
+            <span class="i-lucide-zap w-4 h-4 inline-block"></span>
             Advanced AI Settings
           </summary>
           <div class="grid grid-cols-2 gap-4 text-sm">
@@ -1148,7 +1148,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
               : message.role === 'assistant'
                 ? 'bg-accent'
                 : 'bg-sand/20'}">
-            <span class={`i-lucide-${message.role === "user" ? "send" : message.role === "assistant" ? "brain" : "alert-triangle"} w-4 h-4 text-white inline-block`} />
+            <span class={`i-lucide-${message.role === "user" ? "send" : message.role === "assistant" ? "brain" : "alert-triangle"} w-4 h-4 text-white inline-block`}></span>
           </div>
 
           <!-- Message Content -->
@@ -1275,7 +1275,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
           <!-- Message Actions -->
           <div class="flex-shrink-0 flex flex-col gap-1">
             <Button onclick={() => copyToClipboard(message.content)}>
-              <span class="i-lucide-file-text w-3 h-3 inline-block" />
+              <span class="i-lucide-file-text w-3 h-3 inline-block"></span>
             </Button>
           </div>
         </div>
@@ -1285,7 +1285,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
     {#if isProcessing}
       <div class="flex items-center justify-center py-4" transition:fade>
         <div class="flex items-center gap-2 text-sand/60">
-          <span class="i-lucide-loader-2 w-4 h-4 animate-spin inline-block" />
+          <span class="i-lucide-loader-2 w-4 h-4 animate-spin inline-block"></span>
           <span>Processing with advanced AI pipeline...</span>
         </div>
       </div>
@@ -1304,9 +1304,9 @@ ${relatedReports.length > 0 ? `**Database Stats:**
     />
     <Button onclick={sendMessage} disabled={!currentInput.trim() || isProcessing}>
       {#if isProcessing}
-        <span class="i-lucide-loader-2 w-4 h-4 animate-spin inline-block" />
+        <span class="i-lucide-loader-2 w-4 h-4 animate-spin inline-block"></span>
       {:else}
-        <span class="i-lucide-send w-4 h-4 inline-block" />
+        <span class="i-lucide-send w-4 h-4 inline-block"></span>
       {/if}
     </Button>
   </div>

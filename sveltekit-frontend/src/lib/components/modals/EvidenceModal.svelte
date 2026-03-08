@@ -122,11 +122,11 @@
     <!-- Header -->
     <div class="flex items-center justify-between p-4 border-b border-sand/20">
       <div class="flex items-center gap-2">
-        <span class="i-lucide-file-text h-5 w-5 text-info/80 inline-block" />
+        <span class="i-lucide-file-text h-5 w-5 text-info/80 inline-block"></span>
         <h2 class="text-lg font-semibold text-white">Evidence Details</h2>
       </div>
       <button type="button" onclick={closeModal} class="p-1 hover:bg-panelSoft rounded transition-colors" aria-label="Close">
-        <span class="i-lucide-x h-5 w-5 text-sand/40 inline-block" />
+        <span class="i-lucide-x h-5 w-5 text-sand/40 inline-block"></span>
       </button>
     </div>
 

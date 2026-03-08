@@ -299,7 +299,7 @@ ttl: 60000 } })
   <!-- Header -->
   <div class="bg-panelSoft border border-sand/20 rounded-lg p-6">
     <h3 class="text-xl font-bold text-info/80 flex items-center gap-2">
-      <span class="i-lucide-database w-6 h-6 inline-block" /> Multi-Layer Cache System Demo
+      <span class="i-lucide-database w-6 h-6 inline-block"></span> Multi-Layer Cache System Demo
       <span class="text-xs font-medium bg-panelSoft text-sand/40 px-2 py-1 rounded"
         >Loki.js + Redis + PostgreSQL</span
       >
@@ -395,10 +395,10 @@ ttl: 60000 } })
                 disabled={isLoading}
                 class="bg-info hover:bg-info/60 flex-1"
               >
-                <span class="i-lucide-database mr-2 w-4 h-4 inline-block" /> Set
+                <span class="i-lucide-database mr-2 w-4 h-4 inline-block"></span> Set
               </Button>
               <Button onclick={getCacheValue} disabled={isLoading} variant="secondary" class="flex-1">
-                <span class="i-lucide-refresh-cw mr-2 w-4 h-4 inline-block" /> Get
+                <span class="i-lucide-refresh-cw mr-2 w-4 h-4 inline-block"></span> Get
               </Button>
               <Button
                 onclick={deleteCacheValue}
@@ -406,10 +406,10 @@ ttl: 60000 } })
                 variant="destructive"
                 class="flex-1"
               >
-                <span class="i-lucide-trash-2 mr-2 w-4 h-4 inline-block" /> Delete
+                <span class="i-lucide-trash-2 mr-2 w-4 h-4 inline-block"></span> Delete
               </Button>
               <Button onclick={clearCache} disabled={isLoading} variant="destructive" class="flex-1">
-                <span class="i-lucide-circle-x mr-2 w-4 h-4 inline-block" /> Clear All
+                <span class="i-lucide-circle-x mr-2 w-4 h-4 inline-block"></span> Clear All
               </Button>
             </div>
           </div>
@@ -492,7 +492,7 @@ ttl: 60000 } })
         </div>
       {:else}
         <div class="text-center py-20 text-sand/60">
-          <span class="i-lucide-activity mx-auto mb-4 animate-pulse w-12 h-12 inline-block" />
+          <span class="i-lucide-activity mx-auto mb-4 animate-pulse w-12 h-12 inline-block"></span>
           Loading statistics...
         </div>
       {/if}
@@ -504,9 +504,9 @@ ttl: 60000 } })
           <div class="bg-panelSoft border border-sand/20 rounded-lg p-6">
             <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
               {#if healthStatus.healthy}
-                <span class="i-lucide-check-circle text-accent inline-block" /> System Healthy
+                <span class="i-lucide-check-circle text-accent inline-block"></span> System Healthy
               {:else}
-                <span class="i-lucide-x-circle text-danger inline-block" /> Issues Detected
+                <span class="i-lucide-x-circle text-danger inline-block"></span> Issues Detected
               {/if}
             </h3>
             <div class="space-y-3">
@@ -541,7 +541,7 @@ ttl: 60000 } })
               </div>
             {:else}
               <div class="text-center py-8 text-accent">
-                <span class="i-lucide-check-circle mx-auto mb-2 w-8 h-8 inline-block" />
+                <span class="i-lucide-check-circle mx-auto mb-2 w-8 h-8 inline-block"></span>
                 All systems operational
               </div>
             {/if}
@@ -549,7 +549,7 @@ ttl: 60000 } })
         </div>
       {:else}
         <div class="text-center py-20 text-sand/60">
-          <span class="i-lucide-hard-drive mx-auto mb-4 animate-pulse w-12 h-12 inline-block" />
+          <span class="i-lucide-hard-drive mx-auto mb-4 animate-pulse w-12 h-12 inline-block"></span>
           Checking system health...
         </div>
       {/if}
@@ -561,7 +561,7 @@ ttl: 60000 } })
           <h3 class="text-lg font-bold mb-4">Toolbox</h3>
           <div class="space-y-3">
             <Button onclick={runPerformanceTest} disabled={isLoading} class="w-full justify-start">
-              <span class="i-lucide-zap mr-2 w-4 h-4 inline-block" /> Run Performance Benchmark
+              <span class="i-lucide-zap mr-2 w-4 h-4 inline-block"></span> Run Performance Benchmark
             </Button>
             <Button
               onclick={testCacheHitMiss}
@@ -569,7 +569,7 @@ ttl: 60000 } })
               variant="secondary"
               class="w-full justify-start"
             >
-              <span class="i-lucide-bar-chart-3 mr-2 w-4 h-4 inline-block" /> Verify Hit/Miss Logic
+              <span class="i-lucide-bar-chart-3 mr-2 w-4 h-4 inline-block"></span> Verify Hit/Miss Logic
             </Button>
             <Button
               onclick={refreshStats}
@@ -577,7 +577,7 @@ ttl: 60000 } })
               variant="ghost"
               class="w-full justify-start"
             >
-              <span class="i-lucide-refresh-cw mr-2 w-4 h-4 inline-block" /> Refresh Metrics
+              <span class="i-lucide-refresh-cw mr-2 w-4 h-4 inline-block"></span> Refresh Metrics
             </Button>
           </div>
         </div>

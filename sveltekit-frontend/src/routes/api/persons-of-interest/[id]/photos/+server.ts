@@ -293,6 +293,17 @@ Return ONLY valid JSON.`;
 		// LangExtract unavailable — non-fatal
 	}
 
+	// ── Step 2b: Multi-modal Fusion ──
+	try {
+		const { fuseVLMResults } = await import('$lib/server/ai/multimodal-fusion.js');
+		const fused = await fuseVLMResults(aiCaption, ocrText, aiTags);
+		if (fused.keywords.length > 0) {
+			aiTags = [...new Set([...aiTags, ...fused.keywords])].slice(0, 30);
+		}
+	} catch {
+		// Fusion unavailable — non-fatal
+	}
+
 	// ── Step 3: EmbeddingGemma → 768-dim caption embedding ──
 	let captionEmbedding: number[] = [];
 	const textToEmbed = [aiCaption, ...aiTags, ocrText].filter(Boolean).join(' ').slice(0, 4000);
@@ -348,6 +359,30 @@ Return ONLY valid JSON.`;
 				],
 			});
 			console.log(`[poi-photos] Qdrant stored: pointId=${pointId}`);
+
+			// Dual-write to poi_profiles collection for dedicated POI search
+			try {
+				await qdrant.upsert('poi_profiles', {
+					wait: false,
+					points: [
+						{
+							id: pointId,
+							vector: { embedding: captionEmbedding },
+							payload: {
+								poiId: poiName ? undefined : undefined, // use separate field
+								poi_id: photoId.split('/')[0] || photoId,
+								photo_id: photoId,
+								type: 'poi_photo',
+								caption: aiCaption.slice(0, 500),
+								tags: aiTags.slice(0, 20),
+							},
+						},
+					],
+				});
+				console.log(`[poi-photos] poi_profiles stored: pointId=${pointId}`);
+			} catch (poiErr) {
+				console.warn('[poi-photos] poi_profiles store failed (non-fatal):', poiErr);
+			}
 		} catch (err) {
 			console.warn('[poi-photos] Qdrant store failed (non-fatal):', err);
 		}

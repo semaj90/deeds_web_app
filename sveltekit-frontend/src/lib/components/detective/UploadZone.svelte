@@ -53,11 +53,11 @@
 	aria-label="File drop zone"
 >
 	{#if isUploading}
-		<span class="i-lucide-loader-2 animate-spin mb-2 w-8 h-8 inline-block" />
+		<span class="i-lucide-loader-2 animate-spin mb-2 w-8 h-8 inline-block"></span>
 		<p class="text-xs">UPLOADING DATA...</p>
 		<progress class="nes-progress is-primary w-full max-w-[200px]" value={uploadProgress} max="100"></progress>
 	{:else}
-		<span class="i-lucide-file-up mb-2 w-8 h-8 inline-block" />
+		<span class="i-lucide-file-up mb-2 w-8 h-8 inline-block"></span>
 		<p class="text-xs text-center">DROP INTEL HERE<br/>OR CLICK TO SCAN</p>
 		<label class="mt-2">
 			<span class="nes-btn is-primary text-xs">SELECT FILES</span>

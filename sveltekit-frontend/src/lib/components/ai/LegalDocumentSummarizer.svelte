@@ -59,7 +59,8 @@ Enhanced-bits UI integration with real-time progress and quality metrics
 
 	// State management using Svelte 5 runes
 	let documentTitle = $state('');
-	let documentContent = $state(defaultContent);
+	let documentContent = $state('');
+	$effect(() => { documentContent = defaultContent; });
 	let documentType = $state<'contract' | 'judgment' | 'brief' | 'statute'>('contract');
 	let summaryType = $state<'executive' | 'detailed' | 'bullet_points' | 'legal_analysis'>('executive');
 	let maxLength = $state(500);

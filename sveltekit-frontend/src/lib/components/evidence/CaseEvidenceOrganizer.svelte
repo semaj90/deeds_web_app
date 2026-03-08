@@ -48,12 +48,14 @@
 		onselectevidence
 	}: Props = $props();
 
-	let evidenceList = $state<EvidenceItem[]>(initialEvidence);
+	let evidenceList = $state<EvidenceItem[]>([]);
 	let isLoading = $state(false);
 	let organizationStructure = $state<any>(null);
 	let selectedEvidence = $state<EvidenceItem[]>([]);
 	let searchQuery = $state('');
-	let activeMode = $state(initialMode);
+	let activeMode = $state<Props['organizationMode']>('category');
+	$effect(() => { evidenceList = initialEvidence; });
+	$effect(() => { activeMode = initialMode; });
 	let filterType = $state('all');
 	let filterPriority = $state('all');
 

@@ -254,18 +254,33 @@ function formatTime(ms: number): string {
 
 <style>
   .answer-container {
-    @apply p-4 bg-base-100 rounded-lg border border-base-300;
+    padding: 1rem;
+    background: var(--base-100, #fff);
+    border-radius: 0.5rem;
+    border: 1px solid var(--base-300, #d1d5db);
   }
 
   :global(.citation-link) {
-    @apply inline-flex items-center justify-center min-w-[1.5rem] px-1 py-0.5
-           bg-primary/10 rounded text-xs cursor-pointer
-           hover:bg-primary/20 transition-colors;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5rem;
+    padding: 0.125rem 0.25rem;
+    background: rgba(var(--primary-rgb, 59, 130, 246), 0.1);
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background-color 150ms;
+  }
+
+  :global(.citation-link:hover) {
+    background: rgba(var(--primary-rgb, 59, 130, 246), 0.2);
   }
 
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }

@@ -412,7 +412,7 @@
 		onkeydown={(e) => e.key === 'Enter' && fileInput?.click()}
 	>
 		<div class="drop-zone-content">
-			<span class="i-lucide-upload drop-zone-icon w-12 h-12 inline-block" />
+			<span class="i-lucide-upload drop-zone-icon w-12 h-12 inline-block"></span>
 			<h3 class="drop-zone-title">
 				{isDragging ? 'Drop files here' : 'Upload Legal Documents'}
 			</h3>
@@ -446,11 +446,11 @@
 							{#if file.preview}
 								<img src={file.preview} alt="Preview" class="preview-image" />
 							{:else if file.file.type.startsWith('image/')}
-								<span class="i-lucide-file-image w-6 h-6 inline-block" />
+								<span class="i-lucide-file-image w-6 h-6 inline-block"></span>
 							{:else if file.file.type.includes('pdf')}
-								<span class="i-lucide-file-text w-6 h-6 inline-block" />
+								<span class="i-lucide-file-text w-6 h-6 inline-block"></span>
 							{:else}
-								<span class="i-lucide-file w-6 h-6 inline-block" />
+								<span class="i-lucide-file w-6 h-6 inline-block"></span>
 							{/if}
 						</div>
 
@@ -475,7 +475,7 @@
 							<!-- Error Message -->
 							{#if file.error}
 								<p class="error-message">
-									<span class="i-lucide-alert-triangle w-4 h-4 inline-block" />
+									<span class="i-lucide-alert-triangle w-4 h-4 inline-block"></span>
 									{file.error}
 								</p>
 							{/if}
@@ -485,11 +485,11 @@
 						<div class="file-actions">
 							<span class="status-badge status-{getStatusColor(file.status)}">
 								{#if file.status === 'processing'}
-									<span class="i-lucide-loader-2 badge-icon spinning w-3 h-3 inline-block" />
+									<span class="i-lucide-loader-2 badge-icon spinning w-3 h-3 inline-block"></span>
 								{:else if file.status === 'completed'}
-									<span class="i-lucide-check-circle badge-icon w-3 h-3 inline-block" />
+									<span class="i-lucide-check-circle badge-icon w-3 h-3 inline-block"></span>
 								{:else if file.status === 'error'}
-									<span class="i-lucide-alert-triangle badge-icon w-3 h-3 inline-block" />
+									<span class="i-lucide-alert-triangle badge-icon w-3 h-3 inline-block"></span>
 								{/if}
 								{file.status}
 							</span>
@@ -512,7 +512,7 @@
 									disabled={file.status === 'uploading' ||
 										file.status === 'processing'}
 								>
-									<span class="i-lucide-x w-4 h-4 inline-block" />
+									<span class="i-lucide-x w-4 h-4 inline-block"></span>
 								</Button>
 							</div>
 						</div>
@@ -528,10 +528,10 @@
 				disabled={isProcessing || pendingCount === 0}
 			>
 				{#if isProcessing}
-					<span class="i-lucide-loader-2 mr-2 spinning w-4 h-4 inline-block" />
+					<span class="i-lucide-loader-2 mr-2 spinning w-4 h-4 inline-block"></span>
 					Processing...
 				{:else}
-					<span class="i-lucide-upload mr-2 w-4 h-4 inline-block" />
+					<span class="i-lucide-upload mr-2 w-4 h-4 inline-block"></span>
 					Upload &amp; Process ({pendingCount} files)
 				{/if}
 			</Button>

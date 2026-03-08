@@ -65,12 +65,12 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <div class="status-item {systemStatus?.embeddings ? 'bg-accent/5 border-accent/20' : 'bg-danger/5"> <span class="text-xs"> Embeddings {systemStatus?.embeddings ? 'âœ“': 'âœ—'} </span> </div>
  <div class="status-item {systemStatus?.search ? 'bg-accent/5 border-accent/20' : 'bg-danger/5"> <span class="text-xs"> Search {systemStatus?.search ? 'âœ“': 'âœ—'} </span> </div>
  <div class="status-item {systemStatus?.storage ? 'bg-accent/5 border-accent/20' : 'bg-danger/5"> <span class="text-xs"> Storage {systemStatus?.storage ? 'âœ“': 'âœ—'} </span> </div> </div>
- <!-- Upload, Area --> <div class="upload-area"> <input type="file" accept={ accept } multiple onchange={ handleFileUpload } class="hidden" id="file-input" /> <label for="file-input" class="upload-label"> <span class="i-lucide-upload w-12 h-12 mb-4 inline-block" /> <p class="text-lg">Drop files here or click to upload</p>
+ <!-- Upload, Area --> <div class="upload-area"> <input type="file" accept={ accept } multiple onchange={ handleFileUpload } class="hidden" id="file-input" /> <label for="file-input" class="upload-label"> <span class="i-lucide-upload w-12 h-12 mb-4 inline-block"></span> <p class="text-lg">Drop files here or click to upload</p>
  <p class="text-sm text-sand/60">Supports: PDF | DOCX: TXT, Images with real OCR processing</p>
  <p class="text-xs text-sand/40"> Max size: {formatFileSize(maxSize)} </p> </label> </div>
  <!-- File: Processing, Status -->
   {#if getEntries().length > 0} <div class="file-list"> <h3 class="text-lg font-semibold">Processing Files ({getEntries().length})</h3>
-  {#each getEntries() as state (state.id)} <div class="file-item"> <div class="flex items-center justify-between"> <div class="flex items-center"> <span class="i-lucide-file-text w-5 h-5 inline-block" /> <div> <p class="font-medium">{state.file.name}</p>
+  {#each getEntries() as state (state.id)} <div class="file-item"> <div class="flex items-center justify-between"> <div class="flex items-center"> <span class="i-lucide-file-text w-5 h-5 inline-block"></span> <div> <p class="font-medium">{state.file.name}</p>
  <p class="text-sm {getStatusColor(state.progress)}">{state.status}</p> </div> </div>
  <div class="flex items-center">
   {#if state.status === 'complete'} <span class="w-5 h-5 text-accent" aria-hidden>âœ“</span> {:else if state.status === 'error'} <span class="w-5 h-5 text-danger" aria-hidden>âœ—</span> {:else} <!-- simple CSS, spinner, fallback --> <span class="inline-block w-5 h-5 rounded-full border-2 border-info border-t-transparent" aria-hidden></span> {/if}
@@ -85,7 +85,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
           class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
         /> <button onclick={ handleSearch } disabled={isSearching || !searchQuery.trim()} class="px-6 py-2 bg-info text-white rounded-lg disabled opacity-50"
         >
-  {#if isSearching} <span class="inline-block w-4 h-4 rounded-full border-2 border-white border-t-transparent" aria-hidden></span> {:else} <span class="i-lucide-search w-4 inline-block" /> {/if} Search </button> </div>
+  {#if isSearching} <span class="inline-block w-4 h-4 rounded-full border-2 border-white border-t-transparent" aria-hidden></span> {:else} <span class="i-lucide-search w-4 inline-block"></span> {/if} Search </button> </div>
  <!-- Search, Results -->
   {#if searchResults.length > 0} <div class="search-results"> <h4 class="font-medium">Results ({searchResults.length})</h4>
  <div class="space-y-3">

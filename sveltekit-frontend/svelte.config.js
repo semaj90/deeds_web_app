@@ -1,13 +1,26 @@
 import nodeAdapter from '@sveltejs/adapter-node';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
+// Cosmetic warnings suppressed at config level (a11y + unused CSS).
+// Real errors (type errors, SSR issues) are NOT suppressed.
+const suppressedWarnings = new Set([
+  'css_unused_selector',
+  'a11y_label_has_associated_control',
+  'a11y_click_events_have_key_events',
+  'a11y_no_static_element_interactions',
+  'a11y_consider_explicit_label',
+  'a11y_interactive_supports_focus',
+  'a11y_no_interactive_element_to_noninteractive_role',
+]);
+
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
   compilerOptions: {
     runes: true,
     compatibility: {
       componentApi: 4
-    }
+    },
+    warningFilter: (warning) => !suppressedWarnings.has(warning.code),
   },
   // Use svelte-preprocess for safe defaults (TypeScript, PostCSS, scss, etc.)
   preprocess: vitePreprocess(),

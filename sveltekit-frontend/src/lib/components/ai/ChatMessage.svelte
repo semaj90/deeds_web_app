@@ -97,7 +97,7 @@
 >
   {#if !isUser}
     <div class="flex-shrink-0 w-8 h-8 rounded-full bg-sand/10 flex items-center justify-center">
-      <span class="i-lucide-bot w-5 h-5 text-sand/60 inline-block" />
+      <span class="i-lucide-bot w-5 h-5 text-sand/60 inline-block"></span>
     </div>
   {/if}
 
@@ -109,7 +109,7 @@
     >
       {#if isProactive}
         <div class="flex items-center gap-1 text-xs opacity-70 mb-1">
-          <span class="i-lucide-clock w-3 h-3 inline-block" />
+          <span class="i-lucide-clock w-3 h-3 inline-block"></span>
           <span>Proactive suggestion</span>
         </div>
       {/if}
@@ -121,11 +121,11 @@
       {#if isAssistant && emotionalTone && emotionalTone !== 'neutral'}
         <div class="flex items-center gap-1 text-xs mt-2 {toneColor}">
           {#if emotionalTone === 'encouraging'}
-            <span class="i-lucide-thumbs-up w-3 h-3 inline-block" />
+            <span class="i-lucide-thumbs-up w-3 h-3 inline-block"></span>
           {:else if emotionalTone === 'supportive'}
-            <span class="i-lucide-heart w-3 h-3 inline-block" />
+            <span class="i-lucide-heart w-3 h-3 inline-block"></span>
           {:else if emotionalTone === 'enthusiastic'}
-            <span class="i-lucide-star w-3 h-3 inline-block" />
+            <span class="i-lucide-star w-3 h-3 inline-block"></span>
           {/if}
           <span class="capitalize">{emotionalTone}</span>
         </div>
@@ -145,7 +145,7 @@
             onclick={copyToClipboard}
             title={copied ? 'Copied!' : 'Copy message'}
           >
-            <span class="i-lucide-copy w-3.5 h-3.5 inline-block" />
+            <span class="i-lucide-copy w-3.5 h-3.5 inline-block"></span>
           </Button>
 
           <Button
@@ -156,14 +156,14 @@
             title={message.saved ? 'Remove from saved' : 'Save message'}
           >
             {#if message.saved}
-              <span class="i-lucide-star w-3.5 h-3.5 text-warning inline-block" />
+              <span class="i-lucide-star w-3.5 h-3.5 text-warning inline-block"></span>
             {:else}
-              <span class="i-lucide-star-off w-3.5 h-3.5 inline-block" />
+              <span class="i-lucide-star-off w-3.5 h-3.5 inline-block"></span>
             {/if}
           </Button>
 
           <Button variant="ghost" size="sm" class="p-1 h-auto w-auto" title="More options">
-            <span class="i-lucide-more-vertical w-3.5 h-3.5 inline-block" />
+            <span class="i-lucide-more-vertical w-3.5 h-3.5 inline-block"></span>
           </Button>
         </div>
       {/if}
@@ -187,7 +187,7 @@
 
   {#if isUser}
     <div class="flex-shrink-0 w-8 h-8 rounded-full bg-info/10 flex items-center justify-center">
-      <span class="i-lucide-users w-5 h-5 text-info inline-block" />
+      <span class="i-lucide-users w-5 h-5 text-info inline-block"></span>
     </div>
   {/if}
 </div>

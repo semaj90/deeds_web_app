@@ -38,7 +38,7 @@ Real-time collaboration interface for multiple investigators working on evidence
     onAddAnnotation = () => {}
   }: Props = $props();
 
-  let session = $state<CollaborationSession | null>(initialCollaborationSession);
+  let session = $state<CollaborationSession | null>(null);
   $effect(() => { session = initialCollaborationSession; });
 
   let newMessage = $state('');

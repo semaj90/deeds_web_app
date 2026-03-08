@@ -3,12 +3,15 @@
     import { page } from '$app/stores';
     import { ChatSession } from '$lib/models/ChatSession.svelte';
 
-    let { data } = $props(); // Load initial history from server load function
+    let props = $props(); // Load initial history from server load function
+    let data = $derived(props.data);
 
     // Initialize once — intentionally capture initial data only (not reactive)
-    const chat = untrack(() => new ChatSession($page.params.id, data?.history ?? []));
+    // svelte-ignore state_referenced_locally
+    const initialHistory: any[] = (props.data as any)?.history ?? [];
+    const chat = untrack(() => new ChatSession($page.params.id, initialHistory));
     // Load persisted history from IndexedDB if no server history provided
-    if (!data?.history?.length) chat.loadHistory();
+    if (!initialHistory?.length) chat.loadHistory();
 
     // ?local=1 forces local ONNX, ?server=1 forces server SSE (dev verification)
     const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;

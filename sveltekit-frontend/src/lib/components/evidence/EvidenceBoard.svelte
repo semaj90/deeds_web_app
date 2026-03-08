@@ -44,15 +44,19 @@
 	} = $props();
 
 	// Board state — Svelte 5 runes (no writable stores)
-	let nodes = $state<EvidenceNodeType[]>(initialNodes);
-	let connections = $state<EvidenceConnection[]>(initialConnections);
+	let nodes = $state<EvidenceNodeType[]>([]);
+	let connections = $state<EvidenceConnection[]>([]);
 	let boardMode = $state<BoardMode>('grid');
 	let linkMode = $state(false);
 	let selectedNodes = $state<Set<string>>(new Set());
 	let pendingLinkSource: string | null = $state(null);
 	let selectedEvidenceForInspector = $state<string | null>(null);
 	let selectedRelationshipType = $state('supports');
-	let activeCaseId = $state<string | null>(caseId ?? null);
+	let activeCaseId = $state<string | null>(null);
+	// Sync from props reactively
+	$effect(() => { nodes = initialNodes; });
+	$effect(() => { connections = initialConnections; });
+	$effect(() => { activeCaseId = caseId ?? null; });
 	let showCategories = $state(true);
 
 	// ── Viewport state (zoom/pan) ──────────────────────────────
@@ -577,7 +581,7 @@
 		panY = rect.height / 2 - y * zoom;
 	}
 
-	let canvasElement: HTMLDivElement;
+	let canvasElement = $state<HTMLDivElement>();
 
 	// ── Load persisted layout on mount ─────────────────────────
 	$effect(() => {

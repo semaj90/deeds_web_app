@@ -98,12 +98,12 @@
  </div>
  {:else if disabled}
  <div class="flex flex-col items-center gap-4">
- <span class="i-lucide-camera w-12 h-12 text-gray-400 inline-block" />
+ <span class="i-lucide-camera w-12 h-12 text-gray-400 inline-block"></span>
  <p class="text-gray-500">Photo upload disabled</p>
  </div>
  {:else}
  <div class="flex flex-col items-center gap-4">
- <span class="i-lucide-upload w-12 h-12 text-gray-400 inline-block" />
+ <span class="i-lucide-upload w-12 h-12 text-gray-400 inline-block"></span>
  <div>
  <p class="text-lg font-medium text-gray-700">Drop POI photos here</p>
  <p class="text-gray-500">or</p>
@@ -113,7 +113,7 @@
  onclick={triggerFileSelect}
  class="mt-2 bits-btn"
  >
- <span class="i-lucide-camera w-4 h-4 mr-2 inline-block" />
+ <span class="i-lucide-camera w-4 h-4 mr-2 inline-block"></span>
  Browse Files
  </Button>
  </div>

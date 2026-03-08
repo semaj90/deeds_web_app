@@ -85,9 +85,9 @@
             aria-label={action.label}
           >
             <div class="relative">
-              <span class={`i-lucide-${action.icon} w-5 h-5 text-sand/40 group-hover:text-white transition-colors inline-block`} />
+              <span class={`i-lucide-${action.icon} w-5 h-5 text-sand/40 group-hover:text-white transition-colors inline-block`}></span>
               <div class="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity">
-                <span class={`i-lucide-${action.icon} w-5 h-5 text-white blur-sm inline-block`} />
+                <span class={`i-lucide-${action.icon} w-5 h-5 text-white blur-sm inline-block`}></span>
               </div>
             </div>
             <span class="text-sm font-medium text-sand/40 group-hover:text-white whitespace-nowrap">
@@ -105,7 +105,7 @@
         in:scale={{ duration: 200, delay: 300 }}
         aria-label="AI Assistant Settings"
       >
-        <span class="i-lucide-settings w-5 h-5 text-sand/40 group-hover:text-white group-hover:rotate-90 transition-all duration-300 inline-block" />
+        <span class="i-lucide-settings w-5 h-5 text-sand/40 group-hover:text-white group-hover:rotate-90 transition-all duration-300 inline-block"></span>
       </button>
     {/if}
 
@@ -129,10 +129,10 @@
 
       <div class="relative flex items-center justify-center w-12 h-12">
         {#if isExpanded}
-          <span class="i-lucide-chevron-up w-6 h-6 {getModeColor(aiMode)} transition-all duration-300 group-hover:scale-110 inline-block" />
+          <span class="i-lucide-chevron-up w-6 h-6 {getModeColor(aiMode)} transition-all duration-300 group-hover:scale-110 inline-block"></span>
         {:else}
           <div class="relative">
-            <span class="i-lucide-bot w-7 h-7 {getModeColor(aiMode)} transition-all duration-300 group-hover:scale-110 inline-block" />
+            <span class="i-lucide-bot w-7 h-7 {getModeColor(aiMode)} transition-all duration-300 group-hover:scale-110 inline-block"></span>
             {#if aiMode === 'thinking' || aiMode === 'active'}
               <div class="absolute -top-1 -right-1 w-3 h-3 bg-current rounded-full {pulseClasses[aiMode]}"></div>
             {/if}

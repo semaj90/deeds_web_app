@@ -144,6 +144,72 @@ export async function syncCaseToGraph(caseId: string): Promise<SyncResult> {
 }
 
 /**
+ * Sync a web-ingested content node + its connections to Neo4j.
+ * Non-fatal: if Neo4j is unavailable, PostgreSQL data is sufficient.
+ */
+export async function syncIngestedContent(
+	nodeId: string,
+	caseId: string,
+	title: string,
+	sourceUrl: string
+): Promise<{ synced: boolean; error?: string }> {
+	try {
+		await initializeNeo4jSchema();
+		const driver = getNeo4jDriver();
+		const session = driver.session({ database: 'neo4j' });
+
+		try {
+			// Create WebContent node
+			await session.run(
+				`MERGE (w:WebContent {id: $id})
+				 SET w.title = $title, w.url = $url, w.caseId = $caseId,
+					 w.type = 'web_ingest', w.syncedAt = datetime()`,
+				{ id: nodeId, title, url: sourceUrl, caseId }
+			);
+
+			// Link to Case node if exists
+			await session.run(
+				`MATCH (w:WebContent {id: $nodeId})
+				 MATCH (c:Case {id: $caseId})
+				 MERGE (w)-[:INGESTED_FOR]->(c)`,
+				{ nodeId, caseId }
+			);
+
+			// Sync edges from yorha_evidence_connections
+			const db = (await import('$lib/server/db')).default;
+			const connections = await db.execute(
+				sql`SELECT target_node_id, connection_type, strength
+					FROM yorha_evidence_connections
+					WHERE source_node_id = ${nodeId}
+					LIMIT 20`
+			);
+
+			for (const conn of [...connections] as Record<string, unknown>[]) {
+				const targetId = conn.target_node_id as string;
+				const connType = (conn.connection_type as string) ?? 'RELATED_TO';
+				const strength = (conn.strength as number) ?? 50;
+
+				await session.run(
+					`MATCH (w:WebContent {id: $sourceId})
+					 MERGE (t {id: $targetId})
+					 MERGE (w)-[r:RELATED_TO]->(t)
+					 SET r.type = $connType, r.strength = $strength`,
+					{ sourceId: nodeId, targetId, connType, strength }
+				);
+			}
+
+			return { synced: true };
+		} finally {
+			await session.close();
+		}
+	} catch (err) {
+		const msg = err instanceof Error ? err.message : String(err);
+		console.warn('[pg-neo4j-sync] syncIngestedContent failed (non-fatal):', msg);
+		return { synced: false, error: msg };
+	}
+}
+
+/**
  * Batch sync all cases to Neo4j.
  */
 export async function syncAllCasesToGraph(): Promise<SyncResult> {

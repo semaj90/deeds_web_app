@@ -96,7 +96,7 @@ function applyTagBoost(
  * POST /api/rag/search
  * Step 1: Search knowledge base for relevant chunks via Qdrant + Ollama embeddings
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, url }) => {
 	// Rate limit: 30 requests/min per client
 	const rateCheck = chatRateLimiter.check(request);
 	if (!rateCheck.allowed) {
@@ -261,7 +261,31 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		allChunks.sort((a, b) => b.score - a.score);
-		const topChunks = allChunks.slice(0, top_k);
+		let topChunks = allChunks.slice(0, top_k);
+
+		// Optional DAG reordering: cited documents appear before citing documents
+		const enableDAG = url.searchParams.get('dag') === 'true';
+		if (enableDAG && topChunks.length > 1) {
+			try {
+				const { orderByDependency, extractCitationRefs } = await import(
+					'$lib/server/retrieval/document-dag.js'
+				);
+				const knownIds = new Set(topChunks.map((c) => c.source_id));
+				const dagDocs = topChunks.map((c) => ({
+					id: c.source_id,
+					title: c.source_title ?? '',
+					score: c.score,
+					citations: extractCitationRefs(c.text, knownIds)
+				}));
+				const dagResult = orderByDependency(dagDocs);
+				const idOrder = dagResult.ordered.map((d) => d.id);
+				topChunks = topChunks.sort(
+					(a, b) => idOrder.indexOf(a.source_id) - idOrder.indexOf(b.source_id)
+				);
+			} catch (err) {
+				console.warn('[rag/search] DAG reordering failed (non-fatal):', err);
+			}
+		}
 
 		const response: RetrieveCandidatesResponse = {
 			query_id: crypto.randomUUID(),

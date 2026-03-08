@@ -133,7 +133,7 @@
   <div class="bg-panel/90 backdrop-blur-md border border-warning/30 shadow-xl rounded-lg overflow-hidden">
     <div class="p-3 border-b border-sand/20">
       <h3 class="flex items-center gap-2 text-warning text-sm font-bold">
-        <span class="i-lucide-brain w-4 h-4 inline-block" />
+        <span class="i-lucide-brain w-4 h-4 inline-block"></span>
         Client-Side AI
         {#if showStatus}
           <Badge variant="outline" class={systemStatus.model ? 'border-accent text-accent text-[10px]' : 'border-warning text-warning text-[10px]'}>
@@ -145,10 +145,10 @@
       {#if showStatus && !collapsed}
         <div class="flex items-center gap-3 mt-2 text-[10px]">
           <span class="flex items-center gap-1 {systemStatus.webgpu ? 'text-accent' : 'text-sand/60'}">
-            <span class="i-lucide-zap w-3 h-3 inline-block" /> WebGPU
+            <span class="i-lucide-zap w-3 h-3 inline-block"></span> WebGPU
           </span>
           <span class="flex items-center gap-1 {systemStatus.webasm ? 'text-accent' : 'text-sand/60'}">
-            <span class="i-lucide-cpu w-3 h-3 inline-block" /> WebASM
+            <span class="i-lucide-cpu w-3 h-3 inline-block"></span> WebASM
           </span>
           <span class="ml-auto text-sand/40">
             {isInitialized ? 'Ready' : 'Initializing...'}
@@ -172,7 +172,7 @@
 
         {#if isProcessing}
           <div class="flex items-center gap-2 text-sand/40 text-[10px] italic">
-            <span class="i-lucide-brain w-3 h-3 animate-pulse inline-block" />
+            <span class="i-lucide-brain w-3 h-3 animate-pulse inline-block"></span>
             Gemma is thinking...
           </div>
         {/if}

@@ -19,7 +19,7 @@
     action?: () => void;
   }
 
-  let searchInput: HTMLInputElement;
+  let searchInput = $state<HTMLInputElement>();
   let searchQuery = $state<string>('');
   let selectedIndex = $state<number>(0);
 

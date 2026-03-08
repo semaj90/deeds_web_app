@@ -30,7 +30,8 @@
 	let { caseId = 'default', readonly = false, initialEvidence = [] }: Props = $props();
 
 	let canvasElement = $state<HTMLDivElement>();
-	let evidenceList = $state<EvidenceItem[]>(initialEvidence);
+	let evidenceList = $state<EvidenceItem[]>([]);
+	$effect(() => { evidenceList = initialEvidence; });
 	let connections = $state<EvidenceConnection[]>([]);
 	let selectedNodes = $state<string[]>([]);
 	let highlightedNodes = $state<string[]>([]);

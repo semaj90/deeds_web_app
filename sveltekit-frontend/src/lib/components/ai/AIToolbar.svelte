@@ -157,7 +157,7 @@
 <div class="space-y-6">
   <div class="text-center">
     <h2 class="text-2xl font-bold flex items-center justify-center">
-      <span class="i-lucide-sparkles h-6 w-6 inline-block" />
+      <span class="i-lucide-sparkles h-6 w-6 inline-block"></span>
       AI Legal Assistant
     </h2>
 
@@ -175,9 +175,9 @@
         onclick={performAISearch}
         disabled={disabled || isAISearching || !aiSearchQuery.trim()}>
         {#if isAISearching}
-          <span class="i-lucide-loader-2 h-4 w-4 inline-block" />
+          <span class="i-lucide-loader-2 h-4 w-4 inline-block"></span>
         {:else}
-          <span class="i-lucide-search h-4 inline-block" />
+          <span class="i-lucide-search h-4 inline-block"></span>
         {/if}
       </button>
     </div>
@@ -200,7 +200,7 @@
   <div class="border-accent/20">
     <div class="yorha-panel-header">
       <h3 class="nes-text is-primary flex items-center gap-2">
-        <span class="i-lucide-message-square h-5 w-5 inline-block" />
+        <span class="i-lucide-message-square h-5 w-5 inline-block"></span>
         AI Chat
       </h3>
     </div>
@@ -222,10 +222,10 @@
             disabled={disabled || isAIChatting || !aiChatMessage.trim()}
             class="w-full bits-btn text-sm px-3 py-2">
             {#if isAIChatting}
-              <span class="i-lucide-loader-2 h-4 w-4 animate-spin inline-block" aria-hidden="true" />
+              <span class="i-lucide-loader-2 h-4 w-4 animate-spin inline-block" aria-hidden="true"></span>
               Thinking...
             {:else}
-              <span class="i-lucide-message-square h-4 w-4 inline-block" aria-hidden="true" />
+              <span class="i-lucide-message-square h-4 w-4 inline-block" aria-hidden="true"></span>
               Ask AI
             {/if}
           </button>
@@ -245,7 +245,7 @@
   <div class="border-info/20">
     <div class="yorha-panel-header">
       <h3 class="nes-text is-primary flex items-center gap-2">
-        <span class="i-lucide-file-text h-5 w-5 inline-block" />
+        <span class="i-lucide-file-text h-5 w-5 inline-block"></span>
         AI Summary
       </h3>
     </div>
@@ -263,10 +263,10 @@
           disabled={disabled || isSummarizing || !summarizeText.trim()}
           class="w-full bits-btn text-sm px-3 py-2">
           {#if isSummarizing}
-            <span class="i-lucide-loader-2 h-4 w-4 animate-spin inline-block" />
+            <span class="i-lucide-loader-2 h-4 w-4 animate-spin inline-block"></span>
             Summarizing...
           {:else}
-            <span class="i-lucide-zap h-4 w-4 inline-block" />
+            <span class="i-lucide-zap h-4 w-4 inline-block"></span>
             Summarize
           {/if}
         </button>
@@ -295,7 +295,7 @@
       class="bits-btn text-sm px-2 py-1"
       onclick={() => { aiSearchQuery = 'California murder laws'; performAISearch()}}
       disabled={disabled || isAISearching}>
-      <span class="i-lucide-bot h-3 w-3 inline-block" />
+      <span class="i-lucide-bot h-3 w-3 inline-block"></span>
       Murder Laws
     </button>
 
@@ -304,7 +304,7 @@
       class="bits-btn text-sm px-2 py-1"
       onclick={() => { aiChatMessage = 'What are the elements of a valid contract? '; performAIChat()}}
       disabled={disabled ?? isAIChatting}>
-      <span class="i-lucide-message-square h-3 w-3 inline-block" />
+      <span class="i-lucide-message-square h-3 w-3 inline-block"></span>
       Contract Elements
     </button>
 
@@ -313,7 +313,7 @@
       class="bits-btn text-sm px-2 py-1"
       onclick={() => { aiSearchQuery = 'evidence admissibility rules'; performAISearch()}}
       disabled={disabled || isAISearching}>
-      <span class="i-lucide-search h-3 w-3 inline-block" />
+      <span class="i-lucide-search h-3 w-3 inline-block"></span>
       Evidence Rules
     </button>
   </div>

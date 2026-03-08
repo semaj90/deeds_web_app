@@ -85,13 +85,13 @@
   let displayValue = $derived(showPercentage ? `${Math.round(percentage)}%` : normalizedValue);
   let isComplete = $derived(percentage >= 100);
 
-  const effectiveRenderOptions = {
+  const effectiveRenderOptions = $derived.by(() => ({
     ...N64_TEXTURE_PRESETS.balanced,
     enableTextureFiltering,
     enableMipMapping,
     enableFog,
     ...renderOptions
-  };
+  }));
 
 </script>
 

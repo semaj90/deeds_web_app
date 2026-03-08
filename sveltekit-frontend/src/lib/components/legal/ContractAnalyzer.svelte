@@ -40,7 +40,7 @@
   let searchTerm = $state('');
 
   // sample data fallback
-  let contractData = $state<ContractAnalysis>(contract ?? {
+  const defaultContract: ContractAnalysis = {
     id: 'contract-001',
     title: 'Software Development Service Agreement',
     type: 'service',
@@ -72,10 +72,12 @@
         confidence: 0.95
       }
     ]
-  });
+  };
+  let contractData = $state<ContractAnalysis>(defaultContract);
+  $effect(() => { contractData = contract ?? defaultContract; });
 
   // build a small UI/AI helper (safe access) AFTER contractData is defined
-  const urgency = (contractData?.riskScore ?? 0) > 7 ? 'critical' : 'medium';
+  const urgency = $derived((contractData?.riskScore ?? 0) > 7 ? 'critical' : 'medium');
 
   const contractBuilder: { styling?: { colors?: { primary?: string; evidence?: string }; borderWidth?: string } } | undefined =
     undefined;

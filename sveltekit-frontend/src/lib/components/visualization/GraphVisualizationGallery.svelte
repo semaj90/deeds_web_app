@@ -39,16 +39,16 @@
 		</div>
 		<div class="actions flex gap-2">
 			<Button variant="outline" size="sm" onclick={() => (viewMode = 'grid')}>
-				<span class="i-lucide-grid-2x2 w-4 h-4 inline-block" />
+				<span class="i-lucide-grid-2x2 w-4 h-4 inline-block"></span>
 			</Button>
 			<Button variant="outline" size="sm" onclick={() => (viewMode = 'list')}>
-				<span class="i-lucide-list w-4 h-4 inline-block" />
+				<span class="i-lucide-list w-4 h-4 inline-block"></span>
 			</Button>
 			<Button disabled={isGenerating} onclick={generateVisualizationsForAllAlgorithms}>
 				{#if isGenerating}
-					<span class="i-lucide-refresh-cw w-4 h-4 mr-2 animate-spin inline-block" /> Generating...
+					<span class="i-lucide-refresh-cw w-4 h-4 mr-2 animate-spin inline-block"></span> Generating...
 				{:else}
-					<span class="i-lucide-refresh-cw w-4 h-4 mr-2 inline-block" /> Generate All
+					<span class="i-lucide-refresh-cw w-4 h-4 mr-2 inline-block"></span> Generate All
 				{/if}
 			</Button>
 		</div>

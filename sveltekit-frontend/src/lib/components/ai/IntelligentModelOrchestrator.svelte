@@ -10,7 +10,8 @@
 	// Pipeline state
 	type PipelineStep = 'idle' | 'searching' | 'validating' | 'generating' | 'complete' | 'error';
 	let pipelineStep = $state<PipelineStep>('idle');
-	let query = $state(initialQuery);
+	let query = $state('');
+	$effect(() => { query = initialQuery; });
 	let errorMessage = $state('');
 
 	// Step 1: Search results
@@ -250,11 +251,11 @@
 			<div class="pipeline-step {status}">
 				<div class="step-icon">
 					{#if status === 'active'}
-						<span class="i-lucide-loader animate-spin w-4 h-4 inline-block" />
+						<span class="i-lucide-loader animate-spin w-4 h-4 inline-block"></span>
 					{:else if status === 'done'}
-						<span class="i-lucide-check-circle w-4 h-4 inline-block" />
+						<span class="i-lucide-check-circle w-4 h-4 inline-block"></span>
 					{:else if status === 'error'}
-						<span class="i-lucide-alert-circle w-4 h-4 inline-block" />
+						<span class="i-lucide-alert-circle w-4 h-4 inline-block"></span>
 					{:else}
 						<span class="i-lucide-{step.icon} w-4 h-4 inline-block"></span>
 					{/if}
@@ -287,9 +288,9 @@
 				disabled={!query.trim() || pipelineStep === 'searching' || pipelineStep === 'generating'}
 			>
 				{#if pipelineStep === 'searching'}
-					<span class="i-lucide-loader animate-spin w-4 h-4 inline-block" /> Searching...
+					<span class="i-lucide-loader animate-spin w-4 h-4 inline-block"></span> Searching...
 				{:else}
-					<span class="i-lucide-search w-4 h-4 inline-block" /> Search
+					<span class="i-lucide-search w-4 h-4 inline-block"></span> Search
 				{/if}
 			</button>
 		</div>
@@ -319,15 +320,15 @@
 			</label>
 			<button class="health-btn" onclick={checkHealth} disabled={isCheckingHealth}>
 				{#if isCheckingHealth}
-					<span class="i-lucide-loader animate-spin w-3.5 h-3.5 inline-block" />
+					<span class="i-lucide-loader animate-spin w-3.5 h-3.5 inline-block"></span>
 				{:else}
-					<span class="i-lucide-database w-3.5 h-3.5 inline-block" />
+					<span class="i-lucide-database w-3.5 h-3.5 inline-block"></span>
 				{/if}
 				Health
 			</button>
 			{#if pipelineStep !== 'idle'}
 				<button class="reset-btn" onclick={resetPipeline}>
-					<span class="i-lucide-refresh-cw w-3.5 h-3.5 inline-block" /> Reset
+					<span class="i-lucide-refresh-cw w-3.5 h-3.5 inline-block"></span> Reset
 				</button>
 			{/if}
 		</div>
@@ -362,7 +363,7 @@
 	<!-- Error Message -->
 	{#if errorMessage}
 		<div class="error-bar">
-			<span class="i-lucide-alert-circle w-4 h-4 inline-block" />
+			<span class="i-lucide-alert-circle w-4 h-4 inline-block"></span>
 			<span>{errorMessage}</span>
 			<button onclick={() => (errorMessage = '')}>dismiss</button>
 		</div>
@@ -374,9 +375,9 @@
 			{#if searchTiming.embedMs}<span>Embed: {searchTiming.embedMs}ms</span>{/if}
 			{#if searchTiming.searchMs}<span>Search: {searchTiming.searchMs}ms</span>{/if}
 			{#if searchTiming.rerankMs}<span>Rerank: {searchTiming.rerankMs}ms</span>{/if}
-			{#if searchTiming.hopMs}<span><span class="i-lucide-network w-3 h-3 inline-block" /> DAG-hop: {searchTiming.hopMs}ms</span>{/if}
-			{#if searchTiming.kagMs}<span><span class="i-lucide-zap w-3 h-3 inline-block" /> KAG: {searchTiming.kagMs}ms</span>{/if}
-			{#if searchTiming.dagMs}<span><span class="i-lucide-file-text w-3 h-3 inline-block" /> DAG: {searchTiming.dagMs}ms</span>{/if}
+			{#if searchTiming.hopMs}<span><span class="i-lucide-network w-3 h-3 inline-block"></span> DAG-hop: {searchTiming.hopMs}ms</span>{/if}
+			{#if searchTiming.kagMs}<span><span class="i-lucide-zap w-3 h-3 inline-block"></span> KAG: {searchTiming.kagMs}ms</span>{/if}
+			{#if searchTiming.dagMs}<span><span class="i-lucide-file-text w-3 h-3 inline-block"></span> DAG: {searchTiming.dagMs}ms</span>{/if}
 			<span class="timing-total">Total: {searchTiming.totalMs ?? 0}ms</span>
 			{#if searchTiming.cacheSource}<span class="cache-tag">{searchTiming.cacheSource}</span>{/if}
 		</div>
@@ -417,9 +418,9 @@
 							{#if pipelineStep === 'validating'}
 								<button class="validation-btn" onclick={() => toggleValidation(chunkId)}>
 									{#if status === 'approved'}
-										<span class="i-lucide-thumbs-up w-3.5 h-3.5 inline-block" />
+										<span class="i-lucide-thumbs-up w-3.5 h-3.5 inline-block"></span>
 									{:else if status === 'rejected'}
-										<span class="i-lucide-thumbs-down w-3.5 h-3.5 inline-block" />
+										<span class="i-lucide-thumbs-down w-3.5 h-3.5 inline-block"></span>
 									{:else}
 										<span class="unset">?</span>
 									{/if}
@@ -477,7 +478,7 @@
 	{#if pipelineStep === 'complete' && answer}
 		<div class="answer-section">
 			<div class="answer-header">
-				<h3><span class="i-lucide-brain w-4.5 h-4.5 inline-block" /> Generated Answer</h3>
+				<h3><span class="i-lucide-brain w-4.5 h-4.5 inline-block"></span> Generated Answer</h3>
 				<div class="answer-meta">
 					<span class="confidence" title="Answer confidence">
 						{(answerConfidence * 100).toFixed(0)}% confidence
@@ -485,7 +486,7 @@
 					<span class="model-tag">{answerModel}</span>
 					<span class="gen-time">{generationTimeMs}ms</span>
 					<button class="copy-btn" onclick={() => copyToClipboard(answer)}>
-						<span class="i-lucide-copy w-3.5 h-3.5 inline-block" /> Copy
+						<span class="i-lucide-copy w-3.5 h-3.5 inline-block"></span> Copy
 					</button>
 				</div>
 			</div>

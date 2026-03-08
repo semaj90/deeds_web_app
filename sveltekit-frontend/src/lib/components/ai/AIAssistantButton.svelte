@@ -99,7 +99,7 @@
 		aria-label="Open assistant"
 	>
 		<div class="relative">
-			<span class="i-lucide-brain w-8 h-8 inline-block" />
+			<span class="i-lucide-brain w-8 h-8 inline-block"></span>
 			{#if showStatus}
 				<div
 					class="absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-sand/20 {statusConfig[aiStatus].color} {statusConfig[aiStatus].pulse ? 'animate-pulse' : ''}"
@@ -123,7 +123,7 @@
 	>
 		<div class="flex items-center gap-3 w-full">
 			<div class="relative">
-				<span class="i-lucide-brain w-6 h-6 inline-block" />
+				<span class="i-lucide-brain w-6 h-6 inline-block"></span>
 				{#if showStatus}
 					<div
 						class="absolute -bottom-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-sand/20 {statusConfig[aiStatus].color} {statusConfig[aiStatus].pulse ? 'animate-pulse' : ''}"
@@ -140,17 +140,21 @@
 			</div>
 
 			{#if voiceEnabled}
-				<button
-					class="p-1.5 hover:bg-white/10 rounded-full transition-colors"
-					onclick={toggleVoiceInput}
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<div
+					role="button"
+					tabindex="0"
+					class="p-1.5 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
+					onclick={(e) => { e.stopPropagation(); toggleVoiceInput(e); }}
+					onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); e.preventDefault(); toggleVoiceInput(e); } }}
 					aria-label={isListening ? 'Stop listening' : 'Start voice input'}
 				>
 					{#if isListening}
-						<span class="i-lucide-mic-off w-4 h-4 inline-block" />
+						<span class="i-lucide-mic-off w-4 h-4 inline-block"></span>
 					{:else}
-						<span class="i-lucide-mic w-4 h-4 inline-block" />
+						<span class="i-lucide-mic w-4 h-4 inline-block"></span>
 					{/if}
-				</button>
+				</div>
 			{/if}
 
 			{#if showBadge && unreadCount > 0}
@@ -158,7 +162,7 @@
 			{/if}
 
 			{#if variant === 'full'}
-				<span class="i-lucide-sparkles w-4 h-4 text-warning animate-pulse inline-block" />
+				<span class="i-lucide-sparkles w-4 h-4 text-warning animate-pulse inline-block"></span>
 			{/if}
 		</div>
 	</button>
@@ -172,7 +176,7 @@
 		title="AI Assistant"
 	>
 		<div class="relative">
-			<span class="i-lucide-brain w-5 h-5 inline-block" />
+			<span class="i-lucide-brain w-5 h-5 inline-block"></span>
 			{#if showStatus}
 				<div
 					class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full {statusConfig[aiStatus].color}"

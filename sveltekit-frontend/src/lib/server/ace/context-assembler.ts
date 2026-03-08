@@ -21,6 +21,7 @@ import { extractLegalTags } from '$lib/server/rag/tag-extractor.js';
 import { getTopQueryPatterns, getWeeklySummary } from '$lib/server/analytics/event-logger.js';
 import { applyStyle, type LegalPersona } from './style-adapter.js';
 import { webSearch, formatWebResultsAsContext } from '$lib/server/retrieval/web-search.js';
+import { searchWikipedia, formatWikipediaAsContext } from '$lib/server/retrieval/wikipedia-search.js';
 
 /**
  * Assemble a complete ACE context from all data sources.
@@ -34,6 +35,7 @@ export async function assembleACEContext(opts: {
 	maxTokens?: number;
 	persona?: LegalPersona;
 	enableWebSearch?: boolean;
+	enableWikipedia?: boolean;
 }): Promise<ACEContext> {
 	const { query, userId, caseId, conversationId } = opts;
 
@@ -48,13 +50,14 @@ export async function assembleACEContext(opts: {
 	};
 
 	// Run all data fetches in parallel (includes optional web search)
-	const [userProfile, caseContext, ragChunks, kagNeighbors, chatHistory, webResults] = await Promise.all([
+	const [userProfile, caseContext, ragChunks, kagNeighbors, chatHistory, webResults, wikiResults] = await Promise.all([
 		userId ? fetchUserProfile(userId) : Promise.resolve(null),
 		caseId ? fetchCaseContext(caseId) : Promise.resolve(null),
 		fetchRAGChunks(query),
 		caseId ? fetchKAGNeighbors(caseId) : Promise.resolve([]),
 		conversationId ? fetchChatHistory(conversationId) : Promise.resolve([]),
-		opts.enableWebSearch ? webSearch(query, 3).catch(() => null) : Promise.resolve(null)
+		opts.enableWebSearch ? webSearch(query, 3).catch(() => null) : Promise.resolve(null),
+		(opts.enableWikipedia ?? true) ? searchWikipedia(query, 3).catch(() => null) : Promise.resolve(null)
 	]);
 
 	// Fetch evidence metadata separately (avoids hoisting issues)
@@ -80,7 +83,10 @@ export async function assembleACEContext(opts: {
 		entities,
 		practiceTemplate,
 		queryTags,
-		webSearchContext: webResults ? formatWebResultsAsContext(webResults) : null,
+		webSearchContext: [
+			webResults ? formatWebResultsAsContext(webResults) : '',
+			wikiResults ? formatWikipediaAsContext(wikiResults) : ''
+		].filter(Boolean).join('\n') || null,
 		persona: opts.persona ?? 'neutral',
 		evidenceMetadata
 	};

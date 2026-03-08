@@ -219,7 +219,7 @@
 	<div bind:this={messagesContainer} class="messages-container">
 		{#if conversation.length === 0}
 			<div class="empty-state">
-				<span class="i-lucide-message-circle text-sand/40 w-12 h-12 inline-block" />
+				<span class="i-lucide-message-circle text-sand/40 w-12 h-12 inline-block"></span>
 				<p class="text-sand/60">Ask a question to get started</p>
 			</div>
 		{/if}
@@ -228,9 +228,9 @@
 			<div class="message {message.type}">
 				<div class="message-icon">
 					{#if message.type === 'user'}
-						<span class="i-lucide-message-circle w-5 h-5 inline-block" />
+						<span class="i-lucide-message-circle w-5 h-5 inline-block"></span>
 					{:else}
-						<span class="i-lucide-brain w-5 h-5 inline-block" />
+						<span class="i-lucide-brain w-5 h-5 inline-block"></span>
 					{/if}
 				</div>
 
@@ -260,7 +260,7 @@
 		{#if isLoading}
 			<div class="message ai loading">
 				<div class="message-icon">
-					<span class="i-lucide-loader-2 animate-spin w-5 h-5 inline-block" />
+					<span class="i-lucide-loader-2 animate-spin w-5 h-5 inline-block"></span>
 				</div>
 				<div class="message-content">
 					<p>Thinking...</p>
@@ -272,7 +272,7 @@
 	<!-- Error message -->
 	{#if error}
 		<div class="error-banner">
-			<span class="i-lucide-alert-circle w-4 h-4 inline-block" />
+			<span class="i-lucide-alert-circle w-4 h-4 inline-block"></span>
 			<span>{error}</span>
 		</div>
 	{/if}
@@ -297,9 +297,9 @@
 					aria-label={isListening ? 'Stop listening' : 'Start voice input'}
 				>
 					{#if isListening}
-						<span class="i-lucide-mic-off w-5 h-5 inline-block" />
+						<span class="i-lucide-mic-off w-5 h-5 inline-block"></span>
 					{:else}
-						<span class="i-lucide-mic w-5 h-5 inline-block" />
+						<span class="i-lucide-mic w-5 h-5 inline-block"></span>
 					{/if}
 				</button>
 			{/if}
@@ -311,7 +311,7 @@
 				disabled={!query.trim() || isLoading}
 			>
 				{#if isLoading}
-					<span class="i-lucide-loader-2 animate-spin w-5 h-5 inline-block" />
+					<span class="i-lucide-loader-2 animate-spin w-5 h-5 inline-block"></span>
 				{:else}
 					Send
 				{/if}

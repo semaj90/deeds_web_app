@@ -83,27 +83,27 @@
  <!-- Header -->
  <div class="flex items-center justify-between p-4 border-b">
  <h2 class="text-xl font-semibold flex items-center gap-2">
- <span class="i-lucide-eye w-5 h-5 inline-block" />
+ <span class="i-lucide-eye w-5 h-5 inline-block"></span>
  POI Photo Analysis
  </h2>
  <div class="flex items-center gap-2">
  <button class="nio-btn" type="button" onclick={zoomOut}>
- <span class="i-lucide-zoom-out w-4 h-4 inline-block" />
+ <span class="i-lucide-zoom-out w-4 h-4 inline-block"></span>
  </button>
  <span class="text-sm text-gray-600 min-w-[60px] text-center">
  {Math.round(zoom * 100)}%
  </span>
  <button class="nio-btn" type="button" onclick={zoomIn}>
- <span class="i-lucide-zoom-in w-4 h-4 inline-block" />
+ <span class="i-lucide-zoom-in w-4 h-4 inline-block"></span>
  </button>
  <button class="nio-btn" type="button" onclick={resetView}>
- <span class="i-lucide-rotate-ccw w-4 h-4 inline-block" />
+ <span class="i-lucide-rotate-ccw w-4 h-4 inline-block"></span>
  </button>
  <button class="nio-btn" type="button" onclick={downloadImage}>
- <span class="i-lucide-download w-4 h-4 inline-block" />
+ <span class="i-lucide-download w-4 h-4 inline-block"></span>
  </button>
  <button class="nio-btn ghost" type="button" onclick={handleClose}>
- <span class="i-lucide-x w-4 h-4 inline-block" />
+ <span class="i-lucide-x w-4 h-4 inline-block"></span>
  </button>
  </div>
  </div>
@@ -136,21 +136,21 @@
  <div class="analysis-card-body space-y-3">
  {#if photo.metadata?.timestamp}
  <div class="flex items-center gap-2">
- <span class="i-lucide-calendar w-4 h-4 text-gray-500 inline-block" />
+ <span class="i-lucide-calendar w-4 h-4 text-gray-500 inline-block"></span>
  <span class="text-sm">{formatTimestamp(photo.metadata.timestamp)}</span>
  </div>
  {/if}
 
  {#if photo.metadata?.gps}
  <div class="flex items-center gap-2">
- <span class="i-lucide-map-pin w-4 h-4 text-gray-500 inline-block" />
+ <span class="i-lucide-map-pin w-4 h-4 text-gray-500 inline-block"></span>
  <span class="text-sm">{formatGPS(photo.metadata.gps)}</span>
  </div>
  {/if}
 
  {#if photo.metadata?.device}
  <div class="flex items-center gap-2">
- <span class="i-lucide-camera w-4 h-4 text-gray-500 inline-block" />
+ <span class="i-lucide-camera w-4 h-4 text-gray-500 inline-block"></span>
  <span class="text-sm">{photo.metadata.device}</span>
  </div>
  {/if}
@@ -169,7 +169,7 @@
  <section class="analysis-card">
  <header class="analysis-card-header">
  <h3 class="analysis-card-title text-lg flex items-center gap-2">
- <span class="i-lucide-tag w-4 h-4 inline-block" /> EXIF Metadata
+ <span class="i-lucide-tag w-4 h-4 inline-block"></span> EXIF Metadata
  </h3>
  </header>
  <div class="analysis-card-body">
@@ -191,7 +191,7 @@
  <section class="analysis-card">
  <header class="analysis-card-header">
  <h3 class="analysis-card-title text-lg flex items-center gap-2">
- <span class="i-lucide-brain w-4 h-4 inline-block" /> AI Analysis
+ <span class="i-lucide-brain w-4 h-4 inline-block"></span> AI Analysis
  </h3>
  </header>
  <div class="analysis-card-body space-y-4">

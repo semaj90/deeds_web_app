@@ -135,8 +135,7 @@
 						<span class="group-count">{(selected[group.id] || []).length}</span>
 					{/if}
 					<span
-						class="i-lucide-chevron-down inline-block h-4 w-4 chevron {expandedGroups.has(group.id) ? 'expanded' : ''}"
-					/>
+						class="i-lucide-chevron-down inline-block h-4 w-4 chevron {expandedGroups.has(group.id) ? 'expanded' : ''}"></span>
 				</button>
 
 				{#if expandedGroups.has(group.id)}

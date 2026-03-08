@@ -72,11 +72,11 @@
   </ContextMenu.Trigger>
   <ContextMenu.Content menu={true}>
     <ContextMenu.Item select={() => saveCitation(window.getSelection()?.toString() ?? '')}>
-      <span class="i-lucide-link space-y-4 inline-block" />
+      <span class="i-lucide-link space-y-4 inline-block"></span>
       Save as Citation
     </ContextMenu.Item>
     <ContextMenu.Item select={summarizeReport}>
-      <span class="i-lucide-sparkles space-y-4 inline-block" />
+      <span class="i-lucide-sparkles space-y-4 inline-block"></span>
       AI Summary
     </ContextMenu.Item>
   </ContextMenu.Content>

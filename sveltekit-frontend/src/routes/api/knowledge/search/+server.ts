@@ -91,8 +91,25 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
     // Execute search — parallel across KnowledgeSearcher (Qdrant) + 3 legal sources
     const searcher = getKnowledgeSearcher();
     const startTime = Date.now();
-    const query = body.query.trim();
+    const rawQuery = body.query.trim();
     const topK = body.topK ?? 10;
+    const enableExpansion = (body as unknown as Record<string, unknown>).expand !== false;
+
+    // Query expansion: add legal synonyms for broader retrieval
+    let query = rawQuery;
+    let expansionMeta: { synonyms: Array<{ term: string; synonym: string }>; source: string } | null = null;
+    if (enableExpansion) {
+      try {
+        const { expandQuery } = await import('$lib/server/retrieval/query-expansion.js');
+        const expanded = expandQuery(rawQuery);
+        if (expanded.synonyms.length > 0) {
+          query = expanded.expanded;
+          expansionMeta = { synonyms: expanded.synonyms, source: expanded.source };
+        }
+      } catch {
+        // Non-fatal: search with original query
+      }
+    }
 
     const searchBody = JSON.stringify({ query, limit: topK });
     const hdrs = { 'Content-Type': 'application/json' };
@@ -215,7 +232,8 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
         totalAcrossSources: allResults.length,
         sources: sourceStats,
         synthesized: body?.synthesize || false,
-        llmProvider: body?.llmProvider ?? 'ollama'
+        llmProvider: body?.llmProvider ?? 'ollama',
+        queryExpansion: expansionMeta
       }
     });
   } catch (error) {

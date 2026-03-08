@@ -122,6 +122,33 @@
     });
   }
 
+  // Collection quick-add
+  let userCollections = $state<{ id: string; name: string; color: string }[]>([]);
+  let collectionsLoaded = $state(false);
+  let addingToCollectionFor = $state<string | null>(null);
+
+  async function loadUserCollections() {
+    if (collectionsLoaded) return;
+    try {
+      const res = await fetch('/api/citations/collections');
+      if (res.ok) {
+        userCollections = await res.json();
+        collectionsLoaded = true;
+      }
+    } catch { /* ignore */ }
+  }
+
+  async function addToCollection(collectionId: string, citationId: string) {
+    try {
+      await fetch(`/api/citations/collections/${collectionId}/citations`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ citationId })
+      });
+    } catch { /* ignore */ }
+    addingToCollectionFor = null;
+  }
+
   interface Citation {
     id: string;
     citationType: string;
@@ -504,6 +531,29 @@
                   citation={{ statute_code: citation.formattedCitation, statute_title: citation.legalPrinciple, jurisdiction: citation.documentTitle, severity: citation.citationType, highlighted_text: citation.quotedText, source_type: 'auto_extracted' }}
                   size="sm"
                 />
+                <div class="relative" onclick={(e) => e.stopPropagation()}>
+                  <button
+                    class="px-1.5 py-0.5 rounded text-[10px] text-sand/50 border border-sand/15 hover:border-accent/40 hover:text-accent transition"
+                    onclick={() => { addingToCollectionFor = addingToCollectionFor === citation.id ? null : citation.id; loadUserCollections(); }}
+                  >+ collection</button>
+                  {#if addingToCollectionFor === citation.id && userCollections.length > 0}
+                    <div class="absolute right-0 top-full mt-1 z-20 bg-panel border border-sand/20 rounded shadow-lg min-w-40 py-1">
+                      {#each userCollections as col}
+                        <button
+                          class="w-full text-left px-3 py-1.5 text-xs text-sand hover:bg-accent/10 flex items-center gap-2"
+                          onclick={() => addToCollection(col.id, citation.id)}
+                        >
+                          <span class="w-2 h-2 rounded-full shrink-0" style="background: {col.color}"></span>
+                          {col.name}
+                        </button>
+                      {/each}
+                    </div>
+                  {:else if addingToCollectionFor === citation.id && collectionsLoaded}
+                    <div class="absolute right-0 top-full mt-1 z-20 bg-panel border border-sand/20 rounded shadow-lg p-3">
+                      <p class="text-xs text-sand/50">No collections yet</p>
+                    </div>
+                  {/if}
+                </div>
                 <span class="px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-mono bg-sand/10 text-sand/70">
                   {citation.citationType.replace('_', ' ')}
                 </span>

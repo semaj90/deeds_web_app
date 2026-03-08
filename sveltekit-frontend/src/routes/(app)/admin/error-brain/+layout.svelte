@@ -13,7 +13,7 @@
 	<header class="border-b">
 		<div class="container mx-auto px-6 py-4">
 			<nav class="eb-nav">
-				<a href="/error-brain" class="eb-title">Error-Brain</a>
+				<a href="/admin/error-brain" class="eb-title">Error-Brain</a>
 				<div class="eb-links">
 					{#each navItems as item}
 						<a

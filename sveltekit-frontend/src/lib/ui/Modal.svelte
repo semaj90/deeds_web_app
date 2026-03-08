@@ -128,7 +128,7 @@
   aria-label="Close modal"
   type="button"
   >
-  <span class="i-lucide-x w-5 h-5 inline-block" />
+  <span class="i-lucide-x w-5 h-5 inline-block"></span>
   </button>
   {/if}
   </div>

@@ -154,7 +154,7 @@
 	<div style="max-height: { maxHeight }; display: flex; flex-direction, column; height: 100%;">
 		<div class="chat-header nes-container is-dark">
 			<div class="flex items-center">
-				<span class="i-lucide-brain w-6 h-6 nes-text inline-block" />
+				<span class="i-lucide-brain w-6 h-6 nes-text inline-block"></span>
 				<h3 class="text-lg font-semibold nes-text">Legal AI Assistant</h3>
 
 				{#if caseId}
@@ -167,9 +167,9 @@
 						class="nes-btn is-small"
 						onclick={ toggleVoiceInput } title={isListening ? 'Stop Voice Input' : 'Start Voice Input'} aria-label={isListening ? 'Stop Voice Input' : 'Start Voice Input'} >
 						{#if isListening}
-							<span class="i-lucide-mic-off w-4 inline-block" />
+							<span class="i-lucide-mic-off w-4 inline-block"></span>
 						{:else}
-							<span class="i-lucide-mic w-4 inline-block" />
+							<span class="i-lucide-mic w-4 inline-block"></span>
 						{/if}
 					</button>
 				{/if}
@@ -178,14 +178,14 @@
 					onclick={() => (showSettings = !showSettings)} title="Settings"
 					aria-label="Open settings"
 				>
-					<span class="i-lucide-settings w-4 inline-block" />
+					<span class="i-lucide-settings w-4 inline-block"></span>
 				</button>
 				<button type="button"
 					class="nes-btn is-small"
 					onclick={() => clearMessages()} title="Clear conversation"
 					aria-label="Clear conversation"
 					disabled={messages.length === 0} >
-					<span class="i-lucide-trash-2 w-4 inline-block" />
+					<span class="i-lucide-trash-2 w-4 inline-block"></span>
 				</button>
 			</div>
 		</div>
@@ -209,7 +209,7 @@
 											class="reference-item nes-btn is-small"
 											onclick={() => handleReferenceClick(reference)}
 											aria-label={`Open reference ${reference?.title ?? ''}`}>
-											<span class="i-lucide-quote w-3 h-3 inline-block" />
+											<span class="i-lucide-quote w-3 h-3 inline-block"></span>
 											<span class="reference-title">{reference?.title}</span>
 											<span class="reference-citation text-xs">({reference?.citation})</span>
 										</button>
@@ -225,7 +225,7 @@
 				<div class="flex">
 					<div class="max-w-[80%] p-3 rounded-lg">
 						<div class="flex items-center gap-1">
-							<span class="i-lucide-loader-2 w-4 h-4 inline-block" />
+							<span class="i-lucide-loader-2 w-4 h-4 inline-block"></span>
 							<span>Analyzing your query...</span>
 						</div>
 					</div>
@@ -242,7 +242,7 @@
 					disabled={!query.trim() || isLoading || isListening} class="chat-submit-btn nes-btn is-primary"
 					aria-label="Send message"
 				>
-					<span class="i-lucide-search w-4 inline-block" />
+					<span class="i-lucide-search w-4 inline-block"></span>
 				</button>
 			</div>
 		</form>
@@ -305,7 +305,7 @@
 		<Dialog.Content class="max-w-2xl nes-dialog">
 			<Dialog.Header>
 				<Dialog.Title class="nes-text">
-					<span class="i-lucide-quote w-5 h-5 mr-2 inline-block" /> Legal Citation
+					<span class="i-lucide-quote w-5 h-5 mr-2 inline-block"></span> Legal Citation
 				</Dialog.Title>
 				<Dialog.Description class="nes-text">Details of the cited legal reference.</Dialog.Description>
 			</Dialog.Header>

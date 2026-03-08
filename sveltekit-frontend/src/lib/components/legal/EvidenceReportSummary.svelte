@@ -195,7 +195,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 				</div>
 				{#if allowExport}
 					<button onclick={exportReport} class="export-btn" title="Export Report">
-						<span class="i-lucide-download w-4.5 h-4.5 inline-block" />
+						<span class="i-lucide-download w-4.5 h-4.5 inline-block"></span>
 					</button>
 				{/if}
 			</div>
@@ -227,7 +227,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 		<!-- Evidence Information -->
 		<div class="detail-card">
 			<h3 class="detail-heading">
-				<span class="i-lucide-eye w-4.5 h-4.5 inline-block" /> Evidence Details
+				<span class="i-lucide-eye w-4.5 h-4.5 inline-block"></span> Evidence Details
 			</h3>
 			<div class="detail-fields">
 				<div>
@@ -262,7 +262,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 		<!-- Analysis Details -->
 		<div class="detail-card">
 			<h3 class="detail-heading">
-				<span class="i-lucide-target w-4.5 h-4.5 inline-block" /> Analysis Details
+				<span class="i-lucide-target w-4.5 h-4.5 inline-block"></span> Analysis Details
 			</h3>
 			<div class="detail-fields">
 				<div>
@@ -295,7 +295,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 		<!-- Legal Impact -->
 		<div class="detail-card">
 			<h3 class="detail-heading">
-				<span class="i-lucide-scale w-4.5 h-4.5 inline-block" /> Legal Implications
+				<span class="i-lucide-scale w-4.5 h-4.5 inline-block"></span> Legal Implications
 			</h3>
 			<div class="detail-fields">
 				<div>
@@ -303,7 +303,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 					<div class="item-list">
 						{#each reportData.legalImplications.charges as charge}
 							<div class="item-row">
-								<span class="i-lucide-circle-check text-accent w-3.5 h-3.5 inline-block" />
+								<span class="i-lucide-circle-check text-accent w-3.5 h-3.5 inline-block"></span>
 								<span>{charge}</span>
 							</div>
 						{/each}
@@ -314,7 +314,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 					<div class="item-list">
 						{#each reportData.legalImplications.challengePoints as challenge}
 							<div class="item-row">
-								<span class="i-lucide-triangle-alert text-warning w-3.5 h-3.5 inline-block" />
+								<span class="i-lucide-triangle-alert text-warning w-3.5 h-3.5 inline-block"></span>
 								<span>{challenge}</span>
 							</div>
 						{/each}
@@ -360,7 +360,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 				<ul class="key-points">
 					{#each reportData.findings.keyPoints as point}
 						<li>
-							<span class="i-lucide-circle-check text-accent w-3.5 h-3.5 inline-block" />
+							<span class="i-lucide-circle-check text-accent w-3.5 h-3.5 inline-block"></span>
 							<span>{point}</span>
 						</li>
 					{/each}
@@ -370,7 +370,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 					<ul class="key-points">
 						{#each reportData.findings.limitations as limitation}
 							<li>
-								<span class="i-lucide-triangle-alert text-warning w-3.5 h-3.5 inline-block" />
+								<span class="i-lucide-triangle-alert text-warning w-3.5 h-3.5 inline-block"></span>
 								<span>{limitation}</span>
 							</li>
 						{/each}
@@ -388,7 +388,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 				{#each reportData.attachments as attachment}
 					<div class="attachment-card">
 						<div class="attachment-icon">
-							<span class="i-lucide-file-text w-4.5 h-4.5 inline-block" />
+							<span class="i-lucide-file-text w-4.5 h-4.5 inline-block"></span>
 						</div>
 						<div class="attachment-info">
 							<p class="attachment-name">{attachment.name}</p>

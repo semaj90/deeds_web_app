@@ -69,14 +69,14 @@
 							<div
 								class="absolute -top-1 -right-1 bg-info text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
 							>
-								<span class="i-lucide-camera w-3 h-3 inline-block" />
+								<span class="i-lucide-camera w-3 h-3 inline-block"></span>
 							</div>
 						{/if}
 					</div>
 				{:else}
 					<Avatar class="w-12 h-12">
 						<AvatarFallback class="bg-sand/10">
-							<span class="i-lucide-user w-6 h-6 text-sand/60 inline-block" />
+							<span class="i-lucide-user w-6 h-6 text-sand/60 inline-block"></span>
 						</AvatarFallback>
 					</Avatar>
 				{/if}
@@ -118,7 +118,7 @@
 				}}
 				class="flex-1"
 			>
-				<span class="i-lucide-eye w-4 h-4 mr-1 inline-block" />
+				<span class="i-lucide-eye w-4 h-4 mr-1 inline-block"></span>
 				View
 			</Button>
 			<Button
@@ -130,7 +130,7 @@
 				}}
 				class="flex-1"
 			>
-				<span class="i-lucide-edit w-4 h-4 mr-1 inline-block" />
+				<span class="i-lucide-edit w-4 h-4 mr-1 inline-block"></span>
 				Edit
 			</Button>
 			<Button
@@ -142,7 +142,7 @@
 				}}
 				class="text-danger hover:text-danger"
 			>
-				<span class="i-lucide-trash-2 w-4 h-4 inline-block" />
+				<span class="i-lucide-trash-2 w-4 h-4 inline-block"></span>
 			</Button>
 		</div>
 	</CardContent>

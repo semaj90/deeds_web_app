@@ -203,7 +203,7 @@ message: trimmed, history: messages })
   <div class="p-3 border-b border-[#3a3a3a] flex items-center justify-between bg-[#222]">
     <div class="flex items-center gap-2">
       <div class="w-8 h-8 rounded-full bg-panelSoft border border-sand/20 flex items-center justify-center flex-shrink-0">
-        <span class="i-lucide-bot w-5 h-5 text-info inline-block" />
+        <span class="i-lucide-bot w-5 h-5 text-info inline-block"></span>
       </div>
       <span class="font-bold tracking-tighter uppercase">YoRHa AI Interface</span>
     </div>
@@ -230,7 +230,7 @@ message: trimmed, history: messages })
     {/each}
     {#if isTyping}
       <div class="flex gap-2 items-center text-xs text-sand/60 animate-pulse">
-        <span class="i-lucide-activity w-4 h-4 inline-block" /> <span>YoRHa processing...</span>
+        <span class="i-lucide-activity w-4 h-4 inline-block"></span> <span>YoRHa processing...</span>
       </div>
     {/if}
   </div>
@@ -246,7 +246,7 @@ message: trimmed, history: messages })
         rows="2"
       ></textarea>
       <Button variant="outline" class="h-auto px-6 border-sand/20 bg-black hover:bg-panel" onclick={sendMessage}>
-        <span class="i-lucide-send w-5 h-5 inline-block" />
+        <span class="i-lucide-send w-5 h-5 inline-block"></span>
       </Button>
     </div>
     <div class="mt-2 flex justify-between text-[9px] text-sand/60">

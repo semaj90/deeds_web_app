@@ -243,9 +243,9 @@
       <div class="header-controls">
         <div class="system-health {systemHealth}">
           {#if systemHealth === 'healthy'}
-            <span class="i-lucide-check-circle w-5 h-5 inline-block" />
+            <span class="i-lucide-check-circle w-5 h-5 inline-block"></span>
           {:else}
-            <span class="i-lucide-alert-triangle w-5 h-5 inline-block" />
+            <span class="i-lucide-alert-triangle w-5 h-5 inline-block"></span>
           {/if}
           <span>System {systemHealth.toUpperCase()}</span>
         </div>
@@ -256,7 +256,7 @@
             disabled={isRefreshing}
             class="refresh-btn"
           >
-            <span class="i-lucide-refresh-cw w-4 h-4 inline-block" />
+            <span class="i-lucide-refresh-cw w-4 h-4 inline-block"></span>
             Refresh
           </button>
           <button
@@ -264,7 +264,7 @@
             onclick={toggleAutoRefresh}
             class="auto-refresh-btn {autoRefresh ? 'active' : ''}"
           >
-            <span class="i-lucide-target w-4 h-4 inline-block" />
+            <span class="i-lucide-target w-4 h-4 inline-block"></span>
             Auto: {autoRefresh ? 'ON' : 'OFF'}
           </button>
           <button
@@ -272,7 +272,7 @@
             onclick={clearCache}
             class="clear-cache-btn"
           >
-            <span class="i-lucide-database w-4 h-4 inline-block" />
+            <span class="i-lucide-database w-4 h-4 inline-block"></span>
             Clear Cache
           </button>
         </div>
@@ -285,7 +285,7 @@
     <!-- Key Metrics Row -->
     <section class="metrics-overview">
       <div class="metric-card">
-        <div class="metric-icon"><span class="i-lucide-trending-up w-6 h-6 inline-block" /></div>
+        <div class="metric-icon"><span class="i-lucide-trending-up w-6 h-6 inline-block"></span></div>
         <div class="metric-content">
           <h3>Overall Hit Rate</h3>
           <div class="metric-value {performanceGrade.color}">
@@ -295,21 +295,21 @@
         </div>
       </div>
       <div class="metric-card">
-        <div class="metric-icon"><span class="i-lucide-clock w-6 h-6 inline-block" /></div>
+        <div class="metric-icon"><span class="i-lucide-clock w-6 h-6 inline-block"></span></div>
         <div class="metric-content">
           <h3>Avg Response</h3>
           <div class="metric-value">{cacheMetrics.performance.averageQueryTime.toFixed(0)}ms</div>
         </div>
       </div>
       <div class="metric-card">
-        <div class="metric-icon"><span class="i-lucide-dollar-sign w-6 h-6 inline-block" /></div>
+        <div class="metric-icon"><span class="i-lucide-dollar-sign w-6 h-6 inline-block"></span></div>
         <div class="metric-content">
           <h3>Cost Savings</h3>
           <div class="metric-value">${cacheMetrics.embedding.costSavings}</div>
         </div>
       </div>
       <div class="metric-card">
-        <div class="metric-icon"><span class="i-lucide-bar-chart-3 w-6 h-6 inline-block" /></div>
+        <div class="metric-icon"><span class="i-lucide-bar-chart-3 w-6 h-6 inline-block"></span></div>
         <div class="metric-content">
           <h3>Throughput</h3>
           <div class="metric-value">{cacheMetrics.performance.throughputQPS.toFixed(1)} QPS</div>
@@ -402,15 +402,15 @@
           </div>
           <div class="bank-info">
             <div class="bank-item">
-              <span class="i-lucide-cpu w-4 h-4 inline-block" />
+              <span class="i-lucide-cpu w-4 h-4 inline-block"></span>
               <span>Active Bank: {nintendoStats.activeBankId}</span>
             </div>
             <div class="bank-item">
-              <span class="i-lucide-hard-drive w-4 h-4 inline-block" />
+              <span class="i-lucide-hard-drive w-4 h-4 inline-block"></span>
               <span>Textures: {nintendoStats.textureCount}</span>
             </div>
             <div class="bank-item">
-              <span class="i-lucide-zap w-4 h-4 inline-block" />
+              <span class="i-lucide-zap w-4 h-4 inline-block"></span>
               <span>Streams: {nintendoStats.activeStreams}</span>
             </div>
           </div>

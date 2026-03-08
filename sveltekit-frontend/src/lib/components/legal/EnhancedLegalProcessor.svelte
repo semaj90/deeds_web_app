@@ -53,7 +53,7 @@
 	} | null>(null);
 	let errorMessage = $state<string | null>(null);
 
-	let fileInput: HTMLInputElement;
+	let fileInput = $state<HTMLInputElement>();
 
 	function handleFileSelect(event: Event) {
 		const target = event.target as HTMLInputElement;

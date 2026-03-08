@@ -58,7 +58,8 @@
 	}
 
 	// State
-	let query = $state(initialQuery);
+	let query = $state('');
+	$effect(() => { query = initialQuery; });
 	let useACE = $state(true);
 	let maxIterations = $state(10);
 	let verbose = $state(false);
@@ -233,8 +234,7 @@
 			bind:value={query}
 			placeholder="What would you like to investigate? (e.g., 'Analyze evidence ID xyz for forensic patterns')"
 			rows="3"
-			class="w-full px-3 py-2 bg-panel-soft border border-sand-6 rounded text-sand-12 placeholder:text-sand-9 focus:outline-none focus:border-accent transition-colors resize-none"
-		/>
+			class="w-full px-3 py-2 bg-panel-soft border border-sand-6 rounded text-sand-12 placeholder:text-sand-9 focus:outline-none focus:border-accent transition-colors resize-none"></textarea>
 	</div>
 
 	<!-- Advanced Options -->

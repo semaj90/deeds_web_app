@@ -18,11 +18,16 @@
 	let { data, children }: Props = $props();
 	let showDocumentWriter = $state(false);
 
-	// Dynamic import AccessibilityPanel to avoid bits-ui Dialog SSR TDZ crash
+	// Dynamic imports to avoid SSR TDZ crashes (browser-only components)
 	let AccessibilityPanel = $state<typeof import('$lib/components/ui/AccessibilityPanel.svelte').default | null>(null);
+	let AIChatWidget = $state<typeof import('$lib/components/ai/AIChatWidget.svelte').default | null>(null);
 	onMount(async () => {
-		const mod = await import('$lib/components/ui/AccessibilityPanel.svelte');
-		AccessibilityPanel = mod.default;
+		const [accMod, chatMod] = await Promise.all([
+			import('$lib/components/ui/AccessibilityPanel.svelte'),
+			import('$lib/components/ai/AIChatWidget.svelte'),
+		]);
+		AccessibilityPanel = accMod.default;
+		AIChatWidget = chatMod.default;
 	});
 
 	// Initialize user activity telemetry (typing/idle detection)
@@ -68,7 +73,10 @@
 <LegalCorpusSearch />
 <OfflineIndicator />
 {#if AccessibilityPanel}
-	<svelte:component this={AccessibilityPanel} />
+	<AccessibilityPanel />
+{/if}
+{#if AIChatWidget}
+	<AIChatWidget />
 {/if}
 
 <!-- Toast Notifications Overlay -->

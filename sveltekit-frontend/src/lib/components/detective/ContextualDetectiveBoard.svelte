@@ -43,7 +43,8 @@
     anomalies?: unknown[];
     timelineGaps?: unknown[];
   } | null>(null);
-  let evidenceList = $state<unknown[]>(initialEvidence);
+  let evidenceList = $state<unknown[]>([]);
+  $effect(() => { evidenceList = initialEvidence; });
 
   // WebSocket collaboration state
   let wsManager: DetectiveWebSocketManager | null = null;

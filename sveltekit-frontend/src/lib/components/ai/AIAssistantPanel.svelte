@@ -51,7 +51,7 @@
 		{#if isAssistantLoading || isLoading}
 			<div class="flex justify-start">
 				<div class="nes-balloon from-left">
-					<span class="i-lucide-loader-2 animate-spin inline-block" />
+					<span class="i-lucide-loader-2 animate-spin inline-block"></span>
 				</div>
 			</div>
 		{/if}
@@ -66,7 +66,7 @@
 			onkeydown={(e) => e.key === 'Enter' && handleSendMessage()}
 		/>
 		<Button onclick={handleSendMessage} disabled={isLoading || !userInput.trim()}>
-			<span class="i-lucide-zap w-4 h-4 inline-block" />
+			<span class="i-lucide-zap w-4 h-4 inline-block"></span>
 		</Button>
 	</div>
 </div>

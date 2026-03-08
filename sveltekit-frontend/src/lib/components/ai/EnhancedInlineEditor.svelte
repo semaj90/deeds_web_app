@@ -51,8 +51,8 @@
 	let isProcessing = $state(false);
 	let lastProcessedText = $state('');
 
-	// Debounced suggestion generation
-	const generateSuggestions = debounce(async (text: string, cursorPos: number) => {
+	// Debounced suggestion generation — recreated when suggestionDelay changes
+	const generateSuggestions = $derived.by(() => debounce(async (text: string, cursorPos: number) => {
 		if (text.length < minCharactersForSuggestion || text === lastProcessedText) {
 			return;
 		}
@@ -86,7 +86,7 @@
 		} finally {
 			isProcessing = false;
 		}
-	}, suggestionDelay);
+	}, suggestionDelay));
 
 	// Generate AI suggestions using multiple techniques
 	async function generateAISuggestions(context: { text: string, contextBefore: string;

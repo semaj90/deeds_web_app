@@ -20,6 +20,15 @@
 	let tagInput = $state('');
 	let showAdvanced = $state(false);
 
+	const TAG_PRESETS = [
+		{ tag: 'key authority', color: '#eab308' },
+		{ tag: 'supporting', color: '#22c55e' },
+		{ tag: 'opposing', color: '#ef4444' },
+		{ tag: 'distinguished', color: '#a855f7' },
+		{ tag: 'overruled', color: '#dc2626' },
+		{ tag: 'cited', color: '#3b82f6' },
+	];
+
 	const sourceTypes = [
 		{ value: 'statute', label: 'Statute' },
 	{ value: 'case_law', label: 'Case Law' },
@@ -66,6 +75,21 @@
 			}
 
 			const citation = await response.json();
+
+			// Wire tags to the citation via tag API
+			const citationId = citation?.id ?? citation?.citation?.id;
+			if (citationId && formData.tags && formData.tags.length > 0) {
+				await Promise.allSettled(
+					formData.tags.map((tag) =>
+						fetch(`/api/citations/${citationId}/tags`, {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({ tag })
+						})
+					)
+				);
+			}
+
 			onsaved?.(citation);
 
 			formData = {
@@ -133,10 +157,28 @@
 					Add
 				</button>
 			</div>
+			<div class="tag-presets">
+				{#each TAG_PRESETS as preset}
+					{#if !formData.tags?.includes(preset.tag)}
+						<button
+							type="button"
+							class="tag-preset"
+							style="border-color: {preset.color}; color: {preset.color}"
+							onclick={() => {
+								formData.tags = [...(formData.tags ?? []), preset.tag];
+							}}
+							disabled={isLoading}
+						>
+							+ {preset.tag}
+						</button>
+					{/if}
+				{/each}
+			</div>
 			{#if formData.tags && formData.tags.length > 0}
 				<div class="tags-list">
 					{#each formData.tags as tag}
-						<span class="tag">
+						{@const preset = TAG_PRESETS.find(p => p.tag === tag)}
+						<span class="tag" style={preset ? `background: ${preset.color}` : ''}>
 							{tag}
 							<button
 								type="button"
@@ -323,6 +365,33 @@
 		font-size: 16px;
 	padding: 0;
 		line-height: 1;
+	}
+
+	.tag-presets {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-top: 6px;
+	}
+
+	.tag-preset {
+		background: none;
+		border: 1px solid;
+		border-radius: 4px;
+		padding: 2px 8px;
+		font-size: 12px;
+		cursor: pointer;
+		transition: all 150ms ease;
+	}
+
+	.tag-preset:hover:not(:disabled) {
+		opacity: 0.8;
+		transform: translateY(-1px);
+	}
+
+	.tag-preset:disabled {
+		cursor: not-allowed;
+		opacity: 0.4;
 	}
 
 	.tag-remove:hover {

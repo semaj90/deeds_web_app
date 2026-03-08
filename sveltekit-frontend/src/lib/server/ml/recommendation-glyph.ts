@@ -47,12 +47,16 @@ export interface DecodedGlyph {
 	};
 }
 
+export interface ValidGlyphResult extends DecodedGlyph {
+	valid: true;
+}
+
 export interface GlyphDecodeError {
 	valid: false;
 	error: string;
 }
 
-export type GlyphDecodeResult = (DecodedGlyph & { valid: true }) | GlyphDecodeError;
+export type GlyphDecodeResult = ValidGlyphResult | GlyphDecodeError;
 
 /**
  * Quantize a float [0, 1] to a byte [0, 255]
@@ -195,7 +199,7 @@ export function safeDecodeGlyph(bytes: Uint8Array | number[]): GlyphDecodeResult
 	}
 
 	const decoded = decodeRecommendationGlyph(arr);
-	return { ...decoded, valid: true };
+	return { ...decoded, valid: true as const };
 }
 
 /**
@@ -276,14 +280,14 @@ export function base64ToGlyphs(base64: string): DecodedGlyph[] {
 	for (let i = 0; i + 10 <= buffer.length; i += 10) {
 		const bytes = new Uint8Array(buffer.slice(i, i + 10));
 		const result = safeDecodeGlyph(bytes);
-		if (result.valid) {
-			const { valid: _, ...glyph } = result;
-			glyphs.push(glyph);
-		} else {
+		if (result.valid === false) {
 			console.warn(
 				`[Glyph] Skipping malformed glyph at offset ${i}: ${result.error}`
 			);
+			continue;
 		}
+		const { valid: _, ...glyph } = result;
+		glyphs.push(glyph);
 	}
 
 	return glyphs;

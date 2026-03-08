@@ -77,8 +77,7 @@ function loadSample(text: string) {
 				bind:value={textInput}
 				rows="4"
 				placeholder="Enter legal text to synthesize..."
-				disabled={isSpeaking}
-			/>
+				disabled={isSpeaking}></textarea>
 			<div class="char-count">{textInput.length} characters</div>
 		</div>
 

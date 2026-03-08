@@ -17,7 +17,7 @@
 
 <Button disabled={loading || disabled} class={className} {...rest}>
 	{#if loading}
-		<span class="i-lucide-loader-2 mr-2 h-4 w-4 animate-spin inline-block" />
+		<span class="i-lucide-loader-2 mr-2 h-4 w-4 animate-spin inline-block"></span>
 	{/if}
 	{@render children?.()}
 </Button>

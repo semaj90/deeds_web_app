@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { poiPhotos, personsOfInterest } from '$lib/server/db/schema-postgres.js';
-import { eq, ne, isNotNull, sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 /**
  * POST /api/persons-of-interest/[id]/face-match
@@ -54,34 +54,19 @@ export const POST: RequestHandler = async ({ params }) => {
 			});
 		}
 
-		// Try Qdrant vector search first
+		// Try Qdrant vector search — poi_profiles first, evidence_items fallback
 		let qdrantMatches: Array<{
 			poiId: string;
 			photoId: string;
 			poiName: string;
 			caption: string;
 			score: number;
+			collection: string;
 		}> = [];
 
 		try {
 			const { QdrantClient } = await import('@qdrant/js-client-rest');
 			const qdrant = new QdrantClient({ url: 'http://localhost:6333' });
-
-			const results = await qdrant.search('evidence_items', {
-				vector: queryVector,
-				limit: 20,
-				score_threshold: 0.5,
-				with_payload: true,
-				filter: {
-					must: [
-						{ key: 'type', match: { value: 'poi_photo' } },
-					],
-					must_not: [
-						// Exclude current POI's own photos by name
-						// (poi_id not stored in Qdrant payload, but poi_name is)
-					],
-				},
-			});
 
 			// Get current POI name for filtering
 			const [currentPoi] = await db
@@ -92,22 +77,69 @@ export const POST: RequestHandler = async ({ params }) => {
 
 			const currentPoiName = currentPoi?.name ?? '';
 
-			qdrantMatches = results
-				.filter((r) => {
-					const payload = r.payload as Record<string, unknown>;
-					// Exclude own photos
-					return payload?.poi_name !== currentPoiName;
-				})
-				.map((r) => {
+			// Primary search: poi_profiles collection (dedicated POI vectors)
+			try {
+				const poiResults = await qdrant.search('poi_profiles', {
+					vector: { name: 'embedding', vector: queryVector },
+					limit: 20,
+					score_threshold: 0.7,
+					with_payload: true,
+					filter: {
+						must: [
+							{ key: 'type', match: { value: 'poi_photo' } },
+						],
+						must_not: [
+							{ key: 'poi_id', match: { value: poiId } },
+						],
+					},
+				});
+
+				qdrantMatches = poiResults.map((r) => {
 					const payload = r.payload as Record<string, unknown>;
 					return {
-						poiId: '', // Will be resolved from DB
+						poiId: (payload?.poi_id as string) ?? '',
 						photoId: (payload?.photo_id as string) ?? '',
 						poiName: (payload?.poi_name as string) ?? 'Unknown',
 						caption: (payload?.caption as string) ?? '',
 						score: r.score,
+						collection: 'poi_profiles',
 					};
 				});
+			} catch {
+				// poi_profiles collection may not exist yet — fall through
+			}
+
+			// Fallback: evidence_items collection (broader, lower threshold)
+			if (qdrantMatches.length === 0) {
+				const results = await qdrant.search('evidence_items', {
+					vector: queryVector,
+					limit: 20,
+					score_threshold: 0.5,
+					with_payload: true,
+					filter: {
+						must: [
+							{ key: 'type', match: { value: 'poi_photo' } },
+						],
+					},
+				});
+
+				qdrantMatches = results
+					.filter((r) => {
+						const payload = r.payload as Record<string, unknown>;
+						return payload?.poi_name !== currentPoiName;
+					})
+					.map((r) => {
+						const payload = r.payload as Record<string, unknown>;
+						return {
+							poiId: '',
+							photoId: (payload?.photo_id as string) ?? '',
+							poiName: (payload?.poi_name as string) ?? 'Unknown',
+							caption: (payload?.caption as string) ?? '',
+							score: r.score,
+							collection: 'evidence_items',
+						};
+					});
+			}
 		} catch (err) {
 			console.warn('[face-match] Qdrant search failed, falling back to DB:', err);
 		}
@@ -229,6 +261,7 @@ export const POST: RequestHandler = async ({ params }) => {
 					return json({
 						matches,
 						method: 'qdrant-vector',
+						collection: qdrantMatches[0]?.collection ?? 'evidence_items',
 						queryPhotoId: photosWithEmbeddings[0].id,
 						totalCandidates: qdrantMatches?.length ?? 0,
 					});

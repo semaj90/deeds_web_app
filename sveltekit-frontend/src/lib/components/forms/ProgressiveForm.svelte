@@ -34,23 +34,25 @@
   }: Props = $props();
 
   // Initialize progressive form utilities
-  const progressiveForm = createProgressiveForm(config);
+  const progressiveForm = $derived(createProgressiveForm(config));
 
-  // Form state
-  let formState = $state(progressiveForm.createFormState(initialData));
+  // Form state — initialized inline, synced from props via $effect
+  // svelte-ignore state_referenced_locally
+  let formState = $state(createProgressiveForm({}).createFormState({}));
+  $effect(() => { formState = progressiveForm.createFormState(initialData); });
   let isSubmitting = $state<boolean>(false);
   let submitMessage = $state<string>('');
   let submitMessageType = $state<'success' | 'error' | ''>('');
 
   // Generate field IDs for accessibility
-  const fieldIds = {
+  const fieldIds = $derived({
     email: progressiveForm.generateFieldId('email', formId),
     password: progressiveForm.generateFieldId('password', formId),
     confirmPassword: progressiveForm.generateFieldId('confirmPassword', formId),
     firstName: progressiveForm.generateFieldId('firstName', formId),
     lastName: progressiveForm.generateFieldId('lastName', formId),
     terms: progressiveForm.generateFieldId('terms', formId)
-  };
+  });
 
   // Validation functions
   function validateField(fieldName: string, value: unknown): string | null {

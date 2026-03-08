@@ -5,6 +5,8 @@
 
 	let { data }: { data: PageData } = $props();
 
+	// Intentional one-time capture from server data; refreshStats() updates via fetch
+	// svelte-ignore state_referenced_locally
 	let stats = $state(data.stats);
 	let loading = $state(false);
 	let lastUpdate = $state(new Date().toISOString());

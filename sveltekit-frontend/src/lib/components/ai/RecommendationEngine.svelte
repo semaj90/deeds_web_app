@@ -277,7 +277,7 @@
 	<div class="rec-header">
 		<div>
 			<h3 class="rec-title">
-				<span class="i-lucide-lightbulb w-5 h-5 inline-block" />
+				<span class="i-lucide-lightbulb w-5 h-5 inline-block"></span>
 				AI Recommendation Engine
 			</h3>
 			<p class="rec-subtitle">Strategy, evidence, and risk analysis</p>
@@ -288,10 +288,10 @@
 			disabled={isGenerating}
 		>
 			{#if isGenerating}
-				<span class="i-lucide-loader w-4 h-4 animate-spin inline-block" />
+				<span class="i-lucide-loader w-4 h-4 animate-spin inline-block"></span>
 				Generating...
 			{:else}
-				<span class="i-lucide-zap w-4 h-4 inline-block" />
+				<span class="i-lucide-zap w-4 h-4 inline-block"></span>
 				Generate
 			{/if}
 		</button>
@@ -321,7 +321,7 @@
 
 	{#if errorMessage}
 		<div class="rec-error">
-			<span class="i-lucide-alert-triangle w-4 h-4 inline-block" />
+			<span class="i-lucide-alert-triangle w-4 h-4 inline-block"></span>
 			{errorMessage}
 		</div>
 	{/if}
@@ -329,12 +329,12 @@
 	<!-- Recommendations List -->
 	{#if isGenerating}
 		<div class="rec-loading">
-			<span class="i-lucide-loader w-8 h-8 animate-spin inline-block" />
+			<span class="i-lucide-loader w-8 h-8 animate-spin inline-block"></span>
 			<p>Analyzing case context and generating recommendations...</p>
 		</div>
 	{:else if filteredRecommendations.length === 0}
 		<div class="rec-empty">
-			<span class="i-lucide-lightbulb w-8 h-8 inline-block" />
+			<span class="i-lucide-lightbulb w-8 h-8 inline-block"></span>
 			<p>No recommendations yet. Click "Generate" to analyze your case.</p>
 		</div>
 	{:else}
@@ -406,7 +406,7 @@
 					<div class="rec-card-actions">
 						<button class="rec-btn-secondary" onclick={() => openDetails(rec)}>Details</button>
 						<button class="rec-btn-primary" onclick={() => applyRecommendation(rec)}>
-							<span class="i-lucide-check-circle w-3.5 h-3.5 inline-block" />
+							<span class="i-lucide-check-circle w-3.5 h-3.5 inline-block"></span>
 							Apply
 						</button>
 					</div>
@@ -518,7 +518,7 @@
 				<div class="rec-dialog-actions">
 					<button class="rec-btn-secondary" onclick={() => (showDetails = false)}>Close</button>
 					<button class="rec-btn-primary" onclick={() => { applyRecommendation(rec); showDetails = false; }}>
-						<span class="i-lucide-check-circle w-4 h-4 inline-block" />
+						<span class="i-lucide-check-circle w-4 h-4 inline-block"></span>
 						Apply Recommendation
 					</button>
 				</div>

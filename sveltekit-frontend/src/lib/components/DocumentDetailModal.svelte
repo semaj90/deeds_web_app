@@ -138,39 +138,39 @@
           </div>
         </div>
         <button class="close-btn" onclick={handleClose} aria-label="Close">
-          <span class="i-lucide-x w-4.5 h-4.5 inline-block" />
+          <span class="i-lucide-x w-4.5 h-4.5 inline-block"></span>
         </button>
       </div>
 
       <!-- Metadata Grid -->
       <div class="meta-grid">
         <div class="meta-item">
-          <span class="i-lucide-file-text w-3.5 h-3.5 inline-block" style="color: #8a7a5a; flex-shrink: 0;" />
+          <span class="i-lucide-file-text w-3.5 h-3.5 inline-block" style="color: #8a7a5a; flex-shrink: 0;"></span>
           <span class="meta-label">Type</span>
           <span class="meta-value">{fileType}</span>
         </div>
         <div class="meta-item">
-          <span class="i-lucide-clock w-3.5 h-3.5 inline-block" style="color: #8a7a5a; flex-shrink: 0;" />
+          <span class="i-lucide-clock w-3.5 h-3.5 inline-block" style="color: #8a7a5a; flex-shrink: 0;"></span>
           <span class="meta-label">Created</span>
           <span class="meta-value">{formatDate(createdAt)}</span>
         </div>
         {#if updatedAt}
           <div class="meta-item">
-            <span class="i-lucide-clock w-3.5 h-3.5 inline-block" style="color: #8a7a5a; flex-shrink: 0;" />
+            <span class="i-lucide-clock w-3.5 h-3.5 inline-block" style="color: #8a7a5a; flex-shrink: 0;"></span>
             <span class="meta-label">Updated</span>
             <span class="meta-value">{formatDate(updatedAt)}</span>
           </div>
         {/if}
         {#if caseId}
           <div class="meta-item">
-            <span class="i-lucide-link w-3.5 h-3.5 inline-block" style="color: #8a7a5a; flex-shrink: 0;" />
+            <span class="i-lucide-link w-3.5 h-3.5 inline-block" style="color: #8a7a5a; flex-shrink: 0;"></span>
             <span class="meta-label">Case</span>
             <span class="meta-value">{caseId}</span>
           </div>
         {/if}
         {#if doc.status}
           <div class="meta-item">
-            <span class="i-lucide-shield w-3.5 h-3.5 inline-block" style="color: #8a7a5a; flex-shrink: 0;" />
+            <span class="i-lucide-shield w-3.5 h-3.5 inline-block" style="color: #8a7a5a; flex-shrink: 0;"></span>
             <span class="meta-label">Status</span>
             <span class="meta-value status-badge {doc.status}">{doc.status}</span>
           </div>
@@ -216,13 +216,13 @@
       <div class="actions">
         {#if ondownload}
           <button class="action-btn primary" onclick={() => doc && ondownload?.(doc)}>
-            <span class="i-lucide-download w-4 h-4 inline-block" />
+            <span class="i-lucide-download w-4 h-4 inline-block"></span>
             Download
           </button>
         {/if}
         {#if onviewcustody}
           <button class="action-btn" onclick={() => doc && onviewcustody?.(doc.id)}>
-            <span class="i-lucide-shield w-4 h-4 inline-block" />
+            <span class="i-lucide-shield w-4 h-4 inline-block"></span>
             Chain of Custody
           </button>
         {/if}
