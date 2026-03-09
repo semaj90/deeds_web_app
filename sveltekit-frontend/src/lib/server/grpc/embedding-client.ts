@@ -46,7 +46,8 @@ async function getGrpcClient(): Promise<any> {
 		const protoLoader = await import('@grpc/proto-loader');
 		const { resolve } = await import('path');
 
-		const PROTO_PATH = resolve(process.cwd(), 'proto/active/embedding.proto');
+		// Use Go microservice's proto (matches the gRPC server implementation)
+		const PROTO_PATH = resolve(process.cwd(), '../go-microservice/proto/embedding/embedding.proto');
 
 		const packageDefinition = await protoLoader.load(PROTO_PATH, {
 			keepCase: false,
@@ -78,34 +79,29 @@ async function generateViaGrpc(texts: string[], timeoutMs = 5000): Promise<numbe
 	const client = await getGrpcClient();
 	if (!client) return null;
 
-	const chunks = texts.map((text, i) => ({
-		chunkId: `chunk_${i}`,
-		text,
-		filePath: '',
-		language: 'en',
-		metadata: {}
-	}));
-
 	return new Promise((resolve) => {
 		const deadline = new Date(Date.now() + timeoutMs);
 
-		client.generateEmbeddings(
-			{ chunks, batchSize: texts.length, normalize: true, maxLength: 512 } satisfies embedding.IEmbeddingRequest,
+		// Go proto: GenerateEmbedding({ texts, normalize, use_cache, model_name })
+		client.generateEmbedding(
+			{ texts, normalize: true, useCache: true, modelName: SERVER_EMBEDDING_MODEL },
 			{ deadline },
-			(err: Error | null, response: embedding.IEmbeddingResponse) => {
+			(err: Error | null, response: any) => {
 				if (err) {
 					console.warn('[embedding-client] gRPC call failed:', err.message);
 					resolve(null);
 					return;
 				}
 
-				if (!response || response.status !== 'success') {
+				if (!response || !response.success) {
+					console.warn('[embedding-client] gRPC response error:', response?.error);
 					resolve(null);
 					return;
 				}
 
+				// Go proto: EmbeddingVector.values (float[])
 				const vectors = (response.embeddings ?? []).map((e: any) =>
-					Array.isArray(e.vector) ? e.vector : []
+					Array.isArray(e.values) ? e.values : []
 				);
 
 				resolve(vectors);
@@ -304,16 +300,17 @@ export async function checkGrpcHealth(): Promise<{
 
 	return new Promise((resolve) => {
 		const deadline = new Date(Date.now() + 3000);
-		client.health({ service: 'embedding' } satisfies embedding.IHealthRequest, { deadline }, (err: Error | null, response: embedding.IHealthResponse) => {
+		// Go proto: HealthCheck({ check_gpu, check_redis })
+		client.healthCheck({ checkGpu: true, checkRedis: true }, { deadline }, (err: Error | null, response: any) => {
 			if (err) {
 				resolve({ ...base, available: false });
 				return;
 			}
 			resolve({
 				...base,
-				available: response.status === 'healthy',
-				status: response.status,
-				device: response.device
+				available: response.healthy === true,
+				status: response.healthy ? 'healthy' : 'unhealthy',
+				device: response.gpuAvailable ? 'cuda' : 'cpu'
 			});
 		});
 	});
