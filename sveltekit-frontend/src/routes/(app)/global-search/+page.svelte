@@ -10,6 +10,8 @@
 	import type { GPURerankMetrics, GPURankedItem } from '$lib/gpu/gpu-search-reranker.js';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { trackClick } from '$lib/utils/tracking';
+	import StatuteSearchBar from '$lib/components/legal-ai/StatuteSearchBar.svelte';
+	import StatuteResultsList from '$lib/components/legal-ai/StatuteResultsList.svelte';
 
 	let showRAGAssistant = $state(false);
 	let showCodebaseSearch = $state(false);
@@ -382,6 +384,14 @@
 						class="filter-input"
 					/>
 				</div>
+			{:else if searchMode === 'statutes'}
+				<div class="filter-section">
+					<StatuteSearchBar
+						isLoading={isSearching}
+						onsearch={(params) => { searchQuery = params.query ?? searchQuery; performSearch(); }}
+						onclear={() => { searchQuery = ''; statuteResults = []; }}
+					/>
+				</div>
 			{/if}
 
 			<div class="filter-section">
@@ -694,29 +704,18 @@
 					</button>
 				{/each}
 			{:else if searchMode === 'statutes' && statuteResults.length > 0}
-				{#each statuteResults as result, i}
-					<div class="result-card">
-						<div class="bundle-header">
-							<div class="bundle-rank">#{i + 1}</div>
-							<div class="bundle-title">{result.statuteTitle}</div>
-							<div class="confidence-badge" style="background: rgba(72,187,120,0.15); color: #48bb78;">
-								{Math.round((result.similarity ?? 0) * 100)}%
-							</div>
-						</div>
-						<p class="bundle-preview">{result.content?.slice(0, 300)}</p>
-						<div class="bundle-meta">
-							{#if result.section}
-								<span class="meta-tag section">{result.section}</span>
-							{/if}
-							{#if result.jurisdiction}
-								<span class="meta-tag source">{result.jurisdiction}</span>
-							{/if}
-							{#if result.category}
-								<span class="meta-tag entity">{result.category}</span>
-							{/if}
-						</div>
-					</div>
-				{/each}
+				<StatuteResultsList
+					statutes={statuteResults.map(r => ({
+						id: r.statuteId ?? r.id ?? crypto.randomUUID(),
+						code: r.statuteTitle ?? r.code ?? '',
+						title: r.content?.slice(0, 200),
+						jurisdiction: r.jurisdiction,
+						severity: r.severity,
+						category: r.category,
+						relevance_score: r.similarity ?? r.score
+					}))}
+					onselect={(statute) => { console.log('Selected statute:', statute.code, statute.id); }}
+				/>
 			{:else if searchMode === 'precedents' && precedentResults.length > 0}
 				{#each precedentResults as result, i}
 					<div class="result-card">

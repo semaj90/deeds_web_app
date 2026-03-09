@@ -40,6 +40,7 @@
 	import ChainOfCustodyTracker from '$lib/components/legal/ChainOfCustodyTracker.svelte';
 	import Dialog from '$lib/components/ui/Dialog.svelte';
 	import DropdownMenu from '$lib/components/ui/DropdownMenu.svelte';
+	import FileUploadSection from '$lib/components/FileUploadSection.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	let uploadCard = $state<UploadProgressCard | undefined>(undefined);
@@ -85,6 +86,7 @@
 	let showEnhancedUpload = $state(false);
 	let showEvidenceChat = $state(false);
 	let showEnhancedFileUpload = $state(false);
+	let showQuickUpload = $state(false);
 	let showBulkUpload = $state(false);
 	let showXStateUpload = $state(false);
 	let showSummarizer = $state(false);
@@ -574,6 +576,40 @@
 						maxFiles={10}
 						maxSizeMB={100}
 						onupload={(uploadData) => { console.log('Enhanced upload:', uploadData); showEnhancedFileUpload = false; window.location.reload(); }}
+					/>
+				</div>
+			{/if}
+
+			<div class="mt-2">
+				<button
+					onclick={() => (showQuickUpload = !showQuickUpload)}
+					class="text-sm text-info hover:underline"
+				>
+					{showQuickUpload ? 'Hide Quick Upload' : 'Quick Upload (Drag & Drop with Validation)'}
+				</button>
+			</div>
+
+			{#if showQuickUpload}
+				<div class="mt-4">
+					<FileUploadSection
+						accept=".pdf,.doc,.docx,.txt,.jpg,.png,.tiff,.bmp"
+						multiple={true}
+						maxSizeMB={100}
+						label="Drop evidence files here"
+						onfiles={async (files) => {
+							if (!files.length) return;
+							const formData = new FormData();
+							for (const f of files) formData.append('file', f);
+							if (data.caseId) formData.append('caseId', data.caseId);
+							isUploading = true;
+							try {
+								const res = await fetch('?/upload', { method: 'POST', body: formData });
+								if (res.ok) { showQuickUpload = false; window.location.reload(); }
+								else uploadError = 'Upload failed';
+							} catch { uploadError = 'Upload failed'; }
+							finally { isUploading = false; }
+						}}
+						disabled={isUploading}
 					/>
 				</div>
 			{/if}

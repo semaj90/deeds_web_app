@@ -68,9 +68,6 @@ export { default as Portal } from './Portal.svelte';
 export { default as ThemeProvider } from './ThemeProvider.svelte';
 export { default as ThemeSelector } from './ThemeSelector.svelte';
 
-// Evidence & Case
-export { default as EvidenceCanvas } from './EvidenceCanvas.svelte';
-
 // Performance
 export { default as AdaptiveRenderingEngine } from './AdaptiveRenderingEngine.svelte';
 export { default as PerformanceMonitor } from './PerformanceMonitor.svelte';

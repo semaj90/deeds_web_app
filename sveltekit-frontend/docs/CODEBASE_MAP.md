@@ -91,108 +91,159 @@
 
 ---
 
-## Root Project Directory (145+ directories)
+## Root Project Directory — Full Audit (145 directories, March 8 2026)
 
-### Active Infrastructure
+### ESSENTIAL (Keep — Core Project)
 
-| Directory | Purpose | Status |
-|-----------|---------|--------|
-| `sveltekit-frontend/` | Main application | ACTIVE |
-| `deeds_labs/` | Archive of experimental code | ARCHIVE |
-| `scripts/` | Build/test scripts | ACTIVE |
-| `drizzle/` | DB migration files | ACTIVE |
-| `docker/` | Docker configurations | ACTIVE |
-| `config/` | Configuration files | ACTIVE |
-| `proto/` + `protos/` + `proto-backup/` | Protocol Buffer definitions | LEGACY — 345 files |
-| `sql/` | SQL scripts | ACTIVE |
-| `migrations/` | DB migration history | ACTIVE |
+| Directory | Files | Purpose | Status |
+|-----------|-------|---------|--------|
+| `sveltekit-frontend/` | ~45,000 | Main SvelteKit 2 + Svelte 5 application | ACTIVE |
+| `scripts/` | ~5,127 | Test scripts (test-screenshots.mjs), batch-fix, build automation | ACTIVE |
+| `drizzle/` | ~18 | Drizzle ORM SQL migrations | ACTIVE |
+| `docker/` + `docker-scripts/` | ~13 | Docker build files + utility scripts | ACTIVE |
+| `config/` | ~1 | Configuration files | ACTIVE |
+| `sql/` | ~10 | Raw SQL schemas + queries | ACTIVE |
+| `migrations/` | ~5 | Manual SQL migration history | ACTIVE |
+| `native/` | ~3 | Autoencoder bridge stub (Dockerfile + server.py) | ACTIVE — new |
+| `python-workers/` | ~2 | FastAPI embedding worker stub | ACTIVE — new |
 
-### Go Microservices (12,523 .go files — ABANDONED)
+### INFRASTRUCTURE (Keep — Running Services)
 
-| Directory | Purpose | Status |
-|-----------|---------|--------|
-| `go-microservice/` | Main Go microservices | ABANDONED — SvelteKit handles it |
-| `go-trt-service/` | Go TensorRT service | ABANDONED |
-| `langextract-go/` | Go LangExtract variant | ABANDONED — Python version running |
-| `microservices/` | Additional microservices | ABANDONED |
-| `services/` | Service implementations | ABANDONED |
-| `temp-services/` | Temporary service code | ABANDONED |
-| `test-services/` | Test services | ABANDONED |
+| Directory | Files | Purpose | Status |
+|-----------|-------|---------|--------|
+| `neo4j-community-5.23.0/` + `-windows/` | ~30 | Neo4j graph database binaries | ACTIVE |
+| `qdrant/` + `qdrant-windows/` | ~175 | Qdrant vector DB binaries + data | ACTIVE |
+| `redis/` | ~1 | Redis config | ACTIVE |
+| `minio/` + `minio-data/` | ~70 | MinIO S3 object storage + data | ACTIVE |
+| `pgvector-install/` + `pgvector-precompiled/` | ~92 | pgvector PostgreSQL extension | ACTIVE |
+| `proto/` + `protos/` + `proto-backup/` + `protoc-install/` | ~110 | Protocol Buffer definitions + compiler | LEGACY — keep |
+| `nginx/` | ~2 | Reverse proxy config | AVAILABLE |
+| `ssl/` | ~1 | SSL certificates placeholder | AVAILABLE |
+| `searxng-config/` | ~1 | Searxng search engine config | VERIFY if running |
 
-### CUDA/GPU Infrastructure (562 .cu/.cuh files)
+### DATA (Keep — Content + Models)
 
-| Directory | Purpose | Status |
-|-----------|---------|--------|
-| `legal-ai-cuda/` | CUDA kernels for legal AI | ARCHIVE — WebGPU replaced |
-| `gpu-inference-worker/` | GPU inference workers | ARCHIVE |
-| `gpu-orchestrator/` | GPU orchestration | ARCHIVE |
-| `tensor_services/` | Tensor processing | ARCHIVE |
-| `tensorrt_build/` | TensorRT build artifacts | ARCHIVE |
-| `trt_engines/` + `trt_models/` + `trt_runner/` + `trt_server/` | TensorRT runtime | STOPPED — 2mo |
-| `triton_models/` + `triton-models/` | Triton model configs | ARCHIVE |
+| Directory | Files | Purpose | Status |
+|-----------|-------|---------|--------|
+| `gemma3Q4_K_M/` | varies | Gemma3 quantized model weights | ACTIVE — Ollama uses |
+| `granite-docling-258M/` | ~53 | IBM Granite DocLing model for legal OCR | AVAILABLE |
+| `granite-docling-worker/` | ~97 | DocLing worker service | AVAILABLE |
+| `lawpdfs/` | ~37 | Sample legal PDF documents | DATA |
+| `documents/` | ~650 | Reference markdown docs (architecture, guides) | DATA |
+| `docs/` | ~322 | Project documentation | KEEP |
+| `logs/` | ~1,201 | Build logs, codemod memories, breakthrough notes | KEEP |
+| `training-datasets/` + `datasets/` | ~8 | ML training data samples | DATA |
+| `sample-data/` + `data/` | ~10 | Sample/test data | DATA |
+| `reports/` | ~12 | Generated report files | DATA |
+| `ace_runs/` | ~4 | ACE (Agentic Chat Engine) run logs | KEEP |
+| `storage/` | ~171 | Vector backups, file storage | KEEP |
+| `vector-backup-*` | ~10 | Timestamped Qdrant backup (July 2025) | KEEP for recovery |
 
-### Python Infrastructure (3,576 .py files)
+### ARCHIVE (Move to deeds_labs/ — Dead Projects)
 
-| Directory | Purpose | Status |
-|-----------|---------|--------|
-| `ingestion-phase66/` | Phase 66 ingestion workers | PARTIAL — langextract running |
-| `python-microservice/` | Python microservice | ARCHIVE |
-| `python/` | Python utilities | ARCHIVE |
-| `ocr_pipeline/` + `ocr-service/` | OCR processing | REPLACED — tesseract.js |
-| `hmm-topic-service/` | HMM topic modeling | ARCHIVE |
-| `embedding-service/` | Embedding service | REPLACED — Ollama |
-| `reranker-service/` | Reranking service | REPLACED — GPU pipeline |
+| Directory | Files | Purpose | Status |
+|-----------|-------|---------|--------|
+| `deeds_labs/` | 13,227 | **Central archive** — svelte4, corrupted demos, old dead files | KEEP IN PLACE |
+| `_archive/` | 352 | Old model backups (models-archived-s37/) | MOVE → deeds_labs/ |
+| `archives/` | 474 | Misc old code archives | MOVE → deeds_labs/ |
+| `archive/` | 2 | Small archive dir | MERGE → deeds_labs/ |
+| `go-microservice/` | 26,570 | Complete abandoned Go gRPC service (12,396 .go files) | MOVE → deeds_labs/ |
+| `go-trt-service/` | ~4 | Go TensorRT service stub | MOVE → deeds_labs/ |
+| `langextract-go/` | 171 | Go text extraction service | MOVE → deeds_labs/ |
+| `ingestion-phase66/` | ~5,271 | GPU-based document ingestion pipeline | MOVE → deeds_labs/ |
+| `ai-server/` | ~14 | Old standalone AI server | MOVE → deeds_labs/ |
+| `ai-summary-service/` | ~34 | Old AI summary service | MOVE → deeds_labs/ |
+| `embedding-service/` | ~7 | Old embedding service (replaced by Ollama) | MOVE → deeds_labs/ |
+| `reranker-service/` | ~3 | Old reranker (replaced by GPU pipeline) | MOVE → deeds_labs/ |
+| `ingestion-service/` | ~2 | Legacy ingestion service | MOVE → deeds_labs/ |
+| `svelte_ui/` | ~6 | Old Svelte UI component library (pre-Svelte 5) | MOVE → deeds_labs/ |
+| `unocss-main/` | ~528 | UnoCSS source copy (available via node_modules) | MOVE → deeds_labs/ |
+| `context7/` + `context7-docs/` | ~47 | Old context generation artifacts | MOVE → deeds_labs/ |
+| `legal-ai-cuda/` | varies | CUDA kernels (replaced by WebGPU) | MOVE → deeds_labs/ |
+| `legal-ai-enhanced/` + `legal-ai-production/` + `legal-ai-ubuntu/` + `legal-ai-ubuntu-deployment/` | ~15 | Legacy legal-ai deployment stubs | MOVE → deeds_labs/ |
+| `gpu-inference-worker/` | ~5 | Old GPU inference worker | MOVE → deeds_labs/ |
+| `document-chunker/` | ~3 | Standalone old document chunker | MOVE → deeds_labs/ |
+| `engine-builder/` | ~3 | TensorRT engine builder | MOVE → deeds_labs/ |
+| `error-analysis/` | ~3 | Old error analysis scripts | MOVE → deeds_labs/ |
+| `next_steps/` | ~15 | Old planning documents | MOVE → deeds_labs/ |
+| `codemod-plans/` | ~1 | Old codemod planning docs | MOVE → deeds_labs/ |
+| `commas-previews/` | ~20 | Old UI preview screenshots | MOVE → deeds_labs/ |
+| `jstests/` | ~4 | Old JavaScript tests | MOVE → deeds_labs/ |
+| `legal_ai_output/` | ~4 | Old model outputs | MOVE → deeds_labs/ |
+| `old-scripts/` | ~2 | Deprecated scripts | MOVE → deeds_labs/ |
+| `sveltekit-evidence/` | varies | Old evidence service | MOVE → deeds_labs/ |
 
-### ML Models & Data
+### PYTHON VENVS (Delete — Recreatable)
 
-| Directory | Purpose | Status |
-|-----------|---------|--------|
-| `gemma3Q4_K_M/` | Gemma3 quantized model | ACTIVE — Ollama uses it |
-| `granite-docling-258M/` | IBM Granite DocLing model | AVAILABLE — not wired |
-| `granite-docling-worker/` | DocLing worker | AVAILABLE — not wired |
-| `model_unsloth_hf_f16/` | Unsloth fine-tuned model | AVAILABLE |
-| `ollama_models/` | Ollama model cache | ACTIVE |
-| `onnx/` | ONNX model files | ACTIVE — client inference |
-| `lawpdfs/` | Legal PDF documents | DATA |
-| `datasets/` | Training datasets | DATA |
-| `sample-data/` | Sample data for testing | DATA |
+| Directory | Files | Purpose | Status |
+|-----------|-------|---------|--------|
+| `.venv/` | 77,779 | Active Python virtual environment | KEEP if used |
+| `.venv-phase46/` | 81,103 | Archived Phase 46 Python venv | **DELETE** — recreatable |
+| `phase46-venv/` | 41,964 | Duplicate Phase 46 Python venv | **DELETE** — recreatable |
+| `.venv-verify/` | 2,236 | Small verification venv | **DELETE** — recreatable |
+| `.python311/` | 4,362 | Python 3.11 installation | KEEP if needed |
+| `tensorrt_py310_env/` | 2,994 | TensorRT Python environment | **DELETE** — recreatable |
+| `libtorch-win-shared-with-deps-2.9.0+cu130/` | 9,377 | PyTorch C++ runtime (not used) | **DELETE** — downloadable |
 
-### Archive/Backup/Legacy
+### DELETE (Safe — No Value)
 
-| Directory | Purpose | Status |
-|-----------|---------|--------|
-| `_archive/` + `archive/` + `archives/` | Multiple archive dirs | CLEANUP NEEDED |
-| `backup/` + `backups/` | Backup files | CLEANUP NEEDED |
-| `old-scripts/` | Old scripts | ARCHIVE |
-| `quarantined-routes/` | Quarantined broken routes | ARCHIVE |
-| `weekly-cleanup/` | Cleanup logs | ARCHIVE |
-| `checkpoints/` | Model checkpoints | ARCHIVE |
-| `snapshots/` | State snapshots | ARCHIVE |
+| Directory | Files | Purpose | Status |
+|-----------|-------|---------|--------|
+| `__pycache__/` | ~6 | Python bytecode (auto-regenerates) | DELETE |
+| `build/` | ~406 | Build artifacts (auto-generated) | DELETE |
+| `dist/` | ~5 | Distribution output (auto-generated) | DELETE |
+| `cache/` | ~2 | Runtime cache files | DELETE |
+| `tmp/` + `tmux/` | ~10 | Temporary runtime files | DELETE |
+| `checkpoints/` | 0 | Empty directory | DELETE |
+| `tensor_services/` | ~2 | Empty stub | DELETE |
+| `gpu-orchestrator/` | 0 | Empty directory | DELETE |
+| `hmm-topic-service/` | ~1 | Empty HMM stub | DELETE |
+| `microservices/` | ~1 | Empty stub | DELETE |
+| `temp-services/` | ~11 | Outdated service stubs | DELETE |
+| `test-services/` | ~1 | Empty test service | DELETE |
+| `metrics/` | 0 | Empty directory | DELETE |
+| `model_unsloth_hf_f16/` | 0 | Empty model directory | DELETE |
+| `ollama_models/` | 0 | Empty (models in Ollama server) | DELETE |
+| `onnx/` | ~1 | Empty directory (ONNX in sveltekit-frontend/static/) | DELETE |
+| `trt_engines/` + `trt_models/` | 0 | Empty TensorRT directories | DELETE |
+| `orchestrator/` | ~1 | Empty stub | DELETE |
+| `perf/` + `PERFORMANCE_FIXES_DOCUMENTATION/` | ~2 | Empty performance dirs | DELETE |
+| `playwright-report/` | ~1 | Old test report | DELETE |
+| `q4km_test_results/` | ~2 | Old test results | DELETE |
+| `weekly-cleanup/` | ~2 | Old cleanup logs | DELETE |
+| `windows-service/` | ~6 | Old Windows service wrapper | DELETE |
+| `todolist_2025-08-04T05-23-51/` | ~2 | Abandoned todo export | DELETE |
+| `node-cluster/` | ~1 | Empty Node.js cluster stub | DELETE |
+| `ocr_pipeline/` | ~1 | Empty OCR stub (replaced by tesseract.js) | DELETE |
+| `workers/` | ~2 | Empty worker stubs | DELETE |
+| `svelte-check-errors-index/` | varies | Old error index dump | DELETE |
 
-### Tools & Infrastructure
+### UNCLEAR (Verify Before Action)
 
-| Directory | Purpose | Status |
-|-----------|---------|--------|
-| `neo4j-community-5.23.0/` + `neo4j-community-5.23.0-windows/` | Neo4j binaries | ACTIVE — graph DB |
-| `qdrant/` + `qdrant-windows/` | Qdrant binaries | ACTIVE — vector DB |
-| `redis/` | Redis config | ACTIVE |
-| `minio/` + `minio-data/` | MinIO object storage | ACTIVE |
-| `pgvector-install/` + `pgvector-precompiled/` | pgvector extension | ACTIVE |
-| `nats-server/` | NATS messaging | UNUSED — RabbitMQ used |
-| `elk-stack/` | Elasticsearch/Logstash/Kibana | UNUSED |
-| `nginx/` | Reverse proxy config | AVAILABLE |
-| `ssl/` | SSL certificates | AVAILABLE |
-
-### Misc
-
-| Directory | Purpose | Status |
-|-----------|---------|--------|
-| `context7/` + `context7-docs/` | Context7 system | UNCLEAR |
-| `unocss-main/` | UnoCSS source (for reference) | REFERENCE |
-| `webgpu/` | WebGPU examples | REFERENCE |
-| `xstate/` | XState examples | REFERENCE |
-| `New folder/` | Empty folder | DELETE |
-| `__pycache__/` | Python cache | DELETE |
+| Directory | Files | Purpose | Status |
+|-----------|-------|---------|--------|
+| `src/` | ~410 | Root-level source (agents, lib, routes, server, utils, wasm) — may duplicate sveltekit-frontend | VERIFY — likely dead |
+| `nats-server/` | ~3 | NATS messaging binary (RabbitMQ in use instead) | DELETE if not running |
+| `elk-stack/` + `logstash/` | ~4 | ELK stack configs | DELETE if not running |
+| `tools/` | ~40 | Misc utility scripts | VERIFY — may have useful scripts |
+| `monitoring/` | ~10 | Monitoring scripts/configs | VERIFY if used |
+| `packages/` | ~2 | Package definitions | VERIFY |
+| `bin/` | ~2 | Binary wrapper scripts | VERIFY |
+| `triton_models/` + `triton-models/` | ~5 | Triton inference server model configs | DELETE if not using Triton |
+| `trt_runner/` + `trt_server/` | ~11 | TensorRT runner/server | DELETE if not using TRT |
+| `tensorrt_build/` | ~16 | TensorRT build output | DELETE if not using TRT |
+| `engines/` | ~6 | Pre-built TensorRT engines | DELETE if not using TRT |
+| `backup/` + `backups/` | ~8 | Backup files (check dates) | VERIFY — likely stale |
+| `deeds-web-app/` | varies | Nested copy of project? | VERIFY — may be accidental |
+| `dev/` | varies | Development tools/configs | VERIFY |
+| `simd-bridge/` | ~3 | SIMD bridge experiment | VERIFY |
+| `static/` | ~15 | Root-level static assets | VERIFY — likely dead (served from sveltekit-frontend/static/) |
+| `python/` | varies | Python utilities | VERIFY — likely dead |
+| `database/` | varies | DB tools/configs | VERIFY |
+| `test-reports/` + `test-results/` | ~5 | Test outputs | DELETE |
+| `clickhouse-init/` | varies | ClickHouse DB init scripts | DELETE if not using |
+| `services/` | varies | Old service implementations | VERIFY — likely dead |
+| `legal-ai-quic-server-fixed.exe;C/` | ~1 | Malformed directory name (semicolon) | DELETE |
 
 ---
 
@@ -215,24 +266,133 @@
 | `proto/` | 1 | — | Proto archive |
 
 ---
-Updated Overview
-The 00-OVERVIEW.md now includes this database migration guide in the summary.
 
-Total work across all categories: ~158 hours (6 categories, 77+ TODO items)
+## Language Breakdown (Audited March 8, 2026)
 
-All database changes are production-ready after dev/staging testing. No data will b
-## Language Breakdown
+| Language | Total Files | Active Files | Location | Status |
+|----------|-------------|-------------|----------|--------|
+| TypeScript (.ts) | 1,635 | ~1,100 | sveltekit-frontend/src/ | ACTIVE — 595 server, 244 API, 113 components |
+| Svelte (.svelte) | 816 | ~700 | sveltekit-frontend/src/ | ACTIVE — 613 components, 84 routes |
+| Go (.go) | 12,527 | 0 | go-microservice/ (12,396), langextract-go/ (75) | ABANDONED — DELETE safe |
+| Python (.py) | 73,588 | ~200 | 69,194 in venvs (DELETE), 555 deeds_labs, 139 sveltekit, 43 scripts | 99.7% VENVS |
+| CUDA (.cu/.cuh) | 563 | 5 | 5 in sveltekit-frontend/, 471 in venvs, 13 deeds_labs | ARCHIVE — venvs inflate count |
+| Proto (.proto) | 345 | 9 | 141 go-microservice, 79 venvs, 69 proto/, 9 sveltekit | LEGACY — DELETE safe |
+| Markdown (.md) | 5,626 | ~3,100 | 3,071 sveltekit-frontend/, 650 documents/, 511 go-microservice | CLEANUP needed |
+| WGSL (.wgsl) | 4 | 4 | sveltekit-frontend/src/ | ACTIVE |
+| Dockerfiles | 93 | ~10 | Scattered, mostly in venvs/go | 90% dead |
 
-| Language | Files | Location | Status |
-|----------|-------|----------|--------|
-| TypeScript (.ts) | ~1,800 | sveltekit-frontend/src/ | ACTIVE |
-| Svelte (.svelte) | ~800 | sveltekit-frontend/src/ | ACTIVE |
-| Go (.go) | 12,523 | root dirs (go-microservice/, microservices/, etc.) | ABANDONED |
-| Python (.py) | 3,576 | ingestion-phase66/, deeds_labs/, root dirs | PARTIAL |
-| CUDA (.cu/.cuh) | 562 | legal-ai-cuda/, deeds_labs/ | ARCHIVE |
-| Proto (.proto) | 345 | proto/, protos/, src/proto/ | LEGACY |
-| Markdown (.md) | 2,751+ | Everywhere | NEEDS CLEANUP |
-| WGSL (.wgsl) | 4 | sveltekit-frontend/src/ | ACTIVE |
+### Dead Weight Summary
+
+| Category | Dirs | Files | Safe to Delete? |
+|----------|------|-------|-----------------|
+| **Python venvs** (.venv, .venv-phase46, phase46-venv, .python311, tensorrt_py310_env, .venv-verify) | 6 | **210,438** | YES — recreatable via pip |
+| **Go microservice** (go-microservice/) | 1 | 26,570 | YES — SvelteKit replaced |
+| **LibTorch** (libtorch-win-shared-with-deps-2.9.0+cu130/) | 1 | 9,377 | YES — not used |
+| **deeds_labs/** | 1 | 13,227 | KEEP — intentional archive |
+| **_archive/** | 1 | 352 | KEEP — intentional archive |
+| **Misc legacy** (langextract-go, proto, proto-backup, protoc-install, old-scripts, etc.) | ~20 | ~500 | YES — unused |
+| **TOTAL DELETABLE** | **~30** | **~247,000** | Frees ~50GB+ disk |
+
+### Unwired Files Inside sveltekit-frontend/src/
+
+| Area | Total | Used | Dead | % Dead |
+|------|-------|------|------|--------|
+| lib/types/ | 83 | ~18 | ~65 | 78% |
+| lib/utils/ | 40 | ~12 | ~28 | 70% |
+| lib/services/ | 64 | ~7 | ~57 | 89% (blanket-excluded, 312 corrupted) |
+| lib/api/ | 6 | 1 | 5 | 83% |
+| lib/error-brain/ | 3 | 0 | 3 | 100% |
+| lib/__tests__/ | 3 | 0 | 3 | 100% |
+| lib/stores/ | 16 | 13 | 3 | 19% |
+| lib/db/ | 5 | 3 | 2 | 40% |
+| lib/components/ | 69 top-level | ~55 | ~14 | 20% |
+| **TOTAL** | **~289** | **~109** | **~180** | **62%** |
+
+### lib/types/ — File-by-File Wiring Status
+
+| File | Importers | Status | Recommendation |
+|------|-----------|--------|----------------|
+| `admin.ts` | 0 | DEAD | Archive to deeds_labs/ |
+| `advanced-patches.d.ts` | 0 | DEAD | Archive |
+| `ai.ts` | 3 | WIRED | Keep |
+| `ai-assistant.ts` | 0 | DEAD | Archive |
+| `ai-chat.ts` | 0 | DEAD | Archive |
+| `ai-types.ts` | 0 | DEAD | Archive |
+| `api.ts` | 8 | WIRED | Keep — heavily used |
+| `app.d.ts` | 0 | DEAD | Archive |
+| `auth.d.ts` | 0 | DEAD | Archive |
+| `automated-resolution.ts` | 0 | DEAD | Archive |
+| `button.ts` | 0 | DEAD | Archive |
+| `case-summary.ts` | 7 | WIRED | Keep — heavily used |
+| `case-theory.ts` | 2 | WIRED | Keep |
+| `chat.ts` | 2 | WIRED | Keep |
+| `citations.ts` | 4 | WIRED | Keep |
+| `cluster.ts` | 0 | DEAD | Archive |
+| `common-props.d.ts` | 0 | DEAD | Archive |
+| `common-props.ts` | 0 | DEAD | Archive |
+| `components.ts` | 0 | DEAD | Archive |
+| `database.ts` | 2 | WIRED | Keep |
+| *+ 63 more files* | varies | ~45 DEAD | Audit individually |
+
+**Summary: 9 WIRED / 11+ DEAD of 20 checked (55% active). ~65 of 83 total likely dead.**
+
+### lib/services/ — File-by-File Wiring Status
+
+| File | Importers | Status | Recommendation |
+|------|-----------|--------|----------------|
+| `adaptive-index-orchestrator.ts` | 0 | DEAD | Archive (blanket-excluded) |
+| `agentic-stream.ts` | 0 | DEAD | Archive |
+| `agentShellMachine.ts` | 0 | DEAD | Archive |
+| `ai-error-fixer.ts` | 0 | DEAD | Archive |
+| `ai-service.ts` | 0 | DEAD | Archive |
+| `api-client.ts` | 2 | WIRED | Keep |
+| `case-link.service.ts` | 0 | DEAD | Archive |
+| `contextual-intelligence-service.ts` | 1 | WIRED | Keep |
+| `couchdb-client.ts` | 4 | WIRED | Keep |
+| `get-ollama-endpoint.ts` | 2 | WIRED | Keep |
+| `hybrid-stt.ts` | 1 | WIRED | Keep — voice input |
+| `hybrid-whisper.ts` | 1 | WIRED | Keep — voice input |
+| `llm-logger.ts` | 0 | DEAD | Archive |
+| `neural-sprite-autoencoder.ts` | 0 | DEAD | Archive |
+| `ollamaService.ts` | 3 | WIRED | Keep |
+| `png-embed-extractor.ts` | 1 | WIRED | Keep |
+| `poi.ts` | 0 | DEAD | Archive |
+| `qdrant-client.ts` | 1 | WIRED | Keep |
+| `rag-source-validation.ts` | 1 | WIRED | Keep |
+| `source-validation-api.ts` | 3 | WIRED | Keep |
+| `tts.ts` | 4 | WIRED | Keep — text-to-speech |
+| `vector-service.ts` | 1 | WIRED | Keep |
+| `voice-commands.ts` | 2 | WIRED | Keep |
+| `whisper-stt.ts` | 1 | WIRED | Keep |
+
+**Summary: 15 WIRED / 9 DEAD (63% active). Note: 312+ in lib/services/ are blanket-excluded (corrupted).**
+
+### lib/utils/ — File-by-File Wiring Status (All Active)
+
+| File | Importers | Status |
+|------|-----------|--------|
+| `api-endpoints.ts` | 1 | WIRED |
+| `debounce.ts` | 1 | WIRED |
+| `dynamic-imports.ts` | 1 | WIRED |
+| `intersection-observer.ts` | 1 | WIRED |
+| `ollama.ts` | 11 | WIRED — most used utility |
+| `ollama-endpoint.ts` | 9 | WIRED — second most used |
+| `progressive-enhancement-audit.ts` | 1 | WIRED |
+| `route-operation-logger.ts` | 1 | WIRED |
+| `sensitive-info-detector.ts` | 2 | WIRED |
+| `toast.ts` | 1 | WIRED |
+| `tracking.ts` | 3 | WIRED |
+| `xstate-svelte5.ts` | 2 | WIRED |
+
+**Summary: 12/12 WIRED (100% active). Healthiest directory in the project.**
+
+### Consolidation Recommendations
+
+1. **Immediate wins** — Archive 20 dead files from lib/types/ and lib/services/ to deeds_labs/archived-dead-files/
+2. **Type consolidation** — Merge 83 type files into ~10 domain-grouped files (cases.ts, ai.ts, evidence.ts, etc.)
+3. **Services cleanup** — The 312 blanket-excluded corrupted services need a full triage pass (but low priority since tsconfig excludes them)
+4. **Root directory cleanup** — Delete ~30 empty/stale dirs, move ~25 legacy projects to deeds_labs/ → frees ~247,000 files
+
 ---
 ## Key Server Infrastructure Files
 | File | Lines | Purpose |

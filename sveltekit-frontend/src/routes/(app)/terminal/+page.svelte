@@ -9,6 +9,8 @@
 	import { browser } from '$app/environment';
 	import { ttsService } from '$lib/services/tts';
 	import { voiceCommands, COMMAND_PATTERNS } from '$lib/services/voice-commands';
+	import AIRecommendation from '$lib/components/ai/AIRecommendation.svelte';
+	import ChatContextPanel from '$lib/components/ChatContextPanel.svelte';
 
 	// Chat session — tied to user via server-provided userId
 	let session = $state<ChatSession | null>(null);
@@ -523,8 +525,12 @@
 							>{prompt.label}</button>
 						{/each}
 					</div>
+					<div class="w-full max-w-lg mt-3">
+						<AIRecommendation onselect={(text) => { currentMessage = text; }} />
+					</div>
 				</div>
 			{:else}
+				<ChatContextPanel />
 				{#each session.messages as msg, idx (idx)}
 					<div
 						class="message-fade flex gap-3 max-w-[85%] mb-5"

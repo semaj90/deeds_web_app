@@ -1,92 +1,91 @@
 <script lang="ts">
- import chatContextRaw from '$lib/stores/chat-context';
- // Migrated to $effect
+	import Icon from '$lib/components/ui/Icon.svelte';
+	import { browser } from '$app/environment';
 
- // Define interfaces locally since they are not exported from chat-context
- interface TopicNode {
- clusterSize: number;
-	tags: string[];
- }
+	interface ContextItem {
+		id: string;
+		type: 'topic' | 'shard';
+		title: string;
+		data: { clusterSize?: number; tags?: string[]; chunkCount?: number; status?: string };
+	}
 
- interface ShardNode {
- chunkCount: number;
-	status: string;
- }
+	let items = $state<ContextItem[]>([]);
 
- const chatContext = chatContextRaw as any;
+	$effect(() => {
+		if (!browser) return;
 
- $effect(() => {
+		const handleTopic = (e: Event) => {
+			const detail = (e as CustomEvent).detail;
+			if (detail?.id) {
+				items = [...items.filter(i => i.id !== detail.id), { ...detail, type: 'topic' }];
+			}
+		};
+		const handleShard = (e: Event) => {
+			const detail = (e as CustomEvent).detail;
+			if (detail?.id) {
+				items = [...items.filter(i => i.id !== detail.id), { ...detail, type: 'shard' }];
+			}
+		};
 
- // Listen for topic/shard events from evidence board
- const handleTopicToChat = (event: CustomEvent) => {
- chatContext.addTopic(event.detail);
- };
+		window.addEventListener('topicToChat', handleTopic);
+		window.addEventListener('shardToChat', handleShard);
 
- const handleShardToChat = (event: CustomEvent) => {
- chatContext.addShard(event.detail);
- };
+		return () => {
+			window.removeEventListener('topicToChat', handleTopic);
+			window.removeEventListener('shardToChat', handleShard);
+		};
+	});
 
- window.addEventListener('topicToChat', handleTopicToChat);
- window.addEventListener('shardToChat', handleShardToChat);
+	function removeItem(id: string) {
+		items = items.filter(i => i.id !== id);
+	}
 
- return () => {
- window.removeEventListener('topicToChat', handleTopicToChat);
- window.removeEventListener('shardToChat', handleShardToChat);
- };
- 
-});
-
- function removeContext(id: string) {
- chatContext.remove(id);
- }
-
- function clearAll() {
- chatContext.clear();
- }
+	function clearAll() {
+		items = [];
+	}
 </script>
 
-{#if $chatContext .length > 0}
- <div class="mb-4 p-3 bg-[#1a1813] border border-[#3a352a] rounded">
- <div class="flex items-center justify-between mb-2">
- <h3 class="text-xs font-mono tracking-wide text-[#f5f0e2]">
- PINNED CONTEXT ({$chatContext .length})
- </h3>
- <button
- class="text-[10px] text-danger/80 hover:text-danger/60"
- onclick={ clearAll }
- >
- CLEAR ALL
- </button>
- </div>
+{#if items.length > 0}
+	<div class="mb-4 p-3 bg-stone-900 border border-stone-700 rounded">
+		<div class="flex items-center justify-between mb-2">
+			<h3 class="text-xs font-mono tracking-wide text-stone-200 m-0 flex items-center gap-1.5">
+				<Icon name="pin" size={12} />
+				PINNED CONTEXT ({items.length})
+			</h3>
+			<button
+				class="text-[10px] text-red-400/80 hover:text-red-300 bg-transparent border-none cursor-pointer"
+				onclick={clearAll}
+			>
+				CLEAR ALL
+			</button>
+		</div>
 
- <div class="space-y-2 max-h-32 overflow-y-auto">
- {#each $chatContext as item}
- <div class="flex items-center justify-between p-2 bg-[#221e17] rounded text-[10px]">
- <div class="flex-1">
- <div class="font-mono text-[#f5f0e2]">
- {item.type.toUpperCase()}: {item.title}
- </div>
- <div class="text-sand/40 mt-1">
- {#if item.type === 'topic'}
- {@const topic = item.data as TopicNode}
- {topic.clusterSize} items • {topic.tags.slice(0, 3).join(', ')}
- {:else}
- {@const shard = item.data as ShardNode}
- {shard.chunkCount} chunks • {shard.status}
- {/if}
- </div>
- </div>
- <button
- class="ml-2 text-danger/80 hover:text-danger/60 text-xs"
- onclick={() => removeContext(item.id)}
- >
- ×
- </button>
- </div>
- {/each}
- </div>
- </div>
+		<div class="flex flex-col gap-1.5 max-h-32 overflow-y-auto">
+			{#each items as item (item.id)}
+				<div class="flex items-center justify-between p-2 bg-stone-800/80 rounded text-[10px]">
+					<div class="flex-1 min-w-0">
+						<div class="font-mono text-stone-200 truncate">
+							{item.type.toUpperCase()}: {item.title}
+						</div>
+						<div class="text-stone-500 mt-0.5">
+							{#if item.type === 'topic'}
+								{item.data.clusterSize ?? 0} items
+								{#if item.data.tags?.length}
+									&middot; {item.data.tags.slice(0, 3).join(', ')}
+								{/if}
+							{:else}
+								{item.data.chunkCount ?? 0} chunks &middot; {item.data.status ?? 'ready'}
+							{/if}
+						</div>
+					</div>
+					<button
+						class="ml-2 text-red-400/80 hover:text-red-300 bg-transparent border-none cursor-pointer text-xs p-0.5"
+						onclick={() => removeItem(item.id)}
+					>
+						<Icon name="x" size={12} />
+					</button>
+				</div>
+			{/each}
+		</div>
+	</div>
 {/if}
-
-
-
