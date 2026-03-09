@@ -42,6 +42,9 @@ export const ENV = {
 	EMBEDDING_GRPC_ENABLED: (privateEnv.EMBEDDING_GRPC_ENABLED ?? 'false') === 'true',
 	RETRIEVAL_GRPC_URL: privateEnv.RETRIEVAL_GRPC_URL ?? '127.0.0.1:50053',
 	RETRIEVAL_GRPC_ENABLED: (privateEnv.RETRIEVAL_GRPC_ENABLED ?? 'false') === 'true',
+	// SIMD sidecar (Go minio-simd-service)
+	MINIO_SIMD_ENABLED: (privateEnv.MINIO_SIMD_ENABLED ?? 'false') === 'true',
+	MINIO_SIMD_URL: privateEnv.MINIO_SIMD_URL ?? 'http://127.0.0.1:8095',
 	// QUIC/NATS embedding transport
 	EMBEDDING_QUIC_ENABLED: (privateEnv.EMBEDDING_QUIC_ENABLED ?? privateEnv.QUIC_ENABLED ?? 'false') === 'true',
 	NATS_URL: privateEnv.NATS_URL ?? 'nats://127.0.0.1:4222',

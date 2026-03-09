@@ -1,6 +1,8 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { getGpuLeaseStatus } from '$lib/server/inference/gpu-arbiter.js';
+import { getSIMDStatus } from '$lib/server/minio-simd-client.js';
+import { checkGrpcHealth } from '$lib/server/grpc/embedding-client.js';
 
 /**
  * GET /api/health/capabilities
@@ -42,7 +44,7 @@ export const GET: RequestHandler = async () => {
 	const qdrantUrl = ENV.QDRANT_URL ?? 'http://localhost:6333';
 
 	// Parallel checks — all with 2s timeout
-	const [ollamaRes, qdrantHealth, postgresOk, redisOk, tensorrtOk, gpuLease] = await Promise.all([
+	const [ollamaRes, qdrantHealth, postgresOk, redisOk, tensorrtOk, gpuLease, simdStatus, grpcStatus] = await Promise.all([
 		// Ollama: fetch model list (proves LLM + embedding available)
 		fetch(`${ollamaUrl}/api/tags`, { signal: AbortSignal.timeout(TIMEOUT) })
 			.then(async (r) => {
@@ -109,6 +111,12 @@ export const GET: RequestHandler = async () => {
 
 		// GPU lease status
 		getGpuLeaseStatus().catch(() => null),
+
+		// SIMD sidecar health
+		getSIMDStatus().catch(() => ({ healthy: false, minioConnected: false, latencyMs: -1 })),
+
+		// gRPC embedding health
+		checkGrpcHealth().catch(() => ({ enabled: false, url: '', available: false })),
 	]);
 
 	const ollama = ollamaRes.ok;
@@ -132,6 +140,8 @@ export const GET: RequestHandler = async () => {
 			postgres: postgresOk,
 			redis: redisOk,
 			tensorrt: tensorrtOk,
+			simd: simdStatus,
+			grpc: grpcStatus,
 			gpu: {
 				leaseHolder: gpuLease?.backend ?? null,
 				leaseFree: !gpuLease,

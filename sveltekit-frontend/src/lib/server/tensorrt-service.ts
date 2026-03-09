@@ -21,21 +21,25 @@ class TensorRTLegalAI {
     private enginePath: string;
     private awq4ModelPath: string;
     private tritonServerUrl: string;
+    private ollamaUrl: string;
+    private ollamaModel: string;
 
     constructor() {
         this.pythonEnv = env?.TENSORRT_PYTHON_ENV ?? '/home/james/trt_env_310/bin/python';
         this.enginePath = env?.TENSORRT_ENGINE_PATH ?? '/home/james/gemma3_engine_flash';
         this.awq4ModelPath = env?.AWQ4_MODEL_PATH ?? '/home/james/gemma3_awq4_working';
         this.tritonServerUrl = env?.TRITON_SERVER_URL ?? 'http://localhost:8000';
+        this.ollamaUrl = env?.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+        this.ollamaModel = env?.OLLAMA_LEGAL_MODEL ?? 'gemma3-legal-v2';
     }
 
     async infer(request: LegalAIRequest): Promise<LegalAIResponse> {
-        // Try TensorRT first, fallback to PyTorch
+        // Try TensorRT first, fallback to Ollama
         try {
             return await this.tensorrtInference(request);
         } catch (error) {
-            console.warn('TensorRT inference failed, falling back to PyTorch:', error);
-            return await this.pytorchInference(request);
+            console.warn('TensorRT inference failed, falling back to Ollama:', error);
+            return await this.ollamaInference(request);
         }
     }
 
@@ -139,13 +143,41 @@ except Exception as e:
         });
     }
 
-    private async pytorchInference(request: LegalAIRequest): Promise<LegalAIResponse> {
-        // Fallback PyTorch inference implementation
+    private async ollamaInference(request: LegalAIRequest): Promise<LegalAIResponse> {
+        const startTime = performance.now();
+        let prompt = request.prompt;
+        if (request.context) {
+            prompt = `Context: ${request.context}\n\n${prompt}`;
+        }
+
+        const response = await fetch(`${this.ollamaUrl}/api/generate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: this.ollamaModel,
+                prompt,
+                stream: false,
+                options: {
+                    num_predict: request.max_tokens ?? 256,
+                    temperature: request.temperature ?? 0.3,
+                    top_p: 0.9,
+                },
+            }),
+            signal: AbortSignal.timeout(60000),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Ollama HTTP ${response.status}: ${await response.text()}`);
+        }
+
+        const data = await response.json();
+        const inferenceTime = performance.now() - startTime;
+
         return {
-            text: 'PyTorch, fallback: Legal analysis pending implementation.',
-            tokens: 10,
-            inference_time: 0.5,
-            model_used: 'PyTorch-Fallback'
+            text: data.response ?? '',
+            tokens: data.eval_count ?? 0,
+            inference_time: inferenceTime / 1000,
+            model_used: 'Ollama-Fallback',
         };
     }
 }
