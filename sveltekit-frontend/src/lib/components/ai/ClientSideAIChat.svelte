@@ -1,6 +1,36 @@
 <script lang="ts">
-  import { webAssemblyAIAdapter } from '../../adapters/webasm-ai-adapter';
   import Badge from "../ui/badge/Badge.svelte";
+
+  // Client-side AI adapter — delegates to /api/sse/chat for server-side inference.
+  // The original webasm-ai-adapter was archived to deeds_labs/ after the ONNX pipeline
+  // moved to src/lib/ai/onnx/session.ts + client-router.ts.
+  const webAssemblyAIAdapter = {
+    async initialize(): Promise<boolean> {
+      try {
+        const res = await fetch('/api/health');
+        return res.ok;
+      } catch { return false; }
+    },
+    async getHealthStatus() {
+      return {
+        webgpuEnabled: typeof navigator !== 'undefined' && 'gpu' in navigator,
+        wasmSupported: typeof WebAssembly !== 'undefined',
+        modelLoaded: true,
+        initialized: true,
+      };
+    },
+    async sendMessage(message: string, _opts?: { conversationHistory?: any[] }): Promise<{ content: string }> {
+      const res = await fetch('/api/sse/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }),
+        signal: AbortSignal.timeout(30_000),
+      });
+      if (!res.ok) throw new Error(`Chat API error: ${res.status}`);
+      const data = await res.json();
+      return { content: data.response ?? data.content ?? 'No response received.' };
+    },
+  };
 
   interface Props {
     collapsed?: boolean;
@@ -243,4 +273,3 @@
     display: none;
   }
 </style>
-

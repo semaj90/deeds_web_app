@@ -1,5 +1,6 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { QDRANT_URL } from '$env/static/private';
+import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 
 const qdrant = new QdrantClient({ url: QDRANT_URL || 'http://localhost:6333' });
 
@@ -25,7 +26,7 @@ export class RAGService {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	model: 'embeddinggemma:latest', prompt: q }),
+	model: SERVER_EMBEDDING_MODEL, prompt: q }),
             });
             const data = await r.json();
             // console.log('Ollama response:', JSON.stringify(data).substring(0, 200));

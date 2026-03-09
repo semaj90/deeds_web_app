@@ -111,8 +111,8 @@
   // ========================================
   "github.copilot.chat.codeGeneration.useInstructionFiles": false,
   "editor.codeActionsOnSave": {
-    "source.fixAll": "explicit",
-    "source.organizeImports": "explicit"
+    "source.fixAll": "never",
+    "source.organizeImports": "never"
   },
   "diffEditor.enableSplitViewResizing": true,
   "diffEditor.experimental.useVersionedHover": true,

@@ -1,5 +1,22 @@
-import type { LoggingConfig } from '../config/unified-config.js';
-import { getConfig } from '../config/unified-config.js';
+// LoggingConfig inlined from archived config/unified-config.ts
+interface LoggingConfig {
+    level: 'debug' | 'info' | 'warn' | 'error';
+    format: 'json' | 'text';
+    outputs: ('console' | 'file' | 'syslog')[];
+    file?: { path: string; maxSize: string; maxFiles: number; rotate: boolean; };
+    structured: boolean;
+    includeStack: boolean;
+}
+
+function getDefaultLoggingConfig(): LoggingConfig {
+    return {
+        level: 'info',
+        format: 'json',
+        outputs: ['console'],
+        structured: true,
+        includeStack: true,
+    };
+}
 
 const dev = process.env.NODE_ENV === 'development';
 
@@ -203,7 +220,7 @@ export class ProductionLogger {
     private metricsInterval: NodeJS.Timeout | null = null;
 
     constructor() {
-        this.config = getConfig().logging;
+        this.config = getDefaultLoggingConfig();
         this.windowsMonitor = new WindowsPerformanceMonitor();
         this.initializeLogging();
     }
@@ -621,11 +638,3 @@ export const logPerformance = (operation: string, duration: number, context?: Lo
 
 export const productionLogger = logger;
 export default logger;
-
-
-
-
-
-
-
-

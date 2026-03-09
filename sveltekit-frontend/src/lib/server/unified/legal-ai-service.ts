@@ -17,6 +17,7 @@ import { getVectorCache, setVectorCache } from '$lib/server/vector-cache.js';
 import db from '$lib/server/db';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 
 // --- Types ---
 
@@ -146,7 +147,7 @@ export class UnifiedLegalAIService {
 				const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: query }),
+					body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, prompt: query }),
 					signal: AbortSignal.timeout(15_000),
 				});
 				if (res.ok) {
@@ -214,7 +215,7 @@ export class UnifiedLegalAIService {
 			setVectorCache(query, hits, {
 				searchTime: performance.now() - start,
 				totalResults: hits.length,
-				model: 'embeddinggemma:latest',
+				model: SERVER_EMBEDDING_MODEL,
 				distanceMetric: 'cosine',
 				threshold,
 			}, { caseId, limit }).catch(() => {});

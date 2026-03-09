@@ -45,7 +45,7 @@ export const BADGE_DESCRIPTIONS: Record<string, string> = {
     api: 'API endpoint',
 };
 
-// 🔭 Canonical route “forest”
+// 🔭 Canonical route "forest"
 // Adjust hrefs to exactly match your SvelteKit routes.
 export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
     cases: [
@@ -254,15 +254,16 @@ export function enrichRoutesWithPhase72(
     });
 }
 
-// Import Phase 72 restructure tasks
-// (This was importing .js in TS file, which is usually fine if allowImportingTsExtensions or typical settings,
-//  but safe to assume .ts or module resolution handles it. Removing .js extension for safety if it's TS source)
-// However, sticking to relative path implies it exists.
-import {
-    phase6_72_restructure_tasks,
-    tasksByPriority,
-    tasksByTab,
-} from './phase72/command-center-restructure-tasks.js';
-
-// Export Phase 72 tasks for NES modal integration
-export { phase6_72_restructure_tasks, tasksByPriority, tasksByTab };
+// --- Phase 72 Restructure Tasks ---
+// Phase 72 was the Command Center restructure phase that organized 78 tasks
+// by tab (cases, evidence, persons, system, routes) and priority (high, medium,
+// active, complete) for the NES-style modal in the Route Command Center.
+// The original task definitions lived in ./phase72/command-center-restructure-tasks.ts
+// and were archived to deeds_labs/ts-consolidation-archive/phase72-adapters-orphans-2026-03-09/
+// after all 78 tasks reached "complete" status.
+//
+// These stubs maintain the export contract for any consumers still referencing
+// the Phase 72 task data.
+export const phase6_72_restructure_tasks: Phase72Task[] = [];
+export const tasksByPriority: Record<string, Phase72Task[]> = {};
+export const tasksByTab: Record<string, Phase72Task[]> = {};

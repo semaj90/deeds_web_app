@@ -1,4 +1,5 @@
 import type { SearchResult } from '$lib/types';
+import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 
 /**
  * NATS + QUIC High-Performance Async Search Service
@@ -322,7 +323,7 @@ export class NatsQuicSearchService {
                 method: 'POST',
                 headers: { 'Content-Type': `application/json` },
 	body: fastStringify({
-	model: model ?? 'embeddinggemma:latest',
+	model: model ?? SERVER_EMBEDDING_MODEL,
                     prompt: query.slice(0, 2048)
                 }),
                 signal: AbortSignal.timeout(15000)

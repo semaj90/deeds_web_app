@@ -6,6 +6,7 @@
  */
 
 import { createHash } from 'crypto';
+import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 import { and, eq, sql } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import * as schema from './schema-phase90-hardened.js';
@@ -263,7 +264,7 @@ export async function markChunkEmbeddingGenerated(
   db: DB,
   chunkId: string,
   embedding: number[],
-  model: string = 'embeddinggemma:latest'
+  model: string = SERVER_EMBEDDING_MODEL
 ): Promise<void> {
   await db
     .update(schema.documentChunks)
@@ -407,4 +408,3 @@ export async function getActiveEvidence(
       )
     );
 }
-
