@@ -1,0 +1,266 @@
+/**
+ * LibTorch N-API Bridge — server-only.
+ *
+ * Loads the compiled tensorrt_bridge.node addon and exposes:
+ *   - graphSimilarity(embeddings) → cosine similarity matrix
+ *   - clusterEmbeddings(embeddings, k) → cluster assignments
+ *   - computeCaseEmbedding(weights, embeddings) → weighted embedding
+ *
+ * Falls back to CPU-only JS implementations if addon unavailable.
+ */
+
+import { resolve } from 'path';
+
+// ── Types ──────────────────────────────────────────────────────────────────
+
+export interface SimilarityResult {
+	matrix: number[][];
+	n: number;
+	source: 'gpu' | 'cpu';
+}
+
+export interface ClusterResult {
+	assignments: number[];
+	k: number;
+	source: 'gpu' | 'cpu';
+}
+
+export interface WeightedEmbeddingResult {
+	embedding: number[];
+	dimension: number;
+	source: 'gpu' | 'cpu';
+}
+
+// ── Addon loading ──────────────────────────────────────────────────────────
+
+interface NativeAddon {
+	bridgeSIMD: (json: string) => number;
+	checkCudaAvailable: () => number;
+	graphSimilarity?: (embeddings: Float32Array, n: number, dim: number) => Float32Array;
+	clusterEmbeddings?: (embeddings: Float32Array, n: number, dim: number, k: number, maxIters: number) => Int32Array;
+	computeCaseEmbedding?: (weights: Float32Array, embeddings: Float32Array, n: number, dim: number) => Float32Array;
+}
+
+let addon: NativeAddon | null = null;
+let loadAttempted = false;
+
+function getAddon(): NativeAddon | null {
+	if (loadAttempted) return addon;
+	loadAttempted = true;
+
+	const paths = [
+		resolve(process.cwd(), '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
+		resolve(process.cwd(), '../simd-bridge/cpp/build/tensorrt_bridge.node'),
+		resolve(process.cwd(), '../simd-bridge/build/Release/tensorrt_bridge.node'),
+	];
+
+	for (const p of paths) {
+		try {
+			addon = require(p) as NativeAddon;
+			console.log(`[libtorch-bridge] Loaded native addon from ${p}`);
+			return addon;
+		} catch {
+			// try next path
+		}
+	}
+
+	console.warn('[libtorch-bridge] Native addon not found, using CPU fallback');
+	return null;
+}
+
+// ── CPU fallbacks ──────────────────────────────────────────────────────────
+
+function cpuCosineSimilarity(embeddings: number[][]): number[][] {
+	const n = embeddings.length;
+	const result: number[][] = Array.from({ length: n }, () => new Array(n).fill(0));
+
+	// Precompute norms
+	const norms = embeddings.map(v => {
+		const sum = v.reduce((s, x) => s + x * x, 0);
+		return Math.sqrt(sum) || 1e-12;
+	});
+
+	for (let i = 0; i < n; i++) {
+		result[i][i] = 1.0;
+		for (let j = i + 1; j < n; j++) {
+			let dot = 0;
+			for (let d = 0; d < embeddings[i].length; d++) {
+				dot += embeddings[i][d] * embeddings[j][d];
+			}
+			const sim = dot / (norms[i] * norms[j]);
+			result[i][j] = sim;
+			result[j][i] = sim;
+		}
+	}
+
+	return result;
+}
+
+function cpuKMeans(embeddings: number[][], k: number, maxIters = 100): number[] {
+	const n = embeddings.length;
+	const dim = embeddings[0]?.length ?? 0;
+	if (n === 0 || dim === 0) return [];
+
+	const effectiveK = Math.min(k, n);
+	const centroids = embeddings.slice(0, effectiveK).map(v => [...v]);
+	const assignments = new Array(n).fill(0);
+
+	for (let iter = 0; iter < maxIters; iter++) {
+		let changed = false;
+
+		// Assign
+		for (let i = 0; i < n; i++) {
+			let bestDist = Infinity;
+			let bestC = 0;
+			for (let c = 0; c < effectiveK; c++) {
+				let dist = 0;
+				for (let d = 0; d < dim; d++) {
+					const diff = embeddings[i][d] - centroids[c][d];
+					dist += diff * diff;
+				}
+				if (dist < bestDist) {
+					bestDist = dist;
+					bestC = c;
+				}
+			}
+			if (assignments[i] !== bestC) {
+				assignments[i] = bestC;
+				changed = true;
+			}
+		}
+
+		if (!changed) break;
+
+		// Update centroids
+		for (let c = 0; c < effectiveK; c++) {
+			const members = [];
+			for (let i = 0; i < n; i++) {
+				if (assignments[i] === c) members.push(i);
+			}
+			if (members.length > 0) {
+				for (let d = 0; d < dim; d++) {
+					centroids[c][d] = members.reduce((s, i) => s + embeddings[i][d], 0) / members.length;
+				}
+			}
+		}
+	}
+
+	return assignments;
+}
+
+function cpuWeightedEmbedding(weights: number[], embeddings: number[][]): number[] {
+	const dim = embeddings[0]?.length ?? 0;
+	if (dim === 0) return [];
+
+	const wSum = weights.reduce((s, w) => s + w, 0) || 1e-12;
+	const result = new Array(dim).fill(0);
+
+	for (let i = 0; i < embeddings.length; i++) {
+		const w = weights[i] / wSum;
+		for (let d = 0; d < dim; d++) {
+			result[d] += w * embeddings[i][d];
+		}
+	}
+
+	// L2 normalize
+	const norm = Math.sqrt(result.reduce((s, x) => s + x * x, 0)) || 1e-12;
+	return result.map(x => x / norm);
+}
+
+// ── Public API ─────────────────────────────────────────────────────────────
+
+/**
+ * Compute cosine similarity matrix for embeddings.
+ * GPU-accelerated via libtorch if available, CPU fallback otherwise.
+ */
+export async function graphSimilarity(embeddings: number[][]): Promise<SimilarityResult> {
+	const n = embeddings.length;
+	const dim = embeddings[0]?.length ?? 0;
+
+	const native = getAddon();
+	if (native?.graphSimilarity && n > 0 && dim > 0) {
+		try {
+			const flat = new Float32Array(n * dim);
+			for (let i = 0; i < n; i++) {
+				flat.set(embeddings[i], i * dim);
+			}
+			const result = native.graphSimilarity(flat, n, dim);
+			const matrix: number[][] = [];
+			for (let i = 0; i < n; i++) {
+				matrix.push(Array.from(result.slice(i * n, (i + 1) * n)));
+			}
+			return { matrix, n, source: 'gpu' };
+		} catch {
+			// fall through to CPU
+		}
+	}
+
+	return { matrix: cpuCosineSimilarity(embeddings), n, source: 'cpu' };
+}
+
+/**
+ * K-means clustering on embeddings.
+ * GPU-accelerated via libtorch if available.
+ */
+export async function clusterEmbeddings(embeddings: number[][], k: number): Promise<ClusterResult> {
+	const n = embeddings.length;
+	const dim = embeddings[0]?.length ?? 0;
+
+	const native = getAddon();
+	if (native?.clusterEmbeddings && n > 0 && dim > 0) {
+		try {
+			const flat = new Float32Array(n * dim);
+			for (let i = 0; i < n; i++) {
+				flat.set(embeddings[i], i * dim);
+			}
+			const result = native.clusterEmbeddings(flat, n, dim, k, 100);
+			return { assignments: Array.from(result), k, source: 'gpu' };
+		} catch {
+			// fall through to CPU
+		}
+	}
+
+	return { assignments: cpuKMeans(embeddings, k), k, source: 'cpu' };
+}
+
+/**
+ * Compute weighted average embedding for a case.
+ * GPU-accelerated via libtorch if available.
+ */
+export async function computeCaseEmbedding(
+	weights: number[],
+	embeddings: number[][]
+): Promise<WeightedEmbeddingResult> {
+	const n = embeddings.length;
+	const dim = embeddings[0]?.length ?? 0;
+
+	const native = getAddon();
+	if (native?.computeCaseEmbedding && n > 0 && dim > 0) {
+		try {
+			const wArr = new Float32Array(weights);
+			const flat = new Float32Array(n * dim);
+			for (let i = 0; i < n; i++) {
+				flat.set(embeddings[i], i * dim);
+			}
+			const result = native.computeCaseEmbedding(wArr, flat, n, dim);
+			return { embedding: Array.from(result), dimension: dim, source: 'gpu' };
+		} catch {
+			// fall through to CPU
+		}
+	}
+
+	return {
+		embedding: cpuWeightedEmbedding(weights, embeddings),
+		dimension: dim,
+		source: 'cpu'
+	};
+}
+
+/**
+ * Check if CUDA/GPU is available via native addon.
+ */
+export function isCudaAvailable(): boolean {
+	const native = getAddon();
+	if (!native?.checkCudaAvailable) return false;
+	return native.checkCudaAvailable() === 1;
+}

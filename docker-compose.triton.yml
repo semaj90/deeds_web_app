@@ -4,35 +4,28 @@
 version: '3.8'
 
 services:
-  # NVIDIA Triton Inference Server with TensorRT
+  # NVIDIA Triton Inference Server with TRT-LLM backend
+  # Gemma 3 12B INT4 AWQ (primary) + SigLIP vision (VLM)
   triton-legal-ai:
-    image: nvcr.io/nvidia/tritonserver:24.08-py3
+    image: nvcr.io/nvidia/tritonserver:24.10-trtllm-python-py3
     container_name: triton-legal-ai
-    runtime: nvidia
     environment:
       - NVIDIA_VISIBLE_DEVICES=0
       - CUDA_DEVICE_ORDER=PCI_BUS_ID
       - CUDA_LAUNCH_BLOCKING=0
-      - TF_CPP_MIN_LOG_LEVEL=2
     ports:
-      - "8000:8000"  # HTTP inference endpoint
-      - "8001:8001"  # gRPC inference endpoint
-      - "8002:8002"  # Metrics endpoint
+      - "8099:8000"  # HTTP — matches TRTLLMClient (PUBLIC_TRT_LLM_ENDPOINT)
+      - "8098:8001"  # gRPC
+      - "8097:8002"  # Metrics (Prometheus)
     volumes:
       - ./triton-models:/models:ro
       - ./triton-logs:/logs
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
     command: >
       tritonserver
         --model-repository=/models
         --strict-model-config=false
-        --grpc-infer-allocation-pool-size=16
-        --http-thread-count=8
-        --grpc-max-response-message-size=268435456
-        --backend-config=tensorrt,coalesce-request-input=true
-        --backend-config=tensorrt,max-candidate-sequences=4
-        --backend-config=tensorrt,gather-kernel-buffer-threshold=0
-        --backend-config=tensorrt,eager-batching=1
+        --backend-config=tensorrtllm,batching_type=inflight_fused_batching
+        --backend-config=tensorrtllm,max_queue_delay_microseconds=1000
         --log-verbose=1
         --log-info=true
         --log-warning=true
@@ -40,14 +33,12 @@ services:
         --metrics-port=8002
         --allow-metrics=true
         --allow-gpu-metrics=true
-        --model-control-mode=explicit
-        --load-model=legal_embedding
-        --load-model=legal_generation
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/v2/health/ready"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
+      start_period: 120s
     deploy:
       resources:
         reservations:

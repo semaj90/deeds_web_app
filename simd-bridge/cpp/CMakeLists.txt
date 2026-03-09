@@ -42,4 +42,19 @@ if(SIMDJSON_FOUND)
   target_link_libraries(tensorbridge PRIVATE ${SIMDJSON_LIBRARIES})
 endif()
 
+# ── LibTorch GPU Graph Analysis ──────────────────────────────────────────
+# Set CMAKE_PREFIX_PATH to libtorch before running cmake:
+#   cmake -DCMAKE_PREFIX_PATH=/path/to/libtorch ..
+find_package(Torch QUIET)
+if(Torch_FOUND)
+  message(STATUS "LibTorch found (${TORCH_CXX_FLAGS}) -> building libtorch_graph")
+  add_library(libtorch_graph SHARED libtorch_graph.cc)
+  target_link_libraries(libtorch_graph PRIVATE ${TORCH_LIBRARIES})
+  target_compile_options(libtorch_graph PRIVATE ${TORCH_CXX_FLAGS})
+  set_property(TARGET libtorch_graph PROPERTY CXX_STANDARD 17)
+  install(TARGETS libtorch_graph LIBRARY DESTINATION lib)
+else()
+  message(STATUS "LibTorch not found -> skipping libtorch_graph (set CMAKE_PREFIX_PATH)")
+endif()
+
 install(TARGETS tensorbridge LIBRARY DESTINATION lib)

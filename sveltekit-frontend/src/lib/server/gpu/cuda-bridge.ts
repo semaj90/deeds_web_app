@@ -4,6 +4,16 @@
  * Uses Ampere architecture PTX modules for modularity
  */
 
+// LibTorch N-API bridge (GPU graph analysis with CPU fallback)
+import {
+	graphSimilarity,
+	clusterEmbeddings,
+	computeCaseEmbedding,
+	isCudaAvailable
+} from './libtorch-bridge.js';
+
+export { graphSimilarity, clusterEmbeddings, computeCaseEmbedding, isCudaAvailable };
+
 export interface CudaComputeRequest {
 	operation: 'legal_analysis' | 'vector_similarity' | 'embedding_generation' | 'matrix_multiply';
 	data: {

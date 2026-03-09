@@ -27,6 +27,11 @@ export interface ServerCapabilities {
 	models: string[];
 	latencyMs: number;
 	ts: string;
+	// Extended infrastructure (from /api/health/capabilities)
+	tensorrt?: boolean;
+	simd?: { healthy: boolean; minioConnected: boolean; latencyMs: number };
+	grpc?: { available: boolean; enabled: boolean; url: string };
+	gpu?: { leaseHolder: string | null; leaseFree: boolean };
 }
 
 let _cachedCaps: ServerCapabilities | null = null;

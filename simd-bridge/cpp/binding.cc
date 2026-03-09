@@ -54,6 +54,12 @@ napi_status napi_set_named_property(napi_env env, napi_value object,
 
 extern "C" int bridgeSIMDToTensorRT(const char* json);
 
+// LibTorch graph analysis functions (libtorch_graph.cc)
+extern "C" int graphSimilarity(const float* embeddings, int n, int dim, float* output, int output_len);
+extern "C" int clusterEmbeddings(const float* embeddings, int n, int dim, int k, int max_iters, int* assignments, int assignments_len);
+extern "C" int computeCaseEmbedding(const float* weights, int n, const float* embeddings, int dim, float* output, int output_len);
+extern "C" int checkCudaAvailable();
+
 // Helper: throw a JS TypeError and return nullptr for convenience
 static napi_value throw_type_error(napi_env env, const char *msg) {
   napi_throw_type_error(env, nullptr, msg);
@@ -116,18 +122,29 @@ static napi_value BridgeSIMD(napi_env env, napi_callback_info info) {
   return result;
 }
 
-static napi_value Init(napi_env env, napi_value exports) {
-  napi_status status;
+// N-API wrapper: checkCudaAvailable() → boolean
+static napi_value CheckCuda(napi_env env, napi_callback_info info) {
+  (void)info;
+  int available = checkCudaAvailable();
+  napi_value result;
+  napi_create_int32(env, available, &result);
+  return result;
+}
+
+// Helper: register a named function on exports
+static napi_status registerFn(napi_env env, napi_value exports,
+                               const char* name,
+                               napi_value (*cb)(napi_env, napi_callback_info)) {
   napi_value fn;
-  status = napi_create_function(env, "bridgeSIMD", NAPI_AUTO_LENGTH, BridgeSIMD,
-                                nullptr, &fn);
-  if (status != napi_ok)
-    return nullptr;
-  status = napi_set_named_property(env, exports, "bridgeSIMD", fn);
-  if (status != napi_ok)
-    return nullptr;
+  napi_status s = napi_create_function(env, name, NAPI_AUTO_LENGTH, cb, nullptr, &fn);
+  if (s != napi_ok) return s;
+  return napi_set_named_property(env, exports, name, fn);
+}
+
+static napi_value Init(napi_env env, napi_value exports) {
+  registerFn(env, exports, "bridgeSIMD", BridgeSIMD);
+  registerFn(env, exports, "checkCudaAvailable", CheckCuda);
   return exports;
 }
 
-NAPI_MODULE(NODE_GYP_MODULE_NAME, Init)
 NAPI_MODULE(NODE_GYP_MODULE_NAME, Init)
