@@ -1,3 +1,5 @@
+import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
+
 type Vector = number[];
 
 async function embedWithGemma(texts: string[]): Promise<Vector[]> {
@@ -5,7 +7,7 @@ async function embedWithGemma(texts: string[]): Promise<Vector[]> {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	model: process.env.GEMMA_EMBED_MODEL ?? 'embeddinggemma:latest',
+	model: process.env.GEMMA_EMBED_MODEL ?? SERVER_EMBEDDING_MODEL,
             input: texts,
         }),
     });

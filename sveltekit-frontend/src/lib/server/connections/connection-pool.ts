@@ -333,20 +333,13 @@ export async function closeAllConnections(): Promise<void> {
 	console.log('All connections closed');
 }
 
-// Handle process termination
-if (typeof process !== 'undefined') {
-	process.on('SIGINT', async () => {
-		await closeAllConnections();
-		process.exit(0);
-	});
-	process.on('SIGTERM', async () => {
-		await closeAllConnections();
-		process.exit(0);
-	});
-}
+// Shutdown now centralized in hooks.server.ts — removed duplicate handlers
+// that called process.exit(0) (problematic with adapter-node)
 
 // ============================================================================
 // Exports (only factory functions, no instances)
 // ============================================================================
+type Neo4jDriver = Driver;
+type RabbitChannel = Channel;
+type RabbitConnection = Connection;
 export type { Neo4jDriver, QdrantClient, RabbitChannel, RabbitConnection, Redis };
-

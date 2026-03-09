@@ -63,8 +63,8 @@ export const ENV = {
 	// FastAPI middleware (optional)
 	FASTAPI_URL: privateEnv.FASTAPI_URL ?? 'http://localhost:8001',
 	// Web Push (VAPID) — generate with: npx web-push generate-vapid-keys --json
-	VAPID_PUBLIC_KEY: publicEnv.PUBLIC_VAPID_KEY ?? privateEnv.VAPID_PUBLIC_KEY ?? 'BNtj-Ymwzc6FbcwSeJ46GL2yKLAqMMGj0sDeDPhnQZ3-pbG05UhbUxcZ89q0m7S4bKzEEG5aE-P2WEkCO8DJZ8U',
-	VAPID_PRIVATE_KEY: privateEnv.VAPID_PRIVATE_KEY ?? 'MuusRYO6dkldyhXG_123RBWTB1OhY0pUkA9lkuCZCK8',
+	VAPID_PUBLIC_KEY: publicEnv.PUBLIC_VAPID_KEY ?? privateEnv.VAPID_PUBLIC_KEY ?? '',
+	VAPID_PRIVATE_KEY: privateEnv.VAPID_PRIVATE_KEY ?? '',
 	VAPID_CONTACT: privateEnv.VAPID_CONTACT ?? 'mailto:admin@deeds-legal.ai',
 	// ntfy.sh push notifications
 	NTFY_URL: privateEnv.NTFY_URL ?? 'https://ntfy.sh',

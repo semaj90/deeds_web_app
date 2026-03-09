@@ -16,6 +16,7 @@ import { reports } from '$lib/server/db/schema-postgres.js';
 import { desc } from 'drizzle-orm';
 import { cacheExport } from '$lib/server/cache/pdf-export-cache.js';
 import { storeCachedResponse } from '$lib/server/ai/llm-cache.js';
+import { ENV } from '$lib/server/env.server.js';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 
 // Start the analysis worker on server boot (idempotent)
@@ -72,8 +73,6 @@ warmupLLMCache().then(() => {
  */
 async function warmupExportCache(): Promise<void> {
 	try {
-		// Get top 5 most recent reports as proxy for frequently accessed
-		// (Analytics-based selection can be added later)
 		const recentReports = await db
 			.select()
 			.from(reports)
@@ -91,7 +90,6 @@ async function warmupExportCache(): Promise<void> {
 		for (const report of recentReports) {
 			for (const format of formats) {
 				try {
-					// Generate simple content for warmup (full generation happens on real requests)
 					const content = format === 'json'
 						? JSON.stringify({ id: report.id, title: report.title, content: report.content }, null, 2)
 						: format === 'markdown'
@@ -116,7 +114,6 @@ async function warmupExportCache(): Promise<void> {
 					);
 					cached++;
 				} catch (err) {
-					// Non-fatal per-export failures
 					console.warn(`[Boot] Export warmup failed for ${report.id}:${format}:`, (err as Error).message);
 				}
 			}
@@ -130,11 +127,9 @@ async function warmupExportCache(): Promise<void> {
 
 /**
  * Option #6: Warm up LLM cache with common legal queries
- * Pre-caches frequently asked legal questions to reduce first-request latency
  */
 async function warmupLLMCache(): Promise<void> {
 	try {
-		// Common legal queries (can be expanded from analytics later)
 		const commonQueries = [
 			{
 				query: 'What is the statute of limitations for breach of contract?',
@@ -164,14 +159,11 @@ async function warmupLLMCache(): Promise<void> {
 		];
 
 		let cached = 0;
-
-		// Generate embeddings and cache responses
 		const OLLAMA_URL = 'http://localhost:11434';
 		const EMBEDDING_MODEL = 'embeddinggemma:latest';
 
 		for (const item of commonQueries) {
 			try {
-				// Generate embedding for query
 				const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
@@ -192,7 +184,6 @@ async function warmupLLMCache(): Promise<void> {
 					continue;
 				}
 
-				// Store in LLM cache
 				await storeCachedResponse({
 					query: item.query,
 					queryEmbedding,
@@ -204,7 +195,6 @@ async function warmupLLMCache(): Promise<void> {
 
 				cached++;
 			} catch (err) {
-				// Non-fatal per-query failures
 				console.warn(`[Boot] LLM warmup failed for "${item.query.slice(0, 30)}...":`, (err as Error).message);
 			}
 		}
@@ -242,9 +232,25 @@ export const handle: Handle = async ({ event, resolve }) => {
 	// Add timing information
 	const startTime = Date.now();
 
+	// === CORS for API routes ===
+	if (event.url.pathname.startsWith('/api/')) {
+		const allowedOrigin = dev ? '*' : (ENV.PUBLIC_API_URL || event.url.origin);
+
+		if (event.request.method === 'OPTIONS') {
+			return new Response(null, {
+				status: 204,
+				headers: {
+					'Access-Control-Allow-Origin': allowedOrigin,
+					'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+					'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+					'Access-Control-Max-Age': '86400',
+				},
+			});
+		}
+	}
+
 	// === DEV BYPASS AUTH (only in development mode) ===
 	if (dev && process.env.DEV_BYPASS_AUTH === 'true') {
-		// Use a valid UUID for database compatibility
 		const devUserId = '00000000-0000-0000-0000-000000000001';
 		event.locals.user = {
 			id: devUserId,
@@ -297,6 +303,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 		{ requestId, userId: event.locals.user?.id }
 	);
 
+	// CORS origin header on API responses
+	if (event.url.pathname.startsWith('/api/')) {
+		const allowedOrigin = dev ? '*' : (ENV.PUBLIC_API_URL || event.url.origin);
+		response.headers.set('Access-Control-Allow-Origin', allowedOrigin);
+	}
+
 	// Cross-origin isolation headers — required for SharedArrayBuffer / threaded WASM (ORT)
 	response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
 	response.headers.set('Cross-Origin-Embedder-Policy', 'require-corp');
@@ -317,7 +329,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 export const handleError: HandleServerError = ({ error, event }) => {
 	const errorId = crypto.randomUUID();
 
-	// Debug: log full stack trace to file for diagnosis
 	if (dev) {
 		const errMsg = error instanceof Error ? `${error.message}\n${error.stack}` : String(error);
 		const debugLine = `[${new Date().toISOString()}] ${event.url.pathname}: ${errMsg}\n---\n`;
@@ -335,3 +346,21 @@ export const handleError: HandleServerError = ({ error, event }) => {
 		code: errorId
 	};
 };
+
+// ── Graceful Shutdown Orchestrator ──────────────────────────────────────
+if (typeof process !== 'undefined') {
+	const shutdown = async (signal: string) => {
+		console.log(`[Shutdown] ${signal} received, closing connections...`);
+		try {
+			const { closeAllConnections } = await import('$lib/server/connections/connection-pool.js');
+			await closeAllConnections();
+		} catch (err) {
+			console.error('[Shutdown] Error closing connections:', (err as Error).message);
+		}
+		productionLogger.shutdown();
+		console.log('[Shutdown] All connections closed');
+	};
+
+	process.once('SIGINT', () => void shutdown('SIGINT'));
+	process.once('SIGTERM', () => void shutdown('SIGTERM'));
+}

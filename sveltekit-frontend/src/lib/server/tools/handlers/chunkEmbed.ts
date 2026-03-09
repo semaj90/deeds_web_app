@@ -2,7 +2,7 @@
  * chunk_embed Tool Handler
  *
  * Chunk documents and generate embeddings
- * Uses: content → chunker → embeddinggemma → Qdrant
+ * Uses: content -> chunker -> embeddinggemma -> Qdrant
  */
 
 import {
@@ -11,6 +11,7 @@ import {
   type ChunkEmbedRequest,
   type ToolResult
 } from '../registry.js';
+import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 
 const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
 const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
@@ -123,7 +124,7 @@ async function chunkEmbedHandler(request: ChunkEmbedRequest): Promise<ToolResult
   const strategy = request.chunking?.strategy ?? 'recursive';
   const chunkSize = request.chunking?.chunk_size ?? 512;
   const overlap = request.chunking?.overlap ?? 50;
-  const model = request.embedding?.model ?? 'embeddinggemma:latest';
+  const model = request.embedding?.model ?? SERVER_EMBEDDING_MODEL;
   const batchSize = request.embedding?.batch_size ?? 32;
   const collection = request.storage?.collection ?? 'embeddings';
 
@@ -204,8 +205,3 @@ toolRegistry.register({
 });
 
 export { chunkEmbedHandler };
-
-
-
-
-
