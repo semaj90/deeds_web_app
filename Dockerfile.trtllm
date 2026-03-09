@@ -1,80 +1,39 @@
-# Phase 70 TensorRT-LLM Dockerfile
-# Optimized for Python 3.12 + TensorRT 0.20.0 + CUDA 12.9 + RTX 3060 Ti
-# Reuses cached NVIDIA container layers - no downloads
+# TensorRT-LLM Dockerfile — Gemma3 12B INT4 Engine Builder + Inference
+# TRT-LLM v0.21.0+ (first version with Gemma3 VLM PyTorch backend support)
+# Target: RTX 3060 Ti (8GB VRAM), INT4 AWQ quantization
 
-FROM nvcr.io/nvidia/tensorrt-llm/release:latest
-
-# Copy and install local TensorRT repository
-COPY python_codebase/third_party_integrations/ubuntu_tensorrt/nv-tensorrt-local-repo-ubuntu2204-10.11.0-cuda-12.9_1.0-1_amd64.deb /tmp/
-RUN dpkg -i /tmp/nv-tensorrt-local-repo-ubuntu2204-10.11.0-cuda-12.9_1.0-1_amd64.deb && \
-    apt-get update && \
-    # You might need to specify a version here, e.g., apt-get install -y tensorrt-llm=<version>
-    apt-get install -y tensorrt-llm && \
-    rm /tmp/nv-tensorrt-local-repo-ubuntu2204-10.11.0-cuda-12.9_1.0-1_amd64.deb && \
-    rm -rf /var/lib/apt/lists/*
+FROM nvcr.io/nvidia/tensorrt-llm/release:v0.21.0
 
 # Set working directory
 WORKDIR /app
 
-# Install additional dependencies (small additions only)
+# Install dependencies for engine building + inference serving
 RUN pip install --no-cache-dir \
     fastapi==0.104.1 \
     uvicorn[standard]==0.24.0 \
-    transformers==4.45.0 \
+    transformers>=4.45.0 \
     pydantic==2.5.0 \
     httpx==0.25.2 \
-    python-multipart==0.0.6 \
-    sentence-transformers==2.7.0 \
-    chromadb==0.4.24 \
+    safetensors \
     redis==5.0.1 \
-    psycopg2-binary==2.9.9 \
-    pytesseract==0.3.13 \
-    beautifulsoup4==4.12.3 \
-    requests==2.31.0 \
-    tree-sitter==0.21.3 \
-    tree-sitter-typescript==0.21.2 \
-    tree-sitter-javascript==0.21.3 \
-    peft==0.11.1 \
-    bitsandbytes==0.43.1 \
-    accelerate==0.30.1
+    requests==2.31.0
 
-# Copy service files
-COPY python-services/ ./python-services/
-COPY tensor_services/ ./tensor_services/
-COPY engine-builder/ ./engine-builder/
-COPY training/ ./training/
+# Copy converter script for HF → TRT-LLM tensor remapping
+COPY hf_to_trt_gemma3_rank0.py /app/hf_to_trt_gemma3_rank0.py
+COPY validate_safetensors.py /app/validate_safetensors.py
 
-# Create directories for engines, models, and data
-RUN mkdir -p \
-    tensorrt_engines \
-    tokenizers \
-    models \
-    chroma_db \
-    training_data \
-    engines
-
-# Build TensorRT engine during container build
-# NOTE: Engine build happens at runtime when GPU is available
-# RUN cd tensor_services/engine-builder && python3 build_engine.py
-
-# Copy model files (these should be built separately)
-# COPY tensorrt_engines/ ./tensorrt_engines/
-# COPY tokenizers/ ./tokenizers/
-# COPY models/ ./models/
-
-# Copy startup script and make executable
-COPY tensor_services/engine-builder/start_tensorrt.sh /app/start_tensorrt.sh
-RUN chmod +x /app/start_tensorrt.sh
+# Create directories for model artifacts
+RUN mkdir -p /models/input /models/checkpoint /models/engine_int4
 
 # Set environment variables
 ENV PYTHONPATH=/app
 ENV CUDA_VISIBLE_DEVICES=0
-ENV TORCH_CUDA_DEVICE=0
-ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata/
+ENV CUDA_DEVICE_MAX_CONNECTIONS=1
+ENV TOKENIZERS_PARALLELISM=false
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD python3 -c "import tensorrt_llm; print('TensorRT-LLM OK')" || exit 1
 
-# Default command (builds engine then starts service)
-CMD ["/app/start_tensorrt.sh"]
+# Default: interactive shell for engine building
+CMD ["bash"]

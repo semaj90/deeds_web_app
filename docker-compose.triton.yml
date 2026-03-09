@@ -18,12 +18,14 @@ services:
       - "8098:8001"  # gRPC
       - "8097:8002"  # Metrics (Prometheus)
     volumes:
-      - ./triton-models:/models:ro
+      - ./triton_models:/models/model_repository:ro
+      - ./engines/gemma3_12b_int4:/models/gemma3_12b_int4:ro
       - ./triton-logs:/logs
     command: >
       tritonserver
-        --model-repository=/models
+        --model-repository=/models/model_repository
         --strict-model-config=false
+        --model-control-mode=explicit
         --backend-config=tensorrtllm,batching_type=inflight_fused_batching
         --backend-config=tensorrtllm,max_queue_delay_microseconds=1000
         --log-verbose=1

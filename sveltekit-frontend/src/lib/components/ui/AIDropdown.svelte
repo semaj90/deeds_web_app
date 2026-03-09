@@ -159,12 +159,12 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
       transitionConfig={{ duration: 150, y: -8 }}
     >
       <DropdownMenu.Group>
-        <DropdownMenu.Label
+        <div
           class="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b"
         >
           <Icon name="file-text" size={14} />
           Generate Report
-        </DropdownMenu.Label>
+        </div>
 
         {#each reportTypes as report (report.id)}
           <DropdownMenu.Item
@@ -194,12 +194,12 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
       <DropdownMenu.Separator class="h-px bg-muted my-1" />
 
       <DropdownMenu.Group>
-        <DropdownMenu.Label
+        <div
           class="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b"
         >
           <Icon name="brain" size={14} />
           AI Analysis
-        </DropdownMenu.Label>
+        </div>
 
         {#each aiTools as tool (tool.id)}
           <DropdownMenu.Item

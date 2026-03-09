@@ -1,6 +1,7 @@
 name: "gemma_legal"
-platform: "onnxruntime_onnx"
-max_batch_size: 8
+platform: "tensorrtllm"
+max_batch_size: 4
+
 input [
   {
     name: "input_ids"
@@ -13,13 +14,15 @@ input [
     dims: [ -1 ]
   }
 ]
+
 output [
   {
     name: "logits"
     data_type: TYPE_FP32
-    dims: [ -1, 256000 ]
+    dims: [ -1, 262208 ]
   }
 ]
+
 instance_group [
   {
     count: 1
@@ -27,18 +30,23 @@ instance_group [
     gpus: [ 0 ]
   }
 ]
+
 dynamic_batching {
-  preferred_batch_size: [ 4, 8 ]
-  max_queue_delay_microseconds: 100
+  preferred_batch_size: [ 1, 2, 4 ]
+  max_queue_delay_microseconds: 1000
 }
-optimization {
-  execution_accelerators {
-    gpu_execution_accelerator : [
-      {
-        name: "tensorrt"
-        parameters { key: "precision_mode" value: "FP16" }
-        parameters { key: "max_workspace_size_bytes" value: "2147483648" }
-      }
-    ]
-  }
+
+parameters {
+  key: "engine_dir"
+  value: { string_value: "/models/gemma3_12b_int4" }
+}
+
+parameters {
+  key: "max_tokens_in_paged_kv_cache"
+  value: { string_value: "4096" }
+}
+
+parameters {
+  key: "batch_scheduler_policy"
+  value: { string_value: "inflight_fused_batching" }
 }
