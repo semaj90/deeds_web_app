@@ -86,7 +86,7 @@ export async function embedAndCompare(
 
 	// Step 3: Compress for transport if needed
 	if (result.similarities) {
-		const response: QLoRAProtobufTopologyResponse = {
+		const response = {
 			prediction: {
 				type: 'embedding_similarity',
 				confidence: 0.95,

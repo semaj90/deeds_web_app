@@ -8,51 +8,11 @@
  * Import from '$lib/services-clean' instead of '$lib/services/...'
  * to avoid pulling corrupted siblings into the TS module graph.
  *
- * Clean files (7 migrated + 2 dependencies):
- *   - ai-service.ts          (AI query processing, embeddings, vector search)
- *   - case-link.service.ts   (Case-statute linking, Redis cache)
- *   - agentic-stream.ts      (Ollama streaming + TRT-LLM stub)
- *   - agentShellMachine.ts   (Lightweight state machine, no xstate)
- *   - adaptive-index-orchestrator.ts (Index optimization)
- *   - ai-error-fixer.ts      (Automated error analysis)
- *   - client-server-sync.ts  (Sync operations)
- *   - ollamaService.ts       (Ollama client wrapper)
- *   - get-ollama-endpoint.ts (Endpoint resolution utility)
+ * Most service files were archived during consolidation (March 2026).
+ * Only 2 files remain in src/lib/services/:
+ *   - get-ollama-endpoint.ts  (Endpoint resolution utility)
+ *   - ollamaService.ts        (Ollama client wrapper)
  */
-
-// ─── Core AI Services ───
-export { AIService, aiService } from './services/ai-service';
-export type { AIAnalysisResult, AIQueryOptions, VectorSearchResult } from './services/ai-service';
-
-// ─── Agentic Streaming ───
-export {
-  runAIAgentStream,
-  streamFromOllama,
-  generateEmbedding,
-  chatCompletion,
-  executeAITool,
-  getOllamaEndpoint as getStreamEndpoint,
-  GENERATION_MODEL,
-  EMBEDDING_MODEL,
-} from './services/agentic-stream';
-
-// ─── Case-Statute Linking ───
-export { caseLinkService } from './services/case-link.service';
-export type { CaseStatuteLink, LinkCaseStatuteRequest } from './services/case-link.service';
-
-// ─── Agent Shell State Machine ───
-export { createAgentShellMachine } from './services/agentShellMachine';
-
-// ─── Adaptive Index Orchestrator ───
-export { AdaptiveIndexOrchestrator } from './services/adaptive-index-orchestrator';
-
-// ─── AI Error Fixer ───
-export { AIErrorFixer } from './services/ai-error-fixer';
-
-// ─── Client-Server Sync ───
-// Note: client-server-sync module excluded from build - import directly if needed
-// export { ClientServerSyncService, syncService, syncStatus, offlineCapabilities, isOnline, canSync } from './services/client-server-sync';
-// export type { SyncStatus, SyncOperation } from './services/client-server-sync';
 
 // ─── Ollama Endpoint Utility ───
 export { getOllamaEndpoint, DEFAULT_OLLAMA } from './services/get-ollama-endpoint';
@@ -60,21 +20,12 @@ export { getOllamaEndpoint, DEFAULT_OLLAMA } from './services/get-ollama-endpoin
 // ─── Ollama Service (client wrapper) ───
 export { OllamaService } from './services/ollamaService';
 
-// ─── Neural Sprite Autoencoder ───
-export { default as NeuralSpriteAutoencoder } from './services/neural-sprite-autoencoder';
-export type { Latent, AutoencoderOptions } from './services/neural-sprite-autoencoder';
-
-// ─── Pipeline V2 (Ingestion & Vector DB) ───
-// NOTE: These modules will be created as part of pipeline-v2 implementation
-// export { PipelineOrchestrator, pipelineOrchestrator } from './services/pipeline-orchestrator';
-// export { QdrantService, qdrantService } from './services/qdrant-service';
-
-// ─── PNG Tensor Embedding ───
-export {
-  PNGEmbedExtractor,
-  embedLegalMetadata,
-  extractLegalMetadata,
-  createPortableEvidence,
-  validatePortableEvidence
-} from './services/png-embed-extractor';
-export type { LegalAIMetadata, RiskAssessment, LegalEntity } from './services/png-embed-extractor';
+// ─── Archived Services (consolidated into canonical server modules) ───
+// ai-service → $lib/server/ollama.ts + $lib/server/ai/embeddings.ts
+// agentic-stream → $lib/server/streaming/chunked-response.ts
+// case-link.service → $lib/server/db/schema-postgres.ts (caseStatuteLinks)
+// agentShellMachine → $lib/server/agent/autonomous-agent.ts
+// adaptive-index-orchestrator → $lib/server/vector/qdrant-manager.ts
+// ai-error-fixer → $lib/server/analysis/
+// neural-sprite-autoencoder → archived to deeds_labs/
+// png-embed-extractor → archived to deeds_labs/

@@ -103,11 +103,6 @@ export const DEV_TOOLS = {
 // Hybrid Vector Operations
 // export { getVectorSystemHealth, syncVectorData } from './services/hybrid-vector-operations.js';
 
-// Search Types
-export type {
-    SearchCategory, SearchFilter,
-    SearchOptions, SearchResult, SearchState
-} from './types/search.types.js';
 export * from './utils.js';
 
 // Default export for convenience
