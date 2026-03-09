@@ -1,11 +1,18 @@
+/**
+ * N-API Native Addon: tensorrt_bridge
+ *
+ * Exposes GPU-accelerated functions to Node.js via TypedArrays:
+ *   - bridgeSIMD(json: string) → number
+ *   - checkCudaAvailable() → number (1 = CUDA, 0 = CPU)
+ *   - graphSimilarity(Float32Array, n, dim) → Float32Array[n*n]
+ *   - clusterEmbeddings(Float32Array, n, dim, k, maxIters) → Int32Array[n]
+ *   - computeCaseEmbedding(Float32Array weights, Float32Array embeddings, n, dim) → Float32Array[dim]
+ */
+
 #include <cassert>
 #if __has_include(<node_api.h>)
 #include <node_api.h>
 #else
-// Minimal fallback types & declarations so static analysis / non-node builds
-// compile. These are intentionally minimal and only include what's needed by
-// this file. When building as a real Node addon, the real <node_api.h> will be
-// used instead.
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -15,123 +22,58 @@ typedef void *napi_value;
 typedef void *napi_callback_info;
 typedef int32_t napi_status;
 typedef int32_t napi_valuetype;
+typedef int32_t napi_typedarray_type;
 
 enum { napi_ok = 0 };
 enum { napi_string = 1 };
+enum { napi_float32_array = 0, napi_int32_array = 4 };
 
 #define NAPI_AUTO_LENGTH ((size_t)-1)
 
 extern "C" {
-napi_status napi_get_cb_info(napi_env env, napi_callback_info info,
-                             size_t *argc, napi_value *argv,
-                             napi_value *this_arg, void **data);
-napi_status napi_throw_error(napi_env env, const char *code, const char *msg);
-napi_status napi_throw_type_error(napi_env env, const char *code,
-                                  const char *msg);
-napi_status napi_typeof(napi_env env, napi_value value, napi_valuetype *result);
-napi_status napi_get_value_string_utf8(napi_env env, napi_value value,
-                                       char *buf, size_t bufsize,
-                                       size_t *result);
-napi_status napi_create_int32(napi_env env, int32_t value, napi_value *result);
-napi_status napi_create_function(napi_env env, const char *utf8name,
-                                 size_t length,
-                                 napi_value (*cb)(napi_env, napi_callback_info),
-                                 void *data, napi_value *result);
-napi_status napi_set_named_property(napi_env env, napi_value object,
-                                    const char *utf8name, napi_value value);
+napi_status napi_get_cb_info(napi_env, napi_callback_info, size_t*, napi_value*, napi_value*, void**);
+napi_status napi_throw_error(napi_env, const char*, const char*);
+napi_status napi_throw_type_error(napi_env, const char*, const char*);
+napi_status napi_typeof(napi_env, napi_value, napi_valuetype*);
+napi_status napi_get_value_string_utf8(napi_env, napi_value, char*, size_t, size_t*);
+napi_status napi_get_value_int32(napi_env, napi_value, int32_t*);
+napi_status napi_create_int32(napi_env, int32_t, napi_value*);
+napi_status napi_create_function(napi_env, const char*, size_t, napi_value(*)(napi_env, napi_callback_info), void*, napi_value*);
+napi_status napi_set_named_property(napi_env, napi_value, const char*, napi_value);
+napi_status napi_get_typedarray_info(napi_env, napi_value, napi_typedarray_type*, size_t*, void**, napi_value*, size_t*);
+napi_status napi_create_typedarray(napi_env, napi_typedarray_type, size_t, napi_value, size_t, napi_value*);
+napi_status napi_create_arraybuffer(napi_env, size_t, void**, napi_value*);
 }
 
-// Add a simple stub so non-Node builds / static analysis won't fail on the
-// NAPI_MODULE(...) use at the bottom of this file.
 #ifndef NAPI_MODULE
-#define NAPI_MODULE(modname, regfunc) /* NAPI_MODULE stub for non-Node builds  \
-                                       */
+#define NAPI_MODULE(modname, regfunc)
 #endif
-
 #endif
 
 #include <vector>
+#include <cstring>
 
+// External C functions from other compilation units
 extern "C" int bridgeSIMDToTensorRT(const char* json);
 
-// LibTorch graph analysis functions (libtorch_graph.cc)
+// LibTorch graph analysis (libtorch_graph.cc)
 extern "C" int graphSimilarity(const float* embeddings, int n, int dim, float* output, int output_len);
 extern "C" int clusterEmbeddings(const float* embeddings, int n, int dim, int k, int max_iters, int* assignments, int assignments_len);
 extern "C" int computeCaseEmbedding(const float* weights, int n, const float* embeddings, int dim, float* output, int output_len);
 extern "C" int checkCudaAvailable();
 
-// Helper: throw a JS TypeError and return nullptr for convenience
+// ── Helpers ──────────────────────────────────────────────────────────
+
 static napi_value throw_type_error(napi_env env, const char *msg) {
   napi_throw_type_error(env, nullptr, msg);
   return nullptr;
 }
 
-static napi_value BridgeSIMD(napi_env env, napi_callback_info info) {
-  size_t argc = 1;
-  napi_value argv[1];
-  napi_value this_arg;
-  void *data;
-
-  napi_status status =
-      napi_get_cb_info(env, info, &argc, argv, &this_arg, &data);
-  if (status != napi_ok) {
-    napi_throw_error(env, nullptr, "Failed to get callback info");
-    return nullptr;
-  }
-
-  if (argc < 1) {
-    return throw_type_error(env, "Expected one argument (JSON string)");
-  }
-
-  napi_valuetype t;
-  status = napi_typeof(env, argv[0], &t);
-  if (status != napi_ok) {
-    napi_throw_error(env, nullptr, "Failed to get argument type");
-    return nullptr;
-  }
-
-  if (t != napi_string)
-    return throw_type_error(env, "Expected a JSON string as first argument");
-
-  size_t str_len = 0;
-  status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &str_len);
-  if (status != napi_ok) {
-    napi_throw_error(env, nullptr, "Failed to get string length");
-    return nullptr;
-  }
-
-  // Allocate buffer for string + null
-  std::vector<char> buf(str_len + 1);
-  status = napi_get_value_string_utf8(env, argv[0], buf.data(), buf.size(),
-                                      &str_len);
-  if (status != napi_ok) {
-    napi_throw_error(env, nullptr, "Failed to get string value");
-    return nullptr;
-  }
-  buf[str_len] = '\0';
-
-  // Call into the native bridge (user-provided)
-  int r = bridgeSIMDToTensorRT(buf.data());
-
-  napi_value result;
-  status = napi_create_int32(env, r, &result);
-  if (status != napi_ok) {
-    napi_throw_error(env, nullptr, "Failed to create int32 result");
-    return nullptr;
-  }
-  return result;
+static napi_value throw_error(napi_env env, const char *msg) {
+  napi_throw_error(env, nullptr, msg);
+  return nullptr;
 }
 
-// N-API wrapper: checkCudaAvailable() → boolean
-static napi_value CheckCuda(napi_env env, napi_callback_info info) {
-  (void)info;
-  int available = checkCudaAvailable();
-  napi_value result;
-  napi_create_int32(env, available, &result);
-  return result;
-}
-
-// Helper: register a named function on exports
 static napi_status registerFn(napi_env env, napi_value exports,
                                const char* name,
                                napi_value (*cb)(napi_env, napi_callback_info)) {
@@ -141,9 +83,159 @@ static napi_status registerFn(napi_env env, napi_value exports,
   return napi_set_named_property(env, exports, name, fn);
 }
 
+// ── BridgeSIMD(json: string) → number ───────────────────────────────
+
+static napi_value BridgeSIMD(napi_env env, napi_callback_info info) {
+  size_t argc = 1;
+  napi_value argv[1];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+
+  if (argc < 1) return throw_type_error(env, "Expected one argument (JSON string)");
+
+  napi_valuetype t;
+  napi_typeof(env, argv[0], &t);
+  if (t != napi_string) return throw_type_error(env, "Expected a JSON string");
+
+  size_t str_len = 0;
+  napi_get_value_string_utf8(env, argv[0], nullptr, 0, &str_len);
+  std::vector<char> buf(str_len + 1);
+  napi_get_value_string_utf8(env, argv[0], buf.data(), buf.size(), &str_len);
+  buf[str_len] = '\0';
+
+  int r = bridgeSIMDToTensorRT(buf.data());
+  napi_value result;
+  napi_create_int32(env, r, &result);
+  return result;
+}
+
+// ── CheckCuda() → number (1=CUDA, 0=CPU) ────────────────────────────
+
+static napi_value CheckCuda(napi_env env, napi_callback_info info) {
+  (void)info;
+  napi_value result;
+  napi_create_int32(env, checkCudaAvailable(), &result);
+  return result;
+}
+
+// ── GraphSimilarity(Float32Array, n, dim) → Float32Array[n*n] ────────
+
+static napi_value GraphSimilarityWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 3;
+  napi_value argv[3];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+
+  if (argc < 3) return throw_type_error(env, "graphSimilarity(Float32Array, n, dim)");
+
+  // Get typed array data
+  napi_typedarray_type arr_type;
+  size_t arr_len;
+  void* arr_data;
+  napi_get_typedarray_info(env, argv[0], &arr_type, &arr_len, &arr_data, nullptr, nullptr);
+
+  int32_t n, dim;
+  napi_get_value_int32(env, argv[1], &n);
+  napi_get_value_int32(env, argv[2], &dim);
+
+  if (n <= 0 || dim <= 0 || (size_t)(n * dim) > arr_len)
+    return throw_type_error(env, "Invalid dimensions for embeddings array");
+
+  // Allocate output: n*n float32 values
+  int output_len = n * n;
+  void* out_data;
+  napi_value arraybuffer;
+  napi_create_arraybuffer(env, output_len * sizeof(float), &out_data, &arraybuffer);
+
+  int rc = graphSimilarity((const float*)arr_data, n, dim, (float*)out_data, output_len);
+  if (rc != 0) return throw_error(env, "graphSimilarity failed (GPU/CPU error)");
+
+  napi_value result;
+  napi_create_typedarray(env, napi_float32_array, output_len, arraybuffer, 0, &result);
+  return result;
+}
+
+// ── ClusterEmbeddings(Float32Array, n, dim, k, maxIters) → Int32Array[n] ─
+
+static napi_value ClusterEmbeddingsWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 5;
+  napi_value argv[5];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+
+  if (argc < 5) return throw_type_error(env, "clusterEmbeddings(Float32Array, n, dim, k, maxIters)");
+
+  napi_typedarray_type arr_type;
+  size_t arr_len;
+  void* arr_data;
+  napi_get_typedarray_info(env, argv[0], &arr_type, &arr_len, &arr_data, nullptr, nullptr);
+
+  int32_t n, dim, k, max_iters;
+  napi_get_value_int32(env, argv[1], &n);
+  napi_get_value_int32(env, argv[2], &dim);
+  napi_get_value_int32(env, argv[3], &k);
+  napi_get_value_int32(env, argv[4], &max_iters);
+
+  if (n <= 0 || dim <= 0 || k <= 0 || (size_t)(n * dim) > arr_len)
+    return throw_type_error(env, "Invalid dimensions for cluster input");
+
+  // Allocate output: n int32 assignments
+  void* out_data;
+  napi_value arraybuffer;
+  napi_create_arraybuffer(env, n * sizeof(int32_t), &out_data, &arraybuffer);
+
+  int rc = clusterEmbeddings((const float*)arr_data, n, dim, k, max_iters, (int*)out_data, n);
+  if (rc != 0) return throw_error(env, "clusterEmbeddings failed (GPU/CPU error)");
+
+  napi_value result;
+  napi_create_typedarray(env, napi_int32_array, n, arraybuffer, 0, &result);
+  return result;
+}
+
+// ── ComputeCaseEmbedding(Float32Array weights, Float32Array embeddings, n, dim) → Float32Array[dim] ─
+
+static napi_value ComputeCaseEmbeddingWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 4;
+  napi_value argv[4];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+
+  if (argc < 4) return throw_type_error(env, "computeCaseEmbedding(Float32Array weights, Float32Array embeddings, n, dim)");
+
+  // Weights array
+  size_t w_len;
+  void* w_data;
+  napi_get_typedarray_info(env, argv[0], nullptr, &w_len, &w_data, nullptr, nullptr);
+
+  // Embeddings array
+  size_t e_len;
+  void* e_data;
+  napi_get_typedarray_info(env, argv[1], nullptr, &e_len, &e_data, nullptr, nullptr);
+
+  int32_t n, dim;
+  napi_get_value_int32(env, argv[2], &n);
+  napi_get_value_int32(env, argv[3], &dim);
+
+  if (n <= 0 || dim <= 0 || (size_t)n > w_len || (size_t)(n * dim) > e_len)
+    return throw_type_error(env, "Invalid dimensions for weighted embedding input");
+
+  // Allocate output: dim float32 values
+  void* out_data;
+  napi_value arraybuffer;
+  napi_create_arraybuffer(env, dim * sizeof(float), &out_data, &arraybuffer);
+
+  int rc = computeCaseEmbedding((const float*)w_data, n, (const float*)e_data, dim, (float*)out_data, dim);
+  if (rc != 0) return throw_error(env, "computeCaseEmbedding failed (GPU/CPU error)");
+
+  napi_value result;
+  napi_create_typedarray(env, napi_float32_array, dim, arraybuffer, 0, &result);
+  return result;
+}
+
+// ── Module Init ──────────────────────────────────────────────────────
+
 static napi_value Init(napi_env env, napi_value exports) {
   registerFn(env, exports, "bridgeSIMD", BridgeSIMD);
   registerFn(env, exports, "checkCudaAvailable", CheckCuda);
+  registerFn(env, exports, "graphSimilarity", GraphSimilarityWrapper);
+  registerFn(env, exports, "clusterEmbeddings", ClusterEmbeddingsWrapper);
+  registerFn(env, exports, "computeCaseEmbedding", ComputeCaseEmbeddingWrapper);
   return exports;
 }
 
