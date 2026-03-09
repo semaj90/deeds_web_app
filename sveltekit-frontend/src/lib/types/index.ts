@@ -1,9 +1,5 @@
 // src/lib/types/index.ts
 
-// Re-export database types
-export type {
-    Criminal, NewCase, NewChatMessage, NewCriminal, NewDocument, NewEvidence, NewUser
-} from './database-types';
 
 export interface CanvasState {
   id: string;
@@ -72,58 +68,7 @@ export type {
     VectorSearchResult
 } from './database.js';
 
-// ============================================================================
-// ENDPOINT 2: ADMIN API RESPONSE TYPES
-// ============================================================================
-export type {
-    // Admin actions
-    AdminActionResponse,
-    // Configuration
-    AdminConfigResponse, AdminConfiguration, AdminHealth, AdminHealthData,
-    // Health checks
-    AdminHealthResponse, AdminStatus,
-    // Admin status
-    AdminStatusResponse, AuditLog, AuditLogPagination,
-    // Audit logs
-    AuditLogResponse, CPUMetrics, CacheClearResponse, CacheConfig,
-    // Cache status
-    CacheStatus, DatabaseConfig, DatabaseMaintenanceResponse, DatabaseQueryStats,
-    // Database status
-    DatabaseStatus, DiskMetrics, GPUConfig, IndexInfo, MemoryMetrics, MessageQueueConfig,
-    // Message queue status
-    MessageQueueStatus, NetworkMetrics, QueueInfo, SecurityConfig, ServiceHealth, ServiceHealthStatus, ServiceRestartResponse, ServiceStatus, StorageConfig,
-    // System metrics
-    SystemMetrics, VectorStoreConfig,
-    // Vector store status
-    VectorStoreStatus
-} from './admin.js';
-
-// ============================================================================
-// ENDPOINT 3: WORKER/CLUSTER STATE TYPES
-// ============================================================================
-export type {
-    AutotagJob,
-    // Autotag worker
-    AutotagWorkerStatus,
-    // Job queues
-    BackgroundJob,
-    // Background workers
-    BackgroundWorkerStatus, CPUUsage,
-    // Cluster commands
-    ClusterCommandResponse,
-    // Cluster events
-    ClusterEvent, ClusterEventStreamResponse, ClusterMetadata, ClusterRestartResponse, ClusterStatus, ClusterStatusResponse, EmbeddingJob,
-    // Embedding worker
-    EmbeddingWorkerStatus, FileProcessingProgress, FileProcessingStage, FileUploadBatchResponse, FileUploadInfo,
-    // File upload & processing
-    FileUploadJob, FileUploadResponse, JobBatchResponse, JobQueueStats, JobStatusResponse, OCRJob,
-    // OCR worker
-    OCRWorkerStatus, ProcessInfo,
-    // Process types
-    ProcessMemory,
-    // Cluster status
-    Worker, WorkerHealthCheckResponse, WorkerMetrics, WorkerPool, WorkerScaleResponse
-} from './cluster.js';
+// Admin and cluster types were archived (admin.ts, cluster.ts deleted)
 
 // Replace wildcard re-export of: './search' (causes duplicate top-level symbols)
 // and keep top-level re-exports from './api.js'.

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { appState, cleanupStores, initializeStores, tokenTracker, userPrefs } from '$lib/stores';
+    import { appState, cleanupStores, initializeStores } from '$lib/stores';
     import type { Snippet } from 'svelte';
     import { onMount } from 'svelte';
     import CaseDocumentWriter from '$lib/components/legal-ai/CaseDocumentWriter.svelte';

@@ -1,31 +1,14 @@
 /**
- * PHASE 107 - Restored Store Barrel
- * Unified entrance for reactive Svelte 5 stores
+ * Store barrel — re-exports for $lib/stores imports
  */
-
 export { appState } from './appState.svelte.js';
-export { authStore } from './auth-store.svelte.js';
 export { userPrefs } from './preferences.svelte.js';
-export { tokenTracker } from './tokenUsage.svelte.js';
 export { userStore } from './user.svelte.js';
-export { notificationStore } from './notifications.svelte.js';
-export { chatStore } from './chat-store.svelte.js';
-export { gpuSummaryStore } from './gpu-summary-store.svelte.js';
-export { KnowledgeSearchStore } from './knowledge-search.svelte.js';
-export { searchStore } from './search.svelte.js';
-export { appStore } from './app-store.svelte.js';
 
-/**
- * Initialization function for barrel stores
- */
 export function initializeStores() {
-  console.log('[Barrel Store] Reactive stores initialized');
-  // Initialize auth store if needed
+  // Stores auto-initialize via $state — no-op entry point
 }
 
-/**
- * Cleanup function for barrel stores
- */
 export function cleanupStores() {
-  // Logic for cleaning up effects or subscriptions if needed
+  // Cleanup logic if needed
 }
