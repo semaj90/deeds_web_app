@@ -445,7 +445,7 @@ All candidates below have been **individually verified** against barrel exports,
 
 These have **zero imports, zero barrel exports, zero dynamic imports** anywhere in the codebase.
 
-#### Bucket A: Corrupted Orphans (safe to archive immediately)
+#### Bucket A: Corrupted Orphans — ARCHIVED
 
 | Component | Path | Lines | Corruption Type |
 |-----------|------|-------|----------------|
@@ -458,19 +458,19 @@ These have **zero imports, zero barrel exports, zero dynamic imports** anywhere 
 | CaseDetailPage | `CaseDetailPage.svelte` (root) | ~60 | Broken destructuring, corrupted |
 | UnifiedCanvasIntegration | `canvas/UnifiedCanvasIntegration.svelte` | 20 | Deprecated stub (Session 64 comment) |
 
-**Action**: Archive to `deeds_labs/archived-dead-files/orphan-components-2026-03/`
+**Status**: All 8 archived to `deeds_labs/archived-dead-files/orphan-components-2026-03/` on 2026-03-08.
 
-#### Bucket B: Clean But Unused Orphans (review before archiving)
+#### Bucket B: Clean Orphans — WIRED TO ROUTES
 
-| Component | Path | Lines | Notes |
-|-----------|------|-------|-------|
-| AIRecommendation | `ai/AIRecommendation.svelte` | 40 | Loads recommendations from clientCache — functional but unused |
-| ChatContextPanel | `ChatContextPanel.svelte` | 20 | References chat-context store — functional but unused |
-| FileUploadSection | `FileUploadSection.svelte` | ~40 | Clean props + Icon usage; type ref in `components.ts` only |
-| StatuteResultsList | `legal-ai/StatuteResultsList.svelte` | ~30 | Clean, proper `onselect` callback — candidate for statute search feature |
-| StatuteSearchBar | `legal-ai/StatuteSearchBar.svelte` | ~30 | Clean, `onsearch`/`onclear` callbacks — pairs with StatuteResultsList |
+| Component | Path | Lines | Wired To |
+|-----------|------|-------|----------|
+| AIRecommendation | `ai/AIRecommendation.svelte` | 96 | `/terminal` — chat history suggestions widget |
+| ChatContextPanel | `ChatContextPanel.svelte` | 95 | `/terminal` — pinned context panel (rewritten Svelte 5) |
+| FileUploadSection | `FileUploadSection.svelte` | 130 | `/evidence` — Quick Upload toggle with drag-drop |
+| StatuteResultsList | `legal-ai/StatuteResultsList.svelte` | 212 | `/global-search` — statute results renderer |
+| StatuteSearchBar | `legal-ai/StatuteSearchBar.svelte` | 204 | `/global-search` — statute filter panel |
 
-**Action**: Review for potential wiring to routes. If not needed, archive.
+**Status**: All 5 wired to routes on 2026-03-08. ChatContextPanel rewritten from Svelte 4 `$store` to Svelte 5 `$state`/`$effect`.
 
 #### Bucket C: Schema-Referenced (keep for now)
 
@@ -554,15 +554,15 @@ These components exist in multiple locations but are ALL actively used (not cand
 
 ---
 
-### Recommendations
+### Recommendations — Status
 
-#### Immediate (no risk)
-1. Archive the 8 **corrupted orphans** from Bucket A — zero value, can't be used
-2. Verify the 5 **clean orphans** from Bucket B against feature roadmap before archiving
+#### Completed
+1. ~~Archive the 8 **corrupted orphans** from Bucket A~~ — **DONE** (archived 2026-03-08)
+2. ~~Verify the 5 **clean orphans** from Bucket B~~ — **DONE** (all 5 wired to routes 2026-03-08)
+3. ~~StatuteResultsList + StatuteSearchBar~~ — **DONE** (wired to `/global-search` statute mode)
+4. ~~AIRecommendation~~ — **DONE** (wired to `/terminal` as chat history suggestions)
 
 #### Future consideration
-3. **StatuteResultsList + StatuteSearchBar** are clean and could be wired to a statute search route if that feature is planned
-4. **AIRecommendation** has functional recommendation-loading code that could integrate with the existing RecommendationEngine
 5. **EvidenceCard** 4-way duplication is intentional (showcase) but could be consolidated to 2 (basic + rich) if desired
 
 #### Do NOT archive

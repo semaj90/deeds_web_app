@@ -15,8 +15,14 @@
  */
 import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
+import type { embedding } from '$lib/generated/proto/embedding_pb.js';
 
 // ── Types ──────────────────────────────────────────────────────────────────
+
+/** Re-export proto interfaces for consumers */
+export type ProtoEmbeddingRequest = embedding.IEmbeddingRequest;
+export type ProtoEmbeddingResponse = embedding.IEmbeddingResponse;
+export type ProtoHealthResponse = embedding.IHealthResponse;
 
 export interface EmbeddingResult {
 	vectors: number[][];
@@ -84,9 +90,9 @@ async function generateViaGrpc(texts: string[], timeoutMs = 5000): Promise<numbe
 		const deadline = new Date(Date.now() + timeoutMs);
 
 		client.generateEmbeddings(
-			{ chunks, batchSize: texts.length, normalize: true, maxLength: 512 },
+			{ chunks, batchSize: texts.length, normalize: true, maxLength: 512 } satisfies embedding.IEmbeddingRequest,
 			{ deadline },
-			(err: any, response: any) => {
+			(err: Error | null, response: embedding.IEmbeddingResponse) => {
 				if (err) {
 					console.warn('[embedding-client] gRPC call failed:', err.message);
 					resolve(null);
@@ -298,7 +304,7 @@ export async function checkGrpcHealth(): Promise<{
 
 	return new Promise((resolve) => {
 		const deadline = new Date(Date.now() + 3000);
-		client.health({ service: 'embedding' }, { deadline }, (err: any, response: any) => {
+		client.health({ service: 'embedding' } satisfies embedding.IHealthRequest, { deadline }, (err: Error | null, response: embedding.IHealthResponse) => {
 			if (err) {
 				resolve({ ...base, available: false });
 				return;

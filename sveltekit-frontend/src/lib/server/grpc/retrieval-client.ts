@@ -12,8 +12,9 @@
  *   RETRIEVAL_GRPC_ENABLED — "true" to enable gRPC path (default: "false")
  */
 import { ENV } from '$lib/server/env.server.js';
+import type { yorha } from '$lib/generated/proto/retrieval_pb.js';
 
-// ── Types (mirror retrieval.proto messages) ─────────────────────────────
+// ── Types (mirror retrieval.proto messages — validated against generated types) ─
 
 export interface EvidenceSearchParams {
 	query: string;
@@ -162,7 +163,7 @@ export async function searchEvidenceViaGrpc(
 				jurisdiction: params.jurisdiction ?? ''
 			},
 			{ deadline },
-			(err: any, response: any) => {
+			(err: Error | null, response: yorha.retrieval.IEvidenceSearchResponse) => {
 				if (err) {
 					console.warn('[retrieval-client] gRPC SearchEvidence failed:', err.message);
 					resolve(null);
