@@ -6,6 +6,8 @@ import { ENV } from '$lib/server/env.server.js';
 import { loadCodebaseContext } from '$lib/server/retrieval/codebase-context.js';
 import { getGraphContext } from '$lib/server/retrieval/graph-context.js';
 import { lookupCachedResponse, storeCachedResponse } from '$lib/server/ai/llm-cache.js';
+import { getFragment, setFragment, getGlyphCacheMetrics, FragmentType } from '$lib/server/glyph-prompt-cache.js';
+import { createHash } from 'crypto';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const QDRANT_URL = ENV.QDRANT_URL;
@@ -293,32 +295,84 @@ export const POST: RequestHandler = async ({ request }) => {
 
 			send({ id, role: 'assistant', content: '', status: 'thinking' });
 
-			// Case context: strict UUID validation
+			// L0.5 Glyph Cache: emit diagnostic metrics
+			const glyphMetrics = getGlyphCacheMetrics();
+			if (glyphMetrics.entries > 0) {
+				console.log(`[Glyph L0.5] ${glyphMetrics.entries} entries, hit rate: ${(glyphMetrics.hitRate * 100).toFixed(1)}%, compression: ${(glyphMetrics.avgCompressionRatio * 100).toFixed(0)}%`);
+			}
+
+			// ── L0.5 Intercept 1: Case Context ──────────────────────────
+			// Cache case context per caseId (10min TTL) — identical for every
+			// message in a conversation, saves 1 DB query + 2 evidence/citation queries
 			let caseContext: string | null = null;
 			const caseMatch = conversationId.match(CASE_ID_PATTERN);
 			if (caseMatch) {
-				caseContext = await loadCaseContext(caseMatch[1]);
+				const caseGlyphKey = `glyph:case:${caseMatch[1]}`;
+				caseContext = getFragment(caseGlyphKey);
+				if (caseContext) {
+					console.log(`[Glyph L0.5] Case context HIT (${caseContext.length} chars)`);
+				} else {
+					caseContext = await loadCaseContext(caseMatch[1]);
+					if (caseContext) {
+						setFragment(caseGlyphKey, caseContext, FragmentType.CASE, 10 * 60_000);
+					}
+				}
 			}
 
 			// Code-intent gate: only run codebase retrieval for code-related queries
 			const CODE_HINT = /(svelte|sveltekit|drizzle|ts-morph|playwright|hooks\.server|schema-postgres|route|endpoint|api\/|\.ts\b|\.svelte\b|stack trace|error|typescrip|build|vite|qdrant|rabbitmq|proto|grpc|function|handler|component|database|query|schema|migration|server)/i;
 			const wantsCode = CODE_HINT.test(message) || message.includes('in this repo') || message.includes('codebase');
 
-			// RAG + Codebase + KAG: retrieve all context sources in parallel
+			// RAG + Codebase: retrieve context sources in parallel
 			const caseUuid = caseMatch ? caseMatch[1] : undefined;
-			const [contextDocs, codebaseResult] = await Promise.all([
+
+			// ── L0.5 Intercept 2: Codebase Context ──────────────────────
+			// Cache codebase retrieval by query hash (5min TTL)
+			let codebaseResult: { context: string; chunks: Array<{ relativePath: string; symbol: string; score: number }> } | null = null;
+			let codeGlyphHit = false;
+			if (wantsCode) {
+				const codeGlyphKey = `glyph:code:${createHash('md5').update(message).digest('hex').slice(0, 12)}`;
+				const cachedCodeCtx = getFragment(codeGlyphKey);
+				if (cachedCodeCtx) {
+					codebaseResult = { context: cachedCodeCtx, chunks: [] };
+					codeGlyphHit = true;
+					console.log(`[Glyph L0.5] Codebase context HIT (${cachedCodeCtx.length} chars)`);
+				}
+			}
+
+			const [contextDocs, freshCodebaseResult] = await Promise.all([
 				retrieveContext(message),
-				wantsCode ? loadCodebaseContext(message).catch(() => null) : Promise.resolve(null)
+				(wantsCode && !codeGlyphHit) ? loadCodebaseContext(message).catch(() => null) : Promise.resolve(null)
 			]);
+
+			// If we got fresh codebase context, cache it in L0.5
+			if (freshCodebaseResult && !codeGlyphHit) {
+				codebaseResult = freshCodebaseResult;
+				const codeGlyphKey = `glyph:code:${createHash('md5').update(message).digest('hex').slice(0, 12)}`;
+				setFragment(codeGlyphKey, freshCodebaseResult.context, FragmentType.CODE, 5 * 60_000);
+			}
+
 			const contextUsed = contextDocs.map((d) => d.documentId);
 
-			// KAG: 1-hop graph traversal for related evidence (non-blocking)
+			// ── L0.5 Intercept 3: KAG Graph Context ─────────────────────
+			// Cache graph traversal by evidence ID set (10min TTL)
 			let graphContext: { context: string; neighbors: Array<{ nodeId: string; title: string }> } | null = null;
 			if (contextDocs.length > 0) {
 				const evidenceIds = contextDocs
 					.map(d => d.documentId.split(':').pop())
 					.filter((id): id is string => !!id);
-				graphContext = await getGraphContext(evidenceIds, caseUuid).catch(() => null);
+
+				const kagGlyphKey = `glyph:kag:${createHash('md5').update(evidenceIds.sort().join(',')).digest('hex').slice(0, 12)}`;
+				const cachedKag = getFragment(kagGlyphKey);
+				if (cachedKag) {
+					graphContext = { context: cachedKag, neighbors: [] };
+					console.log(`[Glyph L0.5] KAG graph context HIT (${cachedKag.length} chars)`);
+				} else {
+					graphContext = await getGraphContext(evidenceIds, caseUuid).catch(() => null);
+					if (graphContext) {
+						setFragment(kagGlyphKey, graphContext.context, FragmentType.KAG, 10 * 60_000);
+					}
+				}
 			}
 
 			let systemPrompt =
