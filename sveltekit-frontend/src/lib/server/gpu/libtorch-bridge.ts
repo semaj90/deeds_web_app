@@ -9,7 +9,8 @@
  * Falls back to CPU-only JS implementations if addon unavailable.
  */
 
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
+import { existsSync } from 'fs';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
