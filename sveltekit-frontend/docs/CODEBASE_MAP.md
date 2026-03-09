@@ -297,18 +297,18 @@
 
 ### Unwired Files Inside sveltekit-frontend/src/
 
-| Area | Total | Used | Dead | % Dead |
-|------|-------|------|------|--------|
-| lib/types/ | 83 | ~18 | ~65 | 78% |
-| lib/utils/ | 40 | ~12 | ~28 | 70% |
-| lib/services/ | 64 | ~7 | ~57 | 89% (blanket-excluded, 312 corrupted) |
-| lib/api/ | 6 | 1 | 5 | 83% |
-| lib/error-brain/ | 3 | 0 | 3 | 100% |
-| lib/__tests__/ | 3 | 0 | 3 | 100% |
-| lib/stores/ | 16 | 13 | 3 | 19% |
-| lib/db/ | 5 | 3 | 2 | 40% |
-| lib/components/ | 69 top-level | ~55 | ~14 | 20% |
-| **TOTAL** | **~289** | **~109** | **~180** | **62%** |
+| Area | Total | Used | Dead | % Dead | Notes |
+|------|-------|------|------|--------|-------|
+| lib/types/ | 54 | ~43 | ~10 | 19% | 18 ambient .d.ts counted as used |
+| lib/utils/ | 57 | 22 | ~32 | 56% | includes migration scripts + tests |
+| lib/services/ | 39 | ~7 | ~32 | 82% | blanket-excluded, corrupted |
+| lib/api/ | 0 | 0 | 0 | -- | fully archived to deeds_labs/ |
+| lib/error-brain/ | 7 | 0 | 7 | 100% | excluded from tsconfig |
+| lib/__tests__/ | 15 | 0 | 15 | 100% | excluded from tsconfig |
+| lib/stores/ | 31 | 20 | 11 | 35% | excl _archive/ and machines/ |
+| lib/db/ | 13 | 13 | 0 | 0% | all wired |
+| lib/components/ | 60 | 59 | 1 | 2% | top-level .svelte only |
+| **TOTAL** | **~276** | **~164** | **~108** | **39%** | down from 62% (March 2026 audit) |
 
 ### lib/types/ — File-by-File Wiring Status
 
