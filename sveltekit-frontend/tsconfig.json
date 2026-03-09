@@ -341,6 +341,7 @@
     "src/lib/server/session.ts",
     "src/lib/server/vector-cache.ts",
     "src/lib/server/webgpu-redis-optimizer.ts",
+    "src/lib/server/cache/cartridge-tensor-bridge.ts",
     "src/lib/storage/**",
     "src/lib/ui/**",
     "src/mcp-gpu-orchestrator.ts",

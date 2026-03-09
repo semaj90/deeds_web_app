@@ -582,7 +582,7 @@ export function getServiceAdapters() {
 		pgvector: new PgVectorAdapter(env.postgresConfig),
 		minio: new MinIOAdapter(env.minioConfig),
 		neo4j: new Neo4jAdapter(env.neo4jConfig),
-		rabbitmq: {} as any
+		rabbitmq: { url: env.rabbitmqConfig.url, enabled: env.rabbitmqConfig.enabled }
 	};
 }
 

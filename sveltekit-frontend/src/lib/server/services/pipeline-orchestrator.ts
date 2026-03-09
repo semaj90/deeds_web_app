@@ -1,5 +1,5 @@
-import { OllamaService } from '$lib/services/ollamaService';
-import { qdrantService } from './qdrant-service';
+import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
+import { qdrant, deterministicPointId } from '$lib/server/vector/qdrant-manager.js';
 import type { ChunkRecord, ProcessingStatus } from '$lib/types/pipeline-v2';
 import crypto from 'crypto';
 
@@ -8,17 +8,11 @@ import crypto from 'crypto';
  *
  * Orchestrates the document ingestion pipeline:
  * 1. Chunking (Semantic/Fixed)
- * 2. Embedding (Batch)
+ * 2. Embedding (Batch via gRPC/Ollama fallback)
  * 3. Indexing (Qdrant + Postgres)
  */
 export class PipelineOrchestrator {
-  private ollama: OllamaService;
-  // Default V2 Embedding Model
   private embeddingModel = 'embeddinggemma:latest';
-
-  constructor() {
-    this.ollama = new OllamaService();
-  }
 
   /**
    * Run the full ingestion pipeline for a document
@@ -39,7 +33,7 @@ export class PipelineOrchestrator {
       // 2. Embedding
       onProgress?.({ stage: 'embedding', progress: 0, message: 'Generating embeddings...' });
       const chunkRecords: ChunkRecord[] = [];
-      const embeddings: number[][] = [];
+      const points: Array<{ id: number; vector: number[]; payload: Record<string, unknown> }> = [];
 
       // Process in batches to avoid timeouts
       const BATCH_SIZE = 5;
@@ -53,9 +47,9 @@ export class PipelineOrchestrator {
           const sha256 = crypto.createHash('sha256').update(chunkContent).digest('hex');
           const chunkId = this.hashToUuid(sha256);
 
-          // Get Embedding
-          const vec = await this.ollama.generateEmbedding(chunkContent, { model: this.embeddingModel });
-          if (!vec) throw new Error(`Failed to embed chunk ${globalIdx}`);
+          // Get embedding via 4-tier fallback (gRPC → QUIC → HTTP → Ollama)
+          const vec = await generateSingleEmbedding(chunkContent);
+          if (!vec || vec.length === 0) throw new Error(`Failed to embed chunk ${globalIdx}`);
 
           chunkRecords.push({
              chunk_id: chunkId,
@@ -70,18 +64,34 @@ export class PipelineOrchestrator {
              created_at: new Date().toISOString(),
              offsets: { start: 0, end: 0 }
           });
-          embeddings.push(vec);
+
+          // Build Qdrant point
+          points.push({
+            id: deterministicPointId(chunkId),
+            vector: vec,
+            payload: {
+              chunk_id: chunkId,
+              doc_id: docId,
+              case_id: metadata.case_id,
+              content: chunkContent,
+              source: metadata.source,
+              tags: metadata.tags || [],
+              created_at: new Date().toISOString()
+            }
+          });
         }));
 
         const progress = Math.round(((i + BATCH_SIZE) / rawChunks.length) * 100);
         onProgress?.({ stage: 'embedding', progress, message: `Embedded ${Math.min(i + BATCH_SIZE, rawChunks.length)}/${rawChunks.length} chunks` });
       }
 
-      // 3. Indexing (Qdrant)
+      // 3. Indexing (Qdrant batch upsert)
       onProgress?.({ stage: 'upserting', progress: 0, message: 'Upserting to Vector DB...' });
-      const success = await qdrantService.upsertChunks(chunkRecords, embeddings);
+      const result = await qdrant.batchUpsert({ collection: 'documents', points });
 
-      if (!success) throw new Error('Qdrant upsert failed');
+      if (result.totalUpserted === 0 && points.length > 0) {
+        throw new Error('Qdrant upsert failed — 0 points written');
+      }
       onProgress?.({ stage: 'complete', progress: 100, message: 'Pipeline complete' });
 
       return { success: true, chunkCount: chunkRecords.length };

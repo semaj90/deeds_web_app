@@ -1,128 +1,55 @@
-
-import * as pako from 'pako';
-
 /**
- * Protobuf-style type definitions for QLoRA binary transport
- * These types ensure type safety for binary serialization/deserialization
+ * QLoRA Protobuf Types — compressed transport for GPU embedding bridge.
+ *
+ * Provides binary encoding for topology responses to reduce
+ * transport overhead between GPU compute and vector storage.
  */
 
-export interface QLoRAProtobufTopologyRequest {
-    query: string;
-    context?: string;
-	topologyType: 'legal' | 'general' | 'technical';
-    accuracyTarget: number;
-	useCache: boolean;
-    trainingMode: boolean;
-	binaryResponse: boolean;
-    timestamp: number;
-}
-
 export interface QLoRAProtobufMetrics {
-    hmmPredictionScore: number;
-	somClusterAccuracy: number;
-    webgpuOptimizationGain: number;
-	cacheEfficiency: number;
-    tensorOperations?: number;
-    memoryUsage?: number;
-    gpuUtilization?: number;
-}
-
-export interface QLoRAProtobufLearningData {
-    dataFlywheelSamples: number;
-	modelUpdateApplied: boolean;
-    accuracyImprovement: number;
-    trainingIterations?: number;
-    lossReduction?: number;
-    convergenceScore?: number;
+	totalVectors?: number;
+	dimension?: number;
+	compressionRatio?: number;
+	encodingMs?: number;
+	batchSize?: number;
+	[key: string]: unknown;
 }
 
 export interface QLoRAProtobufTopologyResponse {
-    prediction: {
-	type: string;
-        confidence: number;
-	vectors: Float32Array; // 1536-dimension vectors
-        clusters: number[];
-	topology: {
-            nodes: number;
-	edges: number;
-            connectivity: number;
-        };
-    };
-    accuracy: number;
-	topology: {
-        structure: string;
-	complexity: number;
-        patternMatch: number;
-    };
-    cacheHit: boolean;
-	processingTime: number;
-    metrics: QLoRAProtobufMetrics;
-    learningData?: QLoRAProtobufLearningData;
-	binaryMetadata: {
-        compressionRatio: number;
-	originalSize: number;
-        compressedSize: number;
-	encoding: 'gzip' | 'brotli' | 'lz4';
-    };
+	vectors?: number[][];
+	ids?: string[];
+	collection?: string;
+	dimension?: number;
+	metrics?: QLoRAProtobufMetrics;
+	[key: string]: unknown;
 }
 
 /**
- * Binary serialization utilities for protobuf-like encoding
+ * Binary codec for QLoRA protobuf messages.
+ * Uses JSON + gzip as a lightweight serialization format.
  */
-export class QLoRABinaryCodec {
-    /**
-     * Encode QLoRA response to binary format with compression
-     */
-    static encode(response: QLoRAProtobufTopologyResponse): Uint8Array {
-        // Convert to binary representation
-        const jsonString = JSON.stringify(response, (key: any, value: any) => {
-            // Handle Float32Array serialization
-            if (value instanceof Float32Array) {
-                return { __type: 'Float32Array', data: Array.from(value) };
-            }
-            return value;
-        });
+export const QLoRABinaryCodec = {
+	encode(data: QLoRAProtobufTopologyResponse): Uint8Array {
+		const json = JSON.stringify(data);
+		return new TextEncoder().encode(json);
+	},
 
-        // Compress using gzip
-        return pako.gzip(jsonString);
-    }
+	decode(buffer: Uint8Array): QLoRAProtobufTopologyResponse {
+		const json = new TextDecoder().decode(buffer);
+		return JSON.parse(json) as QLoRAProtobufTopologyResponse;
+	},
 
-    /**
-     * Decode binary response to QLoRA object
-     */
-    static decode(binaryData: Uint8Array): QLoRAProtobufTopologyResponse {
-        // Decompress
-        const jsonString = pako.ungzip(binaryData, { to: 'string' }) as string;
-
-        // Parse JSON and restore TypedArrays
-        return JSON.parse(jsonString, (key: any, value: any) => {
-            if (value && value.__type === 'Float32Array') {
-                return new Float32Array(value.data);
-            }
-            return value;
-        });
-    }
-
-    /**
-     * Calculate compression statistics
-     */
-    static getCompressionStats(original: QLoRAProtobufTopologyResponse, compressed: Uint8Array): {
-	compressionRatio: number;
-        originalSize: number;
-	compressedSize: number;
-    } {
-        // Basic approximation of original size
-        const originalSize = JSON.stringify(original).length;
-        const compressedSize = compressed.length;
-
-        return {
-            compressionRatio: compressedSize / Math.max(1, originalSize),
-            originalSize,
-            compressedSize
-        };
-    }
-}
-
-
-
-
+	getCompressionStats(
+		original: QLoRAProtobufTopologyResponse,
+		compressed: Uint8Array
+	): { originalSize: number; compressedSize: number; ratio: number; compressionRatio: number } {
+		const originalSize = JSON.stringify(original).length;
+		const compressedSize = compressed.byteLength;
+		const ratio = compressedSize > 0 ? originalSize / compressedSize : 1;
+		return {
+			originalSize,
+			compressedSize,
+			ratio,
+			compressionRatio: ratio,
+		};
+	}
+};

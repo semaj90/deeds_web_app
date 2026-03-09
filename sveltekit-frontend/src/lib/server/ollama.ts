@@ -37,6 +37,8 @@ export interface OllamaResponse {
 	eval_duration: number;
 }
 
+import { ollamaBreaker } from '$lib/server/circuit-breaker.js';
+
 // ── Config ──────────────────────────────────────────────────────────────────
 
 export function getOllamaEndpoint(): string {
@@ -117,10 +119,16 @@ export async function callOllamaChat(systemPrompt: string, userPrompt: string): 
 
 export async function checkOllamaHealth(): Promise<boolean> {
 	try {
-		const res = await fetch(`${OLLAMA_BASE_URL}/api/tags`, {
-			signal: AbortSignal.timeout(5000)
-		});
-		return res.ok;
+		const healthy = await ollamaBreaker.call(
+			async () => {
+				const res = await fetch(`${OLLAMA_BASE_URL}/api/tags`, {
+					signal: AbortSignal.timeout(5000)
+				});
+				return res.ok;
+			},
+			() => false
+		);
+		return healthy;
 	} catch {
 		return false;
 	}

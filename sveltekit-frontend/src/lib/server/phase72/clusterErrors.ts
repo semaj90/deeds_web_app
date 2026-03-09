@@ -1,4 +1,5 @@
 import { vectorizeErrorsGPU } from './vectorizeErrors.js';
+import { cosineSimilarity } from '$lib/server/embedding/knn-helper.js';
 
 export interface ErrorCluster {
     id: string;
@@ -105,17 +106,4 @@ function kmeansCluster(embeddings: number[][], errors: string[], k: number): Err
     return clusters;
 }
 
-function cosineSimilarity(a: number[], b: number[]): number {
-    let dotProduct = 0;
-    let normA = 0;
-    let normB = 0;
-
-    for (let i = 0; i < a.length; i++) {
-        dotProduct += a[i] * b[i];
-        normA += a[i] * a[i];
-        normB += b[i] * b[i];
-    }
-
-    if (normA === 0 || normB === 0) return 0;
-    return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-}
+// cosineSimilarity imported from embedding/knn-helper.ts (canonical)

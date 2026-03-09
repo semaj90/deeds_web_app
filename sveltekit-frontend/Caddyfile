@@ -20,6 +20,18 @@
         respond 200
     }
 
+    # SSE — disable buffering for streaming endpoints
+    handle /api/sse/* {
+        reverse_proxy localhost:5173 {
+            flush_interval -1
+        }
+    }
+    handle /api/ai/* {
+        reverse_proxy localhost:5173 {
+            flush_interval -1
+        }
+    }
+
     # Reverse proxy to Vite dev server
     reverse_proxy localhost:5173 {
         # Development connection settings (more permissive)

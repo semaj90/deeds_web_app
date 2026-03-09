@@ -14,10 +14,16 @@
  * Date: 2025-10-17
  */
 import { QdrantClient } from '@qdrant/js-client-rest';
-import amqp, { type Channel, type Connection } from 'amqplib';
 import Redis from 'ioredis';
 import neo4j, { type Driver } from 'neo4j-driver';
 import { VECTOR_CONFIG } from '../config/vector-config.js';
+
+// Local amqplib types (named imports fail with moduleResolution: "bundler")
+type AmqpConnection = { createChannel(): Promise<AmqpChannel>; close(): Promise<void> };
+type AmqpChannel = {
+	on(event: string, listener: (...args: any[]) => void): void;
+	close(): Promise<void>;
+};
 
 // ============================================================================
 // Redis Connection Pool
@@ -49,7 +55,7 @@ export async function ensureRedisInstance(): Promise<Redis> {
 				if (times > 3) return null; // Stop retrying
 				return Math.min(times * 50, 2000); // Exponential backoff
 			},
-	maxRetriesPerRequest: 3,
+			maxRetriesPerRequest: 3,
 			enableReadyCheck: true,
 			lazyConnect: false // Explicitly connect manually to handle errors
 		};
@@ -59,18 +65,11 @@ export async function ensureRedisInstance(): Promise<Redis> {
 			redisConfig.password = redisPassword;
 		}
 
-		// If URL is provided and valid, prioritize it (ioredis supports url string in constructor)
-		// But here we mix config object.
-        // ioredis constructor: new Redis(url, options) OR new Redis(options)
-        // If url has password, it overrides options.password
-
 		if (redisUrl.startsWith('redis://') || redisUrl.startsWith('rediss://')) {
-             redisInstance = new Redis(redisUrl, redisConfig);
-        } else {
-             // Fallback if URL is possibly just host/port or invalid structure for full string
-             // Assuming default localhost if not valid URL
-             redisInstance = new Redis(redisConfig);
-        }
+			redisInstance = new Redis(redisUrl, redisConfig);
+		} else {
+			redisInstance = new Redis(redisConfig);
+		}
 
 		// Wait for ready state
 		await new Promise<void>((resolve, reject) => {
@@ -78,11 +77,11 @@ export async function ensureRedisInstance(): Promise<Redis> {
 			redisInstance!.once('error', (err) => reject(err));
 		});
 
-		console.log('✅ Redis connection established');
+		console.log('Redis connection established');
 		redisConnectionAttempts = 0;
 		return redisInstance;
 	} catch (error) {
-		console.error('❌ Redis connection failed: ', error);
+		console.error('Redis connection failed: ', error);
 		redisInstance = null;
 		throw error;
 	}
@@ -122,7 +121,7 @@ export function ensureQdrantInstance(): QdrantClient {
 		timeout: 10000 // 10 second timeout
 	});
 
-	console.log('✅ Qdrant client initialized');
+	console.log('Qdrant client initialized');
 	return qdrantInstance;
 }
 
@@ -168,7 +167,7 @@ export function ensureNeo4jDriver(): Driver {
 		}
 	);
 
-	console.log('✅ Neo4j driver initialized');
+	console.log('Neo4j driver initialized');
 	return neo4jDriverInstance;
 }
 
@@ -202,8 +201,8 @@ export async function healthCheckNeo4j(): Promise<boolean> {
 // ============================================================================
 // RabbitMQ Connection Pool
 // ============================================================================
-let rabbitConnectionInstance: Connection | null = null;
-let rabbitChannelInstance: Channel | null = null;
+let rabbitConnectionInstance: AmqpConnection | null = null;
+let rabbitChannelInstance: AmqpChannel | null = null;
 let rabbitConnectionAttempts = 0;
 const MAX_RABBIT_ATTEMPTS = 3;
 
@@ -211,7 +210,7 @@ const MAX_RABBIT_ATTEMPTS = 3;
  * Get or create RabbitMQ connection (singleton)
  * Thread-safe for concurrent QUIC requests
  */
-export async function ensureRabbitConnection(): Promise<Connection> {
+export async function ensureRabbitConnection(): Promise<AmqpConnection> {
 	if (rabbitConnectionInstance) {
 		return rabbitConnectionInstance;
 	}
@@ -223,24 +222,25 @@ export async function ensureRabbitConnection(): Promise<Connection> {
 	try {
 		rabbitConnectionAttempts++;
 		const url = process.env?.RABBITMQ_URL ?? 'amqp://guest:guest@localhost:5672';
-		rabbitConnectionInstance = await amqp.connect(url, {
+		const amqplib = await import('amqplib');
+		rabbitConnectionInstance = await (amqplib as any).default.connect(url, {
 			heartbeat: 60,
 			timeout: 10000
 		});
 
-        console.log('✅ RabbitMQ connection established');
-        return rabbitConnectionInstance;
-    } catch (e) {
-        console.error('RabbitMQ connection failed', e);
-        throw e;
-    }
+		console.log('RabbitMQ connection established');
+		return rabbitConnectionInstance!;
+	} catch (e) {
+		console.error('RabbitMQ connection failed', e);
+		throw e;
+	}
 }
 
 /**
  * Get or create RabbitMQ channel (singleton)
  * Thread-safe for concurrent QUIC requests
  */
-export async function ensureRabbitChannel(): Promise<Channel> {
+export async function ensureRabbitChannel(): Promise<AmqpChannel> {
 	if (rabbitChannelInstance) {
 		return rabbitChannelInstance;
 	}
@@ -249,7 +249,7 @@ export async function ensureRabbitChannel(): Promise<Channel> {
 	rabbitChannelInstance = await connection.createChannel();
 
 	// Handle channel errors
-	rabbitChannelInstance.on('error', (err) => {
+	rabbitChannelInstance.on('error', (err: any) => {
 		console.error('RabbitMQ channel error: ', err);
 		rabbitChannelInstance = null;
 	});
@@ -258,7 +258,7 @@ export async function ensureRabbitChannel(): Promise<Channel> {
 		rabbitChannelInstance = null;
 	});
 
-	console.log('✅ RabbitMQ channel created');
+	console.log('RabbitMQ channel created');
 	return rabbitChannelInstance;
 }
 
@@ -304,7 +304,7 @@ export async function healthCheckAll(): Promise<{
 	neo4j: boolean;
 	rabbitmq: boolean;
 }> {
-	const [redis, qdrant, neo4j, rabbitmq] = await Promise.allSettled([
+	const [redis, qdrantHealth, neo4jHealth, rabbitmq] = await Promise.allSettled([
 		ensureRedisInstance().then(() => true).catch(() => false),
 		healthCheckQdrant(),
 		healthCheckNeo4j(),
@@ -313,8 +313,8 @@ export async function healthCheckAll(): Promise<{
 
 	return {
 		redis: redis.status === 'fulfilled' && redis.value,
-		qdrant: qdrant.status === 'fulfilled' && qdrant.value,
-		neo4j: neo4j.status === 'fulfilled' && neo4j.value,
+		qdrant: qdrantHealth.status === 'fulfilled' && qdrantHealth.value,
+		neo4j: neo4jHealth.status === 'fulfilled' && neo4jHealth.value,
 		rabbitmq: rabbitmq.status === 'fulfilled' && rabbitmq.value
 	};
 }
@@ -340,6 +340,6 @@ export async function closeAllConnections(): Promise<void> {
 // Exports (only factory functions, no instances)
 // ============================================================================
 type Neo4jDriver = Driver;
-type RabbitChannel = Channel;
-type RabbitConnection = Connection;
+type RabbitChannel = AmqpChannel;
+type RabbitConnection = AmqpConnection;
 export type { Neo4jDriver, QdrantClient, RabbitChannel, RabbitConnection, Redis };

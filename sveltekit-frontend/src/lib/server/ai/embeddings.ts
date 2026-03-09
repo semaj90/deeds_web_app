@@ -123,17 +123,18 @@ async function generateLocalEmbedding(
 
 		const data: unknown = await response.json();
 
-        // More robustly parse different possible response shapes from Ollama-like services
+        // Parse different possible response shapes from Ollama-like services
         let rawEmbedding: unknown = null;
+        const obj = data as Record<string, unknown>;
 
         if (data && typeof data === 'object') {
-            if ('embedding' in data && Array.isArray((data as any).embedding)) {
-                 rawEmbedding = (data as any).embedding;
-            } else if ('embeddings' in data && Array.isArray((data as any).embeddings)) {
-                 const embeddings = (data as any).embeddings;
-                 rawEmbedding = embeddings[0] ?? embeddings;
+            if ('embedding' in obj && Array.isArray(obj.embedding)) {
+                rawEmbedding = obj.embedding;
+            } else if ('embeddings' in obj && Array.isArray(obj.embeddings)) {
+                const embeddings = obj.embeddings as unknown[];
+                rawEmbedding = embeddings[0] ?? embeddings;
             } else if (Array.isArray(data) && data.length > 0 && typeof data[0] === 'object' && data[0] !== null && 'embedding' in data[0]) {
-                 rawEmbedding = (data[0] as any).embedding;
+                rawEmbedding = (data[0] as Record<string, unknown>).embedding;
             }
         }
 

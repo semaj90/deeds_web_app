@@ -1,58 +1,33 @@
-// Search System Type Definitions
-// Enhanced search with Fuse.js integration
+/**
+ * Search Types — shared between client and server search modules.
+ */
 
-export type SearchCategory =
-    | 'route'
-    | 'component'
-    | 'service'
-    | 'documentation'
-    | 'api'
-    | 'demo'
-    | 'all';
+export type SearchCategory = 'cases' | 'evidence' | 'citations' | 'statutes' | 'documents' | 'all';
 
-export interface SearchResult {
-    id: string;
-	title: string;
-    description: string;
-	category: SearchCategory;
-    path?: string;
-	score: number;
-    matches: SearchMatch[];
-    metadata?: { [key: string]: any };
-    tags: string[];
-}
-
-export interface SearchMatch {
-    indices: [number, number][];
-    key: string;
-	value: string;
+export interface SearchFilter {
+	category?: SearchCategory;
+	dateFrom?: string;
+	dateTo?: string;
+	status?: string;
+	tags?: string[];
 }
 
 export interface SearchOptions {
-    includeScore?: boolean;
-    includeMatches?: boolean;
-    threshold?: number;
-    keys?: string[];
-    limit?: number;
-    category?: SearchCategory;
+	query: string;
+	filters?: SearchFilter;
+	limit?: number;
+	offset?: number;
+	includeEmbeddings?: boolean;
 }
 
-export interface SearchFilter {
-    category?: SearchCategory;
-    tags?: string[];
-    status?: 'running' | 'stopped' | 'error' | 'unknown';
-    port?: number;
-    dateRange?: {
-	start: Date; end: Date };
+export interface SearchResult {
+	id: string;
+	title: string;
+	snippet: string;
+	category: SearchCategory;
+	score: number;
+	url?: string;
+	metadata?: Record<string, unknown>;
 }
 
-export interface SearchState {
-    query: string;
-	results: SearchResult[];
-    isLoading: boolean;
-	error: string | null;
-    filters: SearchFilter;
-	selectedCategory: SearchCategory;
-    totalResults: number;
-	searchTime: number;
-}
+export type SearchState = 'idle' | 'loading' | 'success' | 'error';

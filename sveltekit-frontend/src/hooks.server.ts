@@ -313,6 +313,16 @@ export const handle: Handle = async ({ event, resolve }) => {
 	response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
 	response.headers.set('Cross-Origin-Embedder-Policy', 'require-corp');
 
+	// Security headers (production only — avoid breaking HMR in dev)
+	if (!dev) {
+		response.headers.set('X-Content-Type-Options', 'nosniff');
+		response.headers.set('X-Frame-Options', 'DENY');
+		response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+		response.headers.set('Content-Security-Policy',
+			"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws: wss: http://localhost:*; font-src 'self' data:; worker-src 'self' blob:;"
+		);
+	}
+
 	// Enable streaming for AI endpoints
 	if (event.url.pathname.startsWith('/api/ai/')) {
 		response.headers.set('Content-Type', 'application/x-ndjson');

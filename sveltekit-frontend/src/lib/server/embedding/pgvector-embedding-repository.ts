@@ -4,22 +4,28 @@ import type {
     IngestionJobStatus, SimilarityQueryOptions
 } from '$lib/types/embedding';
 import { sql } from 'drizzle-orm/pg-core';
-import { db } from '../db/unified-client.js'; // Updated to use unified client
-import { embeddingCacheService } from '../embedding-cache-service.js';
+import { db } from '../db/unified-client.js';
+import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 
 const DEFAULT_MODEL = 'embeddinggemma:latest';
 
-async function embedContent(text: string, model: string): Promise<number[]> {
-    const embedding = await embeddingCacheService.getEmbedding(text, model);
-    if (embedding) return embedding;
+interface SimilarityResult {
+    id: string;
+    documentId: string;
+    content: string;
+    chunkIndex: number;
+    score: number;
+}
 
-    // If not in cache, fallback to generating it (implementation detail usually inside embedding service)
-    // Here we might call the upstream service directly if needed
-    return []; // Placeholder if embedding service fails
+async function embedContent(text: string, _model: string): Promise<number[]> {
+    try {
+        return await generateSingleEmbedding(text);
+    } catch {
+        return [];
+    }
 }
 
 async function enqueueIngestion(job: IngestionJobRequest): Promise<IngestionJobStatus> {
-    // Stub implementation for queue
     return {
         jobId: 'stub-job-' + Date.now(),
         evidenceId: job.evidenceId,
@@ -28,12 +34,10 @@ async function enqueueIngestion(job: IngestionJobRequest): Promise<IngestionJobS
 }
 
 async function processNextJob(): Promise<IngestionJobStatus | null> {
-    // Stub implementation
     return null;
 }
 
-async function getJobStatus(jobId: string): Promise<IngestionJobStatus | null> {
-    // Stub implementation
+async function getJobStatus(_jobId: string): Promise<IngestionJobStatus | null> {
     return null;
 }
 

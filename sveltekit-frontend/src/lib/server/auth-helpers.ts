@@ -7,9 +7,9 @@ import { error } from '@sveltejs/kit';
 
 export interface AuthResult {
 	user: {
-	id: string;
+		id: string;
 		email: string;
-	role: 'admin' | 'lead_prosecutor' | 'prosecutor' | 'paralegal' | 'investigator' | 'analyst' | 'viewer' | 'user';
+		role: 'admin' | 'lead_prosecutor' | 'prosecutor' | 'paralegal' | 'investigator' | 'analyst' | 'viewer' | 'user';
 	};
 	session: unknown;
 	isTestMode: boolean;
@@ -20,45 +20,34 @@ export interface AuthResult {
  * Returns authenticated user OR test user if auth is unavailable
  */
 export async function getUserWithFallback(event: RequestEvent): Promise<AuthResult> {
-	// Check if user exists in locals (from hooks.server.ts)
-	// Assuming event.locals has user and session typed correctly or as any to properties
-	if ((event.locals as any)?.user) {
+	if (event.locals.user) {
 		return {
-			user: (event.locals as any).user,
-			session: (event.locals as any).session,
+			user: event.locals.user as AuthResult['user'],
+			session: event.locals.session,
 			isTestMode: false
 		};
 	}
 
 	// Fallback to test mode for development/testing
-    if (process.env.NODE_ENV === 'development' || process.env.TEST_MODE === 'true') {
-        console.log('⚠️ Auth not available, using test mode');
-        return {
-            user: {
-	id: 'test-user-id',
-                email: 'test@legal-ai.dev',
-                role: 'admin'
-            },
-	session: {
-	id: 'test-session-id',
-                userId: 'test-user-id',
-                fresh: false,
-                expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24 hours
-            },
-	isTestMode: true
-        };
-    }
+	if (process.env.NODE_ENV === 'development' || process.env.TEST_MODE === 'true') {
+		console.log('[Auth] Auth not available, using test mode');
+		return {
+			user: {
+				id: 'test-user-id',
+				email: 'test@legal-ai.dev',
+				role: 'admin'
+			},
+			session: {
+				id: 'test-session-id',
+				userId: 'test-user-id',
+				fresh: false,
+				expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
+			},
+			isTestMode: true
+		};
+	}
 
-    // In production, return empty/unauthenticated like state or throw?
-    // This function implies "GET USER", so maybe throw if strict auth required by caller logic
-    // But since it calls itself "WithFallback", let's return a "null" like structure or throw if desired.
-    // Based on usage, requireAuth throws.
-    // Let's create a minimal structure that fails role checks if not found?
-    // Or cleaner: modify return type to allow null, but interface says AuthResult.
-    // Let's assume this path is strictly for dev/test fallback flow or requires auth.
-    // If we reach here, no user and not test mode.
-
-    throw error(401, 'Authentication required');
+	throw error(401, 'Authentication required');
 }
 
 /**
@@ -66,17 +55,16 @@ export async function getUserWithFallback(event: RequestEvent): Promise<AuthResu
  * Throws 401 error if auth is unavailable AND not in development mode
  */
 export async function requireAuth(event: RequestEvent, allowTestMode = true): Promise<AuthResult> {
-    try {
-	    const result = await getUserWithFallback(event);
+	try {
+		const result = await getUserWithFallback(event);
 
-	    // If in test mode and test mode is not allowed, throw error
-	    if (result.isTestMode && !allowTestMode) {
-		    throw error(401, 'Authentication required (Test mode not allowed)');
-	    }
-	    return result;
-    } catch (e) {
-        throw error(401, 'Authentication required');
-    }
+		if (result.isTestMode && !allowTestMode) {
+			throw error(401, 'Authentication required (Test mode not allowed)');
+		}
+		return result;
+	} catch (e) {
+		throw error(401, 'Authentication required');
+	}
 }
 
 /**
@@ -115,18 +103,15 @@ export async function requireRole(
  */
 export async function getOptionalUser(event: RequestEvent): Promise<AuthResult | null> {
 	try {
-        // We modify getUserWithFallback to not throw to support optional used?
-        // Or catch here.
-        if ((event.locals as any)?.user) {
-             return {
-			    user: (event.locals as any).user,
-			    session: (event.locals as any).session,
-			    isTestMode: false
-		    };
-        }
-        return null;
+		if (event.locals.user) {
+			return {
+				user: event.locals.user as AuthResult['user'],
+				session: event.locals.session,
+				isTestMode: false
+			};
+		}
+		return null;
 	} catch {
 		return null;
 	}
 }
-
