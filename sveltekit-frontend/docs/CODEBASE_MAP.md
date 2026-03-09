@@ -1,6 +1,6 @@
 # Deeds Web App — Codebase Map
 
-## Last Updated: February 26, 2026 (Session 93r28)
+## Last Updated: March 9, 2026 (Session 100+ — Infrastructure Wiring Complete)
 
 ---
 
@@ -31,7 +31,7 @@
 
 ### src/routes/ (367 files) — Pages + API
 
-#### App Routes — src/routes/(app)/ (23 pages)
+#### App Routes — src/routes/(app)/ (23 top-level groups, 80 total pages)
 
 | Route | Files | Purpose | Status |
 |-------|-------|---------|--------|
@@ -59,7 +59,7 @@
 | `analytics/` | ~3 | Analytics dashboard | ACTIVE |
 | `phase78/` | ~2 | Legacy phase route | LEGACY |
 
-#### API Routes — src/routes/api/ (55 directories, ~170 endpoints)
+#### API Routes — src/routes/api/ (55 directories, ~248 endpoints)
 
 | API Group | Endpoints | Purpose | Status |
 |-----------|-----------|---------|--------|
@@ -106,6 +106,8 @@
 | `migrations/` | ~5 | Manual SQL migration history | ACTIVE |
 | `native/` | ~3 | Autoencoder bridge stub (Dockerfile + server.py) | ACTIVE — new |
 | `python-workers/` | ~2 | FastAPI embedding worker stub | ACTIVE — new |
+| `go-microservice/` | 26,570 | Go gRPC services — embedding server (:50051), QUIC-NATS bridge (:4434), GPU inference (:8095), analytics, SIMD sidecar | **ACTIVE** — wired to SvelteKit (Session 100+) |
+| `simd-bridge/` | ~20 | LibTorch/CUDA N-API addon (tensorrt_bridge.node) — GPU similarity, clustering, embedding | **ACTIVE** — wired to SvelteKit |
 
 ### INFRASTRUCTURE (Keep — Running Services)
 
@@ -116,7 +118,7 @@
 | `redis/` | ~1 | Redis config | ACTIVE |
 | `minio/` + `minio-data/` | ~70 | MinIO S3 object storage + data | ACTIVE |
 | `pgvector-install/` + `pgvector-precompiled/` | ~92 | pgvector PostgreSQL extension | ACTIVE |
-| `proto/` + `protos/` + `proto-backup/` + `protoc-install/` | ~110 | Protocol Buffer definitions + compiler | LEGACY — keep |
+| `proto/` + `protos/` + `proto-backup/` + `protoc-install/` | ~110 | Protocol Buffer definitions + compiler | **ACTIVE** — pbjs/pbts codegen feeds gRPC clients, `proto/active/` has embedding.proto + retrieval.proto |
 | `nginx/` | ~2 | Reverse proxy config | AVAILABLE |
 | `ssl/` | ~1 | SSL certificates placeholder | AVAILABLE |
 | `searxng-config/` | ~1 | Searxng search engine config | VERIFY if running |
@@ -147,7 +149,6 @@
 | `_archive/` | 352 | Old model backups (models-archived-s37/) | MOVE → deeds_labs/ |
 | `archives/` | 474 | Misc old code archives | MOVE → deeds_labs/ |
 | `archive/` | 2 | Small archive dir | MERGE → deeds_labs/ |
-| `go-microservice/` | 26,570 | Complete abandoned Go gRPC service (12,396 .go files) | MOVE → deeds_labs/ |
 | `go-trt-service/` | ~4 | Go TensorRT service stub | MOVE → deeds_labs/ |
 | `langextract-go/` | 171 | Go text extraction service | MOVE → deeds_labs/ |
 | `ingestion-phase66/` | ~5,271 | GPU-based document ingestion pipeline | MOVE → deeds_labs/ |
@@ -183,7 +184,7 @@
 | `.venv-verify/` | 2,236 | Small verification venv | **DELETE** — recreatable |
 | `.python311/` | 4,362 | Python 3.11 installation | KEEP if needed |
 | `tensorrt_py310_env/` | 2,994 | TensorRT Python environment | **DELETE** — recreatable |
-| `libtorch-win-shared-with-deps-2.9.0+cu130/` | 9,377 | PyTorch C++ runtime (not used) | **DELETE** — downloadable |
+| `libtorch-win-shared-with-deps-2.9.0+cu130/` | 9,377 | PyTorch C++ runtime (GPU bridge) | **KEEP** — linked by tensorrt_bridge.node |
 
 ### DELETE (Safe — No Value)
 
@@ -223,7 +224,7 @@
 | Directory | Files | Purpose | Status |
 |-----------|-------|---------|--------|
 | `src/` | ~410 | Root-level source (agents, lib, routes, server, utils, wasm) — may duplicate sveltekit-frontend | VERIFY — likely dead |
-| `nats-server/` | ~3 | NATS messaging binary (RabbitMQ in use instead) | DELETE if not running |
+| `nats-server/` | ~3 | NATS messaging binary — Tier 2 QUIC/NATS embedding fallback | AVAILABLE — `EMBEDDING_QUIC_ENABLED=true` activates |
 | `elk-stack/` + `logstash/` | ~4 | ELK stack configs | DELETE if not running |
 | `tools/` | ~40 | Misc utility scripts | VERIFY — may have useful scripts |
 | `monitoring/` | ~10 | Monitoring scripts/configs | VERIFY if used |
@@ -236,9 +237,8 @@
 | `backup/` + `backups/` | ~8 | Backup files (check dates) | VERIFY — likely stale |
 | `deeds-web-app/` | varies | Nested copy of project? | VERIFY — may be accidental |
 | `dev/` | varies | Development tools/configs | VERIFY |
-| `simd-bridge/` | ~3 | SIMD bridge experiment | VERIFY |
 | `static/` | ~15 | Root-level static assets | VERIFY — likely dead (served from sveltekit-frontend/static/) |
-| `python/` | varies | Python utilities | VERIFY — likely dead |
+| `python/` | 1 | `docling_analyze.py` — Docling audio/PDF ASR pipeline | ACTIVE — called by MCP `transcribe_audio` tool |
 | `database/` | varies | DB tools/configs | VERIFY |
 | `test-reports/` + `test-results/` | ~5 | Test outputs | DELETE |
 | `clickhouse-init/` | varies | ClickHouse DB init scripts | DELETE if not using |
@@ -273,10 +273,10 @@
 |----------|-------------|-------------|----------|--------|
 | TypeScript (.ts) | 1,635 | ~1,100 | sveltekit-frontend/src/ | ACTIVE — 595 server, 244 API, 113 components |
 | Svelte (.svelte) | 816 | ~700 | sveltekit-frontend/src/ | ACTIVE — 613 components, 84 routes |
-| Go (.go) | 12,527 | 0 | go-microservice/ (12,396), langextract-go/ (75) | ABANDONED — DELETE safe |
+| Go (.go) | 12,527 | ~50 active | go-microservice/ (12,396), langextract-go/ (75) | **ACTIVE** — embedding, QUIC, GPU, analytics services wired |
 | Python (.py) | 73,588 | ~200 | 69,194 in venvs (DELETE), 555 deeds_labs, 139 sveltekit, 43 scripts | 99.7% VENVS |
 | CUDA (.cu/.cuh) | 563 | 5 | 5 in sveltekit-frontend/, 471 in venvs, 13 deeds_labs | ARCHIVE — venvs inflate count |
-| Proto (.proto) | 345 | 9 | 141 go-microservice, 79 venvs, 69 proto/, 9 sveltekit | LEGACY — DELETE safe |
+| Proto (.proto) | 345 | ~15 | 141 go-microservice, 79 venvs, 69 proto/, 9 sveltekit | **ACTIVE** — pbjs/pbts codegen feeds gRPC clients |
 | Markdown (.md) | 5,626 | ~3,100 | 3,071 sveltekit-frontend/, 650 documents/, 511 go-microservice | CLEANUP needed |
 | WGSL (.wgsl) | 4 | 4 | sveltekit-frontend/src/ | ACTIVE |
 | Dockerfiles | 93 | ~10 | Scattered, mostly in venvs/go | 90% dead |
@@ -286,12 +286,14 @@
 | Category | Dirs | Files | Safe to Delete? |
 |----------|------|-------|-----------------|
 | **Python venvs** (.venv, .venv-phase46, phase46-venv, .python311, tensorrt_py310_env, .venv-verify) | 6 | **210,438** | YES — recreatable via pip |
-| **Go microservice** (go-microservice/) | 1 | 26,570 | YES — SvelteKit replaced |
-| **LibTorch** (libtorch-win-shared-with-deps-2.9.0+cu130/) | 1 | 9,377 | YES — not used |
+| **Go microservice** (go-microservice/) | 1 | 26,570 | **NO** — active services (gRPC :50051, QUIC :4434, SIMD :8095, analytics) |
+| **LibTorch** (libtorch-win-shared-with-deps-2.9.0+cu130/) | 1 | 9,377 | **NO** — linked by tensorrt_bridge.node N-API addon |
+| **Proto** (proto/, protos/) | 2 | ~110 | **NO** — active codegen (pbjs/pbts → gRPC clients) |
+| **NATS server** (nats-server/) | 1 | ~3 | **NO** — Tier 2 QUIC/NATS embedding fallback |
 | **deeds_labs/** | 1 | 13,227 | KEEP — intentional archive |
 | **_archive/** | 1 | 352 | KEEP — intentional archive |
-| **Misc legacy** (langextract-go, proto, proto-backup, protoc-install, old-scripts, etc.) | ~20 | ~500 | YES — unused |
-| **TOTAL DELETABLE** | **~30** | **~247,000** | Frees ~50GB+ disk |
+| **Misc legacy** (langextract-go, proto-backup, protoc-install, old-scripts, etc.) | ~15 | ~400 | YES — unused |
+| **TOTAL DELETABLE** | **~27** | **~211,000** | Frees ~45GB+ disk |
 
 ### Unwired Files Inside sveltekit-frontend/src/
 
@@ -398,7 +400,7 @@
 | File | Lines | Purpose |
 |------|-------|---------|
 | `lib/server/db/schema-postgres.ts` | 2000+ | 70+ tables, 14 enums |
-| `lib/server/vector/qdrant-manager.ts` | 400+ | 6 Qdrant collections, hybrid search |
+| `lib/server/vector/qdrant-manager.ts` | 400+ | 8 Qdrant collections, hybrid search |
 | `lib/server/queue/rabbitmq-manager-fixed.ts` | 350+ | 7 queues, 7 consumers |
 | `lib/server/cache.ts` | 200+ | Dual-tier memory + Redis cache |
 | `lib/server/redis.ts` | 100+ | ioredis singleton |
@@ -410,6 +412,26 @@
 | `lib/server/ace/context-assembler.ts` | 250 | ACE parallel data fetching |
 | `lib/server/neo4j-schema.ts` | 100+ | Neo4j constraints + indexes |
 | `lib/server/pg-neo4j-sync.ts` | 150 | Postgres → Neo4j MERGE pipeline |
+| `lib/server/gpu/libtorch-bridge.ts` | 280 | GPU similarity/clustering/embedding + CPU fallback |
+| `lib/server/gpu/cuda-bridge.ts` | 100+ | CUDA runtime integration, re-exports libtorch |
+| `lib/server/inference/gpu-arbiter.ts` | 150+ | Ollama/TRT-LLM/LibTorch VRAM mutex |
+| `lib/server/inference/inference-router.ts` | 200+ | Server-side inference routing (TRT→Ollama) |
+| `lib/server/grpc/retrieval-client.ts` | 150+ | gRPC retrieval client |
+| `lib/server/vector/multi-store.ts` | 150+ | Multi-vector store coordination |
+| `lib/server/vector/pgvector.ts` | 200+ | PostgreSQL pgvector operations |
+| `lib/server/indexer/dual-embedder.ts` | 200+ | Dual-vector embedding (content + signature) |
+| `lib/server/cache/invalidation.ts` | 150+ | Multi-tier cache invalidation |
+| `lib/server/ace/self-prompt.ts` | 150+ | Quality eval → correction → retry |
+| `lib/server/ace/types.ts` | 80+ | ACE context interface + token budgets |
+| `lib/server/ai/ollama-client.ts` | 150+ | Ollama API client |
+| `lib/server/ai/multimodal-fusion.ts` | 150+ | Weighted VLM+OCR+entity fusion |
+| `lib/server/neo4j-driver.ts` | 50+ | Neo4j driver singleton |
+| `lib/server/docling.ts` | 100+ | Audio transcription + PDF structure |
+| `lib/server/services/langextract-service.ts` | 150+ | Go SIMD text extraction (port 8095) |
+| `lib/server/ingest/minio.ts` | 100+ | MinIO S3 integration |
+| `lib/server/queue/queue-worker.ts` | 150+ | Queue message consumer |
+| `lib/server/db/client.ts` | ~50 | Primary Drizzle ORM client (canonical import) |
+| `src/mcp/server.ts` | 400+ | FastMCP server — 11 agentic tools (stdio) |
 
 ## Key Client Infrastructure Files
 
@@ -594,36 +616,329 @@ All features previously listed here are now at 100%. See the Kiro Spec Features 
 
 ---
 
-## Architecture Decisions (Confirmed)
+## Architecture Decisions (Updated March 9, 2026)
 
 | Decision | Status | Rationale |
 |----------|--------|-----------|
-| **SvelteKit-only backend** | CONFIRMED | 170+ API endpoints handle everything |
-| **HTTP + SSE streaming** | CONFIRMED | Works for all use cases |
-| **Go microservices** | ABANDONED | 12,523 files, 2 running — SvelteKit replaced |
-| **gRPC** | ABANDONED | HTTP fallback active, proto files legacy |
-| **QUIC protocol** | ABANDONED | Design-only, never implemented |
-| **Ollama for LLM** | ACTIVE | gemma3-legal + embeddinggemma |
-| **ONNX for client AI** | ACTIVE | WebGPU → WASM → CPU fallback |
+| **SvelteKit primary backend** | CONFIRMED | 248 API endpoints, 80 pages, SSR |
+| **Go microservices** | **ACTIVE** | Embedding server (:50051), QUIC-NATS bridge (:4434), GPU inference (:8095), analytics — wired via gRPC + NATS |
+| **gRPC (Protobuf)** | **ACTIVE** | 4-tier embedding fallback: gRPC → QUIC/NATS → HTTP batch → HTTP sequential. Proto codegen via pbjs/pbts |
+| **QUIC/NATS transport** | **ACTIVE** | NATS uses QUIC since v2.10. `legal.embedding.request` subject → gRPC proxy in quic-nats-bridge |
+| **LibTorch/CUDA N-API** | **ACTIVE** | `tensorrt_bridge.node` — GPU cosine similarity, k-means clustering, weighted embedding. CPU fallback |
+| **TensorRT INT4 AWQ** | AVAILABLE | API routes exist (`/api/ai/tensorrt`), GPU arbiter handles Ollama↔TRT mutex. Engine not built yet |
+| **SIMD JSON (Go)** | **ACTIVE** | bytedance/sonic + simdjson-go for MinIO metadata parsing at :8095 |
+| **HTTP + SSE streaming** | CONFIRMED | Works for all SvelteKit↔client use cases |
+| **Ollama for LLM** | ACTIVE | gemma3-legal (7.3GB) + embeddinggemma (622MB, 768-dim) |
+| **ONNX for client AI** | ACTIVE | WebGPU → WASM SIMD → CPU fallback. gemma270m + embeddinggemma ONNX |
 | **WebGPU compute** | ACTIVE | 3 WGSL shaders, wired to /global-search |
-| **Redis + Postgres + Qdrant** | ACTIVE | Multi-tier architecture |
+| **Redis + Postgres + Qdrant** | ACTIVE | Multi-tier cache (L0 LokiJS → L1 IndexedDB → L2 Memory → L3 Redis → L4 DB) |
+| **Neo4j graph** | ACTIVE | TS driver + Go driver. Cases, evidence, statutes, entities, SIMILAR_TO edges |
+| **CouchDB** | MINIMAL | ACE tags catalog only. Not critical path |
 | **RabbitMQ queues** | ACTIVE | 7 queues, 7 consumers |
+| **GPU Arbiter** | ACTIVE | Redis VRAM lease mutex — Ollama and TRT-LLM can't coexist on 8GB RTX 3060 Ti |
 
 ---
 
-## What's Salvageable from Go/CUDA
+## Infrastructure Wiring Status (Session 100+ — 7 Phases Complete)
 
-### Worth Investigating
-- **granite-docling-258M/** — IBM DocLing model for legal OCR (superior to tesseract.js)
-- **granite-docling-worker/** — Worker to run DocLing
-- **CUDA clustering kernels** — Could accelerate Qdrant operations
-- **Proto schemas** — Could define internal API contracts (without gRPC)
+### Phase Summary
 
-### Replace with SvelteKit/JS
-- Go microservices → SvelteKit API routes (already done)
-- Go gRPC services → HTTP endpoints (already done)
-- CUDA embedding service → Ollama embeddinggemma (already done)
-- Python RAG service → SvelteKit rag-pipeline.ts (already done)
+| Phase | What | Key Files | Status |
+|-------|------|-----------|--------|
+| **1. Proto → TS Types** | pbjs/pbts codegen → 8 generated TS files | `sveltekit-frontend/src/lib/generated/proto/*.ts` | DONE |
+| **2. gRPC Embedding** | Go server :50051, goroutine batch, Redis cache, Ollama proxy | `go-microservice/cmd/embedding-server/main.go` | DONE |
+| **3. SIMD Sidecar** | Go MinIO SIMD on :8095, bytedance/sonic JSON | `go-microservice/minio-simd-service.go`, `lib/server/minio-simd-client.ts` | DONE |
+| **4. TensorRT Routes** | API routes + multimodal build scripts (SigLIP + Gemma3) | `routes/api/ai/tensorrt/`, `routes/api/ai/tensorrt/stream/` | DONE |
+| **5. QUIC/NATS** | Extended quic-nats-bridge with `legal.embedding.request` → gRPC proxy | `go-microservice/cmd/quic-nats-bridge/main.go` | DONE |
+| **6. LibTorch/CUDA** | N-API addon: libtorch_graph.cc + binding.cc + libtorch-bridge.ts | `simd-bridge/cpp/`, `lib/server/gpu/libtorch-bridge.ts` | DONE |
+| **7. Integration** | Inference router + /api/infrastructure/status + client-router extended | `lib/server/inference/inference-router.ts`, `routes/api/infrastructure/status/` | DONE |
+
+### 4-Tier Embedding Fallback Chain
+
+```
+SvelteKit embedding request
+  ↓
+Tier 1: gRPC (embedding-client.ts → Go :50051)
+  │  Protobuf serialization, goroutine batching, Redis cache
+  │  EMBEDDING_GRPC_ENABLED=true, EMBEDDING_GRPC_URL=127.0.0.1:50051
+  ↓ fail
+Tier 2: QUIC/NATS (embedding-client.ts → NATS → quic-nats-bridge → gRPC)
+  │  0-RTT via NATS, queue-subscribed workers, same gRPC backend
+  │  EMBEDDING_QUIC_ENABLED=true, NATS_URL=nats://127.0.0.1:4222
+  ↓ fail
+Tier 3: HTTP Batch (embedding-client.ts → Ollama /api/embed)
+  │  Parallel fetch with pLimit(4), direct to Ollama
+  ↓ fail
+Tier 4: HTTP Sequential (embedding-client.ts → Ollama /api/embed)
+  │  One text at a time, slowest but most reliable
+```
+
+### GPU VRAM Mutex (RTX 3060 Ti — 8GB)
+
+```
+Ollama gemma3-legal (~5.2GB) ←── CANNOT COEXIST ──→ TRT-LLM Gemma3 INT4 (~6GB)
+                               ↑
+                    gpu-arbiter.ts (Redis lease)
+                    • acquireGpuLease(backend, ttlMs)
+                    • releaseGpuLease()
+                    • unloadOllamaModels() before TRT
+```
+
+### Active Go Microservice Entry Points
+
+| Service | Port | Protocol | Purpose | File |
+|---------|------|----------|---------|------|
+| embedding-server | :50051 | gRPC | Ollama proxy + Redis cache + batch parallelism | `cmd/embedding-server/main.go` |
+| quic-nats-bridge | :4434 | QUIC/NATS | Cross-protocol bridge + embedding proxy | `cmd/quic-nats-bridge/main.go` |
+| gpu_inference_server | :8095-8097 | gRPC/QUIC/HTTP3 | CUDA worker pools + tensor cache | `cmd/gpu_inference_server/` |
+| analytics-service | gRPC | gRPC | PostgreSQL analytics (trends, breakdowns) | `cmd/analytics-service/main.go` |
+| minio-simd-service | :8095 | HTTP | SIMD JSON parsing for MinIO metadata | `minio-simd-service.go` |
+
+### N-API Addon Architecture (simd-bridge/)
+
+```
+simd-bridge/cpp/
+  ├── binding.cc          ← N-API module init + TypedArray wrappers
+  ├── libtorch_graph.cc   ← torch::mm similarity, k-means, weighted embedding (CUDA/CPU)
+  ├── libtorch_stubs.cc   ← Stub implementations (-99) when NO_LIBTORCH=1
+  └── CMakeLists.txt      ← find_package(Torch), conditional build
+       ↓ builds
+  build/Release/tensorrt_bridge.node
+       ↓ loaded by
+  sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts
+       ↓ re-exported via
+  sveltekit-frontend/src/lib/server/gpu/cuda-bridge.ts
+       ↓ called by
+  /api/gpu/compute (similarity, cluster, weighted_embedding, device_info)
+  /api/infrastructure/status (isCudaAvailable)
+```
+
+---
+
+## GPU → Redis → Neo4j Pipeline (Current vs Target)
+
+### What Exists Today (Disconnected)
+
+```
+┌─────────────────────────┐    ┌─────────────────────────┐    ┌─────────────────────────┐
+│  GPU / LibTorch (TS)    │    │  Redis Cache            │    │  Neo4j Graph            │
+│                         │    │                         │    │                         │
+│  graphSimilarity()      │    │  L3 cache tier          │    │  evidence-graph-service │
+│  clusterEmbeddings()    │    │  GPU arbiter lease      │    │  graph-centrality.ts    │
+│  computeCaseEmbedding() │    │  session cache          │    │  pg-neo4j-sync.ts       │
+│  isCudaAvailable()      │    │  (NO tensor cache)      │    │  SIMILAR_TO edges       │
+│                         │    │                         │    │  (CPU-computed scores)  │
+└────────────┬────────────┘    └────────────┬────────────┘    └────────────┬────────────┘
+             │                              │                              │
+             └──────── NOT CONNECTED ───────┘──── NOT CONNECTED ──────────┘
+```
+
+### What Exists in Go (Also Disconnected)
+
+```
+┌─────────────────────────┐    ┌─────────────────────────┐    ┌─────────────────────────┐
+│  GPU / CUDA (Go)        │    │  Tensor Cache (Go)      │    │  Neo4j (Go)             │
+│                         │    │                         │    │                         │
+│  internal/cuda/engine   │    │  pkg/cache/pytorch_cache │    │  neo4j-integration.go   │
+│  libtorch_bridge.go     │    │  L1 GPU + L2 RAM + L3   │    │  Entity CRUD            │
+│  tensor-memory-manager  │    │  Redis (DB slot 3)      │    │  Relationship mgmt      │
+│  cuBLAS matmul          │    │  LRU eviction + metrics │    │  Cypher queries          │
+│  cosine_similarity_batch│    │                         │    │                         │
+└─────────────────────────┘    └─────────────────────────┘    └─────────────────────────┘
+```
+
+### Target: Connected Pipeline
+
+```
+Evidence Upload / Case Update
+  ↓
+1. Embed (gRPC Tier 1 → embeddinggemma 768-dim)
+  ↓
+2. GPU Similarity (LibTorch graphSimilarity on CUDA)
+  │  Input: all case embeddings (n × 768 matrix)
+  │  Output: n × n cosine similarity matrix
+  ↓
+3. Redis Tensor Cache (Go pytorch_cache L1→L2→L3)
+  │  Key: sim_matrix:{case_id}:{hash}
+  │  TTL: 24h, invalidated on new evidence
+  ↓
+4. Neo4j Graph Update
+  │  Upsert SIMILAR_TO edges where sim > 0.7
+  │  Update edge weights with GPU-computed scores
+  ↓
+5. Centrality Recompute (graph-centrality.ts)
+  │  Degree + connection strength + 2-hop walks
+  │  Now using GPU-computed similarity (was CPU)
+  ↓
+6. CouchDB Knowledge Catalog
+  │  Store cluster assignments (GPU k-means output)
+  │  Topic labels from LLM summarization
+  ↓
+7. Qdrant Re-index
+  │  Weighted embeddings (GPU computeCaseEmbedding)
+  │  Graph-boosted search ranking
+  ↓
+8. Search Results = Vector Score + Graph Centrality + GPU Similarity
+```
+
+### Files That Need Wiring (Next Phase)
+
+| Action | File | What |
+|--------|------|------|
+| EDIT | `lib/server/graph/evidence-graph-service.ts` | Replace CPU similarity with LibTorch `graphSimilarity()` |
+| NEW | `lib/server/cache/tensor-cache.ts` | SvelteKit client for Go `pytorch_cache` service |
+| EDIT | `lib/server/graph/graph-centrality.ts` | Feed GPU similarity matrix into centrality computation |
+| NEW | `go-microservice/cmd/graph-compute-service/main.go` | Go service: GPU tensor ops → Redis cache → Neo4j writes |
+| NEW | `proto/active/graph_compute.proto` | gRPC proto for graph compute requests |
+| EDIT | `routes/api/infrastructure/status/+server.ts` | Add graph-compute-service health |
+| EDIT | `lib/server/vector/qdrant-manager.ts` | Accept GPU-weighted embeddings for re-indexing |
+
+---
+
+## AST Wiring Graph — Data Flow Diagram
+
+### Client → Server → GPU → Storage
+
+```
+┌─────────────────── CLIENT (Browser) ──────────────────────┐
+│                                                           │
+│  client-router.ts ──→ LOCAL (ONNX gemma270m, <0.3)       │
+│       │                                                   │
+│       ├──→ RETRIEVAL (client embed + server search, 0.3-0.6)
+│       │                                                   │
+│       └──→ SERVER (full pipeline, >0.6)                   │
+│             ↓                                             │
+│  ChatSession.svelte.ts ──→ /api/sse/chat (SSE stream)    │
+│  gpu-compute-pipeline.ts ──→ 3 WGSL shaders (rerank)     │
+│  client-cache.ts ──→ LokiJS (L0) + IndexedDB (L1)       │
+│                                                           │
+└───────────────────────────────────────────────────────────┘
+                            ↓ HTTP/SSE
+┌─────────────────── SVELTEKIT SERVER ──────────────────────┐
+│                                                           │
+│  Inference Router (inference-router.ts)                   │
+│    ├── TRT-LLM (trt-llm.ts, GPU lease)                   │
+│    └── Ollama (gemma3-legal, HTTP)                        │
+│                                                           │
+│  Embedding Client (embedding-client.ts)                   │
+│    ├── Tier 1: gRPC → Go embedding-server :50051          │
+│    ├── Tier 2: NATS → quic-nats-bridge → gRPC            │
+│    ├── Tier 3: HTTP batch → Ollama                        │
+│    └── Tier 4: HTTP sequential → Ollama                   │
+│                                                           │
+│  GPU Bridge (libtorch-bridge.ts → tensorrt_bridge.node)   │
+│    ├── graphSimilarity(embeddings) → Float32Array[n×n]    │
+│    ├── clusterEmbeddings(embeddings, k) → Int32Array[n]   │
+│    └── computeCaseEmbedding(weights, emb) → Float32Array  │
+│                                                           │
+│  RAG Pipeline (rag-pipeline.ts)                           │
+│    ├── Qdrant vector search (768-dim)                     │
+│    ├── pgvector SQL search                                │
+│    ├── Neo4j graph context (citation-graph, centrality)   │
+│    └── KAG glossary/statute lookup                        │
+│                                                           │
+│  Cache Hierarchy                                          │
+│    ├── L2: Memory Map (5min TTL)                          │
+│    └── L3: Redis (configurable TTL)                       │
+│                                                           │
+└───────────────────────────────────────────────────────────┘
+                            ↓ gRPC/NATS/HTTP
+┌─────────────────── GO MICROSERVICES ──────────────────────┐
+│                                                           │
+│  embedding-server (:50051) ─── gRPC ──→ Ollama :11434    │
+│    └── Redis cache (embedding hashes)                     │
+│                                                           │
+│  quic-nats-bridge (:4434) ─── NATS ──→ gRPC :50051      │
+│    └── legal.embedding.request queue                      │
+│                                                           │
+│  gpu_inference_server (:8095) ─── CUDA worker pools      │
+│    ├── cuBLAS matmul                                      │
+│    ├── cosine similarity batch                            │
+│    └── tensor-memory-manager (L1 GPU → L2 RAM → L3 Redis)│
+│                                                           │
+│  analytics-service ─── PostgreSQL trends/breakdowns       │
+│                                                           │
+│  minio-simd-service (:8095) ─── SIMD JSON + MinIO S3    │
+│                                                           │
+└───────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────── STORAGE LAYER ─────────────────────────┐
+│                                                           │
+│  PostgreSQL :5432 ── 70+ tables, pgvector 768-dim         │
+│  Redis :6379 ──────── L3 cache, GPU lease, sessions       │
+│  Qdrant :6333 ─────── 8 collections (768-dim vectors)     │
+│  Neo4j :7687 ──────── Case/Evidence/Statute/Entity graph  │
+│  MinIO :9000 ──────── Evidence files (S3-compatible)      │
+│  RabbitMQ :5672 ───── 7 queues, 7 consumers               │
+│  CouchDB :5984 ────── ACE tags catalog                    │
+│                                                           │
+└───────────────────────────────────────────────────────────┘
+```
+
+### Cross-Service Communication Map
+
+```
+SvelteKit ←─ gRPC ──→ Go embedding-server ←─ HTTP ──→ Ollama
+    │                       ↑
+    │            ←─ NATS ──→│ (quic-nats-bridge)
+    │
+    ├── HTTP ──→ Ollama (direct, Tier 3/4)
+    ├── HTTP ──→ Go SIMD sidecar (MinIO metadata)
+    ├── N-API ──→ tensorrt_bridge.node (LibTorch CUDA)
+    ├── bolt:// ──→ Neo4j (graph queries)
+    ├── TCP ──→ Redis (cache + lease + sessions)
+    ├── TCP ──→ PostgreSQL (primary storage)
+    ├── HTTP ──→ Qdrant (vector search)
+    ├── AMQP ──→ RabbitMQ (async jobs)
+    └── HTTP ──→ CouchDB (tag catalog)
+```
+
+---
+
+## Recommendations (Claude Analysis — March 9, 2026)
+
+### High-Impact, Low-Effort (Do First)
+
+1. **Wire GPU similarity → Neo4j edges** — `evidence-graph-service.ts` currently uses CPU cosine similarity to compute `SIMILAR_TO` edges. Replace with `graphSimilarity()` from `libtorch-bridge.ts`. The N-API addon is built, just needs one import change. ~30 min.
+
+2. **Redis tensor caching on SvelteKit side** — Go has `pytorch_cache.go` (3-tier L1→L2→L3) but SvelteKit only has a TODO comment in `redis.ts`. Create `tensor-cache.ts` that stores GPU-computed similarity matrices in Redis with 24h TTL. Invalidate on new evidence upload. ~2h.
+
+3. **Build the N-API addon** — `tensorrt_bridge.node` isn't compiled yet. Run CMake with LibTorch path to get GPU acceleration live:
+   ```bash
+   cd simd-bridge
+   cmake -B build -DCMAKE_PREFIX_PATH=../libtorch-win-shared-with-deps-2.9.0+cu130/libtorch -DCMAKE_BUILD_TYPE=Release
+   cmake --build build --config Release
+   ```
+   Until built, all GPU ops fall through to JS CPU implementations (which work, just slower).
+
+### Medium-Impact, Medium-Effort (Do Next)
+
+4. **Go graph-compute-service** — New Go service that orchestrates: receive embeddings → GPU tensor ops (Go CUDA engine) → Redis tensor cache → Neo4j edge writes → return ranked results. This is the "missing pipeline" that connects GPU ↔ Redis ↔ Neo4j. ~1 day.
+
+5. **Graph-boosted search ranking** — Qdrant vector scores + Neo4j centrality scores + GPU similarity scores → weighted final ranking. Currently only Qdrant is used. The centrality computation exists in `graph-centrality.ts` but isn't fed into search results. ~4h.
+
+6. **CouchDB knowledge clusters** — Run `clusterEmbeddings()` on all evidence → auto-discover topic clusters → store cluster labels in CouchDB as knowledge categories. LLM summarizes each cluster into a human-readable topic. Enables "browse by topic" in the UI. ~4h.
+
+### High-Impact, High-Effort (Strategic)
+
+7. **TensorRT INT4 engine build** — The API routes, GPU arbiter, and trt-llm.ts client all exist. What's missing is the actual TensorRT engine file. Building Gemma3 12B → INT4 AWQ engine requires ~30GB VRAM during conversion (can be done in Colab). Once built, inference is ~3x faster than Ollama FP16.
+
+8. **Full pipeline end-to-end test** — Create `scripts/tests/test-full-pipeline.mjs` that:
+   - Starts Go services (embedding, QUIC, GPU)
+   - Sends embedding request → verifies gRPC path
+   - Sends GPU compute request → verifies similarity matrix
+   - Checks Neo4j edges updated
+   - Checks Redis tensor cache populated
+   - Reports infrastructure status from `/api/infrastructure/status`
+
+9. **Unsloth fine-tuning → ONNX export** — Fine-tune gemma3-legal with your legal corpus in Colab using Unsloth. Export to ONNX for client-side inference. This replaces the generic gemma270m with a domain-specific model that understands legal terminology. ONNX model loads in the same `onnx/session.ts` factory.
+
+### Not Recommended (Avoid)
+
+- **Don't merge Go services into SvelteKit** — The Go services (embedding, GPU, analytics) are _correctly_ separate. They use CGO for CUDA, goroutine parallelism, and SIMD JSON — none of which is available in Node.js.
+- **Don't replace Neo4j with CouchDB** — CouchDB is good for catalogs but lacks graph traversal (no Cypher, no traversal algorithms). Keep Neo4j for relationship queries.
+- **Don't build a custom QUIC server** — Node.js doesn't support HTTP/3 natively. NATS-over-QUIC (already wired) is the practical path.
+- **Don't add more storage backends** — 7 storage systems is already complex. Focus on connecting what exists rather than adding ClickHouse/Elasticsearch.
 
 ### Future: After Unsloth Training
 - Custom gemma3-legal fine-tuned → Ollama serve

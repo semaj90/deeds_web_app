@@ -9,7 +9,7 @@
  * Falls back to CPU-only JS implementations if addon unavailable.
  */
 
-import { resolve, dirname } from 'path';
+import { resolve } from 'path';
 import { existsSync } from 'fs';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -45,9 +45,30 @@ interface NativeAddon {
 let addon: NativeAddon | null = null;
 let loadAttempted = false;
 
+/** Add LibTorch DLL directory to PATH so the addon can find its dependencies */
+function ensureLibtorchInPath(): void {
+	const libDirs = [
+		resolve(process.cwd(), '../libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/lib'),
+		'C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/lib',
+	];
+	const sep = process.platform === 'win32' ? ';' : ':';
+	const currentPath = process.env.PATH ?? '';
+
+	for (const dir of libDirs) {
+		if (existsSync(dir) && !currentPath.includes(dir)) {
+			process.env.PATH = dir + sep + currentPath;
+			console.log(`[libtorch-bridge] Added to PATH: ${dir}`);
+			return;
+		}
+	}
+}
+
 function getAddon(): NativeAddon | null {
 	if (loadAttempted) return addon;
 	loadAttempted = true;
+
+	// LibTorch DLLs must be in PATH before loading the addon
+	ensureLibtorchInPath();
 
 	const paths = [
 		resolve(process.cwd(), '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
@@ -57,11 +78,13 @@ function getAddon(): NativeAddon | null {
 
 	for (const p of paths) {
 		try {
+			if (!existsSync(p)) continue;
 			addon = require(p) as NativeAddon;
-			console.log(`[libtorch-bridge] Loaded native addon from ${p}`);
+			const cuda = addon.checkCudaAvailable?.() === 1;
+			console.log(`[libtorch-bridge] Loaded native addon from ${p} (CUDA: ${cuda})`);
 			return addon;
-		} catch {
-			// try next path
+		} catch (err) {
+			console.warn(`[libtorch-bridge] Failed to load ${p}:`, (err as Error).message);
 		}
 	}
 
