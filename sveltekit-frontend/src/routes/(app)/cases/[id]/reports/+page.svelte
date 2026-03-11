@@ -10,7 +10,6 @@
 	let selectedReport = $state<any>(null);
 	let showEditor = $state(false);
 	let editorContent = $state('');
-	let editorRef = $state<any>(null);
 	let isSaving = $state(false);
 	let isGenerating = $state(false);
 
@@ -22,7 +21,7 @@
 	function openEditor(report?: any) {
 		if (report) {
 			selectedReport = report;
-			editorContent = report.contentHtml || '';
+			editorContent = report.content || '';
 		} else {
 			selectedReport = null;
 			editorContent = '';
@@ -45,7 +44,7 @@
 
 			if (responseData.success && responseData.report) {
 				selectedReport = responseData.report;
-				editorContent = responseData.report.contentHtml || '';
+				editorContent = responseData.report.content || '';
 				showEditor = true;
 			}
 		} catch (error) {
@@ -66,8 +65,7 @@
 				body: JSON.stringify({
 				reportId: selectedReport.id,
 					title: selectedReport.title || 'Untitled Report',
-					contentHtml: editorRef?.getHTML?.(),
-					contentJson: editorRef?.getJSON?.()
+					contentHtml: editorContent
 				})
 			});
 			const responseData = await res.json();
@@ -91,7 +89,7 @@
 
 <section class="p-4 space-y-4">
 	<div class="flex items-center justify-between gap-2">
-		<h2 class="text-sm uppercase tracking-[0.25em] text-black/60">Reports</h2>
+		<h2 class="text-sm uppercase tracking-[0.25em] text-neutral-400">Reports</h2>
 		<div class="flex gap-2">
 			<button
 				class="text-xs px-3 py-1 rounded-full border border-amber-400/60
@@ -111,22 +109,22 @@
 		</div>
 	</div>
 
-	<div class="border border-slate-800 rounded-2xl bg-panel/60 p-4 space-y-2">
+	<div class="border border-neutral-800 rounded-2xl bg-neutral-900/60 p-4 space-y-2">
 		{#if reports?.length}
 			{#each reports as report (report.id)}
 				<button
 					type="button"
-					class="w-full text-left px-3 py-2 rounded-xl border border-slate-800/60
-                 hover:border-amber-400/60 hover:bg-sand/10/60 transition-colors
+					class="w-full text-left px-3 py-2 rounded-xl border border-neutral-800/60
+                 hover:border-amber-400/60 hover:bg-neutral-800/60 transition-colors
                  flex items-center justify-between gap-3 text-sm"
 					onclick={() => openResume(report)}
 				>
 					<div class="flex flex-col gap-0.5">
-						<span class="font-semibold">
+						<span class="font-semibold text-neutral-100">
 							{report.title ?? 'Untitled report'}
 						</span>
-						<span class="text-xs text-black/60">
-							{report.type ?? 'Draft'} • Last updated {report.updated_at ?? '—'}
+						<span class="text-xs text-neutral-400">
+							{(report.type ?? report.metadata?.reportType ?? 'Draft').replace('_', ' ')} • Last updated {report.updatedAt ?? '—'}
 						</span>
 					</div>
 					<span class="text-[10px] tracking-[0.25em] uppercase text-amber-300">
@@ -135,7 +133,7 @@
 				</button>
 			{/each}
 		{:else}
-			<div class="text-xs text-black/60">
+			<div class="text-xs text-neutral-500">
 				No reports created for this case yet.
 			</div>
 		{/if}
@@ -147,34 +145,34 @@
 			<!-- Modal -->
 			<div
 				class="w-full max-w-xl border border-amber-400/40 rounded-3xl
-                  /95 shadow-2xl shadow-amber-500/20 p-4 space-y-4"
+                  bg-neutral-950/95 shadow-2xl shadow-amber-500/20 p-4 space-y-4"
 			>
 				<header class="flex items-center justify-between gap-2">
 					<div>
 						<div class="text-[10px] uppercase tracking-[0.35em] text-amber-300">
 							Resume Draft
 						</div>
-						<div class="text-sm font-semibold text-black">
+						<div class="text-sm font-semibold text-neutral-100">
 							{selectedReport?.title ?? 'Untitled report'}
 						</div>
 					</div>
 					<button
-						class="text-xs px-2 py-1 rounded-full border border-black/20
-                   hover:bg-sand/10/80"
+						class="text-xs px-2 py-1 rounded-full border border-neutral-700
+                   hover:bg-neutral-800/80"
 						onclick={() => (showResumeModal = false)}
 					>
 						Close
 					</button>
 				</header>
 
-				<div class="text-xs text-slate-300 max-h-64 overflow-auto border border-slate-800 rounded-2xl p-3 bg-panel/60">
+				<div class="text-xs text-neutral-300 max-h-64 overflow-auto border border-neutral-800 rounded-2xl p-3 bg-neutral-900/60">
 					{selectedReport?.preview ?? 'Report body preview will appear here once wired to the reports API.'}
 				</div>
 
 				<footer class="flex justify-end gap-2">
 					<button
-						class="text-xs px-3 py-1 rounded-full border border-slate-600
-                   hover:bg-sand/10/80"
+						class="text-xs px-3 py-1 rounded-full border border-neutral-600
+                   hover:bg-neutral-800/80"
 						onclick={() => (showResumeModal = false)}
 					>
 						Cancel
@@ -198,7 +196,7 @@
 		<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
 			<div
 				class="w-full max-w-6xl h-[90vh] border border-amber-400/40 rounded-3xl
-                  /95 shadow-2xl shadow-amber-500/20 p-6 space-y-4 flex flex-col"
+                  bg-neutral-950/95 shadow-2xl shadow-amber-500/20 p-6 space-y-4 flex flex-col"
 			>
 				<header class="flex items-center justify-between gap-4">
 					<div class="flex-1">
@@ -207,7 +205,7 @@
 						</div>
 						<input
 							type="text"
-							class="text-lg font-semibold text-black bg-transparent border-0 border-b border-black/20
+							class="text-lg font-semibold text-neutral-100 bg-transparent border-0 border-b border-neutral-700
                          focus:border-amber-400/60 outline-none w-full"
 							value={selectedReport?.title || 'Untitled Report'}
 							oninput={(e) => {
@@ -220,8 +218,8 @@
 					</div>
 					<div class="flex gap-2">
 						<button
-							class="text-xs px-3 py-1 rounded-full border border-slate-600
-                         hover:bg-sand/10/80"
+							class="text-xs px-3 py-1 rounded-full border border-neutral-600
+                         hover:bg-neutral-800/80"
 							onclick={closeEditor}
 						>
 							Cancel
@@ -239,7 +237,6 @@
 
 				<div class="flex-1 overflow-auto">
 					<TiptapWithAIAssistant
-						bind:this={editorRef}
 						initialContent={editorContent}
 						placeholder="Start writing your report..."
 						onUpdate={(html) => {

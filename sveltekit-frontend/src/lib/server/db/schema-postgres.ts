@@ -801,6 +801,7 @@ export const reports = pgTable('reports', {
  createdBy: uuid('created_by'), // FK to users.id
  title: varchar('title', { length: 255 }).notNull(),
  content: text('content'),
+ type: varchar('type', { length: 64 }),
  status: reportStatusEnum('status').default('draft').notNull(),
  generatedAt: timestamp('generated_at').defaultNow().notNull(),
  metadata: jsonb('metadata'),

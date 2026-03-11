@@ -42,7 +42,7 @@
 			}
 
 			report = foundReport;
-			editorContent = report.contentHtml || '<p>Start writing...</p>';
+			editorContent = report.content || '<p>Start writing...</p>';
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to load report';
 		} finally {
@@ -102,7 +102,7 @@
 				throw new Error('Failed to publish report');
 			}
 
-			report.isPublished = true;
+			report.status = 'published';
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to publish report';
 		} finally {
@@ -164,7 +164,7 @@
 						</h1>
 						<div class="flex items-center gap-2 text-xs text-neutral-400 mt-0.5">
 							<span class="px-1.5 py-0.5 rounded bg-blue-900/30 text-blue-300 border border-blue-800/30">
-								{report.type.replace('_', ' ')}
+								{(report.type ?? report.metadata?.reportType ?? 'custom').replace('_', ' ')}
 							</span>
 							{#if lastSaved}
 								<span class="flex items-center gap-1 text-green-400">
@@ -174,7 +174,7 @@
 							{:else if isDirty}
 								<span class="text-yellow-400">Unsaved changes</span>
 							{/if}
-							{#if report.isPublished}
+							{#if report.status === 'published'}
 								<span class="flex items-center gap-1 text-green-400">
 									<Icon name="check-circle" class="w-3 h-3" />
 									Published
@@ -210,7 +210,7 @@
 						{/if}
 					</Button>
 
-					{#if !report.isPublished}
+					{#if report.status !== 'published'}
 						<Button
 							size="sm"
 							onclick={publishReport}
@@ -244,7 +244,7 @@
 		<div class="max-w-5xl mx-auto p-6">
 			<TiptapWithAIAssistant
 				initialContent={editorContent}
-				placeholder="Start writing your {report.type.replace('_', ' ')}..."
+				placeholder="Start writing your {(report.type ?? report.metadata?.reportType ?? 'custom').replace('_', ' ')}..."
 				onSave={saveReport}
 				onAutoSave={handleAutoSave}
 				onUpdate={handleUpdate}

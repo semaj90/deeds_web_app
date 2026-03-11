@@ -127,7 +127,7 @@
 							<h1 class="text-xl font-bold text-neutral-100">
 								{report.title}
 							</h1>
-							{#if report.isPublished}
+							{#if report.status === 'published'}
 								<span class="px-2 py-0.5 text-xs rounded bg-green-900/30 text-green-300 border border-green-800/30">
 									Published
 								</span>
@@ -135,7 +135,7 @@
 						</div>
 						<div class="flex items-center gap-3 text-xs text-neutral-400">
 							<span class="px-1.5 py-0.5 rounded bg-blue-900/30 text-blue-300 border border-blue-800/30">
-								{report.type.replace('_', ' ')}
+								{(report.type ?? report.metadata?.reportType ?? 'custom').replace('_', ' ')}
 							</span>
 							<span>Created {formatDate(report.createdAt)}</span>
 							{#if report.updatedAt && new Date(report.updatedAt).getTime() !== new Date(report.createdAt).getTime()}
@@ -207,7 +207,7 @@
 		<!-- Report Content -->
 		<div class="max-w-4xl mx-auto p-8">
 			<article class="prose prose-invert prose-lg max-w-none">
-				{@html report.contentHtml || '<p class="text-neutral-500">No content yet.</p>'}
+				{@html report.content || '<p class="text-neutral-500">No content yet.</p>'}
 			</article>
 		</div>
 	{/if}

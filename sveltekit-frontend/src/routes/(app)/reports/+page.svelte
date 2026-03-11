@@ -153,7 +153,7 @@
 									{report.title}
 								</h3>
 								<span class="px-2 py-0.5 text-xs rounded bg-blue-900/30 text-blue-300 border border-blue-800/30 shrink-0">
-									{getReportTypeLabel(report.type)}
+									{getReportTypeLabel(report.type ?? String(report.metadata?.reportType ?? 'custom'))}
 								</span>
 							</div>
 
@@ -168,7 +168,7 @@
 										Updated {formatDate(report.updatedAt)}
 									</span>
 								{/if}
-								{#if report.isPublished}
+								{#if report.status === 'published'}
 									<span class="flex items-center gap-1 text-green-400">
 										<Icon name="check-circle" class="w-3 h-3" />
 										Published

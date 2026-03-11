@@ -2,7 +2,8 @@
  * ReportStore — Svelte 5 Runes (Session 27)
  */
 
-export type ReportType = 'analysis' | 'summary' | 'timeline' | 'evidence_review' | 'legal_memo' | 'custom';
+export type ReportType = 'analysis' | 'summary' | 'timeline' | 'evidence_review' | 'legal_memo' | 'charging_memo' | 'intake_summary' | 'discovery_list' | 'hearing_prep' | 'custom';
+export type ReportStatus = 'draft' | 'pending' | 'completed' | 'published';
 export type ExportFormat = 'pdf' | 'docx' | 'html' | 'markdown' | 'json';
 
 export interface ReportSection {
@@ -17,18 +18,21 @@ export interface ReportSection {
 export interface Report {
   id: string;
   title: string;
-  type: ReportType;
-  caseId: string;
-  sections: ReportSection[];
-  createdBy: string;
-  createdAt: number;
-  updatedAt: number;
+  type: string | null;
+  caseId: string | null;
+  content: string | null;
+  sections?: ReportSection[];
+  createdBy: string | null;
+  createdAt: string | number;
+  updatedAt: string | number | null;
+  generatedAt?: string | number;
+  status: ReportStatus;
   publishedAt?: number;
-  isPublished: boolean;
-  isShared: boolean;
+  isPublished?: boolean;
+  isShared?: boolean;
   sharedWith?: string[];
-  citations: string[];
-  evidenceReferences: string[];
+  citations?: string[];
+  evidenceReferences?: string[];
   metadata?: Record<string, unknown>;
 }
 
@@ -51,10 +55,11 @@ class ReportStore {
   lastUpdated = $state(0);
 
   reportsByType = $derived.by(() => {
-    const m = new Map<ReportType, Report[]>();
+    const m = new Map<string, Report[]>();
     this.reports.forEach(r => {
-      if (!m.has(r.type)) m.set(r.type, []);
-      m.get(r.type)!.push(r);
+      const t = r.type ?? 'custom';
+      if (!m.has(t)) m.set(t, []);
+      m.get(t)!.push(r);
     });
     return m;
   });
@@ -90,11 +95,11 @@ class ReportStore {
       });
       if (response.ok) {
         const data = await response.json();
-        const newReport: Report = data.report;
+        const newReport: Report = data.data;
         this.reports = [newReport, ...this.reports];
         this.activeReport = newReport;
         this.activeReportId = newReport.id;
-        this.editorContent = newReport.sections;
+        this.editorContent = newReport.sections ?? [];
         this.totalReports++;
         return newReport;
       } else {
@@ -155,16 +160,23 @@ class ReportStore {
     if (!id) return;
     this.isSaving = true;
     try {
-      const response = await fetch(`/api/reports/${id}`, {
-        method: 'PUT',
+      const report = this.reports.find(r => r.id === id) || this.activeReport;
+      const contentHtml = this.editorContent.map(s => s.content).join('\n\n');
+      const response = await fetch('/api/reports', {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sections: this.editorContent }),
+        body: JSON.stringify({
+          ids: [id],
+          contentHtml,
+          title: report?.title,
+        }),
         credentials: 'include',
       });
       if (response.ok) {
-        const data = await response.json();
-        this.activeReport = data.report;
-        this.reports = this.reports.map(r => r.id === id ? data.report : r);
+        if (this.activeReport) {
+          this.activeReport = { ...this.activeReport, updatedAt: Date.now() };
+          this.reports = this.reports.map(r => r.id === id ? this.activeReport! : r);
+        }
         this.isDirty = false;
       } else {
         throw new Error('Save failed');
@@ -275,8 +287,10 @@ class ReportStore {
 
   async deleteReport(reportId: string) {
     try {
-      const response = await fetch(`/api/reports/${reportId}`, {
+      const response = await fetch('/api/reports', {
         method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: [reportId] }),
         credentials: 'include',
       });
       if (response.ok) {
