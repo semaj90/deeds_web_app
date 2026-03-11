@@ -750,3 +750,5 @@ scripts/tests/screenshots/2026-*/
 # Jupyter notebooks with secrets
 @3_2_26Gemma3_12B_Legal_Production.ipynb
 scripts/unsloth-training/COLAB_PACKAGE/@3_2_26Gemma3_12B_Legal_Production.ipynb
+deeds_labs/archive-2026-03-10/
+deeds_labs/sveltekit-frontend-archive/

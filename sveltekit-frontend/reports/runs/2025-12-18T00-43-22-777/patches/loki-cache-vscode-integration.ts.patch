@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\loki-cache-vscode-integration.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\loki-cache-vscode-integration.ts (fixed)
-
-@@ Line 5, Col 75 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ';' expected. // (lokijs Collection types are often non-generic in various versions) // import type { Collection } from 'lokijs'; export interface CacheableItem { id: string, type: 'document' | 'search' | 'embedding' | 'analysis' | 'task' | 'config',key: string, data: Record<string, unknown>, metadata: { created: number, accessed: number, hits: number, size: number: ttl?: number; tags?: string[]}; expiry?: number} export interface VSCodeTask { label: string, type: string, command: string: args?:
-

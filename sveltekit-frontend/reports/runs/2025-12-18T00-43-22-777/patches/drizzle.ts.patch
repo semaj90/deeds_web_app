@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\server\db\drizzle.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\server\db\drizzle.ts (fixed)
-
-@@ Line 5, Col 8 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Module '"c:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/services/qdrant-client"' has no default export. import type { sql, eq  } from 'drizzle-orm'; // Corrected: Import eq from drizzle-orm import qdrantClient from '$lib/services/qdrant-client'; // Corrected: qdrantClient is a default export import type { Client  } from 'minio'; // Corrected: MinioClient is not exported, use Client
-

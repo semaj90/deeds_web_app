@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\chatStore.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\chatStore.ts (fixed)
-
-@@ Line 21, Col 55 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'readonly' cannot be used as a value because it was imported using 'import type'. export const xstateCompatibleStore = derived(chatStore, ($chatStore ): XStateCompatibleState => ({ context: $chatStore , matches: (state, string) => { switch (state) { case "loading": return $chatStore .isLoading; case "streaming": return $chatStore .isStreaming; case "error": return !!$chatStore .error; case "idle": return !$chatStore .isLoading && !$chatStore .error,default: return false} })); export function use
-

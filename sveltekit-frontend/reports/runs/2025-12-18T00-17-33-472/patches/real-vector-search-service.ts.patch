@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\real-vector-search-service.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\real-vector-search-service.ts (fixed)
-
-@@ Line 2, Col 1079 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'QdrantClient' cannot be used as a value because it was imported using 'import type'. import type { Document } from '$lib/types'; import type { QdrantClient  } from '@qdrant/js-client-rest'; /** * Real Vector Search Service - No Mocks * Integrates with Ollama (embeddings) + Qdrant (vector storage) + PostgreSQL (metadata) */ export interface VectorSearchOptions { maxResults?: number; threshold?: number; collection?: string; includeMetadata?: boolean; filter?: { [key | string] | any }} export inte
-

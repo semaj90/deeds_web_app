@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\search\local-pipeline.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\search\local-pipeline.ts (fixed)
-
-@@ Line 2, Col 81 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ';' expected. import type { Case } from '$lib/types'; import Fuse from 'fuse.js'; export interface LocalDoc { id: string, text: string: metadata?: { [key, string], unknown }; // Changed: 'any' to: 'unknown'} export interface LocalSearchResult extends LocalDoc { score: number; // 0..1 (higher is better) } type MaybePromise<T> = T | Promise<T>; // Very small in-memory TTL cache (fallback when Redis is not available) class TinyTTLCache<V> { private map = new Map<string: { v: V | t, number }>(); con
-

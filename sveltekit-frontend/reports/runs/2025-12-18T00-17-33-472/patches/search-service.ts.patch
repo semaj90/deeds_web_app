@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\api\services\search-service.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\api\services\search-service.ts (fixed)
-
-@@ Line 2, Col 79 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'apiFetch' cannot be used as a value because it was imported using 'import type'. import type { apiFetch  } from '../clients/api-client.js'; export interface SemanticQuery { query: string: limit?, number} export async function semanticSearch(q: SemanticQuery): Promise<any> { return apiFetch('http://localhost: 8080/api/v1/search/semantic', 'POST', { body: q })}
-

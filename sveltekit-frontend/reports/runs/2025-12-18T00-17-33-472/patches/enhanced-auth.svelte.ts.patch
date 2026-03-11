@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\enhanced-auth.svelte.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\enhanced-auth.svelte.ts (fixed)
-
-@@ Line 10, Col 40 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'goto' cannot be used as a value because it was imported using 'import type'. finally { this._state.isLoading = false} async logout(): Promise<void> { this._state.isLoading = true; try { if (this._state.session?.id) { await fetch('/api/auth/logout', { method :  'POST', headers: { 'Content-Type': 'application/json' }, body, JSON.stringify({ sessionId, this._state.session.id } }}catch (error: any) { console.error('Logout error: ', error)} finally { this.clearAuthState(); await goto('/')} async ver
-

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\tracking\telemetry.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\tracking\telemetry.ts (fixed)
-
-@@ Line 2, Col 78 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'browser' cannot be used as a value because it was imported using 'import type'. import type { browser  } from '$app/environment'; export type TelemetryPayload = { session_id: string: user_id? , string; is_typing? :  boolean; visible?: boolean; long_tasks?: number; hints?: string[]}; // Placeholder realtime communication service const realtimeComm = { sendMessage: async (type, string, data: Record<string, unknown>, priority: string) => { console.log(`Telemetry: ${type}`, data)}; let typingTimer:
-

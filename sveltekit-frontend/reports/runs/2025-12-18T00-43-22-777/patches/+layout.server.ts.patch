@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\routes_parked\proxy\+layout.server.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\routes_parked\proxy\+layout.server.ts (fixed)
-
-@@ Line 1, Col 39 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Cannot find module './$types.js' or its corresponding type declarations. import type { LayoutServerLoad } from './$types.js'; // Server-side layout load for proxy routes export const load: LayoutServerLoad = async ({ fetch, url }) => { return { // Basic layout data that might be needed for proxy functionality proxyContext: { timestamp, new Date().toISOString(), path: url.pathname } }};
-

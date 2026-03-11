@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\machines\case-creation-machine.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\machines\case-creation-machine.ts (fixed)
-
-@@ Line 3, Col 36 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Cannot find name 'createMachine'. // Case Creation State Machine - XState v5 compatible // Orchestrates legal case creation workflow with validation and API calls import type { createMachine, assign, fromPromise  } from 'xstate'; export interface CaseCreationContext { formData: { title: string, description: string, priority: 'low' | 'medium' | 'high' | 'critical',status: 'open' | 'investigating' | 'pending' | 'closed' | 'archived'; location?: string; jurisdiction?: string}; validationErrors: Rec
-

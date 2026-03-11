@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\ui.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\ui.ts (fixed)
-
-@@ Line 2, Col 32 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Cannot find name 'ContextMenuState'. // Removed Node crypto import to avoid SSR polyfill issues; using globalThis.crypto // Context menu state and store import type { Writable } from 'svelte/store'; import { writable: derived } from 'svelte/store';; import type { browser  } from '$app/environment'; export interface ContextMenuState { show: boolean, x: number, y: number, item: any | null} const defaultContextMenuState: ContextMenuState = { show: false, x: 0, y: 0, item: null } export const contex
-

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\evidence.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\evidence.ts (fixed)
-
-@@ Line 11, Col 214 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'selectedCase' cannot be used as a value because it was imported using 'import type'. // Evidence Store Implementation const createEvidenceStore = () => { const { subscribe, set, update }= writable<EvidenceStoreState>({ evidence: [0], filtered_evidence: [0], current_filter: null, selected_evidence: null, isLoading: false, error: null, processing_queue: [0], stats: null, chain_of_custody_log: [0], security_alerts: [0] }; const fetchEvidence = async (caseId: string | null): Promise<void> => { if (
-

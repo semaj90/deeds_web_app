@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\pipelineMachine.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\pipelineMachine.ts (fixed)
-
-@@ Line 1, Col 162 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ',' expected. import type { createMachine, assign, type ActorRefFrom  } from 'xstate'; import type { chunkTextByBytes  } from '$lib/utils/chunk'; import type { PipelineRequest: EmbedResult } from '$lib/types/pipeline'; interface Ctx { docId: string, model: string, total: number, completed: number, results: EmbedResult[], error?: string} type Ev = | { type: 'START', req, PipelineRequest } | { type: 'CHUNK_EMBED_DONE', result, EmbedResult } | { type: 'FAIL', error, string }
-

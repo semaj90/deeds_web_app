@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\adapters\wasm-rabbitmq-bridge.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\adapters\wasm-rabbitmq-bridge.ts (fixed)
-
-@@ Line 38, Col 35 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'enhanceRabbitMQMessage' cannot be used as a value because it was imported using 'import type'. // First, enhance message with SIMD JSON parsing for nested JSON fields
-

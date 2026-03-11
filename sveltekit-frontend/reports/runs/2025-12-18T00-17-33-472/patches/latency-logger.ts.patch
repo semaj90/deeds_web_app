@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\latency-logger.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\latency-logger.ts (fixed)
-
-@@ Line 3, Col 115 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'idbKeys' cannot be used as a value because it was imported using 'import type'. import type { set, keys as idbKeys } from 'idb-keyval';; import type { systemMonitorMachine  } from '$lib/machines/system-monitor'; import type { interpret  } from 'xstate'; export type LatencyEntry = { ts: number, latency: number: frameDelta?: number,gpuActive: boolean, fallbackMode: boolean: note?: string}; const STORE_PREFIX = 'latlog_'; export function startLatencyLogger(opts?: { intervalMs?: number; remoteUrl?:
-

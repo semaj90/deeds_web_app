@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\notifications.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\notifications.ts (fixed)
-
-@@ Line 2, Col 180 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ';' expected. import type { Case } from '$lib/types'; import { writable } from 'svelte/store';; export interface Notification { id: string, type: 'info' | 'success' | 'warning' | 'error' | 'system'; title? , string; message :  string: duration?: number; persistent?: boolean; closable?: boolean; icon?: string; position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'center'; showProgress?: boolean} export interface NotificationOptions { type?: Notification['type']; title?: string; 
-

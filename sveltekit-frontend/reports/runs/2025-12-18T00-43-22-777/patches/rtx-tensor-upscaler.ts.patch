@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\rtx-tensor-upscaler.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\rtx-tensor-upscaler.ts (fixed)
-
-@@ Line 2, Col 283 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: File 'c:/Users/james/Videos/deeds-web-app/sveltekit-frontend/node_modules/@webgpu/types/dist/index.d.ts' is not a module. import type { Document } from '$lib/types'; /** * RTX Tensor Core Upscaler Service * Revolutionary Neural Sprite Auto-Encoder with RTX, 3060 Ti Optimization * Achieves 50:1 compression ratios with semantic preservation */ import type { browser  } from '$app/environment'; import type { GPUDevice, GPUBuffer, GPUTexture } from '@webgpu/types'; export interface RTXTensorConfig { 
-

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\vector-search-webasm-integration.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\vector-search-webasm-integration.ts (fixed)
-
-@@ Line 5, Col 280 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'SearchResult' cannot be used as a value because it was imported using 'import type'. export interface PipelineMetrics { totalTime: number, embeddingTime: number, searchTime: number, cacheHitRate: number, throughput: number, wasmMemoryUsage: number, gpuUtilization: number} /** * Vector Search WebASM Pipeline * High-performance vector search with WebAssembly acceleration */ export class VectorSearchWebASMPipeline { inferenceEngine: VectorSearchInferenceEngine | private, config: VectorSearchPipeli
-

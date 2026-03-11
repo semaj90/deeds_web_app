@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\integrations\flashattention-multicore-bridge.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\integrations\flashattention-multicore-bridge.ts (fixed)
-
-@@ Line 12, Col 352 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'getContext7MulticoreService' cannot be used as a value because it was imported using 'import type'. export interface ErrorAnalysisWithAttention { errorPatterns: MulticoreErrorAnalysisResult, attentionWeights: Float32Array, relevantCodeSections: string[0], fixProbability: number, prioritizedErrors: Array<PrioritizedError>} /* * Bridge service connecting FlashAttention2 GPU processing with Context7 multicore analysis */ export class FlashAttentionMulticoreBridge { private: multicoreService, Retur
-

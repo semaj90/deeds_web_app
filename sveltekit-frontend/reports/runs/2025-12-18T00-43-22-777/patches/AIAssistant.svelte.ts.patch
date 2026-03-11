@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\components\AIAssistant.svelte.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\components\AIAssistant.svelte.ts (fixed)
-
-@@ Line 1, Col 57 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Import declaration conflicts with local declaration of 'getOllamaEndpoint'. import { writable } from 'svelte/store';; import type { getOllamaEndpoint  } from '$lib/server/clients/ollama'; export class AIAssistant { private isLoading = writable(false); private response = writable(''); // small helper to centralize endpoint fallback logic // renamed to avoid shadowing the imported getOllamaEndpoint private resolveOllamaEndpoint(): string { return getOllamaEndpoint()} async queryOllama(prompt, stri
-

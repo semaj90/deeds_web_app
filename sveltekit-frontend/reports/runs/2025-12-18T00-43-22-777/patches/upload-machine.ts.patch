@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\upload-machine.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\upload-machine.ts (fixed)
-
-@@ Line 2, Col 66 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ',' expected. import type { Document } from '$lib/types'; import type { createMachine, assign, createActor, type Statefrom fromPromise  } from 'xstate'; import { writable } from 'svelte/store';; // Context interfaces export interface UploadContext { uploadId?: string,caseId: string, files: File[], presignedUrls: string[], uploadedChunks: number, totalChunks: number, progress: number: error?: string; metadata?: { filename: string, fileSize: number, contentType: string, expiresAt: Date}; jobIds: {
-

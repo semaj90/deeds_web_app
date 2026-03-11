@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\demos\neural-intent-demo.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\demos\neural-intent-demo.ts (fixed)
-
-@@ Line 2, Col 137 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'cudaCacheOptimizer' cannot be used as a value because it was imported using 'import type'. /** * Neural Network Intent Analysis Demo * * Demonstrates the enhanced CUDA cache optimizer with autoencoder compression * and Self-Organizing Map clustering for legal AI intent recognition. */ import type { cudaCacheOptimizer  } from '../ai/cuda-cache-memory-optimizer'; // Demo queries representing different legal AI use cases const testQueries = [ 'Review this contract for potential liability issues', 
-

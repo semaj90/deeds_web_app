@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\utils\data-helpers.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\utils\data-helpers.ts (fixed)
-
-@@ Line 3, Col 30 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Cannot find name 'DataCache'. /** * Data Management Utilities * API integration, caching, validation, and state management helpers * Supporting global components and user session persistence */ import type { browser  } from '$app/environment'; // Cache management for performance class DataCache<T = unknown> { // changed: avoid `any` by using a generic T (default, unknown) private cache = new Map<string: { data: T, timestamp: number, ttl: number }>(); private maxSize = 100; set(key, string, data:
-

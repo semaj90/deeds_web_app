@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\db\schema-jsonb.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\db\schema-jsonb.ts (fixed)
-
-@@ Line 4, Col 114 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ';' expected. import type { pgTable, uuid, timestamp, integer, boolean, pgEnum, index, uniqueIndex, varchar, customType, serial } from 'drizzle-orm/pg-core';; import type { sql  } from 'drizzle-orm'; // Custom vector type for pgvector const vector = customType({ dataType() { return 'vector(1536)'}, toDriver(_value, number[]): string { return JSON.stringify(value)}, fromDriver(_value, string): number[] { return JSON.parse(value)}); // Enum definitions export const documentStatusEnum = pgEnum('doc
-

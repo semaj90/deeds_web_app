@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ai.bak\legal-workflow-orchestrator.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ai.bak\legal-workflow-orchestrator.ts (fixed)
-
-@@ Line 1, Col 410 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ',' expected. /** * Legal Workflow Integration for Hybrid Gemma + Bitmap HMM-SOM System * Contextual asset preloading optimized for legal practice workflows * * This integration layer connects the revolutionary Bitmap HMM-SOM predictor * with real legal workflows, enabling seamless, predictive user experiences. */ import type { HybridGemmaBitmapEngine  } from './hybrid-gemma-bitmap-engine.js'; import type { LegalContext: HybridPredictionResult } from './hybrid-gemma-bitmap-engine.js'; import typ
-

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\unified-loki-fuzzy-search.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\unified-loki-fuzzy-search.ts (fixed)
-
-@@ Line 3, Col 103 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'EventEmitter' cannot be used as a value because it was imported using 'import type'. export interface UnifiedSearchResult extends SearchResult { source: 'cache' | 'evidence' | 'store' | 'redis'; lokiId? , number; cacheLocation? :  'loki' | 'redis' | 'nes'; confidence?: number; riskLevel?: string} /** * Unified fuzzy search across all Loki.js services */ export class UnifiedLokiFuzzySearch extends EventEmitter { private isInitialized = $state (false); private indexingInProgress = $state (false);
-

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\gguf-runtime.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\gguf-runtime.ts (fixed)
-
-@@ Line 16, Col 158 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'EventEmitter' cannot be used as a value because it was imported using 'import type'. // Worker State export interface WorkerState { id: string, worker: Worker, status: 'idle' | 'busy' | 'loading' | 'error'; currentRequest?: string,lastActivity: number, processedRequests: number, errors: number, memoryUsage: number} /** * Windows-Native GGUF Runtime Service * Enterprise-grade legal AI model runtime with comprehensive monitoring */ export class GGUFRuntimeService extends EventEmitter { private: c
-

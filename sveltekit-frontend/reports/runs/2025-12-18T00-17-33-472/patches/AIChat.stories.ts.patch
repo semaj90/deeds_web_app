@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\components\AIChat.stories.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\components\AIChat.stories.ts (fixed)
-
-@@ Line 1, Col 169 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'AIChat' cannot be used as a value because it was imported using 'import type'. import type { Meta: StoryObj } from '@storybook/svelte'; import type { AIChat  } from './AIChat.svelte'; const meta: Meta<any> = { title: 'Business/AIChat', component: AIChat, parameters: { layout: 'fullscreen', docs: { description: { component: 'AI-powered chat interface for legal assistance and case analysis' } } }, argTypes: { model: { control: { type: 'select' }, options: ['gemma3-legal', 'nomic-embed-text', 'cus
-

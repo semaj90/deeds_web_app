@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\db\schema\gpuInferenceDemo.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\db\schema\gpuInferenceDemo.ts (fixed)
-
-@@ Line 2, Col 131 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'pgTable' cannot be used as a value because it was imported using 'import type'. import { text, jsonb } from 'drizzle-orm/pg-core'; import type { pgTable, timestamp, uuid, real, integer, boolean } from 'drizzle-orm/pg-core';; export const gpuInferenceSessions = pgTable('gpu_inference_sessions', { id, uuid('id').primaryKey().defaultRandom(), sessionName: text('session_name').notNull(), userId: text('user_id'), engineUsed: text('engine_used').notNull(), // ollama, webgpu, vllm, fastembed, etc. cre
-

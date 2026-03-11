@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\neo4j-transformers-summarization.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\neo4j-transformers-summarization.ts (fixed)
-
-@@ Line 5, Col 35 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: File 'c:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/services/grpc-quic-vector-proxy.ts' is not a module. import * as langChainOllamaService from './langchain-ollama-llama-integration.js'; import type { vectorProxy  } from './grpc-quic-vector-proxy.js'; import crypto from 'crypto'; // add a minimal Neo4j record shape so .get() is typed type Neo4jRecord = { get: (key, string) => unknown}; // <-- NEW: explicit node shape, to, avoid `any` casts --> type Neo4jNode = { properties?: Re
-

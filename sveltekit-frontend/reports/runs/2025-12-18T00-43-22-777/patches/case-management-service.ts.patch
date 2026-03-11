@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\case-management-service.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\case-management-service.ts (fixed)
-
-@@ Line 12, Col 15 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Module '"$lib/server/messaging/rabbitmq.js"' has no exported member 'rabbitmq'. import type { globalLoki  } from '$lib/stores/global-loki-store.js'; import type { rabbitmq  } from '$lib/server/messaging/rabbitmq.js'; import type { eq, and, desc, sql  } from 'drizzle-orm'; // Add typed global extensions to avoid `any` type GlobalLoki = { id?: string; startJob?: (job: { id: string, type: string: metadata?: unknown }) => Promise<void>}; type OCRWorker = { process?: (filePath: string) => Promise<{ t
-

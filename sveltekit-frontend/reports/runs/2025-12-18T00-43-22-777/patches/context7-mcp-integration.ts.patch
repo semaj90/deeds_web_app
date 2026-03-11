@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\context7-mcp-integration.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\context7-mcp-integration.ts (fixed)
-
-@@ Line 2, Col 128 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ',' expected. import type { Document } from '$lib/types'; /** * Context7 MCP Integration Service * Provides legal AI best practices and MCP-enhanced recommendations */ import { writable: get } from 'svelte/store';; // Types and Interfaces export interface Context7BestPractice { id: string, category: 'performance' | 'security' | 'accessibility' | 'maintainability',title: string, description: string, implementation: string, codeExample: string, priority: 'low' | 'medium' | 'high' | 'critical',esti
-

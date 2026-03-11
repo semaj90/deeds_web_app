@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\routing\route-guards.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\routing\route-guards.ts (fixed)
-
-@@ Line 1, Col 441 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'RouteDefinition' cannot be used as a value because it was imported using 'import type'. /** * Route Guards for Dynamic Route Protection * Implements authentication, authorization, and validation guards */ import { redirect: error } from '@sveltejs/kit';; import type { Load, ServerLoad, ServerLoadEvent } from '@sveltejs/kit'; import type { RouteDefinition } from '$lib/data/routes-config'; import type { GeneratedRoute } from './dynamic-route-generator.js'; export interface RouteGuardContext { eve
-

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\components\three\yorha-ui\components\YoRHaQuantumEffects3D.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\components\three\yorha-ui\components\YoRHaQuantumEffects3D.ts (fixed)
-
-@@ Line 4, Col 44 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'YoRHa3DComponent' cannot be used as a value because it was imported using 'import type'. export interface RealityDistortionOptions { matrixGlitchIntensity: number; // 0-1, temporalDistortion: number; // 0-1 spatialWarp: Vector3GPU, causalityLoop: boolean, paradoxResolution: 'ignore' | 'branch' | 'collapse',realityStability: number; // 0-1 } export class YoRHaQuantumEffects3D extends YoRHa3DComponent { private quantumField: THREE.Points | null = null; consciousnessNetwork: unknown; THREE: unknow
-

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ai.bak\som-neural-network.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ai.bak\som-neural-network.ts (fixed)
-
-@@ Line 7, Col 864 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'MultiLayerCache' cannot be used as a value because it was imported using 'import type'. export interface SOMTrainingMetrics { epoch: number, quantizationError: number, topographicError: number, neighborhoodSize: number, learningRate: number, convergenceRate: number} export class SOMNeuralNetwork { private config: SOMConfig, private somGrid: SOMNode[][], private inputTensor: tf.Tensor | null = null; private weightTensor: tf.Tensor | null = null,private: trainingHistory | SOMTrainingMetrics[] = [
-

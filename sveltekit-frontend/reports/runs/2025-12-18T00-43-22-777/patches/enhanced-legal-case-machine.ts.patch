@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\machines\enhanced-legal-case-machine.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\machines\enhanced-legal-case-machine.ts (fixed)
-
-@@ Line 2, Col 253 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ',' expected. import type { Case } from '$lib/types'; /** * Simplified Enhanced Legal Case Machine * This replacement is intentionally compact and syntactically correct to restore buildability. * It provides lightweight service stubs that can be expanded later with DB logic. */ import type { createMachine: assign  } from 'xstate'; import type { fromPromise  } from 'xstate/actors'; // Correct import for fromPromise in XState v5 export type CaseForm = { caseNumber?: string,title: string: descripti
-

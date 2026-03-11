@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\machines\legal-case-machine-factory.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\machines\legal-case-machine-factory.ts (fixed)
-
-@@ Line 2, Col 265 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'enhancedLegalCaseMachine' cannot be used as a value because it was imported using 'import type'. /** * Legal Case Machine Factory - Fully Wired with Postgres/Drizzle * Creates XState machines with caseId context and RAG integration * Ready-to-use with your Gemma3 + pgvector setup */ import type { createMachine, assign, fromPromise  } from 'xstate'; import type { enhancedLegalCaseMachine, type EnhancedLegalCaseContext, type EnhancedLegalCaseEvent  } from './enhanced-legal-case-machine.js'; expor
-

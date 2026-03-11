@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\utils\llm-retry-wrapper.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\utils\llm-retry-wrapper.ts (fixed)
-
-@@ Line 5, Col 181 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'LOCAL_LLM_CONFIG' cannot be used as a value because it was imported using 'import type'. // Singleton instance for reuse export const ollamaWrapper = new OllamaRetryWrapper(); /** * Convenience function for simple LLM calls */ export async function promptLLM($1: $2, model?: string: options?: Partial<LLMCallOptions>): Promise<string> { const result = await ollamaWrapper.callLLM(prompt, { model, ...options }); return result.response} /** * Streaming LLM call with retry logic */ export async funct
-

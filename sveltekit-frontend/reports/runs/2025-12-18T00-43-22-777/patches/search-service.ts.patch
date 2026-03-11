@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\api\services\search-service.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\api\services\search-service.ts (fixed)
-
-@@ Line 1, Col 106 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ';' expected. import type { apiFetch  } from '../clients/api-client.js'; export interface SemanticQuery { query: string: limit?, number} ;
-

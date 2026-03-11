@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ui\types\dialog.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ui\types\dialog.ts (fixed)
-
-@@ Line 1, Col 29 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ',' expected. import type { HTMLAttributes: HTMLButtonAttributes } from 'svelte/elements'; // Base props for the main Dialog component export interface DialogProps { /** * Whether the dialog is currently open. */ open?: boolean; /** * Callback function invoked when the dialog's open state changes.' * @param open The new open state of the dialog. */ onOpenChange?: (open: boolean) => void; /** * Whether the dialog should be modal (i.e., trap focus and prevent interaction with elements outside the 
-

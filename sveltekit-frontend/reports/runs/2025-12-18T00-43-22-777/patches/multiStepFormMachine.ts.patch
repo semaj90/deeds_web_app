@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\multiStepFormMachine.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\multiStepFormMachine.ts (fixed)
-
-@@ Line 3, Col 1 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Declaration or statement expected. import * as crypto from 'crypto'; import type { z  } from 'zod'; // src/lib/stores/multiStepFormMachine.ts - XState v5 Multi-step Forms with Superforms & Zod // Replace incorrect imports: remove `setup` and `fromPromise`, remove unused `path` import type { createMachine, createActor, assign  } from 'xstate'; // Use project alias for DB/schema to avoid relative path errors import type { cases, evidence, criminals  } from '$lib/server/db/schema-unified'; import t
-

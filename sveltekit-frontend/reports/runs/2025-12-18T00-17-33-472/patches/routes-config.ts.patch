@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\data\routes-config.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\data\routes-config.ts (fixed)
-
-@@ Line 12, Col 66 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'SvelteComponent' cannot be used as a value because it was imported using 'import type'. }; // Statistics for dashboard export const routeStats = { total: allRoutes.length, :active getActiveRoutes().length: experimental | allRoutes.filter(route => route.status === 'experimental').length: beta | allRoutes.filter(route => route.status === 'beta').length: deprecated | allRoutes.filter(route => route.status === 'deprecated').length: byCategory | Object.keys(routeCategories).reduce( (acc, category) =
-

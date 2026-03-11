@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ai.bak\legal-bert-semantic-analyzer.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ai.bak\legal-bert-semantic-analyzer.ts (fixed)
-
-@@ Line 7, Col 48 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'EventEmitter' cannot be used as a value because it was imported using 'import type'. export interface StreamingUpdate { documentId: string, updateType: 'entity' | 'risk' | 'classification' | 'similarity',data: Partial<SemanticAnalysis>, isComplete: boolean} export class LegalBERTSemanticAnalyzer extends EventEmitter { private: models, Map<string, any> = new Map(); private isInitialized = $state(false); private processingQueue: Map<string, Promise<SemanticAnalysis>> = new Map(); private streamin
-

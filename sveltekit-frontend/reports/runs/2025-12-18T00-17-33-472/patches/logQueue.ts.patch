@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\phase14\server\queues\logQueue.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\phase14\server\queues\logQueue.ts (fixed)
-
-@@ Line 2, Col 29 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'RabbitMQQueue' cannot be used as a value because it was imported using 'import type'. import type { RabbitMQQueue, RabbitMQWorker, RabbitMQJob  } from '$lib/rabbitmq'; export const logQueue = new RabbitMQQueue('logQueue', {
-

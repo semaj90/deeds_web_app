@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\userActivityStore.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\userActivityStore.ts (fixed)
-
-@@ Line 3, Col 58 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ';' expected. /** * User Activity Detection Store for GPU Lifecycle Management * Tracks user interactions to trigger GPU memory optimization */ import { writable, derived, get } from 'svelte/store';; import type { browser  } from '$app/environment'; interface UserActivityMetrics { lastActivity: number, idleTimeMs: number, interactionCount: number, activityScore: number, isActive: boolean, sessionStartTime: number} interface ActivityEvent { type: string, timestamp: number: target?: string; data?:
-

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\config\redis-config.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\config\redis-config.ts (fixed)
-
-@@ Line 2, Col 219 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Module '"ioredis"' has no exported member 'RedisOptions'. Did you mean to use 'import RedisOptions from "ioredis"' instead? import type { User } from '$lib/types'; /** * Redis Configuration Service for Legal AI Platform * Centralized configuration management for all Redis connections * Integrates with: redis-service.ts, loki-redis-integration.ts, redis-helper.ts */ import type { RedisOptions } from 'ioredis'; // Environment-based configuration const isDevelopment = process.env.NODE_ENV === 'deve
-

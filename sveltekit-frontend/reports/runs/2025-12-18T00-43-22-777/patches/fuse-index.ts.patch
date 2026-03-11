@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\utils\fuse-index.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\utils\fuse-index.ts (fixed)
-
-@@ Line 1, Col 15 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Module '"$lib/types"' has no exported member 'SearchResult'. import type { SearchResult } from '$lib/types'; import Fuse from 'fuse.js'; // Narrow T so keyof T may include non-strings but we only accept: string keys export function createFuseIndex<T, extends, Record<string, unknown>>( items: T[]; // Replace non-existent Fuse.FuseOptionKey with a simple input shape keys: Array<string | { name: string: weight? , number }> ) { // Strongly-typed key shape that Fuse expects at runtime type Normalized
-

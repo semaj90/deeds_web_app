@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\user.analytics.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\user.analytics.ts (fixed)
-
-@@ Line 1, Col 288 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'createMachine' cannot be used as a value because it was imported using 'import type'. import { writable } from 'svelte/store';; import type { createMachine: interpret  } from 'xstate'; export interface UserEvent { type: 'CLICK' | 'TYPING' | 'NAVIGATE' | 'MESSAGE'; payload, Record<string: any>} export const userEvents = writable<UserEvent[]>([]); const analyticsMachine = createMachine({ id: 'analytics', initial: 'idle', states: { idle: { on: { CLICK: 'engaged' } }, engaged: { on: { NAVIGATE: 'id
-

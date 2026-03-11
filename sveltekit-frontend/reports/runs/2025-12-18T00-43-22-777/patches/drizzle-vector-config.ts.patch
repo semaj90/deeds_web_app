@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\server\db\drizzle-vector-config.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\server\db\drizzle-vector-config.ts (fixed)
-
-@@ Line 6, Col 29 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Cannot find name 'connectionString'. import type { pgTable, serial, varchar, integer, timestamp, boolean, index } from 'drizzle-orm/pg-core';; import type { sql  } from 'drizzle-orm'; import type { relations  } from 'drizzle-orm/relations'; import type { customType  } from 'drizzle-orm/pg-core'; import postgres from 'postgres'; // Custom vector type for pgvector (512-dim embeddinggemma: latest) const vector = customType({ dataType(config: { dimensions? , number }= {}) { return `vector(${config?.
-

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\tensorrt-quic-client.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\tensorrt-quic-client.ts (fixed)
-
-@@ Line 3, Col 299 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'browser' cannot be used as a value because it was imported using 'import type'. }; // Connection status export const connectionStatus = writable({ connected: false, protocol: 'unknown', quicEnabled: false, lastPing: 0 }; // Real-time response stream export const responseStream = writable<LegalAIResponse | null>(null); export interface LegalAIRequest { prompt: string: maxTokens? , number temperature? :  number topK?: number topP?: number stream?: boolean sessionId?: string legalDomain?: string} 
-

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\server\vector\EnhancedVectorService.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\server\vector\EnhancedVectorService.ts (fixed)
-
-@@ Line 3, Col 55 @@
-Pattern: import-alias-colon-safe (syntax-fix)
-Confidence: 95.0%
-Message: Cannot find name 'QdrantApiWrapper'. import type { redis as ensureRedisReady } from '$lib/server/redis-client'; // Enhanced Vector Service - Auto-generated from 11 files // Generated: 2025-07-25T03: 29:35.246Z // Features: detected | hasOllama, hasQdrant, hasRedis, hasPgVector, hasEmbeddings import type { createQdrantWrapper: QdrantApiWrapper  } from './qdrant-api-wrapper.js'; // Replaced createRedisInstance import with default Redis class import to match instance type import Redis from 'ioredis
-

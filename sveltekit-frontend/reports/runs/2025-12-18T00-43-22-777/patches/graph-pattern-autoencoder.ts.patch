@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ai.bak\graph-pattern-autoencoder.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ai.bak\graph-pattern-autoencoder.ts (fixed)
-
-@@ Line 11, Col 163 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Cannot find name 'y'. import type { reinforcementLearningCache  } from '../caching/reinforcement-learning-cache.server.js'; export interface AutoEncoderConfig { inputDimension: number, hiddenLayers: number[], activationFunction: 'relu' | 'tanh' | 'sigmoid' | 'elu',learningRate: number, batchSize: number, epochs: number, enableGPU: boolean, compressionTarget: number; // Target compression ratio (0.1 = 90% compression) enableNormalization: boolean, enableDropout: boolean, dropoutRate: number} expo
-

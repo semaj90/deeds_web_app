@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\enhancedRAG.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\enhancedRAG.ts (fixed)
-
-@@ Line 3, Col 67 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Module '"$lib/types/llm"' has no exported member 'LLMProvider'. import { writable, get } from 'svelte/store'; import type { type Writable } from 'svelte/store';; import type { LLMProvider } from '$lib/types/llm'; export interface SearchResult { id: string, score: number, payload: { content: string }} export interface QueryIntent { type: string, confidence: number, entities: string[]}
-

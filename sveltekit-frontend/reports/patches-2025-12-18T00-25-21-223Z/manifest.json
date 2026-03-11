@@ -1,9 +1,0 @@
-{
-  "timestamp": "2025-12-18T00-25-21-223Z",
-  "files": [
-    {
-      "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\services\\chat-vector-storage.ts",
-      "patch": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\reports\\patches-2025-12-18T00-25-21-223Z\\chat-vector-storage.ts.patch"
-    }
-  ]
-}

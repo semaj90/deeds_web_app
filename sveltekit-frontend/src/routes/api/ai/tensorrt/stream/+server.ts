@@ -25,7 +25,62 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	const trtAvailable = await trtHealthCheck();
 	if (!trtAvailable) {
-		return new Response(JSON.stringify({ error: 'TensorRT-LLM unavailable' }), {
+		// Fallback to Ollama SSE streaming
+		const ollamaUrl = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+		try {
+			const ollamaRes = await fetch(`${ollamaUrl}/api/generate`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					model: 'gemma3-legal:latest',
+					prompt,
+					stream: true,
+					options: {
+						temperature: temperature ?? 0.7,
+						num_predict: maxTokens ?? 2048
+					}
+				}),
+				signal: AbortSignal.timeout(120000)
+			});
+
+			if (ollamaRes.ok && ollamaRes.body) {
+				const reader = ollamaRes.body.getReader();
+				const encoder = new TextEncoder();
+				const decoder = new TextDecoder();
+
+				const stream = new ReadableStream({
+					async pull(controller) {
+						const { done, value } = await reader.read();
+						if (done) {
+							controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: '', done: true, backend: 'ollama' })}\n\n`));
+							controller.close();
+							return;
+						}
+						const text = decoder.decode(value, { stream: true });
+						for (const line of text.split('\n').filter(Boolean)) {
+							try {
+								const parsed = JSON.parse(line);
+								controller.enqueue(encoder.encode(`data: ${JSON.stringify({
+									content: parsed.response ?? '',
+									done: parsed.done ?? false,
+									backend: 'ollama'
+								})}\n\n`));
+							} catch { /* skip malformed lines */ }
+						}
+					}
+				});
+
+				return new Response(stream, {
+					headers: {
+						'Content-Type': 'text/event-stream',
+						'Cache-Control': 'no-cache',
+						'Connection': 'keep-alive'
+					}
+				});
+			}
+		} catch { /* Ollama also unavailable */ }
+
+		return new Response(JSON.stringify({ error: 'TensorRT-LLM and Ollama both unavailable' }), {
 			status: 503,
 			headers: { 'Content-Type': 'application/json' }
 		});

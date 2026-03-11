@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\components\ui\Button.stories.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\components\ui\Button.stories.ts (fixed)
-
-@@ Line 3, Col 14 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'Meta' cannot be used as a value because it was imported using 'import type'. import type { Meta: StoryObj } from '@storybook/svelte'; import Button from './Button.svelte.js'; const meta = { title: 'UI/Button', component: Button, parameters: { layout: 'centered', docs: { description: { component: 'Primary UI button component with multiple variants for legal AI platform' } } }, tags: ['autodocs'], argTypes: { variant: { control: 'select', options: [ 'default', 'destructive', 'outline', 'secondary
-

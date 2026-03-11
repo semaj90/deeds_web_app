@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\ai-pipeline-client.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\ai-pipeline-client.ts (fixed)
-
-@@ Line 2, Col 228 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'browser' cannot be used as a value because it was imported using 'import type'. /** * Client-Side AI Pipeline with localStorage Graceful Fallback * * Provides resilient AI operations with automatic fallback to: * 1. Live API calls (when services available) * 2. Cached results (localStorage) * 3. Offline-first operation * 4. Progressive enhancement */ import type { browser  } from '$app/environment'; // Service availability tracking interface ServiceStatus { ollama: boolean, embedding: boolean, 
-

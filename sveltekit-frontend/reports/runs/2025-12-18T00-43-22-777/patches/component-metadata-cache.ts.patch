@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\component-metadata-cache.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\component-metadata-cache.ts (fixed)
-
-@@ Line 2, Col 1 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Property or signature expected. /** * Enhanced-Bits Component Metadata Caching System * Caches component metadata, dependencies, and performance stats */ import type { redisComponentStore  } from './redis-component-store.js'; export interface ComponentMetadata { name: string, category: 'core' | 'legal' | 'ai' | 'gaming' | 'advanced',size: number; // Bundle size in bytes: dependencies | string[],props: { [key, string], any }; lastModified: number: loadTime?: number; renderTime?: number; memoryUsa
-

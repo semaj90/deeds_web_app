@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\orchestration\qlora-ollama-orchestrator.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\orchestration\qlora-ollama-orchestrator.ts (fixed)
-
-@@ Line 11, Col 286 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'qloraWasmLoader' cannot be used as a value because it was imported using 'import type'. `).join('\n')}` Provide a comprehensive that: 1. Integrates all expert perspectives 2. Highlights key findings and recommendations 3. Identifies: unknown contradictions or gaps 4. Provides clear steps: Synthesis: ';' const modelKey = this.activeModels.get(synthesisAgent.id)!; const synthesis = await qloraWasmLoader.generateText(modelKey, synthesisPrompt, { maxTokens: 512, temperature: 0.2 }; return synthesis
-

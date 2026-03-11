@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\utils\error-client.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\utils\error-client.ts (fixed)
-
-@@ Line 2, Col 232 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'pushToast' cannot be used as a value because it was imported using 'import type'. import type { pushToast  } from '$lib/stores/errorStore'; export const ERROR_CODE_MAP: Record<string, { title: string | message, string }> = { INVALID_CREDENTIALS: { title: 'Login failed', message: 'Email or password is incorrect.' }, EMAIL_TAKEN: { title: 'Registration failed', message: 'This email is already in use.' }, AUTH_REQUIRED: { title: 'Authentication required', message: 'Please log in to continue.' }, S
-

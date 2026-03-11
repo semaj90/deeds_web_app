@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\optimization\ultra-json-processor.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\optimization\ultra-json-processor.ts (fixed)
-
-@@ Line 6, Col 56 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'EventEmitter' cannot be used as a value because it was imported using 'import type'. export interface StreamingParseResult { chunks: unknown[], totalSize: number, parseTime: number, errors: string[]} export class UltraHighPerformanceJSONProcessor extends EventEmitter { private wasmModule: WasmJSONParser | null = null; private config: JSONOptimizationConfig, private: cache | Map<string: { value: unknown, timestamp: number, accessCount: number }> = new Map(); private metrics: JSONPerformanceMetri
-

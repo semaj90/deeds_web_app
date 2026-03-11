@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ui\types\select.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ui\types\select.ts (fixed)
-
-@@ Line 1, Col 29 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ',' expected. import type { HTMLAttributes: HTMLButtonAttributes } from 'svelte/elements'; // Base props for the main Select component export interface SelectProps<T = string> { /** * The currently selected value. */ selected?: T; /** * Callback function invoked when the selected value changes. * @param value The new selected value. */ onSelectedChange?: (value: T) => void; /** * Whether the select is currently open. */ open? , boolean; /** * Callback function invoked when the select's open stat
-

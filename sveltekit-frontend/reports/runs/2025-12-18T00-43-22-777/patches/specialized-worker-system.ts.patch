@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\workers\specialized-worker-system.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\workers\specialized-worker-system.ts (fixed)
-
-@@ Line 4, Col 64 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ';' expected. /** * Specialized Worker System - Event-Driven, "Hive Programming" * Implements RabbitMQ-based job distribution for AI services * Jobs: SUMMARIZE_DOCUMENT | GET_CASE_LAW, GENERATE_EMBEDDING */ import type { EventEmitter  } from 'events'; // Define minimal local types matching the amqplib surface we use type AmqpConnectionLike = { createChannel: () => Promise<AmqpChannelLike>; close?: () => Promise<void>}; type AmqpChannelLike = { assertQueue: ($1: $2, opts?: Record<string, unknown>
-

@@ -18,6 +18,7 @@ import { embedGate, entityGate, forensicsGate, summarizeGate, gated, EMBED_BATCH
 import { heavyRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 import { detectEvidenceType, inferLegalClassification } from '$lib/server/evidence/type-detector.js';
 import { invalidateEvidenceCache, invalidateCaseCache } from '$lib/server/cache/invalidation.js';
+import { triggerEvidenceGpuAnalysis } from '$lib/server/gpu/background-analyzer.js';
 
 import { ENV } from '$lib/server/env.server.js';
 const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
@@ -129,7 +130,21 @@ export async function POST({ request }: RequestEvent) {
 			updateJob(jobId, { step: 'error', progress: 60, message: 'Embedding generation failed (upload succeeded)', error: String(err) });
 		});
 
-		// 6. Invalidate evidence and case caches
+		// 6. Publish to RabbitMQ for async analysis tracking
+		try {
+			const { rabbitmq } = await import('$lib/server/queue/rabbitmq-manager-fixed.js');
+			await rabbitmq.publishEvidenceProcess({
+				evidenceId,
+				text: '',
+				caseId,
+				fileName: file.name,
+				metadata: { fileSize: file.size, mimeType: file.type, hash: fileHash }
+			});
+		} catch {
+			// RabbitMQ publish is non-critical
+		}
+
+		// 7. Invalidate evidence and case caches
 		await Promise.all([
 			invalidateEvidenceCache(evidenceId, caseId, 'evidence_create'),
 			caseId ? invalidateCaseCache(caseId, 'evidence_create') : Promise.resolve()
@@ -610,6 +625,11 @@ async function processAndEmbed(
 		`);
 	} catch (err) {
 		console.warn('[Upload] Analysis persistence failed (vectors are safe):', err);
+	}
+
+	// 9. GPU background analysis — fire-and-forget (similarity, clustering, case embedding)
+	if (caseId && stored > 0) {
+		triggerEvidenceGpuAnalysis(evidenceId, caseId);
 	}
 
 	// Complete pipeline job

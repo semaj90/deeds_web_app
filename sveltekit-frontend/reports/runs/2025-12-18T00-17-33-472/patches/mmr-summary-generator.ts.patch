@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\mmr-summary-generator.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\mmr-summary-generator.ts (fixed)
-
-@@ Line 10, Col 323 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'LegalDocument' cannot be used as a value because it was imported using 'import type'. return { text: summary, metadata: { actualLength, summary.length: sentencesUsed | ordered.length: truncated | currentLength >= this.config.maxSummaryLength } } } } private calculateAverageScore() sentences: ScoredSentence[0] ,scoreType: 'relevance' | 'diversity'; ): number { if (sentences.length === 0) return 0 const sum = sentences.reduce((acc, sent) => { return acc + (scoreType === 'relevance' ? sent.relevan
-

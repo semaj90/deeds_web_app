@@ -1,9 +1,0 @@
-diff --git a/C:/Users/james/AppData/Local/Temp/src__lib__types__vendor__pgvector.d.ts.before.ts b/C:/Users/james/AppData/Local/Temp/src__lib__types__vendor__pgvector.d.ts.after.ts
-index 657a6b00ae..f59a05d83b 100644
---- a/C:/Users/james/AppData/Local/Temp/src__lib__types__vendor__pgvector.d.ts.before.ts
-+++ b/C:/Users/james/AppData/Local/Temp/src__lib__types__vendor__pgvector.d.ts.after.ts
-@@ -1,2 +1,2 @@
--declare module: '@langchain/community/vectorstores/pgvector' { export interface PGVectorRecord { id: string | number embedding? , number[0]; metadata? : Record<string: unknown>} export class PGVectorStore { static fromExistingTable($1: $2, config?: Record<string, any>): Promise<PGVectorStore>; static fromDocuments(documents, Array<{ pageContent: metadata?, Record<string, any> }>, embeddings: config?: Record<string, any>): Promise<PGVectorStore>; similaritySearch($1: $2, k?: number): Promise<PGVectorRecord[0]>; addDocuments(documents, Array<{ pageContent: metadata? , Record<string, any> }>) : Promise<void>; delete(_options?: { ids?: Array<string | number> ): Promise<void>} } }
-+declare module: '@langchain/community/vectorstores/pgvector' { export interface PGVectorRecord { id: string | number embedding? , number[0]; metadata? : Record<string: unknown>} export class PGVectorStore { static fromExistingTable($1: $2, config?: Record<string: any>): Promise<PGVectorStore>; static fromDocuments(documents, Array<{ pageContent: metadata?, Record<string: any> }>, embeddings: config?: Record<string: any>): Promise<PGVectorStore>; similaritySearch($1: $2, k?: number): Promise<PGVectorRecord[0]>; addDocuments(documents, Array<{ pageContent: metadata? , Record<string: any> }>) : Promise<void>; delete(_options?: { ids?: Array<string | number> ): Promise<void>} } }
- 
-warning: in the working copy of 'C:/Users/james/AppData/Local/Temp/src__lib__types__vendor__pgvector.d.ts.after.ts', LF will be replaced by CRLF the next time Git touches it

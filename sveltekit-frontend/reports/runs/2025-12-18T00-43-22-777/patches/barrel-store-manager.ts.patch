@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\barrel-store-manager.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\barrel-store-manager.ts (fixed)
-
-@@ Line 6, Col 1 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Declaration or statement expected. import type { type Writable, type Readable } from 'svelte/store';; // SSR-safe storage utilities (adapted from ai-store.ts) const SSR_SAFE_STORAGE = { getItem: (key, string): string | null => { if (typeof window === 'undefined') return null; try { return localStorage.getItem(key)}catch { return null}, setItem: (key: string, value: string): void => { if (typeof window === 'undefined') return; try { localStorage.setItem(key, value)}catch { // Silently fail in SSR
-

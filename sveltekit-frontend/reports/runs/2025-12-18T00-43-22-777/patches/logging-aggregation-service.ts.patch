@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\logging-aggregation-service.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\logging-aggregation-service.ts (fixed)
-
-@@ Line 3, Col 83 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ';' expected. import type { type Writable } from 'svelte/store';; import type { browser  } from '$app/environment'; export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal;'; export interface LogEntry { id: string, timestamp: number, level: LogLevel, category: string, message: string: data?: unknown; error?: Error; service?: string; userId?: string; sessionId?: string; requestId?: string; tags?: string[]; meta?: { [key | string] | any } } } export interface LogTransport { name: strin
-

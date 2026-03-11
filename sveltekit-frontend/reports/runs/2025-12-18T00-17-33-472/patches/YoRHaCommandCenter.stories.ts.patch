@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\components\yorha\YoRHaCommandCenter.stories.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\components\yorha\YoRHaCommandCenter.stories.ts (fixed)
-
-@@ Line 3, Col 14 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'Meta' cannot be used as a value because it was imported using 'import type'. import type { Meta: StoryObj } from '@storybook/svelte'; import type { within, userEvent, expect  } from '@storybook/test'; import YoRHaCommandCenter from './YoRHaCommandCenter.svelte.js'; const meta = { title: 'YoRHa/CommandCenter', component: YoRHaCommandCenter, parameters: { layout: 'fullscreen', docs: { description: { component: 'YoRHa Command Center Dashboard - Main interface for legal AI operations' } } }, tags: 
-

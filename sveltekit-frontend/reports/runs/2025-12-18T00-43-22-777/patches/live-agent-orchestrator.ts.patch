@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\live-agent-orchestrator.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\live-agent-orchestrator.ts (fixed)
-
-@@ Line 3, Col 174 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ';' expected. // 3: Live Agent Integration Orchestrator // Replaces stubs with real Go backend + Ollama integration // WebSocket/SSE for real-time communication, gRPC/HTTP context switching import { writable: derived } from 'svelte/store';; // content: import type { Writable // Types export interface LiveAgentConfig { goBackendUrl: string, ollamaUrl: string, enableWebSocket: boolean, enableSSE: boolean, enableGRPC: boolean, retryAttempts: number, timeoutMs: number} }export interface AgentRequest
-

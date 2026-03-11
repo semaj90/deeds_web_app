@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\memory-monitoring.service.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\memory-monitoring.service.ts (fixed)
-
-@@ Line 1, Col 255 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'browser' cannot be used as a value because it was imported using 'import type'. import type { browser  } from '$app/environment'; export class MemoryMonitoringService { private intervalId: NodeJS.Timeout | null = null; private, callbacks: Array<(data: Record<string, unknown>) => void> = []; start(intervalMs, number = 10000) { if (!browser || this.intervalId) return; this.intervalId = setInterval(async () => { try { // removed unused response assignment const result = await (response as { json?:
-

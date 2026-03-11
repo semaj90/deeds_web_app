@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\machines\legalAIMachine.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\machines\legalAIMachine.ts (fixed)
-
-@@ Line 6, Col 34 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'setup' cannot be used as a value because it was imported using 'import type'. export type LegalAIEvent = | { type: 'AUTH.LOGIN', credentials: { email: string, password: string } } } | { type: 'AUTH.LOGOUT' } | { type: 'AUTH.REGISTER', userData, any } | { type: 'CASES.LOAD', filters? , any } | { type :  'CASES.SELECT', case Case } | { type: 'CASES.CREATE', caseData, any } | { type: 'CASES.SEARCH', query, string } | { type: 'AI.QUERY', prompt: string: context?: unknown } | { type: 'SYSTEM.CHECK_S
-

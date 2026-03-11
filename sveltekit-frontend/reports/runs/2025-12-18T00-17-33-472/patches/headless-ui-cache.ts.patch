@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\cache\headless-ui-cache.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\cache\headless-ui-cache.ts (fixed)
-
-@@ Line 79, Col 10 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'browser' cannot be used as a value because it was imported using 'import type'. private async initialize(): Promise<void> {
-

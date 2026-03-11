@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\redis-vector-service.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\redis-vector-service.ts (fixed)
-
-@@ Line 3, Col 81 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ';' expected. import type { logger  } from '$lib/utils/logger'; export interface VectorSearchResult { id: string, score: number, payload: unknown: vector?: number[]} export interface DocumentVector { id: string, vector: number[], payload: unknown: metadata?: unknown} export class RedisVectorService { // Use a minimal Redis-like interface to avoid coupling to a specific ioredis type version private: redis, RedisLike | null = null; private isConnected = $state (false); constructor() { // Prefer RE
-

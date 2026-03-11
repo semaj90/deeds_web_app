@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\machines\ai-computation-machine.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\machines\ai-computation-machine.ts (fixed)
-
-@@ Line 3, Col 37 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'createMachine' cannot be used as a value because it was imported using 'import type'. // Replace `any` with the concrete ComputationResult type export type AIComputationEvent = | { type: 'START_COMPUTATION', data: { input: number[], shape: number[], attentionWeights: number[] } } } | { type: 'USER_ACTIVE' } | { type: 'USER_IDLE' } | { type: 'COMPUTATION_COMPLETE', result, ComputationResult }// <-- typed result | { type: 'COMPUTATION_ERROR', error, string } | { type: 'NETWORK_ONLINE' } | { type:
-

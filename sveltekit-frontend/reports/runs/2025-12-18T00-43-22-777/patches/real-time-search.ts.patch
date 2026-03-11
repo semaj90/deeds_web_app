@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\real-time-search.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\real-time-search.ts (fixed)
-
-@@ Line 3, Col 15 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement. // Real-time Legal Search with WebSocket/NATS Integration // Optimized for Svelte, 5 and SvelteKit, 2 with bits-ui components import { writable, derived } from 'svelte/store'; import type { type Writable } from 'svelte/store';; // WebSocket Service Registry Interface interface WSRegistryEntry { name: string, uuid: string, port: number, endpoint: string} // Load WebSocket service registry (aut
-

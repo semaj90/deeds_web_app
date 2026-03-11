@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\providers\ollama\streaming.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\providers\ollama\streaming.ts (fixed)
-
-@@ Line 4, Col 333 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'EventEmitter' cannot be used as a value because it was imported using 'import type'. export interface StreamSubscriber { callback: (_event: StreamEvent) => void, subscribed: number} export interface StreamingOptions { input: StreamInput: onProgress?: (stage: string | progress: number: data?: unknown) => void; onStage?: (stage: string | data: unknown) => void; onSource?: (source: Source) => void; onComplete?: (result: SynthesizerResult) => void; onError?: (error: Error) => void} class StreamingS
-

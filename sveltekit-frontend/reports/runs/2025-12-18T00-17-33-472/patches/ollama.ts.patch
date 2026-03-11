@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\server\integrations\ollama.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\server\integrations\ollama.ts (fixed)
-
-@@ Line 3, Col 413 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'EmbeddingOptions' cannot be used as a value because it was imported using 'import type'. class OllamaService implements IOllamaEmbeddingService, IOllamaChatService { config: Required<OllamaConfig>, private, embeddingModelFallbacks: string[] = [ 'embeddinggemma, latest', 'embeddinggemma', 'nomic-embed-text: latest', 'nomic-embed-text' ]; constructor(config, Partial<OllamaConfig> = {} { this.config = { baseUrl: config.baseUrl || process.env.OLLAMA_URL || 'http://localhost: 11434', embeddingModel:
-

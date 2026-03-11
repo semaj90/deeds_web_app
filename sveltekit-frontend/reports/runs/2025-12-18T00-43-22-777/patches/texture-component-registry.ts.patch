@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\registry\texture-component-registry.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\registry\texture-component-registry.ts (fixed)
-
-@@ Line 2, Col 1 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Property or signature expected. /** * Component Texture Registry - NES-Inspired GPU Memory Management * Prevents component conflicts and manages texture allocation across memory banks */ import type { MemoryBank } from '$lib/config/legal-priorities'; export interface TextureSlot { slotId: string, textureId: string, memoryBank: MemoryBank, size: number; // bytes lastAccessed: number, lockCount: number; // Reference counting } export interface ComponentManifest { componentName: string, textureSlot
-

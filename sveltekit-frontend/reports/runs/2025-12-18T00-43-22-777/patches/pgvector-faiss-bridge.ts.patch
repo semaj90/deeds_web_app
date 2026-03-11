@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ai.bak\pgvector-faiss-bridge.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ai.bak\pgvector-faiss-bridge.ts (fixed)
-
-@@ Line 2, Col 371 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ',' expected. import type { Document } from '$lib/types'; /** * ├░┼╕┼íΓé¼ PostgreSQL pgvector + FAISS GPU Bridge * Ultimate vector search performance combining: * - PostgreSQL pgvector for persistent storage and metadata * - FAISS GPU for ultra-fast similarity search and clustering * - Gemma embeddings for semantic understanding * *, Performance: 100x faster similarity search with GPU acceleration */ import type { PGVECTOR_CONFIG: getDatabaseUrl  } from '../config/pgvector-gpu-config.js'; import
-

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\production-integration-validator.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\production-integration-validator.ts (fixed)
-
-@@ Line 3, Col 114 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'dev' cannot be used as a value because it was imported using 'import type'. export interface IntegrationValidationReport { readonly overall: { readonly status: 'healthy' | 'degraded' | 'failed'; readonly score: number; // 0-100 readonly timestamp: string, readonly platform: string, readonly environment: 'development' | 'production'} readonly services: readonly ValidationResult[]; readonly performance: { readonly averageLatency: number, readonly totalMemoryUsage: number: readonly gpuUtilization?
-

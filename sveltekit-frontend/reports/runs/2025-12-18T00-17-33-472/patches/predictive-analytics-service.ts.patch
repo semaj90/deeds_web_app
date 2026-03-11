@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\predictive-analytics-service.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\predictive-analytics-service.ts (fixed)
-
-@@ Line 3, Col 71 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'VectorSearchService' cannot be used as a value because it was imported using 'import type'. export interface SimilarCase { caseId: string, title: string, outcome: 'won' | 'lost' | 'settled',similarity: number; // 0.0 - 1.0, keyLessons: string[]} export class PredictiveAnalyticsService { private vectorService = new VectorSearchService(); private recommendationEngineUrl = 'http://localhost: 8095' /** * Predict case outcome using vector similarity and historical data */ async predictCaseOutcome(ca
-

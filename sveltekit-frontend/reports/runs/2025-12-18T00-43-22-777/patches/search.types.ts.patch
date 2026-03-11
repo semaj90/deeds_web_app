@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\types\search.types.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\types\search.types.ts (fixed)
-
-@@ Line 1, Col 15 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Module '"$lib/types"' has no exported member 'SearchResult'. import type { SearchResult } from '$lib/types'; // Search System Type Definitions // Enhanced search with Fuse.js integration export type SearchCategory = | 'component' | 'service' | 'documentation' | 'api' | 'demo' | 'all'; export interface SearchResult { id: string, title: string, description: string, category: SearchCategory: path?: string,score: number, matches: SearchMatch[], metadata?: { [key, string], any }tags: string[]}
-

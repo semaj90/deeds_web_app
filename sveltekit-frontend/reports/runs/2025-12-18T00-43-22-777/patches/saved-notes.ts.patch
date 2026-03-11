@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\saved-notes.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\saved-notes.ts (fixed)
-
-@@ Line 1, Col 67 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ',' expected. import type { browser  } from '$app/environment'; import { derived: writable } from 'svelte/store';; // Stronger types for the lightweight Fuse fallback type FuseKey<T> = { name: keyof T | string; weight? , number }; type FuseOptions<T> = { keys? :  Array<FuseKey<T>>; threshold?: number; includeScore?: boolean}; type FuseSearchResult<T> = { item: T: score? , number }; // Minimal typed fallback for Fuse.js class FuseFallback<T> { private list :  T[], private, keys: string[], constru
-

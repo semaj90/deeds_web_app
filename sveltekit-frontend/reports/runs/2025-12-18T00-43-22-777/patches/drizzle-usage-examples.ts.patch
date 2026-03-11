@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\db\drizzle-usage-examples.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\db\drizzle-usage-examples.ts (fixed)
-
-@@ Line 2, Col 253 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Module '"./index"' has no exported member 'db'. import type { Document } from '$lib/types'; /** * Drizzle ORM Usage Examples - Legal AI Platform * * This file demonstrates best practices for using Drizzle ORM with: * - CRUD operations * - JSONB queries * - Vector similarity search * - Transactions * - Joins and relationships */ import type { db  } from './index'; // Your database connection import type { legalDocuments, legalCases, vectorSearchCache, aiProcessingQueue, type NewLegalDocument, typ
-

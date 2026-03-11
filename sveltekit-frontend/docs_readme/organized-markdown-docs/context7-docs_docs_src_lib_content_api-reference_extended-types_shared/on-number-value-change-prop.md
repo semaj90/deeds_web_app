@@ -1,3 +1,0 @@
-```ts
-(value: number) => void
-```

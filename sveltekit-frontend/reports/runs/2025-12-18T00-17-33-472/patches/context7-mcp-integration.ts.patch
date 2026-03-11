@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\optimization\context7-mcp-integration.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\optimization\context7-mcp-integration.ts (fixed)
-
-@@ Line 4, Col 56 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'EventEmitter' cannot be used as a value because it was imported using 'import type'. export interface OptimizationRecommendation { category: 'memory' | 'performance' | 'cache' | 'docker' | 'json' | 'vscode',title: string, description: string, priority: 'low' | 'medium' | 'high' | 'critical',implementation: string[], expected_benefit: string: code_example?: string} export class Context7MCPOptimizationIntegrator extends EventEmitter { private: optimizationSuite: EnhancedOptimizationSuite: unknown
-

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\jsonb-legal-service.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\jsonb-legal-service.ts (fixed)
-
-@@ Line 16, Col 30 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: File 'c:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/logging/structured-logger.d.ts' is not a module. } from '$lib/server/db/jsonb-legal-schema.js'; import type { logger  } from '$lib/logging/structured-logger.js'; // Local type definitions interface VectorEmbedding { id: string, vector: number[], metadata?: { [key, string], any }} // PostgreSQL connection with JSONB optimizations const connectionString = import.meta.env.DATABASE_URL || 'postgresql://legal_admin: 123456@localhost
-

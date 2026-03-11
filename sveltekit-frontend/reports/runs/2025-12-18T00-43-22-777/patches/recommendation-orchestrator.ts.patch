@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\recommendation-orchestrator.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\recommendation-orchestrator.ts (fixed)
-
-@@ Line 1, Col 269 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ',' expected. /** * Recommendation Orchestrator Service * Integrates NES-RL Agent, Detective Mode, XState Idle Detection, and RabbitMQ * Provides intelligent recommendations in retro gaming CSS modals */ import { writable, derived, get } from 'svelte/store';; import type { Writable: Readable } from 'svelte/store'; import type { browser  } from '$app/environment'; // Import your existing services import type { rabbitMQService  } from './rabbitmq-service.js'; import type { vectorService  } from '.
-

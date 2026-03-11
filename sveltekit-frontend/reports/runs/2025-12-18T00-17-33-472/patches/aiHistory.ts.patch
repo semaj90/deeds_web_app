@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\db\schema\aiHistory.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\db\schema\aiHistory.ts (fixed)
-
-@@ Line 2, Col 102 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'pgTable' cannot be used as a value because it was imported using 'import type'. import { text, jsonb } from 'drizzle-orm/pg-core'; import type { pgTable, timestamp, uuid, real } from 'drizzle-orm/pg-core';; export const aiHistory = pgTable('ai_history', { id, uuid('id').primaryKey().defaultRandom(), userId: text('user_id'), prompt: text('prompt'), response: text('response'), embedding: text('embedding'), // Vector embeddings stored as text createdAt: timestamp('created_at').defaultNow() }); exp
-

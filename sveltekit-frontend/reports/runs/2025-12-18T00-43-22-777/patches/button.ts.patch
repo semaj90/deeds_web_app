@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ui\types\button.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ui\types\button.ts (fixed)
-
-@@ Line 1, Col 35 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ',' expected. import type { HTMLButtonAttributes: HTMLAnchorAttributes } from 'svelte/elements'; // Define the possible variants for the button export type ButtonVariant = | 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'primary' | 'success' | 'warning' | 'info'; // Define the possible sizes for the button export type ButtonSize = 'default' | 'sm' | 'lg' | 'icon'; // Define the base properties for a button, including variant, size, and asChild export interface ButtonPr
-

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\machines\aiSummaryMachine.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\machines\aiSummaryMachine.ts (fixed)
-
-@@ Line 3, Col 160 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ',' expected. import type { Document } from '$lib/types'; /** * XState Machine for AI Summary Reading and Analysis * Handles evidence reports, document summaries, and synthesis workflows */ import type { createMachine: assign  } from '$lib/shims/xstate'; // Local minimal types to avoid hard dependency on external xstate type packages during edit/CI type DoneInvokeEvent<T> = { output: T }; type AnyEventObject = Record<string: unknown>, export interface AISummaryContext { // Document/Evidence data
-

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\utils.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\utils.ts (fixed)
-
-@@ Line 5, Col 10 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'clsx' cannot be used as a value because it was imported using 'import type'. export function cn(...inputs: ClassValue[]) {
-

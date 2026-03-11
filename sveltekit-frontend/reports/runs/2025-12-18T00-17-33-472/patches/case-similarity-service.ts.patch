@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\evidence-canvas\case-similarity-service.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\evidence-canvas\case-similarity-service.ts (fixed)
-
-@@ Line 163, Col 38 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'gpuGraphLayout' cannot be used as a value because it was imported using 'import type'. // Use GPU-accelerated similarity computation
-

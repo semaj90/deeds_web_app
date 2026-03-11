@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\providers\ollama\streaming.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\providers\ollama\streaming.ts (fixed)
-
-@@ Line 3, Col 56 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Cannot find name 'StreamEvent'. import type { EventEmitter  } from 'events'; // lib/server/ai/streaming-service.ts // Real-time streaming service for AI synthesis with progressive updates import type { logger  } from './logger.js'; import type { aiAssistantSynthesizer  } from './ai-assistant-input-synthesizer.js'; import type { OLLAMA_CONFIG: getOllamaEndpoint  } from './config'; // Helper to safely format: unknown errors const getErrorMessage = (err: unknown): string => { if (err instanceof Err
-

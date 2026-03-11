@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\vector-search-service.test.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\vector-search-service.test.ts (fixed)
-
-@@ Line 1, Col 15 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Module '"$lib/types"' has no exported member 'SearchResult'. import type { SearchResult } from '$lib/types'; import type { describe, it, expect, beforeEach  } from 'vitest'; // Mock VectorSearchService for testing - actual service has @ts-nocheck interface SearchResult { documentId: string, similarity: number, source: 'qdrant' | 'postgres'} interface VectorSearchConfig { qdrantUrl?: string; postgresUrl?: string; redisUrl?: string; timeout?: number} interface CollectionStatus { vectorDimension: n
-

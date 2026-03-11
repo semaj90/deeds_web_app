@@ -1,3 +1,0 @@
-```ts
-"horizontal" | "vertical"
-```

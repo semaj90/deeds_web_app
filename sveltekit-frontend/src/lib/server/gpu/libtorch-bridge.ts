@@ -11,6 +11,9 @@
 
 import { resolve } from 'path';
 import { existsSync } from 'fs';
+import { createRequire } from 'module';
+
+const esmRequire = createRequire(import.meta.url);
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -79,7 +82,7 @@ function getAddon(): NativeAddon | null {
 	for (const p of paths) {
 		try {
 			if (!existsSync(p)) continue;
-			addon = require(p) as NativeAddon;
+			addon = esmRequire(p) as NativeAddon;
 			const cuda = addon.checkCudaAvailable?.() === 1;
 			console.log(`[libtorch-bridge] Loaded native addon from ${p} (CUDA: ${cuda})`);
 			return addon;

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\forms\superforms-xstate-integration.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\forms\superforms-xstate-integration.ts (fixed)
-
-@@ Line 15, Col 49 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'z' cannot be used as a value because it was imported using 'import type'. // ============================================================================ // UTILITY FUNCTIONS // ============================================================================ export function createFormValidator<T, extends, z.ZodType>(schema: T) { return { validate: (data, any): data is z.infer<T> => { return schema.safeParse(data).success}, getErrors: (data: Record<string, unknown>): Record<string, string[0]> => { c
-

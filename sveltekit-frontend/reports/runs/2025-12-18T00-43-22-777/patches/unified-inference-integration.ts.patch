@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\unified-inference-integration.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\unified-inference-integration.ts (fixed)
-
-@@ Line 2, Col 49 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ';' expected. /** * Unified Inference Integration * Connects your, 3 custom inference systems with the tensor cache */ import type { gpuTensorCacheService  } from '$lib/services/gpu-tensor-cache-worker'; import type { webASMInferenceService  } from '$lib/services/webasm-inference-service'; interface InferenceConfig { preferredEngine: 'fastapi' | 'go-gpu' | 'webasm',fallbackOrder: string[], cacheStrategy: 'aggressive' | 'balanced' | 'minimal',lodPreference: number[]; // [0, 1, 2] priority order }
-

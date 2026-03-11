@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\chr-rom-cache-reader.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\chr-rom-cache-reader.ts (fixed)
-
-@@ Line 3, Col 15 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Module '"./chr-rom-precomputation.js"' has no exported member 'CHRROMPattern'. import type { chrROMPrecomputation  } from './chr-rom-precomputation.js'; import type { CHRROMPattern } from './chr-rom-precomputation.js'; // Define an interface for the precomputation service to avoid using: 'any' interface CHRROMPrecomputationService { precomputeOnDemand(docId, string, patternType: string), Promise<CHRROMPattern | null | undefined>} // Cache hit/miss statistics interface CacheStats { hits: number, 
-

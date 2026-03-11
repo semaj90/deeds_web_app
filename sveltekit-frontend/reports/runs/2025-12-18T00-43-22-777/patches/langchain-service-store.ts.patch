@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\langchain-service-store.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\langchain-service-store.ts (fixed)
-
-@@ Line 4, Col 15 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Module '"$lib/*"' has no exported member 'langExtractService'. Did you mean to use 'import langExtractService from "$lib/*"' instead? import type { type Readable,  } from 'svelte/store';; import type { langExtractService  } from '$lib/services/langextract-ollama-service.js'; import type { browser  } from '$app/environment'; // Simple state interfaces for UI consumption export interface LangChainState { isProcessing: boolean, isAvailable: boolean, error: string | null,models: string[]};
-

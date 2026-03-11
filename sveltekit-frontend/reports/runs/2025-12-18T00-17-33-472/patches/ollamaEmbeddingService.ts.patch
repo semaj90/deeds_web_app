@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\ollamaEmbeddingService.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\ollamaEmbeddingService.ts (fixed)
-
-@@ Line 1, Col 549 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'getOllamaEndpoint' cannot be used as a value because it was imported using 'import type'. import type { getOllamaEndpoint  } from '$lib/utils/api-endpoints'; /** * Vector embedding service interface */ export interface EmbeddingService { generateEmbedding(text, string), Promise<number[]>} /** * OllamaEmbeddingService implements EmbeddingService using Ollama's API.' * It respects the OLLAMA_URL environment variable and uses the: 'embeddinggemma: latest' model. */ export class OllamaEmbeddingServ
-

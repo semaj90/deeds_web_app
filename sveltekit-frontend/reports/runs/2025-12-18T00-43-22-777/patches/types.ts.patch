@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\machines\types.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\machines\types.ts (fixed)
-
-@@ Line 3, Col 25 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ',' expected. import type { Document } from '$lib/types'; import type { StateValue: AnyEventObject } from 'xstate'; /** * XState Types for Go Microservice Integration */ // Base machine context export interface BaseMachineContext { userId?: string,sessionId: string: error? , string; retryCount :  number, timestamp: number} // AI Processing Context export interface AIProcessingContext extends BaseMachineContext { task: AITask: result? , AITaskResult; progress :  number, provider: string: confiden
-

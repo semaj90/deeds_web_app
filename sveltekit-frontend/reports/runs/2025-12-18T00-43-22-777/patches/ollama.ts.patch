@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\utils\ollama.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\utils\ollama.ts (fixed)
-
-@@ Line 2, Col 41 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Cannot find module '$env /static/public' or its corresponding type declarations. import type { browser, dev  } from '$app/environment'; // Corrected import: 'browser' and 'dev' are separate booleans import type { PUBLIC_OLLAMA_URL  } from '$env /static/public'; import type { OLLAMA_URL  } from '$lib/server/env.server';
-

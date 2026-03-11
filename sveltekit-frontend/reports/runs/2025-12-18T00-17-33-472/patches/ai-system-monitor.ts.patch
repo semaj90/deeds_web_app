@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\machines\ai-system-monitor.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\machines\ai-system-monitor.ts (fixed)
-
-@@ Line 3, Col 190 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'createMachine' cannot be used as a value because it was imported using 'import type'. import type { createMachine: assign  } from 'xstate'; export interface SystemContext { lastActivity: number | latency, number} export type SystemEvent = | { type: 'USER_ACTIVITY' } | { type: 'NETWORK_PING', latency? , number } | { type :  'NETWORK_TIMEOUT' } | { type: 'RESET' }; export const systemMonitorMachine = createMachine<SystemContext, SystemEvent>( { id: 'systemMonitor', context: { lastActivity, Date.n
-

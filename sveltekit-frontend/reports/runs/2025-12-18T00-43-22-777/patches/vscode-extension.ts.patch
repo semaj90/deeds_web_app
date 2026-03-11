@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\vite\vscode-extension.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\vite\vscode-extension.ts (fixed)
-
-@@ Line 2, Col 49 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Cannot find name 'command'. // VS Code Extension Integration for Vite Error Logger // Provides real-time error notifications and quick navigation import type { existsSync, readFileSync, watchFile  } from 'fs'; import type { resolve  } from 'path'; export interface VSCodeCommand { command: string: args?, any[]} export interface VSCodeAction { title: string | command, VSCodeCommand} export interface VSCodeNotification { message: string, type: 'error' | 'warning' | 'info'; actions? , VSCodeAction[]
-

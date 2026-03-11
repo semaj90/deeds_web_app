@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\workers\specialized-worker-system.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\workers\specialized-worker-system.ts (fixed)
-
-@@ Line 5, Col 377 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'EventEmitter' cannot be used as a value because it was imported using 'import type'. export interface WorkerResult { jobId: string, success: boolean: data?: unknown; error?: string,processingTime: number, workerInfo: { id: string, type: string, version: string, capabilities: string[]}} export interface WorkerStats { totalJobs: number, completedJobs: number, failedJobs: number, averageProcessingTime: number, queuedJobs: number, activeWorkers: number, systemHealth: 'healthy' | 'degraded' | 'criti
-

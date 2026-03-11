@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\redis-state.svelte.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\redis-state.svelte.ts (fixed)
-
-@@ Line 1, Col 15 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Module '"$lib/types"' has no exported member 'Message'. import type { Message } from '$lib/types'; /** * Redis State Management with Svelte, 5 Runes * Provides reactive state management for Redis connections and pub/sub */ interface RedisConnectionState { isConnected: boolean, connectionAttempts: number, lastError: string | null,lastConnected: number | null,clientCount: number, activeChannels: Set<string>, messageCount: number, cacheHits: number, cacheMisses: number}
-

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ai.bak\agent-integration.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ai.bak\agent-integration.ts (fixed)
-
-@@ Line 33, Col 23 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'resolveLibraryId' cannot be used as a value because it was imported using 'import type'. // Example: Use Context7 helpers to relate audit result to agent action
-

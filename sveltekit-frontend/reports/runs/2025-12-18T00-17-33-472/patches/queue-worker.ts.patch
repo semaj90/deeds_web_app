@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\workers\queue-worker.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\workers\queue-worker.ts (fixed)
-
-@@ Line 5, Col 163 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'cache' cannot be used as a value because it was imported using 'import type'. async function runRabbitConsumer(): Promise<any> { try { const { consumeFromQueue }= await import('$lib/server/rabbitmq'); await consumeFromQueue('evidence.embedding.queue', async (payload, ack, nack) => { try { await processJob(payload as any); ack()}catch (err: unknown) { console.error('├ó┬¥┼Æ Error processing rabbitmq job: ', err?.message || err); // Nack without requeue to avoid hot loops; you can change this if y
-

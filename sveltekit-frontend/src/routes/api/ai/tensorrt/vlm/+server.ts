@@ -98,13 +98,40 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json({ error: 'image is required for VLM inference. Use /api/ai/tensorrt for text-only.' }, { status: 400 });
 	}
 
-	// Check Triton health
+	// Check Triton health — fall back to Ollama if unavailable
 	const tritonReady = await checkTritonHealth();
 	if (!tritonReady) {
+		// Ollama VLM fallback: gemma3 supports multimodal (image + text)
+		try {
+			const ollamaUrl = ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+			const ollamaRes = await fetch(`${ollamaUrl}/api/generate`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					model: 'gemma3-legal:latest',
+					prompt,
+					images: [imageBase64],
+					stream: false,
+					options: { temperature, num_predict: maxTokens }
+				}),
+				signal: AbortSignal.timeout(120000)
+			});
+			if (ollamaRes.ok) {
+				const ollamaData = await ollamaRes.json();
+				return json({
+					text: ollamaData.response ?? '',
+					model: 'gemma3-legal (ollama fallback)',
+					pipeline: ['ollama-multimodal'],
+					tritonAvailable: false
+				});
+			}
+		} catch {
+			// Ollama also unavailable
+		}
 		return json({
-			error: 'Triton inference server unavailable',
+			error: 'Triton and Ollama VLM both unavailable',
 			fallback: 'ollama',
-			hint: 'Use /api/chat with gemma3 for Ollama-based VLM inference'
+			hint: 'Start Ollama with gemma3-legal or start Triton container'
 		}, { status: 503 });
 	}
 

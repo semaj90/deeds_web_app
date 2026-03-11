@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\components\ai\cognitive\CognitiveDocumentationHub.svelte
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\components\ai\cognitive\CognitiveDocumentationHub.svelte (fixed)
-
-@@ Line 4, Col 17 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Identifier 'Document' has already been declared https://svelte.dev/e/js_parse_error (svelte) import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported let { cognitiveHub, achievements, consciousness }: { cognitiveHub: any, achievements: string[], consciousness: { level: number, experience: number;, awakening: number } } = $props(); let activeTab = $state<string>('strategy'); let searchQuery = $state<string>(''); let filteredContent = $state<any[]>([]); // Documentation sec
-

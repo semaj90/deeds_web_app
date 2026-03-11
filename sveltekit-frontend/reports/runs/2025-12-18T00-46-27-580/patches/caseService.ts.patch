@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\caseService.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\caseService.ts (fixed)
-
-@@ Line 2, Col 115 @@
-Pattern: import-alias-colon-safe (syntax-fix)
-Confidence: 95.0%
-Message: ';' expected. // Add missing imports so the file is a module and Writable/Readable are defined import type { Writable: Readable } from 'svelte/store'; import { get: writable } from 'svelte/store';; // remove Node default crypto import (can break ESM/browser parsing) // provide a cross-runtime id generator that prefers crypto.randomUUID when available const generateId = (): string => { try { // globalThis crypto (browser) or node's crypto (if available on global)' // @ts-ignore const globalCrypto
-

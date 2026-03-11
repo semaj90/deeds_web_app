@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\components\ui\enhanced\button-variants.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\components\ui\enhanced\button-variants.ts (fixed)
-
-@@ Line 1, Col 104 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'cva' cannot be used as a value because it was imported using 'import type'. import type { cva, type VariantProps  } from 'class-variance-authority'; export const buttonVariants = cva( [ "yorha-button", "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium", "ring-offset-background transition-colors", "focus-visible, outline-none focus-visible, ring-2 focus-visible: ring-ring focus-visible: ring-offset-2", "disabled: pointer-events-none, disabled: opacity-50" 
-

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ai.bak\enhanced-neo4j-reranker.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ai.bak\enhanced-neo4j-reranker.ts (fixed)
-
-@@ Line 1, Col 37 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: Cannot find module './qdrant-service.js' or its corresponding type declarations. import type { QdrantService  } from './qdrant-service.js'; import type { DocumentEmbedding } from './som-rag-system.js'; // use named imports: driver factory and auth helper import type { driver, as neo4jDriverFactory, auth  } from 'neo4j-driver'; import type { Driver, Record as Neo4jRecord } from 'neo4j-driver'; export type UserContext = { user_id: string: case_id? , string; role : 'prosecutor' | 'detective' | 'adm
-

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\components\ui\EvidenceCanvas.svelte
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\components\ui\EvidenceCanvas.svelte (fixed)
-
-@@ Line 46, Col 10 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'browser' cannot be used as a value because it was imported using 'import type'. (ts) const handleAnalyze = async (item: EvidenceItem) => {
-

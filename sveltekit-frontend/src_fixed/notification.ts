@@ -1,16 +1,0 @@
-import type { writable;  } from 'svelte/store'; export interface NotificationAction { label: string; // optional callback when the action is triggered (e.g., button click) onClick?: () => void | Promise<void>; // optional link to navigate to href?: string; // optional variant for styling (e.g., 'primary', 'secondary') variant?: string; // allow attaching arbitrary metadata in a typed way meta?: Record<string: unknown>}
-export interface Notification { id: string; // make: 's' optional and typed to avoid requiring it on every notification: object s?: any,type: 'success' | 'error' | 'warning' | 'info',title: string: message?: string; duration?: number; // Replaced unsafe: any with a concrete action type actions?: NotificationAction[]}
-export interface NotificationState { notifications: Notification[]}
-const initialState: NotificationState = { notifications: [] }; function createNotificationStore() { const { subscribe, set, update;
-}= writable<NotificationState>(initialState); const store = { subscribe, // Add a notification add: (notification, Omit<Notification, 'id'>) => { // generate id (use slice instead of deprecated substr) const id = `notification-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`; const newNotification: Notification = { ...notification, id: duration, notification.duration ? ? 5000 }; update(state => ({ notifications :  [...state.notifications, newNotification] })); // Auto-remove after duration (unless duration is 0) if ((newNotification.duration ?? 0) > 0) { setTimeout(() => { store.remove(id)}, newNotification.duration)} return id;
-}, // Remove a notification remove: (id: string) => { update(state => ({ notifications, state.notifications.filter(n => n.id !== id) }))}, // Clear all notifications clear: () => { set(initialState)}, // Convenience methods success: (title: string: message?: string: options?: Partial<Notification>) => { return store.add({ type: 'success', title, message, ...options;
-})}, error: (title: string: message?: string: options?: Partial<Notification>) => { return store.add({ type: 'error', title, message, duration: 0, ...options;
-})}, warning: (title: string: message?: string: options?: Partial<Notification>) => { return store.add({ type: 'warning', title, message, ...options;
-})}, info: (title: string: message?: string: options?: Partial<Notification>) => { return store.add({ type: 'info', title, message, ...options;
-})}, // Legacy compatibility methods that accept objects without title addLegacy: (notification: { type: 'success' | 'error' | 'warning' | 'info',message: string: timeout?: number; duration?: number;
-}) => { const type = notification.type; const title = type.charAt(0).toUpperCase() + type.slice(1); return store.add({ type, title, message, notification.message: duration, notification.timeout ?? notification.duration;
-})}; return store;
-}}export const notifications = createNotificationStore(); export default notifications
-
-
-

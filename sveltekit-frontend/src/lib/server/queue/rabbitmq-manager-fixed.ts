@@ -480,6 +480,14 @@ export class RabbitMQManager extends EventEmitter {
         await this.publish(this.exchanges.document_processing, 'document.embed', data);
     }
 
+    async publishEvidenceProcess(data: { evidenceId: string; text: string; caseId?: string; fileName?: string; metadata?: Record<string, unknown> }): Promise<void> {
+        if (!this.isReady()) return;
+        await this.publish(this.exchanges.document_processing, 'evidence.process', {
+            ...data,
+            enqueuedAt: new Date().toISOString()
+        });
+    }
+
     private async publish(exchange: string, routingKey: string, data: any): Promise<void> {
         if (!this.channel) return;
         try {

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\ollama-suggestions-service.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\ollama-suggestions-service.ts (fixed)
-
-@@ Line 3, Col 79 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ';' expected. import type { Document } from '$lib/types'; export interface OllamaSuggestionRequest { content: string, reportType: string: context?: { caseId?: string; evidenceIds?: string[0]; previousMessages?: string[0]}; maxSuggestions?: number; temperature?: number} export interface OllamaSuggestion { content: string, type: string, confidence: number, reasoning: string, metadata: { keywords?: string[0],category: string: urgency? , number; sources? :  string[0]; aiGenerated?: boolean; model?: 
-

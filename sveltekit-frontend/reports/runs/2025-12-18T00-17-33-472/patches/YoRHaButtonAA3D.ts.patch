@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\components\three\yorha-ui\components\YoRHaButtonAA3D.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\components\three\yorha-ui\components\YoRHaButtonAA3D.ts (fixed)
-
-@@ Line 2, Col 38 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'YoRHaAntiAliased3D' cannot be used as a value because it was imported using 'import type'. /** * YoRHa 3D Button with Advanced Anti-Aliasing * Enhanced version of YoRHa button with production-quality anti-aliasing */ import * as THREE from 'three'; import type { FontLoader  } from 'three/examples/jsm/loaders/FontLoader.js'; import type { TextGeometry  } from 'three/examples/jsm/geometries/TextGeometry.js'; import type { YoRHaAntiAliased3D  } from '../YoRHaAntiAliasing3D.js'; import type { YoRHa
-

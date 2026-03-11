@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\server\rag.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\server\rag.ts (fixed)
-
-@@ Line 4, Col 20 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'QdrantClient' cannot be used as a value because it was imported using 'import type'.
-

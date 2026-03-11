@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ai.bak\legal-workflow-orchestrator.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\ai.bak\legal-workflow-orchestrator.ts (fixed)
-
-@@ Line 6, Col 374 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'HybridGemmaBitmapEngine' cannot be used as a value because it was imported using 'import type'. // Asset preloading strategies for different legal contexts export interface AssetPreloadingStrategy { immediate: string[]; // Load instantly (< 100ms), background: string[]; // Load in background (< 2s) predictive: string[]; // Predict and cache (< 5s), ondemand: string[]; // Load when explicitly requested } export class LegalWorkflowOrchestrator { private hybridEngine: HybridGemmaBitmapEngine, priv
-

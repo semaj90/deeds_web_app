@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\llamacpp-ollama-integration.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\llamacpp-ollama-integration.ts (fixed)
-
-@@ Line 2, Col 196 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ',' expected. import type { Case } from '$lib/types'; /** * Llama.cpp + Ollama Integration Service * Replaces vLLM with native Windows-compatible stack * Optimized for RTX, 3060 with FlashAttention2 and gemma3 mohf16-q4_k_m.gguf */ import { writable: derived } from 'svelte/store';; // Removed: 'type Writable' import type { getOllamaEndpoint  } from '$lib/utils/api-endpoints'; // Import the new utility function // Configuration Interfaces export interface OllamaConfig { endpoint: string, model: s
-

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\unsloth-finetuning.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\services\unsloth-finetuning.ts (fixed)
-
-@@ Line 6, Col 1945 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'browser' cannot be used as a value because it was imported using 'import type'. export interface TrainingSample { input: string, output: string: metadata?: { complexity: number, domain: string, verified: boolean: source?: string}} export interface FinetuningJob { id: string, name: string, status: 'queued' | 'preparing' | 'training' | 'validating' | 'completed' | 'failed' | 'cancelled',config: UnslothConfig, dataset: TrainingDataset, progress: { currentEpoch: number, totalEpochs: number, current
-

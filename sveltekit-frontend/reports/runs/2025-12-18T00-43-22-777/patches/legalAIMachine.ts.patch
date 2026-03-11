@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\machines\legalAIMachine.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\machines\legalAIMachine.ts (fixed)
-
-@@ Line 3, Col 69 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ';' expected. import type { setup, assign, createActor, fromPromise  } from 'xstate'; import { writable } from 'svelte/store';; // Legal AI Application State Machine - XState v5 export interface Case { id: string, title: string, status: string, priority: string, category: string; [key, string]: unknown} export interface Evidence { id: string, caseId: string, type: string: description?: string; fileUrl?: string; metadata?: { [key, string], any }; [key, string]: unknown} // REMOVED: export interfa
-

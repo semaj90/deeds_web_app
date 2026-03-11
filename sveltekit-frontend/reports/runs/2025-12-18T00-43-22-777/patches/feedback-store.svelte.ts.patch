@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\feedback-store.svelte.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\stores\_archive\old-stores\feedback-store.svelte.ts (fixed)
-
-@@ Line 1, Col 132 @@
-Pattern: import-alias-colon (syntax-fix)
-Confidence: 90.0%
-Message: ',' expected. /** * Global Feedback Store for Legal AI Platform * Manages feedback collection across all user interactions */ import { getContext: setContext } from 'svelte';; import type { FeedbackSession, FeedbackTrigger, FeedbackAnalytics, UserFeedbackContext } from '../types/feedback.js'; export interface FeedbackState { activeSession: FeedbackSession | null,pendingFeedback: FeedbackTrigger[], analytics: FeedbackAnalytics, userContext: UserFeedbackContext, isCollecting: boolean} class Feedba
-

@@ -1,8 +1,0 @@
---- c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\routes_parked\upload-test\+page.ts
-+++ c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\routes_parked\upload-test\+page.ts (fixed)
-
-@@ Line 6, Col 36 @@
-Pattern: import-type-to-value (import-transform)
-Confidence: 90.0%
-Message: 'zod' cannot be used as a value because it was imported using 'import type'. export const load = async () => {
-
