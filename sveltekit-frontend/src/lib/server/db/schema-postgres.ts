@@ -2437,3 +2437,50 @@ export type NewUserAiQuery = typeof userAiQueries.$inferInsert;
 export type NewAutoTag = typeof autoTags.$inferInsert;
 export type NewDocumentChunk = typeof documentChunks.$inferInsert;
 
+// === EVIDENCE AUDIT LOG (chain of custody compliance) ===
+
+export const evidenceAuditLog = pgTable('evidence_audit_log', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	evidenceId: uuid('evidence_id')
+		.notNull()
+		.references(() => evidence.id, { onDelete: 'cascade' }),
+	userId: uuid('user_id')
+		.references(() => users.id, { onDelete: 'set null' }),
+	action: varchar('action', { length: 50 }).notNull(), // 'uploaded', 'viewed', 'updated', 'deleted', 'exported', 'tagged', 'analyzed'
+	changes: jsonb('changes'), // { field: { old, new } } diff
+	ipAddress: varchar('ip_address', { length: 45 }),
+	userAgent: text('user_agent'),
+	timestamp: timestamp('timestamp', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	evidenceIdIdx: index('evidence_audit_log_evidence_id_idx').on(table.evidenceId),
+	userIdIdx: index('evidence_audit_log_user_id_idx').on(table.userId),
+	timestampIdx: index('evidence_audit_log_timestamp_idx').on(table.timestamp),
+	actionIdx: index('evidence_audit_log_action_idx').on(table.action),
+}));
+
+export type EvidenceAuditLog = typeof evidenceAuditLog.$inferSelect;
+export type NewEvidenceAuditLog = typeof evidenceAuditLog.$inferInsert;
+
+// === EVIDENCE VERSIONS (metadata change tracking) ===
+
+export const evidenceVersions = pgTable('evidence_versions', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	evidenceId: uuid('evidence_id')
+		.notNull()
+		.references(() => evidence.id, { onDelete: 'cascade' }),
+	version: integer('version').notNull(),
+	title: varchar('title', { length: 255 }),
+	description: text('description'),
+	metadata: jsonb('metadata'),
+	changedBy: uuid('changed_by')
+		.references(() => users.id, { onDelete: 'set null' }),
+	changeReason: text('change_reason'),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	evidenceIdIdx: index('evidence_versions_evidence_id_idx').on(table.evidenceId),
+	versionIdx: index('evidence_versions_version_idx').on(table.evidenceId, table.version),
+}));
+
+export type EvidenceVersion = typeof evidenceVersions.$inferSelect;
+export type NewEvidenceVersion = typeof evidenceVersions.$inferInsert;
+
