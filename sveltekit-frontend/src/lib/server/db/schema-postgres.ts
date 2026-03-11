@@ -31,12 +31,18 @@ export const userRoleEnum = pgEnum('user_role', ['prosecutor',
  'detective',
  'admin',
  'analyst',
- 'paralegal']);
+ 'paralegal',
+ 'investigator',
+ 'viewer',
+ 'user']);
 export const caseStatusEnum = pgEnum('case_status', ['open',
  'in_progress',
  'pending_review',
  'closed',
- 'archived']);
+ 'archived',
+ 'active',
+ 'pending',
+ 'under_review']);
 export const casePriorityEnum = pgEnum('case_priority', ['low',
  'medium',
  'high',
@@ -281,6 +287,19 @@ export const evidence = pgTable('evidence', {
  canvasPosition: jsonb('canvas_position').default({}),
  uploadedBy: uuid('uploaded_by'), // Foreign key to users.id
  uploadedAt: timestamp('uploaded_at', { mode: 'string' }),
+ // ENHANCED COLUMNS (evidence board, AI analysis, forensics)
+ evidenceNumber: varchar('evidence_number', { length: 50 }),
+ type: varchar('type', { length: 100 }), // e.g. 'video','testimonial','digital','photo','scientific','audio','physical','documentary','forensic'
+ summary: text('summary'),
+ posX: integer('pos_x'),
+ posY: integer('pos_y'),
+ collectedAt: timestamp('collected_at', { withTimezone: true }),
+ collectedBy: varchar('collected_by', { length: 255 }),
+ mimeType: varchar('mime_type', { length: 100 }),
+ tags: jsonb('tags'),
+ aiTags: jsonb('ai_tags'),
+ aiAnalysis: jsonb('ai_analysis'),
+ aiSummary: text('ai_summary'),
 });
 
 // === ANALYSIS JOBS ===
@@ -492,7 +511,7 @@ export const caseScores = pgTable('case_scores',
  .primaryKey()
  .notNull(),
  // Foreign key to users.id; who performed the calculation (nullable to allow on delete set null)
- calculatedBy: integer('calculated_by'),
+ calculatedBy: uuid('calculated_by'),
  caseId: uuid('case_id').notNull(),
  score: numeric('score', { precision: 5, scale: 2 }).notNull(),
  riskLevel: caseRiskLevelEnum('risk_level').notNull(),
@@ -577,7 +596,7 @@ export const autoTags = pgTable('auto_tags',
  source: varchar('source', { length: 100 }).notNull(), // e.g., 'ai_analysis', 'user'
  model: varchar('model', { length: 100 }),
  isConfirmed: boolean('is_confirmed').default(false).notNull(),
- confirmedBy: integer('confirmed_by'), // FK to users.id
+ confirmedBy: uuid('confirmed_by'), // FK to users.id
  confirmedAt: timestamp('confirmed_at', { mode: 'string' }),
  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
  },
@@ -627,8 +646,8 @@ export const caseActivities = pgTable('case_activities', {
  .primaryKey()
  .notNull(),
  caseId: uuid('case_id'),
- assignedTo: integer('assigned_to'),
- createdBy: integer('created_by'),
+ assignedTo: uuid('assigned_to'),
+ createdBy: uuid('created_by'),
  activityType: varchar('activity_type', { length: 100 }),
  description: text('description'),
  status: activityStatusEnum('status'),
@@ -643,7 +662,7 @@ export const attachmentVerifications = pgTable('attachment_verifications', {
  .primaryKey()
  .notNull(),
  attachmentId: uuid('attachment_id'), // FK to evidence.id or legalDocuments.id
- verifiedBy: integer('verified_by'), // FK to users.id
+ verifiedBy: uuid('verified_by'), // FK to users.id
  status: verificationStatusEnum('status'),
  verificationDate: timestamp('verification_date'),
  notes: text('notes'),
@@ -669,7 +688,7 @@ export const canvasAnnotations = pgTable('canvas_annotations', {
  .primaryKey()
  .notNull(),
  canvasStateId: uuid('canvas_state_id'), // FK to canvasStates
- createdBy: integer('created_by'), // FK to users.id
+ createdBy: uuid('created_by'), // FK to users.id
  annotationData: jsonb('annotation_data').default({}).notNull(),
  createdAt: timestamp('created_at').defaultNow(),
  updatedAt: timestamp('updatedAt').defaultNow(),
@@ -690,7 +709,7 @@ export const aiReports = pgTable('ai_reports', {
  .primaryKey()
  .notNull(),
  caseId: uuid('case_id').references(() => cases.id, { onDelete: 'cascade' }), // FK to cases.id
- createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }), // FK to users.id
+ createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }), // FK to users.id
  reportType: varchar('report_type', { length: 100 }).notNull(),
  summary: text('summary'),
  fullReport: text('full_report'),
@@ -711,7 +730,7 @@ export const citations = pgTable('citations', {
  sourceUrl: text('source_url'),
  pageNumber: integer('page_number'),
  confidence: real('confidence'),
- createdBy: integer('created_by'), // FK to users.id
+ createdBy: uuid('created_by'), // FK to users.id
  createdAt: timestamp('created_at').defaultNow(),
  updatedAt: timestamp('updated_at').defaultNow(),
 });
@@ -729,7 +748,7 @@ export const citationTags = pgTable('citation_tags',
  .references(() => citations.id, { onDelete: 'cascade' }),
  tag: varchar('tag', { length: 100 }).notNull(),
  color: varchar('color', { length: 7 }).default('#6b7280'),
- createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
+ createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
  createdAt: timestamp('created_at', { withTimezone: true })
  .default(sql`now()`)
  .notNull(),
@@ -839,7 +858,7 @@ export const savedReports = pgTable('saved_reports', {
  .default(sql`gen_random_uuid()`)
  .primaryKey()
  .notNull(),
- userId: integer('user_id').notNull(), // FK to users.id
+ userId: uuid('user_id').notNull(), // FK to users.id
  reportId: uuid('report_id').notNull(), // FK to reports.id
  caseId: uuid('case_id'), // FK to cases.id
  savedAt: timestamp('saved_at').defaultNow().notNull(),
@@ -853,7 +872,7 @@ export const themes = pgTable('themes', {
  .default(sql`gen_random_uuid()`)
  .primaryKey()
  .notNull(),
- userId: integer('user_id').notNull(), // FK to users.id
+ userId: uuid('user_id').notNull(), // FK to users.id
  name: varchar('name', { length: 100 }).notNull(),
  config: jsonb('config').notNull(),
  isDefault: boolean('is_default').default(false).notNull(),
@@ -940,7 +959,7 @@ export const hashVerifications = pgTable('hash_verifications', {
  .primaryKey()
  .notNull(),
  evidenceId: uuid('evidence_id').notNull(),
- verifiedBy: integer('verified_by'),
+ verifiedBy: uuid('verified_by'),
  hashValue: text('hash_value').notNull(),
  algorithm: varchar('algorithm', { length: 50 }).notNull(),
  status: verificationStatusEnum('status').default('pending').notNull(),
@@ -965,7 +984,7 @@ export const userEmbeddings = pgTable('user_embeddings', {
  .default(sql`gen_random_uuid()`)
  .primaryKey()
  .notNull(),
- userId: integer('user_id').notNull(),
+ userId: uuid('user_id').notNull(),
  embedding: text('embedding').notNull(), // Store vector as text
  model: varchar('model', { length: 100 }).notNull(),
  createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -1009,7 +1028,7 @@ export const ragSessions = pgTable('rag_sessions', {
  .default(sql`gen_random_uuid()`)
  .primaryKey()
  .notNull(),
- userId: integer('user_id').notNull(),
+ userId: uuid('user_id').notNull(),
  caseId: uuid('case_id'),
  title: varchar('title', { length: 255 }),
  createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -1121,7 +1140,7 @@ export const legalAnalysisSessions = pgTable('legal_analysis_sessions', {
  .default(sql`gen_random_uuid()`)
  .primaryKey()
  .notNull(),
- userId: integer('user_id').notNull(),
+ userId: uuid('user_id').notNull(),
  caseId: uuid('case_id'),
  analysisType: varchar('analysis_type', { length: 100 }).notNull(),
  inputData: jsonb('input_data'),
@@ -1154,7 +1173,7 @@ export const legalResearch = pgTable('legal_research', {
  .primaryKey()
  .notNull(),
  caseId: uuid('case_id'),
- createdBy: integer('created_by').notNull(),
+ createdBy: uuid('created_by').notNull(),
  query: text('query').notNull(),
  results: jsonb('results'),
  status: varchar('status', { length: 50 }).default('completed').notNull(),
@@ -1462,7 +1481,7 @@ export const evidenceBoardConnections = pgTable('evidence_board_connections',
  notes: text('notes'),
  strength: real('strength').default(1.0), // 0.0 to 1.0 confidence
  isVisible: boolean('is_visible').default(true),
- createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
+ createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
  createdAt: timestamp('created_at', { withTimezone: true })
  .default(sql`now()`)
  .notNull(),
@@ -1571,7 +1590,7 @@ export const workspaces = pgTable('workspaces',
  title: text('title').notNull(),
  description: text('description'),
  caseId: uuid('case_id').references(() => cases.id, { onDelete: 'cascade' }),
- createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
+ createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
  createdAt: timestamp('created_at', { withTimezone: true })
  .default(sql`now()`)
  .notNull(),
@@ -1670,7 +1689,7 @@ export const workspaceNotes = pgTable('workspace_notes',
  content: text('content').notNull(),
  isAI: boolean('is_ai').default(false),
  embedding: text('embedding'), // pgvector stored as text (768 dimensions)
- createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
+ createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
  createdAt: timestamp('created_at', { withTimezone: true })
  .default(sql`now()`)
  .notNull(),

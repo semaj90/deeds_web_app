@@ -1,9 +1,16 @@
 import { db } from '$lib/server/db/client';
 import { cases } from '$lib/server/db/schema';
 import { verifySSRDatabaseConnection } from '$lib/server/db/ssr-health-check';
-import { error, fail, redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
+import { superValidate } from 'sveltekit-superforms/server';
+import { zod4 as zod } from 'sveltekit-superforms/adapters';
 import { and, desc, eq, like } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
+import {
+	caseListCreateSchema,
+	caseBulkUpdateStatusSchema,
+	caseBulkArchiveSchema
+} from './schema.js';
 
 /**
  * SSR Load Function - Server-side data fetching for cases
@@ -76,6 +83,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	available: !fromFallback,
       error: dbError,
     },
+	form: await superValidate(zod(caseListCreateSchema))
 	};
 };
 
@@ -93,30 +101,12 @@ export const actions: Actions = {
 			return fail(401, { error: 'Unauthorized' });
 		}
 
-		const formData = await request.formData();
-		const title = formData.get('title')?.toString();
-		const description = formData.get('description')?.toString();
-		const priority = (formData.get('priority')?.toString() ?? 'medium') as typeof cases.priority.enumValues[number];
-		const caseNumber = formData.get('caseNumber')?.toString();
-		const practiceArea = formData.get('practiceArea')?.toString();
-		const jurisdiction = formData.get('jurisdiction')?.toString();
-
-		// Validation
-		if (!title || title.trim().length === 0) {
-			return fail(400, {
-				error: 'Title is required',
-				field: 'title',
-				values: { title, description, priority, caseNumber, practiceArea, jurisdiction }
-			});
+		const form = await superValidate(request, zod(caseListCreateSchema));
+		if (!form.valid) {
+			return fail(400, { form });
 		}
 
-		if (!description || description.trim().length === 0) {
-			return fail(400, {
-				error: 'Description is required',
-				field: 'description',
-				values: { title, description, priority, caseNumber, practiceArea, jurisdiction }
-			});
-		}
+		const { title, description, priority, caseNumber, practiceArea, jurisdiction } = form.data;
 
 		try {
 			const newCase = await db
@@ -144,7 +134,7 @@ export const actions: Actions = {
 			console.error('Error creating case:', err);
 			return fail(500, {
 				error: 'Failed to create case',
-				values: { title, description, priority, caseNumber, practiceArea, jurisdiction }
+				form
 			});
 		}
 	},
@@ -158,25 +148,28 @@ export const actions: Actions = {
 		}
 
 		const formData = await request.formData();
-		const caseIds = formData.getAll('caseId').map(id => id.toString());
-		const newStatus = formData.get('status')?.toString() as typeof cases.status.enumValues[number];
+		const data = {
+			caseId: formData.getAll('caseId').map(String),
+			status: formData.get('status')?.toString()
+		};
 
-		if (!caseIds?.length || !newStatus) {
-			return fail(400, { error: 'Missing case IDs or status' });
+		const result = caseBulkUpdateStatusSchema.safeParse(data);
+		if (!result.success) {
+			return fail(400, { error: result.error.issues[0]?.message ?? 'Invalid input' });
 		}
 
 		try {
 			const updated = await db
 				.update(cases)
 				.set({
-					status: newStatus,
+					status: result.data.status,
 					updatedAt: new Date().toISOString()
 				})
 				.where(
 					and(
 						eq(cases.assignedAttorney, locals.user.id),
 						// @ts-expect-error - Drizzle inArray typing
-						cases.id.in(caseIds)
+						cases.id.in(result.data.caseId)
 					)
 				)
 				.returning();
@@ -201,10 +194,13 @@ export const actions: Actions = {
 		}
 
 		const formData = await request.formData();
-		const caseIds = formData.getAll('caseId').map(id => id.toString());
+		const data = {
+			caseId: formData.getAll('caseId').map(String)
+		};
 
-		if (!caseIds.length) {
-			return fail(400, { error: 'No case IDs provided' });
+		const result = caseBulkArchiveSchema.safeParse(data);
+		if (!result.success) {
+			return fail(400, { error: result.error.issues[0]?.message ?? 'No case IDs provided' });
 		}
 
 		try {
@@ -218,7 +214,7 @@ export const actions: Actions = {
 					and(
 						eq(cases.assignedAttorney, locals.user.id),
 						// @ts-expect-error - Drizzle inArray typing
-						cases.id.in(caseIds)
+						cases.id.in(result.data.caseId)
 					)
 				)
 				.returning();
@@ -234,5 +230,3 @@ export const actions: Actions = {
 		}
 	}
 };
-
-

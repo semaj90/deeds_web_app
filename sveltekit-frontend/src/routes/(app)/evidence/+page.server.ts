@@ -1,11 +1,20 @@
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema';
 import { uploadFile } from '$lib/server/minio-client';
-import { error, redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
+import { superValidate } from 'sveltekit-superforms/server';
+import { zod4 as zod } from 'sveltekit-superforms/adapters';
 import { and, eq } from 'drizzle-orm';
 import { Buffer } from 'node:buffer';
 import { randomUUID } from 'node:crypto';
 import type { Actions, PageServerLoad } from './$types';
+import {
+	evidenceUploadSchema,
+	evidenceDeleteSchema,
+	evidenceUpdateSchema,
+	MAX_FILE_SIZE,
+	ALLOWED_MIME_TYPES
+} from './schema.js';
 
 export const load: PageServerLoad = async ({ url, locals }) => {
 	const caseId = url.searchParams.get('caseId');
@@ -16,7 +25,8 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 			evidence: [],
 			caseId,
 			user: null,
-			loadError: null
+			loadError: null,
+			form: await superValidate(zod(evidenceUploadSchema))
 		};
 	}
 
@@ -30,16 +40,14 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 		evidenceData = await safe(
 			db.select().from(evidence)
 				.where(and(eq(evidence.caseId, caseId), eq(evidence.userId, locals.user.id)))
-				.limit(100)
-				.$withCache({ config: { ex: 60 } }),
+				.limit(100),
 			[]
 		);
 	} else {
 		evidenceData = await safe(
 			db.select().from(evidence)
 				.where(eq(evidence.userId, locals.user.id))
-				.limit(50)
-				.$withCache({ config: { ex: 60 } }),
+				.limit(50),
 			[]
 		);
 	}
@@ -52,7 +60,8 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 		evidence: evidenceData,
 		caseId,
 		user: locals.user,
-		loadError
+		loadError,
+		form: await superValidate(zod(evidenceUploadSchema))
 	};
 };
 
@@ -64,43 +73,59 @@ export const actions: Actions = {
 			throw redirect(302, '/login');
 		}
 
+		// Clone request so we can read formData for file AND pass to superValidate
+		const formData = await request.formData();
+		const file = formData.get('file') as File | null;
+
+		// Validate text fields via Superforms
+		const form = await superValidate(formData, zod(evidenceUploadSchema));
+		if (!form.valid) {
+			return fail(400, { form });
+		}
+
+		// File validation (separate from Zod)
+		if (!file || !(file instanceof File) || file.size === 0) {
+			return fail(400, { form, error: 'No file provided' });
+		}
+		if (!file.name || file.name.trim().length === 0) {
+			return fail(400, { form, error: 'File has no name' });
+		}
+		if (file.size > MAX_FILE_SIZE) {
+			return fail(400, { form, error: `File exceeds ${MAX_FILE_SIZE / 1024 / 1024}MB limit` });
+		}
+		if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+			return fail(400, { form, error: `File type ${file.type} not allowed` });
+		}
+
 		try {
-			const formData = await request.formData();
-			const file = formData.get('file') as File;
-			const caseId = formData.get('caseId') as string;
-			const title = (formData.get('title') as string) ?? file?.name ?? '';
-			const description = (formData.get('description') as string) ?? '';
+			const { title, description, caseId } = form.data;
 
-			if (!file) {
-				return { success: false, error: 'No file provided' };
-			}
+			// 1. Upload to MinIO
+			const fileExt = file.name.split('.').pop() ?? 'bin';
+			const objectName = `evidence/${locals.user.id}/${randomUUID()}.${fileExt}`;
+			const buffer = Buffer.from(await file.arrayBuffer());
 
-            // 1. Upload to MinIO
-            const fileExt = file.name.split('.').pop() ?? 'bin';
-            const objectName = `evidence/${locals.user.id}/${randomUUID()}.${fileExt}`;
-            const buffer = Buffer.from(await file.arrayBuffer());
-
-            await uploadFile('legal-evidence', objectName, buffer, {
-                'Content-Type': file.type,
-                'Original-Filename': file.name
-            });
+			await uploadFile('legal-evidence', objectName, buffer, {
+				'Content-Type': file.type,
+				'Original-Filename': file.name
+			});
 
 			// 2. Create DB Record
 			const newEvidence = await db
-        .insert(evidence)
-        .values({
-          userId: locals.user.id,
-          caseId: caseId ?? null,
-          title,
-          description,
-          fileName: file.name,
-          fileSize: file.size,
-          fileType: file.type,
-          fileUrl: objectName,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        })
-        .returning();
+				.insert(evidence)
+				.values({
+					userId: locals.user.id,
+					caseId: caseId ?? null,
+					title: title || file.name,
+					description,
+					fileName: file.name,
+					fileSize: file.size,
+					fileType: file.type,
+					fileUrl: objectName,
+					createdAt: new Date(),
+					updatedAt: new Date()
+				})
+				.returning();
 
 			return {
 				success: true,
@@ -120,13 +145,13 @@ export const actions: Actions = {
 			throw redirect(302, '/login');
 		}
 
-		try {
-			const formData = await request.formData();
-			const evidenceId = formData.get('evidenceId') as string;
+		const form = await superValidate(request, zod(evidenceDeleteSchema));
+		if (!form.valid) {
+			return fail(400, { form });
+		}
 
-			if (!evidenceId) {
-				return { success: false, error: 'No evidence ID provided' };
-			}
+		try {
+			const { evidenceId } = form.data;
 
 			// Only delete if owned by user
 			await db
@@ -148,15 +173,14 @@ export const actions: Actions = {
 			throw redirect(302, '/login');
 		}
 
-		try {
-			const formData = await request.formData();
-			const evidenceId = formData.get('evidenceId') as string;
-			const title = formData.get('title') as string;
-			const description = formData.get('description') as string;
+		const form = await superValidate(request, zod(evidenceUpdateSchema));
+		if (!form.valid) {
+			return fail(400, { form });
+		}
 
-			if (!evidenceId) {
-				return { success: false, error: 'No evidence ID provided' };
-			}
+		try {
+			const { evidenceId, title, description } = form.data;
+
 			const updated = await db
 				.update(evidence)
 				.set({
@@ -180,5 +204,3 @@ export const actions: Actions = {
 		}
 	}
 };
-
-

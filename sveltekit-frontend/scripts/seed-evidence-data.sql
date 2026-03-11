@@ -1,0 +1,162 @@
+-- Seed 12 realistic evidence items for State v. Martinez case
+-- Using actual DB schema columns + valid enum values
+
+INSERT INTO evidence (case_id, evidence_number, title, type, summary, description, pos_x, pos_y, collected_at, collected_by, file_name, file_type, file_size, mime_type, tags, ai_tags, ai_analysis, ai_summary, uploaded_by) VALUES
+
+-- 1. Security camera footage
+('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'EV-2026-001',
+ 'Security Camera Footage — Main Lobby', 'video',
+ 'HD surveillance video from main lobby camera capturing suspect entering building at 21:34 on Dec 5, 2024.',
+ 'Continuous recording from Axis P3265-LVE dome camera mounted above main entrance. Shows individual matching suspect description entering at 21:34:12, proceeding to elevator bank. Face partially captured at 21:34:18. Duration: 18 minutes. Resolution: 1920x1080 @ 30fps.',
+ 100, 120, '2024-12-05 21:34:00', 'Det. Sarah Rodriguez',
+ 'lobby-cam-2024-12-05.mp4', 'video/mp4', 245000000, 'video/mp4',
+ '["surveillance", "lobby", "entry-point", "facial-capture"]',
+ '["person-detected", "nighttime", "indoor", "movement-tracking"]',
+ '{"confidence": 0.92, "faces_detected": 1, "motion_events": 3, "lighting": "artificial"}',
+ 'Video shows single individual entering main lobby at 21:34. Facial features partially captured. Clothing matches witness descriptions.',
+ 'e0746670-b799-450f-be1b-d8aa565c5fe3'),
+
+-- 2. Witness statement
+('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'EV-2026-002',
+ 'Witness Statement — K. Ito (Security Guard)', 'testimonial',
+ 'Sworn statement from building security guard describing verbal confrontation in B2 parking garage.',
+ 'Witness Kenji Ito, employed as night security at TechCorp Tower since 2021, observed individual in B2 parking level at approximately 21:15. Reports verbal exchange when challenged. Witness positively identifies suspect from 6-person photo lineup (ID #4). Statement taken under oath at precinct.',
+ 400, 80, '2024-12-06 09:30:00', 'Det. Sarah Rodriguez',
+ 'witness-statement-ito-signed.pdf', 'application/pdf', 85000, 'application/pdf',
+ '["witness", "sworn-statement", "photo-lineup", "parking-garage"]',
+ '["identification", "verbal-confrontation", "positive-id"]',
+ '{"credibility_score": 0.88, "identified_suspect": true, "lineup_position": 4, "statement_pages": 3}',
+ 'Security guard K. Ito positively identifies suspect from photo lineup. Reports verbal confrontation in B2 parking at ~21:15, approximately 19 minutes before lobby camera footage.',
+ 'e0746670-b799-450f-be1b-d8aa565c5fe3'),
+
+-- 3. Access badge logs
+('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'EV-2026-003',
+ 'Access Badge Log — Server Room', 'digital',
+ 'Electronic access control logs showing 4 badge swipes between 20:00-22:00. Badge #4471 used at 21:15 and 21:52.',
+ 'Export from Honeywell Pro-Watch access control system. Badge #4471 (registered to R. Martinez, terminated employee) recorded at: B2 Parking 21:14:38, Server Room Corridor 21:33:45, Server Room 21:34:02, B2 Parking Exit 21:52:11. Badge should have been deactivated upon termination.',
+ 250, 300, '2024-12-05 22:00:00', 'IT Security Team',
+ 'badge-log-export-dec5.csv', 'text/csv', 12400, 'text/csv',
+ '["access-control", "badge-swipe", "server-room", "terminated-employee"]',
+ '["unauthorized-access", "timeline-critical", "security-breach"]',
+ '{"swipe_count": 4, "badge_number": "4471", "should_be_deactivated": true, "time_span_minutes": 38}',
+ 'Badge #4471 (terminated employee R. Martinez) used 4 times between 21:14-21:52. Badge was not deactivated after employment termination.',
+ 'e0746670-b799-450f-be1b-d8aa565c5fe3'),
+
+-- 4. Forensic photos
+('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'EV-2026-004',
+ 'Forensic Photo Set — Server Room Cabinet', 'photo',
+ 'High-resolution photographs of server room cabinet showing tool marks consistent with forced entry.',
+ '24 photographs taken by CSI Tech Williams using Nikon D850 with forensic ruler scale. Shows pry bar marks on server cabinet 7B lock mechanism, scratch patterns on adjacent panel, and displaced cable management. UV light photos reveal latent prints on handle.',
+ 550, 200, '2024-12-06 02:15:00', 'CSI Tech M. Williams',
+ 'forensic-scene-set-001.zip', 'application/zip', 185000000, 'application/zip',
+ '["crime-scene", "tool-marks", "server-cabinet", "forced-entry"]',
+ '["pry-bar-marks", "scratch-patterns", "latent-prints", "uv-photography"]',
+ '{"photo_count": 24, "camera": "Nikon D850", "uv_photos": 6, "scale_reference": true}',
+ '24 forensic photographs documenting forced entry to server cabinet 7B. Tool marks consistent with pry bar. Latent fingerprints visible under UV illumination.',
+ 'e0746670-b799-450f-be1b-d8aa565c5fe3'),
+
+-- 5. DNA analysis
+('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'EV-2026-005',
+ 'DNA Analysis Report — Server Room Door Handle', 'scientific',
+ 'Lab report: DNA from server room door handle matches suspect profile with 99.97% probability.',
+ 'State Crime Lab Report #SCL-2024-1205-DNA. Touch DNA recovered from interior server room door handle using M-Vac wet-vacuum collection. STR analysis at 24 loci. Full profile obtained. Compared against suspect reference sample (buccal swab collected under warrant). Statistical match probability: 1 in 3.2 billion.',
+ 700, 350, '2024-12-20 14:00:00', 'Dr. Emily Park, State Crime Lab',
+ 'dna-analysis-SCL-2024-1205.pdf', 'application/pdf', 420000, 'application/pdf',
+ '["dna", "forensic-lab", "door-handle", "str-analysis"]',
+ '["positive-match", "high-confidence", "touch-dna", "warrant-collected"]',
+ '{"match_probability": "1 in 3.2 billion", "loci_analyzed": 24, "collection_method": "M-Vac", "lab_accredited": true}',
+ 'Full DNA profile from server room door handle matches suspect with 99.97% probability (1:3.2B). 24-locus STR analysis by accredited state crime lab.',
+ 'e0746670-b799-450f-be1b-d8aa565c5fe3'),
+
+-- 6. Phone records
+('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'EV-2026-006',
+ 'Phone Records — Suspect Mobile Device', 'digital',
+ 'Cell tower pings place suspect mobile device within 200m of TechCorp building between 20:45-22:10.',
+ 'Call detail records obtained via subpoena from Verizon Wireless (Case Ref: VZW-LEA-2024-89012). Device IMEI 359872034567891. 14 cell tower connections logged. Triangulation places device within TechCorp building footprint from 20:47 to 22:08. Two outgoing calls during period: 21:01 (2m14s, unknown number) and 21:48 (0m38s, same number).',
+ 150, 450, '2024-12-15 10:00:00', 'Digital Forensics Unit',
+ 'phone-records-verizon-subpoena.xlsx', 'application/vnd.ms-excel', 156000, 'application/vnd.ms-excel',
+ '["phone-records", "cell-tower", "subpoena", "geolocation"]',
+ '["location-verified", "call-records", "triangulation", "two-calls"]',
+ '{"tower_connections": 14, "calls_during_period": 2, "geofence_confidence": "high", "carrier": "Verizon"}',
+ 'Cell tower data places suspect phone inside TechCorp building from 20:47-22:08. Two outgoing calls to unidentified number during the incident window.',
+ 'e0746670-b799-450f-be1b-d8aa565c5fe3'),
+
+-- 7. Suspect interview
+('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'EV-2026-007',
+ 'Interview Recording — R. Martinez (Suspect)', 'audio',
+ 'Audio recording of suspect interview. Suspect denies presence at building. Miranda rights administered at 09:14.',
+ 'Recorded at Precinct 14, Interview Room 3. Duration: 47 minutes. Det. Rodriguez (lead), Det. Park (second). Miranda administered and acknowledged at 09:14:22. Suspect provides alibi: claims to be at home watching television. Cannot name specific programs. Becomes evasive when asked about building access badge. Requests attorney at 09:58.',
+ 450, 420, '2024-12-07 09:14:00', 'Det. Sarah Rodriguez',
+ 'suspect-interview-martinez-2024-12-07.wav', 'audio/wav', 67000000, 'audio/wav',
+ '["interview", "suspect", "miranda", "alibi"]',
+ '["denial", "evasive-responses", "attorney-requested", "alibi-weak"]',
+ '{"duration_minutes": 47, "miranda_time": "09:14:22", "attorney_requested": "09:58", "alibi": "at home"}',
+ 'Suspect denies presence at TechCorp. Claims home alibi but cannot provide specifics. Becomes evasive about access badge. Requests attorney at 09:58.',
+ 'e0746670-b799-450f-be1b-d8aa565c5fe3'),
+
+-- 8. Hard drive
+('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'EV-2026-008',
+ 'Recovered Hard Drive — Suspect Vehicle', 'physical',
+ 'WD 2TB external drive recovered from suspect vehicle. Contains encrypted partitions.',
+ 'Western Digital My Passport Ultra 2TB (S/N: WXB1A89KTP42) found in center console of suspect 2021 Honda Civic during warranted vehicle search. Device powered off at time of recovery. Forensic imaging completed using Tableau T35u write-blocker. Three partitions detected: 500GB unencrypted, 1TB BitLocker encrypted (pending warrant for decryption key), 500GB unallocated space with deleted file traces.',
+ 680, 100, '2024-12-06 16:30:00', 'CSI Tech J. Abernathy',
+ 'evidence-tag-PHY-0088-imaging-report.pdf', 'application/pdf', 34000, 'application/pdf',
+ '["hard-drive", "vehicle-search", "encrypted", "forensic-imaging"]',
+ '["bitlocker-encrypted", "deleted-files", "write-blocked", "warranted-search"]',
+ '{"capacity_gb": 2000, "partitions": 3, "encrypted_partition_gb": 1000, "imaging_tool": "Tableau T35u"}',
+ 'External 2TB drive from suspect vehicle. 1TB partition BitLocker-encrypted. 500GB unallocated space shows deleted file artifacts. Forensic imaging complete.',
+ 'e0746670-b799-450f-be1b-d8aa565c5fe3'),
+
+-- 9. Crime scene diagram
+('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'EV-2026-009',
+ 'Crime Scene Diagram — TechCorp Server Room', 'documentary',
+ 'Detailed floor plan with evidence marker positions, entry/exit points, and suspect movement path.',
+ 'Scale diagram (1:50) of TechCorp Tower 3rd floor server room and adjacent corridor. Prepared by CSI Tech Williams. Shows 12 evidence marker locations, two entry/exit points, camera positions, and reconstructed suspect movement path based on badge swipe sequence and camera footage.',
+ 850, 200, '2024-12-06 04:00:00', 'CSI Tech M. Williams',
+ 'scene-diagram-3rd-floor-v2.pdf', 'application/pdf', 2300000, 'application/pdf',
+ '["crime-scene", "floor-plan", "evidence-markers", "movement-path"]',
+ '["12-evidence-markers", "two-entry-points", "reconstructed-path"]',
+ '{"evidence_markers": 12, "entry_points": 2, "scale": "1:50", "floor": "3rd"}',
+ 'Detailed 1:50 scale floor plan showing 12 evidence markers, camera positions, and reconstructed suspect movement through server room area.',
+ 'e0746670-b799-450f-be1b-d8aa565c5fe3'),
+
+-- 10. Expert report
+('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'EV-2026-010',
+ 'Expert Report — Dr. Chen (Digital Forensics)', 'documentary',
+ 'Certified digital forensics examiner concludes data exfiltration occurred between 21:20-21:45.',
+ 'Expert opinion report by Dr. Lisa Chen, GCFE, CFCE, EnCase Certified Examiner. Analysis of server access logs, network traffic captures, and USB device connection timestamps. Concludes: (1) Server cabinet 7B physically accessed at 21:20, (2) USB mass storage device connected at 21:22 for 23 minutes, (3) ~4.2GB of data copied to external device, (4) File access patterns indicate targeted selection of proprietary source code repositories.',
+ 850, 400, '2025-01-10 16:00:00', 'Dr. Lisa Chen, GCFE',
+ 'expert-report-chen-digital-forensics.pdf', 'application/pdf', 195000, 'application/pdf',
+ '["expert-opinion", "digital-forensics", "data-exfiltration", "usb-device"]',
+ '["targeted-theft", "source-code", "23min-window", "4.2gb-copied"]',
+ '{"data_exfiltrated_gb": 4.2, "usb_connection_minutes": 23, "certifications": ["GCFE", "CFCE", "EnCE"]}',
+ 'Expert concludes 4.2GB of proprietary source code copied via USB device during 23-minute window (21:22-21:45). File access patterns show targeted selection.',
+ 'e0746670-b799-450f-be1b-d8aa565c5fe3'),
+
+-- 11. Fingerprint analysis
+('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'EV-2026-011',
+ 'Fingerprint Analysis — Server Cabinet Handle', 'forensic',
+ 'Latent fingerprint from cabinet handle matches suspect with 12-point ridge detail confirmation.',
+ 'AFIS analysis by State Crime Lab Fingerprint Unit. Latent print recovered from server cabinet 7B exterior handle using cyanoacrylate fuming followed by rhodamine 6G fluorescent dye. Right thumb impression with 12 matching Galton characteristics. Compared against suspect ten-print card (booking #BK-2024-88901). No additional unidentified prints on surface.',
+ 600, 550, '2024-12-18 11:00:00', 'Latent Print Examiner T. Nakamura',
+ 'fingerprint-analysis-FP-2024-089.pdf', 'application/pdf', 890000, 'application/pdf',
+ '["fingerprint", "afis", "latent-print", "cyanoacrylate"]',
+ '["12-point-match", "right-thumb", "cabinet-handle", "no-other-prints"]',
+ '{"matching_points": 12, "finger": "right thumb", "collection_method": "cyanoacrylate + rhodamine 6G", "other_prints": 0}',
+ 'Latent right thumb print from server cabinet handle matches suspect with 12 Galton characteristic points. No other unidentified prints found.',
+ 'e0746670-b799-450f-be1b-d8aa565c5fe3'),
+
+-- 12. Incident report
+('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'EV-2026-012',
+ 'Incident Report — Building Manager', 'documentary',
+ 'Official incident report documenting unauthorized after-hours access and server room damage.',
+ 'Filed by Building Manager David Park on December 6, 2024. Documents: (1) Security system alert at 21:35 for unauthorized badge use, (2) Server room door found propped open at 22:30 during routine patrol, (3) Visible damage to server cabinet 7B lock, (4) IT team confirms missing server blade and disrupted cable connections, (5) Estimated property damage: $15,000-$25,000.',
+ 300, 550, '2024-12-06 08:00:00', 'David Park, Building Manager',
+ 'incident-report-techcorp-2024-12-06.pdf', 'application/pdf', 62000, 'application/pdf',
+ '["incident-report", "building-manager", "property-damage", "insurance"]',
+ '["unauthorized-access", "server-blade-missing", "15k-25k-damage", "insurance-claim"]',
+ '{"estimated_damage_low": 15000, "estimated_damage_high": 25000, "missing_equipment": "server blade", "insurance_claim": true}',
+ 'Building manager reports unauthorized badge use at 21:35, server room door propped open, cabinet 7B lock damaged, server blade missing. Estimated damage $15K-$25K.',
+ 'e0746670-b799-450f-be1b-d8aa565c5fe3')
+
+RETURNING id, evidence_number, title;

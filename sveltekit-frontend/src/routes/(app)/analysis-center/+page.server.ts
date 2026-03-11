@@ -1,9 +1,12 @@
 import { fail } from '@sveltejs/kit';
+import { superValidate } from 'sveltekit-superforms/server';
+import { zod4 as zod } from 'sveltekit-superforms/adapters';
 import { db } from '$lib/server/db/client';
 import { evidence, cases } from '$lib/server/db/schema-postgres.js';
 import { desc, eq, sql, count } from 'drizzle-orm';
 import { getOllamaUrl } from '$lib/config/env.server.js';
 import type { Actions, PageServerLoad } from './$types.js';
+import { evidenceSearchSchema } from './schema.js';
 
 const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
 
@@ -51,21 +54,20 @@ export const load: PageServerLoad = async ({ locals }) => {
 		recentEvidence,
 		caseStats,
 		evidenceCount: evidenceStats,
-		timestamp: new Date().toISOString()
+		timestamp: new Date().toISOString(),
+		form: await superValidate(zod(evidenceSearchSchema))
 	};
 };
 
 export const actions: Actions = {
 	// Semantic evidence search via RAG+KAG+DAG pipeline
 	search: async ({ request, url, locals }) => {
-		const data = await request.formData();
-		const query = String(data.get('query') ?? '').trim();
-		const mode = String(data.get('mode') ?? 'pattern');
-		const caseId = String(data.get('caseId') ?? '');
-
-		if (!query) {
-			return fail(400, { searchError: 'Query cannot be empty' });
+		const form = await superValidate(request, zod(evidenceSearchSchema));
+		if (!form.valid) {
+			return fail(400, { form });
 		}
+
+		const { query, mode, caseId } = form.data;
 
 		try {
 			const origin = url.origin;
@@ -103,13 +105,12 @@ export const actions: Actions = {
 
 	// AI-powered analysis using RAG answer pipeline
 	analyze: async ({ request, url }) => {
-		const data = await request.formData();
-		const query = String(data.get('query') ?? '').trim();
-		const mode = String(data.get('mode') ?? 'pattern');
-
-		if (!query) {
-			return fail(400, { analysisError: 'Query cannot be empty' });
+		const form = await superValidate(request, zod(evidenceSearchSchema));
+		if (!form.valid) {
+			return fail(400, { form });
 		}
+
+		const { query, mode } = form.data;
 
 		try {
 			const ollamaUrl = getOllamaUrl();

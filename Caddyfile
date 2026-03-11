@@ -38,6 +38,16 @@ $caddy = @'
     @cors_preflight method OPTIONS
     respond @cors_preflight 204
 
+    # SSE endpoints — disable response buffering so events stream immediately
+    handle /api/sse/* {
+        reverse_proxy localhost:{env.VITE_PORT_1 5173} localhost:{env.VITE_PORT_2 5174} {
+            flush_interval -1
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            lb_policy round_robin
+        }
+    }
+
     # Proxy to local SvelteKit instances.
     # Upstream ports are picked from env vars if present, otherwise fall back to 5173/5174.
     # This allows "dynamic" dev-port selection by setting VITE_PORT_1/VITE_PORT_2 or leaving defaults.
