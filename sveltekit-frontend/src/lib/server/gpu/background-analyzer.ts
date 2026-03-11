@@ -139,6 +139,13 @@ export async function analyzeEvidenceGpu(
 		const latencyMs = Math.round(performance.now() - start);
 		console.log(`[GPU Analyzer] Case ${caseId}: ${similarEvidence.length} similar, cluster=${clusterAssignment}/${k}, ${latencyMs}ms (${simResult.source})`);
 
+		// Audit log — GPU analysis completed
+		import('$lib/server/audit/evidence-audit.js').then(({ logEvidenceAction }) => {
+			logEvidenceAction(evidenceId, 'gpu_analyzed', {
+				changes: { source: simResult.source, similarCount: similarEvidence.length, clusterAssignment, clusterCount: k, latencyMs },
+			});
+		}).catch(() => { /* audit is non-critical */ });
+
 		return {
 			evidenceId,
 			caseId,

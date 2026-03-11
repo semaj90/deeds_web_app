@@ -124,6 +124,13 @@ export async function POST({ request }: RequestEvent) {
 		const evidenceId = inserted.id;
 		updateJob(jobId, { evidenceId, step: 'db-insert', progress: 60, message: 'Database record created' });
 
+		// 4b. Audit log — chain of custody
+		import('$lib/server/audit/evidence-audit.js').then(({ logEvidenceAction }) => {
+			logEvidenceAction(evidenceId, 'uploaded', {
+				changes: { fileName: file.name, fileSize: file.size, mimeType: file.type, hash: fileHash, caseId },
+			});
+		}).catch(() => { /* audit is non-critical */ });
+
 		// 5. Fire off text extraction + chunking + embedding (non-blocking)
 		processAndEmbed(jobId, evidenceId, file.name, buffer, caseId, evidenceType).catch((err) => {
 			console.error('[Upload] Background processing failed:', err);
