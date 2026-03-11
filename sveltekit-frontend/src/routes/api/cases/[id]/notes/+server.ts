@@ -3,6 +3,13 @@ import { caseNotes, cases } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
 import { eq, desc, sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
+
+const noteCreateSchema = z.object({
+	title: z.string().max(500).optional(),
+	content: z.string().min(1, 'Content is required').max(50000),
+	isAI: z.boolean().optional().default(false)
+});
 
 /**
  * GET /api/cases/[id]/notes
@@ -34,11 +41,12 @@ export const POST: RequestHandler = async ({ params, request }) => {
 	const caseId = params.id;
 
 	try {
-		const body = await request.json();
-
-		if (!body?.content?.trim()) {
-			return json({ error: 'Content is required' }, { status: 400 });
+		const raw = await request.json();
+		const parsed = noteCreateSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
+		const body = parsed.data;
 
 		// Verify case exists
 		const [targetCase] = await db
@@ -57,7 +65,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
 				caseId,
 				title: body.title?.trim() || null,
 				content: body.content.trim(),
-				isAI: body.isAI ?? false
+				isAI: body.isAI
 			})
 			.returning();
 

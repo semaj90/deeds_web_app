@@ -5,6 +5,23 @@ import type { RequestHandler } from './$types';
 import { apiResponses, validateRequest } from '$lib/server/api/response-helper.js';
 import { requireAuth } from '$lib/server/auth-helpers.js';
 import { invalidateCaseCache } from '$lib/server/cache/invalidation.js';
+import { z } from 'zod';
+
+const CASE_STATUS = ['open', 'in_progress', 'pending_review', 'closed', 'archived'] as const;
+const CASE_PRIORITY = ['low', 'medium', 'high', 'urgent'] as const;
+
+const caseCreateSchema = z.object({
+	title: z.string().min(1, 'Title is required').max(500),
+	description: z.string().min(1, 'Description is required').max(10000),
+	status: z.enum(CASE_STATUS).optional(),
+	priority: z.enum(CASE_PRIORITY).optional()
+});
+
+const caseBulkSchema = z.object({
+	ids: z.array(z.string().uuid()).min(1, 'Select at least one case'),
+	status: z.enum(CASE_STATUS).optional(),
+	priority: z.enum(CASE_PRIORITY).optional()
+});
 
 /**
  * GET /api/cases
@@ -63,12 +80,12 @@ export const POST: RequestHandler = async (event) => {
 	const auth = await requireAuth(event);
 
 	try {
-		const body = await event.request.json();
-
-		const missing = validateRequest(body, ['title', 'description']);
-		if (missing) {
-			return apiResponses.badRequest(missing);
+		const raw = await event.request.json();
+		const parsed = caseCreateSchema.safeParse(raw);
+		if (!parsed.success) {
+			return apiResponses.badRequest(parsed.error.issues[0]?.message ?? 'Invalid input');
 		}
+		const body = parsed.data;
 
 		const newCase = await db
 			.insert(cases)
@@ -76,8 +93,8 @@ export const POST: RequestHandler = async (event) => {
 				title: body.title,
 				description: body.description,
 				userId: auth.user.id,
-				status: (body?.status ?? 'open') as any,
-				priority: (body?.priority ?? 'medium') as any,
+				status: (body.status ?? 'open') as any,
+				priority: (body.priority ?? 'medium') as any,
 				updatedAt: new Date().toISOString()
 			})
 			.returning();
@@ -109,11 +126,12 @@ export const PATCH: RequestHandler = async (event) => {
 	const auth = await requireAuth(event);
 
 	try {
-		const body = await event.request.json();
-
-		if (!body?.ids || !Array.isArray(body.ids) || body.ids.length === 0) {
-			return apiResponses.badRequest('Missing required field: ids (array)');
+		const raw = await event.request.json();
+		const parsed = caseBulkSchema.safeParse(raw);
+		if (!parsed.success) {
+			return apiResponses.badRequest(parsed.error.issues[0]?.message ?? 'Invalid input');
 		}
+		const body = parsed.data;
 
 		const updates: Partial<typeof cases.$inferSelect> = {
 			updatedAt: new Date().toISOString()
@@ -156,11 +174,12 @@ export const DELETE: RequestHandler = async (event) => {
 	const auth = await requireAuth(event);
 
 	try {
-		const body = await event.request.json();
-
-		if (!body?.ids || !Array.isArray(body.ids) || body.ids.length === 0) {
-			return apiResponses.badRequest('Missing required field: ids (array)');
+		const raw = await event.request.json();
+		const parsed = caseBulkSchema.safeParse(raw);
+		if (!parsed.success) {
+			return apiResponses.badRequest(parsed.error.issues[0]?.message ?? 'Invalid input');
 		}
+		const body = parsed.data;
 
 		const archived = await db
 			.update(cases)

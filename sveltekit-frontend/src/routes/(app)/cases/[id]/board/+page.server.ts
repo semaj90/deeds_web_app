@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db';
-import { canvasStates, evidence } from '$lib/server/db/schema';
+import { canvasStates, evidence, evidenceBoardConnections } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 
@@ -17,13 +17,14 @@ export const load: PageServerLoad = async ({ params }) => {
 		return {
 			caseId: id,
 			initialState: null,
-			evidence: []
+			evidence: [],
+			connections: []
 		};
 	}
 
 	try {
-		// Load both canvas state and evidence in parallel
-		const [savedState, evidenceItems] = await Promise.all([
+		// Load canvas state, evidence, and connections in parallel
+		const [savedState, evidenceItems, connections] = await Promise.all([
 			safe(
 				db.query.canvasStates.findFirst({
 					where: eq(canvasStates.caseId, id)
@@ -36,6 +37,11 @@ export const load: PageServerLoad = async ({ params }) => {
 					orderBy: (evidence, { desc }) => [desc(evidence.uploadedAt)],
 					limit: 100
 				}),
+				[]
+			),
+			safe(
+				db.select().from(evidenceBoardConnections)
+					.where(eq(evidenceBoardConnections.caseId, id)),
 				[]
 			)
 		]);
@@ -56,14 +62,25 @@ export const load: PageServerLoad = async ({ params }) => {
 					fileType: item.fileType || '',
 					confidence: meta.confidence || 0
 				};
-			})
+			}),
+			connections: connections.map((c) => ({
+				id: c.id,
+				fromEvidenceId: c.fromEvidenceId,
+				toEvidenceId: c.toEvidenceId,
+				connectionType: c.connectionType,
+				label: c.label,
+				notes: c.notes,
+				strength: c.strength,
+				isVisible: c.isVisible
+			}))
 		};
 	} catch (e) {
 		console.error('Failed to load board data:', e);
 		return {
 			caseId: id,
 			initialState: null,
-			evidence: []
+			evidence: [],
+			connections: []
 		};
 	}
 };

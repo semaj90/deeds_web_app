@@ -24,6 +24,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import type { ApiResponse } from '$lib/types/api.js';
 import type { RankedDocument, DocumentCandidate } from '$lib/server/ml/multi-modal-ranker.js';
+import { z } from 'zod';
 import { MultiModalRanker, rankCombinedResults } from '$lib/server/ml/multi-modal-ranker.js';
 import { UserHistoryTracker } from '$lib/server/ml/user-history.js';
 import { requireAuth } from '$lib/server/auth-helpers.js';
@@ -39,13 +40,13 @@ import {
 	computeCentralityForNodes
 } from '$lib/server/graph/graph-centrality.js';
 
-interface RecommendationRequest {
-	query: string;
-	caseId?: string;
-	topK?: number;
-	includeExplanations?: boolean;
-	tags?: string[]; // Optional explicit tags for query context
-}
+const recommendationRequestSchema = z.object({
+	query: z.string().min(1, 'Query required').max(2000),
+	caseId: z.string().uuid('Invalid case ID').optional(),
+	topK: z.number().int().min(1).max(100).optional(),
+	includeExplanations: z.boolean().optional(),
+	tags: z.array(z.string().max(200)).max(50).optional()
+});
 
 /**
  * GET /api/recommendations
@@ -84,12 +85,11 @@ export const GET: RequestHandler = async (event) => {
 		);
 	} catch (err) {
 		console.error('[recommendations] GET request error:', err);
-		const message = err instanceof Error ? err.message : String(err);
 
 		return json(
 			{
 				success: false,
-				error: `Failed to fetch user preferences: ${message}`
+				error: 'Failed to fetch user preferences'
 			},
 			{ status: 500 }
 		);
@@ -105,22 +105,23 @@ export const POST: RequestHandler = async (event) => {
 	const startTime = Date.now();
 
 	try {
-		const body = (await event.request.json()) as RecommendationRequest;
+		const raw = await event.request.json();
+		const parsed = recommendationRequestSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json(
+				{
+					success: false,
+					error: parsed.error.issues[0]?.message ?? 'Invalid input'
+				},
+				{ status: 400 }
+			);
+		}
+		const body = parsed.data;
 
 		// Defaults
 		const topK = body.topK ?? 10;
 		const includeExplanations = body.includeExplanations ?? true;
 		const queryTags = body.tags ?? [];
-
-		if (!body.query || body.query.trim().length === 0) {
-			return json(
-				{
-					success: false,
-					error: 'Query required'
-				},
-				{ status: 400 }
-			);
-		}
 
 		console.log(
 			`[recommendations] User ${auth.user.id}, query="${body.query}", caseId=${body.caseId}, topK=${topK}`
@@ -257,12 +258,11 @@ export const POST: RequestHandler = async (event) => {
 		);
 	} catch (err) {
 		console.error('[recommendations] Request error:', err);
-		const message = err instanceof Error ? err.message : String(err);
 
 		return json(
 			{
 				success: false,
-				error: `Recommendation generation failed: ${message}`
+				error: 'Recommendation generation failed'
 			},
 			{ status: 500 }
 		);

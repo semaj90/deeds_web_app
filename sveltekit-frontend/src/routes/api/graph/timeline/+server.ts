@@ -2,10 +2,24 @@ import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
+import { z } from 'zod';
+
+const TIMELINE_TYPES = ['case', 'evidence', 'person', 'citation', 'report'] as const;
+
+const timelineQuerySchema = z.object({
+	caseId: z.string().uuid('Invalid case ID').optional(),
+	limit: z.coerce.number().int().min(1).max(200).optional().default(50),
+	types: z.string().optional().transform((v) => {
+		if (!v) return [...TIMELINE_TYPES];
+		return v.split(',').filter((t): t is typeof TIMELINE_TYPES[number] =>
+			(TIMELINE_TYPES as readonly string[]).includes(t)
+		);
+	})
+});
 
 interface TimelineNode {
 	id: string;
-	type: 'case' | 'evidence' | 'person' | 'citation' | 'report';
+	type: typeof TIMELINE_TYPES[number];
 	title: string;
 	timestamp: string;
 	metadata: Record<string, unknown>;
@@ -19,9 +33,15 @@ interface TimelineNode {
 export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 
-	const caseId = url.searchParams.get('caseId');
-	const limit = Math.min(Number(url.searchParams.get('limit') || 50), 200);
-	const types = (url.searchParams.get('types') || 'case,evidence,person,citation,report').split(',');
+	const parsed = timelineQuerySchema.safeParse({
+		caseId: url.searchParams.get('caseId') || undefined,
+		limit: url.searchParams.get('limit') || undefined,
+		types: url.searchParams.get('types') || undefined
+	});
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query parameters' }, { status: 400 });
+	}
+	const { caseId, limit, types } = parsed.data;
 
 	const nodes: TimelineNode[] = [];
 
@@ -126,7 +146,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	return json({
 		nodes: nodes.slice(0, limit),
 		totalNodes: nodes.length,
-		caseId: caseId ?? null,
+		caseId: caseId || null,
 		types,
 	});
 };

@@ -3,6 +3,13 @@ import { personsOfInterest, poiPhotos } from '$lib/server/db/schema-postgres';
 import { json, error } from '@sveltejs/kit';
 import { sql, desc } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
+
+const poiSearchSchema = z.object({
+	query: z.string().min(1, 'Query is required').max(200),
+	limit: z.number().int().min(1).max(50).optional().default(10),
+	excludeId: z.string().uuid().optional()
+});
 
 /**
  * POST /api/persons-of-interest/search
@@ -11,11 +18,15 @@ import type { RequestHandler } from './$types';
 export const POST: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 
-	const body = await request.json();
-	const query = body.query?.trim();
-	if (!query) throw error(400, 'Missing query');
+	const raw = await request.json();
+	const parsed = poiSearchSchema.safeParse(raw);
+	if (!parsed.success) {
+		throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
+	}
+	const body = parsed.data;
 
-	const limit = Math.min(body.limit ?? 10, 50);
+	const query = body.query.trim();
+	const limit = body.limit;
 	const excludeId = body.excludeId ?? null;
 
 	try {
@@ -68,8 +79,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 				status: r.status,
 				threatLevel: r.threatLevel,
 				description: r.description?.slice(0, 200) ?? '',
-				lastLocation: null, // TODO: Add when location column exists
-				photoUrl: null, // TODO: Join poi_photos + VLM analysis
+				photoUrl: r.photoUrl ?? null,
 				similarityScore: Math.min(score, 1.0),
 			};
 		});

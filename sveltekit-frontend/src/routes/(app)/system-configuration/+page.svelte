@@ -21,7 +21,7 @@
    model: 'gemma3-legal',
    temperature: 0.7,
    maxTokens: 2048,
-   ollamaEndpoint: 'http://localhost:11434',
+   ollamaEndpoint: '/api/embed',
    embeddingModel: 'embeddinggemma',
    enableFallback: true
   },

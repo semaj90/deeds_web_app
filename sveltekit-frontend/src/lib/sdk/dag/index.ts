@@ -72,16 +72,27 @@ export class DAGClient {
 				throw new Error(`Table ${query.table} not found in schema`);
 			}
 
+			const { eq, desc, asc, sql } = await import('drizzle-orm');
 			let dbQuery = this.db.select().from(table);
 
 			// Apply filters
 			if (query.filters) {
-				// TODO: Apply dynamic filters using Drizzle's where() API
+				for (const [key, value] of Object.entries(query.filters)) {
+					const col = table[key];
+					if (col && value !== undefined) {
+						dbQuery = dbQuery.where(eq(col, value)) as typeof dbQuery;
+					}
+				}
 			}
 
 			// Apply ordering
 			if (query.orderBy) {
-				// TODO: Apply ordering
+				const descending = query.orderBy.startsWith('-');
+				const colName = descending ? query.orderBy.slice(1) : query.orderBy;
+				const col = table[colName];
+				if (col) {
+					dbQuery = dbQuery.orderBy(descending ? desc(col) : asc(col)) as typeof dbQuery;
+				}
 			}
 
 			// Apply limit
@@ -145,12 +156,31 @@ export class DAGClient {
 	 * Aggregate data for statistical insights
 	 */
 	async aggregate(query: DAGQuery): Promise<number> {
-		if (!query.aggregate) {
-			throw new Error('Aggregate function not specified');
-		}
+		if (!this.db) throw new Error('DAG client not initialized');
+		if (!query.aggregate) throw new Error('Aggregate function not specified');
 
-		// TODO: Implement aggregation using Drizzle's count(), sum(), etc.
-		throw new Error('Aggregation not yet implemented');
+		const table = (this.config.schema as any)[query.table];
+		if (!table) throw new Error(`Table ${query.table} not found in schema`);
+
+		const col = table[query.aggregate.column];
+		if (!col) throw new Error(`Column ${query.aggregate.column} not found in table ${query.table}`);
+
+		const { sql } = await import('drizzle-orm');
+		const fnMap: Record<string, string> = {
+			count: 'count',
+			sum: 'sum',
+			avg: 'avg',
+			min: 'min',
+			max: 'max',
+		};
+		const fn = fnMap[query.aggregate.function];
+		if (!fn) throw new Error(`Unknown aggregate function: ${query.aggregate.function}`);
+
+		const result = await this.db
+			.select({ value: sql<number>`${sql.raw(fn)}(${col})::float` })
+			.from(table);
+
+		return result[0]?.value ?? 0;
 	}
 
 	/**

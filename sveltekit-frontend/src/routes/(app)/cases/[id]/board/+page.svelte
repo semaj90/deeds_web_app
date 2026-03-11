@@ -4,6 +4,7 @@
 	import { ChatSession } from '$lib/models/ChatSession.svelte.js';
 	import TypewriterResponse from '$lib/components/ai/TypewriterResponse.svelte';
 	import AISummaryMiniModal from '$lib/components/legal/AISummaryMiniModal.svelte';
+	import { boardHistory } from '$lib/components/evidence/board-history.svelte.js';
 	import type { PageData } from './$types';
 	import { onMount } from 'svelte';
 
@@ -12,6 +13,7 @@
 	let caseId = $derived(data.caseId);
 	let initialState = $derived(data.initialState);
 	let evidenceItems = $derived((data as any).evidence || []);
+	let dbConnections = $derived((data as any).connections || []);
 
 	// State
 	let board: HybridBoard = $state() as HybridBoard;
@@ -39,15 +41,46 @@
 	onMount(() => {
 		// Initialize chat session with case context
 		chatSession = new ChatSession(`board-${caseId}`, [], true);
+
+		// Load timeline events (non-blocking)
+		loadTimeline();
+
+		// Seed board edges from DB connections (after board mounts)
+		if (board && dbConnections.length > 0) {
+			const existingNodes = board.getNodes();
+			const nodeByEvidenceId = new Map(
+				existingNodes.filter((n: any) => n.evidenceId).map((n: any) => [n.evidenceId, n.id])
+			);
+
+			for (const conn of dbConnections) {
+				const fromNodeId = nodeByEvidenceId.get(conn.fromEvidenceId);
+				const toNodeId = nodeByEvidenceId.get(conn.toEvidenceId);
+				if (fromNodeId && toNodeId) {
+					board.addEdge(fromNodeId, toNodeId, conn.label ?? conn.connectionType ?? undefined);
+				}
+			}
+		}
+
 		return () => {
 			chatSession?.destroy();
+			boardHistory.clear();
 		};
 	});
 
-	// Undo/Redo stack (from CollaborativeEvidenceCanvas)
-	let undoStack = $state<any[]>([]);
-	let redoStack = $state<any[]>([]);
-	const MAX_UNDO = 50;
+	// Timeline state (fetched client-side)
+	interface TimelineEvent {
+		id: string;
+		type: string;
+		title: string;
+		description: string;
+		actor: string | null;
+		method: string | null;
+		reason: string | null;
+		timestamp: string;
+		metadata: Record<string, any>;
+	}
+	let timelineEvents = $state<TimelineEvent[]>([]);
+	let timelineLoading = $state(false);
 
 	// Keyboard shortcuts (from CollaborativeEvidenceCanvas analysis)
 	function handleKeyboard(e: KeyboardEvent) {
@@ -65,6 +98,11 @@
 		else if ((e.ctrlKey || e.metaKey) && (e.shiftKey && e.key === 'z' || e.key === 'y')) {
 			e.preventDefault();
 			redo();
+		}
+		// Zoom to fit: Ctrl/Cmd + 0
+		else if ((e.ctrlKey || e.metaKey) && e.key === '0') {
+			e.preventDefault();
+			board?.zoomToFit();
 		}
 		// Tool shortcuts
 		else if (e.key === 'v') {
@@ -89,32 +127,62 @@
 	}
 
 	function undo() {
-		if (undoStack.length === 0) return;
-		const action = undoStack.pop();
-		if (action && board) {
-			redoStack.push(board.serialize());
-			// Apply undo action to board
-			isDirty = true;
-		}
+		if (!boardHistory.canUndo) return;
+		boardHistory.undo();
+		isDirty = true;
 	}
 
 	function redo() {
-		if (redoStack.length === 0) return;
-		const action = redoStack.pop();
-		if (action && board) {
-			undoStack.push(board.serialize());
-			// Apply redo action to board
-			isDirty = true;
+		if (!boardHistory.canRedo) return;
+		boardHistory.redo();
+		isDirty = true;
+	}
+
+	// Persist a new connection to the API
+	async function persistConnection(fromEvidenceId: string, toEvidenceId: string, connectionType = 'related', label?: string) {
+		try {
+			const res = await fetch(`/api/cases/${caseId}/connections`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ fromEvidenceId, toEvidenceId, connectionType, label })
+			});
+			if (res.ok) {
+				const { connection } = await res.json();
+				return connection;
+			}
+		} catch (e) {
+			console.error('Failed to persist connection:', e);
+		}
+		return null;
+	}
+
+	// Delete a connection from the API
+	async function deleteConnectionFromApi(connectionId: string) {
+		try {
+			await fetch(`/api/cases/${caseId}/connections`, {
+				method: 'DELETE',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ connectionId })
+			});
+		} catch (e) {
+			console.error('Failed to delete connection:', e);
 		}
 	}
 
-	function recordAction(action: any) {
-		undoStack.push(action);
-		if (undoStack.length > MAX_UNDO) {
-			undoStack.shift();
+	// Fetch timeline events client-side
+	async function loadTimeline() {
+		timelineLoading = true;
+		try {
+			const res = await fetch(`/api/cases/${caseId}/timeline?limit=30`);
+			if (res.ok) {
+				const data = await res.json();
+				timelineEvents = data.events ?? [];
+			}
+		} catch (e) {
+			console.error('Failed to load timeline:', e);
+		} finally {
+			timelineLoading = false;
 		}
-		redoStack = []; // Clear redo stack on new action
-		isDirty = true;
 	}
 
 	// Parse AI layout suggestions and apply to canvas
@@ -488,7 +556,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 			<button
 				class="tool-btn"
 				onclick={undo}
-				disabled={undoStack.length === 0}
+				disabled={!boardHistory.canUndo}
 				title="Undo (Ctrl+Z)"
 			>
 				<Icon name="undo" />
@@ -496,15 +564,25 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 			<button
 				class="tool-btn"
 				onclick={redo}
-				disabled={redoStack.length === 0}
+				disabled={!boardHistory.canRedo}
 				title="Redo (Ctrl+Shift+Z)"
 			>
 				<Icon name="redo" />
 			</button>
 		</div>
 
+		<div class="tool-group">
+			<button
+				class="tool-btn"
+				onclick={() => board?.zoomToFit()}
+				title="Zoom to Fit (Ctrl+0)"
+			>
+				<Icon name="maximize" />
+			</button>
+		</div>
+
 		<div class="keyboard-hint">
-			<span class="hint-text">Shortcuts: V=Select • E=Evidence • C=Connect • N=Note • 1-4=Views</span>
+			<span class="hint-text">V=Select • E=Evidence • C=Connect • N=Note • 1-4=Views • Ctrl+0=Fit</span>
 		</div>
 	</div>
 
@@ -615,35 +693,54 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		{/if}
 	</div>
 
-	<!-- Timeline View -->
+	<!-- Timeline View (enriched: who/what/why/how) -->
 	<div class="timeline-section">
 		<div class="timeline-header">
-			<span class="timeline-label">TIMELINE VIEW</span>
-			<span class="timeline-count">{evidenceItems.length} items</span>
+			<span class="timeline-label">CASE TIMELINE</span>
+			<span class="timeline-count">
+				{#if timelineLoading}
+					loading...
+				{:else}
+					{timelineEvents.length} events
+				{/if}
+			</span>
+			<button class="timeline-refresh" onclick={loadTimeline} title="Refresh timeline">
+				<Icon name="refresh-cw" />
+			</button>
 		</div>
 		<div class="timeline-track">
-			{#if evidenceItems.length > 0}
-				{#each evidenceItems.slice(0, 10) as item, idx (item.id)}
-					{@const position = ((idx + 1) / (Math.min(evidenceItems.length, 10) + 1)) * 100}
-					{@const colors = ['orange', 'green', 'blue', 'purple', 'red']}
-					{@const color = colors[idx % colors.length]}
+			{#if timelineEvents.length > 0}
+				{#each timelineEvents.slice(0, 15) as evt, idx (evt.id)}
+					{@const position = ((idx + 1) / (Math.min(timelineEvents.length, 15) + 1)) * 100}
+					{@const typeColors: Record<string, string> = {
+						evidence_upload: 'blue',
+						report: 'green',
+						note: 'orange',
+						audit: 'gray',
+						ai_chat: 'purple',
+						connection: 'red'
+					}}
+					{@const color = typeColors[evt.type] ?? 'blue'}
 					<div
 						class="timeline-node"
-						class:active={selectedEvidence?.id === item.id}
 						style="left: {position}%"
-						onclick={() => (selectedEvidence = item)}
 						role="button"
 						tabindex="0"
-						onkeydown={(e) => e.key === 'Enter' && (selectedEvidence = item)}
+						title="{evt.title} — {evt.actor ?? 'System'} ({evt.timestamp ? new Date(evt.timestamp).toLocaleString() : ''})"
+						onclick={() => {
+							if (evt.metadata?.evidenceId) {
+								const match = evidenceItems.find((e: any) => e.id === evt.metadata.evidenceId);
+								if (match) selectedEvidence = match;
+							}
+						}}
+						onkeydown={(e) => e.key === 'Enter' && (e.currentTarget as HTMLElement).click()}
 					>
 						<div class="node-dot {color}"></div>
-						{#if selectedEvidence?.id === item.id}
-							<div class="node-label">{item.title}</div>
-						{/if}
+						<div class="node-type-badge">{evt.type.split('_')[0].charAt(0).toUpperCase()}</div>
 					</div>
 				{/each}
-			{:else}
-				<div class="timeline-empty">No evidence items to display</div>
+			{:else if !timelineLoading}
+				<div class="timeline-empty">No case activity yet</div>
 			{/if}
 		</div>
 	</div>
@@ -1280,9 +1377,15 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 
 	.timeline-header {
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
+		gap: 0.75rem;
 		margin-bottom: 0.5rem;
+	}
+
+	.timeline-count {
+		margin-left: auto;
+		font-size: 0.75rem;
+		color: #9ca3af;
 	}
 
 	.timeline-label {
@@ -1290,11 +1393,6 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		font-weight: 700;
 		letter-spacing: 0.05em;
 		color: #6b7280;
-	}
-
-	.timeline-count {
-		font-size: 0.75rem;
-		color: #9ca3af;
 	}
 
 	.timeline-track {
@@ -1358,6 +1456,10 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		height: 1.25rem;
 	}
 
+	.node-dot.gray {
+		background: #9ca3af;
+	}
+
 	.node-label {
 		position: absolute;
 		top: 100%;
@@ -1368,6 +1470,40 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		font-weight: 600;
 		color: #1f2937;
 		white-space: nowrap;
+	}
+
+	.node-type-badge {
+		position: absolute;
+		top: -0.25rem;
+		right: -0.25rem;
+		width: 0.875rem;
+		height: 0.875rem;
+		border-radius: 50%;
+		background: rgba(0,0,0,0.5);
+		color: white;
+		font-size: 0.5rem;
+		font-weight: 700;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		pointer-events: none;
+	}
+
+	.timeline-refresh {
+		padding: 0.25rem;
+		background: transparent;
+		border: 1px solid #e5e7eb;
+		border-radius: 0.25rem;
+		color: #6b7280;
+		cursor: pointer;
+		transition: all 0.15s;
+		display: flex;
+		align-items: center;
+	}
+
+	.timeline-refresh:hover {
+		background: #f3f4f6;
+		color: #1f2937;
 	}
 
 	/* AI Chat Panel */

@@ -3,6 +3,18 @@ import { error, json } from '@sveltejs/kit';
 import { eq, desc } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { getFromMemoryCache, setCache } from '$lib/server/cache.js';
+import { z } from 'zod';
+
+const citationCreateSchema = z.object({
+	statute_code: z.string().min(1).max(500),
+	statute_title: z.string().max(500).optional(),
+	jurisdiction: z.string().max(200).optional(),
+	severity: z.string().max(100).optional(),
+	highlighted_text: z.string().max(10000).optional(),
+	case_id: z.string().uuid().optional(),
+	source_type: z.string().max(50).optional(),
+	source_url: z.string().max(2000).optional()
+});
 
 /**
  * GET /api/citations
@@ -53,11 +65,12 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	}
 
 	try {
-		const body = await request.json();
-
-		if (!body?.statute_code?.trim()) {
-			throw error(400, 'Missing required field: statute_code');
+		const raw = await request.json();
+		const parsed = citationCreateSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
+		const body = parsed.data;
 
 		// Upsert statute if title/jurisdiction provided
 		let statuteId: string | undefined;

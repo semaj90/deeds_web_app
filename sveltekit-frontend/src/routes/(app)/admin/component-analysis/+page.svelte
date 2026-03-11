@@ -76,13 +76,13 @@
 		}
 	}
 
-	// Search via Go Knowledge Plane
+	// Search via server-side knowledge API proxy
 	async function searchKnowledgeBase(query: string) {
 		try {
-			const res = await fetch('http://localhost:8765/retrieve', {
+			const res = await fetch('/api/knowledge/search', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({ query, k: 10, mode: 'hybrid' })
+				body: JSON.stringify({ query, limit: 10 })
 			});
 			if (res.ok) {
 				return await res.json();
@@ -162,7 +162,7 @@
 	}
 
 	// Filtered and sorted components
-	let filteredComponents = $derived(() => {
+	let filteredComponents = $derived.by(() => {
 		let filtered = components;
 
 		// Filter by search
@@ -190,15 +190,13 @@
 	});
 
 	$effect(() => {
-
 		fetchComponents();
 		connectSSE();
-	
-});
 
-	// TODO: Add as cleanup in $effect: return () => {
-	//	eventSource?.close();
-	// }
+		return () => {
+			eventSource?.close();
+		};
+	});
 
 	function formatRelativeTime(dateStr: string): string {
 		const date = new Date(dateStr);
@@ -281,12 +279,12 @@
 					<p>❌ {error}</p>
 					<button onclick={() => fetchComponents()}>Retry</button>
 				</div>
-			{:else if filteredComponents().length === 0}
+			{:else if filteredComponents.length === 0}
 				<div class="empty-state">
 					<p>No components found</p>
 				</div>
 			{:else}
-				{#each filteredComponents() as component (component.unit_id)}
+				{#each filteredComponents as component (component.unit_id)}
 					<button
 						class="component-card"
 						class:selected={selectedComponent?.unit_id === component.unit_id}

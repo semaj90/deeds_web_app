@@ -61,8 +61,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			}
 		});
 	} catch (err) {
-		const msg = err instanceof Error ? err.message : String(err);
-		console.error('[Auth] Login error:', msg);
-		return json({ error: `Login failed: ${msg}` }, { status: 500 });
+		console.error('[Auth] Login error:', err instanceof Error ? err.message : String(err));
+		return json({ error: 'Login failed — please try again later' }, { status: 500 });
 	}
 };

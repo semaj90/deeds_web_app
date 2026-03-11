@@ -8,8 +8,21 @@ import type {
 	ActionItem
 } from '$lib/types/rag-source-validation';
 import { getRedis } from '$lib/server/redis.js';
+import { z } from 'zod';
 
 const OLLAMA_URL = getOllamaUrl();
+
+const ragAnswerSchema = z.object({
+	context_id: z.string().min(1, 'context_id is required').max(200),
+	query: z.string().min(1, 'query is required').max(5000),
+	case_id: z.string().uuid('Invalid case_id'),
+	max_tokens: z.number().int().min(64).max(8192).optional().default(2048),
+	temperature: z.number().min(0).max(2).optional().default(0.3),
+	include_citations: z.boolean().optional().default(true),
+	include_todos: z.boolean().optional().default(false),
+	jurisdiction: z.string().max(200).optional(),
+	legal_area: z.string().max(200).optional()
+});
 
 /**
  * POST /api/rag/answer
@@ -19,25 +32,25 @@ export const POST: RequestHandler = async ({ request }) => {
 	const startTime = performance.now();
 
 	try {
-		const body: AnswerRequest = await request.json();
+		const raw = await request.json();
+		const parsed = ragAnswerSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json(
+				{ error: parsed.error.issues[0]?.message ?? 'Invalid input' },
+				{ status: 400 }
+			);
+		}
 		const {
 			context_id,
 			query,
 			case_id,
-			max_tokens = 2048,
-			temperature = 0.3,
-			include_citations = true,
-			include_todos = false,
+			max_tokens,
+			temperature,
+			include_citations,
+			include_todos,
 			jurisdiction,
 			legal_area
-		} = body;
-
-		if (!context_id || !query || !case_id) {
-			return json(
-				{ error: 'context_id, query, and case_id are required' },
-				{ status: 400 }
-			);
-		}
+		} = parsed.data;
 
 		// Fetch approved context from Redis (stored by /api/rag/validate)
 		let combinedContext = '';

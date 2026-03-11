@@ -5,6 +5,26 @@ import { and, desc, eq, inArray } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { auditReportAction } from '$lib/server/reports/audit';
 import { invalidateReportCache, invalidateCaseCache } from '$lib/server/cache/invalidation.js';
+import { z } from 'zod';
+
+const reportCreateSchema = z.object({
+	caseId: z.string().uuid('Invalid case ID'),
+	contentHtml: z.string().max(1_000_000).optional(),
+	title: z.string().max(500).optional(),
+	status: z.enum(['draft', 'pending', 'completed', 'published']).optional(),
+	metadata: z.record(z.string(), z.unknown()).optional()
+});
+
+const reportBulkUpdateSchema = z.object({
+	ids: z.array(z.string().uuid()).min(1, 'Select at least one report'),
+	contentHtml: z.string().max(1_000_000).optional(),
+	title: z.string().max(500).optional(),
+	status: z.enum(['draft', 'pending', 'completed', 'published']).optional()
+});
+
+const reportBulkDeleteSchema = z.object({
+	ids: z.array(z.string().uuid()).min(1, 'Select at least one report')
+});
 
 /**
  * GET /api/reports
@@ -82,20 +102,21 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	}
 
 	try {
-		const body = await request.json();
-
-		if (!body?.caseId) {
-			throw error(400, 'Missing required field: caseId');
+		const raw = await request.json();
+		const parsed = reportCreateSchema.safeParse(raw);
+		if (!parsed.success) {
+			throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
 		}
+		const body = parsed.data;
 
 		const newReport = await db.insert(reports)
 			.values({
 				caseId: body.caseId,
 				content: body.contentHtml || '<p>Start writing...</p>',
-				title: body?.title ?? 'Untitled Report',
-				status: body?.status ?? 'draft',
+				title: body.title ?? 'Untitled Report',
+				status: body.status ?? 'draft',
 				createdBy: locals.user.id,
-				metadata: body?.metadata ?? null,
+				metadata: body.metadata ?? null,
 			})
 			.returning();
 
@@ -140,11 +161,12 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 	}
 
 	try {
-		const body = await request.json();
-
-		if (!body?.ids || !Array.isArray(body.ids) || body.ids.length === 0) {
-			throw error(400, 'Missing required field: ids (array)');
+		const raw = await request.json();
+		const parsed = reportBulkUpdateSchema.safeParse(raw);
+		if (!parsed.success) {
+			throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
 		}
+		const body = parsed.data;
 
 		const updates: any = { updatedAt: new Date() };
 		if (body.contentHtml) updates.content = body.contentHtml;
@@ -201,11 +223,12 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 	}
 
 	try {
-		const body = await request.json();
-
-		if (!body?.ids || !Array.isArray(body.ids) || body.ids.length === 0) {
-			throw error(400, 'Missing required field: ids (array)');
+		const raw = await request.json();
+		const parsed = reportBulkDeleteSchema.safeParse(raw);
+		if (!parsed.success) {
+			throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
 		}
+		const body = parsed.data;
 
 		const deleted = await db.delete(reports)
 			.where(

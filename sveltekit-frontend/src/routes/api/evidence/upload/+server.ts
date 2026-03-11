@@ -32,7 +32,12 @@ const MIN_PDF_TEXT_LENGTH = 50;
  * POST /api/evidence/upload
  * Pipeline: MinIO → PostgreSQL → text extraction (pdf-parse + OCR fallback) → chunk → embed → pgvector + Qdrant
  */
-export async function POST({ request }: RequestEvent) {
+export async function POST({ request, locals }: RequestEvent) {
+	// Auth guard: reject unauthenticated uploads
+	if (!locals.user?.id) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
 	// Rate limit: 10 uploads/min per client (heavy operation)
 	const rateCheck = heavyRateLimiter.check(request);
 	if (!rateCheck.allowed) {

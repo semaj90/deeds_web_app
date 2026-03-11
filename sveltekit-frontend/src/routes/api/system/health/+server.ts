@@ -1,25 +1,51 @@
 import { json } from '@sveltejs/kit';
 import os from 'os';
+import { db } from '$lib/server/db/client';
+import { sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
 
+async function checkService(name: string, fn: () => Promise<void>): Promise<'ok' | 'error'> {
+	try {
+		await fn();
+		return 'ok';
+	} catch {
+		return 'error';
+	}
+}
+
 export const GET: RequestHandler = async () => {
+	const [database, redis, ollama, qdrant] = await Promise.all([
+		checkService('database', async () => {
+			await db.execute(sql`SELECT 1`);
+		}),
+		checkService('redis', async () => {
+			const { getRedis } = await import('$lib/server/redis.js');
+			const r = getRedis();
+			const pong = await r.ping();
+			if (pong !== 'PONG') throw new Error('No PONG');
+		}),
+		checkService('ollama', async () => {
+			const res = await fetch('http://localhost:11434/api/tags', { signal: AbortSignal.timeout(3000) });
+			if (!res.ok) throw new Error(`Ollama ${res.status}`);
+		}),
+		checkService('qdrant', async () => {
+			const res = await fetch('http://localhost:6333/healthz', { signal: AbortSignal.timeout(3000) });
+			if (!res.ok) throw new Error(`Qdrant ${res.status}`);
+		}),
+	]);
+
+	const allOk = database === 'ok' && redis === 'ok' && ollama === 'ok' && qdrant === 'ok';
+
 	const health = {
-		status: 'ok',
+		status: allOk ? 'ok' : 'degraded',
 		timestamp: new Date().toISOString(),
-		system: { uptime: os.uptime(),
+		system: {
+			uptime: os.uptime(),
 			loadavg: os.loadavg(),
-			memory: { total: os.totalmem(),
-				free: os.freemem(),
-			},
+			memory: { total: os.totalmem(), free: os.freemem() },
 		},
-		services: { database: 'unknown', // TODO: Check DB connection
-			redis: 'unknown', // TODO: Check Redis connection
-			ollama: 'unknown', // TODO: Check Ollama connection
-		},
+		services: { database, redis, ollama, qdrant },
 	};
 
 	return json(health);
 };
-
-
-

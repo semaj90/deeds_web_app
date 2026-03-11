@@ -10,6 +10,22 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { requireAuth } from '$lib/server/auth-helpers.js';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const synthesisRequestSchema = z.object({
+	query: z.string().min(3, 'Query must be at least 3 characters').max(5000),
+	caseId: z.string().uuid().optional(),
+	conversationId: z.string().max(200).optional(),
+	persona: z.enum(['neutral', 'prosecutor', 'defense', 'plain-language', 'academic']).optional(),
+	maxTokens: z.number().int().min(64).max(8192).optional(),
+	temperature: z.number().min(0).max(2).optional(),
+	enableACE: z.boolean().optional(),
+	retryOnLowQuality: z.boolean().optional(),
+	stream: z.boolean().optional(),
+	includeCitations: z.boolean().optional(),
+	jurisdiction: z.string().max(200).optional(),
+	legalArea: z.string().max(200).optional()
+});
 import { getVectorCache, setVectorCache } from '$lib/server/vector-cache.js';
 import { assembleACEContext, buildACEPrompt } from '$lib/server/ace/context-assembler.js';
 import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self-prompt.js';
@@ -17,20 +33,7 @@ import { createHash } from 'crypto';
 
 // ── Types ─────────────────────────────────────────────────────────────
 
-interface SynthesisRequest {
-	query: string;
-	caseId?: string;
-	conversationId?: string;
-	persona?: 'neutral' | 'prosecutor' | 'defense' | 'plain-language' | 'academic';
-	maxTokens?: number;
-	temperature?: number;
-	enableACE?: boolean;
-	retryOnLowQuality?: boolean;
-	stream?: boolean;
-	includeCitations?: boolean;
-	jurisdiction?: string;
-	legalArea?: string;
-}
+type SynthesisRequest = z.infer<typeof synthesisRequestSchema>;
 
 interface SynthesisCitation {
 	id: string;
@@ -71,7 +74,6 @@ interface SynthesisResponse {
 
 const MODEL = 'gemma3-legal:latest';
 const QUALITY_THRESHOLD = 0.6;
-const VALID_PERSONAS = new Set(['neutral', 'prosecutor', 'defense', 'plain-language', 'academic']);
 
 function buildCacheKey(userId: string, query: string, caseId?: string, persona?: string): string {
 	const payload = `${userId}|${query}|${caseId ?? ''}|${persona ?? 'neutral'}`;
@@ -302,18 +304,12 @@ export const POST: RequestHandler = async (event) => {
 	const auth = await requireAuth(event);
 	const totalStart = performance.now();
 
-	const body = await event.request.json() as SynthesisRequest;
-
-	// Validate
-	if (!body.query || typeof body.query !== 'string' || body.query.trim().length < 3) {
-		return json({ error: 'Query must be at least 3 characters' }, { status: 400 });
+	const raw = await event.request.json();
+	const parsed = synthesisRequestSchema.safeParse(raw);
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	}
-	if (body.query.length > 5000) {
-		return json({ error: 'Query must be under 5000 characters' }, { status: 400 });
-	}
-	if (body.persona && !VALID_PERSONAS.has(body.persona)) {
-		return json({ error: `Invalid persona. Valid: ${[...VALID_PERSONAS].join(', ')}` }, { status: 400 });
-	}
+	const body = parsed.data;
 
 	const {
 		query,

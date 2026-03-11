@@ -17,6 +17,8 @@
 		body?: string;
 		evidenceId?: string;
 		locked?: boolean;
+		fileType?: string;
+		thumbnailUrl?: string;
 	}
 
 	interface BoardEdge { id: string, fromId: string;
@@ -116,6 +118,33 @@
 	let raf = 0;
 	let ro: ResizeObserver | null = null;
 	let dpr = 1;
+
+	// Thumbnail image cache (keyed by URL)
+	const imageCache = new Map<string, HTMLImageElement>();
+
+	function loadImage(url: string): HTMLImageElement | null {
+		if (imageCache.has(url)) {
+			const img = imageCache.get(url)!;
+			return img.complete && img.naturalWidth > 0 ? img : null;
+		}
+		const img = new Image();
+		img.crossOrigin = 'anonymous';
+		img.onload = () => scheduleDraw();
+		img.src = url;
+		imageCache.set(url, img);
+		return null;
+	}
+
+	// File type icon glyphs for canvas rendering
+	function fileTypeIcon(ft: string | undefined): string {
+		if (!ft) return '\u{1F4C4}'; // document
+		const t = ft.toLowerCase();
+		if (t.startsWith('video') || t === 'mp4' || t === 'mov' || t === 'avi') return '\u{25B6}'; // play
+		if (t.startsWith('audio') || t === 'mp3' || t === 'wav' || t === 'ogg') return '\u{1F3B5}'; // music
+		if (t === 'pdf' || t === 'application/pdf') return '\u{1F4D1}'; // PDF
+		if (t.startsWith('image') || t === 'jpg' || t === 'png' || t === 'jpeg') return '\u{1F5BC}'; // image
+		return '\u{1F4C4}'; // document
+	}
 
 	// ===== Coordinate transforms =====
 	function screenToWorld(p: Vec2): Vec2 {
@@ -245,32 +274,73 @@
 		for (const n of nodes) {
 			const isSelected = selected.has(n.id);
 			const isHovered = hoveredId === n.id;
+			const inv = 1 / viewport.zoom;
 
+			// Background fill (subtle)
 			ctx.beginPath();
 			if (typeof ctx.roundRect === 'function') {
-				ctx.roundRect(n.x, n.y, n.w, n.h, 12 / viewport.zoom);
+				ctx.roundRect(n.x, n.y, n.w, n.h, 12 * inv);
 			} else {
 				ctx.rect(n.x, n.y, n.w, n.h);
 			}
+			ctx.fillStyle = n.kind === 'evidence'
+				? 'rgba(59, 130, 246, 0.06)'
+				: n.kind === 'document'
+					? 'rgba(16, 185, 129, 0.06)'
+					: 'rgba(255, 255, 255, 0.04)';
+			ctx.fill();
+
+			// Border
 			ctx.strokeStyle = isSelected
 				? 'rgba(255,255,255, 0.45)'
 				: isHovered
 					? 'rgba(255,255,255, 0.25)'
 					: 'rgba(255,255,255, 0.14)';
-			ctx.lineWidth = 2 / viewport.zoom;
+			ctx.lineWidth = 2 * inv;
 			ctx.stroke();
+
+			// Thumbnail rendering for evidence nodes
+			if (n.kind === 'evidence' && n.thumbnailUrl) {
+				const img = loadImage(n.thumbnailUrl);
+				if (img) {
+					const thumbH = n.h * 0.5;
+					const thumbW = n.w - 20 * inv;
+					const thumbX = n.x + 10 * inv;
+					const thumbY = n.y + n.h - thumbH - 8 * inv;
+					ctx.save();
+					ctx.beginPath();
+					if (typeof ctx.roundRect === 'function') {
+						ctx.roundRect(thumbX, thumbY, thumbW, thumbH, 6 * inv);
+					} else {
+						ctx.rect(thumbX, thumbY, thumbW, thumbH);
+					}
+					ctx.clip();
+					ctx.drawImage(img, thumbX, thumbY, thumbW, thumbH);
+					ctx.restore();
+				}
+			}
+
+			// File type badge (top-right corner)
+			if (n.kind === 'evidence' && n.fileType) {
+				const icon = fileTypeIcon(n.fileType);
+				ctx.font = `${18 * inv}px system-ui`;
+				ctx.fillStyle = 'rgba(255,255,255, 0.7)';
+				ctx.fillText(icon, n.x + n.w - 28 * inv, n.y + 24 * inv);
+			}
 
 			if (n.title) {
 				ctx.fillStyle = 'rgba(255,255,255, 0.85)';
-				ctx.font = `${16 / viewport.zoom}px system-ui`;
-				ctx.fillText(n.title, n.x + 14 / viewport.zoom, n.y + 28 / viewport.zoom);
+				ctx.font = `bold ${15 * inv}px system-ui`;
+				const maxTitleW = n.w - 40 * inv;
+				const titleText = n.title.length > 30 ? n.title.slice(0, 30) + '…' : n.title;
+				ctx.fillText(titleText, n.x + 14 * inv, n.y + 28 * inv, maxTitleW);
 			}
 
 			if (n.body) {
-				ctx.fillStyle = 'rgba(255,255,255, 0.60)';
-				ctx.font = `${13 / viewport.zoom}px system-ui`;
+				ctx.fillStyle = 'rgba(255,255,255, 0.55)';
+				ctx.font = `${13 * inv}px system-ui`;
 				const preview = n.body.length > 90 ? n.body.slice(0, 90) + '…' : n.body;
-				ctx.fillText(preview, n.x + 14 / viewport.zoom, n.y + 52 / viewport.zoom);
+				ctx.fillText(preview, n.x + 14 * inv, n.y + 52 * inv);
 			}
 		}
 
@@ -511,6 +581,65 @@
 		return [...nodes];
 	}
 
+	// Get current edges (for external reference)
+	export function getEdges(): BoardEdge[] {
+		return [...edges];
+	}
+
+	// Add an edge between two nodes
+	export function addEdge(fromId: string, toId: string, label?: string, style?: 'solid' | 'dashed'): string {
+		const id = `edge-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+		edges = [...edges, { id, fromId, toId, style: style ?? 'solid', label }];
+		setDirty(true);
+		scheduleDraw();
+		return id;
+	}
+
+	// Remove an edge by ID
+	export function removeEdge(edgeId: string) {
+		edges = edges.filter(e => e.id !== edgeId);
+		setDirty(true);
+		scheduleDraw();
+	}
+
+	// Remove a node by ID (also removes connected edges)
+	export function removeNode(nodeId: string) {
+		nodes = nodes.filter(n => n.id !== nodeId);
+		edges = edges.filter(e => e.fromId !== nodeId && e.toId !== nodeId);
+		selected = new Set([...selected].filter(id => id !== nodeId));
+		setDirty(true);
+		scheduleDraw();
+	}
+
+	// Zoom to fit all nodes in viewport
+	export function zoomToFit() {
+		if (!canvasEl || nodes.length === 0) return;
+
+		const pad = 80;
+		let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+
+		for (const n of nodes) {
+			minX = Math.min(minX, n.x);
+			minY = Math.min(minY, n.y);
+			maxX = Math.max(maxX, n.x + n.w);
+			maxY = Math.max(maxY, n.y + n.h);
+		}
+
+		if (!isFinite(minX)) return;
+
+		const cw = canvasEl.clientWidth;
+		const ch = canvasEl.clientHeight;
+		const contentW = maxX - minX + pad * 2;
+		const contentH = maxY - minY + pad * 2;
+
+		const zoom = Math.max(0.1, Math.min(2, Math.min(cw / contentW, ch / contentH)));
+		const panX = -minX + pad + (cw / zoom - (maxX - minX)) / 2;
+		const panY = -minY + pad + (ch / zoom - (maxY - minY)) / 2;
+
+		viewport = { zoom, pan: { x: panX, y: panY } };
+		scheduleDraw();
+	}
+
 	$effect(() => {
 
 		if (!canvasEl) return;
@@ -633,9 +762,9 @@
 	<div class="absolute left-3 bottom-3 pointer-events-none text-[10px] text-white/30 font-mono">
 		<div class="flex gap-4">
 			<span>ZOOM: {Math.round(viewport.zoom * 100)}%</span>
-			<span>PAN: {Math.round(viewport.pan.x)},
-	{Math.round(viewport.pan.y)}</span>
+			<span>PAN: {Math.round(viewport.pan.x)},{Math.round(viewport.pan.y)}</span>
 			<span>NODES: {nodes.length}</span>
+			<span>EDGES: {edges.length}</span>
 		</div>
 	</div>
 </div>

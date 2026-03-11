@@ -80,46 +80,28 @@
 		type: 'imports' | 'uses' | 'depends';
 	}
 
-	// Vector search with embeddinggemma
+	// Vector search via server-side proxy (embeds + Qdrant search in one call)
 	async function performSearch() {
 		if (!searchQuery.trim()) return;
 
 		isSearching = true;
 		try {
-			// First get embedding from Ollama
-			const embedRes = await fetch('http://localhost:11434/api/embed', {
+			const res = await fetch('/api/phase89/vector-search', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-model: 'embeddinggemma:latest', input: searchQuery })
+				body: JSON.stringify({ query: searchQuery, limit: 20, threshold: 0.5 })
 			});
 
-			if (!embedRes.ok) throw new Error('Embedding failed');
-			const embedData = await embedRes.json();
-			const vector = embedData.embeddings?.[0] ?? embedData.embedding;
+			if (!res.ok) throw new Error('Search failed');
+			const data = await res.json();
 
-			// Search Qdrant with cosine similarity
-			const searchRes = await fetch('http://localhost:6333/collections/phase89_error_chunks/points/search', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-					vector,
-					limit: 20,
-					with_payload: true,
-					score_threshold: 0.5
-				})
-			});
-
-			if (!searchRes.ok) throw new Error('Search failed');
-			const searchData = await searchRes.json();
-
-			searchResults = (searchData.result || []).map((r: any) => ({
-				id: r.id,
-				score: r.score,
-				text: r.payload?.raw_text ?? (r.payload?.text || ''),
-				source: r.payload?.source ?? '',
-				tags: r.payload?.tags ?? (r.payload?.auto_tags || []),
-				cluster_id: r.payload?.cluster_id
+			searchResults = (data.results || []).map((r: any) => ({
+				id: r.cluster_id ?? r.id,
+				score: r.avg_similarity ?? r.score ?? 0,
+				text: r.summary ?? r.pattern ?? '',
+				source: (r.file_paths ?? [])[0] ?? '',
+				tags: r.tags ?? [],
+				cluster_id: r.cluster_id
 			}));
 		} catch (e) {
 			console.error('Search error:', e);
@@ -128,25 +110,20 @@ model: 'embeddinggemma:latest', input: searchQuery })
 		}
 	}
 
-	// Fetch clusters from Qdrant
+	// Fetch clusters via server-side API proxy
 	async function fetchClusters() {
 		try {
-			const res = await fetch('http://localhost:6333/collections/phase89_error_clusters/points/scroll', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-limit: 50, with_payload: true })
-			});
+			const res = await fetch('/api/phase89/clusters');
 
 			if (!res.ok) return;
 			const data = await res.json();
 
-			clusters = (data.result?.points ?? []).map((p: any) => ({
-				cluster_id: p.payload?.cluster_id ?? p.id,
-				cluster_size: p.payload?.cluster_size ?? 0,
-				pattern_name: p.payload?.pattern_name ?? '',
-				root_cause: p.payload?.root_cause ?? '',
-				fix_strategy: p.payload?.fix_strategy ?? '',
+			clusters = (data.clusters ?? data.result?.points ?? []).map((p: any) => ({
+				cluster_id: p.cluster_id ?? p.payload?.cluster_id ?? p.id,
+				cluster_size: p.error_count ?? p.payload?.cluster_size ?? 0,
+				pattern_name: p.title ?? p.payload?.pattern_name ?? '',
+				root_cause: p.description ?? p.payload?.root_cause ?? '',
+				fix_strategy: p.fix_strategy ?? p.payload?.fix_strategy ?? '',
 				priority: p.payload?.priority ?? 'medium',
 				tags: p.payload?.tags ?? [],
 				sources: p.payload?.sources ?? [],
@@ -258,16 +235,14 @@ cluster_id: cluster.cluster_id,
 	}
 
 	$effect(() => {
-
 		fetchClusters();
 		fetchGraph();
 		connectSSE();
-	
-});
 
-	// TODO: Add as cleanup in $effect: return () => {
-	//	eventSource?.close();
-	// }
+		return () => {
+			eventSource?.close();
+		};
+	});
 </script>
 
 <svelte:head>

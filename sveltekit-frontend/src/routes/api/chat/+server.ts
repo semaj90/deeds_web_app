@@ -2,16 +2,34 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbiter.js';
+import { z } from 'zod';
+
+const chatMessageSchema = z.object({
+	role: z.enum(['user', 'assistant', 'system']),
+	content: z.string().max(10000)
+});
+
+const chatRequestSchema = z.object({
+	message: z.string().max(10000).optional(),
+	prompt: z.string().max(10000).optional(),
+	messages: z.array(chatMessageSchema).max(50).optional(),
+	temperature: z.number().min(0).max(2).optional()
+});
 
 /** POST /api/chat — Simple chat endpoint (also handles /api/chat-test callers) */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
+		const raw = await request.json();
+		const parsed = chatRequestSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ message: parsed.error.issues[0]?.message ?? 'Invalid input', response: '' }, { status: 400 });
+		}
+		const body = parsed.data;
 
 		// Support both { message } and { messages: [{ role, content }] } formats
 		let userContent: string;
-		if (body.messages && Array.isArray(body.messages)) {
-			const lastUser = body.messages.filter((m: { role: string }) => m.role === 'user').pop();
+		if (body.messages && body.messages.length > 0) {
+			const lastUser = body.messages.filter((m) => m.role === 'user').pop();
 			userContent = lastUser?.content || '';
 		} else {
 			userContent = body.message || body.prompt || '';
