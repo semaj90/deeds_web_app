@@ -25,7 +25,7 @@ import { json, type RequestEvent } from '@sveltejs/kit';
 import db from '$lib/server/db';
 import { sql } from 'drizzle-orm';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
-import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
+import { embedText } from '$lib/server/embedding/embed.js';
 import { getVectorCache, setVectorCache } from '$lib/server/vector-cache.js';
 import { ENV } from '$lib/server/env.server.js';
 import { searchEvidenceViaGrpc } from '$lib/server/grpc/retrieval-client.js';
@@ -334,24 +334,11 @@ function extractQueryCitations(query: string): string[] {
 	return citations;
 }
 
-// ── Embedding ────────────────────────────────────────────────────────────
+// ── Embedding (uses unified facade with cache + dedup) ───────────────────
 
 async function embedQuery(text: string): Promise<number[] | null> {
 	try {
-		const vec = await generateSingleEmbedding(text);
-		if (vec && vec.length > 0) return vec;
-	} catch { /* fall through */ }
-
-	try {
-		const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: text }),
-			signal: AbortSignal.timeout(15_000),
-		});
-		if (!res.ok) return null;
-		const data = await res.json();
-		return data.embedding;
+		return await embedText(text);
 	} catch {
 		return null;
 	}

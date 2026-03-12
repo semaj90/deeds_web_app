@@ -13,7 +13,7 @@ import { apiResponses } from '$lib/server/api/response-helper.js';
 import { chatRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 import { computeTFIDF } from '$lib/server/retrieval/tfidf-scorer.js';
 import { getVectorCache, setVectorCache, getEmbeddingCache, setEmbeddingCache } from '$lib/server/vector-cache.js';
-import { embedText } from '$lib/server/batch-embedder.js';
+import { embedText } from '$lib/server/embedding/embed.js';
 import { z } from 'zod';
 
 const SCORING_METHODS = ['hybrid', 'vector_only', 'tfidf_only'] as const;

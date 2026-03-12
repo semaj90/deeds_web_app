@@ -4,6 +4,7 @@ import type { RequestHandler } from './$types.js';
 import { apiResponses } from '$lib/server/api/response-helper.js';
 import { embedRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 import { acquireGpuLease } from '$lib/server/inference/gpu-arbiter.js';
+import { embedText } from '$lib/server/embedding/embed.js';
 import { z } from 'zod';
 
 const OLLAMA_URL = getOllamaUrl();
@@ -71,7 +72,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		switch (model) {
 			case 'embeddinggemma': {
-				const { embedding } = await getOllamaEmbedding(text, 'embeddinggemma:latest');
+				const embedding = await embedText(text);
 				result = { embedding, model: 'embeddinggemma:latest', dimensions: embedding.length };
 				break;
 			}
