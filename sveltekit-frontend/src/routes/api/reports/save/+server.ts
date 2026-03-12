@@ -3,14 +3,21 @@ import { reports } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
+
+const saveReportSchema = z.object({
+	reportId: z.string().min(1, 'Report ID is required').max(500),
+	title: z.string().max(1000).optional(),
+	contentHtml: z.string().max(5_000_000).optional(),
+});
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const { reportId, title, contentHtml } = await request.json();
-
-		if (!reportId) {
-			return json({ error: 'Report ID is required' }, { status: 400 });
+		const parsed = saveReportSchema.safeParse(await request.json());
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
+		const { reportId, title, contentHtml } = parsed.data;
 
 		// Update existing report
 		const [updated] = await db

@@ -63,7 +63,7 @@ Keep schemas outside `load()` or action functions so the Superforms adapter can 
 | `/cases` | `cases/schema.ts` | create, bulkUpdateStatus, bulkArchive |
 | `/login` | `login/schema.ts` | login |
 | `/analysis-center` | `analysis-center/schema.ts` | search, analyze |
-### Zod `safeParse()` (API Routes — 82 endpoints)
+### Zod `safeParse()` (API Routes — 109 endpoints)
 | Endpoint | Validates |
 |----------|-----------|
 | `POST /api/citations` | statute_code, case_id, jurisdiction, etc. |
@@ -147,6 +147,31 @@ Keep schemas outside `load()` or action functions so the Superforms adapter can 
 | `DELETE /api/citations/[citationId]/tags` | tag (1-200) |
 | `POST /api/citations/collections` | name (.trim(), 1-500), description (5K), color (20), isPublic |
 | `POST /api/citations/saved` | statute_code/citationText (500, .refine()), 15 nullable fields |
+| `PATCH /api/cases/[id]/notes/[noteId]` | title (1K), content (100K), isPinned (boolean) |
+| `POST /api/evidence/[id]/chain-of-custody` | action (enum 7 values), from/to/notes/location/hash (500) |
+| `POST /api/error-brain/generate-fix` | errorMessage (50K), filePath (1K), originalCode (100K), sources (array 20) |
+| `POST /api/error-brain/search` | errorMessage/filePath (.refine()), limit (1-50) |
+| `POST /api/error-brain/verify-fix` | filePath (1-1K), fixId (500) |
+| `PATCH /api/citations/collections/[collectionId]` | name (.trim(), 500), description (5K), color (20), isPublic |
+| `POST /api/citations/collections/[collectionId]/citations` | citationId (1-500) |
+| `DELETE /api/citations/collections/[collectionId]/citations` | citationId (1-500) |
+| `POST /api/reports/save` | reportId (1-500), title (1K), contentHtml (5MB) |
+| `POST /api/documents/[id]/auto-save` | content (5MB) |
+| `POST /api/evidence/analysis` | evidenceId (1-500), caseId (500, nullable), stages (enum[]) |
+| `POST /api/reports/generate` | caseId (1-500), type (100, default 'charging_memo') |
+| `POST /api/knowledge/search` | query (.trim(), 1-500), topK (1-100), llmProvider (enum), .passthrough() |
+| `POST /api/knowledge/stream` | query (.trim(), 1-5K), topK (1-100), llmProvider (enum) — SSE |
+| `POST /api/glossary/search` | query (.trim(), 1-500), category (200), limit (1-100, default 20) |
+| `POST /api/statutes/search` | query (.trim(), 1-500), jurisdiction (200), category (200), limit (1-100) |
+| `POST /api/precedents/search` | query (.trim(), 1-500), court (200), caseId (500), limit (1-100) |
+| `POST /api/ollama/pull` | model (.trim(), 1-200) |
+| `POST /api/recommendations/track` | interactionType (enum 5), documentId (1-500), shareMethod (enum), etc. |
+| `POST /api/recommendations/[userId]` | interactionType (enum 5), documentId (1-500), topicPreferences (array 50) |
+| `POST /api/cases/[id]/notes/[noteId]/evidence` | evidenceId (1-500) |
+| `DELETE /api/cases/[id]/notes/[noteId]/evidence` | evidenceId (1-500) |
+| `POST /api/investigate/suggest` | query (1-10K), answer (1-100K), caseId (500) |
+| `POST /api/codebase/recall` | query (1-5K), limit (1-200, default 100) |
+| `POST /api/codebase/rerank` | query (1-5K), candidatePaths (array 200), weights (0-1), pathBoosts (record) |
 ### Pattern Used
 ```typescript
 // Form actions (Superforms)

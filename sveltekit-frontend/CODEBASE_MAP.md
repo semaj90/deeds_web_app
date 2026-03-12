@@ -1,5 +1,5 @@
 # Deeds Web App — Codebase Map
-## Last Updated: March 10, 2026 (Post-Deep Audit + Sprint Pipeline)
+## Last Updated: March 11, 2026 (NES Card Grid UI + PHASE Audit + Evidence Board)
 ---
 ## Grand Totals
 | Metric | Count |
@@ -118,7 +118,7 @@ sveltekit-frontend/
 | `citations/` | Legal citations + KB search + collections | ACTIVE |
 | `command-center/` | Codebase command center + health monitoring | ACTIVE |
 | `dashboard/` | Main dashboard with stats | ACTIVE |
-| `demos/` | Component demos | ACTIVE |
+| `demos/` | Component demos (ace-pipeline, bits-ui, cache, gpu, icons, nes-routes, retro) | ACTIVE |
 | `evidence/` | Evidence upload + search (ssr=false) | ACTIVE |
 | `evidence-library/` | Evidence gallery (ssr=false) | ACTIVE |
 | `global-search/` | GPU-accelerated search | ACTIVE |
@@ -523,6 +523,17 @@ Write back to L0-L3
 | Sprint 2 | Embedding Consolidation (facade, cache-first, dedup) | DONE |
 | Sprint 3 | Infrastructure Hardening (circuit breakers, health) | PARTIAL (circuit breaker done) |
 | Sprint 4 | Production Readiness (CSP, body limit, SSE fix) | PENDING |
+| Sprint 5 | Evidence Board Interactive Wiring (connections, timeline, undo/redo, zoom) | IN PROGRESS |
+| Sprint 6 | NES Card Grid UI (all-routes blue theme, dashboard nav, demos/nes-routes) | DONE |
+---
+## Recent Changes (March 11, 2026)
+| Change | Files |
+|--------|-------|
+| **NES Card Grid UI**: Admin all-routes converted from green terminal list to blue NES card-grid with SVG pixel art icons | `admin/all-routes/+page.svelte` |
+| **NES Route Navigator**: Dashboard gets compact NES route nav widget (12 key routes, blue theme) | `dashboard/+page.svelte` |
+| **NES Routes Demo**: Full demo page at `/demos/nes-routes/` with sidebar, filters, card grid, RouteInspectorModal | `demos/nes-routes/+page.svelte`, `+page.server.ts` |
+| **Evidence Board Wiring**: Connections CRUD API, enriched case timeline API, HybridBoard enhancements | `api/cases/[id]/connections/`, `api/cases/[id]/timeline/`, `HybridBoard.svelte`, board page |
+| **PHASE*.md Audit**: 150+ files audited — 86 complete (57%), 45 in-progress (30%), 19 reference (13%) | Root PHASE*.md files |
 ---
 ## Cleanup Opportunities
 ### Root Project (2,231 loose files)

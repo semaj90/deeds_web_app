@@ -2,6 +2,15 @@ import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
+import { z } from 'zod';
+
+const errorSearchSchema = z.object({
+	errorMessage: z.string().max(50000).optional().default(''),
+	filePath: z.string().max(1000).optional().default(''),
+	limit: z.number().int().min(1).max(50).optional().default(10),
+}).refine(d => d.errorMessage.trim() || d.filePath.trim(), {
+	message: 'Provide errorMessage or filePath',
+});
 
 /**
  * POST /api/error-brain/search
@@ -9,14 +18,15 @@ import { sql } from 'drizzle-orm';
  * Sources: phase72_error table (DB) + Qdrant codebase_chunks_768 (vector) + CouchDB ace_synthesis (docs)
  */
 export const POST: RequestHandler = async ({ request }) => {
-	const body = await request.json();
-	if (!body?.errorMessage && !body?.filePath) {
-		throw error(400, 'Provide errorMessage or filePath');
+	// Zod schema validates errorMessage/filePath (at least one required) + limit range
+	const parsed = errorSearchSchema.safeParse(await request.json());
+	if (!parsed.success) {
+		throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
 	}
 
-	const errorMessage = body.errorMessage ?? '';
-	const filePath = body.filePath ?? '';
-	const limit = Math.min(Number(body.limit) || 10, 50);
+	const errorMessage = parsed.data.errorMessage;
+	const filePath = parsed.data.filePath;
+	const limit = parsed.data.limit;
 
 	const sources: Array<{ type: string; id: string; content: string; relevance: number; metadata: Record<string, unknown> }> = [];
 

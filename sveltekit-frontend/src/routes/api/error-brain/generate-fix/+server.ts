@@ -1,5 +1,18 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
+import { z } from 'zod';
+
+const generateFixSchema = z.object({
+	errorMessage: z.string().min(1, 'Missing errorMessage').max(50000),
+	filePath: z.string().min(1, 'Missing filePath').max(1000),
+	originalCode: z.string().max(100000).optional().default(''),
+	sources: z.array(z.object({
+		type: z.string().max(100),
+		id: z.string().max(500),
+		content: z.string().max(50000),
+		relevance: z.number().min(0).max(1),
+	})).max(20).optional().default([]),
+});
 
 interface FixSource {
 	type: string;
@@ -14,15 +27,14 @@ interface FixSource {
  * Human-in-the-loop: returns fix for review, does NOT auto-apply
  */
 export const POST: RequestHandler = async ({ request }) => {
-	const body = await request.json();
+	// Zod schema validates errorMessage, filePath required + sources array structure
+	const parsed = generateFixSchema.safeParse(await request.json());
+	if (!parsed.success) throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
 
-	if (!body?.errorMessage) throw error(400, 'Missing errorMessage');
-	if (!body?.filePath) throw error(400, 'Missing filePath');
-
-	const errorMessage: string = body.errorMessage;
-	const filePath: string = body.filePath;
-	const originalCode: string = body.originalCode ?? '';
-	const sources: FixSource[] = Array.isArray(body.sources) ? body.sources : [];
+	const errorMessage: string = parsed.data.errorMessage;
+	const filePath: string = parsed.data.filePath;
+	const originalCode: string = parsed.data.originalCode;
+	const sources: FixSource[] = parsed.data.sources;
 
 	// Build context from validated sources
 	const sourceContext = sources

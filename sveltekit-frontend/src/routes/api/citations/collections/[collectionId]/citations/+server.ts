@@ -3,6 +3,11 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { citationCollections, collectionCitations, citations } from '$lib/server/db/schema-postgres.js';
 import { eq, and, sql } from 'drizzle-orm';
+import { z } from 'zod';
+
+const collectionCitationSchema = z.object({
+	citationId: z.string().min(1, 'Missing required field: citationId').max(500),
+});
 
 /**
  * POST /api/citations/collections/[collectionId]/citations
@@ -17,10 +22,9 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 	const { collectionId } = params;
 
 	try {
-		const body = await request.json();
-
-		if (!body?.citationId) {
-			throw error(400, 'Missing required field: citationId');
+		const parsed = collectionCitationSchema.safeParse(await request.json());
+		if (!parsed.success) {
+			throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
 		}
 
 		// Verify collection exists and belongs to user
@@ -43,7 +47,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 		const [citation] = await db
 			.select()
 			.from(citations)
-			.where(eq(citations.id, body.citationId))
+			.where(eq(citations.id, parsed.data.citationId))
 			.limit(1);
 
 		if (!citation) {
@@ -55,7 +59,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 			.insert(collectionCitations)
 			.values({
 				collectionId,
-				citationId: body.citationId,
+				citationId: parsed.data.citationId,
 			})
 			.onConflictDoNothing();
 
@@ -70,7 +74,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 				success: true,
 				message: 'Citation added to collection',
 				collectionId,
-				citationId: body.citationId,
+				citationId: parsed.data.citationId,
 				totalCitations: count?.count || 0,
 			},
 			{ status: 201 }
@@ -97,10 +101,9 @@ export const DELETE: RequestHandler = async ({ locals, params, request }) => {
 	const { collectionId } = params;
 
 	try {
-		const body = await request.json();
-
-		if (!body?.citationId) {
-			throw error(400, 'Missing required field: citationId');
+		const delParsed = collectionCitationSchema.safeParse(await request.json());
+		if (!delParsed.success) {
+			throw error(400, delParsed.error.issues[0]?.message ?? 'Invalid input');
 		}
 
 		// Verify collection exists and belongs to user
@@ -125,7 +128,7 @@ export const DELETE: RequestHandler = async ({ locals, params, request }) => {
 			.where(
 				and(
 					eq(collectionCitations.collectionId, collectionId),
-					eq(collectionCitations.citationId, body.citationId)
+					eq(collectionCitations.citationId, delParsed.data.citationId)
 				)
 			);
 
@@ -139,7 +142,7 @@ export const DELETE: RequestHandler = async ({ locals, params, request }) => {
 			success: true,
 			message: 'Citation removed from collection',
 			collectionId,
-			citationId: body.citationId,
+			citationId: delParsed.data.citationId,
 			totalCitations: count?.count || 0,
 		});
 	} catch (err) {

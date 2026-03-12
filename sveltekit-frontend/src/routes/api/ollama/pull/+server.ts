@@ -1,6 +1,12 @@
 import { json } from '@sveltejs/kit';
 import { getOllamaUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types.js';
+import { z } from 'zod';
+
+// Zod schema validates model name (trimmed, 1-200)
+const ollamaPullSchema = z.object({
+	model: z.string().trim().min(1, 'Missing model').max(200),
+});
 
 const OLLAMA_BASE = getOllamaUrl();
 
@@ -17,10 +23,11 @@ export const GET: RequestHandler = async () => {
 
 export const POST: RequestHandler = async ({ request }) => {
  try {
- const { model } = await request.json();
- if (!model || typeof model !== 'string') {
- return json({ ok: false, error: 'Missing model' }, { status: 400 });
+ const parsed = ollamaPullSchema.safeParse(await request.json());
+ if (!parsed.success) {
+ return json({ ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
  }
+ const { model } = parsed.data;
 
  const res = await fetch(`${OLLAMA_BASE}/api/pull`, {
  method: 'POST',

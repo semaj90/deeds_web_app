@@ -28,17 +28,19 @@ import { requireAuth } from '$lib/server/auth-helpers.js';
 import { db } from '$lib/server/db/client';
 import { documentTopics } from '$lib/server/db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
+import { z } from 'zod';
 
-interface TrackInteractionRequest {
-	interactionType: 'view' | 'click' | 'save' | 'share' | 'dismiss';
-	documentId: string;
-	caseId?: string;
-	recommendationId?: string;
-	durationSeconds?: number;
-	searchContext?: string;
-	shareMethod?: 'email' | 'export' | 'link';
-	dismissReason?: string;
-}
+// Zod schema validates interactionType enum, documentId, and optional fields
+const trackInteractionSchema = z.object({
+	interactionType: z.enum(['view', 'click', 'save', 'share', 'dismiss']),
+	documentId: z.string().min(1, 'Missing documentId').max(500),
+	caseId: z.string().max(500).optional(),
+	recommendationId: z.string().max(500).optional(),
+	durationSeconds: z.number().min(0).optional(),
+	searchContext: z.string().max(5000).optional(),
+	shareMethod: z.enum(['email', 'export', 'link']).optional(),
+	dismissReason: z.string().max(5000).optional(),
+});
 
 /**
  * POST /api/recommendations/track
@@ -49,30 +51,15 @@ export const POST: RequestHandler = async (event) => {
 	const startTime = Date.now();
 
 	try {
-		const body = (await event.request.json()) as TrackInteractionRequest;
-
-		// Validate required fields
-		if (!body.interactionType || !body.documentId) {
+		// Zod schema validates interactionType enum (view|click|save|share|dismiss) and documentId
+		const parsed = trackInteractionSchema.safeParse(await event.request.json());
+		if (!parsed.success) {
 			return json(
-				{
-					success: false,
-					error: 'Missing required fields: interactionType, documentId'
-				},
+				{ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid request' },
 				{ status: 400 }
 			);
 		}
-
-		// Validate interaction type
-		const validTypes = ['view', 'click', 'save', 'share', 'dismiss'];
-		if (!validTypes.includes(body.interactionType)) {
-			return json(
-				{
-					success: false,
-					error: `Invalid interactionType. Must be one of: ${validTypes.join(', ')}`
-				},
-				{ status: 400 }
-			);
-		}
+		const body = parsed.data;
 
 		console.log(
 			`[track-interaction] User ${auth.user.id}, type=${body.interactionType}, doc=${body.documentId}`

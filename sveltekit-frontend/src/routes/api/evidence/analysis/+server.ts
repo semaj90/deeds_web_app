@@ -1,6 +1,13 @@
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { getWorkerStats } from '$lib/server/analysis/worker.js';
 import { getJobCounts, getJobsForEvidence, enqueueJob, type JobType } from '$lib/server/analysis/analysis-jobs.js';
+import { z } from 'zod';
+
+const evidenceAnalysisSchema = z.object({
+	evidenceId: z.string().min(1, 'Missing evidenceId').max(500),
+	caseId: z.string().max(500).nullable().optional(),
+	stages: z.array(z.enum(['entity_extraction', 'forensics', 'summarization'])).optional(),
+});
 
 /**
  * GET /api/evidence/analysis
@@ -41,25 +48,22 @@ export async function POST({ request, locals }: RequestEvent) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
-	const body = await request.json().catch(() => null);
-	if (!body?.evidenceId) {
-		return json({ error: 'Missing evidenceId' }, { status: 400 });
+	// Zod schema validates evidenceId required + stages enum array
+	const parsed = evidenceAnalysisSchema.safeParse(await request.json().catch(() => ({})));
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	}
 
 	const validStages: JobType[] = ['entity_extraction', 'forensics', 'summarization'];
-	const requested: JobType[] = Array.isArray(body.stages)
-		? body.stages.filter((s: string) => validStages.includes(s as JobType))
+	const requested: JobType[] = parsed.data.stages?.length
+		? parsed.data.stages
 		: validStages;
-
-	if (requested.length === 0) {
-		return json({ error: 'No valid stages specified' }, { status: 400 });
-	}
 
 	const enqueued: { jobType: string; jobId: string }[] = [];
 	for (const stage of requested) {
 		const jobId = await enqueueJob({
-			evidenceId: body.evidenceId,
-			caseId: body.caseId ?? null,
+			evidenceId: parsed.data.evidenceId,
+			caseId: parsed.data.caseId ?? null,
 			jobType: stage,
 		});
 		enqueued.push({ jobType: stage, jobId });

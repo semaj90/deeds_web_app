@@ -4,16 +4,22 @@ import { personsOfInterest } from '$lib/db/schema';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { eq, arrayContains } from 'drizzle-orm';
+import { z } from 'zod';
+
+const generateReportSchema = z.object({
+	caseId: z.string().min(1, 'Case ID is required').max(500),
+	type: z.string().max(100).optional().default('charging_memo'),
+});
 
 const OLLAMA_URL = process.env.OLLAMA_HOST ?? 'http://localhost:11434';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const { caseId, type = 'charging_memo' } = await request.json();
-
-		if (!caseId) {
-			return json({ error: 'Case ID is required' }, { status: 400 });
+		const parsed = generateReportSchema.safeParse(await request.json());
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
+		const { caseId, type } = parsed.data;
 
 		// Fetch case data
 		const [caseData] = await db.select().from(cases).where(eq(cases.id, caseId)).limit(1);

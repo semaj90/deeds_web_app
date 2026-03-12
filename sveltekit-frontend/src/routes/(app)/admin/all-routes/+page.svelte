@@ -538,44 +538,40 @@
 		</div>
 	</div>
 
-	<!-- Route Groups -->
-	{#if groupedRoutes.length > 0}
-		{#each groupedRoutes as [groupName, groupRoutes]}
-			<div class="route-group">
-				<div class="group-header">
-					<span class="group-name">{groupName}</span>
-					<span class="group-count">{groupRoutes.length} routes</span>
-				</div>
-				<div class="route-list">
-					{#each groupRoutes as route (route.id)}
-						<button
-							class="route-row"
-							class:has-errors={route.errorCount > 0}
-							class:is-broken={route.errorState === 'broken'}
-							class:is-flaky={route.errorState === 'flaky'}
-							onclick={() => openRouteModal(route)}
-						>
-							<span class="route-health {healthClass(route.errorState)}">{healthIcon(route.errorState)}</span>
-							<span class="route-path">{route.path}</span>
-							<span class="route-kind">[{route.kind || 'page'}]</span>
-							{#if route.errorCount > 0}
-								<span class="route-errors">{route.errorCount}E</span>
-							{/if}
-							{#if route.warningCount > 0}
-								<span class="route-warnings">{route.warningCount}W</span>
-							{/if}
-							{#if route.tags?.length}
-								<span class="route-tags">
-									{#each route.tags.slice(0, 3) as tag}
-										<span class="tag">{tag}</span>
-									{/each}
-								</span>
-							{/if}
-						</button>
-					{/each}
-				</div>
-			</div>
-		{/each}
+	<!-- Route Card Grid -->
+	{#if filteredRoutes.length > 0}
+		<div class="route-card-grid">
+			{#each filteredRoutes as route (route.id ?? route.path)}
+				<button
+					class="route-card"
+					class:card-broken={route.errorState === 'broken'}
+					class:card-flaky={route.errorState === 'flaky'}
+					onclick={() => openRouteModal(route)}
+				>
+					<div class="card-icon-wrap">
+						{#if route.kind === 'endpoint' || route.kind === 'server'}
+							<svg class="card-svg" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="5" y="6" width="2" height="2" fill="currentColor"/><rect x="9" y="6" width="2" height="2" fill="currentColor"/><line x1="4" y1="10" x2="12" y2="10" stroke="currentColor" stroke-width="1"/></svg>
+						{:else if route.kind === 'layout'}
+							<svg class="card-svg" viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="12" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="1" y1="5" x2="15" y2="5" stroke="currentColor" stroke-width="1"/><line x1="6" y1="5" x2="6" y2="14" stroke="currentColor" stroke-width="1"/></svg>
+						{:else if route.hasAiImports}
+							<svg class="card-svg" viewBox="0 0 16 16"><circle cx="8" cy="6" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 12c0-2.2 1.8-4 4-4s4 1.8 4 4" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="6" y="1" width="4" height="2" fill="currentColor"/></svg>
+						{:else if route.errorState === 'broken'}
+							<svg class="card-svg card-svg-broken" viewBox="0 0 16 16"><line x1="3" y1="3" x2="13" y2="13" stroke="currentColor" stroke-width="2"/><line x1="13" y1="3" x2="3" y2="13" stroke="currentColor" stroke-width="2"/></svg>
+						{:else}
+							<svg class="card-svg" viewBox="0 0 16 16"><rect x="3" y="1" width="10" height="14" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="5" y1="4" x2="11" y2="4" stroke="currentColor" stroke-width="1"/><line x1="5" y1="7" x2="11" y2="7" stroke="currentColor" stroke-width="1"/><line x1="5" y1="10" x2="9" y2="10" stroke="currentColor" stroke-width="1"/></svg>
+						{/if}
+					</div>
+					<span class="card-kind">{route.kind || 'page'}</span>
+					<span class="card-path">{route.path}</span>
+					{#if route.errorCount > 0}
+						<span class="card-badge card-badge-error">{route.errorCount}E</span>
+					{/if}
+					{#if route.group}
+						<span class="card-group">/{route.group}</span>
+					{/if}
+				</button>
+			{/each}
+		</div>
 	{:else}
 		<div class="empty-state">
 			<p>NO ROUTES FOUND</p>
@@ -771,12 +767,12 @@
 <RouteDecisionModal bind:open={showDecisionModal} bind:route={decisionRoute} onclose={() => { showDecisionModal = false; decisionRoute = null; }} />
 
 <style>
-	/* ── NES Command Center Theme ── */
+	/* ── NES Command Center Theme (Blue) ── */
 	.nes-command-center {
 		padding: 1.5rem;
-		font-family: 'Courier New', 'Consolas', monospace;
-		background: #0c0c0c;
-		color: #33ff33;
+		font-family: 'Press Start 2P', 'Courier New', 'Consolas', monospace;
+		background: #0d0d2a;
+		color: #c0c0ff;
 		min-height: 100vh;
 	}
 
@@ -784,21 +780,21 @@
 	.nes-header {
 		text-align: center;
 		padding: 1rem 0 1.5rem;
-		border-bottom: 2px solid #33ff33;
+		border-bottom: 2px solid #2a2a5a;
 		margin-bottom: 1.5rem;
 	}
 
 	.nes-header h1 {
-		font-size: 1.8rem;
-		color: #33ff33;
+		font-size: 1.4rem;
+		color: #c0c0ff;
 		letter-spacing: 0.3em;
 		margin: 0;
-		text-shadow: 0 0 10px rgba(51, 255, 51, 0.5);
+		text-shadow: 0 0 10px rgba(64, 64, 192, 0.4);
 	}
 
 	.subtitle {
-		color: #1a9a1a;
-		font-size: 0.8rem;
+		color: #6060a0;
+		font-size: 0.7rem;
 		margin: 0.5rem 0 0;
 		letter-spacing: 0.15em;
 	}
@@ -812,7 +808,7 @@
 	}
 
 	.stat-box {
-		border: 1px solid #33ff33;
+		border: 1px solid #2a2a5a;
 		padding: 0.4rem 0.8rem;
 		display: flex;
 		flex-direction: column;
@@ -821,24 +817,24 @@
 	}
 
 	.stat-label {
-		font-size: 0.65rem;
-		color: #1a9a1a;
+		font-size: 0.55rem;
+		color: #6060a0;
 		letter-spacing: 0.1em;
 	}
 
 	.stat-value {
-		font-size: 1.2rem;
+		font-size: 1.1rem;
 		font-weight: bold;
 	}
 
-	.stat-box.stat-primary { border-color: #33ff33; color: #33ff33; }
-	.stat-box.stat-active { border-color: #33aaff; color: #33aaff; }
-	.stat-box.stat-archived { border-color: #ff6633; color: #ff6633; }
-	.stat-box.health-ok { border-color: #33ff33; }
-	.stat-box.health-flaky { border-color: #ffff33; color: #ffff33; }
-	.stat-box.health-broken { border-color: #ff3333; color: #ff3333; }
-	.stat-box.stat-feature { border-color: #3399ff; color: #3399ff; }
-	.stat-box.stat-ai { border-color: #ff33ff; color: #ff33ff; }
+	.stat-box.stat-primary { border-color: #4040c0; color: #c0c0ff; }
+	.stat-box.stat-active { border-color: #3388cc; color: #66bbff; }
+	.stat-box.stat-archived { border-color: #cc6633; color: #ff8844; }
+	.stat-box.health-ok { border-color: #33aa33; color: #66ff66; }
+	.stat-box.health-flaky { border-color: #cccc33; color: #ffff66; }
+	.stat-box.health-broken { border-color: #cc3333; color: #ff6666; }
+	.stat-box.stat-feature { border-color: #3366cc; color: #6699ff; }
+	.stat-box.stat-ai { border-color: #cc33cc; color: #ff66ff; }
 
 	/* ── Capability Bar ── */
 	.capability-bar {
@@ -846,15 +842,15 @@
 		gap: 1rem;
 		margin-bottom: 1rem;
 		padding: 0.4rem 0.75rem;
-		background: #111;
-		border: 1px solid #1a5a1a;
-		font-size: 0.7rem;
+		background: #0a0a1f;
+		border: 1px solid #2a2a5a;
+		font-size: 0.65rem;
 		flex-wrap: wrap;
 		align-items: center;
 	}
 
 	.cap-item {
-		color: #1a9a1a;
+		color: #6060a0;
 		letter-spacing: 0.05em;
 	}
 
@@ -960,8 +956,8 @@
 
 	.ops-log-panel {
 		margin-bottom: 1.5rem;
-		border: 1px solid #3399ff;
-		background: #0c0c0c;
+		border: 1px solid #2a2a5a;
+		background: #0a0a1f;
 		max-height: 600px;
 		overflow-y: auto;
 	}
@@ -1190,14 +1186,14 @@
 	.search-box {
 		display: flex;
 		align-items: center;
-		border: 1px solid #33ff33;
+		border: 1px solid #2a2a5a;
 		padding: 0.3rem 0.5rem;
 		flex: 1;
 		min-width: 200px;
 	}
 
 	.search-prefix {
-		color: #33ff33;
+		color: #4040c0;
 		margin-right: 0.5rem;
 		font-weight: bold;
 	}
@@ -1205,7 +1201,7 @@
 	.search-input {
 		background: transparent;
 		border: none;
-		color: #33ff33;
+		color: #c0c0ff;
 		font-family: inherit;
 		font-size: 0.85rem;
 		outline: none;
@@ -1214,7 +1210,7 @@
 	}
 
 	.search-input::placeholder {
-		color: #1a6a1a;
+		color: #4040c0;
 	}
 
 	.filter-group {
@@ -1223,9 +1219,9 @@
 	}
 
 	.nes-select {
-		background: #0c0c0c;
-		color: #33ff33;
-		border: 1px solid #33ff33;
+		background: #0d0d2a;
+		color: #c0c0ff;
+		border: 1px solid #2a2a5a;
 		padding: 0.3rem 0.5rem;
 		font-family: inherit;
 		font-size: 0.75rem;
@@ -1234,136 +1230,106 @@
 	}
 
 	.nes-select:focus {
-		outline: 1px solid #33ff33;
+		outline: 1px solid #4040c0;
 	}
 
-	/* ── Route Groups ── */
-	.route-group {
-		margin-bottom: 1.5rem;
-		border: 1px solid #1a5a1a;
+	/* ── Route Card Grid ── */
+	.route-card-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+		gap: 0.75rem;
 	}
 
-	.group-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 0.5rem 0.75rem;
-		background: #111;
-		border-bottom: 1px solid #1a5a1a;
-	}
-
-	.group-name {
-		font-weight: bold;
-		font-size: 0.85rem;
-		letter-spacing: 0.1em;
-		color: #33ff33;
-	}
-
-	.group-count {
-		font-size: 0.7rem;
-		color: #1a9a1a;
-	}
-
-	.route-list {
+	.route-card {
 		display: flex;
 		flex-direction: column;
+		align-items: center;
+		gap: 0.3rem;
+		padding: 0.75rem 0.5rem;
+		background: #10102a;
+		border: 1px solid #2a2a5a;
+		color: #c0c0ff;
+		font-family: inherit;
+		font-size: 0.65rem;
+		cursor: pointer;
+		text-align: center;
+		transition: all 0.15s;
 	}
 
-	/* ── Route Rows ── */
-	.route-row {
+	.route-card:hover {
+		border-color: #4040c0;
+		background: #15153a;
+		box-shadow: 0 0 8px rgba(64, 64, 192, 0.2);
+	}
+
+	.route-card.card-broken {
+		border-color: #cc3333;
+		background: #1a0a1a;
+	}
+
+	.route-card.card-flaky {
+		border-color: #cccc33;
+		background: #1a1a0a;
+	}
+
+	.card-icon-wrap {
+		width: 32px;
+		height: 32px;
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
-		padding: 0.4rem 0.75rem;
-		border: none;
-		border-bottom: 1px solid #0a2a0a;
-		background: transparent;
-		color: #33ff33;
-		font-family: inherit;
-		font-size: 0.8rem;
-		cursor: pointer;
-		text-align: left;
-		width: 100%;
-		transition: background-color 0.15s;
+		justify-content: center;
+		margin-bottom: 0.25rem;
 	}
 
-	.route-row:hover {
-		background: #112211;
+	.card-svg {
+		width: 24px;
+		height: 24px;
+		color: #6060a0;
 	}
 
-	.route-row:last-child {
-		border-bottom: none;
+	.card-svg-broken {
+		color: #ff4444;
 	}
 
-	.route-row.is-broken {
-		border-left: 3px solid #ff3333;
+	.card-kind {
+		font-size: 0.55rem;
+		color: #6060a0;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
 	}
 
-	.route-row.is-flaky {
-		border-left: 3px solid #ffff33;
-	}
-
-	.route-health {
-		font-size: 0.7rem;
-		font-weight: bold;
-		flex-shrink: 0;
-		width: 32px;
-	}
-
-	.health-ok { color: #33ff33; }
-	.health-flaky { color: #ffff33; }
-	.health-broken { color: #ff3333; }
-
-	.route-path {
-		flex: 1;
+	.card-path {
+		font-size: 0.6rem;
+		color: #c0c0ff;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+		max-width: 100%;
 	}
 
-	.route-kind {
-		color: #1a9a1a;
-		font-size: 0.7rem;
-		flex-shrink: 0;
-	}
-
-	.route-errors {
-		background: #ff3333;
-		color: #000;
+	.card-badge {
+		font-size: 0.5rem;
 		padding: 0.1rem 0.3rem;
-		font-size: 0.65rem;
-		font-weight: bold;
-		flex-shrink: 0;
+		border: 1px solid #2a2a5a;
+		color: #6060a0;
 	}
 
-	.route-warnings {
-		background: #ffff33;
-		color: #000;
-		padding: 0.1rem 0.3rem;
-		font-size: 0.65rem;
-		font-weight: bold;
-		flex-shrink: 0;
+	.card-badge-error {
+		border-color: #cc3333;
+		color: #ff6666;
+		background: rgba(204, 51, 51, 0.1);
 	}
 
-	.route-tags {
-		display: flex;
-		gap: 0.25rem;
-		flex-shrink: 0;
-	}
-
-	.tag {
-		background: #1a3a1a;
-		color: #33ff33;
-		padding: 0.1rem 0.3rem;
-		font-size: 0.6rem;
-		letter-spacing: 0.05em;
+	.card-group {
+		font-size: 0.5rem;
+		color: #4040c0;
 	}
 
 	/* ── Empty State ── */
 	.empty-state {
 		text-align: center;
 		padding: 3rem;
-		border: 1px dashed #1a5a1a;
+		border: 1px dashed #2a2a5a;
 	}
 
 	.empty-state p {
@@ -1371,7 +1337,7 @@
 	}
 
 	.hint {
-		color: #1a6a1a;
+		color: #6060a0;
 		font-size: 0.8rem;
 	}
 
@@ -1392,14 +1358,14 @@
 
 	/* ── NES Modal ── */
 	.nes-modal {
-		background: #0c0c0c;
-		border: 2px solid #33ff33;
+		background: #0d0d2a;
+		border: 2px solid #4040c0;
 		max-width: 600px;
 		width: 100%;
 		max-height: 85vh;
 		display: flex;
 		flex-direction: column;
-		box-shadow: 0 0 20px rgba(51, 255, 51, 0.2), inset 0 0 20px rgba(51, 255, 51, 0.05);
+		box-shadow: 0 0 20px rgba(64, 64, 192, 0.3), inset 0 0 20px rgba(64, 64, 192, 0.05);
 	}
 
 	.modal-header {
@@ -1407,21 +1373,21 @@
 		justify-content: space-between;
 		align-items: center;
 		padding: 0.75rem 1rem;
-		border-bottom: 1px solid #33ff33;
-		background: #111;
+		border-bottom: 1px solid #2a2a5a;
+		background: #10102a;
 	}
 
 	.modal-title {
 		font-weight: bold;
 		font-size: 0.9rem;
 		letter-spacing: 0.15em;
-		color: #33ff33;
+		color: #c0c0ff;
 	}
 
 	.modal-close {
 		background: none;
-		border: 1px solid #33ff33;
-		color: #33ff33;
+		border: 1px solid #2a2a5a;
+		color: #6060a0;
 		font-family: inherit;
 		font-size: 0.8rem;
 		cursor: pointer;
@@ -1429,8 +1395,8 @@
 	}
 
 	.modal-close:hover {
-		background: #33ff33;
-		color: #000;
+		background: #4040c0;
+		color: #fff;
 	}
 
 	.modal-body {
@@ -1446,25 +1412,25 @@
 
 	.detail-label {
 		font-size: 0.65rem;
-		color: #1a9a1a;
+		color: #6060a0;
 		letter-spacing: 0.15em;
 		margin-bottom: 0.2rem;
 	}
 
 	.detail-value {
 		font-size: 0.85rem;
-		color: #33ff33;
+		color: #c0c0ff;
 	}
 
 	.path-value {
 		font-size: 1rem;
 		font-weight: bold;
-		color: #55ff55;
+		color: #d0d0ff;
 	}
 
 	.file-value {
 		font-size: 0.75rem;
-		color: #1a9a1a;
+		color: #6060a0;
 		word-break: break-all;
 	}
 
@@ -1508,7 +1474,7 @@
 
 	/* ── Error Box ── */
 	.error-box {
-		background: #1a0a0a;
+		background: #1a0a1a;
 		border-left: 3px solid #ff3333;
 		padding: 0.5rem 0.75rem;
 	}
@@ -1527,8 +1493,8 @@
 
 	/* ── Feature Badges ── */
 	.feature-badge {
-		border: 1px solid #33ff33;
-		color: #33ff33;
+		border: 1px solid #4040c0;
+		color: #c0c0ff;
 		padding: 0.15rem 0.4rem;
 		font-size: 0.65rem;
 		letter-spacing: 0.1em;
@@ -1547,7 +1513,7 @@
 
 	/* ── Modal Actions ── */
 	.analyze-section {
-		border-top: 1px dashed #1a5a1a;
+		border-top: 1px dashed #2a2a5a;
 		margin-top: 0.5rem;
 		padding-top: 0.5rem;
 	}
@@ -1557,11 +1523,11 @@
 		gap: 0.75rem;
 		font-size: 0.7rem;
 		padding: 0.2rem 0;
-		border-bottom: 1px solid #0a2a0a;
-		color: #aaffaa;
+		border-bottom: 1px solid #1a1a3a;
+		color: #a0a0d0;
 	}
 
-	.analysis-phase { color: #55ff55; }
+	.analysis-phase { color: #c0c0ff; }
 	.analysis-status { color: #aaaaaa; }
 	.analysis-patches { color: #ffaa33; }
 	.analysis-date { color: #666; margin-left: auto; }
@@ -1576,14 +1542,14 @@
 		display: flex;
 		gap: 0.5rem;
 		padding: 0.75rem 1rem;
-		border-top: 1px solid #1a5a1a;
-		background: #111;
+		border-top: 1px solid #2a2a5a;
+		background: #10102a;
 	}
 
 	.nes-btn {
-		background: #0c0c0c;
-		color: #33ff33;
-		border: 1px solid #33ff33;
+		background: #0d0d2a;
+		color: #c0c0ff;
+		border: 1px solid #4040c0;
 		padding: 0.4rem 0.8rem;
 		font-family: inherit;
 		font-size: 0.75rem;
@@ -1593,17 +1559,17 @@
 	}
 
 	.nes-btn:hover {
-		background: #33ff33;
-		color: #000;
+		background: #4040c0;
+		color: #fff;
 	}
 
 	.nes-btn.primary {
-		background: #33ff33;
-		color: #000;
+		background: #4040c0;
+		color: #fff;
 		font-weight: bold;
 	}
 
 	.nes-btn.primary:hover {
-		background: #55ff55;
+		background: #5050d0;
 	}
 </style>

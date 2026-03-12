@@ -4,6 +4,12 @@ import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
+import { z } from 'zod';
+
+const verifyFixSchema = z.object({
+	filePath: z.string().min(1, 'Missing filePath').max(1000),
+	fixId: z.string().max(500).optional().default(''),
+});
 
 const execAsync = promisify(exec);
 
@@ -15,13 +21,13 @@ const execAsync = promisify(exec);
  * Returns: { verified: boolean, errors: string[], fixId }
  */
 export const POST: RequestHandler = async ({ request }) => {
-	const body = await request.json();
-	const filePath: string = body?.filePath ?? '';
-	const fixId: string = body?.fixId ?? '';
-
-	if (!filePath) {
-		return json({ verified: false, errors: ['Missing filePath'], fixId }, { status: 400 });
+	// Zod schema validates filePath required + fixId optional
+	const parsed = verifyFixSchema.safeParse(await request.json());
+	if (!parsed.success) {
+		return json({ verified: false, errors: [parsed.error.issues[0]?.message ?? 'Invalid input'], fixId: '' }, { status: 400 });
 	}
+	const filePath: string = parsed.data.filePath;
+	const fixId: string = parsed.data.fixId;
 
 	try {
 		// Run svelte-check and capture output (allow non-zero exit)

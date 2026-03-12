@@ -139,6 +139,78 @@ function setupToolHandlers() {
         },
       },
       {
+        name: "cases:create",
+        description: "Create a new legal case. Returns the created case with ID.",
+        inputSchema: { type: "object",
+          properties: {
+            title: { type: "string", description: "Case title" },
+            description: { type: "string", description: "Case description" },
+            status: { type: "string", enum: ["open", "active", "closed", "archived"], description: "Case status" },
+            priority: { type: "string", enum: ["low", "medium", "high", "critical"], description: "Case priority" },
+          },
+          required: ["title"],
+        },
+      },
+      {
+        name: "cases:update",
+        description: "Update an existing case's title, description, status, or priority.",
+        inputSchema: { type: "object",
+          properties: {
+            caseId: { type: "string", description: "Case ID to update" },
+            title: { type: "string", description: "New case title" },
+            description: { type: "string", description: "New description" },
+            status: { type: "string", enum: ["open", "active", "closed", "archived"], description: "New status" },
+            priority: { type: "string", enum: ["low", "medium", "high", "critical"], description: "New priority" },
+          },
+          required: ["caseId"],
+        },
+      },
+      {
+        name: "cases:delete",
+        description: "Delete a case and all associated data. Use with caution.",
+        inputSchema: { type: "object",
+          properties: {
+            caseId: { type: "string", description: "Case ID to delete" },
+          },
+          required: ["caseId"],
+        },
+      },
+      {
+        name: "citations:search",
+        description: "Search legal citations across cases. Returns matching citations with source, page, and relevance.",
+        inputSchema: { type: "object",
+          properties: {
+            query: { type: "string", description: "Search query for citation text" },
+            caseId: { type: "string", description: "Filter to a specific case" },
+            limit: { type: "number", description: "Max results" },
+            offset: { type: "number", description: "Pagination offset" },
+          },
+        },
+      },
+      {
+        name: "citations:list_by_case",
+        description: "List all citations linked to a specific case.",
+        inputSchema: { type: "object",
+          properties: {
+            caseId: { type: "string", description: "Case ID to list citations for" },
+          },
+          required: ["caseId"],
+        },
+      },
+      {
+        name: "citations:add_to_case",
+        description: "Add a legal citation to a case. Stores citation text, source, and page reference.",
+        inputSchema: { type: "object",
+          properties: {
+            caseId: { type: "string", description: "Case ID to add citation to" },
+            citationText: { type: "string", description: "The citation text (e.g., 'Miranda v. Arizona, 384 U.S. 436 (1966)')" },
+            sourceTitle: { type: "string", description: "Source document title" },
+            pageNumber: { type: "number", description: "Page number in source document" },
+          },
+          required: ["caseId", "citationText"],
+        },
+      },
+      {
         name: "reports:list",
         description: "List reports with optional case filtering. Returns report metadata including title, status, creation date.",
         inputSchema: { type: "object",
@@ -497,6 +569,39 @@ function setupToolHandlers() {
 
         case "reports:export": {
           const result = await mcpTools.reports.exportReport(args as any);
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
+        }
+
+        case "cases:create": {
+          const result = await mcpTools.cases.createCase(args as any);
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
+        }
+
+        case "cases:update": {
+          const { caseId, ...updates } = args as { caseId: string; [k: string]: any };
+          const result = await mcpTools.cases.updateCase(caseId, updates);
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
+        }
+
+        case "cases:delete": {
+          const { caseId } = args as { caseId: string };
+          const result = await mcpTools.cases.deleteCase(caseId);
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
+        }
+
+        case "citations:search": {
+          const result = await mcpTools.citations.searchCitations(args as any);
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
+        }
+
+        case "citations:list_by_case": {
+          const { caseId } = args as { caseId: string };
+          const result = await mcpTools.citations.listByCaseId(caseId);
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
+        }
+
+        case "citations:add_to_case": {
+          const result = await mcpTools.citations.addToCase(args as any);
           return { content: [{ type: "text", text: JSON.stringify(result) }] };
         }
 

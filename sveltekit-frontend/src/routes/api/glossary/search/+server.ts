@@ -13,9 +13,17 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import db from '$lib/server/db';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
+
+// Zod schema validates query (trimmed, 1-500), category, limit (1-100, default 20)
+const glossarySearchSchema = z.object({
+	query: z.string().trim().min(1, 'Missing query').max(500),
+	category: z.string().max(200).optional(),
+	limit: z.number().int().min(1).max(100).optional().default(20),
+});
 
 interface GlossaryResult {
 	id: string;
@@ -61,14 +69,12 @@ function mapRow(r: Record<string, unknown>, matchType: GlossaryResult['matchType
 
 export const POST: RequestHandler = async ({ request }) => {
 	const start = performance.now();
-	const body = await request.json();
-	const query = typeof body.query === 'string' ? body.query.trim() : '';
-	const category = typeof body.category === 'string' ? body.category : null;
-	const limit = Math.min(Math.max(Number(body.limit) || 20, 1), 100);
-
-	if (!query) {
-		return json({ error: 'Missing query' }, { status: 400 });
+	const parsed = glossarySearchSchema.safeParse(await request.json());
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
 	}
+	const { query, limit } = parsed.data;
+	const category = parsed.data.category ?? null;
 
 	const timing: Record<string, number> = {};
 	const categoryPattern = category ? `%${category}%` : null;

@@ -12,6 +12,14 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self-prompt.js';
 import { UserHistoryTracker } from '$lib/server/ml/user-history.js';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+// Zod schema validates query (1-10K), answer (1-100K), optional caseId
+const investigateSuggestSchema = z.object({
+	query: z.string().min(1, 'query is required').max(10000),
+	answer: z.string().min(1, 'answer is required').max(100000),
+	caseId: z.string().max(500).optional(),
+});
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	const user = locals.user;
@@ -19,16 +27,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
-	const body = await request.json();
-	const { query, answer, caseId } = body as {
-		query?: string;
-		answer?: string;
-		caseId?: string;
-	};
-
-	if (!query || !answer) {
-		return json({ error: 'query and answer are required' }, { status: 400 });
+	const parsed = investigateSuggestSchema.safeParse(await request.json());
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
 	}
+	const { query, answer, caseId } = parsed.data;
 
 	try {
 		// 1. Self-evaluate the investigation result

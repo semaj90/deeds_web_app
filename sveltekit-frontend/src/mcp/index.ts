@@ -93,12 +93,29 @@ export interface ReportTools {
   }): Promise<MCPToolResponse<{ url: string, filename: string }>>;
 }
 
+export interface CitationTools {
+  searchCitations(params: {
+    query?: string;
+    caseId?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<MCPToolResponse<any[]>>;
+  listByCaseId(caseId: string): Promise<MCPToolResponse<any[]>>;
+  addToCase(params: {
+    caseId: string;
+    citationText: string;
+    sourceTitle?: string;
+    pageNumber?: number;
+  }): Promise<MCPToolResponse<any>>;
+}
+
 export interface MCPTools {
   cases: CasesTools;
   evidence: EvidenceTools;
   users: UserTools;
   rag: RAGTools;
   reports: ReportTools;
+  citations: CitationTools;
   getAnalytics(params: Record<string, string>): Promise<MCPToolResponse<any>>;
   analyzeLegalDocument(document: any): Promise<MCPToolResponse<any>>;
   extractClauses(documentId: string): Promise<MCPToolResponse<any>>;
@@ -109,21 +126,67 @@ export interface MCPTools {
 
 // Mock implementation for development
 export const mcpTools: MCPTools = {
-  cases: { loadCases: async (_params) => ({ success: true, data: [] }),
-    createCase: async (caseData) => ({
-      success: true,
-      data: { id: 'new-case-123', ...(caseData || {}) },
-    }),
-    updateCase: async (caseId, updates) => ({
-      success: true,
-      data: { id: caseId, ...(updates || {}) },
-    }),
-    deleteCase: async (caseId) => ({ success: true, data: { deleted: true, id: caseId } }),
+  cases: {
+    loadCases: async (params) => {
+      try {
+        const qp = new URLSearchParams();
+        if (params.query) qp.append('q', params.query);
+        if (params.limit) qp.append('limit', String(params.limit));
+        if (params.offset) qp.append('offset', String(params.offset));
+        const response = await fetch(`/api/cases?${qp}`, { headers: { 'Content-Type': 'application/json' } });
+        const result = await response.json();
+        return { success: true, data: result.cases ?? result.data ?? result };
+      } catch (error) {
+        return { success: false, error: String(error) };
+      }
+    },
+    createCase: async (caseData) => {
+      try {
+        const response = await fetch('/api/cases', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(caseData),
+        });
+        const result = await response.json();
+        return { success: response.ok, data: result };
+      } catch (error) {
+        return { success: false, error: String(error) };
+      }
+    },
+    updateCase: async (caseId, updates) => {
+      try {
+        const response = await fetch(`/api/cases/${caseId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updates),
+        });
+        const result = await response.json();
+        return { success: response.ok, data: result };
+      } catch (error) {
+        return { success: false, error: String(error) };
+      }
+    },
+    deleteCase: async (caseId) => {
+      try {
+        const response = await fetch(`/api/cases/${caseId}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+        });
+        return { success: response.ok, data: { deleted: response.ok, id: caseId } };
+      } catch (error) {
+        return { success: false, error: String(error) };
+      }
+    },
     findSimilarCases: async (_embedding, _limit) => ({ success: true, data: [] }),
-    getCaseAnalytics: async (_userId) => ({
-      success: true,
-      data: { totalCases: 0, activeCases: 0 },
-    }),
+    getCaseAnalytics: async (_userId) => {
+      try {
+        const response = await fetch('/api/cases/analytics', { headers: { 'Content-Type': 'application/json' } });
+        const result = await response.json();
+        return { success: true, data: result };
+      } catch (error) {
+        return { success: false, error: String(error) };
+      }
+    },
   },
   evidence: { loadEvidence: async (_params) => ({ success: true, data: [] }),
     createEvidence: async (evidenceData) => ({
@@ -283,6 +346,48 @@ export const mcpTools: MCPTools = {
           success: result.success,
           data: { url: result.url || '', filename: result.filename || '' }
         };
+      } catch (error) {
+        return { success: false, error: String(error) };
+      }
+    },
+  },
+  citations: {
+    searchCitations: async (params) => {
+      try {
+        const qp = new URLSearchParams();
+        if (params.query) qp.append('q', params.query);
+        if (params.caseId) qp.append('caseId', params.caseId);
+        if (params.limit) qp.append('limit', String(params.limit));
+        if (params.offset) qp.append('offset', String(params.offset));
+        const response = await fetch(`/api/citations?${qp}`, { headers: { 'Content-Type': 'application/json' } });
+        const result = await response.json();
+        return { success: response.ok, data: result.citations ?? result.data ?? result };
+      } catch (error) {
+        return { success: false, error: String(error) };
+      }
+    },
+    listByCaseId: async (caseId) => {
+      try {
+        const response = await fetch(`/api/cases/${caseId}/citations`, { headers: { 'Content-Type': 'application/json' } });
+        const result = await response.json();
+        return { success: response.ok, data: result.citations ?? result.data ?? result };
+      } catch (error) {
+        return { success: false, error: String(error) };
+      }
+    },
+    addToCase: async (params) => {
+      try {
+        const response = await fetch(`/api/cases/${params.caseId}/citations`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            citationText: params.citationText,
+            sourceTitle: params.sourceTitle,
+            pageNumber: params.pageNumber,
+          }),
+        });
+        const result = await response.json();
+        return { success: response.ok, data: result };
       } catch (error) {
         return { success: false, error: String(error) };
       }

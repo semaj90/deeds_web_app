@@ -11,6 +11,13 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import Fuse from 'fuse.js';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+// Zod schema validates query (1-5K), limit (1-200, default 100)
+const recallSchema = z.object({
+	query: z.string().min(1, 'Missing query string').max(5000),
+	limit: z.number().int().min(1).max(200).optional().default(100),
+});
 
 interface ChunkMetadataEntry {
 	path: string;
@@ -88,13 +95,11 @@ async function refreshMetadataCache(): Promise<void> {
 }
 
 export const POST: RequestHandler = async ({ request }) => {
-	const body = await request.json();
-	const query = body?.query;
-	const limit = Math.min(body?.limit ?? 100, 200);
-
-	if (!query || typeof query !== 'string') {
-		throw error(400, 'Missing query string');
+	const parsed = recallSchema.safeParse(await request.json());
+	if (!parsed.success) {
+		throw error(400, parsed.error.issues[0]?.message ?? 'Invalid request');
 	}
+	const { query, limit } = parsed.data;
 
 	await refreshMetadataCache();
 

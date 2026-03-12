@@ -12,10 +12,19 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import db from '$lib/server/db';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const QDRANT_URL = ENV.QDRANT_URL;
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
+
+// Zod schema validates query (trimmed, 1-500), court, caseId, limit (1-100, default 20)
+const precedentSearchSchema = z.object({
+	query: z.string().trim().min(1, 'Missing query').max(500),
+	court: z.string().max(200).optional(),
+	caseId: z.string().max(500).optional(),
+	limit: z.number().int().min(1).max(100).optional().default(20),
+});
 
 interface PrecedentSearchResult {
 	id: string;
@@ -107,15 +116,13 @@ function mapPgRow(r: Record<string, unknown>): PrecedentSearchResult {
 
 export const POST: RequestHandler = async ({ request }) => {
 	const start = performance.now();
-	const body = await request.json();
-	const query = typeof body.query === 'string' ? body.query.trim() : '';
-	const court = typeof body.court === 'string' ? body.court : null;
-	const caseId = typeof body.caseId === 'string' ? body.caseId : undefined;
-	const limit = Math.min(Math.max(Number(body.limit) || 20, 1), 100);
-
-	if (!query) {
-		return json({ error: 'Missing query' }, { status: 400 });
+	const parsed = precedentSearchSchema.safeParse(await request.json());
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
 	}
+	const { query, limit } = parsed.data;
+	const court = parsed.data.court ?? null;
+	const caseId = parsed.data.caseId;
 
 	const timing: Record<string, number> = {};
 	const courtPattern = court ? `%${court}%` : null;

@@ -3,6 +3,13 @@ import { caseNotes, caseNoteVersions } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
 import { and, eq, sql, desc, count } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
+
+const updateNoteSchema = z.object({
+	title: z.string().max(1000).optional(),
+	content: z.string().max(100000).optional(),
+	isPinned: z.boolean().optional(),
+});
 
 /**
  * GET /api/cases/[id]/notes/[noteId]
@@ -34,7 +41,11 @@ export const GET: RequestHandler = async ({ params }) => {
  */
 export const PATCH: RequestHandler = async ({ params, request }) => {
 	try {
-		const body = await request.json();
+		const parsed = updateNoteSchema.safeParse(await request.json());
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		}
+		const body = parsed.data;
 		const updates: Record<string, unknown> = { updatedAt: sql`now()` };
 
 		if (body.title !== undefined) updates.title = body.title;

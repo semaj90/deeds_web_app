@@ -3,6 +3,12 @@ import { caseNoteEvidenceRefs, caseNotes, evidence } from '$lib/server/db/schema
 import { json } from '@sveltejs/kit';
 import { and, eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
+
+// Zod schema validates evidenceId for POST and DELETE
+const noteEvidenceSchema = z.object({
+	evidenceId: z.string().min(1, 'evidenceId required').max(500),
+});
 
 /**
  * GET /api/cases/[id]/notes/[noteId]/evidence
@@ -36,12 +42,11 @@ export const GET: RequestHandler = async ({ params }) => {
  */
 export const POST: RequestHandler = async ({ params, request }) => {
 	try {
-		const body = await request.json();
-		const { evidenceId } = body;
-
-		if (!evidenceId) {
-			return json({ error: 'evidenceId required' }, { status: 400 });
+		const parsed = noteEvidenceSchema.safeParse(await request.json());
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
 		}
+		const { evidenceId } = parsed.data;
 
 		// Verify note belongs to this case
 		const [note] = await db
@@ -89,12 +94,11 @@ export const POST: RequestHandler = async ({ params, request }) => {
  */
 export const DELETE: RequestHandler = async ({ params, request }) => {
 	try {
-		const body = await request.json();
-		const { evidenceId } = body;
-
-		if (!evidenceId) {
-			return json({ error: 'evidenceId required' }, { status: 400 });
+		const delParsed = noteEvidenceSchema.safeParse(await request.json());
+		if (!delParsed.success) {
+			return json({ error: delParsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
 		}
+		const { evidenceId } = delParsed.data;
 
 		const [deleted] = await db
 			.delete(caseNoteEvidenceRefs)

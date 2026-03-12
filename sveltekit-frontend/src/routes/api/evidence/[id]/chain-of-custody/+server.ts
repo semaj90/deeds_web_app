@@ -3,6 +3,16 @@ import { json, error } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
+import { z } from 'zod';
+
+const custodyEventSchema = z.object({
+	action: z.enum(['received', 'transferred', 'analyzed', 'stored', 'retrieved', 'exported', 'sealed']),
+	from: z.string().max(500).optional(),
+	to: z.string().max(500).optional(),
+	notes: z.string().max(5000).optional(),
+	location: z.string().max(500).optional(),
+	hash: z.string().max(500).optional(),
+});
 
 interface CustodyEvent {
 	action: 'received' | 'transferred' | 'analyzed' | 'stored' | 'retrieved' | 'exported' | 'sealed';
@@ -57,13 +67,12 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 export const POST: RequestHandler = async ({ params, locals, request }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 
-	const body = await request.json();
-	if (!body?.action) throw error(400, 'Missing required field: action');
-
-	const validActions = ['received', 'transferred', 'analyzed', 'stored', 'retrieved', 'exported', 'sealed'];
-	if (!validActions.includes(body.action)) {
-		throw error(400, `Invalid action. Must be one of: ${validActions.join(', ')}`);
+	// Zod schema validates action enum (received|transferred|analyzed|stored|retrieved|exported|sealed)
+	const parsed = custodyEventSchema.safeParse(await request.json());
+	if (!parsed.success) {
+		throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
 	}
+	const body = parsed.data;
 
 	const item = await db.select({
 		id: evidence.id,

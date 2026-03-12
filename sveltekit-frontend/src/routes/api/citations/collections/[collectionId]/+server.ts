@@ -3,6 +3,14 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { citationCollections, collectionCitations, citations } from '$lib/server/db/schema-postgres.js';
 import { eq, and, sql } from 'drizzle-orm';
+import { z } from 'zod';
+
+const updateCollectionSchema = z.object({
+	name: z.string().trim().max(500).optional(),
+	description: z.string().max(5000).optional(),
+	color: z.string().max(20).optional(),
+	isPublic: z.boolean().optional(),
+});
 
 /**
  * GET /api/citations/collections/[collectionId]
@@ -143,11 +151,15 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 			throw error(404, 'Collection not found');
 		}
 
-		const body = await request.json();
+		const parsed = updateCollectionSchema.safeParse(await request.json());
+		if (!parsed.success) {
+			throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
+		}
+		const body = parsed.data;
 
 		// Build update object (only update provided fields)
 		const updates: any = {};
-		if (body.name !== undefined) updates.name = body.name.trim();
+		if (body.name !== undefined) updates.name = body.name;
 		if (body.description !== undefined) updates.description = body.description?.trim() || null;
 		if (body.color !== undefined) updates.color = body.color;
 		if (body.isPublic !== undefined) updates.isPublic = body.isPublic;

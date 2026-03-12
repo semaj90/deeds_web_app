@@ -9,18 +9,25 @@
 import { getKnowledgeSearcher } from '$lib/services/knowledge-search';
 import { getOllamaUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types.js';
+import { z } from 'zod';
+
+// Zod schema validates query (trimmed, 1-5000), topK (1-100), llmProvider enum
+const knowledgeStreamSchema = z.object({
+	query: z.string().trim().min(1, 'Query is required').max(5000),
+	topK: z.number().int().min(1).max(100).optional().default(5),
+	llmProvider: z.enum(['ollama', 'gemini']).optional().default('ollama'),
+});
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
-		const { query, topK = 5, llmProvider = 'ollama' } = body;
-
-		if (!query || typeof query !== 'string' || query.trim().length === 0) {
+		const parsed = knowledgeStreamSchema.safeParse(await request.json());
+		if (!parsed.success) {
 			return new Response(
-				JSON.stringify({ error: 'Query is required' }),
+				JSON.stringify({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }),
 				{ status: 400, headers: { 'Content-Type': 'application/json' } }
 			);
 		}
+		const { query, topK, llmProvider } = parsed.data;
 
 		// Create SSE stream
 		const stream = new ReadableStream({

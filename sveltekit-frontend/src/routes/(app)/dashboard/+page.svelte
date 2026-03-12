@@ -490,6 +490,45 @@
       </Card>
     </div>
 
+    <!-- NES Route Navigator -->
+    <div class="mt-8 nes-route-nav">
+      <div class="nes-nav-header">
+        <span class="nes-nav-title">ROUTE NAVIGATOR</span>
+        <a href="/admin/all-routes" class="nes-nav-link">VIEW ALL →</a>
+      </div>
+      <div class="nes-nav-grid">
+        {#each [
+          { href: '/cases', label: '/cases', kind: 'page', icon: 'doc' },
+          { href: '/evidence', label: '/evidence', kind: 'page', icon: 'doc' },
+          { href: '/citations', label: '/citations', kind: 'page', icon: 'doc' },
+          { href: '/persons-of-interest', label: '/poi', kind: 'page', icon: 'doc' },
+          { href: '/ai-dashboard', label: '/ai', kind: 'page', icon: 'ai' },
+          { href: '/global-search', label: '/search', kind: 'page', icon: 'doc' },
+          { href: '/admin/all-routes', label: '/all-routes', kind: 'endpoint', icon: 'endpoint' },
+          { href: '/terminal', label: '/terminal', kind: 'page', icon: 'endpoint' },
+          { href: '/analysis-center', label: '/analysis', kind: 'page', icon: 'ai' },
+          { href: '/system-configuration', label: '/config', kind: 'endpoint', icon: 'layout' },
+          { href: '/demos', label: '/demos', kind: 'layout', icon: 'layout' },
+          { href: '/command-center', label: '/cmd', kind: 'page', icon: 'endpoint' },
+        ] as route}
+          <a href={route.href} class="nes-nav-card">
+            <div class="nes-nav-icon">
+              {#if route.icon === 'endpoint'}
+                <svg viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="5" y="6" width="2" height="2" fill="currentColor"/><rect x="9" y="6" width="2" height="2" fill="currentColor"/><line x1="4" y1="10" x2="12" y2="10" stroke="currentColor" stroke-width="1"/></svg>
+              {:else if route.icon === 'layout'}
+                <svg viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="12" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="1" y1="5" x2="15" y2="5" stroke="currentColor" stroke-width="1"/><line x1="6" y1="5" x2="6" y2="14" stroke="currentColor" stroke-width="1"/></svg>
+              {:else if route.icon === 'ai'}
+                <svg viewBox="0 0 16 16"><circle cx="8" cy="6" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 12c0-2.2 1.8-4 4-4s4 1.8 4 4" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="6" y="1" width="4" height="2" fill="currentColor"/></svg>
+              {:else}
+                <svg viewBox="0 0 16 16"><rect x="3" y="1" width="10" height="14" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="5" y1="4" x2="11" y2="4" stroke="currentColor" stroke-width="1"/><line x1="5" y1="7" x2="11" y2="7" stroke="currentColor" stroke-width="1"/><line x1="5" y1="10" x2="9" y2="10" stroke="currentColor" stroke-width="1"/></svg>
+              {/if}
+            </div>
+            <span class="nes-nav-label">{route.label}</span>
+          </a>
+        {/each}
+      </div>
+    </div>
+
     <!-- Workspace -->
     <div class="mt-8">
       <WorkspacePanel workspaceId="dashboard" />
@@ -509,3 +548,90 @@
 <!-- Command Palette (Ctrl+K) -->
 <svelte:window onkeydown={handleGlobalKeydown} />
 <CommandPalette bind:open={showCommandPalette} />
+
+<style>
+  .nes-route-nav {
+    background: #0d0d2a;
+    border: 1px solid #2a2a5a;
+    border-radius: 6px;
+    overflow: hidden;
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+  }
+
+  .nes-nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid #2a2a5a;
+    background: #10102a;
+  }
+
+  .nes-nav-title {
+    font-size: 0.65rem;
+    color: #c0c0ff;
+    letter-spacing: 0.15em;
+    font-weight: bold;
+  }
+
+  .nes-nav-link {
+    font-size: 0.55rem;
+    color: #4040c0;
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    transition: color 0.15s;
+  }
+
+  .nes-nav-link:hover {
+    color: #c0c0ff;
+  }
+
+  .nes-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .nes-nav-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.6rem 0.4rem;
+    background: #10102a;
+    border: 1px solid #2a2a5a;
+    color: #c0c0ff;
+    text-decoration: none;
+    font-size: 0.5rem;
+    text-align: center;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+
+  .nes-nav-card:hover {
+    border-color: #4040c0;
+    background: #15153a;
+    box-shadow: 0 0 6px rgba(64, 64, 192, 0.2);
+  }
+
+  .nes-nav-icon {
+    width: 20px;
+    height: 20px;
+    color: #6060a0;
+  }
+
+  .nes-nav-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .nes-nav-label {
+    font-size: 0.5rem;
+    color: #c0c0ff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+</style>

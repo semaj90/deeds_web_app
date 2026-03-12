@@ -13,6 +13,17 @@ import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 import { logCodebaseSearch } from '$lib/server/analytics/event-logger.js';
+import { z } from 'zod';
+
+// Zod schema validates query, candidatePaths, weights, pathBoosts
+const rerankSchema = z.object({
+	query: z.string().min(1, 'Missing query string').max(5000),
+	candidatePaths: z.array(z.string().max(1000)).max(200).optional(),
+	limit: z.number().int().min(1).max(50).optional().default(10),
+	contentWeight: z.number().min(0).max(1).optional().default(0.6),
+	signatureWeight: z.number().min(0).max(1).optional().default(0.4),
+	pathBoosts: z.record(z.string(), z.number()).optional(),
+});
 
 interface RerankRequest {
 	query: string;
@@ -82,15 +93,15 @@ function applyPathBoosts(
 }
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-	const body = (await request.json()) as RerankRequest;
-
-	if (!body.query || typeof body.query !== 'string') {
-		throw error(400, 'Missing query string');
+	const parsed = rerankSchema.safeParse(await request.json());
+	if (!parsed.success) {
+		throw error(400, parsed.error.issues[0]?.message ?? 'Invalid request');
 	}
+	const body = parsed.data;
 
-	const limit = Math.min(body.limit ?? 10, 50);
-	const contentWeight = body.contentWeight ?? 0.6;
-	const signatureWeight = body.signatureWeight ?? 0.4;
+	const limit = body.limit;
+	const contentWeight = body.contentWeight;
+	const signatureWeight = body.signatureWeight;
 	const pathBoosts = body.pathBoosts ?? {
 		'+server.ts': 1.3,
 		'+page.server.ts': 1.2,

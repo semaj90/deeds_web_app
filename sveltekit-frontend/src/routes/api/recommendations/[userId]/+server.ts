@@ -25,6 +25,21 @@ import { eq, desc } from 'drizzle-orm';
 import { MultiModalRanker, type DocumentCandidate, type RankedDocument } from '$lib/server/ml/multi-modal-ranker.js';
 import { UserHistoryTracker } from '$lib/server/ml/user-history.js';
 import { getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
+import { z } from 'zod';
+
+// Zod schema validates POST body: interactionType enum, documentId, topicPreferences array
+const userInteractionSchema = z.object({
+	interactionType: z.enum(['view', 'click', 'save', 'share', 'dismiss']),
+	documentId: z.string().min(1, 'documentId is required').max(500),
+	recommendationId: z.string().max(500).optional(),
+	caseId: z.string().max(500).optional(),
+	durationSeconds: z.number().min(0).optional(),
+	searchContext: z.string().max(5000).optional(),
+	topicPreferences: z.array(z.object({
+		topicId: z.number(),
+		affinity: z.number().min(0).max(1),
+	})).max(50).optional(),
+});
 
 const QDRANT_URL = getQdrantUrl();
 const OLLAMA_URL = getOllamaUrl();
@@ -273,7 +288,14 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 			return json({ error: 'Forbidden' }, { status: 403 });
 		}
 
-		const body = await request.json();
+		// Zod schema validates interactionType enum (view|click|save|share|dismiss), documentId, topicPreferences
+		const parsed = userInteractionSchema.safeParse(await request.json());
+		if (!parsed.success) {
+			return json(
+				{ error: parsed.error.issues[0]?.message ?? 'Invalid request' },
+				{ status: 400 }
+			);
+		}
 		const {
 			interactionType,
 			documentId,
@@ -282,22 +304,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 			durationSeconds,
 			searchContext,
 			topicPreferences
-		} = body;
-
-		if (!interactionType || !documentId) {
-			return json(
-				{ error: 'interactionType and documentId are required' },
-				{ status: 400 }
-			);
-		}
-
-		const validTypes = ['view', 'click', 'save', 'share', 'dismiss'];
-		if (!validTypes.includes(interactionType)) {
-			return json(
-				{ error: `interactionType must be one of: ${validTypes.join(', ')}` },
-				{ status: 400 }
-			);
-		}
+		} = parsed.data;
 
 		const tracker = new UserHistoryTracker(userId);
 

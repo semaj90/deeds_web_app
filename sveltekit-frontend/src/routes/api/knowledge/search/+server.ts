@@ -12,6 +12,14 @@ import { getKnowledgeSearcher } from '$lib/services/knowledge-search';
 import type { SearchRequest } from '$lib/services/knowledge-search/types';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import { z } from 'zod';
+
+// Zod schema validates query (trimmed, 1-500), topK (1-100), llmProvider enum
+const knowledgeSearchSchema = z.object({
+  query: z.string().trim().min(1, 'Query cannot be empty').max(500, 'Query too long (max 500 characters)'),
+  topK: z.number().int().min(1).max(100).optional(),
+  llmProvider: z.enum(['ollama', 'gemini', 'claude']).optional(),
+}).passthrough();
 
 interface SourceResult {
   id: string;
@@ -42,51 +50,11 @@ function tfidfScore(query: string, text: string): number {
 
 export const POST: RequestHandler = async ({ request, fetch }) => {
   try {
-    const body = (await request.json()) as SearchRequest;
-
-    // Validate required fields
-    if (!body?.query|| typeof body.query !== 'string') {
-      return json(
-        { error: 'Query is required and must be a string' },
-        { status: 400 }
-      );
+    const parsed = knowledgeSearchSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
     }
-
-    // Validate query length
-    if (body.query.trim().length === 0) {
-      return json(
-        { error: 'Query cannot be empty' },
-        { status: 400 }
-      );
-    }
-
-    if (body.query.length > 500) {
-      return json(
-        { error: 'Query too long (max 500 characters)' },
-        { status: 400 }
-      );
-    }
-
-    // Validate topK
-    if (body.topK !== undefined) {
-      if (typeof body.topK !== 'number' || body.topK < 1 || body.topK > 100) {
-        return json(
-          { error: 'topK must be a number between 1 and 100' },
-          { status: 400 }
-        );
-      }
-    }
-
-    // Validate llmProvider
-    if (body.llmProvider !== undefined) {
-      const validProviders = ['ollama', 'gemini', 'claude'];
-      if (!validProviders.includes(body.llmProvider)) {
-        return json(
-          { error: `llmProvider must be one of: ${validProviders.join(', ')}` },
-          { status: 400 }
-        );
-      }
-    }
+    const body = parsed.data as SearchRequest & Record<string, unknown>;
 
     // Execute search — parallel across KnowledgeSearcher (Qdrant) + 3 legal sources
     const searcher = getKnowledgeSearcher();
