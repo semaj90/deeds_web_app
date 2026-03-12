@@ -1,20 +1,26 @@
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const memoSkeletonSchema = z.object({
+	facts: z.string().max(50000).optional().default(''),
+	statutes: z.string().max(50000).optional().default(''),
+	notes: z.array(z.string().max(5000)).max(50).optional().default([])
+}).refine(d => d.facts.trim() || d.statutes.trim(), {
+	message: 'No facts or statutes provided'
+});
 
 /** POST /api/ai/memo-skeleton — Generate legal memo outline (SSE streaming) */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
-		const facts = body.facts || '';
-		const statutes = body.statutes || '';
-		const notes = Array.isArray(body.notes) ? body.notes : [];
-
-		if (!facts.trim() && !statutes.trim()) {
-			return new Response('data: {"error":"No facts or statutes provided"}\n\n', {
+		const parsed = memoSkeletonSchema.safeParse(await request.json());
+		if (!parsed.success) {
+			return new Response(`data: ${JSON.stringify({ error: parsed.error.issues[0]?.message ?? 'Invalid input' })}\n\n`, {
 				status: 400,
 				headers: { 'Content-Type': 'text/event-stream' }
 			});
 		}
+		const { facts, statutes, notes } = parsed.data;
 
 		const systemPrompt = `You are a legal memo drafting assistant. Generate a structured legal memorandum outline.
 Include: Issue, Rule, Application, and Conclusion (IRAC format).

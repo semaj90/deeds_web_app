@@ -1,18 +1,25 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const legalResearchSchema = z.object({
+	topic: z.string().max(10000).optional().default(''),
+	query: z.string().max(10000).optional().default(''),
+	jurisdiction: z.string().max(100).optional().default('general'),
+	depth: z.string().max(50).optional().default('standard')
+}).refine(d => (d.topic.trim() || d.query.trim()), {
+	message: 'Research topic is required'
+});
 
 /** POST /api/ai/legal-research — Automated legal research with citations */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
-		const topic = body.topic || body.query || '';
-		const jurisdiction = body.jurisdiction || 'general';
-		const depth = body.depth || 'standard';
-
-		if (!topic.trim()) {
-			return json({ error: 'Research topic is required' }, { status: 400 });
-		}
+		const parsed = legalResearchSchema.safeParse(await request.json());
+		if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		const topic = parsed.data.topic || parsed.data.query || '';
+		const jurisdiction = parsed.data.jurisdiction;
+		const depth = parsed.data.depth;
 
 		const systemPrompt = `You are a legal research assistant. Provide thorough legal research on the given topic.
 Include: relevant statutes, case law references, legal principles, and practical implications.

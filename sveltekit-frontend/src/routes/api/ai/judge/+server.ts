@@ -1,6 +1,19 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const judgeSchema = z.object({
+	caseId: z.string().max(500).nullable().optional(),
+	evidence: z.array(z.object({
+		id: z.string().max(500),
+		title: z.string().max(1000),
+		description: z.string().max(5000).optional(),
+		content: z.string().max(50000).optional()
+	})).min(1, 'No evidence provided for judicial analysis').max(20),
+	charges: z.array(z.string().max(500)).max(50).optional().default([]),
+	jurisdiction: z.string().max(100).optional().default('federal')
+});
 
 /**
  * POST /api/ai/judge — Mock Trial Wizard (Phoenix Wright-style)
@@ -11,16 +24,9 @@ import { ENV } from '$lib/server/env.server.js';
  */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
-		const caseId = body.caseId || null;
-		const evidence: Array<{ id: string; title: string; description?: string; content?: string }> =
-			Array.isArray(body.evidence) ? body.evidence : [];
-		const charges: string[] = Array.isArray(body.charges) ? body.charges : [];
-		const jurisdiction: string = body.jurisdiction || 'federal';
-
-		if (evidence.length === 0) {
-			return json({ error: 'No evidence provided for judicial analysis' }, { status: 400 });
-		}
+		const parsed = judgeSchema.safeParse(await request.json());
+		if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		const { caseId, evidence, charges, jurisdiction } = parsed.data;
 
 		const evidenceList = evidence
 			.slice(0, 10)

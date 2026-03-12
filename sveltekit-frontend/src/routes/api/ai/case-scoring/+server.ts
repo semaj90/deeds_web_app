@@ -1,12 +1,18 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
+import { z } from 'zod';
+
+const caseScoringSchema = z.object({
+	caseId: z.string().min(1, 'caseId required').max(500)
+});
 
 /** POST /api/ai/case-scoring — Evidence-weighted case strength scoring */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const { caseId } = await request.json();
-		if (!caseId) return json({ error: 'caseId required' }, { status: 400 });
+		const parsed = caseScoringSchema.safeParse(await request.json());
+		if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		const { caseId } = parsed.data;
 
 		const { cases, evidence, personsOfInterest } = await import('$lib/server/db/schema');
 		const { eq, count, sql } = await import('drizzle-orm');
