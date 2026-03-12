@@ -1,19 +1,33 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const contextualChatSchema = z.object({
+	message: z.string().max(50000).optional(),
+	query: z.string().max(50000).optional(),
+	caseId: z.string().max(500).optional().default(''),
+	context: z.string().max(10000).optional().default(''),
+	history: z.array(z.object({
+		role: z.string().max(50),
+		content: z.string().max(50000)
+	})).max(50).optional().default([])
+}).refine(d => (d.message?.trim() || d.query?.trim()), {
+	message: 'Message is required'
+});
 
 /** POST /api/ai/contextual-chat — Case-context-aware chat */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
-		const message = body.message || body.query || '';
-		const caseId = body.caseId || '';
-		const context = body.context || '';
-		const history = body.history || [];
-
-		if (!message.trim()) {
-			return json({ error: 'Message is required' }, { status: 400 });
+		const raw = await request.json();
+		const parsed = contextualChatSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
+		const message = parsed.data.message || parsed.data.query || '';
+		const caseId = parsed.data.caseId;
+		const context = parsed.data.context;
+		const history = parsed.data.history;
 
 		const systemPrompt = caseId
 			? `You are a legal AI assistant working on case ${caseId}. ${context ? `Context: ${String(context).slice(0, 4000)}` : ''} Provide concise, professional legal analysis.`

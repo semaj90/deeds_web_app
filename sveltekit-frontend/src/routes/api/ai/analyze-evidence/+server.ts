@@ -1,18 +1,23 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const analyzeEvidenceSchema = z.object({
+	evidenceId: z.string().max(500).optional().default(''),
+	text: z.string().trim().min(1, 'No evidence text provided').max(100000),
+	metadata: z.any().optional().default({})
+});
 
 /** POST /api/ai/analyze-evidence — Analyze evidence text and return structured insights */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
-		const evidenceId = body.evidenceId || '';
-		const text = body.text || '';
-		const metadata = body.metadata || {};
-
-		if (!text.trim()) {
-			return json({ error: 'No evidence text provided' }, { status: 400 });
+		const raw = await request.json();
+		const parsed = analyzeEvidenceSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
+		const { evidenceId, text, metadata } = parsed.data;
 
 		const systemPrompt = `You are a legal evidence analyst. Analyze the provided evidence text and return structured analysis.
 Respond in JSON format:

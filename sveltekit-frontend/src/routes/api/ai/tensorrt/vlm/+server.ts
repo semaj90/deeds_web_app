@@ -11,6 +11,14 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const vlmJsonSchema = z.object({
+	prompt: z.string().max(50000).optional().default(''),
+	imageBase64: z.string().max(50_000_000).optional(),
+	maxTokens: z.number().int().min(1).max(8192).optional(),
+	temperature: z.number().min(0).max(2).optional()
+});
 
 const getTritonUrl = () => ENV.TENSORRT_URL ?? 'http://localhost:8099';
 
@@ -85,7 +93,12 @@ export const POST: RequestHandler = async ({ request }) => {
 			temperature: parseFloat(formData.get('temperature') as string) || undefined
 		};
 	} else {
-		body = await request.json();
+		const rawJson = await request.json();
+		const jsonParsed = vlmJsonSchema.safeParse(rawJson);
+		if (!jsonParsed.success) {
+			return json({ error: jsonParsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		}
+		body = jsonParsed.data as VlmRequest;
 	}
 
 	const { prompt, imageBase64, maxTokens = 2048, temperature = 0.7 } = body;

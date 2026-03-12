@@ -20,6 +20,8 @@ const OLLAMA_URL = getOllamaUrl();
 
 const analyzeFileSchema = z.object({
 	filePath: z.string().min(1, 'filePath is required').max(1000)
+		.refine(p => !p.includes('..'), 'Path traversal not allowed')
+		.refine(p => !p.startsWith('/'), 'Absolute paths not allowed')
 });
 
 export async function POST({ request }: RequestEvent) {

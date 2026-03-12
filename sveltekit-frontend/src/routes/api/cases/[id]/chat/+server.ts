@@ -3,6 +3,20 @@ import { db } from '$lib/server/db/client';
 import { chatMessages } from '$lib/server/db/schema-postgres';
 import { chatMetadata } from '$lib/server/db/schema-chat';
 import { eq, and } from 'drizzle-orm';
+import { z } from 'zod';
+
+const chatMessageItemSchema = z.object({
+	role: z.enum(['user', 'assistant', 'system']),
+	content: z.string().max(50000),
+	metadata: z.record(z.string(), z.unknown()).optional(),
+	timestamp: z.string().max(100).optional()
+});
+
+const caseChatSchema = z.object({
+	chatId: z.string().min(1, 'chatId is required').max(500),
+	messages: z.array(chatMessageItemSchema).min(1, 'At least one message required').max(100),
+	metadata: z.record(z.string(), z.unknown()).optional()
+});
 
 /**
  * POST /api/cases/[id]/chat
@@ -17,12 +31,12 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 			return json({ error: 'Unauthorized' }, { status: 401 });
 		}
 
-		const body = await request.json();
-		const { chatId, messages, metadata } = body;
-
-		if (!chatId || !messages || !Array.isArray(messages)) {
-			return json({ error: 'Invalid request body' }, { status: 400 });
+		const raw = await request.json();
+		const parsed = caseChatSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
+		const { chatId, messages, metadata } = parsed.data;
 
 		// Save each message to the database
 		const savedMessages = [];

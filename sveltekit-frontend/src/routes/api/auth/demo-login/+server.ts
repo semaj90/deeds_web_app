@@ -4,6 +4,12 @@ import { createUserSession, setSessionCookie } from '$lib/server/lucia';
 import { error, json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
+
+const demoLoginSchema = z.object({
+	email: z.string().email().max(255).optional().default('demo@legal-ai.local'),
+	role: z.string().max(50).optional().default('admin')
+});
 
 /**
  * POST /api/auth/demo-login
@@ -18,8 +24,12 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			throw error(403, 'Demo login is disabled in production');
 		}
 
-		const body = await request.json();
-		const { email = 'demo@legal-ai.local', role = 'admin' } = body;
+		const raw = await request.json();
+		const parsed = demoLoginSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		}
+		const { email, role } = parsed.data;
 
 		// Get or create demo user
 		let user = await db

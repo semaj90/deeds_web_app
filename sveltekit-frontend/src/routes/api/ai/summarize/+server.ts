@@ -1,17 +1,26 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const aiSummarizeSchema = z.object({
+	text: z.string().max(50000).optional(),
+	content: z.string().max(50000).optional(),
+	maxLength: z.number().int().min(50).max(5000).optional().default(500)
+}).refine(d => (d.text?.trim() || d.content?.trim()), {
+	message: 'Text is required'
+});
 
 /** POST /api/ai/summarize — Summarize legal text */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
-		const text = body.text || body.content || '';
-		const maxLength = body.maxLength || 500;
-
-		if (!text.trim()) {
-			return json({ error: 'Text is required' }, { status: 400 });
+		const raw = await request.json();
+		const parsed = aiSummarizeSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
+		const text = parsed.data.text || parsed.data.content || '';
+		const maxLength = parsed.data.maxLength;
 
 		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
 			method: 'POST',

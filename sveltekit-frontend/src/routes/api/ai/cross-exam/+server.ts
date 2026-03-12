@@ -1,13 +1,26 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const crossExamSchema = z.object({
+	witness: z.object({
+		name: z.string().max(500).optional(),
+		statement: z.string().max(50000).optional()
+	}).optional().default({}),
+	caseContext: z.string().max(50000).optional().default('')
+});
 
 /** POST /api/ai/cross-exam — Generate cross-examination questions for a witness */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
-		const witness = body.witness || {};
-		const caseContext = body.caseContext || '';
+		const raw = await request.json();
+		const validated = crossExamSchema.safeParse(raw);
+		if (!validated.success) {
+			return json({ error: validated.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		}
+		const witness = validated.data.witness;
+		const caseContext = validated.data.caseContext;
 
 		const witnessName = witness.name || 'Unknown Witness';
 		const witnessStatement = witness.statement || '';

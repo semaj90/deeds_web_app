@@ -1,20 +1,31 @@
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const routeIntentSchema = z.object({
+	query: z.string().max(10000).optional().default(''),
+	statute: z.object({
+		id: z.string().max(500).optional(),
+		titleNumber: z.string().max(100).optional(),
+		section: z.string().max(500).optional()
+	}).optional().default({}),
+	userQuestion: z.string().max(10000).optional().default('')
+}).refine(d => d.query.trim() || d.userQuestion.trim(), {
+	message: 'No query provided'
+});
 
 /** POST /api/ai/route-intent — Analyze statute intent and provide legal explanation (SSE streaming) */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
-		const query = body.query || '';
-		const statute = body.statute || {};
-		const userQuestion = body.userQuestion || '';
-
-		if (!query.trim() && !userQuestion.trim()) {
-			return new Response('data: {"error":"No query provided"}\n\n', {
+		const raw = await request.json();
+		const parsed = routeIntentSchema.safeParse(raw);
+		if (!parsed.success) {
+			return new Response(`data: ${JSON.stringify({ error: parsed.error.issues[0]?.message ?? 'Invalid input' })}\n\n`, {
 				status: 400,
 				headers: { 'Content-Type': 'text/event-stream' }
 			});
 		}
+		const { query, statute, userQuestion } = parsed.data;
 
 		const systemPrompt = `You are a legal analysis assistant specializing in statutory interpretation.
 Provide clear, thorough analysis of statutes including: legislative intent, key definitions,

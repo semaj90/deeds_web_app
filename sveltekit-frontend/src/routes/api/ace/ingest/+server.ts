@@ -6,6 +6,13 @@ import { createHash } from 'crypto';
 import { db } from '$lib/server/db/client';
 import { yorhaEvidenceNodes, yorhaEvidenceConnections } from '$lib/server/db/schema-postgres.js';
 import { sql } from 'drizzle-orm';
+import { z } from 'zod';
+
+const aceIngestSchema = z.object({
+	url: z.string().min(1, 'url is required').max(5000),
+	caseId: z.string().max(200).optional(),
+	title: z.string().max(500).optional()
+});
 
 /**
  * POST /api/ace/ingest
@@ -26,12 +33,12 @@ export const POST: RequestHandler = async ({ request, url: reqUrl, locals }) => 
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
-	const body = await request.json();
-	const { url, caseId, title } = body as { url?: string; caseId?: string; title?: string };
-
-	if (!url || typeof url !== 'string') {
-		return json({ error: 'url is required' }, { status: 400 });
+	const rawBody = await request.json();
+	const ingestParsed = aceIngestSchema.safeParse(rawBody);
+	if (!ingestParsed.success) {
+		return json({ error: ingestParsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	}
+	const { url, caseId, title } = ingestParsed.data;
 
 	// Basic URL validation
 	let parsed: URL;

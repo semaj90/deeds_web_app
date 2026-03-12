@@ -8,6 +8,13 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { redis } from '$lib/server/redis.js';
+import { z } from 'zod';
+
+const recentQuerySchema = z.object({
+	query: z.string().min(1, 'query is required').max(5000),
+	cached: z.boolean().optional(),
+	responseTime: z.number().min(0).max(300000).optional()
+});
 
 const RECENT_KEY = 'cache:recent_queries';
 const MAX_RECENT = 20;
@@ -38,12 +45,12 @@ export const GET: RequestHandler = async () => {
 /** POST to record a new query (called internally by search endpoints) */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
-		const { query, cached, responseTime } = body;
-
-		if (!query) {
-			return json({ success: false, error: 'query is required' }, { status: 400 });
+		const raw = await request.json();
+		const parsed = recentQuerySchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
+		const { query, cached, responseTime } = parsed.data;
 
 		const entry = JSON.stringify({ query, cached: !!cached, responseTime: responseTime ?? 0 });
 		const score = Date.now();
