@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { getOllamaUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 
 const OLLAMA_URL = getOllamaUrl();
 
@@ -10,14 +11,18 @@ const OLLAMA_URL = getOllamaUrl();
  * Body: { text: string }
  * Returns: { summary, confidence, model }
  */
+const summarizeSchema = z.object({
+	text: z.string().trim().min(10, 'Text too short to summarize').max(50000)
+});
+
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
-		const text = body?.text?.trim();
-
-		if (!text || text.length < 10) {
-			return json({ error: 'Text too short to summarize' }, { status: 400 });
+		const raw = await request.json();
+		const parsed = summarizeSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
+		const text = parsed.data.text;
 
 		const res = await fetch(`${OLLAMA_URL}/api/generate`, {
 			method: 'POST',

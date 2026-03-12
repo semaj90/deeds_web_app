@@ -3,6 +3,20 @@ import { personsOfInterest } from '$lib/db/schema';
 import { error, json } from '@sveltejs/kit';
 import { and, desc, eq, arrayContains } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
+
+const THREAT_LEVELS = ['low', 'medium', 'high', 'critical'] as const;
+const POI_STATUSES = ['active', 'inactive', 'cleared', 'unknown'] as const;
+
+const personCreateSchema = z.object({
+	caseId: z.string().uuid('Invalid caseId'),
+	name: z.string().min(1, 'Name is required').max(500),
+	aliases: z.array(z.string().max(200)).max(50).optional().default([]),
+	description: z.string().max(10000).optional().default(''),
+	threatLevel: z.enum(THREAT_LEVELS).optional().default('low'),
+	status: z.enum(POI_STATUSES).optional().default('active'),
+	relationship: z.string().max(200).optional().default('person_of_interest')
+});
 
 /**
  * GET /api/persons
@@ -64,26 +78,22 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	}
 
 	try {
-		const body = await request.json();
-
-		if (!body?.caseId || !body.name) {
-			throw error(400, 'Missing required fields: caseId, name');
+		const raw = await request.json();
+		const parsed = personCreateSchema.safeParse(raw);
+		if (!parsed.success) {
+			throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
 		}
+		const body = parsed.data;
 
 		const newPerson = await db.insert(personsOfInterest)
 			.values({
-				caseIds: [body.caseId], // Store as array
-                name: body.name,
-                aliases: body.aliases || [], // Ensure array
-				description: body.description ?? '',
-				threatLevel: body.threatLevel ?? 'low',
-                status: body.status ?? 'active',
-                // flagged column removed as it's not in schema
-                // tags: body.tags || [], // tags not in schema snippet either? Let's check.
-                // Step 2862 snippet lines 316-355: name, aliases, description, threatLevel, status, relationship, aiProfile...
-                // NO TAGS.
-                // So remove tags too.
-                relationship: body.relationship ?? 'person_of_interest',
+				caseIds: [body.caseId],
+				name: body.name,
+				aliases: body.aliases,
+				description: body.description,
+				threatLevel: body.threatLevel,
+				status: body.status,
+				relationship: body.relationship,
 				createdAt: new Date(),
 				updatedAt: new Date()
 			})

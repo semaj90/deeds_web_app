@@ -1,14 +1,32 @@
 import { json } from '@sveltejs/kit';
 import { pipelineOrchestrator } from '$lib/server/services/pipeline-orchestrator';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
+
+const pipelineDataSchema = z.object({
+    doc_id: z.string().max(500).optional(),
+    case_id: z.string().max(500).optional(),
+    content: z.string().max(5_000_000).optional(),
+    tags: z.array(z.string().max(200)).max(50).optional(),
+});
+
+const pipelineRunSchema = pipelineDataSchema.extend({
+    pipeline_config: z.record(z.string(), z.unknown()).optional(),
+    data: pipelineDataSchema.optional()
+});
 
 export const POST: RequestHandler = async ({ request, locals }) => {
     // Basic Auth Check (assuming locals.user populated by hooks)
     // if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
     try {
-        const body = await request.json();
-        const { doc_id, case_id, pipeline_config, data } = body;
+        const raw = await request.json();
+        const parsed = pipelineRunSchema.safeParse(raw);
+        if (!parsed.success) {
+            return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+        }
+        const body = parsed.data;
+        const { doc_id, case_id, data } = body;
 
         // Support wrapping in 'data' prop as per test spec
         const payload = data || body;

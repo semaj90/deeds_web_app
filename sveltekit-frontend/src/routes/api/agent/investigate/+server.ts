@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createAutonomousAgent } from '$lib/server/agent/autonomous-agent.js';
+import { z } from 'zod';
 
 /**
  * POST /api/agent/investigate
@@ -41,31 +42,22 @@ import { createAutonomousAgent } from '$lib/server/agent/autonomous-agent.js';
  * - rag_search: Semantic search via RAG pipeline
  * - ast_query: AST code structure analysis
  */
+const investigateSchema = z.object({
+	query: z.string().min(1, 'Query is required and must be a non-empty string').max(10000),
+	useACE: z.boolean().optional().default(true),
+	maxIterations: z.number().int().min(1, 'maxIterations must be between 1 and 50').max(50, 'maxIterations must be between 1 and 50').optional().default(10),
+	caseId: z.string().max(500).optional(),
+	verbose: z.boolean().optional().default(false)
+});
+
 export const POST: RequestHandler = async ({ request, locals }) => {
 	try {
-		const body = await request.json();
-		const {
-			query,
-			useACE = true,
-			maxIterations = 10,
-			caseId,
-			verbose = false
-		}: {
-			query: string;
-			useACE?: boolean;
-			maxIterations?: number;
-			caseId?: string;
-			verbose?: boolean;
-		} = body;
-
-		// Validation
-		if (!query || typeof query !== 'string' || query.trim().length === 0) {
-			return error(400, { message: 'Query is required and must be a non-empty string' });
+		const raw = await request.json();
+		const parsed = investigateSchema.safeParse(raw);
+		if (!parsed.success) {
+			return error(400, { message: parsed.error.issues[0]?.message ?? 'Invalid input' });
 		}
-
-		if (maxIterations < 1 || maxIterations > 50) {
-			return error(400, { message: 'maxIterations must be between 1 and 50' });
-		}
+		const { query, useACE, maxIterations, caseId, verbose } = parsed.data;
 
 		// Create autonomous agent with user context
 		const agent = createAutonomousAgent({

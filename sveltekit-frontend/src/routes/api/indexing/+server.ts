@@ -15,6 +15,7 @@ import { Client as MinIOClient } from 'minio';
 import path from 'path';
 import postgres from 'postgres';
 import { getQdrantUrl, getOllamaUrl, getMinioConfig, getDatabaseUrl } from '$lib/config/env.server.js';
+import { z } from 'zod';
 // Configuration
 const _minioEnv = getMinioConfig();
 const CONFIG = {
@@ -132,6 +133,15 @@ function chunkFileContent(content: string, chunkSize: number = 500, overlap: num
   return chunks;
 }
 
+const indexCodebaseSchema = z.object({
+  rootPath: z.string().max(500).optional().default('./src')
+});
+
+const indexSearchSchema = z.object({
+  query: z.string().min(1, 'query is required').max(5000),
+  limit: z.number().int().min(1).max(100).optional().default(5)
+});
+
 // POST /api/indexing
 
 export const POST: RequestHandler = async ({ request, url }) => {
@@ -141,8 +151,12 @@ export const POST: RequestHandler = async ({ request, url }) => {
   // Index Codebase
   if (pathname === '/api/indexing/codebase' || action === 'codebase') {
     try {
-      const body = await request.json();
-      const rootPath = body?.rootPath ?? './src';
+      const raw = await request.json();
+      const parsed = indexCodebaseSchema.safeParse(raw);
+      if (!parsed.success) {
+        return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+      }
+      const rootPath = parsed.data.rootPath;
 
       const minio = getMinIOClient();
 
@@ -374,8 +388,12 @@ Phase: Phase 66-79 Error Analysis`.trim();
   // Search Codebase
   if (pathname === '/api/indexing/search' || action === 'search') {
     try {
-      const body = await request.json();
-      const { query, limit = 5 } = body;
+      const raw = await request.json();
+      const parsed = indexSearchSchema.safeParse(raw);
+      if (!parsed.success) {
+        return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+      }
+      const { query, limit } = parsed.data;
 
       const embedding = await generateEmbedding(query);
 
@@ -421,8 +439,12 @@ Phase: Phase 66-79 Error Analysis`.trim();
   // Search Error Patterns
   if (pathname === '/api/indexing/search-errors' || action === 'search-errors') {
     try {
-      const body = await request.json();
-      const { query, limit = 5 } = body;
+      const raw = await request.json();
+      const parsed = indexSearchSchema.safeParse(raw);
+      if (!parsed.success) {
+        return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+      }
+      const { query, limit } = parsed.data;
 
       const embedding = await generateEmbedding(query);
 

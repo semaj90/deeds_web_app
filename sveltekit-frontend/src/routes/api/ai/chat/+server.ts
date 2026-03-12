@@ -1,20 +1,38 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const chatMessageSchema = z.object({
+	role: z.enum(['user', 'assistant', 'system']),
+	content: z.string().max(10000)
+});
+
+const aiChatSchema = z.object({
+	message: z.string().max(10000).optional(),
+	prompt: z.string().max(10000).optional(),
+	caseId: z.string().uuid().optional(),
+	temperature: z.number().min(0).max(2).optional().default(0.7),
+	history: z.array(chatMessageSchema).max(50).optional().default([])
+}).refine(
+	(d) => (d.message?.trim() || d.prompt?.trim()),
+	{ message: 'Message is required' }
+);
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 /** POST /api/ai/chat — Simple JSON chat endpoint (non-streaming) */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
+		const raw = await request.json();
+		const parsed = aiChatSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		}
+		const body = parsed.data;
 		const message = body.message || body.prompt || '';
 		const caseId = body.caseId || '';
-		const temperature = body.temperature ?? 0.7;
-
-		if (!message.trim()) {
-			return json({ error: 'Message is required' }, { status: 400 });
-		}
+		const temperature = body.temperature;
 
 		const systemPrompt = caseId
 			? `You are a legal AI assistant for case ${caseId}. Provide concise, professional legal analysis.`

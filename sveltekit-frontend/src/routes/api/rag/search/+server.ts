@@ -126,24 +126,25 @@ export const POST: RequestHandler = async ({ request, url }) => {
 	const startTime = performance.now();
 
 	try {
-		const body: RetrieveCandidatesRequest & { precomputedEmbedding?: number[] } = await request.json();
+		const raw = await request.json();
+		const parsed = ragSearchSchema.safeParse(raw);
+		if (!parsed.success) {
+			return apiResponses.badRequest(parsed.error.issues[0]?.message ?? 'Invalid input');
+		}
+		const body = parsed.data;
 		const {
 			query,
-			top_k = 10,
-			min_score = 0.3,
-			use_hybrid = false,
-			use_rerank = false,
-			scoring_method = "hybrid",
+			top_k,
+			min_score,
+			use_hybrid,
+			use_rerank,
+			scoring_method,
 			userId,
 			caseId,
 			conversationId,
-			enableACE = false,
+			enableACE,
 			precomputedEmbedding
 		} = body;
-
-		if (!query?.trim()) {
-			return apiResponses.badRequest('query is required');
-		}
 
 		// 0. Check vector result cache (Memory → Redis) for identical query+options
 		const cacheOptions = { limit: top_k, threshold: min_score, documentType: caseId };

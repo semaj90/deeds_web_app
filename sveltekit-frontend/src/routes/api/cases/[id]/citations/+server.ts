@@ -2,6 +2,7 @@ import { caseStatuteLinks, citations, cases, db } from '$lib/server/db/client';
 import { error, json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 
 /**
  * GET /api/cases/[id]/citations
@@ -36,6 +37,12 @@ export const GET: RequestHandler = async ({ locals, params }) => {
 	}
 };
 
+const caseCitationSchema = z.object({
+	citation_id: z.string().min(1, 'citation_id is required').max(500),
+	link_type: z.enum(['CHARGED_UNDER', 'CITED_IN', 'RELATED_TO', 'OVERRULED_BY', 'AFFIRMED_BY']).optional().default('CITED_IN'),
+	notes: z.string().max(5000).optional()
+});
+
 /**
  * POST /api/cases/[id]/citations
  * Link an existing citation to a case
@@ -49,11 +56,12 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 	const caseId = params.id;
 
 	try {
-		const body = await request.json();
-
-		if (!body?.citation_id?.trim()) {
-			throw error(400, 'Missing required field: citation_id');
+		const raw = await request.json();
+		const parsed = caseCitationSchema.safeParse(raw);
+		if (!parsed.success) {
+			throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
 		}
+		const body = parsed.data;
 
 		// Verify case exists
 		const [targetCase] = await db

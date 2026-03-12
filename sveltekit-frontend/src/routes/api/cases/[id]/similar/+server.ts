@@ -31,6 +31,13 @@ import { MultiModalRanker } from '$lib/server/ml/multi-modal-ranker.js';
 import { UserHistoryTracker } from '$lib/server/ml/user-history.js';
 import { ENV } from '$lib/server/env.server.js';
 import { computeCentralityForNodes } from '$lib/server/graph/graph-centrality.js';
+import { z } from 'zod';
+
+const caseSimilarQuerySchema = z.object({
+	limit: z.coerce.number().int().min(1).max(100).optional().default(10),
+	includeEmbedding: z.string().optional().default('false').transform(v => v === 'true'),
+	triggerGraph: z.string().optional().default('true').transform(v => v !== 'false')
+});
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
@@ -79,9 +86,16 @@ interface SimilarityResponse {
 export const GET: RequestHandler = async ({ params, url, locals }) => {
 	const startTime = performance.now();
 	const caseId = params.id;
-	const limit = parseInt(url.searchParams.get('limit') || '10', 10);
-	const includeEmbedding = url.searchParams.get('includeEmbedding') === 'true';
-	const triggerGraph = url.searchParams.get('triggerGraph') !== 'false'; // default true
+
+	const queryParsed = caseSimilarQuerySchema.safeParse({
+		limit: url.searchParams.get('limit') ?? undefined,
+		includeEmbedding: url.searchParams.get('includeEmbedding') ?? undefined,
+		triggerGraph: url.searchParams.get('triggerGraph') ?? undefined
+	});
+	if (!queryParsed.success) {
+		return json({ error: queryParsed.error.issues[0]?.message ?? 'Invalid query parameters' }, { status: 400 });
+	}
+	const { limit, includeEmbedding, triggerGraph } = queryParsed.data;
 	const userId = (locals as any).user?.id ?? null;
 
 	try {

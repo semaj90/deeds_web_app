@@ -49,12 +49,12 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 export const POST: RequestHandler = async ({ params, locals, request }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 
-	const body = await request.json();
-	const { fromEvidenceId, toEvidenceId, connectionType, label, notes, strength } = body;
-
-	if (!fromEvidenceId || !toEvidenceId) {
-		throw error(400, 'Missing fromEvidenceId or toEvidenceId');
+	const raw = await request.json();
+	const parsed = connectionCreateSchema.safeParse(raw);
+	if (!parsed.success) {
+		throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
 	}
+	const { fromEvidenceId, toEvidenceId, connectionType, label, notes, strength } = parsed.data;
 
 	const [connection] = await db
 		.insert(evidenceBoardConnections)
@@ -80,10 +80,12 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
 export const PATCH: RequestHandler = async ({ params, locals, request }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 
-	const body = await request.json();
-	const { connectionId, label, notes, strength, connectionType, isVisible } = body;
-
-	if (!connectionId) throw error(400, 'Missing connectionId');
+	const raw = await request.json();
+	const parsed = connectionUpdateSchema.safeParse(raw);
+	if (!parsed.success) {
+		throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
+	}
+	const { connectionId, label, notes, strength, connectionType, isVisible } = parsed.data;
 
 	const updates: Record<string, unknown> = {};
 	if (label !== undefined) updates.label = label;
@@ -119,10 +121,12 @@ export const PATCH: RequestHandler = async ({ params, locals, request }) => {
 export const DELETE: RequestHandler = async ({ params, locals, request }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 
-	const body = await request.json();
-	const { connectionId } = body;
-
-	if (!connectionId) throw error(400, 'Missing connectionId');
+	const raw = await request.json();
+	const parsed = connectionDeleteSchema.safeParse(raw);
+	if (!parsed.success) {
+		throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
+	}
+	const { connectionId } = parsed.data;
 
 	const [deleted] = await db
 		.delete(evidenceBoardConnections)

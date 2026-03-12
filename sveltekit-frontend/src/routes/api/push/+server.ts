@@ -1,5 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { getVapidPublicKey, sendNotification } from '$lib/server/notifications/push-service';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
@@ -14,6 +15,20 @@ export const GET: RequestHandler = async () => {
 	});
 };
 
+const pushSubscribeSchema = z.object({
+	subscription: z.object({
+		endpoint: z.string().min(1).max(2000),
+		keys: z.object({
+			p256dh: z.string().min(1).max(500),
+			auth: z.string().min(1).max(500)
+		})
+	})
+});
+
+const pushUnsubscribeSchema = z.object({
+	endpoint: z.string().min(1, 'Missing endpoint').max(2000)
+});
+
 /**
  * POST /api/push
  * Subscribe to push notifications (stores subscription in DB)
@@ -25,12 +40,12 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	}
 
 	try {
-		const body = await request.json();
-		const subscription = body.subscription;
-
-		if (!subscription?.endpoint || !subscription?.keys?.p256dh || !subscription?.keys?.auth) {
-			throw error(400, 'Invalid push subscription: missing endpoint or keys');
+		const raw = await request.json();
+		const parsed = pushSubscribeSchema.safeParse(raw);
+		if (!parsed.success) {
+			throw error(400, parsed.error.issues[0]?.message ?? 'Invalid push subscription');
 		}
+		const subscription = parsed.data.subscription;
 
 		// Upsert subscription into push_subscriptions table
 		await db.execute(sql`
@@ -60,13 +75,14 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 	}
 
 	try {
-		const body = await request.json();
-		if (!body?.endpoint) {
-			throw error(400, 'Missing endpoint');
+		const raw = await request.json();
+		const parsed = pushUnsubscribeSchema.safeParse(raw);
+		if (!parsed.success) {
+			throw error(400, parsed.error.issues[0]?.message ?? 'Missing endpoint');
 		}
 
 		await db.execute(sql`
-			DELETE FROM push_subscriptions WHERE user_id = ${locals.user.id} AND endpoint = ${body.endpoint}
+			DELETE FROM push_subscriptions WHERE user_id = ${locals.user.id} AND endpoint = ${parsed.data.endpoint}
 		`);
 
 		return json({ success: true, message: 'Push subscription removed' });

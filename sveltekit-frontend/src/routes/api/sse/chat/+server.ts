@@ -8,6 +8,15 @@ import { getGraphContext } from '$lib/server/retrieval/graph-context.js';
 import { lookupCachedResponse, storeCachedResponse } from '$lib/server/ai/llm-cache.js';
 import { getFragment, setFragment, getGlyphCacheMetrics, FragmentType } from '$lib/server/glyph-prompt-cache.js';
 import { createHash } from 'crypto';
+import { z } from 'zod';
+
+const sseChatSchema = z.object({
+	message: z.string().min(1, 'Message is required').max(50000),
+	model: z.string().max(100).optional(),
+	conversationId: z.string().min(1, 'Missing conversationId').max(200),
+	emotionPrompt: z.string().max(5000).optional(),
+	emotionMood: z.string().max(100).optional()
+});
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const QDRANT_URL = ENV.QDRANT_URL;
@@ -247,11 +256,12 @@ async function retrieveContext(
 }
 
 export const POST: RequestHandler = async ({ request }) => {
-	const { message, model, conversationId, emotionPrompt, emotionMood } = await request.json();
-
-	if (!conversationId) {
-		return new Response('Missing conversationId', { status: 400 });
+	const raw = await request.json();
+	const parsed = sseChatSchema.safeParse(raw);
+	if (!parsed.success) {
+		return new Response(parsed.error.issues[0]?.message ?? 'Invalid input', { status: 400 });
 	}
+	const { message, model, conversationId, emotionPrompt, emotionMood } = parsed.data;
 
 	// Save user message to chatMessages table
 	try {

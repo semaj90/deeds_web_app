@@ -11,6 +11,7 @@ import type { RequestHandler } from './$types';
 import type { CaseTheoryRequestPayload, CaseTheoryPlan } from '$lib/types/case-theory.js';
 import { generateCompletion } from '$lib/server/ai/ollama-client.js';
 import { requireAuth } from '$lib/server/auth-helpers.js';
+import { z } from 'zod';
 
 const SYSTEM_PROMPT = `You are a senior legal strategist. Given case facts, charges, and evidence, produce a structured case theory plan as JSON.
 
@@ -76,19 +77,38 @@ function extractJSON(text: string): CaseTheoryPlan | null {
 	}
 }
 
+const caseTheorySchema = z.object({
+	summary: z.string().trim().min(10, 'Case summary is required (minimum 10 characters)').max(50000),
+	caseName: z.string().max(500).optional(),
+	caseId: z.string().max(200).optional(),
+	prosecutionGoals: z.string().max(5000).optional(),
+	charges: z.array(z.string().max(500)).max(50).optional(),
+	keyFacts: z.array(z.string().max(2000)).max(100).optional(),
+	contestedFacts: z.array(z.string().max(2000)).max(100).optional(),
+	defenseAngles: z.array(z.string().max(2000)).max(50).optional(),
+	narrativeBeats: z.array(z.string().max(2000)).max(50).optional(),
+	keyEvidence: z.array(z.object({ label: z.string().max(500), purpose: z.string().max(1000).optional() })).max(100).optional(),
+	witnessProfiles: z.array(z.object({ name: z.string().max(500), angle: z.string().max(1000).optional() })).max(50).optional(),
+	legalIssues: z.array(z.string().max(2000)).max(50).optional(),
+	tone: z.string().max(200).optional(),
+	preferredAudience: z.string().max(500).optional(),
+	deliverables: z.array(z.string().max(200)).max(20).optional()
+});
+
 export const POST: RequestHandler = async (event) => {
 	await requireAuth(event);
 	const startTime = Date.now();
 
 	try {
-		const payload = (await event.request.json()) as CaseTheoryRequestPayload;
-
-		if (!payload.summary || payload.summary.trim().length < 10) {
+		const rawBody = await event.request.json();
+		const parsed = caseTheorySchema.safeParse(rawBody);
+		if (!parsed.success) {
 			return json(
-				{ success: false, error: 'Case summary is required (minimum 10 characters)' },
+				{ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' },
 				{ status: 400 }
 			);
 		}
+		const payload = parsed.data as CaseTheoryRequestPayload;
 
 		const userPrompt = buildUserPrompt(payload);
 

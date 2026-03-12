@@ -11,6 +11,7 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { redis } from '$lib/server/redis.js';
 
 const memoryCache = new Map<string, { value: unknown; expires: number; priority?: string; tags?: string[] }>();
@@ -91,13 +92,23 @@ export const GET: RequestHandler = async ({ url }) => {
 	return json({ success: false, error: 'Missing action or key parameter' }, { status: 400 });
 };
 
-export const POST: RequestHandler = async ({ request }) => {
-	const body = await request.json();
-	const { key, value, options } = body;
+const cacheSetSchema = z.object({
+	key: z.string().min(1, 'key is required').max(500),
+	value: z.unknown(),
+	options: z.object({
+		ttl: z.number().int().min(1000).max(86400000).optional().default(300000),
+		priority: z.string().max(50).optional(),
+		tags: z.array(z.string().max(100)).max(20).optional()
+	}).optional()
+});
 
-	if (!key || value === undefined) {
-		return json({ success: false, error: 'key and value are required' }, { status: 400 });
+export const POST: RequestHandler = async ({ request }) => {
+	const raw = await request.json();
+	const parsed = cacheSetSchema.safeParse(raw);
+	if (!parsed.success) {
+		return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	}
+	const { key, value, options } = parsed.data;
 
 	const ttl = options?.ttl ?? 300000; // 5min default
 	const expires = Date.now() + ttl;

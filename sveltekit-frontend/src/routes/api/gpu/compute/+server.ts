@@ -8,15 +8,24 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { graphSimilarity, clusterEmbeddings, computeCaseEmbedding, isCudaAvailable } from '$lib/server/gpu/libtorch-bridge.js';
+import { z } from 'zod';
+
+const GPU_OPERATIONS = ['similarity', 'cluster', 'weighted_embedding', 'device_info'] as const;
+
+const gpuComputeSchema = z.object({
+	operation: z.enum(GPU_OPERATIONS, { message: 'Invalid operation' }),
+	embeddings: z.array(z.array(z.number())).max(10000).optional(),
+	weights: z.array(z.number()).max(10000).optional(),
+	k: z.number().int().min(1).max(100).optional()
+});
 
 export const POST: RequestHandler = async ({ request }) => {
-	const body = await request.json();
-	const { operation, embeddings, weights, k } = body as {
-		operation: 'similarity' | 'cluster' | 'weighted_embedding' | 'device_info';
-		embeddings?: number[][];
-		weights?: number[];
-		k?: number;
-	};
+	const raw = await request.json();
+	const parsed = gpuComputeSchema.safeParse(raw);
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+	}
+	const { operation, embeddings, weights, k } = parsed.data;
 
 	if (operation === 'device_info') {
 		return json({
@@ -25,7 +34,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		});
 	}
 
-	if (!embeddings || !Array.isArray(embeddings) || embeddings.length === 0) {
+	if (!embeddings || embeddings.length === 0) {
 		return json({ error: 'embeddings array required' }, { status: 400 });
 	}
 

@@ -10,19 +10,22 @@ import type { RequestHandler } from './$types';
 import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 import { inferLLM, healthCheck as trtHealthCheck } from '$lib/server/trt-llm.js';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const tensorrtSchema = z.object({
+	prompt: z.string().min(1, 'prompt is required').max(10000),
+	maxTokens: z.number().int().min(64).max(8192).optional().default(2048),
+	temperature: z.number().min(0).max(2).optional().default(0.7),
+	fallbackToOllama: z.boolean().optional().default(true)
+});
 
 export const POST: RequestHandler = async ({ request }) => {
-	const body = await request.json();
-	const { prompt, maxTokens, temperature, fallbackToOllama = true } = body as {
-		prompt: string;
-		maxTokens?: number;
-		temperature?: number;
-		fallbackToOllama?: boolean;
-	};
-
-	if (!prompt || typeof prompt !== 'string') {
-		return json({ error: 'prompt is required' }, { status: 400 });
+	const raw = await request.json();
+	const parsed = tensorrtSchema.safeParse(raw);
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	}
+	const { prompt, maxTokens, temperature, fallbackToOllama } = parsed.data;
 
 	// Check if TRT-LLM is available
 	const trtAvailable = await trtHealthCheck();

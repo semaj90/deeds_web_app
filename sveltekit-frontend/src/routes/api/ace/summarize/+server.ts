@@ -1,6 +1,16 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { assembleACEContext, buildACEPrompt } from '$lib/server/ace/context-assembler.js';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const aceSummarizeSchema = z.object({
+	evidenceId: z.string().uuid().optional(),
+	caseId: z.string().uuid().optional(),
+	content: z.string().max(50000).optional(),
+	title: z.string().max(500).optional()
+}).refine(d => d.content || d.evidenceId, {
+	message: 'Must provide either content or evidenceId'
+});
 
 /**
  * POST /api/ace/summarize
@@ -13,12 +23,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			return json({ error: 'Unauthorized' }, { status: 401 });
 		}
 
-		const body = await request.json();
-		const { evidenceId, caseId, content, title } = body;
-
-		if (!content && !evidenceId) {
-			return json({ error: 'Must provide either content or evidenceId' }, { status: 400 });
+		const raw = await request.json();
+		const parsed = aceSummarizeSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
+		const { evidenceId, caseId, content, title } = parsed.data;
 
 		// Assemble full ACE context (7 parallel data sources)
 		const context = await assembleACEContext({

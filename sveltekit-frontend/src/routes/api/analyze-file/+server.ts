@@ -14,15 +14,22 @@ import { readFile } from 'fs/promises';
 import { promisify } from 'util';
 
 import { getOllamaUrl } from '$lib/config/env.server.js';
+import { z } from 'zod';
 const execAsync = promisify(exec);
 const OLLAMA_URL = getOllamaUrl();
 
+const analyzeFileSchema = z.object({
+	filePath: z.string().min(1, 'filePath is required').max(1000)
+});
+
 export async function POST({ request }: RequestEvent) {
 	try {
-		const { filePath } = await request.json();
-		if (!filePath) {
-			return json({ success: false, error: 'filePath is required' }, { status: 400 });
+		const raw = await request.json();
+		const parsed = analyzeFileSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
+		const { filePath } = parsed.data;
 
 		// 1. Read file content
 		const content = await readFile(filePath, 'utf-8');

@@ -11,17 +11,24 @@
 import { executeACPTool, getACPToolSchema } from '$lib/services/knowledge-search/ACPToolRegistry';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import { z } from 'zod';
+
+const acpExecuteSchema = z.object({
+	tool: z.string().min(1, 'Tool name is required').max(500),
+	args: z.record(z.string(), z.unknown()).optional().default({}),
+	dryRun: z.boolean().optional().default(false)
+});
 
 export const POST: RequestHandler = async ({ request }) => {
 	const startTime = Date.now();
 
 	try {
-		const body = await request.json();
-		const { tool, args, dryRun } = body;
-
-		if (!tool || typeof tool !== 'string') {
-			return json({ error: 'Tool name is required' }, { status: 400 });
+		const raw = await request.json();
+		const parsed = acpExecuteSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
+		const { tool, args, dryRun } = parsed.data;
 
 		const schema = getACPToolSchema(tool);
 		if (!schema) {

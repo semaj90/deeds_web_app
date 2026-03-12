@@ -66,19 +66,23 @@ export async function POST({ request, locals }: RequestEvent) {
 			return json({ error: 'No file provided' }, { status: 400 });
 		}
 
-		const caseId = formData.get('caseId')?.toString() || null;
-		const title = formData.get('title')?.toString() || '';
-		const description = formData.get('description')?.toString() || null;
-		const userType = formData.get('evidenceType')?.toString();
+		// Validate form fields with Zod
+		const formFields = {
+			title: formData.get('title')?.toString() || undefined,
+			description: formData.get('description')?.toString() || undefined,
+			caseId: formData.get('caseId')?.toString() || undefined,
+			evidenceType: formData.get('evidenceType')?.toString() || undefined
+		};
+		const parsed = evidenceUploadSchema.safeParse(formFields);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		}
+		const caseId = parsed.data.caseId ?? null;
+		const title = parsed.data.title ?? '';
+		const description = parsed.data.description ?? null;
+		const userType = parsed.data.evidenceType;
 		const autoType = detectEvidenceType(file.type, file.name);
 		const evidenceType = (userType && userType !== 'UNKNOWN' ? userType : autoType);
-
-		// Validate caseId is a valid UUID (PostgreSQL uuid type required)
-		if (caseId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(caseId)) {
-			return json({
-				error: `Invalid caseId format. Expected UUID, got: "${caseId}". Use crypto.randomUUID() or a valid case ID.`
-			}, { status: 400 });
-		}
 
 		if (file.size > MAX_FILE_SIZE) {
 			return json({ error: `File too large. Maximum ${MAX_FILE_SIZE / 1024 / 1024}MB.` }, { status: 400 });

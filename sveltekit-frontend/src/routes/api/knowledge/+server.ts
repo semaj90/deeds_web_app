@@ -4,6 +4,7 @@ import { JSDOM } from 'jsdom';
 import pdfParse from 'pdf-parse';
 import postgres from 'postgres';
 import { getDatabaseUrl, getQdrantUrl, getOllamaUrl } from '$lib/config/env.server.js';
+import { z } from 'zod';
 
 const sql = postgres(getDatabaseUrl());
 const qdrant = new QdrantClient({ url: getQdrantUrl() });
@@ -224,17 +225,23 @@ export const GET: RequestHandler = async ({ url }) => {
   }
 };
 
+const knowledgeQuerySchema = z.object({
+  prompt: z.string().min(1, 'Prompt required').max(10000),
+  max_context_chunks: z.number().int().min(1).max(50).optional().default(5),
+  use_gemini: z.boolean().optional().default(false)
+});
+
 /**
  * PATCH /api/knowledge - Generate response using RAG + LLM
  */
 export const PATCH: RequestHandler = async ({ request }) => {
   try {
-    const body = await request.json();
-    const { prompt, max_context_chunks = 5, use_gemini = false } = body;
-
-    if (!prompt) {
-      return json({ error: 'Prompt required' }, { status: 400 });
+    const raw = await request.json();
+    const parsed = knowledgeQuerySchema.safeParse(raw);
+    if (!parsed.success) {
+      return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
     }
+    const { prompt, max_context_chunks, use_gemini } = parsed.data;
 
     await ensureQdrantCollection();
 

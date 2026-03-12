@@ -3,6 +3,17 @@ import { cases } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
 import { and, eq, sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
+
+const CASE_STATUS = ['open', 'in_progress', 'pending_review', 'closed', 'archived'] as const;
+const CASE_PRIORITY = ['low', 'medium', 'high', 'urgent'] as const;
+
+const caseUpdateSchema = z.object({
+	title: z.string().min(1).max(500).optional(),
+	description: z.string().max(10000).optional(),
+	status: z.enum(CASE_STATUS).optional(),
+	priority: z.enum(CASE_PRIORITY).optional()
+});
 
 const isUuid = (s: string) =>
 	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
@@ -56,7 +67,12 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 			return json({ message: 'Unauthorized' }, { status: 401 });
 		}
 
-		const body = await request.json();
+		const raw = await request.json();
+		const parsed = caseUpdateSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ message: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		}
+		const body = parsed.data;
 
 		const updates: Partial<typeof cases.$inferSelect> = {};
 

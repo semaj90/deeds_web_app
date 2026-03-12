@@ -41,7 +41,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		}
 
 		// Verify password (bcrypt.compare expects plaintext first, then hash)
-		const validPassword = await verifyPassword(body.password, user.passwordHash);
+		const validPassword = await verifyPassword(password, user.passwordHash);
 		if (!validPassword) {
 			return json({ error: 'Invalid email or password' }, { status: 401 });
 		}

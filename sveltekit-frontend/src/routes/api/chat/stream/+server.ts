@@ -3,6 +3,13 @@ import { chatMessages, chatMetadata } from '$lib/server/db/schema';
 import { desc, eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { acquireGpuLease } from '$lib/server/inference/gpu-arbiter.js';
+import { z } from 'zod';
+
+const chatStreamPostSchema = z.object({
+	sessionId: z.string().min(1, 'Missing sessionId').max(200),
+	message: z.string().min(1, 'Missing message').max(50000),
+	caseId: z.string().uuid().optional()
+});
 
 /**
  * Server-Sent Events endpoint for contextual chat streaming
@@ -287,11 +294,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return new Response('Unauthorized', { status: 401 });
 	}
 
-	const { sessionId, message, caseId } = await request.json();
-
-	if (!sessionId || !message) {
-		return new Response('Missing required fields', { status: 400 });
+	const raw = await request.json();
+	const parsed = chatStreamPostSchema.safeParse(raw);
+	if (!parsed.success) {
+		return new Response(parsed.error.issues[0]?.message ?? 'Invalid input', { status: 400 });
 	}
+	const { sessionId, message, caseId } = parsed.data;
 
 	try {
 		// Ensure chat metadata exists (upsert session with case association)

@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 
 import { getQdrantUrl, getOllamaUrl } from '$lib/config/env.server.js';
 const QDRANT_URL = getQdrantUrl();
@@ -133,14 +134,20 @@ export const GET: RequestHandler = async ({ url }) => {
 	}
 };
 
+const codebaseSearchSchema = z.object({
+	query: z.string().min(1, 'Query is required').max(5000),
+	limit: z.number().int().min(1).max(100).optional().default(20)
+});
+
 // POST for semantic search using embedding
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const { query, limit = 20 } = await request.json();
-
-		if (!query) {
-			return json({ error: 'Query is required' }, { status: 400 });
+		const raw = await request.json();
+		const parsed = codebaseSearchSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
+		const { query, limit } = parsed.data;
 
 		// Get embedding from Ollama
 		const embedResponse = await fetch(`${OLLAMA_URL}/api/embeddings`, {

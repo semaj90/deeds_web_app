@@ -2,6 +2,14 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve, normalize } from 'node:path';
+import { z } from 'zod';
+
+const autoPatchSchema = z.object({
+	filePath: z.string().min(1, 'Missing filePath').max(1000),
+	errorMessage: z.string().min(1, 'Missing errorMessage').max(50000),
+	originalCode: z.string().max(5_000_000).optional(),
+	maxAttempts: z.number().int().min(1).max(5).optional().default(2)
+});
 
 const ALLOWED_ROOT = resolve('src');
 
@@ -26,14 +34,15 @@ interface PatchAttempt {
  * - Only writes under sveltekit-frontend/src/
  */
 export const POST: RequestHandler = async ({ request, url, fetch: svelteKitFetch }) => {
-	const body = await request.json();
-	const filePath: string = body?.filePath ?? '';
-	const errorMessage: string = body?.errorMessage ?? '';
-	const maxAttempts: number = Math.min(body?.maxAttempts ?? 2, 5);
-
-	if (!filePath || !errorMessage) {
-		return json({ success: false, error: 'Missing filePath or errorMessage' }, { status: 400 });
+	const raw = await request.json();
+	const parsed = autoPatchSchema.safeParse(raw);
+	if (!parsed.success) {
+		return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	}
+	const body = parsed.data;
+	const filePath = body.filePath;
+	const errorMessage = body.errorMessage;
+	const maxAttempts = body.maxAttempts;
 
 	// Safety: restrict to sveltekit-frontend/src/
 	const absPath = resolve(filePath);

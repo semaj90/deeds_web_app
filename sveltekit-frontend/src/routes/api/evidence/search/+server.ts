@@ -119,19 +119,12 @@ interface ContextBundle {
 
 export async function POST({ request, locals }: RequestEvent) {
 	try {
-		const body = await request.json();
-		const { query, caseId, limit = 10, expandSections = true, jurisdiction, useLegalPageRank: useLPR = false } = body as {
-			query: string;
-			caseId?: string;
-			limit?: number;
-			expandSections?: boolean;
-			jurisdiction?: string;
-			useLegalPageRank?: boolean;
-		};
-
-		if (!query || typeof query !== 'string') {
-			return json({ error: 'query is required' }, { status: 400 });
+		const raw = await request.json();
+		const parsed = evidenceSearchSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
+		const { query, caseId, limit, expandSections, jurisdiction, useLegalPageRank: useLPR } = parsed.data;
 
 		const start = performance.now();
 		const userId = (locals as any).user?.id ?? null;

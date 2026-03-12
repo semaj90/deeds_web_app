@@ -4,6 +4,20 @@ import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve, normalize } from 'node:path';
+import { z } from 'zod';
+
+const applyFixSchema = z.object({
+	filePath: z.string().min(1, 'Missing filePath').max(1000),
+	fixedCode: z.string().min(1, 'Missing fixedCode').max(5_000_000),
+	originalCode: z.string().max(5_000_000).optional(),
+	dryRun: z.boolean().optional().default(true),
+	explanation: z.string().max(10000).optional(),
+	confidence: z.number().min(0).max(1).optional(),
+	sourceIds: z.array(z.string().max(200)).max(50).optional(),
+	errorContext: z.record(z.string(), z.unknown()).optional(),
+	userApproved: z.boolean().optional(),
+	success: z.boolean().optional()
+});
 
 const ALLOWED_ROOT = resolve('src');
 
@@ -18,11 +32,14 @@ const ALLOWED_ROOT = resolve('src');
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 
-	const body = await request.json();
-	if (!body?.filePath) throw error(400, 'Missing filePath');
-	if (!body?.fixedCode) throw error(400, 'Missing fixedCode');
+	const raw = await request.json();
+	const parsed = applyFixSchema.safeParse(raw);
+	if (!parsed.success) {
+		throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
+	}
+	const body = parsed.data;
 
-	const dryRun = body.dryRun !== false; // default true — safe by default
+	const dryRun = body.dryRun; // schema defaults to true
 	const fixId = crypto.randomUUID();
 	let fileWritten = false;
 	let backupContent: string | null = null;
