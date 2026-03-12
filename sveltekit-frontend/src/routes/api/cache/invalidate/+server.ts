@@ -13,6 +13,20 @@
 
 import { json, error, type RequestHandler } from '@sveltejs/kit';
 import { redisPool } from '$lib/server/redis.js';
+import { z } from 'zod';
+
+const ALLOWED_PREFIXES = [
+	'template:', 'report:export:', 'llm:response:',
+	'case:', 'evidence:', 'report:', 'user:', 'embedding:'
+] as const;
+
+const cacheInvalidateSchema = z.object({
+	pattern: z.string().min(1, 'Pattern is required').max(200)
+		.refine(
+			(p) => ALLOWED_PREFIXES.some(prefix => p.startsWith(prefix)),
+			{ message: 'Pattern must start with an allowed prefix (template:, case:, evidence:, report:, user:, embedding:, llm:response:)' }
+		)
+});
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	// Admin-only endpoint
@@ -21,37 +35,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 
 	try {
-		const body = await request.json();
-		const { pattern } = body;
-
-		if (!pattern || typeof pattern !== 'string') {
-			throw error(400, 'Invalid pattern parameter');
+		const raw = await request.json();
+		const parsed = cacheInvalidateSchema.safeParse(raw);
+		if (!parsed.success) {
+			throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
 		}
-
-		// Security: Only allow specific safe patterns
-		const allowedPatterns = [
-			'template:*',
-			'template:meta:*',
-			'template:ai:*',
-			'template:rendered:*',
-			'report:export:*',
-			'llm:response:*',
-			'case:*',
-			'evidence:*',
-			'report:*',
-			'user:*',
-			'embedding:*',
-		];
-
-		const isAllowed = allowedPatterns.some(allowed => {
-			// Simple prefix matching for safety
-			const prefix = allowed.replace('*', '');
-			return pattern.startsWith(prefix);
-		});
-
-		if (!isAllowed) {
-			throw error(400, `Pattern not allowed: ${pattern}. Allowed patterns: ${allowedPatterns.join(', ')}`);
-		}
+		const { pattern } = parsed.data;
 
 		const redis = redisPool.getConnection();
 		const keys = await redis.keys(pattern);

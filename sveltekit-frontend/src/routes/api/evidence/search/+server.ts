@@ -33,6 +33,16 @@ import type { VectorSearchResult, VectorSearchOptions } from '$lib/server/db/pgv
 import { productionLogger } from '$lib/server/production-logger.js';
 import { legalPageRank } from '$lib/server/retrieval/legal-pagerank.js';
 import { CitationGraph } from '$lib/server/retrieval/citation-graph.js';
+import { z } from 'zod';
+
+const evidenceSearchSchema = z.object({
+	query: z.string().min(1, 'query is required').max(5000),
+	caseId: z.string().uuid().optional(),
+	limit: z.number().int().min(1).max(100).optional().default(10),
+	expandSections: z.boolean().optional().default(true),
+	jurisdiction: z.string().max(200).optional(),
+	useLegalPageRank: z.boolean().optional().default(false)
+});
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 

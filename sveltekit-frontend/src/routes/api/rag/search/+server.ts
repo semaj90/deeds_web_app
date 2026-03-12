@@ -14,6 +14,24 @@ import { chatRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 import { computeTFIDF } from '$lib/server/retrieval/tfidf-scorer.js';
 import { getVectorCache, setVectorCache, getEmbeddingCache, setEmbeddingCache } from '$lib/server/vector-cache.js';
 import { embedText } from '$lib/server/batch-embedder.js';
+import { z } from 'zod';
+
+const SCORING_METHODS = ['hybrid', 'vector_only', 'tfidf_only'] as const;
+
+const ragSearchSchema = z.object({
+	query: z.string().min(1, 'query is required').max(5000),
+	top_k: z.number().int().min(1).max(100).optional().default(10),
+	min_score: z.number().min(0).max(1).optional().default(0.3),
+	use_hybrid: z.boolean().optional().default(false),
+	use_rerank: z.boolean().optional().default(false),
+	scoring_method: z.enum(SCORING_METHODS).optional().default('hybrid'),
+	userId: z.string().max(200).optional(),
+	caseId: z.string().uuid().optional(),
+	case_id: z.string().uuid().optional(),
+	conversationId: z.string().max(200).optional(),
+	enableACE: z.boolean().optional().default(false),
+	precomputedEmbedding: z.array(z.number()).length(768).optional()
+});
 
 const QDRANT_URL = getQdrantUrl();
 const OLLAMA_URL = getOllamaUrl();

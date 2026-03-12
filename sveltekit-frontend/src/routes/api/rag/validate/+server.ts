@@ -7,6 +7,19 @@ import type {
 	RetrievedChunk
 } from '$lib/types/rag-source-validation';
 import { getRedis } from '$lib/server/redis.js';
+import { z } from 'zod';
+
+const ragValidateSchema = z.object({
+	query_id: z.string().min(1, 'query_id is required').max(200),
+	case_id: z.string().uuid('Invalid case_id'),
+	validations: z.array(z.object({
+		chunk_id: z.string().min(1).max(500),
+		status: z.enum(['approved', 'rejected', 'pending']),
+		reason: z.string().max(1000).optional()
+	})).min(1, 'At least one validation required'),
+	user_id: z.string().max(200).optional(),
+	notes: z.string().max(5000).optional()
+});
 
 const QDRANT_URL = getQdrantUrl();
 
@@ -17,15 +30,15 @@ const QDRANT_URL = getQdrantUrl();
  */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body: ValidateSourcesRequest = await request.json();
-		const { query_id, case_id, validations, user_id, notes } = body;
-
-		if (!query_id || !case_id || !validations?.length) {
+		const raw = await request.json();
+		const parsed = ragValidateSchema.safeParse(raw);
+		if (!parsed.success) {
 			return json(
-				{ error: 'query_id, case_id, and validations are required' },
+				{ error: parsed.error.issues[0]?.message ?? 'Invalid input' },
 				{ status: 400 }
 			);
 		}
+		const { query_id, case_id, validations, user_id, notes } = parsed.data;
 
 		const approvedChunkIds = validations
 			.filter((v) => v.status === 'approved')
@@ -99,7 +112,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			const redis = getRedis();
 			await redis.set(
 				`rag:context:${response.context_id}`,
-				JSON.stringify({ query: body.query_id, combined_context: combinedContext, chunks: approvedChunks }),
+				JSON.stringify({ query: query_id, combined_context: combinedContext, chunks: approvedChunks }),
 				'EX', 600
 			);
 		} catch {

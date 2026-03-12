@@ -4,14 +4,17 @@ import type { RequestHandler } from './$types.js';
 import { apiResponses } from '$lib/server/api/response-helper.js';
 import { embedRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 import { acquireGpuLease } from '$lib/server/inference/gpu-arbiter.js';
+import { z } from 'zod';
 
 const OLLAMA_URL = getOllamaUrl();
 
-interface EmbedRequest {
-	text: string;
-	model?: 'embeddinggemma' | 'nomic' | 'mock';
-	dimensions?: number;
-}
+const embedRequestSchema = z.object({
+	text: z.string().min(1, 'Text is required').max(50000),
+	model: z.enum(['embeddinggemma', 'nomic', 'mock']).optional().default('embeddinggemma'),
+	dimensions: z.number().int().min(1).max(4096).optional()
+});
+
+type EmbedRequest = z.infer<typeof embedRequestSchema>;
 
 interface EmbedResponse {
 	embedding: number[];
@@ -52,15 +55,12 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 
 	try {
-		const { text, model = 'embeddinggemma', dimensions }: EmbedRequest = await request.json();
-
-		if (!text || typeof text !== 'string') {
-			return apiResponses.badRequest('Text is required and must be a string');
+		const raw = await request.json();
+		const parsed = embedRequestSchema.safeParse(raw);
+		if (!parsed.success) {
+			return apiResponses.badRequest(parsed.error.issues[0]?.message ?? 'Invalid input');
 		}
-
-		if (text.length > 50000) {
-			return apiResponses.badRequest('Text too long. Maximum 50,000 characters.');
-		}
+		const { text, model, dimensions } = parsed.data;
 
 		// Acquire GPU lease for Ollama embeddings (non-blocking)
 		if (model !== 'mock') {

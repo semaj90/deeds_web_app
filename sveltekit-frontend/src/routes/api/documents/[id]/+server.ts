@@ -3,6 +3,12 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { documents } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
+import { z } from 'zod';
+
+const documentUpdateSchema = z.object({
+	content: z.string().max(5_000_000).optional(),
+	status: z.enum(['draft', 'pending', 'approved', 'rejected']).optional()
+});
 
 /**
  * GET /api/documents/[id]
@@ -48,8 +54,12 @@ export const PUT: RequestHandler = async ({ params, request }) => {
 	const { id } = params;
 
 	try {
-		const body = await request.json();
-		const { content, status } = body;
+		const raw = await request.json();
+		const parsed = documentUpdateSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		}
+		const { content, status } = parsed.data;
 
 		await db
 			.update(documents)

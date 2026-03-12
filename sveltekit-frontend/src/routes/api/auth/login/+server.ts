@@ -8,22 +8,27 @@ import { users } from '$lib/server/db/schema';
 import { createUserSession, setSessionCookie, verifyPassword } from '$lib/server/lucia';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
+import { z } from 'zod';
 
-interface LoginRequest { email: string; password: string }
+const loginSchema = z.object({
+	email: z.string().trim().min(1, 'Email is required').max(255).email('Invalid email'),
+	password: z.string().min(1, 'Password is required').max(255)
+});
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	try {
-		const body = (await request.json()) as LoginRequest;
-
-		if (!body?.email || !body.password) {
-			return json({ error: 'Email and password required' }, { status: 400 });
+		const raw = await request.json();
+		const parsed = loginSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
+		const { email, password } = parsed.data;
 
 		// Find user by email
 		const [user] = await db
 			.select()
 			.from(users)
-			.where(eq(users.email, body.email))
+			.where(eq(users.email, email))
 			.limit(1);
 
 		if (!user) {

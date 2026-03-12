@@ -5,6 +5,8 @@
 	import TypewriterResponse from '$lib/components/ai/TypewriterResponse.svelte';
 	import AISummaryMiniModal from '$lib/components/legal/AISummaryMiniModal.svelte';
 	import { boardHistory } from '$lib/components/evidence/board-history.svelte.js';
+	import { scheduleSave, flushSave, loadLayout, type BoardLayout } from '$lib/components/evidence/board-persistence.svelte.js';
+	import Fuse from 'fuse.js';
 	import type { PageData } from './$types';
 	import { onMount } from 'svelte';
 
@@ -25,6 +27,15 @@
 	let activeTool = $state<'select' | 'evidence' | 'connection' | 'note'>('select');
 	let showAIChat = $state(false);
 	let isGeneratingLayout = $state(false);
+
+	// Fuse.js fuzzy search for evidence sidebar
+	let searchQuery = $state('');
+	const fuseOptions = { keys: ['title', 'description', 'type', 'location', 'fileType'], threshold: 0.4, ignoreLocation: true };
+	let fuse = $derived(new Fuse(evidenceItems, fuseOptions));
+	let filteredEvidence = $derived.by(() => {
+		if (!searchQuery.trim()) return evidenceItems;
+		return fuse.search(searchQuery).map((r: any) => r.item);
+	});
 
 	// AI Chat session (contextual to this case)
 	let chatSession: ChatSession | null = $state(null);
@@ -61,10 +72,46 @@
 			}
 		}
 
+		// Load cached layout from IndexedDB if no server state
+		if (!initialState && board) {
+			loadLayout(caseId).then((cached) => {
+				if (cached && cached.nodes?.length > 0) {
+					// Restore cached viewport/nodes via board methods
+					for (const n of cached.nodes) {
+						if (n.evidenceId) {
+							board.addEvidenceNode(n.evidenceId, n.title ?? 'Untitled', n.x, n.y);
+						}
+					}
+					board.zoomToFit();
+				}
+			});
+		}
+
+		// Flush pending saves on page unload
+		const onBeforeUnload = () => flushSave();
+		window.addEventListener('beforeunload', onBeforeUnload);
+
 		return () => {
 			chatSession?.destroy();
 			boardHistory.clear();
+			flushSave();
+			window.removeEventListener('beforeunload', onBeforeUnload);
 		};
+	});
+
+	// Auto-save to IndexedDB when board is dirty (debounced 2s via scheduleSave)
+	$effect(() => {
+		if (isDirty && board) {
+			const snapshot = board.serialize();
+			const layout: BoardLayout = {
+				caseId,
+				nodes: snapshot.nodes,
+				connections: snapshot.edges,
+				viewport: { zoom: snapshot.viewport.zoom, panX: snapshot.viewport.pan.x, panY: snapshot.viewport.pan.y },
+				timestamp: Date.now()
+			};
+			scheduleSave(layout);
+		}
 	});
 
 	// Timeline state (fetched client-side)
@@ -592,11 +639,25 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		<aside class="evidence-sidebar">
 			<div class="sidebar-header">
 				<h3>EVIDENCE</h3>
-				<span class="count-badge">{evidenceItems.length}</span>
+				<span class="count-badge">{filteredEvidence.length}/{evidenceItems.length}</span>
+			</div>
+
+			<div class="search-box">
+				<Icon name="search" />
+				<input
+					type="text"
+					placeholder="Search evidence..."
+					bind:value={searchQuery}
+				/>
+				{#if searchQuery}
+					<button class="search-clear" onclick={() => (searchQuery = '')}>
+						<Icon name="x" />
+					</button>
+				{/if}
 			</div>
 
 			<div class="evidence-list">
-				{#each evidenceItems as item (item.id)}
+				{#each filteredEvidence as item (item.id)}
 					<div
 						class="evidence-card"
 						class:selected={selectedEvidence?.id === item.id}
@@ -1178,6 +1239,52 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		border-radius: 1rem;
 		font-size: 0.75rem;
 		font-weight: 600;
+	}
+
+	.search-box {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 0.75rem;
+		margin: 0.5rem;
+		background: #f3f4f6;
+		border: 1px solid #e5e7eb;
+		border-radius: 0.375rem;
+		color: #6b7280;
+		transition: border-color 0.15s;
+	}
+
+	.search-box:focus-within {
+		border-color: #3b82f6;
+		background: white;
+	}
+
+	.search-box input {
+		flex: 1;
+		border: none;
+		background: transparent;
+		outline: none;
+		font-size: 0.8125rem;
+		font-family: inherit;
+		color: #1f2937;
+	}
+
+	.search-box input::placeholder {
+		color: #9ca3af;
+	}
+
+	.search-clear {
+		padding: 0.125rem;
+		background: transparent;
+		border: none;
+		color: #9ca3af;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+	}
+
+	.search-clear:hover {
+		color: #1f2937;
 	}
 
 	.evidence-list {

@@ -21,6 +21,15 @@ import { invalidateEvidenceCache, invalidateCaseCache } from '$lib/server/cache/
 import { triggerEvidenceGpuAnalysis } from '$lib/server/gpu/background-analyzer.js';
 
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const evidenceUploadSchema = z.object({
+	title: z.string().max(256).optional(),
+	description: z.string().max(10000).optional(),
+	caseId: z.string().uuid('Invalid caseId format. Expected UUID, use crypto.randomUUID() or a valid case ID.').optional(),
+	evidenceType: z.string().max(100).optional()
+});
+
 const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB

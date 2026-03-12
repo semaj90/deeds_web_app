@@ -5,15 +5,34 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { logEvent, type AnalyticsEvent } from '$lib/server/analytics/event-logger.js';
 import { sql } from 'drizzle-orm';
+import { z } from 'zod';
+
+const ANALYTICS_EVENT_TYPES = [
+	'chat_query', 'tool_search', 'codebase_search', 'route_opened',
+	'case_created', 'case_updated', 'evidence_uploaded', 'rag_search',
+	'embedding_generated', 'cache_hit', 'cache_miss', 'error_analyzed',
+	'patch_applied', 'document_indexed'
+] as const;
+
+const analyticsEventSchema = z.object({
+	userId: z.string().max(200).optional(),
+	sessionId: z.string().max(100).optional(),
+	eventType: z.enum(ANALYTICS_EVENT_TYPES),
+	payload: z.record(z.string(), z.unknown()).optional().default({})
+});
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
+		const raw = await request.json();
+		const parsed = analyticsEventSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		}
 		const event: AnalyticsEvent = {
-			userId: body.userId ?? null,
-			sessionId: body.sessionId ?? null,
-			eventType: body.eventType ?? 'route_opened',
-			payload: body.payload ?? {}
+			userId: parsed.data.userId ?? null,
+			sessionId: parsed.data.sessionId ?? null,
+			eventType: parsed.data.eventType,
+			payload: parsed.data.payload
 		};
 		await logEvent(event);
 		return json({ ok: true });

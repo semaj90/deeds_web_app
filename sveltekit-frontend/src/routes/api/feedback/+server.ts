@@ -7,20 +7,23 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { feedbackStore } from '$lib/server/ml/feedback-store.js';
 import { requireAuth } from '$lib/server/auth-helpers.js';
+import { z } from 'zod';
+
+const feedbackSchema = z.object({
+	documentId: z.string().min(1, 'documentId is required').max(200),
+	rating: z.number().min(0).max(1)
+});
 
 export const POST: RequestHandler = async (event) => {
 	await requireAuth(event);
 
 	try {
-		const { documentId, rating } = await event.request.json();
-
-		if (!documentId || typeof documentId !== 'string') {
-			return json({ success: false, error: 'documentId is required' }, { status: 400 });
+		const raw = await event.request.json();
+		const parsed = feedbackSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
-
-		if (typeof rating !== 'number' || rating < 0 || rating > 1) {
-			return json({ success: false, error: 'rating must be a number between 0 and 1' }, { status: 400 });
-		}
+		const { documentId, rating } = parsed.data;
 
 		feedbackStore.recordFeedback(documentId, rating);
 

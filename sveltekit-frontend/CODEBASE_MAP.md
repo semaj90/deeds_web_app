@@ -1,11 +1,7 @@
 # Deeds Web App — Codebase Map
-
 ## Last Updated: March 10, 2026 (Post-Deep Audit + Sprint Pipeline)
-
 ---
-
 ## Grand Totals
-
 | Metric | Count |
 |--------|-------|
 | **Root project directories** | 32 |
@@ -24,13 +20,9 @@
 | **deeds_labs/ files** | ~193,000 (intentional archive) |
 | **svelte-check** | **0 errors, 0 warnings** |
 | **Playwright** | **20/20 PASS** |
-
 ---
-
 ## Root Project Directory (32 directories)
-
 ### ESSENTIAL (Active Code)
-
 | Directory | Purpose | Status |
 |-----------|---------|--------|
 | `sveltekit-frontend/` | Main SvelteKit 2 + Svelte 5 application | **ACTIVE** |
@@ -43,9 +35,7 @@
 | `python/` | `docling_analyze.py` — Docling audio/PDF ASR pipeline (MCP transcribe_audio) | **ACTIVE** |
 | `python-workers/` | FastAPI embedding worker stub | AVAILABLE |
 | `next_steps/` | 18 planning docs (10 CURRENT, 8 DONE) | REFERENCE |
-
 ### INFRASTRUCTURE (Running Services)
-
 | Directory | Purpose | Status |
 |-----------|---------|--------|
 | `neo4j-community-5.23.0/` + `-windows/` | Neo4j graph database binaries | ACTIVE |
@@ -56,9 +46,7 @@
 | `nginx/` | Reverse proxy config | AVAILABLE |
 | `ssl/` | SSL certificates placeholder | AVAILABLE |
 | `storage/` | Vector backups, file storage | KEEP |
-
 ### DATA + MODELS
-
 | Directory | Purpose | Status |
 |-----------|---------|--------|
 | `gemma3Q4_K_M/` | Gemma3 quantized model weights | ACTIVE |
@@ -66,9 +54,7 @@
 | `libtorch-win-shared-with-deps-2.9.0+cu130/` | PyTorch C++ runtime — linked by tensorrt_bridge.node | **KEEP** |
 | `models/` | Model files | DATA |
 | `logs/` | Build logs, codemod memories | KEEP |
-
 ### ARCHIVE + CLEANUP
-
 | Directory | Purpose | Status |
 |-----------|---------|--------|
 | `deeds_labs/` | Central archive — ~193K files (svelte4, corrupted, dead code, old services) | KEEP IN PLACE |
@@ -78,13 +64,9 @@
 | `ollama_models/` | Empty (models in Ollama server) | DELETE |
 | `onnx/` | Empty (ONNX in sveltekit-frontend/static/) | DELETE |
 | `deeds-web-app/` | Nested copy of project | VERIFY — likely accidental |
-
 ---
-
 ## SvelteKit Frontend (src/ — 2,445 files, 823 dirs)
-
 ### Directory Structure
-
 ```
 sveltekit-frontend/
 ├── src/
@@ -109,10 +91,8 @@ sveltekit-frontend/
 ├── tests/             ← Playwright test specs
 ├── vite-plugins/      ← Custom Vite plugins
 └── public/            ← Public assets
-```
-
+``
 ### Top-Level Dirs (11 — post-cleanup)
-
 | Directory | Status |
 |-----------|--------|
 | `docs_readme/` | Reference docs |
@@ -126,11 +106,8 @@ sveltekit-frontend/
 | `test/` | Test configs |
 | `tests/` | Playwright specs |
 | `vite-plugins/` | Custom Vite plugins |
-
 ---
-
 ## App Routes — src/routes/(app)/ (17 groups, 109 pages)
-
 | Route | Purpose | Status |
 |-------|---------|--------|
 | `active-cases/` | Active case listing | ACTIVE |
@@ -150,13 +127,9 @@ sveltekit-frontend/
 | `reports/` | Report generation | ACTIVE |
 | `system-configuration/` | System config panel | ACTIVE |
 | `terminal/` | 9S AI Chat Interface (voice I/O, streaming) | ACTIVE |
-
 ---
-
 ## API Routes — src/routes/api/ (77 groups, 254 endpoints)
-
 ### Core API Groups
-
 | API Group | Endpoints | Purpose |
 |-----------|-----------|---------|
 | `ai/` | 17 | AI chat, analysis, predictions, scoring, personas, TensorRT, VLM |
@@ -192,13 +165,9 @@ sveltekit-frontend/
 | `ace/` | 2 | ACE ingest + summarize |
 | `web/` | 2 | Web crawl + search |
 | 20+ more | 1 each | Various single endpoints |
-
 ---
-
 ## Server Architecture — src/lib/server/ (79 subdirectories, 420 .ts files)
-
 ### Core Infrastructure
-
 | Directory | Key Files | Purpose |
 |-----------|-----------|---------|
 | `db/` | `client.ts`, `schema-postgres.ts` (2500+ lines) | Drizzle ORM — 70+ tables, 14 enums |
@@ -208,9 +177,7 @@ sveltekit-frontend/
 | `redis/` | (via `redis.ts` at server root) | ioredis singleton + factory |
 | `connections/` | `connection-pool.ts` | Central connection pool + shutdown |
 | `grpc/` | `embedding-client.ts`, `retrieval-client.ts` | gRPC clients — 4-tier embedding fallback |
-
 ### AI + Inference
-
 | Directory | Key Files | Purpose |
 |-----------|-----------|---------|
 | `gpu/` | `libtorch-bridge.ts`, `cuda-bridge.ts`, `background-analyzer.ts` | LibTorch N-API CUDA — similarity, clustering, embedding |
@@ -220,9 +187,7 @@ sveltekit-frontend/
 | `retrieval/` | `wikipedia-search.ts`, `document-dag.ts`, `query-expansion.ts` | RAG sources — Wikipedia, DAG, legal synonyms |
 | `nlp/` | NLP classify, sentiment | Natural language processing |
 | `ml/` | ML cluster status | Machine learning endpoints |
-
 ### Evidence + Analysis
-
 | Directory | Key Files | Purpose |
 |-----------|-----------|---------|
 | `analysis/` | `entity-extraction.ts`, `forensics.ts` | LLM + regex entities, PII/legal pattern detection |
@@ -230,17 +195,13 @@ sveltekit-frontend/
 | `audit/` | `evidence-audit.ts` | Chain of custody audit logging (NEW) |
 | `indexer/` | `legal-chunker.ts`, `dual-embedder.ts` | Structure-aware chunking, dual-vector embedding |
 | `ocr/` | OCR pipeline | Tesseract integration |
-
 ### Graph + Knowledge
-
 | Directory | Key Files | Purpose |
 |-----------|-----------|---------|
 | `graph/` | `evidence-graph-service.ts`, `graph-centrality.ts` | Neo4j evidence graph + centrality |
 | (root) | `neo4j-schema.ts`, `neo4j-driver.ts`, `pg-neo4j-sync.ts` | Neo4j driver + PG→Neo4j sync |
 | `rag/` | RAG pipeline components | Retrieval-augmented generation |
-
 ### Services + External
-
 | Directory | Key Files | Purpose |
 |-----------|-----------|---------|
 | `services/` | `langextract-service.ts` | Go SIMD text extraction (port 8095) |
@@ -249,9 +210,7 @@ sveltekit-frontend/
 | `notifications/` | Push, email, ntfy | Multi-channel notifications |
 | `engagement/` | Heartbeat scanner | Idle re-engagement system |
 | `streaming/` | SSE infrastructure | Server-Sent Events |
-
 ### Supporting
-
 | Directory | Purpose |
 |-----------|---------|
 | `auth/` | Authentication logic |
@@ -270,13 +229,9 @@ sveltekit-frontend/
 | `training/` | ML training utilities |
 | `validation/` | Input validation |
 | `workflows/` | Workflow orchestration |
-
 ---
-
 ## Client Architecture — src/lib/ (90+ subdirectories)
-
 ### Core Client Modules
-
 | Directory | Key Files | Purpose |
 |-----------|-----------|---------|
 | `ai/` | `client-router.ts`, `client-cache.ts`, `client-embed.ts`, `onnx/session.ts` | Local inference (ONNX WebGPU), 3-tier routing, dual-tier cache |
@@ -289,9 +244,7 @@ sveltekit-frontend/
 | `utils/` | `ollama.ts`, `xstate-svelte5.ts`, etc. | Utility functions (12 active, 100% wired) |
 | `shims/` | Browser compatibility | **MUST preserve** |
 | `services/` | 15 active of 312+ total | **blanket-excluded** (312 corrupted) |
-
 ### Component Subdirectories (38)
-
 | Group | Dirs | Notable |
 |-------|------|---------|
 | **Core UI** | `ui/`, `layout/`, `forms/`, `modals/`, `Dialog/` | Button, Icon, panels, forms |
@@ -300,11 +253,8 @@ sveltekit-frontend/
 | **Visualization** | `visualization/`, `canvas/`, `dashboard/` | Charts, graphs, dashboards |
 | **Terminal** | `terminal/`, `yorha/`, `nes/`, `detective/` | YoRHa theme, NES elements |
 | **Other** | `admin/`, `codebase/`, `editor/`, `editors/`, `source-validation/` | Specialized |
-
 ---
-
 ## Key Server Infrastructure Files (35+)
-
 | File | Lines | Purpose |
 |------|-------|---------|
 | `lib/server/db/schema-postgres.ts` | 2500+ | 70+ tables, 14 enums, evidenceAuditLog, evidenceVersions |
@@ -343,9 +293,7 @@ sveltekit-frontend/
 | `lib/server/env.server.ts` | 100+ | Server environment variables |
 | `src/hooks.server.ts` | 350+ | Request handling, CORS, CSP, auth, COOP/COEP |
 | `src/mcp/server.ts` | 400+ | FastMCP server — 11 agentic tools (stdio) |
-
 ## Key Client Infrastructure Files
-
 | File | Lines | Purpose |
 |------|-------|---------|
 | `lib/ai/client-router.ts` | 200+ | Local vs server inference routing (3-tier) |
@@ -356,13 +304,9 @@ sveltekit-frontend/
 | `lib/gpu/gpu-compute-pipeline.ts` | 709 | 3 WGSL shaders, WebGPU compute |
 | `lib/gpu/gpu-search-reranker.ts` | 148 | Client-side GPU reranking |
 | `lib/machines/retrieval-machine.ts` | 200+ | XState v5 2-stage retrieval orchestration |
-
 ---
-
 ## Storage Layer
-
 ### PostgreSQL (70+ tables)
-
 | Group | Tables | Key |
 |-------|--------|-----|
 | Auth | users, sessions | Core auth |
@@ -375,9 +319,7 @@ sveltekit-frontend/
 | Analytics | analyticsEvents | Event tracking |
 | Error Tracking | phase72_error, phase72_patch, reportAuditLog | Error management |
 | Workspaces, Route Health | Various | Supporting |
-
 ### Qdrant Collections (768-dim)
-
 | Collection | Purpose |
 |------------|---------|
 | `evidence_items` | Evidence chunks + metadata |
@@ -388,33 +330,21 @@ sveltekit-frontend/
 | `embedding_cache` | Embedding lookup cache |
 | `document_tags` | Document tag embeddings |
 | `poi_profiles` | Person of interest face/photo embeddings |
-
 ### Redis Keys
-
 - Session cache, L3 cache tier, GPU arbiter VRAM mutex
 - Analytics sorted sets, HMM bigram transitions
 - Circuit breaker state, template cache, report cache
-
 ### Neo4j Graph
-
 - Cases, Evidence, Statutes, Entities, SIMILAR_TO edges
 - PG→Neo4j sync via `pg-neo4j-sync.ts`
 - Graph centrality computation
-
 ### RabbitMQ Queues (7)
-
 `cache.invalidate`, `document.embed`, `evidence.process`, `vector.index`, `chat.context`, `analytics.track`, `codebase.index`
-
 ### FastMCP Tools (11)
-
 `unified_ast_query`, `cross_language_similarity`, `cuda_fix_priority`, `glyph_metadata`, `neo4j_dependency_graph`, `agentic_recommendation`, `batch_error_analysis`, `redis_cache_stats`, `system_health_check`, `transcribe_audio`, `web_search`
-
 ---
-
 ## Infrastructure Wiring (7 Phases — All Complete)
-
 ### 4-Tier Embedding Fallback Chain
-
 ```
 SvelteKit embedding request
   ↓
@@ -428,9 +358,7 @@ Tier 3: HTTP Batch (Ollama /api/embed, pLimit(4))
   ↓ fail
 Tier 4: HTTP Sequential (Ollama /api/embed, one-at-a-time)
 ```
-
 ### GPU Pipeline (LibTorch/CUDA N-API)
-
 ```
 simd-bridge/cpp/
   ├── binding.cc          ← N-API module init + TypedArray wrappers
@@ -446,9 +374,7 @@ simd-bridge/cpp/
        ↓ called by
   /api/gpu/compute + background-analyzer.ts (post-upload)
 ```
-
 ### Evidence Upload Pipeline (9 stages)
-
 1. MinIO upload + SHA-256 hash + PostgreSQL record
 2. Text extraction: pdf-parse → OCR fallback (Tesseract CLI → tesseract.js)
 3. Structure-aware chunking via legal-chunker.ts (ARTICLE/SECTION/§)
@@ -458,9 +384,7 @@ simd-bridge/cpp/
 7. Forensic pattern detection (SSN, CC, contact density, legal keywords)
 8. Summarization via Ollama gemma3-legal (non-fatal)
 9. **GPU Background Analysis** (fire-and-forget) — similarity, clustering, case embedding via LibTorch CUDA
-
 ### Active Go Microservice Entry Points
-
 | Service | Port | Protocol | Purpose |
 |---------|------|----------|---------|
 | embedding-server | :50051 | gRPC | Ollama proxy + Redis cache + batch parallelism |
@@ -468,9 +392,7 @@ simd-bridge/cpp/
 | gpu_inference_server | :8095-8097 | gRPC/QUIC/HTTP3 | CUDA worker pools + tensor cache |
 | analytics-service | gRPC | gRPC | PostgreSQL analytics (trends, breakdowns) |
 | minio-simd-service | :8095 | HTTP | SIMD JSON parsing for MinIO metadata |
-
 ### Docker Services
-
 | Service | Port | Status |
 |---------|------|--------|
 | deeds-postgres-prod | 5432 | UP |
@@ -480,9 +402,7 @@ simd-bridge/cpp/
 | phase66-rabbitmq | 5672 | UP |
 | phase66-couchdb | 5984 | UP |
 | phase66-langextract | 8095 | UP |
-
 ### GPU + Inference Stack
-
 | Component | Status | Details |
 |-----------|--------|---------|
 | RTX 3060 Ti | ACTIVE | 8192 MiB VRAM, driver 580.88 |
@@ -490,11 +410,8 @@ simd-bridge/cpp/
 | gemma3-legal | LOADED | 11.8B Q4_K_M (7.3GB) |
 | embeddinggemma | LOADED | 307M BF16 (622MB, 768-dim) |
 | TRT-LLM | AVAILABLE | API routes exist, engine not built |
-
 ---
-
 ## Cross-Service Communication Map
-
 ```
 SvelteKit ←─ gRPC ──→ Go embedding-server ←─ HTTP ──→ Ollama
     │                       ↑
@@ -510,11 +427,8 @@ SvelteKit ←─ gRPC ──→ Go embedding-server ←─ HTTP ──→ Ollama
     ├── AMQP ──→ RabbitMQ (async jobs)
     └── HTTP ──→ CouchDB (tag catalog)
 ```
-
 ---
-
 ## Client ↔ Server RAG Architecture
-
 ```
 User Query
   ↓
@@ -536,9 +450,7 @@ Client Router (client-router.ts)
       ├── Citation-grounded answers
       └── SSE streaming to client
 ```
-
 ### Cache Hierarchy
-
 ```
 L0: LokiJS (in-memory, 5-10min TTL, session-scoped)
   ↓ miss
@@ -552,11 +464,8 @@ L4: Service Logic (DB query, Qdrant search, Ollama inference)
   ↓
 Write back to L0-L3
 ```
-
 ---
-
 ## Kiro Spec Features — 16/17 at 100%
-
 | # | Feature | Status |
 |---|---------|--------|
 | 1 | Multi-Source Retrieval | **100%** — RAG, KAG, DAG, Wikipedia, Google+DDG, ACE 8-source, 2-stage retrieval |
@@ -576,11 +485,8 @@ Write back to L0-L3
 | 15 | Evidence Pipeline Scaling | **100%** — pLimit(3), batch embed, summary, auto-tag, GPU analysis |
 | 16 | Report Caching | **100%** — Redis templates, warmup, export cache |
 | 17 | Cache Infrastructure | **100%** — Multi-tier invalidation, dashboard, Qdrant health |
-
 ---
-
 ## next_steps/ Status (18 files)
-
 | File | Status | Summary |
 |------|--------|---------|
 | ACTIVE_DEMOS_LIST.md | DONE | 12 route demos verified |
@@ -601,56 +507,39 @@ Write back to L0-L3
 | WEBGPU_DEMO_IMPLEMENTATION.md | DONE | Memory palace 3D implementation |
 | WEBGPU_MEMORY_PALACE_ANALYSIS.md | CURRENT | WebGL→WebGPU upgrade paths |
 | README.md | CURRENT | Index of all docs |
-
 ---
-
 ## Sprint Pipeline Status (March 10, 2026)
-
 ### Completed This Session
-
 - Evidence audit logging (evidenceAuditLog + evidenceVersions tables)
 - GPU analysis API endpoint (GET/POST /api/evidence/[id]/gpu-analysis)
 - Evidence audit trail API (GET /api/evidence/[id]/audit)
 - Background analyzer audit wiring
 - Evidence upload audit wiring
 - SQL migration created (drizzle/manual/20260311_audit_and_versions.sql)
-
 ### Active Plan (silly-squishing-barto.md)
-
 | Sprint | Focus | Status |
 |--------|-------|--------|
 | Sprint 1 | Critical Fixes (embedding shim, VAPID, shutdown, CORS, timeouts) | IN PROGRESS |
 | Sprint 2 | Embedding Consolidation (facade, dedup) | PENDING |
 | Sprint 3 | Infrastructure Hardening (circuit breakers, health) | PARTIAL (circuit breaker done) |
 | Sprint 4 | Production Readiness (CSP, body limit, SSE fix) | PENDING |
-
 ---
-
 ## Cleanup Opportunities
-
 ### Root Project (2,231 loose files)
-
 - ~500 session log `.txt` files (1_1_25 through 3_10_26 naming pattern)
 - ~50 `.patch` files
 - ~100 misc artifacts (`.exe`, old configs, stale reports)
 - Recommendation: Archive to `deeds_labs/session-logs/`
-
 ### Empty/Stale Root Dirs (5)
-
 - `hmm-topic-service/`, `ocr_pipeline/`, `ollama_models/`, `onnx/`, `deeds-web-app/`
 - Safe to delete (empty or duplicated)
-
 ### SvelteKit src/lib/ (90+ subdirs)
-
 - Many single-file directories could be consolidated
 - `lib/services/` — 312 corrupted files blanket-excluded; 15 active files wired
 - `lib/types/` — ~65 of 83 files likely dead (only 9 actively imported)
 - `lib/__tests__/`, `lib/error-brain/` — excluded from tsconfig
-
 ---
-
 ## Critical Warnings
-
 - **tsconfig**: `src/lib/services/**` blanket-excluded (312 corrupted)
 - **Phase 99**: Commit `0a2bd98929` corrupted 83 files — DO NOT rerun
 - **DB migrations**: Always `drizzle-kit migrate`, review SQL for DROPs

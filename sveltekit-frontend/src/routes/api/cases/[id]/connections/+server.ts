@@ -3,6 +3,29 @@ import { db } from '$lib/server/db/client';
 import { evidenceBoardConnections } from '$lib/server/db/schema-postgres.js';
 import { eq, and } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
+import { z } from 'zod';
+
+const connectionCreateSchema = z.object({
+	fromEvidenceId: z.string().uuid('Invalid fromEvidenceId'),
+	toEvidenceId: z.string().uuid('Invalid toEvidenceId'),
+	connectionType: z.string().max(100).optional(),
+	label: z.string().max(500).optional(),
+	notes: z.string().max(5000).optional(),
+	strength: z.number().min(0).max(1).optional()
+});
+
+const connectionUpdateSchema = z.object({
+	connectionId: z.string().uuid('connectionId is required'),
+	label: z.string().max(500).nullable().optional(),
+	notes: z.string().max(5000).nullable().optional(),
+	strength: z.number().min(0).max(1).optional(),
+	connectionType: z.string().max(100).optional(),
+	isVisible: z.boolean().optional()
+});
+
+const connectionDeleteSchema = z.object({
+	connectionId: z.string().uuid('connectionId is required')
+});
 
 /**
  * GET /api/cases/[id]/connections
