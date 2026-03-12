@@ -10,6 +10,22 @@ import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { redis } from '$lib/server/redis.js';
 import { db } from '$lib/server/db/client';
+import { z } from 'zod';
+
+const qloraConfigSchema = z.object({
+	epochs: z.number().int().min(1).max(100).optional(),
+	batchSize: z.number().int().min(1).max(128).optional(),
+	learningRate: z.number().min(1e-6).max(1).optional(),
+	loraRank: z.number().int().min(1).max(256).optional(),
+	loraAlpha: z.number().int().min(1).max(512).optional(),
+	maxSeqLength: z.number().int().min(64).max(32768).optional()
+});
+
+const qloraSubmitSchema = z.object({
+	model: z.string().max(200).optional().default('gemma3-legal:latest'),
+	dataset: z.string().max(200).optional().default('legal-qa-pairs'),
+	config: qloraConfigSchema.optional().default({})
+});
 
 interface TrainingJob {
 	id: string;
@@ -102,16 +118,12 @@ export async function GET() {
 }
 
 export async function POST({ request }: RequestEvent) {
-	const body = await request.json();
-	const {
-		model = 'gemma3-legal:latest',
-		dataset = 'legal-qa-pairs',
-		config = {}
-	} = body as {
-		model?: string;
-		dataset?: string;
-		config?: Partial<TrainingJob['config']>;
-	};
+	const raw = await request.json();
+	const parsed = qloraSubmitSchema.safeParse(raw);
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+	}
+	const { model, dataset, config } = parsed.data;
 
 	const job: TrainingJob = {
 		id: `qlora-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,

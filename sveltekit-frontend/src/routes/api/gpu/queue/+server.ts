@@ -7,8 +7,18 @@ import {
 	createGpuTask,
 	classifyTaskPriority,
 	type GpuTask,
-	type GpuPriority
 } from '$lib/machines/gpu-process-machine.js';
+import { z } from 'zod';
+
+const GPU_TASK_TYPES = ['chat', 'embedding', 'analysis', 'rerank', 'training', 'classification'] as const;
+
+const gpuQueueSchema = z.object({
+	type: z.enum(GPU_TASK_TYPES),
+	payload: z.record(z.string(), z.unknown()).optional().default({}),
+	backend: z.enum(['ollama', 'tensorrt', 'onnx']).optional().default('ollama'),
+	isRealtime: z.boolean().optional().default(false),
+	batchSize: z.number().int().min(1).max(256).optional()
+});
 
 // In-memory queue for server-side task tracking
 // (XState machine runs client-side; this is the server counterpart)
@@ -48,24 +58,12 @@ export async function GET() {
 }
 
 export async function POST({ request }: RequestEvent) {
-	const body = await request.json();
-	const {
-		type,
-		payload = {},
-		backend = 'ollama',
-		isRealtime = false,
-		batchSize
-	} = body as {
-		type: GpuTask['type'];
-		payload?: Record<string, unknown>;
-		backend?: GpuTask['backend'];
-		isRealtime?: boolean;
-		batchSize?: number;
-	};
-
-	if (!type) {
-		return json({ error: 'type is required (chat|embedding|analysis|rerank|training|classification)' }, { status: 400 });
+	const raw = await request.json();
+	const parsed = gpuQueueSchema.safeParse(raw);
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	}
+	const { type, payload, backend, isRealtime, batchSize } = parsed.data;
 
 	const task = createGpuTask(type, payload, { backend, isRealtime, batchSize });
 	taskQueue.push(task);

@@ -1,16 +1,23 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
+import { z } from 'zod';
+
+const aiFeedbackSchema = z.object({
+	messageId: z.string().min(1, 'messageId is required').max(200),
+	rating: z.number().min(-1).max(1),
+	comment: z.string().max(2000).optional()
+});
 
 /** POST /api/ai/feedback — Store user feedback on AI responses */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
-		const { messageId, rating, comment } = body;
-
-		if (!messageId || rating === undefined) {
-			return json({ error: 'messageId and rating are required' }, { status: 400 });
+		const raw = await request.json();
+		const parsed = aiFeedbackSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
+		const { messageId, rating, comment } = parsed.data;
 
 		// Store feedback in chatMessages metadata JSONB if table exists
 		try {

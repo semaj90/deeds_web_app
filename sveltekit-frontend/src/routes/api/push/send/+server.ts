@@ -4,11 +4,23 @@ import { sendNotification, sendNtfy } from '$lib/server/notifications/push-servi
 import type { NotificationPayload } from '$lib/server/notifications/push-service';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
+import { z } from 'zod';
+
+const pushSendSchema = z.object({
+	title: z.string().min(1, 'Title is required').max(500),
+	body: z.string().min(1, 'Body is required').max(5000),
+	icon: z.string().max(500).optional(),
+	tag: z.string().max(200).optional(),
+	url: z.string().max(2000).optional(),
+	data: z.record(z.string(), z.unknown()).optional(),
+	userId: z.string().uuid().optional(),
+	channels: z.array(z.enum(['web-push', 'ntfy'])).optional(),
+	ntfyTopic: z.string().max(200).optional()
+});
 
 /**
  * POST /api/push/send
  * Send a notification to a user or broadcast
- * Body: { title, body, userId?, channels?: ('web-push' | 'ntfy')[], ntfyTopic? }
  */
 export const POST: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user) {
@@ -16,11 +28,12 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	}
 
 	try {
-		const body = await request.json();
-
-		if (!body?.title || !body?.body) {
-			throw error(400, 'Missing required fields: title, body');
+		const raw = await request.json();
+		const parsed = pushSendSchema.safeParse(raw);
+		if (!parsed.success) {
+			throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
 		}
+		const body = parsed.data;
 
 		const payload: NotificationPayload = {
 			title: body.title,

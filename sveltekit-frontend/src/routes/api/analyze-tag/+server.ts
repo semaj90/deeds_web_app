@@ -9,16 +9,24 @@
 import { db } from '$lib/server/db/client';
 import { getCollections, scrollPoints } from '$lib/server/qdrant-http';
 import { json, type RequestEvent } from '@sveltejs/kit';
-import { exec } from 'child_process';
 import { sql } from 'drizzle-orm';
-import { promisify } from 'util';
+import { z } from 'zod';
 
 import { getOllamaUrl } from '$lib/config/env.server.js';
-const execAsync = promisify(exec);
 const OLLAMA_URL = getOllamaUrl();
 
+const analyzeTagSchema = z.object({
+	tag: z.string().min(1, 'tag is required').max(200),
+	collection: z.string().min(1, 'collection is required').max(200)
+});
+
 export async function POST({ request }: RequestEvent) {
-	const { tag, collection } = await request.json();
+	const raw = await request.json();
+	const parsed = analyzeTagSchema.safeParse(raw);
+	if (!parsed.success) {
+		return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+	}
+	const { tag, collection } = parsed.data;
 
 	try {
 		// 1. Search tag occurrences in Qdrant
@@ -42,7 +50,7 @@ export async function POST({ request }: RequestEvent) {
 		await db.execute(sql`
 			INSERT INTO phase89_enhanced_tags (tag_name, summary, embedding, metadata, created_at)
 			VALUES (
-				${ tag },
+				${tag},
 				${analysis.summary},
 				${JSON.stringify(embedding)},
 				${JSON.stringify({
@@ -72,7 +80,7 @@ export async function POST({ request }: RequestEvent) {
 		console.error('Tag analysis failed:', error);
 		return json({ success: false, error: error.message }, { status: 500 });
 	}
-};
+}
 
 async function searchTagOccurrences(tag: string, collection: string) {
 	const collections = collection === 'all'
@@ -161,7 +169,7 @@ Related: [tag1, tag2, tag3]`;
 	const relatedMatch = text.match(/Related:\s*(.+)/i);
 
 	return {
-		summary: summaryMatch ? summaryMatch[1].trim() : `Tag representing ${ tag } patterns`,
+		summary: summaryMatch ? summaryMatch[1].trim() : `Tag representing ${tag} patterns`,
 		relatedTags: relatedMatch
 			? relatedMatch[1]
 				.split(',')
@@ -170,6 +178,3 @@ Related: [tag1, tag2, tag3]`;
 			: []
 	};
 }
-
-
-

@@ -2,18 +2,24 @@
  * POST /api/nlp/classify
  *
  * Classify legal document by type and practice area via Ollama.
- * Body: { text: string }
  */
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { classifyDocument } from '$lib/server/nlp/analyzer.js';
+import { z } from 'zod';
+
+const classifySchema = z.object({
+	text: z.string().min(1, 'text is required').max(50000)
+});
 
 export async function POST({ request }: RequestEvent) {
-	const { text } = await request.json();
-	if (!text || typeof text !== 'string') {
-		return json({ error: 'text is required' }, { status: 400 });
+	const raw = await request.json();
+	const parsed = classifySchema.safeParse(raw);
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	}
+
 	try {
-		const result = await classifyDocument(text.slice(0, 5000));
+		const result = await classifyDocument(parsed.data.text.slice(0, 5000));
 		return json(result);
 	} catch (err) {
 		return json({ error: err instanceof Error ? err.message : 'Classification failed' }, { status: 500 });

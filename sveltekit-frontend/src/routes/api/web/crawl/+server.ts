@@ -3,13 +3,18 @@
  *
  * Web crawl proxy — delegates to the langextract Docker service (port 8095)
  * for URL content extraction, then optionally embeds + stores the result.
- *
- * Body: { url: string, extractText?: boolean, generateEmbedding?: boolean }
  */
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
 
 const LANGEXTRACT_URL = 'http://localhost:8095';
+
+const webCrawlSchema = z.object({
+	url: z.string().min(1, 'url is required').max(2000).url('Invalid URL format'),
+	extractText: z.boolean().optional().default(true),
+	generateEmbedding: z.boolean().optional().default(false)
+});
 
 interface CrawlResult {
 	url: string;
@@ -22,23 +27,12 @@ interface CrawlResult {
 }
 
 export async function POST({ request }: RequestEvent) {
-	const body = await request.json();
-	const { url, extractText = true, generateEmbedding = false } = body as {
-		url: string;
-		extractText?: boolean;
-		generateEmbedding?: boolean;
-	};
-
-	if (!url || typeof url !== 'string') {
-		return json({ error: 'url is required' }, { status: 400 });
+	const raw = await request.json();
+	const parsed = webCrawlSchema.safeParse(raw);
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	}
-
-	// Validate URL format
-	try {
-		new URL(url);
-	} catch {
-		return json({ error: 'Invalid URL format' }, { status: 400 });
-	}
+	const { url, generateEmbedding } = parsed.data;
 
 	const start = performance.now();
 

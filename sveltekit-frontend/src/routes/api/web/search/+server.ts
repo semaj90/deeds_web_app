@@ -3,20 +3,24 @@
  *
  * Web search endpoint for external knowledge retrieval.
  * Tries Google Custom Search → DuckDuckGo fallback.
- *
- * Body: { query: string, maxResults?: number }
  */
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { webSearch } from '$lib/server/retrieval/web-search.js';
+import { z } from 'zod';
+
+const webSearchSchema = z.object({
+	query: z.string().min(1, 'query is required').max(200),
+	maxResults: z.number().int().min(1).max(10).optional().default(5)
+});
 
 export async function POST({ request }: RequestEvent) {
-	const body = await request.json();
-	const { query, maxResults = 5 } = body as { query: string; maxResults?: number };
-
-	if (!query || typeof query !== 'string') {
-		return json({ error: 'query is required' }, { status: 400 });
+	const raw = await request.json();
+	const parsed = webSearchSchema.safeParse(raw);
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	}
+	const { query, maxResults } = parsed.data;
 
-	const response = await webSearch(query.slice(0, 200), Math.min(maxResults, 10));
+	const response = await webSearch(query, maxResults);
 	return json(response);
 }
