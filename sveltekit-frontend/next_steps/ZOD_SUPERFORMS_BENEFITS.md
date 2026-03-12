@@ -63,7 +63,7 @@ Keep schemas outside `load()` or action functions so the Superforms adapter can 
 | `/cases` | `cases/schema.ts` | create, bulkUpdateStatus, bulkArchive |
 | `/login` | `login/schema.ts` | login |
 | `/analysis-center` | `analysis-center/schema.ts` | search, analyze |
-### Zod `safeParse()` (API Routes — 55 endpoints)
+### Zod `safeParse()` (API Routes — 70 endpoints)
 | Endpoint | Validates |
 |----------|-----------|
 | `POST /api/citations` | statute_code, case_id, jurisdiction, etc. |
@@ -119,6 +119,21 @@ Keep schemas outside `load()` or action functions so the Superforms adapter can 
 | `PATCH /api/knowledge` | prompt (1-10K), max_context_chunks (1-50), use_gemini (boolean) |
 | `POST /api/indexing?action=codebase` | rootPath (500, default './src') |
 | `POST /api/indexing?action=search` | query (1-5K), limit (1-100, default 5) |
+| `POST /api/agent/investigate` | query (1-10K), useACE, maxIterations (1-50), caseId, verbose |
+| `POST /api/agents/chat` | prompt/message (10K, .refine() requires one) |
+| `POST /api/ace/summarize` | evidenceId (uuid), caseId (uuid), content (50K), title (.refine() requires content or evidenceId) |
+| `POST /api/acp/execute` | tool (1-500), args (record), dryRun (boolean) |
+| `POST /api/analyze-file` | filePath (1K, .refine() blocks `..` path traversal + absolute paths) |
+| `POST /api/ace/ingest` | url (1-5K), caseId (200), title (500) |
+| `POST /api/ai/analyze-evidence` | evidenceId (500), text (.trim(), 1-100K), metadata (any) |
+| `POST /api/ai/summarize` | text/content (50K, .refine() requires one), maxLength (50-5K) |
+| `POST /api/ai/tensorrt/vlm` (JSON) | prompt (50K), imageBase64 (50MB), maxTokens (1-8192), temperature (0-2) |
+| `POST /api/cases/[id]/chat` | chatId (1-500), messages (array 1-100, role enum), metadata (record) |
+| `POST /api/auth/demo-login` | email (.email(), 255), role (50) |
+| `POST /api/ai/contextual-chat` | message/query (50K, .refine()), caseId, context (10K), history (50 msgs) |
+| `POST /api/ai/cross-exam` | witness.name (500), witness.statement (50K), caseContext (50K) |
+| `POST /api/cache/recent-queries` | query (1-5K), cached (boolean), responseTime (0-300K) |
+| `POST /api/ai/route-intent` | query (10K), statute.id/titleNumber/section, userQuestion (.refine()) |
 ### Pattern Used
 ```typescript
 // Form actions (Superforms)

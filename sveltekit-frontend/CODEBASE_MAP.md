@@ -519,8 +519,8 @@ Write back to L0-L3
 ### Active Plan (silly-squishing-barto.md)
 | Sprint | Focus | Status |
 |--------|-------|--------|
-| Sprint 1 | Critical Fixes (embedding shim, VAPID, shutdown, CORS, timeouts) | IN PROGRESS |
-| Sprint 2 | Embedding Consolidation (facade, dedup) | PENDING |
+| Sprint 1 | Critical Fixes (shutdown, VAPID, CORS, timeouts, IORedis shim) | DONE |
+| Sprint 2 | Embedding Consolidation (facade, cache-first, dedup) | DONE |
 | Sprint 3 | Infrastructure Hardening (circuit breakers, health) | PARTIAL (circuit breaker done) |
 | Sprint 4 | Production Readiness (CSP, body limit, SSE fix) | PENDING |
 ---
