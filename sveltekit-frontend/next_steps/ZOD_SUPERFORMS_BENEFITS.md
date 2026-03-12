@@ -63,7 +63,7 @@ Keep schemas outside `load()` or action functions so the Superforms adapter can 
 | `/cases` | `cases/schema.ts` | create, bulkUpdateStatus, bulkArchive |
 | `/login` | `login/schema.ts` | login |
 | `/analysis-center` | `analysis-center/schema.ts` | search, analyze |
-### Zod `safeParse()` (API Routes — 70 endpoints)
+### Zod `safeParse()` (API Routes — 82 endpoints)
 | Endpoint | Validates |
 |----------|-----------|
 | `POST /api/citations` | statute_code, case_id, jurisdiction, etc. |
@@ -134,6 +134,19 @@ Keep schemas outside `load()` or action functions so the Superforms adapter can 
 | `POST /api/ai/cross-exam` | witness.name (500), witness.statement (50K), caseContext (50K) |
 | `POST /api/cache/recent-queries` | query (1-5K), cached (boolean), responseTime (0-300K) |
 | `POST /api/ai/route-intent` | query (10K), statute.id/titleNumber/section, userQuestion (.refine()) |
+| `POST /api/ai/case-prediction` | caseId (1-500) |
+| `POST /api/ai/case-scoring` | caseId (1-500) |
+| `POST /api/ai/judge` | evidence (array 1-20, id+title), charges (50), jurisdiction (100), caseId |
+| `POST /api/ai/legal-research` | topic/query (10K, .refine()), jurisdiction (100), depth (50) |
+| `POST /api/ai/memo-skeleton` | facts (50K), statutes (50K), notes (array, .refine()) — SSE |
+| `POST /api/ai/tensorrt/stream` | prompt (1-50K), maxTokens (1-8192), temperature (0-2) — SSE |
+| `POST /api/ai/yorha/context-chat` | message (.trim(), 1-50K), caseId (500, nullable) |
+| `POST /api/cases/[id]/reasoning-chain` | summary (.trim(), 10-50K), keyFacts[], charges[], jurisdiction |
+| `POST /api/cases/cluster` | algorithm (enum), k (2-50), includeEmbeddings, caseId |
+| `POST /api/citations/[citationId]/tags` | tag (.trim(), 1-200), color (20) |
+| `DELETE /api/citations/[citationId]/tags` | tag (1-200) |
+| `POST /api/citations/collections` | name (.trim(), 1-500), description (5K), color (20), isPublic |
+| `POST /api/citations/saved` | statute_code/citationText (500, .refine()), 15 nullable fields |
 ### Pattern Used
 ```typescript
 // Form actions (Superforms)
