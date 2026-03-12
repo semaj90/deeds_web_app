@@ -2,10 +2,11 @@
  * Embedding Facade — unified import point for all embedding operations.
  *
  * Sprint 2: Cache-first pattern with in-flight request deduplication.
+ * Sprint 3: Circuit breaker + retry for transient failure recovery.
  *
  * Architecture:
- *   embedText(text)   → cache check → in-flight dedup → generateSingleEmbedding() → cache store
- *   embedTexts(texts)  → batch cache check → generate misses → batch cache store
+ *   embedText(text)   → cache check → in-flight dedup → circuit breaker → retry → generate → cache store
+ *   embedTexts(texts)  → batch cache check → circuit breaker → retry → generate misses → batch cache store
  *
  * Re-exports from canonical modules:
  *   - Batch embeddings: grpc/embedding-client.ts (4-tier fallback: gRPC → QUIC → HTTP)
@@ -20,6 +21,8 @@ import {
 	batchGetCachedEmbeddings,
 	batchCacheEmbeddings,
 } from '$lib/server/embedding-cache.js';
+import { ollamaBreaker } from '$lib/server/circuit-breaker.js';
+import { retry, retryPredicates } from '$lib/server/utils/retry.js';
 import { createHash } from 'crypto';
 
 // ── Re-exports (keep backward compatibility) ────────────────────────────────
@@ -88,8 +91,13 @@ export async function embedText(text: string): Promise<number[]> {
 	const existing = inFlight.get(key);
 	if (existing) return existing;
 
-	// 3. Generate + cache
-	const promise = generateSingleEmbedding(trimmed).then(async (vector) => {
+	// 3. Generate via circuit breaker + retry, then cache
+	const promise = ollamaBreaker.call(
+		() => retry(
+			() => generateSingleEmbedding(trimmed),
+			{ maxAttempts: 2, baseDelayMs: 200, isRetryable: retryPredicates.networkOrServer }
+		)
+	).then(async (vector) => {
 		inFlight.delete(key);
 		// Cache asynchronously (don't block return)
 		try {
@@ -150,8 +158,13 @@ export async function embedTexts(texts: string[]): Promise<number[][]> {
 		return results as number[][];
 	}
 
-	// 3. Generate only cache misses via 4-tier fallback
-	const generated = await generateEmbeddings(missTexts);
+	// 3. Generate only cache misses via circuit breaker + retry + 4-tier fallback
+	const generated = await ollamaBreaker.call(
+		() => retry(
+			() => generateEmbeddings(missTexts),
+			{ maxAttempts: 2, baseDelayMs: 200, isRetryable: retryPredicates.networkOrServer }
+		)
+	);
 
 	// 4. Merge results + batch cache store
 	const toCache: Array<{ text: string; embedding: Float32Array }> = [];

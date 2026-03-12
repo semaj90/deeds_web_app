@@ -6,6 +6,8 @@
 
 import { qdrant, deterministicPointId } from '$lib/server/vector/qdrant-manager.js';
 import { pgVectorService, type PgVectorSearchResult } from './PgVectorService.js';
+import { qdrantBreaker } from '$lib/server/circuit-breaker.js';
+import { retry, retryPredicates } from '$lib/server/utils/retry.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -52,25 +54,30 @@ export class MultiVectorStore {
 	async dualWrite(doc: MultiStoreDocument): Promise<DualWriteResult> {
 		const collection = doc.collection ?? qdrant.collections.evidence;
 
-		// Primary: Qdrant (must succeed)
+		// Primary: Qdrant (must succeed) — circuit breaker + retry
 		let qdrantResult: { ok: boolean; error?: string };
 		try {
 			const pointId = deterministicPointId(doc.id);
-			await qdrant.client.upsert(collection, {
-				wait: true,
-				points: [
-					{
-						id: pointId,
-						vector: { content: doc.embedding },
-						payload: {
-							document_id: doc.id,
-							content: doc.content,
-							source: doc.source ?? 'unknown',
-							...(doc.metadata ?? {})
-						}
-					}
-				]
-			});
+			await qdrantBreaker.call(() =>
+				retry(
+					() => qdrant.client.upsert(collection, {
+						wait: true,
+						points: [
+							{
+								id: pointId,
+								vector: { content: doc.embedding },
+								payload: {
+									document_id: doc.id,
+									content: doc.content,
+									source: doc.source ?? 'unknown',
+									...(doc.metadata ?? {})
+								}
+							}
+						]
+					}),
+					{ maxAttempts: 2, baseDelayMs: 300, isRetryable: retryPredicates.networkOrServer }
+				)
+			);
 			qdrantResult = { ok: true };
 		} catch (error) {
 			qdrantResult = { ok: false, error: (error as Error).message };
@@ -225,11 +232,16 @@ export class MultiVectorStore {
 		topK: number,
 		collection: string
 	): Promise<MultiStoreSearchResult[]> {
-		const results = await qdrant.client.search(collection, {
-			vector: { name: 'content', vector: embedding },
-			limit: topK,
-			with_payload: true
-		});
+		const results = await qdrantBreaker.call(() =>
+			retry(
+				() => qdrant.client.search(collection, {
+					vector: { name: 'content', vector: embedding },
+					limit: topK,
+					with_payload: true
+				}),
+				{ maxAttempts: 2, baseDelayMs: 200, isRetryable: retryPredicates.networkOrServer }
+			)
+		);
 
 		return results.map((r) => ({
 			id: (r.payload?.document_id as string) ?? String(r.id),

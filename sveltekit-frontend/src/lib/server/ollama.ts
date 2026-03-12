@@ -38,6 +38,7 @@ export interface OllamaResponse {
 }
 
 import { ollamaBreaker } from '$lib/server/circuit-breaker.js';
+import { retry, retryPredicates } from '$lib/server/utils/retry.js';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
@@ -65,21 +66,25 @@ export async function generateText(prompt: string): Promise<string> {
 		stream: false,
 	};
 
-	const res = await fetch(`${OLLAMA_BASE_URL}/api/chat`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(body),
-		signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
-	});
+	return ollamaBreaker.call(() =>
+		retry(async () => {
+			const res = await fetch(`${OLLAMA_BASE_URL}/api/chat`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(body),
+				signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+			});
 
-	if (!res.ok) {
-		const text = await res.text().catch(() => '');
-		console.error('[ollama] /api/chat error:', res.status, text.slice(0, 200));
-		throw new Error(`Ollama chat failed: ${res.status}`);
-	}
+			if (!res.ok) {
+				const text = await res.text().catch(() => '');
+				console.error('[ollama] /api/chat error:', res.status, text.slice(0, 200));
+				throw new Error(`Ollama chat failed: ${res.status}`);
+			}
 
-	const data = await res.json() as { message?: { content: string } };
-	return data.message?.content ?? '';
+			const data = await res.json() as { message?: { content: string } };
+			return data.message?.content ?? '';
+		}, { maxAttempts: 2, baseDelayMs: 500, isRetryable: retryPredicates.networkOrServer })
+	);
 }
 
 export async function callOllamaChat(systemPrompt: string, userPrompt: string): Promise<string> {
@@ -94,25 +99,29 @@ export async function callOllamaChat(systemPrompt: string, userPrompt: string): 
 
 	const startTime = Date.now();
 
-	const res = await fetch(`${OLLAMA_BASE_URL}/api/chat`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(body),
-		signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
-	});
+	return ollamaBreaker.call(() =>
+		retry(async () => {
+			const res = await fetch(`${OLLAMA_BASE_URL}/api/chat`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(body),
+				signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+			});
 
-	const duration = Date.now() - startTime;
+			const duration = Date.now() - startTime;
 
-	if (!res.ok) {
-		const text = await res.text().catch(() => '');
-		console.error('[ollama] /api/chat error:', res.status, text.slice(0, 200));
-		throw new Error(`Ollama chat failed: ${res.status}`);
-	}
+			if (!res.ok) {
+				const text = await res.text().catch(() => '');
+				console.error('[ollama] /api/chat error:', res.status, text.slice(0, 200));
+				throw new Error(`Ollama chat failed: ${res.status}`);
+			}
 
-	const data = await res.json() as { message?: { content: string } };
-	const content = data.message?.content ?? '';
-	console.log(`[ollama] Chat completed in ${duration}ms (${content.length} chars)`);
-	return content;
+			const data = await res.json() as { message?: { content: string } };
+			const content = data.message?.content ?? '';
+			console.log(`[ollama] Chat completed in ${duration}ms (${content.length} chars)`);
+			return content;
+		}, { maxAttempts: 2, baseDelayMs: 500, isRetryable: retryPredicates.networkOrServer })
+	);
 }
 
 // ── Health & Model Discovery ────────────────────────────────────────────────
