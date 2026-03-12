@@ -3,6 +3,16 @@ import { json, error } from '@sveltejs/kit';
 import { sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { invalidateCitationCache } from '$lib/server/cache/invalidation.js';
+import { z } from 'zod';
+
+const addTagSchema = z.object({
+	tag: z.string().trim().min(1, 'Tag is required').max(200),
+	color: z.string().max(20).optional().default('#6b7280')
+});
+
+const removeTagSchema = z.object({
+	tag: z.string().min(1, 'Tag is required').max(200)
+});
 
 /**
  * GET /api/citations/[citationId]/tags
@@ -29,11 +39,10 @@ export const GET: RequestHandler = async ({ params }) => {
 export const POST: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 
-	const body = await request.json();
-	if (!body?.tag?.trim()) throw error(400, 'Tag is required');
-
-	const tag = body.tag.trim().toLowerCase();
-	const color = body.color || '#6b7280';
+	const parsed = addTagSchema.safeParse(await request.json());
+	if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+	const tag = parsed.data.tag.toLowerCase();
+	const color = parsed.data.color;
 
 	try {
 		const result = await db.execute(
@@ -64,12 +73,12 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 export const DELETE: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 
-	const body = await request.json();
-	if (!body?.tag) throw error(400, 'Tag is required');
+	const delParsed = removeTagSchema.safeParse(await request.json());
+	if (!delParsed.success) return json({ error: delParsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 
 	try {
 		await db.execute(
-			sql`DELETE FROM citation_tag_links WHERE citation_id = ${params.citationId} AND tag = ${body.tag}`
+			sql`DELETE FROM citation_tag_links WHERE citation_id = ${params.citationId} AND tag = ${delParsed.data.tag}`
 		);
 
 		// Invalidate citation cache

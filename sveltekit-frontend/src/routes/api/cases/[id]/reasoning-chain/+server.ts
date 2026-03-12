@@ -10,6 +10,14 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { generateReasoningChain } from '$lib/server/ai/legal-reasoning-chain.js';
 import { requireAuth } from '$lib/server/auth-helpers.js';
+import { z } from 'zod';
+
+const reasoningChainSchema = z.object({
+	summary: z.string().trim().min(10, 'summary is required (minimum 10 characters)').max(50000),
+	keyFacts: z.array(z.string().max(5000)).max(100).optional(),
+	charges: z.array(z.string().max(500)).max(100).optional(),
+	jurisdiction: z.string().max(200).optional()
+});
 
 export const POST: RequestHandler = async (event) => {
 	await requireAuth(event);
@@ -17,14 +25,14 @@ export const POST: RequestHandler = async (event) => {
 	const startTime = Date.now();
 
 	try {
-		const body = await event.request.json();
-
-		if (!body.summary || typeof body.summary !== 'string' || body.summary.trim().length < 10) {
+		const parsed = reasoningChainSchema.safeParse(await event.request.json());
+		if (!parsed.success) {
 			return json(
-				{ success: false, error: 'summary is required (minimum 10 characters)' },
+				{ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' },
 				{ status: 400 }
 			);
 		}
+		const body = parsed.data;
 
 		console.log(`[reasoning-chain] Starting 4-step analysis for case ${caseId}`);
 

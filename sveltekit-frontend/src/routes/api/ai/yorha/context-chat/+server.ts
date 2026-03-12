@@ -9,18 +9,21 @@
  */
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const yorhaChatSchema = z.object({
+	message: z.string().trim().min(1, 'Missing message').max(50000),
+	caseId: z.string().max(500).nullable().optional()
+});
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const MODEL = 'gemma3-legal:latest';
 
 export const POST: RequestHandler = async ({ request }) => {
-	const body = await request.json();
-	const message = typeof body.message === 'string' ? body.message.trim() : '';
-	const caseId = typeof body.caseId === 'string' ? body.caseId : null;
-
-	if (!message) {
-		return json({ error: 'Missing message' }, { status: 400 });
-	}
+	const parsed = yorhaChatSchema.safeParse(await request.json());
+	if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+	const message = parsed.data.message;
+	const caseId = parsed.data.caseId ?? null;
 
 	// Build prompt with optional case context
 	let systemPrompt = 'You are YorHA, a legal AI assistant. Provide concise, accurate legal analysis.';

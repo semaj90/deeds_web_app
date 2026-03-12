@@ -15,6 +15,14 @@ import { KMeansClusterer } from '$lib/server/ml/topic-cluster.js';
 import { SOMClusterer } from '$lib/server/ml/som-cluster.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { requireAuth } from '$lib/server/auth-helpers.js';
+import { z } from 'zod';
+
+const clusterSchema = z.object({
+	caseId: z.string().max(500).optional(),
+	algorithm: z.enum(['kmeans', 'som', 'hierarchical']).optional().default('kmeans'),
+	k: z.number().int().min(2, 'k must be between 2 and 50').max(50, 'k must be between 2 and 50').optional().default(5),
+	includeEmbeddings: z.boolean().optional().default(false)
+});
 
 interface ClusterRequest {
 	caseId?: string;
@@ -32,34 +40,16 @@ export const POST: RequestHandler = async (event) => {
 	const startTime = Date.now();
 
 	try {
-		const body = (await event.request.json()) as ClusterRequest;
-
-		// Defaults
-		const algorithm = body.algorithm ?? 'kmeans';
-		const k = body.k ?? 5;
-		const includeEmbeddings = body.includeEmbeddings ?? false;
-
-		// Validate algorithm
-		if (!['kmeans', 'som', 'hierarchical'].includes(algorithm)) {
+		// Zod schema validates algorithm enum, k range (2-50), and applies defaults
+		const parsed = clusterSchema.safeParse(await event.request.json());
+		if (!parsed.success) {
 			return json(
-				{
-					success: false,
-					error: `Unsupported algorithm: ${algorithm}. Use 'kmeans', 'som', or 'hierarchical'`
-				},
+				{ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' },
 				{ status: 400 }
 			);
 		}
-
-		// Validate k
-		if (k < 2 || k > 50) {
-			return json(
-				{
-					success: false,
-					error: 'k must be between 2 and 50'
-				},
-				{ status: 400 }
-			);
-		}
+		const body = parsed.data;
+		const { algorithm, k, includeEmbeddings } = body;
 
 		console.log(
 			`[cases-cluster] Starting clustering: algorithm=${algorithm}, k=${k}, caseId=${body.caseId || 'all'}`

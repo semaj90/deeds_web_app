@@ -2,6 +2,27 @@ import { db, savedCitations } from '$lib/server/db/client';
 import { json, error } from '@sveltejs/kit';
 import { eq, and, desc } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
+
+const saveCitationSchema = z.object({
+	statute_code: z.string().max(500).optional().default(''),
+	citationText: z.string().max(500).optional().default(''),
+	statute_title: z.string().max(1000).nullable().optional(),
+	statuteTitle: z.string().max(1000).nullable().optional(),
+	jurisdiction: z.string().max(200).nullable().optional(),
+	severity: z.string().max(100).nullable().optional(),
+	year: z.union([z.number(), z.string().max(10)]).nullable().optional(),
+	case_id: z.string().max(500).nullable().optional(),
+	caseId: z.string().max(500).nullable().optional(),
+	source_type: z.string().max(100).optional(),
+	sourceType: z.string().max(100).optional(),
+	highlighted_text: z.string().max(50000).nullable().optional(),
+	highlightedText: z.string().max(50000).nullable().optional(),
+	contextText: z.string().max(50000).nullable().optional(),
+	notes: z.string().max(50000).nullable().optional()
+}).refine(d => (d.statute_code?.trim() || d.citationText?.trim()), {
+	message: 'Missing required field: statute_code'
+});
 
 /**
  * GET /api/citations/saved
@@ -55,12 +76,11 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	const userId = locals.user?.id ?? 'anonymous';
 
 	try {
-		const body = await request.json();
-
+		// Zod validates statute_code or citationText required via .refine()
+		const parsed = saveCitationSchema.safeParse(await request.json());
+		if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		const body = parsed.data;
 		const statuteCode = (body.statute_code ?? body.citationText ?? '').trim();
-		if (!statuteCode) {
-			throw error(400, 'Missing required field: statute_code');
-		}
 
 		const [newCitation] = await db
 			.insert(savedCitations)

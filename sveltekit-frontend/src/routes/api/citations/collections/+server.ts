@@ -3,6 +3,14 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { citationCollections, collectionCitations, citations } from '$lib/server/db/schema-postgres.js';
 import { eq, and, sql } from 'drizzle-orm';
+import { z } from 'zod';
+
+const createCollectionSchema = z.object({
+	name: z.string().trim().min(1, 'Missing required field: name').max(500),
+	description: z.string().max(5000).nullable().optional(),
+	color: z.string().max(20).optional().default('#8B2332'),
+	isPublic: z.boolean().optional().default(false)
+});
 
 /**
  * GET /api/citations/collections
@@ -51,20 +59,18 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	}
 
 	try {
-		const body = await request.json();
-
-		if (!body?.name?.trim()) {
-			throw error(400, 'Missing required field: name');
-		}
+		// Zod validates name (required, trimmed), description, color default, isPublic default
+		const parsed = createCollectionSchema.safeParse(await request.json());
+		if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 
 		const [newCollection] = await db
 			.insert(citationCollections)
 			.values({
 				userId: locals.user.id,
-				name: body.name.trim(),
-				description: body.description?.trim() || null,
-				color: body.color || '#8B2332',
-				isPublic: body.isPublic ?? false,
+				name: parsed.data.name,
+				description: parsed.data.description ?? null,
+				color: parsed.data.color,
+				isPublic: parsed.data.isPublic,
 			})
 			.returning();
 

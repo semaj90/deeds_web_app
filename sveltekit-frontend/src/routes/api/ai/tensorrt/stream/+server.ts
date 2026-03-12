@@ -7,21 +7,23 @@
 import type { RequestHandler } from './$types';
 import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 import { streamLLM, healthCheck as trtHealthCheck } from '$lib/server/trt-llm.js';
+import { z } from 'zod';
+
+const trtStreamSchema = z.object({
+	prompt: z.string().min(1, 'prompt is required').max(50000),
+	maxTokens: z.number().int().min(1).max(8192).optional(),
+	temperature: z.number().min(0).max(2).optional()
+});
 
 export const POST: RequestHandler = async ({ request }) => {
-	const body = await request.json();
-	const { prompt, maxTokens, temperature } = body as {
-		prompt: string;
-		maxTokens?: number;
-		temperature?: number;
-	};
-
-	if (!prompt || typeof prompt !== 'string') {
-		return new Response(JSON.stringify({ error: 'prompt is required' }), {
+	const parsed = trtStreamSchema.safeParse(await request.json());
+	if (!parsed.success) {
+		return new Response(JSON.stringify({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }), {
 			status: 400,
 			headers: { 'Content-Type': 'application/json' }
 		});
 	}
+	const { prompt, maxTokens, temperature } = parsed.data;
 
 	const trtAvailable = await trtHealthCheck();
 	if (!trtAvailable) {
