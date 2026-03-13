@@ -1,4 +1,4 @@
-import { assign, createMachine, fromPromise } from 'xstate';
+import { assign, setup } from 'xstate';
 
 export interface CustodyEvent {
   id: string;
@@ -90,7 +90,12 @@ function createCustodyEvent(eventType: string, userId: string, details: Record<s
   };
 }
 
-export const evidenceCustodyMachine = createMachine({
+export const evidenceCustodyMachine = setup({
+  types: {
+    context: {} as EvidenceCustodyContext,
+    events: {} as EvidenceCustodyEvent,
+  },
+}).createMachine({
   id: 'evidenceCustody',
   initial: 'idle',
   context: initialContext,

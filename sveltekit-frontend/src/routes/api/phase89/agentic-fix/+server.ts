@@ -2,11 +2,30 @@ import { spawn } from 'child_process';
 import fs from 'fs/promises';
 import path from 'path';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 
 const SCRIPT_DIR = path.join(process.cwd(), 'scripts');
 
+const agenticFixSchema = z.object({
+	cluster_id: z.number().int().min(1, 'cluster_id is required'),
+	pattern: z.string().max(1000).optional().default(''),
+	file_paths: z.array(z.string().max(1000)).max(200).optional().default([]),
+	context: z.object({
+		summary: z.string().max(10000).optional().default(''),
+		tags: z.array(z.string()).optional().default([]),
+		similar_clusters: z.array(z.string()).optional().default([]),
+	}).optional().default({ summary: '', tags: [], similar_clusters: [] }),
+});
+
 export const POST: RequestHandler = async ({ request }) => {
-	const { cluster_id, pattern, file_paths, context } = await request.json();
+	const parsed = agenticFixSchema.safeParse(await request.json());
+	if (!parsed.success) {
+		return new Response(JSON.stringify({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }), {
+			status: 400,
+			headers: { 'Content-Type': 'application/json' },
+		});
+	}
+	const { cluster_id, pattern, file_paths, context } = parsed.data;
 
 	const stream = new ReadableStream({
 		async start(controller) {

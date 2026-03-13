@@ -11,39 +11,41 @@
 import { db } from '$lib/server/db/client';
 import { chatMessages } from '$lib/server/db/schema';
 import { error, json } from '@sveltejs/kit';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
 
-interface ChatMessage {
-	id: string;
-	conversationId: string;
-	role: 'user' | 'assistant' | 'system';
-	content: string;
-	timestamp: string;
-	saved?: boolean;
-}
+const chatMessageSchema = z.object({
+	id: z.string().max(500).optional().default(''),
+	conversationId: z.string().max(500).optional().default(''),
+	role: z.enum(['user', 'assistant', 'system']),
+	content: z.string().max(100_000),
+	timestamp: z.string(),
+	saved: z.boolean().optional(),
+});
 
-interface MigrationRequest {
-	sessionId: string;
-	chats: Record<string, ChatMessage[]>;
-}
+const migrationSchema = z.object({
+	sessionId: z.string().min(1, 'Missing sessionId').max(500),
+	chats: z.record(z.string(), z.array(chatMessageSchema).max(1000)),
+});
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) {
 		throw error(401, 'You must be logged in to save your chat history');
 	}
 
-	let body: MigrationRequest;
+	let body: unknown;
 	try {
 		body = await request.json();
 	} catch {
 		throw error(400, 'Invalid JSON');
 	}
 
-	const { sessionId, chats } = body;
-
-	if (!sessionId || !chats) {
-		throw error(400, 'Missing sessionId or chats');
+	const parsed = migrationSchema.safeParse(body);
+	if (!parsed.success) {
+		return json({ error: 'Invalid request', details: parsed.error.flatten() }, { status: 400 });
 	}
+
+	const { sessionId, chats } = parsed.data;
 
 	try {
 		let migratedCount = 0;

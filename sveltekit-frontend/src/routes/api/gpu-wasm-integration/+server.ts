@@ -10,6 +10,7 @@
  *   "shaders" — Full WGSL shader source + binding layouts
  */
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 import { getGpuLeaseStatus } from '$lib/server/inference/gpu-arbiter.js';
 import { ENV } from '$lib/server/env.server.js';
 import { existsSync, statSync } from 'fs';
@@ -184,9 +185,17 @@ function getShadersFull(): ShaderSpec[] {
 
 // ─── Handlers ─────────────────────────────────────────────────────────────────
 
+const gpuWasmActionSchema = z.object({
+	action: z.enum(['status', 'health', 'shaders']).optional().default('status'),
+});
+
 export const POST: RequestHandler = async ({ request, fetch: skFetch }) => {
 	const body = await request.json().catch(() => ({}));
-	const action = (body as Record<string, string>).action ?? 'status';
+	const parsed = gpuWasmActionSchema.safeParse(body);
+	if (!parsed.success) {
+		return json({ status: 'error', error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
+	}
+	const action = parsed.data.action;
 
 	// Lightweight health check
 	if (action === 'health') {

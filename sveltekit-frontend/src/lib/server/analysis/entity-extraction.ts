@@ -14,6 +14,7 @@ export interface Entity {
 	score?: number;
 	start?: number;
 	end?: number;
+	source?: 'llm' | 'regex';
 }
 
 /**
@@ -80,7 +81,12 @@ ${text}`;
 		// Validate shape
 		return arr.filter(
 			(e: any) => typeof e?.text === 'string' && typeof e?.label === 'string' && e.text.length > 0
-		).map((e: any) => ({ text: e.text, label: e.label, score: 0.85 }));
+		).map((e: any) => ({
+			text: e.text,
+			label: e.label,
+			score: typeof e.score === 'number' ? e.score : 0.85,
+			source: 'llm' as const,
+		}));
 	} catch {
 		return [];
 	}
@@ -88,52 +94,71 @@ ${text}`;
 
 /**
  * Regex-based extraction — zero latency, always available.
+ * Covers: EMAIL, PHONE, DATE, CASE, STATUTE, MONEY, SSN, CREDIT_CARD, URL, DOCKET, ADDRESS
  */
 function extractViaRegex(text: string): Entity[] {
 	const entities: Entity[] = [];
 	let match: RegExpExecArray | null;
 
+	const push = (m: RegExpExecArray, label: string, score: number) => {
+		entities.push({ text: m[0], label, score, start: m.index, end: m.index + m[0].length, source: 'regex' });
+	};
+
 	// Email addresses
 	const emailRe = /[\w.-]+@[\w.-]+\.[A-Za-z]{2,6}/g;
-	while ((match = emailRe.exec(text))) {
-		entities.push({ text: match[0], label: 'EMAIL', score: 1.0, start: match.index, end: match.index + match[0].length });
-	}
+	while ((match = emailRe.exec(text))) push(match, 'EMAIL', 1.0);
 
 	// Phone numbers
 	const phoneRe = /(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g;
-	while ((match = phoneRe.exec(text))) {
-		entities.push({ text: match[0], label: 'PHONE', score: 1.0, start: match.index, end: match.index + match[0].length });
-	}
+	while ((match = phoneRe.exec(text))) push(match, 'PHONE', 1.0);
 
 	// Dates (MM/DD/YYYY, DD-MM-YYYY, etc.)
 	const dateRe = /\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b/g;
-	while ((match = dateRe.exec(text))) {
-		entities.push({ text: match[0], label: 'DATE', score: 1.0, start: match.index, end: match.index + match[0].length });
-	}
+	while ((match = dateRe.exec(text))) push(match, 'DATE', 1.0);
 
 	// ISO dates (2025-02-18)
 	const isoDateRe = /\b\d{4}-\d{2}-\d{2}\b/g;
-	while ((match = isoDateRe.exec(text))) {
-		entities.push({ text: match[0], label: 'DATE', score: 1.0, start: match.index, end: match.index + match[0].length });
-	}
+	while ((match = isoDateRe.exec(text))) push(match, 'DATE', 1.0);
+
+	// Written dates (January 15, 2025 / 15 Jan 2025)
+	const writtenDateRe = /\b(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.?\s+\d{1,2},?\s+\d{4}\b/gi;
+	while ((match = writtenDateRe.exec(text))) push(match, 'DATE', 0.95);
 
 	// Case citations (Smith v. Jones, 123 Cal.App.4th 456)
 	const caseRe = /\b[A-Z][a-z]+\s+v\.\s+[A-Z][a-z]+(?:,\s+\d+\s+[\w.]+\s+\d+)?/g;
-	while ((match = caseRe.exec(text))) {
-		entities.push({ text: match[0], label: 'CASE', score: 0.9, start: match.index, end: match.index + match[0].length });
-	}
+	while ((match = caseRe.exec(text))) push(match, 'CASE', 0.9);
 
 	// Statute references (§ 1234, Section 1234, Cal. Civ. Code § 1234)
 	const statuteRe = /(?:§|Section|Sec\.)\s*\d+(?:\.\d+)?(?:\([a-z]\))?/gi;
-	while ((match = statuteRe.exec(text))) {
-		entities.push({ text: match[0], label: 'STATUTE', score: 0.9, start: match.index, end: match.index + match[0].length });
-	}
+	while ((match = statuteRe.exec(text))) push(match, 'STATUTE', 0.9);
+
+	// U.S. Code references (18 U.S.C. § 1343, 42 USC 1983)
+	const uscRe = /\b\d{1,2}\s+U\.?S\.?C\.?\s*§?\s*\d+(?:\([a-z]\))?/gi;
+	while ((match = uscRe.exec(text))) push(match, 'STATUTE', 0.95);
 
 	// Dollar amounts ($1,234.56)
 	const moneyRe = /\$[\d,]+(?:\.\d{2})?/g;
-	while ((match = moneyRe.exec(text))) {
-		entities.push({ text: match[0], label: 'MONEY', score: 1.0, start: match.index, end: match.index + match[0].length });
-	}
+	while ((match = moneyRe.exec(text))) push(match, 'MONEY', 1.0);
+
+	// SSN (redacted or full — high forensic value)
+	const ssnRe = /\b\d{3}-\d{2}-\d{4}\b/g;
+	while ((match = ssnRe.exec(text))) push(match, 'SSN', 1.0);
+
+	// Credit card numbers (16 digits, grouped)
+	const ccRe = /\b(?:\d{4}[-\s]?){3}\d{4}\b/g;
+	while ((match = ccRe.exec(text))) push(match, 'CREDIT_CARD', 0.9);
+
+	// URLs
+	const urlRe = /https?:\/\/[^\s<>"{}|\\^`[\]]+/g;
+	while ((match = urlRe.exec(text))) push(match, 'URL', 1.0);
+
+	// Docket numbers (Case No. 2:24-cv-01234-ABC, No. 24-CR-5678)
+	const docketRe = /\b(?:Case\s+)?No\.\s*\d{1,2}:\d{2}-[a-z]{2,3}-\d{4,6}(?:-[A-Z]+)?\b/gi;
+	while ((match = docketRe.exec(text))) push(match, 'DOCKET', 0.95);
+
+	// Street addresses (123 Main St, Suite 456)
+	const addressRe = /\b\d{1,5}\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?\s+(?:St|Street|Ave|Avenue|Blvd|Boulevard|Dr|Drive|Ln|Lane|Rd|Road|Way|Ct|Court|Pl|Place)\.?(?:\s*,?\s*(?:Suite|Ste|Apt|Unit|#)\s*\d+)?\b/g;
+	while ((match = addressRe.exec(text))) push(match, 'ADDRESS', 0.85);
 
 	return entities;
 }

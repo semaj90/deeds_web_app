@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import pg from 'pg';
 import { getDatabaseUrl, getOllamaUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 
 const { Pool } = pg;
 
@@ -9,20 +10,19 @@ const pool = new Pool({
 	connectionString: getDatabaseUrl()
 });
 
-interface AnalyzeRequest {
-	cluster_id: number;
-	model?: string;
-	ace_context?: boolean;
-}
+const analyzeSchema = z.object({
+	cluster_id: z.number().int().min(1, 'Missing cluster_id'),
+	model: z.string().max(200).optional().default('gemma3-legal'),
+	ace_context: z.boolean().optional().default(true),
+});
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body: AnalyzeRequest = await request.json();
-		const { cluster_id, model = 'gemma3-legal', ace_context = true } = body;
-
-		if (!cluster_id) {
-			return json({ error: 'Missing cluster_id' }, { status: 400 });
+		const parsed = analyzeSchema.safeParse(await request.json());
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
 		}
+		const { cluster_id, model, ace_context } = parsed.data;
 
 		// Fetch cluster errors from PostgreSQL
 		const errorsResult = await pool.query(

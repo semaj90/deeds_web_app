@@ -263,15 +263,16 @@ function handleSessionMode(sessionId: string, caseId: string | null): Response {
 				send('ping', { timestamp: new Date().toISOString() });
 			}, 30000);
 
-			// Store cleanup functions for later
+			// Store cleanup ref for cancel()
 			(controller as any)._cleanup = () => {
 				clearInterval(pollInterval);
 				clearInterval(keepAlive);
 			};
 		},
 
-		cancel() {
-			console.log('SSE client disconnected');
+		cancel(controller: any) {
+			console.log('SSE client disconnected — cleaning up intervals');
+			if (typeof controller?._cleanup === 'function') controller._cleanup();
 		}
 	});
 

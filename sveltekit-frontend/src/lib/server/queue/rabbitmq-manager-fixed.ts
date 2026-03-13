@@ -48,12 +48,15 @@ export class RabbitMQManager extends EventEmitter {
     // Embeddings placeholder
     private embeddings: any = null;
 
+    private static readonly MAX_RETRIES = 3;
+
     private readonly exchanges = {
         cache_invalidation: 'cache.invalidation',
         document_processing: 'document.processing',
         vector_updates: 'vector.updates',
         analytics: 'analytics.events',
-        codebase_indexing: 'codebase.indexing'
+        codebase_indexing: 'codebase.indexing',
+        dlx: 'dlx.dead-letter'
     };
 
     private readonly queues = {
@@ -152,18 +155,26 @@ export class RabbitMQManager extends EventEmitter {
     private async setupInfrastructure(): Promise<void> {
         if (!this.channel) throw new Error('Channel not available');
 
-        // Declare exchanges
-        for (const [name, exchange] of Object.entries(this.exchanges)) {
+        // Declare exchanges (including dead-letter exchange)
+        for (const [, exchange] of Object.entries(this.exchanges)) {
             await this.channel.assertExchange(exchange, 'topic', { durable: true });
         }
 
-        // Declare queues
-        for (const [name, queue] of Object.entries(this.queues)) {
+        // Declare DLQ queues (one per main queue)
+        for (const [, queue] of Object.entries(this.queues)) {
+            const dlqName = `${queue}.dlq`;
+            await this.channel.assertQueue(dlqName, { durable: true });
+            await this.channel.bindQueue(dlqName, this.exchanges.dlx, queue);
+        }
+
+        // Declare main queues with dead-letter routing
+        for (const [, queue] of Object.entries(this.queues)) {
             await this.channel.assertQueue(queue, {
                 durable: true,
                 arguments: {
                     'x-message-ttl': 300000, // 5 minutes
-                    'x-max-retries': 3
+                    'x-dead-letter-exchange': this.exchanges.dlx,
+                    'x-dead-letter-routing-key': queue
                 }
             });
         }
@@ -177,7 +188,7 @@ export class RabbitMQManager extends EventEmitter {
         await this.bindQueue(this.queues.analytics_track, this.exchanges.analytics, 'analytics.*');
         await this.bindQueue(this.queues.codebase_index, this.exchanges.codebase_indexing, 'codebase.index.*');
 
-        console.log('✅ Queue bindings configured');
+        console.log('✅ Queue bindings configured (with DLQ)');
     }
 
     private async bindQueue(queue: string, exchange: string, routingKey: string) {
@@ -231,7 +242,7 @@ export class RabbitMQManager extends EventEmitter {
             this.channel.ack(msg);
         } catch (error) {
             console.error('❌ Cache invalidation error:', this.formatError(error));
-            this.channel.nack(msg, false, true);
+            this.retryOrDLQ(msg, error);
         }
     }
 
@@ -258,7 +269,7 @@ export class RabbitMQManager extends EventEmitter {
             this.channel.ack(msg);
         } catch (error) {
             console.error('❌ Document embedding error:', this.formatError(error));
-            this.channel.nack(msg, false, true);
+            this.retryOrDLQ(msg, error);
         }
     }
 
@@ -294,7 +305,7 @@ export class RabbitMQManager extends EventEmitter {
             this.channel.ack(msg);
         } catch (error) {
             console.error('❌ Evidence process error:', this.formatError(error));
-            this.channel.nack(msg, false, true);
+            this.retryOrDLQ(msg, error);
         }
     }
 
@@ -326,7 +337,7 @@ export class RabbitMQManager extends EventEmitter {
             this.channel.ack(msg);
         } catch (error) {
             console.error('❌ Vector index error:', this.formatError(error));
-            this.channel.nack(msg, false, true);
+            this.retryOrDLQ(msg, error);
         }
     }
 
@@ -339,14 +350,24 @@ export class RabbitMQManager extends EventEmitter {
                 return;
             }
             console.log('💬 Chat context update:', data.sessionId);
+            // Generate embedding if not provided
+            let embedding = data.embedding;
+            if (!embedding && data.message) {
+                try {
+                    const { generateSingleEmbedding } = await import('../grpc/embedding-client.js');
+                    embedding = await generateSingleEmbedding(data.message.slice(0, 2048));
+                } catch {
+                    // Embedding generation failed — non-fatal
+                }
+            }
             // Store chat message embedding for context retrieval
-            if (data.message && data.embedding) {
+            if (data.message && embedding?.length) {
                 const { qdrant } = await import('../vector/qdrant-manager.js');
                 await qdrant.batchUpsert({
                     collection: 'chat_messages' as any,
                     points: [{
                         id: `chat-${data.sessionId}-${Date.now()}`,
-                        vector: data.embedding,
+                        vector: embedding,
                         payload: {
                             sessionId: data.sessionId,
                             role: data.role ?? 'user',
@@ -359,7 +380,7 @@ export class RabbitMQManager extends EventEmitter {
             this.channel.ack(msg);
         } catch (error) {
             console.error('❌ Chat context error:', this.formatError(error));
-            this.channel.nack(msg, false, true);
+            this.retryOrDLQ(msg, error);
         }
     }
 
@@ -372,21 +393,34 @@ export class RabbitMQManager extends EventEmitter {
                 return;
             }
             console.log('📊 Analytics:', data.eventType);
+            const ts = data.timestamp ?? Date.now();
             // Store analytics event in Redis sorted set for time-series queries
             if (this.redisService) {
                 const key = `analytics:${data.eventType}`;
-                const entry = JSON.stringify({
-                    ...data.payload,
-                    timestamp: data.timestamp ?? Date.now()
-                });
+                const entry = JSON.stringify({ ...data.payload, timestamp: ts });
                 await this.redisService.zadd(key, Date.now(), entry);
                 // Trim to last 10000 events per type
                 await this.redisService.zremrangebyrank(key, 0, -10001);
             }
+            // Persist to PostgreSQL for durable analytics
+            if (this.db) {
+                try {
+                    const { analyticsEvents } = await import('../db/schema-postgres.js');
+                    await this.db.insert(analyticsEvents).values({
+                        eventType: data.eventType,
+                        userId: data.userId ?? null,
+                        sessionId: data.sessionId ?? null,
+                        payload: data.payload ?? {},
+                        createdAt: new Date(ts),
+                    }).onConflictDoNothing();
+                } catch (dbErr) {
+                    console.warn('⚠️ Analytics DB persist failed (non-fatal):', this.formatError(dbErr));
+                }
+            }
             this.channel.ack(msg);
         } catch (error) {
             console.error('❌ Analytics track error:', this.formatError(error));
-            this.channel.nack(msg, false, true);
+            this.retryOrDLQ(msg, error);
         }
     }
 
@@ -441,7 +475,7 @@ export class RabbitMQManager extends EventEmitter {
             this.channel.ack(msg);
         } catch (error) {
             console.error('❌ Codebase index error:', this.formatError(error));
-            this.channel.nack(msg, false, true);
+            this.retryOrDLQ(msg, error);
         }
     }
 
@@ -480,6 +514,11 @@ export class RabbitMQManager extends EventEmitter {
         await this.publish(this.exchanges.document_processing, 'document.embed', data);
     }
 
+    async publishChatContext(data: { sessionId: string; message: string; role: 'user' | 'assistant'; metadata?: Record<string, unknown> }): Promise<void> {
+        if (!this.isReady()) return;
+        await this.publish(this.exchanges.vector_updates, 'chat.context.message', data);
+    }
+
     async publishEvidenceProcess(data: { evidenceId: string; text: string; caseId?: string; fileName?: string; metadata?: Record<string, unknown> }): Promise<void> {
         if (!this.isReady()) return;
         await this.publish(this.exchanges.document_processing, 'evidence.process', {
@@ -509,6 +548,24 @@ export class RabbitMQManager extends EventEmitter {
         }
     }
 
+    /**
+     * Retry-aware nack: checks x-death header count.
+     * If retries exhausted, sends to DLQ (nack without requeue).
+     * Otherwise, requeues for retry.
+     */
+    private retryOrDLQ(msg: AmqpMessageObj, error: unknown): void {
+        if (!this.channel) return;
+        const deaths = (msg.properties?.headers as any)?.['x-death'] as Array<{ count?: number }> | undefined;
+        const retryCount = deaths?.[0]?.count ?? 0;
+        if (retryCount >= RabbitMQManager.MAX_RETRIES) {
+            console.warn(`☠️ DLQ: message exhausted ${RabbitMQManager.MAX_RETRIES} retries — routing to dead letter`);
+            this.channel.nack(msg, false, false); // goes to DLQ via x-dead-letter-exchange
+        } else {
+            console.warn(`🔄 Retry ${retryCount + 1}/${RabbitMQManager.MAX_RETRIES}: ${this.formatError(error)}`);
+            this.channel.nack(msg, false, true); // requeue
+        }
+    }
+
     private formatError(err: any): string {
         if (err instanceof Error) return err.message;
         return String(err);
@@ -522,6 +579,21 @@ export class RabbitMQManager extends EventEmitter {
         if (this.reconnectAttempts >= this.maxReconnectAttempts) return;
         this.reconnectAttempts++;
         setTimeout(() => this.initialize(), 5000);
+    }
+
+    /** Get DLQ message counts for monitoring */
+    async getDLQStatus(): Promise<Record<string, number>> {
+        if (!this.channel) return {};
+        const counts: Record<string, number> = {};
+        for (const [, queue] of Object.entries(this.queues)) {
+            try {
+                const info = await this.channel.assertQueue(`${queue}.dlq`, { durable: true }) as { messageCount?: number };
+                counts[`${queue}.dlq`] = info.messageCount ?? 0;
+            } catch {
+                counts[`${queue}.dlq`] = -1;
+            }
+        }
+        return counts;
     }
 
     async close() {

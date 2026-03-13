@@ -63,7 +63,7 @@ Keep schemas outside `load()` or action functions so the Superforms adapter can 
 | `/cases` | `cases/schema.ts` | create, bulkUpdateStatus, bulkArchive |
 | `/login` | `login/schema.ts` | login |
 | `/analysis-center` | `analysis-center/schema.ts` | search, analyze |
-### Zod `safeParse()` (API Routes — 109 endpoints)
+### Zod `safeParse()` (API Routes — 122 endpoints)
 | Endpoint | Validates |
 |----------|-----------|
 | `POST /api/citations` | statute_code, case_id, jurisdiction, etc. |
@@ -172,6 +172,19 @@ Keep schemas outside `load()` or action functions so the Superforms adapter can 
 | `POST /api/investigate/suggest` | query (1-10K), answer (1-100K), caseId (500) |
 | `POST /api/codebase/recall` | query (1-5K), limit (1-200, default 100) |
 | `POST /api/codebase/rerank` | query (1-5K), candidatePaths (array 200), weights (0-1), pathBoosts (record) |
+| `POST /api/graph/sync` | caseId (500, optional) |
+| `POST /api/orchestrator/analyze` | .passthrough() proxy validation (ensures valid JSON object) |
+| `POST /api/admin/agent/fix` | file_path (1-1K), errors (array 50), auto_apply (boolean) |
+| `POST /api/gpu-wasm-integration` | action (enum: status/health/shaders, default status) |
+| `POST /api/phase89/analyze` | cluster_id (int, min 1), model (200, default gemma3-legal), ace_context (boolean) |
+| `POST /api/phase89/fix` | file (1K), errorId (500), .refine(file or errorId required) |
+| `POST /api/phase89/similar-clusters` | cluster_id (int), embedding (number[], min 1), limit (1-100) |
+| `POST /api/phase89/vector-search` | query (.trim(), 1-5K), limit (1-100), threshold (0-1) |
+| `POST /api/phase89/pipeline` | action (enum: cluster), chunkSize (1-10K), maxErrors (int) |
+| `POST /api/phase89/agentic-fix` | cluster_id (int), pattern (1K), file_paths (array 200), context (nested) — SSE |
+| `POST /api/vision/analyze` | file (formData), caseId (500), evidenceId (500), skipCache (boolean) |
+| `POST /api/chat/migrate` | sessionId (1-500), chats (record of message arrays with role enum) |
+| `DELETE /api/persons-of-interest/[id]/photos` | photoId (1-500) |
 ### Pattern Used
 ```typescript
 // Form actions (Superforms)

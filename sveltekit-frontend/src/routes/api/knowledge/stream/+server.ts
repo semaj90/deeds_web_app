@@ -28,16 +28,31 @@ export const POST: RequestHandler = async ({ request }) => {
 			);
 		}
 		const { query, topK, llmProvider } = parsed.data;
+		const abortSignal = request.signal;
 
 		// Create SSE stream
+		const shared = { cleanup: () => {} };
 		const stream = new ReadableStream({
 			async start(controller) {
 				const encoder = new TextEncoder();
+				let closed = false;
 
 				const sendEvent = (event: string, data: unknown) => {
-					const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
-					controller.enqueue(encoder.encode(message));
+					if (closed) return;
+					try {
+						const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+						controller.enqueue(encoder.encode(message));
+					} catch { closed = true; }
 				};
+
+				// Heartbeat every 25s to prevent proxy timeout
+				const heartbeat = setInterval(() => {
+					if (closed) { clearInterval(heartbeat); return; }
+					try { controller.enqueue(encoder.encode(`: heartbeat\n\n`)); } catch { closed = true; clearInterval(heartbeat); }
+				}, 25_000);
+
+				shared.cleanup = () => { closed = true; clearInterval(heartbeat); };
+				abortSignal.addEventListener('abort', shared.cleanup, { once: true });
 
 				try {
 					// Step 1: Send search started event
@@ -88,8 +103,13 @@ export const POST: RequestHandler = async ({ request }) => {
 						timestamp: Date.now()
 					});
 				} finally {
+					shared.cleanup();
 					controller.close();
 				}
+			},
+
+			cancel() {
+				shared.cleanup();
 			}
 		});
 

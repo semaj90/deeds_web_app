@@ -413,7 +413,7 @@
               </div>
             {/if}
 
-            {#if currentState.value === 'error'}
+            {#if currentState.value === 'failed' || currentState.value === 'rejected'}
               <div class="flex space-x-3">
                 <Button onclick={retryWorkflow}>
                   Retry Workflow

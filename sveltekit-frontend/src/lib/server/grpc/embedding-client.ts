@@ -220,48 +220,109 @@ async function generateViaHttpSingle(texts: string[]): Promise<number[][]> {
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
+// ── Redis embedding cache ──────────────────────────────────────────────────
+
+const EMBED_CACHE_TTL = 24 * 60 * 60; // 24h — embeddings are deterministic for same model+text
+
+async function getCachedEmbedding(text: string): Promise<number[] | null> {
+	try {
+		const { getRedis } = await import('../redis.js');
+		const redis = getRedis();
+		if (!redis) return null;
+		const { createHash } = await import('crypto');
+		const key = `embed:${SERVER_EMBEDDING_MODEL}:${createHash('sha256').update(text).digest('hex').slice(0, 16)}`;
+		const cached = await redis.get(key);
+		if (!cached) return null;
+		return JSON.parse(cached);
+	} catch {
+		return null;
+	}
+}
+
+async function setCachedEmbedding(text: string, vector: number[]): Promise<void> {
+	try {
+		const { getRedis } = await import('../redis.js');
+		const redis = getRedis();
+		if (!redis) return;
+		const { createHash } = await import('crypto');
+		const key = `embed:${SERVER_EMBEDDING_MODEL}:${createHash('sha256').update(text).digest('hex').slice(0, 16)}`;
+		await redis.set(key, JSON.stringify(vector), 'EX', EMBED_CACHE_TTL);
+	} catch {
+		// Cache write failure is non-fatal
+	}
+}
+
 /**
  * Generate embeddings for a batch of texts.
+ * Checks Redis cache first, then falls back through 4-tier chain.
  * 4-tier fallback: gRPC → QUIC/NATS → HTTP batch → HTTP sequential.
  */
 export async function generateEmbeddings(texts: string[]): Promise<EmbeddingResult> {
 	const start = performance.now();
 
+	// Check cache for each text
+	const cachedResults = await Promise.all(texts.map(getCachedEmbedding));
+	const uncachedIndices = cachedResults.map((v, i) => v === null ? i : -1).filter(i => i >= 0);
+
+	// All cached — return immediately
+	if (uncachedIndices.length === 0) {
+		return {
+			vectors: cachedResults as number[][],
+			model: SERVER_EMBEDDING_MODEL,
+			dimension: cachedResults[0]?.length ?? 768,
+			source: 'http-ollama',
+			totalMs: Math.round(performance.now() - start)
+		};
+	}
+
+	// Generate only uncached embeddings
+	const uncachedTexts = uncachedIndices.map(i => texts[i]);
+	let newVectors: number[][] | null = null;
+	let source: EmbeddingResult['source'] = 'http-ollama';
+	let model = SERVER_EMBEDDING_MODEL;
+
 	// Tier 1: gRPC (binary protocol, lowest latency)
 	if (ENV.EMBEDDING_GRPC_ENABLED) {
-		const grpcVectors = await generateViaGrpc(texts);
-		if (grpcVectors && grpcVectors.length === texts.length && grpcVectors[0]?.length > 0) {
-			return {
-				vectors: grpcVectors,
-				model: 'embeddinggemma-grpc',
-				dimension: grpcVectors[0].length,
-				source: 'grpc',
-				totalMs: Math.round(performance.now() - start)
-			};
+		const grpcVectors = await generateViaGrpc(uncachedTexts);
+		if (grpcVectors && grpcVectors.length === uncachedTexts.length && grpcVectors[0]?.length > 0) {
+			newVectors = grpcVectors;
+			source = 'grpc';
+			model = 'embeddinggemma-grpc';
 		}
 	}
 
 	// Tier 2: QUIC/NATS (HTTP/3, 0-RTT, multiplexed)
-	if (ENV.EMBEDDING_QUIC_ENABLED) {
-		const quicVectors = await generateViaQuic(texts);
-		if (quicVectors && quicVectors.length === texts.length && quicVectors[0]?.length > 0) {
-			return {
-				vectors: quicVectors,
-				model: 'embeddinggemma-quic',
-				dimension: quicVectors[0].length,
-				source: 'quic',
-				totalMs: Math.round(performance.now() - start)
-			};
+	if (!newVectors && ENV.EMBEDDING_QUIC_ENABLED) {
+		const quicVectors = await generateViaQuic(uncachedTexts);
+		if (quicVectors && quicVectors.length === uncachedTexts.length && quicVectors[0]?.length > 0) {
+			newVectors = quicVectors;
+			source = 'quic';
+			model = 'embeddinggemma-quic';
 		}
 	}
 
 	// Tier 3+4: HTTP/Ollama (batch → sequential fallback)
-	const httpVectors = await generateViaHttp(texts);
+	if (!newVectors) {
+		newVectors = await generateViaHttp(uncachedTexts);
+	}
+
+	// Merge cached + new, and cache new results
+	const vectors = [...cachedResults] as number[][];
+	for (let j = 0; j < uncachedIndices.length; j++) {
+		const idx = uncachedIndices[j];
+		vectors[idx] = newVectors[j];
+	}
+
+	// Fire-and-forget cache writes for new embeddings
+	for (let j = 0; j < uncachedIndices.length; j++) {
+		setCachedEmbedding(texts[uncachedIndices[j]], newVectors[j]).catch(() => {});
+	}
+
 	return {
-		vectors: httpVectors,
-		model: SERVER_EMBEDDING_MODEL,
-		dimension: httpVectors[0]?.length ?? 768,
-		source: 'http-ollama',
+		vectors,
+		model,
+		dimension: vectors[0]?.length ?? 768,
+		source,
 		totalMs: Math.round(performance.now() - start)
 	};
 }

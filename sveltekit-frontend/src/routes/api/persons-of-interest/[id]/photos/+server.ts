@@ -5,7 +5,12 @@ import { eq, desc } from 'drizzle-orm';
 import { uploadFile } from '$lib/server/minio-client';
 import { createHash } from 'crypto';
 import sharp from 'sharp';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
+
+const deletePhotoSchema = z.object({
+	photoId: z.string().min(1, 'photoId required').max(500),
+});
 
 const BUCKET = 'poi-photos';
 const THUMB_BUCKET = 'poi-photos';
@@ -147,12 +152,12 @@ export const POST: RequestHandler = async ({ params, request }) => {
  */
 export const DELETE: RequestHandler = async ({ params, request }) => {
 	try {
-		const body = await request.json();
-		const photoId = body.photoId;
-
-		if (!photoId) {
-			return json({ error: 'photoId required' }, { status: 400 });
+		const body = await request.json().catch(() => ({}));
+		const parsed = deletePhotoSchema.safeParse(body);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
 		}
+		const { photoId } = parsed.data;
 
 		const [deleted] = await db
 			.delete(poiPhotos)

@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import crypto from 'crypto';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { redis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 import { uploadFile } from '$lib/server/minio-client.js';
@@ -43,9 +44,6 @@ export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const formData = await request.formData();
 		const file = formData.get('file') as File | null;
-		const caseId = formData.get('caseId')?.toString() || null;
-		const evidenceId = formData.get('evidenceId')?.toString() || null;
-		const skipCache = formData.get('skipCache') === 'true';
 
 		if (!file || typeof file.arrayBuffer !== 'function') {
 			return json({ error: 'No image file provided' }, { status: 400 });
@@ -59,6 +57,21 @@ export const POST: RequestHandler = async ({ request }) => {
 		if (file.size > 50 * 1024 * 1024) {
 			return json({ error: 'Image too large. Maximum 50MB.' }, { status: 400 });
 		}
+
+		const visionMetaSchema = z.object({
+			caseId: z.string().max(500).nullable().optional().default(null),
+			evidenceId: z.string().max(500).nullable().optional().default(null),
+			skipCache: z.boolean().optional().default(false),
+		});
+		const metaParsed = visionMetaSchema.safeParse({
+			caseId: formData.get('caseId')?.toString() || null,
+			evidenceId: formData.get('evidenceId')?.toString() || null,
+			skipCache: formData.get('skipCache') === 'true',
+		});
+		if (!metaParsed.success) {
+			return json({ error: metaParsed.error.issues[0]?.message ?? 'Invalid metadata' }, { status: 400 });
+		}
+		const { caseId, evidenceId, skipCache } = metaParsed.data;
 
 		// 1. Read buffer + compute hash
 		const arrayBuffer = await file.arrayBuffer();

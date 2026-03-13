@@ -3,15 +3,16 @@ import { getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
 // Stream endpoint not yet implemented
 function broadcastAgentProgress(_data: any) { /* no-op */ }
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 
 const OLLAMA_URL = getOllamaUrl();
 const QDRANT_URL = getQdrantUrl();
 
-interface FixRequest {
-	file_path: string;
-	errors?: string[];
-	auto_apply?: boolean;
-}
+const agentFixSchema = z.object({
+	file_path: z.string().min(1, 'file_path is required').max(1000),
+	errors: z.array(z.string().max(5000)).max(50).optional().default([]),
+	auto_apply: z.boolean().optional().default(false),
+});
 
 interface AgentProgress {
 	status: 'analyzing' | 'fixing' | 'testing' | 'complete' | 'failed';
@@ -198,12 +199,11 @@ ${f.code}
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body: FixRequest = await request.json();
-		const { file_path, errors = [], auto_apply = false } = body;
-
-		if (!file_path) {
-			return json({ error: 'file_path is required' }, { status: 400 });
+		const parsed = agentFixSchema.safeParse(await request.json());
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
 		}
+		const { file_path, errors, auto_apply } = parsed.data;
 
 		// Query KB for context
 		const errorContext = errors.join('\n');

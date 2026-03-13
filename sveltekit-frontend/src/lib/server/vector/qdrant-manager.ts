@@ -34,182 +34,100 @@ export class QdrantManager {
         this.client = new QdrantClient({ url });
     }
 
+    /** Shared HNSW + quantization config for all 768-dim collections */
+    private static readonly HNSW_CONFIG = { m: 16, ef_construct: 200 };
+    private static readonly QUANTIZATION_CONFIG = {
+        scalar: { type: 'int8' as const, quantile: 0.99, always_ram: false }
+    };
+
     async initializeCollections() {
+        const hnsw = QdrantManager.HNSW_CONFIG;
+        const quant = QdrantManager.QUANTIZATION_CONFIG;
+
         const collectionConfigs = [
-            {
-                name: this.collections.documents,
-                vectors: {
-	content: { size: 768, distance: 'Cosine' },
-	summary: {
-	size: 768, distance: 'Cosine' }
-                },
-                // INT8 scalar quantization for 4x memory savings
-                quantization_config: {
-                    scalar: {
-                        type: 'int8',
-                        quantile: 0.99,
-                        always_ram: true
-                    }
-                },
-                hnsw_config: {
-                    m: 16,
-                    ef_construct: 100
-                }
-            },
-	{
-                name: this.collections.cases,
-                vectors: {
-	description: { size: 768, distance: 'Cosine' }
-                },
-                quantization_config: {
-                    scalar: {
-                        type: 'int8',
-                        quantile: 0.99,
-                        always_ram: true
-                    }
-                },
-                hnsw_config: {
-                    m: 16,
-                    ef_construct: 100
-                }
-            },
-	{
-                name: this.collections.evidence,
-                vectors: {
-	content: { size: 768, distance: 'Cosine' }
-                },
-                quantization_config: {
-                    scalar: {
-                        type: 'int8',
-                        quantile: 0.99,
-                        always_ram: true
-                    }
-                },
-                hnsw_config: {
-                    m: 16,
-                    ef_construct: 100
-                }
-            },
-	{
-                name: this.collections.chat_history,
-                vectors: {
-	message: { size: 768, distance: 'Cosine' }
-                },
-                quantization_config: {
-                    scalar: {
-                        type: 'int8',
-                        quantile: 0.99,
-                        always_ram: true
-                    }
-                },
-                hnsw_config: {
-                    m: 16,
-                    ef_construct: 100
-                }
-            },
-	{
-                name: this.collections.embeddings_cache,
-                vectors: {
-	embedding: { size: 768, distance: 'Cosine' }
-                },
-                quantization_config: {
-                    scalar: {
-                        type: 'int8',
-                        quantile: 0.99,
-                        always_ram: true
-                    }
-                },
-                hnsw_config: {
-                    m: 16,
-                    ef_construct: 100
-                }
-            },
-	{
-                name: this.collections.document_tags,
-                vectors: {
-	size: 768, distance: 'Cosine'
-                },
-                quantization_config: {
-                    scalar: {
-                        type: 'int8',
-                        quantile: 0.99,
-                        always_ram: true
-                    }
-                },
-                hnsw_config: {
-                    m: 16,
-                    ef_construct: 100
-                }
-            },
-	{
-                name: this.collections.topic_clusters,
-                vectors: {
-	size: 768, distance: 'Cosine'
-                },
-                quantization_config: {
-                    scalar: {
-                        type: 'int8',
-                        quantile: 0.99,
-                        always_ram: true
-                    }
-                },
-                hnsw_config: {
-                    m: 16,
-                    ef_construct: 100
-                }
-            },
-	{
-                name: this.collections.llm_cache,
-                vectors: {
-	query: { size: 768, distance: 'Cosine' }
-                },
-                quantization_config: {
-                    scalar: {
-                        type: 'int8',
-                        quantile: 0.99,
-                        always_ram: true
-                    }
-                },
-                hnsw_config: {
-                    m: 16,
-                    ef_construct: 100
-                }
-            },
-	{
-                name: this.collections.poi_profiles,
-                vectors: {
-	embedding: { size: 768, distance: 'Cosine' }
-                },
-                quantization_config: {
-                    scalar: {
-                        type: 'int8',
-                        quantile: 0.99,
-                        always_ram: true
-                    }
-                },
-                hnsw_config: {
-                    m: 16,
-                    ef_construct: 100
-                }
-            }
+            { name: this.collections.documents, vectors: { content: { size: 768, distance: 'Cosine' }, summary: { size: 768, distance: 'Cosine' } }, quantization_config: quant, hnsw_config: hnsw, on_disk_payload: true },
+            { name: this.collections.cases, vectors: { description: { size: 768, distance: 'Cosine' } }, quantization_config: quant, hnsw_config: hnsw },
+            { name: this.collections.evidence, vectors: { content: { size: 768, distance: 'Cosine' } }, quantization_config: quant, hnsw_config: hnsw, on_disk_payload: true },
+            { name: this.collections.chat_history, vectors: { message: { size: 768, distance: 'Cosine' } }, quantization_config: quant, hnsw_config: hnsw },
+            { name: this.collections.embeddings_cache, vectors: { embedding: { size: 768, distance: 'Cosine' } }, quantization_config: quant, hnsw_config: hnsw },
+            { name: this.collections.document_tags, vectors: { size: 768, distance: 'Cosine' }, quantization_config: quant, hnsw_config: hnsw },
+            { name: this.collections.topic_clusters, vectors: { size: 768, distance: 'Cosine' }, quantization_config: quant, hnsw_config: hnsw },
+            { name: this.collections.llm_cache, vectors: { query: { size: 768, distance: 'Cosine' } }, quantization_config: quant, hnsw_config: hnsw },
+            { name: this.collections.poi_profiles, vectors: { embedding: { size: 768, distance: 'Cosine' } }, quantization_config: quant, hnsw_config: hnsw },
         ];
 
         for (const config of collectionConfigs) {
             try {
                 await this.client.createCollection(config.name, config as any);
-                console.log(`✅ Qdrant collection created: ${config.name} (INT8 quantized)`);
+                console.log(`✅ Qdrant collection created: ${config.name} (INT8 quantized, ef_construct=${hnsw.ef_construct})`);
             } catch (error: any) {
                 if (!error?.message?.includes('already exists')) {
                     console.error(`❌ Failed to create collection ${config.name}:`, error);
                 }
             }
         }
+
+        // Create payload indexes for frequently filtered fields (non-fatal)
+        await this.ensurePayloadIndexes();
+    }
+
+    /** Create payload indexes on fields used in filter queries — O(log n) vs O(n) filter scans */
+    private async ensurePayloadIndexes() {
+        const indexConfigs: Array<{ collection: string; field: string; schema: 'keyword' | 'integer' | 'float' }> = [
+            // chat_history: filtered by user_id and session_id in searchChatContext()
+            { collection: this.collections.chat_history, field: 'user_id', schema: 'keyword' },
+            { collection: this.collections.chat_history, field: 'session_id', schema: 'keyword' },
+            // embeddings_cache: filtered by cache_key and expires_at in getCachedEmbedding()
+            { collection: this.collections.embeddings_cache, field: 'cache_key', schema: 'keyword' },
+            { collection: this.collections.embeddings_cache, field: 'expires_at', schema: 'integer' },
+            // evidence: filtered by evidence_id (must_not) in findRelatedEvidence()
+            { collection: this.collections.evidence, field: 'evidence_id', schema: 'keyword' },
+            { collection: this.collections.evidence, field: 'case_id', schema: 'keyword' },
+            // documents: filtered by case_id and document_type in storeDocument()
+            { collection: this.collections.documents, field: 'case_id', schema: 'keyword' },
+            { collection: this.collections.documents, field: 'document_type', schema: 'keyword' },
+        ];
+
+        for (const { collection, field, schema } of indexConfigs) {
+            try {
+                await this.client.createPayloadIndex(collection, {
+                    field_name: field,
+                    field_schema: schema,
+                    wait: false,
+                });
+            } catch (error: any) {
+                // Index may already exist — not an error
+                if (!error?.message?.includes('already exists')) {
+                    console.warn(`⚠️ Payload index ${collection}.${field} failed:`, error?.message);
+                }
+            }
+        }
+        console.log(`✅ Payload indexes ensured (${indexConfigs.length} fields across ${new Set(indexConfigs.map(c => c.collection)).size} collections)`);
     }
 
     async hybridSearch(params: {
 	query: string, queryEmbedding: number[];
-	collection: keyof typeof this.collections; filters?: any; limit?: number; scoreThreshold?: number }) {
+	collection: string; filters?: any; limit?: number; scoreThreshold?: number; skipCache?: boolean }) {
         const startTime = Date.now();
+
+        // Check Redis cache for identical query+collection+filters
+        const cacheKey = params.skipCache ? null : await this.buildSearchCacheKey(params);
+        if (cacheKey) {
+            try {
+                const { getRedis } = await import('../redis.js');
+                const redis = getRedis();
+                if (redis) {
+                    const cached = await redis.get(cacheKey);
+                    if (cached) {
+                        const parsed = JSON.parse(cached);
+                        parsed.metadata.responseTime = Date.now() - startTime;
+                        parsed.metadata.cached = true;
+                        return parsed;
+                    }
+                }
+            } catch { /* cache miss — proceed */ }
+        }
+
         try {
             const searchRequest: any = {
                 vector: {
@@ -229,7 +147,7 @@ export class QdrantManager {
 
             const responseTime = Date.now() - startTime;
 
-            return {
+            const response = {
                 results: results.map((result) => ({
                     id: result.id,
                     score: result.score,
@@ -239,12 +157,36 @@ export class QdrantManager {
 	query: params.query,
                     collection: params.collection,
                     responseTime,
-                    total_results: results.length
+                    total_results: results.length,
+                    cached: false
                 }
             };
+
+            // Cache for 5 minutes (search results change when data is upserted)
+            if (cacheKey) {
+                try {
+                    const { getRedis } = await import('../redis.js');
+                    const redis = getRedis();
+                    if (redis) {
+                        await redis.set(cacheKey, JSON.stringify(response), 'EX', 300);
+                    }
+                } catch { /* cache write failure — non-fatal */ }
+            }
+
+            return response;
         } catch (error: any) {
             console.error('Qdrant hybrid search error:', error);
             throw new Error(`Qdrant search failed: ${error.message}`);
+        }
+    }
+
+    private async buildSearchCacheKey(params: { query: string; collection: string; filters?: any; limit?: number; scoreThreshold?: number }): Promise<string | null> {
+        try {
+            const { createHash } = await import('crypto');
+            const raw = JSON.stringify({ q: params.query, c: params.collection, f: params.filters, l: params.limit, s: params.scoreThreshold });
+            return `qdrant:search:${createHash('sha256').update(raw).digest('hex').slice(0, 16)}`;
+        } catch {
+            return null;
         }
     }
 
@@ -294,6 +236,20 @@ export class QdrantManager {
             } catch (error) {
                 console.error(`❌ Batch upsert failed for ${collectionName}:`, error);
             }
+        }
+        // Invalidate cached searches for this collection after upsert
+        if (totalUpserted > 0) {
+            try {
+                const { getRedis } = await import('../redis.js');
+                const redis = getRedis();
+                if (redis) {
+                    const pattern = `qdrant:search:*`;
+                    const keys = await redis.keys(pattern);
+                    if (keys.length > 0) {
+                        await Promise.all(keys.map(k => redis.del(k)));
+                    }
+                }
+            } catch { /* invalidation failure — non-fatal, cache will TTL-expire */ }
         }
         return { totalUpserted };
     }

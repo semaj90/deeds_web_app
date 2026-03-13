@@ -8,15 +8,22 @@ import { spawn } from 'child_process';
 import { createClient } from 'redis';
 import { getRedisUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
+
+const fixTriggerSchema = z.object({
+  file: z.string().max(1000).optional(),
+  errorId: z.string().max(500).optional(),
+}).refine((data) => data.file || data.errorId, {
+  message: 'file or errorId required',
+});
 
 export const POST: RequestHandler = async ({ request }) => {
   try {
-    const body = await request.json();
-    const { file, errorId } = body;
-
-    if (!file && !errorId) {
-      return json({ error: 'file or errorId required' }, { status: 400 });
+    const parsed = fixTriggerSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
     }
+    const { file, errorId } = parsed.data;
 
     // Store fix request in Redis for tracking
     const redis = createClient({

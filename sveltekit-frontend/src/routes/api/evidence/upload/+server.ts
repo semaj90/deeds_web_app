@@ -22,6 +22,9 @@ import { triggerEvidenceGpuAnalysis } from '$lib/server/gpu/background-analyzer.
 
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { redis } from '$lib/server/redis.js';
+import { classifyDocument } from '$lib/server/nlp/analyzer.js';
+import { createYOLOService } from '$lib/server/yolo.js';
 
 const evidenceUploadSchema = z.object({
 	title: z.string().max(256).optional(),
@@ -36,6 +39,32 @@ const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
 
 /** Min text length before we try OCR fallback for scanned PDFs */
 const MIN_PDF_TEXT_LENGTH = 50;
+
+/** Extraction cache TTL: 7 days — stable results keyed by file hash */
+const EXTRACTION_CACHE_TTL = 7 * 24 * 60 * 60;
+const EXTRACTION_CACHE_PREFIX = 'extraction:text:';
+
+/** Check Redis for cached extraction result by file SHA-256 hash. */
+async function getCachedExtraction(fileHash: string): Promise<{ text: string; method: string; doclingBlocks?: any[] } | null> {
+	try {
+		const cached = await redis.get(`${EXTRACTION_CACHE_PREFIX}${fileHash}`);
+		if (cached) return JSON.parse(cached);
+	} catch { /* cache unavailable */ }
+	return null;
+}
+
+/** Cache extraction result in Redis keyed by file SHA-256 hash. */
+async function setCachedExtraction(fileHash: string, result: { text: string; method: string; doclingBlocks?: any[] }): Promise<void> {
+	try {
+		// Only cache results with meaningful text (>50 chars)
+		if (result.text.length < 50) return;
+		await redis.set(
+			`${EXTRACTION_CACHE_PREFIX}${fileHash}`,
+			JSON.stringify({ text: result.text, method: result.method, doclingBlocks: result.doclingBlocks?.slice(0, 50) }),
+			'EX', EXTRACTION_CACHE_TTL
+		);
+	} catch { /* cache unavailable */ }
+}
 
 /**
  * POST /api/evidence/upload
@@ -302,7 +331,17 @@ async function processAndEmbed(
 ): Promise<void> {
 	updateJob(jobId, { step: 'embedding', progress: 65, message: 'Extracting text...' });
 
-	const { text: fullText, method: extractionMethod, doclingBlocks } = await extractText(fileName, buffer);
+	// Check extraction cache by file hash (SHA-256 keyed, 7-day TTL)
+	const fileHash = crypto.createHash('sha256').update(buffer).digest('hex');
+	let extractionResult = await getCachedExtraction(fileHash);
+	if (extractionResult) {
+		console.log(`[Upload] Extraction cache HIT for ${fileName} (hash=${fileHash.slice(0, 8)}, method=${extractionResult.method})`);
+	} else {
+		extractionResult = await extractText(fileName, buffer);
+		setCachedExtraction(fileHash, extractionResult).catch(() => {});
+	}
+
+	const { text: fullText, method: extractionMethod, doclingBlocks } = extractionResult;
 	if (!fullText.trim()) {
 		updateJob(jobId, { step: 'complete', progress: 100, message: 'Upload complete (no text to embed)' });
 		return;
@@ -495,22 +534,84 @@ async function processAndEmbed(
 		});
 	} catch { /* non-fatal */ }
 
-	// 6b. VLM image analysis via /api/vision/analyze (non-fatal, cached by SHA256)
-	let visionAnalysis: { summary?: string; keyFindings?: string[]; suggestedTags?: string[] } | null = null;
-	const isImage = /\.(png|jpg|jpeg|tiff|tif|bmp|webp)$/i.test(fileName);
-	if (isImage) {
+	// 6a-ii. Persist entities + forensic flags to normalized tables (no cap)
+	if (entities.length > 0) {
 		try {
-			// Check VLM cache first (SHA256 of image bytes → cached result)
-			const imageHash = crypto.createHash('sha256').update(new Uint8Array(buffer)).digest('hex');
-			const { entry: cachedVLM } = await getVLMCache(imageHash, 'evidence');
-			if (cachedVLM) {
-				visionAnalysis = {
-					summary: cachedVLM.result.description,
-					keyFindings: cachedVLM.result.labels.map(l => `${l.label} (${(l.confidence * 100).toFixed(0)}%)`),
-					suggestedTags: cachedVLM.result.labels.map(l => l.label),
-				};
-				console.log(`[Upload] VLM cache HIT for ${fileName} (hash=${imageHash.slice(0, 8)})`);
-			} else {
+			const entityRows = entities.map(e => ({
+				evidenceId,
+				caseId: caseId ?? null,
+				entityText: e.text.slice(0, 5000),
+				entityLabel: e.label.slice(0, 50),
+				confidence: e.score ?? null,
+				startOffset: e.start ?? null,
+				endOffset: e.end ?? null,
+				source: 'llm' as const,
+			}));
+			// Batch insert in chunks of 500 (Drizzle has no cap, but PG has param limit)
+			for (let i = 0; i < entityRows.length; i += 500) {
+				await db.execute(sql`
+					INSERT INTO evidence_entities (evidence_id, case_id, entity_text, entity_label, confidence, start_offset, end_offset, source)
+					SELECT * FROM jsonb_to_recordset(${JSON.stringify(entityRows.slice(i, i + 500))}::jsonb)
+					AS t(evidence_id uuid, case_id uuid, entity_text text, entity_label varchar, confidence real, start_offset int, end_offset int, source varchar)
+				`);
+			}
+			console.log(`[Upload] Persisted ${entities.length} entities to evidence_entities for ${fileName}`);
+		} catch (err) {
+			console.warn('[Upload] Entity normalization failed (non-fatal, JSONB fallback intact):', err);
+		}
+	}
+
+	if (forensicFlags.length > 0) {
+		try {
+			const flagRows = forensicFlags.map(f => ({
+				evidenceId,
+				caseId: caseId ?? null,
+				flagType: f.type.slice(0, 50),
+				description: f.description.slice(0, 5000),
+				severity: f.severity ?? 'medium',
+				metadata: f.metadata ? JSON.stringify(f.metadata) : null,
+			}));
+			await db.execute(sql`
+				INSERT INTO evidence_forensic_flags (evidence_id, case_id, flag_type, description, severity, metadata)
+				SELECT * FROM jsonb_to_recordset(${JSON.stringify(flagRows)}::jsonb)
+				AS t(evidence_id uuid, case_id uuid, flag_type varchar, description text, severity varchar, metadata jsonb)
+			`);
+			console.log(`[Upload] Persisted ${forensicFlags.length} forensic flags to evidence_forensic_flags for ${fileName}`);
+		} catch (err) {
+			console.warn('[Upload] Forensic flag normalization failed (non-fatal, JSONB fallback intact):', err);
+		}
+	}
+
+	// 6b. YOLO + VLM image analysis in parallel (both independent, non-fatal)
+	const isImage = /\.(png|jpg|jpeg|tiff|tif|bmp|webp)$/i.test(fileName);
+	let yoloDetections: { objects: any[]; layout: any; modelType: string } | null = null;
+	let visionAnalysis: { summary?: string; keyFindings?: string[]; suggestedTags?: string[] } | null = null;
+
+	if (isImage) {
+		const [yoloResult, vlmResult] = await Promise.allSettled([
+			// YOLO object detection
+			(async () => {
+				const yolo = createYOLOService();
+				if (await yolo.isModelAvailable()) {
+					const result = await yolo.analyzeDocument(buffer, fileName);
+					const objectLabels = result.objects?.map(o => o.class) ?? [];
+					console.log(`[Upload] YOLO detected ${result.objects?.length ?? 0} objects [${objectLabels.slice(0, 5).join(', ')}] in ${fileName} (${result.modelType}, ${result.processingTime}ms)`);
+					return { objects: result.objects ?? [], layout: result.layout, modelType: result.modelType };
+				}
+				return null;
+			})(),
+			// VLM vision analysis (cached by SHA256)
+			(async () => {
+				const imageHash = crypto.createHash('sha256').update(new Uint8Array(buffer)).digest('hex');
+				const { entry: cachedVLM } = await getVLMCache(imageHash, 'evidence');
+				if (cachedVLM) {
+					console.log(`[Upload] VLM cache HIT for ${fileName} (hash=${imageHash.slice(0, 8)})`);
+					return {
+						summary: cachedVLM.result.description,
+						keyFindings: cachedVLM.result.labels.map(l => `${l.label} (${(l.confidence * 100).toFixed(0)}%)`),
+						suggestedTags: cachedVLM.result.labels.map(l => l.label),
+					};
+				}
 				const formDataVLM = new FormData();
 				formDataVLM.append('file', new Blob([new Uint8Array(buffer)]), fileName);
 				const visionRes = await fetch('http://localhost:5173/api/vision/analyze', {
@@ -519,33 +620,48 @@ async function processAndEmbed(
 					signal: AbortSignal.timeout(30_000),
 				});
 				if (visionRes.ok) {
-					visionAnalysis = await visionRes.json() as any;
-					console.log(`[Upload] VLM analysis complete for ${fileName}: ${visionAnalysis?.keyFindings?.length ?? 0} findings`);
-					// Cache VLM result for future dedup
+					const result = await visionRes.json() as any;
+					console.log(`[Upload] VLM analysis complete for ${fileName}: ${result?.keyFindings?.length ?? 0} findings`);
 					await setVLMCache(imageHash, {
-						labels: (visionAnalysis?.suggestedTags ?? []).map(t => ({ label: t, confidence: 0.8 })),
-						description: visionAnalysis?.summary ?? '',
+						labels: (result?.suggestedTags ?? []).map((t: string) => ({ label: t, confidence: 0.8 })),
+						description: result?.summary ?? '',
 						analysisType: 'evidence',
 					}).catch(() => {});
+					return result;
 				}
-			}
-		} catch (err) {
-			console.warn('[Upload] VLM analysis skipped:', err);
-		}
+				return null;
+			})(),
+		]);
+
+		yoloDetections = yoloResult.status === 'fulfilled' ? yoloResult.value : null;
+		visionAnalysis = vlmResult.status === 'fulfilled' ? vlmResult.value : null;
+		if (yoloResult.status === 'rejected') console.warn('[Upload] YOLO detection skipped:', yoloResult.reason);
+		if (vlmResult.status === 'rejected') console.warn('[Upload] VLM analysis skipped:', vlmResult.reason);
 	}
 
-	// 6c. LangExtract evidence profile (non-fatal)
+	// 6c. LangExtract + NLP classification in parallel (both independent, non-fatal)
 	let evidenceProfile: any = null;
+	let nlpClassification: { documentType: string; practiceArea: string; confidence: number; keyPhrases: string[] } | null = null;
+
 	if (fullText.trim().length > 100) {
-		try {
-			const { extractEvidenceProfile } = await import('$lib/server/services/langextract-service.js');
-			evidenceProfile = await extractEvidenceProfile(fullText, evidenceType);
-			if (evidenceProfile) {
-				console.log(`[Upload] LangExtract profile: ${evidenceProfile.suggested_tags?.length ?? 0} tags, type=${evidenceProfile.evidence_type_classification}`);
-			}
-		} catch (err) {
-			console.warn('[Upload] LangExtract profile skipped:', err);
-		}
+		const [langResult, nlpResult] = await Promise.allSettled([
+			(async () => {
+				const { extractEvidenceProfile } = await import('$lib/server/services/langextract-service.js');
+				const profile = await extractEvidenceProfile(fullText, evidenceType);
+				if (profile) console.log(`[Upload] LangExtract profile: ${profile.suggested_tags?.length ?? 0} tags, type=${profile.evidence_type_classification}`);
+				return profile;
+			})(),
+			(async () => {
+				const result = await classifyDocument(fullText.slice(0, 3000));
+				console.log(`[Upload] NLP classification: ${result.documentType} (${result.practiceArea}, ${(result.confidence * 100).toFixed(0)}%) for ${fileName}`);
+				return { documentType: result.documentType, practiceArea: result.practiceArea, confidence: result.confidence, keyPhrases: result.keyPhrases };
+			})(),
+		]);
+
+		evidenceProfile = langResult.status === 'fulfilled' ? langResult.value : null;
+		nlpClassification = nlpResult.status === 'fulfilled' ? nlpResult.value : null;
+		if (langResult.status === 'rejected') console.warn('[Upload] LangExtract profile skipped:', langResult.reason);
+		if (nlpResult.status === 'rejected') console.warn('[Upload] NLP classification skipped:', nlpResult.reason);
 	}
 
 	// 6d. Post-analysis evidence type refinement
@@ -638,11 +754,14 @@ async function processAndEmbed(
 				refinedEvidenceType: finalType,
 				doclingBlocks: doclingBlocks?.slice(0, 50) ?? null,
 				visionAnalysis: visionAnalysis ?? null,
+				yoloDetections: yoloDetections ?? null,
+				nlpClassification: nlpClassification ?? null,
 				evidenceProfile: evidenceProfile ?? null,
 				admissibilityIndicators: evidenceProfile?.admissibility_indicators ?? null,
 				suggestedTags: [
 					...(evidenceProfile?.suggested_tags ?? []),
 					...(visionAnalysis?.suggestedTags ?? []),
+					...(yoloDetections?.objects?.map((o: any) => `detected:${o.class}`) ?? []),
 				].filter(Boolean),
 				analysisTimestamp: new Date().toISOString(),
 			})}::jsonb
@@ -679,6 +798,11 @@ async function processAndEmbed(
 	});
 }
 
+/** Escape a string for safe use in raw SQL (single-quote doubling) */
+function escapeSql(s: string): string {
+	return `'${s.replace(/'/g, "''")}'`;
+}
+
 /**
  * Create yorha_evidence_nodes for each section and connect them with edges.
  */
@@ -700,52 +824,46 @@ async function createGraphNodes(
 		ON CONFLICT (id) DO NOTHING
 	`);
 
-	// Create a node for each section
+	// Build all node rows in memory, then batch INSERT
+	const nodeRows: Array<{ id: string; heading: string; path: string[]; chunkCount: number }> = [];
 	for (const [sectionKey, section] of sections) {
 		const nodeId = crypto.randomUUID();
 		nodeIds.set(sectionKey, nodeId);
-
-		await db.execute(sql`
-			INSERT INTO yorha_evidence_nodes
-				(id, case_id, title, description, evidence_type, source, file_path,
-				 ai_tags, key_entities, status, created_by)
-			VALUES (
-				${nodeId},
-				${caseId},
-				${section.heading.slice(0, 500)},
-				${`Section from ${fileName}: ${section.path.join(' > ')}`},
-				'document-section',
-				${fileName},
-				${`evidence/${evidenceId}/section/${section.path.join('/')}`},
-				${JSON.stringify(section.path)}::jsonb,
-				${JSON.stringify({ chunkCount: section.chunkIds.length, sectionPath: section.path })}::jsonb,
-				'active',
-				${DEV_USER}
-			)
-		`);
+		nodeRows.push({ id: nodeId, heading: section.heading, path: section.path, chunkCount: section.chunkIds.length });
 	}
 
-	// Create HAS_SECTION edges: parent section → child section
-	const sectionKeys = [...sections.keys()];
-	for (const key of sectionKeys) {
-		const section = sections.get(key)!;
+	// Batch INSERT nodes (single round-trip instead of N)
+	if (nodeRows.length > 0) {
+		const nodeValues = nodeRows.map(n =>
+			`('${n.id}', '${caseId}', ${escapeSql(n.heading.slice(0, 500))}, ${escapeSql(`Section from ${fileName}: ${n.path.join(' > ')}`)}, 'document-section', ${escapeSql(fileName)}, ${escapeSql(`evidence/${evidenceId}/section/${n.path.join('/')}`)}, '${JSON.stringify(n.path).replace(/'/g, "''")}'::jsonb, '${JSON.stringify({ chunkCount: n.chunkCount, sectionPath: n.path }).replace(/'/g, "''")}'::jsonb, 'active', '${DEV_USER}')`
+		).join(',\n');
+		await db.execute(sql.raw(`
+			INSERT INTO yorha_evidence_nodes
+				(id, case_id, title, description, evidence_type, source, file_path, ai_tags, key_entities, status, created_by)
+			VALUES ${nodeValues}
+		`));
+	}
+
+	// Batch INSERT edges (single round-trip instead of N)
+	const edgeValues: string[] = [];
+	for (const [key, section] of sections) {
 		if (section.path.length > 1) {
-			// Find parent by removing last segment
 			const parentPath = section.path.slice(0, -1).join(' > ');
 			const parentId = nodeIds.get(parentPath);
 			const childId = nodeIds.get(key);
 			if (parentId && childId) {
-				await db.execute(sql`
-					INSERT INTO yorha_evidence_connections
-						(case_id, source_node_id, target_node_id, connection_type, strength, description, created_by)
-					VALUES (
-						${caseId}, ${parentId}, ${childId}, 'HAS_SECTION', 100,
-						${`${section.path.slice(0, -1).join(' > ')} contains ${section.heading}`},
-						${DEV_USER}
-					)
-				`);
+				edgeValues.push(
+					`('${caseId}', '${parentId}', '${childId}', 'HAS_SECTION', 100, ${escapeSql(`${section.path.slice(0, -1).join(' > ')} contains ${section.heading}`)}, '${DEV_USER}')`
+				);
 			}
 		}
+	}
+	if (edgeValues.length > 0) {
+		await db.execute(sql.raw(`
+			INSERT INTO yorha_evidence_connections
+				(case_id, source_node_id, target_node_id, connection_type, strength, description, created_by)
+			VALUES ${edgeValues.join(',\n')}
+		`));
 	}
 }
 

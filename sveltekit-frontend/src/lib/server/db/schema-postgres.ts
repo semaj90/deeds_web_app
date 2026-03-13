@@ -2504,3 +2504,71 @@ export const evidenceVersions = pgTable('evidence_versions', {
 export type EvidenceVersion = typeof evidenceVersions.$inferSelect;
 export type NewEvidenceVersion = typeof evidenceVersions.$inferInsert;
 
+// === EVIDENCE ENTITIES (normalized entity extraction results) ===
+
+export const evidenceEntities = pgTable('evidence_entities', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	evidenceId: uuid('evidence_id')
+		.notNull()
+		.references(() => evidence.id, { onDelete: 'cascade' }),
+	caseId: uuid('case_id')
+		.references(() => cases.id, { onDelete: 'set null' }),
+	entityText: text('entity_text').notNull(),
+	entityLabel: varchar('entity_label', { length: 50 }).notNull(),
+	confidence: real('confidence'),
+	startOffset: integer('start_offset'),
+	endOffset: integer('end_offset'),
+	source: varchar('source', { length: 20 }).default('llm'), // 'llm' | 'regex' | 'yolo' | 'vlm'
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	evidenceIdIdx: index('evidence_entities_evidence_id_idx').on(table.evidenceId),
+	caseIdIdx: index('evidence_entities_case_id_idx').on(table.caseId),
+	labelIdx: index('evidence_entities_label_idx').on(table.entityLabel),
+	textLabelIdx: index('evidence_entities_text_label_idx').on(table.entityText, table.entityLabel),
+}));
+
+export type EvidenceEntity = typeof evidenceEntities.$inferSelect;
+export type NewEvidenceEntity = typeof evidenceEntities.$inferInsert;
+
+// === EVIDENCE FORENSIC FLAGS (normalized forensic detection results) ===
+
+export const evidenceForensicFlags = pgTable('evidence_forensic_flags', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	evidenceId: uuid('evidence_id')
+		.notNull()
+		.references(() => evidence.id, { onDelete: 'cascade' }),
+	caseId: uuid('case_id')
+		.references(() => cases.id, { onDelete: 'set null' }),
+	flagType: varchar('flag_type', { length: 50 }).notNull(),
+	description: text('description').notNull(),
+	severity: varchar('severity', { length: 10 }).notNull(), // 'high' | 'medium' | 'low'
+	metadata: jsonb('metadata'),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	evidenceIdIdx: index('evidence_forensic_flags_evidence_id_idx').on(table.evidenceId),
+	caseIdIdx: index('evidence_forensic_flags_case_id_idx').on(table.caseId),
+	flagTypeIdx: index('evidence_forensic_flags_type_idx').on(table.flagType),
+	severityIdx: index('evidence_forensic_flags_severity_idx').on(table.severity),
+}));
+
+export type EvidenceForensicFlag = typeof evidenceForensicFlags.$inferSelect;
+export type NewEvidenceForensicFlag = typeof evidenceForensicFlags.$inferInsert;
+
+// === ANALYTICS EVENTS (durable event log for RabbitMQ analytics consumer) ===
+
+export const analyticsEvents = pgTable('analytics_events', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	eventType: varchar('event_type', { length: 100 }).notNull(),
+	userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+	sessionId: varchar('session_id', { length: 255 }),
+	payload: jsonb('payload').default({}),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	eventTypeIdx: index('analytics_events_event_type_idx').on(table.eventType),
+	createdAtIdx: index('analytics_events_created_at_idx').on(table.createdAt),
+	userIdIdx: index('analytics_events_user_id_idx').on(table.userId),
+}));
+
+export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
+export type NewAnalyticsEvent = typeof analyticsEvents.$inferInsert;
+

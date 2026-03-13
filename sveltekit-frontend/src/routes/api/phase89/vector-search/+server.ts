@@ -1,6 +1,7 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 
 import { getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
 const qdrant = new QdrantClient({
@@ -32,19 +33,19 @@ async function generateEmbedding(text: string): Promise<number[]> {
 	}
 }
 
+const vectorSearchSchema = z.object({
+	query: z.string().trim().min(1, 'Query is required').max(5000),
+	limit: z.number().int().min(1).max(100).optional().default(10),
+	threshold: z.number().min(0).max(1).optional().default(0.7),
+});
+
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const { query, limit = 10, threshold = 0.7 } = await request.json();
-
-		if (!query || typeof query !== 'string') {
-			return json(
-				{
-					success: false,
-					error: 'Query is required'
-				},
-				{ status: 400 }
-			);
+		const parsed = vectorSearchSchema.safeParse(await request.json());
+		if (!parsed.success) {
+			return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
 		}
+		const { query, limit, threshold } = parsed.data;
 
 		// Generate embedding for search query
 		const queryEmbedding = await generateEmbedding(query);

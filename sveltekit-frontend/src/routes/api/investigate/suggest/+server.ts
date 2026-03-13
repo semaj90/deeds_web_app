@@ -57,23 +57,25 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		// 2. Generate correction prompt if quality is low
 		const correctionPrompt = generateCorrectionPrompt(evaluation, query, answer);
 
-		// 3. Generate follow-up investigation suggestions via Ollama
-		let suggestedQueries: string[] = [];
+		// 3. Generate follow-up investigation suggestions with confidence ranking via Ollama
+		let suggestedQueries: Array<{ query: string; confidence: number; reason: string }> = [];
 		try {
 			const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					model: 'gemma3-legal:latest',
-					prompt: `Given this investigation query and result, suggest 4 follow-up investigation queries that would deepen the analysis. Return ONLY a JSON array of strings.
+					prompt: `Given this investigation query and result, suggest 4 follow-up investigation queries that would deepen the analysis. For each, rate your confidence (0.0-1.0) that this follow-up will yield useful results, and explain briefly why.
 
 Investigation Query: ${query.slice(0, 300)}
 
 Investigation Result: ${answer.slice(0, 800)}
 
-Return format: ["query 1", "query 2", "query 3", "query 4"]`,
+Return ONLY a JSON array:
+[{"query": "follow-up query", "confidence": 0.85, "reason": "why this is useful"}]`,
 					stream: false,
-					options: { temperature: 0.5, num_predict: 256 }
+					format: 'json',
+					options: { temperature: 0.5, num_predict: 512 }
 				}),
 				signal: AbortSignal.timeout(15000)
 			});
@@ -83,15 +85,50 @@ Return format: ["query 1", "query 2", "query 3", "query 4"]`,
 				const text = String(data.response ?? '');
 				const arrMatch = text.match(/\[[\s\S]*\]/);
 				if (arrMatch) {
-					const parsed = JSON.parse(arrMatch[0]);
-					if (Array.isArray(parsed)) {
-						suggestedQueries = parsed.filter((q: any) => typeof q === 'string').slice(0, 5);
+					const arr = JSON.parse(arrMatch[0]);
+					if (Array.isArray(arr)) {
+						suggestedQueries = arr
+							.filter((q: any) => typeof q?.query === 'string')
+							.slice(0, 5)
+							.map((q: any) => ({
+								query: q.query,
+								confidence: typeof q.confidence === 'number' ? Math.round(Math.min(1, Math.max(0, q.confidence)) * 100) / 100 : 0.5,
+								reason: typeof q.reason === 'string' ? q.reason : ''
+							}))
+							.sort((a: { confidence: number }, b: { confidence: number }) => b.confidence - a.confidence);
 					}
 				}
 			}
 		} catch {
-			// Suggestion generation is non-fatal
 			suggestedQueries = [];
+		}
+
+		// 3b. Fetch related recommendations with real confidence scores (non-blocking)
+		let relatedRecommendations: Array<{ documentId: string; title: string; confidence: number; signals: string[] }> = [];
+		try {
+			const { generateEmbeddings } = await import('$lib/server/grpc/embedding-client.js');
+			const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
+			const embResult = await generateEmbeddings([query]);
+			if (embResult.vectors[0]?.length) {
+				const searchResult = await qdrant.hybridSearch({
+					query,
+					queryEmbedding: embResult.vectors[0],
+					collection: 'documents',
+					limit: 5,
+					scoreThreshold: 0.5
+				});
+				relatedRecommendations = searchResult.results.map((r: any) => ({
+					documentId: String(r.id),
+					title: r.payload?.title || r.payload?.filename || 'Untitled',
+					confidence: Math.round(r.score * 100) / 100,
+					signals: [
+						r.score > 0.8 ? `High similarity (${(r.score * 100).toFixed(0)}%)` : `Moderate similarity (${(r.score * 100).toFixed(0)}%)`,
+						...(r.payload?.metadata?.tags ? [`Tags: ${(r.payload.metadata.tags as string[]).slice(0, 3).join(', ')}`] : [])
+					]
+				}));
+			}
+		} catch {
+			// Non-fatal
 		}
 
 		// 4. Record user interaction for recommendation learning (fire-and-forget)
@@ -110,6 +147,7 @@ Return format: ["query 1", "query 2", "query 3", "query 4"]`,
 				evalMs: evaluation.evalMs
 			},
 			suggestedQueries,
+			relatedRecommendations,
 			correctionPrompt
 		});
 	} catch (e) {

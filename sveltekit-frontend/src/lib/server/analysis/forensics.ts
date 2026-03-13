@@ -143,6 +143,42 @@ export function detectForensicPatterns(text: string): ForensicFlag[] {
 		}
 	}
 
+	// --- Driver's license / state ID pattern ---
+	if (/\b(?:driver'?s?\s*license|DL|state\s*ID)\s*(?:no\.?|number|#)?\s*:?\s*[A-Z]?\d{5,12}\b/i.test(text)) {
+		flags.push({
+			type: 'PII_DRIVERS_LICENSE',
+			description: 'Possible driver\'s license or state ID number detected',
+			severity: 'high',
+		});
+	}
+
+	// --- Passport number pattern ---
+	if (/\bpassport\s*(?:no\.?|number|#)?\s*:?\s*[A-Z]?\d{6,9}\b/i.test(text)) {
+		flags.push({
+			type: 'PII_PASSPORT',
+			description: 'Possible passport number detected',
+			severity: 'high',
+		});
+	}
+
+	// --- Seal / under seal / sealed ---
+	if (/\bunder\s+seal\b|\bsealed\b|\bFILED\s+UNDER\s+SEAL\b/i.test(text)) {
+		flags.push({
+			type: 'sealed_document',
+			description: 'Document may be under seal',
+			severity: 'high',
+		});
+	}
+
+	// --- Expungement / record sealing ---
+	if (/\bexpung(?:e|ed|ement)\b/i.test(text)) {
+		flags.push({
+			type: 'expungement',
+			description: 'Expungement reference detected',
+			severity: 'medium',
+		});
+	}
+
 	return flags;
 }
 

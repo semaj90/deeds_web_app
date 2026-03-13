@@ -1,25 +1,26 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 
 import { getQdrantUrl } from '$lib/config/env.server.js';
 const qdrant = new QdrantClient({
 	url: getQdrantUrl()
 });
 
+const similarClustersSchema = z.object({
+	cluster_id: z.number().int().optional(),
+	embedding: z.array(z.number()).min(1, 'Valid embedding array is required'),
+	limit: z.number().int().min(1).max(100).optional().default(5),
+});
+
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const { cluster_id, embedding, limit = 5 } = await request.json();
-
-		if (!embedding || !Array.isArray(embedding)) {
-			return json(
-				{
-					success: false,
-					error: 'Valid embedding array is required'
-				},
-				{ status: 400 }
-			);
+		const parsed = similarClustersSchema.safeParse(await request.json());
+		if (!parsed.success) {
+			return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
 		}
+		const { cluster_id, embedding, limit } = parsed.data;
 
 		// Search for similar clusters using cosine similarity
 		const searchResults = await qdrant.search('phase89_error_clusters', {

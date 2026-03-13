@@ -1,14 +1,24 @@
 import { json } from '@sveltejs/kit';
 import { spawn } from 'child_process';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 
 // Phase 89: Pipeline API Endpoint
 // Triggers CUDA clustering pipeline with real-time progress
 
+const pipelineSchema = z.object({
+	action: z.enum(['cluster'], { message: 'Unknown action' }),
+	chunkSize: z.number().int().min(1).max(10000).optional().default(500),
+	maxErrors: z.number().int().min(1).optional(),
+});
+
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
-		const { action, chunkSize = 500, maxErrors } = body;
+		const parsed = pipelineSchema.safeParse(await request.json());
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
+		}
+		const { action, chunkSize, maxErrors } = parsed.data;
 
 		if (action === 'cluster') {
 			// Spawn Python pipeline process

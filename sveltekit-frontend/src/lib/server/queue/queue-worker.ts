@@ -472,8 +472,23 @@ export class ChatContextWorker extends QueueWorker<{
 		message?: string;
 		embedding?: number[];
 		role?: string;
+		metadata?: Record<string, unknown>;
 	}): Promise<void> {
-		if (!data.message || !data.embedding) return;
+		if (!data.message) return;
+
+		// Generate embedding if not provided by producer
+		let embedding = data.embedding;
+		if (!embedding) {
+			try {
+				const { generateSingleEmbedding } = await import('$lib/server/grpc/embedding-client.js');
+				embedding = await generateSingleEmbedding(data.message.slice(0, 2048));
+			} catch {
+				// Embedding generation failed — skip indexing
+				return;
+			}
+		}
+
+		if (!embedding?.length) return;
 
 		const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
 		await qdrant.batchUpsert({
@@ -481,7 +496,7 @@ export class ChatContextWorker extends QueueWorker<{
 			points: [
 				{
 					id: `chat-${data.sessionId}-${Date.now()}`,
-					vector: data.embedding,
+					vector: embedding,
 					payload: {
 						sessionId: data.sessionId,
 						role: data.role ?? 'user',

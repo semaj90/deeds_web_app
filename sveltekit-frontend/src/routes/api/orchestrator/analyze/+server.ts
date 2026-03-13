@@ -1,11 +1,18 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
+import { z } from 'zod';
 
 const ORCHESTRATOR_URL = 'http://localhost:8102';
 
+const orchestratorTaskSchema = z.object({}).passthrough();
+
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
+		const parsed = orchestratorTaskSchema.safeParse(await request.json());
+		if (!parsed.success) {
+			return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid request body' }, { status: 400 });
+		}
+		const body = parsed.data;
 
 		// Proxy to Legal AI Orchestrator
 		const response = await fetch(`${ORCHESTRATOR_URL}/api/v1/agentic/tasks`, {

@@ -275,6 +275,16 @@ export const POST: RequestHandler = async ({ request }) => {
 		console.error('Failed to save user message', e);
 	}
 
+	// Publish user message to chat.context queue for embedding indexing (non-blocking)
+	import('$lib/server/queue/rabbitmq-manager-fixed.js').then(({ rabbitmq }) => {
+		rabbitmq.publishChatContext({
+			sessionId: conversationId,
+			message,
+			role: 'user',
+			metadata: { emotionMood: emotionMood ?? undefined }
+		});
+	}).catch(() => { /* RabbitMQ unavailable — non-critical */ });
+
 	// Load conversation history for multi-turn context
 	let conversationHistory: Array<{ role: string; content: string }> = [];
 	try {
@@ -294,14 +304,34 @@ export const POST: RequestHandler = async ({ request }) => {
 		// DB may be unavailable — continue without history
 	}
 
+	const abortSignal = request.signal;
+
+	const shared = { cleanup: () => {} };
 	const stream = new ReadableStream({
 		async start(controller) {
 			const encoder = new TextEncoder();
 			const id = crypto.randomUUID();
+			let closed = false;
 
 			const send = (data: unknown) => {
-				controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+				if (closed) return;
+				try {
+					controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+				} catch { closed = true; }
 			};
+
+			// Heartbeat every 25s to prevent proxy timeout
+			const heartbeat = setInterval(() => {
+				if (closed) { clearInterval(heartbeat); return; }
+				try { controller.enqueue(encoder.encode(`: heartbeat\n\n`)); } catch { closed = true; clearInterval(heartbeat); }
+			}, 25_000);
+
+			// Clean up on client disconnect
+			shared.cleanup = () => {
+				closed = true;
+				clearInterval(heartbeat);
+			};
+			abortSignal.addEventListener('abort', shared.cleanup, { once: true });
 
 			send({ id, role: 'assistant', content: '', status: 'thinking' });
 
@@ -667,6 +697,16 @@ export const POST: RequestHandler = async ({ request }) => {
 					metadata: assistantMetadata
 				});
 
+				// Publish assistant response to chat.context queue (non-blocking)
+				import('$lib/server/queue/rabbitmq-manager-fixed.js').then(({ rabbitmq }) => {
+					rabbitmq.publishChatContext({
+						sessionId: conversationId,
+						message: fullResponse.slice(0, 5000),
+						role: 'assistant',
+						metadata: { model: model ?? 'gemma3-legal:latest', confidence }
+					});
+				}).catch(() => {});
+
 				// Store response in LLM cache for future lookups (non-blocking)
 				// Generate embedding for caching (reuses embedding from retrieveContext if available)
 				const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
@@ -711,7 +751,12 @@ export const POST: RequestHandler = async ({ request }) => {
 				});
 			}
 
+			shared.cleanup();
 			controller.close();
+		},
+
+		cancel() {
+			shared.cleanup();
 		}
 	});
 
