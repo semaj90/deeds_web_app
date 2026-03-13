@@ -71,7 +71,7 @@ services:
     build:
       context: ./docker/postgres
       dockerfile: Dockerfile
-    image: deeds-postgres-pgai:pg16
+    image: deeds-postgres-pgai:pg17
     container_name: deeds-postgres-prod
     restart: unless-stopped
     environment:

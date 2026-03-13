@@ -1,13 +1,16 @@
-# PostgreSQL 16 + pgvector + pgai
+# PostgreSQL 17 + pgvector + pgai
 # Extends the pgvector image with plpython3u and pgai for in-database AI
 # Provides: ai.ollama_embed(), ai.ollama_generate(), ai.ollama_chat_complete(),
 #           ai.create_vectorizer(), ai.vectorizer_embed() + auto-embedding triggers
-FROM pgvector/pgvector:pg16
+#
+# PG17 benefits: 27% faster sequential scans, 20x lower vacuum memory,
+#                improved JSON_TABLE, incremental sorts, better IN-clause B-tree
+FROM pgvector/pgvector:pg17
 
 # Install plpython3u (required by pgai) + Python dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        postgresql-plpython3-16 \
+        postgresql-plpython3-17 \
         python3-pip \
         python3-dev \
         git && \
