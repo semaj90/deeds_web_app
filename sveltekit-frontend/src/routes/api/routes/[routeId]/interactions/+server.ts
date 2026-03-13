@@ -21,6 +21,13 @@ type NewRouteInteractionLog = {
 };
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import { z } from 'zod';
+
+const interactionSchema = z.object({
+    interaction_type: z.enum(['view', 'navigate', 'analyze', 'patch_apply']),
+    user_id: z.string().max(500).optional(),
+    metadata: z.record(z.string(), z.unknown()).optional()
+});
 
 /**
  * POST /api/routes/:routeId/interactions
@@ -38,17 +45,15 @@ export const POST: RequestHandler = async ({ params, request }) => {
     const { routeId } = params;
 
     try {
-        // Parse request body
-        const body = await request.json();
-        const { interaction_type, user_id, metadata } = body;
-
-        // Validate interaction_type
-        const validTypes = ['view', 'navigate', 'analyze', 'patch_apply'];
-        if (!interaction_type || !validTypes.includes(interaction_type)) {
+        // Parse and validate request body
+        const raw = await request.json();
+        const parsed = interactionSchema.safeParse(raw);
+        if (!parsed.success) {
             return error(400, {
-                message: `Invalid interaction_type. Must be one, of: ${validTypes.join(', ')}`,
+                message: parsed.error.issues[0]?.message ?? 'Invalid input',
             });
         }
+        const { interaction_type, user_id, metadata } = parsed.data;
 
         // Validate route exists
         const route = await getRouteMetadata(routeId);

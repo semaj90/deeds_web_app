@@ -9,6 +9,11 @@ import {
 	cacheExport,
 	type CachedExport
 } from '$lib/server/cache/pdf-export-cache.js';
+import { z } from 'zod';
+
+const reportExportSchema = z.object({
+	format: z.enum(['html', 'markdown', 'json', 'pdf', 'docx']).optional().default('html')
+});
 
 /**
  * GET /api/reports/[id]/export?format=pdf|html|markdown|json
@@ -189,8 +194,9 @@ export const GET: RequestHandler = async ({ locals, params, url }) => {
 };
 
 export const POST: RequestHandler = async ({ locals, params, request }) => {
-	const body = await request.json();
-	const format = body.format || 'html';
+	const raw = await request.json();
+	const parsed = reportExportSchema.safeParse(raw);
+	const format = parsed.success ? parsed.data.format : 'html';
 	try {
 		const result = await handleExport({ locals, params, format, request });
 
@@ -333,7 +339,7 @@ function htmlToMarkdown(html: string): string {
 		.replace(/<ol[^>]*>(.*?)<\/ol>/gs, (_match, inner) => {
 			let counter = 1;
 			return (
-				inner.replace(/<li[^>]*>(.*?)<\/li>/g, () => `${counter++}. \n`) + '\n'
+				inner.replace(/<li[^>]*>(.*?)<\/li>/g, (_m: string, content: string) => `${counter++}. ${content}\n`) + '\n'
 			);
 		})
 		.replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n\n')

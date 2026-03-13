@@ -25,7 +25,7 @@ export interface SIMDParseOptions {
 }
 
 class SIMDJSONParser {
-	private goServiceUrl = 'http://localhost:8097/json'; // Existing Go SIMD service
+	private goServiceUrl = ((typeof process !== 'undefined' && process.env?.PYTHON_SIMD_URL) || 'http://localhost:8097') + '/json';
 
 	/**
 	 * Parse JSON using SIMD acceleration

@@ -5,6 +5,11 @@ import { eq } from 'drizzle-orm';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 import type { RequestHandler } from './$types.js';
+import { z } from 'zod';
+
+const applyPatchSchema = z.object({
+	suggestionId: z.string().min(1, 'Missing suggestionId parameter').max(500)
+});
 
 /**
  * Phase 78 Auto-Patch Application API
@@ -17,11 +22,12 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	}
 
 	try {
-		const { suggestionId } = await request.json();
-
-		if (!suggestionId) {
-			throw error(400, 'Missing suggestionId parameter');
+		const raw = await request.json();
+		const parsed = applyPatchSchema.safeParse(raw);
+		if (!parsed.success) {
+			throw error(400, parsed.error.issues[0]?.message ?? 'Missing suggestionId parameter');
 		}
+		const { suggestionId } = parsed.data;
 
 		// 1. Fetch the suggestion from database
 		const [suggestion] = await db

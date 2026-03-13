@@ -29,7 +29,9 @@ export async function GET() {
 	});
 }
 
-export async function POST({ request }: RequestEvent) {
+export async function POST({ request, locals }: RequestEvent) {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+
 	const raw = await request.json();
 	const parsed = gpuLeaseSchema.safeParse(raw);
 	if (!parsed.success) {
@@ -49,7 +51,9 @@ export async function POST({ request }: RequestEvent) {
 	return json({ lease, acquired: true });
 }
 
-export async function DELETE({ request }: RequestEvent) {
+export async function DELETE({ request, locals }: RequestEvent) {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+
 	const raw = await request.json();
 	const parsed = gpuReleaseSchema.safeParse(raw);
 	if (!parsed.success) {

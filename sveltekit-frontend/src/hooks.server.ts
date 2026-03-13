@@ -194,7 +194,7 @@ async function warmupLLMCache(): Promise<void> {
 		];
 
 		let cached = 0;
-		const OLLAMA_URL = 'http://localhost:11434';
+		const OLLAMA_URL = ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434';
 		const EMBEDDING_MODEL = 'embeddinggemma:latest';
 
 		for (const item of commonQueries) {

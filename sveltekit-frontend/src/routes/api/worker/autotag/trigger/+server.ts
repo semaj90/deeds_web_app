@@ -11,21 +11,24 @@ import type { RequestHandler } from './$types';
 import type { ApiResponse } from '$lib/types/api.js';
 import { requireAuth } from '$lib/server/auth-helpers.js';
 import { getRabbitMQUrl } from '$lib/config/env.server.js';
+import { z } from 'zod';
 
-interface WorkerTriggerRequest {
-	type: 'case_created' | 'evidence_uploaded' | 'document_added';
-	caseId?: string;
-	evidenceId?: string;
-	documentId?: string;
-	action: 'process' | 'reprocess';
-	metadata: {
-		priority: 'low' | 'medium' | 'high';
-		tags?: string[];
-		trigger: string;
-		userId?: string;
-		[key: string]: unknown;
-	};
-}
+const workerTriggerSchema = z.object({
+	type: z.enum(['case_created', 'evidence_uploaded', 'document_added']),
+	caseId: z.string().max(500).optional(),
+	evidenceId: z.string().max(500).optional(),
+	documentId: z.string().max(500).optional(),
+	action: z.enum(['process', 'reprocess']),
+	metadata: z.object({
+		priority: z.enum(['low', 'medium', 'high']),
+		tags: z.array(z.string().max(200)).max(50).optional(),
+		trigger: z.string().max(200),
+		userId: z.string().max(500).optional()
+	}).passthrough()
+}).refine(
+	data => !(data.type === 'evidence_uploaded' && !data.evidenceId),
+	{ message: 'evidenceId required for type=evidence_uploaded' }
+);
 
 interface WorkerTriggerResponse {
 	streamId: string;
@@ -45,29 +48,18 @@ export const POST: RequestHandler = async (event) => {
 	const auth = await requireAuth(event);
 
 	try {
-		const body = (await event.request.json()) as WorkerTriggerRequest;
-
-		// Validate request
-		if (!body.type || !body.action) {
+		const raw = await event.request.json();
+		const parsed = workerTriggerSchema.safeParse(raw);
+		if (!parsed.success) {
 			return json(
 				{
 					success: false,
-					error: 'Missing required fields: type, action'
+					error: parsed.error.issues[0]?.message ?? 'Invalid input'
 				},
 				{ status: 400 }
 			);
 		}
-
-		// Validate IDs based on type
-		if (body.type === 'evidence_uploaded' && !body.evidenceId) {
-			return json(
-				{
-					success: false,
-					error: 'evidenceId required for type=evidence_uploaded'
-				},
-				{ status: 400 }
-			);
-		}
+		const body = parsed.data;
 
 		// Generate correlation ID
 		const correlationId = `autotag-${Date.now()}-${Math.random().toString(36).substring(7)}`;

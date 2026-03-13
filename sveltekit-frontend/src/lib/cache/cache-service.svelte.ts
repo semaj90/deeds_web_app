@@ -24,8 +24,39 @@ class UnifiedCacheService {
 		memoryHits: 0,
 		persistentHits: 0,
 		misses: 0,
-		writes: 0
+		writes: 0,
+		invalidations: 0
 	});
+	private channel: BroadcastChannel | null = null;
+
+	constructor() {
+		if (browser && typeof BroadcastChannel !== 'undefined') {
+			this.channel = new BroadcastChannel('cache-sync');
+			this.channel.onmessage = (ev) => this.handleBroadcast(ev.data);
+		}
+	}
+
+	private handleBroadcast(msg: { type: string; keys?: string[]; prefix?: string }) {
+		if (msg.type === 'invalidate-keys' && msg.keys) {
+			for (const key of msg.keys) {
+				lokiCache.isReady() && lokiCache.delete('default', key);
+			}
+		} else if (msg.type === 'invalidate-prefix' && msg.prefix) {
+			this.localInvalidateByPrefix(msg.prefix);
+		} else if (msg.type === 'clear-all') {
+			lokiCache.isReady() && lokiCache.clearAll();
+		}
+	}
+
+	private localInvalidateByPrefix(prefix: string) {
+		if (!lokiCache.isReady()) return;
+		const all = lokiCache.query<{ _cacheKey?: string }>('default', {});
+		for (const item of all) {
+			if (item._cacheKey?.startsWith(prefix)) {
+				lokiCache.delete('default', item._cacheKey);
+			}
+		}
+	}
 
 	/**
 	 * Get data with two-layer cache strategy
@@ -110,6 +141,42 @@ class UnifiedCacheService {
 	}
 
 	/**
+	 * Invalidate all cache entries matching a key prefix (e.g., 'cases-', 'evidence-')
+	 * Broadcasts to other tabs via BroadcastChannel.
+	 */
+	async invalidateByPrefix(prefix: string): Promise<number> {
+		if (!browser) return 0;
+		let count = 0;
+
+		// Invalidate LokiJS entries
+		this.localInvalidateByPrefix(prefix);
+
+		// Invalidate IndexedDB entries
+		if (indexedDBCache.isReady()) {
+			count = await indexedDBCache.deleteByPrefix(prefix);
+		}
+
+		this.stats.invalidations++;
+		this.channel?.postMessage({ type: 'invalidate-prefix', prefix });
+		return count;
+	}
+
+	/**
+	 * Invalidate specific cache keys. Broadcasts to other tabs.
+	 */
+	async invalidateKeys(keys: string[]): Promise<void> {
+		if (!browser || keys.length === 0) return;
+
+		for (const key of keys) {
+			if (lokiCache.isReady()) lokiCache.delete('default', key);
+			if (indexedDBCache.isReady()) await indexedDBCache.delete(key);
+		}
+
+		this.stats.invalidations += keys.length;
+		this.channel?.postMessage({ type: 'invalidate-keys', keys });
+	}
+
+	/**
 	 * Clear all caches
 	 */
 	async clearAll(): Promise<void> {
@@ -127,9 +194,11 @@ class UnifiedCacheService {
 			memoryHits: 0,
 			persistentHits: 0,
 			misses: 0,
-			writes: 0
+			writes: 0,
+			invalidations: 0
 		};
 
+		this.channel?.postMessage({ type: 'clear-all' });
 		console.log('✅ All caches cleared');
 	}
 
@@ -236,6 +305,8 @@ export function useCache() {
 		set: <T>(key: string, data: T, strategy?: CacheStrategy) => cache.set(key, data, strategy),
 		delete: (key: string, strategy?: CacheStrategy) => cache.delete(key, strategy),
 		query: <T>(collection: string, queryObj?: any) => cache.query<T>(collection, queryObj),
+		invalidateByPrefix: (prefix: string) => cache.invalidateByPrefix(prefix),
+		invalidateKeys: (keys: string[]) => cache.invalidateKeys(keys),
 		clearAll: () => cache.clearAll(),
 		persistSnapshot: () => cache.persistMemorySnapshot(),
 		restoreSnapshot: () => cache.restoreMemorySnapshot(),

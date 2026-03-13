@@ -7,8 +7,13 @@
 import { updatePatchVerificationStatus } from '$lib/db/queries/nes-command-center.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import { z } from 'zod';
 
-const VALID_STATUSES = ['pending', 'passed', 'failed'];
+const patchVerificationSchema = z.object({
+	verification_status: z.enum(['pending', 'passed', 'failed']),
+	verification_message: z.string().max(5000).optional()
+});
+
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export const PUT: RequestHandler = async ({ params, request }) => {
@@ -20,15 +25,15 @@ export const PUT: RequestHandler = async ({ params, request }) => {
 	}
 
 	try {
-		const body = await request.json();
-
-		// Validate verification_status
-		if (!body?.verification_status || !VALID_STATUSES.includes(body.verification_status)) {
+		const raw = await request.json();
+		const parsed = patchVerificationSchema.safeParse(raw);
+		if (!parsed.success) {
 			return json(
-				{ error: `Invalid verification_status. Must be one of: ${VALID_STATUSES.join(', ')}` },
+				{ error: parsed.error.issues[0]?.message ?? 'Invalid verification_status' },
 				{ status: 400 }
 			);
 		}
+		const body = parsed.data;
 
 		const updated = await updatePatchVerificationStatus(
 			patchId,

@@ -7,6 +7,11 @@ import {
 	getCachedExport,
 	cacheExport,
 } from '$lib/server/cache/pdf-export-cache.js';
+import { z } from 'zod';
+
+const collectionExportSchema = z.object({
+	format: z.enum(['html', 'markdown', 'json']).optional().default('html')
+});
 
 /**
  * GET /api/citations/collections/[collectionId]/export?format=html|markdown|json
@@ -175,8 +180,9 @@ export const GET: RequestHandler = async ({ locals, params, url }) => {
 };
 
 export const POST: RequestHandler = async ({ locals, params, request }) => {
-	const body = await request.json();
-	const format = body.format || 'html';
+	const raw = await request.json();
+	const parsed = collectionExportSchema.safeParse(raw);
+	const format = parsed.success ? parsed.data.format : 'html';
 	return handleExport({ locals, params, format });
 };
 

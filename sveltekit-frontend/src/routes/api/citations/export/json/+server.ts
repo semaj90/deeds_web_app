@@ -2,6 +2,13 @@ import { citations, statutes, db } from '$lib/server/db/client';
 import { error, json } from '@sveltejs/kit';
 import { eq, inArray } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
+
+const citationExportSchema = z.object({
+	citationIds: z.array(z.string().max(500)).max(1000).optional(),
+	caseId: z.string().max(500).optional(),
+	includeStatutes: z.boolean().optional().default(true)
+});
 
 /**
  * POST /api/citations/export/json
@@ -14,8 +21,12 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	}
 
 	try {
-		const body = await request.json();
-		const { citationIds, caseId, includeStatutes = true } = body;
+		const raw = await request.json();
+		const parsed = citationExportSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		}
+		const { citationIds, caseId, includeStatutes } = parsed.data;
 
 		let citationsData: any[];
 

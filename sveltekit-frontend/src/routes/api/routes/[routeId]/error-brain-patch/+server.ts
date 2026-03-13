@@ -11,20 +11,25 @@ import {
 } from '$lib/db/queries/nes-command-center.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import { z } from 'zod';
+
+const errorBrainPatchSchema = z.object({
+	patch_content: z.string().min(1, 'Missing required field: patch_content').max(50000),
+	analysis_id: z.string().min(1, 'Missing required field: analysis_id').max(500),
+	file_path: z.string().max(1000).optional(),
+	risk_level: z.string().max(50).optional()
+});
 
 export const POST: RequestHandler = async ({ params, request }) => {
 	const { routeId } = params;
 
 	try {
-		const body = await request.json();
-
-		// Validate required fields
-		if (!body?.patch_content) {
-			return json({ error: 'Missing required field: patch_content' }, { status: 400 });
+		const raw = await request.json();
+		const parsed = errorBrainPatchSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
-		if (!body?.analysis_id) {
-			return json({ error: 'Missing required field: analysis_id' }, { status: 400 });
-		}
+		const body = parsed.data;
 
 		// Ensure route exists
 		let route = await getRouteMetadata(routeId);

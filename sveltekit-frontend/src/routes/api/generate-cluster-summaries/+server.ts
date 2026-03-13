@@ -10,7 +10,7 @@
 import { db } from '$lib/server/db/client';
 import { getOllamaUrl, getRedisUrl } from '$lib/config/env.server.js';
 import { scrollPoints, upsertPoints } from '$lib/server/qdrant-http';
-import { json } from '@sveltejs/kit';
+import { json, type RequestEvent } from '@sveltejs/kit';
 import { exec } from 'child_process';
 import { sql } from 'drizzle-orm';
 import { createClient } from 'redis';
@@ -21,7 +21,9 @@ const redis = createClient({ url: getRedisUrl() });
 const OLLAMA_URL = getOllamaUrl();
 const PYTHON_PATH = 'C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\python.exe';
 
-export async function POST() {
+export async function POST({ locals }: RequestEvent) {
+	if (!locals.user) return json({ success: false, error: 'Unauthorized' }, { status: 401 });
+
 	try {
 		await redis.connect().catch(() => {});
 

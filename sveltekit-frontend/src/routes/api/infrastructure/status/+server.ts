@@ -26,10 +26,10 @@ export const GET: RequestHandler = async () => {
 		routerStatus,
 		gpuLease,
 		ollamaOk,
-		redisOk,
+		redisInfo,
 		postgresOk,
-		qdrantOk,
-		rabbitmqOk,
+		qdrantInfo,
+		rabbitmqInfo,
 	] = await Promise.all([
 		checkGrpcHealth().catch(() => ({ enabled: false, url: '', available: false })),
 		getSIMDStatus().catch(() => ({ healthy: false, minioConnected: false, latencyMs: -1 })),
@@ -41,14 +41,19 @@ export const GET: RequestHandler = async () => {
 		fetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(TIMEOUT) })
 			.then(r => r.ok).catch(() => false),
 
-		// Redis
+		// Redis — ping + memory/keyspace stats
 		(async () => {
 			try {
 				const { redis } = await import('$lib/server/redis.js');
-				if (!redis) return false;
+				if (!redis) return { ok: false };
 				await redis.ping();
-				return true;
-			} catch { return false; }
+				const info = await redis.info('memory');
+				const keyspace = await redis.info('keyspace');
+				const usedMemory = info.match(/used_memory_human:(\S+)/)?.[1] ?? 'unknown';
+				const peakMemory = info.match(/used_memory_peak_human:(\S+)/)?.[1] ?? 'unknown';
+				const dbKeys = keyspace.match(/keys=(\d+)/)?.[1] ?? '0';
+				return { ok: true, usedMemory, peakMemory, keys: parseInt(dbKeys) };
+			} catch { return { ok: false }; }
 		})(),
 
 		// Postgres
@@ -61,15 +66,36 @@ export const GET: RequestHandler = async () => {
 			} catch { return false; }
 		})(),
 
-		// Qdrant
-		fetch(`${ENV.QDRANT_URL}/collections`, { signal: AbortSignal.timeout(TIMEOUT) })
-			.then(r => r.ok).catch(() => false),
+		// Qdrant — collection count + total vectors
+		(async () => {
+			try {
+				const res = await fetch(`${ENV.QDRANT_URL}/collections`, { signal: AbortSignal.timeout(TIMEOUT) });
+				if (!res.ok) return { ok: false };
+				const data = await res.json();
+				const collections = data.result?.collections ?? [];
+				return { ok: true, collectionCount: collections.length };
+			} catch { return { ok: false }; }
+		})(),
 
-		// RabbitMQ (check management API)
-		fetch(`${getRabbitMQManagementUrl()}/api/overview`, {
-			headers: { Authorization: 'Basic ' + btoa('guest:guest') },
-			signal: AbortSignal.timeout(TIMEOUT)
-		}).then(r => r.ok).catch(() => false),
+		// RabbitMQ — overview with queue/message counts
+		(async () => {
+			try {
+				const res = await fetch(`${getRabbitMQManagementUrl()}/api/overview`, {
+					headers: { Authorization: 'Basic ' + btoa('guest:guest') },
+					signal: AbortSignal.timeout(TIMEOUT)
+				});
+				if (!res.ok) return { ok: false };
+				const data = await res.json();
+				return {
+					ok: true,
+					queues: data.object_totals?.queues ?? 0,
+					messagesReady: data.queue_totals?.messages_ready ?? 0,
+					messagesUnacked: data.queue_totals?.messages_unacknowledged ?? 0,
+					publishRate: data.message_stats?.publish_details?.rate ?? 0,
+					deliverRate: data.message_stats?.deliver_get_details?.rate ?? 0,
+				};
+			} catch { return { ok: false }; }
+		})(),
 	]);
 
 	const cudaAddon = isCudaAvailable();
@@ -108,11 +134,28 @@ export const GET: RequestHandler = async () => {
 		},
 		services: {
 			postgres: postgresOk,
-			redis: redisOk,
-			qdrant: qdrantOk,
-			rabbitmq: rabbitmqOk,
+			redis: redisInfo.ok,
+			qdrant: qdrantInfo.ok,
+			rabbitmq: rabbitmqInfo.ok,
 			simd,
 		},
+		cache: {
+			redis: redisInfo.ok ? {
+				usedMemory: redisInfo.usedMemory,
+				peakMemory: redisInfo.peakMemory,
+				keys: redisInfo.keys,
+			} : null,
+			qdrant: qdrantInfo.ok ? {
+				collectionCount: qdrantInfo.collectionCount,
+			} : null,
+		},
+		queues: rabbitmqInfo.ok ? {
+			total: rabbitmqInfo.queues,
+			messagesReady: rabbitmqInfo.messagesReady,
+			messagesUnacked: rabbitmqInfo.messagesUnacked,
+			publishRate: rabbitmqInfo.publishRate,
+			deliverRate: rabbitmqInfo.deliverRate,
+		} : null,
 		latencyMs: Date.now() - start,
 		ts: new Date().toISOString(),
 	}, {

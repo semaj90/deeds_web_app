@@ -2,6 +2,12 @@ import { json } from '@sveltejs/kit';
 import pg from 'pg';
 import { getDatabaseUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
+
+const graphExpandSchema = z.object({
+	seed_uris: z.array(z.string().max(1000)).min(1, 'seed_uris must be a non-empty array').max(100),
+	depth: z.number().int().min(1).max(10).optional().default(1)
+});
 
 const pool = new pg.Pool({ connectionString: getDatabaseUrl() });
 
@@ -13,11 +19,12 @@ const pool = new pg.Pool({ connectionString: getDatabaseUrl() });
  */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const { seed_uris, depth = 1 } = await request.json();
-
-		if (!Array.isArray(seed_uris) || seed_uris.length === 0) {
-			return json({ error: 'seed_uris must be a non-empty array' }, { status: 400 });
+		const raw = await request.json();
+		const parsed = graphExpandSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
+		const { seed_uris, depth } = parsed.data;
 
 		// Use expand_graph function to get expanded nodes
 		const expandedResult = await pool.query(

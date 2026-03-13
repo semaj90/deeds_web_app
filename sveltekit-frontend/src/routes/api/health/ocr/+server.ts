@@ -1,5 +1,11 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import { z } from 'zod';
+
+const ocrHealthActionSchema = z.object({
+	action: z.enum(['test-processing', 'detailed-status']).optional(),
+	timeout: z.number().int().min(1000).max(60000).optional()
+});
 
 interface OCRHealthDetails { service: string, status: 'operational' | 'degraded' | 'offline';
  port?: number; endpoint: string;
@@ -200,8 +206,12 @@ export const GET: RequestHandler = async () => {
 // Support POST for triggering specific OCR health actions
 export const POST: RequestHandler = async ({ request }) => {
  try {
- const body = (await request.json()) as unknown;
- const { action, timeout } = (body as { action?: string; timeout?: number }) ?? {};
+ const raw = await request.json();
+ const parsed = ocrHealthActionSchema.safeParse(raw);
+ if (!parsed.success) {
+ return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+ }
+ const { action, timeout } = parsed.data;
 
  if (action === 'test-processing') {
  // Test OCR processing capability with a simple test

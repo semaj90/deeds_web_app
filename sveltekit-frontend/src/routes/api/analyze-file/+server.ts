@@ -24,7 +24,9 @@ const analyzeFileSchema = z.object({
 		.refine(p => !p.startsWith('/'), 'Absolute paths not allowed')
 });
 
-export async function POST({ request }: RequestEvent) {
+export async function POST({ request, locals }: RequestEvent) {
+	if (!locals.user) return json({ success: false, error: 'Unauthorized' }, { status: 401 });
+
 	try {
 		const raw = await request.json();
 		const parsed = analyzeFileSchema.safeParse(raw);

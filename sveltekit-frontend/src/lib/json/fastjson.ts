@@ -30,12 +30,14 @@ export interface FastJSONResult<T = any> {
 /**
  * Try Python SIMD/GPU backend via agentic bridge service
  */
+const PYTHON_SIMD_URL = (typeof process !== 'undefined' && process.env?.PYTHON_SIMD_URL) || 'http://localhost:8097';
+
 async function tryPythonSIMD(input: string): Promise<FastJSONResult> {
     try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
 
-        const res = await fetch('http://localhost:8097/parse', {
+        const res = await fetch(`${PYTHON_SIMD_URL}/parse`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
@@ -238,7 +240,7 @@ export async function checkBackends(): Promise<{
 
     // Test Python SIMD
     try {
-        const res = await fetch('http://localhost:8097/health', { timeout: 2000 });
+        const res = await fetch(`${PYTHON_SIMD_URL}/health`, { timeout: 2000 });
         results.pythonSIMD = res.ok;
     } catch {}
 

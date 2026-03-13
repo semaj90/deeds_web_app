@@ -11,7 +11,9 @@ const sentimentSchema = z.object({
 	text: z.string().min(1, 'text is required').max(50000)
 });
 
-export async function POST({ request }: RequestEvent) {
+export async function POST({ request, locals }: RequestEvent) {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+
 	const raw = await request.json();
 	const parsed = sentimentSchema.safeParse(raw);
 	if (!parsed.success) {

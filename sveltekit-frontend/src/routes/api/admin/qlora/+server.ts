@@ -70,7 +70,8 @@ async function saveJobs(jobs: TrainingJob[]): Promise<void> {
 	} catch { /* non-critical */ }
 }
 
-export async function GET() {
+export async function GET({ locals }: RequestEvent) {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	const jobs = await getJobs();
 
 	// Count available training data files
@@ -117,7 +118,9 @@ export async function GET() {
 	});
 }
 
-export async function POST({ request }: RequestEvent) {
+export async function POST({ request, locals }: RequestEvent) {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+
 	const raw = await request.json();
 	const parsed = qloraSubmitSchema.safeParse(raw);
 	if (!parsed.success) {

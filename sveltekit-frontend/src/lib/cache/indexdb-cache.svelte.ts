@@ -122,6 +122,27 @@ class IndexedDBCache {
 	}
 
 	/**
+	 * Delete all entries whose key starts with the given prefix.
+	 * Returns the number of entries deleted.
+	 */
+	async deleteByPrefix(prefix: string): Promise<number> {
+		if (!browser || !this.ready) return 0;
+
+		try {
+			const allKeys = await keys();
+			const matching = allKeys.filter(k => typeof k === 'string' && k.startsWith(prefix));
+			for (const key of matching) {
+				await del(key as string);
+			}
+			await this.updateSize();
+			return matching.length;
+		} catch (error) {
+			console.error('Cache deleteByPrefix error:', error);
+			return 0;
+		}
+	}
+
+	/**
 	 * Get all cache keys
 	 */
 	async getKeys(): Promise<IDBValidKey[]> {

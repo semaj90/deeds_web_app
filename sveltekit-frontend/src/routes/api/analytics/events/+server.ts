@@ -43,6 +43,20 @@ export const POST: RequestHandler = async ({ request }) => {
 				payload: e.payload
 			}));
 			const logged = await logEventBatch(events);
+
+			// Fire-and-forget: publish user-associated events to RabbitMQ for async processing
+			const userEvents = events.filter(e => e.userId);
+			if (userEvents.length > 0) {
+				import('$lib/server/queue/rabbitmq-manager-fixed.js').then(({ rabbitmq }) => {
+					for (const e of userEvents) {
+						rabbitmq.publishAnalyticsEvent({
+							eventType: e.eventType,
+							payload: { ...e.payload, userId: e.userId, sessionId: e.sessionId }
+						}).catch(() => {});
+					}
+				}).catch(() => {});
+			}
+
 			return json({ ok: true, logged });
 		}
 

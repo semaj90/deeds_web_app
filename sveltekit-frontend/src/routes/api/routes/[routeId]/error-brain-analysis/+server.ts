@@ -11,24 +11,25 @@ import {
 } from '$lib/db/queries/nes-command-center.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import { z } from 'zod';
 
-const VALID_PHASES = ['suggesting', 'analyzing', 'patching', 'verifying', 'complete'];
+const errorBrainAnalysisSchema = z.object({
+	suggestions: z.array(z.unknown()).min(1, 'Missing or empty suggestions array').max(100),
+	selected_suggestion_index: z.number().int().optional(),
+	phase: z.enum(['suggesting', 'analyzing', 'patching', 'verifying', 'complete']).optional().default('suggesting'),
+	error_message: z.string().max(5000).optional()
+});
 
 export const POST: RequestHandler = async ({ params, request }) => {
 	const { routeId } = params;
 
 	try {
-		const body = await request.json();
-
-		// Validate required fields
-		if (!body?.suggestions || !Array.isArray(body.suggestions) || body.suggestions.length === 0) {
-			return json({ error: 'Missing or empty suggestions array' }, { status: 400 });
+		const raw = await request.json();
+		const parsed = errorBrainAnalysisSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
-
-		// Validate phase if provided
-		if (body.phase && !VALID_PHASES.includes(body.phase)) {
-			return json({ error: `Invalid phase. Must be one of: ${VALID_PHASES.join(', ')}` }, { status: 400 });
-		}
+		const body = parsed.data;
 
 		// Ensure route exists in route_metadata (auto-create for integration tests)
 		let route = await getRouteMetadata(routeId);

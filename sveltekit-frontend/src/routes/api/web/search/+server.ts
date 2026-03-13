@@ -13,7 +13,9 @@ const webSearchSchema = z.object({
 	maxResults: z.number().int().min(1).max(10).optional().default(5)
 });
 
-export async function POST({ request }: RequestEvent) {
+export async function POST({ request, locals }: RequestEvent) {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+
 	const raw = await request.json();
 	const parsed = webSearchSchema.safeParse(raw);
 	if (!parsed.success) {

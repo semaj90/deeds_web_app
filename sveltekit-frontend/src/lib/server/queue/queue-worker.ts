@@ -405,6 +405,12 @@ export class AnalyticsTrackWorker extends QueueWorker<{
 }> {
 	readonly queue = 'analytics.track' as const;
 
+	/** Recommendation-relevant event types that should feed UserHistoryTracker */
+	private static readonly TRACKABLE_EVENTS = new Set([
+		'case_created', 'case_updated', 'evidence_uploaded',
+		'rag_search', 'chat_query', 'document_indexed'
+	]);
+
 	async process(data: {
 		eventType: string;
 		payload: Record<string, unknown>;
@@ -421,6 +427,20 @@ export class AnalyticsTrackWorker extends QueueWorker<{
 			JSON.stringify({ ...data.payload, timestamp: score })
 		);
 		await redis.zremrangebyrank(key, 0, -10001); // Keep last 10,000
+
+		// Feed recommendation system: record user interaction for topic affinity tracking
+		const userId = data.payload.userId as string | undefined;
+		if (userId && AnalyticsTrackWorker.TRACKABLE_EVENTS.has(data.eventType)) {
+			try {
+				const { UserHistoryTracker } = await import('$lib/server/ml/user-history.js');
+				const tracker = new UserHistoryTracker(userId);
+				const documentId = (data.payload.documentId ?? data.payload.caseId ?? data.eventType) as string;
+				const caseId = (data.payload.caseId ?? 'general') as string;
+				await tracker.recordView(documentId, caseId, 0);
+			} catch {
+				// Non-fatal — recommendation tracking is best-effort
+			}
+		}
 	}
 }
 

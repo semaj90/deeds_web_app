@@ -4,9 +4,9 @@
  */
 
 const SIMD_SERVERS = {
- primary: 'http://localhost:8097', // Main SIMD parser service
- accelerator: 'http://localhost:8095', // SIMD JSON accelerator
- fallback: 'http://localhost:8099' // HTTP fallback server
+ primary: (typeof process !== 'undefined' && process.env?.PYTHON_SIMD_URL) || 'http://localhost:8097',
+ accelerator: (typeof process !== 'undefined' && process.env?.SIMD_ACCELERATOR_URL) || 'http://localhost:8095',
+ fallback: (typeof process !== 'undefined' && process.env?.TENSORRT_URL) || 'http://localhost:8099'
 };
 
 /**

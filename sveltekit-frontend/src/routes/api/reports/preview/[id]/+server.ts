@@ -13,6 +13,11 @@ import { reports } from '$lib/server/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { auditReportAction } from '$lib/server/reports/audit.js';
 import { CACHE_PATTERNS, cacheInvalidation } from '$lib/server/cache/invalidation.js';
+import { z } from 'zod';
+
+const reportPreviewSchema = z.object({
+	format: z.enum(['html', 'json']).optional().default('html')
+});
 
 async function generatePreview({ locals, params, format, request }: {
 	locals: App.Locals;
@@ -117,8 +122,9 @@ export const GET: RequestHandler = async ({ locals, params, url }) => {
 };
 
 export const POST: RequestHandler = async ({ locals, params, request }) => {
-	const body = await request.json();
-	const format = body.format || 'html';
+	const raw = await request.json();
+	const parsed = reportPreviewSchema.safeParse(raw);
+	const format = parsed.success ? parsed.data.format : 'html';
 	try {
 		const result = await generatePreview({ locals, params, format, request });
 		return json({

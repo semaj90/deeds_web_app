@@ -1,16 +1,21 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
-interface SuggestFixRequest {
-	route?: string;
-	file_path?: string;
-	code?: string;
-	message?: string;
-	errors?: Array<{ code: string; message: string; severity: string }>;
-}
+const suggestFixSchema = z.object({
+	route: z.string().max(500).optional(),
+	file_path: z.string().max(1000).optional(),
+	code: z.string().max(200).optional(),
+	message: z.string().max(5000).optional(),
+	errors: z.array(z.object({
+		code: z.string().max(200),
+		message: z.string().max(5000),
+		severity: z.string().max(50)
+	})).max(50).optional()
+});
 
 /**
  * POST /api/phase72/suggest-fix
@@ -19,7 +24,12 @@ interface SuggestFixRequest {
  */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const payload: SuggestFixRequest = await request.json();
+		const raw = await request.json();
+		const parsed = suggestFixSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		}
+		const payload = parsed.data;
 		const route = payload.route ?? 'unknown';
 		const errorMsg = payload.message ?? payload.errors?.[0]?.message ?? 'Unknown error';
 		const errorCode = payload.code ?? payload.errors?.[0]?.code ?? 'UNKNOWN';

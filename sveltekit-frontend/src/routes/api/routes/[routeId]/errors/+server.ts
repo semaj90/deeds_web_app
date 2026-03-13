@@ -17,6 +17,19 @@ import type { NewErrorCluster } from '$lib/db/schema/nes-command-center.js';
 import { error, json } from '@sveltejs/kit';
 import { _broadcastErrorCountChange, _broadcastHealthChange } from '../../events/+server.js';
 import type { RequestHandler } from './$types.js';
+import { z } from 'zod';
+
+const errorClusterSchema = z.object({
+    tool: z.string().min(1).max(200),
+    code: z.string().min(1).max(200),
+    message: z.string().min(1).max(5000),
+    severity: z.enum(['error', 'warning', 'info']),
+    file_path: z.string().max(1000).optional(),
+    filePath: z.string().max(1000).optional(),
+    raw_log_snippet: z.string().max(10000).optional(),
+    rawLogSnippet: z.string().max(10000).optional(),
+    count: z.number().int().min(1).max(10000).optional().default(1)
+});
 
 /**
  * POST /api/routes/:routeId/errors
@@ -30,22 +43,14 @@ export const POST: RequestHandler = async ({ params, request }) => {
   const { routeId } = params;
 
   try {
-    const body = await request.json();
-
-    // Validate required fields
-    if (!body?.tool|| !body?.code|| !body?.message|| !body.severity) {
+    const raw = await request.json();
+    const parsed = errorClusterSchema.safeParse(raw);
+    if (!parsed.success) {
       return error(400, {
-        message: 'Missing required, fields: tool, code, message, severity',
+        message: parsed.error.issues[0]?.message ?? 'Invalid input',
       });
     }
-
-    // Validate severity enum
-    const validSeverities = ['error', 'warning', 'info'];
-    if (!validSeverities.includes(body.severity)) {
-      return error(400, {
-        message: `Invalid severity. Must be one, of: ${validSeverities.join(', ')}`,
-      });
-    }
+    const body = parsed.data;
 
     // Validate route exists
     const route = await getRouteMetadata(routeId);

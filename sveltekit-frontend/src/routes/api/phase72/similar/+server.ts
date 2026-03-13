@@ -3,6 +3,17 @@ import type { RequestHandler } from './$types.js';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const phase72SimilarSchema = z.object({
+	error_hash: z.string().max(500).optional(),
+	similar_errors: z.array(z.object({
+		error_code: z.string().optional(),
+		message: z.string().optional(),
+		file_path: z.string().optional()
+	})).max(100).optional().default([]),
+	context: z.string().max(5000).optional()
+});
 
 /**
  * GET /api/phase72/similar?hash=<error_hash>&limit=5
@@ -94,8 +105,12 @@ export const GET: RequestHandler = async ({ url }) => {
  * Returns SSE stream with { text } chunks.
  */
 export const POST: RequestHandler = async ({ request }) => {
-	const body = await request.json();
-	const { error_hash, similar_errors = [], context } = body;
+	const raw = await request.json();
+	const parsed = phase72SimilarSchema.safeParse(raw);
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+	}
+	const { error_hash, similar_errors, context } = parsed.data;
 
 	// Build prompt from error context
 	let prompt = 'You are a TypeScript/Svelte expert. Analyze this error and suggest a concise fix.\n\n';

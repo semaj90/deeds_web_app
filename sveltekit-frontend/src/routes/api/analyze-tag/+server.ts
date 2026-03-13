@@ -20,7 +20,9 @@ const analyzeTagSchema = z.object({
 	collection: z.string().min(1, 'collection is required').max(200)
 });
 
-export async function POST({ request }: RequestEvent) {
+export async function POST({ request, locals }: RequestEvent) {
+	if (!locals.user) return json({ success: false, error: 'Unauthorized' }, { status: 401 });
+
 	const raw = await request.json();
 	const parsed = analyzeTagSchema.safeParse(raw);
 	if (!parsed.success) {

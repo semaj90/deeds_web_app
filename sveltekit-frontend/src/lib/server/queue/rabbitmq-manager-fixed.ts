@@ -38,7 +38,6 @@ export class RabbitMQManager extends EventEmitter {
 
     // Services (loaded dynamically)
     private redisService: any = null;
-    private lokiRedisCache: any = null;
     private enhancedRAGPipeline: any = null;
     private instantSearchEngine: any = null;
     private db: any = null;
@@ -109,11 +108,6 @@ export class RabbitMQManager extends EventEmitter {
             } catch (e) { console.warn('⚠️ Redis failed:', this.formatError(e)); }
 
             try {
-                const lokiModule = await import('../../../lib/cache/loki-redis-integration.js');
-                this.lokiRedisCache = lokiModule.lokiRedisCache;
-            } catch (e) { console.warn('⚠️ LokiRedis failed:', this.formatError(e)); }
-
-             try {
                 const dbModule = await import('../db/client.js');
                 this.db = dbModule.db;
             } catch (e) { console.warn('⚠️ DB failed:', this.formatError(e)); }

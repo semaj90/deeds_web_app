@@ -2,6 +2,11 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
+import { z } from 'zod';
+
+const errorBrainRunSchema = z.object({
+	filePath: z.string().max(1000).optional()
+});
 
 /** GET /api/internal/error-brain/runs — Error analysis run history */
 export const GET: RequestHandler = async ({ url }) => {
@@ -37,7 +42,12 @@ export const GET: RequestHandler = async ({ url }) => {
 /** POST /api/internal/error-brain/runs — Trigger a new analysis run */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const { filePath } = await request.json();
+		const raw = await request.json();
+		const parsed = errorBrainRunSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		}
+		const { filePath } = parsed.data;
 		return json({
 			runId: crypto.randomUUID(),
 			status: 'queued',
