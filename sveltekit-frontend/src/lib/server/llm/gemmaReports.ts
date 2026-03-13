@@ -1,4 +1,5 @@
 import { ENV } from '$lib/server/env.server.js';
+import { traceLLM } from '$lib/server/observability/langfuse.js';
 
 export type ReportTemplate = 'charging_memo' | 'intake_summary';
 
@@ -77,20 +78,23 @@ Requirements:
 - DO NOT include citations to real-world cases or statutes unless they are generic placeholders.
 `;
 
-    const res = await fetch(`${OLLAMA_URL}/api/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	model: OLLAMA_MODEL,
-            prompt,
-            stream: false
-        }),
+    return traceLLM('gemma-report', { model: OLLAMA_MODEL, template, caseId }, async (gen) => {
+        const res = await fetch(`${OLLAMA_URL}/api/generate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+	    body: JSON.stringify({
+	        model: OLLAMA_MODEL,
+                prompt,
+                stream: false
+            }),
+        });
+
+        if (!res.ok) {
+            throw new Error(`Gemma3 request failed: ${res.status} ${res.statusText}`);
+        }
+
+        const data = (await res.json()) as { response: string };
+        gen.end({ output: data.response.slice(0, 1000) });
+        return data.response;
     });
-
-    if (!res.ok) {
-        throw new Error(`Gemma3 request failed: ${res.status} ${res.statusText}`);
-    }
-
-    const data = (await res.json()) as { response: string };
-    return data.response; // plain HTML-ish text
 }

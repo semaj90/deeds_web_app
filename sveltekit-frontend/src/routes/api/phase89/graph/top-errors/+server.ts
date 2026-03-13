@@ -87,6 +87,6 @@ export const GET: RequestHandler = async ({ url }) => {
 		return json({ nodes, links });
 	} catch (error: any) {
 		console.error('Error fetching graph:', error);
-		return json({ error: error.message }, { status: 500 });
+		return json({ error: 'Failed to fetch graph data' }, { status: 500 });
 	}
 };

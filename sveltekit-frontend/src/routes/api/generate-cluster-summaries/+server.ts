@@ -60,7 +60,7 @@ export async function POST({ locals }: RequestEvent) {
 		});
 	} catch (error: any) {
 		console.error('Cluster summary generation failed:', error);
-		return json({ success: false, error: error.message }, { status: 500 });
+		return json({ success: false, error: 'Cluster summary generation failed' }, { status: 500 });
 	} finally {
 		await redis.disconnect().catch(() => {});
 	}

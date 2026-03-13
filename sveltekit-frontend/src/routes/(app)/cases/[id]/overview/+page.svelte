@@ -34,6 +34,11 @@
 	let isExportingPacket = $state(false);
 	let exportPacketError = $state<string | null>(null);
 
+	// Reasoning chain state
+	let isGeneratingReasoning = $state(false);
+	let reasoningChain = $state<{ steps: Array<{ name: string; content: string; confidence: number; durationMs: number }>; overallConfidence: number } | null>(null);
+	let reasoningError = $state<string | null>(null);
+
 	$effect(() => {
 		if (!browser) return;
 		loadDiagnostics();
@@ -97,6 +102,40 @@
 			console.error('[CaseOverview] export error', err);
 		} finally {
 			isExportingPacket = false;
+		}
+	}
+
+	async function generateReasoningChain() {
+		const caseId = data.caseData?.id ?? data.caseId;
+		if (!caseId) return;
+		isGeneratingReasoning = true;
+		reasoningError = null;
+
+		try {
+			const res = await fetch(`/api/cases/${caseId}/reasoning-chain`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					summary: data.caseData?.narrative ?? data.caseData?.title ?? 'Case analysis',
+					keyFacts: [data.caseData?.who, data.caseData?.what, data.caseData?.when, data.caseData?.where].filter(Boolean),
+					jurisdiction: data.caseData?.jurisdiction ?? undefined
+				})
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({ error: 'Generation failed' }));
+				reasoningError = err.error || 'Generation failed';
+				return;
+			}
+			const result = await res.json();
+			if (result.success) {
+				reasoningChain = result.chain;
+			} else {
+				reasoningError = result.error || 'Unknown error';
+			}
+		} catch {
+			reasoningError = 'Network error';
+		} finally {
+			isGeneratingReasoning = false;
 		}
 	}
 
@@ -340,17 +379,58 @@
 					AI-powered document drafting and case analysis via Gemma3 legal model.
 				</p>
 
-				<button
-					class="px-3 py-2 rounded-lg border border-neutral-700 hover:border-neutral-500 transition-colors text-xs"
-					onclick={() => (showDraftingTool = !showDraftingTool)}
-				>
-					{showDraftingTool ? 'Hide Document Drafting' : 'Legal Document Drafting'}
-				</button>
+				<div class="flex items-center gap-2">
+					<button
+						class="px-3 py-2 rounded-lg border border-neutral-700 hover:border-neutral-500 transition-colors text-xs"
+						onclick={() => (showDraftingTool = !showDraftingTool)}
+					>
+						{showDraftingTool ? 'Hide Document Drafting' : 'Legal Document Drafting'}
+					</button>
+					<button
+						class="px-3 py-2 rounded-lg border border-amber-700 bg-amber-500/10 hover:bg-amber-500/20 transition-colors text-xs text-amber-300 flex items-center gap-1.5"
+						disabled={isGeneratingReasoning}
+						onclick={generateReasoningChain}
+					>
+						<Icon name="brain" size={14} />
+						{isGeneratingReasoning ? 'Generating...' : 'Legal Reasoning Chain'}
+					</button>
+				</div>
 			</section>
 			{#if showDraftingTool}
 				<div class="mt-3">
 					<LegalDocumentDrafting />
 				</div>
+			{/if}
+
+			{#if reasoningError}
+				<div class="rounded-xl border border-rose-800/30 bg-rose-950/20 p-4 text-rose-300 text-xs">
+					{reasoningError}
+				</div>
+			{/if}
+
+			{#if reasoningChain}
+				<section class="rounded-xl border border-amber-800/30 bg-amber-950/10 p-4 space-y-3">
+					<div class="flex items-center justify-between">
+						<h3 class="text-sm font-semibold text-amber-200">Legal Reasoning Chain</h3>
+						<span class="text-xs px-2 py-1 rounded-full border border-amber-700/50 text-amber-300">
+							{Math.round(reasoningChain.overallConfidence * 100)}% confidence
+						</span>
+					</div>
+
+					{#each reasoningChain.steps as step, i}
+						<div class="rounded-lg border border-neutral-800 bg-neutral-900/60 p-3 space-y-1">
+							<div class="flex items-center justify-between">
+								<h4 class="text-xs font-semibold text-neutral-200">
+									Step {i + 1}: {step.name}
+								</h4>
+								<span class="text-[10px] text-neutral-500">
+									{step.durationMs}ms • {Math.round(step.confidence * 100)}%
+								</span>
+							</div>
+							<p class="text-xs text-neutral-300 whitespace-pre-line">{step.content}</p>
+						</div>
+					{/each}
+				</section>
 			{/if}
 		{:else if activeTab === 'reports'}
 			<section class="rounded-xl border border-neutral-800 bg-neutral-900/70 p-4 space-y-4 text-sm">

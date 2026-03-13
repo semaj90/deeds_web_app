@@ -81,7 +81,7 @@ export async function POST({ request, locals }: RequestEvent) {
 		});
 	} catch (error: any) {
 		console.error('Tag analysis failed:', error);
-		return json({ success: false, error: error.message }, { status: 500 });
+		return json({ success: false, error: 'Tag analysis failed' }, { status: 500 });
 	}
 }
 

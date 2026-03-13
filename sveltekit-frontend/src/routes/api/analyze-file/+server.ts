@@ -102,7 +102,7 @@ export async function POST({ request, locals }: RequestEvent) {
 		});
 	} catch (error: any) {
 		console.error('File analysis failed:', error);
-		return json({ success: false, error: error.message }, { status: 500 });
+		return json({ success: false, error: 'File analysis failed' }, { status: 500 });
 	}
 }
 

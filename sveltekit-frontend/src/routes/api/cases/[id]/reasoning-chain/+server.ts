@@ -68,9 +68,8 @@ export const POST: RequestHandler = async (event) => {
 		});
 	} catch (err) {
 		console.error(`[reasoning-chain] Error for case ${caseId}:`, err);
-		const message = err instanceof Error ? err.message : String(err);
 		return json(
-			{ success: false, error: `Reasoning chain failed: ${message}` },
+			{ success: false, error: 'Reasoning chain generation failed' },
 			{ status: 500 }
 		);
 	}

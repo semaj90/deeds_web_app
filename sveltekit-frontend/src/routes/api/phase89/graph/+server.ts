@@ -46,7 +46,7 @@ export const GET: RequestHandler = async ({ url }) => {
     return json(graphData);
   } catch (error) {
     console.error('Error loading graph:', error);
-    return json({ nodes: [], edges: [], error: error.message }, { status: 500 });
+    return json({ nodes: [], edges: [], error: 'Failed to load graph data' }, { status: 500 });
   }
 };
 

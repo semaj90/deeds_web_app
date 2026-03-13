@@ -43,8 +43,8 @@ services:
     ports:
       - "3030:3000"  # Langfuse UI at http://localhost:3030
     environment:
-      # Postgres (metadata) - Uses your existing Postgres 17
-      DATABASE_URL: postgresql://user:pass@172.23.32.1:5434/langfuse?connect_timeout=10&pool_timeout=10
+      # Postgres (metadata) - Uses existing deeds-postgres-prod on host port 5432
+      DATABASE_URL: postgresql://legal_admin:123456@host.docker.internal:5432/langfuse?connect_timeout=10&pool_timeout=10
 
       # ClickHouse (traces/analytics) - Uses local ClickHouse
       CLICKHOUSE_URL: http://clickhouse:8123  # Internal Docker network (no port conflict)

@@ -709,45 +709,47 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 
 				<div class="details-content">
 					<div class="detail-section">
-						<h4>Financial Impact</h4>
-						<div class="financial-value">$50,000.00</div>
-						<p class="financial-subtitle">Total damages • Current Market</p>
-					</div>
-
-					<div class="detail-section">
-						<h4>AI Case Insights</h4>
-						<ul class="insights-list">
-							<li>High correlation with suspect timeline</li>
-							<li>Location data matches witness statements</li>
-							<li>Timestamp aligns with incident report</li>
-						</ul>
+						<h4>Evidence Details</h4>
+						<p class="evidence-description">{selectedEvidence.description || 'No description available'}</p>
 					</div>
 
 					<div class="detail-section">
 						<h4>Document Statistics</h4>
 						<div class="stats-grid">
 							<div class="stat">
-								<span class="stat-label">Created</span>
-								<span class="stat-value">2021-11-15</span>
+								<span class="stat-label">Date</span>
+								<span class="stat-value">{selectedEvidence.date || 'Unknown'}</span>
 							</div>
 							<div class="stat">
-								<span class="stat-label">Modified</span>
-								<span class="stat-value">Wed 3:12 PM</span>
+								<span class="stat-label">Type</span>
+								<span class="stat-value">{selectedEvidence.type || 'Unknown'}</span>
 							</div>
 							<div class="stat">
-								<span class="stat-label">File ID</span>
-								<span class="stat-value">V4-87-2340</span>
+								<span class="stat-label">File Type</span>
+								<span class="stat-value">{selectedEvidence.fileType || 'N/A'}</span>
 							</div>
-							<div class="stat">
-								<span class="stat-label">Priority</span>
-								<span class="stat-value priority-high">HIGH</span>
-							</div>
+							{#if selectedEvidence.confidence > 0}
+								<div class="stat">
+									<span class="stat-label">Confidence</span>
+									<span class="stat-value">{Math.round(selectedEvidence.confidence * 100)}%</span>
+								</div>
+							{/if}
 						</div>
 					</div>
 
 					<div class="detail-section">
-						<h4>Related Items</h4>
-						<p class="related-info">4 connected evidence items, 2 witness statements</p>
+						<h4>Location</h4>
+						<p class="related-info">{selectedEvidence.location || 'No location data'}</p>
+					</div>
+
+					<div class="detail-section">
+						<button
+							class="action-btn"
+							onclick={() => { summaryEvidenceId = selectedEvidence.id; summaryEvidenceTitle = selectedEvidence.title; showSummaryModal = true; }}
+						>
+							<Icon name="sparkles" />
+							AI Summary
+						</button>
 					</div>
 				</div>
 			</aside>

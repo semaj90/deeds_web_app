@@ -75,9 +75,9 @@ export const ENV = {
 	SMTP_USER: privateEnv.SMTP_USER ?? '',
 	SMTP_PASS: privateEnv.SMTP_PASS ?? '',
 	SMTP_FROM: privateEnv.SMTP_FROM ?? 'Deeds Legal AI <noreply@deeds-legal.ai>',
-	// Langfuse LLM observability (docker-compose.langfuse.yml)
+	// Langfuse LLM observability (docker/langfuse.yml — port 3030)
 	LANGFUSE_PUBLIC_KEY: privateEnv.LANGFUSE_PUBLIC_KEY ?? '',
 	LANGFUSE_SECRET_KEY: privateEnv.LANGFUSE_SECRET_KEY ?? '',
-	LANGFUSE_HOST: privateEnv.LANGFUSE_HOST ?? 'http://localhost:3000',
+	LANGFUSE_HOST: privateEnv.LANGFUSE_HOST ?? 'http://localhost:3030',
 	LANGFUSE_ENABLED: (privateEnv.LANGFUSE_ENABLED ?? 'false') === 'true',
 };

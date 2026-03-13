@@ -66,9 +66,12 @@ services:
           cpus: '1.0'
           memory: 1G
 
-  # PostgreSQL Database
+  # PostgreSQL Database (pgvector + pgai)
   postgres:
-    image: pgvector/pgvector:pg16
+    build:
+      context: ./docker/postgres
+      dockerfile: Dockerfile
+    image: deeds-postgres-pgai:pg16
     container_name: deeds-postgres-prod
     restart: unless-stopped
     environment:
@@ -76,8 +79,11 @@ services:
       POSTGRES_PASSWORD: 123456
       POSTGRES_DB: legal_ai_db
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
+      # pgai needs Ollama URL for in-database AI functions
+      OLLAMA_HOST: http://host.docker.internal:11434
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./docker/init:/docker-entrypoint-initdb.d
     networks:
       - deeds-network
     healthcheck:
