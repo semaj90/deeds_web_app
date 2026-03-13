@@ -170,7 +170,7 @@ export async function traceRAG<T>(
 export async function flushLangfuse(): Promise<void> {
 	if (_langfuse) {
 		try {
-			await _langfuse.flush();
+			await _langfuse.flushAsync();
 		} catch {
 			// Non-fatal
 		}
@@ -183,7 +183,7 @@ export async function flushLangfuse(): Promise<void> {
 export async function shutdownLangfuse(): Promise<void> {
 	if (_langfuse) {
 		try {
-			await _langfuse.shutdown();
+			await _langfuse.shutdownAsync();
 			_langfuse = null;
 		} catch {
 			// Non-fatal

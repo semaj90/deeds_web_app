@@ -113,7 +113,7 @@ Format as JSON:
 	} catch (e) {
 		console.error('[api/ace/summarize] Failed:', e);
 		return json(
-			{ error: e instanceof Error ? e.message : 'Internal server error' },
+			{ error: 'Summarization failed' },
 			{ status: 500 }
 		);
 	}

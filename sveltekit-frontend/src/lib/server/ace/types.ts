@@ -54,6 +54,15 @@ export interface ACEContext {
 		entities: Array<{ text: string; label: string }>;
 		summary?: string;
 	}> | null;
+	/** Evidence board connections/relationships between evidence items */
+	evidenceConnections: Array<{
+		fromTitle: string;
+		toTitle: string;
+		connectionType: string;
+		label: string | null;
+		notes: string | null;
+		strength: number;
+	}> | null;
 }
 
 export interface ACEPrompt {
@@ -99,9 +108,10 @@ export const TOKEN_BUDGET = {
 	caseContext: 300,
 	ragChunks: 400,
 	evidenceMetadata: 200,
+	evidenceConnections: 150,
 	kagNeighbors: 200,
 	chatHistory: 400,
 	userProfile: 100,
 	selfPrompt: 100,
-	total: 1900
+	total: 2050
 } as const;

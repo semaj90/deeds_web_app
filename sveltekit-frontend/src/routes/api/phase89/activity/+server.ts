@@ -71,7 +71,7 @@ export const GET: RequestHandler = async () => {
     console.error('Activity error:', error);
     return json({
       activity: [],
-      error: error.message
+      error: 'Failed to load activity data'
     });
   }
 };

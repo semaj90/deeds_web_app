@@ -96,17 +96,17 @@ services:
         limits:
           memory: 1G
 
-  # Redis Cache
+  # Redis Stack (includes RediSearch for vector semantic caching)
   redis:
-    image: redis:7-alpine
+    image: redis/redis-stack-server:7.4.0-v3
     container_name: deeds-redis-prod
     restart: unless-stopped
-    command: >
-      redis-server
-      --maxmemory 512mb
-      --maxmemory-policy allkeys-lru
-      --appendonly yes
-      --save 60 1
+    environment:
+      REDIS_ARGS: >-
+        --maxmemory 512mb
+        --maxmemory-policy allkeys-lru
+        --appendonly yes
+        --save 60 1
     volumes:
       - redis-data:/data
     networks:
@@ -119,7 +119,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 768M
 
   # Qdrant Vector Database
   qdrant:
@@ -237,6 +237,38 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  # LiteLLM Proxy (OpenAI-compatible gateway with semantic caching)
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    container_name: deeds-litellm-proxy
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./litellm_config.yaml:/app/config.yaml
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      REDIS_PASSWORD: ""
+      OLLAMA_API_BASE: http://host.docker.internal:11434
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - deeds-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:

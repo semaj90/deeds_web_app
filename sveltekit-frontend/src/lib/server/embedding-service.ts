@@ -2,6 +2,7 @@
 // Simple wrapper around your embedding model (Ollama / Gemma / embeddinggemma, etc.)
 
 import { ENV } from '$lib/server/env.server.js';
+import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 
 const OLLAMA_BASE_URL = ENV.OLLAMA_BASE_URL;
 const DEFAULT_EMBED_MODEL = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
@@ -16,60 +17,54 @@ export async function embedText(text: string): Promise<number[]> {
 }
 
 export async function generateEmbedding(text: string): Promise<number[]> {
-    const baseUrl = OLLAMA_BASE_URL;
-    const timeout = Number(process.env.OLLAMA_EMBED_TIMEOUT_MS ?? '180000'); // 3 minutes
+    return traceEmbedding(text, DEFAULT_EMBED_MODEL, async () => {
+        const baseUrl = OLLAMA_BASE_URL;
+        const timeout = Number(process.env.OLLAMA_EMBED_TIMEOUT_MS ?? '180000'); // 3 minutes
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-    try {
-        console.log(`[RAG] Generating embedding for query: "${text.substring(0, 50)}..."`);
+        try {
+            console.log(`[RAG] Generating embedding for query: "${text.substring(0, 50)}..."`);
 
-        const res = await fetch(`${baseUrl}/api/embeddings`, {
-            method: 'POST',
-            headers: { 'content-type': 'application/json' },
+            const res = await fetch(`${baseUrl}/api/embeddings`, {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
 	body: JSON.stringify({
 	model: DEFAULT_EMBED_MODEL,
-                prompt: text,
-            }),
-            signal: controller.signal,
-        });
+                    prompt: text,
+                }),
+                signal: controller.signal,
+            });
 
-        clearTimeout(timeoutId);
+            clearTimeout(timeoutId);
 
-        if (!res.ok) {
-            const body = await res.text().catch(() => '');
-            console.error('❌ Ollama embeddings error:', res.status, body.slice(0, 200));
-            throw new Error(`Ollama embeddings failed: ${res.status}`);
+            if (!res.ok) {
+                const body = await res.text().catch(() => '');
+                console.error('[embedding-service] Ollama error:', res.status, body.slice(0, 200));
+                throw new Error(`Ollama embeddings failed: ${res.status}`);
+            }
+
+            const data = (await res.json()) as OllamaEmbedResponse;
+
+            const embedding = data.embedding ?? (Array.isArray(data.embeddings) && data.embeddings.length > 0 ? data.embeddings[0] : undefined);
+
+            if (!embedding || embedding.length === 0) {
+                throw new Error('No embedding returned from Ollama');
+            }
+
+            const expectedDim = Number(process.env.EMBEDDING_DIM ?? 768);
+            if (!Array.isArray(embedding) || embedding.length !== expectedDim) {
+                 console.warn(`Warning: Embedding size mismatch. Expected ${expectedDim}, got ${embedding?.length}`);
+            }
+
+            return embedding;
+        } catch (error) {
+            clearTimeout(timeoutId);
+            if (error instanceof Error && error.name === 'AbortError') {
+                throw new Error(`Embedding generation timed out after ${timeout}ms`);
+            }
+            throw error;
         }
-
-        const data = (await res.json()) as OllamaEmbedResponse;
-
-        // Handle both response formats
-        const embedding = data.embedding ?? (Array.isArray(data.embeddings) && data.embeddings.length > 0 ? data.embeddings[0] : undefined);
-
-        if (!embedding || embedding.length === 0) {
-            console.error('❌ No embedding in response:', JSON.stringify(data).substring(0, 200));
-            throw new Error('No embedding returned from Ollama');
-        }
-
-        // Validate embedding dimensions
-        const expectedDim = Number(process.env.EMBEDDING_DIM ?? 768);
-        if (!Array.isArray(embedding) || embedding.length !== expectedDim) {
-             // Warn but don't fail, maybe model changed
-             console.warn(`Warning: Embedding size mismatch. Expected ${expectedDim},
-	got ${embedding?.length}`);
-        }
-
-        console.log(`✅ Embedding generated: ${embedding.length} dimensions`);
-        return embedding;
-    } catch (error) {
-        clearTimeout(timeoutId);
-        if (error instanceof Error && error.name === 'AbortError') {
-            console.error(`❌ Embedding timeout after ${timeout}ms`);
-            throw new Error(`Embedding generation timed out after ${timeout}ms`);
-        }
-        console.error('❌ Embedding error:', error);
-        throw error;
-    }
+    });
 }

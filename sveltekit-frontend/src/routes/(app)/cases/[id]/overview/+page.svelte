@@ -39,6 +39,23 @@
 	let reasoningChain = $state<{ steps: Array<{ name: string; content: string; confidence: number; durationMs: number }>; overallConfidence: number } | null>(null);
 	let reasoningError = $state<string | null>(null);
 
+	// Key points generation state
+	let generatingKeyPointsFor = $state<Set<string>>(new Set());
+	let isGeneratingAllKeyPoints = $state(false);
+	let keyPointsBatchResult = $state<{ generated: number; total: number } | null>(null);
+
+	// POI summary generation state
+	let generatingSummaryFor = $state<Set<string>>(new Set());
+
+	// Local mutable copies for optimistic updates
+	let localEvidence = $state<Array<any>>([]);
+	let localPersons = $state<Array<any>>([]);
+
+	$effect(() => {
+		localEvidence = [...(data.evidence ?? [])];
+		localPersons = [...(data.persons ?? [])];
+	});
+
 	$effect(() => {
 		if (!browser) return;
 		loadDiagnostics();
@@ -136,6 +153,90 @@
 			reasoningError = 'Network error';
 		} finally {
 			isGeneratingReasoning = false;
+		}
+	}
+
+	async function generateKeyPoints(evidenceId: string) {
+		generatingKeyPointsFor = new Set([...generatingKeyPointsFor, evidenceId]);
+		try {
+			const res = await fetch(`/api/evidence/${evidenceId}/key-points`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ caseId: data.caseId })
+			});
+			if (res.ok) {
+				const result = await res.json();
+				if (result.keyPoints?.length) {
+					localEvidence = localEvidence.map(e =>
+						e.id === evidenceId ? { ...e, keyPoints: result.keyPoints } : e
+					);
+				}
+			}
+		} catch {
+			// Silent fail
+		} finally {
+			const next = new Set(generatingKeyPointsFor);
+			next.delete(evidenceId);
+			generatingKeyPointsFor = next;
+		}
+	}
+
+	async function generateAllKeyPoints() {
+		const caseId = data.caseData?.id ?? data.caseId;
+		if (!caseId) return;
+		isGeneratingAllKeyPoints = true;
+		keyPointsBatchResult = null;
+		try {
+			const res = await fetch(`/api/cases/${caseId}/key-points`, { method: 'POST' });
+			if (res.ok) {
+				const result = await res.json();
+				keyPointsBatchResult = { generated: result.generated, total: result.total };
+				// Reload evidence key points
+				if (result.generated > 0) {
+					const reloadRes = await fetch(`/api/cases/${caseId}/key-points`).catch(() => null);
+					// Trigger a page-level data refresh by re-fetching evidence
+					for (const item of localEvidence) {
+						if (!item.keyPoints?.length) {
+							const kpRes = await fetch(`/api/evidence/${item.id}/key-points`).catch(() => null);
+							if (kpRes?.ok) {
+								const kpData = await kpRes.json();
+								if (kpData.keyPoints?.length) {
+									localEvidence = localEvidence.map(e =>
+										e.id === item.id ? { ...e, keyPoints: kpData.keyPoints } : e
+									);
+								}
+							}
+						}
+					}
+				}
+			}
+		} catch {
+			// Silent fail
+		} finally {
+			isGeneratingAllKeyPoints = false;
+		}
+	}
+
+	async function generatePoiSummary(poiId: string) {
+		generatingSummaryFor = new Set([...generatingSummaryFor, poiId]);
+		try {
+			const res = await fetch(`/api/persons-of-interest/${poiId}/summary`, {
+				method: 'POST'
+			});
+			if (res.ok) {
+				const result = await res.json();
+				if (result.summary) {
+					localPersons = localPersons.map(p =>
+						p.id === poiId ? { ...p, aiSummary: result.summary } : p
+					);
+				}
+			}
+		} catch {
+			// Silent fail
+		} finally {
+			const next = new Set(generatingSummaryFor);
+			next.delete(poiId);
+			generatingSummaryFor = next;
 		}
 	}
 
@@ -320,19 +421,43 @@
 		{:else if activeTab === 'evidence'}
 			<section class="rounded-xl border border-neutral-800 bg-neutral-900/70 p-4">
 				<h2 class="text-sm font-semibold mb-3">Evidence</h2>
-				{#if data.evidence?.length}
+				{#if localEvidence?.length}
 					<div class="space-y-2 text-sm">
-						{#each data.evidence as item}
-							<div class="flex items-center justify-between gap-4 px-3 py-2 rounded-lg bg-neutral-950/80 border border-neutral-800">
-								<div class="min-w-0">
-									<p class="font-medium truncate">{item.label ?? item.filename}</p>
-									<p class="text-xs text-neutral-500 truncate">
-										{item.type ?? 'document'} • {item.mimeType ?? 'unknown'}
-									</p>
+						{#each localEvidence as item (item.id)}
+							<div class="px-3 py-2 rounded-lg bg-neutral-950/80 border border-neutral-800">
+								<div class="flex items-center justify-between gap-4">
+									<div class="min-w-0">
+										<p class="font-medium truncate">{item.label ?? item.filename}</p>
+										<p class="text-xs text-neutral-500 truncate">
+											{item.type ?? 'document'} • {item.mimeType ?? 'unknown'}
+										</p>
+									</div>
+									<div class="flex items-center gap-2 shrink-0">
+										{#if !item.keyPoints?.length}
+											<button
+												class="px-2 py-1 rounded border border-emerald-700/50 bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors text-[10px] text-emerald-300 flex items-center gap-1"
+												disabled={generatingKeyPointsFor.has(item.id)}
+												onclick={() => generateKeyPoints(item.id)}
+											>
+												<Icon name="sparkles" size={10} />
+												{generatingKeyPointsFor.has(item.id) ? 'Generating...' : 'Key Points'}
+											</button>
+										{/if}
+										<span class="text-[10px] uppercase tracking-wide text-neutral-500">
+											{item.status ?? 'indexed'}
+										</span>
+									</div>
 								</div>
-								<span class="text-[10px] uppercase tracking-wide text-neutral-500">
-									{item.status ?? 'indexed'}
-								</span>
+								{#if item.keyPoints?.length}
+									<ul class="mt-2 space-y-0.5">
+										{#each item.keyPoints as point}
+											<li class="text-xs text-neutral-400 flex items-start gap-1.5">
+												<span class="text-emerald-400 mt-0.5 shrink-0">•</span>
+												<span>{point}</span>
+											</li>
+										{/each}
+									</ul>
+								{/if}
 							</div>
 						{/each}
 					</div>
@@ -357,14 +482,26 @@
 		{:else if activeTab === 'persons'}
 			<section class="rounded-xl border border-neutral-800 bg-neutral-900/70 p-4">
 				<h2 class="text-sm font-semibold mb-3">Persons of Interest</h2>
-				{#if data.persons?.length}
+				{#if localPersons?.length}
 					<div class="grid gap-3 md:grid-cols-2">
-						{#each data.persons as person}
+						{#each localPersons as person (person.id)}
 							<div class="rounded-lg border border-neutral-800 bg-neutral-950/80 p-3 space-y-1 text-sm">
 								<p class="font-medium">{person.name ?? 'Unknown'}</p>
 								<p class="text-xs text-neutral-500">
 									{person.role ?? 'Person of interest'} • Risk: {person.riskScore ?? '—'}
 								</p>
+								{#if person.aiSummary}
+									<p class="text-xs text-neutral-300 mt-1 leading-relaxed">{person.aiSummary}</p>
+								{:else}
+									<button
+										class="mt-1 px-2 py-1 rounded border border-emerald-700/50 bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors text-[10px] text-emerald-300 flex items-center gap-1"
+										disabled={generatingSummaryFor.has(person.id)}
+										onclick={() => generatePoiSummary(person.id)}
+									>
+										<Icon name="sparkles" size={10} />
+										{generatingSummaryFor.has(person.id) ? 'Generating...' : 'Generate Summary'}
+									</button>
+								{/if}
 							</div>
 						{/each}
 					</div>
@@ -379,7 +516,7 @@
 					AI-powered document drafting and case analysis via Gemma3 legal model.
 				</p>
 
-				<div class="flex items-center gap-2">
+				<div class="flex items-center gap-2 flex-wrap">
 					<button
 						class="px-3 py-2 rounded-lg border border-neutral-700 hover:border-neutral-500 transition-colors text-xs"
 						onclick={() => (showDraftingTool = !showDraftingTool)}
@@ -394,7 +531,21 @@
 						<Icon name="brain" size={14} />
 						{isGeneratingReasoning ? 'Generating...' : 'Legal Reasoning Chain'}
 					</button>
+					<button
+						class="px-3 py-2 rounded-lg border border-emerald-700 bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors text-xs text-emerald-300 flex items-center gap-1.5"
+						disabled={isGeneratingAllKeyPoints}
+						onclick={generateAllKeyPoints}
+					>
+						<Icon name="list" size={14} />
+						{isGeneratingAllKeyPoints ? 'Generating...' : 'Generate Evidence Key Points'}
+					</button>
 				</div>
+
+				{#if keyPointsBatchResult}
+					<div class="text-xs text-emerald-400">
+						Generated key points for {keyPointsBatchResult.generated}/{keyPointsBatchResult.total} evidence items
+					</div>
+				{/if}
 			</section>
 			{#if showDraftingTool}
 				<div class="mt-3">

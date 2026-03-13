@@ -34,7 +34,7 @@ services:
 
   # Langfuse v3 - Main observability server
   langfuse-server:
-    image: langfuse/langfuse:3.10.0  # Stable v3 with ClickHouse support
+    image: langfuse/langfuse:2
     container_name: langfuse-server
     restart: unless-stopped
     depends_on:
@@ -43,19 +43,21 @@ services:
     ports:
       - "3030:3000"  # Langfuse UI at http://localhost:3030
     environment:
-      # Postgres (metadata) - Uses existing deeds-postgres-prod on host port 5432
-      DATABASE_URL: postgresql://legal_admin:123456@host.docker.internal:5432/langfuse?connect_timeout=10&pool_timeout=10
+      # Postgres (metadata) - Uses existing deeds-postgres-prod container
+      DATABASE_URL: postgresql://legal_admin:123456@deeds-postgres-prod:5432/langfuse?connect_timeout=10&pool_timeout=10
 
-      # ClickHouse (traces/analytics) - Uses local ClickHouse
-      CLICKHOUSE_URL: http://clickhouse:8123  # Internal Docker network (no port conflict)
-      CLICKHOUSE_MIGRATION_URL: clickhouse://default:clickhouse_password@clickhouse:9000/langfuse
-      CLICKHOUSE_USER: default
-      CLICKHOUSE_PASSWORD: clickhouse_password
+      # ClickHouse disabled for v2 (Postgres-only mode)
+      # CLICKHOUSE_URL: http://clickhouse:8123
+      # CLICKHOUSE_MIGRATION_URL: clickhouse://default:clickhouse_password@clickhouse:9000/langfuse
 
       # Server
       NEXTAUTH_URL: http://localhost:3030
       NEXTAUTH_SECRET: langfuse-secret-key-change-in-production-min-32-chars
       SALT: langfuse-salt-change-in-production
+      ENCRYPTION_KEY: 8754be3c748398a38dd9a797fbb84747cb8b94d34dd15a2d5237851dbbe1b671
+
+      # Redis (existing deeds-redis-prod on host port 6379)
+      REDIS_CONNECTION_STRING: redis://deeds-redis-prod:6379
 
       # Auth (disable for local dev)
       AUTH_DISABLE_USERNAME_PASSWORD: "false"
@@ -67,17 +69,26 @@ services:
       # Feature flags
       LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: "true"
 
-      # Neo4j integration (your existing graph DB)
-      NEO4J_URI: bolt://172.23.32.1:7687
-      NEO4J_USER: neo4j
-      NEO4J_PASSWORD: your-neo4j-password
+      # Auto-seed project with API keys (runs on first boot only)
+      LANGFUSE_INIT_ORG_ID: deeds-legal-ai
+      LANGFUSE_INIT_ORG_NAME: Deeds Legal AI
+      LANGFUSE_INIT_PROJECT_ID: deeds-observability
+      LANGFUSE_INIT_PROJECT_NAME: Deeds LLM Observability
+      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: pk-lf-4e3db8a0107de7872b894e309494252b
+      LANGFUSE_INIT_PROJECT_SECRET_KEY: sk-lf-3941aba7500ce9fabbe0c513ad6c3a58
+      LANGFUSE_INIT_USER_EMAIL: admin@deeds-legal.ai
+      LANGFUSE_INIT_USER_NAME: Admin
+      LANGFUSE_INIT_USER_PASSWORD: admin123
+    networks:
+      - default
+      - deeds-bridge
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/public/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
     extra_hosts:
-      - "host.docker.internal:host-gateway"  # Access host services
+      - "host.docker.internal:host-gateway"
 
   # Data Mirror Service - Syncs Postgres/Qdrant → ClickHouse with Ollama auto-tagging
   clickhouse-mirror:
@@ -105,6 +116,10 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
+networks:
+  deeds-bridge:
+    external: true
 
 volumes:
   clickhouse-data:

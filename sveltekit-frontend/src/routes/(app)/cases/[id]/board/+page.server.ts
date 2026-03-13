@@ -51,6 +51,7 @@ export const load: PageServerLoad = async ({ params }) => {
 			initialState: savedState ? savedState.stateData : null,
 			evidence: evidenceItems.map((item) => {
 				const meta = (item.metadata || {}) as Record<string, any>;
+				const analysis = (item.aiAnalysis || {}) as Record<string, any>;
 				return {
 					id: item.id,
 					title: item.title || 'Untitled Evidence',
@@ -60,7 +61,8 @@ export const load: PageServerLoad = async ({ params }) => {
 					thumbnail: item.fileUrl || null,
 					description: item.description || '',
 					fileType: item.fileType || '',
-					confidence: meta.confidence || 0
+					confidence: meta.confidence || 0,
+					keyPoints: (analysis.keyPoints as string[]) ?? []
 				};
 			}),
 			connections: connections.map((c) => ({

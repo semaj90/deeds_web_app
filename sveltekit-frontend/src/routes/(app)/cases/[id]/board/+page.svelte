@@ -49,6 +49,95 @@
 	let summaryEvidenceId = $state<string | null>(null);
 	let summaryEvidenceTitle = $state<string | null>(null);
 
+	// Selected board node (for note editing in sidebar)
+	let selectedNode = $state<any>(null);
+	let noteTitle = $state('');
+	let noteBody = $state('');
+
+	// Handle canvas click — create note when note tool is active
+	function handleCanvasClick(world: { x: number; y: number }) {
+		if (activeTool === 'note' && board) {
+			const nodeId = board.addNote(world.x, world.y);
+			// Select the newly created note
+			const nodes = board.getNodes();
+			const newNode = nodes.find((n: any) => n.id === nodeId);
+			if (newNode) {
+				selectedNode = newNode;
+				noteTitle = newNode.title ?? 'New Note';
+				noteBody = newNode.body ?? '';
+				selectedEvidence = null; // Clear evidence selection
+			}
+			activeTool = 'select'; // Switch back to select after placing
+		}
+	}
+
+	// Handle node selection from canvas
+	function handleNodeSelect(node: any) {
+		if (!node) {
+			selectedNode = null;
+			return;
+		}
+		selectedNode = node;
+		if (node.kind === 'note') {
+			noteTitle = node.title ?? '';
+			noteBody = node.body ?? '';
+			selectedEvidence = null;
+		} else if (node.kind === 'evidence' && node.evidenceId) {
+			const match = evidenceItems.find((e: any) => e.id === node.evidenceId);
+			if (match) selectedEvidence = match;
+		}
+	}
+
+	// Save note edits back to the board
+	function saveNoteEdits() {
+		if (!board || !selectedNode) return;
+		board.updateNodeTitle(selectedNode.id, noteTitle);
+		board.updateNodeBody(selectedNode.id, noteBody);
+		selectedNode = { ...selectedNode, title: noteTitle, body: noteBody };
+	}
+
+	// Delete the selected note from the board
+	function deleteSelectedNote() {
+		if (!board || !selectedNode) return;
+		board.removeNode(selectedNode.id);
+		selectedNode = null;
+		noteTitle = '';
+		noteBody = '';
+	}
+
+	// Key points generation
+	let isGeneratingKeyPoints = $state(false);
+
+	async function generateEvidenceKeyPoints(evidenceId: string) {
+		isGeneratingKeyPoints = true;
+		try {
+			const res = await fetch(`/api/evidence/${evidenceId}/key-points`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ caseId })
+			});
+			if (res.ok) {
+				const result = await res.json();
+				if (result.keyPoints?.length) {
+					// Update the evidence item in the local array
+					const items = evidenceItems as any[];
+					const idx = items.findIndex((e: any) => e.id === evidenceId);
+					if (idx >= 0) {
+						(items[idx] as any).keyPoints = result.keyPoints;
+						// Force reactivity by reassigning selectedEvidence
+						if (selectedEvidence?.id === evidenceId) {
+							selectedEvidence = { ...selectedEvidence, keyPoints: result.keyPoints };
+						}
+					}
+				}
+			}
+		} catch {
+			// Silent fail
+		} finally {
+			isGeneratingKeyPoints = false;
+		}
+	}
+
 	onMount(() => {
 		// Initialize chat session with case context
 		chatSession = new ChatSession(`board-${caseId}`, [], true);
@@ -692,10 +781,55 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 					bind:this={board}
 					initialSnapshot={initialState as any}
 					onDirtyChange={(d) => (isDirty = d)}
+					onCanvasClick={handleCanvasClick}
+					onNodeSelect={handleNodeSelect}
 					{caseId}
 				/>
 			{/key}
 		</div>
+
+		<!-- Right Sidebar - Note Editor -->
+		{#if selectedNode?.kind === 'note' && !selectedEvidence}
+			<aside class="details-sidebar">
+				<div class="details-header">
+					<h3>Note</h3>
+					<button class="close-btn" onclick={() => { selectedNode = null; noteTitle = ''; noteBody = ''; }}>
+						<Icon name="x" />
+					</button>
+				</div>
+
+				<div class="details-content">
+					<div class="detail-section">
+						<label class="note-label">Title</label>
+						<input
+							class="note-title-input"
+							type="text"
+							bind:value={noteTitle}
+							oninput={saveNoteEdits}
+							placeholder="Note title..."
+						/>
+					</div>
+
+					<div class="detail-section">
+						<label class="note-label">Content</label>
+						<textarea
+							class="note-body-input"
+							bind:value={noteBody}
+							oninput={saveNoteEdits}
+							placeholder="Write your notes here..."
+							rows="8"
+						></textarea>
+					</div>
+
+					<div class="detail-section note-actions">
+						<button class="action-btn" onclick={deleteSelectedNote} title="Delete Note">
+							<Icon name="trash-2" />
+							Delete Note
+						</button>
+					</div>
+				</div>
+			</aside>
+		{/if}
 
 		<!-- Right Sidebar - Detailed Evidence -->
 		{#if selectedEvidence}
@@ -750,6 +884,29 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 							<Icon name="sparkles" />
 							AI Summary
 						</button>
+					</div>
+
+					<div class="detail-section">
+						<h4>Key Points</h4>
+						{#if selectedEvidence.keyPoints?.length}
+							<ul class="key-points-list">
+								{#each selectedEvidence.keyPoints as point}
+									<li class="key-point-item">
+										<span class="key-point-bullet">•</span>
+										<span>{point}</span>
+									</li>
+								{/each}
+							</ul>
+						{:else}
+							<button
+								class="action-btn"
+								disabled={isGeneratingKeyPoints}
+								onclick={() => generateEvidenceKeyPoints(selectedEvidence.id)}
+							>
+								<Icon name="sparkles" />
+								{isGeneratingKeyPoints ? 'Generating...' : 'Generate Key Points'}
+							</button>
+						{/if}
 					</div>
 				</div>
 			</aside>
@@ -1029,6 +1186,83 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 	.action-btn:hover {
 		background: #e5e7eb;
 		color: #1f2937;
+	}
+
+	.key-points-list {
+		list-style: none;
+		padding: 0;
+		margin: 0.25rem 0 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	.key-point-item {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.375rem;
+		font-size: 0.75rem;
+		color: #d1d5db;
+		line-height: 1.4;
+	}
+
+	.key-point-bullet {
+		color: #34d399;
+		margin-top: 0.125rem;
+		flex-shrink: 0;
+	}
+
+	/* Note editor styles */
+	.note-label {
+		display: block;
+		font-size: 0.7rem;
+		font-weight: 600;
+		color: #9ca3af;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin-bottom: 0.375rem;
+	}
+
+	.note-title-input {
+		width: 100%;
+		padding: 0.5rem 0.75rem;
+		background: #f9fafb;
+		border: 1px solid #e5e7eb;
+		border-radius: 0.375rem;
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: #1f2937;
+		outline: none;
+		transition: border-color 0.2s;
+	}
+
+	.note-title-input:focus {
+		border-color: #3b82f6;
+	}
+
+	.note-body-input {
+		width: 100%;
+		padding: 0.5rem 0.75rem;
+		background: #f9fafb;
+		border: 1px solid #e5e7eb;
+		border-radius: 0.375rem;
+		font-size: 0.8125rem;
+		color: #374151;
+		outline: none;
+		resize: vertical;
+		min-height: 120px;
+		line-height: 1.5;
+		font-family: inherit;
+		transition: border-color 0.2s;
+	}
+
+	.note-body-input:focus {
+		border-color: #3b82f6;
+	}
+
+	.note-actions {
+		display: flex;
+		gap: 0.5rem;
 	}
 
 	.btn-primary {

@@ -60,8 +60,11 @@ export async function assembleACEContext(opts: {
 		(opts.enableWikipedia ?? true) ? searchWikipedia(query, 3).catch(() => null) : Promise.resolve(null)
 	]);
 
-	// Fetch evidence metadata separately (avoids hoisting issues)
-	const evidenceMetadata = caseId ? await fetchEvidenceMetadataForCase(caseId) : null;
+	// Fetch evidence metadata and connections separately (avoids hoisting issues)
+	const [evidenceMetadata, evidenceConnections] = await Promise.all([
+		caseId ? fetchEvidenceMetadataForCase(caseId) : Promise.resolve(null),
+		caseId ? fetchEvidenceConnections(caseId) : Promise.resolve(null)
+	]);
 
 	// Determine practice area from case or user profile
 	const practiceArea = extractPracticeArea(caseContext, userProfile);
@@ -88,7 +91,8 @@ export async function assembleACEContext(opts: {
 			wikiResults ? formatWikipediaAsContext(wikiResults) : ''
 		].filter(Boolean).join('\n') || null,
 		persona: opts.persona ?? 'neutral',
-		evidenceMetadata
+		evidenceMetadata,
+		evidenceConnections
 	};
 }
 
@@ -187,7 +191,22 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
 		confidenceFactors.evidenceMetadata = 0.9;
 	}
 
-	// 10. Web search results (if available)
+	// 10. Evidence connections/relationships
+	if (context.evidenceConnections && context.evidenceConnections.length > 0) {
+		const connLines = context.evidenceConnections
+			.slice(0, 15)
+			.map((c) => {
+				const strengthLabel = c.strength >= 0.8 ? 'STRONG' : c.strength >= 0.5 ? 'MODERATE' : 'WEAK';
+				const desc = c.label || c.connectionType;
+				const notes = c.notes ? ` — ${truncate(c.notes, 80)}` : '';
+				return `- "${truncate(c.fromTitle, 40)}" → "${truncate(c.toTitle, 40)}" [${desc.toUpperCase()}] (${strengthLabel})${notes}`;
+			})
+			.join('\n');
+		lines.push(`\n## Evidence Relationships (${context.evidenceConnections.length} connections)\n${connLines}`);
+		confidenceFactors.evidenceConnections = 0.85;
+	}
+
+	// 11. Web search results (if available)
 	if (context.webSearchContext) {
 		lines.push(`\n${context.webSearchContext}`);
 		confidenceFactors.webSearch = 0.6;
@@ -408,6 +427,35 @@ async function fetchEvidenceMetadataForCase(
 				summary: meta.summary ? String(meta.summary).slice(0, 200) : undefined,
 			};
 		});
+	} catch {
+		return null;
+	}
+}
+
+async function fetchEvidenceConnections(
+	caseId: string
+): Promise<ACEContext['evidenceConnections']> {
+	try {
+		const db = (await import('$lib/server/db')).default;
+		const rows = await db.execute(
+			sql`SELECT
+				ebc.connection_type, ebc.label, ebc.notes, ebc.strength,
+				ef.title AS from_title, et.title AS to_title
+			FROM evidence_board_connections ebc
+			JOIN evidence ef ON ef.id = ebc.from_evidence_id
+			JOIN evidence et ON et.id = ebc.to_evidence_id
+			WHERE ebc.case_id = ${caseId} AND ebc.is_visible = true
+			ORDER BY ebc.strength DESC
+			LIMIT 20`
+		);
+		return [...rows].map((r: any) => ({
+			fromTitle: String(r.from_title ?? 'Unknown'),
+			toTitle: String(r.to_title ?? 'Unknown'),
+			connectionType: String(r.connection_type ?? 'related'),
+			label: r.label ? String(r.label) : null,
+			notes: r.notes ? String(r.notes) : null,
+			strength: Number(r.strength ?? 1.0)
+		}));
 	} catch {
 		return null;
 	}

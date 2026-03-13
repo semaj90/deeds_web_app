@@ -1,5 +1,6 @@
 import type { BackendId } from '$lib/types/pipeline';
 import { ENV } from '$lib/server/env.server.js';
+import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
@@ -19,39 +20,33 @@ export async function getEmbeddingViaGate(
   text: string,
   opts: EmbedGatewayOptions = {}
 ): Promise<EmbedGatewayResult> {
-  const model = opts.model || 'nomic-embed-text';
+  const model = opts.model || 'embeddinggemma:latest';
 
-  try {
-    const response = await fetchFn(`${OLLAMA_URL}/api/embeddings`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+  return traceEmbedding(text, model, async () => {
+    try {
+      const response = await fetchFn(`${OLLAMA_URL}/api/embeddings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
 	model: model,
-        prompt: text,
-      }),
-    });
+          prompt: text,
+        }),
+      });
 
-    if (!response.ok) {
-      throw new Error(`Embedding failed: ${response.statusText}`);
+      if (!response.ok) {
+        throw new Error(`Embedding failed: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const embeddingArray = Array.isArray(data.embedding) ? data.embedding : [];
+      return {
+        embedding: new Float32Array(embeddingArray),
+        model: model,
+        backend: 'ollama' as BackendId,
+      };
+    } catch (error) {
+      console.error('Embedding gateway error:', error);
+      throw error;
     }
-
-    const data = await response.json();
-    // Convert to Float32Array for transferable ArrayBuffer support (500× faster for large batches)
-    const embeddingArray = Array.isArray(data.embedding) ? data.embedding : [];
-    return {
-      embedding: new Float32Array(embeddingArray),
-      model: model,
-      backend: 'ollama',
-    };
-  } catch (error) {
-    console.error('Embedding gateway error:', error);
-    throw error;
-  }
+  });
 }
-
-
-
-
-
-
-

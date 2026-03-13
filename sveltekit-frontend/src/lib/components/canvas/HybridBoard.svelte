@@ -39,13 +39,17 @@
 		initialSnapshot?: BoardSnapshot | null;
 		readonly?: boolean;
 		onDirtyChange?: ((dirty: boolean) => void) | null;
+		onCanvasClick?: ((world: Vec2) => void) | null;
+		onNodeSelect?: ((node: BoardNode | null) => void) | null;
 	}
 
 	let {
 		caseId,
 		initialSnapshot = null,
 		readonly = false,
-		onDirtyChange = null
+		onDirtyChange = null,
+		onCanvasClick = null,
+		onNodeSelect = null
 	}: Props = $props();
 
 	let rootEl = $state<HTMLDivElement | null>(null);
@@ -438,8 +442,12 @@
 					return [id, { x: n.x, y: n.y }];
 				})
 			);
+				// Notify parent of node selection
+			onNodeSelect?.(getNodeById(hitId));
 		} else {
 			if (!e.shiftKey) selected = new Set();
+			onNodeSelect?.(null);
+			onCanvasClick?.(world);
 		}
 	}
 
@@ -535,6 +543,37 @@
 			edges,
 			updatedAt: new Date().toISOString()
 		};
+	}
+
+	// Add sticky note to canvas at specific position
+	export function addNote(x: number, y: number, title?: string, body?: string): string {
+		const nodeId = `note_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+		const newNode: BoardNode = {
+			id: nodeId,
+			kind: 'note',
+			x,
+			y,
+			w: 240,
+			h: 140,
+			title: title || 'New Note',
+			body: body || ''
+		};
+		nodes.push(newNode);
+		setDirty(true);
+		scheduleDraw();
+		return nodeId;
+	}
+
+	// Update a node's body text
+	export function updateNodeBody(nodeId: string, body: string) {
+		nodes = nodes.map(n => n.id === nodeId ? { ...n, body } : n);
+		setDirty(true);
+	}
+
+	// Update a node's title
+	export function updateNodeTitle(nodeId: string, title: string) {
+		nodes = nodes.map(n => n.id === nodeId ? { ...n, title } : n);
+		setDirty(true);
 	}
 
 	// Add evidence item to canvas at specific position

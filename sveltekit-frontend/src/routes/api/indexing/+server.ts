@@ -270,7 +270,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
         message: `Indexed ${indexed} of ${Math.min(50, files.length)} files`
       });
     } catch (err: any) {
-      return json({ success: false, error: err.message }, { status: 500 });
+      return json({ success: false, error: 'Indexing operation failed' }, { status: 500 });
     }
   }
 
@@ -381,7 +381,7 @@ Phase: Phase 66-79 Error Analysis`.trim();
         message: `Indexed ${indexed} error clusters`
       });
     } catch (err: any) {
-      return json({ success: false, error: err.message }, { status: 500 });
+      return json({ success: false, error: 'Indexing operation failed' }, { status: 500 });
     }
   }
 
@@ -432,7 +432,7 @@ Phase: Phase 66-79 Error Analysis`.trim();
         }))
       });
     } catch (err: any) {
-      return json({ success: false, error: err.message }, { status: 500 });
+      return json({ success: false, error: 'Indexing operation failed' }, { status: 500 });
     }
   }
 
@@ -483,7 +483,7 @@ Phase: Phase 66-79 Error Analysis`.trim();
         }))
       });
     } catch (err: any) {
-      return json({ success: false, error: err.message }, { status: 500 });
+      return json({ success: false, error: 'Indexing operation failed' }, { status: 500 });
     }
   }
 
@@ -521,7 +521,7 @@ export const GET: RequestHandler = async () => {
     return json(
       {
         success: false,
-        error: err.message,
+        error: 'Indexing operation failed',
         collections: {
           codebase: { points_count: 0 },
           errors: { points_count: 0 }

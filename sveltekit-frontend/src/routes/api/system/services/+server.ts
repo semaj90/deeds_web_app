@@ -8,7 +8,8 @@ import { sql } from 'drizzle-orm';
  * Detailed service probe results + readiness
  * No side effects
  */
-export async function GET() {
+export async function GET({ locals }: { locals: App.Locals }) {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   const services: Record<string, any> = {};
 
   // Redis health

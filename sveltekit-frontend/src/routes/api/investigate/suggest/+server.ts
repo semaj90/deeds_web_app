@@ -49,7 +49,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				queryTags: [],
 				webSearchContext: null,
 				persona: 'investigator',
-				evidenceMetadata: null
+				evidenceMetadata: null,
+				evidenceConnections: null
 			},
 			backend: 'ollama'
 		});

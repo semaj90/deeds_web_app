@@ -1,53 +1,64 @@
 model_list:
+  # ── Primary Legal LLM (Ollama) ──────────────────────────────────────
+  - model_name: gemma3-legal
+    litellm_params:
+      model: ollama/gemma3-legal:latest
+      api_base: http://host.docker.internal:11434
+      num_gpu: 30
+      flash_attention: true
+
+  # ── TRT-LLM via Triton (when engine is built) ──────────────────────
+  # Uncomment when TRT engine is available on port 8099
+  # - model_name: gemma3-legal
+  #   litellm_params:
+  #     model: triton/gemma3-legal
+  #     api_base: http://host.docker.internal:8099/generate
+
+  # ── Embedding Model ─────────────────────────────────────────────────
+  - model_name: embeddinggemma
+    litellm_params:
+      model: ollama/embeddinggemma:latest
+      api_base: http://host.docker.internal:11434
+
+  # ── Smaller context model ───────────────────────────────────────────
+  - model_name: gemma-270m-context
+    litellm_params:
+      model: ollama/gemma-270m-context
+      api_base: http://host.docker.internal:11434
+      num_gpu: 30
+      flash_attention: true
+
+  # ── Claude → local Ollama aliases (for tools expecting OpenAI API) ──
   - model_name: claude-sonnet-4-5
     litellm_params:
-      model: ollama/gemma3-legal-optimized
-      api_base: http://localhost:11434
+      model: ollama/gemma3-legal:latest
+      api_base: http://host.docker.internal:11434
       num_gpu: 30
       flash_attention: true
 
   - model_name: claude-3-5-sonnet-20241022
     litellm_params:
-      model: ollama/gemma3-legal-optimized
-      api_base: http://localhost:11434
-      num_gpu: 30
-      flash_attention: true
-
-  - model_name: claude-3-5-sonnet-20240620
-    litellm_params:
       model: ollama/gemma3-legal:latest
-      api_base: http://localhost:11434
+      api_base: http://host.docker.internal:11434
       num_gpu: 30
       flash_attention: true
-
-  # Explicitly define local Ollama models for direct use
-  - model_name: gemma3:legal-latest
-    litellm_params:
-      model: ollama/gemma3-legal:latest
-      api_base: http://localhost:11434
-      num_gpu: 30
-      flash_attention: true
-
-  - model_name: gemma-270m-context
-    litellm_params:
-      model: ollama/gemma-270m-context # Assuming this is the actual Ollama model name
-      api_base: http://localhost:11434
-      num_gpu: 30
-      flash_attention: true
-
-
 
 litellm_settings:
   drop_params: true
-  success_callback: []
-  failure_callback: []
-  cache: false
+  set_verbose: false
+  # ── Semantic Cache (Redis Stack + embeddinggemma) ───────────────────
+  cache: true
   cache_params:
-    type: redis
-    host: localhost
+    type: redis-semantic
+    host: deeds-redis-prod
     port: 6379
-    ttl: 3600  # 1 hour cache
+    password: ""
+    similarity_threshold: 0.85
+    ttl: 3600
+    redis_semantic_cache_embedding_model: ollama/embeddinggemma:latest
+    redis_semantic_cache_use_async: true
+    namespace: "llm_cache"
 
 general_settings:
-  master_key: sk-1234
+  master_key: sk-deeds-litellm-2026
   database_url: null

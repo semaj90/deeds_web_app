@@ -242,7 +242,7 @@ export const POST: RequestHandler = async ({ request, url: reqUrl, locals }) => 
 	} catch (e) {
 		console.error('[api/ace/ingest] Failed:', e);
 		return json(
-			{ error: e instanceof Error ? e.message : 'Ingestion failed' },
+			{ error: 'Ingestion failed' },
 			{ status: 500 }
 		);
 	}

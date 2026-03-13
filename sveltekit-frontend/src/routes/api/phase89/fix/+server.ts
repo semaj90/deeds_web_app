@@ -68,7 +68,7 @@ export const POST: RequestHandler = async ({ request }) => {
     console.error('Fix trigger error:', error);
     return json({
       success: false,
-      error: error.message
+      error: 'Fix operation failed'
     }, { status: 500 });
   }
 };

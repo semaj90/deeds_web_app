@@ -5,6 +5,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { traceLLM } from '$lib/server/observability/langfuse.js';
 
 const MODEL = 'gemma3-legal:latest';
 
@@ -55,41 +56,48 @@ Only return entities that are clearly present. Do not fabricate.
 Text:
 ${text}`;
 
-	const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			model: MODEL,
-			prompt,
-			stream: false,
-			format: 'json',
-			options: { temperature: 0.1, top_p: 0.9 },
-		}),
-		signal: AbortSignal.timeout(90_000),
+	return traceLLM('entity-extraction', { model: MODEL, prompt: text.slice(0, 500) }, async (gen) => {
+		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				model: MODEL,
+				prompt,
+				stream: false,
+				format: 'json',
+				options: { temperature: 0.1, top_p: 0.9 },
+			}),
+			signal: AbortSignal.timeout(90_000),
+		});
+
+		if (!res.ok) {
+			gen.end({ output: 'failed', level: 'WARNING' });
+			return [];
+		}
+
+		const data = await res.json();
+		const raw = typeof data.response === 'string' ? data.response : JSON.stringify(data.response);
+
+		try {
+			const parsed = JSON.parse(raw);
+			const arr = Array.isArray(parsed) ? parsed
+				: Array.isArray(parsed.entities) ? parsed.entities
+				: [];
+			const entities = arr.filter(
+				(e: any) => typeof e?.text === 'string' && typeof e?.label === 'string' && e.text.length > 0
+			).map((e: any) => ({
+				text: e.text,
+				label: e.label,
+				score: typeof e.score === 'number' ? e.score : 0.85,
+				source: 'llm' as const,
+			}));
+			gen.end({ output: `${entities.length} entities extracted` });
+			return entities;
+		} catch {
+			gen.end({ output: 'parse-failed', level: 'WARNING' });
+			return [];
+		}
 	});
-
-	if (!res.ok) return [];
-
-	const data = await res.json();
-	const raw = typeof data.response === 'string' ? data.response : JSON.stringify(data.response);
-
-	try {
-		const parsed = JSON.parse(raw);
-		const arr = Array.isArray(parsed) ? parsed
-			: Array.isArray(parsed.entities) ? parsed.entities
-			: [];
-		// Validate shape
-		return arr.filter(
-			(e: any) => typeof e?.text === 'string' && typeof e?.label === 'string' && e.text.length > 0
-		).map((e: any) => ({
-			text: e.text,
-			label: e.label,
-			score: typeof e.score === 'number' ? e.score : 0.85,
-			source: 'llm' as const,
-		}));
-	} catch {
-		return [];
-	}
 }
 
 /**

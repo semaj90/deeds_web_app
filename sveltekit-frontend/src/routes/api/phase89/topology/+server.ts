@@ -89,7 +89,7 @@ export const GET: RequestHandler = async () => {
         edges: [],
         summary: { totalFiles: 0, totalErrors: 0, totalEmbedded: 0 }
       },
-      error: error.message
+      error: 'Failed to load topology data'
     });
   }
 };

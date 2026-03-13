@@ -123,7 +123,7 @@ async function executeTool(name: string, args: Record<string, unknown>): Promise
 				return { result: `Unknown tool: ${name}`, duration: Date.now() - start };
 		}
 	} catch (err) {
-		return { result: `Tool error: ${err instanceof Error ? err.message : String(err)}`, duration: Date.now() - start };
+		return { result: 'Tool execution failed', duration: Date.now() - start };
 	}
 }
 

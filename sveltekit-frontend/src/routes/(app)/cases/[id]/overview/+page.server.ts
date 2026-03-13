@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 			caseId,
 			caseData: null,
 			evidence: [],
-			persons: [] as Array<{ name: string; role: string; riskScore: string }>,
+			persons: [] as Array<{ id: string; name: string; role: string; riskScore: string; aiSummary: string | null }>,
 			loadError: 'Case not found or database unavailable'
 		};
 	}
@@ -71,12 +71,15 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 			filename: e.fileName,
 			type: e.evidenceType ?? 'document',
 			mimeType: e.fileType ?? 'unknown',
-			status: 'indexed'
+			status: 'indexed',
+			keyPoints: ((e.aiAnalysis as Record<string, unknown> | null)?.keyPoints as string[]) ?? []
 		})),
 		persons: personRows.map((p) => ({
+			id: p.id,
 			name: p.name ?? 'Unknown',
 			role: p.status ?? 'Person of interest',
-			riskScore: p.threatLevel ?? '—'
+			riskScore: p.threatLevel ?? '—',
+			aiSummary: ((p.aiProfile as Record<string, unknown> | null)?.summary as string) ?? null
 		})),
 		loadError: null
 	};
