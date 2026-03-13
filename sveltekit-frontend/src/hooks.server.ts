@@ -236,21 +236,6 @@ async function warmupLLMCache(): Promise<void> {
 	}
 }
 
-/**
- * Start typed RabbitMQ queue workers via WorkerRegistry.
- * All 7 queues get consumers. Partial failure = degraded, not crash.
- */
-async function startQueueWorkers(): Promise<void> {
-	const { createDefaultRegistry } = await import('$lib/server/queue/queue-worker.js');
-
-	const registry = createDefaultRegistry();
-	const result = await registry.startAll();
-	console.log(`[Boot] Queue workers: ${result.started}/${result.started + result.failed} started`);
-
-	if (result.errors.length > 0) {
-		console.warn('[Boot] Queue worker errors:', result.errors.join('; '));
-	}
-}
 
 /**
  * Main request handler with Lucia v3 session validation

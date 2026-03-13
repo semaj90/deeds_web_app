@@ -614,7 +614,7 @@ async function processAndEmbed(
 				}
 				const formDataVLM = new FormData();
 				formDataVLM.append('file', new Blob([new Uint8Array(buffer)]), fileName);
-				const visionRes = await fetch(`${process.env.ORIGIN ?? 'http://localhost:5173'}/api/vision/analyze`, {
+				const visionRes = await fetch(`${ENV.PUBLIC_API_URL}/api/vision/analyze`, {
 					method: 'POST',
 					body: formDataVLM,
 					signal: AbortSignal.timeout(30_000),
