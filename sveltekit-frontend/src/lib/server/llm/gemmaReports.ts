@@ -1,7 +1,8 @@
+import { ENV } from '$lib/server/env.server.js';
+
 export type ReportTemplate = 'charging_memo' | 'intake_summary';
 
-// Phase 14: Read AI configuration from environment
-const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'gemma3-legal:latest';
 
 export async function generateReportWithGemma(opts: {

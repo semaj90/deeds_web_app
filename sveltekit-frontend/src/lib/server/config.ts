@@ -1,4 +1,5 @@
 import { env } from '$env/dynamic/private';
+import { ENV } from '$lib/server/env.server.js';
 
 /**
  * Application Configuration
@@ -31,7 +32,7 @@ export const MCP_CONFIG = {
 export const AI_CONFIG = {
 	// Primary: Ollama with Gemma models
 	ollama: {
-	baseUrl: process.env.OLLAMA_URL || process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
+	baseUrl: ENV.OLLAMA_BASE_URL,
 		models: {
 	legal: process.env.GEMMA_LEGAL_MODEL || 'gemma3-legal:latest',
 			embedding: process.env.GEMMA_EMBEDDING_MODEL || 'embeddinggemma:latest',

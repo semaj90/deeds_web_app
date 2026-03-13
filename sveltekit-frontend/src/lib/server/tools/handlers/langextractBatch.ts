@@ -12,8 +12,10 @@ import {
   type LangExtractResult,
   type ToolResult
 } from '../registry.js';
-const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
-const LANGEXTRACT_URL = process.env?.LANGEXTRACT_URL ?? 'http://localhost:8095';
+import { ENV } from '$lib/server/env.server.js';
+
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const LANGEXTRACT_URL = ENV.MINIO_SIMD_URL;
 
 interface ExtractedEntity {
   type: string;

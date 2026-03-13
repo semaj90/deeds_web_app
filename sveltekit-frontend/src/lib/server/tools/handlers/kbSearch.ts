@@ -13,8 +13,10 @@ import {
   type ToolResult
 } from '../registry.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
-const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
-const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
+import { ENV } from '$lib/server/env.server.js';
+
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const QDRANT_URL = ENV.QDRANT_URL;
 
 async function generateEmbedding(text: string, model: string = SERVER_EMBEDDING_MODEL): Promise<number[]> {
   const response = await fetch(`${OLLAMA_URL}/api/embeddings`, {

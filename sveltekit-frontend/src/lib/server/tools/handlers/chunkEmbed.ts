@@ -12,9 +12,10 @@ import {
   type ToolResult
 } from '../registry.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
+import { ENV } from '$lib/server/env.server.js';
 
-const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
-const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
+const QDRANT_URL = ENV.QDRANT_URL;
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 interface ChunkEmbedResult {
   chunks_created: number;

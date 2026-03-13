@@ -1,8 +1,9 @@
 import { randomUUID } from 'node:crypto';
 import { simdMarkdownParser } from '$lib/utils/simd-markdown-parser';
 import type { MarkdownEvidenceInput, FactCluster, FactClaim } from '../types.js';
+import { ENV } from '$lib/server/env.server.js';
 
-const GEMMA_ENDPOINT = process.env.OLLAMA_URL ?? 'http://localhost:11434';
+const GEMMA_ENDPOINT = ENV.OLLAMA_BASE_URL;
 
 export async function extractFactsFromMarkdown(input: MarkdownEvidenceInput): Promise<FactCluster> {
 	const parsed = await simdMarkdownParser.parse(input.content, {

@@ -12,8 +12,10 @@ import {
   type ClusterTagResult,
   type ToolResult
 } from '../registry.js';
-const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
-const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
+import { ENV } from '$lib/server/env.server.js';
+
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const QDRANT_URL = ENV.QDRANT_URL;
 const PHASE72_PYTHON = process.env?.PHASE72_PYTHON ?? 'python';
 
 async function fetchVectors(collection: string, limit: number): Promise<Array<{

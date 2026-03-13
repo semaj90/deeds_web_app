@@ -1,9 +1,10 @@
 import neo4j, { type Driver, type Transaction } from 'neo4j-driver';
+import { ENV } from '$lib/server/env.server.js';
 
 // Configuration / env with safe defaults
-const NEO4J_URL = process.env.NEO4J_URL ?? 'bolt://localhost:7687';
-const NEO4J_USER = process.env.NEO4J_USER ?? 'neo4j';
-const NEO4J_PASS = process.env.NEO4J_PASS ?? 'neo4j';
+const NEO4J_URL = ENV.NEO4J_URI;
+const NEO4J_USER = ENV.NEO4J_USER;
+const NEO4J_PASS = ENV.NEO4J_PASSWORD;
 const NEO4J_INIT_ON_START = (process.env.NEO4J_INIT_ON_START ?? 'false') === 'true';
 const CREATE_SIMILARITY = (process.env.NEO4J_CREATE_SIMILARITY_LINKS ?? 'false') === 'true';
 const SIMILARITY_THRESHOLD = Number(process.env.NEO4J_SIMILARITY_THRESHOLD ?? 0.85);

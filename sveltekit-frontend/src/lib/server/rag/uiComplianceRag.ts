@@ -1,13 +1,14 @@
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
+import { ENV } from '$lib/server/env.server.js';
 
 type Vector = number[];
 
 async function embedWithGemma(texts: string[]): Promise<Vector[]> {
-    const response = await fetch(process.env.GEMMA_EMBED_URL ?? 'http://localhost:11434/api/embed', {
+    const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	model: process.env.GEMMA_EMBED_MODEL ?? SERVER_EMBEDDING_MODEL,
+	model: SERVER_EMBEDDING_MODEL,
             input: texts,
         }),
     });

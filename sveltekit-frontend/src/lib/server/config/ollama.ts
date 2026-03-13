@@ -2,6 +2,7 @@
  * Ollama Configuration
  * Centralized endpoint management for Gemma models
  */
+import { ENV } from '$lib/server/env.server.js';
 
 export interface OllamaConfig {
 	baseUrl: string;
@@ -9,7 +10,7 @@ export interface OllamaConfig {
 	timeout: number;
 }
 
-const DEFAULT_OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
+const DEFAULT_OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const DEFAULT_MODEL = process.env?.OLLAMA_MODEL ?? 'gemma:7b';
 const DEFAULT_TIMEOUT = 30000;
 

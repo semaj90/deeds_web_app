@@ -7,6 +7,7 @@
 import { generateTags } from './tag-generator.js';
 import { mirrorTags } from './tag-sync.js';
 import type { GeneratedTag } from './types.js';
+import { ENV } from '$lib/server/env.server.js';
 
 export interface AutoTagResult {
 	documentId: string;
@@ -38,7 +39,7 @@ export async function autoTagDocument(opts: {
 	const embeddings = new Map<string, number[]>();
 	try {
 		const uniqueLabels = [...new Set(tagResult.tags.map((t) => t.label))];
-		const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
+		const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 		for (const label of uniqueLabels) {
 			try {

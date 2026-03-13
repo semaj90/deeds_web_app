@@ -1,7 +1,7 @@
-import { env } from '$env/dynamic/private';
 import type { BackendId } from '$lib/types/pipeline';
+import { ENV } from '$lib/server/env.server.js';
 
-const OLLAMA_URL = process.env.OLLAMA_URL || env.OLLAMA_URL || 'http://localhost:11434';
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 export interface EmbedGatewayOptions {
   model?: string;

@@ -1,6 +1,7 @@
 import type { FactContradiction, UIContradiction } from '../types.js';
+import { ENV } from '$lib/server/env.server.js';
 
-const GEMMA_ENDPOINT = process.env.OLLAMA_URL ?? 'http://localhost:11434';
+const GEMMA_ENDPOINT = ENV.OLLAMA_BASE_URL;
 
 export async function runReasoningPass(
     factContradictions: FactContradiction[],

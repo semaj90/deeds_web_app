@@ -1,5 +1,7 @@
+import { ENV } from '$lib/server/env.server.js';
+
 export async function runCustomAnalysis(content: string, prompt: string): Promise<any> {
-    const ollamaUrl = import.meta.env?.OLLAMA_URL ?? "http://localhost:11434";
+    const ollamaUrl = ENV.OLLAMA_BASE_URL;
     const res = await fetch(`${ollamaUrl}/api/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
