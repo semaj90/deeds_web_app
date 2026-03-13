@@ -4,8 +4,10 @@
  * Provides a clean interface for LLM integration with the RAG system.
  * Supports both streaming and non-streaming responses.
  */
+import { ENV } from '$lib/server/env.server.js';
+import { traceLLM } from '$lib/server/observability/langfuse.js';
 
-const DEFAULT_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
+const DEFAULT_URL = ENV.OLLAMA_BASE_URL;
 const DEFAULT_MODEL = process.env.OLLAMA_MODEL_CHAT ?? process.env.OLLAMA_MODEL ?? 'gemma3-legal:latest';
 
 export interface LLMMessage {
@@ -39,36 +41,44 @@ export async function generateCompletion(
 ): Promise<LLMResponse> {
     const model = options.model ?? DEFAULT_MODEL;
 
-    const response = await fetch(`${DEFAULT_URL}/api/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-            model,
-            prompt,
-            stream: false,
-            options: {
-	temperature: options.temperature ?? 0.7,
-                num_predict: options.maxTokens ?? 2048,
-                top_p: options.topP ?? 0.9,
-                top_k: options.topK ?? 40,
-            },
-	}),
+    return traceLLM('generate-completion', { model, prompt: prompt.slice(0, 500) }, async (gen) => {
+        const response = await fetch(`${DEFAULT_URL}/api/generate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model,
+                prompt,
+                stream: false,
+                options: {
+                    temperature: options.temperature ?? 0.7,
+                    num_predict: options.maxTokens ?? 2048,
+                    top_p: options.topP ?? 0.9,
+                    top_k: options.topK ?? 40,
+                },
+            }),
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`Ollama error: ${response.status} - ${error}`);
+        }
+
+        const data = await response.json();
+        const result: LLMResponse = {
+            content: data.response,
+            model: data.model,
+            totalDuration: data.total_duration,
+            promptEvalCount: data.prompt_eval_count,
+            evalCount: data.eval_count,
+        };
+
+        gen.end({
+            output: result.content.slice(0, 1000),
+            usage: { promptTokens: result.promptEvalCount, completionTokens: result.evalCount },
+        });
+
+        return result;
     });
-
-    if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`Ollama error: ${response.status} - ${error}`);
-    }
-
-    const data = await response.json();
-
-    return {
-        content: data.response,
-        model: data.model,
-        totalDuration: data.total_duration,
-        promptEvalCount: data.prompt_eval_count,
-        evalCount: data.eval_count,
-    };
 }
 
 /**
@@ -80,36 +90,44 @@ export async function chatCompletion(
 ): Promise<LLMResponse> {
     const model = options.model ?? DEFAULT_MODEL;
 
-    const response = await fetch(`${DEFAULT_URL}/api/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-            model,
-            messages,
-            stream: false,
-            options: {
-	temperature: options.temperature ?? 0.7,
-                num_predict: options.maxTokens ?? 2048,
-                top_p: options.topP ?? 0.9,
-                top_k: options.topK ?? 40,
-            },
-	}),
+    return traceLLM('chat-completion', { model, messages: messages.slice(-3) }, async (gen) => {
+        const response = await fetch(`${DEFAULT_URL}/api/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model,
+                messages,
+                stream: false,
+                options: {
+                    temperature: options.temperature ?? 0.7,
+                    num_predict: options.maxTokens ?? 2048,
+                    top_p: options.topP ?? 0.9,
+                    top_k: options.topK ?? 40,
+                },
+            }),
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`Ollama chat error: ${response.status} - ${error}`);
+        }
+
+        const data = await response.json();
+        const result: LLMResponse = {
+            content: data.message?.content ?? '',
+            model: data.model,
+            totalDuration: data.total_duration,
+            promptEvalCount: data.prompt_eval_count,
+            evalCount: data.eval_count,
+        };
+
+        gen.end({
+            output: result.content.slice(0, 1000),
+            usage: { promptTokens: result.promptEvalCount, completionTokens: result.evalCount },
+        });
+
+        return result;
     });
-
-    if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`Ollama chat error: ${response.status} - ${error}`);
-    }
-
-    const data = await response.json();
-
-    return {
-        content: data.message?.content ?? '',
-        model: data.model,
-        totalDuration: data.total_duration,
-        promptEvalCount: data.prompt_eval_count,
-        evalCount: data.eval_count,
-    };
 }
 
 /**

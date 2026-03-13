@@ -541,6 +541,14 @@ if (typeof process !== 'undefined') {
 			console.error('[Shutdown] Error closing DB pools:', (err as Error).message);
 		}
 
+		// Flush Langfuse traces
+		try {
+			const { shutdownLangfuse } = await import('$lib/server/observability/langfuse.js');
+			await shutdownLangfuse();
+		} catch {
+			// Non-fatal
+		}
+
 		productionLogger.shutdown();
 		console.log('[Shutdown] All connections closed');
 	};

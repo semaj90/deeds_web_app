@@ -5,6 +5,7 @@
 
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { ENV } from '$lib/server/env.server.js';
+import { VECTOR_CONFIG } from '$lib/server/config/vector-config.js';
 
 export interface CollectionHealth {
 	name: string;
@@ -30,65 +31,19 @@ export interface QdrantHealthReport {
 }
 
 /**
- * Expected collection schemas
- * Must match qdrant-manager.ts collection configs
+ * Expected collection schemas — derived from VECTOR_CONFIG (single source of truth)
  */
-export const COLLECTION_SCHEMAS = {
-	legal_documents: {
-		vectors: ['content', 'summary'],
-		size: 768,
-		distance: 'Cosine',
-		quantized: true
-	},
-	legal_cases: {
-		vectors: ['description'],
-		size: 768,
-		distance: 'Cosine',
-		quantized: true
-	},
-	evidence_items: {
-		vectors: ['content'],
-		size: 768,
-		distance: 'Cosine',
-		quantized: true
-	},
-	chat_messages: {
-		vectors: ['message'],
-		size: 768,
-		distance: 'Cosine',
-		quantized: true
-	},
-	embedding_cache: {
-		vectors: ['embedding'],
-		size: 768,
-		distance: 'Cosine',
-		quantized: true
-	},
-	document_tags: {
-		vectors: ['default'], // Single unnamed vector
-		size: 768,
-		distance: 'Cosine',
-		quantized: true
-	},
-	topic_clusters: {
-		vectors: ['default'],
-		size: 768,
-		distance: 'Cosine',
-		quantized: true
-	},
-	llm_response_cache: {
-		vectors: ['query'],
-		size: 768,
-		distance: 'Cosine',
-		quantized: true
-	},
-	poi_profiles: {
-		vectors: ['default'],
-		size: 768,
-		distance: 'Cosine',
-		quantized: true
-	}
-} as const;
+export const COLLECTION_SCHEMAS = Object.fromEntries(
+	Object.entries(VECTOR_CONFIG.COLLECTION_VECTORS).map(([name, schema]) => [
+		name,
+		{
+			vectors: schema.vectors,
+			size: VECTOR_CONFIG.DIMENSIONS,
+			distance: VECTOR_CONFIG.DISTANCE_METRIC.QDRANT,
+			quantized: true,
+		},
+	])
+) as Record<string, { vectors: readonly string[]; size: number; distance: string; quantized: boolean }>;
 
 /**
  * Check health of all Qdrant collections

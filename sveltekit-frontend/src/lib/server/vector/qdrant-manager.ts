@@ -2,6 +2,7 @@ import { QdrantClient } from '@qdrant/js-client-rest';
 import { createHash } from 'crypto';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 import { ENV } from '$lib/server/env.server.js';
+import { VECTOR_CONFIG } from '$lib/server/config/vector-config.js';
 
 /**
  * Generate a deterministic integer point ID from a string key.
@@ -10,51 +11,49 @@ import { ENV } from '$lib/server/env.server.js';
  */
 export function deterministicPointId(key: string): number {
     const hash = createHash('md5').update(key).digest();
-    // Read first 4 bytes as unsigned 32-bit integer (big-endian)
     const raw = hash.readUInt32BE(0);
-    // Mod by 2^31 to stay within signed 32-bit integer range (Qdrant requirement)
     return raw % 2147483648;
 }
 
 export class QdrantManager {
     public client: QdrantClient;
-    public readonly collections = {
-        documents: 'legal_documents',
-        cases: 'legal_cases',
-        evidence: 'evidence_items',
-        chat_history: 'chat_messages',
-        embeddings_cache: 'embedding_cache',
-        document_tags: 'document_tags',
-        topic_clusters: 'topic_clusters',
-        llm_cache: 'llm_response_cache',
-        poi_profiles: 'poi_profiles'
-    };
+    /** Canonical collection names — sourced from VECTOR_CONFIG */
+    public readonly collections = VECTOR_CONFIG.COLLECTIONS;
 
     constructor(url = ENV.QDRANT_URL) {
         this.client = new QdrantClient({ url });
     }
 
-    /** Shared HNSW + quantization config for all 768-dim collections */
-    private static readonly HNSW_CONFIG = { m: 16, ef_construct: 200 };
-    private static readonly QUANTIZATION_CONFIG = {
-        scalar: { type: 'int8' as const, quantile: 0.99, always_ram: false }
-    };
-
     async initializeCollections() {
-        const hnsw = QdrantManager.HNSW_CONFIG;
-        const quant = QdrantManager.QUANTIZATION_CONFIG;
+        const dim = VECTOR_CONFIG.DIMENSIONS;
+        const dist = VECTOR_CONFIG.DISTANCE_METRIC.QDRANT;
+        const hnsw = VECTOR_CONFIG.QDRANT_HNSW;
+        const quant = VECTOR_CONFIG.QDRANT_QUANTIZATION;
 
-        const collectionConfigs = [
-            { name: this.collections.documents, vectors: { content: { size: 768, distance: 'Cosine' }, summary: { size: 768, distance: 'Cosine' } }, quantization_config: quant, hnsw_config: hnsw, on_disk_payload: true },
-            { name: this.collections.cases, vectors: { description: { size: 768, distance: 'Cosine' } }, quantization_config: quant, hnsw_config: hnsw },
-            { name: this.collections.evidence, vectors: { content: { size: 768, distance: 'Cosine' } }, quantization_config: quant, hnsw_config: hnsw, on_disk_payload: true },
-            { name: this.collections.chat_history, vectors: { message: { size: 768, distance: 'Cosine' } }, quantization_config: quant, hnsw_config: hnsw },
-            { name: this.collections.embeddings_cache, vectors: { embedding: { size: 768, distance: 'Cosine' } }, quantization_config: quant, hnsw_config: hnsw },
-            { name: this.collections.document_tags, vectors: { size: 768, distance: 'Cosine' }, quantization_config: quant, hnsw_config: hnsw },
-            { name: this.collections.topic_clusters, vectors: { size: 768, distance: 'Cosine' }, quantization_config: quant, hnsw_config: hnsw },
-            { name: this.collections.llm_cache, vectors: { query: { size: 768, distance: 'Cosine' } }, quantization_config: quant, hnsw_config: hnsw },
-            { name: this.collections.poi_profiles, vectors: { embedding: { size: 768, distance: 'Cosine' } }, quantization_config: quant, hnsw_config: hnsw },
-        ];
+        const collectionConfigs = Object.entries(VECTOR_CONFIG.COLLECTION_VECTORS).map(
+            ([name, schema]) => {
+                const vectors: Record<string, { size: number; distance: string }> = {};
+                for (const v of schema.vectors) {
+                    if (v === 'default') continue;
+                    vectors[v] = { size: dim, distance: dist };
+                }
+                const config: any = {
+                    name,
+                    quantization_config: quant,
+                    hnsw_config: hnsw,
+                };
+                // Single unnamed vector vs named multi-vector
+                if (schema.vectors.length === 1 && schema.vectors[0] === 'default') {
+                    config.vectors = { size: dim, distance: dist };
+                } else {
+                    config.vectors = vectors;
+                }
+                if ('on_disk_payload' in schema) {
+                    config.on_disk_payload = schema.on_disk_payload;
+                }
+                return config;
+            }
+        );
 
         for (const config of collectionConfigs) {
             try {
