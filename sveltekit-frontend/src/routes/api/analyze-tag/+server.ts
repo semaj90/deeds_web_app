@@ -23,7 +23,8 @@ const analyzeTagSchema = z.object({
 export async function POST({ request, locals }: RequestEvent) {
 	if (!locals.user) return json({ success: false, error: 'Unauthorized' }, { status: 401 });
 
-	const raw = await request.json();
+	let raw: unknown;
+	try { raw = await request.json(); } catch { return json({ success: false, error: 'Invalid JSON body' }, { status: 400 }); }
 	const parsed = analyzeTagSchema.safeParse(raw);
 	if (!parsed.success) {
 		return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });

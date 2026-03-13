@@ -50,7 +50,7 @@ class UnifiedCacheService {
 
 	private localInvalidateByPrefix(prefix: string) {
 		if (!lokiCache.isReady()) return;
-		const all = lokiCache.query<{ _cacheKey?: string }>('default', {});
+		const all = lokiCache.query('default', {}) as { _cacheKey?: string }[];
 		for (const item of all) {
 			if (item._cacheKey?.startsWith(prefix)) {
 				lokiCache.delete('default', item._cacheKey);

@@ -5,6 +5,7 @@ import { db } from '$lib/server/db/client';
 import { cases, evidence, reports } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { auditReportAction } from '$lib/server/reports/audit';
+import { ENV } from '$lib/server/env.server.js';
 import {
 	getCachedTemplate,
 	getCachedAIContent,
@@ -102,7 +103,7 @@ Generate the complete report content in HTML format, maintaining the structure b
           `.trim();
 
           // Call Ollama for AI generation
-          const ollamaResponse = await fetch('http://127.0.0.1:11434/api/generate', {
+          const ollamaResponse = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -37,7 +37,7 @@ async function probe(url: string, timeoutMs = 5000): Promise<CheckResult> {
 export const GET = async () => {
 	const trtllmUrl = getTrtLlmUrl();
 	const tritonUrl = getTritonUrl();
-	const langextractUrl = ENV.MINIO_SIMD_URL ?? 'http://127.0.0.1:8095';
+	const langextractUrl = ENV.MINIO_SIMD_URL;
 
 	// Run all probes in parallel
 	const [ollama, qdrant, trtllm, triton, langextract, grpc] = await Promise.all([

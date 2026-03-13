@@ -1,11 +1,12 @@
 import { createClient } from 'redis';
+import { ENV } from '$lib/server/env.server.js';
 
 let redisClient: ReturnType<typeof createClient> | null = null;
 
 export async function getRedisClient() {
  if (!redisClient) {
  redisClient = createClient({
- url: process.env?.REDIS_URL ?? 'redis://127.0.0.1:4005',
+ url: ENV.REDIS_URL,
  });
 
  redisClient.on('error', (err) => {

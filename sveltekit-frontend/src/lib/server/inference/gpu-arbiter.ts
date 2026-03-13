@@ -26,6 +26,8 @@ interface GpuLease {
 
 const LEASE_KEY = 'gpu:lease';
 const DEFAULT_TTL_SEC = 120; // 2 minutes
+const SEMAPHORE_KEY = 'gpu:semaphore';
+const MAX_CONCURRENT_GPU_OPS = 2;
 
 /**
  * Attempt to acquire exclusive GPU lease.
@@ -110,6 +112,58 @@ export async function getGpuLeaseStatus(): Promise<GpuLease | null> {
 		return lease;
 	} catch {
 		return null;
+	}
+}
+
+/**
+ * Acquire a GPU compute semaphore slot.
+ * Limits concurrent GPU operations to MAX_CONCURRENT_GPU_OPS to prevent OOM.
+ * Returns a ticket string on success, null if all slots are taken.
+ */
+export async function acquireGpuSemaphore(timeoutSec = 30): Promise<string | null> {
+	try {
+		const ticket = `gpu-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+		const count = await redis.scard(SEMAPHORE_KEY);
+		if (count >= MAX_CONCURRENT_GPU_OPS) {
+			// Clean expired tickets before rejecting
+			const members = await redis.smembers(SEMAPHORE_KEY);
+			for (const m of members) {
+				const ts = parseInt(m.split('-')[1] ?? '0');
+				if (Date.now() - ts > timeoutSec * 1000) {
+					await redis.srem(SEMAPHORE_KEY, m);
+				}
+			}
+			const refreshed = await redis.scard(SEMAPHORE_KEY);
+			if (refreshed >= MAX_CONCURRENT_GPU_OPS) return null;
+		}
+		await redis.sadd(SEMAPHORE_KEY, ticket);
+		await redis.expire(SEMAPHORE_KEY, timeoutSec);
+		return ticket;
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Release a GPU compute semaphore slot.
+ */
+export async function releaseGpuSemaphore(ticket: string): Promise<void> {
+	try {
+		await redis.srem(SEMAPHORE_KEY, ticket);
+	} catch {
+		// Non-critical
+	}
+}
+
+/**
+ * Get current GPU semaphore status.
+ */
+export async function getGpuSemaphoreStatus(): Promise<{ active: number; max: number }> {
+	try {
+		const count = await redis.scard(SEMAPHORE_KEY);
+		return { active: count, max: MAX_CONCURRENT_GPU_OPS };
+	} catch {
+		return { active: 0, max: MAX_CONCURRENT_GPU_OPS };
 	}
 }
 

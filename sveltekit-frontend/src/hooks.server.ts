@@ -74,12 +74,8 @@ warmupTemplateCache().then(() => {
 // Idle re-engagement scanner (5-min interval, checks user activity → notifications)
 startIdleScanner();
 
-// Start typed RabbitMQ queue workers (concrete consumers for 4 queues)
-startQueueWorkers().then(() => {
-	console.log('[Boot] Queue workers active');
-}).catch((err) => {
-	console.warn('[Boot] Queue workers failed (non-fatal):', (err as Error).message);
-});
+// Note: Queue consumers are registered by startRabbitMQPipeline() above
+// via rabbitmq.initialize() → startConsumers() (all 7 queues)
 
 // Option #6: Warm up export cache (pre-generate top 5 recent report exports)
 warmupExportCache().then(() => {
@@ -367,35 +363,35 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	}
 
-	// === CENTRALIZED AUTH GUARDS (Phase A2) ===
+	// === CENTRALIZED AUTH GUARDS (Phase A2 — deny-by-default) ===
 	if (event.url.pathname.startsWith('/api/')) {
 		const path = event.url.pathname;
 
-		// Routes that require any authenticated user
-		const AUTH_REQUIRED = ['/api/cases', '/api/evidence', '/api/citations',
-			'/api/chat', '/api/ai/', '/api/reports', '/api/persons', '/api/recommendations',
-			'/api/graph', '/api/orchestrator', '/api/synthesis'];
-
-		// Routes that require admin role
-		const ADMIN_ONLY = ['/api/admin', '/api/codebase-index', '/api/phase89', '/api/error-brain'];
-
-		// Public routes (no auth needed)
+		// Public routes (no auth needed) — explicitly allowlisted
 		const PUBLIC = ['/api/health', '/api/auth', '/api/metrics', '/api/system',
-			'/api/embed', '/api/rag', '/api/knowledge', '/api/ollama', '/api/infrastructure'];
+			'/api/ping', '/api/infrastructure', '/api/docs', '/api/glossary',
+			'/api/kb', '/api/precedents', '/api/statutes', '/api/ollama'];
+
+		// Admin-only routes (require admin role)
+		const ADMIN_ONLY = ['/api/admin', '/api/codebase-index', '/api/codebase', '/api/phase89',
+			'/api/phase72', '/api/phase82', '/api/error-brain', '/api/errors', '/api/internal',
+			'/api/cache', '/api/consolidation', '/api/gpu', '/api/gpu-wasm', '/api/indexing',
+			'/api/pipeline', '/api/qlora', '/api/rabbitmq', '/api/security', '/api/topology',
+			'/api/worker', '/api/generate-cluster'];
 
 		const isPublic = PUBLIC.some(p => path.startsWith(p));
 
 		if (!isPublic) {
-			const needsAdmin = ADMIN_ONLY.some(p => path.startsWith(p));
-			const needsAuth = needsAdmin || AUTH_REQUIRED.some(p => path.startsWith(p));
-
-			if (needsAuth && !event.locals.user) {
+			// Deny-by-default: ALL non-public API routes require authentication
+			if (!event.locals.user) {
 				return new Response(
 					JSON.stringify({ error: 'Authentication required' }),
 					{ status: 401, headers: { 'Content-Type': 'application/json', 'X-Request-ID': requestId } }
 				);
 			}
 
+			// Admin-only routes additionally require admin role
+			const needsAdmin = ADMIN_ONLY.some(p => path.startsWith(p));
 			if (needsAdmin && event.locals.user?.role !== 'admin') {
 				return new Response(
 					JSON.stringify({ error: 'Admin access required' }),

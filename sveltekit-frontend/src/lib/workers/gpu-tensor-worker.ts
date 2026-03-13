@@ -162,13 +162,13 @@ class GPUTensorWorker {
 		const paramsBuf = device.createBuffer({
 			size: 8, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
 		});
-		device.queue.writeBuffer(paramsBuf, 0, paramsData);
+		device.queue.writeBuffer(paramsBuf, 0, paramsData.buffer);
 
 		const vectorBuf = device.createBuffer({
 			size: vectors.byteLength,
 			usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST
 		});
-		device.queue.writeBuffer(vectorBuf, 0, vectors);
+		device.queue.writeBuffer(vectorBuf, 0, vectors.buffer);
 
 		const readBuf = device.createBuffer({
 			size: vectors.byteLength,

@@ -103,7 +103,8 @@ const cacheSetSchema = z.object({
 });
 
 export const POST: RequestHandler = async ({ request }) => {
-	const raw = await request.json();
+	let raw: unknown;
+	try { raw = await request.json(); } catch { return json({ success: false, error: 'Invalid JSON body' }, { status: 400 }); }
 	const parsed = cacheSetSchema.safeParse(raw);
 	if (!parsed.success) {
 		return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });

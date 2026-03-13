@@ -1,10 +1,11 @@
 
 /**
  * Optional, guarded Ollama embeddings helper for SvelteKit 2.
- * Attempts to call a local Ollama server (default http://127.0.0.1:11434)
- * using the embeddings API with `embeddinggemma:latest` by default.
+ * Uses ENV.OLLAMA_BASE_URL for the server URL.
  * Returns null on failure or if the server is unavailable.
  */
+
+import { ENV } from '$lib/server/env.server.js';
 
 export type OllamaEmbedResult = {
   model: string;
@@ -27,7 +28,7 @@ export async function tryEmbedOllama(
   }
 ): Promise<OllamaEmbedResult | null> {
   const model = opts?.model ?? 'embeddinggemma:latest';
-  const baseUrl = (opts?.baseUrl ?? 'http://127.0.0.1:11434').replace(/\/$/, '');
+  const baseUrl = (opts?.baseUrl ?? ENV.OLLAMA_BASE_URL).replace(/\/$/, '');
   const url = `${baseUrl}/api/embeddings`;
 
   const controller = new AbortController();

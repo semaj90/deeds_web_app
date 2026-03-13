@@ -1,7 +1,9 @@
 // src/lib/server/embedding-service.ts
 // Simple wrapper around your embedding model (Ollama / Gemma / embeddinggemma, etc.)
 
-const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
+import { ENV } from '$lib/server/env.server.js';
+
+const OLLAMA_BASE_URL = ENV.OLLAMA_BASE_URL;
 const DEFAULT_EMBED_MODEL = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
 
 type OllamaEmbedResponse = {

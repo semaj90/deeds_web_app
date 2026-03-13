@@ -1,3 +1,5 @@
+import { ENV } from '$lib/server/env.server.js';
+
 export type ExtractedPerson = {
  fullName: string;
 	role: 'suspect' | 'victim' | 'witness' | 'other';
@@ -61,7 +63,7 @@ NARRATIVE:
 ${ narrative }
 `;
 
- const res = await fetch('http://127.0.0.1:11434/api/generate', {
+ const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
