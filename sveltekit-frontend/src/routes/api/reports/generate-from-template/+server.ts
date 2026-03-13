@@ -12,34 +12,32 @@ import {
 	hashTemplateParams,
 	invalidateAllCaseTemplates
 } from '$lib/server/cache/report-template-cache.js';
+import { z } from 'zod';
+
+const generateFromTemplateSchema = z.object({
+  templateType: z.string().min(1).max(200),
+  caseId: z.string().uuid(),
+  customTitle: z.string().max(500).optional(),
+  useAI: z.boolean().optional().default(false)
+});
 
 /**
  * POST /api/reports/generate-from-template
  * Generate a report from a template with AI enhancement
- *
- * Body: {
- *   templateType: string,
- *   caseId: string,
- *   customTitle?: string,
- *   useAI?: boolean
- * }
  */
 export const POST: RequestHandler = async ({ locals, request, fetch }) => {
   if (!locals.user) {
     throw error(401, 'Unauthorized');
   }
 
+  const raw = await request.json();
+  const parsed = generateFromTemplateSchema.safeParse(raw);
+  if (!parsed.success) {
+    throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
+  }
+
   try {
-    const body = await request.json();
-    const { templateType, caseId, customTitle, useAI = false } = body;
-
-    if (!templateType) {
-      throw error(400, 'Missing required field: templateType');
-    }
-
-    if (!caseId) {
-      throw error(400, 'Missing required field: caseId');
-    }
+    const { templateType, caseId, customTitle, useAI } = parsed.data;
 
     // Get the template (with caching)
     const template = await getCachedTemplate(templateType);

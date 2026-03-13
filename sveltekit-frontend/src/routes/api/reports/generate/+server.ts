@@ -5,13 +5,14 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { eq, arrayContains } from 'drizzle-orm';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
 const generateReportSchema = z.object({
 	caseId: z.string().min(1, 'Case ID is required').max(500),
 	type: z.string().max(100).optional().default('charging_memo'),
 });
 
-const OLLAMA_URL = process.env.OLLAMA_HOST ?? 'http://localhost:11434';
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {

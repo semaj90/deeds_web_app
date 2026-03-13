@@ -6,22 +6,24 @@
  * Endpoint: POST /api/codebase-index/reindex
  * Purpose: Trigger codebase reindexing and clustering
  */
-import { env } from '$env/dynamic/private';
+import { getCodebaseIndexUrl } from '$lib/config/env.server.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 
-const FASTAPI_URL = env?.FASTAPI_URL ?? 'http://localhost:8090';
+const FASTAPI_URL = getCodebaseIndexUrl();
+
+const reindexSchema = z.object({
+	force: z.boolean().optional().default(false),
+	runClustering: z.boolean().optional().default(true)
+});
 
 export const POST: RequestHandler = async ({ request, fetch }) => {
 	try {
 		// Parse request body for options
-		let options = { force: false, runClustering: true };
-		try {
-			const body = await request.json();
-			options = { ...options, ...body };
-		} catch {
-			// No body provided, use defaults
-		}
+		const raw = await request.json().catch(() => ({}));
+		const parsed = reindexSchema.safeParse(raw);
+		const options = parsed.success ? parsed.data : { force: false, runClustering: true };
 
 		// Trigger reindex via FastAPI admin routes (Task 16.1: 16.2)
 		const response = await fetch(`${FASTAPI_URL}/api/codebase/reindex`, {

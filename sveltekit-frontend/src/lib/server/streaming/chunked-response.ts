@@ -8,6 +8,11 @@
  * - RabbitMQ background jobs
  */
 
+import { ENV } from '$lib/server/env.server.js';
+
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+const QDRANT_URL = ENV.QDRANT_URL ?? 'http://localhost:6333';
+
 export interface ChunkingStrategy {
 	maxTokens?: number;
 	sentenceBoundary?: boolean;
@@ -134,7 +139,7 @@ export async function* streamOllamaResponse(
 	model: string = 'gemma3-legal:latest'
 ): AsyncGenerator<StreamChunk> {
 	try {
-		const response = await fetch('http://localhost:11434/api/generate', {
+		const response = await fetch(`${OLLAMA_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
@@ -220,7 +225,7 @@ export async function* streamRAGResponse(
 
 		let embedding: number[] = [];
 		try {
-			const embeddingResponse = await fetch('http://localhost:11434/api/embeddings', {
+			const embeddingResponse = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
@@ -249,7 +254,7 @@ export async function* streamRAGResponse(
 		let context = '';
 		if (embedding.length > 0) {
 			try {
-				const searchResponse = await fetch(`http://localhost:6333/collections/${qdrantCollection}/points/search`, {
+				const searchResponse = await fetch(`${QDRANT_URL}/collections/${qdrantCollection}/points/search`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({

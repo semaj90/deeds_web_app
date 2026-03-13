@@ -7,6 +7,7 @@ import { createHash } from 'crypto';
 import sharp from 'sharp';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
+import { ENV } from '$lib/server/env.server.js';
 
 const deletePhotoSchema = z.object({
 	photoId: z.string().min(1, 'photoId required').max(500),
@@ -16,7 +17,7 @@ const BUCKET = 'poi-photos';
 const THUMB_BUCKET = 'poi-photos';
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const VLM_MODEL = 'gemma3-legal:latest';
 const EMBED_MODEL = 'embeddinggemma:latest';
 const VLM_TIMEOUT = 60_000; // 60s for vision analysis
@@ -277,7 +278,7 @@ Return ONLY valid JSON.`;
 	// ── Step 2: LangExtract OCR (if available) ──
 	let ocrText = '';
 	try {
-		const langextractRes = await fetch('http://localhost:8095/extract', {
+		const langextractRes = await fetch(`${ENV.MINIO_SIMD_URL}/extract`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -337,7 +338,7 @@ Return ONLY valid JSON.`;
 	if (captionEmbedding.length === 768) {
 		try {
 			const { QdrantClient } = await import('@qdrant/js-client-rest');
-			const qdrant = new QdrantClient({ url: 'http://localhost:6333' });
+			const qdrant = new QdrantClient({ url: ENV.QDRANT_URL });
 
 			// Deterministic point ID from photoId
 			const pointId = parseInt(

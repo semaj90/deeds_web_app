@@ -16,6 +16,7 @@ import { SOMClusterer } from '$lib/server/ml/som-cluster.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { requireAuth } from '$lib/server/auth-helpers.js';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
 const clusterSchema = z.object({
 	caseId: z.string().max(500).optional(),
@@ -62,7 +63,7 @@ export const POST: RequestHandler = async (event) => {
 		try {
 			// Fetch from legal_documents collection
 			const response = await fetch(
-				`${process.env.QDRANT_URL || 'http://localhost:6333'}/collections/legal_documents/points/scroll`,
+				`${ENV.QDRANT_URL}/collections/legal_documents/points/scroll`,
 				{
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },

@@ -1,8 +1,9 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
+import { getOrchestratorUrl } from '$lib/config/env.server.js';
 
-const ORCHESTRATOR_URL = 'http://localhost:8102';
+const ORCHESTRATOR_URL = getOrchestratorUrl();
 
 const orchestratorTaskSchema = z.object({}).passthrough();
 

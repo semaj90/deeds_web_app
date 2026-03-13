@@ -1,6 +1,11 @@
 import { db } from '$lib/server/db/client';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
+
+const analyzeStreamSchema = z.object({
+	analysisType: z.enum(['summary', 'legal_issues', 'risks', 'evidence_review']).optional().default('summary')
+});
 
 type AnalysisType = 'summary' | 'legal_issues' | 'risks' | 'evidence_review';
 
@@ -88,18 +93,19 @@ async function loadCaseContext(caseId: string): Promise<string> {
 
 export const POST: RequestHandler = async ({ params, request }) => {
 	const caseId = params.id;
-	let body: { analysisType?: string };
+	let raw: unknown;
 
 	try {
-		body = await request.json();
+		raw = await request.json();
 	} catch {
 		return new Response(JSON.stringify({ error: 'Invalid JSON' }), { status: 400 });
 	}
 
-	const analysisType = (body.analysisType ?? 'summary') as AnalysisType;
-	if (!ANALYSIS_PROMPTS[analysisType]) {
-		return new Response(JSON.stringify({ error: 'Invalid analysis type' }), { status: 400 });
+	const parsed = analyzeStreamSchema.safeParse(raw);
+	if (!parsed.success) {
+		return new Response(JSON.stringify({ error: parsed.error.issues[0]?.message ?? 'Invalid analysis type' }), { status: 400 });
 	}
+	const { analysisType } = parsed.data;
 
 	const stream = new ReadableStream({
 		async start(controller) {

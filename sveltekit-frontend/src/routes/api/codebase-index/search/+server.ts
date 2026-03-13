@@ -3,7 +3,7 @@
  * Endpoint: GET /api/codebase-index/search
  * Purpose: Semantic search across codebase index
  */
-import { env } from '$env/dynamic/private';
+import { getCodebaseIndexUrl } from '$lib/config/env.server.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
@@ -28,7 +28,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 
   try {
     // Try to fetch from FastAPI backend
-    const backendUrl = (env?.FASTAPI_URL || env?.CODEBASE_INDEXER_URL) ?? 'http://localhost:8090';
+    const backendUrl = getCodebaseIndexUrl();
 
     try {
       const searchParams = new URLSearchParams({

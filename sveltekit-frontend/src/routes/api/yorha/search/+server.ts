@@ -3,6 +3,14 @@ import { json, error } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { evidence, cases, personsOfInterest } from '$lib/server/db/schema-postgres.js';
 import { or, ilike, desc, sql } from 'drizzle-orm';
+import { z } from 'zod';
+
+const yorhaSearchSchema = z.object({
+	query: z.string().min(2, 'Query must be at least 2 characters').max(2000),
+	limit: z.number().int().min(1).max(100).optional().default(20),
+	sources: z.array(z.enum(['evidence', 'cases', 'persons'])).optional().default(['evidence', 'cases', 'persons']),
+	vectorSearch: z.boolean().optional().default(true)
+});
 
 /**
  * POST /api/yorha/search
@@ -12,13 +20,13 @@ import { or, ilike, desc, sql } from 'drizzle-orm';
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 
-	const body = await request.json();
-	const query = body.query?.trim();
-	if (!query || query.length < 2) throw error(400, 'Query must be at least 2 characters');
+	const raw = await request.json();
+	const parsed = yorhaSearchSchema.safeParse(raw);
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+	}
 
-	const limit = Math.min(Number(body.limit) || 20, 100);
-	const sources = body.sources ?? ['evidence', 'cases', 'persons'];
-	const useVector = body.vectorSearch ?? true;
+	const { query, limit, sources, vectorSearch: useVector } = parsed.data;
 	const pattern = `%${query}%`;
 
 	const results: Array<{ type: string; id: string; title: string; snippet: string; score: number; metadata: Record<string, unknown> }> = [];

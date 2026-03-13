@@ -11,6 +11,11 @@ import type { RequestHandler } from './$types';
 import { getClusteringStatus, startClusteringJob } from '$lib/server/ml/topic-clustering-worker.js';
 import { db } from '$lib/server/db/client';
 import { documentTopics } from '$lib/server/db/schema-postgres.js';
+import { z } from 'zod';
+
+const clusterTriggerSchema = z.object({
+	force: z.boolean().optional().default(false)
+});
 
 /**
  * GET /api/ml/cluster-status
@@ -89,9 +94,9 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		//   return json({ error: 'Forbidden' }, { status: 403 });
 		// }
 
-		const body = (await request.json().catch(() => ({}))) as {
-			force?: boolean;
-		};
+		const raw = await request.json().catch(() => ({}));
+		const parsed = clusterTriggerSchema.safeParse(raw);
+		const body = parsed.success ? parsed.data : { force: false };
 
 		// Start clustering job
 		const jobId = await startClusteringJob();

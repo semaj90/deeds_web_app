@@ -8,7 +8,7 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { env } from '$env/dynamic/private';
+import { getCodebaseIndexUrl } from '$lib/config/env.server.js';
 
 interface GraphNode { id: string, label: string;
   type: 'route' | 'component' | 'store' | 'service' | 'api' | 'util';
@@ -26,7 +26,7 @@ interface GraphEdge { source: string, target:string;
 export const GET: RequestHandler = async ({ url, fetch }) => {
   try {
     // Try to fetch from FastAPI backend (Task 16.2 integration)
-    const backendUrl = (env?.FASTAPI_URL || env?.CODEBASE_INDEXER_URL) ?? 'http://localhost:8090';
+    const backendUrl = getCodebaseIndexUrl();
 
     try {
       // Try FastAPI admin routes first (Task 16.2)

@@ -141,7 +141,8 @@ export const createEnhancedLayoutLoad = () => {
 
                 // Check AI services status
                 try {
-                    const aiHealthResponse = await fetch('http://localhost:11434/api/tags', {
+                    const ollamaUrl = env?.OLLAMA_URL ?? env?.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+                    const aiHealthResponse = await fetch(`${ollamaUrl}/api/tags`, {
                         signal: AbortSignal.timeout(2000)
                     });
                     layoutData.systemStatus.aiServicesOnline = aiHealthResponse.ok;

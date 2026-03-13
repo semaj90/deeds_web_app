@@ -62,6 +62,38 @@ export function getNeo4jConfig() {
  };
 }
 
+export function getCodebaseIndexUrl(): string {
+ return env?.CODEBASE_INDEX_URL ?? `http://${isDocker ? 'codebase-index' : 'localhost'}:8090`;
+}
+
+export function getTrtLlmUrl(): string {
+ return env?.TRTLLM_URL ?? `http://${isDocker ? 'trtllm' : 'localhost'}:8099`;
+}
+
+export function getTritonUrl(): string {
+ return env?.TRITON_URL ?? `http://${isDocker ? 'triton' : 'localhost'}:8000`;
+}
+
+export function getOrchestratorUrl(): string {
+ return env?.ORCHESTRATOR_URL ?? `http://${isDocker ? 'orchestrator' : 'localhost'}:8102`;
+}
+
+export function getCudaServiceUrl(): string {
+ return env?.CUDA_SERVICE_URL ?? `http://${isDocker ? 'cuda-service' : 'localhost'}:8765`;
+}
+
+export function getRabbitMQManagementUrl(): string {
+ return env?.RABBITMQ_MGMT_URL ?? `http://${isDocker ? 'rabbitmq' : 'localhost'}:15672`;
+}
+
+export function getGoMicroserviceUrl(): string {
+ return env?.GO_MICROSERVICE_URL ?? `http://${isDocker ? 'go-microservice' : 'localhost'}:8080`;
+}
+
+export function getRagServiceUrl(): string {
+ return env?.RAG_SERVICE_URL ?? `http://${isDocker ? 'rag-service' : 'localhost'}:8103`;
+}
+
 export function isProduction(): boolean {
  return env.NODE_ENV === 'production';
 }

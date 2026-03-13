@@ -1,13 +1,14 @@
 import { getQdrantUrl } from '$lib/config/env.server.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 
 const QDRANT_URL = getQdrantUrl();
 
-interface ApplyPatchRequest {
-    clusterId: string;
-    dryRun?: boolean;
-}
+const applyPatchSchema = z.object({
+    clusterId: z.string().min(1).max(500),
+    dryRun: z.boolean().optional().default(true)
+});
 
 interface PatchResult { success: boolean, clusterId: string;
     filesPatched: number, errorsFixed: number;
@@ -19,12 +20,12 @@ interface PatchResult { success: boolean, clusterId: string;
 
 export const POST: RequestHandler = async ({ request, fetch }) => {
     try {
-        const body: ApplyPatchRequest = await request.json();
-        const { clusterId, dryRun = true } = body;
-
-        if (!clusterId) {
-            return json({ error: 'clusterId is required' }, { status: 400 });
+        const raw = await request.json();
+        const parsed = applyPatchSchema.safeParse(raw);
+        if (!parsed.success) {
+            return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
         }
+        const { clusterId, dryRun } = parsed.data;
 
         // Fetch cluster details from Qdrant
         const clusterResponse = await fetch(`${QDRANT_URL}/collections/phase90_error_clusters/points/scroll`, {

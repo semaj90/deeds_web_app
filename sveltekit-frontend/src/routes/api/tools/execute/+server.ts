@@ -9,21 +9,27 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { toolRegistry } from '$lib/server/tools/handlers/index.js';
+import { z } from 'zod';
+
+const executeToolSchema = z.object({
+  tool: z.string().min(1).max(200),
+  args: z.unknown().optional()
+});
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   try {
-    const body = await request.json() as { tool: string; args: unknown };
-
-    if (!body?.tool|| typeof body.tool !== 'string') {
+    const raw = await request.json();
+    const parsed = executeToolSchema.safeParse(raw);
+    if (!parsed.success) {
       return json({
         success: false,
-        error: 'Missing or invalid "tool" field',
+        error: parsed.error.issues[0]?.message ?? 'Invalid input',
         available_tools: toolRegistry.list()
       }, { status: 400 });
     }
 
     // Execute tool
-    const result = await toolRegistry.execute(body.tool, body.args);
+    const result = await toolRegistry.execute(parsed.data.tool, parsed.data.args);
 
     if (!result.success) {
       return json(result, { status: 400 });

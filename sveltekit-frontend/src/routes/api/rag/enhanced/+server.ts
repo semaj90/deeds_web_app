@@ -1,12 +1,23 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
+import { getRagServiceUrl } from '$lib/config/env.server.js';
+import { z } from 'zod';
 
-const RAG_SERVICE_URL = 'http://localhost:8103';
+const RAG_SERVICE_URL = getRagServiceUrl();
+
+const ragEnhancedSchema = z.object({
+	query: z.string().min(1).max(10000),
+	mode: z.enum(['query', 'process']).optional().default('query')
+});
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
-		const { query, mode = 'query' } = body;
+		const raw = await request.json();
+		const parsed = ragEnhancedSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		}
+		const { query, mode } = parsed.data;
 
 		// Determine endpoint based on mode
 		const endpoint = mode === 'process'
@@ -19,7 +30,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(body)
+			body: JSON.stringify(raw)
 		});
 
 		if (!response.ok) {

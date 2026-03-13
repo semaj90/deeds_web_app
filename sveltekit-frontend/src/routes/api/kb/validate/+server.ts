@@ -9,16 +9,18 @@ import { getQdrantUrl } from '$lib/config/env.server.js';
 import { couchdb } from '$lib/services/couchdb-client.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 
 const QDRANT_URL = getQdrantUrl();
 
-interface ValidateSourcesRequest {
-  query_id: string;
-  case_id?: string; selected_chunk_ids: string[];
-  rejected_chunk_ids?: string[];
-  user_notes?: string;
-  pin_to_canvas?: boolean;
-}
+const validateSourcesSchema = z.object({
+  query_id: z.string().min(1).max(500),
+  case_id: z.string().max(500).optional(),
+  selected_chunk_ids: z.array(z.string().max(500)).min(1).max(100),
+  rejected_chunk_ids: z.array(z.string().max(500)).max(100).optional(),
+  user_notes: z.string().max(5000).optional(),
+  pin_to_canvas: z.boolean().optional()
+});
 
 interface ValidatedSource { chunk_id: string, content: string;
   metadata: Record<string, unknown>;
@@ -27,14 +29,12 @@ interface ValidatedSource { chunk_id: string, content: string;
 
 export const POST: RequestHandler = async ({ request }) => {
   try {
-    const body = await request.json() as ValidateSourcesRequest;
-
-    if (!body?.query_id|| !body.selected_chunk_ids?.length) {
-      return json({
-        success: false,
-        error: 'query_id and selected_chunk_ids are required'
-      }, { status: 400 });
+    const raw = await request.json();
+    const parsed = validateSourcesSchema.safeParse(raw);
+    if (!parsed.success) {
+      return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
     }
+    const body = parsed.data;
 
     // Fetch selected chunks from Qdrant
     const selectedSources: ValidatedSource[] = [];

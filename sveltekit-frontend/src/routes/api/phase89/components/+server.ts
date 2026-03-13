@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { getQdrantUrl } from '$lib/config/env.server.js';
+import { getQdrantUrl, getCudaServiceUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 
 // Phase 89: Components API Endpoint
@@ -63,7 +63,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 
 		// Get CUDA status
 		let cudaEnabled = false;
-		const CUDA_SERVICE_URL = (await import('$env/dynamic/private')).env?.CUDA_SERVICE_URL ?? 'http://localhost:8765';
+		const CUDA_SERVICE_URL = getCudaServiceUrl();
 		try {
 			const gpuCheck = await fetch(`${CUDA_SERVICE_URL}/health`).catch(() => null);
 			if (gpuCheck?.ok) {

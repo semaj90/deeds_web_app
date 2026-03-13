@@ -10,6 +10,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import type { ApiResponse } from '$lib/types/api.js';
 import { requireAuth } from '$lib/server/auth-helpers.js';
+import { getRabbitMQUrl } from '$lib/config/env.server.js';
 
 interface WorkerTriggerRequest {
 	type: 'case_created' | 'evidence_uploaded' | 'document_added';
@@ -76,7 +77,7 @@ export const POST: RequestHandler = async (event) => {
 		try {
 			// Dynamic import to avoid server-side dependency issues
 			const amqp = (await import('amqplib')) as any;
-			const rabbitmqUrl = process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672';
+			const rabbitmqUrl = getRabbitMQUrl();
 
 			const connection = await amqp.connect(rabbitmqUrl);
 			const channel = await connection.createChannel();

@@ -3,17 +3,24 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { poiPhotos, personsOfInterest } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
+import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const faceMatchSchema = z.object({
+	photoId: z.string().max(500).optional(),
+	limit: z.number().int().min(1).max(50).optional().default(10)
+});
 
 /**
  * POST /api/persons-of-interest/[id]/face-match
  *
  * Search for similar POI faces using caption embeddings stored in Qdrant.
  * Falls back to DB-based cosine similarity if Qdrant is unavailable.
- *
- * Body (optional): { photoId?: string, limit?: number }
  */
-export const POST: RequestHandler = async ({ params }) => {
+export const POST: RequestHandler = async ({ params, request }) => {
 	const poiId = params.id;
+	const raw = await request.json().catch(() => ({}));
+	const parsed = faceMatchSchema.safeParse(raw);
 
 	try {
 		// Get photos with embeddings for this POI
@@ -66,7 +73,7 @@ export const POST: RequestHandler = async ({ params }) => {
 
 		try {
 			const { QdrantClient } = await import('@qdrant/js-client-rest');
-			const qdrant = new QdrantClient({ url: 'http://localhost:6333' });
+			const qdrant = new QdrantClient({ url: ENV.QDRANT_URL });
 
 			// Get current POI name for filtering
 			const [currentPoi] = await db

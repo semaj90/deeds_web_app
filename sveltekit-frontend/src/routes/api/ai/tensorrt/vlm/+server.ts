@@ -11,6 +11,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 import { ENV } from '$lib/server/env.server.js';
+import { getTrtLlmUrl, getOllamaUrl } from '$lib/config/env.server.js';
 import { z } from 'zod';
 
 const vlmJsonSchema = z.object({
@@ -20,7 +21,7 @@ const vlmJsonSchema = z.object({
 	temperature: z.number().min(0).max(2).optional()
 });
 
-const getTritonUrl = () => ENV.TENSORRT_URL ?? 'http://localhost:8099';
+const getTritonUrl = () => getTrtLlmUrl();
 
 interface VlmRequest {
 	prompt: string;
@@ -116,7 +117,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	if (!tritonReady) {
 		// Ollama VLM fallback: gemma3 supports multimodal (image + text)
 		try {
-			const ollamaUrl = ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+			const ollamaUrl = getOllamaUrl();
 			const ollamaRes = await fetch(`${ollamaUrl}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },

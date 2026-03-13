@@ -8,6 +8,7 @@ import type { RequestHandler } from './$types';
 import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 import { streamLLM, healthCheck as trtHealthCheck } from '$lib/server/trt-llm.js';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
 const trtStreamSchema = z.object({
 	prompt: z.string().min(1, 'prompt is required').max(50000),
@@ -28,7 +29,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	const trtAvailable = await trtHealthCheck();
 	if (!trtAvailable) {
 		// Fallback to Ollama SSE streaming
-		const ollamaUrl = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+		const ollamaUrl = ENV.OLLAMA_BASE_URL;
 		try {
 			const ollamaRes = await fetch(`${ollamaUrl}/api/generate`, {
 				method: 'POST',

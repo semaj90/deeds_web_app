@@ -15,21 +15,28 @@ import { ENV } from '$lib/server/env.server.js';
 import { redis } from '$lib/server/redis.js';
 import { buildCartridge, type RuneData, type CartridgeMetadata } from '$lib/server/cartridge/chr97-builder.js';
 import crypto from 'crypto';
+import { z } from 'zod';
+
+const cartridgeExportSchema = z.object({
+	caseId: z.string().min(1, 'caseId is required').max(500),
+	collections: z.array(z.string().max(200)).max(10).optional()
+});
 
 const CACHE_TTL = 1800; // 30 minutes
 
 export const POST: RequestHandler = async ({ request }) => {
-	let body: { caseId?: string; collections?: string[] };
+	let raw: unknown;
 	try {
-		body = await request.json();
+		raw = await request.json();
 	} catch {
 		return json({ error: 'Invalid JSON body' }, { status: 400 });
 	}
 
-	const { caseId, collections } = body;
-	if (!caseId) {
-		return json({ error: 'caseId is required' }, { status: 400 });
+	const parsed = cartridgeExportSchema.safeParse(raw);
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	}
+	const { caseId, collections } = parsed.data;
 
 	// Check Redis cache
 	const cacheKey = `cartridge:${caseId}`;

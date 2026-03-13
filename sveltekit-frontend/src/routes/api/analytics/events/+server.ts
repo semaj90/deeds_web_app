@@ -1,9 +1,10 @@
 /**
- * POST /api/analytics/events — Log an analytics event
+ * POST /api/analytics/events — Log analytics event(s)
+ *   Accepts single event or batch array: { batch: [...] }
  * GET  /api/analytics/events — Get recent events for a user
  */
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { logEvent, type AnalyticsEvent } from '$lib/server/analytics/event-logger.js';
+import { logEvent, logEventBatch, type AnalyticsEvent } from '$lib/server/analytics/event-logger.js';
 import { sql } from 'drizzle-orm';
 import { z } from 'zod';
 
@@ -14,17 +15,39 @@ const ANALYTICS_EVENT_TYPES = [
 	'patch_applied', 'document_indexed'
 ] as const;
 
-const analyticsEventSchema = z.object({
+const singleEventSchema = z.object({
 	userId: z.string().max(200).optional(),
 	sessionId: z.string().max(100).optional(),
 	eventType: z.enum(ANALYTICS_EVENT_TYPES),
 	payload: z.record(z.string(), z.unknown()).optional().default({})
 });
 
+const batchEventSchema = z.object({
+	batch: z.array(singleEventSchema).min(1).max(200)
+});
+
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const raw = await request.json();
-		const parsed = analyticsEventSchema.safeParse(raw);
+
+		// Batch mode: { batch: [...] }
+		if (Array.isArray(raw?.batch)) {
+			const parsed = batchEventSchema.safeParse(raw);
+			if (!parsed.success) {
+				return json({ ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid batch' }, { status: 400 });
+			}
+			const events: AnalyticsEvent[] = parsed.data.batch.map(e => ({
+				userId: e.userId ?? null,
+				sessionId: e.sessionId ?? null,
+				eventType: e.eventType,
+				payload: e.payload
+			}));
+			const logged = await logEventBatch(events);
+			return json({ ok: true, logged });
+		}
+
+		// Single event mode (backwards compatible)
+		const parsed = singleEventSchema.safeParse(raw);
 		if (!parsed.success) {
 			return json({ ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}

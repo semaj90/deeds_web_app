@@ -12,23 +12,28 @@
 
 import { checkHealth, getChannel, getCurrentConfig } from '$lib/server/rabbitmq/connection';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
+
+const publishSchema = z.object({
+	queue: z.string().min(1).max(200),
+	message: z.record(z.string(), z.unknown()),
+	options: z.object({
+		persistent: z.boolean().optional(),
+		priority: z.number().int().min(0).max(10).optional()
+	}).optional().default({})
+});
 
 /**
  * Publish message to RabbitMQ queue
  */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
-		const { queue, message, options = {} } = body;
-
-		// Validation
-		if (!queue || typeof queue !== 'string') {
-			return new Response('Missing or invalid queue name', { status: 400 });
+		const raw = await request.json();
+		const parsed = publishSchema.safeParse(raw);
+		if (!parsed.success) {
+			return new Response(JSON.stringify({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
 		}
-
-		if (!message || typeof message !== 'object') {
-			return new Response('Missing or invalid message payload', { status: 400 });
-		}
+		const { queue, message, options } = parsed.data;
 
 		// Get channel
 		const ch = await getChannel();

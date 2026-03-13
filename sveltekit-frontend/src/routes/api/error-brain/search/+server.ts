@@ -3,6 +3,7 @@ import { json, error } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
 const errorSearchSchema = z.object({
 	errorMessage: z.string().max(50000).optional().default(''),
@@ -95,7 +96,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	// Source 3: CouchDB ace_synthesis — cached AI analysis docs
 	try {
-		const couchUrl = process.env.COUCHDB_URL ?? 'http://localhost:5984';
+		const couchUrl = ENV.COUCHDB_URL;
 		const res = await fetch(`${couchUrl}/ace_synthesis/_all_docs?include_docs=true&limit=${Math.min(limit, 5)}`, {
 			signal: AbortSignal.timeout(3000),
 		});

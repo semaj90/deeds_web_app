@@ -7,6 +7,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { getRabbitMQManagementUrl } from '$lib/config/env.server.js';
 import { getGpuLeaseStatus } from '$lib/server/inference/gpu-arbiter.js';
 import { getRouterStatus } from '$lib/server/inference/inference-router.js';
 import { getSIMDStatus } from '$lib/server/minio-simd-client.js';
@@ -65,7 +66,7 @@ export const GET: RequestHandler = async () => {
 			.then(r => r.ok).catch(() => false),
 
 		// RabbitMQ (check management API)
-		fetch('http://localhost:15672/api/overview', {
+		fetch(`${getRabbitMQManagementUrl()}/api/overview`, {
 			headers: { Authorization: 'Basic ' + btoa('guest:guest') },
 			signal: AbortSignal.timeout(TIMEOUT)
 		}).then(r => r.ok).catch(() => false),

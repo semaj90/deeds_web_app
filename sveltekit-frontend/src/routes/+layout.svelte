@@ -5,6 +5,8 @@
     import CaseDocumentWriter from '$lib/components/legal-ai/CaseDocumentWriter.svelte';
     import YorhaSidebar from '$lib/components/layout/YorhaSidebar.svelte';
     import { notificationStore } from '$lib/stores/notifications.svelte';
+    import { analytics } from '$lib/stores/analytics.svelte';
+    import { page } from '$app/stores';
     import { toast } from 'svelte-sonner';
     import { browser } from '$app/environment';
 
@@ -71,13 +73,22 @@
         lastNotificationCount = notifications.length;
     });
 
+    // Track page views automatically
+    $effect(() => {
+        if (browser) {
+            analytics.trackPageView($page.url.pathname);
+        }
+    });
+
     onMount(() => {
         mounted = true;
+        analytics.init();
         // Dynamic import avoids SSR TDZ bug (svelte-sonner Toaster triggers "props is not defined")
         import('svelte-sonner').then((mod) => {
             Toaster = mod.Toaster;
         });
         return () => {
+            analytics.destroy();
             cleanupStores();
         };
     });

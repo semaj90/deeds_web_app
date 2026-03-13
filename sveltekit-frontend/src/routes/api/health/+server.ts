@@ -10,7 +10,7 @@ import { ollamaBreaker, qdrantBreaker, redisBreaker } from '$lib/server/circuit-
 import { getInFlightCount } from '$lib/server/embedding/embed.js';
 import { checkGrpcHealth } from '$lib/server/grpc/embedding-client.js';
 import { ENV } from '$lib/server/env.server.js';
-import { env } from '$env/dynamic/private';
+import { getTrtLlmUrl, getTritonUrl } from '$lib/config/env.server.js';
 
 const startedAt = Date.now();
 
@@ -35,8 +35,8 @@ async function probe(url: string, timeoutMs = 5000): Promise<CheckResult> {
 }
 
 export const GET = async () => {
-	const trtllmUrl = env?.TRTLLM_URL ?? 'http://localhost:8099';
-	const tritonUrl = env?.TRITON_URL ?? 'http://localhost:8000';
+	const trtllmUrl = getTrtLlmUrl();
+	const tritonUrl = getTritonUrl();
 	const langextractUrl = ENV.MINIO_SIMD_URL ?? 'http://127.0.0.1:8095';
 
 	// Run all probes in parallel

@@ -11,6 +11,7 @@
 
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { createClient } from 'redis';
+import { ENV } from '$lib/server/env.server.js';
 
 // Redis client type
 type RedisClient = ReturnType<typeof createClient>;
@@ -71,14 +72,14 @@ let redis: RedisClientExt | null = null;
 
 async function getQdrant(): Promise<QdrantClientExt> {
 	if (!qdrant) {
-		qdrant = new QdrantClient({ host: 'localhost', port: 6333 }) as QdrantClientExt;
+		qdrant = new QdrantClient({ url: ENV.QDRANT_URL }) as QdrantClientExt;
 	}
 	return qdrant;
 }
 
 async function getRedis(): Promise<RedisClientExt> {
 	if (!redis) {
-		const client = createClient({ url: 'redis://localhost:6379' });
+		const client = createClient({ url: ENV.REDIS_URL });
 		await client.connect();
 		redis = client as unknown as RedisClientExt;
 	}

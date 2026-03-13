@@ -1,16 +1,25 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const evidenceAnalyzeSchema = z.object({
+	evidenceId: z.string().max(500).optional(),
+	content: z.string().max(50000).optional(),
+	type: z.string().max(200).optional()
+}).refine(data => data.content || data.evidenceId, {
+	message: 'content or evidenceId required'
+});
 
 /** POST /api/v1/evidence/analyze — Proxy to /api/evidence/analysis + Ollama */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const body = await request.json();
-		const { evidenceId, content, type } = body;
-
-		if (!content && !evidenceId) {
-			return json({ error: 'content or evidenceId required' }, { status: 400 });
+		const raw = await request.json();
+		const parsed = evidenceAnalyzeSchema.safeParse(raw);
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
+		const { evidenceId, content, type } = parsed.data;
 
 		const textToAnalyze = content || '';
 

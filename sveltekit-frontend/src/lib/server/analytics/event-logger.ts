@@ -80,6 +80,32 @@ export async function logEvent(event: AnalyticsEvent): Promise<void> {
 }
 
 /**
+ * Log a batch of analytics events in a single INSERT.
+ * Non-blocking — errors are swallowed to never break the main flow.
+ */
+export async function logEventBatch(events: AnalyticsEvent[]): Promise<number> {
+	if (events.length === 0) return 0;
+	try {
+		// Build a single INSERT with multiple VALUES rows
+		const rows = events.map(e => ({
+			user_id: e.userId ?? null,
+			session_id: e.sessionId ?? null,
+			event_type: e.eventType,
+			payload: e.payload,
+		}));
+		await db.execute(sql`
+			INSERT INTO user_analytics_events (user_id, session_id, event_type, payload, created_at)
+			SELECT r.user_id, r.session_id, r.event_type, r.payload::jsonb, NOW()
+			FROM jsonb_to_recordset(${JSON.stringify(rows)}::jsonb)
+			AS r(user_id text, session_id text, event_type text, payload jsonb)
+		`);
+		return events.length;
+	} catch {
+		return 0;
+	}
+}
+
+/**
  * Log a chat/search query with automatic hash + preview truncation.
  */
 export function logQuery(opts: {

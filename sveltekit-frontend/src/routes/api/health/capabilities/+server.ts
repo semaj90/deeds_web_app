@@ -1,5 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { getTritonUrl, getQdrantUrl } from '$lib/config/env.server.js';
 import { getGpuLeaseStatus } from '$lib/server/inference/gpu-arbiter.js';
 import { getSIMDStatus } from '$lib/server/minio-simd-client.js';
 import { checkGrpcHealth } from '$lib/server/grpc/embedding-client.js';
@@ -41,7 +42,7 @@ export const GET: RequestHandler = async () => {
 	};
 
 	const ollamaUrl = ENV.OLLAMA_BASE_URL;
-	const qdrantUrl = ENV.QDRANT_URL ?? 'http://localhost:6333';
+	const qdrantUrl = getQdrantUrl();
 
 	// Parallel checks — all with 2s timeout
 	const [ollamaRes, qdrantHealth, postgresOk, redisOk, tensorrtOk, gpuLease, simdStatus, grpcStatus] = await Promise.all([
@@ -107,7 +108,7 @@ export const GET: RequestHandler = async () => {
 		})(),
 
 		// TensorRT-LLM: check /health endpoint
-		check(ENV.TENSORRT_URL ?? 'http://localhost:8000'),
+		check(getTritonUrl()),
 
 		// GPU lease status
 		getGpuLeaseStatus().catch(() => null),

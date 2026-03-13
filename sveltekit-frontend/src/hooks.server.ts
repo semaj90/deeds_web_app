@@ -30,6 +30,23 @@ import type { Handle, HandleServerError } from '@sveltejs/kit';
 const DEFAULT_REQUEST_TIMEOUT = 30_000; // 30s for normal routes
 const AI_REQUEST_TIMEOUT = 120_000;     // 120s for AI/inference routes
 
+// ── Request Body Size Limits (Sprint 4) ──────────────────────────────────
+const MAX_BODY_SIZE = 50 * 1024 * 1024;          // 50MB default
+const MAX_UPLOAD_SIZE = 100 * 1024 * 1024;        // 100MB for file uploads
+const UPLOAD_PATHS = ['/api/evidence/upload', '/api/vision/analyze', '/api/persons-of-interest'];
+
+// ── Global Write Rate Limiting (Sprint 4) ────────────────────────────────
+// In-memory sliding window for write endpoints — 60 writes/min per IP
+const writeRateLimits = new Map<string, { count: number; resetTime: number }>();
+const WRITE_RATE_WINDOW = 60_000;  // 1 minute
+const WRITE_RATE_MAX = 60;         // 60 writes per minute per IP
+setInterval(() => {
+	const now = Date.now();
+	for (const [key, entry] of writeRateLimits) {
+		if (now > entry.resetTime) writeRateLimits.delete(key);
+	}
+}, 60_000);
+
 // Start the analysis worker on server boot (idempotent)
 startWorker();
 
@@ -269,6 +286,49 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	}
 
+	// === REQUEST BODY SIZE LIMIT (Sprint 4) ===
+	if (event.url.pathname.startsWith('/api/') && event.request.method !== 'GET' && event.request.method !== 'HEAD') {
+		const contentLength = parseInt(event.request.headers.get('content-length') || '0', 10);
+		const isUpload = UPLOAD_PATHS.some(p => event.url.pathname.startsWith(p));
+		const limit = isUpload ? MAX_UPLOAD_SIZE : MAX_BODY_SIZE;
+
+		if (contentLength > limit) {
+			return new Response(
+				JSON.stringify({ error: 'Payload too large', maxBytes: limit }),
+				{ status: 413, headers: { 'Content-Type': 'application/json', 'X-Request-ID': requestId } }
+			);
+		}
+	}
+
+	// === GLOBAL WRITE RATE LIMITING (Sprint 4) ===
+	if (event.url.pathname.startsWith('/api/')
+		&& ['POST', 'PUT', 'PATCH', 'DELETE'].includes(event.request.method)
+		&& !event.url.pathname.startsWith('/api/health')) {
+		const forwarded = event.request.headers.get('x-forwarded-for');
+		const ip = forwarded ? forwarded.split(',')[0].trim() : event.getClientAddress?.() ?? 'unknown';
+		const now = Date.now();
+		const entry = writeRateLimits.get(ip);
+
+		if (!entry || now > entry.resetTime) {
+			writeRateLimits.set(ip, { count: 1, resetTime: now + WRITE_RATE_WINDOW });
+		} else if (entry.count >= WRITE_RATE_MAX) {
+			const retryAfter = Math.ceil((entry.resetTime - now) / 1000);
+			return new Response(
+				JSON.stringify({ error: 'Rate limit exceeded', retryAfter }),
+				{
+					status: 429,
+					headers: {
+						'Content-Type': 'application/json',
+						'Retry-After': String(retryAfter),
+						'X-Request-ID': requestId
+					}
+				}
+			);
+		} else {
+			entry.count++;
+		}
+	}
+
 	// === DEV BYPASS AUTH (only in development mode) ===
 	if (dev && process.env.DEV_BYPASS_AUTH === 'true') {
 		const devUserId = '00000000-0000-0000-0000-000000000001';
@@ -307,6 +367,44 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	}
 
+	// === CENTRALIZED AUTH GUARDS (Phase A2) ===
+	if (event.url.pathname.startsWith('/api/')) {
+		const path = event.url.pathname;
+
+		// Routes that require any authenticated user
+		const AUTH_REQUIRED = ['/api/cases', '/api/evidence', '/api/citations',
+			'/api/chat', '/api/ai/', '/api/reports', '/api/persons', '/api/recommendations',
+			'/api/graph', '/api/orchestrator', '/api/synthesis'];
+
+		// Routes that require admin role
+		const ADMIN_ONLY = ['/api/admin', '/api/codebase-index', '/api/phase89', '/api/error-brain'];
+
+		// Public routes (no auth needed)
+		const PUBLIC = ['/api/health', '/api/auth', '/api/metrics', '/api/system',
+			'/api/embed', '/api/rag', '/api/knowledge', '/api/ollama', '/api/infrastructure'];
+
+		const isPublic = PUBLIC.some(p => path.startsWith(p));
+
+		if (!isPublic) {
+			const needsAdmin = ADMIN_ONLY.some(p => path.startsWith(p));
+			const needsAuth = needsAdmin || AUTH_REQUIRED.some(p => path.startsWith(p));
+
+			if (needsAuth && !event.locals.user) {
+				return new Response(
+					JSON.stringify({ error: 'Authentication required' }),
+					{ status: 401, headers: { 'Content-Type': 'application/json', 'X-Request-ID': requestId } }
+				);
+			}
+
+			if (needsAdmin && event.locals.user?.role !== 'admin') {
+				return new Response(
+					JSON.stringify({ error: 'Admin access required' }),
+					{ status: 403, headers: { 'Content-Type': 'application/json', 'X-Request-ID': requestId } }
+				);
+			}
+		}
+	}
+
 	// === Resolve with request-level timeout (Sprint 1) ===
 	let response: Response;
 	const isStreamRoute = event.url.pathname.includes('/stream')
@@ -315,7 +413,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const isAIRoute = event.url.pathname.startsWith('/api/ai/')
 		|| event.url.pathname.startsWith('/api/nlp/')
 		|| event.url.pathname.startsWith('/api/rag/')
-		|| event.url.pathname.startsWith('/api/synthesis/');
+		|| event.url.pathname.startsWith('/api/synthesis/')
+		|| event.url.pathname.startsWith('/api/evidence/upload');
 
 	if (isStreamRoute) {
 		// No timeout for SSE / streaming routes
@@ -385,7 +484,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		response.headers.set('X-Frame-Options', 'DENY');
 		response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 		response.headers.set('Content-Security-Policy',
-			"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws: wss: http://localhost:*; font-src 'self' data:; worker-src 'self' blob:;"
+			"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws: wss:; font-src 'self' data:; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
 		);
 	}
 
@@ -419,7 +518,9 @@ export const handleError: HandleServerError = ({ error, event }) => {
 
 	return {
 		message: dev ? `${error instanceof Error ? error.message : String(error)}` : 'An unexpected error occurred',
-		code: errorId
+		code: errorId,
+		requestId: event.locals.requestId,
+		timestamp: new Date().toISOString()
 	};
 };
 
