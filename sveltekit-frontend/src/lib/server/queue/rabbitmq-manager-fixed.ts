@@ -16,6 +16,7 @@ interface AmqpChannel {
     publish(exchange: string, routingKey: string, content: Buffer, options?: Record<string, unknown>): boolean;
     ack(message: { content: Buffer; fields: Record<string, unknown>; properties: Record<string, unknown> }): void;
     nack(message: { content: Buffer; fields: Record<string, unknown>; properties: Record<string, unknown> }, allUpTo?: boolean, requeue?: boolean): void;
+    prefetch(count: number): Promise<void>;
     close(): Promise<void>;
     on(event: string, listener: (...args: unknown[]) => void): this;
 }
@@ -65,7 +66,8 @@ export class RabbitMQManager extends EventEmitter {
         vector_index: 'vector.index',
         chat_context: 'chat.context',
         analytics_track: 'analytics.track',
-        codebase_index: 'codebase.index'
+        codebase_index: 'codebase.index',
+        ace_evaluate: 'ace.evaluate'
     };
 
     constructor() {
@@ -161,6 +163,19 @@ export class RabbitMQManager extends EventEmitter {
             await this.channel.bindQueue(dlqName, this.exchanges.dlx, queue);
         }
 
+        // Migrate queues created without DLX (pre-existing mismatch fix).
+        // AMQP assertQueue fails with PRECONDITION_FAILED if queue exists with
+        // different arguments, and that closes the channel. Delete-then-recreate
+        // is safe for ephemeral queues like cache.invalidate.
+        const queuesToMigrate = ['cache.invalidate'];
+        for (const queue of queuesToMigrate) {
+            try {
+                await (this.channel as any).deleteQueue(queue, { ifEmpty: true });
+            } catch {
+                // Queue doesn't exist or has messages — will be created below
+            }
+        }
+
         // Declare main queues with dead-letter routing
         for (const [, queue] of Object.entries(this.queues)) {
             await this.channel.assertQueue(queue, {
@@ -181,6 +196,7 @@ export class RabbitMQManager extends EventEmitter {
         await this.bindQueue(this.queues.chat_context, this.exchanges.vector_updates, 'chat.context.*');
         await this.bindQueue(this.queues.analytics_track, this.exchanges.analytics, 'analytics.*');
         await this.bindQueue(this.queues.codebase_index, this.exchanges.codebase_indexing, 'codebase.index.*');
+        await this.bindQueue(this.queues.ace_evaluate, this.exchanges.document_processing, 'ace.evaluate');
 
         console.log('✅ Queue bindings configured (with DLQ)');
     }
@@ -194,15 +210,20 @@ export class RabbitMQManager extends EventEmitter {
     private async startConsumers(): Promise<void> {
         if (!this.channel) return;
 
-        await this.consume(this.queues.cache_invalidate, this.handleCacheInvalidation.bind(this));
-        await this.consume(this.queues.document_embed, this.handleDocumentEmbedding.bind(this));
-        await this.consume(this.queues.evidence_process, this.handleEvidenceProcess.bind(this));
-        await this.consume(this.queues.vector_index, this.handleVectorIndex.bind(this));
-        await this.consume(this.queues.chat_context, this.handleChatContext.bind(this));
-        await this.consume(this.queues.analytics_track, this.handleAnalyticsTrack.bind(this));
-        await this.consume(this.queues.codebase_index, this.handleCodebaseIndex.bind(this));
+        // Set prefetch per processing speed:
+        // Fast (Redis/analytics): 50, Medium (embedding/evidence): 10, Slow (LLM/ACE): 2
+        await this.channel.prefetch(10); // Default for most queues
 
-        console.log('👂 All 7 RabbitMQ consumers started');
+        await this.consume(this.queues.cache_invalidate, this.handleCacheInvalidation.bind(this));  // fast
+        await this.consume(this.queues.document_embed, this.handleDocumentEmbedding.bind(this));     // medium
+        await this.consume(this.queues.evidence_process, this.handleEvidenceProcess.bind(this));     // medium
+        await this.consume(this.queues.vector_index, this.handleVectorIndex.bind(this));             // medium
+        await this.consume(this.queues.chat_context, this.handleChatContext.bind(this));             // medium
+        await this.consume(this.queues.analytics_track, this.handleAnalyticsTrack.bind(this));       // fast
+        await this.consume(this.queues.codebase_index, this.handleCodebaseIndex.bind(this));         // slow
+        await this.consume(this.queues.ace_evaluate, this.handleACEEvaluate.bind(this));             // slow (LLM call)
+
+        console.log('👂 All 8 RabbitMQ consumers started (prefetch: 10)');
     }
 
     async consume(queue: string, handler: (msg: AmqpMessage) => Promise<void>) {
@@ -473,6 +494,39 @@ export class RabbitMQManager extends EventEmitter {
         }
     }
 
+    private async handleACEEvaluate(msg: AmqpMessage): Promise<void> {
+        if (!msg || !this.channel) return;
+        try {
+            const data = this.parseMessage(msg);
+            if (!data?.responseId || !data?.query || !data?.response) {
+                this.channel.nack(msg, false, false);
+                return;
+            }
+            console.log('🧠 ACE evaluation:', data.responseId);
+            const { evaluateResponse } = await import('../ace/self-prompt.js');
+            const evaluation = await evaluateResponse({
+                query: data.query,
+                response: data.response,
+                context: data.context ?? { ragChunks: [], kagNeighbors: [], persona: 'neutral' },
+                backend: 'ollama'
+            });
+            // Store result in Redis for async retrieval
+            if (this.redisService) {
+                const key = `ace:result:${data.responseId}`;
+                await this.redisService.set(key, JSON.stringify({
+                    responseId: data.responseId,
+                    ...evaluation,
+                    evaluatedAt: new Date().toISOString()
+                }), 'EX', 3600); // 1 hour TTL
+            }
+            console.log(`✅ ACE eval complete: ${data.responseId} (quality: ${evaluation.quality.toFixed(2)})`);
+            this.channel.ack(msg);
+        } catch (error) {
+            console.error('❌ ACE evaluate error:', this.formatError(error));
+            this.retryOrDLQ(msg, error);
+        }
+    }
+
     // --- Publishers ---
 
     async publishCacheInvalidation(data: any): Promise<void> {
@@ -516,6 +570,19 @@ export class RabbitMQManager extends EventEmitter {
     async publishEvidenceProcess(data: { evidenceId: string; text: string; caseId?: string; fileName?: string; metadata?: Record<string, unknown> }): Promise<void> {
         if (!this.isReady()) return;
         await this.publish(this.exchanges.document_processing, 'evidence.process', {
+            ...data,
+            enqueuedAt: new Date().toISOString()
+        });
+    }
+
+    async publishACEEvaluation(data: {
+        responseId: string;
+        query: string;
+        response: string;
+        context?: { ragChunks: unknown[]; kagNeighbors: unknown[]; persona: string };
+    }): Promise<void> {
+        if (!this.isReady()) return;
+        await this.publish(this.exchanges.document_processing, 'ace.evaluate', {
             ...data,
             enqueuedAt: new Date().toISOString()
         });

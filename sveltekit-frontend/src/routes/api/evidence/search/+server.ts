@@ -41,7 +41,12 @@ const evidenceSearchSchema = z.object({
 	limit: z.number().int().min(1).max(100).optional().default(10),
 	expandSections: z.boolean().optional().default(true),
 	jurisdiction: z.string().max(200).optional(),
-	useLegalPageRank: z.boolean().optional().default(false)
+	useLegalPageRank: z.boolean().optional().default(false),
+	sectionTypes: z.array(z.enum([
+		'facts', 'issues', 'reasoning', 'holding', 'citations',
+		'parties', 'motions', 'bibliography', 'procedural_history',
+		'sentencing', 'judgment'
+	])).max(11).optional()
 });
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
@@ -124,7 +129,7 @@ export async function POST({ request, locals }: RequestEvent) {
 		if (!parsed.success) {
 			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
-		const { query, caseId, limit, expandSections, jurisdiction, useLegalPageRank: useLPR } = parsed.data;
+		const { query, caseId, limit, expandSections, jurisdiction, useLegalPageRank: useLPR, sectionTypes } = parsed.data;
 
 		const start = performance.now();
 		const userId = (locals as any).user?.id ?? null;
@@ -141,7 +146,7 @@ export async function POST({ request, locals }: RequestEvent) {
 		const cacheKey = buildEvidenceSearchCacheKey({
 			userId,
 			query,
-			filters: { caseId, jurisdiction, expandSections },
+			filters: { caseId, jurisdiction, expandSections, sectionTypes },
 			limit,
 		});
 		const cacheOpts = { limit, metric: 'cosine' };
@@ -168,7 +173,7 @@ export async function POST({ request, locals }: RequestEvent) {
 		// 2. Dual search: Qdrant ANN (fast) + pgvector (authoritative), merge + deduplicate
 		const searchStart = performance.now();
 		const fetchLimit = Math.min(limit * 3, 50); // over-fetch for rerank headroom
-		const rawHits = await dualSearch(queryEmbedding, caseId, fetchLimit);
+		const rawHits = await dualSearch(queryEmbedding, caseId, fetchLimit, sectionTypes);
 		const searchMs = performance.now() - searchStart;
 
 		if (rawHits.length === 0) {
@@ -349,11 +354,12 @@ async function embedQuery(text: string): Promise<number[] | null> {
 async function dualSearch(
 	embedding: number[],
 	caseId: string | undefined,
-	limit: number
+	limit: number,
+	sectionTypes?: string[]
 ): Promise<SearchResult[]> {
 	const [pgResults, qdrantResults] = await Promise.all([
-		searchPgvector(embedding, caseId, limit),
-		searchQdrant(embedding, caseId, limit).catch((err) => {
+		searchPgvector(embedding, caseId, limit, sectionTypes),
+		searchQdrant(embedding, caseId, limit, sectionTypes).catch((err) => {
 			console.warn('[Evidence Search] Qdrant unavailable, using pgvector only:', err instanceof Error ? err.message : err);
 			return [] as SearchResult[];
 		}),
@@ -370,16 +376,27 @@ async function dualSearch(
 async function searchQdrant(
 	embedding: number[],
 	caseId: string | undefined,
-	limit: number
+	limit: number,
+	sectionTypes?: string[]
 ): Promise<SearchResult[]> {
-	const { results } = await qdrant.hybridSearch({
-		query: '',
-		queryEmbedding: embedding,
-		collection: 'evidence',
-		filters: caseId ? { case_id: caseId } : undefined,
-		limit,
-		scoreThreshold: 0.3,
-	});
+	// Use section-filtered search when sectionTypes provided
+	const { results } = sectionTypes?.length
+		? await qdrant.sectionFilteredSearch({
+			query: '',
+			queryEmbedding: embedding,
+			sectionTypes,
+			caseId,
+			limit,
+			scoreThreshold: 0.3,
+		})
+		: await qdrant.hybridSearch({
+			query: '',
+			queryEmbedding: embedding,
+			collection: 'evidence',
+			filters: caseId ? { case_id: caseId } : undefined,
+			limit,
+			scoreThreshold: 0.3,
+		});
 
 	return results.map((r: any) => ({
 		evidenceId: r.payload?.evidence_id ?? '',
@@ -394,6 +411,7 @@ async function searchQdrant(
 			tokenCount: r.payload?.token_count ?? 0,
 			extractionMethod: r.payload?.extraction_method ?? '',
 			jurisdiction: r.payload?.jurisdiction ?? '',
+			sectionType: r.payload?.section_type ?? null,
 		},
 	}));
 }
@@ -403,9 +421,15 @@ async function searchQdrant(
 async function searchPgvector(
 	embedding: number[],
 	caseId: string | undefined,
-	limit: number
+	limit: number,
+	sectionTypes?: string[]
 ): Promise<SearchResult[]> {
 	const vectorStr = `[${embedding.join(',')}]`;
+
+	// Build optional section-type filter (values are Zod-validated enums, safe for sql.raw)
+	const sectionFilter = sectionTypes?.length
+		? sql.raw(` AND ev.metadata->>'sectionType' IN (${sectionTypes.map(t => `'${t}'`).join(',')})`)
+		: sql.raw('');
 
 	const query = caseId
 		? sql`
@@ -413,7 +437,7 @@ async function searchPgvector(
 				1 - (ev.embedding <=> ${sql.raw(`'${vectorStr}'::vector`)}) AS score
 			FROM evidence_vectors ev
 			JOIN evidence e ON e.id = ev.evidence_id
-			WHERE e.case_id = ${caseId}
+			WHERE e.case_id = ${caseId}${sectionFilter}
 			ORDER BY ev.embedding <=> ${sql.raw(`'${vectorStr}'::vector`)}
 			LIMIT ${limit}
 		`
@@ -421,6 +445,7 @@ async function searchPgvector(
 			SELECT ev.evidence_id, ev.chunk_index, ev.content, ev.metadata,
 				1 - (ev.embedding <=> ${sql.raw(`'${vectorStr}'::vector`)}) AS score
 			FROM evidence_vectors ev
+			WHERE 1=1${sectionFilter}
 			ORDER BY ev.embedding <=> ${sql.raw(`'${vectorStr}'::vector`)}
 			LIMIT ${limit}
 		`;

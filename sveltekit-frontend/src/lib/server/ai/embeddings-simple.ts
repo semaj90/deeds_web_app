@@ -1,6 +1,7 @@
 // Lightweight embedding utilities with safe fallbacks and strict typing
 import { createHash } from 'crypto';
 import { ENV } from '$lib/server/env.server.js';
+import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 
 export interface CacheInterface {
     getCachedEmbedding: (key: string) => Promise<number[] | null>;
@@ -129,6 +130,7 @@ async function generateOpenAIEmbedding(text: string): Promise<number[]> {
 
 // Ollama single embedding
 async function generateOllamaEmbedding(text: string, model: string): Promise<number[]> {
+    return traceEmbedding(text, model, async () => {
     const url = ENV.OLLAMA_BASE_URL;
 
     const res = await fetch(`${url}/api/embeddings`, {
@@ -149,6 +151,7 @@ async function generateOllamaEmbedding(text: string, model: string): Promise<num
     if (Array.isArray(data?.data) && Array.isArray(data.data[0]?.embedding)) return data.data[0].embedding as number[];
 
     throw new Error(`Invalid Ollama embedding response for model ${model}`);
+    });
 }
 
 // CPU embedding using xenova transformers (optional)

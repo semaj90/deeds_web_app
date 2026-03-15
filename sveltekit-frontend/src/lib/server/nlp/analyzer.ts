@@ -11,6 +11,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { traceLLM } from '$lib/server/observability/langfuse.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const MODEL = 'gemma3-legal:latest';
@@ -87,32 +88,34 @@ export async function analyzeText(text: string): Promise<NLPAnalysis> {
 
 /** Call Ollama with JSON format mode and parse the response. */
 async function ollamaJSON<T>(prompt: string): Promise<T> {
-	const res = await fetch(`${OLLAMA_URL}/api/generate`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			model: MODEL,
-			prompt,
-			format: 'json',
-			stream: false,
-			options: { temperature: 0.1, num_predict: 512 }
-		}),
-		signal: AbortSignal.timeout(30_000)
+	return traceLLM('nlp-analyzer', { model: MODEL, prompt: prompt.slice(0, 500) }, async (gen) => {
+		const res = await fetch(`${OLLAMA_URL}/api/generate`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				model: MODEL,
+				prompt,
+				format: 'json',
+				stream: false,
+				options: { temperature: 0.1, num_predict: 512 }
+			}),
+			signal: AbortSignal.timeout(30_000)
+		});
+
+		if (!res.ok) {
+			throw new Error(`Ollama ${res.status}: ${await res.text()}`);
+		}
+
+		const data = await res.json();
+		const raw = data.response ?? '';
+		gen.end({ output: raw.slice(0, 500) });
+
+		try {
+			return JSON.parse(raw) as T;
+		} catch {
+			const match = raw.match(/\{[\s\S]*\}/);
+			if (match) return JSON.parse(match[0]) as T;
+			throw new Error('Failed to parse Ollama JSON response');
+		}
 	});
-
-	if (!res.ok) {
-		throw new Error(`Ollama ${res.status}: ${await res.text()}`);
-	}
-
-	const data = await res.json();
-	const raw = data.response ?? '';
-
-	try {
-		return JSON.parse(raw) as T;
-	} catch {
-		// Try to extract JSON from response if wrapped in markdown
-		const match = raw.match(/\{[\s\S]*\}/);
-		if (match) return JSON.parse(match[0]) as T;
-		throw new Error('Failed to parse Ollama JSON response');
-	}
 }

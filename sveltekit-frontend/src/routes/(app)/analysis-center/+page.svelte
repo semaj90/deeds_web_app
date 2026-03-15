@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { analytics } from '$lib/stores/analytics.svelte';
 	import type { PageData } from './$types';
 	import AISummaryReader from '$lib/components/legal/AISummaryReader.svelte';
 	import JudicialAnalysisAgent from '$lib/components/yorha/JudicialAnalysisAgent.svelte';
@@ -43,6 +44,7 @@
 
 	async function ingestWebUrl() {
 		if (!ingestUrl.trim()) return;
+		analytics.track('document_indexed', { url: ingestUrl.slice(0, 200), caseId: ingestCaseId });
 		ingestLoading = true;
 		ingestError = null;
 		ingestResult = null;

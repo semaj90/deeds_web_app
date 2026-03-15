@@ -10,8 +10,10 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { acquireGpuLease, releaseGpuLease, getGpuLeaseStatus } from './gpu-arbiter.js';
 import { inferLLM, healthCheck as trtHealthCheck } from '$lib/server/trt-llm.js';
+import { litellmChat } from '$lib/server/ollama.js';
 
 export interface InferenceRequest {
 	prompt: string;
@@ -24,7 +26,7 @@ export interface InferenceRequest {
 export interface InferenceResponse {
 	text: string;
 	model: string;
-	backend: 'tensorrt' | 'ollama';
+	backend: 'tensorrt' | 'litellm' | 'ollama';
 	usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
 	latencyMs: number;
 	error?: string;
@@ -46,7 +48,13 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
 		}
 	}
 
-	// Fall back to Ollama
+	// Try LiteLLM proxy (semantic caching via Redis) when enabled
+	if (ENV.LITELLM_ENABLED) {
+		const litellmResult = await tryLiteLLM(request, start);
+		if (litellmResult) return litellmResult;
+	}
+
+	// Fall back to direct Ollama
 	return ollamaInference(request, start);
 }
 
@@ -87,6 +95,34 @@ async function tryTensorRT(request: InferenceRequest): Promise<InferenceResponse
 	}
 }
 
+async function tryLiteLLM(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
+	const model = 'gemma3-legal';
+	const messages: Array<{ role: string; content: string }> = [];
+	if (request.systemPrompt) messages.push({ role: 'system', content: request.systemPrompt });
+	messages.push({ role: 'user', content: request.prompt });
+
+	try {
+		const text = await traceLLM('inference-router-litellm', { model, prompt: request.prompt.slice(0, 500) }, async (gen) => {
+			const content = await litellmChat(messages, model, {
+				temperature: request.temperature,
+				maxTokens: request.maxTokens,
+				timeoutMs: 120_000
+			});
+			gen.end({ output: content.slice(0, 1000) });
+			return content;
+		});
+
+		return {
+			text,
+			model: 'gemma3-legal-litellm',
+			backend: 'litellm',
+			latencyMs: Math.round(performance.now() - startTime)
+		};
+	} catch {
+		return null; // fall through to direct Ollama
+	}
+}
+
 async function ollamaInference(request: InferenceRequest, startTime: number): Promise<InferenceResponse> {
 	const model = 'gemma3-legal:latest';
 	const prompt = request.systemPrompt
@@ -94,43 +130,47 @@ async function ollamaInference(request: InferenceRequest, startTime: number): Pr
 		: request.prompt;
 
 	try {
-		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model,
-				prompt,
-				stream: false,
-				options: {
-					num_predict: request.maxTokens ?? 2048,
-					temperature: request.temperature ?? 0.7
-				}
-			}),
-			signal: AbortSignal.timeout(120_000)
-		});
+		return await traceLLM('inference-router-ollama', { model, prompt: prompt.slice(0, 500) }, async (gen) => {
+			const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					model,
+					prompt,
+					stream: false,
+					options: {
+						num_predict: request.maxTokens ?? 2048,
+						temperature: request.temperature ?? 0.7
+					}
+				}),
+				signal: AbortSignal.timeout(120_000)
+			});
 
-		if (!res.ok) {
+			if (!res.ok) {
+				gen.end({ output: `error:${res.status}`, level: 'WARNING' });
+				return {
+					text: '',
+					model,
+					backend: 'ollama' as const,
+					latencyMs: Math.round(performance.now() - startTime),
+					error: `Ollama error: ${res.status}`
+				};
+			}
+
+			const data = await res.json();
+			gen.end({ output: (data.response ?? '').slice(0, 1000), usage: { promptTokens: data.prompt_eval_count, completionTokens: data.eval_count } });
 			return {
-				text: '',
+				text: data.response ?? '',
 				model,
-				backend: 'ollama',
-				latencyMs: Math.round(performance.now() - startTime),
-				error: `Ollama error: ${res.status}`
+				backend: 'ollama' as const,
+				usage: {
+					prompt_tokens: data.prompt_eval_count ?? 0,
+					completion_tokens: data.eval_count ?? 0,
+					total_tokens: (data.prompt_eval_count ?? 0) + (data.eval_count ?? 0)
+				},
+				latencyMs: Math.round(performance.now() - startTime)
 			};
-		}
-
-		const data = await res.json();
-		return {
-			text: data.response ?? '',
-			model,
-			backend: 'ollama',
-			usage: {
-				prompt_tokens: data.prompt_eval_count ?? 0,
-				completion_tokens: data.eval_count ?? 0,
-				total_tokens: (data.prompt_eval_count ?? 0) + (data.eval_count ?? 0)
-			},
-			latencyMs: Math.round(performance.now() - startTime)
-		};
+		});
 	} catch (err) {
 		return {
 			text: '',
@@ -153,11 +193,12 @@ export async function getRouterStatus() {
 
 	return {
 		tensorrt: { available: trtOk, url: ENV.TENSORRT_URL },
+		litellm: { enabled: ENV.LITELLM_ENABLED, url: ENV.LITELLM_URL },
 		ollama: { url: ENV.OLLAMA_BASE_URL },
 		gpu: {
 			leaseHolder: lease?.backend ?? null,
 			leaseFree: !lease,
 		},
-		preferredBackend: trtOk && !lease ? 'tensorrt' : 'ollama'
+		preferredBackend: trtOk && !lease ? 'tensorrt' : ENV.LITELLM_ENABLED ? 'litellm' : 'ollama'
 	};
 }

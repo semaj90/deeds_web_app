@@ -1,4 +1,5 @@
 import { ENV } from '$lib/server/env.server.js';
+import { traceLLM } from '$lib/server/observability/langfuse.js';
 
 export type ExtractedPerson = {
  fullName: string;
@@ -63,21 +64,25 @@ NARRATIVE:
 ${ narrative }
 `;
 
- const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	model: 'gemma3-legal',
- prompt,
- stream: false,
- }),
+ const data = await traceLLM('gemma-intake', { model: 'gemma3-legal', prompt: narrative.slice(0, 500) }, async (gen) => {
+	const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			model: 'gemma3-legal',
+			prompt,
+			stream: false,
+		}),
+	});
+
+	if (!res.ok) {
+		throw new Error(`Gemma3 intake extraction failed: ${res.status} ${res.statusText}`);
+	}
+
+	const d = (await res.json()) as { response: string };
+	gen.end({ output: d.response.slice(0, 1000) });
+	return d;
  });
-
- if (!res.ok) {
- throw new Error(`Gemma3 intake extraction failed: ${res.status} ${res.statusText}`);
- }
-
- const data = (await res.json()) as { response: string };
 
  let parsed: IntakeExtractionResult;
  try {

@@ -8,6 +8,10 @@
 
 import { getKnowledgeSearcher } from '$lib/services/knowledge-search';
 import { getOllamaUrl } from '$lib/config/env.server.js';
+import { traceLLM } from '$lib/server/observability/langfuse.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
+import { qdrant } from '$lib/server/vector/qdrant-manager.js';
+import { embedText } from '$lib/server/embedding/embed.js';
 import type { RequestHandler } from './$types.js';
 import { z } from 'zod';
 
@@ -16,6 +20,11 @@ const knowledgeStreamSchema = z.object({
 	query: z.string().trim().min(1, 'Query is required').max(5000),
 	topK: z.number().int().min(1).max(100).optional().default(5),
 	llmProvider: z.enum(['ollama', 'gemini']).optional().default('ollama'),
+	sectionTypes: z.array(z.enum([
+		'facts', 'issues', 'reasoning', 'holding', 'citations',
+		'parties', 'motions', 'bibliography', 'procedural_history',
+		'sentencing', 'judgment'
+	])).max(11).optional(),
 });
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -27,7 +36,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				{ status: 400, headers: { 'Content-Type': 'application/json' } }
 			);
 		}
-		const { query, topK, llmProvider } = parsed.data;
+		const { query, topK, llmProvider, sectionTypes } = parsed.data;
 		const abortSignal = request.signal;
 
 		// Create SSE stream
@@ -55,8 +64,41 @@ export const POST: RequestHandler = async ({ request }) => {
 				abortSignal.addEventListener('abort', shared.cleanup, { once: true });
 
 				try {
+					// Set reconnection interval (3s) for auto-reconnect on disconnect
+					controller.enqueue(encoder.encode('retry: 3000\n\n'));
+
 					// Step 1: Send search started event
 					sendEvent('search_started', { query, timestamp: Date.now() });
+
+					// Pre-search: section-filtered evidence via Qdrant (when sectionTypes provided)
+					let sectionContext = '';
+					if (sectionTypes?.length) {
+						try {
+							const queryEmbedding = await embedText(query);
+							const sectionResults = await qdrant.sectionFilteredSearch({
+								query,
+								queryEmbedding: Array.from(queryEmbedding),
+								sectionTypes,
+								limit: 5,
+								scoreThreshold: 0.4,
+							});
+							if (sectionResults.results.length > 0) {
+								sectionContext = sectionResults.results
+									.map((r: any, i: number) => {
+										const label = r.payload?.section_type?.toUpperCase() ?? 'UNKNOWN';
+										const text = r.payload?.content_preview ?? r.payload?.content ?? '';
+										return `[SECTION ${i + 1} — ${label}] ${text.slice(0, 400)}`;
+									})
+									.join('\n\n');
+								sendEvent('section_search_results', {
+									count: sectionResults.results.length,
+									sectionTypes,
+								});
+							}
+						} catch {
+							// Section pre-search failed — non-fatal, proceed without
+						}
+					}
 
 					const searcher = getKnowledgeSearcher();
 					const results = await searcher.search(query, { topK, includeContent: true });
@@ -71,13 +113,17 @@ export const POST: RequestHandler = async ({ request }) => {
 						}))
 					});
 
-					// Build context from results
-					const context = results
+					// Build context from results (prepend section context if available)
+					const knowledgeContext = results
 						.slice(0, topK)
 						.map((r: any, idx: number) => `[${idx + 1}] ${r.title}: ${r?.summary || (r.content?.slice(0, 500) ?? 'No content')}`)
 						.join('\n\n');
 
-					const prompt = `Question: ${query}\n\nContext:\n${context}\n\nProvide a clear, comprehensive answer. Reference the source numbers [1], [2], etc. when citing information.`;
+					const fullContext = sectionContext
+						? `Section-Filtered Evidence:\n${sectionContext}\n\nKnowledge Base:\n${knowledgeContext}`
+						: knowledgeContext;
+
+					const prompt = `Question: ${query}\n\nContext:\n${fullContext}\n\nProvide a clear, comprehensive answer. Reference the source numbers [1], [2], etc. when citing information.`;
 
 					// Step 5: Stream LLM response
 					sendEvent('synthesis_started', { provider: llmProvider });
@@ -118,7 +164,8 @@ export const POST: RequestHandler = async ({ request }) => {
 				'Content-Type': 'text/event-stream',
 				'Cache-Control': 'no-cache',
 				'Connection': 'keep-alive',
-				'X-Accel-Buffering': 'no'
+				'X-Accel-Buffering': 'no',
+				'X-SSE-Retry': '3000'
 			}
 		});
 
@@ -143,19 +190,24 @@ async function streamOllamaResponse(
 	const OLLAMA_URL = getOllamaUrl();
 	const MODEL = process.env?.OLLAMA_MODEL ?? 'gemma3-legal:latest';
 
-	const response = await fetch(`${OLLAMA_URL}/api/generate`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			model: MODEL,
-			prompt,
-			stream: true,
-			options: { temperature: 0.3, num_predict: 2048 }
-		})
+	const response = await traceLLM('knowledge-stream', { model: MODEL, prompt: prompt.slice(0, 500) }, async (gen) => {
+		const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				model: MODEL,
+				prompt,
+				stream: true,
+				keep_alive: process.env?.OLLAMA_KEEP_ALIVE ?? '24h',
+				options: { temperature: 0.3, num_predict: 2048 }
+			})
+		});
+		gen.end({ output: 'streaming' });
+		return res;
 	});
 
-	if (!response?.ok || !response.body) {
-		throw new Error(`Ollama request failed: ${response.statusText}`);
+	if (!response?.ok || !response?.body) {
+		throw new Error(`Ollama request failed: ${(response as Response)?.statusText ?? 'unknown'}`);
 	}
 
 	const reader = response.body.getReader();

@@ -10,7 +10,7 @@
     import { toast } from 'svelte-sonner';
     import { browser } from '$app/environment';
 
-    let { children }: { children: Snippet } = $props();
+    let { children, data }: { children: Snippet; data: { user?: { id: string } | null } } = $props();
     let showDocumentWriter = $state(false);
     let mounted = $state(false);
     let Toaster: any = $state(null);
@@ -82,7 +82,7 @@
 
     onMount(() => {
         mounted = true;
-        analytics.init();
+        analytics.init(data?.user?.id);
         // Dynamic import avoids SSR TDZ bug (svelte-sonner Toaster triggers "props is not defined")
         import('svelte-sonner').then((mod) => {
             Toaster = mod.Toaster;

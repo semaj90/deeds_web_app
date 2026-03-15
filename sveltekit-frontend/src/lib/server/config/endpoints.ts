@@ -15,3 +15,11 @@ export function getQdrantEndpoint(): string {
 export function getRedisUrl(): string {
 	return ENV.REDIS_URL;
 }
+
+export function getLiteLLMEndpoint(): string {
+	return ENV.LITELLM_URL;
+}
+
+export function isLiteLLMEnabled(): boolean {
+	return ENV.LITELLM_ENABLED;
+}

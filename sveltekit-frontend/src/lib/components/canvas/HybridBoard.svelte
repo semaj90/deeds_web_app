@@ -1,18 +1,15 @@
 <script lang="ts">
-	// Migrated to $effect
-
 	// Type definitions
-	interface Vec2 { x: number, y: number;
-	}
+	interface Vec2 { x: number; y: number; }
+	interface BoardViewport { pan: Vec2; zoom: number; }
 
-	interface BoardViewport { pan: Vec2, zoom: number;
-	}
-
-	interface BoardNode { id: string, kind: 'note' | 'evidence' | 'document';
+	export interface BoardNode {
+		id: string;
+		kind: 'note' | 'evidence' | 'document';
 		x: number;
-	y: number;
+		y: number;
 		w: number;
-	h: number;
+		h: number;
 		title?: string;
 		body?: string;
 		evidenceId?: string;
@@ -21,98 +18,104 @@
 		thumbnailUrl?: string;
 	}
 
-	interface BoardEdge { id: string, fromId: string;
+	export interface BoardEdge {
+		id: string;
+		fromId: string;
 		toId: string;
-	style: 'solid' | 'dashed';
+		style: 'solid' | 'dashed';
 		label?: string;
+		connectionType?: string;
+		strength?: number;
 	}
 
-	interface BoardSnapshot { version: number, viewport: BoardViewport;
+	interface BoardSnapshot {
+		version: number;
+		viewport: BoardViewport;
 		nodes: BoardNode[];
-	edges: BoardEdge[];
+		edges: BoardEdge[];
 		updatedAt?: string;
 	}
 
-	// Props interface
+	// Relationship type color map
+	const EDGE_COLORS: Record<string, string> = {
+		corroborates: 'rgba(34, 197, 94, 0.7)',
+		supports: 'rgba(34, 197, 94, 0.7)',
+		contradicts: 'rgba(239, 68, 68, 0.7)',
+		refutes: 'rgba(239, 68, 68, 0.7)',
+		sequence: 'rgba(59, 130, 246, 0.7)',
+		timeline: 'rgba(59, 130, 246, 0.7)',
+		references: 'rgba(168, 85, 247, 0.6)',
+		related: 'rgba(255, 255, 255, 0.22)',
+		financial: 'rgba(245, 158, 11, 0.7)',
+		communication: 'rgba(236, 72, 153, 0.6)',
+		location: 'rgba(20, 184, 166, 0.6)',
+		person: 'rgba(249, 115, 22, 0.6)',
+	};
+
+	const EDGE_STYLES: Record<string, 'solid' | 'dashed'> = {
+		contradicts: 'dashed',
+		refutes: 'dashed',
+		references: 'dashed',
+	};
+
+	// Props
 	interface Props {
 		caseId: string;
 		initialSnapshot?: BoardSnapshot | null;
 		readonly?: boolean;
+		activeTool?: 'select' | 'evidence' | 'connection' | 'note';
+		snapToGrid?: boolean;
 		onDirtyChange?: ((dirty: boolean) => void) | null;
 		onCanvasClick?: ((world: Vec2) => void) | null;
 		onNodeSelect?: ((node: BoardNode | null) => void) | null;
+		onConnectionCreated?: ((fromId: string, toId: string) => void) | null;
+		onContextMenu?: ((node: BoardNode, screen: Vec2) => void) | null;
 	}
 
 	let {
 		caseId,
 		initialSnapshot = null,
 		readonly = false,
+		activeTool = 'select',
+		snapToGrid = false,
 		onDirtyChange = null,
 		onCanvasClick = null,
-		onNodeSelect = null
+		onNodeSelect = null,
+		onConnectionCreated = null,
+		onContextMenu = null,
 	}: Props = $props();
 
 	let rootEl = $state<HTMLDivElement | null>(null);
 	let canvasEl = $state<HTMLCanvasElement | null>(null);
 
-	// ===== State (Svelte 5 runes) =====
+	// State
 	const getInitialViewport = (): BoardViewport =>
-		initialSnapshot?.viewport ? { ...initialSnapshot.viewport } : { pan: { x: 0, y: 0 },
-	zoom: 1 };
-
+		initialSnapshot?.viewport ? { ...initialSnapshot.viewport } : { pan: { x: 0, y: 0 }, zoom: 1 };
 	const getInitialNodes = (): BoardNode[] =>
-		initialSnapshot?.nodes
-			? [...initialSnapshot.nodes]
-			: [
-					{
-						id: 'n1',
-						kind: 'note',
-						x: 80,
-						y: 80,
-						w: 260,
-						h: 140,
-						title: 'Witness Statement',
-						body: 'Witness claims they saw the suspect...'
-					},
-	{
-						id: 'n2',
-						kind: 'evidence',
-						x: 420,
-						y: 220,
-						w: 300,
-						h: 180,
-						title: 'Photo Evidence',
-						evidenceId: 'ev_123',
-						body: 'Surveillance footage frame 404'
-					}
-				];
-
+		initialSnapshot?.nodes ? [...initialSnapshot.nodes] : [];
 	const getInitialEdges = (): BoardEdge[] =>
-		initialSnapshot?.edges
-			? [...initialSnapshot.edges]
-			: [{
-	id: 'e1', fromId: 'n1', toId: 'n2', style: 'solid', label: 'corroborates' }];
+		initialSnapshot?.edges ? [...initialSnapshot.edges] : [];
 
 	let viewport = $state<BoardViewport>(getInitialViewport());
 	let nodes = $state<BoardNode[]>(getInitialNodes());
 	let edges = $state<BoardEdge[]>(getInitialEdges());
-
 	let selected = $state<Set<string>>(new Set());
 	let hoveredId = $state<string | null>(null);
-
 	let dirty = $state(false);
 
 	// Interaction modes
 	let spaceDown = $state(false);
 	let isPanning = $state(false);
 	let isDraggingNode = $state(false);
-
 	let dragStartScreen = $state<Vec2>({ x: 0, y: 0 });
 	let dragStartWorld = $state<Vec2>({ x: 0, y: 0 });
 	let panStart = $state<Vec2>({ x: 0, y: 0 });
-
 	let dragNodeIds = $state<string[]>([]);
 	let dragNodesStart = $state<Map<string, Vec2>>(new Map());
+
+	// Connection drawing state
+	let connectionSourceId = $state<string | null>(null);
+	let connectionPreviewEnd = $state<Vec2 | null>(null);
 
 	// Text editing overlay
 	let editing = $state<{ id: string; value: string; mode: 'title' | 'body' } | null>(null);
@@ -123,7 +126,7 @@
 	let ro: ResizeObserver | null = null;
 	let dpr = 1;
 
-	// Thumbnail image cache (keyed by URL)
+	// Thumbnail image cache
 	const imageCache = new Map<string, HTMLImageElement>();
 
 	function loadImage(url: string): HTMLImageElement | null {
@@ -139,30 +142,26 @@
 		return null;
 	}
 
-	// File type icon glyphs for canvas rendering
 	function fileTypeIcon(ft: string | undefined): string {
-		if (!ft) return '\u{1F4C4}'; // document
+		if (!ft) return '\u{1F4C4}';
 		const t = ft.toLowerCase();
-		if (t.startsWith('video') || t === 'mp4' || t === 'mov' || t === 'avi') return '\u{25B6}'; // play
-		if (t.startsWith('audio') || t === 'mp3' || t === 'wav' || t === 'ogg') return '\u{1F3B5}'; // music
-		if (t === 'pdf' || t === 'application/pdf') return '\u{1F4D1}'; // PDF
-		if (t.startsWith('image') || t === 'jpg' || t === 'png' || t === 'jpeg') return '\u{1F5BC}'; // image
-		return '\u{1F4C4}'; // document
+		if (t.startsWith('video') || t === 'mp4' || t === 'mov' || t === 'avi') return '\u{25B6}';
+		if (t.startsWith('audio') || t === 'mp3' || t === 'wav' || t === 'ogg') return '\u{1F3B5}';
+		if (t === 'pdf' || t === 'application/pdf') return '\u{1F4D1}';
+		if (t.startsWith('image') || t === 'jpg' || t === 'png' || t === 'jpeg') return '\u{1F5BC}';
+		return '\u{1F4C4}';
 	}
 
-	// ===== Coordinate transforms =====
+	// Coordinate transforms
 	function screenToWorld(p: Vec2): Vec2 {
 		return { x: p.x / viewport.zoom - viewport.pan.x, y: p.y / viewport.zoom - viewport.pan.y };
 	}
-
 	function worldToScreen(p: Vec2): Vec2 {
 		return { x: (p.x + viewport.pan.x) * viewport.zoom, y: (p.y + viewport.pan.y) * viewport.zoom };
 	}
-
 	function getNodeById(id: string) {
 		return nodes.find((n) => n.id === id) ?? null;
 	}
-
 	function hitTestNode(world: Vec2): string | null {
 		for (let i = nodes.length - 1; i >= 0; i--) {
 			const n = nodes[i];
@@ -172,13 +171,18 @@
 		}
 		return null;
 	}
-
 	function setDirty(v: boolean) {
 		dirty = v;
 		if (onDirtyChange) onDirtyChange(v);
 	}
 
-	// ===== Drawing =====
+	// Snap helper
+	const GRID_STEP = 20;
+	function snap(v: number): number {
+		return snapToGrid ? Math.round(v / GRID_STEP) * GRID_STEP : v;
+	}
+
+	// Drawing
 	function scheduleDraw() {
 		cancelAnimationFrame(raf);
 		raf = requestAnimationFrame(draw);
@@ -202,75 +206,104 @@
 		c.save();
 		c.lineWidth = 1 / viewport.zoom;
 		c.strokeStyle = 'rgba(255,255,255, 0.04)';
-
 		const topLeft = screenToWorld({ x: 0, y: 0 });
 		const bottomRight = screenToWorld({ x: width, y: height });
-
 		const startX = Math.floor(topLeft.x / step) * step;
 		const endX = Math.ceil(bottomRight.x / step) * step;
 		const startY = Math.floor(topLeft.y / step) * step;
 		const endY = Math.ceil(bottomRight.y / step) * step;
-
 		c.beginPath();
-		for (let x = startX; x <= endX; x += step) {
-			c.moveTo(x, startY);
-			c.lineTo(x, endY);
-		}
-		for (let y = startY; y <= endY; y += step) {
-			c.moveTo(startX, y);
-			c.lineTo(endX, y);
-		}
+		for (let x = startX; x <= endX; x += step) { c.moveTo(x, startY); c.lineTo(x, endY); }
+		for (let y = startY; y <= endY; y += step) { c.moveTo(startX, y); c.lineTo(endX, y); }
 		c.stroke();
 		c.restore();
 	}
 
+	function drawArrowhead(c: CanvasRenderingContext2D, fromX: number, fromY: number, toX: number, toY: number, inv: number) {
+		const angle = Math.atan2(toY - fromY, toX - fromX);
+		const arrowLen = 10 * inv;
+		c.beginPath();
+		c.moveTo(toX, toY);
+		c.lineTo(toX - arrowLen * Math.cos(angle - 0.3), toY - arrowLen * Math.sin(angle - 0.3));
+		c.moveTo(toX, toY);
+		c.lineTo(toX - arrowLen * Math.cos(angle + 0.3), toY - arrowLen * Math.sin(angle + 0.3));
+		c.stroke();
+	}
+
 	function draw() {
 		if (!ctx || !canvasEl) return;
-
 		resizeCanvasToDisplaySize();
-
 		const w = canvasEl.clientWidth;
 		const h = canvasEl.clientHeight;
-
 		ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 		ctx.clearRect(0, 0, w, h);
-
 		ctx.fillStyle = 'rgba(0,0,0,0)';
 		ctx.fillRect(0, 0, w, h);
-
 		ctx.save();
 		ctx.scale(viewport.zoom, viewport.zoom);
 		ctx.translate(viewport.pan.x, viewport.pan.y);
-
 		drawGrid(ctx, w, h);
 
-		// Edges
+		const inv = 1 / viewport.zoom;
+
+		// Edges with relationship type colors + strength thickness
 		for (const e of edges) {
 			const a = getNodeById(e.fromId);
 			const b = getNodeById(e.toId);
 			if (!a || !b) continue;
+			const ax = a.x + a.w / 2, ay = a.y + a.h / 2;
+			const bx = b.x + b.w / 2, by = b.y + b.h / 2;
 
-			const ax = a.x + a.w / 2;
-			const ay = a.y + a.h / 2;
-			const bx = b.x + b.w / 2;
-			const by = b.y + b.h / 2;
+			const connType = e.connectionType || e.label || 'related';
+			const color = EDGE_COLORS[connType.toLowerCase()] || EDGE_COLORS.related;
+			const edgeStyle = EDGE_STYLES[connType.toLowerCase()] || e.style || 'solid';
+			const strength = e.strength ?? 1.0;
+			const lineWidth = Math.max(1.5, 2 + strength * 3) * inv;
 
 			ctx.beginPath();
 			ctx.moveTo(ax, ay);
 			ctx.lineTo(bx, by);
-			ctx.strokeStyle = 'rgba(255,255,255, 0.22)';
-			ctx.lineWidth = 2 / viewport.zoom;
-			if (e.style === 'dashed') ctx.setLineDash([8 / viewport.zoom, 6 / viewport.zoom]);
+			ctx.strokeStyle = color;
+			ctx.lineWidth = lineWidth;
+			if (edgeStyle === 'dashed') ctx.setLineDash([8 * inv, 6 * inv]);
 			else ctx.setLineDash([]);
 			ctx.stroke();
 
-			if (e.label) {
+			// Arrowhead
+			drawArrowhead(ctx, ax, ay, bx, by, inv);
+
+			// Label
+			if (e.label || e.connectionType) {
 				ctx.setLineDash([]);
-				ctx.fillStyle = 'rgba(255,255,255, 0.7)';
-				ctx.font = `${14 / viewport.zoom}px system-ui`;
-				const mx = (ax + bx) / 2;
-				const my = (ay + by) / 2;
-				ctx.fillText(e.label, mx + 6 / viewport.zoom, my - 6 / viewport.zoom);
+				ctx.fillStyle = color;
+				ctx.font = `bold ${12 * inv}px system-ui`;
+				const mx = (ax + bx) / 2, my = (ay + by) / 2;
+				const displayLabel = (e.label || e.connectionType || '').toUpperCase();
+				ctx.fillText(displayLabel, mx + 6 * inv, my - 8 * inv);
+
+				// Strength indicator
+				if (strength < 1.0) {
+					ctx.font = `${10 * inv}px system-ui`;
+					ctx.fillStyle = 'rgba(255,255,255,0.4)';
+					ctx.fillText(`${Math.round(strength * 100)}%`, mx + 6 * inv, my + 6 * inv);
+				}
+			}
+		}
+
+		// Connection preview line (while drawing)
+		if (connectionSourceId && connectionPreviewEnd) {
+			const src = getNodeById(connectionSourceId);
+			if (src) {
+				const sx = src.x + src.w / 2, sy = src.y + src.h / 2;
+				ctx.beginPath();
+				ctx.moveTo(sx, sy);
+				ctx.lineTo(connectionPreviewEnd.x, connectionPreviewEnd.y);
+				ctx.strokeStyle = 'rgba(59, 130, 246, 0.6)';
+				ctx.lineWidth = 2 * inv;
+				ctx.setLineDash([6 * inv, 4 * inv]);
+				ctx.stroke();
+				ctx.setLineDash([]);
+				drawArrowhead(ctx, sx, sy, connectionPreviewEnd.x, connectionPreviewEnd.y, inv);
 			}
 		}
 
@@ -278,15 +311,12 @@
 		for (const n of nodes) {
 			const isSelected = selected.has(n.id);
 			const isHovered = hoveredId === n.id;
-			const inv = 1 / viewport.zoom;
+			const isConnectionSource = connectionSourceId === n.id;
 
-			// Background fill (subtle)
 			ctx.beginPath();
-			if (typeof ctx.roundRect === 'function') {
-				ctx.roundRect(n.x, n.y, n.w, n.h, 12 * inv);
-			} else {
-				ctx.rect(n.x, n.y, n.w, n.h);
-			}
+			if (typeof ctx.roundRect === 'function') ctx.roundRect(n.x, n.y, n.w, n.h, 12 * inv);
+			else ctx.rect(n.x, n.y, n.w, n.h);
+
 			ctx.fillStyle = n.kind === 'evidence'
 				? 'rgba(59, 130, 246, 0.06)'
 				: n.kind === 'document'
@@ -294,56 +324,60 @@
 					: 'rgba(255, 255, 255, 0.04)';
 			ctx.fill();
 
-			// Border
-			ctx.strokeStyle = isSelected
-				? 'rgba(255,255,255, 0.45)'
-				: isHovered
-					? 'rgba(255,255,255, 0.25)'
-					: 'rgba(255,255,255, 0.14)';
-			ctx.lineWidth = 2 * inv;
+			// Border (highlight connection source)
+			ctx.strokeStyle = isConnectionSource
+				? 'rgba(59, 130, 246, 0.8)'
+				: isSelected
+					? 'rgba(255,255,255, 0.45)'
+					: isHovered
+						? 'rgba(255,255,255, 0.25)'
+						: 'rgba(255,255,255, 0.14)';
+			ctx.lineWidth = (isConnectionSource ? 3 : 2) * inv;
+			ctx.setLineDash([]);
 			ctx.stroke();
 
-			// Thumbnail rendering for evidence nodes
+			// Kind badge (top-left)
+			const badgeLabel = n.kind === 'evidence' ? 'EV' : n.kind === 'document' ? 'DOC' : 'NOTE';
+			const badgeColor = n.kind === 'evidence' ? 'rgba(59,130,246,0.6)' : n.kind === 'document' ? 'rgba(16,185,129,0.6)' : 'rgba(168,85,247,0.5)';
+			ctx.fillStyle = badgeColor;
+			ctx.font = `bold ${9 * inv}px system-ui`;
+			ctx.fillText(badgeLabel, n.x + 10 * inv, n.y + 16 * inv);
+
+			// Thumbnail
 			if (n.kind === 'evidence' && n.thumbnailUrl) {
 				const img = loadImage(n.thumbnailUrl);
 				if (img) {
-					const thumbH = n.h * 0.5;
-					const thumbW = n.w - 20 * inv;
-					const thumbX = n.x + 10 * inv;
-					const thumbY = n.y + n.h - thumbH - 8 * inv;
+					const thumbH = n.h * 0.5, thumbW = n.w - 20 * inv;
+					const thumbX = n.x + 10 * inv, thumbY = n.y + n.h - thumbH - 8 * inv;
 					ctx.save();
 					ctx.beginPath();
-					if (typeof ctx.roundRect === 'function') {
-						ctx.roundRect(thumbX, thumbY, thumbW, thumbH, 6 * inv);
-					} else {
-						ctx.rect(thumbX, thumbY, thumbW, thumbH);
-					}
+					if (typeof ctx.roundRect === 'function') ctx.roundRect(thumbX, thumbY, thumbW, thumbH, 6 * inv);
+					else ctx.rect(thumbX, thumbY, thumbW, thumbH);
 					ctx.clip();
 					ctx.drawImage(img, thumbX, thumbY, thumbW, thumbH);
 					ctx.restore();
 				}
 			}
 
-			// File type badge (top-right corner)
+			// File type badge (top-right)
 			if (n.kind === 'evidence' && n.fileType) {
-				const icon = fileTypeIcon(n.fileType);
 				ctx.font = `${18 * inv}px system-ui`;
 				ctx.fillStyle = 'rgba(255,255,255, 0.7)';
-				ctx.fillText(icon, n.x + n.w - 28 * inv, n.y + 24 * inv);
+				ctx.fillText(fileTypeIcon(n.fileType), n.x + n.w - 28 * inv, n.y + 24 * inv);
 			}
 
 			if (n.title) {
 				ctx.fillStyle = 'rgba(255,255,255, 0.85)';
 				ctx.font = `bold ${15 * inv}px system-ui`;
 				const maxTitleW = n.w - 40 * inv;
-				const titleText = n.title.length > 30 ? n.title.slice(0, 30) + '…' : n.title;
+				const titleText = n.title.length > 30 ? n.title.slice(0, 30) + '\u2026' : n.title;
 				ctx.fillText(titleText, n.x + 14 * inv, n.y + 28 * inv, maxTitleW);
 			}
 
 			if (n.body) {
 				ctx.fillStyle = 'rgba(255,255,255, 0.55)';
 				ctx.font = `${13 * inv}px system-ui`;
-				const preview = n.body.length > 90 ? n.body.slice(0, 90) + '…' : n.body;
+				const preview = n.body.length > 90 ? n.body.slice(0, 90) + '\u2026' : n.body;
 				ctx.fillText(preview, n.x + 14 * inv, n.y + 52 * inv);
 			}
 		}
@@ -351,41 +385,20 @@
 		ctx.restore();
 	}
 
-	$effect(() => {
-		viewport;
-		nodes;
-		edges;
-		selected;
-		hoveredId;
-		scheduleDraw();
-	});
+	$effect(() => { viewport; nodes; edges; selected; hoveredId; connectionSourceId; connectionPreviewEnd; scheduleDraw(); });
+	$effect(() => { nodes; edges; viewport; if (!readonly) setDirty(true); });
 
-	$effect(() => {
-		nodes;
-		edges;
-		viewport;
-		if (!readonly) setDirty(true);
-	});
-
-	function selectedBounds(): { x: number, y: number;
-	w: number; h: number } | null {
+	function selectedBounds(): { x: number; y: number; w: number; h: number } | null {
 		const ids = [...selected];
 		if (ids.length === 0) return null;
-
-		let minX = Infinity,
-			minY = Infinity,
-			maxX = -Infinity,
-			maxY = -Infinity;
+		let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
 		for (const id of ids) {
 			const n = getNodeById(id);
 			if (!n) continue;
-			minX = Math.min(minX, n.x);
-			minY = Math.min(minY, n.y);
-			maxX = Math.max(maxX, n.x + n.w);
-			maxY = Math.max(maxY, n.y + n.h);
+			minX = Math.min(minX, n.x); minY = Math.min(minY, n.y);
+			maxX = Math.max(maxX, n.x + n.w); maxY = Math.max(maxY, n.y + n.h);
 		}
 		if (!isFinite(minX)) return null;
-
 		const tl = worldToScreen({ x: minX, y: minY });
 		const br = worldToScreen({ x: maxX, y: maxY });
 		return { x: tl.x, y: tl.y, w: br.x - tl.x, h: br.y - tl.y };
@@ -399,20 +412,29 @@
 		return { x: tl.x, y: tl.y, w: br.x - tl.x, h: br.y - tl.y };
 	}
 
-	// ===== Input handlers =====
-	function getLocalScreen(e: PointerEvent | WheelEvent): Vec2 {
+	// Cursor derivation
+	let cursorStyle = $derived.by(() => {
+		if (isPanning || spaceDown) return 'grab';
+		if (activeTool === 'connection') return connectionSourceId ? 'crosshair' : 'cell';
+		if (activeTool === 'note') return 'cell';
+		if (activeTool === 'evidence') return 'copy';
+		if (hoveredId) return 'pointer';
+		return 'default';
+	});
+
+	// Input handlers
+	function getLocalScreen(e: PointerEvent | WheelEvent | MouseEvent): Vec2 {
 		const rect = canvasEl!.getBoundingClientRect();
 		return { x: e.clientX - rect.left, y: e.clientY - rect.top };
 	}
 
 	function onPointerDown(e: PointerEvent) {
 		if (readonly || !canvasEl) return;
-
 		canvasEl.setPointerCapture(e.pointerId);
-
 		const screen = getLocalScreen(e);
 		const world = screenToWorld(screen);
 
+		// Pan with space/middle/right
 		if (spaceDown || e.button === 1 || e.button === 2) {
 			isPanning = true;
 			dragStartScreen = screen;
@@ -422,27 +444,41 @@
 
 		const hitId = hitTestNode(world);
 
+		// Connection tool
+		if (activeTool === 'connection') {
+			if (hitId) {
+				if (!connectionSourceId) {
+					connectionSourceId = hitId;
+					connectionPreviewEnd = world;
+				} else if (hitId !== connectionSourceId) {
+					// Complete connection
+					onConnectionCreated?.(connectionSourceId, hitId);
+					connectionSourceId = null;
+					connectionPreviewEnd = null;
+				}
+			} else {
+				// Cancel connection
+				connectionSourceId = null;
+				connectionPreviewEnd = null;
+			}
+			return;
+		}
+
 		if (hitId) {
 			if (e.shiftKey) {
 				const next = new Set(selected);
-				if (next.has(hitId)) next.delete(hitId);
-				else next.add(hitId);
+				if (next.has(hitId)) next.delete(hitId); else next.add(hitId);
 				selected = next;
 			} else {
 				if (!selected.has(hitId)) selected = new Set([hitId]);
 			}
-
 			isDraggingNode = true;
 			dragStartWorld = world;
-
 			dragNodeIds = [...selected];
-			dragNodesStart = new Map(
-				dragNodeIds.map((id) => {
-					const n = getNodeById(id)!;
-					return [id, { x: n.x, y: n.y }];
-				})
-			);
-				// Notify parent of node selection
+			dragNodesStart = new Map(dragNodeIds.map((id) => {
+				const n = getNodeById(id)!;
+				return [id, { x: n.x, y: n.y }];
+			}));
 			onNodeSelect?.(getNodeById(hitId));
 		} else {
 			if (!e.shiftKey) selected = new Set();
@@ -453,32 +489,33 @@
 
 	function onPointerMove(e: PointerEvent) {
 		if (!canvasEl) return;
-
 		const screen = getLocalScreen(e);
 		const world = screenToWorld(screen);
 
+		// Update connection preview
+		if (activeTool === 'connection' && connectionSourceId) {
+			connectionPreviewEnd = world;
+			return;
+		}
+
 		if (!isPanning && !isDraggingNode) {
-			const hit = hitTestNode(world);
-			hoveredId = hit;
+			hoveredId = hitTestNode(world);
 		}
 
 		if (isPanning) {
 			const dx = (screen.x - dragStartScreen.x) / viewport.zoom;
 			const dy = (screen.y - dragStartScreen.y) / viewport.zoom;
-			viewport = { ...viewport, pan: {
-	x: panStart.x + dx, y: panStart.y + dy } };
+			viewport = { ...viewport, pan: { x: panStart.x + dx, y: panStart.y + dy } };
 			return;
 		}
 
 		if (isDraggingNode && dragNodeIds.length > 0) {
 			const dx = world.x - dragStartWorld.x;
 			const dy = world.y - dragStartWorld.y;
-
 			nodes = nodes.map((n) => {
-				if (!dragNodesStart.has(n.id)) return n;
-				if (n.locked) return n;
+				if (!dragNodesStart.has(n.id) || n.locked) return n;
 				const start = dragNodesStart.get(n.id)!;
-				return { ...n, x: start.x + dx, y: start.y + dy };
+				return { ...n, x: snap(start.x + dx), y: snap(start.y + dy) };
 			});
 		}
 	}
@@ -494,33 +531,39 @@
 	function onWheel(e: WheelEvent) {
 		if (readonly || !canvasEl) return;
 		e.preventDefault();
-
 		const screen = getLocalScreen(e);
 		const before = screenToWorld(screen);
-
 		const factor = e.deltaY < 0 ? 1.1 : 0.9;
 		const nextZoom = Math.min(4, Math.max(0.1, viewport.zoom * factor));
 		viewport.zoom = nextZoom;
-
-		const newPanX = screen.x / nextZoom - before.x;
-		const newPanY = screen.y / nextZoom - before.y;
-
-		viewport.pan = { x: newPanX, y: newPanY };
+		viewport.pan = { x: screen.x / nextZoom - before.x, y: screen.y / nextZoom - before.y };
 	}
 
 	function onDblClick(e: MouseEvent) {
 		if (readonly || !canvasEl) return;
-		const rect = canvasEl.getBoundingClientRect();
-		const screen = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+		const screen = getLocalScreen(e);
 		const world = screenToWorld(screen);
 		const hitId = hitTestNode(world);
 		if (!hitId) return;
-
 		const n = getNodeById(hitId);
 		if (!n) return;
-
 		selected = new Set([hitId]);
 		editing = { id: hitId, value: n.body ?? '', mode: 'body' };
+	}
+
+	function handleContextMenu(e: MouseEvent) {
+		if (readonly || !canvasEl) return;
+		e.preventDefault();
+		const screen = getLocalScreen(e);
+		const world = screenToWorld(screen);
+		const hitId = hitTestNode(world);
+		if (hitId) {
+			const node = getNodeById(hitId);
+			if (node) {
+				selected = new Set([hitId]);
+				onContextMenu?.(node, screen);
+			}
+		}
 	}
 
 	function commitEditing() {
@@ -530,196 +573,136 @@
 		editing = null;
 	}
 
-	function cancelEditing() {
-		editing = null;
-	}
+	function cancelEditing() { editing = null; }
 
-	// ===== External API =====
+	// External API
 	export function serialize(): BoardSnapshot {
-		return {
-			version: initialSnapshot?.version ?? 1,
-			viewport,
-			nodes,
-			edges,
-			updatedAt: new Date().toISOString()
-		};
+		return { version: initialSnapshot?.version ?? 1, viewport, nodes, edges, updatedAt: new Date().toISOString() };
 	}
 
-	// Add sticky note to canvas at specific position
 	export function addNote(x: number, y: number, title?: string, body?: string): string {
 		const nodeId = `note_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-		const newNode: BoardNode = {
-			id: nodeId,
-			kind: 'note',
-			x,
-			y,
-			w: 240,
-			h: 140,
-			title: title || 'New Note',
-			body: body || ''
-		};
-		nodes.push(newNode);
-		setDirty(true);
-		scheduleDraw();
+		nodes.push({ id: nodeId, kind: 'note', x: snap(x), y: snap(y), w: 240, h: 140, title: title || 'New Note', body: body || '' });
+		setDirty(true); scheduleDraw();
 		return nodeId;
 	}
 
-	// Update a node's body text
 	export function updateNodeBody(nodeId: string, body: string) {
 		nodes = nodes.map(n => n.id === nodeId ? { ...n, body } : n);
 		setDirty(true);
 	}
 
-	// Update a node's title
 	export function updateNodeTitle(nodeId: string, title: string) {
 		nodes = nodes.map(n => n.id === nodeId ? { ...n, title } : n);
 		setDirty(true);
 	}
 
-	// Add evidence item to canvas at specific position
-	export function addEvidenceNode(evidenceId: string, title: string, x: number, y: number) {
+	export function addEvidenceNode(evidenceId: string, title: string, x: number, y: number, fileType?: string) {
 		const nodeId = `ev_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-		const newNode: BoardNode = {
-			id: nodeId,
-			kind: 'evidence',
-			x,
-			y,
-			w: 280,
-			h: 160,
-			title,
-			evidenceId,
-			body: ''
-		};
-		nodes.push(newNode);
-		dirty = true;
-		scheduleDraw();
+		nodes.push({ id: nodeId, kind: 'evidence', x: snap(x), y: snap(y), w: 280, h: 160, title, evidenceId, fileType, body: '' });
+		setDirty(true); scheduleDraw();
 		return nodeId;
 	}
 
-	// Update position of existing node
 	export function updateNodePosition(nodeId: string, x: number, y: number) {
 		const node = nodes.find(n => n.id === nodeId || n.evidenceId === nodeId);
-		if (node) {
-			node.x = x;
-			node.y = y;
-			dirty = true;
-			scheduleDraw();
-		}
+		if (node) { node.x = snap(x); node.y = snap(y); setDirty(true); scheduleDraw(); }
 	}
 
-	// Clear all nodes
-	export function clearNodes() {
-		nodes = [];
-		edges = [];
-		dirty = true;
-		scheduleDraw();
-	}
+	export function clearNodes() { nodes = []; edges = []; setDirty(true); scheduleDraw(); }
+	export function getNodes(): BoardNode[] { return [...nodes]; }
+	export function getEdges(): BoardEdge[] { return [...edges]; }
 
-	// Get current nodes (for external reference)
-	export function getNodes(): BoardNode[] {
-		return [...nodes];
-	}
-
-	// Get current edges (for external reference)
-	export function getEdges(): BoardEdge[] {
-		return [...edges];
-	}
-
-	// Add an edge between two nodes
-	export function addEdge(fromId: string, toId: string, label?: string, style?: 'solid' | 'dashed'): string {
+	export function addEdge(fromId: string, toId: string, label?: string, style?: 'solid' | 'dashed', connectionType?: string, strength?: number): string {
 		const id = `edge-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
-		edges = [...edges, { id, fromId, toId, style: style ?? 'solid', label }];
-		setDirty(true);
-		scheduleDraw();
+		edges = [...edges, { id, fromId, toId, style: style ?? 'solid', label, connectionType: connectionType ?? label, strength: strength ?? 1.0 }];
+		setDirty(true); scheduleDraw();
 		return id;
 	}
 
-	// Remove an edge by ID
 	export function removeEdge(edgeId: string) {
 		edges = edges.filter(e => e.id !== edgeId);
-		setDirty(true);
-		scheduleDraw();
+		setDirty(true); scheduleDraw();
 	}
 
-	// Remove a node by ID (also removes connected edges)
 	export function removeNode(nodeId: string) {
 		nodes = nodes.filter(n => n.id !== nodeId);
 		edges = edges.filter(e => e.fromId !== nodeId && e.toId !== nodeId);
 		selected = new Set([...selected].filter(id => id !== nodeId));
-		setDirty(true);
+		setDirty(true); scheduleDraw();
+	}
+
+	export function zoomToFit() {
+		if (!canvasEl || nodes.length === 0) return;
+		const pad = 80;
+		let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+		for (const n of nodes) {
+			minX = Math.min(minX, n.x); minY = Math.min(minY, n.y);
+			maxX = Math.max(maxX, n.x + n.w); maxY = Math.max(maxY, n.y + n.h);
+		}
+		if (!isFinite(minX)) return;
+		const cw = canvasEl.clientWidth, ch = canvasEl.clientHeight;
+		const contentW = maxX - minX + pad * 2, contentH = maxY - minY + pad * 2;
+		const zoom = Math.max(0.1, Math.min(2, Math.min(cw / contentW, ch / contentH)));
+		viewport = { zoom, pan: { x: -minX + pad + (cw / zoom - (maxX - minX)) / 2, y: -minY + pad + (ch / zoom - (maxY - minY)) / 2 } };
 		scheduleDraw();
 	}
 
-	// Zoom to fit all nodes in viewport
-	export function zoomToFit() {
-		if (!canvasEl || nodes.length === 0) return;
+	// Canvas export as PNG data URL
+	export function exportPNG(): string | null {
+		if (!canvasEl) return null;
+		return canvasEl.toDataURL('image/png');
+	}
 
-		const pad = 80;
-		let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+	// Export nodes/edges as CSV
+	export function exportCSV(): { nodesCSV: string; edgesCSV: string } {
+		const nodesHeader = 'id,kind,title,x,y,w,h,evidenceId';
+		const nodesRows = nodes.map(n => `"${n.id}","${n.kind}","${(n.title || '').replace(/"/g, '""')}",${n.x},${n.y},${n.w},${n.h},"${n.evidenceId || ''}"`);
 
-		for (const n of nodes) {
-			minX = Math.min(minX, n.x);
-			minY = Math.min(minY, n.y);
-			maxX = Math.max(maxX, n.x + n.w);
-			maxY = Math.max(maxY, n.y + n.h);
-		}
+		const edgesHeader = 'id,fromId,toId,connectionType,label,strength';
+		const edgesRows = edges.map(e => `"${e.id}","${e.fromId}","${e.toId}","${e.connectionType || ''}","${(e.label || '').replace(/"/g, '""')}",${e.strength ?? 1}`);
 
-		if (!isFinite(minX)) return;
-
-		const cw = canvasEl.clientWidth;
-		const ch = canvasEl.clientHeight;
-		const contentW = maxX - minX + pad * 2;
-		const contentH = maxY - minY + pad * 2;
-
-		const zoom = Math.max(0.1, Math.min(2, Math.min(cw / contentW, ch / contentH)));
-		const panX = -minX + pad + (cw / zoom - (maxX - minX)) / 2;
-		const panY = -minY + pad + (ch / zoom - (maxY - minY)) / 2;
-
-		viewport = { zoom, pan: { x: panX, y: panY } };
-		scheduleDraw();
+		return {
+			nodesCSV: [nodesHeader, ...nodesRows].join('\n'),
+			edgesCSV: [edgesHeader, ...edgesRows].join('\n')
+		};
 	}
 
 	$effect(() => {
-
 		if (!canvasEl) return;
 		ctx = canvasEl.getContext('2d');
-
 		const wheelOpts: AddEventListenerOptions = { passive: false };
 		canvasEl.addEventListener('wheel', onWheel, wheelOpts);
-
 		ro = new ResizeObserver(() => scheduleDraw());
 		if (rootEl) ro.observe(rootEl);
 
 		const onKeyDown = (e: KeyboardEvent) => {
 			if (editing) return;
-
-			if (e.code === 'Space') {
-				spaceDown = true;
-			}
+			if (e.code === 'Space') spaceDown = true;
 			if (e.code === 'Escape') {
 				cancelEditing();
+				connectionSourceId = null;
+				connectionPreviewEnd = null;
 				selected = new Set();
 			}
-			if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
-				e.preventDefault();
+			// Delete selected nodes
+			if ((e.code === 'Delete' || e.code === 'Backspace') && selected.size > 0 && !editing) {
+				for (const id of selected) removeNode(id);
+				selected = new Set();
 			}
+			if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') e.preventDefault();
 		};
+		const onKeyUp = (e: KeyboardEvent) => { if (e.code === 'Space') spaceDown = false; };
 
-		const onKeyUp = (e: KeyboardEvent) => {
-			if (e.code === 'Space') spaceDown = false;
-		};
-
-		window.addEventListener('keydown', onKeyDown, { passive: false 
-});
+		window.addEventListener('keydown', onKeyDown, { passive: false });
 		window.addEventListener('keyup', onKeyUp);
-
 		return () => {
 			cancelAnimationFrame(raf);
 			canvasEl?.removeEventListener('wheel', onWheel);
 			ro?.disconnect();
 			window.removeEventListener('keydown', onKeyDown);
 			window.removeEventListener('keyup', onKeyUp);
-		}
+		};
 	});
 </script>
 
@@ -727,40 +710,31 @@
 	bind:this={rootEl}
 	class="relative w-full h-full overflow-hidden select-none rounded-2xl border border-white/10 bg-black/20"
 >
-	<!-- Layer 1: Canvas rendering -->
 	<canvas
 		bind:this={canvasEl}
-		class="absolute inset-0 w-full h-full cursor-crosshair"
-		style:cursor={isPanning || spaceDown ? 'grab' : 'default'}
+		class="absolute inset-0 w-full h-full"
+		style:cursor={cursorStyle}
 		onpointerdown={onPointerDown}
 		onpointermove={onPointerMove}
 		onpointerup={onPointerUp}
 		onpointercancel={onPointerUp}
-		oncontextmenu={(e) => e.preventDefault()}
+		oncontextmenu={handleContextMenu}
 		ondblclick={onDblClick}
 	></canvas>
 
-	<!-- Layer 2: DOM overlay -->
+	<!-- DOM overlay -->
 	<div class="absolute inset-0 pointer-events-none">
 		{#if selected.size > 0}
 			{@const b = selectedBounds()}
 			{#if b}
 				<div
-					class="absolute rounded-xl border border-info/50 shadow-[0_0_0_1px_rgba(59 130 246 0.2)]"
+					class="absolute rounded-xl border border-info/50 shadow-[0_0_0_1px_rgba(59_130_246_0.2)]"
 					style="left:{b.x}px; top:{b.y}px; width:{b.w}px; height:{b.h}px;"
 				>
-					<div
-						class="absolute -left-1.5 -top-1.5 w-3 h-3 rounded-full bg-info border border-black/50"
-					></div>
-					<div
-						class="absolute -right-1.5 -top-1.5 w-3 h-3 rounded-full bg-info border border-black/50"
-					></div>
-					<div
-						class="absolute -left-1.5 -bottom-1.5 w-3 h-3 rounded-full bg-info border border-black/50"
-					></div>
-					<div
-						class="absolute -right-1.5 -bottom-1.5 w-3 h-3 rounded-full bg-info border border-black/50"
-					></div>
+					<div class="absolute -left-1.5 -top-1.5 w-3 h-3 rounded-full bg-info border border-black/50"></div>
+					<div class="absolute -right-1.5 -top-1.5 w-3 h-3 rounded-full bg-info border border-black/50"></div>
+					<div class="absolute -left-1.5 -bottom-1.5 w-3 h-3 rounded-full bg-info border border-black/50"></div>
+					<div class="absolute -right-1.5 -bottom-1.5 w-3 h-3 rounded-full bg-info border border-black/50"></div>
 				</div>
 			{/if}
 		{/if}
@@ -768,32 +742,39 @@
 		{#if editing}
 			{@const r = nodeScreenRect(editing.id)}
 			{#if r}
-				<div
-					class="absolute pointer-events-auto"
-					style="left:{r.x}px; top:{r.y}px; width:{r.w}px; height:{r.h}px;"
-				>
+				<div class="absolute pointer-events-auto" style="left:{r.x}px; top:{r.y}px; width:{r.w}px; height:{r.h}px;">
 					<textarea
 						class="w-full h-full resize-none rounded-xl border border-info/50 bg-black/80 p-3 text-white/90 outline-none text-sm font-sans"
 						value={editing.value}
-						oninput={(e) =>
-							(editing = { ...editing!, value: (e.currentTarget as HTMLTextAreaElement).value })}
+						oninput={(e) => (editing = { ...editing!, value: (e.currentTarget as HTMLTextAreaElement).value })}
 						onkeydown={(e) => {
-							if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-								e.preventDefault();
-								commitEditing();
-							}
-							if (e.key === 'Escape') {
-								e.preventDefault();
-								cancelEditing();
-							}
+							if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); commitEditing(); }
+							if (e.key === 'Escape') { e.preventDefault(); cancelEditing(); }
 						}}
 						onblur={commitEditing}
 					></textarea>
-					<div class="mt-2 text-[10px] text-white/40 font-mono tracking-tight">
-						CMD+ENTER to save • ESC to cancel
-					</div>
+					<div class="mt-2 text-[10px] text-white/40 font-mono tracking-tight">CMD+ENTER to save &bull; ESC to cancel</div>
 				</div>
 			{/if}
+		{/if}
+
+		<!-- Connection drawing hint -->
+		{#if activeTool === 'connection' && connectionSourceId}
+			<div class="absolute top-3 left-1/2 -translate-x-1/2 pointer-events-none px-3 py-1 rounded-full bg-info/90 text-white text-xs font-mono">
+				Click target node to connect &bull; ESC to cancel
+			</div>
+		{:else if activeTool === 'connection'}
+			<div class="absolute top-3 left-1/2 -translate-x-1/2 pointer-events-none px-3 py-1 rounded-full bg-black/60 text-white/70 text-xs font-mono">
+				Click source node to start connection
+			</div>
+		{:else if activeTool === 'note'}
+			<div class="absolute top-3 left-1/2 -translate-x-1/2 pointer-events-none px-3 py-1 rounded-full bg-black/60 text-white/70 text-xs font-mono">
+				Click canvas to place a note
+			</div>
+		{:else if activeTool === 'evidence'}
+			<div class="absolute top-3 left-1/2 -translate-x-1/2 pointer-events-none px-3 py-1 rounded-full bg-black/60 text-white/70 text-xs font-mono">
+				Click canvas to place evidence
+			</div>
 		{/if}
 	</div>
 
@@ -806,4 +787,16 @@
 			<span>EDGES: {edges.length}</span>
 		</div>
 	</div>
+
+	<!-- Edge legend -->
+	{#if edges.length > 0}
+		<div class="absolute right-3 bottom-3 pointer-events-none flex flex-wrap gap-2 text-[9px] font-mono">
+			{#each Object.entries(EDGE_COLORS).slice(0, 6) as [type, color]}
+				<span class="flex items-center gap-1">
+					<span class="inline-block w-3 h-0.5 rounded" style="background:{color}"></span>
+					<span class="text-white/40">{type}</span>
+				</span>
+			{/each}
+		</div>
+	{/if}
 </div>

@@ -8,6 +8,8 @@
  * Stores evaluations in Redis for analytics.
  */
 import { ENV } from '$lib/server/env.server.js';
+import { traceLLM } from '$lib/server/observability/langfuse.js';
+import { litellmChat, ollamaFetch } from '$lib/server/ollama.js';
 import { redis } from '$lib/server/redis.js';
 import type { ACEContext, SelfEvaluation } from './types.js';
 
@@ -15,6 +17,19 @@ const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const MODEL = 'gemma3-legal:latest';
 const EVAL_CACHE_TTL = 3600; // 1 hour
 const QUALITY_THRESHOLD = 0.6;
+
+// Ollama structured output: JSON schema guarantees valid JSON via GBNF grammar constraining
+const EVAL_FORMAT = {
+	type: 'object' as const,
+	properties: {
+		quality: { type: 'number' as const },
+		completeness: { type: 'number' as const },
+		accuracy: { type: 'number' as const },
+		suggestions: { type: 'array' as const, items: { type: 'string' as const } },
+		shouldRetry: { type: 'boolean' as const }
+	},
+	required: ['quality', 'completeness', 'accuracy', 'suggestions', 'shouldRetry']
+};
 
 /**
  * Evaluate the quality of an AI-generated response.
@@ -31,22 +46,39 @@ export async function evaluateResponse(opts: {
 	try {
 		const evalPrompt = buildEvalPrompt(opts.query, opts.response);
 
-		const res = await fetch(`${OLLAMA_URL}/api/generate`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: MODEL,
-				prompt: evalPrompt,
-				stream: false,
-				options: { temperature: 0.1, num_predict: 256 }
-			}),
-			signal: AbortSignal.timeout(10000)
+		const responseText = await traceLLM('ace-self-eval', { model: MODEL, prompt: opts.query.slice(0, 300) }, async (gen) => {
+			// Route through LiteLLM proxy when enabled (gets semantic caching)
+			if (ENV.LITELLM_ENABLED) {
+				const text = await litellmChat(
+					[{ role: 'user', content: evalPrompt }],
+					MODEL,
+					{ temperature: 0.1, maxTokens: 256, timeoutMs: 10000 }
+				);
+				gen.end({ output: text.slice(0, 500) });
+				return text;
+			}
+
+			const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					model: MODEL,
+					prompt: evalPrompt,
+					stream: false,
+					format: EVAL_FORMAT,
+					keep_alive: process.env?.OLLAMA_KEEP_ALIVE ?? '24h',
+					options: { temperature: 0.1, num_predict: 256 }
+				}),
+				signal: AbortSignal.timeout(10000)
+			});
+
+			if (!res.ok) throw new Error(`Ollama ${res.status}`);
+
+			const data = await res.json();
+			const text = String(data.response ?? '');
+			gen.end({ output: text.slice(0, 500) });
+			return text;
 		});
-
-		if (!res.ok) throw new Error(`Ollama ${res.status}`);
-
-		const data = await res.json();
-		const responseText = String(data.response ?? '');
 		const evaluation = parseEvaluation(responseText);
 		evaluation.evalMs = Date.now() - start;
 
@@ -92,14 +124,12 @@ export function generateCorrectionPrompt(
 }
 
 function buildEvalPrompt(query: string, response: string): string {
-	return `Evaluate this AI response for quality. Return ONLY valid JSON.
+	// Static instruction prefix (Ollama KV-caches identical prefixes)
+	return `You are an AI quality evaluator for legal assistant responses. Evaluate the response quality on a 0.0-1.0 scale for quality, completeness, and accuracy. Provide actionable improvement suggestions. Set shouldRetry to true only if quality is below 0.6.
 
 User Question: ${query.slice(0, 300)}
 
-AI Response: ${response.slice(0, 1000)}
-
-Rate on a 0.0-1.0 scale and provide suggestions:
-{"quality":0.8,"completeness":0.7,"accuracy":0.9,"suggestions":["Add more detail about X"],"shouldRetry":false}`;
+AI Response: ${response.slice(0, 1000)}`;
 }
 
 function parseEvaluation(text: string): SelfEvaluation {

@@ -10,6 +10,7 @@
 
 import { ENV } from './env.server.js';
 import { getCachedEmbedding, cacheEmbedding, batchGetCachedEmbeddings, batchCacheEmbeddings } from './embedding-cache.js';
+import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 
 const BATCH_SIZE = 32;
 const BATCH_TIMEOUT_MS = 50; // 50ms batching window
@@ -138,23 +139,26 @@ class BatchEmbedder {
 	 * Fetch embeddings from Ollama (no caching)
 	 */
 	private async fetchFromOllama(texts: string[]): Promise<Float32Array[]> {
-		const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: 'embeddinggemma:latest',
-				input: texts
-			})
+		const model = 'embeddinggemma:latest';
+		return traceEmbedding(`[batch:${texts.length}]`, model, async () => {
+			const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					model,
+					input: texts
+				})
+			});
+
+			if (!response.ok) {
+				throw new Error(`Ollama embedding failed: ${response.statusText}`);
+			}
+
+			const data = await response.json();
+			const embeddings = data.embeddings as number[][];
+
+			return embeddings.map((arr) => new Float32Array(arr));
 		});
-
-		if (!response.ok) {
-			throw new Error(`Ollama embedding failed: ${response.statusText}`);
-		}
-
-		const data = await response.json();
-		const embeddings = data.embeddings as number[][];
-
-		return embeddings.map((arr) => new Float32Array(arr));
 	}
 
 	/**

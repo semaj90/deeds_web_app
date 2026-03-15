@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/Button.svelte';
+	import { analytics } from '$lib/stores/analytics.svelte';
 	import RAGSearchComponent from '$lib/components/RAGSearchComponent.svelte';
 	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
 	import SearchPanel from '$lib/components/SearchPanel.svelte';
@@ -155,6 +156,7 @@
 
 	async function performSearch() {
 		if (!searchQuery.trim()) return;
+		analytics.track('codebase_search', { query: searchQuery.slice(0, 200) });
 
 		isSearching = true;
 		searchError = null;

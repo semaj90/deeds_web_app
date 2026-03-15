@@ -1,6 +1,8 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { traceLLM } from '$lib/server/observability/langfuse.js';
+import { litellmChat } from '$lib/server/ollama.js';
 import { z } from 'zod';
 
 const chatMessageSchema = z.object({
@@ -38,27 +40,57 @@ export const POST: RequestHandler = async ({ request }) => {
 			? `You are a legal AI assistant for case ${caseId}. Provide concise, professional legal analysis.`
 			: 'You are a legal AI assistant. Provide concise, professional legal analysis.';
 
-		const res = await fetch(`${OLLAMA_URL}/api/chat`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: 'gemma3-legal:latest',
-				messages: [
-					{ role: 'system', content: systemPrompt },
-					...(body.history || []),
-					{ role: 'user', content: message }
-				],
-				stream: false,
-				options: { temperature }
-			}),
-			signal: AbortSignal.timeout(30_000)
+		const data = await traceLLM('ai-chat', { model: 'gemma3-legal:latest', prompt: message.slice(0, 500) }, async (gen) => {
+			// Route through LiteLLM proxy when enabled (gets semantic caching)
+			if (ENV.LITELLM_ENABLED) {
+				try {
+					const content = await litellmChat(
+						[
+							{ role: 'system', content: systemPrompt },
+							...(body.history || []),
+							{ role: 'user', content: message }
+						],
+						'gemma3-legal',
+						{ temperature, timeoutMs: 30_000 }
+					);
+					gen.end({ output: content.slice(0, 1000) });
+					return { message: { content }, model: 'gemma3-legal:latest' };
+				} catch {
+					gen.end({ output: 'litellm-fallthrough', level: 'WARNING' });
+					// Fall through to direct Ollama
+				}
+			}
+
+			const res = await fetch(`${OLLAMA_URL}/api/chat`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					model: 'gemma3-legal:latest',
+					messages: [
+						{ role: 'system', content: systemPrompt },
+						...(body.history || []),
+						{ role: 'user', content: message }
+					],
+					stream: false,
+					options: { temperature }
+				}),
+				signal: AbortSignal.timeout(30_000)
+			});
+
+			if (!res.ok) {
+				gen.end({ output: `error:${res.status}`, level: 'WARNING' });
+				return null;
+			}
+
+			const d = await res.json();
+			gen.end({ output: (d.message?.content || '').slice(0, 1000) });
+			return d;
 		});
 
-		if (!res.ok) {
-			return json({ error: `Ollama error: ${res.status}` }, { status: 502 });
+		if (!data) {
+			return json({ error: 'Ollama error' }, { status: 502 });
 		}
 
-		const data = await res.json();
 		return json({
 			response: data.message?.content || data.response || '',
 			model: data.model || 'gemma3-legal:latest',

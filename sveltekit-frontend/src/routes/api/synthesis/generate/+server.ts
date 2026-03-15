@@ -10,6 +10,8 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { requireAuth } from '$lib/server/auth-helpers.js';
 import { ENV } from '$lib/server/env.server.js';
+import { traceLLM } from '$lib/server/observability/langfuse.js';
+import { litellmChat } from '$lib/server/ollama.js';
 import { z } from 'zod';
 
 const synthesisRequestSchema = z.object({
@@ -24,11 +26,17 @@ const synthesisRequestSchema = z.object({
 	stream: z.boolean().optional(),
 	includeCitations: z.boolean().optional(),
 	jurisdiction: z.string().max(200).optional(),
-	legalArea: z.string().max(200).optional()
+	legalArea: z.string().max(200).optional(),
+	sectionTypes: z.array(z.enum([
+		'facts', 'issues', 'reasoning', 'holding', 'citations',
+		'parties', 'motions', 'bibliography', 'procedural_history',
+		'sentencing', 'judgment'
+	])).max(11).optional()
 });
 import { getVectorCache, setVectorCache } from '$lib/server/vector-cache.js';
 import { assembleACEContext, buildACEPrompt } from '$lib/server/ace/context-assembler.js';
 import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self-prompt.js';
+import { rabbitmq } from '$lib/server/queue/rabbitmq-manager-fixed.js';
 import { createHash } from 'crypto';
 
 // ── Types ─────────────────────────────────────────────────────────────
@@ -127,29 +135,51 @@ async function callOllama(
 		: `${contextWindow}\n\nQuestion: ${query}\n\nProvide a comprehensive legal analysis. Include [Source N] citations where applicable.`;
 
 	const start = performance.now();
-	const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			model: MODEL,
-			messages: [
-				{ role: 'system', content: systemPrompt },
-				{ role: 'user', content: userPrompt }
-			],
-			stream: false,
-			options: { num_predict: maxTokens, temperature }
-		}),
-		signal: AbortSignal.timeout(60_000)
+	return traceLLM('synthesis-generate', { model: MODEL, prompt: query.slice(0, 500) }, async (gen) => {
+		// Route through LiteLLM proxy when enabled (gets semantic caching)
+		if (ENV.LITELLM_ENABLED) {
+			const text = await litellmChat(
+				[
+					{ role: 'system', content: systemPrompt },
+					{ role: 'user', content: userPrompt }
+				],
+				MODEL,
+				{ maxTokens, temperature, timeoutMs: 60_000 }
+			);
+			gen.end({ output: text.slice(0, 1000) });
+			return {
+				text: text.trim(),
+				tokensUsed: Math.ceil(text.length / 4),
+				durationMs: performance.now() - start
+			};
+		}
+
+		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				model: MODEL,
+				messages: [
+					{ role: 'system', content: systemPrompt },
+					{ role: 'user', content: userPrompt }
+				],
+				stream: false,
+				options: { num_predict: maxTokens, temperature }
+			}),
+			signal: AbortSignal.timeout(60_000)
+		});
+
+		if (!res.ok) throw new Error(`Ollama ${res.status}: ${res.statusText}`);
+
+		const data = await res.json();
+		const text = (data.message?.content ?? '').trim();
+		gen.end({ output: text.slice(0, 1000), usage: { promptTokens: data.prompt_eval_count, completionTokens: data.eval_count } });
+		return {
+			text,
+			tokensUsed: data.eval_count ?? Math.ceil(text.length / 4),
+			durationMs: performance.now() - start
+		};
 	});
-
-	if (!res.ok) throw new Error(`Ollama ${res.status}: ${res.statusText}`);
-
-	const data = await res.json();
-	return {
-		text: (data.message?.content ?? '').trim(),
-		tokensUsed: data.eval_count ?? Math.ceil((data.message?.content ?? '').length / 4),
-		durationMs: performance.now() - start
-	};
 }
 
 // ── SSE Stream Handler ────────────────────────────────────────────────
@@ -165,12 +195,14 @@ async function handleStream(body: SynthesisRequest, userId: string): Promise<Res
 			};
 
 			try {
+				// Set SSE reconnection interval (3s)
+				controller.enqueue(encoder.encode('retry: 3000\n\n'));
 				const totalStart = performance.now();
 
 				// Stage 1: Context assembly
 				const ctxStart = performance.now();
 				const context = await assembleACEContext({
-					query, userId, caseId: body.caseId, conversationId: body.conversationId, persona: body.persona
+					query, userId, caseId: body.caseId, conversationId: body.conversationId, persona: body.persona, sectionTypes: body.sectionTypes
 				});
 				const acePrompt = buildACEPrompt(context, query);
 				sendEvent('context_assembled', {
@@ -342,7 +374,8 @@ export const POST: RequestHandler = async (event) => {
 			userId: auth.user.id,
 			caseId: body.caseId,
 			conversationId: body.conversationId,
-			persona: body.persona
+			persona: body.persona,
+			sectionTypes: body.sectionTypes
 		});
 		const acePrompt = buildACEPrompt(context, query);
 		const contextMs = performance.now() - ctxStart;
@@ -355,61 +388,38 @@ export const POST: RequestHandler = async (event) => {
 		// Stage 4: Citations
 		const citations = includeCitations ? extractCitations(answer, context.ragChunks) : [];
 
-		// Stage 5: ACE self-evaluation + optional retry
-		let evaluation: SynthesisEvaluation | null = null;
-		let evalMs = 0;
+		// Stage 5: ACE self-evaluation (fire-and-forget via RabbitMQ)
+		const synthesisId = crypto.randomUUID();
 
 		if (enableACE) {
-			const evalStart = performance.now();
-			const selfEval = await evaluateResponse({ query, response: answer, context, backend: 'ollama' });
-			evalMs = performance.now() - evalStart;
-
-			evaluation = {
-				quality: selfEval.quality,
-				completeness: selfEval.completeness,
-				accuracy: selfEval.accuracy,
-				suggestions: selfEval.suggestions,
-				wasRetried: false
-			};
-
-			// Auto-correct on low quality (max 1 retry)
-			if (retryOnLowQuality && selfEval.quality < QUALITY_THRESHOLD && selfEval.shouldRetry) {
-				const correction = generateCorrectionPrompt(selfEval, query, answer);
-				if (correction) {
-					console.log(`[synthesis] ACE retry triggered (quality: ${selfEval.quality.toFixed(2)})`);
-					const retry = await callOllama(acePrompt.systemPrompt, acePrompt.contextWindow, query, maxTokens, temperature, correction);
-					answer = retry.text;
-					tokensUsed += retry.tokensUsed;
-
-					const retryEval = await evaluateResponse({ query, response: answer, context, backend: 'ollama' });
-					evaluation = {
-						quality: retryEval.quality,
-						completeness: retryEval.completeness,
-						accuracy: retryEval.accuracy,
-						suggestions: retryEval.suggestions,
-						wasRetried: true
-					};
-					evalMs = performance.now() - evalStart;
+			rabbitmq.publishACEEvaluation({
+				responseId: synthesisId,
+				query,
+				response: answer,
+				context: {
+					ragChunks: context.ragChunks,
+					kagNeighbors: context.kagNeighbors,
+					persona: context.persona
 				}
-			}
+			}).catch(() => {});
 		}
 
-		const confidence = computeConfidence(answer, citations, evaluation);
+		const confidence = computeConfidence(answer, citations, null);
 		const totalMs = performance.now() - totalStart;
 
 		const response: SynthesisResponse = {
-			synthesisId: crypto.randomUUID(),
+			synthesisId,
 			query,
 			answer,
 			citations,
-			evaluation,
+			evaluation: null,
 			confidence,
 			model: MODEL,
 			tokensUsed,
 			timing: {
 				contextMs: Math.round(contextMs),
 				generateMs: Math.round(gen.durationMs),
-				evalMs: Math.round(evalMs),
+				evalMs: 0,
 				totalMs: Math.round(totalMs)
 			},
 			cached: false,

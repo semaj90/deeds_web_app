@@ -49,6 +49,9 @@
 	let summaryEvidenceId = $state<string | null>(null);
 	let summaryEvidenceTitle = $state<string | null>(null);
 
+	// Context menu
+	let contextMenu = $state<{ node: any; x: number; y: number } | null>(null);
+
 	// Selected board node (for note editing in sidebar)
 	let selectedNode = $state<any>(null);
 	let noteTitle = $state('');
@@ -56,18 +59,22 @@
 
 	// Handle canvas click — create note when note tool is active
 	function handleCanvasClick(world: { x: number; y: number }) {
+		contextMenu = null;
+
 		if (activeTool === 'note' && board) {
 			const nodeId = board.addNote(world.x, world.y);
-			// Select the newly created note
 			const nodes = board.getNodes();
 			const newNode = nodes.find((n: any) => n.id === nodeId);
 			if (newNode) {
 				selectedNode = newNode;
 				noteTitle = newNode.title ?? 'New Note';
 				noteBody = newNode.body ?? '';
-				selectedEvidence = null; // Clear evidence selection
+				selectedEvidence = null;
 			}
-			activeTool = 'select'; // Switch back to select after placing
+			activeTool = 'select';
+		} else if (activeTool === 'evidence' && board && selectedEvidence) {
+			board.addEvidenceNode(selectedEvidence.id, selectedEvidence.title, world.x, world.y, selectedEvidence.fileType);
+			activeTool = 'select';
 		}
 	}
 
@@ -138,6 +145,97 @@
 		}
 	}
 
+	// Handle connection created from HybridBoard canvas
+	async function handleConnectionCreated(fromNodeId: string, toNodeId: string) {
+		if (!board) return;
+		const nodes = board.getNodes();
+		const fromNode = nodes.find((n: any) => n.id === fromNodeId);
+		const toNode = nodes.find((n: any) => n.id === toNodeId);
+
+		// Add visual edge immediately
+		const edgeId = board.addEdge(fromNodeId, toNodeId, 'related', 'solid', 'related', 1.0);
+
+		// Push undo command
+		boardHistory.push({
+			execute: () => board.addEdge(fromNodeId, toNodeId, 'related', 'solid', 'related', 1.0),
+			undo: () => board.removeEdge(edgeId),
+			description: 'Add connection'
+		});
+
+		// Persist to DB if both are evidence nodes
+		if (fromNode?.evidenceId && toNode?.evidenceId) {
+			await persistConnection(fromNode.evidenceId, toNode.evidenceId);
+		}
+	}
+
+	// Handle right-click context menu from HybridBoard canvas
+	function handleBoardContextMenu(node: any, screen: { x: number; y: number }) {
+		contextMenu = { node, x: screen.x, y: screen.y };
+	}
+
+	// Close context menu
+	function closeContextMenu() {
+		contextMenu = null;
+	}
+
+	// Context menu actions
+	function ctxDelete() {
+		if (!board || !contextMenu) return;
+		board.removeNode(contextMenu.node.id);
+		boardHistory.push({
+			execute: () => board.removeNode(contextMenu!.node.id),
+			undo: () => {}, // simplified — full restore would need node data
+			description: 'Delete node'
+		});
+		closeContextMenu();
+	}
+
+	function ctxDuplicate() {
+		if (!board || !contextMenu) return;
+		const n = contextMenu.node;
+		if (n.kind === 'note') {
+			board.addNote(n.x + 40, n.y + 40, n.title, n.body);
+		} else if (n.kind === 'evidence' && n.evidenceId) {
+			board.addEvidenceNode(n.evidenceId, n.title ?? 'Untitled', n.x + 40, n.y + 40, n.fileType);
+		}
+		closeContextMenu();
+	}
+
+	function ctxSummarize() {
+		if (!contextMenu) return;
+		const n = contextMenu.node;
+		if (n.evidenceId) {
+			summaryEvidenceId = n.evidenceId;
+			summaryEvidenceTitle = n.title ?? null;
+			showSummaryModal = true;
+		}
+		closeContextMenu();
+	}
+
+	// Export canvas as PNG download
+	function exportPNG() {
+		if (!board) return;
+		const dataUrl = board.exportPNG();
+		if (!dataUrl) return;
+		const a = document.createElement('a');
+		a.href = dataUrl;
+		a.download = `evidence-board-${caseId.substring(0, 8)}-${Date.now()}.png`;
+		a.click();
+	}
+
+	// Export canvas data as CSV download
+	function exportCSV() {
+		if (!board) return;
+		const { nodesCSV, edgesCSV } = board.exportCSV();
+		const blob = new Blob([`--- NODES ---\n${nodesCSV}\n\n--- EDGES ---\n${edgesCSV}`], { type: 'text/csv' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `evidence-board-${caseId.substring(0, 8)}-${Date.now()}.csv`;
+		a.click();
+		URL.revokeObjectURL(url);
+	}
+
 	onMount(() => {
 		// Initialize chat session with case context
 		chatSession = new ChatSession(`board-${caseId}`, [], true);
@@ -156,7 +254,7 @@
 				const fromNodeId = nodeByEvidenceId.get(conn.fromEvidenceId);
 				const toNodeId = nodeByEvidenceId.get(conn.toEvidenceId);
 				if (fromNodeId && toNodeId) {
-					board.addEdge(fromNodeId, toNodeId, conn.label ?? conn.connectionType ?? undefined);
+					board.addEdge(fromNodeId, toNodeId, conn.label ?? conn.connectionType ?? undefined, 'solid', conn.connectionType ?? 'related', conn.strength ?? 1.0);
 				}
 			}
 		}
@@ -717,6 +815,15 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 			</button>
 		</div>
 
+		<div class="tool-group">
+			<button class="tool-btn" onclick={exportPNG} title="Export as PNG">
+				<Icon name="image" />
+			</button>
+			<button class="tool-btn" onclick={exportCSV} title="Export as CSV">
+				<Icon name="download" />
+			</button>
+		</div>
+
 		<div class="keyboard-hint">
 			<span class="hint-text">V=Select • E=Evidence • C=Connect • N=Note • 1-4=Views • Ctrl+0=Fit</span>
 		</div>
@@ -774,18 +881,66 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 			</div>
 		</aside>
 
-		<!-- Center Canvas - Board Visualization -->
+		<!-- Center Canvas / Alt Views -->
 		<div class="canvas-area">
-			{#key caseId}
-				<HybridBoard
-					bind:this={board}
-					initialSnapshot={initialState as any}
-					onDirtyChange={(d) => (isDirty = d)}
-					onCanvasClick={handleCanvasClick}
-					onNodeSelect={handleNodeSelect}
-					{caseId}
-				/>
-			{/key}
+			{#if activeView === 'wall'}
+				{#key caseId}
+					<HybridBoard
+						bind:this={board}
+						initialSnapshot={initialState as any}
+						onDirtyChange={(d) => (isDirty = d)}
+						onCanvasClick={handleCanvasClick}
+						onNodeSelect={handleNodeSelect}
+						onConnectionCreated={handleConnectionCreated}
+						onContextMenu={handleBoardContextMenu}
+						{activeTool}
+						{caseId}
+					/>
+				{/key}
+			{:else if activeView === 'line'}
+				<div class="alt-view">
+					<h3 class="alt-view-title">Timeline View</h3>
+					<div class="line-track-view">
+						{#each evidenceItems.slice().sort((a, b) => (a.date || '').localeCompare(b.date || '')) as item (item.id)}
+							<button class="line-card" class:selected={selectedEvidence?.id === item.id} onclick={() => (selectedEvidence = item)}>
+								<span class="line-date">{item.date || 'No date'}</span>
+								<span class="line-dot"></span>
+								<span class="line-title">{item.title}</span>
+								<span class="line-type">{item.type}</span>
+							</button>
+						{/each}
+					</div>
+				</div>
+			{:else if activeView === 'file'}
+				<div class="alt-view file-view">
+					<h3 class="alt-view-title">File View</h3>
+					{#each evidenceItems as item (item.id)}
+						<button class="file-card" class:selected={selectedEvidence?.id === item.id} onclick={() => (selectedEvidence = item)}>
+							<div class="file-icon"><Icon name="file" /></div>
+							<div class="file-info">
+								<div class="file-name">{item.title}</div>
+								<div class="file-meta">{item.type} &bull; {item.date} &bull; {item.fileType || 'Unknown'}</div>
+							</div>
+						</button>
+					{/each}
+				</div>
+			{:else if activeView === 'list'}
+				<div class="alt-view list-view">
+					<table class="list-table">
+						<thead><tr><th>Title</th><th>Type</th><th>Date</th><th>Location</th></tr></thead>
+						<tbody>
+							{#each evidenceItems as item (item.id)}
+								<tr class:selected={selectedEvidence?.id === item.id} onclick={() => (selectedEvidence = item)}>
+									<td class="list-title">{item.title}</td>
+									<td>{item.type}</td>
+									<td>{item.date || '—'}</td>
+									<td>{item.location || '—'}</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			{/if}
 		</div>
 
 		<!-- Right Sidebar - Note Editor -->
@@ -1106,6 +1261,30 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 			summaryEvidenceTitle = null;
 		}}
 	/>
+
+	<!-- Context Menu Overlay -->
+	{#if contextMenu}
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div class="ctx-backdrop" onclick={closeContextMenu} onkeydown={(e) => e.key === 'Escape' && closeContextMenu()}>
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<div class="ctx-menu" style="left:{contextMenu.x}px;top:{contextMenu.y}px" onclick={(e) => e.stopPropagation()}>
+				<button class="ctx-item" onclick={ctxDuplicate}>
+					<Icon name="copy" />
+					Duplicate
+				</button>
+				{#if contextMenu.node.evidenceId}
+					<button class="ctx-item" onclick={ctxSummarize}>
+						<Icon name="sparkles" />
+						AI Summary
+					</button>
+				{/if}
+				<button class="ctx-item danger" onclick={ctxDelete}>
+					<Icon name="trash-2" />
+					Delete
+				</button>
+			</div>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -2179,4 +2358,166 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 	.action-btn [class*="loader"] {
 		animation: spin 1s linear infinite;
 	}
+
+	/* Context Menu */
+	.ctx-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 200;
+	}
+
+	.ctx-menu {
+		position: fixed;
+		min-width: 160px;
+		background: white;
+		border: 1px solid #e5e7eb;
+		border-radius: 0.5rem;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		padding: 0.25rem;
+		z-index: 201;
+	}
+
+	.ctx-item {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		width: 100%;
+		padding: 0.5rem 0.75rem;
+		background: transparent;
+		border: none;
+		border-radius: 0.375rem;
+		font-size: 0.8125rem;
+		color: #374151;
+		cursor: pointer;
+		transition: background 0.1s;
+	}
+
+	.ctx-item:hover {
+		background: #f3f4f6;
+	}
+
+	.ctx-item.danger {
+		color: #dc2626;
+	}
+
+	.ctx-item.danger:hover {
+		background: #fef2f2;
+	}
+
+	/* Alt View Modes (LINE / FILE / LIST) */
+	.alt-view {
+		padding: 1.5rem;
+		overflow-y: auto;
+		height: 100%;
+	}
+
+	.alt-view-title {
+		font-size: 0.875rem;
+		font-weight: 700;
+		color: #6b7280;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin: 0 0 1rem;
+	}
+
+	/* LINE (timeline) */
+	.line-track {
+		display: flex;
+		gap: 1rem;
+		overflow-x: auto;
+		padding: 1rem 0;
+	}
+
+	.line-card {
+		flex: 0 0 180px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 1rem;
+		background: #fafafa;
+		border: 1px solid #e5e7eb;
+		border-radius: 0.5rem;
+		cursor: pointer;
+		transition: all 0.15s;
+		text-align: center;
+	}
+
+	.line-card:hover { border-color: #3b82f6; background: #f0f9ff; }
+	.line-card.selected { border-color: #3b82f6; background: #eff6ff; }
+
+	.line-date { font-size: 0.7rem; color: #6b7280; font-weight: 600; }
+	.line-dot { width: 10px; height: 10px; border-radius: 50%; background: #3b82f6; }
+	.line-title { font-size: 0.8125rem; font-weight: 600; color: #1f2937; }
+	.line-type { font-size: 0.7rem; color: #9ca3af; }
+
+	/* FILE (stacked cards) */
+	.file-view { display: flex; flex-direction: column; gap: 0.5rem; }
+
+	.file-card {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		padding: 0.75rem 1rem;
+		background: #fafafa;
+		border: 1px solid #e5e7eb;
+		border-radius: 0.5rem;
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+
+	.file-card:hover { border-color: #3b82f6; background: #f0f9ff; }
+	.file-card.selected { border-color: #3b82f6; background: #eff6ff; }
+
+	.file-icon {
+		flex: 0 0 2.5rem;
+		height: 2.5rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: #e5e7eb;
+		border-radius: 0.375rem;
+		color: #6b7280;
+	}
+
+	.file-info { flex: 1; min-width: 0; }
+	.file-name { font-size: 0.875rem; font-weight: 600; color: #1f2937; }
+	.file-meta { font-size: 0.75rem; color: #9ca3af; margin-top: 0.125rem; }
+	.file-desc { font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.file-confidence { font-size: 0.75rem; font-weight: 700; color: #3b82f6; }
+
+	/* LIST (table) */
+	.list-view { overflow: auto; height: 100%; }
+
+	.list-table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.8125rem;
+	}
+
+	.list-table th {
+		padding: 0.625rem 0.75rem;
+		text-align: left;
+		font-size: 0.7rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: #6b7280;
+		border-bottom: 2px solid #e5e7eb;
+		background: #f9fafb;
+		position: sticky;
+		top: 0;
+	}
+
+	.list-table td {
+		padding: 0.5rem 0.75rem;
+		border-bottom: 1px solid #f3f4f6;
+		color: #374151;
+	}
+
+	.list-table tr { cursor: pointer; transition: background 0.1s; }
+	.list-table tr:hover { background: #f0f9ff; }
+	.list-table tr.selected { background: #eff6ff; }
+
+	.list-title { font-weight: 600; color: #1f2937; }
 </style>

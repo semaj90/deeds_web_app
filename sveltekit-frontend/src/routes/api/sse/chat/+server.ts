@@ -3,6 +3,7 @@ import { db } from '$lib/server/db/client';
 import { chatMessages } from '$lib/server/db/schema';
 import { eq, desc, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 import { loadCodebaseContext } from '$lib/server/retrieval/codebase-context.js';
 import { getGraphContext } from '$lib/server/retrieval/graph-context.js';
 import { lookupCachedResponse, storeCachedResponse } from '$lib/server/ai/llm-cache.js';
@@ -191,10 +192,10 @@ async function retrieveContext(
 ): Promise<ContextDoc[]> {
 	try {
 		// 1. Generate embedding for the user query
-		const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+		const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: query }),
+			body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: query, keep_alive: '24h' }),
 			signal: AbortSignal.timeout(8000)
 		});
 
@@ -332,6 +333,9 @@ export const POST: RequestHandler = async ({ request }) => {
 				clearInterval(heartbeat);
 			};
 			abortSignal.addEventListener('abort', shared.cleanup, { once: true });
+
+			// Set SSE reconnection interval (3s) for auto-reconnect on disconnect
+			controller.enqueue(encoder.encode('retry: 3000\n\n'));
 
 			send({ id, role: 'assistant', content: '', status: 'thinking' });
 
@@ -574,13 +578,14 @@ export const POST: RequestHandler = async ({ request }) => {
 				];
 
 				// Stream from Ollama with RAG-enriched system prompt + conversation history
-				const ollamaRes = await fetch(`${OLLAMA_URL}/api/chat`, {
+				const ollamaRes = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
 						model: model ?? 'gemma3-legal:latest',
 						messages: ollamaMessages,
-						stream: true
+						stream: true,
+						keep_alive: '24h'
 					})
 				});
 
@@ -709,10 +714,10 @@ export const POST: RequestHandler = async ({ request }) => {
 
 				// Store response in LLM cache for future lookups (non-blocking)
 				// Generate embedding for caching (reuses embedding from retrieveContext if available)
-				const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+				const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: message }),
+					body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: message, keep_alive: '24h' }),
 					signal: AbortSignal.timeout(8000)
 				}).catch(() => null);
 
@@ -764,7 +769,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		headers: {
 			'Content-Type': 'text/event-stream',
 			'Cache-Control': 'no-cache',
-			Connection: 'keep-alive'
+			'Connection': 'keep-alive',
+			'X-Accel-Buffering': 'no'
 		}
 	});
 };

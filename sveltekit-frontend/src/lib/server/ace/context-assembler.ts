@@ -36,6 +36,7 @@ export async function assembleACEContext(opts: {
 	persona?: LegalPersona;
 	enableWebSearch?: boolean;
 	enableWikipedia?: boolean;
+	sectionTypes?: string[];
 }): Promise<ACEContext> {
 	const { query, userId, caseId, conversationId } = opts;
 
@@ -53,7 +54,7 @@ export async function assembleACEContext(opts: {
 	const [userProfile, caseContext, ragChunks, kagNeighbors, chatHistory, webResults, wikiResults] = await Promise.all([
 		userId ? fetchUserProfile(userId) : Promise.resolve(null),
 		caseId ? fetchCaseContext(caseId) : Promise.resolve(null),
-		fetchRAGChunks(query),
+		fetchRAGChunks(query, opts.sectionTypes),
 		caseId ? fetchKAGNeighbors(caseId) : Promise.resolve([]),
 		conversationId ? fetchChatHistory(conversationId) : Promise.resolve([]),
 		opts.enableWebSearch ? webSearch(query, 3).catch(() => null) : Promise.resolve(null),
@@ -283,7 +284,8 @@ async function fetchCaseContext(caseId: string): Promise<string | null> {
 }
 
 async function fetchRAGChunks(
-	query: string
+	query: string,
+	sectionTypes?: string[]
 ): Promise<Array<{ content: string; score: number; source: string }>> {
 	try {
 		const ollamaUrl = ENV.OLLAMA_BASE_URL;
@@ -300,18 +302,28 @@ async function fetchRAGChunks(
 		const embedding = embedData.embedding as number[];
 		if (!embedding?.length) return [];
 
-		// Search Qdrant evidence_items + legal_documents in parallel
-		const { QdrantClient } = await import('@qdrant/js-client-rest');
-		const qdrant = new QdrantClient({ url: ENV.QDRANT_URL });
+		// Use qdrant singleton (reuses connection + gets payload indexes)
+		const { qdrant: qdrantMgr } = await import('$lib/server/vector/qdrant-manager.js');
 
-		const [evidenceResults, docResults] = await Promise.all([
-			qdrant.search('evidence_items', {
+		// When sectionTypes provided, use section-filtered evidence search
+		const evidenceSearch = sectionTypes?.length
+			? qdrantMgr.sectionFilteredSearch({
+				query,
+				queryEmbedding: embedding,
+				sectionTypes,
+				limit: 5,
+				scoreThreshold: 0.5,
+			}).then(r => r.results).catch(() => [])
+			: qdrantMgr.client.search('evidence_items', {
 				vector: { name: 'content', vector: embedding },
 				limit: 5,
 				score_threshold: 0.5,
 				with_payload: true
-			}).catch(() => []),
-			qdrant.search('legal_documents', {
+			}).catch(() => []);
+
+		const [evidenceResults, docResults] = await Promise.all([
+			evidenceSearch,
+			qdrantMgr.client.search('legal_documents', {
 				vector: { name: 'content', vector: embedding },
 				limit: 3,
 				score_threshold: 0.5,
@@ -320,15 +332,15 @@ async function fetchRAGChunks(
 		]);
 
 		const mapped = [
-			...evidenceResults.map((r) => ({
-				content: String((r.payload as Record<string, unknown>)?.content ?? ''),
+			...evidenceResults.map((r: any) => ({
+				content: String(r.payload?.content ?? r.payload?.content_preview ?? ''),
 				score: r.score,
-				source: String((r.payload as Record<string, unknown>)?.source ?? 'evidence')
+				source: String(r.payload?.source ?? 'evidence')
 			})),
-			...docResults.map((r) => ({
-				content: String((r.payload as Record<string, unknown>)?.content_preview ?? (r.payload as Record<string, unknown>)?.full_text ?? ''),
+			...docResults.map((r: any) => ({
+				content: String(r.payload?.content_preview ?? r.payload?.full_text ?? ''),
 				score: r.score,
-				source: String((r.payload as Record<string, unknown>)?.source_url ?? (r.payload as Record<string, unknown>)?.document_type ?? 'document')
+				source: String(r.payload?.source_url ?? r.payload?.document_type ?? 'document')
 			}))
 		];
 

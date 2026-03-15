@@ -15,6 +15,7 @@ import { computeTFIDF } from '$lib/server/retrieval/tfidf-scorer.js';
 import { getVectorCache, setVectorCache, getEmbeddingCache, setEmbeddingCache } from '$lib/server/vector-cache.js';
 import { embedText } from '$lib/server/embedding/embed.js';
 import { z } from 'zod';
+import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 
 const SCORING_METHODS = ['hybrid', 'vector_only', 'tfidf_only'] as const;
 
@@ -30,7 +31,12 @@ const ragSearchSchema = z.object({
 	case_id: z.string().uuid().optional(),
 	conversationId: z.string().max(200).optional(),
 	enableACE: z.boolean().optional().default(false),
-	precomputedEmbedding: z.array(z.number()).length(768).optional()
+	precomputedEmbedding: z.array(z.number()).length(768).optional(),
+	sectionTypes: z.array(z.enum([
+		'facts', 'issues', 'reasoning', 'holding', 'citations',
+		'parties', 'motions', 'bibliography', 'procedural_history',
+		'sentencing', 'judgment'
+	])).max(11).optional()
 });
 
 const QDRANT_URL = getQdrantUrl();
@@ -143,7 +149,8 @@ export const POST: RequestHandler = async ({ request, url }) => {
 			caseId,
 			conversationId,
 			enableACE,
-			precomputedEmbedding
+			precomputedEmbedding,
+			sectionTypes
 		} = body;
 
 		// 0. Check vector result cache (Memory → Redis) for identical query+options
@@ -228,6 +235,41 @@ export const POST: RequestHandler = async ({ request, url }) => {
 				}
 			} catch {
 				// Skip unavailable collections
+			}
+		}
+
+		// 2b. Section-filtered evidence search (when sectionTypes provided)
+		if (sectionTypes?.length) {
+			try {
+				const sectionResults = await qdrant.sectionFilteredSearch({
+					query,
+					queryEmbedding: embedding,
+					sectionTypes,
+					caseId: caseId || body.case_id,
+					limit: top_k,
+					scoreThreshold: min_score,
+				});
+				for (const r of sectionResults.results) {
+					const payload = (r as any).payload ?? {};
+					allChunks.push({
+						chunk_id: `evidence_items:${r.id}`,
+						text: payload.content_preview ?? payload.content ?? payload.text ?? '',
+						snippet: (payload.content_preview ?? payload.content ?? '').slice(0, 300),
+						score: r.score,
+						dense_score: r.score,
+						confidence: toConfidence(r.score),
+						source_type: 'evidence',
+						source_id: String(r.id),
+						source_title: payload.title ?? payload.file_name ?? 'Evidence',
+						section: payload.section_type ?? undefined,
+						has_image: false,
+						has_table: false,
+						related_entities: [],
+						graph_neighbors: []
+					});
+				}
+			} catch {
+				// Section-filtered search unavailable — non-fatal
 			}
 		}
 

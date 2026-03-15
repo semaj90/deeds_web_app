@@ -9,6 +9,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 
 export interface FusedResult {
 	summary: string;
@@ -95,21 +96,23 @@ export async function fuseVLMResults(
 /** Generate embedding for the fused text via Ollama. */
 async function generateFusedEmbedding(text: string): Promise<number[]> {
 	try {
-		const ollamaUrl = ENV.OLLAMA_BASE_URL;
-		const res = await fetch(`${ollamaUrl}/api/embeddings`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: EMBEDDING_MODEL,
-				prompt: text.slice(0, 8000)
-			}),
-			signal: AbortSignal.timeout(10000)
+		return await traceEmbedding(text, EMBEDDING_MODEL, async () => {
+			const ollamaUrl = ENV.OLLAMA_BASE_URL;
+			const res = await fetch(`${ollamaUrl}/api/embeddings`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					model: EMBEDDING_MODEL,
+					prompt: text.slice(0, 8000)
+				}),
+				signal: AbortSignal.timeout(10000)
+			});
+
+			if (!res.ok) return [];
+
+			const data = await res.json();
+			return data?.embedding ?? [];
 		});
-
-		if (!res.ok) return [];
-
-		const data = await res.json();
-		return data?.embedding ?? [];
 	} catch {
 		return [];
 	}

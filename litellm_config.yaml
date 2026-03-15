@@ -1,11 +1,14 @@
 model_list:
-  # ── Primary Legal LLM (Ollama) ──────────────────────────────────────
+  # ── Primary Legal LLM (Ollama via OpenAI-compat endpoint) ─────────
   - model_name: gemma3-legal
     litellm_params:
-      model: ollama/gemma3-legal:latest
-      api_base: http://host.docker.internal:11434
-      num_gpu: 30
-      flash_attention: true
+      model: openai/gemma3-legal:latest
+      api_base: http://host.docker.internal:11434/v1
+      api_key: ollama
+      max_retries: 2
+      timeout: 60
+      rpm: 30
+      tpm: 100000
 
   # ── TRT-LLM via Triton (when engine is built) ──────────────────────
   # Uncomment when TRT engine is available on port 8099
@@ -19,33 +22,36 @@ model_list:
     litellm_params:
       model: ollama/embeddinggemma:latest
       api_base: http://host.docker.internal:11434
+      rpm: 60
 
   # ── Smaller context model ───────────────────────────────────────────
   - model_name: gemma-270m-context
     litellm_params:
-      model: ollama/gemma-270m-context
-      api_base: http://host.docker.internal:11434
-      num_gpu: 30
-      flash_attention: true
+      model: openai/gemma3:270m
+      api_base: http://host.docker.internal:11434/v1
+      api_key: ollama
+      rpm: 60
+      timeout: 30
 
   # ── Claude → local Ollama aliases (for tools expecting OpenAI API) ──
   - model_name: claude-sonnet-4-5
     litellm_params:
-      model: ollama/gemma3-legal:latest
-      api_base: http://host.docker.internal:11434
-      num_gpu: 30
-      flash_attention: true
+      model: openai/gemma3-legal:latest
+      api_base: http://host.docker.internal:11434/v1
+      api_key: ollama
 
   - model_name: claude-3-5-sonnet-20241022
     litellm_params:
-      model: ollama/gemma3-legal:latest
-      api_base: http://host.docker.internal:11434
-      num_gpu: 30
-      flash_attention: true
+      model: openai/gemma3-legal:latest
+      api_base: http://host.docker.internal:11434/v1
+      api_key: ollama
 
 litellm_settings:
   drop_params: true
   set_verbose: false
+  num_retries: 2
+  request_timeout: 60
+  max_parallel_requests: 4
   # ── Semantic Cache (Redis Stack + embeddinggemma) ───────────────────
   cache: true
   cache_params:

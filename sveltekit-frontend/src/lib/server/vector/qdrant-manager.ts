@@ -82,6 +82,8 @@ export class QdrantManager {
             // evidence: filtered by evidence_id (must_not) in findRelatedEvidence()
             { collection: this.collections.evidence, field: 'evidence_id', schema: 'keyword' },
             { collection: this.collections.evidence, field: 'case_id', schema: 'keyword' },
+            // evidence: filtered by section_type in sectionFilteredSearch()
+            { collection: this.collections.evidence, field: 'section_type', schema: 'keyword' },
             // documents: filtered by case_id and document_type in storeDocument()
             { collection: this.collections.documents, field: 'case_id', schema: 'keyword' },
             { collection: this.collections.documents, field: 'document_type', schema: 'keyword' },
@@ -176,6 +178,57 @@ export class QdrantManager {
         } catch (error: any) {
             console.error('Qdrant hybrid search error:', error);
             throw new Error(`Qdrant search failed: ${error.message}`);
+        }
+    }
+
+    /**
+     * Search evidence collection filtered by legal section type(s).
+     * Uses the section_type keyword payload index for O(log n) filtering.
+     */
+    async sectionFilteredSearch(params: {
+        query: string;
+        queryEmbedding: number[];
+        sectionTypes: string[];
+        caseId?: string | null;
+        limit?: number;
+        scoreThreshold?: number;
+    }) {
+        const startTime = Date.now();
+        const mustConditions: any[] = [
+            { key: 'section_type', match: { any: params.sectionTypes } },
+        ];
+        if (params.caseId) {
+            mustConditions.push({ key: 'case_id', match: { value: params.caseId } });
+        }
+
+        try {
+            const results = await this.client.search(this.collections.evidence, {
+                vector: { name: 'content', vector: params.queryEmbedding },
+                limit: params.limit ?? 10,
+                score_threshold: params.scoreThreshold ?? 0.5,
+                filter: { must: mustConditions },
+                with_payload: true,
+                with_vector: false,
+            });
+
+            return {
+                results: results.map((r) => ({
+                    id: r.id,
+                    score: r.score,
+                    payload: r.payload,
+                })),
+                metadata: {
+                    query: params.query,
+                    collection: 'evidence',
+                    sectionTypes: params.sectionTypes,
+                    responseTime: Date.now() - startTime,
+                    total_results: results.length,
+                    cached: false,
+                },
+            };
+        } catch (error: any) {
+            console.error('Qdrant section-filtered search error:', error);
+            return { results: [], metadata: { query: params.query, collection: 'evidence', responseTime: Date.now() - startTime, total_results: 0, cached: false } };
         }
     }
 

@@ -45,6 +45,8 @@ export const ENV = {
 	// SIMD sidecar (Go minio-simd-service)
 	MINIO_SIMD_ENABLED: (privateEnv.MINIO_SIMD_ENABLED ?? 'false') === 'true',
 	MINIO_SIMD_URL: privateEnv.MINIO_SIMD_URL ?? 'http://127.0.0.1:8095',
+	// LangExtract legal section extraction (phase66-langextract container)
+	LANGEXTRACT_URL: privateEnv.LANGEXTRACT_URL ?? privateEnv.LANGEXTRACT_API_URL ?? 'http://127.0.0.1:8095',
 	// QUIC/NATS embedding transport
 	EMBEDDING_QUIC_ENABLED: (privateEnv.EMBEDDING_QUIC_ENABLED ?? privateEnv.QUIC_ENABLED ?? 'false') === 'true',
 	NATS_URL: privateEnv.NATS_URL ?? 'nats://127.0.0.1:4222',
@@ -80,4 +82,8 @@ export const ENV = {
 	LANGFUSE_SECRET_KEY: privateEnv.LANGFUSE_SECRET_KEY ?? '',
 	LANGFUSE_HOST: privateEnv.LANGFUSE_HOST ?? 'http://localhost:3030',
 	LANGFUSE_ENABLED: (privateEnv.LANGFUSE_ENABLED ?? 'false') === 'true',
+	// LiteLLM proxy (OpenAI-compatible gateway with semantic caching)
+	LITELLM_URL: privateEnv.LITELLM_URL ?? 'http://localhost:4000',
+	LITELLM_API_KEY: privateEnv.LITELLM_API_KEY ?? 'sk-deeds-litellm-2026',
+	LITELLM_ENABLED: (privateEnv.LITELLM_ENABLED ?? 'false') === 'true',
 };

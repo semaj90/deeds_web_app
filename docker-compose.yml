@@ -156,7 +156,7 @@ services:
       --loadmodule /opt/redis-stack/lib/rejson.so
       --loadmodule /opt/redis-stack/lib/redisbloom.so
       --maxmemory 2gb
-      --maxmemory-policy allkeys-lru
+      --maxmemory-policy allkeys-lfu
       --save 900 1
       --save 300 10
       --save 60 10000

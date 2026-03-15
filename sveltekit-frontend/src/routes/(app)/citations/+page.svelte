@@ -1,5 +1,6 @@
 <script lang="ts">
   import Button from '$lib/components/ui/Button.svelte';
+  import { analytics } from '$lib/stores/analytics.svelte';
   import DropdownMenu from '$lib/components/ui/DropdownMenu.svelte';
   import Card from '$lib/components/ui/card/Card.svelte';
   import CardContent from '$lib/components/ui/card/CardContent.svelte';
@@ -190,6 +191,7 @@
   });
 
   async function loadCitations() {
+    if (searchQuery) analytics.track('rag_search', { query: searchQuery.slice(0, 200), source: 'citations' });
     try {
       loading = true;
       error = null;

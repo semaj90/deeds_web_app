@@ -2,6 +2,7 @@
 	import { ChatSession } from '$lib/models/ChatSession.svelte.js';
 	import TypewriterResponse from '$lib/components/ai/TypewriterResponse.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
+	import { analytics } from '$lib/stores/analytics.svelte';
 	// ScrollArea removed — bits-ui ScrollArea triggers $props() TDZ in Svelte 5.46.0
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { tick } from 'svelte';
@@ -143,6 +144,7 @@
 			conversationState = 'ai-thinking';
 		}
 
+		analytics.track('chat_query', { queryLength: msg.length, forceServer: prefs.forceServer });
 		await session.sendMessage(msg, { forceServer: prefs.forceServer });
 
 		// In hands-free mode, speak the AI response after it arrives

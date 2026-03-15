@@ -5,6 +5,7 @@ import { callOllamaChat } from '$lib/server/ollama.js';
 import { extractKeywords } from '$lib/server/keyword-extractor.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
+import { extractSectionsFromText, type LangExtractOutput } from '$lib/server/services/langextract-service.js';
 import { eq } from 'drizzle-orm';
 
 export type ContextChatRequest = {
@@ -14,6 +15,7 @@ export type ContextChatRequest = {
 	userId?: string | null;
 	tags?: string[] | null;
 	jurisdiction?: string | null;
+	sectionTypes?: string[] | null;
 };
 
 export type Suggestion = {
@@ -45,6 +47,7 @@ async function getContextFromRag(params: {
 	caseId?: string | null;
 	tags?: string[] | null;
 	jurisdiction?: string | null;
+	sectionTypes?: string[] | null;
 }): Promise<{ contextText: string; citations: Array<{ id: string; source: string; score: number }> }> {
 	try {
 		const embResult = await generateEmbeddings([params.query]);
@@ -58,7 +61,26 @@ async function getContextFromRag(params: {
 		if (params.caseId) filters.case_id = params.caseId;
 		if (params.jurisdiction) filters.jurisdiction = params.jurisdiction;
 
-		// Search both legal_documents and evidence_items in parallel
+		// Search legal_documents + evidence_items in parallel
+		// When sectionTypes provided, use section-filtered search for evidence
+		const evidenceSearch = params.sectionTypes?.length
+			? qdrant.sectionFilteredSearch({
+				query: params.query,
+				queryEmbedding,
+				sectionTypes: params.sectionTypes,
+				caseId: params.caseId,
+				limit: 5,
+				scoreThreshold: 0.5,
+			}).catch(() => ({ results: [], metadata: {} }))
+			: qdrant.hybridSearch({
+				query: params.query,
+				queryEmbedding,
+				collection: 'evidence',
+				filters: params.caseId ? { case_id: params.caseId } : undefined,
+				limit: 3,
+				scoreThreshold: 0.5,
+			}).catch(() => ({ results: [], metadata: {} }));
+
 		const [docResults, evidenceResults] = await Promise.all([
 			qdrant.hybridSearch({
 				query: params.query,
@@ -68,14 +90,7 @@ async function getContextFromRag(params: {
 				limit: 5,
 				scoreThreshold: 0.5,
 			}).catch(() => ({ results: [], metadata: {} })),
-			qdrant.hybridSearch({
-				query: params.query,
-				queryEmbedding,
-				collection: 'evidence',
-				filters: params.caseId ? { case_id: params.caseId } : undefined,
-				limit: 3,
-				scoreThreshold: 0.5,
-			}).catch(() => ({ results: [], metadata: {} })),
+			evidenceSearch,
 		]);
 
 		const allResults = [
@@ -91,7 +106,8 @@ async function getContextFromRag(params: {
 		const contextParts = allResults.slice(0, 6).map((r: any, i: number) => {
 			const title = r.payload?.title || r.payload?.filename || `Source ${i + 1}`;
 			const content = r.payload?.content_preview || r.payload?.content || r.payload?.text || '';
-			return `[${i + 1}] ${title} (score: ${(r.score * 100).toFixed(0)}%)\n${content}`;
+			const sectionLabel = r.payload?.section_type ? ` [${r.payload.section_type.toUpperCase()}]` : '';
+			return `[${i + 1}] ${title}${sectionLabel} (score: ${(r.score * 100).toFixed(0)}%)\n${content}`;
 		});
 
 		const citations = allResults.slice(0, 6).map((r: any) => ({
@@ -118,27 +134,60 @@ export async function contextualChat(params: ContextChatRequest): Promise<Contex
 		userId = null,
 		tags = null,
 		jurisdiction = null,
+		sectionTypes = null,
 	} = params;
 
 	const startedAt = performance.now();
 	const turnId = crypto.randomUUID();
 
-	// 1) Get RAG context from Qdrant
-	const rag = await getContextFromRag({ query: message, caseId, tags, jurisdiction });
+	// 1) Get RAG context from Qdrant (with optional section-type filtering)
+	const rag = await getContextFromRag({ query: message, caseId, tags, jurisdiction, sectionTypes });
+
+	// 2) Extract legal sections from top RAG results via LangExtract (non-blocking, 10s timeout)
+	let sectionSummary = '';
+	if (rag.contextText) {
+		try {
+			const topDocs = rag.contextText.split('\n\n').slice(0, 3);
+			const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 10_000));
+			const extractionWork = Promise.all(
+				topDocs.map((docText, i) =>
+					extractSectionsFromText(docText, `rag-${turnId}-${i}`, 'case')
+						.catch(() => null)
+				)
+			);
+			const extractions = await Promise.race([extractionWork, timeout]) ?? [];
+			const sections = extractions
+				.filter((e): e is LangExtractOutput => e !== null && e.sections.length > 0)
+				.flatMap(e => e.sections);
+			if (sections.length > 0) {
+				const grouped: Record<string, string[]> = {};
+				for (const s of sections) {
+					if (!grouped[s.section_type]) grouped[s.section_type] = [];
+					grouped[s.section_type].push(s.text.slice(0, 300));
+				}
+				sectionSummary = '\n\nExtracted Legal Sections:\n' +
+					Object.entries(grouped)
+						.map(([type, texts]) => `[${type.toUpperCase()}]: ${texts.join(' | ')}`)
+						.join('\n');
+			}
+		} catch (err) {
+			console.warn('[contextual-chat] LangExtract section extraction failed (non-fatal):', err);
+		}
+	}
 
 	const systemPrompt = [
 		'You are a legal AI assistant helping analyze a case.',
 		'Use the provided context when relevant, but do not hallucinate facts.',
 		'Cite sources by number when referencing context (e.g. [1], [2]).',
 		rag.contextText
-			? `\nRelevant context:\n${rag.contextText}`
+			? `\nRelevant context:\n${rag.contextText}${sectionSummary}`
 			: '\nNo additional context was retrieved for this query.',
 	].join('\n');
 
-	// 2) Call Ollama (real implementation with circuit breaker + retry)
+	// 3) Call Ollama (real implementation with circuit breaker + retry)
 	const answer = await callOllamaChat(systemPrompt, message);
 
-	// 3) Extract keywords / key phrases using real Ollama-backed extractor
+	// 4) Extract keywords / key phrases using real Ollama-backed extractor
 	const extractionResult = await extractKeywords(`${message}\n\n${answer}`, 'chat');
 
 	const keywords = extractionResult.keywords;
@@ -152,7 +201,7 @@ export async function contextualChat(params: ContextChatRequest): Promise<Contex
 
 	const latencyMs = Math.round(performance.now() - startedAt);
 
-	// 4) Persist chat turn to ragMessages table
+	// 5) Persist chat turn to ragMessages table
 	if (sessionId) {
 		try {
 			await db.insert(ragMessages).values({

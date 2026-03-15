@@ -100,9 +100,15 @@ const RETRIEVAL_GRPC_ENABLED = ENV.RETRIEVAL_GRPC_ENABLED;
 
 let grpcClient: any = null;
 let grpcLoadFailed = false;
+let grpcRetryAt = 0; // Timestamp for next retry after failure
 
 async function getGrpcClient(): Promise<any> {
-	if (grpcLoadFailed) return null;
+	if (grpcLoadFailed) {
+		// Retry after 30s instead of permanent disable
+		if (Date.now() < grpcRetryAt) return null;
+		grpcLoadFailed = false;
+		grpcClient = null;
+	}
 	if (grpcClient) return grpcClient;
 
 	try {
@@ -125,13 +131,28 @@ async function getGrpcClient(): Promise<any> {
 
 		grpcClient = new RetrievalService(
 			RETRIEVAL_GRPC_URL,
-			grpc.credentials.createInsecure()
+			grpc.credentials.createInsecure(),
+			{
+				// Keepalive: detect dead connections early (10s ping, 5s timeout)
+				'grpc.keepalive_time_ms': 10_000,
+				'grpc.keepalive_timeout_ms': 5_000,
+				'grpc.keepalive_permit_without_calls': 1,
+				// Connection lifecycle: prevent stale connections
+				'grpc.max_connection_idle_ms': 300_000,      // 5min idle disconnect
+				'grpc.max_connection_age_ms': 600_000,       // 10min max age
+				// Message size: 10MB for large retrieval responses
+				'grpc.max_send_message_length': 10 * 1024 * 1024,
+				'grpc.max_receive_message_length': 10 * 1024 * 1024,
+				// HTTP/2: allow pings without active streams
+				'grpc.http2.max_pings_without_data': 0,
+			}
 		);
 
 		return grpcClient;
 	} catch (err) {
-		console.warn('[retrieval-client] gRPC client init failed, will use inline fallback:', (err as Error).message);
+		console.warn('[retrieval-client] gRPC client init failed, will retry in 30s:', (err as Error).message);
 		grpcLoadFailed = true;
+		grpcRetryAt = Date.now() + 30_000;
 		return null;
 	}
 }

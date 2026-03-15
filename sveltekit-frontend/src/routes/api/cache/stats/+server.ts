@@ -95,6 +95,12 @@ export const GET: RequestHandler = async () => {
 					misses: llmMisses,
 					hitRate: llmHitRate
 				},
+				memory: {
+					size: dbsize,
+					estimatedSize: parseInt(memInfo.used_memory || '0', 10),
+					defaultTTL: 300_000,
+					hitRate: llmHitRate
+				},
 				metrics: metricsInsights
 			}
 		});
@@ -130,6 +136,12 @@ export const GET: RequestHandler = async () => {
 					totalResponses: 0,
 					hits: 0,
 					misses: 0,
+					hitRate: 0
+				},
+				memory: {
+					size: 0,
+					estimatedSize: 0,
+					defaultTTL: 300_000,
 					hitRate: 0
 				},
 				metrics: {

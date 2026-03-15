@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import Skeleton from '$lib/components/ui/Skeleton.svelte';
+	import { analytics } from '$lib/stores/analytics.svelte';
 	// Migrated to $effect
 	import type { PageProps } from './$types';
 
@@ -85,6 +86,13 @@
 		if (searchQuery) params.set('search', searchQuery);
 		goto(`/cases?${params.toString()}`);
 	}
+
+	// Track case creation on form success
+	$effect(() => {
+		if (form?.success) {
+			analytics.track('case_created', { message: form.message });
+		}
+	});
 
 	async function navigateToCase(caseId: string) {
 		await goto(`/cases/${caseId}`);

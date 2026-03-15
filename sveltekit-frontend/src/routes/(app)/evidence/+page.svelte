@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { applyAction, enhance } from '$app/forms';
+	import { analytics } from '$lib/stores/analytics.svelte';
 	import type { ActionData, PageData } from './$types';
 	import SmartDocumentForm from '$lib/components/forms/SmartDocumentForm.svelte';
 	import DocumentDetails from '$lib/components/legal/DocumentDetails.svelte';
@@ -470,6 +471,7 @@
 							uploadError = result.data?.error as string;
 						} else if (result.type === 'success') {
 							selectedFile = null;
+							analytics.track('evidence_uploaded', { caseId: data.caseId });
 						}
 						await applyAction(result);
 					};

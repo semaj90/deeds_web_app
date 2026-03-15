@@ -6,6 +6,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 
 export type OllamaEmbedResult = {
   model: string;
@@ -36,22 +37,24 @@ export async function tryEmbedOllama(
   const signal = opts?.signal ?? controller.signal;
 
   try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({ model, prompt: text }),
-      signal
+    return await traceEmbedding(text, model, async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model, prompt: text }),
+        signal
+      });
+
+      if (!res.ok) return null;
+
+      const data = (await res.json()) as OllamaEmbedResponse;
+      if (!data?.embedding || !Array.isArray(data.embedding)) return null;
+
+      return {
+        model: data.model ?? model,
+        embedding: data.embedding
+      };
     });
-
-    if (!res.ok) return null;
-
-    const data = (await res.json()) as OllamaEmbedResponse;
-    if (!data?.embedding || !Array.isArray(data.embedding)) return null;
-
-    return {
-      model: data.model ?? model,
-      embedding: data.embedding
-    };
   } catch (err) {
     return null;
   } finally {

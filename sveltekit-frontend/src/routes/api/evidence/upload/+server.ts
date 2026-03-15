@@ -18,7 +18,9 @@ import { embedGate, entityGate, forensicsGate, summarizeGate, gated, EMBED_BATCH
 import { heavyRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 import { detectEvidenceType, inferLegalClassification } from '$lib/server/evidence/type-detector.js';
 import { invalidateEvidenceCache, invalidateCaseCache } from '$lib/server/cache/invalidation.js';
+import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { triggerEvidenceGpuAnalysis } from '$lib/server/gpu/background-analyzer.js';
+import { extractSectionsFromText, detectSectionsHeuristic, type LangExtractSection } from '$lib/server/services/langextract-service.js';
 
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
@@ -319,6 +321,25 @@ async function extractText(fileName: string, buffer: Buffer, mimeType?: string):
 }
 
 /**
+ * Find the best-matching legal section type for a chunk based on character offset overlap.
+ * Returns the section_type with the greatest overlap, or null if no overlap.
+ */
+function findChunkSectionType(chunkStart: number, chunkEnd: number, sections: LangExtractSection[]): string | null {
+	let bestType: string | null = null;
+	let bestOverlap = 0;
+	for (const s of sections) {
+		const overlapStart = Math.max(chunkStart, s.start_offset);
+		const overlapEnd = Math.min(chunkEnd, s.end_offset);
+		const overlap = overlapEnd - overlapStart;
+		if (overlap > bestOverlap) {
+			bestOverlap = overlap;
+			bestType = s.section_type;
+		}
+	}
+	return bestType;
+}
+
+/**
  * Background processing: extract text → legal-aware chunk → embed → pgvector + Qdrant + graph nodes.
  */
 async function processAndEmbed(
@@ -353,6 +374,19 @@ async function processAndEmbed(
 	const legalChunks = chunkLegalDocument(fullText, { maxTokens: 512, overlap: 128 });
 	const hasStructure = legalChunks.some(c => c.sectionPath.length > 0);
 	console.log(`[Upload] ${legalChunks.length} chunks, structure=${hasStructure ? 'legal' : 'flat'}`);
+
+	// Extract legal sections via LangExtract (facts, issues, holdings, etc.) for chunk tagging
+	let sectionMap: LangExtractSection[] = [];
+	try {
+		const result = await extractSectionsFromText(fullText.slice(0, 50_000), evidenceId, 'case');
+		sectionMap = result.sections;
+		console.log(`[Upload] LangExtract: ${sectionMap.length} sections extracted for ${fileName}`);
+	} catch {
+		try {
+			sectionMap = detectSectionsHeuristic(fullText.slice(0, 50_000), evidenceId).sections;
+			console.log(`[Upload] LangExtract unavailable, heuristic: ${sectionMap.length} sections for ${fileName}`);
+		} catch { /* proceed without sections */ }
+	}
 
 	updateJob(jobId, { step: 'embedding', progress: 70, message: `Generating embeddings for ${legalChunks.length} chunk(s)...` });
 
@@ -410,6 +444,7 @@ async function processAndEmbed(
 			if (!embedding || embedding.length === 0) continue;
 
 			const chunkUUID = crypto.randomUUID();
+			const sectionType = findChunkSectionType(chunk.startOffset, chunk.endOffset, sectionMap);
 
 			try {
 				await storeChunkVector(evidenceId, chunk.chunkIndex, chunk.text.slice(0, 4000), embedding, {
@@ -422,6 +457,7 @@ async function processAndEmbed(
 					startOffset: chunk.startOffset,
 					endOffset: chunk.endOffset,
 					tokenCount: chunk.tokenCount,
+					sectionType,
 				});
 			} catch (err) {
 				console.warn(`[Upload] Chunk ${chunk.chunkIndex} pgvector store failed:`, err);
@@ -441,6 +477,7 @@ async function processAndEmbed(
 					heading: chunk.heading,
 					citations: chunk.citations,
 					token_count: chunk.tokenCount,
+					section_type: sectionType,
 					created_at: new Date().toISOString(),
 				},
 			});
@@ -758,6 +795,12 @@ async function processAndEmbed(
 				nlpClassification: nlpClassification ?? null,
 				evidenceProfile: evidenceProfile ?? null,
 				admissibilityIndicators: evidenceProfile?.admissibility_indicators ?? null,
+				langextractSections: sectionMap.length > 0 ? sectionMap.map(s => ({ type: s.section_type, confidence: s.confidence })) : null,
+				sectionTypeDistribution: sectionMap.length > 0
+					? Object.fromEntries(
+						[...new Set(sectionMap.map(s => s.section_type))].map(t => [t, sectionMap.filter(s => s.section_type === t).length])
+					)
+					: null,
 				suggestedTags: [
 					...(evidenceProfile?.suggested_tags ?? []),
 					...(visionAnalysis?.suggestedTags ?? []),
@@ -891,28 +934,30 @@ async function embedText(text: string): Promise<number[] | null> {
 
 	if (!embedding) {
 		try {
-			const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ model, prompt: text }),
-				signal: AbortSignal.timeout(30_000),
-			});
-
-			if (!res.ok) {
-				// Fallback to nomic-embed-text
-				const fallback = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+			embedding = await traceEmbedding(text, model, async () => {
+				const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ model: 'nomic-embed-text:latest', prompt: text }),
+					body: JSON.stringify({ model, prompt: text }),
 					signal: AbortSignal.timeout(30_000),
 				});
-				if (!fallback.ok) return null;
-				const data = await fallback.json();
-				embedding = data.embedding;
-			} else {
+
+				if (!res.ok) {
+					// Fallback to nomic-embed-text
+					const fallback = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ model: 'nomic-embed-text:latest', prompt: text }),
+						signal: AbortSignal.timeout(30_000),
+					});
+					if (!fallback.ok) return null;
+					const data = await fallback.json();
+					return data.embedding;
+				}
+
 				const data = await res.json();
-				embedding = data.embedding;
-			}
+				return data.embedding;
+			});
 		} catch {
 			return null;
 		}

@@ -8,6 +8,9 @@ import type {
 	ActionItem
 } from '$lib/types/rag-source-validation';
 import { getRedis } from '$lib/server/redis.js';
+import { traceLLM } from '$lib/server/observability/langfuse.js';
+import { litellmChat } from '$lib/server/ollama.js';
+import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 
 const OLLAMA_URL = getOllamaUrl();
@@ -86,30 +89,45 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		const prompt = `${systemPrompt}${contextBlock}Question: ${query}\n\nProvide a comprehensive legal analysis. Include [Source N] citations where applicable.${include_todos ? ' Also list any recommended action items.' : ''}`;
 
-		// Call Ollama for generation
-		const genResp = await fetch(`${OLLAMA_URL}/api/generate`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: 'gemma3-legal:latest',
-				prompt,
-				stream: false,
-				options: {
-					num_predict: max_tokens,
-					temperature
-				}
-			}),
-			signal: AbortSignal.timeout(30000)
+		// Call Ollama (or LiteLLM) for generation
+		const { answerText, genTime, evalCount } = await traceLLM('rag-answer', { model: 'gemma3-legal:latest', prompt: query.slice(0, 500), case_id }, async (gen) => {
+			// Route through LiteLLM proxy when enabled (gets semantic caching)
+			if (ENV.LITELLM_ENABLED) {
+				const text = await litellmChat(
+					[{ role: 'user', content: prompt }],
+					'gemma3-legal',
+					{ maxTokens: max_tokens, temperature, timeoutMs: 30_000 }
+				);
+				gen.end({ output: text.slice(0, 1000) });
+				return { answerText: text.trim(), genTime: performance.now() - startTime, evalCount: Math.ceil(text.length / 4) as number | undefined };
+			}
+
+			const genResp = await fetch(`${OLLAMA_URL}/api/generate`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					model: 'gemma3-legal:latest',
+					prompt,
+					stream: false,
+					options: {
+						num_predict: max_tokens,
+						temperature
+					}
+				}),
+				signal: AbortSignal.timeout(30000)
+			});
+
+			if (!genResp.ok) {
+				console.error('[rag/answer] Ollama error:', genResp.status);
+				gen.end({ output: `error:${genResp.status}`, level: 'WARNING' });
+				throw new Error(`Ollama ${genResp.status}`);
+			}
+
+			const genData = await genResp.json();
+			const text = genData.response?.trim() ?? '';
+			gen.end({ output: text.slice(0, 1000), usage: { promptTokens: genData.prompt_eval_count, completionTokens: genData.eval_count } });
+			return { answerText: text, genTime: performance.now() - startTime, evalCount: genData.eval_count as number | undefined };
 		});
-
-		if (!genResp.ok) {
-			console.error('[rag/answer] Ollama error:', genResp.status);
-			return json({ error: 'Answer generation service unavailable' }, { status: 502 });
-		}
-
-		const genData = await genResp.json();
-		const answerText = genData.response?.trim() ?? '';
-		const genTime = performance.now() - startTime;
 
 		// Extract citations from [Source N] references in the answer
 		const citations: Citation[] = [];
@@ -170,7 +188,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			citations,
 			action_items: actionItems,
 			model: 'gemma3-legal:latest',
-			tokens_used: genData.eval_count ?? Math.ceil(answerText.length / 4),
+			tokens_used: evalCount ?? Math.ceil(answerText.length / 4),
 			generation_time_ms: Math.round(genTime),
 			answer_confidence: answerConfidence,
 			grounding_score: groundingScore,

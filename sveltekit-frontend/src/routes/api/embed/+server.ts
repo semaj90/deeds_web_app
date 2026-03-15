@@ -5,6 +5,7 @@ import { apiResponses } from '$lib/server/api/response-helper.js';
 import { embedRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 import { acquireGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 import { embedText } from '$lib/server/embedding/embed.js';
+import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { z } from 'zod';
 
 const OLLAMA_URL = getOllamaUrl();
@@ -31,19 +32,21 @@ async function getOllamaEmbedding(
 	text: string,
 	model: string = 'embeddinggemma:latest'
 ): Promise<{ embedding: number[] }> {
-	const response = await fetch(`${OLLAMA_URL}/api/embeddings`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ model, prompt: text }),
-		signal: AbortSignal.timeout(10_000),
+	return traceEmbedding(text, model, async () => {
+		const response = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ model, prompt: text }),
+			signal: AbortSignal.timeout(10_000),
+		});
+
+		if (!response.ok) {
+			throw new Error(`Ollama embedding error: ${response.status} ${response.statusText}`);
+		}
+
+		const data = await response.json();
+		return { embedding: Array.isArray(data.embedding) ? data.embedding : [] };
 	});
-
-	if (!response.ok) {
-		throw new Error(`Ollama embedding error: ${response.status} ${response.statusText}`);
-	}
-
-	const data = await response.json();
-	return { embedding: Array.isArray(data.embedding) ? data.embedding : [] };
 }
 
 export const POST: RequestHandler = async ({ request }) => {

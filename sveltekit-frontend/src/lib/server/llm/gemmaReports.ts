@@ -1,5 +1,6 @@
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
+import { litellmChat } from '$lib/server/ollama.js';
 
 export type ReportTemplate = 'charging_memo' | 'intake_summary';
 
@@ -79,6 +80,16 @@ Requirements:
 `;
 
     return traceLLM('gemma-report', { model: OLLAMA_MODEL, template, caseId }, async (gen) => {
+        // Route through LiteLLM proxy when enabled (gets semantic caching)
+        if (ENV.LITELLM_ENABLED) {
+            const content = await litellmChat(
+                [{ role: 'user', content: prompt }],
+                OLLAMA_MODEL
+            );
+            gen.end({ output: content.slice(0, 1000) });
+            return content;
+        }
+
         const res = await fetch(`${OLLAMA_URL}/api/generate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

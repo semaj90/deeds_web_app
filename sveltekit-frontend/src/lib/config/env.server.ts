@@ -137,9 +137,9 @@ const ConfigSchema = z.object({
  API_KEY: z.string().default('dev-api-key'),
  LOG_LEVEL: z.string().default('info'),
  ENABLE_STRUCTURED_LOGGING: z.coerce.boolean().default(false),
- // Backward-compatible (legacy) aliases
- DATABASE_URL: z.string().url().optional(),
- MINIO_ENDPOINT: z.string().url().optional(),
+ // Backward-compatible (legacy) aliases — no .url() since these can be host:port or connection strings
+ DATABASE_URL: z.string().optional(),
+ MINIO_ENDPOINT: z.string().optional(),
  MINIO_REGION: z.string().optional(),
 });
 
@@ -191,11 +191,10 @@ const parsed = ConfigSchema.safeParse({
 	MINIO_ENDPOINT: env.MINIO_ENDPOINT,
 	MINIO_REGION: env.MINIO_REGION,
 });if (!parsed.success) {
- console.error('❌ CONFIG validation failed: ', parsed.error.format());
- throw new Error('Invalid environment configuration');
+ console.warn('⚠️ CONFIG validation issues (non-fatal): ', parsed.error.format());
 }
 
-export const CONFIG = parsed.data;
+export const CONFIG = parsed.success ? parsed.data : ConfigSchema.parse({});
 export type Config = typeof CONFIG;
 
 /** Convenience helpers */

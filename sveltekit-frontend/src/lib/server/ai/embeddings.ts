@@ -7,6 +7,7 @@ import { db } from '../db/index.js';
 import { cases, evidence } from '../db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
 import { getOllamaEndpoint } from './endpoints.js';
+import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 
 export interface EmbeddingOptions {
 	model?: string;
@@ -105,57 +106,44 @@ async function generateLocalEmbedding(
 	const ollamaUrl = getOllamaEndpoint();
 
 	try {
-		const response = await fetch(`${ollamaUrl}/api/embeddings`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-	body: JSON.stringify({
-				model,
-				// Ollama uses: "prompt" for embeddings with recent versions
-				prompt: text
-			})
+		return await traceEmbedding(text, model, async () => {
+			const response = await fetch(`${ollamaUrl}/api/embeddings`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ model, prompt: text })
+			});
+
+			if (!response.ok) {
+				throw new Error(`Ollama API error, ${response.status} ${response.statusText}`);
+			}
+
+			const data: unknown = await response.json();
+			let rawEmbedding: unknown = null;
+			const obj = data as Record<string, unknown>;
+
+			if (data && typeof data === 'object') {
+				if ('embedding' in obj && Array.isArray(obj.embedding)) {
+					rawEmbedding = obj.embedding;
+				} else if ('embeddings' in obj && Array.isArray(obj.embeddings)) {
+					const embeddings = obj.embeddings as unknown[];
+					rawEmbedding = embeddings[0] ?? embeddings;
+				} else if (Array.isArray(data) && data.length > 0 && typeof data[0] === 'object' && data[0] !== null && 'embedding' in data[0]) {
+					rawEmbedding = (data[0] as Record<string, unknown>).embedding;
+				}
+			}
+
+			const isNumberArray = (value: unknown): value is number[] =>
+				Array.isArray(value) && value.every((item) => typeof item === 'number');
+
+			if (!isNumberArray(rawEmbedding)) {
+				throw new Error('Unexpected or invalid embedding format from Ollama');
+			}
+
+			return rawEmbedding;
 		});
-
-		if (!response.ok) {
-			throw new Error(`Ollama API error, ${response.status} ${response.statusText}`);
-		}
-
-		const data: unknown = await response.json();
-
-        // Parse different possible response shapes from Ollama-like services
-        let rawEmbedding: unknown = null;
-        const obj = data as Record<string, unknown>;
-
-        if (data && typeof data === 'object') {
-            if ('embedding' in obj && Array.isArray(obj.embedding)) {
-                rawEmbedding = obj.embedding;
-            } else if ('embeddings' in obj && Array.isArray(obj.embeddings)) {
-                const embeddings = obj.embeddings as unknown[];
-                rawEmbedding = embeddings[0] ?? embeddings;
-            } else if (Array.isArray(data) && data.length > 0 && typeof data[0] === 'object' && data[0] !== null && 'embedding' in data[0]) {
-                rawEmbedding = (data[0] as Record<string, unknown>).embedding;
-            }
-        }
-
-		// Type guard to check if a value is an array of numbers
-		const isNumberArray = (value: unknown): value is number[] =>
-			Array.isArray(value) && value.every((item) => typeof item === 'number');
-
-		if (!isNumberArray(rawEmbedding)) {
-			throw new Error('Unexpected or invalid embedding format from Ollama');
-		}
-
-		// Quantize EmbeddingGemma (768D) to 384D for schema compatibility
-		// if (model.startsWith('embeddinggemma') && rawEmbedding.length === 768) {
-		// return quantizeEmbedding(rawEmbedding, 384);
-		// }
-
-		return rawEmbedding;
 	} catch (error: unknown) {
 		console.error('Ollama embedding generation failed: ', error);
-		// Fallback to mock embedding for development
-		return generateMockEmbedding(768); // Use 768D for web embeddings schema
+		return generateMockEmbedding(768);
 	}
 }
 

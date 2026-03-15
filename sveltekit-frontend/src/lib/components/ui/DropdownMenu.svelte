@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { cn } from "$lib";
-  import { DropdownMenu } from "bits-ui";
-import type { Snippet } from "svelte";
+  import type { Snippet } from "svelte";
 
   interface DropdownItem {
     label: string;
@@ -19,45 +17,74 @@ import type { Snippet } from "svelte";
   }
 
   let { items = [], trigger = "Menu", class: className = "" }: Props = $props();
+  let open = $state(false);
+  let menuRef = $state<HTMLDivElement>();
+
+  function toggle() { open = !open; }
+  function close() { open = false; }
+
+  function handleItemClick(item: DropdownItem) {
+    if (item.disabled) return;
+    item.onClick?.(item.value);
+    close();
+  }
+
+  function handleClickOutside(e: MouseEvent) {
+    if (menuRef && !menuRef.contains(e.target as Node)) close();
+  }
+
+  $effect(() => {
+    if (open) {
+      document.addEventListener("click", handleClickOutside, true);
+      return () => document.removeEventListener("click", handleClickOutside, true);
+    }
+  });
 </script>
 
-<DropdownMenu.Root>
-  <DropdownMenu.Trigger
-    class={cn(
-      "inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none, disabled:opacity-50",
-      className
-    )}
+<div class="relative inline-block" bind:this={menuRef}>
+  <button
+    type="button"
+    class="inline-flex items-center justify-center rounded-md border border-current/20 bg-transparent px-4 py-2 text-sm font-semibold uppercase tracking-wider transition-colors hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/30 {className}"
+    onclick={toggle}
+    aria-haspopup="true"
+    aria-expanded={open}
   >
-    {#if typeof trigger === 'string'}
+    {#if typeof trigger === "string"}
       {trigger}
     {:else if trigger}
       {@render trigger()}
     {/if}
-  </DropdownMenu.Trigger>
+  </button>
 
-  <DropdownMenu.Content
-    class="z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md transition-all data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
-  >
-    {#each items as item}
-      {#if item.separator}
-        <DropdownMenu.Separator class="-mx-1 my-1 h-px bg-muted" />
-      {:else}
-        <DropdownMenu.Item
-          class={cn(
-            "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent, focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-          )}
-          disabled={item.disabled}
-          onSelect={() => item.onClick?.(item.value)}
-        >
-          {#if item.href}
-            <a href={item.href} class="w-full h-full block">{item.label}</a>
-          {:else}
+  {#if open}
+    <div
+      class="absolute right-0 z-50 mt-1 min-w-[10rem] overflow-hidden rounded-md border-2 border-current/15 bg-white shadow-lg"
+      role="menu"
+    >
+      {#each items as item}
+        {#if item.separator}
+          <div class="my-1 h-px bg-current/10"></div>
+        {:else if item.href}
+          <a
+            href={item.href}
+            class="block w-full px-3 py-2 text-left text-sm font-medium uppercase tracking-wider transition-colors hover:bg-black/5"
+            role="menuitem"
+            onclick={close}
+          >
             {item.label}
-          {/if}
-        </DropdownMenu.Item>
-      {/if}
-    {/each}
-  </DropdownMenu.Content>
-</DropdownMenu.Root>
-
-
+          </a>
+        {:else}
+          <button
+            type="button"
+            class="block w-full px-3 py-2 text-left text-sm font-medium uppercase tracking-wider transition-colors hover:bg-black/5 disabled:opacity-40 disabled:cursor-not-allowed"
+            role="menuitem"
+            disabled={item.disabled}
+            onclick={() => handleItemClick(item)}
+          >
+            {item.label}
+          </button>
+        {/if}
+      {/each}
+    </div>
+  {/if}
+</div>

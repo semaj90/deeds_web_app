@@ -10,6 +10,11 @@ const contextualChatSchema = z.object({
 	sessionId: z.string().max(500).optional(),
 	tags: z.array(z.string().max(200)).max(20).optional(),
 	jurisdiction: z.string().max(200).optional(),
+	sectionTypes: z.array(z.enum([
+		'facts', 'issues', 'reasoning', 'holding', 'citations',
+		'parties', 'motions', 'bibliography', 'procedural_history',
+		'sentencing', 'judgment'
+	])).max(11).optional(),
 	context: z.string().max(10000).optional().default(''),
 	history: z.array(z.object({
 		role: z.string().max(50),
@@ -29,7 +34,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 
 		const message = parsed.data.message || parsed.data.query || '';
-		const { caseId, sessionId, tags, jurisdiction } = parsed.data;
+		const { caseId, sessionId, tags, jurisdiction, sectionTypes } = parsed.data;
 
 		const result = await contextualChat({
 			message,
@@ -38,6 +43,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			userId: locals.user?.id ?? null,
 			tags: tags ?? null,
 			jurisdiction: jurisdiction || null,
+			sectionTypes: sectionTypes ?? null,
 		});
 
 		return json({

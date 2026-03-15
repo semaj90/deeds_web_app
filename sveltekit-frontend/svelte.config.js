@@ -25,12 +25,15 @@ const config = {
   // Use svelte-preprocess for safe defaults (TypeScript, PostCSS, scss, etc.)
   preprocess: vitePreprocess(),
 
-  // Configure Vite to handle node_modules differently (legacy mode for lucide-svelte)
   vitePlugin: {
     inspector: false,
     dynamicCompileOptions({ filename }) {
-      // Disable runes for node_modules components that use $$props
-      if (filename.includes('node_modules')) {
+      // Svelte 4 legacy packages (lucide-svelte uses $$props) need runes disabled.
+      // svelte-sonner and bits-ui use $props() runes and must NOT be overridden.
+      if (filename.includes('node_modules') &&
+          !filename.includes('svelte-sonner') &&
+          !filename.includes('bits-ui') &&
+          !filename.includes('svelte-tiptap')) {
         return { runes: false };
       }
     }
@@ -66,7 +69,7 @@ const config = {
     // This allows the client to directly access Ollama if needed, or via a proxy.
     env: {
       publicPrefix: 'PUBLIC_', // Ensures variables starting with PUBLIC_ are exposed to client
-      privatePrefix: 'PRIVATE_', // Ensures variables starting with PRIVATE_ are server-only
+      privatePrefix: '', // Default: all non-PUBLIC_ vars accessible server-side via $env/dynamic/private
     },
   },
 };

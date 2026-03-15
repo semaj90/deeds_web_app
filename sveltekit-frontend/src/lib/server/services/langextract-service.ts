@@ -1,4 +1,4 @@
-import { env } from '$lib/env';
+import { ENV } from '$lib/server/env.server.js';
 
 type SectionType =
 	| 'facts'
@@ -46,11 +46,11 @@ export interface LangExtractOutput {
  * If neither set, try python:8095 then go:8090.
  */
 const CANDIDATE_BASE_URLS = [
-	env?.LANGEXTRACT_URL,
-	env?.LANGEXTRACT_API_URL,
+	ENV.LANGEXTRACT_URL,
+	ENV.MINIO_SIMD_URL,
 	'http://localhost:8095', // python (phase66)
 	'http://localhost:8090' // go (langextract-go)
-].filter(Boolean) as string[];
+].filter((v, i, arr) => Boolean(v) && arr.indexOf(v) === i) as string[];
 
 let cachedBaseUrl: string | null = null;
 
@@ -70,7 +70,7 @@ async function resolveLangExtractBaseUrl(): Promise<string> {
 	}
 
 	// If no /health exists, still allow explicit env override to work.
-	const explicit = (env?.LANGEXTRACT_URL ?? env?.LANGEXTRACT_API_URL)?.trim();
+	const explicit = ENV.LANGEXTRACT_URL?.trim();
 	if (explicit) {
 		cachedBaseUrl = explicit;
 		return explicit;

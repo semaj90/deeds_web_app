@@ -3,12 +3,11 @@
     import { page } from '$app/stores';
     import { ChatSession } from '$lib/models/ChatSession.svelte';
 
-    let props = $props(); // Load initial history from server load function
-    let data = $derived(props.data);
+    let { data }: { data?: any } = $props();
 
     // Initialize once — intentionally capture initial data only (not reactive)
     // svelte-ignore state_referenced_locally
-    const initialHistory: any[] = (props.data as any)?.history ?? [];
+    const initialHistory: any[] = data?.history ?? [];
     const chat = untrack(() => new ChatSession($page.params.id, initialHistory));
     // Load persisted history from IndexedDB if no server history provided
     if (!initialHistory?.length) chat.loadHistory();
