@@ -10,6 +10,7 @@ import { eq } from 'drizzle-orm';
 import { Lucia, type Session, type User } from 'lucia';
 import db from './db/drizzle.js';
 import * as schema from './db/schema.js';
+import { ENV } from './env.server.js';
 import {
     LoginError,
     PasswordError,
@@ -379,8 +380,9 @@ export class AuthService {
     try {
       const response = await fetch(`${getLegalGatewayUrl()}/cases/${caseId}`, {
         headers: {
-	Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
-	});
+          Authorization: `Bearer ${ENV.SERVICE_AUTH_TOKEN}`,
+        },
+      });
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -412,8 +414,9 @@ export class AuthService {
     try {
       const response = await fetch(`${getLegalGatewayUrl()}/cases/${caseId}/documents`, {
         headers: {
-	Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
-	});
+          Authorization: `Bearer ${ENV.SERVICE_AUTH_TOKEN}`,
+        },
+      });
 
       if (!response.ok) {
         return [];
@@ -433,8 +436,9 @@ export class AuthService {
     try {
       const response = await fetch(`${getLegalGatewayUrl()}/cases/count`, {
         headers: {
-	Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
-	});
+          Authorization: `Bearer ${ENV.SERVICE_AUTH_TOKEN}`,
+        },
+      });
 
       if (!response.ok) {
         return 0;
@@ -455,8 +459,9 @@ export class AuthService {
     try {
       const response = await fetch(`${getLegalGatewayUrl()}/documents/count`, {
         headers: {
-	Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
-	});
+          Authorization: `Bearer ${ENV.SERVICE_AUTH_TOKEN}`,
+        },
+      });
 
       if (!response.ok) {
         return 0;
@@ -477,8 +482,9 @@ export class AuthService {
     try {
       const response = await fetch(`${getLegalGatewayUrl()}/cases?limit=${limit}`, {
         headers: {
-	Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
-	});
+          Authorization: `Bearer ${ENV.SERVICE_AUTH_TOKEN}`,
+        },
+      });
 
       if (!response.ok) {
         return [];

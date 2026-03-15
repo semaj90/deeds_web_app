@@ -1,24 +1,17 @@
 import * as bcrypt from 'bcryptjs';
 import * as crypto from 'crypto';
 import * as jwt from 'jsonwebtoken';
+import { ENV } from './env.server.js';
 
 // JWT Payload type definition
 export interface JWTPayload {
-	userId: string;
-	exp?: number;
-	iat?: number;
-	[key: string]: unknown;
+  userId: string;
+  exp?: number;
+  iat?: number;
+  [key: string]: unknown;
 }
 
-const JWT_SECRET = process.env.JWT_SECRET ?? 'fallback-secret-key'; // Fixed import.meta.env to process.env for Node compatibility as requested in server context
-// or stick with import.meta.env if using Vite exclusively for building server logic.
-// However `import type { env } from "process"` in view suggests mixing patterns.
-// We'll use process.env to be safe for typical node server files, or import.meta.env if forced.
-// The file previously used import.meta.env. Let's assume standard Vite project.
-// But earlier errors showed "process" based imports. I will respect the user environment.
-
-// const JWT_SECRET = import.meta.env?.JWT_SECRET ?? "fallback-secret-key";
-// const JWT_EXPIRATION = import.meta.env?.JWT_EXPIRATION ?? "86400"; // 24 hours
+const JWT_SECRET = ENV.JWT_SECRET;
 
 /**
  * Hashes a plain-text password using Bcrypt.

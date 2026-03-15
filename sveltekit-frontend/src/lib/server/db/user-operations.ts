@@ -22,14 +22,35 @@ export class UserAuthService {
         profileData?: any;
     }): Promise<{ user: any | null, success: boolean; error?: string }> {
         try {
-            // Check if user already exists
-            const existingUser = await db.select().from(users).where(eq(users.email, userData.email.toLowerCase())).limit(1);
-            if (existingUser.length > 0) {
-                return { user: null, success: false, error: 'User already exists' };
-            }
+          // Check if user already exists
+          const existingUser = await db
+            .select()
+            .from(users)
+            .where(eq(users.email, userData.email.toLowerCase()))
+            .limit(1);
+          if (existingUser.length > 0) {
+            return { user: null, success: false, error: 'User already exists' };
+          }
 
-            // TODO: Implement user creation logic
-            return { user: null, success: false, error: 'Not implemented' };
+          // Hash password
+          const passwordHash = await bcrypt.hash(userData.password, 12);
+
+          // Create user
+          const [newUser] = await db
+            .insert(users)
+            .values({
+              email: userData.email.toLowerCase(),
+              passwordHash,
+              firstName: userData.firstName ?? null,
+              lastName: userData.lastName ?? null,
+              role: userData.role ?? 'prosecutor',
+              isActive: true,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            } as any)
+            .returning();
+
+          return { user: newUser, success: true };
         } catch (error: any) {
             console.error('User registration error:', error);
             return { user: null, success: false, error: error.message };

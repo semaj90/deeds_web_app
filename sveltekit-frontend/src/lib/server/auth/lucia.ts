@@ -1,37 +1,4 @@
-// PHASE 72 TESTING STUB - Auth completely disabled
-// DEV_BYPASS_AUTH=true in .env means no actual auth is needed
-
-export const auth = {
-    sessionCookieName: 'yorha_session',
-    validateSession: async () => ({ session: null, user: null }),
-    createSession: async (userId: string) => ({
-        id: 'demo-session-' + userId,
-        userId,
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24)
-    }),
-    createSessionCookie: (sessionId: string) => ({
-        name: 'yorha_session',
-        value: sessionId,
-        attributes: { path: '/', httpOnly: true }
-    }),
-    createBlankSessionCookie: () => ({
-        name: 'yorha_session',
-        value: '',
-        attributes: {}
-    }),
-};
-
-export type Auth = typeof auth;
-export type User = Record<string, unknown>;
-
-interface DatabaseUserAttributes {
-    email: string;
-    role?: string;
-}
-
-// Placeholder type for when Lucia is disabled
-type LuciaUser<T> = {
-    id: string;
-    email: string;
-    role?: string;
-};
+// Re-export canonical Lucia v3 instance from $lib/server/lucia
+// Replaces Phase 72 testing stub that always returned null sessions
+export { lucia as auth, lucia } from '$lib/server/lucia';
+export type { ValidationResult, ValidatedUser, CreateUserSessionResult } from '$lib/server/lucia';

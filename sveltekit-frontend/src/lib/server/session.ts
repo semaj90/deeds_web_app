@@ -1,8 +1,10 @@
 import type { Cookies } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
 import { getUserById } from './db/queries.js';
 // Use namespace import to tolerate different export shapes in authUtils
 import * as authUtils from './authUtils.js';
 import { db } from './db/client.js';
+import { sessions } from './db/schema.js';
 
 export interface Session {
     id: string;
@@ -152,18 +154,16 @@ export function setSessionTokenCookie(
 }
 
 /**
- * Invalidates a user session by its ID.
- * In a real application, this would delete the session from the database or Redis.
+ * Invalidates a user session by deleting it from the database.
  * @param sessionId The ID of the session to invalidate.
  */
 export async function invalidateSession(sessionId: string): Promise<void> {
     console.log(`[Session Service] Invalidating session: ${sessionId}`);
-    // TODO: Implement actual session deletion from DB/Redis
-    // Example with Drizzle:
-    // import { db } from '$lib/server/db/client';
-    // import * as schema from '$lib/server/db/schema-postgres';
-    // import { eq } from 'drizzle-orm';
-    // await db.delete(schema.sessions).where(eq(schema.sessions.id, sessionId));
+    try {
+      await db.delete(sessions).where(eq(sessions.id, sessionId));
+    } catch (error) {
+      console.error('[Session Service] Failed to invalidate session:', error);
+    }
 }
 
 /**
