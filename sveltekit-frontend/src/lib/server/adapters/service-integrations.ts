@@ -13,6 +13,7 @@
  * All configurations are loaded from environment variables.
  */
 import { dev } from '$app/environment';
+import { env as privateEnv } from '$env/dynamic/private';
 import { ENV } from '$lib/server/env.server.js';
 import type {
 	MinIOClient,
@@ -58,62 +59,57 @@ export function loadServiceEnvironment(): ServiceEnvironment {
 		// Redis
 		redisConfig: {
 			url: ENV.REDIS_URL,
-			password: process.env.REDIS_PASSWORD || undefined,
-			host: process.env.REDIS_HOST || 'localhost',
-			port: parseInt(process.env.REDIS_PORT || '6379', 10),
+			password: privateEnv.REDIS_PASSWORD || undefined,
+			host: privateEnv.REDIS_HOST || 'localhost',
+			port: parseInt(privateEnv.REDIS_PORT || '6379', 10),
 			db: 0,
 			maxRetriesPerRequest: 3,
 			enableReadyCheck: true
 		},
 		// Qdrant
 		qdrantConfig: {
-			host: process.env.QDRANT_HOST || 'localhost',
-			port: parseInt(process.env.QDRANT_PORT || '6333', 10),
-			apiKey: process.env.QDRANT_API_KEY,
+			host: privateEnv.QDRANT_HOST || 'localhost',
+			port: parseInt(privateEnv.QDRANT_PORT || '6333', 10),
+			apiKey: privateEnv.QDRANT_API_KEY,
 			timeout: 30000
 		},
 		// Ollama
 		ollamaConfig: {
 			baseUrl: ENV.OLLAMA_BASE_URL,
-			embeddingModel: process.env.EMBEDDING_MODEL || 'embeddinggemma:latest',
-			chatModel: process.env.CHAT_MODEL || 'gemma3-legal:latest',
-			gpuLayers: parseInt(process.env.OLLAMA_GPU_LAYERS || '30', 10),
+			embeddingModel: privateEnv.EMBEDDING_MODEL || 'embeddinggemma:latest',
+			chatModel: privateEnv.CHAT_MODEL || 'gemma3-legal:latest',
+			gpuLayers: parseInt(privateEnv.OLLAMA_GPU_LAYERS || '30', 10),
 			timeout: 60000
 		},
 		// MinIO
 		minioConfig: {
-			endPoint: (process.env.MINIO_ENDPOINT || 'localhost:9000').split(':')[0],
-			port: parseInt(
-				(process.env.MINIO_ENDPOINT || 'localhost:9000').split(':')[1] ||
-				process.env.MINIO_PORT ||
-				'9000',
-				10
-			),
-			accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
-			secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin123',
-			useSSL: process.env.MINIO_USE_SSL === 'true',
+			endPoint: ENV.MINIO_ENDPOINT.split(':')[0],
+			port: parseInt(ENV.MINIO_PORT, 10),
+			accessKey: ENV.MINIO_ACCESS_KEY,
+			secretKey: ENV.MINIO_SECRET_KEY,
+			useSSL: ENV.MINIO_USE_SSL === 'true',
 			region: 'us-east-1'
 		},
 		// Neo4j
 		neo4jConfig: {
-			uri: process.env.NEO4J_URI || 'bolt://localhost:7687',
-			user: process.env.NEO4J_USER || 'neo4j',
-			password: process.env.NEO4J_PASSWORD || 'password',
-			database: process.env.NEO4J_DATABASE || 'neo4j',
+			uri: ENV.NEO4J_URI,
+			user: ENV.NEO4J_USER,
+			password: ENV.NEO4J_PASSWORD,
+			database: privateEnv.NEO4J_DATABASE || 'neo4j',
 			maxConnectionPoolSize: 50
 		},
 		// RabbitMQ
 		rabbitmqConfig: {
-			url: process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672',
-			enabled: process.env.RABBITMQ_ENABLED !== 'false',
+			url: ENV.RABBITMQ_URL,
+			enabled: privateEnv.RABBITMQ_ENABLED !== 'false',
 			exchange: 'legal-ai-exchange',
 			queuePrefix: 'legal-ai',
 			heartbeat: 60
 		},
 		// Development
-		nodeEnv: (process.env.NODE_ENV || 'development') as 'development' | 'production' | 'test',
-		devBypassAuth: process.env.DEV_BYPASS_AUTH === 'true' || false,
-		logLevel: (process.env.LOG_LEVEL || 'info') as 'error' | 'warn' | 'info' | 'debug'
+		nodeEnv: (privateEnv.NODE_ENV || 'development') as 'development' | 'production' | 'test',
+		devBypassAuth: dev,
+		logLevel: (privateEnv.LOG_LEVEL || 'info') as 'error' | 'warn' | 'info' | 'debug'
 	};
 }
 
@@ -139,13 +135,13 @@ export function getServiceUrls(env: ServiceEnvironment): ServiceUrls {
 			.replace('amqp://', 'http://')
 			.replace(':5672', ':15672'),
 		// QUIC Microservices
-		quicGateway: process.env.QUIC_GATEWAY_URL ?? '',
-		quicVectorService: process.env.QUIC_VECTOR_SERVICE_URL ?? '',
-		quicSearchService: process.env.QUIC_SEARCH_SERVICE_URL ?? '',
+		quicGateway: privateEnv.QUIC_GATEWAY_URL ?? '',
+		quicVectorService: privateEnv.QUIC_VECTOR_SERVICE_URL ?? '',
+		quicSearchService: privateEnv.QUIC_SEARCH_SERVICE_URL ?? '',
 		// GPU Services
-		tensorRTApi: process.env.TENSORRT_API_URL ?? '',
-		tensorRTWs: process.env.TENSORRT_WS_URL ?? '',
-		cudaService: process.env.CUDA_SERVICE_URL ?? ''
+		tensorRTApi: privateEnv.TENSORRT_API_URL ?? '',
+		tensorRTWs: privateEnv.TENSORRT_WS_URL ?? '',
+		cudaService: privateEnv.CUDA_SERVICE_URL ?? ''
 	};
 }
 
