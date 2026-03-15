@@ -2571,3 +2571,24 @@ export const analyticsEvents = pgTable('analytics_events', {
 export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
 export type NewAnalyticsEvent = typeof analyticsEvents.$inferInsert;
 
+// === FAILED JOBS (durable log for RabbitMQ dead-lettered messages) ===
+
+export const failedJobs = pgTable('failed_jobs', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	queue: varchar('queue', { length: 100 }).notNull(),
+	dlqQueue: varchar('dlq_queue', { length: 100 }).notNull(),
+	reason: varchar('reason', { length: 100 }).notNull().default('unknown'),
+	retryCount: integer('retry_count').notNull().default(0),
+	payload: jsonb('payload').default({}),
+	error: text('error'),
+	deadLetteredAt: timestamp('dead_lettered_at', { withTimezone: true }).default(sql`now()`).notNull(),
+	resolvedAt: timestamp('resolved_at', { withTimezone: true }),
+}, (table) => ({
+	queueIdx: index('failed_jobs_queue_idx').on(table.queue),
+	deadLetteredAtIdx: index('failed_jobs_dead_lettered_at_idx').on(table.deadLetteredAt),
+	resolvedAtIdx: index('failed_jobs_resolved_at_idx').on(table.resolvedAt),
+}));
+
+export type FailedJob = typeof failedJobs.$inferSelect;
+export type NewFailedJob = typeof failedJobs.$inferInsert;
+

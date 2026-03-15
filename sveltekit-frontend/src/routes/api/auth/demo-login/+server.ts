@@ -1,3 +1,4 @@
+import { dev } from '$app/environment';
 import { db } from '$lib/server/db/client';
 import { users } from '$lib/server/db/schema';
 import { createUserSession, setSessionCookie } from '$lib/server/lucia';
@@ -16,12 +17,13 @@ const demoLoginSchema = z.object({
  * Development-only endpoint for quick testing without credentials
  *
  * Uses real Lucia v3 session creation (not the auth/lucia stub)
+ * SECURITY: Requires BOTH dev build AND DEV_BYPASS_AUTH env var
  */
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	try {
-		const devBypassAuth = process.env.DEV_BYPASS_AUTH === 'true';
-		if (!devBypassAuth) {
-			throw error(403, 'Demo login is disabled in production');
+		// Double-gate: dev is false in production SvelteKit builds (compile-time)
+		if (!dev || process.env.DEV_BYPASS_AUTH !== 'true') {
+			throw error(403, 'Demo login is only available in development mode');
 		}
 
 		const raw = await request.json();

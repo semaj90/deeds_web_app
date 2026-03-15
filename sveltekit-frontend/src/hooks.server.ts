@@ -350,41 +350,71 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	// === CENTRALIZED AUTH GUARDS (Phase A2 — deny-by-default) ===
 	if (event.url.pathname.startsWith('/api/')) {
-		const path = event.url.pathname;
+    const path = event.url.pathname;
 
-		// Public routes (no auth needed) — explicitly allowlisted
-		const PUBLIC = ['/api/health', '/api/auth', '/api/metrics', '/api/system',
-			'/api/ping', '/api/infrastructure', '/api/docs', '/api/glossary',
-			'/api/kb', '/api/precedents', '/api/statutes', '/api/ollama'];
+    // Public routes (no auth needed) — explicitly allowlisted
+    // NOTE: /api/system, /api/ollama moved to ADMIN_ONLY (Sprint 3 — infra recon + model pull risk)
+    // NOTE: /api/kb, /api/precedents moved to auth-required (Sprint 3 — access Qdrant/case data)
+    const PUBLIC = [
+      '/api/health',
+      '/api/auth',
+      '/api/metrics',
+      '/api/ping',
+      '/api/infrastructure',
+      '/api/docs',
+      '/api/glossary',
+      '/api/statutes',
+    ];
 
-		// Admin-only routes (require admin role)
-		const ADMIN_ONLY = ['/api/admin', '/api/codebase-index', '/api/codebase', '/api/phase89',
-			'/api/phase72', '/api/phase82', '/api/error-brain', '/api/errors', '/api/internal',
-			'/api/cache', '/api/consolidation', '/api/gpu', '/api/gpu-wasm', '/api/indexing',
-			'/api/pipeline', '/api/qlora', '/api/rabbitmq', '/api/security', '/api/topology',
-			'/api/worker', '/api/generate-cluster', '/api/tools'];
+    // Admin-only routes (require admin role)
+    const ADMIN_ONLY = [
+      '/api/admin',
+      '/api/codebase-index',
+      '/api/codebase',
+      '/api/phase89',
+      '/api/phase72',
+      '/api/phase82',
+      '/api/error-brain',
+      '/api/errors',
+      '/api/internal',
+      '/api/cache',
+      '/api/consolidation',
+      '/api/gpu',
+      '/api/gpu-wasm',
+      '/api/indexing',
+      '/api/pipeline',
+      '/api/qlora',
+      '/api/rabbitmq',
+      '/api/security',
+      '/api/topology',
+      '/api/worker',
+      '/api/generate-cluster',
+      '/api/tools',
+      '/api/system',
+      '/api/ollama',
+    ];
 
-		const isPublic = PUBLIC.some(p => path.startsWith(p));
+    const isPublic = PUBLIC.some((p) => path.startsWith(p));
 
-		if (!isPublic) {
-			// Deny-by-default: ALL non-public API routes require authentication
-			if (!event.locals.user) {
-				return new Response(
-					JSON.stringify({ error: 'Authentication required' }),
-					{ status: 401, headers: { 'Content-Type': 'application/json', 'X-Request-ID': requestId } }
-				);
-			}
+    if (!isPublic) {
+      // Deny-by-default: ALL non-public API routes require authentication
+      if (!event.locals.user) {
+        return new Response(JSON.stringify({ error: 'Authentication required' }), {
+          status: 401,
+          headers: { 'Content-Type': 'application/json', 'X-Request-ID': requestId },
+        });
+      }
 
-			// Admin-only routes additionally require admin role
-			const needsAdmin = ADMIN_ONLY.some(p => path.startsWith(p));
-			if (needsAdmin && event.locals.user?.role !== 'admin') {
-				return new Response(
-					JSON.stringify({ error: 'Admin access required' }),
-					{ status: 403, headers: { 'Content-Type': 'application/json', 'X-Request-ID': requestId } }
-				);
-			}
-		}
-	}
+      // Admin-only routes additionally require admin role
+      const needsAdmin = ADMIN_ONLY.some((p) => path.startsWith(p));
+      if (needsAdmin && event.locals.user?.role !== 'admin') {
+        return new Response(JSON.stringify({ error: 'Admin access required' }), {
+          status: 403,
+          headers: { 'Content-Type': 'application/json', 'X-Request-ID': requestId },
+        });
+      }
+    }
+  }
 
 	// === Resolve with request-level timeout (Sprint 1) ===
 	let response: Response;
