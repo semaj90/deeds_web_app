@@ -1,5 +1,5 @@
 import { jsonb, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
-import { cases } from './cases.js';
+import { cases } from './legal-cases.js';
 
 export const reports = pgTable('reports', {
     id: uuid('id').defaultRandom().primaryKey(),

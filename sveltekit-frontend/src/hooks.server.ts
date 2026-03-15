@@ -362,7 +362,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			'/api/phase72', '/api/phase82', '/api/error-brain', '/api/errors', '/api/internal',
 			'/api/cache', '/api/consolidation', '/api/gpu', '/api/gpu-wasm', '/api/indexing',
 			'/api/pipeline', '/api/qlora', '/api/rabbitmq', '/api/security', '/api/topology',
-			'/api/worker', '/api/generate-cluster'];
+			'/api/worker', '/api/generate-cluster', '/api/tools'];
 
 		const isPublic = PUBLIC.some(p => path.startsWith(p));
 
