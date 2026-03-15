@@ -18,13 +18,12 @@ import {
     unique,
     uuid,
     varchar,
+    vector,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm/relations';
 
 // Re-export chatMessages from schema-chat for broader availability
 export { chatMessages, type ChatMessage, type NewChatMessage } from './schema-chat';
-
-// Note: vector type is handled via sql`` template in table definitions
 
 // === ENUMS FOR LEGAL AI APPLICATION ===
 export const userRoleEnum = pgEnum('user_role', ['prosecutor',
@@ -414,7 +413,7 @@ export const legalDocuments = pgTable('legal_documents',
  documentType: documentTypeEnum('document_type'), // Specific legal document type
  practiceArea: varchar('practice_area', { length: 100 }),
  metadata: jsonb('metadata'), // General metadata
- contentEmbedding: text('content_embedding'), // pgvector column for embeddings
+ contentEmbedding: vector('content_embedding', { dimensions: 768 }),
  qdrantId: uuid('qdrant_id'), // ID in Qdrant
  qdrantCollection: varchar('qdrant_collection', { length: 100 }), // Qdrant collection name
  lastSyncedToQdrant: timestamp('last_synced_to_qdrant', { withTimezone: true, mode: 'string' }),
@@ -935,7 +934,7 @@ export const poiPhotos = pgTable('poi_photos',
  aiTags: jsonb('ai_tags').default([]).$type<string[]>(),
  exifData: jsonb('exif_data'),
  forensicData: jsonb('forensic_data'),
- faceEmbedding: text('face_embedding'), // Store vector as text for now
+ faceEmbedding: vector('face_embedding', { dimensions: 768 }),
  uploadedAt: timestamp('uploaded_at').defaultNow().notNull(),
  },
 	(table) => ({
@@ -974,7 +973,7 @@ export const contentEmbeddings = pgTable('content_embeddings', {
  .primaryKey()
  .notNull(),
  documentId: uuid('document_id').notNull(),
- embedding: text('embedding').notNull(), // Store vector as text
+ embedding: vector('embedding', { dimensions: 768 }).notNull(),
  model: varchar('model', { length: 100 }).notNull(),
  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
@@ -985,7 +984,7 @@ export const userEmbeddings = pgTable('user_embeddings', {
  .primaryKey()
  .notNull(),
  userId: uuid('user_id').notNull(),
- embedding: text('embedding').notNull(), // Store vector as text
+ embedding: vector('embedding', { dimensions: 768 }).notNull(),
  model: varchar('model', { length: 100 }).notNull(),
  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
@@ -996,7 +995,7 @@ export const chatEmbeddings = pgTable('chat_embeddings', {
  .primaryKey()
  .notNull(),
  ragMessageId: uuid('rag_message_id').notNull(),
- embedding: text('embedding').notNull(), // Store vector as text
+ embedding: vector('embedding', { dimensions: 768 }).notNull(),
  model: varchar('model', { length: 100 }).notNull(),
  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
@@ -1007,7 +1006,7 @@ export const evidenceVectors = pgTable('evidence_vectors', {
  .primaryKey()
  .notNull(),
  evidenceId: uuid('evidence_id').notNull(),
- vector: text('vector').notNull(), // Store vector as text
+ vector: vector('vector', { dimensions: 768 }).notNull(),
  model: varchar('model', { length: 100 }).notNull(),
  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
@@ -1018,7 +1017,7 @@ export const caseEmbeddings = pgTable('case_embeddings', {
  .primaryKey()
  .notNull(),
  caseId: uuid('case_id').notNull(),
- embedding: text('embedding').notNull(), // Store vector as text
+ embedding: vector('embedding', { dimensions: 768 }).notNull(),
  model: varchar('model', { length: 100 }).notNull(),
  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
@@ -1109,7 +1108,7 @@ export const statuteChunks = pgTable('statute_chunks',
  .references(() => statutes.id, { onDelete: 'cascade' }),
  chunkIndex: integer('chunk_index').notNull(),
  content: text('content').notNull(),
- embedding: text('embedding'), // pgvector stored as text (768 dimensions)
+ embedding: vector('embedding', { dimensions: 768 }),
  createdAt: timestamp('created_at', { withTimezone: true })
  .default(sql`now()`)
  .notNull(),
@@ -1162,7 +1161,7 @@ export const legalGlossary = pgTable('legal_glossary', {
  jurisdiction: varchar('jurisdiction', { length: 100 }),
  relatedTerms: jsonb('related_terms'),
  sources: jsonb('sources'),
- embedding: text('embedding'),
+ embedding: vector('embedding', { dimensions: 768 }),
  createdAt: timestamp('created_at').defaultNow().notNull(),
  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -1205,7 +1204,7 @@ export const documentChunks = pgTable('document_chunks', {
  documentId: uuid('document_id').notNull(),
  chunkIndex: integer('chunk_index').notNull(),
  content: text('content').notNull(),
- embedding: text('embedding'), // Store vector as text
+ embedding: vector('embedding', { dimensions: 768 }),
  metadata: jsonb('metadata'),
  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
@@ -1688,7 +1687,7 @@ export const workspaceNotes = pgTable('workspace_notes',
  .references(() => workspaces.id, { onDelete: 'cascade' }),
  content: text('content').notNull(),
  isAI: boolean('is_ai').default(false),
- embedding: text('embedding'), // pgvector stored as text (768 dimensions)
+ embedding: vector('embedding', { dimensions: 768 }),
  createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
  createdAt: timestamp('created_at', { withTimezone: true })
  .default(sql`now()`)

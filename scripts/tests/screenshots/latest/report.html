@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Screenshot Test Report — 2026-03-15T01-06-47</title>
+<title>Screenshot Test Report — 2026-03-15T02-55-41</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'JetBrains Mono', 'SF Mono', monospace; background: #0a0a0a; color: #e5e7eb; padding: 2rem; }
@@ -40,16 +40,16 @@
 </head>
 <body>
 <h1>SCREENSHOT TEST REPORT</h1>
-<div class="timestamp">Invalid Date | 60.7s total</div>
+<div class="timestamp">Invalid Date | 42.7s total</div>
 
 <div class="summary">
   <div class="summary-item"><span class="summary-label">Passed</span><span class="summary-value pass">20</span></div>
   <div class="summary-item"><span class="summary-label">Failed</span><span class="summary-value ">0</span></div>
   <div class="summary-item"><span class="summary-label">Total</span><span class="summary-value">20</span></div>
-  <div class="summary-item"><span class="summary-label">Avg Load</span><span class="summary-value">2629ms</span></div>
-  <div class="summary-item"><span class="summary-label">Slowest</span><span class="summary-value warn">evidence (7654ms)</span></div>
+  <div class="summary-item"><span class="summary-label">Avg Load</span><span class="summary-value">1833ms</span></div>
+  <div class="summary-item"><span class="summary-label">Slowest</span><span class="summary-value ">evidence (4603ms)</span></div>
   <div class="summary-item"><span class="summary-label">Console Errors</span><span class="summary-value warn">51</span></div>
-  <div class="summary-item"><span class="summary-label">Net Failures</span><span class="summary-value fail">48</span></div>
+  <div class="summary-item"><span class="summary-label">Net Failures</span><span class="summary-value fail">1</span></div>
 </div>
 
 <div class="grid">
@@ -59,14 +59,14 @@
         <span class="status-dot" style="background:#22c55e"></span>
         <span class="route-name">evidence</span>
         <span class="http-status">200</span>
-        <span class="badge warn">2 console err</span><span class="badge fail">47 net fail</span>
+        <span class="badge warn">2 console err</span>
       </div>
       <div class="card-path">/evidence</div>
       <div class="card-metrics">
-        <span>7654ms</span>
+        <span>4603ms</span>
         <span>849 DOM</span>
-        <span>367 reqs</span>
-        <span>11393 KB</span>
+        <span>258 reqs</span>
+        <span>8857 KB</span>
       </div>
       <a href="evidence.png" target="_blank"><img src="evidence.png" alt="evidence" loading="lazy" /></a>
       
@@ -86,53 +86,7 @@ ErrorBoundary caught error: ReferenceError: props is not defined
 	in undefined
 
     at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so</pre></details>
-      <details class="errors"><summary>Network Failures (47)</summary><pre>GET http://localhost:5173/src/lib/components/evidence/EvidenceUpload.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/ui/Dialog.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/forms/EnhancedFileUpload.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/ui/DropdownMenu.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/legal/EvidenceCustodyFlow.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/legal/EvidenceReportSummary.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/yorha/ContradictionReveal.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/UploadProgress.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/legal/WorkflowProgress.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/ai/LegalDocumentSummarizer.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/evidence/UploadProgressCard.svelte — net::ERR_ABORTED
-GET http://localhost:5173/node_modules/.vite/deps/xstate.js?v=5e09fb04 — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/evidence/EvidenceAssistant.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/legal/IntegrityVerification.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/DocumentDetailModal.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/forms/SmartDocumentForm.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/routes/(app)/evidence/+page.svelte?svelte&amp;type=style&amp;lang.css — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/FileUploadSection.svelte — net::ERR_ABORTED
-GET http://localhost:5173/node_modules/.vite/deps/@tiptap_core.js?v=5e09fb04 — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/legal/EnhancedLegalProcessor.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/yorha/evidence/EvidenceComparisonOverlay.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/ui/MarkdownSceneViewer.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/ai/Gemma270MWebAssembly.svelte — net::ERR_ABORTED
-GET http://localhost:5173/node_modules/@sveltejs/kit/src/runtime/app/forms.js?v=5e09fb04 — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/evidence/EvidenceUploadModal.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/ai/EnhancedDocumentUploader.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/legal/ChainOfCustodyTracker.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/ai/ContextualEvidenceChatModal.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/ui/Button.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/EvidenceConnections.svelte — net::ERR_ABORTED
-GET http://localhost:5173/node_modules/.vite/deps/@tiptap_extension-placeholder.js?v=5e09fb04 — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/yorha/DetectiveEvidenceMap.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/CaseSelector.svelte?svelte&amp;type=style&amp;lang.css — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/editor/TipTapEditor.svelte?svelte&amp;type=style&amp;lang.css — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/modals/EvidenceCRUDModal.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/yorha/evidence/UploadZone.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/LegalAnalysisDialog.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/evidence/RelationshipInspector.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/ActionPopup.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/ui/AIFileUpload.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/yorha/evidence/EvidenceFilters.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/evidence/VisionImageAnalyzer.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/yorha/evidence/EvidenceGrid.svelte — net::ERR_ABORTED
-GET http://localhost:5173/node_modules/.vite/deps/@tiptap_starter-kit.js?v=5e09fb04 — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/ui/ErrorBoundary.svelte?svelte&amp;type=style&amp;lang.css — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/legal/DocumentDetails.svelte — net::ERR_ABORTED
-GET http://localhost:5173/src/lib/components/DocumentUploadMachineIntegration.svelte — net::ERR_ABORTED</pre></details>
+      
     </div>
 
     <div class="card ">
@@ -144,10 +98,10 @@ GET http://localhost:5173/src/lib/components/DocumentUploadMachineIntegration.sv
       </div>
       <div class="card-path">/persons-of-interest/fake-id</div>
       <div class="card-metrics">
-        <span>2867ms</span>
+        <span>807ms</span>
         <span>266 DOM</span>
         <span>235 reqs</span>
-        <span>6620 KB</span>
+        <span>6612 KB</span>
       </div>
       <a href="persons-of-interest.png" target="_blank"><img src="persons-of-interest.png" alt="persons-of-interest" loading="lazy" /></a>
       
@@ -179,16 +133,19 @@ ErrorBoundary caught error: ReferenceError: props is not defined
       </div>
       <div class="card-path">/cases/test-id/overview</div>
       <div class="card-metrics">
-        <span>2086ms</span>
+        <span>2052ms</span>
         <span>342 DOM</span>
         <span>170 reqs</span>
-        <span>6090 KB</span>
+        <span>6082 KB</span>
       </div>
       <a href="cases-overview.png" target="_blank"><img src="cases-overview.png" alt="cases-overview" loading="lazy" /></a>
       
       <details class="errors"><summary>Console Errors (7)</summary><pre>Failed to load resource: the server responded with a status of 404 (Not Found)
 Failed to load resource: the server responded with a status of 404 (Not Found)
 Failed to load resource: the server responded with a status of 400 (Bad Request)
+Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[SimilarCases] Error: Error: Failed to load similar cases: 500
+    at loadSimilarCases (http://localhost:5173/src/lib/components/legal/SimilarCasesPanel.svelte:106:11)
 Uncaught error: ReferenceError: props is not defined
 
 	in &lt;unknown&gt;
@@ -204,10 +161,7 @@ ErrorBoundary caught error: ReferenceError: props is not defined
 	in root.svelte
 	in undefined
 
-    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so
-Failed to load resource: the server responded with a status of 500 (Internal Server Error)
-[SimilarCases] Error: Error: Failed to load similar cases: 500
-    at loadSimilarCases (http://localhost:5173/src/lib/components/legal/SimilarCasesPanel.svelte:106:11)</pre></details>
+    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so</pre></details>
       
     </div>
 
@@ -220,10 +174,10 @@ Failed to load resource: the server responded with a status of 500 (Internal Ser
       </div>
       <div class="card-path">/cases/test-id/board</div>
       <div class="card-metrics">
-        <span>3460ms</span>
-        <span>344 DOM</span>
+        <span>2826ms</span>
+        <span>343 DOM</span>
         <span>162 reqs</span>
-        <span>6067 KB</span>
+        <span>6060 KB</span>
       </div>
       <a href="cases-board.png" target="_blank"><img src="cases-board.png" alt="cases-board" loading="lazy" /></a>
       
@@ -258,10 +212,10 @@ ErrorBoundary caught error: ReferenceError: props is not defined
       </div>
       <div class="card-path">/cases</div>
       <div class="card-metrics">
-        <span>1309ms</span>
+        <span>901ms</span>
         <span>306 DOM</span>
         <span>150 reqs</span>
-        <span>5753 KB</span>
+        <span>5746 KB</span>
       </div>
       <a href="cases-list.png" target="_blank"><img src="cases-list.png" alt="cases-list" loading="lazy" /></a>
       
@@ -293,10 +247,10 @@ ErrorBoundary caught error: ReferenceError: props is not defined
       </div>
       <div class="card-path">/dashboard</div>
       <div class="card-metrics">
-        <span>2770ms</span>
+        <span>2224ms</span>
         <span>336 DOM</span>
         <span>185 reqs</span>
-        <span>6234 KB</span>
+        <span>6227 KB</span>
       </div>
       <a href="dashboard.png" target="_blank"><img src="dashboard.png" alt="dashboard" loading="lazy" /></a>
       
@@ -328,10 +282,10 @@ ErrorBoundary caught error: ReferenceError: props is not defined
       </div>
       <div class="card-path">/citations</div>
       <div class="card-metrics">
-        <span>2100ms</span>
+        <span>796ms</span>
         <span>288 DOM</span>
         <span>201 reqs</span>
-        <span>6570 KB</span>
+        <span>6563 KB</span>
       </div>
       <a href="citations.png" target="_blank"><img src="citations.png" alt="citations" loading="lazy" /></a>
       
@@ -363,10 +317,10 @@ ErrorBoundary caught error: ReferenceError: props is not defined
       </div>
       <div class="card-path">/cases/test-id/evidence/upload</div>
       <div class="card-metrics">
-        <span>956ms</span>
+        <span>756ms</span>
         <span>280 DOM</span>
         <span>154 reqs</span>
-        <span>5742 KB</span>
+        <span>5735 KB</span>
       </div>
       <a href="evidence-upload.png" target="_blank"><img src="evidence-upload.png" alt="evidence-upload" loading="lazy" /></a>
       
@@ -399,10 +353,10 @@ ErrorBoundary caught error: ReferenceError: props is not defined
       </div>
       <div class="card-path">/active-cases</div>
       <div class="card-metrics">
-        <span>974ms</span>
+        <span>829ms</span>
         <span>425 DOM</span>
         <span>155 reqs</span>
-        <span>5869 KB</span>
+        <span>5861 KB</span>
       </div>
       <a href="active-cases.png" target="_blank"><img src="active-cases.png" alt="active-cases" loading="lazy" /></a>
       
@@ -434,10 +388,10 @@ ErrorBoundary caught error: ReferenceError: props is not defined
       </div>
       <div class="card-path">/analysis-center</div>
       <div class="card-metrics">
-        <span>1661ms</span>
+        <span>783ms</span>
         <span>460 DOM</span>
         <span>178 reqs</span>
-        <span>6618 KB</span>
+        <span>6611 KB</span>
       </div>
       <a href="analysis-center.png" target="_blank"><img src="analysis-center.png" alt="analysis-center" loading="lazy" /></a>
       
@@ -469,10 +423,10 @@ ErrorBoundary caught error: ReferenceError: props is not defined
       </div>
       <div class="card-path">/command-center</div>
       <div class="card-metrics">
-        <span>2067ms</span>
-        <span>571 DOM</span>
+        <span>2049ms</span>
+        <span>581 DOM</span>
         <span>180 reqs</span>
-        <span>6075 KB</span>
+        <span>6074 KB</span>
       </div>
       <a href="command-center.png" target="_blank"><img src="command-center.png" alt="command-center" loading="lazy" /></a>
       
@@ -507,10 +461,10 @@ Failed to load resource: the server responded with a status of 404 (Not Found)</
       </div>
       <div class="card-path">/evidence-library</div>
       <div class="card-metrics">
-        <span>4280ms</span>
+        <span>3968ms</span>
         <span>305 DOM</span>
         <span>168 reqs</span>
-        <span>6130 KB</span>
+        <span>6123 KB</span>
       </div>
       <a href="evidence-library.png" target="_blank"><img src="evidence-library.png" alt="evidence-library" loading="lazy" /></a>
       
@@ -542,10 +496,10 @@ ErrorBoundary caught error: ReferenceError: props is not defined
       </div>
       <div class="card-path">/global-search</div>
       <div class="card-metrics">
-        <span>2133ms</span>
+        <span>1150ms</span>
         <span>323 DOM</span>
         <span>170 reqs</span>
-        <span>6183 KB</span>
+        <span>6175 KB</span>
       </div>
       <a href="global-search.png" target="_blank"><img src="global-search.png" alt="global-search" loading="lazy" /></a>
       
@@ -577,10 +531,10 @@ ErrorBoundary caught error: ReferenceError: props is not defined
       </div>
       <div class="card-path">/admin/dev-tools</div>
       <div class="card-metrics">
-        <span>3799ms</span>
+        <span>1537ms</span>
         <span>378 DOM</span>
         <span>201 reqs</span>
-        <span>6719 KB</span>
+        <span>6712 KB</span>
       </div>
       <a href="admin-dev-tools.png" target="_blank"><img src="admin-dev-tools.png" alt="admin-dev-tools" loading="lazy" /></a>
       
@@ -612,10 +566,10 @@ ErrorBoundary caught error: ReferenceError: props is not defined
       </div>
       <div class="card-path">/admin/knowledge-search</div>
       <div class="card-metrics">
-        <span>1400ms</span>
+        <span>1067ms</span>
         <span>262 DOM</span>
         <span>143 reqs</span>
-        <span>5642 KB</span>
+        <span>5634 KB</span>
       </div>
       <a href="admin-knowledge-search.png" target="_blank"><img src="admin-knowledge-search.png" alt="admin-knowledge-search" loading="lazy" /></a>
       
@@ -647,10 +601,10 @@ ErrorBoundary caught error: ReferenceError: props is not defined
       </div>
       <div class="card-path">/admin/codebase-viewer</div>
       <div class="card-metrics">
-        <span>2417ms</span>
+        <span>1295ms</span>
         <span>830 DOM</span>
         <span>160 reqs</span>
-        <span>6071 KB</span>
+        <span>6064 KB</span>
       </div>
       <a href="admin-codebase-viewer.png" target="_blank"><img src="admin-codebase-viewer.png" alt="admin-codebase-viewer" loading="lazy" /></a>
       
@@ -682,10 +636,10 @@ ErrorBoundary caught error: ReferenceError: props is not defined
       </div>
       <div class="card-path">/system-configuration</div>
       <div class="card-metrics">
-        <span>1499ms</span>
+        <span>1253ms</span>
         <span>319 DOM</span>
         <span>152 reqs</span>
-        <span>5772 KB</span>
+        <span>5765 KB</span>
       </div>
       <a href="system-configuration.png" target="_blank"><img src="system-configuration.png" alt="system-configuration" loading="lazy" /></a>
       
@@ -717,10 +671,10 @@ ErrorBoundary caught error: ReferenceError: props is not defined
       </div>
       <div class="card-path">/terminal</div>
       <div class="card-metrics">
-        <span>4231ms</span>
+        <span>4455ms</span>
         <span>298 DOM</span>
         <span>149 reqs</span>
-        <span>5706 KB</span>
+        <span>5698 KB</span>
       </div>
       <a href="terminal.png" target="_blank"><img src="terminal.png" alt="terminal" loading="lazy" /></a>
       
@@ -752,10 +706,10 @@ ErrorBoundary caught error: ReferenceError: props is not defined
       </div>
       <div class="card-path">/admin/cache</div>
       <div class="card-metrics">
-        <span>3594ms</span>
+        <span>2155ms</span>
         <span>468 DOM</span>
         <span>146 reqs</span>
-        <span>5684 KB</span>
+        <span>5677 KB</span>
       </div>
       <a href="admin-cache.png" target="_blank"><img src="admin-cache.png" alt="admin-cache" loading="lazy" /></a>
       
@@ -787,10 +741,10 @@ ErrorBoundary caught error: ReferenceError: props is not defined
       </div>
       <div class="card-path">/analytics</div>
       <div class="card-metrics">
-        <span>1330ms</span>
+        <span>1152ms</span>
         <span>286 DOM</span>
         <span>139 reqs</span>
-        <span>5588 KB</span>
+        <span>5580 KB</span>
       </div>
       <a href="analytics.png" target="_blank"><img src="analytics.png" alt="analytics" loading="lazy" /></a>
       

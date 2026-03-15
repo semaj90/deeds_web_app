@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-03-15T01-06-47",
+  "timestamp": "2026-03-15T02-55-41",
   "base": "http://localhost:5173",
-  "totalTimeMs": 60655,
+  "totalTimeMs": 42746,
   "results": [
     {
       "name": "evidence",
@@ -18,253 +18,15 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
-        "No available adapters.",
-        "WebGPU: No adapter available",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
-      "failedRequests": [
-        {
-          "url": "http://localhost:5173/src/lib/components/evidence/EvidenceUpload.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/ui/Dialog.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/forms/EnhancedFileUpload.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/ui/DropdownMenu.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/legal/EvidenceCustodyFlow.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/legal/EvidenceReportSummary.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/yorha/ContradictionReveal.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/UploadProgress.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/legal/WorkflowProgress.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/ai/LegalDocumentSummarizer.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/evidence/UploadProgressCard.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/node_modules/.vite/deps/xstate.js?v=5e09fb04",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/evidence/EvidenceAssistant.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/legal/IntegrityVerification.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/DocumentDetailModal.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/forms/SmartDocumentForm.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/routes/(app)/evidence/+page.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/FileUploadSection.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/node_modules/.vite/deps/@tiptap_core.js?v=5e09fb04",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/legal/EnhancedLegalProcessor.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/yorha/evidence/EvidenceComparisonOverlay.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/ui/MarkdownSceneViewer.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/ai/Gemma270MWebAssembly.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/node_modules/@sveltejs/kit/src/runtime/app/forms.js?v=5e09fb04",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/evidence/EvidenceUploadModal.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/ai/EnhancedDocumentUploader.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/legal/ChainOfCustodyTracker.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/ai/ContextualEvidenceChatModal.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/ui/Button.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/EvidenceConnections.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/node_modules/.vite/deps/@tiptap_extension-placeholder.js?v=5e09fb04",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/yorha/DetectiveEvidenceMap.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/CaseSelector.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/editor/TipTapEditor.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/modals/EvidenceCRUDModal.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/yorha/evidence/UploadZone.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/LegalAnalysisDialog.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/evidence/RelationshipInspector.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/ActionPopup.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/ui/AIFileUpload.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/yorha/evidence/EvidenceFilters.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/evidence/VisionImageAnalyzer.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/yorha/evidence/EvidenceGrid.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/node_modules/.vite/deps/@tiptap_starter-kit.js?v=5e09fb04",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/ui/ErrorBoundary.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/legal/DocumentDetails.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://localhost:5173/src/lib/components/DocumentUploadMachineIntegration.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        }
-      ],
-      "loadTimeMs": 7654,
+      "failedRequests": [],
+      "loadTimeMs": 4603,
       "domElements": 849,
-      "resourceCount": 367,
-      "resourceSizeKB": 11393
+      "resourceCount": 258,
+      "resourceSizeKB": 8857
     },
     {
       "name": "persons-of-interest",
@@ -286,10 +48,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2867,
+      "loadTimeMs": 807,
       "domElements": 266,
       "resourceCount": 235,
-      "resourceSizeKB": 6620
+      "resourceSizeKB": 6612
     },
     {
       "name": "cases-overview",
@@ -303,10 +65,10 @@
         "Failed to load resource: the server responded with a status of 404 (Not Found)",
         "Failed to load resource: the server responded with a status of 404 (Not Found)",
         "Failed to load resource: the server responded with a status of 400 (Bad Request)",
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so",
         "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
-        "[SimilarCases] Error: Error: Failed to load similar cases: 500\n    at loadSimilarCases (http://localhost:5173/src/lib/components/legal/SimilarCasesPanel.svelte:106:11)"
+        "[SimilarCases] Error: Error: Failed to load similar cases: 500\n    at loadSimilarCases (http://localhost:5173/src/lib/components/legal/SimilarCasesPanel.svelte:106:11)",
+        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
+        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so"
       ],
       "consoleWarnings": [
         "No available adapters.",
@@ -316,10 +78,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2086,
+      "loadTimeMs": 2052,
       "domElements": 342,
       "resourceCount": 170,
-      "resourceSizeKB": 6090
+      "resourceSizeKB": 6082
     },
     {
       "name": "cases-board",
@@ -343,10 +105,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 3460,
-      "domElements": 344,
+      "loadTimeMs": 2826,
+      "domElements": 343,
       "resourceCount": 162,
-      "resourceSizeKB": 6067
+      "resourceSizeKB": 6060
     },
     {
       "name": "cases-list",
@@ -368,10 +130,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1309,
+      "loadTimeMs": 901,
       "domElements": 306,
       "resourceCount": 150,
-      "resourceSizeKB": 5753
+      "resourceSizeKB": 5746
     },
     {
       "name": "dashboard",
@@ -393,10 +155,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2770,
+      "loadTimeMs": 2224,
       "domElements": 336,
       "resourceCount": 185,
-      "resourceSizeKB": 6234
+      "resourceSizeKB": 6227
     },
     {
       "name": "citations",
@@ -418,10 +180,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2100,
+      "loadTimeMs": 796,
       "domElements": 288,
       "resourceCount": 201,
-      "resourceSizeKB": 6570
+      "resourceSizeKB": 6563
     },
     {
       "name": "evidence-upload",
@@ -444,10 +206,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 956,
+      "loadTimeMs": 756,
       "domElements": 280,
       "resourceCount": 154,
-      "resourceSizeKB": 5742
+      "resourceSizeKB": 5735
     },
     {
       "name": "active-cases",
@@ -469,10 +231,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 974,
+      "loadTimeMs": 829,
       "domElements": 425,
       "resourceCount": 155,
-      "resourceSizeKB": 5869
+      "resourceSizeKB": 5861
     },
     {
       "name": "analysis-center",
@@ -494,10 +256,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1661,
+      "loadTimeMs": 783,
       "domElements": 460,
       "resourceCount": 178,
-      "resourceSizeKB": 6618
+      "resourceSizeKB": 6611
     },
     {
       "name": "command-center",
@@ -528,10 +290,10 @@
           "failure": "net::ERR_ABORTED"
         }
       ],
-      "loadTimeMs": 2067,
-      "domElements": 571,
+      "loadTimeMs": 2049,
+      "domElements": 581,
       "resourceCount": 180,
-      "resourceSizeKB": 6075
+      "resourceSizeKB": 6074
     },
     {
       "name": "evidence-library",
@@ -553,10 +315,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 4280,
+      "loadTimeMs": 3968,
       "domElements": 305,
       "resourceCount": 168,
-      "resourceSizeKB": 6130
+      "resourceSizeKB": 6123
     },
     {
       "name": "global-search",
@@ -578,10 +340,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2133,
+      "loadTimeMs": 1150,
       "domElements": 323,
       "resourceCount": 170,
-      "resourceSizeKB": 6183
+      "resourceSizeKB": 6175
     },
     {
       "name": "admin-dev-tools",
@@ -603,10 +365,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 3799,
+      "loadTimeMs": 1537,
       "domElements": 378,
       "resourceCount": 201,
-      "resourceSizeKB": 6719
+      "resourceSizeKB": 6712
     },
     {
       "name": "admin-knowledge-search",
@@ -628,10 +390,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1400,
+      "loadTimeMs": 1067,
       "domElements": 262,
       "resourceCount": 143,
-      "resourceSizeKB": 5642
+      "resourceSizeKB": 5634
     },
     {
       "name": "admin-codebase-viewer",
@@ -653,10 +415,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2417,
+      "loadTimeMs": 1295,
       "domElements": 830,
       "resourceCount": 160,
-      "resourceSizeKB": 6071
+      "resourceSizeKB": 6064
     },
     {
       "name": "system-configuration",
@@ -678,10 +440,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1499,
+      "loadTimeMs": 1253,
       "domElements": 319,
       "resourceCount": 152,
-      "resourceSizeKB": 5772
+      "resourceSizeKB": 5765
     },
     {
       "name": "terminal",
@@ -703,10 +465,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 4231,
+      "loadTimeMs": 4455,
       "domElements": 298,
       "resourceCount": 149,
-      "resourceSizeKB": 5706
+      "resourceSizeKB": 5698
     },
     {
       "name": "admin-cache",
@@ -728,10 +490,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 3594,
+      "loadTimeMs": 2155,
       "domElements": 468,
       "resourceCount": 146,
-      "resourceSizeKB": 5684
+      "resourceSizeKB": 5677
     },
     {
       "name": "analytics",
@@ -753,20 +515,20 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1330,
+      "loadTimeMs": 1152,
       "domElements": 286,
       "resourceCount": 139,
-      "resourceSizeKB": 5588
+      "resourceSizeKB": 5580
     }
   ],
   "summary": {
     "passed": 20,
     "failed": 0,
     "total": 20,
-    "avgLoadMs": 2629,
+    "avgLoadMs": 1833,
     "slowestRoute": "evidence",
-    "slowestLoadMs": 7654,
+    "slowestLoadMs": 4603,
     "totalConsoleErrors": 51,
-    "totalNetworkFailures": 48
+    "totalNetworkFailures": 1
   }
 }

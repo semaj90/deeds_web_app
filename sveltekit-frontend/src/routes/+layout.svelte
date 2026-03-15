@@ -13,7 +13,6 @@
     let { children, data }: { children: Snippet; data: { user?: { id: string } | null } } = $props();
     let showDocumentWriter = $state(false);
     let mounted = $state(false);
-    let Toaster: any = $state(null);
 
     function handleGlobalKeydown(e: KeyboardEvent) {
         if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'd') {
@@ -83,10 +82,6 @@
     onMount(() => {
         mounted = true;
         analytics.init(data?.user?.id);
-        // Dynamic import avoids SSR TDZ bug (svelte-sonner Toaster triggers "props is not defined")
-        import('svelte-sonner').then((mod) => {
-            Toaster = mod.Toaster;
-        });
         return () => {
             analytics.destroy();
             cleanupStores();
@@ -95,18 +90,6 @@
 </script>
 
 <svelte:window onkeydown={handleGlobalKeydown} />
-
-<!-- Toast notifications (svelte-sonner) — loaded client-only to avoid SSR TDZ bug -->
-{#if Toaster}
-    <Toaster
-        position="top-right"
-        richColors
-        closeButton
-        toastOptions={{
-            style: 'font-family: "JetBrains Mono", monospace; font-size: 0.8125rem;'
-        }}
-    />
-{/if}
 
 <!-- YoRHa Detective Sidebar -->
 <YorhaSidebar />

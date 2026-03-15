@@ -198,9 +198,12 @@
       }
 
       if (casesRes.ok) {
-        const data = await casesRes.json();
-        recentCases = (data.cases ?? data.data ?? []).slice(0, 10);
-        stats.activeCases = recentCases.filter(c => c.status === 'open' || c.status === 'in_progress').length;
+        try {
+          const data = await casesRes.json();
+          const arr = data.cases ?? data.data?.cases ?? (Array.isArray(data.data) ? data.data : []);
+          recentCases = arr.slice(0, 10);
+          stats.activeCases = recentCases.filter((c: RecentCase) => c.status === 'open' || c.status === 'in_progress').length;
+        } catch { /* cases parse failed — continue to stats */ }
       }
 
       if (statsRes?.ok) {
@@ -298,21 +301,22 @@
     {/if}
 
     <!-- Stats Grid -->
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
       {#each [
-        { label: 'Active Cases', value: stats.activeCases, color: 'text-accent' },
-        { label: 'Total Evidence', value: stats.totalEvidence, color: 'text-warning' },
-        { label: 'Persons of Interest', value: stats.personsOfInterest, color: 'text-sand' },
-        { label: 'Citations', value: stats.totalCitations, color: 'text-accent' },
-        { label: 'Knowledge Base', value: stats.knowledgeBase.total, color: 'text-info' },
-        { label: 'Total Cases', value: stats.recentActivity, color: 'text-sand/60' },
+        { label: 'Active Cases', value: stats.activeCases, icon: 'briefcase' },
+        { label: 'Total Evidence', value: stats.totalEvidence, icon: 'file-text' },
+        { label: 'Persons of Interest', value: stats.personsOfInterest, icon: 'users' },
+        { label: 'Citations', value: stats.totalCitations, icon: 'bookmark' },
+        { label: 'Knowledge Base', value: stats.knowledgeBase.total, icon: 'database' },
+        { label: 'Total Cases', value: stats.recentActivity, icon: 'folder' },
       ] as stat}
-        <Card class="bg-panel border-sand/10">
-          <CardContent class="p-4 text-center">
-            <p class="text-2xl font-bold {stat.color}">{stat.value}</p>
-            <p class="text-xs text-sand/50 mt-1">{stat.label}</p>
-          </CardContent>
-        </Card>
+        <div style="background: #fff; border: 2px solid rgba(0,0,0,0.12); border-radius: 8px; padding: 1.25rem 1rem; text-align: center;">
+          <div style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.06); color: #1a1a1a; margin-bottom: 0.5rem;">
+            <Icon name={stat.icon} size={18} />
+          </div>
+          <p style="font-size: 2rem; font-weight: 800; color: #1a1a1a; line-height: 1.1; margin: 0;">{stat.value}</p>
+          <p style="font-size: 0.7rem; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.08em; margin: 0.35rem 0 0 0;">{stat.label}</p>
+        </div>
       {/each}
     </div>
 
@@ -634,4 +638,5 @@
     white-space: nowrap;
     max-width: 100%;
   }
+
 </style>

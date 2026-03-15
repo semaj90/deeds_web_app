@@ -167,7 +167,7 @@ export class RabbitMQManager extends EventEmitter {
         // AMQP assertQueue fails with PRECONDITION_FAILED if queue exists with
         // different arguments, and that closes the channel. Delete-then-recreate
         // is safe for ephemeral queues like cache.invalidate.
-        const queuesToMigrate = ['cache.invalidate'];
+        const queuesToMigrate = ['cache.invalidate', 'document.embed'];
         for (const queue of queuesToMigrate) {
             try {
                 await (this.channel as any).deleteQueue(queue, { ifEmpty: true });

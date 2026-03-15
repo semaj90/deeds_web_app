@@ -109,7 +109,24 @@
 		<Card>
 			<CardHeader><CardTitle style="color: white;">Service Health</CardTitle></CardHeader>
 			<CardContent>
-				<pre style="font-size: 0.8rem; color: #e0e0e0;">{JSON.stringify(data.serviceHealth, null, 2)}</pre>
+				<div style="display: grid; gap: 0.5rem;">
+					{#each Object.entries(data.serviceHealth ?? {}).filter(([k]) => k !== 'overall') as [service, status]}
+						<div style="display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0.8rem; background: rgba(255,255,255,0.05); border-radius: 6px; border-left: 3px solid {status ? '#22c55e' : '#ef4444'};">
+							<span style="font-size: 0.85rem; color: #e0e0e0; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">{service}</span>
+							<span style="font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 4px; background: {status ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)'}; color: {status ? '#4ade80' : '#f87171'};">
+								{status ? 'ONLINE' : 'OFFLINE'}
+							</span>
+						</div>
+					{/each}
+					{#if data.serviceHealth?.overall}
+						<div style="margin-top: 0.5rem; padding: 0.5rem 0.8rem; text-align: center; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; border-radius: 6px;
+							background: {data.serviceHealth.overall === 'healthy' ? 'rgba(34,197,94,0.1)' : data.serviceHealth.overall === 'degraded' ? 'rgba(234,179,8,0.1)' : 'rgba(239,68,68,0.1)'};
+							color: {data.serviceHealth.overall === 'healthy' ? '#4ade80' : data.serviceHealth.overall === 'degraded' ? '#facc15' : '#f87171'};
+							border: 1px solid {data.serviceHealth.overall === 'healthy' ? 'rgba(34,197,94,0.2)' : data.serviceHealth.overall === 'degraded' ? 'rgba(234,179,8,0.2)' : 'rgba(239,68,68,0.2)'};">
+							System: {data.serviceHealth.overall}
+						</div>
+					{/if}
+				</div>
 			</CardContent>
 		</Card>
 

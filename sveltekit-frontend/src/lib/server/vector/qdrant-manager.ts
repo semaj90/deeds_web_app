@@ -4,6 +4,84 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 import { ENV } from '$lib/server/env.server.js';
 import { VECTOR_CONFIG } from '$lib/server/config/vector-config.js';
 
+// ── BM25 Sparse Vector Generator ─────────────────────────────────────────
+// Generates sparse vectors for Qdrant hybrid search (dense + sparse RRF fusion).
+// Uses deterministic token hashing for vocabulary-free BM25-style weighting.
+
+const SPARSE_STOP_WORDS = new Set([
+    'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+    'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
+    'should', 'may', 'might', 'shall', 'can', 'to', 'of', 'in', 'for',
+    'on', 'with', 'at', 'by', 'from', 'as', 'into', 'about', 'between',
+    'through', 'after', 'before', 'above', 'below', 'and', 'or', 'not',
+    'but', 'if', 'then', 'than', 'so', 'no', 'nor', 'too', 'very',
+    'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those',
+    'how', 'when', 'where', 'why', 'all', 'each', 'every', 'both',
+    'few', 'more', 'most', 'other', 'some', 'such', 'only', 'own',
+    'same', 'just', 'also', 'any', 'it', 'its',
+]);
+
+/** Hash a token string to a stable uint32 index (vocabulary-free). */
+function tokenToIndex(token: string): number {
+    let h = 0x811c9dc5; // FNV-1a offset basis
+    for (let i = 0; i < token.length; i++) {
+        h ^= token.charCodeAt(i);
+        h = Math.imul(h, 0x01000193); // FNV prime
+    }
+    return (h >>> 0) % 2_000_000; // Cap at 2M vocabulary slots
+}
+
+export interface SparseVector {
+    indices: number[];
+    values: number[];
+}
+
+/**
+ * Generate a BM25-style sparse vector from text.
+ * Tokens are hashed to vocabulary indices; values are log(1 + TF) normalized.
+ * Legal tokens (§, U.S.C.) get 2x weight boost.
+ */
+export function generateSparseVector(text: string): SparseVector {
+    const tokens = text
+        .toLowerCase()
+        .replace(/[^\w\s§./-]/g, ' ')
+        .split(/\s+/)
+        .filter(t => t.length > 1 && !SPARSE_STOP_WORDS.has(t));
+
+    if (tokens.length === 0) return { indices: [], values: [] };
+
+    // Count term frequencies
+    const tf = new Map<number, { count: number; isLegal: boolean }>();
+    for (const token of tokens) {
+        const idx = tokenToIndex(token);
+        const isLegal = token.startsWith('§') || token.includes('u.s.c') || token.includes('cfr');
+        const entry = tf.get(idx);
+        if (entry) {
+            entry.count++;
+            if (isLegal) entry.isLegal = true;
+        } else {
+            tf.set(idx, { count: 1, isLegal });
+        }
+    }
+
+    // Build sparse vector with log(1+TF) weighting
+    const indices: number[] = [];
+    const values: number[] = [];
+    for (const [idx, { count, isLegal }] of tf) {
+        indices.push(idx);
+        const weight = Math.log(1 + count) * (isLegal ? 2.0 : 1.0);
+        values.push(weight);
+    }
+
+    // L2-normalize values
+    const norm = Math.sqrt(values.reduce((s, v) => s + v * v, 0));
+    if (norm > 0) {
+        for (let i = 0; i < values.length; i++) values[i] /= norm;
+    }
+
+    return { indices, values };
+}
+
 /**
  * Generate a deterministic integer point ID from a string key.
  * Ported from Python qdrant_gpu_client.py — MD5 hash → first 4 bytes → int % 2^31.
@@ -435,6 +513,114 @@ export class QdrantManager {
             }
         }
         return { must: conditions };
+    }
+
+    /**
+     * BM42-style hybrid search: dense vector + sparse BM25 vector fused via RRF.
+     * Uses Qdrant's query API with prefetch for server-side multi-stage retrieval.
+     * Falls back to dense-only search if the collection lacks sparse vectors.
+     */
+    async sparseHybridSearch(params: {
+        query: string;
+        queryEmbedding: number[];
+        collection: string;
+        denseVectorName?: string;
+        sparseVectorName?: string;
+        filters?: any;
+        limit?: number;
+        scoreThreshold?: number;
+    }) {
+        const startTime = Date.now();
+        const collectionName = this.collections[params.collection] ?? params.collection;
+        const denseVecName = params.denseVectorName ?? 'content';
+        const sparseVecName = params.sparseVectorName ?? 'bm25';
+        const limit = params.limit ?? 10;
+
+        // Generate sparse vector from query text
+        const sparseVec = generateSparseVector(params.query);
+
+        try {
+            // Try hybrid query with RRF fusion (dense + sparse prefetch)
+            const queryParams: any = {
+                prefetch: [
+                    {
+                        query: { indices: sparseVec.indices, values: sparseVec.values },
+                        using: sparseVecName,
+                        limit: limit * 3,
+                    },
+                    {
+                        query: params.queryEmbedding,
+                        using: denseVecName,
+                        limit: limit * 3,
+                    },
+                ],
+                query: { fusion: 'rrf' },
+                limit,
+                with_payload: true,
+                with_vector: false,
+            };
+
+            if (params.filters) {
+                queryParams.filter = this.buildQdrantFilter(params.filters);
+            }
+
+            const response = await this.client.query(collectionName, queryParams);
+            const points = (response as any).points ?? response ?? [];
+
+            return {
+                results: Array.isArray(points) ? points.map((p: any) => ({
+                    id: p.id,
+                    score: p.score,
+                    payload: p.payload,
+                })) : [],
+                metadata: {
+                    query: params.query,
+                    collection: params.collection,
+                    responseTime: Date.now() - startTime,
+                    total_results: Array.isArray(points) ? points.length : 0,
+                    searchType: 'hybrid-rrf',
+                    cached: false,
+                },
+            };
+        } catch (error: any) {
+            // Fallback to dense-only if collection doesn't have sparse vectors
+            if (error?.message?.includes('sparse') || error?.message?.includes('not found') || error?.message?.includes('does not exist')) {
+                console.warn(`[qdrant] Sparse vector not available on ${collectionName}, falling back to dense-only`);
+                return this.hybridSearch({
+                    query: params.query,
+                    queryEmbedding: params.queryEmbedding,
+                    collection: params.collection,
+                    filters: params.filters,
+                    limit,
+                    scoreThreshold: params.scoreThreshold,
+                });
+            }
+            console.error('Qdrant sparse hybrid search error:', error);
+            throw new Error(`Qdrant hybrid search failed: ${error.message}`);
+        }
+    }
+
+    /**
+     * Ensure a collection has sparse vector support for BM42 hybrid search.
+     * Adds a 'bm25' sparse vector config if not already present.
+     */
+    async ensureSparseVectors(collectionName: string, sparseVectorName = 'bm25') {
+        try {
+            const info = await this.client.getCollection(collectionName);
+            const sparseVecs = (info as any).config?.params?.sparse_vectors;
+            if (sparseVecs && sparseVectorName in sparseVecs) {
+                return; // Already configured
+            }
+            // Update collection to add sparse vector
+            await this.client.updateCollection(collectionName, {
+                sparse_vectors: {
+                    [sparseVectorName]: {},
+                },
+            });
+            console.log(`✅ Added sparse vector '${sparseVectorName}' to ${collectionName}`);
+        } catch (error: any) {
+            console.warn(`⚠️ Could not add sparse vectors to ${collectionName}:`, error?.message);
+        }
     }
 
     private calculateRelationshipStrength(score: number): 'weak' | 'moderate' | 'strong' | 'very_strong' {

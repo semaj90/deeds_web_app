@@ -14,8 +14,41 @@ import { chatRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 import { computeTFIDF } from '$lib/server/retrieval/tfidf-scorer.js';
 import { getVectorCache, setVectorCache, getEmbeddingCache, setEmbeddingCache } from '$lib/server/vector-cache.js';
 import { embedText } from '$lib/server/embedding/embed.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
+import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
+
+// ── BM42 hybrid search collections (must have sparse 'bm25' vector configured) ──
+const BM42_COLLECTIONS = ['legal_documents', 'evidence_items'];
+
+// ── Corrective RAG: query reformulation on low-confidence retrieval ──────
+const CORRECTIVE_RAG_THRESHOLD = 0.50;
+
+async function reformulateQuery(query: string, topScore: number): Promise<string | null> {
+	try {
+		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				model: 'gemma3-legal:latest',
+				prompt: `Rephrase this legal search query to improve retrieval. Return ONLY the rephrased query, nothing else.\n\nOriginal: ${query.slice(0, 500)}`,
+				stream: false,
+				keep_alive: process.env?.OLLAMA_KEEP_ALIVE ?? '24h',
+				options: { temperature: 0.3, num_predict: 128 }
+			}),
+			signal: AbortSignal.timeout(5000)
+		});
+		if (!res.ok) return null;
+		const data = await res.json();
+		const reformulated = String(data.response ?? '').trim();
+		if (reformulated.length < 3 || reformulated.length > 1000) return null;
+		console.log(`[rag/search] Corrective RAG: top_score=${topScore.toFixed(3)}, reformulated="${reformulated.slice(0, 80)}"`);
+		return reformulated;
+	} catch {
+		return null;
+	}
+}
 
 const SCORING_METHODS = ['hybrid', 'vector_only', 'tfidf_only'] as const;
 
@@ -189,8 +222,51 @@ export const POST: RequestHandler = async ({ request, url }) => {
 		// 2. Search across Qdrant collections
 		const collections = ['fastmcp_file_profiles', 'phase90_error_cards', 'legal_documents'];
 		const allChunks: RetrievedChunk[] = [];
+		let hybridSearchUsed = false;
 
+		// 2a. BM42 hybrid search (dense + sparse RRF fusion) for supported collections
+		if (use_hybrid) {
+			for (const collection of BM42_COLLECTIONS) {
+				try {
+					const hybridResult = await qdrant.sparseHybridSearch({
+						query,
+						queryEmbedding: embedding,
+						collection,
+						limit: top_k,
+						scoreThreshold: min_score,
+					});
+					for (const r of hybridResult.results) {
+						const payload = (r as any).payload ?? {};
+						allChunks.push({
+							chunk_id: `${collection}:${r.id}`,
+							text: payload.content ?? payload.text ?? payload.summary ?? '',
+							snippet: (payload.content ?? payload.text ?? '').slice(0, 300),
+							score: r.score,
+							dense_score: r.score,
+							confidence: toConfidence(r.score),
+							source_type: payload.source_type ?? 'document',
+							source_id: String(r.id),
+							source_title: payload.title ?? payload.file_path ?? payload.name ?? 'Unknown',
+							source_url: payload.url ?? undefined,
+							page_num: payload.page_num ?? undefined,
+							section: payload.section ?? undefined,
+							has_image: !!payload.has_image,
+							has_table: !!payload.has_table,
+							related_entities: payload.entities ?? [],
+							graph_neighbors: []
+						});
+					}
+					if (hybridResult.metadata.searchType === 'hybrid-rrf') hybridSearchUsed = true;
+				} catch {
+					// BM42 unavailable for this collection — will fall through to dense-only below
+				}
+			}
+		}
+
+		// 2b. Dense-only search for remaining collections (skip BM42 collections if already searched)
+		const bm42Set = use_hybrid ? new Set(BM42_COLLECTIONS) : new Set<string>();
 		for (const collection of collections) {
+			if (bm42Set.has(collection)) continue;
 			try {
 				const searchResp = await fetch(
 					`${QDRANT_URL}/collections/${collection}/points/search`,
@@ -322,6 +398,69 @@ export const POST: RequestHandler = async ({ request, url }) => {
 		}
 
 		allChunks.sort((a, b) => b.score - a.score);
+
+		// ── Corrective RAG: reformulate + retry when top score is low ──────
+		let correctiveMetadata: { reformulatedQuery?: string; originalTopScore?: number } | null = null;
+		const topScore = allChunks[0]?.score ?? 0;
+		if (topScore < CORRECTIVE_RAG_THRESHOLD && allChunks.length > 0) {
+			const reformulated = await reformulateQuery(query, topScore);
+			if (reformulated && reformulated !== query) {
+				try {
+					const retryEmbedding = await embedText(reformulated);
+					const retryVec = Array.from(retryEmbedding);
+					const seenIds = new Set(allChunks.map(c => c.chunk_id));
+					for (const collection of collections) {
+						try {
+							const retryResp = await fetch(
+								`${QDRANT_URL}/collections/${collection}/points/search`,
+								{
+									method: 'POST',
+									headers: { 'Content-Type': 'application/json' },
+									body: JSON.stringify({
+										vector: retryVec,
+										limit: top_k,
+										with_payload: true,
+										score_threshold: min_score
+									}),
+									signal: AbortSignal.timeout(5000)
+								}
+							);
+							if (!retryResp.ok) continue;
+							const retryData = await retryResp.json();
+							for (const r of (retryData?.result ?? [])) {
+								const chunkId = `${collection}:${r.id}`;
+								if (seenIds.has(chunkId)) continue;
+								seenIds.add(chunkId);
+								const payload = r.payload ?? {};
+								allChunks.push({
+									chunk_id: chunkId,
+									text: payload.content ?? payload.text ?? payload.summary ?? '',
+									snippet: (payload.content ?? payload.text ?? '').slice(0, 300),
+									score: r.score,
+									dense_score: r.score,
+									confidence: toConfidence(r.score),
+									source_type: payload.source_type ?? 'document',
+									source_id: String(r.id),
+									source_title: payload.title ?? payload.file_path ?? payload.name ?? 'Unknown',
+									source_url: payload.url ?? undefined,
+									page_num: payload.page_num ?? undefined,
+									section: payload.section ?? undefined,
+									has_image: !!payload.has_image,
+									has_table: !!payload.has_table,
+									related_entities: payload.entities ?? [],
+									graph_neighbors: []
+								});
+							}
+						} catch { /* retry collection unavailable */ }
+					}
+					allChunks.sort((a, b) => b.score - a.score);
+					correctiveMetadata = { reformulatedQuery: reformulated, originalTopScore: topScore };
+				} catch {
+					// Corrective retry failed — non-fatal, proceed with original results
+				}
+			}
+		}
+
 		let topChunks = allChunks.slice(0, top_k);
 
 		// Optional DAG reordering: cited documents appear before citing documents
@@ -348,7 +487,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
 			}
 		}
 
-		const response: RetrieveCandidatesResponse = {
+		const response: RetrieveCandidatesResponse & { corrective_rag?: unknown; hybrid_search?: string } = {
 			query_id: crypto.randomUUID(),
 			query,
 			case_id: body.case_id,
@@ -360,7 +499,9 @@ export const POST: RequestHandler = async ({ request, url }) => {
 			embedding_model: embeddingSource === 'client-precomputed' ? 'embeddinggemma-onnx-client' : 'embeddinggemma:latest',
 			rerank_model: use_rerank ? 'none' : undefined,
 			scoring_method: scoring_method,
+			hybrid_search: hybridSearchUsed ? 'bm42-rrf' : undefined,
 			ace: aceMetadata ?? undefined,
+			corrective_rag: correctiveMetadata ?? undefined,
 			timestamp: new Date().toISOString()
 		};
 
