@@ -191,13 +191,13 @@ export class KnowledgeBase {
 	${options?.lineNumber ?? null},
 	${errorVector},
 	1, ${success ? 1.0 : 0.0},
-	NOW(), ${JSON.stringify(options?.metadata ?? {})}
+	NOW(), ${options?.metadata ?? {}}
 				)
 				ON CONFLICT (id) DO UPDATE SET
 					fix_count = error_patterns.fix_count + 1,
 					success_rate = (error_patterns.success_rate * error_patterns.fix_count + ${success ? 1.0 : 0.0}) / (error_patterns.fix_count + 1),
 					last_seen = NOW(),
-					metadata = ${JSON.stringify(options?.metadata ?? {})}
+					metadata = ${options?.metadata ?? {}}
 			`);
 
 			// Store patch knowledge

@@ -212,6 +212,41 @@ services:
         limits:
           memory: 1G
 
+  # Go gRPC Embedding Server (goroutine batching + Redis cache + Ollama proxy)
+  go-embedding-grpc:
+    build:
+      context: ./go-microservice
+      dockerfile: Dockerfile.embedding
+    container_name: deeds-embedding-grpc
+    restart: unless-stopped
+    ports:
+      - "50051:50051"
+      - "50052:50052"
+    environment:
+      GRPC_PORT: "50051"
+      HTTP_HEALTH_PORT: "50052"
+      OLLAMA_URL: http://host.docker.internal:11434
+      REDIS_URL: redis:6379
+      REDIS_DB: "3"
+      EMBEDDING_MODEL: embeddinggemma:latest
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - deeds-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:50052/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
   # CouchDB Document Store (Optional)
   couchdb:
     image: couchdb:3

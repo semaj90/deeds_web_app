@@ -279,10 +279,10 @@ async function syncToPostgreSQL(summaries: any[]) {
 			) VALUES (
 				${summary.id},
 				${summary.summary},
-				${JSON.stringify(summary.tags)},
+				${summary.tags},
 				${summary.errorCount},
-				${JSON.stringify(summary.recommendations)},
-				${JSON.stringify({ cudaAnalysis: summary.cudaAnalysis, timestamp: summary.timestamp })},
+				${summary.recommendations},
+				${{ cudaAnalysis: summary.cudaAnalysis, timestamp: summary.timestamp }},
 				NOW()
 			)
 			ON CONFLICT (cluster_id) DO UPDATE SET

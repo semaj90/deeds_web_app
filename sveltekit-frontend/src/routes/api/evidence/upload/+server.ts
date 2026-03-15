@@ -606,7 +606,7 @@ async function processAndEmbed(
 				flagType: f.type.slice(0, 50),
 				description: f.description.slice(0, 5000),
 				severity: f.severity ?? 'medium',
-				metadata: f.metadata ? JSON.stringify(f.metadata) : null,
+				metadata: f.metadata ?? null,
 			}));
 			await db.execute(sql`
 				INSERT INTO evidence_forensic_flags (evidence_id, case_id, flag_type, description, severity, metadata)
@@ -995,7 +995,7 @@ async function storeChunkVector(
 			${content},
 			${sql.raw(`'${vectorStr}'::vector`)},
 			'upload-embedding',
-			${JSON.stringify(metadata)}::jsonb
+			${metadata}::jsonb
 		)
 	`);
 }

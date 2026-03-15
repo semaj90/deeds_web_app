@@ -58,9 +58,9 @@ export async function insertKnowledgeDocument(
 	${doc.embedding ? JSON.stringify(doc.embedding) : null /* Or ::vector syntax if raw client */},
 	${doc.couchdb_id},
 	${doc.qdrant_id},
-	${JSON.stringify(doc.metadata)},
+	${doc.metadata},
 	${doc.blob_url},
-	${JSON.stringify(doc.blob_metadata)}
+	${doc.blob_metadata}
             )
             RETURNING id
         `);
@@ -98,11 +98,11 @@ export async function updateKnowledgeDocument(
             // Postgres vector typical insert format
             setParts.push(sql`embedding = ${JSON.stringify(updates.embedding)}`);
         }
-        if (updates.metadata !== undefined) { setParts.push(sql`metadata = ${JSON.stringify(updates.metadata)}`); }
+        if (updates.metadata !== undefined) { setParts.push(sql`metadata = ${updates.metadata}`); }
         if (updates.couchdb_id !== undefined) { setParts.push(sql`couchdb_id = ${updates.couchdb_id}`); }
         if (updates.qdrant_id !== undefined) { setParts.push(sql`qdrant_id = ${updates.qdrant_id}`); }
         if (updates.blob_url !== undefined) { setParts.push(sql`blob_url = ${updates.blob_url}`); }
-        if (updates.blob_metadata !== undefined) { setParts.push(sql`blob_metadata = ${JSON.stringify(updates.blob_metadata)}`); }
+        if (updates.blob_metadata !== undefined) { setParts.push(sql`blob_metadata = ${updates.blob_metadata}`); }
 
         if (setParts.length === 0) return false;
 

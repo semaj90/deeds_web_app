@@ -70,7 +70,7 @@ export async function logEvent(event: AnalyticsEvent): Promise<void> {
 				${event.userId ?? null},
 				${event.sessionId ?? null},
 				${event.eventType},
-				${JSON.stringify(event.payload)}::jsonb,
+				${event.payload}::jsonb,
 				NOW()
 			)
 		`);

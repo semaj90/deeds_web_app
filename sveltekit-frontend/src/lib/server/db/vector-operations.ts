@@ -123,7 +123,7 @@ export async function storeAiQueryWithEmbedding(
 	${caseId},
 	${query},
 	${response},
-	${arrayToPgVector(embedding)}::vector, ${JSON.stringify(metadata)}::jsonb, true)
+	${arrayToPgVector(embedding)}::vector, ${metadata}::jsonb, true)
 		`);
 	} catch (error) {
 		console.error('Failed to store AI query with embedding:', stringifyError(error));
@@ -135,7 +135,7 @@ export async function storeAiQueryWithEmbedding(
 	${caseId},
 	${query},
 	${response},
-	${JSON.stringify(metadata)}::jsonb, true)
+	${metadata}::jsonb, true)
 			`);
 		} catch (err) {
 			console.error('Fallback store also failed:', stringifyError(err));

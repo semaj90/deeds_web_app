@@ -75,7 +75,7 @@ export class PgVectorService {
 	${title},
 	${content},
 	${docType},
-	${JSON.stringify(metadata)}::jsonb,
+	${metadata}::jsonb,
 					${embeddingStr}::vector,
 					NOW()
 				)

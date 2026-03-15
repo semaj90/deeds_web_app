@@ -287,7 +287,7 @@ Return ONLY valid JSON.`;
 	// ── Step 2: LangExtract OCR (if available) ──
 	let ocrText = '';
 	try {
-		const langextractRes = await fetch(`${ENV.MINIO_SIMD_URL}/extract`, {
+		const langextractRes = await fetch(`${ENV.LANGEXTRACT_URL}/extract`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

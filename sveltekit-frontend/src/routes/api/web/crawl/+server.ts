@@ -8,7 +8,7 @@ import { json, type RequestEvent } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 
-const LANGEXTRACT_URL = ENV.MINIO_SIMD_URL;
+const LANGEXTRACT_URL = ENV.LANGEXTRACT_URL;
 
 const webCrawlSchema = z.object({
 	url: z.string().min(1, 'url is required').max(2000).url('Invalid URL format'),

@@ -663,7 +663,7 @@ function setupToolHandlers() {
         // ─────────────────────────────────────────────────────────────────────
         case "langextract:legal": {
           const { text, extraction_passes, temperature } = args as { text: string; extraction_passes?: number; temperature?: number };
-          const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8098';
+          const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
 
           const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
             method: 'POST',
@@ -686,7 +686,7 @@ function setupToolHandlers() {
 
         case "langextract:evidence": {
           const { text, extraction_passes, temperature } = args as { text: string; extraction_passes?: number; temperature?: number };
-          const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8098';
+          const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
 
           const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
             method: 'POST',
@@ -709,7 +709,7 @@ function setupToolHandlers() {
 
         case "langextract:file": {
           const { file_path, extraction_type, extraction_passes } = args as { file_path: string; extraction_type?: string; extraction_passes?: number };
-          const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8098';
+          const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
 
           const response = await fetch(`${LANGEXTRACT_URL}/extract/file`, {
             method: 'POST',
@@ -731,7 +731,7 @@ function setupToolHandlers() {
 
         case "langextract:custom": {
           const { text, prompt, examples, extraction_passes } = args as { text: string; prompt: string; examples?: any[]; extraction_passes?: number };
-          const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8098';
+          const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
 
           const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
             method: 'POST',
