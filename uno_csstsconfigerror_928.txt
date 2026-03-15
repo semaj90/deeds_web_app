@@ -1,6 +1,0 @@
-ntend directory with the provided content. If you already have this file, merge the theme, rules, and shortcuts sections.
-se changes should resolve the CSS preprocessing errors and the UnoCSS unmatched utility warnings, allowing your SvelteKit application to compile and run correctly with the intended styles and animations.
-
-Apply the code changes to DocumentListCHRROM.svelte and ReportToolbar.svelte by locating the incorrect CSS selectors and removing the space before :hover.
-Create unocss.config.ts in your sveltekit-frontend directory with the provided content. If you already have this file, merge the theme, rules, and shortcuts sections.
-se changes should resolve the CSS preprocessing errors and the UnoCSS unmatched utility warnings, allowing your SvelteKit application to compile and run correctly with the intended styles and animations.

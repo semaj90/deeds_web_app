@@ -135,23 +135,35 @@ class HealthResponse(BaseModel):
 # ─────────────────────────────────────────────────────────────────────────────
 
 async def call_ollama(prompt: str, model: str = DEFAULT_MODEL, temperature: float = 0.2) -> str:
-    """Call Ollama API with the given prompt."""
-    import requests
-    response = requests.post(
-        f"{OLLAMA_URL}/api/generate",
-        json={
-            "model": model,
-            "prompt": prompt,
-            "stream": False,
-            "options": {
-                "temperature": temperature,
-                "num_predict": 2048,
+    """Call Ollama API with the given prompt (async via httpx)."""
+    async with httpx.AsyncClient(timeout=120.0) as client:
+        response = await client.post(
+            f"{OLLAMA_URL}/api/generate",
+            json={
+                "model": model,
+                "prompt": prompt,
+                "stream": False,
+                "keep_alive": "24h",
+                "options": {
+                    "temperature": temperature,
+                    "num_predict": 2048,
+                },
+                "format": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "type": {"type": "string"},
+                            "text": {"type": "string"},
+                            "attributes": {"type": "object"}
+                        },
+                        "required": ["type", "text"]
+                    }
+                }
             }
-        },
-        timeout=120
-    )
-    response.raise_for_status()
-    return response.json().get("response", "")
+        )
+        response.raise_for_status()
+        return response.json().get("response", "")
 
 
 def parse_json_response(response: str) -> list[dict]:

@@ -1,5 +1,5 @@
 # Deeds Web App — Codebase Map
-## Last Updated: March 11, 2026 (NES Card Grid UI + PHASE Audit + Evidence Board)
+## Last Updated: March 15, 2026 (Verification Audit — corrected counts)
 ---
 ## Grand Totals
 | Metric | Count |
@@ -13,10 +13,10 @@
 | **Server files (lib/server/*.ts)** | 420 |
 | **Component files (lib/components/*.svelte)** | 544 |
 | **App route groups** | 17 |
-| **Page routes (+page.svelte)** | 109 |
-| **API endpoints (+server.ts)** | 254 |
+| **Page routes (+page.svelte)** | 110 |
+| **API endpoints (+server.ts)** | 267 |
 | **API route groups** | 77 |
-| **Server subdirectories (lib/server/)** | 79 |
+| **Server subdirectories (lib/server/)** | 81 |
 | **deeds_labs/ files** | ~193,000 (intentional archive) |
 | **svelte-check** | **0 errors, 0 warnings** |
 | **Playwright** | **20/20 PASS** |
@@ -72,7 +72,7 @@ sveltekit-frontend/
 ├── src/
 │   ├── lib/           ← 90+ subdirs (components, server, ai, stores, types, utils...)
 │   ├── routes/        ← (app)/ pages + api/ endpoints
-│   ├── mcp/           ← FastMCP server (11 agentic tools, stdio)
+│   ├── mcp/           ← FastMCP server (36 tools, stdio)
 │   ├── native/        ← Native bridge stubs
 │   ├── proto/         ← Proto definitions for frontend gRPC clients
 │   ├── scripts/       ← Build/utility scripts
@@ -107,7 +107,7 @@ sveltekit-frontend/
 | `tests/` | Playwright specs |
 | `vite-plugins/` | Custom Vite plugins |
 ---
-## App Routes — src/routes/(app)/ (17 groups, 109 pages)
+## App Routes — src/routes/(app)/ (17 groups, 110 pages)
 | Route | Purpose | Status |
 |-------|---------|--------|
 | `active-cases/` | Active case listing | ACTIVE |
@@ -128,7 +128,7 @@ sveltekit-frontend/
 | `system-configuration/` | System config panel | ACTIVE |
 | `terminal/` | 9S AI Chat Interface (voice I/O, streaming) | ACTIVE |
 ---
-## API Routes — src/routes/api/ (77 groups, 254 endpoints)
+## API Routes — src/routes/api/ (77 groups, 267 endpoints)
 ### Core API Groups
 | API Group | Endpoints | Purpose |
 |-----------|-----------|---------|
@@ -166,13 +166,13 @@ sveltekit-frontend/
 | `web/` | 2 | Web crawl + search |
 | 20+ more | 1 each | Various single endpoints |
 ---
-## Server Architecture — src/lib/server/ (79 subdirectories, 420 .ts files)
+## Server Architecture — src/lib/server/ (81 subdirectories, 420 .ts files)
 ### Core Infrastructure
 | Directory | Key Files | Purpose |
 |-----------|-----------|---------|
 | `db/` | `client.ts`, `schema-postgres.ts` (2500+ lines) | Drizzle ORM — 70+ tables, 14 enums |
-| `vector/` | `qdrant-manager.ts`, `multi-store.ts`, `pgvector.ts` | Qdrant (8 collections) + pgvector |
-| `queue/` | `rabbitmq-manager-fixed.ts`, `queue-worker.ts` | RabbitMQ — 7 queues, 7 consumers |
+| `vector/` | `qdrant-manager.ts`, `multi-store.ts`, `pgvector.ts` | Qdrant (9 collections) + pgvector |
+| `queue/` | `rabbitmq-manager-fixed.ts`, `queue-worker.ts` | RabbitMQ — 8 queues, 8 consumers |
 | `cache/` | `invalidation.ts` | Multi-tier cache invalidation |
 | `redis/` | (via `redis.ts` at server root) | ioredis singleton + factory |
 | `connections/` | `connection-pool.ts` | Central connection pool + shutdown |
@@ -259,13 +259,13 @@ sveltekit-frontend/
 |------|-------|---------|
 | `lib/server/db/schema-postgres.ts` | 2500+ | 70+ tables, 14 enums, evidenceAuditLog, evidenceVersions |
 | `lib/server/db/client.ts` | ~50 | Primary Drizzle ORM client (canonical import) |
-| `lib/server/vector/qdrant-manager.ts` | 400+ | 8 Qdrant collections, hybrid search |
-| `lib/server/queue/rabbitmq-manager-fixed.ts` | 350+ | 7 queues, 7 consumers |
+| `lib/server/vector/qdrant-manager.ts` | 400+ | 9 Qdrant collections, hybrid search |
+| `lib/server/queue/rabbitmq-manager-fixed.ts` | 350+ | 8 queues, 8 consumers |
 | `lib/server/cache.ts` | 200+ | Dual-tier memory + Redis cache |
 | `lib/server/redis.ts` | 100+ | ioredis singleton |
 | `lib/server/grpc/embedding-client.ts` | 200+ | gRPC → HTTP fallback embeddings (4-tier) |
 | `lib/server/grpc/retrieval-client.ts` | 150+ | gRPC retrieval client |
-| `lib/server/rag-pipeline.ts` | 300+ | End-to-end RAG pipeline |
+| `lib/server/rag/*.ts` | 8 files | RAG pipeline (evidenceRag, qdrant, ranker, sdk, tag-extractor, types, uiComplianceRag) |
 | `lib/server/indexer/legal-chunker.ts` | 200+ | Structure-aware legal chunking |
 | `lib/server/indexer/dual-embedder.ts` | 200+ | Dual-vector embedding (content + signature) |
 | `lib/server/analysis/entity-extraction.ts` | 250+ | LLM + regex entity extraction |
@@ -292,7 +292,7 @@ sveltekit-frontend/
 | `lib/server/circuit-breaker.ts` | 100+ | Ollama/Qdrant/Redis circuit breakers |
 | `lib/server/env.server.ts` | 100+ | Server environment variables |
 | `src/hooks.server.ts` | 350+ | Request handling, CORS, CSP, auth, COOP/COEP |
-| `src/mcp/server.ts` | 400+ | FastMCP server — 11 agentic tools (stdio) |
+| `src/mcp/server.ts` | 400+ | FastMCP server — 36 tools (cases, evidence, RAG, citations, LangExtract, Playwright) |
 ## Key Client Infrastructure Files
 | File | Lines | Purpose |
 |------|-------|---------|
@@ -325,10 +325,11 @@ sveltekit-frontend/
 | `evidence_items` | Evidence chunks + metadata |
 | `legal_documents` | Legal document embeddings |
 | `legal_cases` | Case description embeddings |
-| `codebase_chunks_768` | Dual-vector code search |
 | `chat_messages` | Chat context search |
 | `embedding_cache` | Embedding lookup cache |
 | `document_tags` | Document tag embeddings |
+| `topic_clusters` | Topic clustering embeddings |
+| `llm_response_cache` | LLM query response cache |
 | `poi_profiles` | Person of interest face/photo embeddings |
 ### Redis Keys
 - Session cache, L3 cache tier, GPU arbiter VRAM mutex
@@ -338,10 +339,17 @@ sveltekit-frontend/
 - Cases, Evidence, Statutes, Entities, SIMILAR_TO edges
 - PG→Neo4j sync via `pg-neo4j-sync.ts`
 - Graph centrality computation
-### RabbitMQ Queues (7)
-`cache.invalidate`, `document.embed`, `evidence.process`, `vector.index`, `chat.context`, `analytics.track`, `codebase.index`
-### FastMCP Tools (11)
-`unified_ast_query`, `cross_language_similarity`, `cuda_fix_priority`, `glyph_metadata`, `neo4j_dependency_graph`, `agentic_recommendation`, `batch_error_analysis`, `redis_cache_stats`, `system_health_check`, `transcribe_audio`, `web_search`
+### RabbitMQ Queues (8)
+`cache.invalidate`, `document.embed`, `evidence.process`, `vector.index`, `chat.context`, `analytics.track`, `codebase.index`, `ace.evaluate`
+### FastMCP Tools (36)
+**Cases (6):** `cases:load`, `cases:create`, `cases:update`, `cases:delete`, `reports:list`, `reports:create`
+**Reports (4):** `reports:generate_from_template`, `reports:update`, `reports:delete`, `reports:export`
+**RAG (2):** `rag:search`, `rag:index_page`
+**Citations (3):** `citations:search`, `citations:list_by_case`, `citations:add_to_case`
+**Evidence (5):** `evidence:analyze`, `evidence:analyze_multimodal`, `evidence:detect_objects`, `evidence:transcribe_gpu`, `evidence:search_similar`
+**Audio (1):** `transcribe_audio`
+**LangExtract (4):** `langextract:legal`, `langextract:evidence`, `langextract:file`, `langextract:custom`
+**Browser (1):** `playwright:browser_action`
 ---
 ## Infrastructure Wiring (7 Phases — All Complete)
 ### 4-Tier Embedding Fallback Chain

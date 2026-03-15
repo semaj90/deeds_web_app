@@ -1,8 +1,0 @@
-{
-  "type": "test",
-  "file": "system-test.ts:1:0",
-  "message": "System verification test",
-  "context": "Comprehensive testing after SIMD and Svelte 5 integration",
-  "timestamp": "2025-09-10T16:00:00Z",
-  "severity": "info"
-}

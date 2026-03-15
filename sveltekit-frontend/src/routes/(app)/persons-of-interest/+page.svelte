@@ -481,19 +481,19 @@
 <style>
 	.yorha-page {
 		min-height: 100vh;
-		background: #f5f5f5;
+		background: #f8f9fa;
 		font-family: 'JetBrains Mono', 'Courier New', monospace;
 	}
 
 	/* Header */
 	.yorha-header {
-		background: #fff;
-		border-bottom: 1px solid #e0e0e0;
+		background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+		border-bottom: 2px solid #e5e7eb;
 		padding: 1rem 2rem;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 	}
 
 	.header-logo {
@@ -503,15 +503,19 @@
 	}
 
 	.logo-icon {
-		font-size: 1.25rem;
+		font-size: 1rem;
 		font-weight: 700;
 		letter-spacing: 0.1em;
-		color: #000;
+		color: #fff;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		border-radius: 12px;
+		padding: 0.625rem 1rem;
+		box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
 	}
 
 	.logo-subtitle {
 		font-size: 0.7rem;
-		color: #999;
+		color: #9ca3af;
 		letter-spacing: 0.15em;
 	}
 
@@ -527,19 +531,19 @@
 		font-size: 0.75rem;
 		font-weight: 600;
 		letter-spacing: 0.1em;
-		color: #999;
+		color: #9ca3af;
 		cursor: pointer;
 		font-family: 'JetBrains Mono', monospace;
 		transition: all 0.2s;
 	}
 
 	.nav-item:hover {
-		color: #000;
+		color: #667eea;
 	}
 
 	.nav-item.active {
-		color: #000;
-		border-bottom: 2px solid #000;
+		color: #667eea;
+		border-bottom: 2px solid #667eea;
 	}
 
 	.header-actions {
@@ -552,30 +556,31 @@
 		align-items: center;
 		gap: 0.5rem;
 		background: #fff;
-		border: 1px solid #e0e0e0;
+		border: 1px solid #e5e7eb;
 		padding: 0.5rem 1rem;
 		font-size: 0.75rem;
 		font-weight: 600;
 		letter-spacing: 0.1em;
-		color: #666;
+		color: #6b7280;
 		cursor: pointer;
 		font-family: 'JetBrains Mono', monospace;
 		transition: all 0.2s;
+		border-radius: 8px;
 	}
 
 	.header-btn:hover {
-		border-color: #000;
-		color: #000;
+		border-color: #667eea;
+		color: #667eea;
 	}
 
 	.header-btn.primary {
-		background: #000;
-		border-color: #000;
+		background: #667eea;
+		border-color: #667eea;
 		color: #fff;
 	}
 
 	.header-btn.primary:hover {
-		background: #222;
+		background: #5a6fd6;
 	}
 
 	/* Content Layout */
@@ -588,7 +593,7 @@
 	/* Sidebar */
 	.yorha-sidebar {
 		background: #fff;
-		border-right: 1px solid #e0e0e0;
+		border-right: 1px solid #e5e7eb;
 		padding: 1.5rem 0;
 	}
 
@@ -601,7 +606,7 @@
 		font-size: 0.7rem;
 		font-weight: 700;
 		letter-spacing: 0.15em;
-		color: #999;
+		color: #9ca3af;
 		margin-bottom: 1rem;
 	}
 
@@ -620,22 +625,23 @@
 		padding: 0.75rem 1rem;
 		font-size: 0.75rem;
 		font-weight: 500;
-		color: #666;
+		color: #6b7280;
 		cursor: pointer;
 		font-family: 'JetBrains Mono', monospace;
 		text-align: left;
 		transition: all 0.2s;
+		border-radius: 6px;
 	}
 
 	.menu-item:hover {
-		background: #f5f5f5;
-		color: #000;
+		background: #f8f9fa;
+		color: #667eea;
 	}
 
 	.menu-item.active {
-		background: #f0f0f0;
-		color: #000;
-		border-left: 3px solid #000;
+		background: #f0f0ff;
+		color: #667eea;
+		border-left: 3px solid #667eea;
 	}
 
 	.stats-compact {
@@ -652,16 +658,16 @@
 	}
 
 	.stat-label {
-		color: #999;
+		color: #9ca3af;
 	}
 
 	.stat-value {
 		font-weight: 600;
-		color: #000;
+		color: #1f2937;
 	}
 
 	.stat-value.highlight {
-		color: #3b82f6;
+		color: #667eea;
 	}
 
 	.stat-value.danger {
@@ -681,7 +687,7 @@
 		padding: 1rem;
 		background: #fef2f2;
 		border: 1px solid #fecaca;
-		border-radius: 4px;
+		border-radius: 8px;
 		color: #dc2626;
 		margin-bottom: 1.5rem;
 		font-size: 0.85rem;
@@ -701,8 +707,8 @@
 	.yorha-input {
 		flex: 1;
 		padding: 0.75rem 1rem;
-		border: 1px solid #e0e0e0;
-		border-radius: 4px;
+		border: 1px solid #e5e7eb;
+		border-radius: 8px;
 		font-size: 0.85rem;
 		font-family: 'JetBrains Mono', monospace;
 		transition: all 0.2s;
@@ -710,7 +716,8 @@
 
 	.yorha-input:focus {
 		outline: none;
-		border-color: #000;
+		border-color: #667eea;
+		box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 	}
 
 	.filter-btn {
@@ -719,20 +726,20 @@
 		gap: 0.5rem;
 		padding: 0.75rem 1rem;
 		background: #fff;
-		border: 1px solid #e0e0e0;
-		border-radius: 4px;
+		border: 1px solid #e5e7eb;
+		border-radius: 8px;
 		font-size: 0.75rem;
 		font-weight: 600;
 		letter-spacing: 0.05em;
-		color: #666;
+		color: #6b7280;
 		cursor: pointer;
 		font-family: 'JetBrains Mono', monospace;
 		transition: all 0.2s;
 	}
 
 	.filter-btn:hover {
-		border-color: #000;
-		color: #000;
+		border-color: #667eea;
+		color: #667eea;
 	}
 
 	.filter-row {
@@ -743,8 +750,8 @@
 
 	.yorha-select {
 		padding: 0.75rem 1rem;
-		border: 1px solid #e0e0e0;
-		border-radius: 4px;
+		border: 1px solid #e5e7eb;
+		border-radius: 8px;
 		font-size: 0.85rem;
 		font-family: 'JetBrains Mono', monospace;
 		background: #fff;
@@ -754,13 +761,14 @@
 
 	.yorha-select:focus {
 		outline: none;
-		border-color: #000;
+		border-color: #667eea;
+		box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 	}
 
 	.view-toggle {
 		display: flex;
-		border: 1px solid #e0e0e0;
-		border-radius: 4px;
+		border: 1px solid #e5e7eb;
+		border-radius: 8px;
 		overflow: hidden;
 		margin-left: auto;
 	}
@@ -769,11 +777,11 @@
 		padding: 0.75rem 1.25rem;
 		background: #fff;
 		border: none;
-		border-right: 1px solid #e0e0e0;
+		border-right: 1px solid #e5e7eb;
 		font-size: 0.75rem;
 		font-weight: 600;
 		letter-spacing: 0.05em;
-		color: #999;
+		color: #9ca3af;
 		cursor: pointer;
 		font-family: 'JetBrains Mono', monospace;
 		transition: all 0.2s;
@@ -784,12 +792,12 @@
 	}
 
 	.toggle-btn:hover {
-		background: #f5f5f5;
-		color: #666;
+		background: #f8f9fa;
+		color: #6b7280;
 	}
 
 	.toggle-btn.active {
-		background: #000;
+		background: #667eea;
 		color: #fff;
 	}
 
@@ -798,13 +806,13 @@
 		text-align: center;
 		padding: 4rem 2rem;
 		background: #fff;
-		border-radius: 8px;
-		border: 1px solid #e0e0e0;
+		border-radius: 12px;
+		border: 1px solid #e5e7eb;
 	}
 
 	.empty-icon {
 		font-size: 3rem;
-		color: #e0e0e0;
+		color: #d1d5db;
 		margin-bottom: 1rem;
 	}
 
@@ -812,13 +820,13 @@
 		font-size: 1rem;
 		font-weight: 600;
 		letter-spacing: 0.1em;
-		color: #666;
+		color: #6b7280;
 		margin: 0 0 0.5rem 0;
 	}
 
 	.empty-subtitle {
 		font-size: 0.85rem;
-		color: #999;
+		color: #9ca3af;
 		margin: 0 0 1.5rem 0;
 	}
 
@@ -828,12 +836,12 @@
 		gap: 0.5rem;
 		padding: 0.75rem 1.5rem;
 		background: #fff;
-		border: 1px solid #e0e0e0;
-		border-radius: 4px;
+		border: 1px solid #e5e7eb;
+		border-radius: 8px;
 		font-size: 0.75rem;
 		font-weight: 600;
 		letter-spacing: 0.1em;
-		color: #666;
+		color: #6b7280;
 		text-decoration: none;
 		cursor: pointer;
 		font-family: 'JetBrains Mono', monospace;
@@ -841,18 +849,18 @@
 	}
 
 	.btn-yorha:hover {
-		border-color: #000;
-		color: #000;
+		border-color: #667eea;
+		color: #667eea;
 	}
 
 	.btn-yorha.primary {
-		background: #000;
-		border-color: #000;
+		background: #667eea;
+		border-color: #667eea;
 		color: #fff;
 	}
 
 	.btn-yorha.primary:hover {
-		background: #222;
+		background: #5a6fd6;
 	}
 
 	/* POI Grid */
@@ -864,15 +872,15 @@
 
 	.poi-card {
 		background: #fff;
-		border: 1px solid #e0e0e0;
-		border-radius: 8px;
+		border: 1px solid #e5e7eb;
+		border-radius: 12px;
 		overflow: hidden;
 		transition: all 0.2s;
 	}
 
 	.poi-card:hover {
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-		border-color: #ccc;
+		box-shadow: 0 4px 16px rgba(102, 126, 234, 0.1);
+		border-color: #667eea;
 	}
 
 	.card-header {
@@ -880,20 +888,20 @@
 		align-items: center;
 		gap: 1rem;
 		padding: 1.5rem;
-		border-bottom: 1px solid #f5f5f5;
+		border-bottom: 1px solid #f3f4f6;
 	}
 
 	.card-photo {
 		width: 60px;
 		height: 60px;
-		background: #f5f5f5;
-		border: 2px solid #e0e0e0;
-		border-radius: 4px;
+		background: #f3f4f6;
+		border: 2px solid #e5e7eb;
+		border-radius: 8px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		font-size: 1.5rem;
-		color: #999;
+		color: #9ca3af;
 	}
 
 	.card-info {
@@ -904,14 +912,14 @@
 	.card-name {
 		font-size: 1rem;
 		font-weight: 600;
-		color: #000;
+		color: #1f2937;
 		margin: 0 0 0.25rem 0;
 		letter-spacing: 0.05em;
 	}
 
 	.card-status {
 		font-size: 0.7rem;
-		color: #999;
+		color: #9ca3af;
 		margin: 0;
 		letter-spacing: 0.1em;
 	}
@@ -923,7 +931,7 @@
 
 	.threat-badge {
 		padding: 0.375rem 0.75rem;
-		border-radius: 4px;
+		border-radius: 8px;
 		font-size: 0.65rem;
 		font-weight: 700;
 		letter-spacing: 0.1em;
@@ -966,13 +974,13 @@
 		font-size: 0.7rem;
 		font-weight: 600;
 		letter-spacing: 0.1em;
-		color: #999;
+		color: #9ca3af;
 		margin-bottom: 0.25rem;
 	}
 
 	.field-value {
 		font-size: 0.85rem;
-		color: #333;
+		color: #374151;
 		margin: 0;
 		line-height: 1.5;
 	}
@@ -980,7 +988,7 @@
 	.card-actions {
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
-		border-top: 1px solid #f5f5f5;
+		border-top: 1px solid #f3f4f6;
 	}
 
 	.action-btn {
@@ -991,11 +999,11 @@
 		padding: 0.875rem;
 		background: #fff;
 		border: none;
-		border-right: 1px solid #f5f5f5;
+		border-right: 1px solid #f3f4f6;
 		font-size: 0.7rem;
 		font-weight: 600;
 		letter-spacing: 0.05em;
-		color: #666;
+		color: #6b7280;
 		cursor: pointer;
 		font-family: 'JetBrains Mono', monospace;
 		text-decoration: none;
@@ -1007,24 +1015,24 @@
 	}
 
 	.action-btn:hover {
-		background: #f5f5f5;
-		color: #000;
+		background: #f8f9fa;
+		color: #667eea;
 	}
 
 	.action-btn.primary {
-		background: #000;
+		background: #667eea;
 		color: #fff;
 	}
 
 	.action-btn.primary:hover {
-		background: #222;
+		background: #5a6fd6;
 	}
 
 	/* Table */
 	.poi-table-wrapper {
 		background: #fff;
-		border: 1px solid #e0e0e0;
-		border-radius: 8px;
+		border: 1px solid #e5e7eb;
+		border-radius: 12px;
 		overflow: hidden;
 	}
 
@@ -1034,8 +1042,8 @@
 	}
 
 	.yorha-table thead {
-		background: #f5f5f5;
-		border-bottom: 1px solid #e0e0e0;
+		background: #f9fafb;
+		border-bottom: 1px solid #e5e7eb;
 	}
 
 	.yorha-table th {
@@ -1044,16 +1052,16 @@
 		font-size: 0.7rem;
 		font-weight: 700;
 		letter-spacing: 0.15em;
-		color: #666;
+		color: #6b7280;
 	}
 
 	.table-row {
-		border-bottom: 1px solid #f5f5f5;
+		border-bottom: 1px solid #f3f4f6;
 		transition: background 0.15s;
 	}
 
 	.table-row:hover {
-		background: #fafafa;
+		background: #f8f8ff;
 	}
 
 	.yorha-table td {
@@ -1066,13 +1074,13 @@
 	}
 
 	.name-link {
-		color: #000;
+		color: #1f2937;
 		text-decoration: none;
 		transition: color 0.2s;
 	}
 
 	.name-link:hover {
-		color: #3b82f6;
+		color: #667eea;
 	}
 
 	.status-pill {
@@ -1116,7 +1124,7 @@
 
 	.location-cell,
 	.date-cell {
-		color: #666;
+		color: #6b7280;
 		font-size: 0.8rem;
 	}
 
@@ -1128,14 +1136,14 @@
 	.icon-btn {
 		background: transparent;
 		border: none;
-		color: #999;
+		color: #9ca3af;
 		cursor: pointer;
 		padding: 0.25rem;
 		transition: color 0.2s;
 	}
 
 	.icon-btn:hover {
-		color: #000;
+		color: #667eea;
 	}
 
 	/* Modals */
@@ -1154,13 +1162,13 @@
 
 	.modal-content {
 		background: #fff;
-		border-radius: 8px;
+		border-radius: 12px;
 		padding: 2rem;
 		max-width: 600px;
 		width: 90%;
 		max-height: 90vh;
 		overflow-y: auto;
-		box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+		box-shadow: 0 20px 40px rgba(102, 126, 234, 0.15);
 	}
 
 	/* 4-column card actions */
@@ -1171,8 +1179,8 @@
 	/* Similar POIs Panel */
 	.similar-panel {
 		background: #fff;
-		border: 2px solid #000;
-		border-radius: 8px;
+		border: 2px solid #667eea;
+		border-radius: 12px;
 		margin-bottom: 1.5rem;
 		overflow: hidden;
 	}
@@ -1182,7 +1190,7 @@
 		justify-content: space-between;
 		align-items: center;
 		padding: 0.875rem 1.25rem;
-		background: #000;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 		color: #fff;
 	}
 
@@ -1202,7 +1210,7 @@
 		font-size: 0.6rem;
 		padding: 0.2rem 0.5rem;
 		background: rgba(255, 255, 255, 0.2);
-		border-radius: 4px;
+		border-radius: 6px;
 		letter-spacing: 0.05em;
 	}
 
@@ -1225,7 +1233,7 @@
 		padding: 1.5rem;
 		text-align: center;
 		font-size: 0.85rem;
-		color: #999;
+		color: #9ca3af;
 		letter-spacing: 0.05em;
 	}
 
@@ -1241,14 +1249,14 @@
 		align-items: flex-start;
 		gap: 0.75rem;
 		padding: 1rem 1.25rem;
-		border-bottom: 1px solid #f0f0f0;
+		border-bottom: 1px solid #f3f4f6;
 		text-decoration: none;
 		color: inherit;
 		transition: background 0.15s;
 	}
 
 	.similar-item:hover {
-		background: #fafafa;
+		background: #f8f8ff;
 	}
 
 	.similar-item:last-child {
@@ -1258,7 +1266,7 @@
 	.sim-score {
 		font-size: 1.25rem;
 		font-weight: 700;
-		color: #000;
+		color: #667eea;
 		min-width: 3rem;
 		text-align: center;
 		line-height: 1;
@@ -1274,7 +1282,7 @@
 		display: block;
 		font-size: 0.9rem;
 		font-weight: 600;
-		color: #000;
+		color: #1f2937;
 		margin-bottom: 0.25rem;
 	}
 
@@ -1283,7 +1291,7 @@
 		align-items: center;
 		gap: 0.5rem;
 		font-size: 0.7rem;
-		color: #999;
+		color: #9ca3af;
 		letter-spacing: 0.05em;
 	}
 
@@ -1292,7 +1300,7 @@
 		margin: 0.25rem 0 0 0;
 		padding-left: 3.75rem;
 		font-size: 0.8rem;
-		color: #666;
+		color: #6b7280;
 		line-height: 1.4;
 	}
 

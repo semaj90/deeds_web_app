@@ -282,7 +282,7 @@ async def health():
 
 
 @app.post("/extract", response_model=ExtractionResponse)
-async def extract(request: ExtractionRequest):
+async def extract_text(request: ExtractionRequest):
     """Extract structured information from text."""
 
     # Select prompt and examples based on type

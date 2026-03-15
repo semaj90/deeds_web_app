@@ -1,3 +1,0 @@
-select vdisk file="C:\Users\james\AppData\Local\wsl\{7a1fd9f9-2749-492c-80e3-e3d2757c3e0c}\ext4.vhdx"
-compact vdisk
-exit
