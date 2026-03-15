@@ -1,0 +1,30 @@
+version: '3.9'
+
+# Optimized LangExtract Override
+# Usage: docker-compose -f docker-compose.deeds.yml -f docker/langextract-optimized/docker-compose.override.yml up -d langextract
+
+services:
+  langextract-optimized:
+    build:
+      context: ./docker/langextract-optimized
+      dockerfile: Dockerfile
+    image: deeds-langextract-optimized:latest
+    container_name: langextract-optimized
+    ports:
+      - "8095:8095"
+    environment:
+      - OLLAMA_URL=http://host.docker.internal:11434
+      - SPACY_MODEL=en_core_web_md
+      - ENABLE_SPACY=true
+    deploy:
+      resources:
+        limits:
+          memory: 512M  # Down from 1.5GB
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8095/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+volumes: {}

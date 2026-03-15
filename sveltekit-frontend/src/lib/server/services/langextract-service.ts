@@ -380,3 +380,188 @@ export async function extractSectionsBatch(
 
 	return results;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Google LangExtract Integration (Official Library)
+// Uses gemma3-legal via Ollama — much better structured extraction
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface GoogleLangExtractEntity {
+	extraction_class: string;
+	extraction_text: string;
+	attributes: Record<string, string>;
+	start_char?: number;
+	end_char?: number;
+}
+
+export interface GoogleLangExtractResult {
+	document_id: string;
+	total_extractions: number;
+	extractions: GoogleLangExtractEntity[];
+	metadata: {
+		model_id: string;
+		extraction_passes: number;
+		temperature: number;
+	};
+}
+
+/**
+ * Extract structured legal entities using Google's official LangExtract library.
+ * Falls back to heuristic extraction if service unavailable.
+ *
+ * Entity types: PARTY, DATE, CITATION, MONEY, STATUTE, OBLIGATION, TERM, LOCATION
+ */
+export async function extractLegalEntities(
+	text: string,
+	options: {
+		extraction_passes?: number;
+		temperature?: number;
+	} = {}
+): Promise<GoogleLangExtractResult | null> {
+	try {
+		const baseUrl = await resolveLangExtractBaseUrl();
+		const response = await fetch(`${baseUrl}/extract`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				text: text.slice(0, 50_000),
+				extraction_type: 'legal',
+				extraction_passes: options.extraction_passes ?? 1,
+				temperature: options.temperature ?? 0.3,
+			}),
+			signal: AbortSignal.timeout(30_000),
+		});
+
+		if (!response.ok) {
+			console.warn(`[LangExtract:legal] Service returned ${response.status}`);
+			return null;
+		}
+
+		return await response.json() as GoogleLangExtractResult;
+	} catch (e) {
+		console.warn('[LangExtract:legal] Service unavailable:', e);
+		return null;
+	}
+}
+
+/**
+ * Extract forensic/evidence entities using Google's official LangExtract library.
+ *
+ * Entity types: PERSON, DATE, LOCATION, PHONE, EMAIL, DOCUMENT, IDENTIFIER, QUOTE
+ */
+export async function extractEvidenceEntities(
+	text: string,
+	options: {
+		extraction_passes?: number;
+		temperature?: number;
+	} = {}
+): Promise<GoogleLangExtractResult | null> {
+	try {
+		const baseUrl = await resolveLangExtractBaseUrl();
+		const response = await fetch(`${baseUrl}/extract`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				text: text.slice(0, 50_000),
+				extraction_type: 'evidence',
+				extraction_passes: options.extraction_passes ?? 1,
+				temperature: options.temperature ?? 0.3,
+			}),
+			signal: AbortSignal.timeout(30_000),
+		});
+
+		if (!response.ok) {
+			console.warn(`[LangExtract:evidence] Service returned ${response.status}`);
+			return null;
+		}
+
+		return await response.json() as GoogleLangExtractResult;
+	} catch (e) {
+		console.warn('[LangExtract:evidence] Service unavailable:', e);
+		return null;
+	}
+}
+
+/**
+ * Extract from file path or URL using Google LangExtract.
+ * Supports PDF, TXT, and web URLs.
+ */
+export async function extractFromFile(
+	filePath: string,
+	options: {
+		extraction_type?: 'legal' | 'evidence';
+		extraction_passes?: number;
+	} = {}
+): Promise<GoogleLangExtractResult | null> {
+	try {
+		const baseUrl = await resolveLangExtractBaseUrl();
+		const response = await fetch(`${baseUrl}/extract/file`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				file_path: filePath,
+				extraction_type: options.extraction_type ?? 'legal',
+				extraction_passes: options.extraction_passes ?? 2,
+			}),
+			signal: AbortSignal.timeout(60_000),
+		});
+
+		if (!response.ok) {
+			console.warn(`[LangExtract:file] Service returned ${response.status}`);
+			return null;
+		}
+
+		return await response.json() as GoogleLangExtractResult;
+	} catch (e) {
+		console.warn('[LangExtract:file] Service unavailable:', e);
+		return null;
+	}
+}
+
+/**
+ * Custom extraction with user-defined prompt and few-shot examples.
+ * Flexible for any domain (medical, financial, research).
+ */
+export async function extractCustom(
+	text: string,
+	prompt: string,
+	examples: Array<{
+		text: string;
+		extractions: Array<{
+			extraction_class: string;
+			extraction_text: string;
+			attributes?: Record<string, string>;
+		}>;
+	}> = [],
+	options: {
+		extraction_passes?: number;
+		temperature?: number;
+	} = {}
+): Promise<GoogleLangExtractResult | null> {
+	try {
+		const baseUrl = await resolveLangExtractBaseUrl();
+		const response = await fetch(`${baseUrl}/extract`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				text: text.slice(0, 50_000),
+				extraction_type: 'custom',
+				custom_prompt: prompt,
+				custom_examples: examples,
+				extraction_passes: options.extraction_passes ?? 1,
+				temperature: options.temperature ?? 0.3,
+			}),
+			signal: AbortSignal.timeout(30_000),
+		});
+
+		if (!response.ok) {
+			console.warn(`[LangExtract:custom] Service returned ${response.status}`);
+			return null;
+		}
+
+		return await response.json() as GoogleLangExtractResult;
+	} catch (e) {
+		console.warn('[LangExtract:custom] Service unavailable:', e);
+		return null;
+	}
+}

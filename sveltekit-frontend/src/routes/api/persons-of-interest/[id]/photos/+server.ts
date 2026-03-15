@@ -2,12 +2,13 @@ import { db } from '$lib/server/db/client';
 import { poiPhotos, personsOfInterest } from '$lib/server/db/schema-postgres';
 import { json } from '@sveltejs/kit';
 import { eq, desc } from 'drizzle-orm';
-import { uploadFile } from '$lib/server/minio-client';
+import { uploadFile, deleteFile } from '$lib/server/minio-client';
 import { createHash } from 'crypto';
 import sharp from 'sharp';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const deletePhotoSchema = z.object({
 	photoId: z.string().min(1, 'photoId required').max(500),
@@ -169,6 +170,14 @@ export const DELETE: RequestHandler = async ({ params, request }) => {
 			return json({ error: 'Photo not found' }, { status: 404 });
 		}
 
+		// Clean up MinIO objects (non-fatal)
+		if (deleted.minioKey) {
+			deleteFile(BUCKET, deleted.minioKey).catch(() => {});
+		}
+		if (deleted.thumbnailKey) {
+			deleteFile(BUCKET, deleted.thumbnailKey).catch(() => {});
+		}
+
 		return json({ success: true });
 	} catch (err) {
 		console.error('[poi-photos] DELETE error:', err);
@@ -237,7 +246,7 @@ Return ONLY valid JSON.`;
 		const controller = new AbortController();
 		const timeout = setTimeout(() => controller.abort(), VLM_TIMEOUT);
 
-		const vlmRes = await fetch(`${OLLAMA_URL}/api/generate`, {
+		const vlmRes = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -316,7 +325,7 @@ Return ONLY valid JSON.`;
 
 	if (textToEmbed.length > 20) {
 		try {
-			const embedRes = await fetch(`${OLLAMA_URL}/api/embed`, {
+			const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embed`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ model: EMBED_MODEL, input: textToEmbed }),

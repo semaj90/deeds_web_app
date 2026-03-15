@@ -4,6 +4,8 @@ import { db } from '$lib/server/db/client';
 import { personsOfInterest, evidence, cases } from '$lib/server/db/schema-postgres.js';
 import { eq, sql, arrayContains } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
+
 /**
  * GET /api/persons-of-interest/[id]/risk
  * Compute risk score based on evidence connections, case severity, threat level
@@ -106,7 +108,7 @@ Provide a JSON object with: riskScore (0-100), patterns (string[]), recommendati
 	let aiProfile = poi.aiProfile ?? { riskScore: 0, patterns: [], recommendations: [], lastUpdated: '' };
 
 	try {
-		const ollamaRes = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+		const ollamaRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: 'gemma3-legal:latest', prompt, format: 'json', stream: false }),

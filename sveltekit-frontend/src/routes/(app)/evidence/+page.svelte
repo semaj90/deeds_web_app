@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { applyAction, enhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 	import { analytics } from '$lib/stores/analytics.svelte';
 	import type { ActionData, PageData } from './$types';
 	import SmartDocumentForm from '$lib/components/forms/SmartDocumentForm.svelte';
@@ -373,7 +374,7 @@
 		<!-- Bulk Upload (Multi-file with metadata) -->
 		{#if showBulkUpload}
 			<div class="mb-6">
-				<EvidenceUpload caseId={data.caseId ?? ''} onUploadComplete={(uploads) => { showBulkUpload = false; window.location.reload(); }} />
+				<EvidenceUpload caseId={data.caseId ?? ''} onUploadComplete={(uploads) => { showBulkUpload = false; invalidateAll(); }} />
 			</div>
 		{/if}
 
@@ -411,7 +412,7 @@
 			<div class="mb-6">
 				<UploadZone
 					onfilesadded={(e) => console.log('Files added:', e.files.length)}
-					onuploadcomplete={(e) => { showYorhaUpload = false; window.location.reload(); }}
+					onuploadcomplete={(e) => { showYorhaUpload = false; invalidateAll(); }}
 				/>
 			</div>
 		{/if}
@@ -438,7 +439,7 @@
 					multiple={true}
 					maxSize={100}
 					analyzeEndpoint="/api/evidence/analyze"
-					onUpload={(files) => { console.log('AI Upload complete:', files.length, 'files'); showAIFileUpload = false; window.location.reload(); }}
+					onUpload={(files) => { console.log('AI Upload complete:', files.length, 'files'); showAIFileUpload = false; invalidateAll(); }}
 					onAnalyze={(file, metadata) => { console.log('AI Analysis:', file.name, 'confidence:', metadata.confidence); }}
 				/>
 			</div>
@@ -534,7 +535,7 @@
 						caseId={data.caseId ?? ''}
 						onsubmit={() => {
 							showAdvancedUpload = false;
-							window.location.reload();
+							invalidateAll();
 						}}
 					/>
 				</div>
@@ -577,7 +578,7 @@
 						multiple={true}
 						maxFiles={10}
 						maxSizeMB={100}
-						onupload={(uploadData) => { console.log('Enhanced upload:', uploadData); showEnhancedFileUpload = false; window.location.reload(); }}
+						onupload={(uploadData) => { console.log('Enhanced upload:', uploadData); showEnhancedFileUpload = false; invalidateAll(); }}
 					/>
 				</div>
 			{/if}
@@ -606,7 +607,7 @@
 							isUploading = true;
 							try {
 								const res = await fetch('?/upload', { method: 'POST', body: formData });
-								if (res.ok) { showQuickUpload = false; window.location.reload(); }
+								if (res.ok) { showQuickUpload = false; invalidateAll(); }
 								else uploadError = 'Upload failed';
 							} catch { uploadError = 'Upload failed'; }
 							finally { isUploading = false; }
@@ -917,7 +918,7 @@
 					caseId={data.caseId ?? ''}
 					userId={data.user?.id ?? 'anonymous'}
 					originalHash={''}
-					onWorkflowComplete={() => { showCustodyFlow = false; window.location.reload(); }}
+					onWorkflowComplete={() => { showCustodyFlow = false; invalidateAll(); }}
 					onWorkflowError={(err) => { uploadError = `Custody error: ${err}`; }}
 				/>
 			</div>
@@ -1010,8 +1011,8 @@
 	mode={crudMode}
 	evidenceId={crudEvidenceId}
 	onClose={() => { showCrudModal = false; }}
-	onSave={() => { window.location.reload(); }}
-	onDelete={() => { window.location.reload(); }}
+	onSave={() => { invalidateAll(); }}
+	onDelete={() => { invalidateAll(); }}
 />
 
 <EvidenceAssistant
@@ -1069,14 +1070,14 @@
 	caseId={data.evidence?.[0]?.caseId || 'default'}
 	isOpen={showUploadPipeline}
 	onClose={() => (showUploadPipeline = false)}
-	onSuccess={(evidenceId, jobId) => { console.log('Pipeline complete:', evidenceId, jobId); showUploadPipeline = false; window.location.reload(); }}
+	onSuccess={(evidenceId, jobId) => { console.log('Pipeline complete:', evidenceId, jobId); showUploadPipeline = false; invalidateAll(); }}
 />
 
 <Dialog bind:open={showDeleteConfirm} title="Delete Evidence" description="This action cannot be undone.">
 	<p class="text-sm text-sand/80">Are you sure you want to delete <strong>{deleteEvidenceName}</strong>?</p>
 	{#snippet footer()}
 		<button onclick={() => (showDeleteConfirm = false)} class="px-4 py-2 rounded border border-sand/30 text-sm hover:bg-sand/10 transition">Cancel</button>
-		<form method="POST" action="?/delete" use:enhance={() => { return async ({ result }) => { showDeleteConfirm = false; await applyAction(result); window.location.reload(); }; }}>
+		<form method="POST" action="?/delete" use:enhance={() => { return async ({ result }) => { showDeleteConfirm = false; await applyAction(result); invalidateAll(); }; }}>
 			<input type="hidden" name="evidenceId" value={deleteEvidenceId} />
 			<button type="submit" class="px-4 py-2 rounded bg-danger text-white text-sm hover:bg-danger/80 transition">Delete</button>
 		</form>

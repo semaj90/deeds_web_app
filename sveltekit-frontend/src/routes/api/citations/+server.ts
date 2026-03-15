@@ -95,7 +95,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 				citationText: body.statute_code.trim(),
 				caseId: body.case_id || null,
 				sourceUrl: body.source_type === 'manual' ? null : body.source_url || null,
-				createdBy: null, // TODO: map locals.user.id (uuid) to integer FK
+				createdBy: locals.user?.id ?? null,
 			})
 			.returning();
 

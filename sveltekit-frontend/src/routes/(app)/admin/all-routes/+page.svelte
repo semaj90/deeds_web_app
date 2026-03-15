@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { goto } from '$app/navigation';
 	import RouteOperationsDashboard from '$lib/components/RouteOperationsDashboard.svelte';
 	import RouteInspectorModal from '$lib/components/RouteInspectorModal.svelte';
 	import RouteDecisionModal from '$lib/components/RouteDecisionModal.svelte';
@@ -237,7 +238,7 @@
 
 	function handleNavigate(route: any) {
 		logInteraction(route.id, 'navigate', { path: route.path });
-		window.location.href = route.path;
+		goto(route.path);
 	}
 
 	async function handleAnalyze(route: any) {

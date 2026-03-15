@@ -4,6 +4,7 @@ import { db } from '$lib/server/db/client';
 import { personsOfInterest } from '$lib/server/db/schema-poi.js';
 import { eq, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 /**
  * GET /api/persons-of-interest/[id]/summary
@@ -79,7 +80,7 @@ Respond with ONLY a JSON object:
 	let confidence = 0.7;
 
 	try {
-		const ollamaRes = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+		const ollamaRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

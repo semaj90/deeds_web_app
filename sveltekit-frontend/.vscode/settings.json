@@ -50,11 +50,11 @@
   "cmake.showOptionsMovedNotification": false,
 
   // ========================================
-  // PYTHON ENVIRONMENT SETTINGS
+  // PYTHON ENVIRONMENT SETTINGS (DISABLED — not needed for SvelteKit)
   // ========================================
-  "python.terminal.useEnvFile": true,
+  "python.terminal.useEnvFile": false,
   "python.envFile": "${workspaceFolder}/../.env",
-  "python.terminal.activateEnvironment": true,
+  "python.terminal.activateEnvironment": false,
   "python.terminal.executeInFileDir": false,
   // ========================================
   // CUDA ACCELERATION SETTINGS

@@ -1,5 +1,6 @@
 <script lang="ts">
   import Button from '$lib/components/ui/Button.svelte';
+  import { goto } from '$app/navigation';
   import { analytics } from '$lib/stores/analytics.svelte';
   import DropdownMenu from '$lib/components/ui/DropdownMenu.svelte';
   import Card from '$lib/components/ui/card/Card.svelte';
@@ -658,7 +659,7 @@
         />
         <RelatedCasesPanel
           statuteCode={selectedCitation.statute_code ?? null}
-          onviewcase={(c) => { window.location.href = `/cases/${c.id}`; }}
+          onviewcase={(c) => { goto(`/cases/${c.id}`); }}
         />
         <div class="mt-4">
           <button onclick={() => { editingLink = { id: selectedCitation.id, case_id: '', statute_code: selectedCitation.statute_code ?? '', link_type: 'CITED_IN', notes: selectedCitation.notes ?? '', created_at: selectedCitation.created_at ?? new Date().toISOString(), updated_at: new Date().toISOString() }; showLinkEditor = !showLinkEditor; }} class="text-sm text-accent hover:underline">

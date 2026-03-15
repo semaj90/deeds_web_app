@@ -48,7 +48,37 @@ export const GET: RequestHandler = async ({ params }) => {
 			return json({ similar: [], method: 'none' });
 		}
 
-		const vectorResults = await tryVectorSimilarity(targetProfile, candidates);
+		// Fetch face embeddings for blending (non-fatal)
+		let targetFaceEmb: number[] | null = null;
+		const candidateFaceEmbs = new Map<string, number[]>();
+		try {
+			const [targetPhoto] = await db
+				.select({ faceEmbedding: poiPhotos.faceEmbedding })
+				.from(poiPhotos)
+				.where(eq(poiPhotos.poiId, poiId))
+				.orderBy(desc(poiPhotos.uploadedAt))
+				.limit(1);
+			if (targetPhoto?.faceEmbedding && Array.isArray(targetPhoto.faceEmbedding) && targetPhoto.faceEmbedding.length === 768) {
+				targetFaceEmb = targetPhoto.faceEmbedding as number[];
+				const candIds = candidates.map((c) => c.id);
+				if (candIds.length > 0) {
+					const candPhotos = await db
+						.select({ poiId: poiPhotos.poiId, faceEmbedding: poiPhotos.faceEmbedding })
+						.from(poiPhotos)
+						.where(sql`${poiPhotos.poiId} = ANY(${candIds})`)
+						.orderBy(desc(poiPhotos.uploadedAt));
+					for (const cp of candPhotos) {
+						if (cp.poiId && !candidateFaceEmbs.has(cp.poiId) && Array.isArray(cp.faceEmbedding) && (cp.faceEmbedding as number[]).length === 768) {
+							candidateFaceEmbs.set(cp.poiId, cp.faceEmbedding as number[]);
+						}
+					}
+				}
+			}
+		} catch {
+			// Face embeddings unavailable — text-only ranking
+		}
+
+		const vectorResults = await tryVectorSimilarity(targetProfile, candidates, targetFaceEmb, candidateFaceEmbs);
 		if (vectorResults) {
 			return json({ similar: vectorResults.slice(0, 5), method: 'vector' });
 		}
@@ -127,7 +157,9 @@ function toSimilarPOI(c: Candidate, similarity: number): SimilarPOI {
 
 async function tryVectorSimilarity(
 	targetProfile: string,
-	candidates: Candidate[]
+	candidates: Candidate[],
+	targetFaceEmb: number[] | null,
+	candidateFaceEmbs: Map<string, number[]>
 ): Promise<SimilarPOI[] | null> {
 	try {
 		const targetEmbedding = await Promise.race([
@@ -166,9 +198,18 @@ async function tryVectorSimilarity(
 					Array.isArray(result.value) &&
 					result.value.length > 0
 				) {
-					const sim = cosineSim(targetEmbedding as number[], result.value as number[]);
-					if (sim > 0.1) {
-						scored.push(toSimilarPOI(batch[j], sim));
+					let textSim = cosineSim(targetEmbedding as number[], result.value as number[]);
+					// Blend face embedding similarity (30%) if available
+					let finalSim = textSim;
+					if (targetFaceEmb) {
+						const candFace = candidateFaceEmbs.get(batch[j].id);
+						if (candFace) {
+							const faceSim = cosineSim(targetFaceEmb, candFace);
+							finalSim = textSim * 0.7 + faceSim * 0.3;
+						}
+					}
+					if (finalSim > 0.1) {
+						scored.push(toSimilarPOI(batch[j], finalSim));
 					}
 				}
 			}

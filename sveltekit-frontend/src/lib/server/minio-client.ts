@@ -50,6 +50,20 @@ export async function uploadFile(
  return objectName;
 }
 
+/**
+ * Deletes a file from MinIO. Non-fatal — logs and returns false on failure.
+ */
+export async function deleteFile(bucketName: string, objectName: string): Promise<boolean> {
+ try {
+  const client = getMinioClient();
+  await client.removeObject(bucketName, objectName);
+  return true;
+ } catch (err) {
+  console.warn(`[minio] deleteFile failed: ${bucketName}/${objectName}`, err);
+  return false;
+ }
+}
+
 const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
 const AI_CHAT_IMAGES_BUCKET = process.env.MINIO_AI_CHAT_IMAGES_BUCKET ?? 'ai-chat-images';
 

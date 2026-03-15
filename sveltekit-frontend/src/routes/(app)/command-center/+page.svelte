@@ -13,41 +13,44 @@
 
 	let { data }: { data: PageData } = $props();
 
-	let metrics = $state({
-		totalCases: 42,
-		activeCases: 15,
-		evidenceProcessed: 237,
-		trends: { totalCases: 5.2, activeCases: -2.1, evidenceProcessed: 12.8 }
+	let metrics = $derived({
+		totalCases: data.metrics?.totalCases ?? 0,
+		activeCases: data.metrics?.activeCases ?? 0,
+		evidenceProcessed: data.metrics?.evidenceProcessed ?? 0,
 	});
 
-	// System alerts for SystemStatus component
-	let systemAlerts = $state<Alert[]>([
-		{
-			id: '1',
-			type: 'success',
-			message: 'All services operational',
-			timestamp: new Date().toLocaleTimeString()
-		},
-		{
-			id: '2',
-			type: 'info',
-			message: 'Database connection healthy',
-			timestamp: new Date().toLocaleTimeString()
-		},
-		{
-			id: '3',
-			type: 'warning',
-			message: 'High memory usage detected (72%)',
-			timestamp: new Date().toLocaleTimeString()
+	// Dismissed alert IDs tracked separately (derived is read-only)
+	let dismissedIds = $state(new Set<string>());
+
+	// System alerts derived from actual service health
+	let systemAlerts = $derived.by(() => {
+		const alerts: Alert[] = [];
+		const health = data.serviceHealth ?? {};
+		const overall = (health as Record<string, unknown>).overall as string | undefined;
+
+		if (overall === 'healthy') {
+			alerts.push({ id: 'overall', type: 'success', message: 'All services operational', timestamp: new Date().toLocaleTimeString() });
+		} else if (overall === 'degraded') {
+			alerts.push({ id: 'overall', type: 'warning', message: 'Some services degraded', timestamp: new Date().toLocaleTimeString() });
+		} else {
+			alerts.push({ id: 'overall', type: 'error', message: 'System health check failed', timestamp: new Date().toLocaleTimeString() });
 		}
-	]);
+
+		for (const [service, status] of Object.entries(health).filter(([k]) => k !== 'overall')) {
+			if (!status) {
+				alerts.push({ id: service, type: 'error', message: `${service} is offline`, timestamp: new Date().toLocaleTimeString() });
+			}
+		}
+
+		if (alerts.length === 1 && alerts[0].type === 'success') {
+			alerts.push({ id: 'db', type: 'info', message: `${metrics.totalCases} cases, ${metrics.evidenceProcessed} evidence items`, timestamp: new Date().toLocaleTimeString() });
+		}
+
+		return alerts.filter(a => !dismissedIds.has(a.id));
+	});
 
 	function dismissAlert(id: string) {
-		const alert = systemAlerts.find(a => a.id === id);
-		if (alert) {
-			alert.dismissed = true;
-			systemAlerts = [...systemAlerts]; // Trigger reactivity
-		}
+		dismissedIds = new Set([...dismissedIds, id]);
 	}
 
 	// Quick actions for QuickActions component
@@ -96,12 +99,9 @@
 
 	<!-- Stats Cards Row -->
 	<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2rem;">
-		<StatsCard icon="gavel" label="Total Cases" value={metrics.totalCases}
-		           trend={metrics.trends.totalCases} trendLabel="vs last month" />
-		<StatsCard icon="activity" label="Active Cases" value={metrics.activeCases}
-		           trend={metrics.trends.activeCases} trendLabel="vs last week" />
-		<StatsCard icon="file-text" label="Evidence Items" value={metrics.evidenceProcessed}
-		           trend={metrics.trends.evidenceProcessed} trendLabel="this month" />
+		<StatsCard icon="gavel" label="Total Cases" value={metrics.totalCases} />
+		<StatsCard icon="activity" label="Active Cases" value={metrics.activeCases} />
+		<StatsCard icon="file-text" label="Evidence Items" value={metrics.evidenceProcessed} />
 	</div>
 
 	<!-- Main Grid: Service Health + System Status -->

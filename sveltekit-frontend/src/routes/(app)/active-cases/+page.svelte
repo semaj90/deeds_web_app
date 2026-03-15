@@ -8,6 +8,7 @@
 	import CaseCard from '$lib/components/cases/CaseCard.svelte';
 	import CaseScoringDashboard from '$lib/components/ai/CaseScoringDashboard.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import { invalidateAll, goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
 	const { data }: { data: PageData } = $props();
@@ -126,7 +127,7 @@
 	{#if data.loadError}
 		<ErrorAlert
 			error={data.loadError}
-			onRetry={() => window.location.reload()}
+			onRetry={() => invalidateAll()}
 		/>
 	{/if}
 
@@ -281,8 +282,8 @@
 			{#each richCaseCards as caseItem (caseItem.id)}
 				<CaseCard
 					{caseItem}
-					onView={(id) => { window.location.href = `/cases/${id}`; }}
-					onEdit={(id) => { window.location.href = `/cases/${id}`; }}
+					onView={(id) => { goto(`/cases/${id}`); }}
+					onEdit={(id) => { goto(`/cases/${id}`); }}
 				/>
 			{/each}
 			{#if richCaseCards.length === 0}

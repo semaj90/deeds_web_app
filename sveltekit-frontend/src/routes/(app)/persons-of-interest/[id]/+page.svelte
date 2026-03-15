@@ -2,6 +2,7 @@
 	import { poiService } from '$lib/features/poi/services/poi';
 	import type { KnownAssociate } from '$lib/types/poi';
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import POIPhotoGrid from '$lib/components/poi/POIPhotoGrid.svelte';
 	import POIQuickActions from '$lib/components/poi/POIQuickActions.svelte';
 	import POIThreatBadge from '$lib/components/poi/POIThreatBadge.svelte';
@@ -160,8 +161,10 @@
 		if (!photo?.id || !data.poi?.id) return;
 		if (!confirm(`Delete photo "${photo.originalName ?? 'this photo'}"?`)) return;
 		try {
-			const res = await fetch(`/api/persons-of-interest/${data.poi.id}/photos?photoId=${photo.id}`, {
-				method: 'DELETE'
+			const res = await fetch(`/api/persons-of-interest/${data.poi.id}/photos`, {
+				method: 'DELETE',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ photoId: photo.id })
 			});
 			if (!res.ok) throw new Error('Delete failed');
 			photos = photos.filter((_, i) => i !== index);
@@ -416,7 +419,7 @@
 				{#if photos.length > 0}
 					<POIPhotoModal {photos} bind:currentIndex={photoModalIndex} bind:open={photoModalOpen} onclose={() => { photoModalOpen = false; }} />
 				{/if}
-				<POIFaceMatchDialog bind:open={faceMatchOpen} matches={faceMatches} onSelect={(selected) => { window.location.href = `/persons-of-interest/${selected.id}`; }} />
+				<POIFaceMatchDialog bind:open={faceMatchOpen} matches={faceMatches} onSelect={(selected) => { goto(`/persons-of-interest/${selected.id}`); }} />
 			{:else if activeTab === 'search'}
 				<div class="similar-panel">
 					<h3 class="similar-heading">Similar Persons <span class="method-tag">{similarMethod}</span></h3>
@@ -433,6 +436,9 @@
 							{#each similarPOIs as sp (sp.poiId)}
 								<a href="/persons-of-interest/{sp.poiId}" class="result-card">
 									<div class="result-header">
+										{#if sp.photoUrl}
+											<img src={sp.photoUrl} alt={sp.name} style="width:32px;height:32px;border-radius:50%;object-fit:cover;margin-right:0.5rem;flex-shrink:0;" />
+										{/if}
 										<span class="result-name">{sp.name}</span>
 										<span class="result-score" style="opacity: {0.4 + sp.similarity * 0.6}">
 											{Math.round(sp.similarity * 100)}% match
@@ -487,6 +493,9 @@
 							{#each searchResults as result (result.poiId)}
 								<a href="/persons-of-interest/{result.poiId}" class="result-card">
 									<div class="result-header">
+										{#if result.photoUrl}
+											<img src={result.photoUrl} alt={result.name} style="width:32px;height:32px;border-radius:50%;object-fit:cover;margin-right:0.5rem;flex-shrink:0;" />
+										{/if}
 										<span class="result-name">{result.name}</span>
 										<span class="result-score" style="opacity: {0.4 + result.similarityScore * 0.6}">
 											{Math.round(result.similarityScore * 100)}% match

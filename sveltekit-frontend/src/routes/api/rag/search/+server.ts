@@ -7,7 +7,6 @@ import type {
 	RetrievedChunk,
 	ConfidenceLevel
 } from '$lib/types/rag-source-validation';
-import type { RAGConfig } from '$lib/sdk/rag/index.js';
 import { productionLogger } from '$lib/server/production-logger.js';
 import { apiResponses } from '$lib/server/api/response-helper.js';
 import { chatRateLimiter } from '$lib/server/middleware/rate-limiter.js';

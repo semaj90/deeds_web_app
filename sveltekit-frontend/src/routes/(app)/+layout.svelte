@@ -22,12 +22,14 @@
 	let AccessibilityPanel = $state<typeof import('$lib/components/ui/AccessibilityPanel.svelte').default | null>(null);
 	let AIChatWidget = $state<typeof import('$lib/components/ai/AIChatWidget.svelte').default | null>(null);
 	onMount(async () => {
-		const [accMod, chatMod] = await Promise.all([
-			import('$lib/components/ui/AccessibilityPanel.svelte'),
-			import('$lib/components/ai/AIChatWidget.svelte'),
-		]);
-		AccessibilityPanel = accMod.default;
-		AIChatWidget = chatMod.default;
+		try {
+			const [accMod, chatMod] = await Promise.all([
+				import('$lib/components/ui/AccessibilityPanel.svelte').catch(() => null),
+				import('$lib/components/ai/AIChatWidget.svelte').catch(() => null),
+			]);
+			if (accMod) AccessibilityPanel = accMod.default;
+			if (chatMod) AIChatWidget = chatMod.default;
+		} catch { /* non-fatal: optional UI components */ }
 	});
 
 	// Initialize user activity telemetry (typing/idle detection)

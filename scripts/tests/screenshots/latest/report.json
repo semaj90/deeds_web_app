@@ -1,534 +1,457 @@
 {
-  "timestamp": "2026-03-15T02-55-41",
+  "timestamp": "2026-03-15T15-28-53",
   "base": "http://localhost:5173",
-  "totalTimeMs": 42746,
+  "totalTimeMs": 28232,
   "results": [
     {
       "name": "evidence",
       "path": "/evidence",
       "url": "http://localhost:5173/evidence",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "evidence.png",
-      "consoleErrors": [
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/evidence",
+      "file": "evidence-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/evidence",
+          "method": "GET",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
       ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
-      "failedRequests": [],
-      "loadTimeMs": 4603,
-      "domElements": 849,
-      "resourceCount": 258,
-      "resourceSizeKB": 8857
+      "loadTimeMs": 2370,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     },
     {
       "name": "persons-of-interest",
       "path": "/persons-of-interest/fake-id",
       "url": "http://localhost:5173/persons-of-interest/fake-id",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "persons-of-interest.png",
-      "consoleErrors": [
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/persons-of-interest/fake-id",
+      "file": "persons-of-interest-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/persons-of-interest/fake-id",
+          "method": "GET",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
       ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
-      "failedRequests": [],
-      "loadTimeMs": 807,
-      "domElements": 266,
-      "resourceCount": 235,
-      "resourceSizeKB": 6612
+      "loadTimeMs": 22,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     },
     {
       "name": "cases-overview",
       "path": "/cases/test-id/overview",
       "url": "http://localhost:5173/cases/test-id/overview",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "cases-overview.png",
-      "consoleErrors": [
-        "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
-        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
-        "[SimilarCases] Error: Error: Failed to load similar cases: 500\n    at loadSimilarCases (http://localhost:5173/src/lib/components/legal/SimilarCasesPanel.svelte:106:11)",
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/cases/test-id/overview",
+      "file": "cases-overview-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/cases/test-id/overview",
+          "method": "GET",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
       ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
-      "failedRequests": [],
-      "loadTimeMs": 2052,
-      "domElements": 342,
-      "resourceCount": 170,
-      "resourceSizeKB": 6082
+      "loadTimeMs": 2210,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     },
     {
       "name": "cases-board",
       "path": "/cases/test-id/board",
       "url": "http://localhost:5173/cases/test-id/board",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "cases-board.png",
-      "consoleErrors": [
-        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so",
-        "[board-persistence] IndexedDB save failed: DataCloneError: Failed to execute 'put' on 'IDBObjectStore': [object Array] could not be cloned.\n    at Proxy.<anonymous> (http://localhost:5173/node_modules"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/cases/test-id/board",
+      "file": "cases-board-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/cases/test-id/board",
+          "method": "GET",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
       ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
-      "failedRequests": [],
-      "loadTimeMs": 2826,
-      "domElements": 343,
-      "resourceCount": 162,
-      "resourceSizeKB": 6060
+      "loadTimeMs": 18,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     },
     {
       "name": "cases-list",
       "path": "/cases",
       "url": "http://localhost:5173/cases",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "cases-list.png",
-      "consoleErrors": [
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/cases",
+      "file": "cases-list-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/cases",
+          "method": "GET",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
       ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
-      "failedRequests": [],
-      "loadTimeMs": 901,
-      "domElements": 306,
-      "resourceCount": 150,
-      "resourceSizeKB": 5746
+      "loadTimeMs": 2213,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     },
     {
       "name": "dashboard",
       "path": "/dashboard",
       "url": "http://localhost:5173/dashboard",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "dashboard.png",
-      "consoleErrors": [
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/dashboard",
+      "file": "dashboard-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/dashboard",
+          "method": "GET",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
       ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
-      "failedRequests": [],
-      "loadTimeMs": 2224,
-      "domElements": 336,
-      "resourceCount": 185,
-      "resourceSizeKB": 6227
+      "loadTimeMs": 2349,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     },
     {
       "name": "citations",
       "path": "/citations",
       "url": "http://localhost:5173/citations",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "citations.png",
-      "consoleErrors": [
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/citations",
+      "file": "citations-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/citations",
+          "method": "GET",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
       ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
-      "failedRequests": [],
-      "loadTimeMs": 796,
-      "domElements": 288,
-      "resourceCount": 201,
-      "resourceSizeKB": 6563
+      "loadTimeMs": 135,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     },
     {
       "name": "evidence-upload",
       "path": "/cases/test-id/evidence/upload",
       "url": "http://localhost:5173/cases/test-id/evidence/upload",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "evidence-upload.png",
-      "consoleErrors": [
-        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/cases/test-id/evidence/upload",
+      "file": "evidence-upload-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/cases/test-id/evidence/upload",
+          "method": "GET",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
       ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
-      "failedRequests": [],
-      "loadTimeMs": 756,
-      "domElements": 280,
-      "resourceCount": 154,
-      "resourceSizeKB": 5735
+      "loadTimeMs": 2087,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     },
     {
       "name": "active-cases",
       "path": "/active-cases",
       "url": "http://localhost:5173/active-cases",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "active-cases.png",
-      "consoleErrors": [
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/active-cases",
+      "file": "active-cases-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/active-cases",
+          "method": "GET",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
       ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
-      "failedRequests": [],
-      "loadTimeMs": 829,
-      "domElements": 425,
-      "resourceCount": 155,
-      "resourceSizeKB": 5861
+      "loadTimeMs": 124,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     },
     {
       "name": "analysis-center",
       "path": "/analysis-center",
       "url": "http://localhost:5173/analysis-center",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "analysis-center.png",
-      "consoleErrors": [
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/analysis-center",
+      "file": "analysis-center-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/analysis-center",
+          "method": "GET",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
       ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
-      "failedRequests": [],
-      "loadTimeMs": 783,
-      "domElements": 460,
-      "resourceCount": 178,
-      "resourceSizeKB": 6611
+      "loadTimeMs": 2121,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     },
     {
       "name": "command-center",
       "path": "/command-center",
       "url": "http://localhost:5173/command-center",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "command-center.png",
-      "consoleErrors": [
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so",
-        "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "EventSource error: Event",
-        "Failed to load resource: the server responded with a status of 404 (Not Found)"
-      ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/command-center",
+      "file": "command-center-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
       "failedRequests": [
         {
-          "url": "http://localhost:5173/agentic/events",
+          "url": "http://localhost:5173/command-center",
           "method": "GET",
-          "failure": "net::ERR_ABORTED"
+          "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 2049,
-      "domElements": 581,
-      "resourceCount": 180,
-      "resourceSizeKB": 6074
+      "loadTimeMs": 112,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     },
     {
       "name": "evidence-library",
       "path": "/evidence-library",
       "url": "http://localhost:5173/evidence-library",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "evidence-library.png",
-      "consoleErrors": [
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/evidence-library",
+      "file": "evidence-library-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/evidence-library",
+          "method": "GET",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
       ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
-      "failedRequests": [],
-      "loadTimeMs": 3968,
-      "domElements": 305,
-      "resourceCount": 168,
-      "resourceSizeKB": 6123
+      "loadTimeMs": 2114,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     },
     {
       "name": "global-search",
       "path": "/global-search",
       "url": "http://localhost:5173/global-search",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "global-search.png",
-      "consoleErrors": [
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/global-search",
+      "file": "global-search-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/global-search",
+          "method": "GET",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
       ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
-      "failedRequests": [],
-      "loadTimeMs": 1150,
-      "domElements": 323,
-      "resourceCount": 170,
-      "resourceSizeKB": 6175
+      "loadTimeMs": 116,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     },
     {
       "name": "admin-dev-tools",
       "path": "/admin/dev-tools",
       "url": "http://localhost:5173/admin/dev-tools",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "admin-dev-tools.png",
-      "consoleErrors": [
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/admin/dev-tools",
+      "file": "admin-dev-tools-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/admin/dev-tools",
+          "method": "GET",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
       ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
-      "failedRequests": [],
-      "loadTimeMs": 1537,
-      "domElements": 378,
-      "resourceCount": 201,
-      "resourceSizeKB": 6712
+      "loadTimeMs": 2119,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     },
     {
       "name": "admin-knowledge-search",
       "path": "/admin/knowledge-search",
       "url": "http://localhost:5173/admin/knowledge-search",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "admin-knowledge-search.png",
-      "consoleErrors": [
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/admin/knowledge-search",
+      "file": "admin-knowledge-search-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/admin/knowledge-search",
+          "method": "GET",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
       ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
-      "failedRequests": [],
-      "loadTimeMs": 1067,
-      "domElements": 262,
-      "resourceCount": 143,
-      "resourceSizeKB": 5634
+      "loadTimeMs": 134,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     },
     {
       "name": "admin-codebase-viewer",
       "path": "/admin/codebase-viewer",
       "url": "http://localhost:5173/admin/codebase-viewer",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "admin-codebase-viewer.png",
-      "consoleErrors": [
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/admin/codebase-viewer",
+      "file": "admin-codebase-viewer-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/admin/codebase-viewer",
+          "method": "GET",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
       ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
-      "failedRequests": [],
-      "loadTimeMs": 1295,
-      "domElements": 830,
-      "resourceCount": 160,
-      "resourceSizeKB": 6064
+      "loadTimeMs": 2105,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     },
     {
       "name": "system-configuration",
       "path": "/system-configuration",
       "url": "http://localhost:5173/system-configuration",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "system-configuration.png",
-      "consoleErrors": [
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/system-configuration",
+      "file": "system-configuration-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/system-configuration",
+          "method": "GET",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
       ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
-      "failedRequests": [],
-      "loadTimeMs": 1253,
-      "domElements": 319,
-      "resourceCount": 152,
-      "resourceSizeKB": 5765
+      "loadTimeMs": 128,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     },
     {
       "name": "terminal",
       "path": "/terminal",
       "url": "http://localhost:5173/terminal",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "terminal.png",
-      "consoleErrors": [
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/terminal",
+      "file": "terminal-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/terminal",
+          "method": "GET",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
       ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
-      "failedRequests": [],
-      "loadTimeMs": 4455,
-      "domElements": 298,
-      "resourceCount": 149,
-      "resourceSizeKB": 5698
+      "loadTimeMs": 2119,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     },
     {
       "name": "admin-cache",
       "path": "/admin/cache",
       "url": "http://localhost:5173/admin/cache",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "admin-cache.png",
-      "consoleErrors": [
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/admin/cache",
+      "file": "admin-cache-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/admin/cache",
+          "method": "GET",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
       ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
-      "failedRequests": [],
-      "loadTimeMs": 2155,
-      "domElements": 468,
-      "resourceCount": 146,
-      "resourceSizeKB": 5677
+      "loadTimeMs": 108,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     },
     {
       "name": "analytics",
       "path": "/analytics",
       "url": "http://localhost:5173/analytics",
-      "status": 200,
-      "ok": true,
-      "error": null,
-      "file": "analytics.png",
-      "consoleErrors": [
-        "Uncaught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-sonner.js?v=5e",
-        "ErrorBoundary caught error: ReferenceError: props is not defined\n\n\tin <unknown>\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n\n    at $props (http://localhost:5173/node_modules/.vite/deps/svelte-so"
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/analytics",
+      "file": "analytics-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/analytics",
+          "method": "GET",
+          "failure": "net::ERR_CONNECTION_REFUSED"
+        }
       ],
-      "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
-      ],
-      "failedRequests": [],
-      "loadTimeMs": 1152,
-      "domElements": 286,
-      "resourceCount": 139,
-      "resourceSizeKB": 5580
+      "loadTimeMs": 2106,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
     }
   ],
   "summary": {
-    "passed": 20,
-    "failed": 0,
+    "passed": 0,
+    "failed": 20,
     "total": 20,
-    "avgLoadMs": 1833,
+    "avgLoadMs": 1241,
     "slowestRoute": "evidence",
-    "slowestLoadMs": 4603,
-    "totalConsoleErrors": 51,
-    "totalNetworkFailures": 1
+    "slowestLoadMs": 2370,
+    "totalConsoleErrors": 0,
+    "totalNetworkFailures": 20
   }
 }

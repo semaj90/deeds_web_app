@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { invalidateAll } from '$app/navigation';
+
 	// Props from server load (properly typed via SvelteKit)
 	let { data } = $props();
 
@@ -19,7 +21,7 @@
 	let loading = $state(false);
 
 	function refreshData() {
-		window.location.reload();
+		invalidateAll();
 	}
 
 	// Computed filtered files

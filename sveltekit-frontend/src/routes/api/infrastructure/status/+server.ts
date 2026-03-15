@@ -14,6 +14,7 @@ import { getSIMDStatus } from '$lib/server/minio-simd-client.js';
 import { checkGrpcHealth } from '$lib/server/grpc/embedding-client.js';
 import { healthCheck as trtHealthCheck } from '$lib/server/trt-llm.js';
 import { isCudaAvailable } from '$lib/server/gpu/libtorch-bridge.js';
+import { NODE_RUNTIME_CONFIG, GPU_MARKDOWN_ENV } from '$lib/gpu/runtime-optimizations.js';
 
 export const GET: RequestHandler = async () => {
 	const start = Date.now();
@@ -156,6 +157,15 @@ export const GET: RequestHandler = async () => {
 			publishRate: rabbitmqInfo.publishRate,
 			deliverRate: rabbitmqInfo.deliverRate,
 		} : null,
+		runtimeConfig: {
+			maxOldSpaceSize: NODE_RUNTIME_CONFIG.maxOldSpaceSize,
+			gpuBatchSize: NODE_RUNTIME_CONFIG.gpuBatchSize,
+			gpuConcurrencyLimit: NODE_RUNTIME_CONFIG.gpuConcurrencyLimit,
+			wasmSimd: NODE_RUNTIME_CONFIG.experimentalWasmSimd,
+			wasmThreads: NODE_RUNTIME_CONFIG.experimentalWasmThreads,
+			gpuMarkdownService: GPU_MARKDOWN_ENV.GPU_MARKDOWN_SERVICE_URL,
+			fallbackToCpu: GPU_MARKDOWN_ENV.FALLBACK_TO_CPU,
+		},
 		latencyMs: Date.now() - start,
 		ts: new Date().toISOString(),
 	}, {

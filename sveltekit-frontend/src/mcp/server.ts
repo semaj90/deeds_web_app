@@ -281,6 +281,59 @@ function setupToolHandlers() {
           required: ["reportId", "format"],
         },
       },
+      // ─────────────────────────────────────────────────────────────────────
+      // LangExtract Tools — Google's official structured extraction library
+      // Uses local Ollama (gemma3-legal) instead of Gemini API
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        name: "langextract:legal",
+        description: "Extract structured legal entities from text using Google LangExtract + gemma3-legal. Returns parties (plaintiff/defendant), dates, citations, money amounts, statutes, obligations with exact text locations for source grounding.",
+        inputSchema: { type: "object",
+          properties: {
+            text: { type: "string", description: "Legal document text to analyze (max 50000 chars)" },
+            extraction_passes: { type: "number", description: "Number of extraction passes for higher recall (1-3)", default: 1 },
+            temperature: { type: "number", description: "Sampling temperature (0.0-1.0)", default: 0.3 },
+          },
+          required: ["text"],
+        },
+      },
+      {
+        name: "langextract:evidence",
+        description: "Extract forensic/evidentiary entities from text: persons (witnesses, suspects), locations, phone numbers, emails, document references, quotes with attribution. Returns structured data with exact text positions.",
+        inputSchema: { type: "object",
+          properties: {
+            text: { type: "string", description: "Evidence document or investigation notes (max 50000 chars)" },
+            extraction_passes: { type: "number", description: "Number of extraction passes (1-3)", default: 1 },
+            temperature: { type: "number", description: "Sampling temperature (0.0-1.0)", default: 0.3 },
+          },
+          required: ["text"],
+        },
+      },
+      {
+        name: "langextract:file",
+        description: "Extract structured information from a file path or URL. Supports PDF, TXT, and web pages. Uses LangExtract multi-pass processing for long documents.",
+        inputSchema: { type: "object",
+          properties: {
+            file_path: { type: "string", description: "Local file path or URL to extract from" },
+            extraction_type: { type: "string", enum: ["legal", "evidence"], description: "Type of entities to extract", default: "legal" },
+            extraction_passes: { type: "number", description: "Passes for long documents (1-5)", default: 2 },
+          },
+          required: ["file_path"],
+        },
+      },
+      {
+        name: "langextract:custom",
+        description: "Custom structured extraction with user-defined prompt and few-shot examples. Flexible for any domain (medical, financial, research papers).",
+        inputSchema: { type: "object",
+          properties: {
+            text: { type: "string", description: "Text to extract from" },
+            prompt: { type: "string", description: "Extraction instructions (e.g., 'Extract medications, dosages, and frequencies')" },
+            examples: { type: "array", items: { type: "object" }, description: "Few-shot examples in LangExtract format" },
+            extraction_passes: { type: "number", description: "Extraction passes", default: 1 },
+          },
+          required: ["text", "prompt"],
+        },
+      },
     ],
   }));
 
@@ -602,6 +655,101 @@ function setupToolHandlers() {
 
         case "citations:add_to_case": {
           const result = await mcpTools.citations.addToCase(args as any);
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // LangExtract Handlers — Call Python service on port 8095
+        // ─────────────────────────────────────────────────────────────────────
+        case "langextract:legal": {
+          const { text, extraction_passes, temperature } = args as { text: string; extraction_passes?: number; temperature?: number };
+          const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
+
+          const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              text: text.slice(0, 50000),
+              extraction_type: 'legal',
+              extraction_passes: extraction_passes ?? 1,
+              temperature: temperature ?? 0.3,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`LangExtract failed: ${response.status} ${await response.text()}`);
+          }
+
+          const result = await response.json();
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
+        }
+
+        case "langextract:evidence": {
+          const { text, extraction_passes, temperature } = args as { text: string; extraction_passes?: number; temperature?: number };
+          const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
+
+          const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              text: text.slice(0, 50000),
+              extraction_type: 'evidence',
+              extraction_passes: extraction_passes ?? 1,
+              temperature: temperature ?? 0.3,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`LangExtract failed: ${response.status} ${await response.text()}`);
+          }
+
+          const result = await response.json();
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
+        }
+
+        case "langextract:file": {
+          const { file_path, extraction_type, extraction_passes } = args as { file_path: string; extraction_type?: string; extraction_passes?: number };
+          const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
+
+          const response = await fetch(`${LANGEXTRACT_URL}/extract/file`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              file_path,
+              extraction_type: extraction_type ?? 'legal',
+              extraction_passes: extraction_passes ?? 2,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`LangExtract file failed: ${response.status} ${await response.text()}`);
+          }
+
+          const result = await response.json();
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
+        }
+
+        case "langextract:custom": {
+          const { text, prompt, examples, extraction_passes } = args as { text: string; prompt: string; examples?: any[]; extraction_passes?: number };
+          const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
+
+          const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              text: text.slice(0, 50000),
+              extraction_type: 'custom',
+              custom_prompt: prompt,
+              custom_examples: examples ?? [],
+              extraction_passes: extraction_passes ?? 1,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`LangExtract custom failed: ${response.status} ${await response.text()}`);
+          }
+
+          const result = await response.json();
           return { content: [{ type: "text", text: JSON.stringify(result) }] };
         }
 

@@ -84,6 +84,32 @@ services:
       timeout: 10s
       retries: 5
 
+  docling-vlm:
+    build:
+      context: ./docker/docling-vlm
+      dockerfile: Dockerfile
+    image: deeds-docling-vlm:latest
+    container_name: deeds-docling-vlm
+    ports:
+      - "8085:8085"
+    environment:
+      - OLLAMA_HOST=${OLLAMA_HOST:-http://host.docker.internal:11434}
+      - LOG_LEVEL=info
+    volumes:
+      - docling_cache:/app/.cache
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 1G
+
 volumes:
   postgres_data:
     driver: local
@@ -94,6 +120,8 @@ volumes:
   neo4j_data:
     driver: local
   qdrant_data:
+    driver: local
+  docling_cache:
     driver: local
 
 networks: {}

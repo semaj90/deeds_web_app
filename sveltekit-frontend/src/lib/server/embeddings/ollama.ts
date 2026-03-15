@@ -7,6 +7,7 @@
 
 import { ENV } from '$lib/server/env.server.js';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 export type OllamaEmbedResult = {
   model: string;
@@ -38,7 +39,7 @@ export async function tryEmbedOllama(
 
   try {
     return await traceEmbedding(text, model, async () => {
-      const res = await fetch(url, {
+      const res = await ollamaFetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model, prompt: text }),

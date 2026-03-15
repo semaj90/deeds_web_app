@@ -446,14 +446,20 @@
 					poi={{ name: editingPoi.name ?? '', alias: editingPoi.alias ?? '', threatLevel: editingPoi.threatLevel ?? 'low', photos: [], notes: editingPoi.description ?? '' }}
 					onSave={async (formData) => {
 						try {
-							await fetch(`/api/persons/${editingPoi.id}`, {
+							const res = await fetch(`/api/persons/${editingPoi.id}`, {
 								method: 'PATCH',
 								headers: { 'Content-Type': 'application/json' },
 								body: JSON.stringify({ name: formData.name, alias: formData.alias, threatLevel: formData.threatLevel, description: formData.notes })
 							});
+							if (res.ok) {
+								const idx = data.pois.findIndex((p: any) => p.id === editingPoi.id);
+								if (idx !== -1) {
+									data.pois[idx] = { ...data.pois[idx], name: formData.name, alias: formData.alias, threatLevel: formData.threatLevel, description: formData.notes };
+									data.pois = [...data.pois];
+								}
+							}
 							showEditor = false;
 							editingPoi = null;
-							window.location.reload();
 						} catch (e) { console.error('Save failed:', e); }
 					}}
 					onCancel={() => { showEditor = false; editingPoi = null; }}

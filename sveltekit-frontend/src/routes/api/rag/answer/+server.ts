@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { getOllamaUrl } from '$lib/config/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 import type { RequestHandler } from './$types';
 import type {
 	AnswerRequest,
@@ -13,7 +13,7 @@ import { litellmChat } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 
-const OLLAMA_URL = getOllamaUrl();
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 const ragAnswerSchema = z.object({
 	context_id: z.string().min(1, 'context_id is required').max(200),
@@ -102,7 +102,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				return { answerText: text.trim(), genTime: performance.now() - startTime, evalCount: Math.ceil(text.length / 4) as number | undefined };
 			}
 
-			const genResp = await fetch(`${OLLAMA_URL}/api/generate`, {
+			const genResp = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
