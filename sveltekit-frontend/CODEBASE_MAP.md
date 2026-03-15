@@ -4,24 +4,24 @@
 ## Grand Totals
 | Metric | Count |
 |--------|-------|
-| **Root project directories** | 32 |
-| **Root project loose files** | 2,231 (session logs, patches — cleanup candidate) |
-| **SvelteKit src/ files** | 2,445 |
-| **SvelteKit src/ directories** | 823 |
+| **Root project directories** | 28 (+ 15 hidden) |
+| **Root project loose files** | 35 (was 2,231 — bulk archived to deeds_labs/) |
+| **SvelteKit src/ files** | 2,447 |
+| **SvelteKit src/ directories** | 831 |
 | **Svelte components (.svelte)** | 744 |
-| **TypeScript files (.ts)** | 1,370 |
-| **Server files (lib/server/*.ts)** | 420 |
+| **TypeScript files (.ts)** | 1,384 |
+| **Server files (lib/server/*.ts)** | 425 |
 | **Component files (lib/components/*.svelte)** | 544 |
 | **App route groups** | 17 |
 | **Page routes (+page.svelte)** | 110 |
 | **API endpoints (+server.ts)** | 267 |
 | **API route groups** | 77 |
 | **Server subdirectories (lib/server/)** | 81 |
-| **deeds_labs/ files** | ~193,000 (intentional archive) |
+| **deeds_labs/ files** | ~80,000 (intentional archive) |
 | **svelte-check** | **0 errors, 0 warnings** |
 | **Playwright** | **20/20 PASS** |
 ---
-## Root Project Directory (32 directories)
+## Root Project Directory (28 regular + 15 hidden)
 ### ESSENTIAL (Active Code)
 | Directory | Purpose | Status |
 |-----------|---------|--------|
@@ -57,15 +57,15 @@
 ### ARCHIVE + CLEANUP
 | Directory | Purpose | Status |
 |-----------|---------|--------|
-| `deeds_labs/` | Central archive — ~193K files (svelte4, corrupted, dead code, old services) | KEEP IN PLACE |
-| `tensorrt_py310_env/` | TensorRT Python venv | DELETE — recreatable |
-| `hmm-topic-service/` | Empty HMM stub | DELETE |
-| `ocr_pipeline/` | Empty OCR stub (replaced by tesseract.js) | DELETE |
-| `ollama_models/` | Empty (models in Ollama server) | DELETE |
-| `onnx/` | Empty (ONNX in sveltekit-frontend/static/) | DELETE |
-| `deeds-web-app/` | Nested copy of project | VERIFY — likely accidental |
+| `deeds_labs/` | Central archive — ~80K files (svelte4, corrupted, dead code, old services) | KEEP IN PLACE |
+| `onnx/` | ONNX model files (gemma3_270m/, model.onnx/) | REVIEW |
+| ~~`tensorrt_py310_env/`~~ | ~~TensorRT Python venv~~ | DELETED |
+| ~~`hmm-topic-service/`~~ | ~~Empty HMM stub~~ | DELETED |
+| ~~`ocr_pipeline/`~~ | ~~Empty OCR stub~~ | DELETED |
+| ~~`ollama_models/`~~ | ~~Empty~~ | DELETED |
+| ~~`deeds-web-app/`~~ | ~~Nested copy~~ | DELETED |
 ---
-## SvelteKit Frontend (src/ — 2,445 files, 823 dirs)
+## SvelteKit Frontend (src/ — 2,447 files, 831 dirs)
 ### Directory Structure
 ```
 sveltekit-frontend/
@@ -166,7 +166,7 @@ sveltekit-frontend/
 | `web/` | 2 | Web crawl + search |
 | 20+ more | 1 each | Various single endpoints |
 ---
-## Server Architecture — src/lib/server/ (81 subdirectories, 420 .ts files)
+## Server Architecture — src/lib/server/ (81 subdirectories, 425 .ts files)
 ### Core Infrastructure
 | Directory | Key Files | Purpose |
 |-----------|-----------|---------|
@@ -544,14 +544,12 @@ Write back to L0-L3
 | **PHASE*.md Audit**: 150+ files audited — 86 complete (57%), 45 in-progress (30%), 19 reference (13%) | Root PHASE*.md files |
 ---
 ## Cleanup Opportunities
-### Root Project (2,231 loose files)
-- ~500 session log `.txt` files (1_1_25 through 3_10_26 naming pattern)
-- ~50 `.patch` files
-- ~100 misc artifacts (`.exe`, old configs, stale reports)
-- Recommendation: Archive to `deeds_labs/session-logs/`
-### Empty/Stale Root Dirs (5)
-- `hmm-topic-service/`, `ocr_pipeline/`, `ollama_models/`, `onnx/`, `deeds-web-app/`
-- Safe to delete (empty or duplicated)
+### Root Project (35 loose files — was 2,231, bulk archived)
+- Config files (.env, docker-compose, tsconfig, etc.) — all needed
+- Only `onnx/` remains as a potential cleanup target (model files may be redundant with static/ort/)
+### Empty/Stale Root Dirs
+- 5 of 6 stale dirs already deleted (tensorrt_py310_env, hmm-topic-service, ocr_pipeline, ollama_models, deeds-web-app)
+- Only `onnx/` remains — contains gemma3_270m/ and model.onnx/
 ### SvelteKit src/lib/ (90+ subdirs)
 - Many single-file directories could be consolidated
 - `lib/services/` — 312 corrupted files blanket-excluded; 15 active files wired
