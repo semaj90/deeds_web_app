@@ -11,12 +11,11 @@
  * Or import directly from 'bits-ui' for raw bits-ui components.
  */
 
-// Re-export bits-ui components for convenience
-export { Avatar, Button, Checkbox, Dialog, Popover, Select, Tabs, Tooltip } from 'bits-ui';
+// Re-export bits-ui components for convenience (Dialog removed — use $lib/components/ui/dialog for SSR safety)
+export { Avatar, Button, Checkbox, Popover, Select, Tabs, Tooltip } from 'bits-ui';
 
 // Real Svelte 5 implementations (not stubs)
 export { default as Svelte5Button } from './Svelte5Button.svelte';
-export { default as Svelte5Dialog } from './Svelte5Dialog.svelte';
 export { default as BitsButton } from './Button.svelte';
 
 // Export types

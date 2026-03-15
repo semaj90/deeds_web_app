@@ -3,8 +3,9 @@
   import { fade, fly } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
 
-  // UI Components
-  import { Dialog, DropdownMenu, Tooltip } from 'bits-ui';
+  // UI Components — Dialog swapped from bits-ui to custom SSR-safe wrapper
+  import { DropdownMenu, Tooltip } from 'bits-ui';
+  import * as Dialog from '$lib/components/ui/dialog';
   import Button from '$lib/components/ui/Button.svelte';
   import { Input } from '$lib/components/ui/input';
   import { Label } from '$lib/components/ui/label';

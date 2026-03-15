@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-03-15T15-28-53",
+  "timestamp": "2026-03-15T17-39-59",
   "base": "http://localhost:5173",
-  "totalTimeMs": 28232,
+  "totalTimeMs": 33598,
   "results": [
     {
       "name": "evidence",
@@ -20,7 +20,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 2370,
+      "loadTimeMs": 2364,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -42,7 +42,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 22,
+      "loadTimeMs": 17,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -64,7 +64,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 2210,
+      "loadTimeMs": 2190,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -86,7 +86,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 18,
+      "loadTimeMs": 23,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -108,7 +108,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 2213,
+      "loadTimeMs": 2207,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -130,7 +130,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 2349,
+      "loadTimeMs": 12,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -152,7 +152,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 135,
+      "loadTimeMs": 2188,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -174,7 +174,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 2087,
+      "loadTimeMs": 17,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -196,7 +196,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 124,
+      "loadTimeMs": 2214,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -218,7 +218,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 2121,
+      "loadTimeMs": 2358,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -240,7 +240,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 112,
+      "loadTimeMs": 2360,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -262,7 +262,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 2114,
+      "loadTimeMs": 2361,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -284,7 +284,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 116,
+      "loadTimeMs": 85,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -306,7 +306,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 2119,
+      "loadTimeMs": 2091,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -328,7 +328,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 134,
+      "loadTimeMs": 105,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -350,7 +350,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 2105,
+      "loadTimeMs": 2044,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -372,7 +372,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 128,
+      "loadTimeMs": 144,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -394,7 +394,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 2119,
+      "loadTimeMs": 1995,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -416,7 +416,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 108,
+      "loadTimeMs": 218,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -438,7 +438,7 @@
           "failure": "net::ERR_CONNECTION_REFUSED"
         }
       ],
-      "loadTimeMs": 2106,
+      "loadTimeMs": 2007,
       "domElements": 0,
       "resourceCount": 0,
       "resourceSizeKB": 0
@@ -448,9 +448,9 @@
     "passed": 0,
     "failed": 20,
     "total": 20,
-    "avgLoadMs": 1241,
+    "avgLoadMs": 1350,
     "slowestRoute": "evidence",
-    "slowestLoadMs": 2370,
+    "slowestLoadMs": 2364,
     "totalConsoleErrors": 0,
     "totalNetworkFailures": 20
   }

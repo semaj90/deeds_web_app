@@ -31,8 +31,8 @@ export {
     DialogTrigger
 } from './dialog/index.js';
 
-// Bits-UI components (Svelte 5 compatible)
-export { Svelte5Button, Svelte5Dialog } from './bits/index.js';
+// Bits-UI components (Svelte 5 compatible — Svelte5Dialog removed, use $lib/components/ui/dialog)
+export { Svelte5Button } from './bits/index.js';
 
 // Type exports
 export type * from './dialog/types.js';

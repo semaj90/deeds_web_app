@@ -51,11 +51,11 @@ Example input: "On January 15, 2024, ACME Corp filed suit in California Superior
 
 Example output:
 [
-  {"type": "DATE", "text": "January 15, 2024", "attributes": {"kind": "filing_date"}},
-  {"type": "PARTY", "text": "ACME Corp", "attributes": {"role": "plaintiff", "entity_type": "corporation"}},
-  {"type": "LOCATION", "text": "California Superior Court", "attributes": {"kind": "court"}},
-  {"type": "MONEY", "text": "$500,000", "attributes": {"kind": "damages"}},
-  {"type": "STATUTE", "text": "Cal. Civ. Code § 3294", "attributes": {"jurisdiction": "California"}}
+  {{"type": "DATE", "text": "January 15, 2024", "attributes": {{"kind": "filing_date"}}}},
+  {{"type": "PARTY", "text": "ACME Corp", "attributes": {{"role": "plaintiff", "entity_type": "corporation"}}}},
+  {{"type": "LOCATION", "text": "California Superior Court", "attributes": {{"kind": "court"}}}},
+  {{"type": "MONEY", "text": "$500,000", "attributes": {{"kind": "damages"}}}},
+  {{"type": "STATUTE", "text": "Cal. Civ. Code § 3294", "attributes": {{"jurisdiction": "California"}}}}
 ]
 
 Now extract from this text:
@@ -74,11 +74,11 @@ Example input: 'Officer Badge #4521 responded to 123 Main St at 2:45 PM. Witness
 
 Example output:
 [
-  {"type": "IDENTIFIER", "text": "Badge #4521", "attributes": {"kind": "badge_number"}},
-  {"type": "LOCATION", "text": "123 Main St", "attributes": {"kind": "address"}},
-  {"type": "DATE", "text": "2:45 PM", "attributes": {"kind": "time"}},
-  {"type": "PERSON", "text": "Jane Doe", "attributes": {"role": "witness"}},
-  {"type": "QUOTE", "text": "I saw a blue sedan", "attributes": {"speaker": "Jane Doe"}}
+  {{"type": "IDENTIFIER", "text": "Badge #4521", "attributes": {{"kind": "badge_number"}}}},
+  {{"type": "LOCATION", "text": "123 Main St", "attributes": {{"kind": "address"}}}},
+  {{"type": "DATE", "text": "2:45 PM", "attributes": {{"kind": "time"}}}},
+  {{"type": "PERSON", "text": "Jane Doe", "attributes": {{"role": "witness"}}}},
+  {{"type": "QUOTE", "text": "I saw a blue sedan", "attributes": {{"speaker": "Jane Doe"}}}}
 ]
 
 Now extract from this text:
@@ -136,21 +136,22 @@ class HealthResponse(BaseModel):
 
 async def call_ollama(prompt: str, model: str = DEFAULT_MODEL, temperature: float = 0.2) -> str:
     """Call Ollama API with the given prompt."""
-    async with httpx.AsyncClient(timeout=60.0) as client:
-        response = await client.post(
-            f"{OLLAMA_URL}/api/generate",
-            json={
-                "model": model,
-                "prompt": prompt,
-                "stream": False,
-                "options": {
-                    "temperature": temperature,
-                    "num_predict": 2048,
-                }
+    import requests
+    response = requests.post(
+        f"{OLLAMA_URL}/api/generate",
+        json={
+            "model": model,
+            "prompt": prompt,
+            "stream": False,
+            "options": {
+                "temperature": temperature,
+                "num_predict": 2048,
             }
-        )
-        response.raise_for_status()
-        return response.json().get("response", "")
+        },
+        timeout=120
+    )
+    response.raise_for_status()
+    return response.json().get("response", "")
 
 
 def parse_json_response(response: str) -> list[dict]:

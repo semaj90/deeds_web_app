@@ -1,2 +1,0 @@
-#!/bin/bash
-echo "deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/ubuntu-noble" | tee /etc/apt/sources.list.d/nvidia-container-toolkit.list

@@ -1,3 +1,0 @@
-@echo off
-echo Running TensorRT-LLM smoke test...
-docker run --rm --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 -v C:\Users\james\Videos\deeds-web-app:/workspace -w /workspace nvcr.io/nvidia/tensorrt-llm/release:latest bash -c "cd /workspace/smoke-test && chmod +x build.sh && ./build.sh"

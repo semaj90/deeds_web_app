@@ -273,9 +273,8 @@ export default defineConfig(({ mode }) => {
           manualChunks: (id) => {
             // Rolldown requires manualChunks to be a function, not an object
             // Split only vendor chunks - avoid splitting src/ code due to dynamic imports
-            if (id.includes('node_modules/bits-ui')) {
-              return 'vendor-bits-ui';
-            }
+            // NOTE: bits-ui NOT chunked here — forcing all bits-ui into one chunk causes
+            // class declaration TDZ (Vite reorders `const x = new Cls` before `class Cls`)
             if (id.includes('node_modules/svelte')) {
               return 'vendor-svelte';
             }
