@@ -157,9 +157,8 @@ export const POST: RequestHandler = async ({ url }) => {
 				if (row.term && row.definition) {
 					const embedding = await embedText(`${row.term}: ${row.definition}`);
 					if (embedding) {
-						const vectorStr = `[${embedding.join(',')}]`;
 						await db.update(legalGlossary)
-							.set({ embedding: vectorStr })
+							.set({ embedding: Array.from(embedding) })
 							.where(eq(legalGlossary.id, row.id));
 						results.embeddings++;
 					}
@@ -179,9 +178,8 @@ export const POST: RequestHandler = async ({ url }) => {
 			for (const row of unembedded) {
 				const embedding = await embedText(row.content);
 				if (embedding) {
-					const vectorStr = `[${embedding.join(',')}]`;
 					await db.update(statuteChunks)
-						.set({ embedding: vectorStr })
+						.set({ embedding: Array.from(embedding) })
 						.where(eq(statuteChunks.id, row.id));
 					results.embeddings++;
 				}

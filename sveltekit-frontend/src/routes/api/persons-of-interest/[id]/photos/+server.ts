@@ -418,7 +418,7 @@ Return ONLY valid JSON.`;
 				aiTags: aiTags.length > 0 ? aiTags : [],
 				forensicData: Object.keys(forensicData).length > 0 ? forensicData : null,
 				faceEmbedding:
-					captionEmbedding.length === 768 ? JSON.stringify(captionEmbedding) : null,
+					captionEmbedding.length === 768 ? captionEmbedding : null,
 			})
 			.where(eq(poiPhotos.id, photoId));
 	} catch (err) {

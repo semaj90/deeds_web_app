@@ -49,7 +49,8 @@ export const POST: RequestHandler = async ({ params, request }) => {
 		// Parse the first available embedding as the query vector
 		let queryVector: number[];
 		try {
-			queryVector = JSON.parse(photosWithEmbeddings[0].faceEmbedding!);
+			const raw = photosWithEmbeddings[0].faceEmbedding!;
+			queryVector = Array.isArray(raw) ? raw : JSON.parse(raw as unknown as string);
 			if (!Array.isArray(queryVector) || queryVector.length !== 768) {
 				throw new Error('Invalid embedding dimensions');
 			}
