@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
-import { personsOfInterest } from '$lib/server/db/schema-poi.js';
+import { personsOfInterest } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
@@ -114,7 +114,7 @@ Respond with ONLY a JSON object:
 	const generatedAt = new Date().toISOString();
 	try {
 		await db.execute(sql`
-			UPDATE persons
+			UPDATE persons_of_interest
 			SET ai_profile = COALESCE(ai_profile, '{}'::jsonb) || ${JSON.stringify({
 				summary,
 				summaryConfidence: confidence,

@@ -37,3 +37,6 @@ export * from './warden-schema';
 // Saved Citations Schema (user-saved citation bookmarks)
 export { savedCitations } from './schema/citations';
 
+// Analytics events (used by event-logger.ts)
+export { userAnalyticsEvents, type UserAnalyticsEvent, type NewUserAnalyticsEvent } from './schema/analytics';
+

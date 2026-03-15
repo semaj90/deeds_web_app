@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db/client';
-import { personsOfInterest } from '$lib/db/schema';
+import { personsOfInterest } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
 import { eq, ne, and, sql, inArray } from 'drizzle-orm';
 import type { RequestHandler } from './$types';

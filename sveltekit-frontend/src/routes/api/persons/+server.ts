@@ -1,12 +1,12 @@
 import { db } from '$lib/server/db/client';
-import { personsOfInterest } from '$lib/db/schema';
+import { personsOfInterest } from '$lib/server/db/schema';
 import { error, json } from '@sveltejs/kit';
 import { and, desc, eq, arrayContains } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 
 const THREAT_LEVELS = ['low', 'medium', 'high', 'critical'] as const;
-const POI_STATUSES = ['active', 'inactive', 'cleared', 'unknown'] as const;
+const POI_STATUSES = ['surveillance', 'wanted', 'active', 'cleared'] as const;
 
 const personCreateSchema = z.object({
 	caseId: z.string().uuid('Invalid caseId'),
@@ -90,12 +90,10 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 				caseIds: [body.caseId],
 				name: body.name,
 				aliases: body.aliases,
-				description: body.description,
+				description: body.description ?? '',
 				threatLevel: body.threatLevel,
-				status: body.status,
+				status: body.status ?? 'surveillance',
 				relationship: body.relationship,
-				createdAt: new Date(),
-				updatedAt: new Date()
 			})
 			.returning();
 

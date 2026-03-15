@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/client';
 import { cases, evidence } from '$lib/server/db/schema';
-import { personsOfInterest } from '$lib/db/schema';
+import { personsOfInterest } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { eq, arrayContains } from 'drizzle-orm';
