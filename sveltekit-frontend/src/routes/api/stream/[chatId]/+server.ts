@@ -1,32 +1,32 @@
 
-import { createClient } from 'redis';
-import { getRedisUrl } from '$lib/config/env.server.js';
+import { getRedis } from '$lib/server/redis.js';
 import type { RequestHandler } from './$types';
 
-const REDIS_URL = getRedisUrl();
-
 export const GET: RequestHandler = async ({ params }) => {
-    const subscriber = createClient({ url: REDIS_URL });
-    await subscriber.connect();
+  // ioredis needs a dedicated connection for pub/sub (subscriber mode)
+  const subscriber = getRedis().duplicate();
+  const channel = `chat_stream:${params.chatId}`;
 
-    const stream = new ReadableStream({
-        async start(controller) {
-            // Subscribe to the specific Chat ID channel
-            await subscriber.subscribe(`chat_stream:${params.chatId}`, (message) => {
-                // Format for Server-Sent Events (SSE)
-                controller.enqueue(`data: ${ message }\n\n`);
-            });
-        },
-        async cancel() {
-            await subscriber.quit();
+  const stream = new ReadableStream({
+    async start(controller) {
+      subscriber.on('message', (ch: string, message: string) => {
+        if (ch === channel) {
+          controller.enqueue(`data: ${message}\n\n`);
         }
-    });
+      });
+      await subscriber.subscribe(channel);
+    },
+    async cancel() {
+      await subscriber.unsubscribe(channel);
+      subscriber.disconnect();
+    },
+  });
 
-    return new Response(stream, {
-        headers: {
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive'
-        }
-    });
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      Connection: 'keep-alive',
+    },
+  });
 };

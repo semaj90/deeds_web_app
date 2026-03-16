@@ -10,11 +10,9 @@
  */
 
 import { QdrantClient } from '@qdrant/js-client-rest';
-import { createClient } from 'redis';
+import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
-
-// Redis client type
-type RedisClient = ReturnType<typeof createClient>;
+import type Redis from 'ioredis';
 
 // Extended Qdrant client interface (use intersection to avoid incompatible override)
 interface QdrantClientExt extends QdrantClient {
@@ -29,14 +27,8 @@ interface QdrantClientExt extends QdrantClient {
 	points: Array<{ id: string | number; payload?: Record<string, unknown> }> }>;
 }
 
-// Extended Redis client type
-interface RedisClientExt {
-	get(key: string): Promise<string | null>;
-	keys(pattern: string): Promise<string[]>;
-	connect(): Promise<void>;
-	dbSize(): Promise<number>;
-	sendCommand(args: string[]): Promise<unknown>;
-}
+// ioredis client type alias
+type RedisClientExt = Redis;
 
 // Types
 interface GlyphData {
@@ -68,7 +60,6 @@ interface ClusterInfo {
 
 // Connections
 let qdrant: QdrantClientExt | null = null;
-let redis: RedisClientExt | null = null;
 
 async function getQdrant(): Promise<QdrantClientExt> {
 	if (!qdrant) {
@@ -77,13 +68,8 @@ async function getQdrant(): Promise<QdrantClientExt> {
 	return qdrant;
 }
 
-async function getRedis(): Promise<RedisClientExt> {
-	if (!redis) {
-		const client = createClient({ url: ENV.REDIS_URL });
-		await client.connect();
-		redis = client as unknown as RedisClientExt;
-	}
-	return redis;
+async function getRedisClient(): Promise<RedisClientExt> {
+  return getRedis();
 }
 
 // Tool Definitions
@@ -298,7 +284,7 @@ export async function phase90_query_glyphs(
 	errorCode?: string,
 	limit: number = 50
 ): Promise<GlyphData[]> {
-	const redisClient = await getRedis();
+	const redisClient = await getRedisClient();
 
 	const pattern = 'glyph:*';
 	const allKeys = await redisClient.keys(pattern);
@@ -342,13 +328,13 @@ export async function phase90_get_stats(): Promise<{
 	embedKeys: number };
 }> {
 	const qdrantClient = await getQdrant();
-	const redisClient = await getRedis();
+	const redisClient = await getRedisClient();
 
 	const embeddings = await qdrantClient.getCollection('phase90_cuda_embeddings');
 	const clusters = await qdrantClient.getCollection('phase90_error_clusters');
 	const recs = await qdrantClient.getCollection('phase90_fix_recommendations');
 
-	const totalKeys = await redisClient.dbSize();
+	const totalKeys = await redisClient.dbsize();
 	const glyphKeys = await redisClient.keys('glyph:*');
 	const embedKeys = await redisClient.keys('embed:*');
 

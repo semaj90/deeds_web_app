@@ -4,30 +4,17 @@
  */
 
 import { json } from '@sveltejs/kit';
-import { createClient } from 'redis';
-import { getRedisUrl } from '$lib/config/env.server.js';
+import { getRedis } from '$lib/server/redis.js';
 import type { RequestHandler } from './$types';
-
-let redis: ReturnType<typeof createClient> | null = null;
-
-async function getRedis() {
-  if (!redis) {
-    redis = createClient({
-      url: getRedisUrl()
-    });
-    await redis.connect().catch(() => null);
-  }
-  return redis;
-}
 
 export const GET: RequestHandler = async () => {
   try {
-    const client = await getRedis();
+    const client = getRedis();
 
-    if (!client?.isOpen) {
+    if (!client || client.status !== 'ready') {
       return json({
         activity: [],
-        error: 'Redis not connected'
+        error: 'Redis not connected',
       });
     }
 

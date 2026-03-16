@@ -1,7 +1,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import pg from 'pg';
-import { createClient } from 'redis';
-import { getDatabaseUrl, getQdrantUrl, getRedisUrl } from '$lib/config/env.server.js';
+import { getRedis } from '$lib/server/redis.js';
+import { getDatabaseUrl, getQdrantUrl } from '$lib/config/env.server.js';
 
 const { Pool } = pg;
 
@@ -10,7 +10,6 @@ const pgPool = new Pool({
 });
 
 const QDRANT_URL = getQdrantUrl();
-const REDIS_URL = getRedisUrl();
 
 export const GET: RequestHandler = async () => {
 	try {
@@ -38,8 +37,7 @@ export const GET: RequestHandler = async () => {
 		};
 
 		// Redis Stats
-		const redisClient = createClient({ url: REDIS_URL });
-		await redisClient.connect();
+		const redisClient = getRedis();
 
 		const [totalKeys, phase89Keys, embKeys, topkKeys, kbKeys] = await Promise.all([
 			redisClient.dbsize(),
@@ -48,8 +46,6 @@ export const GET: RequestHandler = async () => {
 			redisClient.keys('topk:*').then(k => k.length),
 			redisClient.keys('kb:*').then(k => k.length)
 		]);
-
-		await redisClient.quit();
 
 		const redisStats = {
 			total_keys: totalKeys,

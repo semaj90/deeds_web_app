@@ -5,8 +5,7 @@
 
 import { json } from '@sveltejs/kit';
 import { spawn } from 'child_process';
-import { createClient } from 'redis';
-import { getRedisUrl } from '$lib/config/env.server.js';
+import { getRedis } from '$lib/server/redis.js';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 
@@ -26,20 +25,22 @@ export const POST: RequestHandler = async ({ request }) => {
     const { file, errorId } = parsed.data;
 
     // Store fix request in Redis for tracking
-    const redis = createClient({
-      url: getRedisUrl()
-    });
-    await redis.connect().catch(() => null);
+    const redis = getRedis();
 
     const requestId = 'fix_req_' + Date.now();
 
-    if (redis.isOpen) {
-      await redis.set('phase89:fix:' + requestId, JSON.stringify({
-        file,
-        errorId,
-        status: 'pending',
-        timestamp: Date.now()
-      }), { EX: 3600 });
+    if (redis.status === 'ready') {
+      await redis.set(
+        'phase89:fix:' + requestId,
+        JSON.stringify({
+          file,
+          errorId,
+          status: 'pending',
+          timestamp: Date.now(),
+        }),
+        'EX',
+        3600
+      );
     }
 
     // Trigger the agentic fixer in background
@@ -55,8 +56,6 @@ export const POST: RequestHandler = async ({ request }) => {
     });
 
     fixProcess.unref(); // Don't wait for completion
-
-    await redis.quit().catch(() => {});
 
     return json({
       success: true,

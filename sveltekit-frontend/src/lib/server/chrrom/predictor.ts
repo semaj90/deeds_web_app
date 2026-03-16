@@ -4,7 +4,7 @@
  * Enhanced with Redis caching for persistence and performance
  */
 import { env } from '$env/dynamic/private';
-import { ensureRedisReady, redis } from '$lib/server/redis-client';
+import { ensureRedis as ensureRedisReady, redis } from '$lib/server/redis.js';
 
 type ActionType = string; // e.g., 'open:123', 'hover:123', 'search:term|indemnification'
 

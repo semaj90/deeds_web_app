@@ -16,7 +16,7 @@ async function getRedisClient(): Promise<Redis | null> {
 
     try {
         // Dynamically import the shared redis client from server modules
-        const mod = await import('$lib/server/redis-client');
+        const mod = await import('$lib/server/redis');
         redisClient = mod.redis;
         return redisClient;
     } catch (err) {

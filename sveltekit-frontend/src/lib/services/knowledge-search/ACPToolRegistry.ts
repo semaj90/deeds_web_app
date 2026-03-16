@@ -8,7 +8,7 @@
 
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
-import { redis } from '$lib/server/redis-client';
+import { redis } from '$lib/server/redis.js';
 import type { ACPTool, ToolResult, ToolPlanStep } from './types.js';
 
 const CONFIG = {

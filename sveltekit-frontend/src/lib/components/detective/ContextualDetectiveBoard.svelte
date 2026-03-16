@@ -5,7 +5,8 @@
 <script lang="ts">
   import HeadlessTypingListener from '$lib/components/HeadlessTypingListener.svelte';
   import type { TypingContext, TypingState } from '$lib/machines/userTypingStateMachine';
-  import DetectiveWebSocketManager, { type CollaborativeUser } from '$lib/websocket/DetectiveWebSocketManager';
+  // WebSocket collaboration removed — was dead code (no WS server at port 3003)
+  interface CollaborativeUser { id: string; name: string; }
   // Migrated to $effect
 
   // Props interface
@@ -46,8 +47,8 @@
   let evidenceList = $state<unknown[]>([]);
   $effect(() => { evidenceList = initialEvidence; });
 
-  // WebSocket collaboration state
-  let wsManager: DetectiveWebSocketManager | null = null;
+  // WebSocket collaboration state (disabled — no WS server)
+  let wsManager: any = null;
   let isConnectedToCollaboration = $state<boolean>(false);
   let collaborativeUsers = $state<CollaborativeUser[]>([]);
   let collaborationStats = $state({
@@ -103,68 +104,17 @@ evidence: 0, connections: 0, analysis: 0 }
   }
 
   /**
-   * Initialize WebSocket collaboration
+   * Initialize WebSocket collaboration (disabled — no WS server)
    */
   async function initializeCollaboration(): Promise<void> {
-    try {
-      // Create WebSocket manager (mock user ID for now)
-      const userId = `user_${Math.random().toString().slice(2, 11)}`;
-      wsManager = new DetectiveWebSocketManager(caseId, userId);
-
-      // Set up event handlers
-      wsManager.onConnectionStatus((connected: boolean) => {
-        isConnectedToCollaboration = connected;
-        updateCollaborationStats();
-      });
-
-      wsManager.onUserJoined((user: CollaborativeUser) => {
-        collaborativeUsers = [...collaborativeUsers, user];
-        updateCollaborationStats();
-        console.log('[Collaboration] User joined:', user.name);
-      });
-
-      wsManager.onUserLeft((userId: string) => {
-        collaborativeUsers = collaborativeUsers.filter((u) => u.id !== userId);
-        updateCollaborationStats();
-        console.log('[Collaboration] User left:', userId);
-      });
-
-      // Handle real-time updates
-      wsManager.onMessage('connection_map_update', (data: { action?: string, connectionMap?: unknown }) => {
-        if (data.action === 'generated') {
-          connectionMap = data.connectionMap as typeof connectionMap;
-          console.log('[Collaboration] Connection map updated by remote user');
-        }
-      });
-
-      wsManager.onMessage('evidence_analysis', (data: { action?: string; evidenceId?: string, analysis?: unknown }) => {
-        if (data.action === 'completed') {
-          // Update evidence list with remote analysis
-          evidenceList = evidenceList.map((item: unknown) => {
-            const typedItem = item as { id?: string; metadata?: { aiAnalysis?: unknown } };
-            return typedItem.id === data.evidenceId
-              ? { ...typedItem, metadata: { ...typedItem.metadata, aiAnalysis: data.analysis } }
-              : item;
-          });
-          console.log('[Collaboration] Evidence analysis updated by remote user');
-        }
-      });
-
-      // Connect to WebSocket (will fallback gracefully if server not available)
-      wsManager.connect();
-    } catch (error) {
-      console.warn('[Collaboration] WebSocket initialization failed:', error);
-      // Continue without collaboration features
-    }
+    console.warn('[Collaboration] WebSocket disabled — using SSE for real-time');
   }
 
   /**
    * Update collaboration statistics
    */
   function updateCollaborationStats() {
-    if (wsManager) {
-      collaborationStats = wsManager.getCollaborationStats();
-    }
+    // No-op: WS collaboration disabled
   }
 
   /**
