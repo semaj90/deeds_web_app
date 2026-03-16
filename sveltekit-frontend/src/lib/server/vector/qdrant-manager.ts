@@ -639,6 +639,51 @@ export class QdrantManager {
     }
 }
 
+// ── Adaptive GPU Scaling ─────────────────────────────────────────────────
+// Auto-downgrade quantization when GPU thermal thresholds are exceeded.
+// Extracted from vector/metadata-encoder.ts adaptive scaling pattern.
+
+export type QuantizationLevel = 'int8' | 'int4' | 'binary';
+export type ScalingMode = 'balanced' | 'performance' | 'memory';
+
+export interface GPUHealthMetrics {
+    memoryUsage: number;   // 0.0-1.0 ratio
+    temperature: number;   // Celsius
+    gpuUtilization: number; // 0.0-1.0 ratio
+}
+
+export interface ScalingDecision {
+    shouldScale: boolean;
+    recommendedDimensions: number;
+    recommendedQuantization: QuantizationLevel;
+}
+
+/**
+ * Decide whether to downgrade vector dimensions/quantization based on GPU health.
+ * Call this before batch upserts to protect against GPU thermal throttling.
+ */
+export function adaptiveScalingDecision(
+    metrics: GPUHealthMetrics,
+    mode: ScalingMode = 'balanced'
+): ScalingDecision {
+    const shouldScale =
+        metrics.memoryUsage > 0.8 ||
+        metrics.temperature > 75;
+
+    if (!shouldScale) {
+        return { shouldScale: false, recommendedDimensions: 768, recommendedQuantization: 'int8' };
+    }
+
+    switch (mode) {
+        case 'performance':
+            return { shouldScale: true, recommendedDimensions: 512, recommendedQuantization: 'int4' };
+        case 'memory':
+            return { shouldScale: true, recommendedDimensions: 256, recommendedQuantization: 'binary' };
+        default: // balanced
+            return { shouldScale: true, recommendedDimensions: 384, recommendedQuantization: 'int4' };
+    }
+}
+
 export const qdrant = new QdrantManager();
 
 
