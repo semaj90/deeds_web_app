@@ -112,6 +112,11 @@
 			</form>
 		{/if}
 
+		<p class="register-link">
+			Don't have an account?
+			<a href="/register">Create one</a>
+		</p>
+
 		<noscript>
 			<form method="POST" action="?/login">
 				<input name="username" type="text" required placeholder="Email or username" />
@@ -274,5 +279,21 @@
 		to {
 			transform: rotate(360deg);
 		}
+	}
+
+	.register-link {
+		text-align: center;
+		margin-top: 1.5rem;
+		font-size: 0.875rem;
+		color: rgba(255, 255, 255, 0.5);
+	}
+
+	.register-link a {
+		color: #c4a882;
+		text-decoration: none;
+	}
+
+	.register-link a:hover {
+		text-decoration: underline;
 	}
 </style>

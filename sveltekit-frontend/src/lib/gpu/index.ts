@@ -20,12 +20,6 @@ export { GPUSOMEmbeddings, createGPUSOM, type GPUSOMConfig, type GPUSOMResult } 
 // Server-side embedding bridge — gRPC → GPU similarity → QLoRA compression
 export { embedAndCompare, type EmbeddingBatchResult } from './gpu-embedding-bridge.js';
 
-// WebGPU-CUDA bridge — error pattern analysis
-export {
-	WebGPUCUDABridge, webgpuCUDABridge,
-	type GPUComputeDevice, type GPUErrorPattern, type GPUAnalysisResult, type ErrorCluster,
-} from './webgpu-cuda-bridge.js';
-
 // Runtime config constants
 export {
 	NODE_RUNTIME_CONFIG, GPU_MARKDOWN_ENV,

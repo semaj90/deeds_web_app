@@ -21,14 +21,17 @@
 	// Dynamic imports to avoid SSR TDZ crashes (browser-only components)
 	let AccessibilityPanel = $state<typeof import('$lib/components/ui/AccessibilityPanel.svelte').default | null>(null);
 	let AIChatWidget = $state<typeof import('$lib/components/ai/AIChatWidget.svelte').default | null>(null);
+	let SetupWizard = $state<typeof import('$lib/components/onboarding/SetupWizard.svelte').default | null>(null);
 	onMount(async () => {
 		try {
-			const [accMod, chatMod] = await Promise.all([
+			const [accMod, chatMod, wizardMod] = await Promise.all([
 				import('$lib/components/ui/AccessibilityPanel.svelte').catch(() => null),
 				import('$lib/components/ai/AIChatWidget.svelte').catch(() => null),
+				import('$lib/components/onboarding/SetupWizard.svelte').catch(() => null),
 			]);
 			if (accMod) AccessibilityPanel = accMod.default;
 			if (chatMod) AIChatWidget = chatMod.default;
+			if (wizardMod) SetupWizard = wizardMod.default;
 		} catch { /* non-fatal: optional UI components */ }
 	});
 
@@ -79,6 +82,9 @@
 {/if}
 {#if AIChatWidget}
 	<AIChatWidget />
+{/if}
+{#if SetupWizard}
+	<SetupWizard />
 {/if}
 
 <!-- Toast Notifications Overlay -->

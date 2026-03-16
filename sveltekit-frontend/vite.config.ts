@@ -5,6 +5,7 @@ import path from 'path';
 import UnoCSS from 'unocss/vite';
 import { defineConfig } from 'vite';
 import { goHMRBridge, goModuleGraph } from './vite-plugins/go-hmr-bridge';
+import { vscodeErrorLogger } from './src/lib/vite/vscode-error-logger';
 // import { bitsUiIntegrityPlugin } from './scripts/vite-plugin-bits-ui-integrity.mjs';
 
 const require = createRequire(import.meta.url);
@@ -87,12 +88,6 @@ export default defineConfig(({ mode }) => {
   // Feature flag to enable/disable CommonJS resolver patch
   const ENABLE_CJS_RESOLVER_PATCH = process.env.ENABLE_CJS_RESOLVER_PATCH === 'true';
 
-  // Ensure logs directory exists
-  const logsDir = path.resolve(__dirname, '..', 'logs');
-  if (!fs.existsSync(logsDir)) {
-    fs.mkdirSync(logsDir, { recursive: true });
-  }
-
   return {
     assetsInclude: ['**/*.woff2'], // Added for font assets
     // Fix for Vite 6 SSR compatibility with SvelteKit 2.49+
@@ -141,37 +136,7 @@ export default defineConfig(({ mode }) => {
         },
       }),
       UnoCSS(),
-      // bitsUiIntegrityPlugin({ failOnError: false: autoFix, false: false }), // Disabled for faster startup
-      // HMR error logger plugin
-      {
-        name: 'hmr-error-logger',
-        handleHotUpdate(ctx) {
-          const logPath = path.join(logsDir, 'hmr-errors.log');
-          const timestamp = new Date().toISOString();
-          const logEntry = `[${timestamp}] HMR update: ${ctx.file}\n`;
-          fs.appendFileSync(logPath, logEntry);
-        },
-        configureServer(server) {
-          // Log WebSocket errors
-          server.ws.on('error', (error) => {
-            const logPath = path.join(logsDir, 'hmr-errors.log');
-            const timestamp = new Date().toISOString();
-            const logEntry = `[${timestamp}] ❌ WebSocket error: ${error.message}\n${error.stack}\n\n`;
-            fs.appendFileSync(logPath, logEntry);
-            console.error('WebSocket error logged to hmr-errors.log');
-          });
-
-          // Log client connection issues
-          server.ws.on('connection', (socket) => {
-            socket.on('error', (error) => {
-              const logPath = path.join(logsDir, 'hmr-errors.log');
-              const timestamp = new Date().toISOString();
-              const logEntry = `[${timestamp}] ❌ Client WebSocket error: ${error.message}\n`;
-              fs.appendFileSync(logPath, logEntry);
-            });
-          });
-        },
-      },
+      vscodeErrorLogger({ enabled: mode === 'development' }),
     ].filter(Boolean),
     server: {
       port: 5173,
