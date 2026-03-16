@@ -3,6 +3,7 @@
 ## Status: TODO
 ## Priority: Medium
 ## Created: 2026-03-16
+## Updated: 2026-03-16 (Session: Onboarding wizard + dir audit)
 
 ---
 
@@ -18,6 +19,7 @@ If the local disk is lost, all archive history disappears. Currently contains:
 - **Svelte 4 archive** (pre-migration components)
 - **Dead microservices** (Python, Go, Docker configs)
 - **Phase 99 corrupted files** (83 .svelte files from commit 0a2bd98929)
+- **phantom-code-lab/**: markdown-pipeline.ts, webgpu-cuda-bridge.ts (archived this session)
 
 ## Solution
 
@@ -55,3 +57,13 @@ git add .
 git commit -m "Initial archive: 17,900+ files from deeds-web-app cleanup sessions"
 gh repo create semaj90/deeds-labs --private --source=. --push
 ```
+
+---
+
+## Also Pending: src/lib/ Slim Candidates (Dir Audit 2026-03-16)
+
+| Directory | Issue | Action |
+|-----------|-------|--------|
+| `src/lib/tracking/` | 7 of 8 files dead (only `telemetry.ts` used) | Archive 7 files to deeds_labs/ |
+| `src/lib/stores/machines/` | 0 importers (shadows `src/lib/machines/`) | Archive or delete |
+| `src/lib/utils/*.mjs` | 92 test/build scripts in $lib (not imported) | Move to `scripts/` or archive |
