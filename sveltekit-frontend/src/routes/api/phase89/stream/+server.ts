@@ -55,7 +55,7 @@ export const GET: RequestHandler = async ({ request }) => {
       // Handle client disconnect
       request.signal.addEventListener('abort', () => {
         clearInterval(statsInterval);
-        controller.close();
+        try { controller.close(); } catch { /* already closed */ }
       });
     },
   });
