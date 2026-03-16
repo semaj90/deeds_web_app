@@ -191,18 +191,7 @@ export default defineConfig(({ mode }) => {
           secure: false,
           rewrite: (path) => path.replace(/^\/api\/playwright-auditor/, ''),
         },
-        // POI API proxy (Phase 8)
-        // '/api/persons-of-interest': {
-        //   target: 'http://localhost:8000',
-        //   changeOrigin: true,
-        //   secure: false,
-        // },
-        // Health check proxy - DISABLED: was routing to non-existent service
-        // '/health': {
-        //   target: `http://localhost:${wsPort}`,
-        //   changeOrigin: true,
-        // },
-        // Add more WebSocket endpoints as needed
+        // Removed: POI API proxy (handled by SvelteKit routes), health check proxy, WS proxies (SSE+HTTP/2 stack)
       },
     },
     preview: {

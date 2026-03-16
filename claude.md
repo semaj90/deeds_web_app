@@ -401,9 +401,9 @@ See `memory/corruption-patterns.md` for detection patterns and fix strategies.
 
 ---
 
-## Component Wiring Audit Methodology (5-Gate Test)
+## Component Wiring Audit Methodology (6-Gate Test)
 
-When auditing orphan components, apply this 5-gate test to decide **wire**, **rewrite**, or **archive**:
+When auditing orphan components, apply this 6-gate test to decide **wire**, **rewrite**, or **archive**:
 
 | Gate | Question | Pass | Fail |
 |------|----------|------|------|
@@ -412,10 +412,27 @@ When auditing orphan components, apply this 5-gate test to decide **wire**, **re
 | G3: Rewrite potential? | If broken/Svelte 4, is the feature valuable enough to rewrite? | → REWRITE candidate | Continue to G4 |
 | G4: Integration point? | Natural route or layout that logically hosts it? | Continue | → ARCHIVE (homeless) |
 | G5: Low effort? | Wire in < 30 min (import + render, not deep refactor)? | → WIRE | → DEFER to backlog |
+| G6: Fully wired? | End-to-end: import → render → API routes → props → data flow? | FULLY WIRED | → SHALLOW (incomplete) |
+
+**Gate 6 — Deep Wiring Verification** (post-wire check):
+After wiring a component, verify the full chain is connected:
+1. **Import exists** — `grep -r "ComponentName" src/` shows the import
+2. **Render exists** — The importing file actually renders it (`<ComponentName` or `{@render`)
+3. **API routes exist** — If component calls `fetch('/api/...')`, verify `+server.ts` exists
+4. **Props connected** — Callback props wired to real handlers, NOT `() => {}` no-ops
+5. **Data flows** — Component receives real data from `$props()`, not placeholders
+
+**Shallow wiring indicators** (G6 fail):
+- `onCallback={() => {}}` or `onCallback={() => console.log()}` — no-op handlers
+- Component imported but never rendered in template
+- Component rendered but its API endpoints don't exist
+- Dynamic import loaded but conditional render never triggers
+- Props bound to `$state` that's declared but never set
 
 **Automated via slash commands:**
-- `/audit-components [dir]` — Scan a directory for orphans, apply 5-gate test, report + optionally execute
-- `/prune-codebase [dir]` — Full garden audit across `src/lib/` — directory-level dead ratios, cross-cutting checks, relocation candidates, health report
+- `/audit-components [dir]` — Scan for orphans, apply 6-gate test, report + execute
+- `/prune-codebase [dir]` — Full garden audit across `src/lib/` — dead ratios, cross-cutting checks, AI-driven analysis, health report
+- `/wire-modules [dir]` — Find and fix broken imports, missing API routes, stale types
 
 **Rewrite indicators** (G3 pass):
 - Clean logic but Svelte 4 syntax (`export let`, `$:`, `on:click`) — mechanical migration
@@ -429,7 +446,7 @@ When auditing orphan components, apply this 5-gate test to decide **wire**, **re
 - Test files for deleted/archived code
 
 **Examples from Session 100+:**
-- `KeyboardShortcutsPanel.svelte` → WIRE: All 5 gates pass — clean Svelte 5, unique feature, `?` key in layout, 5-line change
+- `KeyboardShortcutsPanel.svelte` → WIRE + G6 PASS: All 6 gates pass — clean Svelte 5, unique feature, `?` key in layout (line 58-63), `bind:open` (line 102), fully wired end-to-end
 - `speak.ts` → ARCHIVE: Fails G2 — superseded by `$lib/services/tts.ts` (160-line TTSService)
 - `AIChat.stories.ts` → ARCHIVE: Fails G4 — Storybook not active, references non-existent component
 
@@ -437,8 +454,9 @@ When auditing orphan components, apply this 5-gate test to decide **wire**, **re
 1. `grep -r "ComponentName" src/routes/ src/lib/` — check import count
 2. If 0 imports → orphan candidate
 3. Read the file — assess code quality
-4. Apply 5-gate test (G1→G5 in order, stop at first fail)
+4. Apply gates G1→G5 in order (stop at first fail)
 5. Execute action: WIRE / REWRITE / ARCHIVE / DEFER
+6. After wiring, apply G6 to verify end-to-end connection
 
 ---
 

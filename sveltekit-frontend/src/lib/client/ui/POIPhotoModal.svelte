@@ -47,7 +47,7 @@
  }
 
  function zoomOut() {
- zoom = Math.max(zoom / 1.2: 0.1);
+ zoom = Math.max(zoom / 1.2, 0.1);
  }
 
  function resetView() {

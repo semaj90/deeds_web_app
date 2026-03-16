@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 	import { fade, fly, scale } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import Icon from '$lib/components/ui/Icon.svelte';
@@ -100,6 +101,7 @@
 
 	const STORAGE_KEY = 'deeds-onboarding-completed';
 	const STEP_KEY = 'deeds-onboarding-step';
+	const MAX_STEP_INDEX = WIZARD_STEPS.length - 1;
 
 	const SHORTCUTS = [
 		{ keys: 'Ctrl + K', desc: 'Command Palette' },
@@ -114,18 +116,113 @@
 	let spotlightRect = $state<DOMRect | null>(null);
 	let isAnimating = $state(false);
 	let cardPosition = $state<'center' | 'bottom-right' | 'bottom-left'>('center');
+	let onboardingReady = $state(false);
 
-	// Check if onboarding should show
-	$effect(() => {
-		if (browser) {
-			const completed = localStorage.getItem(STORAGE_KEY);
-			if (!completed) {
-				const savedStep = localStorage.getItem(STEP_KEY);
-				currentStep = savedStep ? parseInt(savedStep, 10) : 0;
-				setTimeout(() => { isVisible = true; }, 600);
+	type OnboardingState = {
+		hasCompletedOnboarding: boolean;
+		onboardingStep: number;
+	};
+
+	function clampStep(step: number): number {
+		return Math.max(0, Math.min(MAX_STEP_INDEX, step));
+	}
+
+	function readLocalState(): OnboardingState {
+		const completed = localStorage.getItem(STORAGE_KEY) === 'true';
+		const rawStep = parseInt(localStorage.getItem(STEP_KEY) ?? '0', 10);
+
+		return {
+			hasCompletedOnboarding: completed,
+			onboardingStep: Number.isFinite(rawStep) ? clampStep(rawStep) : 0,
+		};
+	}
+
+	function writeLocalState(state: Partial<OnboardingState>) {
+		if (typeof state.hasCompletedOnboarding === 'boolean') {
+			if (state.hasCompletedOnboarding) {
+				localStorage.setItem(STORAGE_KEY, 'true');
+			} else {
+				localStorage.removeItem(STORAGE_KEY);
 			}
 		}
+
+		if (typeof state.onboardingStep === 'number') {
+			localStorage.setItem(STEP_KEY, String(clampStep(state.onboardingStep)));
+		}
+	}
+
+	async function persistState(state: Partial<OnboardingState>) {
+		if (!browser) return;
+
+		writeLocalState(state);
+
+		try {
+			const response = await fetch('/api/onboarding', {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(state),
+			});
+
+			if (!response.ok && response.status !== 401) {
+				console.warn('Failed to persist onboarding state', response.status);
+			}
+		} catch (error) {
+			console.warn('Failed to persist onboarding state', error);
+		}
+	}
+
+	async function initializeWizard() {
+		if (!browser || onboardingReady) return;
+
+		let state = readLocalState();
+
+		try {
+			const response = await fetch('/api/onboarding');
+			if (response.ok) {
+				const serverState = (await response.json()) as Partial<OnboardingState>;
+				state = {
+					hasCompletedOnboarding: serverState.hasCompletedOnboarding === true,
+					onboardingStep: clampStep(serverState.onboardingStep ?? 0),
+				};
+				writeLocalState(state);
+			}
+		} catch (error) {
+			console.warn('Failed to load onboarding state', error);
+		}
+
+		currentStep = state.onboardingStep;
+		onboardingReady = true;
+		runStepSideEffects(currentStep);
+
+		if (!state.hasCompletedOnboarding) {
+			setTimeout(() => {
+				isVisible = true;
+			}, 600);
+		}
+	}
+
+	onMount(() => {
+		void initializeWizard();
 	});
+
+	function runStepSideEffects(stepIndex: number) {
+		const activeStep = WIZARD_STEPS[stepIndex];
+		if (!activeStep) return;
+
+		if (activeStep.route && browser && window.location.pathname !== activeStep.route) {
+			void goto(activeStep.route);
+		}
+
+		if (activeStep.action === 'openChat' && browser) {
+			window.dispatchEvent(new CustomEvent('yorha:open-chat'));
+		}
+	}
+
+	function goToStep(stepIndex: number) {
+		currentStep = clampStep(stepIndex);
+		void persistState({ onboardingStep: currentStep });
+		runStepSideEffects(currentStep);
+	}
 
 	// Update spotlight when step changes
 	$effect(() => {
@@ -189,20 +286,7 @@
 		isAnimating = true;
 
 		if (currentStep < WIZARD_STEPS.length - 1) {
-			currentStep++;
-			localStorage.setItem(STEP_KEY, String(currentStep));
-
-			const step = WIZARD_STEPS[currentStep];
-			if (step.route) {
-				goto(step.route);
-			}
-			// Handle actions
-			if (step.action === 'openChat') {
-				// Dispatch a custom event for AIChatWidget to listen to
-				if (browser) {
-					window.dispatchEvent(new CustomEvent('yorha:open-chat'));
-				}
-			}
+			goToStep(currentStep + 1);
 		} else {
 			completeWizard();
 		}
@@ -213,8 +297,7 @@
 	function prevStep() {
 		if (isAnimating || currentStep <= 0) return;
 		isAnimating = true;
-		currentStep--;
-		localStorage.setItem(STEP_KEY, String(currentStep));
+		goToStep(currentStep - 1);
 		setTimeout(() => { isAnimating = false; }, 300);
 	}
 
@@ -224,15 +307,18 @@
 
 	function completeWizard() {
 		isVisible = false;
-		localStorage.setItem(STORAGE_KEY, 'true');
-		localStorage.removeItem(STEP_KEY);
+		void persistState({
+			hasCompletedOnboarding: true,
+			onboardingStep: MAX_STEP_INDEX,
+		});
 	}
 
 	function restartWizard() {
-		localStorage.removeItem(STORAGE_KEY);
-		localStorage.removeItem(STEP_KEY);
+		writeLocalState({ hasCompletedOnboarding: false, onboardingStep: 0 });
+		void persistState({ hasCompletedOnboarding: false, onboardingStep: 0 });
 		currentStep = 0;
 		isVisible = true;
+		runStepSideEffects(0);
 	}
 
 	export { restartWizard };
@@ -305,7 +391,9 @@
 						class="step-dot"
 						class:active={i === currentStep}
 						class:completed={i < currentStep}
-						onclick={() => { currentStep = i; }}
+						onclick={() => {
+							goToStep(i);
+						}}
 						aria-label="Go to step {i + 1}: {WIZARD_STEPS[i].title}"
 					></button>
 				{/each}

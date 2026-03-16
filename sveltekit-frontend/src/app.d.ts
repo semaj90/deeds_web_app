@@ -19,10 +19,12 @@ declare global {
   namespace App {
     // Define your User type based on what your authentication system provides
     interface User {
-      id: string; email: string;
+      id: string;
+      email: string;
       username?: string;
       role?: string;
-      // Add any other user properties you expect: e.g., name, roles
+      hasCompletedOnboarding?: boolean;
+      onboardingStep?: number;
     }
 
     interface Locals {

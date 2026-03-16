@@ -96,17 +96,22 @@ export const caseRiskLevelEnum = pgEnum('case_risk_level', ['low', 'medium', 'hi
 // === TABLES FOR LEGAL AI APPLICATION ===
 
 export const users = pgTable('users', {
- id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
- email: varchar('email', { length: 255 }).unique().notNull(),
- passwordHash: varchar('hashed_password', { length: 255 }).notNull(),
- name: varchar('name', { length: 255 }), // Legacy field - use firstName/lastName instead
- firstName: varchar('first_name', { length: 255 }),
- lastName: varchar('last_name', { length: 255 }),
- role: userRoleEnum('role').notNull().default('prosecutor'),
- isActive: boolean('is_active').default(true).notNull(),
- avatarUrl: text('avatar_url'),
- createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  email: varchar('email', { length: 255 }).unique().notNull(),
+  passwordHash: varchar('hashed_password', { length: 255 }).notNull(),
+  name: varchar('name', { length: 255 }), // Legacy field - use firstName/lastName instead
+  firstName: varchar('first_name', { length: 255 }),
+  lastName: varchar('last_name', { length: 255 }),
+  role: userRoleEnum('role').notNull().default('prosecutor'),
+  isActive: boolean('is_active').default(true).notNull(),
+  avatarUrl: text('avatar_url'),
+  hasCompletedOnboarding: boolean('has_completed_onboarding').default(false).notNull(),
+  onboardingStep: integer('onboarding_step').default(0),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });
 export const sessions = pgTable('sessions',
  {

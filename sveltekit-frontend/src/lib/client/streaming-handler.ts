@@ -66,11 +66,11 @@ export async function handleStreamingResponse(
  }
  }
 
- onComplete.fullText;
+ onComplete?.(fullText);
  return fullText;
  } catch (error) {
  const err = error instanceof Error ? error : new Error(String(error));
- onError.err;
+ onError?.(err);
  throw err;
  }
 }

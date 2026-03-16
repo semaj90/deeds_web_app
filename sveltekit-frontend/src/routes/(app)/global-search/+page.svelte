@@ -13,6 +13,7 @@
 	import { trackClick } from '$lib/utils/tracking';
 	import StatuteSearchBar from '$lib/components/legal-ai/StatuteSearchBar.svelte';
 	import StatuteResultsList from '$lib/components/legal-ai/StatuteResultsList.svelte';
+	import { searchCases, searchLaws, getSearchSuggestions, trackSearch, type SearchQuery, type SearchResponse } from '$lib/client/search-client.js';
 
 	let showRAGAssistant = $state(false);
 	let showCodebaseSearch = $state(false);

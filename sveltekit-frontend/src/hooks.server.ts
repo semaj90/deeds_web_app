@@ -314,11 +314,13 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (dev && process.env.DEV_BYPASS_AUTH === 'true') {
 		const devUserId = '00000000-0000-0000-0000-000000000001';
 		event.locals.user = {
-			id: devUserId,
-			email: 'admin@yorha.dev',
-			username: '2B',
-			role: 'admin'
-		};
+      id: devUserId,
+      email: 'admin@yorha.dev',
+      username: '2B',
+      role: 'admin',
+      hasCompletedOnboarding: false,
+      onboardingStep: 0,
+    };
 		event.locals.session = {
 			id: '00000000-0000-0000-0000-000000000002',
 			userId: devUserId,

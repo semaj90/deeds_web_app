@@ -18,11 +18,11 @@ const adapter = new DrizzlePostgreSQLAdapter(db as any, sessions, users);
 
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
-	attributes: {
+    attributes: {
       secure: process.env.NODE_ENV === 'production',
     },
-	},
-	getUserAttributes: (attributes) => {
+  },
+  getUserAttributes: (attributes) => {
     return {
       email: attributes.email,
       firstName: attributes.firstName,
@@ -30,9 +30,11 @@ export const lucia = new Lucia(adapter, {
       role: attributes.role,
       isActive: attributes.isActive,
       avatarUrl: attributes.avatarUrl,
+      hasCompletedOnboarding: attributes.hasCompletedOnboarding,
+      onboardingStep: attributes.onboardingStep,
     };
   },
-	});
+});
 
 declare module 'lucia' {
   interface Register {
@@ -43,11 +45,13 @@ declare module 'lucia' {
 
 interface DatabaseUserAttributes {
   email: string;
-	firstName: string;
+  firstName: string;
   lastName: string;
-	role: string;
+  role: string;
   isActive: boolean;
-	avatarUrl: string;
+  avatarUrl: string;
+  hasCompletedOnboarding: boolean;
+  onboardingStep: number;
 }
 
 /**

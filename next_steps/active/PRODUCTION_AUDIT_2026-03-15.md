@@ -246,9 +246,18 @@
 28. [ ] Schema validation in CI
 29. [ ] Remove `|| true` from CI workflows
 
+### Phase 6: Type Safety & Validation (RECOMMENDED — 4-6 hours)
+30. [ ] Add Zod validation to 140 unvalidated API routes (118/258 currently validated = 46%)
+31. [ ] Audit `src/lib/services/` blanket tsconfig exclude (312 corrupted files — clean or remove)
+32. [ ] Run Drizzle 0.44 type review — ensure all `vector(768)` columns use `number[]` (not `string`)
+33. [ ] Add `$inferSelect` / `$inferInsert` type exports for all 70+ tables (currently ~30 have explicit types)
+34. [ ] Review SvelteKit 2 module wiring — run `/wire-modules` to find broken import chains
+35. [ ] Validate all `fetch('/api/...')` calls have matching `+server.ts` routes
+
 ### TOTAL TO MVP: Phases 1-2 = **7-11 hours**
 ### TOTAL TO PRODUCTION: Phases 1-4 = **13-19 hours**
 ### TOTAL TO FULL RELIABILITY: Phases 1-5 = **15-22 hours**
+### TOTAL WITH TYPE SAFETY: Phases 1-6 = **19-28 hours**
 
 ---
 

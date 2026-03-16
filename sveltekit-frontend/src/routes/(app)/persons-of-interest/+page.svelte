@@ -9,6 +9,8 @@
 	import FilterPanel from '$lib/components/FilterPanel.svelte';
 	import StatsPanel from '$lib/components/StatsPanel.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import POIPhotoModal from '$lib/client/ui/POIPhotoModal.svelte';
+	import POIPhotoUploader from '$lib/client/ui/POIPhotoUploader.svelte';
 	import type { FugitiveDexPerson } from '$lib/components/types';
 
 	let filterPanelFilters = $state<{ status: string; priority: string; tags: string[] }>({ status: '', priority: '', tags: [] });
@@ -31,6 +33,10 @@
 	let similarMethod = $state('');
 	let similarSourceName = $state('');
 	let loadingSimilar = $state(false);
+	let photoModalOpen = $state(false);
+	let photoModalPhoto = $state<any>(null);
+	let showPhotoUploader = $state(false);
+	let uploadingPoiId = $state<number>(0);
 
 	async function findSimilar(poi: any) {
 		loadingSimilar = true;
@@ -463,12 +469,26 @@
 						} catch (e) { console.error('Save failed:', e); }
 					}}
 					onCancel={() => { showEditor = false; editingPoi = null; }}
-					onUploadPhoto={() => {}}
-					onViewPhoto={() => {}}
+					onUploadPhoto={() => { uploadingPoiId = editingPoi.id; showPhotoUploader = true; }}
+					onViewPhoto={(photo: any) => { photoModalPhoto = photo; photoModalOpen = true; }}
 				/>
 			</div>
 		</div>
 	{/if}
+
+	{#if showPhotoUploader && uploadingPoiId}
+		<div class="modal-overlay" onclick={() => (showPhotoUploader = false)}>
+			<div class="modal-content" onclick={(e) => e.stopPropagation()}>
+				<POIPhotoUploader
+					poiId={uploadingPoiId}
+					onUpload={(result) => { console.log('Photo uploaded:', result); showPhotoUploader = false; }}
+					onError={(err) => { console.error('Photo upload error:', err); }}
+				/>
+			</div>
+		</div>
+	{/if}
+
+	<POIPhotoModal open={photoModalOpen} photo={photoModalPhoto} onClose={() => { photoModalOpen = false; photoModalPhoto = null; }} />
 
 	<PersonOfInterestDetailView
 		poi={previewPoi}

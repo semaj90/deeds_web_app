@@ -42,7 +42,7 @@
  formData.append('file', file);
  formData.append('poiId', String(poiId));
 
- const response = await fetch('/api/v1/poi/photo', {
+ const response = await fetch(`/api/persons-of-interest/${poiId}/photos`, {
  method: 'POST',
  body: formData
  });

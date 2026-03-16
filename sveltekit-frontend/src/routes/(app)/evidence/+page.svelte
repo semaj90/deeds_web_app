@@ -43,6 +43,8 @@
 	import Dialog from '$lib/components/ui/Dialog.svelte';
 	import DropdownMenu from '$lib/components/ui/DropdownMenu.svelte';
 	import FileUploadSection from '$lib/components/FileUploadSection.svelte';
+	import { WorkflowEventStream, type WorkflowEvent } from '$lib/client/workflow-event-stream.js';
+	import { evidenceProcessingMachine, getProcessingProgress, getCurrentStep } from '$lib/machines/evidence-processing-machine.js';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	let uploadCard = $state<UploadProgressCard | undefined>(undefined);

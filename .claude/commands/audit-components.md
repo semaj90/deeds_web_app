@@ -11,8 +11,12 @@ If a directory path is provided, audit that directory instead.
 
 For each `.svelte`, `.svelte.ts`, or `.ts` file in the target directory:
 1. `grep -r "FILENAME" src/routes/ src/lib/` — count import references
-2. If **0 imports** → candidate for audit (orphan)
-3. If **1+ imports** → USED, skip
+2. **ALSO check dynamic imports**: `grep -r "import('.*FILENAME')" src/` — dynamic `import()` expressions
+3. **ALSO check duplicate names**: `find src/lib/components/ -name "FILENAME"` — if same file exists in a subdirectory, the root-level version may be a dead duplicate
+4. If **0 imports** (static + dynamic) → candidate for audit (orphan)
+5. If **1+ imports** → USED, skip
+
+**CRITICAL**: Dynamic imports like `import('$lib/components/Foo.svelte')` are NOT caught by `from` grep patterns. Always check both `from '...'` AND `import('...')` patterns. The root layout `(app)/+layout.svelte` uses dynamic imports for SSR-safe components.
 
 Report the orphan list with file sizes.
 
@@ -27,6 +31,26 @@ For each orphan, read the file and apply these gates IN ORDER:
 | **G3: Rewrite Potential** | If Svelte 4 or corrupted, is the feature valuable enough to rewrite from scratch? | → REWRITE candidate | Continue to G4 |
 | **G4: Integration Point** | Is there a natural route or layout that should host this? | Continue | → ARCHIVE (homeless) |
 | **G5: Effort** | Can it be wired with a simple import + render (< 30 min)? | → WIRE | → DEFER to backlog |
+| **G6: Full Wiring** | Is the component TRULY connected end-to-end? | FULLY WIRED | → SHALLOW (incomplete) |
+
+### Gate 6: Deep Wiring Verification
+
+For components already imported (or newly wired), verify the full chain:
+
+1. **Import exists** — `grep -r "ComponentName" src/` shows the import
+2. **Render exists** — Importing file actually renders it (`<ComponentName` or `{@render`)
+3. **API routes exist** — If component calls `/api/...` endpoints, verify `+server.ts` files exist
+4. **Props connected** — Callback props (onSubmit, onUpload) wired to real handlers, NOT `() => {}`
+5. **Data flows** — Component receives real data from `$props()`, not placeholder/mock data
+
+**Shallow wiring indicators:**
+- `onCallback={() => {}}` or `onCallback={() => console.log()}` — no-op handlers
+- Component imported but never rendered in template
+- Component rendered but its API endpoints don't exist
+- Dynamic import loaded but conditional render never triggers
+- Props bound to `$state` that's declared but never set
+
+Report any "imported but not truly wired" component as **SHALLOW**.
 
 ## Phase 3: Report
 
