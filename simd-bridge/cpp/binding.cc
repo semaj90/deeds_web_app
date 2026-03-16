@@ -62,6 +62,12 @@ extern "C" int clusterEmbeddings(const float* embeddings, int n, int dim, int k,
 extern "C" int computeCaseEmbedding(const float* weights, int n, const float* embeddings, int dim, float* output, int output_len);
 extern "C" int checkCudaAvailable();
 
+// LSTM bridge (lstm_bridge.cc → lstm_gpu.cu)
+extern "C" int bridge_run_lstm(const float* a, const float* b, float* out, int n);
+
+// SOM cache (som_cache.cu)
+extern "C" void runSOMCache(const float* in, float* out, int n);
+
 // ── Helpers ──────────────────────────────────────────────────────────
 
 static napi_value throw_type_error(napi_env env, const char *msg) {
@@ -228,6 +234,71 @@ static napi_value ComputeCaseEmbeddingWrapper(napi_env env, napi_callback_info i
   return result;
 }
 
+// ── LSTMAdd(Float32Array a, Float32Array b, n) → Float32Array[n] ─────
+
+static napi_value LSTMAddWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 3;
+  napi_value argv[3];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+
+  if (argc < 3) return throw_type_error(env, "lstmAdd(Float32Array a, Float32Array b, n)");
+
+  size_t a_len;
+  void* a_data;
+  napi_get_typedarray_info(env, argv[0], nullptr, &a_len, &a_data, nullptr, nullptr);
+
+  size_t b_len;
+  void* b_data;
+  napi_get_typedarray_info(env, argv[1], nullptr, &b_len, &b_data, nullptr, nullptr);
+
+  int32_t n;
+  napi_get_value_int32(env, argv[2], &n);
+
+  if (n <= 0 || (size_t)n > a_len || (size_t)n > b_len)
+    return throw_type_error(env, "Invalid length for LSTM add input");
+
+  void* out_data;
+  napi_value arraybuffer;
+  napi_create_arraybuffer(env, n * sizeof(float), &out_data, &arraybuffer);
+
+  int rc = bridge_run_lstm((const float*)a_data, (const float*)b_data, (float*)out_data, n);
+  if (rc != 0) return throw_error(env, "LSTM add failed (GPU/CPU error)");
+
+  napi_value result;
+  napi_create_typedarray(env, napi_float32_array, n, arraybuffer, 0, &result);
+  return result;
+}
+
+// ── SOMCache(Float32Array in, n) → Float32Array[n] ───────────────────
+
+static napi_value SOMCacheWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 2;
+  napi_value argv[2];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+
+  if (argc < 2) return throw_type_error(env, "somCache(Float32Array in, n)");
+
+  size_t in_len;
+  void* in_data;
+  napi_get_typedarray_info(env, argv[0], nullptr, &in_len, &in_data, nullptr, nullptr);
+
+  int32_t n;
+  napi_get_value_int32(env, argv[1], &n);
+
+  if (n <= 0 || (size_t)n > in_len)
+    return throw_type_error(env, "Invalid length for SOM cache input");
+
+  void* out_data;
+  napi_value arraybuffer;
+  napi_create_arraybuffer(env, n * sizeof(float), &out_data, &arraybuffer);
+
+  runSOMCache((const float*)in_data, (float*)out_data, n);
+
+  napi_value result;
+  napi_create_typedarray(env, napi_float32_array, n, arraybuffer, 0, &result);
+  return result;
+}
+
 // ── Module Init ──────────────────────────────────────────────────────
 
 static napi_value Init(napi_env env, napi_value exports) {
@@ -236,6 +307,8 @@ static napi_value Init(napi_env env, napi_value exports) {
   registerFn(env, exports, "graphSimilarity", GraphSimilarityWrapper);
   registerFn(env, exports, "clusterEmbeddings", ClusterEmbeddingsWrapper);
   registerFn(env, exports, "computeCaseEmbedding", ComputeCaseEmbeddingWrapper);
+  registerFn(env, exports, "lstmAdd", LSTMAddWrapper);
+  registerFn(env, exports, "somCache", SOMCacheWrapper);
   return exports;
 }
 

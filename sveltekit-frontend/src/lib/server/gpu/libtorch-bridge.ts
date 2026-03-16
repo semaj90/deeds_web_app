@@ -43,6 +43,8 @@ interface NativeAddon {
 	graphSimilarity?: (embeddings: Float32Array, n: number, dim: number) => Float32Array;
 	clusterEmbeddings?: (embeddings: Float32Array, n: number, dim: number, k: number, maxIters: number) => Int32Array;
 	computeCaseEmbedding?: (weights: Float32Array, embeddings: Float32Array, n: number, dim: number) => Float32Array;
+	lstmAdd?: (a: Float32Array, b: Float32Array, n: number) => Float32Array;
+	somCache?: (input: Float32Array, n: number) => Float32Array;
 }
 
 let addon: NativeAddon | null = null;
@@ -290,4 +292,73 @@ export function isCudaAvailable(): boolean {
 	const native = getAddon();
 	if (!native?.checkCudaAvailable) return false;
 	return native.checkCudaAvailable() === 1;
+}
+
+// ── LSTM / SOM types ──────────────────────────────────────────────────
+
+export interface LSTMAddResult {
+	output: number[];
+	n: number;
+	source: 'gpu' | 'cpu';
+}
+
+export interface SOMCacheResult {
+	output: number[];
+	n: number;
+	source: 'gpu' | 'cpu';
+}
+
+// ── LSTM Add ──────────────────────────────────────────────────────────
+
+/**
+ * Element-wise add two float arrays via CUDA kernel.
+ * GPU-accelerated via LSTM CUDA kernel if available, CPU fallback otherwise.
+ */
+export async function lstmAdd(a: number[], b: number[]): Promise<LSTMAddResult> {
+	const n = Math.min(a.length, b.length);
+	if (n === 0) return { output: [], n: 0, source: 'cpu' };
+
+	const native = getAddon();
+	if (native?.lstmAdd) {
+		try {
+			const aArr = new Float32Array(a);
+			const bArr = new Float32Array(b);
+			const result = native.lstmAdd(aArr, bArr, n);
+			return { output: Array.from(result), n, source: 'gpu' };
+		} catch {
+			// fall through to CPU
+		}
+	}
+
+	// CPU fallback: simple element-wise add
+	const output = new Array(n);
+	for (let i = 0; i < n; i++) {
+		output[i] = a[i] + b[i];
+	}
+	return { output, n, source: 'cpu' };
+}
+
+// ── SOM Cache ─────────────────────────────────────────────────────────
+
+/**
+ * Run SOM cache operation (GPU copy/transform kernel).
+ * GPU-accelerated if CUDA available, CPU memcpy fallback otherwise.
+ */
+export async function somCache(input: number[]): Promise<SOMCacheResult> {
+	const n = input.length;
+	if (n === 0) return { output: [], n: 0, source: 'cpu' };
+
+	const native = getAddon();
+	if (native?.somCache) {
+		try {
+			const inArr = new Float32Array(input);
+			const result = native.somCache(inArr, n);
+			return { output: Array.from(result), n, source: 'gpu' };
+		} catch {
+			// fall through to CPU
+		}
+	}
+
+	// CPU fallback: identity copy
+	return { output: [...input], n, source: 'cpu' };
 }
