@@ -10,230 +10,262 @@
  * - Slow request logging (>10s warning)
  */
 
-import { dev } from '$app/environment';
+import { building, dev } from '$app/environment';
 import { deleteSessionCookie, setSessionCookie, validateSession } from '$lib/server/lucia';
 import { startWorker } from '$lib/server/analysis/worker.js';
 import { productionLogger } from '$lib/server/production-logger.js';
-import { startRabbitMQPipeline } from '$lib/messaging/rabbitmq-xstate-integration.js';
+import { startRabbitMQPipeline } from '$lib/server/queue/rabbitmq-xstate-integration.js';
 import { initializeQdrant } from '$lib/server/startup/qdrant-init.js';
 import { warmupTemplateCache } from '$lib/server/cache/report-template-cache.js';
 import { startIdleScanner } from '$lib/server/engagement/idle-reengagement.js';
-import { db } from '$lib/server/db/client';
-import { reports } from '$lib/server/db/schema-postgres.js';
-import { desc } from 'drizzle-orm';
+import { pool } from '$lib/server/db/client';
 import { cacheExport } from '$lib/server/cache/pdf-export-cache.js';
 import { storeCachedResponse } from '$lib/server/ai/llm-cache.js';
 import { ENV } from '$lib/server/env.server.js';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 // ── Request Timeout Constants ────────────────────────────────────────────
 const DEFAULT_REQUEST_TIMEOUT = 30_000; // 30s for normal routes
-const AI_REQUEST_TIMEOUT = 120_000;     // 120s for AI/inference routes
+const AI_REQUEST_TIMEOUT = 120_000; // 120s for AI/inference routes
 
 // ── Request Body Size Limits (Sprint 4) ──────────────────────────────────
-const MAX_BODY_SIZE = 50 * 1024 * 1024;          // 50MB default
-const MAX_UPLOAD_SIZE = 100 * 1024 * 1024;        // 100MB for file uploads
+const MAX_BODY_SIZE = 50 * 1024 * 1024; // 50MB default
+const MAX_UPLOAD_SIZE = 100 * 1024 * 1024; // 100MB for file uploads
 const UPLOAD_PATHS = ['/api/evidence/upload', '/api/vision/analyze', '/api/persons-of-interest'];
+const shouldRunBootTasks = !building && process.env.NODE_ENV !== 'test';
 
 // ── Global Write Rate Limiting (Sprint 4) ────────────────────────────────
 // In-memory sliding window for write endpoints — 60 writes/min per IP
 const writeRateLimits = new Map<string, { count: number; resetTime: number }>();
-const WRITE_RATE_WINDOW = 60_000;  // 1 minute
-const WRITE_RATE_MAX = 60;         // 60 writes per minute per IP
-setInterval(() => {
-	const now = Date.now();
-	for (const [key, entry] of writeRateLimits) {
-		if (now > entry.resetTime) writeRateLimits.delete(key);
-	}
-}, 60_000);
-
-// Start the analysis worker on server boot (idempotent)
-startWorker();
-
-// Start RabbitMQ 7-queue pipeline (XState v5 with auto-reconnect, non-blocking)
-startRabbitMQPipeline().then(() => {
-	console.log('[Boot] RabbitMQ consumers active');
-}).catch((err) => {
-	console.warn('[Boot] RabbitMQ unavailable (non-fatal):', (err as Error).message);
-});
-
-// Initialize Qdrant collections (Priority #2: auto-create missing collections)
-initializeQdrant().then(() => {
-	console.log('[Boot] Qdrant collections verified');
-}).catch((err) => {
-	console.warn('[Boot] Qdrant initialization failed (non-fatal):', (err as Error).message);
-});
-
-// Warm up template cache (Priority #10: pre-load all 10 templates on startup)
-warmupTemplateCache().then(() => {
-	console.log('[Boot] Template cache warmed');
-}).catch((err) => {
-	console.warn('[Boot] Template cache warmup failed (non-fatal):', (err as Error).message);
-});
-
-// Idle re-engagement scanner (5-min interval, checks user activity → notifications)
-startIdleScanner();
-
-// Note: Queue consumers are registered by startRabbitMQPipeline() above
-// via rabbitmq.initialize() → startConsumers() (all 7 queues)
-
-// Option #6: Warm up export cache (pre-generate top 5 recent report exports)
-warmupExportCache().then(() => {
-	console.log('[Boot] Export cache warmed');
-}).catch((err) => {
-	console.warn('[Boot] Export cache warmup failed (non-fatal):', (err as Error).message);
-});
-
-// Option #6: Warm up LLM cache (pre-cache 5 common legal queries)
-warmupLLMCache().then(() => {
-	console.log('[Boot] LLM cache warmed');
-}).catch((err) => {
-	console.warn('[Boot] LLM cache warmup failed (non-fatal):', (err as Error).message);
-});
-
-// ── VAPID Key Validation ─────────────────────────────────────────────────
-if (ENV.VAPID_PUBLIC_KEY && ENV.VAPID_PRIVATE_KEY) {
-	console.log('[Boot] VAPID keys configured — Web Push enabled');
-} else {
-	console.warn('[Boot] VAPID keys empty — Web Push notifications disabled. Generate with: npx web-push generate-vapid-keys --json');
+const WRITE_RATE_WINDOW = 60_000; // 1 minute
+const WRITE_RATE_MAX = 60; // 60 writes per minute per IP
+if (shouldRunBootTasks) {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, entry] of writeRateLimits) {
+      if (now > entry.resetTime) writeRateLimits.delete(key);
+    }
+  }, 60_000);
 }
 
+if (shouldRunBootTasks) {
+  // Start the analysis worker on server boot (idempotent)
+  startWorker();
+
+  // Start RabbitMQ 7-queue pipeline (XState v5 with auto-reconnect, non-blocking)
+  startRabbitMQPipeline()
+    .then(() => {
+      console.log('[Boot] RabbitMQ consumers active');
+    })
+    .catch((err) => {
+      console.warn('[Boot] RabbitMQ unavailable (non-fatal):', (err as Error).message);
+    });
+
+  // Initialize Qdrant collections (Priority #2: auto-create missing collections)
+  initializeQdrant()
+    .then(() => {
+      console.log('[Boot] Qdrant collections verified');
+    })
+    .catch((err) => {
+      console.warn('[Boot] Qdrant initialization failed (non-fatal):', (err as Error).message);
+    });
+
+  // Warm up template cache (Priority #10: pre-load all 10 templates on startup)
+  warmupTemplateCache()
+    .then(() => console.log('[Boot] Template cache: warmed'))
+    .catch((err) => console.warn('[Boot] Template cache: failed:', (err as Error).message));
+
+  // Idle re-engagement scanner (5-min interval, checks user activity → notifications)
+  startIdleScanner();
+
+  // Note: Queue consumers are registered by startRabbitMQPipeline() above
+  // via rabbitmq.initialize() → startConsumers() (all 7 queues)
+
+  // Option #6: Warm up export cache (pre-generate top 5 recent report exports)
+  warmupExportCache()
+    .then((s) =>
+      console.log(
+        `[Boot] Export cache: ${s.status}${s.cached ? ` (${s.cached} exports)` : ''}${s.reason ? ` — ${s.reason}` : ''}`
+      )
+    )
+    .catch((err) => console.warn('[Boot] Export cache: failed:', (err as Error).message));
+
+  // Option #6: Warm up LLM cache (pre-cache 5 common legal queries)
+  warmupLLMCache()
+    .then((s) =>
+      console.log(
+        `[Boot] LLM cache: ${s.status}${s.cached ? ` (${s.cached}/${s.total})` : ''}${s.reason ? ` — ${s.reason}` : ''}`
+      )
+    )
+    .catch((err) => console.warn('[Boot] LLM cache: failed:', (err as Error).message));
+
+  // ── VAPID Key Validation ─────────────────────────────────────────────────
+  if (ENV.VAPID_PUBLIC_KEY && ENV.VAPID_PRIVATE_KEY) {
+    console.log('[Boot] VAPID keys configured — Web Push enabled');
+  } else {
+    console.warn(
+      '[Boot] VAPID keys empty — Web Push notifications disabled. Generate with: npx web-push generate-vapid-keys --json'
+    );
+  }
+}
+
+type WarmupStatus = {
+  status: 'warmed' | 'skipped' | 'failed';
+  cached?: number;
+  total?: number;
+  reason?: string;
+};
+
 /**
- * Option #6: Warm up export cache with top 5 recent reports
- * Pre-generates HTML, Markdown, and JSON exports for frequently accessed reports
+ * Option #6: Warm up export cache with top 5 recent reports.
+ * Uses raw pool query instead of Drizzle to bypass the cache layer
+ * that can fail silently during early boot.
  */
-async function warmupExportCache(): Promise<void> {
-	try {
-		const recentReports = await db
-			.select()
-			.from(reports)
-			.orderBy(desc(reports.createdAt))
-			.limit(5);
+async function warmupExportCache(): Promise<WarmupStatus> {
+  try {
+    // Use the raw pg pool — bypasses Drizzle cache to avoid PRECONDITION issues at boot
+    const client = await pool.connect();
+    let recentReports: { id: string; title: string; content: string | null; updated_at: Date }[];
+    try {
+      const result = await client.query(
+        'SELECT id, title, content, updated_at FROM reports ORDER BY created_at DESC LIMIT 5'
+      );
+      recentReports = result.rows;
+    } finally {
+      client.release();
+    }
 
-		if (recentReports.length === 0) {
-			console.log('[Boot] Export warmup: No reports found, skipping');
-			return;
-		}
+    if (recentReports.length === 0) {
+      return { status: 'skipped', reason: 'no reports in database' };
+    }
 
-		const formats = ['html', 'markdown', 'json'] as const;
-		let cached = 0;
+    const formats = ['html', 'markdown', 'json'] as const;
+    let cached = 0;
 
-		for (const report of recentReports) {
-			for (const format of formats) {
-				try {
-					const content = format === 'json'
-						? JSON.stringify({ id: report.id, title: report.title, content: report.content }, null, 2)
-						: format === 'markdown'
-						? `# ${report.title}\n\n${report.content || ''}`
-						: `<html><head><title>${report.title}</title></head><body><h1>${report.title}</h1><div>${report.content || ''}</div></body></html>`;
+    for (const report of recentReports) {
+      for (const format of formats) {
+        try {
+          const content =
+            format === 'json'
+              ? JSON.stringify(
+                  { id: report.id, title: report.title, content: report.content },
+                  null,
+                  2
+                )
+              : format === 'markdown'
+                ? `# ${report.title}\n\n${report.content || ''}`
+                : `<html><head><title>${report.title}</title></head><body><h1>${report.title}</h1><div>${report.content || ''}</div></body></html>`;
 
-					const contentType = format === 'json'
-						? 'application/json'
-						: format === 'markdown'
-						? 'text/markdown'
-						: 'text/html';
+          const contentType =
+            format === 'json'
+              ? 'application/json'
+              : format === 'markdown'
+                ? 'text/markdown'
+                : 'text/html';
 
-					const filename = `${report.title.replace(/[^a-z0-9]/gi, '_')}.${format}`;
+          const filename = `${report.title.replace(/[^a-z0-9]/gi, '_')}.${format}`;
 
-					await cacheExport(
-						report.id,
-						format,
-						content,
-						contentType,
-						filename,
-						report.updatedAt
-					);
-					cached++;
-				} catch (err) {
-					console.warn(`[Boot] Export warmup failed for ${report.id}:${format}:`, (err as Error).message);
-				}
-			}
-		}
+          await cacheExport(report.id, format, content, contentType, filename, report.updated_at);
+          cached++;
+        } catch (err) {
+          // Per-format failure is non-fatal — continue with other formats
+        }
+      }
+    }
 
-		console.log(`[Boot] Export warmup: Cached ${cached} exports (${recentReports.length} reports x ${formats.length} formats)`);
-	} catch (err) {
-		console.warn('[Boot] Export warmup failed:', (err as Error).message);
-	}
+    return { status: 'warmed', cached, total: recentReports.length * formats.length };
+  } catch (err) {
+    return { status: 'failed', reason: (err as Error).message };
+  }
 }
 
 /**
  * Option #6: Warm up LLM cache with common legal queries
  */
-async function warmupLLMCache(): Promise<void> {
-	try {
-		const commonQueries = [
-			{
-				query: 'What is the statute of limitations for breach of contract?',
-				context: 'general legal research',
-				response: 'The statute of limitations for breach of contract varies by jurisdiction. In most U.S. states, it ranges from 3-6 years for written contracts and 2-4 years for oral contracts. California: 4 years (written), 2 years (oral). New York: 6 years. Texas: 4 years. Always consult local statutes and recent case law, as exceptions apply for fraud, tolling, and discovery rules.'
-			},
-			{
-				query: 'How do I file a motion to suppress evidence?',
-				context: 'criminal procedure',
-				response: 'To file a motion to suppress evidence: 1) Draft the motion citing Fourth Amendment violations or other legal grounds. 2) Include supporting affidavits and case law (Mapp v. Ohio, Miranda v. Arizona). 3) File with the court clerk before trial. 4) Serve opposing counsel. 5) Attend the suppression hearing. Grounds include illegal search/seizure, lack of warrant, Miranda violations, chain of custody issues.'
-			},
-			{
-				query: 'What are the elements of negligence?',
-				context: 'tort law',
-				response: 'The four elements of negligence are: 1) Duty - defendant owed plaintiff a legal duty of care. 2) Breach - defendant breached that duty through action or inaction. 3) Causation - breach was the actual and proximate cause of harm. 4) Damages - plaintiff suffered actual injury or loss. All four must be proven by a preponderance of evidence for a successful negligence claim.'
-			},
-			{
-				query: 'What is hearsay and what are the exceptions?',
-				context: 'evidence law',
-				response: 'Hearsay is an out-of-court statement offered to prove the truth of the matter asserted (FRE 801). It is generally inadmissible unless an exception applies. Key exceptions: present sense impression, excited utterance, then-existing mental/emotional/physical condition, statements for medical diagnosis, recorded recollection, business records, public records, learned treatises, former testimony, dying declarations, statements against interest.'
-			},
-			{
-				query: 'How long do I have to respond to discovery requests?',
-				context: 'civil procedure',
-				response: 'Under Federal Rules of Civil Procedure: Interrogatories - 30 days (FRCP 33). Requests for Production - 30 days (FRCP 34). Requests for Admission - 30 days (FRCP 36). Time starts from service date. Extensions can be requested by stipulation or court order. State court deadlines may vary - check local rules. Failure to respond timely may result in waiver of objections or court sanctions.'
-			}
-		];
+async function warmupLLMCache(): Promise<WarmupStatus> {
+  const OLLAMA_URL = ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+  const EMBEDDING_MODEL = 'embeddinggemma:latest';
 
-		let cached = 0;
-		const OLLAMA_URL = ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434';
-		const EMBEDDING_MODEL = 'embeddinggemma:latest';
+  // Quick connectivity check — skip entirely if Ollama is unreachable
+  try {
+    const ping = await ollamaFetch(`${OLLAMA_URL}/api/tags`, { signal: AbortSignal.timeout(3000) });
+    if (!ping.ok) return { status: 'skipped', reason: `Ollama returned ${ping.status}` };
+  } catch {
+    return { status: 'skipped', reason: 'Ollama unreachable' };
+  }
 
-		for (const item of commonQueries) {
-			try {
-				const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: item.query }),
-					signal: AbortSignal.timeout(8000)
-				});
+  const commonQueries = [
+    {
+      query: 'What is the statute of limitations for breach of contract?',
+      context: 'general legal research',
+      response:
+        'The statute of limitations for breach of contract varies by jurisdiction. In most U.S. states, it ranges from 3-6 years for written contracts and 2-4 years for oral contracts. California: 4 years (written), 2 years (oral). New York: 6 years. Texas: 4 years. Always consult local statutes and recent case law, as exceptions apply for fraud, tolling, and discovery rules.',
+    },
+    {
+      query: 'How do I file a motion to suppress evidence?',
+      context: 'criminal procedure',
+      response:
+        'To file a motion to suppress evidence: 1) Draft the motion citing Fourth Amendment violations or other legal grounds. 2) Include supporting affidavits and case law (Mapp v. Ohio, Miranda v. Arizona). 3) File with the court clerk before trial. 4) Serve opposing counsel. 5) Attend the suppression hearing. Grounds include illegal search/seizure, lack of warrant, Miranda violations, chain of custody issues.',
+    },
+    {
+      query: 'What are the elements of negligence?',
+      context: 'tort law',
+      response:
+        'The four elements of negligence are: 1) Duty - defendant owed plaintiff a legal duty of care. 2) Breach - defendant breached that duty through action or inaction. 3) Causation - breach was the actual and proximate cause of harm. 4) Damages - plaintiff suffered actual injury or loss. All four must be proven by a preponderance of evidence for a successful negligence claim.',
+    },
+    {
+      query: 'What is hearsay and what are the exceptions?',
+      context: 'evidence law',
+      response:
+        'Hearsay is an out-of-court statement offered to prove the truth of the matter asserted (FRE 801). It is generally inadmissible unless an exception applies. Key exceptions: present sense impression, excited utterance, then-existing mental/emotional/physical condition, statements for medical diagnosis, recorded recollection, business records, public records, learned treatises, former testimony, dying declarations, statements against interest.',
+    },
+    {
+      query: 'How long do I have to respond to discovery requests?',
+      context: 'civil procedure',
+      response:
+        'Under Federal Rules of Civil Procedure: Interrogatories - 30 days (FRCP 33). Requests for Production - 30 days (FRCP 34). Requests for Admission - 30 days (FRCP 36). Time starts from service date. Extensions can be requested by stipulation or court order. State court deadlines may vary - check local rules. Failure to respond timely may result in waiver of objections or court sanctions.',
+    },
+  ];
 
-				if (!embedRes.ok) {
-					console.warn(`[Boot] LLM warmup: Embedding failed for "${item.query.slice(0, 30)}..."`);
-					continue;
-				}
+  let cached = 0;
 
-				const embedData = await embedRes.json();
-				const queryEmbedding = embedData.embedding;
+  for (const item of commonQueries) {
+    try {
+      const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: item.query }),
+        signal: AbortSignal.timeout(8000),
+      });
 
-				if (!Array.isArray(queryEmbedding)) {
-					console.warn(`[Boot] LLM warmup: Invalid embedding for "${item.query.slice(0, 30)}..."`);
-					continue;
-				}
+      if (!embedRes.ok) continue;
 
-				await storeCachedResponse({
-					query: item.query,
-					queryEmbedding,
-					context: item.context,
-					response: item.response,
-					model: 'gemma3-legal:latest',
-					confidence: 0.95
-				});
+      const embedData = await embedRes.json();
+      const queryEmbedding = embedData.embedding;
+      if (!Array.isArray(queryEmbedding)) continue;
 
-				cached++;
-			} catch (err) {
-				console.warn(`[Boot] LLM warmup failed for "${item.query.slice(0, 30)}...":`, (err as Error).message);
-			}
-		}
+      await storeCachedResponse({
+        query: item.query,
+        queryEmbedding,
+        context: item.context,
+        response: item.response,
+        model: 'gemma3-legal:latest',
+        confidence: 0.95,
+      });
 
-		console.log(`[Boot] LLM warmup: Cached ${cached}/${commonQueries.length} common queries`);
-	} catch (err) {
-		console.warn('[Boot] LLM warmup failed:', (err as Error).message);
-	}
+      cached++;
+    } catch {
+      // Per-query failure is non-fatal
+    }
+  }
+
+  return {
+    status: cached > 0 ? 'warmed' : 'skipped',
+    cached,
+    total: commonQueries.length,
+    reason: cached === 0 ? 'all embeddings failed' : undefined,
+  };
 }
 
 

@@ -8,7 +8,7 @@
 	import ErrorBoundary from '$lib/components/ui/ErrorBoundary.svelte';
 	import { notificationStore } from '$lib/stores/unified/notification-store.svelte.js';
 	import OfflineIndicator from '$lib/components/cache/OfflineIndicator.svelte';
-	import { initTypingDetector } from '$lib/tracking/telemetry.js';
+	import { initTypingDetector } from '$lib/utils/telemetry.js';
 
 	interface Props {
 		data: LayoutData;

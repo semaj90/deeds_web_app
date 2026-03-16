@@ -7,8 +7,7 @@
  * States: disconnected → connecting → connected → consuming ↔ error
  *
  * Uses:
- *   - src/lib/server/rabbitmq.ts — core connection/channel/publish/consume
- *   - src/lib/server/queue/rabbitmq-manager-fixed.ts — 7-queue manager with handlers
+ *   - src/lib/server/queue/rabbitmq-manager-fixed.ts — canonical queue manager with handlers
  */
 
 import { setup, createActor, fromPromise, assign } from 'xstate';
@@ -64,15 +63,7 @@ export const rabbitmqMachine = setup({
 		events: RabbitMQEvent;
 	},
 	actors: {
-		connectToRabbitMQ: fromPromise(async () => {
-			const { getConnection, getChannel, setupQueues } = await import(
-				'$lib/server/rabbitmq.js'
-			);
-			await getConnection();
-			await getChannel();
-			await setupQueues();
-			return true;
-		}),
+		connectToRabbitMQ: fromPromise(async () => true),
 		initializeManager: fromPromise(async () => {
 			const { rabbitmq } = await import('$lib/server/queue/rabbitmq-manager-fixed.js');
 			const ok = await rabbitmq.initialize();

@@ -1,7 +1,7 @@
 <!-- AI Dialog: Svelte 5 | Bits UI | UnoCSS, transitions, analytics, logging -->
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import { accessibleClick } from '$lib/actions/accessibleClick';
+  import { accessibleClick } from '$lib/utils/accessibleClick';
   import { fade, scale } from 'svelte/transition';
 
   interface Props {

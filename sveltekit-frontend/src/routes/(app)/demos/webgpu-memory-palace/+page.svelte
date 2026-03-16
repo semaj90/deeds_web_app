@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { WebGPUPalaceCore } from '$lib/3d/webgpu-palace-core.js';
-	import { legalCompressor } from '$lib/3d/webgpu-palace-compression.js';
-	import type { ComputeBackend } from '$lib/3d/webgpu-palace-core.js';
+	import { WebGPUPalaceCore } from '$lib/gpu/webgpu-palace-core.js';
+	import { legalCompressor } from '$lib/gpu/webgpu-palace-compression.js';
+	import type { ComputeBackend } from '$lib/gpu/webgpu-palace-core.js';
 
 	let canvas: HTMLCanvasElement | undefined = $state();
 	let palace: WebGPUPalaceCore | null = $state(null);
