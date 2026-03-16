@@ -13,10 +13,10 @@
  *   for await (const chunk of stream) { console.log(chunk.content); }
  */
 
-import { getOllamaEndpoint } from '$lib/services/get-ollama-endpoint';
+import { ENV } from '$lib/server/env.server.js';
 import { isLegalTask, getOptimalModel, OLLAMA_CONFIG } from '$lib/server/ai/ollama-config.js';
 
-const OLLAMA_URL = getOllamaEndpoint();
+const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY ?? '';
 const GEMINI_MODEL = process.env.GEMINI_MODEL ?? 'gemini-2.0-flash-exp';
 

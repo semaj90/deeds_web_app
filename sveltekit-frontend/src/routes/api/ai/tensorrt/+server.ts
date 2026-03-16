@@ -27,19 +27,38 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 	const { prompt, maxTokens, temperature, fallbackToOllama } = parsed.data;
 
-	// Check if TRT-LLM is available
+	// Check if TRT-LLM is available — auto-fallback to Ollama
 	const trtAvailable = await trtHealthCheck();
 	if (!trtAvailable) {
 		if (fallbackToOllama) {
-			// Fallback to Ollama via existing /api/chat
-			return json({
-				text: '',
-				error: 'TensorRT-LLM unavailable, use /api/chat for Ollama fallback',
-				fallback: 'ollama',
-				trtAvailable: false
-			}, { status: 503 });
+			try {
+				const ollamaUrl = ENV.OLLAMA_BASE_URL;
+				const ollamaRes = await fetch(`${ollamaUrl}/api/generate`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						model: 'gemma3-legal:latest',
+						prompt,
+						stream: false,
+						options: {
+							temperature: temperature ?? 0.7,
+							num_predict: maxTokens ?? 2048
+						}
+					}),
+					signal: AbortSignal.timeout(120000)
+				});
+				if (ollamaRes.ok) {
+					const ollamaData = await ollamaRes.json();
+					return json({
+						text: ollamaData.response ?? '',
+						model: 'ollama',
+						backend: 'ollama',
+						trtAvailable: false
+					});
+				}
+			} catch { /* Ollama also unavailable */ }
 		}
-		return json({ error: 'TensorRT-LLM service unavailable' }, { status: 503 });
+		return json({ error: 'TensorRT-LLM and Ollama both unavailable' }, { status: 503 });
 	}
 
 	// Acquire GPU lease for TensorRT

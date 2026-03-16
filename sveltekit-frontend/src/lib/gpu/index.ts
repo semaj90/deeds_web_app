@@ -34,6 +34,3 @@ export {
 
 // NES memory bridge (FlatBuffer serialization shim)
 export { nesGPUBridge } from './nes-gpu-memory-bridge.js';
-
-// CHR ROM cache
-export { chrCache } from './chrrom-cache.js';

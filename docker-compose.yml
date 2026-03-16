@@ -55,8 +55,8 @@ services:
       - RABBITMQ_URL=amqp://legal_admin:secret123@rabbitmq:5672
       # ── AI / Embedding ──
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
-      - EMBEDDING_GRPC_URL=embedding-service:50051
-      - EMBEDDING_GRPC_ENABLED=true
+      - EMBEDDING_GRPC_URL=embedding-service:8094
+      - EMBEDDING_GRPC_ENABLED=false
       # ── MinIO (server-side uses Docker DNS, browser uses host port) ──
       - MINIO_ENDPOINT=minio
       - MINIO_PORT=9000

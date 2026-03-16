@@ -3,6 +3,7 @@
   import { goto } from '$app/navigation';
   import { analytics } from '$lib/stores/analytics.svelte';
   import DropdownMenu from '$lib/components/ui/DropdownMenu.svelte';
+  import { citationCache } from '$lib/ai/citation-cache.js';
   import Card from '$lib/components/ui/card/Card.svelte';
   import CardContent from '$lib/components/ui/card/CardContent.svelte';
   import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
@@ -176,7 +177,7 @@
     if (citationType !== 'all') {
       result = result.filter(c => c.citationType === citationType);
     }
-    if (searchQuery) {
+    if (searchQuery && !cachedSearchActive) {
       const q = searchQuery.toLowerCase();
       result = result.filter(c =>
         c.formattedCitation.toLowerCase().includes(q) ||
@@ -187,8 +188,35 @@
     return result;
   });
 
+  // Cache-enhanced search state
+  let cachedSearchActive = $state(false);
+  let cachedSearchResults = $state<any[]>([]);
+  let searchDebounce: ReturnType<typeof setTimeout> | undefined;
+
   $effect(() => {
     loadCitations();
+  });
+
+  // Debounced fuzzy + RAG search via citation cache
+  $effect(() => {
+    const q = searchQuery;
+    if (searchDebounce) clearTimeout(searchDebounce);
+
+    if (!q || q.length < 2) {
+      cachedSearchActive = false;
+      cachedSearchResults = [];
+      return;
+    }
+
+    searchDebounce = setTimeout(async () => {
+      try {
+        const results = await citationCache.searchCitations(q, { limit: 20, ragFallback: true });
+        if (results.length > 0) {
+          cachedSearchResults = results;
+          cachedSearchActive = true;
+        }
+      } catch { /* fallback to server filter */ }
+    }, 300);
   });
 
   async function loadCitations() {
@@ -203,6 +231,17 @@
       if (response.ok) {
         const data = await response.json();
         citations = data.citations ?? [];
+        // Backfill local cache with server results
+        for (const c of citations) {
+          citationCache.saveCitationLocal({
+            id: c.id,
+            statuteCode: c.formattedCitation ?? '',
+            statuteTitle: c.documentTitle ?? c.caseTitle,
+            highlightedText: c.quotedText,
+            notes: c.legalPrinciple,
+            createdAt: new Date().toISOString()
+          }).catch(() => {});
+        }
       } else {
         error = 'Failed to load citations';
       }

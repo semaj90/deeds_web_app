@@ -23,6 +23,7 @@
 		{ href: '/demos/document-summarizer', label: 'Legal Document Summarizer', description: 'AI summarization for contracts, judgments, briefs, statutes: quality metrics, compression ratios, key points', icon: 'file-text', lines: 786 },
 		{ href: '/demos/knowledge-graph', label: 'Knowledge Graph', description: 'D3.js force-directed provenance graph: entity relationships, interactive nodes, RAG source validation', icon: 'git-merge', lines: 280 },
 		{ href: '/demos/rag-documents', label: 'RAG Document Grid', description: 'Multi-document card grid: search, grid/list views, file sizes, embedding model info, document management', icon: 'file-stack', lines: 427 },
+		{ href: '/demos/phantom-code-lab', label: 'Phantom Code Lab', description: 'Extracted phantom files + wired system map. 5-point audit reference. Cartridge pipeline stats.', icon: 'ghost', lines: 165 },
 	];
 
 	const showcases: Demo[] = [
