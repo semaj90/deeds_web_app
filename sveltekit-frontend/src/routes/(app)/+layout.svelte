@@ -17,21 +17,25 @@
 
 	let { data, children }: Props = $props();
 	let showDocumentWriter = $state(false);
+	let showShortcuts = $state(false);
 
 	// Dynamic imports to avoid SSR TDZ crashes (browser-only components)
 	let AccessibilityPanel = $state<typeof import('$lib/components/ui/AccessibilityPanel.svelte').default | null>(null);
 	let AIChatWidget = $state<typeof import('$lib/components/ai/AIChatWidget.svelte').default | null>(null);
 	let SetupWizard = $state<typeof import('$lib/components/onboarding/SetupWizard.svelte').default | null>(null);
+	let KeyboardShortcutsPanel = $state<typeof import('$lib/components/KeyboardShortcutsPanel.svelte').default | null>(null);
 	onMount(async () => {
 		try {
-			const [accMod, chatMod, wizardMod] = await Promise.all([
+			const [accMod, chatMod, wizardMod, shortcutsMod] = await Promise.all([
 				import('$lib/components/ui/AccessibilityPanel.svelte').catch(() => null),
 				import('$lib/components/ai/AIChatWidget.svelte').catch(() => null),
 				import('$lib/components/onboarding/SetupWizard.svelte').catch(() => null),
+				import('$lib/components/KeyboardShortcutsPanel.svelte').catch(() => null),
 			]);
 			if (accMod) AccessibilityPanel = accMod.default;
 			if (chatMod) AIChatWidget = chatMod.default;
 			if (wizardMod) SetupWizard = wizardMod.default;
+			if (shortcutsMod) KeyboardShortcutsPanel = shortcutsMod.default;
 		} catch { /* non-fatal: optional UI components */ }
 	});
 
@@ -49,6 +53,14 @@
 		if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'd') {
 			e.preventDefault();
 			showDocumentWriter = !showDocumentWriter;
+		}
+		// ? key toggles keyboard shortcuts panel (only when not typing in an input)
+		if (e.key === '?' && !e.ctrlKey && !e.altKey) {
+			const tag = (e.target as HTMLElement)?.tagName;
+			if (tag !== 'INPUT' && tag !== 'TEXTAREA' && !(e.target as HTMLElement)?.isContentEditable) {
+				e.preventDefault();
+				showShortcuts = !showShortcuts;
+			}
 		}
 	}
 </script>
@@ -85,6 +97,9 @@
 {/if}
 {#if SetupWizard}
 	<SetupWizard />
+{/if}
+{#if KeyboardShortcutsPanel}
+	<KeyboardShortcutsPanel bind:open={showShortcuts} />
 {/if}
 
 <!-- Toast Notifications Overlay -->

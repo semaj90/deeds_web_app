@@ -401,6 +401,31 @@ See `memory/corruption-patterns.md` for detection patterns and fix strategies.
 
 ---
 
+## Component Wiring Audit Methodology
+
+When auditing orphan components, apply this 4-gate test to decide **wire vs archive**:
+
+| Gate | Question | Wire if YES | Archive if NO |
+|------|----------|-------------|---------------|
+| 1. Functional? | Is the code clean, non-corrupted, compiles without errors? | Continue | Archive |
+| 2. Feature gap? | Does it fill a gap no existing component covers? | Continue | Archive (redundant) |
+| 3. Integration point? | Is there a natural route/layout that logically hosts it? | Continue | Archive |
+| 4. Low effort? | Can it be wired in < 30 min (import + render, not deep refactor)? | Wire it | Defer to backlog |
+
+**Examples from Session 100+:**
+- `KeyboardShortcutsPanel.svelte` → WIRE: Clean Svelte 5, no other shortcuts panel exists, `?` key in layout is natural trigger, 5-line change
+- `speak.ts` → ARCHIVE: Superseded by `$lib/services/tts.ts` (160-line TTSService already wired to SimpleWorkingChat)
+- `AIChat.stories.ts` → ARCHIVE: Storybook not active in project, references non-existent `./AIChat.svelte`
+
+**Process:**
+1. `grep -r "ComponentName" src/routes/ src/lib/` — check import count
+2. If 0 imports → candidate for audit
+3. Read the file — check code quality (Svelte 5 runes? Clean? Corrupted?)
+4. Apply 4-gate test
+5. Wire or move to `deeds_labs/lib-dead-directories/components-orphans/`
+
+---
+
 ## Drizzle ORM 0.44 (PostgreSQL 16 + pgvector)
 
 **Main schema**: `src/lib/server/db/schema-postgres.ts` (70+ tables, 14 enums)
