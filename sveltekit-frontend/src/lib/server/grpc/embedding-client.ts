@@ -15,14 +15,13 @@
  */
 import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
-import type { embedding } from '$lib/generated/proto/embedding_pb.js';
+// Proto types inlined (generated/proto archived — regenerate from proto/*.proto if gRPC revived)
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-/** Re-export proto interfaces for consumers */
-export type ProtoEmbeddingRequest = embedding.IEmbeddingRequest;
-export type ProtoEmbeddingResponse = embedding.IEmbeddingResponse;
-export type ProtoHealthResponse = embedding.IHealthResponse;
+export interface ProtoEmbeddingRequest { texts: string[]; model?: string; dimensions?: number; }
+export interface ProtoEmbeddingResponse { embeddings: number[][]; model: string; dimensions: number; }
+export interface ProtoHealthResponse { status: string; model: string; ready: boolean; }
 
 export interface EmbeddingResult {
 	vectors: number[][];
