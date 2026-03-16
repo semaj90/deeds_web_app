@@ -129,7 +129,10 @@ export default defineConfig(({ mode }) => {
         },
         onwarn(warning, handler) {
           // Suppress $$props warnings from lucide-svelte (Svelte 4 library in Svelte 5)
-          if (warning.code === 'legacy_props_invalid' && warning.filename?.includes('node_modules/lucide-svelte')) {
+          if (
+            warning.code === 'legacy_props_invalid' &&
+            warning.filename?.includes('node_modules/lucide-svelte')
+          ) {
             return;
           }
           handler(warning);
@@ -183,10 +186,10 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/api\/ast-fixer/, ''),
         },
         '/api/playwright-auditor': {
-            target: 'http://localhost:8082',
-            changeOrigin: true,
-            secure: false,
-            rewrite: (path) => path.replace(/^\/api\/playwright-auditor/, ''),
+          target: 'http://localhost:8082',
+          changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path.replace(/^\/api\/playwright-auditor/, ''),
         },
         // POI API proxy (Phase 8)
         // '/api/persons-of-interest': {
@@ -194,22 +197,6 @@ export default defineConfig(({ mode }) => {
         //   changeOrigin: true,
         //   secure: false,
         // },
-        // WebSocket proxy for legal AI services
-        '/ws/rag': {
-          target: `ws://localhost:${wsPort}`, // enhanced-rag Go service
-          ws: true,
-          changeOrigin: true,
-        },
-        '/ws/canvas': {
-          target: 'ws://localhost:8095', // evidence canvas collaboration
-          ws: true,
-          changeOrigin: true,
-        },
-        '/ws/chat': {
-          target: 'ws://localhost:8096', // AI chat service
-          ws: true,
-          changeOrigin: true,
-        },
         // Health check proxy - DISABLED: was routing to non-existent service
         // '/health': {
         //   target: `http://localhost:${wsPort}`,
@@ -223,12 +210,12 @@ export default defineConfig(({ mode }) => {
       host: '0.0.0.0',
     },
     css: {
-      transformer: 'postcss',  // Disable lightningcss for Vite 8
+      transformer: 'postcss', // Disable lightningcss for Vite 8
     },
     build: {
       target: 'ES2022',
       minify: 'esbuild',
-      cssMinify: 'esbuild',  // Use esbuild for CSS (lightningcss has issues with @apply and malformed var())
+      cssMinify: 'esbuild', // Use esbuild for CSS (lightningcss has issues with @apply and malformed var())
       sourcemap: false,
       // Skip processing large binary assets (ONNX models, WASM files)
       assetsInlineLimit: 0, // Don't inline any assets (keeps them as separate files)
@@ -301,14 +288,22 @@ export default defineConfig(({ mode }) => {
     },
     clearScreen: false,
     ssr: {
-      external: ['canvas', '@napi-rs/canvas', 'simdjson-wasm', 'onnxruntime-web', '@xenova/transformers', 'piper-wasm', 'nats'],
+      external: [
+        'canvas',
+        '@napi-rs/canvas',
+        'simdjson-wasm',
+        'onnxruntime-web',
+        '@xenova/transformers',
+        'piper-wasm',
+        'nats',
+      ],
     },
     resolve: {
       alias: {
         __SERVER__: serverInternals,
         __PUBLIC__: publicInternals,
         // Shim worker_threads for onnxruntime-web (Emscripten WASM loaders import it at module level)
-        'worker_threads': path.resolve('src/lib/shims/worker-threads-browser-shim.js'),
+        worker_threads: path.resolve('src/lib/shims/worker-threads-browser-shim.js'),
       },
       dedupe: ['svelte'],
     },
