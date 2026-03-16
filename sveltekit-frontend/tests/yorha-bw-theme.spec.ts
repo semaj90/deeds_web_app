@@ -11,6 +11,13 @@ import { test, expect } from '@playwright/test';
  */
 
 test.describe('YoRHa Black & White Theme', () => {
+  test.beforeEach(async ({ page }) => {
+    // Bypass onboarding wizard
+    await page.addInitScript(() => {
+      window.localStorage.setItem('deeds-onboarding-completed', 'true');
+    });
+  });
+
   test('should toggle to black & white theme and persist', async ({ page }) => {
     // Navigate to system configuration
     await page.goto('/system-configuration');

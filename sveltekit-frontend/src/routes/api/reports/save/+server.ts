@@ -11,7 +11,11 @@ const saveReportSchema = z.object({
 	contentHtml: z.string().max(5_000_000).optional(),
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
 	try {
 		const parsed = saveReportSchema.safeParse(await request.json());
 		if (!parsed.success) {

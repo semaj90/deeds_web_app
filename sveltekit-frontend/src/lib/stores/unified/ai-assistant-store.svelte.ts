@@ -75,46 +75,55 @@ class AIAssistantStore {
 		this.messages = [...this.messages, userMessage];
 		this.currentQuery = query;
 		this.isProcessing = true;
+		const resolvedCaseId = caseId || this.activeContext.caseId;
+    const normalizedCaseId =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+        resolvedCaseId ?? ''
+      )
+        ? resolvedCaseId
+        : undefined;
+    const history = this.messages
+      .filter((message) => message.id !== messageId)
+      .slice(-10)
+      .map(({ role, content }) => ({ role, content }));
 
-		try {
-			const response = await fetch('/api/ai/chat', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-					query,
-					model: this.aiModel,
-					temperature: this.temperature,
-					context: {
-	caseId: caseId || this.activeContext.caseId,
-						evidenceIds
-					}
-				})
-			});
+    try {
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: query,
+          caseId: normalizedCaseId,
+          temperature: this.temperature,
+          history,
+        }),
+      });
 
-			if (response.ok) {
-				const data = await response.json();
-				const assistantMessage: Message = {
-					id: `msg-${Date.now()}`,
-					role: 'assistant',
-					content: data.response,
-					model: this.aiModel,
-					timestamp: Date.now(),
-					tokens: data.tokens,
-					confidence: data.confidence
-				};
+      if (response.ok) {
+        const data = await response.json();
+        const evalCount = data?.performance?.eval_count;
+        const assistantMessage: Message = {
+          id: `msg-${Date.now()}`,
+          role: 'assistant',
+          content: data.response,
+          model: this.aiModel,
+          timestamp: Date.now(),
+          tokens: typeof evalCount === 'number' ? evalCount : undefined,
+          confidence: data.confidence,
+        };
 
-				this.messages = [...this.messages, assistantMessage];
-				this.tokenUsage += (data?.tokens ?? 0);
-				this.isProcessing = false;
-				return assistantMessage;
-			} else {
-				throw new Error('AI response failed');
-			}
-		} catch (error) {
-			console.error('AI error:', error);
-			this.isProcessing = false;
-			throw error;
-		}
+        this.messages = [...this.messages, assistantMessage];
+        this.tokenUsage += typeof evalCount === 'number' ? evalCount : 0;
+        this.isProcessing = false;
+        return assistantMessage;
+      } else {
+        throw new Error('AI response failed');
+      }
+    } catch (error) {
+      console.error('AI error:', error);
+      this.isProcessing = false;
+      throw error;
+    }
 	}
 
 	async streamMessage(query: string, onChunk: (chunk: string) => void) {

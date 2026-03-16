@@ -3,17 +3,11 @@
  * Handles vector similarity search using PostgreSQL pg_vector extension
  */
 
-import type { Pool } from 'pg';
-import pg from 'pg';
+import { pool as POOL } from '$lib/server/db/client';
 
 // Centralized Party role/type defaults
 const DEFAULT_PARTY_ROLE = 'other' as const;
 const DEFAULT_PARTY_TYPE = 'individual' as const;
-
-// Single, canonical pg.Pool instance for server runtime
-const POOL: Pool = new pg.Pool({
-	connectionString: process.env.DATABASE_URL
-});
 
 export interface Party {
 	name: string;
@@ -68,10 +62,6 @@ export interface SearchResult {
 // Type guards
 function isString(v: unknown): v is string {
 	return typeof v === 'string';
-}
-
-function isNumber(v: unknown): v is number {
-	return typeof v === 'number';
 }
 
 function isRecord(v: unknown): v is Record<string, unknown> {
@@ -207,10 +197,5 @@ export async function searchPGVector(queryVector: number[], topK = 10): Promise<
 	});
 }
 
-/**
- * Close the pool connection
- */
-export async function closePool(): Promise<void> {
-	await POOL.end();
-}
+// Pool lifecycle managed by $lib/server/db/client — no closePool needed here
 

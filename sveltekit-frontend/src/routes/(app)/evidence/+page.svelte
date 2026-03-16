@@ -46,12 +46,21 @@
 	import { WorkflowEventStream, type WorkflowEvent } from '$lib/client/workflow-event-stream.js';
 	import { evidenceProcessingMachine, getProcessingProgress, getCurrentStep } from '$lib/machines/evidence-processing-machine.js';
 
+	type CaseSelection = {
+		id: string;
+		title: string;
+	};
+
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	let uploadCard = $state<UploadProgressCard | undefined>(undefined);
 	let showAdvancedFilters = $state(false);
 	let actionPopupFile = $state<{ name: string } | null>(null);
 	let showCaseSelector = $state(false);
 	let linkedCaseTitle = $state('');
+	let pendingUploadCaseId = $state<string | null>(null);
+	let caseLinkError = $state<string | null>(null);
+	let caseLinkSuccess = $state<string | null>(null);
+	let isLinkingCase = $state(false);
 	let uploadProgressPercent = $state(0);
 	let uploadProgressStatus = $state('');
 	let uploadProgressDocId = $state('');
@@ -162,21 +171,210 @@
 	let selectedDocument = $derived(
 		selectedDocumentId ? (data.evidence ?? []).find((d: any) => d.id === selectedDocumentId) ?? null : null
 	);
+	let activeCaseId = $derived(pendingUploadCaseId ?? data.caseId ?? '');
+	let caseLinkTarget = $derived(
+		selectedDocumentId ? (data.evidence ?? []).find((d: any) => d.id === selectedDocumentId) ?? null : null
+	);
+	let caseLinkTargetLabel = $derived(
+		caseLinkTarget ? (caseLinkTarget.title || caseLinkTarget.fileName || caseLinkTarget.file_name || caseLinkTarget.id) : ''
+	);
+
+	type AdvancedEvidenceFilters = {
+		search: string;
+		type: string;
+		status: string;
+		case: string;
+		dateRange: string;
+		aiAnalyzed: string;
+	};
+
+	const defaultAdvancedFilters: AdvancedEvidenceFilters = {
+		search: '',
+		type: 'all',
+		status: 'all',
+		case: 'all',
+		dateRange: 'all',
+		aiAnalyzed: 'all'
+	};
+
+	let advancedFilters = $state<AdvancedEvidenceFilters>({ ...defaultAdvancedFilters });
+
+	function openUploadPanel(panel: string) {
+		showYorhaUpload = false;
+		showAIFileUpload = false;
+		showAdvancedUpload = false;
+		showEnhancedUpload = false;
+		showEnhancedFileUpload = false;
+		showQuickUpload = false;
+
+		switch (panel) {
+			case 'yorha':
+				showYorhaUpload = true;
+				break;
+			case 'ai':
+				showAIFileUpload = true;
+				break;
+			case 'advanced':
+				showAdvancedUpload = true;
+				break;
+			case 'enhanced':
+				showEnhancedUpload = true;
+				break;
+			case 'enhanced-file':
+				showEnhancedFileUpload = true;
+				break;
+			case 'quick':
+			default:
+				showQuickUpload = true;
+		}
+	}
+
+	function matchesSearchQuery(doc: any) {
+		const query = searchQuery.trim().toLowerCase();
+		if (!query) return true;
+
+		return [doc.title, doc.fileName, doc.file_name, doc.description, doc.content]
+			.filter((value): value is string => typeof value === 'string' && value.length > 0)
+			.some((value) => value.toLowerCase().includes(query));
+	}
+
+	function matchesSelectedType(doc: any) {
+		const fileType = String(doc.fileType ?? doc.file_type ?? '').toLowerCase();
+		if (typeFilter === 'all') return true;
+		if (typeFilter === 'pdf') return fileType.includes('pdf');
+		if (typeFilter === 'image') return fileType.startsWith('image/') || fileType.includes('image');
+		if (typeFilter === 'video') return fileType.startsWith('video/');
+		if (typeFilter === 'document') {
+			return fileType.includes('word') ||
+				fileType.includes('text') ||
+				fileType.includes('officedocument') ||
+				fileType.includes('excel') ||
+				fileType.includes('sheet') ||
+				fileType.includes('message/');
+		}
+
+		return true;
+	}
+
+	function isAiAnalyzed(doc: any) {
+		return Boolean(doc.summary ?? doc.aiSummary ?? doc.aiAnalysis ?? doc.metadata?.analysis ?? doc.metadata?.entities);
+	}
+
+	function matchesDateRange(doc: any, range: string) {
+		if (range === 'all') return true;
+
+		const value = doc.createdAt ?? doc.created_at ?? doc.updatedAt ?? doc.updated_at;
+		if (!value) return false;
+
+		const date = new Date(value);
+		if (Number.isNaN(date.getTime())) return false;
+
+		const now = new Date();
+		const start = new Date(now);
+		if (range === 'today') {
+			start.setHours(0, 0, 0, 0);
+			return date >= start;
+		}
+		if (range === 'week') {
+			start.setDate(now.getDate() - 7);
+			return date >= start;
+		}
+		if (range === 'month') {
+			start.setMonth(now.getMonth() - 1);
+			return date >= start;
+		}
+		if (range === 'quarter') {
+			start.setMonth(now.getMonth() - 3);
+			return date >= start;
+		}
+
+		return true;
+	}
+
+	function matchesAdvancedFilters(doc: any) {
+		const status = String(doc.status ?? doc.processingStatus ?? doc.documentStatus ?? '').toLowerCase();
+		const caseReference = [doc.caseNumber, doc.case_number, doc.caseId, doc.case_id, doc.caseTitle, doc.case_title]
+			.filter(Boolean)
+			.join(' ')
+			.toLowerCase();
+		const matchesStatus = advancedFilters.status === 'all' || status === advancedFilters.status;
+		const matchesCase = advancedFilters.case === 'all' || caseReference.includes(advancedFilters.case.toLowerCase());
+		const matchesAi = advancedFilters.aiAnalyzed === 'all' || (advancedFilters.aiAnalyzed === 'analyzed' ? isAiAnalyzed(doc) : !isAiAnalyzed(doc));
+		const matchesDate = matchesDateRange(doc, advancedFilters.dateRange);
+
+		return matchesSelectedType(doc) && matchesStatus && matchesCase && matchesAi && matchesDate;
+	}
+
+	function applyAdvancedFilters(filterData: AdvancedEvidenceFilters) {
+		advancedFilters = { ...filterData };
+		searchQuery = filterData.search;
+
+		switch (filterData.type) {
+			case 'email':
+			case 'spreadsheet':
+				typeFilter = 'document';
+				break;
+			case 'video':
+				typeFilter = 'video';
+				break;
+			default:
+				typeFilter = filterData.type;
+		}
+	}
+
+	function clearEvidenceFilters() {
+		searchQuery = '';
+		typeFilter = 'all';
+		advancedFilters = { ...defaultAdvancedFilters };
+	}
+
+	async function handleCaseLinkSelection(selectedCase: CaseSelection) {
+		caseLinkError = null;
+		caseLinkSuccess = null;
+		linkedCaseTitle = selectedCase.title;
+		pendingUploadCaseId = selectedCase.id;
+
+		if (!caseLinkTarget?.id) {
+			caseLinkSuccess = `New uploads on this page will be associated with ${selectedCase.title}.`;
+			showCaseSelector = false;
+			return;
+		}
+
+		isLinkingCase = true;
+
+		try {
+			const response = await fetch(`/api/evidence/${caseLinkTarget.id}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ caseId: selectedCase.id })
+			});
+
+			const payload = await response.json().catch(() => null);
+			if (!response.ok) {
+				throw new Error(payload?.error ?? 'Failed to link evidence to case');
+			}
+
+			caseLinkSuccess = `Linked ${caseLinkTargetLabel} to ${selectedCase.title}.`;
+			showCaseSelector = false;
+			await invalidateAll();
+		} catch (error) {
+			caseLinkError = error instanceof Error ? error.message : 'Failed to link evidence to case';
+		} finally {
+			isLinkingCase = false;
+		}
+	}
+
+	let hasActiveEvidenceFilters = $derived(
+		searchQuery.trim().length > 0 ||
+			typeFilter !== 'all' ||
+			advancedFilters.status !== 'all' ||
+			advancedFilters.case !== 'all' ||
+			advancedFilters.dateRange !== 'all' ||
+			advancedFilters.aiAnalyzed !== 'all'
+	);
 
 	let filteredEvidence = $derived(
-		(data.evidence ?? []).filter((doc: any) => {
-			const matchesSearch = !searchQuery ||
-				doc.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				doc.fileName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				doc.description?.toLowerCase().includes(searchQuery.toLowerCase());
-
-			const matchesType = typeFilter === 'all' ||
-				(typeFilter === 'pdf' && doc.fileType?.includes('pdf')) ||
-				(typeFilter === 'image' && doc.fileType?.startsWith('image/')) ||
-				(typeFilter === 'document' && (doc.fileType?.includes('word') || doc.fileType?.includes('text')));
-
-			return matchesSearch && matchesType;
-		})
+		(data.evidence ?? []).filter((doc: any) => matchesSearchQuery(doc) && matchesAdvancedFilters(doc))
 	);
 
 	function formatFileSize(bytes: number): string {
@@ -232,6 +430,31 @@
 			actionPopupFile = { name: event.dataTransfer.files[0].name };
 		}
 	}
+
+	$effect(() => {
+		if (!browser) return;
+
+		const url = new URL(window.location.href);
+		const upload = url.searchParams.get('upload');
+		let shouldCleanUrl = false;
+
+		if (upload) {
+			openUploadPanel(upload);
+			url.searchParams.delete('upload');
+			shouldCleanUrl = true;
+		}
+
+		if (url.searchParams.get('caseSelector') === 'true') {
+			showCaseSelector = true;
+			url.searchParams.delete('caseSelector');
+			shouldCleanUrl = true;
+		}
+
+		if (shouldCleanUrl) {
+			const search = url.searchParams.toString();
+			window.history.replaceState({}, '', search ? `${url.pathname}?${search}` : url.pathname);
+		}
+	});
 
 	// Debounced semantic search — triggers 500ms after user stops typing (3+ chars)
 	$effect(() => {
@@ -311,7 +534,7 @@
 	// Display items: semantic results when searching, local filter otherwise
 	let displayEvidence = $derived.by(() => {
 		if (searchMode === 'semantic' && semanticResults.length > 0) {
-			return semanticResults;
+			return semanticResults.filter((doc: any) => matchesAdvancedFilters(doc));
 		}
 		return filteredEvidence;
 	});
@@ -376,7 +599,7 @@
 		<!-- Bulk Upload (Multi-file with metadata) -->
 		{#if showBulkUpload}
 			<div class="mb-6">
-				<EvidenceUpload caseId={data.caseId ?? ''} onUploadComplete={(uploads) => { showBulkUpload = false; invalidateAll(); }} />
+				<EvidenceUpload caseId={activeCaseId} onUploadComplete={(uploads) => { showBulkUpload = false; invalidateAll(); }} />
 			</div>
 		{/if}
 
@@ -534,7 +757,7 @@
 					<SmartDocumentForm
 						title="Advanced Evidence Upload"
 						description="Upload with OCR extraction and entity detection"
-						caseId={data.caseId ?? ''}
+						caseId={activeCaseId}
 						onsubmit={() => {
 							showAdvancedUpload = false;
 							invalidateAll();
@@ -555,7 +778,7 @@
 			{#if showEnhancedUpload}
 				<div class="mt-4">
 					<EnhancedDocumentUploader
-						caseId={data.caseId ?? ''}
+						caseId={activeCaseId}
 						userId={data.user?.id ?? ''}
 						autoProcess={true}
 						showMetadataForm={true}
@@ -576,7 +799,7 @@
 			{#if showEnhancedFileUpload}
 				<div class="mt-4">
 					<EnhancedFileUpload
-						caseId={data.caseId ?? undefined}
+						caseId={activeCaseId || undefined}
 						multiple={true}
 						maxFiles={10}
 						maxSizeMB={100}
@@ -605,7 +828,7 @@
 							if (!files.length) return;
 							const formData = new FormData();
 							for (const f of files) formData.append('file', f);
-							if (data.caseId) formData.append('caseId', data.caseId);
+							if (activeCaseId) formData.append('caseId', activeCaseId);
 							isUploading = true;
 							try {
 								const res = await fetch('?/upload', { method: 'POST', body: formData });
@@ -631,7 +854,7 @@
 			{#if showEvidenceChat}
 				<div class="mt-4">
 					<ContextualEvidenceChatModal
-						defaultCaseId={data.caseId ?? ''}
+						defaultCaseId={activeCaseId}
 						title="Evidence AI Assistant"
 					/>
 				</div>
@@ -651,12 +874,30 @@
 			</button>
 		</div>
 		{#if showCaseSelector}
+			<div class="mt-2 text-xs text-sand/60">
+				{#if caseLinkTarget}
+					Linking selected evidence: <span class="text-sand">{caseLinkTargetLabel}</span>
+				{:else if activeCaseId}
+					New uploads will use case <span class="text-sand">{linkedCaseTitle || activeCaseId}</span>.
+				{:else}
+					Choose a case for upcoming uploads, or open an evidence item first to persist a link on an existing record.
+				{/if}
+			</div>
 			<div class="mt-3" style="max-width: 400px;">
 				<CaseSelector
 					placeholder="Search and select a case..."
-					onselect={(c) => { linkedCaseTitle = c.title; console.log('Linked to case:', c.id); }}
+					onselect={handleCaseLinkSelection}
 				/>
 			</div>
+			{#if isLinkingCase}
+				<p class="mt-2 text-xs text-sand/60">Linking evidence to case...</p>
+			{/if}
+		{/if}
+		{#if caseLinkError}
+			<p class="mt-2 text-xs text-danger">{caseLinkError}</p>
+		{/if}
+		{#if caseLinkSuccess}
+			<p class="mt-2 text-xs text-info">{caseLinkSuccess}</p>
 		{/if}
 
 		<!-- Upload Progress -->
@@ -734,7 +975,7 @@
 		</div>
 		{#if showAdvancedFilters}
 			<div class="mt-3">
-				<EvidenceFilters onfilter={(filterData) => { console.log('Advanced filter applied:', filterData); }} />
+				<EvidenceFilters onfilter={applyAdvancedFilters} />
 			</div>
 		{/if}
 
@@ -779,10 +1020,10 @@
 			<div class="text-center py-16 bg-panelSoft rounded-lg border border-sand/20">
 				<p class="text-4xl mb-4">📂</p>
 				<p class="text-sand/80 text-lg">
-					{searchQuery || typeFilter !== 'all' ? 'No evidence matches your filters.' : 'No evidence uploaded yet.'}
+					{hasActiveEvidenceFilters ? 'No evidence matches your filters.' : 'No evidence uploaded yet.'}
 				</p>
-				{#if searchQuery || typeFilter !== 'all'}
-					<button onclick={() => { searchQuery = ''; typeFilter = 'all'; }} class="mt-3 text-info hover:underline text-sm">
+				{#if hasActiveEvidenceFilters}
+					<button onclick={clearEvidenceFilters} class="mt-3 text-info hover:underline text-sm">
 						Clear filters
 					</button>
 				{/if}
@@ -1069,7 +1310,7 @@
 {/if}
 
 <EvidenceUploadModal
-	caseId={data.evidence?.[0]?.caseId || 'default'}
+	caseId={activeCaseId || data.evidence?.[0]?.caseId || 'default'}
 	isOpen={showUploadPipeline}
 	onClose={() => (showUploadPipeline = false)}
 	onSuccess={(evidenceId, jobId) => { console.log('Pipeline complete:', evidenceId, jobId); showUploadPipeline = false; invalidateAll(); }}

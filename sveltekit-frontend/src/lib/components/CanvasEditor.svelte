@@ -1,19 +1,14 @@
 <script lang="ts">
+ import type { BoardSnapshotSchema } from '$lib/schemas/board';
+
  interface CanvasElement {
    id: string;
    x: number;
    y: number;
-   type: string;
+   type: BoardSnapshotSchema['nodes'][number]['kind'];
    text: string;
- }
-
- interface CanvasState {
-   id: string;
-   caseId: string;
-   userId: string;
-   stateData: unknown;
-   createdAt: Date;
-   updatedAt: Date;
+   evidenceId?: string;
+   color?: string;
  }
 
  interface CitationPoint {
@@ -28,28 +23,70 @@
  }
 
  interface Props {
-   canvasState: CanvasState | null;
+   canvasState: BoardSnapshotSchema | null;
    reportId: string;
    evidence?: EvidenceItem[];
    citationPoints?: CitationPoint[];
-   save: (canvasState: CanvasState) => Promise<void>;
+   save: (canvasState: BoardSnapshotSchema) => Promise<void>;
  }
 
  let { canvasState, reportId, evidence = [], citationPoints = [], save }: Props = $props();
 
- // Reactive derived value from props
- let currentCanvasElements = $derived(((canvasState?.stateData ?? []) as CanvasElement[]));
+ function toCanvasElement(node: BoardSnapshotSchema['nodes'][number]): CanvasElement {
+    return {
+      id: node.id,
+      x: node.x,
+      y: node.y,
+      type: node.kind,
+      text: node.title ?? node.body ?? node.kind,
+      evidenceId: node.evidenceId,
+      color: node.color,
+    };
+ }
 
- function handleSave() {
-		const updatedCanvasState: CanvasState = {
-			id: canvasState?.id ?? crypto.randomUUID(),
-			caseId: reportId, // Use reportId from props
-			userId: '', // Will be set by server
-			stateData: currentCanvasElements,
-			createdAt: canvasState?.createdAt ?? new Date(),
-			updatedAt: new Date(),
-		};
-		save(updatedCanvasState);
+ function toBoardKind(type: string): BoardSnapshotSchema['nodes'][number]['kind'] {
+    switch (type) {
+      case 'note':
+      case 'image':
+      case 'pdf':
+      case 'link':
+      case 'evidence':
+        return type;
+      default:
+        return 'note';
+    }
+ }
+
+ let currentCanvasElements = $derived((canvasState?.nodes ?? []).map(toCanvasElement));
+
+ async function handleSave() {
+    const updatedCanvasState: BoardSnapshotSchema = {
+      version: canvasState?.version ?? 1,
+      viewport: canvasState?.viewport ?? {
+        pan: { x: 0, y: 0 },
+        zoom: 1,
+      },
+      nodes: currentCanvasElements.map((element) => ({
+        id: element.id,
+        kind: toBoardKind(element.type),
+        x: element.x,
+        y: element.y,
+        w: 240,
+        h: 96,
+        title: element.text,
+        body: element.text,
+        evidenceId: element.type === 'evidence' ? (element.evidenceId ?? element.id) : undefined,
+        color: element.color,
+      })),
+      edges: canvasState?.edges ?? [],
+      updatedAt: new Date().toISOString(),
+    };
+
+    try {
+      await save(updatedCanvasState);
+    } catch (error) {
+      console.error('Failed to save canvas:', error);
+    }
  }
 </script>
 

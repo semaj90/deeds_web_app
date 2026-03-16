@@ -15,7 +15,11 @@ const generateReportSchema = z.object({
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
 	try {
 		const parsed = generateReportSchema.safeParse(await request.json());
 		if (!parsed.success) {

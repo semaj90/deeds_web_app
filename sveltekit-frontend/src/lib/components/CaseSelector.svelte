@@ -23,6 +23,18 @@
 	let inputRef = $state<HTMLInputElement | null>(null);
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
+	function extractResults(payload: unknown): CaseResult[] {
+		const data = payload as {
+			data?: CaseResult[] | { cases?: CaseResult[] };
+			cases?: CaseResult[];
+		};
+
+		if (Array.isArray(data?.data)) return data.data;
+		if (Array.isArray(data?.data?.cases)) return data.data.cases;
+		if (Array.isArray(data?.cases)) return data.cases;
+		return [];
+	}
+
 	async function search(term: string) {
 		if (!term.trim()) {
 			results = [];
@@ -34,7 +46,7 @@
 			const res = await fetch(`/api/cases?search=${encodeURIComponent(term)}&limit=10`);
 			if (!res.ok) throw new Error('Search failed');
 			const data = await res.json();
-			results = data.data ?? [];
+			results = extractResults(data);
 			isOpen = results.length > 0;
 			highlightedIndex = -1;
 		} catch {

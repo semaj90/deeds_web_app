@@ -1,6 +1,8 @@
 <script lang="ts">
  // Migrated to $effect
 
+ import { browser } from '$app/environment';
+
  import AccessibilitySettings from '$lib/components/ui/AccessibilitySettings.svelte';
  import ThemeSelector from '$lib/components/ui/ThemeSelector.svelte';
  import SystemStatusCard from '$lib/components/ui/SystemStatusCard.svelte';
@@ -10,44 +12,68 @@
 
  let activeTab = $state<'general' | 'ai' | 'database' | 'gpu' | 'security' | 'accessibility' | 'status'>('general');
 
- // Configuration settings
- let config = $state({ general: { theme: 'yorha',
-   language: 'en',
-   timezone: 'UTC',
-   autoSave: true,
-   notifications: true
-  },
-	ai: {
-   model: 'gemma3-legal',
-   temperature: 0.7,
-   maxTokens: 2048,
-   ollamaEndpoint: '/api/embed',
-   embeddingModel: 'embeddinggemma',
-   enableFallback: true
-  },
-	database: {
-   type: 'postgresql',
-   host: 'localhost',
-   port: 5432,
-   database: 'legal_ai_db',
-   ssl: false,
-   connectionPool: 10
-  },
-	gpu: {
-   enableWebGPU: true,
-   enableCUDA: true,
-   memoryLimit: 80,
-   batchSize: 32,
-   precision: 'fp16'
-  },
-	security: {
-  encryption: 'AES256',
-   sessionTimeout: 3600,
-   twoFactor: false,
-   auditLogging: true,
-   backupFrequency: 'daily'
+  const CONFIG_STORAGE_KEY = 'system-configuration:v1';
+
+  function createDefaultConfig() {
+    return {
+      general: {
+        theme: 'yorha',
+        language: 'en',
+        timezone: 'UTC',
+        autoSave: true,
+        notifications: true
+      },
+      ai: {
+        model: 'gemma3-legal',
+        temperature: 0.7,
+        maxTokens: 2048,
+        ollamaEndpoint: '/api/embed',
+        embeddingModel: 'embeddinggemma',
+        enableFallback: true
+      },
+      database: {
+        type: 'postgresql',
+        host: 'localhost',
+        port: 5432,
+        database: 'legal_ai_db',
+        ssl: false,
+        connectionPool: 10
+      },
+      gpu: {
+        enableWebGPU: true,
+        enableCUDA: true,
+        memoryLimit: 80,
+        batchSize: 32,
+        precision: 'fp16'
+      },
+      security: {
+        encryption: 'AES256',
+        sessionTimeout: 3600,
+        twoFactor: false,
+        auditLogging: true,
+        backupFrequency: 'daily'
+      }
+    };
   }
- });
+
+  type ConfigState = ReturnType<typeof createDefaultConfig>;
+
+  function mergeStoredConfig(value: unknown): ConfigState {
+    const defaults = createDefaultConfig();
+    if (!value || typeof value !== 'object') return defaults;
+
+    const stored = value as Partial<ConfigState>;
+    return {
+      general: { ...defaults.general, ...(stored.general ?? {}) },
+      ai: { ...defaults.ai, ...(stored.ai ?? {}) },
+      database: { ...defaults.database, ...(stored.database ?? {}) },
+      gpu: { ...defaults.gpu, ...(stored.gpu ?? {}) },
+      security: { ...defaults.security, ...(stored.security ?? {}) }
+    };
+  }
+
+ // Configuration settings
+ let config = $state<ConfigState>(createDefaultConfig());
 
  let systemInfo = $state({
   version: '2.0.0',
@@ -58,34 +84,62 @@
  });
 
  let webgpuCapabilities = $state({ hasWebGPU: false });
+  let saveState = $state<'idle' | 'saved' | 'error'>('idle');
+  let saveMessage = $state('');
+  let lastSavedAt = $state('');
 
  $effect(() => {
-  (async () => {
+    if (!browser) return;
 
-  // Simulate system info updates
-  const updateInfo = () => {
-   systemInfo.uptime = '2d 14h 32m';
-   systemInfo.memory = { used: 8192, total: 16384, percentage: 50 };
-   systemInfo.disk = { used: 256, total: 512, percentage: 50 };
-   systemInfo.cpu = { usage: 45, cores: 8 };
-  };
+    try {
+      const storedConfig = window.localStorage.getItem(CONFIG_STORAGE_KEY);
+      if (storedConfig) {
+        config = mergeStoredConfig(JSON.parse(storedConfig));
+        saveState = 'saved';
+        saveMessage = 'Loaded saved configuration.';
+      }
+    } catch (error) {
+      saveState = 'error';
+      saveMessage = 'Saved configuration could not be loaded.';
+      console.error('Failed to load configuration:', error);
+    }
 
-  updateInfo();
-  const interval = setInterval(updateInfo, 5000);
+    const updateInfo = () => {
+      systemInfo.uptime = '2d 14h 32m';
+      systemInfo.memory = { used: 8192, total: 16384, percentage: 50 };
+      systemInfo.disk = { used: 256, total: 512, percentage: 50 };
+      systemInfo.cpu = { usage: 45, cores: 8 };
+    };
 
-  // Check WebGPU
-  if (navigator.gpu) {
-   webgpuCapabilities.hasWebGPU = true;
-  }
+    updateInfo();
+    webgpuCapabilities.hasWebGPU = typeof navigator !== 'undefined' && 'gpu' in navigator;
 
-  return () => clearInterval(interval);
-
-  })();
+    const interval = window.setInterval(updateInfo, 5000);
+    return () => window.clearInterval(interval);
 });
 
  function saveConfig() {
-  console.log('Saving configuration...', config);
-  // Implementation for saving config
+    if (!browser) return;
+    try {
+      window.localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(config));
+      saveState = 'saved';
+      saveMessage = 'Changes applied locally.';
+      lastSavedAt = new Date().toLocaleTimeString();
+    } catch (error) {
+      saveState = 'error';
+      saveMessage = 'Failed to save configuration.';
+      console.error('Failed to save configuration:', error);
+    }
+  }
+
+  function resetConfig() {
+    config = createDefaultConfig();
+    if (browser) {
+      window.localStorage.removeItem(CONFIG_STORAGE_KEY);
+    }
+    saveState = 'saved';
+    saveMessage = 'Configuration reset to defaults.';
+    lastSavedAt = '';
  }
 </script>
 
@@ -314,7 +368,17 @@
 
    <!-- Save Actions -->
    <div class="action-bar">
-    <button class="btn-secondary">RESET</button>
+      {#if saveMessage || lastSavedAt}
+        <div class="save-status" class:saved={saveState === 'saved'} class:error={saveState === 'error'}>
+          {#if saveMessage}
+            <span>{saveMessage}</span>
+          {/if}
+          {#if lastSavedAt}
+            <span>Last saved {lastSavedAt}</span>
+          {/if}
+        </div>
+      {/if}
+        <button class="btn-secondary" onclick={resetConfig}>RESET</button>
     <button class="btn-primary" onclick={saveConfig}>APPLY CHANGES</button>
    </div>
   </main>
@@ -489,10 +553,28 @@
   margin-top: auto;
   padding-top: 2rem;
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   gap: 1rem;
   border-top: 1px solid #334155;
  }
+
+  .save-status {
+    margin-right: auto;
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: #94a3b8;
+  }
+
+  .save-status.saved {
+    color: #93c5fd;
+  }
+
+  .save-status.error {
+    color: #fca5a5;
+  }
 
  .btn-primary, .btn-secondary {
   padding: 0.5rem 1.5rem;

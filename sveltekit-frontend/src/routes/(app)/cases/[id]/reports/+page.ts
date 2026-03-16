@@ -1,18 +1,2 @@
-import type { PageLoad } from './$types.js';
-
-export const load: PageLoad = async ({ fetch, params }) => {
-  let reports = [];
-
-  try {
-    const res = await fetch(`/api/reports?caseId=${params.id}`);
-    if (res.ok) {
-      reports = await res.json();
-    }
-  } catch {
-    // ignore for now
-  }
-
-  return {
-    reports,
-  };
-};
+// Tiptap editor requires DOM APIs — disable SSR
+export const ssr = false;

@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-03-16T20-23-11",
+  "timestamp": "2026-03-16T22-33-41",
   "base": "http://localhost:5173",
-  "totalTimeMs": 63513,
+  "totalTimeMs": 174394,
   "results": [
     {
       "name": "evidence",
@@ -19,13 +19,13 @@
         "WebGPU: No adapter available",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
       "failedRequests": [],
-      "loadTimeMs": 5307,
+      "loadTimeMs": 6068,
       "domElements": 895,
-      "resourceCount": 263,
-      "resourceSizeKB": 9267
+      "resourceCount": 267,
+      "resourceSizeKB": 9406
     },
     {
       "name": "persons-of-interest",
@@ -43,13 +43,13 @@
         "WebGPU: No adapter available",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2155,
+      "loadTimeMs": 1277,
       "domElements": 270,
-      "resourceCount": 240,
-      "resourceSizeKB": 6988
+      "resourceCount": 244,
+      "resourceSizeKB": 7101
     },
     {
       "name": "cases-overview",
@@ -61,10 +61,12 @@
       "file": "cases-overview.png",
       "consoleErrors": [
         "Failed to load resource: the server responded with a status of 400 (Bad Request)",
-        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
-        "[SimilarCases] Error: Error: Failed to load similar cases: 500\n    at loadSimilarCases (http://localhost:5173/src/lib/components/legal/SimilarCasesPanel.svelte:106:11)",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Unhandled promise rejection: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/cache-service.svelte",
+        "Unhandled promise rejection: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/cache-service.svelte",
         "Unhandled promise rejection: TypeError: (data.evidence ?? []) is not iterable\n\n\tin $effect\n\tin +page.svelte\n\tin +layout.svelte\n\tin ErrorBoundary.svelte\n\tin +layout.svelte\n\tin +layout.svelte\n\tin root.s",
-        "ErrorBoundary caught error: TypeError: (data.evidence ?? []) is not iterable\n\n\tin $effect\n\tin +page.svelte\n\tin +layout.svelte\n\tin ErrorBoundary.svelte\n\tin +layout.svelte\n\tin +layout.svelte\n\tin root.sv",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+        "[SimilarCases] Error: Error: Failed to load similar cases: 500\n    at loadSimilarCases (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/legal/Simila",
         "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
       ],
       "consoleWarnings": [
@@ -72,111 +74,230 @@
         "WebGPU: No adapter available",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
-      "failedRequests": [],
-      "loadTimeMs": 2241,
-      "domElements": 285,
-      "resourceCount": 175,
-      "resourceSizeKB": 6313
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/cases/test-id/overview/__data.json?x-sveltekit-invalidated=1101",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/idb-keyval.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 2060,
+      "domElements": 384,
+      "resourceCount": 179,
+      "resourceSizeKB": 6409
     },
     {
       "name": "cases-board",
       "path": "/cases/test-id/board",
       "url": "http://localhost:5173/cases/test-id/board",
       "status": 200,
-      "ok": true,
-      "error": null,
+      "ok": false,
+      "error": "SvelteKit error page rendered",
       "file": "cases-board.png",
       "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
         "Failed to load resource: the server responded with a status of 400 (Bad Request)",
-        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
-        "[board-persistence] IndexedDB save failed: DataCloneError: Failed to execute 'put' on 'IDBObjectStore': [object Array] could not be cloned.\n    at Proxy.<anonymous> (http://localhost:5173/node_modules"
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Unhandled promise rejection: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/cache-service.svelte",
+        "Client error: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.svelte-kit/generated/client/nodes/34.js",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "Client error: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.svelte-kit/generated/client/nodes/34.js",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Unhandled promise rejection: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/cache-service.svelte",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "Client error: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.svelte-kit/generated/client/nodes/34.js",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Unhandled promise rejection: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/cache-service.svelte"
       ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "The next HMR update will cause the page to reload",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s",
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The next HMR update will cause the page to reload",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s",
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The next HMR update will cause the page to reload",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
-      "failedRequests": [],
-      "loadTimeMs": 5044,
-      "domElements": 390,
-      "resourceCount": 167,
-      "resourceSizeKB": 6426
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/fuse__js.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/idb-keyval.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/cases/test-id/board",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/fuse__js.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/idb-keyval.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/cases/test-id/board",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/fuse__js.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/idb-keyval.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 2829,
+      "domElements": 184,
+      "resourceCount": 452,
+      "resourceSizeKB": 12705
     },
     {
       "name": "cases-list",
       "path": "/cases",
       "url": "http://localhost:5173/cases",
       "status": 200,
-      "ok": true,
-      "error": null,
+      "ok": false,
+      "error": "SvelteKit error page rendered",
       "file": "cases-list.png",
       "consoleErrors": [
-        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Client error: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.svelte-kit/generated/client/nodes/30.js"
       ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "The next HMR update will cause the page to reload",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
-      "failedRequests": [],
-      "loadTimeMs": 1993,
-      "domElements": 340,
-      "resourceCount": 155,
-      "resourceSizeKB": 6118
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/idb-keyval.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 1006,
+      "domElements": 183,
+      "resourceCount": 135,
+      "resourceSizeKB": 3814
     },
     {
       "name": "dashboard",
       "path": "/dashboard",
       "url": "http://localhost:5173/dashboard",
       "status": 200,
-      "ok": true,
-      "error": null,
+      "ok": false,
+      "error": "SvelteKit error page rendered",
       "file": "dashboard.png",
       "consoleErrors": [
-        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Client error: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.svelte-kit/generated/client/nodes/49.js"
       ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "The next HMR update will cause the page to reload",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
-      "failedRequests": [],
-      "loadTimeMs": 2136,
-      "domElements": 746,
-      "resourceCount": 190,
-      "resourceSizeKB": 6595
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/fuse__js.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 2157,
+      "domElements": 182,
+      "resourceCount": 163,
+      "resourceSizeKB": 4047
     },
     {
       "name": "citations",
       "path": "/citations",
       "url": "http://localhost:5173/citations",
       "status": 200,
-      "ok": true,
-      "error": null,
+      "ok": false,
+      "error": "SvelteKit error page rendered",
       "file": "citations.png",
       "consoleErrors": [
-        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Client error: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.svelte-kit/generated/client/nodes/42.js",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Client error: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.svelte-kit/generated/client/nodes/42.js"
       ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "The next HMR update will cause the page to reload",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s",
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The next HMR update will cause the page to reload",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
-      "failedRequests": [],
-      "loadTimeMs": 4506,
-      "domElements": 295,
-      "resourceCount": 208,
-      "resourceSizeKB": 7012
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/fuse__js.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/citations",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/fuse__js.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 1742,
+      "domElements": 183,
+      "resourceCount": 358,
+      "resourceSizeKB": 9278
     },
     {
       "name": "evidence-upload",
@@ -188,6 +309,8 @@
       "file": "evidence-upload.png",
       "consoleErrors": [
         "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Unhandled promise rejection: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/cache-service.svelte",
         "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
       ],
       "consoleWarnings": [
@@ -195,13 +318,19 @@
         "WebGPU: No adapter available",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
-      "failedRequests": [],
-      "loadTimeMs": 1320,
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/idb-keyval.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 1119,
       "domElements": 284,
-      "resourceCount": 159,
-      "resourceSizeKB": 6101
+      "resourceCount": 163,
+      "resourceSizeKB": 6195
     },
     {
       "name": "active-cases",
@@ -219,13 +348,13 @@
         "WebGPU: No adapter available",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1995,
-      "domElements": 471,
-      "resourceCount": 160,
-      "resourceSizeKB": 6237
+      "loadTimeMs": 1223,
+      "domElements": 541,
+      "resourceCount": 164,
+      "resourceSizeKB": 6340
     },
     {
       "name": "analysis-center",
@@ -243,13 +372,13 @@
         "WebGPU: No adapter available",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1522,
+      "loadTimeMs": 1400,
       "domElements": 464,
-      "resourceCount": 182,
-      "resourceSizeKB": 6969
+      "resourceCount": 186,
+      "resourceSizeKB": 7071
     },
     {
       "name": "command-center",
@@ -270,13 +399,13 @@
         "WebGPU: No adapter available",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2133,
+      "loadTimeMs": 2127,
       "domElements": 632,
-      "resourceCount": 186,
-      "resourceSizeKB": 6443
+      "resourceCount": 190,
+      "resourceSizeKB": 6543
     },
     {
       "name": "evidence-library",
@@ -294,13 +423,13 @@
         "WebGPU: No adapter available",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
       "failedRequests": [],
-      "loadTimeMs": 4349,
+      "loadTimeMs": 3972,
       "domElements": 351,
-      "resourceCount": 173,
-      "resourceSizeKB": 6490
+      "resourceCount": 177,
+      "resourceSizeKB": 6589
     },
     {
       "name": "global-search",
@@ -318,37 +447,45 @@
         "WebGPU: No adapter available",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1446,
+      "loadTimeMs": 1115,
       "domElements": 330,
-      "resourceCount": 177,
-      "resourceSizeKB": 6583
+      "resourceCount": 181,
+      "resourceSizeKB": 6681
     },
     {
       "name": "admin-dev-tools",
       "path": "/admin/dev-tools",
       "url": "http://localhost:5173/admin/dev-tools",
       "status": 200,
-      "ok": true,
-      "error": null,
+      "ok": false,
+      "error": "SvelteKit error page rendered",
       "file": "admin-dev-tools.png",
       "consoleErrors": [
-        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Client error: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.svelte-kit/generated/client/nodes/16.js"
       ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "The next HMR update will cause the page to reload",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
-      "failedRequests": [],
-      "loadTimeMs": 1715,
-      "domElements": 382,
-      "resourceCount": 206,
-      "resourceSizeKB": 7078
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/idb-keyval.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 1090,
+      "domElements": 182,
+      "resourceCount": 184,
+      "resourceSizeKB": 6537
     },
     {
       "name": "admin-knowledge-search",
@@ -366,13 +503,13 @@
         "WebGPU: No adapter available",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1492,
+      "loadTimeMs": 1012,
       "domElements": 266,
-      "resourceCount": 148,
-      "resourceSizeKB": 6001
+      "resourceCount": 152,
+      "resourceSizeKB": 6097
     },
     {
       "name": "admin-codebase-viewer",
@@ -390,13 +527,13 @@
         "WebGPU: No adapter available",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2145,
+      "loadTimeMs": 1158,
       "domElements": 834,
-      "resourceCount": 165,
-      "resourceSizeKB": 6430
+      "resourceCount": 169,
+      "resourceSizeKB": 6528
     },
     {
       "name": "system-configuration",
@@ -414,37 +551,63 @@
         "WebGPU: No adapter available",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1800,
+      "loadTimeMs": 1123,
       "domElements": 323,
-      "resourceCount": 156,
-      "resourceSizeKB": 6120
+      "resourceCount": 160,
+      "resourceSizeKB": 6227
     },
     {
       "name": "terminal",
       "path": "/terminal",
       "url": "http://localhost:5173/terminal",
       "status": 200,
-      "ok": true,
-      "error": null,
+      "ok": false,
+      "error": "SvelteKit error page rendered",
       "file": "terminal.png",
       "consoleErrors": [
-        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Client error: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.svelte-kit/generated/client/nodes/93.js",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Client error: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.svelte-kit/generated/client/nodes/93.js"
       ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "The next HMR update will cause the page to reload",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s",
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The next HMR update will cause the page to reload",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
-      "failedRequests": [],
-      "loadTimeMs": 4238,
-      "domElements": 344,
-      "resourceCount": 154,
-      "resourceSizeKB": 6065
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/fuse__js.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/terminal",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/fuse__js.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 3860,
+      "domElements": 183,
+      "resourceCount": 286,
+      "resourceSizeKB": 7885
     },
     {
       "name": "admin-cache",
@@ -462,13 +625,13 @@
         "WebGPU: No adapter available",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2098,
+      "loadTimeMs": 3277,
       "domElements": 484,
-      "resourceCount": 151,
-      "resourceSizeKB": 6043
+      "resourceCount": 155,
+      "resourceSizeKB": 6138
     },
     {
       "name": "analytics",
@@ -486,23 +649,817 @@
         "WebGPU: No adapter available",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1880,
+      "loadTimeMs": 1026,
       "domElements": 290,
-      "resourceCount": 144,
-      "resourceSizeKB": 5947
+      "resourceCount": 148,
+      "resourceSizeKB": 6041
+    },
+    {
+      "name": "cases-new",
+      "path": "/cases/new",
+      "url": "http://localhost:5173/cases/new",
+      "status": 200,
+      "ok": false,
+      "error": "SvelteKit error page rendered",
+      "file": "cases-new.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Client error: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.svelte-kit/generated/client/nodes/31.js",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Client error: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.svelte-kit/generated/client/nodes/31.js",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The next HMR update will cause the page to reload",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s",
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The next HMR update will cause the page to reload",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/sveltekit-superforms_client.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/sveltekit-superforms_adapters.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/cases/new",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/cases/new",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/cases/new",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/sveltekit-superforms_client.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/sveltekit-superforms_adapters.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 1872,
+      "domElements": 182,
+      "resourceCount": 261,
+      "resourceSizeKB": 7444
+    },
+    {
+      "name": "cases-detail",
+      "path": "/cases/test-id",
+      "url": "http://localhost:5173/cases/test-id",
+      "status": 200,
+      "ok": false,
+      "error": "SvelteKit error page rendered",
+      "file": "cases-detail.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Client error: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.svelte-kit/generated/client/nodes/32.js",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Unhandled promise rejection: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/cache-service.svelte"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The next HMR update will cause the page to reload",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/svelte-tiptap.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/idb-keyval.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 1128,
+      "domElements": 183,
+      "resourceCount": 220,
+      "resourceSizeKB": 7384
+    },
+    {
+      "name": "cases-ai",
+      "path": "/cases/test-id/ai",
+      "url": "http://localhost:5173/cases/test-id/ai",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "cases-ai.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Unhandled promise rejection: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/cache-service.svelte",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/idb-keyval.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 1065,
+      "domElements": 275,
+      "resourceCount": 161,
+      "resourceSizeKB": 6143
+    },
+    {
+      "name": "cases-chat",
+      "path": "/cases/test-id/chat",
+      "url": "http://localhost:5173/cases/test-id/chat",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "cases-chat.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Unhandled promise rejection: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/cache-service.svelte",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/idb-keyval.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 2125,
+      "domElements": 409,
+      "resourceCount": 165,
+      "resourceSizeKB": 6223
+    },
+    {
+      "name": "cases-notes",
+      "path": "/cases/test-id/notes",
+      "url": "http://localhost:5173/cases/test-id/notes",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "cases-notes.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Unhandled promise rejection: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/cache-service.svelte",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/idb-keyval.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 1229,
+      "domElements": 266,
+      "resourceCount": 162,
+      "resourceSizeKB": 6219
+    },
+    {
+      "name": "cases-persons",
+      "path": "/cases/test-id/persons",
+      "url": "http://localhost:5173/cases/test-id/persons",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "cases-persons.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Unhandled promise rejection: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/cache-service.svelte",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/idb-keyval.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 1153,
+      "domElements": 272,
+      "resourceCount": 162,
+      "resourceSizeKB": 6151
+    },
+    {
+      "name": "cases-reports",
+      "path": "/cases/test-id/reports",
+      "url": "http://localhost:5173/cases/test-id/reports",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "cases-reports.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Unhandled promise rejection: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/cache-service.svelte",
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/idb-keyval.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 4123,
+      "domElements": 314,
+      "resourceCount": 165,
+      "resourceSizeKB": 6161
+    },
+    {
+      "name": "cases-canvas",
+      "path": "/cases/test-id/canvas",
+      "url": "http://localhost:5173/cases/test-id/canvas",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "cases-canvas.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Unhandled promise rejection: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/cache-service.svelte",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/idb-keyval.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 6124,
+      "domElements": 314,
+      "resourceCount": 161,
+      "resourceSizeKB": 6128
+    },
+    {
+      "name": "poi-create",
+      "path": "/persons-of-interest/create",
+      "url": "http://localhost:5173/persons-of-interest/create",
+      "status": 200,
+      "ok": false,
+      "error": "SvelteKit error page rendered",
+      "file": "poi-create.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Client error: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.svelte-kit/generated/client/nodes/85.js",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+        "Client error: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.svelte-kit/generated/client/nodes/85.js",
+        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The next HMR update will cause the page to reload",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s",
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The next HMR update will cause the page to reload",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/sveltekit-superforms.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/zod.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/sveltekit-superforms_adapters.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/persons-of-interest/create",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/sveltekit-superforms.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/sveltekit-superforms_adapters.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://localhost:5173/node_modules/.vite/deps/zod.js?v=727703c7",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 1728,
+      "domElements": 182,
+      "resourceCount": 259,
+      "resourceSizeKB": 6929
+    },
+    {
+      "name": "poi-list",
+      "path": "/persons-of-interest",
+      "url": "http://localhost:5173/persons-of-interest",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "poi-list.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 1291,
+      "domElements": 333,
+      "resourceCount": 253,
+      "resourceSizeKB": 7344
+    },
+    {
+      "name": "reports",
+      "path": "/reports",
+      "url": "http://localhost:5173/reports",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "reports.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 1004,
+      "domElements": 272,
+      "resourceCount": 150,
+      "resourceSizeKB": 6066
+    },
+    {
+      "name": "reports-new",
+      "path": "/reports/new",
+      "url": "http://localhost:5173/reports/new",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "reports-new.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 1030,
+      "domElements": 348,
+      "resourceCount": 152,
+      "resourceSizeKB": 6129
+    },
+    {
+      "name": "recommendations",
+      "path": "/recommendations",
+      "url": "http://localhost:5173/recommendations",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "recommendations.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "[RecommendationWidget] Fetch error: Error: Recommendation fetch failed: 400\n    at fetchRecommendations (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/compon",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 1256,
+      "domElements": 358,
+      "resourceCount": 154,
+      "resourceSizeKB": 6249
+    },
+    {
+      "name": "evidence-analyze",
+      "path": "/evidence/analyze",
+      "url": "http://localhost:5173/evidence/analyze",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "evidence-analyze.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 4375,
+      "domElements": 331,
+      "resourceCount": 175,
+      "resourceSizeKB": 6214
+    },
+    {
+      "name": "evidence-manage",
+      "path": "/evidence/manage",
+      "url": "http://localhost:5173/evidence/manage",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "evidence-manage.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 1166,
+      "domElements": 462,
+      "resourceCount": 151,
+      "resourceSizeKB": 6047
+    },
+    {
+      "name": "evidence-upload-direct",
+      "path": "/evidence/upload",
+      "url": "http://localhost:5173/evidence/upload",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "evidence-upload-direct.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 1940,
+      "domElements": 260,
+      "resourceCount": 151,
+      "resourceSizeKB": 6085
+    },
+    {
+      "name": "admin-ai-dashboard",
+      "path": "/admin/ai-dashboard",
+      "url": "http://localhost:5173/admin/ai-dashboard",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "admin-ai-dashboard.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 503 (Service Unavailable)",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 4256,
+      "domElements": 445,
+      "resourceCount": 249,
+      "resourceSizeKB": 7983
+    },
+    {
+      "name": "admin-all-routes",
+      "path": "/admin/all-routes",
+      "url": "http://localhost:5173/admin/all-routes",
+      "status": 0,
+      "ok": false,
+      "error": "page.goto: Timeout 15000ms exceeded.",
+      "file": "admin-all-routes-ERROR.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 15019,
+      "domElements": 0,
+      "resourceCount": 0,
+      "resourceSizeKB": 0
+    },
+    {
+      "name": "admin-error-brain",
+      "path": "/admin/error-brain",
+      "url": "http://localhost:5173/admin/error-brain",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "admin-error-brain.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 4149,
+      "domElements": 369,
+      "resourceCount": 184,
+      "resourceSizeKB": 6357
+    },
+    {
+      "name": "admin-phase89",
+      "path": "/admin/phase89",
+      "url": "http://localhost:5173/admin/phase89",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "admin-phase89.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2154,
+      "domElements": 308,
+      "resourceCount": 152,
+      "resourceSizeKB": 6207
+    },
+    {
+      "name": "admin-component-analysis",
+      "path": "/admin/component-analysis",
+      "url": "http://localhost:5173/admin/component-analysis",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "admin-component-analysis.png",
+      "consoleErrors": [
+        "Uncaught error: Svelte error: state_unsafe_mutation\nUpdating state inside `$derived(...)`, `$inspect(...)` or a template expression is forbidden. If the value should not be reactive, declare it withou",
+        "ErrorBoundary caught error: Svelte error: state_unsafe_mutation\nUpdating state inside `$derived(...)`, `$inspect(...)` or a template expression is forbidden. If the value should not be reactive, decla"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2076,
+      "domElements": 287,
+      "resourceCount": 154,
+      "resourceSizeKB": 6331
+    },
+    {
+      "name": "demos-index",
+      "path": "/demos",
+      "url": "http://localhost:5173/demos",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "demos-index.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 943,
+      "domElements": 408,
+      "resourceCount": 148,
+      "resourceSizeKB": 6042
+    },
+    {
+      "name": "demos-keyboard-shortcuts",
+      "path": "/demos/keyboard-shortcuts",
+      "url": "http://localhost:5173/demos/keyboard-shortcuts",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "demos-keyboard-shortcuts.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 993,
+      "domElements": 365,
+      "resourceCount": 149,
+      "resourceSizeKB": 6045
+    },
+    {
+      "name": "demos-icons",
+      "path": "/demos/icons",
+      "url": "http://localhost:5173/demos/icons",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "demos-icons.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 958,
+      "domElements": 350,
+      "resourceCount": 149,
+      "resourceSizeKB": 6017
+    },
+    {
+      "name": "demos-memory-palace",
+      "path": "/demos/memory-palace",
+      "url": "http://localhost:5173/demos/memory-palace",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "demos-memory-palace.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2999,
+      "domElements": 309,
+      "resourceCount": 156,
+      "resourceSizeKB": 6215
+    },
+    {
+      "name": "demos-vector-search",
+      "path": "/demos/vector-search",
+      "url": "http://localhost:5173/demos/vector-search",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "demos-vector-search.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/@fs/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/s"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 946,
+      "domElements": 269,
+      "resourceCount": 150,
+      "resourceSizeKB": 6075
     }
   ],
   "summary": {
-    "passed": 20,
-    "failed": 0,
-    "total": 20,
-    "avgLoadMs": 2576,
-    "slowestRoute": "evidence",
-    "slowestLoadMs": 5307,
-    "totalConsoleErrors": 31,
-    "totalNetworkFailures": 0
+    "passed": 36,
+    "failed": 10,
+    "total": 46,
+    "avgLoadMs": 2342,
+    "slowestRoute": "admin-all-routes",
+    "slowestLoadMs": 15019,
+    "totalConsoleErrors": 122,
+    "totalNetworkFailures": 42
   }
 }

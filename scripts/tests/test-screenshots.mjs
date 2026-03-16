@@ -45,16 +45,50 @@ const ALL_ROUTES = [
   { name: 'terminal', path: '/terminal' },
   { name: 'admin-cache', path: '/admin/cache' },
   { name: 'analytics', path: '/analytics' },
+  // ── Expanded routes (session 101+) ──
+  { name: 'cases-new', path: '/cases/new' },
+  { name: 'cases-detail', path: '/cases/test-id' },
+  { name: 'cases-ai', path: '/cases/test-id/ai' },
+  { name: 'cases-chat', path: '/cases/test-id/chat' },
+  { name: 'cases-notes', path: '/cases/test-id/notes' },
+  { name: 'cases-persons', path: '/cases/test-id/persons' },
+  { name: 'cases-reports', path: '/cases/test-id/reports' },
+  { name: 'cases-canvas', path: '/cases/test-id/canvas' },
+  { name: 'poi-create', path: '/persons-of-interest/create' },
+  { name: 'poi-list', path: '/persons-of-interest' },
+  { name: 'reports', path: '/reports' },
+  { name: 'reports-new', path: '/reports/new' },
+  { name: 'recommendations', path: '/recommendations' },
+  { name: 'evidence-analyze', path: '/evidence/analyze' },
+  { name: 'evidence-manage', path: '/evidence/manage' },
+  { name: 'evidence-upload-direct', path: '/evidence/upload' },
+  { name: 'admin-ai-dashboard', path: '/admin/ai-dashboard' },
+  { name: 'admin-all-routes', path: '/admin/all-routes' },
+  { name: 'admin-error-brain', path: '/admin/error-brain' },
+  { name: 'admin-phase89', path: '/admin/phase89' },
+  { name: 'admin-component-analysis', path: '/admin/component-analysis' },
+  { name: 'demos-index', path: '/demos' },
+  { name: 'demos-keyboard-shortcuts', path: '/demos/keyboard-shortcuts' },
+  { name: 'demos-icons', path: '/demos/icons' },
+  { name: 'demos-memory-palace', path: '/demos/memory-palace' },
+  { name: 'demos-vector-search', path: '/demos/vector-search' },
 ];
 
 // SSE / long-poll pages that never reach networkidle
-const SSE_PAGES = new Set(['cases-overview', 'dashboard', 'command-center']);
+const SSE_PAGES = new Set([
+  'cases-overview', 'dashboard', 'command-center', 'cases-chat',
+  'admin-all-routes', 'admin-phase89', 'admin-component-analysis',
+]);
 
 // CSR-only pages (ssr = false) need extra wait for client JS to render
-const CSR_PAGES = new Set(['evidence-library', 'evidence', 'terminal']);
+const CSR_PAGES = new Set([
+  'evidence-library', 'evidence', 'terminal',
+  'admin-ai-dashboard', 'admin-error-brain',
+  'cases-canvas', 'cases-reports', 'evidence-analyze',
+]);
 
 // Pages with complex canvas/WebGL rendering need extra initialization time
-const CANVAS_PAGES = new Set(['cases-board']);
+const CANVAS_PAGES = new Set(['cases-board', 'cases-canvas', 'demos-memory-palace']);
 
 // ── CLI args ───────────────────────────────────────────────────────
 const args = process.argv.slice(2);
@@ -187,14 +221,41 @@ for (const route of routes) {
     await tab.screenshot({ path: filepath, fullPage: true });
     result.file = filepath;
   } catch (err) {
-    result.loadTimeMs = Date.now() - loadStart;
-    result.error = err.message.split('\n')[0];
-    // Try screenshot even on error
-    try {
-      const filepath = path.join(outDir, `${route.name}-ERROR.png`);
-      await tab.screenshot({ path: filepath, fullPage: true });
-      result.file = filepath;
-    } catch { /* ignore */ }
+    const errMsg = err.message.split('\n')[0];
+    // Retry once on connection refused (server crashed or Vite restarting)
+    if (errMsg.includes('ERR_CONNECTION_REFUSED') || errMsg.includes('ERR_CONNECTION_RESET')) {
+      await new Promise(r => setTimeout(r, 3000)); // Wait for server recovery
+      try {
+        const response2 = await tab.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
+        await tab.waitForTimeout(2000);
+        result.loadTimeMs = Date.now() - loadStart;
+        result.status = response2?.status() ?? 0;
+        result.ok = result.status >= 200 && result.status < 400;
+        result.resourceCount = resourceCount;
+        result.domElements = await tab.evaluate(() => document.querySelectorAll('*').length).catch(() => 0);
+        const filepath = path.join(outDir, `${route.name}.png`);
+        await tab.screenshot({ path: filepath, fullPage: true });
+        result.file = filepath;
+        result.error = null;
+      } catch (retryErr) {
+        result.loadTimeMs = Date.now() - loadStart;
+        result.error = `retry failed: ${retryErr.message.split('\n')[0]}`;
+        try {
+          const filepath = path.join(outDir, `${route.name}-ERROR.png`);
+          await tab.screenshot({ path: filepath, fullPage: true });
+          result.file = filepath;
+        } catch { /* ignore */ }
+      }
+    } else {
+      result.loadTimeMs = Date.now() - loadStart;
+      result.error = errMsg;
+      // Try screenshot even on error
+      try {
+        const filepath = path.join(outDir, `${route.name}-ERROR.png`);
+        await tab.screenshot({ path: filepath, fullPage: true });
+        result.file = filepath;
+      } catch { /* ignore */ }
+    }
   }
 
   // Console output line
@@ -207,6 +268,11 @@ for (const route of routes) {
   console.log(`  [${icon}] ${result.status} ${route.name} — ${route.path} (${metrics}${errTag}${netTag})${result.error ? ` — ${result.error}` : ''}`);
   results.push(result);
   await tab.close();
+
+  // Delay between routes to prevent Vite dep optimizer overload (504 Outdated Optimize Dep)
+  if (routes.length > 10) {
+    await new Promise(r => setTimeout(r, 500));
+  }
 }
 
 await browser.close();

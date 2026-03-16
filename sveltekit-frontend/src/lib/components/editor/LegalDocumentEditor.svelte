@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+    import { browser } from '$app/environment';
   import { fade, fly } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
 
@@ -53,6 +53,7 @@
   let isSaving = $state<boolean>(false);
   let saveError = $state<string>("");
   let hasUnsavedChanges = $state<boolean>(false);
+	let actionMessage = $state<string>("");
 
   interface DocumentData {
     id: string;
@@ -193,6 +194,77 @@
     }
   }
 
+    function escapeHtml(value: string) {
+        return value
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#39;');
+    }
+
+    function openPreview() {
+        if (!browser) return;
+
+        const previewWindow = window.open('', '_blank', 'noopener,noreferrer');
+        if (!previewWindow) {
+            saveError = 'Preview window was blocked by the browser.';
+            return;
+        }
+
+        const safeTitle = escapeHtml(title);
+        const safeContent = escapeHtml(content).replace(/\n/g, '<br>');
+        previewWindow.document.write(`<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>${safeTitle}</title>
+<style>
+body { font-family: Georgia, serif; margin: 40px; color: #111827; line-height: 1.6; }
+h1 { margin-bottom: 0.5rem; }
+.meta { color: #6b7280; font-size: 0.9rem; margin-bottom: 1.5rem; }
+.content { white-space: normal; }
+</style>
+</head>
+<body>
+<h1>${safeTitle}</h1>
+<p class="meta">${caseId ? `Case ${escapeHtml(caseId)}` : 'Standalone document'}</p>
+<div class="content">${safeContent || '<em>No content yet.</em>'}</div>
+</body>
+</html>`);
+        previewWindow.document.close();
+        actionMessage = 'Preview opened in a new window.';
+        saveError = '';
+    }
+
+    async function shareDocument() {
+        if (!browser) return;
+
+        const shareText = `${title}${caseId ? `\nCase: ${caseId}` : ''}\n\n${content}`.trim();
+        try {
+            if (!navigator.clipboard?.writeText) {
+                throw new Error('Clipboard access is unavailable in this browser.');
+            }
+
+            await navigator.clipboard.writeText(shareText);
+            actionMessage = 'Document copied to clipboard.';
+            saveError = '';
+        } catch (err) {
+            saveError = err instanceof Error ? err.message : 'Failed to copy document.';
+        }
+    }
+
+    function clearDraft() {
+        if (!browser || readonly) return;
+        if (!window.confirm('Clear the current draft content?')) return;
+
+        content = '';
+        citations = [];
+        hasUnsavedChanges = true;
+        actionMessage = 'Draft cleared locally. Save to persist the change.';
+        saveError = '';
+    }
+
   async function loadDocument() {
     if (!documentId) return;
     loadingDocument = true;
@@ -279,15 +351,15 @@
                     </Button>
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Content>
-                    <DropdownMenu.Item onclick={() => console.log('Preview')}>
+                    <DropdownMenu.Item onclick={openPreview}>
                         <span class="i-lucide-eye mr-2 h-4 w-4 inline-block"></span> Preview
                     </DropdownMenu.Item>
-                    <DropdownMenu.Item onclick={() => console.log('Share')}>
+                    <DropdownMenu.Item onclick={shareDocument}>
                         <span class="i-lucide-share-2 mr-2 h-4 w-4 inline-block"></span> Share
                     </DropdownMenu.Item>
                     <DropdownMenu.Separator />
-                    <DropdownMenu.Item onclick={() => console.log('Delete')}>
-                        <span class="text-danger flex items-center"><span class="i-lucide-x mr-2 h-4 w-4 inline-block"></span> Delete</span>
+                    <DropdownMenu.Item onclick={clearDraft}>
+                        <span class="text-danger flex items-center"><span class="i-lucide-eraser mr-2 h-4 w-4 inline-block"></span> Clear Draft</span>
                     </DropdownMenu.Item>
                 </DropdownMenu.Content>
             </DropdownMenu.Root>
@@ -301,6 +373,12 @@
             </Button>
         </div>
     </header>
+
+    {#if actionMessage}
+        <div class="mb-4 rounded border border-accent/30 bg-accent/5 px-3 py-2 text-sm text-accent">
+            {actionMessage}
+        </div>
+    {/if}
 
     <main class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Editor Area -->

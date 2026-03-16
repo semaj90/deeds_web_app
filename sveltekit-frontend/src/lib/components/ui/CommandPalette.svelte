@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import Fuse from 'fuse.js';
   import Icon from '$lib/components/ui/Icon.svelte';
   import { cn } from '$lib/utils';
@@ -59,7 +60,7 @@
       description: 'Start a new legal case',
       icon: 'briefcase',
       category: 'Actions',
-      action: () => console.log('Create new case'),
+      href: '/cases?create=true',
       shortcut: ['⌘', 'N']
     },
     {
@@ -68,7 +69,7 @@
       description: 'Add new evidence to a case',
       icon: 'file',
       category: 'Actions',
-      action: () => console.log('Upload evidence'),
+      href: '/evidence?upload=quick',
       shortcut: ['⌘', 'U']
     },
     // Settings
@@ -86,7 +87,7 @@
       description: 'Configure system preferences',
       icon: 'settings',
       category: 'Settings',
-      href: '/settings'
+      href: '/system-configuration'
     }
   ];
 
@@ -140,7 +141,7 @@
 
   function selectItem(item: CommandItem) {
     if (item.href) {
-      window.location.href = item.href;
+      void goto(item.href);
     } else if (item.action) {
       item.action();
     }

@@ -233,7 +233,10 @@ export const load = async () => {
   // ─────────────────────────────────────────────────────────
 
   try {
-    routes = await enrichRoutesWithDatabase(routes);
+    routes = await Promise.race([
+      enrichRoutesWithDatabase(routes),
+      new Promise<RouteNode[]>((resolve) => setTimeout(() => resolve(routes), 3000))
+    ]);
   } catch (error) {
     console.error('[Phase 6] Database enrichment error:', error);
   }

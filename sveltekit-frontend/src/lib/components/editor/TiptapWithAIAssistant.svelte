@@ -74,6 +74,16 @@ $effect(() => {
 	};
 });
 
+// Sync initialContent changes into existing editor instance
+$effect(() => {
+	if (editor && initialContent !== undefined) {
+		const currentHtml = editor.getHTML();
+		if (initialContent !== currentHtml) {
+			editor.commands.setContent(initialContent, false);
+		}
+	}
+});
+
 async function handleSave() {
 if (!editor || !onSave) return;
 

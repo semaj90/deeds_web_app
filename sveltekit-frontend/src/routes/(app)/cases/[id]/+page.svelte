@@ -35,6 +35,7 @@ import CollaborationPanel from '$lib/components/legal/CollaborationPanel.svelte'
 import CaseEvidenceOrganizer from '$lib/components/evidence/CaseEvidenceOrganizer.svelte';
 import EvidenceUploadButton from '$lib/components/evidence/EvidenceUploadButton.svelte';
 import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
+import type { BoardSnapshotSchema } from '$lib/schemas/board';
  import { CacheStrategies, useCache } from '$lib/cache/cache-service.svelte';
  import NesModal from '$lib/components/nes/NesModal.svelte';
 
@@ -72,6 +73,10 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  let typingPrompts = $state<string[]>([]);
  let showIdleRecommendations = $state(false);
  let idleRecommendationQuery = $state('');
+ let canvasState = $state<BoardSnapshotSchema | null>(null);
+ let isLoadingCanvas = $state(false);
+ let canvasError = $state('');
+ let hasLoadedCanvas = $state(false);
 
  // Case Intelligence Hub state
  let ragResults = $state<any[]>([]);
@@ -167,9 +172,10 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  let selectedStatute = $state<any>(null);
  let showStatuteModal = $state(false);
 
- const caseId = page.params.id;
+ let caseId = $derived(page.params.id ?? '');
+ let initializedCaseId = $state('');
 
- const theoryQuickActions: QuickAction[] = [
+ let theoryQuickActions = $derived<QuickAction[]>([
    {
      id: 'timeline-analysis',
      icon: 'bar-chart-2',
@@ -210,11 +216,23 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
        activeTab = 'document';
      }
    }
- ];
+ ]);
 
- onMount(async () => {
- await loadCase();
- await Promise.all([loadEvidence(), loadCitations(), loadStatutes(), loadSimilarCases()]);
+ $effect(() => {
+  if (!caseId || initializedCaseId === caseId) return;
+
+  initializedCaseId = caseId;
+  void (async () => {
+    isLoading = true;
+    await loadCase();
+    await Promise.all([loadEvidence(), loadCitations(), loadStatutes(), loadSimilarCases()]);
+  })();
+ });
+
+ $effect(() => {
+    if (activeTab === 'canvas' && !hasLoadedCanvas) {
+      void loadCanvasState();
+    }
  });
 
  const loadCase = async () => {
@@ -303,6 +321,49 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  } finally {
  isLoading = false;
  }
+ };
+
+ const loadCanvasState = async () => {
+    isLoadingCanvas = true;
+    canvasError = '';
+
+    try {
+      const response = await fetch(`/api/cases/${caseId}/canvas`);
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        canvasState = null;
+        canvasError = data?.error ?? 'Failed to load canvas';
+        return;
+      }
+
+      canvasState = data;
+    } catch (err) {
+      canvasState = null;
+      canvasError = err instanceof Error ? err.message : 'Failed to load canvas';
+    } finally {
+      hasLoadedCanvas = true;
+      isLoadingCanvas = false;
+    }
+ };
+
+ const saveCanvasState = async (state: BoardSnapshotSchema) => {
+    canvasError = '';
+
+    const response = await fetch(`/api/cases/${caseId}/canvas`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state)
+    });
+
+    const data = await response.json().catch(() => null);
+    if (!response.ok) {
+      canvasError = data?.error ?? 'Failed to save canvas';
+      throw new Error(canvasError);
+    }
+
+    canvasState = state;
+    hasLoadedCanvas = true;
  };
 
  const loadCitations = async () => {
@@ -937,13 +998,23 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  />
  {:else if activeTab === 'canvas'}
  <!-- Evidence Canvas Tab -->
+ <div class="bg-white rounded-lg shadow p-6">
+ {#if canvasError}
+ <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+ {canvasError}
+ </div>
+ {/if}
+ {#if isLoadingCanvas}
+ <p class="mb-4 text-sm text-gray-500">Loading saved canvas...</p>
+ {/if}
  <CanvasEditor
-   canvasState={null}
+   {canvasState}
    reportId={caseId}
    evidence={evidence.map(e => ({ id: e.id, title: e.fileName, evidenceType: e.documentType }))}
    citationPoints={citations.map(c => ({ id: c.id, source: c.citationText ?? 'Citation' }))}
-   save={async (state) => { console.log('Canvas state saved:', state); }}
+   save={saveCanvasState}
  />
+ </div>
  {:else if activeTab === 'summary'}
  <!-- Case Summary Editor Tab -->
  <div class="bg-white rounded-lg shadow p-6">

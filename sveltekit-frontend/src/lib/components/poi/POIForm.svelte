@@ -1,5 +1,5 @@
 <script lang="ts">
-  import superForm from 'sveltekit-superforms';
+  import { superForm } from 'sveltekit-superforms';
   import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
   import { z } from 'zod';
 
@@ -24,31 +24,31 @@
   let { formData }: Props = $props();
 
   // svelte-ignore state_referenced_locally
-  const { form, errors, enhance, submitting, message } = superForm(formData, {
+  const { form, errors, enhance, submitting } = superForm(formData, {
     validators: zodClient(poiSchema),
     resetForm: false
   });
 
   const statusOptions = [
     { value: 'person_of_interest', label: 'Person of Interest' },
-	{ value: 'witness', label: 'Witness' },
-	{ value: 'suspect', label: 'Suspect' },
-	{ value: 'victim', label: 'Victim' },
-	{ value: 'informant', label: 'Informant' }
+    { value: 'witness', label: 'Witness' },
+    { value: 'suspect', label: 'Suspect' },
+    { value: 'victim', label: 'Victim' },
+    { value: 'informant', label: 'Informant' }
   ];
 
   const priorityOptions = [
     { value: 'low', label: 'Low' },
-	{ value: 'medium', label: 'Medium' },
-	{ value: 'high', label: 'High' },
-	{ value: 'critical', label: 'Critical' }
+    { value: 'medium', label: 'Medium' },
+    { value: 'high', label: 'High' },
+    { value: 'critical', label: 'Critical' }
   ];
 
   const threatLevelOptions = [
     { value: 'low', label: 'Low' },
-	{ value: 'medium', label: 'Medium' },
-	{ value: 'high', label: 'High' },
-	{ value: 'extreme', label: 'Extreme' }
+    { value: 'medium', label: 'Medium' },
+    { value: 'high', label: 'High' },
+    { value: 'extreme', label: 'Extreme' }
   ];
 </script>
 
@@ -214,34 +214,35 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
-	padding: 1.5rem;
+    padding: 1.5rem;
     background: #0f0f23;
-	border: 1px solid #dc2626;
+    border: 1px solid #dc2626;
     border-radius: 0.5rem;
   }
 
   .form-group {
     display: flex;
     flex-direction: column;
-	gap: 0.5rem;
+    gap: 0.5rem;
   }
 
   label {
     font-weight: 600;
-	color: #ffffff;
+    color: #ffffff;
     font-size: 0.875rem;
   }
 
   input,
   select,
-  textarea { padding: 0.75rem;
-		background: #1a1a2e;
+  textarea {
+    padding: 0.75rem;
+    background: #1a1a2e;
     border: 1px solid #333;
     border-radius: 0.375rem;
-	color: #ffffff;
+    color: #ffffff;
     font-family: inherit;
     font-size: 0.875rem;
-	transition: border-color 0.2s;
+    transition: border-color 0.2s;
   }
 
   input:focus,
@@ -266,7 +267,7 @@
   .form-actions {
     grid-column: 1 / -1;
     display: flex;
-	gap: 1rem;
+    gap: 1rem;
     justify-content: flex-end;
     margin-top: 1rem;
   }
@@ -274,19 +275,20 @@
   .btn-primary {
     padding: 0.75rem 1.5rem;
     background: #dc2626;
-	color: #ffffff;
+    color: #ffffff;
     border: none;
     border-radius: 0.375rem;
     font-weight: 600;
-	cursor: pointer;
-    transition:background-color 0.2s;
+    cursor: pointer;
+    transition: background-color 0.2s;
   }
 
   .btn-primary:hover:not(:disabled) {
     background: #b91c1c;
   }
 
-  .btn-primary:disabled { opacity: 0.5;
-		cursor: not-allowed;
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 </style>

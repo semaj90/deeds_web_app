@@ -16,6 +16,11 @@ function getChatUrl() {
 
 test.describe('Legal AI Chat Testing', () => {
   test.beforeEach(async ({ page }) => {
+    // Bypass onboarding wizard
+    await page.addInitScript(() => {
+      window.localStorage.setItem('deeds-onboarding-completed', 'true');
+    });
+
     // Mock SSE chat endpoints with proper SSEChunk format
     await page.route('**/api/sse/**', async (route) => {
       await route.fulfill({

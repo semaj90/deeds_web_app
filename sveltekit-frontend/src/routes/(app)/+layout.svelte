@@ -7,6 +7,7 @@
 	import LegalCorpusSearch from '$lib/components/LegalCorpusSearch.svelte';
 	import ErrorBoundary from '$lib/components/ui/ErrorBoundary.svelte';
 	import { notificationStore } from '$lib/stores/unified/notification-store.svelte.js';
+	import { authStore } from '$lib/stores/auth-store.svelte.js';
 	import OfflineIndicator from '$lib/components/cache/OfflineIndicator.svelte';
 	import { initTypingDetector } from '$lib/utils/telemetry.js';
 
@@ -37,6 +38,18 @@
 			if (wizardMod) SetupWizard = wizardMod.default;
 			if (shortcutsMod) KeyboardShortcutsPanel = shortcutsMod.default;
 		} catch { /* non-fatal: optional UI components */ }
+	});
+
+	// Hydrate client-side auth store from server layout data (avoids extra /api/auth/me fetch)
+	$effect(() => {
+		if (data.user) {
+			authStore.session = {
+				user: data.user as import('$lib/stores/auth-store.svelte').AuthUser,
+				session: { id: 'server-hydrated', expiresAt: '' }
+			};
+		} else {
+			authStore.session = null;
+		}
 	});
 
 	// Initialize user activity telemetry (typing/idle detection)

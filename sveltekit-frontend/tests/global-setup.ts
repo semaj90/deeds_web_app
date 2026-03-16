@@ -50,7 +50,8 @@ export default async function globalSetup() {
 
 			if (res.ok) {
 				const payload = await res.json();
-				const id: string = payload?.data?.id ?? payload?.id;
+				// Support both standard and legalApiResponses formats
+				const id: string = payload?.data?.case?.id ?? payload?.data?.id ?? payload?.id;
 				if (id) {
 					createdIds.push(id);
 					console.log(`   ✅  Created: "${seedCase.title}" → ${id}`);

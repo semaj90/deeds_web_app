@@ -30,13 +30,21 @@ const coreRoutes = [
   '/reports',
   '/gpu-evidence-graph',
   '/error-brain',
-  '/investigate',
+  '/demos/investigate',
+  '/demos/nes-bits-ui',
 ];
 
 test.describe('Quick Routes Test', () => {
   test.use({
     ignoreHTTPSErrors: true,
     navigationTimeout: 30000,
+  });
+
+  test.beforeEach(async ({ page }) => {
+    // Bypass onboarding wizard
+    await page.addInitScript(() => {
+      window.localStorage.setItem('deeds-onboarding-completed', 'true');
+    });
   });
 
   for (const route of coreRoutes) {

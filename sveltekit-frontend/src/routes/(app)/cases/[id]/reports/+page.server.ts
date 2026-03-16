@@ -5,7 +5,8 @@ import { reports, cases } from '$lib/server/db/schema';
 import { eq, desc } from 'drizzle-orm';
 
 const safe = <T>(p: Promise<T>, fallback: T): Promise<T> =>
-	Promise.race([p, new Promise<T>((resolve) => setTimeout(() => resolve(fallback), 5000))]);
+	Promise.race([p, new Promise<T>((resolve) => setTimeout(() => resolve(fallback), 5000))])
+		.catch(() => fallback);
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	// Phase 79: Lucia v3 Authentication Guard

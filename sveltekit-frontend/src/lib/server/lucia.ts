@@ -73,7 +73,10 @@ export async function createUserSession(userId: string): Promise<CreateUserSessi
 export function setSessionCookie(cookies: Cookies, sessionId: string): void {
   console.log(`[lucia] Setting session cookie with session ID ${sessionId}`);
   const sessionCookie = lucia.createSessionCookie(sessionId);
-  cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
+  cookies.set(sessionCookie.name, sessionCookie.value, {
+    ...sessionCookie.attributes,
+    path: '/',
+  });
 }
 
 export async function hashPassword(password: string): Promise<string> {
@@ -133,7 +136,10 @@ export async function invalidateUserSessions(userId: string): Promise<void> {
 export function deleteSessionCookie(cookies: Cookies): void {
   console.log(`[lucia] Deleting session cookie`);
   const blankSessionCookie = lucia.createBlankSessionCookie();
-  cookies.set(blankSessionCookie.name, blankSessionCookie.value, blankSessionCookie.attributes);
+  cookies.set(blankSessionCookie.name, blankSessionCookie.value, {
+    ...blankSessionCookie.attributes,
+    path: '/',
+  });
 }
 
 export const clearSessionCookie = deleteSessionCookie;

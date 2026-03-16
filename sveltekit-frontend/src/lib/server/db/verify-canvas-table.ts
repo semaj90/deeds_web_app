@@ -22,7 +22,16 @@ export async function verifyCanvasStatesTable(): Promise<boolean> {
             sql`SELECT to_regclass('public.canvas_states') IS NOT NULL AS exists`
         );
 
-        canvasStatesExists = (result as any).rows?.[0]?.exists === true;
+        const firstRow = Array.isArray(result)
+          ? result[0]
+          : ((result as any).rows?.[0] ?? (result as any)[0]);
+        const existsValue = (firstRow as { exists?: unknown } | undefined)?.exists;
+
+        canvasStatesExists =
+          existsValue === true ||
+          existsValue === 't' ||
+          existsValue === 'true' ||
+          existsValue === 1;
         lastChecked = now;
 
         return canvasStatesExists;
