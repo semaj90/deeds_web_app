@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Button from '$lib/components/ui/enhanced-bits/Button.svelte';
+    import Button from '$lib/components/ui/Button.svelte';
     import documentUploadMachine from '$lib/machines/document-upload-machine';
 // Migrated to $effect
     import { fade, slide } from 'svelte/transition';
