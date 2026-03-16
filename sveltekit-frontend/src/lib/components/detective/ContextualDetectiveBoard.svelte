@@ -6,7 +6,6 @@
   import HeadlessTypingListener from '$lib/components/HeadlessTypingListener.svelte';
   import type { TypingContext, TypingState } from '$lib/machines/userTypingStateMachine';
   // WebSocket collaboration removed — was dead code (no WS server at port 3003)
-  interface CollaborativeUser { id: string; name: string; }
   // Migrated to $effect
 
   // Props interface
@@ -15,26 +14,27 @@
     initialEvidence?: unknown[];
     enableContextualPrompts?: boolean;
     enableAnalytics?: boolean;
-    mcpEndpoint?: string;
   }
 
   let {
     caseId,
     initialEvidence = [],
     enableContextualPrompts = true,
-    enableAnalytics = true,
-    mcpEndpoint = 'http://localhost:3002'
+    enableAnalytics = true
   }: Props = $props();
 
   // State
   let userInput = $state<string>('');
   let connectionMap = $state<{
-    nodes?: { type: string, label: string;
-	color: string }[];
+    nodes?: { type: string; label: string; color: string }[];
     edges?: unknown[];
     clusters?: unknown[];
   } | null>(null);
   let isGeneratingMap = $state<boolean>(false);
+  let isAnalyzing = $state<boolean>(false);
+  let analysisProgress = $state<number>(0);
+  let analysisMessage = $state<string>('');
+  let streamingTokens = $state<string>('');
   let currentTypingState = $state<TypingState>('idle');
   let typingContext = $state<TypingContext | undefined>(undefined);
   let contextualPrompts = $state<string[]>([]);
@@ -47,15 +47,12 @@
   let evidenceList = $state<unknown[]>([]);
   $effect(() => { evidenceList = initialEvidence; });
 
-  // WebSocket collaboration state (disabled — no WS server)
-  let wsManager: any = null;
+  // Collaboration state (placeholder for future SSE collaboration)
   let isConnectedToCollaboration = $state<boolean>(false);
-  let collaborativeUsers = $state<CollaborativeUser[]>([]);
   let collaborationStats = $state({
     connectedUsers: 0,
     typingUsers: 0,
-    focusDistribution: {
-evidence: 0, connections: 0, analysis: 0 }
+    focusDistribution: { evidence: 0, connections: 0, analysis: 0 }
   });
 
   // Typing behavior element binding
@@ -82,9 +79,7 @@ evidence: 0, connections: 0, analysis: 0 }
     })();
 
     return () => {
-      if (wsManager) {
-        wsManager.disconnect();
-      }
+      // cleanup placeholder
     };
   });
 
@@ -93,13 +88,52 @@ evidence: 0, connections: 0, analysis: 0 }
    */
   async function loadCaseEvidence(): Promise<void> {
     try {
-      const response = await fetch(`/api/v1/cases/${caseId}/evidence`);
+      const response = await fetch(`/api/cases/${caseId}/evidence`);
       if (response.ok) {
         const data = await response.json();
         evidenceList = data.evidence || [];
       }
     } catch (error) {
       console.error('Failed to load case evidence:', error);
+    }
+  }
+
+  /** Parse SSE stream from a fetch Response */
+  async function readSSE(
+    response: Response,
+    handlers: {
+      onProgress?: (d: { step: string; percentage: number; message: string }) => void;
+      onToken?: (d: { token: string }) => void;
+      onComplete?: (d: any) => void;
+      onError?: (d: { message: string }) => void;
+    }
+  ): Promise<void> {
+    const reader = response.body?.getReader();
+    if (!reader) return;
+    const decoder = new TextDecoder();
+    let buffer = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const parts = buffer.split('\n\n');
+      buffer = parts.pop() || '';
+      for (const part of parts) {
+        let event = 'message';
+        let data = '';
+        for (const line of part.split('\n')) {
+          if (line.startsWith('event: ')) event = line.slice(7);
+          else if (line.startsWith('data: ')) data = line.slice(6);
+        }
+        if (!data) continue;
+        try {
+          const parsed = JSON.parse(data);
+          if (event === 'progress') handlers.onProgress?.(parsed);
+          else if (event === 'token') handlers.onToken?.(parsed);
+          else if (event === 'complete') handlers.onComplete?.(parsed);
+          else if (event === 'error') handlers.onError?.(parsed);
+        } catch { /* skip malformed */ }
+      }
     }
   }
 
@@ -125,9 +159,7 @@ evidence: 0, connections: 0, analysis: 0 }
     typingContext = event.detail.context;
 
     // Send typing updates to collaborators
-    if (wsManager && typingContext) {
-      wsManager.sendTypingUpdate(currentTypingState, typingContext);
-    }
+    // (placeholder for future SSE collaboration)
 
     // Trigger detective analysis when user stops typing with substantial content
     if (currentTypingState === 'waiting_user' && userInput.length > 100) {
@@ -163,74 +195,100 @@ evidence: 0, connections: 0, analysis: 0 }
   }
 
   /**
-   * Trigger detective analysis using Gemma embeddings
+   * Trigger detective analysis via SSE streaming endpoint
    */
   async function triggerDetectiveAnalysis(): Promise<void> {
-    if (!userInput.trim()) return;
+    if (!userInput.trim() || isAnalyzing) return;
+
+    isAnalyzing = true;
+    analysisProgress = 0;
+    analysisMessage = 'Starting analysis...';
+    streamingTokens = '';
 
     try {
-      // Use MCP server for semantic analysis of user input
-      const response = await fetch(`${mcpEndpoint}/mcp/detective-analyze`, {
+      const response = await fetch('/api/detective/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-text: userInput,
+        body: JSON.stringify({
           caseId,
-          evidence: evidenceList,
-          analysisType: 'contextual_detective',
-          useGemmaEmbeddings: true
+          text: userInput,
+          evidence: evidenceList
         })
       });
 
-      if (response.ok) {
-        detectiveAnalysis = await response.json();
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-        // Generate enhanced contextual prompts based on analysis
-        const enhancedPrompts = generateEnhancedPrompts(detectiveAnalysis);
-        contextualPrompts = [...contextualPrompts, ...enhancedPrompts];
-      }
+      await readSSE(response, {
+        onProgress(d) {
+          analysisProgress = d.percentage;
+          analysisMessage = d.message;
+        },
+        onToken(d) {
+          streamingTokens += d.token;
+        },
+        onComplete(d) {
+          detectiveAnalysis = d;
+          analysisProgress = 100;
+          analysisMessage = 'Analysis complete';
+          const enhancedPrompts = generateEnhancedPrompts(detectiveAnalysis);
+          contextualPrompts = [...contextualPrompts, ...enhancedPrompts];
+        },
+        onError(d) {
+          console.error('Detective analysis error:', d.message);
+          analysisMessage = `Error: ${d.message}`;
+        }
+      });
     } catch (error) {
       console.error('Detective analysis failed:', error);
+      analysisMessage = 'Analysis failed — check server connection';
+    } finally {
+      isAnalyzing = false;
     }
   }
 
   /**
-   * Generate detective connection map
+   * Generate detective connection map via SSE streaming endpoint
    */
   async function generateConnectionMap(): Promise<void> {
-    if (!caseId) return;
+    if (!caseId || isGeneratingMap) return;
 
     isGeneratingMap = true;
+    analysisProgress = 0;
+    analysisMessage = 'Generating connection map...';
 
     try {
-      const response = await fetch('/api/v1/detective/connections', {
+      const response = await fetch('/api/detective/connections', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
+        body: JSON.stringify({
           caseId,
           focusTypes: ['people', 'evidence', 'locations', 'events'],
           connectionStrength: 0.4,
           maxDepth: 3,
-          options: {
-includeWeakConnections: true,
-            includePredictedConnections: true,
-            clusterSimilar: true,
-            layout: 'force'
-          }
+          context: userInput || undefined
         })
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        connectionMap = data.data?.connectionMap;
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-        // Send to collaborators
-        if (wsManager) {
-          wsManager.sendConnectionMapUpdate(data.data?.metadata);
+      await readSSE(response, {
+        onProgress(d) {
+          analysisProgress = d.percentage;
+          analysisMessage = d.message;
+        },
+        onComplete(d) {
+          connectionMap = d.connectionMap;
+          analysisProgress = 100;
+          analysisMessage = `Map complete: ${d.metadata?.nodeCount ?? 0} nodes, ${d.metadata?.edgeCount ?? 0} edges`;
+        },
+        onError(d) {
+          console.error('Connection map error:', d.message);
+          analysisMessage = `Error: ${d.message}`;
         }
-      }
+      });
     } catch (error) {
       console.error('Failed to generate connection map:', error);
+      analysisMessage = 'Connection map failed — check server connection';
     } finally {
       isGeneratingMap = false;
     }
@@ -294,7 +352,6 @@ includeWeakConnections: true,
   bind:element={typingElement}
   {enableContextualPrompts}
   {enableAnalytics}
-  {mcpEndpoint}
   onstateChange={handleTypingStateChange}
   oncontextualPrompt={handleContextualPrompt}
   onanalyticsUpdate={handleAnalyticsUpdate}
@@ -360,11 +417,22 @@ includeWeakConnections: true,
       ></textarea>
 
       <div class="input-actions">
+        <button type="button" onclick={triggerDetectiveAnalysis} disabled={isAnalyzing || !userInput.trim()}>
+          {isAnalyzing ? 'Analyzing...' : 'Analyze'}
+        </button>
         <button type="button" onclick={generateConnectionMap} disabled={isGeneratingMap}>
-          {isGeneratingMap ? 'Generating...' : 'Generate Connection Map'}
+          {isGeneratingMap ? 'Generating...' : 'Connection Map'}
         </button>
         <button type="button" onclick={clearInput}>Clear</button>
       </div>
+
+      <!-- Progress bar -->
+      {#if analysisProgress > 0 && analysisProgress < 100}
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: {analysisProgress}%"></div>
+          <span class="progress-label">{analysisMessage}</span>
+        </div>
+      {/if}
     </section>
 
     <!-- Contextual prompts display -->
@@ -504,6 +572,34 @@ includeWeakConnections: true,
     border-radius: 0.5rem;
 	padding: 1.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .progress-bar-container {
+    position: relative;
+    margin-top: 0.75rem;
+    height: 1.5rem;
+    background: #f1f5f9;
+    border-radius: 0.375rem;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: #3b82f6;
+    border-radius: 0.375rem;
+    transition: width 0.3s ease;
+  }
+
+  .progress-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #1e293b;
+    pointer-events: none;
   }
 
   .input-header {
