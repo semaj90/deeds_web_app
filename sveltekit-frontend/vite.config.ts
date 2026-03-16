@@ -5,7 +5,8 @@ import path from 'path';
 import UnoCSS from 'unocss/vite';
 import { defineConfig } from 'vite';
 import { goHMRBridge, goModuleGraph } from './vite-plugins/go-hmr-bridge';
-import { vscodeErrorLogger } from './src/lib/vite/vscode-error-logger';
+// vscodeErrorLogger was archived — stub it to no-op
+const vscodeErrorLogger = (_opts?: { enabled?: boolean }) => null;
 // import { bitsUiIntegrityPlugin } from './scripts/vite-plugin-bits-ui-integrity.mjs';
 
 const require = createRequire(import.meta.url);
