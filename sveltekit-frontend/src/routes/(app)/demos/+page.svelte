@@ -24,6 +24,10 @@
 		{ href: '/demos/knowledge-graph', label: 'Knowledge Graph', description: 'D3.js force-directed provenance graph: entity relationships, interactive nodes, RAG source validation', icon: 'git-merge', lines: 280 },
 		{ href: '/demos/rag-documents', label: 'RAG Document Grid', description: 'Multi-document card grid: search, grid/list views, file sizes, embedding model info, document management', icon: 'file-stack', lines: 427 },
 		{ href: '/demos/phantom-code-lab', label: 'Phantom Code Lab', description: 'Extracted phantom files + wired system map. 5-point audit reference. Cartridge pipeline stats.', icon: 'ghost', lines: 165 },
+		{ href: '/demos/spotlight', label: 'Spotlight Overlay', description: 'Interactive CSS spotlight with box-shadow cutout technique. Configurable padding, border-radius, pulse glow.', icon: 'scan', lines: 210 },
+		{ href: '/demos/keyboard-shortcuts', label: 'Keyboard Shortcuts', description: 'Live key detection, shortcut reference grid, category filters, press history — from the onboarding wizard.', icon: 'keyboard', lines: 195 },
+		{ href: '/demos/particles', label: 'Particle Animation', description: 'Canvas particle system with 4 presets (ambient, celebration, snow, fireflies) + CSS-only wizard variant.', icon: 'sparkles', lines: 245 },
+		{ href: '/demos/smart-positioning', label: 'Smart Card Positioning', description: 'Adaptive tooltip placement: below → above → right → left → center. Resize-aware with auto-cycle mode.', icon: 'move', lines: 220 },
 	];
 
 	const showcases: Demo[] = [
