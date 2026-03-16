@@ -45,6 +45,9 @@ interface NativeAddon {
 	computeCaseEmbedding?: (weights: Float32Array, embeddings: Float32Array, n: number, dim: number) => Float32Array;
 	lstmAdd?: (a: Float32Array, b: Float32Array, n: number) => Float32Array;
 	somCache?: (input: Float32Array, n: number) => Float32Array;
+	dotProduct?: (a: Float32Array, b: Float32Array, n: number) => Float32Array;
+	scale?: (input: Float32Array, scalar: number, n: number) => Float32Array;
+	relu?: (input: Float32Array, n: number) => Float32Array;
 }
 
 let addon: NativeAddon | null = null;
@@ -361,4 +364,105 @@ export async function somCache(input: number[]): Promise<SOMCacheResult> {
 
 	// CPU fallback: identity copy
 	return { output: [...input], n, source: 'cpu' };
+}
+
+// ── Dot Product ───────────────────────────────────────────────────────
+
+export interface DotProductResult {
+	value: number;
+	n: number;
+	source: 'gpu' | 'cpu';
+}
+
+/**
+ * GPU-accelerated dot product of two float arrays.
+ * Uses parallel reduction on CUDA, sequential sum on CPU.
+ */
+export async function dotProduct(a: number[], b: number[]): Promise<DotProductResult> {
+	const n = Math.min(a.length, b.length);
+	if (n === 0) return { value: 0, n: 0, source: 'cpu' };
+
+	const native = getAddon();
+	if (native?.dotProduct) {
+		try {
+			const aArr = new Float32Array(a);
+			const bArr = new Float32Array(b);
+			const result = native.dotProduct(aArr, bArr, n);
+			return { value: result[0], n, source: 'gpu' };
+		} catch {
+			// fall through to CPU
+		}
+	}
+
+	let sum = 0;
+	for (let i = 0; i < n; i++) {
+		sum += a[i] * b[i];
+	}
+	return { value: sum, n, source: 'cpu' };
+}
+
+// ── Scale ─────────────────────────────────────────────────────────────
+
+export interface ScaleResult {
+	output: number[];
+	n: number;
+	source: 'gpu' | 'cpu';
+}
+
+/**
+ * GPU-accelerated scalar multiplication of a float array.
+ */
+export async function scaleArray(input: number[], scalar: number): Promise<ScaleResult> {
+	const n = input.length;
+	if (n === 0) return { output: [], n: 0, source: 'cpu' };
+
+	const native = getAddon();
+	if (native?.scale) {
+		try {
+			const inArr = new Float32Array(input);
+			const result = native.scale(inArr, scalar, n);
+			return { output: Array.from(result), n, source: 'gpu' };
+		} catch {
+			// fall through to CPU
+		}
+	}
+
+	const output = new Array(n);
+	for (let i = 0; i < n; i++) {
+		output[i] = input[i] * scalar;
+	}
+	return { output, n, source: 'cpu' };
+}
+
+// ── ReLU ──────────────────────────────────────────────────────────────
+
+export interface ReLUResult {
+	output: number[];
+	n: number;
+	source: 'gpu' | 'cpu';
+}
+
+/**
+ * GPU-accelerated ReLU activation: max(0, x) for each element.
+ */
+export async function reluActivation(input: number[]): Promise<ReLUResult> {
+	const n = input.length;
+	if (n === 0) return { output: [], n: 0, source: 'cpu' };
+
+	const native = getAddon();
+	if (native?.relu) {
+		try {
+			const inArr = new Float32Array(input);
+			const result = native.relu(inArr, n);
+			return { output: Array.from(result), n, source: 'gpu' };
+		} catch {
+			// fall through to CPU
+		}
+	}
+
+	const output = new Array(n);
+	for (let i = 0; i < n; i++) {
+		output[i] = input[i] > 0 ? input[i] : 0;
+	}
+	return { output, n, source: 'cpu' };
 }
