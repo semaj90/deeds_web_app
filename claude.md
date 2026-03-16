@@ -1,7 +1,7 @@
 # Legal AI Platform — Claude Project Instructions
 
-## Last Updated: March 3, 2026 (Session 93r28c+++++++)
-## Status: svelte-check 10 pre-existing errors, 412 warnings
+## Last Updated: March 15, 2026 (GPU Audit Session)
+## Status: svelte-check 0 errors, 0 warnings | vite build PASSES | Playwright 20/20
 
 ---
 
@@ -377,6 +377,30 @@ See `memory/corruption-patterns.md` for detection patterns and fix strategies.
 
 ---
 
+## Directory Audit Protocol (MANDATORY before moving/archiving)
+
+**Root cause**: Previous audits moved `$lib/webgpu/` as "dead" — but root layout (`+layout.svelte`) imports `$lib/webgpu/webgpu-init` + `$lib/webgpu/webgpu-cpu-fallback` on **every page load**. Moving it would have broken the entire app.
+
+**BEFORE moving ANY directory to `deeds_labs/`, run this checklist:**
+
+1. `grep -r "from.*\$lib/MODULE" src/` — check ALL import consumers
+2. Check root layout (`+layout.svelte`) for dynamic imports
+3. Check all `+page.svelte` files for lazy/dynamic imports
+4. Check barrel `index.ts` re-exports and their downstream consumers
+5. Check API routes (`src/routes/api/`) for server-side imports
+6. Check `.svelte.ts` store files for cross-module references
+7. Verify SvelteKit 2 + Drizzle ORM adapter compatibility (schema refs)
+
+**Key directories that LOOK dead but ARE wired:**
+- `$lib/webgpu/` — root layout WebGPU init (every page)
+- `$lib/gpu/` — active compute pipeline (3 WGSL shaders, search reranker)
+- `$lib/ai/onnx/` — client-side ONNX inference (WebGPU → WASM → CPU)
+- `simd-bridge/cpp/` — LibTorch/CUDA N-API addon (3 GPU functions verified)
+
+**`deeds_labs/` is gitignored** — moving files there is effectively permanent deletion. Measure twice, cut once.
+
+---
+
 ## Drizzle ORM 0.44 (PostgreSQL 16 + pgvector)
 
 **Main schema**: `src/lib/server/db/schema-postgres.ts` (70+ tables, 14 enums)
@@ -558,6 +582,9 @@ safelist: [
 - **Drizzle casing option**: `drizzle(pool, { casing: 'snake_case' })` for auto camelCase→snake_case (v0.34+, NOT currently enabled)
 - **bits-ui v2 Svelte 5**: Use `child` snippet (not `asChild`), `ref` (not `el`), `forceMount` + snippet for transitions, `type="multiple"` (not `multiple={true}`)
 - **Svelte 5 $props**: Don't mutate props — use callback props or `$bindable` rune. `$derived` tracks dependencies at runtime, not compile time
+- **MANDATORY: Wiring audit before moving files**: NEVER move/archive files without checking ALL import consumers first. Use `grep -r 'from.*module-name'` across entire `src/`. Root layout (`+layout.svelte`) imports from `$lib/webgpu/` — would have broken every page if moved. The cartridge system (`ChatSession.svelte.ts` → `/api/cartridge/export` → `chr97-builder.ts` → `cartridge-tensor-bridge.ts`) was 70% wired but appeared phantom. Always check: (1) grep for `from.*$lib/module`, (2) check root layout, (3) check `+page.svelte` dynamic imports, (4) check barrel `index.ts` re-exports, (5) check API routes. Files in `deeds_labs/` are gitignored — permanent deletion if lost
+- **Phantom vs wired detection**: A file re-exported by `index.ts` but never imported downstream IS dead. A file with phantom CHR-ROM97 comments but real LokiJS/IndexedDB/Fuse.js code is NOT dead. Check call sites, not just file names
+- **Cartridge API endpoints**: `/api/cartridge/export` (POST, build+cache), `/api/cartridge/search` (POST, tensor similarity), `/api/cartridge/stats` (GET, Redis cache stats), `/api/cartridge/invalidate` (POST, evict cached cartridge)
 
 ---
 
