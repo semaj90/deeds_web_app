@@ -21,7 +21,8 @@ async function getCache(): Promise<any | undefined> {
   if (_cacheInitialized) return _cache;
   _cacheInitialized = true;
   try {
-    const mod = await import('$lib/server/cache/redis');
+    const cachePath = '$lib/server/cache/redis';
+    const mod = await import(/* @vite-ignore */ cachePath);
     _cache = (mod as any).default ?? mod;
   } catch (err) {
     _cache = undefined;

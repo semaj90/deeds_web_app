@@ -156,7 +156,8 @@
         if (typeof window === 'undefined') return;
 
         // Dynamic import to avoid SSR issues - module may not exist yet
-        const module = await import('$lib/engines/neural-sprite-engine-enhanced').catch(() => null);
+        const enginePath = '$lib/engines/neural-sprite-engine-enhanced';
+        const module = await import(/* @vite-ignore */ enginePath).catch(() => null);
         if (!module) {
           console.warn('Neural Sprite Engine module not available (optional)');
           return;

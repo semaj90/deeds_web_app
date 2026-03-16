@@ -14,7 +14,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { redisPool } from '$lib/server/redis.js';
 import { getTemplateCacheStats } from '$lib/server/cache/report-template-cache.js';
 import { getExportCacheStats } from '$lib/server/cache/pdf-export-cache.js';
-import { getRedisMetricsCache } from '$lib/server/cache/redis-metrics.js';
+// redis-metrics module removed — inline fallback below
 
 export const GET: RequestHandler = async () => {
 	try {
@@ -71,9 +71,13 @@ export const GET: RequestHandler = async () => {
 		const llmTotal = llmHits + llmMisses;
 		const llmHitRate = llmTotal > 0 ? (llmHits / llmTotal) * 100 : 0;
 
-		// Real metrics from RedisMetricsCache
-		const metricsCache = getRedisMetricsCache();
-		const metricsInsights = metricsCache.getPerformanceInsights();
+		// Inline metrics (redis-metrics module was removed)
+		const metricsInsights = {
+			overall: { hitRate: `${llmHitRate.toFixed(1)}%`, totalRequests: llmTotal, hits: llmHits, misses: llmMisses, errors: 0, errorRate: '0%' },
+			performance: { averageGetTime: 'N/A', averageSetTime: 'N/A' },
+			topPatterns: keyPatterns.filter(p => p.count > 0).map(p => ({ pattern: p.pattern, count: p.count })),
+			recommendations: []
+		};
 
 		return json({
 			success: true,
