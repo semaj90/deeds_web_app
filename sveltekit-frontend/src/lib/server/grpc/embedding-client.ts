@@ -15,6 +15,7 @@
  */
 import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 // Proto types inlined (generated/proto archived — regenerate from proto/*.proto if gRPC revived)
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -198,7 +199,7 @@ async function generateViaQuic(texts: string[], timeoutMs = 5000): Promise<numbe
  */
 async function generateViaHttp(texts: string[]): Promise<number[][]> {
 	try {
-		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
+		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, input: texts }),
@@ -223,7 +224,7 @@ async function generateViaHttpSingle(texts: string[]): Promise<number[][]> {
 	const vectors: number[][] = [];
 
 	for (const text of texts) {
-		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
+		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, prompt: text }),

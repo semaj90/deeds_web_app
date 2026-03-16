@@ -15,6 +15,7 @@ import { promisify } from 'util';
 
 import { getOllamaUrl } from '$lib/config/env.server.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 const execAsync = promisify(exec);
 const OLLAMA_URL = getOllamaUrl();
 
@@ -176,7 +177,7 @@ Provide:
 Be concise and actionable.`;
 
 	try {
-		const response = await fetch(`${OLLAMA_URL}/api/chat`, {
+		const response = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: 'gemma3-legal:latest',
@@ -237,7 +238,7 @@ async function generateEnhancedTag(filePath: string, analysis: any) {
 
 	try {
 		// Generate embedding for summary
-		const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+		const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: 'nomic-embed-text:latest', // Changed to a common embedding model

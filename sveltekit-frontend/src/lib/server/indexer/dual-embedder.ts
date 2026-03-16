@@ -15,6 +15,7 @@
 import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL, SERVER_EMBEDDING_DIMS } from '$lib/ai/model-ids.js';
 import type { CodeChunk } from './ast-chunker.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const QDRANT_COLLECTION = 'codebase_chunks';
 const BATCH_SIZE = 16;
@@ -36,7 +37,7 @@ interface IndexResult {
  * Redis-cached by content hash to avoid re-embedding identical text.
  */
 async function embed(text: string): Promise<number[]> {
-	const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
+	const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, prompt: text }),

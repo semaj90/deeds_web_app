@@ -8,13 +8,14 @@ import postgres from 'postgres';
 import type { RequestHandler } from './$types';
 
 import { getDatabaseUrl, getQdrantUrl, getOllamaUrl } from '$lib/config/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 const sql = postgres(getDatabaseUrl());
 const QDRANT_URL = getQdrantUrl();
 const OLLAMA_URL = getOllamaUrl();
 const KNOWLEDGE_COLLECTION = 'phase76_knowledge_base';
 
 async function generateEmbedding(text: string): Promise<number[]> {
-  const response = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+  const response = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

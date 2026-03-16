@@ -9,7 +9,7 @@
 	import FilterPanel from '$lib/components/FilterPanel.svelte';
 	import StatsPanel from '$lib/components/StatsPanel.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
-	import POIPhotoModal from '$lib/client/ui/POIPhotoModal.svelte';
+	import POIPhotoModal from '$lib/components/POIPhotoModal.svelte';
 	import POIPhotoUploader from '$lib/client/ui/POIPhotoUploader.svelte';
 	import type { FugitiveDexPerson } from '$lib/components/types';
 
@@ -34,9 +34,30 @@
 	let similarSourceName = $state('');
 	let loadingSimilar = $state(false);
 	let photoModalOpen = $state(false);
-	let photoModalPhoto = $state<any>(null);
+	let photoModalPhotos = $state<any[]>([]);
+	let photoModalIndex = $state(0);
 	let showPhotoUploader = $state(false);
 	let uploadingPoiId = $state<number>(0);
+
+	function normalizePoiPhoto(photo: any) {
+		if (!photo) return photo;
+		return {
+			...photo,
+			url: photo.url ?? photo.thumbnailUrl ?? '',
+			thumbnailUrl: photo.thumbnailUrl ?? photo.url ?? null,
+			aiCaption: photo.aiCaption ?? photo.metadata?.ai?.caption ?? photo.ai?.caption ?? null,
+			aiTags: photo.aiTags ?? photo.metadata?.ai?.tags ?? photo.ai?.tags ?? [],
+		};
+	}
+
+	function openPhotoModal(photo: any) {
+		const normalizedPhotos = (editingPoi?.photos ?? []).map(normalizePoiPhoto);
+		const normalizedPhoto = normalizePoiPhoto(photo);
+		photoModalPhotos = normalizedPhotos.length > 0 ? normalizedPhotos : normalizedPhoto ? [normalizedPhoto] : [];
+		const photoIndex = photoModalPhotos.findIndex((candidate) => candidate?.id && candidate.id === normalizedPhoto?.id);
+		photoModalIndex = photoIndex >= 0 ? photoIndex : 0;
+		photoModalOpen = photoModalPhotos.length > 0;
+	}
 
 	async function findSimilar(poi: any) {
 		loadingSimilar = true;
@@ -449,10 +470,10 @@
 		<div class="modal-overlay" onclick={() => { showEditor = false; editingPoi = null; }}>
 			<div class="modal-content" onclick={(e) => e.stopPropagation()}>
 				<POIEditor
-					poi={{ name: editingPoi.name ?? '', alias: editingPoi.alias ?? '', threatLevel: editingPoi.threatLevel ?? 'low', photos: [], notes: editingPoi.description ?? '' }}
+					poi={{ name: editingPoi.name ?? '', alias: editingPoi.alias ?? '', threatLevel: editingPoi.threatLevel ?? 'low', photos: editingPoi.photos ?? [], notes: editingPoi.description ?? '' }}
 					onSave={async (formData) => {
 						try {
-							const res = await fetch(`/api/persons/${editingPoi.id}`, {
+							const res = await fetch(`/api/persons-of-interest/${editingPoi.id}`, {
 								method: 'PATCH',
 								headers: { 'Content-Type': 'application/json' },
 								body: JSON.stringify({ name: formData.name, alias: formData.alias, threatLevel: formData.threatLevel, description: formData.notes })
@@ -470,7 +491,7 @@
 					}}
 					onCancel={() => { showEditor = false; editingPoi = null; }}
 					onUploadPhoto={() => { uploadingPoiId = editingPoi.id; showPhotoUploader = true; }}
-					onViewPhoto={(photo: any) => { photoModalPhoto = photo; photoModalOpen = true; }}
+						onViewPhoto={(photo: any) => { openPhotoModal(photo); }}
 				/>
 			</div>
 		</div>
@@ -481,14 +502,32 @@
 			<div class="modal-content" onclick={(e) => e.stopPropagation()}>
 				<POIPhotoUploader
 					poiId={uploadingPoiId}
-					onUpload={(result) => { console.log('Photo uploaded:', result); showPhotoUploader = false; }}
+					onUpload={(result) => {
+						const uploadedPhoto = normalizePoiPhoto(result);
+						if (editingPoi?.id === uploadingPoiId) {
+							editingPoi = {
+								...editingPoi,
+								photos: [uploadedPhoto, ...(editingPoi.photos ?? [])]
+							};
+						}
+						showPhotoUploader = false;
+					}}
 					onError={(err) => { console.error('Photo upload error:', err); }}
 				/>
 			</div>
 		</div>
 	{/if}
 
-	<POIPhotoModal open={photoModalOpen} photo={photoModalPhoto} onClose={() => { photoModalOpen = false; photoModalPhoto = null; }} />
+	<POIPhotoModal
+		photos={photoModalPhotos}
+		bind:currentIndex={photoModalIndex}
+		bind:open={photoModalOpen}
+		onclose={() => {
+			photoModalOpen = false;
+			photoModalPhotos = [];
+			photoModalIndex = 0;
+		}}
+	/>
 
 	<PersonOfInterestDetailView
 		poi={previewPoi}

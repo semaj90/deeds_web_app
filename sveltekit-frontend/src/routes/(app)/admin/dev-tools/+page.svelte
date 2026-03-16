@@ -654,9 +654,9 @@
 							pageSize={50}
 							isLoading={isLoadingEvidence}
 							onRowClick={(item) => { selectedEvidenceFile = evidenceFiles.find((f: any) => f.id === item.id); showEvidenceDrawer = true; }}
-							onPageChange={() => {}}
-							onSearch={() => {}}
-							onFilterChange={() => {}}
+							onPageChange={() => {}} /* intentional no-op: view-only grid */
+							onSearch={() => {}} /* intentional no-op: view-only grid */
+							onFilterChange={() => {}} /* intentional no-op: view-only grid */
 						/>
 					</div>
 				{/if}

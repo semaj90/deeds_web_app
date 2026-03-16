@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { z } from 'zod';
 
 import { getQdrantUrl, getOllamaUrl } from '$lib/config/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 const QDRANT_URL = getQdrantUrl();
 const OLLAMA_URL = getOllamaUrl();
 const COLLECTION_NAME = 'fastmcp_file_profiles';
@@ -150,7 +151,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const { query, limit } = parsed.data;
 
 		// Get embedding from Ollama
-		const embedResponse = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+		const embedResponse = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

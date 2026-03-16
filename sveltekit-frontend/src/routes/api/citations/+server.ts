@@ -120,3 +120,46 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		throw error(500, 'Failed to create citation');
 	}
 };
+
+const deleteCitationSchema = z.object({
+	citationId: z.string().min(1, 'citationId required').max(500),
+});
+
+/**
+ * DELETE /api/citations
+ * Delete a citation by ID
+ * Body: { citationId: string }
+ */
+export const DELETE: RequestHandler = async ({ locals, request }) => {
+	if (!locals.user) {
+		throw error(401, 'Unauthorized');
+	}
+
+	try {
+		const body = await request.json().catch(() => ({}));
+		const parsed = deleteCitationSchema.safeParse(body);
+		if (!parsed.success) {
+			return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
+		}
+
+		const [deleted] = await db
+			.delete(citations)
+			.where(eq(citations.id, parsed.data.citationId))
+			.returning({ id: citations.id });
+
+		if (!deleted) {
+			return json({ success: false, error: 'Citation not found' }, { status: 404 });
+		}
+
+		// Invalidate cache
+		setCache('citations:all:50', null, 0);
+
+		return json({ success: true, message: 'Citation deleted' });
+	} catch (err) {
+		console.error('Error deleting citation:', err);
+		if (err instanceof Error && 'status' in err) {
+			throw err;
+		}
+		throw error(500, 'Failed to delete citation');
+	}
+};

@@ -55,6 +55,13 @@ For each orphan, answer:
 - Does it implement a capability listed in project requirements?
 - Would a user notice if this was removed?
 
+### 2d. Trigger Reachability Check
+If a file exposes callbacks, async handlers, state machines, or `fetch('/api/...')` calls, verify the trigger path is real:
+1. Is the handler bound to a rendered button, form, onMount, load function, machine transition, or keyboard shortcut?
+2. Can current state/conditions actually reach that trigger, or is it trapped behind a permanently-false branch?
+3. If the file calls an API route, can a real consumer action reach that call end to end?
+4. If the function exists but is never bound or never reachable, classify it as **SHALLOW/DEAD**, not wired.
+
 ---
 
 ## Phase 3: Classification — 5-Gate Test
@@ -85,9 +92,19 @@ HOW:
   2. Add $state variable for component reference
   3. Add conditional render: {#if Component}<Component />{/if}
   4. Add trigger: keyboard shortcut / button / route param
+  5. Verify the trigger path actually fires the consumer handler/API route
 PATTERN: Follow (app)/+layout.svelte dynamic import pattern
 EFFORT: ~10 min
 ```
+
+### AI-Assisted Planning For DEFER Cases:
+Use chat-based AI tools or web search only for planning, not as proof. Good uses:
+- Map SvelteKit 2 production patterns before wiring SSR/client-only code
+- Check TypeScript/JavaScript interop when a module boundary is unclear
+- Confirm Drizzle ORM 0.44 typing/migration patterns before schema work
+- Plan backend ↔ frontend data contracts before wiring orphaned UI to live routes
+
+Any external recommendation must be reconciled against the current repo before action.
 
 ### For REWRITE files:
 ```
@@ -118,31 +135,52 @@ CONSUMERS: [list files that import it — all need updating]
 
 ## Phase 5: Cross-Cutting Checks
 
-### Barrel Export Zombies
+### 5a. Route Reachability Audit
+For every `fetch('/api/...')` call in `src/lib/`:
+```
+1. Does the API route +server.ts exist?
+2. Does the calling function have a RENDERED trigger?
+   (onclick/onsubmit/onMount/$effect/XState fromPromise actor)
+3. Is the trigger reachable from the current state?
+   (check: is the $state that guards the render ever set to true?)
+```
+Flag as **DEAD_CHAIN** if fetch exists but no rendered path invokes it.
+Flag as **MISSING_API_ROUTE** if +server.ts doesn't exist.
+
+### 5b. Barrel Export Zombies
 Files exported from `index.ts` but never imported downstream:
 ```bash
 grep -r "export.*from" src/lib/**/index.ts
 # Cross-reference each export against src/routes/ imports
 ```
 
-### Shadow Duplicates
+### 5c. Shadow Duplicates
 Files with same basename in different directories (e.g., `stores/machines/` vs `machines/`):
 ```bash
 find src/lib/ -name "*.ts" -o -name "*.svelte" | xargs -I{} basename {} | sort | uniq -d
 ```
+When two files share a name, the one with ACTIVE route imports wins. Archive the other.
 
-### Orphan Type Files
+### 5d. Orphan Type Files
 `.d.ts` files declaring types for deleted components.
 
-### Dead Server Files
+### 5e. Dead Server Files
 `src/lib/server/` files not imported by any API route or other server file.
 
-### Orphan Cluster Detection
+### 5f. Orphan Cluster Detection
 Groups of files that only import each other but nothing imports the group:
 ```
 If A imports B, B imports C, but nothing outside {A,B,C} imports any of them
 → entire cluster is dead
 ```
+
+### 5g. No-Op Handler Detection
+Scan route files for callback props wired to empty functions:
+```
+onCallback={() => {}}
+onCallback={() => console.log(...)}
+```
+These indicate incomplete integration — component rendered but non-functional.
 
 ---
 
@@ -224,6 +262,7 @@ Manifest: deeds_labs/lib-dead-directories/MANIFEST.md
   - Root layout: `+layout.svelte` imports
   - API routes: `src/routes/api/` server imports
   - `.svelte.ts` stores: cross-module references
+- **ALWAYS prove reachability** — an API route or handler only counts as wired if a rendered consumer, lifecycle hook, or machine transition can actually trigger it
 - **NEVER archive** `$lib/webgpu/`, `$lib/gpu/`, `$lib/ai/onnx/`, `simd-bridge/cpp/`
 - **ALWAYS generate/update MANIFEST.md** after archiving
 - Follow the Directory Audit Protocol from CLAUDE.md (7-step checklist)

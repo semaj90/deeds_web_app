@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-03-15T20-14-31",
+  "timestamp": "2026-03-16T20-23-11",
   "base": "http://localhost:5173",
-  "totalTimeMs": 47225,
+  "totalTimeMs": 63513,
   "results": [
     {
       "name": "evidence",
@@ -11,7 +11,9 @@
       "ok": true,
       "error": null,
       "file": "evidence.png",
-      "consoleErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
@@ -20,10 +22,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 4857,
-      "domElements": 852,
-      "resourceCount": 257,
-      "resourceSizeKB": 9115
+      "loadTimeMs": 5307,
+      "domElements": 895,
+      "resourceCount": 263,
+      "resourceSizeKB": 9267
     },
     {
       "name": "persons-of-interest",
@@ -33,7 +35,9 @@
       "ok": true,
       "error": null,
       "file": "persons-of-interest.png",
-      "consoleErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
@@ -42,10 +46,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1255,
-      "domElements": 269,
-      "resourceCount": 234,
-      "resourceSizeKB": 6877
+      "loadTimeMs": 2155,
+      "domElements": 270,
+      "resourceCount": 240,
+      "resourceSizeKB": 6988
     },
     {
       "name": "cases-overview",
@@ -56,16 +60,12 @@
       "error": null,
       "file": "cases-overview.png",
       "consoleErrors": [
-        "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "Failed to load resource: the server responded with a status of 404 (Not Found)",
         "Failed to load resource: the server responded with a status of 400 (Bad Request)",
-        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
         "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
         "[SimilarCases] Error: Error: Failed to load similar cases: 500\n    at loadSimilarCases (http://localhost:5173/src/lib/components/legal/SimilarCasesPanel.svelte:106:11)",
-        "Unhandled promise rejection: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/lib/cache/cache-service.svelte.ts",
-        "ErrorBoundary caught error: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/lib/cache/cache-service.svelte.ts",
-        "Unhandled promise rejection: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/lib/cache/cache-service.svelte.ts",
-        "ErrorBoundary caught error: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/lib/cache/cache-service.svelte.ts"
+        "Unhandled promise rejection: TypeError: (data.evidence ?? []) is not iterable\n\n\tin $effect\n\tin +page.svelte\n\tin +layout.svelte\n\tin ErrorBoundary.svelte\n\tin +layout.svelte\n\tin +layout.svelte\n\tin root.s",
+        "ErrorBoundary caught error: TypeError: (data.evidence ?? []) is not iterable\n\n\tin $effect\n\tin +page.svelte\n\tin +layout.svelte\n\tin ErrorBoundary.svelte\n\tin +layout.svelte\n\tin +layout.svelte\n\tin root.sv",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
       ],
       "consoleWarnings": [
         "No available adapters.",
@@ -74,17 +74,11 @@
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
-      "failedRequests": [
-        {
-          "url": "http://localhost:5173/node_modules/.vite/deps/idb-keyval.js?v=c5d972c9",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        }
-      ],
-      "loadTimeMs": 2075,
-      "domElements": 287,
-      "resourceCount": 169,
-      "resourceSizeKB": 6336
+      "failedRequests": [],
+      "loadTimeMs": 2241,
+      "domElements": 285,
+      "resourceCount": 175,
+      "resourceSizeKB": 6313
     },
     {
       "name": "cases-board",
@@ -96,8 +90,7 @@
       "file": "cases-board.png",
       "consoleErrors": [
         "Failed to load resource: the server responded with a status of 400 (Bad Request)",
-        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
-        "Unhandled promise rejection: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/lib/cache/cache-service.svelte.ts",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
         "[board-persistence] IndexedDB save failed: DataCloneError: Failed to execute 'put' on 'IDBObjectStore': [object Array] could not be cloned.\n    at Proxy.<anonymous> (http://localhost:5173/node_modules"
       ],
       "consoleWarnings": [
@@ -107,49 +100,35 @@
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
-      "failedRequests": [
-        {
-          "url": "http://localhost:5173/node_modules/.vite/deps/idb-keyval.js?v=c5d972c9",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        }
-      ],
-      "loadTimeMs": 3010,
-      "domElements": 347,
-      "resourceCount": 161,
-      "resourceSizeKB": 6313
+      "failedRequests": [],
+      "loadTimeMs": 5044,
+      "domElements": 390,
+      "resourceCount": 167,
+      "resourceSizeKB": 6426
     },
     {
       "name": "cases-list",
       "path": "/cases",
       "url": "http://localhost:5173/cases",
       "status": 200,
-      "ok": false,
-      "error": "SvelteKit error page rendered",
+      "ok": true,
+      "error": null,
       "file": "cases-list.png",
       "consoleErrors": [
-        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
-        "Client error: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/.svelte-kit/generated/client/nodes/30.js?t=1773605065467"
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
       ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
-        "The next HMR update will cause the page to reload",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
-      "failedRequests": [
-        {
-          "url": "http://localhost:5173/node_modules/.vite/deps/idb-keyval.js?v=c5d972c9",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        }
-      ],
-      "loadTimeMs": 979,
-      "domElements": 183,
-      "resourceCount": 132,
-      "resourceSizeKB": 3711
+      "failedRequests": [],
+      "loadTimeMs": 1993,
+      "domElements": 340,
+      "resourceCount": 155,
+      "resourceSizeKB": 6118
     },
     {
       "name": "dashboard",
@@ -159,7 +138,9 @@
       "ok": true,
       "error": null,
       "file": "dashboard.png",
-      "consoleErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
@@ -168,10 +149,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2100,
-      "domElements": 682,
-      "resourceCount": 184,
-      "resourceSizeKB": 6485
+      "loadTimeMs": 2136,
+      "domElements": 746,
+      "resourceCount": 190,
+      "resourceSizeKB": 6595
     },
     {
       "name": "citations",
@@ -181,7 +162,9 @@
       "ok": true,
       "error": null,
       "file": "citations.png",
-      "consoleErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
@@ -190,10 +173,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1290,
-      "domElements": 291,
-      "resourceCount": 200,
-      "resourceSizeKB": 6821
+      "loadTimeMs": 4506,
+      "domElements": 295,
+      "resourceCount": 208,
+      "resourceSizeKB": 7012
     },
     {
       "name": "evidence-upload",
@@ -205,8 +188,7 @@
       "file": "evidence-upload.png",
       "consoleErrors": [
         "Failed to load resource: the server responded with a status of 400 (Bad Request)",
-        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
-        "Unhandled promise rejection: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/lib/cache/cache-service.svelte.ts"
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
       ],
       "consoleWarnings": [
         "No available adapters.",
@@ -215,17 +197,11 @@
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
-      "failedRequests": [
-        {
-          "url": "http://localhost:5173/node_modules/.vite/deps/idb-keyval.js?v=c5d972c9",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        }
-      ],
-      "loadTimeMs": 851,
-      "domElements": 283,
-      "resourceCount": 153,
-      "resourceSizeKB": 5988
+      "failedRequests": [],
+      "loadTimeMs": 1320,
+      "domElements": 284,
+      "resourceCount": 159,
+      "resourceSizeKB": 6101
     },
     {
       "name": "active-cases",
@@ -235,7 +211,9 @@
       "ok": true,
       "error": null,
       "file": "active-cases.png",
-      "consoleErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
@@ -244,10 +222,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1067,
-      "domElements": 428,
-      "resourceCount": 154,
-      "resourceSizeKB": 6124
+      "loadTimeMs": 1995,
+      "domElements": 471,
+      "resourceCount": 160,
+      "resourceSizeKB": 6237
     },
     {
       "name": "analysis-center",
@@ -257,7 +235,9 @@
       "ok": true,
       "error": null,
       "file": "analysis-center.png",
-      "consoleErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
@@ -266,10 +246,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 998,
-      "domElements": 463,
-      "resourceCount": 177,
-      "resourceSizeKB": 6869
+      "loadTimeMs": 1522,
+      "domElements": 464,
+      "resourceCount": 182,
+      "resourceSizeKB": 6969
     },
     {
       "name": "command-center",
@@ -282,7 +262,8 @@
       "consoleErrors": [
         "Failed to load resource: the server responded with a status of 404 (Not Found)",
         "EventSource error: Event",
-        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
       ],
       "consoleWarnings": [
         "No available adapters.",
@@ -291,17 +272,11 @@
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
-      "failedRequests": [
-        {
-          "url": "http://localhost:5173/agentic/events",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        }
-      ],
-      "loadTimeMs": 2061,
-      "domElements": 569,
-      "resourceCount": 179,
-      "resourceSizeKB": 6333
+      "failedRequests": [],
+      "loadTimeMs": 2133,
+      "domElements": 632,
+      "resourceCount": 186,
+      "resourceSizeKB": 6443
     },
     {
       "name": "evidence-library",
@@ -311,7 +286,9 @@
       "ok": true,
       "error": null,
       "file": "evidence-library.png",
-      "consoleErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
@@ -320,10 +297,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 4690,
-      "domElements": 308,
-      "resourceCount": 167,
-      "resourceSizeKB": 6381
+      "loadTimeMs": 4349,
+      "domElements": 351,
+      "resourceCount": 173,
+      "resourceSizeKB": 6490
     },
     {
       "name": "global-search",
@@ -333,7 +310,9 @@
       "ok": true,
       "error": null,
       "file": "global-search.png",
-      "consoleErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
@@ -342,42 +321,34 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1449,
-      "domElements": 326,
-      "resourceCount": 169,
-      "resourceSizeKB": 6433
+      "loadTimeMs": 1446,
+      "domElements": 330,
+      "resourceCount": 177,
+      "resourceSizeKB": 6583
     },
     {
       "name": "admin-dev-tools",
       "path": "/admin/dev-tools",
       "url": "http://localhost:5173/admin/dev-tools",
       "status": 200,
-      "ok": false,
-      "error": "SvelteKit error page rendered",
+      "ok": true,
+      "error": null,
       "file": "admin-dev-tools.png",
       "consoleErrors": [
-        "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
-        "Client error: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/.svelte-kit/generated/client/nodes/16.js?t=1773605065461"
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
       ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
-        "The next HMR update will cause the page to reload",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
-      "failedRequests": [
-        {
-          "url": "http://localhost:5173/node_modules/.vite/deps/idb-keyval.js?v=c5d972c9",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        }
-      ],
-      "loadTimeMs": 1251,
-      "domElements": 182,
-      "resourceCount": 186,
-      "resourceSizeKB": 6493
+      "failedRequests": [],
+      "loadTimeMs": 1715,
+      "domElements": 382,
+      "resourceCount": 206,
+      "resourceSizeKB": 7078
     },
     {
       "name": "admin-knowledge-search",
@@ -387,7 +358,9 @@
       "ok": true,
       "error": null,
       "file": "admin-knowledge-search.png",
-      "consoleErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
@@ -396,10 +369,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1225,
-      "domElements": 265,
-      "resourceCount": 142,
-      "resourceSizeKB": 5892
+      "loadTimeMs": 1492,
+      "domElements": 266,
+      "resourceCount": 148,
+      "resourceSizeKB": 6001
     },
     {
       "name": "admin-codebase-viewer",
@@ -409,7 +382,9 @@
       "ok": true,
       "error": null,
       "file": "admin-codebase-viewer.png",
-      "consoleErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
@@ -418,10 +393,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1258,
-      "domElements": 295,
-      "resourceCount": 159,
-      "resourceSizeKB": 6276
+      "loadTimeMs": 2145,
+      "domElements": 834,
+      "resourceCount": 165,
+      "resourceSizeKB": 6430
     },
     {
       "name": "system-configuration",
@@ -431,7 +406,9 @@
       "ok": true,
       "error": null,
       "file": "system-configuration.png",
-      "consoleErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
@@ -440,10 +417,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1244,
-      "domElements": 322,
-      "resourceCount": 150,
-      "resourceSizeKB": 6011
+      "loadTimeMs": 1800,
+      "domElements": 323,
+      "resourceCount": 156,
+      "resourceSizeKB": 6120
     },
     {
       "name": "terminal",
@@ -453,7 +430,9 @@
       "ok": true,
       "error": null,
       "file": "terminal.png",
-      "consoleErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
@@ -461,17 +440,11 @@
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
-      "failedRequests": [
-        {
-          "url": "http://localhost:5173/terminal/__data.json?x-sveltekit-invalidated=111",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        }
-      ],
-      "loadTimeMs": 4482,
-      "domElements": 301,
-      "resourceCount": 148,
-      "resourceSizeKB": 5956
+      "failedRequests": [],
+      "loadTimeMs": 4238,
+      "domElements": 344,
+      "resourceCount": 154,
+      "resourceSizeKB": 6065
     },
     {
       "name": "admin-cache",
@@ -481,7 +454,9 @@
       "ok": true,
       "error": null,
       "file": "admin-cache.png",
-      "consoleErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
@@ -490,10 +465,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2679,
-      "domElements": 471,
-      "resourceCount": 145,
-      "resourceSizeKB": 5934
+      "loadTimeMs": 2098,
+      "domElements": 484,
+      "resourceCount": 151,
+      "resourceSizeKB": 6043
     },
     {
       "name": "analytics",
@@ -503,7 +478,9 @@
       "ok": true,
       "error": null,
       "file": "analytics.png",
-      "consoleErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
@@ -512,20 +489,20 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1045,
-      "domElements": 289,
-      "resourceCount": 138,
-      "resourceSizeKB": 5838
+      "loadTimeMs": 1880,
+      "domElements": 290,
+      "resourceCount": 144,
+      "resourceSizeKB": 5947
     }
   ],
   "summary": {
-    "passed": 18,
-    "failed": 2,
+    "passed": 20,
+    "failed": 0,
     "total": 20,
-    "avgLoadMs": 1993,
+    "avgLoadMs": 2576,
     "slowestRoute": "evidence",
-    "slowestLoadMs": 4857,
-    "totalConsoleErrors": 24,
-    "totalNetworkFailures": 7
+    "slowestLoadMs": 5307,
+    "totalConsoleErrors": 31,
+    "totalNetworkFailures": 0
   }
 }

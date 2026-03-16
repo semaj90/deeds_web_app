@@ -9,6 +9,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434';
 const QDRANT_URL = ENV.QDRANT_URL ?? 'http://localhost:6333';
@@ -139,7 +140,7 @@ export async function* streamOllamaResponse(
 	model: string = 'gemma3-legal:latest'
 ): AsyncGenerator<StreamChunk> {
 	try {
-		const response = await fetch(`${OLLAMA_URL}/api/generate`, {
+		const response = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
@@ -225,7 +226,7 @@ export async function* streamRAGResponse(
 
 		let embedding: number[] = [];
 		try {
-			const embeddingResponse = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+			const embeddingResponse = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({

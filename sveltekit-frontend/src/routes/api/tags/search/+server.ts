@@ -5,6 +5,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { searchTagsBySemantic } from '$lib/server/ace/tag-sync.js';
 import { ENV } from '$lib/server/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 export const GET: RequestHandler = async ({ url }) => {
 	const query = url.searchParams.get('q') ?? '';
@@ -17,7 +18,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	try {
 		// Embed query
 		const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-		const embedRes = await fetch(OLLAMA_URL + '/api/embed', {
+		const embedRes = await ollamaFetch(OLLAMA_URL + '/api/embed', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: 'embeddinggemma:latest', input: query })

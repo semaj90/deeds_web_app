@@ -3,6 +3,7 @@ import { json, error } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 /**
  * GET /api/yorha/analytics
@@ -77,7 +78,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 			// Ollama health
 			(async () => {
 				try {
-					const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(2000) });
+					const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(2000) });
 					if (res.ok) {
 						const data = await res.json();
 						return { ollama: 'up', models: (data.models ?? []).length };

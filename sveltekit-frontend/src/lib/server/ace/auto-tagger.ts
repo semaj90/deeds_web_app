@@ -8,6 +8,7 @@ import { generateTags } from './tag-generator.js';
 import { mirrorTags } from './tag-sync.js';
 import type { GeneratedTag } from './types.js';
 import { ENV } from '$lib/server/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 export interface AutoTagResult {
 	documentId: string;
@@ -43,7 +44,7 @@ export async function autoTagDocument(opts: {
 
 		for (const label of uniqueLabels) {
 			try {
-				const res = await fetch(OLLAMA_URL + '/api/embed', {
+				const res = await ollamaFetch(OLLAMA_URL + '/api/embed', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ model: 'embeddinggemma:latest', input: label })

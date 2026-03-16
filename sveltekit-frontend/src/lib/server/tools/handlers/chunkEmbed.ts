@@ -13,6 +13,7 @@ import {
 } from '../registry.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 import { ENV } from '$lib/server/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const QDRANT_URL = ENV.QDRANT_URL;
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
@@ -90,7 +91,7 @@ function chunkText(
 }
 
 async function generateEmbedding(text: string, model: string): Promise<number[]> {
-  const response = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+  const response = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({

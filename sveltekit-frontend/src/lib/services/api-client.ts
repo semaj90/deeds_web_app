@@ -98,7 +98,12 @@ export const poiApi = {
 };
 
 export const searchApi = {
-	searchGlobal: (query: string, filters?: any) => apiFetch<SearchResult[]>('/api/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query, ...filters }) }),
+	searchGlobal: (query: string, filters?: any) => {
+		const params = new URLSearchParams({ q: query });
+		if (filters?.type) params.set('type', Array.isArray(filters.type) ? filters.type[0] : filters.type);
+		if (filters?.limit) params.set('limit', String(filters.limit));
+		return apiFetch<SearchResult[]>(`/api/search?${params}`);
+	},
 };
 
 export const systemApi = {

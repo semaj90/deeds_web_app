@@ -849,9 +849,8 @@
       "type": "shell",
       "command": "python",
       "args": [
-        "backend\\scripts\\phase94_fastmcp_registry.py",
-        "--tool",
-        "system_health_check"
+        "sveltekit-frontend\\scripts\\phase94-task-cli.py",
+        "health"
       ],
       "group": "test",
       "presentation": {
@@ -862,15 +861,15 @@
         "showReuseMessage": true,
         "clear": false
       },
-      "problemMatcher": "$tsc"
+      "problemMatcher": []
     },
     {
       "label": "📊 Phase 94: Redis Cache Stats",
       "type": "shell",
       "command": "python",
       "args": [
-        "backend\\scripts\\phase94_redis_glyph_query.py",
-        "--stats"
+        "sveltekit-frontend\\scripts\\phase94-task-cli.py",
+        "redis-stats"
       ],
       "group": "test",
       "presentation": {
@@ -881,14 +880,15 @@
         "showReuseMessage": true,
         "clear": false
       },
-      "problemMatcher": "$tsc"
+      "problemMatcher": []
     },
     {
       "label": "🔍 Phase 94: Query Cluster Errors",
       "type": "shell",
       "command": "python",
       "args": [
-        "backend\\scripts\\phase94_redis_glyph_query.py",
+        "sveltekit-frontend\\scripts\\phase94-task-cli.py",
+        "query-cluster",
         "--cluster",
         "${input:clusterId}"
       ],
@@ -901,15 +901,15 @@
         "showReuseMessage": true,
         "clear": false
       },
-      "problemMatcher": "$tsc"
+      "problemMatcher": []
     },
     {
       "label": "🔧 Phase 94: List All FastMCP Tools",
       "type": "shell",
       "command": "python",
       "args": [
-        "backend\\scripts\\phase94_fastmcp_registry.py",
-        "--list"
+        "sveltekit-frontend\\scripts\\phase94-task-cli.py",
+        "list-tools"
       ],
       "group": "test",
       "presentation": {
@@ -920,18 +920,23 @@
         "showReuseMessage": true,
         "clear": false
       },
-      "problemMatcher": "$tsc"
+      "problemMatcher": []
     },
     {
       "label": "🤖 Phase 94: Get AI Recommendation",
       "type": "shell",
       "command": "python",
       "args": [
-        "backend\\scripts\\phase94_fastmcp_registry.py",
-        "--tool",
-        "agentic_recommendation",
-        "--args",
-        "{\"language\": \"typescript\", \"error_type\": \"${input:errorType}\", \"context\": \"${fileBasename}\"}"
+        "sveltekit-frontend\\scripts\\phase94-task-cli.py",
+        "recommend",
+        "--language",
+        "typescript",
+        "--error-type",
+        "${input:errorType}",
+        "--context",
+        "${fileBasename}",
+        "--file",
+        "${relativeFile}"
       ],
       "group": "build",
       "presentation": {
@@ -942,18 +947,17 @@
         "showReuseMessage": true,
         "clear": false
       },
-      "problemMatcher": "$tsc"
+      "problemMatcher": []
     },
     {
       "label": "🔎 Phase 94: Analyze Current File",
       "type": "shell",
       "command": "python",
       "args": [
-        "backend\\scripts\\phase94_fastmcp_registry.py",
-        "--tool",
-        "unified_ast_query",
-        "--args",
-        "{\"file_path\": \"${relativeFile}\"}"
+        "sveltekit-frontend\\scripts\\phase94-task-cli.py",
+        "analyze-file",
+        "--file",
+        "${relativeFile}"
       ],
       "group": "build",
       "presentation": {
@@ -964,7 +968,7 @@
         "showReuseMessage": true,
         "clear": false
       },
-      "problemMatcher": "$tsc"
+      "problemMatcher": []
     },
     {
       "label": "🚀 Phase 94: Batch Fix Cluster 0 (Dry-Run)",
@@ -986,19 +990,13 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "problemMatcher": "$tsc"
+      "problemMatcher": []
     },
     {
       "label": "✅ Phase 94: Validate Fix",
       "type": "shell",
-      "command": "npx",
-      "args": [
-        "svelte-check",
-        "--threshold",
-        "error",
-        "--tsconfig",
-        "./tsconfig.json"
-      ],
+      "command": "npx svelte-kit sync; npx svelte-check --threshold error --tsconfig ./tsconfig.json",
+      "args": [],
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -1011,9 +1009,7 @@
         "showReuseMessage": true,
         "clear": false
       },
-      "problemMatcher": [
-        "$tsc"
-      ]
+      "problemMatcher": []
     },
     {
       "label": "📖 Phase 94: Open How-To Guide",
@@ -1031,7 +1027,7 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "problemMatcher": "$tsc"
+      "problemMatcher": []
     }
   ],
   "inputs": [

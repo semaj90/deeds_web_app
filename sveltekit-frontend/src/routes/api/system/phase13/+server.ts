@@ -2,6 +2,7 @@ import { redisPool } from '$lib/server/redis.js';
 import { db } from '$lib/server/db/client';
 import { json } from '@sveltejs/kit';
 import { sql } from 'drizzle-orm';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 /**
  * GET /api/system/phase13
@@ -52,7 +53,7 @@ export async function GET() {
 		// Check Ollama (if configured)
 		if (process.env.OLLAMA_URL) {
 			try {
-				const resp = await fetch(`${process.env.OLLAMA_URL}/api/tags`);
+				const resp = await ollamaFetch(`${process.env.OLLAMA_URL}/api/tags`);
 				const data = await resp.json();
 				health.services.ollama = {
 					ok: resp.ok,

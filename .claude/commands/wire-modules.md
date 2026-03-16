@@ -14,6 +14,7 @@ For each `.svelte`, `.svelte.ts`, or `.ts` file in scope:
 2. Verify the target file exists (resolve `$lib/` → `src/lib/`, `.js` → `.ts`)
 3. If target is missing → **BROKEN IMPORT**
 4. If target exists but the exported symbol doesn't match → **STALE IMPORT**
+5. If a `fetch('/api/...')` helper exists, verify a rendered consumer, lifecycle hook, or machine transition can actually trigger it
 
 Also check:
 - `fetch('/api/...')` calls → verify corresponding `+server.ts` route exists
@@ -27,6 +28,9 @@ Also check:
 | **MISSING_FILE** | Import target doesn't exist | Create stub or find replacement |
 | **MISSING_EXPORT** | File exists but named export is gone | Update import to correct export |
 | **MISSING_API_ROUTE** | `fetch('/api/...')` calls non-existent route | Create `+server.ts` stub |
+| **SHALLOW_TRIGGER** | API route exists but no rendered UI path can invoke it | Wire handler into rendered UI/lifecycle, or archive dead path |
+| **DEAD_CHAIN** | File imported → function defined → fetch call exists, but the call is never reachable from any rendered element, lifecycle hook, or machine transition | Trace back from fetch: if no onclick/onMount/$effect/XState actor invokes the function, mark DEAD_CHAIN |
+| **DUPLICATE_IMPL** | Two files implement the same feature (same basename or overlapping API) | Keep the richer/actively-imported version, archive the other |
 | **STALE_TYPE** | Type import references removed/renamed type | Update type import |
 | **CIRCULAR** | Circular dependency detected | Refactor to break cycle |
 

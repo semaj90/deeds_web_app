@@ -12,6 +12,7 @@
 import Fuse from 'fuse.js';
 import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -147,7 +148,7 @@ const DEFAULT_PATH_BOOSTS: Record<string, number> = {
 };
 
 async function embedQuery(text: string): Promise<number[]> {
-	const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
+	const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, prompt: text }),

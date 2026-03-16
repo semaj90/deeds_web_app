@@ -14,6 +14,7 @@ import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { acquireGpuLease, releaseGpuLease, getGpuLeaseStatus } from './gpu-arbiter.js';
 import { inferLLM, healthCheck as trtHealthCheck } from '$lib/server/trt-llm.js';
 import { litellmChat } from '$lib/server/ollama.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 export interface InferenceRequest {
 	prompt: string;
@@ -131,7 +132,7 @@ async function ollamaInference(request: InferenceRequest, startTime: number): Pr
 
 	try {
 		return await traceLLM('inference-router-ollama', { model, prompt: prompt.slice(0, 500) }, async (gen) => {
-			const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+			const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({

@@ -1,10 +1,11 @@
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 import { ENV } from '$lib/server/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 type Vector = number[];
 
 async function embedWithGemma(texts: string[]): Promise<Vector[]> {
-    const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
+    const response = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({

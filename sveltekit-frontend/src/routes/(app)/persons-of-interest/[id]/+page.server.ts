@@ -25,34 +25,39 @@ export const load: PageServerLoad = async ({ params }) => {
 	);
 
 	return {
-		poi: {
-			id: poi.id,
-			name: poi.name,
-			status: poi.status,
-			threatLevel: poi.threatLevel,
-			description: poi.description,
-			relationship: poi.relationship,
-			aliases: poi.aliases,
-			caseIds: poi.caseIds,
-			aiProfile: poi.aiProfile,
-			who: poi.who,
-			what: poi.what,
-			why: poi.why,
-			how: poi.how,
-			risk: poi.risk,
-			confidence: poi.confidence,
-			createdAt: poi.createdAt?.toISOString() ?? '',
-			updatedAt: poi.updatedAt?.toISOString() ?? ''
-		},
-		photos: photos.map(p => ({
-			id: p.id,
-			url: p.url,
-			thumbnailUrl: p.thumbnailUrl,
-			originalName: p.originalName,
-			aiCaption: p.aiCaption,
-			aiTags: p.aiTags,
-			uploadedAt: p.uploadedAt?.toISOString() ?? ''
-		})),
-		loadError: null
-	};
+    poi: {
+      id: poi.id,
+      name: poi.name,
+      status: poi.status,
+      threatLevel: poi.threatLevel,
+      description: poi.description,
+      relationship: poi.relationship,
+      aliases: poi.aliases,
+      caseIds: poi.caseIds,
+      caseId: poi.caseIds?.[0] ?? null,
+      aiProfile: poi.aiProfile,
+      who: poi.who,
+      what: poi.what,
+      why: poi.why,
+      how: poi.how,
+      risk: poi.risk,
+      confidence: poi.confidence,
+      createdAt: poi.createdAt?.toISOString() ?? '',
+      updatedAt: poi.updatedAt?.toISOString() ?? '',
+    },
+    photos: photos.map((p) => ({
+      id: p.id,
+      url: p.url,
+      thumbnailUrl: p.thumbnailUrl ?? p.url,
+      originalName: p.originalName,
+      mimeType: p.mimeType,
+      size: p.size,
+      aiCaption: p.aiCaption,
+      aiTags: p.aiTags,
+      exifData: p.exifData,
+      forensicData: p.forensicData,
+      uploadedAt: p.uploadedAt?.toISOString() ?? '',
+    })),
+    loadError: null,
+  };
 };

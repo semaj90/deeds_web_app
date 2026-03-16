@@ -4,6 +4,7 @@ import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 /**
  * POST /api/cases/[id]/key-points
@@ -68,7 +69,7 @@ Respond with ONLY a JSON object:
 }`;
 
 		try {
-			const ollamaRes = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+			const ollamaRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({

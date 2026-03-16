@@ -7,6 +7,7 @@ import { acquireGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 import { embedText } from '$lib/server/embedding/embed.js';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const OLLAMA_URL = getOllamaUrl();
 
@@ -33,7 +34,7 @@ async function getOllamaEmbedding(
 	model: string = 'embeddinggemma:latest'
 ): Promise<{ embedding: number[] }> {
 	return traceEmbedding(text, model, async () => {
-		const response = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+		const response = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model, prompt: text }),

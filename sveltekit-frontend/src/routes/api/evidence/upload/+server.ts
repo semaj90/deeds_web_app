@@ -27,6 +27,7 @@ import { z } from 'zod';
 import { redis } from '$lib/server/redis.js';
 import { classifyDocument } from '$lib/server/nlp/analyzer.js';
 import { createYOLOService } from '$lib/server/yolo.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const evidenceUploadSchema = z.object({
 	title: z.string().max(256).optional(),
@@ -935,7 +936,7 @@ async function embedText(text: string): Promise<number[] | null> {
 	if (!embedding) {
 		try {
 			embedding = await traceEmbedding(text, model, async () => {
-				const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+				const res = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ model, prompt: text }),
@@ -944,7 +945,7 @@ async function embedText(text: string): Promise<number[] | null> {
 
 				if (!res.ok) {
 					// Fallback to nomic-embed-text
-					const fallback = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+					const fallback = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify({ model: 'nomic-embed-text:latest', prompt: text }),

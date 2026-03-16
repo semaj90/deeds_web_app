@@ -38,6 +38,7 @@ import { assembleACEContext, buildACEPrompt } from '$lib/server/ace/context-asse
 import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self-prompt.js';
 import { rabbitmq } from '$lib/server/queue/rabbitmq-manager-fixed.js';
 import { createHash } from 'crypto';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 // ── Types ─────────────────────────────────────────────────────────────
 
@@ -154,7 +155,7 @@ async function callOllama(
 			};
 		}
 
-		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -216,7 +217,7 @@ async function handleStream(body: SynthesisRequest, userId: string): Promise<Res
 				sendEvent('synthesis_started', { model: MODEL, maxTokens });
 
 				const userPrompt = `${acePrompt.contextWindow}\n\nQuestion: ${query}\n\nProvide a comprehensive legal analysis. Include [Source N] citations where applicable.`;
-				const genRes = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+				const genRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({

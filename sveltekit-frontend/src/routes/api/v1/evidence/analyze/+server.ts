@@ -2,6 +2,7 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const evidenceAnalyzeSchema = z.object({
 	evidenceId: z.string().max(500).optional(),
@@ -34,7 +35,7 @@ export const POST: RequestHandler = async ({ request }) => {
 Evidence text:
 ${textToAnalyze.slice(0, 2000)}`;
 
-		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

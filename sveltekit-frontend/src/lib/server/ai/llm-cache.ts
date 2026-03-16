@@ -12,6 +12,7 @@
 import { createHash } from 'crypto';
 import { QdrantManager, deterministicPointId } from '$lib/server/vector/qdrant-manager.js';
 import { ENV } from '$lib/server/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
@@ -54,7 +55,7 @@ function hashContext(context: string): string {
  */
 async function embedQuery(query: string): Promise<number[] | null> {
 	try {
-		const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+		const res = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: query }),

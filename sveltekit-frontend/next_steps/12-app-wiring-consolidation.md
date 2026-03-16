@@ -5,6 +5,20 @@
 
 ---
 
+## March 16, 2026 Delta
+
+- POI photo modal is now canonicalized around `src/lib/components/POIPhotoModal.svelte`; `src/lib/client/ui/POIPhotoModal.svelte` remains only as a compatibility wrapper for older consumers.
+- Wiring audits must prove **reachable trigger paths**, not just import presence and route-file existence. A `fetch('/api/...')` helper with no rendered/lifecycle trigger is shallow wiring.
+- Quick top-level `src/lib/` usage scan flagged these low-reference directories for consolidation review before any archive moves: `env` (0 refs), `__tests__` (0), `tracking` (1), `actions` (1), `agents` (1), `themes` (1), `phase72` (1), `messaging` (1), `shims` (1), `memory` (2), `workers` (3), `features` (3), `client` (5), `data` (5).
+- Follow-up audit correction: `components/dashboard/QuickActions.svelte` and `components/dashboard/SystemStatus.svelte` are live via `(app)/command-center/+page.svelte`, so they are not archive candidates.
+- `components/dashboard/QuickActionsPanel.svelte` was partially shallow on `(app)/cases/[id]/+page.svelte`: three actions targeted unsupported `?tab=` states, while the board action was valid. It has been replaced there with the generic `QuickActions` component wired to reachable tabs plus the existing board route and archived to `deeds_labs/lib-dead-directories/dashboard/QuickActionsPanel.svelte`.
+- Remaining orphan/defer candidates still needing G6 verification: `machines/AIAssistantMachineComponent.svelte`, `components/dashboard/SystemStatusPanel.svelte`, `utils/bits-ui-ssr`, `utils/backup-analysis.mjs`, `data/phase82-route-consolidation.json`.
+- Low-reference directory audit corrections: `shims/` is required runtime support, `messaging/rabbitmq-xstate-integration.ts` is live from `src/hooks.server.ts`, and `phase72/routeGraphAdapter.ts` is live from `(app)/admin/all-routes/+page.server.ts` even though its directory name is still phase-scoped.
+- Pre-push consolidation TODO: run the updated slash-command audits on `src/lib/{env,__tests__,tracking,actions,agents,themes,phase72,messaging,shims,memory,workers,features,client,data}` and `src/routes/api/search`, then fold the verified findings back into this plan instead of archiving by raw reference count.
+- Search surface consolidation TODO: keep `/api/search/cases`, `/api/search/laws`, `/api/search/suggestions`, and `/api/search/filters` as one typed Drizzle-backed search surface, then decide whether `(app)/global-search/+page.svelte` should wire into `search-client.ts` or whether that helper path should be pruned as duplicate implementation.
+
+---
+
 ## App Route Architecture (18 Top-Level Groups)
 
 ```

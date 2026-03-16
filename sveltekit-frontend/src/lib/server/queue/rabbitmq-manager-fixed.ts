@@ -169,14 +169,23 @@ export class RabbitMQManager extends EventEmitter {
 
     // Migrate queues created without DLX (pre-existing mismatch fix).
     // AMQP assertQueue fails with PRECONDITION_FAILED if queue exists with
-    // different arguments, and that closes the channel. Delete-then-recreate
-    // is safe for ephemeral queues like cache.invalidate.
-    const queuesToMigrate = ['cache.invalidate', 'document.embed'];
+    // different arguments, and that closes the channel. Force delete before
+    // re-creating so stale queue args from earlier boot paths do not survive.
+    const queuesToMigrate = [
+      'cache.invalidate',
+      'document.embed',
+      'evidence.process',
+      'vector.index',
+      'chat.context',
+      'analytics.track',
+      'codebase.index',
+      'ace.evaluate',
+    ];
     for (const queue of queuesToMigrate) {
       try {
-        await (this.channel as any).deleteQueue(queue, { ifEmpty: true });
+        await (this.channel as any).deleteQueue(queue);
       } catch {
-        // Queue doesn't exist or has messages — will be created below
+        // Queue doesn't exist yet — it will be created below
       }
     }
 

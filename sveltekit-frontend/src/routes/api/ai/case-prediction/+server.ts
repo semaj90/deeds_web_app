@@ -3,6 +3,7 @@ import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { db } from '$lib/server/db/client';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const casePredictionSchema = z.object({
 	caseId: z.string().min(1, 'caseId required').max(500)
@@ -36,7 +37,7 @@ Description: ${caseRow.description || 'No description'}
 
 Provide: 1) Likelihood of favorable outcome (0-100%), 2) Key risk factors, 3) Recommended next steps. Be concise.`;
 
-		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

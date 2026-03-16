@@ -9,6 +9,7 @@
 import { extractLegalTags } from '$lib/server/rag/tag-extractor.js';
 import { ENV } from '$lib/server/env.server.js';
 import type { GeneratedTag } from './types.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const MODEL = 'gemma3-legal:latest';
@@ -116,7 +117,7 @@ Categories must be from: criminal, civil-litigation, corporate, employment, inte
 
 Text: ${text}`;
 
-	const res = await fetch(`${OLLAMA_URL}/api/generate`, {
+	const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({

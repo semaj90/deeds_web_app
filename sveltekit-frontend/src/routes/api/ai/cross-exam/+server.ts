@@ -2,6 +2,7 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const crossExamSchema = z.object({
 	witness: z.object({
@@ -47,7 +48,7 @@ ${caseContext ? `Case Context: ${caseContext}` : ''}
 
 Generate 5-8 strategic cross-examination questions.`;
 
-		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

@@ -10,6 +10,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const yorhaChatSchema = z.object({
 	message: z.string().trim().min(1, 'Missing message').max(50000),
@@ -48,7 +49,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 
 	try {
-		const res = await fetch(`${OLLAMA_URL}/api/generate`, {
+		const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

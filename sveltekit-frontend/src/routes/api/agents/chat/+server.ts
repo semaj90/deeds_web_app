@@ -2,6 +2,7 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const agentChatSchema = z.object({
 	prompt: z.string().max(10000).optional(),
@@ -161,7 +162,7 @@ Provide structured, actionable responses with confidence levels where appropriat
 
 		// Iterative tool calling loop
 		while (maxToolRounds > 0) {
-			const chatRes = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+			const chatRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -210,7 +211,7 @@ Provide structured, actionable responses with confidence levels where appropriat
 		}
 
 		// Exhausted tool rounds — get final response
-		const finalRes = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const finalRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

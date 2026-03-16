@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import { getOllamaUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const OLLAMA_URL = getOllamaUrl();
 
@@ -24,7 +25,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 		const text = parsed.data.text;
 
-		const res = await fetch(`${OLLAMA_URL}/api/generate`, {
+		const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

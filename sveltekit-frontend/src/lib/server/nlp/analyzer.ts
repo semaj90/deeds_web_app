@@ -12,6 +12,7 @@
 
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const MODEL = 'gemma3-legal:latest';
@@ -89,7 +90,7 @@ export async function analyzeText(text: string): Promise<NLPAnalysis> {
 /** Call Ollama with JSON format mode and parse the response. */
 async function ollamaJSON<T>(prompt: string): Promise<T> {
 	return traceLLM('nlp-analyzer', { model: MODEL, prompt: prompt.slice(0, 500) }, async (gen) => {
-		const res = await fetch(`${OLLAMA_URL}/api/generate`, {
+		const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

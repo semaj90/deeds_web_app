@@ -10,6 +10,7 @@ import { sql } from 'drizzle-orm';
 import { redis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 import type { RequestHandler } from '@sveltejs/kit';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const PROBE_TIMEOUT = 3000;
 
@@ -25,7 +26,7 @@ export const GET: RequestHandler = async () => {
 		safe(db.execute(sql`SELECT 1`).then(() => true), false),
 		safe(redis.ping().then(() => true), false),
 		safe(
-			fetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(PROBE_TIMEOUT) })
+			ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(PROBE_TIMEOUT) })
 				.then((r) => r.ok),
 			false,
 		),

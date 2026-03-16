@@ -4,6 +4,7 @@ import { getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
 function broadcastAgentProgress(_data: any) { /* no-op */ }
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const OLLAMA_URL = getOllamaUrl();
 const QDRANT_URL = getQdrantUrl();
@@ -24,7 +25,7 @@ interface AgentProgress {
 async function queryKnowledgeBase(filePath: string, errorContext: string): Promise<string> {
 	try {
 		// Generate embedding for the error context
-		const embedResponse = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+		const embedResponse = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: 'embeddinggemma:latest',
@@ -130,7 +131,7 @@ Return fixes in JSON format:
 	});
 
 	try {
-		const response = await fetch(`${OLLAMA_URL}/api/generate`, {
+		const response = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: 'gemma3-legal:latest',

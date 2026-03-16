@@ -6,6 +6,7 @@ import type { RequestHandler } from './$types';
 import { eq, arrayContains } from 'drizzle-orm';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const generateReportSchema = z.object({
 	caseId: z.string().min(1, 'Case ID is required').max(500),
@@ -102,7 +103,7 @@ Generate the document with these sections:
 Output ONLY the HTML content (no markdown, no code fences). Use h1, h2, h3, p, ul, li, strong, em tags.`;
 
 	try {
-		const res = await fetch(`${OLLAMA_URL}/api/generate`, {
+		const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

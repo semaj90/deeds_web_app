@@ -31,24 +31,51 @@ For each orphan, read the file and apply these gates IN ORDER:
 | **G3: Rewrite Potential** | If Svelte 4 or corrupted, is the feature valuable enough to rewrite from scratch? | → REWRITE candidate | Continue to G4 |
 | **G4: Integration Point** | Is there a natural route or layout that should host this? | Continue | → ARCHIVE (homeless) |
 | **G5: Effort** | Can it be wired with a simple import + render (< 30 min)? | → WIRE | → DEFER to backlog |
-| **G6: Full Wiring** | Is the component TRULY connected end-to-end? | FULLY WIRED | → SHALLOW (incomplete) |
+| **G6: Route Reachability** | Is there a REACHABLE execution path from rendered UI → handler → API route? | FULLY WIRED | → SHALLOW (incomplete) |
 
-### Gate 6: Deep Wiring Verification
+### Gate 6: Route Reachability Verification
 
-For components already imported (or newly wired), verify the full chain:
+For every component (imported or candidate), trace the full execution chain. A component is **FULLY WIRED** only if ALL links in the chain resolve:
 
+```
+Rendered UI element (button/form/onMount/lifecycle)
+  → Event handler or callback prop
+    → fetch('/api/...') or server action
+      → +server.ts file EXISTS with matching HTTP method
+        → Server logic returns data that flows back to UI
+```
+
+**6a. Static Chain** (must all resolve):
 1. **Import exists** — `grep -r "ComponentName" src/` shows the import
-2. **Render exists** — Importing file actually renders it (`<ComponentName` or `{@render`)
-3. **API routes exist** — If component calls `/api/...` endpoints, verify `+server.ts` files exist
-4. **Props connected** — Callback props (onSubmit, onUpload) wired to real handlers, NOT `() => {}`
-5. **Data flows** — Component receives real data from `$props()`, not placeholder/mock data
+2. **Render exists** — Importing file actually renders `<ComponentName` or `{@render`
+3. **Trigger reachable** — A rendered button/form/onMount/machine transition can invoke the handler
+4. **API route exists** — Every `fetch('/api/...')` call has a matching `+server.ts` with the right HTTP method (GET/POST/PATCH/DELETE)
+5. **Props connected** — Callback props wired to real handlers, NOT `() => {}` or `() => console.log()`
+6. **Data flows** — Component receives real data from `$props()`, not placeholder/mock
 
-**Shallow wiring indicators:**
+**6b. Dynamic Chain** (for SSE/streaming/XState):
+1. **EventSource URLs** — `new EventSource('/api/...')` must have matching SSE endpoint
+2. **XState actors** — `fromPromise` actors must resolve to real API calls, not mocks
+3. **WebSocket URLs** — Must match a running server (note: project uses SSE, not WS)
+
+**Shallow wiring indicators (flag as SHALLOW):**
 - `onCallback={() => {}}` or `onCallback={() => console.log()}` — no-op handlers
-- Component imported but never rendered in template
-- Component rendered but its API endpoints don't exist
-- Dynamic import loaded but conditional render never triggers
-- Props bound to `$state` that's declared but never set
+- `fetch('/api/foo')` where `src/routes/api/foo/+server.ts` does NOT exist
+- `fetch('/api/foo')` inside a function that is never bound to rendered UI
+- Component imported but never rendered in template (`<Component` not found)
+- Component rendered but trigger state is declared but never set (e.g., `let show = $state(false)` and nothing ever sets it to `true`)
+- Props bound to `$state` that's initialized but never mutated
+- Dynamic import loaded but conditional render gate never opens
+
+**Missing API route catalog** — When a component references a non-existent API route, log it:
+```
+MISSING ROUTE: /api/search/cases (GET) — referenced by search-client.ts
+```
+These become stubs for the wire-modules skill.
+
+## AI Planning Guardrail
+
+For borderline `WIRE` vs `DEFER` calls, AI tools and web search are useful for planning SvelteKit 2 SSR/client splits, TypeScript ↔ JavaScript interop, Drizzle ORM 0.44 type patterns, and backend ↔ frontend data contracts. Do not treat external guidance as proof: confirm it against this repo before wiring or archiving.
 
 Report any "imported but not truly wired" component as **SHALLOW**.
 

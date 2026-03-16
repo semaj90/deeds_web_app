@@ -2,6 +2,7 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const legalResearchSchema = z.object({
 	topic: z.string().max(10000).optional().default(''),
@@ -26,7 +27,7 @@ Include: relevant statutes, case law references, legal principles, and practical
 Jurisdiction: ${jurisdiction}. Research depth: ${depth}.
 Format your response with clear sections: Summary, Key Legal Principles, Relevant Statutes, Case Law, and Practical Implications.`;
 
-		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

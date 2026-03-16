@@ -4,7 +4,7 @@ export const load: PageLoad = async ({ fetch, params }) => {
   let reports = [];
 
   try {
-    const res = await fetch(`/api/v1/reports?caseId=${params.id}`);
+    const res = await fetch(`/api/reports?caseId=${params.id}`);
     if (res.ok) {
       reports = await res.json();
     }

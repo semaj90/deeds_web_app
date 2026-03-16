@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from '$lib/components/ui/Button.svelte';
+  import Button from '../../components/ui/Button.svelte';
 	let { poiId, disabled = false, onUpload, onError } = $props<{ poiId: number; disabled?: boolean;
 	onUpload: (data: any) => void, onError: (error: any) => void }>();
 
@@ -51,12 +51,12 @@
  throw new Error(`Upload failed: ${response.statusText}`);
  }
 
- const result = await response.json();
- onUpload(result.data);
+     const result = await response.json();
+     onUpload(result.photo ?? result.data ?? result);
  }
  } catch (error) {
  console.error('Upload error:', error);
- onError({ error: error.message });
+     onError({ error: error instanceof Error ? error.message : 'Upload failed' });
  } finally {
  uploading = false;
  }

@@ -5,6 +5,20 @@
 
 ---
 
+## March 16, 2026 Follow-Up Audit
+
+- **Type review still worth scheduling**: do a focused Drizzle ORM 0.44 + Svelte 5 runes type review after current wiring cleanup. The main value is catching contract drift between route payloads, `$props()` shapes, and `.$inferSelect`/`.$inferInsert` usage.
+- **Validation backlog remains material**: approximately 118 of 258 API routes still lack Zod validation.
+- **Services visibility remains incomplete**: `src/lib/services/**` blanket exclusion still hides roughly 312 corrupted files from normal discovery, even though transitively imported clean files are checked.
+- **Full containerization is NOT done yet**: main compose files still point core LLM traffic to `host.docker.internal:11434`, and many scripts/ecosystem configs still hardcode `localhost:11434`. Until Ollama is run as a first-class container service or all consumers are normalized behind one internal service URL, the pipeline is only partially containerized.
+- **Audit standard tightened**: “fully wired” now means import → render → reachable trigger path → API route → props → data flow. Route existence alone is insufficient.
+- **Pre-push directory audit should be explicit**: run `/shallow-wiring-analysis`, `/audit-components`, `/prune-codebase`, and `/wire-modules` against the low-reference directories in `src/lib/` plus `src/routes/api/search` before pushing consolidation work.
+- **Verified keepers from the low-reference sweep**: `src/lib/shims/*` remains required browser-compatibility surface, and `src/lib/messaging/rabbitmq-xstate-integration.ts` is live via `src/hooks.server.ts`; neither should be treated as archive candidates.
+- **Verified relocation candidate**: `src/lib/phase72/routeGraphAdapter.ts` is live from `(app)/admin/all-routes/+page.server.ts`, but it should move to a non-phase diagnostics namespace during directory consolidation.
+- **Search wiring still needs a product decision**: the `/api/search/*` routes are now the typed Drizzle-backed search surface, but `(app)/global-search/+page.svelte` still bypasses them with direct fetches to `/api/statutes/search`, `/api/precedents/search`, and `/api/glossary/search` while also carrying an unused `search-client.ts` import path.
+
+---
+
 ## Architecture Overview
 
 ```

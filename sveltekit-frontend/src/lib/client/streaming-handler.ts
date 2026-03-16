@@ -92,6 +92,13 @@ export async function fetchWithStreaming(
  throw new Error(`HTTP ${response.status}: ${response.statusText}`);
  }
 
+ const contentType = response.headers.get('content-type') ?? '';
+ if (!contentType.includes('text/event-stream')) {
+   const text = await response.text();
+   onComplete?.(text);
+   return text;
+ }
+
  return handleStreamingResponse(response, {
  onChunk,
  onComplete,

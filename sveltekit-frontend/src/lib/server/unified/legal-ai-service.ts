@@ -18,6 +18,7 @@ import db from '$lib/server/db';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 // --- Types ---
 
@@ -144,7 +145,7 @@ export class UnifiedLegalAIService {
 		} catch {
 			// gRPC unavailable — try direct Ollama
 			try {
-				const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
+				const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, prompt: query }),

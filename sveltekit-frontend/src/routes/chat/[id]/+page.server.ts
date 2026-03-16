@@ -7,6 +7,7 @@ import { fail } from '@sveltejs/kit';
 import { redis } from '$lib/server/redis';
 import { getOllamaUrl } from '$lib/config/env.server.js';
 import type { Actions, PageServerLoad } from './$types';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const OLLAMA_URL = getOllamaUrl();
 const OLLAMA_MODEL = process.env?.OLLAMA_MODEL ?? 'gemma3-legal:latest';
@@ -156,7 +157,7 @@ async function streamOllamaResponse(
 	let fullContent = '';
 
 	try {
-		const response = await fetch(`${OLLAMA_URL}/api/generate`, {
+		const response = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

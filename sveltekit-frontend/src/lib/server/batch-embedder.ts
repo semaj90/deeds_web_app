@@ -11,6 +11,7 @@
 import { ENV } from './env.server.js';
 import { getCachedEmbedding, cacheEmbedding, batchGetCachedEmbeddings, batchCacheEmbeddings } from './embedding-cache.js';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const BATCH_SIZE = 32;
 const BATCH_TIMEOUT_MS = 50; // 50ms batching window
@@ -141,7 +142,7 @@ class BatchEmbedder {
 	private async fetchFromOllama(texts: string[]): Promise<Float32Array[]> {
 		const model = 'embeddinggemma:latest';
 		return traceEmbedding(`[batch:${texts.length}]`, model, async () => {
-			const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
+			const response = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({

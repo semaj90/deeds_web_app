@@ -11,7 +11,8 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
 import WysiwygEditor from '$lib/components/editor/WysiwygEditor.svelte';
 import TipTapEditor from '$lib/components/TipTapEditor.svelte';
 import CaseTheoryConstructor from '$lib/components/yorha/CaseTheoryConstructor.svelte';
-import QuickActionsPanel from '$lib/components/dashboard/QuickActionsPanel.svelte';
+import QuickActions from '$lib/components/dashboard/QuickActions.svelte';
+import type { QuickAction } from '$lib/components/dashboard/QuickActions.svelte';
 import CaseOutcomePrediction from '$lib/components/CaseOutcomePrediction.svelte';
 import CaseTimeline from '$lib/components/legal/CaseTimeline.svelte';
 import CrossExaminationAssistant from '$lib/components/yorha/CrossExaminationAssistant.svelte';
@@ -167,6 +168,49 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  let showStatuteModal = $state(false);
 
  const caseId = page.params.id;
+
+ const theoryQuickActions: QuickAction[] = [
+   {
+     id: 'timeline-analysis',
+     icon: 'bar-chart-2',
+     label: 'Timeline Analysis',
+     description: 'Jump to the live case timeline tab.',
+     variant: 'primary',
+     onClick: () => {
+       activeTab = 'timeline';
+     }
+   },
+   {
+     id: 'evidence-summary',
+     icon: 'file-text',
+     label: 'Evidence Summary',
+     description: 'Open the current summary editor for this case.',
+     variant: 'success',
+     onClick: () => {
+       activeTab = 'summary';
+     }
+   },
+   {
+     id: 'suspect-connections',
+     icon: 'search',
+     label: 'Suspect Connections',
+     description: 'Open the evidence board for relationship mapping.',
+     variant: 'default',
+     onClick: () => {
+       goto(`/cases/${caseId}/board`);
+     }
+   },
+   {
+     id: 'draft-document',
+     icon: 'gavel',
+     label: 'Draft Document',
+     description: 'Open the legal document drafting tab.',
+     variant: 'warning',
+     onClick: () => {
+       activeTab = 'document';
+     }
+   }
+ ];
 
  onMount(async () => {
  await loadCase();
@@ -848,7 +892,7 @@ import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
  </div>
  {:else if activeTab === 'theory'}
  <!-- Case Theory Tab -->
- <QuickActionsPanel {caseId} />
+ <QuickActions actions={theoryQuickActions} title="Theory Actions" compact={true} />
  <div class="mt-6">
    <CaseTheoryConstructor />
  </div>

@@ -1,3 +1,4 @@
+import { ollamaFetch } from '$lib/server/ollama.js';
 /**
  * CouchDB Client - Lightweight wrapper for ACE knowledge base
  *
@@ -94,7 +95,7 @@ const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
 export const aceLLM = {
   async summarize(text: string, model = 'gemma3-legal:latest'): Promise<string> {
     try {
-      const res = await fetch(OLLAMA_URL + '/api/generate', {
+      const res = await ollamaFetch(OLLAMA_URL + '/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

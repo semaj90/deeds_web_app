@@ -14,6 +14,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 import { logCodebaseSearch } from '$lib/server/analytics/event-logger.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 // Zod schema validates query, candidatePaths, weights, pathBoosts
 const rerankSchema = z.object({
@@ -41,7 +42,7 @@ interface QdrantSearchResult {
 }
 
 async function embedQuery(text: string): Promise<number[]> {
-	const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
+	const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, prompt: text }),

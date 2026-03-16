@@ -28,7 +28,6 @@
 	let faceMatchLoading = $state(false);
 	let faceMatchError = $state<string | null>(null);
 	let photos = $state<any[]>([]);
-	$effect(() => { photos = (data as any).photos ?? []; });
 	let uploading = $state(false);
 	let uploadError = $state<string | null>(null);
 	let similarPOIs = $state<any[]>([]);
@@ -39,6 +38,19 @@
 	let searchResults = $state<any[]>([]);
 	let searchLoading = $state(false);
 	let searchError = $state<string | null>(null);
+
+	function normalizePhoto(photo: any) {
+		if (!photo) return photo;
+		return {
+			...photo,
+			url: photo.url ?? photo.thumbnailUrl ?? '',
+			thumbnailUrl: photo.thumbnailUrl ?? photo.url ?? null,
+			aiCaption: photo.aiCaption ?? photo.metadata?.ai?.caption ?? photo.ai?.caption ?? null,
+			aiTags: photo.aiTags ?? photo.metadata?.ai?.tags ?? photo.ai?.tags ?? [],
+		};
+	}
+
+	$effect(() => { photos = ((data as any).photos ?? []).map(normalizePhoto); });
 
 	async function loadSimilarPOIs() {
 		if (!data.poi?.id) return;
@@ -58,7 +70,7 @@
 		}
 	}
 
-	
+
 	async function searchSimilarPOIs(query?: string) {
 		const q = query ?? searchQuery.trim();
 		if (!q) return;
@@ -134,7 +146,8 @@
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.error ?? `Upload failed (${res.status})`);
 			}
-			const newPhoto = await res.json();
+			const payload = await res.json();
+			const newPhoto = normalizePhoto(payload.photo ?? payload);
 			photos = [newPhoto, ...photos];
 		} catch (err) {
 			uploadError = err instanceof Error ? err.message : 'Upload failed';

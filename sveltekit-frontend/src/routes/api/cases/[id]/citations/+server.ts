@@ -113,3 +113,43 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 		throw error(500, 'Failed to link citation to case');
 	}
 };
+
+const deleteCaseCitationSchema = z.object({
+	linkId: z.string().min(1, 'linkId required').max(500),
+});
+
+/**
+ * DELETE /api/cases/[id]/citations
+ * Remove a citation link from a case
+ * Body: { linkId: string }
+ */
+export const DELETE: RequestHandler = async ({ locals, params, request }) => {
+	if (!locals.user) {
+		throw error(401, 'Unauthorized');
+	}
+
+	try {
+		const body = await request.json().catch(() => ({}));
+		const parsed = deleteCaseCitationSchema.safeParse(body);
+		if (!parsed.success) {
+			throw error(400, parsed.error.issues[0]?.message ?? 'Invalid request');
+		}
+
+		const [deleted] = await db
+			.delete(caseStatuteLinks)
+			.where(eq(caseStatuteLinks.id, parsed.data.linkId))
+			.returning({ id: caseStatuteLinks.id });
+
+		if (!deleted) {
+			throw error(404, 'Citation link not found');
+		}
+
+		return json({ success: true, message: 'Citation unlinked from case' });
+	} catch (err) {
+		console.error('Error unlinking citation from case:', err);
+		if (err instanceof Error && 'status' in err) {
+			throw err;
+		}
+		throw error(500, 'Failed to unlink citation from case');
+	}
+};

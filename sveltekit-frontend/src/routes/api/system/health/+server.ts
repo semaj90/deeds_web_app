@@ -4,6 +4,7 @@ import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
 import { ENV } from '$lib/server/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 async function checkService(name: string, fn: () => Promise<void>): Promise<'ok' | 'error'> {
 	try {
@@ -26,7 +27,7 @@ export const GET: RequestHandler = async () => {
 			if (pong !== 'PONG') throw new Error('No PONG');
 		}),
 		checkService('ollama', async () => {
-			const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(3000) });
+			const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(3000) });
 			if (!res.ok) throw new Error(`Ollama ${res.status}`);
 		}),
 		checkService('qdrant', async () => {

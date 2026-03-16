@@ -14,6 +14,7 @@ import {
 	invalidateAllCaseTemplates
 } from '$lib/server/cache/report-template-cache.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const generateFromTemplateSchema = z.object({
   templateType: z.string().min(1).max(200),
@@ -103,7 +104,7 @@ Generate the complete report content in HTML format, maintaining the structure b
           `.trim();
 
           // Call Ollama for AI generation
-          const ollamaResponse = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+          const ollamaResponse = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -440,7 +440,7 @@
 					accept=".pdf,image/*,.doc,.docx,.txt"
 					multiple={true}
 					maxSize={100}
-					analyzeEndpoint="/api/evidence/analyze"
+					analyzeEndpoint="/api/evidence/analysis"
 					onUpload={(files) => { console.log('AI Upload complete:', files.length, 'files'); showAIFileUpload = false; invalidateAll(); }}
 					onAnalyze={(file, metadata) => { console.log('AI Analysis:', file.name, 'confidence:', metadata.confidence); }}
 				/>

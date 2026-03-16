@@ -13,6 +13,7 @@ import { sql } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { getOllamaUrl } from '$lib/config/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 const OLLAMA_URL = getOllamaUrl();
 
 const analyzeTagSchema = z.object({
@@ -39,7 +40,7 @@ export async function POST({ request, locals }: RequestEvent) {
 		const analysis = await analyzeTagWithLLM(tag, occurrences);
 
 		// 3. Generate embedding for summary
-		const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+		const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: 'embeddinggemma:latest',
@@ -145,7 +146,7 @@ Format:
 Summary: [your summary]
 Related: [tag1, tag2, tag3]`;
 
-	const response = await fetch(`${OLLAMA_URL}/api/chat`, {
+	const response = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ model: 'gemma3-legal:latest',

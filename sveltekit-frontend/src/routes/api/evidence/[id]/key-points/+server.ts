@@ -5,6 +5,7 @@ import { evidence } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const keyPointsSchema = z.object({
 	caseId: z.string().uuid().optional()
@@ -93,7 +94,7 @@ Respond with ONLY a JSON object:
 	let confidence = 0.7;
 
 	try {
-		const ollamaRes = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+		const ollamaRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

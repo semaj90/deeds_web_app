@@ -92,7 +92,15 @@ export async function getChannel(): Promise<AmqpChannel> {
 export async function publishToQueue(queueName: string, payload: any): Promise<boolean> {
   try {
     const ch = await getChannel();
-    await ch.assertQueue(queueName, { durable: true });
+    // Match canonical queue args from rabbitmq-manager-fixed.ts to avoid PRECONDITION_FAILED
+    await ch.assertQueue(queueName, {
+      durable: true,
+      arguments: {
+        'x-message-ttl': 300000,
+        'x-dead-letter-exchange': 'dlx.dead-letter',
+        'x-dead-letter-routing-key': queueName,
+      },
+    });
 
     const message = JSON.stringify(payload);
     const sent = ch.sendToQueue(queueName, Buffer.from(message), {
@@ -120,7 +128,15 @@ export async function consumeFromQueue(
 ): Promise<void> {
   try {
     const ch = await getChannel();
-    await ch.assertQueue(queueName, { durable: true });
+    // Match canonical queue args from rabbitmq-manager-fixed.ts to avoid PRECONDITION_FAILED
+    await ch.assertQueue(queueName, {
+      durable: true,
+      arguments: {
+        'x-message-ttl': 300000,
+        'x-dead-letter-exchange': 'dlx.dead-letter',
+        'x-dead-letter-routing-key': queueName,
+      },
+    });
 
     console.log(`🔄 Starting consumer for ${queueName}`);
 
@@ -150,15 +166,10 @@ export async function setupQueues(): Promise<void> {
   try {
     const ch = await getChannel();
 
-    // Setup DLX
-    await ch.assertExchange('evidence.dlx', 'direct', { durable: true });
-    await ch.assertQueue('evidence.failed', {
-      durable: true,
-      arguments: { 'x-message-ttl': 86400000 },
-	});
-    await ch.bindQueue('evidence.failed', 'evidence.dlx', 'failed');
+    // Setup DLX — use canonical exchange name matching rabbitmq-manager-fixed.ts
+    await ch.assertExchange('dlx.dead-letter', 'topic', { durable: true });
 
-    // Assert all defined queues
+    // Assert all defined queues with canonical DLX arguments
     const allQueues = [
       ...Object.values(QUEUES.evidence),
       ...Object.values(QUEUES.ai),
@@ -166,10 +177,19 @@ export async function setupQueues(): Promise<void> {
     ];
 
     for (const q of allQueues) {
+      // Create DLQ for each queue
+      const dlqName = `${q}.dlq`;
+      await ch.assertQueue(dlqName, { durable: true });
+      await ch.bindQueue(dlqName, 'dlx.dead-letter', q);
+
+      // Create main queue with DLX routing
       await ch.assertQueue(q, {
         durable: true,
-        deadLetterExchange: 'evidence.dlx',
-        deadLetterRoutingKey: 'failed',
+        arguments: {
+          'x-message-ttl': 300000,
+          'x-dead-letter-exchange': 'dlx.dead-letter',
+          'x-dead-letter-routing-key': q,
+        },
       });
     }
 

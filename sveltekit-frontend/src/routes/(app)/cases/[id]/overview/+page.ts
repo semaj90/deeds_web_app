@@ -39,8 +39,8 @@ export const load: PageLoad = async ({ fetch, params }) => {
     // Cache miss - execute fetches in parallel
     console.log('📡 Fetching evidence + persons from API for case ' + caseId);
     const [evidenceRes, personsRes] = await Promise.all([
-        fetch(`/api/v1/evidence/by-case/${caseId}`),
-        fetch(`/api/v1/cases/${caseId}/persons`)
+        fetch(`/api/cases/${caseId}/evidence`),
+        fetch(`/api/persons-of-interest?caseId=${caseId}`)
     ]);
 
     evidence = evidenceRes.ok ? await evidenceRes.json() : [];

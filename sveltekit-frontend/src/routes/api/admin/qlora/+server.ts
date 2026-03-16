@@ -11,6 +11,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { redis } from '$lib/server/redis.js';
 import { db } from '$lib/server/db/client';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const qloraConfigSchema = z.object({
 	epochs: z.number().int().min(1).max(100).optional(),
@@ -87,7 +88,7 @@ export async function GET({ locals }: RequestEvent) {
 	// Available base models from Ollama
 	let models: string[] = [];
 	try {
-		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, {
+		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, {
 			signal: AbortSignal.timeout(3000)
 		});
 		if (res.ok) {

@@ -2,6 +2,7 @@ import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const generateFixSchema = z.object({
 	errorMessage: z.string().min(1, 'Missing errorMessage').max(50000),
@@ -70,7 +71,7 @@ Respond in JSON format:
 }`;
 
 	try {
-		const ollamaRes = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+		const ollamaRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

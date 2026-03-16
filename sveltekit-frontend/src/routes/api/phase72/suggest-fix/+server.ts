@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
@@ -50,7 +51,7 @@ Provide:
 
 Respond in JSON: {"plan": "...", "suggestions": ["..."], "related_routes": ["..."]}`;
 
-			const res = await fetch(`${OLLAMA_URL}/api/generate`, {
+			const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({

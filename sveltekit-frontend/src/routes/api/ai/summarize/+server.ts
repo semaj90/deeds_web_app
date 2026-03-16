@@ -2,6 +2,7 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const aiSummarizeSchema = z.object({
 	text: z.string().max(50000).optional(),
@@ -22,7 +23,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const text = parsed.data.text || parsed.data.content || '';
 		const maxLength = parsed.data.maxLength;
 
-		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

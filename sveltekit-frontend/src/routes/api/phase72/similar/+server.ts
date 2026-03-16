@@ -4,6 +4,7 @@ import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const phase72SimilarSchema = z.object({
 	error_hash: z.string().max(500).optional(),
@@ -142,7 +143,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	// Stream from Ollama
 	try {
-		const ollamaRes = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+		const ollamaRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: 'gemma3-legal:latest', prompt, stream: true }),

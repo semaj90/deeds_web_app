@@ -26,6 +26,7 @@ import { MultiModalRanker, type DocumentCandidate, type RankedDocument } from '$
 import { UserHistoryTracker } from '$lib/server/ml/user-history.js';
 import { getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 // Zod schema validates POST body: interactionType enum, documentId, topicPreferences array
 const userInteractionSchema = z.object({
@@ -49,7 +50,7 @@ const OLLAMA_URL = getOllamaUrl();
  */
 async function embedQuery(query: string): Promise<number[] | null> {
 	try {
-		const resp = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+		const resp = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: query }),

@@ -2,7 +2,7 @@
  * GPU Module Barrel Export
  *
  * Re-exports all GPU acceleration utilities for clean imports:
- *   import { globalGPUManager, embedAndCompare, createGPUSOM } from '$lib/gpu';
+ *   import { globalGPUManager, embedAndCompare } from '$lib/gpu';
  */
 
 // Core compute pipeline (actively used by /global-search, /api/gpu/compute)
@@ -13,9 +13,6 @@ export { SHADER_REGISTRY, getShader, getShaderIds, type ShaderSpec } from './sha
 // GPU management — singleton WebGPU/WebGL2/CPU fallback detector
 export { globalGPUManager } from './global-gpu-manager.js';
 export type { HybridGPUContext } from './hybrid-gpu-context.js';
-
-// SOM clustering — GPU-accelerated Self-Organizing Map
-export { GPUSOMEmbeddings, createGPUSOM, type GPUSOMConfig, type GPUSOMResult } from './gpu-som-embeddings.js';
 
 // Server-side embedding bridge — gRPC → GPU similarity → QLoRA compression
 export { embedAndCompare, type EmbeddingBatchResult } from './gpu-embedding-bridge.js';

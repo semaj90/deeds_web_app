@@ -3,7 +3,7 @@
 ## Status: TODO
 ## Priority: Medium
 ## Created: 2026-03-16
-## Updated: 2026-03-16 (Session: Onboarding wizard + dir audit)
+## Updated: 2026-03-16 (Session: deeds_labs cleanup + orphan wiring)
 
 ---
 
@@ -60,6 +60,27 @@ gh repo create semaj90/deeds-labs --private --source=. --push
 
 ---
 
+## Cleanup Completed (2026-03-16)
+
+**~12.6GB freed from deeds_labs/:**
+
+| Target | Size Freed | Action |
+|--------|-----------|--------|
+| `snapshots/2026-03-10/bucket-a-generated/` | 4.3GB | Deleted (auto-generated code) |
+| `frontend/.../dirs/logs/` | ~3.3GB | Kept 4 sample files |
+| `frontend/.../dirs/reports/` | ~4.3GB | Emptied (all entries were directories) |
+| `frontend/.../dirs/phase72_logs/` | 284MB | Deleted |
+| `projects/evidence-service/node_modules/` | 341MB | Deleted |
+| `projects/legacy-projects/.../node_modules/` | 133MB | Deleted |
+
+**Tarball compression estimates (for GitHub push sizing):**
+- `services/` (source code): 667MB raw → 304MB gzip (2.2x compression)
+- Small dirs (docs, configs): 19MB raw → 1.5MB gzip (12.7x compression)
+- Full deeds_labs (~21GB after cleanup) → estimated 3-7GB tarball
+- GitHub soft limit: 5GB — may need to split or use Git LFS for large dirs
+
+---
+
 ## Also Pending: src/lib/ Slim Candidates (Dir Audit 2026-03-16)
 
 | Directory | Issue | Action |
@@ -67,3 +88,42 @@ gh repo create semaj90/deeds-labs --private --source=. --push
 | `src/lib/tracking/` | 7 of 8 files dead (only `telemetry.ts` used) | Archive 7 files to deeds_labs/ |
 | `src/lib/stores/machines/` | 0 importers (shadows `src/lib/machines/`) | Archive or delete |
 | `src/lib/utils/*.mjs` | 92 test/build scripts in $lib (not imported) | Move to `scripts/` or archive |
+
+---
+
+## Orphan Files Archived (2026-03-16)
+
+**Moved to `deeds_labs/lib-dead-directories/batch-2026-03-16-orphans/`:**
+- `messaging/`: rabbitmq-integration.js (5 syntax errors), rabbitmq-legal-queue.ts (missing NES dep)
+- `state/`: 2x bullmq backups, 2x .code-workspace, xstate-detective-mode.js
+- `agents/__tests__/` (empty)
+- `client/`: securityOrchestrator.ts, webgpuWorker.ts (placeholder)
+- `actions/`: draggable.ts (Svelte 4)
+- `components/`: UploadArea.svelte.d.ts (no impl), NesModal.svelte, SimilarCasesPanel.svelte, SummaryEditor.svelte (all 3 duplicates of subdirectory versions)
+
+---
+
+## Missing API Route Stubs (Backlog)
+
+**Created as stubs (2026-03-16)** — return empty results, need real DB/Qdrant wiring:
+- `/api/search/cases` (GET) — stub created
+- `/api/search/laws` (GET) — stub created
+- `/api/search/suggestions` (GET) — stub created
+- `/api/search/filters` (GET) — stub created
+- `/api/analytics/search` (POST) — stub created
+
+**Still missing:**
+- `/api/workflow-events` — referenced by `src/lib/client/workflow-event-stream.ts`
+
+**Audit lesson**: Glob patterns treat `[id]` as character class, not literal dir name.
+`/cases/[id]/board/` was falsely flagged as missing because `**/cases/[id]/board/**`
+matched zero files. Always verify dynamic route segments with `ls` or `find`.
+
+---
+
+## Type Safety Audit (Backlog)
+
+- **Zod validation**: 118/258 API routes (46%) have validation — 140 remaining
+- **Auth guards**: ~30/258 routes check `locals.user` — ~228 unguarded
+- **src/lib/services/**: 312 corrupted files blanket-excluded from tsconfig
+- **Drizzle 0.44 + Svelte 5 runes**: Full type review deferred

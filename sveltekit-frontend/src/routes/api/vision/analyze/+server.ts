@@ -6,6 +6,7 @@ import { redis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 import { uploadFile } from '$lib/server/minio-client.js';
 import { createYOLOService, type YOLOResult } from '$lib/server/yolo.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
@@ -175,7 +176,7 @@ Respond in JSON format:
 			// Convert image to base64 for Ollama multimodal
 			const base64Image = buffer.toString('base64');
 
-			const ollamaRes = await fetch(`${OLLAMA_URL}/api/generate`, {
+			const ollamaRes = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({

@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const memoSkeletonSchema = z.object({
 	facts: z.string().max(50000).optional().default(''),
@@ -30,7 +31,7 @@ Reference the provided statutes and apply them to the facts.`;
 
 Draft a legal memorandum outline.`;
 
-		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

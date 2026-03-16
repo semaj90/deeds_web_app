@@ -13,7 +13,7 @@
 	import { trackClick } from '$lib/utils/tracking';
 	import StatuteSearchBar from '$lib/components/legal-ai/StatuteSearchBar.svelte';
 	import StatuteResultsList from '$lib/components/legal-ai/StatuteResultsList.svelte';
-	import { searchCases, searchLaws, getSearchSuggestions, trackSearch, type SearchQuery, type SearchResponse } from '$lib/client/search-client.js';
+	import { searchCases, searchLaws, getSearchSuggestions, trackSearch, type SearchQuery, type SearchResponse, type SearchResult as TypedSearchResult } from '$lib/client/search-client.js';
 
 	let showRAGAssistant = $state(false);
 	let showCodebaseSearch = $state(false);
@@ -90,11 +90,24 @@
 		search_time_ms?: number;
 	}
 
+	type SearchMode = 'cases' | 'rag' | 'evidence' | 'statutes' | 'precedents' | 'glossary';
+
 	let searchQuery = $state('');
 	let isSearching = $state(false);
-	let searchMode = $state<'rag' | 'evidence' | 'statutes' | 'precedents' | 'glossary'>('evidence');
+	let searchMode = $state<SearchMode>('evidence');
 	let scoringMethod = $state<"vector_only" | "hybrid" | "tfidf_only">("hybrid");
 	let caseIdFilter = $state('');
+	let caseSearchFilters = $state({
+		jurisdiction: '',
+		crimeCategory: '',
+		crimeClassification: '',
+	});
+	let statuteSearchFilters = $state({
+		jurisdiction: '',
+		sectionType: '',
+	});
+	let searchSuggestions = $state<string[]>([]);
+	let caseResults = $state<TypedSearchResult[]>([]);
 
 	// RAG search results
 	let ragResults = $state<SearchResult[]>([]);
@@ -128,6 +141,7 @@
 	let gpuRerankMetrics = $state<GPURerankMetrics | null>(null);
 	let gpuRankedItems = $state<GPURankedItem[]>([]);
 	let isGpuReranking = $state(false);
+	let searchSuggestionTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	async function runGpuRerank() {
 		if (!gpuRerankEnabled) return;
@@ -161,6 +175,8 @@
 
 		isSearching = true;
 		searchError = null;
+		searchSuggestions = [];
+		caseResults = [];
 		ragResults = [];
 		evidenceBundles = [];
 		evidenceResults = [];
@@ -173,7 +189,9 @@
 		gpuRerankMetrics = null;
 
 		try {
-			if (searchMode === 'evidence') {
+			if (searchMode === 'cases') {
+				await searchCaseRecords();
+			} else if (searchMode === 'evidence') {
 				await searchEvidence();
 			} else if (searchMode === 'statutes') {
 				await searchStatutes();
@@ -190,6 +208,22 @@
 		} finally {
 			isSearching = false;
 		}
+	}
+
+	async function searchCaseRecords() {
+		const query: SearchQuery = {
+			query: searchQuery,
+			limit: 20,
+			jurisdiction: caseSearchFilters.jurisdiction || undefined,
+			crimeCategory: caseSearchFilters.crimeCategory || undefined,
+			crimeClassification: caseSearchFilters.crimeClassification || undefined,
+		};
+
+		const data: SearchResponse = await searchCases(query);
+		caseResults = data.results ?? [];
+		auxTiming = { total_ms: data.executionTimeMs };
+		totalFound = data.total ?? caseResults.length;
+		void trackSearch(searchQuery, totalFound, data.executionTimeMs, 'cases');
 	}
 
 	async function searchEvidence() {
@@ -248,16 +282,17 @@
 	}
 
 	async function searchStatutes() {
-		const res = await fetch('/api/statutes/search', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: searchQuery, limit: 20 }),
-		});
-		if (!res.ok) throw new Error(`Statutes search failed: ${res.status}`);
-		const data = await res.json();
+		const query: SearchQuery = {
+			query: searchQuery,
+			limit: 20,
+			jurisdiction: statuteSearchFilters.jurisdiction || undefined,
+			sectionType: statuteSearchFilters.sectionType || undefined,
+		};
+		const data: SearchResponse = await searchLaws(query);
 		statuteResults = data.results ?? [];
-		auxTiming = data.timing ?? {};
-		totalFound = statuteResults.length;
+		auxTiming = { total_ms: data.executionTimeMs };
+		totalFound = data.total ?? statuteResults.length;
+		void trackSearch(searchQuery, totalFound, data.executionTimeMs, 'laws');
 	}
 
 	async function searchPrecedents() {
@@ -309,6 +344,33 @@
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.key === 'Enter') performSearch();
 	}
+
+	function handleSearchInput() {
+		if (searchSuggestionTimeout) {
+			clearTimeout(searchSuggestionTimeout);
+		}
+
+		if (searchMode !== 'cases' && searchMode !== 'statutes') {
+			searchSuggestions = [];
+			return;
+		}
+
+		if (searchQuery.trim().length < 2) {
+			searchSuggestions = [];
+			return;
+		}
+
+		searchSuggestionTimeout = setTimeout(() => {
+			void refreshSearchSuggestions();
+		}, 150);
+	}
+
+	async function refreshSearchSuggestions() {
+		searchSuggestions = await getSearchSuggestions(
+			searchQuery,
+			searchMode === 'cases' ? 'cases' : 'laws'
+		);
+	}
 </script>
 
 <div class="search-page">
@@ -324,6 +386,9 @@
 			</div>
 
 			<div class="mode-toggle">
+				<button class="mode-btn" class:active={searchMode === 'cases'} onclick={() => { searchMode = 'cases'; searchSuggestions = []; }}>
+					<Icon name="briefcase" size={14} /> Cases
+				</button>
 				<button class="mode-btn" class:active={searchMode === 'evidence'} onclick={() => searchMode = 'evidence'}>
 					<Icon name="network" size={14} /> Evidence
 				</button>
@@ -353,9 +418,16 @@
 						type="text"
 						placeholder="Search evidence, cases, legal documents..."
 						bind:value={searchQuery}
+						oninput={handleSearchInput}
 						onkeydown={handleKeydown}
+						list="global-search-suggestions"
 						class="search-input"
 					/>
+					<datalist id="global-search-suggestions">
+						{#each searchSuggestions as suggestion}
+							<option value={suggestion}></option>
+						{/each}
+					</datalist>
 					{#if searchQuery}
 						<button class="clear-btn" onclick={() => { searchQuery = ''; }}>
 							<Icon name="x" size={14} />
@@ -377,7 +449,29 @@
 				</Button>
 			</div>
 
-			{#if searchMode === 'evidence'}
+			{#if searchMode === 'cases'}
+				<div class="filter-section">
+					<h3>CASE FILTERS</h3>
+					<input
+						type="text"
+						placeholder="Jurisdiction"
+						bind:value={caseSearchFilters.jurisdiction}
+						class="filter-input"
+					/>
+					<input
+						type="text"
+						placeholder="Crime category"
+						bind:value={caseSearchFilters.crimeCategory}
+						class="filter-input"
+					/>
+					<input
+						type="text"
+						placeholder="Crime classification"
+						bind:value={caseSearchFilters.crimeClassification}
+						class="filter-input"
+					/>
+				</div>
+			{:else if searchMode === 'evidence'}
 				<div class="filter-section">
 					<h3>CASE FILTER</h3>
 					<input
@@ -391,8 +485,19 @@
 				<div class="filter-section">
 					<StatuteSearchBar
 						isLoading={isSearching}
-						onsearch={(params) => { searchQuery = params.query ?? searchQuery; performSearch(); }}
-						onclear={() => { searchQuery = ''; statuteResults = []; }}
+						onsearch={(params) => {
+							searchQuery = params.query ?? searchQuery;
+							statuteSearchFilters.jurisdiction = params.jurisdiction ?? '';
+							statuteSearchFilters.sectionType = params.category ?? '';
+							performSearch();
+						}}
+						onclear={() => {
+							searchQuery = '';
+							statuteResults = [];
+							statuteSearchFilters.jurisdiction = '';
+							statuteSearchFilters.sectionType = '';
+							searchSuggestions = [];
+						}}
 					/>
 				</div>
 			{/if}
@@ -414,7 +519,7 @@
 			</div>
 
 			<!-- GPU Rerank Toggle -->
-			
+
 			<!-- Scoring Method Toggle -->
 			{#if searchMode === "rag"}
 				<div class="filter-section">
@@ -490,7 +595,7 @@
 			{/if}
 
 			<!-- Timing Breakdown -->
-			{#if (searchMode === 'statutes' || searchMode === 'precedents' || searchMode === 'glossary') && auxTiming.total_ms}
+			{#if (searchMode === 'cases' || searchMode === 'statutes' || searchMode === 'precedents' || searchMode === 'glossary') && auxTiming.total_ms}
 				<div class="timing-panel">
 					<h3><Icon name="clock" size={14} /> TIMING</h3>
 					<div class="timing-grid">
@@ -570,8 +675,48 @@
 			{:else if isSearching}
 				<div class="loading-state">
 					<span class="animate-spin"><Icon name="loader-2" size={32} /></span>
-					<p>Running {searchMode === 'evidence' ? 'RAG+KAG+DAG' : 'RAG'} pipeline...</p>
+					<p>Running {searchMode === 'evidence' ? 'RAG+KAG+DAG' : searchMode === 'rag' ? 'RAG' : 'typed Drizzle'} pipeline...</p>
 				</div>
+			{:else if searchMode === 'cases' && caseResults.length > 0}
+				{#each caseResults as result, i}
+					<button
+						class="result-card"
+						onclick={() => {
+							trackClick({
+								documentId: result.id,
+								recommendationId: `case-${result.id}`,
+								searchContext: searchQuery,
+							});
+						}}
+						type="button"
+					>
+						<div class="bundle-header">
+							<div class="bundle-rank">#{i + 1}</div>
+							<div class="bundle-title">{result.title}</div>
+							<div class="confidence-badge" style="background: rgba(56, 178, 172, 0.15); color: #38b2ac;">
+								{Math.round((result.score ?? 0) * 100)}%
+							</div>
+						</div>
+						<p class="bundle-preview">{result.text}</p>
+						<div class="bundle-meta">
+							{#if result.metadata?.caseNumber}
+								<span class="meta-tag section">{result.metadata.caseNumber}</span>
+							{/if}
+							{#if result.metadata?.jurisdiction}
+								<span class="meta-tag source">{result.metadata.jurisdiction}</span>
+							{/if}
+							{#if result.metadata?.court}
+								<span class="meta-tag entity">{result.metadata.court}</span>
+							{/if}
+							{#if result.metadata?.crimeCategories?.length > 0}
+								<span class="meta-tag citation">{result.metadata.crimeCategories.join(', ')}</span>
+							{/if}
+							{#if result.metadata?.crimeClassifications?.length > 0}
+								<span class="meta-tag confidence">{result.metadata.crimeClassifications.join(', ')}</span>
+							{/if}
+						</div>
+					</button>
+				{/each}
 			{:else if searchMode === 'evidence' && evidenceBundles.length > 0}
 				<!-- Evidence Bundles (RAG+KAG+DAG) -->
 				{#each evidenceBundles as bundle, i}
@@ -709,13 +854,13 @@
 			{:else if searchMode === 'statutes' && statuteResults.length > 0}
 				<StatuteResultsList
 					statutes={statuteResults.map(r => ({
-						id: r.statuteId ?? r.id ?? crypto.randomUUID(),
-						code: r.statuteTitle ?? r.code ?? '',
-						title: r.content?.slice(0, 200),
-						jurisdiction: r.jurisdiction,
-						severity: r.severity,
-						category: r.category,
-						relevance_score: r.similarity ?? r.score
+						id: r.id,
+						code: r.metadata?.section ?? r.title,
+						title: r.text?.slice(0, 200),
+						jurisdiction: r.metadata?.jurisdiction,
+						severity: r.metadata?.sectionType,
+						category: r.metadata?.category,
+						relevance_score: r.score
 					}))}
 					onselect={(statute) => { console.log('Selected statute:', statute.code, statute.id); }}
 				/>

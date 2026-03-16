@@ -4,6 +4,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { litellmChat } from '$lib/server/ollama.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const chatMessageSchema = z.object({
 	role: z.enum(['user', 'assistant', 'system']),
@@ -61,7 +62,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				}
 			}
 
-			const res = await fetch(`${OLLAMA_URL}/api/chat`, {
+			const res = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({

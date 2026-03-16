@@ -60,10 +60,15 @@ class ErrorIndexer:
     """Index Svelte errors to Qdrant + Redis"""
 
     def __init__(self):
-        self.ollama_url = "http://localhost:11434"
-        self.qdrant = QdrantClient(url="http://localhost:6333")
+        self.ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
+        self.qdrant = QdrantClient(url=os.getenv("QDRANT_URL", "http://localhost:6333"))
+        self.redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
         self.redis: Optional[aioredis.Redis] = None
-        self.collection_name = "phase89_error_chunks"
+        self.http_session: Optional[aiohttp.ClientSession] = None
+        self.collection_name = os.getenv("PHASE94_COLLECTION_NAME", "phase89_error_chunks")
+        self.cluster_threshold = float(os.getenv("PHASE94_CLUSTER_THRESHOLD", "0.8"))
+        self.embedding_concurrency = max(1, int(os.getenv("PHASE94_EMBEDDING_CONCURRENCY", "4")))
+        self._embedding_semaphore = asyncio.Semaphore(self.embedding_concurrency)
 
         # GPU check
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -74,8 +79,15 @@ class ErrorIndexer:
 
     async def connect(self):
         """Connect to Redis"""
-        self.redis = await aioredis.from_url("redis://localhost:6379/0")
+        self.redis = await aioredis.from_url(self.redis_url)
         await self.redis.ping()
+        if self.http_session is None:
+            connector = aiohttp.TCPConnector(
+                limit=self.embedding_concurrency,
+                limit_per_host=self.embedding_concurrency,
+            )
+            timeout = aiohttp.ClientTimeout(total=60)
+            self.http_session = aiohttp.ClientSession(connector=connector, timeout=timeout)
         print("✅ Redis connected")
 
     def ensure_collection(self):
@@ -129,8 +141,16 @@ class ErrorIndexer:
 
     async def generate_embedding(self, text: str) -> List[float]:
         """Generate embedding via embeddinggemma:latest"""
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
+        if self.http_session is None:
+            connector = aiohttp.TCPConnector(
+                limit=self.embedding_concurrency,
+                limit_per_host=self.embedding_concurrency,
+            )
+            timeout = aiohttp.ClientTimeout(total=60)
+            self.http_session = aiohttp.ClientSession(connector=connector, timeout=timeout)
+
+        async with self._embedding_semaphore:
+            async with self.http_session.post(
                 f"{self.ollama_url}/api/embeddings",
                 json={"model": "embeddinggemma:latest", "prompt": text}
             ) as resp:
@@ -140,33 +160,35 @@ class ErrorIndexer:
                 return data["embedding"]
 
     def cluster_errors(self, embeddings: torch.Tensor) -> torch.Tensor:
-        """GPU-accelerated DBSCAN clustering"""
+        """Greedy cosine clustering without materializing an N x N matrix."""
         if len(embeddings) < 3:
             return torch.zeros(len(embeddings), dtype=torch.long)
 
-        # Move to GPU
-        emb_gpu = embeddings.to(self.device)
-
-        # Cosine similarity
-        sim = torch.mm(emb_gpu, emb_gpu.t())
-        norms = torch.norm(emb_gpu, dim=1, keepdim=True)
-        sim = sim / (norms * norms.t() + 1e-8)
-
-        # Simple clustering: group similar errors (sim > 0.8)
-        labels = torch.zeros(len(embeddings), dtype=torch.long)
+        normalized = torch.nn.functional.normalize(
+            embeddings.to(self.device, dtype=torch.float32),
+            dim=1,
+        )
+        labels = torch.full((len(embeddings),), -1, dtype=torch.long, device=self.device)
         cluster_id = 0
 
         for i in range(len(embeddings)):
-            if labels[i] == 0:  # Unassigned
-                similar = (sim[i] > 0.8).nonzero(as_tuple=True)[0]
-                labels[similar] = cluster_id
-                cluster_id += 1
+            if labels[i].item() != -1:
+                continue
+
+            similarities = torch.mv(normalized, normalized[i])
+            similar = torch.logical_and(similarities > self.cluster_threshold, labels == -1)
+            labels[similar] = cluster_id
+            cluster_id += 1
 
         return labels.cpu()
 
     async def index_errors(self, errors: List[ErrorEntry]):
         """Main indexing pipeline"""
         print(f"\n🔍 Indexing {len(errors)} errors...")
+
+        if not errors:
+            print("ℹ️ No errors to index")
+            return
 
         # Step 1: Build signatures
         for error in errors:
@@ -175,13 +197,14 @@ class ErrorIndexer:
 
         # Step 2: Generate embeddings
         print("🧠 Generating embeddings...")
-        embeddings = []
-        for error in errors:
+        async def embed_error(error: ErrorEntry) -> List[float]:
             emb = await self.generate_embedding(error.signature)
             error.embedding = emb
-            embeddings.append(emb)
+            return emb
 
-        embeddings_tensor = torch.tensor(embeddings)
+        embeddings = await asyncio.gather(*(embed_error(error) for error in errors))
+
+        embeddings_tensor = torch.tensor(embeddings, dtype=torch.float32)
 
         # Step 3: Cluster
         print("🔬 Clustering errors (GPU)...")
@@ -213,28 +236,35 @@ class ErrorIndexer:
                 }
             ))
 
-        self.qdrant.upsert(
-            collection_name=self.collection_name,
-            points=points
-        )
+        for start in range(0, len(points), 128):
+            self.qdrant.upsert(
+                collection_name=self.collection_name,
+                points=points[start:start + 128]
+            )
         print(f"✅ Upserted {len(points)} points to Qdrant")
 
         # Step 5: Cache in Redis
         print("💾 Caching in Redis...")
-        for error in errors:
-            redis_key = f"phase89:error:{error.signature}"
-            await self.redis.setex(
-                redis_key,
-                86400,  # 24 hours
-                json.dumps({
-                    "file": error.file_path,
-                    "line": error.line,
-                    "message": error.message,
-                    "tags": error.tags,
-                    "cluster_id": error.cluster_id,
-                    "cached_at": datetime.now().isoformat()
-                })
-            )
+        if self.redis is None:
+            raise RuntimeError("Redis connection is not initialized")
+
+        for start in range(0, len(errors), 128):
+            pipeline = self.redis.pipeline(transaction=False)
+            for error in errors[start:start + 128]:
+                redis_key = f"phase89:error:{error.signature}"
+                pipeline.setex(
+                    redis_key,
+                    86400,
+                    json.dumps({
+                        "file": error.file_path,
+                        "line": error.line,
+                        "message": error.message,
+                        "tags": error.tags,
+                        "cluster_id": error.cluster_id,
+                        "cached_at": datetime.now().isoformat()
+                    })
+                )
+            await pipeline.execute()
 
         print(f"✅ Cached {len(errors)} errors in Redis")
 
@@ -255,6 +285,21 @@ class ErrorIndexer:
             print(f"    - {tag}: {count}")
 
         print()
+
+    async def close(self):
+        """Close network clients cleanly."""
+        if self.http_session is not None:
+            await self.http_session.close()
+            self.http_session = None
+
+        if self.redis is not None:
+            if hasattr(self.redis, "aclose"):
+                await self.redis.aclose()
+            else:
+                close_result = self.redis.close()
+                if asyncio.iscoroutine(close_result):
+                    await close_result
+            self.redis = None
 
 
 async def main():
@@ -293,7 +338,7 @@ async def main():
     indexer.ensure_collection()
     await indexer.index_errors(errors)
 
-    await indexer.redis.close()
+    await indexer.close()
 
 
 if __name__ == "__main__":

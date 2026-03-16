@@ -475,9 +475,9 @@
               { href: '/analysis-center', label: 'Analysis Center', desc: 'ContractAnalyzer, HybridBoard whiteboard', count: 2 },
               { href: '/global-search', label: 'Global Search', desc: 'VectorIntelligenceDemo semantic search', count: 1 },
               { href: '/persons-of-interest', label: 'Persons of Interest', desc: 'POI DetailView with threat scoring', count: 1 },
-              { href: '/evidence-canvas-demo', label: 'Evidence Canvas', desc: '6 visualization engines + architecture panel', count: 1 },
-              { href: '/nier-showcase', label: 'NieR Showcase', desc: 'YoRHa Command Center, Terminal, Dialogs', count: 4 },
-              { href: '/system-status', label: 'System Status', desc: 'Health dashboard with 6 StatusCards', count: 3 },
+              { href: '/demos/evidence-canvas', label: 'Evidence Canvas', desc: '6 visualization engines + architecture panel', count: 1 },
+              { href: '/demos/nier-showcase', label: 'NieR Showcase', desc: 'YoRHa Command Center, Terminal, Dialogs', count: 4 },
+              { href: '/system-configuration', label: 'System Status', desc: 'Health dashboard with 6 StatusCards', count: 3 },
               { href: '/demos/ace-pipeline', label: 'ACE Pipeline', desc: 'Context bubbles, RAG chart, cache tiers', count: 3 },
               { href: '/demos', label: 'All Demos', desc: 'Cache, Bits UI, NES, GPU, Icons, ACE', count: 6 },
             ] as demo}

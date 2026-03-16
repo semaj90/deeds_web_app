@@ -1,7 +1,9 @@
 <script lang="ts">
   import Button from '$lib/components/ui/Button.svelte';
   interface Photo {
-    thumbnailUrl: string;
+    url?: string;
+    thumbnailUrl?: string | null;
+    aiCaption?: string | null;
     ai?: {
       caption?: string;
     };
@@ -83,7 +85,7 @@
             }}
           >
             <img
-              src={photo.thumbnailUrl}
+              src={photo.thumbnailUrl ?? photo.url ?? ''}
               alt="POI photo {index + 1}"
               class="w-full h-full object-cover"
             />
@@ -114,7 +116,7 @@
           </div>
 
           <!-- AI Analysis Badge -->
-          {#if photo.ai && photo.ai.caption}
+          {#if photo.ai?.caption || photo.aiCaption}
             <div class="absolute bottom-2 left-2">
               <span class="px-2 py-1 rounded text-xs font-medium bg-sand/10 text-sand/80"
                 >AI Analyzed</span

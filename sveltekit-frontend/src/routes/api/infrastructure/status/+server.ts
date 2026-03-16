@@ -15,6 +15,7 @@ import { checkGrpcHealth } from '$lib/server/grpc/embedding-client.js';
 import { healthCheck as trtHealthCheck } from '$lib/server/trt-llm.js';
 import { isCudaAvailable } from '$lib/server/gpu/libtorch-bridge.js';
 import { NODE_RUNTIME_CONFIG, GPU_MARKDOWN_ENV } from '$lib/gpu/runtime-optimizations.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 export const GET: RequestHandler = async () => {
 	const start = Date.now();
@@ -39,7 +40,7 @@ export const GET: RequestHandler = async () => {
 		getGpuLeaseStatus().catch(() => null),
 
 		// Ollama
-		fetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(TIMEOUT) })
+		ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(TIMEOUT) })
 			.then(r => r.ok).catch(() => false),
 
 		// Redis — ping + memory/keyspace stats

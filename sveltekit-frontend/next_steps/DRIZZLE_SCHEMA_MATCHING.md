@@ -7,6 +7,13 @@
 
 ## Summary
 
+### March 16, 2026 Search API Schema Alignment
+- Prior review noise about unused `limit`, `jurisdiction`, and `crimeCategory` on `/api/search/cases` was stale. Those params were already consumed by the handler.
+- The real contract gap was missing `crimeClassification` handling plus drift between `search-client.ts` and the `/api/search/cases` and `/api/search/laws` payload shapes.
+- `/api/search/cases` should be treated as a `cases` + `crimes` query surface: `cases.practiceArea` is only a fallback category, while `crimes.crime_category` and `crimes.crime_classification` are the schema-backed filters.
+- `/api/search/filters` should aggregate case categories from both `cases.practice_area` and `crimes.crime_category`; law `sectionType` still maps to `statutes.category` until the schema grows a dedicated section-type column.
+- Pre-push verification for these route contracts remains: `npx svelte-kit sync`, `npx svelte-check --threshold error --tsconfig ./tsconfig.json`, then `npx vite build`.
+
 The database has been bootstrapped from 7 tables → **85 tables**, matching all 83 table definitions in `schema-postgres.ts` plus 2 legacy tables (`phase72_error`, `push_subscriptions`).
 
 | Metric | Before | After |

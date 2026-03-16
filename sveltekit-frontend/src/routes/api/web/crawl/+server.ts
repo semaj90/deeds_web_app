@@ -7,6 +7,7 @@
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const LANGEXTRACT_URL = ENV.LANGEXTRACT_URL;
 
@@ -55,7 +56,7 @@ export async function POST({ request, locals }: RequestEvent) {
 	let embedding: number[] | null = null;
 	if (generateEmbedding && result.text.length > 0) {
 		try {
-			const embedRes = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
+			const embedRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: result.text.slice(0, 4000) }),

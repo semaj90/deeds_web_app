@@ -15,6 +15,7 @@
 
 import { ENV } from '$lib/server/env.server.js';
 import { isLegalTask, getOptimalModel, OLLAMA_CONFIG } from '$lib/server/ai/ollama-config.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY ?? '';
@@ -50,7 +51,7 @@ async function* streamOllama(request: StreamRequest): AsyncGenerator<StreamChunk
       ? getOptimalModel('legal-analysis')[0]
       : getOptimalModel('generation')[0]
   ) ?? OLLAMA_CONFIG.defaultModel;
-  const response = await fetch(OLLAMA_URL + '/api/generate', {
+  const response = await ollamaFetch(OLLAMA_URL + '/api/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

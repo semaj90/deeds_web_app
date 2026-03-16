@@ -26,7 +26,7 @@
 	$effect(() => {
 
 		loadCollections();
-	
+
 });
 
 	async function loadCollections() {
@@ -87,10 +87,22 @@
 		selectedCollection = collection;
 	}
 
-	function handleCollectionDeleted(collectionId: string) {
-		collections = collections.filter((c) => c.id !== collectionId);
-		if (selectedCollection?.id === collectionId) {
-			selectedCollection = null;
+	async function handleCollectionDeleted(collectionId: string) {
+		try {
+			const response = await fetch(`/api/citations/collections/${collectionId}`, {
+				method: 'DELETE'
+			});
+
+			if (!response.ok) {
+				throw new Error('Failed to delete collection');
+			}
+
+			collections = collections.filter((c) => c.id !== collectionId);
+			if (selectedCollection?.id === collectionId) {
+				selectedCollection = null;
+			}
+		} catch (err) {
+			error = err instanceof Error ? err.message : 'Failed to delete collection';
 		}
 	}
 </script>

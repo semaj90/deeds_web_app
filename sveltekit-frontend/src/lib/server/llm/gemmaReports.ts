@@ -1,6 +1,7 @@
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { litellmChat } from '$lib/server/ollama.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 export type ReportTemplate = 'charging_memo' | 'intake_summary';
 
@@ -90,7 +91,7 @@ Requirements:
             return content;
         }
 
-        const res = await fetch(`${OLLAMA_URL}/api/generate`, {
+        const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
 	    body: JSON.stringify({

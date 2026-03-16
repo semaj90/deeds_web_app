@@ -2,6 +2,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { assembleACEContext, buildACEPrompt } from '$lib/server/ace/context-assembler.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const aceSummarizeSchema = z.object({
 	evidenceId: z.string().uuid().optional(),
@@ -55,7 +56,7 @@ Format as JSON:
 		const acePrompt = buildACEPrompt(context, summaryPrompt);
 
 		// Call Ollama with ACE-enhanced prompt
-		const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+		const response = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

@@ -3,6 +3,7 @@ import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const chatMessageSchema = z.object({
 	role: z.enum(['user', 'assistant', 'system']),
@@ -42,7 +43,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		// Acquire GPU lease for Ollama (non-blocking — continue even if lease fails)
 		const lease = await acquireGpuLease('ollama', 60).catch(() => null);
 
-		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

@@ -412,19 +412,22 @@ When auditing orphan components, apply this 6-gate test to decide **wire**, **re
 | G3: Rewrite potential? | If broken/Svelte 4, is the feature valuable enough to rewrite? | → REWRITE candidate | Continue to G4 |
 | G4: Integration point? | Natural route or layout that logically hosts it? | Continue | → ARCHIVE (homeless) |
 | G5: Low effort? | Wire in < 30 min (import + render, not deep refactor)? | → WIRE | → DEFER to backlog |
-| G6: Fully wired? | End-to-end: import → render → API routes → props → data flow? | FULLY WIRED | → SHALLOW (incomplete) |
+| G6: Fully wired? | End-to-end: import → render → trigger path → API routes → props → data flow? | FULLY WIRED | → SHALLOW (incomplete) |
 
 **Gate 6 — Deep Wiring Verification** (post-wire check):
 After wiring a component, verify the full chain is connected:
 1. **Import exists** — `grep -r "ComponentName" src/` shows the import
 2. **Render exists** — The importing file actually renders it (`<ComponentName` or `{@render`)
-3. **API routes exist** — If component calls `fetch('/api/...')`, verify `+server.ts` exists
-4. **Props connected** — Callback props wired to real handlers, NOT `() => {}` no-ops
-5. **Data flows** — Component receives real data from `$props()`, not placeholders
+3. **Trigger reachable** — Rendered UI, `onMount`, form submit, load function, or machine transition actually calls the handler/fetch; no dead helper function or permanently-false branch
+4. **API routes exist** — If component calls `fetch('/api/...')`, verify `+server.ts` exists
+5. **Props connected** — Callback props wired to real handlers, NOT `() => {}` no-ops
+6. **Data flows** — Component receives real data from `$props()`, not placeholders
 
 **Shallow wiring indicators** (G6 fail):
 - `onCallback={() => {}}` or `onCallback={() => console.log()}` — no-op handlers
 - Component imported but never rendered in template
+- Handler or `fetch('/api/...')` exists but no rendered control/state transition can trigger it
+- Trigger only exists behind a branch that never becomes true with current state/data
 - Component rendered but its API endpoints don't exist
 - Dynamic import loaded but conditional render never triggers
 - Props bound to `$state` that's declared but never set

@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { getOllamaUrl } from '$lib/config/env.server.js';
 import { embedText } from '$lib/server/embedding/embed.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const schema = z.object({
 	query: z.string().min(1).max(2000),
@@ -68,7 +69,7 @@ Respond in valid JSON with this exact structure:
 
 Provide 3-5 recommendations, 2-3 alternative queries, and 2-4 predictive signals. Return ONLY the JSON object.`;
 
-		const ollamaRes = await fetch(`${OLLAMA_URL}/api/generate`, {
+		const ollamaRes = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

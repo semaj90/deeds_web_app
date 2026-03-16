@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const routeIntentSchema = z.object({
 	query: z.string().max(10000).optional().default(''),
@@ -37,7 +38,7 @@ application scope, relevant case law, and practical implications.`;
 
 		const userPrompt = `${userQuestion || query}\n\nStatute Reference: ${statuteRef}${statute.id ? `\nStatute ID: ${statute.id}` : ''}`;
 
-		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

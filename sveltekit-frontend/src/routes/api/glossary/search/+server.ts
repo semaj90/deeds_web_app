@@ -14,6 +14,7 @@ import db from '$lib/server/db';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
@@ -39,7 +40,7 @@ interface GlossaryResult {
 
 async function embedQuery(query: string): Promise<number[] | null> {
 	try {
-		const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+		const res = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: query }),

@@ -5,6 +5,7 @@ import pdfParse from 'pdf-parse';
 import postgres from 'postgres';
 import { getDatabaseUrl, getQdrantUrl, getOllamaUrl } from '$lib/config/env.server.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const sql = postgres(getDatabaseUrl());
 const qdrant = new QdrantClient({ url: getQdrantUrl() });
@@ -54,7 +55,7 @@ function chunkText(text: string, chunkSize = 500, overlap = 100): string[] {
  */
 async function generateEmbedding(text: string): Promise<number[]> {
   try {
-    const response = await fetch(`${OLLAMA_URL_VAR}/api/embeddings`, {
+    const response = await ollamaFetch(`${OLLAMA_URL_VAR}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -295,7 +296,7 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
       response = geminiData.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
     } else {
       llmUsed = 'gemma3-legal:latest';
-      const ollamaRes = await fetch(`${OLLAMA_URL_VAR}/api/generate`, {
+      const ollamaRes = await ollamaFetch(`${OLLAMA_URL_VAR}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -2,6 +2,7 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const judgeSchema = z.object({
 	caseId: z.string().max(500).nullable().optional(),
@@ -93,7 +94,7 @@ ${evidenceList}
 
 Your Honor, please evaluate this case. Rule on evidence admissibility, assess probable cause, score the case strength for both prosecution and defense, and provide your judicial recommendations.`;
 
-		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

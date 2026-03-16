@@ -32,7 +32,7 @@
 		uploading = true;
 		try {
 			const formData = new FormData();
-			formData.append('photo', file);
+			formData.append('file', file);
 
 			const res = await fetch(`/api/persons-of-interest/${poiId}/photos`, {
 				method: 'POST',
@@ -44,8 +44,8 @@
 				throw new Error(data.error || `Upload failed (${res.status})`);
 			}
 
-			const photo = await res.json();
-			onuploaded?.(photo);
+			const payload = await res.json();
+			onuploaded?.(payload.photo ?? payload.data ?? payload);
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Upload failed';
 		} finally {

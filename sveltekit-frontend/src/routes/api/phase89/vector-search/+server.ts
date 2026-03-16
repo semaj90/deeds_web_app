@@ -4,6 +4,7 @@ import type { RequestHandler } from './$types';
 import { z } from 'zod';
 
 import { getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 const qdrant = new QdrantClient({
 	url: getQdrantUrl()
 });
@@ -12,7 +13,7 @@ const OLLAMA_URL = getOllamaUrl();
 
 async function generateEmbedding(text: string): Promise<number[]> {
 	try {
-		const response = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+		const response = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

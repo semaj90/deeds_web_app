@@ -13,6 +13,7 @@ import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self
 import { UserHistoryTracker } from '$lib/server/ml/user-history.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 // Zod schema validates query (1-10K), answer (1-100K), optional caseId
 const investigateSuggestSchema = z.object({
@@ -61,7 +62,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		// 3. Generate follow-up investigation suggestions with confidence ranking via Ollama
 		let suggestedQueries: Array<{ query: string; confidence: number; reason: string }> = [];
 		try {
-			const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+			const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({

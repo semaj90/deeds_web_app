@@ -145,14 +145,19 @@ Write-Host "   4. Generate comprehensive fix report for stakeholders" -Foregroun
 Write-Host ""
 
 Write-Host "FastMCP Agentic Tools Integration:" -ForegroundColor Cyan
-Write-Host "   # Query unified AST graph" -ForegroundColor Gray
-Write-Host "   python backend\scripts\phase94_fastmcp_registry.py --tool unified_ast_query" -ForegroundColor White
+Write-Host "   # Maintained Phase 94 task CLI (wraps live FastMCP + Redis-backed surfaces)" -ForegroundColor Gray
+Write-Host "   python sveltekit-frontend\scripts\phase94-task-cli.py health" -ForegroundColor White
 Write-Host ""
-Write-Host "   # Get AI-generated fix recommendations" -ForegroundColor Gray
-Write-Host "   python backend\scripts\phase94_fastmcp_registry.py --tool agentic_recommendation" -ForegroundColor White
+Write-Host "   # Redis-backed cached error summary" -ForegroundColor Gray
+Write-Host "   python sveltekit-frontend\scripts\phase94-task-cli.py redis-stats" -ForegroundColor White
 Write-Host ""
-Write-Host "   # Check system health" -ForegroundColor Gray
-Write-Host "   python backend\scripts\phase94_fastmcp_registry.py --tool system_health_check" -ForegroundColor White
+Write-Host "   # FastMCP tool discovery via live HTTP endpoints" -ForegroundColor Gray
+Write-Host "   python sveltekit-frontend\scripts\phase94-task-cli.py list-tools" -ForegroundColor White
+Write-Host ""
+Write-Host "   # Validate generated SvelteKit route types before checking fixes" -ForegroundColor Gray
+Write-Host "   npx svelte-kit sync; npx svelte-check --threshold error --tsconfig ./sveltekit-frontend/tsconfig.json" -ForegroundColor White
+Write-Host ""
+Write-Host "   # Current file analysis / recommendation now route through the maintained CLI tasks" -ForegroundColor Gray
 Write-Host ""
 
 Write-Host "================================================================================" -ForegroundColor Cyan

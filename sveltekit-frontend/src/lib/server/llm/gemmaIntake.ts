@@ -1,5 +1,6 @@
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 export type ExtractedPerson = {
  fullName: string;
@@ -65,7 +66,7 @@ ${ narrative }
 `;
 
  const data = await traceLLM('gemma-intake', { model: 'gemma3-legal', prompt: narrative.slice(0, 500) }, async (gen) => {
-	const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+	const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({

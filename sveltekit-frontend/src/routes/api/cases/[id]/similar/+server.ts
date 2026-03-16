@@ -32,6 +32,7 @@ import { UserHistoryTracker } from '$lib/server/ml/user-history.js';
 import { ENV } from '$lib/server/env.server.js';
 import { computeCentralityForNodes } from '$lib/server/graph/graph-centrality.js';
 import { z } from 'zod';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const caseSimilarQuerySchema = z.object({
 	limit: z.coerce.number().int().min(1).max(100).optional().default(10),
@@ -323,7 +324,7 @@ async function generateCaseEmbedding(
 
 	// Fallback: Ollama HTTP API
 	try {
-		const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+		const res = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
