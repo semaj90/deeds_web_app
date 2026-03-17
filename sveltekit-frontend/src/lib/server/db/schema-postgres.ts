@@ -914,6 +914,7 @@ export const personsOfInterest = pgTable('persons_of_interest', {
 	modelVersion: text('model_version'),
 	generatedAt: timestamp('generated_at'),
 	lastUpdated: timestamp('last_updated'),
+	crimes: text('crimes').array(),
 	caseIds: text('case_ids').array(),
 	createdBy: text('created_by'),
 	createdAt: timestamp('created_at').defaultNow(),

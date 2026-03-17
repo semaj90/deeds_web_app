@@ -1,20 +1,16 @@
 <script lang="ts">
-  import { superForm } from 'sveltekit-superforms';
+  import superForm from 'sveltekit-superforms';
   import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
   import { z } from 'zod';
 
   const poiSchema = z.object({
     name: z.string().min(1, 'Name is required'),
-    dateOfBirth: z.string().optional(),
-    email: z.string().email('Invalid email').optional().or(z.literal('')),
-    phone: z.string().optional(),
-    address: z.string().optional(),
-    status: z.enum(['person_of_interest', 'witness', 'suspect', 'victim', 'informant']),
-    priority: z.enum(['low', 'medium', 'high', 'critical']),
-    threatLevel: z.enum(['low', 'medium', 'high', 'extreme']),
-    occupation: z.string().optional(),
-    lastKnownLocation: z.string().optional(),
-    physicalDescription: z.string().optional()
+    aliases: z.string().optional(),
+    description: z.string().optional(),
+    status: z.enum(['surveillance', 'wanted', 'active', 'cleared']),
+    threatLevel: z.enum(['low', 'medium', 'high', 'critical']),
+    relationship: z.string().optional(),
+    crimes: z.string().optional()
   });
 
   interface Props {
@@ -30,25 +26,17 @@
   });
 
   const statusOptions = [
-    { value: 'person_of_interest', label: 'Person of Interest' },
-    { value: 'witness', label: 'Witness' },
-    { value: 'suspect', label: 'Suspect' },
-    { value: 'victim', label: 'Victim' },
-    { value: 'informant', label: 'Informant' }
-  ];
-
-  const priorityOptions = [
-    { value: 'low', label: 'Low' },
-    { value: 'medium', label: 'Medium' },
-    { value: 'high', label: 'High' },
-    { value: 'critical', label: 'Critical' }
+    { value: 'surveillance', label: 'Surveillance' },
+    { value: 'wanted', label: 'Wanted' },
+    { value: 'active', label: 'Active' },
+    { value: 'cleared', label: 'Cleared' }
   ];
 
   const threatLevelOptions = [
     { value: 'low', label: 'Low' },
     { value: 'medium', label: 'Medium' },
     { value: 'high', label: 'High' },
-    { value: 'extreme', label: 'Extreme' }
+    { value: 'critical', label: 'Critical' }
   ];
 </script>
 
@@ -69,50 +57,29 @@
   </div>
 
   <div class="form-group">
-    <label for="dateOfBirth">Date of Birth</label>
+    <label for="aliases">Aliases</label>
     <input
-      id="dateOfBirth"
-      type="date"
-      name="dateOfBirth"
-      bind:value={$form.dateOfBirth}
+      id="aliases"
+      type="text"
+      name="aliases"
+      bind:value={$form.aliases}
+      placeholder="Comma-separated aliases"
     />
   </div>
 
   <div class="form-group">
-    <label for="email">Email</label>
+    <label for="relationship">Relationship / Other Context</label>
     <input
-      id="email"
-      type="email"
-      name="email"
-      bind:value={$form.email}
-      placeholder="email@example.com"
-      class:error={$errors.email}
+      id="relationship"
+      type="text"
+      name="relationship"
+      bind:value={$form.relationship}
+      placeholder="Witness, associate, other context"
+      class:error={$errors.relationship}
     />
-    {#if $errors.email}
-      <span class="error-message">{$errors.email}</span>
+    {#if $errors.relationship}
+      <span class="error-message">{$errors.relationship}</span>
     {/if}
-  </div>
-
-  <div class="form-group">
-    <label for="phone">Phone</label>
-    <input
-      id="phone"
-      type="tel"
-      name="phone"
-      bind:value={$form.phone}
-      placeholder="(555) 123-4567"
-    />
-  </div>
-
-  <div class="form-group">
-    <label for="address">Address</label>
-    <textarea
-      id="address"
-      name="address"
-      bind:value={$form.address}
-      placeholder="Street address"
-      rows="2"
-    ></textarea>
   </div>
 
   <div class="form-group">
@@ -130,24 +97,6 @@
     </select>
     {#if $errors.status}
       <span class="error-message">{$errors.status}</span>
-    {/if}
-  </div>
-
-  <div class="form-group">
-    <label for="priority">Priority *</label>
-    <select
-      id="priority"
-      name="priority"
-      bind:value={$form.priority}
-      class:error={$errors.priority}
-    >
-      <option value="">Select priority</option>
-      {#each priorityOptions as option}
-        <option value={option.value}>{option.label}</option>
-      {/each}
-    </select>
-    {#if $errors.priority}
-      <span class="error-message">{$errors.priority}</span>
     {/if}
   </div>
 
@@ -170,34 +119,27 @@
   </div>
 
   <div class="form-group">
-    <label for="occupation">Occupation</label>
-    <input
-      id="occupation"
-      type="text"
-      name="occupation"
-      bind:value={$form.occupation}
-      placeholder="Job title or profession"
-    />
-  </div>
-
-  <div class="form-group">
-    <label for="lastKnownLocation">Last Known Location</label>
-    <input
-      id="lastKnownLocation"
-      type="text"
-      name="lastKnownLocation"
-      bind:value={$form.lastKnownLocation}
-      placeholder="City, state, or address"
-    />
-  </div>
-
-  <div class="form-group">
-    <label for="physicalDescription">Physical Description</label>
+    <label for="crimes">Crimes / Charges</label>
     <textarea
-      id="physicalDescription"
-      name="physicalDescription"
-      bind:value={$form.physicalDescription}
-      placeholder="Height, build, distinguishing features, etc."
+      id="crimes"
+      name="crimes"
+      bind:value={$form.crimes}
+      placeholder="Comma-separated, e.g. Fraud, Assault, Theft"
+      rows="3"
+      class:error={$errors.crimes}
+    ></textarea>
+    {#if $errors.crimes}
+      <span class="error-message">{$errors.crimes}</span>
+    {/if}
+  </div>
+
+  <div class="form-group">
+    <label for="description">Description</label>
+    <textarea
+      id="description"
+      name="description"
+      bind:value={$form.description}
+      placeholder="Physical description, notes, or other details"
       rows="3"
     ></textarea>
   </div>
@@ -254,7 +196,8 @@
   }
 
   input.error,
-  select.error {
+  select.error,
+  textarea.error {
     border-color: #ef4444;
   }
 

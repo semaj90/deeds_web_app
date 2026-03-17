@@ -48,6 +48,22 @@
   let kbQuery = $state('');
   let kbSearching = $state(false);
 
+  async function exportCitations(format: 'json' | 'pdf') {
+    try {
+      const res = await fetch(`/api/citations/export/${format}`);
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `citations-export.${format === 'pdf' ? 'txt' : format}`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(`Failed to export citations as ${format}:`, err);
+    }
+  }
+
   // Citation tags
   let citationTagsMap = $state<Record<string, { tag: string; color: string }[]>>({});
   let addingTagFor = $state<string | null>(null);
@@ -272,6 +288,9 @@
           { label: 'Citation Library', onClick: () => { showLibraryPage = !showLibraryPage; } },
           { separator: true, label: '' },
           { label: 'Knowledge Base', onClick: () => { showKnowledgeBase = !showKnowledgeBase; } },
+          { separator: true, label: '' },
+          { label: 'Export JSON', onClick: () => { exportCitations('json'); } },
+          { label: 'Export PDF', onClick: () => { exportCitations('pdf'); } },
         ]}
       />
     </div>

@@ -3,6 +3,7 @@
 
 	const { data, children } = $props();
 	const caseData = $derived(data?.caseData);
+	const caseId = $derived(caseData?.id ?? page.params.id ?? '');
 
 	const tabs = [
 		{ slug: 'overview', label: 'Overview' },
@@ -18,7 +19,7 @@
 		<div>
 			<div class="text-xs uppercase tracking-[0.25em] text-black/60 font-bold">Case File</div>
 			<div class="text-lg font-semibold text-black">
-				{caseData?.title ?? `Case #${caseData?.id ?? '…'}`}
+				{caseData?.title ?? `Case #${caseId || '…'}`}
 			</div>
 			{#if caseData?.status}
 				<div class="text-xs mt-1 text-black/60">
@@ -39,7 +40,7 @@
 		{#each tabs as tab}
 			{@const isActive = page.url.pathname.endsWith(`/${tab.slug}`)}
 			<a
-				href={`/cases/${caseData?.id ?? ''}/${tab.slug}`}
+				href={`/cases/${caseId}/${tab.slug}`}
 				class="cl-tab"
 				class:active={isActive}
 			>

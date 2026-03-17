@@ -7,17 +7,13 @@ import { db } from '$lib/server/db/client';
 import { personsOfInterest } from '$lib/server/db/schema-postgres';
 
 const poiSchema = z.object({
-	name: z.string().min(1, 'Name is required'),
-	dateOfBirth: z.string().optional(),
-	email: z.string().email('Invalid email').optional().or(z.literal('')),
-	phone: z.string().optional(),
-	address: z.string().optional(),
-	status: z.enum(['person_of_interest', 'witness', 'suspect', 'victim', 'informant']),
-	priority: z.enum(['low', 'medium', 'high', 'critical']),
-	threatLevel: z.enum(['low', 'medium', 'high', 'extreme']),
-	occupation: z.string().optional(),
-	lastKnownLocation: z.string().optional(),
-	physicalDescription: z.string().optional()
+  name: z.string().trim().min(1, 'Name is required').max(500),
+  aliases: z.string().optional().default(''),
+  description: z.string().max(5000).optional().default(''),
+  status: z.enum(['surveillance', 'wanted', 'active', 'cleared']).default('surveillance'),
+  threatLevel: z.enum(['low', 'medium', 'high', 'critical']).default('low'),
+  relationship: z.string().max(500).optional().default(''),
+  crimes: z.string().max(5000).optional().default(''),
 });
 
 export const load: PageServerLoad = async ({ locals, url }) => {
@@ -32,36 +28,48 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, url }) => {
-		const form = await superValidate(request, zod(poiSchema));
+  default: async ({ request, url, locals }) => {
+    const form = await superValidate(request, zod(poiSchema));
 
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+    if (!form.valid) {
+      return fail(400, { form });
+    }
 
-		try {
-			const caseId = url.searchParams.get('caseId') || null;
+    try {
+      const caseId = url.searchParams.get('caseId') || null;
+      const aliases = form.data.aliases
+        .split(',')
+        .map((value) => value.trim())
+        .filter(Boolean);
+      const crimes = (form.data.crimes || '')
+        .split(',')
+        .map((value: string) => value.trim())
+        .filter(Boolean);
 
-			const newPerson = await db.insert(personsOfInterest)
-				.values({
-					name: form.data.name,
-					description: form.data.physicalDescription || '',
-					threatLevel: form.data.threatLevel || 'low',
-					status: form.data.status || 'person_of_interest',
-					lastLocation: form.data.lastKnownLocation || null,
-					caseId: caseId || null,
-				} as any)
-				.returning();
+      const newPerson = await db
+        .insert(personsOfInterest)
+        .values({
+          name: form.data.name,
+          aliases,
+          description: form.data.description,
+          threatLevel: form.data.threatLevel,
+          status: form.data.status,
+          relationship: form.data.relationship || null,
+          crimes,
+          caseIds: caseId ? [caseId] : [],
+          createdBy: locals.user?.id ?? null,
+        })
+        .returning();
 
-			const poi = newPerson[0];
-			if (!poi) {
-				return fail(500, { form, error: 'Failed to create POI' });
-			}
+      const poi = newPerson[0];
+      if (!poi) {
+        return fail(500, { form, error: 'Failed to create POI' });
+      }
 
-			return redirect(303, `/persons-of-interest/${poi.id}`);
-		} catch (error) {
-			if (error && typeof error === 'object' && 'status' in error) throw error;
-			return fail(500, { form, error: 'Server error' });
-		}
-	},
+      return redirect(303, `/persons-of-interest/${poi.id}`);
+    } catch (error) {
+      if (error && typeof error === 'object' && 'status' in error) throw error;
+      return fail(500, { form, error: 'Server error' });
+    }
+  },
 };

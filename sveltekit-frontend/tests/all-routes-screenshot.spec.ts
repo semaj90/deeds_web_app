@@ -54,7 +54,7 @@ const routes = [
   '/evidence/upload',
   '/global-search',
   '/persons-of-interest',
-  '/persons-of-interest/1', // Replace [id] with test data
+  '/persons-of-interest',
   '/persons-of-interest/create',
   '/phase78/monitor',
   '/phase78/patches',
@@ -87,14 +87,14 @@ test.describe('All Routes Screenshot Test', () => {
     // Wait for network to be idle before screenshot
     navigationTimeout: 30000,
   });
- 
+
   test.beforeEach(async ({ page }) => {
     // Bypass onboarding wizard
     await page.addInitScript(() => {
       window.localStorage.setItem('deeds-onboarding-completed', 'true');
     });
   });
- 
+
   for (const route of routes) {
     test(`Screenshot: ${route}`, async ({ page }) => {
       const consoleErrors: string[] = [];

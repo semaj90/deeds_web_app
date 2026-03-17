@@ -51,6 +51,9 @@ import type { BoardSnapshotSchema } from '$lib/schemas/board';
 
  interface Case { id: string, title: string;
  createdAt: string;
+ description?: string | null;
+ jurisdiction?: string | null;
+ status?: string | null;
  }
 
  let caseData = $state<Case | null>(null);
@@ -172,7 +175,49 @@ import type { BoardSnapshotSchema } from '$lib/schemas/board';
  let selectedStatute = $state<any>(null);
  let showStatuteModal = $state(false);
 
- let caseId = $derived(page.params.id ?? '');
+function normalizeCaseResponse(payload: unknown): Case | null {
+ if (!payload || typeof payload !== 'object') return null;
+
+ const response = payload as Record<string, unknown>;
+ const nestedCase = response.data;
+
+ if (nestedCase && typeof nestedCase === 'object' && !Array.isArray(nestedCase)) {
+  return nestedCase as Case;
+ }
+
+ if ('id' in response && typeof response.id === 'string') {
+  return response as unknown as Case;
+ }
+
+ return null;
+}
+
+function normalizeEvidenceResponse(payload: unknown): Evidence[] {
+ if (Array.isArray(payload)) {
+  return payload as Evidence[];
+ }
+
+ if (!payload || typeof payload !== 'object') {
+  return [];
+ }
+
+ const response = payload as Record<string, unknown>;
+ const list = response.evidence ?? response.data;
+
+ return Array.isArray(list) ? (list as Evidence[]) : [];
+}
+
+ function resolveCaseId() {
+  const fromParams = page.params.id;
+  if (fromParams) return fromParams;
+
+  const segments = page.url.pathname.split('/').filter(Boolean);
+  if (segments[0] === 'cases' && segments[1]) return segments[1];
+
+  return '';
+ }
+
+ let caseId = $derived(resolveCaseId());
  let initializedCaseId = $state('');
 
  let theoryQuickActions = $derived<QuickAction[]>([
@@ -243,6 +288,7 @@ import type { BoardSnapshotSchema } from '$lib/schemas/board';
  const cached = await cache.get<Case>(cacheKey);
  if (cached) {
  caseData = cached;
+ caseDescription = cached.description ?? '';
  console.log('✅ Cache hit: case-' + caseId);
  return;
  }
@@ -257,12 +303,17 @@ import type { BoardSnapshotSchema } from '$lib/schemas/board';
  throw new Error('Failed to load case');
  }
 
- const data = await response.json();
- caseData = data;
- caseDescription = data.description ?? '';
+ const payload = await response.json();
+ const normalizedCase = normalizeCaseResponse(payload);
+ if (!normalizedCase) {
+ throw new Error('Failed to load case');
+ }
+
+ caseData = normalizedCase;
+ caseDescription = normalizedCase.description ?? '';
 
  // Cache with 5 minute TTL
- await cache.set(cacheKey, data, CacheStrategies.TWO_LAYER);
+ await cache.set(cacheKey, normalizedCase, CacheStrategies.TWO_LAYER);
  console.log('💾 Cached: case-' + caseId);
  } catch (err) {
  error = err instanceof Error ? err.message : 'Failed to load case';
@@ -296,7 +347,7 @@ import type { BoardSnapshotSchema } from '$lib/schemas/board';
  // Try cache first
  const cached = await cache.get<Evidence[]>(cacheKey);
  if (cached) {
- evidence = cached;
+ evidence = Array.isArray(cached) ? cached : [];
  console.log('✅ Cache hit: evidence-list-' + caseId);
  isLoading = false;
  return;
@@ -306,11 +357,12 @@ import type { BoardSnapshotSchema } from '$lib/schemas/board';
  const response = await fetch(`/api/cases/${caseId}/evidence`);
  if (!response.ok) throw new Error('Failed to load evidence');
 
- const data = await response.json();
- evidence = data;
+ const payload = await response.json();
+ const normalizedEvidence = normalizeEvidenceResponse(payload);
+ evidence = normalizedEvidence;
 
  // Cache with 10 minute TTL (evidence changes less frequently)
- await cache.set(cacheKey, data, {
+ await cache.set(cacheKey, normalizedEvidence, {
  memory: true,
  persistent: true,
  ttl: 600000 // 10 minutes
@@ -498,8 +550,8 @@ import type { BoardSnapshotSchema } from '$lib/schemas/board';
  }
  };
 
- const getPendingCount = () => evidence.filter((e) => e.status === 'pending').length;
- const getApprovedCount = () => evidence.filter((e) => e.status === 'approved').length;
+ const getPendingCount = () => (Array.isArray(evidence) ? evidence.filter((e) => e.status === 'pending').length : 0);
+ const getApprovedCount = () => (Array.isArray(evidence) ? evidence.filter((e) => e.status === 'approved').length : 0);
 
  const handleExportPacket = async () => {
  isExportingPacket = true;

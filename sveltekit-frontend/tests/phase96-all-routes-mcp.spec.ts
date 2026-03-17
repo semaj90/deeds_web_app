@@ -71,7 +71,7 @@ const routes = [
   '/evidence/upload',
   '/global-search',
   '/persons-of-interest',
-  '/persons-of-interest/1',
+  '/persons-of-interest',
   '/persons-of-interest/create',
   '/phase78/monitor',
   '/phase78/patches',

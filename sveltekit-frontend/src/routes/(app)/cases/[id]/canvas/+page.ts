@@ -1,14 +1,3 @@
-import type { PageLoad } from './$types.js';
-
-export const load: PageLoad = async ({ fetch, params }) => {
- const res = await fetch(`/api/cases/${params.id}/evidence`);
-
- let evidence = [];
- if (res.ok) {
- evidence = await res.json();
- }
-
- return {
- evidence,
- };
-};
+// Canvas requires DOM APIs (WebGL/Canvas2D) — disable SSR
+// Server load in +page.server.ts provides evidence + connections data
+export const ssr = false;

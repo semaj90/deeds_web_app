@@ -132,7 +132,7 @@ node scripts/tests/test-quickactions-scroll.mjs
 | Route | Path | Special | Status |
 |-------|------|---------|--------|
 | evidence | `/evidence` | CSR | ✅ |
-| persons-of-interest | `/persons-of-interest/fake-id` | - | ✅ |
+| persons-of-interest | `/persons-of-interest` | - | ✅ |
 | cases-overview | `/cases/test-id/overview` | SSE | ✅ |
 | **cases-board** | `/cases/test-id/board` | **Canvas** | ✅ **NEW** |
 | agentic-errors-analysis | `/agentic-errors/analysis` | - | ✅ |

@@ -4,27 +4,44 @@ import { eq, desc } from 'drizzle-orm';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types.js';
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export const load: PageServerLoad = async ({ params }) => {
-	const safe = <T>(p: Promise<T>, fallback: T, timeoutMs = 5000): Promise<T> =>
-		Promise.race([p, new Promise<T>((resolve) => setTimeout(() => resolve(fallback), timeoutMs))]).catch(() => fallback);
+  if (!UUID_PATTERN.test(params.id)) {
+    return { poi: null, photos: [], loadError: 'Invalid person of interest id' };
+  }
 
-	const results = await safe(
-		db.select().from(personsOfInterest).where(eq(personsOfInterest.id, params.id)).limit(1),
-		[]
-	);
+  const safe = <T>(p: Promise<T>, fallback: T, timeoutMs = 5000): Promise<T> =>
+    Promise.race([
+      p,
+      new Promise<T>((resolve) => setTimeout(() => resolve(fallback), timeoutMs)),
+    ]).catch(() => fallback);
 
-	const poi = results[0];
+  const results = await safe(
+    db.select().from(personsOfInterest).where(eq(personsOfInterest.id, params.id)).limit(1),
+    []
+  );
 
-	if (!poi) {
-		return { poi: null, photos: [], loadError: 'Person of interest not found or database unavailable' };
-	}
+  const poi = results[0];
 
-	const photos = await safe(
-		db.select().from(poiPhotos).where(eq(poiPhotos.poiId, params.id)).orderBy(desc(poiPhotos.uploadedAt)),
-		[]
-	);
+  if (!poi) {
+    return {
+      poi: null,
+      photos: [],
+      loadError: 'Person of interest not found or database unavailable',
+    };
+  }
 
-	return {
+  const photos = await safe(
+    db
+      .select()
+      .from(poiPhotos)
+      .where(eq(poiPhotos.poiId, params.id))
+      .orderBy(desc(poiPhotos.uploadedAt)),
+    []
+  );
+
+  return {
     poi: {
       id: poi.id,
       name: poi.name,
@@ -33,6 +50,7 @@ export const load: PageServerLoad = async ({ params }) => {
       description: poi.description,
       relationship: poi.relationship,
       aliases: poi.aliases,
+      crimes: poi.crimes ?? [],
       caseIds: poi.caseIds,
       caseId: poi.caseIds?.[0] ?? null,
       aiProfile: poi.aiProfile,

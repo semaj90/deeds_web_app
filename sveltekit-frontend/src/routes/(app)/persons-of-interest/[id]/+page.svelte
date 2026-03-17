@@ -38,6 +38,9 @@
 	let searchResults = $state<any[]>([]);
 	let searchLoading = $state(false);
 	let searchError = $state<string | null>(null);
+	let riskData = $state<any>(null);
+	let riskLoading = $state(false);
+	let riskError = $state<string | null>(null);
 
 	function normalizePhoto(photo: any) {
 		if (!photo) return photo;
@@ -70,6 +73,21 @@
 		}
 	}
 
+
+	async function loadRiskScore() {
+		if (!data.poi?.id) return;
+		riskLoading = true;
+		riskError = null;
+		try {
+			const res = await fetch(`/api/persons-of-interest/${data.poi.id}/risk`);
+			if (!res.ok) throw new Error('Failed to compute risk score');
+			riskData = await res.json();
+		} catch (err) {
+			riskError = err instanceof Error ? err.message : 'Failed to compute risk';
+		} finally {
+			riskLoading = false;
+		}
+	}
 
 	async function searchSimilarPOIs(query?: string) {
 		const q = query ?? searchQuery.trim();
@@ -358,6 +376,17 @@
 						</div>
 					{/if}
 
+					{#if (poi.crimes ?? []).length > 0}
+						<div class="detail-item full-width">
+							<div class="label">Crimes / Charges</div>
+							<div class="aliases-list">
+								{#each poi.crimes ?? [] as crime}
+									<span class="alias-tag" style="background: rgba(220, 38, 38, 0.2); border-color: #dc2626;">{crime}</span>
+								{/each}
+							</div>
+						</div>
+					{/if}
+
 					<div class="detail-item">
 						<div class="label">Created</div>
 						<p>{new Date(poi.createdAt).toLocaleString()}</p>
@@ -366,6 +395,31 @@
 					<div class="detail-item">
 						<div class="label">Last Updated</div>
 						<p>{new Date(poi.updatedAt).toLocaleString()}</p>
+					</div>
+
+					<div class="detail-item full-width" style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.1);">
+						<div class="label" style="display: flex; align-items: center; gap: 0.5rem;">Risk Assessment
+							{#if !riskData}
+								<button class="text-xs px-2 py-0.5 rounded-full border border-amber-400/60 hover:bg-amber-400/10" onclick={loadRiskScore} disabled={riskLoading}>
+									{riskLoading ? 'Computing...' : 'Compute Risk Score'}
+								</button>
+							{/if}
+						</div>
+						{#if riskError}
+							<p class="text-xs text-red-400">{riskError}</p>
+						{:else if riskData}
+							{@const score = riskData.riskScore ?? 0}
+							{@const scoreClass = score >= 7 ? 'bg-red-600/20' : score >= 4 ? 'bg-amber-600/20' : 'bg-green-600/20'}
+							<div class="flex flex-wrap gap-3 text-xs">
+								<span class="px-2 py-0.5 rounded-full {scoreClass}">
+									Score: {score}/10
+								</span>
+								<span>Evidence: {riskData.evidenceCount ?? 0} items</span>
+								{#if riskData.aiAnalysis}
+									<p class="w-full text-neutral-300 mt-1">{riskData.aiAnalysis}</p>
+								{/if}
+							</div>
+						{/if}
 					</div>
 				</div>
 			{:else if activeTab === 'associates'}

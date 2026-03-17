@@ -22,7 +22,7 @@ const SCREENSHOTS_DIR = path.join(__dirname, 'screenshots');
 // ── Route definitions ──────────────────────────────────────────────
 const QUICK_ROUTES = [
   { name: 'evidence', path: '/evidence' },
-  { name: 'persons-of-interest', path: '/persons-of-interest/fake-id' },
+  { name: 'persons-of-interest', path: '/persons-of-interest' },
   { name: 'cases-overview', path: '/cases/test-id/overview' },
   { name: 'cases-board', path: '/cases/test-id/board' },
   { name: 'cases-list', path: '/cases' },
@@ -55,7 +55,6 @@ const ALL_ROUTES = [
   { name: 'cases-reports', path: '/cases/test-id/reports' },
   { name: 'cases-canvas', path: '/cases/test-id/canvas' },
   { name: 'poi-create', path: '/persons-of-interest/create' },
-  { name: 'poi-list', path: '/persons-of-interest' },
   { name: 'reports', path: '/reports' },
   { name: 'reports-new', path: '/reports/new' },
   { name: 'recommendations', path: '/recommendations' },
@@ -180,8 +179,10 @@ for (const route of routes) {
   const loadStart = Date.now();
 
   try {
-    const waitUntil = (route.sse || SSE_PAGES.has(route.name)) ? 'domcontentloaded' : 'networkidle';
-    const response = await tab.goto(url, { waitUntil, timeout: 15000 });
+    const isSSE = route.sse || SSE_PAGES.has(route.name);
+    const waitUntil = isSSE ? 'domcontentloaded' : 'networkidle';
+    const pageTimeout = isSSE ? 25000 : 15000;
+    const response = await tab.goto(url, { waitUntil, timeout: pageTimeout });
 
     // For domcontentloaded pages, give extra render time
     if (waitUntil === 'domcontentloaded') {
@@ -209,11 +210,38 @@ for (const route of routes) {
 
     // Check page for SvelteKit error page (.error-page class from +error.svelte)
     // or Vite error overlay (custom element injected on module load failure).
-    const errorPageCount = await tab.locator('.error-page').count().catch(() => 0);
-    const viteErrorCount = await tab.locator('vite-error-overlay').count().catch(() => 0);
-    if (errorPageCount > 0 || viteErrorCount > 0) {
+    // Also detect Vite 504 "Outdated Optimize Dep" via page text content.
+    let errorPageCount = await tab.locator('.error-page').count().catch(() => 0);
+    let viteErrorCount = await tab.locator('vite-error-overlay').count().catch(() => 0);
+    let has504Text = await tab.evaluate(() =>
+      document.body?.innerText?.includes('504') || document.body?.innerText?.includes('Outdated Optimize Dep')
+    ).catch(() => false);
+
+    // Retry up to 3 times if error page detected — likely Vite "Outdated Optimize Dep" (504)
+    const MAX_RETRIES = 3;
+    for (let retry = 0; retry < MAX_RETRIES && (errorPageCount > 0 || viteErrorCount > 0 || has504Text); retry++) {
+      const backoff = 2000 + retry * 1500; // 2s, 3.5s, 5s
+      await new Promise(r => setTimeout(r, backoff));
+      const retryWait = (route.sse || SSE_PAGES.has(route.name)) ? 'domcontentloaded' : 'networkidle';
+      try {
+        const retryRes = await tab.goto(url, { waitUntil: retryWait, timeout: 20000 });
+        if (retryWait === 'domcontentloaded') await tab.waitForTimeout(2000);
+        if (CSR_PAGES.has(route.name)) await tab.waitForTimeout(3000);
+        if (CANVAS_PAGES.has(route.name)) await tab.waitForTimeout(2000);
+        result.status = retryRes?.status() ?? result.status;
+        result.ok = result.status >= 200 && result.status < 400;
+        result.domElements = await tab.evaluate(() => document.querySelectorAll('*').length).catch(() => 0);
+        errorPageCount = await tab.locator('.error-page').count().catch(() => 0);
+        viteErrorCount = await tab.locator('vite-error-overlay').count().catch(() => 0);
+        has504Text = await tab.evaluate(() =>
+          document.body?.innerText?.includes('504') || document.body?.innerText?.includes('Outdated Optimize Dep')
+        ).catch(() => false);
+      } catch { /* keep original error detection */ }
+    }
+
+    if (errorPageCount > 0 || viteErrorCount > 0 || has504Text) {
       result.ok = false;
-      result.error = errorPageCount > 0 ? 'SvelteKit error page rendered' : 'Vite error overlay detected';
+      result.error = has504Text ? 'Vite 504 Outdated Optimize Dep' : errorPageCount > 0 ? 'SvelteKit error page rendered' : 'Vite error overlay detected';
     }
 
     const filename = `${route.name}.png`;
@@ -271,7 +299,7 @@ for (const route of routes) {
 
   // Delay between routes to prevent Vite dep optimizer overload (504 Outdated Optimize Dep)
   if (routes.length > 10) {
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(r => setTimeout(r, 1500));
   }
 }
 

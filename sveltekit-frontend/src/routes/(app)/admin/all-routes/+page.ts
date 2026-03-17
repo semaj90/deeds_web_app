@@ -5,7 +5,6 @@ export const load = async ({ fetch }: { fetch: typeof globalThis.fetch }) => {
 		const metadata = await metadataRes.json();
 
 		return {
-			routes: [], // Legacy route monitoring data (will be populated by SSE)
 			apiMetadata: metadata.success ? metadata.data : {
 				allEndpoints: [],
 				activeAPI: [],
@@ -29,7 +28,6 @@ export const load = async ({ fetch }: { fetch: typeof globalThis.fetch }) => {
 	} catch (err) {
 		console.error('[all-routes +page.ts] Failed to load metadata:', err);
 		return {
-			routes: [],
 			apiMetadata: {
 				allEndpoints: [],
 				activeAPI: [],
