@@ -123,6 +123,40 @@ For files marked REWRITE:
 - Feature exists in no other form in the codebase
 - Used to be imported but import was removed (git log check)
 
+## Gate 7: Infrastructure Wiring
+
+After G6 Route Reachability, apply G7 to verify the component's backend dependencies are real:
+
+### 7a. XState Machine Connectivity
+If the component uses `useMachine()` or imports from `$lib/machines/`:
+1. Verify every `invoke.src` actor in the machine has a real implementation (not a stub)
+2. Verify `send()` calls use events that the machine actually handles
+3. Verify `fromPromise` actors resolve to real API calls or DB queries
+4. Flag as **DEAD_MACHINE** if machine is imported but `send()` is never called from rendered UI
+
+### 7b. RabbitMQ Queue Wiring
+If the component's handler calls `publishVectorIndex()`, `publishDocumentEmbed()`, etc.:
+1. Verify a consumer exists for that queue in `rabbitmq-manager-fixed.ts`
+2. Verify the consumer does real work (not a no-op handler)
+3. Flag as **ORPHAN_QUEUE** if publisher exists but no consumer (or vice versa)
+
+### 7c. Redis/Cache Coherence
+If the component uses `cache.get()`, `cache.set()`, or Redis operations:
+1. Verify the cache key pattern has both read AND write paths
+2. Flag **STALE_CACHE** if key is written but never read (dead write)
+3. Flag **STALE_CACHE** if key is read but never written (always miss)
+
+### 7d. Environment Variable Dependencies
+If the file imports from `$lib/config/env.server.ts` or accesses `ENV.*`:
+1. Verify the referenced env var is set in `.env` or `.env.example`
+2. Flag **MISSING_ENV** if var is accessed but not defined anywhere
+
+### 7e. Demo Page Verification
+If the component is used ONLY by a `/demos/*` route:
+1. Verify the demo is listed in `/demos/+page.svelte` (the demos index)
+2. If not listed → the demo is unreachable from navigation → flag as **UNLISTED_DEMO**
+3. Verify the demo page loads without 500 errors (if dev server is running)
+
 ## Rules
 
 - NEVER delete files — always move to `deeds_labs/`
@@ -130,3 +164,4 @@ For files marked REWRITE:
 - Check root layout, barrel exports (`index.ts`), dynamic imports
 - Follow the Directory Audit Protocol from CLAUDE.md
 - Run `svelte-check` after any wiring changes
+- Use ripgrep (`rg`) for fast cross-file searches: `rg "from.*\$lib/PATTERN" src/`

@@ -97,15 +97,10 @@
 
 <svelte:head><title>State Constitution Corpus — Legal Library</title></svelte:head>
 
-<div class="min-h-screen bg-app-bg text-sand p-6">
+<div class="p-6 text-sand">
 	<!-- Header -->
 	<header class="mb-6 flex items-start justify-between gap-4">
 		<div>
-			<div class="flex items-center gap-2 mb-1">
-				<a href="/library" class="text-sand/40 hover:text-sand/70 text-sm">← Library</a>
-				<span class="text-sand/20">/</span>
-				<span class="text-sm text-sand/60">State Constitutions</span>
-			</div>
 			<h1 class="text-2xl font-bold text-sand">50-State Constitution Corpus</h1>
 			<p class="text-sand/50 text-sm mt-0.5">
 				Official state legislature sources · LII discovery layer · Qdrant + pgvector mirrored

@@ -103,7 +103,7 @@
 	<div class="p-8 text-center text-red-400">{data.loadError}</div>
 {:else if data.document}
 	{@const doc = data.document}
-	<div class="h-screen flex flex-col bg-app-bg text-sand overflow-hidden">
+	<div class="h-full flex flex-col bg-app-bg text-sand overflow-hidden">
 		<!-- Top bar -->
 		<header class="shrink-0 flex items-center gap-3 px-4 h-11 border-b border-sand/10 bg-[#111113]">
 			<a href="/library/{doc.id}" class="text-sand/40 hover:text-sand/70 text-sm">←</a>

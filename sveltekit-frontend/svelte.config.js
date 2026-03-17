@@ -11,6 +11,7 @@ const suppressedWarnings = new Set([
   'a11y_consider_explicit_label',
   'a11y_interactive_supports_focus',
   'a11y_no_interactive_element_to_noninteractive_role',
+  'css_vendor_prefix',
 ]);
 
 /** @type {import('@sveltejs/kit').Config} */

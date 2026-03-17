@@ -1,5 +1,14 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
+  import { goto, pushState } from '$app/navigation';
+
+  function openCaseModal(e: MouseEvent, id: string) {
+    if (e.metaKey || e.ctrlKey) return;
+    e.preventDefault();
+    pushState(`/cases/${id}/overview`, {
+      showCaseModal: true,
+      caseId: id
+    });
+  }
   import Button from '$lib/components/ui/Button.svelte';
   import Card from '$lib/components/ui/card/Card.svelte';
   import CardContent from '$lib/components/ui/card/CardContent.svelte';
@@ -408,7 +417,7 @@
             {#each recentCases as caseItem}
               <button
                 class="flex items-center justify-between w-full px-3 py-2.5 bg-black/20 rounded text-sm hover:bg-black/30 transition-colors text-left"
-                onclick={() => goto(`/cases/${caseItem.id}`)}
+                onclick={(e) => openCaseModal(e, caseItem.id)}
               >
                 <div class="flex items-center gap-3">
                   <span class="font-mono text-xs text-sand/40">{caseItem.caseNumber}</span>

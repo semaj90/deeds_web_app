@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import TocTree from '$lib/components/legal/TocTree.svelte';
+	import { goto } from '$app/navigation';
 
 	let { data }: { data: PageData } = $props();
 
@@ -26,15 +28,41 @@
 		graphing: 'text-teal-400',
 	};
 
-	const NODE_TYPE_ICON: Record<string, string> = {
-		root: 'book',
-		part: 'layers',
-		title: 'bookmark',
-		chapter: 'folder',
-		article: 'file-text',
-		section: 'hash',
-		subdivision: 'corner-down-right',
-	};
+
+	interface TocNode {
+		id: string;
+		parentId: string | null;
+		nodeType: string;
+		heading: string;
+		citationLabel?: string | null;
+		nodePath: string;
+		depth: number;
+		children?: TocNode[];
+	}
+
+	const tocTree = $derived.by(() => {
+		const nodes: TocNode[] = data.toc.map((n: Record<string, unknown>) => ({
+			id: n.id as string,
+			parentId: n.parent_id as string | null,
+			nodeType: n.node_type as string,
+			heading: n.heading as string,
+			citationLabel: n.citation_label as string | null,
+			nodePath: n.node_path as string,
+			depth: n.depth as number,
+			children: [],
+		}));
+
+		const map = new Map(nodes.map((n) => [n.id, n]));
+		const roots: TocNode[] = [];
+		for (const n of nodes) {
+			if (n.parentId && map.has(n.parentId)) {
+				map.get(n.parentId)!.children!.push(n);
+			} else {
+				roots.push(n);
+			}
+		}
+		return roots;
+	});
 </script>
 
 <svelte:head>
@@ -45,14 +73,7 @@
 	<div class="p-8 text-center text-red-400">{data.loadError}</div>
 {:else if data.document}
 	{@const doc = data.document}
-	<div class="min-h-screen bg-app-bg text-sand p-6">
-		<!-- Breadcrumb -->
-		<nav class="text-xs text-sand/40 mb-5 flex items-center gap-1.5">
-			<a href="/library" class="hover:text-accent">Legal Library</a>
-			<span>/</span>
-			<span class="text-sand/70">{doc.title}</span>
-		</nav>
-
+	<div class="p-6 text-sand">
 		<!-- Header -->
 		<div class="mb-6 pb-5 border-b border-sand/10">
 			<div class="flex items-start justify-between gap-4">
@@ -125,32 +146,18 @@
 						<p class="text-sand/30 text-sm">Indexing in progress…</p>
 					{/if}
 				{:else}
-					<div class="flex flex-col gap-0.5">
-						{#each data.toc as node}
-							<a
-								href="/library/{doc.id}/reader?node={node.id}"
-								class="flex items-center gap-2 px-3 py-2 rounded hover:bg-sand/5 transition-colors group"
-								style:padding-left="{(node.depth ?? 0) * 16 + 12}px"
-							>
-								<Icon
-									name={NODE_TYPE_ICON[node.node_type] ?? 'hash'}
-									class="w-3 h-3 text-sand/30 group-hover:text-accent shrink-0"
-								/>
-								<span class="text-sm text-sand/70 group-hover:text-sand">{node.heading}</span>
-								{#if node.citation_label}
-									<span class="ml-auto text-[10px] text-sand/30 font-mono">{node.citation_label}</span>
-								{/if}
-							</a>
-						{/each}
-						{#if data.toc.length >= 40}
-							<a
-								href="/library/{doc.id}/reader"
-								class="text-xs text-accent/60 hover:text-accent text-center py-2"
-							>
-								View full table of contents in reader →
-							</a>
-						{/if}
-					</div>
+					<TocTree
+						nodes={tocTree}
+						onSelect={(id) => goto(`/library/${doc.id}/reader?node=${id}`)}
+					/>
+					{#if data.toc.length >= 40}
+						<a
+							href="/library/{doc.id}/reader"
+							class="text-xs text-accent/60 hover:text-accent text-center py-2 block mt-2"
+						>
+							View full table of contents in reader →
+						</a>
+					{/if}
 				{/if}
 			</div>
 

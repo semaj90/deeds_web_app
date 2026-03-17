@@ -86,10 +86,46 @@ Find the renamed/moved type and update the import path.
 - `$effect()` — side effects, NOT for computed values
 - Stores: `.svelte.ts` for rune-based, `.ts` for plain
 
+## Phase 5: Infrastructure Wiring Issues
+
+Beyond import resolution, detect infrastructure-level wiring problems:
+
+### Additional Issue Categories
+
+| Category | Description | Fix Strategy |
+|----------|-------------|-------------|
+| **DEAD_ACTOR** | XState machine `invoke.src` references non-existent or stub actor | Wire actor to real API/DB call or remove machine |
+| **ORPHAN_PUBLISHER** | `publishVectorIndex()` etc. called but no consumer for that queue | Create consumer in `rabbitmq-manager-fixed.ts` or remove publish call |
+| **ORPHAN_CONSUMER** | Consumer registered for queue but nothing publishes to it | Wire publisher or remove consumer |
+| **ENV_MISMATCH** | `ENV.FOO` accessed but `FOO` not defined in env.server.ts or .env.example | Add to env.server.ts getter + .env.example |
+| **SCHEMA_DRIFT** | Drizzle schema column type doesn't match actual DB column (detect via `sql<T>` casts or `as any` workarounds) | Update Drizzle schema or migration |
+| **UNLISTED_DEMO** | Demo route exists at `/demos/X` but not listed in demos index page | Add entry to demos/+page.svelte demos or showcases array |
+| **DEAD_DEMO_LINK** | Demos index links to non-existent demo route | Remove link or create the demo page |
+
+### Detection Commands
+```bash
+# XState dead actors — find all invoke.src references
+rg "invoke.*src:" src/lib/machines/ --no-heading
+
+# RabbitMQ orphan queues
+rg "publish(VectorIndex|DocumentEmbed|EvidenceProcess)" src/ --no-heading
+rg "consume\(" src/lib/server/queue/ --no-heading
+
+# Env var mismatches
+rg "ENV\.\w+" src/ -o --no-heading | sort | uniq -c | sort -rn
+
+# Schema drift — find sql<T> casts and as any workarounds on DB queries
+rg "sql<|as any\)\.|\bas unknown as\b" src/routes/api/ --no-heading
+
+# Demo page reachability
+rg "href:.*'/demos/" src/routes/(app)/demos/+page.svelte -o --no-heading
+```
+
 ## Rules
 
 - NEVER create files unless the missing module is clearly needed
 - Prefer finding existing alternatives over creating stubs
+- Use ripgrep (`rg`) for fast cross-file searches, NOT grep
 - Run `svelte-check` after any fixes
 - Check `src/lib/services/` is excluded (312 corrupted files)
 - Follow CLAUDE.md conventions for all new code

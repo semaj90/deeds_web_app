@@ -1,9 +1,28 @@
-import { defineConfig, presetUno, presetIcons, presetTypography } from 'unocss';
+import extractorSvelte from '@unocss/extractor-svelte';
+import { defineConfig, presetUno, presetIcons, presetTypography, presetWebFonts } from 'unocss';
 
 export default defineConfig({
-  presets: [presetUno(), presetIcons(), presetTypography()],
+  presets: [
+    presetUno(),
+    presetIcons(),
+    presetTypography(),
+    presetWebFonts({
+      fonts: {
+        sans: 'Inter:400,500,600,700',
+        mono: 'JetBrains Mono:400,500,600',
+      },
+    }),
+  ],
+  extractors: [extractorSvelte()],
   theme: {
     colors: {
+      accent: '#5ea0ff',
+      legal: '#f0b35a',
+      sand: '#f4f4f5',
+      'app-bg': '#0b0e12',
+      panel: '#11161d',
+      panelSoft: '#161c24',
+
       // YoRHa theme
       'yorha-primary': '#e0e0e0',
       'yorha-secondary': '#b0b0b0',
@@ -32,11 +51,26 @@ export default defineConfig({
       'yorha-noir-light': '#2d2d2d',
     },
     fontFamily: {
+      sans: ['Inter', 'system-ui', 'sans-serif'],
       nes: ['"Press Start 2P"', 'system-ui', 'monospace'],
       mono: ['JetBrains Mono', 'Consolas', 'monospace'],
     },
   },
   shortcuts: {
+    'app-shell': 'min-h-screen bg-[#0b0e12] text-zinc-100',
+    'app-bg': 'bg-[#0b0e12] text-zinc-100',
+    panel: 'rounded-2xl border border-white/8 bg-panel shadow-lg shadow-black/20',
+    'panel-header': 'flex items-center justify-between gap-3 px-4 py-3 border-b border-white/8',
+    'panel-body': 'p-4',
+    muted: 'text-zinc-400',
+    badge:
+      'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium border border-white/10 bg-white/6',
+    btn: 'inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium transition',
+    'btn-primary': 'btn bg-blue-500 text-white hover:bg-blue-400',
+    'btn-ghost': 'btn bg-white/6 hover:bg-white/10',
+    input:
+      'w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm outline-none focus:border-blue-400',
+
     // ═══════════════════════════════════════════════════════════════════════
     // NES COMMAND CENTER SCREEN
     // ═══════════════════════════════════════════════════════════════════════

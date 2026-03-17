@@ -1,12 +1,19 @@
 /**
  * GET /api/library/search
- * Hybrid search: lexical (tsvector FTS) + semantic (pgvector cosine).
+ *
+ * Hybrid search over legal library tables.
+ * Fast-path: Go search service at GO_SEARCH_URL (4-way parallel fan-out).
+ * Fallback:  Inline SQL (lexical + semantic, same as before).
+ *
  * Query params: q, jurisdiction?, corpusType?, limit?
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
+import { ENV } from '$lib/server/env.server.js';
+
+const GO_SEARCH_URL = (ENV as unknown as Record<string, string>).GO_SEARCH_URL || '';
 
 export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -18,7 +25,36 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 
 	if (q.length < 2) return json({ hits: [], total: 0 });
 
-	// Generate query embedding (non-fatal)
+	// Fast-path: Go search service (parallel fan-out: citation + FTS + pgvector + Qdrant)
+	if (GO_SEARCH_URL) {
+		try {
+			const goResp = await fetch(`${GO_SEARCH_URL}/search`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					query: q,
+					jurisdiction: jurisdiction ?? '',
+					corpusType: corpusType ?? '',
+					limit,
+					userId: locals.user.id,
+				}),
+				signal: AbortSignal.timeout(8000),
+			});
+			if (goResp.ok) {
+				const data = await goResp.json();
+				return json({
+					hits: (data.hits ?? []).map(formatGoHit),
+					total: data.total ?? 0,
+					meta: { ...data.meta, source: 'go-search-service' },
+				});
+			}
+			// Non-200 → fall through to inline SQL
+		} catch {
+			// Go service unavailable → fall through
+		}
+	}
+
+	// Fallback: inline SQL (existing logic)
 	let queryEmbedding: number[] | null = null;
 	try {
 		queryEmbedding = await generateSingleEmbedding(q.slice(0, 512));
@@ -130,10 +166,35 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			LIMIT $${paramIdx}`;
 
 		const res = await pool.query(lexQuery, params);
-		return json({ hits: res.rows.map(formatHit), total: res.rowCount });
+		return json({ hits: res.rows.map(formatHit), total: res.rowCount, meta: { source: 'inline-sql' } });
 	}
 };
 
+/** Format a row from the Go search service response */
+function formatGoHit(hit: Record<string, unknown>) {
+	return {
+		chunkId:      hit.chunkId,
+		documentId:   hit.documentId,
+		nodeId:       hit.nodeId,
+		title:        hit.title,
+		citation:     hit.citationLabel,
+		heading:      hit.heading,
+		nodePath:     hit.nodePath,
+		nodeType:     hit.nodeType,
+		snippet:      hit.snippet,
+		score:        Number(hit.score ?? 0),
+		sourceType:   hit.sourceType,
+		isOfficial:   hit.isOfficial,
+		officialUrl:  hit.officialUrl,
+		pageStart:    hit.pageStart,
+		pageEnd:      hit.pageEnd,
+		jurisdiction: { code: hit.jurisdictionCode, name: hit.jurisdictionName },
+		corpusType:   hit.corpusType,
+		matchType:    hit.matchType,
+	};
+}
+
+/** Format a row from the inline SQL fallback */
 function formatHit(row: Record<string, unknown>) {
 	return {
 		chunkId:      row.chunk_id,

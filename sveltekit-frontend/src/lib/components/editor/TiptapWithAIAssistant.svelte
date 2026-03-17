@@ -152,48 +152,48 @@ return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
 </script>
 
-<div class="border rounded-xl bg-background shadow-sm overflow-hidden flex flex-col h-full min-h-[500px]">
+<div class="report-editor-shell flex h-full min-h-[500px] flex-col overflow-hidden rounded-xl border border-neutral-300 bg-white text-neutral-900 shadow-sm">
 <!-- Toolbar -->
 {#if !readOnly}
-<div class="border-b bg-muted/40 p-2 flex items-center gap-1 flex-wrap">
+<div class="editor-toolbar flex flex-wrap items-center gap-1 border-b border-neutral-200 bg-neutral-100 p-2">
 <Button variant="ghost" size="sm"
-class={isActive.bold ? "bg-muted" : ""}
+class={`toolbar-button ${isActive.bold ? 'toolbar-button-active' : ''}`}
 onclick={() => editor?.chain().focus().toggleBold().run()}
 >
 <span class="i-lucide-bold w-4 h-4 inline-block"></span>
 </Button>
 <Button variant="ghost" size="sm"
-class={isActive.italic ? "bg-muted" : ""}
+class={`toolbar-button ${isActive.italic ? 'toolbar-button-active' : ''}`}
 onclick={() => editor?.chain().focus().toggleItalic().run()}
 >
 <span class="i-lucide-italic w-4 h-4 inline-block"></span>
 </Button>
 
-<div class="w-px h-6 bg-border mx-1"></div>
+<div class="mx-1 h-6 w-px bg-neutral-300"></div>
 
 <Button variant="ghost" size="sm"
-class={isActive.h1 ? "bg-muted" : ""}
+class={`toolbar-button ${isActive.h1 ? 'toolbar-button-active' : ''}`}
 onclick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
 >
 <span class="i-lucide-heading-1 w-4 h-4 inline-block"></span>
 </Button>
 <Button variant="ghost" size="sm"
-class={isActive.h2 ? "bg-muted" : ""}
+class={`toolbar-button ${isActive.h2 ? 'toolbar-button-active' : ''}`}
 onclick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
 >
 <span class="i-lucide-heading-2 w-4 h-4 inline-block"></span>
 </Button>
 
-<div class="w-px h-6 bg-border mx-1"></div>
+<div class="mx-1 h-6 w-px bg-neutral-300"></div>
 
 <Button variant="ghost" size="sm"
-class={isActive.bullet ? "bg-muted" : ""}
+class={`toolbar-button ${isActive.bullet ? 'toolbar-button-active' : ''}`}
 onclick={() => editor?.chain().focus().toggleBulletList().run()}
 >
 <span class="i-lucide-list w-4 h-4 inline-block"></span>
 </Button>
 <Button variant="ghost" size="sm"
-class={isActive.ordered ? "bg-muted" : ""}
+class={`toolbar-button ${isActive.ordered ? 'toolbar-button-active' : ''}`}
 onclick={() => editor?.chain().focus().toggleOrderedList().run()}
 >
 <span class="i-lucide-list-ordered w-4 h-4 inline-block"></span>
@@ -202,7 +202,7 @@ onclick={() => editor?.chain().focus().toggleOrderedList().run()}
 <div class="flex-1"></div>
 
 <Button variant="outline" size="sm"
-class="gap-2 text-indigo-400 border-info/30 hover:bg-info/10"
+class="ai-trigger gap-2"
 onclick={() => showAiMenu = !showAiMenu}
 >
 <span class="i-lucide-wand-2 w-3.5 h-3.5 inline-block"></span>
@@ -210,7 +210,7 @@ AI Assistant
 </Button>
 
 <Button variant="default" size="sm"
-class="gap-2 min-w-[100px]"
+class="save-trigger gap-2 min-w-[100px]"
 onclick={handleSave}
 disabled={isSaving}
 >
@@ -227,16 +227,16 @@ Save
 
 <!-- AI Menu -->
 {#if showAiMenu}
-<div class="bg-indigo-950/30 border-b border-info/20 p-3" transition:slide>
+<div class="border-b border-neutral-200 bg-neutral-100 p-3" transition:slide>
 <div class="flex gap-2">
 <input
 type="text"
-class="flex-1 bg-background border rounded-md px-3 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-info"
+class="flex-1 rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900"
 placeholder="Ask AI to draft a section, summarize, or improved phrasing..."
 bind:value={aiPrompt}
 onkeydown={(e) => e.key === 'Enter' && runAiCommand()}
 />
-<Button size="sm" onclick={runAiCommand} disabled={isGenerating || !aiPrompt}>
+<Button size="sm" class="generate-trigger" onclick={runAiCommand} disabled={isGenerating || !aiPrompt}>
 {#if isGenerating}
 <span class="i-lucide-loader-2 w-3.5 h-3.5 animate-spin p-0 inline-block"></span>
 {:else}
@@ -248,16 +248,16 @@ Generate
 {/if}
 
 <!-- Editor Area -->
-<div class="flex-1 overflow-hidden relative bg-editor-bg">
-<div bind:this={element} class="h-full overflow-y-auto px-8 py-6 prose prose-invert max-w-none focus:outline-none"></div>
+<div class="relative flex-1 overflow-hidden bg-white">
+<div bind:this={element} class="h-full max-w-none overflow-y-auto px-8 py-6 prose text-neutral-900 focus:outline-none"></div>
 </div>
 
 <!-- Status Bar -->
-<div class="border-t bg-muted/20 px-3 py-1.5 flex items-center justify-between text-xs text-muted-foreground">
+<div class="flex items-center justify-between border-t border-neutral-200 bg-neutral-100 px-3 py-1.5 text-xs text-neutral-500">
 <div class="flex items-center gap-3">
 <span>{wordCount} words</span>
 {#if lastSaved}
-<span class="flex items-center gap-1 text-accent">
+<span class="flex items-center gap-1 text-neutral-700">
 <span class="i-lucide-check w-3 h-3 inline-block"></span>
 Saved {formatTime(lastSaved)}
 </span>
@@ -272,9 +272,44 @@ Markdown Supported
 </div>
 
 <style>
+:global(.toolbar-button) {
+color: #525252;
+}
+
+:global(.toolbar-button:hover),
+:global(.toolbar-button:focus-visible),
+:global(.toolbar-button-active) {
+background: #e5e7eb !important;
+color: #111827 !important;
+}
+
+:global(.ai-trigger) {
+background: #ffffff !important;
+border-color: #d4d4d8 !important;
+color: #374151 !important;
+}
+
+:global(.ai-trigger:hover) {
+background: #f5f5f5 !important;
+color: #111827 !important;
+}
+
+:global(.save-trigger),
+:global(.generate-trigger) {
+background: #171717 !important;
+border-color: #171717 !important;
+color: #ffffff !important;
+}
+
+:global(.save-trigger:hover),
+:global(.generate-trigger:hover) {
+background: #000000 !important;
+}
+
 :global(.ProseMirror) {
 outline: none;
 min-height: 100%;
+color: #111827;
 }
 :global(.ProseMirror p.is-editor-empty:first-child::before) { color: #64748b;
 		content: attr(data-placeholder);
@@ -286,14 +321,14 @@ pointer-events: none;
 font-size: 1.8em;
 font-weight: 700;
 margin-bottom: 0.5em;
-color: #f8fafc;
+color: #111827;
 }
 :global(.ProseMirror h2) {
 font-size: 1.4em;
 font-weight: 600;
 margin-top: 1em;
 margin-bottom: 0.5em;
-color: #e2e8f0;
+color: #374151;
 }
 :global(.ProseMirror ul) {
 list-style-type: disc;

@@ -275,10 +275,10 @@
 
   .action-button:hover {
     background: #f3f4f6;
-	color: #3b82f6;}
+  color: #111827;}
 
   .action-button.unsaved {
-    color: #ef4444;}
+  color: #374151;}
 
   .separator {
     width: 1px;
@@ -297,9 +297,9 @@
     font-weight: 500;}
 
   .unsaved-indicator {
-    color: #ef4444;
+  color: #374151;
     font-weight: 500;}
 
   .saved-indicator {
-    color: #10b981;}
+  color: #111827;}
 </style>

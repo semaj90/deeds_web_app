@@ -1,5 +1,5 @@
 # Multi-stage build for SvelteKit 2 with QUIC/HTTP3 support
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 
 # Install dependencies for building
 RUN apk add --no-cache libc6-compat git python3 make g++
@@ -49,7 +49,7 @@ FROM base AS build
 RUN pnpm run build
 
 # Production image
-FROM node:20-alpine AS production
+FROM node:22-alpine AS production
 
 WORKDIR /app
 

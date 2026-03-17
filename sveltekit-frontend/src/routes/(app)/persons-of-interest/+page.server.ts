@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	} catch (error) {
 		console.error('Failed to load POIs:', error);
 		return {
-			caseId,
+			caseId: id,
 			pois: [],
 			error: 'Failed to load persons of interest'
 		};

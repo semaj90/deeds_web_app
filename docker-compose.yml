@@ -68,7 +68,7 @@ services:
       - ./src:/app/src
       - ./static:/app/static
       - ./svelte.config.js:/app/svelte.config.js
-      - ./vite.config.js:/app/vite.config.js
+      - ./vite.config.ts:/app/vite.config.ts
     depends_on:
       - postgres
       - redis

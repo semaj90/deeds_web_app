@@ -6,6 +6,20 @@
 	import { cubicOut } from 'svelte/easing';
 	import Icon from '$lib/components/ui/Icon.svelte';
 
+	interface Props {
+		isAuthenticated?: boolean;
+		userId?: string | null;
+		initialHasCompletedOnboarding?: boolean;
+		initialOnboardingStep?: number;
+	}
+
+	let {
+		isAuthenticated = false,
+		userId = null,
+		initialHasCompletedOnboarding = false,
+		initialOnboardingStep = 0,
+	}: Props = $props();
+
 	interface WizardStep {
 		id: string;
 		title: string;
@@ -101,6 +115,7 @@
 
 	const STORAGE_KEY = 'deeds-onboarding-completed';
 	const STEP_KEY = 'deeds-onboarding-step';
+	const OPEN_EVENT = 'deeds:onboarding:open';
 	const MAX_STEP_INDEX = WIZARD_STEPS.length - 1;
 
 	const SHORTCUTS = [
@@ -117,6 +132,9 @@
 	let isAnimating = $state(false);
 	let cardPosition = $state<'center' | 'bottom-right' | 'bottom-left'>('center');
 	let onboardingReady = $state(false);
+	let initializedUserId = $state<string | null>(null);
+	let hasCompletedOnce = $state(false);
+	let replayMode = $state(false);
 
 	type OnboardingState = {
 		hasCompletedOnboarding: boolean;
@@ -127,9 +145,47 @@
 		return Math.max(0, Math.min(MAX_STEP_INDEX, step));
 	}
 
+	function storageKeys() {
+		if (!userId) {
+			return { completedKey: STORAGE_KEY, stepKey: STEP_KEY };
+		}
+
+		return {
+			completedKey: `${STORAGE_KEY}:${userId}`,
+			stepKey: `${STEP_KEY}:${userId}`,
+		};
+	}
+
+	function migrateLegacyState() {
+		const keys = storageKeys();
+
+		if (!userId) {
+			return keys;
+		}
+
+		if (localStorage.getItem(keys.completedKey) === null) {
+			const legacyCompleted = localStorage.getItem(STORAGE_KEY);
+			if (legacyCompleted !== null) {
+				localStorage.setItem(keys.completedKey, legacyCompleted);
+				localStorage.removeItem(STORAGE_KEY);
+			}
+		}
+
+		if (localStorage.getItem(keys.stepKey) === null) {
+			const legacyStep = localStorage.getItem(STEP_KEY);
+			if (legacyStep !== null) {
+				localStorage.setItem(keys.stepKey, legacyStep);
+				localStorage.removeItem(STEP_KEY);
+			}
+		}
+
+		return keys;
+	}
+
 	function readLocalState(): OnboardingState {
-		const completed = localStorage.getItem(STORAGE_KEY) === 'true';
-		const rawStep = parseInt(localStorage.getItem(STEP_KEY) ?? '0', 10);
+		const keys = migrateLegacyState();
+		const completed = localStorage.getItem(keys.completedKey) === 'true';
+		const rawStep = parseInt(localStorage.getItem(keys.stepKey) ?? '0', 10);
 
 		return {
 			hasCompletedOnboarding: completed,
@@ -138,21 +194,28 @@
 	}
 
 	function writeLocalState(state: Partial<OnboardingState>) {
+		const keys = storageKeys();
+
+		if (userId) {
+			localStorage.removeItem(STORAGE_KEY);
+			localStorage.removeItem(STEP_KEY);
+		}
+
 		if (typeof state.hasCompletedOnboarding === 'boolean') {
 			if (state.hasCompletedOnboarding) {
-				localStorage.setItem(STORAGE_KEY, 'true');
+				localStorage.setItem(keys.completedKey, 'true');
 			} else {
-				localStorage.removeItem(STORAGE_KEY);
+				localStorage.removeItem(keys.completedKey);
 			}
 		}
 
 		if (typeof state.onboardingStep === 'number') {
-			localStorage.setItem(STEP_KEY, String(clampStep(state.onboardingStep)));
+			localStorage.setItem(keys.stepKey, String(clampStep(state.onboardingStep)));
 		}
 	}
 
 	async function persistState(state: Partial<OnboardingState>) {
-		if (!browser) return;
+		if (!browser || !isAuthenticated || !userId) return;
 
 		writeLocalState(state);
 
@@ -171,27 +234,34 @@
 		}
 	}
 
-	async function initializeWizard() {
-		if (!browser || onboardingReady) return;
+	function resolveInitialState(): OnboardingState {
+		const serverState = {
+			hasCompletedOnboarding: initialHasCompletedOnboarding,
+			onboardingStep: clampStep(initialOnboardingStep),
+		};
 
-		let state = readLocalState();
+		const localState = readLocalState();
 
-		try {
-			const response = await fetch('/api/onboarding');
-			if (response.ok) {
-				const serverState = (await response.json()) as Partial<OnboardingState>;
-				state = {
-					hasCompletedOnboarding: serverState.hasCompletedOnboarding === true,
-					onboardingStep: clampStep(serverState.onboardingStep ?? 0),
-				};
-				writeLocalState(state);
-			}
-		} catch (error) {
-			console.warn('Failed to load onboarding state', error);
+		if (serverState.hasCompletedOnboarding) {
+			return serverState;
 		}
 
+		if (localState.hasCompletedOnboarding || localState.onboardingStep > serverState.onboardingStep) {
+			return localState;
+		}
+
+		return serverState;
+	}
+
+	function initializeWizard() {
+		if (!browser || onboardingReady || !isAuthenticated || !userId) return;
+
+		const state = resolveInitialState();
 		currentStep = state.onboardingStep;
+		hasCompletedOnce = state.hasCompletedOnboarding;
+		replayMode = false;
 		onboardingReady = true;
+		writeLocalState(state);
 		runStepSideEffects(currentStep);
 
 		if (!state.hasCompletedOnboarding) {
@@ -202,7 +272,40 @@
 	}
 
 	onMount(() => {
-		void initializeWizard();
+		if (!browser) return;
+
+		const handleOpen = () => {
+			if (!isAuthenticated || !userId) return;
+			openReplayWizard();
+		};
+
+		window.addEventListener(OPEN_EVENT, handleOpen);
+
+		return () => {
+			window.removeEventListener(OPEN_EVENT, handleOpen);
+		};
+	});
+
+	$effect(() => {
+		if (!browser) return;
+
+		if (!isAuthenticated || !userId) {
+			initializedUserId = null;
+			hasCompletedOnce = false;
+			replayMode = false;
+			onboardingReady = false;
+			isVisible = false;
+			spotlightRect = null;
+			cardPosition = 'center';
+			return;
+		}
+
+		if (initializedUserId === userId) return;
+
+		initializedUserId = userId;
+		onboardingReady = false;
+		isVisible = false;
+		initializeWizard();
 	});
 
 	function runStepSideEffects(stepIndex: number) {
@@ -220,7 +323,9 @@
 
 	function goToStep(stepIndex: number) {
 		currentStep = clampStep(stepIndex);
-		void persistState({ onboardingStep: currentStep });
+		if (!replayMode) {
+			void persistState({ onboardingStep: currentStep });
+		}
 		runStepSideEffects(currentStep);
 	}
 
@@ -307,21 +412,35 @@
 
 	function completeWizard() {
 		isVisible = false;
-		void persistState({
+		currentStep = MAX_STEP_INDEX;
+
+		const nextState = {
 			hasCompletedOnboarding: true,
 			onboardingStep: MAX_STEP_INDEX,
-		});
+		};
+
+		const shouldPersist = !hasCompletedOnce;
+		hasCompletedOnce = true;
+		replayMode = false;
+
+		if (shouldPersist) {
+			void persistState(nextState);
+		} else {
+			writeLocalState(nextState);
+		}
 	}
 
-	function restartWizard() {
-		writeLocalState({ hasCompletedOnboarding: false, onboardingStep: 0 });
-		void persistState({ hasCompletedOnboarding: false, onboardingStep: 0 });
+	function openReplayWizard() {
+		if (!browser || !isAuthenticated || !userId) return;
+
+		replayMode = true;
 		currentStep = 0;
+		spotlightRect = null;
+		cardPosition = 'center';
+		onboardingReady = true;
 		isVisible = true;
 		runStepSideEffects(0);
 	}
-
-	export { restartWizard };
 
 	const step = $derived(WIZARD_STEPS[currentStep]);
 	const progress = $derived(((currentStep + 1) / WIZARD_STEPS.length) * 100);

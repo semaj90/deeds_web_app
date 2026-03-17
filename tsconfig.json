@@ -31,15 +31,11 @@
   },
   // ensure the proto outputs are part of the project used by eslint's parser
   "include": [
-    "sveltekit-frontend/src/**/*",
-    "sveltekit-frontend/**/*.svelte",
     "src/**/*",
     "tests/**/*",
     "uno.config.ts",
     "playwright.config.ts",
     "types.d.ts",
-    "sveltekit-frontend/src/lib/types/vendor/**/*.d.ts",
-    "**/*.svelte",
     "src/proto/**/*.js"
   ],
   "exclude": [
@@ -47,10 +43,11 @@
     "build/**",
     "dist/**",
     ".svelte-kit/**",
+    "sveltekit-frontend/**",
     "sveltekit-frontend/archives/**",
     "sveltekit-frontend/src/archived/**",
     "sveltekit-frontend/archived-components/**",
     "**/*.svelte.js"
-    // removed the previous "sveltekit-frontend/**" exclusion so Svelte sources are processed
+    // nested SvelteKit app is handled by sveltekit-frontend/tsconfig.json
   ]
 }

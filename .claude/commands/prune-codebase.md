@@ -182,6 +182,61 @@ onCallback={() => console.log(...)}
 ```
 These indicate incomplete integration — component rendered but non-functional.
 
+### 5h. XState Actor Audit
+For each machine in `src/lib/machines/`:
+```
+1. List all invoke.src actors — verify each has a real implementation (not a stub/mock)
+2. List all sendTo() targets — verify target actor ID exists in machine hierarchy
+3. List all guard functions — verify they return meaningful booleans (not always true/false)
+4. Verify machine is actually used: grep for useMachine(machineName) or interpret(machineName)
+```
+Flag: **DEAD_MACHINE** if machine exists but is never instantiated.
+Flag: **DEAD_ACTOR** if `invoke.src` references a missing or stub actor.
+
+### 5i. RabbitMQ Flow Audit
+For each queue in `rabbitmq-manager-fixed.ts`:
+```
+1. Verify both a publisher AND consumer exist for the queue
+2. Verify message schema matches between producer and consumer
+3. Verify consumer does real work (not just console.log)
+```
+Flag: **ORPHAN_PUBLISHER** if `publish*()` called but no consumer for that queue.
+Flag: **ORPHAN_CONSUMER** if consumer registered but nothing publishes to that queue.
+
+### 5j. Redis Key Pattern Audit
+```bash
+rg "redis\.(get|set|del|hget|hset)" src/lib/ --no-heading
+```
+Group by key pattern (e.g., `case:*`, `embed:*`, `cache:*`):
+- Flag **WRITE_ONLY_KEY** if key pattern has set() but no get()
+- Flag **READ_ONLY_KEY** if key pattern has get() but no set()
+- Flag **ORPHAN_TTL** if key set with TTL but never refreshed or read before expiry
+
+### 5k. Environment Variable Audit
+```bash
+rg "ENV\.\w+" src/lib/ src/routes/ --no-heading -o | sort | uniq -c | sort -rn
+```
+Cross-reference against `.env.example` or `env.server.ts` getters:
+- Flag **MISSING_ENV** if var is accessed but not in `.env.example`
+- Flag **UNUSED_ENV** if var is in `.env.example` but never accessed in code
+
+### 5l. API Contract Audit
+For each `fetch('/api/...')` in client code:
+1. Read the server's Zod schema (if present) in the matching `+server.ts`
+2. Verify the client sends a matching request body shape
+3. Verify the client reads the response in the same shape the server sends
+Flag: **CONTRACT_MISMATCH** if request/response shapes diverge.
+
+### 5m. Demo Page Reachability
+```bash
+# Find all demo route directories
+ls src/routes/(app)/demos/*/+page.svelte
+# Cross-reference with demos index page array
+rg "href:.*'/demos/" src/routes/(app)/demos/+page.svelte
+```
+Flag: **UNLISTED_DEMO** if a demo page exists but is not in the demos index.
+Flag: **DEAD_DEMO_LINK** if demos index links to a route that doesn't exist.
+
 ---
 
 ## Phase 6: Automated Refactoring (Execute with user confirmation)

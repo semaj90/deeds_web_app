@@ -248,7 +248,7 @@ ${notesCards}
 </body>
 </html>`;
 
-	const filename = `case-${caseId}-packet-${Date.now()}.html`;
+	const filename = `case-${id}-packet-${Date.now()}.html`;
 
 	return new Response(html, {
 		status: 200,

@@ -4,11 +4,14 @@
  import { browser } from '$app/environment';
 
  import AccessibilitySettings from '$lib/components/ui/AccessibilitySettings.svelte';
+  import Icon from '$lib/components/ui/Icon.svelte';
  import ThemeSelector from '$lib/components/ui/ThemeSelector.svelte';
  import SystemStatusCard from '$lib/components/ui/SystemStatusCard.svelte';
  import SystemStatusPanel from '$lib/components/dashboard/SystemStatusPanel.svelte';
  import SystemOverview from '$lib/components/yorha/dashboard/SystemOverview.svelte';
  import YoRHaSystemStatus from '$lib/components/yorha/_simulations/YoRHaSystemStatus.svelte';
+
+  const ONBOARDING_OPEN_EVENT = 'deeds:onboarding:open';
 
  let activeTab = $state<'general' | 'ai' | 'database' | 'gpu' | 'security' | 'accessibility' | 'status'>('general');
 
@@ -141,6 +144,14 @@
     saveMessage = 'Configuration reset to defaults.';
     lastSavedAt = '';
  }
+
+	function replayOnboardingTutorial() {
+		if (!browser) return;
+
+		window.dispatchEvent(new CustomEvent(ONBOARDING_OPEN_EVENT));
+		saveState = 'saved';
+		saveMessage = 'Onboarding tutorial reopened from Settings.';
+	}
 </script>
 
 <div class="config-container">
@@ -250,6 +261,26 @@
        </label>
       </div>
      </div>
+
+      <div class="status-card" style="margin-top: 1.5rem; border-color: rgba(245, 158, 11, 0.28); background: rgba(15, 23, 42, 0.72);">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+          <div style="display: flex; align-items: flex-start; gap: 0.85rem; min-width: min(100%, 28rem);">
+            <div style="width: 2.5rem; height: 2.5rem; border-radius: 0.85rem; border: 1px solid rgba(245, 158, 11, 0.28); background: rgba(245, 158, 11, 0.12); display: inline-flex; align-items: center; justify-content: center; color: #fbbf24; flex-shrink: 0;">
+              <Icon name="sparkles" size={18} />
+            </div>
+            <div>
+              <h3 style="margin: 0; color: #f8fafc; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase;">USER_ONBOARDING</h3>
+              <p style="margin: 0.45rem 0 0; color: #94a3b8; font-size: 0.9rem; line-height: 1.55; max-width: 42rem;">
+                The tutorial only auto-runs for authenticated app sessions. After the first pass, relaunch it here whenever you want the guided tour again.
+              </p>
+            </div>
+          </div>
+
+          <button class="btn-secondary" type="button" onclick={replayOnboardingTutorial}>
+            Replay tutorial
+          </button>
+        </div>
+      </div>
     </section>
    {/if}
 

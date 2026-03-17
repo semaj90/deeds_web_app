@@ -68,6 +68,8 @@ export const ENV = {
   SEARXNG_URL: privateEnv.SEARXNG_URL ?? '', // Free self-hosted: http://localhost:8080 or public instance
   GOOGLE_SEARCH_API_KEY: privateEnv.GOOGLE_SEARCH_API_KEY ?? '',
   GOOGLE_SEARCH_CX: privateEnv.GOOGLE_SEARCH_CX ?? '',
+  // Go Legal Library Search Service (parallel fan-out: citation + FTS + pgvector + Qdrant)
+  GO_SEARCH_URL: privateEnv.GO_SEARCH_URL ?? '',
   // FastAPI middleware (optional)
   FASTAPI_URL: privateEnv.FASTAPI_URL ?? 'http://localhost:8001',
   // Web Push (VAPID) — generate with: npx web-push generate-vapid-keys --json

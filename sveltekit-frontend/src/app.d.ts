@@ -35,6 +35,13 @@ declare global {
     // interface PageData {}
     // interface Error {}
     // interface Platform {}
+
+    interface PageState {
+      showDocumentModal?: boolean;
+      documentId?: string;
+      showCaseModal?: boolean;
+      caseId?: string;
+    }
   }
 
   interface ImportMetaEnv {

@@ -3,7 +3,6 @@
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import TiptapWithAIAssistant from '$lib/components/editor/TiptapWithAIAssistant.svelte';
-	import Button from '$lib/components/ui/Button.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 
 	let reportId = $derived(page.params.id);
@@ -125,57 +124,60 @@
 	}
 </script>
 
-<div class="min-h-screen bg-background">
+<div class="min-h-screen bg-neutral-100 text-neutral-900">
 	{#if loading}
 		<div class="flex items-center justify-center h-screen">
-			<Icon name="loader-2" class="w-8 h-8 animate-spin text-accent" />
-			<span class="ml-3 text-neutral-400">Loading report...</span>
+			<Icon name="loader-2" class="h-8 w-8 animate-spin text-neutral-700" />
+			<span class="ml-3 text-neutral-600">Loading report...</span>
 		</div>
 	{:else if error && !report}
 		<div class="flex flex-col items-center justify-center h-screen gap-4">
-			<Icon name="alert-triangle" class="w-12 h-12 text-red-400" />
-			<div class="text-neutral-300 text-center">
+			<Icon name="alert-triangle" class="h-12 w-12 text-neutral-600" />
+			<div class="text-center text-neutral-800">
 				<h2 class="text-xl font-semibold mb-2">Error Loading Report</h2>
-				<p class="text-sm text-neutral-400">{error}</p>
+				<p class="text-sm text-neutral-600">{error}</p>
 			</div>
-			<Button onclick={() => goto('/reports')}>
+			<button
+				onclick={() => goto('/reports')}
+				class="inline-flex items-center justify-center rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-800 transition hover:border-neutral-400 hover:bg-neutral-50"
+			>
 				<Icon name="arrow-left" class="w-4 h-4 mr-2" />
 				Back to Reports
-			</Button>
+			</button>
 		</div>
 	{:else if report}
 		<!-- Header Bar -->
-		<div class="sticky top-0 z-10 border-b border-neutral-800 bg-neutral-950/95 backdrop-blur">
+		<div class="sticky top-0 z-10 border-b border-neutral-300 bg-white/95 backdrop-blur">
 			<div class="flex items-center justify-between px-6 py-3">
 				<div class="flex items-center gap-4">
 					<button
 						onclick={() => goto('/reports')}
-						class="flex items-center gap-1 text-sm text-neutral-400 hover:text-neutral-300 transition-colors"
+						class="flex items-center gap-1 text-sm text-neutral-600 transition-colors hover:text-neutral-900"
 					>
 						<Icon name="arrow-left" class="w-4 h-4" />
 						Back
 					</button>
 
-					<div class="h-6 w-px bg-neutral-800"></div>
+					<div class="h-6 w-px bg-neutral-300"></div>
 
 					<div>
-						<h1 class="text-lg font-semibold text-neutral-100">
+						<h1 class="text-lg font-semibold text-neutral-950">
 							{report.title}
 						</h1>
-						<div class="flex items-center gap-2 text-xs text-neutral-400 mt-0.5">
-							<span class="px-1.5 py-0.5 rounded bg-blue-900/30 text-blue-300 border border-blue-800/30">
+						<div class="mt-0.5 flex items-center gap-2 text-xs text-neutral-500">
+							<span class="rounded border border-neutral-900 bg-neutral-900 px-1.5 py-0.5 text-white">
 								{(report.type ?? report.metadata?.reportType ?? 'custom').replace('_', ' ')}
 							</span>
 							{#if lastSaved}
-								<span class="flex items-center gap-1 text-green-400">
+								<span class="flex items-center gap-1 text-neutral-700">
 									<Icon name="check" class="w-3 h-3" />
 									Saved {formatTime(lastSaved)}
 								</span>
 							{:else if isDirty}
-								<span class="text-yellow-400">Unsaved changes</span>
+								<span class="text-neutral-700">Unsaved changes</span>
 							{/if}
 							{#if report.status === 'published'}
-								<span class="flex items-center gap-1 text-green-400">
+								<span class="flex items-center gap-1 text-neutral-800">
 									<Icon name="check-circle" class="w-3 h-3" />
 									Published
 								</span>
@@ -185,21 +187,18 @@
 				</div>
 
 				<div class="flex items-center gap-2">
-					<Button
-						variant="ghost"
-						size="sm"
+					<button
 						onclick={() => goto(`/reports/${reportId}`)}
 						title="Preview"
+						class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-neutral-300 bg-white text-neutral-700 transition hover:border-neutral-400 hover:bg-neutral-50 hover:text-neutral-900"
 					>
 						<Icon name="eye" class="w-4 h-4" />
-					</Button>
+					</button>
 
-					<Button
-						variant="outline"
-						size="sm"
+					<button
 						onclick={saveReport}
 						disabled={isSaving || !isDirty}
-						class="gap-2"
+						class="inline-flex items-center justify-center gap-2 rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-800 transition hover:border-neutral-400 hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
 					>
 						{#if isSaving}
 							<Icon name="loader-2" class="w-4 h-4 animate-spin" />
@@ -208,14 +207,13 @@
 							<Icon name="save" class="w-4 h-4" />
 							Save
 						{/if}
-					</Button>
+					</button>
 
 					{#if report.status !== 'published'}
-						<Button
-							size="sm"
+						<button
 							onclick={publishReport}
 							disabled={isPublishing || isDirty}
-							class="gap-2"
+							class="inline-flex items-center justify-center gap-2 rounded-md border border-neutral-900 bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
 						>
 							{#if isPublishing}
 								<Icon name="loader-2" class="w-4 h-4 animate-spin" />
@@ -223,14 +221,14 @@
 								<Icon name="upload" class="w-4 h-4" />
 							{/if}
 							Publish
-						</Button>
+						</button>
 					{/if}
 				</div>
 			</div>
 
 			{#if error}
 				<div class="px-6 pb-3">
-					<div class="rounded-lg border border-red-800/30 bg-red-950/40 p-3 text-red-300 text-sm">
+					<div class="rounded-lg border border-neutral-300 bg-white p-3 text-sm text-neutral-800 shadow-sm">
 						<div class="flex items-center gap-2">
 							<Icon name="alert-triangle" class="w-4 h-4" />
 							<span>{error}</span>

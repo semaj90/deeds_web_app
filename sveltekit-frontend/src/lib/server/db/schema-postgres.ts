@@ -2598,3 +2598,249 @@ export const failedJobs = pgTable('failed_jobs', {
 export type FailedJob = typeof failedJobs.$inferSelect;
 export type NewFailedJob = typeof failedJobs.$inferInsert;
 
+// ═══════════════════════════════════════════════════════════════════════════
+// LEGAL LIBRARY (hierarchy-first corpus model)
+// Tables: jurisdictions, library_documents, library_document_versions,
+//         legal_nodes, legal_chunks, legal_definitions,
+//         legal_citations, case_library_links, page_artifacts, ingestion_jobs
+// ═══════════════════════════════════════════════════════════════════════════
+
+// --- Enums (created in SQL migration, referenced here) ---
+
+export const sourceTypeEnum = pgEnum('source_type', [
+	'upload', 'govinfo', 'state_official', 'openstates', 'lii_reference',
+]);
+
+export const corpusTypeEnum = pgEnum('corpus_type', [
+	'constitution', 'statute', 'regulation', 'bill', 'case', 'glossary', 'treatise', 'other',
+]);
+
+export const legalNodeTypeEnum = pgEnum('legal_node_type', [
+	'document', 'title', 'article', 'chapter', 'part', 'section',
+	'subsection', 'paragraph', 'clause', 'definition', 'appendix', 'note',
+]);
+
+export const processingStatusEnum = pgEnum('processing_status', [
+	'queued', 'extracting', 'ocr', 'structuring', 'chunking', 'embedding', 'graphing', 'complete', 'failed',
+]);
+
+export const citationTypeEnum = pgEnum('citation_type', [
+	'statutory', 'constitutional', 'regulatory', 'judicial', 'other',
+]);
+
+export const caseLinkCategoryEnum = pgEnum('case_link_category', [
+	'charged_under', 'cited_authority', 'defense_authority', 'court_ruling',
+	'related_regulation', 'constitutional_basis', 'sentencing_guideline',
+]);
+
+// --- Jurisdictions lookup ---
+
+export const jurisdictions = pgTable('jurisdictions', {
+	id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+	code: text('code').unique().notNull(),
+	name: text('name').notNull(),
+	level: text('level').notNull(),
+	parentId: bigint('parent_id', { mode: 'number' }),
+});
+
+export type Jurisdiction = typeof jurisdictions.$inferSelect;
+export type NewJurisdiction = typeof jurisdictions.$inferInsert;
+
+// --- Library Documents ---
+
+export const libraryDocuments = pgTable('library_documents', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	sourceType: sourceTypeEnum('source_type').notNull().default('upload'),
+	corpusType: corpusTypeEnum('corpus_type').notNull().default('other'),
+	jurisdictionId: bigint('jurisdiction_id', { mode: 'number' }).references(() => jurisdictions.id),
+	title: text('title').notNull(),
+	shortTitle: text('short_title'),
+	citation: text('citation'),
+	officialUrl: text('official_url'),
+	sourceHash: text('source_hash'),
+	mimeType: text('mime_type').default('application/pdf'),
+	minioKey: text('minio_key').notNull(),
+	pageCount: integer('page_count'),
+	effectiveDate: timestamp('effective_date', { mode: 'date' }),
+	updatedAtSource: timestamp('updated_at_source', { withTimezone: true }),
+	isOfficial: boolean('is_official').default(false),
+	processingStatus: processingStatusEnum('processing_status').notNull().default('queued'),
+	uploadedBy: uuid('uploaded_by').references(() => users.id, { onDelete: 'set null' }),
+	sourceConfidence: text('source_confidence'),
+	fetchedAt: timestamp('fetched_at', { withTimezone: true }),
+	minioKeyNormalized: text('minio_key_normalized'),
+	sourceKind: text('source_kind').default('uploaded_pdf'),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	jurisdictionIdx: index('library_docs_jurisdiction_idx').on(table.jurisdictionId),
+	corpusIdx: index('library_docs_corpus_idx').on(table.corpusType),
+	statusIdx: index('library_docs_status_idx').on(table.processingStatus),
+}));
+
+export type LibraryDocument = typeof libraryDocuments.$inferSelect;
+export type NewLibraryDocument = typeof libraryDocuments.$inferInsert;
+
+// --- Library Document Versions ---
+
+export const libraryDocumentVersions = pgTable('library_document_versions', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	documentId: uuid('document_id').notNull().references(() => libraryDocuments.id, { onDelete: 'cascade' }),
+	versionLabel: text('version_label'),
+	sourceDate: timestamp('source_date', { mode: 'date' }),
+	isCurrent: boolean('is_current').default(false),
+	parentVersionId: uuid('parent_version_id'),
+	diffSummary: text('diff_summary'),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+});
+
+export type LibraryDocumentVersion = typeof libraryDocumentVersions.$inferSelect;
+
+// --- Legal Nodes (hierarchy tree) ---
+
+export const legalNodes = pgTable('legal_nodes', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	documentId: uuid('document_id').notNull().references(() => libraryDocuments.id, { onDelete: 'cascade' }),
+	versionId: uuid('version_id').references(() => libraryDocumentVersions.id, { onDelete: 'cascade' }),
+	parentNodeId: uuid('parent_node_id'),
+	nodeType: legalNodeTypeEnum('node_type').notNull().default('section'),
+	ordinal: text('ordinal'),
+	heading: text('heading'),
+	citationLabel: text('citation_label'),
+	nodePath: text('node_path').notNull(),
+	depth: integer('depth').notNull().default(0),
+	pageStart: integer('page_start'),
+	pageEnd: integer('page_end'),
+	charStart: integer('char_start'),
+	charEnd: integer('char_end'),
+	fullText: text('full_text').notNull(),
+	textClean: text('text_clean').notNull(),
+	tagsJson: jsonb('tags_json').default({}),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	docIdx: index('legal_nodes_doc_idx').on(table.documentId),
+	parentIdx: index('legal_nodes_parent_idx').on(table.parentNodeId),
+	pathIdx: index('legal_nodes_path_idx').on(table.documentId, table.nodePath),
+}));
+
+export type LegalNode = typeof legalNodes.$inferSelect;
+export type NewLegalNode = typeof legalNodes.$inferInsert;
+
+// --- Legal Chunks (section → chunk → embedding) ---
+
+export const legalChunks = pgTable('legal_chunks', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	legalNodeId: uuid('legal_node_id').notNull().references(() => legalNodes.id, { onDelete: 'cascade' }),
+	chunkIndex: integer('chunk_index').notNull(),
+	chunkText: text('chunk_text').notNull(),
+	tokenCount: integer('token_count'),
+	pageStart: integer('page_start'),
+	pageEnd: integer('page_end'),
+	charStart: integer('char_start'),
+	charEnd: integer('char_end'),
+	embedding: vector('embedding', { dimensions: 768 }),
+	summary: text('summary'),
+	qdrantPointId: text('qdrant_point_id'),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	nodeIdx: index('legal_chunks_node_idx').on(table.legalNodeId),
+	nodeChunkUnique: unique('legal_chunks_node_chunk_unique').on(table.legalNodeId, table.chunkIndex),
+}));
+
+export type LegalChunk = typeof legalChunks.$inferSelect;
+export type NewLegalChunk = typeof legalChunks.$inferInsert;
+
+// --- Legal Definitions (glossary terms within documents) ---
+
+export const legalDefinitions = pgTable('legal_definitions', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	term: text('term').notNull(),
+	normalizedTerm: text('normalized_term').notNull(),
+	definedInNodeId: uuid('defined_in_node_id').notNull().references(() => legalNodes.id, { onDelete: 'cascade' }),
+	definitionText: text('definition_text').notNull(),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	termIdx: index('legal_defs_term_idx').on(table.normalizedTerm),
+}));
+
+export type LegalDefinition = typeof legalDefinitions.$inferSelect;
+
+// --- Legal Citations (cross-references between nodes) ---
+
+export const legalCitations = pgTable('legal_citations', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	fromNodeId: uuid('from_node_id').notNull().references(() => legalNodes.id, { onDelete: 'cascade' }),
+	toNodeId: uuid('to_node_id').references(() => legalNodes.id, { onDelete: 'set null' }),
+	citationText: text('citation_text').notNull(),
+	citationType: citationTypeEnum('citation_type').notNull().default('other'),
+	normalizedTarget: text('normalized_target'),
+	confidence: real('confidence').default(1.0),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	fromIdx: index('idx_legal_citations_from').on(table.fromNodeId),
+	toIdx: index('idx_legal_citations_to').on(table.toNodeId),
+	targetIdx: index('idx_legal_citations_target').on(table.normalizedTarget),
+}));
+
+export type LegalCitation = typeof legalCitations.$inferSelect;
+
+// --- Case ↔ Library Links ---
+
+export const caseLibraryLinks = pgTable('case_library_links', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	caseId: uuid('case_id').notNull().references(() => cases.id, { onDelete: 'cascade' }),
+	documentId: uuid('document_id').references(() => libraryDocuments.id, { onDelete: 'cascade' }),
+	nodeId: uuid('node_id').references(() => legalNodes.id, { onDelete: 'set null' }),
+	category: caseLinkCategoryEnum('category').notNull().default('cited_authority'),
+	relevanceScore: real('relevance_score'),
+	citationText: text('citation_text'),
+	notes: text('notes'),
+	addedBy: uuid('added_by'),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	caseIdx: index('case_lib_links_case_idx').on(table.caseId),
+	docIdx: index('case_lib_links_doc_idx').on(table.documentId),
+	nodeIdx: index('case_lib_links_node_idx').on(table.nodeId),
+}));
+
+export type CaseLibraryLink = typeof caseLibraryLinks.$inferSelect;
+
+// --- Page Artifacts (per-page extraction) ---
+
+export const pageArtifacts = pgTable('page_artifacts', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	documentId: uuid('document_id').notNull().references(() => libraryDocuments.id, { onDelete: 'cascade' }),
+	pageNumber: integer('page_number').notNull(),
+	imageMinioKey: text('image_minio_key'),
+	extractedText: text('extracted_text'),
+	ocrText: text('ocr_text'),
+	finalText: text('final_text'),
+	hasNativeText: boolean('has_native_text').default(false),
+	ocrConfidence: numeric('ocr_confidence', { precision: 5, scale: 4 }),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	docIdx: index('page_artifacts_doc_idx').on(table.documentId),
+	docPageUnique: unique('page_artifacts_doc_page_unique').on(table.documentId, table.pageNumber),
+}));
+
+export type PageArtifact = typeof pageArtifacts.$inferSelect;
+
+// --- Ingestion Jobs (pipeline progress tracking) ---
+
+export const ingestionJobs = pgTable('ingestion_jobs', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	documentId: uuid('document_id').notNull().references(() => libraryDocuments.id, { onDelete: 'cascade' }),
+	stage: processingStatusEnum('stage').notNull().default('queued'),
+	status: text('status').notNull().default('running'),
+	progress: numeric('progress', { precision: 5, scale: 2 }).default('0'),
+	errorText: text('error_text'),
+	metricsJson: jsonb('metrics_json').default({}),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	docIdx: index('ingestion_jobs_doc_idx').on(table.documentId),
+	statusIdx: index('ingestion_jobs_status_idx').on(table.status),
+}));
+
+export type IngestionJob = typeof ingestionJobs.$inferSelect;
+

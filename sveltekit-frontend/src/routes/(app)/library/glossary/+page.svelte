@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import GlossaryTermCard from '$lib/components/legal/GlossaryTermCard.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -349,22 +350,17 @@
 								<div class="sticky top-0 z-10 bg-slate-50/95 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500 backdrop-blur">
 									{letter}
 								</div>
-								<div class="p-2">
+								<div class="p-2 space-y-2">
 									{#each terms as term}
-										<button
-											onclick={() => selectTerm(term)}
-											class="mb-2 w-full rounded-2xl border px-3 py-3 text-left transition {selectedTerm?.id === term.id ? 'border-blue-300 bg-blue-50 shadow-sm' : 'border-transparent bg-white hover:border-slate-200 hover:bg-slate-50'}"
-										>
-											<div class="flex items-start justify-between gap-3">
-												<div class="min-w-0">
-													<p class="text-sm font-semibold text-slate-900">{term.term}</p>
-													<p class="mt-1 text-xs text-slate-500">{term.jurisdiction ?? 'Federal/State'}</p>
-												</div>
-												<span class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold {CATEGORY_COLOR[term.category ?? 'general'] ?? CATEGORY_COLOR.general}">
-													{CATEGORY_LABELS[term.category ?? 'general'] ?? 'General'}
-												</span>
-											</div>
-										</button>
+										<GlossaryTermCard
+											{term}
+											variant="light"
+											selected={selectedTerm?.id === term.id}
+											onSelect={(id) => {
+												const found = data.terms.find((t) => t.id === id);
+												if (found) selectTerm(found);
+											}}
+										/>
 									{/each}
 								</div>
 							</section>

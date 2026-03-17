@@ -1,5 +1,14 @@
 @layer base, components, utilities;
 
+:root {
+ color-scheme: dark;
+}
+
+html,
+body {
+ min-height: 100%;
+}
+
 /* Custom scrollbar for YoRHa aesthetic */
 .custom-scrollbar::-webkit-scrollbar {
  width: 6px;
@@ -20,6 +29,8 @@ body {
  @apply app-bg;
  margin: 0;
  padding: 0;
+ font-family: Inter, system-ui, sans-serif;
+ color: #f4f4f5;
 }
 
 /* Smooth transitions */

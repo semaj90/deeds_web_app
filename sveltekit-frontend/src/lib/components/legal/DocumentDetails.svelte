@@ -185,188 +185,199 @@
 	}
 </script>
 
-<!-- Document Details Modal -->
+<!-- Document Details Panel (YoRHa / Nier Dark Aesthetic) -->
 {#if isVisible}
-	<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-		<div class="bg-white rounded-lg shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col">
+	<div class="fixed inset-0 z-[150] flex items-center justify-center p-4">
+		<!-- Backdrop -->
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div 
+			class="absolute inset-0 bg-black/80 backdrop-blur-md" 
+			onclick={onClose}
+		></div>
+
+		<!-- Modal Container -->
+		<div class="relative w-full max-w-6xl h-[90vh] bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
 			<!-- Header -->
-			<div class="bg-info text-white px-6 py-4 flex justify-between rounded-t-lg">
-				<div>
-					<h2 class="text-2xl">Document Analysis</h2>
-					<p class="text-info/20">
-						{#if loadingSource === 'cache'}
-							Loading from cache... ({formatDuration(cacheHitTime)})
-						{:else if loadingSource === 'server'}
-							Fetching from server...
-						{:else if documentData}
-							{documentData.title || `Document ${documentId}`}
-						{:else}
-							Document ID: {documentId}
-						{/if}
-					</p>
+			<header class="h-16 border-b border-neutral-800 flex items-center justify-between px-6 bg-neutral-950/50">
+				<div class="flex items-center gap-4">
+					<div class="h-10 w-10 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400">
+						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+					</div>
+					<div>
+						<h2 class="text-sm font-bold uppercase tracking-widest text-neutral-100">Document Analysis</h2>
+						<p class="text-[10px] text-neutral-500 font-mono uppercase">
+							{#if loadingSource === 'cache'}
+								<span class="text-emerald-400">CACHE HIT</span> ({formatDuration(cacheHitTime)})
+							{:else if loadingSource === 'server'}
+								<span class="text-sky-400">SERVER FETCH</span>
+							{:else if documentData}
+								ID: {documentId.slice(0, 12)}...
+							{:else}
+								INITIALIZING...
+							{/if}
+						</p>
+					</div>
 				</div>
-				<button
-					onclick={onClose}
-					class="text-white hover:text-info/40 text-2xl"
-					aria-label="Close"
-				>
-					&times;
-				</button>
-			</div>
+
+				<div class="flex items-center gap-2">
+					<button
+						onclick={onClose}
+						class="h-8 w-8 flex items-center justify-center rounded-full hover:bg-neutral-800 text-neutral-400 hover:text-white transition-all"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+					</button>
+				</div>
+			</header>
 
 			<!-- Loading State -->
 			{#if isLoading}
-				<div class="p-8 text-center">
-					<div
-						class="animate-spin rounded-full h-12 w-12 border-b-2 border-info mx-auto"
-					></div>
-					<p class="text-sand/60 mt-4">
-						{#if loadingSource === 'cache'}
-							Checking cache...
-						{:else if loadingSource === 'server'}
-							Performing comprehensive analysis...
-						{:else}
-							Loading document details...
-						{/if}
-					</p>
+				<div class="flex-1 flex flex-col items-center justify-center gap-4">
+					<div class="h-12 w-12 border-2 border-sky-500/20 border-t-sky-500 rounded-full animate-spin"></div>
+					<p class="text-xs font-mono text-sky-400 uppercase tracking-widest animate-pulse">Analyzing structures...</p>
 				</div>
 			{/if}
 
 			<!-- Error State -->
 			{#if errorMessage}
-				<div class="p-8">
-					<div class="text-danger text-xl">Error</div>
-					<p class="text-danger">{errorMessage}</p>
+				<div class="flex-1 flex flex-col items-center justify-center gap-6 p-8 text-center">
+					<div class="h-16 w-16 rounded-full bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-500">
+						<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+					</div>
+					<div>
+						<h3 class="text-lg font-bold text-neutral-100 uppercase">Analysis Error</h3>
+						<p class="text-sm text-neutral-400 mt-2 max-w-md">{errorMessage}</p>
+					</div>
 					<button
 						onclick={() => loadDocumentDetails(documentId, true)}
-						class="mt-4 bg-info text-white px-6 py-2 rounded hover:bg-info/60"
+						class="px-6 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-lg text-xs font-bold uppercase tracking-widest transition-all"
 					>
-						Retry
+						Retry Analysis
 					</button>
 				</div>
 			{/if}
 
-			<!-- Document Content -->
+			<!-- Content -->
 			{#if documentData && !isLoading}
-				<div class="overflow-y-auto flex-1">
-					<!-- Performance Metrics Bar -->
-					<div
-						class="bg-sand/10 px-6 py-3 border-b grid grid-cols-2 md:grid-cols-4 gap-4 text-sm"
-					>
-						<div>
-							<span class="font-semibold">Cache Hit:</span>
-							{cacheHitTime ? formatDuration(cacheHitTime) : 'No cache'}
+				<div class="flex-1 overflow-hidden flex flex-col">
+					<!-- Sub-header Metrics -->
+					<div class="bg-neutral-950 border-b border-neutral-800 px-6 py-3 flex items-center gap-8 text-[10px] uppercase font-mono tracking-wider">
+						<div class="flex flex-col gap-1">
+							<span class="text-neutral-500">Performance</span>
+							<span class="text-neutral-200">
+								{#if cacheHitTime}
+									<span class="text-emerald-400">CACHE:</span> {formatDuration(cacheHitTime)}
+								{:else if serverFetchTime}
+									<span class="text-sky-400">SERVER:</span> {formatDuration(serverFetchTime)}
+								{:else}
+									LOCAL
+								{/if}
+							</span>
 						</div>
-						<div>
-							<span class="font-semibold">Server Fetch:</span>
-							{serverFetchTime ? formatDuration(serverFetchTime) : 'Not fetched'}
+						<div class="h-8 w-px bg-neutral-800"></div>
+						<div class="flex flex-col gap-1">
+							<span class="text-neutral-500">Associations</span>
+							<span class="text-neutral-200">{relatedDocuments.length} RELATED &middot; {graphConnections.length} GRAPH</span>
 						</div>
-						<div>
-							<span class="font-semibold">Related Docs:</span>
-							{relatedDocuments.length}
-						</div>
-						<div>
-							<span class="font-semibold">Graph Links:</span>
-							{graphConnections.length}
+						<div class="h-8 w-px bg-neutral-800"></div>
+						<div class="flex flex-col gap-1">
+							<span class="text-neutral-500">Status</span>
+							<span class="text-emerald-400">VERIFIED HASH</span>
 						</div>
 					</div>
 
-					<!-- Main Content Grid -->
-					<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
-						<!-- Document Content Column -->
-						<div class="lg:col-span-2 space-y-6">
-							<div class="bg-white rounded-lg border border-sand/20 p-4">
-								<div class="flex justify-between items-start mb-4">
-									<h3 class="text-xl font-semibold">Document Content</h3>
+					<div class="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-[1fr_320px]">
+						<!-- Main viewing area -->
+						<div class="overflow-y-auto p-6 space-y-6">
+							<!-- Document Info Card -->
+							<div class="bg-neutral-950/40 border border-neutral-800 rounded-xl p-6">
+								<div class="flex items-start justify-between mb-6">
+									<div>
+										<h3 class="text-2xl font-bold text-neutral-100">{documentData.title}</h3>
+										<div class="flex items-center gap-2 mt-2">
+											<span class="px-2 py-0.5 rounded bg-sky-500/10 border border-sky-500/30 text-[10px] font-bold text-sky-400 uppercase tracking-widest">
+												{documentData.documentType || documentData.metadata?.documentType || 'UNSPECIFIED'}
+											</span>
+											<span class="text-[10px] text-neutral-500 font-mono">
+												{formatBytes(documentData.fileSize || 0)}
+											</span>
+										</div>
+									</div>
+									
 									<div class="flex gap-2">
 										<button
 											onclick={() => loadDocumentDetails(documentId, true)}
-											class="text-sm bg-sand/10 hover:bg-sand/20 px-3 py-1 rounded"
+											class="p-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-400 transition-all"
+											title="Refresh"
 										>
-											Refresh
+											<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
 										</button>
 										<button
 											onclick={toggleGPUAnalysis}
-											class="text-sm {showGPUAnalysis
-												? 'bg-info/10 text-info'
-												: 'bg-sand/10'} hover:bg-info/20 px-3 py-1 rounded"
+											class="flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-[10px] font-bold uppercase tracking-widest
+												{showGPUAnalysis ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-neutral-800 text-neutral-400 border border-transparent'}"
 										>
-											{showGPUAnalysis ? 'GPU Active' : 'GPU Analysis'}
+											<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h10"/></svg>
+											{showGPUAnalysis ? 'Core Active' : 'AI Analysis'}
 										</button>
 									</div>
 								</div>
+
 								<div class="space-y-4">
-									<div>
-										<span class="font-medium">Title:</span>
-										<p class="text-sand">{documentData.title}</p>
-									</div>
-									<div>
-										<span class="font-medium">Type:</span>
-										<span
-											class="inline-block bg-info/10 text-info px-2 py-1 rounded text-sm"
-										>
-											{documentData.document_type || 'Unknown'}
-										</span>
-									</div>
-									<div>
-										<span class="font-medium">Content:</span>
-										<div class="mt-2 p-4 bg-sand/5 rounded-lg max-h-96 overflow-y-auto">
-											<pre class="whitespace-pre-wrap text-sm">{documentData.content
-													? documentData.content.substring(0, 2000) +
-														(documentData.content.length > 2000 ? '...' : '')
-													: 'No content available'}</pre>
+									<h4 class="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em]">Context Extraction</h4>
+									<div class="bg-black/40 border border-neutral-800 rounded-lg p-5 font-mono text-sm leading-relaxed text-neutral-300 pointer-events-auto">
+										<div class="overflow-y-auto max-h-[400px] scrollbar-thin">
+											{documentData.content || 'Content analysis pending...'}
 										</div>
 									</div>
 								</div>
 							</div>
 
-							<!-- GPU Analysis Results -->
+							<!-- GPU Analysis Result -->
 							{#if gpuAnalysis}
-								<div class="bg-info/5 rounded-lg border border-info/20 p-6">
-									<h3 class="text-xl font-semibold text-info mb-4">
-										GPU Analysis (FlashAttention2 RTX 3060 Ti)
-									</h3>
-									<div class="grid grid-cols-2 gap-4">
-										<div>
-											<span class="font-medium">Confidence:</span>
-											<div class="w-full bg-info/20 rounded-full h-2 mt-1">
-												<div
-													class="bg-info/60 h-2 rounded-full"
-													style="width: {(gpuAnalysis.confidence * 100).toFixed(1)}%"
-												></div>
-											</div>
-											<p class="text-sm text-info mt-1">
-												{(gpuAnalysis.confidence * 100).toFixed(1)}%
-											</p>
+								<div class="bg-amber-500/5 border border-amber-500/20 rounded-xl p-6">
+									<div class="flex items-center gap-3 mb-6">
+										<div class="h-8 w-8 rounded bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500">
+											<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M2 12h2"/><path d="m4.93 19.07 1.41-1.41"/><path d="M12 20v2"/><path d="m17.66 17.66 1.41 1.41"/><path d="M20 12h2"/><path d="m17.66 6.34 1.41-1.41"/></svg>
 										</div>
-										<div>
-											<span class="font-medium">Processing Time:</span>
-											<p class="text-info">
-												{formatDuration(gpuAnalysis.processingTime)}
-											</p>
+										<h3 class="text-sm font-bold uppercase tracking-wider text-amber-400">Gemma LLM Reasoning</h3>
+									</div>
+
+									<div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+										<div class="space-y-2">
+											<div class="flex justify-between text-[10px] font-bold text-neutral-500 uppercase">
+												<span>Confidence Score</span>
+												<span class="text-amber-400">{(gpuAnalysis.confidence * 100).toFixed(1)}%</span>
+											</div>
+											<div class="h-1.5 w-full bg-neutral-800 rounded-full overflow-hidden">
+												<div class="h-full bg-amber-500" style="width: {gpuAnalysis.confidence * 100}%"></div>
+											</div>
+										</div>
+										<div class="space-y-1">
+											<span class="text-[10px] font-bold text-neutral-500 uppercase block">Inference Speed</span>
+											<span class="text-neutral-200 font-mono text-sm">{formatDuration(gpuAnalysis.processingTime)}</span>
 										</div>
 									</div>
+
 									{#if gpuAnalysis.legalAnalysis}
-										<div class="mt-4">
-											<h4 class="font-medium text-info">Legal Analysis:</h4>
-											<div class="bg-white rounded p-3 mt-2">
-												<p>
-													<strong>Relevance:</strong>
-													{(
-														gpuAnalysis.legalAnalysis.relevanceScore * 100
-													).toFixed(1)}%
-												</p>
-												<p>
-													<strong>Entities:</strong>
-													{gpuAnalysis.legalAnalysis.legalEntities?.join(', ') ??
-														'None detected'}
-												</p>
-												<p>
-													<strong>Concepts:</strong>
-													{gpuAnalysis.legalAnalysis.conceptClusters?.join(
-														', '
-													) ?? 'None detected'}
-												</p>
+										<div class="space-y-4">
+											<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+												<div class="bg-neutral-900 shadow-inner rounded-lg p-4 border border-neutral-800/50">
+													<h4 class="text-[10px] font-bold text-neutral-500 uppercase mb-2">Extracted Entities</h4>
+													<div class="flex flex-wrap gap-2">
+														{#each (gpuAnalysis.legalAnalysis.legalEntities || []) as entity}
+															<span class="px-2 py-0.5 rounded bg-neutral-800 text-xs text-neutral-300">{entity}</span>
+														{/each}
+													</div>
+												</div>
+												<div class="bg-neutral-900 shadow-inner rounded-lg p-4 border border-neutral-800/50">
+													<h4 class="text-[10px] font-bold text-neutral-500 uppercase mb-2">Legal Concepts</h4>
+													<div class="flex flex-wrap gap-2">
+														{#each (gpuAnalysis.legalAnalysis.conceptClusters || []) as concept}
+															<span class="px-2 py-0.5 rounded bg-neutral-800 text-xs text-neutral-300">{concept}</span>
+														{/each}
+													</div>
+												</div>
 											</div>
 										</div>
 									{/if}
@@ -375,147 +386,76 @@
 						</div>
 
 						<!-- Sidebar -->
-						<div class="space-y-6">
+						<aside class="bg-neutral-950/80 border-l border-neutral-800 p-6 space-y-8 overflow-y-auto">
+							<!-- Metadata Section -->
+							<section>
+								<h3 class="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em] mb-4">Properties</h3>
+								<div class="space-y-4 text-xs">
+									<div class="flex flex-col gap-1">
+										<span class="text-neutral-600">Storage Location</span>
+										<span class="text-neutral-300 font-mono">MinIO S3 // bucket-1</span>
+									</div>
+									<div class="flex flex-col gap-1">
+										<span class="text-neutral-600">Indexing Status</span>
+										<span class="text-emerald-400 font-bold tracking-tighter italic">SYNCHRONIZED</span>
+									</div>
+								</div>
+							</section>
+
 							<!-- Related Documents -->
 							{#if relatedDocuments.length > 0}
-								<div class="bg-white rounded-lg border border-sand/20 p-4">
-									<h3 class="text-lg font-semibold text-sand mb-3">
-										Related Documents ({relatedDocuments.length})
-									</h3>
-									<div class="space-y-3 max-h-64 overflow-y-auto">
+								<section>
+									<h3 class="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em] mb-4">Related</h3>
+									<div class="space-y-2">
 										{#each relatedDocuments as doc}
-											<div class="bg-sand/5 rounded p-3">
-												<h4 class="font-medium">{doc.title}</h4>
-												<p class="text-sand/60 text-xs">
-													Similarity: {(doc.similarity * 100).toFixed(1)}% | {doc.documentType ||
-														'Document'}
-												</p>
-												{#if doc.content}
-													<p class="text-sand/80 text-xs mt-2">
-														{doc.content.substring(0, 100)}...
-													</p>
-												{/if}
+											<div class="p-3 bg-neutral-900 border border-neutral-800 rounded-lg hover:border-sky-500/30 transition-all group cursor-pointer">
+												<h4 class="text-xs font-bold text-neutral-200 group-hover:text-sky-400 truncate">{doc.title}</h4>
+												<p class="text-[10px] text-neutral-500 mt-1 uppercase">{(doc.similarity * 100).toFixed(0)}% Similarity</p>
 											</div>
 										{/each}
 									</div>
-								</div>
+								</section>
 							{/if}
 
-							<!-- Graph Connections -->
+							<!-- Graph -->
 							{#if graphConnections.length > 0}
-								<div class="bg-white rounded-lg border border-sand/20 p-4">
-									<h3 class="text-lg font-semibold text-sand mb-3">
-										Knowledge Graph ({graphConnections.length})
-									</h3>
-									<div class="space-y-3 max-h-64 overflow-y-auto">
+								<section>
+									<h3 class="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em] mb-4">Knowledge Graph</h3>
+									<div class="space-y-2">
 										{#each graphConnections as conn}
-											<div class="bg-sand/5 rounded p-3">
-												<div class="flex items-center gap-2">
-													<span
-														class="bg-info/10 text-info px-2 py-1 rounded text-xs"
-													>
-														{conn.type}
-													</span>
-													<span class="text-sand/60">
-														{(conn.relationship_strength * 100).toFixed(0)}%
-													</span>
+											<div class="p-3 bg-neutral-900 border border-neutral-800 rounded-lg">
+												<div class="flex items-center justify-between mb-1">
+													<span class="px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-400 text-[8px] font-bold uppercase">{conn.type}</span>
+													<span class="text-[8px] text-neutral-500 font-mono">{(conn.relationship_strength * 100).toFixed(0)}%</span>
 												</div>
-												<h4 class="font-medium">{conn.targetTitle}</h4>
-												<p class="text-sand/60 text-xs">{conn.connection_type}</p>
+												<h4 class="text-[11px] font-medium text-neutral-300">{conn.targetTitle}</h4>
 											</div>
 										{/each}
 									</div>
-								</div>
+								</section>
 							{/if}
-
-							<!-- Case Associations -->
-							{#if caseAssociations.length > 0}
-								<div class="bg-white rounded-lg border border-sand/20 p-4">
-									<h3 class="text-lg font-semibold text-sand mb-3">
-										Associated Cases ({caseAssociations.length})
-									</h3>
-									<div class="space-y-3 max-h-64 overflow-y-auto">
-										{#each caseAssociations as caseItem}
-											<div class="bg-sand/5 rounded p-3">
-												<h4 class="font-medium">{caseItem.title}</h4>
-												<div class="flex items-center gap-2 mt-1">
-													<span class="bg-accent/10 text-accent px-2 py-1 rounded text-xs">
-														{caseItem.status}
-													</span>
-													<span class="bg-warning/10 text-warning px-2 py-1 rounded text-xs">
-														{caseItem.priority}
-													</span>
-												</div>
-											</div>
-										{/each}
-									</div>
-								</div>
-							{/if}
-
-							<!-- Processing Metrics -->
-							{#if processingMetrics}
-								<div class="bg-white rounded-lg border border-sand/20 p-4">
-									<h3 class="text-lg font-semibold text-sand mb-3">
-										Processing Metrics
-									</h3>
-									<div class="space-y-2 text-sm">
-										<div class="flex justify-between">
-											<span class="text-sand/60">Content Length:</span>
-											<span class="font-medium"
-												>{formatBytes(processingMetrics.content_length || 0)}</span
-											>
-										</div>
-										<div class="flex justify-between">
-											<span class="text-sand/60">Vector Embedding:</span>
-											<span
-												class="font-medium {processingMetrics.has_vector_embedding
-													? 'text-accent'
-													: 'text-danger'}"
-											>
-												{processingMetrics.has_vector_embedding
-													? 'Available'
-													: 'Missing'}
-											</span>
-										</div>
-										<div class="flex justify-between">
-											<span class="text-sand/60">Last Accessed:</span>
-											<span class="font-medium">
-												{new Date(
-													processingMetrics.last_accessed
-												).toLocaleTimeString()}
-											</span>
-										</div>
-										{#if processingMetrics.server_processing}
-											<div class="mt-3 pt-3 border-t">
-												<p class="text-xs text-sand/60 mb-2">
-													Server Performance:
-												</p>
-												<div class="space-y-1">
-													<div class="flex justify-between">
-														<span>Total Time:</span>
-														<span class="font-mono"
-															>{processingMetrics.server_processing
-																.total_server_time}</span
-														>
-													</div>
-													<div class="flex justify-between">
-														<span>Vector Search:</span>
-														<span class="font-mono"
-															>{processingMetrics.server_processing
-																.vector_search_time}</span
-														>
-													</div>
-												</div>
-											</div>
-										{/if}
-									</div>
-								</div>
-							{/if}
-						</div>
+						</aside>
 					</div>
 				</div>
 			{/if}
 		</div>
 	</div>
 {/if}
+
+<style>
+	/* Custom scrollbar for premium feel */
+	.scrollbar-thin::-webkit-scrollbar {
+		width: 4px;
+	}
+	.scrollbar-thin::-webkit-scrollbar-track {
+		background: transparent;
+	}
+	.scrollbar-thin::-webkit-scrollbar-thumb {
+		background: #262626;
+		border-radius: 2px;
+	}
+	.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+		background: #404040;
+	}
+</style>
 

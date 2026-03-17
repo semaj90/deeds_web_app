@@ -25,8 +25,8 @@ export const GET: RequestHandler = async ({ url }) => {
 	// Try fetching from legal_definitions (new hierarchical schema)
 	try {
 		const conditions: string[] = [];
-		const params: unknown[] = [limit, offset];
-		let idx = 3;
+		const params: unknown[] = [];
+		let idx = 1;
 
 		if (category) { conditions.push(`ld.normalized_term ILIKE $${idx++}`); params.push(`%${category}%`); }
 		if (q) { conditions.push(`(ld.term ILIKE $${idx} OR ld.definition_text ILIKE $${idx})`); params.push(`%${q}%`); idx++; }
@@ -41,8 +41,8 @@ export const GET: RequestHandler = async ({ url }) => {
 			 LEFT JOIN legal_nodes ln ON ln.id = ld.defined_in_node_id
 			 ${where}
 			 ORDER BY ld.term
-			 LIMIT $1 OFFSET $2`,
-			params
+			 LIMIT $${idx++} OFFSET $${idx++}`,
+			[...params, limit, offset]
 		);
 
 		if (res.rows.length > 0) {
@@ -67,8 +67,8 @@ export const GET: RequestHandler = async ({ url }) => {
 	// Legacy fallback: legal_glossary
 	try {
 		const conditions: string[] = [];
-		const params: unknown[] = [limit, offset];
-		let idx = 3;
+		const params: unknown[] = [];
+		let idx = 1;
 
 		if (category) { conditions.push(`lg.category ILIKE $${idx++}`); params.push(`%${category}%`); }
 		if (q) { conditions.push(`(lg.term ILIKE $${idx} OR lg.definition ILIKE $${idx})`); params.push(`%${q}%`); idx++; }
@@ -80,8 +80,8 @@ export const GET: RequestHandler = async ({ url }) => {
 			 FROM legal_glossary lg
 			 ${where}
 			 ORDER BY lg.term
-			 LIMIT $1 OFFSET $2`,
-			params
+			 LIMIT $${idx++} OFFSET $${idx++}`,
+			[...params, limit, offset]
 		);
 
 		return json({

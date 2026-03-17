@@ -118,6 +118,73 @@ because they are runtime logic errors. Always verify `goto()` targets and `fetch
 at the filesystem level, not just with type checks. Be especially careful with SvelteKit
 dynamic route segments (`[id]`, `[slug]`) — glob patterns treat brackets as character classes.
 
+## Phase 5: Infrastructure Chain Analysis
+
+Beyond UI → handler → API chains, trace infrastructure dependencies:
+
+### 5a. XState Machine Dead Chains
+```
+PATTERN: Component imports useMachine(fooMachine)
+CHECK:
+  1. Does the component ever call send({ type: 'EVENT' })?
+  2. Does fooMachine handle that event in its current state?
+  3. Does the machine's invoke.src actor do real work (API call, DB query)?
+  4. Is the machine's state consumed in the template ({#if snapshot.matches('...')})?
+```
+Flag as **DEAD_MACHINE** if machine is imported but `send()` never called with a reachable event.
+Flag as **UNREACHABLE_STATE** if machine has states that no transition path can reach.
+
+### 5b. RabbitMQ Orphan Queues
+```bash
+# Find all publish calls
+rg "publish(VectorIndex|DocumentEmbed|EvidenceProcess|ChatContext|AnalyticsTrack|CacheInvalidate|CodebaseIndex)" src/ --no-heading
+# Find all consume calls
+rg "consume\(" src/lib/server/queue/ --no-heading
+```
+Flag as **ORPHAN_QUEUE** if a queue has publishers but no consumer (or vice versa).
+
+### 5c. Redis Stale Cache Keys
+```bash
+rg "redis\.(get|hget|mget)\(" src/ --no-heading -n
+rg "redis\.(set|hset|setex)\(" src/ --no-heading -n
+```
+Group by key pattern prefix. Flag as **STALE_CACHE** if:
+- Key written but never read (dead write)
+- Key read but never written (always cache miss)
+- Key used with TTL but read pattern doesn't handle miss gracefully
+
+### 5d. Missing Environment Variables
+```bash
+rg "ENV\.\w+" src/lib/config/env.server.ts -o | sort -u
+rg "ENV\.\w+" src/routes/ src/lib/server/ -o | sort -u
+```
+Cross-reference: Flag as **MISSING_ENV** if code accesses `ENV.X` but the getter in `env.server.ts` doesn't define it or `.env.example` doesn't list it.
+
+### 5e. Demo Page Reachability
+```bash
+# All demo routes that exist on disk
+ls -d src/routes/(app)/demos/*/
+# All demo hrefs listed in the index page
+rg "href:.*'/demos/" src/routes/(app)/demos/+page.svelte -o
+```
+Flag as **UNLISTED_DEMO** if a demo route exists but isn't linked from the demos index page.
+Flag as **DEAD_DEMO_LINK** if the index page links to a demo route that doesn't exist on disk.
+
+### 5f. Ripgrep-Based Shallow Route Fix
+Use ripgrep to systematically find ALL broken route references across the codebase:
+```bash
+# Extract all goto() targets
+rg "goto\(['\`]([^'\`]+)" src/ -o --no-heading | sort -u
+# Extract all <a href="..."> targets
+rg 'href="(/[^"]+)"' src/ -o --no-heading | sort -u
+# Extract all fetch() API targets
+rg "fetch\(['\`](/api/[^'\`]+)" src/ -o --no-heading | sort -u
+```
+For each extracted route:
+1. Resolve SvelteKit dynamic segments: `[id]` → check parent dir exists
+2. Verify `+page.svelte` or `+server.ts` exists at that path
+3. Report ALL broken references in one pass (not file-by-file)
+
 ## Detection Heuristics
 
 **High-probability shallow wiring patterns:**
@@ -127,6 +194,9 @@ dynamic route segments (`[id]`, `[slug]`) — glob patterns treat brackets as ch
 - `$state(false)` for modal visibility that's never set `true` by any handler
 - Component imported but no `<Component` or `{@render` in template
 - State variable assigned in handler but never read in `{#if}` / `{:else if}` / `{#each}`
+- XState machine imported but `send()` never called from rendered UI
+- RabbitMQ publish with no matching consumer
+- Redis key written with TTL but never read before expiry
 
 ## Rules
 
@@ -135,5 +205,6 @@ dynamic route segments (`[id]`, `[slug]`) — glob patterns treat brackets as ch
 - Check both static imports AND dynamic `import()` patterns
 - Verify `goto()` targets against BOTH `(app)/` routes and `api/` routes
 - For `fetch()` calls, check the HTTP method matches (GET vs POST vs PATCH)
+- Use ripgrep (`rg`) for fast cross-file searches, NOT grep
 - Run `svelte-check` after any fixes
 - Follow CLAUDE.md Directory Audit Protocol for any file moves

@@ -50,41 +50,6 @@
 
 	<!-- Main Dashboard Layout -->
 	<div class="dashboard-container">
-		<!-- Left Sidebar: Corpus Explorer -->
-		<aside class="corpus-explorer">
-			<div class="explorer-header">
-				<Icon name="layers" size={16} />
-				<span>Corpus</span>
-			</div>
-
-			<div class="explorer-nav">
-				<a href="/library" class="nav-item active">
-					<Icon name="book" size={14} />
-					<span>Statutes</span>
-				</a>
-				<a href="/library?corpusType=regulation" class="nav-item">
-					<Icon name="file-text" size={14} />
-					<span>Regulations</span>
-				</a>
-				<a href="/library?corpusType=case" class="nav-item">
-					<Icon name="scale" size={14} />
-					<span>Case Law</span>
-				</a>
-				<a href="/library/glossary" class="nav-item">
-					<Icon name="book-open" size={14} />
-					<span>Glossary</span>
-				</a>
-			</div>
-
-			<div class="jurisdiction-select">
-				<span class="label">Jurisdiction</span>
-				<div class="select-box">
-					<span>{data.document.jurisdiction?.name || 'Federal'}</span>
-					<Icon name="chevron-down" size={12} />
-				</div>
-			</div>
-		</aside>
-
 		<!-- Central Content Feed -->
 		<main class="dashboard-main">
 			<div class="main-header">
@@ -183,7 +148,7 @@
 	.legal-dashboard-root {
 		background: #0a0b10;
 		color: #e0e0e0;
-		min-height: 100vh;
+		height: 100%;
 		display: flex;
 		flex-direction: column;
 		font-family: 'Inter', sans-serif;
@@ -247,79 +212,9 @@
 	/* Layout Container */
 	.dashboard-container {
 		display: grid;
-		grid-template-columns: 200px 1fr 320px;
+		grid-template-columns: 1fr 320px;
 		flex: 1;
-		height: calc(100vh - 56px);
-	}
-
-	/* Left Explorer Sidebar */
-	.corpus-explorer {
-		border-right: 1px solid rgba(255, 255, 255, 0.05);
-		padding: 1.5rem 1rem;
-		display: flex;
-		flex-direction: column;
-		gap: 2rem;
-	}
-
-	.explorer-header {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-size: 0.75rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.3);
-	}
-
-	.explorer-nav {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
-
-	.nav-item {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		padding: 0.5rem 0.75rem;
-		border-radius: 6px;
-		color: rgba(255, 255, 255, 0.6);
-		text-decoration: none;
-		font-size: 0.8125rem;
-		transition: all 0.15s;
-	}
-
-	.nav-item:hover, .nav-item.active {
-		background: rgba(255, 255, 255, 0.05);
-		color: #e0e0e0;
-	}
-
-	.nav-item.active {
-		color: #60a5fa;
-	}
-
-	.jurisdiction-select {
-		margin-top: auto;
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
-
-	.jurisdiction-select .label {
-		font-size: 0.625rem;
-		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.3);
-	}
-
-	.select-box {
-		padding: 0.5rem;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 6px;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		font-size: 0.75rem;
+		overflow: hidden;
 	}
 
 	/* Main Central Area */

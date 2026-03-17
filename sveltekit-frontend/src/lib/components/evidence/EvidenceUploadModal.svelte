@@ -92,6 +92,14 @@
 		if (status === 'running') currentStage = index;
 	}
 
+	function formatUploadErrorMessage(message: string | null | undefined): string {
+		if (!message) return 'Upload could not be completed';
+
+		return message
+			.replace(/^Upload failed/i, 'Upload could not be completed')
+			.replace(/^Failed to upload/i, 'Upload could not be completed');
+	}
+
 	const handleUpload = async () => {
 		if (!selectedFile) return;
 		isUploading = true;
@@ -111,7 +119,7 @@
 			const res = await fetch('/api/evidence/upload', { method: 'POST', body: formData });
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-				throw new Error(err.error || err.message || `Upload failed (${res.status})`);
+				throw new Error(err.error || err.message || `Upload could not be completed (${res.status})`);
 			}
 			const data = await res.json();
 			advanceStage(0, 'done');
@@ -152,7 +160,7 @@
 		} catch (error) {
 			const failedStage = stageStatuses.findIndex(s => s === 'running');
 			if (failedStage >= 0) advanceStage(failedStage, 'error');
-			uploadError = error instanceof Error ? error.message : 'Upload failed';
+			uploadError = formatUploadErrorMessage(error instanceof Error ? error.message : null);
 		} finally {
 			isUploading = false;
 		}
@@ -242,12 +250,12 @@
 							<div class="mt-3 flex flex-wrap gap-3 text-xs">
 								<label class="flex items-center gap-1.5 text-sand/60 cursor-pointer">
 									<input type="checkbox" bind:checked={enableRag} class="rounded" />
-									RAG Index (Qdrant + pgvector)
+									Search indexing
 								</label>
 								{#if isImageFile(selectedFile)}
 									<label class="flex items-center gap-1.5 text-sand/60 cursor-pointer">
 										<input type="checkbox" bind:checked={enableYolo} class="rounded" />
-										YOLO Analysis (signatures, seals, tables)
+										Visual review (signatures, seals, tables)
 									</label>
 								{/if}
 							</div>
@@ -298,11 +306,11 @@
 								{/if}
 							</div>
 							<div class="mt-3 flex flex-wrap gap-2 text-[10px]">
-								<span class="px-2 py-0.5 bg-accent/10 text-accent rounded">RAG Indexed</span>
-								<span class="px-2 py-0.5 bg-blue-900/20 text-blue-400 rounded">pgvector 768d</span>
-								<span class="px-2 py-0.5 bg-purple-900/20 text-purple-400 rounded">Qdrant ANN</span>
+								<span class="px-2 py-0.5 bg-accent/10 text-accent rounded">Search ready</span>
+								<span class="px-2 py-0.5 bg-blue-900/20 text-blue-400 rounded">Vector stored</span>
+								<span class="px-2 py-0.5 bg-purple-900/20 text-purple-400 rounded">Fast search ready</span>
 								{#if enableYolo && selectedFile && isImageFile(selectedFile)}
-									<span class="px-2 py-0.5 bg-yellow-900/20 text-yellow-400 rounded">YOLO Analyzed</span>
+									<span class="px-2 py-0.5 bg-yellow-900/20 text-yellow-400 rounded">Visual review complete</span>
 								{/if}
 							</div>
 						</div>
@@ -312,6 +320,7 @@
 					{#if uploadError}
 						<div class="flex items-center gap-2 bg-red-900/10 border border-red-800/20 rounded-lg p-3 text-sm text-red-400 mt-3">
 							<Icon name="alert-circle" size={16} class="shrink-0" />
+							<span class="font-medium">Upload issue:</span>
 							<span>{uploadError}</span>
 						</div>
 					{/if}
@@ -321,7 +330,7 @@
 			<!-- Footer -->
 			<div class="flex gap-3 justify-end p-5 border-t border-sand/10">
 				<button class="px-4 py-2 text-sm text-sand/60 hover:text-sand transition rounded-lg" onclick={handleCancel} disabled={isUploading}>
-					{uploadResult ? 'Close' : 'Cancel'}
+					{uploadResult ? 'Close' : 'Cancel upload'}
 				</button>
 				{#if selectedFile && !uploadResult}
 					<button
@@ -335,7 +344,7 @@
 								Processing...
 							</span>
 						{:else}
-							Upload & Process
+							Upload and process
 						{/if}
 					</button>
 				{/if}

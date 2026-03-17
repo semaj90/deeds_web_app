@@ -79,6 +79,9 @@
         }
     });
 
+    import CaseOverviewModal from '$lib/components/cases/CaseOverviewModal.svelte';
+    import DocumentDetailModal from '$lib/components/DocumentDetailModal.svelte';
+
     onMount(() => {
         mounted = true;
         analytics.init(data?.user?.id);
@@ -87,6 +90,14 @@
             cleanupStores();
         };
     });
+
+    function closeCaseModal() {
+        history.back();
+    }
+
+    function closeDocumentModal() {
+        history.back();
+    }
 </script>
 
 <svelte:window onkeydown={handleGlobalKeydown} />
@@ -109,6 +120,20 @@
 
 {#if mounted}
     <CaseDocumentWriter bind:isOpen={showDocumentWriter} />
+{/if}
+
+{#if $page.state.showCaseModal && $page.state.caseId}
+    <CaseOverviewModal 
+        id={$page.state.caseId} 
+        onClose={closeCaseModal} 
+    />
+{/if}
+
+{#if $page.state.showDocumentModal && $page.state.documentId}
+    <DocumentDetailModal 
+        id={$page.state.documentId} 
+        onClose={closeDocumentModal} 
+    />
 {/if}
 
 <style>

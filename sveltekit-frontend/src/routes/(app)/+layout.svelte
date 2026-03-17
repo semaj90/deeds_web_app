@@ -108,8 +108,13 @@
 {#if AIChatWidget}
 	<AIChatWidget />
 {/if}
-{#if SetupWizard}
-	<SetupWizard />
+{#if SetupWizard && data.user}
+	<SetupWizard
+		isAuthenticated={data.isAuthenticated}
+		userId={data.user.id}
+		initialHasCompletedOnboarding={data.user.hasCompletedOnboarding ?? false}
+		initialOnboardingStep={data.user.onboardingStep ?? 0}
+	/>
 {/if}
 {#if KeyboardShortcutsPanel}
 	<KeyboardShortcutsPanel bind:open={showShortcuts} />

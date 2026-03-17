@@ -1,0 +1,243 @@
+syntax = "proto3";
+
+package library.search;
+
+option go_package = "github.com/deeds-web-app/services/go-search-service/proto/libsearch";
+
+// ─────────────────────────────────────────────────────────────────────────
+// LibrarySearchService — parallel retrieval over the legal library tables.
+//
+// Tables targeted:
+//   library_documents  → corpus metadata, jurisdiction, source
+//   legal_nodes        → hierarchical tree (ARTICLE > SECTION > §)
+//   legal_chunks       → chunk text + 768d pgvector embedding + tsvector
+//   jurisdictions      → code/name/level lookup
+//
+// Fan-out strategy (all goroutine-parallel):
+//   1. Exact citation match (ILIKE on legal_nodes.citation_label)
+//   2. GIN full-text search (legal_chunks.tsv @@ plainto_tsquery)
+//   3. pgvector cosine similarity (legal_chunks.embedding <=> query_vec)
+//   4. Qdrant ANN search (legal_documents collection, 768-dim)
+//
+// Results are fused via Reciprocal Rank Fusion (RRF) with configurable
+// weights, deduped by chunk_id, and returned ranked.
+// ─────────────────────────────────────────────────────────────────────────
+
+service LibrarySearchService {
+  // Unary: parallel fan-out search, fused and ranked
+  rpc SearchLibrary(LibrarySearchRequest) returns (LibrarySearchResponse);
+
+  // Streaming: progressive delivery for large result sets
+  rpc StreamLibrary(LibrarySearchRequest) returns (stream LibrarySearchEvent);
+
+  // Tree navigation: get document table-of-contents
+  rpc GetDocumentToc(TocRequest) returns (TocResponse);
+
+  // Node context: get a node with its children and chunks
+  rpc GetNodeContext(NodeContextRequest) returns (NodeContextResponse);
+
+  // Citation resolution: find nodes by citation label
+  rpc ResolveCitation(CitationRequest) returns (CitationResponse);
+
+  // Health check
+  rpc Health(HealthRequest) returns (HealthResponse);
+}
+
+// ── Search ────────────────────────────────────────────────────────────────
+
+message LibrarySearchRequest {
+  string query = 1;                         // Search text (min 2 chars)
+  string jurisdiction = 2;                  // Filter: jurisdiction code (e.g., "ca", "fed-us")
+  string corpus_type = 3;                   // Filter: "constitution", "statute", "regulation", etc.
+  int32 limit = 4;                          // Max results (default 20, max 100)
+
+  // Optional: tie results to a case for contextual AI chat
+  string case_id = 5;
+  string user_id = 6;
+
+  // Optional: pre-computed 768d query embedding (skip embed step if set)
+  repeated float query_embedding = 7 [packed = true];
+
+  // Fusion weights (defaults: citation=1.0, fts=0.4, vector=0.6, qdrant=0.5)
+  FusionWeights weights = 8;
+
+  bool include_debug = 9;
+}
+
+message FusionWeights {
+  float citation_weight = 1;                // Exact citation match weight
+  float fts_weight = 2;                     // GIN full-text search weight
+  float pgvector_weight = 3;               // pgvector cosine similarity weight
+  float qdrant_weight = 4;                 // Qdrant ANN search weight
+}
+
+message LibrarySearchResponse {
+  repeated LibraryHit hits = 1;
+  int32 total = 2;
+  SearchMeta meta = 3;
+  string debug_json = 4;
+}
+
+message LibrarySearchEvent {
+  oneof event {
+    LibraryHit hit = 1;
+    SearchProgress progress = 2;
+    SearchError error = 3;
+  }
+}
+
+message LibraryHit {
+  string chunk_id = 1;
+  string document_id = 2;
+  string node_id = 3;
+
+  // Document-level
+  string title = 4;
+  string corpus_type = 5;                   // "constitution", "statute", etc.
+  string source_type = 6;                   // "official_government", "academic", etc.
+  bool is_official = 7;
+  string official_url = 8;
+
+  // Node-level
+  string heading = 9;
+  string citation_label = 10;
+  string node_path = 11;
+  string node_type = 12;                    // "article", "section", "subsection", etc.
+
+  // Chunk-level
+  string snippet = 13;                     // Truncated chunk text (max 400 chars)
+  int32 page_start = 14;
+  int32 page_end = 15;
+
+  // Scoring
+  float score = 16;                         // Final fused score
+  string match_type = 17;                   // "citation", "fts", "vector", "qdrant", "fused"
+  string source_confidence = 18;            // "high", "medium", "low"
+
+  // Jurisdiction
+  Jurisdiction jurisdiction = 19;
+}
+
+message Jurisdiction {
+  string code = 1;
+  string name = 2;
+}
+
+message SearchMeta {
+  float embed_ms = 1;
+  float citation_ms = 2;
+  float fts_ms = 3;
+  float pgvector_ms = 4;
+  float qdrant_ms = 5;
+  float fusion_ms = 6;
+  float total_ms = 7;
+  string embedding_source = 8;             // "cache", "grpc", "ollama"
+  int32 citation_hits = 9;
+  int32 fts_hits = 10;
+  int32 pgvector_hits = 11;
+  int32 qdrant_hits = 12;
+}
+
+// ── TOC / Navigation ──────────────────────────────────────────────────────
+
+message TocRequest {
+  int32 document_id = 1;
+  int32 max_depth = 2;                      // 0 = unlimited
+}
+
+message TocResponse {
+  repeated TocNode nodes = 1;
+  string document_title = 2;
+  string corpus_type = 3;
+}
+
+message TocNode {
+  int32 node_id = 1;
+  string heading = 2;
+  string citation_label = 3;
+  string node_type = 4;
+  string node_path = 5;
+  int32 depth = 6;
+  int32 ordinal = 7;
+  int32 chunk_count = 8;
+  repeated TocNode children = 9;
+}
+
+// ── Node Context ──────────────────────────────────────────────────────────
+
+message NodeContextRequest {
+  int32 node_id = 1;
+  bool include_children = 2;                // Default true
+  bool include_chunks = 3;                  // Default true
+  int32 max_children = 4;                   // Default 50
+}
+
+message NodeContextResponse {
+  TocNode node = 1;
+  string full_text = 2;
+  repeated ChunkDetail chunks = 3;
+  repeated TocNode children = 4;
+  Breadcrumb breadcrumb = 5;
+}
+
+message ChunkDetail {
+  string chunk_id = 1;
+  int32 chunk_index = 2;
+  string chunk_text = 3;
+  int32 page_start = 4;
+  int32 page_end = 5;
+  bool has_embedding = 6;
+}
+
+message Breadcrumb {
+  repeated BreadcrumbItem items = 1;
+}
+
+message BreadcrumbItem {
+  int32 node_id = 1;
+  string heading = 2;
+  string node_type = 3;
+  int32 depth = 4;
+}
+
+// ── Citation Resolution ───────────────────────────────────────────────────
+
+message CitationRequest {
+  string citation = 1;                      // e.g., "Article I, Section 8"
+  string jurisdiction = 2;                  // Optional filter
+}
+
+message CitationResponse {
+  repeated LibraryHit matches = 1;
+  int32 total = 2;
+}
+
+// ── Diagnostics ───────────────────────────────────────────────────────────
+
+message SearchProgress {
+  string stage = 1;                         // "embed", "citation", "fts", "pgvector", "qdrant", "fusion"
+  int32 current = 2;
+  int32 total = 3;
+  string message = 4;
+}
+
+message SearchError {
+  string code = 1;
+  string message = 2;
+  string details_json = 3;
+}
+
+message HealthRequest {
+  string service = 1;
+}
+
+message HealthResponse {
+  string status = 1;                        // "healthy", "degraded", "unhealthy"
+  bool pgvector_connected = 2;
+  bool qdrant_connected = 3;
+  bool redis_connected = 4;
+  bool embedding_service_up = 5;
+  int64 timestamp = 6;
+  int32 indexed_documents = 7;
+  int32 indexed_chunks = 8;
+}

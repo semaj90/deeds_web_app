@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import Button from '$lib/components/ui/Button.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { getTemplate, getTemplateTypes } from '$lib/data/report-templates';
 
@@ -96,25 +95,25 @@
 	}
 </script>
 
-<div class="min-h-screen bg-background p-6">
+<div class="min-h-screen bg-neutral-100 p-6 text-neutral-900">
 	<!-- Header -->
 	<div class="mb-8">
 		<button
 			onclick={() => goto('/reports')}
-			class="flex items-center gap-1 text-sm text-neutral-400 hover:text-neutral-300 mb-4 transition-colors"
+			class="mb-4 flex items-center gap-1 text-sm text-neutral-600 transition-colors hover:text-neutral-900"
 		>
 			<Icon name="arrow-left" class="w-4 h-4" />
 			Back to Reports
 		</button>
-		<h1 class="text-3xl font-bold text-neutral-100">Create New Report</h1>
-		<p class="text-sm text-neutral-400 mt-1">
+		<h1 class="text-3xl font-bold text-neutral-950">Create New Report</h1>
+		<p class="mt-1 text-sm text-neutral-600">
 			Select a report type and start writing
 		</p>
 	</div>
 
 	<!-- Error Message -->
 	{#if error}
-		<div class="rounded-lg border border-red-800/30 bg-red-950/40 p-4 text-red-300 mb-6">
+		<div class="mb-6 rounded-lg border border-neutral-300 bg-white p-4 text-neutral-800 shadow-sm">
 			<div class="flex items-center gap-2">
 				<Icon name="alert-triangle" class="w-4 h-4" />
 				<span>{error}</span>
@@ -126,7 +125,7 @@
 	<div class="max-w-3xl">
 		<!-- Title Input -->
 		<div class="mb-6">
-			<label for="title" class="block text-sm font-semibold text-neutral-300 mb-2">
+			<label for="title" class="mb-2 block text-sm font-semibold text-neutral-700">
 				Report Title
 			</label>
 			<input
@@ -134,33 +133,33 @@
 				type="text"
 				bind:value={title}
 				placeholder="Enter report title..."
-				class="w-full px-4 py-2 rounded-lg border border-neutral-800 bg-neutral-900 text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-accent"
+				class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900"
 			/>
 		</div>
 
 		<!-- Report Type Selection -->
 		<div class="mb-8">
-			<h2 class="text-sm font-semibold text-neutral-300 mb-4">Report Type</h2>
+			<h2 class="mb-4 text-sm font-semibold text-neutral-700">Report Type</h2>
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
 				{#each reportTypes as type}
 					<button
 						onclick={() => selectedType = type.value}
 						class="text-left p-4 rounded-lg border transition-all {selectedType === type.value
-							? 'border-accent bg-accent/10'
-							: 'border-neutral-800 bg-neutral-900/50 hover:bg-neutral-900/70'}"
+							? 'border-neutral-900 bg-white shadow-sm'
+							: 'border-neutral-300 bg-white hover:border-neutral-400 hover:bg-neutral-50'}"
 					>
 						<div class="flex items-start gap-3">
-							<Icon name={type.icon} class="w-5 h-5 mt-0.5 shrink-0 {selectedType === type.value ? 'text-accent' : 'text-neutral-400'}" />
+							<Icon name={type.icon} class="mt-0.5 h-5 w-5 shrink-0 {selectedType === type.value ? 'text-neutral-900' : 'text-neutral-500'}" />
 							<div class="flex-1 min-w-0">
-								<div class="font-semibold text-neutral-100 mb-1">
+								<div class="mb-1 font-semibold text-neutral-900">
 									{type.label}
 								</div>
-								<div class="text-xs text-neutral-400">
+								<div class="text-xs text-neutral-500">
 									{type.description}
 								</div>
 							</div>
 							{#if selectedType === type.value}
-								<Icon name="check-circle" class="w-5 h-5 text-accent shrink-0" />
+								<Icon name="check-circle" class="h-5 w-5 shrink-0 text-neutral-900" />
 							{/if}
 						</div>
 					</button>
@@ -170,18 +169,18 @@
 
 		<!-- Template Options -->
 		{#if selectedTemplate}
-			<div class="mb-6 p-4 rounded-lg border border-neutral-800 bg-neutral-900/50">
-				<h3 class="text-sm font-semibold text-neutral-300 mb-3">Generation Options</h3>
+			<div class="mb-6 rounded-lg border border-neutral-300 bg-white p-4 shadow-sm">
+				<h3 class="mb-3 text-sm font-semibold text-neutral-700">Generation Options</h3>
 
 				<!-- Use Template Toggle -->
 				<label class="flex items-center gap-3 mb-3 cursor-pointer">
 					<input
 						type="checkbox"
 						bind:checked={useTemplate}
-						class="w-4 h-4 rounded border-neutral-700 bg-neutral-800 text-accent focus:ring-2 focus:ring-accent focus:ring-offset-0"
+						class="h-4 w-4 rounded border-neutral-400 bg-white accent-neutral-900 focus:ring-2 focus:ring-neutral-900 focus:ring-offset-0"
 					/>
 					<div class="flex-1">
-						<div class="text-sm text-neutral-200">Use {selectedTemplate.name} template</div>
+						<div class="text-sm text-neutral-900">Use {selectedTemplate.name} template</div>
 						<div class="text-xs text-neutral-500">Pre-fill report with structured template ({selectedTemplate.estimatedTime})</div>
 					</div>
 				</label>
@@ -192,19 +191,19 @@
 						<input
 							type="checkbox"
 							bind:checked={useAI}
-							class="w-4 h-4 rounded border-neutral-700 bg-neutral-800 text-accent focus:ring-2 focus:ring-accent focus:ring-offset-0"
+							class="h-4 w-4 rounded border-neutral-400 bg-white accent-neutral-900 focus:ring-2 focus:ring-neutral-900 focus:ring-offset-0"
 						/>
 						<div class="flex-1">
-							<div class="text-sm text-neutral-200 flex items-center gap-2">
+							<div class="flex items-center gap-2 text-sm text-neutral-900">
 								<span>AI-powered content generation</span>
-								<span class="px-2 py-0.5 text-xs rounded-full bg-accent/20 text-accent">Beta</span>
+								<span class="rounded-full bg-neutral-900 px-2 py-0.5 text-xs text-white">Beta</span>
 							</div>
 							<div class="text-xs text-neutral-500">Generate case-specific content using AI (requires Ollama)</div>
 						</div>
 					</label>
 
 					{#if useAI}
-						<div class="mt-3 p-3 rounded bg-neutral-800/50 text-xs text-neutral-400">
+						<div class="mt-3 rounded bg-neutral-100 p-3 text-xs text-neutral-600">
 							<Icon name="sparkles" class="w-3 h-3 inline-block mr-1" />
 							AI will analyze your case evidence and generate tailored content following the template structure.
 						</div>
@@ -215,10 +214,10 @@
 
 		<!-- Actions -->
 		<div class="flex items-center gap-3">
-			<Button
+			<button
 				onclick={createReport}
 				disabled={isCreating || !title.trim() || !caseId}
-				class="gap-2"
+				class="inline-flex items-center justify-center gap-2 rounded-md border border-neutral-900 bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				{#if isCreating}
 					<Icon name="loader-2" class="w-4 h-4 animate-spin" />
@@ -227,22 +226,22 @@
 					<Icon name="file-plus" class="w-4 h-4" />
 					Create Report
 				{/if}
-			</Button>
-			<Button
-				variant="outline"
+			</button>
+			<button
 				onclick={() => goto('/reports')}
+				class="inline-flex items-center justify-center rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-800 transition hover:border-neutral-400 hover:bg-neutral-50"
 			>
 				Cancel
-			</Button>
+			</button>
 		</div>
 
 		{#if !caseId}
-			<div class="mt-4 p-3 rounded-lg border border-yellow-800/30 bg-yellow-950/30 text-yellow-300 text-sm">
+			<div class="mt-4 rounded-lg border border-neutral-300 bg-white p-3 text-sm text-neutral-700 shadow-sm">
 				<div class="flex items-start gap-2">
 					<Icon name="info" class="w-4 h-4 mt-0.5 shrink-0" />
 					<div>
 						<strong>Note:</strong> Reports must be linked to a case. Please create a report from a case page
-						(e.g., <code class="px-1 py-0.5 rounded bg-black/30">/cases/[id]/overview</code>).
+						(e.g., <code class="rounded bg-neutral-100 px-1 py-0.5">/cases/[id]/overview</code>).
 					</div>
 				</div>
 			</div>

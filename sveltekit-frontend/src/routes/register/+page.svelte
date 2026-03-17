@@ -36,7 +36,7 @@
 		if (isAuthenticated) {
 			step = 'success';
 			// Brief pause to show success state, then redirect to dashboard
-			// The onboarding wizard will auto-trigger on first visit
+			// Authenticated app routes decide whether onboarding should appear
 			setTimeout(() => goto('/dashboard'), 1500);
 		}
 	});
