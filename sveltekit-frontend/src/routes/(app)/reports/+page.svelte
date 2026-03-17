@@ -4,12 +4,17 @@
 	import { reportStore } from '$lib/stores/unified/report-store.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import ReportViewModal from '$lib/components/reports/ReportViewModal.svelte';
 
 	type ReportType = 'charging_memo' | 'intake_summary' | 'discovery_list' | 'hearing_prep' |
 		'analysis' | 'summary' | 'timeline' | 'evidence_review' | 'legal_memo' | 'custom';
 
 	let loading = $state(true);
 	let error = $state<string | null>(null);
+
+	// Quick-view modal
+	let viewReport = $state<any>(null);
+	let showViewModal = $state(false);
 
 	// Reactive state from store
 	let reports = $derived(reportStore.reports);
@@ -181,7 +186,7 @@
 							<Button
 								variant="ghost"
 								size="sm"
-								onclick={() => goto(`/reports/${report.id}`)}
+								onclick={() => { viewReport = report; showViewModal = true; }}
 								title="View report"
 							>
 								<Icon name="eye" class="w-4 h-4" />
@@ -210,3 +215,10 @@
 		</div>
 	{/if}
 </div>
+
+<ReportViewModal
+	bind:open={showViewModal}
+	report={viewReport}
+	onClose={() => { showViewModal = false; viewReport = null; }}
+	onEdit={(id) => goto(`/reports/${id}/edit`)}
+/>

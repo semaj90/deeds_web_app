@@ -7,6 +7,7 @@
 	import SearchBar from '$lib/components/SearchBar.svelte';
 	import CaseCard from '$lib/components/cases/CaseCard.svelte';
 	import CaseScoringDashboard from '$lib/components/ai/CaseScoringDashboard.svelte';
+	import CaseViewModal from '$lib/components/cases/CaseViewModal.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { invalidateAll, goto } from '$app/navigation';
 	import type { PageData } from './$types';
@@ -18,6 +19,10 @@
 	let caseSearchQuery = $state('');
 	let analyzingCaseId = $state<string | null>(null);
 	let lastAnalyzedCase = $state<{ id: string; title: string } | null>(null);
+
+	// Case quick-view modal
+	let viewCaseId = $state<string | null>(null);
+	let showViewModal = $state(false);
 	let analysisResult = $state<any>(null);
 	let analysisError = $state<string | null>(null);
 
@@ -236,7 +241,7 @@
 					{#each filteredActiveCases as caseItem (caseItem.id)}
 						<tr class="case-row">
 							<td class="case-title">
-								<a href="/cases/{caseItem.id}" class="case-link">
+								<a href="/cases/{caseItem.id}" class="case-link" onclick={(e) => { e.preventDefault(); viewCaseId = caseItem.id; showViewModal = true; }}>
 									{caseItem.title ?? 'Untitled Case'}
 								</a>
 							</td>
@@ -260,7 +265,7 @@
 										<Icon name="brain" />
 									{/if}
 								</button>
-								<a href="/cases/{caseItem.id}" class="action-icon" title="View">
+								<a href="/cases/{caseItem.id}" class="action-icon" title="View" onclick={(e) => { e.preventDefault(); viewCaseId = caseItem.id; showViewModal = true; }}>
 									<Icon name="eye" />
 								</a>
 								<a href="/cases/{caseItem.id}/edit" class="action-icon" title="Edit">
@@ -282,7 +287,7 @@
 			{#each richCaseCards as caseItem (caseItem.id)}
 				<CaseCard
 					{caseItem}
-					onView={(id) => { goto(`/cases/${id}`); }}
+					onView={(id) => { viewCaseId = id; showViewModal = true; }}
 					onEdit={(id) => { goto(`/cases/${id}`); }}
 				/>
 			{/each}
@@ -382,6 +387,13 @@
 			</div>
 		</div>
 	{/if}
+
+	<CaseViewModal
+		bind:open={showViewModal}
+		caseId={viewCaseId}
+		onClose={() => { showViewModal = false; viewCaseId = null; }}
+		onEdit={(id) => goto(`/cases/${id}`)}
+	/>
 
 	<!-- Terminal Footer -->
 	<div class="terminal-footer">
