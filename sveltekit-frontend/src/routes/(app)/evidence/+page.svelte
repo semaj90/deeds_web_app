@@ -2,6 +2,7 @@
 	import { browser } from '$app/environment';
 	import { applyAction, enhance } from '$app/forms';
 	import { invalidateAll, pushState } from '$app/navigation';
+	import { page } from '$app/stores';
 	import type { ActionData, PageData } from './$types';
 	import {
 		type AdvancedEvidenceFilters,
@@ -22,6 +23,7 @@
 	import EvidenceAiAssistantDrawer from '$lib/components/evidence/EvidenceAiAssistantDrawer.svelte';
 	import LinkEvidenceToCaseDialog from '$lib/components/evidence/LinkEvidenceToCaseDialog.svelte';
 	import EvidenceCRUDModal from '$lib/components/modals/EvidenceCRUDModal.svelte';
+	import EvidenceViewModal from '$lib/components/evidence/EvidenceViewModal.svelte';
 	import EvidenceUploadModal from '$lib/components/evidence/EvidenceUploadModal.svelte';
 	import ActionPopup from '$lib/components/ActionPopup.svelte';
 	import UploadProgress from '$lib/components/UploadProgress.svelte';
@@ -76,6 +78,21 @@
 
 	// Component refs
 	let aiDrawer = $state<EvidenceAiAssistantDrawer | undefined>(undefined);
+
+	// Evidence detail view modal (from card clicks)
+	let viewEvidenceId = $state<string | null>(null);
+	let showViewModal = $state(false);
+
+	// React to pushState / popstate (back button closes modal)
+	$effect(() => {
+		const state = $page.state as { showDocumentModal?: boolean; documentId?: string } | undefined;
+		if (state?.showDocumentModal && state?.documentId) {
+			viewEvidenceId = state.documentId;
+			showViewModal = true;
+		} else {
+			showViewModal = false;
+		}
+	});
 
 	// Derived
 	let activeCaseId = $derived(pendingUploadCaseId ?? data.caseId ?? '');
@@ -167,6 +184,8 @@
 	function openDocumentModal(e: MouseEvent, id: string) {
 		if (e.metaKey || e.ctrlKey) return;
 		e.preventDefault();
+		viewEvidenceId = id;
+		showViewModal = true;
 		pushState(window.location.pathname, { showDocumentModal: true, documentId: id });
 	}
 
@@ -352,6 +371,19 @@
 		onClose={() => { showCrudModal = false; }}
 		onSave={() => { invalidateAll(); }}
 		onDelete={() => { invalidateAll(); }}
+	/>
+
+	<!-- Evidence detail view modal (opened by card click) -->
+	<EvidenceViewModal
+		bind:open={showViewModal}
+		evidenceId={viewEvidenceId}
+		onClose={() => {
+			showViewModal = false;
+			viewEvidenceId = null;
+			history.back();
+		}}
+		onEdit={(id) => { crudMode = 'edit'; crudEvidenceId = id; showCrudModal = true; }}
+		onAnalyze={(doc) => { showAiAssistant = true; aiDrawer?.analyzeEvidence(doc); }}
 	/>
 
 	<EvidenceUploadModal
