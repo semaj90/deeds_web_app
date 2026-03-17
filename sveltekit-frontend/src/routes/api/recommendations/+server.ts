@@ -308,14 +308,14 @@ async function fetchRAGCandidates(
  * Falls back to Qdrant filter-only search when Neo4j is unavailable.
  */
 async function fetchGraphCandidates(
-	caseId: string | undefined,
+	id: string | undefined,
 	limit: number
 ): Promise<DocumentCandidate[]> {
-	if (!caseId) return [];
+	if (!id) return [];
 
 	try {
 		// Primary: Neo4j graph walking with real centrality
-		const graphResult = await fetchGraphDocuments(caseId, limit);
+		const graphResult = await fetchGraphDocuments(id, limit);
 
 		if (graphResult.documents.length > 0) {
 			console.log(
@@ -334,10 +334,10 @@ async function fetchGraphCandidates(
 
 		// Fallback: Qdrant filter-only search when Neo4j has no data
 		console.log('[recommendations] Neo4j returned 0 docs, falling back to Qdrant filter');
-		return await fetchGraphCandidatesFromQdrant(caseId, limit);
+		return await fetchGraphCandidatesFromQdrant(id, limit);
 	} catch (err) {
 		console.warn('[recommendations] Graph candidate fetch failed, using Qdrant fallback:', err);
-		return await fetchGraphCandidatesFromQdrant(caseId, limit);
+		return await fetchGraphCandidatesFromQdrant(id, limit);
 	}
 }
 
@@ -346,7 +346,7 @@ async function fetchGraphCandidates(
  * Uses case_id filter to find linked evidence with heuristic centrality.
  */
 async function fetchGraphCandidatesFromQdrant(
-	caseId: string,
+	id: string,
 	limit: number
 ): Promise<DocumentCandidate[]> {
 	try {
@@ -354,7 +354,7 @@ async function fetchGraphCandidatesFromQdrant(
 			query: '',
 			queryEmbedding: new Array(768).fill(0),
 			collection: 'evidence',
-			filters: { case_id: caseId },
+			filters: { case_id: id },
 			limit,
 			scoreThreshold: 0
 		});
@@ -368,7 +368,7 @@ async function fetchGraphCandidatesFromQdrant(
 				embedding: result.payload?.vector || new Array(768).fill(0),
 				tags: (meta?.tags as string[]) ?? [],
 				centrality: 0.5, // Heuristic fallback (lower than hardcoded 0.8 to reflect uncertainty)
-				caseIds: [caseId]
+				caseIds: [id]
 			};
 		});
 	} catch (err) {

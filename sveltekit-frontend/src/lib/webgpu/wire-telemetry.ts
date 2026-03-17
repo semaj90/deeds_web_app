@@ -1,7 +1,14 @@
 // SSR-safe wiring: connect webgpuLegalGraph.onFrame -> captureLatency + batching client
-import type { LatencyEntry } from '$lib/services/latency-logger';
 import webgpuLegalGraph from '$lib/webgpu/webgpu-legal-graph';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+
+interface LatencyEntry {
+    ts: number;
+    latency: number;
+    frameDelta: number;
+    gpuActive: boolean;
+    fallbackMode: boolean;
+    note?: string;
+}
 
 export function wireWebGPUToTelemetry(opts?: { clientUrl?: string }) {
     if (typeof window === 'undefined') return () => {};

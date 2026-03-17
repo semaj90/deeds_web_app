@@ -16,10 +16,7 @@ import UploadZone from "$lib/components/detective/UploadZone.svelte";
 // GPU and message queue services - lazy loaded when available
 const gpuService: any = null;
 const rabbitmqService: any = null;
-import VectorService from "$lib/services/vector-service";
 import { evidenceStore } from "$lib/stores/unified/evidence-store";
-
-const vectorService = new VectorService();
 const EvidenceCardAny = EvidenceCard as any;
 
 // Svelte 5 Runes

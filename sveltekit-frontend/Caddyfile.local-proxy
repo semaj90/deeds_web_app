@@ -8,24 +8,19 @@
 }
 
 localhost:5178 {
-  # Enable HTTP/3 (QUIC)
-  protocols h1 h2 h3
-
   # Health check endpoint (kept before other handlers)
   handle /health {
     respond "OK" 200
   }
 
   # Proxy vector service traffic through Caddy so the frontend can reach it via QUIC.
-  # The upstream address defaults to a local host binding but can be overridden via
-  # VECTOR_BACKEND_URL when starting the container.
   handle_path /vector/* {
-    reverse_proxy {env.VECTOR_BACKEND_URL http://host.docker.internal:8095}
+    reverse_proxy http://host.docker.internal:8095
   }
 
   # Default: proxy application traffic to the SvelteKit dev server.
   handle {
-    reverse_proxy {env.VITE_DEV_SERVER http://host.docker.internal:5173} {
+    reverse_proxy http://host.docker.internal:5173 {
       # Preserve original headers for dev server
       header_up Host {http.request.host}
       header_up X-Forwarded-For {http.request.remote}
@@ -39,8 +34,16 @@ localhost:5178 {
     }
   }
 
-  # Enable compression
-  encode gzip
+  # Security headers
+  header {
+    X-Frame-Options "SAMEORIGIN"
+    X-Content-Type-Options "nosniff"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  }
+
+  # Enable compression (zstd > gzip priority)
+  encode zstd gzip
 
   # Logging
   log {

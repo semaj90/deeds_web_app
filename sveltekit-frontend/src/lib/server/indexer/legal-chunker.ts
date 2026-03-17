@@ -135,7 +135,7 @@ export function chunkLegalDocument(fullText: string, opts?: LegalChunkerOptions)
 
 // ── Section parsing ─────────────────────────────────────────────────────
 
-function parseSections(text: string): LegalSection[] {
+export function parseSections(text: string): LegalSection[] {
 	const lines = text.split('\n');
 	const root: LegalSection[] = [];
 	const stack: LegalSection[] = [];

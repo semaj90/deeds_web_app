@@ -33,6 +33,8 @@
 		{ label: 'EVIDENCE LIBRARY', icon: 'library', href: '/evidence-library' },
 		{ label: 'CITATIONS', icon: 'scroll-text', href: '/citations' },
 		{ label: 'LEGAL CORPUS', icon: 'book-open', href: '/legal-corpus' },
+		{ label: 'LEGAL LIBRARY', icon: 'library-big', href: '/library' },
+		{ label: 'GLOSSARY', icon: 'book-open-text', href: '/library/glossary' },
 		{ label: 'PERSONS OF INTEREST', icon: 'users', href: '/persons-of-interest' },
 		{ label: 'ANALYSIS CENTER', icon: 'search', href: '/analysis-center' },
 		{ label: 'GLOBAL SEARCH', icon: 'scan-search', href: '/global-search' },

@@ -27,7 +27,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		throw error(401, 'Unauthorized');
 	}
 
-	const caseId = url.searchParams.get('caseId');
+	const id = url.searchParams.get('caseId');
 	const threatLevel = url.searchParams.get('threatLevel');
 	const limit = Number(url.searchParams.get('limit')) || 20;
 	const offset = Number(url.searchParams.get('offset')) || 0;
@@ -35,9 +35,9 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	try {
         const filters = [];
 
-        if (caseId) {
-            // Check if caseId is in the caseIds array
-            filters.push(arrayContains(personsOfInterest.caseIds, [caseId]));
+        if (id) {
+            // Check if id is in the caseIds array
+            filters.push(arrayContains(personsOfInterest.caseIds, [id]));
         }
 
         if (threatLevel) {
@@ -84,10 +84,11 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
 		}
 		const body = parsed.data;
+		const id = body.caseId;
 
 		const newPerson = await db.insert(personsOfInterest)
 			.values({
-				caseIds: [body.caseId],
+				caseIds: [id],
 				name: body.name,
 				aliases: body.aliases,
 				description: body.description ?? '',

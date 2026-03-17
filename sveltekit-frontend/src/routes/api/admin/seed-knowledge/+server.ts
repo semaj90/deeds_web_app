@@ -99,6 +99,7 @@ export const POST: RequestHandler = async ({ url }) => {
 				section: statute.section,
 				category: statute.category,
 				sourceUrl: statute.sourceUrl,
+				effectiveDate: statute.effectiveDate ? new Date(statute.effectiveDate) : undefined,
 			}).returning({ id: statutes.id });
 
 			if (inserted) {

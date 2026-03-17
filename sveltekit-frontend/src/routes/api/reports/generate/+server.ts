@@ -25,23 +25,23 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		if (!parsed.success) {
 			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
-		const { caseId, type } = parsed.data;
+		const { caseId: id, type } = parsed.data;
 
 		// Fetch case data
-		const [caseData] = await db.select().from(cases).where(eq(cases.id, caseId)).limit(1);
+		const [caseData] = await db.select().from(cases).where(eq(cases.id, id)).limit(1);
 
 		if (!caseData) {
 			return json({ error: 'Case not found' }, { status: 404 });
 		}
 
 		// Fetch evidence and persons for context
-		const evidenceData = await db.select().from(evidence).where(eq(evidence.caseId, caseId));
+		const evidenceData = await db.select().from(evidence).where(eq(evidence.caseId, id));
 		let personsData: any[] = [];
 		try {
 			personsData = await db
 				.select()
 				.from(personsOfInterest)
-				.where(arrayContains(personsOfInterest.caseIds, [caseId]));
+				.where(arrayContains(personsOfInterest.caseIds, [id]));
 		} catch { /* table may not exist */ }
 
 		// Try AI generation first, fall back to template
@@ -54,7 +54,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			const [row] = await db
 				.insert(reports)
 				.values({
-					caseId,
+					caseId: id,
 					title: `${type === 'charging_memo' ? 'Charging Memo' : 'Report'} - ${caseData.title}`,
 					content: generatedContent.html,
 					metadata: { type, contentJson: generatedContent.json, rawModelOutput: generatedContent.raw },

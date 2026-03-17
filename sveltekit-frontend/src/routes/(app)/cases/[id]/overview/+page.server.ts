@@ -9,11 +9,11 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		throw redirect(302, '/login');
 	}
 
-	const caseId = params.id;
+	const id = params.id;
 	const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
 
 	const caseRows = await safe(
-		db.select().from(cases).where(eq(cases.id, caseId)).limit(1),
+		db.select().from(cases).where(eq(cases.id, id)).limit(1),
 		[]
 	);
 
@@ -22,7 +22,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	if (!caseRow) {
 		return {
 			user: locals.user,
-			caseId,
+			caseId: id,
 			caseData: null,
 			evidence: [],
 			persons: [] as Array<{ id: string; name: string; role: string; riskScore: string; aiSummary: string | null }>,
@@ -32,12 +32,12 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 	const [evidenceRows, personRows] = await Promise.all([
 		safe(
-			db.select().from(evidence).where(eq(evidence.caseId, caseId)).limit(50),
+			db.select().from(evidence).where(eq(evidence.caseId, id)).limit(50),
 			[]
 		),
 		safe(
 			db.select().from(personsOfInterest)
-				.where(arrayContains(personsOfInterest.caseIds, [caseId]))
+				.where(arrayContains(personsOfInterest.caseIds, [id]))
 				.limit(20),
 			[]
 		)
@@ -51,7 +51,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 	return {
 		user: locals.user,
-		caseId,
+		caseId: id,
 		caseData: {
 			id: caseRow.id,
 			title: caseRow.title,

@@ -12,24 +12,24 @@ export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const parsed = caseScoringSchema.safeParse(await request.json());
 		if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
-		const { caseId } = parsed.data;
+		const { caseId: id } = parsed.data;
 
 		const { cases, evidence, personsOfInterest } = await import('$lib/server/db/schema');
 		const { eq, count, sql } = await import('drizzle-orm');
 
-		const [caseRow] = await db.select().from(cases).where(eq(cases.id, caseId)).limit(1);
+		const [caseRow] = await db.select().from(cases).where(eq(cases.id, id)).limit(1);
 		if (!caseRow) return json({ error: 'Case not found' }, { status: 404 });
 
 		const [evidenceCount] = await db
 			.select({ count: count() })
 			.from(evidence)
-			.where(eq(evidence.caseId, caseId));
+			.where(eq(evidence.caseId, id));
 
 		const { arrayContains } = await import('drizzle-orm');
 		const [poiCount] = await db
 			.select({ count: count() })
 			.from(personsOfInterest)
-			.where(arrayContains(personsOfInterest.caseIds, [caseId]));
+			.where(arrayContains(personsOfInterest.caseIds, [id]));
 
 		const evCount = Number(evidenceCount?.count || 0);
 		const persons = Number(poiCount?.count || 0);
@@ -43,7 +43,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const totalScore = Math.min(evidenceScore + witnessScore + documentationScore + statusBonus, 100);
 
 		return json({
-			caseId,
+			caseId: id,
 			caseTitle: caseRow.title,
 			score: totalScore,
 			breakdown: {

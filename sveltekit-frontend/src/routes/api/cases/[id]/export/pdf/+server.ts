@@ -36,10 +36,10 @@ function fmtDate(d: string | Date | null | undefined): string {
  * The user can open the HTML and use browser Print > Save as PDF.
  */
 export const POST: RequestHandler = async ({ params }) => {
-	const caseId = params.id;
+	const id = params.id;
 
 	const caseRows = await safe(
-		db.select().from(cases).where(eq(cases.id, caseId)).limit(1),
+		db.select().from(cases).where(eq(cases.id, id)).limit(1),
 		[]
 	);
 
@@ -53,14 +53,14 @@ export const POST: RequestHandler = async ({ params }) => {
 
 	const [evidenceRows, noteRows, personRows, citationRows] = await Promise.all([
 		safe(
-			db.select().from(evidence).where(eq(evidence.caseId, caseId)).limit(200),
+			db.select().from(evidence).where(eq(evidence.caseId, id)).limit(200),
 			[]
 		),
 		safe(
 			db
 				.select()
 				.from(caseNotes)
-				.where(eq(caseNotes.caseId, caseId))
+				.where(eq(caseNotes.caseId, id))
 				.orderBy(desc(caseNotes.isPinned), desc(caseNotes.updatedAt))
 				.limit(100),
 			[]
@@ -69,7 +69,7 @@ export const POST: RequestHandler = async ({ params }) => {
 			db
 				.select()
 				.from(personsOfInterest)
-				.where(arrayContains(personsOfInterest.caseIds, [caseId]))
+				.where(arrayContains(personsOfInterest.caseIds, [id]))
 				.limit(50),
 			[]
 		),
@@ -86,14 +86,14 @@ export const POST: RequestHandler = async ({ params }) => {
 					isKeyAuthority: sql<boolean>`"citations"."is_key_authority"`,
 				})
 				.from(citations)
-				.where(eq(citations.caseId, caseId))
+				.where(eq(citations.caseId, id))
 				.limit(100),
 			[]
 		)
 	]);
 
 	const title = esc(caseRow.title) || 'Untitled Case';
-	const caseNum = esc(caseRow.caseNumber) || `#${caseId}`;
+	const caseNum = esc(caseRow.caseNumber) || `#${id}`;
 	const now = new Date().toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' });
 	const evRows = evidenceRows.length
 		? evidenceRows

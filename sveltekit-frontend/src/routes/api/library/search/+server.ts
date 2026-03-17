@@ -1,0 +1,157 @@
+/**
+ * GET /api/library/search
+ * Hybrid search: lexical (tsvector FTS) + semantic (pgvector cosine).
+ * Query params: q, jurisdiction?, corpusType?, limit?
+ */
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
+import { pool } from '$lib/server/db/client';
+import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
+
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+
+	const q            = url.searchParams.get('q')?.trim() ?? '';
+	const jurisdiction = url.searchParams.get('jurisdiction');
+	const corpusType   = url.searchParams.get('corpusType');
+	const limit        = Math.min(50, Number(url.searchParams.get('limit') ?? 20));
+
+	if (q.length < 2) return json({ hits: [], total: 0 });
+
+	// Generate query embedding (non-fatal)
+	let queryEmbedding: number[] | null = null;
+	try {
+		queryEmbedding = await generateSingleEmbedding(q.slice(0, 512));
+	} catch {
+		// Lexical-only fallback
+	}
+
+	const filters: string[] = [];
+	const params: unknown[] = [q];
+	let paramIdx = 2;
+
+	if (jurisdiction) {
+		params.push(jurisdiction);
+		filters.push(`j.code = $${paramIdx++}`);
+	}
+	if (corpusType) {
+		params.push(corpusType);
+		filters.push(`ld.corpus_type = $${paramIdx++}::corpus_type`);
+	}
+
+	const whereClause = filters.length ? `AND ${filters.join(' AND ')}` : '';
+
+	if (queryEmbedding) {
+		// Hybrid: lexical rank + cosine, fused with RRF
+		params.push(`[${queryEmbedding.join(',')}]`);
+		const embeddingParam = paramIdx++;
+		params.push(limit * 2); // Fetch more for reranking
+		const fetchParam = paramIdx++;
+
+		const hybridQuery = `
+			WITH lexical AS (
+			  SELECT lc.id AS chunk_id, ln.id AS node_id, ln.document_id,
+			         ld.title, ld.corpus_type, ld.source_type, ld.is_official, ld.official_url,
+			         ln.heading, ln.citation_label, ln.node_path, ln.node_type,
+			         lc.page_start, lc.page_end,
+			         ts_rank(ln.tsv, plainto_tsquery('english', $1)) AS lex_score,
+			         lc.chunk_text AS snippet,
+			         j.code AS jcode, j.name AS jname
+			  FROM legal_chunks lc
+			  JOIN legal_nodes ln ON ln.id = lc.legal_node_id
+			  JOIN library_documents ld ON ld.id = ln.document_id
+			  LEFT JOIN jurisdictions j ON j.id = ld.jurisdiction_id
+			  WHERE ln.tsv @@ plainto_tsquery('english', $1)
+			  ${whereClause}
+			  ORDER BY lex_score DESC LIMIT $${fetchParam}
+			),
+			semantic AS (
+			  SELECT lc.id AS chunk_id, ln.id AS node_id, ln.document_id,
+			         ld.title, ld.corpus_type, ld.source_type, ld.is_official, ld.official_url,
+			         ln.heading, ln.citation_label, ln.node_path, ln.node_type,
+			         lc.page_start, lc.page_end,
+			         1 - (lc.embedding <=> $${embeddingParam}::vector) AS sem_score,
+			         lc.chunk_text AS snippet,
+			         j.code AS jcode, j.name AS jname
+			  FROM legal_chunks lc
+			  JOIN legal_nodes ln ON ln.id = lc.legal_node_id
+			  JOIN library_documents ld ON ld.id = ln.document_id
+			  LEFT JOIN jurisdictions j ON j.id = ld.jurisdiction_id
+			  WHERE lc.embedding IS NOT NULL
+			  ${whereClause}
+			  ORDER BY lc.embedding <=> $${embeddingParam}::vector LIMIT $${fetchParam}
+			),
+			combined AS (
+			  SELECT coalesce(l.chunk_id, s.chunk_id) AS chunk_id,
+			         coalesce(l.node_id, s.node_id) AS node_id,
+			         coalesce(l.document_id, s.document_id) AS document_id,
+			         coalesce(l.title, s.title) AS title,
+			         coalesce(l.citation_label, s.citation_label) AS citation_label,
+			         coalesce(l.heading, s.heading) AS heading,
+			         coalesce(l.node_path, s.node_path) AS node_path,
+			         coalesce(l.node_type, s.node_type) AS node_type,
+			         coalesce(l.corpus_type, s.corpus_type) AS corpus_type,
+			         coalesce(l.source_type, s.source_type) AS source_type,
+			         coalesce(l.is_official, s.is_official) AS is_official,
+			         coalesce(l.official_url, s.official_url) AS official_url,
+			         coalesce(l.page_start, s.page_start) AS page_start,
+			         coalesce(l.page_end, s.page_end) AS page_end,
+			         coalesce(l.snippet, s.snippet) AS snippet,
+			         coalesce(l.jcode, s.jcode) AS jcode,
+			         coalesce(l.jname, s.jname) AS jname,
+			         coalesce(l.lex_score, 0) * 0.4 + coalesce(s.sem_score, 0) * 0.6 AS score
+			  FROM lexical l
+			  FULL OUTER JOIN semantic s USING (chunk_id)
+			)
+			SELECT * FROM combined ORDER BY score DESC LIMIT $${paramIdx}`;
+
+		params.push(limit);
+
+		const res = await pool.query(hybridQuery, params);
+		return json({ hits: res.rows.map(formatHit), total: res.rowCount });
+	} else {
+		// Lexical only
+		params.push(limit);
+		const lexQuery = `
+			SELECT lc.id AS chunk_id, ln.id AS node_id, ln.document_id,
+			       ld.title, ld.corpus_type, ld.source_type, ld.is_official, ld.official_url,
+			       ln.heading, ln.citation_label, ln.node_path, ln.node_type,
+			       lc.page_start, lc.page_end,
+			       ts_rank(ln.tsv, plainto_tsquery('english', $1)) AS score,
+			       lc.chunk_text AS snippet,
+			       j.code AS jcode, j.name AS jname
+			FROM legal_chunks lc
+			JOIN legal_nodes ln ON ln.id = lc.legal_node_id
+			JOIN library_documents ld ON ld.id = ln.document_id
+			LEFT JOIN jurisdictions j ON j.id = ld.jurisdiction_id
+			WHERE ln.tsv @@ plainto_tsquery('english', $1)
+			${whereClause}
+			ORDER BY score DESC
+			LIMIT $${paramIdx}`;
+
+		const res = await pool.query(lexQuery, params);
+		return json({ hits: res.rows.map(formatHit), total: res.rowCount });
+	}
+};
+
+function formatHit(row: Record<string, unknown>) {
+	return {
+		chunkId:      row.chunk_id,
+		documentId:   row.document_id,
+		nodeId:       row.node_id,
+		title:        row.title,
+		citation:     row.citation_label,
+		heading:      row.heading,
+		nodePath:     row.node_path,
+		nodeType:     row.node_type,
+		snippet:      (row.snippet as string)?.slice(0, 400) + ((row.snippet as string)?.length > 400 ? '…' : ''),
+		score:        Number(row.score ?? 0),
+		sourceType:   row.source_type,
+		isOfficial:   row.is_official,
+		officialUrl:  row.official_url,
+		pageStart:    row.page_start,
+		pageEnd:      row.page_end,
+		jurisdiction: { code: row.jcode, name: row.jname },
+		corpusType:   row.corpus_type,
+	};
+}

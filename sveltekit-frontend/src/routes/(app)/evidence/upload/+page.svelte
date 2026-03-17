@@ -11,6 +11,7 @@
 	let currentFileName = $state<string | null>(null);
 	let uploadComplete = $state(false);
 	let completedEvidenceId = $state<string | null>(null);
+	let error = $state<string | null>(null);
 
 	async function uploadFile(file: File) {
 		if (!file) return;
@@ -42,9 +43,11 @@
 
 			// Start SSE progress tracking via component
 			currentJobId = result.jobId;
-		} catch (error) {
-			console.error('[Upload] Error:', error);
+			error = null;
+		} catch (err) {
+			console.error('[Upload] Error:', err);
 			currentJobId = null;
+			error = err instanceof Error ? err.message : 'An unexpected error occurred';
 		}
 	}
 
@@ -119,6 +122,7 @@
 		currentFileName = null;
 		uploadComplete = false;
 		completedEvidenceId = null;
+		error = null;
 		if (fileInput) {
 			fileInput.value = '';
 		}
@@ -156,6 +160,17 @@
 		onchange={handleFileSelect}
 		style="display: none"
 	/>
+
+	{#if error}
+		<div class="error-alert">
+			<div class="error-icon">⚠️</div>
+			<div class="error-content">
+				<strong>Upload Failed</strong>
+				<p>{error}</p>
+			</div>
+			<button class="close-error" onclick={() => { error = null; }}>×</button>
+		</div>
+	{/if}
 
 	{#if currentJobId}
 		<div class="progress-container">
@@ -285,5 +300,46 @@
 
 	.reset-button:hover {
 		background-color: #6b2a2a;
+	}
+
+	.error-alert {
+		margin-top: 1.5rem;
+		padding: 1rem;
+		background-color: #fcecea;
+		border: 1px solid #f5c2bc;
+		border-radius: 6px;
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		position: relative;
+	}
+
+	.error-icon {
+		font-size: 1.5rem;
+	}
+
+	.error-content {
+		flex: 1;
+	}
+
+	.error-content strong {
+		display: block;
+		color: #b91c1c;
+		margin-bottom: 0.25rem;
+	}
+
+	.error-content p {
+		margin: 0;
+		font-size: 0.9rem;
+		color: #7f1d1d;
+	}
+
+	.close-error {
+		background: none;
+		border: none;
+		font-size: 1.5rem;
+		color: #991b1b;
+		cursor: pointer;
+		padding: 0 0.5rem;
 	}
 </style>

@@ -40,3 +40,63 @@ export { savedCitations } from './schema/citations';
 // Analytics events (used by event-logger.ts)
 export { userAnalyticsEvents, type UserAnalyticsEvent, type NewUserAnalyticsEvent } from './schema/analytics';
 
+// === UNIVERSAL LEGAL CORPUS SCHEMA ===
+// Layer 1: Canonical legal structure
+export {
+	jurisdictions, type Jurisdiction, type NewJurisdiction
+} from './schema/jurisdictions';
+export {
+	libraryDocuments, sourceTypeEnum, corpusTypeEnum, processingStatusEnum,
+	type LibraryDocument, type NewLibraryDocument
+} from './schema/library-documents';
+export {
+	libraryDocumentVersions,
+	type LibraryDocumentVersion, type NewLibraryDocumentVersion
+} from './schema/library-document-versions';
+export {
+	legalNodes, legalNodeTypeEnum,
+	type LegalNode, type NewLegalNode
+} from './schema/legal-nodes';
+export {
+	legalDefinitions,
+	type LegalDefinition, type NewLegalDefinition
+} from './schema/legal-definitions';
+export {
+	legalCitations, citationTypeEnum,
+	type LegalCitation, type NewLegalCitation
+} from './schema/legal-citations';
+
+// Layer 2: Retrieval/index
+export {
+	legalChunks,
+	type LegalChunk, type NewLegalChunk
+} from './schema/legal-chunks';
+
+// Pipeline & provenance
+export {
+	pageArtifacts,
+	type PageArtifact, type NewPageArtifact
+} from './schema/page-artifacts';
+export {
+	ingestionJobs,
+	type IngestionJob, type NewIngestionJob
+} from './schema/ingestion-jobs';
+export {
+	stateConstitutionSources,
+	type StateConstitutionSource, type NewStateConstitutionSource
+} from './schema/state-constitution-sources';
+
+// Case ↔ corpus linkage
+export {
+	caseLibraryLinks, caseLinkCategoryEnum,
+	type CaseLibraryLink, type NewCaseLibraryLink
+} from './schema/case-library-links';
+
+// Drizzle relations for all legal corpus tables
+export {
+	jurisdictionsRelations, libraryDocumentsRelations,
+	libraryDocumentVersionsRelations, legalNodesRelations,
+	legalChunksRelations, legalDefinitionsRelations,
+	legalCitationsRelations, pageArtifactsRelations,
+	ingestionJobsRelations, stateConstitutionSourcesRelations
+} from './schema/legal-relations';

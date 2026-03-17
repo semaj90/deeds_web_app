@@ -379,6 +379,11 @@
 			class:card-bottom-left={cardPosition === 'bottom-left'}
 			transition:scale={{ duration: 300, start: 0.9, easing: cubicOut }}
 		>
+			<!-- Close button -->
+			<button class="btn-close" onclick={skipWizard} aria-label="Close tutorial">
+				<Icon name="x" size={16} />
+			</button>
+
 			<!-- Progress bar -->
 			<div class="progress-track">
 				<div class="progress-fill" style="width: {progress}%"></div>
@@ -470,7 +475,7 @@
 			<!-- Navigation -->
 			<div class="wizard-nav">
 				<button class="btn-skip" onclick={skipWizard}>
-					Skip Tutorial
+					Skip
 				</button>
 
 				<div class="nav-buttons">
@@ -557,6 +562,31 @@
 		50% { box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7), 0 0 40px 8px rgba(99, 179, 237, 0.6); }
 	}
 
+	/* Close button */
+	.btn-close {
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		z-index: 10;
+		width: 28px;
+		height: 28px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 6px;
+		color: #718096;
+		cursor: pointer;
+		padding: 0;
+		transition: all 0.15s;
+	}
+
+	.btn-close:hover {
+		background: rgba(255, 255, 255, 0.1);
+		color: #e2e8f0;
+	}
+
 	/* Card */
 	.wizard-card {
 		position: relative;
@@ -609,23 +639,30 @@
 	}
 
 	.step-dot {
-		width: 8px;
-		height: 8px;
+		width: 10px;
+		height: 10px;
 		border-radius: 50%;
-		border: none;
-		background: rgba(255, 255, 255, 0.15);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255, 0.1);
 		cursor: pointer;
 		padding: 0;
 		transition: all 0.2s;
 	}
 
+	.step-dot:hover {
+		background: rgba(255, 255, 255, 0.25);
+	}
+
 	.step-dot.active {
 		background: #63b3ed;
-		transform: scale(1.3);
+		border-color: #63b3ed;
+		transform: scale(1.2);
+		box-shadow: 0 0 8px rgba(99, 179, 237, 0.4);
 	}
 
 	.step-dot.completed {
 		background: #805ad5;
+		border-color: #805ad5;
 	}
 
 	.wizard-content {

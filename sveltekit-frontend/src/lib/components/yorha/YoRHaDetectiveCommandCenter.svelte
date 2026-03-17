@@ -238,22 +238,6 @@
 
   <!-- Main Content -->
   <main class="main-content">
-    <!-- Sidebar -->
-    <aside class="yorha-sidebar">
-      <h2 class="sidebar-title">YORHA DETECTIVE</h2>
-      <nav class="sidebar-nav">
-        {#each navigationItems as item}
-          <button
-            class="sidebar-link {activeTab === item.id ? 'active' : ''}"
-            onclick={() => handleNavigation(item)}
-          >
-            <span class="nav-icon">{item.icon}</span>
-            {item.label}
-          </button>
-        {/each}
-      </nav>
-    </aside>
-
     <!-- Dashboard Content -->
     <div class="dashboard-content">
       <!-- System Metrics -->
@@ -513,7 +497,7 @@
 
   .main-content {
     display: grid;
-    grid-template-columns: 1fr 3fr;
+    grid-template-columns: 1fr;
     gap: 1.5rem;
     max-width: 100%;
 	margin: 0 auto;

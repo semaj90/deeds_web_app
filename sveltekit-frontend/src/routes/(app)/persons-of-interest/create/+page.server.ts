@@ -18,11 +18,11 @@ const poiSchema = z.object({
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const form = await superValidate(zod(poiSchema));
-	const caseId = url.searchParams.get('caseId') || null;
+	const id = url.searchParams.get('caseId') || null;
 
 	return {
 		form,
-		caseId,
+		caseId: id,
 		userId: locals.user?.id ?? null
 	};
 };
@@ -36,7 +36,7 @@ export const actions: Actions = {
     }
 
     try {
-      const caseId = url.searchParams.get('caseId') || null;
+      const id = url.searchParams.get('caseId') || null;
       const aliases = form.data.aliases
         .split(',')
         .map((value) => value.trim())
@@ -56,7 +56,7 @@ export const actions: Actions = {
           status: form.data.status,
           relationship: form.data.relationship || null,
           crimes,
-          caseIds: caseId ? [caseId] : [],
+          caseIds: id ? [id] : [],
           createdBy: locals.user?.id ?? null,
         })
         .returning();

@@ -178,6 +178,52 @@
     isKeyAuthority: boolean;
     documentTitle?: string;
     caseTitle?: string;
+    // Source trust fields (from DB)
+    sourceUrl?: string;
+    jurisdiction?: string;
+    effectiveDate?: string;
+    amendedDate?: string;
+    createdAt?: string;
+  }
+
+  // Corpus / jurisdiction navigation
+  const CORPUS_TABS = [
+    { id: 'all',             label: 'All Sources' },
+    { id: 'statute',         label: 'Statutes' },
+    { id: 'case_law',        label: 'Case Law' },
+    { id: 'regulation',      label: 'Regulations' },
+    { id: 'executive_order', label: 'Exec. Orders' },
+    { id: 'treaty',          label: 'Treaties' },
+    { id: 'glossary',        label: 'Glossary', special: true },
+  ] as const;
+
+  function setCorpusFilter(id: string) {
+    if (id === 'glossary') {
+      showKnowledgeBase = true;
+      citationType = 'all';
+    } else {
+      showKnowledgeBase = false;
+      citationType = id;
+    }
+  }
+
+  function inferJurisdiction(code: string): string {
+    if (!code) return '';
+    if (/^\d+\s+U\.?S\.?C/i.test(code))         return 'Federal';
+    if (/\bCFR\b/i.test(code))                   return 'Fed. Reg.';
+    if (/\bPub\.?\s*L\.?/i.test(code))          return 'Federal';
+    if (/\bF\.\s*(?:2d|3d|4th|Supp)/i.test(code)) return 'Federal';
+    if (/\b(?:Cal\.|CA)\b/i.test(code))          return 'CA';
+    if (/\b(?:N\.?Y\.?|New York)\b/i.test(code)) return 'NY';
+    if (/\b(?:Tex\.|TX)\b/i.test(code))          return 'TX';
+    if (/\b(?:Fla\.|FL)\b/i.test(code))          return 'FL';
+    return '';
+  }
+
+  function formatCitationDate(iso?: string): string {
+    if (!iso) return '';
+    try { return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }); }
+    catch { return ''; }
   }
 
   let citations = $state<Citation[]>([]);
@@ -270,12 +316,21 @@
 </script>
 
 <div class="max-w-6xl mx-auto px-4 py-8">
-  <header class="mb-8 text-center">
-    <h1 class="text-3xl font-bold text-sand mb-2">Citation Library</h1>
-    <p class="text-sand/60 text-sm">Browse and search legal citations across all cases</p>
-    <div class="flex justify-center items-center gap-2 mt-4 flex-wrap">
+  <header class="mb-8">
+    <div class="flex items-start justify-between gap-4 mb-1">
+      <div>
+        <h1 class="text-2xl font-bold text-sand">Legal Corpus</h1>
+        <p class="text-sand/50 text-sm mt-0.5">Statutes · Case Law · Regulations · Treaties · Glossary</p>
+      </div>
+      <div class="text-right text-xs text-sand/30 leading-relaxed">
+        <div>Sources: GovInfo · Cornell LII · Open States</div>
+        <div>Embeddings: pgvector + Qdrant 768-dim</div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 mt-4 flex-wrap">
       <Button onclick={() => viewMode = 'list'}>List View</Button>
       <Button onclick={() => viewMode = 'manager'}>Citation Manager</Button>
+      <Button onclick={() => goto('/citations/law')}>Law Citation Pages</Button>
       <Button onclick={() => (showSaveForm = !showSaveForm)}>{showSaveForm ? 'Hide Save Form' : '+ Save Citation'}</Button>
       <DropdownMenu
         trigger="More Tools"
@@ -283,6 +338,7 @@
           { label: 'GPU Search', onClick: () => { showGpuSearch = !showGpuSearch; } },
           { label: 'Advanced Search', onClick: () => { showAdvancedSearch = !showAdvancedSearch; } },
           { separator: true, label: '' },
+          { label: 'Law Citation Pages', onClick: () => { goto('/citations/law'); } },
           { label: 'Collections', onClick: () => { showCollections = !showCollections; } },
           { label: 'Citation Browser', onClick: () => { showCitationBrowser = !showCitationBrowser; } },
           { label: 'Citation Library', onClick: () => { showLibraryPage = !showLibraryPage; } },
@@ -413,21 +469,7 @@
               <div class="space-y-2">
                 {#each kbResults.statutes as statute (statute.chunkId ?? statute.statuteId)}
                   <div
-                    class="p-3 bg-black/20 rounded border border-sand/10 cursor-pointer hover:border-accent/30 transition"
-                    onclick={() => {
-                      selectedCitation = {
-                        id: statute.statuteId ?? statute.chunkId,
-                        statute_code: statute.section ?? statute.statuteTitle,
-                        statute_title: statute.statuteTitle,
-                        jurisdiction: statute.jurisdiction ?? '',
-                        severity: statute.category ?? 'statute',
-                        source_type: 'auto_extracted' as const,
-                        highlighted_text: statute.content ?? '',
-                        notes: '',
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString(),
-                      };
-                    }}
+                    class="p-3 bg-black/20 rounded border border-sand/10 hover:border-accent/30 transition group"
                   >
                     <div class="flex items-baseline gap-2">
                       <span class="font-medium text-sand text-sm">{statute.statuteTitle}</span>
@@ -440,6 +482,16 @@
                       <span class="text-[10px] text-sand/40">{statute.jurisdiction}</span>
                     {/if}
                     <p class="text-xs text-sand/70 mt-1 line-clamp-2">{statute.content}</p>
+                    <div class="mt-2 flex justify-end">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        class="text-[10px] text-accent hover:bg-accent/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onclick={() => goto(`/library/${statute.docId}/node/${statute.statuteId}`)}
+                      >
+                        View Full Statute →
+                      </Button>
+                    </div>
                   </div>
                 {/each}
               </div>
@@ -516,12 +568,23 @@
     <CitationManager />
   {:else}
 
+  <!-- Corpus / jurisdiction navigation strip -->
+  <div class="flex items-center gap-1.5 mb-4 flex-wrap">
+    {#each CORPUS_TABS as tab}
+      <button
+        class="px-3 py-1.5 rounded-full text-xs font-medium transition-colors border {(tab.id === 'glossary' ? showKnowledgeBase : citationType === tab.id) ? 'bg-accent text-black border-accent' : 'bg-black/30 text-sand/60 border-sand/15 hover:border-accent/40 hover:text-accent'}"
+        onclick={() => setCorpusFilter(tab.id)}
+      >{tab.label}</button>
+    {/each}
+    <span class="ml-auto text-xs text-sand/30 pr-1">{filteredCitations.length} result{filteredCitations.length === 1 ? '' : 's'}</span>
+  </div>
+
   <Card class="mb-6 bg-panel border-black/40">
     <CardContent class="p-4">
       <div class="flex gap-3 items-center flex-wrap">
         <input
           type="text"
-          placeholder="Search citations..."
+          placeholder="Search citations by code, principle, or keyword…"
           bind:value={searchQuery}
           oninput={() => loadCitations()}
           class="flex-1 min-w-48 px-3 py-2 bg-black/30 border border-sand/20 rounded text-sand text-sm placeholder:text-sand/40 focus:border-accent focus:outline-none"
@@ -535,7 +598,6 @@
             <option value={type}>{type === 'all' ? 'All Types' : type.replace('_', ' ')}</option>
           {/each}
         </select>
-        <span class="text-sand/50 text-xs">{filteredCitations.length} results</span>
       </div>
     </CardContent>
   </Card>
@@ -635,14 +697,56 @@
                 <CitationLink text={citation.quotedText} />
               </blockquote>
             {/if}
-            <div class="flex items-center gap-4 mt-3 text-xs text-sand/40">
+            <!-- Source trust metadata row -->
+            <div class="flex items-center gap-2 mt-3 flex-wrap">
+              {#if citation.jurisdiction || inferJurisdiction(citation.formattedCitation)}
+                {@const juris = citation.jurisdiction || inferJurisdiction(citation.formattedCitation)}
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] bg-blue-950/60 text-blue-300 border border-blue-700/30 font-mono">
+                  {juris}
+                </span>
+              {/if}
+              {#if citation.effectiveDate || citation.createdAt}
+                <span class="text-[10px] text-sand/35 border-l border-sand/15 pl-2">
+                  {formatCitationDate(citation.effectiveDate ?? citation.createdAt)}
+                </span>
+              {/if}
               {#if citation.caseTitle}
-                <span>Case: {citation.caseTitle}</span>
+                <span class="text-[10px] text-sand/40">Case: {citation.caseTitle}</span>
               {/if}
-              {#if citation.documentTitle}
-                <span>Doc: {citation.documentTitle}</span>
+              {#if citation.documentTitle && !citation.caseTitle}
+                <span class="text-[10px] text-sand/40">{citation.documentTitle}</span>
               {/if}
-              <span>Relevance: {Math.round(citation.relevanceScore * 100)}%</span>
+              <span class="ml-auto flex items-center gap-1.5">
+                {#if citation.sourceUrl}
+                  <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-green-950/60 text-green-400 border border-green-700/30">✓ Verified</span>
+                {:else}
+                  <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-sand/5 text-sand/30 border border-sand/10">Unverified</span>
+                {/if}
+                <span class="text-[10px] text-sand/30">{Math.round(citation.relevanceScore * 100)}% relevance</span>
+              </span>
+            </div>
+            <!-- Research workflow actions -->
+            <div class="flex items-center gap-1.5 mt-2 flex-wrap" onclick={(e) => e.stopPropagation()}>
+              {#if citation.sourceUrl}
+                <a
+                  href={citation.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="px-2 py-1 rounded text-[10px] text-sand/60 border border-sand/15 hover:border-green-600/50 hover:text-green-400 transition"
+                >View Official Text ↗</a>
+              {/if}
+              <button
+                class="px-2 py-1 rounded text-[10px] text-sand/60 border border-sand/15 hover:border-accent/40 hover:text-accent transition"
+                onclick={() => { kbQuery = citation.formattedCitation; showKnowledgeBase = true; if (kbDebounceTimer) clearTimeout(kbDebounceTimer); kbDebounceTimer = setTimeout(() => searchKnowledgeBase(kbQuery), 100); }}
+              >Show Related Cases</button>
+              <button
+                class="px-2 py-1 rounded text-[10px] text-sand/60 border border-sand/15 hover:border-accent/40 hover:text-accent transition"
+                onclick={() => { kbQuery = citation.formattedCitation; showKnowledgeBase = true; if (kbDebounceTimer) clearTimeout(kbDebounceTimer); kbDebounceTimer = setTimeout(() => searchKnowledgeBase(kbQuery), 100); }}
+              >Glossary Terms</button>
+              <button
+                class="px-2 py-1 rounded text-[10px] text-sand/60 border border-sand/15 hover:border-accent/40 hover:text-accent transition"
+                onclick={() => { citationType = 'regulation'; loadCitations(); }}
+              >Related Regulations</button>
             </div>
             <!-- Tags row -->
             <div class="flex items-center gap-1.5 mt-2 flex-wrap">

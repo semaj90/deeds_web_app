@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
-import { eq, desc, sql } from 'drizzle-orm';
+import { eq, and, desc } from 'drizzle-orm';
 
 /**
  * GET /api/cases/[id]/evidence
@@ -46,4 +46,33 @@ export const GET: RequestHandler = async ({ params }) => {
 		console.error(`[cases/${caseId}/evidence] GET error:`, err);
 		return json({ evidence: [], total: 0 });
 	}
+};
+
+/**
+ * DELETE /api/cases/[id]/evidence
+ * Remove an evidence item from a case (soft: unlinks, hard: deletes row).
+ * Body: { evidenceId: string, hard?: boolean }
+ * Evidence upload goes through /api/evidence/upload (full 9-stage pipeline).
+ */
+export const DELETE: RequestHandler = async ({ params, request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+
+	const caseId = params.id;
+	const body = await request.json();
+	const { evidenceId, hard } = body as { evidenceId: string; hard?: boolean };
+
+	if (!evidenceId) return json({ error: 'evidenceId required' }, { status: 400 });
+
+	if (hard) {
+		await db.delete(evidence).where(
+			and(eq(evidence.id, evidenceId), eq(evidence.caseId, caseId))
+		);
+	} else {
+		// Soft unlink: set caseId to null
+		await db.update(evidence)
+			.set({ caseId: null })
+			.where(and(eq(evidence.id, evidenceId), eq(evidence.caseId, caseId)));
+	}
+
+	return json({ success: true });
 };

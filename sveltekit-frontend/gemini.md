@@ -756,3 +756,25 @@ services
 - Types defined in src/lib/types/pipeline-v2.ts.
 - E2E Test created at tests/e2e/pipeline-happy-path.spec.ts.
 - Clean Services: neural-sprite-autoencoder.ts, png-embed-extractor.ts restored.
+
+---
+
+## 🛡️ Phase 90 Data Safeguards & Migration Protocol
+
+**CRITICAL RULE: NEVER DROP TABLES THAT MIGHT CONTAIN DATA.**
+
+When working with database schemas during Phase 90 and beyond, strict data safety protocols apply:
+
+### 1. Verification Before Modification
+- Run `\d [table_name]` or `SELECT count(*) FROM [table_name]` to check if a table exists and contains data before any schema changes.
+- Check Foreign Key dependencies. Dropping a table with `CASCADE` might destroy connected relationships (`legal_chunks`, `legal_definitions`, etc.).
+
+### 2. Additive Migrations Only (Merge over Drop)
+- **Do not use** `DROP TABLE IF EXISTS ... CASCADE;` on established tables.
+- If a table lacks columns required by a new feature, use `ALTER TABLE ... ADD COLUMN ...` to non-destructively evolve the schema.
+- If existing column names differ from a new design (e.g. `parent_node_id` vs `parent_id`), adapt the application code to use the existing DB schema rather than renaming the column and risking breakage in other microservices.
+
+### 3. Snapshotting
+- Before applying massive schema migrations, take a snapshot of the database state.
+- Keep track of duplicate records using the `phase90-migration-safety.ps1` tools.
+- Run `npm run db:migrate-safe` for controlled executions instead of raw `psql` scripts where possible.

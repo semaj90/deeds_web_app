@@ -32,3 +32,26 @@ export * from './ace-web-crawl.js';
 
 // Analytics (user_analytics_events — used via raw SQL in event-logger.ts)
 export * from './analytics.js';
+
+// === UNIVERSAL LEGAL CORPUS SCHEMA ===
+// Canonical legal structure (Layer 1)
+export * from './jurisdictions.js';
+export * from './library-documents.js';
+export * from './library-document-versions.js';
+export * from './legal-nodes.js';
+export * from './legal-definitions.js';
+export * from './legal-citations.js';
+
+// Retrieval/index layer (Layer 2)
+export * from './legal-chunks.js';
+
+// Pipeline & provenance
+export * from './page-artifacts.js';
+export * from './ingestion-jobs.js';
+export * from './state-constitution-sources.js';
+
+// Case ↔ corpus linkage
+export * from './case-library-links.js';
+
+// Drizzle relations for legal corpus tables
+export * from './legal-relations.js';

@@ -1,28 +1,30 @@
 # Deeds Web App — Codebase Map
-## Last Updated: March 15, 2026 (Verification Audit — corrected counts)
+## Last Updated: March 17, 2026 (Verification Audit — corrected counts, clarified historical status)
 ---
 ## Grand Totals
 | Metric | Count |
 |--------|-------|
-| **Root project directories** | 28 (+ 15 hidden) |
-| **Root project loose files** | 35 (was 2,231 — bulk archived to deeds_labs/) |
-| **SvelteKit src/ files** | 2,447 |
-| **SvelteKit src/ directories** | 831 |
-| **Svelte components (.svelte)** | 744 |
-| **TypeScript files (.ts)** | 1,384 |
-| **Server files (lib/server/*.ts)** | 425 |
-| **Component files (lib/components/*.svelte)** | 544 |
+| **Root project directories** | 26 (+ 15 dotdirs) |
+| **Root project loose files** | 38 (was 2,231 — bulk archived to deeds_labs/) |
+| **SvelteKit src/ files** | 2,115 |
+| **SvelteKit src/ directories** | 754 |
+| **Svelte components (.svelte)** | 678 |
+| **TypeScript files (.ts)** | 1,214 |
+| **Server files (lib/server/*.ts)** | 362 |
+| **Component files (lib/components/*.svelte)** | 541 |
 | **App route groups** | 17 |
-| **Page routes (+page.svelte)** | 110 |
-| **API endpoints (+server.ts)** | 267 |
-| **API route groups** | 77 |
-| **Server subdirectories (lib/server/)** | 81 |
+| **Page routes (+page.svelte)** | 86 |
+| **API endpoints (+server.ts)** | 294 |
+| **API route groups** | 80 |
+| **Server subdirectories (lib/server/)** | 88 |
 | **deeds_labs/ files** | ~80,000 (intentional archive) |
-| **svelte-check** | **0 errors, 0 warnings** |
-| **Playwright** | **20/20 PASS** |
+| **Active compile diagnostics** | **19 import-resolution errors** |
+| **Playwright** | **Last audited: 20/20 PASS** |
 ---
-## Root Project Directory (28 regular + 15 hidden)
-### ESSENTIAL (Active Code)
+## Root Project Directory (26 regular + 15 dotdirs)
+Status note: labels in this inventory describe repository role/classification and were not revalidated as live runtime state during the March 17 audit.
+
+### ESSENTIAL (Primary Code Areas)
 | Directory | Purpose | Status |
 |-----------|---------|--------|
 | `sveltekit-frontend/` | Main SvelteKit 2 + Svelte 5 application | **ACTIVE** |
@@ -34,8 +36,8 @@
 | `proto/` | Protocol Buffer definitions — pbjs/pbts codegen, `proto/active/` has embedding + retrieval | **ACTIVE** |
 | `python/` | `docling_analyze.py` — Docling audio/PDF ASR pipeline (MCP transcribe_audio) | **ACTIVE** |
 | `python-workers/` | FastAPI embedding worker stub | AVAILABLE |
-| `next_steps/` | 18 planning docs (10 CURRENT, 8 DONE) | REFERENCE |
-### INFRASTRUCTURE (Running Services)
+| `next_steps/` | 17 planning/reference docs (current inventory) | REFERENCE |
+### INFRASTRUCTURE (Service Assets)
 | Directory | Purpose | Status |
 |-----------|---------|--------|
 | `neo4j-community-5.23.0/` + `-windows/` | Neo4j graph database binaries | ACTIVE |
@@ -65,14 +67,14 @@
 | ~~`ollama_models/`~~ | ~~Empty~~ | DELETED |
 | ~~`deeds-web-app/`~~ | ~~Nested copy~~ | DELETED |
 ---
-## SvelteKit Frontend (src/ — 2,447 files, 831 dirs)
+## SvelteKit Frontend (src/ — 2,115 files, 754 dirs)
 ### Directory Structure
 ```
 sveltekit-frontend/
 ├── src/
-│   ├── lib/           ← 90+ subdirs (components, server, ai, stores, types, utils...)
+│   ├── lib/           ← 22 top-level dirs, 236 nested subdirs (components, server, ai, stores, types, utils...)
 │   ├── routes/        ← (app)/ pages + api/ endpoints
-│   ├── mcp/           ← FastMCP server (36 tools, stdio)
+│   ├── mcp/           ← FastMCP server (26 listed tools, stdio)
 │   ├── native/        ← Native bridge stubs
 │   ├── proto/         ← Proto definitions for frontend gRPC clients
 │   ├── scripts/       ← Build/utility scripts
@@ -91,8 +93,8 @@ sveltekit-frontend/
 ├── tests/             ← Playwright test specs
 ├── vite-plugins/      ← Custom Vite plugins
 └── public/            ← Public assets
-``
-### Top-Level Dirs (11 — post-cleanup)
+```
+### Top-Level Dirs (11 tracked source dirs — excludes generated/internal folders)
 | Directory | Status |
 |-----------|--------|
 | `docs_readme/` | Reference docs |
@@ -107,7 +109,9 @@ sveltekit-frontend/
 | `tests/` | Playwright specs |
 | `vite-plugins/` | Custom Vite plugins |
 ---
-## App Routes — src/routes/(app)/ (17 groups, 110 pages)
+## App Routes — src/routes/(app)/ (17 groups, 86 pages)
+Status note: `ACTIVE` in this table means the route group is present in `src/routes/(app)`; it does not imply route-level runtime verification.
+
 | Route | Purpose | Status |
 |-------|---------|--------|
 | `active-cases/` | Active case listing | ACTIVE |
@@ -128,29 +132,29 @@ sveltekit-frontend/
 | `system-configuration/` | System config panel | ACTIVE |
 | `terminal/` | 9S AI Chat Interface (voice I/O, streaming) | ACTIVE |
 ---
-## API Routes — src/routes/api/ (77 groups, 267 endpoints)
+## API Routes — src/routes/api/ (80 groups, 294 endpoints)
 ### Core API Groups
 | API Group | Endpoints | Purpose |
 |-----------|-----------|---------|
-| `ai/` | 17 | AI chat, analysis, predictions, scoring, personas, TensorRT, VLM |
-| `cases/` | 14 | Case CRUD + notes + citations + chat + export + similar |
-| `health/` | 13 | Health checks (DB, Redis, Qdrant, Neo4j, Ollama, GPU, OCR, circuit breakers) |
-| `phase89/` | 20 | Legacy phase 89 migration endpoints |
+| `ai/` | 20 | AI chat, analysis, predictions, scoring, personas, TensorRT, VLM |
+| `cases/` | 21 | Case CRUD + notes + citations + chat + export + similar |
+| `health/` | 14 | Health checks (DB, Redis, Qdrant, Neo4j, Ollama, GPU, OCR, circuit breakers) |
+| `phase89/` | 22 | Legacy phase 89 migration endpoints |
 | `routes/` | 9 | Route health SSE + error brain analyses |
 | `codebase-index/` | 8 | Codebase search + indexing + clusters |
-| `evidence/` | 8 | Upload, search, analysis, realtime, audit, GPU analysis, chain of custody |
+| `evidence/` | 18 | Upload, search, analysis, realtime, audit, GPU analysis, chain of custody |
 | `auth/` | 8 | Authentication (login, register, session, debug, health) |
-| `reports/` | 7 | Report generation, export, publish, preview, save |
-| `citations/` | 8 | Citations CRUD, collections, tags, export (JSON/PDF) |
+| `reports/` | 8 | Report generation, export, publish, preview, save |
+| `citations/` | 10 | Citations CRUD, collections, tags, export (JSON/PDF) |
 | `cache/` | 8 | Cache operations, invalidation, metrics, stats, LLM cache |
-| `error-brain/` | 6 | Generate-fix, apply-fix, verify-fix, auto-patch, search, history |
-| `persons-of-interest/` | 7 | POI CRUD, associates, photos, face-match, risk, similar |
+| `error-brain/` | 10 | Generate-fix, apply-fix, verify-fix, auto-patch, search, history |
+| `persons-of-interest/` | 10 | POI CRUD, associates, photos, face-match, risk, similar |
 | `admin/` | 6 | Admin operations, agent fix, knowledge seed |
 | `system/` | 6 | System env, health, phase13/78 patches |
 | `knowledge/` | 5 | Knowledge base queries, search, stats, stream |
-| `analytics/` | 3 | Events, patterns, summary |
+| `analytics/` | 4 | Events, patterns, summary |
 | `rag/` | 4 | Search, validate, answer, enhanced |
-| `graph/` | 4 | Neo4j connections, relationships, sync, timeline |
+| `graph/` | 5 | Neo4j connections, relationships, sync, timeline |
 | `chat/` | 3 | Chat POST, stream, migrate |
 | `gpu/` | 3 | Compute, lease, queue |
 | `sse/` | 2 | SSE streaming (by ID + chat) |
@@ -164,13 +168,13 @@ sveltekit-frontend/
 | `synthesis/` | 1 | ACE synthesis generation |
 | `ace/` | 2 | ACE ingest + summarize |
 | `web/` | 2 | Web crawl + search |
-| 20+ more | 1 each | Various single endpoints |
+| 48 more | Mixed | Additional specialized endpoints |
 ---
-## Server Architecture — src/lib/server/ (81 subdirectories, 425 .ts files)
+## Server Architecture — src/lib/server/ (88 subdirectories, 362 .ts files)
 ### Core Infrastructure
 | Directory | Key Files | Purpose |
 |-----------|-----------|---------|
-| `db/` | `client.ts`, `schema-postgres.ts` (2500+ lines) | Drizzle ORM — 70+ tables, 14 enums |
+| `db/` | `client.ts`, `schema-postgres.ts` (2500+ lines) | Drizzle ORM — 87 tables, 19 enums |
 | `vector/` | `qdrant-manager.ts`, `multi-store.ts`, `pgvector.ts` | Qdrant (9 collections) + pgvector |
 | `queue/` | `rabbitmq-manager-fixed.ts`, `queue-worker.ts` | RabbitMQ — 8 queues, 8 consumers |
 | `cache/` | `invalidation.ts` | Multi-tier cache invalidation |
@@ -230,7 +234,7 @@ sveltekit-frontend/
 | `validation/` | Input validation |
 | `workflows/` | Workflow orchestration |
 ---
-## Client Architecture — src/lib/ (90+ subdirectories)
+## Client Architecture — src/lib/ (22 top-level, 236 nested subdirectories)
 ### Core Client Modules
 | Directory | Key Files | Purpose |
 |-----------|-----------|---------|
@@ -238,13 +242,13 @@ sveltekit-frontend/
 | `gpu/` | `gpu-compute-pipeline.ts` (709L), `gpu-search-reranker.ts` | 3 WGSL shaders, WebGPU compute, search reranking |
 | `models/` | `ChatSession.svelte.ts` (429L) | Central chat hub (local↔server routing) |
 | `machines/` | `retrieval-machine.ts` | XState v5 2-stage retrieval orchestration |
-| `components/` | 544 .svelte files across 38 subdirs | All UI components |
+| `components/` | 541 .svelte files across 39 top-level subdirs | All UI components |
 | `stores/` | `.svelte.ts` stores | Svelte 5 rune-based shared state |
 | `types/` | TypeScript definitions | Type system |
-| `utils/` | `ollama.ts`, `xstate-svelte5.ts`, etc. | Utility functions (12 active, 100% wired) |
+| `utils/` | `ollama.ts`, `xstate-svelte5.ts`, etc. | Utility functions (12 active, current inventory) |
 | `shims/` | Browser compatibility | **MUST preserve** |
 | `services/` | 15 active of 312+ total | **blanket-excluded** (312 corrupted) |
-### Component Subdirectories (38)
+### Component Subdirectories (39)
 | Group | Dirs | Notable |
 |-------|------|---------|
 | **Core UI** | `ui/`, `layout/`, `forms/`, `modals/`, `Dialog/` | Button, Icon, panels, forms |
@@ -257,7 +261,7 @@ sveltekit-frontend/
 ## Key Server Infrastructure Files (35+)
 | File | Lines | Purpose |
 |------|-------|---------|
-| `lib/server/db/schema-postgres.ts` | 2500+ | 70+ tables, 14 enums, evidenceAuditLog, evidenceVersions |
+| `lib/server/db/schema-postgres.ts` | 2500+ | 87 tables, 19 enums, evidenceAuditLog, evidenceVersions |
 | `lib/server/db/client.ts` | ~50 | Primary Drizzle ORM client (canonical import) |
 | `lib/server/vector/qdrant-manager.ts` | 400+ | 9 Qdrant collections, hybrid search |
 | `lib/server/queue/rabbitmq-manager-fixed.ts` | 350+ | 8 queues, 8 consumers |
@@ -292,7 +296,7 @@ sveltekit-frontend/
 | `lib/server/circuit-breaker.ts` | 100+ | Ollama/Qdrant/Redis circuit breakers |
 | `lib/server/env.server.ts` | 100+ | Server environment variables |
 | `src/hooks.server.ts` | 350+ | Request handling, CORS, CSP, auth, COOP/COEP |
-| `src/mcp/server.ts` | 400+ | FastMCP server — 36 tools (cases, evidence, RAG, citations, LangExtract, Playwright) |
+| `src/mcp/server.ts` | 400+ | FastMCP server — 26 listed tools (cases, evidence, RAG, citations, LangExtract, Playwright) |
 ## Key Client Infrastructure Files
 | File | Lines | Purpose |
 |------|-------|---------|
@@ -306,7 +310,7 @@ sveltekit-frontend/
 | `lib/machines/retrieval-machine.ts` | 200+ | XState v5 2-stage retrieval orchestration |
 ---
 ## Storage Layer
-### PostgreSQL (70+ tables)
+### PostgreSQL (87 tables)
 | Group | Tables | Key |
 |-------|--------|-----|
 | Auth | users, sessions | Core auth |
@@ -341,9 +345,9 @@ sveltekit-frontend/
 - Graph centrality computation
 ### RabbitMQ Queues (8)
 `cache.invalidate`, `document.embed`, `evidence.process`, `vector.index`, `chat.context`, `analytics.track`, `codebase.index`, `ace.evaluate`
-### FastMCP Tools (36)
-**Cases (6):** `cases:load`, `cases:create`, `cases:update`, `cases:delete`, `reports:list`, `reports:create`
-**Reports (4):** `reports:generate_from_template`, `reports:update`, `reports:delete`, `reports:export`
+### FastMCP Tools (26 listed in src/mcp/server.ts)
+**Cases (4):** `cases:load`, `cases:create`, `cases:update`, `cases:delete`
+**Reports (6):** `reports:list`, `reports:create`, `reports:generate_from_template`, `reports:update`, `reports:delete`, `reports:export`
 **RAG (2):** `rag:search`, `rag:index_page`
 **Citations (3):** `citations:search`, `citations:list_by_case`, `citations:add_to_case`
 **Evidence (5):** `evidence:analyze`, `evidence:analyze_multimodal`, `evidence:detect_objects`, `evidence:transcribe_gpu`, `evidence:search_similar`
@@ -351,7 +355,9 @@ sveltekit-frontend/
 **LangExtract (4):** `langextract:legal`, `langextract:evidence`, `langextract:file`, `langextract:custom`
 **Browser (1):** `playwright:browser_action`
 ---
-## Infrastructure Wiring (7 Phases — All Complete)
+## Infrastructure Wiring (Documented architecture overview)
+Status note: the diagrams, service states, and completion language in this section are preserved as documented architecture notes and were not live-revalidated during the March 17 audit.
+
 ### 4-Tier Embedding Fallback Chain
 ```
 SvelteKit embedding request
@@ -473,8 +479,10 @@ L4: Service Logic (DB query, Qdrant search, Ollama inference)
 Write back to L0-L3
 ```
 ---
-## Kiro Spec Features — 16/17 at 100%
-| # | Feature | Status |
+## Kiro Spec Features (Historical project-status snapshot)
+Status note: percentages below are carried forward from earlier project tracking and were not mechanically reverified during the March 17 audit.
+
+| # | Feature | Historical Status |
 |---|---------|--------|
 | 1 | Multi-Source Retrieval | **100%** — RAG, KAG, DAG, Wikipedia, Google+DDG, ACE 8-source, 2-stage retrieval |
 | 2 | YoRHa Detective Screens | **100%** — Terminal (25KB, voice), Board (37KB, Kanban), Command Center |
@@ -494,38 +502,37 @@ Write back to L0-L3
 | 16 | Report Caching | **100%** — Redis templates, warmup, export cache |
 | 17 | Cache Infrastructure | **100%** — Multi-tier invalidation, dashboard, Qdrant health |
 ---
-## next_steps/ Status (18 files)
-| File | Status | Summary |
-|------|--------|---------|
-| ACTIVE_DEMOS_LIST.md | DONE | 12 route demos verified |
-| ARCHIVE_GEMS_REVIEW.md | DONE | Archive review complete |
-| CITATION_COLLECTIONS_NEXT_STEPS.md | CURRENT | UI rewiring + superforms |
-| COMPREHENSIVE_ARCHIVE_REVIEW.md | DONE | 5-task deep audit complete |
-| OPTIMIZATION_COMPARISON.md | DONE | Performance benchmarks documented |
-| P3_P4_COMPLETION_PLAN.md | CURRENT | UX polish (search, skeletons, keyboard nav) |
-| P4_ROUTES_PARKED_REVIEW.md | DONE | 588→0 corrupted files archived |
-| PRODUCTION_DEPLOYMENT.md | CURRENT | Pointer compression, monitoring setup |
-| PRODUCTION_OPTIMIZATIONS_COMPLETE.md | DONE | 9 optimizations verified |
-| PRODUCTION_READINESS_ROADMAP.md | CURRENT | 5 critical items: env vars, DB, SSL, health, security |
-| QUICK_START_PRODUCTION.md | DONE | 3 deployment options ready |
-| TENSORRT_VLM_PIPELINE.md | CURRENT | TRT INT4 engine + Triton ensemble |
-| TRT_DIRECTORY_CONSOLIDATION.md | DONE | 102 archived, 17 kept |
-| TRT_ENGINE_BUILD_STEPS.md | CURRENT | Colab→docker→Triton steps |
-| VLM_POI_PHOTOS_WIRING.md | CURRENT | VLM auto-analysis, face embeddings |
-| WEBGPU_DEMO_IMPLEMENTATION.md | DONE | Memory palace 3D implementation |
-| WEBGPU_MEMORY_PALACE_ANALYSIS.md | CURRENT | WebGL→WebGPU upgrade paths |
-| README.md | CURRENT | Index of all docs |
+## next_steps/ Inventory (17 files)
+| File | Notes |
+|------|-------|
+| 00-OVERVIEW.md | Overview index for the current next_steps set |
+| 01-reports-next-steps.md | Reports planning notes |
+| 02-mcp-integration.md | MCP integration planning notes |
+| 03-evidence-improvements.md | Evidence improvement notes |
+| 04-ai-integration.md | AI integration notes |
+| 05-infrastructure.md | Infrastructure notes |
+| 06-database-migrations.md | Database migration notes |
+| 07-ml-training.md | ML training notes |
+| 08-detective-mode-integration.md | Detective mode integration notes |
+| 09-agent-investigate-endpoint.md | Agent-investigate endpoint notes |
+| 10-trtllm-triton-deployment.md | TRT-LLM / Triton deployment notes |
+| 11-wiring-production-quality.md | Production wiring notes |
+| 12-app-wiring-consolidation.md | App wiring consolidation notes |
+| DRIZZLE_SCHEMA_MATCHING.md | Drizzle schema matching reference |
+| SESSION_93r28c_COMPLETE.md | Session completion log |
+| TODO_TRTLLM_TRITON.md | TRT-LLM / Triton todo list |
+| ZOD_SUPERFORMS_BENEFITS.md | Zod and Superforms reference notes |
 ---
-## Sprint Pipeline Status (March 10, 2026)
-### Completed This Session
+## Sprint Pipeline Snapshot (March 10, 2026 historical notes)
+### Reported Completed Work
 - Evidence audit logging (evidenceAuditLog + evidenceVersions tables)
 - GPU analysis API endpoint (GET/POST /api/evidence/[id]/gpu-analysis)
 - Evidence audit trail API (GET /api/evidence/[id]/audit)
 - Background analyzer audit wiring
 - Evidence upload audit wiring
 - SQL migration created (drizzle/manual/20260311_audit_and_versions.sql)
-### Active Plan (silly-squishing-barto.md)
-| Sprint | Focus | Status |
+### Historical Active Plan (silly-squishing-barto.md)
+| Sprint | Focus | Historical Status |
 |--------|-------|--------|
 | Sprint 1 | Critical Fixes (shutdown, VAPID, CORS, timeouts, IORedis shim) | DONE |
 | Sprint 2 | Embedding Consolidation (facade, cache-first, dedup) | DONE |
@@ -534,7 +541,14 @@ Write back to L0-L3
 | Sprint 5 | Evidence Board Interactive Wiring (connections, timeline, undo/redo, zoom) | IN PROGRESS |
 | Sprint 6 | NES Card Grid UI (all-routes blue theme, dashboard nav, demos/nes-routes) | DONE |
 ---
-## Recent Changes (March 11, 2026)
+## Recent Changes
+### March 17, 2026
+| Change | Files |
+|--------|-------|
+| **Citation Search Compatibility Fix**: Normalized both citation search endpoints to use the saved-citation schema and return the response shapes expected by CitationSearch and WysiwygEditor callers | `src/routes/api/citations/search/+server.ts`, `src/routes/api/search/citations/+server.ts` |
+| **Targeted Error Revalidation**: Rechecked the reported Tiptap, case canvas, and case reports problem spots and confirmed no active diagnostics remained in the targeted files after the endpoint fix | `src/lib/components/editor/TiptapWithAIAssistant.svelte`, `src/routes/(app)/cases/[id]/canvas/+page.svelte`, `src/routes/(app)/cases/[id]/reports/+page.svelte` |
+---
+### March 11, 2026
 | Change | Files |
 |--------|-------|
 | **NES Card Grid UI**: Admin all-routes converted from green terminal list to blue NES card-grid with SVG pixel art icons | `admin/all-routes/+page.svelte` |
@@ -544,13 +558,13 @@ Write back to L0-L3
 | **PHASE*.md Audit**: 150+ files audited — 86 complete (57%), 45 in-progress (30%), 19 reference (13%) | Root PHASE*.md files |
 ---
 ## Cleanup Opportunities
-### Root Project (35 loose files — was 2,231, bulk archived)
+### Root Project (38 loose files — was 2,231, bulk archived)
 - Config files (.env, docker-compose, tsconfig, etc.) — all needed
 - Only `onnx/` remains as a potential cleanup target (model files may be redundant with static/ort/)
 ### Empty/Stale Root Dirs
 - 5 of 6 stale dirs already deleted (tensorrt_py310_env, hmm-topic-service, ocr_pipeline, ollama_models, deeds-web-app)
 - Only `onnx/` remains — contains gemma3_270m/ and model.onnx/
-### SvelteKit src/lib/ (90+ subdirs)
+### SvelteKit src/lib/ (22 top-level dirs, 236 nested subdirs)
 - Many single-file directories could be consolidated
 - `lib/services/` — 312 corrupted files blanket-excluded; 15 active files wired
 - `lib/types/` — ~65 of 83 files likely dead (only 9 actively imported)

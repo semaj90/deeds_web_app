@@ -39,6 +39,7 @@
 		{ href: '/system-status', label: 'System Status', description: 'System health dashboard: StatusCards, SystemStatusPanel, SystemOverview', icon: 'activity' },
 		{ href: '/ai-dashboard', label: 'AI Dashboard', description: '35+ AI components: RAG pipeline, ONNX/Ollama chat, source validation, case intake wizard', icon: 'brain' },
 		{ href: '/admin/dev-tools', label: 'Dev Tools', description: 'Cache dashboard, Redis stats, NES memory banks, GPU metrics, embeddings, knowledge base seeder', icon: 'wrench' },
+		{ href: '/legal-corpus', label: 'Legal Corpus', description: 'Statute browser, legal glossary, precedent search — jurisdiction/category filters, pgvector semantic ranking', icon: 'book-open' },
 	];
 </script>
 

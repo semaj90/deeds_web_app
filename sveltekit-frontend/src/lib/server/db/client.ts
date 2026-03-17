@@ -6,7 +6,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { createDrizzleCache } from './drizzle-cache.js';
 
 function getDatabaseUrl(): string {
- return ENV.DATABASE_URL;
+ return 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db'; // Hardcoded bypass for active :5432 db
 }
 
 function getAdminDatabaseUrl(): string {

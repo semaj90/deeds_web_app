@@ -146,6 +146,21 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       strictPort: true,
       host: '0.0.0.0',
+      // Pre-transform frequently imported modules on dev server start
+      warmup: {
+        clientFiles: [
+          'src/lib/components/ui/**/*.svelte',
+          'src/lib/components/layout/**/*.svelte',
+          'src/lib/stores/**/*.svelte.ts',
+          'src/routes/(app)/+layout.svelte',
+        ],
+        ssrFiles: [
+          'src/lib/server/db/client.ts',
+          'src/lib/server/redis.ts',
+          'src/lib/server/cache.ts',
+          'src/lib/server/env.server.ts',
+        ],
+      },
       // Performance: Exclude large binary assets from file watching
       watch: {
         ignored: [

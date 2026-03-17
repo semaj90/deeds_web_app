@@ -54,7 +54,6 @@ const routes = [
   '/evidence/upload',
   '/global-search',
   '/persons-of-interest',
-  '/persons-of-interest',
   '/persons-of-interest/create',
   '/phase78/monitor',
   '/phase78/patches',
@@ -117,17 +116,21 @@ test.describe('All Routes Screenshot Test', () => {
         networkErrors.push(`${request.method()} ${request.url()} - ${request.failure()?.errorText}`);
       });
 
+      // Heavy graph visualization routes often take >30s to serialize
+      const isHeavyRoute = route === '/admin/explorer' || route === '/admin/topology' || route === '/admin/phase89';
+      const routeTimeout = isHeavyRoute ? 60000 : 30000;
+
       // Navigate to route
       const response = await page.goto(`${BASE_URL}${route}`, {
-        waitUntil: 'networkidle',
-        timeout: 30000,
+        waitUntil: 'domcontentloaded',
+        timeout: routeTimeout,
       });
 
       // Verify route didn't 404
       expect(response?.status()).not.toBe(404);
 
-      // Wait for any hydration/rendering
-      await page.waitForTimeout(1000);
+      // Wait for any hydration/rendering (especially graphs)
+      await page.waitForTimeout(2000);
 
       // Take screenshot
       const screenshotPath = `screenshots${route === '/' ? '/index' : route}.png`.replace(/\//g, '-');

@@ -4,20 +4,20 @@ import { desc, eq, arrayContains } from 'drizzle-orm';
 import type { PageServerLoad } from './$types.js';
 
 export const load: PageServerLoad = async ({ url }) => {
-	const caseId = url.searchParams.get('caseId') || null;
+	const id = url.searchParams.get('caseId') || null;
 
 	const safe = <T>(p: Promise<T>, fallback: T, timeoutMs = 5000): Promise<T> =>
 		Promise.race([p, new Promise<T>((resolve) => setTimeout(() => resolve(fallback), timeoutMs))]).catch(() => fallback);
 
 	try {
-		const query = caseId
-			? db.select().from(personsOfInterest).where(arrayContains(personsOfInterest.caseIds, [caseId]))
+		const query = id
+			? db.select().from(personsOfInterest).where(arrayContains(personsOfInterest.caseIds, [id]))
 			: db.select().from(personsOfInterest);
 
 		const pois = await safe(query.orderBy(desc(personsOfInterest.createdAt)).limit(100).$withCache({ config: { ex: 60 } }), []);
 
 		return {
-			caseId,
+			caseId: id,
 			pois: pois.map((p) => ({
 				id: p.id,
 				name: p.name,
