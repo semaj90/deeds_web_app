@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import Skeleton from '$lib/components/ui/Skeleton.svelte';
 	import { analytics } from '$lib/stores/analytics.svelte';
+	import CaseViewModal from '$lib/components/cases/CaseViewModal.svelte';
 	// Migrated to $effect
 	import type { PageProps } from './$types';
 
@@ -14,6 +15,10 @@
 	let priorityFilter = $state('');
 	let searchQuery = $state('');
 	let selectedCases = $state<Set<string>>(new Set());
+
+	// Case detail view modal
+	let viewCaseId = $state<string | null>(null);
+	let showViewModal = $state(false);
 
 	// Bulk action state
 	let bulkStatus = $state<string>('');
@@ -34,7 +39,7 @@
 			window.history.replaceState({},
 	'', '/cases');
 		}
-	
+
 });
 
 	function openNewCase() {
@@ -93,6 +98,11 @@
 			analytics.track('case_created', { message: form.message });
 		}
 	});
+
+	function openCaseDetail(caseId: string) {
+		viewCaseId = caseId;
+		showViewModal = true;
+	}
 
 	async function navigateToCase(caseId: string) {
 		await goto(`/cases/${caseId}`);
@@ -273,7 +283,7 @@
 
 							<!-- Case Header -->
 							<button
-								onclick={() => navigateToCase(caseItem.id)}
+								onclick={() => openCaseDetail(caseItem.id)}
 								class="block w-full text-left"
 							>
 								<h3 class="text-lg font-semibold text-emerald-100 group-hover:text-emerald-300 mb-2 pr-8">
@@ -448,6 +458,14 @@
 		</div>
 	</div>
 {/if}
+
+<!-- Case detail view modal -->
+<CaseViewModal
+	bind:open={showViewModal}
+	caseId={viewCaseId}
+	onClose={() => { showViewModal = false; viewCaseId = null; }}
+	onEdit={(id) => goto(`/cases/${id}?edit=true`)}
+/>
 
 <style>
 	.line-clamp-2 {

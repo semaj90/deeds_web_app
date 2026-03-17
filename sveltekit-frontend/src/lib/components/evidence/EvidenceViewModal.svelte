@@ -221,6 +221,17 @@
 				<div class="modal-footer">
 					<button type="button" class="footer-btn ghost" onclick={close}>Close</button>
 					<div class="footer-actions">
+						{#if fileUrl}
+							<a
+								href={fileUrl}
+								download={doc.fileName ?? doc.file_name ?? true}
+								class="footer-btn secondary"
+								onclick={close}
+							>
+								<Icon name="download" class="w-3.5 h-3.5" />
+								Download
+							</a>
+						{/if}
 						{#if onAnalyze}
 							<button type="button" class="footer-btn secondary" onclick={() => { onAnalyze?.(doc); close(); }}>
 								<Icon name="sparkles" class="w-3.5 h-3.5" />
