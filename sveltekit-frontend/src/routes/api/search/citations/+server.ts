@@ -1,12 +1,12 @@
 /**
  * POST /api/search/citations
  * Caller: WysiwygEditor.svelte
- * Proxies citation search for inline editor linking
+ * Searches user-saved citations and returns the editor result shape.
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
-import { citations } from '$lib/server/db/schema';
+import { savedCitations } from '$lib/server/db/schema';
 import { desc, ilike, or } from 'drizzle-orm';
 import { z } from 'zod';
 
@@ -28,20 +28,38 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	const { query, limit } = parsed.data;
 
 	try {
-		const results = await db.select().from(citations)
-			.where(
-				or(
-					ilike(citations.statuteCode, `%${query}%`),
-					ilike(citations.statuteTitle, `%${query}%`),
-					ilike(citations.highlightedText, `%${query}%`)
-				)
-			)
-			.orderBy(desc(citations.createdAt))
-			.limit(limit);
+		const results = await db
+      .select()
+      .from(savedCitations)
+      .where(
+        or(
+          ilike(savedCitations.statuteCode, `%${query}%`),
+          ilike(savedCitations.statuteTitle, `%${query}%`),
+          ilike(savedCitations.highlightedText, `%${query}%`),
+          ilike(savedCitations.notes, `%${query}%`)
+        )
+      )
+      .orderBy(desc(savedCitations.createdAt))
+      .limit(limit);
 
-		return json({ success: true, citations: results });
+		const normalizedResults = results.map((citation) => ({
+      id: citation.id,
+      title: citation.statuteTitle ?? citation.statuteCode,
+      citation: citation.highlightedText ?? citation.notes ?? citation.statuteCode,
+      similarity: 1,
+      metadata: {
+        statuteCode: citation.statuteCode,
+        jurisdiction: citation.jurisdiction ?? undefined,
+        severity: citation.severity ?? undefined,
+        year: citation.year ?? undefined,
+        sourceType: citation.sourceType,
+        notes: citation.notes ?? undefined,
+      },
+    }));
+
+    return json({ success: true, results: normalizedResults, citations: normalizedResults });
 	} catch (err) {
 		console.error('[search/citations] Failed:', err);
-		return json({ success: false, error: 'Citation search failed', citations: [] });
+		return json({ success: false, error: 'Citation search failed', results: [], citations: [] });
 	}
 };

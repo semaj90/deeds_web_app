@@ -22,7 +22,7 @@ async function hasCaseStatuteLinksTable(): Promise<boolean> {
     const firstRow = Array.isArray(result)
       ? result[0]
       : ((result as { rows?: Array<Record<string, unknown>> }).rows?.[0] ??
-        (result as Array<Record<string, unknown>>)[0]);
+        (result as unknown as Array<Record<string, unknown>>)[0]);
     const existsValue = (firstRow as { exists?: unknown } | undefined)?.exists;
 
     return (

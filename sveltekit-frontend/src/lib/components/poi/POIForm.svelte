@@ -1,5 +1,5 @@
 <script lang="ts">
-  import superForm from 'sveltekit-superforms';
+  import { superForm } from 'sveltekit-superforms/client';
   import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
   import { z } from 'zod';
 

@@ -76,10 +76,10 @@ $effect(() => {
 
 // Sync initialContent changes into existing editor instance
 $effect(() => {
-	if (editor && initialContent !== undefined) {
+	if (editor && initialContent != null) {
 		const currentHtml = editor.getHTML();
 		if (initialContent !== currentHtml) {
-			editor.commands.setContent(initialContent, false);
+			editor.commands.setContent(initialContent as string, { emitUpdate: false });
 		}
 	}
 });

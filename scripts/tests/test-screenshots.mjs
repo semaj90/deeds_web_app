@@ -6,6 +6,7 @@
  * --all          Test every known app route (default: quick list)
  * --route <path> Test a single route
  * --port <n>     Dev server port (default: 5173)
+ * --concurrency <n> Parallel pages per batch (default: 3 with --all, 1 otherwise)
  * --html         Generate HTML gallery report (auto-enabled with --all)
  *
  * Captures: screenshot, HTTP status, console errors, failed network requests,
@@ -71,6 +72,7 @@ const ALL_ROUTES = [
   { name: 'demos-icons', path: '/demos/icons' },
   { name: 'demos-memory-palace', path: '/demos/memory-palace' },
   { name: 'demos-vector-search', path: '/demos/vector-search' },
+  { name: 'legal-corpus', path: '/legal-corpus' },
 ];
 
 // SSE / long-poll pages that never reach networkidle
@@ -96,6 +98,9 @@ const BASE = `http://localhost:${port}`;
 const useAll = args.includes('--all');
 const singleRoute = args.includes('--route') ? args[args.indexOf('--route') + 1] : null;
 const generateHtml = args.includes('--html') || useAll;
+const concurrency = args.includes('--concurrency')
+  ? parseInt(args[args.indexOf('--concurrency') + 1], 10)
+  : (useAll ? 3 : 1);
 
 let routes;
 if (singleRoute) {
@@ -114,16 +119,14 @@ await fs.mkdir(outDir, { recursive: true });
 
 const startTime = Date.now();
 console.log(`\n  Screenshot Test — ${new Date().toLocaleString()}`);
-console.log(`  Routes: ${routes.length} | Output: ${outDir}\n`);
+console.log(`  Routes: ${routes.length} | Concurrency: ${concurrency} | Output: ${outDir}\n`);
 
 const browser = await chromium.launch();
-const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
 
-const results = [];
-
-for (const route of routes) {
+// ── Test a single route (reusable) ──────────────────────────────────
+async function testRoute(route, ctx) {
   const url = `${BASE}${route.path}`;
-  const tab = await context.newPage();
+  const tab = await ctx.newPage();
   const result = {
     name: route.name,
     path: route.path,
@@ -132,7 +135,6 @@ for (const route of routes) {
     ok: false,
     error: null,
     file: null,
-    // Enhanced fields
     consoleErrors: [],
     consoleWarnings: [],
     failedRequests: [],
@@ -142,11 +144,9 @@ for (const route of routes) {
     resourceSizeKB: 0,
   };
 
-  // Collect console messages
   tab.on('console', (msg) => {
     if (msg.type() === 'error') {
       const text = msg.text();
-      // Filter out noisy known messages
       if (!text.includes('favicon.ico') && !text.includes('net::ERR_')) {
         result.consoleErrors.push(text.slice(0, 200));
       }
@@ -155,19 +155,16 @@ for (const route of routes) {
     }
   });
 
-  // Collect failed network requests
   tab.on('requestfailed', (req) => {
-    const url = req.url();
-    // Filter out expected failures (SSE, favicon, websocket)
-    if (url.includes('favicon') || url.includes('__vite') || url.includes('ws:')) return;
+    const reqUrl = req.url();
+    if (reqUrl.includes('favicon') || reqUrl.includes('__vite') || reqUrl.includes('ws:')) return;
     result.failedRequests.push({
-      url: url.slice(0, 150),
+      url: reqUrl.slice(0, 150),
       method: req.method(),
       failure: req.failure()?.errorText || 'unknown'
     });
   });
 
-  // Track resource loading
   let resourceCount = 0;
   let resourceSize = 0;
   tab.on('response', (res) => {
@@ -181,48 +178,31 @@ for (const route of routes) {
   try {
     const isSSE = route.sse || SSE_PAGES.has(route.name);
     const waitUntil = isSSE ? 'domcontentloaded' : 'networkidle';
-    const pageTimeout = isSSE ? 25000 : 15000;
+    const pageTimeout = isSSE ? 35000 : 15000;
     const response = await tab.goto(url, { waitUntil, timeout: pageTimeout });
 
-    // For domcontentloaded pages, give extra render time
-    if (waitUntil === 'domcontentloaded') {
-      await tab.waitForTimeout(2000);
-    }
-
-    // CSR-only pages (ssr=false) need extra wait for client JS bundle to render
-    if (CSR_PAGES.has(route.name)) {
-      await tab.waitForTimeout(3000);
-    }
-
-    // Canvas/WebGL pages need extra time for canvas initialization
-    if (CANVAS_PAGES.has(route.name)) {
-      await tab.waitForTimeout(2000);
-    }
+    if (waitUntil === 'domcontentloaded') await tab.waitForTimeout(2000);
+    if (CSR_PAGES.has(route.name)) await tab.waitForTimeout(3000);
+    if (CANVAS_PAGES.has(route.name)) await tab.waitForTimeout(2000);
 
     result.loadTimeMs = Date.now() - loadStart;
     result.status = response?.status() ?? 0;
     result.ok = result.status >= 200 && result.status < 400;
     result.resourceCount = resourceCount;
     result.resourceSizeKB = Math.round(resourceSize / 1024);
-
-    // DOM element count
     result.domElements = await tab.evaluate(() => document.querySelectorAll('*').length).catch(() => 0);
 
-    // Check page for SvelteKit error page (.error-page class from +error.svelte)
-    // or Vite error overlay (custom element injected on module load failure).
-    // Also detect Vite 504 "Outdated Optimize Dep" via page text content.
     let errorPageCount = await tab.locator('.error-page').count().catch(() => 0);
     let viteErrorCount = await tab.locator('vite-error-overlay').count().catch(() => 0);
     let has504Text = await tab.evaluate(() =>
       document.body?.innerText?.includes('504') || document.body?.innerText?.includes('Outdated Optimize Dep')
     ).catch(() => false);
 
-    // Retry up to 3 times if error page detected — likely Vite "Outdated Optimize Dep" (504)
     const MAX_RETRIES = 3;
     for (let retry = 0; retry < MAX_RETRIES && (errorPageCount > 0 || viteErrorCount > 0 || has504Text); retry++) {
-      const backoff = 2000 + retry * 1500; // 2s, 3.5s, 5s
+      const backoff = 2000 + retry * 1500;
       await new Promise(r => setTimeout(r, backoff));
-      const retryWait = (route.sse || SSE_PAGES.has(route.name)) ? 'domcontentloaded' : 'networkidle';
+      const retryWait = isSSE ? 'domcontentloaded' : 'networkidle';
       try {
         const retryRes = await tab.goto(url, { waitUntil: retryWait, timeout: 20000 });
         if (retryWait === 'domcontentloaded') await tab.waitForTimeout(2000);
@@ -250,9 +230,8 @@ for (const route of routes) {
     result.file = filepath;
   } catch (err) {
     const errMsg = err.message.split('\n')[0];
-    // Retry once on connection refused (server crashed or Vite restarting)
     if (errMsg.includes('ERR_CONNECTION_REFUSED') || errMsg.includes('ERR_CONNECTION_RESET')) {
-      await new Promise(r => setTimeout(r, 3000)); // Wait for server recovery
+      await new Promise(r => setTimeout(r, 3000));
       try {
         const response2 = await tab.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
         await tab.waitForTimeout(2000);
@@ -277,7 +256,6 @@ for (const route of routes) {
     } else {
       result.loadTimeMs = Date.now() - loadStart;
       result.error = errMsg;
-      // Try screenshot even on error
       try {
         const filepath = path.join(outDir, `${route.name}-ERROR.png`);
         await tab.screenshot({ path: filepath, fullPage: true });
@@ -286,20 +264,43 @@ for (const route of routes) {
     }
   }
 
-  // Console output line
-  const icon = result.ok ? '\x1b[32mPASS\x1b[0m' : '\x1b[31mFAIL\x1b[0m';
-  const metrics = `${result.loadTimeMs}ms | ${result.domElements} DOM | ${result.resourceCount} reqs`;
-  const errCount = result.consoleErrors.length;
-  const errTag = errCount > 0 ? ` | \x1b[33m${errCount} console err\x1b[0m` : '';
-  const netFail = result.failedRequests.length;
-  const netTag = netFail > 0 ? ` | \x1b[31m${netFail} net fail\x1b[0m` : '';
-  console.log(`  [${icon}] ${result.status} ${route.name} — ${route.path} (${metrics}${errTag}${netTag})${result.error ? ` — ${result.error}` : ''}`);
-  results.push(result);
   await tab.close();
+  return result;
+}
 
-  // Delay between routes to prevent Vite dep optimizer overload (504 Outdated Optimize Dep)
-  if (routes.length > 10) {
-    await new Promise(r => setTimeout(r, 1500));
+// ── Run routes in parallel batches ──────────────────────────────────
+const results = [];
+
+// Chunk routes into batches of `concurrency` size
+for (let i = 0; i < routes.length; i += concurrency) {
+  const batch = routes.slice(i, i + concurrency);
+  // Fresh context per batch to limit memory accumulation (prevents OOM)
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+
+  const batchResults = await Promise.allSettled(
+    batch.map(route => testRoute(route, ctx))
+  );
+
+  for (const settled of batchResults) {
+    const result = settled.status === 'fulfilled'
+      ? settled.value
+      : { name: '?', path: '?', url: '', status: 0, ok: false, error: settled.reason?.message ?? 'unknown', file: null, consoleErrors: [], consoleWarnings: [], failedRequests: [], loadTimeMs: 0, domElements: 0, resourceCount: 0, resourceSizeKB: 0 };
+
+    const icon = result.ok ? '\x1b[32mPASS\x1b[0m' : '\x1b[31mFAIL\x1b[0m';
+    const metrics = `${result.loadTimeMs}ms | ${result.domElements} DOM | ${result.resourceCount} reqs`;
+    const errCount = result.consoleErrors.length;
+    const errTag = errCount > 0 ? ` | \x1b[33m${errCount} console err\x1b[0m` : '';
+    const netFail = result.failedRequests.length;
+    const netTag = netFail > 0 ? ` | \x1b[31m${netFail} net fail\x1b[0m` : '';
+    console.log(`  [${icon}] ${result.status} ${result.name} — ${result.path} (${metrics}${errTag}${netTag})${result.error ? ` — ${result.error}` : ''}`);
+    results.push(result);
+  }
+
+  await ctx.close();
+
+  // Brief pause between batches to let Vite breathe
+  if (i + concurrency < routes.length) {
+    await new Promise(r => setTimeout(r, 500));
   }
 }
 

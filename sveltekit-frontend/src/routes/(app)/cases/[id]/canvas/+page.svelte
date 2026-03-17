@@ -1,5 +1,5 @@
 <script lang="ts">
-	const { data } = $props();
+	const { data }: { data: any } = $props();
 	const caseData = $derived(data?.caseData);
 	const evidence = $derived(data?.evidence);
 </script>

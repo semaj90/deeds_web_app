@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { browser } from '$app/environment';
 
@@ -32,6 +32,7 @@
 		{ label: 'EVIDENCE', icon: 'fingerprint', href: '/evidence' },
 		{ label: 'EVIDENCE LIBRARY', icon: 'library', href: '/evidence-library' },
 		{ label: 'CITATIONS', icon: 'scroll-text', href: '/citations' },
+		{ label: 'LEGAL CORPUS', icon: 'book-open', href: '/legal-corpus' },
 		{ label: 'PERSONS OF INTEREST', icon: 'users', href: '/persons-of-interest' },
 		{ label: 'ANALYSIS CENTER', icon: 'search', href: '/analysis-center' },
 		{ label: 'GLOBAL SEARCH', icon: 'scan-search', href: '/global-search' },
@@ -54,7 +55,7 @@
 	];
 
 	function isActive(href: string): boolean {
-		return $page.url.pathname === href || $page.url.pathname.startsWith(href + '/');
+		return page.url.pathname === href || page.url.pathname.startsWith(href + '/');
 	}
 
 	// Persist collapse state
@@ -148,14 +149,14 @@
 		top: 0;
 		bottom: 0;
 		width: 210px;
-		background: #b8b5a8;
-		border-right: 2px solid #000;
+		background: #1e1f26;
+		border-right: 1px solid rgba(255, 255, 255, 0.08);
 		display: flex;
 		flex-direction: column;
 		z-index: 1000;
 		transition: width 0.3s ease;
 		font-family: 'JetBrains Mono', monospace;
-		color: #000;
+		color: #c8c8d0;
 	}
 
 	.yorha-sidebar.collapsed {
@@ -165,7 +166,7 @@
 	/* Header */
 	.sidebar-header {
 		padding: 1.5rem 1rem;
-		border-bottom: 2px solid #000;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 		position: relative;
 	}
 
@@ -201,17 +202,19 @@
 		right: 0.5rem;
 		width: 24px;
 		height: 24px;
-		border: 1px solid #000;
+		border: 1px solid rgba(255, 255, 255, 0.15);
 		background: transparent;
+		color: #c8c8d0;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		transition: background 0.2s;
+		padding: 0;
 	}
 
 	.collapse-btn:hover {
-		background: rgba(0, 0, 0, 0.1);
+		background: rgba(255, 255, 255, 0.08);
 	}
 
 	/* Navigation */
@@ -227,36 +230,39 @@
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
-		padding: 0.75rem 1rem;
-		margin: 0.125rem 0.5rem;
+		padding: 0.5rem 0.75rem;
+		margin: 1px 0.5rem;
 		text-decoration: none;
-		color: #000;
-		font-size: 0.75rem;
+		color: #a0a0b0;
+		font-size: 0.6875rem;
 		font-weight: 500;
 		letter-spacing: 0.05em;
 		text-transform: uppercase;
 		border: 1px solid transparent;
-		transition: all 0.2s;
+		border-radius: 4px;
+		transition: all 0.15s;
 		position: relative;
 	}
 
 	.collapsed .nav-item {
 		justify-content: center;
-		padding: 0.75rem 0.5rem;
+		padding: 0.6rem 0.5rem;
 	}
 
 	.nav-item:hover {
-		background: rgba(0, 0, 0, 0.05);
-		border-color: #000;
+		background: rgba(255, 255, 255, 0.06);
+		color: #e0e0e8;
+		border-color: rgba(255, 255, 255, 0.08);
 	}
 
 	.nav-item.active {
-		background: rgba(0, 0, 0, 0.1);
-		border-color: #000;
+		background: rgba(74, 222, 128, 0.1);
+		color: #4ade80;
+		border-color: rgba(74, 222, 128, 0.2);
 	}
 
 	.admin-item {
-		opacity: 0.7;
+		opacity: 0.6;
 	}
 
 	.admin-item:hover,
@@ -277,22 +283,22 @@
 	.section-divider {
 		padding: 0.5rem 1rem;
 		margin-top: 0.5rem;
-		border-top: 1px solid rgba(0, 0, 0, 0.15);
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
 	}
 
 	.section-label {
-		font-size: 0.625rem;
+		font-size: 0.5625rem;
 		font-weight: 700;
-		opacity: 0.5;
+		color: #666;
 		letter-spacing: 0.1em;
 	}
 
 	/* Footer */
 	.sidebar-footer {
 		padding: 1rem;
-		border-top: 2px solid #000;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
 		font-size: 0.625rem;
-		opacity: 0.8;
+		opacity: 0.7;
 	}
 
 	.status-indicator {
@@ -332,15 +338,15 @@
 	}
 
 	.sidebar-nav::-webkit-scrollbar-track {
-		background: rgba(0, 0, 0, 0.05);
+		background: rgba(255, 255, 255, 0.02);
 	}
 
 	.sidebar-nav::-webkit-scrollbar-thumb {
-		background: rgba(0, 0, 0, 0.2);
+		background: rgba(255, 255, 255, 0.1);
 		border-radius: 2px;
 	}
 
 	.sidebar-nav::-webkit-scrollbar-thumb:hover {
-		background: rgba(0, 0, 0, 0.3);
+		background: rgba(255, 255, 255, 0.2);
 	}
 </style>

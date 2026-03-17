@@ -2,12 +2,187 @@
   "version": "2.0.0",
   "tasks": [
     // ============================================
+    // Core Development Workflow
+    // ============================================
+    {
+      "label": "Dev Server",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "isBackground": true,
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": {
+          "regexp": "^([^\\s].*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "severity": 4,
+          "message": 5
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "ready in"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "Svelte Check",
+      "type": "shell",
+      "command": "npx svelte-kit sync && npx svelte-check --threshold error --tsconfig ./tsconfig.json",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "problemMatcher": ["$tsc"],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "Vite Build",
+      "type": "shell",
+      "command": "npx vite build",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "problemMatcher": ["$tsc"],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "Screenshot Test (Quick)",
+      "type": "shell",
+      "command": "node scripts/tests/test-screenshots.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "Screenshot Test (All Routes)",
+      "type": "shell",
+      "command": "node scripts/tests/test-screenshots.mjs --all",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "Screenshot Test (Single Route)",
+      "type": "shell",
+      "command": "node scripts/tests/test-screenshots.mjs --route ${input:screenshotRoute}",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "MSYS_NO_PATHCONV": "1"
+        }
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "Docker Services Up",
+      "type": "shell",
+      "command": "docker start deeds-postgres-prod deeds-redis-prod deeds-qdrant-prod phase66-minio phase66-rabbitmq phase66-couchdb",
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "Docker Services Status",
+      "type": "shell",
+      "command": "docker ps --format \"table {{.Names}}\\t{{.Status}}\\t{{.Ports}}\"",
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "DB Migrate",
+      "type": "shell",
+      "command": "npx drizzle-kit migrate",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    // ============================================
     // Phase 14: Legacy Tasks (Keep for compatibility)
     // ============================================
     {
       "label": "Phase 14: Apply env + Phase 6 core check",
       "type": "shell",
-      "command": "Copy-Item ../.env.phase14 ./.env -Force; npm run phase6:core",
+        "command": "Copy-Item .env.phase14 ./.env -Force; npm run phase6:core",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -25,7 +200,7 @@
     {
       "label": "Dev: QUIC (Phase 14 env)",
       "type": "shell",
-      "command": "Copy-Item ../.env.phase14 ./.env -Force; npm run dev:quic",
+        "command": "Copy-Item .env.phase14 ./.env -Force; docker start phase66-postgres phase66-redis phase66-minio phase66-qdrant; $env:VITE_DEV_SERVER='http://host.docker.internal:5173'; $env:QUIC_ENABLED='true'; npm run caddy:start; $env:DEV_BYPASS_AUTH='true'; node scripts/phase72-dev-wrapper.mjs",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -1031,6 +1206,12 @@
     }
   ],
   "inputs": [
+    {
+      "id": "screenshotRoute",
+      "type": "promptString",
+      "description": "Route path to screenshot (e.g., /evidence, /legal-corpus, /cases)",
+      "default": "/dashboard"
+    },
     {
       "id": "aceTask",
       "type": "promptString",

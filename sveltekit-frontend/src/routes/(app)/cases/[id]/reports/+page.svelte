@@ -217,7 +217,7 @@
 							{report.title ?? 'Untitled report'}
 						</span>
 						<span class="text-xs text-neutral-400">
-							{(report.type ?? report.metadata?.reportType ?? report.status ?? 'Draft').replace('_', ' ')} &bull; Updated {formatDate(report.updatedAt)}
+							{(report.type ?? (report.metadata as any)?.reportType ?? report.status ?? 'Draft').replace('_', ' ')} &bull; Updated {formatDate(String(report.updatedAt ?? report.createdAt ?? ''))}
 						</span>
 					</div>
 					<span class="text-[10px] tracking-[0.25em] uppercase text-amber-300">
