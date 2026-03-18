@@ -9,14 +9,15 @@ import { getGraphContext } from '$lib/server/retrieval/graph-context.js';
 import { lookupCachedResponse, storeCachedResponse } from '$lib/server/ai/llm-cache.js';
 import { getFragment, setFragment, getGlyphCacheMetrics, FragmentType } from '$lib/server/glyph-prompt-cache.js';
 import { createHash } from 'crypto';
+import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { z } from 'zod';
 
 const sseChatSchema = z.object({
-	message: z.string().min(1, 'Message is required').max(50000),
-	model: z.string().max(100).optional(),
-	conversationId: z.string().min(1, 'Missing conversationId').max(200),
-	emotionPrompt: z.string().max(5000).optional(),
-	emotionMood: z.string().max(100).optional()
+  message: z.string().min(1, 'Message is required').max(50000),
+  model: z.string().max(100).optional(),
+  conversationId: z.string().min(1, 'Missing conversationId').max(200),
+  emotionPrompt: z.string().max(5000).optional(),
+  emotionMood: z.string().max(100).optional(),
 });
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
@@ -32,7 +33,7 @@ const RAG_MAX_CHUNKS = 5;
 
 // Qdrant uses cosine distance — score is already 0..1 similarity.
 // For cosine with embeddinggemma, useful hits typically score > 0.30.
-const RAG_SCORE_THRESHOLD = 0.30;
+const RAG_SCORE_THRESHOLD = 0.3;
 
 // Conversation memory: load last N messages for multi-turn context
 const CONVERSATION_HISTORY_LIMIT = 10;
@@ -41,19 +42,19 @@ const CONVERSATION_HISTORY_LIMIT = 10;
 const CASE_ID_PATTERN = /^case-([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
 
 interface ContextDoc {
-	content: string;
-	similarity: number;
-	documentId: string;
-	model?: string;
+  content: string;
+  similarity: number;
+  documentId: string;
+  model?: string;
 }
 
 interface ConfidenceFactors {
-	caseContext: boolean;
-	ragHits: number;
-	topScore: number | null;
-	embeddingModel: string;
-	codebaseHits: number;
-	kagNeighbors: number;
+  caseContext: boolean;
+  ragHits: number;
+  topScore: number | null;
+  embeddingModel: string;
+  codebaseHits: number;
+  kagNeighbors: number;
 }
 
 /**
@@ -62,122 +63,120 @@ interface ConfidenceFactors {
  * Respects CASE_CONTEXT_MAX_CHARS budget.
  */
 async function loadCaseContext(caseId: string): Promise<string | null> {
-	try {
-		const { cases } = await import('$lib/server/db/schema');
+  try {
+    const { cases } = await import('$lib/server/db/schema');
 
-		const caseRows = await db
-			.select()
-			.from(cases)
-			.where(eq(cases.id, caseId))
-			.limit(1);
+    const caseRows = await db.select().from(cases).where(eq(cases.id, caseId)).limit(1);
 
-		if (!caseRows.length) return null;
+    if (!caseRows.length) return null;
 
-		const c = caseRows[0];
-		let context = `## Active Case Context\n`;
-		context += `- **Title**: ${c.title}\n`;
-		if (c.caseNumber) context += `- **Case #**: ${c.caseNumber}\n`;
-		if (c.jurisdiction) context += `- **Jurisdiction**: ${c.jurisdiction}\n`;
-		if (c.court) context += `- **Court**: ${c.court}\n`;
-		if (c.status) context += `- **Status**: ${c.status}\n`;
-		if (c.description) context += `- **Description**: ${c.description}\n`;
+    const c = caseRows[0];
+    let context = `## Active Case Context\n`;
+    context += `- **Title**: ${c.title}\n`;
+    if (c.caseNumber) context += `- **Case #**: ${c.caseNumber}\n`;
+    if (c.jurisdiction) context += `- **Jurisdiction**: ${c.jurisdiction}\n`;
+    if (c.court) context += `- **Court**: ${c.court}\n`;
+    if (c.status) context += `- **Status**: ${c.status}\n`;
+    if (c.description) context += `- **Description**: ${c.description}\n`;
 
-		// Load recent evidence with metadata (type, forensic flags, entities)
-		try {
-			const evidenceResult = await db.execute(
-				sql`SELECT title, evidence_type, file_type, file_size, metadata
+    // Load recent evidence with metadata (type, forensic flags, entities)
+    try {
+      const evidenceResult = await db.execute(
+        sql`SELECT title, evidence_type, file_type, file_size, metadata
 					FROM evidence WHERE case_id = ${caseId}
 					ORDER BY created_at DESC LIMIT 10`
-			);
-			const evidenceRows = evidenceResult.rows || [];
+      );
+      const evidenceRows = evidenceResult.rows || [];
 
-			if (evidenceRows.length > 0) {
-				context += `\n## Evidence on File (${evidenceRows.length} items)\n`;
-				for (const e of evidenceRows as any[]) {
-					const type = (e.evidence_type || 'unknown').toUpperCase();
-					const meta = (typeof e.metadata === 'string' ? JSON.parse(e.metadata) : e.metadata) || {};
-					const entityCount = meta.entityCount ?? (Array.isArray(meta.entities) ? meta.entities.length : 0);
-					const flags = Array.isArray(meta.forensicFlags) ? meta.forensicFlags : [];
-					const highFlags = flags.filter((f: any) => f.severity === 'high');
-					const forensicLabel = highFlags.length ? `Forensic: HIGH (${highFlags.length})` : flags.length ? `Forensic: ${flags.length} flags` : 'No forensic flags';
-					const summary = meta.summary ? String(meta.summary).slice(0, 80) : '';
-					context += `- [${type}] "${e.title || 'Untitled'}" (${e.file_type || 'unknown'}) | Entities: ${entityCount} | ${forensicLabel}${summary ? '\n  ' + summary : ''}\n`;
-				}
-			}
-		} catch {
-			// Evidence table may not exist yet
-		}
+      if (evidenceRows.length > 0) {
+        context += `\n## Evidence on File (${evidenceRows.length} items)\n`;
+        for (const e of evidenceRows as any[]) {
+          const type = (e.evidence_type || 'unknown').toUpperCase();
+          const meta = (typeof e.metadata === 'string' ? JSON.parse(e.metadata) : e.metadata) || {};
+          const entityCount =
+            meta.entityCount ?? (Array.isArray(meta.entities) ? meta.entities.length : 0);
+          const flags = Array.isArray(meta.forensicFlags) ? meta.forensicFlags : [];
+          const highFlags = flags.filter((f: any) => f.severity === 'high');
+          const forensicLabel = highFlags.length
+            ? `Forensic: HIGH (${highFlags.length})`
+            : flags.length
+              ? `Forensic: ${flags.length} flags`
+              : 'No forensic flags';
+          const summary = meta.summary ? String(meta.summary).slice(0, 80) : '';
+          context += `- [${type}] "${e.title || 'Untitled'}" (${e.file_type || 'unknown'}) | Entities: ${entityCount} | ${forensicLabel}${summary ? '\n  ' + summary : ''}\n`;
+        }
+      }
+    } catch {
+      // Evidence table may not exist yet
+    }
 
-		// Load linked citations
-		try {
-			const { savedCitations } = await import('$lib/server/db/schema');
-			const citationRows = await db
-				.select()
-				.from(savedCitations)
-				.where(eq(savedCitations.caseId, caseId))
-				.limit(10);
+    // Load linked citations
+    try {
+      const { savedCitations } = await import('$lib/server/db/schema');
+      const citationRows = await db
+        .select()
+        .from(savedCitations)
+        .where(eq(savedCitations.caseId, caseId))
+        .limit(10);
 
-			if (citationRows.length > 0) {
-				context += `\n## Citations (${citationRows.length} items)\n`;
-				for (const cit of citationRows) {
-					context += `- ${cit.statuteCode}: ${cit.statuteTitle ?? ''}\n`;
-				}
-			}
-		} catch {
-			// Citations table may not exist yet
-		}
+      if (citationRows.length > 0) {
+        context += `\n## Citations (${citationRows.length} items)\n`;
+        for (const cit of citationRows) {
+          context += `- ${cit.statuteCode}: ${cit.statuteTitle ?? ''}\n`;
+        }
+      }
+    } catch {
+      // Citations table may not exist yet
+    }
 
-		// Enforce token budget
-		if (context.length > CASE_CONTEXT_MAX_CHARS) {
-			context = context.slice(0, CASE_CONTEXT_MAX_CHARS) + '\n...(truncated)';
-		}
+    // Enforce token budget
+    if (context.length > CASE_CONTEXT_MAX_CHARS) {
+      context = context.slice(0, CASE_CONTEXT_MAX_CHARS) + '\n...(truncated)';
+    }
 
-		return context;
-	} catch (error) {
-		console.warn('[Case Context] Failed to load:', error);
-		return null;
-	}
+    return context;
+  } catch (error) {
+    console.warn('[Case Context] Failed to load:', error);
+    return null;
+  }
 }
 
 // All legal RAG collections to search (768-dim Cosine, embeddinggemma)
 const RAG_COLLECTIONS = [
-	'evidence_vectors', // uploaded evidence: PDFs, images, documents
-	'case_chunks',      // court opinions, rulings, case law
-	'law_sections'      // statutes, constitutions, regulations, codes
+  'evidence_vectors', // uploaded evidence: PDFs, images, documents
+  'case_chunks', // court opinions, rulings, case law
+  'law_sections', // statutes, constitutions, regulations, codes
 ] as const;
 
 /**
  * Search a single Qdrant collection. Returns raw hits or empty array on failure.
  */
 async function searchCollection(
-	collection: string,
-	vector: number[],
-	limit: number
+  collection: string,
+  vector: number[],
+  limit: number
 ): Promise<Array<Record<string, unknown>>> {
-	try {
-		const res = await fetch(
-			`${QDRANT_URL}/collections/${collection}/points/search`,
-			{
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					vector,
-					limit,
-					with_payload: true,
-					score_threshold: RAG_SCORE_THRESHOLD
-				}),
-				signal: AbortSignal.timeout(5000)
-			}
-		);
-		if (!res.ok) return [];
-		const data = await res.json();
-		return (data.result ?? []).map((r: Record<string, unknown>) => ({
-			...r,
-			_collection: collection
-		}));
-	} catch {
-		return [];
-	}
+  try {
+    const res = await fetch(`${QDRANT_URL}/collections/${collection}/points/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        vector,
+        limit,
+        with_payload: true,
+        score_threshold: RAG_SCORE_THRESHOLD,
+      }),
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.result ?? []).map((r: Record<string, unknown>) => ({
+      ...r,
+      _collection: collection,
+    }));
+  } catch {
+    return [];
+  }
 }
 
 /**
@@ -186,74 +185,73 @@ async function searchCollection(
  * merges results by score, validates embedding consistency.
  * Returns empty array if embedding or search fails (chat continues without RAG).
  */
-async function retrieveContext(
-	query: string,
-	limit = RAG_MAX_CHUNKS
-): Promise<ContextDoc[]> {
-	try {
-		// 1. Generate embedding for the user query
-		const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: query, keep_alive: '24h' }),
-			signal: AbortSignal.timeout(8000)
-		});
+async function retrieveContext(query: string, limit = RAG_MAX_CHUNKS): Promise<ContextDoc[]> {
+  try {
+    // 1. Generate embedding for the user query
+    const embedRes = await traceEmbedding(query, EMBEDDING_MODEL, () =>
+      ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: query, keep_alive: '24h' }),
+        signal: AbortSignal.timeout(8000),
+      })
+    );
 
-		if (!embedRes.ok) return [];
-		const embedData = await embedRes.json();
-		const vector = embedData.embedding;
-		if (!Array.isArray(vector) || vector.length === 0) return [];
+    if (!embedRes.ok) return [];
+    const embedData = await embedRes.json();
+    const vector = embedData.embedding;
+    if (!Array.isArray(vector) || vector.length === 0) return [];
 
-		const embeddingDims = vector.length;
-		const embeddingModel = String(embedData.model ?? EMBEDDING_MODEL);
+    const embeddingDims = vector.length;
+    const embeddingModel = String(embedData.model ?? EMBEDDING_MODEL);
 
-		// 2. Search ALL legal collections in parallel
-		const allHits = await Promise.all(
-			RAG_COLLECTIONS.map((col) => searchCollection(col, vector, limit))
-		);
-		const merged = allHits.flat();
+    // 2. Search ALL legal collections in parallel
+    const allHits = await Promise.all(
+      RAG_COLLECTIONS.map((col) => searchCollection(col, vector, limit))
+    );
+    const merged = allHits.flat();
 
-		// 3. Sort by score descending, take top `limit`
-		merged.sort((a, b) => Number(b.score ?? 0) - Number(a.score ?? 0));
-		const topResults = merged.slice(0, limit);
+    // 3. Sort by score descending, take top `limit`
+    merged.sort((a, b) => Number(b.score ?? 0) - Number(a.score ?? 0));
+    const topResults = merged.slice(0, limit);
 
-		if (topResults.length > 0) {
-			const summary = topResults.map((r) =>
-				`${r._collection}:${Number(r.score ?? 0).toFixed(3)}`
-			).join(', ');
-			console.log(`[RAG] ${merged.length} total hits across ${RAG_COLLECTIONS.length} collections → top ${topResults.length}: [${summary}]`);
-		}
+    if (topResults.length > 0) {
+      const summary = topResults
+        .map((r) => `${r._collection}:${Number(r.score ?? 0).toFixed(3)}`)
+        .join(', ');
+      console.log(
+        `[RAG] ${merged.length} total hits across ${RAG_COLLECTIONS.length} collections → top ${topResults.length}: [${summary}]`
+      );
+    }
 
-		// 4. Map to ContextDoc with validation
-		return topResults
-			.map((r) => {
-				const payload = r.payload as Record<string, unknown> | undefined;
+    // 4. Map to ContextDoc with validation
+    return topResults
+      .map((r) => {
+        const payload = r.payload as Record<string, unknown> | undefined;
 
-				const pointModel = payload?.embedding_model as string | undefined;
-				const pointDims = payload?.embedding_dims as number | undefined;
-				if (pointModel && pointModel !== embeddingModel) return null;
-				if (pointDims && pointDims !== embeddingDims) return null;
+        const pointModel = payload?.embedding_model as string | undefined;
+        const pointDims = payload?.embedding_dims as number | undefined;
+        if (pointModel && pointModel !== embeddingModel) return null;
+        if (pointDims && pointDims !== embeddingDims) return null;
 
-				const rawContent = String(
-					payload?.text ?? payload?.content ?? payload?.title ?? ''
-				);
-				const content =
-					rawContent.length > RAG_CHUNK_MAX_CHARS
-						? rawContent.slice(0, RAG_CHUNK_MAX_CHARS) + '...'
-						: rawContent;
+        const rawContent = String(payload?.text ?? payload?.content ?? payload?.title ?? '');
+        const content =
+          rawContent.length > RAG_CHUNK_MAX_CHARS
+            ? rawContent.slice(0, RAG_CHUNK_MAX_CHARS) + '...'
+            : rawContent;
 
-				return {
-					content,
-					similarity: Number(r.score ?? 0),
-					documentId: `${r._collection}:${r.id}`,
-					model: pointModel
-				};
-			})
-			.filter((r: ContextDoc | null): r is ContextDoc => r !== null && r.content.length > 0);
-	} catch (err) {
-		console.warn('[RAG] Context retrieval skipped:', err);
-		return [];
-	}
+        return {
+          content,
+          similarity: Number(r.score ?? 0),
+          documentId: `${r._collection}:${r.id}`,
+          model: pointModel,
+        };
+      })
+      .filter((r: ContextDoc | null): r is ContextDoc => r !== null && r.content.length > 0);
+  } catch (err) {
+    console.warn('[RAG] Context retrieval skipped:', err);
+    return [];
+  }
 }
 
 export const POST: RequestHandler = async ({ request }) => {

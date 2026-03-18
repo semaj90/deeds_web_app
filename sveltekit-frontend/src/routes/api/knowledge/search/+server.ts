@@ -10,6 +10,7 @@
 
 import { getKnowledgeSearcher } from '$lib/services/knowledge-search';
 import type { SearchRequest } from '$lib/services/knowledge-search/types';
+import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { z } from 'zod';
@@ -84,14 +85,16 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
 
     // Fire all 4 searches in parallel
     const [qdrantResults, glossaryRes, statutesRes, precedentsRes] = await Promise.allSettled([
-      searcher.search(query, {
-        topK,
-        threshold: 0.5,
-        filters: body.filters,
-        includeContent: body.includeContent,
-        synthesize: body.synthesize,
-        llmProvider: body.llmProvider
-      }),
+      traceEmbedding(query, 'embeddinggemma:latest', () =>
+        searcher.search(query, {
+          topK,
+          threshold: 0.5,
+          filters: body.filters,
+          includeContent: body.includeContent,
+          synthesize: body.synthesize,
+          llmProvider: body.llmProvider,
+        })
+      ),
       fetch('/api/glossary/search', { method: 'POST', headers: hdrs, body: searchBody }),
       fetch('/api/statutes/search', { method: 'POST', headers: hdrs, body: searchBody }),
       fetch('/api/precedents/search', { method: 'POST', headers: hdrs, body: searchBody }),

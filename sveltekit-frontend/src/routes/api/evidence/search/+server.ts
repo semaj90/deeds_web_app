@@ -26,6 +26,7 @@ import db from '$lib/server/db';
 import { sql } from 'drizzle-orm';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { embedText } from '$lib/server/embedding/embed.js';
+import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { getVectorCache, setVectorCache } from '$lib/server/vector-cache.js';
 import { ENV } from '$lib/server/env.server.js';
 import { searchEvidenceViaGrpc } from '$lib/server/grpc/retrieval-client.js';
@@ -36,24 +37,37 @@ import { CitationGraph } from '$lib/server/retrieval/citation-graph.js';
 import { z } from 'zod';
 
 const evidenceSearchSchema = z.object({
-	query: z.string().min(1, 'query is required').max(5000),
-	caseId: z.string().uuid().optional(),
-	limit: z.number().int().min(1).max(100).optional().default(10),
-	expandSections: z.boolean().optional().default(true),
-	jurisdiction: z.string().max(200).optional(),
-	useLegalPageRank: z.boolean().optional().default(false),
-	sectionTypes: z.array(z.enum([
-		'facts', 'issues', 'reasoning', 'holding', 'citations',
-		'parties', 'motions', 'bibliography', 'procedural_history',
-		'sentencing', 'judgment'
-	])).max(11).optional()
+  query: z.string().min(1, 'query is required').max(5000),
+  caseId: z.string().uuid().optional(),
+  limit: z.number().int().min(1).max(100).optional().default(10),
+  expandSections: z.boolean().optional().default(true),
+  jurisdiction: z.string().max(200).optional(),
+  useLegalPageRank: z.boolean().optional().default(false),
+  sectionTypes: z
+    .array(
+      z.enum([
+        'facts',
+        'issues',
+        'reasoning',
+        'holding',
+        'citations',
+        'parties',
+        'motions',
+        'bibliography',
+        'procedural_history',
+        'sentencing',
+        'judgment',
+      ])
+    )
+    .max(11)
+    .optional(),
 });
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 /** SHA-256 hex digest (truncated to 16 chars for cache key brevity). */
 function sha256(input: string): string {
-	return createHash('sha256').update(input).digest('hex').slice(0, 16);
+  return createHash('sha256').update(input).digest('hex').slice(0, 16);
 }
 
 /**
@@ -61,207 +75,251 @@ function sha256(input: string): string {
  * and distinguishes different filter combinations.
  */
 function buildEvidenceSearchCacheKey(args: {
-	userId: string | null;
-	query: string;
-	filters: Record<string, unknown>;
-	limit: number;
-	version?: string;
+  userId: string | null;
+  query: string;
+  filters: Record<string, unknown>;
+  limit: number;
+  version?: string;
 }): string {
-	const payload = JSON.stringify({
-		v: args.version ?? 'v1',
-		u: args.userId ?? 'anon',
-		q: args.query,
-		f: args.filters,
-		n: args.limit,
-	});
-	return `evidence:search:${sha256(payload)}`;
+  const payload = JSON.stringify({
+    v: args.version ?? 'v1',
+    u: args.userId ?? 'anon',
+    q: args.query,
+    f: args.filters,
+    n: args.limit,
+  });
+  return `evidence:search:${sha256(payload)}`;
 }
 
 interface SearchResult {
-	evidenceId: string;
-	chunkIndex: number;
-	content: string;
-	score: number;
-	metadata: Record<string, unknown>;
-	rerank?: {
-		cosine: number;
-		sharedCitations: number;
-		jurisdictionMatch: number;
-		sectionProximity: number;
-		finalScore: number;
-	};
+  evidenceId: string;
+  chunkIndex: number;
+  content: string;
+  score: number;
+  metadata: Record<string, unknown>;
+  rerank?: {
+    cosine: number;
+    sharedCitations: number;
+    jurisdictionMatch: number;
+    sectionProximity: number;
+    finalScore: number;
+  };
 }
 
 interface GraphNeighbor {
-	nodeId: string;
-	title: string;
-	evidenceType: string;
-	connectionType: string;
-	strength: number;
-	confidence: number;
-	aiReasoning?: string;
+  nodeId: string;
+  title: string;
+  evidenceType: string;
+  connectionType: string;
+  strength: number;
+  confidence: number;
+  aiReasoning?: string;
 }
 
 interface DocumentContext {
-	evidenceId: string;
-	fileName: string;
-	fileType: string;
-	description: string;
-	aiSummary?: string;
-	aiTags?: unknown;
-	keyEntities?: unknown;
+  evidenceId: string;
+  fileName: string;
+  fileType: string;
+  description: string;
+  aiSummary?: string;
+  aiTags?: unknown;
+  keyEntities?: unknown;
 }
 
 interface ContextBundle {
-	hit: SearchResult;
-	siblings: SearchResult[];
-	sectionPath: string[];
-	heading: string;
-	citations: string[];
-	graphNeighbors: GraphNeighbor[];
-	documentContext?: DocumentContext;
+  hit: SearchResult;
+  siblings: SearchResult[];
+  sectionPath: string[];
+  heading: string;
+  citations: string[];
+  graphNeighbors: GraphNeighbor[];
+  documentContext?: DocumentContext;
 }
 
 export async function POST({ request, locals }: RequestEvent) {
-	try {
-		const raw = await request.json();
-		const parsed = evidenceSearchSchema.safeParse(raw);
-		if (!parsed.success) {
-			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
-		}
-		const { query, caseId, limit, expandSections, jurisdiction, useLegalPageRank: useLPR, sectionTypes } = parsed.data;
+  try {
+    const raw = await request.json();
+    const parsed = evidenceSearchSchema.safeParse(raw);
+    if (!parsed.success) {
+      return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+    }
+    const {
+      query,
+      caseId,
+      limit,
+      expandSections,
+      jurisdiction,
+      useLegalPageRank: useLPR,
+      sectionTypes,
+    } = parsed.data;
 
-		const start = performance.now();
-		const userId = (locals as any).user?.id ?? null;
+    const start = performance.now();
+    const userId = (locals as any).user?.id ?? null;
 
-		// ── gRPC fast-path: delegate to RetrievalService if available ────
-		const grpcResult = await searchEvidenceViaGrpc({ query, caseId, limit, expandSections, jurisdiction });
-		if (grpcResult) {
-			console.log(`[Evidence Search] gRPC hit for "${query.slice(0, 40)}..." (${grpcResult.timing.totalMs}ms)`);
-			return json(grpcResult);
-		}
-		// gRPC unavailable or disabled — fall through to inline pipeline
+    // ── gRPC fast-path: delegate to RetrievalService if available ────
+    const grpcResult = await searchEvidenceViaGrpc({
+      query,
+      caseId,
+      limit,
+      expandSections,
+      jurisdiction,
+    });
+    if (grpcResult) {
+      console.log(
+        `[Evidence Search] gRPC hit for "${query.slice(0, 40)}..." (${grpcResult.timing.totalMs}ms)`
+      );
+      return json(grpcResult);
+    }
+    // gRPC unavailable or disabled — fall through to inline pipeline
 
-		// ── Cache check: session-scoped key (user + filters + query) ─────
-		const cacheKey = buildEvidenceSearchCacheKey({
-			userId,
-			query,
-			filters: { caseId, jurisdiction, expandSections, sectionTypes },
-			limit,
-		});
-		const cacheOpts = { limit, metric: 'cosine' };
-		const { entry: cached, source: cacheSource } = await getVectorCache(cacheKey, cacheOpts);
+    // ── Cache check: session-scoped key (user + filters + query) ─────
+    const cacheKey = buildEvidenceSearchCacheKey({
+      userId,
+      query,
+      filters: { caseId, jurisdiction, expandSections, sectionTypes },
+      limit,
+    });
+    const cacheOpts = { limit, metric: 'cosine' };
+    const { entry: cached, source: cacheSource } = await getVectorCache(cacheKey, cacheOpts);
 
-		if (cached) {
-			const totalMs = Math.round(performance.now() - start);
-			console.log(`[Evidence Search] Cache ${cacheSource} hit for "${query.slice(0, 40)}..." (${totalMs}ms)`);
-			return json({
-				...(cached.results[0] as Record<string, unknown>),
-				timing: { ...(cached.metadata as Record<string, unknown>), totalMs, cacheSource },
-			});
-		}
+    if (cached) {
+      const totalMs = Math.round(performance.now() - start);
+      console.log(
+        `[Evidence Search] Cache ${cacheSource} hit for "${query.slice(0, 40)}..." (${totalMs}ms)`
+      );
+      return json({
+        ...(cached.results[0] as Record<string, unknown>),
+        timing: { ...(cached.metadata as Record<string, unknown>), totalMs, cacheSource },
+      });
+    }
 
-		// ── Cache miss: full pipeline ────────────────────────────────────
+    // ── Cache miss: full pipeline ────────────────────────────────────
 
-		// 1. Embed the query
-		const queryEmbedding = await embedQuery(query);
-		if (!queryEmbedding) {
-			return json({ error: 'Failed to generate query embedding' }, { status: 500 });
-		}
-		const embedMs = performance.now() - start;
+    // 1. Embed the query
+    const queryEmbedding = await embedQuery(query);
+    if (!queryEmbedding) {
+      return json({ error: 'Failed to generate query embedding' }, { status: 500 });
+    }
+    const embedMs = performance.now() - start;
 
-		// 2. Dual search: Qdrant ANN (fast) + pgvector (authoritative), merge + deduplicate
-		const searchStart = performance.now();
-		const fetchLimit = Math.min(limit * 3, 50); // over-fetch for rerank headroom
-		const rawHits = await dualSearch(queryEmbedding, caseId, fetchLimit, sectionTypes);
-		const searchMs = performance.now() - searchStart;
+    // 2. Dual search: Qdrant ANN (fast) + pgvector (authoritative), merge + deduplicate
+    const searchStart = performance.now();
+    const fetchLimit = Math.min(limit * 3, 50); // over-fetch for rerank headroom
+    const rawHits = await dualSearch(queryEmbedding, caseId, fetchLimit, sectionTypes);
+    const searchMs = performance.now() - searchStart;
 
-		if (rawHits.length === 0) {
-			return json({
-				results: [],
-				bundles: [],
-				timing: { embedMs: Math.round(embedMs), searchMs: Math.round(searchMs), totalMs: Math.round(performance.now() - start) },
-			});
-		}
+    if (rawHits.length === 0) {
+      return json({
+        results: [],
+        bundles: [],
+        timing: {
+          embedMs: Math.round(embedMs),
+          searchMs: Math.round(searchMs),
+          totalMs: Math.round(performance.now() - start),
+        },
+      });
+    }
 
-		// 3. Legal-aware rerank: cosine 75% + citations 15% + jurisdiction/section 10%
-		const rerankStart = performance.now();
-		let reranked = rerankEvidence(rawHits, query, jurisdiction);
+    // 3. Legal-aware rerank: cosine 75% + citations 15% + jurisdiction/section 10%
+    const rerankStart = performance.now();
+    let reranked = rerankEvidence(rawHits, query, jurisdiction);
 
-		// 3b. Optional Legal PageRank: 40% vector + 30% citation + 20% court + 10% recency
-		//      Now uses CitationGraph for iterative PageRank authority scoring
-		if (useLPR) {
-			const lprItems = reranked.map((h) => ({ id: h.evidenceId, score: h.score, metadata: h.metadata as Record<string, unknown>, content: h.content }));
+    // 3b. Optional Legal PageRank: 40% vector + 30% citation + 20% court + 10% recency
+    //      Now uses CitationGraph for iterative PageRank authority scoring
+    if (useLPR) {
+      const lprItems = reranked.map((h) => ({
+        id: h.evidenceId,
+        score: h.score,
+        metadata: h.metadata as Record<string, unknown>,
+        content: h.content,
+      }));
 
-			// Build citation graph + run PageRank for authority scoring
-			const citationGraph = new CitationGraph();
-			citationGraph.buildFromItems(lprItems);
-			const iterations = citationGraph.runPageRank();
+      // Build citation graph + run PageRank for authority scoring
+      const citationGraph = new CitationGraph();
+      citationGraph.buildFromItems(lprItems);
+      const iterations = citationGraph.runPageRank();
 
-			const ranked = legalPageRank(lprItems, undefined, citationGraph);
-			reranked = ranked.map((r) => {
-				const orig = reranked.find((h) => h.evidenceId === r.id);
-				return { ...(orig ?? reranked[0]), score: r.score, rerank: { ...((orig ?? reranked[0]).rerank!), finalScore: r.score, legalPageRank: r.legalRank } };
-			}) as typeof reranked;
+      const ranked = legalPageRank(lprItems, undefined, citationGraph);
+      reranked = ranked.map((r) => {
+        const orig = reranked.find((h) => h.evidenceId === r.id);
+        return {
+          ...(orig ?? reranked[0]),
+          score: r.score,
+          rerank: {
+            ...(orig ?? reranked[0]).rerank!,
+            finalScore: r.score,
+            legalPageRank: r.legalRank,
+          },
+        };
+      }) as typeof reranked;
 
-			if (citationGraph.size > 0) {
-				console.log(`[Evidence Search] CitationGraph: ${citationGraph.size} nodes, ${citationGraph.edgeCount} edges, ${iterations} PageRank iterations`);
-			}
-		}
+      if (citationGraph.size > 0) {
+        console.log(
+          `[Evidence Search] CitationGraph: ${citationGraph.size} nodes, ${citationGraph.edgeCount} edges, ${iterations} PageRank iterations`
+        );
+      }
+    }
 
-		const hits = reranked.slice(0, limit);
-		const rerankMs = performance.now() - rerankStart;
+    const hits = reranked.slice(0, limit);
+    const rerankMs = performance.now() - rerankStart;
 
-		// 4. Graph-hop: expand each hit to its section siblings
-		let bundles: ContextBundle[] = [];
-		let hopMs = 0;
-		if (expandSections) {
-			const hopStart = performance.now();
-			bundles = await expandToSections(hits, caseId);
-			hopMs = performance.now() - hopStart;
-		}
+    // 4. Graph-hop: expand each hit to its section siblings
+    let bundles: ContextBundle[] = [];
+    let hopMs = 0;
+    if (expandSections) {
+      const hopStart = performance.now();
+      bundles = await expandToSections(hits, caseId);
+      hopMs = performance.now() - hopStart;
+    }
 
-		// 5. KAG: traverse evidence graph for related nodes
-		let kagMs = 0;
-		if (bundles.length > 0 && caseId) {
-			const kagStart = performance.now();
-			await enrichWithGraphNeighbors(bundles, caseId);
-			kagMs = performance.now() - kagStart;
-		}
+    // 5. KAG: traverse evidence graph for related nodes
+    let kagMs = 0;
+    if (bundles.length > 0 && caseId) {
+      const kagStart = performance.now();
+      await enrichWithGraphNeighbors(bundles, caseId);
+      kagMs = performance.now() - kagStart;
+    }
 
-		// 6. DAG: attach parent document context
-		let dagMs = 0;
-		if (bundles.length > 0) {
-			const dagStart = performance.now();
-			await enrichWithDocumentContext(bundles);
-			dagMs = performance.now() - dagStart;
-		}
+    // 6. DAG: attach parent document context
+    let dagMs = 0;
+    if (bundles.length > 0) {
+      const dagStart = performance.now();
+      await enrichWithDocumentContext(bundles);
+      dagMs = performance.now() - dagStart;
+    }
 
-		const timing = {
-			embedMs: Math.round(embedMs),
-			searchMs: Math.round(searchMs),
-			rerankMs: Math.round(rerankMs),
-			hopMs: Math.round(hopMs),
-			kagMs: Math.round(kagMs),
-			dagMs: Math.round(dagMs),
-			totalMs: Math.round(performance.now() - start),
-		};
+    const timing = {
+      embedMs: Math.round(embedMs),
+      searchMs: Math.round(searchMs),
+      rerankMs: Math.round(rerankMs),
+      hopMs: Math.round(hopMs),
+      kagMs: Math.round(kagMs),
+      dagMs: Math.round(dagMs),
+      totalMs: Math.round(performance.now() - start),
+    };
 
-		const response = { results: hits, bundles, timing };
+    const response = { results: hits, bundles, timing };
 
-		// Cache the full response — fire-and-forget
-		setVectorCache(
-			cacheKey,
-			[response],
-			{ searchTime: timing.totalMs, totalResults: hits.length, model: 'embeddinggemma:latest', distanceMetric: 'cosine' },
-			cacheOpts
-		).catch(() => { /* non-critical */ });
+    // Cache the full response — fire-and-forget
+    setVectorCache(
+      cacheKey,
+      [response],
+      {
+        searchTime: timing.totalMs,
+        totalResults: hits.length,
+        model: 'embeddinggemma:latest',
+        distanceMetric: 'cosine',
+      },
+      cacheOpts
+    ).catch(() => {
+      /* non-critical */
+    });
 
-		return json(response);
-	} catch (err) {
-		console.error('[Evidence Search] Error:', err);
-		return json({ error: 'Search failed' }, { status: 500 });
-	}
+    return json(response);
+  } catch (err) {
+    console.error('[Evidence Search] Error:', err);
+    return json({ error: 'Search failed' }, { status: 500 });
+  }
 }
 
 // ── Legal-aware reranking ────────────────────────────────────────────────
@@ -273,80 +331,84 @@ export async function POST({ request, locals }: RequestEvent) {
  * When absent, it favors deeper section paths (more specific chunks).
  */
 function rerankEvidence(
-	hits: SearchResult[],
-	query: string,
-	jurisdiction?: string
+  hits: SearchResult[],
+  query: string,
+  jurisdiction?: string
 ): SearchResult[] {
-	const queryCitations = extractQueryCitations(query);
-	const jLower = jurisdiction?.toLowerCase();
+  const queryCitations = extractQueryCitations(query);
+  const jLower = jurisdiction?.toLowerCase();
 
-	return hits
-		.map((hit) => {
-			const cosine = hit.score;
+  return hits
+    .map((hit) => {
+      const cosine = hit.score;
 
-			// Citation overlap: how many of the hit's citations match query-mentioned refs
-			const hitCitations: string[] = (hit.metadata?.citations as string[]) ?? [];
-			let sharedCitations = 0;
-			if (queryCitations.length > 0 && hitCitations.length > 0) {
-				for (const hc of hitCitations) {
-					const hcLower = hc.toLowerCase();
-					for (const qc of queryCitations) {
-						if (hcLower.includes(qc)) { sharedCitations++; break; }
-					}
-				}
-			}
+      // Citation overlap: how many of the hit's citations match query-mentioned refs
+      const hitCitations: string[] = (hit.metadata?.citations as string[]) ?? [];
+      let sharedCitations = 0;
+      if (queryCitations.length > 0 && hitCitations.length > 0) {
+        for (const hc of hitCitations) {
+          const hcLower = hc.toLowerCase();
+          for (const qc of queryCitations) {
+            if (hcLower.includes(qc)) {
+              sharedCitations++;
+              break;
+            }
+          }
+        }
+      }
 
-			// Section proximity: deeper sections (more specific) get a small boost
-			const sectionPath: string[] = (hit.metadata?.sectionPath as string[]) ?? [];
-			const sectionProximity = Math.min(sectionPath.length / 5, 1);
+      // Section proximity: deeper sections (more specific) get a small boost
+      const sectionPath: string[] = (hit.metadata?.sectionPath as string[]) ?? [];
+      const sectionProximity = Math.min(sectionPath.length / 5, 1);
 
-			// Jurisdiction match: if provided, boost chunks from same jurisdiction
-			let jurisdictionMatch = 0;
-			if (jLower) {
-				const hitJurisdiction = String(hit.metadata?.jurisdiction ?? '').toLowerCase();
-				const hitContent = hit.content.toLowerCase();
-				if (hitJurisdiction && hitJurisdiction.includes(jLower)) {
-					jurisdictionMatch = 1;
-				} else if (hitContent.includes(jLower)) {
-					jurisdictionMatch = 0.5; // partial: jurisdiction mentioned in text
-				}
-			}
+      // Jurisdiction match: if provided, boost chunks from same jurisdiction
+      let jurisdictionMatch = 0;
+      if (jLower) {
+        const hitJurisdiction = String(hit.metadata?.jurisdiction ?? '').toLowerCase();
+        const hitContent = hit.content.toLowerCase();
+        if (hitJurisdiction && hitJurisdiction.includes(jLower)) {
+          jurisdictionMatch = 1;
+        } else if (hitContent.includes(jLower)) {
+          jurisdictionMatch = 0.5; // partial: jurisdiction mentioned in text
+        }
+      }
 
-			// 10% slot: jurisdiction match when available, else section proximity
-			const contextSignal = jLower ? jurisdictionMatch : sectionProximity;
-			const finalScore = 0.75 * cosine + 0.15 * Math.min(sharedCitations, 3) / 3 + 0.10 * contextSignal;
+      // 10% slot: jurisdiction match when available, else section proximity
+      const contextSignal = jLower ? jurisdictionMatch : sectionProximity;
+      const finalScore =
+        0.75 * cosine + (0.15 * Math.min(sharedCitations, 3)) / 3 + 0.1 * contextSignal;
 
-			return {
-				...hit,
-				score: finalScore,
-				rerank: { cosine, sharedCitations, jurisdictionMatch, sectionProximity, finalScore },
-			};
-		})
-		.sort((a, b) => b.score - a.score);
+      return {
+        ...hit,
+        score: finalScore,
+        rerank: { cosine, sharedCitations, jurisdictionMatch, sectionProximity, finalScore },
+      };
+    })
+    .sort((a, b) => b.score - a.score);
 }
 
 /**
  * Extract citation-like fragments from the query string for overlap scoring.
  */
 function extractQueryCitations(query: string): string[] {
-	const citations: string[] = [];
-	const sectionRefs = query.match(/§\s*\d+[\w.-]*/g);
-	if (sectionRefs) citations.push(...sectionRefs.map(s => s.toLowerCase()));
-	const uscRefs = query.match(/\d+\s+U\.?S\.?C\.?\s*§?\s*\d+/gi);
-	if (uscRefs) citations.push(...uscRefs.map(s => s.toLowerCase()));
-	const artSecRefs = query.match(/(?:article|section|art\.?|sec\.?)\s+[IVXLCDM\d]+/gi);
-	if (artSecRefs) citations.push(...artSecRefs.map(s => s.toLowerCase()));
-	return citations;
+  const citations: string[] = [];
+  const sectionRefs = query.match(/§\s*\d+[\w.-]*/g);
+  if (sectionRefs) citations.push(...sectionRefs.map((s) => s.toLowerCase()));
+  const uscRefs = query.match(/\d+\s+U\.?S\.?C\.?\s*§?\s*\d+/gi);
+  if (uscRefs) citations.push(...uscRefs.map((s) => s.toLowerCase()));
+  const artSecRefs = query.match(/(?:article|section|art\.?|sec\.?)\s+[IVXLCDM\d]+/gi);
+  if (artSecRefs) citations.push(...artSecRefs.map((s) => s.toLowerCase()));
+  return citations;
 }
 
 // ── Embedding (uses unified facade with cache + dedup) ───────────────────
 
 async function embedQuery(text: string): Promise<number[] | null> {
-	try {
-		return await embedText(text);
-	} catch {
-		return null;
-	}
+  try {
+    return await traceEmbedding(text, 'embeddinggemma:latest', () => embedText(text));
+  } catch {
+    return null;
+  }
 }
 
 // ── Dual search: Qdrant ANN + pgvector ───────────────────────────────────
