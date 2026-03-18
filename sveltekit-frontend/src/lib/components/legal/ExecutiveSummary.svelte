@@ -1,14 +1,42 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import { onMount } from 'svelte';
 
-	let { node, document, imagePath } = $props<{
+	let { node, document, imagePath = '/images/legal-dashboard-hero.png' }: {
 		node: any;
 		document: any;
-		imagePath: string;
-	}>();
+		imagePath?: string;
+	} = $props();
 
-	// Placeholder for AI summarized content if not provided
-	const summary = $derived(node.summary || `This section of the ${document.title} establishes the core legal framework for ${node.heading}. It outlines the primary obligations, rights, and definitions that govern this specific area of law.`);
+	let aiSummary = $state<string | null>(null);
+	let loading = $state(false);
+
+	// Build a sensible summary from node text if no AI summary available
+	const displaySummary = $derived(
+		aiSummary
+		?? node.summary
+		?? (node.fullText
+			? node.fullText.slice(0, 400) + (node.fullText.length > 400 ? '...' : '')
+			: `This section of the ${document.title} establishes the core legal framework for ${node.heading}. It outlines the primary obligations, rights, and definitions that govern this specific area of law.`)
+	);
+
+	onMount(async () => {
+		if (aiSummary || !document.id) return;
+		loading = true;
+		try {
+			const res = await fetch(`/api/library/documents/${document.id}/summary`);
+			if (res.ok) {
+				const data = await res.json();
+				if (data.summary) {
+					aiSummary = data.summary;
+				}
+			}
+		} catch {
+			// Non-fatal — fall back to text excerpt
+		} finally {
+			loading = false;
+		}
+	});
 </script>
 
 <div class="executive-summary-card">
@@ -21,14 +49,14 @@
 		<div class="header">
 			<Icon name="scroll" size={18} class="text-accent" />
 			<h3>Executive Summary</h3>
+			{#if loading}
+				<span class="loading-badge">Analyzing...</span>
+			{/if}
 		</div>
 
 		<div class="summary-text">
 			<p>
-				<span class="first-word">The</span> {summary}
-			</p>
-			<p class="secondary-info text-sand/60">
-				This section provides a high-level overview of the protected elements, including the or logic by financial institutions, government entities, and in-those interstate or foreign commerce.
+				<span class="first-word">{displaySummary.split(' ')[0]}</span> {displaySummary.split(' ').slice(1).join(' ')}
 			</p>
 		</div>
 
@@ -37,6 +65,12 @@
 				<Icon name="hash" size={12} class="text-sand/40" />
 				<span>{node.citationLabel || node.heading}</span>
 			</div>
+			{#if document.jurisdiction}
+				<div class="meta-item">
+					<Icon name="map-pin" size={12} class="text-sand/40" />
+					<span>{document.jurisdiction.name}</span>
+				</div>
+			{/if}
 			<div class="meta-item">
 				<Icon name="external-link" size={12} class="text-sand/40" />
 				{#if document.officialUrl}
@@ -101,6 +135,20 @@
 		color: #e0e0e0;
 	}
 
+	.loading-badge {
+		font-size: 0.625rem;
+		padding: 0.15rem 0.5rem;
+		border-radius: 99px;
+		background: rgba(96, 165, 250, 0.15);
+		color: #60a5fa;
+		animation: pulse 1.5s ease-in-out infinite;
+	}
+
+	@keyframes pulse {
+		0%, 100% { opacity: 1; }
+		50% { opacity: 0.5; }
+	}
+
 	.summary-text {
 		font-size: 0.875rem;
 		line-height: 1.6;
@@ -112,11 +160,6 @@
 		font-weight: 700;
 	}
 
-	.secondary-info {
-		font-size: 0.8125rem;
-		margin-top: 0.75rem;
-	}
-
 	.metadata-footer {
 		margin-top: auto;
 		display: flex;
@@ -124,6 +167,7 @@
 		align-items: center;
 		padding-top: 1rem;
 		border-top: 1px solid rgba(255, 255, 255, 0.05);
+		flex-wrap: wrap;
 	}
 
 	.meta-item {

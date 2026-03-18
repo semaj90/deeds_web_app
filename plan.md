@@ -1,113 +1,152 @@
-# Legal Corpus & Glossary — Implementation Plan
+# Implementation Plan: Legal Corpus UI + Two-Layer Platform Search
 
-## What We Have (Strong Foundation)
-- **7 DB tables**: statutes, statuteChunks (768-dim pgvector), citations, savedCitations, legalDocuments, legalPrecedents, legalGlossary (768-dim pgvector), caseStatuteLinks
-- **18 API endpoints**: Statute search, glossary search, precedent search, citation CRUD, collections, export, tags
-- **19 components**: StatuteDetail, StatuteSearchBar, StatuteResultsList, LegalPrecedentCard, CitationHighlighter, CitationManager, etc.
-- **Knowledge Base search** already in `/citations` page (glossary + statutes + precedents in parallel)
+## Context
+Match reference screenshot (`legalcorpus_gpt.png`). Build two-layer search (platform + domain).
 
-## What's Missing (Per User's Feature Spec)
-1. **No dedicated Legal Corpus page** — everything crammed into `/citations`
-2. **No jurisdiction navigation** (Federal/State/Regulation/Case Law filter rail)
-3. **No glossary mode** (popular name → official citation → related doctrines)
-4. **No statute summary view** matching the screenshot (Executive Summary, Key Provisions, Precedents, Implications)
-5. **No versioning/amendment UI** (effective dates, repealed markers)
-6. **No source-backed trust indicators** (jurisdiction badge, effective date, confidence, source link)
-7. **No citation-first reading** (hover to reveal source text)
+**Key discovery**: The node dashboard page (`/library/[documentId]/node/[nodeId]`) already has the
+correct 3-column layout with ExecutiveSummary, KeyProvisions, LegalImplications, Precedents,
+breadcrumbs, and 6 tabs — but ALL data is hardcoded. The library layout already wraps everything
+with a left `LibrarySidebar` (Documents/Glossary/Corpus nav). We need to:
+1. Wire real data into existing components
+2. Make tabs functional
+3. Add left TOC panel for the node page
+4. Wire docker-compose for Go search service
+5. Build platform search orchestrator
 
-## Plan: New `/legal-corpus` Route (3 Phases)
+---
 
-### Phase 1: Page Shell + Jurisdiction Navigation
-**New route**: `src/routes/(app)/legal-corpus/+page.svelte` + `+page.server.ts`
+## Phase 1: Docker + Go Service Wiring
 
-**Layout** (matching screenshot design, adapted to YoRHa dark theme):
+### 1a. Add `go-search-service` to docker-compose.yml
+- Build context: `./services/go-search-service`
+- Ports: 8096:8096 (HTTP), 50055:50055 (gRPC)
+- Depends on: postgres, redis, qdrant
+- Environment: DATABASE_URL, REDIS_URL, QDRANT_HOST, QDRANT_PORT, OLLAMA_URL
+
+### 1b. Add `GO_SEARCH_URL` to SvelteKit service environment in docker-compose
+- Already in env.server.ts, just needs docker-compose env var
+
+---
+
+## Phase 2: Node Dashboard — Wire Real Data (Match Screenshot)
+
+### 2a. Enhance server load (`node/[nodeId]/+page.server.ts`)
+Add these queries alongside existing ones:
+- **Citations**: `SELECT * FROM legal_citations WHERE from_node_id = $1 OR to_node_id = $1`
+- **Breadcrumb chain**: Recursive CTE walking parent_node_id up to root
+- **AI summary**: Check if node has a cached summary, else return null (client will fetch)
+- Return: `{ ...existing, citations, breadcrumbs }`
+
+### 2b. Make ExecutiveSummary dynamic
+- Accept optional `summary` prop (from server or client fetch)
+- On mount, if no summary provided, fetch from `/api/library/documents/[documentId]/summary`
+- Show loading skeleton while fetching
+- Replace hardcoded "secondary-info" paragraph with actual AI-generated text
+- Keep the image + existing layout structure
+
+### 2c. Make LegalImplications dynamic
+- Accept `implications` prop instead of hardcoded CFAA array
+- Generate implications from node metadata in server load:
+  - Derive from corpus_type, jurisdiction, node_type, heading keywords
+  - Template-based: constitution -> "Constitutional Authority" + "Amendment Scope" + "Judicial Review"
+  - Statute -> "Compliance Risk" + "Enforcement" + "Penalty Structure"
+  - Regulation -> "Regulatory Compliance" + "Reporting Requirements" + "Penalty Risk"
+- Pass generated implications from server load -> component
+
+### 2d. Wire Cited Sources into sidebar
+- Replace hardcoded Van Buren/HiQ precedents with real `legal_citations` data
+- Map citation rows to compact cards: citation_text + confidence + citation_type badge
+- If no citations exist, show "No cross-references detected" placeholder
+
+### 2e. Make tabs functional
+- Track `activeTab` state: 'summary' | 'text' | 'citations'
+- **Summary tab** (default): ExecutiveSummary + KeyProvisions (already done)
+- **Official Text tab**: Client-fetch chunks via `/api/library/documents/[docId]/chunks?nodeId=X`,
+  render with OfficialTextPane component
+- **Citations tab**: Show CitedSourcesOverlay content inline (not as overlay)
+- Cases/Regulations/History tabs: Show "Coming soon" placeholder
+
+### 2f. Add in-page TOC sidebar
+- Change layout from `grid-template-columns: 1fr 320px` to `240px 1fr 320px`
+- Add left column with TocTree component
+- Fetch full TOC in server load (already done in reader page, reuse query)
+- Clicking a node navigates to that node's dashboard: `/library/[docId]/node/[nodeId]`
+
+### 2g. Wire breadcrumb navigation with real data
+- Use recursive CTE breadcrumb from server load
+- Render: Library / {jurisdiction} / {document.title} / {parent.heading} / {current.heading}
+
+---
+
+## Phase 3: Platform Search API (`/api/search`)
+
+### 3a. Create `/api/search/+server.ts` — unified orchestrator
+- POST handler accepting `{ query, limit?, filters?: { entityTypes?, jurisdiction? } }`
+- Fan out to domain adapters in parallel using Promise.allSettled()
+- Normalize all results to PlatformSearchHit shape
+- RRF fusion across domains (weight legal higher for legal queries)
+- Return `{ results: PlatformSearchHit[], groups: Record<string, number>, meta }`
+
+### 3b. Domain adapters (inline functions in the search endpoint)
+- **legal**: Call Go service `/search` via GO_SEARCH_URL (fastest path)
+- **cases**: FTS on cases table (title, description) via pool.query
+- **evidence**: FTS on evidence table + Qdrant evidence_items collection
+- **glossary**: ILIKE on legal_definitions.term + definition_text
+- **statutes**: FTS on statutes + statute_chunks tables
+- Each adapter returns normalized PlatformSearchHit[]
+
+### 3c. PlatformSearchHit type definition
+```typescript
+interface PlatformSearchHit {
+  id: string;
+  entityType: 'case' | 'evidence' | 'document' | 'glossary' | 'statute' | 'precedent';
+  title: string;
+  snippet: string;
+  score: number;
+  matchType: 'citation' | 'fts' | 'vector' | 'fused';
+  route: string;
+  documentId?: string;
+  nodeId?: string;
+  jurisdiction?: string;
+  corpusType?: string;
+}
 ```
-┌─────────────────────────────────────────────────────┐
-│ Header: "Legal Corpus"  [Search...]  [Export PDF]    │
-├──────────┬──────────────────────────────────────────┤
-│ Left Rail│  Main Content                            │
-│          │                                          │
-│ CORPUS   │  ┌─────────────┐ ┌──────────────────┐   │
-│ ○ Federal│  │ Executive   │ │ Legal Precedents │   │
-│ ○ State  │  │ Summary     │ │ - Van Buren v US │   │
-│ ○ Regs   │  │ (AI-gen)    │ │ - hiQ v LinkedIn │   │
-│ ○ Case   │  │ + source    │ │ [View Case]      │   │
-│ ○ Glossary  │ badges      │ └──────────────────┘   │
-│          │  └─────────────┘                         │
-│ FILTERS  │  ┌─────────────┐ ┌──────────────────┐   │
-│ Category │  │ Key         │ │ Implications     │   │
-│ Year     │  │ Provisions  │ │ - Compliance     │   │
-│ Severity │  │ § 1030(a)   │ │ - Scraping       │   │
-│          │  │ § 1030(b)   │ │ - Penalties      │   │
-│ GLOSSARY │  └─────────────┘ └──────────────────┘   │
-│ Quick    │                                          │
-│ lookup   │  [View Official Text] [Show Cited Cases] │
-│          │  [Compare Jurisdictions] [Glossary Terms] │
-└──────────┴──────────────────────────────────────────┘
-```
 
-**Server load**: Fetch recent/popular statutes, populate glossary quick-lookup
-**Left rail**: Jurisdiction radio buttons + category/year/severity filters
-**Search**: Reuse existing `/api/statutes/search` + `/api/glossary/search` + `/api/precedents/search`
+---
 
-### Phase 2: Statute Summary View (Detail Page)
-**New route**: `src/routes/(app)/legal-corpus/[id]/+page.svelte` + `+page.server.ts`
+## Phase 4: Wire Global Search UI
 
-Matches the screenshot layout exactly:
-1. **Header**: Statute code + title + "AI-generated summary" badge + effective date
-2. **Executive Summary**: AI-generated via Ollama gemma3-legal (cached in Redis)
-   - Source jurisdiction badge
-   - Effective date / last updated
-   - Official source link
-   - Confidence indicator
-3. **Key Provisions**: Parsed from statute chunks (statuteChunks table)
-   - Each provision traceable to section number
-   - Hover reveals exact source text (CitationHighlighter)
-4. **Legal Precedents**: Query `/api/precedents/search` with statute code
-   - Reuse existing `LegalPrecedentCard` component
-   - "View Case Details" links
-5. **Implications**: AI-generated analysis of practical impact
-6. **Action Bar**: View Official Text, Show Cited Cases, Compare Jurisdictions, Related Regulations, Glossary Terms
+### 4a. Update `/global-search` page
+- Call `/api/search` instead of current search
+- Add entity type filter tabs: All | Law | Cases | Evidence | Glossary
+- Show result count badges per group
+- Each result links to its source page via `hit.route`
 
-### Phase 3: Glossary Mode + Research Workflow
-**Glossary sub-view** (toggle or tab within `/legal-corpus`):
-- Popular name → official citation (e.g., "CFAA" → "18 U.S.C. § 1030")
-- Acronym expansion
-- Related doctrines (from legalGlossary.relatedTerms JSONB)
-- Linked terms with navigation
-- Semantic search via existing `/api/glossary/search`
+---
 
-**Research actions** wired to existing APIs:
-- "View Official Text" → statute.sourceUrl or full_text modal
-- "Show Cited Cases" → `/api/precedents/search` with statute code
-- "Compare Jurisdictions" → side-by-side statutes filtered by jurisdiction
-- "Related Regulations" → `/api/statutes/search` with category filter
-- "Glossary Terms in this Section" → extract terms from statute text, cross-ref glossary
+## Execution Order
+1. **Phase 2** first (visual match to screenshot — highest user impact)
+2. **Phase 1** (docker-compose wiring — infrastructure)
+3. **Phase 3** (platform search API)
+4. **Phase 4** (global search UI)
 
-## Files to Create/Edit
+## Files Modified
+- `library/[documentId]/node/[nodeId]/+page.svelte` — tabs, layout, real data
+- `library/[documentId]/node/[nodeId]/+page.server.ts` — citations, breadcrumbs, TOC
+- `lib/components/legal/ExecutiveSummary.svelte` — dynamic summary
+- `lib/components/legal/LegalImplications.svelte` — prop-driven implications
+- `docker-compose.yml` — go-search-service + GO_SEARCH_URL
+- `routes/api/search/+server.ts` — NEW platform search
 
-### New Files (3)
-1. `src/routes/(app)/legal-corpus/+page.svelte` — Main corpus browser
-2. `src/routes/(app)/legal-corpus/+page.server.ts` — Server load (recent statutes, glossary terms)
-3. `src/routes/(app)/legal-corpus/[id]/+page.svelte` — Statute detail/summary view
-4. `src/routes/(app)/legal-corpus/[id]/+page.server.ts` — Load statute + chunks + precedents
+## Files NOT Modified (reused as-is)
+- KeyProvisions.svelte — already receives data.children correctly
+- TocTree.svelte — reused from reader
+- OfficialTextPane.svelte — reused from reader
+- CitedSourcesOverlay.svelte — reused for citations tab
+- LegalPrecedentCard.svelte — available for future precedent wiring
 
-### New API (1)
-5. `src/routes/api/statutes/[id]/summary/+server.ts` — AI summary generation (Ollama + Redis cache)
-
-### Existing Components to Reuse (no changes needed)
-- `StatuteDetail.svelte` — Statute viewer with citation highlighting
-- `StatuteSearchBar.svelte` — Search input (wired to global-search)
-- `StatuteResultsList.svelte` — Results display
-- `LegalPrecedentCard.svelte` — Precedent card with expand/collapse
-- `CitationHighlighter.svelte` — Inline citation hover
-- `StatuteActionPanel.svelte` — Quick actions
-- `Icon.svelte` — UnoCSS icon system
-
-### Sidebar Update (1 edit)
-- `YorhaSidebar.svelte` — Add "Legal Corpus" nav item
-
-## Non-Goals (Not in This PR)
-- Seeding the statutes/glossary tables with real data (separate data pipeline)
-- Amendment versioning (requires schema additions — defer to Sprint 7)
-- Compare jurisdictions side-by-side (defer — needs dedicated comparison UI)
+## Verification
+- svelte-check: 0 errors, 0 warnings
+- vite build: exit 0
+- Node dashboard visually matches reference screenshot
+- Platform search returns cross-domain results

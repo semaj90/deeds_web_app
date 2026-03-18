@@ -1,28 +1,23 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
 
-	let { node } = $props<{ node: any }>();
+	interface Implication {
+		title: string;
+		description: string;
+		icon: string;
+		status: string;
+	}
 
-	const implications = [
-		{
-			title: 'Compliance Risk',
-			description: 'Organizations must strictly define internal data access policies at safeguard liability according to the CFAA to avoid violations.',
-			icon: 'shield-alert',
-			status: 'high'
-		},
-		{
-			title: 'Data Protection',
-			description: 'Companies must implement advanced and monitor network access in compliance with recent court rulings.',
-			icon: 'lock',
-			status: 'medium'
-		},
-		{
-			title: 'Legal Uncertainty',
-			description: 'Definitions of terms like "without authorization" remain subject to interpretation by courts.',
-			icon: 'help-circle',
-			status: 'low'
-		}
-	];
+	let { node, implications = [] }: {
+		node: any;
+		implications?: Implication[];
+	} = $props();
+
+	const items = $derived(implications.length > 0 ? implications : [
+		{ title: 'Compliance Risk', description: 'Organizations must ensure compliance with this legal provision to avoid potential liability.', icon: 'shield-alert', status: 'high' },
+		{ title: 'Legal Authority', description: 'This provision establishes binding legal standards within its jurisdiction.', icon: 'lock', status: 'medium' },
+		{ title: 'Interpretation', description: 'Key terms remain subject to judicial interpretation and evolving case law.', icon: 'help-circle', status: 'low' },
+	]);
 </script>
 
 <div class="implications-panel">
@@ -32,10 +27,10 @@
 	</div>
 
 	<div class="implications-list">
-		{#each implications as item}
+		{#each items as item}
 			<div class="implication-item">
 				<div class="status-indicator">
-					<Icon name="check-circle" size={16} class="text-accent" />
+					<Icon name={item.icon} size={16} class="text-accent" />
 				</div>
 				<div class="item-content">
 					<h4 class="item-title">
@@ -52,7 +47,7 @@
 			<h4>Legal Uncertainty</h4>
 		</div>
 		<p class="box-text">
-			Definition of terms like "malicious intent" and "unauthorized access" remain subject to evolving judicial interpretation in federal courts.
+			Key legal terms in this provision may be subject to evolving judicial interpretation. Consult authoritative sources for the most current analysis.
 		</p>
 		<div class="box-footer">
 			<span>Accurate summary?</span>
