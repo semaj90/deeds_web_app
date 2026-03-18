@@ -138,7 +138,6 @@ export const actions: Actions = {
         .publishEvidenceProcess({
           evidenceId: newEvidence?.[0]?.id ?? randomUUID(),
           text: indexText,
-          contentType: file.type,
           fileName: file.name,
           caseId: caseId ?? undefined,
           metadata: { userId: locals.user.id, fileName: file.name, fileType: file.type },

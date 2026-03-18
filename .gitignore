@@ -412,7 +412,8 @@ src/proto/**
 ########################################
 # Native Windows Services (downloaded by SETUP-NATIVE-SERVICES.bat)
 ########################################
-/services/
+/services/*
+!/services/go-search-service/
 Ollama/ollama.exe
 Ollama/ollama\ app.exe
 Ollama/unins000.exe

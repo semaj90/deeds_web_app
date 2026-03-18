@@ -64,6 +64,8 @@ services:
       - MINIO_SECRET_KEY=minio123
       - MINIO_USE_SSL=false
       - MINIO_EVIDENCE_BUCKET=legal-evidence
+      # ── Go Search Service ──
+      - GO_SEARCH_URL=http://go-search-service:8096
     volumes:
       - ./src:/app/src
       - ./static:/app/static
@@ -75,6 +77,7 @@ services:
       - qdrant
       - minio
       - rabbitmq
+      - go-search-service
     networks:
       - legal-ai-network
     restart: unless-stopped
@@ -946,6 +949,43 @@ services:
       - legal-ai-network
     volumes:
       - ./checkpoints:/app/checkpoints
+
+  # ── Go Legal Library Search Service ──────────────────────────────────────
+  go-search-service:
+    build:
+      context: ./services/go-search-service
+      dockerfile: Dockerfile
+    container_name: legal-ai-go-search
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+    ports:
+      - "8096:8096"
+      - "50055:50055"
+    environment:
+      DATABASE_URL: postgresql://legal_admin:123456@postgres:5432/legal_ai_db
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_GRPC_HOST: qdrant
+      QDRANT_GRPC_PORT: "6334"
+      REDIS_URL: redis://redis:6379
+      OLLAMA_URL: http://host.docker.internal:11434
+      GRPC_PORT: "50055"
+      HTTP_PORT: "8096"
+    depends_on:
+      - postgres
+      - redis
+      - qdrant
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8096/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
 volumes:
   couchdb_data:

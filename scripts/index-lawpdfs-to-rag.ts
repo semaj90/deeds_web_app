@@ -409,18 +409,19 @@ async function createEvidenceRecord(
 
   // Generate evidence number: LP-YYYYMMDD-XXX (auto-incrementing per run)
   const evidenceNumber = `LP-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${String(STATS.evidenceRows + 1).padStart(3, '0')}`;
+  const description = `Legal document: ${corpusType} — ${jurisdiction}`;
 
   const result = await sql`
     INSERT INTO evidence (
       case_id, title, description, file_path, file_type, file_size,
-      hash, source, metadata, tags, evidence_number, created_at, updated_at
+      hash, source, metadata, tags, evidence_number, type,
+      created_at, updated_at
     ) VALUES (
-      ${DEFAULT_CASE_ID}, ${filename},
-      ${`Legal document: ${corpusType} — ${jurisdiction}`},
-      ${minioObjectName}, 'application/pdf', ${fileSize},
-      ${contentHash}, 'lawpdfs-indexer',
-      ${JSON.stringify(metadata)}, ${JSON.stringify(tags)},
-      ${evidenceNumber},
+      ${DEFAULT_CASE_ID}, ${filename}, ${description},
+      ${minioObjectName}, ${'application/pdf'}, ${fileSize},
+      ${contentHash}, ${'lawpdfs-indexer'},
+      ${sql.json(metadata)}, ${sql.json(tags)},
+      ${evidenceNumber}, ${'document'},
       NOW(), NOW()
     )
     RETURNING id
@@ -1080,27 +1081,22 @@ async function createFlatLegalChunks(
 // ── Main pipeline per file ───────────────────────────────────────────────
 
 async function processFile(filepath: string, filename: string): Promise<void> {
-  const stats = await stat(filepath);
-  const fileSize = stats.size;
-
   // 1. Compute content hash for dedupe
   const contentHash = await computeFileHash(filepath);
 
-  // 2. Check if already indexed
-  const existingId = await checkExistingEvidence(filename, contentHash);
-  if (existingId) {
-    console.log(`  Already indexed: ${existingId} — skipping`);
+  // 2. Check if already indexed (by source_hash in library_documents)
+  const existingDoc = await sql`
+    SELECT id FROM library_documents WHERE source_hash = ${contentHash} LIMIT 1
+  `;
+  if (existingDoc.length > 0) {
+    console.log(`  Already indexed: ${existingDoc[0].id} — skipping`);
     return;
   }
 
   // 3. Upload to MinIO (optional)
   const minioObjectName = await tryUploadToMinio(filepath, filename);
 
-  // 4. Create evidence record
-  const evidenceId = await createEvidenceRecord(filename, fileSize, minioObjectName, contentHash);
-  console.log(`  Evidence record: ${evidenceId}`);
-
-  // 5. Parse PDF
+  // 4. Parse PDF
   console.log(`  Parsing PDF: ${filename}`);
   const parsed = await parsePdf(filepath);
   console.log(`     ${parsed.fullText.length} chars from ${parsed.totalPages} pages`);
@@ -1109,7 +1105,7 @@ async function processFile(filepath: string, filename: string): Promise<void> {
     throw new Error('PDF parsing failed or document is empty');
   }
 
-  // 6. Legal-aware chunking
+  // 5. Legal-aware chunking
   const chunks = await createChunks(parsed.fullText);
   console.log(`     ${chunks.length} chunks created`);
 
@@ -1118,23 +1114,19 @@ async function processFile(filepath: string, filename: string): Promise<void> {
   if (withHeadings.length > 0) console.log(`     ${withHeadings.length} chunks have section headings`);
   if (withCitations.length > 0) console.log(`     ${withCitations.length} chunks contain citations`);
 
-  // 7. Insert evidence_chunks
-  const evidenceChunkCount = await insertEvidenceChunks(evidenceId, filename, parsed, chunks);
-  console.log(`  ${chunks.length} evidence chunks stored`);
-
-  // 8. Dual-write to legacy statutes + statute_chunks
+  // 6. Dual-write to legacy statutes + statute_chunks
   await writeToStatutes(filename, parsed.fullText, chunks);
 
-  // 9. Build legal tree (library_documents + legal_nodes)
+  // 7. Build legal tree (library_documents + legal_nodes)
   const { documentId, nodeIds } = await buildLegalTree(filename, contentHash, parsed);
 
-  // 10. Create legal_chunks with embeddings (makes search work)
+  // 8. Create legal_chunks with embeddings (makes search work)
   if (documentId && nodeIds.length > 0) {
     const legalChunkCount = await createLegalChunksWithEmbeddings(documentId, nodeIds);
     console.log(`  ${legalChunkCount} legal_chunks created with embeddings`);
-  } else if (documentId === null) {
+  } else {
     // Fallback: create flat legal_chunks from generic chunks
-    console.log(`     No structural tree — creating flat legal_chunks with embeddings`);
+    console.log(`     Creating flat legal_chunks with embeddings`);
     const flatChunkCount = await createFlatLegalChunks(filename, contentHash, parsed, chunks);
     console.log(`  ${flatChunkCount} flat legal_chunks created with embeddings`);
   }
