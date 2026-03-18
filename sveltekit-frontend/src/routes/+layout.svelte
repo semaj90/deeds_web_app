@@ -1,4 +1,5 @@
 <script lang="ts">
+    import '../app.postcss';
     import { appState, cleanupStores, initializeStores } from '$lib/stores';
     import type { Snippet } from 'svelte';
     import { onMount } from 'svelte';

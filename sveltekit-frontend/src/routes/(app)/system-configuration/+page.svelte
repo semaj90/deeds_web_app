@@ -397,6 +397,91 @@
     </section>
    {/if}
 
+   {#if activeTab === 'database'}
+    <section class="config-section">
+     <h2>DATABASE_CONFIGURATION</h2>
+     <div class="form-grid">
+      <div class="form-group">
+       <label for="db-type">Database Type</label>
+       <select id="db-type" bind:value={config.database.type}>
+        <option value="postgresql">PostgreSQL 16 + pgvector</option>
+        <option value="sqlite">SQLite (dev only)</option>
+       </select>
+      </div>
+      <div class="form-group">
+       <label for="db-host">Host</label>
+       <input type="text" id="db-host" bind:value={config.database.host} />
+      </div>
+      <div class="form-group">
+       <label for="db-port">Port</label>
+       <input type="number" id="db-port" bind:value={config.database.port} min="1" max="65535" />
+      </div>
+      <div class="form-group">
+       <label for="db-name">Database Name</label>
+       <input type="text" id="db-name" bind:value={config.database.database} />
+      </div>
+      <div class="form-group">
+       <label for="db-pool">Connection Pool Size ({config.database.connectionPool})</label>
+       <input type="range" id="db-pool" min="1" max="50" step="1" bind:value={config.database.connectionPool} />
+      </div>
+      <div class="form-group checkbox">
+       <label>
+        <input type="checkbox" bind:checked={config.database.ssl} />
+        Enable SSL / TLS
+       </label>
+      </div>
+     </div>
+     <div class="status-card success">
+      <h3>Connection Status</h3>
+      <p>PostgreSQL 16 — 70+ tables, pgvector 0.7, Drizzle ORM 0.44</p>
+     </div>
+    </section>
+   {/if}
+
+   {#if activeTab === 'security'}
+    <section class="config-section">
+     <h2>SECURITY_SETTINGS</h2>
+     <div class="form-grid">
+      <div class="form-group">
+       <label for="encryption">Encryption Algorithm</label>
+       <select id="encryption" bind:value={config.security.encryption}>
+        <option value="AES256">AES-256-GCM (recommended)</option>
+        <option value="AES128">AES-128-GCM</option>
+        <option value="ChaCha20">ChaCha20-Poly1305</option>
+       </select>
+      </div>
+      <div class="form-group">
+       <label for="session-timeout">Session Timeout (seconds)</label>
+       <input type="number" id="session-timeout" bind:value={config.security.sessionTimeout} min="300" max="86400" step="300" />
+      </div>
+      <div class="form-group">
+       <label for="backup-freq">Backup Frequency</label>
+       <select id="backup-freq" bind:value={config.security.backupFrequency}>
+        <option value="hourly">Hourly</option>
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+       </select>
+      </div>
+      <div class="form-group checkbox">
+       <label>
+        <input type="checkbox" bind:checked={config.security.twoFactor} />
+        Enable Two-Factor Authentication
+       </label>
+      </div>
+      <div class="form-group checkbox">
+       <label>
+        <input type="checkbox" bind:checked={config.security.auditLogging} />
+        Enable Audit Logging
+       </label>
+      </div>
+     </div>
+     <div class="status-card {config.security.auditLogging ? 'success' : 'warning'}">
+      <h3>Audit Log Status</h3>
+      <p>{config.security.auditLogging ? 'All actions are being logged to the audit trail.' : 'Audit logging is disabled — enable for compliance.'}</p>
+     </div>
+    </section>
+   {/if}
+
    <!-- Save Actions -->
    <div class="action-bar">
       {#if saveMessage || lastSavedAt}

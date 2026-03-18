@@ -35,6 +35,7 @@
 	let showGoldenLayout = $state(false);
 	let showOrchestrator = $state(false);
 	let showWebIngest = $state(false);
+	let activeTool = $state<string | null>(null);
 	let ingestUrl = $state('');
 	let ingestCaseId = $state('');
 	let ingestLoading = $state(false);
@@ -416,217 +417,121 @@
 		</div>
 	{/if}
 
-	<!-- AI Summary Reader -->
-	<div class="summary-toggle">
-		<button
-			class="mode-btn {showSummaryReader ? 'active' : ''}"
-			onclick={() => (showSummaryReader = !showSummaryReader)}
-		>
-			<span class="mode-label">
-				{showSummaryReader ? 'HIDE SUMMARY READER' : 'AI SUMMARY READER'}
-			</span>
-		</button>
-	</div>
-	{#if showSummaryReader}
-		<div class="summary-reader-container">
-			<AISummaryReader documentType="evidence" />
+	<!-- Analytical Tools Panel -->
+	<div class="tools-panel">
+		<div class="tools-panel-header">
+			<span class="tools-title">ANALYTICAL TOOLS</span>
+			<span class="tools-count">10 MODULES</span>
 		</div>
-	{/if}
+		<div class="tools-grid">
+			{#each [
+				{ id: 'summary', label: 'AI Summary Reader', badge: 'S', desc: 'Document summarization' },
+				{ id: 'judicial', label: 'Judicial Agent', badge: 'J', desc: 'Legal analysis AI' },
+				{ id: 'graph', label: 'Graph Gallery', badge: 'G', desc: 'Neo4j visualizations' },
+				{ id: 'research', label: 'Legal Research', badge: 'R', desc: 'Automated research' },
+				{ id: 'detective', label: 'Detective Board', badge: 'D', desc: 'Case connections' },
+				{ id: 'whiteboard', label: 'Evidence Board', badge: 'W', desc: 'HybridBoard canvas' },
+				{ id: 'contract', label: 'Contract Analyzer', badge: 'C', desc: 'Contract intelligence' },
+				{ id: 'golden', label: 'Golden Layout', badge: 'L', desc: 'Ratio-based layout' },
+				{ id: 'rag', label: 'RAG Pipeline', badge: 'P', desc: 'Orchestrator view' },
+				{ id: 'ingest', label: 'Web Ingest', badge: 'I', desc: 'URL → knowledge base' },
+			] as tool}
+				<button
+					class="tool-card {activeTool === tool.id ? 'active' : ''}"
+					onclick={() => (activeTool = activeTool === tool.id ? null : tool.id)}
+				>
+					<span class="tool-icon-badge">[{tool.badge}]</span>
+					<span class="tool-label">{tool.label}</span>
+					<span class="tool-desc">{tool.desc}</span>
+				</button>
+			{/each}
+		</div>
+	</div>
 
-	<!-- Judicial Analysis Agent -->
-	<div class="summary-toggle">
-		<button
-			class="mode-btn {showJudicialAgent ? 'active' : ''}"
-			onclick={() => (showJudicialAgent = !showJudicialAgent)}
-		>
-			<span class="mode-label">
-				{showJudicialAgent ? 'HIDE JUDICIAL AGENT' : 'JUDICIAL ANALYSIS AGENT'}
-			</span>
-		</button>
-	</div>
-	{#if showJudicialAgent}
-		<div class="summary-reader-container">
-			<JudicialAnalysisAgent
-				evidence={evidencePool.map((e: any) => ({ id: e.id, title: e.title ?? 'Untitled', description: e.description }))}
-			/>
-		</div>
-	{/if}
-
-	<!-- Graph Visualization Gallery -->
-	<div class="summary-toggle">
-		<button
-			class="mode-btn {showGraphGallery ? 'active' : ''}"
-			onclick={() => (showGraphGallery = !showGraphGallery)}
-		>
-			<span class="mode-label">
-				{showGraphGallery ? 'HIDE GRAPH GALLERY' : 'GRAPH VISUALIZATION GALLERY'}
-			</span>
-		</button>
-	</div>
-	{#if showGraphGallery}
-		<div class="summary-reader-container">
-			<GraphVisualizationGallery />
-		</div>
-	{/if}
-
-	<!-- Automated Legal Research -->
-	<div class="summary-toggle">
-		<button
-			class="mode-btn {showLegalResearch ? 'active' : ''}"
-			onclick={() => (showLegalResearch = !showLegalResearch)}
-		>
-			<span class="mode-label">
-				{showLegalResearch ? 'HIDE LEGAL RESEARCH' : 'AUTOMATED LEGAL RESEARCH'}
-			</span>
-		</button>
-	</div>
-	{#if showLegalResearch}
-		<div class="summary-reader-container">
-			<AutomatedLegalResearch research={{ query: '', jurisdiction: '', case_type: '', research_depth: 'comprehensive', metadata: { research_timestamp: '', model_used: 'gemma3-legal' } }} />
-		</div>
-	{/if}
-
-	<!-- Contextual Detective Board -->
-	<div class="summary-toggle">
-		<button
-			class="mode-btn {showDetectiveBoard ? 'active' : ''}"
-			onclick={() => (showDetectiveBoard = !showDetectiveBoard)}
-		>
-			<span class="mode-label">
-				{showDetectiveBoard ? 'HIDE DETECTIVE BOARD' : 'CONTEXTUAL DETECTIVE BOARD'}
-			</span>
-		</button>
-	</div>
-	{#if showDetectiveBoard}
-		<div class="summary-reader-container">
-			<ContextualDetectiveBoard caseId={selectedCaseId || 'default'} initialEvidence={evidencePool} />
-		</div>
-	{/if}
-	<!-- Hybrid Whiteboard -->
-	<div class="section-toggle">
-		<button
-			class="mode-btn {showHybridBoard ? 'active' : ''}"
-			onclick={() => (showHybridBoard = !showHybridBoard)}
-		>
-			<span class="mode-icon">W</span>
-				{showHybridBoard ? 'HIDE WHITEBOARD' : 'EVIDENCE WHITEBOARD'}
-		</button>
-	</div>
-	{#if showHybridBoard}
-		<div class="summary-reader-container" style="height: 500px;">
-			<HybridBoard caseId={selectedCaseId || 'default'} />
-		</div>
-	{/if}
-
-	<div class="section-toggle">
-		<button
-			class="mode-btn {showContractAnalyzer ? 'active' : ''}"
-			onclick={() => (showContractAnalyzer = !showContractAnalyzer)}
-		>
-			<span class="mode-icon">C</span>
-				{showContractAnalyzer ? 'HIDE CONTRACT ANALYZER' : 'CONTRACT ANALYZER'}
-		</button>
-	</div>
-	{#if showContractAnalyzer}
-		<div class="summary-reader-container">
-			<ContractAnalyzer />
-		</div>
-	{/if}
-
-	<button
-		class="mode-btn {showGoldenLayout ? 'active' : ''}"
-		onclick={() => (showGoldenLayout = !showGoldenLayout)}
-	>
-		<span class="mode-icon">[G]</span>
-		<span class="mode-label">
-			{showGoldenLayout ? 'HIDE GOLDEN LAYOUT' : 'GOLDEN RATIO LAYOUT'}
-		</span>
-	</button>
-	{#if showGoldenLayout}
-		<div class="summary-reader-container">
-			<GoldenLayout ratio="golden" collapsible={true} sidebarPosition="right">
-				{#snippet children()}
-					<div style="padding: 1rem; background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2); border-radius: 8px; min-height: 200px;">
-						<h3 style="color: #10b981; margin-bottom: 0.5rem;">Main Content Area</h3>
-						<p style="color: #9ca3af; font-size: 0.875rem;">This panel uses golden ratio proportions (1.618:1). The sidebar is collapsible with Ctrl+\\ keyboard shortcut.</p>
-						<p style="color: #6b7280; font-size: 0.75rem; margin-top: 0.5rem;">Use this layout for evidence review, document analysis, or case comparison views.</p>
-					</div>
-				{/snippet}
-				{#snippet sidebar()}
-					<div style="padding: 1rem; background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.2); border-radius: 8px; min-height: 200px;">
-						<h4 style="color: #3b82f6; margin-bottom: 0.5rem;">Sidebar Panel</h4>
-						<p style="color: #9ca3af; font-size: 0.75rem;">Context, metadata, or navigation panel. Collapses to preserve main content space.</p>
-					</div>
-				{/snippet}
-			</GoldenLayout>
-		</div>
-	{/if}
-
-	<div class="section-toggle">
-		<button
-			class="mode-btn {showOrchestrator ? 'active' : ''}"
-			onclick={() => (showOrchestrator = !showOrchestrator)}
-		>
-			<span class="mode-icon">R</span>
-				{showOrchestrator ? 'HIDE RAG PIPELINE' : 'RAG + KAG + DAG PIPELINE'}
-		</button>
-	</div>
-	{#if showOrchestrator}
-		<div class="summary-reader-container">
-			<IntelligentModelOrchestrator caseId={selectedCaseId} initialQuery={analysisQuery} />
-		</div>
-	{/if}
-
-	<div class="section-toggle">
-		<button
-			class="mode-btn {showWebIngest ? 'active' : ''}"
-			onclick={() => (showWebIngest = !showWebIngest)}
-		>
-			<span class="mode-icon">W</span>
-				{showWebIngest ? 'HIDE WEB INGEST' : 'WEB URL INGEST'}
-		</button>
-	</div>
-	{#if showWebIngest}
-		<div class="summary-reader-container">
-			<div class="web-ingest-panel">
-				<h3 style="margin: 0 0 0.75rem; color: #10b981;">WEB URL INGEST</h3>
-				<p style="color: #8b949e; font-size: 0.85rem; margin-bottom: 1rem;">
-					Paste a URL to fetch, chunk, embed, and store in the knowledge base for RAG search.
-				</p>
-				<div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
-					<input
-						type="url"
-						bind:value={ingestUrl}
-						placeholder="https://example.com/legal-document"
-						disabled={ingestLoading}
-						style="flex: 1; padding: 0.5rem 0.75rem; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #f0f6fc; font-family: inherit; font-size: 0.85rem;"
+	{#if activeTool}
+		<div class="tool-expanded">
+			<div class="tool-expanded-header">
+				<button class="tool-close-btn" onclick={() => (activeTool = null)}>✕ CLOSE</button>
+			</div>
+			<div class="summary-reader-container">
+				{#if activeTool === 'summary'}
+					<AISummaryReader documentType="evidence" />
+				{:else if activeTool === 'judicial'}
+					<JudicialAnalysisAgent
+						evidence={evidencePool.map((e: any) => ({ id: e.id, title: e.title ?? 'Untitled', description: e.description }))}
 					/>
-					<input
-						type="text"
-						bind:value={ingestCaseId}
-						placeholder="Case ID (optional)"
-						disabled={ingestLoading}
-						style="width: 150px; padding: 0.5rem 0.75rem; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #f0f6fc; font-family: inherit; font-size: 0.85rem;"
-					/>
-					<button
-						class="mode-btn active"
-						onclick={ingestWebUrl}
-						disabled={ingestLoading || !ingestUrl.trim()}
-						style="white-space: nowrap;"
-					>
-						{ingestLoading ? 'INGESTING...' : 'INGEST'}
-					</button>
-				</div>
-				{#if ingestError}
-					<div style="color: #f85149; background: #f8514920; padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.85rem; margin-bottom: 0.5rem;">
-						{ingestError}
+				{:else if activeTool === 'graph'}
+					<GraphVisualizationGallery />
+				{:else if activeTool === 'research'}
+					<AutomatedLegalResearch research={{ query: '', jurisdiction: '', case_type: '', research_depth: 'comprehensive', metadata: { research_timestamp: '', model_used: 'gemma3-legal' } }} />
+				{:else if activeTool === 'detective'}
+					<ContextualDetectiveBoard caseId={selectedCaseId || 'default'} initialEvidence={evidencePool} />
+				{:else if activeTool === 'whiteboard'}
+					<div style="height: 500px;">
+						<HybridBoard caseId={selectedCaseId || 'default'} />
 					</div>
-				{/if}
-				{#if ingestResult}
-					<div style="color: #10b981; background: #10b98120; padding: 0.75rem; border-radius: 6px; font-size: 0.85rem;">
-						<strong>Ingested:</strong> {ingestResult.title}<br/>
-						<strong>Chunks:</strong> {ingestResult.chunksCreated} ({ingestResult.totalTokens} tokens)<br/>
-						<strong>Model:</strong> {ingestResult.embeddingModel} | <strong>Time:</strong> {ingestResult.totalMs}ms
+				{:else if activeTool === 'contract'}
+					<ContractAnalyzer />
+				{:else if activeTool === 'golden'}
+					<GoldenLayout ratio="golden" collapsible={true} sidebarPosition="right">
+						{#snippet children()}
+							<div style="padding: 1rem; background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2); border-radius: 8px; min-height: 200px;">
+								<h3 style="color: #10b981; margin-bottom: 0.5rem;">Main Content Area</h3>
+								<p style="color: #9ca3af; font-size: 0.875rem;">This panel uses golden ratio proportions (1.618:1). The sidebar is collapsible with Ctrl+\ keyboard shortcut.</p>
+								<p style="color: #6b7280; font-size: 0.75rem; margin-top: 0.5rem;">Use this layout for evidence review, document analysis, or case comparison views.</p>
+							</div>
+						{/snippet}
+						{#snippet sidebar()}
+							<div style="padding: 1rem; background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.2); border-radius: 8px; min-height: 200px;">
+								<h4 style="color: #3b82f6; margin-bottom: 0.5rem;">Sidebar Panel</h4>
+								<p style="color: #9ca3af; font-size: 0.75rem;">Context, metadata, or navigation panel. Collapses to preserve main content space.</p>
+							</div>
+						{/snippet}
+					</GoldenLayout>
+				{:else if activeTool === 'rag'}
+					<IntelligentModelOrchestrator caseId={selectedCaseId} initialQuery={analysisQuery} />
+				{:else if activeTool === 'ingest'}
+					<div class="web-ingest-panel">
+						<h3 style="margin: 0 0 0.75rem; color: #10b981;">WEB URL INGEST</h3>
+						<p style="color: #8b949e; font-size: 0.85rem; margin-bottom: 1rem;">
+							Paste a URL to fetch, chunk, embed, and store in the knowledge base for RAG search.
+						</p>
+						<div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+							<input
+								type="url"
+								bind:value={ingestUrl}
+								placeholder="https://example.com/legal-document"
+								disabled={ingestLoading}
+								style="flex: 1; padding: 0.5rem 0.75rem; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #f0f6fc; font-family: inherit; font-size: 0.85rem;"
+							/>
+							<input
+								type="text"
+								bind:value={ingestCaseId}
+								placeholder="Case ID (optional)"
+								disabled={ingestLoading}
+								style="width: 150px; padding: 0.5rem 0.75rem; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #f0f6fc; font-family: inherit; font-size: 0.85rem;"
+							/>
+							<button
+								class="mode-btn active"
+								onclick={ingestWebUrl}
+								disabled={ingestLoading || !ingestUrl.trim()}
+								style="white-space: nowrap;"
+							>
+								{ingestLoading ? 'INGESTING...' : 'INGEST'}
+							</button>
+						</div>
+						{#if ingestError}
+							<div style="color: #f85149; background: #f8514920; padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.85rem; margin-bottom: 0.5rem;">
+								{ingestError}
+							</div>
+						{/if}
+						{#if ingestResult}
+							<div style="color: #10b981; background: #10b98120; padding: 0.75rem; border-radius: 6px; font-size: 0.85rem;">
+								<strong>Ingested:</strong> {ingestResult.title}<br/>
+								<strong>Chunks:</strong> {ingestResult.chunksCreated} ({ingestResult.totalTokens} tokens)<br/>
+								<strong>Model:</strong> {ingestResult.embeddingModel} | <strong>Time:</strong> {ingestResult.totalMs}ms
+							</div>
+						{/if}
 					</div>
 				{/if}
 			</div>
@@ -1228,4 +1133,20 @@
 		z-index: 1;
 		padding: 0 1rem 1rem;
 	}
+
+	.tools-panel { margin: 1.5rem 1rem; }
+	.tools-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+	.tools-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; color: #10b981; }
+	.tools-count { font-size: 0.65rem; color: #6b7280; }
+	.tools-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; }
+	.tool-card { display: flex; flex-direction: column; align-items: flex-start; gap: 0.2rem; padding: 0.6rem 0.75rem; background: rgba(16,185,129,0.04); border: 1px solid rgba(16,185,129,0.15); border-radius: 6px; cursor: pointer; text-align: left; transition: all 0.15s; }
+	.tool-card:hover { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.4); }
+	.tool-card.active { background: rgba(16,185,129,0.15); border-color: #10b981; }
+	.tool-icon-badge { font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; color: #10b981; }
+	.tool-label { font-size: 0.7rem; font-weight: 600; color: #e6edf3; }
+	.tool-desc { font-size: 0.6rem; color: #6b7280; }
+	.tool-expanded { margin: 1rem 1rem 0; border: 1px solid rgba(16,185,129,0.2); border-radius: 8px; overflow: hidden; }
+	.tool-expanded-header { display: flex; justify-content: flex-end; padding: 0.5rem 0.75rem; background: rgba(16,185,129,0.05); border-bottom: 1px solid rgba(16,185,129,0.15); }
+	.tool-close-btn { font-size: 0.7rem; color: #6b7280; cursor: pointer; background: none; border: none; padding: 0.2rem 0.5rem; border-radius: 4px; }
+	.tool-close-btn:hover { color: #10b981; background: rgba(16,185,129,0.1); }
 </style>

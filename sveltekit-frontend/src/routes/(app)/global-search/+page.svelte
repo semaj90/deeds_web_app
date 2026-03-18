@@ -90,11 +90,11 @@
 		search_time_ms?: number;
 	}
 
-	type SearchMode = 'cases' | 'rag' | 'evidence' | 'statutes' | 'precedents' | 'glossary';
+	type SearchMode = 'all' | 'cases' | 'rag' | 'evidence' | 'statutes' | 'precedents' | 'glossary' | 'library';
 
 	let searchQuery = $state('');
 	let isSearching = $state(false);
-	let searchMode = $state<SearchMode>('evidence');
+	let searchMode = $state<SearchMode>('all');
 	let scoringMethod = $state<"vector_only" | "hybrid" | "tfidf_only">("hybrid");
 	let caseIdFilter = $state('');
 	let caseSearchFilters = $state({
@@ -123,6 +123,24 @@
 	let precedentResults = $state<any[]>([]);
 	let glossaryResults = $state<any[]>([]);
 	let auxTiming = $state<Record<string, number>>({});
+
+	// Platform (all) search results
+	interface PlatformHit {
+		id: string;
+		entityType: string;
+		title: string;
+		snippet: string;
+		score: number;
+		matchType: string;
+		route: string;
+		jurisdiction?: string;
+		corpusType?: string;
+	}
+	let platformHits = $state<PlatformHit[]>([]);
+	let platformGroups = $state<Record<string, number>>({});
+
+	// Library search results
+	let libraryResults = $state<any[]>([]);
 
 	let selectedResult = $state<SearchResult | null>(null);
 	let selectedBundle = $state<EvidenceBundle | null>(null);
@@ -183,13 +201,20 @@
 		statuteResults = [];
 		precedentResults = [];
 		glossaryResults = [];
+		platformHits = [];
+		platformGroups = {};
+		libraryResults = [];
 		selectedResult = null;
 		selectedBundle = null;
 		gpuRankedItems = [];
 		gpuRerankMetrics = null;
 
 		try {
-			if (searchMode === 'cases') {
+			if (searchMode === 'all') {
+				await searchPlatform();
+			} else if (searchMode === 'library') {
+				await searchLibrary();
+			} else if (searchMode === 'cases') {
 				await searchCaseRecords();
 			} else if (searchMode === 'evidence') {
 				await searchEvidence();
@@ -208,6 +233,27 @@
 		} finally {
 			isSearching = false;
 		}
+	}
+
+	async function searchPlatform() {
+		const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}&type=all&limit=20`);
+		if (!res.ok) throw new Error(`Platform search failed: ${res.status}`);
+		const data = await res.json();
+		platformHits = data.hits ?? [];
+		platformGroups = data.groups ?? {};
+		totalFound = data.totalResults ?? platformHits.length;
+	}
+
+	async function searchLibrary() {
+		const res = await fetch('/api/library/search', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ query: searchQuery, limit: 20 }),
+		});
+		if (!res.ok) throw new Error(`Library search failed: ${res.status}`);
+		const data = await res.json();
+		libraryResults = data.results ?? [];
+		totalFound = libraryResults.length;
 	}
 
 	async function searchCaseRecords() {
@@ -386,6 +432,12 @@
 			</div>
 
 			<div class="mode-toggle">
+				<button class="mode-btn" class:active={searchMode === 'all'} onclick={() => searchMode = 'all'}>
+					<Icon name="layers" size={14} /> All
+				</button>
+				<button class="mode-btn" class:active={searchMode === 'library'} onclick={() => searchMode = 'library'}>
+					<Icon name="library-big" size={14} /> Library
+				</button>
 				<button class="mode-btn" class:active={searchMode === 'cases'} onclick={() => { searchMode = 'cases'; searchSuggestions = []; }}>
 					<Icon name="briefcase" size={14} /> Cases
 				</button>
@@ -393,7 +445,7 @@
 					<Icon name="network" size={14} /> Evidence
 				</button>
 				<button class="mode-btn" class:active={searchMode === 'rag'} onclick={() => searchMode = 'rag'}>
-					<Icon name="search" size={14} /> Knowledge Base
+					<Icon name="search" size={14} /> RAG
 				</button>
 				<button class="mode-btn" class:active={searchMode === 'statutes'} onclick={() => searchMode = 'statutes'}>
 					<Icon name="scale" size={14} /> Statutes
@@ -677,6 +729,72 @@
 					<span class="animate-spin"><Icon name="loader-2" size={32} /></span>
 					<p>Running {searchMode === 'evidence' ? 'RAG+KAG+DAG' : searchMode === 'rag' ? 'RAG' : 'typed Drizzle'} pipeline...</p>
 				</div>
+			{:else if searchMode === 'all' && platformHits.length > 0}
+				<!-- Platform Search Results (grouped) -->
+				{#if Object.keys(platformGroups).length > 0}
+					<div class="platform-groups">
+						{#each Object.entries(platformGroups) as [entityType, count]}
+							<span class="platform-group-badge">
+								{entityType} <span class="group-count">{count}</span>
+							</span>
+						{/each}
+					</div>
+				{/if}
+				{#each platformHits as hit, i}
+					<a href={hit.route} class="result-card platform-hit">
+						<div class="bundle-header">
+							<div class="bundle-rank">#{i + 1}</div>
+							<span class="entity-type-badge">{hit.entityType}</span>
+							<div class="bundle-title">{hit.title}</div>
+							<div class="confidence-badge" style="background: rgba(96, 165, 250, 0.15); color: #60a5fa;">
+								{hit.matchType} · {Math.round(hit.score * 100)}%
+							</div>
+						</div>
+						<p class="bundle-preview">{hit.snippet}</p>
+						{#if hit.jurisdiction || hit.corpusType}
+							<div class="bundle-meta">
+								{#if hit.jurisdiction}
+									<span class="meta-tag source">{hit.jurisdiction}</span>
+								{/if}
+								{#if hit.corpusType}
+									<span class="meta-tag section">{hit.corpusType}</span>
+								{/if}
+							</div>
+						{/if}
+					</a>
+				{/each}
+
+			{:else if searchMode === 'library' && libraryResults.length > 0}
+				<!-- Legal Library Search Results -->
+				{#each libraryResults as hit, i}
+					<a href="/library/{hit.document_id ?? ''}/node/{hit.node_id ?? ''}" class="result-card library-hit">
+						<div class="bundle-header">
+							<div class="bundle-rank">#{i + 1}</div>
+							<div class="bundle-title">{hit.document_title ?? 'Legal Document'}</div>
+							<div class="confidence-badge" style="background: rgba(74, 222, 128, 0.15); color: #4ade80;">
+								{Math.round(((hit.score ?? hit.rrf_score ?? 0) as number) * 100)}%
+							</div>
+						</div>
+						{#if hit.node_heading}
+							<p class="hit-heading-label">{hit.node_heading}</p>
+						{/if}
+						<p class="bundle-preview">{hit.snippet ?? (hit.chunk_text ?? '').slice(0, 250)}</p>
+						{#if hit.jurisdiction_code || hit.corpus_type}
+							<div class="bundle-meta">
+								{#if hit.jurisdiction_code}
+									<span class="meta-tag source">{hit.jurisdiction_code}</span>
+								{/if}
+								{#if hit.corpus_type}
+									<span class="meta-tag section">{hit.corpus_type}</span>
+								{/if}
+								{#if hit.citation_label}
+									<span class="meta-tag citation">{hit.citation_label}</span>
+								{/if}
+							</div>
+						{/if}
+					</a>
+				{/each}
+
 			{:else if searchMode === 'cases' && caseResults.length > 0}
 				{#each caseResults as result, i}
 					<button
@@ -1624,6 +1742,53 @@
 	.empty-hint, .error-hint {
 		font-size: 0.7rem;
 		color: #4a4030;
+	}
+
+	/* Platform search */
+	.platform-groups {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+		margin-bottom: 0.75rem;
+	}
+
+	.platform-group-badge {
+		font-size: 0.6875rem;
+		padding: 0.2rem 0.6rem;
+		border-radius: 99px;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		color: rgba(255, 255, 255, 0.5);
+		text-transform: capitalize;
+	}
+
+	.group-count {
+		font-weight: 700;
+		color: #60a5fa;
+		margin-left: 0.25rem;
+	}
+
+	.entity-type-badge {
+		font-size: 0.5625rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		padding: 0.1rem 0.4rem;
+		border-radius: 3px;
+		background: rgba(255, 255, 255, 0.06);
+		color: rgba(255, 255, 255, 0.4);
+		letter-spacing: 0.03em;
+	}
+
+	.platform-hit, .library-hit {
+		text-decoration: none;
+		color: inherit;
+		display: block;
+	}
+
+	.hit-heading-label {
+		font-size: 0.75rem;
+		color: rgba(255, 255, 255, 0.4);
+		margin: 0.15rem 0 0.35rem;
 	}
 
 	.error-msg {

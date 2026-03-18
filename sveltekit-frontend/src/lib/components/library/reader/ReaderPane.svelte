@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import * as Collapsible from 'bits-ui';
-	import { ChevronRight } from 'lucide-svelte';
+	import Icon from '$lib/components/ui/Icon.svelte';
 
 	interface LegalNode {
 		id: string;
@@ -45,21 +45,22 @@
 		{#each nodes as node (node.id)}
 			<div class="mb-8 max-w-3xl mx-auto">
 				<div class="group flex items-start gap-4 mb-2">
-					<div 
+					<div
 						class="mt-1 w-5 h-5 flex items-center justify-center rounded hover:bg-[#222] cursor-pointer transition-colors"
 						onclick={() => toggleNode(node.id)}
 					>
-						<ChevronRight 
-							class="w-4 h-4 text-[#555] transition-transform duration-200"
+						<span
+							class="text-[#555] transition-transform duration-200 block"
 							style="transform: {expandedNodes.has(node.id) ? 'rotate(90deg)' : 'rotate(0deg)'}"
-						/>
+						>
+							<Icon name="chevron-right" size={16} />
+						</span>
 					</div>
-					
 					<div class="flex-1">
 						<h3 class="text-lg font-bold text-white mb-2 group-hover:text-blue-400 transition-colors cursor-pointer">
 							{node.heading}
 						</h3>
-						
+
 						{#if node.citationLabel}
 							<span class="text-[10px] bg-[#1a1a1c] text-[#888] px-2 py-0.5 rounded border border-[#222] font-mono mb-4 inline-block">
 								{node.citationLabel}

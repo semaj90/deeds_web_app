@@ -312,19 +312,19 @@
     <!-- Stats Grid -->
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
       {#each [
-        { label: 'Active Cases', value: stats.activeCases, icon: 'briefcase' },
-        { label: 'Total Evidence', value: stats.totalEvidence, icon: 'file-text' },
-        { label: 'Persons of Interest', value: stats.personsOfInterest, icon: 'users' },
-        { label: 'Citations', value: stats.totalCitations, icon: 'bookmark' },
-        { label: 'Knowledge Base', value: stats.knowledgeBase.total, icon: 'database' },
-        { label: 'Total Cases', value: stats.recentActivity, icon: 'folder' },
+        { label: 'Active Cases', value: stats.activeCases, icon: 'briefcase', color: '#c8a84b' },
+        { label: 'Total Evidence', value: stats.totalEvidence, icon: 'file-text', color: '#60a5fa' },
+        { label: 'Persons of Interest', value: stats.personsOfInterest, icon: 'users', color: '#f87171' },
+        { label: 'Citations', value: stats.totalCitations, icon: 'bookmark', color: '#a78bfa' },
+        { label: 'Knowledge Base', value: stats.knowledgeBase.total, icon: 'database', color: '#34d399' },
+        { label: 'Total Cases', value: stats.recentActivity, icon: 'folder', color: '#38bdf8' },
       ] as stat}
-        <div style="background: #fff; border: 2px solid rgba(0,0,0,0.12); border-radius: 8px; padding: 1.25rem 1rem; text-align: center;">
-          <div style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.06); color: #1a1a1a; margin-bottom: 0.5rem;">
-            <Icon name={stat.icon} size={18} />
+        <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(212,199,163,0.12); border-radius: 8px; padding: 1.25rem 1rem; text-align: center; transition: border-color 0.2s;">
+          <div style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: rgba(212,199,163,0.08); margin-bottom: 0.5rem;">
+            <span class="i-lucide-{stat.icon} inline-block" style="width:18px;height:18px;color:{stat.color}"></span>
           </div>
-          <p style="font-size: 2rem; font-weight: 800; color: #1a1a1a; line-height: 1.1; margin: 0;">{stat.value}</p>
-          <p style="font-size: 0.7rem; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.08em; margin: 0.35rem 0 0 0;">{stat.label}</p>
+          <p style="font-size: 2rem; font-weight: 800; color: #d4c7a3; line-height: 1.1; margin: 0;">{stat.value}</p>
+          <p style="font-size: 0.7rem; font-weight: 600; color: rgba(212,199,163,0.5); text-transform: uppercase; letter-spacing: 0.08em; margin: 0.35rem 0 0 0;">{stat.label}</p>
         </div>
       {/each}
     </div>
