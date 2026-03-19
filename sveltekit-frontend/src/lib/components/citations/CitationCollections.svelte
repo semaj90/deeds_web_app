@@ -211,7 +211,7 @@
 	<!-- Error -->
 	{#if error}
 		<div class="error-msg">
-			<Icon name="alert-triangle" size={12} />
+			<Icon name="triangle-alert" size={12} />
 			{error}
 			<button class="retry-btn" onclick={loadCollections}>Retry</button>
 		</div>
@@ -220,7 +220,7 @@
 	<!-- Loading / Empty / List -->
 	{#if isLoading && collections.length === 0}
 		<div class="empty-state">
-			<Icon name="loader-2" size={16} class="animate-spin" />
+			<Icon name="loader-circle" size={16} class="animate-spin" />
 			Loading collections...
 		</div>
 	{:else if collections.length === 0}

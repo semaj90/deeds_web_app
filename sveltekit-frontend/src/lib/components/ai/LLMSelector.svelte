@@ -86,10 +86,10 @@
 
 	function getStatusIcon(status: string): string {
 		switch (status) {
-			case 'online': return 'check-circle';
+			case 'online': return 'circle-check';
 			case 'offline': return 'circle';
-			case 'loading': return 'loader-2';
-			case 'error': return 'alert-circle';
+			case 'loading': return 'loader-circle';
+			case 'error': return 'circle-alert';
 			default: return 'circle';
 		}
 	}
@@ -235,7 +235,7 @@
 								</button>
 							{/if}
 							{#if selectedModel?.id === model.id}
-								<Icon name="check-circle" size={16} />
+								<Icon name="circle-check" size={16} />
 							{/if}
 						</div>
 					</div>

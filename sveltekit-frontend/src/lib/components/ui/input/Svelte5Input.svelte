@@ -1,5 +1,4 @@
 <script lang="ts">
-
 /**
  * Svelte 5 Input Component
  * Native HTML with Svelte 5 runes and accessible input
@@ -47,51 +46,41 @@ let {
 	name = '',
 	id = crypto.randomUUID(),
 	autocomplete = '',
-	min: max,
-	step: pattern,
-	maxlength: minlength,
+	min,
+	max,
+	step,
+	pattern,
+	maxlength,
+	minlength,
 	class: className = '',
 	variant = 'default',
 	size = 'md',
 	error = '',
 	label = '',
-	oninput: onchange,
-	onfocus: onblur,
-	prefix: suffix
+	oninput,
+	onchange,
+	onfocus,
+	onblur,
+	prefix,
+	suffix,
 }: Props = $props();
 
 let isFocused = $state(false);
 
-// Size classes
 let sizeClasses = $derived({
 	sm: 'h-8 text-sm px-2',
 	md: 'h-10 text-base px-3',
 	lg: 'h-12 text-lg px-4'
 }[size]);
 
-// Variant classes
 let variantClasses = $derived({
-	default: `
-		bg-panelSoft text-white
-		border-2 border-sand/30
-		hover:border-sand/30 focus:border-info focus:ring-2 focus:ring-info/20 placeholder:text-sand/40
-	`,
-	nes: `
-		bg-panel text-white
-		border-4 border-white
-		font-["Press_Start_2P",monospace]
-		placeholder:text-sand/60
-	`,
-	ghost: `
-		bg-transparent text-white
-		border-b-2 border-sand/30
-		hover:border-sand/30 focus:border-info, placeholder:text-sand/40
-		rounded-none
-	`
-}[variant].replace(/\s+/g, ' ').trim());
+	default: 'bg-panelSoft text-white border-2 border-sand/30 hover:border-sand/30 focus:border-info focus:ring-2 focus:ring-info/20 placeholder:text-sand/40',
+	nes: 'bg-panel text-white border-4 border-white font-mono placeholder:text-sand/60',
+	ghost: 'bg-transparent text-white border-b-2 border-sand/30 hover:border-sand/30 focus:border-info placeholder:text-sand/40 rounded-none'
+}[variant]);
 
 let errorClasses = $derived(
-	error ? 'border-danger focus:border-danger, focus:ring-danger/20' : ''
+	error ? 'border-danger focus:border-danger focus:ring-danger/20' : ''
 );
 
 function handleInput(e: Event) {
@@ -155,12 +144,12 @@ function handleBlur() {
 				   disabled:opacity-50 disabled:cursor-not-allowed
 				   {prefix ? 'pl-10' : ''}
 				   {suffix ? 'pr-10' : ''}"
-			oninput={ handleInput }
-			onchange={ handleChange }
-			onfocus={ handleFocus }
-			onblur={ handleBlur }
+			oninput={handleInput}
+			onchange={handleChange}
+			onfocus={handleFocus}
+			onblur={handleBlur}
 			aria-invalid={!!error}
-			aria-describedby={error ? `${id}-error`  | undefined}
+			aria-describedby={error ? `${id}-error` : undefined}
 		/>
 
 		{#if suffix}
@@ -176,5 +165,3 @@ function handleBlur() {
 		</p>
 	{/if}
 </div>
-
-

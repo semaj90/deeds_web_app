@@ -77,8 +77,14 @@ const ALL_ROUTES = [
 
 // SSE / long-poll pages that never reach networkidle
 const SSE_PAGES = new Set([
-  'cases-overview', 'dashboard', 'command-center', 'cases-chat',
-  'admin-all-routes', 'admin-phase89', 'admin-component-analysis',
+  'cases-overview',
+  'dashboard',
+  'command-center',
+  'cases-chat',
+  'admin-all-routes',
+  'admin-phase89',
+  'admin-component-analysis',
+  'admin-error-brain',
 ]);
 
 // CSR-only pages (ssr = false) need extra wait for client JS to render

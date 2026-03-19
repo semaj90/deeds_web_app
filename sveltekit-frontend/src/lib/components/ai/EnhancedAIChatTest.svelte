@@ -302,7 +302,7 @@ What would you like to explore today?`,
 	}
 
 	// Connection status helpers
-	function getStatusIcon(): string { switch (connectionStatus) { case 'checking': return 'loader-2'; case 'connected': return 'check-circle'; case 'error': return 'x-circle'; default: return 'x-circle'; } }
+	function getStatusIcon(): string { switch (connectionStatus) { case 'checking': return 'loader-circle'; case 'connected': return 'circle-check'; case 'error': return 'circle-x'; default: return 'circle-x'; } }
 
 	function getStatusColor() {
 		switch (connectionStatus) {

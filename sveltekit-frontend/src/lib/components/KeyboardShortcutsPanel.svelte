@@ -9,24 +9,36 @@
 	let { open = $bindable(false), onclose }: Props = $props();
 
 	const shortcuts = [
-		{ category: 'Navigation', items: [
-			{ keys: ['Ctrl', 'Shift', 'D'], action: 'Toggle Document Writer' },
-			{ keys: ['Ctrl', 'K'], action: 'Open Global Search' },
-			{ keys: ['Ctrl', '/'], action: 'Focus Terminal Input' },
+		{ category: 'Navigation', icon: 'compass', items: [
+			{ keys: ['Ctrl', '1'], action: 'Dashboard' },
+			{ keys: ['Ctrl', '2'], action: 'Cases' },
+			{ keys: ['Ctrl', '3'], action: 'Evidence' },
+			{ keys: ['Ctrl', '4'], action: 'Search' },
+			{ keys: ['Ctrl', '5'], action: 'Terminal' },
 			{ keys: ['Escape'], action: 'Close Modal / Panel' },
 		]},
-		{ category: 'Evidence', items: [
+		{ category: 'Cases', icon: 'briefcase', items: [
+			{ keys: ['Ctrl', 'N'], action: 'New Case' },
+			{ keys: ['Ctrl', 'P'], action: 'Print / Export Case' },
+		]},
+		{ category: 'Evidence', icon: 'file-text', items: [
 			{ keys: ['Ctrl', 'U'], action: 'Upload Evidence' },
 			{ keys: ['Ctrl', 'E'], action: 'Open Evidence Library' },
 			{ keys: ['Ctrl', 'F'], action: 'Search Current Page' },
 		]},
-		{ category: 'Chat', items: [
+		{ category: 'AI / Chat', icon: 'bot', items: [
 			{ keys: ['Enter'], action: 'Send Message' },
 			{ keys: ['Shift', 'Enter'], action: 'New Line in Chat' },
 			{ keys: ['Ctrl', 'L'], action: 'Clear Chat History' },
 		]},
-		{ category: 'General', items: [
+		{ category: 'Search', icon: 'search', items: [
+			{ keys: ['Ctrl', 'K'], action: 'Open Global Search' },
+			{ keys: ['Ctrl', '/'], action: 'Focus Terminal Input' },
+			{ keys: ['/'], action: 'Quick Search Focus' },
+		]},
+		{ category: 'System', icon: 'settings', items: [
 			{ keys: ['?'], action: 'Show This Panel' },
+			{ keys: ['Ctrl', 'Shift', 'D'], action: 'Toggle Document Writer' },
 			{ keys: ['Ctrl', 'S'], action: 'Save Current Note' },
 			{ keys: ['Ctrl', 'Z'], action: 'Undo' },
 		]},
@@ -49,24 +61,21 @@
 
 {#if open}
 	<div
-		class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+		class="shortcut-backdrop"
 		onclick={handleBackdropClick}
 		role="dialog"
 		aria-modal="true"
 		aria-label="Keyboard Shortcuts"
 	>
-		<div
-			class="relative w-[550px] max-w-[90vw] max-h-[80vh] bg-[#1c1917] border border-stone-700 rounded-lg shadow-2xl overflow-hidden flex flex-col"
-			onclick={(e) => e.stopPropagation()}
-		>
+		<div class="shortcut-dialog" onclick={(e) => e.stopPropagation()}>
 			<!-- Header -->
-			<div class="flex items-center justify-between px-5 py-3 border-b border-stone-800">
-				<div class="flex items-center gap-2">
-					<Icon name="keyboard" size={18} class="text-emerald-400" />
-					<span class="font-mono text-sm text-stone-200 tracking-wider">KEYBOARD SHORTCUTS</span>
+			<div class="shortcut-header">
+				<div class="shortcut-header-left">
+					<Icon name="keyboard" size={18} />
+					<span class="shortcut-header-title">KEYBOARD SHORTCUTS</span>
 				</div>
 				<button
-					class="text-stone-500 hover:text-white bg-transparent border-none cursor-pointer p-1"
+					class="shortcut-close"
 					onclick={() => { open = false; onclose?.(); }}
 				>
 					<Icon name="x" size={18} />
@@ -74,21 +83,24 @@
 			</div>
 
 			<!-- Shortcuts Grid -->
-			<div class="flex-1 overflow-y-auto p-5">
-				<div class="grid grid-cols-1 gap-5">
+			<div class="shortcut-body">
+				<div class="shortcut-grid">
 					{#each shortcuts as section}
-						<div>
-							<h3 class="text-[11px] text-emerald-500 font-mono tracking-widest uppercase mb-2.5">{section.category}</h3>
-							<div class="flex flex-col gap-1.5">
+						<div class="shortcut-section">
+							<h3 class="section-title">
+								<Icon name={section.icon} size={13} />
+								{section.category}
+							</h3>
+							<div class="section-items">
 								{#each section.items as shortcut}
-									<div class="flex items-center justify-between py-1.5 px-2 rounded hover:bg-stone-800/50">
-										<span class="text-sm text-stone-300">{shortcut.action}</span>
-										<div class="flex items-center gap-1">
+									<div class="shortcut-row">
+										<span class="shortcut-action">{shortcut.action}</span>
+										<div class="shortcut-keys">
 											{#each shortcut.keys as key, i}
 												{#if i > 0}
-													<span class="text-stone-600 text-xs">+</span>
+													<span class="key-plus">+</span>
 												{/if}
-												<kbd class="inline-block px-2 py-0.5 text-[11px] font-mono bg-stone-800 border border-stone-600 rounded text-stone-300 min-w-6 text-center">{key}</kbd>
+												<kbd class="key-badge">{key}</kbd>
 											{/each}
 										</div>
 									</div>
@@ -100,9 +112,175 @@
 			</div>
 
 			<!-- Footer -->
-			<div class="px-5 py-2.5 border-t border-stone-800 text-[10px] text-stone-600 text-center">
-				Press <kbd class="px-1.5 py-px bg-stone-800 border border-stone-700 rounded text-stone-400 text-[10px]">?</kbd> anywhere to toggle this panel
+			<div class="shortcut-footer">
+				Press <kbd class="key-badge-sm">?</kbd> to toggle &middot; <kbd class="key-badge-sm">Esc</kbd> to close
 			</div>
 		</div>
 	</div>
 {/if}
+
+<style>
+	.shortcut-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 50;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(0, 0, 0, 0.6);
+		backdrop-filter: blur(4px);
+	}
+
+	.shortcut-dialog {
+		position: relative;
+		width: 640px;
+		max-width: 90vw;
+		max-height: 80vh;
+		background: #1c1917;
+		border: 1px solid #44403c;
+		border-radius: 8px;
+		box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.shortcut-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.75rem 1.25rem;
+		border-bottom: 1px solid #292524;
+		color: #34d399;
+	}
+
+	.shortcut-header-left {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.shortcut-header-title {
+		font-family: 'JetBrains Mono', ui-monospace, monospace;
+		font-size: 0.8rem;
+		color: #d6d3d1;
+		letter-spacing: 0.1em;
+	}
+
+	.shortcut-close {
+		color: #78716c;
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		padding: 0.25rem;
+		display: flex;
+		align-items: center;
+	}
+
+	.shortcut-close:hover {
+		color: #fff;
+	}
+
+	.shortcut-body {
+		flex: 1;
+		overflow-y: auto;
+		padding: 1.25rem;
+	}
+
+	.shortcut-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1.25rem;
+	}
+
+	.shortcut-section {
+		min-width: 0;
+	}
+
+	.section-title {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		font-size: 0.65rem;
+		font-family: 'JetBrains Mono', ui-monospace, monospace;
+		color: #34d399;
+		text-transform: uppercase;
+		letter-spacing: 0.15em;
+		margin: 0 0 0.625rem 0;
+		font-weight: 600;
+	}
+
+	.section-items {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	.shortcut-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.3rem 0.5rem;
+		border-radius: 4px;
+	}
+
+	.shortcut-row:hover {
+		background: rgba(68, 64, 60, 0.35);
+	}
+
+	.shortcut-action {
+		font-size: 0.8rem;
+		color: #d6d3d1;
+	}
+
+	.shortcut-keys {
+		display: flex;
+		align-items: center;
+		gap: 0.2rem;
+		flex-shrink: 0;
+	}
+
+	.key-plus {
+		color: #57534e;
+		font-size: 0.65rem;
+	}
+
+	.key-badge {
+		display: inline-block;
+		padding: 0.125rem 0.4rem;
+		font-size: 0.65rem;
+		font-family: 'JetBrains Mono', ui-monospace, monospace;
+		background: #292524;
+		border: 1px solid #57534e;
+		border-radius: 3px;
+		color: #d6d3d1;
+		min-width: 1.4rem;
+		text-align: center;
+		line-height: 1.4;
+	}
+
+	.shortcut-footer {
+		padding: 0.625rem 1.25rem;
+		border-top: 1px solid #292524;
+		font-size: 0.625rem;
+		color: #57534e;
+		text-align: center;
+	}
+
+	.key-badge-sm {
+		display: inline-block;
+		padding: 0 0.3rem;
+		font-size: 0.6rem;
+		font-family: 'JetBrains Mono', ui-monospace, monospace;
+		background: #292524;
+		border: 1px solid #44403c;
+		border-radius: 3px;
+		color: #a8a29e;
+	}
+
+	@media (max-width: 640px) {
+		.shortcut-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

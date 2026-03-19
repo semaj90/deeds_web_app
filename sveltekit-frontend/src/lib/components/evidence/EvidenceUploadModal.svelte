@@ -274,9 +274,9 @@
 										{#if stageStatuses[i] === 'running'}
 											<Icon name="loader" size={16} class="text-accent animate-spin" />
 										{:else if stageStatuses[i] === 'done'}
-											<Icon name="check-circle" size={16} class="text-green-500" />
+											<Icon name="circle-check" size={16} class="text-green-500" />
 										{:else if stageStatuses[i] === 'error'}
-											<Icon name="alert-circle" size={16} class="text-red-500" />
+											<Icon name="circle-alert" size={16} class="text-red-500" />
 										{:else}
 											<span class="w-2 h-2 rounded-full bg-sand/20"></span>
 										{/if}
@@ -295,7 +295,7 @@
 					{#if uploadResult}
 						<div class="bg-green-900/10 border border-green-800/20 rounded-lg p-4 text-sm">
 							<div class="flex items-center gap-2 text-green-400 font-medium mb-2">
-								<Icon name="check-circle" size={16} />
+								<Icon name="circle-check" size={16} />
 								Upload Complete — Pipeline Processed
 							</div>
 							<div class="grid grid-cols-2 gap-2 text-xs text-sand/50">
@@ -319,7 +319,7 @@
 					<!-- Error -->
 					{#if uploadError}
 						<div class="flex items-center gap-2 bg-red-900/10 border border-red-800/20 rounded-lg p-3 text-sm text-red-400 mt-3">
-							<Icon name="alert-circle" size={16} class="shrink-0" />
+							<Icon name="circle-alert" size={16} class="shrink-0" />
 							<span class="font-medium">Upload issue:</span>
 							<span>{uploadError}</span>
 						</div>

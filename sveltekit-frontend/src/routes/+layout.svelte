@@ -7,7 +7,7 @@
     import YorhaSidebar from '$lib/components/layout/YorhaSidebar.svelte';
     import { notificationStore } from '$lib/stores/notifications.svelte';
     import { analytics } from '$lib/stores/analytics.svelte';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import { toast } from 'svelte-sonner';
     import { browser } from '$app/environment';
 
@@ -76,7 +76,7 @@
     // Track page views automatically
     $effect(() => {
         if (browser) {
-            analytics.trackPageView($page.url.pathname);
+            analytics.trackPageView(page.url.pathname);
         }
     });
 
@@ -123,16 +123,16 @@
     <CaseDocumentWriter bind:isOpen={showDocumentWriter} />
 {/if}
 
-{#if $page.state.showCaseModal && $page.state.caseId}
+{#if page.state.showCaseModal && page.state.caseId}
     <CaseOverviewModal 
-        id={$page.state.caseId} 
+        id={page.state.caseId} 
         onClose={closeCaseModal} 
     />
 {/if}
 
-{#if $page.state.showDocumentModal && $page.state.documentId}
+{#if page.state.showDocumentModal && page.state.documentId}
     <DocumentDetailModal 
-        id={$page.state.documentId} 
+        id={page.state.documentId} 
         onClose={closeDocumentModal} 
     />
 {/if}

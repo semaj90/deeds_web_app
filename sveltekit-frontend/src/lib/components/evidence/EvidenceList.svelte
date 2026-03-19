@@ -27,6 +27,15 @@
 		onClearFilters?: () => void;
 		onLinkCase?: (id: string) => void;
 	} = $props();
+
+	function getAccentColor(doc: any): string {
+		const ft = String(doc.fileType ?? doc.file_type ?? '').toLowerCase();
+		if (ft.includes('pdf')) return '#ef4444';
+		if (ft.startsWith('image/')) return '#a855f7';
+		if (ft.includes('word') || ft.includes('text') || ft.includes('document')) return '#60a5fa';
+		if (ft.includes('sheet') || ft.includes('csv') || ft.includes('excel')) return '#22c55e';
+		return 'rgba(212, 199, 163, 0.2)';
+	}
 </script>
 
 {#if evidence.length === 0}
@@ -53,6 +62,7 @@
 				class="ev-card"
 				role="button"
 				tabindex="0"
+				style="border-left-color: {getAccentColor(doc)};"
 				onclick={(e) => onOpenDetail?.(e, doc.id)}
 				onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') onOpenDetail?.(e as any, doc.id); }}
 			>
@@ -60,9 +70,10 @@
 					<span class="ev-card-icon">{getIcon(doc.fileType ?? doc.file_type ?? '')}</span>
 					<div class="ev-card-info">
 						<h3 class="ev-card-title">{doc.title || doc.fileName || doc.file_name || ''}</h3>
-						<span class="ev-card-meta">
-							{getTypeLabel(doc.fileType ?? doc.file_type ?? '')} &middot; {formatFileSize(doc.fileSize ?? doc.file_size ?? 0)}
-						</span>
+						<div class="ev-card-badges">
+							<span class="ev-type-badge">{getTypeLabel(doc.fileType ?? doc.file_type ?? '')}</span>
+							<span class="ev-card-size">{formatFileSize(doc.fileSize ?? doc.file_size ?? 0)}</span>
+						</div>
 					</div>
 					{#if doc.similarity !== undefined}
 						<span class="ev-score" class:high={doc.similarity >= 0.7} class:medium={doc.similarity >= 0.4 && doc.similarity < 0.7} class:low={doc.similarity < 0.4}>
@@ -76,7 +87,10 @@
 				{/if}
 
 				<div class="ev-card-footer">
-					<span class="ev-card-date">{formatDate(doc.createdAt ?? doc.created_at)}</span>
+					<span class="ev-card-date">
+						<Icon name="calendar" class="w-3 h-3" />
+						{formatDate(doc.createdAt ?? doc.created_at)}
+					</span>
 					{#if !doc.similarity}
 						<div class="ev-card-actions">
 							<button type="button" onclick={(e) => { e.stopPropagation(); onAnalyze?.(doc); }} title="AI Analysis">
@@ -209,14 +223,17 @@
 	.ev-card {
 		background: rgba(255, 255, 255, 0.025);
 		border: 1px solid rgba(255, 255, 255, 0.06);
+		border-left: 3px solid rgba(212, 199, 163, 0.2);
 		border-radius: 12px;
 		padding: 1rem 1.125rem;
 		cursor: pointer;
-		transition: all 0.15s;
+		transition: all 0.18s ease;
 	}
 	.ev-card:hover {
-		background: rgba(255, 255, 255, 0.045);
-		border-color: rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255, 0.05);
+		border-color: rgba(255, 255, 255, 0.12);
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+		transform: translateY(-1px);
 	}
 	.ev-card-top {
 		display: flex;
@@ -241,9 +258,27 @@
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
-	.ev-card-meta {
-		font-size: 0.7rem;
-		color: rgba(212, 199, 163, 0.35);
+	.ev-card-badges {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		margin-top: 0.25rem;
+	}
+	.ev-type-badge {
+		display: inline-block;
+		font-size: 0.6rem;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		padding: 0.1rem 0.4rem;
+		border-radius: 3px;
+		background: rgba(212, 199, 163, 0.06);
+		border: 1px solid rgba(212, 199, 163, 0.1);
+		color: rgba(212, 199, 163, 0.5);
+	}
+	.ev-card-size {
+		font-size: 0.68rem;
+		color: rgba(212, 199, 163, 0.3);
 	}
 	.ev-score {
 		flex-shrink: 0;
@@ -285,12 +320,20 @@
 		justify-content: space-between;
 	}
 	.ev-card-date {
-		font-size: 0.7rem;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+		font-size: 0.68rem;
 		color: rgba(212, 199, 163, 0.25);
 	}
 	.ev-card-actions {
 		display: flex;
 		gap: 0.125rem;
+		opacity: 0;
+		transition: opacity 0.15s;
+	}
+	.ev-card:hover .ev-card-actions {
+		opacity: 1;
 	}
 	.ev-card-actions button {
 		padding: 0.25rem;

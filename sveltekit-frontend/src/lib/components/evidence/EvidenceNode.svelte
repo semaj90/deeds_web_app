@@ -98,7 +98,7 @@
 	digital: 'monitor',
 	witness_statement: 'eye',
 	forensic: 'microscope',
-	other: 'help-circle',
+	other: 'life-buoy',
 	};
 	return icons[evidenceType] ?? icons.other;
 	}

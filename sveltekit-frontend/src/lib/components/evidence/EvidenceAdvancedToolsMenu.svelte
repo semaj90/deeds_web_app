@@ -46,7 +46,7 @@
 		{ id: 'connections', label: 'Evidence Connections', icon: 'git-branch' },
 		{ id: 'custody', label: 'Chain of Custody', icon: 'shield' },
 		{ id: 'tracker', label: 'Custody Tracker', icon: 'clock' },
-		{ id: 'integrity', label: 'Integrity Verification', icon: 'check-circle' },
+		{ id: 'integrity', label: 'Integrity Verification', icon: 'circle-check' },
 		{ id: 'relationships', label: 'Relationship Inspector', icon: 'network' },
 		{ id: 'workflow', label: 'Workflow Progress', icon: 'activity' }
 	];

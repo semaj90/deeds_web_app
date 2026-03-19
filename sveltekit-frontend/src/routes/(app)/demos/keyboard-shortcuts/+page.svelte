@@ -111,7 +111,7 @@
 				{@const match = SHORTCUTS.find(s => keyMatch(lastPressed, s.keys))}
 				{#if match}
 					<span class="text-xs text-green-400 flex items-center gap-1" in:fade={{ duration: 150 }}>
-						<Icon name="check-circle" size={12} />
+						<Icon name="circle-check" size={12} />
 						{match.description}
 					</span>
 				{/if}

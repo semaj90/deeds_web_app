@@ -530,7 +530,7 @@
 							<div class="ceo-card-row">
 								<h4>{ev.title}</h4>
 								<span class="ceo-custody-status" class:complete={ev.custodyStatus === 'complete'} class:missing={ev.custodyStatus === 'missing'}>
-									{#if ev.custodyStatus === 'complete'}<Icon name="check-circle" size={12} />{:else}<Icon name="alert-circle" size={12} />{/if}
+									{#if ev.custodyStatus === 'complete'}<Icon name="circle-check" size={12} />{:else}<Icon name="circle-alert" size={12} />{/if}
 									{ev.custodyStatus}
 								</span>
 							</div>

@@ -2,7 +2,7 @@
   N64 Toaster Component
 -->
 <script lang="ts">
-  import { toastStore } from './N64ToastStore';
+  import { toastStore } from './N64ToastStore.svelte';
   import { flip } from 'svelte/animate';
   import { fade, fly } from 'svelte/transition';
 
@@ -19,7 +19,7 @@
 </script>
 
 <div class="n64-toaster {position} {className}">
-  {#each $toastStore as toast (toast.id)}
+  {#each toastStore.toasts as toast (toast.id)}
     <div
         class="n64-toast {toast.type}"
         animate:flip

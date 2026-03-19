@@ -101,14 +101,14 @@
 
 		{#if caseLinkError}
 			<div class="link-message error">
-				<Icon name="alert-circle" class="w-4 h-4" />
+				<Icon name="circle-alert" class="w-4 h-4" />
 				{caseLinkError}
 			</div>
 		{/if}
 
 		{#if caseLinkSuccess}
 			<div class="link-message success">
-				<Icon name="check-circle" class="w-4 h-4" />
+				<Icon name="circle-check" class="w-4 h-4" />
 				{caseLinkSuccess}
 			</div>
 		{/if}

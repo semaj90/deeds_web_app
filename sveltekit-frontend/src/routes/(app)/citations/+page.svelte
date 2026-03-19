@@ -1,5 +1,6 @@
 <script lang="ts">
   import Button from '$lib/components/ui/Button.svelte';
+  import Icon from '$lib/components/ui/Icon.svelte';
   import { goto } from '$app/navigation';
   import { analytics } from '$lib/stores/analytics.svelte';
   import DropdownMenu from '$lib/components/ui/DropdownMenu.svelte';
@@ -27,6 +28,11 @@
   import LinkMetadataForm from '$lib/components/legal-ai/LinkMetadataForm.svelte';
   import LegalPrecedentCard from '$lib/components/legal/LegalPrecedentCard.svelte';
   import CitationsSaveButton from '$lib/components/citations/CitationsSaveButton.svelte';
+  import CitationViewModal from '$lib/components/citations/CitationViewModal.svelte';
+
+  // Quick View modal state
+  let quickViewCitation = $state<any>(null);
+  let showQuickView = $state(false);
 
   let viewMode = $state<'list' | 'manager'>('list');
   let showGpuSearch = $state(false);
@@ -188,13 +194,13 @@
 
   // Corpus / jurisdiction navigation
   const CORPUS_TABS = [
-    { id: 'all',             label: 'All Sources' },
-    { id: 'statute',         label: 'Statutes' },
-    { id: 'case_law',        label: 'Case Law' },
-    { id: 'regulation',      label: 'Regulations' },
-    { id: 'executive_order', label: 'Exec. Orders' },
-    { id: 'treaty',          label: 'Treaties' },
-    { id: 'glossary',        label: 'Glossary', special: true },
+    { id: 'all',             label: 'All Sources',   icon: 'layers' },
+    { id: 'statute',         label: 'Statutes',      icon: 'scroll-text' },
+    { id: 'case_law',        label: 'Case Law',      icon: 'gavel' },
+    { id: 'regulation',      label: 'Regulations',   icon: 'shield-check' },
+    { id: 'executive_order', label: 'Exec. Orders',  icon: 'stamp' },
+    { id: 'treaty',          label: 'Treaties',      icon: 'globe' },
+    { id: 'glossary',        label: 'Glossary', special: true, icon: 'book-open' },
   ] as const;
 
   function setCorpusFilter(id: string) {
@@ -315,23 +321,67 @@
   }
 </script>
 
-<div class="max-w-6xl mx-auto px-4 py-8">
-  <header class="mb-8">
-    <div class="flex items-start justify-between gap-4 mb-1">
-      <div>
-        <h1 class="text-2xl font-bold text-sand">Legal Corpus</h1>
-        <p class="text-sand/50 text-sm mt-0.5">Statutes · Case Law · Regulations · Treaties · Glossary</p>
+<div class="citations-page">
+  <header class="cit-header">
+    <div class="cit-header-left">
+      <div class="cit-header-icon">
+        <Icon name="scale" />
       </div>
-      <div class="text-right text-xs text-sand/30 leading-relaxed">
-        <div>Sources: GovInfo · Cornell LII · Open States</div>
-        <div>Embeddings: pgvector + Qdrant 768-dim</div>
+      <div>
+        <h1 class="cit-title">Legal Corpus</h1>
+        <p class="cit-subtitle">Statutes · Case Law · Regulations · Treaties · Glossary</p>
       </div>
     </div>
-    <div class="flex items-center gap-2 mt-4 flex-wrap">
-      <Button onclick={() => viewMode = 'list'}>List View</Button>
-      <Button onclick={() => viewMode = 'manager'}>Citation Manager</Button>
-      <Button onclick={() => goto('/citations/law')}>Law Citation Pages</Button>
-      <Button onclick={() => (showSaveForm = !showSaveForm)}>{showSaveForm ? 'Hide Save Form' : '+ Save Citation'}</Button>
+    <div class="cit-header-right">
+      <span class="cit-meta-line">Sources: GovInfo · Cornell LII · Open States</span>
+      <span class="cit-meta-line">Embeddings: pgvector + Qdrant 768-dim</span>
+    </div>
+  </header>
+
+  <!-- Stats Row -->
+  <div class="cit-stats-row">
+    <span class="cit-stat">
+      <Icon name="archive" />
+      <strong>{filteredCitations.length}</strong>
+      <span>Results</span>
+    </span>
+    <span class="cit-stat-divider"></span>
+    <span class="cit-stat">
+      <Icon name="layers" />
+      <strong>{citations.length}</strong>
+      <span>Total</span>
+    </span>
+    {#if cachedSearchActive}
+      <span class="cit-stat-divider"></span>
+      <span class="cit-stat cached">
+        <Icon name="zap" />
+        <strong>{cachedSearchResults.length}</strong>
+        <span>Cache hits</span>
+      </span>
+    {/if}
+  </div>
+
+  <!-- Action Bar -->
+  <div class="cit-action-bar">
+    <div class="cit-actions-left">
+      <button class="cit-btn" class:active={viewMode === 'list'} onclick={() => viewMode = 'list'}>
+        <Icon name="list" />
+        List
+      </button>
+      <button class="cit-btn" class:active={viewMode === 'manager'} onclick={() => viewMode = 'manager'}>
+        <Icon name="columns" />
+        Manager
+      </button>
+      <a href="/citations/law" class="cit-btn">
+        <Icon name="book-open" />
+        Law Pages
+      </a>
+    </div>
+    <div class="cit-actions-right">
+      <button class="cit-btn primary" onclick={() => (showSaveForm = !showSaveForm)}>
+        <Icon name="plus" />
+        {showSaveForm ? 'Hide Form' : 'Save Citation'}
+      </button>
       <DropdownMenu
         trigger="More Tools"
         items={[
@@ -350,7 +400,9 @@
         ]}
       />
     </div>
-  </header>
+  </div>
+
+  <div class="cit-body">
 
   <!-- Advanced Citation Search -->
   {#if showAdvancedSearch}
@@ -569,14 +621,18 @@
   {:else}
 
   <!-- Corpus / jurisdiction navigation strip -->
-  <div class="flex items-center gap-1.5 mb-4 flex-wrap">
+  <div class="cit-corpus-tabs">
     {#each CORPUS_TABS as tab}
       <button
-        class="px-3 py-1.5 rounded-full text-xs font-medium transition-colors border {(tab.id === 'glossary' ? showKnowledgeBase : citationType === tab.id) ? 'bg-accent text-black border-accent' : 'bg-black/30 text-sand/60 border-sand/15 hover:border-accent/40 hover:text-accent'}"
+        class="cit-corpus-tab"
+        class:active={(tab.id === 'glossary' ? showKnowledgeBase : citationType === tab.id)}
         onclick={() => setCorpusFilter(tab.id)}
-      >{tab.label}</button>
+      >
+        <Icon name={tab.icon} />
+        {tab.label}
+      </button>
     {/each}
-    <span class="ml-auto text-xs text-sand/30 pr-1">{filteredCitations.length} result{filteredCitations.length === 1 ? '' : 's'}</span>
+    <span class="cit-corpus-count">{filteredCitations.length} result{filteredCitations.length === 1 ? '' : 's'}</span>
   </div>
 
   <Card class="mb-6 bg-panel border-black/40">
@@ -650,6 +706,13 @@
             <div class="flex items-start justify-between gap-4">
               <CardTitle class="text-sm font-mono text-accent">{citation.formattedCitation}</CardTitle>
               <div class="flex items-center gap-2 shrink-0">
+                <button
+                  class="px-1.5 py-0.5 rounded text-[10px] text-sand/50 border border-sand/15 hover:border-accent/40 hover:text-accent transition"
+                  onclick={(e) => { e.stopPropagation(); quickViewCitation = citation; showQuickView = true; }}
+                  title="Quick view"
+                >
+                  <Icon name="eye" />
+                </button>
                 <CitationsSaveButton
                   citation={{ statute_code: citation.formattedCitation, statute_title: citation.legalPrinciple, jurisdiction: citation.documentTitle, severity: citation.citationType, highlighted_text: citation.quotedText, source_type: 'auto_extracted' }}
                   size="sm"
@@ -837,7 +900,23 @@
     {/if}
   {/if}
   {/if}
-</div>
+  </div><!-- /cit-body -->
+</div><!-- /citations-page -->
+
+<!-- Quick View Modal -->
+<CitationViewModal
+  bind:open={showQuickView}
+  citation={quickViewCitation}
+  onClose={() => { showQuickView = false; quickViewCitation = null; }}
+  onViewFull={(c) => {
+    selectedCitation = { id: c.id, statute_code: c.formattedCitation, statute_title: c.legalPrinciple, jurisdiction: c.documentTitle, severity: c.citationType, source_type: 'auto_extracted' as const, highlighted_text: c.quotedText, notes: '', created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+  }}
+  onAttachToCase={(c) => {
+    attachStatuteCode = c.formattedCitation ?? null;
+    attachCitationId = c.id ?? null;
+    showAttachModal = true;
+  }}
+/>
 
 <!-- Citation Source Inspector Modal -->
 <CitationInspector
@@ -864,3 +943,190 @@
     />
   </div>
 {/if}
+
+<style>
+  /* ── Citations page layout ── */
+  .citations-page {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  /* ── Page header ── */
+  .cit-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .cit-header-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+  }
+  .cit-header-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.625rem;
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.15), rgba(167, 139, 250, 0.15));
+    border: 1px solid rgba(96, 165, 250, 0.25);
+    color: rgba(96, 165, 250, 0.9);
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+  }
+  .cit-title {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: rgba(212, 199, 163, 0.95);
+    letter-spacing: -0.01em;
+    margin: 0;
+    line-height: 1.3;
+  }
+  .cit-subtitle {
+    font-size: 0.75rem;
+    color: rgba(212, 199, 163, 0.4);
+    margin-top: 0.125rem;
+    letter-spacing: 0.04em;
+  }
+  .cit-header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.125rem;
+    padding-top: 0.25rem;
+  }
+  .cit-meta-line {
+    font-size: 0.625rem;
+    color: rgba(212, 199, 163, 0.22);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── Stats row ── */
+  .cit-stats-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 0.875rem;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(212, 199, 163, 0.08);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .cit-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.6875rem;
+    color: rgba(212, 199, 163, 0.5);
+  }
+  .cit-stat strong {
+    color: rgba(212, 199, 163, 0.85);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .cit-stat.cached strong {
+    color: rgba(250, 204, 21, 0.85);
+  }
+  .cit-stat-divider {
+    width: 1px;
+    height: 1rem;
+    background: rgba(212, 199, 163, 0.12);
+  }
+
+  /* ── Action bar ── */
+  .cit-action-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .cit-actions-left,
+  .cit-actions-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .cit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.4375rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: rgba(212, 199, 163, 0.6);
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(212, 199, 163, 0.12);
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-decoration: none;
+  }
+  .cit-btn:hover {
+    color: rgba(212, 199, 163, 0.85);
+    border-color: rgba(96, 165, 250, 0.35);
+    background: rgba(96, 165, 250, 0.08);
+  }
+  .cit-btn.active {
+    color: rgba(96, 165, 250, 0.95);
+    border-color: rgba(96, 165, 250, 0.4);
+    background: rgba(96, 165, 250, 0.12);
+  }
+  .cit-btn.primary {
+    color: rgba(96, 165, 250, 0.9);
+    border-color: rgba(96, 165, 250, 0.3);
+    background: rgba(96, 165, 250, 0.1);
+  }
+  .cit-btn.primary:hover {
+    background: rgba(96, 165, 250, 0.18);
+    border-color: rgba(96, 165, 250, 0.45);
+  }
+
+  /* ── Corpus tab strip ── */
+  .cit-corpus-tabs {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .cit-corpus-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: rgba(212, 199, 163, 0.5);
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(212, 199, 163, 0.1);
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .cit-corpus-tab:hover {
+    color: rgba(96, 165, 250, 0.85);
+    border-color: rgba(96, 165, 250, 0.3);
+    background: rgba(96, 165, 250, 0.06);
+  }
+  .cit-corpus-tab.active {
+    color: #000;
+    background: rgba(96, 165, 250, 0.9);
+    border-color: rgba(96, 165, 250, 0.9);
+    font-weight: 600;
+  }
+  .cit-corpus-count {
+    margin-left: auto;
+    font-size: 0.625rem;
+    color: rgba(212, 199, 163, 0.25);
+    padding-right: 0.25rem;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

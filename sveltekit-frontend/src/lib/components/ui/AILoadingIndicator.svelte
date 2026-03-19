@@ -57,16 +57,16 @@
       case 'ai': return 'brain';
       case 'gpu': return 'zap';
       case 'cpu': return 'cpu';
-      case 'upload': return 'check-circle';
+      case 'upload': return 'circle-check';
       default:return 'brain';
     }
   }
 
   function getStatusIcon(st: string): string {
     switch (st) {
-      case 'success': return 'check-circle';
-      case 'error': return 'x-circle';
-      case 'warning': return 'alert-circle';
+      case 'success': return 'circle-check';
+      case 'error': return 'circle-x';
+      case 'warning': return 'circle-alert';
       default:return getOperationIcon(operation);
     }
   }

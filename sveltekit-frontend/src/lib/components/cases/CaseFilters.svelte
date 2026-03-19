@@ -125,10 +125,10 @@ import Button from '$lib/components/ui/Button.svelte';
     onclick={toggleSortOrder}
   >
     {#if sortOrder === 'asc'}
-      <Icon name="sort-asc" class="w-4 h-4" />
+      <Icon name="arrow-up-narrow-wide" class="w-4 h-4" />
       Ascending
     {:else}
-      <Icon name="sort-desc" class="w-4 h-4" />
+      <Icon name="arrow-down-wide-narrow" class="w-4 h-4" />
       Descending
     {/if}
   </Button>

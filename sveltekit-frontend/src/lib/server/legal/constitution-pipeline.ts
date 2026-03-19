@@ -20,6 +20,7 @@ import { pool } from '$lib/server/db/client';
 import { minio } from '$lib/server/minio/client';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client';
 import { chunkLegalDocument } from '$lib/server/indexer/legal-chunker';
+import { generateSparseVector } from '$lib/server/vector/bm42-sparse.js';
 import { fetchConstitution } from './constitution-fetcher';
 import { normalizePlainText } from './html-normalizer';
 import { tagNode, computeRankScore } from './constitution-tagger';
@@ -117,19 +118,38 @@ async function upsertToQdrant(
 		const { ENV } = await import('$lib/server/env.server');
 		const client = new QdrantClient({ url: ENV.QDRANT_URL ?? 'http://localhost:6333' });
 
-		// Ensure collection exists for legal library chunks
-		const COLLECTION = 'legal_library_chunks';
+		const COLLECTION = 'legal_documents';
 		try {
 			await client.getCollection(COLLECTION);
 		} catch {
 			await client.createCollection(COLLECTION, {
 				vectors: { size: 768, distance: 'Cosine', on_disk: true },
+				sparse_vectors: { bm25: {} },
 				optimizers_config: { default_segment_number: 2 },
 				hnsw_config: { m: 16, ef_construct: 128, on_disk: true },
 			});
 		}
 
-		await client.upsert(COLLECTION, { wait: true, points });
+		// Ensure sparse vector support on existing collection
+		try {
+			await client.updateCollection(COLLECTION, { sparse_vectors: { bm25: {} } });
+		} catch { /* already configured */ }
+
+		// Enrich points with BM42 sparse vectors
+		const hybridPoints = points.map(p => {
+			const text = (p.payload.chunk_text as string) ?? (p.payload.text as string) ?? '';
+			const sparse = generateSparseVector(text);
+			return {
+				id: p.id,
+				vector: {
+					'': p.vector,
+					bm25: { indices: sparse.indices, values: sparse.values },
+				},
+				payload: p.payload,
+			};
+		});
+
+		await client.upsert(COLLECTION, { wait: true, points: hybridPoints as any });
 	} catch (err) {
 		console.warn('[constitution-pipeline] Qdrant upsert skipped:', err instanceof Error ? err.message : err);
 	}
@@ -463,6 +483,7 @@ export async function runConstitutionPipeline(
 							corpus_type: 'constitution',
 							is_official: source.isOfficial,
 							chunk_index: batch[j].index,
+							text: batch[j].text.slice(0, 500),
 						},
 					});
 

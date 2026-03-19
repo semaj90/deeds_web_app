@@ -117,7 +117,7 @@
 			class="sr-only"
 			onchange={handleFileInput}
 		/>
-		<Icon name={isDragging ? 'folder-open' : 'upload-cloud'} size={24} />
+		<Icon name={isDragging ? 'folder-open' : 'cloud-upload'} size={24} />
 		<span>{isDragging ? 'Drop files here' : 'Drop files or click to select'}</span>
 		<span class="drop-hint">Simulates the 4-stage evidence pipeline</span>
 	</div>

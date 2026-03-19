@@ -155,7 +155,7 @@
 			autocomplete="off"
 		/>
 		{#if isLoading}
-			<Icon name="loader-2" class="loading-icon h-4 w-4 animate-spin" />
+			<Icon name="loader-circle" class="loading-icon h-4 w-4 animate-spin" />
 		{:else if query}
 			<button class="clear-btn" onclick={ clearSearch }>
 				<Icon name="x" class="h-3 w-3" />
@@ -174,7 +174,7 @@
 				>
 					<div class="result-icon">
 						{#if result.type === 'error'}
-							<Icon name="alert-triangle" class="h-4 w-4 text-danger/80" />
+							<Icon name="triangle-alert" class="h-4 w-4 text-danger/80" />
 						{:else}
 							<Icon name="file-code" class={`h-4 w-4 ${typeColors[result.type] || 'text-sand/40'}`} />
 						{/if}

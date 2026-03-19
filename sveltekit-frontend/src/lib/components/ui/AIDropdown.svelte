@@ -46,7 +46,7 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	{
       id: "legal-brief",
       name: "Legal Brief",
-      icon: "wand-2",
+      icon: "wand-sparkles",
       shortcut: "Ctrl+Shift+L",
       description: "Structured legal arguments with precedents",
     },

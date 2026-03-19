@@ -25,14 +25,14 @@
 	};
 
 	const STATUS_COLOR: Record<string, string> = {
-		complete: 'text-green-400 bg-green-950/50',
-		failed: 'text-red-400 bg-red-950/50',
-		queued: 'text-sand/40 bg-sand/5',
-		extracting: 'text-blue-400 bg-blue-950/50',
-		structuring: 'text-blue-400 bg-blue-950/50',
-		chunking: 'text-yellow-400 bg-yellow-950/50',
-		embedding: 'text-purple-400 bg-purple-950/50',
-		graphing: 'text-teal-400 bg-teal-950/50',
+		complete: 'text-green-700 bg-green-50',
+		failed: 'text-red-700 bg-red-50',
+		queued: 'text-gray-500 bg-gray-50',
+		extracting: 'text-blue-700 bg-blue-50',
+		structuring: 'text-blue-700 bg-blue-50',
+		chunking: 'text-amber-700 bg-amber-50',
+		embedding: 'text-purple-700 bg-purple-50',
+		graphing: 'text-teal-700 bg-teal-50',
 	};
 
 	const filteredDocs = $derived.by(() => {
@@ -111,20 +111,20 @@
 
 <svelte:head><title>Legal Library</title></svelte:head>
 
-<div class="p-6 text-sand">
+<div class="library-page">
 	<header class="mb-6">
 		<div class="flex items-start justify-between gap-4">
 			<div>
-				<h1 class="text-2xl font-bold text-sand">Documents</h1>
-				<p class="text-sand/50 text-sm mt-0.5">
+				<h1 class="text-2xl font-bold text-research-text">Documents</h1>
+				<p class="text-research-text-muted text-sm mt-0.5">
 					Upload · Index · Search · Read — Constitutions, Statutes, Regulations, Case Law
 				</p>
 			</div>
 			<div class="flex items-center gap-3">
-				<span class="text-xs text-sand/30">{data.documents.length} indexed</span>
+				<span class="text-xs text-research-text-muted">{data.documents.length} indexed</span>
 				<button
 					onclick={() => (showUpload = !showUpload)}
-					class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent text-black text-xs font-medium hover:bg-accent/90 transition-colors"
+					class="rs-btn rs-btn-primary text-xs"
 				>
 					<Icon name="upload" class="w-3.5 h-3.5" />
 					Upload
@@ -138,17 +138,17 @@
 	</div>
 
 	{#if showUpload}
-		<div class="mb-6 panel rounded-lg border border-sand/10 p-4 max-w-xl">
-			<h2 class="text-xs font-semibold text-sand/60 uppercase tracking-wider mb-3">Upload Document</h2>
+		<div class="mb-6 rs-panel p-4 max-w-xl">
+			<h2 class="text-xs font-semibold text-research-text-secondary uppercase tracking-wider mb-3">Upload Document</h2>
 			<form onsubmit={(e) => { e.preventDefault(); handleUpload(e); }}>
-				<div class="border-2 border-dashed border-sand/15 rounded-lg p-4 text-center mb-3 hover:border-accent/40 transition-colors">
+				<div class="border-2 border-dashed border-research-border rounded-lg p-4 text-center mb-3 hover:border-research-accent/40 transition-colors">
 					<input
 						type="file"
 						name="file"
 						accept=".pdf"
-						class="block w-full text-sm text-sand/50 file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-accent/20 file:text-accent cursor-pointer"
+						class="block w-full text-sm text-research-text-secondary file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-research-accent/10 file:text-research-accent cursor-pointer"
 					/>
-					<p class="text-sand/30 text-xs mt-2">PDF up to 200 MB</p>
+					<p class="text-research-text-muted text-xs mt-2">PDF up to 200 MB</p>
 				</div>
 
 				<div class="flex flex-col gap-2 mb-3">
@@ -156,12 +156,12 @@
 						type="text"
 						name="title"
 						placeholder="Title (optional — inferred from filename)"
-						class="w-full bg-sand/5 border border-sand/10 rounded px-3 py-1.5 text-sm text-sand placeholder:text-sand/30 focus:outline-none focus:border-accent/50"
+						class="rs-input"
 					/>
 					<div class="grid grid-cols-2 gap-2">
 						<select
 							name="corpusType"
-							class="w-full bg-sand/5 border border-sand/10 rounded px-3 py-1.5 text-sm text-sand focus:outline-none focus:border-accent/50"
+							class="rs-input"
 						>
 							<option value="constitution">Constitution</option>
 							<option value="statute">Statute</option>
@@ -172,7 +172,7 @@
 						</select>
 						<select
 							name="jurisdiction"
-							class="w-full bg-sand/5 border border-sand/10 rounded px-3 py-1.5 text-sm text-sand focus:outline-none focus:border-accent/50"
+							class="rs-input"
 						>
 							<option value="federal">Federal</option>
 							<option value="ca">California</option>
@@ -188,39 +188,39 @@
 						type="url"
 						name="officialUrl"
 						placeholder="Official source URL (optional)"
-						class="w-full bg-sand/5 border border-sand/10 rounded px-3 py-1.5 text-sm text-sand placeholder:text-sand/30 focus:outline-none focus:border-accent/50"
+						class="rs-input"
 					/>
 				</div>
 
 				<button
 					type="submit"
 					disabled={uploading}
-					class="w-full py-2 rounded text-sm font-medium bg-accent text-black hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+					class="w-full py-2 rounded-lg text-sm font-medium rs-btn-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
 				>
 					{uploading ? 'Processing…' : 'Upload & Ingest'}
 				</button>
 			</form>
 
 			{#if uploadProgress}
-				<div class="mt-3 p-3 bg-sand/5 rounded border border-sand/10">
+				<div class="mt-3 p-3 bg-research-surface-alt rounded-lg border border-research-border">
 					<div class="flex items-center justify-between mb-1.5">
-						<span class="text-xs text-sand/70">{uploadProgress.stageLabel}</span>
-						<span class="text-xs text-sand/50">{Math.round(uploadProgress.progress)}%</span>
+						<span class="text-xs text-research-text-secondary">{uploadProgress.stageLabel}</span>
+						<span class="text-xs text-research-text-muted">{Math.round(uploadProgress.progress)}%</span>
 					</div>
-					<div class="h-1.5 bg-sand/10 rounded-full overflow-hidden">
+					<div class="h-1.5 bg-research-border rounded-full overflow-hidden">
 						<div
-							class="h-full bg-accent rounded-full transition-all duration-300"
+							class="h-full bg-research-accent rounded-full transition-all duration-300"
 							style:width="{uploadProgress.progress}%"
 						></div>
 					</div>
 					{#if uploadProgress.status === 'complete'}
-						<p class="text-xs text-green-400 mt-1.5">Indexing complete</p>
+						<p class="text-xs text-research-success mt-1.5">Indexing complete</p>
 					{/if}
 				</div>
 			{/if}
 
 			{#if uploadError}
-				<p class="mt-2 text-xs text-red-400">{uploadError}</p>
+				<p class="mt-2 text-xs text-research-danger">{uploadError}</p>
 			{/if}
 		</div>
 	{/if}
@@ -231,12 +231,12 @@
 				bind:value={searchQ}
 				type="search"
 				placeholder="Search documents…"
-				class="w-full bg-sand/5 border border-sand/10 rounded-lg px-4 py-2 text-sm text-sand placeholder:text-sand/30 focus:outline-none focus:border-accent/40"
+				class="rs-input"
 			/>
 		</div>
 		<select
 			bind:value={jurisdictionFilter}
-			class="bg-sand/5 border border-sand/10 rounded px-2 py-1.5 text-xs text-sand focus:outline-none"
+			class="rs-input w-auto"
 		>
 			{#each jurisdictions as j}
 				<option value={j}>{j === 'all' ? 'All jurisdictions' : j.toUpperCase()}</option>
@@ -244,17 +244,17 @@
 		</select>
 		<select
 			bind:value={corpusFilter}
-			class="bg-sand/5 border border-sand/10 rounded px-2 py-1.5 text-xs text-sand focus:outline-none"
+			class="rs-input w-auto"
 		>
 			{#each corpusTypes as c}
 				<option value={c}>{c === 'all' ? 'All types' : CORPUS_LABELS[c] ?? c}</option>
 			{/each}
 		</select>
-		<span class="text-xs text-sand/30 ml-auto">{filteredDocs.length} results</span>
+		<span class="text-xs text-research-text-muted ml-auto">{filteredDocs.length} results</span>
 	</div>
 
 	{#if filteredDocs.length === 0}
-		<div class="text-center py-20 text-sand/30">
+		<div class="text-center py-20 text-research-text-muted">
 			<Icon name="library-big" class="w-12 h-12 mx-auto mb-3 opacity-30" />
 			<p class="text-sm">No documents yet. Upload a PDF to begin.</p>
 		</div>
@@ -263,19 +263,19 @@
 			{#each filteredDocs as doc}
 				<a
 					href="/library/{doc.id}"
-					class="panel rounded-lg border border-sand/10 p-4 hover:border-accent/30 transition-colors group"
+					class="rs-card block group"
 				>
 					<div class="flex items-start justify-between gap-2 mb-2">
 						<div class="flex-1 min-w-0">
-							<p class="text-sm font-medium text-sand truncate group-hover:text-accent transition-colors">
+							<p class="text-sm font-medium text-research-text truncate group-hover:text-research-accent transition-colors">
 								{doc.title}
 							</p>
 							{#if doc.citation}
-								<p class="text-xs text-sand/40 font-mono">{doc.citation}</p>
+								<p class="text-xs text-research-text-muted font-mono">{doc.citation}</p>
 							{/if}
 						</div>
 						<span
-							class="shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded {STATUS_COLOR[doc.processingStatus] ?? 'text-sand/40'}"
+							class="shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded {STATUS_COLOR[doc.processingStatus] ?? 'text-research-text-muted'}"
 						>
 							{doc.processingStatus}
 						</span>
@@ -283,21 +283,21 @@
 
 					<div class="flex items-center gap-1.5 flex-wrap mb-3">
 						{#if doc.jurisdiction?.code}
-							<span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-950/60 text-blue-300 border border-blue-700/30 font-mono">
+							<span class="rs-badge rs-badge-statute font-mono">
 								{doc.jurisdiction.code.toUpperCase()}
 							</span>
 						{/if}
 						{#if doc.corpusType}
-							<span class="text-[10px] px-1.5 py-0.5 rounded bg-sand/8 text-sand/50">
+							<span class="rs-badge bg-gray-50 text-gray-600 border border-gray-200">
 								{CORPUS_LABELS[doc.corpusType] ?? doc.corpusType}
 							</span>
 						{/if}
 						{#if doc.isOfficial}
-							<span class="text-[10px] px-1.5 py-0.5 rounded bg-green-950/60 text-green-400">Official</span>
+							<span class="rs-badge bg-green-50 text-green-700 border border-green-200">Official</span>
 						{/if}
 					</div>
 
-					<div class="flex items-center gap-3 text-[10px] text-sand/30">
+					<div class="flex items-center gap-3 text-[10px] text-research-text-muted">
 						{#if doc.pageCount}
 							<span>{doc.pageCount} pages</span>
 						{/if}
@@ -313,3 +313,14 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	.library-page {
+		color: #1a1a1a;
+		font-family: 'Inter', system-ui, sans-serif;
+	}
+
+	.library-page :global(a) {
+		text-decoration: none;
+	}
+</style>

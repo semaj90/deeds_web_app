@@ -1,12 +1,31 @@
 /**
  * GET /api/library/document/[id]/node/[nodeId]
  * Returns node content, sibling navigation, and breadcrumbs.
+ * Fast-path: Go search service for numeric IDs, SQL fallback for UUIDs.
  */
 import { json } from '@sveltejs/kit';
 import { pool } from '$lib/server/db/client';
+import { ENV } from '$lib/server/env.server.js';
 
 export async function GET({ params }) {
 	const { id, nodeId } = params;
+
+	// Go fast-path: only works with integer IDs (Go service uses int32)
+	const goUrl = (ENV as unknown as Record<string, string>).GO_SEARCH_URL;
+	if (goUrl && /^\d+$/.test(nodeId)) {
+		try {
+			const res = await fetch(`${goUrl}/node/${nodeId}`, {
+				signal: AbortSignal.timeout(5000),
+			});
+			if (res.ok) {
+				return new Response(res.body, {
+					headers: { 'Content-Type': 'application/json' },
+				});
+			}
+		} catch {
+			// Go service unavailable — fall through to SQL
+		}
+	}
 
 	// 1. Fetch the node
 	// We join with jurisdictions/library_documents for context if needed, but the primary target is the node.

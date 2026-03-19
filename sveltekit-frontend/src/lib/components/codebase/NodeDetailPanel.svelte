@@ -86,7 +86,7 @@
         <div class="detail-section">
           <span class="section-label">Errors</span>
           <button class="error-badge" onclick={() => onViewErrors(node.filePath)}>
-            <Icon name="alert-triangle" class="h-4 w-4" />
+            <Icon name="triangle-alert" class="h-4 w-4" />
             <span>{node.errorCount} error{node.errorCount !== 1 ? 's' : ''}</span>
             <span class="view-link">View →</span>
           </button>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 	import RouteOperationsDashboard from '$lib/components/RouteOperationsDashboard.svelte';
 	import RouteInspectorModal from '$lib/components/RouteInspectorModal.svelte';
 	import RouteDecisionModal from '$lib/components/RouteDecisionModal.svelte';
@@ -43,29 +44,77 @@
 	let showAPIExplorer = $state(false);
 	let showRouteTree = $state(false);
 	let showArchivedRoutes = $state(false);
+	let showDemos = $state(false);
 	let selectedEndpoint = $state<RouteEndpoint | null>(null);
 	let apiTesterOpen = $state(false);
 
-	// Comprehensive route metadata
-	let apiMetadata = $derived((data as any).apiMetadata ?? {
-		allEndpoints: [],
-		activeAPI: [],
-		archived: [],
-		categories: [],
+	// ── Loading + Client-Side Cache ──────────────────────────────────
+	let metadataLoading = $state(true);
+	let metadataProgress = $state(0);
+	let metadataSource = $state<'cache' | 'network' | ''>('');
+
+	const EMPTY_METADATA = {
+		allEndpoints: [] as any[],
+		activeAPI: [] as any[],
+		archived: [] as any[],
+		categories: [] as any[],
 		stats: {
-			totalRoutes: 0,
-			activeRoutes: 0,
-			archivedRoutes: 0,
-			apiEndpoints: 0,
-			pageServers: 0,
-			pages: 0,
-			categories: 0,
+			totalRoutes: 0, activeRoutes: 0, archivedRoutes: 0,
+			apiEndpoints: 0, pageServers: 0, pages: 0, categories: 0,
 			methodCounts: { GET: 0, POST: 0, PUT: 0, DELETE: 0, PATCH: 0, load: 0, actions: 0 },
 			groupCounts: { app: 0, dev: 0, admin: 0, api: 0, other: 0, archived: 0 },
-			authRequired: 0,
-			sse: 0
+			authRequired: 0, sse: 0
 		}
-	});
+	};
+
+	const IDB_NAME = 'deeds-route-cache';
+	const IDB_STORE = 'metadata';
+	const IDB_KEY = 'route-metadata';
+	const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+	function openCacheDB(): Promise<IDBDatabase> {
+		return new Promise((resolve, reject) => {
+			const req = indexedDB.open(IDB_NAME, 1);
+			req.onupgradeneeded = () => {
+				const db = req.result;
+				if (!db.objectStoreNames.contains(IDB_STORE)) {
+					db.createObjectStore(IDB_STORE);
+				}
+			};
+			req.onsuccess = () => resolve(req.result);
+			req.onerror = () => reject(req.error);
+		});
+	}
+
+	async function getCachedMetadata(): Promise<{ data: any; ts: number } | null> {
+		try {
+			const db = await openCacheDB();
+			return new Promise((resolve) => {
+				const tx = db.transaction(IDB_STORE, 'readonly');
+				const store = tx.objectStore(IDB_STORE);
+				const req = store.get(IDB_KEY);
+				req.onsuccess = () => resolve(req.result ?? null);
+				req.onerror = () => resolve(null);
+			});
+		} catch { return null; }
+	}
+
+	async function setCachedMetadata(data: any): Promise<void> {
+		try {
+			const db = await openCacheDB();
+			const tx = db.transaction(IDB_STORE, 'readwrite');
+			const store = tx.objectStore(IDB_STORE);
+			store.put({ data, ts: Date.now() }, IDB_KEY);
+		} catch { /* non-critical */ }
+	}
+
+	// Comprehensive route metadata — $state so we can update from cache/network
+	let apiMetadata = $state(EMPTY_METADATA);
+
+	// Derived counts from metadata
+	let demoCount = $derived(apiMetadata.allEndpoints.filter((e: RouteEndpoint) => e.path.includes('/demos/')).length);
+	let demoEndpoints = $derived(apiMetadata.allEndpoints.filter((e: RouteEndpoint) => e.path.includes('/demos/')));
+	let categoryCount = $derived(apiMetadata.categories.length);
 
 	async function loadErrorBrainHistory() {
 		if (errorBrainLoading) return;
@@ -91,6 +140,48 @@
 	$effect(() => {
 		routes = Array.isArray(data.routes) ? data.routes : [];
 	});
+
+	// ── Client-side metadata loading: IDB cache → network fetch ──
+	onMount(async () => {
+		metadataProgress = 10;
+
+		// Step 1: Check IDB cache for instant display
+		const cached = await getCachedMetadata();
+		if (cached && Date.now() - cached.ts < CACHE_TTL) {
+			apiMetadata = cached.data;
+			metadataSource = 'cache';
+			metadataLoading = false;
+			metadataProgress = 100;
+			// Still refresh in background (stale-while-revalidate)
+			fetchMetadataNetwork(false);
+			return;
+		}
+
+		metadataProgress = 30;
+
+		// Step 2: No cache — full network load with progress bar
+		await fetchMetadataNetwork(true);
+	});
+
+	async function fetchMetadataNetwork(showLoading: boolean) {
+		if (showLoading) metadataLoading = true;
+		try {
+			metadataProgress = 50;
+			const res = await fetch('/api/routes/metadata?includeArchived=true');
+			metadataProgress = 80;
+			const json = await res.json();
+			if (json.success && json.data) {
+				apiMetadata = json.data;
+				metadataSource = 'network';
+				await setCachedMetadata(json.data);
+			}
+			metadataProgress = 100;
+		} catch (err) {
+			console.error('[all-routes] Network metadata fetch failed:', err);
+		} finally {
+			metadataLoading = false;
+		}
+	}
 
 	let filteredRoutes = $derived.by(() => {
 		let result = routes;
@@ -290,6 +381,35 @@
 <svelte:window onkeydown={handleKeydown} />
 
 <main class="nes-command-center">
+	<!-- Loading Overlay -->
+	{#if metadataLoading}
+		<div class="loading-overlay">
+			<div class="loading-dialog">
+				<div class="loading-title">INITIALIZING ROUTE SCANNER...</div>
+				<div class="loading-bar-track">
+					<div class="loading-bar-fill" style="width: {metadataProgress}%"></div>
+				</div>
+				<div class="loading-status">
+					{#if metadataProgress < 30}
+						CHECKING LOCAL CACHE...
+					{:else if metadataProgress < 60}
+						SCANNING FILESYSTEM ({metadataProgress}%)...
+					{:else if metadataProgress < 90}
+						INDEXING ENDPOINTS...
+					{:else}
+						FINALIZING...
+					{/if}
+				</div>
+			</div>
+		</div>
+	{/if}
+
+	{#if metadataSource === 'cache'}
+		<div class="cache-banner">
+			LOADED FROM CACHE — refreshing in background...
+		</div>
+	{/if}
+
 	<!-- Header -->
 	<div class="nes-header">
 		<h1>NES COMMAND CENTER</h1>
@@ -318,6 +438,18 @@
 			<span class="stat-label">SERVER</span>
 			<span class="stat-value">{apiMetadata.stats.pageServers}</span>
 		</div>
+		<div class="stat-box stat-ai">
+			<span class="stat-label">PAGES</span>
+			<span class="stat-value">{apiMetadata.stats.pages}</span>
+		</div>
+		<button class="stat-box stat-demo stat-clickable" onclick={() => { showDemos = !showDemos; }}>
+			<span class="stat-label">DEMOS</span>
+			<span class="stat-value">{demoCount}</span>
+		</button>
+		<div class="stat-box stat-cats">
+			<span class="stat-label">CATEGORIES</span>
+			<span class="stat-value">{categoryCount}</span>
+		</div>
 		<div class="stat-box health-ok">
 			<span class="stat-label">HEALTHY</span>
 			<span class="stat-value">{stats.healthy}</span>
@@ -340,13 +472,16 @@
 
 		<!-- New Component Toggles -->
 		<button class="cap-item cap-api" onclick={() => { showAPIExplorer = !showAPIExplorer; }}>
-			{showAPIExplorer ? '[-]' : '[+]'} API EXPLORER ({apiMetadata.stats.apiEndpoints})
+			{showAPIExplorer ? '[-]' : '[+]'} ROUTE EXPLORER ({apiMetadata.stats.activeRoutes})
 		</button>
 		<button class="cap-item cap-tree" onclick={() => { showRouteTree = !showRouteTree; }}>
 			{showRouteTree ? '[-]' : '[+]'} ROUTE TREE
 		</button>
 		<button class="cap-item cap-archive" onclick={() => { showArchivedRoutes = !showArchivedRoutes; }}>
 			{showArchivedRoutes ? '[-]' : '[+]'} ARCHIVED ({apiMetadata.stats.archivedRoutes})
+		</button>
+		<button class="cap-item cap-demo" onclick={() => { showDemos = !showDemos; }}>
+			{showDemos ? '[-]' : '[+]'} DEMOS ({demoCount})
 		</button>
 
 		{#if serverStats.totalClusters > 0}
@@ -402,6 +537,39 @@
 			<ArchivedRoutesPanel
 				archived={apiMetadata.archived}
 			/>
+		</div>
+	{/if}
+
+	<!-- Demos Showcase Panel (collapsible) -->
+	{#if showDemos}
+		<div class="demos-panel">
+			<div class="demos-header">
+				<span class="demos-title">DEMOS & SHOWCASES</span>
+				<span class="demos-count">{demoEndpoints.length} demo routes</span>
+			</div>
+			<div class="demos-grid">
+				{#each demoEndpoints as demo}
+					<div class="demo-card">
+						<div class="demo-card-header">
+							<span class="demo-type-badge" class:demo-page={demo.type === 'page'} class:demo-api={demo.type === 'api'} class:demo-server={demo.type === 'page-server'}>
+								{demo.type === 'api' ? 'API' : demo.type === 'page-server' ? 'SRV' : 'PG'}
+							</span>
+							<span class="demo-path">{demo.path}</span>
+						</div>
+						{#if demo.description}
+							<p class="demo-desc">{demo.description}</p>
+						{/if}
+						<div class="demo-actions">
+							{#if demo.type === 'page' || demo.type === 'page-server'}
+								<a href={demo.path} class="demo-visit-btn">VISIT</a>
+							{/if}
+							{#if demo.absolutePath}
+								<a href="vscode://file/{demo.absolutePath}" class="demo-edit-btn">[EDIT]</a>
+							{/if}
+						</div>
+					</div>
+				{/each}
+			</div>
 		</div>
 	{/if}
 
@@ -768,6 +936,78 @@
 <RouteDecisionModal bind:open={showDecisionModal} bind:route={decisionRoute} onclose={() => { showDecisionModal = false; decisionRoute = null; }} />
 
 <style>
+	/* ── Loading Overlay ── */
+	.loading-overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 9999;
+		background: rgba(13, 13, 42, 0.95);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-family: 'Press Start 2P', 'Courier New', 'Consolas', monospace;
+	}
+
+	.loading-dialog {
+		border: 2px solid #4040c0;
+		background: #0a0a1f;
+		padding: 2rem 3rem;
+		text-align: center;
+		min-width: 380px;
+		box-shadow: 0 0 40px rgba(64, 64, 192, 0.3);
+	}
+
+	.loading-title {
+		font-size: 0.85rem;
+		color: #c0c0ff;
+		letter-spacing: 0.15em;
+		margin-bottom: 1.5rem;
+	}
+
+	.loading-bar-track {
+		height: 20px;
+		border: 2px solid #2a2a5a;
+		background: #0d0d2a;
+		overflow: hidden;
+	}
+
+	.loading-bar-fill {
+		height: 100%;
+		background: linear-gradient(90deg, #3333cc 0%, #6666ff 50%, #3333cc 100%);
+		background-size: 200% 100%;
+		animation: loading-shimmer 1.5s linear infinite;
+		transition: width 0.3s ease;
+	}
+
+	@keyframes loading-shimmer {
+		0% { background-position: 200% 0; }
+		100% { background-position: -200% 0; }
+	}
+
+	.loading-status {
+		font-size: 0.6rem;
+		color: #6060a0;
+		margin-top: 1rem;
+		letter-spacing: 0.1em;
+	}
+
+	.cache-banner {
+		font-size: 0.6rem;
+		color: #33aa33;
+		text-align: center;
+		padding: 0.3rem;
+		border: 1px solid #1a441a;
+		background: rgba(51, 170, 51, 0.05);
+		margin-bottom: 0.75rem;
+		letter-spacing: 0.05em;
+		animation: cache-fade 3s forwards;
+	}
+
+	@keyframes cache-fade {
+		0%, 70% { opacity: 1; }
+		100% { opacity: 0; }
+	}
+
 	/* ── NES Command Center Theme (Blue) ── */
 	.nes-command-center {
 		padding: 1.5rem;
@@ -775,6 +1015,7 @@
 		background: #0d0d2a;
 		color: #c0c0ff;
 		min-height: 100vh;
+		position: relative;
 	}
 
 	/* ── Header ── */
@@ -836,6 +1077,10 @@
 	.stat-box.health-broken { border-color: #cc3333; color: #ff6666; }
 	.stat-box.stat-feature { border-color: #3366cc; color: #6699ff; }
 	.stat-box.stat-ai { border-color: #cc33cc; color: #ff66ff; }
+	.stat-box.stat-demo { border-color: #33cccc; color: #66ffff; }
+	.stat-box.stat-cats { border-color: #9966cc; color: #bb88ff; }
+	.stat-box.stat-clickable { cursor: pointer; transition: background 0.15s; }
+	.stat-box.stat-clickable:hover { background: rgba(51, 204, 204, 0.15); }
 
 	/* ── Capability Bar ── */
 	.capability-bar {
@@ -950,6 +1195,21 @@
 		background: rgba(255, 102, 51, 0.1);
 	}
 
+	.cap-item.cap-demo {
+		color: #33cccc;
+		background: none;
+		border: 1px solid #33cccc;
+		padding: 0.15rem 0.4rem;
+		cursor: pointer;
+		font-family: inherit;
+		font-size: inherit;
+		letter-spacing: inherit;
+	}
+
+	.cap-item.cap-demo:hover {
+		background: rgba(51, 204, 204, 0.1);
+	}
+
 	/* ── New Component Panels ── */
 	.explorer-panel, .tree-panel, .archived-panel-wrapper {
 		margin-bottom: 1.5rem;
@@ -1036,6 +1296,118 @@
 	.cluster-count {
 		color: #666;
 		flex-shrink: 0;
+	}
+
+	/* ── Demos Panel ── */
+	.demos-panel {
+		margin-bottom: 1.5rem;
+		border: 1px solid #33cccc;
+		background: #0c0c0c;
+	}
+
+	.demos-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.4rem 0.75rem;
+		background: #001a1a;
+		border-bottom: 1px solid #33cccc;
+	}
+
+	.demos-title {
+		font-weight: bold;
+		font-size: 0.8rem;
+		color: #33cccc;
+		letter-spacing: 0.1em;
+	}
+
+	.demos-count {
+		font-size: 0.7rem;
+		color: #1a9999;
+	}
+
+	.demos-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		gap: 0.5rem;
+		padding: 0.75rem;
+	}
+
+	.demo-card {
+		border: 1px solid #1a6666;
+		padding: 0.5rem 0.75rem;
+		background: #0a1a1a;
+	}
+
+	.demo-card:hover {
+		border-color: #33cccc;
+		background: #0f2222;
+	}
+
+	.demo-card-header {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		margin-bottom: 0.3rem;
+	}
+
+	.demo-type-badge {
+		font-size: 0.55rem;
+		font-weight: bold;
+		padding: 0.05rem 0.25rem;
+		border: 1px solid;
+		letter-spacing: 0.08em;
+		flex-shrink: 0;
+	}
+
+	.demo-type-badge.demo-page { color: #cc99ff; border-color: #cc99ff; }
+	.demo-type-badge.demo-api { color: #33ff33; border-color: #33ff33; }
+	.demo-type-badge.demo-server { color: #ff9933; border-color: #ff9933; }
+
+	.demo-path {
+		font-size: 0.7rem;
+		color: #66ffff;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.demo-desc {
+		font-size: 0.6rem;
+		color: #669999;
+		margin: 0 0 0.3rem 0;
+		line-height: 1.3;
+	}
+
+	.demo-actions {
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+	}
+
+	.demo-visit-btn {
+		font-size: 0.6rem;
+		color: #33ff99;
+		border: 1px solid #33ff99;
+		padding: 0.1rem 0.4rem;
+		text-decoration: none;
+		font-family: inherit;
+		letter-spacing: 0.05em;
+	}
+
+	.demo-visit-btn:hover {
+		background: rgba(51, 255, 153, 0.15);
+	}
+
+	.demo-edit-btn {
+		font-size: 0.6rem;
+		color: #666;
+		text-decoration: none;
+		font-family: inherit;
+	}
+
+	.demo-edit-btn:hover {
+		color: #999;
 	}
 
 	/* ── Error Brain Panel ── */

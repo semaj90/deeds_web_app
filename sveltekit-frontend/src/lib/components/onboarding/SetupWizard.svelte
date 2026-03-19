@@ -108,7 +108,7 @@
 			id: 'complete',
 			title: 'You\'re All Set!',
 			description: 'You\'re ready to start investigating. Create your first case or explore the demo data to see the platform in action.',
-			icon: 'check-circle',
+			icon: 'circle-check',
 			tip: 'You can restart this tutorial anytime from Settings',
 		},
 	];

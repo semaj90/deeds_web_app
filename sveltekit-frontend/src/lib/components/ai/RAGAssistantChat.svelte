@@ -45,7 +45,7 @@
     { key: 'who', question: 'Who was involved? Identify all parties, witnesses, and key individuals.', icon: 'users', placeholder: 'List suspects, victims, witnesses, law enforcement, experts...' },
     { key: 'when', question: 'When did this occur? Provide timeline details and chronology.', icon: 'clock', placeholder: 'Dates, times, sequence of events, duration...' },
     { key: 'where', question: 'Where did it happen? Specify all relevant locations.', icon: 'map-pin', placeholder: 'Crime scene, addresses, jurisdictions, related locations...' },
-    { key: 'why', question: 'Why did this happen? What was the motive or underlying cause?', icon: 'help-circle', placeholder: 'Motive, intent, circumstances, contributing factors...' },
+    { key: 'why', question: 'Why did this happen? What was the motive or underlying cause?', icon: 'life-buoy', placeholder: 'Motive, intent, circumstances, contributing factors...' },
     { key: 'how', question: 'How was it carried out? Describe the method and execution.', icon: 'settings', placeholder: 'Method of operation, tools used, sequence of actions...' }
   ];
 

@@ -26,7 +26,8 @@
 		closeOnEscape = true,
 		showCloseButton = true,
 		class: className = '',
-		children: footer,
+		children,
+		footer,
 	}: Props = $props();
 
 	function close() {
@@ -51,14 +52,14 @@
 		event.stopPropagation();
 	}
 
-	const sizeClass = $derived(() => {
+	const sizeClass = $derived.by(() => {
 		switch (size) {
 			case 'sm': return 'max-w-sm';
 			case 'md': return 'max-w-md';
 			case 'lg': return 'max-w-lg';
 			case 'xl': return 'max-w-xl';
 			case 'full': return 'max-w-full mx-4';
-			default:return 'max-w-md';
+			default: return 'max-w-md';
 		}
 	});
 
@@ -89,7 +90,7 @@
 	`.replace(/\s+/g, ' ').trim();
 
 	const footerClass = `
-		flex flex-col-reverse sm: flex-row sm: justify-end sm:space-x-2 mt-4
+		flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4
 	`.replace(/\s+/g, ' ').trim();
 
 	function handleOverlayKeydown(event: KeyboardEvent) {
@@ -98,7 +99,7 @@
 			handleOverlayClick();
 		}
 	}
-}</script>
+</script>
 
 <svelte:window onkeydown={handleKeydown} />
 
@@ -107,21 +108,20 @@
 	<div
 		transition:fade={{ duration: 150 }}
 		class={overlayClass}
-		onclick={ handleOverlayClick }
-		onkeydown={ handleOverlayKeydown }
+		onclick={handleOverlayClick}
+		onkeydown={handleOverlayKeydown}
 		tabindex="-1"
 		role="presentation"
 	>
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
-			transition:scale={{
-	duration: 150 start: 0.95 }}
-			class="{contentClass} {sizeClass()} { className }"
-			onclick={ handleContentClick }
+			transition:scale={{ duration: 150, start: 0.95 }}
+			class="{contentClass} {sizeClass} {className}"
+			onclick={handleContentClick}
 			onkeydown={(e) => e.stopPropagation()}
 			role="dialog"
 			aria-modal="true"
-			aria-labelledby={title ? 'modal-title'  : undefined}
+			aria-labelledby={title ? 'modal-title' : undefined}
 			tabindex="-1"
 		>
 			{#if showCloseButton}
@@ -132,7 +132,7 @@
 					aria-label="Close"
 				>
 					<svg
-						xmlns="http, //www.w3.org/2000/svg"
+						xmlns="http://www.w3.org/2000/svg"
 						width="24"
 						height="24"
 						viewBox="0 0 24 24"
@@ -172,7 +172,3 @@
 		</div>
 	</div>
 {/if}
-
-
-
-

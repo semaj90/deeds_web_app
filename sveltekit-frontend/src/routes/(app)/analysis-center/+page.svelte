@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { analytics } from '$lib/stores/analytics.svelte';
+	import Icon from '$lib/components/ui/Icon.svelte';
 	import type { PageData } from './$types';
 	import AISummaryReader from '$lib/components/legal/AISummaryReader.svelte';
 	import JudicialAnalysisAgent from '$lib/components/yorha/JudicialAnalysisAgent.svelte';
@@ -83,13 +84,25 @@
 	<!-- Header -->
 	<header class="analysis-header">
 		<div class="header-title">
-			<h1>ANALYSIS CENTER</h1>
+			<div class="header-title-group">
+				<div class="header-icon-badge">
+					<Icon name="brain" />
+				</div>
+				<h1>ANALYSIS CENTER</h1>
+			</div>
 			<div class="header-stats">
 				<span class="status-indicator">
+					<Icon name={webgpuCapable ? 'gpu' : 'cpu'} />
 					{webgpuCapable ? 'GPU READY' : 'CPU MODE'}
 				</span>
-				<span class="stat-pill">{evidenceCount} Evidence Items</span>
-				<span class="stat-pill">{caseStats.total} Cases ({caseStats.open} open)</span>
+				<span class="stat-pill">
+					<Icon name="file-search" />
+					{evidenceCount} Evidence Items
+				</span>
+				<span class="stat-pill">
+					<Icon name="briefcase" />
+					{caseStats.total} Cases ({caseStats.open} open)
+				</span>
 			</div>
 		</div>
 		<div class="analysis-controls">
@@ -577,7 +590,26 @@
 		justify-content: space-between;
 		align-items: center;
 		flex-wrap: wrap;
-		gap: 0.5rem;
+		gap: 0.75rem;
+	}
+
+	.header-title-group {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.header-icon-badge {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 0.5rem;
+		background: rgba(16, 185, 129, 0.15);
+		border: 1px solid rgba(16, 185, 129, 0.35);
+		color: #10b981;
+		box-shadow: 0 0 12px rgba(16, 185, 129, 0.15);
 	}
 
 	.header-title h1 {
@@ -596,6 +628,9 @@
 	}
 
 	.status-indicator {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
 		padding: 0.2rem 0.6rem;
 		font-size: 0.7rem;
 		border-radius: 3px;
@@ -606,6 +641,9 @@
 	}
 
 	.stat-pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
 		padding: 0.2rem 0.6rem;
 		font-size: 0.7rem;
 		border-radius: 3px;

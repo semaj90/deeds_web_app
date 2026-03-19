@@ -220,7 +220,7 @@
 			{/if}
 			{#if loading || gpuReranking}
 				<div class="flex items-center gap-2 text-xs text-sand-11">
-					<Icon name="loader-2" class="animate-spin" />
+					<Icon name="loader-circle" class="animate-spin" />
 					<span>{gpuReranking ? 'GPU reranking...' : 'Loading...'}</span>
 				</div>
 			{/if}
@@ -230,7 +230,7 @@
 	<!-- Content -->
 	{#if error}
 		<div class="error-state">
-			<Icon name="alert-circle" class="text-danger" />
+			<Icon name="circle-alert" class="text-danger" />
 			<p class="text-xs text-danger">{error}</p>
 			<Button onclick={fetchRecommendations} class="text-xs">Retry</Button>
 		</div>

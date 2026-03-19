@@ -103,7 +103,7 @@
 		<p class="text-[13px] opacity-50 m-0">No training status available</p>
 	{:else if !status.active}
 		<div class="flex items-center gap-3 p-3 rounded-md bg-white/3 opacity-60">
-			<Icon name="pause-circle" size={20} />
+			<Icon name="circle-pause" size={20} />
 			<div>
 				<span class="block text-[13px] font-medium">No Active Training</span>
 				<span class="block text-[11px] opacity-70">Model: {status.model}</span>

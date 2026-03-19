@@ -1,5 +1,4 @@
 <script lang="ts">
-
 /**
  * Svelte 5 Card Component
  * Flexible container with Svelte 5 runes
@@ -24,8 +23,10 @@ let {
 	href = '',
 	interactive = false,
 	class: className = '',
-	onclick: children,
-	header: footer
+	onclick,
+	children,
+	header,
+	footer,
 }: Props = $props();
 
 let isClickable = $derived(!!href || !!onclick || interactive);
@@ -46,14 +47,14 @@ let paddingClasses = $derived({
 
 let interactiveClasses = $derived(
 	isClickable
-		? 'cursor-pointer transition-all duration-200 hover:border-info hover:shadow-lg, active:scale-[0.98]'
+		? 'cursor-pointer transition-all duration-200 hover:border-info hover:shadow-lg active:scale-[0.98]'
 		: ''
 );
 </script>
 
 {#if href}
 	<a
-		{ href }
+		{href}
 		class="block rounded-lg overflow-hidden {variantClasses} {interactiveClasses} {className}"
 		onclick={onclick}
 	>
@@ -78,8 +79,8 @@ let interactiveClasses = $derived(
 {:else}
 	<div
 		class="rounded-lg overflow-hidden {variantClasses} {interactiveClasses} {className}"
-		role={isClickable ? 'button'  : undefined}
-		tabindex={isClickable ? 0 , undefined}
+		role={isClickable ? 'button' : undefined}
+		tabindex={isClickable ? 0 : undefined}
 		onclick={onclick}
 		onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && onclick?.()}
 	>
@@ -102,5 +103,3 @@ let interactiveClasses = $derived(
 		{/if}
 	</div>
 {/if}
-
-

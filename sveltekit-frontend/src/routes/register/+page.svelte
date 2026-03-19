@@ -86,7 +86,7 @@
 	{#if step === 'success'}
 		<div class="success-card" in:fly={{ y: 20, duration: 400 }}>
 			<div class="success-icon">
-				<Icon name="check-circle" size={48} />
+				<Icon name="circle-check" size={48} />
 			</div>
 			<h1>Account Created!</h1>
 			<p>Welcome aboard. Redirecting to your dashboard...</p>

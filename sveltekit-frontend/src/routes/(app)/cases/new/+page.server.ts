@@ -11,14 +11,23 @@ import { intakeCaseSchema } from './schema.js';
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) throw redirect(302, '/login');
 
-	const form = await superValidate(zod(intakeCaseSchema));
+	const safe = <T>(p: Promise<T>, fallback: T, timeoutMs = 5000): Promise<T> =>
+    Promise.race([
+      p,
+      new Promise<T>((resolve) => setTimeout(() => resolve(fallback), timeoutMs)),
+    ]).catch(() => fallback);
 
-	const recentCases = await db
-		.select()
-		.from(cases)
-		.where(eq(cases.userId, locals.user.id))
-		.orderBy(desc(cases.createdAt))
-		.limit(5);
+  const form = await superValidate(zod(intakeCaseSchema));
+
+  const recentCases = await safe(
+    db
+      .select()
+      .from(cases)
+      .where(eq(cases.userId, locals.user.id))
+      .orderBy(desc(cases.createdAt))
+      .limit(5),
+    []
+  );
 
 	return { form, user: locals.user, recentCases };
 };

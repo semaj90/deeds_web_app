@@ -157,7 +157,12 @@
 <div class="config-container">
  <header class="config-header">
   <div class="header-content">
-   <h1>SYSTEM_CONFIGURATION</h1>
+   <div class="cfg-header-group">
+    <div class="cfg-icon-badge">
+     <Icon name="settings" />
+    </div>
+    <h1>SYSTEM_CONFIGURATION</h1>
+   </div>
    <div class="status-badge">ONLINE</div>
   </div>
   <p class="subtitle">System parameters and environment variables</p>
@@ -170,7 +175,7 @@
     class="nav-item {activeTab === 'general' ? 'active' : ''}"
     onclick={() => activeTab = 'general'}
    >
-    <span class="icon">⚙️</span>
+    <span class="icon"><Icon name="settings" /></span>
     GENERAL
    </button>
 
@@ -178,7 +183,7 @@
     class="nav-item {activeTab === 'ai' ? 'active' : ''}"
     onclick={() => activeTab = 'ai'}
    >
-    <span class="icon">🧠</span>
+    <span class="icon"><Icon name="brain" /></span>
     AI_ENGINE
    </button>
 
@@ -186,7 +191,7 @@
     class="nav-item {activeTab === 'database' ? 'active' : ''}"
     onclick={() => activeTab = 'database'}
    >
-    <span class="icon">💾</span>
+    <span class="icon"><Icon name="database" /></span>
     DATABASE
    </button>
 
@@ -194,7 +199,7 @@
     class="nav-item {activeTab === 'gpu' ? 'active' : ''}"
     onclick={() => activeTab = 'gpu'}
    >
-    <span class="icon">⚡</span>
+    <span class="icon"><Icon name="zap" /></span>
     GPU_ACCEL
    </button>
 
@@ -202,7 +207,7 @@
     class="nav-item {activeTab === 'security' ? 'active' : ''}"
     onclick={() => activeTab = 'security'}
    >
-    <span class="icon">🛡️</span>
+    <span class="icon"><Icon name="shield" /></span>
     SECURITY
    </button>
 
@@ -210,7 +215,7 @@
     class="nav-item {activeTab === 'accessibility' ? 'active' : ''}"
     onclick={() => activeTab = 'accessibility'}
    >
-    <span class="icon">♿</span>
+    <span class="icon"><Icon name="accessibility" /></span>
     A11Y
    </button>
 
@@ -220,7 +225,7 @@
     class="nav-item {activeTab === 'status' ? 'active' : ''}"
     onclick={() => activeTab = 'status'}
    >
-    <span class="icon">📊</span>
+    <span class="icon"><Icon name="activity" /></span>
     STATUS
    </button>
   </nav>
@@ -557,6 +562,24 @@
   margin: 0;
   color: #e2e8f0;
   letter-spacing: -0.05em;
+ }
+
+ .cfg-header-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+ }
+
+ .cfg-icon-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  background: rgba(5, 150, 105, 0.15);
+  border: 1px solid rgba(5, 150, 105, 0.35);
+  color: #10b981;
  }
 
  .status-badge { background: #059669;

@@ -37,7 +37,7 @@
 	const quickActions = [
 		{ label: 'Analyze Evidence', icon: 'search', action: 'Analyze the selected evidence items and identify key findings, patterns, and connections.' },
 		{ label: 'Next Steps', icon: 'list-checks', action: 'Based on the current evidence, what are the recommended next investigation steps?' },
-		{ label: 'Find Gaps', icon: 'alert-triangle', action: 'What gaps or missing information exist in the current evidence collection?' },
+		{ label: 'Find Gaps', icon: 'triangle-alert', action: 'What gaps or missing information exist in the current evidence collection?' },
 		{ label: 'Timeline', icon: 'clock', action: 'Construct a chronological timeline of events from the available evidence.' },
 	];
 
@@ -297,7 +297,7 @@
 		/>
 		<Button onclick={() => sendMessage()} disabled={!input.trim() || isStreaming} size="sm" class="bits-btn">
 			{#if isStreaming}
-				<Icon name="loader-2" size={16} />
+				<Icon name="loader-circle" size={16} />
 			{:else}
 				<Icon name="send" size={16} />
 			{/if}

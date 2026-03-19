@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Icon from '$lib/components/ui/Icon.svelte';
 	import CanvasEditor from '$lib/components/CanvasEditor.svelte';
 	import FabricCanvas from '$lib/components/canvas/FabricCanvas.svelte';
 	import EvidenceCanvasEditor from '$lib/components/canvas/EvidenceCanvasEditor.svelte';
@@ -81,67 +82,67 @@
 			title: 'Evidence Canvas Editor',
 			desc: 'Full-featured evidence canvas with drag-and-drop placement, evidence-citation linking, and interactive node editing. Built for constructing visual case narratives.',
 			tech: ['Canvas API', 'Drag & Drop', '$state()', '$effect()'],
-			icon: '🎨'
+			icon: 'pen-tool'
 		},
 		'fabric': {
 			title: 'Fabric.js Canvas',
 			desc: 'Low-level Fabric.js integration with grid snapping, object manipulation, and state serialization. Supports collaborative editing workflows.',
 			tech: ['Fabric.js', 'Grid Snap', 'JSON Serialization'],
-			icon: '🧵'
+			icon: 'layers'
 		},
 		'evidence-canvas': {
 			title: 'Evidence-Specific Canvas',
 			desc: 'Purpose-built canvas for legal evidence visualization with AI tag overlays, file type detection, and case-specific evidence linking.',
 			tech: ['Canvas 2D', 'AI Tags', 'Evidence Pipeline', 'Qdrant'],
-			icon: '🔍'
+			icon: 'search'
 		},
 		'recursive': {
 			title: 'Recursive Evidence Hierarchy',
 			desc: 'Hierarchical evidence chain viewer with tree, radial, and force-directed layout modes. Visualizes parent-child evidence relationships and chain of custody.',
 			tech: ['Tree Layout', 'Radial Layout', 'Force-Directed', 'Canvas 2D'],
-			icon: '🌳'
+			icon: 'git-fork'
 		},
 		'provenance': {
 			title: 'Knowledge Provenance Graph',
 			desc: 'D3.js force-directed graph showing the platform tech stack as a knowledge graph. Interactive with drag, zoom, and typed relationship legends.',
 			tech: ['D3.js v7', 'SVG Force Simulation', 'Arrow Markers', 'Collision Detection'],
-			icon: '🕸'
+			icon: 'share-2'
 		},
 		'evidence-board': {
 			title: 'Evidence Relationship Board',
 			desc: 'Canvas-based evidence relationship board with drag-and-drop nodes, connection lines, and spatial evidence organization for case analysis.',
 			tech: ['Canvas API', 'Drag & Drop', 'Relationship Mapping', '$derived()'],
-			icon: '📋'
+			icon: 'clipboard'
 		},
 		'canvas-board': {
 			title: 'YoRHa Canvas Board',
 			desc: 'Interactive drawing canvas with YoRHa-styled color palette, brush/eraser tools, adjustable brush size, and device pixel ratio support for crisp rendering.',
 			tech: ['Canvas 2D', 'Drawing Tools', 'YoRHa Palette', 'DPR Scaling'],
-			icon: '🖌'
+			icon: 'palette'
 		},
 		'yorha-board': {
 			title: 'YoRHa Evidence Network',
 			desc: 'SVG-based evidence node graph with API-backed connections. Drag nodes to rearrange, click to inspect, auto-loads from /api/yorha/evidence endpoints.',
 			tech: ['SVG', 'API Fetch', 'Drag & Drop', '$props()'],
-			icon: '🔗'
+			icon: 'link'
 		},
 		'draggable-nodes': {
 			title: 'Draggable Evidence Nodes',
 			desc: 'Interactive draggable evidence nodes with AI analysis, metadata display, connection indicators, and real-time position updates. Each node represents an evidence item with type-specific icons.',
 			tech: ['Drag & Drop', 'AI Analysis', '$bindable()', 'Lucide Icons'],
-			icon: '🧩'
+			icon: 'grip'
 		},
 		'node-graph': {
 			title: 'Evidence Node Graph',
 			desc: 'Interactive node-based evidence graph with typed nodes (audio/video/document/photo/forensic), confidence badges, canvas-drawn connections with strength indicators, and a board toolbar for actions.',
 			tech: ['Canvas 2D', 'EvidenceNode', 'EvidenceConnections', 'Toolbar'],
-			icon: '🔬'
+			icon: 'microscope'
 		},
 		'ai-canvas': {
 			title: 'AI Evidence Canvas',
 			desc: 'Drag-and-drop evidence workspace with AI-powered cosine similarity analysis via embeddinggemma, connection types (similarity/temporal/causal/reference), SVG path connections, and JSON export.',
 			tech: ['SVG Paths', 'embeddinggemma', 'Cosine Similarity', 'Drag & Drop'],
-			icon: '🧠'
+			icon: 'brain'
 		}
 	};
 
@@ -190,62 +191,69 @@
 	};
 </script>
 
-<div class="max-w-[1440px] mx-auto px-4 py-8">
+<div class="ec-page">
 	<!-- Header -->
-	<div class="mb-6">
-		<h1 class="text-3xl font-bold text-sand mb-2">Evidence Canvas Demo</h1>
-		<p class="text-sand/60 text-lg">11 visualization engines — Canvas API, Fabric.js, D3.js, SVG, YoRHa Drawing, Evidence Network, Draggable Nodes, Node Graph, AI Canvas</p>
-		<div class="mt-2 flex items-center gap-4 text-sm text-sand/40">
-			<span>{sampleEvidence.length} evidence items</span>
-			<span>{sampleCitations.length} citations</span>
-			<span>{graphEntities.length} graph entities</span>
-			<span>{graphRelationships.length} relationships</span>
+	<header class="ec-header">
+		<div class="ec-header-left">
+			<div class="ec-icon-badge">
+				<Icon name="monitor" />
+			</div>
+			<div>
+				<h1 class="ec-title">Evidence Canvas</h1>
+				<p class="ec-subtitle">11 visualization engines — Canvas API, Fabric.js, D3.js, SVG, YoRHa, Evidence Network, Node Graph, AI Canvas</p>
+			</div>
 		</div>
-	</div>
+		<div class="ec-stats">
+			<span class="ec-stat"><Icon name="file-search" size={13} /> <strong>{sampleEvidence.length}</strong> Evidence</span>
+			<span class="ec-stat-divider"></span>
+			<span class="ec-stat"><Icon name="scale" size={13} /> <strong>{sampleCitations.length}</strong> Citations</span>
+			<span class="ec-stat-divider"></span>
+			<span class="ec-stat"><Icon name="share-2" size={13} /> <strong>{graphEntities.length}</strong> Entities</span>
+			<span class="ec-stat-divider"></span>
+			<span class="ec-stat"><Icon name="link" size={13} /> <strong>{graphRelationships.length}</strong> Relations</span>
+		</div>
+	</header>
 
 	<!-- View Toggle Bar -->
-	<div class="flex flex-wrap gap-2 mb-4">
+	<div class="ec-view-bar">
 		{#each Object.entries(views) as [key, view] (key)}
 			<button
 				onclick={() => (activeView = key as typeof activeView)}
-				class="px-3 py-2 rounded-lg text-sm font-medium transition flex items-center gap-1.5
-					{activeView === key ? 'bg-accent text-white shadow-md' : 'bg-panelSoft text-sand hover:bg-panel'}"
+				class="ec-view-btn {activeView === key ? 'active' : ''}"
 			>
-				<span>{view.icon}</span>
+				<Icon name={view.icon} size={14} />
 				{view.title.split(' ').slice(0, 2).join(' ')}
 			</button>
 		{/each}
-		<div class="ml-auto">
-			<button
-				onclick={() => (showSidebar = !showSidebar)}
-				class="px-3 py-2 rounded-lg text-xs bg-panelSoft text-sand hover:bg-panel transition"
-			>
-				{showSidebar ? 'Hide Panel' : 'Show Panel'}
-			</button>
-		</div>
+		<div class="ec-view-bar-spacer"></div>
+		<button
+			onclick={() => (showSidebar = !showSidebar)}
+			class="ec-view-btn panel-toggle"
+		>
+			<Icon name={showSidebar ? 'panel-right-close' : 'panel-right-open'} size={14} />
+			{showSidebar ? 'Hide' : 'Show'} Panel
+		</button>
 	</div>
 
 	<!-- Description Bar -->
-	<div class="mb-6 p-3 bg-info/5 border border-info/20 rounded-lg">
-		<div class="flex items-start justify-between gap-4">
-			<div>
-				<h2 class="text-lg font-semibold text-sand">{currentView.icon} {currentView.title}</h2>
-				<p class="text-sm text-sand/60 mt-1">{currentView.desc}</p>
-			</div>
-			<div class="flex flex-wrap gap-1.5 shrink-0">
-				{#each currentView.tech as tech}
-					<span class="px-2 py-0.5 bg-info/10 text-info text-xs rounded-full whitespace-nowrap">{tech}</span>
-				{/each}
-			</div>
+	<div class="ec-desc-bar">
+		<div class="ec-desc-left">
+			<h2 class="ec-desc-title"><Icon name={currentView.icon} size={18} /> {currentView.title}</h2>
+			<p class="ec-desc-text">{currentView.desc}</p>
+		</div>
+		<div class="ec-desc-tags">
+			{#each currentView.tech as tech}
+				<span class="ec-tag">{tech}</span>
+			{/each}
 		</div>
 	</div>
 
 	<!-- Main Content -->
-	<div class="flex gap-6">
+	<div class="ec-content">
 		<!-- Canvas Area -->
-		<div class="flex-1 min-w-0">
+		<div class="ec-canvas-area">
 			{#if activeView === 'canvas-editor'}
-				<div class="bg-white rounded-lg shadow p-6">
+				<div class="ec-canvas-frame">
 					<CanvasEditor
 						canvasState={null}
 						reportId="demo-report-001"
@@ -255,7 +263,7 @@
 					/>
 				</div>
 			{:else if activeView === 'fabric'}
-				<div class="bg-white rounded-lg shadow p-6">
+				<div class="ec-canvas-frame">
 					<FabricCanvas
 						width={canvasWidth}
 						height={600}
@@ -267,7 +275,7 @@
 					/>
 				</div>
 			{:else if activeView === 'evidence-canvas'}
-				<div class="bg-white rounded-lg shadow p-6">
+				<div class="ec-canvas-frame">
 					<EvidenceCanvasEditor
 						reportId="demo-report-001"
 						evidence={canvasEvidenceItems}
@@ -276,7 +284,7 @@
 					/>
 				</div>
 			{:else if activeView === 'recursive'}
-				<div class="bg-white rounded-lg shadow p-6">
+				<div class="ec-canvas-frame">
 					<RecursiveEvidenceVisualization
 						caseId="CASE-2024-001"
 						width={canvasWidth}
@@ -286,7 +294,7 @@
 					/>
 				</div>
 			{:else if activeView === 'provenance'}
-				<div class="bg-white rounded-lg shadow p-6">
+				<div class="ec-canvas-frame">
 					<ProvenanceGraph
 						validationId="demo-validation-001-abcdef1234567890"
 						entities={graphEntities}
@@ -296,11 +304,11 @@
 					/>
 				</div>
 			{:else if activeView === 'evidence-board'}
-				<div class="bg-white rounded-lg shadow p-6">
+				<div class="ec-canvas-frame">
 					<EvidenceBoard caseId="CASE-2024-001" />
 				</div>
 			{:else if activeView === 'canvas-board'}
-				<div class="bg-white rounded-lg shadow p-6">
+				<div class="ec-canvas-frame">
 					<CanvasBoard
 						width={canvasWidth}
 						height={600}
@@ -310,14 +318,14 @@
 					/>
 				</div>
 			{:else if activeView === 'yorha-board'}
-				<div class="bg-white rounded-lg shadow p-6">
+				<div class="ec-canvas-frame">
 					<YoRHaEvidenceBoard caseId="CASE-2024-001" />
 				</div>
 			{:else if activeView === 'node-graph'}
-				<div class="bg-white rounded-lg shadow p-2">
+				<div class="ec-canvas-toolbar">
 					<EvidenceBoardToolbar onAction={(action) => console.log('Board action:', action)} />
 				</div>
-				<div class="bg-gray-50 rounded-lg shadow p-6 relative mt-2" style="min-height: 500px; position: relative;">
+				<div class="ec-canvas-frame node-graph" style="min-height: 500px; position: relative;">
 					<EvidenceConnections nodes={nodeGraphNodes} connections={nodeGraphConnections} />
 					{#each nodeGraphNodes as node (node.id)}
 						<EvidenceNode
@@ -330,8 +338,8 @@
 					{/each}
 				</div>
 			{:else if activeView === 'draggable-nodes'}
-				<div class="bg-gray-50 rounded-lg shadow p-6 relative" style="min-height: 500px;">
-					<p class="text-xs text-gray-500 mb-4">Drag evidence nodes to rearrange. Click to select, use Analyze to run AI analysis.</p>
+				<div class="ec-canvas-frame" style="min-height: 500px;">
+					<p class="ec-canvas-hint">Drag evidence nodes to rearrange. Click to select, use Analyze to run AI analysis.</p>
 					<div class="relative" style="height: 450px;">
 						{#each sampleEvidence as item, i (item.id)}
 							<DraggableEvidenceNode
@@ -352,7 +360,7 @@
 					</div>
 				</div>
 			{:else if activeView === 'ai-canvas'}
-				<div class="bg-white rounded-lg shadow">
+				<div class="ec-canvas-frame no-pad">
 					<EvidenceCanvas
 						caseId="CASE-2024-001"
 						initialEvidence={sampleEvidence.map((e, i) => ({
@@ -370,22 +378,21 @@
 
 		<!-- Sidebar -->
 		{#if showSidebar}
-			<div class="w-[340px] shrink-0 space-y-4">
+			<div class="ec-sidebar">
 				<!-- Evidence Items Panel -->
-				<div class="bg-white rounded-lg shadow p-4">
-					<h3 class="text-sm font-semibold text-gray-900 mb-3">Evidence ({sampleEvidence.length})</h3>
-					<div class="space-y-1.5 max-h-[240px] overflow-y-auto">
+				<div class="ec-sidebar-panel">
+					<h3 class="ec-panel-title"><Icon name="file-search" size={14} /> Evidence ({sampleEvidence.length})</h3>
+					<div class="ec-panel-list">
 						{#each sampleEvidence as item (item.id)}
 							<button
 								onclick={() => (selectedEvidenceId = selectedEvidenceId === item.id ? null : item.id)}
-								class="w-full text-left p-2 rounded border text-sm transition
-									{selectedEvidenceId === item.id ? 'border-accent bg-accent/5' : 'border-gray-100 hover:border-gray-200'}"
+								class="ec-evidence-item {selectedEvidenceId === item.id ? 'selected' : ''}"
 							>
-								<div class="flex items-center gap-2">
-									<span>{item.evidenceType === 'image' ? '🖼' : item.evidenceType === 'video' ? '🎬' : '📄'}</span>
-									<div class="min-w-0">
-										<p class="font-medium text-gray-800 truncate text-xs">{item.title}</p>
-										<p class="text-[10px] text-gray-400">{item.id}</p>
+								<div class="ec-evidence-item-inner">
+									<Icon name={item.evidenceType === 'image' ? 'image' : item.evidenceType === 'video' ? 'video' : 'file-text'} size={14} />
+									<div class="ec-evidence-item-text">
+										<p class="ec-evidence-item-title">{item.title}</p>
+										<p class="ec-evidence-item-id">{item.id}</p>
 									</div>
 								</div>
 							</button>
@@ -394,13 +401,13 @@
 				</div>
 
 				<!-- Citations Panel -->
-				<div class="bg-white rounded-lg shadow p-4">
-					<h3 class="text-sm font-semibold text-gray-900 mb-3">Citations ({sampleCitations.length})</h3>
-					<div class="space-y-1.5">
+				<div class="ec-sidebar-panel">
+					<h3 class="ec-panel-title"><Icon name="scale" size={14} /> Citations ({sampleCitations.length})</h3>
+					<div class="ec-panel-citations">
 						{#each sampleCitations as cit (cit.id)}
-							<div class="p-2 border border-gray-100 rounded text-xs">
-								<span class="text-blue-600 font-medium">[{cit.id}]</span>
-								<span class="text-gray-500 ml-1">{cit.source}</span>
+							<div class="ec-citation-item">
+								<span class="ec-citation-id">[{cit.id}]</span>
+								<span class="ec-citation-source">{cit.source}</span>
 							</div>
 						{/each}
 					</div>
@@ -447,12 +454,327 @@
 	</div>
 
 	<!-- Tech Stack Footer -->
-	<div class="mt-8 p-4 bg-panelSoft rounded-lg border border-sand/10">
-		<h3 class="text-sm font-semibold text-sand mb-2">Full Tech Stack</h3>
-		<div class="flex flex-wrap gap-2 text-xs text-sand/60">
+	<div class="ec-footer">
+		<h3 class="ec-footer-title"><Icon name="cpu" size={14} /> Full Tech Stack</h3>
+		<div class="ec-footer-tags">
 			{#each ['Svelte 5 Runes', 'SvelteKit 2', 'Drizzle ORM 0.44', 'PostgreSQL 16 + pgvector', 'Qdrant (768-dim)', 'Ollama gemma3-legal', 'Redis Cache', 'RabbitMQ', 'WebGPU + ONNX', 'IndexedDB + LokiJS', 'Fabric.js', 'D3.js v7', 'Canvas 2D', 'SVG Force', 'XState v5', 'FastMCP (9 tools)'] as tech}
-				<span class="px-2 py-1 bg-panel rounded">{tech}</span>
+				<span class="ec-footer-tag">{tech}</span>
 			{/each}
 		</div>
 	</div>
 </div>
+
+<style>
+	.ec-page {
+		max-width: 90rem;
+		margin: 0 auto;
+		padding: 1.5rem 1rem;
+	}
+
+	/* Header */
+	.ec-header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1.5rem;
+		margin-bottom: 1.25rem;
+		flex-wrap: wrap;
+	}
+	.ec-header-left {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.875rem;
+	}
+	.ec-icon-badge {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.75rem;
+		height: 2.75rem;
+		border-radius: 0.625rem;
+		background: linear-gradient(135deg, rgba(96, 165, 250, 0.12), rgba(167, 139, 250, 0.12));
+		border: 1px solid rgba(96, 165, 250, 0.25);
+		color: rgba(96, 165, 250, 0.9);
+		flex-shrink: 0;
+	}
+	.ec-title {
+		font-size: 1.375rem;
+		font-weight: 700;
+		color: rgba(212, 199, 163, 0.95);
+		margin: 0;
+		line-height: 1.3;
+	}
+	.ec-subtitle {
+		font-size: 0.6875rem;
+		color: rgba(212, 199, 163, 0.4);
+		margin-top: 0.125rem;
+		max-width: 36rem;
+	}
+	.ec-stats {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 0.75rem;
+		background: rgba(0, 0, 0, 0.25);
+		border: 1px solid rgba(212, 199, 163, 0.08);
+		border-radius: 0.5rem;
+	}
+	.ec-stat {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		font-size: 0.6875rem;
+		color: rgba(212, 199, 163, 0.5);
+	}
+	.ec-stat strong {
+		color: rgba(212, 199, 163, 0.85);
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+	}
+	.ec-stat-divider {
+		width: 1px;
+		height: 1rem;
+		background: rgba(212, 199, 163, 0.12);
+	}
+
+	/* View Toggle Bar */
+	.ec-view-bar {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.375rem;
+		margin-bottom: 0.75rem;
+		align-items: center;
+	}
+	.ec-view-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.4375rem 0.75rem;
+		border-radius: 0.5rem;
+		font-size: 0.75rem;
+		font-weight: 500;
+		border: 1px solid transparent;
+		cursor: pointer;
+		transition: all 0.15s ease;
+		background: rgba(212, 199, 163, 0.06);
+		color: rgba(212, 199, 163, 0.6);
+	}
+	.ec-view-btn:hover {
+		background: rgba(212, 199, 163, 0.1);
+		color: rgba(212, 199, 163, 0.85);
+	}
+	.ec-view-btn.active {
+		background: rgba(96, 165, 250, 0.15);
+		color: rgba(96, 165, 250, 0.95);
+		border-color: rgba(96, 165, 250, 0.3);
+		box-shadow: 0 0 8px rgba(96, 165, 250, 0.1);
+	}
+	.ec-view-btn.panel-toggle {
+		font-size: 0.6875rem;
+		color: rgba(212, 199, 163, 0.4);
+	}
+	.ec-view-bar-spacer {
+		flex: 1;
+	}
+
+	/* Description Bar */
+	.ec-desc-bar {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 1rem;
+		padding: 0.75rem;
+		background: rgba(96, 165, 250, 0.04);
+		border: 1px solid rgba(96, 165, 250, 0.12);
+		border-radius: 0.5rem;
+	}
+	.ec-desc-title {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.9375rem;
+		font-weight: 600;
+		color: rgba(212, 199, 163, 0.9);
+		margin: 0;
+	}
+	.ec-desc-text {
+		font-size: 0.75rem;
+		color: rgba(212, 199, 163, 0.5);
+		margin-top: 0.25rem;
+	}
+	.ec-desc-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.375rem;
+		flex-shrink: 0;
+	}
+	.ec-tag {
+		padding: 0.125rem 0.5rem;
+		background: rgba(96, 165, 250, 0.1);
+		color: rgba(96, 165, 250, 0.8);
+		font-size: 0.6875rem;
+		border-radius: 9999px;
+		white-space: nowrap;
+	}
+
+	/* Main Content Layout */
+	.ec-content {
+		display: flex;
+		gap: 1.25rem;
+	}
+	.ec-canvas-area {
+		flex: 1;
+		min-width: 0;
+	}
+	.ec-canvas-frame {
+		background: rgba(20, 22, 28, 0.8);
+		border: 1px solid rgba(212, 199, 163, 0.1);
+		border-radius: 0.5rem;
+		padding: 1rem;
+		position: relative;
+	}
+	.ec-canvas-frame.no-pad {
+		padding: 0;
+		overflow: hidden;
+	}
+	.ec-canvas-frame.node-graph {
+		margin-top: 0.5rem;
+	}
+	.ec-canvas-toolbar {
+		background: rgba(20, 22, 28, 0.6);
+		border: 1px solid rgba(212, 199, 163, 0.1);
+		border-radius: 0.5rem;
+		padding: 0.5rem;
+	}
+	.ec-canvas-hint {
+		font-size: 0.6875rem;
+		color: rgba(212, 199, 163, 0.4);
+		margin-bottom: 0.75rem;
+	}
+
+	/* Sidebar */
+	.ec-sidebar {
+		width: 340px;
+		flex-shrink: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+	.ec-sidebar-panel {
+		background: rgba(0, 0, 0, 0.25);
+		border: 1px solid rgba(212, 199, 163, 0.1);
+		border-radius: 0.5rem;
+		padding: 0.875rem;
+	}
+	.ec-panel-title {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: rgba(212, 199, 163, 0.85);
+		margin: 0 0 0.75rem 0;
+	}
+	.ec-panel-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		max-height: 240px;
+		overflow-y: auto;
+	}
+	.ec-evidence-item {
+		width: 100%;
+		text-align: left;
+		padding: 0.5rem;
+		border-radius: 0.375rem;
+		border: 1px solid rgba(212, 199, 163, 0.08);
+		background: transparent;
+		cursor: pointer;
+		transition: all 0.15s ease;
+		color: inherit;
+	}
+	.ec-evidence-item:hover {
+		border-color: rgba(212, 199, 163, 0.2);
+		background: rgba(212, 199, 163, 0.04);
+	}
+	.ec-evidence-item.selected {
+		border-color: rgba(96, 165, 250, 0.4);
+		background: rgba(96, 165, 250, 0.06);
+	}
+	.ec-evidence-item-inner {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: rgba(212, 199, 163, 0.6);
+	}
+	.ec-evidence-item-text {
+		min-width: 0;
+	}
+	.ec-evidence-item-title {
+		font-size: 0.6875rem;
+		font-weight: 500;
+		color: rgba(212, 199, 163, 0.85);
+		margin: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.ec-evidence-item-id {
+		font-size: 0.5625rem;
+		color: rgba(212, 199, 163, 0.3);
+		font-family: 'JetBrains Mono', ui-monospace, monospace;
+		margin: 0;
+	}
+
+	/* Citations Panel */
+	.ec-panel-citations {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+	.ec-citation-item {
+		padding: 0.375rem 0.5rem;
+		border: 1px solid rgba(212, 199, 163, 0.08);
+		border-radius: 0.375rem;
+		font-size: 0.6875rem;
+	}
+	.ec-citation-id {
+		color: rgba(96, 165, 250, 0.8);
+		font-weight: 600;
+	}
+	.ec-citation-source {
+		color: rgba(212, 199, 163, 0.5);
+		margin-left: 0.25rem;
+	}
+
+	/* Footer */
+	.ec-footer {
+		margin-top: 1.5rem;
+		padding: 0.875rem;
+		background: rgba(0, 0, 0, 0.2);
+		border: 1px solid rgba(212, 199, 163, 0.08);
+		border-radius: 0.5rem;
+	}
+	.ec-footer-title {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: rgba(212, 199, 163, 0.8);
+		margin: 0 0 0.5rem 0;
+	}
+	.ec-footer-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.375rem;
+	}
+	.ec-footer-tag {
+		padding: 0.25rem 0.5rem;
+		background: rgba(212, 199, 163, 0.06);
+		border-radius: 0.25rem;
+		font-size: 0.6875rem;
+		color: rgba(212, 199, 163, 0.5);
+	}
+</style>

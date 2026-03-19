@@ -211,9 +211,9 @@
   function getStatusIconName(status: string): string {
     switch (status) {
       case 'verified':
-        return 'check-circle';
+        return 'circle-check';
       case 'compromised':
-        return 'alert-triangle';
+        return 'triangle-alert';
       case 'pending':
       case 'requires-attention':
         return 'clock';
@@ -284,7 +284,7 @@
   <!-- Error Messages -->
   {#if error}
     <div class="border border-danger/30 bg-danger/5 rounded-lg p-4 flex items-start gap-3">
-      <Icon name="alert-triangle" class="w-5 h-5 text-danger flex-shrink-0 mt-0.5" />
+      <Icon name="triangle-alert" class="w-5 h-5 text-danger flex-shrink-0 mt-0.5" />
       <div>
         <h4 class="font-medium text-danger">Workflow Error</h4>
         <p class="text-danger text-sm">{error}</p>
@@ -295,7 +295,7 @@
   <!-- Warnings -->
   {#if warnings.length > 0}
     <div class="border border-warning/30 bg-warning/5 rounded-lg p-4 flex items-start gap-3">
-      <Icon name="alert-triangle" class="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
+      <Icon name="triangle-alert" class="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
       <div>
         <h4 class="font-medium text-warning">Warnings</h4>
         <ul class="list-disc list-inside mt-2 text-sm text-warning">

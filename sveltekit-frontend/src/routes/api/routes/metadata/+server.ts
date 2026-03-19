@@ -11,25 +11,26 @@ import {
 /** GET /api/routes/metadata — Comprehensive route metadata for /all-routes UI */
 export const GET: RequestHandler = async ({ url }) => {
 	try {
-		const includeArchived = url.searchParams.get('includeArchived') === 'true';
+    const includeArchived = url.searchParams.get('includeArchived') === 'true';
 
-		const allEndpoints = getAllRouteEndpoints(includeArchived);
-		const activeAPI = getActiveAPIEndpoints();
-		const archived = includeArchived ? getArchivedEndpoints() : [];
-		const categories = getRoutesByCategory(includeArchived);
-		const stats = getRouteStats();
+    // Single scan — pass precomputed list to avoid repeated filesystem walks
+    const allEndpoints = getAllRouteEndpoints(includeArchived);
+    const activeAPI = getActiveAPIEndpoints(allEndpoints);
+    const archived = includeArchived ? getArchivedEndpoints(allEndpoints) : [];
+    const categories = getRoutesByCategory(includeArchived, allEndpoints);
+    const stats = getRouteStats(allEndpoints);
 
-		return json({
-			success: true,
-			data: {
-				allEndpoints,
-				activeAPI,
-				archived,
-				categories,
-				stats
-			}
-		});
-	} catch (err) {
+    return json({
+      success: true,
+      data: {
+        allEndpoints,
+        activeAPI,
+        archived,
+        categories,
+        stats,
+      },
+    });
+  } catch (err) {
 		console.error('[/api/routes/metadata]', err);
 		return json({
 			success: false,

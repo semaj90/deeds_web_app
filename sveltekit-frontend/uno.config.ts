@@ -49,11 +49,59 @@ export default defineConfig({
       'yorha-beige-dark': '#a89f7c',
       'yorha-noir': '#1a1a1a',
       'yorha-noir-light': '#2d2d2d',
+
+      // ═══ Yorha-Legal Parchment Theme (Legal Corpus reader) ═══
+      parchment: '#f5f0e8',
+      bone: '#faf7f0',
+      ash: '#e8e2d6',
+      ink: '#2a2520',
+      inkSoft: '#4a4238',
+      amber: { DEFAULT: '#c4752b' },  // Preserves built-in amber scale (amber-400 etc.)
+      amberSoft: '#d4934b',
+      sandDark: '#b9aa86',
+      danger: '#ef4444',
+      warning: '#facc15',
+      info: '#38bdf8',
+
+      // ═══ Research Shell (Legal Corpus / Reader mode) ═══
+      'research-bg': '#faf9f6',
+      'research-surface': '#ffffff',
+      'research-surface-alt': '#f5f3ef',
+      'research-border': '#e5e2da',
+      'research-border-strong': '#c8c3b8',
+      'research-text': '#1a1a1a',
+      'research-text-secondary': '#5a5a5a',
+      'research-text-muted': '#8a8a8a',
+      'research-accent': '#d97706',
+      'research-accent-soft': '#fef3c7',
+      'research-accent-hover': '#b45309',
+      'research-link': '#2563eb',
+      'research-success': '#16a34a',
+      'research-warning': '#d97706',
+      'research-danger': '#dc2626',
+
+      // ═══ Investigation Shell (Evidence / Tactical mode) ═══
+      'inv-bg': '#d4c9a9',
+      'inv-surface': '#1a1a1a',
+      'inv-surface-alt': '#242424',
+      'inv-border': '#333333',
+      'inv-border-strong': '#555555',
+      'inv-text': '#e8e0cc',
+      'inv-text-muted': '#8a8272',
+      'inv-label': '#a89f7c',
+      'inv-accent': '#c4a35a',
+      'inv-accent-hover': '#d4b36a',
+      'inv-node': '#2a2a2a',
+      'inv-node-selected': '#3a3520',
+      'inv-connector': '#555544',
+      'inv-timeline': '#4a4535',
     },
     fontFamily: {
       sans: ['Inter', 'system-ui', 'sans-serif'],
+      ui: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],
       nes: ['"Press Start 2P"', 'system-ui', 'monospace'],
-      mono: ['JetBrains Mono', 'Consolas', 'monospace'],
+      mono: ['"Fira Code"', 'JetBrains Mono', 'Consolas', 'monospace'],
+      serif: ['"Iowan Old Style"', '"Palatino Linotype"', 'Palatino', 'Georgia', 'serif'],
     },
   },
   shortcuts: {
@@ -198,8 +246,36 @@ export default defineConfig({
     // YORHA DETECTIVE BEIGE THEME OVERRIDES
     // ═══════════════════════════════════════════════════════════════════════
     'yorha-screen': 'min-h-screen bg-yorha-beige text-yorha-noir font-mono',
-    'yorha-panel': 'bg-yorha-noir border-4 border-yorha-noir text-yorha-beige',
+    'yorha-noir-panel': 'bg-yorha-noir border-4 border-yorha-noir text-yorha-beige',
     'yorha-panel-beige': 'bg-yorha-beige-dark border-4 border-yorha-noir text-yorha-noir',
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // YORHA-LEGAL PARCHMENT THEME (warm parchment + black frames + muted amber)
+    // ═══════════════════════════════════════════════════════════════════════
+    'yorha-page': 'bg-parchment text-ink font-ui min-h-screen',
+    'yorha-panel': 'bg-bone border border-ink/15 rounded-lg shadow-sm',
+    'yorha-card': 'bg-bone border border-ink/20 rounded-lg p-5 shadow-sm',
+    'yorha-frame': 'bg-bone border-2 border-ink/25 rounded-lg p-5',
+    'yorha-label': 'font-mono text-[10px] uppercase tracking-widest text-inkSoft/60 font-semibold',
+    'yorha-reader': 'bg-[#fdfbf5] border border-ink/12 rounded-lg shadow-[inset_0_1px_4px_rgba(42,37,32,0.06)] p-6 font-serif text-ink/85 leading-relaxed',
+    'yorha-sidebar': 'bg-bone/80 border-r border-ink/10',
+    'yorha-divider': 'border-ink/10',
+    'yorha-pill': 'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-mono uppercase tracking-wider bg-ash/60 border border-ink/10 text-inkSoft/70',
+    'yorha-tab': 'inline-flex items-center gap-1.5 px-3.5 py-2.5 text-[13px] font-medium whitespace-nowrap border-b-2 border-transparent text-inkSoft/50 hover:text-ink/80 transition-colors',
+    'yorha-tab-active': 'border-amber text-amber',
+    'yorha-btn': 'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-mono uppercase tracking-wider bg-ink text-bone hover:bg-inkSoft transition-colors',
+    'yorha-btn-amber': 'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-mono uppercase tracking-wider bg-amber text-white hover:bg-amberSoft transition-colors',
+    'yorha-btn-ghost': 'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-inkSoft/60 hover:bg-ink/5 hover:text-ink/90 transition-colors',
+    'yorha-input': 'bg-white/80 border border-ink/15 rounded-lg px-3 py-2 text-sm text-ink/80 placeholder-ink/30 outline-none focus:border-amber/50 font-ui',
+
+    // Glassmorphism — dark overlays (CitedSourcesDrawer, etc.)
+    glass: 'bg-white/5 backdrop-blur-md border border-white/10 rounded-xl',
+    'glass-card': 'bg-white/5 backdrop-blur-md border border-white/10 rounded-xl shadow-lg p-5',
+    'glass-soft': 'bg-white/3 backdrop-blur-sm border border-white/8 rounded-lg',
+    'glass-sidebar': 'bg-white/4 backdrop-blur-sm border-r border-white/8',
+    'glass-pill': 'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs bg-white/8 border border-white/12 text-white/70',
+    'glass-input': 'bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white/80 placeholder-white/30 outline-none focus:border-orange-400/40',
+    'btn-orange': 'inline-flex items-center justify-center rounded border border-orange-600 px-3 py-2 text-xs uppercase tracking-[0.18em] font-mono bg-orange-500 text-white hover:bg-orange-400',
 
     // ═══════════════════════════════════════════════════════════════════════
     // POKÉMON WATERCOLOR FRAME (for modals)
@@ -224,5 +300,182 @@ export default defineConfig({
     'pkmn-modal-grid':
       'mt-2 grid grid-cols-[minmax(0,2.2fr)_minmax(0,2.4fr)_minmax(0,2fr)] gap-y-1 gap-x-3 text-[10px]',
     'pkmn-modal-heading-row': 'font-bold uppercase tracking-[0.12em] text-[9px] opacity-80',
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // RESEARCH SHELL (Legal Corpus / Reader mode)
+    // ═══════════════════════════════════════════════════════════════════════
+    'rs-screen': 'min-h-screen bg-research-bg text-research-text font-sans',
+    'rs-panel': 'bg-research-surface rounded-xl border border-research-border shadow-sm',
+    'rs-panel-header':
+      'px-5 py-3.5 border-b border-research-border flex items-center justify-between',
+    'rs-panel-body': 'p-5',
+    'rs-card':
+      'bg-research-surface rounded-lg border border-research-border p-4 hover:border-research-accent/40 hover:shadow-md transition-all',
+    'rs-sidebar': 'w-60 bg-research-surface border-r border-research-border flex flex-col',
+    'rs-sidebar-item':
+      'px-4 py-2.5 text-sm text-research-text-secondary hover:bg-research-surface-alt hover:text-research-text transition-colors',
+    'rs-sidebar-active':
+      'bg-research-accent-soft text-research-accent font-medium border-r-2 border-research-accent',
+    'rs-heading': 'text-lg font-semibold text-research-text tracking-tight',
+    'rs-subheading': 'text-sm text-research-text-secondary',
+    'rs-badge': 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
+    'rs-badge-statute': 'bg-blue-50 text-blue-700 border border-blue-200',
+    'rs-badge-case': 'bg-amber-50 text-amber-700 border border-amber-200',
+    'rs-badge-regulation': 'bg-green-50 text-green-700 border border-green-200',
+    'rs-badge-bill': 'bg-purple-50 text-purple-700 border border-purple-200',
+    'rs-tab':
+      'px-4 py-2 text-sm font-medium text-research-text-muted hover:text-research-text border-b-2 border-transparent transition-colors',
+    'rs-tab-active': 'text-research-accent border-research-accent',
+    'rs-btn':
+      'inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors',
+    'rs-btn-primary': 'bg-research-accent text-white hover:bg-research-accent-hover',
+    'rs-btn-ghost':
+      'text-research-text-secondary hover:bg-research-surface-alt hover:text-research-text',
+    'rs-input':
+      'w-full px-3 py-2 rounded-lg border border-research-border bg-research-surface text-sm text-research-text placeholder:text-research-text-muted focus:outline-none focus:border-research-accent focus:ring-1 focus:ring-research-accent/30',
+    'rs-divider': 'border-t border-research-border',
+    'rs-label': 'text-[10px] uppercase tracking-wider text-research-text-muted font-semibold',
+    'rs-pill':
+      'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-research-surface-alt border border-research-border text-research-text-secondary',
+    'rs-reader':
+      'prose prose-sm max-w-none text-research-text leading-relaxed [&_p]:mb-3 [&_ul]:pl-5 [&_li]:mb-1',
+    'rs-citation': 'text-sm text-research-link hover:underline cursor-pointer',
+    'rs-stat': 'text-center p-3',
+    'rs-stat-value': 'text-2xl font-bold text-research-text',
+    'rs-stat-label': 'text-xs text-research-text-muted uppercase tracking-wide mt-0.5',
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // INVESTIGATION SHELL (Evidence / Tactical mode)
+    // ═══════════════════════════════════════════════════════════════════════
+    'inv-screen': 'min-h-screen bg-inv-bg font-mono text-inv-text',
+    'inv-panel': 'bg-inv-surface border-2 border-inv-border',
+    'inv-panel-header':
+      'px-3 py-2 border-b border-inv-border flex items-center justify-between text-xs uppercase tracking-wider text-inv-label',
+    'inv-panel-body': 'p-3',
+    'inv-card':
+      'bg-inv-node border border-inv-border p-3 hover:border-inv-accent/60 transition-colors',
+    'inv-inspector':
+      'w-80 bg-inv-surface border-l-2 border-inv-border flex flex-col overflow-y-auto',
+    'inv-inspector-header':
+      'px-4 py-3 border-b border-inv-border text-xs uppercase tracking-wider text-inv-label',
+    'inv-inspector-body': 'p-4 space-y-3 text-sm',
+    'inv-label-text': 'text-[10px] uppercase tracking-wider text-inv-label',
+    'inv-node-card':
+      'bg-inv-node border border-inv-border rounded-sm p-2.5 cursor-pointer hover:border-inv-accent transition-colors',
+    'inv-node-selected': 'bg-inv-node-selected border-inv-accent',
+    'inv-timeline': 'h-12 bg-inv-timeline border-t border-inv-border flex items-center px-3 gap-2',
+    'inv-connector': 'absolute bg-inv-connector',
+    'inv-heading': 'text-sm font-bold uppercase tracking-wider text-inv-text',
+    'inv-subheading': 'text-[11px] text-inv-text-muted',
+    'inv-badge': 'inline-flex items-center px-1.5 py-0.5 text-[9px] uppercase tracking-wide border',
+    'inv-badge-evidence': 'border-inv-accent bg-inv-accent/10 text-inv-accent',
+    'inv-badge-forensic': 'border-red-500 bg-red-500/10 text-red-400',
+    'inv-badge-linked': 'border-blue-400 bg-blue-400/10 text-blue-400',
+    'inv-btn':
+      'inline-flex items-center gap-1 px-2.5 py-1.5 text-[11px] uppercase tracking-wide font-mono border transition-colors',
+    'inv-btn-primary': 'border-inv-accent bg-inv-accent/20 text-inv-accent hover:bg-inv-accent/30',
+    'inv-btn-ghost':
+      'border-inv-border text-inv-text-muted hover:text-inv-text hover:border-inv-border-strong',
+    'inv-btn-action': 'border-inv-accent bg-inv-surface text-inv-accent hover:bg-inv-accent/10',
+    'inv-input':
+      'w-full px-2.5 py-1.5 bg-inv-node border border-inv-border text-sm font-mono text-inv-text placeholder:text-inv-text-muted focus:outline-none focus:border-inv-accent',
+    'inv-divider': 'border-t border-inv-border',
+    'inv-workspace': 'flex-1 relative overflow-hidden',
   },
+  safelist: [
+    // Layout utilities — safelisted for dynamic Svelte class expressions
+    'flex', 'inline-flex', 'flex-col', 'flex-wrap', 'flex-1',
+    'items-center', 'items-start', 'items-end',
+    'justify-between', 'justify-center', 'justify-start',
+    'gap-1', 'gap-2', 'gap-3', 'gap-4', 'gap-6',
+    'px-2', 'px-3', 'px-4', 'px-6',
+    'py-1', 'py-2', 'py-3', 'py-4',
+    'p-2', 'p-3', 'p-4',
+    'rounded', 'rounded-md', 'rounded-lg', 'rounded-xl',
+    'overflow-auto', 'overflow-hidden', 'overflow-x-auto',
+    'min-h-screen', 'min-w-0',
+    'space-y-2', 'space-y-3', 'space-y-4',
+    'grid', 'grid-cols-2', 'grid-cols-3', 'md:grid-cols-2', 'md:grid-cols-3',
+
+    // Heroicons
+    'i-heroicons-magnifying-glass-20-solid', 'i-heroicons-plus-20-solid',
+    'i-heroicons-exclamation-triangle', 'i-heroicons-chat-bubble-left-right',
+    'i-heroicons-check-circle', 'i-heroicons-information-circle',
+    'i-heroicons-arrow-path', 'i-heroicons-check',
+    'i-heroicons-document-text', 'i-heroicons-calculator',
+    'i-heroicons-link', 'i-heroicons-check-badge',
+    'i-heroicons-user-group', 'i-heroicons-user-plus',
+    'i-heroicons-map', 'i-heroicons-clock', 'i-heroicons-document-chart-bar',
+
+    // Lucide icons — all icons used across codebase (enables dynamic i-lucide-{name})
+    'i-lucide-activity', 'i-lucide-align-left', 'i-lucide-archive',
+    'i-lucide-arrow-down-left', 'i-lucide-arrow-down-right',
+    'i-lucide-arrow-down-wide-narrow', 'i-lucide-arrow-left', 'i-lucide-arrow-right',
+    'i-lucide-arrow-up-left', 'i-lucide-arrow-up-right', 'i-lucide-arrow-up-narrow-wide',
+    'i-lucide-bar-chart-3', 'i-lucide-bell', 'i-lucide-bold', 'i-lucide-book-open',
+    'i-lucide-book-open-text', 'i-lucide-book-text', 'i-lucide-bookmark',
+    'i-lucide-bot', 'i-lucide-braces', 'i-lucide-brain', 'i-lucide-briefcase',
+    'i-lucide-bug', 'i-lucide-cable',
+    'i-lucide-calendar', 'i-lucide-camera', 'i-lucide-chart-bar', 'i-lucide-check',
+    'i-lucide-chevron-down', 'i-lucide-chevron-left', 'i-lucide-chevron-right',
+    'i-lucide-chevron-up', 'i-lucide-circle', 'i-lucide-circle-alert',
+    'i-lucide-circle-check', 'i-lucide-circle-pause', 'i-lucide-circle-x',
+    'i-lucide-clipboard-check', 'i-lucide-clipboard-list', 'i-lucide-clock',
+    'i-lucide-cloud-upload', 'i-lucide-code', 'i-lucide-command',
+    'i-lucide-construction', 'i-lucide-copy', 'i-lucide-cpu', 'i-lucide-crosshair',
+    'i-lucide-crown',
+    'i-lucide-database', 'i-lucide-dna', 'i-lucide-dollar-sign', 'i-lucide-download',
+    'i-lucide-ellipsis-vertical', 'i-lucide-eraser', 'i-lucide-external-link',
+    'i-lucide-eye', 'i-lucide-eye-off',
+    'i-lucide-file', 'i-lucide-file-check', 'i-lucide-file-code', 'i-lucide-file-image',
+    'i-lucide-file-json', 'i-lucide-file-plus', 'i-lucide-file-spreadsheet',
+    'i-lucide-file-stack', 'i-lucide-file-text', 'i-lucide-file-up', 'i-lucide-file-x',
+    'i-lucide-files', 'i-lucide-filter', 'i-lucide-fingerprint-pattern', 'i-lucide-focus',
+    'i-lucide-folder', 'i-lucide-folder-open', 'i-lucide-folder-search',
+    'i-lucide-folder-tree', 'i-lucide-folders',
+    'i-lucide-gamepad-2', 'i-lucide-gavel', 'i-lucide-git-branch',
+    'i-lucide-git-compare', 'i-lucide-git-compare-arrows', 'i-lucide-globe',
+    'i-lucide-grid-2x2', 'i-lucide-grid-3x3',
+    'i-lucide-hard-drive', 'i-lucide-hash', 'i-lucide-heading-1', 'i-lucide-heading-2',
+    'i-lucide-headphones', 'i-lucide-heart', 'i-lucide-history', 'i-lucide-house',
+    'i-lucide-image', 'i-lucide-inbox', 'i-lucide-info', 'i-lucide-italic',
+    'i-lucide-keyboard',
+    'i-lucide-landmark', 'i-lucide-layers', 'i-lucide-layout-dashboard',
+    'i-lucide-layout-grid', 'i-lucide-library', 'i-lucide-library-big',
+    'i-lucide-life-buoy', 'i-lucide-lightbulb', 'i-lucide-link', 'i-lucide-link-2',
+    'i-lucide-list', 'i-lucide-list-ordered', 'i-lucide-list-tree',
+    'i-lucide-loader', 'i-lucide-loader-circle', 'i-lucide-lock',
+    'i-lucide-magnet', 'i-lucide-mail', 'i-lucide-map', 'i-lucide-map-pin',
+    'i-lucide-maximize', 'i-lucide-maximize-2', 'i-lucide-message-circle',
+    'i-lucide-message-square', 'i-lucide-mic', 'i-lucide-mic-off', 'i-lucide-minimize',
+    'i-lucide-monitor', 'i-lucide-monitor-off', 'i-lucide-moon',
+    'i-lucide-mouse-pointer-2', 'i-lucide-move', 'i-lucide-music',
+    'i-lucide-network', 'i-lucide-notebook-pen',
+    'i-lucide-option',
+    'i-lucide-palette', 'i-lucide-panel-left', 'i-lucide-paperclip', 'i-lucide-pause',
+    'i-lucide-pen-tool', 'i-lucide-pencil', 'i-lucide-percent', 'i-lucide-phone',
+    'i-lucide-pin', 'i-lucide-play', 'i-lucide-plus',
+    'i-lucide-quote',
+    'i-lucide-radar', 'i-lucide-radio', 'i-lucide-redo', 'i-lucide-redo-2',
+    'i-lucide-refresh-cw', 'i-lucide-replace', 'i-lucide-rotate-ccw', 'i-lucide-rotate-cw',
+    'i-lucide-save', 'i-lucide-scale', 'i-lucide-scan', 'i-lucide-scan-face',
+    'i-lucide-scan-search', 'i-lucide-scroll', 'i-lucide-scroll-text',
+    'i-lucide-search', 'i-lucide-search-code', 'i-lucide-search-x',
+    'i-lucide-send', 'i-lucide-server', 'i-lucide-settings', 'i-lucide-share-2',
+    'i-lucide-shield', 'i-lucide-shield-alert', 'i-lucide-shield-check',
+    'i-lucide-skip-back', 'i-lucide-skip-forward',
+    'i-lucide-sliders-horizontal', 'i-lucide-sparkles', 'i-lucide-split',
+    'i-lucide-square', 'i-lucide-star', 'i-lucide-star-off',
+    'i-lucide-sticky-note', 'i-lucide-sun', 'i-lucide-sun-moon',
+    'i-lucide-tag', 'i-lucide-tags', 'i-lucide-target', 'i-lucide-terminal',
+    'i-lucide-thumbs-down', 'i-lucide-thumbs-up', 'i-lucide-timer',
+    'i-lucide-trash-2', 'i-lucide-trending-down', 'i-lucide-trending-up',
+    'i-lucide-triangle-alert', 'i-lucide-type',
+    'i-lucide-undo', 'i-lucide-undo-2', 'i-lucide-upload', 'i-lucide-user',
+    'i-lucide-user-cog', 'i-lucide-user-x', 'i-lucide-users',
+    'i-lucide-video', 'i-lucide-volume-2', 'i-lucide-volume-x',
+    'i-lucide-wand-sparkles', 'i-lucide-wifi', 'i-lucide-wifi-off', 'i-lucide-wrench',
+    'i-lucide-x', 'i-lucide-zap', 'i-lucide-zap-off',
+    'i-lucide-zoom-in', 'i-lucide-zoom-out',
+  ],
 });

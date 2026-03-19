@@ -51,11 +51,11 @@ Visual progress indicator for the Evidence Chain of Custody workflow
   function getStageIconName(status: 'completed' | 'current' | 'pending'): string {
     switch (status) {
       case 'completed':
-        return 'check-circle';
+        return 'circle-check';
       case 'current':
         return 'clock';
       case 'pending':
-        return 'alert-circle';
+        return 'circle-alert';
       default:return 'clock';
     }
   }

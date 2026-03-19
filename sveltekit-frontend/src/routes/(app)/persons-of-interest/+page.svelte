@@ -1,19 +1,22 @@
 <script lang="ts">
+	import { Dialog } from 'bits-ui';
+	import { fade, fly } from 'svelte/transition';
 	import AddPoiModal from '$lib/components/poi/AddPoiModal.svelte';
 	import POIEditor from '$lib/components/poi/POIEditor.svelte';
-	import PersonCard from '$lib/components/PersonCard.svelte';
-	import PersonForm from '$lib/components/PersonForm.svelte';
 	import PersonOfInterestDetailView from '$lib/components/poi/PersonOfInterestDetailView.svelte';
-	import POICard from '$lib/components/poi/POICard.svelte';
-	import PersonList from '$lib/components/PersonList.svelte';
-	import FilterPanel from '$lib/components/FilterPanel.svelte';
-	import StatsPanel from '$lib/components/StatsPanel.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import POIPhotoModal from '$lib/components/POIPhotoModal.svelte';
 	import POIPhotoUploader from '$lib/client/ui/POIPhotoUploader.svelte';
-	import type { FugitiveDexPerson } from '$lib/components/types';
 
-	let filterPanelFilters = $state<{ status: string; priority: string; tags: string[] }>({ status: '', priority: '', tags: [] });
+	// Toast notifications
+	let toasts = $state<{ id: number; message: string; type: 'success' | 'error' | 'info' }[]>([]);
+	let toastIdCounter = $state(0);
+
+	function showToast(message: string, type: 'success' | 'error' | 'info' = 'info') {
+		const id = ++toastIdCounter;
+		toasts = [...toasts, { id, message, type }];
+		setTimeout(() => { toasts = toasts.filter(t => t.id !== id); }, 4000);
+	}
 
 	let { data } = $props();
 
@@ -21,11 +24,9 @@
 	let selectedStatus = $state('');
 	let selectedThreatLevel = $state('');
 	let showAddModal = $state(false);
-	let showPersonForm = $state(false);
 	let editingPoi = $state<any>(null);
 	let showEditor = $state(false);
-	let viewMode = $state<'list' | 'ai-cards' | 'detail-cards' | 'fugitive-dex'>('list');
-	let dexSelectedPerson = $state<FugitiveDexPerson | null>(null);
+	let viewMode = $state<'list' | 'detail-cards'>('list');
 	let previewPoi = $state<any>(null);
 	let showPreview = $state(false);
 	let showStats = $state(false);
@@ -179,13 +180,13 @@
 			<button class="nav-item">UNIT REPORTS</button>
 		</div>
 		<div class="header-actions">
-			<button class="header-btn" onclick={() => (showPersonForm = !showPersonForm)}>
-				<Icon name="sparkles" />
-				AI CREATE
+			<button class="header-btn" onclick={() => (showStats = !showStats)}>
+				<Icon name="bar-chart-2" />
+				{showStats ? 'HIDE STATS' : 'ANALYTICS'}
 			</button>
 			<button class="header-btn primary" onclick={() => (showAddModal = true)}>
-				<Icon name="plus" />
-				REGISTER
+				<Icon name="user-plus" />
+				REGISTER POI
 			</button>
 		</div>
 	</div>
@@ -219,24 +220,63 @@
 			{#if showStats}
 				<div class="sidebar-section">
 					<div class="sidebar-title">STATISTICS</div>
-					<div class="stats-compact">
-						<div class="stat-row">
-							<span class="stat-label">Total</span>
-							<span class="stat-value">{poiStats.total}</span>
+					<div class="stat-cards">
+						<div class="stat-card">
+							<div class="stat-card-icon" style="background: #eff6ff; color: #3b82f6;"><Icon name="users" size={14} /></div>
+							<div class="stat-card-info">
+								<span class="stat-card-num">{poiStats.total}</span>
+								<span class="stat-card-label">Total</span>
+							</div>
 						</div>
-						<div class="stat-row">
-							<span class="stat-label">Active</span>
-							<span class="stat-value highlight">{poiStats.active}</span>
+						<div class="stat-card">
+							<div class="stat-card-icon" style="background: #f0f0ff; color: #667eea;"><Icon name="activity" size={14} /></div>
+							<div class="stat-card-info">
+								<span class="stat-card-num">{poiStats.active}</span>
+								<span class="stat-card-label">Active</span>
+							</div>
 						</div>
-						<div class="stat-row">
-							<span class="stat-label">High Risk</span>
-							<span class="stat-value danger">{poiStats.highRisk}</span>
+						<div class="stat-card">
+							<div class="stat-card-icon" style="background: #fef2f2; color: #ef4444;"><Icon name="shield-alert" size={14} /></div>
+							<div class="stat-card-info">
+								<span class="stat-card-num">{poiStats.highRisk}</span>
+								<span class="stat-card-label">High Risk</span>
+							</div>
 						</div>
-						<div class="stat-row">
-							<span class="stat-label">AI Generated</span>
-							<span class="stat-value">{poiStats.aiGenerated}</span>
+						<div class="stat-card">
+							<div class="stat-card-icon" style="background: #f0fdf4; color: #10b981;"><Icon name="sparkles" size={14} /></div>
+							<div class="stat-card-info">
+								<span class="stat-card-num">{poiStats.aiGenerated}</span>
+								<span class="stat-card-label">AI Gen</span>
+							</div>
 						</div>
 					</div>
+
+					<!-- Threat breakdown bar -->
+					{#if poiStats.total > 0}
+						<div class="threat-breakdown">
+							<div class="threat-breakdown-label">THREAT DISTRIBUTION</div>
+							<div class="threat-bar">
+								{#if poiStats.byPriority.low > 0}
+									<div class="threat-bar-seg low" style="width: {(poiStats.byPriority.low / poiStats.total * 100)}%" title="Low: {poiStats.byPriority.low}"></div>
+								{/if}
+								{#if poiStats.byPriority.medium > 0}
+									<div class="threat-bar-seg med" style="width: {(poiStats.byPriority.medium / poiStats.total * 100)}%" title="Medium: {poiStats.byPriority.medium}"></div>
+								{/if}
+								{#if poiStats.byPriority.high > 0}
+									<div class="threat-bar-seg high" style="width: {(poiStats.byPriority.high / poiStats.total * 100)}%" title="High: {poiStats.byPriority.high}"></div>
+								{/if}
+								{#if poiStats.byPriority.critical > 0}
+									<div class="threat-bar-seg crit" style="width: {(poiStats.byPriority.critical / poiStats.total * 100)}%" title="Critical: {poiStats.byPriority.critical}"></div>
+								{/if}
+							</div>
+							<div class="threat-legend">
+								<span class="legend-dot low"></span>Low
+								<span class="legend-dot med"></span>Med
+								<span class="legend-dot high"></span>High
+								<span class="legend-dot crit"></span>Crit
+							</div>
+						</div>
+					{/if}
 				</div>
 			{/if}
 		</div>
@@ -245,7 +285,7 @@
 		<div class="yorha-main">
 			{#if data.error}
 				<div class="error-banner">
-					<Icon name="alert-circle" />
+					<Icon name="circle-alert" />
 					<span>{data.error}</span>
 				</div>
 			{/if}
@@ -253,16 +293,20 @@
 			<!-- Filters & Search -->
 			<div class="filter-section">
 				<div class="search-group">
-					<input
-						type="text"
-						placeholder="Search by name or description..."
-						bind:value={searchQuery}
-						class="yorha-input search-input"
-					/>
-					<button class="filter-btn" onclick={() => (showStats = !showStats)}>
-						<Icon name="bar-chart" />
-						{showStats ? 'HIDE STATS' : 'STATS'}
-					</button>
+					<div class="search-input-wrap">
+						<Icon name="search" size={16} />
+						<input
+							type="text"
+							placeholder="Search by name or description..."
+							bind:value={searchQuery}
+							class="yorha-input search-input"
+						/>
+						{#if searchQuery}
+							<button class="search-clear" onclick={() => (searchQuery = '')} aria-label="Clear search">
+								<Icon name="x" size={14} />
+							</button>
+						{/if}
+					</div>
 				</div>
 
 				<div class="filter-row">
@@ -287,10 +331,40 @@
 						<option value="critical">Critical</option>
 					</select>
 
+					{#if selectedStatus || selectedThreatLevel}
+						<button class="filter-clear-btn" onclick={() => { selectedStatus = ''; selectedThreatLevel = ''; }}>
+							<Icon name="filter-x" size={14} />
+							CLEAR
+						</button>
+					{/if}
+
 					<div class="view-toggle">
-						<button class="toggle-btn" class:active={viewMode === 'list'} onclick={() => (viewMode = 'list')}>LIST</button>
-						<button class="toggle-btn" class:active={viewMode === 'detail-cards'} onclick={() => (viewMode = 'detail-cards')}>CARDS</button>
+						<button class="toggle-btn" class:active={viewMode === 'list'} onclick={() => (viewMode = 'list')}>
+							<Icon name="list" size={14} />
+							LIST
+						</button>
+						<button class="toggle-btn" class:active={viewMode === 'detail-cards'} onclick={() => (viewMode = 'detail-cards')}>
+							<Icon name="layout-grid" size={14} />
+							CARDS
+						</button>
 					</div>
+				</div>
+
+				<!-- Active filter + results count -->
+				<div class="filter-status-bar">
+					<span class="results-count">{filtered.length} record{filtered.length !== 1 ? 's' : ''}</span>
+					{#if selectedStatus}
+						<span class="active-chip">
+							{selectedStatus.replace(/_/g, ' ')}
+							<button onclick={() => (selectedStatus = '')} aria-label="Remove status filter"><Icon name="x" size={12} /></button>
+						</span>
+					{/if}
+					{#if selectedThreatLevel}
+						<span class="active-chip threat">
+							{selectedThreatLevel}
+							<button onclick={() => (selectedThreatLevel = '')} aria-label="Remove threat filter"><Icon name="x" size={12} /></button>
+						</span>
+					{/if}
 				</div>
 			</div>
 
@@ -336,20 +410,32 @@
 			<!-- Content Display -->
 			{#if filtered.length === 0}
 				<div class="empty-state">
-					<div class="empty-icon">
-						<Icon name="user-x" />
+					<div class="empty-icon-ring">
+						<Icon name="user-x" size={32} />
 					</div>
 					<p class="empty-title">NO PERSONS OF INTEREST FOUND</p>
-					<p class="empty-subtitle">Try adjusting your filters or create a new entry</p>
-					<a href="/persons-of-interest/create{data.caseId ? `?caseId=${data.caseId}` : ''}" class="btn-yorha primary">CREATE FIRST POI</a>
+					<p class="empty-subtitle">{searchQuery || selectedStatus || selectedThreatLevel ? 'Try adjusting your filters or clearing search' : 'Register persons of interest to get started'}</p>
+					<div class="empty-actions">
+						{#if searchQuery || selectedStatus || selectedThreatLevel}
+							<button class="btn-yorha" onclick={() => { searchQuery = ''; selectedStatus = ''; selectedThreatLevel = ''; }}>
+								<Icon name="filter-x" size={14} />
+								CLEAR FILTERS
+							</button>
+						{/if}
+						<button class="btn-yorha primary" onclick={() => (showAddModal = true)}>
+							<Icon name="user-plus" size={14} />
+							REGISTER POI
+						</button>
+					</div>
 				</div>
 			{:else if viewMode === 'detail-cards'}
 				<div class="poi-grid">
 					{#each filtered as poi (poi.id)}
 						<div class="poi-card">
+							<div class="card-status-ribbon" style="background: {getStatusColor(poi.status)}"></div>
 							<div class="card-header">
-								<div class="card-photo">
-									<Icon name="user" />
+								<div class="card-avatar" style="background: {getStatusColor(poi.status)}20; color: {getStatusColor(poi.status)};">
+									{poi.name?.charAt(0)?.toUpperCase() ?? '?'}
 								</div>
 								<div class="card-info">
 									<h3 class="card-name">{poi.name}</h3>
@@ -455,69 +541,125 @@
 		</div>
 	</div>
 
-	<!-- Modals -->
+	<!-- Register POI Modal (bits-ui Dialog) -->
 	<AddPoiModal bind:open={showAddModal} />
 
-	{#if showPersonForm}
-		<div class="modal-overlay" onclick={() => (showPersonForm = false)}>
-			<div class="modal-content" onclick={(e) => e.stopPropagation()}>
-				<PersonForm />
-			</div>
-		</div>
-	{/if}
+	<!-- Editor Modal (bits-ui Dialog) -->
+	<Dialog.Root bind:open={showEditor} onOpenChange={(v) => { if (!v) { editingPoi = null; } }}>
+		<Dialog.Portal>
+			<Dialog.Overlay forceMount>
+				{#snippet child({ props, open })}
+					{#if open}
+						<div {...props} class="dialog-backdrop" transition:fade={{ duration: 200 }}></div>
+					{/if}
+				{/snippet}
+			</Dialog.Overlay>
+			<Dialog.Content forceMount>
+				{#snippet child({ props, open })}
+					{#if open && editingPoi}
+						<div {...props} class="dialog-panel" transition:fly={{ y: 16, duration: 250 }}>
+							<div class="dialog-title-bar">
+								<div class="dialog-title-icon">
+									<Icon name="pencil" size={16} />
+								</div>
+								<div>
+									<Dialog.Title class="dialog-title">Edit Profile</Dialog.Title>
+									<Dialog.Description class="dialog-desc">Update details for {editingPoi.name ?? 'this person'}.</Dialog.Description>
+								</div>
+								<Dialog.Close class="dialog-close-btn">
+									<Icon name="x" size={18} />
+								</Dialog.Close>
+							</div>
+							<div class="dialog-body">
+								<POIEditor
+									poi={{ name: editingPoi.name ?? '', alias: editingPoi.alias ?? '', threatLevel: editingPoi.threatLevel ?? 'low', photos: editingPoi.photos ?? [], notes: editingPoi.description ?? '' }}
+									onSave={async (formData) => {
+										try {
+											const res = await fetch(`/api/persons-of-interest/${editingPoi.id}`, {
+												method: 'PATCH',
+												headers: { 'Content-Type': 'application/json' },
+												body: JSON.stringify({ name: formData.name, alias: formData.alias, threatLevel: formData.threatLevel, description: formData.notes })
+											});
+											if (res.ok) {
+												const idx = data.pois.findIndex((p: any) => p.id === editingPoi.id);
+												if (idx !== -1) {
+													data.pois[idx] = { ...data.pois[idx], name: formData.name, alias: formData.alias, threatLevel: formData.threatLevel, description: formData.notes };
+													data.pois = [...data.pois];
+												}
+												showToast(`${formData.name} updated successfully.`, 'success');
+											} else {
+												showToast('Failed to save changes.', 'error');
+											}
+											showEditor = false;
+											editingPoi = null;
+										} catch (e) {
+											console.error('Save failed:', e);
+											showToast('Network error — could not save.', 'error');
+										}
+									}}
+									onCancel={() => { showEditor = false; editingPoi = null; }}
+									onUploadPhoto={() => { uploadingPoiId = editingPoi.id; showPhotoUploader = true; }}
+									onViewPhoto={(photo) => { openPhotoModal(photo); }}
+								/>
+							</div>
+						</div>
+					{/if}
+				{/snippet}
+			</Dialog.Content>
+		</Dialog.Portal>
+	</Dialog.Root>
 
-	{#if showEditor && editingPoi}
-		<div class="modal-overlay" onclick={() => { showEditor = false; editingPoi = null; }}>
-			<div class="modal-content" onclick={(e) => e.stopPropagation()}>
-				<POIEditor
-					poi={{ name: editingPoi.name ?? '', alias: editingPoi.alias ?? '', threatLevel: editingPoi.threatLevel ?? 'low', photos: editingPoi.photos ?? [], notes: editingPoi.description ?? '' }}
-					onSave={async (formData) => {
-						try {
-							const res = await fetch(`/api/persons-of-interest/${editingPoi.id}`, {
-								method: 'PATCH',
-								headers: { 'Content-Type': 'application/json' },
-								body: JSON.stringify({ name: formData.name, alias: formData.alias, threatLevel: formData.threatLevel, description: formData.notes })
-							});
-							if (res.ok) {
-								const idx = data.pois.findIndex((p: any) => p.id === editingPoi.id);
-								if (idx !== -1) {
-									data.pois[idx] = { ...data.pois[idx], name: formData.name, alias: formData.alias, threatLevel: formData.threatLevel, description: formData.notes };
-									data.pois = [...data.pois];
-								}
-							}
-							showEditor = false;
-							editingPoi = null;
-						} catch (e) { console.error('Save failed:', e); }
-					}}
-					onCancel={() => { showEditor = false; editingPoi = null; }}
-					onUploadPhoto={() => { uploadingPoiId = editingPoi.id; showPhotoUploader = true; }}
-						onViewPhoto={(photo: any) => { openPhotoModal(photo); }}
-				/>
-			</div>
-		</div>
-	{/if}
+	<!-- Photo Uploader Modal (bits-ui Dialog) -->
+	<Dialog.Root bind:open={showPhotoUploader} onOpenChange={(v) => { if (!v) uploadingPoiId = 0; }}>
+		<Dialog.Portal>
+			<Dialog.Overlay forceMount>
+				{#snippet child({ props, open })}
+					{#if open}
+						<div {...props} class="dialog-backdrop" transition:fade={{ duration: 200 }}></div>
+					{/if}
+				{/snippet}
+			</Dialog.Overlay>
+			<Dialog.Content forceMount>
+				{#snippet child({ props, open })}
+					{#if open && uploadingPoiId}
+						<div {...props} class="dialog-panel dialog-panel-sm" transition:fly={{ y: 16, duration: 250 }}>
+							<div class="dialog-title-bar">
+								<div class="dialog-title-icon upload">
+									<Icon name="image-plus" size={16} />
+								</div>
+								<div>
+									<Dialog.Title class="dialog-title">Upload Photo</Dialog.Title>
+									<Dialog.Description class="dialog-desc">Add a photo to this person's profile.</Dialog.Description>
+								</div>
+								<Dialog.Close class="dialog-close-btn">
+									<Icon name="x" size={18} />
+								</Dialog.Close>
+							</div>
+							<div class="dialog-body">
+								<POIPhotoUploader
+									poiId={uploadingPoiId}
+									onUpload={(result) => {
+										const uploadedPhoto = normalizePoiPhoto(result);
+										if (editingPoi?.id === uploadingPoiId) {
+											editingPoi = { ...editingPoi, photos: [uploadedPhoto, ...(editingPoi.photos ?? [])] };
+										}
+										showToast('Photo uploaded successfully.', 'success');
+										showPhotoUploader = false;
+									}}
+									onError={(err) => {
+										console.error('Photo upload error:', err);
+										showToast('Photo upload failed.', 'error');
+									}}
+								/>
+							</div>
+						</div>
+					{/if}
+				{/snippet}
+			</Dialog.Content>
+		</Dialog.Portal>
+	</Dialog.Root>
 
-	{#if showPhotoUploader && uploadingPoiId}
-		<div class="modal-overlay" onclick={() => (showPhotoUploader = false)}>
-			<div class="modal-content" onclick={(e) => e.stopPropagation()}>
-				<POIPhotoUploader
-					poiId={uploadingPoiId}
-					onUpload={(result) => {
-						const uploadedPhoto = normalizePoiPhoto(result);
-						if (editingPoi?.id === uploadingPoiId) {
-							editingPoi = {
-								...editingPoi,
-								photos: [uploadedPhoto, ...(editingPoi.photos ?? [])]
-							};
-						}
-						showPhotoUploader = false;
-					}}
-					onError={(err) => { console.error('Photo upload error:', err); }}
-				/>
-			</div>
-		</div>
-	{/if}
-
+	<!-- Photo Viewer -->
 	<POIPhotoModal
 		photos={photoModalPhotos}
 		bind:currentIndex={photoModalIndex}
@@ -529,30 +671,43 @@
 		}}
 	/>
 
+	<!-- Detail Preview -->
 	<PersonOfInterestDetailView
 		poi={previewPoi}
-		bind:open={showPreview}
+		open={showPreview}
 		onOpenChange={(v) => { showPreview = v; }}
 		onEdit={(poi) => { showPreview = false; editingPoi = poi; showEditor = true; }}
 	/>
+
+	<!-- Toast Notifications -->
+	{#if toasts.length > 0}
+		<div class="toast-container">
+			{#each toasts as toast (toast.id)}
+				<div class="toast toast-{toast.type}" transition:fly={{ y: 20, duration: 300 }}>
+					<Icon name={toast.type === 'success' ? 'circle-check' : toast.type === 'error' ? 'circle-alert' : 'info'} size={16} />
+					<span>{toast.message}</span>
+				</div>
+			{/each}
+		</div>
+	{/if}
 </div>
 
 <style>
 	.yorha-page {
 		min-height: 100vh;
-		background: #f8f9fa;
+		background: #faf9f7;
 		font-family: 'JetBrains Mono', 'Courier New', monospace;
 	}
 
 	/* Header */
 	.yorha-header {
-		background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-		border-bottom: 2px solid #e5e7eb;
+		background: linear-gradient(135deg, #ffffff 0%, #f9f8f6 100%);
+		border-bottom: 1px solid #e8e5e0;
 		padding: 1rem 2rem;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(102, 126, 234, 0.03);
 	}
 
 	.header-logo {
@@ -651,8 +806,8 @@
 
 	/* Sidebar */
 	.yorha-sidebar {
-		background: #fff;
-		border-right: 1px solid #e5e7eb;
+		background: #fffffe;
+		border-right: 1px solid #e8e5e0;
 		padding: 1.5rem 0;
 	}
 
@@ -698,9 +853,10 @@
 	}
 
 	.menu-item.active {
-		background: #f0f0ff;
+		background: linear-gradient(90deg, #f0f0ff 0%, #fff 100%);
 		color: #667eea;
 		border-left: 3px solid #667eea;
+		font-weight: 600;
 	}
 
 	.stats-compact {
@@ -733,6 +889,113 @@
 		color: #ef4444;
 	}
 
+	/* Stat cards */
+	.stat-cards {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.5rem;
+		margin-bottom: 1rem;
+	}
+
+	.stat-card {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.6rem;
+		background: #fff;
+		border: 1px solid #f0eeeb;
+		border-radius: 10px;
+		transition: box-shadow 0.2s;
+	}
+
+	.stat-card:hover {
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+	}
+
+	.stat-card-icon {
+		width: 28px;
+		height: 28px;
+		border-radius: 8px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+	.stat-card-info {
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+	}
+
+	.stat-card-num {
+		font-size: 1rem;
+		font-weight: 700;
+		color: #1f2937;
+		line-height: 1.2;
+	}
+
+	.stat-card-label {
+		font-size: 0.6rem;
+		color: #9ca3af;
+		letter-spacing: 0.08em;
+		font-weight: 600;
+	}
+
+	/* Threat breakdown bar */
+	.threat-breakdown {
+		padding-top: 0.25rem;
+	}
+
+	.threat-breakdown-label {
+		font-size: 0.6rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		color: #9ca3af;
+		margin-bottom: 0.4rem;
+	}
+
+	.threat-bar {
+		display: flex;
+		height: 6px;
+		border-radius: 3px;
+		overflow: hidden;
+		background: #f3f4f6;
+	}
+
+	.threat-bar-seg {
+		min-width: 4px;
+		transition: width 0.4s ease;
+	}
+
+	.threat-bar-seg.low { background: #10b981; }
+	.threat-bar-seg.med { background: #f59e0b; }
+	.threat-bar-seg.high { background: #ef4444; }
+	.threat-bar-seg.crit { background: #991b1b; }
+
+	.threat-legend {
+		display: flex;
+		gap: 0.625rem;
+		margin-top: 0.35rem;
+		font-size: 0.55rem;
+		color: #9ca3af;
+		align-items: center;
+		font-weight: 600;
+		letter-spacing: 0.05em;
+	}
+
+	.legend-dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		display: inline-block;
+	}
+
+	.legend-dot.low { background: #10b981; }
+	.legend-dot.med { background: #f59e0b; }
+	.legend-dot.high { background: #ef4444; }
+	.legend-dot.crit { background: #991b1b; }
+
 	/* Main Content */
 	.yorha-main {
 		padding: 2rem;
@@ -754,23 +1017,68 @@
 
 	/* Filters */
 	.filter-section {
-		margin-bottom: 2rem;
+		margin-bottom: 1.5rem;
 	}
 
 	.search-group {
 		display: flex;
 		gap: 1rem;
-		margin-bottom: 1rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.search-input-wrap {
+		position: relative;
+		flex: 1;
+		display: flex;
+		align-items: center;
+	}
+
+	.search-input-wrap > :global(svg:first-child) {
+		position: absolute;
+		left: 0.875rem;
+		color: #9ca3af;
+		pointer-events: none;
+		transition: color 0.2s;
+	}
+
+	.search-input-wrap:focus-within > :global(svg:first-child) {
+		color: #667eea;
+	}
+
+	.search-input {
+		padding-left: 2.5rem !important;
+		padding-right: 2.25rem !important;
+	}
+
+	.search-clear {
+		position: absolute;
+		right: 0.625rem;
+		background: none;
+		border: none;
+		color: #9ca3af;
+		cursor: pointer;
+		padding: 4px;
+		border-radius: 6px;
+		transition: all 0.15s;
+		display: flex;
+		align-items: center;
+	}
+
+	.search-clear:hover {
+		background: #f3f4f6;
+		color: #374151;
 	}
 
 	.yorha-input {
 		flex: 1;
+		width: 100%;
 		padding: 0.75rem 1rem;
 		border: 1px solid #e5e7eb;
-		border-radius: 8px;
+		border-radius: 10px;
 		font-size: 0.85rem;
 		font-family: 'JetBrains Mono', monospace;
 		transition: all 0.2s;
+		background: #fff;
 	}
 
 	.yorha-input:focus {
@@ -786,7 +1094,7 @@
 		padding: 0.75rem 1rem;
 		background: #fff;
 		border: 1px solid #e5e7eb;
-		border-radius: 8px;
+		border-radius: 10px;
 		font-size: 0.75rem;
 		font-weight: 600;
 		letter-spacing: 0.05em;
@@ -801,16 +1109,87 @@
 		color: #667eea;
 	}
 
+	.filter-clear-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.5rem 0.875rem;
+		background: #fef2f2;
+		border: 1px solid #fecaca;
+		border-radius: 8px;
+		font-size: 0.65rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		color: #dc2626;
+		cursor: pointer;
+		font-family: 'JetBrains Mono', monospace;
+		transition: all 0.15s;
+	}
+
+	.filter-clear-btn:hover {
+		background: #fee2e2;
+	}
+
 	.filter-row {
 		display: flex;
-		gap: 1rem;
+		gap: 0.75rem;
 		align-items: center;
+	}
+
+	.filter-status-bar {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-top: 0.6rem;
+		min-height: 1.5rem;
+	}
+
+	.results-count {
+		font-size: 0.7rem;
+		color: #9ca3af;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+	}
+
+	.active-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		padding: 0.2rem 0.5rem 0.2rem 0.6rem;
+		background: #f0f0ff;
+		border: 1px solid #c7d2fe;
+		border-radius: 6px;
+		font-size: 0.65rem;
+		font-weight: 600;
+		color: #667eea;
+		text-transform: capitalize;
+	}
+
+	.active-chip.threat {
+		background: #fef3c7;
+		border-color: #fde68a;
+		color: #92400e;
+	}
+
+	.active-chip button {
+		background: none;
+		border: none;
+		cursor: pointer;
+		padding: 1px;
+		color: inherit;
+		opacity: 0.6;
+		transition: opacity 0.15s;
+		display: flex;
+	}
+
+	.active-chip button:hover {
+		opacity: 1;
 	}
 
 	.yorha-select {
 		padding: 0.75rem 1rem;
 		border: 1px solid #e5e7eb;
-		border-radius: 8px;
+		border-radius: 10px;
 		font-size: 0.85rem;
 		font-family: 'JetBrains Mono', monospace;
 		background: #fff;
@@ -833,11 +1212,14 @@
 	}
 
 	.toggle-btn {
-		padding: 0.75rem 1.25rem;
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.625rem 1rem;
 		background: #fff;
 		border: none;
 		border-right: 1px solid #e5e7eb;
-		font-size: 0.75rem;
+		font-size: 0.7rem;
 		font-weight: 600;
 		letter-spacing: 0.05em;
 		color: #9ca3af;
@@ -864,15 +1246,23 @@
 	.empty-state {
 		text-align: center;
 		padding: 4rem 2rem;
-		background: #fff;
-		border-radius: 12px;
-		border: 1px solid #e5e7eb;
+		background: linear-gradient(180deg, #fff 0%, #faf9f7 100%);
+		border-radius: 16px;
+		border: 1px solid #e8e5e0;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 	}
 
-	.empty-icon {
-		font-size: 3rem;
-		color: #d1d5db;
-		margin-bottom: 1rem;
+	.empty-icon-ring {
+		width: 80px;
+		height: 80px;
+		border-radius: 50%;
+		background: linear-gradient(135deg, #f0f0ff 0%, #faf9f7 100%);
+		border: 2px solid #e5e7eb;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #c7d2fe;
+		margin: 0 auto 1.25rem;
 	}
 
 	.empty-title {
@@ -884,9 +1274,17 @@
 	}
 
 	.empty-subtitle {
-		font-size: 0.85rem;
+		font-size: 0.8rem;
 		color: #9ca3af;
 		margin: 0 0 1.5rem 0;
+		line-height: 1.5;
+	}
+
+	.empty-actions {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.75rem;
 	}
 
 	.btn-yorha {
@@ -931,36 +1329,46 @@
 
 	.poi-card {
 		background: #fff;
-		border: 1px solid #e5e7eb;
-		border-radius: 12px;
+		border: 1px solid #e8e5e0;
+		border-radius: 14px;
 		overflow: hidden;
-		transition: all 0.2s;
+		transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 	}
 
 	.poi-card:hover {
-		box-shadow: 0 4px 16px rgba(102, 126, 234, 0.1);
+		box-shadow: 0 8px 24px rgba(102, 126, 234, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
 		border-color: #667eea;
+		transform: translateY(-2px);
 	}
 
 	.card-header {
 		display: flex;
 		align-items: center;
 		gap: 1rem;
-		padding: 1.5rem;
+		padding: 1.25rem 1.5rem;
 		border-bottom: 1px solid #f3f4f6;
 	}
 
-	.card-photo {
-		width: 60px;
-		height: 60px;
-		background: #f3f4f6;
-		border: 2px solid #e5e7eb;
-		border-radius: 8px;
+	.card-avatar {
+		width: 48px;
+		height: 48px;
+		border-radius: 12px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 1.5rem;
-		color: #9ca3af;
+		font-size: 1.25rem;
+		font-weight: 700;
+		flex-shrink: 0;
+		transition: transform 0.2s;
+	}
+
+	.poi-card:hover .card-avatar {
+		transform: scale(1.05);
+	}
+
+	.card-status-ribbon {
+		height: 3px;
+		border-radius: 3px 3px 0 0;
 	}
 
 	.card-info {
@@ -1120,7 +1528,7 @@
 	}
 
 	.table-row:hover {
-		background: #f8f8ff;
+		background: #f8f7ff;
 	}
 
 	.yorha-table td {
@@ -1205,29 +1613,133 @@
 		color: #667eea;
 	}
 
-	/* Modals */
-	.modal-overlay {
+	/* bits-ui Dialog Styles */
+	:global(.dialog-backdrop) {
 		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background: rgba(0, 0, 0, 0.5);
+		inset: 0;
+		background: rgba(15, 15, 20, 0.55);
+		backdrop-filter: blur(4px);
+		z-index: 1100;
+	}
+
+	:global(.dialog-panel) {
+		position: fixed;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		z-index: 1200;
+		width: 95%;
+		max-width: 600px;
+		max-height: 90vh;
+		overflow-y: auto;
+		background: #fff;
+		border-radius: 16px;
+		box-shadow:
+			0 24px 48px rgba(0, 0, 0, 0.12),
+			0 8px 16px rgba(0, 0, 0, 0.08),
+			0 0 0 1px rgba(0, 0, 0, 0.04);
+	}
+
+	:global(.dialog-panel-sm) {
+		max-width: 480px;
+	}
+
+	:global(.dialog-title-bar) {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.875rem;
+		padding: 1.5rem 1.5rem 1rem;
+	}
+
+	:global(.dialog-title-icon) {
+		width: 36px;
+		height: 36px;
+		border-radius: 10px;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		color: #fff;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		z-index: 1000;
+		flex-shrink: 0;
 	}
 
-	.modal-content {
-		background: #fff;
+	:global(.dialog-title-icon.upload) {
+		background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+	}
+
+	:global(.dialog-title) {
+		font-size: 1rem;
+		font-weight: 700;
+		color: #1f2937;
+		margin: 0;
+	}
+
+	:global(.dialog-desc) {
+		font-size: 0.775rem;
+		color: #6b7280;
+		margin: 0.15rem 0 0;
+	}
+
+	:global(.dialog-close-btn) {
+		margin-left: auto;
+		background: none;
+		border: none;
+		color: #9ca3af;
+		padding: 6px;
+		border-radius: 8px;
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+
+	:global(.dialog-close-btn:hover) {
+		background: #f3f4f6;
+		color: #374151;
+	}
+
+	:global(.dialog-body) {
+		padding: 0 1.5rem 1.5rem;
+	}
+
+	/* Toast notifications */
+	.toast-container {
+		position: fixed;
+		bottom: 1.5rem;
+		right: 1.5rem;
+		z-index: 2000;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		max-width: 380px;
+	}
+
+	.toast {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		padding: 0.75rem 1.25rem;
 		border-radius: 12px;
-		padding: 2rem;
-		max-width: 600px;
-		width: 90%;
-		max-height: 90vh;
-		overflow-y: auto;
-		box-shadow: 0 20px 40px rgba(102, 126, 234, 0.15);
+		font-size: 0.8rem;
+		font-weight: 500;
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+		font-family: inherit;
+	}
+
+	.toast-success {
+		background: #f0fdf4;
+		color: #166534;
+		border: 1px solid #bbf7d0;
+	}
+
+	.toast-error {
+		background: #fef2f2;
+		color: #991b1b;
+		border: 1px solid #fecaca;
+	}
+
+	.toast-info {
+		background: #eff6ff;
+		color: #1e40af;
+		border: 1px solid #bfdbfe;
 	}
 
 	/* 4-column card actions */

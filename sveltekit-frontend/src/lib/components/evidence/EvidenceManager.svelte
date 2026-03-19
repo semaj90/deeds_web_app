@@ -171,7 +171,7 @@
 						<span class="meta-tag">{formatDate(item.uploadedAt)}</span>
 						{#if item.hasEmbedding}
 							<span class="embed-badge">
-								<Icon name="check-circle" size={10} />
+								<Icon name="circle-check" size={10} />
 								Embedded
 							</span>
 						{/if}

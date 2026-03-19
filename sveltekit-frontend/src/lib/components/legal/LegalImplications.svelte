@@ -16,7 +16,7 @@
 	const items = $derived(implications.length > 0 ? implications : [
 		{ title: 'Compliance Risk', description: 'Organizations must ensure compliance with this legal provision to avoid potential liability.', icon: 'shield-alert', status: 'high' },
 		{ title: 'Legal Authority', description: 'This provision establishes binding legal standards within its jurisdiction.', icon: 'lock', status: 'medium' },
-		{ title: 'Interpretation', description: 'Key terms remain subject to judicial interpretation and evolving case law.', icon: 'help-circle', status: 'low' },
+		{ title: 'Interpretation', description: 'Key terms remain subject to judicial interpretation and evolving case law.', icon: 'life-buoy', status: 'low' },
 	]);
 </script>
 
@@ -43,7 +43,7 @@
 
 	<div class="uncertainty-box">
 		<div class="box-header">
-			<Icon name="alert-triangle" size={16} class="text-orange-400" />
+			<Icon name="triangle-alert" size={16} class="text-orange-400" />
 			<h4>Legal Uncertainty</h4>
 		</div>
 		<p class="box-text">

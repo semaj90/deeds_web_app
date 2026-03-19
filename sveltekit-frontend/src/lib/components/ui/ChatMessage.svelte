@@ -30,7 +30,7 @@
 	{:else if message.role === 'assistant'}
 		<Icon name="bot" class="w-5 h-5" />
 	{:else}
-		<Icon name="alert-triangle" class="w-5 h-5" />
+		<Icon name="triangle-alert" class="w-5 h-5" />
 	{/if}
 	<div class="flex-1">
 		<div class="text-sm">{message.content}</div>

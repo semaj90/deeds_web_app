@@ -1,38 +1,18 @@
 {
-  "timestamp": "2026-03-17T21-37-04",
+  "timestamp": "2026-03-19T01-16-44",
   "base": "http://localhost:5173",
-  "totalTimeMs": 25440,
+  "totalTimeMs": 4083,
   "results": [
     {
-      "name": "library-b301b10e-03b9-4801-b813-c940309d3898-node-2b938d1f-f8ca-400d-b59c-5368e840412d",
-      "path": "/library/b301b10e-03b9-4801-b813-c940309d3898/node/2b938d1f-f8ca-400d-b59c-5368e840412d",
-      "url": "http://localhost:5173/library/b301b10e-03b9-4801-b813-c940309d3898/node/2b938d1f-f8ca-400d-b59c-5368e840412d",
-      "status": 500,
-      "ok": false,
-      "error": "SvelteKit error page rendered",
-      "file": "library-b301b10e-03b9-4801-b813-c940309d3898-node-2b938d1f-f8ca-400d-b59c-5368e840412d.png",
-      "consoleErrors": [
-        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
-        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
-        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
-        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
-      ],
+      "name": "demos-evidence-canvas",
+      "path": "/demos/evidence-canvas",
+      "url": "http://localhost:5173/demos/evidence-canvas",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "demos-evidence-canvas.png",
+      "consoleErrors": [],
       "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra",
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra",
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra",
         "No available adapters.",
         "WebGPU: No adapter available",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
@@ -40,20 +20,20 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 7916,
-      "domElements": 188,
-      "resourceCount": 104,
-      "resourceSizeKB": 3041
+      "loadTimeMs": 3061,
+      "domElements": 514,
+      "resourceCount": 211,
+      "resourceSizeKB": 7884
     }
   ],
   "summary": {
-    "passed": 0,
-    "failed": 1,
+    "passed": 1,
+    "failed": 0,
     "total": 1,
-    "avgLoadMs": 7916,
-    "slowestRoute": "library-b301b10e-03b9-4801-b813-c940309d3898-node-2b938d1f-f8ca-400d-b59c-5368e840412d",
-    "slowestLoadMs": 7916,
-    "totalConsoleErrors": 4,
+    "avgLoadMs": 3061,
+    "slowestRoute": "demos-evidence-canvas",
+    "slowestLoadMs": 3061,
+    "totalConsoleErrors": 0,
     "totalNetworkFailures": 0
   }
 }

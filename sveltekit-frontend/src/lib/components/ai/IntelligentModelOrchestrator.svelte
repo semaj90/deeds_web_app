@@ -227,7 +227,7 @@
 	// Pipeline steps config
 	const pipelineSteps = [
 		{ id: 'searching', label: 'RAG Search', desc: 'Embed → Dual Search → Rerank', icon: 'search' },
-		{ id: 'validating', label: 'Source Validation', desc: 'Approve/reject retrieved chunks', icon: 'check-circle' },
+		{ id: 'validating', label: 'Source Validation', desc: 'Approve/reject retrieved chunks', icon: 'circle-check' },
 		{ id: 'generating', label: 'LLM Generation', desc: 'gemma3-legal with citations', icon: 'brain' }
 	] as const;
 

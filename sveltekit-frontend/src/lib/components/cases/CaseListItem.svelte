@@ -73,7 +73,7 @@
   function getStatusIconName(status: string): string {
     switch (status) {
       case "open":
-        return 'check-circle';
+        return 'circle-check';
       case "in_progress":
         return 'clock';
       case "closed":

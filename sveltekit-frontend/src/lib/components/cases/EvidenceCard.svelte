@@ -93,7 +93,7 @@
 				<Icon name="eye" size={16} />
 			</button>
 			<button onclick={() => onedit?.()} class="p-1.5 text-sand/40 hover:text-sand rounded transition" title="Edit" {disabled} aria-label="Edit evidence">
-				<Icon name="edit" size={16} />
+				<Icon name="pencil" size={16} />
 			</button>
 			<button onclick={() => ondownload?.()} class="p-1.5 text-sand/40 hover:text-sand rounded transition" title="Download" {disabled} aria-label="Download evidence">
 				<Icon name="download" size={16} />

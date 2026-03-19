@@ -189,7 +189,7 @@
 			</div>
 		{:else if error}
 			<div class="state-message error-state">
-				<Icon name="alert-circle" size={24} />
+				<Icon name="circle-alert" size={24} />
 				<p>{error}</p>
 				<Button onclick={loadCitations}>Retry</Button>
 			</div>

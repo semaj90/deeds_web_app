@@ -1,10 +1,10 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
-  // Get error from page store
-  const errorPage = $derived($page.error);
-  const status = $derived($page.status);
+  // Get error from page state
+  const errorPage = $derived(page.error);
+  const status = $derived(page.status);
 </script>
 
 <svelte:head>

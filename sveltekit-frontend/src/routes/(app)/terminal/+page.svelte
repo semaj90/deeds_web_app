@@ -579,7 +579,7 @@
 										disabled={ttsInitializing}
 									>
 										{#if ttsInitializing && speakingIdx === idx}
-											<Icon name="loader-2" size={12} class="animate-spin" />
+											<Icon name="loader-circle" size={12} class="animate-spin" />
 										{:else if speakingIdx === idx}
 											<Icon name="volume-x" size={12} />
 										{:else}
@@ -633,7 +633,7 @@
 						</div>
 						<div class="flex flex-col gap-1 min-w-0">
 							<div class="flex items-center gap-3 text-emerald-500 text-sm px-4 py-3 bg-[#1c1917] border border-dashed border-emerald-900/60 rounded">
-								<Icon name="loader-2" size={16} class="animate-spin" />
+								<Icon name="loader-circle" size={16} class="animate-spin" />
 								<span>9S IS ANALYZING...</span>
 							</div>
 						</div>
@@ -646,7 +646,7 @@
 	<!-- Error Display -->
 	{#if session?.error}
 		<div class="px-6 py-2 bg-red-950 border-t border-red-900 text-red-300 text-[13px] flex items-center gap-2 shrink-0">
-			<Icon name="alert-triangle" size={14} />
+			<Icon name="triangle-alert" size={14} />
 			<span>{session.error}</span>
 		</div>
 	{/if}

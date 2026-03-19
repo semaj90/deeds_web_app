@@ -105,7 +105,7 @@ let demoMode = $state<'basic' | 'handsfree'>('basic');
 					<li><strong>No Clicks Required:</strong> After enabling hands-free, have an entire conversation without touching your keyboard or mouse.</li>
 				</ol>
 				<div class="warning-box">
-					<Icon name="alert-circle" size={14} />
+					<Icon name="circle-alert" size={14} />
 					<span><strong>Note:</strong> Hands-free mode works best in a quiet environment. Background noise may trigger false positives.</span>
 				</div>
 			{/if}

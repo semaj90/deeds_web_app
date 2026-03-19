@@ -120,7 +120,7 @@
 			{#if tag.errorCount > 0}
 				<section class="detail-section">
 					<h3 class="section-title">
-						<Icon name="alert-triangle" class="h-4 w-4 text-danger/80" />
+						<Icon name="triangle-alert" class="h-4 w-4 text-danger/80" />
 						Errors
 					</h3>
 					<div class="error-badge">

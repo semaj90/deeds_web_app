@@ -129,7 +129,7 @@ function loadSample(text: string) {
 		<!-- Error Display -->
 		{#if error}
 			<div class="error-box">
-				<Icon name="alert-triangle" />
+				<Icon name="triangle-alert" />
 				{error}
 			</div>
 		{/if}

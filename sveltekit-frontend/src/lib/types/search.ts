@@ -2,6 +2,58 @@
  * Search and Vector Types
  */
 
+// ── Platform Search (unified cross-domain) ───────────────────────────────
+
+export type PlatformEntityType =
+	| 'case'
+	| 'evidence'
+	| 'poi'
+	| 'citation'
+	| 'document'
+	| 'glossary'
+	| 'statute'
+	| 'report'
+	| 'message';
+
+export type PlatformMatchType = 'fts' | 'vector' | 'fused' | 'ilike' | 'qdrant';
+
+export interface PlatformSearchHit {
+	id: string;
+	entityType: PlatformEntityType;
+	title: string;
+	snippet: string;
+	score: number;
+	matchType: PlatformMatchType;
+	route: string;
+	caseId?: string;
+	documentId?: string;
+	nodeId?: string;
+	chunkId?: string;
+	jurisdiction?: string;
+	corpusType?: string;
+	sourceConfidence?: string;
+	metadata?: Record<string, unknown>;
+}
+
+export interface PlatformSearchTiming {
+	totalMs: number;
+	adapters: Record<string, { ms: number; count: number; status: 'ok' | 'error' | 'timeout' }>;
+}
+
+export interface PlatformSuggestion {
+	text: string;
+	source: 'heading' | 'citation' | 'document' | 'case' | 'evidence' | 'report';
+}
+
+export interface PlatformSearchResponse {
+	hits: PlatformSearchHit[];
+	groups: Record<PlatformEntityType, PlatformSearchHit[]>;
+	totalResults: number;
+	timing: PlatformSearchTiming;
+}
+
+// ── Legacy Search Types ──────────────────────────────────────────────────
+
 export interface SearchResult {
   id: string;
 	title: string;

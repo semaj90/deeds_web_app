@@ -13,7 +13,18 @@
 	import { trackClick } from '$lib/utils/tracking';
 	import StatuteSearchBar from '$lib/components/legal-ai/StatuteSearchBar.svelte';
 	import StatuteResultsList from '$lib/components/legal-ai/StatuteResultsList.svelte';
-	import { searchCases, searchLaws, getSearchSuggestions, trackSearch, type SearchQuery, type SearchResponse, type SearchResult as TypedSearchResult } from '$lib/client/search-client.js';
+	import { searchCases, searchLaws, getSearchSuggestions, getSearchFilters, trackSearch, type SearchQuery, type SearchResponse, type SearchResult as TypedSearchResult } from '$lib/client/search-client.js';
+	import type { PlatformSearchHit, PlatformSearchTiming } from '$lib/types/search.js';
+
+	interface FilterFacets {
+		jurisdictions: string[];
+		categories: string[];
+		types: string[];
+	}
+
+	let caseFacets = $state<FilterFacets>({ jurisdictions: [], categories: [], types: [] });
+	let lawFacets = $state<FilterFacets>({ jurisdictions: [], categories: [], types: [] });
+	let facetsLoaded = $state(false);
 
 	let showRAGAssistant = $state(false);
 	let showCodebaseSearch = $state(false);
@@ -90,7 +101,7 @@
 		search_time_ms?: number;
 	}
 
-	type SearchMode = 'all' | 'cases' | 'rag' | 'evidence' | 'statutes' | 'precedents' | 'glossary' | 'library';
+	type SearchMode = 'all' | 'law' | 'cases' | 'evidence' | 'reports' | 'messages' | 'rag' | 'statutes' | 'precedents' | 'glossary';
 
 	let searchQuery = $state('');
 	let isSearching = $state(false);
@@ -125,19 +136,9 @@
 	let auxTiming = $state<Record<string, number>>({});
 
 	// Platform (all) search results
-	interface PlatformHit {
-		id: string;
-		entityType: string;
-		title: string;
-		snippet: string;
-		score: number;
-		matchType: string;
-		route: string;
-		jurisdiction?: string;
-		corpusType?: string;
-	}
-	let platformHits = $state<PlatformHit[]>([]);
+	let platformHits = $state<PlatformSearchHit[]>([]);
 	let platformGroups = $state<Record<string, number>>({});
+	let platformTiming = $state<PlatformSearchTiming | null>(null);
 
 	// Library search results
 	let libraryResults = $state<any[]>([]);
@@ -152,6 +153,20 @@
 		evidence: true,
 		documents: true,
 		persons: true,
+	});
+
+	// Load filter facets on mount
+	$effect(() => {
+		if (!facetsLoaded) {
+			facetsLoaded = true;
+			Promise.allSettled([
+				getSearchFilters('cases'),
+				getSearchFilters('laws'),
+			]).then(([caseRes, lawRes]) => {
+				if (caseRes.status === 'fulfilled') caseFacets = caseRes.value as FilterFacets;
+				if (lawRes.status === 'fulfilled') lawFacets = lawRes.value as FilterFacets;
+			});
+		}
 	});
 
 	// GPU reranking state
@@ -212,12 +227,16 @@
 		try {
 			if (searchMode === 'all') {
 				await searchPlatform();
-			} else if (searchMode === 'library') {
+			} else if (searchMode === 'law') {
 				await searchLibrary();
 			} else if (searchMode === 'cases') {
 				await searchCaseRecords();
 			} else if (searchMode === 'evidence') {
 				await searchEvidence();
+			} else if (searchMode === 'reports') {
+				await searchReportRecords();
+			} else if (searchMode === 'messages') {
+				await searchMessageRecords();
 			} else if (searchMode === 'statutes') {
 				await searchStatutes();
 			} else if (searchMode === 'precedents') {
@@ -241,6 +260,7 @@
 		const data = await res.json();
 		platformHits = data.hits ?? [];
 		platformGroups = data.groups ?? {};
+		platformTiming = data.timing ?? null;
 		totalFound = data.totalResults ?? platformHits.length;
 	}
 
@@ -371,6 +391,26 @@
 		totalFound = glossaryResults.length;
 	}
 
+	async function searchReportRecords() {
+		const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}&type=reports&limit=20`);
+		if (!res.ok) throw new Error(`Report search failed: ${res.status}`);
+		const data = await res.json();
+		platformHits = data.hits ?? [];
+		platformGroups = data.groups ?? {};
+		platformTiming = data.timing ?? null;
+		totalFound = data.totalResults ?? platformHits.length;
+	}
+
+	async function searchMessageRecords() {
+		const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}&type=messages&limit=20`);
+		if (!res.ok) throw new Error(`Message search failed: ${res.status}`);
+		const data = await res.json();
+		platformHits = data.hits ?? [];
+		platformGroups = data.groups ?? {};
+		platformTiming = data.timing ?? null;
+		totalFound = data.totalResults ?? platformHits.length;
+	}
+
 	function getConfidenceFromScore(score: number) {
 		return getConfidenceLevel(score);
 	}
@@ -396,11 +436,6 @@
 			clearTimeout(searchSuggestionTimeout);
 		}
 
-		if (searchMode !== 'cases' && searchMode !== 'statutes') {
-			searchSuggestions = [];
-			return;
-		}
-
 		if (searchQuery.trim().length < 2) {
 			searchSuggestions = [];
 			return;
@@ -412,10 +447,10 @@
 	}
 
 	async function refreshSearchSuggestions() {
-		searchSuggestions = await getSearchSuggestions(
-			searchQuery,
-			searchMode === 'cases' ? 'cases' : 'laws'
-		);
+		const sugType = searchMode === 'cases' ? 'cases'
+			: (searchMode === 'law' || searchMode === 'statutes') ? 'laws'
+			: 'all';
+		searchSuggestions = await getSearchSuggestions(searchQuery, sugType);
 	}
 </script>
 
@@ -435,8 +470,8 @@
 				<button class="mode-btn" class:active={searchMode === 'all'} onclick={() => searchMode = 'all'}>
 					<Icon name="layers" size={14} /> All
 				</button>
-				<button class="mode-btn" class:active={searchMode === 'library'} onclick={() => searchMode = 'library'}>
-					<Icon name="library-big" size={14} /> Library
+				<button class="mode-btn" class:active={searchMode === 'law'} onclick={() => searchMode = 'law'}>
+					<Icon name="scale" size={14} /> Law
 				</button>
 				<button class="mode-btn" class:active={searchMode === 'cases'} onclick={() => { searchMode = 'cases'; searchSuggestions = []; }}>
 					<Icon name="briefcase" size={14} /> Cases
@@ -444,17 +479,11 @@
 				<button class="mode-btn" class:active={searchMode === 'evidence'} onclick={() => searchMode = 'evidence'}>
 					<Icon name="network" size={14} /> Evidence
 				</button>
-				<button class="mode-btn" class:active={searchMode === 'rag'} onclick={() => searchMode = 'rag'}>
-					<Icon name="search" size={14} /> RAG
+				<button class="mode-btn" class:active={searchMode === 'reports'} onclick={() => searchMode = 'reports'}>
+					<Icon name="file-text" size={14} /> Reports
 				</button>
-				<button class="mode-btn" class:active={searchMode === 'statutes'} onclick={() => searchMode = 'statutes'}>
-					<Icon name="scale" size={14} /> Statutes
-				</button>
-				<button class="mode-btn" class:active={searchMode === 'precedents'} onclick={() => searchMode = 'precedents'}>
-					<Icon name="briefcase" size={14} /> Precedents
-				</button>
-				<button class="mode-btn" class:active={searchMode === 'glossary'} onclick={() => searchMode = 'glossary'}>
-					<Icon name="file-text" size={14} /> Glossary
+				<button class="mode-btn" class:active={searchMode === 'messages'} onclick={() => searchMode = 'messages'}>
+					<Icon name="message-square" size={14} /> Messages
 				</button>
 			</div>
 		</div>
@@ -494,7 +523,7 @@
 					class="search-submit"
 				>
 					{#if isSearching}
-						<span class="animate-spin"><Icon name="loader-2" size={16} /></span>
+						<span class="animate-spin"><Icon name="loader-circle" size={16} /></span>
 					{:else}
 						SEARCH
 					{/if}
@@ -504,24 +533,40 @@
 			{#if searchMode === 'cases'}
 				<div class="filter-section">
 					<h3>CASE FILTERS</h3>
-					<input
-						type="text"
-						placeholder="Jurisdiction"
-						bind:value={caseSearchFilters.jurisdiction}
-						class="filter-input"
-					/>
-					<input
-						type="text"
-						placeholder="Crime category"
-						bind:value={caseSearchFilters.crimeCategory}
-						class="filter-input"
-					/>
-					<input
-						type="text"
-						placeholder="Crime classification"
-						bind:value={caseSearchFilters.crimeClassification}
-						class="filter-input"
-					/>
+					<select bind:value={caseSearchFilters.jurisdiction} class="filter-input">
+						<option value="">All Jurisdictions</option>
+						{#each caseFacets.jurisdictions as jur}
+							<option value={jur}>{jur}</option>
+						{/each}
+					</select>
+					<select bind:value={caseSearchFilters.crimeCategory} class="filter-input">
+						<option value="">All Categories</option>
+						{#each caseFacets.categories as cat}
+							<option value={cat}>{cat}</option>
+						{/each}
+					</select>
+					<select bind:value={caseSearchFilters.crimeClassification} class="filter-input">
+						<option value="">All Classifications</option>
+						{#each caseFacets.types as typ}
+							<option value={typ}>{typ}</option>
+						{/each}
+					</select>
+				</div>
+			{:else if searchMode === 'law'}
+				<div class="filter-section">
+					<h3>LAW FILTERS</h3>
+					<select bind:value={statuteSearchFilters.jurisdiction} class="filter-input">
+						<option value="">All Jurisdictions</option>
+						{#each lawFacets.jurisdictions as jur}
+							<option value={jur}>{jur}</option>
+						{/each}
+					</select>
+					<select bind:value={statuteSearchFilters.sectionType} class="filter-input">
+						<option value="">All Categories</option>
+						{#each lawFacets.categories as cat}
+							<option value={cat}>{cat}</option>
+						{/each}
+					</select>
 				</div>
 			{:else if searchMode === 'evidence'}
 				<div class="filter-section">
@@ -604,7 +649,7 @@
 					{/if}
 					{#if isGpuReranking}
 						<div class="timing-row">
-							<span class="animate-spin"><Icon name="loader-2" size={12} /></span>
+							<span class="animate-spin"><Icon name="loader-circle" size={12} /></span>
 							<span>Computing GPU scores...</span>
 						</div>
 					{/if}
@@ -647,6 +692,23 @@
 			{/if}
 
 			<!-- Timing Breakdown -->
+			{#if platformTiming && (searchMode === 'all' || searchMode === 'reports' || searchMode === 'messages')}
+				<div class="timing-panel">
+					<h3><Icon name="clock" size={14} /> SEARCH TIMING</h3>
+					<div class="timing-grid">
+						<div class="timing-row total">
+							<span>Total</span>
+							<span class="timing-value">{platformTiming.totalMs}ms</span>
+						</div>
+						{#each Object.entries(platformTiming.adapters) as [name, info]}
+							<div class="timing-row">
+								<span>{name} ({info.count})</span>
+								<span class="timing-value" class:error-text={info.status === 'error'}>{info.ms}ms</span>
+							</div>
+						{/each}
+					</div>
+				</div>
+			{/if}
 			{#if (searchMode === 'cases' || searchMode === 'statutes' || searchMode === 'precedents' || searchMode === 'glossary') && auxTiming.total_ms}
 				<div class="timing-panel">
 					<h3><Icon name="clock" size={14} /> TIMING</h3>
@@ -726,7 +788,7 @@
 				</div>
 			{:else if isSearching}
 				<div class="loading-state">
-					<span class="animate-spin"><Icon name="loader-2" size={32} /></span>
+					<span class="animate-spin"><Icon name="loader-circle" size={32} /></span>
 					<p>Running {searchMode === 'evidence' ? 'RAG+KAG+DAG' : searchMode === 'rag' ? 'RAG' : 'typed Drizzle'} pipeline...</p>
 				</div>
 			{:else if searchMode === 'all' && platformHits.length > 0}
@@ -764,7 +826,7 @@
 					</a>
 				{/each}
 
-			{:else if searchMode === 'library' && libraryResults.length > 0}
+			{:else if searchMode === 'law' && libraryResults.length > 0}
 				<!-- Legal Library Search Results -->
 				{#each libraryResults as hit, i}
 					<a href="/library/{hit.document_id ?? ''}/node/{hit.node_id ?? ''}" class="result-card library-hit">
@@ -789,6 +851,44 @@
 								{/if}
 								{#if hit.citation_label}
 									<span class="meta-tag citation">{hit.citation_label}</span>
+								{/if}
+							</div>
+						{/if}
+					</a>
+				{/each}
+
+			{:else if (searchMode === 'reports' || searchMode === 'messages') && platformHits.length > 0}
+				<!-- Report/Message Results (via platform search) -->
+				{#if Object.keys(platformGroups).length > 0}
+					<div class="platform-groups">
+						{#each Object.entries(platformGroups) as [entityType, count]}
+							<span class="platform-group-badge">
+								{entityType} <span class="group-count">{count}</span>
+							</span>
+						{/each}
+					</div>
+				{/if}
+				{#each platformHits as hit, i}
+					<a href={hit.route} class="result-card platform-hit">
+						<div class="bundle-header">
+							<div class="bundle-rank">#{i + 1}</div>
+							<span class="entity-type-badge">{hit.entityType}</span>
+							<div class="bundle-title">{hit.title}</div>
+							<div class="confidence-badge" style="background: rgba(96, 165, 250, 0.15); color: #60a5fa;">
+								{hit.matchType} · {Math.round(hit.score * 100)}%
+							</div>
+						</div>
+						<p class="bundle-preview">{hit.snippet}</p>
+						{#if hit.metadata}
+							<div class="bundle-meta">
+								{#if hit.metadata.type}
+									<span class="meta-tag source">{hit.metadata.type}</span>
+								{/if}
+								{#if hit.metadata.status}
+									<span class="meta-tag section">{hit.metadata.status}</span>
+								{/if}
+								{#if hit.metadata.role}
+									<span class="meta-tag entity">{hit.metadata.role}</span>
 								{/if}
 							</div>
 						{/if}

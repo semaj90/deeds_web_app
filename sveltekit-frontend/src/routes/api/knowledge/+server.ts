@@ -6,6 +6,7 @@ import postgres from 'postgres';
 import { getDatabaseUrl, getQdrantUrl, getOllamaUrl } from '$lib/config/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { generateSparseVector } from '$lib/server/vector/bm42-sparse.js';
 
 const sql = postgres(getDatabaseUrl());
 const qdrant = new QdrantClient({ url: getQdrantUrl() });
@@ -78,11 +79,20 @@ async function generateEmbedding(text: string): Promise<number[]> {
 async function ensureQdrantCollection() {
   try {
     await (qdrant as any).getCollection('knowledge_base');
+    // Ensure sparse vectors configured on existing collection
+    try {
+      await qdrant.updateCollection('knowledge_base', {
+        sparse_vectors: { bm25: {} }
+      });
+    } catch { /* already configured */ }
   } catch {
     await qdrant.createCollection('knowledge_base', {
       vectors: {
         size: 768,
         distance: 'Cosine'
+      },
+      sparse_vectors: {
+        bm25: {}
       }
     });
   }
@@ -125,13 +135,22 @@ export const POST: RequestHandler = async ({ request }) => {
             chunk_count: chunks.length
           };
 
-          // Store in Qdrant
+          // Generate BM42 sparse vector for hybrid search
+          const sparse = generateSparseVector(chunk);
+
+          // Store in Qdrant (dense + sparse vectors)
           await (qdrant as any).upsert('knowledge_base', {
             points: [
               {
                 id: pointId,
-                vector: embedding,
-                payload
+                vector: {
+                  '': embedding,
+                  'bm25': sparse,
+                },
+                payload: {
+                  ...payload,
+                  text: chunk.slice(0, 500),
+                },
               }
             ]
           });
@@ -193,12 +212,27 @@ export const GET: RequestHandler = async ({ url }) => {
     // Generate embedding for query
     const queryEmbedding = await generateEmbedding(query);
 
-    // Search Qdrant
-    const results = await (qdrant as any).search('knowledge_base', {
-      vector: queryEmbedding,
-      limit,
-      score_threshold: 0.6
-    });
+    // Hybrid search: dense + BM42 sparse with RRF fusion
+    const querySparse = generateSparseVector(query);
+    let results: any[];
+    try {
+      results = await (qdrant as any).query('knowledge_base', {
+        prefetch: [
+          { query: queryEmbedding, using: '', limit: limit * 2 },
+          { query: querySparse, using: 'bm25', limit: limit * 2 },
+        ],
+        query: { fusion: 'rrf' },
+        limit,
+        score_threshold: 0.4,
+      });
+    } catch {
+      // Fallback to dense-only if sparse not configured
+      results = await (qdrant as any).search('knowledge_base', {
+        vector: queryEmbedding,
+        limit,
+        score_threshold: 0.6,
+      });
+    }
 
     const matches = (results as any[]).map(r => ({
       id: r.id,
@@ -246,13 +280,27 @@ export const PATCH: RequestHandler = async ({ request }) => {
 
     await ensureQdrantCollection();
 
-    // 1. Search knowledge base for context
+    // 1. Hybrid search knowledge base for context (dense + BM42)
     const queryEmbedding = await generateEmbedding(prompt);
-    const searchResults = await (qdrant as any).search('knowledge_base', {
-      vector: queryEmbedding,
-      limit: max_context_chunks,
-      score_threshold: 0.6
-    });
+    const promptSparse = generateSparseVector(prompt);
+    let searchResults: any[];
+    try {
+      searchResults = await (qdrant as any).query('knowledge_base', {
+        prefetch: [
+          { query: queryEmbedding, using: '', limit: max_context_chunks * 2 },
+          { query: promptSparse, using: 'bm25', limit: max_context_chunks * 2 },
+        ],
+        query: { fusion: 'rrf' },
+        limit: max_context_chunks,
+        score_threshold: 0.4,
+      });
+    } catch {
+      searchResults = await (qdrant as any).search('knowledge_base', {
+        vector: queryEmbedding,
+        limit: max_context_chunks,
+        score_threshold: 0.6,
+      });
+    }
 
     const contextText = (searchResults as any[])
       .map(r => `[${r.payload?.document_name}] ${r.payload?.content}`)

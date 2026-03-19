@@ -1,5 +1,5 @@
 <script lang="ts">
- import { page } from '$app/stores';
+ import { page } from '$app/state';
  import type { Snippet } from 'svelte';
 
  interface Props {
@@ -57,7 +57,7 @@
  <a
  href={item.href}
  class="nav-item"
- class:active={$page.url.pathname.startsWith(item.href)}
+ class:active={page.url.pathname.startsWith(item.href)}
  >
  <span class="nav-icon">{item.icon}</span>
  <span class="nav-label">{item.label}</span>

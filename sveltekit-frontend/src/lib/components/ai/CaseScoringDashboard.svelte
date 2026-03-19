@@ -190,7 +190,7 @@
 
 	{#if errorMessage}
 		<div class="error-bar">
-			<Icon name="alert-triangle" size={14} />
+			<Icon name="triangle-alert" size={14} />
 			<span>{errorMessage}</span>
 		</div>
 	{/if}

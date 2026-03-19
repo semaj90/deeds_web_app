@@ -92,12 +92,12 @@
 <div class="min-h-screen bg-background">
 	{#if loading}
 		<div class="flex items-center justify-center h-screen">
-			<Icon name="loader-2" class="w-8 h-8 animate-spin text-accent" />
+			<Icon name="loader-circle" class="w-8 h-8 animate-spin text-accent" />
 			<span class="ml-3 text-neutral-400">Loading report...</span>
 		</div>
 	{:else if error}
 		<div class="flex flex-col items-center justify-center h-screen gap-4">
-			<Icon name="alert-triangle" class="w-12 h-12 text-red-400" />
+			<Icon name="triangle-alert" class="w-12 h-12 text-red-400" />
 			<div class="text-neutral-300 text-center">
 				<h2 class="text-xl font-semibold mb-2">Error Loading Report</h2>
 				<p class="text-sm text-neutral-400">{error}</p>

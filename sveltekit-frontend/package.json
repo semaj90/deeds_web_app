@@ -882,6 +882,7 @@
     "@paralleldrive/cuid2": "^2.2.2",
     "@tiptap/core": "^3.0.7",
     "@tiptap/extension-collaboration": "^3.0.7",
+    "@tiptap/extension-image": "3.20.4",
     "@tiptap/extension-placeholder": "3.17.1",
     "@tiptap/pm": "^3.0.7",
     "@tiptap/starter-kit": "^3.0.7",

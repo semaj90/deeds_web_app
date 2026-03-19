@@ -995,7 +995,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
     return 'text-danger';
   }
 
-  function getStatusIcon(status: string): string { switch (status) { case 'active': return 'check-circle'; case 'inactive': return 'alert-triangle'; default: return 'loader-2'; } }
+  function getStatusIcon(status: string): string { switch (status) { case 'active': return 'circle-check'; case 'inactive': return 'triangle-alert'; default: return 'loader-circle'; } }
 
   function copyToClipboard(text: string) {
     navigator.clipboard.writeText(text);
@@ -1148,7 +1148,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
               : message.role === 'assistant'
                 ? 'bg-accent'
                 : 'bg-sand/20'}">
-            <span class={`i-lucide-${message.role === "user" ? "send" : message.role === "assistant" ? "brain" : "alert-triangle"} w-4 h-4 text-white inline-block`}></span>
+            <span class={`i-lucide-${message.role === "user" ? "send" : message.role === "assistant" ? "brain" : "triangle-alert"} w-4 h-4 text-white inline-block`}></span>
           </div>
 
           <!-- Message Content -->

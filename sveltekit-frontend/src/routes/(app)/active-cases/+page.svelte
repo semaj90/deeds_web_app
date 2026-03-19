@@ -116,6 +116,9 @@
 	<!-- Terminal Header -->
 	<div class="terminal-header">
 		<div class="header-left">
+			<div class="ac-icon-badge">
+				<Icon name="folder-open" />
+			</div>
 			<div class="system-tag">LEGAL-AI.CORPUS</div>
 			<div class="header-divider"></div>
 			<h1 class="terminal-title">ACTIVE CASE FILES</h1>
@@ -172,32 +175,28 @@
 		</div>
 	</div>
 
-	<!-- Priority Stats Bar -->
-	<div class="stats-bar">
-		<div class="stat-item critical">
-			<span class="stat-value">{data.stats.high}</span>
-			<span class="stat-label">HIGH/CRITICAL</span>
+	<!-- Priority Stats Cards -->
+	<div class="stats-cards-row">
+		<div class="pstat-card pstat-critical">
+			<span class="pstat-value">{data.stats.high}</span>
+			<span class="pstat-label">HIGH / CRITICAL</span>
 		</div>
-		<div class="stat-divider"></div>
-		<div class="stat-item medium">
-			<span class="stat-value">{data.stats.medium}</span>
-			<span class="stat-label">MEDIUM</span>
+		<div class="pstat-card pstat-medium">
+			<span class="pstat-value">{data.stats.medium}</span>
+			<span class="pstat-label">MEDIUM</span>
 		</div>
-		<div class="stat-divider"></div>
-		<div class="stat-item low">
-			<span class="stat-value">{data.stats.low}</span>
-			<span class="stat-label">LOW</span>
+		<div class="pstat-card pstat-low">
+			<span class="pstat-value">{data.stats.low}</span>
+			<span class="pstat-label">LOW</span>
 		</div>
-		<div class="stat-divider"></div>
-		<div class="stat-item closed">
-			<span class="stat-value">{data.stats.closed}</span>
-			<span class="stat-label">CLOSED</span>
+		<div class="pstat-card pstat-closed">
+			<span class="pstat-value">{data.stats.closed}</span>
+			<span class="pstat-label">CLOSED</span>
 		</div>
 		{#if data.user}
-			<div class="stat-divider"></div>
-			<div class="stat-item agent">
-				<span class="stat-label">AGENT:</span>
-				<span class="stat-value">{data.user.username ?? data.user.email ?? 'Unknown'}</span>
+			<div class="pstat-card pstat-agent">
+				<span class="pstat-label">AGENT</span>
+				<span class="pstat-value agent-name">{data.user.username ?? data.user.email ?? 'Unknown'}</span>
 			</div>
 		{/if}
 	</div>
@@ -260,7 +259,7 @@
 									disabled={analyzingCaseId === caseItem.id}
 								>
 									{#if analyzingCaseId === caseItem.id}
-										<Icon name="loader-2" class="animate-spin" />
+										<Icon name="loader-circle" class="animate-spin" />
 									{:else}
 										<Icon name="brain" />
 									{/if}
@@ -316,7 +315,7 @@
 				{#if analysisError}
 					<div class="modal-body">
 						<div class="error-message">
-							<Icon name="alert-triangle" />
+							<Icon name="triangle-alert" />
 							<div>
 								<div class="error-title">ANALYSIS FAILED</div>
 								<div class="error-detail">{analysisError}</div>
@@ -425,6 +424,18 @@
 		display: flex;
 		align-items: center;
 		gap: 1rem;
+	}
+
+	.ac-icon-badge {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		border-radius: 0.5rem;
+		background: rgba(212, 199, 163, 0.08);
+		border: 1px solid rgba(212, 199, 163, 0.2);
+		color: rgba(212, 199, 163, 0.7);
 	}
 
 	.system-tag {
@@ -570,45 +581,60 @@
 		color: #fff;
 	}
 
-	/* Stats Bar */
-	.stats-bar {
+	/* Stats Cards Row */
+	.stats-cards-row {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+		gap: 0.75rem;
+		padding: 1rem 1.5rem;
 		background: #0a0a0a;
 		border-bottom: 1px solid #1a1a1a;
-		padding: 0.75rem 1.5rem;
+	}
+
+	.pstat-card {
+		background: #111;
+		border: 1px solid #222;
+		border-top: 3px solid #333;
+		padding: 0.875rem 1rem;
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		flex-direction: column;
+		gap: 0.25rem;
+		transition: border-color 0.2s, transform 0.15s;
 	}
 
-	.stat-item {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-size: 0.7rem;
-		letter-spacing: 0.1em;
+	.pstat-card:hover {
+		transform: translateY(-1px);
+		border-color: #333;
 	}
 
-	.stat-value {
-		font-weight: 700;
-		font-size: 0.85rem;
+	.pstat-value {
+		font-size: 1.375rem;
+		font-weight: 800;
+		line-height: 1.2;
 	}
 
-	.stat-label {
-		color: #666;
+	.pstat-value.agent-name {
+		font-size: 0.8rem;
+		font-weight: 600;
 	}
 
-	.stat-item.critical .stat-value { color: #ef4444; }
-	.stat-item.medium .stat-value { color: #f59e0b; }
-	.stat-item.low .stat-value { color: #3b82f6; }
-	.stat-item.closed .stat-value { color: #6b7280; }
-	.stat-item.agent .stat-value { color: #8b5cf6; }
-
-	.stat-divider {
-		width: 1px;
-		height: 1rem;
-		background: #333;
-		margin: 0 0.5rem;
+	.pstat-label {
+		font-size: 0.6rem;
+		letter-spacing: 0.15em;
+		color: #555;
+		font-weight: 600;
 	}
+
+	.pstat-critical { border-top-color: #ef4444; }
+	.pstat-critical .pstat-value { color: #ef4444; }
+	.pstat-medium { border-top-color: #f59e0b; }
+	.pstat-medium .pstat-value { color: #f59e0b; }
+	.pstat-low { border-top-color: #3b82f6; }
+	.pstat-low .pstat-value { color: #3b82f6; }
+	.pstat-closed { border-top-color: #6b7280; }
+	.pstat-closed .pstat-value { color: #6b7280; }
+	.pstat-agent { border-top-color: #8b5cf6; }
+	.pstat-agent .pstat-value { color: #8b5cf6; }
 
 	/* Search */
 	.search-wrapper {

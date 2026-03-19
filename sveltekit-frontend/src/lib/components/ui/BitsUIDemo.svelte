@@ -224,7 +224,7 @@
                 <Icon name="eye" class="w-4 h-4" />
               </Button>
               <Button variant="ghost" size="sm">
-                <Icon name="edit" class="w-4 h-4" />
+                <Icon name="pencil" class="w-4 h-4" />
               </Button>
             </div>
           </div>

@@ -592,7 +592,7 @@
 										disabled={ttsInitializing}
 									>
 										{#if ttsInitializing && speakingIdx === idx}
-											<Icon name="loader-2" size={11} class="animate-spin" />
+											<Icon name="loader-circle" size={11} class="animate-spin" />
 										{:else if speakingIdx === idx}
 											<Icon name="volume-x" size={11} />
 										{:else}
@@ -635,7 +635,7 @@
 							<Icon name="bot" size={14} />
 						</div>
 						<div class="flex items-center gap-2 text-sm opacity-40 px-3 py-2">
-							<Icon name="loader-2" size={14} class="animate-spin" />
+							<Icon name="loader-circle" size={14} class="animate-spin" />
 							<span>Thinking...</span>
 						</div>
 					</div>
@@ -646,7 +646,7 @@
 	<!-- Error -->
 	{#if session?.error}
 		<div class="px-4 py-2 border-t border-red-900/30 text-red-300 text-xs flex items-center gap-2" style:background="rgba(69, 10, 10, 0.5)">
-			<Icon name="alert-triangle" size={12} />
+			<Icon name="triangle-alert" size={12} />
 			<span>{session.error}</span>
 		</div>
 	{/if}
@@ -759,8 +759,8 @@
 		>
 			<Icon
 				name={
-					commandFeedback.type === 'success' ? 'check-circle' :
-					commandFeedback.type === 'error' ? 'x-circle' :
+					commandFeedback.type === 'success' ? 'circle-check' :
+					commandFeedback.type === 'error' ? 'circle-x' :
 					'info'
 				}
 				size={16}

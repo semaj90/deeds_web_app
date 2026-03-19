@@ -11,13 +11,13 @@
  case 'critical':
  return {
  color: 'bg-danger text-white border-danger',
- icon: 'alert-triangle',
+ icon: 'triangle-alert',
  label: 'CRITICAL'
  };
  case 'high':
  return {
  color: 'bg-warning text-white border-warning/60',
- icon: 'alert-circle',
+ icon: 'circle-alert',
  label: 'HIGH'
  };
  case 'medium':
@@ -29,7 +29,7 @@
  case 'low':
  return {
  color: 'bg-accent text-white border-accent',
- icon: 'check-circle',
+ icon: 'circle-check',
  label: 'LOW'
  };
  default:return {

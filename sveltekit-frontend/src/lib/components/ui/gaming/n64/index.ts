@@ -32,6 +32,6 @@ export { default as Select } from './Select.svelte';
 export { default as Switch } from './Switch.svelte';
 
 // Utils
-export { default as N64ToastStore } from './N64ToastStore';
+export { default as N64ToastStore } from './N64ToastStore.svelte';
 
 export { default as tokens } from './tokens';

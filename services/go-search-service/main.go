@@ -32,7 +32,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"hash/fnv"
 	"log"
+	"log/slog"
 	"math"
 	"net"
 	"net/http"
@@ -44,6 +46,7 @@ import (
 	"sync"
 	"syscall"
 	"time"
+	"unicode"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	qdrantclient "github.com/qdrant/go-client/qdrant"
@@ -99,6 +102,9 @@ type libraryServer struct {
 	qdrant     *qdrantclient.Client // native gRPC client
 	httpClient *http.Client         // shared for Ollama + fallback
 }
+
+// searchTimeout is the max time for a single search request's parallel fan-out.
+const searchTimeout = 10 * time.Second
 
 // ── SearchLibrary (unary) ─────────────────────────────────────────────────
 
@@ -502,6 +508,10 @@ type searchResponse struct {
 // ── Parallel Search ───────────────────────────────────────────────────────
 
 func (s *libraryServer) parallelSearch(ctx context.Context, req *searchRequest) searchResponse {
+	// Apply search timeout to prevent hung goroutines
+	searchCtx, cancel := context.WithTimeout(ctx, searchTimeout)
+	defer cancel()
+
 	start := time.Now()
 	meta := map[string]any{}
 
@@ -513,11 +523,11 @@ func (s *libraryServer) parallelSearch(ctx context.Context, req *searchRequest) 
 	} else {
 		embStart := time.Now()
 		var err error
-		embedding, err = s.getQueryEmbedding(ctx, req.Query)
+		embedding, err = s.getQueryEmbedding(searchCtx, req.Query)
 		meta["embedMs"] = time.Since(embStart).Milliseconds()
 		if err != nil {
 			meta["embeddingSource"] = "failed"
-			log.Printf("⚠️  Embedding failed: %v", err)
+			slog.Warn("embedding failed", "query", req.Query, "error", err)
 		} else {
 			meta["embeddingSource"] = "ollama"
 		}
@@ -539,7 +549,7 @@ func (s *libraryServer) parallelSearch(ctx context.Context, req *searchRequest) 
 	go func() {
 		defer wg.Done()
 		t := time.Now()
-		hits := s.searchCitation(ctx, req.Query, filters, params, req.Limit*2)
+		hits := s.searchCitation(searchCtx, req.Query, filters, params, req.Limit*2)
 		results <- result{hits, "citation", time.Since(t).Milliseconds()}
 	}()
 
@@ -548,7 +558,7 @@ func (s *libraryServer) parallelSearch(ctx context.Context, req *searchRequest) 
 	go func() {
 		defer wg.Done()
 		t := time.Now()
-		hits := s.searchFTS(ctx, req.Query, filters, params, req.Limit*2)
+		hits := s.searchFTS(searchCtx, req.Query, filters, params, req.Limit*2)
 		results <- result{hits, "fts", time.Since(t).Milliseconds()}
 	}()
 
@@ -561,11 +571,11 @@ func (s *libraryServer) parallelSearch(ctx context.Context, req *searchRequest) 
 			return
 		}
 		t := time.Now()
-		hits := s.searchPgvector(ctx, embedding, filters, params, req.Limit*2)
+		hits := s.searchPgvector(searchCtx, embedding, filters, params, req.Limit*2)
 		results <- result{hits, "pgvector", time.Since(t).Milliseconds()}
 	}()
 
-	// 4. Qdrant ANN search (native gRPC client)
+	// 4. Qdrant ANN search (native gRPC with BM42 hybrid, REST fallback)
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -574,7 +584,7 @@ func (s *libraryServer) parallelSearch(ctx context.Context, req *searchRequest) 
 			return
 		}
 		t := time.Now()
-		hits := s.searchQdrant(ctx, embedding, req)
+		hits := s.searchQdrant(searchCtx, embedding, req)
 		results <- result{hits, "qdrant", time.Since(t).Milliseconds()}
 	}()
 
@@ -604,6 +614,14 @@ func (s *libraryServer) parallelSearch(ctx context.Context, req *searchRequest) 
 	if len(fused) > req.Limit {
 		fused = fused[:req.Limit]
 	}
+
+	slog.Info("search complete",
+		"query", req.Query,
+		"totalMs", meta["totalMs"],
+		"results", len(fused),
+		"sources", fmt.Sprintf("citation:%v fts:%v pgvec:%v qdrant:%v",
+			meta["citationHits"], meta["ftsHits"], meta["pgvectorHits"], meta["qdrantHits"]),
+	)
 
 	return searchResponse{
 		Hits:  fused,
@@ -719,15 +737,89 @@ func (s *libraryServer) searchPgvector(ctx context.Context, embedding []float32,
 	return s.queryHits(ctx, q, params, "vector")
 }
 
-// searchQdrant uses the native Qdrant Go gRPC client for ANN search.
+// searchQdrant uses the native Qdrant Go gRPC client for ANN search with BM42 hybrid.
 // Falls back to REST API if the native client is unavailable.
 func (s *libraryServer) searchQdrant(ctx context.Context, embedding []float32, req *searchRequest) []libraryHit {
 	if s.qdrant != nil {
-		return s.searchQdrantNative(ctx, embedding, req)
+		hits := s.searchQdrantHybrid(ctx, embedding, req)
+		if hits != nil {
+			return hits
+		}
+		// Hybrid failed (e.g., no sparse vectors on collection) — try dense-only native
+		hits = s.searchQdrantNative(ctx, embedding, req)
+		if hits != nil {
+			return hits
+		}
 	}
 	return s.searchQdrantREST(ctx, embedding, req)
 }
 
+// searchQdrantHybrid performs BM42 hybrid search: dense + sparse prefetch → RRF fusion at Qdrant level.
+// Returns nil if the collection doesn't support sparse vectors (caller should fall back).
+func (s *libraryServer) searchQdrantHybrid(ctx context.Context, embedding []float32, req *searchRequest) []libraryHit {
+	limit := uint64(req.Limit * 2)
+	prefetchLimit := uint64(req.Limit * 4)
+
+	// Generate BM42 sparse vector from query terms
+	sparseIndices, sparseValues := queryToBM42Sparse(req.Query)
+	if len(sparseIndices) == 0 {
+		return nil // no terms to search
+	}
+
+	// Build filter conditions
+	var conditions []*qdrantclient.Condition
+	if req.Jurisdiction != "" {
+		conditions = append(conditions, qdrantclient.NewMatch("jurisdiction", req.Jurisdiction))
+	}
+	if req.CorpusType != "" {
+		conditions = append(conditions, qdrantclient.NewMatch("corpus_type", req.CorpusType))
+	}
+
+	var filter *qdrantclient.Filter
+	if len(conditions) > 0 {
+		filter = &qdrantclient.Filter{Must: conditions}
+	}
+
+	// Build hybrid query: dense + sparse prefetch → RRF fusion
+	bm25VecName := "bm25"
+	queryReq := &qdrantclient.QueryPoints{
+		CollectionName: "legal_documents",
+		Prefetch: []*qdrantclient.PrefetchQuery{
+			{
+				Query:  qdrantclient.NewQuery(embedding...),
+				Limit:  &prefetchLimit,
+				Filter: filter,
+			},
+			{
+				Query:  qdrantclient.NewQuerySparse(sparseIndices, sparseValues),
+				Using:  &bm25VecName,
+				Limit:  &prefetchLimit,
+				Filter: filter,
+			},
+		},
+		Query:       qdrantclient.NewQueryFusion(qdrantclient.Fusion_RRF),
+		Limit:       &limit,
+		WithPayload: qdrantclient.NewWithPayload(true),
+	}
+
+	points, err := s.qdrant.Query(ctx, queryReq)
+	if err != nil {
+		// Likely the collection doesn't have "bm25" sparse vector — fall back
+		slog.Debug("qdrant hybrid search unavailable, falling back to dense",
+			"error", err, "collection", "legal_documents")
+		return nil
+	}
+
+	slog.Debug("qdrant hybrid search success",
+		"collection", "legal_documents",
+		"results", len(points),
+		"sparseTerms", len(sparseIndices),
+	)
+
+	return qdrantPointsToHits(points)
+}
+
+// searchQdrantNative performs dense-only ANN search via the native gRPC client.
 func (s *libraryServer) searchQdrantNative(ctx context.Context, embedding []float32, req *searchRequest) []libraryHit {
 	limit := uint64(req.Limit * 2)
 
@@ -752,10 +844,16 @@ func (s *libraryServer) searchQdrantNative(ctx context.Context, embedding []floa
 
 	points, err := s.qdrant.Query(ctx, queryReq)
 	if err != nil {
-		log.Printf("⚠️  Qdrant native search failed, falling back to REST: %v", err)
-		return s.searchQdrantREST(ctx, embedding, req)
+		slog.Warn("qdrant native search failed, falling back to REST",
+			"error", err, "collection", "legal_documents")
+		return nil
 	}
 
+	return qdrantPointsToHits(points)
+}
+
+// qdrantPointsToHits converts Qdrant query results to libraryHit slice.
+func qdrantPointsToHits(points []*qdrantclient.ScoredPoint) []libraryHit {
 	var hits []libraryHit
 	for _, p := range points {
 		hit := libraryHit{
@@ -824,13 +922,13 @@ func (s *libraryServer) searchQdrantREST(ctx context.Context, embedding []float3
 
 	resp, err := s.httpClient.Do(httpReq)
 	if err != nil {
-		log.Printf("⚠️  Qdrant REST search failed: %v", err)
+		slog.Warn("qdrant REST search failed", "error", err)
 		return nil
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		log.Printf("⚠️  Qdrant REST returned %d", resp.StatusCode)
+		slog.Warn("qdrant REST non-200", "status", resp.StatusCode)
 		return nil
 	}
 
@@ -842,6 +940,7 @@ func (s *libraryServer) searchQdrantREST(ctx context.Context, embedding []float3
 		} `json:"result"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&qdResp); err != nil {
+		slog.Warn("qdrant REST decode failed", "error", err)
 		return nil
 	}
 
@@ -875,7 +974,7 @@ func (s *libraryServer) searchQdrantREST(ctx context.Context, embedding []float3
 func (s *libraryServer) queryHits(ctx context.Context, sqlQuery string, params []any, matchType string) []libraryHit {
 	rows, err := s.pool.Query(ctx, sqlQuery, params...)
 	if err != nil {
-		log.Printf("⚠️  %s query failed: %v", matchType, err)
+		slog.Warn("query failed", "strategy", matchType, "error", err)
 		return nil
 	}
 	defer rows.Close()
@@ -997,6 +1096,73 @@ func rrfFusion(allHits map[string][]rankEntry, req *searchRequest) []libraryHit 
 		return result[i].Score > result[j].Score
 	})
 	return result
+}
+
+// ── BM42 Sparse Vectors ──────────────────────────────────────────────────
+
+// queryToBM42Sparse converts a search query into BM42-compatible sparse vectors
+// using FNV-1a hashing for term indices and simple TF weighting for values.
+// This matches the ingestion-side BM42 implementation.
+func queryToBM42Sparse(query string) (indices []uint32, values []float32) {
+	// Tokenize: lowercase, split on non-alphanumeric, remove stopwords
+	words := tokenize(query)
+	if len(words) == 0 {
+		return nil, nil
+	}
+
+	// Count term frequency
+	tf := map[string]int{}
+	for _, w := range words {
+		tf[w]++
+	}
+
+	// Convert to sparse vector: FNV-1a hash → index, TF weight → value
+	seen := map[uint32]bool{}
+	for term, count := range tf {
+		h := fnv.New32a()
+		h.Write([]byte(term))
+		idx := h.Sum32()
+
+		if seen[idx] {
+			continue // hash collision — skip duplicate
+		}
+		seen[idx] = true
+
+		// BM42 weight: log(1 + tf) normalized
+		weight := float32(math.Log1p(float64(count)))
+		indices = append(indices, idx)
+		values = append(values, weight)
+	}
+
+	return indices, values
+}
+
+// tokenize splits text into lowercase terms, removing stopwords and punctuation.
+func tokenize(text string) []string {
+	lower := strings.ToLower(text)
+	words := strings.FieldsFunc(lower, func(r rune) bool {
+		return !unicode.IsLetter(r) && !unicode.IsDigit(r)
+	})
+
+	var result []string
+	for _, w := range words {
+		if len(w) < 2 || stopwords[w] {
+			continue
+		}
+		result = append(result, w)
+	}
+	return result
+}
+
+// stopwords is a minimal English stopword set for legal search queries.
+var stopwords = map[string]bool{
+	"a": true, "an": true, "and": true, "are": true, "as": true, "at": true,
+	"be": true, "by": true, "for": true, "from": true, "has": true, "he": true,
+	"in": true, "is": true, "it": true, "its": true, "of": true, "on": true,
+	"or": true, "that": true, "the": true, "to": true, "was": true, "were": true,
+	"will": true, "with": true, "this": true, "but": true, "they": true,
+	"have": true, "had": true, "not": true, "been": true, "no": true,
+	"do": true, "does": true, "did": true, "so": true, "if": true,
 }
 
 // ── Embedding ─────────────────────────────────────────────────────────────
@@ -1353,6 +1519,11 @@ func strFromMap(m map[string]any, key string) string {
 // ── Main ──────────────────────────────────────────────────────────────────
 
 func main() {
+	// Initialize structured logger
+	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelInfo,
+	})))
+
 	cfg := loadConfig()
 
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -1368,7 +1539,7 @@ func main() {
 	if err := pool.Ping(ctx); err != nil {
 		log.Fatalf("PostgreSQL ping failed: %v", err)
 	}
-	log.Println("✅ PostgreSQL connected")
+	slog.Info("PostgreSQL connected")
 
 	// Redis (optional, non-fatal)
 	var rdb *redis.Client
@@ -1376,10 +1547,10 @@ func main() {
 	if redisErr == nil {
 		rdb = redis.NewClient(opts)
 		if rdb.Ping(ctx).Err() != nil {
-			log.Println("⚠️  Redis not available — caching disabled")
+			slog.Warn("Redis not available, caching disabled")
 			rdb = nil
 		} else {
-			log.Println("✅ Redis connected")
+			slog.Info("Redis connected")
 		}
 	}
 
@@ -1390,18 +1561,19 @@ func main() {
 		Port: cfg.QdrantPort,
 	})
 	if err != nil {
-		log.Printf("⚠️  Qdrant gRPC client failed (%s:%d): %v — using REST fallback",
-			cfg.QdrantHost, cfg.QdrantPort, err)
+		slog.Warn("Qdrant gRPC client failed, using REST fallback",
+			"host", cfg.QdrantHost, "port", cfg.QdrantPort, "error", err)
 		qdClient = nil
 	} else {
 		// Verify connection
 		_, listErr := qdClient.ListCollections(ctx)
 		if listErr != nil {
-			log.Printf("⚠️  Qdrant gRPC connection check failed: %v — using REST fallback", listErr)
+			slog.Warn("Qdrant gRPC connection check failed, using REST fallback", "error", listErr)
 			qdClient.Close()
 			qdClient = nil
 		} else {
-			log.Printf("✅ Qdrant connected (gRPC %s:%d)", cfg.QdrantHost, cfg.QdrantPort)
+			slog.Info("Qdrant connected", "transport", "gRPC",
+				"host", cfg.QdrantHost, "port", cfg.QdrantPort)
 		}
 	}
 
@@ -1436,7 +1608,7 @@ func main() {
 	httpServer := &http.Server{Addr: ":" + cfg.HTTPPort, Handler: mux}
 
 	go func() {
-		log.Printf("🚀 HTTP listening on :%s", cfg.HTTPPort)
+		slog.Info("HTTP server started", "port", cfg.HTTPPort)
 		if err := httpServer.ListenAndServe(); err != http.ErrServerClosed {
 			log.Fatalf("HTTP server error: %v", err)
 		}
@@ -1464,25 +1636,60 @@ func main() {
 	reflection.Register(grpcServer)
 
 	go func() {
-		log.Printf("🚀 gRPC listening on :%s (LibrarySearchService registered)", cfg.GRPCPort)
+		slog.Info("gRPC server started", "port", cfg.GRPCPort, "service", "LibrarySearchService")
 		if err := grpcServer.Serve(lis); err != nil {
 			log.Fatalf("gRPC server error: %v", err)
 		}
 	}()
 
-	log.Printf("🔍 Legal Library Search Service ready (HTTP :%s, gRPC :%s)", cfg.HTTPPort, cfg.GRPCPort)
+	slog.Info("Legal Library Search Service ready",
+		"http", ":"+cfg.HTTPPort, "grpc", ":"+cfg.GRPCPort)
 
-	// Wait for shutdown
+	// Wait for shutdown signal
 	<-ctx.Done()
-	log.Println("Shutting down...")
+	slog.Info("shutdown signal received, draining connections...")
 
 	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer shutdownCancel()
 
-	grpcServer.GracefulStop()
-	httpServer.Shutdown(shutdownCtx)
+	// Graceful shutdown: stop accepting new requests, drain in-flight
+	var shutdownWg sync.WaitGroup
+
+	shutdownWg.Add(1)
+	go func() {
+		defer shutdownWg.Done()
+		grpcServer.GracefulStop()
+		slog.Info("gRPC server stopped")
+	}()
+
+	shutdownWg.Add(1)
+	go func() {
+		defer shutdownWg.Done()
+		if err := httpServer.Shutdown(shutdownCtx); err != nil {
+			slog.Error("HTTP shutdown error", "error", err)
+		} else {
+			slog.Info("HTTP server stopped")
+		}
+	}()
+
+	// Wait for both servers to drain (or timeout)
+	done := make(chan struct{})
+	go func() {
+		shutdownWg.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		slog.Info("all servers drained successfully")
+	case <-shutdownCtx.Done():
+		slog.Warn("shutdown timed out, forcing stop")
+		grpcServer.Stop() // force stop if graceful didn't finish
+	}
+
 	if qdClient != nil {
 		qdClient.Close()
 	}
-	log.Println("✅ Shutdown complete")
+
+	slog.Info("shutdown complete")
 }

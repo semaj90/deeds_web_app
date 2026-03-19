@@ -1,5 +1,6 @@
 <script lang="ts">
   import Button from '$lib/components/ui/Button.svelte';
+  import Icon from '$lib/components/ui/Icon.svelte';
   import Card from '$lib/components/ui/card/Card.svelte';
   import CardContent from '$lib/components/ui/card/CardContent.svelte';
   import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
@@ -230,10 +231,23 @@
   );
 </script>
 
-<div class="max-w-6xl mx-auto px-4 py-8">
-  <header class="mb-8 text-center">
-    <h1 class="text-3xl font-bold text-sand mb-2">AI Dashboard</h1>
-    <p class="text-sand/60 text-sm">Monitor AI services, models, and processing pipelines</p>
+<div class="ai-dash-page">
+  <header class="ai-dash-header">
+    <div class="ai-dash-header-left">
+      <div class="ai-dash-icon">
+        <Icon name="brain" />
+      </div>
+      <div>
+        <h1 class="ai-dash-title">AI Dashboard</h1>
+        <p class="ai-dash-subtitle">Monitor AI services, models, and processing pipelines</p>
+      </div>
+    </div>
+    <div class="ai-dash-status">
+      <span class="ai-dash-chip" class:connected={stats.ollamaStatus === 'connected'} class:error={stats.ollamaStatus === 'disconnected'}>
+        <Icon name={stats.ollamaStatus === 'connected' ? 'check-circle' : 'alert-circle'} />
+        Ollama: {stats.ollamaStatus}
+      </span>
+    </div>
   </header>
 
   {#if loading}
@@ -882,3 +896,84 @@
     {/if}
   {/if}
 </div>
+
+<style>
+  .ai-dash-page {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  .ai-dash-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .ai-dash-header-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+  }
+
+  .ai-dash-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.625rem;
+    background: linear-gradient(135deg, rgba(167, 139, 250, 0.15), rgba(96, 165, 250, 0.15));
+    border: 1px solid rgba(167, 139, 250, 0.25);
+    color: rgba(167, 139, 250, 0.9);
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+  }
+
+  .ai-dash-title {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: rgba(212, 199, 163, 0.95);
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .ai-dash-subtitle {
+    font-size: 0.75rem;
+    color: rgba(212, 199, 163, 0.4);
+    margin-top: 0.125rem;
+  }
+
+  .ai-dash-status {
+    display: flex;
+    align-items: center;
+  }
+
+  .ai-dash-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    background: rgba(245, 158, 11, 0.12);
+    color: rgba(245, 158, 11, 0.85);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+  }
+
+  .ai-dash-chip.connected {
+    background: rgba(52, 211, 153, 0.12);
+    color: rgba(52, 211, 153, 0.9);
+    border-color: rgba(52, 211, 153, 0.3);
+  }
+
+  .ai-dash-chip.error {
+    background: rgba(248, 113, 113, 0.12);
+    color: rgba(248, 113, 113, 0.9);
+    border-color: rgba(248, 113, 113, 0.3);
+  }
+</style>

@@ -7,7 +7,7 @@
 	interface TreeNode {
 		name: string;
 		path: string;
-		type: 'group' | 'page' | 'api' | 'server' | 'layout';
+		type: 'group' | 'page' | 'page-server' | 'api' | 'server' | 'layout' | 'archived';
 		children: TreeNode[];
 		count: number;
 	}
@@ -44,7 +44,7 @@
 					child = {
 						name: part,
 						path: '/' + parts.slice(0, i + 1).join('/'),
-						type: isLast ? (route.type === 'api' ? 'api' : 'page') : 'group',
+						type: isLast ? (route.type || 'page') : 'group',
 						children: [],
 						count: 0
 					};
@@ -106,9 +106,11 @@
 		switch (type) {
 			case 'group': return '📁';
 			case 'page': return '📄';
+			case 'page-server': return '🔧';
 			case 'api': return '⚙️';
 			case 'server': return '🔧';
 			case 'layout': return '📐';
+			case 'archived': return '📦';
 			default: return '•';
 		}
 	}
@@ -116,11 +118,23 @@
 	function getNodeColor(type: string): string {
 		switch (type) {
 			case 'group': return '#ffaa33';
-			case 'page': return '#33ff33';
-			case 'api': return '#3399ff';
+			case 'page': return '#cc99ff';
+			case 'page-server': return '#ff9933';
+			case 'api': return '#33ff33';
 			case 'server': return '#ff33ff';
 			case 'layout': return '#ffff33';
+			case 'archived': return '#ff6633';
 			default: return '#999';
+		}
+	}
+
+	function getTypeBadge(type: string): string {
+		switch (type) {
+			case 'api': return 'API';
+			case 'page': return 'PG';
+			case 'page-server': return 'SRV';
+			case 'archived': return 'ARC';
+			default: return '';
 		}
 	}
 </script>
@@ -145,10 +159,10 @@
 	<!-- Legend -->
 	<div class="tree-legend">
 		<span class="legend-item"><span style="color: {getNodeColor('group')}">{getNodeIcon('group')}</span> Folder</span>
-		<span class="legend-item"><span style="color: {getNodeColor('page')}">{getNodeIcon('page')}</span> Page</span>
 		<span class="legend-item"><span style="color: {getNodeColor('api')}">{getNodeIcon('api')}</span> API</span>
-		<span class="legend-item"><span style="color: {getNodeColor('server')}">{getNodeIcon('server')}</span> Server</span>
-		<span class="legend-item"><span style="color: {getNodeColor('layout')}">{getNodeIcon('layout')}</span> Layout</span>
+		<span class="legend-item"><span style="color: {getNodeColor('page')}">{getNodeIcon('page')}</span> Page</span>
+		<span class="legend-item"><span style="color: {getNodeColor('page-server')}">{getNodeIcon('page-server')}</span> Server</span>
+		<span class="legend-item"><span style="color: {getNodeColor('archived')}">{getNodeIcon('archived')}</span> Archived</span>
 	</div>
 
 	<!-- Tree -->
@@ -170,6 +184,9 @@
 						<span class="node-name" style="color: {getNodeColor(node.type)}">
 							{node.name}
 						</span>
+						{#if node.type !== 'group' && getTypeBadge(node.type)}
+							<span class="tree-type-badge" style="color: {getNodeColor(node.type)}; border-color: {getNodeColor(node.type)}">{getTypeBadge(node.type)}</span>
+						{/if}
 						<span class="node-count">[{node.count}]</span>
 					</button>
 
@@ -190,6 +207,9 @@
 						<span class="node-name" style="color: {getNodeColor(node.type)}">
 							{node.name}
 						</span>
+						{#if getTypeBadge(node.type)}
+							<span class="tree-type-badge" style="color: {getNodeColor(node.type)}; border-color: {getNodeColor(node.type)}">{getTypeBadge(node.type)}</span>
+						{/if}
 						<span class="node-path">{node.path}</span>
 					</div>
 				{/if}
@@ -358,6 +378,15 @@
 		font-size: 0.7rem;
 		color: #666;
 		margin-left: auto;
+	}
+
+	.tree-type-badge {
+		font-size: 0.55rem;
+		font-weight: bold;
+		padding: 0.05rem 0.25rem;
+		border: 1px solid;
+		letter-spacing: 0.08em;
+		flex-shrink: 0;
 	}
 
 	/* ── Node Children ── */

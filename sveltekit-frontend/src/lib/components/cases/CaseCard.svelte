@@ -35,7 +35,7 @@
 
   let open = $state(false);
 
-  const statusConfig = { active: { label: 'Active', class: 'bg-accent/10 text-accent', icon: 'check-circle' },
+  const statusConfig = { active: { label: 'Active', class: 'bg-accent/10 text-accent', icon: 'circle-check' },
 	pending: {
 	label: 'Pending', class: 'bg-warning/10 text-warning', icon: 'clock' },
 	closed: {
@@ -109,7 +109,7 @@
           aria-label="More options"
           onclick={() => open = !open}
         >
-          <Icon name="more-vertical" class="w-5 h-5 text-nier-gray" />
+          <Icon name="ellipsis-vertical" class="w-5 h-5 text-nier-gray" />
         </Button>
       </div>
     </div>
@@ -128,7 +128,7 @@
 
       <div class="text-center p-3 rounded-lg bg-nier-white/50">
         <div class="flex items-center justify-center gap-1">
-          <Icon name="alert-triangle" class="w-4 h-4 text-nier-gray" />
+          <Icon name="triangle-alert" class="w-4 h-4 text-nier-gray" />
           <p class="text-xl font-bold text-harvard-crimson">
             {caseData.stats.evidence}
           </p>
@@ -220,7 +220,7 @@
         variant="ghost"
         size="sm"
       >
-        <Icon name="edit" class="w-4 h-4" />
+        <Icon name="pencil" class="w-4 h-4" />
       </Button>
     </div>
   </div>
@@ -251,7 +251,7 @@
       class="w-full justify-start"
       size="sm"
     >
-      <Icon name="edit" class="w-4 h-4 mr-2" />
+      <Icon name="pencil" class="w-4 h-4 mr-2" />
       Edit Case
     </Button>
     <div class="h-px bg-nier-light-gray dark:bg-nier-gray/30 my-1"></div>

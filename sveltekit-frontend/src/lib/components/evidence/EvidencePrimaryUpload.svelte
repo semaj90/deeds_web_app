@@ -106,7 +106,7 @@
 			{:else}
 				<div class="upload-state empty">
 					<div class="upload-icon-wrap">
-						<Icon name="upload-cloud" class="w-6 h-6" />
+						<Icon name="cloud-upload" class="w-6 h-6" />
 					</div>
 					<div>
 						<p class="upload-cta">
@@ -124,7 +124,7 @@
 
 		{#if form?.error ?? uploadError}
 			<div class="upload-error">
-				<Icon name="alert-circle" class="w-4 h-4" />
+				<Icon name="circle-alert" class="w-4 h-4" />
 				<span>{form?.error ?? uploadError}</span>
 			</div>
 		{/if}

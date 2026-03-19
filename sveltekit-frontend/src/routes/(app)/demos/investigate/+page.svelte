@@ -245,7 +245,7 @@
 						<Icon name="lightbulb" class="text-accent" />
 						<h3 class="text-sm font-medium text-sand-12">Suggested Follow-Up Investigations</h3>
 						{#if selfPromptLoading}
-							<Icon name="loader-2" class="animate-spin text-sand-10" />
+							<Icon name="loader-circle" class="animate-spin text-sand-10" />
 						{/if}
 					</div>
 					{#if investigations[0].evaluation}
@@ -270,7 +270,7 @@
 				</div>
 			{:else if selfPromptLoading}
 				<div class="panel p-4 flex items-center gap-2 text-sm text-sand-11">
-					<Icon name="loader-2" class="animate-spin" />
+					<Icon name="loader-circle" class="animate-spin" />
 					Generating follow-up suggestions...
 				</div>
 			{/if}
@@ -421,35 +421,35 @@
 		<h3 class="text-sand-12 font-semibold mb-2">About the Autonomous Investigator</h3>
 		<ul class="space-y-2">
 			<li class="flex items-start gap-2">
-				<Icon name="check-circle" size="sm" class="text-accent mt-0.5" />
+				<Icon name="circle-check" size="sm" class="text-accent mt-0.5" />
 				<span
 					><strong>14 FastMCP Tools:</strong> Evidence analysis, multimodal processing, codebase investigation,
 					web search, and database queries</span
 				>
 			</li>
 			<li class="flex items-start gap-2">
-				<Icon name="check-circle" size="sm" class="text-accent mt-0.5" />
+				<Icon name="circle-check" size="sm" class="text-accent mt-0.5" />
 				<span
 					><strong>ReAct Architecture:</strong> Reasons about which tools to use, then acts with those
 					tools in a multi-step workflow</span
 				>
 			</li>
 			<li class="flex items-start gap-2">
-				<Icon name="check-circle" size="sm" class="text-accent mt-0.5" />
+				<Icon name="circle-check" size="sm" class="text-accent mt-0.5" />
 				<span
 					><strong>ACE Context Engine:</strong> Optionally assembles context from 7 parallel data
 					sources for enhanced investigation</span
 				>
 			</li>
 			<li class="flex items-start gap-2">
-				<Icon name="check-circle" size="sm" class="text-accent mt-0.5" />
+				<Icon name="circle-check" size="sm" class="text-accent mt-0.5" />
 				<span
 					><strong>Self-Prompting:</strong> Evaluates investigation quality and suggests follow-up queries
 					via ACE self-evaluation module</span
 				>
 			</li>
 			<li class="flex items-start gap-2">
-				<Icon name="check-circle" size="sm" class="text-accent mt-0.5" />
+				<Icon name="circle-check" size="sm" class="text-accent mt-0.5" />
 				<span
 					><strong>Personalized Recommendations:</strong> 5-signal multi-modal ranking (vector similarity,
 					tag overlap, topic affinity, graph centrality, user profile) for suggested documents</span

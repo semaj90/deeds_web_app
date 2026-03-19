@@ -169,7 +169,7 @@
 			<Card class="metric-card">
 				<CardHeader class="pb-2">
 					<CardTitle class="text-sm flex items-center">
-						<Icon name="alert-triangle" class="h-4 w-4 mr-2 text-red-400" />
+						<Icon name="triangle-alert" class="h-4 w-4 mr-2 text-red-400" />
 						Total Errors
 					</CardTitle>
 				</CardHeader>

@@ -39,7 +39,7 @@
 
 <div class="p-3 border border-sand-dark rounded-lg bg-panel-soft">
 	<div class="flex items-center gap-2 mb-3">
-		<Icon name="alert-triangle" size={16} />
+		<Icon name="triangle-alert" size={16} />
 		<h3 class="flex-1 text-sm font-semibold m-0">Pipeline Audit Results</h3>
 		<Button variant="ghost" size="sm" onclick={fetchResults} disabled={loading}>
 			{loading ? 'Loading...' : 'Refresh'}
@@ -52,7 +52,7 @@
 		<p class="text-[13px] text-danger m-0">{error}</p>
 	{:else if results.length === 0}
 		<div class="flex items-center gap-2 text-[13px] opacity-60">
-			<Icon name="check-circle" size={20} />
+			<Icon name="circle-check" size={20} />
 			<span>No errors found</span>
 		</div>
 	{:else}

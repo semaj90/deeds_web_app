@@ -36,7 +36,8 @@
     onViewPhoto
   }: Props = $props();
 
-  let formData = $state({ ...poi });
+  let formData = $state({ name: '', alias: '', threatLevel: 'low', photos: [] as any[], notes: '' });
+  $effect(() => { formData = { ...poi }; });
 
   function handleSave() {
     onSave(formData);

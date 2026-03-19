@@ -145,14 +145,14 @@
 
         <!-- Warning -->
         <div class="warning-box">
-          <Icon name="alert-circle" class="h-4 w-4" />
+          <Icon name="circle-alert" class="h-4 w-4" />
           <span>This will update the tag in Qdrant, PostgreSQL, Neo4j, and CouchDB atomically.</span>
         </div>
 
         <!-- Error Message -->
         {#if error}
           <div class="error-box">
-            <Icon name="alert-circle" class="h-4 w-4" />
+            <Icon name="circle-alert" class="h-4 w-4" />
             <span>{error}</span>
           </div>
         {/if}
@@ -181,7 +181,7 @@
           disabled={!isValid || isRenaming || success}
         >
           {#if isRenaming}
-            <Icon name="loader-2" class="h-4 w-4 animate-spin" />
+            <Icon name="loader-circle" class="h-4 w-4 animate-spin" />
             Renaming...
           {:else if success}
             <Icon name="check" class="h-4 w-4" />

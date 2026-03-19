@@ -102,7 +102,7 @@
 	<!-- Error -->
 	{#if error}
 		<div class="text-red-400 text-xs flex items-center gap-1.5 px-1">
-			<Icon name="alert-triangle" size={12} />
+			<Icon name="triangle-alert" size={12} />
 			{error}
 		</div>
 	{/if}

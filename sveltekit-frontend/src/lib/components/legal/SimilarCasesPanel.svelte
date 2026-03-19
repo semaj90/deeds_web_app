@@ -96,12 +96,12 @@
 	<div class="flex-1 min-h-0 overflow-y-auto similar-cases-scroll p-3">
 		{#if loading}
 			<div class="flex items-center justify-center py-8 opacity-40">
-				<Icon name="loader-2" size={24} class="animate-spin" />
+				<Icon name="loader-circle" size={24} class="animate-spin" />
 				<span class="ml-2 text-sm">Finding similar cases...</span>
 			</div>
 		{:else if error}
 			<div class="flex items-center gap-2 p-3 rounded bg-red-950/40 border border-red-800/30 text-red-300 text-sm">
-				<Icon name="alert-triangle" size={14} />
+				<Icon name="triangle-alert" size={14} />
 				<span>{error}</span>
 			</div>
 		{:else if similarCases.length === 0}

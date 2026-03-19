@@ -327,7 +327,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
     const embeddingTime = performance.now() - embedStart;
 
     // 2. Search across Qdrant collections
-    const collections = ['fastmcp_file_profiles', 'phase90_error_cards', 'legal_documents'];
+    const collections = ['legal_documents', 'evidence_items'];
     const allChunks: RetrievedChunk[] = [];
     let hybridSearchUsed = false;
 
@@ -346,17 +346,17 @@ export const POST: RequestHandler = async ({ request, url }) => {
             const payload = (r as any).payload ?? {};
             allChunks.push({
               chunk_id: `${collection}:${r.id}`,
-              text: payload.content ?? payload.text ?? payload.summary ?? '',
-              snippet: (payload.content ?? payload.text ?? '').slice(0, 300),
+              text: payload.content ?? payload.text ?? payload.snippet ?? payload.summary ?? '',
+              snippet: (payload.content ?? payload.text ?? payload.snippet ?? '').slice(0, 300),
               score: r.score,
               dense_score: r.score,
               confidence: toConfidence(r.score),
-              source_type: payload.source_type ?? 'document',
-              source_id: String(r.id),
-              source_title: payload.title ?? payload.file_path ?? payload.name ?? 'Unknown',
+              source_type: payload.source_type ?? payload.source ?? 'document',
+              source_id: String(payload.chunk_id ?? r.id),
+              source_title: payload.title ?? payload.doc_title ?? payload.heading ?? payload.file_path ?? payload.name ?? 'Unknown',
               source_url: payload.url ?? undefined,
-              page_num: payload.page_num ?? undefined,
-              section: payload.section ?? undefined,
+              page_num: payload.page_num ?? payload.page_start ?? undefined,
+              section: payload.section ?? payload.heading ?? undefined,
               has_image: !!payload.has_image,
               has_table: !!payload.has_table,
               related_entities: payload.entities ?? [],
@@ -379,7 +379,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            vector: embedding,
+            vector: { name: 'content', vector: embedding },
             limit: top_k,
             with_payload: true,
             score_threshold: min_score,
@@ -396,17 +396,17 @@ export const POST: RequestHandler = async ({ request, url }) => {
           const payload = r.payload ?? {};
           allChunks.push({
             chunk_id: `${collection}:${r.id}`,
-            text: payload.content ?? payload.text ?? payload.summary ?? '',
-            snippet: (payload.content ?? payload.text ?? '').slice(0, 300),
+            text: payload.content ?? payload.text ?? payload.snippet ?? payload.summary ?? '',
+            snippet: (payload.content ?? payload.text ?? payload.snippet ?? '').slice(0, 300),
             score: r.score,
             dense_score: r.score,
             confidence: toConfidence(r.score),
-            source_type: payload.source_type ?? 'document',
-            source_id: String(r.id),
-            source_title: payload.title ?? payload.file_path ?? payload.name ?? 'Unknown',
+            source_type: payload.source_type ?? payload.source ?? 'document',
+            source_id: String(payload.chunk_id ?? r.id),
+            source_title: payload.title ?? payload.doc_title ?? payload.heading ?? payload.file_path ?? payload.name ?? 'Unknown',
             source_url: payload.url ?? undefined,
-            page_num: payload.page_num ?? undefined,
-            section: payload.section ?? undefined,
+            page_num: payload.page_num ?? payload.page_start ?? undefined,
+            section: payload.section ?? payload.heading ?? undefined,
             has_image: !!payload.has_image,
             has_table: !!payload.has_table,
             related_entities: payload.entities ?? [],

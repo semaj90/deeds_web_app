@@ -1,12 +1,31 @@
 /**
  * GET /api/library/document/[id]/toc
  * Returns the legal node hierarchy as a TOC tree + document metadata.
+ * Fast-path: Go search service for numeric IDs, SQL fallback for UUIDs.
  */
 import { json } from '@sveltejs/kit';
 import { pool } from '$lib/server/db/client';
+import { ENV } from '$lib/server/env.server.js';
 
 export async function GET({ params }) {
 	const { id } = params;
+
+	// Go fast-path: only works with integer IDs (Go service uses int32)
+	const goUrl = (ENV as unknown as Record<string, string>).GO_SEARCH_URL;
+	if (goUrl && /^\d+$/.test(id)) {
+		try {
+			const res = await fetch(`${goUrl}/toc/${id}`, {
+				signal: AbortSignal.timeout(5000),
+			});
+			if (res.ok) {
+				return new Response(res.body, {
+					headers: { 'Content-Type': 'application/json' },
+				});
+			}
+		} catch {
+			// Go service unavailable — fall through to SQL
+		}
+	}
 
 	// 1. Fetch document metadata
 	const docRes = await pool.query(

@@ -2,7 +2,7 @@
 	import { browser } from '$app/environment';
 	import { applyAction, enhance } from '$app/forms';
 	import { invalidateAll, pushState } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import type { ActionData, PageData } from './$types';
 	import {
 		type AdvancedEvidenceFilters,
@@ -85,7 +85,7 @@
 
 	// React to pushState / popstate (back button closes modal)
 	$effect(() => {
-		const state = $page.state as { showDocumentModal?: boolean; documentId?: string } | undefined;
+		const state = page.state as { showDocumentModal?: boolean; documentId?: string } | undefined;
 		if (state?.showDocumentModal && state?.documentId) {
 			viewEvidenceId = state.documentId;
 			showViewModal = true;

@@ -286,7 +286,7 @@
 	<!-- Action Button -->
 	<Button onclick={investigate} disabled={investigating || !query.trim()} class="w-full">
 		{#if investigating}
-			<Icon name="loader-2" class="animate-spin" />
+			<Icon name="loader-circle" class="animate-spin" />
 			Investigating...
 		{:else}
 			<Icon name="play" />
@@ -298,7 +298,7 @@
 	{#if error}
 		<div class="p-3 bg-danger/10 border border-danger/30 rounded text-sm text-danger">
 			<div class="flex items-start gap-2">
-				<Icon name="alert-circle" size="sm" class="mt-0.5" />
+				<Icon name="circle-alert" size="sm" class="mt-0.5" />
 				<div>{error}</div>
 			</div>
 		</div>
@@ -310,7 +310,7 @@
 			<!-- Answer -->
 			<div class="space-y-2">
 				<div class="flex items-center gap-2">
-					<Icon name="check-circle" class="text-green-500" />
+					<Icon name="circle-check" class="text-green-500" />
 					<h4 class="font-semibold text-sand-12">Investigation Complete</h4>
 					<span class="text-xs text-sand-10">({result.duration}ms)</span>
 				</div>

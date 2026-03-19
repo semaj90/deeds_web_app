@@ -1,9 +1,42 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { browser } from '$app/environment';
+	import LegalBreadcrumbs from '$lib/components/legal-corpus/LegalBreadcrumbs.svelte';
+	import LegalDocumentHeader from '$lib/components/legal-corpus/LegalDocumentHeader.svelte';
+	import LegalMetadataBar from '$lib/components/legal-corpus/LegalMetadataBar.svelte';
+	import LegalTabBar from '$lib/components/legal-corpus/LegalTabBar.svelte';
+	import CorpusSidebar from '$lib/components/legal-corpus/CorpusSidebar.svelte';
+	import CitedSourcesOverlay from '$lib/components/legal/CitedSourcesOverlay.svelte';
+	import GlossaryTermCard from '$lib/components/legal/GlossaryTermCard.svelte';
+	import CitationViewModal from '$lib/components/citations/CitationViewModal.svelte';
+	import LegalCorpusClassicView from '$lib/components/legal-corpus/LegalCorpusClassicView.svelte';
+	import LegalCorpusDemoView from '$lib/components/legal-corpus/LegalCorpusDemoView.svelte';
+	import { type LegalCorpusView, type DemoModel, legalCorpusViews, parseView, toDemoModel } from '$lib/adapters/legal-corpus';
 
 	let { data } = $props();
 	let statute = $derived(data.statute);
+
+	// View toggle: reader (yorha) | classic | demo
+	// URL param overrides → localStorage supplies default
+	let viewMode = $state<LegalCorpusView>(browser ? parseView(new URL(window.location.href)) : 'reader');
+
+	// Sync URL param when view changes
+	$effect(() => {
+		if (!browser) return;
+		const url = new URL(window.location.href);
+		if (viewMode === 'reader') {
+			url.searchParams.delete('view');
+		} else {
+			url.searchParams.set('view', viewMode);
+		}
+		window.history.replaceState({}, '', url.toString());
+		localStorage.setItem('legal-corpus-view', viewMode);
+	});
+
+	// Demo model (only computed when needed)
+	let demoModel = $derived(toDemoModel(data));
+
+	function setView(v: LegalCorpusView) { viewMode = v; }
 
 	// Tab system
 	type TabId = 'summary' | 'official-text' | 'cases' | 'regulations' | 'glossary' | 'history' | 'citations';
@@ -18,81 +51,124 @@
 	let summaryError = $state<string | null>(null);
 
 	// Source drawer
-	let expandedSource = $state<number | null>(null);
+	let drawerOpen = $state(false);
+
+	// Citation modal state
+	let citationModalOpen = $state(false);
+	let selectedCitation = $state<{
+		id: string;
+		citationType?: string;
+		formattedCitation?: string;
+		quotedText?: string;
+		legalPrinciple?: string;
+		relevanceScore?: number;
+		isKeyAuthority?: boolean;
+		documentTitle?: string;
+		caseTitle?: string;
+		sourceUrl?: string;
+		jurisdiction?: string;
+		effectiveDate?: string;
+		createdAt?: string;
+	} | null>(null);
+
+	function openCitationModal(cite: { id?: string; title: string; citation?: string | null; court?: string | null; summary?: string | null; decisionDate?: string | null }) {
+		selectedCitation = {
+			id: cite.id ?? cite.title,
+			citationType: 'case_law',
+			formattedCitation: cite.citation ?? cite.title,
+			caseTitle: cite.title,
+			legalPrinciple: cite.summary ?? undefined,
+			jurisdiction: cite.court ?? undefined,
+			effectiveDate: cite.decisionDate ?? undefined,
+		};
+		citationModalOpen = true;
+	}
+
+	function handleDemoCitationClick(cite: DemoModel['topCitations'][number]) {
+		openCitationModal(cite);
+	}
+
+	// Adapt AI sources → CitedSourcesOverlay format
+	let overlayCitations = $derived(aiCitedSources.map((s, i) => ({
+		type: 'Authority',
+		label: `Source ${i + 1}`,
+		content: s,
+	})));
+	let overlayDefinitions = $derived((data.glossaryTerms ?? []).map(t => ({
+		term: t.term,
+		definition_text: t.definition,
+	})));
 
 	// Glossary search
 	let glossarySearch = $state('');
 	let glossaryLoading = $state(false);
-	let searchedGlossary = $state<{ term: string; definition: string; category?: string; relatedTerms?: string[] | null }[]>([]);
+	let searchedGlossary = $state<{ id: string; term: string; definition: string; category?: string; relatedTerms?: string[] | null }[]>([]);
 
 	// Left sidebar
 	let activeSection = $state('executive-summary');
-	let corpusFilter = $state<'all' | 'federal' | 'state' | 'regulations' | 'case-law' | 'glossary'>('all');
 
-	const tabs: { id: TabId; label: string; icon: string }[] = [
-		{ id: 'summary', label: 'Summary', icon: 'file-text' },
-		{ id: 'official-text', label: 'Official Text', icon: 'scroll-text' },
-		{ id: 'cases', label: 'Cases', icon: 'folder' },
-		{ id: 'regulations', label: 'Regulations', icon: 'landmark' },
-		{ id: 'glossary', label: 'Glossary', icon: 'book-text' },
-		{ id: 'history', label: 'History', icon: 'clock' },
-		{ id: 'citations', label: 'Citations', icon: 'bookmark' },
-	];
+	// Selected glossary term (for detail view)
+	let selectedGlossaryTerm = $state<{ id: string; term: string; definition: string; category?: string | null; relatedTerms?: string[] | null } | null>(null);
 
-	// Corpus sidebar sections — derived from content
+	// Sidebar sections — derived from content
 	let sidebarSections = $derived.by(() => {
 		const sections = [
 			{ id: 'executive-summary', label: 'Executive Summary', icon: 'sparkles' },
 			{ id: 'key-provisions', label: 'Key Provisions', icon: 'list' },
-			{ id: 'implications', label: 'Implications', icon: 'alert-triangle' },
+			{ id: 'implications', label: 'Implications', icon: 'triangle-alert' },
 		];
-		if (data.chunks.length > 0) {
-			sections.push({ id: 'full-text', label: 'Full Text', icon: 'file-text' });
-		}
-		if (data.caseLinks.length > 0) {
-			sections.push({ id: 'linked-cases', label: 'Linked Cases', icon: 'link' });
-		}
+		if (data.chunks.length > 0) sections.push({ id: 'full-text', label: 'Full Text', icon: 'file-text' });
+		if (data.caseLinks.length > 0) sections.push({ id: 'linked-cases', label: 'Linked Cases', icon: 'link' });
 		sections.push({ id: 'glossary-terms', label: 'Glossary', icon: 'book-text' });
 		return sections;
 	});
-
-	// Corpus type filters for left sidebar
-	const corpusTypes = [
-		{ id: 'all' as const, label: 'All', icon: 'layers' },
-		{ id: 'federal' as const, label: 'Federal', icon: 'landmark' },
-		{ id: 'state' as const, label: 'State', icon: 'map' },
-		{ id: 'regulations' as const, label: 'Regulations', icon: 'shield' },
-		{ id: 'case-law' as const, label: 'Case Law', icon: 'scale' },
-		{ id: 'glossary' as const, label: 'Definitions', icon: 'book-text' },
-	];
 
 	// Filtered glossary terms from server data
 	let filteredGlossary = $derived.by(() => {
 		const terms = data.glossaryTerms ?? [];
 		if (!glossarySearch.trim()) return terms;
 		const q = glossarySearch.toLowerCase();
-		return terms.filter(t =>
-			t.term.toLowerCase().includes(q) ||
-			t.definition.toLowerCase().includes(q)
-		);
+		return terms.filter(t => t.term.toLowerCase().includes(q) || t.definition.toLowerCase().includes(q));
+	});
+
+	// Breadcrumb parts
+	let breadcrumbs = $derived.by(() => {
+		const parts: string[] = [];
+		if (statute?.jurisdiction) parts.push(statute.jurisdiction);
+		if (statute?.category) parts.push(statute.category);
+		parts.push(statute?.section ? `§ ${statute.section}` : statute?.title ?? 'Detail');
+		return parts;
+	});
+
+	// Citation format
+	let citationText = $derived.by(() => {
+		if (!statute) return '';
+		const parts: string[] = [];
+		if (statute.title) parts.push(statute.title);
+		if (statute.section) parts.push(`§ ${statute.section}`);
+		if (statute.jurisdiction) parts.push(`(${statute.jurisdiction})`);
+		return parts.join(' ');
+	});
+
+	// Status derivation
+	let statuteStatus = $derived.by(() => {
+		if (!statute?.effectiveDate) return 'Unknown';
+		return new Date(statute.effectiveDate) <= new Date() ? 'Current' : 'Pending';
 	});
 
 	function getProvisionIcon(icon?: string): string {
 		const map: Record<string, string> = {
-			shield: 'shield', access: 'lock', fraud: 'alert-triangle',
+			shield: 'shield', access: 'lock', fraud: 'triangle-alert',
 			theft: 'credit-card', code: 'code', data: 'database',
-			privacy: 'eye-off', compliance: 'check-circle', penalty: 'gavel',
+			privacy: 'eye-off', compliance: 'circle-check', penalty: 'gavel',
 		};
-		if (!icon) return 'file-text';
-		return map[icon.toLowerCase()] ?? icon;
+		return icon ? (map[icon.toLowerCase()] ?? icon) : 'file-text';
 	}
 
-	function getSeverityColor(severity?: string): string {
-		switch (severity) {
-			case 'high': return 'severity-high';
-			case 'low': return 'severity-low';
-			default: return 'severity-medium';
-		}
+	function scrollToSection(id: string) {
+		activeSection = id;
+		activeTab = 'summary';
+		if (browser) document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 	}
 
 	function formatDate(d: string | null): string {
@@ -103,18 +179,6 @@
 	function formatShortDate(d: string | null): string {
 		if (!d) return 'N/A';
 		return new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-	}
-
-	function scrollToSection(id: string) {
-		activeSection = id;
-		if (browser) {
-			const el = document.getElementById(id);
-			el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-		}
-	}
-
-	function toggleSourceDrawer(index: number) {
-		expandedSource = expandedSource === index ? null : index;
 	}
 
 	async function generateSummary() {
@@ -149,435 +213,383 @@
 				const json = await res.json();
 				searchedGlossary = json.results ?? [];
 			}
-		} catch { /* ignore */ }
+		} catch { /* non-fatal */ }
 		glossaryLoading = false;
 	}
-
-	// Breadcrumb parts
-	let breadcrumbs = $derived.by(() => {
-		const parts: string[] = [];
-		if (statute?.jurisdiction) parts.push(statute.jurisdiction);
-		if (statute?.category) parts.push(statute.category);
-		const label = statute?.section ? `§ ${statute.section}` : statute?.title ?? 'Detail';
-		parts.push(label);
-		return parts;
-	});
-
-	// Citation format
-	let citationText = $derived.by(() => {
-		if (!statute) return '';
-		const parts: string[] = [];
-		if (statute.title) parts.push(statute.title);
-		if (statute.section) parts.push(`§ ${statute.section}`);
-		if (statute.jurisdiction) parts.push(`(${statute.jurisdiction})`);
-		return parts.join(' ');
-	});
-
-	// Status derivation
-	let statuteStatus = $derived.by(() => {
-		if (!statute?.effectiveDate) return 'Unknown';
-		const effective = new Date(statute.effectiveDate);
-		return effective <= new Date() ? 'Current' : 'Pending';
-	});
 </script>
 
 {#if !statute}
-	<div class="detail-page">
-		<div class="error-banner">
-			<Icon name="alert-circle" size={32} />
-			<p>{data.loadError ?? 'Statute not found'}</p>
-			<a href="/legal-corpus" class="back-link">
+	<!-- Error State -->
+	<div class="yorha-page error-center">
+		<div class="yorha-card error-card">
+			<Icon name="circle-alert" size={32} class="text-amber" />
+			<p class="error-msg">{data.loadError ?? 'Statute not found'}</p>
+			<a href="/legal-corpus" class="yorha-btn-ghost back-link">
 				<Icon name="arrow-left" size={14} /> Back to Legal Corpus
 			</a>
 		</div>
 	</div>
 {:else}
-	<div class="detail-page">
-		<!-- Top Bar: Breadcrumbs + Actions -->
+	{#if viewMode === 'classic'}
+		<!-- Classic View (original full-featured layout) -->
+		<div class="relative">
+			<div class="floating-toggle">
+				<button class="yorha-btn-amber shadow-lg" onclick={() => setView('reader')}>
+					<Icon name="sparkles" size={13} /> Reader
+				</button>
+				<button class="yorha-btn-ghost floating-toggle-alt" onclick={() => setView('demo')}>
+					<Icon name="layout-template" size={13} /> Demo
+				</button>
+			</div>
+			<LegalCorpusClassicView {data} />
+		</div>
+	{:else if viewMode === 'demo'}
+		<!-- Demo View (slim showcase shell) -->
+		<div class="relative">
+			<div class="floating-toggle">
+				<button class="yorha-btn-amber shadow-lg" onclick={() => setView('reader')}>
+					<Icon name="sparkles" size={13} /> Reader
+				</button>
+				<button class="yorha-btn-ghost floating-toggle-alt" onclick={() => setView('classic')}>
+					<Icon name="layout-dashboard" size={13} /> Classic
+				</button>
+			</div>
+			<LegalCorpusDemoView model={demoModel} onCitationClick={handleDemoCitationClick} />
+		</div>
+	{:else}
+	<div class="reader-page">
+
+		<!-- Breadcrumbs + Top Nav -->
 		<div class="top-bar">
-			<nav class="breadcrumb">
-				<a href="/legal-corpus"><Icon name="book-open" size={14} /> Legal Corpus</a>
-				{#each breadcrumbs as crumb, i}
-					<span class="sep">/</span>
-					{#if i < breadcrumbs.length - 1}
-						<span class="crumb-text">{crumb}</span>
-					{:else}
-						<span class="crumb-active">{crumb}</span>
+			<LegalBreadcrumbs crumbs={breadcrumbs} />
+			<div class="top-links">
+				<a href="/legal-corpus">Recent Documents</a>
+				<a href="/library">My Library</a>
+			</div>
+		</div>
+
+		<!-- Search Bar -->
+		<div class="yorha-panel search-bar">
+			<Icon name="search" size={15} class="search-icon" />
+			<input
+				type="text"
+				placeholder="Search legal terms..."
+				class="search-input"
+			/>
+			<div class="search-actions">
+				<button class="yorha-btn-ghost search-action-btn"><Icon name="git-compare" size={13} /> Compare</button>
+				<button class="yorha-btn-amber"><Icon name="download" size={13} /> Export</button>
+			</div>
+		</div>
+
+		<!-- Document Header -->
+		<div class="doc-header">
+			<div>
+				<h1 class="doc-title">
+					{statute.title || 'Untitled Statute'}
+					{#if statute.section}
+						<span class="yorha-pill section-pill">§ {statute.section}</span>
 					{/if}
-				{/each}
-			</nav>
-			<div class="top-actions">
-				<button class="action-btn primary" onclick={generateSummary} disabled={summaryLoading}>
-					<Icon name="sparkles" size={14} />
+				</h1>
+				{#if statute.jurisdiction}
+					<span class="yorha-pill jurisdiction-pill">{statute.jurisdiction}</span>
+				{/if}
+			</div>
+			<div class="doc-actions">
+				<div class="view-toggle-group">
+					<button class="view-toggle-btn active" disabled>
+						<Icon name="sparkles" size={12} /> Reader
+					</button>
+					<button class="view-toggle-btn" onclick={() => setView('classic')}>
+						<Icon name="layout-dashboard" size={12} /> Classic
+					</button>
+					<button class="view-toggle-btn" onclick={() => setView('demo')}>
+						<Icon name="layout-template" size={12} /> Demo
+					</button>
+				</div>
+				<button class="yorha-btn-amber" onclick={generateSummary} disabled={summaryLoading}>
+					<Icon name="sparkles" size={13} />
 					{summaryLoading ? 'Analyzing...' : 'AI Analysis'}
 				</button>
+				{#if aiCitedSources.length > 0}
+					<button class="yorha-btn-ghost" onclick={() => drawerOpen = true}>
+						<Icon name="bookmark" size={13} /> Sources ({aiCitedSources.length})
+					</button>
+				{/if}
 				{#if statute.sourceUrl}
-					<a href={statute.sourceUrl} target="_blank" rel="noopener noreferrer" class="action-btn">
-						<Icon name="external-link" size={14} /> Official Source
+					<a href={statute.sourceUrl} target="_blank" rel="noopener noreferrer" class="yorha-btn-ghost">
+						<Icon name="external-link" size={13} /> Official
 					</a>
 				{/if}
 			</div>
 		</div>
-
-		<!-- Statute Title -->
-		<header class="statute-header">
-			<h1>
-				{statute.title || 'Untitled Statute'}
-				{#if statute.section}
-					<span class="section-badge">§ {statute.section}</span>
-				{/if}
-			</h1>
-		</header>
 
 		<!-- Metadata Bar -->
-		<div class="metadata-bar">
+		<div class="yorha-panel metadata-bar">
+			{#if statute.jurisdiction}
+				<div class="meta-item">
+					<span class="yorha-label">Jurisdiction</span>
+					<span class="meta-value meta-value-amber">{statute.jurisdiction}</span>
+				</div>
+				<div class="meta-divider"></div>
+			{/if}
+			{#if statute.category}
+				<div class="meta-item">
+					<span class="yorha-label">Corpus</span>
+					<span class="meta-value">{statute.category}</span>
+				</div>
+				<div class="meta-divider"></div>
+			{/if}
+			{#if citationText}
+				<div class="meta-item">
+					<span class="yorha-label">Citation</span>
+					<span class="meta-value meta-value-mono">{citationText}</span>
+				</div>
+				<div class="meta-divider"></div>
+			{/if}
 			<div class="meta-item">
-				<span class="meta-label">Jurisdiction</span>
-				<span class="meta-value jurisdiction">{statute.jurisdiction ?? 'Unknown'}</span>
+				<span class="yorha-label">Status</span>
+				{#if statuteStatus === 'Current'}
+					<span class="meta-value meta-value-green">{statuteStatus}</span>
+				{:else if statuteStatus === 'Pending'}
+					<span class="meta-value meta-value-yellow">{statuteStatus}</span>
+				{:else}
+					<span class="meta-value meta-value-muted">{statuteStatus}</span>
+				{/if}
 			</div>
 			<div class="meta-divider"></div>
 			<div class="meta-item">
-				<span class="meta-label">Corpus</span>
-				<span class="meta-value">{statute.category ?? 'Statute'}</span>
+				<span class="yorha-label">Effective</span>
+				<span class="meta-value meta-value-dim">{formatShortDate(statute.effectiveDate)}</span>
 			</div>
-			<div class="meta-divider"></div>
-			<div class="meta-item">
-				<span class="meta-label">Citation</span>
-				<span class="meta-value mono">{citationText || 'N/A'}</span>
-			</div>
-			<div class="meta-divider"></div>
-			<div class="meta-item">
-				<span class="meta-label">Status</span>
-				<span class="meta-value status" class:current={statuteStatus === 'Current'} class:pending={statuteStatus === 'Pending'}>
-					{statuteStatus}
-				</span>
-			</div>
-			<div class="meta-divider"></div>
-			<div class="meta-item">
-				<span class="meta-label">Effective</span>
-				<span class="meta-value">{formatShortDate(statute.effectiveDate)}</span>
-			</div>
-			<div class="meta-divider"></div>
-			<div class="meta-item">
-				<span class="meta-label">Updated</span>
-				<span class="meta-value">{formatShortDate(statute.updatedAt)}</span>
-			</div>
-			{#if statute.sourceUrl}
+			{#if statute.updatedAt}
 				<div class="meta-divider"></div>
 				<div class="meta-item">
-					<span class="meta-label">Source</span>
-					<a href={statute.sourceUrl} target="_blank" rel="noopener noreferrer" class="meta-link">
-						<Icon name="external-link" size={11} /> Official
-					</a>
+					<span class="yorha-label">Updated</span>
+					<span class="meta-value meta-value-dim">{formatShortDate(statute.updatedAt)}</span>
 				</div>
 			{/if}
-			<div class="meta-trust">
-				<Icon name="shield-check" size={12} />
-				AI-generated — verify with official sources
-			</div>
-		</div>
-
-		<!-- Research Actions Toolbar -->
-		<div class="research-toolbar">
-			<button class="research-btn" onclick={() => activeTab = 'official-text'}>
-				<Icon name="scroll-text" size={13} /> View Official Text
-			</button>
-			<button class="research-btn" onclick={() => activeTab = 'cases'}>
-				<Icon name="scale" size={13} /> Show Cited Cases
-			</button>
-			<button class="research-btn" onclick={() => activeTab = 'regulations'}>
-				<Icon name="landmark" size={13} /> Related Regulations
-			</button>
-			<button class="research-btn" onclick={() => activeTab = 'glossary'}>
-				<Icon name="book-text" size={13} /> Glossary Terms
-			</button>
-			<button class="research-btn" onclick={() => activeTab = 'history'}>
-				<Icon name="git-compare" size={13} /> Version History
-			</button>
+			{#if statute.sourceUrl}
+				<div class="meta-badge">
+					<Icon name="shield-check" size={11} />
+					AI-generated — verify with official sources
+				</div>
+			{/if}
 		</div>
 
 		<!-- Tab Navigation -->
 		<div class="tab-bar">
-			{#each tabs as tab}
+			{#each [
+				{ id: 'summary', label: 'Summary', icon: 'file-text' },
+				{ id: 'official-text', label: 'Official Text', icon: 'scroll-text' },
+				{ id: 'cases', label: 'Cases', icon: 'folder', count: data.caseLinks.length || undefined },
+				{ id: 'regulations', label: 'Regulations', icon: 'landmark' },
+				{ id: 'glossary', label: 'Glossary', icon: 'book-text', count: data.glossaryTerms?.length || undefined },
+				{ id: 'history', label: 'History', icon: 'clock' },
+				{ id: 'citations', label: 'Citations', icon: 'bookmark', count: aiCitedSources.length || undefined },
+			] as tab}
 				<button
-					class="tab-item"
-					class:active={activeTab === tab.id}
-					onclick={() => activeTab = tab.id}
+					class="tab-item {activeTab === tab.id ? 'tab-item-active' : ''}"
+					onclick={() => { activeTab = tab.id as TabId; }}
 				>
 					<Icon name={tab.icon} size={14} />
 					{tab.label}
-					{#if tab.id === 'cases' && data.caseLinks.length > 0}
-						<span class="tab-count">{data.caseLinks.length}</span>
-					{/if}
-					{#if tab.id === 'glossary' && (data.glossaryTerms?.length ?? 0) > 0}
-						<span class="tab-count">{data.glossaryTerms.length}</span>
-					{/if}
-					{#if tab.id === 'citations' && aiCitedSources.length > 0}
-						<span class="tab-count">{aiCitedSources.length}</span>
+					{#if tab.count}
+						<span class="tab-count">{tab.count}</span>
 					{/if}
 				</button>
 			{/each}
 		</div>
 
 		<!-- 3-Column Layout -->
-		<div class="main-layout">
+		<div class="corpus-grid">
+
 			<!-- Left Sidebar: Corpus Nav -->
-			<aside class="corpus-sidebar">
-				<!-- Jurisdiction Filters -->
-				<div class="sidebar-title">Jurisdiction</div>
-				<div class="filter-chips">
-					{#each corpusTypes as ct}
-						<button
-							class="filter-chip"
-							class:active={corpusFilter === ct.id}
-							onclick={() => corpusFilter = ct.id}
-						>
-							<Icon name={ct.icon} size={11} />
-							{ct.label}
-						</button>
-					{/each}
-				</div>
-
-				<!-- Section Navigation -->
-				<div class="sidebar-title" style="margin-top: 0.75rem">Sections</div>
-				{#each sidebarSections as section}
-					<button
-						class="sidebar-item"
-						class:active={activeSection === section.id}
-						onclick={() => { activeTab = 'summary'; scrollToSection(section.id); }}
-					>
-						<Icon name={section.icon} size={13} />
-						<span>{section.label}</span>
-					</button>
-				{/each}
-
-				<!-- Related Statutes -->
-				{#if (data.relatedStatutes?.length ?? 0) > 0}
-					<div class="sidebar-title" style="margin-top: 0.75rem">Related</div>
-					{#each data.relatedStatutes as related}
-						<a href="/legal-corpus/{related.id}" class="sidebar-related">
-							<span class="related-section">{related.section ? `§ ${related.section}` : ''}</span>
-							<span class="related-title">{related.title?.slice(0, 40)}</span>
-						</a>
-					{/each}
-				{/if}
+			<aside class="corpus-left yorha-sidebar">
+				<CorpusSidebar
+					sections={sidebarSections}
+					{activeSection}
+					relatedStatutes={data.relatedStatutes}
+					jurisdiction={statute.jurisdiction}
+					category={statute.category}
+					casesCount={data.caseLinks.length}
+					glossaryCount={data.glossaryTerms?.length ?? 0}
+					onSectionClick={scrollToSection}
+				/>
 			</aside>
 
 			<!-- Center Content -->
-			<main class="center-content">
+			<main class="corpus-center">
+
 				{#if activeTab === 'summary'}
 					<!-- Executive Summary -->
-					<section id="executive-summary" class="content-card">
-						<h2><Icon name="sparkles" size={16} /> Executive Summary</h2>
+					<section id="executive-summary" class="yorha-card content-section">
+						<h2 class="section-heading">
+							<Icon name="sparkles" size={16} class="text-amber" /> Executive Summary
+						</h2>
 						{#if aiSummary}
-							<div class="summary-text">{aiSummary}</div>
-							<!-- Source drawer toggle -->
-							<button class="source-drawer-toggle" onclick={() => toggleSourceDrawer(0)}>
-								<Icon name={expandedSource === 0 ? 'chevron-up' : 'chevron-down'} size={12} />
-								{expandedSource === 0 ? 'Hide' : 'Show'} Source Details
-							</button>
-							{#if expandedSource === 0}
-								<div class="source-drawer">
-									<div class="source-row">
-										<span class="source-label">Source</span>
-										<span class="source-val">{statute.title}</span>
-									</div>
-									<div class="source-row">
-										<span class="source-label">Jurisdiction</span>
-										<span class="source-val">{statute.jurisdiction ?? 'N/A'}</span>
-									</div>
-									<div class="source-row">
-										<span class="source-label">Section</span>
-										<span class="source-val mono">{statute.section ? `§ ${statute.section}` : 'N/A'}</span>
-									</div>
-									<div class="source-row">
-										<span class="source-label">Citation</span>
-										<span class="source-val mono">{citationText}</span>
-									</div>
-									{#if statute.sourceUrl}
-										<div class="source-row">
-											<span class="source-label">Official</span>
-											<a href={statute.sourceUrl} target="_blank" rel="noopener noreferrer" class="source-link">
-												<Icon name="external-link" size={11} /> View Official Source
-											</a>
-										</div>
-									{/if}
-									<div class="source-row">
-										<span class="source-label">Model</span>
-										<span class="source-val mono">gemma3-legal:latest</span>
-									</div>
-									<p class="source-disclaimer">This summary was AI-generated and may contain inaccuracies. Always verify against official sources before relying on this content for legal purposes.</p>
-								</div>
-							{/if}
+							<div class="yorha-reader">{aiSummary}</div>
 						{:else if summaryError}
-							<p class="error-text"><Icon name="alert-circle" size={14} /> {summaryError}</p>
+							<p class="error-inline">
+								<Icon name="circle-alert" size={14} /> {summaryError}
+							</p>
 						{:else if summaryLoading}
-							<div class="loading-placeholder">
+							<div class="skeleton-group">
 								<div class="skeleton-line"></div>
-								<div class="skeleton-line short"></div>
+								<div class="skeleton-line w-60p"></div>
 								<div class="skeleton-line"></div>
-								<div class="skeleton-line short"></div>
+								<div class="skeleton-line w-50p"></div>
 							</div>
 						{:else}
-							<div class="placeholder-card">
+							<div class="empty-state">
 								<Icon name="sparkles" size={24} />
-								<p>Click <strong>AI Analysis</strong> to generate an executive summary, key provisions, and legal implications using gemma3-legal.</p>
+								<p>Click <strong>AI Analysis</strong> to generate an executive summary, key provisions, and legal implications.</p>
 							</div>
 						{/if}
 					</section>
 
 					<!-- Key Provisions -->
-					<section id="key-provisions" class="content-card">
-						<h2><Icon name="list" size={16} /> Key Provisions</h2>
+					<section id="key-provisions" class="yorha-card content-section">
+						<h2 class="section-heading">
+							<Icon name="list" size={16} class="text-amber" /> Key Provisions
+						</h2>
 						{#if aiKeyProvisions.length > 0}
 							<div class="provisions-grid">
-								{#each aiKeyProvisions as prov, i}
-									<div class="provision-card">
+								{#each aiKeyProvisions as prov}
+									<div class="yorha-panel provision-card">
 										<div class="provision-icon">
 											<Icon name={getProvisionIcon(prov.icon)} size={18} />
 										</div>
-										<h4>{prov.title}</h4>
-										<p>{prov.description}</p>
-										<button class="source-drawer-toggle small" onclick={() => toggleSourceDrawer(100 + i)}>
-											<Icon name="info" size={10} /> source
-										</button>
-										{#if expandedSource === 100 + i}
-											<div class="source-drawer compact">
-												<span class="source-val mono">{citationText}</span>
-												{#if statute.sourceUrl}
-													<a href={statute.sourceUrl} target="_blank" rel="noopener noreferrer" class="source-link">
-														<Icon name="external-link" size={10} /> Official
-													</a>
-												{/if}
-											</div>
-										{/if}
+										<h4 class="provision-title">{prov.title}</h4>
+										<p class="provision-desc">{prov.description}</p>
 									</div>
 								{/each}
 							</div>
 						{:else if data.chunks.length > 0}
 							<div class="provisions-grid">
 								{#each data.chunks.slice(0, 4) as chunk}
-									<div class="provision-card">
-										<div class="provision-icon">
+									<div class="yorha-panel provision-card">
+										<div class="provision-icon provision-icon-muted">
 											<Icon name="file-text" size={18} />
 										</div>
-										<h4>Section {chunk.chunkIndex + 1}</h4>
-										<p>{chunk.content?.slice(0, 150)}...</p>
+										<h4 class="provision-title">Section {chunk.chunkIndex + 1}</h4>
+										<p class="provision-desc">{chunk.content?.slice(0, 150)}...</p>
 									</div>
 								{/each}
 							</div>
 							{#if data.chunks.length > 4}
-								<p class="see-more">+ {data.chunks.length - 4} more sections.
-									<button class="inline-link" onclick={() => activeTab = 'official-text'}>View all in Official Text</button>
+								<p class="more-link">
+									+ {data.chunks.length - 4} more sections.
+									<button class="text-link" onclick={() => activeTab = 'official-text'}>View all</button>
 								</p>
 							{/if}
 						{:else}
-							<p class="placeholder-text">Run AI Analysis to extract key provisions, or upload statute text to enable section indexing.</p>
+							<p class="empty-hint">Run AI Analysis to extract key provisions.</p>
 						{/if}
 					</section>
 
 					<!-- Implications -->
-					<section id="implications" class="content-card">
-						<h2><Icon name="alert-triangle" size={16} /> Implications</h2>
+					<section id="implications" class="yorha-card content-section">
+						<h2 class="section-heading">
+							<Icon name="triangle-alert" size={16} class="text-amber" /> Implications
+						</h2>
 						{#if aiImplications.length > 0}
 							<div class="implications-grid">
-								{#each aiImplications as imp, i}
-									<div class="implication-card {getSeverityColor(imp.severity)}">
-										<h4>{imp.title}</h4>
-										<p>{imp.description}</p>
+								{#each aiImplications as imp}
+									<div class="implication-card {imp.severity === 'high' ? 'imp-high' : imp.severity === 'low' ? 'imp-low' : 'imp-medium'}">
+										<h4 class="imp-title">{imp.title}</h4>
+										<p class="imp-desc">{imp.description}</p>
 										{#if imp.severity}
-											<span class="severity-tag">{imp.severity}</span>
-										{/if}
-										<button class="source-drawer-toggle small" onclick={() => toggleSourceDrawer(200 + i)}>
-											<Icon name="info" size={10} /> source
-										</button>
-										{#if expandedSource === 200 + i}
-											<div class="source-drawer compact">
-												<span class="source-val mono">{citationText}</span>
-											</div>
+											<span class="yorha-label imp-severity">{imp.severity}</span>
 										{/if}
 									</div>
 								{/each}
 							</div>
 						{:else}
-							<p class="placeholder-text">Run AI Analysis to identify compliance risks, data protection requirements, and legal uncertainties.</p>
+							<p class="empty-hint">Run AI Analysis to identify compliance risks and legal implications.</p>
 						{/if}
 					</section>
 
 				{:else if activeTab === 'official-text'}
-					<section id="full-text" class="content-card">
-						<h2><Icon name="scroll-text" size={16} /> Official Text</h2>
+					<section id="full-text" class="yorha-card">
+						<h2 class="section-heading">
+							<Icon name="scroll-text" size={16} class="text-amber" /> Official Text
+						</h2>
 						{#if statute.content}
-							<div class="full-text">{statute.content}</div>
+							<div class="yorha-reader official-text-reader">{statute.content}</div>
 						{:else if data.chunks.length > 0}
 							{#each data.chunks as chunk}
-								<div class="chunk-block">
-									<span class="chunk-index">§ {chunk.chunkIndex + 1}</span>
-									<p>{chunk.content}</p>
+								<div class="chunk-row">
+									<span class="chunk-idx">§ {chunk.chunkIndex + 1}</span>
+									<p class="chunk-text">{chunk.content}</p>
 								</div>
 							{/each}
 						{:else}
-							<p class="placeholder-text">No official text available. Upload the statute document to populate this section.</p>
+							<p class="empty-hint">No official text available. Upload the statute document to populate this section.</p>
 						{/if}
 					</section>
 
 				{:else if activeTab === 'cases'}
-					<section class="content-card">
-						<h2><Icon name="folder" size={16} /> Linked Cases ({data.caseLinks.length})</h2>
+					<section class="yorha-card content-section">
+						<h2 class="section-heading">
+							<Icon name="folder" size={16} class="text-amber" /> Linked Cases ({data.caseLinks.length})
+						</h2>
 						{#if data.caseLinks.length > 0}
 							{#each data.caseLinks as link}
-								<div class="case-link-row">
-									<div class="case-link-header">
-										<a href="/cases/{link.caseId}" class="case-link-id">
+								<div class="case-row">
+									<div class="case-row-header">
+										<a href="/cases/{link.caseId}" class="case-link">
 											<Icon name="folder-open" size={14} />
 											{link.caseTitle ?? link.caseId}
 										</a>
-										<span class="link-type-badge">{link.linkType?.replace(/_/g, ' ')}</span>
+										<span class="yorha-pill pill-purple">{link.linkType?.replace(/_/g, ' ')}</span>
 										{#if link.caseStatus}
-											<span class="case-status-badge">{link.caseStatus}</span>
+											<span class="yorha-pill pill-green">{link.caseStatus}</span>
 										{/if}
 									</div>
-									{#if link.notes}<p class="link-notes">{link.notes}</p>{/if}
-									<span class="link-date">{formatShortDate(link.createdAt)}</span>
+									{#if link.notes}<p class="case-notes">{link.notes}</p>{/if}
+									<span class="case-date">{formatShortDate(link.createdAt)}</span>
 								</div>
 							{/each}
 						{:else}
-							<p class="placeholder-text">No cases linked to this statute yet.</p>
+							<p class="empty-hint">No cases linked to this statute yet.</p>
 						{/if}
 					</section>
 
-					<!-- Precedents inline -->
+					<!-- Precedents -->
 					{#if data.precedents.length > 0}
-						<section class="content-card">
-							<h2><Icon name="scale" size={16} /> Legal Precedents</h2>
+						<section class="yorha-card">
+							<h2 class="section-heading">
+								<Icon name="scale" size={16} class="text-amber" /> Legal Precedents
+							</h2>
 							{#each data.precedents as p}
-								<div class="precedent-row">
-									<h4>{p.title}</h4>
+								<button class="case-row case-row-btn" onclick={() => openCitationModal(p)}>
+									<h4 class="precedent-title">{p.title}</h4>
 									<div class="precedent-meta">
-										{#if p.court}<span class="precedent-court">{p.court}</span>{/if}
+										{#if p.court}<span class="meta-court">{p.court}</span>{/if}
 										{#if p.decisionDate}<span>{formatShortDate(p.decisionDate)}</span>{/if}
-										{#if p.citation}<span class="precedent-cite">{p.citation}</span>{/if}
+										{#if p.citation}<span class="meta-citation">{p.citation}</span>{/if}
 									</div>
 									{#if p.summary}<p class="precedent-summary">{p.summary}</p>{/if}
-								</div>
+								</button>
 							{/each}
 						</section>
 					{/if}
 
 				{:else if activeTab === 'regulations'}
-					<section class="content-card">
-						<h2><Icon name="landmark" size={16} /> Related Regulations</h2>
-						<p class="placeholder-text">Related regulations for this statute will appear here once CFR and regulatory cross-references are indexed.</p>
-						<div class="regulation-placeholder">
-							<div class="regulation-tip">
-								<Icon name="info" size={14} />
-								<div>
-									<strong>Coming soon:</strong> Automated cross-referencing with the Code of Federal Regulations (CFR) and state regulatory databases.
-								</div>
+					<section class="yorha-card">
+						<h2 class="section-heading">
+							<Icon name="landmark" size={16} class="text-amber" /> Related Regulations
+						</h2>
+						<p class="empty-hint mb-hint">Related regulations will appear here once CFR and regulatory cross-references are indexed.</p>
+						<div class="info-stack">
+							<div class="info-box">
+								<Icon name="info" size={14} class="info-icon" />
+								<div><strong class="info-strong">Coming soon:</strong> Automated cross-referencing with the Code of Federal Regulations (CFR) and state regulatory databases.</div>
 							</div>
 							{#if statute.jurisdiction === 'Federal' || statute.jurisdiction === 'federal'}
-								<div class="regulation-tip">
-									<Icon name="landmark" size={14} />
+								<div class="info-box">
+									<Icon name="landmark" size={14} class="info-icon" />
 									<div>Federal statutes like this one often have implementing regulations in Title 18 CFR.</div>
 								</div>
 							{/if}
@@ -585,205 +597,324 @@
 					</section>
 
 				{:else if activeTab === 'glossary'}
-					<section class="content-card">
-						<h2><Icon name="book-text" size={16} /> Legal Glossary</h2>
-						<!-- Glossary search -->
-						<div class="glossary-search-bar">
-							<Icon name="search" size={14} />
-							<input
-								type="text"
-								placeholder="Search terms, acronyms, or doctrines..."
-								bind:value={glossarySearch}
-								onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter') searchGlossary(); }}
-							/>
-							<button class="search-go" onclick={searchGlossary} disabled={glossaryLoading}>
-								{glossaryLoading ? '...' : 'Search'}
+					<!-- Glossary Tabs (sub-tabs) -->
+					<div class="tab-bar subtab-bar">
+						<button class="tab-item tab-item-active">Glossary</button>
+						<button class="tab-item" onclick={() => activeTab = 'cases'}>Cases</button>
+						<button class="tab-item" onclick={() => activeTab = 'history'}>History</button>
+					</div>
+
+					<!-- Selected Term Pills -->
+					{#if selectedGlossaryTerm}
+						<div class="selected-term-pills">
+							<button
+								class="term-pill-btn"
+								onclick={() => selectedGlossaryTerm = null}
+							>
+								<Icon name="book-text" size={12} />
+								{selectedGlossaryTerm.term}
+								<Icon name="x" size={11} class="pill-x" />
+							</button>
+							<button class="pill-action">
+								<Icon name="sparkles" size={14} />
 							</button>
 						</div>
+					{/if}
 
-						<!-- Server-loaded glossary terms for this jurisdiction -->
-						{#if searchedGlossary.length > 0}
-							<div class="glossary-results">
-								<h3>Search Results</h3>
+					<!-- Selected Term Detail Card -->
+					{#if selectedGlossaryTerm}
+						<div class="yorha-card content-section">
+							<div class="term-detail-header">
+								<div>
+									<span class="yorha-label">Selected Term</span>
+									<h3 class="term-detail-title">{selectedGlossaryTerm.term}</h3>
+								</div>
+								<span class="term-detail-date">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+							</div>
+							<!-- Category pills -->
+							<div class="term-pills-row">
+								{#if selectedGlossaryTerm.category}
+									<span class="yorha-pill">{selectedGlossaryTerm.category}</span>
+								{/if}
+								{#if statute.jurisdiction}
+									<span class="yorha-pill pill-amber">{statute.jurisdiction}</span>
+								{/if}
+								{#if statute.category}
+									<span class="yorha-pill">{statute.category}</span>
+								{/if}
+							</div>
+							<!-- Source badge -->
+							<div class="term-source-row">
+								<span class="source-badge"><Icon name="circle-check" size={12} class="text-green-600" /> Official Source</span>
+								<span>Date added: {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+							</div>
+							<!-- Reader pane -->
+							<div class="yorha-reader term-reader">
+								{selectedGlossaryTerm.definition}
+							</div>
+							<!-- Related terms -->
+							{#if selectedGlossaryTerm.relatedTerms && Array.isArray(selectedGlossaryTerm.relatedTerms) && selectedGlossaryTerm.relatedTerms.length > 0}
+								<div class="related-terms-section">
+									<span class="yorha-label">Related Terms</span>
+									<div class="related-terms-list">
+										{#each selectedGlossaryTerm.relatedTerms as rt}
+											<span class="yorha-pill">{rt}</span>
+										{/each}
+									</div>
+								</div>
+							{/if}
+						</div>
+					{/if}
+
+					<!-- Search bar -->
+					<div class="glossary-search yorha-input">
+						<Icon name="search" size={14} class="search-icon-sm" />
+						<input
+							type="text"
+							placeholder="Search terms, acronyms, or doctrines..."
+							bind:value={glossarySearch}
+							onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter') searchGlossary(); }}
+							class="glossary-search-input"
+						/>
+						<button
+							class="glossary-search-btn"
+							onclick={searchGlossary}
+							disabled={glossaryLoading}
+						>
+							{glossaryLoading ? '...' : 'Search'}
+						</button>
+					</div>
+
+					<!-- Search results from API -->
+					{#if searchedGlossary.length > 0}
+						<div class="content-section">
+							<h3 class="yorha-label list-heading">Search Results</h3>
+							<div class="term-list">
 								{#each searchedGlossary as term}
-									<div class="glossary-card">
-										<div class="glossary-term-header">
-											<strong>{term.term}</strong>
-											{#if term.category}
-												<span class="glossary-cat">{term.category}</span>
-											{/if}
-										</div>
-										<p>{term.definition}</p>
-										{#if term.relatedTerms && Array.isArray(term.relatedTerms) && term.relatedTerms.length > 0}
-											<div class="related-terms">
-												<Icon name="link" size={11} />
-												{#each term.relatedTerms as rt}
-													<span class="related-pill">{rt}</span>
-												{/each}
-											</div>
-										{/if}
-									</div>
+									<GlossaryTermCard
+										term={{ ...term, id: term.id ?? term.term }}
+										variant="light"
+										onSelect={() => { selectedGlossaryTerm = { ...term, id: term.id ?? term.term }; }}
+									/>
 								{/each}
 							</div>
-						{/if}
+						</div>
+					{/if}
 
-						{#if filteredGlossary.length > 0}
-							<div class="glossary-results">
-								<h3>{statute.jurisdiction ?? 'All'} Terms ({filteredGlossary.length})</h3>
-								{#each filteredGlossary as term}
-									<div class="glossary-card">
-										<div class="glossary-term-header">
-											<strong>{term.term}</strong>
-											{#if term.category}
-												<span class="glossary-cat">{term.category}</span>
-											{/if}
-										</div>
-										<p>{term.definition}</p>
-										{#if term.relatedTerms && Array.isArray(term.relatedTerms) && term.relatedTerms.length > 0}
-											<div class="related-terms">
-												<Icon name="link" size={11} />
-												{#each term.relatedTerms as rt}
-													<span class="related-pill">{rt}</span>
-												{/each}
-											</div>
-										{/if}
-									</div>
-								{/each}
-							</div>
-						{:else}
-							<p class="placeholder-text" style="margin-top: 1rem">No glossary terms found for this jurisdiction. Try searching above.</p>
-						{/if}
-					</section>
+					<!-- Server-loaded terms -->
+					{#if filteredGlossary.length > 0}
+						<h3 class="yorha-label list-heading">{statute.jurisdiction ?? 'All'} Terms ({filteredGlossary.length})</h3>
+						<div class="term-list">
+							{#each filteredGlossary as term}
+								<GlossaryTermCard
+									{term}
+									variant="light"
+									selected={selectedGlossaryTerm?.id === term.id}
+									onSelect={() => { selectedGlossaryTerm = term; }}
+								/>
+							{/each}
+						</div>
+					{:else}
+						<p class="empty-hint mt-hint">No glossary terms found for this jurisdiction. Try searching above.</p>
+					{/if}
 
 				{:else if activeTab === 'history'}
-					<section class="content-card">
-						<h2><Icon name="clock" size={16} /> Version History</h2>
+					<section class="yorha-card">
+						<h2 class="section-heading">
+							<Icon name="clock" size={16} class="text-amber" /> Version History
+						</h2>
 						<div class="timeline">
 							{#if statute.effectiveDate}
 								<div class="timeline-item">
-									<div class="timeline-dot effective"></div>
-									<div class="timeline-content">
+									<div class="timeline-line"></div>
+									<div class="timeline-dot timeline-dot-green"></div>
+									<div>
 										<span class="timeline-date">{formatDate(statute.effectiveDate)}</span>
-										<p>Effective date — statute entered into force</p>
-										<span class="timeline-badge current">Current version</span>
+										<p class="timeline-desc">Effective date — statute entered into force</p>
+										<span class="yorha-pill pill-green">Current version</span>
 									</div>
 								</div>
 							{/if}
 							<div class="timeline-item">
-								<div class="timeline-dot"></div>
-								<div class="timeline-content">
+								<div class="timeline-line"></div>
+								<div class="timeline-dot timeline-dot-gray"></div>
+								<div>
 									<span class="timeline-date">{formatDate(statute.createdAt)}</span>
-									<p>Added to legal corpus</p>
+									<p class="timeline-desc">Added to legal corpus</p>
 								</div>
 							</div>
-							<div class="timeline-item">
-								<div class="timeline-dot"></div>
-								<div class="timeline-content">
+							<div class="timeline-item timeline-item-last">
+								<div class="timeline-dot timeline-dot-gray"></div>
+								<div>
 									<span class="timeline-date">{formatDate(statute.updatedAt)}</span>
-									<p>Last updated in system</p>
+									<p class="timeline-desc">Last updated in system</p>
 								</div>
 							</div>
 						</div>
-						<div class="history-notice">
-							<Icon name="info" size={14} />
-							<p>Full amendment history and version comparison will be available once legislative change tracking is connected to official sources (GovInfo/GPO for federal, Open States for state).</p>
+						<div class="info-box info-box-amber">
+							<Icon name="info" size={14} class="info-icon" />
+							<p>Full amendment history and version comparison will be available once legislative change tracking is connected to official sources.</p>
 						</div>
 					</section>
 
 				{:else if activeTab === 'citations'}
-					<section class="content-card">
-						<h2><Icon name="bookmark" size={16} /> Citations & References</h2>
-
+					<section class="yorha-card">
+						<h2 class="section-heading">
+							<Icon name="bookmark" size={16} class="text-amber" /> Citations & References
+						</h2>
 						<!-- This statute's citation -->
-						<div class="citation-box">
-							<div class="citation-label">Cite this statute</div>
-							<div class="citation-formatted">{citationText}</div>
+						<div class="cite-box">
+							<span class="yorha-label cite-label">Cite this statute</span>
+							<span class="cite-text">{citationText}</span>
 						</div>
 
 						{#if aiCitedSources.length > 0}
-							<h3 class="subsection-title">Referenced Sources ({aiCitedSources.length})</h3>
-							<ul class="citation-list">
+							<h3 class="yorha-label list-heading">Referenced Sources ({aiCitedSources.length})</h3>
+							<ul class="source-list">
 								{#each aiCitedSources as source, i}
-									<li class="citation-item">
-										<span class="citation-num">{i + 1}</span>
-										<div class="citation-body">
-											<span>{source}</span>
-											<button class="source-drawer-toggle small" onclick={() => toggleSourceDrawer(300 + i)}>
-												<Icon name="info" size={10} /> details
-											</button>
-											{#if expandedSource === 300 + i}
-												<div class="source-drawer compact">
-													<span class="source-val">Extracted from AI analysis of {statute.title}</span>
-												</div>
-											{/if}
-										</div>
+									<li class="source-item">
+										<span class="source-num">{i + 1}</span>
+										<span class="source-text">{source}</span>
 									</li>
 								{/each}
 							</ul>
 						{:else}
-							<p class="placeholder-text">Run AI Analysis to extract citations and referenced sources from the statute text.</p>
+							<p class="empty-hint">Run AI Analysis to extract citations and referenced sources.</p>
 						{/if}
 					</section>
 				{/if}
 			</main>
 
 			<!-- Right Sidebar -->
-			<aside class="right-sidebar">
-				<!-- Cited Sources -->
-				<div class="sidebar-card">
-					<h3><Icon name="quote" size={14} /> Cited Sources</h3>
-					{#if aiCitedSources.length > 0}
-						{#each aiCitedSources as source}
-							<div class="cited-source">
-								<span class="source-text">{source}</span>
-							</div>
-						{/each}
-					{:else}
-						<p class="sidebar-placeholder">AI-extracted sources appear after analysis.</p>
-					{/if}
-				</div>
+			<aside class="corpus-right">
 
-				<!-- Legal Precedents -->
-				<div class="sidebar-card">
-					<h3><Icon name="scale" size={14} /> Legal Precedents</h3>
+				<!-- Similar Cases -->
+				<div class="yorha-panel sidebar-card">
+					<div class="sidebar-card-header">
+						<h3 class="sidebar-card-title">
+							<Icon name="scale" size={14} class="text-amber" /> Similar Cases
+						</h3>
+						<button class="sidebar-more-btn">
+							<Icon name="ellipsis-vertical" size={14} />
+						</button>
+					</div>
 					{#if data.precedents.length > 0}
-						{#each data.precedents.slice(0, 5) as p}
-							<div class="precedent-item">
-								<h4>{p.title}</h4>
-								<div class="precedent-meta-mini">
-									{#if p.court}<span>{p.court}</span>{/if}
-									{#if p.decisionDate}<span>{formatShortDate(p.decisionDate)}</span>{/if}
-								</div>
-								{#if p.citation}<span class="precedent-citation">{p.citation}</span>{/if}
-							</div>
-						{/each}
-						{#if data.precedents.length > 5}
-							<button class="sidebar-action" onclick={() => activeTab = 'cases'}>
-								View all {data.precedents.length} precedents
+						<div class="sidebar-card-list">
+							{#each data.precedents.slice(0, 4) as p}
+								<button class="sidebar-case-card sidebar-case-btn" onclick={() => openCitationModal(p)}>
+									<h4 class="sidebar-case-title">{p.title}</h4>
+									<div class="sidebar-case-meta">
+										<Icon name="calendar" size={11} />
+										<span>{formatShortDate(p.decisionDate)}</span>
+									</div>
+									<div class="sidebar-case-pills">
+										{#if p.court}
+											<span class="yorha-pill">{p.court}</span>
+										{/if}
+										{#if p.citation}
+											<span class="sidebar-citation">{p.citation}</span>
+										{/if}
+									</div>
+								</button>
+							{/each}
+						</div>
+						{#if data.precedents.length > 4}
+							<button class="sidebar-see-all" onclick={() => activeTab = 'cases'}>
+								See all {data.precedents.length} similar cases
+								<Icon name="chevron-right" size={13} />
+							</button>
+						{/if}
+					{:else if data.caseLinks.length > 0}
+						<div class="sidebar-card-list">
+							{#each data.caseLinks.slice(0, 4) as link}
+								<a href="/cases/{link.caseId}" class="sidebar-case-card sidebar-case-link">
+									<h4 class="sidebar-case-title">{link.caseTitle ?? link.caseId}</h4>
+									<div class="sidebar-case-meta">
+										<Icon name="calendar" size={11} />
+										<span>{formatShortDate(link.createdAt)}</span>
+									</div>
+									<div class="sidebar-case-pills">
+										<span class="yorha-pill">{link.linkType?.replace(/_/g, ' ')}</span>
+										{#if link.caseStatus}
+											<span class="yorha-pill pill-green">{link.caseStatus}</span>
+										{/if}
+									</div>
+								</a>
+							{/each}
+						</div>
+						{#if data.caseLinks.length > 4}
+							<button class="sidebar-see-all" onclick={() => activeTab = 'cases'}>
+								See all {data.caseLinks.length} linked cases
+								<Icon name="chevron-right" size={13} />
 							</button>
 						{/if}
 					{:else}
-						<p class="sidebar-placeholder">No precedents linked yet.</p>
+						<p class="sidebar-empty">No similar cases found yet.</p>
+					{/if}
+				</div>
+
+				<!-- Cases Quick Stats -->
+				<div class="yorha-panel sidebar-card">
+					<div class="sidebar-card-header">
+						<h3 class="sidebar-card-title">
+							<Icon name="folder" size={14} class="text-amber" /> Cases
+						</h3>
+					</div>
+					<div class="sidebar-stats">
+						<div class="sidebar-stat-row">
+							<span class="stat-label-row"><Icon name="clock" size={12} /> Recent</span>
+							<span class="stat-value-row">{data.caseLinks.length}</span>
+						</div>
+						<div class="sidebar-stat-row">
+							<span class="stat-label-row"><Icon name="target" size={12} /> Relevant</span>
+							<span class="stat-value-row">{data.precedents.length}</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Cited Sources -->
+				<div class="yorha-panel sidebar-card">
+					<h3 class="sidebar-card-title sidebar-card-title-mb">
+						<Icon name="quote" size={14} class="text-amber" /> Cited Sources
+					</h3>
+					{#if aiCitedSources.length > 0}
+						{#each aiCitedSources.slice(0, 3) as source}
+							<div class="sidebar-source-row">
+								<span class="sidebar-source-text">{source}</span>
+							</div>
+						{/each}
+						<button class="sidebar-see-all" onclick={() => drawerOpen = true}>
+							View all {aiCitedSources.length} sources
+							<Icon name="chevron-right" size={13} />
+						</button>
+					{:else}
+						<p class="sidebar-empty">AI-extracted sources appear after analysis.</p>
 					{/if}
 				</div>
 
 				<!-- Glossary Terms -->
-				<div class="sidebar-card">
-					<h3><Icon name="book-text" size={14} /> Glossary</h3>
+				<div class="yorha-panel sidebar-card">
+					<h3 class="sidebar-card-title sidebar-card-title-mb">
+						<Icon name="book-text" size={14} class="text-amber" /> Glossary
+					</h3>
 					{#if (data.glossaryTerms?.length ?? 0) > 0}
-						{#each data.glossaryTerms.slice(0, 5) as term}
-							<div class="glossary-mini">
-								<strong>{term.term}</strong>
-								<p>{term.definition?.slice(0, 80)}</p>
-							</div>
+						{#each data.glossaryTerms.slice(0, 4) as term}
+							<button
+								class="sidebar-glossary-item"
+								onclick={() => { selectedGlossaryTerm = term; activeTab = 'glossary'; }}
+							>
+								<strong class="sidebar-glossary-term">{term.term}</strong>
+								<p class="sidebar-glossary-def">{term.definition?.slice(0, 80)}</p>
+							</button>
 						{/each}
-						{#if data.glossaryTerms.length > 5}
-							<button class="sidebar-action" onclick={() => activeTab = 'glossary'}>
+						{#if data.glossaryTerms.length > 4}
+							<button class="sidebar-see-all" onclick={() => activeTab = 'glossary'}>
 								View all {data.glossaryTerms.length} terms
+								<Icon name="chevron-right" size={13} />
 							</button>
 						{/if}
 					{:else}
-						<button class="sidebar-action" onclick={() => activeTab = 'glossary'}>
+						<button class="yorha-btn-ghost sidebar-search-btn" onclick={() => activeTab = 'glossary'}>
 							<Icon name="search" size={13} /> Search Glossary
 						</button>
 					{/if}
@@ -791,12 +922,14 @@
 
 				<!-- Related Statutes -->
 				{#if (data.relatedStatutes?.length ?? 0) > 0}
-					<div class="sidebar-card">
-						<h3><Icon name="git-branch" size={14} /> Related Statutes</h3>
+					<div class="yorha-panel sidebar-card">
+						<h3 class="sidebar-card-title sidebar-card-title-mb">
+							<Icon name="git-branch" size={14} class="text-amber" /> Related Statutes
+						</h3>
 						{#each data.relatedStatutes.slice(0, 5) as rs}
-							<a href="/legal-corpus/{rs.id}" class="related-statute-link">
-								<span>{rs.section ? `§ ${rs.section}` : ''}</span>
-								<span class="related-title-text">{rs.title?.slice(0, 50)}</span>
+							<a href="/legal-corpus/{rs.id}" class="sidebar-related-link">
+								<span class="sidebar-related-section">{rs.section ? `§ ${rs.section}` : ''}</span>
+								<span class="sidebar-related-title">{rs.title?.slice(0, 50)}</span>
 							</a>
 						{/each}
 					</div>
@@ -804,751 +937,703 @@
 			</aside>
 		</div>
 	</div>
+
+	<!-- Cited Sources Overlay -->
+	<CitedSourcesOverlay
+		bind:isOpen={drawerOpen}
+		citations={overlayCitations}
+		definitions={overlayDefinitions}
+	/>
+
+	<!-- Citation Detail Modal -->
+	<CitationViewModal
+		citation={selectedCitation}
+		bind:open={citationModalOpen}
+		onClose={() => { citationModalOpen = false; }}
+		onViewFull={(c) => { if (c.id) window.open(`/citations?id=${c.id}`, '_blank'); }}
+	/>
+	{/if}
 {/if}
 
 <style>
-	.detail-page {
-		min-height: 100vh;
-		padding: 1rem 1.5rem 3rem;
-		max-width: 1400px;
+	/* ═══════════════════════════════════════════════════════════════════════
+	   READER VIEW — Scoped CSS (bypasses UnoCSS extraction issues)
+	   ═══════════════════════════════════════════════════════════════════════ */
+
+	/* ── Page Container ── */
+	.reader-page {
+		padding: 1rem 1rem 2rem;
+		max-width: 1440px;
 		margin: 0 auto;
-		overflow-y: auto;
+	}
+	@media (min-width: 1024px) {
+		.reader-page { padding: 1rem 1.5rem 2rem; }
 	}
 
-	/* Error */
-	.error-banner {
-		text-align: center;
-		padding: 4rem 2rem;
-		color: rgba(255, 255, 255, 0.5);
+	/* ── Error State ── */
+	.error-center {
 		display: flex;
-		flex-direction: column;
 		align-items: center;
-		gap: 1rem;
+		justify-content: center;
+		min-height: 60vh;
+	}
+	.error-card {
+		text-align: center;
+		max-width: 28rem;
+	}
+	.error-msg {
+		color: rgba(74, 66, 56, 0.7);
+		margin-bottom: 1rem;
 	}
 	.back-link {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.35rem;
-		color: #60a5fa;
-		text-decoration: none;
-		font-size: 0.85rem;
+		gap: 0.25rem;
 	}
-	.back-link:hover { text-decoration: underline; }
 
-	/* Top Bar */
+	/* ── Floating View Toggle (Classic/Demo modes) ── */
+	.floating-toggle {
+		position: fixed;
+		top: 1rem;
+		right: 1rem;
+		z-index: 50;
+		display: flex;
+		gap: 0.375rem;
+	}
+	.floating-toggle-alt {
+		background: #faf7f0;
+		box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+		border: 1px solid rgba(42, 37, 32, 0.15);
+	}
+
+	/* ── Top Bar ── */
 	.top-bar {
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 0.75rem;
+		justify-content: space-between;
 		gap: 1rem;
-		flex-wrap: wrap;
+		margin-bottom: 0.5rem;
 	}
-	.breadcrumb {
+	.top-links {
 		display: flex;
 		align-items: center;
-		gap: 0.4rem;
-		font-size: 0.8rem;
-		color: rgba(255, 255, 255, 0.4);
+		gap: 0.75rem;
+		font-size: 0.75rem;
 	}
-	.breadcrumb a {
+	.top-links a {
+		color: rgba(42, 37, 32, 0.4);
+		text-decoration: none;
+		transition: color 0.15s;
+	}
+	.top-links a:hover { color: rgba(42, 37, 32, 0.7); }
+
+	/* ── Search Bar ── */
+	.search-bar {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 0.75rem;
+		margin-bottom: 0.75rem;
+	}
+	.search-input {
+		flex: 1;
+		background: transparent;
+		border: none;
+		outline: none;
+		font-size: 0.875rem;
+		color: rgba(42, 37, 32, 0.8);
+	}
+	.search-input::placeholder { color: rgba(42, 37, 32, 0.3); }
+	.search-icon { color: rgba(42, 37, 32, 0.25); }
+	.search-actions {
+		display: flex;
+		gap: 0.5rem;
+		margin-left: auto;
+	}
+	.search-action-btn {
+		border: 1px solid rgba(42, 37, 32, 0.12);
+	}
+
+	/* ── Document Header ── */
+	.doc-header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 0.75rem;
+		flex-wrap: wrap;
+	}
+	.doc-title {
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: #2a2520;
+		line-height: 1.3;
+		margin: 0;
+	}
+	.section-pill {
+		margin-left: 0.5rem;
+		color: #c4752b;
+	}
+	.jurisdiction-pill {
+		margin-top: 0.375rem;
+		display: inline-flex;
+	}
+	.doc-actions {
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+		flex-shrink: 0;
+	}
+	.view-toggle-group {
+		display: flex;
+		border: 1px solid rgba(42, 37, 32, 0.15);
+		border-radius: 0.5rem;
+		overflow: hidden;
+	}
+
+	/* ── View Toggle Buttons ── */
+	.view-toggle-btn {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.3rem;
-		color: #60a5fa;
-		text-decoration: none;
+		padding: 0.35rem 0.65rem;
+		background: transparent;
+		border: none;
+		border-right: 1px solid rgba(42, 37, 32, 0.1);
+		font-size: 0.7rem;
+		font-weight: 500;
+		color: rgba(42, 37, 32, 0.45);
+		cursor: pointer;
+		transition: all 0.15s;
+		white-space: nowrap;
 	}
-	.breadcrumb a:hover { text-decoration: underline; }
-	.sep { color: rgba(255, 255, 255, 0.2); }
-	.crumb-text { color: rgba(255, 255, 255, 0.5); }
-	.crumb-active { color: rgba(255, 255, 255, 0.8); font-weight: 500; }
-	.top-actions { display: flex; gap: 0.5rem; }
+	.view-toggle-btn:last-child { border-right: none; }
+	.view-toggle-btn:hover { background: rgba(42, 37, 32, 0.04); color: rgba(42, 37, 32, 0.7); }
+	.view-toggle-btn.active {
+		background: rgba(196, 117, 43, 0.1);
+		color: #c4752b;
+		cursor: default;
+	}
+	.view-toggle-btn:disabled { cursor: default; }
 
-	/* Header */
-	.statute-header { margin-bottom: 0.5rem; }
-	.statute-header h1 {
-		font-size: 1.4rem;
-		font-weight: 700;
-		margin: 0;
-		line-height: 1.3;
-	}
-	.section-badge {
-		display: inline-block;
-		padding: 0.15rem 0.5rem;
-		background: rgba(96, 165, 250, 0.15);
-		color: #60a5fa;
-		border-radius: 0.25rem;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.85rem;
-		vertical-align: middle;
-		margin-left: 0.4rem;
-	}
-
-	/* Metadata Bar */
+	/* ── Metadata Bar ── */
 	.metadata-bar {
 		display: flex;
 		align-items: center;
-		gap: 0.6rem;
+		gap: 0.75rem;
 		flex-wrap: wrap;
-		padding: 0.6rem 0.85rem;
-		background: rgba(255, 255, 255, 0.025);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 0.375rem;
-		margin-bottom: 0.6rem;
+		padding: 0.625rem 1rem;
+		margin-bottom: 0.75rem;
 	}
-	.meta-item { display: flex; flex-direction: column; gap: 0.1rem; }
-	.meta-label {
-		font-size: 0.6rem;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: rgba(255, 255, 255, 0.3);
-		font-weight: 600;
+	.meta-item {
+		display: flex;
+		flex-direction: column;
+		gap: 0.125rem;
 	}
 	.meta-value {
 		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.8);
-		font-weight: 500;
+		color: rgba(42, 37, 32, 0.7);
 	}
-	.meta-value.mono { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; }
-	.meta-value.jurisdiction { color: #22c55e; }
-	.meta-value.status.current { color: #22c55e; }
-	.meta-value.status.pending { color: #eab308; }
+	.meta-value-amber { color: #c4752b; font-weight: 500; }
+	.meta-value-mono { font-family: 'Fira Code', monospace; }
+	.meta-value-green { color: #15803d; font-weight: 500; }
+	.meta-value-yellow { color: #ca8a04; font-weight: 500; }
+	.meta-value-muted { color: rgba(42, 37, 32, 0.5); font-weight: 500; }
+	.meta-value-dim { color: rgba(42, 37, 32, 0.6); }
 	.meta-divider {
 		width: 1px;
-		height: 24px;
-		background: rgba(255, 255, 255, 0.08);
+		height: 1.25rem;
+		background: rgba(42, 37, 32, 0.1);
+		flex-shrink: 0;
 	}
-	.meta-link {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.2rem;
-		font-size: 0.72rem;
-		color: #60a5fa;
-		text-decoration: none;
-	}
-	.meta-link:hover { text-decoration: underline; }
-	.meta-trust {
+	.meta-badge {
 		margin-left: auto;
 		display: flex;
 		align-items: center;
 		gap: 0.25rem;
-		font-size: 0.65rem;
-		color: #eab308;
-		background: rgba(234, 179, 8, 0.06);
-		border: 1px solid rgba(234, 179, 8, 0.12);
-		padding: 0.2rem 0.5rem;
+		font-size: 11px;
+		color: rgba(196, 117, 43, 0.8);
+		background: rgba(196, 117, 43, 0.08);
+		border: 1px solid rgba(196, 117, 43, 0.15);
 		border-radius: 0.25rem;
+		padding: 0.125rem 0.5rem;
 	}
 
-	/* Research Toolbar */
-	.research-toolbar {
-		display: flex;
-		gap: 0.35rem;
-		flex-wrap: wrap;
-		margin-bottom: 0.6rem;
-	}
-	.research-btn {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.3rem;
-		padding: 0.3rem 0.65rem;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 0.25rem;
-		color: rgba(255, 255, 255, 0.55);
-		font-size: 0.72rem;
-		cursor: pointer;
-		transition: all 0.15s;
-	}
-	.research-btn:hover {
-		background: rgba(255, 255, 255, 0.06);
-		color: rgba(255, 255, 255, 0.85);
-		border-color: rgba(255, 255, 255, 0.15);
-	}
-
-	/* Tab Bar */
+	/* ── Tab Bar ── */
 	.tab-bar {
 		display: flex;
-		gap: 0;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		border-bottom: 1px solid rgba(42, 37, 32, 0.1);
 		margin-bottom: 1rem;
 		overflow-x: auto;
+		scrollbar-width: none;
 	}
+	.tab-bar::-webkit-scrollbar { display: none; }
+	.subtab-bar { margin-bottom: 1rem; }
 	.tab-item {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.35rem;
-		padding: 0.55rem 0.85rem;
-		background: none;
-		border: none;
-		border-bottom: 2px solid transparent;
-		color: rgba(255, 255, 255, 0.5);
-		font-size: 0.78rem;
+		gap: 0.375rem;
+		padding: 0.625rem 0.875rem;
+		font-size: 0.8125rem;
 		font-weight: 500;
-		cursor: pointer;
 		white-space: nowrap;
-		transition: all 0.15s;
+		border: none;
+		background: none;
+		border-bottom: 2px solid transparent;
+		color: rgba(74, 66, 56, 0.5);
+		cursor: pointer;
+		transition: color 0.15s, border-color 0.15s;
 	}
-	.tab-item:hover { color: rgba(255, 255, 255, 0.8); }
-	.tab-item.active {
-		color: #60a5fa;
-		border-bottom-color: #60a5fa;
+	.tab-item:hover { color: rgba(42, 37, 32, 0.8); }
+	.tab-item-active {
+		border-bottom-color: #c4752b;
+		color: #c4752b;
 	}
 	.tab-count {
-		background: rgba(96, 165, 250, 0.15);
-		color: #60a5fa;
-		font-size: 0.6rem;
-		padding: 0.1rem 0.35rem;
-		border-radius: 0.2rem;
+		font-size: 10px;
+		padding: 0 0.375rem;
+		border-radius: 0.25rem;
+		background: rgba(196, 117, 43, 0.15);
+		color: #c4752b;
 		font-weight: 600;
 	}
 
-	/* 3-Column Layout */
-	.main-layout {
+	/* ── 3-Column Grid ── */
+	.corpus-grid {
 		display: grid;
-		grid-template-columns: 180px 1fr 280px;
+		grid-template-columns: 1fr;
 		gap: 1.25rem;
 		align-items: start;
 	}
-	@media (max-width: 1100px) {
-		.main-layout { grid-template-columns: 1fr 260px; }
-		.corpus-sidebar { display: none; }
-	}
-	@media (max-width: 768px) {
-		.main-layout { grid-template-columns: 1fr; }
-		.right-sidebar { display: none; }
+	@media (min-width: 1024px) {
+		.corpus-grid {
+			grid-template-columns: 240px 1fr 280px;
+		}
 	}
 
-	/* Left Sidebar */
-	.corpus-sidebar {
-		position: sticky;
-		top: 1rem;
-		max-height: calc(100vh - 2rem);
-		overflow-y: auto;
+	/* ── Left Sidebar ── */
+	.corpus-left {
+		display: none;
 	}
-	.sidebar-title {
-		font-size: 0.65rem;
-		font-weight: 700;
-		color: rgba(255, 255, 255, 0.3);
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
-		padding: 0.4rem 0.6rem;
+	@media (min-width: 1024px) {
+		.corpus-left {
+			display: block;
+			position: sticky;
+			top: 1rem;
+			max-height: calc(100vh - 2rem);
+			overflow-y: auto;
+			padding: 0.25rem 0.5rem 0.25rem 0;
+		}
 	}
-	.filter-chips {
-		display: flex;
-		flex-direction: column;
-		gap: 0.15rem;
-		padding: 0 0.3rem;
+
+	/* ── Center Content ── */
+	.corpus-center {
+		min-width: 0;
 	}
-	.filter-chip {
-		display: flex;
-		align-items: center;
-		gap: 0.4rem;
-		padding: 0.3rem 0.5rem;
-		background: none;
-		border: none;
-		border-radius: 0.25rem;
-		color: rgba(255, 255, 255, 0.45);
-		font-size: 0.7rem;
-		cursor: pointer;
-		text-align: left;
-		transition: all 0.12s;
+
+	/* ── Right Sidebar ── */
+	.corpus-right {
+		display: none;
 	}
-	.filter-chip:hover { background: rgba(255, 255, 255, 0.04); color: rgba(255, 255, 255, 0.7); }
-	.filter-chip.active {
-		background: rgba(96, 165, 250, 0.1);
-		color: #60a5fa;
+	@media (min-width: 1024px) {
+		.corpus-right {
+			display: flex;
+			flex-direction: column;
+			gap: 0.75rem;
+			position: sticky;
+			top: 1rem;
+			max-height: calc(100vh - 2rem);
+			overflow-y: auto;
+		}
 	}
-	.sidebar-item {
+
+	/* ── Section Headings ── */
+	.section-heading {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		width: 100%;
-		padding: 0.4rem 0.6rem;
-		background: none;
-		border: none;
-		border-left: 2px solid transparent;
-		color: rgba(255, 255, 255, 0.5);
-		font-size: 0.72rem;
-		cursor: pointer;
-		text-align: left;
-		transition: all 0.15s;
-	}
-	.sidebar-item:hover { color: rgba(255, 255, 255, 0.8); background: rgba(255, 255, 255, 0.03); }
-	.sidebar-item.active {
-		color: #60a5fa;
-		border-left-color: #60a5fa;
-		background: rgba(96, 165, 250, 0.06);
-	}
-	.sidebar-related {
-		display: flex;
-		flex-direction: column;
-		padding: 0.35rem 0.6rem;
-		text-decoration: none;
-		border-left: 2px solid transparent;
-		transition: all 0.12s;
-	}
-	.sidebar-related:hover { border-left-color: rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.02); }
-	.related-section {
-		font-size: 0.65rem;
-		color: #60a5fa;
-		font-family: 'JetBrains Mono', monospace;
-	}
-	.related-title {
-		font-size: 0.68rem;
-		color: rgba(255, 255, 255, 0.45);
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
-	/* Center Content */
-	.center-content { min-width: 0; }
-	.content-card {
-		padding: 1.25rem;
-		background: rgba(255, 255, 255, 0.025);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 0.5rem;
-		margin-bottom: 1rem;
-	}
-	.content-card h2 {
-		display: flex;
-		align-items: center;
-		gap: 0.4rem;
-		font-size: 0.95rem;
-		font-weight: 600;
-		margin: 0 0 0.75rem 0;
-		color: rgba(255, 255, 255, 0.85);
-	}
-	.subsection-title {
-		font-size: 0.85rem;
-		font-weight: 600;
-		color: rgba(255, 255, 255, 0.7);
-		margin: 1rem 0 0.5rem 0;
-	}
-
-	/* Summary + Source Drawer */
-	.summary-text {
 		font-size: 0.875rem;
-		line-height: 1.7;
-		color: rgba(255, 255, 255, 0.8);
-		white-space: pre-wrap;
+		font-weight: 600;
+		color: rgba(42, 37, 32, 0.85);
+		margin: 0 0 0.75rem 0;
 	}
-	.source-drawer-toggle {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.25rem;
-		margin-top: 0.6rem;
-		padding: 0.25rem 0.5rem;
-		background: rgba(96, 165, 250, 0.06);
-		border: 1px solid rgba(96, 165, 250, 0.15);
-		border-radius: 0.2rem;
-		color: #60a5fa;
-		font-size: 0.7rem;
-		cursor: pointer;
-		transition: all 0.12s;
-	}
-	.source-drawer-toggle:hover { background: rgba(96, 165, 250, 0.12); }
-	.source-drawer-toggle.small {
-		margin-top: 0.4rem;
-		padding: 0.15rem 0.35rem;
-		font-size: 0.62rem;
-	}
-	.source-drawer {
-		margin-top: 0.5rem;
-		padding: 0.75rem;
-		background: rgba(0, 0, 0, 0.2);
-		border: 1px solid rgba(96, 165, 250, 0.1);
-		border-radius: 0.375rem;
-	}
-	.source-drawer.compact {
-		padding: 0.4rem 0.6rem;
-		margin-top: 0.3rem;
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		flex-wrap: wrap;
-	}
-	.source-row {
-		display: flex;
-		gap: 0.5rem;
-		padding: 0.25rem 0;
-		font-size: 0.75rem;
-	}
-	.source-label {
-		color: rgba(255, 255, 255, 0.35);
-		min-width: 70px;
-		font-weight: 500;
-	}
-	.source-val {
-		color: rgba(255, 255, 255, 0.7);
-	}
-	.source-val.mono { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; }
-	.source-link {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.2rem;
-		color: #60a5fa;
-		text-decoration: none;
-		font-size: 0.72rem;
-	}
-	.source-link:hover { text-decoration: underline; }
-	.source-disclaimer {
-		margin-top: 0.5rem;
-		padding-top: 0.5rem;
-		border-top: 1px solid rgba(255, 255, 255, 0.05);
-		font-size: 0.68rem;
-		color: #eab308;
-		font-style: italic;
-	}
+	.content-section { margin-bottom: 1rem; }
 
-	.placeholder-text {
-		font-size: 0.825rem;
-		color: rgba(255, 255, 255, 0.35);
-		font-style: italic;
-	}
-	.placeholder-card {
+	/* ── Skeleton Loading ── */
+	.skeleton-group {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		gap: 0.75rem;
-		padding: 2rem;
-		text-align: center;
-		color: rgba(255, 255, 255, 0.35);
+		gap: 0.5rem;
 	}
-	.placeholder-card p { font-size: 0.85rem; max-width: 360px; }
-	.error-text {
-		display: flex;
-		align-items: center;
-		gap: 0.35rem;
-		color: #ef4444;
-		font-size: 0.85rem;
+	.skeleton-line {
+		height: 0.75rem;
+		background: rgba(42, 37, 32, 0.06);
+		border-radius: 0.25rem;
+		animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 	}
-	.inline-link {
-		background: none;
-		border: none;
-		color: #60a5fa;
-		cursor: pointer;
-		font-size: inherit;
-		text-decoration: underline;
-		padding: 0;
+	.w-60p { width: 60%; }
+	.w-50p { width: 50%; }
+	@keyframes pulse {
+		0%, 100% { opacity: 1; }
+		50% { opacity: 0.5; }
 	}
 
-	/* Key Provisions Grid */
+	/* ── Empty States ── */
+	.empty-state {
+		text-align: center;
+		padding: 2rem 0;
+		color: rgba(74, 66, 56, 0.4);
+	}
+	.empty-state p {
+		font-size: 0.875rem;
+		max-width: 20rem;
+		margin: 0.5rem auto 0;
+	}
+	.empty-hint {
+		font-size: 0.875rem;
+		color: rgba(74, 66, 56, 0.4);
+		font-style: italic;
+	}
+	.mb-hint { margin-bottom: 0.75rem; }
+	.mt-hint { margin-top: 0.75rem; }
+
+	/* ── Provisions Grid ── */
 	.provisions-grid {
 		display: grid;
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: 1fr;
 		gap: 0.75rem;
 	}
-	@media (max-width: 600px) {
-		.provisions-grid { grid-template-columns: 1fr; }
+	@media (min-width: 768px) {
+		.provisions-grid { grid-template-columns: 1fr 1fr; }
 	}
 	.provision-card {
 		padding: 1rem;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 0.375rem;
 		transition: border-color 0.15s;
 	}
-	.provision-card:hover { border-color: rgba(96, 165, 250, 0.3); }
+	.provision-card:hover { border-color: rgba(196, 117, 43, 0.3); }
 	.provision-icon {
-		width: 32px;
-		height: 32px;
+		width: 2rem;
+		height: 2rem;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: rgba(96, 165, 250, 0.1);
-		border-radius: 0.375rem;
-		color: #60a5fa;
+		background: rgba(196, 117, 43, 0.1);
+		border-radius: 0.5rem;
+		color: #c4752b;
 		margin-bottom: 0.5rem;
 	}
-	.provision-card h4 {
-		font-size: 0.85rem;
+	.provision-icon-muted {
+		background: rgba(42, 37, 32, 0.05);
+		color: rgba(74, 66, 56, 0.7);
+	}
+	.provision-title {
+		font-size: 0.875rem;
 		font-weight: 600;
-		margin: 0 0 0.35rem 0;
-		color: rgba(255, 255, 255, 0.9);
+		color: rgba(42, 37, 32, 0.9);
+		margin: 0 0 0.25rem 0;
 	}
-	.provision-card p {
-		font-size: 0.78rem;
-		color: rgba(255, 255, 255, 0.55);
-		line-height: 1.5;
-		margin: 0;
-	}
-	.see-more {
-		font-size: 0.78rem;
-		color: rgba(255, 255, 255, 0.4);
-		margin-top: 0.5rem;
-		font-style: italic;
-	}
-
-	/* Implications Grid */
-	.implications-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-		gap: 0.75rem;
-	}
-	.implication-card {
-		padding: 1rem;
-		border-radius: 0.375rem;
-		border: 1px solid;
-		position: relative;
-	}
-	.implication-card h4 {
-		font-size: 0.85rem;
-		font-weight: 600;
-		margin: 0 0 0.35rem 0;
-	}
-	.implication-card p {
-		font-size: 0.78rem;
-		line-height: 1.5;
-		margin: 0;
-		opacity: 0.75;
-	}
-	.severity-tag {
-		position: absolute;
-		top: 0.5rem;
-		right: 0.5rem;
-		font-size: 0.6rem;
-		text-transform: uppercase;
-		font-weight: 700;
-		letter-spacing: 0.05em;
-		opacity: 0.6;
-	}
-	.severity-high {
-		background: rgba(239, 68, 68, 0.08);
-		border-color: rgba(239, 68, 68, 0.2);
-		color: #fca5a5;
-	}
-	.severity-high h4 { color: #fca5a5; }
-	.severity-medium {
-		background: rgba(234, 179, 8, 0.08);
-		border-color: rgba(234, 179, 8, 0.2);
-		color: #fde68a;
-	}
-	.severity-medium h4 { color: #fde68a; }
-	.severity-low {
-		background: rgba(34, 197, 94, 0.08);
-		border-color: rgba(34, 197, 94, 0.2);
-		color: #86efac;
-	}
-	.severity-low h4 { color: #86efac; }
-
-	/* Official Text */
-	.full-text {
-		font-size: 0.85rem;
-		line-height: 1.7;
-		color: rgba(255, 255, 255, 0.7);
-		white-space: pre-wrap;
-		max-height: 70vh;
-		overflow-y: auto;
-		padding: 1rem;
-		background: rgba(0, 0, 0, 0.2);
-		border-radius: 0.375rem;
-	}
-	.chunk-block {
-		display: flex;
-		gap: 0.75rem;
-		padding: 0.75rem 0;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-	}
-	.chunk-index {
-		flex-shrink: 0;
-		color: #60a5fa;
-		font-family: 'JetBrains Mono', monospace;
-		font-weight: 600;
-		font-size: 0.8rem;
-	}
-	.chunk-block p {
-		font-size: 0.85rem;
-		color: rgba(255, 255, 255, 0.7);
+	.provision-desc {
+		font-size: 0.75rem;
+		color: rgba(74, 66, 56, 0.65);
 		line-height: 1.6;
 		margin: 0;
 	}
-
-	/* Case Links */
-	.case-link-row {
-		padding: 0.75rem 0;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+	.more-link {
+		font-size: 0.75rem;
+		color: rgba(74, 66, 56, 0.4);
+		font-style: italic;
+		margin-top: 0.5rem;
 	}
-	.case-link-header {
+	.text-link {
+		color: #c4752b;
+		text-decoration: underline;
+		background: none;
+		border: none;
+		cursor: pointer;
+		font-size: inherit;
+	}
+
+	/* ── Implications Grid ── */
+	.implications-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 0.75rem;
+	}
+	@media (min-width: 640px) {
+		.implications-grid { grid-template-columns: 1fr 1fr; }
+	}
+	@media (min-width: 1024px) {
+		.implications-grid { grid-template-columns: 1fr 1fr 1fr; }
+	}
+	.implication-card {
+		padding: 1rem;
+		border-radius: 0.5rem;
+		border: 1px solid;
+	}
+	.imp-high { background: #fef2f2; border-color: #fecaca; color: #7f1d1d; }
+	.imp-medium { background: #fefce8; border-color: #fde68a; color: #78350f; }
+	.imp-low { background: #f0fdf4; border-color: #bbf7d0; color: #14532d; }
+	.imp-title { font-size: 0.875rem; font-weight: 600; margin: 0 0 0.25rem 0; }
+	.imp-desc { font-size: 0.75rem; line-height: 1.6; margin: 0; opacity: 0.75; }
+	.imp-severity { margin-top: 0.5rem; display: inline-block; }
+
+	/* ── Official Text ── */
+	.official-text-reader {
+		max-height: 70vh;
+		overflow-y: auto;
+		white-space: pre-wrap;
+		font-size: 15px;
+	}
+	.chunk-row {
+		display: flex;
+		gap: 0.75rem;
+		padding: 0.75rem 0;
+		border-bottom: 1px solid rgba(42, 37, 32, 0.05);
+	}
+	.chunk-idx {
+		flex-shrink: 0;
+		color: #c4752b;
+		font-family: monospace;
+		font-weight: 600;
+		font-size: 0.875rem;
+	}
+	.chunk-text {
+		font-size: 0.875rem;
+		color: rgba(42, 37, 32, 0.7);
+		line-height: 1.6;
+		font-family: 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+		margin: 0;
+	}
+
+	/* ── Cases ── */
+	.case-row {
+		padding: 0.75rem 0;
+		border-bottom: 1px solid rgba(42, 37, 32, 0.05);
+	}
+	.case-row-btn {
+		display: block;
+		width: 100%;
+		text-align: left;
+		background: none;
+		border-left: none;
+		border-right: none;
+		border-top: none;
+		cursor: pointer;
+		border-radius: 0.25rem;
+		transition: background 0.15s;
+		padding: 0.75rem 0.5rem;
+		margin: 0 -0.5rem;
+	}
+	.case-row-btn:hover { background: rgba(196, 117, 43, 0.06); }
+	.case-row-header {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
 		flex-wrap: wrap;
 	}
-	.case-link-id {
-		display: inline-flex;
+	.case-link {
+		display: flex;
 		align-items: center;
-		gap: 0.3rem;
-		color: #60a5fa;
-		text-decoration: none;
-		font-size: 0.82rem;
+		gap: 0.375rem;
+		font-size: 0.875rem;
 		font-weight: 500;
+		color: #c4752b;
+		text-decoration: none;
 	}
-	.case-link-id:hover { text-decoration: underline; }
-	.link-type-badge {
-		display: inline-block;
-		padding: 0.1rem 0.4rem;
-		background: rgba(168, 85, 247, 0.12);
-		color: #a855f7;
-		border-radius: 0.2rem;
-		font-size: 0.62rem;
-		text-transform: uppercase;
+	.case-link:hover { text-decoration: underline; }
+	.pill-purple {
+		background: #f3e8ff;
+		color: #6b21a8;
+		border-color: #e9d5ff;
+	}
+	.pill-green {
+		background: #dcfce7;
+		color: #15803d;
+		border-color: #bbf7d0;
+	}
+	.pill-amber {
+		background: rgba(196, 117, 43, 0.1);
+		color: #c4752b;
+		border-color: rgba(196, 117, 43, 0.2);
+	}
+	.case-notes {
+		font-size: 0.75rem;
+		color: rgba(74, 66, 56, 0.5);
+		margin: 0.25rem 0 0;
+	}
+	.case-date {
+		font-size: 10px;
+		color: rgba(74, 66, 56, 0.3);
+		font-family: monospace;
+	}
+	.precedent-title {
+		font-size: 0.875rem;
 		font-weight: 600;
-	}
-	.case-status-badge {
-		padding: 0.1rem 0.35rem;
-		background: rgba(34, 197, 94, 0.1);
-		color: #22c55e;
-		border-radius: 0.2rem;
-		font-size: 0.6rem;
-		text-transform: uppercase;
-		font-weight: 600;
-	}
-	.link-notes {
-		font-size: 0.78rem;
-		color: rgba(255, 255, 255, 0.45);
-		margin: 0.25rem 0 0 0;
-	}
-	.link-date {
-		font-size: 0.65rem;
-		color: rgba(255, 255, 255, 0.3);
-	}
-
-	/* Precedent rows (center content) */
-	.precedent-row {
-		padding: 0.75rem 0;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-	}
-	.precedent-row h4 {
-		font-size: 0.88rem;
-		font-weight: 600;
-		margin: 0 0 0.25rem 0;
+		color: rgba(42, 37, 32, 0.85);
+		margin: 0;
 	}
 	.precedent-meta {
 		display: flex;
 		gap: 0.75rem;
-		font-size: 0.72rem;
-		color: rgba(255, 255, 255, 0.4);
-		margin-bottom: 0.35rem;
+		font-size: 0.75rem;
+		color: rgba(74, 66, 56, 0.4);
+		margin: 0.125rem 0 0.25rem;
 	}
-	.precedent-court { color: rgba(255, 255, 255, 0.55); }
-	.precedent-cite {
-		font-family: 'JetBrains Mono', monospace;
-		color: #60a5fa;
-		font-size: 0.7rem;
-	}
+	.meta-court { color: rgba(74, 66, 56, 0.55); }
+	.meta-citation { font-family: monospace; color: #c4752b; }
 	.precedent-summary {
-		font-size: 0.8rem;
-		color: rgba(255, 255, 255, 0.6);
-		line-height: 1.5;
+		font-size: 0.75rem;
+		color: rgba(42, 37, 32, 0.6);
+		line-height: 1.6;
 		margin: 0;
 	}
 
-	/* Regulations placeholder */
-	.regulation-placeholder {
+	/* ── Info Boxes ── */
+	.info-stack {
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
-		margin-top: 0.75rem;
 	}
-	.regulation-tip {
+	.info-box {
 		display: flex;
 		gap: 0.5rem;
-		padding: 0.65rem;
-		background: rgba(96, 165, 250, 0.04);
-		border: 1px solid rgba(96, 165, 250, 0.1);
-		border-radius: 0.375rem;
-		font-size: 0.78rem;
-		color: rgba(255, 255, 255, 0.6);
+		padding: 0.75rem;
+		background: rgba(42, 37, 32, 0.03);
+		border: 1px solid rgba(42, 37, 32, 0.08);
+		border-radius: 0.5rem;
+		font-size: 0.75rem;
+		color: rgba(42, 37, 32, 0.6);
 	}
-	.regulation-tip strong { color: rgba(255, 255, 255, 0.8); }
+	.info-box-amber {
+		background: rgba(196, 117, 43, 0.05);
+		border-color: rgba(196, 117, 43, 0.12);
+		margin-top: 0.5rem;
+	}
+	.info-icon {
+		flex-shrink: 0;
+		color: #c4752b;
+		margin-top: 0.125rem;
+	}
+	.info-strong { color: rgba(42, 37, 32, 0.8); }
 
-	/* Glossary Tab */
-	.glossary-search-bar {
+	/* ── Glossary ── */
+	.selected-term-pills {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		padding: 0.4rem 0.6rem;
-		background: rgba(0, 0, 0, 0.15);
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 0.375rem;
+		margin-bottom: 1rem;
+		flex-wrap: wrap;
 	}
-	.glossary-search-bar input {
-		flex: 1;
+	.term-pill-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.375rem 0.75rem;
+		background: white;
+		border-radius: 9999px;
+		border: 1px solid rgba(42, 37, 32, 0.15);
+		font-size: 0.75rem;
+		color: rgba(42, 37, 32, 0.7);
+		cursor: pointer;
+		transition: border-color 0.15s;
+	}
+	.term-pill-btn:hover { border-color: rgba(196, 117, 43, 0.3); }
+	.pill-x { color: rgba(42, 37, 32, 0.3); }
+	.pill-action {
+		color: rgba(42, 37, 32, 0.2);
 		background: none;
 		border: none;
-		outline: none;
-		color: rgba(255, 255, 255, 0.85);
-		font-size: 0.82rem;
-	}
-	.glossary-search-bar input::placeholder { color: rgba(255, 255, 255, 0.3); }
-	.search-go {
-		padding: 0.25rem 0.5rem;
-		background: rgba(96, 165, 250, 0.15);
-		border: 1px solid rgba(96, 165, 250, 0.3);
-		border-radius: 0.2rem;
-		color: #60a5fa;
-		font-size: 0.72rem;
 		cursor: pointer;
+		transition: color 0.15s;
 	}
-	.search-go:hover { background: rgba(96, 165, 250, 0.25); }
-	.search-go:disabled { opacity: 0.5; }
-	.glossary-results { margin-top: 1rem; }
-	.glossary-results h3 {
-		font-size: 0.8rem;
+	.pill-action:hover { color: rgba(42, 37, 32, 0.5); }
+	.term-detail-header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		margin-bottom: 0.75rem;
+	}
+	.term-detail-title {
+		font-size: 1.125rem;
 		font-weight: 600;
-		color: rgba(255, 255, 255, 0.6);
-		margin: 0 0 0.5rem 0;
+		color: #2a2520;
+		margin: 0.125rem 0 0;
 	}
-	.glossary-card {
-		padding: 0.75rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+	.term-detail-date {
+		font-size: 0.75rem;
+		color: rgba(42, 37, 32, 0.3);
+		font-family: monospace;
 	}
-	.glossary-term-header {
+	.term-pills-row {
+		display: flex;
+		gap: 0.5rem;
+		margin-bottom: 0.75rem;
+		flex-wrap: wrap;
+	}
+	.term-source-row {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		font-size: 0.75rem;
+		color: rgba(42, 37, 32, 0.4);
+		margin-bottom: 1rem;
+	}
+	.source-badge {
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+	}
+	.term-reader { font-size: 15px; }
+	.related-terms-section {
+		margin-top: 1rem;
+		padding-top: 0.75rem;
+		border-top: 1px solid rgba(42, 37, 32, 0.08);
+	}
+	.related-terms-list {
+		display: flex;
+		gap: 0.375rem;
+		margin-top: 0.375rem;
+		flex-wrap: wrap;
+	}
+	.glossary-search {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		margin-bottom: 0.25rem;
+		margin-bottom: 1rem;
+		padding: 0;
+		padding-left: 0.75rem;
 	}
-	.glossary-term-header strong {
-		color: #60a5fa;
-		font-size: 0.88rem;
+	.search-icon-sm { color: rgba(74, 66, 56, 0.4); }
+	.glossary-search-input {
+		flex: 1;
+		background: transparent;
+		border: none;
+		outline: none;
+		padding: 0.5rem 0;
+		font-size: 0.875rem;
+		color: rgba(42, 37, 32, 0.8);
 	}
-	.glossary-cat {
-		padding: 0.1rem 0.35rem;
-		background: rgba(168, 85, 247, 0.1);
-		color: #a855f7;
-		border-radius: 0.2rem;
-		font-size: 0.6rem;
-		text-transform: uppercase;
-		font-weight: 600;
+	.glossary-search-input::placeholder { color: rgba(42, 37, 32, 0.3); }
+	.glossary-search-btn {
+		padding: 0.375rem 0.75rem;
+		font-size: 0.75rem;
+		font-family: monospace;
+		color: #c4752b;
+		background: rgba(196, 117, 43, 0.1);
+		border: none;
+		border-left: 1px solid rgba(42, 37, 32, 0.1);
+		cursor: pointer;
+		transition: background 0.15s;
 	}
-	.glossary-card p {
-		font-size: 0.8rem;
-		color: rgba(255, 255, 255, 0.65);
-		line-height: 1.5;
-		margin: 0;
-	}
-	.related-terms {
+	.glossary-search-btn:hover { background: rgba(196, 117, 43, 0.2); }
+	.list-heading { margin-bottom: 0.5rem; }
+	.term-list {
 		display: flex;
-		align-items: center;
-		gap: 0.35rem;
-		flex-wrap: wrap;
-		margin-top: 0.4rem;
-		color: rgba(255, 255, 255, 0.4);
-		font-size: 0.7rem;
-	}
-	.related-pill {
-		padding: 0.1rem 0.35rem;
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 0.2rem;
-		font-size: 0.65rem;
-		color: rgba(255, 255, 255, 0.55);
+		flex-direction: column;
+		gap: 0.25rem;
 	}
 
-	/* Timeline */
+	/* ── Timeline ── */
 	.timeline { padding-left: 1rem; }
 	.timeline-item {
 		display: flex;
@@ -1556,264 +1641,288 @@
 		padding-bottom: 1.25rem;
 		position: relative;
 	}
-	.timeline-item:not(:last-child)::before {
-		content: '';
+	.timeline-item-last { padding-bottom: 1.25rem; }
+	.timeline-line {
 		position: absolute;
 		left: 4px;
 		top: 14px;
 		bottom: 0;
 		width: 1px;
-		background: rgba(255, 255, 255, 0.1);
+		background: rgba(42, 37, 32, 0.1);
 	}
 	.timeline-dot {
-		width: 9px;
-		height: 9px;
-		border-radius: 50%;
-		background: rgba(255, 255, 255, 0.3);
+		width: 0.625rem;
+		height: 0.625rem;
+		border-radius: 9999px;
 		flex-shrink: 0;
-		margin-top: 4px;
+		margin-top: 0.25rem;
 	}
-	.timeline-dot.effective { background: #22c55e; }
+	.timeline-dot-green { background: #22c55e; }
+	.timeline-dot-gray { background: rgba(42, 37, 32, 0.25); }
 	.timeline-date {
 		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.4);
-		font-family: 'JetBrains Mono', monospace;
+		color: rgba(74, 66, 56, 0.4);
+		font-family: monospace;
 	}
-	.timeline-content p {
-		font-size: 0.82rem;
-		color: rgba(255, 255, 255, 0.7);
-		margin: 0.15rem 0 0 0;
+	.timeline-desc {
+		font-size: 0.875rem;
+		color: rgba(42, 37, 32, 0.7);
+		margin: 0.125rem 0 0;
 	}
-	.timeline-badge {
-		display: inline-block;
-		margin-top: 0.25rem;
-		padding: 0.1rem 0.4rem;
-		border-radius: 0.2rem;
-		font-size: 0.6rem;
-		font-weight: 600;
-		text-transform: uppercase;
-	}
-	.timeline-badge.current { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
-	.history-notice {
-		display: flex;
-		gap: 0.5rem;
-		margin-top: 1rem;
-		padding: 0.65rem;
-		background: rgba(234, 179, 8, 0.04);
-		border: 1px solid rgba(234, 179, 8, 0.1);
-		border-radius: 0.375rem;
-		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.5);
-	}
-	.history-notice p { margin: 0; }
 
-	/* Citations Tab */
-	.citation-box {
+	/* ── Citations ── */
+	.cite-box {
+		background: rgba(42, 37, 32, 0.03);
+		border: 1px solid rgba(42, 37, 32, 0.1);
+		border-radius: 0.5rem;
 		padding: 0.75rem;
-		background: rgba(0, 0, 0, 0.15);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 0.375rem;
-		margin-bottom: 0.75rem;
+		margin-bottom: 1rem;
 	}
-	.citation-label {
-		font-size: 0.65rem;
-		color: rgba(255, 255, 255, 0.35);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		margin-bottom: 0.3rem;
+	.cite-label {
+		margin-bottom: 0.25rem;
+		display: block;
 	}
-	.citation-formatted {
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.82rem;
-		color: rgba(255, 255, 255, 0.85);
+	.cite-text {
+		font-size: 0.875rem;
+		font-family: monospace;
+		color: rgba(42, 37, 32, 0.85);
 	}
-	.citation-list { list-style: none; padding: 0; }
-	.citation-item {
+	.source-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+	.source-item {
 		display: flex;
 		align-items: flex-start;
 		gap: 0.5rem;
-		padding: 0.6rem 0;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		padding: 0.5rem 0;
+		border-bottom: 1px solid rgba(42, 37, 32, 0.05);
 	}
-	.citation-num {
+	.source-num {
 		flex-shrink: 0;
-		width: 20px;
-		height: 20px;
+		width: 1.25rem;
+		height: 1.25rem;
+		border-radius: 9999px;
+		background: rgba(196, 117, 43, 0.15);
+		color: #c4752b;
+		font-size: 10px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: rgba(96, 165, 250, 0.1);
-		color: #60a5fa;
-		border-radius: 50%;
-		font-size: 0.65rem;
-		font-weight: 600;
-	}
-	.citation-body {
-		font-size: 0.82rem;
-		color: rgba(255, 255, 255, 0.7);
-	}
-
-	/* Right Sidebar */
-	.right-sidebar {
-		position: sticky;
-		top: 1rem;
-		max-height: calc(100vh - 2rem);
-		overflow-y: auto;
-	}
-	.sidebar-card {
-		padding: 0.85rem;
-		background: rgba(255, 255, 255, 0.025);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 0.5rem;
-		margin-bottom: 0.6rem;
-	}
-	.sidebar-card h3 {
-		display: flex;
-		align-items: center;
-		gap: 0.35rem;
-		font-size: 0.78rem;
-		font-weight: 600;
-		margin: 0 0 0.5rem 0;
-		color: rgba(255, 255, 255, 0.65);
-	}
-	.sidebar-placeholder {
-		font-size: 0.72rem;
-		color: rgba(255, 255, 255, 0.3);
-		font-style: italic;
-	}
-
-	/* Cited Sources */
-	.cited-source {
-		padding: 0.35rem 0;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		font-weight: 700;
 	}
 	.source-text {
-		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.6);
+		font-size: 0.875rem;
+		color: rgba(42, 37, 32, 0.7);
 	}
 
-	/* Precedents (sidebar) */
-	.precedent-item {
-		padding: 0.45rem 0;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-	}
-	.precedent-item:last-child { border-bottom: none; }
-	.precedent-item h4 {
-		font-size: 0.76rem;
-		font-weight: 600;
-		margin: 0 0 0.15rem 0;
-		color: rgba(255, 255, 255, 0.8);
-	}
-	.precedent-meta-mini {
-		display: flex;
-		gap: 0.5rem;
-		font-size: 0.65rem;
-		color: rgba(255, 255, 255, 0.3);
-	}
-	.precedent-citation {
-		font-size: 0.67rem;
-		color: #60a5fa;
-		font-family: 'JetBrains Mono', monospace;
-	}
-
-	/* Glossary sidebar */
-	.glossary-mini {
-		padding: 0.35rem 0;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-	}
-	.glossary-mini strong {
-		font-size: 0.75rem;
-		color: #60a5fa;
-	}
-	.glossary-mini p {
-		font-size: 0.68rem;
-		color: rgba(255, 255, 255, 0.45);
-		margin: 0.1rem 0 0 0;
-	}
-
-	/* Related statutes links */
-	.related-statute-link {
+	/* ── Right Sidebar Cards ── */
+	.sidebar-card { padding: 1rem; }
+	.sidebar-card-header {
 		display: flex;
 		align-items: center;
-		gap: 0.35rem;
-		padding: 0.3rem 0;
-		text-decoration: none;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-		font-size: 0.72rem;
-		transition: all 0.12s;
+		justify-content: space-between;
+		margin-bottom: 0.75rem;
 	}
-	.related-statute-link:hover { background: rgba(255, 255, 255, 0.02); }
-	.related-statute-link span:first-child {
-		color: #60a5fa;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.68rem;
+	.sidebar-card-title {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: rgba(42, 37, 32, 0.75);
+		margin: 0;
+	}
+	.sidebar-card-title-mb { margin-bottom: 0.5rem; }
+	.sidebar-more-btn {
+		color: rgba(42, 37, 32, 0.25);
+		background: none;
+		border: none;
+		cursor: pointer;
+		transition: color 0.15s;
+	}
+	.sidebar-more-btn:hover { color: rgba(42, 37, 32, 0.5); }
+	.sidebar-card-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.625rem;
+	}
+	.sidebar-case-card {
+		padding: 0.75rem;
+		background: #faf7f0;
+		border-radius: 0.5rem;
+		border: 1px solid rgba(42, 37, 32, 0.08);
+		transition: border-color 0.15s;
+	}
+	.sidebar-case-card:hover { border-color: rgba(196, 117, 43, 0.25); }
+	.sidebar-case-btn {
+		display: block;
+		width: 100%;
+		text-align: left;
+		cursor: pointer;
+	}
+	.sidebar-case-link {
+		display: block;
+		text-decoration: none;
+	}
+	.sidebar-case-title {
+		font-size: 13px;
+		font-weight: 600;
+		color: rgba(42, 37, 32, 0.85);
+		line-height: 1.4;
+		margin: 0 0 0.375rem 0;
+	}
+	.sidebar-case-meta {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		font-size: 11px;
+		color: rgba(42, 37, 32, 0.4);
+		margin-bottom: 0.25rem;
+	}
+	.sidebar-case-pills {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+	.sidebar-citation {
+		font-size: 10px;
+		font-family: monospace;
+		color: rgba(196, 117, 43, 0.7);
+	}
+	.sidebar-see-all {
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+		width: 100%;
+		justify-content: center;
+		margin-top: 0.75rem;
+		font-size: 0.75rem;
+		color: #c4752b;
+		font-weight: 500;
+		background: none;
+		border: none;
+		cursor: pointer;
+		transition: color 0.15s;
+	}
+	.sidebar-see-all:hover { color: #d4934b; }
+	.sidebar-empty {
+		font-size: 0.75rem;
+		color: rgba(74, 66, 56, 0.3);
+		font-style: italic;
+		margin: 0;
+	}
+
+	/* ── Sidebar Stats ── */
+	.sidebar-stats {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+	.sidebar-stat-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.375rem 0.5rem;
+		font-size: 0.75rem;
+		color: rgba(42, 37, 32, 0.55);
+		border-radius: 0.25rem;
+		transition: background 0.15s;
+	}
+	.sidebar-stat-row:hover { background: rgba(42, 37, 32, 0.03); }
+	.stat-label-row {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+	}
+	.stat-value-row {
+		font-size: 10px;
+		font-family: monospace;
+		color: rgba(42, 37, 32, 0.3);
+	}
+
+	/* ── Sidebar Sources ── */
+	.sidebar-source-row {
+		padding: 0.375rem 0;
+		border-bottom: 1px solid rgba(42, 37, 32, 0.05);
+	}
+	.sidebar-source-row:last-child { border-bottom: none; }
+	.sidebar-source-text {
+		font-size: 11px;
+		color: rgba(42, 37, 32, 0.55);
+		line-height: 1.6;
+	}
+
+	/* ── Sidebar Glossary ── */
+	.sidebar-glossary-item {
+		display: block;
+		width: 100%;
+		text-align: left;
+		padding: 0.375rem 0.25rem;
+		border-bottom: 1px solid rgba(42, 37, 32, 0.05);
+		background: none;
+		border-left: none;
+		border-right: none;
+		border-top: none;
+		cursor: pointer;
+		border-radius: 0.25rem;
+		margin: 0 -0.25rem;
+		transition: background 0.15s;
+	}
+	.sidebar-glossary-item:last-child { border-bottom: none; }
+	.sidebar-glossary-item:hover { background: rgba(42, 37, 32, 0.03); }
+	.sidebar-glossary-term {
+		font-size: 0.75rem;
+		color: #c4752b;
+	}
+	.sidebar-glossary-def {
+		font-size: 10px;
+		color: rgba(74, 66, 56, 0.45);
+		margin: 0.125rem 0 0;
+		line-height: 1.6;
+	}
+	.sidebar-search-btn {
+		width: 100%;
+		justify-content: center;
+	}
+
+	/* ── Sidebar Related Statutes ── */
+	.sidebar-related-link {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.375rem 0.25rem;
+		border-bottom: 1px solid rgba(42, 37, 32, 0.03);
+		text-decoration: none;
+		border-radius: 0.25rem;
+		margin: 0 -0.25rem;
+		transition: background 0.15s;
+	}
+	.sidebar-related-link:last-child { border-bottom: none; }
+	.sidebar-related-link:hover { background: rgba(42, 37, 32, 0.03); }
+	.sidebar-related-section {
+		font-size: 10px;
+		font-family: monospace;
+		color: #c4752b;
 		flex-shrink: 0;
 	}
-	.related-title-text {
-		color: rgba(255, 255, 255, 0.5);
+	.sidebar-related-title {
+		font-size: 11px;
+		color: rgba(74, 66, 56, 0.5);
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
 
-	/* Buttons */
-	.action-btn {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.35rem;
-		padding: 0.4rem 0.85rem;
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 0.375rem;
-		color: #e0e0e0;
-		font-size: 0.8rem;
-		cursor: pointer;
-		text-decoration: none;
-		transition: all 0.15s;
-	}
-	.action-btn:hover { background: rgba(255, 255, 255, 0.1); }
-	.action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-	.action-btn.primary {
-		background: rgba(96, 165, 250, 0.15);
-		border-color: rgba(96, 165, 250, 0.4);
-		color: #60a5fa;
-	}
-	.action-btn.primary:hover { background: rgba(96, 165, 250, 0.25); }
-
-	.sidebar-action {
+	/* ── Error inline ── */
+	.error-inline {
 		display: flex;
 		align-items: center;
-		justify-content: center;
-		gap: 0.35rem;
-		width: 100%;
-		padding: 0.35rem 0.5rem;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 0.25rem;
-		color: rgba(255, 255, 255, 0.55);
-		font-size: 0.7rem;
-		cursor: pointer;
-		transition: all 0.15s;
-		margin-top: 0.35rem;
-	}
-	.sidebar-action:hover { background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.8); }
-	.sidebar-action:disabled { opacity: 0.5; cursor: not-allowed; }
-
-	/* Skeleton */
-	.loading-placeholder {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
-	.skeleton-line {
-		height: 0.75rem;
-		background: rgba(255, 255, 255, 0.06);
-		border-radius: 0.25rem;
-		animation: pulse 1.5s infinite;
-	}
-	.skeleton-line.short { width: 60%; }
-	@keyframes pulse {
-		0%, 100% { opacity: 1; }
-		50% { opacity: 0.3; }
+		gap: 0.375rem;
+		font-size: 0.875rem;
+		color: #ef4444;
+		margin: 0;
 	}
 </style>

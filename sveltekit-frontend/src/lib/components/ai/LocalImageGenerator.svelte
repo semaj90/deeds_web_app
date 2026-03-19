@@ -43,7 +43,7 @@
 	const legalTemplates = [
 		{ name: 'Crime Scene Recreation', icon: 'search', prompt: 'detailed crime scene recreation, professional forensic photography, evidence markers, accurate lighting, overhead view' },
 		{ name: 'Traffic Accident Diagram', icon: 'map', prompt: 'traffic accident scene diagram, aerial view, road markings, vehicle positions, impact points, technical illustration' },
-		{ name: 'Property Damage', icon: 'home', prompt: 'property damage documentation, insurance photo style, clear structural details, professional lighting, measurement references' },
+		{ name: 'Property Damage', icon: 'house', prompt: 'property damage documentation, insurance photo style, clear structural details, professional lighting, measurement references' },
 		{ name: 'Evidence Visualization', icon: 'eye', prompt: 'forensic evidence visualization, scientific illustration, laboratory setting, detailed analysis, annotated' },
 		{ name: 'Legal Flowchart', icon: 'git-branch', prompt: 'legal process flowchart, clean professional diagram, clear annotations, decision tree, formal presentation' },
 		{ name: 'Suspect Composite', icon: 'user', prompt: 'police sketch style, facial composite, professional law enforcement illustration, neutral background' },
@@ -229,7 +229,7 @@
 	<div class="flex items-center gap-3">
 		<Button onclick={generateImage} disabled={isGenerating || !prompt.trim()} class="bits-btn flex-1">
 			{#if isGenerating}
-				<Icon name="loader-2" size={16} />
+				<Icon name="loader-circle" size={16} />
 				{currentStep} ({progress}%)
 			{:else}
 				<Icon name="sparkles" size={16} />

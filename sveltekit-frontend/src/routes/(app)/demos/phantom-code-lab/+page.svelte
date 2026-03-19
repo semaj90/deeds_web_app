@@ -115,7 +115,7 @@
 			{#each wiredSystems as sys}
 				<div class="p-4 border border-green-500/30 rounded-lg bg-panel-soft">
 					<div class="flex items-center gap-2 mb-2">
-						<Icon name="check-circle" size={16} />
+						<Icon name="circle-check" size={16} />
 						<span class="text-sm font-semibold">{sys.name}</span>
 						<span class="text-[11px] px-2 py-0.5 rounded bg-green-500/20 text-green-400 ml-auto">{sys.status}</span>
 					</div>
@@ -151,7 +151,7 @@
 
 	<section class="p-4 border border-amber-500/30 rounded-lg bg-amber-500/5">
 		<h3 class="flex items-center gap-2 text-sm font-semibold m-0 mb-2">
-			<Icon name="alert-triangle" size={16} />
+			<Icon name="triangle-alert" size={16} />
 			5-Point Wiring Audit (MANDATORY before archiving files)
 		</h3>
 		<ol class="text-xs opacity-70 m-0 pl-4 space-y-1">

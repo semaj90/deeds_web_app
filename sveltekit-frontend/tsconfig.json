@@ -304,7 +304,6 @@
     "src/routes/(app)/admin/phase89/**",
     "src/routes/knowledge/**",
     "src/routes/indexing/**",
-    "src/routes/(dev)/**",
-    "src/routes/(app)/persons-of-interest/+page.svelte"
+    "src/routes/(dev)/**"
   ]
 }

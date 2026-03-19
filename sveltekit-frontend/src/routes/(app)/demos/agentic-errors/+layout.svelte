@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	const { children } = $props();
 </script>
@@ -16,7 +16,7 @@
 						<a
 							href="/agentic-errors"
 							class="px-3 py-1.5 rounded-lg text-sm font-semibold uppercase tracking-wide transition-all {
-								$page.url.pathname === '/agentic-errors'
+								page.url.pathname === '/agentic-errors'
 									? 'bg-accent text-white shadow-md'
 									: 'text-black/70 hover:text-black hover:bg-black/10'
 							}"
@@ -26,7 +26,7 @@
 						<a
 							href="/agentic-errors/analysis"
 							class="px-3 py-1.5 rounded-lg text-sm font-semibold uppercase tracking-wide transition-all {
-								$page.url.pathname === '/agentic-errors/analysis'
+								page.url.pathname === '/agentic-errors/analysis'
 									? 'bg-accent text-white shadow-md'
 									: 'text-black/70 hover:text-black hover:bg-black/10'
 							}"
@@ -36,7 +36,7 @@
 						<a
 							href="/agentic-errors/rag-kag"
 							class="px-3 py-1.5 rounded-lg text-sm font-semibold uppercase tracking-wide transition-all {
-								$page.url.pathname === '/agentic-errors/rag-kag'
+								page.url.pathname === '/agentic-errors/rag-kag'
 									? 'bg-accent text-white shadow-md'
 									: 'text-black/70 hover:text-black hover:bg-black/10'
 							}"
@@ -46,7 +46,7 @@
 						<a
 							href="/agentic-errors/fastmcp"
 							class="px-3 py-1.5 rounded-lg text-sm font-semibold uppercase tracking-wide transition-all {
-								$page.url.pathname === '/agentic-errors/fastmcp'
+								page.url.pathname === '/agentic-errors/fastmcp'
 									? 'bg-accent text-white shadow-md'
 									: 'text-black/70 hover:text-black hover:bg-black/10'
 							}"

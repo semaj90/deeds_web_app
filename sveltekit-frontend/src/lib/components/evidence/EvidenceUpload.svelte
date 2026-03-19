@@ -397,7 +397,7 @@
               {#if completedUploads.length > 0}
                 <div class="mb-4">
                   <div class="flex items-center gap-2 mb-2">
-                    <Icon name="check-circle" class="w-4 h-4 text-accent" />
+                    <Icon name="circle-check" class="w-4 h-4 text-accent" />
                     <span class="text-sm font-medium text-accent">
                       Successfully uploaded ({completedUploads.length})
                     </span>
@@ -405,7 +405,7 @@
                   <div class="space-y-1">
                     {#each completedUploads as upload}
                       <div class="flex items-center gap-2 text-sm text-accent">
-                        <Icon name="check-circle" class="w-3 h-3" />
+                        <Icon name="circle-check" class="w-3 h-3" />
                         <span>{upload.title}</span>
                       </div>
                     {/each}
@@ -416,7 +416,7 @@
               {#if failedUploads.length > 0}
                 <div>
                   <div class="flex items-center gap-2 mb-2">
-                    <Icon name="alert-circle" class="w-4 h-4 text-danger" />
+                    <Icon name="circle-alert" class="w-4 h-4 text-danger" />
                     <span class="text-sm font-medium text-danger">
                       Failed uploads ({failedUploads.length})
                     </span>
@@ -424,7 +424,7 @@
                   <div class="space-y-1">
                     {#each failedUploads as upload}
                       <div class="flex items-center gap-2 text-sm text-danger">
-                        <Icon name="alert-circle" class="w-3 h-3" />
+                        <Icon name="circle-alert" class="w-3 h-3" />
                         <span>{upload.title}: {upload.error}</span>
                       </div>
                     {/each}

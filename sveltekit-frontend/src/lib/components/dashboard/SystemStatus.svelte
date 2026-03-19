@@ -45,9 +45,9 @@
 
 	function getAlertIcon(type: AlertType): string {
 		switch (type) {
-			case 'error': return 'alert-circle';
-			case 'warning': return 'alert-triangle';
-			case 'success': return 'check-circle';
+			case 'error': return 'circle-alert';
+			case 'warning': return 'triangle-alert';
+			case 'success': return 'circle-check';
 			case 'info': return 'info';
 		}
 	}
@@ -89,7 +89,7 @@
 	<div class="status-content status-viewport" style="max-height: {maxHeight}; overflow-y: auto;">
 		{#if visibleAlerts.length === 0}
 			<div class="no-alerts">
-				<Icon name="check-circle" class="no-alerts-icon" />
+				<Icon name="circle-check" class="no-alerts-icon" />
 				<p class="no-alerts-text">All systems operational</p>
 				<p class="no-alerts-subtext">No active alerts</p>
 			</div>

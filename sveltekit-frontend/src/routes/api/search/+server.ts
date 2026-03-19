@@ -2,31 +2,48 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { pool } from '$lib/server/db/client';
-import { cases, evidence, personsOfInterest, citations } from '$lib/server/db/schema-postgres.js';
-import { ilike, or, desc, sql } from 'drizzle-orm';
+import {
+	cases,
+	evidence,
+	personsOfInterest,
+	citations,
+	reports,
+	ragMessages,
+	ragSessions,
+} from '$lib/server/db/schema-postgres.js';
+import { ilike, or, desc, sql, eq } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+import type { PlatformSearchHit, PlatformSearchTiming } from '$lib/types/search.js';
 
 /**
  * Unified Platform Search — Two-layer architecture:
- *   Layer 1: Fan out to domain adapters in parallel
- *   Layer 2: Normalize to PlatformSearchHit[], merge, return grouped
+ *   Layer 1: Fan out to domain adapters in parallel via Promise.allSettled()
+ *   Layer 2: Normalize to PlatformSearchHit[], merge, return grouped + timing
  *
- * GET /api/search?q=...&type=all|cases|evidence|poi|citations|legal|glossary&limit=10
+ * GET /api/search?q=...&type=all|cases|evidence|poi|citations|legal|glossary|reports|messages&limit=10
  */
 
-interface PlatformSearchHit {
-	id: string;
-	entityType: 'case' | 'evidence' | 'poi' | 'citation' | 'document' | 'glossary' | 'statute';
-	title: string;
-	snippet: string;
-	score: number;
-	matchType: 'fts' | 'vector' | 'fused' | 'ilike';
-	route: string;
-	documentId?: string;
-	nodeId?: string;
-	jurisdiction?: string;
-	corpusType?: string;
+// ── Timed Adapter Wrapper ─────────────────────────────────────────────────
+
+type AdapterTimings = Record<string, { ms: number; count: number; status: 'ok' | 'error' | 'timeout' }>;
+
+async function timedAdapter(
+	name: string,
+	timings: AdapterTimings,
+	fn: () => Promise<PlatformSearchHit[]>
+): Promise<PlatformSearchHit[]> {
+	const t0 = performance.now();
+	try {
+		const results = await fn();
+		timings[name] = { ms: Math.round(performance.now() - t0), count: results.length, status: 'ok' };
+		return results;
+	} catch {
+		timings[name] = { ms: Math.round(performance.now() - t0), count: 0, status: 'error' };
+		return [];
+	}
 }
+
+// ── Domain Adapters ───────────────────────────────────────────────────────
 
 /** Search the legal library via Go service (fast path) or inline SQL fallback */
 async function searchLegalLibrary(q: string, limit: number): Promise<PlatformSearchHit[]> {
@@ -44,19 +61,21 @@ async function searchLegalLibrary(q: string, limit: number): Promise<PlatformSea
 			if (res.ok) {
 				const data = await res.json();
 				return (data.results ?? data.hits ?? []).map((h: Record<string, unknown>) => ({
-					id: h.chunk_id ?? h.id ?? '',
+					id: (h.chunkId ?? h.chunk_id ?? h.id ?? '') as string,
 					entityType: 'document' as const,
-					title: (h.document_title ?? h.heading ?? 'Legal Document') as string,
+					title: (h.title ?? h.document_title ?? h.heading ?? 'Legal Document') as string,
 					snippet: (h.snippet ?? h.chunk_text ?? '') as string,
 					score: (h.score ?? h.rrf_score ?? 0) as number,
-					matchType: (h.match_type ?? 'fused') as 'fts' | 'vector' | 'fused',
-					route: h.node_id
-						? `/library/${h.document_id}/node/${h.node_id}`
-						: `/library/${h.document_id ?? ''}`,
-					documentId: (h.document_id ?? '') as string,
-					nodeId: (h.node_id ?? '') as string,
-					jurisdiction: (h.jurisdiction ?? '') as string,
-					corpusType: (h.corpus_type ?? '') as string,
+					matchType: (h.matchType ?? h.match_type ?? 'fused') as PlatformSearchHit['matchType'],
+					route: h.nodeId ?? h.node_id
+						? `/library/${h.documentId ?? h.document_id}/node/${h.nodeId ?? h.node_id}`
+						: `/library/${h.documentId ?? h.document_id ?? ''}`,
+					documentId: (h.documentId ?? h.document_id ?? '') as string,
+					nodeId: (h.nodeId ?? h.node_id ?? '') as string,
+					chunkId: (h.chunkId ?? h.chunk_id ?? '') as string,
+					jurisdiction: (h.jurisdictionCode ?? h.jurisdiction ?? '') as string,
+					corpusType: (h.corpusType ?? h.corpus_type ?? '') as string,
+					sourceConfidence: (h.sourceConfidence ?? '') as string,
 				}));
 			}
 		} catch {
@@ -137,6 +156,187 @@ async function searchGlossary(q: string, limit: number): Promise<PlatformSearchH
 	}
 }
 
+/** Search cases via ILIKE on title/description */
+async function searchCases(q: string, limit: number): Promise<PlatformSearchHit[]> {
+	const pattern = `%${q}%`;
+	const rows = await db
+		.select({
+			id: cases.id,
+			title: cases.title,
+			description: cases.description,
+			status: cases.status,
+			createdAt: cases.createdAt,
+		})
+		.from(cases)
+		.where(or(ilike(cases.title, pattern), ilike(cases.description, pattern)))
+		.orderBy(desc(cases.createdAt))
+		.limit(limit);
+
+	return rows.map((r) => ({
+		id: r.id,
+		entityType: 'case' as const,
+		title: r.title ?? 'Untitled Case',
+		snippet: (r.description ?? '').slice(0, 250),
+		score: 0.8,
+		matchType: 'ilike' as const,
+		route: `/cases/${r.id}`,
+		metadata: { status: r.status },
+	}));
+}
+
+/** Search evidence via ILIKE on title/description */
+async function searchEvidence(q: string, limit: number): Promise<PlatformSearchHit[]> {
+	const pattern = `%${q}%`;
+	const rows = await db
+		.select({
+			id: evidence.id,
+			title: evidence.title,
+			description: evidence.description,
+			type: evidence.type,
+			createdAt: evidence.createdAt,
+		})
+		.from(evidence)
+		.where(or(ilike(evidence.title, pattern), ilike(evidence.description, pattern)))
+		.orderBy(desc(evidence.createdAt))
+		.limit(limit);
+
+	return rows.map((r) => ({
+		id: r.id,
+		entityType: 'evidence' as const,
+		title: r.title ?? 'Evidence',
+		snippet: (r.description ?? '').slice(0, 250),
+		score: 0.75,
+		matchType: 'ilike' as const,
+		route: `/evidence?id=${r.id}`,
+		metadata: { type: r.type },
+	}));
+}
+
+/** Search persons of interest via ILIKE */
+async function searchPOI(q: string, limit: number): Promise<PlatformSearchHit[]> {
+	const pattern = `%${q}%`;
+	const rows = await db
+		.select({
+			id: personsOfInterest.id,
+			name: personsOfInterest.name,
+			description: personsOfInterest.description,
+			threatLevel: personsOfInterest.threatLevel,
+			status: personsOfInterest.status,
+		})
+		.from(personsOfInterest)
+		.where(or(ilike(personsOfInterest.name, pattern), ilike(personsOfInterest.description, pattern)))
+		.orderBy(desc(personsOfInterest.createdAt))
+		.limit(limit);
+
+	return rows.map((r) => ({
+		id: r.id,
+		entityType: 'poi' as const,
+		title: r.name ?? 'Person',
+		snippet: (r.description ?? '').slice(0, 250),
+		score: 0.7,
+		matchType: 'ilike' as const,
+		route: `/persons-of-interest/${r.id}`,
+		metadata: { threatLevel: r.threatLevel, status: r.status },
+	}));
+}
+
+/** Search citations via ILIKE on quoted_text/formatted_citation */
+async function searchCitations(q: string, limit: number): Promise<PlatformSearchHit[]> {
+	const pattern = `%${q}%`;
+	const rows = await db
+		.select({
+			id: citations.id,
+			caseId: citations.caseId,
+			pageNumber: citations.pageNumber,
+			createdAt: citations.createdAt,
+			quotedText: sql<string>`"citations"."quoted_text"`,
+			formattedCitation: sql<string>`"citations"."formatted_citation"`,
+		})
+		.from(citations)
+		.where(
+			or(
+				sql`"citations"."quoted_text" ILIKE ${pattern}`,
+				sql`"citations"."formatted_citation" ILIKE ${pattern}`
+			)
+		)
+		.orderBy(desc(citations.createdAt))
+		.limit(limit);
+
+	return rows.map((r) => ({
+		id: r.id,
+		entityType: 'citation' as const,
+		title: r.formattedCitation ?? 'Citation',
+		snippet: (r.quotedText ?? '').slice(0, 250),
+		score: 0.65,
+		matchType: 'ilike' as const,
+		route: `/citations`,
+		caseId: r.caseId ?? undefined,
+	}));
+}
+
+/** Search reports via ILIKE on title/content */
+async function searchReports(q: string, limit: number): Promise<PlatformSearchHit[]> {
+	const pattern = `%${q}%`;
+	const rows = await db
+		.select({
+			id: reports.id,
+			title: reports.title,
+			content: reports.content,
+			type: reports.type,
+			status: reports.status,
+			caseId: reports.caseId,
+			createdAt: reports.createdAt,
+		})
+		.from(reports)
+		.where(or(ilike(reports.title, pattern), ilike(reports.content, pattern)))
+		.orderBy(desc(reports.createdAt))
+		.limit(limit);
+
+	return rows.map((r) => ({
+		id: r.id,
+		entityType: 'report' as const,
+		title: r.title ?? 'Report',
+		snippet: (r.content ?? '').slice(0, 250),
+		score: 0.7,
+		matchType: 'ilike' as const,
+		route: `/reports/${r.id}`,
+		caseId: r.caseId ?? undefined,
+		metadata: { type: r.type, status: r.status },
+	}));
+}
+
+/** Search chat messages via ILIKE on content, joined with sessions for title */
+async function searchMessages(q: string, limit: number): Promise<PlatformSearchHit[]> {
+	const pattern = `%${q}%`;
+	const rows = await db
+		.select({
+			id: ragMessages.id,
+			content: ragMessages.content,
+			role: ragMessages.role,
+			createdAt: ragMessages.createdAt,
+			sessionId: ragMessages.sessionId,
+			sessionTitle: ragSessions.title,
+		})
+		.from(ragMessages)
+		.innerJoin(ragSessions, eq(ragMessages.sessionId, ragSessions.id))
+		.where(ilike(ragMessages.content, pattern))
+		.orderBy(desc(ragMessages.createdAt))
+		.limit(limit);
+
+	return rows.map((r) => ({
+		id: r.id,
+		entityType: 'message' as const,
+		title: r.sessionTitle ?? 'Chat Message',
+		snippet: (r.content ?? '').slice(0, 250),
+		score: 0.6,
+		matchType: 'ilike' as const,
+		route: `/terminal?session=${r.sessionId}`,
+		metadata: { role: r.role },
+	}));
+}
+
+// ── Main Handler ──────────────────────────────────────────────────────────
+
 export const GET: RequestHandler = async ({ url }) => {
 	const q = url.searchParams.get('q')?.trim() ?? '';
 	const type = url.searchParams.get('type') ?? 'all';
@@ -146,168 +346,50 @@ export const GET: RequestHandler = async ({ url }) => {
 		return json({ error: 'Query must be at least 2 characters' }, { status: 400 });
 	}
 
-	const pattern = `%${q}%`;
-	const results: Record<string, unknown[]> = {};
-	const hits: PlatformSearchHit[] = [];
+	const startTime = performance.now();
+	const adapterTimings: AdapterTimings = {};
 
 	try {
-		const searches: Promise<void>[] = [];
+		// Build adapter list based on requested type
+		const adapters: Array<{ name: string; fn: () => Promise<PlatformSearchHit[]> }> = [];
 
-		// ── Domain: Cases ──
 		if (type === 'all' || type === 'cases') {
-			searches.push(
-				db
-					.select({
-						id: cases.id,
-						title: cases.title,
-						description: cases.description,
-						status: cases.status,
-						createdAt: cases.createdAt,
-					})
-					.from(cases)
-					.where(or(ilike(cases.title, pattern), ilike(cases.description, pattern)))
-					.orderBy(desc(cases.createdAt))
-					.limit(limit)
-					.then((rows) => {
-						results.cases = rows;
-						for (const r of rows) {
-							hits.push({
-								id: r.id,
-								entityType: 'case',
-								title: r.title ?? 'Untitled Case',
-								snippet: (r.description ?? '').slice(0, 250),
-								score: 0.8,
-								matchType: 'ilike',
-								route: `/cases/${r.id}`,
-							});
-						}
-					})
-			);
+			adapters.push({ name: 'cases', fn: () => searchCases(q, limit) });
 		}
-
-		// ── Domain: Evidence ──
 		if (type === 'all' || type === 'evidence') {
-			searches.push(
-				db
-					.select({
-						id: evidence.id,
-						title: evidence.title,
-						description: evidence.description,
-						type: evidence.type,
-						createdAt: evidence.createdAt,
-					})
-					.from(evidence)
-					.where(or(ilike(evidence.title, pattern), ilike(evidence.description, pattern)))
-					.orderBy(desc(evidence.createdAt))
-					.limit(limit)
-					.then((rows) => {
-						results.evidence = rows;
-						for (const r of rows) {
-							hits.push({
-								id: r.id,
-								entityType: 'evidence',
-								title: r.title ?? 'Evidence',
-								snippet: (r.description ?? '').slice(0, 250),
-								score: 0.75,
-								matchType: 'ilike',
-								route: `/evidence?id=${r.id}`,
-							});
-						}
-					})
-			);
+			adapters.push({ name: 'evidence', fn: () => searchEvidence(q, limit) });
 		}
-
-		// ── Domain: POI ──
 		if (type === 'all' || type === 'poi') {
-			searches.push(
-				db
-					.select({
-						id: personsOfInterest.id,
-						name: personsOfInterest.name,
-						description: personsOfInterest.description,
-						threatLevel: personsOfInterest.threatLevel,
-						status: personsOfInterest.status,
-					})
-					.from(personsOfInterest)
-					.where(or(ilike(personsOfInterest.name, pattern), ilike(personsOfInterest.description, pattern)))
-					.orderBy(desc(personsOfInterest.createdAt))
-					.limit(limit)
-					.then((rows) => {
-						results.poi = rows;
-						for (const r of rows) {
-							hits.push({
-								id: r.id,
-								entityType: 'poi',
-								title: r.name ?? 'Person',
-								snippet: (r.description ?? '').slice(0, 250),
-								score: 0.7,
-								matchType: 'ilike',
-								route: `/persons-of-interest/${r.id}`,
-							});
-						}
-					})
-			);
+			adapters.push({ name: 'poi', fn: () => searchPOI(q, limit) });
 		}
-
-		// ── Domain: Citations ──
 		if (type === 'all' || type === 'citations') {
-			searches.push(
-				db
-					.select({
-						id: citations.id,
-						caseId: citations.caseId,
-						pageNumber: citations.pageNumber,
-						createdAt: citations.createdAt,
-						quotedText: sql<string>`"citations"."quoted_text"`,
-						formattedCitation: sql<string>`"citations"."formatted_citation"`,
-					})
-					.from(citations)
-					.where(
-						or(
-							sql`"citations"."quoted_text" ILIKE ${pattern}`,
-							sql`"citations"."formatted_citation" ILIKE ${pattern}`
-						)
-					)
-					.orderBy(desc(citations.createdAt))
-					.limit(limit)
-					.then((rows) => {
-						results.citations = rows;
-						for (const r of rows) {
-							hits.push({
-								id: r.id,
-								entityType: 'citation',
-								title: r.formattedCitation ?? 'Citation',
-								snippet: (r.quotedText ?? '').slice(0, 250),
-								score: 0.65,
-								matchType: 'ilike',
-								route: `/citations`,
-							});
-						}
-					})
-			);
+			adapters.push({ name: 'citations', fn: () => searchCitations(q, limit) });
 		}
-
-		// ── Domain: Legal Library (Go service + SQL fallback) ──
 		if (type === 'all' || type === 'legal') {
-			searches.push(
-				searchLegalLibrary(q, limit).then((legalHits) => {
-					results.legal = legalHits;
-					hits.push(...legalHits);
-				})
-			);
+			adapters.push({ name: 'legal', fn: () => searchLegalLibrary(q, limit) });
 		}
-
-		// ── Domain: Glossary ──
 		if (type === 'all' || type === 'glossary') {
-			searches.push(
-				searchGlossary(q, limit).then((glossaryHits) => {
-					results.glossary = glossaryHits;
-					hits.push(...glossaryHits);
-				})
-			);
+			adapters.push({ name: 'glossary', fn: () => searchGlossary(q, limit) });
+		}
+		if (type === 'all' || type === 'reports') {
+			adapters.push({ name: 'reports', fn: () => searchReports(q, limit) });
+		}
+		if (type === 'all' || type === 'messages') {
+			adapters.push({ name: 'messages', fn: () => searchMessages(q, limit) });
 		}
 
-		await Promise.all(searches);
+		// Fan out with Promise.allSettled — individual failures don't break the search
+		const settled = await Promise.allSettled(
+			adapters.map((a) => timedAdapter(a.name, adapterTimings, a.fn))
+		);
+
+		// Collect all successful hits
+		const hits: PlatformSearchHit[] = [];
+		for (const result of settled) {
+			if (result.status === 'fulfilled') {
+				hits.push(...result.value);
+			}
+		}
 
 		// Sort all hits by score descending
 		hits.sort((a, b) => b.score - a.score);
@@ -318,19 +400,31 @@ export const GET: RequestHandler = async ({ url }) => {
 			groups[h.entityType] = (groups[h.entityType] ?? 0) + 1;
 		}
 
-		const totalResults = hits.length;
+		const timing: PlatformSearchTiming = {
+			totalMs: Math.round(performance.now() - startTime),
+			adapters: adapterTimings,
+		};
 
 		return json({
 			query: q,
 			type,
-			totalResults,
+			totalResults: hits.length,
 			groups,
 			hits,
-			// Legacy format for backward compatibility
-			results,
+			timing,
 		});
 	} catch (err) {
 		console.error('[search] error:', err);
-		return json({ query: q, type, totalResults: 0, groups: {}, hits: [], results: {} });
+		return json({
+			query: q,
+			type,
+			totalResults: 0,
+			groups: {},
+			hits: [],
+			timing: {
+				totalMs: Math.round(performance.now() - startTime),
+				adapters: adapterTimings,
+			},
+		});
 	}
 };

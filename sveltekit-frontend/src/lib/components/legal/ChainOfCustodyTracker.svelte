@@ -132,7 +132,7 @@
           {/if}
           {#if evidence.compromised}
             <div class="flex items-center gap-1 px-2 py-1 bg-danger/10 text-danger/80 text-xs font-mono rounded border border-danger/20">
-              <Icon name="alert-triangle" class="w-3 h-3" />
+              <Icon name="triangle-alert" class="w-3 h-3" />
               COMPROMISED
             </div>
           {/if}
@@ -165,7 +165,7 @@
       {#if evidence.compromised}
         <div class="mt-3 p-3 bg-danger/10 border border-danger/20 rounded text-sm">
           <div class="flex items-center gap-2 text-danger/80 font-medium">
-            <Icon name="alert-triangle" class="w-4 h-4" />
+            <Icon name="triangle-alert" class="w-4 h-4" />
             Chain of Custody Compromised
           </div>
           <p class="text-danger/60 mt-1 text-xs">
@@ -225,7 +225,7 @@
                   interactive && 'group-hover:scale-110 transition-transform'
                 )}>
                   <Icon
-                    name={transfer.verified ? 'check-circle' : 'alert-circle'}
+                    name={transfer.verified ? 'circle-check' : 'circle-alert'}
                     class={cn('w-5 h-5', transfer.verified ? 'text-accent' : 'text-warning')}
                   />
                 </div>

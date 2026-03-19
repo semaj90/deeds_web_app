@@ -4,6 +4,7 @@
  */
 
 import { fetchWithStreaming, type StreamingOptions } from './streaming-handler.js';
+import type { PlatformEntityType, PlatformSearchResponse } from '$lib/types/search.js';
 
 export interface SearchQuery {
  query: string;
@@ -87,7 +88,7 @@ export async function searchLaws(
  */
 export async function getSearchSuggestions(
  query: string,
- type: 'cases' | 'laws' = 'laws'
+ type: 'cases' | 'laws' | 'all' = 'all'
 ): Promise<string[]> {
  try {
 const response = await fetch(
@@ -117,27 +118,51 @@ export async function getSearchFilters(
 }
 
 /**
+ * Unified platform search — queries all entity types via /api/search
+ */
+export async function unifiedSearch(
+	query: string,
+	type: PlatformEntityType | 'all' = 'all',
+	limit: number = 20
+): Promise<PlatformSearchResponse> {
+	const params = new URLSearchParams({
+		q: query,
+		type,
+		limit: String(limit),
+	});
+	try {
+		const res = await fetch(`/api/search?${params}`);
+		if (!res.ok) {
+			return { hits: [], groups: {} as any, totalResults: 0, timing: { totalMs: 0, adapters: {} } };
+		}
+		return res.json();
+	} catch {
+		return { hits: [], groups: {} as any, totalResults: 0, timing: { totalMs: 0, adapters: {} } };
+	}
+}
+
+/**
  * Track search analytics
  */
 export async function trackSearch(
- query: string, resultCount: number, executionTimeMs: number,
- type: 'cases' | 'laws' = 'laws'
+	query: string, resultCount: number, executionTimeMs: number,
+	type: 'cases' | 'laws' | 'evidence' | 'all' = 'all'
 ): Promise<void> {
- try {
- await fetch('/api/analytics/search', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
- query,
- resultCount,
- executionTimeMs,
- type,
- timestamp: new Date().toISOString(),
- }),
- });
- } catch (error) {
- console.error('Failed to track search:', error);
- }
+	try {
+		await fetch('/api/analytics/search', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				query,
+				resultCount,
+				executionTimeMs,
+				type,
+				timestamp: new Date().toISOString(),
+			}),
+		});
+	} catch (error) {
+		console.error('Failed to track search:', error);
+	}
 }
 
 

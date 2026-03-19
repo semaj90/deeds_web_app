@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ url }) => {
 			? db.select().from(personsOfInterest).where(arrayContains(personsOfInterest.caseIds, [id]))
 			: db.select().from(personsOfInterest);
 
-		const pois = await safe(query.orderBy(desc(personsOfInterest.createdAt)).limit(100).$withCache({ config: { ex: 60 } }), []);
+		const pois = await safe(query.orderBy(desc(personsOfInterest.createdAt)).limit(100), []);
 
 		return {
 			caseId: id,

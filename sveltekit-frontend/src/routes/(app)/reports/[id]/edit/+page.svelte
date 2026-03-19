@@ -127,12 +127,12 @@
 <div class="min-h-screen bg-neutral-100 text-neutral-900">
 	{#if loading}
 		<div class="flex items-center justify-center h-screen">
-			<Icon name="loader-2" class="h-8 w-8 animate-spin text-neutral-700" />
+			<Icon name="loader-circle" class="h-8 w-8 animate-spin text-neutral-700" />
 			<span class="ml-3 text-neutral-600">Loading report...</span>
 		</div>
 	{:else if error && !report}
 		<div class="flex flex-col items-center justify-center h-screen gap-4">
-			<Icon name="alert-triangle" class="h-12 w-12 text-neutral-600" />
+			<Icon name="triangle-alert" class="h-12 w-12 text-neutral-600" />
 			<div class="text-center text-neutral-800">
 				<h2 class="text-xl font-semibold mb-2">Error Loading Report</h2>
 				<p class="text-sm text-neutral-600">{error}</p>
@@ -178,7 +178,7 @@
 							{/if}
 							{#if report.status === 'published'}
 								<span class="flex items-center gap-1 text-neutral-800">
-									<Icon name="check-circle" class="w-3 h-3" />
+									<Icon name="circle-check" class="w-3 h-3" />
 									Published
 								</span>
 							{/if}
@@ -201,7 +201,7 @@
 						class="inline-flex items-center justify-center gap-2 rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-800 transition hover:border-neutral-400 hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
 					>
 						{#if isSaving}
-							<Icon name="loader-2" class="w-4 h-4 animate-spin" />
+							<Icon name="loader-circle" class="w-4 h-4 animate-spin" />
 							Saving...
 						{:else}
 							<Icon name="save" class="w-4 h-4" />
@@ -216,7 +216,7 @@
 							class="inline-flex items-center justify-center gap-2 rounded-md border border-neutral-900 bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
 						>
 							{#if isPublishing}
-								<Icon name="loader-2" class="w-4 h-4 animate-spin" />
+								<Icon name="loader-circle" class="w-4 h-4 animate-spin" />
 							{:else}
 								<Icon name="upload" class="w-4 h-4" />
 							{/if}
@@ -230,7 +230,7 @@
 				<div class="px-6 pb-3">
 					<div class="rounded-lg border border-neutral-300 bg-white p-3 text-sm text-neutral-800 shadow-sm">
 						<div class="flex items-center gap-2">
-							<Icon name="alert-triangle" class="w-4 h-4" />
+							<Icon name="triangle-alert" class="w-4 h-4" />
 							<span>{error}</span>
 						</div>
 					</div>

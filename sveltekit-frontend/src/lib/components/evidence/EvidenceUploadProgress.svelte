@@ -48,8 +48,8 @@ const STAGES = [
 	{ id: 'storing', label: 'Storing in MinIO', icon: 'database', color: '#06b6d4' },
 	{ id: 'db-insert', label: 'Creating Record', icon: 'file-plus', color: '#10b981' },
 	{ id: 'embedding', label: 'Processing Content', icon: 'cpu', color: '#f59e0b' },
-	{ id: 'complete', label: 'Complete', icon: 'check-circle', color: '#22c55e' },
-	{ id: 'error', label: 'Failed', icon: 'x-circle', color: '#ef4444' }
+	{ id: 'complete', label: 'Complete', icon: 'circle-check', color: '#22c55e' },
+	{ id: 'error', label: 'Failed', icon: 'circle-x', color: '#ef4444' }
 ] as const;
 
 type StageId = typeof STAGES[number]['id'];
@@ -254,7 +254,7 @@ onDestroy(() => {
 	<!-- Error State -->
 	{#if isFailed && error}
 		<div class="error-container">
-			<Icon name="alert-triangle" class="w-5 h-5 text-danger" />
+			<Icon name="triangle-alert" class="w-5 h-5 text-danger" />
 			<div class="error-message">
 				<strong>Upload Failed</strong>
 				<p>{error}</p>
@@ -269,7 +269,7 @@ onDestroy(() => {
 	<!-- Success State -->
 	{#if isComplete && evidenceId}
 		<div class="success-container">
-			<Icon name="check-circle" class="w-5 h-5 text-info" />
+			<Icon name="circle-check" class="w-5 h-5 text-info" />
 			<div class="success-message">
 				<strong>Upload Complete!</strong>
 				<p class="text-sm text-sand-11">Evidence ID: {evidenceId.slice(0, 8)}...</p>

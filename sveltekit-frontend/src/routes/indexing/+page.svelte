@@ -200,7 +200,7 @@
 					</div>
 
 					<div class="status-card">
-						<div class="card-icon"><Icon name="alert-triangle" size={24} /></div>
+						<div class="card-icon"><Icon name="triangle-alert" size={24} /></div>
 						<div class="card-body">
 							<h3>Error Patterns</h3>
 							<p class="card-number">{status.collections.errors.points_count}</p>
@@ -250,12 +250,12 @@
 				</div>
 			{:else if loading}
 				<div class="loading-state">
-					<Icon name="loader-2" size={32} class="animate-spin" />
+					<Icon name="loader-circle" size={32} class="animate-spin" />
 					<p>Loading status...</p>
 				</div>
 			{:else}
 				<div class="loading-state">
-					<Icon name="alert-triangle" size={32} />
+					<Icon name="triangle-alert" size={32} />
 					<p>Failed to load status. Ensure Qdrant is running.</p>
 				</div>
 			{/if}
@@ -287,7 +287,7 @@
 						disabled={indexing}
 					>
 						{#if indexing}
-							<Icon name="loader-2" size={16} class="animate-spin" />
+							<Icon name="loader-circle" size={16} class="animate-spin" />
 							Indexing...
 						{:else}
 							<Icon name="file-code" size={16} />
@@ -307,10 +307,10 @@
 						disabled={indexing}
 					>
 						{#if indexing}
-							<Icon name="loader-2" size={16} class="animate-spin" />
+							<Icon name="loader-circle" size={16} class="animate-spin" />
 							Indexing...
 						{:else}
-							<Icon name="alert-triangle" size={16} />
+							<Icon name="triangle-alert" size={16} />
 							Index Errors
 						{/if}
 					</Button>
@@ -366,7 +366,7 @@
 						class:active={searchType === 'errors'}
 						onclick={() => searchType = 'errors'}
 					>
-						<Icon name="alert-triangle" size={14} />
+						<Icon name="triangle-alert" size={14} />
 						Errors
 					</button>
 				</div>
@@ -389,7 +389,7 @@
 						disabled={searching || !searchQuery.trim()}
 					>
 						{#if searching}
-							<Icon name="loader-2" size={16} class="animate-spin" />
+							<Icon name="loader-circle" size={16} class="animate-spin" />
 						{:else}
 							<Icon name="search" size={16} />
 						{/if}
@@ -443,7 +443,7 @@
 
 				{#if searchQuery.trim() && !searching && errorResults.length === 0 && searchType === 'errors'}
 					<div class="no-results">
-						<Icon name="alert-triangle" size={32} />
+						<Icon name="triangle-alert" size={32} />
 						<p>No error patterns for "{searchQuery}"</p>
 						<p class="hint">Try indexing errors first, or use different keywords.</p>
 					</div>

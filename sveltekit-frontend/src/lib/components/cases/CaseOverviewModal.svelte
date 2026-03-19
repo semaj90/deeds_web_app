@@ -55,7 +55,7 @@
 			</div>
 		{:else if error}
 			<div class="flex-1 flex flex-col items-center justify-center gap-4 text-rose-400 p-8 text-center">
-				<Icon name="alert-circle" size={48} />
+				<Icon name="circle-alert" size={48} />
 				<div>
 					<h3 class="font-semibold text-lg">Failed to load case</h3>
 					<p class="text-sm opacity-80 mt-1">{error}</p>

@@ -115,7 +115,7 @@
 	{#if error}
 		<div class="mb-6 rounded-lg border border-neutral-300 bg-white p-4 text-neutral-800 shadow-sm">
 			<div class="flex items-center gap-2">
-				<Icon name="alert-triangle" class="w-4 h-4" />
+				<Icon name="triangle-alert" class="w-4 h-4" />
 				<span>{error}</span>
 			</div>
 		</div>
@@ -159,7 +159,7 @@
 								</div>
 							</div>
 							{#if selectedType === type.value}
-								<Icon name="check-circle" class="h-5 w-5 shrink-0 text-neutral-900" />
+								<Icon name="circle-check" class="h-5 w-5 shrink-0 text-neutral-900" />
 							{/if}
 						</div>
 					</button>
@@ -220,7 +220,7 @@
 				class="inline-flex items-center justify-center gap-2 rounded-md border border-neutral-900 bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				{#if isCreating}
-					<Icon name="loader-2" class="w-4 h-4 animate-spin" />
+					<Icon name="loader-circle" class="w-4 h-4 animate-spin" />
 					Creating...
 				{:else}
 					<Icon name="file-plus" class="w-4 h-4" />

@@ -29,7 +29,7 @@
 		{ label: 'COMMAND CENTER', icon: 'radio', href: '/command-center' },
 		{ label: 'ACTIVE CASES', icon: 'folder-open', href: '/active-cases' },
 		{ label: 'CASES', icon: 'folder', href: '/cases' },
-		{ label: 'EVIDENCE', icon: 'fingerprint', href: '/evidence' },
+		{ label: 'EVIDENCE', icon: 'fingerprint-pattern', href: '/evidence' },
 		{ label: 'EVIDENCE LIBRARY', icon: 'library', href: '/evidence-library' },
 		{ label: 'CITATIONS', icon: 'scroll-text', href: '/citations' },
 		{ label: 'LEGAL CORPUS', icon: 'book-open', href: '/legal-corpus' },

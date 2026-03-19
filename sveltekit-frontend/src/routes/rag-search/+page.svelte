@@ -15,7 +15,7 @@
  * @phase Phase 94 ACE Synthesis
  */
 
-import { page } from '$app/stores';
+import { page } from '$app/state';
 import AnswerWithCitations from '$lib/components/rag/AnswerWithCitations.svelte';
 import SourceValidator from '$lib/components/rag/SourceValidator.svelte';
 import { generateAnswer, searchKnowledgeBase, validateSources } from '$lib/services/rag-source-validation';
@@ -59,7 +59,7 @@ let recentQueries = $state<string[]>([]);
 
 // Load case ID from URL if present
 $effect(() => {
-  const urlCaseId = $page.url.searchParams.get('case');
+  const urlCaseId = page.url.searchParams.get('case');
   if (urlCaseId) {
     caseId = urlCaseId;
   }

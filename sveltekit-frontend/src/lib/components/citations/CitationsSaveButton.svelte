@@ -104,7 +104,7 @@
 	title={isSaved ? 'Remove saved citation' : 'Save citation'}
 >
 	{#if isSaving}
-		<Icon name="loader-2" size={14} />
+		<Icon name="loader-circle" size={14} />
 	{:else if isSaved}
 		<Icon name="star" size={14} />
 	{:else}

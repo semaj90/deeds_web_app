@@ -102,7 +102,7 @@
         <!-- Header -->
         <div class="bg-danger dark:bg-danger text-white p-6">
           <div class="flex items-center gap-4">
-            <Icon name="alert-triangle" class="w-8 h-8" />
+            <Icon name="triangle-alert" class="w-8 h-8" />
             <div>
               <h1 class="text-2xl font-bold">Something went wrong</h1>
               <p class="text-danger/20">We encountered an unexpected error. Don't worry, your data is safe.</p>
@@ -140,7 +140,7 @@
               {isRetrying ? 'Retrying...' : 'Try Again'}
             </Button>
             <Button variant="ghost" onclick={goHome} class="flex items-center gap-2">
-              <Icon name="home" class="w-4 h-4" />
+              <Icon name="house" class="w-4 h-4" />
               Go Home
             </Button>
             <Button variant="ghost" onclick={reportError} class="flex items-center gap-2">

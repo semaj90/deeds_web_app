@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import Skeleton from '$lib/components/ui/Skeleton.svelte';
+	import Icon from '$lib/components/ui/Icon.svelte';
 	import { analytics } from '$lib/stores/analytics.svelte';
 	import CaseViewModal from '$lib/components/cases/CaseViewModal.svelte';
 	// Migrated to $effect
@@ -113,21 +114,22 @@
 	<title>Cases | YoRHa Legal AI</title>
 </svelte:head>
 
-<div class="flex h-screen flex-col  text-black">
+<div class="cases-page">
 	<!-- Header -->
-	<header class="border-b border-black/20 bg-black/60 backdrop-blur-sm">
-		<div class="container mx-auto flex max-w-7xl items-center justify-between py-4 px-6">
-			<div>
-				<h1 class="text-2xl font-bold">Cases</h1>
-				<p class="text-sm text-black/60">Manage your legal cases and investigations</p>
+	<header class="cases-header">
+		<div class="cases-header-left">
+			<div class="cases-icon-badge">
+				<Icon name="briefcase" />
 			</div>
-			<button
-				class="rounded border border-emerald-500/60 bg-emerald-500/20 px-6 py-2 text-sm font-semibold text-emerald-100 hover:bg-emerald-500/30 transition-colors"
-				onclick={openNewCase}
-			>
-				+ New Case
-			</button>
+			<div>
+				<h1 class="cases-title">Cases</h1>
+				<p class="cases-subtitle">Manage your legal cases and investigations</p>
+			</div>
 		</div>
+		<button class="cases-new-btn" onclick={openNewCase}>
+			<Icon name="plus" />
+			New Case
+		</button>
 	</header>
 
 	<!-- Filters Bar -->
@@ -468,12 +470,83 @@
 />
 
 <style>
+	.cases-page {
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+		color: rgba(212, 199, 163, 0.85);
+	}
+
+	.cases-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1.25rem 1.5rem;
+		border-bottom: 1px solid rgba(212, 199, 163, 0.08);
+		background: rgba(0, 0, 0, 0.4);
+		backdrop-filter: blur(8px);
+	}
+
+	.cases-header-left {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.875rem;
+	}
+
+	.cases-icon-badge {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 0.5rem;
+		background: linear-gradient(135deg, rgba(52, 211, 153, 0.15), rgba(96, 165, 250, 0.15));
+		border: 1px solid rgba(52, 211, 153, 0.25);
+		color: rgba(52, 211, 153, 0.9);
+		flex-shrink: 0;
+		margin-top: 0.125rem;
+	}
+
+	.cases-title {
+		font-size: 1.25rem;
+		font-weight: 700;
+		color: rgba(212, 199, 163, 0.95);
+		margin: 0;
+		line-height: 1.3;
+	}
+
+	.cases-subtitle {
+		font-size: 0.75rem;
+		color: rgba(212, 199, 163, 0.4);
+		margin-top: 0.125rem;
+	}
+
+	.cases-new-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.5rem 1rem;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: rgba(52, 211, 153, 0.95);
+		background: rgba(52, 211, 153, 0.12);
+		border: 1px solid rgba(52, 211, 153, 0.3);
+		border-radius: 0.375rem;
+		cursor: pointer;
+		transition: all 0.15s ease;
+	}
+
+	.cases-new-btn:hover {
+		background: rgba(52, 211, 153, 0.2);
+		border-color: rgba(52, 211, 153, 0.45);
+	}
+
 	.line-clamp-2 {
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
 		line-clamp: 2;
 		-webkit-box-orient: vertical;
-	overflow: hidden;
+		overflow: hidden;
 	}
 </style>
 

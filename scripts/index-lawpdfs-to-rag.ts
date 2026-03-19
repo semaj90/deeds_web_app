@@ -1176,8 +1176,11 @@ async function indexLawpdfs(): Promise<IndexResult> {
   }
 
   const files = await readdir(LAWPDFS_DIR);
+  const filterEnv = process.env.LAWPDFS_FILTER;
+  const allowedFiles = filterEnv ? new Set(filterEnv.split(',').map(f => f.trim())) : null;
   const pdfFiles = files
     .filter((f) => f.toLowerCase().endsWith('.pdf'))
+    .filter((f) => !allowedFiles || allowedFiles.has(f))
     .sort((a, b) => a.localeCompare(b));
 
   result.total = pdfFiles.length;

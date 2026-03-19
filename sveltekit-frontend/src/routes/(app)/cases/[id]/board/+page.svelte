@@ -874,7 +874,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 							<p class="evidence-location">{item.location}</p>
 						</div>
 						<button class="evidence-menu">
-							<Icon name="more-vertical" />
+							<Icon name="ellipsis-vertical" />
 						</button>
 					</div>
 				{/each}

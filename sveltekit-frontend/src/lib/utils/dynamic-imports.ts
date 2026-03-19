@@ -51,13 +51,10 @@ export const loadAIComponents = {
   // TODO: Add IndexedDB + Loki.js + Fuse.js caching layer for front-end optimizations
   async webgpu() {
     try {
-      const [WebGPULoader, TextureStreaming] = await Promise.all([
-        import('$lib/components/ui/enhanced-bits/SSRWebGPULoader.svelte'),
-        import('$lib/components/examples/NESTextureStreamingExample.svelte')
-      ]);
+      const WebGPULoader = await import('$lib/components/ui/enhanced-bits/SSRWebGPULoader.svelte');
       return {
         WebGPULoader: WebGPULoader.default,
-        TextureStreaming: TextureStreaming.default
+        TextureStreaming: null
       };
     } catch {
       console.warn('[dynamic-imports] WebGPU components not yet available');

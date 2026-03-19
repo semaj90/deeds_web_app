@@ -45,17 +45,17 @@ function generateImplications(corpusType: string, heading: string, jurisdictionN
 		constitution: [
 			{ title: 'Constitutional Authority', description: `This provision carries the highest legal authority in ${jur}. All subsequent legislation must conform to this framework.`, icon: 'shield-alert', status: 'high' },
 			{ title: 'Amendment Scope', description: `Changes to this section require formal amendment procedures, making it resistant to ordinary legislative modification.`, icon: 'lock', status: 'medium' },
-			{ title: 'Judicial Review', description: `Courts may interpret the scope and application of this provision, leading to evolving legal standards.`, icon: 'help-circle', status: 'low' },
+			{ title: 'Judicial Review', description: `Courts may interpret the scope and application of this provision, leading to evolving legal standards.`, icon: 'life-buoy', status: 'low' },
 		],
 		statute: [
 			{ title: 'Compliance Risk', description: `Organizations operating in ${jur} must ensure compliance with this statute to avoid civil and criminal liability.`, icon: 'shield-alert', status: 'high' },
 			{ title: 'Enforcement', description: `Enforcement agencies may investigate and prosecute violations under this statutory framework.`, icon: 'lock', status: 'medium' },
-			{ title: 'Legal Uncertainty', description: `Key terms in this statute may be subject to ongoing judicial interpretation and evolving case law.`, icon: 'help-circle', status: 'low' },
+			{ title: 'Legal Uncertainty', description: `Key terms in this statute may be subject to ongoing judicial interpretation and evolving case law.`, icon: 'life-buoy', status: 'low' },
 		],
 		regulation: [
 			{ title: 'Regulatory Compliance', description: `Regulated entities must meet the requirements of this regulation within ${jur}.`, icon: 'shield-alert', status: 'high' },
 			{ title: 'Reporting Requirements', description: `This regulation may impose disclosure, reporting, or record-keeping obligations.`, icon: 'lock', status: 'medium' },
-			{ title: 'Penalty Risk', description: `Non-compliance may result in administrative penalties, fines, or enforcement actions.`, icon: 'help-circle', status: 'low' },
+			{ title: 'Penalty Risk', description: `Non-compliance may result in administrative penalties, fines, or enforcement actions.`, icon: 'life-buoy', status: 'low' },
 		],
 	};
 

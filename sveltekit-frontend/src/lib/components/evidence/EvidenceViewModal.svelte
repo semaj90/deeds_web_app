@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
-	import { formatFileSize, formatDate, getIcon } from './evidence-utils.js';
+	import { formatFileSize, formatDate, getIcon, getTypeLabel } from './evidence-utils.js';
 
 	let {
 		evidenceId,
@@ -60,6 +60,17 @@
 	let summary = $derived(doc?.summary ?? doc?.aiSummary ?? doc?.ai_summary ?? null);
 	let entities = $derived(doc?.metadata?.entities ?? doc?.extractedEntities ?? null);
 	let tags = $derived<string[]>(doc?.tags ?? []);
+	let status = $derived(doc?.status ?? doc?.processingStatus ?? doc?.documentStatus ?? '');
+
+	// File-type color accent
+	let accentColor = $derived.by(() => {
+		const ft = fileType.toLowerCase();
+		if (ft.includes('pdf')) return { bg: 'rgba(239, 68, 68, 0.12)', border: 'rgba(239, 68, 68, 0.3)', text: '#f87171', strip: '#ef4444' };
+		if (ft.startsWith('image/')) return { bg: 'rgba(168, 85, 247, 0.12)', border: 'rgba(168, 85, 247, 0.3)', text: '#c4b5fd', strip: '#a855f7' };
+		if (ft.includes('word') || ft.includes('text') || ft.includes('document')) return { bg: 'rgba(96, 165, 250, 0.12)', border: 'rgba(96, 165, 250, 0.3)', text: '#93c5fd', strip: '#60a5fa' };
+		if (ft.includes('sheet') || ft.includes('csv') || ft.includes('excel')) return { bg: 'rgba(34, 197, 94, 0.12)', border: 'rgba(34, 197, 94, 0.3)', text: '#4ade80', strip: '#22c55e' };
+		return { bg: 'rgba(212, 199, 163, 0.08)', border: 'rgba(212, 199, 163, 0.15)', text: 'rgba(212, 199, 163, 0.7)', strip: 'rgba(212, 199, 163, 0.3)' };
+	});
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -73,19 +84,37 @@
 	>
 		<!-- Modal panel -->
 		<div class="modal-panel" role="dialog" aria-modal="true" aria-label="Evidence Detail">
+			<!-- Type accent strip -->
+			<div class="modal-accent-strip" style="background: {accentColor.strip};"></div>
+
 			<!-- Header -->
 			<div class="modal-header">
 				<div class="modal-title-row">
-					<span class="modal-file-icon">{doc ? getIcon(fileType) : '📄'}</span>
+					<div class="modal-file-icon-wrap" style="background: {accentColor.bg}; border-color: {accentColor.border};">
+						<span class="modal-file-icon">{doc ? getIcon(fileType) : '📄'}</span>
+					</div>
 					<div class="modal-title-text">
 						<h2 class="modal-title">
 							{#if isLoading}Loading…{:else if doc}{doc.title || doc.fileName || doc.file_name || 'Untitled'}{:else}Evidence Detail{/if}
 						</h2>
 						{#if doc}
-							<span class="modal-subtitle">
-								{formatFileSize(doc.fileSize ?? doc.file_size ?? 0)}
-								{#if doc.caseId ?? doc.case_id}&nbsp;&middot; Linked to case{/if}
-							</span>
+							<div class="modal-subtitle-row">
+								<span class="modal-type-badge" style="background: {accentColor.bg}; border-color: {accentColor.border}; color: {accentColor.text};">
+									{getTypeLabel(fileType)}
+								</span>
+								<span class="modal-subtitle">
+									{formatFileSize(doc.fileSize ?? doc.file_size ?? 0)}
+								</span>
+								{#if doc.caseId ?? doc.case_id}
+									<span class="modal-case-badge">
+										<Icon name="link" class="w-3 h-3" />
+										Linked
+									</span>
+								{/if}
+								{#if status}
+									<span class="modal-status-badge">{status}</span>
+								{/if}
+							</div>
 						{/if}
 					</div>
 				</div>
@@ -97,13 +126,19 @@
 			<!-- Body -->
 			<div class="modal-body">
 				{#if isLoading}
-					<div class="modal-loading">
-						<div class="spinner"></div>
-						<span>Loading evidence…</span>
+					<div class="modal-skeleton">
+						<div class="skel-line skel-w-60"></div>
+						<div class="skel-row">
+							<div class="skel-box"></div>
+							<div class="skel-box"></div>
+						</div>
+						<div class="skel-line skel-w-80"></div>
+						<div class="skel-line skel-w-40"></div>
+						<div class="skel-block"></div>
 					</div>
 				{:else if loadError}
 					<div class="modal-error">
-						<Icon name="alert-circle" class="w-5 h-5" />
+						<Icon name="circle-alert" class="w-5 h-5" />
 						<span>{loadError}</span>
 					</div>
 				{:else if doc}
@@ -122,41 +157,59 @@
 					{/if}
 
 					<!-- Core fields -->
-					<div class="fields-grid">
+					<div class="fields-card">
 						{#if doc.description}
 							<div class="field full-width">
-								<span class="field-label">Description</span>
+								<span class="field-label">
+									<Icon name="align-left" class="w-3 h-3" />
+									Description
+								</span>
 								<p class="field-value">{doc.description}</p>
 							</div>
 						{/if}
 
 						<div class="field">
-							<span class="field-label">Type</span>
+							<span class="field-label">
+								<Icon name="file" class="w-3 h-3" />
+								Type
+							</span>
 							<span class="field-value">{fileType || doc.type || 'Unknown'}</span>
 						</div>
 
 						<div class="field">
-							<span class="field-label">Uploaded</span>
+							<span class="field-label">
+								<Icon name="calendar" class="w-3 h-3" />
+								Uploaded
+							</span>
 							<span class="field-value">{formatDate(doc.createdAt ?? doc.created_at)}</span>
 						</div>
 
 						{#if doc.source}
 							<div class="field">
-								<span class="field-label">Source</span>
+								<span class="field-label">
+									<Icon name="database" class="w-3 h-3" />
+									Source
+								</span>
 								<span class="field-value">{doc.source}</span>
 							</div>
 						{/if}
 
-						{#if doc.status ?? doc.processingStatus ?? doc.documentStatus}
+						{#if status}
 							<div class="field">
-								<span class="field-label">Status</span>
-								<span class="field-badge">{doc.status ?? doc.processingStatus ?? doc.documentStatus}</span>
+								<span class="field-label">
+									<Icon name="activity" class="w-3 h-3" />
+									Status
+								</span>
+								<span class="field-badge">{status}</span>
 							</div>
 						{/if}
 
 						{#if doc.evidenceNumber ?? doc.evidence_number}
 							<div class="field">
-								<span class="field-label">Evidence #</span>
+								<span class="field-label">
+									<Icon name="shield" class="w-3 h-3" />
+									Evidence #
+								</span>
 								<span class="field-value mono">{doc.evidenceNumber ?? doc.evidence_number}</span>
 							</div>
 						{/if}
@@ -164,9 +217,11 @@
 
 					<!-- Summary / AI analysis -->
 					{#if summary}
-						<div class="section">
+						<div class="section ai-section">
 							<h3 class="section-title">
-								<Icon name="sparkles" class="w-3.5 h-3.5" />
+								<span class="ai-icon-wrap">
+									<Icon name="sparkles" class="w-3.5 h-3.5" />
+								</span>
 								AI Summary
 							</h3>
 							<p class="section-body">{summary}</p>
@@ -219,13 +274,16 @@
 			<!-- Footer -->
 			{#if doc && !isLoading}
 				<div class="modal-footer">
-					<button type="button" class="footer-btn ghost" onclick={close}>Close</button>
+					<button type="button" class="footer-btn ghost" onclick={close}>
+						<Icon name="x" class="w-3.5 h-3.5" />
+						Close
+					</button>
 					<div class="footer-actions">
 						{#if fileUrl}
 							<a
 								href={fileUrl}
 								download={doc.fileName ?? doc.file_name ?? true}
-								class="footer-btn secondary"
+								class="footer-btn secondary download"
 								onclick={close}
 							>
 								<Icon name="download" class="w-3.5 h-3.5" />
@@ -260,7 +318,7 @@
 		align-items: center;
 		justify-content: center;
 		background: rgba(0, 0, 0, 0.65);
-		backdrop-filter: blur(2px);
+		backdrop-filter: blur(4px);
 		padding: 1rem;
 		animation: fadeIn 0.15s ease;
 	}
@@ -271,61 +329,126 @@
 		max-width: 680px;
 		max-height: 90vh;
 		background: #131519;
-		border: 1px solid rgba(212, 199, 163, 0.12);
-		border-radius: 12px;
+		border: 1px solid rgba(212, 199, 163, 0.1);
+		border-radius: 14px;
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
-		animation: slideUp 0.18s ease;
+		animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+		box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.03);
 	}
-	@keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+	@keyframes slideUp { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+	/* Type accent strip */
+	.modal-accent-strip {
+		height: 3px;
+		flex-shrink: 0;
+	}
 
 	/* Header */
 	.modal-header {
 		display: flex;
-		align-items: center;
+		align-items: flex-start;
 		justify-content: space-between;
-		padding: 1rem 1.25rem;
-		border-bottom: 1px solid rgba(212, 199, 163, 0.08);
+		padding: 1.125rem 1.25rem;
+		border-bottom: 1px solid rgba(212, 199, 163, 0.06);
 		flex-shrink: 0;
+		gap: 0.75rem;
 	}
 	.modal-title-row {
 		display: flex;
+		align-items: flex-start;
+		gap: 0.875rem;
+		min-width: 0;
+	}
+	.modal-file-icon-wrap {
+		width: 42px;
+		height: 42px;
+		border-radius: 10px;
+		border: 1px solid;
+		display: flex;
 		align-items: center;
-		gap: 0.75rem;
+		justify-content: center;
+		flex-shrink: 0;
 	}
 	.modal-file-icon {
-		font-size: 1.5rem;
+		font-size: 1.35rem;
 		line-height: 1;
+	}
+	.modal-title-text {
+		min-width: 0;
 	}
 	.modal-title {
 		font-size: 0.95rem;
 		font-weight: 600;
-		color: rgba(212, 199, 163, 0.9);
+		color: rgba(212, 199, 163, 0.92);
 		margin: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.modal-subtitle-row {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-top: 0.375rem;
+		flex-wrap: wrap;
+	}
+	.modal-type-badge {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.125rem 0.5rem;
+		border-radius: 4px;
+		font-size: 0.65rem;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		border: 1px solid;
 	}
 	.modal-subtitle {
 		font-size: 0.75rem;
 		color: rgba(212, 199, 163, 0.4);
-		display: block;
-		margin-top: 0.125rem;
+	}
+	.modal-case-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+		padding: 0.125rem 0.5rem;
+		border-radius: 4px;
+		font-size: 0.65rem;
+		font-weight: 600;
+		background: rgba(34, 197, 94, 0.1);
+		border: 1px solid rgba(34, 197, 94, 0.2);
+		color: #4ade80;
+	}
+	.modal-status-badge {
+		display: inline-flex;
+		padding: 0.125rem 0.5rem;
+		border-radius: 4px;
+		font-size: 0.65rem;
+		font-weight: 600;
+		background: rgba(245, 158, 11, 0.1);
+		border: 1px solid rgba(245, 158, 11, 0.2);
+		color: #fbbf24;
+		text-transform: capitalize;
 	}
 	.modal-close {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 28px;
-		height: 28px;
-		border-radius: 6px;
+		width: 30px;
+		height: 30px;
+		border-radius: 8px;
 		background: transparent;
-		border: none;
-		color: rgba(212, 199, 163, 0.4);
+		border: 1px solid rgba(212, 199, 163, 0.06);
+		color: rgba(212, 199, 163, 0.35);
 		cursor: pointer;
 		transition: all 0.15s;
 		flex-shrink: 0;
 	}
 	.modal-close:hover {
-		background: rgba(212, 199, 163, 0.08);
+		background: rgba(212, 199, 163, 0.06);
+		border-color: rgba(212, 199, 163, 0.12);
 		color: rgba(212, 199, 163, 0.8);
 	}
 
@@ -338,32 +461,58 @@
 		flex-direction: column;
 		gap: 1rem;
 	}
-	.modal-loading, .modal-error {
+
+	/* Skeleton loading */
+	.modal-skeleton {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		padding: 1rem 0;
+	}
+	.skel-line, .skel-box, .skel-block {
+		background: linear-gradient(90deg, rgba(212, 199, 163, 0.04) 25%, rgba(212, 199, 163, 0.08) 50%, rgba(212, 199, 163, 0.04) 75%);
+		background-size: 200% 100%;
+		animation: shimmer 1.5s ease infinite;
+		border-radius: 6px;
+	}
+	.skel-line {
+		height: 12px;
+	}
+	.skel-w-60 { width: 60%; }
+	.skel-w-80 { width: 80%; }
+	.skel-w-40 { width: 40%; }
+	.skel-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.75rem;
+	}
+	.skel-box {
+		height: 52px;
+	}
+	.skel-block {
+		height: 80px;
+	}
+	@keyframes shimmer {
+		0% { background-position: 200% 0; }
+		100% { background-position: -200% 0; }
+	}
+
+	.modal-error {
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		gap: 0.5rem;
 		padding: 3rem;
-		color: rgba(212, 199, 163, 0.4);
+		color: #f87171;
 		font-size: 0.875rem;
 	}
-	.modal-error { color: #f87171; }
-	.spinner {
-		width: 20px;
-		height: 20px;
-		border: 2px solid rgba(212, 199, 163, 0.2);
-		border-top-color: rgba(212, 199, 163, 0.6);
-		border-radius: 50%;
-		animation: spin 0.7s linear infinite;
-	}
-	@keyframes spin { to { transform: rotate(360deg); } }
 
 	/* File preview */
 	.preview-wrap {
-		border-radius: 8px;
+		border-radius: 10px;
 		overflow: hidden;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(212, 199, 163, 0.08);
+		background: rgba(255, 255, 255, 0.02);
+		border: 1px solid rgba(212, 199, 163, 0.06);
 	}
 	.preview-img {
 		width: 100%;
@@ -382,18 +531,25 @@
 	}
 	.pdf-link:hover { text-decoration: underline; }
 
-	/* Fields grid */
-	.fields-grid {
+	/* Fields card */
+	.fields-card {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 0.75rem;
+		background: rgba(255, 255, 255, 0.02);
+		border: 1px solid rgba(212, 199, 163, 0.06);
+		border-radius: 10px;
+		padding: 1rem;
 	}
-	.field { display: flex; flex-direction: column; gap: 0.25rem; }
+	.field { display: flex; flex-direction: column; gap: 0.3rem; }
 	.field.full-width { grid-column: 1 / -1; }
 	.field-label {
-		font-size: 0.7rem;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		font-size: 0.68rem;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: 0.06em;
 		color: rgba(212, 199, 163, 0.35);
 		font-weight: 600;
 	}
@@ -403,40 +559,53 @@
 		line-height: 1.5;
 		margin: 0;
 	}
-	.field-value.mono { font-family: monospace; }
+	.field-value.mono {
+		font-family: 'JetBrains Mono', 'Courier New', monospace;
+		font-size: 0.78rem;
+		letter-spacing: 0.03em;
+	}
 	.field-badge {
 		display: inline-block;
-		font-size: 0.7rem;
-		padding: 0.125rem 0.5rem;
+		font-size: 0.68rem;
+		padding: 0.15rem 0.5rem;
 		border-radius: 20px;
 		background: rgba(96, 165, 250, 0.1);
 		border: 1px solid rgba(96, 165, 250, 0.2);
 		color: #93c5fd;
 		text-transform: capitalize;
+		width: fit-content;
 	}
 
 	/* Sections */
 	.section {
 		background: rgba(255, 255, 255, 0.02);
 		border: 1px solid rgba(212, 199, 163, 0.06);
-		border-radius: 8px;
-		padding: 0.875rem;
+		border-radius: 10px;
+		padding: 0.875rem 1rem;
+	}
+	.ai-section {
+		border-color: rgba(168, 85, 247, 0.15);
+		background: linear-gradient(135deg, rgba(168, 85, 247, 0.04) 0%, rgba(96, 165, 250, 0.03) 100%);
 	}
 	.section-title {
 		display: flex;
 		align-items: center;
 		gap: 0.375rem;
-		font-size: 0.75rem;
+		font-size: 0.72rem;
 		font-weight: 600;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: 0.06em;
 		color: rgba(212, 199, 163, 0.45);
 		margin: 0 0 0.625rem;
+	}
+	.ai-icon-wrap {
+		display: inline-flex;
+		color: #a78bfa;
 	}
 	.section-body {
 		font-size: 0.82rem;
 		color: rgba(212, 199, 163, 0.7);
-		line-height: 1.6;
+		line-height: 1.65;
 		margin: 0;
 		white-space: pre-wrap;
 	}
@@ -444,25 +613,26 @@
 	/* Entities / tags */
 	.entity-list { display: flex; flex-wrap: wrap; gap: 0.375rem; }
 	.entity-chip {
-		font-size: 0.7rem;
-		padding: 0.15rem 0.5rem;
-		border-radius: 4px;
+		font-size: 0.68rem;
+		padding: 0.2rem 0.6rem;
+		border-radius: 6px;
 		background: rgba(168, 85, 247, 0.08);
 		border: 1px solid rgba(168, 85, 247, 0.18);
 		color: #c4b5fd;
 	}
 	.tag-chip {
-		font-size: 0.7rem;
-		padding: 0.15rem 0.5rem;
-		border-radius: 4px;
+		font-size: 0.68rem;
+		padding: 0.2rem 0.6rem;
+		border-radius: 6px;
 		background: rgba(96, 165, 250, 0.08);
 		border: 1px solid rgba(96, 165, 250, 0.18);
 		color: #93c5fd;
+		font-weight: 500;
 	}
 
 	/* Text preview */
 	.text-preview {
-		font-family: 'Courier New', monospace;
+		font-family: 'JetBrains Mono', 'Courier New', monospace;
 		font-size: 0.72rem;
 		line-height: 1.5;
 		color: rgba(212, 199, 163, 0.55);
@@ -479,29 +649,32 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: 0.875rem 1.25rem;
-		border-top: 1px solid rgba(212, 199, 163, 0.08);
+		border-top: 1px solid rgba(212, 199, 163, 0.06);
 		flex-shrink: 0;
+		background: rgba(0, 0, 0, 0.15);
 	}
 	.footer-actions { display: flex; gap: 0.5rem; }
 	.footer-btn {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.375rem;
-		padding: 0.4rem 0.875rem;
-		border-radius: 6px;
+		padding: 0.45rem 0.9rem;
+		border-radius: 8px;
 		font-size: 0.8rem;
 		font-weight: 500;
 		cursor: pointer;
 		transition: all 0.15s;
 		border: none;
+		text-decoration: none;
 	}
 	.footer-btn.ghost {
 		background: transparent;
-		color: rgba(212, 199, 163, 0.5);
-		border: 1px solid rgba(212, 199, 163, 0.12);
+		color: rgba(212, 199, 163, 0.45);
+		border: 1px solid rgba(212, 199, 163, 0.08);
 	}
 	.footer-btn.ghost:hover {
 		background: rgba(212, 199, 163, 0.06);
+		border-color: rgba(212, 199, 163, 0.15);
 		color: rgba(212, 199, 163, 0.8);
 	}
 	.footer-btn.secondary {
@@ -511,13 +684,24 @@
 	}
 	.footer-btn.secondary:hover {
 		background: rgba(168, 85, 247, 0.2);
+		border-color: rgba(168, 85, 247, 0.3);
+	}
+	.footer-btn.secondary.download {
+		background: rgba(34, 197, 94, 0.1);
+		border: 1px solid rgba(34, 197, 94, 0.2);
+		color: #4ade80;
+	}
+	.footer-btn.secondary.download:hover {
+		background: rgba(34, 197, 94, 0.2);
+		border-color: rgba(34, 197, 94, 0.3);
 	}
 	.footer-btn.primary {
-		background: rgba(96, 165, 250, 0.12);
+		background: rgba(96, 165, 250, 0.15);
 		border: 1px solid rgba(96, 165, 250, 0.25);
 		color: #93c5fd;
 	}
 	.footer-btn.primary:hover {
-		background: rgba(96, 165, 250, 0.22);
+		background: rgba(96, 165, 250, 0.25);
+		border-color: rgba(96, 165, 250, 0.35);
 	}
 </style>

@@ -6,13 +6,35 @@ declare module 'bits-ui' {
  // Corrected ComponentCtor type to include Props: Events, and Slots
  type ComponentCtor = new (...args: unknown[]) => SvelteComponentTyped<unknown, unknown, unknown>;
 
- export const Dialog: ComponentCtor;
+ export const Dialog: {
+  Root: ComponentCtor;
+  Trigger: ComponentCtor;
+  Portal: ComponentCtor;
+  Overlay: ComponentCtor;
+  Content: ComponentCtor;
+  Title: ComponentCtor;
+  Description: ComponentCtor;
+  Close: ComponentCtor;
+ };
  export const Button: ComponentCtor;
  export const Badge: ComponentCtor;
  export const Card: ComponentCtor;
  export const Checkbox: ComponentCtor;
- export const Select: ComponentCtor;
- export const Tabs: ComponentCtor;
+ export const Select: {
+  Root: ComponentCtor;
+  Trigger: ComponentCtor;
+  Content: ComponentCtor;
+  Item: ComponentCtor;
+  Value: ComponentCtor;
+  Group: ComponentCtor;
+  GroupHeading: ComponentCtor;
+ };
+ export const Tabs: {
+  Root: ComponentCtor;
+  List: ComponentCtor;
+  Trigger: ComponentCtor;
+  Content: ComponentCtor;
+ };
  export const Toast: ComponentCtor;
  export const Collapsible: {
    Root: ComponentCtor;

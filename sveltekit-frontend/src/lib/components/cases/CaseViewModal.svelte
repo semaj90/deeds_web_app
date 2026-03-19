@@ -122,7 +122,7 @@
 					</div>
 				{:else if loadError}
 					<div class="error-state">
-						<Icon name="alert-circle" class="w-5 h-5" />
+						<Icon name="circle-alert" class="w-5 h-5" />
 						{loadError}
 					</div>
 				{:else if caseData}

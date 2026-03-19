@@ -80,12 +80,12 @@
   };
 
   const statusConfig = {
-    at_large: { label: 'At Large', className: 'bg-danger/20 text-danger/80', icon: 'alert-triangle' },
+    at_large: { label: 'At Large', className: 'bg-danger/20 text-danger/80', icon: 'triangle-alert' },
     incarcerated: { label: 'Incarcerated', className: 'bg-sand/20 text-sand/40', icon: 'lock' },
     on_parole: { label: 'On Parole', className: 'bg-warning/20 text-warning', icon: 'eye' },
     probation: { label: 'Probation', className: 'bg-info/20 text-info/80', icon: 'refresh-cw' },
     deceased: { label: 'Deceased', className: 'bg-sand/20 text-sand/40', icon: 'minus-circle' },
-    cleared: { label: 'Cleared', className: 'bg-accent/20 text-accent', icon: 'check-circle' }
+    cleared: { label: 'Cleared', className: 'bg-accent/20 text-accent', icon: 'circle-check' }
   };
 
   const dispositionConfig = {
@@ -229,7 +229,7 @@
     {#if activeWarrants.length > 0}
       <div class="mt-3 p-3 bg-danger/10 border border-danger/20 rounded">
         <div class="flex items-center gap-2 text-danger/80 font-medium text-sm font-mono">
-          <Icon name="alert-triangle" class="w-4 h-4" />
+          <Icon name="triangle-alert" class="w-4 h-4" />
           {activeWarrants.length} Active Warrant{activeWarrants.length !== 1 ? 's' : ''}
         </div>
         {#each activeWarrants as warrant}
@@ -339,7 +339,7 @@
             <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
               {#if profile.identification.biometrics.fingerprints?.length}
                 <div class="flex items-center gap-2">
-                  <Icon name="fingerprint" class="w-4 h-4 text-yorha-text-secondary" />
+                  <Icon name="fingerprint-pattern" class="w-4 h-4 text-yorha-text-secondary" />
                   <span class="text-yorha-text-primary">
                     {profile.identification.biometrics.fingerprints.length} fingerprint record{profile.identification.biometrics.fingerprints.length !== 1 ? 's' : ''}
                   </span>
