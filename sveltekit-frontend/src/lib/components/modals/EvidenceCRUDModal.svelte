@@ -61,6 +61,7 @@
   let dragOver = $state(false);
   let modalElement = $state<HTMLDivElement>();
   let isClosing = $state(false);
+  let fileInputElement = $state<HTMLInputElement | null>(null);
 
   // Derived values
   let isReadonly = $derived(mode === 'view');
@@ -303,12 +304,26 @@
       handleSave();
     }
   }
+
+  function openFileUploadPicker() {
+    if (!isReadonly) {
+      fileInputElement?.click();
+    }
+  }
+
+  function handleUploadZoneKeydown(event: KeyboardEvent) {
+    if (isReadonly) return;
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      openFileUploadPicker();
+    }
+  }
 </script>
 
 {#if isOpen}
   <!-- Backdrop -->
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+    class="crud-modal-overlay"
     class:animate-fadeOut={isClosing}
     onclick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
     onkeydown={handleKeydown}
@@ -319,7 +334,7 @@
     <!-- Modal Container -->
     <div
       bind:this={modalElement}
-      class="relative w-full max-w-4xl max-h-[90vh] m-4 overflow-hidden rounded-lg bg-white shadow-xl"
+      class="crud-modal-card"
       class:animate-scaleIn={!isClosing}
       class:animate-scaleOut={isClosing}
     >
@@ -330,7 +345,7 @@
         </div>
       {:else}
         <!-- Header -->
-        <div class="flex items-center justify-between px-6 py-4 border-b">
+        <div class="crud-modal-header">
           <div class="flex items-center gap-2">
             {#if evidence.type === 'image'}
               <span class="i-lucide-image w-5 h-5 text-sand/60 inline-block"></span>
@@ -343,7 +358,7 @@
             {/if}
             <h2 class="text-lg font-semibold text-sand">{modalTitle}</h2>
           </div>
-          <Button variant="ghost" size="sm" onclick={handleClose} class="rounded-full p-1">
+          <Button variant="ghost" size="sm" onclick={handleClose} class="crud-modal-close">
             <span class="i-lucide-x w-4 h-4 inline-block"></span>
           </Button>
         </div>
@@ -466,40 +481,45 @@
                 <div class="space-y-1">
                   <label class="block text-sm font-medium text-sand/80">File Upload</label>
                   <div
-                    class="border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer {dragOver ? 'bg-info/5' : ''} {!dragOver ? 'border-sand/20' : ''}"
-                    class:border-info={dragOver}
+                    class="crud-upload-zone"
+                    class:dragging={dragOver}
                     ondrop={handleFileDrop}
                     ondragover={(e) => { e.preventDefault(); dragOver = true; }}
                     ondragleave={() => { dragOver = false; }}
+                    onclick={openFileUploadPicker}
+                    onkeydown={handleUploadZoneKeydown}
                     role="button"
-                    tabindex="0"
+                    tabindex={isReadonly ? -1 : 0}
+                    aria-disabled={isReadonly}
                   >
+                    <input
+                      bind:this={fileInputElement}
+                      type="file"
+                      class="hidden"
+                      onchange={handleFileUpload}
+                      accept="*/*"
+                    />
                     {#if uploadedFile}
-                      <div class="space-y-2">
+                      <div class="crud-upload-stack">
                         <span class="i-lucide-upload w-8 h-8 mx-auto text-sand/40 inline-block"></span>
                         <p class="font-medium text-sm text-sand">{uploadedFile.name}</p>
                         <p class="text-xs text-sand/60">
                           {(uploadedFile.size / 1024).toFixed(1)} KB
                         </p>
                         {#if uploadProgress > 0 && uploadProgress < 100}
-                          <div class="w-full bg-sand/10 rounded-full h-2">
+                          <div class="crud-upload-progress">
                             <div
-                              class="bg-info h-2 rounded-full transition-all"
+                              class="crud-upload-progress-bar"
                               style="width: {uploadProgress}%"
                             ></div>
                           </div>
                         {/if}
                       </div>
                     {:else}
-                      <div class="space-y-2">
+                      <div class="crud-upload-stack">
                         <span class="i-lucide-upload w-8 h-8 mx-auto text-sand/40 inline-block"></span>
                         <p class="text-sm text-sand/60">Drop file here or click to browse</p>
-                        <input
-                          type="file"
-                          class="hidden"
-                          onchange={handleFileUpload}
-                          accept="*/*"
-                        />
+                        <p class="crud-upload-note">Documents, images, audio, or video assets</p>
                       </div>
                     {/if}
                   </div>
@@ -619,6 +639,146 @@
 {/if}
 
 <style>
+  .crud-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background:
+      radial-gradient(circle at top, rgba(126, 231, 255, 0.14), transparent 26%),
+      radial-gradient(circle at bottom right, rgba(255, 212, 121, 0.12), transparent 24%),
+      rgba(4, 8, 15, 0.82);
+    backdrop-filter: blur(16px) saturate(1.12);
+  }
+
+  .crud-modal-card {
+    position: relative;
+    width: min(100%, 64rem);
+    max-height: 90vh;
+    margin: 1rem;
+    overflow: hidden;
+    border-radius: var(--shell-radius-curve, 26px 26px 18px 18px / 22px 22px 30px 30px);
+    background: linear-gradient(180deg, rgba(19, 27, 42, 0.96) 0%, rgba(8, 12, 20, 0.98) 100%);
+    border: 1px solid var(--shell-border, rgba(120, 160, 220, 0.18));
+    box-shadow:
+      0 0 0 1px rgba(126, 231, 255, 0.04),
+      0 28px 56px -18px rgba(0, 0, 0, 0.72),
+      0 0 72px rgba(0, 0, 0, 0.36),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    color: var(--shell-text, rgba(233, 240, 255, 0.88));
+  }
+
+  .crud-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(126, 231, 255, 0.08);
+  }
+
+  :global(.crud-modal-close) {
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(120, 160, 220, 0.14);
+    color: rgba(214, 226, 248, 0.64);
+    transition: all 0.15s ease;
+  }
+
+  :global(.crud-modal-close)::before {
+    content: none;
+  }
+
+  :global(.crud-modal-close:hover) {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(126, 231, 255, 0.18);
+    color: rgba(240, 248, 255, 0.92);
+  }
+
+  .crud-upload-zone {
+    position: relative;
+    overflow: hidden;
+    padding: 1.5rem;
+    border: 1px dashed var(--shell-border, rgba(120, 160, 220, 0.2));
+    border-radius: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition:
+      transform 0.18s ease,
+      border-color 0.18s ease,
+      background 0.18s ease,
+      box-shadow 0.18s ease;
+    background:
+      radial-gradient(circle at top, rgba(126, 231, 255, 0.08), transparent 42%),
+      linear-gradient(180deg, rgba(13, 19, 31, 0.84) 0%, rgba(7, 10, 17, 0.94) 100%);
+    box-shadow:
+      0 18px 34px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .crud-upload-zone::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    pointer-events: none;
+  }
+
+  .crud-upload-zone:hover,
+  .crud-upload-zone.dragging {
+    border-color: var(--shell-border-strong, rgba(126, 231, 255, 0.3));
+    background:
+      radial-gradient(circle at top, rgba(126, 231, 255, 0.14), transparent 46%),
+      radial-gradient(circle at bottom right, rgba(255, 212, 121, 0.1), transparent 34%),
+      linear-gradient(180deg, rgba(16, 24, 39, 0.94) 0%, rgba(8, 12, 20, 0.98) 100%);
+    box-shadow:
+      0 22px 42px rgba(0, 0, 0, 0.24),
+      0 0 0 1px rgba(126, 231, 255, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transform: translateY(-1px);
+  }
+
+  .crud-upload-zone:focus-visible {
+    outline: 2px solid rgba(126, 231, 255, 0.32);
+    outline-offset: 2px;
+  }
+
+  .crud-upload-stack {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .crud-upload-note {
+    margin: 0;
+    font-size: 0.75rem;
+    color: rgba(184, 198, 226, 0.54);
+  }
+
+  .crud-upload-progress {
+    width: 100%;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+
+  .crud-upload-progress-bar {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #7ee7ff 0%, #53b7ff 45%, #ffd479 100%);
+    transition: width 0.2s ease;
+  }
+
   @keyframes fadeOut {
     from { opacity: 1; }
     to { opacity: 0; }

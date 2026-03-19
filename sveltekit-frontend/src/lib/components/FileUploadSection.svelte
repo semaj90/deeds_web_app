@@ -75,19 +75,23 @@
 	}
 </script>
 
-<div class="flex flex-col gap-2 {className}">
-	<!-- Drop Zone -->
+<div class="file-upload {className}">
 	<button
-		class="w-full border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer bg-transparent {dragOver ? 'border-emerald-500 bg-emerald-950/20' : 'border-stone-700'} {disabled ? 'opacity-50 cursor-not-allowed' : ''}"
+		type="button"
+		class="file-upload-zone"
+		class:dragging={dragOver}
+		class:disabled={disabled}
 		ondragover={(e) => { e.preventDefault(); if (!disabled) dragOver = true; }}
-		ondragleave={() => dragOver = false}
+		ondragleave={() => (dragOver = false)}
 		ondrop={handleDrop}
 		onclick={() => !disabled && fileInput?.click()}
 		{disabled}
 	>
-		<Icon name="upload" size={24} class="mx-auto mb-2 text-stone-500" />
-		<p class="text-sm text-stone-400 m-0">{label}</p>
-		<p class="text-[11px] text-stone-600 mt-1 m-0">Drag & drop or click to browse. Max {maxSizeMB}MB per file.</p>
+		<span class="file-upload-icon">
+			<Icon name="upload" size={24} />
+		</span>
+		<p class="file-upload-title">{label}</p>
+		<p class="file-upload-hint">Drag & drop or click to browse. Max {maxSizeMB}MB per file.</p>
 	</button>
 
 	<input
@@ -101,7 +105,7 @@
 
 	<!-- Error -->
 	{#if error}
-		<div class="text-red-400 text-xs flex items-center gap-1.5 px-1">
+		<div class="file-upload-error" role="alert">
 			<Icon name="triangle-alert" size={12} />
 			{error}
 		</div>
@@ -109,14 +113,15 @@
 
 	<!-- File List -->
 	{#if selectedFiles.length > 0}
-		<div class="flex flex-col gap-1">
+		<div class="file-upload-list">
 			{#each selectedFiles as file, idx}
-				<div class="flex items-center gap-2 px-3 py-1.5 rounded bg-stone-800/50 border border-stone-700 text-sm">
-					<Icon name="file" size={14} class="text-stone-500 shrink-0" />
-					<span class="text-stone-300 truncate flex-1">{file.name}</span>
-					<span class="text-stone-600 text-[11px] shrink-0">{formatSize(file.size)}</span>
+				<div class="file-upload-row">
+					<Icon name="file" size={14} class="file-upload-file-icon" />
+					<span class="file-upload-name">{file.name}</span>
+					<span class="file-upload-size">{formatSize(file.size)}</span>
 					<button
-						class="text-stone-600 hover:text-red-400 bg-transparent border-none cursor-pointer p-0.5 shrink-0 transition-colors"
+						type="button"
+						class="file-upload-remove"
 						onclick={() => removeFile(idx)}
 						title="Remove file"
 					>
@@ -127,3 +132,169 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	.file-upload {
+		display: flex;
+		flex-direction: column;
+		gap: 0.625rem;
+	}
+
+	.file-upload-zone {
+		position: relative;
+		display: block;
+		width: 100%;
+		padding: 1.5rem 1.25rem;
+		border: 1px dashed var(--shell-border, rgba(120, 160, 220, 0.22));
+		border-radius: 24px;
+		background:
+			radial-gradient(circle at top, rgba(126, 231, 255, 0.08), transparent 42%),
+			linear-gradient(180deg, rgba(12, 18, 31, 0.82) 0%, rgba(7, 10, 17, 0.94) 100%);
+		box-shadow:
+			0 18px 32px rgba(0, 0, 0, 0.18),
+			inset 0 1px 0 rgba(255, 255, 255, 0.04);
+		color: inherit;
+		font: inherit;
+		text-align: center;
+		text-transform: none;
+		letter-spacing: normal;
+		cursor: pointer;
+		transition:
+			transform 0.18s ease,
+			border-color 0.18s ease,
+			background 0.18s ease,
+			box-shadow 0.18s ease;
+		box-shadow: 0 18px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+	}
+
+	.file-upload-zone::before {
+		content: '';
+		position: absolute;
+		inset: 1px;
+		border-radius: 22px;
+		border: 1px solid rgba(255, 255, 255, 0.04);
+		pointer-events: none;
+	}
+
+	.file-upload-zone:hover:not(.disabled),
+	.file-upload-zone.dragging {
+		border-color: var(--shell-border-strong, rgba(126, 231, 255, 0.3));
+		background:
+			radial-gradient(circle at top, rgba(126, 231, 255, 0.14), transparent 46%),
+			radial-gradient(circle at bottom right, rgba(255, 212, 121, 0.1), transparent 34%),
+			linear-gradient(180deg, rgba(16, 24, 39, 0.92) 0%, rgba(8, 12, 20, 0.98) 100%);
+		box-shadow:
+			0 22px 38px rgba(0, 0, 0, 0.24),
+			0 0 0 1px rgba(126, 231, 255, 0.06),
+			inset 0 1px 0 rgba(255, 255, 255, 0.05);
+		transform: translateY(-1px);
+	}
+
+	.file-upload-zone.disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+		transform: none;
+		filter: saturate(0.65);
+	}
+
+	.file-upload-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 3rem;
+		height: 3rem;
+		margin: 0 auto 0.75rem;
+		border-radius: 18px;
+		background: rgba(126, 231, 255, 0.08);
+		color: var(--shell-accent, #7ee7ff);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+	}
+
+	.file-upload-title {
+		margin: 0;
+		font-size: 0.9375rem;
+		font-weight: 600;
+		color: var(--shell-text, rgba(233, 240, 255, 0.88));
+	}
+
+	.file-upload-hint {
+		margin: 0.45rem 0 0;
+		font-size: 0.75rem;
+		color: var(--shell-text-soft, rgba(184, 198, 226, 0.72));
+	}
+
+	.file-upload-error {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.75rem 0.9rem;
+		border-radius: 16px;
+		background: rgba(255, 107, 120, 0.08);
+		border: 1px solid rgba(255, 107, 120, 0.18);
+		color: #ff9da8;
+		font-size: 0.75rem;
+	}
+
+	.file-upload-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.file-upload-row {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.8rem 0.95rem;
+		border-radius: 18px;
+		background: rgba(12, 18, 31, 0.72);
+		border: 1px solid rgba(120, 160, 220, 0.12);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+	}
+
+	.file-upload-file-icon {
+		color: rgba(126, 231, 255, 0.58);
+		flex-shrink: 0;
+	}
+
+	.file-upload-name {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-size: 0.875rem;
+		color: var(--shell-text, rgba(233, 240, 255, 0.88));
+	}
+
+	.file-upload-size {
+		flex-shrink: 0;
+		font-size: 0.6875rem;
+		color: var(--shell-muted, rgba(140, 160, 199, 0.52));
+	}
+
+	.file-upload-remove {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.9rem;
+		height: 1.9rem;
+		padding: 0;
+		border: 1px solid transparent;
+		border-radius: 999px;
+		background: transparent;
+		color: rgba(184, 198, 226, 0.52);
+		cursor: pointer;
+		transition: all 0.15s ease;
+	}
+
+	.file-upload-remove::before {
+		content: none;
+	}
+
+	.file-upload-remove:hover {
+		background: rgba(255, 107, 120, 0.1);
+		border-color: rgba(255, 107, 120, 0.18);
+		color: #ff9da8;
+	}
+</style>

@@ -16,6 +16,14 @@
 	let selectedTemplate = $derived(getTemplate(selectedType));
 	const reportTypes = getTemplateTypes();
 
+	// Derive sections from contentTemplate <h2> headings
+	let templateSections = $derived.by(() => {
+		if (!selectedTemplate?.contentTemplate) return [];
+		const matches = selectedTemplate.contentTemplate.match(/<h2>([^<]+)<\/h2>/g);
+		if (!matches) return [];
+		return matches.map((m: string) => m.replace(/<\/?h2>/g, ''));
+	});
+
 	async function createReport() {
 		if (!title.trim()) { error = 'Please enter a report title'; return; }
 		if (!caseId) { error = 'Case ID is required. Please create report from a case page.'; return; }
@@ -58,345 +66,866 @@
 	}
 </script>
 
-<div class="new-report-page">
-	<!-- Header -->
-	<div class="nr-header">
-		<button onclick={() => goto('/reports')} class="nr-back-btn">
-			<Icon name="arrow-left" />
-			Back to Reports
-		</button>
-		<h1 class="nr-title">Create New Report</h1>
-		<p class="nr-subtitle">Select a report type and start writing</p>
-	</div>
+<div class="sqex-page">
+	<!-- CRT Scan Lines -->
+	<div class="scanlines"></div>
 
-	<!-- Error -->
-	{#if error}
-		<div class="nr-error-box">
-			<Icon name="triangle-alert" />
-			<span>{error}</span>
-		</div>
-	{/if}
+	<!-- Top accent bar -->
+	<div class="accent-bar"></div>
 
-	<!-- Form -->
-	<div class="nr-form">
-		<!-- Title Input -->
-		<div class="nr-field">
-			<label for="title" class="nr-label">Report Title</label>
-			<input
-				id="title"
-				type="text"
-				bind:value={title}
-				placeholder="Enter report title..."
-				class="nr-input"
-			/>
-		</div>
+	<div class="sqex-container">
+		<!-- Header -->
+		<div class="sqex-header">
+			<button onclick={() => goto('/reports')} class="sqex-back">
+				<Icon name="arrow-left" size={14} />
+				<span>Back to Reports</span>
+			</button>
 
-		<!-- Report Type Selection -->
-		<div class="nr-field">
-			<h2 class="nr-label">Report Type</h2>
-			<div class="nr-type-grid">
-				{#each reportTypes as type}
-					<button
-						onclick={() => selectedType = type.value}
-						class="nr-type-card"
-						class:selected={selectedType === type.value}
-					>
-						<div class="nr-type-content">
-							<Icon name={type.icon} class="nr-type-icon" />
-							<div class="nr-type-info">
-								<div class="nr-type-name">{type.label}</div>
-								<div class="nr-type-desc">{type.description}</div>
-							</div>
-							{#if selectedType === type.value}
-								<Icon name="circle-check" class="nr-type-check" />
-							{/if}
-						</div>
-					</button>
-				{/each}
+			<div class="sqex-title-block">
+				<div class="sqex-title-row">
+					<div class="sqex-icon-badge">
+						<Icon name="file-plus" size={18} />
+					</div>
+					<div>
+						<h1 class="sqex-title">Create New Report</h1>
+						<p class="sqex-subtitle">Select a report type and start writing</p>
+					</div>
+				</div>
+				<div class="sqex-status-chip">
+					<span class="status-dot"></span>
+					DRAFT MODE
+				</div>
 			</div>
 		</div>
 
-		<!-- Template Options -->
-		{#if selectedTemplate}
-			<div class="nr-options-panel">
-				<h3 class="nr-options-title">Generation Options</h3>
-
-				<label class="nr-toggle-row">
-					<input type="checkbox" bind:checked={useTemplate} class="nr-checkbox" />
-					<div class="nr-toggle-info">
-						<div class="nr-toggle-label">Use {selectedTemplate.name} template</div>
-						<div class="nr-toggle-desc">Pre-fill report with structured template ({selectedTemplate.estimatedTime})</div>
-					</div>
-				</label>
-
-				{#if useTemplate}
-					<label class="nr-toggle-row">
-						<input type="checkbox" bind:checked={useAI} class="nr-checkbox" />
-						<div class="nr-toggle-info">
-							<div class="nr-toggle-label">
-								AI-powered content generation
-								<span class="nr-beta-badge">Beta</span>
-							</div>
-							<div class="nr-toggle-desc">Generate case-specific content using AI (requires Ollama)</div>
-						</div>
-					</label>
-
-					{#if useAI}
-						<div class="nr-ai-notice">
-							<Icon name="sparkles" />
-							AI will analyze your case evidence and generate tailored content following the template structure.
-						</div>
-					{/if}
-				{/if}
+		<!-- Error -->
+		{#if error}
+			<div class="sqex-error">
+				<Icon name="triangle-alert" size={14} />
+				<span>{error}</span>
 			</div>
 		{/if}
 
-		<!-- Actions -->
-		<div class="nr-actions">
-			<button onclick={createReport} disabled={isCreating || !title.trim() || !caseId} class="nr-btn primary">
-				{#if isCreating}
-					<Icon name="loader-circle" class="animate-spin" />
-					Creating...
-				{:else}
-					<Icon name="file-plus" />
-					Create Report
+		<!-- Main Content — Two Column -->
+		<div class="sqex-layout">
+			<!-- LEFT: Form -->
+			<div class="sqex-form-col">
+				<!-- Title Input -->
+				<div class="sqex-field">
+					<label for="title" class="sqex-label">
+						<span class="label-marker"></span>
+						REPORT TITLE
+					</label>
+					<input
+						id="title"
+						type="text"
+						bind:value={title}
+						placeholder="Enter report title..."
+						class="sqex-input"
+					/>
+				</div>
+
+				<!-- Report Type Selection -->
+				<div class="sqex-field">
+					<h2 class="sqex-label">
+						<span class="label-marker"></span>
+						REPORT TYPE
+					</h2>
+					<div class="sqex-type-grid">
+						{#each reportTypes as type}
+							<button
+								onclick={() => selectedType = type.value}
+								class="sqex-type-card"
+								class:selected={selectedType === type.value}
+							>
+								<div class="type-indicator">
+									{#if selectedType === type.value}
+										<span class="indicator-active"></span>
+									{:else}
+										<span class="indicator-idle"></span>
+									{/if}
+								</div>
+								<Icon name={type.icon} size={16} />
+								<div class="type-text">
+									<span class="type-name">{type.label}</span>
+									<span class="type-desc">{type.description}</span>
+								</div>
+							</button>
+						{/each}
+					</div>
+				</div>
+
+				<!-- Template Options -->
+				{#if selectedTemplate}
+					<div class="sqex-options-panel">
+						<div class="options-header">
+							<span class="options-title">GENERATION OPTIONS</span>
+							<span class="options-badge">{selectedTemplate.estimatedTime}</span>
+						</div>
+
+						<label class="sqex-toggle">
+							<input type="checkbox" bind:checked={useTemplate} class="sqex-checkbox" />
+							<div class="toggle-content">
+								<span class="toggle-label">Use {selectedTemplate.name} template</span>
+								<span class="toggle-desc">Pre-fill report with structured template</span>
+							</div>
+						</label>
+
+						{#if useTemplate}
+							<label class="sqex-toggle">
+								<input type="checkbox" bind:checked={useAI} class="sqex-checkbox" />
+								<div class="toggle-content">
+									<span class="toggle-label">
+										AI-powered content generation
+										<span class="ai-badge">AI</span>
+									</span>
+									<span class="toggle-desc">Generate case-specific content using Ollama</span>
+								</div>
+							</label>
+
+							{#if useAI}
+								<div class="sqex-ai-notice">
+									<div class="ai-glow"></div>
+									<Icon name="sparkles" size={14} />
+									<span>Neural analysis will generate tailored content from case evidence.</span>
+								</div>
+							{/if}
+						{/if}
+					</div>
 				{/if}
-			</button>
-			<button onclick={() => goto('/reports')} class="nr-btn secondary">
-				Cancel
-			</button>
+
+				<!-- Actions -->
+				<div class="sqex-actions">
+					<button onclick={createReport} disabled={isCreating || !title.trim() || !caseId} class="sqex-btn-primary">
+						{#if isCreating}
+							<Icon name="loader-circle" size={14} class="animate-spin" />
+							<span>GENERATING...</span>
+						{:else}
+							<Icon name="file-plus" size={14} />
+							<span>CREATE REPORT</span>
+						{/if}
+					</button>
+					<button onclick={() => goto('/reports')} class="sqex-btn-ghost">
+						CANCEL
+					</button>
+				</div>
+			</div>
+
+			<!-- RIGHT: Preview Panel -->
+			<div class="sqex-preview-col">
+				<div class="preview-panel">
+					<div class="preview-header">
+						<span class="preview-label">PREVIEW</span>
+						<span class="preview-dot"></span>
+					</div>
+
+					{#if selectedTemplate}
+						<div class="preview-content">
+							<div class="preview-icon-wrap">
+								<Icon name="file-text" size={28} />
+							</div>
+							<h3 class="preview-title">{selectedTemplate.name}</h3>
+							<p class="preview-desc">{selectedTemplate.description}</p>
+
+							<div class="preview-meta">
+								<div class="meta-row">
+									<span class="meta-key">TYPE</span>
+									<span class="meta-val">{selectedType.replace(/_/g, ' ').toUpperCase()}</span>
+								</div>
+								<div class="meta-row">
+									<span class="meta-key">MODE</span>
+									<span class="meta-val">{useTemplate ? (useAI ? 'AI GENERATED' : 'TEMPLATE') : 'BLANK'}</span>
+								</div>
+								<div class="meta-row">
+									<span class="meta-key">TIME</span>
+									<span class="meta-val">{selectedTemplate.estimatedTime}</span>
+								</div>
+								<div class="meta-row">
+									<span class="meta-key">SECTIONS</span>
+									<span class="meta-val">{templateSections.length || '—'}</span>
+								</div>
+							</div>
+
+							{#if templateSections.length > 0}
+								<div class="preview-sections">
+									<span class="sections-label">STRUCTURE</span>
+									{#each templateSections.slice(0, 6) as section}
+										<div class="section-row">
+											<span class="section-bullet"></span>
+											<span class="section-name">{section}</span>
+										</div>
+									{/each}
+									{#if templateSections.length > 6}
+										<div class="section-more">+{templateSections.length - 6} more sections</div>
+									{/if}
+								</div>
+							{/if}
+						</div>
+					{:else}
+						<div class="preview-empty">
+							<Icon name="monitor" size={24} />
+							<span>Select a report type</span>
+						</div>
+					{/if}
+				</div>
+			</div>
 		</div>
 
 		{#if !caseId}
-			<div class="nr-info-box">
-				<Icon name="info" class="nr-info-icon" />
-				<div>
-					<strong>Note:</strong> Reports must be linked to a case. Please create a report from a case page
-					(e.g., <code>/cases/[id]/overview</code>).
-				</div>
+			<div class="sqex-info-bar">
+				<Icon name="info" size={13} />
+				<span>Reports must be linked to a case. Create a report from a case page (<code>/cases/[id]/overview</code>).</span>
 			</div>
 		{/if}
 	</div>
 </div>
 
 <style>
-	.new-report-page {
+	/* ═══════════════════════════════════════
+	   SQUARE ENIX / NieR DESIGN SYSTEM
+	   ═══════════════════════════════════════ */
+
+	.sqex-page {
+		position: relative;
 		min-height: 100vh;
-		background: #0e0d0b;
 		margin: -2.5rem;
-		padding: 1.5rem max(1.5rem, calc(50% - 26rem));
+		padding: 0;
+		background:
+			radial-gradient(ellipse at 15% 5%, rgba(126, 231, 255, 0.06), transparent 45%),
+			radial-gradient(ellipse at 85% 90%, rgba(255, 212, 121, 0.04), transparent 40%),
+			radial-gradient(ellipse at 50% 50%, rgba(83, 226, 164, 0.02), transparent 60%),
+			linear-gradient(180deg, #060a12 0%, #0a0e18 40%, #080c14 100%);
+		color: rgba(233, 240, 255, 0.85);
+		font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+		overflow: hidden;
 	}
 
-	.new-report-page :global(h1), .new-report-page :global(h2), .new-report-page :global(h3), .new-report-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
-	.new-report-page :global(a) { color: inherit; border-bottom: none; }
-	.new-report-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
-	.new-report-page :global(input), .new-report-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
-	.new-report-page :global([class*="panel"]), .new-report-page :global(.card) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
+	/* Reset inherited styles */
+	.sqex-page :global(h1), .sqex-page :global(h2), .sqex-page :global(h3), .sqex-page :global(p) {
+		color: inherit; text-transform: none; letter-spacing: normal; margin: 0;
+	}
+	.sqex-page :global(button) {
+		text-transform: none; letter-spacing: normal; background: none; border: none;
+		box-shadow: none; padding: 0; color: inherit; font-family: inherit;
+	}
+	.sqex-page :global(button)::before { display: none; }
+	.sqex-page :global(button):hover { transform: none; }
+	.sqex-page :global(input) {
+		background: transparent; border: none; box-shadow: none; color: inherit; font-family: inherit;
+	}
 
-	/* ── Header ── */
-	.nr-header { margin-bottom: 2rem; }
-	.nr-back-btn {
+	/* CRT Scan Lines */
+	.scanlines {
+		position: fixed;
+		inset: 0;
+		pointer-events: none;
+		z-index: 1;
+		background: repeating-linear-gradient(
+			0deg,
+			rgba(126, 231, 255, 0.012),
+			rgba(126, 231, 255, 0.012) 1px,
+			transparent 1px,
+			transparent 3px
+		);
+		mix-blend-mode: screen;
+		opacity: 0.5;
+	}
+
+	/* Top Accent Bar */
+	.accent-bar {
+		position: relative;
+		height: 2px;
+		background: linear-gradient(90deg,
+			transparent 5%,
+			rgba(126, 231, 255, 0.6) 25%,
+			rgba(255, 212, 121, 0.5) 50%,
+			rgba(83, 226, 164, 0.5) 75%,
+			transparent 95%
+		);
+		z-index: 2;
+	}
+
+	.sqex-container {
+		position: relative;
+		z-index: 2;
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 1.5rem 2rem 3rem;
+	}
+
+	/* ═══ HEADER ═══ */
+	.sqex-header {
+		margin-bottom: 2rem;
+	}
+
+	.sqex-back {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.375rem;
-		font-size: 0.8rem;
-		color: rgba(212, 199, 163, 0.45);
-		background: none;
-		border: none;
+		gap: 0.4rem;
+		font-size: 0.6875rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: rgba(183, 224, 255, 0.38);
 		cursor: pointer;
-		margin-bottom: 1rem;
 		transition: color 0.15s;
+		margin-bottom: 1.25rem;
 	}
-	.nr-back-btn:hover { color: rgba(212, 199, 163, 0.8); }
-	.nr-title {
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: rgba(212, 199, 163, 0.95);
-		margin: 0;
-	}
-	.nr-subtitle { font-size: 0.8rem; color: rgba(212, 199, 163, 0.4); margin-top: 0.25rem; }
+	.sqex-back:hover { color: rgba(126, 231, 255, 0.8); }
 
-	/* ── Error ── */
-	.nr-error-box {
+	.sqex-title-block {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+
+	.sqex-title-row {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
-		padding: 0.75rem 1rem;
-		border-radius: 0.5rem;
-		background: rgba(248, 113, 113, 0.08);
-		border: 1px solid rgba(248, 113, 113, 0.2);
-		color: #f87171;
-		font-size: 0.8rem;
-		margin-bottom: 1.5rem;
+		gap: 1rem;
 	}
 
-	/* ── Form ── */
-	.nr-form { max-width: 48rem; }
-	.nr-field { margin-bottom: 1.5rem; }
-	.nr-label {
-		display: block;
-		font-size: 0.8rem;
-		font-weight: 600;
-		color: rgba(212, 199, 163, 0.65);
-		margin-bottom: 0.5rem;
-	}
-	.nr-input {
-		width: 100%;
-		padding: 0.625rem 1rem;
-		border-radius: 0.5rem;
-		background: rgba(0, 0, 0, 0.3);
-		border: 1px solid rgba(212, 199, 163, 0.12);
-		color: rgba(212, 199, 163, 0.9);
-		font-size: 0.85rem;
-	}
-	.nr-input::placeholder { color: rgba(212, 199, 163, 0.3); }
-	.nr-input:focus { border-color: rgba(96, 165, 250, 0.5); outline: none; }
-
-	/* ── Type grid ── */
-	.nr-type-grid {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 0.625rem;
-	}
-	@media (max-width: 640px) { .nr-type-grid { grid-template-columns: 1fr; } }
-	.nr-type-card {
-		text-align: left;
-		padding: 1rem;
-		border-radius: 0.5rem;
-		background: rgba(0, 0, 0, 0.25);
-		border: 1px solid rgba(212, 199, 163, 0.08);
-		cursor: pointer;
-		transition: all 0.15s;
-	}
-	.nr-type-card:hover { border-color: rgba(96, 165, 250, 0.25); }
-	.nr-type-card.selected {
-		border-color: rgba(96, 165, 250, 0.5);
-		background: rgba(96, 165, 250, 0.06);
-		box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.15);
-	}
-	.nr-type-content {
+	.sqex-icon-badge {
+		width: 48px;
+		height: 48px;
 		display: flex;
-		align-items: flex-start;
-		gap: 0.75rem;
-	}
-	:global(.nr-type-icon) { width: 1.25rem; height: 1.25rem; color: rgba(212, 199, 163, 0.5); flex-shrink: 0; margin-top: 0.125rem; }
-	.nr-type-card.selected :global(.nr-type-icon) { color: rgba(96, 165, 250, 0.9); }
-	.nr-type-info { flex: 1; min-width: 0; }
-	.nr-type-name { font-size: 0.85rem; font-weight: 600; color: rgba(212, 199, 163, 0.9); margin-bottom: 0.125rem; }
-	.nr-type-desc { font-size: 0.7rem; color: rgba(212, 199, 163, 0.4); }
-	:global(.nr-type-check) { width: 1.25rem; height: 1.25rem; color: rgba(96, 165, 250, 0.9); flex-shrink: 0; }
-
-	/* ── Options panel ── */
-	.nr-options-panel {
-		background: rgba(0, 0, 0, 0.25);
-		border: 1px solid rgba(212, 199, 163, 0.08);
-		border-radius: 0.5rem;
-		padding: 1rem;
-		margin-bottom: 1.5rem;
-	}
-	.nr-options-title {
-		font-size: 0.8rem;
-		font-weight: 600;
-		color: rgba(212, 199, 163, 0.65);
-		margin: 0 0 0.75rem;
-	}
-	.nr-toggle-row {
-		display: flex;
-		align-items: flex-start;
-		gap: 0.75rem;
-		margin-bottom: 0.75rem;
-		cursor: pointer;
-	}
-	.nr-checkbox {
-		width: 1rem;
-		height: 1rem;
-		border-radius: 0.25rem;
-		border: 1px solid rgba(212, 199, 163, 0.3);
-		background: rgba(0, 0, 0, 0.3);
-		accent-color: rgba(96, 165, 250, 0.9);
-		margin-top: 0.125rem;
-		flex-shrink: 0;
-	}
-	.nr-toggle-info { flex: 1; }
-	.nr-toggle-label { font-size: 0.8rem; color: rgba(212, 199, 163, 0.85); }
-	.nr-toggle-desc { font-size: 0.7rem; color: rgba(212, 199, 163, 0.4); margin-top: 0.125rem; }
-	.nr-beta-badge {
-		display: inline-block;
-		font-size: 0.6rem;
-		font-weight: 700;
-		padding: 0.1rem 0.4rem;
-		border-radius: 9999px;
-		background: rgba(96, 165, 250, 0.15);
-		color: rgba(96, 165, 250, 0.9);
-		margin-left: 0.375rem;
-		vertical-align: middle;
-	}
-	.nr-ai-notice {
-		display: flex;
-		align-items: flex-start;
-		gap: 0.375rem;
-		padding: 0.75rem;
-		border-radius: 0.375rem;
-		background: rgba(96, 165, 250, 0.06);
-		border: 1px solid rgba(96, 165, 250, 0.1);
-		font-size: 0.75rem;
-		color: rgba(212, 199, 163, 0.55);
-		margin-top: 0.5rem;
-	}
-
-	/* ── Actions ── */
-	.nr-actions {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		margin-bottom: 1rem;
-	}
-	.nr-btn {
-		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		gap: 0.375rem;
-		padding: 0.5rem 1rem;
-		border-radius: 0.375rem;
-		font-size: 0.8rem;
-		font-weight: 600;
-		cursor: pointer;
-		transition: all 0.15s;
-		border: 1px solid;
+		border: 1px solid rgba(126, 231, 255, 0.2);
+		border-radius: 2px;
+		background: linear-gradient(135deg, rgba(126, 231, 255, 0.08) 0%, rgba(83, 183, 255, 0.04) 100%);
+		color: rgba(126, 231, 255, 0.72);
+		flex-shrink: 0;
 	}
-	.nr-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-	.nr-btn.primary {
-		background: rgba(96, 165, 250, 0.15);
-		border-color: rgba(96, 165, 250, 0.4);
-		color: rgba(96, 165, 250, 0.95);
-	}
-	.nr-btn.primary:hover:not(:disabled) { background: rgba(96, 165, 250, 0.25); }
-	.nr-btn.secondary {
-		background: rgba(0, 0, 0, 0.2);
-		border-color: rgba(212, 199, 163, 0.15);
-		color: rgba(212, 199, 163, 0.6);
-	}
-	.nr-btn.secondary:hover { background: rgba(212, 199, 163, 0.06); color: rgba(212, 199, 163, 0.85); }
 
-	/* ── Info box ── */
-	.nr-info-box {
+	.sqex-title {
+		font-size: 1.375rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: rgba(233, 240, 255, 0.95);
+	}
+
+	.sqex-subtitle {
+		font-size: 0.6875rem;
+		color: rgba(183, 224, 255, 0.42);
+		margin-top: 0.25rem;
+		letter-spacing: 0.02em;
+	}
+
+	.sqex-status-chip {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.3rem 0.75rem;
+		font-size: 0.5625rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		border: 1px solid rgba(255, 212, 121, 0.2);
+		border-radius: 2px;
+		color: rgba(255, 212, 121, 0.72);
+		background: rgba(255, 212, 121, 0.06);
+	}
+
+	.status-dot {
+		width: 5px;
+		height: 5px;
+		border-radius: 50%;
+		background: rgba(255, 212, 121, 0.72);
+		box-shadow: 0 0 6px rgba(255, 212, 121, 0.4);
+	}
+
+	/* ═══ ERROR ═══ */
+	.sqex-error {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.625rem 1rem;
+		margin-bottom: 1.5rem;
+		font-size: 0.75rem;
+		color: rgba(248, 113, 113, 0.9);
+		background: rgba(248, 113, 113, 0.06);
+		border: 1px solid rgba(248, 113, 113, 0.18);
+		border-radius: 2px;
+	}
+
+	/* ═══ LAYOUT ═══ */
+	.sqex-layout {
+		display: grid;
+		grid-template-columns: 1fr 320px;
+		gap: 1.5rem;
+		align-items: start;
+	}
+
+	@media (max-width: 900px) {
+		.sqex-layout { grid-template-columns: 1fr; }
+		.sqex-preview-col { display: none; }
+	}
+
+	/* ═══ FORM COLUMN ═══ */
+	.sqex-form-col {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.sqex-field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.sqex-label {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.625rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: rgba(126, 231, 255, 0.6);
+	}
+
+	.label-marker {
+		width: 3px;
+		height: 12px;
+		background: linear-gradient(180deg, rgba(126, 231, 255, 0.7), rgba(83, 226, 164, 0.5));
+		border-radius: 1px;
+	}
+
+	.sqex-input {
+		width: 100%;
+		padding: 0.75rem 1rem;
+		font-size: 0.8125rem;
+		color: rgba(233, 240, 255, 0.9);
+		background: rgba(6, 10, 18, 0.6);
+		border: 1px solid rgba(126, 231, 255, 0.12);
+		border-radius: 2px;
+		outline: none;
+		transition: border-color 0.2s, box-shadow 0.2s;
+	}
+	.sqex-input::placeholder { color: rgba(140, 160, 199, 0.32); }
+	.sqex-input:focus {
+		border-color: rgba(126, 231, 255, 0.5);
+		box-shadow: 0 0 12px rgba(126, 231, 255, 0.08), inset 0 0 12px rgba(126, 231, 255, 0.03);
+	}
+
+	/* ═══ TYPE GRID ═══ */
+	.sqex-type-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.5rem;
+	}
+	@media (max-width: 640px) { .sqex-type-grid { grid-template-columns: 1fr; } }
+
+	.sqex-type-card {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.625rem;
+		padding: 0.875rem;
+		text-align: left;
+		cursor: pointer;
+		border: 1px solid rgba(126, 231, 255, 0.06);
+		border-radius: 2px;
+		background: rgba(6, 10, 18, 0.5);
+		color: rgba(183, 224, 255, 0.6);
+		transition: all 0.15s ease;
+	}
+	.sqex-type-card:hover {
+		border-color: rgba(126, 231, 255, 0.18);
+		background: rgba(126, 231, 255, 0.03);
+		color: rgba(233, 240, 255, 0.85);
+	}
+	.sqex-type-card.selected {
+		border-color: rgba(126, 231, 255, 0.4);
+		background: linear-gradient(135deg, rgba(126, 231, 255, 0.08) 0%, rgba(83, 226, 164, 0.04) 100%);
+		color: rgba(233, 240, 255, 0.95);
+		box-shadow: 0 0 16px rgba(126, 231, 255, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+	}
+
+	.type-indicator {
+		width: 8px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		margin-top: 0.25rem;
+	}
+	.indicator-idle {
+		width: 4px;
+		height: 4px;
+		border-radius: 50%;
+		border: 1px solid rgba(183, 224, 255, 0.2);
+	}
+	.indicator-active {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: rgba(126, 231, 255, 0.8);
+		box-shadow: 0 0 8px rgba(126, 231, 255, 0.5);
+	}
+
+	.type-text { flex: 1; min-width: 0; }
+	.type-name {
+		display: block;
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: inherit;
+		margin-bottom: 0.125rem;
+	}
+	.type-desc {
+		display: block;
+		font-size: 0.625rem;
+		color: rgba(140, 160, 199, 0.5);
+	}
+	.sqex-type-card.selected .type-desc { color: rgba(183, 224, 255, 0.5); }
+
+	/* ═══ OPTIONS PANEL ═══ */
+	.sqex-options-panel {
+		border: 1px solid rgba(126, 231, 255, 0.08);
+		border-radius: 2px;
+		background: rgba(6, 10, 18, 0.5);
+		overflow: hidden;
+	}
+
+	.options-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.625rem 1rem;
+		border-bottom: 1px solid rgba(126, 231, 255, 0.06);
+		background: rgba(14, 20, 32, 0.5);
+	}
+
+	.options-title {
+		font-size: 0.5625rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		color: rgba(126, 231, 255, 0.55);
+	}
+
+	.options-badge {
+		font-size: 0.5625rem;
+		padding: 0.15rem 0.5rem;
+		border-radius: 2px;
+		border: 1px solid rgba(83, 226, 164, 0.2);
+		background: rgba(83, 226, 164, 0.06);
+		color: rgba(83, 226, 164, 0.72);
+	}
+
+	.sqex-toggle {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.75rem;
+		padding: 0.75rem 1rem;
+		cursor: pointer;
+		border-bottom: 1px solid rgba(126, 231, 255, 0.04);
+		transition: background 0.15s;
+	}
+	.sqex-toggle:hover { background: rgba(126, 231, 255, 0.02); }
+	.sqex-toggle:last-child { border-bottom: none; }
+
+	.sqex-checkbox {
+		width: 14px;
+		height: 14px;
+		margin-top: 0.125rem;
+		flex-shrink: 0;
+		accent-color: rgba(126, 231, 255, 0.9);
+		border-radius: 2px;
+	}
+
+	.toggle-content { flex: 1; }
+	.toggle-label {
+		display: block;
+		font-size: 0.75rem;
+		font-weight: 500;
+		color: rgba(233, 240, 255, 0.78);
+	}
+	.toggle-desc {
+		display: block;
+		font-size: 0.625rem;
+		color: rgba(140, 160, 199, 0.42);
+		margin-top: 0.125rem;
+	}
+
+	.ai-badge {
+		display: inline-block;
+		font-size: 0.5rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		padding: 0.1rem 0.35rem;
+		border-radius: 2px;
+		background: linear-gradient(135deg, rgba(83, 226, 164, 0.15), rgba(126, 231, 255, 0.1));
+		border: 1px solid rgba(83, 226, 164, 0.25);
+		color: rgba(83, 226, 164, 0.9);
+		vertical-align: middle;
+		margin-left: 0.375rem;
+	}
+
+	.sqex-ai-notice {
+		position: relative;
 		display: flex;
 		align-items: flex-start;
 		gap: 0.5rem;
 		padding: 0.75rem 1rem;
-		border-radius: 0.5rem;
-		background: rgba(0, 0, 0, 0.25);
-		border: 1px solid rgba(212, 199, 163, 0.08);
-		font-size: 0.8rem;
-		color: rgba(212, 199, 163, 0.6);
-		margin-top: 1rem;
+		margin: 0 0.75rem 0.75rem;
+		border: 1px solid rgba(83, 226, 164, 0.12);
+		border-radius: 2px;
+		background: rgba(83, 226, 164, 0.04);
+		font-size: 0.6875rem;
+		color: rgba(183, 224, 255, 0.56);
+		overflow: hidden;
 	}
-	:global(.nr-info-icon) { width: 1rem; height: 1rem; color: rgba(96, 165, 250, 0.6); flex-shrink: 0; margin-top: 0.125rem; }
-	.nr-info-box code {
+	.sqex-ai-notice :global(svg) { color: rgba(83, 226, 164, 0.72); flex-shrink: 0; margin-top: 1px; }
+	.ai-glow {
+		position: absolute;
+		top: -20px;
+		right: -20px;
+		width: 80px;
+		height: 80px;
+		border-radius: 50%;
+		background: radial-gradient(circle, rgba(83, 226, 164, 0.08), transparent 60%);
+		pointer-events: none;
+	}
+
+	/* ═══ ACTIONS ═══ */
+	.sqex-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.sqex-btn-primary {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.65rem 1.5rem;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: rgba(126, 231, 255, 0.95);
+		background: linear-gradient(135deg, rgba(126, 231, 255, 0.14) 0%, rgba(83, 183, 255, 0.08) 100%);
+		border: 1px solid rgba(126, 231, 255, 0.3);
+		border-radius: 2px;
+		cursor: pointer;
+		transition: all 0.15s ease;
+	}
+	.sqex-btn-primary:hover:not(:disabled) {
+		background: linear-gradient(135deg, rgba(126, 231, 255, 0.22) 0%, rgba(255, 212, 121, 0.1) 100%);
+		border-color: rgba(126, 231, 255, 0.5);
+		box-shadow: 0 0 20px rgba(126, 231, 255, 0.1);
+	}
+	.sqex-btn-primary:disabled {
+		opacity: 0.35;
+		cursor: not-allowed;
+	}
+
+	.sqex-btn-ghost {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.65rem 1.25rem;
+		font-size: 0.6875rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: rgba(183, 224, 255, 0.42);
+		border: 1px solid rgba(126, 231, 255, 0.08);
+		border-radius: 2px;
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+	.sqex-btn-ghost:hover {
+		color: rgba(233, 240, 255, 0.78);
+		border-color: rgba(126, 231, 255, 0.18);
+		background: rgba(126, 231, 255, 0.03);
+	}
+
+	/* ═══ PREVIEW PANEL ═══ */
+	.sqex-preview-col {
+		position: sticky;
+		top: 1.5rem;
+	}
+
+	.preview-panel {
+		border: 1px solid rgba(126, 231, 255, 0.1);
+		border-radius: 2px;
+		background: rgba(8, 12, 20, 0.6);
+		backdrop-filter: blur(12px) saturate(1.1);
+		overflow: hidden;
+	}
+
+	.preview-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.625rem 1rem;
+		border-bottom: 1px solid rgba(126, 231, 255, 0.08);
+		background: rgba(14, 20, 32, 0.5);
+	}
+
+	.preview-label {
+		font-size: 0.5625rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		color: rgba(126, 231, 255, 0.55);
+	}
+
+	.preview-dot {
+		width: 5px;
+		height: 5px;
+		border-radius: 50%;
+		background: rgba(83, 226, 164, 0.6);
+		box-shadow: 0 0 6px rgba(83, 226, 164, 0.3);
+	}
+
+	.preview-content {
+		padding: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.preview-icon-wrap {
+		width: 56px;
+		height: 56px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid rgba(126, 231, 255, 0.15);
+		border-radius: 2px;
+		background: linear-gradient(135deg, rgba(126, 231, 255, 0.06) 0%, rgba(83, 226, 164, 0.03) 100%);
+		color: rgba(126, 231, 255, 0.6);
+	}
+
+	.preview-title {
+		font-size: 0.875rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: rgba(233, 240, 255, 0.9);
+		text-align: center;
+	}
+
+	.preview-desc {
+		font-size: 0.6875rem;
+		color: rgba(183, 224, 255, 0.42);
+		text-align: center;
+		line-height: 1.5;
+	}
+
+	.preview-meta {
+		width: 100%;
+		border: 1px solid rgba(126, 231, 255, 0.06);
+		border-radius: 2px;
+		overflow: hidden;
+	}
+
+	.meta-row {
+		display: flex;
+		align-items: center;
+		padding: 0.5rem 0.75rem;
+		border-bottom: 1px solid rgba(126, 231, 255, 0.04);
+	}
+	.meta-row:last-child { border-bottom: none; }
+
+	.meta-key {
+		width: 80px;
+		font-size: 0.5625rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		color: rgba(183, 224, 255, 0.32);
+	}
+
+	.meta-val {
+		flex: 1;
+		font-size: 0.6875rem;
+		color: rgba(233, 240, 255, 0.72);
+	}
+
+	.preview-sections {
+		width: 100%;
+	}
+
+	.sections-label {
+		display: block;
+		font-size: 0.5625rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		color: rgba(255, 212, 121, 0.5);
+		margin-bottom: 0.5rem;
+	}
+
+	.section-row {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.3rem 0;
+		font-size: 0.6875rem;
+		color: rgba(183, 224, 255, 0.56);
+	}
+
+	.section-bullet {
+		width: 3px;
+		height: 3px;
+		border-radius: 50%;
+		background: rgba(126, 231, 255, 0.4);
+		flex-shrink: 0;
+	}
+
+	.section-name {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.section-more {
+		font-size: 0.625rem;
+		color: rgba(126, 231, 255, 0.35);
+		padding-left: 1rem;
+		margin-top: 0.25rem;
+	}
+
+	.preview-empty {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.75rem;
+		padding: 3rem 1rem;
+		color: rgba(183, 224, 255, 0.2);
 		font-size: 0.75rem;
-		padding: 0.1rem 0.3rem;
-		border-radius: 0.25rem;
-		background: rgba(212, 199, 163, 0.06);
-		font-family: 'JetBrains Mono', ui-monospace, monospace;
 	}
+
+	/* ═══ INFO BAR ═══ */
+	.sqex-info-bar {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.625rem 1rem;
+		margin-top: 1.5rem;
+		font-size: 0.6875rem;
+		color: rgba(183, 224, 255, 0.42);
+		border: 1px solid rgba(126, 231, 255, 0.06);
+		border-radius: 2px;
+		background: rgba(6, 10, 18, 0.4);
+	}
+	.sqex-info-bar :global(svg) { color: rgba(126, 231, 255, 0.42); flex-shrink: 0; }
+	.sqex-info-bar code {
+		font-size: 0.625rem;
+		padding: 0.1rem 0.35rem;
+		border-radius: 2px;
+		background: rgba(126, 231, 255, 0.06);
+		border: 1px solid rgba(126, 231, 255, 0.1);
+		color: rgba(183, 224, 255, 0.6);
+	}
+
+	/* ═══ SCROLLBAR ═══ */
+	.sqex-page ::-webkit-scrollbar { width: 4px; }
+	.sqex-page ::-webkit-scrollbar-track { background: transparent; }
+	.sqex-page ::-webkit-scrollbar-thumb { background: rgba(126, 231, 255, 0.15); border-radius: 2px; }
+	.sqex-page ::-webkit-scrollbar-thumb:hover { background: rgba(126, 231, 255, 0.28); }
 </style>

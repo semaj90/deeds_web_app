@@ -35,6 +35,7 @@
 	let stageStatuses = $state<('pending' | 'running' | 'done' | 'error')[]>(Array(8).fill('pending'));
 	let enableYolo = $state(false);
 	let enableRag = $state(true);
+	let fileInputEl = $state<HTMLInputElement | null>(null);
 
 	// File validation (inline — no excluded service imports)
 	const ALLOWED_TYPES = [
@@ -75,6 +76,19 @@
 		const input = e.target as HTMLInputElement;
 		if (input.files && input.files.length > 0) selectFile(input.files[0]);
 	};
+
+	function openFilePicker() {
+		if (!isUploading) {
+			fileInputEl?.click();
+		}
+	}
+
+	function handleDropZoneKeydown(e: KeyboardEvent) {
+		if ((e.key === 'Enter' || e.key === ' ') && !isUploading) {
+			e.preventDefault();
+			openFilePicker();
+		}
+	}
 
 	const selectFile = (file: File) => {
 		uploadError = null;
@@ -199,41 +213,46 @@
 <svelte:window onkeydown={handleKeydown} />
 
 {#if isOpen}
-	<div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50" transition:fade={{ duration: 150 }} onclick={handleCancel}>
-		<div class="bg-panel border border-sand/20 rounded-xl shadow-2xl max-w-2xl w-[95%] max-h-[85vh] overflow-y-auto" onclick={(e) => e.stopPropagation()}>
+	<div class="upload-modal-overlay" transition:fade={{ duration: 150 }} onclick={handleCancel}>
+		<div class="upload-modal-card" onclick={(e) => e.stopPropagation()}>
 			<!-- Header -->
-			<div class="flex items-center justify-between p-5 border-b border-sand/10">
+			<div class="upload-modal-header">
 				<div>
 					<h2 class="text-lg font-semibold text-sand">Evidence Upload Pipeline</h2>
 					<p class="text-xs text-sand/50 mt-0.5">MinIO + embeddinggemma + Qdrant + pgvector</p>
 				</div>
-				<button class="text-sand/40 hover:text-sand transition p-1" onclick={handleCancel}>
+				<button type="button" class="upload-modal-close" onclick={handleCancel}>
 					<Icon name="x" size={20} />
 				</button>
 			</div>
 
-			<div class="p-5">
+			<div class="upload-modal-body">
 				<!-- Drop Zone -->
 				{#if !selectedFile}
 					<div
-						class="border-2 border-dashed rounded-lg p-10 text-center cursor-pointer transition-all
-							{isDragging ? 'border-accent bg-accent/5' : 'border-sand/20 hover:border-sand/40'}"
+						class="upload-modal-zone"
+						class:dragging={isDragging}
 						ondragover={handleDragOver}
 						ondragleave={handleDragLeave}
 						ondrop={handleDrop}
+						onclick={openFilePicker}
+						onkeydown={handleDropZoneKeydown}
+						role="button"
+						tabindex={isUploading ? -1 : 0}
+						aria-disabled={isUploading}
 					>
 						<Icon name="upload" size={48} class="mx-auto text-sand/30 mb-3" />
 						<p class="text-sand/80 font-medium">Drag and drop evidence file</p>
 						<p class="text-sand/40 text-sm mt-1">or</p>
-						<label class="inline-block mt-2 px-4 py-2 bg-accent/80 text-white rounded-lg cursor-pointer hover:bg-accent transition text-sm font-medium">
+						<button type="button" class="upload-modal-select" onclick={(event) => { event.stopPropagation(); openFilePicker(); }}>
 							Select File
-							<input type="file" class="hidden" accept=".pdf,.png,.jpg,.jpeg,.tiff,.docx,.txt,.md,.csv,.json" onchange={handleFileInput} disabled={isUploading} />
-						</label>
-						<p class="text-sand/30 text-xs mt-3">PDF, PNG, JPG, TIFF, DOCX, TXT, MD, CSV, JSON (max 100MB)</p>
+						</button>
+						<input bind:this={fileInputEl} type="file" class="upload-modal-input" accept=".pdf,.png,.jpg,.jpeg,.tiff,.docx,.txt,.md,.csv,.json" onchange={handleFileInput} disabled={isUploading} />
+						<p class="upload-modal-hint">PDF, PNG, JPG, TIFF, DOCX, TXT, MD, CSV, JSON up to 100MB</p>
 					</div>
 				{:else}
 					<!-- Selected File Info -->
-					<div class="bg-panelSoft rounded-lg p-4 mb-4">
+					<div class="upload-modal-file-card">
 						<div class="flex items-center gap-3">
 							<Icon name={fileTypeIconName} size={28} class="text-accent/70 shrink-0" />
 							<div class="min-w-0 flex-1">
@@ -241,7 +260,7 @@
 								<p class="text-sand/40 text-xs">{(selectedFile.size / (1024 * 1024)).toFixed(2)} MB &middot; {selectedFile.type || 'unknown type'}</p>
 							</div>
 							{#if !isUploading}
-								<button class="text-sand/40 hover:text-danger transition text-xs" onclick={resetUpload}>Change</button>
+								<button type="button" class="upload-modal-change" onclick={resetUpload}>Change</button>
 							{/if}
 						</div>
 
@@ -328,13 +347,14 @@
 			</div>
 
 			<!-- Footer -->
-			<div class="flex gap-3 justify-end p-5 border-t border-sand/10">
-				<button class="px-4 py-2 text-sm text-sand/60 hover:text-sand transition rounded-lg" onclick={handleCancel} disabled={isUploading}>
+			<div class="upload-modal-footer">
+				<button type="button" class="upload-modal-secondary" onclick={handleCancel} disabled={isUploading}>
 					{uploadResult ? 'Close' : 'Cancel upload'}
 				</button>
 				{#if selectedFile && !uploadResult}
 					<button
-						class="px-5 py-2 text-sm font-medium bg-accent text-white rounded-lg hover:bg-accent/90 transition disabled:opacity-40"
+						type="button"
+						class="upload-modal-primary"
 						onclick={handleUpload}
 						disabled={isUploading}
 					>
@@ -352,3 +372,275 @@
 		</div>
 	</div>
 {/if}
+
+<style>
+	.upload-modal-overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 50;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 1rem;
+		background:
+			radial-gradient(circle at top, rgba(126, 231, 255, 0.14), transparent 26%),
+			radial-gradient(circle at bottom right, rgba(255, 212, 121, 0.12), transparent 24%),
+			rgba(4, 8, 15, 0.82);
+		backdrop-filter: blur(16px) saturate(1.12);
+	}
+
+	.upload-modal-card {
+		width: min(95vw, 46rem);
+		max-height: 85vh;
+		overflow-y: auto;
+		background: linear-gradient(180deg, rgba(19, 27, 42, 0.96) 0%, rgba(8, 12, 20, 0.98) 100%);
+		border: 1px solid var(--shell-border, rgba(120, 160, 220, 0.18));
+		border-radius: var(--shell-radius-curve, 26px 26px 18px 18px / 22px 22px 30px 30px);
+		box-shadow:
+			0 0 0 1px rgba(126, 231, 255, 0.04),
+			0 28px 56px -18px rgba(0, 0, 0, 0.72),
+			0 0 72px rgba(0, 0, 0, 0.36),
+			inset 0 1px 0 rgba(255, 255, 255, 0.05);
+		color: var(--shell-text, rgba(233, 240, 255, 0.88));
+	}
+
+	.upload-modal-card::-webkit-scrollbar {
+		width: 6px;
+	}
+
+	.upload-modal-card::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	.upload-modal-card::-webkit-scrollbar-thumb {
+		background: rgba(212, 199, 163, 0.12);
+		border-radius: 999px;
+	}
+
+	.upload-modal-header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: 1.5rem 1.75rem;
+		border-bottom: 1px solid rgba(126, 231, 255, 0.08);
+	}
+
+	.upload-modal-close {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		padding: 0;
+		border: 1px solid rgba(120, 160, 220, 0.14);
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.04);
+		color: rgba(214, 226, 248, 0.64);
+		cursor: pointer;
+		transition: all 0.15s ease;
+	}
+
+	.upload-modal-close::before {
+		content: none;
+	}
+
+	.upload-modal-close:hover {
+		background: rgba(255, 255, 255, 0.08);
+		border-color: rgba(126, 231, 255, 0.18);
+		color: rgba(240, 248, 255, 0.92);
+	}
+
+	.upload-modal-body {
+		padding: 1.5rem 1.75rem;
+	}
+
+	.upload-modal-zone {
+		position: relative;
+		overflow: hidden;
+		padding: 2rem 1.5rem;
+		border: 1px dashed var(--shell-border, rgba(120, 160, 220, 0.2));
+		border-radius: 28px;
+		text-align: center;
+		cursor: pointer;
+		transition:
+			transform 0.18s ease,
+			border-color 0.18s ease,
+			background 0.18s ease,
+			box-shadow 0.18s ease;
+		background:
+			radial-gradient(circle at top, rgba(126, 231, 255, 0.08), transparent 42%),
+			linear-gradient(180deg, rgba(13, 19, 31, 0.84) 0%, rgba(7, 10, 17, 0.94) 100%);
+		box-shadow:
+			0 18px 34px rgba(0, 0, 0, 0.2),
+			inset 0 1px 0 rgba(255, 255, 255, 0.04);
+	}
+
+	.upload-modal-zone::before {
+		content: '';
+		position: absolute;
+		inset: 1px;
+		border-radius: 26px;
+		border: 1px solid rgba(255, 255, 255, 0.04);
+		pointer-events: none;
+	}
+
+	.upload-modal-zone:hover,
+	.upload-modal-zone.dragging {
+		border-color: var(--shell-border-strong, rgba(126, 231, 255, 0.3));
+		background:
+			radial-gradient(circle at top, rgba(126, 231, 255, 0.14), transparent 46%),
+			radial-gradient(circle at bottom right, rgba(255, 212, 121, 0.1), transparent 34%),
+			linear-gradient(180deg, rgba(16, 24, 39, 0.94) 0%, rgba(8, 12, 20, 0.98) 100%);
+		box-shadow:
+			0 22px 42px rgba(0, 0, 0, 0.24),
+			0 0 0 1px rgba(126, 231, 255, 0.06),
+			inset 0 1px 0 rgba(255, 255, 255, 0.05);
+		transform: translateY(-1px);
+	}
+
+	.upload-modal-zone:focus-visible {
+		outline: 2px solid rgba(126, 231, 255, 0.32);
+		outline-offset: 2px;
+	}
+
+	.upload-modal-select {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		margin-top: 0.75rem;
+		padding: 0.65rem 1rem;
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		border-radius: 999px;
+		background: linear-gradient(135deg, #7ee7ff 0%, #53b7ff 45%, #ffd479 100%);
+		color: #06101b;
+		font-size: 0.8rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		cursor: pointer;
+		transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+		box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+	}
+
+	.upload-modal-select::before,
+	.upload-modal-secondary::before,
+	.upload-modal-primary::before,
+	.upload-modal-change::before {
+		content: none;
+	}
+
+	.upload-modal-select:hover {
+		filter: brightness(1.05);
+		transform: translateY(-1px);
+	}
+
+	.upload-modal-input {
+		display: none;
+	}
+
+	.upload-modal-hint {
+		margin: 0.85rem 0 0;
+		font-size: 0.75rem;
+		color: rgba(184, 198, 226, 0.54);
+	}
+
+	.upload-modal-file-card {
+		padding: 1rem 1.1rem;
+		margin-bottom: 1rem;
+		border-radius: 20px;
+		background:
+			radial-gradient(circle at top right, rgba(255, 212, 121, 0.08), transparent 36%),
+			linear-gradient(180deg, rgba(18, 23, 34, 0.96) 0%, rgba(10, 13, 20, 0.98) 100%);
+		border: 1px solid rgba(255, 212, 121, 0.14);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+	}
+
+	.upload-modal-change {
+		padding: 0.5rem 0.85rem;
+		border: 1px solid rgba(120, 160, 220, 0.14);
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.04);
+		color: rgba(214, 226, 248, 0.68);
+		font-size: 0.75rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.15s ease;
+	}
+
+	.upload-modal-change:hover {
+		background: rgba(255, 255, 255, 0.08);
+		border-color: rgba(126, 231, 255, 0.18);
+		color: rgba(240, 248, 255, 0.9);
+	}
+
+	.upload-modal-footer {
+		display: flex;
+		gap: 0.75rem;
+		justify-content: flex-end;
+		padding: 1.25rem 1.75rem;
+		border-top: 1px solid rgba(126, 231, 255, 0.08);
+	}
+
+	.upload-modal-secondary,
+	.upload-modal-primary {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 2.6rem;
+		padding: 0.7rem 1.1rem;
+		border-radius: 999px;
+		font-size: 0.8125rem;
+		font-weight: 700;
+		cursor: pointer;
+		transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease, background 0.15s ease;
+	}
+
+	.upload-modal-secondary {
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(120, 160, 220, 0.14);
+		color: rgba(214, 226, 248, 0.72);
+	}
+
+	.upload-modal-secondary:hover:not(:disabled) {
+		background: rgba(255, 255, 255, 0.08);
+		border-color: rgba(126, 231, 255, 0.18);
+		color: rgba(240, 248, 255, 0.9);
+	}
+
+	.upload-modal-primary {
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		background: linear-gradient(135deg, #7ee7ff 0%, #53b7ff 45%, #ffd479 100%);
+		color: #06101b;
+		box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+	}
+
+	.upload-modal-primary:hover:not(:disabled) {
+		filter: brightness(1.05);
+		transform: translateY(-1px);
+	}
+
+	.upload-modal-primary:disabled,
+	.upload-modal-secondary:disabled {
+		opacity: 0.45;
+		cursor: not-allowed;
+		transform: none;
+		filter: saturate(0.65);
+	}
+
+	@media (max-width: 640px) {
+		.upload-modal-card {
+			width: 100%;
+		}
+
+		.upload-modal-header,
+		.upload-modal-body,
+		.upload-modal-footer {
+			padding-left: 1rem;
+			padding-right: 1rem;
+		}
+
+		.upload-modal-footer {
+			flex-direction: column-reverse;
+		}
+	}
+</style>

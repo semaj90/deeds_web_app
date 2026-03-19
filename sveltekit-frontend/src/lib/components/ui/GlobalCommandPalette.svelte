@@ -93,7 +93,6 @@
 		const items = tabItems[activeTab] ?? [];
 		if (!searchQuery.trim()) return items;
 		const q = searchQuery.toLowerCase();
-		// Search across ALL tabs when query is present
 		const allItems = Object.values(tabItems).flat();
 		return allItems.filter(
 			(item) =>
@@ -102,18 +101,14 @@
 		);
 	});
 
-	// Detail for selected item
 	let selectedItem = $derived(currentItems[selectedIndex] ?? null);
 
-	// Reset selection when tab changes or search changes
 	$effect(() => {
-		// Track these dependencies
 		activeTab;
 		searchQuery;
 		selectedIndex = 0;
 	});
 
-	// Focus input on open
 	$effect(() => {
 		if (open && inputRef) {
 			searchQuery = '';
@@ -159,7 +154,6 @@
 				activeTab = (activeTab + 1) % tabs.length;
 			}
 		}
-		// Number keys 1-7 switch tabs
 		const num = parseInt(e.key);
 		if (num >= 1 && num <= tabs.length && !isInputFocused(e)) {
 			activeTab = num - 1;
@@ -171,12 +165,10 @@
 		return tag === 'INPUT' || tag === 'TEXTAREA';
 	}
 
-	// Current location for status bar
 	let currentPath = $derived(page.url.pathname);
 </script>
 
 {#if open}
-	<!-- Full-screen NieR-style viewer -->
 	<div
 		class="intel-backdrop"
 		onkeydown={handleKeydown}
@@ -185,10 +177,9 @@
 		aria-label="Command palette"
 		transition:fade={{ duration: 200 }}
 	>
-		<!-- Scan lines overlay -->
-		<div class="scanlines"></div>
+		<!-- Subtle grid pattern (evidence board style) -->
+		<div class="grid-overlay"></div>
 
-		<!-- Main container -->
 		<div class="intel-frame" transition:scale={{ duration: 280, start: 0.94, easing: cubicOut }}>
 
 			<!-- ═══ TOP: Tab Bar ═══ -->
@@ -207,7 +198,6 @@
 					</button>
 				{/each}
 
-				<!-- Search integrated into tab bar -->
 				<div class="tab-search">
 					<Icon name="search" size={14} />
 					<input
@@ -223,7 +213,7 @@
 			<!-- ═══ MIDDLE: Split Panel ═══ -->
 			<div class="intel-body">
 
-				<!-- LEFT: Item list -->
+				<!-- LEFT: Item list (corpus sidebar style) -->
 				<div class="intel-list">
 					<div class="list-header">
 						<span class="list-title">
@@ -262,11 +252,10 @@
 					</div>
 				</div>
 
-				<!-- RIGHT: Detail panel -->
+				<!-- RIGHT: Detail panel (research/parchment style) -->
 				<div class="intel-detail">
 					{#if selectedItem}
 						<div class="detail-content" in:fade={{ duration: 120 }}>
-							<!-- Detail header -->
 							<div class="detail-header">
 								<div class="detail-icon-wrap">
 									<Icon name={selectedItem.icon} size={32} />
@@ -277,7 +266,6 @@
 								</div>
 							</div>
 
-							<!-- Detail metadata -->
 							<div class="detail-meta">
 								<div class="meta-row">
 									<span class="meta-label">Route</span>
@@ -289,13 +277,12 @@
 								</div>
 								<div class="meta-row">
 									<span class="meta-label">Status</span>
-									<span class="meta-value status-active">
+									<span class="meta-value" class:status-viewing={selectedItem.href === currentPath}>
 										{selectedItem.href === currentPath ? 'VIEWING' : 'AVAILABLE'}
 									</span>
 								</div>
 							</div>
 
-							<!-- Action button -->
 							<button
 								class="detail-action"
 								onclick={() => handleNavigate(selectedItem?.href)}
@@ -338,6 +325,11 @@
 {/if}
 
 <style>
+	/* ═══════════════════════════════════════════════════════════
+	   WARM PALETTE — blending Legal Corpus parchment,
+	   Evidence Board dark tactical cards, and YoRHa gold/beige
+	   ═══════════════════════════════════════════════════════════ */
+
 	/* ═══ FULL-SCREEN BACKDROP ═══ */
 	.intel-backdrop {
 		position: fixed;
@@ -347,26 +339,33 @@
 		align-items: center;
 		justify-content: center;
 		background:
-			radial-gradient(ellipse at top, rgba(126, 231, 255, 0.08), transparent 50%),
-			radial-gradient(ellipse at bottom right, rgba(255, 212, 121, 0.06), transparent 40%),
-			rgba(2, 4, 8, 0.94);
-		backdrop-filter: blur(24px) saturate(1.2);
+			radial-gradient(ellipse at top, rgba(196, 165, 90, 0.08), transparent 50%),
+			radial-gradient(ellipse at bottom right, rgba(212, 147, 75, 0.06), transparent 40%),
+			rgba(10, 8, 6, 0.92);
+		backdrop-filter: blur(24px) saturate(1.1);
 	}
 
-	/* CRT scan lines */
-	.scanlines {
+	/* Evidence board grid pattern */
+	.grid-overlay {
 		position: absolute;
 		inset: 0;
 		pointer-events: none;
-		background: repeating-linear-gradient(
-			0deg,
-			rgba(126, 231, 255, 0.015),
-			rgba(126, 231, 255, 0.015) 1px,
-			transparent 1px,
-			transparent 3px
-		);
-		mix-blend-mode: screen;
-		opacity: 0.6;
+		background:
+			repeating-linear-gradient(
+				0deg,
+				rgba(196, 183, 143, 0.02),
+				rgba(196, 183, 143, 0.02) 1px,
+				transparent 1px,
+				transparent 40px
+			),
+			repeating-linear-gradient(
+				90deg,
+				rgba(196, 183, 143, 0.02),
+				rgba(196, 183, 143, 0.02) 1px,
+				transparent 1px,
+				transparent 40px
+			);
+		opacity: 0.7;
 	}
 
 	/* ═══ MAIN FRAME ═══ */
@@ -379,17 +378,17 @@
 		display: flex;
 		flex-direction: column;
 		border-radius: 2px;
-		border: 1px solid rgba(126, 231, 255, 0.22);
-		background: linear-gradient(180deg, rgba(8, 12, 20, 0.98) 0%, rgba(4, 7, 13, 0.99) 100%);
+		border: 1px solid rgba(196, 183, 143, 0.28);
+		background: linear-gradient(180deg, rgba(26, 23, 18, 0.98) 0%, rgba(18, 16, 12, 0.99) 100%);
 		box-shadow:
-			0 0 0 1px rgba(126, 231, 255, 0.06),
-			0 40px 80px -20px rgba(0, 0, 0, 0.8),
-			0 0 120px rgba(0, 0, 0, 0.4),
-			inset 0 1px 0 rgba(255, 255, 255, 0.04);
+			0 0 0 1px rgba(196, 183, 143, 0.06),
+			0 40px 80px -20px rgba(0, 0, 0, 0.75),
+			0 0 120px rgba(0, 0, 0, 0.35),
+			inset 0 1px 0 rgba(232, 224, 200, 0.06);
 		overflow: hidden;
 	}
 
-	/* Top accent line */
+	/* Top accent line — warm gold gradient */
 	.intel-frame::before {
 		content: '';
 		position: absolute;
@@ -399,9 +398,9 @@
 		height: 1px;
 		background: linear-gradient(90deg,
 			transparent,
-			rgba(126, 231, 255, 0.7) 20%,
-			rgba(255, 212, 121, 0.5) 50%,
-			rgba(126, 231, 255, 0.7) 80%,
+			rgba(196, 165, 90, 0.65) 20%,
+			rgba(212, 147, 75, 0.5) 50%,
+			rgba(196, 165, 90, 0.65) 80%,
 			transparent
 		);
 		z-index: 1;
@@ -415,8 +414,8 @@
 		padding: 0 0.5rem;
 		height: 44px;
 		min-height: 44px;
-		border-bottom: 1px solid rgba(126, 231, 255, 0.12);
-		background: linear-gradient(180deg, rgba(14, 20, 32, 0.96) 0%, rgba(8, 12, 20, 0.98) 100%);
+		border-bottom: 1px solid rgba(138, 133, 94, 0.22);
+		background: linear-gradient(180deg, rgba(33, 29, 22, 0.96) 0%, rgba(23, 20, 15, 0.98) 100%);
 	}
 
 	.intel-tab {
@@ -429,7 +428,7 @@
 		background: none;
 		border: none;
 		border-radius: 0;
-		color: rgba(183, 224, 255, 0.48);
+		color: rgba(200, 195, 160, 0.46);
 		font-family: 'JetBrains Mono', monospace;
 		font-size: 0.625rem;
 		font-weight: 600;
@@ -445,15 +444,15 @@
 	}
 
 	.intel-tab:hover {
-		color: rgba(233, 240, 255, 0.78);
-		background: rgba(126, 231, 255, 0.04);
+		color: rgba(232, 228, 200, 0.78);
+		background: rgba(196, 183, 143, 0.06);
 		transform: none;
 		box-shadow: none;
 	}
 
 	.intel-tab.active {
-		color: rgba(126, 231, 255, 0.92);
-		background: rgba(126, 231, 255, 0.06);
+		color: rgba(236, 230, 203, 0.92);
+		background: rgba(196, 183, 143, 0.08);
 	}
 
 	.tab-indicator {
@@ -462,7 +461,7 @@
 		left: 0.5rem;
 		right: 0.5rem;
 		height: 2px;
-		background: linear-gradient(90deg, rgba(126, 231, 255, 0.8), rgba(255, 212, 121, 0.6));
+		background: linear-gradient(90deg, #c4b78f, #d4934b);
 		border-radius: 1px 1px 0 0;
 	}
 
@@ -477,9 +476,9 @@
 		gap: 0.4rem;
 		padding: 0 0.75rem;
 		height: 28px;
-		border: 1px solid rgba(126, 231, 255, 0.12);
+		border: 1px solid rgba(138, 133, 94, 0.22);
 		border-radius: 2px;
-		color: rgba(183, 224, 255, 0.48);
+		color: rgba(200, 195, 160, 0.46);
 		background: rgba(0, 0, 0, 0.2);
 	}
 
@@ -488,7 +487,7 @@
 		background: none;
 		border: none;
 		outline: none;
-		color: rgba(233, 240, 255, 0.88);
+		color: rgba(232, 228, 200, 0.88);
 		font-family: 'JetBrains Mono', monospace;
 		font-size: 0.6875rem;
 		padding: 0;
@@ -496,7 +495,7 @@
 	}
 
 	.search-input::placeholder {
-		color: rgba(140, 160, 199, 0.42);
+		color: rgba(168, 159, 124, 0.42);
 	}
 
 	.search-input:focus {
@@ -510,14 +509,14 @@
 		min-height: 0;
 	}
 
-	/* ═══ LEFT: List Panel ═══ */
+	/* ═══ LEFT: List Panel — dark sidebar like YoRHa ═══ */
 	.intel-list {
 		width: 340px;
 		min-width: 340px;
 		display: flex;
 		flex-direction: column;
-		border-right: 1px solid rgba(126, 231, 255, 0.1);
-		background: rgba(6, 10, 18, 0.6);
+		border-right: 1px solid rgba(138, 133, 94, 0.18);
+		background: rgba(18, 16, 12, 0.6);
 	}
 
 	.list-header {
@@ -525,21 +524,21 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: 0.75rem 1rem;
-		border-bottom: 1px solid rgba(126, 231, 255, 0.08);
-		background: rgba(14, 20, 32, 0.5);
+		border-bottom: 1px solid rgba(138, 133, 94, 0.14);
+		background: rgba(33, 29, 22, 0.5);
 	}
 
 	.list-title {
 		font-size: 0.625rem;
 		font-weight: 700;
 		letter-spacing: 0.12em;
-		color: rgba(126, 231, 255, 0.72);
+		color: rgba(196, 183, 143, 0.72);
 		text-transform: uppercase;
 	}
 
 	.list-count {
 		font-size: 0.5625rem;
-		color: rgba(183, 224, 255, 0.36);
+		color: rgba(200, 195, 160, 0.36);
 		letter-spacing: 0.06em;
 	}
 
@@ -558,7 +557,7 @@
 		background: none;
 		border: none;
 		border-radius: 0;
-		color: rgba(233, 240, 255, 0.68);
+		color: rgba(232, 228, 200, 0.62);
 		font-family: 'JetBrains Mono', monospace;
 		font-size: 0.75rem;
 		font-weight: 500;
@@ -576,20 +575,20 @@
 	}
 
 	.list-item:hover {
-		background: rgba(126, 231, 255, 0.04);
-		color: rgba(233, 240, 255, 0.88);
+		background: rgba(196, 183, 143, 0.06);
+		color: rgba(240, 237, 212, 0.88);
 		transform: none;
 		box-shadow: none;
 	}
 
 	.list-item.selected {
-		background: linear-gradient(90deg, rgba(126, 231, 255, 0.1) 0%, rgba(126, 231, 255, 0.02) 100%);
-		color: rgba(233, 240, 255, 0.95);
-		border-left-color: rgba(126, 231, 255, 0.72);
+		background: linear-gradient(90deg, rgba(196, 183, 143, 0.12) 0%, rgba(196, 183, 143, 0.02) 100%);
+		color: rgba(247, 242, 223, 0.95);
+		border-left-color: #c4b78f;
 	}
 
 	.list-item.current {
-		color: rgba(255, 212, 121, 0.88);
+		color: rgba(212, 147, 75, 0.88);
 	}
 
 	.item-marker {
@@ -604,16 +603,16 @@
 		width: 4px;
 		height: 4px;
 		border-radius: 50%;
-		background: rgba(126, 231, 255, 0.72);
-		box-shadow: 0 0 6px rgba(126, 231, 255, 0.4);
+		background: #c4b78f;
+		box-shadow: 0 0 6px rgba(196, 183, 143, 0.4);
 	}
 
 	.marker-current {
 		width: 4px;
 		height: 4px;
 		border-radius: 50%;
-		background: rgba(255, 212, 121, 0.82);
-		box-shadow: 0 0 6px rgba(255, 212, 121, 0.4);
+		background: #d4934b;
+		box-shadow: 0 0 6px rgba(212, 147, 75, 0.4);
 	}
 
 	.item-label {
@@ -627,11 +626,11 @@
 		font-size: 0.5rem;
 		font-weight: 700;
 		letter-spacing: 0.1em;
-		color: rgba(255, 212, 121, 0.72);
+		color: rgba(212, 147, 75, 0.72);
 		padding: 0.1rem 0.4rem;
-		border: 1px solid rgba(255, 212, 121, 0.2);
+		border: 1px solid rgba(212, 147, 75, 0.22);
 		border-radius: 2px;
-		background: rgba(255, 212, 121, 0.06);
+		background: rgba(212, 147, 75, 0.08);
 	}
 
 	.list-empty {
@@ -639,18 +638,18 @@
 		align-items: center;
 		justify-content: center;
 		height: 120px;
-		color: rgba(183, 224, 255, 0.32);
+		color: rgba(200, 195, 160, 0.32);
 		font-size: 0.75rem;
 	}
 
-	/* ═══ RIGHT: Detail Panel ═══ */
+	/* ═══ RIGHT: Detail Panel — research/parchment meets evidence board ═══ */
 	.intel-detail {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
 		background:
-			radial-gradient(ellipse at top right, rgba(126, 231, 255, 0.03), transparent 60%),
-			rgba(8, 12, 20, 0.4);
+			radial-gradient(ellipse at top right, rgba(196, 165, 90, 0.04), transparent 60%),
+			rgba(20, 18, 14, 0.4);
 		min-width: 0;
 	}
 
@@ -674,10 +673,10 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		border: 1px solid rgba(126, 231, 255, 0.18);
+		border: 1px solid rgba(138, 133, 94, 0.28);
 		border-radius: 2px;
-		background: linear-gradient(135deg, rgba(126, 231, 255, 0.08) 0%, rgba(83, 183, 255, 0.04) 100%);
-		color: rgba(126, 231, 255, 0.72);
+		background: linear-gradient(135deg, rgba(196, 183, 143, 0.1) 0%, rgba(212, 147, 75, 0.06) 100%);
+		color: rgba(196, 183, 143, 0.72);
 		flex-shrink: 0;
 	}
 
@@ -685,14 +684,14 @@
 		font-size: 1.25rem;
 		font-weight: 700;
 		letter-spacing: 0.06em;
-		color: rgba(233, 240, 255, 0.95);
+		color: #ece6cb;
 		margin: 0;
 		text-transform: uppercase;
 	}
 
 	.detail-desc {
 		font-size: 0.8125rem;
-		color: rgba(183, 224, 255, 0.56);
+		color: rgba(200, 195, 160, 0.56);
 		margin: 0.35rem 0 0 0;
 		line-height: 1.5;
 	}
@@ -701,7 +700,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0;
-		border: 1px solid rgba(126, 231, 255, 0.08);
+		border: 1px solid rgba(138, 133, 94, 0.14);
 		border-radius: 2px;
 		overflow: hidden;
 	}
@@ -710,7 +709,7 @@
 		display: flex;
 		align-items: center;
 		padding: 0.6rem 1rem;
-		border-bottom: 1px solid rgba(126, 231, 255, 0.06);
+		border-bottom: 1px solid rgba(138, 133, 94, 0.1);
 	}
 
 	.meta-row:last-child {
@@ -723,18 +722,18 @@
 		font-weight: 700;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
-		color: rgba(183, 224, 255, 0.42);
+		color: rgba(200, 195, 160, 0.42);
 	}
 
 	.meta-value {
 		flex: 1;
 		font-size: 0.75rem;
-		color: rgba(233, 240, 255, 0.78);
+		color: rgba(232, 228, 200, 0.78);
 		font-family: 'JetBrains Mono', monospace;
 	}
 
-	.status-active {
-		color: rgba(83, 226, 164, 0.88);
+	.status-viewing {
+		color: #4ade80;
 	}
 
 	.detail-action {
@@ -743,10 +742,10 @@
 		align-items: center;
 		gap: 0.5rem;
 		padding: 0.6rem 1.25rem;
-		background: linear-gradient(135deg, rgba(126, 231, 255, 0.14) 0%, rgba(83, 183, 255, 0.08) 100%);
-		border: 1px solid rgba(126, 231, 255, 0.22);
+		background: linear-gradient(135deg, rgba(196, 165, 90, 0.16) 0%, rgba(212, 147, 75, 0.1) 100%);
+		border: 1px solid rgba(196, 183, 143, 0.28);
 		border-radius: 2px;
-		color: rgba(126, 231, 255, 0.88);
+		color: #c4b78f;
 		font-family: 'JetBrains Mono', monospace;
 		font-size: 0.6875rem;
 		font-weight: 700;
@@ -762,10 +761,10 @@
 	}
 
 	.detail-action:hover {
-		background: linear-gradient(135deg, rgba(126, 231, 255, 0.22) 0%, rgba(255, 212, 121, 0.12) 100%);
-		border-color: rgba(126, 231, 255, 0.38);
+		background: linear-gradient(135deg, rgba(196, 165, 90, 0.24) 0%, rgba(212, 147, 75, 0.16) 100%);
+		border-color: rgba(196, 183, 143, 0.42);
 		transform: none;
-		box-shadow: 0 0 16px rgba(126, 231, 255, 0.1);
+		box-shadow: 0 0 16px rgba(196, 165, 90, 0.08);
 	}
 
 	.detail-empty {
@@ -775,7 +774,7 @@
 		align-items: center;
 		justify-content: center;
 		gap: 0.75rem;
-		color: rgba(183, 224, 255, 0.24);
+		color: rgba(200, 195, 160, 0.24);
 		font-size: 0.75rem;
 	}
 
@@ -787,11 +786,11 @@
 		padding: 0 1rem;
 		height: 32px;
 		min-height: 32px;
-		border-top: 1px solid rgba(126, 231, 255, 0.1);
-		background: linear-gradient(180deg, rgba(10, 15, 24, 0.96) 0%, rgba(6, 9, 15, 0.98) 100%);
+		border-top: 1px solid rgba(138, 133, 94, 0.18);
+		background: linear-gradient(180deg, rgba(26, 23, 18, 0.96) 0%, rgba(18, 16, 12, 0.98) 100%);
 		font-size: 0.5625rem;
 		font-family: 'JetBrains Mono', monospace;
-		color: rgba(183, 224, 255, 0.38);
+		color: rgba(200, 195, 160, 0.38);
 	}
 
 	.status-left,
@@ -805,11 +804,11 @@
 		display: flex;
 		align-items: center;
 		gap: 0.3rem;
-		color: rgba(255, 212, 121, 0.56);
+		color: rgba(212, 147, 75, 0.56);
 	}
 
 	.status-sep {
-		color: rgba(126, 231, 255, 0.16);
+		color: rgba(138, 133, 94, 0.24);
 	}
 
 	.intel-status kbd {
@@ -823,9 +822,9 @@
 		font-family: 'JetBrains Mono', monospace;
 		font-weight: 700;
 		border-radius: 2px;
-		background: rgba(126, 231, 255, 0.08);
-		border: 1px solid rgba(126, 231, 255, 0.14);
-		color: rgba(183, 224, 255, 0.56);
+		background: rgba(196, 183, 143, 0.08);
+		border: 1px solid rgba(138, 133, 94, 0.2);
+		color: rgba(200, 195, 160, 0.56);
 	}
 
 	/* ═══ SCROLLBAR ═══ */
@@ -838,12 +837,12 @@
 	}
 
 	.list-scroll::-webkit-scrollbar-thumb {
-		background: rgba(126, 231, 255, 0.16);
+		background: rgba(138, 133, 94, 0.24);
 		border-radius: 2px;
 	}
 
 	.list-scroll::-webkit-scrollbar-thumb:hover {
-		background: rgba(126, 231, 255, 0.28);
+		background: rgba(170, 164, 126, 0.38);
 	}
 
 	/* ═══ Responsive ═══ */
