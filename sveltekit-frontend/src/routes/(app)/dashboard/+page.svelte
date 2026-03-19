@@ -28,6 +28,186 @@
 
   let showCommandPalette = $state(false);
 
+  // ═══ WWWH Use Case Generator ═══
+  let wwwhNotes = $state('');
+  let wwwhWho = $state('');
+  let wwwhWhat = $state('');
+  let wwwhWhy = $state('');
+  let wwwhHow = $state('');
+  let wwwhTitle = $state('');
+  let wwwhStatus = $state('open');
+  let wwwhLocation = $state('');
+  let wwwhDate = $state('');
+  let wwwhCollapsed = $state(false);
+
+  let wwwhSummary = $derived.by(() => {
+    const parts: string[] = [];
+    if (wwwhWho.trim()) parts.push(wwwhWho.trim());
+    if (wwwhWhat.trim()) parts.push(wwwhWhat.trim());
+    if (wwwhWhy.trim()) parts.push(`because ${wwwhWhy.trim()}`);
+    if (wwwhHow.trim()) parts.push(`by ${wwwhHow.trim()}`);
+    if (wwwhLocation.trim()) parts.push(`at ${wwwhLocation.trim()}`);
+    if (wwwhDate.trim()) parts.push(`on ${wwwhDate.trim()}`);
+    if (parts.length === 0) return '';
+    let s = parts.join(' ');
+    return s.charAt(0).toUpperCase() + s.slice(1) + (s.endsWith('.') ? '' : '.');
+  });
+
+  function parseWWWHNotes() {
+    const text = wwwhNotes.trim();
+    if (!text) return;
+
+    // Try tagged format: "Who: ... What: ... Why: ... How: ..."
+    const tagPattern = /\b(who|what|why|how|title|status|location|date)\s*[:—–-]\s*/gi;
+    const tags: { key: string; start: number; end: number }[] = [];
+    let m: RegExpExecArray | null;
+    while ((m = tagPattern.exec(text)) !== null) {
+      tags.push({ key: m[1].toLowerCase(), start: m.index, end: m.index + m[0].length });
+    }
+
+    if (tags.length > 0) {
+      for (let i = 0; i < tags.length; i++) {
+        const valueStart = tags[i].end;
+        const valueEnd = i + 1 < tags.length ? tags[i + 1].start : text.length;
+        const value = text.slice(valueStart, valueEnd).replace(/[\n\r]+/g, ' ').trim();
+        switch (tags[i].key) {
+          case 'who': wwwhWho = value; break;
+          case 'what': wwwhWhat = value; break;
+          case 'why': wwwhWhy = value; break;
+          case 'how': wwwhHow = value; break;
+          case 'title': wwwhTitle = value; break;
+          case 'status': wwwhStatus = value; break;
+          case 'location': wwwhLocation = value; break;
+          case 'date': wwwhDate = value; break;
+        }
+      }
+    } else {
+      // No tags found — put everything in "What"
+      wwwhWhat = text;
+    }
+
+    // Auto-generate title if empty
+    if (!wwwhTitle.trim() && wwwhWhat.trim()) {
+      wwwhTitle = wwwhWhat.split(/[.!?\n]/)[0].trim().slice(0, 80);
+    }
+  }
+
+  let wwwhSaving = $state(false);
+  let wwwhAnalyzing = $state(false);
+  let wwwhError = $state('');
+  let wwwhSuccess = $state('');
+
+  async function createCaseFromWWWH() {
+    if (!wwwhTitle.trim() && !wwwhWhat.trim()) {
+      wwwhError = 'Provide at least a title or describe what happened.';
+      return;
+    }
+    wwwhSaving = true;
+    wwwhError = '';
+    wwwhSuccess = '';
+    try {
+      // Build description from WWWH fields
+      const wFields = [
+        wwwhWho && `WHO: ${wwwhWho}`,
+        wwwhWhat && `WHAT: ${wwwhWhat}`,
+        wwwhDate && `WHEN: ${wwwhDate}`,
+        wwwhLocation && `WHERE: ${wwwhLocation}`,
+        wwwhWhy && `WHY: ${wwwhWhy}`,
+        wwwhHow && `HOW: ${wwwhHow}`,
+      ].filter(Boolean).join('\n');
+      const description = [wwwhNotes.trim(), wFields].filter(Boolean).join('\n\n');
+      const title = wwwhTitle.trim() || wwwhWhat.split(/[.!?\n]/)[0].trim().slice(0, 80) || 'New Case';
+
+      const res = await fetch('/api/cases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          description,
+          status: wwwhStatus || 'open',
+          priority: 'medium',
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message ?? data.error ?? `Failed (${res.status})`);
+      }
+
+      const data = await res.json();
+      const newCaseId = data.case?.id ?? data.data?.case?.id;
+      wwwhSuccess = `Case created successfully!`;
+
+      // Refresh dashboard case list
+      loadDashboard();
+
+      // Navigate to the new case after a moment so user sees the success message
+      if (newCaseId) {
+        setTimeout(() => goto(`/cases/${newCaseId}/overview`), 1200);
+      }
+    } catch (err) {
+      wwwhError = err instanceof Error ? err.message : 'Failed to create case';
+    } finally {
+      wwwhSaving = false;
+    }
+  }
+
+  async function aiAnalyzeWWWH() {
+    if (!wwwhWhat.trim() && !wwwhNotes.trim()) {
+      wwwhError = 'Provide notes or describe what happened before running AI analysis.';
+      return;
+    }
+    wwwhAnalyzing = true;
+    wwwhError = '';
+    wwwhSuccess = '';
+    try {
+      const formData = new FormData();
+      formData.append('narrative', wwwhNotes.trim());
+      formData.append('who', wwwhWho);
+      formData.append('what', wwwhWhat);
+      formData.append('when', wwwhDate);
+      formData.append('where', wwwhLocation);
+      formData.append('why', wwwhWhy);
+      formData.append('how', wwwhHow);
+
+      const res = await fetch('/cases/new?/analyze', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error('AI analysis unavailable — Ollama may be offline.');
+      }
+
+      const result = await res.json();
+      // Superforms returns data in a specific structure
+      const extraction = result?.data?.extraction ?? result?.extraction;
+      if (extraction) {
+        if (extraction.title && !wwwhTitle.trim()) wwwhTitle = extraction.title;
+        if (extraction.who) wwwhWho = extraction.who;
+        if (extraction.what) wwwhWhat = extraction.what;
+        if (extraction.why) wwwhWhy = extraction.why;
+        if (extraction.how) wwwhHow = extraction.how;
+        if (extraction.when) wwwhDate = extraction.when;
+        if (extraction.where) wwwhLocation = extraction.where;
+        wwwhSuccess = 'AI analysis complete — fields updated.';
+      } else {
+        wwwhSuccess = 'AI analysis returned no extractions.';
+      }
+    } catch (err) {
+      wwwhError = err instanceof Error ? err.message : 'AI analysis failed';
+    } finally {
+      wwwhAnalyzing = false;
+    }
+  }
+
+  function clearWWWH() {
+    wwwhNotes = '';
+    wwwhWho = ''; wwwhWhat = ''; wwwhWhy = ''; wwwhHow = '';
+    wwwhTitle = ''; wwwhStatus = 'open'; wwwhLocation = ''; wwwhDate = '';
+    wwwhError = ''; wwwhSuccess = '';
+  }
+
   // Collapsible section states
   let coreCollapsed = $state(false);
   let toolsCollapsed = $state(false);
@@ -243,6 +423,7 @@
   }
 </script>
 
+<div class="dashboard-dark">
 <LegalDisclaimer />
 
 <div class="dashboard-page">
@@ -286,6 +467,143 @@
   </header>
 
   <FallbackAlert />
+
+  <!-- ═══ WWWH USE CASE GENERATOR ═══ -->
+  <div class="wwwh-section">
+    <button class="wwwh-toggle" onclick={() => (wwwhCollapsed = !wwwhCollapsed)}>
+      <span class="section-chevron" class:open={!wwwhCollapsed}>
+        <Icon name="chevron-right" size={14} />
+      </span>
+      <div class="wwwh-toggle-left">
+        <div class="wwwh-badge">
+          <Icon name="file-plus" />
+        </div>
+        <div>
+          <span class="wwwh-toggle-title">Use Case Generator</span>
+          <span class="wwwh-toggle-sub">Who · What · Why · How</span>
+        </div>
+      </div>
+    </button>
+
+    {#if !wwwhCollapsed}
+      <div class="wwwh-body">
+        <!-- Notes Input -->
+        <div class="wwwh-notes-area">
+          <label class="wwwh-label" for="wwwh-notes">
+            <Icon name="notebook-pen" size={14} />
+            Raw Notes
+          </label>
+          <textarea
+            id="wwwh-notes"
+            class="wwwh-textarea"
+            bind:value={wwwhNotes}
+            placeholder="Paste your notes here...&#10;&#10;Supports tagged format:&#10;Who: John Smith&#10;What: Filed motion to suppress evidence&#10;Why: Illegal search and seizure&#10;How: Fourth Amendment violation&#10;Title: Motion to Suppress&#10;Location: District Court&#10;Date: 2026-03-18&#10;&#10;Or just paste plain text — it will go into the What field."
+            rows="8"
+          ></textarea>
+          <div class="wwwh-btn-row">
+            <button class="wwwh-btn primary" onclick={parseWWWHNotes}>
+              <Icon name="sparkles" size={14} />
+              Auto Fill From Notes
+            </button>
+            <button class="wwwh-btn ai" onclick={aiAnalyzeWWWH} disabled={wwwhAnalyzing}>
+              <Icon name="brain" size={14} />
+              {wwwhAnalyzing ? 'Analyzing...' : 'AI Extract'}
+            </button>
+            <button class="wwwh-btn" onclick={clearWWWH}>
+              <Icon name="eraser" size={14} />
+              Clear All
+            </button>
+          </div>
+        </div>
+
+        <!-- Parsed Fields Grid -->
+        <div class="wwwh-grid">
+          <div class="wwwh-field full">
+            <label class="wwwh-label" for="wwwh-title"><Icon name="heading" size={14} /> Title</label>
+            <input id="wwwh-title" class="wwwh-input" bind:value={wwwhTitle} placeholder="Auto-generated or enter manually" />
+          </div>
+          <div class="wwwh-field">
+            <label class="wwwh-label" for="wwwh-who"><Icon name="user" size={14} /> Who</label>
+            <input id="wwwh-who" class="wwwh-input" bind:value={wwwhWho} placeholder="Person, entity, or party" />
+          </div>
+          <div class="wwwh-field">
+            <label class="wwwh-label" for="wwwh-what"><Icon name="file-text" size={14} /> What</label>
+            <input id="wwwh-what" class="wwwh-input" bind:value={wwwhWhat} placeholder="Action, event, or filing" />
+          </div>
+          <div class="wwwh-field">
+            <label class="wwwh-label" for="wwwh-why"><Icon name="help-circle" size={14} /> Why</label>
+            <input id="wwwh-why" class="wwwh-input" bind:value={wwwhWhy} placeholder="Reason, cause, or basis" />
+          </div>
+          <div class="wwwh-field">
+            <label class="wwwh-label" for="wwwh-how"><Icon name="wrench" size={14} /> How</label>
+            <input id="wwwh-how" class="wwwh-input" bind:value={wwwhHow} placeholder="Method, mechanism, or procedure" />
+          </div>
+          <div class="wwwh-field">
+            <label class="wwwh-label" for="wwwh-status"><Icon name="circle-dot" size={14} /> Status</label>
+            <select id="wwwh-status" class="wwwh-input" bind:value={wwwhStatus}>
+              <option value="open">Open</option>
+              <option value="in_progress">In Progress</option>
+              <option value="pending_review">Pending Review</option>
+              <option value="closed">Closed</option>
+            </select>
+          </div>
+          <div class="wwwh-field">
+            <label class="wwwh-label" for="wwwh-loc"><Icon name="map-pin" size={14} /> Location</label>
+            <input id="wwwh-loc" class="wwwh-input" bind:value={wwwhLocation} placeholder="Court, jurisdiction, venue" />
+          </div>
+          <div class="wwwh-field">
+            <label class="wwwh-label" for="wwwh-date"><Icon name="calendar" size={14} /> Date</label>
+            <input id="wwwh-date" class="wwwh-input" type="date" bind:value={wwwhDate} />
+          </div>
+        </div>
+
+        <!-- Status Messages -->
+        {#if wwwhError}
+          <div class="wwwh-alert error">
+            <Icon name="alert-circle" size={14} />
+            <span>{wwwhError}</span>
+            <button class="wwwh-alert-close" onclick={() => (wwwhError = '')}>&times;</button>
+          </div>
+        {/if}
+        {#if wwwhSuccess}
+          <div class="wwwh-alert success">
+            <Icon name="check-circle" size={14} />
+            <span>{wwwhSuccess}</span>
+            <button class="wwwh-alert-close" onclick={() => (wwwhSuccess = '')}>&times;</button>
+          </div>
+        {/if}
+
+        <!-- Summary -->
+        {#if wwwhSummary}
+          <div class="wwwh-summary">
+            <span class="wwwh-summary-label"><Icon name="scroll-text" size={14} /> Generated Summary</span>
+            <p class="wwwh-summary-text">{wwwhSummary}</p>
+          </div>
+        {/if}
+
+        <!-- Create Case Action -->
+        <div class="wwwh-action-row">
+          <button
+            class="wwwh-create-btn"
+            onclick={createCaseFromWWWH}
+            disabled={wwwhSaving || (!wwwhTitle.trim() && !wwwhWhat.trim())}
+          >
+            {#if wwwhSaving}
+              <Icon name="loader" size={16} />
+              Creating Case...
+            {:else}
+              <Icon name="plus-circle" size={16} />
+              Create Case & Save to DB
+            {/if}
+          </button>
+          <a class="wwwh-link-btn" href="/cases/new">
+            <Icon name="external-link" size={14} />
+            Open Full Intake Form
+          </a>
+        </div>
+      </div>
+    {/if}
+  </div>
 
   {#if documentProgressStore.isProcessing}
     <div class="progress-section">
@@ -549,7 +867,7 @@
               {#each [
                 { href: '/evidence', label: 'Evidence Hub', desc: 'CustodyFlow, Summarizer, FileUpload, Connections', count: 4 },
                 { href: '/ai-dashboard', label: 'AI Dashboard', desc: 'ContextualChat, EnhancedAIChat, Gemma, Streaming', count: 4 },
-                { href: '/all-routes', label: 'Route Inspector', desc: 'Inspector, Detective, Working, Graph, OpsLog', count: 5 },
+                { href: '/admin/all-routes', label: 'Route Inspector', desc: 'Inspector, Detective, Working, Graph, OpsLog', count: 5 },
                 { href: '/cases/new', label: 'New Case Form', desc: 'CaseForm with WHO/WHAT/WHY auto-populator', count: 1 },
                 { href: '/active-cases', label: 'Active Cases', desc: 'CaseScoringDashboard with AI risk analysis', count: 1 },
                 { href: '/analysis-center', label: 'Analysis Center', desc: 'ContractAnalyzer, HybridBoard whiteboard', count: 2 },
@@ -616,6 +934,7 @@
 
   {/if}
 </div>
+</div>
 
 <!-- Floating AI Assistant Button -->
 <AIAssistantButton variant="floating" position="bottom-right" />
@@ -625,6 +944,60 @@
 <CommandPalette bind:open={showCommandPalette} />
 
 <style>
+  /* Full-bleed dark wrapper */
+  .dashboard-dark {
+    min-height: 100vh;
+    background: #0e0d0b;
+    margin: -2.5rem;
+    padding: 2.5rem;
+    color: rgb(212 199 163);
+  }
+
+  /* Neutralize root layout light-theme globals */
+  .dashboard-dark :global(h1),
+  .dashboard-dark :global(h2),
+  .dashboard-dark :global(h3),
+  .dashboard-dark :global(h4),
+  .dashboard-dark :global(p) {
+    color: inherit;
+    text-transform: none;
+    letter-spacing: normal;
+    margin: 0;
+  }
+
+  .dashboard-dark :global(a) {
+    color: inherit;
+    border-bottom: none;
+  }
+
+  .dashboard-dark :global(button) {
+    text-transform: none;
+    letter-spacing: normal;
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  .dashboard-dark :global(input),
+  .dashboard-dark :global(select) {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: inherit;
+  }
+
+  .dashboard-dark :global(.panel),
+  .dashboard-dark :global(.card),
+  .dashboard-dark :global([class*="panel"]) {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: inherit;
+    padding: 0;
+  }
+
   /* Page container */
   .dashboard-page {
     max-width: 72rem;
@@ -1287,5 +1660,321 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     max-width: 100%;
+  }
+
+  /* ═══ WWWH Use Case Generator ═══ */
+  .wwwh-section {
+    margin-bottom: 1.5rem;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(212, 199, 163, 0.12);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .wwwh-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(212, 199, 163, 0.8);
+    transition: background 0.15s;
+  }
+
+  .wwwh-toggle:hover {
+    background: rgba(212, 199, 163, 0.04);
+  }
+
+  .wwwh-toggle-left {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .wwwh-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.5rem;
+    background: linear-gradient(135deg, rgba(52, 211, 153, 0.12), rgba(96, 165, 250, 0.12));
+    border: 1px solid rgba(52, 211, 153, 0.25);
+    color: rgba(52, 211, 153, 0.9);
+    flex-shrink: 0;
+  }
+
+  .wwwh-toggle-title {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgba(212, 199, 163, 0.9);
+  }
+
+  .wwwh-toggle-sub {
+    display: block;
+    font-size: 0.625rem;
+    color: rgba(212, 199, 163, 0.35);
+    letter-spacing: 0.05em;
+  }
+
+  .wwwh-body {
+    padding: 0 1rem 1rem;
+  }
+
+  .wwwh-notes-area {
+    margin-bottom: 1rem;
+  }
+
+  .wwwh-label {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: rgba(212, 199, 163, 0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.375rem;
+  }
+
+  .wwwh-textarea {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(212, 199, 163, 0.1);
+    border-radius: 0.375rem;
+    color: rgba(212, 199, 163, 0.9);
+    font-size: 0.875rem;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    line-height: 1.6;
+    resize: vertical;
+    min-height: 10rem;
+  }
+
+  .wwwh-textarea::placeholder {
+    color: rgba(212, 199, 163, 0.2);
+  }
+
+  .wwwh-textarea:focus {
+    outline: none;
+    border-color: rgba(52, 211, 153, 0.4);
+    box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.08);
+  }
+
+  .wwwh-btn-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.625rem;
+  }
+
+  .wwwh-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid rgba(212, 199, 163, 0.15);
+    background: rgba(212, 199, 163, 0.06);
+    color: rgba(212, 199, 163, 0.7);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .wwwh-btn:hover {
+    background: rgba(212, 199, 163, 0.1);
+    color: rgba(212, 199, 163, 0.9);
+  }
+
+  .wwwh-btn.primary {
+    background: rgba(52, 211, 153, 0.12);
+    border-color: rgba(52, 211, 153, 0.3);
+    color: rgba(52, 211, 153, 0.95);
+  }
+
+  .wwwh-btn.primary:hover {
+    background: rgba(52, 211, 153, 0.2);
+  }
+
+  /* Fields Grid */
+  .wwwh-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .wwwh-field.full {
+    grid-column: 1 / -1;
+  }
+
+  .wwwh-input {
+    width: 100%;
+    padding: 0.5rem 0.625rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(212, 199, 163, 0.1);
+    border-radius: 0.375rem;
+    color: rgba(212, 199, 163, 0.9);
+    font-size: 0.8125rem;
+  }
+
+  .wwwh-input::placeholder {
+    color: rgba(212, 199, 163, 0.2);
+  }
+
+  .wwwh-input:focus {
+    outline: none;
+    border-color: rgba(96, 165, 250, 0.4);
+  }
+
+  select.wwwh-input {
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23d4c7a366' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m2 4 4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    padding-right: 1.75rem;
+  }
+
+  /* Summary */
+  .wwwh-summary {
+    background: rgba(96, 165, 250, 0.05);
+    border: 1px solid rgba(96, 165, 250, 0.15);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .wwwh-summary-label {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.625rem;
+    font-weight: 600;
+    color: rgba(96, 165, 250, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.375rem;
+  }
+
+  .wwwh-summary-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: rgba(212, 199, 163, 0.9);
+    margin: 0;
+  }
+
+  /* AI button */
+  .wwwh-btn.ai {
+    background: rgba(167, 139, 250, 0.15);
+    color: #c4b5fd;
+    border-color: rgba(167, 139, 250, 0.3);
+  }
+  .wwwh-btn.ai:hover:not(:disabled) {
+    background: rgba(167, 139, 250, 0.25);
+    border-color: rgba(167, 139, 250, 0.5);
+  }
+  .wwwh-btn.ai:disabled {
+    opacity: 0.5;
+    cursor: wait;
+  }
+
+  /* Alert banners */
+  .wwwh-alert {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 0.875rem;
+    border-radius: 0.375rem;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+  }
+  .wwwh-alert.error {
+    background: rgba(248, 113, 113, 0.1);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    color: #fca5a5;
+  }
+  .wwwh-alert.success {
+    background: rgba(52, 211, 153, 0.1);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    color: #6ee7b7;
+  }
+  .wwwh-alert-close {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.125rem;
+    cursor: pointer;
+    opacity: 0.7;
+    padding: 0 0.25rem;
+  }
+  .wwwh-alert-close:hover {
+    opacity: 1;
+  }
+
+  /* Create Case action row */
+  .wwwh-action-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(212, 199, 163, 0.08);
+  }
+  .wwwh-create-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(96, 165, 250, 0.2));
+    color: #6ee7b7;
+    border: 1px solid rgba(52, 211, 153, 0.35);
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .wwwh-create-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(52, 211, 153, 0.3), rgba(96, 165, 250, 0.3));
+    border-color: rgba(52, 211, 153, 0.55);
+    box-shadow: 0 0 12px rgba(52, 211, 153, 0.15);
+  }
+  .wwwh-create-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .wwwh-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    color: rgba(212, 199, 163, 0.6);
+    font-size: 0.75rem;
+    text-decoration: none;
+    border-radius: 0.375rem;
+    transition: all 0.2s;
+  }
+  .wwwh-link-btn:hover {
+    color: rgba(212, 199, 163, 0.9);
+    background: rgba(212, 199, 163, 0.06);
+  }
+
+  @media (max-width: 640px) {
+    .wwwh-grid {
+      grid-template-columns: 1fr;
+    }
+    .wwwh-action-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .wwwh-create-btn {
+      justify-content: center;
+    }
   }
 </style>

@@ -17,18 +17,6 @@
 		other: 'Other',
 	};
 
-	const STATUS_COLOR: Record<string, string> = {
-		complete: 'text-green-400',
-		failed: 'text-red-400',
-		queued: 'text-sand/40',
-		extracting: 'text-blue-400',
-		structuring: 'text-blue-400',
-		chunking: 'text-yellow-400',
-		embedding: 'text-purple-400',
-		graphing: 'text-teal-400',
-	};
-
-
 	interface TocNode {
 		id: string;
 		parentId: string | null;
@@ -70,48 +58,39 @@
 </svelte:head>
 
 {#if data.loadError}
-	<div class="p-8 text-center text-red-400">{data.loadError}</div>
+	<div class="ld-error-page">{data.loadError}</div>
 {:else if data.document}
 	{@const doc = data.document}
-	<div class="p-6 text-sand">
+	<div class="ld-page">
 		<!-- Header -->
-		<div class="mb-6 pb-5 border-b border-sand/10">
-			<div class="flex items-start justify-between gap-4">
+		<div class="ld-header">
+			<div class="ld-header-top">
 				<div>
-					<div class="flex items-center gap-2 mb-1.5">
+					<div class="ld-badge-row">
 						{#if doc.jurisdiction}
-							<span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-950/60 text-blue-300 border border-blue-700/30 font-mono">
-								{doc.jurisdiction.code.toUpperCase()}
-							</span>
+							<span class="ld-badge ld-badge-blue">{doc.jurisdiction.code.toUpperCase()}</span>
 						{/if}
 						{#if doc.corpusType}
-							<span class="text-[10px] px-1.5 py-0.5 rounded bg-sand/8 text-sand/50">
-								{CORPUS_LABELS[doc.corpusType] ?? doc.corpusType}
-							</span>
+							<span class="ld-badge ld-badge-neutral">{CORPUS_LABELS[doc.corpusType] ?? doc.corpusType}</span>
 						{/if}
 						{#if doc.isOfficial}
-							<span class="text-[10px] px-1.5 py-0.5 rounded bg-green-950/60 text-green-400">✓ Official</span>
+							<span class="ld-badge ld-badge-green">Official</span>
 						{/if}
-						<span class="text-[10px] {STATUS_COLOR[doc.processingStatus] ?? ''}">
-							{doc.processingStatus}
-						</span>
+						<span class="ld-status ld-status-{doc.processingStatus}">{doc.processingStatus}</span>
 					</div>
-					<h1 class="text-2xl font-bold text-sand">{doc.title}</h1>
+					<h1 class="ld-h1">{doc.title}</h1>
 					{#if doc.citation}
-						<p class="text-sm text-sand/50 font-mono mt-0.5">{doc.citation}</p>
+						<p class="ld-citation">{doc.citation}</p>
 					{/if}
 				</div>
 
-				<a
-					href="/library/{doc.id}/reader"
-					class="shrink-0 px-4 py-2 rounded-lg bg-accent text-black text-sm font-medium hover:bg-accent/90 transition-colors"
-				>
-					Open Reader →
+				<a href="/library/{doc.id}/reader" class="ld-open-reader">
+					Open Reader &rarr;
 				</a>
 			</div>
 
 			<!-- Metadata bar -->
-			<div class="flex items-center gap-6 mt-4 text-xs text-sand/40">
+			<div class="ld-meta-bar">
 				{#if doc.pageCount}
 					<span>{doc.pageCount} pages</span>
 				{/if}
@@ -128,22 +107,23 @@
 					<span>Effective {new Date(doc.effectiveDate).toLocaleDateString()}</span>
 				{/if}
 				{#if doc.officialUrl}
-					<a href={doc.officialUrl} target="_blank" rel="noopener noreferrer" class="text-accent hover:underline">
-						Official source ↗
+					<a href={doc.officialUrl} target="_blank" rel="noopener noreferrer" class="ld-official-link">
+						Official source
+						<Icon name="external-link" />
 					</a>
 				{/if}
 			</div>
 		</div>
 
-		<div class="grid grid-cols-[1fr_280px] gap-6">
+		<div class="ld-body-grid">
 			<!-- TOC preview -->
 			<div>
-				<h2 class="text-xs font-semibold text-sand/60 uppercase tracking-wider mb-3">Table of Contents</h2>
+				<h2 class="ld-section-label">Table of Contents</h2>
 				{#if data.toc.length === 0}
 					{#if doc.processingStatus === 'complete'}
-						<p class="text-sand/30 text-sm">No sections detected.</p>
+						<p class="ld-muted-text">No sections detected.</p>
 					{:else}
-						<p class="text-sand/30 text-sm">Indexing in progress…</p>
+						<p class="ld-muted-text">Indexing in progress&hellip;</p>
 					{/if}
 				{:else}
 					<TocTree
@@ -151,59 +131,233 @@
 						onSelect={(id) => goto(`/library/${doc.id}/reader?node=${id}`)}
 					/>
 					{#if data.toc.length >= 40}
-						<a
-							href="/library/{doc.id}/reader"
-							class="text-xs text-accent/60 hover:text-accent text-center py-2 block mt-2"
-						>
-							View full table of contents in reader →
+						<a href="/library/{doc.id}/reader" class="ld-view-full">
+							View full table of contents in reader &rarr;
 						</a>
 					{/if}
 				{/if}
 			</div>
 
 			<!-- Right: Quick info -->
-			<div class="flex flex-col gap-4">
-				<div class="panel rounded-lg border border-sand/10 p-4">
-					<h3 class="text-xs font-semibold text-sand/50 uppercase tracking-wider mb-3">Document Info</h3>
-					<dl class="flex flex-col gap-2 text-xs">
+			<div class="ld-info-col">
+				<div class="ld-info-card">
+					<h3 class="ld-section-label">Document Info</h3>
+					<dl class="ld-info-dl">
 						{#if doc.jurisdiction}
-							<div class="flex justify-between">
-								<dt class="text-sand/40">Jurisdiction</dt>
-								<dd class="text-sand/70">{doc.jurisdiction.name}</dd>
+							<div class="ld-info-row">
+								<dt>Jurisdiction</dt>
+								<dd>{doc.jurisdiction.name}</dd>
 							</div>
 						{/if}
 						{#if doc.corpusType}
-							<div class="flex justify-between">
-								<dt class="text-sand/40">Type</dt>
-								<dd class="text-sand/70">{CORPUS_LABELS[doc.corpusType] ?? doc.corpusType}</dd>
+							<div class="ld-info-row">
+								<dt>Type</dt>
+								<dd>{CORPUS_LABELS[doc.corpusType] ?? doc.corpusType}</dd>
 							</div>
 						{/if}
-						<div class="flex justify-between">
-							<dt class="text-sand/40">Status</dt>
-							<dd class="{STATUS_COLOR[doc.processingStatus] ?? ''}">{doc.processingStatus}</dd>
+						<div class="ld-info-row">
+							<dt>Status</dt>
+							<dd class="ld-status ld-status-{doc.processingStatus}">{doc.processingStatus}</dd>
 						</div>
 						{#if doc.createdAt}
-							<div class="flex justify-between">
-								<dt class="text-sand/40">Added</dt>
-								<dd class="text-sand/70">{new Date(doc.createdAt).toLocaleDateString()}</dd>
+							<div class="ld-info-row">
+								<dt>Added</dt>
+								<dd>{new Date(doc.createdAt).toLocaleDateString()}</dd>
 							</div>
 						{/if}
 					</dl>
 				</div>
 
-				<a
-					href="/library/{doc.id}/reader"
-					class="block w-full py-3 rounded-lg border border-accent/30 text-center text-sm text-accent hover:bg-accent/10 transition-colors"
-				>
-					Open Reader
-				</a>
-				<a
-					href="/library"
-					class="block w-full py-2 rounded text-center text-xs text-sand/40 hover:text-sand/70 transition-colors"
-				>
-					← Back to Library
-				</a>
+				<a href="/library/{doc.id}/reader" class="ld-cta-reader">Open Reader</a>
+				<a href="/library" class="ld-back-link">&larr; Back to Library</a>
 			</div>
 		</div>
 	</div>
 {/if}
+
+<style>
+	/* ── Error / page ── */
+	.ld-error-page {
+		padding: 2rem;
+		text-align: center;
+		color: #f87171;
+	}
+	.ld-page {
+		padding: 1.5rem;
+		color: rgba(212, 199, 163, 0.9);
+	}
+
+	/* ── Header ── */
+	.ld-header {
+		margin-bottom: 1.5rem;
+		padding-bottom: 1.25rem;
+		border-bottom: 1px solid rgba(212, 199, 163, 0.08);
+	}
+	.ld-header-top {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+	.ld-badge-row {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 0.375rem;
+	}
+	.ld-badge {
+		font-size: 0.6rem;
+		padding: 0.125rem 0.375rem;
+		border-radius: 0.25rem;
+		font-family: 'JetBrains Mono', ui-monospace, monospace;
+	}
+	.ld-badge-blue {
+		background: rgba(96, 165, 250, 0.1);
+		color: rgba(96, 165, 250, 0.8);
+		border: 1px solid rgba(96, 165, 250, 0.2);
+	}
+	.ld-badge-neutral {
+		background: rgba(212, 199, 163, 0.06);
+		color: rgba(212, 199, 163, 0.4);
+	}
+	.ld-badge-green {
+		background: rgba(52, 211, 153, 0.1);
+		color: #34d399;
+	}
+	.ld-h1 {
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: rgba(212, 199, 163, 0.95);
+		margin: 0;
+	}
+	.ld-citation {
+		font-size: 0.85rem;
+		color: rgba(212, 199, 163, 0.4);
+		font-family: 'JetBrains Mono', ui-monospace, monospace;
+		margin-top: 0.125rem;
+	}
+	.ld-open-reader {
+		flex-shrink: 0;
+		padding: 0.5rem 1rem;
+		border-radius: 0.5rem;
+		background: rgba(96, 165, 250, 0.15);
+		border: 1px solid rgba(96, 165, 250, 0.3);
+		color: rgba(96, 165, 250, 0.95);
+		font-size: 0.85rem;
+		font-weight: 500;
+		text-decoration: none;
+		transition: background 0.15s;
+	}
+	.ld-open-reader:hover { background: rgba(96, 165, 250, 0.25); }
+
+	/* ── Status colors ── */
+	.ld-status { font-size: 0.6rem; }
+	.ld-status-complete { color: #34d399; }
+	.ld-status-failed { color: #f87171; }
+	.ld-status-queued { color: rgba(212, 199, 163, 0.35); }
+	.ld-status-extracting,
+	.ld-status-structuring { color: rgba(96, 165, 250, 0.9); }
+	.ld-status-chunking { color: #fbbf24; }
+	.ld-status-embedding { color: rgba(168, 85, 247, 0.9); }
+	.ld-status-graphing { color: rgba(20, 184, 166, 0.9); }
+
+	/* ── Meta bar ── */
+	.ld-meta-bar {
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+		margin-top: 1rem;
+		font-size: 0.7rem;
+		color: rgba(212, 199, 163, 0.3);
+	}
+	.ld-official-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+		color: rgba(96, 165, 250, 0.7);
+		text-decoration: none;
+		transition: color 0.15s;
+	}
+	.ld-official-link:hover { color: rgba(96, 165, 250, 1); text-decoration: underline; }
+
+	/* ── Body grid ── */
+	.ld-body-grid {
+		display: grid;
+		grid-template-columns: 1fr 280px;
+		gap: 1.5rem;
+	}
+
+	/* ── Section label ── */
+	.ld-section-label {
+		font-size: 0.7rem;
+		font-weight: 600;
+		color: rgba(212, 199, 163, 0.45);
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		margin: 0 0 0.75rem;
+	}
+	.ld-muted-text { font-size: 0.85rem; color: rgba(212, 199, 163, 0.25); }
+	.ld-view-full {
+		display: block;
+		text-align: center;
+		padding: 0.5rem 0;
+		margin-top: 0.5rem;
+		font-size: 0.7rem;
+		color: rgba(96, 165, 250, 0.5);
+		text-decoration: none;
+		transition: color 0.15s;
+	}
+	.ld-view-full:hover { color: rgba(96, 165, 250, 0.9); }
+
+	/* ── Info column ── */
+	.ld-info-col {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+	.ld-info-card {
+		border-radius: 0.5rem;
+		border: 1px solid rgba(212, 199, 163, 0.08);
+		background: rgba(0, 0, 0, 0.2);
+		padding: 1rem;
+	}
+	.ld-info-dl {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		font-size: 0.7rem;
+	}
+	.ld-info-row {
+		display: flex;
+		justify-content: space-between;
+	}
+	.ld-info-row dt { color: rgba(212, 199, 163, 0.3); }
+	.ld-info-row dd { color: rgba(212, 199, 163, 0.6); }
+
+	/* ── CTA links ── */
+	.ld-cta-reader {
+		display: block;
+		width: 100%;
+		padding: 0.75rem 0;
+		border-radius: 0.5rem;
+		border: 1px solid rgba(96, 165, 250, 0.25);
+		text-align: center;
+		font-size: 0.85rem;
+		color: rgba(96, 165, 250, 0.9);
+		text-decoration: none;
+		transition: background 0.15s;
+	}
+	.ld-cta-reader:hover { background: rgba(96, 165, 250, 0.08); }
+	.ld-back-link {
+		display: block;
+		width: 100%;
+		padding: 0.5rem 0;
+		border-radius: 0.25rem;
+		text-align: center;
+		font-size: 0.7rem;
+		color: rgba(212, 199, 163, 0.3);
+		text-decoration: none;
+		transition: color 0.15s;
+	}
+	.ld-back-link:hover { color: rgba(212, 199, 163, 0.6); }
+</style>

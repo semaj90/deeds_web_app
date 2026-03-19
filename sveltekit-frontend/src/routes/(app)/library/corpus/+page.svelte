@@ -33,26 +33,6 @@
 		return list;
 	});
 
-	function statusColor(status: string | null) {
-		switch (status) {
-			case 'complete':   return 'text-green-400 bg-green-950/50';
-			case 'failed':     return 'text-red-400 bg-red-950/50';
-			case 'extracting':
-			case 'structuring':
-			case 'chunking':
-			case 'embedding':
-			case 'graphing':   return 'text-blue-400 bg-blue-950/50';
-			case 'queued':     return 'text-yellow-400 bg-yellow-950/50';
-			default:           return 'text-sand/30 bg-sand/5';
-		}
-	}
-
-	function confidenceDot(confidence: string) {
-		if (confidence === 'high') return 'bg-green-400';
-		if (confidence === 'medium') return 'bg-yellow-400';
-		return 'bg-red-400';
-	}
-
 	function formatDate(iso: string | null) {
 		if (!iso) return null;
 		return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -97,22 +77,22 @@
 
 <svelte:head><title>State Constitution Corpus — Legal Library</title></svelte:head>
 
-<div class="p-6 text-sand">
+<div class="co-page">
 	<!-- Header -->
-	<header class="mb-6 flex items-start justify-between gap-4">
+	<header class="co-header">
 		<div>
-			<h1 class="text-2xl font-bold text-sand">50-State Constitution Corpus</h1>
-			<p class="text-sand/50 text-sm mt-0.5">
-				Official state legislature sources · LII discovery layer · Qdrant + pgvector mirrored
+			<h1 class="co-h1">50-State Constitution Corpus</h1>
+			<p class="co-subtitle">
+				Official state legislature sources &middot; LII discovery layer &middot; Qdrant + pgvector mirrored
 			</p>
 		</div>
 		<button
 			onclick={ingestAll}
 			disabled={bulkRunning}
-			class="px-4 py-2 rounded bg-accent/20 text-accent text-sm font-medium hover:bg-accent/30 disabled:opacity-50 transition-colors shrink-0"
+			class="co-ingest-btn"
 		>
 			{#if bulkRunning}
-				<span class="animate-pulse">Running…</span>
+				<span class="co-pulse">Running&hellip;</span>
 			{:else}
 				Ingest All States
 			{/if}
@@ -120,36 +100,34 @@
 	</header>
 
 	{#if bulkMessage}
-		<div class="mb-4 p-3 rounded bg-blue-950/40 border border-blue-800/30 text-blue-300 text-sm">
-			{bulkMessage}
-		</div>
+		<div class="co-bulk-msg">{bulkMessage}</div>
 	{/if}
 
 	<!-- Stats bar -->
-	<div class="grid grid-cols-5 gap-3 mb-6">
+	<div class="co-stats-grid">
 		{#each [
-			{ label: 'Total States', value: data.stats.total, color: 'text-sand/70' },
-			{ label: 'Complete', value: data.stats.complete, color: 'text-green-400' },
-			{ label: 'In Progress', value: data.stats.inProgress, color: 'text-blue-400' },
-			{ label: 'Failed', value: data.stats.failed, color: 'text-red-400' },
-			{ label: 'Not Started', value: data.stats.notStarted, color: 'text-sand/30' },
+			{ label: 'Total States', value: data.stats.total, cls: 'co-stat-default' },
+			{ label: 'Complete', value: data.stats.complete, cls: 'co-stat-green' },
+			{ label: 'In Progress', value: data.stats.inProgress, cls: 'co-stat-blue' },
+			{ label: 'Failed', value: data.stats.failed, cls: 'co-stat-red' },
+			{ label: 'Not Started', value: data.stats.notStarted, cls: 'co-stat-muted' },
 		] as stat}
-			<div class="panel rounded-lg border border-sand/10 p-3 text-center">
-				<div class="text-2xl font-bold {stat.color}">{stat.value}</div>
-				<div class="text-[11px] text-sand/40 mt-0.5">{stat.label}</div>
+			<div class="co-stat-card">
+				<div class="co-stat-value {stat.cls}">{stat.value}</div>
+				<div class="co-stat-label">{stat.label}</div>
 			</div>
 		{/each}
 	</div>
 
 	<!-- Filter + Search -->
-	<div class="flex items-center gap-3 mb-4">
+	<div class="co-filter-bar">
 		<input
 			bind:value={searchQ}
 			type="search"
-			placeholder="Search states…"
-			class="flex-1 max-w-xs bg-sand/5 border border-sand/10 rounded px-3 py-1.5 text-sm text-sand placeholder:text-sand/30 focus:outline-none focus:border-accent/40"
+			placeholder="Search states..."
+			class="co-search-input"
 		/>
-		<div class="flex gap-1">
+		<div class="co-filter-tabs">
 			{#each [
 				{ key: 'all', label: 'All' },
 				{ key: 'complete', label: 'Complete' },
@@ -159,41 +137,38 @@
 			] as tab}
 				<button
 					onclick={() => (filter = tab.key as typeof filter)}
-					class="px-3 py-1.5 rounded text-xs font-medium transition-colors
-						{filter === tab.key
-							? 'bg-accent/20 text-accent'
-							: 'bg-sand/5 text-sand/40 hover:text-sand/70'}"
+					class="co-filter-btn"
+					class:active={filter === tab.key}
 				>
 					{tab.label}
 				</button>
 			{/each}
 		</div>
-		<span class="text-xs text-sand/30 ml-auto">{filtered.length} states</span>
+		<span class="co-filter-count">{filtered.length} states</span>
 	</div>
 
 	<!-- State grid -->
-	<div class="grid grid-cols-1 gap-2">
+	<div class="co-state-list">
 		{#each filtered as src}
-			<div class="panel rounded-lg border border-sand/8 p-4 flex items-center gap-4 hover:border-sand/15 transition-colors">
+			<div class="co-state-row">
 				<!-- State badge -->
-				<div class="w-10 h-10 rounded bg-accent/10 flex items-center justify-center shrink-0">
-					<span class="text-sm font-bold text-accent/80 uppercase">{src.stateCode}</span>
+				<div class="co-state-badge">
+					<span class="co-state-code">{src.stateCode}</span>
 				</div>
 
 				<!-- Name + metadata -->
-				<div class="flex-1 min-w-0">
-					<div class="flex items-center gap-2 mb-0.5">
-						<span class="text-sm font-medium text-sand">{src.stateName}</span>
+				<div class="co-state-info">
+					<div class="co-state-name-row">
+						<span class="co-state-name">{src.stateName}</span>
 						{#if src.isOfficial}
-							<span class="text-[10px] px-1.5 py-0.5 rounded bg-green-950/50 text-green-400 font-mono">official</span>
+							<span class="co-tag co-tag-official">official</span>
 						{:else}
-							<span class="text-[10px] px-1.5 py-0.5 rounded bg-sand/8 text-sand/30">scraped</span>
+							<span class="co-tag co-tag-scraped">scraped</span>
 						{/if}
-						<!-- Source confidence dot -->
-						<span class="w-1.5 h-1.5 rounded-full {confidenceDot(src.sourceConfidence)}" title="Source confidence: {src.sourceConfidence}"></span>
-						<span class="text-[10px] text-sand/30 font-mono">{src.format.toUpperCase()}</span>
+						<span class="co-confidence-dot co-confidence-{src.sourceConfidence}" title="Source confidence: {src.sourceConfidence}"></span>
+						<span class="co-format-tag">{src.format.toUpperCase()}</span>
 					</div>
-					<div class="flex items-center gap-3 text-[11px] text-sand/40">
+					<div class="co-state-meta">
 						{#if src.wordCount}
 							<span>{src.wordCount.toLocaleString()} words</span>
 						{/if}
@@ -207,70 +182,316 @@
 							<span>Fetched {formatDate(src.lastFetchedAt)}</span>
 						{/if}
 						{#if src.notes}
-							<span class="text-yellow-500/60 truncate max-w-xs" title={src.notes}>⚠ {src.notes}</span>
+							<span class="co-state-warning" title={src.notes}>{src.notes}</span>
 						{/if}
 					</div>
 
-					<!-- Progress bar when in progress -->
 					{#if src.stage && src.processingStatus !== 'complete' && src.processingStatus !== 'failed'}
-						<div class="mt-2 flex items-center gap-2">
-							<div class="flex-1 h-1 bg-sand/10 rounded-full overflow-hidden">
+						<div class="co-progress-row">
+							<div class="co-progress-track">
 								<div
-									class="h-full bg-accent rounded-full transition-all duration-500"
+									class="co-progress-fill"
 									style:width="{src.progress}%"
 								></div>
 							</div>
-							<span class="text-[10px] text-sand/40">{src.stage} {src.progress}%</span>
+							<span class="co-progress-label">{src.stage} {src.progress}%</span>
 						</div>
 					{/if}
 
 					{#if src.errorText && src.processingStatus === 'failed'}
-						<p class="mt-1 text-[10px] text-red-400/70 truncate" title={src.errorText}>{src.errorText}</p>
+						<p class="co-error-text" title={src.errorText}>{src.errorText}</p>
 					{/if}
 				</div>
 
 				<!-- Status badge -->
-				<div class="shrink-0">
-					<span class="text-[10px] px-2 py-0.5 rounded font-mono {statusColor(src.processingStatus)}">
+				<div class="co-status-badge-wrap">
+					<span class="co-status-badge co-status-{src.processingStatus ?? 'pending'}">
 						{src.processingStatus ?? 'pending'}
 					</span>
 				</div>
 
 				<!-- Actions -->
-				<div class="shrink-0 flex items-center gap-2">
+				<div class="co-actions">
 					{#if src.documentId}
-						<a
-							href="/library/{src.documentId}"
-							class="text-xs px-2 py-1 rounded bg-sand/5 text-sand/50 hover:text-accent hover:bg-accent/10 transition-colors"
-						>
-							View
-						</a>
+						<a href="/library/{src.documentId}" class="co-action-btn">View</a>
 					{/if}
 					<button
 						onclick={() => ingestState(src)}
 						disabled={perStateRunning.has(src.stateCode)}
-						class="text-xs px-2 py-1 rounded bg-sand/5 text-sand/50 hover:text-accent hover:bg-accent/10 disabled:opacity-40 transition-colors"
+						class="co-action-btn"
 						title={src.processingStatus === 'complete' ? 'Re-fetch (checks hash, skips if unchanged)' : 'Start ingestion'}
 					>
 						{#if perStateRunning.has(src.stateCode)}
-							<span class="animate-pulse">…</span>
+							<span class="co-pulse">&hellip;</span>
 						{:else if src.processingStatus === 'complete'}
-							↺ Refresh
+							Refresh
 						{:else}
-							▶ Ingest
+							Ingest
 						{/if}
 					</button>
 					<a
 						href={src.sourceUrl ?? src.discoveryUrl}
 						target="_blank"
 						rel="noopener noreferrer"
-						class="text-xs text-sand/25 hover:text-accent/60 transition-colors"
+						class="co-external-link"
 						title="View source"
 					>
-						↗
+						<Icon name="external-link" />
 					</a>
 				</div>
 			</div>
 		{/each}
 	</div>
 </div>
+
+<style>
+	/* ── Page ── */
+	.co-page { padding: 1.5rem; color: rgba(212, 199, 163, 0.9); }
+
+	/* ── Header ── */
+	.co-header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 1.5rem;
+	}
+	.co-h1 { font-size: 1.5rem; font-weight: 700; color: rgba(212, 199, 163, 0.95); margin: 0; }
+	.co-subtitle { font-size: 0.8rem; color: rgba(212, 199, 163, 0.4); margin-top: 0.125rem; }
+
+	.co-ingest-btn {
+		padding: 0.5rem 1rem;
+		border-radius: 0.375rem;
+		background: rgba(96, 165, 250, 0.15);
+		border: 1px solid rgba(96, 165, 250, 0.3);
+		color: rgba(96, 165, 250, 0.9);
+		font-size: 0.85rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background 0.15s;
+		flex-shrink: 0;
+	}
+	.co-ingest-btn:hover { background: rgba(96, 165, 250, 0.25); }
+	.co-ingest-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+	.co-pulse { animation: pulse 1.5s ease-in-out infinite; }
+
+	/* ── Bulk message ── */
+	.co-bulk-msg {
+		margin-bottom: 1rem;
+		padding: 0.75rem;
+		border-radius: 0.5rem;
+		background: rgba(96, 165, 250, 0.08);
+		border: 1px solid rgba(96, 165, 250, 0.15);
+		color: rgba(96, 165, 250, 0.8);
+		font-size: 0.85rem;
+	}
+
+	/* ── Stats ── */
+	.co-stats-grid {
+		display: grid;
+		grid-template-columns: repeat(5, 1fr);
+		gap: 0.75rem;
+		margin-bottom: 1.5rem;
+	}
+	.co-stat-card {
+		border-radius: 0.5rem;
+		border: 1px solid rgba(212, 199, 163, 0.08);
+		background: rgba(0, 0, 0, 0.2);
+		padding: 0.75rem;
+		text-align: center;
+	}
+	.co-stat-value { font-size: 1.5rem; font-weight: 700; }
+	.co-stat-label { font-size: 0.6875rem; color: rgba(212, 199, 163, 0.3); margin-top: 0.125rem; }
+	.co-stat-default { color: rgba(212, 199, 163, 0.6); }
+	.co-stat-green { color: #34d399; }
+	.co-stat-blue { color: rgba(96, 165, 250, 0.9); }
+	.co-stat-red { color: #f87171; }
+	.co-stat-muted { color: rgba(212, 199, 163, 0.25); }
+
+	/* ── Filter bar ── */
+	.co-filter-bar {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin-bottom: 1rem;
+	}
+	.co-search-input {
+		flex: 1;
+		max-width: 16rem;
+		background: rgba(0, 0, 0, 0.2);
+		border: 1px solid rgba(212, 199, 163, 0.1);
+		border-radius: 0.375rem;
+		padding: 0.375rem 0.75rem;
+		font-size: 0.85rem;
+		color: rgba(212, 199, 163, 0.9);
+	}
+	.co-search-input::placeholder { color: rgba(212, 199, 163, 0.25); }
+	.co-search-input:focus { outline: none; border-color: rgba(96, 165, 250, 0.4); }
+	.co-filter-tabs { display: flex; gap: 0.25rem; }
+	.co-filter-btn {
+		padding: 0.375rem 0.75rem;
+		border-radius: 0.375rem;
+		font-size: 0.7rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.15s;
+		background: rgba(212, 199, 163, 0.04);
+		border: 1px solid transparent;
+		color: rgba(212, 199, 163, 0.3);
+	}
+	.co-filter-btn:hover { color: rgba(212, 199, 163, 0.6); }
+	.co-filter-btn.active {
+		background: rgba(96, 165, 250, 0.12);
+		border-color: rgba(96, 165, 250, 0.25);
+		color: rgba(96, 165, 250, 0.9);
+	}
+	.co-filter-count { font-size: 0.7rem; color: rgba(212, 199, 163, 0.25); margin-left: auto; }
+
+	/* ── State list ── */
+	.co-state-list { display: flex; flex-direction: column; gap: 0.5rem; }
+	.co-state-row {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		padding: 1rem;
+		border-radius: 0.5rem;
+		border: 1px solid rgba(212, 199, 163, 0.06);
+		background: rgba(0, 0, 0, 0.2);
+		transition: border-color 0.15s;
+	}
+	.co-state-row:hover { border-color: rgba(212, 199, 163, 0.12); }
+
+	/* ── State badge ── */
+	.co-state-badge {
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 0.375rem;
+		background: rgba(96, 165, 250, 0.08);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+	.co-state-code {
+		font-size: 0.85rem;
+		font-weight: 700;
+		color: rgba(96, 165, 250, 0.7);
+		text-transform: uppercase;
+	}
+
+	/* ── State info ── */
+	.co-state-info { flex: 1; min-width: 0; }
+	.co-state-name-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.125rem; }
+	.co-state-name { font-size: 0.85rem; font-weight: 500; color: rgba(212, 199, 163, 0.9); }
+	.co-tag {
+		font-size: 0.6rem;
+		padding: 0.125rem 0.375rem;
+		border-radius: 0.25rem;
+		font-family: 'JetBrains Mono', ui-monospace, monospace;
+	}
+	.co-tag-official { background: rgba(52, 211, 153, 0.1); color: #34d399; }
+	.co-tag-scraped { background: rgba(212, 199, 163, 0.06); color: rgba(212, 199, 163, 0.25); }
+	.co-confidence-dot { width: 0.375rem; height: 0.375rem; border-radius: 50%; flex-shrink: 0; }
+	.co-confidence-high { background: #34d399; }
+	.co-confidence-medium { background: #fbbf24; }
+	.co-confidence-low { background: #f87171; }
+	.co-format-tag {
+		font-size: 0.6rem;
+		color: rgba(212, 199, 163, 0.25);
+		font-family: 'JetBrains Mono', ui-monospace, monospace;
+	}
+	.co-state-meta {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		font-size: 0.6875rem;
+		color: rgba(212, 199, 163, 0.3);
+	}
+	.co-state-warning {
+		color: rgba(251, 191, 36, 0.5);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		max-width: 16rem;
+	}
+
+	/* ── Progress bar ── */
+	.co-progress-row {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-top: 0.5rem;
+	}
+	.co-progress-track {
+		flex: 1;
+		height: 0.25rem;
+		background: rgba(212, 199, 163, 0.08);
+		border-radius: 9999px;
+		overflow: hidden;
+	}
+	.co-progress-fill {
+		height: 100%;
+		background: rgba(96, 165, 250, 0.7);
+		border-radius: 9999px;
+		transition: width 0.5s;
+	}
+	.co-progress-label { font-size: 0.6rem; color: rgba(212, 199, 163, 0.3); }
+	.co-error-text {
+		margin-top: 0.25rem;
+		font-size: 0.6rem;
+		color: rgba(248, 113, 113, 0.6);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	/* ── Status badge ── */
+	.co-status-badge-wrap { flex-shrink: 0; }
+	.co-status-badge {
+		font-size: 0.6rem;
+		padding: 0.125rem 0.5rem;
+		border-radius: 0.25rem;
+		font-family: 'JetBrains Mono', ui-monospace, monospace;
+	}
+	.co-status-complete { color: #34d399; background: rgba(52, 211, 153, 0.08); }
+	.co-status-failed { color: #f87171; background: rgba(248, 113, 113, 0.08); }
+	.co-status-extracting,
+	.co-status-structuring,
+	.co-status-chunking,
+	.co-status-embedding,
+	.co-status-graphing { color: rgba(96, 165, 250, 0.9); background: rgba(96, 165, 250, 0.08); }
+	.co-status-queued { color: #fbbf24; background: rgba(251, 191, 36, 0.08); }
+	.co-status-pending { color: rgba(212, 199, 163, 0.25); background: rgba(212, 199, 163, 0.04); }
+
+	/* ── Actions ── */
+	.co-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-shrink: 0;
+	}
+	.co-action-btn {
+		font-size: 0.7rem;
+		padding: 0.25rem 0.5rem;
+		border-radius: 0.25rem;
+		background: rgba(212, 199, 163, 0.04);
+		border: 1px solid transparent;
+		color: rgba(212, 199, 163, 0.4);
+		cursor: pointer;
+		text-decoration: none;
+		transition: all 0.15s;
+	}
+	.co-action-btn:hover { color: rgba(96, 165, 250, 0.9); background: rgba(96, 165, 250, 0.08); }
+	.co-action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+	.co-external-link {
+		color: rgba(212, 199, 163, 0.2);
+		transition: color 0.15s;
+	}
+	.co-external-link:hover { color: rgba(96, 165, 250, 0.6); }
+
+	@keyframes pulse {
+		0%, 100% { opacity: 1; }
+		50% { opacity: 0.5; }
+	}
+</style>

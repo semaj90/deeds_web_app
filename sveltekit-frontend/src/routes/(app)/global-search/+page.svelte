@@ -1472,6 +1472,51 @@
 		background: #1a1610;
 		color: #d4c9a9;
 		font-family: 'JetBrains Mono', monospace;
+		margin: -2.5rem;
+		padding: 0;
+	}
+
+	.search-page :global(h1),
+	.search-page :global(h2),
+	.search-page :global(h3),
+	.search-page :global(p) {
+		color: inherit;
+		text-transform: none;
+		letter-spacing: normal;
+		margin: 0;
+	}
+
+	.search-page :global(a) {
+		color: inherit;
+		border-bottom: none;
+	}
+
+	.search-page :global(button) {
+		text-transform: none;
+		letter-spacing: normal;
+		background: none;
+		border: none;
+		box-shadow: none;
+		padding: 0;
+		color: inherit;
+	}
+
+	.search-page :global(input),
+	.search-page :global(select) {
+		background: transparent;
+		border: none;
+		box-shadow: none;
+		color: inherit;
+	}
+
+	.search-page :global(.panel),
+	.search-page :global(.card),
+	.search-page :global([class*="panel"]) {
+		background: transparent;
+		border: none;
+		box-shadow: none;
+		color: inherit;
+		padding: 0;
 	}
 
 	.search-header {

@@ -1,17 +1,19 @@
 {
-  "timestamp": "2026-03-19T01-16-44",
+  "timestamp": "2026-03-19T02-47-29",
   "base": "http://localhost:5173",
-  "totalTimeMs": 4083,
+  "totalTimeMs": 2001,
   "results": [
     {
-      "name": "demos-evidence-canvas",
-      "path": "/demos/evidence-canvas",
-      "url": "http://localhost:5173/demos/evidence-canvas",
+      "name": "cases-test-id-board",
+      "path": "/cases/test-id/board",
+      "url": "http://localhost:5173/cases/test-id/board",
       "status": 200,
       "ok": true,
       "error": null,
-      "file": "demos-evidence-canvas.png",
-      "consoleErrors": [],
+      "file": "cases-test-id-board.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+      ],
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
@@ -20,20 +22,20 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 3061,
-      "domElements": 514,
-      "resourceCount": 211,
-      "resourceSizeKB": 7884
+      "loadTimeMs": 1613,
+      "domElements": 366,
+      "resourceCount": 189,
+      "resourceSizeKB": 7149
     }
   ],
   "summary": {
     "passed": 1,
     "failed": 0,
     "total": 1,
-    "avgLoadMs": 3061,
-    "slowestRoute": "demos-evidence-canvas",
-    "slowestLoadMs": 3061,
-    "totalConsoleErrors": 0,
+    "avgLoadMs": 1613,
+    "slowestRoute": "cases-test-id-board",
+    "slowestLoadMs": 1613,
+    "totalConsoleErrors": 1,
     "totalNetworkFailures": 0
   }
 }

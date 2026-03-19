@@ -5,10 +5,6 @@
   import { analytics } from '$lib/stores/analytics.svelte';
   import DropdownMenu from '$lib/components/ui/DropdownMenu.svelte';
   import { citationCache } from '$lib/ai/citation-cache.js';
-  import Card from '$lib/components/ui/card/Card.svelte';
-  import CardContent from '$lib/components/ui/card/CardContent.svelte';
-  import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
-  import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
   import Skeleton from '$lib/components/ui/Skeleton.svelte';
   import CitationManager from '$lib/components/legal/CitationManager.svelte';
   import CitationDetail from '$lib/components/legal-ai/CitationDetail.svelte';
@@ -184,7 +180,6 @@
     isKeyAuthority: boolean;
     documentTitle?: string;
     caseTitle?: string;
-    // Source trust fields (from DB)
     sourceUrl?: string;
     jurisdiction?: string;
     effectiveDate?: string;
@@ -406,7 +401,7 @@
 
   <!-- Advanced Citation Search -->
   {#if showAdvancedSearch}
-    <div class="mb-6">
+    <div class="cit-section">
       <CitationSearch
         placeholder="Search by statute code, title, or keyword..."
         onselect={(c) => {
@@ -419,7 +414,7 @@
 
   <!-- Save New Citation -->
   {#if showSaveForm}
-    <div class="mb-6">
+    <div class="cit-section">
       <CitationSaveForm
         onsaved={() => { showSaveForm = false; loadCitations(); }}
       />
@@ -428,13 +423,13 @@
 
   <!-- Citation Library Page — Full collection management -->
   {#if showLibraryPage}
-    <div class="mb-6">
+    <div class="cit-section">
       <CitationLibraryPage />
     </div>
   {/if}
 
   {#if showGpuSearch}
-    <div class="mb-6">
+    <div class="cit-section">
       <SearchBox
         placeholder="GPU-powered legal citation search..."
         limit={10}
@@ -459,7 +454,7 @@
   {/if}
 
   {#if showCollections}
-    <div class="mb-6">
+    <div class="cit-section">
       <CitationCollections
         onSelectCollection={(collection) => {
           selectedCollection = collection;
@@ -471,13 +466,13 @@
 
   <!-- Knowledge Base Search (Glossary + Statutes + Precedents) -->
   {#if showKnowledgeBase}
-    <div class="mb-6">
-      <Card class="bg-panel border-accent/30">
-        <CardHeader>
-          <CardTitle class="text-sm text-accent">Knowledge Base Search</CardTitle>
-        </CardHeader>
-        <CardContent class="space-y-4">
-          <div class="flex gap-2">
+    <div class="cit-section">
+      <div class="kb-panel">
+        <div class="kb-header">
+          <h3 class="kb-title">Knowledge Base Search</h3>
+        </div>
+        <div class="kb-content">
+          <div class="kb-search-row">
             <input
               type="text"
               bind:value={kbQuery}
@@ -486,29 +481,29 @@
                 if (kbDebounceTimer) clearTimeout(kbDebounceTimer);
                 kbDebounceTimer = setTimeout(() => searchKnowledgeBase(kbQuery), 400);
               }}
-              class="flex-1 px-3 py-2 bg-black/30 border border-sand/20 rounded text-sand text-sm placeholder:text-sand/40 focus:border-accent focus:outline-none"
+              class="kb-input"
             />
             {#if kbSearching}
-              <span class="text-xs text-accent self-center">Searching...</span>
+              <span class="kb-status searching">Searching...</span>
             {:else if kbTiming.totalMs}
-              <span class="text-xs text-sand/40 self-center">{kbTiming.totalMs}ms</span>
+              <span class="kb-status">{kbTiming.totalMs}ms</span>
             {/if}
           </div>
 
           {#if kbResults.glossary.length > 0}
             <div>
-              <h4 class="text-xs font-semibold text-sand/60 uppercase tracking-wider mb-2">Glossary ({kbResults.glossary.length})</h4>
-              <div class="space-y-2">
+              <h4 class="kb-section-label">Glossary ({kbResults.glossary.length})</h4>
+              <div class="kb-results-list">
                 {#each kbResults.glossary as term (term.id ?? term.term)}
-                  <div class="p-3 bg-black/20 rounded border border-sand/10">
-                    <div class="flex items-baseline gap-2">
-                      <span class="font-medium text-accent text-sm">{term.term}</span>
+                  <div class="kb-result-card">
+                    <div class="kb-result-head">
+                      <span class="kb-term-name">{term.term}</span>
                       {#if term.category}
-                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-sand/10 text-sand/50">{term.category}</span>
+                        <span class="kb-tag">{term.category}</span>
                       {/if}
-                      <span class="text-[10px] text-sand/30 ml-auto">{Math.round((term.similarity ?? 0) * 100)}%</span>
+                      <span class="kb-score">{Math.round((term.similarity ?? 0) * 100)}%</span>
                     </div>
-                    <p class="text-xs text-sand/70 mt-1 line-clamp-2">{term.definition}</p>
+                    <p class="kb-result-text">{term.definition}</p>
                   </div>
                 {/each}
               </div>
@@ -517,28 +512,25 @@
 
           {#if kbResults.statutes.length > 0}
             <div>
-              <h4 class="text-xs font-semibold text-sand/60 uppercase tracking-wider mb-2">Statutes ({kbResults.statutes.length})</h4>
-              <div class="space-y-2">
+              <h4 class="kb-section-label">Statutes ({kbResults.statutes.length})</h4>
+              <div class="kb-results-list">
                 {#each kbResults.statutes as statute (statute.chunkId ?? statute.statuteId)}
-                  <div
-                    class="p-3 bg-black/20 rounded border border-sand/10 hover:border-accent/30 transition group"
-                  >
-                    <div class="flex items-baseline gap-2">
-                      <span class="font-medium text-sand text-sm">{statute.statuteTitle}</span>
+                  <div class="kb-result-card kb-hoverable">
+                    <div class="kb-result-head">
+                      <span class="kb-statute-name">{statute.statuteTitle}</span>
                       {#if statute.section}
-                        <span class="text-[10px] font-mono text-accent/70">{statute.section}</span>
+                        <span class="kb-mono-tag">{statute.section}</span>
                       {/if}
-                      <span class="text-[10px] text-sand/30 ml-auto">{Math.round((statute.similarity ?? 0) * 100)}%</span>
+                      <span class="kb-score">{Math.round((statute.similarity ?? 0) * 100)}%</span>
                     </div>
                     {#if statute.jurisdiction}
-                      <span class="text-[10px] text-sand/40">{statute.jurisdiction}</span>
+                      <span class="kb-jurisdiction">{statute.jurisdiction}</span>
                     {/if}
-                    <p class="text-xs text-sand/70 mt-1 line-clamp-2">{statute.content}</p>
-                    <div class="mt-2 flex justify-end">
+                    <p class="kb-result-text">{statute.content}</p>
+                    <div class="kb-result-action">
                       <Button
                         size="sm"
                         variant="ghost"
-                        class="text-[10px] text-accent hover:bg-accent/10 opacity-0 group-hover:opacity-100 transition-opacity"
                         onclick={() => goto(`/library/${statute.docId}/node/${statute.statuteId}`)}
                       >
                         View Full Statute →
@@ -552,8 +544,8 @@
 
           {#if kbResults.precedents.length > 0}
             <div>
-              <h4 class="text-xs font-semibold text-sand/60 uppercase tracking-wider mb-2">Precedents ({kbResults.precedents.length})</h4>
-              <div class="space-y-3">
+              <h4 class="kb-section-label">Precedents ({kbResults.precedents.length})</h4>
+              <div class="kb-results-list prec">
                 {#each kbResults.precedents as prec (prec.id ?? prec.title)}
                   {@const precedentData = {
                     id: prec.id ?? crypto.randomUUID(),
@@ -598,16 +590,16 @@
           {/if}
 
           {#if !kbSearching && kbQuery.length >= 2 && kbResults.glossary.length === 0 && kbResults.statutes.length === 0 && kbResults.precedents.length === 0}
-            <p class="text-sand/40 text-sm text-center py-4">No results found for "{kbQuery}"</p>
+            <p class="kb-empty">No results found for "{kbQuery}"</p>
           {/if}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   {/if}
 
   <!-- Citation Browser (API-backed paginated list) -->
   {#if showCitationBrowser}
-    <div class="mb-6">
+    <div class="cit-section">
       <CitationList
         searchQuery={searchQuery}
         sourceTypeFilter={citationType !== 'all' ? citationType : ''}
@@ -635,227 +627,225 @@
     <span class="cit-corpus-count">{filteredCitations.length} result{filteredCitations.length === 1 ? '' : 's'}</span>
   </div>
 
-  <Card class="mb-6 bg-panel border-black/40">
-    <CardContent class="p-4">
-      <div class="flex gap-3 items-center flex-wrap">
-        <input
-          type="text"
-          placeholder="Search citations by code, principle, or keyword…"
-          bind:value={searchQuery}
-          oninput={() => loadCitations()}
-          class="flex-1 min-w-48 px-3 py-2 bg-black/30 border border-sand/20 rounded text-sand text-sm placeholder:text-sand/40 focus:border-accent focus:outline-none"
-        />
-        <select
-          bind:value={citationType}
-          onchange={() => loadCitations()}
-          class="px-3 py-2 bg-black/30 border border-sand/20 rounded text-sand text-sm"
-        >
-          {#each citationTypes as type}
-            <option value={type}>{type === 'all' ? 'All Types' : type.replace('_', ' ')}</option>
-          {/each}
-        </select>
-      </div>
-    </CardContent>
-  </Card>
+  <!-- Search / Filter -->
+  <div class="cit-search-panel">
+    <div class="cit-search-row">
+      <input
+        type="text"
+        placeholder="Search citations by code, principle, or keyword…"
+        bind:value={searchQuery}
+        oninput={() => loadCitations()}
+        class="cit-search-input"
+      />
+      <select
+        bind:value={citationType}
+        onchange={() => loadCitations()}
+        class="cit-search-select"
+      >
+        {#each citationTypes as type}
+          <option value={type}>{type === 'all' ? 'All Types' : type.replace('_', ' ')}</option>
+        {/each}
+      </select>
+    </div>
+  </div>
 
   {#if loading}
-    <div class="grid gap-4">
+    <div class="cit-list">
       {#each Array(6) as _, i}
-        <Card class="bg-panel border-sand/10">
-          <CardHeader class="pb-2">
-            <div class="flex items-start justify-between gap-4">
-              <Skeleton variant="text" width="40%" height="1.2em" />
-              <div class="flex items-center gap-2">
-                <Skeleton variant="rect" width="80px" height="24px" />
-                <Skeleton variant="rect" width="60px" height="24px" />
-              </div>
+        <div class="cit-skel-card">
+          <div class="cit-skel-top">
+            <Skeleton variant="text" width="40%" height="1.2em" />
+            <div class="cit-skel-badges">
+              <Skeleton variant="rect" width="80px" height="24px" />
+              <Skeleton variant="rect" width="60px" height="24px" />
             </div>
-          </CardHeader>
-          <CardContent class="pt-0">
-            <Skeleton variant="text" width="90%" height="1em" className="mb-2" />
-            <Skeleton variant="text" width="95%" height="0.875em" className="mb-1" />
-            <Skeleton variant="text" width="85%" height="0.875em" className="mb-3" />
-            <div class="flex items-center gap-4">
-              <Skeleton variant="text" width="120px" height="0.75em" />
-              <Skeleton variant="text" width="100px" height="0.75em" />
-              <Skeleton variant="text" width="80px" height="0.75em" />
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div class="cit-skel-body">
+            <Skeleton variant="text" width="90%" height="1em" />
+            <Skeleton variant="text" width="95%" height="0.875em" />
+            <Skeleton variant="text" width="85%" height="0.875em" />
+          </div>
+          <div class="cit-skel-footer">
+            <Skeleton variant="text" width="120px" height="0.75em" />
+            <Skeleton variant="text" width="100px" height="0.75em" />
+            <Skeleton variant="text" width="80px" height="0.75em" />
+          </div>
+        </div>
       {/each}
     </div>
   {:else if error}
-    <Card class="bg-panel border-danger/40">
-      <CardContent class="p-6 text-center">
-        <p class="text-danger mb-4">{error}</p>
-        <Button onclick={() => loadCitations()}>Retry</Button>
-      </CardContent>
-    </Card>
+    <div class="cit-error-panel">
+      <p class="cit-error-text">{error}</p>
+      <Button onclick={() => loadCitations()}>Retry</Button>
+    </div>
   {:else if filteredCitations.length === 0}
-    <Card class="bg-panel border-sand/20">
-      <CardContent class="p-12 text-center">
-        <p class="text-sand/50 text-lg mb-2">No citations found</p>
-        <p class="text-sand/30 text-sm">Try adjusting your search or filter criteria</p>
-      </CardContent>
-    </Card>
+    <div class="cit-empty-panel">
+      <p class="cit-empty-title">No citations found</p>
+      <p class="cit-empty-desc">Try adjusting your search or filter criteria</p>
+    </div>
   {:else}
-    <div class="grid gap-4">
+    <div class="cit-list">
       {#each filteredCitations as citation (citation.id)}
-        <Card class="bg-panel border-sand/10 hover:border-accent/30 transition-colors cursor-pointer" onclick={() => (selectedCitation = selectedCitation?.id === citation.id ? null : { id: citation.id, statute_code: citation.formattedCitation, statute_title: citation.legalPrinciple, jurisdiction: citation.documentTitle, severity: citation.citationType, source_type: 'auto_extracted' as const, highlighted_text: citation.quotedText, notes: '', created_at: new Date().toISOString(), updated_at: new Date().toISOString() })}>
-          <CardHeader class="pb-2">
-            <div class="flex items-start justify-between gap-4">
-              <CardTitle class="text-sm font-mono text-accent">{citation.formattedCitation}</CardTitle>
-              <div class="flex items-center gap-2 shrink-0">
+        <div
+          class="cit-card"
+          onclick={() => (selectedCitation = selectedCitation?.id === citation.id ? null : { id: citation.id, statute_code: citation.formattedCitation, statute_title: citation.legalPrinciple, jurisdiction: citation.documentTitle, severity: citation.citationType, source_type: 'auto_extracted' as const, highlighted_text: citation.quotedText, notes: '', created_at: new Date().toISOString(), updated_at: new Date().toISOString() })}
+          role="button"
+          tabindex="0"
+        >
+          <div class="cit-card-top">
+            <span class="cit-card-code">{citation.formattedCitation}</span>
+            <div class="cit-card-actions">
+              <button
+                class="cit-mini-btn"
+                onclick={(e) => { e.stopPropagation(); quickViewCitation = citation; showQuickView = true; }}
+                title="Quick view"
+              >
+                <Icon name="eye" />
+              </button>
+              <CitationsSaveButton
+                citation={{ statute_code: citation.formattedCitation, statute_title: citation.legalPrinciple, jurisdiction: citation.documentTitle, severity: citation.citationType, highlighted_text: citation.quotedText, source_type: 'auto_extracted' }}
+                size="sm"
+              />
+              <div class="cit-collection-wrap" onclick={(e) => e.stopPropagation()}>
                 <button
-                  class="px-1.5 py-0.5 rounded text-[10px] text-sand/50 border border-sand/15 hover:border-accent/40 hover:text-accent transition"
-                  onclick={(e) => { e.stopPropagation(); quickViewCitation = citation; showQuickView = true; }}
-                  title="Quick view"
-                >
-                  <Icon name="eye" />
-                </button>
-                <CitationsSaveButton
-                  citation={{ statute_code: citation.formattedCitation, statute_title: citation.legalPrinciple, jurisdiction: citation.documentTitle, severity: citation.citationType, highlighted_text: citation.quotedText, source_type: 'auto_extracted' }}
-                  size="sm"
-                />
-                <div class="relative" onclick={(e) => e.stopPropagation()}>
-                  <button
-                    class="px-1.5 py-0.5 rounded text-[10px] text-sand/50 border border-sand/15 hover:border-accent/40 hover:text-accent transition"
-                    onclick={() => { addingToCollectionFor = addingToCollectionFor === citation.id ? null : citation.id; loadUserCollections(); }}
-                  >+ collection</button>
-                  {#if addingToCollectionFor === citation.id && userCollections.length > 0}
-                    <div class="absolute right-0 top-full mt-1 z-20 bg-panel border border-sand/20 rounded shadow-lg min-w-40 py-1">
-                      {#each userCollections as col}
-                        <button
-                          class="w-full text-left px-3 py-1.5 text-xs text-sand hover:bg-accent/10 flex items-center gap-2"
-                          onclick={() => addToCollection(col.id, citation.id)}
-                        >
-                          <span class="w-2 h-2 rounded-full shrink-0" style="background: {col.color}"></span>
-                          {col.name}
-                        </button>
-                      {/each}
-                    </div>
-                  {:else if addingToCollectionFor === citation.id && collectionsLoaded}
-                    <div class="absolute right-0 top-full mt-1 z-20 bg-panel border border-sand/20 rounded shadow-lg p-3">
-                      <p class="text-xs text-sand/50">No collections yet</p>
-                    </div>
-                  {/if}
-                </div>
-                <span class="px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-mono bg-sand/10 text-sand/70">
-                  {citation.citationType.replace('_', ' ')}
-                </span>
-                {#if citation.isKeyAuthority}
-                  <span class="px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-mono bg-accent/20 text-accent">
-                    Key Authority
-                  </span>
+                  class="cit-mini-btn"
+                  onclick={() => { addingToCollectionFor = addingToCollectionFor === citation.id ? null : citation.id; loadUserCollections(); }}
+                >+ collection</button>
+                {#if addingToCollectionFor === citation.id && userCollections.length > 0}
+                  <div class="cit-collection-dropdown">
+                    {#each userCollections as col}
+                      <button
+                        class="cit-collection-item"
+                        onclick={() => addToCollection(col.id, citation.id)}
+                      >
+                        <span class="cit-collection-dot" style="background: {col.color}"></span>
+                        {col.name}
+                      </button>
+                    {/each}
+                  </div>
+                {:else if addingToCollectionFor === citation.id && collectionsLoaded}
+                  <div class="cit-collection-dropdown">
+                    <p class="cit-collection-empty">No collections yet</p>
+                  </div>
                 {/if}
               </div>
-            </div>
-          </CardHeader>
-          <CardContent class="pt-0">
-            {#if citation.legalPrinciple}
-              <p class="text-sand/80 text-sm mb-2">{citation.legalPrinciple}</p>
-            {/if}
-            {#if citation.quotedText}
-              <blockquote class="border-l-2 border-accent/30 pl-3 text-sand/60 text-xs italic">
-                <CitationLink text={citation.quotedText} />
-              </blockquote>
-            {/if}
-            <!-- Source trust metadata row -->
-            <div class="flex items-center gap-2 mt-3 flex-wrap">
-              {#if citation.jurisdiction || inferJurisdiction(citation.formattedCitation)}
-                {@const juris = citation.jurisdiction || inferJurisdiction(citation.formattedCitation)}
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] bg-blue-950/60 text-blue-300 border border-blue-700/30 font-mono">
-                  {juris}
-                </span>
-              {/if}
-              {#if citation.effectiveDate || citation.createdAt}
-                <span class="text-[10px] text-sand/35 border-l border-sand/15 pl-2">
-                  {formatCitationDate(citation.effectiveDate ?? citation.createdAt)}
-                </span>
-              {/if}
-              {#if citation.caseTitle}
-                <span class="text-[10px] text-sand/40">Case: {citation.caseTitle}</span>
-              {/if}
-              {#if citation.documentTitle && !citation.caseTitle}
-                <span class="text-[10px] text-sand/40">{citation.documentTitle}</span>
-              {/if}
-              <span class="ml-auto flex items-center gap-1.5">
-                {#if citation.sourceUrl}
-                  <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-green-950/60 text-green-400 border border-green-700/30">✓ Verified</span>
-                {:else}
-                  <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-sand/5 text-sand/30 border border-sand/10">Unverified</span>
-                {/if}
-                <span class="text-[10px] text-sand/30">{Math.round(citation.relevanceScore * 100)}% relevance</span>
+              <span class="cit-type-badge">
+                {citation.citationType.replace('_', ' ')}
               </span>
-            </div>
-            <!-- Research workflow actions -->
-            <div class="flex items-center gap-1.5 mt-2 flex-wrap" onclick={(e) => e.stopPropagation()}>
-              {#if citation.sourceUrl}
-                <a
-                  href={citation.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="px-2 py-1 rounded text-[10px] text-sand/60 border border-sand/15 hover:border-green-600/50 hover:text-green-400 transition"
-                >View Official Text ↗</a>
-              {/if}
-              <button
-                class="px-2 py-1 rounded text-[10px] text-sand/60 border border-sand/15 hover:border-accent/40 hover:text-accent transition"
-                onclick={() => { kbQuery = citation.formattedCitation; showKnowledgeBase = true; if (kbDebounceTimer) clearTimeout(kbDebounceTimer); kbDebounceTimer = setTimeout(() => searchKnowledgeBase(kbQuery), 100); }}
-              >Show Related Cases</button>
-              <button
-                class="px-2 py-1 rounded text-[10px] text-sand/60 border border-sand/15 hover:border-accent/40 hover:text-accent transition"
-                onclick={() => { kbQuery = citation.formattedCitation; showKnowledgeBase = true; if (kbDebounceTimer) clearTimeout(kbDebounceTimer); kbDebounceTimer = setTimeout(() => searchKnowledgeBase(kbQuery), 100); }}
-              >Glossary Terms</button>
-              <button
-                class="px-2 py-1 rounded text-[10px] text-sand/60 border border-sand/15 hover:border-accent/40 hover:text-accent transition"
-                onclick={() => { citationType = 'regulation'; loadCitations(); }}
-              >Related Regulations</button>
-            </div>
-            <!-- Tags row -->
-            <div class="flex items-center gap-1.5 mt-2 flex-wrap">
-              {#each citationTagsMap[citation.id] ?? [] as t (t.tag)}
-                <span
-                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium text-black cursor-pointer"
-                  style="background-color: {t.color}"
-                  onclick={(e) => { e.stopPropagation(); removeTagFromCitation(citation.id, t.tag); }}
-                  title="Click to remove"
-                >
-                  {t.tag} ×
+              {#if citation.isKeyAuthority}
+                <span class="cit-key-badge">
+                  Key Authority
                 </span>
-              {/each}
-              {#if addingTagFor === citation.id}
-                <div class="flex items-center gap-1" onclick={(e) => e.stopPropagation()}>
-                  {#each TAG_PRESETS as preset}
-                    <button
-                      class="px-1.5 py-0.5 rounded text-[9px] text-black hover:opacity-80"
-                      style="background-color: {preset.color}"
-                      onclick={(e) => { e.stopPropagation(); addTagToCitation(citation.id, preset.tag, preset.color); }}
-                    >{preset.tag}</button>
-                  {/each}
-                  <input
-                    type="text"
-                    bind:value={newTagInput}
-                    placeholder="custom..."
-                    class="w-16 px-1 py-0.5 text-[10px] bg-black/30 border border-sand/20 rounded text-sand"
-                    onkeydown={(e) => { if (e.key === 'Enter' && newTagInput.trim()) addTagToCitation(citation.id, newTagInput.trim(), '#6b7280'); }}
-                  />
-                </div>
-              {:else}
-                <button
-                  class="px-1.5 py-0.5 rounded text-[10px] text-sand/40 border border-sand/15 hover:border-sand/30 hover:text-sand/60"
-                  onclick={(e) => { e.stopPropagation(); addingTagFor = citation.id; loadTagsForCitation(citation.id); }}
-                >+ tag</button>
               {/if}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+
+          {#if citation.legalPrinciple}
+            <p class="cit-card-principle">{citation.legalPrinciple}</p>
+          {/if}
+          {#if citation.quotedText}
+            <blockquote class="cit-card-quote">
+              <CitationLink text={citation.quotedText} />
+            </blockquote>
+          {/if}
+
+          <!-- Source trust metadata row -->
+          <div class="cit-card-meta">
+            {#if citation.jurisdiction || inferJurisdiction(citation.formattedCitation)}
+              {@const juris = citation.jurisdiction || inferJurisdiction(citation.formattedCitation)}
+              <span class="cit-juris-badge">{juris}</span>
+            {/if}
+            {#if citation.effectiveDate || citation.createdAt}
+              <span class="cit-date-text">
+                {formatCitationDate(citation.effectiveDate ?? citation.createdAt)}
+              </span>
+            {/if}
+            {#if citation.caseTitle}
+              <span class="cit-meta-text">Case: {citation.caseTitle}</span>
+            {/if}
+            {#if citation.documentTitle && !citation.caseTitle}
+              <span class="cit-meta-text">{citation.documentTitle}</span>
+            {/if}
+            <span class="cit-meta-right">
+              {#if citation.sourceUrl}
+                <span class="cit-verified-badge">✓ Verified</span>
+              {:else}
+                <span class="cit-unverified-badge">Unverified</span>
+              {/if}
+              <span class="cit-relevance">{Math.round(citation.relevanceScore * 100)}% relevance</span>
+            </span>
+          </div>
+
+          <!-- Research workflow actions -->
+          <div class="cit-card-workflow" onclick={(e) => e.stopPropagation()}>
+            {#if citation.sourceUrl}
+              <a
+                href={citation.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="cit-workflow-btn"
+              >View Official Text ↗</a>
+            {/if}
+            <button
+              class="cit-workflow-btn"
+              onclick={() => { kbQuery = citation.formattedCitation; showKnowledgeBase = true; if (kbDebounceTimer) clearTimeout(kbDebounceTimer); kbDebounceTimer = setTimeout(() => searchKnowledgeBase(kbQuery), 100); }}
+            >Show Related Cases</button>
+            <button
+              class="cit-workflow-btn"
+              onclick={() => { kbQuery = citation.formattedCitation; showKnowledgeBase = true; if (kbDebounceTimer) clearTimeout(kbDebounceTimer); kbDebounceTimer = setTimeout(() => searchKnowledgeBase(kbQuery), 100); }}
+            >Glossary Terms</button>
+            <button
+              class="cit-workflow-btn"
+              onclick={() => { citationType = 'regulation'; loadCitations(); }}
+            >Related Regulations</button>
+          </div>
+
+          <!-- Tags row -->
+          <div class="cit-card-tags">
+            {#each citationTagsMap[citation.id] ?? [] as t (t.tag)}
+              <span
+                class="cit-tag-pill"
+                style="background-color: {t.color}"
+                onclick={(e) => { e.stopPropagation(); removeTagFromCitation(citation.id, t.tag); }}
+                title="Click to remove"
+                role="button"
+                tabindex="0"
+              >
+                {t.tag} ×
+              </span>
+            {/each}
+            {#if addingTagFor === citation.id}
+              <div class="cit-tag-adder" onclick={(e) => e.stopPropagation()}>
+                {#each TAG_PRESETS as preset}
+                  <button
+                    class="cit-tag-preset"
+                    style="background-color: {preset.color}"
+                    onclick={(e) => { e.stopPropagation(); addTagToCitation(citation.id, preset.tag, preset.color); }}
+                  >{preset.tag}</button>
+                {/each}
+                <input
+                  type="text"
+                  bind:value={newTagInput}
+                  placeholder="custom..."
+                  class="cit-tag-input"
+                  onkeydown={(e) => { if (e.key === 'Enter' && newTagInput.trim()) addTagToCitation(citation.id, newTagInput.trim(), '#6b7280'); }}
+                />
+              </div>
+            {:else}
+              <button
+                class="cit-mini-btn"
+                onclick={(e) => { e.stopPropagation(); addingTagFor = citation.id; loadTagsForCitation(citation.id); }}
+              >+ tag</button>
+            {/if}
+          </div>
+        </div>
       {/each}
     </div>
 
     {#if selectedCitation}
-      <div class="mt-6">
-        <div class="flex items-center gap-3 mb-4">
-          <h3 class="text-sm font-semibold text-sand">Selected Citation</h3>
+      <div class="cit-selected-section">
+        <div class="cit-selected-header">
+          <h3 class="cit-selected-title">Selected Citation</h3>
           <CitationsSaveButton
             citation={{ statute_code: selectedCitation.statute_code, statute_title: selectedCitation.statute_title, jurisdiction: selectedCitation.jurisdiction, severity: selectedCitation.severity, highlighted_text: selectedCitation.highlighted_text, source_type: selectedCitation.source_type }}
             size="md"
@@ -886,13 +876,13 @@
           statuteCode={selectedCitation.statute_code ?? null}
           onviewcase={(c) => { goto(`/cases/${c.id}`); }}
         />
-        <div class="mt-4">
-          <button onclick={() => { editingLink = { id: selectedCitation.id, case_id: '', statute_code: selectedCitation.statute_code ?? '', link_type: 'CITED_IN', notes: selectedCitation.notes ?? '', created_at: selectedCitation.created_at ?? new Date().toISOString(), updated_at: new Date().toISOString() }; showLinkEditor = !showLinkEditor; }} class="text-sm text-accent hover:underline">
+        <div class="cit-link-toggle">
+          <button onclick={() => { editingLink = { id: selectedCitation.id, case_id: '', statute_code: selectedCitation.statute_code ?? '', link_type: 'CITED_IN', notes: selectedCitation.notes ?? '', created_at: selectedCitation.created_at ?? new Date().toISOString(), updated_at: new Date().toISOString() }; showLinkEditor = !showLinkEditor; }} class="cit-link-btn">
             {showLinkEditor ? 'Hide Link Editor' : 'Edit Link Metadata'}
           </button>
         </div>
         {#if showLinkEditor && editingLink}
-          <div class="mt-2">
+          <div class="cit-link-editor">
             <LinkMetadataForm link={editingLink} onupdated={() => { showLinkEditor = false; loadCitations(); }} />
           </div>
         {/if}
@@ -935,7 +925,7 @@
 
 <!-- Collection Detail Panel -->
 {#if selectedCollection}
-  <div class="mt-6">
+  <div class="cit-selected-section">
     <CollectionDetail
       collection={selectedCollection}
       onback={() => { selectedCollection = null; }}
@@ -947,10 +937,17 @@
 <style>
   /* ── Citations page layout ── */
   .citations-page {
-    max-width: 72rem;
-    margin: 0 auto;
-    padding: 2rem 1.5rem;
+    min-height: 100vh;
+    background: #0e0d0b;
+    margin: -2.5rem;
+    padding: 2rem max(1.5rem, calc(50% - 36rem));
   }
+
+  .citations-page :global(h1), .citations-page :global(h2), .citations-page :global(h3), .citations-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+  .citations-page :global(a) { color: inherit; border-bottom: none; }
+  .citations-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+  .citations-page :global(input), .citations-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+  .citations-page :global([class*="panel"]), .citations-page :global(.card) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
   /* ── Page header ── */
   .cit-header {
@@ -1128,5 +1125,535 @@
     color: rgba(212, 199, 163, 0.25);
     padding-right: 0.25rem;
     font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Body + Section Spacing ── */
+  .cit-section { margin-bottom: 1.5rem; }
+
+  /* ── Search / Filter Panel ── */
+  .cit-search-panel {
+    border-radius: 0.5rem;
+    border: 1px solid rgba(212, 199, 163, 0.08);
+    background: rgba(0, 0, 0, 0.25);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .cit-search-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .cit-search-input {
+    flex: 1;
+    min-width: 12rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    border: 1px solid rgba(212, 199, 163, 0.12);
+    background: rgba(0, 0, 0, 0.3);
+    color: rgba(212, 199, 163, 0.9);
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .cit-search-input::placeholder { color: rgba(212, 199, 163, 0.3); }
+  .cit-search-input:focus { border-color: rgba(96, 165, 250, 0.5); }
+  .cit-search-select {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    border: 1px solid rgba(212, 199, 163, 0.12);
+    background: rgba(0, 0, 0, 0.3);
+    color: rgba(212, 199, 163, 0.9);
+    font-size: 0.875rem;
+  }
+
+  /* ── Skeleton Cards ── */
+  .cit-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .cit-skel-card {
+    border-radius: 0.5rem;
+    border: 1px solid rgba(212, 199, 163, 0.06);
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem 1.25rem;
+  }
+  .cit-skel-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .cit-skel-badges {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .cit-skel-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    margin-top: 0.75rem;
+  }
+  .cit-skel-footer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.75rem;
+  }
+
+  /* ── Error / Empty ── */
+  .cit-error-panel {
+    border-radius: 0.5rem;
+    border: 1px solid rgba(248, 113, 113, 0.2);
+    background: rgba(0, 0, 0, 0.25);
+    padding: 1.5rem;
+    text-align: center;
+  }
+  .cit-error-text {
+    color: rgba(248, 113, 113, 0.9);
+    margin-bottom: 1rem;
+  }
+  .cit-empty-panel {
+    border-radius: 0.5rem;
+    border: 1px solid rgba(212, 199, 163, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+    padding: 3rem 1.5rem;
+    text-align: center;
+  }
+  .cit-empty-title {
+    font-size: 1.125rem;
+    color: rgba(212, 199, 163, 0.5);
+    margin-bottom: 0.5rem;
+  }
+  .cit-empty-desc {
+    font-size: 0.875rem;
+    color: rgba(212, 199, 163, 0.3);
+  }
+
+  /* ── Citation Card ── */
+  .cit-card {
+    border-radius: 0.5rem;
+    border: 1px solid rgba(212, 199, 163, 0.08);
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .cit-card:hover {
+    border-color: rgba(96, 165, 250, 0.3);
+  }
+  .cit-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .cit-card-code {
+    font-size: 0.875rem;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-weight: 500;
+    color: rgba(96, 165, 250, 0.9);
+  }
+  .cit-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .cit-mini-btn {
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.625rem;
+    color: rgba(212, 199, 163, 0.45);
+    border: 1px solid rgba(212, 199, 163, 0.1);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .cit-mini-btn:hover {
+    border-color: rgba(96, 165, 250, 0.4);
+    color: rgba(96, 165, 250, 0.9);
+  }
+  .cit-type-badge {
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    background: rgba(212, 199, 163, 0.06);
+    color: rgba(212, 199, 163, 0.6);
+  }
+  .cit-key-badge {
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    background: rgba(96, 165, 250, 0.12);
+    color: rgba(96, 165, 250, 0.9);
+  }
+
+  /* ── Card Body ── */
+  .cit-card-principle {
+    font-size: 0.875rem;
+    color: rgba(212, 199, 163, 0.75);
+    margin-bottom: 0.5rem;
+  }
+  .cit-card-quote {
+    border-left: 2px solid rgba(96, 165, 250, 0.25);
+    padding-left: 0.75rem;
+    color: rgba(212, 199, 163, 0.5);
+    font-size: 0.75rem;
+    font-style: italic;
+    margin: 0 0 0.75rem;
+  }
+
+  /* ── Card Metadata Row ── */
+  .cit-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+  }
+  .cit-juris-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.625rem;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    background: rgba(96, 165, 250, 0.08);
+    color: rgba(96, 165, 250, 0.7);
+    border: 1px solid rgba(96, 165, 250, 0.15);
+  }
+  .cit-date-text {
+    font-size: 0.625rem;
+    color: rgba(212, 199, 163, 0.3);
+    border-left: 1px solid rgba(212, 199, 163, 0.1);
+    padding-left: 0.5rem;
+  }
+  .cit-meta-text {
+    font-size: 0.625rem;
+    color: rgba(212, 199, 163, 0.35);
+  }
+  .cit-meta-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+  .cit-verified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.625rem;
+    background: rgba(52, 211, 153, 0.08);
+    color: rgba(52, 211, 153, 0.8);
+    border: 1px solid rgba(52, 211, 153, 0.15);
+  }
+  .cit-unverified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.625rem;
+    background: rgba(212, 199, 163, 0.04);
+    color: rgba(212, 199, 163, 0.25);
+    border: 1px solid rgba(212, 199, 163, 0.08);
+  }
+  .cit-relevance {
+    font-size: 0.625rem;
+    color: rgba(212, 199, 163, 0.25);
+  }
+
+  /* ── Workflow Buttons ── */
+  .cit-card-workflow {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+  }
+  .cit-workflow-btn {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.625rem;
+    color: rgba(212, 199, 163, 0.5);
+    border: 1px solid rgba(212, 199, 163, 0.1);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+  .cit-workflow-btn:hover {
+    border-color: rgba(96, 165, 250, 0.4);
+    color: rgba(96, 165, 250, 0.9);
+  }
+
+  /* ── Tags ── */
+  .cit-card-tags {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+  }
+  .cit-tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.625rem;
+    font-weight: 500;
+    color: #000;
+    cursor: pointer;
+  }
+  .cit-tag-adder {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .cit-tag-preset {
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.5625rem;
+    color: #000;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .cit-tag-preset:hover { opacity: 0.8; }
+  .cit-tag-input {
+    width: 4rem;
+    padding: 0.125rem 0.25rem;
+    font-size: 0.625rem;
+    border-radius: 0.25rem;
+    border: 1px solid rgba(212, 199, 163, 0.12);
+    background: rgba(0, 0, 0, 0.3);
+    color: rgba(212, 199, 163, 0.9);
+  }
+
+  /* ── Collection Dropdown ── */
+  .cit-collection-wrap {
+    position: relative;
+  }
+  .cit-collection-dropdown {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 0.25rem;
+    z-index: 20;
+    background: rgba(19, 21, 25, 0.98);
+    border: 1px solid rgba(212, 199, 163, 0.12);
+    border-radius: 0.375rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    min-width: 10rem;
+    padding: 0.25rem 0;
+  }
+  .cit-collection-item {
+    width: 100%;
+    text-align: left;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    color: rgba(212, 199, 163, 0.8);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.15s;
+  }
+  .cit-collection-item:hover { background: rgba(96, 165, 250, 0.08); }
+  .cit-collection-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .cit-collection-empty {
+    padding: 0.75rem;
+    font-size: 0.75rem;
+    color: rgba(212, 199, 163, 0.4);
+  }
+
+  /* ── Selected Citation Section ── */
+  .cit-selected-section {
+    margin-top: 1.5rem;
+  }
+  .cit-selected-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  .cit-selected-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgba(212, 199, 163, 0.85);
+    margin: 0;
+  }
+  .cit-link-toggle {
+    margin-top: 1rem;
+  }
+  .cit-link-btn {
+    font-size: 0.875rem;
+    color: rgba(96, 165, 250, 0.8);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .cit-link-btn:hover { color: rgba(96, 165, 250, 1); text-decoration: underline; }
+  .cit-link-editor {
+    margin-top: 0.5rem;
+  }
+
+  /* ── Knowledge Base Panel ── */
+  .kb-panel {
+    border-radius: 0.5rem;
+    border: 1px solid rgba(96, 165, 250, 0.2);
+    background: rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+  }
+  .kb-header {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(212, 199, 163, 0.08);
+  }
+  .kb-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgba(96, 165, 250, 0.9);
+    margin: 0;
+  }
+  .kb-content {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .kb-search-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  .kb-input {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    border: 1px solid rgba(212, 199, 163, 0.12);
+    background: rgba(0, 0, 0, 0.3);
+    color: rgba(212, 199, 163, 0.9);
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .kb-input::placeholder { color: rgba(212, 199, 163, 0.3); }
+  .kb-input:focus { border-color: rgba(96, 165, 250, 0.5); }
+  .kb-status {
+    font-size: 0.75rem;
+    color: rgba(212, 199, 163, 0.3);
+    white-space: nowrap;
+  }
+  .kb-status.searching {
+    color: rgba(96, 165, 250, 0.8);
+  }
+  .kb-section-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(212, 199, 163, 0.45);
+    margin: 0 0 0.5rem;
+  }
+  .kb-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .kb-results-list.prec {
+    gap: 0.75rem;
+  }
+  .kb-result-card {
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    border: 1px solid rgba(212, 199, 163, 0.06);
+    background: rgba(0, 0, 0, 0.15);
+  }
+  .kb-hoverable {
+    transition: border-color 0.15s;
+  }
+  .kb-hoverable:hover {
+    border-color: rgba(96, 165, 250, 0.25);
+  }
+  .kb-result-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+  .kb-term-name {
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: rgba(96, 165, 250, 0.9);
+  }
+  .kb-statute-name {
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: rgba(212, 199, 163, 0.85);
+  }
+  .kb-tag {
+    font-size: 0.625rem;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    background: rgba(212, 199, 163, 0.06);
+    color: rgba(212, 199, 163, 0.45);
+  }
+  .kb-mono-tag {
+    font-size: 0.625rem;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    color: rgba(96, 165, 250, 0.6);
+  }
+  .kb-score {
+    font-size: 0.625rem;
+    color: rgba(212, 199, 163, 0.25);
+    margin-left: auto;
+  }
+  .kb-jurisdiction {
+    font-size: 0.625rem;
+    color: rgba(212, 199, 163, 0.3);
+  }
+  .kb-result-text {
+    font-size: 0.75rem;
+    color: rgba(212, 199, 163, 0.55);
+    margin-top: 0.25rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .kb-result-action {
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .kb-empty {
+    color: rgba(212, 199, 163, 0.35);
+    font-size: 0.875rem;
+    text-align: center;
+    padding: 1rem 0;
   }
 </style>

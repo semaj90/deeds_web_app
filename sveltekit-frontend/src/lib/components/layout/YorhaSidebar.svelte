@@ -41,7 +41,7 @@
 		{ label: 'AI DASHBOARD', icon: 'brain', href: '/ai-dashboard' },
 		{ label: 'TERMINAL', icon: 'terminal', href: '/terminal' },
 		{ label: 'MEMORY PALACE', icon: 'landmark', href: '/memory-palace' },
-		{ label: 'ALL ROUTES', icon: 'map', href: '/all-routes' },
+		{ label: 'ALL ROUTES', icon: 'map', href: '/admin/all-routes' },
 		{ label: 'DEMOS', icon: 'gamepad-2', href: '/demos' },
 	];
 

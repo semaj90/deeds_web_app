@@ -191,7 +191,7 @@
 		{ name: 'Error Analysis', href: '/admin/error-analysis', desc: 'Phase 89 error analysis with SSE', icon: '🐛' },
 		{ name: 'Route Explorer', href: '/admin/explorer', desc: 'Route explorer with tree view + SSE', icon: '🗺️' },
 		{ name: 'Topology View', href: '/admin/topology', desc: 'Canvas-based network visualization', icon: '🕸️' },
-		{ name: 'All Routes', href: '/all-routes', desc: 'SSE-based real-time route health', icon: '📡' },
+		{ name: 'All Routes', href: '/admin/all-routes', desc: 'SSE-based real-time route health', icon: '📡' },
 	];
 
 	async function searchCodebase() {
@@ -268,21 +268,23 @@
 	}
 </script>
 
-<div class="mx-auto max-w-[1600px] p-6">
+<div class="dt-dark">
+<div class="dt-page">
 	<!-- Header -->
-	<header class="mb-6 flex items-center justify-between">
-		<div>
-			<h1 class="text-2xl font-bold text-black uppercase tracking-wide">Dev Tools Hub</h1>
-			<p class="mt-1 text-sm text-black/60">
-				Codebase indexing &bull; Service health &bull; Admin tools
-			</p>
+	<header class="dt-header">
+		<div class="dt-header-left">
+			<div class="dt-icon-badge">
+				<Icon name="wrench" size={20} />
+			</div>
+			<div>
+				<h1 class="dt-title">Dev Tools Hub</h1>
+				<p class="dt-subtitle">Codebase indexing &middot; Service health &middot; Admin tools</p>
+			</div>
 		</div>
-		<div class="flex items-center gap-3">
-			<span class="text-xs text-black/40">Updated: {new Date(data.timestamp).toLocaleTimeString()}</span>
-			<button
-				class="rounded-md border-2 border-black/30 bg-panel px-3 py-1.5 text-xs font-mono uppercase tracking-wider text-black transition hover:border-accent hover:text-accent"
-				onclick={refreshHealth}
-			>
+		<div class="dt-header-right">
+			<span class="dt-timestamp">Updated: {new Date(data.timestamp).toLocaleTimeString()}</span>
+			<button class="dt-refresh-btn" onclick={refreshHealth}>
+				<Icon name="refresh-cw" size={12} />
 				Refresh
 			</button>
 		</div>
@@ -949,6 +951,7 @@
 	{/if}
 
 </div>
+</div>
 
 <EvidenceDrawer
 	isOpen={showEvidenceDrawer}
@@ -980,32 +983,200 @@
 />
 
 <style>
+	/* ── Full-bleed dark wrapper ── */
+	.dt-dark {
+		min-height: 100vh;
+		background: #0e0d0b;
+		margin: -2.5rem;
+		padding: 2.5rem;
+		color: rgb(212 199 163);
+	}
+
+	/* Neutralize root layout globals */
+	.dt-dark :global(h1),
+	.dt-dark :global(h2),
+	.dt-dark :global(h3),
+	.dt-dark :global(h4),
+	.dt-dark :global(p) {
+		color: inherit;
+		text-transform: none;
+		letter-spacing: normal;
+		margin: 0;
+	}
+	.dt-dark :global(a) {
+		color: inherit;
+		border-bottom: none;
+	}
+	.dt-dark :global(button) {
+		text-transform: none;
+		letter-spacing: normal;
+		background: none;
+		border: none;
+		box-shadow: none;
+		padding: 0;
+		color: inherit;
+	}
+	.dt-dark :global(input),
+	.dt-dark :global(select),
+	.dt-dark :global(textarea) {
+		background: transparent;
+		border: none;
+		box-shadow: none;
+		color: inherit;
+	}
+
+	/* Override text-black classes to sand */
+	.dt-dark :global([class*="text-black"]) {
+		color: rgba(212, 199, 163, 0.85) !important;
+	}
+	.dt-dark :global([class*="text-black/"]) {
+		color: rgba(212, 199, 163, 0.5) !important;
+	}
+	/* Override border-black classes */
+	.dt-dark :global([class*="border-black"]) {
+		border-color: rgba(212, 199, 163, 0.1) !important;
+	}
+	/* Override bg-sand references */
+	.dt-dark :global([class*="bg-sand/"]) {
+		background-color: rgba(212, 199, 163, 0.06) !important;
+	}
+	/* Override placeholder colors */
+	.dt-dark :global([class*="placeholder-black"]) {
+		--tw-placeholder-opacity: 1;
+	}
+	.dt-dark :global(input::placeholder),
+	.dt-dark :global(textarea::placeholder) {
+		color: rgba(212, 199, 163, 0.3) !important;
+	}
+	/* Override bg-panel */
+	.dt-dark :global([class*="bg-panel"]) {
+		background-color: rgba(0, 0, 0, 0.25) !important;
+	}
+	/* Tables */
+	.dt-dark :global(table) {
+		border-collapse: collapse;
+	}
+	.dt-dark :global(th) {
+		color: rgba(212, 199, 163, 0.5) !important;
+		background: rgba(0, 0, 0, 0.3) !important;
+	}
+	.dt-dark :global(td) {
+		color: rgba(212, 199, 163, 0.75) !important;
+	}
+	.dt-dark :global(tr:hover) {
+		background: rgba(212, 199, 163, 0.04) !important;
+	}
+	.dt-dark :global(pre) {
+		color: rgba(212, 199, 163, 0.65) !important;
+	}
+	.dt-dark :global(code) {
+		color: rgba(96, 165, 250, 0.85) !important;
+	}
+
+	/* ── Page container ── */
+	.dt-page {
+		max-width: 100rem;
+		margin: 0 auto;
+		padding: 2rem 1.5rem;
+	}
+
+	/* ── Header ── */
+	.dt-header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1.5rem;
+		margin-bottom: 2rem;
+		padding-bottom: 1.5rem;
+		border-bottom: 1px solid rgba(212, 199, 163, 0.06);
+		flex-wrap: wrap;
+	}
+	.dt-header-left {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.875rem;
+	}
+	.dt-icon-badge {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.75rem;
+		height: 2.75rem;
+		border-radius: 0.625rem;
+		background: linear-gradient(135deg, rgba(96, 165, 250, 0.12), rgba(52, 211, 153, 0.08));
+		border: 1px solid rgba(96, 165, 250, 0.2);
+		color: rgba(96, 165, 250, 0.85);
+		flex-shrink: 0;
+	}
+	.dt-title {
+		font-size: 1.375rem;
+		font-weight: 700;
+		color: rgba(212, 199, 163, 0.95);
+		line-height: 1.3;
+	}
+	.dt-subtitle {
+		font-size: 0.75rem;
+		color: rgba(212, 199, 163, 0.4);
+		margin-top: 0.125rem;
+	}
+	.dt-header-right {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+	.dt-timestamp {
+		font-size: 0.6875rem;
+		color: rgba(212, 199, 163, 0.3);
+	}
+	.dt-refresh-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.375rem 0.875rem !important;
+		font-size: 0.6875rem;
+		font-weight: 600;
+		color: rgba(96, 165, 250, 0.85) !important;
+		background: rgba(96, 165, 250, 0.08) !important;
+		border: 1px solid rgba(96, 165, 250, 0.2) !important;
+		border-radius: 0.375rem;
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+	.dt-refresh-btn:hover {
+		background: rgba(96, 165, 250, 0.15) !important;
+		border-color: rgba(96, 165, 250, 0.35) !important;
+	}
+
+	/* ── Tab Bar ── */
 	.dt-tab-bar {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 4px;
-		margin-bottom: 1rem;
-		border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+		margin-bottom: 1.5rem;
+		padding-bottom: 0.75rem;
+		border-bottom: 1px solid rgba(212, 199, 163, 0.06);
 	}
 	.dt-tab {
-		padding: 0.5rem 1rem;
-		border-radius: 0.375rem 0.375rem 0 0;
-		font-size: 0.875rem;
+		padding: 0.5rem 1rem !important;
+		border-radius: 0.375rem;
+		font-size: 0.6875rem;
 		text-transform: uppercase;
-		color: rgba(0, 0, 0, 0.6);
-		background: rgba(212, 199, 163, 0.2);
+		letter-spacing: 0.05em;
+		color: rgba(212, 199, 163, 0.4) !important;
+		background: rgba(212, 199, 163, 0.04) !important;
+		border: 1px solid transparent !important;
 		cursor: pointer;
 		transition: all 0.15s;
 		font-weight: 600;
 	}
 	.dt-tab:hover {
-		color: #000;
-		background: rgba(212, 199, 163, 0.3);
+		color: rgba(212, 199, 163, 0.7) !important;
+		background: rgba(212, 199, 163, 0.06) !important;
 	}
 	.dt-tab.active {
-		border-bottom: 2px solid #4ade80;
-		color: #4ade80;
-		background: rgba(212, 199, 163, 0.4);
+		color: rgba(52, 211, 153, 0.9) !important;
+		background: rgba(52, 211, 153, 0.08) !important;
+		border-color: rgba(52, 211, 153, 0.2) !important;
 		font-weight: 700;
 	}
 </style>

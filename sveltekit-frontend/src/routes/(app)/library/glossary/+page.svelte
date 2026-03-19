@@ -128,17 +128,45 @@
 		evidence: 'Evidence',
 		general: 'General',
 		procedure: 'Procedure',
+		cybercrime: 'Cybercrime',
+		regulatory: 'Regulatory',
+		family: 'Family Law',
+		property: 'Property',
+		corporate: 'Corporate',
+		employment: 'Employment',
+		bankruptcy: 'Bankruptcy',
+		intellectual_property: 'IP Law',
+		immigration: 'Immigration',
+		estate: 'Estate',
+		environmental: 'Environmental',
+		administrative: 'Administrative',
+		contract: 'Contract',
+		tax: 'Tax Law',
 		uncategorized: 'Other',
 	};
 
 	const CATEGORY_COLOR: Record<string, string> = {
-		civil: 'bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-200',
-		constitutional: 'bg-violet-50 text-violet-700 ring-1 ring-inset ring-violet-200',
-		criminal: 'bg-rose-50 text-rose-700 ring-1 ring-inset ring-rose-200',
-		evidence: 'bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200',
-		general: 'bg-slate-100 text-slate-700 ring-1 ring-inset ring-slate-200',
-		procedure: 'bg-teal-50 text-teal-700 ring-1 ring-inset ring-teal-200',
-		uncategorized: 'bg-slate-50 text-slate-500 ring-1 ring-inset ring-slate-200',
+		civil: 'gl-cat-civil',
+		constitutional: 'gl-cat-constitutional',
+		criminal: 'gl-cat-criminal',
+		evidence: 'gl-cat-evidence',
+		general: 'gl-cat-general',
+		procedure: 'gl-cat-procedure',
+		cybercrime: 'gl-cat-cybercrime',
+		regulatory: 'gl-cat-regulatory',
+		family: 'gl-cat-family',
+		property: 'gl-cat-property',
+		corporate: 'gl-cat-corporate',
+		employment: 'gl-cat-employment',
+		bankruptcy: 'gl-cat-bankruptcy',
+		intellectual_property: 'gl-cat-ip',
+		immigration: 'gl-cat-immigration',
+		estate: 'gl-cat-estate',
+		environmental: 'gl-cat-environmental',
+		administrative: 'gl-cat-administrative',
+		contract: 'gl-cat-contract',
+		tax: 'gl-cat-tax',
+		uncategorized: 'gl-cat-general',
 	};
 
 	$effect(() => {
@@ -615,3 +643,29 @@
 		</div>
 	</div>
 </div>
+
+<style>
+	/* -- Category color badges (scoped, gl-* prefix) -- */
+	/* Original 6 categories */
+	.gl-cat-civil { background: rgba(59, 130, 246, 0.12); color: rgba(59, 130, 246, 0.9); }
+	.gl-cat-constitutional { background: rgba(139, 92, 246, 0.12); color: rgba(139, 92, 246, 0.9); }
+	.gl-cat-criminal { background: rgba(244, 63, 94, 0.12); color: rgba(244, 63, 94, 0.9); }
+	.gl-cat-evidence { background: rgba(245, 158, 11, 0.12); color: rgba(245, 158, 11, 0.9); }
+	.gl-cat-general { background: rgba(100, 116, 139, 0.12); color: rgba(100, 116, 139, 0.9); }
+	.gl-cat-procedure { background: rgba(20, 184, 166, 0.12); color: rgba(20, 184, 166, 0.9); }
+	/* 14 new categories */
+	.gl-cat-cybercrime { background: rgba(239, 68, 68, 0.12); color: rgba(239, 68, 68, 0.9); }
+	.gl-cat-regulatory { background: rgba(234, 179, 8, 0.12); color: rgba(234, 179, 8, 0.9); }
+	.gl-cat-family { background: rgba(236, 72, 153, 0.12); color: rgba(236, 72, 153, 0.9); }
+	.gl-cat-property { background: rgba(168, 85, 247, 0.12); color: rgba(168, 85, 247, 0.9); }
+	.gl-cat-corporate { background: rgba(59, 130, 246, 0.12); color: rgba(59, 130, 246, 0.9); }
+	.gl-cat-employment { background: rgba(249, 115, 22, 0.12); color: rgba(249, 115, 22, 0.9); }
+	.gl-cat-bankruptcy { background: rgba(156, 163, 175, 0.12); color: rgba(156, 163, 175, 0.9); }
+	.gl-cat-ip { background: rgba(14, 165, 233, 0.12); color: rgba(14, 165, 233, 0.9); }
+	.gl-cat-immigration { background: rgba(34, 197, 94, 0.12); color: rgba(34, 197, 94, 0.9); }
+	.gl-cat-estate { background: rgba(217, 119, 6, 0.12); color: rgba(217, 119, 6, 0.9); }
+	.gl-cat-environmental { background: rgba(16, 185, 129, 0.12); color: rgba(16, 185, 129, 0.9); }
+	.gl-cat-administrative { background: rgba(99, 102, 241, 0.12); color: rgba(99, 102, 241, 0.9); }
+	.gl-cat-contract { background: rgba(245, 158, 11, 0.12); color: rgba(245, 158, 11, 0.9); }
+	.gl-cat-tax { background: rgba(107, 114, 128, 0.12); color: rgba(107, 114, 128, 0.9); }
+</style>

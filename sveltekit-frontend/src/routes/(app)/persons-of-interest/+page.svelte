@@ -222,28 +222,28 @@
 					<div class="sidebar-title">STATISTICS</div>
 					<div class="stat-cards">
 						<div class="stat-card">
-							<div class="stat-card-icon" style="background: #eff6ff; color: #3b82f6;"><Icon name="users" size={14} /></div>
+							<div class="stat-card-icon" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6;"><Icon name="users" size={14} /></div>
 							<div class="stat-card-info">
 								<span class="stat-card-num">{poiStats.total}</span>
 								<span class="stat-card-label">Total</span>
 							</div>
 						</div>
 						<div class="stat-card">
-							<div class="stat-card-icon" style="background: #f0f0ff; color: #667eea;"><Icon name="activity" size={14} /></div>
+							<div class="stat-card-icon" style="background: rgba(102, 126, 234, 0.12); color: #667eea;"><Icon name="activity" size={14} /></div>
 							<div class="stat-card-info">
 								<span class="stat-card-num">{poiStats.active}</span>
 								<span class="stat-card-label">Active</span>
 							</div>
 						</div>
 						<div class="stat-card">
-							<div class="stat-card-icon" style="background: #fef2f2; color: #ef4444;"><Icon name="shield-alert" size={14} /></div>
+							<div class="stat-card-icon" style="background: rgba(239, 68, 68, 0.12); color: #ef4444;"><Icon name="shield-alert" size={14} /></div>
 							<div class="stat-card-info">
 								<span class="stat-card-num">{poiStats.highRisk}</span>
 								<span class="stat-card-label">High Risk</span>
 							</div>
 						</div>
 						<div class="stat-card">
-							<div class="stat-card-icon" style="background: #f0fdf4; color: #10b981;"><Icon name="sparkles" size={14} /></div>
+							<div class="stat-card-icon" style="background: rgba(16, 185, 129, 0.12); color: #10b981;"><Icon name="sparkles" size={14} /></div>
 							<div class="stat-card-info">
 								<span class="stat-card-num">{poiStats.aiGenerated}</span>
 								<span class="stat-card-label">AI Gen</span>
@@ -695,19 +695,19 @@
 <style>
 	.yorha-page {
 		min-height: 100vh;
-		background: #faf9f7;
+		background: #131519;
 		font-family: 'JetBrains Mono', 'Courier New', monospace;
+		color: rgba(212, 199, 163, 0.9);
 	}
 
 	/* Header */
 	.yorha-header {
-		background: linear-gradient(135deg, #ffffff 0%, #f9f8f6 100%);
-		border-bottom: 1px solid #e8e5e0;
+		background: rgba(0, 0, 0, 0.4);
+		border-bottom: 1px solid rgba(212, 199, 163, 0.08);
 		padding: 1rem 2rem;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(102, 126, 234, 0.03);
 	}
 
 	.header-logo {
@@ -729,7 +729,7 @@
 
 	.logo-subtitle {
 		font-size: 0.7rem;
-		color: #9ca3af;
+		color: rgba(212, 199, 163, 0.35);
 		letter-spacing: 0.15em;
 	}
 
@@ -745,7 +745,7 @@
 		font-size: 0.75rem;
 		font-weight: 600;
 		letter-spacing: 0.1em;
-		color: #9ca3af;
+		color: rgba(212, 199, 163, 0.4);
 		cursor: pointer;
 		font-family: 'JetBrains Mono', monospace;
 		transition: all 0.2s;
@@ -769,13 +769,13 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		background: #fff;
-		border: 1px solid #e5e7eb;
+		background: rgba(0, 0, 0, 0.3);
+		border: 1px solid rgba(212, 199, 163, 0.1);
 		padding: 0.5rem 1rem;
 		font-size: 0.75rem;
 		font-weight: 600;
 		letter-spacing: 0.1em;
-		color: #6b7280;
+		color: rgba(212, 199, 163, 0.6);
 		cursor: pointer;
 		font-family: 'JetBrains Mono', monospace;
 		transition: all 0.2s;
@@ -783,7 +783,7 @@
 	}
 
 	.header-btn:hover {
-		border-color: #667eea;
+		border-color: rgba(102, 126, 234, 0.4);
 		color: #667eea;
 	}
 
@@ -806,8 +806,8 @@
 
 	/* Sidebar */
 	.yorha-sidebar {
-		background: #fffffe;
-		border-right: 1px solid #e8e5e0;
+		background: rgba(0, 0, 0, 0.25);
+		border-right: 1px solid rgba(212, 199, 163, 0.08);
 		padding: 1.5rem 0;
 	}
 
@@ -820,7 +820,7 @@
 		font-size: 0.7rem;
 		font-weight: 700;
 		letter-spacing: 0.15em;
-		color: #9ca3af;
+		color: rgba(212, 199, 163, 0.35);
 		margin-bottom: 1rem;
 	}
 
@@ -839,7 +839,7 @@
 		padding: 0.75rem 1rem;
 		font-size: 0.75rem;
 		font-weight: 500;
-		color: #6b7280;
+		color: rgba(212, 199, 163, 0.5);
 		cursor: pointer;
 		font-family: 'JetBrains Mono', monospace;
 		text-align: left;
@@ -848,45 +848,15 @@
 	}
 
 	.menu-item:hover {
-		background: #f8f9fa;
+		background: rgba(212, 199, 163, 0.06);
 		color: #667eea;
 	}
 
 	.menu-item.active {
-		background: linear-gradient(90deg, #f0f0ff 0%, #fff 100%);
+		background: rgba(102, 126, 234, 0.1);
 		color: #667eea;
 		border-left: 3px solid #667eea;
 		font-weight: 600;
-	}
-
-	.stats-compact {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
-
-	.stat-row {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		font-size: 0.75rem;
-	}
-
-	.stat-label {
-		color: #9ca3af;
-	}
-
-	.stat-value {
-		font-weight: 600;
-		color: #1f2937;
-	}
-
-	.stat-value.highlight {
-		color: #667eea;
-	}
-
-	.stat-value.danger {
-		color: #ef4444;
 	}
 
 	/* Stat cards */
@@ -902,14 +872,14 @@
 		align-items: center;
 		gap: 0.5rem;
 		padding: 0.6rem;
-		background: #fff;
-		border: 1px solid #f0eeeb;
+		background: rgba(0, 0, 0, 0.2);
+		border: 1px solid rgba(212, 199, 163, 0.06);
 		border-radius: 10px;
-		transition: box-shadow 0.2s;
+		transition: border-color 0.2s;
 	}
 
 	.stat-card:hover {
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+		border-color: rgba(212, 199, 163, 0.12);
 	}
 
 	.stat-card-icon {
@@ -931,13 +901,13 @@
 	.stat-card-num {
 		font-size: 1rem;
 		font-weight: 700;
-		color: #1f2937;
+		color: rgba(212, 199, 163, 0.95);
 		line-height: 1.2;
 	}
 
 	.stat-card-label {
 		font-size: 0.6rem;
-		color: #9ca3af;
+		color: rgba(212, 199, 163, 0.35);
 		letter-spacing: 0.08em;
 		font-weight: 600;
 	}
@@ -951,7 +921,7 @@
 		font-size: 0.6rem;
 		font-weight: 700;
 		letter-spacing: 0.1em;
-		color: #9ca3af;
+		color: rgba(212, 199, 163, 0.35);
 		margin-bottom: 0.4rem;
 	}
 
@@ -960,7 +930,7 @@
 		height: 6px;
 		border-radius: 3px;
 		overflow: hidden;
-		background: #f3f4f6;
+		background: rgba(212, 199, 163, 0.06);
 	}
 
 	.threat-bar-seg {
@@ -978,7 +948,7 @@
 		gap: 0.625rem;
 		margin-top: 0.35rem;
 		font-size: 0.55rem;
-		color: #9ca3af;
+		color: rgba(212, 199, 163, 0.4);
 		align-items: center;
 		font-weight: 600;
 		letter-spacing: 0.05em;
@@ -1007,10 +977,10 @@
 		align-items: center;
 		gap: 0.75rem;
 		padding: 1rem;
-		background: #fef2f2;
-		border: 1px solid #fecaca;
+		background: rgba(239, 68, 68, 0.1);
+		border: 1px solid rgba(239, 68, 68, 0.2);
 		border-radius: 8px;
-		color: #dc2626;
+		color: #f87171;
 		margin-bottom: 1.5rem;
 		font-size: 0.85rem;
 	}
@@ -1036,7 +1006,7 @@
 	.search-input-wrap > :global(svg:first-child) {
 		position: absolute;
 		left: 0.875rem;
-		color: #9ca3af;
+		color: rgba(212, 199, 163, 0.3);
 		pointer-events: none;
 		transition: color 0.2s;
 	}
@@ -1055,7 +1025,7 @@
 		right: 0.625rem;
 		background: none;
 		border: none;
-		color: #9ca3af;
+		color: rgba(212, 199, 163, 0.4);
 		cursor: pointer;
 		padding: 4px;
 		border-radius: 6px;
@@ -1065,48 +1035,31 @@
 	}
 
 	.search-clear:hover {
-		background: #f3f4f6;
-		color: #374151;
+		background: rgba(212, 199, 163, 0.08);
+		color: rgba(212, 199, 163, 0.8);
 	}
 
 	.yorha-input {
 		flex: 1;
 		width: 100%;
 		padding: 0.75rem 1rem;
-		border: 1px solid #e5e7eb;
+		border: 1px solid rgba(212, 199, 163, 0.1);
 		border-radius: 10px;
 		font-size: 0.85rem;
 		font-family: 'JetBrains Mono', monospace;
 		transition: all 0.2s;
-		background: #fff;
+		background: rgba(0, 0, 0, 0.3);
+		color: rgba(212, 199, 163, 0.9);
+	}
+
+	.yorha-input::placeholder {
+		color: rgba(212, 199, 163, 0.25);
 	}
 
 	.yorha-input:focus {
 		outline: none;
-		border-color: #667eea;
+		border-color: rgba(102, 126, 234, 0.5);
 		box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-	}
-
-	.filter-btn {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.75rem 1rem;
-		background: #fff;
-		border: 1px solid #e5e7eb;
-		border-radius: 10px;
-		font-size: 0.75rem;
-		font-weight: 600;
-		letter-spacing: 0.05em;
-		color: #6b7280;
-		cursor: pointer;
-		font-family: 'JetBrains Mono', monospace;
-		transition: all 0.2s;
-	}
-
-	.filter-btn:hover {
-		border-color: #667eea;
-		color: #667eea;
 	}
 
 	.filter-clear-btn {
@@ -1114,20 +1067,20 @@
 		align-items: center;
 		gap: 0.35rem;
 		padding: 0.5rem 0.875rem;
-		background: #fef2f2;
-		border: 1px solid #fecaca;
+		background: rgba(239, 68, 68, 0.1);
+		border: 1px solid rgba(239, 68, 68, 0.2);
 		border-radius: 8px;
 		font-size: 0.65rem;
 		font-weight: 700;
 		letter-spacing: 0.08em;
-		color: #dc2626;
+		color: #f87171;
 		cursor: pointer;
 		font-family: 'JetBrains Mono', monospace;
 		transition: all 0.15s;
 	}
 
 	.filter-clear-btn:hover {
-		background: #fee2e2;
+		background: rgba(239, 68, 68, 0.15);
 	}
 
 	.filter-row {
@@ -1146,7 +1099,7 @@
 
 	.results-count {
 		font-size: 0.7rem;
-		color: #9ca3af;
+		color: rgba(212, 199, 163, 0.4);
 		font-weight: 600;
 		letter-spacing: 0.08em;
 	}
@@ -1156,8 +1109,8 @@
 		align-items: center;
 		gap: 0.3rem;
 		padding: 0.2rem 0.5rem 0.2rem 0.6rem;
-		background: #f0f0ff;
-		border: 1px solid #c7d2fe;
+		background: rgba(102, 126, 234, 0.12);
+		border: 1px solid rgba(102, 126, 234, 0.25);
 		border-radius: 6px;
 		font-size: 0.65rem;
 		font-weight: 600;
@@ -1166,9 +1119,9 @@
 	}
 
 	.active-chip.threat {
-		background: #fef3c7;
-		border-color: #fde68a;
-		color: #92400e;
+		background: rgba(245, 158, 11, 0.12);
+		border-color: rgba(245, 158, 11, 0.25);
+		color: #f59e0b;
 	}
 
 	.active-chip button {
@@ -1188,24 +1141,30 @@
 
 	.yorha-select {
 		padding: 0.75rem 1rem;
-		border: 1px solid #e5e7eb;
+		border: 1px solid rgba(212, 199, 163, 0.1);
 		border-radius: 10px;
 		font-size: 0.85rem;
 		font-family: 'JetBrains Mono', monospace;
-		background: #fff;
+		background: rgba(0, 0, 0, 0.3);
+		color: rgba(212, 199, 163, 0.8);
 		cursor: pointer;
 		transition: all 0.2s;
 	}
 
+	.yorha-select option {
+		background: #1a1d24;
+		color: rgba(212, 199, 163, 0.9);
+	}
+
 	.yorha-select:focus {
 		outline: none;
-		border-color: #667eea;
+		border-color: rgba(102, 126, 234, 0.5);
 		box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 	}
 
 	.view-toggle {
 		display: flex;
-		border: 1px solid #e5e7eb;
+		border: 1px solid rgba(212, 199, 163, 0.1);
 		border-radius: 8px;
 		overflow: hidden;
 		margin-left: auto;
@@ -1216,13 +1175,13 @@
 		align-items: center;
 		gap: 0.35rem;
 		padding: 0.625rem 1rem;
-		background: #fff;
+		background: rgba(0, 0, 0, 0.2);
 		border: none;
-		border-right: 1px solid #e5e7eb;
+		border-right: 1px solid rgba(212, 199, 163, 0.08);
 		font-size: 0.7rem;
 		font-weight: 600;
 		letter-spacing: 0.05em;
-		color: #9ca3af;
+		color: rgba(212, 199, 163, 0.4);
 		cursor: pointer;
 		font-family: 'JetBrains Mono', monospace;
 		transition: all 0.2s;
@@ -1233,8 +1192,8 @@
 	}
 
 	.toggle-btn:hover {
-		background: #f8f9fa;
-		color: #6b7280;
+		background: rgba(212, 199, 163, 0.06);
+		color: rgba(212, 199, 163, 0.7);
 	}
 
 	.toggle-btn.active {
@@ -1246,22 +1205,21 @@
 	.empty-state {
 		text-align: center;
 		padding: 4rem 2rem;
-		background: linear-gradient(180deg, #fff 0%, #faf9f7 100%);
+		background: rgba(0, 0, 0, 0.2);
 		border-radius: 16px;
-		border: 1px solid #e8e5e0;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+		border: 1px solid rgba(212, 199, 163, 0.08);
 	}
 
 	.empty-icon-ring {
 		width: 80px;
 		height: 80px;
 		border-radius: 50%;
-		background: linear-gradient(135deg, #f0f0ff 0%, #faf9f7 100%);
-		border: 2px solid #e5e7eb;
+		background: rgba(102, 126, 234, 0.08);
+		border: 2px solid rgba(212, 199, 163, 0.1);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: #c7d2fe;
+		color: rgba(102, 126, 234, 0.4);
 		margin: 0 auto 1.25rem;
 	}
 
@@ -1269,13 +1227,13 @@
 		font-size: 1rem;
 		font-weight: 600;
 		letter-spacing: 0.1em;
-		color: #6b7280;
+		color: rgba(212, 199, 163, 0.6);
 		margin: 0 0 0.5rem 0;
 	}
 
 	.empty-subtitle {
 		font-size: 0.8rem;
-		color: #9ca3af;
+		color: rgba(212, 199, 163, 0.35);
 		margin: 0 0 1.5rem 0;
 		line-height: 1.5;
 	}
@@ -1292,13 +1250,13 @@
 		align-items: center;
 		gap: 0.5rem;
 		padding: 0.75rem 1.5rem;
-		background: #fff;
-		border: 1px solid #e5e7eb;
+		background: rgba(0, 0, 0, 0.3);
+		border: 1px solid rgba(212, 199, 163, 0.1);
 		border-radius: 8px;
 		font-size: 0.75rem;
 		font-weight: 600;
 		letter-spacing: 0.1em;
-		color: #6b7280;
+		color: rgba(212, 199, 163, 0.6);
 		text-decoration: none;
 		cursor: pointer;
 		font-family: 'JetBrains Mono', monospace;
@@ -1306,7 +1264,7 @@
 	}
 
 	.btn-yorha:hover {
-		border-color: #667eea;
+		border-color: rgba(102, 126, 234, 0.4);
 		color: #667eea;
 	}
 
@@ -1328,16 +1286,16 @@
 	}
 
 	.poi-card {
-		background: #fff;
-		border: 1px solid #e8e5e0;
+		background: rgba(0, 0, 0, 0.25);
+		border: 1px solid rgba(212, 199, 163, 0.08);
 		border-radius: 14px;
 		overflow: hidden;
 		transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 	}
 
 	.poi-card:hover {
-		box-shadow: 0 8px 24px rgba(102, 126, 234, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
-		border-color: #667eea;
+		box-shadow: 0 8px 24px rgba(102, 126, 234, 0.12), 0 2px 8px rgba(0, 0, 0, 0.2);
+		border-color: rgba(102, 126, 234, 0.35);
 		transform: translateY(-2px);
 	}
 
@@ -1346,7 +1304,7 @@
 		align-items: center;
 		gap: 1rem;
 		padding: 1.25rem 1.5rem;
-		border-bottom: 1px solid #f3f4f6;
+		border-bottom: 1px solid rgba(212, 199, 163, 0.06);
 	}
 
 	.card-avatar {
@@ -1379,14 +1337,14 @@
 	.card-name {
 		font-size: 1rem;
 		font-weight: 600;
-		color: #1f2937;
+		color: rgba(212, 199, 163, 0.95);
 		margin: 0 0 0.25rem 0;
 		letter-spacing: 0.05em;
 	}
 
 	.card-status {
 		font-size: 0.7rem;
-		color: #9ca3af;
+		color: rgba(212, 199, 163, 0.4);
 		margin: 0;
 		letter-spacing: 0.1em;
 	}
@@ -1405,23 +1363,23 @@
 	}
 
 	.threat-badge.threat-low {
-		background: #d1fae5;
-		color: #065f46;
+		background: rgba(16, 185, 129, 0.15);
+		color: #34d399;
 	}
 
 	.threat-badge.threat-medium {
-		background: #fef3c7;
-		color: #92400e;
+		background: rgba(245, 158, 11, 0.15);
+		color: #fbbf24;
 	}
 
 	.threat-badge.threat-high {
-		background: #fee2e2;
-		color: #991b1b;
+		background: rgba(239, 68, 68, 0.15);
+		color: #f87171;
 	}
 
 	.threat-badge.threat-critical {
-		background: #fecaca;
-		color: #7f1d1d;
+		background: rgba(220, 38, 38, 0.2);
+		color: #ef4444;
 	}
 
 	.card-body {
@@ -1441,13 +1399,13 @@
 		font-size: 0.7rem;
 		font-weight: 600;
 		letter-spacing: 0.1em;
-		color: #9ca3af;
+		color: rgba(212, 199, 163, 0.35);
 		margin-bottom: 0.25rem;
 	}
 
 	.field-value {
 		font-size: 0.85rem;
-		color: #374151;
+		color: rgba(212, 199, 163, 0.7);
 		margin: 0;
 		line-height: 1.5;
 	}
@@ -1455,7 +1413,7 @@
 	.card-actions {
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
-		border-top: 1px solid #f3f4f6;
+		border-top: 1px solid rgba(212, 199, 163, 0.06);
 	}
 
 	.action-btn {
@@ -1464,13 +1422,13 @@
 		justify-content: center;
 		gap: 0.5rem;
 		padding: 0.875rem;
-		background: #fff;
+		background: transparent;
 		border: none;
-		border-right: 1px solid #f3f4f6;
+		border-right: 1px solid rgba(212, 199, 163, 0.06);
 		font-size: 0.7rem;
 		font-weight: 600;
 		letter-spacing: 0.05em;
-		color: #6b7280;
+		color: rgba(212, 199, 163, 0.5);
 		cursor: pointer;
 		font-family: 'JetBrains Mono', monospace;
 		text-decoration: none;
@@ -1482,23 +1440,23 @@
 	}
 
 	.action-btn:hover {
-		background: #f8f9fa;
+		background: rgba(102, 126, 234, 0.08);
 		color: #667eea;
 	}
 
 	.action-btn.primary {
-		background: #667eea;
-		color: #fff;
+		background: rgba(102, 126, 234, 0.15);
+		color: #667eea;
 	}
 
 	.action-btn.primary:hover {
-		background: #5a6fd6;
+		background: rgba(102, 126, 234, 0.25);
 	}
 
 	/* Table */
 	.poi-table-wrapper {
-		background: #fff;
-		border: 1px solid #e5e7eb;
+		background: rgba(0, 0, 0, 0.25);
+		border: 1px solid rgba(212, 199, 163, 0.08);
 		border-radius: 12px;
 		overflow: hidden;
 	}
@@ -1509,8 +1467,8 @@
 	}
 
 	.yorha-table thead {
-		background: #f9fafb;
-		border-bottom: 1px solid #e5e7eb;
+		background: rgba(0, 0, 0, 0.3);
+		border-bottom: 1px solid rgba(212, 199, 163, 0.08);
 	}
 
 	.yorha-table th {
@@ -1519,16 +1477,16 @@
 		font-size: 0.7rem;
 		font-weight: 700;
 		letter-spacing: 0.15em;
-		color: #6b7280;
+		color: rgba(212, 199, 163, 0.45);
 	}
 
 	.table-row {
-		border-bottom: 1px solid #f3f4f6;
+		border-bottom: 1px solid rgba(212, 199, 163, 0.04);
 		transition: background 0.15s;
 	}
 
 	.table-row:hover {
-		background: #f8f7ff;
+		background: rgba(102, 126, 234, 0.05);
 	}
 
 	.yorha-table td {
@@ -1541,7 +1499,7 @@
 	}
 
 	.name-link {
-		color: #1f2937;
+		color: rgba(212, 199, 163, 0.9);
 		text-decoration: none;
 		transition: color 0.2s;
 	}
@@ -1570,28 +1528,28 @@
 	}
 
 	.threat-pill.threat-low {
-		background: #d1fae5;
-		color: #065f46;
+		background: rgba(16, 185, 129, 0.15);
+		color: #34d399;
 	}
 
 	.threat-pill.threat-medium {
-		background: #fef3c7;
-		color: #92400e;
+		background: rgba(245, 158, 11, 0.15);
+		color: #fbbf24;
 	}
 
 	.threat-pill.threat-high {
-		background: #fee2e2;
-		color: #991b1b;
+		background: rgba(239, 68, 68, 0.15);
+		color: #f87171;
 	}
 
 	.threat-pill.threat-critical {
-		background: #fecaca;
-		color: #7f1d1d;
+		background: rgba(220, 38, 38, 0.2);
+		color: #ef4444;
 	}
 
 	.location-cell,
 	.date-cell {
-		color: #6b7280;
+		color: rgba(212, 199, 163, 0.5);
 		font-size: 0.8rem;
 	}
 
@@ -1603,7 +1561,7 @@
 	.icon-btn {
 		background: transparent;
 		border: none;
-		color: #9ca3af;
+		color: rgba(212, 199, 163, 0.35);
 		cursor: pointer;
 		padding: 0.25rem;
 		transition: color 0.2s;
@@ -1617,8 +1575,8 @@
 	:global(.dialog-backdrop) {
 		position: fixed;
 		inset: 0;
-		background: rgba(15, 15, 20, 0.55);
-		backdrop-filter: blur(4px);
+		background: rgba(0, 0, 0, 0.6);
+		backdrop-filter: blur(6px);
 		z-index: 1100;
 	}
 
@@ -1632,12 +1590,10 @@
 		max-width: 600px;
 		max-height: 90vh;
 		overflow-y: auto;
-		background: #fff;
+		background: #1a1d24;
+		border: 1px solid rgba(212, 199, 163, 0.1);
 		border-radius: 16px;
-		box-shadow:
-			0 24px 48px rgba(0, 0, 0, 0.12),
-			0 8px 16px rgba(0, 0, 0, 0.08),
-			0 0 0 1px rgba(0, 0, 0, 0.04);
+		box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(212, 199, 163, 0.05);
 	}
 
 	:global(.dialog-panel-sm) {
@@ -1670,13 +1626,13 @@
 	:global(.dialog-title) {
 		font-size: 1rem;
 		font-weight: 700;
-		color: #1f2937;
+		color: rgba(212, 199, 163, 0.95);
 		margin: 0;
 	}
 
 	:global(.dialog-desc) {
 		font-size: 0.775rem;
-		color: #6b7280;
+		color: rgba(212, 199, 163, 0.5);
 		margin: 0.15rem 0 0;
 	}
 
@@ -1684,7 +1640,7 @@
 		margin-left: auto;
 		background: none;
 		border: none;
-		color: #9ca3af;
+		color: rgba(212, 199, 163, 0.4);
 		padding: 6px;
 		border-radius: 8px;
 		cursor: pointer;
@@ -1692,8 +1648,8 @@
 	}
 
 	:global(.dialog-close-btn:hover) {
-		background: #f3f4f6;
-		color: #374151;
+		background: rgba(212, 199, 163, 0.08);
+		color: rgba(212, 199, 163, 0.8);
 	}
 
 	:global(.dialog-body) {
@@ -1720,26 +1676,26 @@
 		border-radius: 12px;
 		font-size: 0.8rem;
 		font-weight: 500;
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 		font-family: inherit;
 	}
 
 	.toast-success {
-		background: #f0fdf4;
-		color: #166534;
-		border: 1px solid #bbf7d0;
+		background: rgba(16, 185, 129, 0.15);
+		color: #34d399;
+		border: 1px solid rgba(16, 185, 129, 0.25);
 	}
 
 	.toast-error {
-		background: #fef2f2;
-		color: #991b1b;
-		border: 1px solid #fecaca;
+		background: rgba(239, 68, 68, 0.15);
+		color: #f87171;
+		border: 1px solid rgba(239, 68, 68, 0.25);
 	}
 
 	.toast-info {
-		background: #eff6ff;
-		color: #1e40af;
-		border: 1px solid #bfdbfe;
+		background: rgba(96, 165, 250, 0.15);
+		color: #60a5fa;
+		border: 1px solid rgba(96, 165, 250, 0.25);
 	}
 
 	/* 4-column card actions */
@@ -1749,8 +1705,8 @@
 
 	/* Similar POIs Panel */
 	.similar-panel {
-		background: #fff;
-		border: 2px solid #667eea;
+		background: rgba(0, 0, 0, 0.25);
+		border: 2px solid rgba(102, 126, 234, 0.35);
 		border-radius: 12px;
 		margin-bottom: 1.5rem;
 		overflow: hidden;
@@ -1804,7 +1760,7 @@
 		padding: 1.5rem;
 		text-align: center;
 		font-size: 0.85rem;
-		color: #9ca3af;
+		color: rgba(212, 199, 163, 0.4);
 		letter-spacing: 0.05em;
 	}
 
@@ -1820,14 +1776,14 @@
 		align-items: flex-start;
 		gap: 0.75rem;
 		padding: 1rem 1.25rem;
-		border-bottom: 1px solid #f3f4f6;
+		border-bottom: 1px solid rgba(212, 199, 163, 0.06);
 		text-decoration: none;
 		color: inherit;
 		transition: background 0.15s;
 	}
 
 	.similar-item:hover {
-		background: #f8f8ff;
+		background: rgba(102, 126, 234, 0.06);
 	}
 
 	.similar-item:last-child {
@@ -1853,7 +1809,7 @@
 		display: block;
 		font-size: 0.9rem;
 		font-weight: 600;
-		color: #1f2937;
+		color: rgba(212, 199, 163, 0.9);
 		margin-bottom: 0.25rem;
 	}
 
@@ -1862,7 +1818,7 @@
 		align-items: center;
 		gap: 0.5rem;
 		font-size: 0.7rem;
-		color: #9ca3af;
+		color: rgba(212, 199, 163, 0.4);
 		letter-spacing: 0.05em;
 	}
 
@@ -1871,7 +1827,7 @@
 		margin: 0.25rem 0 0 0;
 		padding-left: 3.75rem;
 		font-size: 0.8rem;
-		color: #6b7280;
+		color: rgba(212, 199, 163, 0.5);
 		line-height: 1.4;
 	}
 

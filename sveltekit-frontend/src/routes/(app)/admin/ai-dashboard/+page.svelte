@@ -231,6 +231,7 @@
   );
 </script>
 
+<div class="ai-dash-dark">
 <div class="ai-dash-page">
   <header class="ai-dash-header">
     <div class="ai-dash-header-left">
@@ -896,8 +897,62 @@
     {/if}
   {/if}
 </div>
+</div>
 
 <style>
+  /* Full-bleed dark wrapper */
+  .ai-dash-dark {
+    min-height: 100vh;
+    background: #0e0d0b;
+    margin: -2.5rem;
+    padding: 2.5rem;
+    color: rgb(212 199 163);
+  }
+
+  .ai-dash-dark :global(h1),
+  .ai-dash-dark :global(h2),
+  .ai-dash-dark :global(h3),
+  .ai-dash-dark :global(h4),
+  .ai-dash-dark :global(p) {
+    color: inherit;
+    text-transform: none;
+    letter-spacing: normal;
+    margin: 0;
+  }
+
+  .ai-dash-dark :global(a) {
+    color: inherit;
+    border-bottom: none;
+  }
+
+  .ai-dash-dark :global(button) {
+    text-transform: none;
+    letter-spacing: normal;
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  .ai-dash-dark :global(input),
+  .ai-dash-dark :global(select) {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: inherit;
+  }
+
+  .ai-dash-dark :global(.panel),
+  .ai-dash-dark :global(.card),
+  .ai-dash-dark :global([class*="panel"]) {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: inherit;
+    padding: 0;
+  }
+
   .ai-dash-page {
     max-width: 72rem;
     margin: 0 auto;

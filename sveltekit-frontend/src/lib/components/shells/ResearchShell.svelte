@@ -96,8 +96,8 @@
 		display: grid;
 		grid-template-columns: 240px minmax(0, 1fr);
 		min-height: 100vh;
-		background: #faf9f6;
-		color: #1a1a1a;
+		background: #131519;
+		color: rgba(212, 199, 163, 0.9);
 		font-family: 'Inter', system-ui, sans-serif;
 	}
 
@@ -107,8 +107,8 @@
 
 	/* ─── Sidebar ─── */
 	.research-sidebar {
-		background: #ffffff;
-		border-right: 1px solid #e5e2da;
+		background: rgba(0, 0, 0, 0.3);
+		border-right: 1px solid rgba(212, 199, 163, 0.08);
 		display: flex;
 		flex-direction: column;
 		height: 100vh;
@@ -118,7 +118,7 @@
 
 	.sidebar-brand {
 		padding: 1.25rem 1rem;
-		border-bottom: 1px solid #e5e2da;
+		border-bottom: 1px solid rgba(212, 199, 163, 0.08);
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
@@ -127,12 +127,12 @@
 	.brand-icon {
 		width: 36px;
 		height: 36px;
-		background: #fef3c7;
+		background: rgba(96, 165, 250, 0.12);
 		border-radius: 8px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: #d97706;
+		color: rgba(96, 165, 250, 0.9);
 		flex-shrink: 0;
 	}
 
@@ -140,14 +140,14 @@
 		font-size: 0.875rem;
 		font-weight: 600;
 		margin: 0;
-		color: #1a1a1a;
+		color: rgba(212, 199, 163, 0.9);
 		letter-spacing: -0.01em;
 	}
 
 	.brand-subtitle {
 		font-size: 0.6875rem;
 		margin: 0;
-		color: #8a8a8a;
+		color: rgba(212, 199, 163, 0.35);
 	}
 
 	/* ─── Nav ─── */
@@ -164,32 +164,32 @@
 		padding: 0.5rem 0.75rem;
 		border-radius: 0.5rem;
 		font-size: 0.8125rem;
-		color: #5a5a5a;
+		color: rgba(212, 199, 163, 0.45);
 		text-decoration: none;
 		transition: all 0.15s ease;
 		margin-bottom: 2px;
 	}
 
 	.nav-link:hover {
-		background: #f5f3ef;
-		color: #1a1a1a;
+		background: rgba(212, 199, 163, 0.06);
+		color: rgba(212, 199, 163, 0.8);
 	}
 
 	.nav-link.active {
-		background: #fef3c7;
-		color: #d97706;
+		background: rgba(96, 165, 250, 0.12);
+		color: rgba(96, 165, 250, 0.95);
 		font-weight: 500;
 	}
 
 	.sidebar-bridge {
 		padding: 0.5rem;
-		border-top: 1px solid #e5e2da;
+		border-top: 1px solid rgba(212, 199, 163, 0.08);
 	}
 
 	/* ─── Mode Switch ─── */
 	.sidebar-footer {
 		padding: 0.75rem;
-		border-top: 1px solid #e5e2da;
+		border-top: 1px solid rgba(212, 199, 163, 0.08);
 	}
 
 	.mode-switch {
@@ -199,15 +199,15 @@
 		padding: 0.5rem 0.75rem;
 		border-radius: 0.5rem;
 		font-size: 0.75rem;
-		color: #5a5a5a;
+		color: rgba(212, 199, 163, 0.45);
 		text-decoration: none;
-		background: #f5f3ef;
+		background: rgba(212, 199, 163, 0.04);
 		transition: all 0.15s ease;
 	}
 
 	.mode-switch:hover {
-		background: #1a1a1a;
-		color: #c4b998;
+		background: rgba(96, 165, 250, 0.1);
+		color: rgba(96, 165, 250, 0.9);
 	}
 
 	.mode-switch :global(svg:last-child) {
@@ -229,13 +229,13 @@
 		font-size: 1.375rem;
 		font-weight: 600;
 		margin: 0;
-		color: #1a1a1a;
+		color: rgba(212, 199, 163, 0.95);
 		letter-spacing: -0.02em;
 	}
 
 	.research-subtitle {
 		font-size: 0.8125rem;
-		color: #8a8a8a;
+		color: rgba(212, 199, 163, 0.4);
 		margin: 0.25rem 0 0;
 	}
 

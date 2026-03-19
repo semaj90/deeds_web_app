@@ -412,13 +412,10 @@
 </div>
 
 <style>
-	:global(body) {
-		background: #0c0a09;
-	}
-
 	.command-shell {
 		position: relative;
 		min-height: 100vh;
+		margin: -2.5rem;
 		padding: 1.25rem;
 		background:
 			radial-gradient(circle at top, rgba(22, 101, 52, 0.14), transparent 24%),
@@ -426,6 +423,49 @@
 			linear-gradient(180deg, #13100f 0%, #0d0b0a 52%, #080707 100%);
 		color: #e7e5e4;
 		font-family: 'JetBrains Mono', 'Courier New', monospace;
+	}
+
+	.command-shell :global(h1),
+	.command-shell :global(h2),
+	.command-shell :global(h3),
+	.command-shell :global(p) {
+		color: inherit;
+		text-transform: none;
+		letter-spacing: normal;
+		margin: 0;
+	}
+
+	.command-shell :global(a) {
+		color: inherit;
+		border-bottom: none;
+	}
+
+	.command-shell :global(button) {
+		text-transform: none;
+		letter-spacing: normal;
+		background: none;
+		border: none;
+		box-shadow: none;
+		padding: 0;
+		color: inherit;
+	}
+
+	.command-shell :global(input),
+	.command-shell :global(select) {
+		background: transparent;
+		border: none;
+		box-shadow: none;
+		color: inherit;
+	}
+
+	.command-shell :global(.panel),
+	.command-shell :global(.card),
+	.command-shell :global([class*="panel"]) {
+		background: transparent;
+		border: none;
+		box-shadow: none;
+		color: inherit;
+		padding: 0;
 	}
 
 	.command-shell__glow {
