@@ -111,50 +111,58 @@ export const GET: RequestHandler = async () => {
 	} catch (err) {
 		console.error('[CacheStats] Error:', err);
 		return json({
-			success: false,
-			error: 'Failed to fetch cache statistics',
-			data: {
-				redis: {
-					connected: false,
-					totalKeys: 0,
-					memoryUsed: 0,
-					memoryPeak: 0,
-					uptimeMs: 0,
-					connectedClients: 0,
-					keyPatterns: []
-				},
-				template: {
-					totalKeys: 0,
-					metadataKeys: 0,
-					aiContentKeys: 0,
-					renderedKeys: 0
-				},
-				export: {
-					totalKeys: 0,
-					formats: {},
-					totalSizeBytes: 0,
-					oldestExport: null,
-					newestExport: null
-				},
-				llm: {
-					totalResponses: 0,
-					hits: 0,
-					misses: 0,
-					hitRate: 0
-				},
-				memory: {
-					size: 0,
-					estimatedSize: 0,
-					defaultTTL: 300_000,
-					hitRate: 0
-				},
-				metrics: {
-					overall: { hitRate: '0%', totalRequests: 0, hits: 0, misses: 0, errors: 0, errorRate: '0%' },
-					performance: { averageGetTime: '0ms', averageSetTime: '0ms' },
-					topPatterns: [],
-					recommendations: []
-				}
-			}
-		}, { status: 500 });
+      success: false,
+      message: 'Cache backends unavailable; showing fallback stats',
+      error: 'Failed to fetch cache statistics',
+      data: {
+        redis: {
+          connected: false,
+          totalKeys: 0,
+          memoryUsed: 0,
+          memoryPeak: 0,
+          uptimeMs: 0,
+          connectedClients: 0,
+          keyPatterns: [],
+        },
+        template: {
+          totalKeys: 0,
+          metadataKeys: 0,
+          aiContentKeys: 0,
+          renderedKeys: 0,
+        },
+        export: {
+          totalKeys: 0,
+          formats: {},
+          totalSizeBytes: 0,
+          oldestExport: null,
+          newestExport: null,
+        },
+        llm: {
+          totalResponses: 0,
+          hits: 0,
+          misses: 0,
+          hitRate: 0,
+        },
+        memory: {
+          size: 0,
+          estimatedSize: 0,
+          defaultTTL: 300_000,
+          hitRate: 0,
+        },
+        metrics: {
+          overall: {
+            hitRate: '0%',
+            totalRequests: 0,
+            hits: 0,
+            misses: 0,
+            errors: 0,
+            errorRate: '0%',
+          },
+          performance: { averageGetTime: '0ms', averageSetTime: '0ms' },
+          topPatterns: [],
+          recommendations: [],
+        },
+      },
+    });
 	}
 };

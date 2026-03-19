@@ -183,9 +183,17 @@
 		color: #f87171;
 	}
 	.ld-page {
-		padding: 1.5rem;
+		padding: 1.5rem 2.5rem;
+		margin: -2.5rem;
+		min-height: 100vh;
+		background: #0e0d0b;
 		color: rgba(212, 199, 163, 0.9);
 	}
+	.ld-page :global(h1), .ld-page :global(h2), .ld-page :global(h3), .ld-page :global(h4), .ld-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+	.ld-page :global(a) { color: inherit; border-bottom: none; }
+	.ld-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	.ld-page :global(input), .ld-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+	.ld-page :global(.panel), .ld-page :global(.card), .ld-page :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
 	/* ── Header ── */
 	.ld-header {

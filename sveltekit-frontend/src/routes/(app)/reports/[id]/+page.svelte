@@ -89,7 +89,7 @@
 	}
 </script>
 
-<div class="min-h-screen bg-background">
+<div class="report-view-page">
 	{#if loading}
 		<div class="flex items-center justify-center h-screen">
 			<Icon name="loader-circle" class="w-8 h-8 animate-spin text-accent" />
@@ -214,6 +214,19 @@
 </div>
 
 <style>
+	.report-view-page {
+		min-height: 100vh;
+		background: #0e0d0b;
+		color: #d4c7a3;
+		margin: -2.5rem;
+		padding: 0 2.5rem;
+	}
+	.report-view-page :global(h1), .report-view-page :global(h2), .report-view-page :global(h3), .report-view-page :global(h4), .report-view-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; }
+	.report-view-page :global(a) { color: inherit; border-bottom: none; }
+	.report-view-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	.report-view-page :global(input), .report-view-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+	.report-view-page :global(.panel), .report-view-page :global(.card), .report-view-page :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
+
 	:global(.prose) {
 		color: #e5e7eb;
 	}

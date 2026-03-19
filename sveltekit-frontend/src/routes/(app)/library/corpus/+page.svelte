@@ -246,7 +246,12 @@
 
 <style>
 	/* ── Page ── */
-	.co-page { padding: 1.5rem; color: rgba(212, 199, 163, 0.9); }
+	.co-page { padding: 1.5rem 2.5rem; margin: -2.5rem; min-height: 100vh; background: #0e0d0b; color: rgba(212, 199, 163, 0.9); }
+	.co-page :global(h1), .co-page :global(h2), .co-page :global(h3), .co-page :global(h4), .co-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+	.co-page :global(a) { color: inherit; border-bottom: none; }
+	.co-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	.co-page :global(input), .co-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+	.co-page :global(.panel), .co-page :global(.card), .co-page :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
 	/* ── Header ── */
 	.co-header {

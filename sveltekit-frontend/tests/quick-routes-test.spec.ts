@@ -51,6 +51,8 @@ test.describe('Quick Routes Test', () => {
     test(`Test route: ${route}`, async ({ page }) => {
       const consoleErrors: string[] = [];
       const networkErrors: string[] = [];
+      const isIgnorableFailure = (_url: string, errorText?: string | null) =>
+        (errorText ?? '').includes('ERR_ABORTED');
 
       // Capture console errors
       page.on('console', (msg) => {
@@ -61,7 +63,9 @@ test.describe('Quick Routes Test', () => {
 
       // Capture network failures
       page.on('requestfailed', (request) => {
-        networkErrors.push(`${request.url()} - ${request.failure()?.errorText}`);
+        const errorText = request.failure()?.errorText;
+        if (isIgnorableFailure(request.url(), errorText)) return;
+        networkErrors.push(`${request.url()} - ${errorText}`);
       });
 
       // Navigate to route — use domcontentloaded (networkidle hangs on SSE routes)

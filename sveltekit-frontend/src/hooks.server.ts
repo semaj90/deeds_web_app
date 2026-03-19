@@ -350,8 +350,8 @@ export const handle: Handle = async ({ event, resolve }) => {
       email: 'admin@yorha.dev',
       username: '2B',
       role: 'admin',
-      hasCompletedOnboarding: false,
-      onboardingStep: 0,
+      hasCompletedOnboarding: true,
+      onboardingStep: 10,
     };
 		event.locals.session = {
 			id: '00000000-0000-0000-0000-000000000002',

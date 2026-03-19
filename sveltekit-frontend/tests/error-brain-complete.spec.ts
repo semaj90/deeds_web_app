@@ -10,6 +10,7 @@ import { test, expect } from '@playwright/test';
 
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
 const API_BASE = `${BASE_URL}/api/internal/error-brain`;
+const KNOWLEDGE_API_BASE = `${BASE_URL}/api/knowledge`;
 
 test.describe('Error-Brain Core API', () => {
   test('GET /status — should respond', async ({ request }) => {
@@ -25,7 +26,8 @@ test.describe('Error-Brain Core API', () => {
     const response = await request.get(`${API_BASE}/runs`);
     if (response.ok()) {
       const data = await response.json();
-      expect(Array.isArray(data)).toBeTruthy();
+      const runs = Array.isArray(data) ? data : data.runs;
+      expect(Array.isArray(runs)).toBeTruthy();
     }
     // 404 or 500 is acceptable — endpoint may not exist
     expect(response.status()).toBeLessThan(600);
@@ -35,8 +37,8 @@ test.describe('Error-Brain Core API', () => {
     const response = await request.post(`${API_BASE}/runs`, {
       data: {
         scanPaths: ['src/lib/error-brain'],
-        options: { dryRun: true, maxErrors: 100 }
-      }
+        options: { dryRun: true, maxErrors: 100 },
+      },
     });
     if (response.ok()) {
       const data = await response.json();
@@ -48,25 +50,25 @@ test.describe('Error-Brain Core API', () => {
 
 test.describe('Knowledge Base API', () => {
   test('GET /knowledge/stats — should respond', async ({ request }) => {
-    const response = await request.get(`${API_BASE}/knowledge/stats`);
+    const response = await request.get(`${KNOWLEDGE_API_BASE}/stats`);
     if (response.ok()) {
       const data = await response.json();
-      expect(data).toHaveProperty('totalPatterns');
+      expect(data).toHaveProperty('stats');
+      expect(data.stats).toHaveProperty('totalDocuments');
     }
     expect(response.status()).toBeLessThan(600);
   });
 
   test('POST /knowledge/search — should respond', async ({ request }) => {
-    const response = await request.post(`${API_BASE}/knowledge/search`, {
+    const response = await request.post(`${KNOWLEDGE_API_BASE}/search`, {
       data: {
-        errorMessage: 'Cannot find module "typescript"',
-        filePath: 'src/lib/types.ts',
-        errorCode: 'TS2307',
-      }
+        query: 'typescript module resolution',
+        topK: 5,
+      },
     });
     if (response.ok()) {
       const data = await response.json();
-      expect(data).toHaveProperty('similarErrors');
+      expect(Array.isArray(data.results)).toBeTruthy();
     }
     expect(response.status()).toBeLessThan(600);
   });
@@ -74,14 +76,14 @@ test.describe('Knowledge Base API', () => {
 
 test.describe('Error-Brain Dashboard UI', () => {
   test('should load error-brain page without crash', async ({ page }) => {
-    const response = await page.goto(`${BASE_URL}/error-brain`, {
+    const response = await page.goto(`${BASE_URL}/admin/error-brain`, {
       waitUntil: 'domcontentloaded',
       timeout: 15000,
     });
 
     const status = response?.status() ?? 0;
     if (status === 404) {
-      console.log('ℹ️  /error-brain route not found — not implemented');
+      console.log('ℹ️  /admin/error-brain route not found — not implemented');
       return;
     }
 
@@ -92,10 +94,12 @@ test.describe('Error-Brain Dashboard UI', () => {
 
   test('should handle error state gracefully', async ({ page, context }) => {
     // Load page first while online
-    await page.goto(`${BASE_URL}/error-brain`, {
-      waitUntil: 'domcontentloaded',
-      timeout: 15000,
-    }).catch(() => null);
+    await page
+      .goto(`${BASE_URL}/admin/error-brain`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 15000,
+      })
+      .catch(() => null);
 
     // Then simulate offline
     await context.setOffline(true);
@@ -115,14 +119,14 @@ test.describe('Error-Brain Dashboard UI', () => {
 
 test.describe('Error-Brain Runs UI', () => {
   test('should load runs list page without crash', async ({ page }) => {
-    const response = await page.goto(`${BASE_URL}/error-brain/runs`, {
+    const response = await page.goto(`${BASE_URL}/admin/error-brain/runs`, {
       waitUntil: 'domcontentloaded',
       timeout: 15000,
     });
 
     const status = response?.status() ?? 0;
     if (status === 404) {
-      console.log('ℹ️  /error-brain/runs route not found');
+      console.log('ℹ️  /admin/error-brain/runs route not found');
       return;
     }
 

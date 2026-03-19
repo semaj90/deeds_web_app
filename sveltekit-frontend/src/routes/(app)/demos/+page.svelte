@@ -52,6 +52,7 @@
 	];
 
 	const showcases: Demo[] = [
+		{ href: '/demos/bits-ui', label: 'Bits UI Showcase', description: 'Headless Bits UI v2 patterns for dialogs, selects, inputs, and polished legal-AI interface primitives.', icon: 'layout', category: 'ui' },
 		{ href: '/evidence-canvas-demo', label: 'Evidence Canvas Demo', description: '11 visualization engines including Canvas, Fabric.js, D3.js, provenance graph, and AI similarity.', icon: 'pen-tool', category: 'visualization' },
 		{ href: '/evidence-library', label: 'Evidence Library', description: 'Evidence analysis with custody timeline, police reports, stats panel, and RAG document grid.', icon: 'library', category: 'ai' },
 		{ href: '/citations', label: 'Citations & KB Search', description: 'Legal glossary, statutes, and precedents with RAG semantic search and pgvector cosine ranking.', icon: 'scroll', category: 'ai' },
@@ -927,6 +928,7 @@
 		color: rgba(212, 199, 163, 0.38);
 		flex: 1;
 		display: -webkit-box;
+		line-clamp: 3;
 		-webkit-line-clamp: 3;
 		-webkit-box-orient: vertical;
 		overflow: hidden;

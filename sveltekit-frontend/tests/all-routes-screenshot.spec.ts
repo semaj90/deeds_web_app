@@ -20,11 +20,8 @@ const routes = [
   '/admin/component-analysis',
   '/admin/knowledge-search',
   '/admin/phase89',
-  '/agentic-errors',
-  '/agentic-errors/analysis',
   '/admin/all-routes',
   '/analysis-center',
-  '/ast-topology',
   '/cases',
   '/cases/test-case-1', // Replace [id] with test data
   '/cases/test-case-1/ai',
@@ -36,8 +33,6 @@ const routes = [
   '/cases/test-case-1/persons',
   '/cases/create',
   '/cases/new',
-  '/codebase-index',
-  '/codebase-index/1', // Replace [fileId] with test data
   '/command-center',
   '/command-center/codebase',
   '/command-center/codebase/clusters/1', // Replace [id] with test data
@@ -55,9 +50,6 @@ const routes = [
   '/global-search',
   '/persons-of-interest',
   '/persons-of-interest/create',
-  '/phase78/monitor',
-  '/phase78/patches',
-  '/phase78/routes/test-route', // Replace [routePath] with test data
   '/system-configuration',
   '/terminal',
   '/acp',

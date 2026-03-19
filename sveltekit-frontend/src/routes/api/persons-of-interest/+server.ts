@@ -12,6 +12,7 @@ const createPOISchema = z.object({
 	threatLevel: z.enum(['low', 'medium', 'high', 'critical']).default('low'),
 	aliases: z.array(z.string()).optional(),
 	relationship: z.string().max(500).optional(),
+	crimes: z.array(z.string()).optional(),
 	caseIds: z.array(z.string()).optional(),
 });
 
@@ -54,6 +55,7 @@ export const GET: RequestHandler = async ({ url }) => {
 					description: personsOfInterest.description,
 					aliases: personsOfInterest.aliases,
 					relationship: personsOfInterest.relationship,
+					crimes: personsOfInterest.crimes,
 					caseIds: personsOfInterest.caseIds,
 					confidence: personsOfInterest.confidence,
 					createdAt: personsOfInterest.createdAt,
@@ -104,6 +106,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				threatLevel: parsed.data.threatLevel,
 				aliases: parsed.data.aliases ?? [],
 				relationship: parsed.data.relationship ?? null,
+				crimes: parsed.data.crimes ?? [],
 				caseIds: parsed.data.caseIds ?? [],
 			})
 			.returning();

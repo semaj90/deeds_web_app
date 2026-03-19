@@ -962,13 +962,20 @@
 
 	/* ── Page Container ── */
 	.reader-page {
-		padding: 1rem 1rem 2rem;
-		max-width: 1440px;
-		margin: 0 auto;
+		min-height: 100vh;
+		background: #0e0d0b;
+		color: #d4c7a3;
+		margin: -2.5rem;
+		padding: 1rem max(1rem, calc(50% - 720px)) 2rem;
 	}
 	@media (min-width: 1024px) {
-		.reader-page { padding: 1rem 1.5rem 2rem; }
+		.reader-page { padding: 1rem max(1.5rem, calc(50% - 720px)) 2rem; }
 	}
+	.reader-page :global(h1), .reader-page :global(h2), .reader-page :global(h3), .reader-page :global(h4), .reader-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+	.reader-page :global(a) { color: inherit; border-bottom: none; }
+	.reader-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	.reader-page :global(input), .reader-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+	.reader-page :global(.panel), .reader-page :global(.card), .reader-page :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
 	/* ── Error State ── */
 	.error-center {

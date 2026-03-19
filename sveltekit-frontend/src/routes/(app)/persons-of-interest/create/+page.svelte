@@ -15,10 +15,16 @@
 
 <style>
 	.create-page {
-		padding: 2rem;
+		padding: 2rem 2.5rem;
+		margin: -2.5rem;
 		background: #0f0f23;
 		min-height: 100vh;
 	}
+	.create-page :global(h1), .create-page :global(h2), .create-page :global(h3), .create-page :global(h4), .create-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+	.create-page :global(a) { color: inherit; border-bottom: none; }
+	.create-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	.create-page :global(input), .create-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+	.create-page :global(.panel), .create-page :global(.card), .create-page :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
 	.page-header {
 		display: flex;

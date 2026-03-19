@@ -10,7 +10,9 @@ test.describe('ErrorBrainModal Integration Tests', () => {
 
 	test('should load all-routes page with route list', async ({ page }) => {
 		// Page has NES Command Center title
-		await expect(page.locator('h1')).toContainText('NES COMMAND CENTER');
+		await expect(page.locator('.nes-command-center .nes-header h1')).toContainText(
+      'NES COMMAND CENTER'
+    );
 		// Stats bar is always visible (even with no routes)
 		await expect(page.locator('.stats-bar')).toBeVisible();
 	});

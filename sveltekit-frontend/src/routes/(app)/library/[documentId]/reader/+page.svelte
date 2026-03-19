@@ -304,9 +304,16 @@
 		height: 100%;
 		display: flex;
 		flex-direction: column;
+		margin: -2.5rem;
+		background: #0e0d0b;
 		color: rgba(212, 199, 163, 0.9);
 		overflow: hidden;
 	}
+	.lr-page :global(h1), .lr-page :global(h2), .lr-page :global(h3), .lr-page :global(h4), .lr-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+	.lr-page :global(a) { color: inherit; border-bottom: none; }
+	.lr-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	.lr-page :global(input), .lr-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+	.lr-page :global(.panel), .lr-page :global(.card), .lr-page :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
 	/* ── Top bar ── */
 	.lr-topbar {

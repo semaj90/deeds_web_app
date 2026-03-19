@@ -14,6 +14,7 @@ const updatePoiSchema = z.object({
   threatLevel: z.enum(['low', 'medium', 'high', 'critical']).optional(),
   status: z.enum(['surveillance', 'wanted', 'active', 'cleared']).optional(),
   relationship: z.string().max(500).optional(),
+  crimes: z.array(z.string()).optional(),
   caseIds: z.array(z.string()).optional(),
 });
 
@@ -81,6 +82,7 @@ export const PATCH: RequestHandler = async ({ params, request }) => {
     if (data.threatLevel !== undefined) updates.threatLevel = data.threatLevel;
     if (data.status !== undefined) updates.status = data.status;
     if (data.relationship !== undefined) updates.relationship = data.relationship;
+    if (data.crimes !== undefined) updates.crimes = data.crimes;
     if (data.caseIds !== undefined) updates.caseIds = data.caseIds;
     updates.updatedAt = sql`now()`;
 

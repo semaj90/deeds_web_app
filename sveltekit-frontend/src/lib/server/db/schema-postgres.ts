@@ -956,6 +956,28 @@ export const poiPhotos = pgTable('poi_photos',
  })
 );
 
+// === TIMELINE EVENTS ===
+
+export const timelineEvents = pgTable('timeline_events', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	poiId: uuid('poi_id').references(() => personsOfInterest.id, { onDelete: 'cascade' }),
+	caseId: uuid('case_id'),
+	title: varchar('title', { length: 500 }).notNull(),
+	description: text('description'),
+	eventDate: timestamp('event_date', { withTimezone: true }).notNull(),
+	eventType: varchar('event_type', { length: 100 }).default('general'),
+	location: varchar('location', { length: 500 }),
+	severity: varchar('severity', { length: 20 }).default('low'),
+	metadata: jsonb('metadata'),
+	createdBy: uuid('created_by'),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`now()`),
+}, (table) => [
+	index('idx_timeline_events_poi_id').on(table.poiId),
+	index('idx_timeline_events_case_id').on(table.caseId),
+	index('idx_timeline_events_event_date').on(table.eventDate),
+]);
+
 // === AI/VECTOR TABLES (Missing Definitions) ===
 
 export const hashVerifications = pgTable('hash_verifications', {

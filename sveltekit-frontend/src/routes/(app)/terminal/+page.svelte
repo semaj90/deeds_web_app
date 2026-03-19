@@ -552,6 +552,7 @@
 		display: flex;
 		flex-direction: column;
 		height: 100vh;
+		margin: -2.5rem;
 		font-family: 'JetBrains Mono', ui-monospace, monospace;
 		background: #0c0a09;
 		color: #e7e5e4;

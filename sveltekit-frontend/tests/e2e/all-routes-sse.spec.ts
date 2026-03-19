@@ -16,7 +16,9 @@ test.describe('All Routes SSE Integration', () => {
   });
 
   test('should display NES COMMAND CENTER heading', async ({ page }) => {
-    await expect(page.locator('h1')).toHaveText('NES COMMAND CENTER');
+    await expect(page.locator('.nes-command-center .nes-header h1')).toHaveText(
+      'NES COMMAND CENTER'
+    );
   });
 
   test('should display stats bar with route counts', async ({ page }) => {
@@ -158,7 +160,7 @@ test.describe('All Routes SSE Performance', () => {
 
     await page.goto('/admin/all-routes');
     await page.waitForLoadState('domcontentloaded');
-    await expect(page.locator('h1')).toBeVisible();
+    await expect(page.locator('.nes-command-center .nes-header h1')).toBeVisible();
 
     const loadTime = Date.now() - startTime;
     expect(loadTime).toBeLessThan(5000);

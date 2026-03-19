@@ -199,7 +199,16 @@
 <style>
 	.edit-report-page {
 		min-height: 100vh;
+		background: #0e0d0b;
+		color: #d4c7a3;
+		margin: -2.5rem;
+		padding: 0 2.5rem;
 	}
+	.edit-report-page :global(h1), .edit-report-page :global(h2), .edit-report-page :global(h3), .edit-report-page :global(h4), .edit-report-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+	.edit-report-page :global(a) { color: inherit; border-bottom: none; }
+	.edit-report-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	.edit-report-page :global(input), .edit-report-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+	.edit-report-page :global(.panel), .edit-report-page :global(.card), .edit-report-page :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
 	/* ── Loading / Error ── */
 	.er-loading {

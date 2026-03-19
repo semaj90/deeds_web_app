@@ -196,10 +196,17 @@
 
 <style>
 	.upload-container {
-		max-width: 600px;
-		margin: 0 auto;
-		padding: 2rem;
+		min-height: 100vh;
+		background: #0e0d0b;
+		color: #d4c7a3;
+		margin: -2.5rem;
+		padding: 2rem max(1.5rem, calc(50% - 300px));
 	}
+	.upload-container :global(h1), .upload-container :global(h2), .upload-container :global(h3), .upload-container :global(h4), .upload-container :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+	.upload-container :global(a) { color: inherit; border-bottom: none; }
+	.upload-container :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	.upload-container :global(input), .upload-container :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+	.upload-container :global(.panel), .upload-container :global(.card), .upload-container :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
 	.upload-header {
 		text-align: center;

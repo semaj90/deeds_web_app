@@ -11,7 +11,7 @@
 	<title>Citation: {data.label} | Legal Corpus</title>
 </svelte:head>
 
-<div class="min-h-screen bg-black flex items-center justify-center p-6">
+<div class="citation-fallback-page">
 	<Card class="max-w-md w-full bg-panel border-accent/20">
 		<CardContent class="p-8 text-center">
 			<div class="mb-4 flex justify-center">
@@ -44,3 +44,18 @@
 		</CardContent>
 	</Card>
 </div>
+
+<style>
+	.citation-fallback-page {
+		min-height: 100vh;
+		background: black;
+		margin: -2.5rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 1.5rem;
+	}
+	.citation-fallback-page :global(h1), .citation-fallback-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+	.citation-fallback-page :global(button) { text-transform: none; letter-spacing: normal; }
+	.citation-fallback-page :global(.panel), .citation-fallback-page :global(.card), .citation-fallback-page :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
+</style>

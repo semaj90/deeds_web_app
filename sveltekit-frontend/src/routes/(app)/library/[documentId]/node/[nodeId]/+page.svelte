@@ -393,10 +393,16 @@
 		background: #0a0b10;
 		color: #e0e0e0;
 		height: 100%;
+		margin: -2.5rem;
 		display: flex;
 		flex-direction: column;
 		font-family: 'Inter', sans-serif;
 	}
+	.legal-dashboard-root :global(h1), .legal-dashboard-root :global(h2), .legal-dashboard-root :global(h3), .legal-dashboard-root :global(h4), .legal-dashboard-root :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+	.legal-dashboard-root :global(a) { color: inherit; border-bottom: none; }
+	.legal-dashboard-root :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	.legal-dashboard-root :global(input), .legal-dashboard-root :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+	.legal-dashboard-root :global(.panel), .legal-dashboard-root :global(.card), .legal-dashboard-root :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
 	.dashboard-navbar {
 		height: 48px;
