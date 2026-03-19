@@ -12,7 +12,7 @@ const routes = [
   { path: '/cases', title: 'Cases' },
   { path: '/demo/vector-intelligence', title: 'Vector' },
   { path: '/demo/ui-components', title: 'Components' },
-  { path: '/error-brain', title: 'Error-Brain Dashboard' },
+  { path: '/admin/error-brain', title: 'Error-Brain Dashboard' },
   { path: '/error-brain/runs', title: 'Error-Brain Runs' },
 ];
 

@@ -29,7 +29,7 @@ test.describe('Core route smoke checks', () => {
   });
 
   test('all routes directory renders', async ({ page }) => {
-    await page.goto('/all-routes');
+    await page.goto('/admin/all-routes');
 
     const placeholder = page.locator(`text=${PLACEHOLDER_TEXT}`);
     if (await placeholder.first().isVisible()) {

@@ -84,13 +84,8 @@
 		}
 	});
 
-	// Global keyboard shortcut: Ctrl+K / Cmd+K
+	// Escape key to close (Ctrl+K is handled by GlobalCommandPalette in root layout)
 	function handleGlobalKeydown(e: KeyboardEvent) {
-		if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-			e.preventDefault();
-			if (isOpen) close();
-			else open();
-		}
 		if (e.key === 'Escape' && isOpen) {
 			close();
 		}

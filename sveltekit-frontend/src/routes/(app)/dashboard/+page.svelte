@@ -20,13 +20,10 @@
   import RecentActivity from '$lib/components/yorha/dashboard/RecentActivity.svelte';
   import LegalDisclaimer from '$lib/components/LegalDisclaimer.svelte';
   import AIAssistantButton from '$lib/components/ai/AIAssistantButton.svelte';
-  import CommandPalette from '$lib/components/ui/CommandPalette.svelte';
   import ActiveCasesWidget from '$lib/components/yorha/dashboard/ActiveCasesWidget.svelte';
   import YoRHaDataViz from '$lib/components/yorha/_simulations/YoRHaDataViz.svelte';
   import Icon from '$lib/components/ui/Icon.svelte';
   import PipelineOverview from '$lib/components/dashboard/PipelineOverview.svelte';
-
-  let showCommandPalette = $state(false);
 
   // ═══ WWWH Use Case Generator ═══
   let wwwhNotes = $state('');
@@ -232,10 +229,7 @@
   }
 
   function handleGlobalKeydown(e: KeyboardEvent) {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-      e.preventDefault();
-      showCommandPalette = !showCommandPalette;
-    }
+    // Ctrl+K is handled by GlobalCommandPalette in root layout
     if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
       e.preventDefault();
       goto('/cases/new');
@@ -866,7 +860,7 @@
             <div class="demos-grid">
               {#each [
                 { href: '/evidence', label: 'Evidence Hub', desc: 'CustodyFlow, Summarizer, FileUpload, Connections', count: 4 },
-                { href: '/ai-dashboard', label: 'AI Dashboard', desc: 'ContextualChat, EnhancedAIChat, Gemma, Streaming', count: 4 },
+                { href: '/admin/ai-dashboard', label: 'AI Dashboard', desc: 'ContextualChat, EnhancedAIChat, Gemma, Streaming', count: 4 },
                 { href: '/admin/all-routes', label: 'Route Inspector', desc: 'Inspector, Detective, Working, Graph, OpsLog', count: 5 },
                 { href: '/cases/new', label: 'New Case Form', desc: 'CaseForm with WHO/WHAT/WHY auto-populator', count: 1 },
                 { href: '/active-cases', label: 'Active Cases', desc: 'CaseScoringDashboard with AI risk analysis', count: 1 },
@@ -904,7 +898,7 @@
             { href: '/evidence', label: '/evidence', kind: 'page', icon: 'doc' },
             { href: '/citations', label: '/citations', kind: 'page', icon: 'doc' },
             { href: '/persons-of-interest', label: '/poi', kind: 'page', icon: 'doc' },
-            { href: '/ai-dashboard', label: '/ai', kind: 'page', icon: 'ai' },
+            { href: '/admin/ai-dashboard', label: '/ai', kind: 'page', icon: 'ai' },
             { href: '/global-search', label: '/search', kind: 'page', icon: 'doc' },
             { href: '/admin/all-routes', label: '/all-routes', kind: 'endpoint', icon: 'endpoint' },
             { href: '/terminal', label: '/terminal', kind: 'page', icon: 'endpoint' },
@@ -939,9 +933,8 @@
 <!-- Floating AI Assistant Button -->
 <AIAssistantButton variant="floating" position="bottom-right" />
 
-<!-- Command Palette (Ctrl+K) -->
+<!-- Ctrl+N shortcut -->
 <svelte:window onkeydown={handleGlobalKeydown} />
-<CommandPalette bind:open={showCommandPalette} />
 
 <style>
   /* Full-bleed dark wrapper */

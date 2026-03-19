@@ -39,7 +39,7 @@ const routes = [
   '/admin/phase89',
   '/agentic-errors',
   '/agentic-errors/analysis',
-  '/all-routes',
+  '/admin/all-routes',
   '/analysis-center',
   '/ast-topology',
   '/cases',

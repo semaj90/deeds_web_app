@@ -116,7 +116,7 @@
 	<SetupWizard
 		isAuthenticated={data.isAuthenticated}
 		userId={data.user.id}
-		initialHasCompletedOnboarding={data.user.hasCompletedOnboarding ?? false}
+		initialHasCompletedOnboarding={data.user.hasCompletedOnboarding ?? true}
 		initialOnboardingStep={data.user.onboardingStep ?? 0}
 	/>
 {/if}

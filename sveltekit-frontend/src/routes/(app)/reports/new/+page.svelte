@@ -49,7 +49,7 @@
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					credentials: 'include',
-					body: JSON.stringify({ caseId, title: title.trim(), contentHtml: '<p>Start writing your report...</p>', status: 'draft', metadata: { reportType: selectedType } })
+					body: JSON.stringify({ caseId, title: title.trim(), type: selectedType, contentHtml: '<p>Start writing your report...</p>', status: 'draft', metadata: { reportType: selectedType } })
 				});
 				if (!res.ok) { const data = await res.json(); throw new Error(data.message || 'Failed to create report'); }
 				const data = await res.json();

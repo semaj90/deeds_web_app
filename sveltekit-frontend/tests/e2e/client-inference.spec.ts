@@ -239,13 +239,10 @@ test.describe('Client-Side ONNX Inference Pipeline', () => {
   });
 
   test('5. Cosine similarity between related vs unrelated queries', async ({ page }) => {
-    await page.goto('/ai-dashboard');
+    await page.goto('/admin/ai-dashboard');
     await page.waitForLoadState('networkidle');
 
-    await page.waitForFunction(
-      () => !!(window as any).__deedsClientInference,
-      { timeout: 30_000 }
-    );
+    await page.waitForFunction(() => !!(window as any).__deedsClientInference, { timeout: 30_000 });
 
     await page.evaluate(() => (window as any).__deedsClientInference.preload());
 
@@ -258,7 +255,9 @@ test.describe('Client-Side ONNX Inference Pipeline', () => {
 
       // Cosine similarity helper
       function cosine(a: number[], b: number[]) {
-        let dot = 0, normA = 0, normB = 0;
+        let dot = 0,
+          normA = 0,
+          normB = 0;
         for (let i = 0; i < a.length; i++) {
           dot += a[i] * b[i];
           normA += a[i] * a[i];
@@ -272,10 +271,18 @@ test.describe('Client-Side ONNX Inference Pipeline', () => {
       const simUnrelated = cosine(q1.vector, q3.vector);
 
       return {
-        related: { query1: 'breach of fiduciary duty', query2: 'fiduciary obligation violation', similarity: simRelated },
-        unrelated: { query1: 'breach of fiduciary duty', query2: 'chocolate cake recipe', similarity: simUnrelated },
+        related: {
+          query1: 'breach of fiduciary duty',
+          query2: 'fiduciary obligation violation',
+          similarity: simRelated,
+        },
+        unrelated: {
+          query1: 'breach of fiduciary duty',
+          query2: 'chocolate cake recipe',
+          similarity: simUnrelated,
+        },
         backends: [q1.backend, q2.backend, q3.backend],
-        durations: [q1.durationMs, q2.durationMs, q3.durationMs]
+        durations: [q1.durationMs, q2.durationMs, q3.durationMs],
       };
     });
 
@@ -291,7 +298,7 @@ test.describe('Client-Side ONNX Inference Pipeline', () => {
     expect(result.related.similarity).toBeGreaterThan(0.5);
 
     await captureNumberedStep(page, 7, 'similarity-test-complete', {
-      directory: SCREENSHOT_DIR
+      directory: SCREENSHOT_DIR,
     });
 
     fs.writeFileSync(
@@ -301,13 +308,10 @@ test.describe('Client-Side ONNX Inference Pipeline', () => {
   });
 
   test('6. Embedding is cached in IndexedDB on second call', async ({ page }) => {
-    await page.goto('/ai-dashboard');
+    await page.goto('/admin/ai-dashboard');
     await page.waitForLoadState('networkidle');
 
-    await page.waitForFunction(
-      () => !!(window as any).__deedsClientInference,
-      { timeout: 30_000 }
-    );
+    await page.waitForFunction(() => !!(window as any).__deedsClientInference, { timeout: 30_000 });
 
     await page.evaluate(() => (window as any).__deedsClientInference.preload());
 
@@ -325,7 +329,7 @@ test.describe('Client-Side ONNX Inference Pipeline', () => {
         secondDuration: second.durationMs,
         vectorsMatch: JSON.stringify(first.vector) === JSON.stringify(second.vector),
         firstBackend: first.backend,
-        secondBackend: second.backend
+        secondBackend: second.backend,
       };
     });
 
@@ -340,7 +344,7 @@ test.describe('Client-Side ONNX Inference Pipeline', () => {
     console.log(`Cache speedup: ${result.firstDuration}ms → ${result.secondDuration}ms`);
 
     await captureNumberedStep(page, 8, 'caching-verified', {
-      directory: SCREENSHOT_DIR
+      directory: SCREENSHOT_DIR,
     });
 
     fs.writeFileSync(

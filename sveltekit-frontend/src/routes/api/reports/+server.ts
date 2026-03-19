@@ -8,23 +8,40 @@ import { invalidateReportCache, invalidateCaseCache } from '$lib/server/cache/in
 import { z } from 'zod';
 
 const reportCreateSchema = z.object({
-	caseId: z.string().uuid('Invalid case ID'),
-	contentHtml: z.string().max(1_000_000).optional(),
-	title: z.string().max(500).optional(),
-	status: z.enum(['draft', 'pending', 'completed', 'published']).optional(),
-	metadata: z.record(z.string(), z.unknown()).optional()
+  caseId: z.string().uuid('Invalid case ID'),
+  type: z.string().max(100).optional(),
+  contentHtml: z.string().max(1_000_000).optional(),
+  title: z.string().max(500).optional(),
+  status: z.enum(['draft', 'pending', 'completed', 'published']).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 const reportBulkUpdateSchema = z.object({
-	ids: z.array(z.string().uuid()).min(1, 'Select at least one report'),
-	contentHtml: z.string().max(1_000_000).optional(),
-	title: z.string().max(500).optional(),
-	status: z.enum(['draft', 'pending', 'completed', 'published']).optional()
+  ids: z.array(z.string().uuid()).min(1, 'Select at least one report'),
+  contentHtml: z.string().max(1_000_000).optional(),
+  title: z.string().max(500).optional(),
+  status: z.enum(['draft', 'pending', 'completed', 'published']).optional(),
 });
 
 const reportBulkDeleteSchema = z.object({
-	ids: z.array(z.string().uuid()).min(1, 'Select at least one report')
+  ids: z.array(z.string().uuid()).min(1, 'Select at least one report'),
 });
+
+function getReportType(
+  type: string | undefined,
+  metadata: Record<string, unknown> | undefined
+): string {
+  if (typeof type === 'string' && type.trim()) {
+    return type.trim();
+  }
+
+  const metadataType = metadata?.reportType;
+  if (typeof metadataType === 'string' && metadataType.trim()) {
+    return metadataType.trim();
+  }
+
+  return 'custom';
+}
 
 /**
  * GET /api/reports
@@ -32,64 +49,67 @@ const reportBulkDeleteSchema = z.object({
  * Query params: caseId, ids (comma-separated), limit, offset
  */
 export const GET: RequestHandler = async ({ locals, url }) => {
-	if (!locals.user) {
-		throw error(401, 'Unauthorized');
-	}
+  if (!locals.user) {
+    throw error(401, 'Unauthorized');
+  }
 
-	const caseId = url.searchParams.get('caseId');
-	const idsParam = url.searchParams.get('ids');
-	const limit = Number(url.searchParams.get('limit')) || 20;
-	const offset = Number(url.searchParams.get('offset')) || 0;
+  const caseId = url.searchParams.get('caseId');
+  const idsParam = url.searchParams.get('ids');
+  const limit = Number(url.searchParams.get('limit')) || 20;
+  const offset = Number(url.searchParams.get('offset')) || 0;
 
-	try {
-		// Filter by specific IDs if provided
-		if (idsParam) {
-			const ids = idsParam.split(',').filter(Boolean);
-			const userReports = await db.select().from(reports)
-				.where(and(
-					inArray(reports.id, ids),
-					eq(reports.createdBy, locals.user.id)
-				))
-				.orderBy(desc(reports.createdAt))
-				.$withCache({ config: { ex: 60 } });
+  try {
+    // Filter by specific IDs if provided
+    if (idsParam) {
+      const ids = idsParam.split(',').filter(Boolean);
+      const userReports = await db
+        .select()
+        .from(reports)
+        .where(and(inArray(reports.id, ids), eq(reports.createdBy, locals.user.id)))
+        .orderBy(desc(reports.createdAt))
+        .$withCache({ config: { ex: 60 } });
 
-			return json({ success: true, data: userReports });
-		}
+      return json({ success: true, data: userReports });
+    }
 
-		// Filter by case ID if provided
-		if (caseId) {
-			const userReports = await db.select().from(reports)
-				.where(eq(reports.caseId, caseId))
-				.orderBy(desc(reports.createdAt))
-				.limit(limit)
-				.offset(offset)
-				.$withCache({ config: { ex: 600 } });
+    // Filter by case ID if provided
+    if (caseId) {
+      const userReports = await db
+        .select()
+        .from(reports)
+        .where(eq(reports.caseId, caseId))
+        .orderBy(desc(reports.createdAt))
+        .limit(limit)
+        .offset(offset)
+        .$withCache({ config: { ex: 600 } });
 
-			return json({ success: true, data: userReports });
-		}
+      return json({ success: true, data: userReports });
+    }
 
-		// Otherwise return all user's reports
-		const userReports = await db.select().from(reports)
-			.where(eq(reports.createdBy, locals.user.id))
-			.orderBy(desc(reports.createdAt))
-			.limit(limit)
-			.offset(offset)
-			.$withCache({ config: { ex: 600 } });
+    // Otherwise return all user's reports
+    const userReports = await db
+      .select()
+      .from(reports)
+      .where(eq(reports.createdBy, locals.user.id))
+      .orderBy(desc(reports.createdAt))
+      .limit(limit)
+      .offset(offset)
+      .$withCache({ config: { ex: 600 } });
 
-		return json({ success: true, data: userReports });
-	} catch (err) {
-		console.error('Error fetching reports:', err);
-		console.error('Error type:', typeof err);
-		console.error('Error constructor:', err?.constructor?.name);
-		if (err && typeof err === 'object') {
-			console.error('Error keys:', Object.keys(err));
-			console.error('Error cause:', (err as any).cause);
-		}
-		const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-		const errorStack = err instanceof Error ? err.stack : '';
-		console.error('Full error:', errorMessage, errorStack);
-		throw error(500, `Failed to fetch reports: ${errorMessage}`);
-	}
+    return json({ success: true, data: userReports });
+  } catch (err) {
+    console.error('Error fetching reports:', err);
+    console.error('Error type:', typeof err);
+    console.error('Error constructor:', err?.constructor?.name);
+    if (err && typeof err === 'object') {
+      console.error('Error keys:', Object.keys(err));
+      console.error('Error cause:', (err as any).cause);
+    }
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    const errorStack = err instanceof Error ? err.stack : '';
+    console.error('Full error:', errorMessage, errorStack);
+    throw error(500, `Failed to fetch reports: ${errorMessage}`);
+  }
 };
 
 /**
@@ -97,58 +117,71 @@ export const GET: RequestHandler = async ({ locals, url }) => {
  * Create a new report
  */
 export const POST: RequestHandler = async ({ locals, request }) => {
-	if (!locals.user) {
-		throw error(401, 'Unauthorized');
-	}
+  if (!locals.user) {
+    throw error(401, 'Unauthorized');
+  }
 
-	try {
-		const raw = await request.json();
-		const parsed = reportCreateSchema.safeParse(raw);
-		if (!parsed.success) {
-			throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
-		}
-		const body = parsed.data;
+  try {
+    const raw = await request.json();
+    const parsed = reportCreateSchema.safeParse(raw);
+    if (!parsed.success) {
+      throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
+    }
+    const body = parsed.data;
+    const reportType = getReportType(body.type, body.metadata);
 
-		const newReport = await db.insert(reports)
-			.values({
-				caseId: body.caseId,
-				content: body.contentHtml || '<p>Start writing...</p>',
-				title: body.title ?? 'Untitled Report',
-				status: body.status ?? 'draft',
-				createdBy: locals.user.id,
-				metadata: body.metadata ?? null,
-			})
-			.returning();
+    const newReport = await db
+      .insert(reports)
+      .values({
+        caseId: body.caseId,
+        content: body.contentHtml || '<p>Start writing...</p>',
+        title: body.title ?? 'Untitled Report',
+        type: reportType,
+        status: body.status ?? 'draft',
+        createdBy: locals.user.id,
+        metadata: body.metadata ?? null,
+      })
+      .returning();
 
-		// Audit log: report created
-		await auditReportAction({
-			reportId: newReport[0].id,
-			userId: locals.user.id,
-			action: 'created',
-			changes: { caseId: body.caseId, title: newReport[0].title, status: newReport[0].status },
-			request,
-		});
+    // Audit log: report created
+    await auditReportAction({
+      reportId: newReport[0].id,
+      userId: locals.user.id,
+      action: 'created',
+      changes: {
+        caseId: body.caseId,
+        title: newReport[0].title,
+        type: reportType,
+        status: newReport[0].status,
+      },
+      request,
+    });
 
-		// Invalidate report list and case cache
-		await Promise.all([
-			invalidateReportCache(newReport[0].id, 'report_create', locals.user.id),
-			invalidateCaseCache(body.caseId, 'report_create', locals.user.id)
-		]).catch(err => console.warn('[Reports] Cache invalidation failed:', err));
+    // Invalidate report list and case cache
+    await Promise.all([
+      invalidateReportCache(newReport[0].id, 'report_create', locals.user.id),
+      invalidateCaseCache(body.caseId, 'report_create', locals.user.id),
+    ]).catch((err) => console.warn('[Reports] Cache invalidation failed:', err));
 
-		// Track analytics event (non-blocking)
-		import('$lib/server/queue/rabbitmq-manager-fixed.js').then(({ rabbitmq }) =>
-			rabbitmq.publishAnalyticsEvent({ eventType: 'report_create', payload: { reportId: newReport[0].id, caseId: body.caseId, userId: locals.user.id } })
-		).catch(() => {});
+    // Track analytics event (non-blocking)
+    import('$lib/server/queue/rabbitmq-manager-fixed.js')
+      .then(({ rabbitmq }) =>
+        rabbitmq.publishAnalyticsEvent({
+          eventType: 'report_create',
+          payload: { reportId: newReport[0].id, caseId: body.caseId, userId: locals.user.id },
+        })
+      )
+      .catch(() => {});
 
-		return json(
-			{ success: true, data: newReport[0], message: 'Report created successfully' },
-			{ status: 201 }
-		);
-	} catch (err) {
-		console.error('Error creating report:', err);
-		if (err instanceof Error && 'status' in err) throw err;
-		throw error(500, 'Failed to create report');
-	}
+    return json(
+      { success: true, data: newReport[0], message: 'Report created successfully' },
+      { status: 201 }
+    );
+  } catch (err) {
+    console.error('Error creating report:', err);
+    if (err instanceof Error && 'status' in err) throw err;
+    throw error(500, 'Failed to create report');
+  }
 };
 
 /**

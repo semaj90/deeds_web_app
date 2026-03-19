@@ -163,19 +163,21 @@ Generate the complete report content in HTML format, maintaining the structure b
       .replace(/\[AREA\]/g, caseData.practiceArea || 'General');
 
     // Create the report
-    const [newReport] = await db.insert(reports)
+    const [newReport] = await db
+      .insert(reports)
       .values({
         caseId,
         createdBy: locals.user.id,
         title,
         content,
+        type: templateType,
         status: 'draft',
         metadata: {
           reportType: templateType,
           templateUsed: template.name,
           aiGenerated: useAI,
-          generatedAt: new Date().toISOString()
-        }
+          generatedAt: new Date().toISOString(),
+        },
       })
       .returning();
 

@@ -41,7 +41,7 @@
 			{ label: 'Persons of Interest', desc: 'POI profiles and tracking', icon: 'users', href: '/persons-of-interest' },
 			{ label: 'Analysis Center', desc: 'Deep analysis tools', icon: 'search', href: '/analysis-center' },
 			{ label: 'Global Search', desc: 'Platform-wide search', icon: 'scan-search', href: '/global-search' },
-			{ label: 'AI Dashboard', desc: 'AI model status and tools', icon: 'brain', href: '/ai-dashboard' },
+			{ label: 'AI Dashboard', desc: 'AI model status and tools', icon: 'brain', href: '/admin/ai-dashboard' },
 			{ label: 'Terminal', desc: 'AI assistant terminal', icon: 'terminal', href: '/terminal' },
 			{ label: 'Memory Palace', desc: 'Knowledge graph visualization', icon: 'landmark', href: '/memory-palace' },
 			{ label: 'All Routes', desc: 'Full application route map', icon: 'map', href: '/admin/all-routes' },
@@ -58,7 +58,7 @@
 			{ label: 'Evidence Upload', desc: 'Upload new evidence files', icon: 'upload', href: '/evidence' },
 			{ label: 'Evidence Library', desc: 'Browse all evidence items', icon: 'library', href: '/evidence-library' },
 			{ label: 'Evidence Manage', desc: 'Manage evidence metadata', icon: 'settings', href: '/evidence/manage' },
-			{ label: 'GPU Evidence Graph', desc: 'GPU-accelerated evidence graph', icon: 'share-2', href: '/gpu-evidence-graph' },
+			{ label: 'GPU Evidence Graph', desc: 'GPU-accelerated evidence graph', icon: 'share-2', href: '/admin/gpu-evidence-graph' },
 		],
 		3: [
 			{ label: 'Global Search', desc: 'Search across all data sources', icon: 'scan-search', href: '/global-search' },
@@ -73,7 +73,7 @@
 			{ label: 'Citations', desc: 'Manage citation collections', icon: 'scroll-text', href: '/citations' },
 		],
 		5: [
-			{ label: 'AI Dashboard', desc: 'Model status and inference metrics', icon: 'brain', href: '/ai-dashboard' },
+			{ label: 'AI Dashboard', desc: 'Model status and inference metrics', icon: 'brain', href: '/admin/ai-dashboard' },
 			{ label: 'Terminal', desc: 'AI assistant chat terminal', icon: 'terminal', href: '/terminal' },
 			{ label: 'Recommendations', desc: 'AI-powered recommendations', icon: 'sparkles', href: '/recommendations' },
 			{ label: 'Synthesis', desc: 'AI document synthesis', icon: 'wand-2', href: '/analysis-center' },
@@ -83,7 +83,7 @@
 			{ label: 'Admin Panel', desc: 'Administration dashboard', icon: 'shield', href: '/admin' },
 			{ label: 'Dev Tools', desc: 'Developer utilities', icon: 'code', href: '/admin/dev-tools' },
 			{ label: 'AST Topology', desc: 'Abstract syntax tree viewer', icon: 'network', href: '/ast-topology' },
-			{ label: 'Error Brain', desc: 'Error analysis system', icon: 'bug', href: '/error-brain' },
+			{ label: 'Error Brain', desc: 'Error analysis system', icon: 'bug', href: '/admin/error-brain' },
 			{ label: 'Agentic Errors', desc: 'AI-detected error patterns', icon: 'bot', href: '/agentic-errors' },
 		],
 	};

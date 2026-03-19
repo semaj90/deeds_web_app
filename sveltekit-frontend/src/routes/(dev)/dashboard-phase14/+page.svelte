@@ -34,7 +34,7 @@
 			<a href="/cases/new">➕ New Case</a>
 			<a href="/evidence">🔍 Evidence Library</a>
 			<a href="/legal/documents">📄 Legal Documents</a>
-			<a href="/all-routes">🗺️ All Routes</a>
+			<a href="/admin/all-routes">🗺️ All Routes</a>
 		</nav>
 	</div>
 

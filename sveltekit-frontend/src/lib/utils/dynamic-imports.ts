@@ -210,18 +210,23 @@ export const preloadStrategies = {
 
   // Preload based on route
   async forRoute(routeId: string) {
-    const routeComponentMap: Record<string, Array<{ key: string, loader: () => Promise<unknown> }>> = {
+    const routeComponentMap: Record<
+      string,
+      Array<{ key: string; loader: () => Promise<unknown> }>
+    > = {
       '/detective': [
         { key: 'detectives', loader: loadAIComponents.detectives },
-        { key: 'fabricCanvas', loader: loadAIComponents.fabricCanvas }
+        { key: 'fabricCanvas', loader: loadAIComponents.fabricCanvas },
       ],
-      '/upload': [
-        { key: 'uploads', loader: loadAIComponents.uploads }
-      ],
+      '/upload': [{ key: 'uploads', loader: loadAIComponents.uploads }],
       '/ai-dashboard': [
         { key: 'qloraMonitoring', loader: loadAIComponents.qloraMonitoring },
-        { key: 'webgpu', loader: loadAIComponents.webgpu }
-      ]
+        { key: 'webgpu', loader: loadAIComponents.webgpu },
+      ],
+      '/admin/ai-dashboard': [
+        { key: 'qloraMonitoring', loader: loadAIComponents.qloraMonitoring },
+        { key: 'webgpu', loader: loadAIComponents.webgpu },
+      ],
     };
 
     const componentsToLoad = routeComponentMap[routeId] || [];

@@ -133,7 +133,7 @@ test.describe('Error-Brain Runs UI', () => {
 
 test.describe('Error-Brain Navigation', () => {
   test('error-brain routes should not crash the app', async ({ page }) => {
-    const routes = ['/error-brain', '/error-brain/runs'];
+    const routes = ['/admin/error-brain', '/admin/error-brain/runs'];
 
     for (const route of routes) {
       const response = await page.goto(`${BASE_URL}${route}`, {

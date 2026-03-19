@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test.describe('ErrorBrainModal Integration Tests', () => {
 	test.beforeEach(async ({ page }) => {
 		// /all-routes has an SSE connection — use domcontentloaded to avoid networkidle timeout
-		await page.goto('/all-routes');
+		await page.goto('/admin/all-routes');
 		await page.waitForLoadState('domcontentloaded');
 		await page.waitForTimeout(1500);
 	});

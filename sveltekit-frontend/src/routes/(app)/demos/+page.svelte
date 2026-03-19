@@ -58,7 +58,7 @@
 		{ href: '/cases', label: 'Case Management', description: 'Full CRUD with overview, evidence manager, AI document drafting, and case scoring integration.', icon: 'folder', category: 'ai' },
 		{ href: '/nier-showcase', label: 'NieR Showcase', description: 'YoRHa UI suite: CommandCenter, Terminal, SystemStatus, Dialogs, DiamondModal, and NES CRT.', icon: 'monitor', category: 'gaming' },
 		{ href: '/system-status', label: 'System Status', description: 'System health dashboard with StatusCards, SystemStatusPanel, and SystemOverview.', icon: 'activity', category: 'system' },
-		{ href: '/ai-dashboard', label: 'AI Dashboard', description: '35+ AI components: RAG pipeline, ONNX/Ollama chat, source validation, and case intake wizard.', icon: 'brain', category: 'ai' },
+		{ href: '/admin/ai-dashboard', label: 'AI Dashboard', description: '35+ AI components: RAG pipeline, ONNX/Ollama chat, source validation, and case intake wizard.', icon: 'brain', category: 'ai' },
 		{ href: '/admin/dev-tools', label: 'Dev Tools', description: 'Cache dashboard, Redis stats, NES memory banks, GPU metrics, and knowledge base seeder.', icon: 'wrench', category: 'system' },
 		{ href: '/legal-corpus', label: 'Legal Corpus', description: 'Statute browser, legal glossary, and precedent search with jurisdiction filters and semantic ranking.', icon: 'book-open', category: 'ai' },
 	];

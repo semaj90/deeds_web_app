@@ -52,14 +52,20 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		try {
 			const { reports } = await import('$lib/server/db/schema');
 			const [row] = await db
-				.insert(reports)
-				.values({
-					caseId: id,
-					title: `${type === 'charging_memo' ? 'Charging Memo' : 'Report'} - ${caseData.title}`,
-					content: generatedContent.html,
-					metadata: { type, contentJson: generatedContent.json, rawModelOutput: generatedContent.raw },
-				})
-				.returning();
+        .insert(reports)
+        .values({
+          caseId: id,
+          createdBy: locals.user.id,
+          title: `${type === 'charging_memo' ? 'Charging Memo' : 'Report'} - ${caseData.title}`,
+          content: generatedContent.html,
+          type,
+          metadata: {
+            type,
+            contentJson: generatedContent.json,
+            rawModelOutput: generatedContent.raw,
+          },
+        })
+        .returning();
 			newReport = row;
 		} catch {
 			// Reports table may not exist — return generated content without saving

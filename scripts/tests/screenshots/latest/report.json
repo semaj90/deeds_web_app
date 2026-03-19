@@ -1,38 +1,18 @@
 {
-  "timestamp": "2026-03-19T20-13-04",
+  "timestamp": "2026-03-19T22-51-59",
   "base": "http://localhost:5173",
-  "totalTimeMs": 17499,
+  "totalTimeMs": 101671,
   "results": [
     {
-      "name": "C:-Program Files-Git-reports-new",
-      "path": "/C:/Program Files/Git/reports/new",
-      "url": "http://localhost:5173/C:/Program Files/Git/reports/new",
-      "status": 404,
-      "ok": false,
-      "error": "SvelteKit error page rendered",
-      "file": "C:-Program Files-Git-reports-new.png",
-      "consoleErrors": [
-        "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "Failed to load resource: the server responded with a status of 404 (Not Found)"
-      ],
+      "name": "evidence",
+      "path": "/evidence",
+      "url": "http://localhost:5173/evidence",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "evidence.png",
+      "consoleErrors": [],
       "consoleWarnings": [
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra",
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra",
-        "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra",
         "No available adapters.",
         "WebGPU: No adapter available",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
@@ -40,20 +20,1048 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 3991,
-      "domElements": 198,
-      "resourceCount": 129,
-      "resourceSizeKB": 3866
+      "loadTimeMs": 8663,
+      "domElements": 1698,
+      "resourceCount": 313,
+      "resourceSizeKB": 9864
+    },
+    {
+      "name": "persons-of-interest",
+      "path": "/persons-of-interest",
+      "url": "http://localhost:5173/persons-of-interest",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "persons-of-interest.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 10360,
+      "domElements": 374,
+      "resourceCount": 276,
+      "resourceSizeKB": 8144
+    },
+    {
+      "name": "cases-overview",
+      "path": "/cases/test-id/overview",
+      "url": "http://localhost:5173/cases/test-id/overview",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "cases-overview.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2544,
+      "domElements": 448,
+      "resourceCount": 188,
+      "resourceSizeKB": 6846
+    },
+    {
+      "name": "cases-board",
+      "path": "/cases/test-id/board",
+      "url": "http://localhost:5173/cases/test-id/board",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "cases-board.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "[board-persistence] IndexedDB save failed: DataCloneError: Failed to execute 'put' on 'IDBObjectStore': [object Array] could not be cloned.\n    at Proxy.<anonymous> (http://localhost:5173/node_modules"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 4152,
+      "domElements": 433,
+      "resourceCount": 194,
+      "resourceSizeKB": 7296
+    },
+    {
+      "name": "cases-list",
+      "path": "/cases",
+      "url": "http://localhost:5173/cases",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "cases-list.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2527,
+      "domElements": 485,
+      "resourceCount": 187,
+      "resourceSizeKB": 7182
+    },
+    {
+      "name": "dashboard",
+      "path": "/dashboard",
+      "url": "http://localhost:5173/dashboard",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "dashboard.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 3828,
+      "domElements": 680,
+      "resourceCount": 215,
+      "resourceSizeKB": 7588
+    },
+    {
+      "name": "citations",
+      "path": "/citations",
+      "url": "http://localhost:5173/citations",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "citations.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2909,
+      "domElements": 419,
+      "resourceCount": 248,
+      "resourceSizeKB": 8121
+    },
+    {
+      "name": "evidence-upload",
+      "path": "/cases/test-id/evidence/upload",
+      "url": "http://localhost:5173/cases/test-id/evidence/upload",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "evidence-upload.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2484,
+      "domElements": 330,
+      "resourceCount": 186,
+      "resourceSizeKB": 7023
+    },
+    {
+      "name": "active-cases",
+      "path": "/active-cases",
+      "url": "http://localhost:5173/active-cases",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "active-cases.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 3067,
+      "domElements": 655,
+      "resourceCount": 192,
+      "resourceSizeKB": 7266
+    },
+    {
+      "name": "analysis-center",
+      "path": "/analysis-center",
+      "url": "http://localhost:5173/analysis-center",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "analysis-center.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 5070,
+      "domElements": 561,
+      "resourceCount": 218,
+      "resourceSizeKB": 7992
+    },
+    {
+      "name": "command-center",
+      "path": "/command-center",
+      "url": "http://localhost:5173/command-center",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "command-center.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2850,
+      "domElements": 504,
+      "resourceCount": 179,
+      "resourceSizeKB": 6885
+    },
+    {
+      "name": "evidence-library",
+      "path": "/evidence-library",
+      "url": "http://localhost:5173/evidence-library",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "evidence-library.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 7963,
+      "domElements": 384,
+      "resourceCount": 203,
+      "resourceSizeKB": 7426
+    },
+    {
+      "name": "global-search",
+      "path": "/global-search",
+      "url": "http://localhost:5173/global-search",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "global-search.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 3916,
+      "domElements": 352,
+      "resourceCount": 209,
+      "resourceSizeKB": 7594
+    },
+    {
+      "name": "admin-dev-tools",
+      "path": "/admin/dev-tools",
+      "url": "http://localhost:5173/admin/dev-tools",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "admin-dev-tools.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 5065,
+      "domElements": 423,
+      "resourceCount": 236,
+      "resourceSizeKB": 8041
+    },
+    {
+      "name": "admin-knowledge-search",
+      "path": "/admin/knowledge-search",
+      "url": "http://localhost:5173/admin/knowledge-search",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "admin-knowledge-search.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2918,
+      "domElements": 302,
+      "resourceCount": 178,
+      "resourceSizeKB": 6950
+    },
+    {
+      "name": "admin-codebase-viewer",
+      "path": "/admin/codebase-viewer",
+      "url": "http://localhost:5173/admin/codebase-viewer",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "admin-codebase-viewer.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2937,
+      "domElements": 332,
+      "resourceCount": 195,
+      "resourceSizeKB": 7335
+    },
+    {
+      "name": "system-configuration",
+      "path": "/system-configuration",
+      "url": "http://localhost:5173/system-configuration",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "system-configuration.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2079,
+      "domElements": 373,
+      "resourceCount": 186,
+      "resourceSizeKB": 7115
+    },
+    {
+      "name": "terminal",
+      "path": "/terminal",
+      "url": "http://localhost:5173/terminal",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "terminal.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 5104,
+      "domElements": 377,
+      "resourceCount": 181,
+      "resourceSizeKB": 6941
+    },
+    {
+      "name": "admin-cache",
+      "path": "/admin/cache",
+      "url": "http://localhost:5173/admin/cache",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "admin-cache.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2322,
+      "domElements": 466,
+      "resourceCount": 181,
+      "resourceSizeKB": 6941
+    },
+    {
+      "name": "analytics",
+      "path": "/analytics",
+      "url": "http://localhost:5173/analytics",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "analytics.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2143,
+      "domElements": 328,
+      "resourceCount": 175,
+      "resourceSizeKB": 6920
+    },
+    {
+      "name": "cases-new",
+      "path": "/cases/new",
+      "url": "http://localhost:5173/cases/new",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "cases-new.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 3144,
+      "domElements": 376,
+      "resourceCount": 202,
+      "resourceSizeKB": 9775
+    },
+    {
+      "name": "cases-detail",
+      "path": "/cases/test-id",
+      "url": "http://localhost:5173/cases/test-id",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "cases-detail.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+        "Failed to load statutes: Error: Failed to load statutes\n    at loadStatutes (http://localhost:5173/src/routes/(app)/cases/[id]/+page.svelte:675:28)\n    at async Promise.all (index 2)\n    at async Modu",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+        "Failed to load citations: Error: Failed to load citations\n    at loadCitations (http://localhost:5173/src/routes/(app)/cases/[id]/+page.svelte:657:28)\n    at async Promise.all (index 1)\n    at async M"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 5654,
+      "domElements": 492,
+      "resourceCount": 294,
+      "resourceSizeKB": 8993
+    },
+    {
+      "name": "cases-ai",
+      "path": "/cases/test-id/ai",
+      "url": "http://localhost:5173/cases/test-id/ai",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "cases-ai.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2251,
+      "domElements": 316,
+      "resourceCount": 184,
+      "resourceSizeKB": 6971
+    },
+    {
+      "name": "cases-chat",
+      "path": "/cases/test-id/chat",
+      "url": "http://localhost:5173/cases/test-id/chat",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "cases-chat.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2950,
+      "domElements": 452,
+      "resourceCount": 188,
+      "resourceSizeKB": 7050
+    },
+    {
+      "name": "cases-notes",
+      "path": "/cases/test-id/notes",
+      "url": "http://localhost:5173/cases/test-id/notes",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "cases-notes.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2018,
+      "domElements": 306,
+      "resourceCount": 183,
+      "resourceSizeKB": 6949
+    },
+    {
+      "name": "cases-persons",
+      "path": "/cases/test-id/persons",
+      "url": "http://localhost:5173/cases/test-id/persons",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "cases-persons.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2010,
+      "domElements": 313,
+      "resourceCount": 185,
+      "resourceSizeKB": 6979
+    },
+    {
+      "name": "cases-reports",
+      "path": "/cases/test-id/reports",
+      "url": "http://localhost:5173/cases/test-id/reports",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "cases-reports.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 4997,
+      "domElements": 358,
+      "resourceCount": 189,
+      "resourceSizeKB": 6951
+    },
+    {
+      "name": "cases-canvas",
+      "path": "/cases/test-id/canvas",
+      "url": "http://localhost:5173/cases/test-id/canvas",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "cases-canvas.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 6709,
+      "domElements": 357,
+      "resourceCount": 186,
+      "resourceSizeKB": 6851
+    },
+    {
+      "name": "poi-create",
+      "path": "/persons-of-interest/create",
+      "url": "http://localhost:5173/persons-of-interest/create",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "poi-create.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 1891,
+      "domElements": 324,
+      "resourceCount": 187,
+      "resourceSizeKB": 9406
+    },
+    {
+      "name": "reports",
+      "path": "/reports",
+      "url": "http://localhost:5173/reports",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "reports.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 1907,
+      "domElements": 394,
+      "resourceCount": 179,
+      "resourceSizeKB": 6992
+    },
+    {
+      "name": "reports-new",
+      "path": "/reports/new",
+      "url": "http://localhost:5173/reports/new",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "reports-new.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 1895,
+      "domElements": 454,
+      "resourceCount": 176,
+      "resourceSizeKB": 7020
+    },
+    {
+      "name": "recommendations",
+      "path": "/recommendations",
+      "url": "http://localhost:5173/recommendations",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "recommendations.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "[RecommendationWidget] Fetch error: Error: Recommendation fetch failed: 400\n    at fetchRecommendations (http://localhost:5173/src/lib/components/recommendations/RecommendationWidget.svelte:95:11)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2125,
+      "domElements": 433,
+      "resourceCount": 181,
+      "resourceSizeKB": 7138
+    },
+    {
+      "name": "evidence-analyze",
+      "path": "/evidence/analyze",
+      "url": "http://localhost:5173/evidence/analyze",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "evidence-analyze.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 4878,
+      "domElements": 410,
+      "resourceCount": 182,
+      "resourceSizeKB": 7015
+    },
+    {
+      "name": "evidence-manage",
+      "path": "/evidence/manage",
+      "url": "http://localhost:5173/evidence/manage",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "evidence-manage.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 3088,
+      "domElements": 775,
+      "resourceCount": 183,
+      "resourceSizeKB": 6993
+    },
+    {
+      "name": "evidence-upload-direct",
+      "path": "/evidence/upload",
+      "url": "http://localhost:5173/evidence/upload",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "evidence-upload-direct.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2985,
+      "domElements": 333,
+      "resourceCount": 183,
+      "resourceSizeKB": 7011
+    },
+    {
+      "name": "admin-ai-dashboard",
+      "path": "/admin/ai-dashboard",
+      "url": "http://localhost:5173/admin/ai-dashboard",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "admin-ai-dashboard.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 5887,
+      "domElements": 520,
+      "resourceCount": 279,
+      "resourceSizeKB": 8789
+    },
+    {
+      "name": "admin-all-routes",
+      "path": "/admin/all-routes",
+      "url": "http://localhost:5173/admin/all-routes",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "admin-all-routes.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "⚠️ Slow operation: http://localhost:5173/admin/all-routes took 3315ms",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 5115,
+      "domElements": 432,
+      "resourceCount": 200,
+      "resourceSizeKB": 8305
+    },
+    {
+      "name": "admin-error-brain",
+      "path": "/admin/error-brain",
+      "url": "http://localhost:5173/admin/error-brain",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "admin-error-brain.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 5577,
+      "domElements": 407,
+      "resourceCount": 207,
+      "resourceSizeKB": 7132
+    },
+    {
+      "name": "admin-phase89",
+      "path": "/admin/phase89",
+      "url": "http://localhost:5173/admin/phase89",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "admin-phase89.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2617,
+      "domElements": 302,
+      "resourceCount": 178,
+      "resourceSizeKB": 7071
+    },
+    {
+      "name": "admin-component-analysis",
+      "path": "/admin/component-analysis",
+      "url": "http://localhost:5173/admin/component-analysis",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "admin-component-analysis.png",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 7602,
+      "domElements": 370,
+      "resourceCount": 181,
+      "resourceSizeKB": 6856
+    },
+    {
+      "name": "demos-index",
+      "path": "/demos",
+      "url": "http://localhost:5173/demos",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "demos-index.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 7470,
+      "domElements": 775,
+      "resourceCount": 178,
+      "resourceSizeKB": 7090
+    },
+    {
+      "name": "demos-keyboard-shortcuts",
+      "path": "/demos/keyboard-shortcuts",
+      "url": "http://localhost:5173/demos/keyboard-shortcuts",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "demos-keyboard-shortcuts.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 7302,
+      "domElements": 401,
+      "resourceCount": 175,
+      "resourceSizeKB": 6909
+    },
+    {
+      "name": "demos-icons",
+      "path": "/demos/icons",
+      "url": "http://localhost:5173/demos/icons",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "demos-icons.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2048,
+      "domElements": 386,
+      "resourceCount": 175,
+      "resourceSizeKB": 6881
+    },
+    {
+      "name": "demos-memory-palace",
+      "path": "/demos/memory-palace",
+      "url": "http://localhost:5173/demos/memory-palace",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "demos-memory-palace.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 4192,
+      "domElements": 356,
+      "resourceCount": 182,
+      "resourceSizeKB": 7080
+    },
+    {
+      "name": "demos-vector-search",
+      "path": "/demos/vector-search",
+      "url": "http://localhost:5173/demos/vector-search",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "demos-vector-search.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2036,
+      "domElements": 305,
+      "resourceCount": 176,
+      "resourceSizeKB": 6939
+    },
+    {
+      "name": "legal-corpus",
+      "path": "/legal-corpus",
+      "url": "http://localhost:5173/legal-corpus",
+      "status": 200,
+      "ok": true,
+      "error": null,
+      "file": "legal-corpus.png",
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://localhost:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+      ],
+      "failedRequests": [],
+      "loadTimeMs": 2258,
+      "domElements": 580,
+      "resourceCount": 187,
+      "resourceSizeKB": 7232
     }
   ],
   "summary": {
-    "passed": 0,
-    "failed": 1,
-    "total": 1,
-    "avgLoadMs": 3991,
-    "slowestRoute": "C:-Program Files-Git-reports-new",
-    "slowestLoadMs": 3991,
-    "totalConsoleErrors": 4,
+    "passed": 46,
+    "failed": 0,
+    "total": 46,
+    "avgLoadMs": 3989,
+    "slowestRoute": "persons-of-interest",
+    "slowestLoadMs": 10360,
+    "totalConsoleErrors": 23,
     "totalNetworkFailures": 0
   }
 }
