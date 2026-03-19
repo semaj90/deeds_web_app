@@ -47,12 +47,6 @@
 
 	const isSelected = $derived(commandContext?.selectedValue === value);
 	const isVisible = $derived(commandContext?.isItemVisible(value, textContent) ?? true);
-
-	const defaultClass = `
-		relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none
-		aria-selected:bg-accent aria-selected:text-accent-foreground
-		data-[disabled]:pointer-events-none data-[disabled]:opacity-50 hover:bg-accent hover:text-accent-foreground
-	`.replace(/\s+/g, ' ').trim();
 </script>
 
 {#if isVisible}
@@ -61,10 +55,10 @@
 		role="option"
 		aria-selected={isSelected}
 		data-disabled={disabled || undefined}
-	tabindex={disabled ? -1 : 0}
-		onclick={ handleClick }
-		onkeydown={ handleKeydown }
-		class="{defaultClass} {className}"
+		tabindex={disabled ? -1 : 0}
+		onclick={handleClick}
+		onkeydown={handleKeydown}
+		class="cmd-item {className}"
 	>
 		{#if children}
 			{@render children()}
@@ -72,4 +66,28 @@
 	</div>
 {/if}
 
-
+<style>
+	.cmd-item {
+		position: relative;
+		display: flex;
+		cursor: default;
+		user-select: none;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 0.625rem;
+		font-size: 0.8125rem;
+		border-radius: 0.5rem;
+		outline: none;
+		transition: all 0.1s ease;
+		color: rgba(212, 199, 163, 0.75);
+	}
+	.cmd-item:hover,
+	.cmd-item[aria-selected="true"] {
+		background: rgba(212, 199, 163, 0.08);
+		color: rgba(212, 199, 163, 0.95);
+	}
+	.cmd-item[data-disabled] {
+		pointer-events: none;
+		opacity: 0.4;
+	}
+</style>

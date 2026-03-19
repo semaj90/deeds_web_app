@@ -20,7 +20,14 @@
             e.preventDefault();
             showDocumentWriter = !showDocumentWriter;
         }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            showCommandPalette = !showCommandPalette;
+        }
     }
+
+    import GlobalCommandPalette from '$lib/components/ui/GlobalCommandPalette.svelte';
+    let showCommandPalette = $state(false);
 
     // Import webgpu modules dynamically to avoid SSR issues
     let webgpu: any = null;
@@ -102,6 +109,7 @@
 </script>
 
 <svelte:window onkeydown={handleGlobalKeydown} />
+<GlobalCommandPalette bind:open={showCommandPalette} />
 
 <!-- YoRHa Detective Sidebar -->
 <YorhaSidebar />
@@ -124,23 +132,49 @@
 {/if}
 
 {#if page.state.showCaseModal && page.state.caseId}
-    <CaseOverviewModal 
-        id={page.state.caseId} 
-        onClose={closeCaseModal} 
+    <CaseOverviewModal
+        id={page.state.caseId}
+        onClose={closeCaseModal}
     />
 {/if}
 
 {#if page.state.showDocumentModal && page.state.documentId}
-    <DocumentDetailModal 
-        id={page.state.documentId} 
-        onClose={closeDocumentModal} 
+    <DocumentDetailModal
+        id={page.state.documentId}
+        onClose={closeDocumentModal}
     />
 {/if}
 
 <style>
+    :global(:root) {
+        --shell-base: #060a12;
+        --shell-base-elevated: #0d1423;
+        --shell-base-deep: #121b30;
+        --shell-surface: rgba(17, 24, 39, 0.82);
+        --shell-surface-strong: rgba(17, 24, 39, 0.94);
+        --shell-border: rgba(120, 160, 220, 0.18);
+        --shell-border-strong: rgba(126, 231, 255, 0.28);
+        --shell-text: rgba(233, 240, 255, 0.88);
+        --shell-text-soft: rgba(184, 198, 226, 0.72);
+        --shell-muted: rgba(140, 160, 199, 0.52);
+        --shell-accent: #7ee7ff;
+        --shell-accent-strong: #53b7ff;
+        --shell-warm: #ffd479;
+        --shell-success: #53e2a4;
+        --shell-danger: #ff6b78;
+        --shell-radius-sm: 12px;
+        --shell-radius-md: 18px;
+        --shell-radius-lg: 24px;
+        --shell-radius-curve: 26px 26px 18px 18px / 22px 22px 30px 30px;
+    }
+
     :global(body) {
-        background: linear-gradient(135deg, #d4c9a9 0%, #c9bfa0 100%);
-        color: #1a1a1a;
+        background:
+            radial-gradient(circle at top left, rgba(126, 231, 255, 0.14), transparent 24%),
+            radial-gradient(circle at top right, rgba(255, 212, 121, 0.12), transparent 22%),
+            radial-gradient(circle at bottom, rgba(83, 183, 255, 0.14), transparent 30%),
+            linear-gradient(180deg, #0d1423 0%, #080d17 48%, #04070d 100%);
+        color: var(--shell-text);
         font-family: 'JetBrains Mono', 'Courier New', monospace;
         margin: 0;
         padding: 0;
@@ -154,22 +188,52 @@
         min-height: 100vh;
         padding-left: 210px;
         transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        background: linear-gradient(135deg, #d4c9a9 0%, #c9bfa0 100%);
+        background:
+            radial-gradient(circle at top left, rgba(126, 231, 255, 0.14), transparent 30%),
+            radial-gradient(circle at top right, rgba(255, 212, 121, 0.12), transparent 24%),
+            radial-gradient(circle at bottom right, rgba(83, 183, 255, 0.12), transparent 30%),
+            linear-gradient(180deg, #101728 0%, #0a0f1c 52%, #060910 100%);
+        position: relative;
     }
 
     :global(body:has(.yorha-sidebar.collapsed)) .app-shell {
         padding-left: 60px;
     }
 
+    .app-shell::before {
+        content: '';
+        position: fixed;
+        inset: 0 0 0 210px;
+        pointer-events: none;
+        background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 32%),
+            repeating-linear-gradient(
+                0deg,
+                rgba(126, 231, 255, 0.02),
+                rgba(126, 231, 255, 0.02) 1px,
+                transparent 1px,
+                transparent 7px
+            );
+        mix-blend-mode: screen;
+        opacity: 0.45;
+        transition: inset 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    :global(body:has(.yorha-sidebar.collapsed)) .app-shell::before {
+		inset: 0 0 0 60px;
+    }
+
     .main-content {
         min-height: 100vh;
         display: flex;
         flex-direction: column;
+		position: relative;
+		z-index: 1;
     }
 
     .content {
         flex: 1;
-        padding: 2.5rem;
+		padding: 2rem 2.5rem;
         max-width: 100%;
     }
 
@@ -200,9 +264,32 @@
         }
     }
 
-    /* Global Professional Styling */
+    /* ═══ Global Reset & Foundations ═══ */
     :global(*) {
         box-sizing: border-box;
+    }
+
+    :global(html) {
+        scroll-behavior: smooth;
+    }
+
+    /* Branded text selection */
+    :global(::selection) {
+        background: rgba(126, 231, 255, 0.22);
+        color: #f5fbff;
+    }
+
+    /* Accessible focus ring — visible only on keyboard nav */
+    :global(:focus-visible) {
+        outline: 2px solid rgba(126, 231, 255, 0.42);
+        outline-offset: 2px;
+    }
+
+    /* Inputs handle their own focus styles */
+    :global(input:focus-visible),
+    :global(textarea:focus-visible),
+    :global(select:focus-visible) {
+        outline: none;
     }
 
     /* Typography Hierarchy */
@@ -212,7 +299,7 @@
         font-weight: 700;
         letter-spacing: 0.05em;
         text-transform: uppercase;
-        color: #1a1a1a;
+        color: #e8e4c8;
         margin: 0 0 1.5rem 0;
         line-height: 1.2;
     }
@@ -223,7 +310,7 @@
         font-weight: 700;
         letter-spacing: 0.05em;
         text-transform: uppercase;
-        color: #1a1a1a;
+        color: #ddd7b8;
         margin: 0 0 1rem 0;
         line-height: 1.3;
     }
@@ -234,7 +321,7 @@
         font-weight: 600;
         letter-spacing: 0.05em;
         text-transform: uppercase;
-        color: #2a2a2a;
+        color: #c9c39f;
         margin: 0 0 0.75rem 0;
         line-height: 1.4;
     }
@@ -244,13 +331,13 @@
         font-weight: 600;
         letter-spacing: 0.05em;
         text-transform: uppercase;
-        color: #2a2a2a;
+        color: #bdb691;
         margin: 0 0 0.5rem 0;
     }
 
     :global(p) {
         font-family: 'JetBrains Mono', monospace;
-        color: #1a1a1a;
+		color: var(--shell-text-soft);
         margin: 0 0 1rem 0;
         line-height: 1.6;
     }
@@ -259,14 +346,14 @@
     :global(.panel),
     :global(.card),
     :global([class*="panel"]) {
-        background: linear-gradient(135deg, #e8e4d8 0%, #ddd9cd 100%);
-        border: 2px solid rgba(0, 0, 0, 0.15);
-        border-radius: 8px;
+        background: linear-gradient(180deg, rgba(23, 31, 48, 0.95) 0%, rgba(10, 15, 25, 0.98) 100%);
+        border: 1px solid var(--shell-border);
+        border-radius: var(--shell-radius-lg);
         box-shadow:
-            0 4px 6px rgba(0, 0, 0, 0.1),
-            0 2px 4px rgba(0, 0, 0, 0.06),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        color: #1a1a1a;
+            0 20px 40px rgba(0, 0, 0, 0.3),
+            0 0 0 1px rgba(126, 231, 255, 0.04),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        color: var(--shell-text);
         padding: 1.5rem;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -274,9 +361,10 @@
     :global(.panel:hover),
     :global(.card:hover) {
         box-shadow:
-            0 10px 15px rgba(0, 0, 0, 0.15),
-            0 4px 6px rgba(0, 0, 0, 0.1),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            0 24px 48px rgba(0, 0, 0, 0.38),
+            0 0 0 1px rgba(126, 231, 255, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        border-color: var(--shell-border-strong);
         transform: translateY(-1px);
     }
 
@@ -284,102 +372,181 @@
     :global(input),
     :global(textarea),
     :global(select) {
-        background: #ffffff;
-        border: 2px solid rgba(0, 0, 0, 0.2);
-        border-radius: 6px;
-        color: #1a1a1a;
+        background: linear-gradient(180deg, rgba(8, 12, 20, 0.92) 0%, rgba(14, 19, 31, 0.96) 100%);
+        border: 1px solid var(--shell-border);
+        border-radius: var(--shell-radius-sm);
+        color: var(--shell-text);
         font-family: 'JetBrains Mono', monospace;
         font-size: 0.875rem;
         padding: 0.75rem 1rem;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.04),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.02),
+            0 10px 20px rgba(0, 0, 0, 0.12);
     }
 
     :global(input:focus),
     :global(textarea:focus),
     :global(select:focus) {
         outline: none;
-        border-color: #1a1a1a;
+        border-color: var(--shell-border-strong);
         box-shadow:
-            0 0 0 3px rgba(26, 26, 26, 0.1),
-            inset 0 2px 4px rgba(0, 0, 0, 0.06);
+            0 0 0 3px rgba(126, 231, 255, 0.12),
+            0 10px 24px rgba(0, 0, 0, 0.18),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
 
     :global(input::placeholder),
     :global(textarea::placeholder) {
-        color: rgba(26, 26, 26, 0.4);
+		color: var(--shell-muted);
+    }
+
+    :global(input[type='file']) {
+		padding: 0.625rem;
+		border-style: dashed;
+		background: linear-gradient(180deg, rgba(10, 15, 25, 0.88) 0%, rgba(19, 27, 42, 0.92) 100%);
+    }
+
+    :global(input[type='file']::file-selector-button) {
+		margin-right: 0.85rem;
+		padding: 0.625rem 1rem;
+		border: 1px solid var(--shell-border);
+		border-radius: 999px;
+		background: linear-gradient(135deg, rgba(126, 231, 255, 0.18) 0%, rgba(83, 183, 255, 0.18) 100%);
+		color: var(--shell-text);
+		font: inherit;
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		cursor: pointer;
+    }
+
+    :global(input[type='file']::file-selector-button:hover) {
+		border-color: var(--shell-border-strong);
+		background: linear-gradient(135deg, rgba(126, 231, 255, 0.26) 0%, rgba(255, 212, 121, 0.18) 100%);
     }
 
     /* Professional Button Styling */
-    :global(button) {
+    :global(button),
+    :global(a[class*="btn"]),
+    :global(a.empty-action) {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.55rem;
         font-family: 'JetBrains Mono', monospace;
         font-size: 0.8125rem;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        border: 2px solid rgba(0, 0, 0, 0.2);
-        border-radius: 6px;
-        background: linear-gradient(135deg, #e8e4d8 0%, #ddd9cd 100%);
-        color: #1a1a1a;
+		border: 1px solid var(--shell-border);
+        border-radius: var(--shell-radius-md);
+		background: linear-gradient(180deg, rgba(24, 33, 50, 0.96) 0%, rgba(11, 15, 25, 0.98) 100%);
+		color: var(--shell-text);
         padding: 0.75rem 1.5rem;
         cursor: pointer;
+        text-decoration: none;
+        border-bottom: none;
+        overflow: hidden;
+        isolation: isolate;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow:
-            0 2px 4px rgba(0, 0, 0, 0.1),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+			0 14px 26px rgba(0, 0, 0, 0.22),
+			0 0 0 1px rgba(126, 231, 255, 0.04),
+			inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
 
-    :global(button:hover:not(:disabled)) {
-        background: linear-gradient(135deg, #d4d0c4 0%, #c9c5b9 100%);
-        border-color: rgba(0, 0, 0, 0.3);
+    :global(button)::before,
+    :global(a[class*="btn"])::before,
+    :global(a.empty-action)::before {
+        content: '';
+        position: absolute;
+        inset: 1px;
+        border-radius: calc(var(--shell-radius-md) - 4px);
+        background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 38%),
+            linear-gradient(90deg, rgba(126, 231, 255, 0.08), transparent 42%, rgba(255, 212, 121, 0.06));
+        pointer-events: none;
+    }
+
+    :global(button:hover:not(:disabled)),
+    :global(a[class*="btn"]:hover),
+    :global(a.empty-action:hover) {
+        background: linear-gradient(180deg, rgba(34, 46, 70, 0.98) 0%, rgba(15, 21, 33, 1) 100%);
+        border-color: var(--shell-border-strong);
         box-shadow:
-            0 4px 6px rgba(0, 0, 0, 0.15),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            0 18px 34px rgba(0, 0, 0, 0.3),
+            0 0 0 1px rgba(126, 231, 255, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06);
         transform: translateY(-1px);
     }
 
     :global(button:active:not(:disabled)) {
-        transform: translateY(0);
+        transform: translateY(1px) scale(0.98);
         box-shadow:
-            0 1px 2px rgba(0, 0, 0, 0.1),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            0 0px 1px rgba(0, 0, 0, 0.4),
+            inset 0 2px 4px rgba(0, 0, 0, 0.15);
+        transition-duration: 0.05s;
     }
 
     :global(button:disabled) {
-        opacity: 0.5;
+        opacity: 0.35;
         cursor: not-allowed;
+        filter: grayscale(0.3);
+    }
+
+    /* Danger Button */
+    :global(button.danger),
+    :global(button[class*="btn-danger"]) {
+        background: linear-gradient(135deg, #ff7585 0%, #ff5b71 48%, #db3d58 100%);
+        color: #fff;
+        border-color: rgba(255, 107, 120, 0.45);
+    }
+
+    :global(button.danger:hover:not(:disabled)),
+    :global(button[class*="btn-danger"]:hover:not(:disabled)) {
+        background: linear-gradient(135deg, #ff8a97 0%, #ff6074 48%, #e0445f 100%);
+        box-shadow: 0 18px 32px rgba(255, 91, 113, 0.18);
     }
 
     /* Primary Button Variant */
     :global(button.primary),
     :global(button[class*="btn-primary"]) {
-        background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
-        color: #ffffff;
-        border-color: rgba(0, 0, 0, 0.2);
+        background: linear-gradient(135deg, #7ee7ff 0%, #53b7ff 45%, #ffd479 100%);
+        color: #06101b;
+        border-color: rgba(255, 255, 255, 0.2);
         font-weight: 700;
     }
 
     :global(button.primary:hover:not(:disabled)),
     :global(button[class*="btn-primary"]:hover:not(:disabled)) {
-        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        background: linear-gradient(135deg, #98efff 0%, #69c2ff 45%, #ffe08f 100%);
         box-shadow:
-            0 6px 8px rgba(34, 197, 94, 0.3),
-            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            0 18px 34px rgba(0, 0, 0, 0.22),
+            0 0 26px rgba(126, 231, 255, 0.18),
+            inset 0 1px 0 rgba(255, 255, 255, 0.18);
     }
 
     /* Link Styling */
     :global(a) {
-        color: #1a1a1a;
+        color: rgba(183, 224, 255, 0.88);
         text-decoration: none;
         font-family: 'JetBrains Mono', monospace;
         font-weight: 500;
-        border-bottom: 2px solid rgba(26, 26, 26, 0.2);
+		border-bottom: 1px solid rgba(126, 231, 255, 0.16);
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     :global(a:hover) {
-        border-bottom-color: #1a1a1a;
-        opacity: 0.8;
+		border-bottom-color: rgba(126, 231, 255, 0.45);
+		color: #f6fbff;
+    }
+
+    :global(a:active) {
+        opacity: 0.7;
     }
 
     /* Professional Scrollbar */
@@ -389,19 +556,19 @@
     }
 
     :global(::-webkit-scrollbar-track) {
-        background: rgba(0, 0, 0, 0.05);
+		background: rgba(255, 255, 255, 0.03);
         border-radius: 5px;
     }
 
     :global(::-webkit-scrollbar-thumb) {
-        background: linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.2) 100%);
+		background: linear-gradient(180deg, rgba(83, 183, 255, 0.42) 0%, rgba(120, 160, 220, 0.46) 100%);
         border-radius: 5px;
         border: 2px solid transparent;
         background-clip: padding-box;
     }
 
     :global(::-webkit-scrollbar-thumb:hover) {
-        background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.3) 100%);
+		background: linear-gradient(180deg, rgba(126, 231, 255, 0.52) 0%, rgba(255, 212, 121, 0.42) 100%);
         background-clip: padding-box;
     }
 
@@ -415,23 +582,28 @@
     }
 
     :global(th) {
-        background: linear-gradient(135deg, #d4d0c4 0%, #c9c5b9 100%);
-        color: #1a1a1a;
+        background: linear-gradient(135deg, rgba(22, 31, 48, 0.98) 0%, rgba(14, 20, 32, 1) 100%);
+        color: rgba(213, 233, 255, 0.88);
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         padding: 0.75rem 1rem;
         text-align: left;
-        border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+        border-bottom: 2px solid rgba(126, 231, 255, 0.14);
     }
 
     :global(td) {
         padding: 0.75rem 1rem;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        border-bottom: 1px solid rgba(120, 160, 220, 0.12);
+        color: rgba(214, 226, 248, 0.82);
+    }
+
+    :global(tr:nth-child(even)) {
+        background: rgba(120, 160, 220, 0.025);
     }
 
     :global(tr:hover) {
-        background: rgba(0, 0, 0, 0.02);
+        background: rgba(126, 231, 255, 0.06);
     }
 
     /* Badge/Tag Styling */
@@ -448,21 +620,56 @@
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        background: rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        background: rgba(212, 199, 163, 0.08);
+        border: 1px solid rgba(212, 199, 163, 0.15);
+        color: #d4c7a5;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     }
 
-    /* Loading/Spinner States */
+    /* ═══ Loading & Skeleton States ═══ */
     :global(.loading) {
-        opacity: 0.6;
+        opacity: 0.45;
         pointer-events: none;
-        animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        animation: shimmer 2s ease-in-out infinite;
     }
 
-    @keyframes pulse {
-        0%, 100% { opacity: 0.6; }
-        50% { opacity: 0.8; }
+    @keyframes shimmer {
+        0%, 100% { opacity: 0.45; }
+        50% { opacity: 0.65; }
+    }
+
+    :global(.skeleton) {
+        background: linear-gradient(
+            90deg,
+            rgba(212, 199, 163, 0.04) 25%,
+            rgba(212, 199, 163, 0.08) 50%,
+            rgba(212, 199, 163, 0.04) 75%
+        );
+        background-size: 200% 100%;
+        animation: skeletonWave 1.8s ease-in-out infinite;
+        border-radius: 6px;
+    }
+
+    @keyframes skeletonWave {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    /* ═══ Semantic Status Colors ═══ */
+    :global(.text-success) { color: #4ade80; }
+    :global(.text-warning) { color: #fbbf24; }
+    :global(.text-danger)  { color: #f87171; }
+    :global(.text-info)    { color: #60a5fa; }
+    :global(.text-muted)   { color: rgba(212, 199, 165, 0.4); }
+
+    /* ═══ Fade-in for page content ═══ */
+    :global(.fade-in) {
+        animation: fadeIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     /* Mobile Responsiveness */
@@ -470,6 +677,10 @@
         .content {
             padding: 1.5rem;
         }
+
+		.app-shell::before {
+            inset: 0 0 0 60px;
+		}
 
         :global(h1) {
             font-size: 1.5rem;

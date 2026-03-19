@@ -47,8 +47,8 @@
 
 	const context: CommandContext = {
 		get searchValue() { return searchValue; },
-	get selectedValue() { return value; },
-	setSearchValue,
+		get selectedValue() { return value; },
+		setSearchValue,
 		setSelectedValue,
 		registerItem,
 		unregisterItem,
@@ -56,16 +56,23 @@
 	};
 
 	setContext<CommandContext>('command', context);
-
-	const defaultClass = `
-		flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground
-	`.replace(/\s+/g, ' ').trim();
 </script>
 
-<div class="{defaultClass} {className}" role="listbox">
+<div class="cmd-root {className}" role="listbox">
 	{#if children}
 		{@render children()}
 	{/if}
 </div>
 
-
+<style>
+	.cmd-root {
+		display: flex;
+		height: 100%;
+		width: 100%;
+		flex-direction: column;
+		overflow: hidden;
+		border-radius: 0.875rem;
+		background: rgba(22, 21, 18, 0.97);
+		color: rgba(212, 199, 163, 0.85);
+	}
+</style>

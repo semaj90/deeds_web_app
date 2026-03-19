@@ -216,13 +216,19 @@
 <style>
 	/* ── Page layout ── */
 	.analytics-page {
-		max-width: 72rem;
-		margin: 0 auto;
-		padding: 1.5rem;
+		min-height: 100vh;
+		background: #0e0d0b;
+		margin: -2.5rem;
+		padding: 1.5rem max(1.5rem, calc(50% - 36rem));
 		display: flex;
 		flex-direction: column;
 		gap: 1.25rem;
 	}
+	.analytics-page :global(h1), .analytics-page :global(h2), .analytics-page :global(h3), .analytics-page :global(h4), .analytics-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+	.analytics-page :global(a) { color: inherit; border-bottom: none; }
+	.analytics-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	.analytics-page :global(input), .analytics-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+	.analytics-page :global(.panel), .analytics-page :global(.card), .analytics-page :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
 	/* ── Header ── */
 	.ana-header {

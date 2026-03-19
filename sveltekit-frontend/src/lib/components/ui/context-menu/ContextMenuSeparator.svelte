@@ -6,12 +6,14 @@
 	let {
 		class: className = '',
 	}: Props = $props();
-
-	const defaultClass = `
-		-mx-1 my-1 h-px bg-muted
-	`.replace(/\s+/g, ' ').trim();
 </script>
 
-<div class="{defaultClass} {className}" role="separator"></div>
+<div class="ctx-sep {className}" role="separator"></div>
 
-
+<style>
+	.ctx-sep {
+		margin: 0.25rem -0.375rem;
+		height: 1px;
+		background: rgba(212, 199, 163, 0.08);
+	}
+</style>

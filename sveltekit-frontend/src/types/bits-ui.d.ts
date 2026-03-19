@@ -1,10 +1,9 @@
 declare module 'bits-ui' {
  // Minimal ambient declarations for bits-ui used during development.
- // Use Svelte's SvelteComponentTyped constructor shape to avoid `any` ESLint/TS warnings.
- import type { SvelteComponentTyped } from 'svelte';
+ // Use Svelte 5 Component type for compatibility with runes mode.
+ import type { Component } from 'svelte';
 
- // Corrected ComponentCtor type to include Props: Events, and Slots
- type ComponentCtor = new (...args: unknown[]) => SvelteComponentTyped<unknown, unknown, unknown>;
+ type ComponentCtor = Component<Record<string, any>, Record<string, any>, any>;
 
  export const Dialog: {
   Root: ComponentCtor;
@@ -40,6 +39,15 @@ declare module 'bits-ui' {
    Root: ComponentCtor;
    Trigger: ComponentCtor;
    Content: ComponentCtor;
+ };
+ export const Command: {
+   Root: ComponentCtor;
+   Input: ComponentCtor;
+   List: ComponentCtor;
+   Empty: ComponentCtor;
+   Group: ComponentCtor;
+   Item: ComponentCtor;
+   Separator: ComponentCtor;
  };
  export const Popover: ComponentCtor;
  export const Tooltip: ComponentCtor;

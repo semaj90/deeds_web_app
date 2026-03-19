@@ -20,19 +20,13 @@
 		onclick?.();
 		dialogContext?.close();
 	}
-
-	const defaultClass = `
-		inline-flex items-center justify-center rounded-md text-sm font-medium
-		ring-offset-background transition-colors focus-visible:outline-none
-		focus-visible:ring-2 focus-visible:ring-ring focus-visible: ring-offset-2 disabled:pointer-events-none disabled:opacity-50
-		border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2
-	`.replace(/\s+/g, ' ').trim();
 </script>
 
 <button
 	type="button"
 	onclick={handleClick}
-	class="{defaultClass} {className}"
+	class="alert-cancel {className}"
+	aria-label="Cancel"
 >
 	{#if children}
 		{@render children()}
@@ -41,4 +35,34 @@
 	{/if}
 </button>
 
-
+<style>
+	.alert-cancel {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		height: 2.5rem;
+		padding: 0 1rem;
+		border-radius: 0.625rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.15s ease;
+		border: 1px solid rgba(212, 199, 163, 0.1);
+		background: rgba(212, 199, 163, 0.04);
+		color: rgba(212, 199, 163, 0.6);
+	}
+	.alert-cancel:hover {
+		background: rgba(212, 199, 163, 0.08);
+		border-color: rgba(212, 199, 163, 0.15);
+		color: rgba(212, 199, 163, 0.85);
+	}
+	.alert-cancel:focus-visible {
+		outline: 2px solid rgba(96, 165, 250, 0.5);
+		outline-offset: 2px;
+	}
+	.alert-cancel:disabled {
+		pointer-events: none;
+		opacity: 0.5;
+	}
+</style>

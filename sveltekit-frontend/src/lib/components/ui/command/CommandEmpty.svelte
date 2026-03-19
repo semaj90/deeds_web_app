@@ -10,13 +10,9 @@
 		class: className = '',
 		children,
 	}: Props = $props();
-
-	const defaultClass = `
-		py-6 text-center text-sm
-	`.replace(/\s+/g, ' ').trim();
 </script>
 
-<div class="{defaultClass} {className}">
+<div class="cmd-empty {className}">
 	{#if children}
 		{@render children()}
 	{:else}
@@ -24,4 +20,11 @@
 	{/if}
 </div>
 
-
+<style>
+	.cmd-empty {
+		padding: 1.5rem 1rem;
+		text-align: center;
+		font-size: 0.8125rem;
+		color: rgba(212, 199, 163, 0.35);
+	}
+</style>

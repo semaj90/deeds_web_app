@@ -85,11 +85,17 @@
 
 <style>
 	.evidence-manage-page {
-		padding: 2rem;
+		padding: 2rem 2.5rem;
+		margin: -2.5rem;
 		background: #0f0f23;
 		min-height: 100vh;
 		color: #e0e0e0;
 	}
+	.evidence-manage-page :global(h1), .evidence-manage-page :global(h2), .evidence-manage-page :global(h3), .evidence-manage-page :global(h4), .evidence-manage-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+	.evidence-manage-page :global(a) { color: inherit; border-bottom: none; }
+	.evidence-manage-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	.evidence-manage-page :global(input), .evidence-manage-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+	.evidence-manage-page :global(.panel), .evidence-manage-page :global(.card), .evidence-manage-page :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
 	.page-header {
 		margin-bottom: 2rem;

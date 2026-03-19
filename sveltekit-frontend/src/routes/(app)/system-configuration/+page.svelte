@@ -540,21 +540,22 @@
 </div>
 
 <style>
- :global(body) {
-  background-color: #0f172a;
+ .config-container {
+  min-height: 100vh;
+  background: #0f172a;
   color: #f8fafc;
   font-family: 'Inter', system-ui, sans-serif;
- }
-
- .config-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 2rem;
-  height: 100vh;
+  margin: -2.5rem;
+  padding: 2rem max(1.5rem, calc(50% - 43.75rem));
   display: flex;
   flex-direction: column;
   gap: 2rem;
  }
+ .config-container :global(h1), .config-container :global(h2), .config-container :global(h3), .config-container :global(h4), .config-container :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+ .config-container :global(a) { color: inherit; border-bottom: none; }
+ .config-container :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+ .config-container :global(input), .config-container :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+ .config-container :global(.panel), .config-container :global(.card), .config-container :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
  .config-header h1 {
   font-family: 'JetBrains Mono', monospace;

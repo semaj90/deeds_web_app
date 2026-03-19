@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
+	import Icon from '$lib/components/ui/Icon.svelte';
 	import type { CommandContext, CommandInputProps } from './types';
 
 	interface Props extends CommandInputProps {}
@@ -17,36 +18,40 @@
 		value = target.value;
 		commandContext?.setSearchValue(target.value);
 	}
-
-	const defaultClass = `
-		flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none
-		placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50
-	`.replace(/\s+/g, ' ').trim();
 </script>
 
-<div class="flex items-center border-b px-3">
-	<svg
-		xmlns="http://www.w3.org/2000/svg"
-		width="24"
-		height="24"
-		viewBox="0 0 24 24"
-		fill="none"
-		stroke="currentColor"
-		stroke-width="2"
-		stroke-linecap="round"
-		stroke-linejoin="round"
-		class="mr-2 h-4 w-4 shrink-0 opacity-50"
-	>
-		<circle cx="11" cy="11" r="8"></circle>
-		<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-	</svg>
+<div class="cmd-input-row">
+	<Icon name="search" size={16} />
 	<input
 		type="text"
 		{placeholder}
 		{value}
 		oninput={handleInput}
-		class="{defaultClass} {className}"
+		class="cmd-input {className}"
 	/>
 </div>
 
+<style>
+	.cmd-input-row {
+		display: flex;
+		align-items: center;
+		gap: 0.625rem;
+		padding: 0.875rem 1rem;
+		border-bottom: 1px solid rgba(212, 199, 163, 0.08);
+		color: rgba(212, 199, 163, 0.35);
+	}
 
+	.cmd-input {
+		flex: 1;
+		height: 1.5rem;
+		width: 100%;
+		background: transparent;
+		border: none;
+		outline: none;
+		font-size: 0.875rem;
+		color: rgba(212, 199, 163, 0.85);
+	}
+	.cmd-input::placeholder {
+		color: rgba(212, 199, 163, 0.3);
+	}
+</style>

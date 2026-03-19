@@ -7,14 +7,24 @@
 	}
 
 	let { children, class: className = '' }: Props = $props();
-
-	const defaultClass = 'flex flex-col-reverse sm: flex-row sm: justify-end sm:space-x-2';
 </script>
 
-<div class="{defaultClass} {className}">
+<div class="alert-dlg-footer {className}">
 	{#if children}
 		{@render children()}
 	{/if}
 </div>
 
-
+<style>
+	.alert-dlg-footer {
+		display: flex;
+		flex-direction: column-reverse;
+		gap: 0.625rem;
+	}
+	@media (min-width: 640px) {
+		.alert-dlg-footer {
+			flex-direction: row;
+			justify-content: flex-end;
+		}
+	}
+</style>

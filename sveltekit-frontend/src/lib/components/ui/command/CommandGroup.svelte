@@ -11,19 +11,11 @@
 		class: className = '',
 		children,
 	}: Props = $props();
-
-	const defaultClass = `
-		overflow-hidden p-1 text-foreground
-	`.replace(/\s+/g, ' ').trim();
-
-	const headingClass = `
-		px-2 py-1.5 text-xs font-medium text-muted-foreground
-	`.replace(/\s+/g, ' ').trim();
 </script>
 
-<div class="{defaultClass} {className}" role="group">
+<div class="cmd-group {className}" role="group">
 	{#if heading}
-		<div class={headingClass}>
+		<div class="cmd-group-heading">
 			{heading}
 		</div>
 	{/if}
@@ -32,4 +24,18 @@
 	{/if}
 </div>
 
+<style>
+	.cmd-group {
+		overflow: hidden;
+		padding: 0.25rem;
+	}
 
+	.cmd-group-heading {
+		padding: 0.375rem 0.625rem 0.5rem;
+		font-size: 0.6875rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: rgba(212, 199, 163, 0.35);
+	}
+</style>

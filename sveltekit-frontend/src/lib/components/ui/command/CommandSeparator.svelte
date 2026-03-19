@@ -6,12 +6,14 @@
 	let {
 		class: className = '',
 	}: Props = $props();
-
-	const defaultClass = `
-		-mx-1 h-px bg-border
-	`.replace(/\s+/g, ' ').trim();
 </script>
 
-<div class="{defaultClass} {className}" role="separator"></div>
+<div class="cmd-sep {className}" role="separator"></div>
 
-
+<style>
+	.cmd-sep {
+		margin: 0.25rem 0;
+		height: 1px;
+		background: rgba(212, 199, 163, 0.08);
+	}
+</style>

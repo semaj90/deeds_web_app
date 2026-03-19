@@ -559,7 +559,13 @@
 		color: #f0f6fc;
 		font-family: 'JetBrains Mono', 'Consolas', monospace;
 		position: relative;
+		margin: -2.5rem;
 	}
+	.analysis-center :global(h1), .analysis-center :global(h2), .analysis-center :global(h3), .analysis-center :global(h4), .analysis-center :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+	.analysis-center :global(a) { color: inherit; border-bottom: none; }
+	.analysis-center :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	.analysis-center :global(input), .analysis-center :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+	.analysis-center :global(.panel), .analysis-center :global(.card), .analysis-center :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
 	.analysis-center::before {
 		content: '';

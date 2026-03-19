@@ -19,18 +19,11 @@
 		dialogContext?.close();
 	}
 
-	const defaultClass = `
-		absolute right-4 top-4
-		rounded-sm opacity-70
-		ring-offset-panel
-		transition-opacity
-		hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:pointer-events-none
-	`.replace(/\s+/g, ' ').trim();
 </script>
 
 <button
 	type="button"
-	class="{defaultClass} {className}"
+	class="dlg-close {className}"
 	onclick={handleClick}
 	aria-label={ariaLabel}
 	data-dialog-close=""
@@ -56,5 +49,33 @@
 		<span class="sr-only">Close</span>
 	{/if}
 </button>
+
+<style>
+	.dlg-close {
+		position: absolute;
+		right: 1.25rem;
+		top: 1.25rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2rem;
+		height: 2rem;
+		border-radius: 0.625rem;
+		color: rgba(212, 199, 163, 0.4);
+		background: rgba(212, 199, 163, 0.04);
+		border: 1px solid transparent;
+		cursor: pointer;
+		transition: all 0.15s ease;
+	}
+	.dlg-close:hover {
+		color: rgba(212, 199, 163, 0.85);
+		background: rgba(212, 199, 163, 0.08);
+		border-color: rgba(212, 199, 163, 0.1);
+	}
+	.dlg-close:focus-visible {
+		outline: 2px solid rgba(96, 165, 250, 0.5);
+		outline-offset: 2px;
+	}
+</style>
 
 

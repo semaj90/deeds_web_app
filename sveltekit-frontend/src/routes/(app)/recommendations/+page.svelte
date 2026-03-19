@@ -348,13 +348,19 @@
 <style>
 	/* ── Page layout ── */
 	.rec-page {
-		max-width: 80rem;
-		margin: 0 auto;
-		padding: 1.5rem;
+		min-height: 100vh;
+		background: #0e0d0b;
+		margin: -2.5rem;
+		padding: 1.5rem max(1.5rem, calc(50% - 40rem));
 		display: flex;
 		flex-direction: column;
 		gap: 1.25rem;
 	}
+	.rec-page :global(h1), .rec-page :global(h2), .rec-page :global(h3), .rec-page :global(h4), .rec-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+	.rec-page :global(a) { color: inherit; border-bottom: none; }
+	.rec-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	.rec-page :global(input), .rec-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+	.rec-page :global(.panel), .rec-page :global(.card), .rec-page :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
 	/* ── Header ── */
 	.rec-header {

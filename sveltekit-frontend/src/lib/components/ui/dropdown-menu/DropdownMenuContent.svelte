@@ -1,20 +1,34 @@
 <script lang="ts">
-  import { cn } from "$lib";
-  import { DropdownMenu } from "bits-ui";
-let { children, class: className = "", sideOffset = 4, ...rest } = $props();
+	import { cn } from "$lib";
+	import { DropdownMenu } from "bits-ui";
+	let { children, class: className = "", sideOffset = 4, ...rest }: any = $props();
 </script>
 
 <DropdownMenu.Content
-  {sideOffset}
-  class={cn(
-    "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md transition-all data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-    className
-  )}
-  {...rest}
+	{sideOffset}
+	class={cn("dropdown-content", className)}
+	{...rest}
 >
-  {#if children}
-    {@render children()}
-  {/if}
+	{#if children}
+		{@render children()}
+	{/if}
 </DropdownMenu.Content>
 
-
+<style>
+	:global(.dropdown-content) {
+		z-index: 50;
+		min-width: 10rem;
+		overflow: hidden;
+		padding: 0.375rem;
+		border-radius: 0.875rem;
+		background: rgba(22, 21, 18, 0.97);
+		border: 1px solid rgba(212, 199, 163, 0.1);
+		box-shadow:
+			0 0 0 1px rgba(0, 0, 0, 0.25),
+			0 12px 32px -4px rgba(0, 0, 0, 0.55),
+			0 0 48px rgba(0, 0, 0, 0.2),
+			inset 0 1px 0 rgba(212, 199, 163, 0.04);
+		backdrop-filter: blur(16px) saturate(1.2);
+		color: rgba(212, 199, 163, 0.85);
+	}
+</style>

@@ -12,7 +12,7 @@
 		level = 2,
 	}: Props = $props();
 
-	const defaultClass = 'text-lg font-semibold leading-none tracking-tight text-sand/20';
+	const defaultClass = 'text-lg font-semibold leading-none tracking-tight text-[rgba(212,199,163,0.92)]';
 </script>
 
 {#if level === 1}

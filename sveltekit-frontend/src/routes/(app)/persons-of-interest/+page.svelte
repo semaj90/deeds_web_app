@@ -5,6 +5,9 @@
 	import POIEditor from '$lib/components/poi/POIEditor.svelte';
 	import PersonOfInterestDetailView from '$lib/components/poi/PersonOfInterestDetailView.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import Kbd from '$lib/components/ui/Kbd.svelte';
+	import MicroInteraction from '$lib/components/ui/MicroInteraction.svelte';
+	import EmptyState from '$lib/components/ui/EmptyState.svelte';
 	import POIPhotoModal from '$lib/components/POIPhotoModal.svelte';
 	import POIPhotoUploader from '$lib/client/ui/POIPhotoUploader.svelte';
 
@@ -305,6 +308,8 @@
 							<button class="search-clear" onclick={() => (searchQuery = '')} aria-label="Clear search">
 								<Icon name="x" size={14} />
 							</button>
+						{:else}
+							<Kbd keys="Ctrl+K" size="sm" />
 						{/if}
 					</div>
 				</div>
@@ -409,28 +414,27 @@
 
 			<!-- Content Display -->
 			{#if filtered.length === 0}
-				<div class="empty-state">
-					<div class="empty-icon-ring">
-						<Icon name="user-x" size={32} />
-					</div>
-					<p class="empty-title">NO PERSONS OF INTEREST FOUND</p>
-					<p class="empty-subtitle">{searchQuery || selectedStatus || selectedThreatLevel ? 'Try adjusting your filters or clearing search' : 'Register persons of interest to get started'}</p>
-					<div class="empty-actions">
+				<EmptyState
+					icon="user-search"
+					title={searchQuery || selectedStatus || selectedThreatLevel ? 'No matching records' : 'No persons of interest'}
+					description={searchQuery || selectedStatus || selectedThreatLevel ? 'Try adjusting your filters or clearing search' : 'Register persons of interest to get started'}
+					actionLabel="REGISTER POI"
+					onaction={() => (showAddModal = true)}
+					variant="card"
+				>
+					{#snippet children()}
 						{#if searchQuery || selectedStatus || selectedThreatLevel}
 							<button class="btn-yorha" onclick={() => { searchQuery = ''; selectedStatus = ''; selectedThreatLevel = ''; }}>
 								<Icon name="filter-x" size={14} />
 								CLEAR FILTERS
 							</button>
 						{/if}
-						<button class="btn-yorha primary" onclick={() => (showAddModal = true)}>
-							<Icon name="user-plus" size={14} />
-							REGISTER POI
-						</button>
-					</div>
-				</div>
+					{/snippet}
+				</EmptyState>
 			{:else if viewMode === 'detail-cards'}
 				<div class="poi-grid">
 					{#each filtered as poi (poi.id)}
+						<MicroInteraction effect="lift">
 						<div class="poi-card">
 							<div class="card-status-ribbon" style="background: {getStatusColor(poi.status)}"></div>
 							<div class="card-header">
@@ -486,6 +490,7 @@
 								</a>
 							</div>
 						</div>
+						</MicroInteraction>
 					{/each}
 				</div>
 			{:else}
@@ -698,7 +703,13 @@
 		background: #131519;
 		font-family: 'JetBrains Mono', 'Courier New', monospace;
 		color: rgba(212, 199, 163, 0.9);
+		margin: -2.5rem;
 	}
+	.yorha-page :global(h1), .yorha-page :global(h2), .yorha-page :global(h3), .yorha-page :global(h4), .yorha-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+	.yorha-page :global(a) { color: inherit; border-bottom: none; }
+	.yorha-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	.yorha-page :global(input), .yorha-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+	.yorha-page :global(.panel), .yorha-page :global(.card), .yorha-page :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
 	/* Header */
 	.yorha-header {

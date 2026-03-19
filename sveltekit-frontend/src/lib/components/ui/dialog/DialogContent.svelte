@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { getContext } from 'svelte';
-// Migrated to $effect
 	import { scale } from 'svelte/transition';
 	import type { DialogContentProps } from './types';
 
@@ -21,7 +20,7 @@
 
 	const dialogContext = getContext<{ open: boolean, close: () => void }>('dialog');
 
-let contentRef = $state<HTMLDivElement | null>(null);
+	let contentRef = $state<HTMLDivElement | null>(null);
 	let previousActiveElement: Element | null = null;
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -35,58 +34,40 @@ let contentRef = $state<HTMLDivElement | null>(null);
 	}
 
 	function handleClick(e: MouseEvent) {
-		// Stop propagation to prevent overlay from closing
 		e.stopPropagation();
 	}
 
 	$effect(() => {
 		if (dialogContext?.open) {
 			previousActiveElement = document.activeElement;
-
-			// Prevent scroll
 			if (preventScroll) {
 				document.body.style.overflow = 'hidden';
 			}
-
-			// Focus the content
 			if (trapFocus && contentRef) {
 				contentRef.focus();
 			}
 		}
 
-		// Cleanup on effect destroy
 		return () => {
-			// Restore scroll
 			document.body.style.overflow = '';
-
-			// Restore focus
 			if (previousActiveElement instanceof HTMLElement) {
 				previousActiveElement.focus();
 			}
 		};
 	});
-
-	const defaultClass = `
-		fixed left-1/2 top-1/2 z-50
-		grid w-full max-w-lg
-		-translate-x-1/2 -translate-y-1/2
-		gap-4 border border-sand/20 bg-panel
-		p-6 shadow-lg duration-200
-		sm:rounded-lg md:w-full
-	`.replace(/\s+/g, ' ').trim();
 </script>
 
 {#if dialogContext?.open ?? forceMount}
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<div
 		bind:this={contentRef}
-		class="{defaultClass} {className}"
+		class="dlg-content {className}"
 		transition:scale={{
-			duration: 150,
-			start: 0.95
+			duration: 180,
+			start: 0.96
 		}}
-		onclick={ handleClick }
-		onkeydown={ handleKeydown }
+		onclick={handleClick}
+		onkeydown={handleKeydown}
 		role="dialog"
 		aria-modal="true"
 		tabindex="-1"
@@ -99,6 +80,53 @@ let contentRef = $state<HTMLDivElement | null>(null);
 	</div>
 {/if}
 
+<style>
+	.dlg-content {
+		position: fixed;
+		left: 50%;
+		top: 50%;
+		z-index: 50;
+		display: grid;
+		width: calc(100% - 2rem);
+		max-width: 32rem;
+		transform: translate(-50%, -50%);
+		gap: 1.25rem;
+		padding: 1.75rem;
+		overflow: hidden;
+		border-radius: var(--shell-radius-curve, 26px 26px 18px 18px / 22px 22px 30px 30px);
+		background: linear-gradient(180deg, rgba(19, 27, 42, 0.96) 0%, rgba(8, 12, 20, 0.98) 100%);
+		border: 1px solid var(--shell-border, rgba(120, 160, 220, 0.18));
+		box-shadow:
+			0 0 0 1px rgba(126, 231, 255, 0.04),
+			0 28px 56px -18px rgba(0, 0, 0, 0.72),
+			0 0 72px rgba(0, 0, 0, 0.36),
+			inset 0 1px 0 rgba(255, 255, 255, 0.05);
+		backdrop-filter: blur(20px) saturate(1.18);
+		color: var(--shell-text, rgba(233, 240, 255, 0.88));
+	}
 
+	.dlg-content::before {
+		content: '';
+		position: absolute;
+		inset: 0 1.5rem auto;
+		height: 1px;
+		background: linear-gradient(90deg, transparent, rgba(126, 231, 255, 0.82), rgba(255, 212, 121, 0.6), transparent);
+		pointer-events: none;
+	}
 
+	.dlg-content::after {
+		content: '';
+		position: absolute;
+		inset: 1px;
+		border-radius: calc(var(--shell-radius-lg, 24px) - 4px);
+		border: 1px solid rgba(255, 255, 255, 0.04);
+		pointer-events: none;
+	}
 
+	@media (min-width: 640px) {
+		.dlg-content {
+			width: 100%;
+			max-width: 32rem;
+		}
+	}
+</style>

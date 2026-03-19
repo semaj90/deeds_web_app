@@ -241,8 +241,15 @@
 	/* Page container */
 	.reports-page {
 		min-height: 100vh;
-		padding: 1.5rem;
+		background: #0e0d0b;
+		margin: -2.5rem;
+		padding: 1.5rem 2.5rem;
 	}
+	.reports-page :global(h1), .reports-page :global(h2), .reports-page :global(h3), .reports-page :global(h4), .reports-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+	.reports-page :global(a) { color: inherit; border-bottom: none; }
+	.reports-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	.reports-page :global(input), .reports-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+	.reports-page :global(.panel), .reports-page :global(.card), .reports-page :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
 	/* Header */
 	.reports-header {

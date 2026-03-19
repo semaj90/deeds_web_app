@@ -10,16 +10,10 @@
 		class: className = '',
 		children,
 	}: Props = $props();
-
-	const defaultClass = `
-		text-sm text-muted-foreground
-	`.replace(/\s+/g, ' ').trim();
 </script>
 
-<p class="{defaultClass} {className}">
+<p class="text-sm text-[rgba(212,199,163,0.5)] leading-relaxed {className}">
 	{#if children}
 		{@render children()}
 	{/if}
 </p>
-
-

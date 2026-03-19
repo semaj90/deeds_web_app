@@ -423,7 +423,13 @@
 		background: #0a0b0e;
 		display: flex;
 		flex-direction: column;
+		margin: -2.5rem;
 	}
+	.evidence-page :global(h1), .evidence-page :global(h2), .evidence-page :global(h3), .evidence-page :global(h4), .evidence-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+	.evidence-page :global(a) { color: inherit; border-bottom: none; }
+	.evidence-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	.evidence-page :global(input), .evidence-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+	.evidence-page :global(.panel), .evidence-page :global(.card), .evidence-page :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 	.evidence-content {
 		flex: 1;
 		padding: 0.5rem 0;

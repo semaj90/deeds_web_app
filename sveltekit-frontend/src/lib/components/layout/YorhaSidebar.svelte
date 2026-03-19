@@ -151,14 +151,19 @@
 		top: 0;
 		bottom: 0;
 		width: 210px;
-		background: #1e1f26;
-		border-right: 1px solid rgba(255, 255, 255, 0.08);
+		background:
+			radial-gradient(circle at top left, rgba(200, 195, 160, 0.08), transparent 34%),
+			linear-gradient(180deg, #211d16 0%, #17140f 52%, #12100c 100%);
+		border-right: 1px solid rgba(138, 133, 94, 0.38);
 		display: flex;
 		flex-direction: column;
 		z-index: 1000;
-		transition: width 0.3s ease;
+		transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 		font-family: 'JetBrains Mono', monospace;
-		color: #c8c8d0;
+		color: rgba(232, 228, 200, 0.88);
+		box-shadow:
+			inset -1px 0 0 rgba(255, 255, 255, 0.03),
+			12px 0 32px rgba(0, 0, 0, 0.35);
 	}
 
 	.yorha-sidebar.collapsed {
@@ -168,8 +173,9 @@
 	/* Header */
 	.sidebar-header {
 		padding: 1.5rem 1rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		border-bottom: 1px solid rgba(138, 133, 94, 0.18);
 		position: relative;
+		background: rgba(0, 0, 0, 0.12);
 	}
 
 	.branding {
@@ -189,12 +195,13 @@
 		margin: 0;
 		letter-spacing: 0.05em;
 		text-transform: uppercase;
+		color: #ece6cb;
 	}
 
 	.subtitle {
 		font-size: 0.625rem;
 		margin: 0.25rem 0 0 0;
-		opacity: 0.7;
+		color: rgba(200, 195, 160, 0.46);
 		letter-spacing: 0.05em;
 	}
 
@@ -204,19 +211,22 @@
 		right: 0.5rem;
 		width: 24px;
 		height: 24px;
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		background: transparent;
-		color: #c8c8d0;
+		border: 1px solid rgba(138, 133, 94, 0.28);
+		background: rgba(216, 212, 184, 0.04);
+		color: rgba(232, 228, 200, 0.7);
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		transition: background 0.2s;
+		transition: all 0.15s ease;
 		padding: 0;
+		border-radius: 0.45rem;
 	}
 
 	.collapse-btn:hover {
-		background: rgba(255, 255, 255, 0.08);
+		background: rgba(216, 212, 184, 0.1);
+		color: #f0edd4;
+		border-color: rgba(138, 133, 94, 0.42);
 	}
 
 	/* Navigation */
@@ -235,13 +245,13 @@
 		padding: 0.5rem 0.75rem;
 		margin: 1px 0.5rem;
 		text-decoration: none;
-		color: #a0a0b0;
+		color: rgba(232, 228, 200, 0.68);
 		font-size: 0.6875rem;
 		font-weight: 500;
 		letter-spacing: 0.05em;
 		text-transform: uppercase;
 		border: 1px solid transparent;
-		border-radius: 4px;
+		border-radius: 0.7rem;
 		transition: all 0.15s;
 		position: relative;
 	}
@@ -252,19 +262,28 @@
 	}
 
 	.nav-item:hover {
-		background: rgba(255, 255, 255, 0.06);
-		color: #e0e0e8;
-		border-color: rgba(255, 255, 255, 0.08);
+		background: rgba(216, 212, 184, 0.06);
+		color: #f0edd4;
+		border-color: rgba(138, 133, 94, 0.18);
 	}
 
 	.nav-item.active {
-		background: rgba(74, 222, 128, 0.1);
-		color: #4ade80;
-		border-color: rgba(74, 222, 128, 0.2);
+		background: linear-gradient(180deg, rgba(216, 212, 184, 0.14) 0%, rgba(216, 212, 184, 0.08) 100%);
+		color: #f7f2df;
+		border-color: rgba(138, 133, 94, 0.36);
+		box-shadow:
+			inset 3px 0 0 #c4b78f,
+			inset 0 1px 0 rgba(255, 255, 255, 0.03);
+	}
+
+	.collapsed .nav-item.active {
+		box-shadow:
+			inset 0 -2px 0 #c4b78f,
+			inset 0 1px 0 rgba(255, 255, 255, 0.03);
 	}
 
 	.admin-item {
-		opacity: 0.6;
+		opacity: 0.72;
 	}
 
 	.admin-item:hover,
@@ -275,6 +294,8 @@
 	.nav-label {
 		flex: 1;
 		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.nav-spacer {
@@ -285,22 +306,23 @@
 	.section-divider {
 		padding: 0.5rem 1rem;
 		margin-top: 0.5rem;
-		border-top: 1px solid rgba(255, 255, 255, 0.06);
+		border-top: 1px solid rgba(138, 133, 94, 0.16);
 	}
 
 	.section-label {
 		font-size: 0.5625rem;
 		font-weight: 700;
-		color: #666;
+		color: rgba(200, 195, 160, 0.46);
 		letter-spacing: 0.1em;
 	}
 
 	/* Footer */
 	.sidebar-footer {
 		padding: 1rem;
-		border-top: 1px solid rgba(255, 255, 255, 0.08);
+		border-top: 1px solid rgba(138, 133, 94, 0.16);
 		font-size: 0.625rem;
-		opacity: 0.7;
+		opacity: 1;
+		background: rgba(0, 0, 0, 0.16);
 	}
 
 	.status-indicator {
@@ -318,20 +340,30 @@
 	}
 
 	.status-dot.online {
-		background: #22c55e;
+		background: #4ade80;
+		box-shadow: 0 0 6px rgba(74, 222, 128, 0.4);
+		animation: statusPulse 3s ease-in-out infinite;
+	}
+
+	@keyframes statusPulse {
+		0%, 100% { box-shadow: 0 0 4px rgba(74, 222, 128, 0.3); }
+		50% { box-shadow: 0 0 8px rgba(74, 222, 128, 0.55); }
 	}
 
 	.status-text {
 		font-weight: 500;
+		color: #ece6cb;
 	}
 
 	.system-status {
 		margin-bottom: 0.25rem;
+		color: rgba(200, 195, 160, 0.58);
 	}
 
 	.timestamp {
-		opacity: 0.6;
-		font-size: 0.5625rem;
+		color: rgba(200, 195, 160, 0.36);
+		font-size: 0.5rem;
+		font-variant-numeric: tabular-nums;
 	}
 
 	/* Scrollbar */
@@ -340,15 +372,15 @@
 	}
 
 	.sidebar-nav::-webkit-scrollbar-track {
-		background: rgba(255, 255, 255, 0.02);
+		background: transparent;
 	}
 
 	.sidebar-nav::-webkit-scrollbar-thumb {
-		background: rgba(255, 255, 255, 0.1);
-		border-radius: 2px;
+		background: rgba(138, 133, 94, 0.24);
+		border-radius: 999px;
 	}
 
 	.sidebar-nav::-webkit-scrollbar-thumb:hover {
-		background: rgba(255, 255, 255, 0.2);
+		background: rgba(170, 164, 126, 0.38);
 	}
 </style>

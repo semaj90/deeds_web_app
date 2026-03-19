@@ -7,14 +7,10 @@
 	}
 
 	let { children, class: className = '' }: Props = $props();
-
-	const defaultClass = 'flex flex-col space-y-2 text-center sm:text-left';
 </script>
 
-<div class="{defaultClass} {className}">
+<div class="flex flex-col space-y-2 text-center sm:text-left {className}">
 	{#if children}
 		{@render children()}
 	{/if}
 </div>
-
-

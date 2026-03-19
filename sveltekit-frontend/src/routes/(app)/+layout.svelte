@@ -9,6 +9,7 @@
 	import { notificationStore } from '$lib/stores/unified/notification-store.svelte.js';
 	import { authStore } from '$lib/stores/auth-store.svelte.js';
 	import OfflineIndicator from '$lib/components/cache/OfflineIndicator.svelte';
+	import Breadcrumbs from '$lib/components/ui/Breadcrumbs.svelte';
 	import { initTypingDetector } from '$lib/utils/telemetry.js';
 
 	interface Props {
@@ -93,6 +94,9 @@
 
 <!-- Main Content (Sidebar is in root layout) -->
 <main id="main-content" class="app-content">
+	<div class="breadcrumb-bar">
+		<Breadcrumbs />
+	</div>
 	<ErrorBoundary showDetails={data.devBypass}>
 		{@render children?.()}
 	</ErrorBoundary>
@@ -134,17 +138,21 @@
 
 <style>
 	.dev-banner {
-		background: #ecc94b;
-		color: #000;
+		background:
+			radial-gradient(circle at left, rgba(126, 231, 255, 0.12), transparent 24%),
+			linear-gradient(135deg, rgba(12, 18, 31, 0.98) 0%, rgba(20, 28, 45, 0.96) 100%);
+		color: rgba(255, 221, 145, 0.96);
+		border-bottom: 1px solid rgba(126, 231, 255, 0.18);
 		padding: 0.375rem 1rem;
 		text-align: center;
 		font-size: 0.75rem;
 		font-family: 'JetBrains Mono', monospace;
 		font-weight: 600;
-		letter-spacing: 0.05em;
+		letter-spacing: 0.08em;
 		position: sticky;
 		top: 0;
 		z-index: 100;
+		backdrop-filter: blur(8px);
 	}
 
 	.app-content {
@@ -153,6 +161,14 @@
 		flex-direction: column;
 	}
 
+	.breadcrumb-bar {
+		padding: 0.5rem 2rem 0.25rem;
+		border-bottom: 1px solid rgba(126, 231, 255, 0.08);
+		background: linear-gradient(180deg, rgba(9, 14, 23, 0.78) 0%, rgba(9, 14, 23, 0.18) 100%);
+		backdrop-filter: blur(18px);
+	}
+
+	/* ═══ Toast Notifications ═══ */
 	.toast-container {
 		position: fixed;
 		bottom: 1.5rem;
@@ -169,22 +185,42 @@
 		align-items: center;
 		gap: 0.75rem;
 		padding: 0.75rem 1rem;
-		border-radius: 0.375rem;
-		font-size: 0.8125rem;
+		border-radius: 1rem;
+		font-size: 0.75rem;
 		font-family: 'JetBrains Mono', monospace;
-		box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-		animation: toast-in 0.2s ease-out;
+		border: 1px solid rgba(126, 231, 255, 0.08);
+		box-shadow:
+			0 18px 34px rgba(0, 0, 0, 0.28),
+			0 0 0 1px rgba(0, 0, 0, 0.2);
+		animation: toast-in 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+		backdrop-filter: blur(12px);
 	}
 
 	@keyframes toast-in {
-		from { opacity: 0; transform: translateX(1rem); }
-		to { opacity: 1; transform: translateX(0); }
+		from { opacity: 0; transform: translateX(1rem) scale(0.96); }
+		to { opacity: 1; transform: translateX(0) scale(1); }
 	}
 
-	.toast-info { background: #1a2332; color: #63b3ed; border: 1px solid #63b3ed40; }
-	.toast-success { background: #1a2e1a; color: #48bb78; border: 1px solid #48bb7840; }
-	.toast-warning { background: #2e2a1a; color: #ecc94b; border: 1px solid #ecc94b40; }
-	.toast-error { background: #2e1a1a; color: #f56565; border: 1px solid #f5656540; }
+	.toast-info {
+		background: linear-gradient(135deg, rgba(14, 27, 44, 0.96) 0%, rgba(10, 19, 31, 0.98) 100%);
+		color: #8adfff;
+		border-color: rgba(126, 231, 255, 0.2);
+	}
+	.toast-success {
+		background: linear-gradient(135deg, rgba(11, 32, 26, 0.96) 0%, rgba(8, 20, 16, 0.98) 100%);
+		color: #7df0ba;
+		border-color: rgba(83, 226, 164, 0.2);
+	}
+	.toast-warning {
+		background: linear-gradient(135deg, rgba(34, 25, 11, 0.96) 0%, rgba(22, 16, 7, 0.98) 100%);
+		color: #ffd479;
+		border-color: rgba(255, 212, 121, 0.22);
+	}
+	.toast-error {
+		background: linear-gradient(135deg, rgba(40, 16, 22, 0.96) 0%, rgba(24, 10, 14, 0.98) 100%);
+		color: #ff99a3;
+		border-color: rgba(255, 107, 120, 0.2);
+	}
 
 	.toast-msg { flex: 1; }
 
@@ -192,11 +228,13 @@
 		background: none;
 		border: none;
 		color: inherit;
-		opacity: 0.6;
+		opacity: 0.4;
 		cursor: pointer;
-		font-size: 1.25rem;
-		padding: 0;
+		font-size: 1.125rem;
+		padding: 0.25rem;
 		line-height: 1;
+		border-radius: 999px;
+		transition: opacity 0.15s ease;
 	}
-	.toast-dismiss:hover { opacity: 1; }
+	.toast-dismiss:hover { opacity: 0.9; }
 </style>

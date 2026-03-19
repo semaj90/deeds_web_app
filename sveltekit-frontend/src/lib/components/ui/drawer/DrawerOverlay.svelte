@@ -14,21 +14,26 @@
 	function handleClick() {
 		drawerContext?.close();
 	}
-
-	const defaultClass = `
-		fixed inset-0 z-50 bg-black/80
-	`.replace(/\s+/g, ' ').trim();
 </script>
 
 {#if drawerContext?.open}
 	<div
-		transition:fade={{
-	duration: 150 }}
-		class="{defaultClass} {className}"
-		onclick={ handleClick }
+		transition:fade={{ duration: 200 }}
+		class="drawer-overlay {className}"
+		onclick={handleClick}
 		role="presentation"
 	></div>
 {/if}
 
-
-
+<style>
+	.drawer-overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 50;
+		background:
+			radial-gradient(circle at top, rgba(126, 231, 255, 0.14), transparent 26%),
+			radial-gradient(circle at bottom right, rgba(255, 212, 121, 0.12), transparent 24%),
+			rgba(4, 8, 15, 0.82);
+		backdrop-filter: blur(14px) saturate(1.15);
+	}
+</style>

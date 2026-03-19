@@ -336,6 +336,18 @@
  <div class="stat-icon">📊</div>
  </div>
  </section>
+ 
+  <!-- Featured Experimental UI -->
+  <section class="featured-demo-banner" style="margin: 0 2rem 1.5rem; padding: 1.5rem; background: #1a3a5a; border: 3px solid #0f0f0f; color: #fdf3d4; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;">
+    <div style="display: flex; align-items: center; gap: 1.25rem;">
+      <div style="font-size: 2.5rem;">✨</div>
+      <div>
+        <h3 style="margin: 0; font-size: 1rem; font-weight: 900; letter-spacing: 1px;">NEW: PREMIUM BENTO DASHBOARD [PROTOTYPE]</h3>
+        <p style="margin: 0; font-size: 0.75rem; opacity: 0.8;">Experience the future of the YoRHa intelligence interface with UnoCSS and glassmorphism.</p>
+      </div>
+    </div>
+    <a href="/demos/bento-dashboard" class="view-all-btn" style="background: #0f0f0f; color: #fdf3d4;">LAUNCH PROTOTYPE →</a>
+  </section>
 
  <!-- Legal Glossary / Laws Search -->
  <section class="legal-search-section">

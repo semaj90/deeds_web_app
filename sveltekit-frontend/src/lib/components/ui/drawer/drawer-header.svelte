@@ -10,16 +10,21 @@
 		class: className = '',
 		children,
 	}: Props = $props();
-
-	const defaultClass = `
-		flex flex-col space-y-2 text-center sm:text-left
-	`.replace(/\s+/g, ' ').trim();
 </script>
 
-<div class="{defaultClass} {className}">
+<div class="drawer-header {className}">
 	{#if children}
 		{@render children()}
 	{/if}
 </div>
 
-
+<style>
+	.drawer-header {
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
+		padding-bottom: 1rem;
+		border-bottom: 1px solid rgba(212, 199, 163, 0.08);
+		margin-bottom: 1rem;
+	}
+</style>

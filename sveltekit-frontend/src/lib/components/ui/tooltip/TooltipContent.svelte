@@ -18,13 +18,6 @@
 
 	const tooltipContext = getContext<TooltipContext>('tooltip');
 
-	const defaultClass = `
-		absolute z-50 overflow-hidden rounded-md border
-		bg-popover px-3 py-1.5 text-sm text-popover-foreground
-		shadow-md animate-in fade-in-0 zoom-in-95
-	`.replace(/\\s+/g, ' ').trim();
-
-	// Position classes based on side - use $derived for reactivity
 	const sideClass = $derived(
 		side === 'top' ? 'bottom-full left-1/2 -translate-x-1/2 mb-1'
 		: side === 'bottom' ? 'top-full left-1/2 -translate-x-1/2 mt-1'
@@ -37,12 +30,11 @@
 	<div
 		id="tooltip-content"
 		role="tooltip"
-		class="{defaultClass} {sideClass} {className}"
-		transition:fade={{
-	duration: 150 }}
+		class="tip-content {sideClass} {className}"
+		transition:fade={{ duration: 120 }}
 		data-state="open"
 		data-side={side}
-		data-align={ align }
+		data-align={align}
 	>
 		{#if children}
 			{@render children()}
@@ -50,5 +42,22 @@
 	</div>
 {/if}
 
-
-
+<style>
+	.tip-content {
+		position: absolute;
+		z-index: 50;
+		overflow: hidden;
+		padding: 0.375rem 0.75rem;
+		border-radius: 0.625rem;
+		font-size: 0.8125rem;
+		line-height: 1.4;
+		background: rgba(22, 21, 18, 0.97);
+		border: 1px solid rgba(212, 199, 163, 0.1);
+		box-shadow:
+			0 0 0 1px rgba(0, 0, 0, 0.2),
+			0 8px 24px -4px rgba(0, 0, 0, 0.5),
+			inset 0 1px 0 rgba(212, 199, 163, 0.04);
+		backdrop-filter: blur(12px) saturate(1.15);
+		color: rgba(212, 199, 163, 0.8);
+	}
+</style>

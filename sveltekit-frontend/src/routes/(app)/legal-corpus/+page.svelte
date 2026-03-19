@@ -441,10 +441,16 @@
 <style>
 	.legal-corpus-page {
 		min-height: 100vh;
-		padding: 1.5rem;
+		padding: 1.5rem 2.5rem;
+		margin: -2.5rem;
 		background: var(--color-bg, #0a0a1a);
 		color: var(--color-text, #e0e0e0);
 	}
+	.legal-corpus-page :global(h1), .legal-corpus-page :global(h2), .legal-corpus-page :global(h3), .legal-corpus-page :global(h4), .legal-corpus-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+	.legal-corpus-page :global(a) { color: inherit; border-bottom: none; }
+	.legal-corpus-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	.legal-corpus-page :global(input), .legal-corpus-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+	.legal-corpus-page :global(.panel), .legal-corpus-page :global(.card), .legal-corpus-page :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
 	.corpus-header {
 		display: flex;

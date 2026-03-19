@@ -31,6 +31,7 @@
 		{ href: '/demos/bits-ui', label: 'Bits UI Showcase', description: 'Comprehensive bits-ui v2 component showcase: Dialog, Select, Input, and headless patterns for legal AI.', icon: 'layout', lines: 267, category: 'ui' },
 		{ href: '/demos/nes-elements', label: 'NES Elements', description: 'Full NES.css HTML element catalogue styled with retro gaming theme and pixel-perfect rendering.', icon: 'gamepad-2', lines: 233, category: 'gaming' },
 		{ href: '/demos/gpu-cache', label: 'GPU Cache Integration', description: 'Multi-tier cache visualization across L0 through L4 with GPU compute metrics and hit-rate analysis.', icon: 'cpu', lines: 150, category: 'system' },
+		{ href: '/demos/bento-dashboard', label: 'Bento Dashboard', description: 'Premium Bento Box dashboard layout with UnoCSS, Svelte 5 Runes, and glassmorphic widgets.', icon: 'layout-dashboard', lines: 349, category: 'ui' },
 		{ href: '/demos/icons', label: 'Icon System', description: 'Dynamic icon loading via UnoCSS presetIcons with container component showcase and accessibility testing.', icon: 'image', lines: 65, category: 'ui' },
 		{ href: '/demos/ace-pipeline', label: 'ACE Pipeline', description: 'ACE Context Bubble and RAG Pipeline Chart with confidence scoring and self-evaluation metrics.', icon: 'git-branch', lines: 188, category: 'ai' },
 		{ href: '/demos/case-scoring', label: 'Case Scoring', description: 'AI case risk scoring dashboard with dynamic factors, confidence metrics, priority filtering, and risk visualization.', icon: 'shield', lines: 543, category: 'ai' },

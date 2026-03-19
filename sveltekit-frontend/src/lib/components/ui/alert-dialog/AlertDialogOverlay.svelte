@@ -10,21 +10,26 @@
 	let { class: className = '' }: Props = $props();
 
 	const dialogContext = getContext<AlertDialogContext>('alert-dialog');
-
-	const defaultClass = `
-		fixed inset-0 z-50 bg-black/80
-	`.replace(/\s+/g, ' ').trim();
 </script>
 
 {#if dialogContext?.open}
 	<div
-		class="{defaultClass} {className}"
-		transition:fade={{
-	duration: 150 }}
+		class="alert-dlg-overlay {className}"
+		transition:fade={{ duration: 200 }}
 		data-state="open"
 		aria-hidden="true"
 	></div>
 {/if}
 
-
-
+<style>
+	.alert-dlg-overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 50;
+		background:
+			radial-gradient(circle at top, rgba(126, 231, 255, 0.14), transparent 26%),
+			radial-gradient(circle at bottom right, rgba(255, 212, 121, 0.12), transparent 24%),
+			rgba(4, 8, 15, 0.82);
+		backdrop-filter: blur(14px) saturate(1.15);
+	}
+</style>

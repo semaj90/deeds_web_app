@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
+	import Icon from '$lib/components/ui/Icon.svelte';
 	import EvidenceDrawer from '$lib/components/admin/EvidenceDrawer.svelte';
 	import EvidenceDataGrid from '$lib/components/admin/EvidenceDataGrid.svelte';
 	import CachePerformanceDashboard from '$lib/components/ai/CachePerformanceDashboard.svelte';

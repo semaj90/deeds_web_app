@@ -69,11 +69,14 @@
   </div>
 {/if}
 <style>
-  /* @unocss-include */
   .modal-backdrop {
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background:
+      radial-gradient(circle at top, rgba(126, 231, 255, 0.14), transparent 26%),
+      radial-gradient(circle at bottom right, rgba(255, 212, 121, 0.12), transparent 24%),
+      rgba(4, 8, 15, 0.82);
+    backdrop-filter: blur(14px) saturate(1.15);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -82,56 +85,102 @@
   }
 
   .modal-content {
-    background-color: white;
-    border-radius: 0.5rem;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    position: relative;
+    background: linear-gradient(180deg, rgba(19, 27, 42, 0.96) 0%, rgba(8, 12, 20, 0.98) 100%);
+    border-radius: var(--shell-radius-curve, 26px 26px 18px 18px / 22px 22px 30px 30px);
+    border: 1px solid var(--shell-border, rgba(120, 160, 220, 0.18));
+    box-shadow:
+      0 0 0 1px rgba(126, 231, 255, 0.04),
+      0 28px 56px -18px rgba(0, 0, 0, 0.72),
+      0 0 72px rgba(0, 0, 0, 0.36),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px) saturate(1.18);
     width: 100%;
     max-height: 90vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    color: var(--shell-text, rgba(233, 240, 255, 0.88));
+  }
+
+  .modal-content::before {
+    content: '';
+    position: absolute;
+    inset: 0 1.5rem auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(126, 231, 255, 0.82), rgba(255, 212, 121, 0.6), transparent);
+    pointer-events: none;
+  }
+
+  .modal-content::after {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    border-radius: calc(var(--shell-radius-lg, 24px) - 4px);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    pointer-events: none;
   }
 
   .modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
+    padding: 1.5rem 1.75rem;
+    border-bottom: 1px solid rgba(126, 231, 255, 0.1);
   }
 
   .modal-title {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 600;
-    color: #111827;
+    color: rgba(233, 240, 255, 0.92);
     margin: 0;
+    letter-spacing: 0.04em;
   }
 
   .modal-close {
-    background: none;
-    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.375rem;
+    height: 2.375rem;
+    border-radius: 999px;
+    background: rgba(126, 231, 255, 0.06);
+    border: 1px solid rgba(126, 231, 255, 0.12);
     cursor: pointer;
-    padding: 0.5rem;
-    color: #6b7280;
-    transition: color 0.15s;
+    padding: 0;
+    color: rgba(214, 226, 248, 0.62);
+    transition: all 0.15s ease;
   }
 
   .modal-close:hover {
-    color: #374151;
+    color: rgba(244, 250, 255, 0.92);
+    background: linear-gradient(135deg, rgba(126, 231, 255, 0.16) 0%, rgba(255, 212, 121, 0.12) 100%);
+    border-color: rgba(126, 231, 255, 0.24);
   }
 
   .modal-body {
-    padding: 1.5rem;
+    padding: 1.5rem 1.75rem;
     overflow-y: auto;
     flex: 1;
   }
 
+  .modal-body::-webkit-scrollbar {
+    width: 6px;
+  }
+  .modal-body::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .modal-body::-webkit-scrollbar-thumb {
+    background: rgba(212, 199, 163, 0.12);
+    border-radius: 3px;
+  }
+
   .modal-footer {
-    padding: 1.5rem;
-    border-top: 1px solid #e5e7eb;
+    padding: 1.25rem 1.75rem;
+    border-top: 1px solid rgba(126, 231, 255, 0.08);
     display: flex;
     justify-content: flex-end;
-    gap: 0.5rem;
+    gap: 0.625rem;
   }
 </style>
 

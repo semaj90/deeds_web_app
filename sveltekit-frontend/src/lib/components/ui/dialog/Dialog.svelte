@@ -23,11 +23,10 @@
 	import DialogRoot from './DialogRoot.svelte';
 	import DialogTitle from './DialogTitle.svelte';
 	import type { DialogRootProps } from './types';
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
 	/**
-	 * A convenient all-in-one Dialog component that combines Root:Portal: Overlay, and Content.
-	 * For more control, use the individual sub-components (Dialog.Root:Dialog.Content, etc.)
+	 * A convenient all-in-one Dialog component that combines Root, Portal, Overlay, and Content.
+	 * For more control, use the individual sub-components (Dialog.Root, Dialog.Content, etc.)
 	 */
 	interface Props extends DialogRootProps {
 		children?: Snippet;
@@ -51,10 +50,10 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	}: Props = $props();
 </script>
 
-<DialogRoot bind:open { onOpenChange } class={ className }>
+<DialogRoot bind:open {onOpenChange} class={className}>
 	<DialogPortal>
 		<DialogOverlay class={overlayClass} />
-		<DialogContent class={ contentClass }>
+		<DialogContent class={contentClass}>
 			{#if title || description}
 				<div class="mb-4">
 					{#if title}
@@ -76,5 +75,3 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 		</DialogContent>
 	</DialogPortal>
 </DialogRoot>
-
-

@@ -11,7 +11,7 @@
 		class: className = '',
 	}: Props = $props();
 
-	const defaultClass = 'text-sm text-sand/40';
+	const defaultClass = 'text-sm text-[rgba(212,199,163,0.5)] leading-relaxed';
 </script>
 
 <p class="{defaultClass} {className}" data-dialog-description="">

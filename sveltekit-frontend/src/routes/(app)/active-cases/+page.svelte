@@ -408,7 +408,13 @@
 		color: #e0e0e0;
 		font-family: 'JetBrains Mono', 'Courier New', monospace;
 		padding: 0;
+		margin: -2.5rem;
 	}
+	.terminal-page :global(h1), .terminal-page :global(h2), .terminal-page :global(h3), .terminal-page :global(h4), .terminal-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+	.terminal-page :global(a) { color: inherit; border-bottom: none; }
+	.terminal-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	.terminal-page :global(input), .terminal-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+	.terminal-page :global(.panel), .terminal-page :global(.card), .terminal-page :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
 	/* Terminal Header */
 	.terminal-header {

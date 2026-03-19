@@ -15,11 +15,6 @@
 
 	const menuContext = getContext<ContextMenuContext>('context-menu');
 
-	const defaultClass = `
-		fixed z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1
-		text-popover-foreground shadow-md
-	`.replace(/\s+/g, ' ').trim();
-
 	function handleClick(event: MouseEvent) {
 		event.stopPropagation();
 	}
@@ -32,12 +27,11 @@
 {#if menuContext?.open}
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
-		transition:scale={{
-	duration: 100, start: 0.95 }}
-		class="{defaultClass} {className}"
+		transition:scale={{ duration: 120, start: 0.96 }}
+		class="ctx-content {className}"
 		style="left: {menuContext.position.x}px; top: {menuContext.position.y}px;"
-		onclick={ handleClick }
-		onkeydown={ handleKeydown }
+		onclick={handleClick}
+		onkeydown={handleKeydown}
 		role="menu"
 		tabindex="-1"
 	>
@@ -47,6 +41,22 @@
 	</div>
 {/if}
 
-
-
-
+<style>
+	.ctx-content {
+		position: fixed;
+		z-index: 50;
+		min-width: 10rem;
+		overflow: hidden;
+		padding: 0.375rem;
+		border-radius: 0.875rem;
+		background: rgba(22, 21, 18, 0.97);
+		border: 1px solid rgba(212, 199, 163, 0.1);
+		box-shadow:
+			0 0 0 1px rgba(0, 0, 0, 0.25),
+			0 12px 32px -4px rgba(0, 0, 0, 0.55),
+			0 0 48px rgba(0, 0, 0, 0.2),
+			inset 0 1px 0 rgba(212, 199, 163, 0.04);
+		backdrop-filter: blur(16px) saturate(1.2);
+		color: rgba(212, 199, 163, 0.85);
+	}
+</style>

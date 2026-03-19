@@ -428,10 +428,16 @@
 
 	.intake-container {
 		min-height: 100vh;
-		padding: 2rem;
+		padding: 2rem 2.5rem;
+		margin: -2.5rem;
 		background: var(--yorha-bg, #1a1a1a);
 		color: var(--yorha-ink, #d4c7a3);
 	}
+	.intake-container :global(h1), .intake-container :global(h2), .intake-container :global(h3), .intake-container :global(h4), .intake-container :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
+	.intake-container :global(a) { color: inherit; border-bottom: none; }
+	.intake-container :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	.intake-container :global(input), .intake-container :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
+	.intake-container :global(.panel), .intake-container :global(.card), .intake-container :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
 	.intake-header {
 		max-width: 1200px;

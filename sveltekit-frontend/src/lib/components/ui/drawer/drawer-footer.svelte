@@ -10,16 +10,27 @@
 		class: className = '',
 		children,
 	}: Props = $props();
-
-	const defaultClass = `
-		flex flex-col-reverse sm: flex-row sm: justify-end sm:space-x-2
-	`.replace(/\s+/g, ' ').trim();
 </script>
 
-<div class="{defaultClass} {className}">
+<div class="drawer-footer {className}">
 	{#if children}
 		{@render children()}
 	{/if}
 </div>
 
-
+<style>
+	.drawer-footer {
+		display: flex;
+		flex-direction: column-reverse;
+		gap: 0.625rem;
+		padding-top: 1rem;
+		border-top: 1px solid rgba(212, 199, 163, 0.08);
+		margin-top: auto;
+	}
+	@media (min-width: 640px) {
+		.drawer-footer {
+			flex-direction: row;
+			justify-content: flex-end;
+		}
+	}
+</style>
