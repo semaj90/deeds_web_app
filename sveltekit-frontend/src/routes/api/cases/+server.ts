@@ -123,47 +123,42 @@ export const POST: RequestHandler = async (event) => {
  * Bulk update multiple cases
  */
 export const PATCH: RequestHandler = async (event) => {
-	const auth = await requireAuth(event);
+  const auth = await requireAuth(event);
 
-	try {
-		const raw = await event.request.json();
-		const parsed = caseBulkSchema.safeParse(raw);
-		if (!parsed.success) {
-			return apiResponses.badRequest(parsed.error.issues[0]?.message ?? 'Invalid input');
-		}
-		const body = parsed.data;
+  try {
+    const raw = await event.request.json();
+    const parsed = caseBulkSchema.safeParse(raw);
+    if (!parsed.success) {
+      return apiResponses.badRequest(parsed.error.issues[0]?.message ?? 'Invalid input');
+    }
+    const body = parsed.data;
 
-		const updates: Partial<typeof cases.$inferSelect> = {
-			updatedAt: new Date().toISOString()
-		};
+    const updates: Partial<typeof cases.$inferSelect> = {
+      updatedAt: new Date().toISOString(),
+    };
 
-		if (body.status) updates.status = body.status;
-		if (body.priority) updates.priority = body.priority;
+    if (body.status) updates.status = body.status;
+    if (body.priority) updates.priority = body.priority;
 
-		const updated = await db
-			.update(cases)
-			.set(updates)
-			.where(
-				and(
-					eq(cases.assignedAttorney, auth.user.id),
-					inArray(cases.id, body.ids)
-				)
-			)
-			.returning();
+    const updated = await db
+      .update(cases)
+      .set(updates)
+      .where(and(eq(cases.userId, auth.user.id), inArray(cases.id, body.ids)))
+      .returning();
 
-		// Invalidate cache for all updated cases
-		await Promise.all(
-			updated.map(c => invalidateCaseCache(c.id, 'case_update', auth.user.id))
-		).catch(err => console.warn('[Cases] Cache invalidation failed:', err));
+    // Invalidate cache for all updated cases
+    await Promise.all(
+      updated.map((c) => invalidateCaseCache(c.id, 'case_update', auth.user.id))
+    ).catch((err) => console.warn('[Cases] Cache invalidation failed:', err));
 
-		return apiResponses.ok({
-			updated: updated.length,
-			message: `Updated ${updated.length} cases`
-		});
-	} catch (err) {
-		console.error('Error updating cases:', err);
-		return apiResponses.serverError('Failed to update cases');
-	}
+    return apiResponses.ok({
+      updated: updated.length,
+      message: `Updated ${updated.length} cases`,
+    });
+  } catch (err) {
+    console.error('Error updating cases:', err);
+    return apiResponses.serverError('Failed to update cases');
+  }
 };
 
 /**
@@ -171,41 +166,36 @@ export const PATCH: RequestHandler = async (event) => {
  * Bulk delete cases (soft delete by setting status to 'archived')
  */
 export const DELETE: RequestHandler = async (event) => {
-	const auth = await requireAuth(event);
+  const auth = await requireAuth(event);
 
-	try {
-		const raw = await event.request.json();
-		const parsed = caseBulkSchema.safeParse(raw);
-		if (!parsed.success) {
-			return apiResponses.badRequest(parsed.error.issues[0]?.message ?? 'Invalid input');
-		}
-		const body = parsed.data;
+  try {
+    const raw = await event.request.json();
+    const parsed = caseBulkSchema.safeParse(raw);
+    if (!parsed.success) {
+      return apiResponses.badRequest(parsed.error.issues[0]?.message ?? 'Invalid input');
+    }
+    const body = parsed.data;
 
-		const archived = await db
-			.update(cases)
-			.set({
-				status: 'archived',
-				updatedAt: new Date().toISOString()
-			})
-			.where(
-				and(
-					eq(cases.assignedAttorney, auth.user.id),
-					inArray(cases.id, body.ids)
-				)
-			)
-			.returning();
+    const archived = await db
+      .update(cases)
+      .set({
+        status: 'archived',
+        updatedAt: new Date().toISOString(),
+      })
+      .where(and(eq(cases.userId, auth.user.id), inArray(cases.id, body.ids)))
+      .returning();
 
-		// Invalidate cache for all archived cases
-		await Promise.all(
-			archived.map(c => invalidateCaseCache(c.id, 'case_update', auth.user.id))
-		).catch(err => console.warn('[Cases] Cache invalidation failed:', err));
+    // Invalidate cache for all archived cases
+    await Promise.all(
+      archived.map((c) => invalidateCaseCache(c.id, 'case_update', auth.user.id))
+    ).catch((err) => console.warn('[Cases] Cache invalidation failed:', err));
 
-		return apiResponses.ok({
-			archived: archived.length,
-			message: `Archived ${archived.length} cases`
-		});
-	} catch (err) {
-		console.error('Error archiving cases:', err);
-		return apiResponses.serverError('Failed to archive cases');
-	}
+    return apiResponses.ok({
+      archived: archived.length,
+      message: `Archived ${archived.length} cases`,
+    });
+  } catch (err) {
+    console.error('Error archiving cases:', err);
+    return apiResponses.serverError('Failed to archive cases');
+  }
 };

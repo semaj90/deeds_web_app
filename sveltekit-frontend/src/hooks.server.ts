@@ -273,79 +273,99 @@ async function warmupLLMCache(): Promise<WarmupStatus> {
  * Main request handler with Lucia v3 session validation
  */
 export const handle: Handle = async ({ event, resolve }) => {
-	// Add request ID for tracing
-	const requestId = crypto.randomUUID();
-	event.locals.requestId = requestId;
+  // Add request ID for tracing
+  const requestId = crypto.randomUUID();
+  event.locals.requestId = requestId;
 
-	// Add timing information
-	const startTime = Date.now();
+  // Add timing information
+  const startTime = Date.now();
 
-	// === CORS for API routes (Sprint 1: credentials + expose-headers + PATCH) ===
-	if (event.url.pathname.startsWith('/api/')) {
-		const allowedOrigin = dev ? '*' : (ENV.PUBLIC_API_URL || event.url.origin);
+  // === CORS for API routes (Sprint 1: credentials + expose-headers + PATCH) ===
+  if (event.url.pathname.startsWith('/api/')) {
+    const allowedOrigin = dev ? '*' : ENV.PUBLIC_API_URL || event.url.origin;
 
-		if (event.request.method === 'OPTIONS') {
-			return new Response(null, {
-				status: 204,
-				headers: {
-					'Access-Control-Allow-Origin': allowedOrigin,
-					'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-					'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
-					'Access-Control-Allow-Credentials': 'true',
-					'Access-Control-Expose-Headers': 'X-Request-ID, X-Response-Time',
-					'Access-Control-Max-Age': '86400',
-				},
-			});
-		}
-	}
+    if (event.request.method === 'OPTIONS') {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          'Access-Control-Allow-Origin': allowedOrigin,
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+          'Access-Control-Allow-Credentials': 'true',
+          'Access-Control-Expose-Headers': 'X-Request-ID, X-Response-Time',
+          'Access-Control-Max-Age': '86400',
+        },
+      });
+    }
+  }
 
-	// === REQUEST BODY SIZE LIMIT (Sprint 4) ===
-	if (event.url.pathname.startsWith('/api/') && event.request.method !== 'GET' && event.request.method !== 'HEAD') {
-		const contentLength = parseInt(event.request.headers.get('content-length') || '0', 10);
-		const isUpload = UPLOAD_PATHS.some(p => event.url.pathname.startsWith(p));
-		const limit = isUpload ? MAX_UPLOAD_SIZE : MAX_BODY_SIZE;
+  // === REQUEST BODY SIZE LIMIT (Sprint 4) ===
+  if (
+    event.url.pathname.startsWith('/api/') &&
+    event.request.method !== 'GET' &&
+    event.request.method !== 'HEAD'
+  ) {
+    const contentLength = parseInt(event.request.headers.get('content-length') || '0', 10);
+    const isUpload = UPLOAD_PATHS.some((p) => event.url.pathname.startsWith(p));
+    const limit = isUpload ? MAX_UPLOAD_SIZE : MAX_BODY_SIZE;
 
-		if (contentLength > limit) {
-			return new Response(
-				JSON.stringify({ error: 'Payload too large', maxBytes: limit }),
-				{ status: 413, headers: { 'Content-Type': 'application/json', 'X-Request-ID': requestId } }
-			);
-		}
-	}
+    if (contentLength > limit) {
+      return new Response(JSON.stringify({ error: 'Payload too large', maxBytes: limit }), {
+        status: 413,
+        headers: { 'Content-Type': 'application/json', 'X-Request-ID': requestId },
+      });
+    }
+  }
 
-	// === GLOBAL WRITE RATE LIMITING (Sprint 4) ===
-	if (event.url.pathname.startsWith('/api/')
-		&& ['POST', 'PUT', 'PATCH', 'DELETE'].includes(event.request.method)
-		&& !event.url.pathname.startsWith('/api/health')) {
-		const forwarded = event.request.headers.get('x-forwarded-for');
-		const ip = forwarded ? forwarded.split(',')[0].trim() : event.getClientAddress?.() ?? 'unknown';
-		const now = Date.now();
-		const entry = writeRateLimits.get(ip);
+  // === GLOBAL WRITE RATE LIMITING (Sprint 4) ===
+  if (
+    event.url.pathname.startsWith('/api/') &&
+    ['POST', 'PUT', 'PATCH', 'DELETE'].includes(event.request.method) &&
+    !event.url.pathname.startsWith('/api/health')
+  ) {
+    const forwarded = event.request.headers.get('x-forwarded-for');
+    const ip = forwarded
+      ? forwarded.split(',')[0].trim()
+      : (event.getClientAddress?.() ?? 'unknown');
+    const now = Date.now();
+    const entry = writeRateLimits.get(ip);
 
-		if (!entry || now > entry.resetTime) {
-			writeRateLimits.set(ip, { count: 1, resetTime: now + WRITE_RATE_WINDOW });
-		} else if (entry.count >= WRITE_RATE_MAX) {
-			const retryAfter = Math.ceil((entry.resetTime - now) / 1000);
-			return new Response(
-				JSON.stringify({ error: 'Rate limit exceeded', retryAfter }),
-				{
-					status: 429,
-					headers: {
-						'Content-Type': 'application/json',
-						'Retry-After': String(retryAfter),
-						'X-Request-ID': requestId
-					}
-				}
-			);
-		} else {
-			entry.count++;
-		}
-	}
+    if (!entry || now > entry.resetTime) {
+      writeRateLimits.set(ip, { count: 1, resetTime: now + WRITE_RATE_WINDOW });
+    } else if (entry.count >= WRITE_RATE_MAX) {
+      const retryAfter = Math.ceil((entry.resetTime - now) / 1000);
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded', retryAfter }), {
+        status: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'Retry-After': String(retryAfter),
+          'X-Request-ID': requestId,
+        },
+      });
+    } else {
+      entry.count++;
+    }
+  }
 
-	// === DEV BYPASS AUTH (only in development mode) ===
-	if (dev && process.env.DEV_BYPASS_AUTH === 'true') {
-		const devUserId = '00000000-0000-0000-0000-000000000001';
-		event.locals.user = {
+  // === SESSION AUTH / DEV BYPASS AUTH ===
+  const sessionId = event.cookies.get('auth_session');
+
+  if (sessionId) {
+    const { session, user } = await validateSession(sessionId);
+
+    if (session && session.fresh) {
+      setSessionCookie(event.cookies, session.id);
+    }
+
+    if (!session) {
+      deleteSessionCookie(event.cookies);
+    }
+
+    event.locals.user = user;
+    event.locals.session = session;
+  } else if (dev && process.env.DEV_BYPASS_AUTH === 'true') {
+    const devUserId = '00000000-0000-0000-0000-000000000001';
+    event.locals.user = {
       id: devUserId,
       email: 'admin@yorha.dev',
       username: '2B',
@@ -353,37 +373,19 @@ export const handle: Handle = async ({ event, resolve }) => {
       hasCompletedOnboarding: true,
       onboardingStep: 10,
     };
-		event.locals.session = {
-			id: '00000000-0000-0000-0000-000000000002',
-			userId: devUserId,
-			expiresAt: new Date(Date.now() + 86400000),
-			fresh: true
-		} as any;
-	} else {
-		// === LUCIA V3 SESSION VALIDATION ===
-		const sessionId = event.cookies.get('auth_session');
+    event.locals.session = {
+      id: '00000000-0000-0000-0000-000000000002',
+      userId: devUserId,
+      expiresAt: new Date(Date.now() + 86400000),
+      fresh: true,
+    } as any;
+  } else {
+    event.locals.user = null;
+    event.locals.session = null;
+  }
 
-		if (!sessionId) {
-			event.locals.user = null;
-			event.locals.session = null;
-		} else {
-			const { session, user } = await validateSession(sessionId);
-
-			if (session && session.fresh) {
-				setSessionCookie(event.cookies, session.id);
-			}
-
-			if (!session) {
-				deleteSessionCookie(event.cookies);
-			}
-
-			event.locals.user = user;
-			event.locals.session = session;
-		}
-	}
-
-	// === CENTRALIZED AUTH GUARDS (Phase A2 — deny-by-default) ===
-	if (event.url.pathname.startsWith('/api/')) {
+  // === CENTRALIZED AUTH GUARDS (Phase A2 — deny-by-default) ===
+  if (event.url.pathname.startsWith('/api/')) {
     const path = event.url.pathname;
 
     // Public routes (no auth needed) — explicitly allowlisted
@@ -450,97 +452,97 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
   }
 
-	// === Resolve with request-level timeout (Sprint 1) ===
-	let response: Response;
-	const isStreamRoute = event.url.pathname.includes('/stream')
-		|| event.url.pathname.startsWith('/api/sse/')
-		|| event.url.pathname.startsWith('/api/routes');
-	const isAIRoute = event.url.pathname.startsWith('/api/ai/')
-		|| event.url.pathname.startsWith('/api/nlp/')
-		|| event.url.pathname.startsWith('/api/rag/')
-		|| event.url.pathname.startsWith('/api/synthesis/')
-		|| event.url.pathname.startsWith('/api/evidence/upload');
+  // === Resolve with request-level timeout (Sprint 1) ===
+  let response: Response;
+  const isStreamRoute =
+    event.url.pathname.includes('/stream') ||
+    event.url.pathname.startsWith('/api/sse/') ||
+    event.url.pathname.startsWith('/api/routes');
+  const isAIRoute =
+    event.url.pathname.startsWith('/api/ai/') ||
+    event.url.pathname.startsWith('/api/nlp/') ||
+    event.url.pathname.startsWith('/api/rag/') ||
+    event.url.pathname.startsWith('/api/synthesis/') ||
+    event.url.pathname.startsWith('/api/evidence/upload');
 
-	if (isStreamRoute) {
-		// No timeout for SSE / streaming routes
-		response = await resolve(event);
-	} else {
-		const timeout = isAIRoute ? AI_REQUEST_TIMEOUT : DEFAULT_REQUEST_TIMEOUT;
-		const controller = new AbortController();
-		const timer = setTimeout(() => controller.abort(), timeout);
+  if (isStreamRoute) {
+    // No timeout for SSE / streaming routes
+    response = await resolve(event);
+  } else {
+    const timeout = isAIRoute ? AI_REQUEST_TIMEOUT : DEFAULT_REQUEST_TIMEOUT;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
 
-		try {
-			response = await Promise.race([
-				resolve(event),
-				new Promise<Response>((_, reject) => {
-					controller.signal.addEventListener('abort', () => {
-						reject(new Error(`Request timeout after ${timeout}ms`));
-					});
-				})
-			]);
-		} catch (err) {
-			clearTimeout(timer);
-			const msg = err instanceof Error ? err.message : 'Request timeout';
-			console.warn(`[Timeout] ${event.request.method} ${event.url.pathname} — ${msg}`);
-			return new Response(JSON.stringify({ error: 'Request timeout', timeout }), {
-				status: 504,
-				headers: {
-					'Content-Type': 'application/json',
-					'X-Request-ID': requestId
-				}
-			});
-		}
-		clearTimeout(timer);
-	}
+    try {
+      response = await Promise.race([
+        resolve(event),
+        new Promise<Response>((_, reject) => {
+          controller.signal.addEventListener('abort', () => {
+            reject(new Error(`Request timeout after ${timeout}ms`));
+          });
+        }),
+      ]);
+    } catch (err) {
+      clearTimeout(timer);
+      const msg = err instanceof Error ? err.message : 'Request timeout';
+      console.warn(`[Timeout] ${event.request.method} ${event.url.pathname} — ${msg}`);
+      return new Response(JSON.stringify({ error: 'Request timeout', timeout }), {
+        status: 504,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Request-ID': requestId,
+        },
+      });
+    }
+    clearTimeout(timer);
+  }
 
-	// Add timing headers + structured request logging
-	const duration = Date.now() - startTime;
-	response.headers.set('X-Request-ID', requestId);
-	response.headers.set('X-Response-Time', `${duration}ms`);
+  // Add timing headers + structured request logging
+  const duration = Date.now() - startTime;
+  response.headers.set('X-Request-ID', requestId);
+  response.headers.set('X-Response-Time', `${duration}ms`);
 
-	// Slow request warning (Sprint 1)
-	if (duration > 10_000) {
-		console.warn(`[Slow] ${event.request.method} ${event.url.pathname} took ${duration}ms`);
-	}
+  // Slow request warning (Sprint 1)
+  if (duration > 10_000) {
+    console.warn(`[Slow] ${event.request.method} ${event.url.pathname} took ${duration}ms`);
+  }
 
-	productionLogger.apiRequest(
-		event.request.method,
-		event.url.pathname,
-		response.status,
-		duration,
-		{ requestId, userId: event.locals.user?.id }
-	);
+  productionLogger.apiRequest(event.request.method, event.url.pathname, response.status, duration, {
+    requestId,
+    userId: event.locals.user?.id,
+  });
 
-	// CORS origin header on API responses (Sprint 1: credentials + expose-headers)
-	if (event.url.pathname.startsWith('/api/')) {
-		const allowedOrigin = dev ? '*' : (ENV.PUBLIC_API_URL || event.url.origin);
-		response.headers.set('Access-Control-Allow-Origin', allowedOrigin);
-		response.headers.set('Access-Control-Allow-Credentials', 'true');
-		response.headers.set('Access-Control-Expose-Headers', 'X-Request-ID, X-Response-Time');
-	}
+  // CORS origin header on API responses (Sprint 1: credentials + expose-headers)
+  if (event.url.pathname.startsWith('/api/')) {
+    const allowedOrigin = dev ? '*' : ENV.PUBLIC_API_URL || event.url.origin;
+    response.headers.set('Access-Control-Allow-Origin', allowedOrigin);
+    response.headers.set('Access-Control-Allow-Credentials', 'true');
+    response.headers.set('Access-Control-Expose-Headers', 'X-Request-ID, X-Response-Time');
+  }
 
-	// Cross-origin isolation headers — required for SharedArrayBuffer / threaded WASM (ORT)
-	response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
-	response.headers.set('Cross-Origin-Embedder-Policy', 'require-corp');
+  // Cross-origin isolation headers — required for SharedArrayBuffer / threaded WASM (ORT)
+  response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+  response.headers.set('Cross-Origin-Embedder-Policy', 'require-corp');
 
-	// Security headers (production only — avoid breaking HMR in dev)
-	if (!dev) {
-		response.headers.set('X-Content-Type-Options', 'nosniff');
-		response.headers.set('X-Frame-Options', 'DENY');
-		response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-		response.headers.set('Content-Security-Policy',
-			"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws: wss:; font-src 'self' data:; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
-		);
-	}
+  // Security headers (production only — avoid breaking HMR in dev)
+  if (!dev) {
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('X-Frame-Options', 'DENY');
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    response.headers.set(
+      'Content-Security-Policy',
+      "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws: wss:; font-src 'self' data:; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
+    );
+  }
 
-	// Enable streaming for AI endpoints
-	if (event.url.pathname.startsWith('/api/ai/')) {
-		response.headers.set('Content-Type', 'application/x-ndjson');
-		response.headers.set('Cache-Control', 'no-cache');
-		response.headers.set('X-Accel-Buffering', 'no');
-	}
+  // Enable streaming for AI endpoints
+  if (event.url.pathname.startsWith('/api/ai/')) {
+    response.headers.set('Content-Type', 'application/x-ndjson');
+    response.headers.set('Cache-Control', 'no-cache');
+    response.headers.set('X-Accel-Buffering', 'no');
+  }
 
-	return response;
+  return response;
 };
 
 /**

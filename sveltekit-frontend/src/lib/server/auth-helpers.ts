@@ -1,6 +1,5 @@
 /**
- * Authentication Helpers with Test Fallback
- * Provides conditional authentication for development and testing
+ * Authentication helpers that trust the user/session already resolved by hooks.server.ts.
  */
 import type { RequestEvent } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
@@ -16,8 +15,8 @@ export interface AuthResult {
 }
 
 /**
- * Get user with conditional fallback to test mode
- * Returns authenticated user OR test user if auth is unavailable
+ * Get the authenticated user resolved by hooks.server.ts.
+ * In development this may be a validated session or the explicit dev bypass user.
  */
 export async function getUserWithFallback(event: RequestEvent): Promise<AuthResult> {
 	if (event.locals.user) {
@@ -28,43 +27,20 @@ export async function getUserWithFallback(event: RequestEvent): Promise<AuthResu
 		};
 	}
 
-	// Fallback to test mode for development/testing
-	if (process.env.NODE_ENV === 'development' || process.env.TEST_MODE === 'true') {
-		console.log('[Auth] Auth not available, using test mode');
-		return {
-			user: {
-				id: 'test-user-id',
-				email: 'test@legal-ai.dev',
-				role: 'admin'
-			},
-			session: {
-				id: 'test-session-id',
-				userId: 'test-user-id',
-				fresh: false,
-				expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
-			},
-			isTestMode: true
-		};
-	}
-
 	throw error(401, 'Authentication required');
 }
 
 /**
- * Require authentication with conditional fallback
- * Throws 401 error if auth is unavailable AND not in development mode
+ * Require authentication using the resolved request user.
  */
 export async function requireAuth(event: RequestEvent, allowTestMode = true): Promise<AuthResult> {
-	try {
-		const result = await getUserWithFallback(event);
+  const result = await getUserWithFallback(event);
 
-		if (result.isTestMode && !allowTestMode) {
-			throw error(401, 'Authentication required (Test mode not allowed)');
-		}
-		return result;
-	} catch (e) {
-		throw error(401, 'Authentication required');
-	}
+  if (result.isTestMode && !allowTestMode) {
+    throw error(401, 'Authentication required (Test mode not allowed)');
+  }
+
+  return result;
 }
 
 /**

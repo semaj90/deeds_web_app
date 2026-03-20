@@ -335,6 +335,147 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
   });
 });
 
+test.describe('Phase 76: Case-Aware Stream Diagnostics', () => {
+  test('should log streamed chunks and render case relevance context for evidence and reports', async ({
+    page,
+  }) => {
+    const caseId = `00000000-0000-4000-8000-${Date.now().toString(16).padStart(12, '0').slice(-12)}`;
+    const chunkLogs: string[] = [];
+    const streamedChunks = [
+      {
+        id: 'case-stream-1',
+        role: 'assistant',
+        content: 'Streaming analysis for the linked case record.',
+        status: 'streaming',
+        source: 'server-ollama',
+      },
+      {
+        id: 'case-stream-1',
+        role: 'assistant',
+        content:
+          'Streaming analysis for the linked case record. Uploaded evidence and the incident report both support the timeline.',
+        status: 'streaming',
+        source: 'server-ollama',
+      },
+      {
+        id: 'case-stream-1',
+        role: 'assistant',
+        content: `Case ${caseId} is strongly linked to [Source 1] uploaded evidence, [Source 2] the incident report, and [Source 3] the governing statute. Uploaded evidence includes the body-cam stills, while the report data aligns with the witness timeline.`,
+        status: 'done',
+        source: 'server-ollama',
+        confidence: 0.91,
+        confidenceFactors: {
+          caseContext: true,
+          ragHits: 3,
+          topScore: 0.82,
+          embeddingModel: 'embeddinggemma:latest',
+        },
+        contextUsed: [
+          'evidence_vectors:upload-1',
+          'case_chunks:incident-report-7',
+          'law_sections:ca-pen-1001',
+        ],
+        citations: [
+          { sourceNum: 1, documentId: 'evidence_vectors:upload-1', similarity: 0.82 },
+          { sourceNum: 2, documentId: 'case_chunks:incident-report-7', similarity: 0.74 },
+          { sourceNum: 3, documentId: 'law_sections:ca-pen-1001', similarity: 0.68 },
+        ],
+      },
+    ];
+
+    page.on('console', (msg) => {
+      const text = msg.text();
+      if (text.includes('[ChatSSE]')) {
+        chunkLogs.push(text);
+      }
+    });
+
+    await page.route('**/api/sse/chat', async (route) => {
+      for (const chunk of streamedChunks) {
+        console.log(
+          `[TEST SSE] ${JSON.stringify({ status: chunk.status, source: chunk.source, contentLength: chunk.content.length })}`
+        );
+      }
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'text/event-stream',
+        headers: { 'Cache-Control': 'no-cache' },
+        body: streamedChunks.map((chunk) => `data: ${JSON.stringify(chunk)}\n\n`).join(''),
+      });
+    });
+
+    await page.goto(`http://127.0.0.1:5173/cases/${caseId}/chat?debug=1`, {
+      waitUntil: 'networkidle',
+    });
+
+    await expect(page.locator('[data-testid="case-chat-panel"]')).toBeVisible();
+    await expect(page.locator('[data-testid="case-chat-case-id"]')).toContainText(caseId);
+
+    await page
+      .locator('[data-testid="case-chat-input"]')
+      .fill('What evidence and reports are most relevant to this case?');
+    await page.locator('[data-testid="case-chat-send"]').click();
+
+    const assistantMessages = page.locator(
+      '[data-testid="case-chat-message"][data-role="assistant"]'
+    );
+    await expect(assistantMessages.last()).toContainText(
+      'Uploaded evidence includes the body-cam stills'
+    );
+    await expect(
+      assistantMessages.last().locator('[data-testid="case-response-context"]')
+    ).toBeVisible();
+    await expect(assistantMessages.last().locator('[data-testid="case-relevance"]')).toContainText(
+      'Case-linked'
+    );
+    await expect(assistantMessages.last().locator('[data-testid="case-relevance"]')).toContainText(
+      'RAG hits: 3'
+    );
+    await expect(assistantMessages.last().locator('[data-testid="case-relevance"]')).toContainText(
+      'Top match: 0.82'
+    );
+    await expect(
+      assistantMessages.last().locator('[data-testid="case-context-collections"]')
+    ).toContainText('Uploaded Evidence: 1');
+    await expect(
+      assistantMessages.last().locator('[data-testid="case-context-collections"]')
+    ).toContainText('Reports / Case Files: 1');
+    await expect(
+      assistantMessages.last().locator('[data-testid="case-context-collections"]')
+    ).toContainText('Law & Statutes: 1');
+    await expect(
+      assistantMessages.last().locator('[data-testid="case-context-docids"]')
+    ).toContainText('Evidence upload-1');
+    await expect(
+      assistantMessages.last().locator('[data-testid="case-context-docids"]')
+    ).toContainText('Report incident-report-7');
+    await expect(
+      assistantMessages.last().locator('[data-testid="case-extracted-citations"]')
+    ).toContainText('[Source 1] Evidence upload-1 (0.82)');
+
+    await expect.poll(() => chunkLogs.length, { timeout: 10_000 }).toBeGreaterThanOrEqual(3);
+    expect(
+      chunkLogs.some(
+        (log) => log.includes(`"chatId":"case-${caseId}"`) && log.includes('"status":"streaming"')
+      )
+    ).toBeTruthy();
+    expect(
+      chunkLogs.some(
+        (log) =>
+          log.includes(`"chatId":"case-${caseId}"`) &&
+          log.includes('"status":"done"') &&
+          log.includes('"contextUsed":3')
+      )
+    ).toBeTruthy();
+
+    await page.screenshot({
+      path: path.join(SCREENSHOT_DIR, '11-case-context-stream.png'),
+      fullPage: true,
+    });
+  });
+});
+
 test.describe('Phase 76: Service Integration Tests', () => {
   test('should verify all backend services are running', async ({ request }) => {
     const services = [

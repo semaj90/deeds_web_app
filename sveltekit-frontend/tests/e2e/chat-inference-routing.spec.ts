@@ -282,46 +282,51 @@ test.describe('Natural Routing (no query params)', () => {
 	});
 
 	test('legal query routes to server naturally', async ({ page }) => {
-		// "negligence" is a legal keyword → scores 0.5+ → server
-		await page.goto(`${BASE}/chat?debug=1`, { waitUntil: 'networkidle' });
+    // "negligence" is a legal keyword → scores 0.5+ → server
+    await page.goto(`${BASE}/chat?debug=1`, { waitUntil: 'networkidle' });
 
-		const input = page.locator('[data-testid="chat-input"]');
-		const sendBtn = page.locator('[data-testid="chat-send"]');
+    const input = page.locator('[data-testid="chat-input"]');
+    const sendBtn = page.locator('[data-testid="chat-send"]');
 
-		await input.fill('What is negligence?');
-		await sendBtn.click();
+    await input.fill('What is negligence?');
+    await sendBtn.click();
 
-		const assistantMsg = page.locator('[data-role="assistant"]').first();
-		await expect(assistantMsg).toBeVisible({ timeout: 15_000 });
+    const assistantMsg = page.locator('[data-role="assistant"]').first();
+    await expect(assistantMsg).toBeVisible({ timeout: 15_000 });
 
-		// Debug overlay should show legal-keywords reason (not user-forced)
-		const overlay = page.locator('[data-testid="debug-overlay"]');
-		await expect(overlay).toContainText('legal-keywords');
+    // Debug overlay should show the live legal term score reason (not user-forced)
+    const overlay = page.locator('[data-testid="debug-overlay"]');
+    await expect(overlay).toContainText('legal(1)');
 
-		await page.screenshot({ path: `${SCREENSHOT_DIR}/08-natural-server-route.png`, fullPage: true });
-	});
+    await page.screenshot({
+      path: `${SCREENSHOT_DIR}/08-natural-server-route.png`,
+      fullPage: true,
+    });
+  });
 
-	test('simple query routes to local (then escalates)', async ({ page }) => {
-		// "thanks" has no legal keywords → scores 0 → local-onnx → escalates
-		await page.goto(`${BASE}/chat?debug=1`, { waitUntil: 'networkidle' });
+  test('simple query routes to local (then escalates)', async ({ page }) => {
+    // "thanks" matches a local pattern; depending on ONNX availability it may stay local or escalate
+    await page.goto(`${BASE}/chat?debug=1`, { waitUntil: 'networkidle' });
 
-		const input = page.locator('[data-testid="chat-input"]');
-		const sendBtn = page.locator('[data-testid="chat-send"]');
+    const input = page.locator('[data-testid="chat-input"]');
+    const sendBtn = page.locator('[data-testid="chat-send"]');
 
-		await input.fill('thanks');
-		await sendBtn.click();
+    await input.fill('thanks');
+    await sendBtn.click();
 
-		const assistantMsg = page.locator('[data-role="assistant"]').first();
-		await expect(assistantMsg).toBeVisible({ timeout: 30_000 });
+    const assistantMsg = page.locator('[data-role="assistant"]').first();
+    await expect(assistantMsg).toBeVisible({ timeout: 30_000 });
 
-		// Debug overlay should show simple-query or local-fallback
-		const overlay = page.locator('[data-testid="debug-overlay"]');
-		const overlayText = await overlay.textContent();
-		const isLocalAttempt = overlayText?.includes('simple-query') || overlayText?.includes('local-fallback');
-		expect(isLocalAttempt).toBeTruthy();
+    // Debug overlay should show the live local routing reason
+    const overlay = page.locator('[data-testid="debug-overlay"]');
+    const overlayText = await overlay.textContent();
+    const isLocalAttempt =
+      overlayText?.includes('local-pattern') ||
+      overlayText?.includes('local-fallback(local-pattern)');
+    expect(isLocalAttempt).toBeTruthy();
 
-		await page.screenshot({ path: `${SCREENSHOT_DIR}/09-natural-local-route.png`, fullPage: true });
-	});
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/09-natural-local-route.png`, fullPage: true });
+  });
 });
 
 test.describe('SSE Stream Handling', () => {

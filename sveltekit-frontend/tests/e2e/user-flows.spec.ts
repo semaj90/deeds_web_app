@@ -2,45 +2,95 @@
  * User Flow E2E Tests
  *
  * End-to-end tests for complete user workflows including:
- * - Login flow
+ * - Homepage navigation
+ * - Real login flow
  * - Case creation flow
- * - Evidence upload flow
- *
- * Each test captures screenshots at key steps for visual verification.
- *
- * @module tests/e2e/user-flows
- * @validates Requirements 2.1-2.7, 3.1-3.7
+ * - Evidence upload availability
  */
 
-import { test, expect } from '@playwright/test';
+import pg from 'pg';
+import { expect, test, type Page } from '@playwright/test';
+import { TEST_CASE_PREFIX } from '../fixtures/test-cases.js';
+import { captureNumberedStep, captureStepScreenshot } from './utils/screenshot-utils';
 import {
-  captureStepScreenshot,
-  captureNumberedStep,
-} from './utils/screenshot-utils';
-import {
-  testCredentials,
-  testCaseData,
-  testRoutes,
   commonSelectors,
+  testCaseData,
+  testCredentials,
+  testRoutes,
   timeouts,
 } from './utils/test-fixtures';
 
-// ═══════════════════════════════════════════════════════════════════════════
-// Test Configuration
-// ═══════════════════════════════════════════════════════════════════════════
+const DB_URL =
+  process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+const TEST_PASSWORD = 'TestPass123!';
+
+interface FlowUser {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
+function buildUser(label: string): FlowUser {
+  const nonce = `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  return {
+    email: `playwright-${label}-${nonce}@test.legal.ai`,
+    password: TEST_PASSWORD,
+    firstName: 'Playwright',
+    lastName: label,
+  };
+}
+
+async function cleanupUserArtifacts(email: string) {
+  const pool = new pg.Pool({ connectionString: DB_URL });
+
+  try {
+    const usersResult = await pool.query<{ id: string }>('SELECT id FROM users WHERE email = $1', [
+      email,
+    ]);
+
+    for (const row of usersResult.rows) {
+      await pool.query('DELETE FROM cases WHERE user_id = $1', [row.id]);
+      await pool.query('DELETE FROM sessions WHERE user_id = $1', [row.id]);
+      await pool.query('DELETE FROM users WHERE id = $1', [row.id]);
+    }
+  } finally {
+    await pool.end();
+  }
+}
+
+async function expectAuthenticatedEmail(page: Page, email: string) {
+  await expect
+    .poll(
+      async () => {
+        const meResponse = await page.request.get('/api/auth/me');
+        if (meResponse.status() !== 200) return '';
+        const body = await meResponse.json();
+        return body.user?.email ?? '';
+      },
+      { timeout: 15000 }
+    )
+    .toBe(email);
+}
+
+async function registerUser(page: Page, user: FlowUser) {
+  const registerResponse = await page.request.post('/api/auth/register', {
+    data: user,
+  });
+  expect(registerResponse.status()).toBe(201);
+  await expectAuthenticatedEmail(page, user.email);
+}
+
+async function logoutUser(page: Page) {
+  const logoutResponse = await page.request.post('/api/auth/logout');
+  expect(logoutResponse.ok()).toBeTruthy();
+  await page.context().clearCookies();
+}
 
 test.describe('User Flow Tests', () => {
-  test.describe.configure({ mode: 'serial' }); // Run tests sequentially
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Homepage Tests
-  // ═══════════════════════════════════════════════════════════════════════════
+  test.describe.configure({ mode: 'serial' });
 
   test.describe('Homepage Navigation', () => {
-    /**
-     * Verify homepage loads correctly with expected elements
-     * @validates Requirements 3.1, 4.1, 4.2
-     */
     test('should load homepage with navigation elements', async ({ page }) => {
       await page.goto('/');
       try {
@@ -49,22 +99,14 @@ test.describe('User Flow Tests', () => {
         // networkidle may timeout on SSE routes
       }
 
-      console.log('Homepage loaded, URL:', page.url());
-
-      // Capture screenshot of homepage
       await captureNumberedStep(page, 1, 'homepage-loaded', {
         directory: 'screenshots/user-flow',
       });
 
-      // Verify page loaded (check for any content)
       const bodyContent = await page.textContent('body');
       expect(bodyContent).toBeTruthy();
     });
 
-    /**
-     * Verify navigation buttons are present and functional
-     * @validates Requirements 3.2, 3.7
-     */
     test('should have functional navigation buttons', async ({ page }) => {
       await page.goto('/');
       try {
@@ -73,28 +115,17 @@ test.describe('User Flow Tests', () => {
         // networkidle may timeout on SSE routes
       }
 
-      // Look for common navigation elements
       const navElements = await page.locator('nav, [role="navigation"], header').count();
 
-      // Capture navigation state
       await captureStepScreenshot(page, 'navigation-elements', {
         directory: 'screenshots/user-flow',
       });
 
-      // At minimum, page should have some structure
-      expect(navElements).toBeGreaterThanOrEqual(0);
+      expect(navElements).toBeGreaterThan(0);
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Login Flow Tests
-  // ═══════════════════════════════════════════════════════════════════════════
-
   test.describe('Login Flow', () => {
-    /**
-     * Verify login page displays correctly
-     * @validates Requirements 2.1
-     */
     test('should display login page', async ({ page }) => {
       await page.goto('/login');
       try {
@@ -103,291 +134,174 @@ test.describe('User Flow Tests', () => {
         // networkidle may timeout on SSE routes
       }
 
-      // Capture login page screenshot
       await captureNumberedStep(page, 1, 'login-page-displayed', {
         directory: 'screenshots/login-flow',
       });
 
-      // Verify we're on a login-related page OR redirected to home (auth bypass)
-      const url = page.url();
-      expect(
-        url.includes('login') || url === 'http://localhost:5173/' || url === 'http://127.0.0.1:5173/' || url.endsWith('/')
-      ).toBeTruthy();
+      await expect(page).toHaveURL(/\/login$/);
+      await expect(page.getByText(/sign in to your account/i)).toBeVisible();
+      await expect(page.getByLabel(/^email$/i)).toBeVisible();
+      await expect(page.getByLabel(/^password$/i)).toBeVisible();
     });
 
-    /**
-     * Verify successful login flow
-     * @validates Requirements 2.1, 2.2, 2.7
-     */
     test('should allow user to login successfully', async ({ page }) => {
-      await page.goto('/login');
-      try {
-        await page.waitForLoadState('networkidle', { timeout: 5000 });
-      } catch {
-        // networkidle may timeout on SSE routes
-      }
+      const user = buildUser('login');
 
-      // Check if we're already logged in (auth bypass mode)
-      const url = page.url();
-      if (!url.includes('login')) {
-        // Already authenticated, skip login form
-        console.log('Auth bypass detected - already logged in');
-        await captureNumberedStep(page, 2, 'auth-bypass-detected', {
+      try {
+        await registerUser(page, user);
+        await logoutUser(page);
+
+        await page.goto('/login');
+        await page.getByLabel(/^email$/i).fill(user.email);
+        await page.getByLabel(/^password$/i).fill(user.password);
+
+        await captureNumberedStep(page, 2, 'login-form-filled', {
           directory: 'screenshots/login-flow',
         });
-        // Verify we're on a valid page
-        const bodyContent = await page.textContent('body');
-        expect(bodyContent).toBeTruthy();
-        return;
+
+        await page.getByRole('button', { name: /sign in/i }).click();
+        await page.waitForURL((url) => !url.pathname.includes('/login'), {
+          timeout: timeouts.medium,
+        });
+        await expectAuthenticatedEmail(page, user.email);
+
+        await captureNumberedStep(page, 3, 'post-login-dashboard', {
+          directory: 'screenshots/login-flow',
+        });
+
+        await expect(page.locator('nav, .sidebar-nav, header').first()).toBeVisible();
+      } finally {
+        await cleanupUserArtifacts(user.email);
       }
-
-      // Fill credentials
-      // Try data-testid first, fall back to name/placeholder if needed
-      const usernameInput = page.locator(
-        '[data-testid="username-input"], input[name="username"], input[type="email"]'
-      );
-      const passwordInput = page.locator(
-        '[data-testid="password-input"], input[name="password"], input[type="password"]'
-      );
-      const submitButton = page.locator('[data-testid="submit-button"], button[type="submit"]');
-
-      await usernameInput.fill(testCredentials.username);
-      await passwordInput.fill(testCredentials.password);
-
-      // Capture filled form
-      await captureNumberedStep(page, 2, 'login-form-filled', {
-        directory: 'screenshots/login-flow',
-      });
-
-      // Submit
-      await submitButton.click();
-
-      // Wait for navigation to dashboard or homepage
-      await page.waitForURL(/(\/dashboard|\/$)/, { timeout: timeouts.medium });
-
-      // Capture post-login state
-      await captureNumberedStep(page, 3, 'post-login-dashboard', {
-        directory: 'screenshots/login-flow',
-      });
-
-      // Verify successful login (check for dashboad element or logout button)
-      const dashboardContent = page.locator('[data-testid="dashboard-content"], .dashboard, nav');
-      await expect(dashboardContent).toBeVisible();
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Route Verification Tests
-  // ═══════════════════════════════════════════════════════════════════════════
-
   test.describe('Route Verification', () => {
-    /**
-     * Verify all public routes load without errors
-     * @validates Requirements 3.1, 3.3, 3.4, 3.5
-     */
-    for (const route of testRoutes.filter((r) => !r.requiresAuth)) {
+    for (const route of testRoutes.filter((route) => !route.requiresAuth)) {
       test(`should load ${route.name} route (${route.path})`, async ({ page }) => {
         const response = await page.goto(route.path, { timeout: timeouts.extended });
 
-        // Capture route screenshot
-        await captureStepScreenshot(
-          page,
-          `route-${route.name.toLowerCase().replace(/\s+/g, '-')}`,
-          {
-            directory: 'screenshots/routes',
-            fullPage: true,
-          }
-        );
+        await captureStepScreenshot(page, `route-${route.name.toLowerCase().replace(/\s+/g, '-')}`, {
+          directory: 'screenshots/routes',
+          fullPage: true,
+        });
 
-        // Verify route loaded (accept 500 for not-yet-implemented routes, log warning)
         const status = response?.status() ?? 0;
         if (status >= 500) {
-          console.log(`WARNING: ${route.name} (${route.path}) returned ${status} - may not be fully implemented`);
+          console.log(`WARNING: ${route.name} (${route.path}) returned ${status}`);
         }
         expect(status).toBeLessThan(501);
       });
     }
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Case Creation Flow Tests
-  // ═══════════════════════════════════════════════════════════════════════════
-
   test.describe('Case Creation Flow', () => {
-    /**
-     * Verify case creation page loads
-     * @validates Requirements 2.3
-     */
     test('should display case creation page', async ({ page }) => {
-      // Navigate to case creation page
-      const response = await page.goto('/cases/new', { timeout: timeouts.extended });
+      const user = buildUser('case-page');
 
       try {
-        await page.waitForLoadState('networkidle', { timeout: 5000 });
-      } catch {
-        // networkidle may timeout on SSE routes
+        await registerUser(page, user);
+
+        const response = await page.goto('/cases/new', { timeout: timeouts.extended });
+        await expect(page.getByRole('heading', { name: /new case intake/i })).toBeVisible();
+
+        await captureNumberedStep(page, 1, 'case-creation-page', {
+          directory: 'screenshots/case-flow',
+        });
+
+        expect(response?.status()).toBeLessThan(400);
+      } finally {
+        await cleanupUserArtifacts(user.email);
       }
-
-      // Capture case creation page
-      await captureNumberedStep(page, 1, 'case-creation-page', {
-        directory: 'screenshots/case-flow',
-      });
-
-      // Verify page loaded (accept redirect to login or actual page)
-      expect(response?.status()).toBeLessThan(500);
     });
 
-    /**
-     * Verify case creation form submission
-     * @validates Requirements 2.3, 2.4, 2.7
-     */
     test('should allow case creation with form submission', async ({ page }) => {
-      await page.goto('/cases/new');
+      const user = buildUser('case-create');
+      const caseTitle = `${TEST_CASE_PREFIX} E2E Case ${Date.now()}`;
+
       try {
-        await page.waitForLoadState('networkidle', { timeout: 5000 });
-      } catch {
-        // networkidle may timeout on SSE routes
-      }
+        await registerUser(page, user);
 
-      // Check if we're on the case creation page or redirected
-      const url = page.url();
-      if (url.includes('login')) {
-        console.log('Redirected to login - skipping case creation test');
-        await captureStepScreenshot(page, 'case-creation-requires-auth', {
+        await page.goto('/cases/new');
+        await expect(page.getByRole('heading', { name: /new case intake/i })).toBeVisible();
+
+        await page.locator('input[name="title"]').fill(caseTitle);
+        await page.locator('textarea[name="narrative"]').fill(testCaseData.description);
+        await page.locator('input[name="what"]').fill('E2E authenticated case creation flow');
+        await page.locator('select[name="priority"]').selectOption(testCaseData.priority ?? 'medium');
+
+        await captureNumberedStep(page, 2, 'case-form-filled', {
           directory: 'screenshots/case-flow',
         });
-        return;
-      }
 
-      // Look for case creation form elements
-      const titleInput = page.locator('input[name="title"], input[placeholder*="title" i], #title');
-      const descriptionInput = page.locator(
-        'textarea[name="description"], textarea[name="narrative"], #description, #narrative'
-      );
-
-      // Check if form elements exist
-      const hasTitleInput = (await titleInput.count()) > 0;
-
-      if (!hasTitleInput) {
-        console.log('Case creation form not found - page may have different structure');
-        await captureStepScreenshot(page, 'case-creation-form-not-found', {
-          directory: 'screenshots/case-flow',
+        await page.getByRole('button', { name: /create case/i }).click();
+        await page.waitForURL(/\/cases\/[0-9a-f-]+\/overview$/i, {
+          timeout: 30000,
         });
-        // Still pass - we verified the page loads
-        return;
-      }
+        await expect(page.getByText(caseTitle).first()).toBeVisible({ timeout: 15000 });
 
-      // Fill the form — use .first() to avoid strict mode violation from CaseDocumentWriter inputs
-      await titleInput.first().fill(testCaseData.title);
-
-      if ((await descriptionInput.count()) > 0) {
-        await descriptionInput.first().fill(testCaseData.description);
-      }
-
-      // Capture filled form
-      await captureNumberedStep(page, 2, 'case-form-filled', {
-        directory: 'screenshots/case-flow',
-      });
-
-      // Look for submit button
-      const submitButton = page.locator(
-        'button[type="submit"], button:has-text("Create"), button:has-text("Save")'
-      );
-
-      if ((await submitButton.count()) > 0) {
-        await submitButton.first().click();
-
-        // Wait for navigation or response
-        await page.waitForTimeout(2000);
-
-        // Capture post-submission state
         await captureNumberedStep(page, 3, 'case-created', {
           directory: 'screenshots/case-flow',
         });
+      } finally {
+        await cleanupUserArtifacts(user.email);
       }
-
-      // Verify we're still on a valid page
-      const bodyContent = await page.textContent('body');
-      expect(bodyContent).toBeTruthy();
     });
   });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Evidence Upload Flow Tests
-  // ═══════════════════════════════════════════════════════════════════════════
 
   test.describe('Evidence Upload Flow', () => {
-    /**
-     * Verify evidence page loads
-     * @validates Requirements 2.5
-     */
     test('should display evidence page', async ({ page }) => {
-      const response = await page.goto('/evidence', { timeout: timeouts.extended });
+      const user = buildUser('evidence-page');
 
       try {
-        await page.waitForLoadState('networkidle', { timeout: 5000 });
-      } catch {
-        // networkidle may timeout on SSE routes
+        await registerUser(page, user);
+
+        const response = await page.goto('/evidence', { timeout: timeouts.extended });
+        await expect(page).not.toHaveURL(/\/login$/);
+        await expect(page.locator('.upload-zone')).toBeVisible();
+        await expect(page.getByText(/drop files here or use/i)).toBeVisible();
+
+        await captureNumberedStep(page, 1, 'evidence-page', {
+          directory: 'screenshots/evidence-flow',
+        });
+
+        expect(response?.status()).toBeLessThan(400);
+      } finally {
+        await cleanupUserArtifacts(user.email);
       }
-
-      // Capture evidence page
-      await captureNumberedStep(page, 1, 'evidence-page', {
-        directory: 'screenshots/evidence-flow',
-      });
-
-      // Verify page loaded
-      expect(response?.status()).toBeLessThan(500);
     });
 
-    /**
-     * Verify evidence upload functionality
-     * @validates Requirements 2.5, 2.6, 2.7
-     */
     test('should have evidence upload capability', async ({ page }) => {
-      await page.goto('/evidence');
+      const user = buildUser('evidence-upload');
+
       try {
-        await page.waitForLoadState('networkidle', { timeout: 5000 });
-      } catch {
-        // networkidle may timeout on SSE routes
+        await registerUser(page, user);
+
+        await page.goto('/evidence');
+
+        const uploadZone = page.locator('.upload-zone');
+        const uploadBrowse = page.locator('.upload-browse');
+        const fileInput = page.locator('input[type="file"][name="file"]');
+
+        await expect(uploadZone).toBeVisible({ timeout: 15000 });
+        await expect(uploadBrowse).toContainText(/browse/i);
+        await expect(fileInput).toHaveCount(1);
+
+        const accept = await fileInput.first().getAttribute('accept');
+
+        await captureStepScreenshot(page, 'evidence-upload-elements', {
+          directory: 'screenshots/evidence-flow',
+        });
+
+        expect(accept).toContain('.pdf');
+        expect(accept).toContain('image/*');
+      } finally {
+        await cleanupUserArtifacts(user.email);
       }
-
-      // Look for file upload elements
-      const fileInput = page.locator('input[type="file"]');
-      const uploadButton = page.locator(
-        'button:has-text("Upload"), button:has-text("Add Evidence"), [data-testid="upload-button"]'
-      );
-      const dropZone = page.locator('.drop-zone, .file-drop-zone, [data-testid="drop-zone"]');
-
-      // Check for any upload mechanism
-      const hasFileInput = (await fileInput.count()) > 0;
-      const hasUploadButton = (await uploadButton.count()) > 0;
-      const hasDropZone = (await dropZone.count()) > 0;
-
-      // Capture current state
-      await captureStepScreenshot(page, 'evidence-upload-elements', {
-        directory: 'screenshots/evidence-flow',
-      });
-
-      // Log what we found
-      console.log(
-        `Evidence upload elements found: fileInput=${hasFileInput}, uploadButton=${hasUploadButton}, dropZone=${hasDropZone}`
-      );
-
-      // Verify page has some content
-      const bodyContent = await page.textContent('body');
-      expect(bodyContent).toBeTruthy();
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Screenshot Capture Verification
-  // ═══════════════════════════════════════════════════════════════════════════
-
   test.describe('Screenshot Capture', () => {
-    /**
-     * Verify screenshot capture works correctly
-     * @validates Requirements 2.7
-     */
     test('should capture screenshots at test steps', async ({ page }) => {
       await page.goto('/');
       try {
@@ -396,7 +310,6 @@ test.describe('User Flow Tests', () => {
         // networkidle may timeout on SSE routes
       }
 
-      // Capture multiple screenshots to verify functionality
       const screenshot1 = await captureNumberedStep(page, 1, 'screenshot-test-step1', {
         directory: 'screenshots/verification',
       });
@@ -406,7 +319,6 @@ test.describe('User Flow Tests', () => {
         fullPage: true,
       });
 
-      // Verify screenshots were captured
       expect(screenshot1.path).toContain('step-01');
       expect(screenshot2.path).toContain('step-02');
       expect(screenshot1.stepName).toBe('step-01-screenshot-test-step1');
@@ -415,34 +327,17 @@ test.describe('User Flow Tests', () => {
   });
 });
 
-// ═══════════════════════════════════════════════════════════════════════════
-// Utility Tests
-// ═══════════════════════════════════════════════════════════════════════════
-
 test.describe('E2E Utility Verification', () => {
-  /**
-   * Verify test fixtures are properly configured
-   */
   test('should have valid test fixtures', async () => {
-    // Verify test credentials
     expect(testCredentials.username).toBeTruthy();
     expect(testCredentials.password).toBeTruthy();
-
-    // Verify test case data
     expect(testCaseData.title).toBeTruthy();
     expect(testCaseData.description).toBeTruthy();
-
-    // Verify routes are defined
     expect(testRoutes.length).toBeGreaterThan(0);
-
-    // Verify common selectors
     expect(commonSelectors.sidebar).toBeTruthy();
     expect(commonSelectors.header).toBeTruthy();
   });
 
-  /**
-   * Verify timeouts are properly configured
-   */
   test('should have valid timeout configurations', async () => {
     expect(timeouts.short).toBeGreaterThan(0);
     expect(timeouts.medium).toBeGreaterThan(timeouts.short);

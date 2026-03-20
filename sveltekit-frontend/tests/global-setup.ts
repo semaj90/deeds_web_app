@@ -10,68 +10,94 @@
 import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
 import pg from 'pg';
-import { TEST_CASE_SEED, TEST_CASE_PREFIX, TEST_IDS_FILE } from './fixtures/test-cases.js';
+import { request as playwrightRequest } from '@playwright/test';
+import {
+  PLAYWRIGHT_DEV_SESSION_USER,
+  TEST_CASE_SEED,
+  TEST_CASE_PREFIX,
+  TEST_IDS_FILE,
+} from './fixtures/test-cases.js';
 
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
-const DB_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+const DB_URL =
+  process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
 
 export default async function globalSetup() {
-	console.log('\n🌱  [global-setup] Cleaning up stale test cases …');
+  if (process.env.PLAYWRIGHT_SKIP_GLOBAL_SETUP === 'true') {
+    console.log('\n🌱  [global-setup] Skipped via PLAYWRIGHT_SKIP_GLOBAL_SETUP\n');
+    return;
+  }
 
-	// Hard-delete any leftover [PW-TEST] cases from previous runs
-	const pool = new pg.Pool({ connectionString: DB_URL });
-	try {
-		const result = await pool.query(
-			`DELETE FROM cases WHERE title LIKE $1 RETURNING title`,
-			[`${TEST_CASE_PREFIX}%`]
-		);
-		if (result.rowCount && result.rowCount > 0) {
-			console.log(`   🗑️  Removed ${result.rowCount} stale test case(s) from previous runs`);
-		} else {
-			console.log('   ✓  No stale test cases to clean up');
-		}
-	} catch (err) {
-		console.warn(`   ⚠️  Could not clean stale cases (DB may be unavailable): ${err}`);
-	} finally {
-		await pool.end();
-	}
+  console.log('\n🌱  [global-setup] Cleaning up stale test cases …');
 
-	console.log('🌱  [global-setup] Seeding test cases via /api/cases …');
+  // Hard-delete any leftover [PW-TEST] cases from previous runs
+  const pool = new pg.Pool({ connectionString: DB_URL });
+  try {
+    const result = await pool.query(`DELETE FROM cases WHERE title LIKE $1 RETURNING title`, [
+      `${TEST_CASE_PREFIX}%`,
+    ]);
+    if (result.rowCount && result.rowCount > 0) {
+      console.log(`   🗑️  Removed ${result.rowCount} stale test case(s) from previous runs`);
+    } else {
+      console.log('   ✓  No stale test cases to clean up');
+    }
+  } catch (err) {
+    console.warn(`   ⚠️  Could not clean stale cases (DB may be unavailable): ${err}`);
+  } finally {
+    await pool.end();
+  }
 
-	const createdIds: string[] = [];
+  console.log('🌱  [global-setup] Creating DB-backed Playwright session …');
 
-	for (const seedCase of TEST_CASE_SEED) {
-		try {
-			const res = await fetch(`${BASE_URL}/api/cases`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(seedCase),
-			});
+  const createdIds: string[] = [];
+  const apiContext = await playwrightRequest.newContext({ baseURL: BASE_URL });
 
-			if (res.ok) {
-				const payload = await res.json();
-				// Support both standard and legalApiResponses formats
-				const id: string = payload?.data?.case?.id ?? payload?.data?.id ?? payload?.id;
-				if (id) {
-					createdIds.push(id);
-					console.log(`   ✅  Created: "${seedCase.title}" → ${id}`);
-				} else {
-					console.warn(`   ⚠️  Created but no ID returned for: "${seedCase.title}"`);
-				}
-			} else {
-				const text = await res.text().catch(() => '');
-				console.warn(`   ⚠️  Failed to create "${seedCase.title}" (${res.status}): ${text}`);
-			}
-		} catch (err) {
-			// Server might not be running — tests will fail naturally, don't block setup
-			console.warn(`   ⚠️  Fetch error for "${seedCase.title}": ${err}`);
-		}
-	}
+  try {
+    const loginRes = await apiContext.post('/api/auth/demo-login', {
+      data: PLAYWRIGHT_DEV_SESSION_USER,
+    });
 
-	// Persist IDs for teardown
-	const idsFilePath = path.resolve(TEST_IDS_FILE);
-	await mkdir(path.dirname(idsFilePath), { recursive: true });
-	await writeFile(idsFilePath, JSON.stringify({ ids: createdIds }, null, 2));
+    if (!loginRes.ok()) {
+      const body = await loginRes.text().catch(() => '');
+      throw new Error(`Demo login failed (${loginRes.status()}): ${body}`);
+    }
 
-	console.log(`🌱  [global-setup] Done — seeded ${createdIds.length}/${TEST_CASE_SEED.length} cases\n`);
+    const loginPayload = await loginRes.json();
+    console.log(
+      `   ✅  Authenticated as ${loginPayload.user?.email ?? PLAYWRIGHT_DEV_SESSION_USER.email}`
+    );
+
+    console.log('🌱  [global-setup] Seeding test cases via /api/cases …');
+
+    for (const seedCase of TEST_CASE_SEED) {
+      const res = await apiContext.post('/api/cases', {
+        data: seedCase,
+      });
+
+      if (res.ok()) {
+        const payload = await res.json();
+        const id: string = payload?.data?.case?.id ?? payload?.data?.id ?? payload?.id;
+        if (id) {
+          createdIds.push(id);
+          console.log(`   ✅  Created: "${seedCase.title}" → ${id}`);
+        } else {
+          console.warn(`   ⚠️  Created but no ID returned for: "${seedCase.title}"`);
+        }
+      } else {
+        const text = await res.text().catch(() => '');
+        console.warn(`   ⚠️  Failed to create "${seedCase.title}" (${res.status()}): ${text}`);
+      }
+    }
+  } finally {
+    await apiContext.dispose();
+  }
+
+  // Persist IDs for teardown
+  const idsFilePath = path.resolve(TEST_IDS_FILE);
+  await mkdir(path.dirname(idsFilePath), { recursive: true });
+  await writeFile(idsFilePath, JSON.stringify({ ids: createdIds }, null, 2));
+
+  console.log(
+    `🌱  [global-setup] Done — seeded ${createdIds.length}/${TEST_CASE_SEED.length} cases\n`
+  );
 }

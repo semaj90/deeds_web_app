@@ -30,37 +30,35 @@ export type SeedCaseResult = {
 };
 
 /**
- * Register a fresh test user and return session-authenticated request context info.
- * The register endpoint sets the auth_session cookie automatically.
+ * Create a fresh dev-only demo user and return session-authenticated request context info.
+ * The demo-login endpoint creates a real DB user/session and sets the auth_session cookie.
  */
 export async function registerTestUser(request: APIRequestContext) {
 	const id = Math.random().toString(36).substring(2, 10);
 	const user = {
-		email: `pw-seed-${id}@test.local`,
-		password: 'Password123!',
-		firstName: 'PW',
-		lastName: 'Seed'
-	};
+    email: `pw-seed-${id}@test.local`,
+    role: 'admin',
+  };
 
-	const res = await request.post('/api/auth/register', { data: user });
+	const res = await request.post('/api/auth/demo-login', { data: user });
 	if (!res.ok()) {
 		const body = await res.text();
-		throw new Error(`Registration failed (${res.status()}): ${body}`);
+		throw new Error(`Demo login failed (${res.status()}): ${body}`);
 	}
 
 	const data = await res.json();
 	return {
-		userId: data.userId as string,
-		sessionId: data.sessionId as string,
-		email: user.email,
-		user
-	};
+    userId: data.user.id as string,
+    sessionId: data.session.id as string,
+    email: user.email,
+    user: data.user,
+  };
 }
 
 /**
  * Seed cases for the currently authenticated user.
  * Requires that the request context already has a valid auth_session cookie
- * (e.g., from registerTestUser or a prior login).
+ * (e.g., from registerTestUser/demo-login or a prior login).
  *
  * POST /api/cases expects: { title, description, status?, priority? }
  */
@@ -86,7 +84,7 @@ export async function seedCasesForUser(opts: {
 		}
 
 		const json = await res.json();
-		created.push(json.data);
+		created.push(json.data?.case ?? json.data);
 	}
 
 	return created;
@@ -105,6 +103,7 @@ export async function cleanupSeededCases(opts: {
 	// The DELETE /api/cases endpoint soft-deletes (archives) by IDs
 	// but uses assignedAttorney not userId — so we delete individually
 	for (const id of opts.caseIds) {
+		if (!id) continue;
 		const res = await opts.request.delete(`/api/cases/${id}`);
 		if (!res.ok()) {
 			console.warn(`Cleanup: failed to delete case ${id} (${res.status()})`);
@@ -120,5 +119,7 @@ export async function getSeededCases(request: APIRequestContext): Promise<SeedCa
 	if (!res.ok()) return [];
 
 	const json = await res.json();
-	return (json.data ?? []).filter((c: SeedCaseResult) => c.title.startsWith(SEED_PREFIX));
+	return (json.data?.cases ?? json.data ?? []).filter((c: SeedCaseResult) =>
+    c.title.startsWith(SEED_PREFIX)
+  );
 }

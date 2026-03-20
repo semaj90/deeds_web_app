@@ -22,7 +22,7 @@
 	let associates = $state<KnownAssociate[]>([]);
 	let associatesLoading = $state(false);
 	let associatesError = $state<string | null>(null);
-	let activeTab = $state<'details' | 'associates' | 'photos' | 'search' | 'dex' | 'criminal'>('details');
+	let activeTab = $state<'details' | 'associates' | 'photos' | 'search' | 'dex' | 'criminal' | 'timeline'>('details');
 	let faceMatchOpen = $state(false);
 	let faceMatches = $state<any[]>([]);
 	let faceMatchLoading = $state(false);
@@ -41,6 +41,21 @@
 	let riskData = $state<any>(null);
 	let riskLoading = $state(false);
 	let riskError = $state<string | null>(null);
+
+	// Timeline state
+	let timelineEvents = $state<any[]>([]);
+	let timelineLoading = $state(false);
+	let timelineError = $state<string | null>(null);
+	let showTimelineDrawer = $state(false);
+	let timelineSaving = $state(false);
+	let newEvent = $state({
+		title: '',
+		description: '',
+		eventDate: new Date().toISOString().slice(0, 16),
+		eventType: 'general' as string,
+		location: '',
+		severity: 'low' as string,
+	});
 
 	function normalizePhoto(photo: any) {
 		if (!photo) return photo;
@@ -72,7 +87,6 @@
 			similarLoading = false;
 		}
 	}
-
 
 	async function loadRiskScore() {
 		if (!data.poi?.id) return;
@@ -234,6 +248,55 @@
 		}
 	}
 
+	// Timeline functions
+	async function loadTimeline() {
+		if (!data.poi?.id) return;
+		timelineLoading = true;
+		timelineError = null;
+		try {
+			const res = await fetch(`/api/persons-of-interest/${data.poi.id}/timeline`);
+			if (!res.ok) throw new Error('Failed to load timeline');
+			const json = await res.json();
+			timelineEvents = json.events ?? [];
+		} catch (err) {
+			timelineError = err instanceof Error ? err.message : 'Failed to load';
+			timelineEvents = [];
+		} finally {
+			timelineLoading = false;
+		}
+	}
+
+	async function saveTimelineEvent() {
+		if (!data.poi?.id || !newEvent.title.trim()) return;
+		timelineSaving = true;
+		try {
+			const res = await fetch(`/api/persons-of-interest/${data.poi.id}/timeline`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					...newEvent,
+					eventDate: new Date(newEvent.eventDate).toISOString(),
+				}),
+			});
+			if (!res.ok) throw new Error('Failed to save event');
+			const created = await res.json();
+			timelineEvents = [created, ...timelineEvents];
+			showTimelineDrawer = false;
+			newEvent = {
+				title: '',
+				description: '',
+				eventDate: new Date().toISOString().slice(0, 16),
+				eventType: 'general',
+				location: '',
+				severity: 'low',
+			};
+		} catch (err) {
+			console.error('Failed to save timeline event:', err);
+		} finally {
+			timelineSaving = false;
+		}
+	}
+
 	function getStatusColor(status: string): string {
 		const colors: Record<string, string> = {
 			person_of_interest: '#dc2626',
@@ -258,6 +321,30 @@
 			extreme: '#7c2d12'
 		};
 		return colors[level] || '#6b7280';
+	}
+
+	function getEventTypeColor(type: string): string {
+		const colors: Record<string, string> = {
+			arrest: '#dc2626',
+			court: '#7c3aed',
+			sighting: '#3b82f6',
+			evidence: '#f59e0b',
+			contact: '#10b981',
+			incident: '#ef4444',
+			note: '#6b7280',
+			general: '#9ca3af',
+		};
+		return colors[type] || '#9ca3af';
+	}
+
+	function getSeverityColor(severity: string): string {
+		const colors: Record<string, string> = {
+			low: '#10b981',
+			medium: '#f59e0b',
+			high: '#ef4444',
+			critical: '#dc2626',
+		};
+		return colors[severity] || '#6b7280';
 	}
 </script>
 
@@ -290,48 +377,13 @@
 		{/if}
 
 		<div class="tabs">
-			<button
-				class="tab-button"
-				class:active={activeTab === 'details'}
-				onclick={() => (activeTab = 'details')}
-			>
-				Details
-			</button>
-			<button
-				class="tab-button"
-				class:active={activeTab === 'associates'}
-				onclick={() => (activeTab = 'associates')}
-			>
-				Known Associates ({associates.length})
-			</button>
-			<button
-				class="tab-button"
-				class:active={activeTab === 'photos'}
-				onclick={() => (activeTab = 'photos')}
-			>
-				Photos ({photos.length})
-			</button>
-			<button
-				class="tab-button"
-				class:active={activeTab === 'search'}
-				onclick={() => (activeTab = 'search')}
-			>
-				Similar POIs
-			</button>
-			<button
-				class="tab-button"
-				class:active={activeTab === 'dex'}
-				onclick={() => (activeTab = 'dex')}
-			>
-				Dex Profile
-			</button>
-			<button
-				class="tab-button"
-				class:active={activeTab === 'criminal'}
-				onclick={() => (activeTab = 'criminal')}
-			>
-				Criminal Record
-			</button>
+			<button class="tab-button" class:active={activeTab === 'details'} onclick={() => (activeTab = 'details')}>Details</button>
+			<button class="tab-button" class:active={activeTab === 'timeline'} onclick={() => { activeTab = 'timeline'; if (timelineEvents.length === 0 && !timelineLoading) loadTimeline(); }}>Timeline ({timelineEvents.length})</button>
+			<button class="tab-button" class:active={activeTab === 'associates'} onclick={() => (activeTab = 'associates')}>Associates ({associates.length})</button>
+			<button class="tab-button" class:active={activeTab === 'photos'} onclick={() => (activeTab = 'photos')}>Photos ({photos.length})</button>
+			<button class="tab-button" class:active={activeTab === 'search'} onclick={() => (activeTab = 'search')}>Similar POIs</button>
+			<button class="tab-button" class:active={activeTab === 'dex'} onclick={() => (activeTab = 'dex')}>Dex Profile</button>
+			<button class="tab-button" class:active={activeTab === 'criminal'} onclick={() => (activeTab = 'criminal')}>Criminal Record</button>
 		</div>
 
 		<div class="tab-content">
@@ -343,28 +395,24 @@
 							<p>{poi.description}</p>
 						</div>
 					{/if}
-
 					{#if poi.lastLocation}
 						<div class="detail-item">
 							<div class="label">Last Known Location</div>
 							<p>{poi.lastLocation}</p>
 						</div>
 					{/if}
-
 					{#if poi.lastSeen}
 						<div class="detail-item">
 							<div class="label">Last Seen</div>
 							<p>{poi.lastSeen}</p>
 						</div>
 					{/if}
-
 					{#if poi.caseId}
 						<div class="detail-item">
 							<div class="label">Case ID</div>
 							<p><a href={`/cases/${poi.caseId}`} class="case-link">{poi.caseId}</a></p>
 						</div>
 					{/if}
-
 					{#if (poi.aliases ?? []).length > 0}
 						<div class="detail-item full-width">
 							<div class="label">Known Aliases</div>
@@ -375,7 +423,6 @@
 							</div>
 						</div>
 					{/if}
-
 					{#if (poi.crimes ?? []).length > 0}
 						<div class="detail-item full-width">
 							<div class="label">Crimes / Charges</div>
@@ -386,17 +433,14 @@
 							</div>
 						</div>
 					{/if}
-
 					<div class="detail-item">
 						<div class="label">Created</div>
 						<p>{new Date(poi.createdAt).toLocaleString()}</p>
 					</div>
-
 					<div class="detail-item">
 						<div class="label">Last Updated</div>
 						<p>{new Date(poi.updatedAt).toLocaleString()}</p>
 					</div>
-
 					<div class="detail-item full-width" style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.1);">
 						<div class="label" style="display: flex; align-items: center; gap: 0.5rem;">Risk Assessment
 							{#if !riskData}
@@ -411,9 +455,7 @@
 							{@const score = riskData.riskScore ?? 0}
 							{@const scoreClass = score >= 7 ? 'bg-red-600/20' : score >= 4 ? 'bg-amber-600/20' : 'bg-green-600/20'}
 							<div class="flex flex-wrap gap-3 text-xs">
-								<span class="px-2 py-0.5 rounded-full {scoreClass}">
-									Score: {score}/10
-								</span>
+								<span class="px-2 py-0.5 rounded-full {scoreClass}">Score: {score}/10</span>
 								<span>Evidence: {riskData.evidenceCount ?? 0} items</span>
 								{#if riskData.aiAnalysis}
 									<p class="w-full text-neutral-300 mt-1">{riskData.aiAnalysis}</p>
@@ -422,6 +464,125 @@
 						{/if}
 					</div>
 				</div>
+
+			{:else if activeTab === 'timeline'}
+				<div class="timeline-section">
+					<div class="timeline-header">
+						<h3 class="timeline-heading">Event Timeline</h3>
+						<button class="btn-add-event" onclick={() => { showTimelineDrawer = true; }}>
+							<span class="i-lucide-plus w-4 h-4 inline-block"></span>
+							Add Event
+						</button>
+					</div>
+					{#if timelineLoading}
+						<p class="empty-message">Loading timeline...</p>
+					{:else if timelineError}
+						<div class="search-error">{timelineError}
+							<button class="btn-retry" onclick={loadTimeline}>Retry</button>
+						</div>
+					{:else if timelineEvents.length === 0}
+						<div class="timeline-empty">
+							<p>No timeline events yet.</p>
+							<button class="btn-add-event" onclick={() => { showTimelineDrawer = true; }}>
+								<span class="i-lucide-plus w-4 h-4 inline-block"></span>
+								Add First Event
+							</button>
+						</div>
+					{:else}
+						<div class="timeline-list">
+							{#each timelineEvents as event (event.id)}
+								<div class="timeline-item">
+									<div class="timeline-dot" style="background-color: {getEventTypeColor(event.eventType)}"></div>
+									<div class="timeline-line"></div>
+									<div class="timeline-card">
+										<div class="timeline-card-header">
+											<span class="timeline-date">
+												{new Date(event.eventDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+												<span class="timeline-time">{new Date(event.eventDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+											</span>
+											<div class="timeline-tags">
+												<span class="event-type-tag" style="background-color: {getEventTypeColor(event.eventType)}20; color: {getEventTypeColor(event.eventType)}; border: 1px solid {getEventTypeColor(event.eventType)}40;">{event.eventType}</span>
+												<span class="severity-tag" style="background-color: {getSeverityColor(event.severity)}20; color: {getSeverityColor(event.severity)}; border: 1px solid {getSeverityColor(event.severity)}40;">{event.severity}</span>
+											</div>
+										</div>
+										<h4 class="timeline-title">{event.title}</h4>
+										{#if event.description}
+											<p class="timeline-desc">{event.description}</p>
+										{/if}
+										{#if event.location}
+											<span class="timeline-location">
+												<span class="i-lucide-map-pin w-3 h-3 inline-block"></span>
+												{event.location}
+											</span>
+										{/if}
+									</div>
+								</div>
+							{/each}
+						</div>
+					{/if}
+				</div>
+
+				{#if showTimelineDrawer}
+					<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+					<div class="drawer-overlay" onclick={() => { showTimelineDrawer = false; }}></div>
+					<div class="drawer-panel">
+						<div class="drawer-header">
+							<h3>Add Timeline Event</h3>
+							<button class="drawer-close" onclick={() => { showTimelineDrawer = false; }}>
+								<span class="i-lucide-x w-5 h-5 inline-block"></span>
+							</button>
+						</div>
+						<form class="drawer-form" onsubmit={(e) => { e.preventDefault(); saveTimelineEvent(); }}>
+							<div class="drawer-field">
+								<label for="evt-title">Title *</label>
+								<input id="evt-title" type="text" bind:value={newEvent.title} placeholder="Event title" required />
+							</div>
+							<div class="drawer-field">
+								<label for="evt-date">Date & Time *</label>
+								<input id="evt-date" type="datetime-local" bind:value={newEvent.eventDate} required />
+							</div>
+							<div class="drawer-row">
+								<div class="drawer-field">
+									<label for="evt-type">Type</label>
+									<select id="evt-type" bind:value={newEvent.eventType}>
+										<option value="general">General</option>
+										<option value="arrest">Arrest</option>
+										<option value="court">Court</option>
+										<option value="sighting">Sighting</option>
+										<option value="evidence">Evidence</option>
+										<option value="contact">Contact</option>
+										<option value="incident">Incident</option>
+										<option value="note">Note</option>
+									</select>
+								</div>
+								<div class="drawer-field">
+									<label for="evt-severity">Severity</label>
+									<select id="evt-severity" bind:value={newEvent.severity}>
+										<option value="low">Low</option>
+										<option value="medium">Medium</option>
+										<option value="high">High</option>
+										<option value="critical">Critical</option>
+									</select>
+								</div>
+							</div>
+							<div class="drawer-field">
+								<label for="evt-location">Location</label>
+								<input id="evt-location" type="text" bind:value={newEvent.location} placeholder="Where did this occur?" />
+							</div>
+							<div class="drawer-field">
+								<label for="evt-desc">Description</label>
+								<textarea id="evt-desc" bind:value={newEvent.description} placeholder="Details about the event..." rows="4"></textarea>
+							</div>
+							<div class="drawer-actions">
+								<button type="button" class="btn-secondary" onclick={() => { showTimelineDrawer = false; }}>Cancel</button>
+								<button type="submit" class="btn-primary" disabled={timelineSaving || !newEvent.title.trim()}>
+									{timelineSaving ? 'Saving...' : 'Save Event'}
+								</button>
+							</div>
+						</form>
+					</div>
+				{/if}
+
 			{:else if activeTab === 'associates'}
 				<div class="associates-section">
 					{#if associatesLoading}
@@ -444,12 +605,7 @@
 											<p class="notes">{associate.notes}</p>
 										{/if}
 									</div>
-									<button
-										class="btn-remove"
-										onclick={() => removeAssociate(associate.associateId)}
-									>
-										Remove
-									</button>
+									<button class="btn-remove" onclick={() => removeAssociate(associate.associateId)}>Remove</button>
 								</div>
 							{/each}
 						</div>
@@ -457,11 +613,7 @@
 				</div>
 			{:else if activeTab === 'photos'}
 				<div class="face-match-bar">
-					<button
-						class="btn-face-match"
-						onclick={findFaceMatches}
-						disabled={faceMatchLoading || photos.length === 0}
-					>
+					<button class="btn-face-match" onclick={findFaceMatches} disabled={faceMatchLoading || photos.length === 0}>
 						<span class="i-lucide-scan w-4 h-4 inline-block"></span>
 						{faceMatchLoading ? 'Searching...' : 'Find Similar Faces'}
 					</button>
@@ -475,13 +627,7 @@
 				{#if uploadError}
 					<div class="upload-error">{uploadError}</div>
 				{/if}
-				<POIPhotoGrid
-					{photos}
-					editable={true}
-					onupload={handleUploadClick}
-					ondelete={deletePhoto}
-					onview={viewPhoto}
-				/>
+				<POIPhotoGrid {photos} editable={true} onupload={handleUploadClick} ondelete={deletePhoto} onview={viewPhoto} />
 				<input type="file" bind:this={fileInputEl} onchange={handleFileSelected} accept="image/*" style="display:none" />
 				{#if photos.length > 0}
 					<POIPhotoModal {photos} bind:currentIndex={photoModalIndex} bind:open={photoModalOpen} onclose={() => { photoModalOpen = false; }} />
@@ -507,17 +653,11 @@
 											<img src={sp.photoUrl} alt={sp.name} style="width:32px;height:32px;border-radius:50%;object-fit:cover;margin-right:0.5rem;flex-shrink:0;" />
 										{/if}
 										<span class="result-name">{sp.name}</span>
-										<span class="result-score" style="opacity: {0.4 + sp.similarity * 0.6}">
-											{Math.round(sp.similarity * 100)}% match
-										</span>
+										<span class="result-score" style="opacity: {0.4 + sp.similarity * 0.6}">{Math.round(sp.similarity * 100)}% match</span>
 									</div>
 									<div class="result-meta">
-										<span class="badge status" style="background-color: {getStatusColor(sp.status)}; font-size: 0.75rem; padding: 0.25rem 0.5rem;">
-											{sp.status}
-										</span>
-										<span class="badge" style="background-color: {getThreatColor(sp.threatLevel)}; font-size: 0.75rem; padding: 0.25rem 0.5rem;">
-											{sp.threatLevel}
-										</span>
+										<span class="badge status" style="background-color: {getStatusColor(sp.status)}; font-size: 0.75rem; padding: 0.25rem 0.5rem;">{sp.status}</span>
+										<span class="badge" style="background-color: {getThreatColor(sp.threatLevel)}; font-size: 0.75rem; padding: 0.25rem 0.5rem;">{sp.threatLevel}</span>
 										{#if sp.lastLocation}
 											<span class="result-location">{sp.lastLocation}</span>
 										{/if}
@@ -532,28 +672,15 @@
 				</div>
 				<hr style="border-color: #333; margin: 1.5rem 0;" />
 				<h3 class="results-heading">MANUAL SEARCH</h3>
-
 				<div class="search-section">
 					<div class="search-bar">
-						<input
-							type="text"
-							bind:value={searchQuery}
-							placeholder="Search by name, alias, description, location..."
-							class="search-input"
-							onkeydown={(e) => { if (e.key === 'Enter') searchSimilarPOIs(); }}
-						/>
-						<button class="btn-search" onclick={() => searchSimilarPOIs()} disabled={searchLoading || !searchQuery.trim()}>
-							{searchLoading ? 'Searching...' : 'Search'}
-						</button>
-						<button class="btn-secondary btn-auto" onclick={autoSearchFromProfile} disabled={searchLoading}>
-							Find Similar
-						</button>
+						<input type="text" bind:value={searchQuery} placeholder="Search by name, alias, description, location..." class="search-input" onkeydown={(e) => { if (e.key === 'Enter') searchSimilarPOIs(); }} />
+						<button class="btn-search" onclick={() => searchSimilarPOIs()} disabled={searchLoading || !searchQuery.trim()}>{searchLoading ? 'Searching...' : 'Search'}</button>
+						<button class="btn-secondary btn-auto" onclick={autoSearchFromProfile} disabled={searchLoading}>Find Similar</button>
 					</div>
-
 					{#if searchError}
 						<div class="search-error">{searchError}</div>
 					{/if}
-
 					{#if searchResults.length > 0}
 						<div class="search-results">
 							<h3 class="results-heading">{searchResults.length} result{searchResults.length !== 1 ? 's' : ''}</h3>
@@ -564,17 +691,11 @@
 											<img src={result.photoUrl} alt={result.name} style="width:32px;height:32px;border-radius:50%;object-fit:cover;margin-right:0.5rem;flex-shrink:0;" />
 										{/if}
 										<span class="result-name">{result.name}</span>
-										<span class="result-score" style="opacity: {0.4 + result.similarityScore * 0.6}">
-											{Math.round(result.similarityScore * 100)}% match
-										</span>
+										<span class="result-score" style="opacity: {0.4 + result.similarityScore * 0.6}">{Math.round(result.similarityScore * 100)}% match</span>
 									</div>
 									<div class="result-meta">
-										<span class="badge status" style="background-color: {getStatusColor(result.status)}; font-size: 0.75rem; padding: 0.25rem 0.5rem;">
-											{result.status}
-										</span>
-										<span class="badge" style="background-color: {getThreatColor(result.threatLevel)}; font-size: 0.75rem; padding: 0.25rem 0.5rem;">
-											{result.threatLevel}
-										</span>
+										<span class="badge status" style="background-color: {getStatusColor(result.status)}; font-size: 0.75rem; padding: 0.25rem 0.5rem;">{result.status}</span>
+										<span class="badge" style="background-color: {getThreatColor(result.threatLevel)}; font-size: 0.75rem; padding: 0.25rem 0.5rem;">{result.threatLevel}</span>
 										{#if result.lastLocation}
 											<span class="result-location">{result.lastLocation}</span>
 										{/if}
@@ -656,445 +777,112 @@
 </div>
 
 <style>
-	.poi-detail-page {
-		padding: 2rem 2.5rem;
-		margin: -2.5rem;
-		background: #0f0f23;
-		min-height: 100vh;
-	}
+	.poi-detail-page { padding: 2rem 2.5rem; margin: -2.5rem; background: #0f0f23; min-height: 100vh; }
 	.poi-detail-page :global(h1), .poi-detail-page :global(h2), .poi-detail-page :global(h3), .poi-detail-page :global(h4), .poi-detail-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
 	.poi-detail-page :global(a) { color: inherit; border-bottom: none; }
 	.poi-detail-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
 	.poi-detail-page :global(input), .poi-detail-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
 	.poi-detail-page :global(.panel), .poi-detail-page :global(.card), .poi-detail-page :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
+	.error-banner { padding: 1rem; background: #7f1d1d; border: 1px solid #dc2626; border-radius: 0.375rem; color: #fecaca; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+	.error-banner a { color: #fecaca; text-decoration: underline; }
+	.detail-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid #333; }
+	.header-content h1 { color: #ffffff; font-size: 2rem; margin: 0 0 1rem 0; }
+	.badges { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+	.badge { padding: 0.5rem 1rem; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 600; color: #ffffff; text-transform: capitalize; }
+	.header-right { display: flex; flex-direction: column; gap: 1rem; align-items: flex-end; }
+	.btn-secondary { padding: 0.75rem 1.5rem; background: #333; color: #ffffff; text-decoration: none; border-radius: 0.375rem; font-weight: 600; transition: background-color 0.2s; }
+	.btn-secondary:hover { background: #444; }
+	.tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; border-bottom: 1px solid #333; flex-wrap: wrap; }
+	.tab-button { padding: 0.75rem 1.25rem; background: transparent; color: #9ca3af; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 0.875rem; }
+	.tab-button.active { color: #dc2626; border-bottom-color: #dc2626; }
+	.tab-button:hover { color: #ffffff; }
+	.tab-content { background: #1a1a2e; border: 1px solid #333; border-radius: 0.5rem; padding: 2rem; }
+	.details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
+	.detail-item { display: flex; flex-direction: column; }
+	.detail-item.full-width { grid-column: 1 / -1; }
+	.detail-item .label { color: #9ca3af; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; }
+	.detail-item p { color: #ffffff; margin: 0; }
+	.case-link { color: #3b82f6; text-decoration: underline; }
+	.aliases-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+	.alias-tag { padding: 0.375rem 0.75rem; background: #0f0f23; border: 1px solid #333; border-radius: 0.375rem; color: #d1d5db; font-size: 0.875rem; }
+	.associates-list { display: flex; flex-direction: column; gap: 1rem; }
+	.associate-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #0f0f23; border: 1px solid #333; border-radius: 0.375rem; }
+	.associate-info h4 { color: #ffffff; margin: 0 0 0.25rem 0; }
+	.relationship { color: #dc2626; font-size: 0.875rem; margin: 0.25rem 0; text-transform: capitalize; }
+	.notes { color: #9ca3af; font-size: 0.875rem; margin: 0.5rem 0 0 0; }
+	.associates-error { text-align: center; padding: 1rem; color: #fecaca; }
+	.btn-retry { margin-top: 0.5rem; padding: 0.5rem 1rem; background: #333; color: #ffffff; border: none; border-radius: 0.25rem; cursor: pointer; }
+	.btn-remove { padding: 0.5rem 1rem; background: #7f1d1d; color: #fecaca; border: 1px solid #dc2626; border-radius: 0.25rem; cursor: pointer; font-weight: 600; transition: background-color 0.2s; }
+	.btn-remove:hover { background: #991b1b; }
+	.empty-message { color: #9ca3af; text-align: center; padding: 2rem; }
+	.search-section { color: #d1d5db; }
+	.search-bar { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; }
+	.search-input { flex: 1; padding: 0.75rem 1rem; background: #0f0f23; border: 1px solid #333; border-radius: 0.375rem; color: #ffffff; font-size: 0.9rem; }
+	.search-input:focus { outline: none; border-color: #dc2626; }
+	.btn-search { padding: 0.75rem 1.5rem; background: #dc2626; color: #ffffff; border: none; border-radius: 0.375rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
+	.btn-search:hover:not(:disabled) { background: #b91c1c; }
+	.btn-search:disabled, .btn-auto:disabled { opacity: 0.5; cursor: not-allowed; }
+	.btn-auto { white-space: nowrap; }
+	.search-error { padding: 0.75rem; background: #7f1d1d; border: 1px solid #dc2626; border-radius: 0.375rem; color: #fecaca; margin-bottom: 1rem; }
+	.results-heading { color: #9ca3af; font-size: 0.875rem; font-weight: 600; margin: 0 0 1rem 0; text-transform: uppercase; letter-spacing: 0.05em; }
+	.search-results { display: flex; flex-direction: column; gap: 0.75rem; }
+	.result-card { display: block; padding: 1rem; background: #0f0f23; border: 1px solid #333; border-radius: 0.375rem; text-decoration: none; transition: border-color 0.2s; }
+	.result-card:hover { border-color: #dc2626; }
+	.result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+	.result-name { color: #ffffff; font-weight: 600; font-size: 1rem; }
+	.result-score { color: #10b981; font-size: 0.8rem; font-weight: 600; }
+	.result-meta { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+	.result-location { color: #9ca3af; font-size: 0.8rem; }
+	.result-desc { color: #9ca3af; font-size: 0.85rem; margin: 0.5rem 0 0 0; line-height: 1.4; }
+	.similar-panel { margin-bottom: 1.5rem; }
+	.similar-heading { color: #ffffff; font-size: 1rem; font-weight: 600; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem; }
+	.method-tag { font-size: 0.7rem; padding: 0.2rem 0.5rem; background: #1e293b; border: 1px solid #334155; border-radius: 0.25rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+	.face-match-bar { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; padding: 0.75rem; background: #0f0f23; border: 1px solid #333; border-radius: 0.375rem; }
+	.btn-face-match { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: #7c3aed; color: #ffffff; border: none; border-radius: 0.375rem; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: background-color 0.2s; }
+	.btn-face-match:hover:not(:disabled) { background: #6d28d9; }
+	.btn-face-match:disabled { opacity: 0.5; cursor: not-allowed; }
+	.face-match-msg { color: #9ca3af; font-size: 0.85rem; }
+	.upload-status { padding: 0.75rem; background: #1e3a5f; border: 1px solid #3b82f6; border-radius: 0.375rem; color: #93c5fd; margin-bottom: 1rem; text-align: center; }
+	.upload-error { padding: 0.75rem; background: #7f1d1d; border: 1px solid #dc2626; border-radius: 0.375rem; color: #fecaca; margin-bottom: 1rem; }
 
-	.error-banner {
-		padding: 1rem;
-		background: #7f1d1d;
-		border: 1px solid #dc2626;
-		border-radius: 0.375rem;
-		color: #fecaca;
-		margin-bottom: 1.5rem;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
+	/* Timeline */
+	.timeline-section { color: #d1d5db; }
+	.timeline-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+	.timeline-heading { color: #ffffff; font-size: 1.125rem; font-weight: 600; margin: 0; }
+	.btn-add-event { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: #dc2626; color: #ffffff; border: none; border-radius: 0.375rem; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: background-color 0.2s; }
+	.btn-add-event:hover { background: #b91c1c; }
+	.timeline-empty { text-align: center; padding: 3rem 1rem; display: flex; flex-direction: column; align-items: center; gap: 1rem; color: #9ca3af; }
+	.timeline-list { display: flex; flex-direction: column; position: relative; }
+	.timeline-item { display: flex; gap: 1rem; position: relative; padding-bottom: 1.5rem; }
+	.timeline-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 0.375rem; z-index: 1; }
+	.timeline-line { position: absolute; left: 5px; top: 18px; bottom: 0; width: 2px; background: #333; }
+	.timeline-item:last-child .timeline-line { display: none; }
+	.timeline-card { flex: 1; background: #0f0f23; border: 1px solid #333; border-radius: 0.5rem; padding: 1rem; transition: border-color 0.2s; }
+	.timeline-card:hover { border-color: #555; }
+	.timeline-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem; }
+	.timeline-date { color: #9ca3af; font-size: 0.8rem; font-weight: 600; }
+	.timeline-time { opacity: 0.6; margin-left: 0.5rem; }
+	.timeline-tags { display: flex; gap: 0.375rem; }
+	.event-type-tag, .severity-tag { font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 0.25rem; text-transform: capitalize; font-weight: 600; }
+	.timeline-title { color: #ffffff; font-size: 0.95rem; font-weight: 600; margin: 0 0 0.25rem 0; }
+	.timeline-desc { color: #9ca3af; font-size: 0.85rem; margin: 0.25rem 0 0 0; line-height: 1.5; }
+	.timeline-location { display: inline-flex; align-items: center; gap: 0.25rem; color: #6b7280; font-size: 0.8rem; margin-top: 0.5rem; }
 
-	.error-banner a {
-		color: #fecaca;
-		text-decoration: underline;
-	}
-
-	.detail-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-		margin-bottom: 2rem;
-		padding-bottom: 1.5rem;
-		border-bottom: 1px solid #333;
-	}
-
-	.header-content h1 {
-		color: #ffffff;
-		font-size: 2rem;
-		margin: 0 0 1rem 0;
-	}
-
-	.badges {
-		display: flex;
-		gap: 0.5rem;
-		flex-wrap: wrap;
-	}
-
-	.badge {
-		padding: 0.5rem 1rem;
-		border-radius: 0.375rem;
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: #ffffff;
-		text-transform: capitalize;
-	}
-
-	.header-right {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-		align-items: flex-end;
-	}
-
-	.btn-secondary {
-		padding: 0.75rem 1.5rem;
-		background: #333;
-		color: #ffffff;
-		text-decoration: none;
-		border-radius: 0.375rem;
-		font-weight: 600;
-		transition: background-color 0.2s;
-	}
-
-	.btn-secondary:hover {
-		background: #444;
-	}
-
-	.tabs {
-		display: flex;
-		gap: 1rem;
-		margin-bottom: 2rem;
-		border-bottom: 1px solid #333;
-	}
-
-	.tab-button {
-		padding: 0.75rem 1.5rem;
-		background: transparent;
-		color: #9ca3af;
-		border: none;
-		border-bottom: 2px solid transparent;
-		cursor: pointer;
-		font-weight: 600;
-		transition: all 0.2s;
-	}
-
-	.tab-button.active {
-		color: #dc2626;
-		border-bottom-color: #dc2626;
-	}
-
-	.tab-button:hover {
-		color: #ffffff;
-	}
-
-	.tab-content {
-		background: #1a1a2e;
-		border: 1px solid #333;
-		border-radius: 0.5rem;
-		padding: 2rem;
-	}
-
-	.details-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-		gap: 2rem;
-	}
-
-	.detail-item {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.detail-item.full-width {
-		grid-column: 1 / -1;
-	}
-
-	.detail-item .label {
-		color: #9ca3af;
-		font-size: 0.875rem;
-		font-weight: 600;
-		margin-bottom: 0.5rem;
-	}
-
-	.detail-item p {
-		color: #ffffff;
-		margin: 0;
-	}
-
-	.case-link {
-		color: #3b82f6;
-		text-decoration: underline;
-	}
-
-	.aliases-list {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-	}
-
-	.alias-tag {
-		padding: 0.375rem 0.75rem;
-		background: #0f0f23;
-		border: 1px solid #333;
-		border-radius: 0.375rem;
-		color: #d1d5db;
-		font-size: 0.875rem;
-	}
-
-	.associates-list {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-	}
-
-	.associate-item {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 1rem;
-		background: #0f0f23;
-		border: 1px solid #333;
-		border-radius: 0.375rem;
-	}
-
-	.associate-info h4 {
-		color: #ffffff;
-		margin: 0 0 0.25rem 0;
-	}
-
-	.relationship {
-		color: #dc2626;
-		font-size: 0.875rem;
-		margin: 0.25rem 0;
-		text-transform: capitalize;
-	}
-
-	.notes {
-		color: #9ca3af;
-		font-size: 0.875rem;
-		margin: 0.5rem 0 0 0;
-	}
-
-	.associates-error {
-		text-align: center;
-		padding: 1rem;
-		color: #fecaca;
-	}
-
-	.btn-retry {
-		margin-top: 0.5rem;
-		padding: 0.5rem 1rem;
-		background: #333;
-		color: #ffffff;
-		border: none;
-		border-radius: 0.25rem;
-		cursor: pointer;
-	}
-
-	.btn-remove {
-		padding: 0.5rem 1rem;
-		background: #7f1d1d;
-		color: #fecaca;
-		border: 1px solid #dc2626;
-		border-radius: 0.25rem;
-		cursor: pointer;
-		font-weight: 600;
-		transition: background-color 0.2s;
-	}
-
-	.btn-remove:hover {
-		background: #991b1b;
-	}
-
-	.empty-message {
-		color: #9ca3af;
-		text-align: center;
-		padding: 2rem;
-	}
-
-	.search-section {
-		color: #d1d5db;
-	}
-
-	.search-bar {
-		display: flex;
-		gap: 0.75rem;
-		margin-bottom: 1.5rem;
-	}
-
-	.search-input {
-		flex: 1;
-		padding: 0.75rem 1rem;
-		background: #0f0f23;
-		border: 1px solid #333;
-		border-radius: 0.375rem;
-		color: #ffffff;
-		font-size: 0.9rem;
-	}
-
-	.search-input:focus {
-		outline: none;
-		border-color: #dc2626;
-	}
-
-	.btn-search {
-		padding: 0.75rem 1.5rem;
-		background: #dc2626;
-		color: #ffffff;
-		border: none;
-		border-radius: 0.375rem;
-		font-weight: 600;
-		cursor: pointer;
-		transition: background-color 0.2s;
-	}
-
-	.btn-search:hover:not(:disabled) {
-		background: #b91c1c;
-	}
-
-	.btn-search:disabled,
-	.btn-auto:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
-	.btn-auto {
-		white-space: nowrap;
-	}
-
-	.search-error {
-		padding: 0.75rem;
-		background: #7f1d1d;
-		border: 1px solid #dc2626;
-		border-radius: 0.375rem;
-		color: #fecaca;
-		margin-bottom: 1rem;
-	}
-
-	.results-heading {
-		color: #9ca3af;
-		font-size: 0.875rem;
-		font-weight: 600;
-		margin: 0 0 1rem 0;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
-
-	.search-results {
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-	}
-
-	.result-card {
-		display: block;
-		padding: 1rem;
-		background: #0f0f23;
-		border: 1px solid #333;
-		border-radius: 0.375rem;
-		text-decoration: none;
-		transition: border-color 0.2s;
-	}
-
-	.result-card:hover {
-		border-color: #dc2626;
-	}
-
-	.result-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 0.5rem;
-	}
-
-	.result-name {
-		color: #ffffff;
-		font-weight: 600;
-		font-size: 1rem;
-	}
-
-	.result-score {
-		color: #10b981;
-		font-size: 0.8rem;
-		font-weight: 600;
-	}
-
-	.result-meta {
-		display: flex;
-		gap: 0.5rem;
-		align-items: center;
-		flex-wrap: wrap;
-	}
-
-	.result-location {
-		color: #9ca3af;
-		font-size: 0.8rem;
-	}
-
-	.result-desc {
-		color: #9ca3af;
-		font-size: 0.85rem;
-		margin: 0.5rem 0 0 0;
-		line-height: 1.4;
-	}
-
-	.similar-panel {
-		margin-bottom: 1.5rem;
-	}
-
-	.similar-heading {
-		color: #ffffff;
-		font-size: 1rem;
-		font-weight: 600;
-		margin: 0 0 1rem 0;
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
-	.method-tag {
-		font-size: 0.7rem;
-		padding: 0.2rem 0.5rem;
-		background: #1e293b;
-		border: 1px solid #334155;
-		border-radius: 0.25rem;
-		color: #94a3b8;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
-
-	.face-match-bar {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		margin-bottom: 1rem;
-		padding: 0.75rem;
-		background: #0f0f23;
-		border: 1px solid #333;
-		border-radius: 0.375rem;
-	}
-
-	.btn-face-match {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.5rem 1rem;
-		background: #7c3aed;
-		color: #ffffff;
-		border: none;
-		border-radius: 0.375rem;
-		font-weight: 600;
-		font-size: 0.875rem;
-		cursor: pointer;
-		transition: background-color 0.2s;
-	}
-
-	.btn-face-match:hover:not(:disabled) {
-		background: #6d28d9;
-	}
-
-	.btn-face-match:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
-	.face-match-msg {
-		color: #9ca3af;
-		font-size: 0.85rem;
-	}
-
-	.upload-status {
-		padding: 0.75rem;
-		background: #1e3a5f;
-		border: 1px solid #3b82f6;
-		border-radius: 0.375rem;
-		color: #93c5fd;
-		margin-bottom: 1rem;
-		text-align: center;
-	}
-
-	.upload-error {
-		padding: 0.75rem;
-		background: #7f1d1d;
-		border: 1px solid #dc2626;
-		border-radius: 0.375rem;
-		color: #fecaca;
-		margin-bottom: 1rem;
-	}
+	/* Drawer */
+	.drawer-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 100; }
+	.drawer-panel { position: fixed; top: 0; right: 0; bottom: 0; width: 28rem; max-width: 90vw; background: #1a1a2e; border-left: 1px solid #333; z-index: 101; display: flex; flex-direction: column; overflow-y: auto; }
+	.drawer-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid #333; }
+	.drawer-header h3 { color: #ffffff; font-size: 1.125rem; font-weight: 600; margin: 0; }
+	.drawer-close { padding: 0.375rem; cursor: pointer; color: #9ca3af; transition: color 0.2s; }
+	.drawer-close:hover { color: #ffffff; }
+	.drawer-form { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; flex: 1; }
+	.drawer-field { display: flex; flex-direction: column; gap: 0.375rem; }
+	.drawer-field label { color: #9ca3af; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+	.drawer-field input, .drawer-field select, .drawer-field textarea { padding: 0.625rem 0.75rem; background: #0f0f23; border: 1px solid #333; border-radius: 0.375rem; color: #ffffff; font-family: inherit; font-size: 0.875rem; transition: border-color 0.2s; }
+	.drawer-field input:focus, .drawer-field select:focus, .drawer-field textarea:focus { outline: none; border-color: #dc2626; }
+	.drawer-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+	.drawer-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: auto; padding-top: 1rem; border-top: 1px solid #333; }
+	.btn-primary { padding: 0.625rem 1.25rem; background: #dc2626; color: #ffffff; border: none; border-radius: 0.375rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
+	.btn-primary:hover:not(:disabled) { background: #b91c1c; }
+	.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>

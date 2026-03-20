@@ -1,15 +1,16 @@
 import { db } from '$lib/server/db/client';
 import { cases } from '$lib/server/db/schema';
 import { verifySSRDatabaseConnection } from '$lib/server/db/ssr-health-check';
+import { invalidateCaseCache } from '$lib/server/cache/invalidation.js';
 import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
 import { zod4 as zod } from 'sveltekit-superforms/adapters';
 import { and, desc, eq, like } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 import {
-	caseListCreateSchema,
-	caseBulkUpdateStatusSchema,
-	caseBulkArchiveSchema
+  caseListCreateSchema,
+  caseBulkUpdateStatusSchema,
+  caseBulkArchiveSchema,
 } from './schema.js';
 
 /**
@@ -61,7 +62,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         .offset(offset)
         .$withCache({ config: { ex: 300 } });
     },
-	[] // Fallback to empty array if database unavailable
+    [] // Fallback to empty array if database unavailable
   );
 
   // Log database errors but don't crash the page
@@ -77,14 +78,14 @@ export const load: PageServerLoad = async ({ locals, url }) => {
       offset,
       hasMore: userCases.length === limit,
     },
-	filters: { status, priority, search },
-	// Pass database status to UI for graceful degradation
+    filters: { status, priority, search },
+    // Pass database status to UI for graceful degradation
     databaseStatus: {
-	available: !fromFallback,
+      available: !fromFallback,
       error: dbError,
     },
-	form: await superValidate(zod(caseListCreateSchema))
-	};
+    form: await superValidate(zod(caseListCreateSchema)),
+  };
 };
 
 /**
@@ -92,141 +93,158 @@ export const load: PageServerLoad = async ({ locals, url }) => {
  * Replaces POST /api/cases
  */
 export const actions: Actions = {
-	/**
-	 * Create a new case
-	 * Usage: <form method="POST" action="?/create">
-	 */
-	create: async ({ request, locals }) => {
-		if (!locals.user) {
-			return fail(401, { error: 'Unauthorized' });
-		}
+  /**
+   * Create a new case
+   * Usage: <form method="POST" action="?/create">
+   */
+  create: async ({ request, locals }) => {
+    if (!locals.user) {
+      return fail(401, { error: 'Unauthorized' });
+    }
 
-		const form = await superValidate(request, zod(caseListCreateSchema));
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+    const form = await superValidate(request, zod(caseListCreateSchema));
+    if (!form.valid) {
+      return fail(400, { form });
+    }
 
-		const { title, description, priority, caseNumber, practiceArea, jurisdiction } = form.data;
+    const { title, description, priority, caseNumber, practiceArea, jurisdiction } = form.data;
 
-		try {
-			const newCase = await db
-				.insert(cases)
-				.values({
-					title: title.trim(),
-					description: description.trim(),
-					userId: locals.user.id,
-					status: 'open',
-					priority,
-					caseNumber,
-					practiceArea,
-					jurisdiction,
-					createdAt: new Date().toISOString(),
-					updatedAt: new Date().toISOString()
-				})
-				.returning();
+    try {
+      const newCase = await db
+        .insert(cases)
+        .values({
+          title: title.trim(),
+          description: description.trim(),
+          userId: locals.user.id,
+          status: 'open',
+          priority,
+          caseNumber,
+          practiceArea,
+          jurisdiction,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        })
+        .returning();
 
-			// Redirect to the new case detail page
-			throw redirect(303, `/cases/${newCase[0]?.id}`);
-		} catch (err) {
-			if (err instanceof Error && 'status' in err && (err as { status?: number }).status === 303) {
-				throw err; // Re-throw redirect
-			}
-			console.error('Error creating case:', err);
-			return fail(500, {
-				error: 'Failed to create case',
-				form
-			});
-		}
-	},
-	/**
-	 * Update case status (bulk action)
-	 * Usage: <form method="POST" action="?/updateStatus">
-	 */
-	updateStatus: async ({ request, locals }) => {
-		if (!locals.user) {
-			return fail(401, { error: 'Unauthorized' });
-		}
+      await invalidateCaseCache(newCase[0]?.id, 'case_update', locals.user.id).catch((err) =>
+        console.warn('[Cases Page] Cache invalidation failed:', err)
+      );
 
-		const formData = await request.formData();
-		const data = {
-			caseId: formData.getAll('caseId').map(String),
-			status: formData.get('status')?.toString()
-		};
+      // Redirect to the new case detail page
+      throw redirect(303, `/cases/${newCase[0]?.id}`);
+    } catch (err) {
+      if (
+        err &&
+        typeof err === 'object' &&
+        'status' in err &&
+        (err as { status?: number }).status === 303
+      ) {
+        throw err; // Re-throw redirect
+      }
+      console.error('Error creating case:', err);
+      return fail(500, {
+        error: 'Failed to create case',
+        form,
+      });
+    }
+  },
+  /**
+   * Update case status (bulk action)
+   * Usage: <form method="POST" action="?/updateStatus">
+   */
+  updateStatus: async ({ request, locals }) => {
+    if (!locals.user) {
+      return fail(401, { error: 'Unauthorized' });
+    }
 
-		const result = caseBulkUpdateStatusSchema.safeParse(data);
-		if (!result.success) {
-			return fail(400, { error: result.error.issues[0]?.message ?? 'Invalid input' });
-		}
+    const formData = await request.formData();
+    const data = {
+      caseId: formData.getAll('caseId').map(String),
+      status: formData.get('status')?.toString(),
+    };
 
-		try {
-			const updated = await db
-				.update(cases)
-				.set({
-					status: result.data.status,
-					updatedAt: new Date().toISOString()
-				})
-				.where(
-					and(
-						eq(cases.assignedAttorney, locals.user.id),
-						// @ts-expect-error - Drizzle inArray typing
-						cases.id.in(result.data.caseId)
-					)
-				)
-				.returning();
+    const result = caseBulkUpdateStatusSchema.safeParse(data);
+    if (!result.success) {
+      return fail(400, { error: result.error.issues[0]?.message ?? 'Invalid input' });
+    }
 
-			return {
-				success: true,
-				message: `Updated ${updated.length} case(s)`,
-				count: updated.length
-			};
-		} catch (err) {
-			console.error('Error updating cases:', err);
-			return fail(500, { error: 'Failed to update cases' });
-		}
-	},
-	/**
-	 * Archive cases (soft delete)
-	 * Usage: <form method="POST" action="?/archive">
-	 */
-	archive: async ({ request, locals }) => {
-		if (!locals.user) {
-			return fail(401, { error: 'Unauthorized' });
-		}
+    try {
+      const updated = await db
+        .update(cases)
+        .set({
+          status: result.data.status,
+          updatedAt: new Date().toISOString(),
+        })
+        .where(
+          and(
+            eq(cases.userId, locals.user.id),
+            // @ts-expect-error - Drizzle inArray typing
+            cases.id.in(result.data.caseId)
+          )
+        )
+        .returning();
 
-		const formData = await request.formData();
-		const data = {
-			caseId: formData.getAll('caseId').map(String)
-		};
+      await Promise.all(
+        updated.map((caseItem) => invalidateCaseCache(caseItem.id, 'case_update', locals.user.id))
+      ).catch((err) => console.warn('[Cases Page] Cache invalidation failed:', err));
 
-		const result = caseBulkArchiveSchema.safeParse(data);
-		if (!result.success) {
-			return fail(400, { error: result.error.issues[0]?.message ?? 'No case IDs provided' });
-		}
+      return {
+        success: true,
+        message: `Updated ${updated.length} case(s)`,
+        count: updated.length,
+      };
+    } catch (err) {
+      console.error('Error updating cases:', err);
+      return fail(500, { error: 'Failed to update cases' });
+    }
+  },
+  /**
+   * Archive cases (soft delete)
+   * Usage: <form method="POST" action="?/archive">
+   */
+  archive: async ({ request, locals }) => {
+    if (!locals.user) {
+      return fail(401, { error: 'Unauthorized' });
+    }
 
-		try {
-			const archived = await db
-				.update(cases)
-				.set({
-					status: 'archived',
-					updatedAt: new Date().toISOString()
-				})
-				.where(
-					and(
-						eq(cases.assignedAttorney, locals.user.id),
-						// @ts-expect-error - Drizzle inArray typing
-						cases.id.in(result.data.caseId)
-					)
-				)
-				.returning();
+    const formData = await request.formData();
+    const data = {
+      caseId: formData.getAll('caseId').map(String),
+    };
 
-			return {
-				success: true,
-				message: `Archived ${archived.length} case(s)`,
-				count: archived.length
-			};
-		} catch (err) {
-			console.error('Error archiving cases:', err);
-			return fail(500, { error: 'Failed to archive cases' });
-		}
-	}
+    const result = caseBulkArchiveSchema.safeParse(data);
+    if (!result.success) {
+      return fail(400, { error: result.error.issues[0]?.message ?? 'No case IDs provided' });
+    }
+
+    try {
+      const archived = await db
+        .update(cases)
+        .set({
+          status: 'archived',
+          updatedAt: new Date().toISOString(),
+        })
+        .where(
+          and(
+            eq(cases.userId, locals.user.id),
+            // @ts-expect-error - Drizzle inArray typing
+            cases.id.in(result.data.caseId)
+          )
+        )
+        .returning();
+
+      await Promise.all(
+        archived.map((caseItem) => invalidateCaseCache(caseItem.id, 'case_update', locals.user.id))
+      ).catch((err) => console.warn('[Cases Page] Cache invalidation failed:', err));
+
+      return {
+        success: true,
+        message: `Archived ${archived.length} case(s)`,
+        count: archived.length,
+      };
+    } catch (err) {
+      console.error('Error archiving cases:', err);
+      return fail(500, { error: 'Failed to archive cases' });
+    }
+  },
 };

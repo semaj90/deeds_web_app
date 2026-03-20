@@ -11,19 +11,27 @@ import { updateTextEmotion, getEmotionSystemPrompt, getEmotionState } from '$lib
 
 export type ChatRole = 'user' | 'assistant' | 'system';
 
+export interface ExtractedCitation {
+  sourceNum: number;
+  documentId: string;
+  similarity: number;
+}
+
 export interface ChatMessage {
-	role: ChatRole;
-	content: string;
-	timestamp?: string;
-	source?: InferenceSource;
-	metadata?: {
-		confidence?: number;
-		confidenceFactors?: ConfidenceFactors;
-		citations?: string[];
-		graph_context?: string[];
-		warnings?: string[];
-		routerDecision?: RouterDecision;
-	};
+  role: ChatRole;
+  content: string;
+  timestamp?: string;
+  source?: InferenceSource;
+  metadata?: {
+    confidence?: number;
+    confidenceFactors?: ConfidenceFactors;
+    citations?: string[];
+    contextDocIds?: string[];
+    extractedCitations?: ExtractedCitation[];
+    graph_context?: string[];
+    warnings?: string[];
+    routerDecision?: RouterDecision;
+  };
 }
 
 export interface ConfidenceFactors {
@@ -34,16 +42,42 @@ export interface ConfidenceFactors {
 }
 
 export interface SSEChunk {
-	id: string;
-	role: 'assistant';
-	content: string;
-	status: 'thinking' | 'streaming' | 'done' | 'error';
-	source?: InferenceSource;
-	confidence?: number;
-	confidenceFactors?: ConfidenceFactors;
-	contextUsed?: string[];
-	citations?: Array<{ sourceNum: number; documentId: string; similarity: number }>;
-	conversationTurns?: number;
+  id: string;
+  role: 'assistant';
+  content: string;
+  status: 'thinking' | 'streaming' | 'done' | 'error';
+  source?: InferenceSource;
+  confidence?: number;
+  confidenceFactors?: ConfidenceFactors;
+  contextUsed?: string[];
+  citations?: ExtractedCitation[];
+  conversationTurns?: number;
+}
+
+function shouldDebugLogChunkStream(): boolean {
+  if (typeof window === 'undefined') return false;
+
+  try {
+    return new URLSearchParams(window.location.search).get('debug') === '1';
+  } catch {
+    return false;
+  }
+}
+
+function logDebugSseChunk(chatId: string, chunk: SSEChunk): void {
+  if (!shouldDebugLogChunkStream()) return;
+
+  console.info(
+    `[ChatSSE] ${JSON.stringify({
+      chatId,
+      status: chunk.status,
+      source: chunk.source ?? 'unknown',
+      contentLength: chunk.content.length,
+      contextUsed: chunk.contextUsed?.length ?? 0,
+      extractedCitations: chunk.citations?.length ?? 0,
+      confidence: chunk.confidence ?? null,
+    })}`
+  );
 }
 
 export class ChatSession {
@@ -494,21 +528,32 @@ export class ChatSession {
 
 					try {
 						const chunk: SSEChunk = JSON.parse(dataLine);
+						logDebugSseChunk(this._chatId, chunk);
 
 						if (chunk.status === 'streaming' || chunk.status === 'done') {
 							this.status = chunk.status === 'done' ? 'idle' : 'streaming';
+							if (chunk.source) {
+                this.lastSource = chunk.source;
+              }
 							this.messages[assistantIdx] = {
-								...this.messages[assistantIdx],
-								content: chunk.content,
-								source: chunk.source ?? decision.source,
-								metadata: {
-									...this.messages[assistantIdx].metadata,
-									confidence: chunk.confidence,
-									confidenceFactors: chunk.confidenceFactors,
-									citations: chunk.contextUsed,
-									...(chunk.citations && { extractedCitations: chunk.citations })
-								}
-							};
+                ...this.messages[assistantIdx],
+                content: chunk.content,
+                source: chunk.source ?? decision.source,
+                metadata: {
+                  ...this.messages[assistantIdx].metadata,
+                  ...(chunk.confidence !== undefined && { confidence: chunk.confidence }),
+                  ...(chunk.confidenceFactors && {
+                    confidenceFactors: chunk.confidenceFactors,
+                  }),
+                  ...(chunk.contextUsed && {
+                    citations: chunk.contextUsed,
+                    contextDocIds: chunk.contextUsed,
+                  }),
+                  ...(chunk.citations && {
+                    extractedCitations: chunk.citations,
+                  }),
+                },
+              };
 						}
 
 						if (chunk.status === 'done' && chunk.confidence !== undefined) {

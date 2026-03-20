@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { ChatSession } from '$lib/models/ChatSession.svelte.js';
+	import { ChatSession, type ChatMessage } from '$lib/models/ChatSession.svelte.js';
 	import { onDestroy } from 'svelte';
 
 	interface Props {
@@ -110,6 +110,67 @@
 		});
 	}
 
+	function getContextDocIds(message: ChatMessage): string[] {
+		const metadata = message.metadata;
+		if (!metadata) return [];
+
+		if (metadata.contextDocIds && metadata.contextDocIds.length > 0) {
+			return metadata.contextDocIds;
+		}
+
+		return (metadata.citations ?? []).filter((citation) => citation.includes(':'));
+	}
+
+	function summarizeContextCollections(docIds: string[]): Array<{ label: string; count: number }> {
+		const counts = new Map<string, number>();
+
+		for (const docId of docIds) {
+			const [collection] = docId.split(':');
+			counts.set(collection, (counts.get(collection) ?? 0) + 1);
+		}
+
+		const labels: Record<string, string> = {
+			evidence_vectors: 'Uploaded Evidence',
+			case_chunks: 'Reports / Case Files',
+			law_sections: 'Law & Statutes'
+		};
+
+		return Array.from(counts.entries()).map(([collection, count]) => ({
+			label: labels[collection] ?? 'Related Records',
+			count
+		}));
+	}
+
+	function formatContextDocId(docId: string): string {
+		const [collection, rawId = 'unknown'] = docId.split(':');
+		const shortId = rawId.length > 18 ? `${rawId.slice(0, 8)}...${rawId.slice(-4)}` : rawId;
+
+		switch (collection) {
+			case 'evidence_vectors':
+				return `Evidence ${shortId}`;
+			case 'case_chunks':
+				return `Report ${shortId}`;
+			case 'law_sections':
+				return `Law ${shortId}`;
+			default:
+				return docId;
+		}
+	}
+
+	function formatRelevanceSummary(message: ChatMessage): string | null {
+		const factors = message.metadata?.confidenceFactors;
+		if (!factors) return null;
+
+		const parts = [factors.caseContext ? 'Case-linked' : 'General context'];
+		parts.push(`RAG hits: ${factors.ragHits}`);
+
+		if (factors.topScore !== null) {
+			parts.push(`Top match: ${factors.topScore.toFixed(2)}`);
+		}
+
+		return parts.join(' · ');
+	}
+
 	function displayRole(role: string): string {
 		if (role === 'user') return 'Prosecutor';
 		if (role === 'assistant') return 'AI Legal Assistant';
@@ -138,10 +199,15 @@
 	}
 </script>
 
-<div class="case-chat-panel">
+<div class="case-chat-panel" data-testid="case-chat-panel">
 	<!-- Header -->
 	<div class="chat-header">
-		<h3 class="chat-title">Case Analysis Chat</h3>
+		<div class="chat-header-copy">
+			<h3 class="chat-title">Case Analysis Chat</h3>
+			{#if caseId}
+				<div class="case-session-meta" data-testid="case-chat-case-id">Case ID: {caseId}</div>
+			{/if}
+		</div>
 		<div class="header-actions">
 			<button class="header-btn" title="Clear chat" onclick={clearChat}>
 				🗑️
@@ -164,11 +230,16 @@
 	<!-- Messages -->
 	<div class="messages-container" bind:this={messagesContainer}>
 		{#each session.messages as message, i (i)}
+			{@const contextDocIds = getContextDocIds(message)}
+			{@const contextCollections = summarizeContextCollections(contextDocIds)}
+			{@const relevanceSummary = formatRelevanceSummary(message)}
 			<div
 				class="message"
 				class:system={message.role === 'system'}
 				class:prosecutor={message.role === 'user'}
 				class:ai={message.role === 'assistant'}
+				data-testid="case-chat-message"
+				data-role={message.role}
 			>
 				<div class="message-header">
 					<span class="message-role">
@@ -195,6 +266,43 @@
 					{#if message.metadata?.confidence !== undefined}
 						<div class="confidence-badge">
 							Confidence: {(message.metadata.confidence * 100).toFixed(0)}%
+						</div>
+					{/if}
+					{#if message.role === 'assistant' && (relevanceSummary || contextCollections.length > 0 || contextDocIds.length > 0 || (message.metadata?.extractedCitations?.length ?? 0) > 0)}
+						<div class="case-context-panel" data-testid="case-response-context">
+							{#if caseId}
+								<div class="case-context-row" data-testid="case-response-case-id">Case ID: {caseId}</div>
+							{/if}
+							{#if relevanceSummary}
+								<div class="case-context-row" data-testid="case-relevance">{relevanceSummary}</div>
+							{/if}
+							{#if contextCollections.length > 0}
+								<div class="case-context-chip-row" data-testid="case-context-collections">
+									{#each contextCollections as collection}
+										<span class="case-context-chip" data-testid="case-context-collection">
+											{collection.label}: {collection.count}
+										</span>
+									{/each}
+								</div>
+							{/if}
+							{#if contextDocIds.length > 0}
+								<div class="case-context-chip-row" data-testid="case-context-docids">
+									{#each contextDocIds as docId}
+										<span class="case-context-chip case-context-chip-muted">
+											{formatContextDocId(docId)}
+										</span>
+									{/each}
+								</div>
+							{/if}
+							{#if message.metadata?.extractedCitations && message.metadata.extractedCitations.length > 0}
+								<div class="case-context-chip-row" data-testid="case-extracted-citations">
+									{#each message.metadata.extractedCitations as citation}
+										<span class="case-context-chip case-context-chip-source">
+											[Source {citation.sourceNum}] {formatContextDocId(citation.documentId)} ({citation.similarity.toFixed(2)})
+										</span>
+									{/each}
+								</div>
+							{/if}
 						</div>
 					{/if}
 				</div>
@@ -229,11 +337,13 @@
 			placeholder="Ask a legal question about this case..."
 			class="chat-input"
 			disabled={isLoading}
+			data-testid="case-chat-input"
 		></textarea>
 		<button
 			class="send-btn"
 			onclick={sendMessage}
 			disabled={isLoading || !inputValue.trim()}
+			data-testid="case-chat-send"
 		>
 			{#if isLoading}
 				⏳
@@ -264,12 +374,25 @@
 		border-bottom: 2px solid #d4a574;
 	}
 
+	.chat-header-copy {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
 	.chat-title {
 		font-family: 'Crimson Text', Georgia, serif;
 		font-size: 1.1rem;
 		font-weight: 600;
 		margin: 0;
 		color: #2c2c2c;
+	}
+
+	.case-session-meta {
+		font-size: 0.8rem;
+		color: #6b7280;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
 	}
 
 	.header-actions {
@@ -402,6 +525,48 @@
 		margin-top: 0.25rem;
 		font-size: 0.75rem;
 		color: #9ca3af;
+	}
+
+	.case-context-panel {
+		margin-top: 0.75rem;
+		padding: 0.75rem;
+		background: rgba(139, 69, 19, 0.06);
+		border: 1px solid rgba(139, 69, 19, 0.14);
+		border-radius: 6px;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.case-context-row {
+		font-size: 0.78rem;
+		color: #5b4636;
+	}
+
+	.case-context-chip-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+	}
+
+	.case-context-chip {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.25rem 0.5rem;
+		border-radius: 999px;
+		font-size: 0.72rem;
+		background: rgba(139, 69, 19, 0.12);
+		color: #5b4636;
+	}
+
+	.case-context-chip-muted {
+		background: rgba(107, 114, 128, 0.12);
+		color: #4b5563;
+	}
+
+	.case-context-chip-source {
+		background: rgba(0, 102, 204, 0.12);
+		color: #1d4ed8;
 	}
 
 	.streaming-text {

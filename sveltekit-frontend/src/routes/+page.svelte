@@ -156,7 +156,7 @@
 
 	function fillDemoCredentials() {
 		loginEmail = 'demo@legal-ai.local';
-		loginPassword = 'demo123';
+		loginPassword = 'password123';
 	}
 
 	function cycleAIMode() {
@@ -336,7 +336,7 @@
  <div class="stat-icon">📊</div>
  </div>
  </section>
- 
+
   <!-- Featured Experimental UI -->
   <section class="featured-demo-banner" style="margin: 0 2rem 1.5rem; padding: 1.5rem; background: #1a3a5a; border: 3px solid #0f0f0f; color: #fdf3d4; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;">
     <div style="display: flex; align-items: center; gap: 1.25rem;">
@@ -570,7 +570,7 @@
 				</label>
 				<label class="dialog-label">
 					PASSWORD
-					<input type="password" bind:value={loginPassword} required class="dialog-input" placeholder="demo123" />
+					<input type="password" bind:value={loginPassword} required class="dialog-input" placeholder="password123" />
 				</label>
 				<button type="submit" class="dialog-btn-primary" disabled={authLoading}>
 					{authLoading ? 'AUTHENTICATING...' : 'SIGN IN'}
@@ -584,7 +584,7 @@
 			<div class="demo-credentials">
 				<div class="demo-row">
 					<span class="demo-label">Admin:</span>
-					<code>demo@legal-ai.local</code> / <code>demo123</code>
+					<code>demo@legal-ai.local</code> / <code>password123</code>
 					<button class="demo-fill-btn" onclick={fillDemoCredentials}>FILL</button>
 				</div>
 				<div class="demo-row">
@@ -598,11 +598,11 @@
 			</div>
 
 			<button class="dialog-btn-demo" onclick={handleDemoLogin} disabled={authLoading}>
-				QUICK DEMO LOGIN (admin)
+				SEED + SIGN IN DEMO (admin)
 			</button>
 
 			<div class="dialog-hint">
-				Run <code>npm run db:seed</code> to create demo accounts
+				The demo button creates or refreshes the admin demo account in the database.
 			</div>
 		{:else}
 			<form class="dialog-form" onsubmit={(e) => { e.preventDefault(); handleRegister(); }}>

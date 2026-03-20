@@ -1,10 +1,18 @@
 <script lang="ts">
+	import { dev } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { authMachine } from '$lib/machines/auth-machine.js';
 	import { createActor } from 'xstate';
 
+	const demoCredentials = {
+		email: 'demo@legal-ai.local',
+		password: 'password123'
+	} as const;
+
 	let email = $state('');
 	let password = $state('');
+	let isSeedingDemo = $state(false);
+	let demoSeedError = $state('');
 
 	// XState v5 auth actor — manages login lifecycle, attempt tracking, lockout
 	const actor = createActor(authMachine);
@@ -39,12 +47,43 @@
 
 	function handleSubmit(e: Event) {
 		e.preventDefault();
+		demoSeedError = '';
 		if (!email.trim() || !password) return;
 		actor.send({ type: 'START_LOGIN', data: { email: email.trim(), password } });
 	}
 
 	function handleUnlock() {
 		actor.send({ type: 'UNLOCK_ACCOUNT' });
+	}
+
+	async function handleSeedDemoUser() {
+		if (!dev || isSeedingDemo || isLoading) return;
+
+		demoSeedError = '';
+		isSeedingDemo = true;
+
+		try {
+			const res = await fetch('/api/auth/demo-login', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+				body: JSON.stringify({ email: demoCredentials.email, role: 'admin' })
+			});
+
+			const data = await res.json().catch(() => ({}));
+			if (!res.ok) {
+				demoSeedError = typeof data.error === 'string' ? data.error : 'Demo seed failed';
+				return;
+			}
+
+			email = demoCredentials.email;
+			password = demoCredentials.password;
+			await goto('/');
+		} catch {
+			demoSeedError = 'Demo seed failed';
+		} finally {
+			isSeedingDemo = false;
+		}
 	}
 </script>
 
@@ -110,6 +149,29 @@
 					{/if}
 				</button>
 			</form>
+		{/if}
+
+		{#if dev}
+			<div class="demo-panel">
+				<p class="demo-title">Development Demo</p>
+				<p class="demo-copy">
+					Creates or refreshes <code>{demoCredentials.email}</code> / <code>{demoCredentials.password}</code>
+					in the database and signs in as admin.
+				</p>
+
+				{#if demoSeedError}
+					<div class="error-banner demo-error" role="alert">{demoSeedError}</div>
+				{/if}
+
+				<button type="button" class="demo-btn" onclick={handleSeedDemoUser} disabled={isLoading || isSeedingDemo}>
+					{#if isSeedingDemo}
+						<span class="spinner"></span>
+						Seeding demo user...
+					{:else}
+						Seed Demo User
+					{/if}
+				</button>
+			</div>
 		{/if}
 
 		<p class="register-link">
@@ -286,6 +348,64 @@
 		margin-top: 1.5rem;
 		font-size: 0.875rem;
 		color: rgba(255, 255, 255, 0.5);
+	}
+
+	.demo-panel {
+		margin-top: 1.5rem;
+		padding-top: 1.25rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.12);
+	}
+
+	.demo-title {
+		margin: 0 0 0.375rem;
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: #c4a882;
+	}
+
+	.demo-copy {
+		margin: 0 0 0.875rem;
+		font-size: 0.8125rem;
+		line-height: 1.5;
+		color: rgba(255, 255, 255, 0.65);
+	}
+
+	.demo-copy code {
+		padding: 0.125rem 0.375rem;
+		border-radius: 4px;
+		background: rgba(0, 0, 0, 0.25);
+		color: #f3dfbf;
+	}
+
+	.demo-btn {
+		width: 100%;
+		padding: 0.75rem;
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: #f3dfbf;
+		background: rgba(196, 168, 130, 0.12);
+		border: 1px solid rgba(196, 168, 130, 0.35);
+		border-radius: 6px;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		transition: background 0.2s, border-color 0.2s;
+	}
+
+	.demo-btn:hover:not(:disabled) {
+		background: rgba(196, 168, 130, 0.2);
+		border-color: rgba(196, 168, 130, 0.5);
+	}
+
+	.demo-btn:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.demo-error {
+		margin-bottom: 0.875rem;
 	}
 
 	.register-link a {

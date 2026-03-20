@@ -24,6 +24,7 @@
   import YoRHaDataViz from '$lib/components/yorha/_simulations/YoRHaDataViz.svelte';
   import Icon from '$lib/components/ui/Icon.svelte';
   import PipelineOverview from '$lib/components/dashboard/PipelineOverview.svelte';
+  import GamificationWidget from '$lib/components/dashboard/GamificationWidget.svelte';
 
   // ═══ WWWH Use Case Generator ═══
   let wwwhNotes = $state('');
@@ -683,6 +684,11 @@
             <div class="dash-stat-label">{stat.label}</div>
           </div>
         {/each}
+      </div>
+
+      <!-- Investigation Progress (Gamification) -->
+      <div class="section-gap">
+        <GamificationWidget {stats} {recentCases} />
       </div>
 
       <!-- Pipeline Overview -->

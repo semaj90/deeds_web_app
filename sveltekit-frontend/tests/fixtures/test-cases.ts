@@ -1,8 +1,14 @@
 /**
  * Test case seed data
  * Seeded by global-setup.ts, cleaned up by global-teardown.ts
- * All cases are assigned to the dev bypass user (00000000-0000-0000-0000-000000000001)
+ * All cases are created through a real auth_session for the seeded dev user.
+ * That user matches the dev bypass identity so older bypass-based tests still see the same rows.
  */
+export const PLAYWRIGHT_DEV_SESSION_USER = {
+	email: 'admin@yorha.dev',
+	role: 'admin'
+} as const;
+
 export const TEST_CASE_SEED = [
 	{
 		title: '[PW-TEST] Yorha v. State — Criminal Defense Alpha',

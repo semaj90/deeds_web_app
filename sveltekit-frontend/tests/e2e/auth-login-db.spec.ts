@@ -19,11 +19,11 @@ import { test, expect } from '@playwright/test';
 import { captureNumberedStep } from './utils/screenshot-utils';
 import { timeouts } from './utils/test-fixtures';
 
-const BASE = 'http://127.0.0.1:5173';
+const BASE = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
 
 // Seeded credentials (from db:seed / manual SQL insert)
 const SEED_USERS = {
-  demo: { email: 'demo@legal-ai.local', password: 'demo123' },
+  demo: { email: 'demo@legal-ai.local', password: 'password123' },
   prosecutor: { email: 'prosecutor@legal.ai', password: 'password123' },
   detective: { email: 'detective@legal.ai', password: 'password123' },
   admin: { email: 'admin@legal.ai', password: 'password123' },

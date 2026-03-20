@@ -1,60 +1,144 @@
+import path from 'path';
+import pg from 'pg';
 import { expect, test } from '@playwright/test';
+import { TEST_CASE_PREFIX } from './fixtures/test-cases.js';
 
-// Basic smoke test for cases page headless components
+const SCREENSHOT_DIR = path.join(process.cwd(), 'test-results', 'screenshots');
+const DB_URL =
+  process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
 
-test.describe('Cases Page Headless UI', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/cases');
-  });
+async function cleanupCasesPageArtifacts(email: string, caseId: string | null) {
+  const pool = new pg.Pool({ connectionString: DB_URL });
 
-  test('create case dialog opens, validates, submits, and optimistic evidence works', async ({
-    page,
-  }) => {
-    // Open create case dialog
-    await page.getByRole('button', { name: /new case/i }).click();
-    await expect(page.getByRole('dialog')).toBeVisible();
-
-    // Attempt submit empty to trigger validation
-    await page.getByRole('button', { name: /create case/i }).click();
-    // Expect an error message (first validation error)
-    await expect(page.getByText(/required/i).first()).toBeVisible();
-
-    // Fill required fields (best-effort selectors; adjust to real labels / placeholders)
-    await page.getByLabel(/title/i).fill('Playwright Case');
-    const statusTrigger = page.getByRole('button', { name: /status/i }).first();
-    if (await statusTrigger.isVisible()) {
-      await statusTrigger.click();
-      await page.getByRole('option').first().click();
+  try {
+    if (caseId) {
+      await pool.query('DELETE FROM cases WHERE id = $1', [caseId]);
     }
 
-    await page.getByRole('button', { name: /create case/i }).click();
+    const usersResult = await pool.query<{ id: string }>('SELECT id FROM users WHERE email = $1', [
+      email,
+    ]);
 
-    // aria-live announcement present
-    await expect(page.getByText(/creating case/i)).toBeVisible();
+    for (const row of usersResult.rows) {
+      await pool.query('DELETE FROM sessions WHERE user_id = $1', [row.id]);
+      await pool.query('DELETE FROM users WHERE id = $1', [row.id]);
+    }
+  } finally {
+    await pool.end();
+  }
+}
 
-    // Dialog closes after creation
-    await expect(page.getByRole('dialog')).toHaveCount(0, { timeout: 10000 });
+test.describe('Cases Page CRUD', () => {
+  test('authenticated create, update, and archive render back in the cases UI', async ({
+    page,
+  }) => {
+    test.setTimeout(180000);
 
-    // New case appears in list
-    await expect(page.getByText('Playwright Case')).toBeVisible({ timeout: 15000 });
+    const nonce = Date.now();
+    const user = {
+      email: `playwright-cases-page-${nonce}@test.legal.ai`,
+      password: 'TestPass123!',
+      firstName: 'Playwright',
+      lastName: 'CasesPage',
+    };
+    const createdTitle = `${TEST_CASE_PREFIX} CRUD Render ${nonce}`;
+    const updatedTitle = `${createdTitle} Updated`;
+    let caseId: string | null = null;
 
-    // Open case (if list item clickable)
-    const caseRow = page.getByText('Playwright Case').first();
-    await caseRow.click({ trial: true }).catch(() => {}); // tolerate if not clickable
+    try {
+      const registerRes = await page.request.post('/api/auth/register', {
+        data: user,
+      });
+      expect(registerRes.status()).toBe(201);
 
-    // Add evidence dialog
-    const addEvidenceButton = page.getByRole('button', { name: /add evidence/i }).first();
-    if (await addEvidenceButton.isVisible()) {
-      await addEvidenceButton.click();
-      await expect(page.getByRole('dialog')).toBeVisible();
-      // Fill evidence form
-      const evidenceTitle = page.getByLabel(/evidence title|title/i).first();
-      await evidenceTitle.fill('Initial Evidence');
-      await page.getByRole('button', { name: /add evidence/i }).click();
-      // aria-live for adding
-      await expect(page.getByText(/adding evidence/i)).toBeVisible();
-      // Optimistic evidence appears
-      await expect(page.getByText('Initial Evidence')).toBeVisible({ timeout: 10000 });
+      await expect
+        .poll(
+          async () => {
+            const meResponse = await page.request.get('/api/auth/me');
+            if (meResponse.status() !== 200) return '';
+            const body = await meResponse.json();
+            return body.user?.email ?? '';
+          },
+          { timeout: 15000 }
+        )
+        .toBe(user.email);
+
+      await page.goto('/cases');
+      await expect(page.getByRole('heading', { name: 'Cases', exact: true })).toBeVisible();
+
+      const createCaseHeading = page.locator('.cs-modal-title', { hasText: 'Create New Case' });
+
+      await expect
+        .poll(
+          async () => {
+            if (await createCaseHeading.count()) {
+              return 'Create New Case';
+            }
+
+            for (const selector of ['.cases-new-btn', '.cs-empty-cta']) {
+              const button = page.locator(selector);
+              if (!(await button.count())) {
+                continue;
+              }
+
+              try {
+                await button.first().click();
+              } catch {
+                continue;
+              }
+
+              if (await createCaseHeading.count()) {
+                return 'Create New Case';
+              }
+            }
+
+            return '';
+          },
+          { timeout: 15000, intervals: [500, 1000, 1500] }
+        )
+        .toBe('Create New Case');
+      await expect(createCaseHeading).toBeVisible();
+
+      await page.getByLabel(/case title/i).fill(createdTitle);
+      await page
+        .getByLabel(/description/i)
+        .fill('Playwright CRUD coverage using a real registered auth session.');
+      await page.getByLabel(/priority/i).selectOption('high');
+      await page.getByLabel(/case number/i).fill(`PW-${nonce}`);
+      await page.getByLabel(/practice area/i).fill('Civil Litigation');
+      await page.getByLabel(/jurisdiction/i).fill('Federal District Court');
+      await page.getByRole('button', { name: /create case/i }).click();
+
+      await page.waitForURL(/\/cases\/[0-9a-f-]+$/i, { timeout: 30000 });
+      await expect(page.getByText(createdTitle).first()).toBeVisible();
+
+      caseId = page.url().split('/').pop() ?? null;
+      expect(caseId).toBeTruthy();
+
+      const updateRes = await page.request.patch(`/api/cases/${caseId}`, {
+        data: {
+          title: updatedTitle,
+          status: 'closed',
+        },
+      });
+      expect(updateRes.ok()).toBeTruthy();
+
+      await page.goto(`/cases?status=closed&search=${encodeURIComponent(updatedTitle)}`);
+      await page.waitForLoadState('domcontentloaded');
+      await expect(page.getByText(updatedTitle)).toBeVisible({ timeout: 15000 });
+
+      const archiveRes = await page.request.delete(`/api/cases/${caseId}`);
+      expect(archiveRes.ok()).toBeTruthy();
+
+      await page.goto(`/cases?status=archived&search=${encodeURIComponent(updatedTitle)}`);
+      await page.waitForLoadState('domcontentloaded');
+      await expect(page.getByText(updatedTitle)).toBeVisible({ timeout: 15000 });
+      await page.screenshot({
+        path: path.join(SCREENSHOT_DIR, 'cases-crud-render-back.png'),
+        fullPage: true,
+      });
+    } finally {
+      await cleanupCasesPageArtifacts(user.email, caseId);
     }
   });
 });

@@ -1,100 +1,164 @@
 import { dev } from '$app/environment';
 import { db } from '$lib/server/db/client';
 import { users } from '$lib/server/db/schema';
-import { createUserSession, setSessionCookie } from '$lib/server/lucia';
-import { error, json } from '@sveltejs/kit';
+import { createUserSession, hashPassword, setSessionCookie } from '$lib/server/lucia';
+import { json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 
+const DEMO_EMAIL = 'demo@legal-ai.local';
+const DEMO_PASSWORD = 'password123';
+const DEMO_FIRST_NAME = 'Demo';
+const DEMO_LAST_NAME = 'User';
+const DEMO_ONBOARDING_STEP = 10;
+const demoRoleValues = [
+  'prosecutor',
+  'detective',
+  'admin',
+  'analyst',
+  'paralegal',
+  'investigator',
+  'viewer',
+  'user',
+] as const;
+
 const demoLoginSchema = z.object({
-	email: z.string().email().max(255).optional().default('demo@legal-ai.local'),
-	role: z.string().max(50).optional().default('admin')
+  email: z.string().email().max(255).optional().default(DEMO_EMAIL),
+  role: z.enum(demoRoleValues).optional().default('admin'),
 });
+
+type DemoLoginInput = z.infer<typeof demoLoginSchema>;
+
+async function parseDemoLoginInput(request: Request, url: URL): Promise<unknown> {
+  if (request.method === 'GET') {
+    return Object.fromEntries(url.searchParams);
+  }
+
+  const rawBody = await request.text();
+  if (!rawBody.trim()) {
+    return {};
+  }
+
+  return JSON.parse(rawBody) as unknown;
+}
+
+async function upsertDemoUser(input: DemoLoginInput) {
+  const now = new Date().toISOString();
+  const passwordHash = await hashPassword(DEMO_PASSWORD);
+  const username = input.email.split('@')[0];
+
+  const [existingUser] = await db.select().from(users).where(eq(users.email, input.email)).limit(1);
+
+  if (!existingUser) {
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        email: input.email,
+        passwordHash,
+        name: username,
+        firstName: DEMO_FIRST_NAME,
+        lastName: DEMO_LAST_NAME,
+        role: input.role,
+        isActive: true,
+        hasCompletedOnboarding: true,
+        onboardingStep: DEMO_ONBOARDING_STEP,
+        createdAt: now,
+        updatedAt: now,
+      } as any)
+      .returning();
+
+    return { user: newUser, created: true };
+  }
+
+  const [updatedUser] = await db
+    .update(users)
+    .set({
+      passwordHash,
+      name: username,
+      firstName: DEMO_FIRST_NAME,
+      lastName: DEMO_LAST_NAME,
+      role: input.role,
+      isActive: true,
+      hasCompletedOnboarding: true,
+      onboardingStep: DEMO_ONBOARDING_STEP,
+      updatedAt: now,
+    } as any)
+    .where(eq(users.id, existingUser.id))
+    .returning();
+
+  return { user: updatedUser, created: false };
+}
 
 /**
  * POST /api/auth/demo-login
- * Development-only endpoint for quick testing without credentials
+ * Development-only endpoint that seeds a real demo user in the database
+ * and signs in with a normal Lucia session.
  *
- * Uses real Lucia v3 session creation (not the auth/lucia stub)
- * SECURITY: Requires BOTH dev build AND DEV_BYPASS_AUTH env var
+ * SECURITY: Only enabled in development builds.
  */
-export const POST: RequestHandler = async ({ request, cookies }) => {
-	try {
-		// Double-gate: dev is false in production SvelteKit builds (compile-time)
-		if (!dev || process.env.DEV_BYPASS_AUTH !== 'true') {
-			throw error(403, 'Demo login is only available in development mode');
-		}
+const handleDemoLogin: RequestHandler = async ({ request, cookies, url }) => {
+  if (!dev) {
+    return json({ error: 'Demo login is only available in development mode' }, { status: 403 });
+  }
 
-		const raw = await request.json();
-		const parsed = demoLoginSchema.safeParse(raw);
-		if (!parsed.success) {
-			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
-		}
-		const { email, role } = parsed.data;
+  try {
+    const raw = await parseDemoLoginInput(request, url);
+    const parsed = demoLoginSchema.safeParse(raw);
+    if (!parsed.success) {
+      return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+    }
 
-		// Get or create demo user
-		let user = await db
-			.select()
-			.from(users)
-			.where(eq(users.email, email))
-			.then((rows) => rows[0]);
+    const { user, created } = await upsertDemoUser(parsed.data);
 
-		if (!user) {
-			const [newUser] = await db
-				.insert(users)
-				.values({
-					email,
-					firstName: email.split('@')[0],
-					lastName: 'Demo',
-					isActive: true,
-					passwordHash: 'demo-mode-no-password',
-					createdAt: new Date().toISOString(),
-					updatedAt: new Date().toISOString()
-				} as any)
-				.returning();
-			user = newUser;
-		} else if (user.role !== role) {
-			const [updated] = await db
-				.update(users)
-				.set({ role: role as any, updatedAt: new Date().toISOString() })
-				.where(eq(users.id, user.id))
-				.returning();
-			user = updated;
-		}
+    // Create a real Lucia session for the seeded account.
+    const session = await createUserSession(user.id);
+    setSessionCookie(cookies, session.sessionId);
 
-		// Create real Lucia session (uses auth_session cookie)
-		const session = await createUserSession(user.id);
-		setSessionCookie(cookies, session.sessionId);
+    return json({
+      success: true,
+      message: created
+        ? `Created and logged in as ${user.email} (${user.role})`
+        : `Refreshed and logged in as ${user.email} (${user.role})`,
+      credentials: {
+        email: user.email,
+        password: DEMO_PASSWORD,
+      },
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        isActive: user.isActive,
+      },
+      session: { id: session.sessionId, userId: session.userId },
+      seeded: {
+        created,
+        username: user.name ?? user.email.split('@')[0],
+      },
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    if (err instanceof SyntaxError) {
+      return json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
 
-		return json({
-			success: true,
-			message: `Logged in as ${email} (${role})`,
-			user: {
-				id: user.id,
-				email: user.email,
-				firstName: user.firstName,
-				lastName: user.lastName,
-				role: user.role,
-				isActive: user.isActive
-			},
-			session: { id: session.sessionId, userId: session.userId },
-			timestamp: new Date().toISOString()
-		});
-	} catch (err) {
-		console.error('[Demo Login] Error:', err);
-		throw error(500, err instanceof Error ? err.message : 'Failed to create demo session');
-	}
+    console.error('[Demo Login] Error:', err);
+    return json(
+      { error: err instanceof Error ? err.message : 'Failed to create demo session' },
+      { status: 500 }
+    );
+  }
 };
+
+export const POST = handleDemoLogin;
 
 /**
  * GET /api/auth/demo-login?email=...&role=...
- * Quick demo login via URL parameters (development only)
+ * Development-only seed and login via query parameters.
  */
-export const GET: RequestHandler = async (event) => {
- // Redirect to form submission to avoid GET side effects
- return POST(event);
-};
+export const GET = handleDemoLogin;
 
 
 

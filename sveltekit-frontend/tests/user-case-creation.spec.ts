@@ -1,61 +1,101 @@
 
-import { test, expect } from '@playwright/test';
-import { generateUser } from './utils';
+import { expect, test } from '@playwright/test';
+import pg from 'pg';
+import { TEST_CASE_PREFIX } from './fixtures/test-cases.js';
+
+const DB_URL =
+  process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+
+async function cleanupNonBypassArtifacts(email: string, caseTitle: string) {
+  const pool = new pg.Pool({ connectionString: DB_URL });
+
+  try {
+    await pool.query('DELETE FROM cases WHERE title = $1', [caseTitle]);
+
+    const usersResult = await pool.query<{ id: string }>('SELECT id FROM users WHERE email = $1', [
+      email,
+    ]);
+    for (const row of usersResult.rows) {
+      await pool.query('DELETE FROM sessions WHERE user_id = $1', [row.id]);
+      await pool.query('DELETE FROM users WHERE id = $1', [row.id]);
+    }
+  } finally {
+    await pool.end();
+  }
+}
 
 test.describe('User Case Creation', () => {
-    test('should allow a registered user to create a case', async ({ page, request }) => {
-        const user = generateUser();
+  test('registers, logs in again, and creates a case without dev bypass', async ({ page }) => {
+    const nonce = Date.now();
+    const user = {
+      email: `playwright-nonbypass-${nonce}@test.legal.ai`,
+      password: 'TestPass123!',
+      firstName: 'Playwright',
+      lastName: 'NonBypass',
+    };
+    const caseTitle = `${TEST_CASE_PREFIX} Non-Bypass Create ${nonce}`;
 
-        // 1. Register via API
-        const registerRes = await request.post('/api/auth/register', {
-            data: user
-        });
+    try {
+      await page.goto('/register');
+      await page.getByLabel(/first name/i).fill(user.firstName);
+      await page.getByLabel(/last name/i).fill(user.lastName);
+      await page.getByLabel(/^email$/i).fill(user.email);
+      await page.getByLabel(/^password$/i).fill(user.password);
+      await page.getByLabel(/confirm password/i).fill(user.password);
+      await page.getByRole('button', { name: /create account/i }).click();
 
-        if (!registerRes.ok()) {
-            console.error('Registration failed:', registerRes.status(), await registerRes.text());
-        }
-        expect(registerRes.ok()).toBeTruthy();
-        const registerData = await registerRes.json();
-        console.log('Registered user:', registerData.user.id);
+      await expect
+        .poll(
+          async () => {
+            const meResponse = await page.request.get('/api/auth/me');
+            if (meResponse.status() !== 200) return '';
+            const body = await meResponse.json();
+            return body.user?.email ?? '';
+          },
+          { timeout: 15000 }
+        )
+        .toBe(user.email);
 
-        // 2. Set cookie context (Playwright request context is separate from page context usually,
-        // unless they share storage state. But here we might need to login via page or share cookies).
-        // Actually, request.post might set cookies in the context, which the page shares if using the same context.
-        // Let's verify by visiting /dashboard.
+      const logoutResponse = await page.request.post('/api/auth/logout');
+      expect(logoutResponse.ok()).toBeTruthy();
+      await page.context().clearCookies();
 
-        await page.goto('/dashboard');
+      await page.goto('/login');
+      await page.getByLabel(/^email$/i).fill(user.email);
+      await page.getByLabel(/^password$/i).fill(user.password);
+      await page.getByRole('button', { name: /sign in/i }).click();
 
-        // If redirected to login, maybe cookies didn't stick?
-        // Let's force login via API if needed or rely on session.
-        // If register sets cookie, we are good.
+      await expect
+        .poll(
+          async () => {
+            const meResponse = await page.request.get('/api/auth/me');
+            if (meResponse.status() !== 200) return '';
+            const body = await meResponse.json();
+            return body.user?.email ?? '';
+          },
+          { timeout: 15000 }
+        )
+        .toBe(user.email);
 
-        // 3. Navigate to Case Creation
-        await page.goto('/cases/new'); // Or /cases/create
+      await page.goto('/cases/new');
+      await expect(page.getByRole('heading', { name: /new case intake/i })).toBeVisible();
+      await page.locator('input[name="title"]').fill(caseTitle);
+      await page
+        .locator('textarea[name="narrative"]')
+        .fill('Playwright non-bypass flow verifying registration, login, and case creation.');
+      await page
+        .locator('input[name="what"]')
+        .fill('Registered user creates a new case after logging back in.');
+      await page.locator('select[name="priority"]').selectOption('high');
+      await page.getByRole('button', { name: /create case/i }).click();
 
-        const caseTitle = `Test Case ${Date.now()}`;
+      await page.waitForURL(/\/cases\/[0-9a-f-]+\/overview$/i, { timeout: 30000 });
+      await expect(page.getByText(caseTitle).first()).toBeVisible({ timeout: 15000 });
 
-        // Handle form
-        await page.waitForSelector('input[name="title"]', { timeout: 10000 });
-        await page.fill('input[name="title"]', caseTitle);
-
-        // Optional fields
-        if (await page.locator('textarea[name="description"]').isVisible()) {
-            await page.fill('textarea[name="description"]', 'Playwright test case');
-        }
-
-        // Submit
-        // Check for "Save" or "Create" button
-        const submitBtn = page.locator('button[type="submit"]');
-        await submitBtn.click();
-
-        // 4. Verify Case Created
-        // Expect redirect to case detail
-        await page.waitForURL(/\/cases\/[a-zA-Z0-9-]+/);
-
-        const url = page.url();
-        const caseId = url.split('/').pop();
-        console.log(`Case created: ${caseId}`);
-
-        await expect(page.locator('h1, h2, .case-title')).toContainText(caseTitle);
-    });
+      await page.goto(`/cases?search=${encodeURIComponent(caseTitle)}`);
+      await expect(page.getByText(caseTitle)).toBeVisible({ timeout: 15000 });
+    } finally {
+      await cleanupNonBypassArtifacts(user.email, caseTitle);
+    }
+  });
 });

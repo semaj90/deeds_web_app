@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
-import { personsOfInterest, poiPhotos } from '$lib/server/db/schema-postgres.js';
+import { personsOfInterest, poiPhotos, timelineEvents } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
@@ -121,7 +121,8 @@ export const DELETE: RequestHandler = async ({ params }) => {
   }
 
   try {
-    // Delete photos first (cascade may handle this, but be explicit)
+    // Delete related records first (FK CASCADE handles this too, but be explicit)
+    await db.delete(timelineEvents).where(eq(timelineEvents.poiId, parsedId.data));
     await db.delete(poiPhotos).where(eq(poiPhotos.poiId, parsedId.data));
 
     const [deleted] = await db
