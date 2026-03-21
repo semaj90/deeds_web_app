@@ -7,12 +7,14 @@
 	interface Props {
 		context?: { title?: string; description?: string } | null;
 		caseId?: string | null;
+		currentRoute?: string;
 		class?: string;
 	}
 
 	let {
 		context = null,
 		caseId = null,
+		currentRoute = '',
 		class: className = ''
 	}: Props = $props();
 
@@ -51,6 +53,7 @@
 		<SimpleWorkingChat
 			{chatId}
 			hasCaseContext={!!caseId}
+			{currentRoute}
 			height="420px"
 			class="border-0 rounded-none"
 		/>

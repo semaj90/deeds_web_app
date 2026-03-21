@@ -147,7 +147,7 @@
         position="bottom-right"
         onclick={() => showAIChat = !showAIChat}
     />
-    <FloatingChatModal bind:open={showAIChat} caseId={activeCaseId} />
+    <FloatingChatModal bind:open={showAIChat} caseId={activeCaseId} currentRoute={page.url.pathname} />
 {/if}
 
 {#if page.state.showCaseModal && page.state.caseId}

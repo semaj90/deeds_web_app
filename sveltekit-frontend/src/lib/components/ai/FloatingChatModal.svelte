@@ -11,9 +11,10 @@
 	interface Props {
 		open?: boolean;
 		caseId?: string;
+		currentRoute?: string;
 	}
 
-	let { open = $bindable(false), caseId = '' }: Props = $props();
+	let { open = $bindable(false), caseId = '', currentRoute = '' }: Props = $props();
 
 	let messages = $state<Message[]>([]);
 	let inputText = $state('');
@@ -52,7 +53,8 @@
 				body: JSON.stringify({
 					message: text,
 					conversationId,
-					...(caseId ? { caseId } : {})
+					...(caseId ? { caseId } : {}),
+					...(currentRoute ? { currentRoute } : {})
 				})
 			});
 
@@ -131,11 +133,15 @@
 				<div class="flex items-center gap-2">
 					<span class="i-lucide-brain-circuit w-4 h-4 text-warning inline-block"></span>
 					<Dialog.Title class="font-mono text-sm font-semibold text-sand/90">
-						Legal AI Assistant
+						AI CONTEXTUAL CHAT
 					</Dialog.Title>
 					{#if caseId}
 						<span class="text-[10px] font-mono text-warning/70 bg-warning/10 px-1.5 py-0.5 rounded">
 							{caseId.slice(0, 12)}…
+						</span>
+					{:else if currentRoute}
+						<span class="text-[10px] font-mono text-accent/60 bg-accent/8 px-1.5 py-0.5 rounded">
+							{currentRoute.split('/').filter(Boolean).slice(-1)[0] || 'home'}
 						</span>
 					{/if}
 				</div>

@@ -18,6 +18,7 @@ const sseChatSchema = z.object({
   conversationId: z.string().min(1, 'Missing conversationId').max(200),
   emotionPrompt: z.string().max(5000).optional(),
   emotionMood: z.string().max(100).optional(),
+  currentRoute: z.string().max(500).optional(),
 });
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
@@ -40,6 +41,61 @@ const CONVERSATION_HISTORY_LIMIT = 10;
 
 // Strict caseId format: "case-" followed by a UUID
 const CASE_ID_PATTERN = /^case-([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
+
+/**
+ * Map a URL pathname to a human-readable page description for LLM context.
+ */
+function describeRoute(pathname: string): string {
+  const routes: Record<string, string> = {
+    '/dashboard': 'the Dashboard (case overview, statistics, recent activity)',
+    '/active-cases': 'Active Cases list',
+    '/citations': 'Citations library (legal citations, statutes, case law references)',
+    '/evidence': 'Evidence management hub',
+    '/evidence/analyze': 'Evidence Analysis page (AI-powered forensic analysis)',
+    '/evidence/manage': 'Evidence management (upload, organize, tag)',
+    '/evidence/upload': 'Evidence upload page',
+    '/evidence-library': 'Evidence Library (search and browse all evidence)',
+    '/reports': 'Reports list (generated case reports)',
+    '/reports/new': 'New Report creation',
+    '/recommendations': 'AI Recommendations (suggested actions, related cases)',
+    '/global-search': 'Global Search (cross-domain search across cases, evidence, statutes)',
+    '/legal-corpus': 'Legal Corpus (statute database, legal reference library)',
+    '/persons-of-interest': 'Persons of Interest (POI profiles, suspect tracking)',
+    '/terminal': 'Terminal (developer console, AI chat, system commands)',
+    '/command-center': 'Command Center (system overview, infrastructure status)',
+    '/analysis-center': 'Analysis Center (deep analytics, case patterns)',
+    '/system-configuration': 'System Configuration (settings, theme, AI engine config)',
+    '/demos': 'Demo pages (feature showcases)',
+    '/admin/ai-dashboard': 'Admin AI Dashboard (model status, inference metrics)',
+    '/admin/error-brain': 'Error Brain (error tracking, pattern detection)',
+    '/admin/phase89': 'Phase 89 Admin (cluster management)',
+    '/admin/all-routes': 'All Routes admin (route health monitoring)',
+    '/admin/component-analysis': 'Component Analysis (codebase component audit)',
+    '/admin/dev-tools': 'Developer Tools',
+  };
+
+  // Exact match
+  if (routes[pathname]) return routes[pathname];
+
+  // Pattern matches for dynamic routes
+  if (/^\/cases\/[^/]+\/evidence/.test(pathname)) return 'Case Evidence tab (evidence for a specific case)';
+  if (/^\/cases\/[^/]+\/notes/.test(pathname)) return 'Case Notes tab (notes and annotations for a case)';
+  if (/^\/cases\/[^/]+\/persons/.test(pathname)) return 'Case Persons tab (people linked to this case)';
+  if (/^\/cases\/[^/]+\/reports/.test(pathname)) return 'Case Reports tab (reports for this case)';
+  if (/^\/cases\/[^/]+\/chat/.test(pathname)) return 'Case Chat tab (AI chat scoped to this case)';
+  if (/^\/cases\/[^/]+\/ai/.test(pathname)) return 'Case AI tab (AI analysis for this case)';
+  if (/^\/cases\/[^/]+\/canvas/.test(pathname)) return 'Case Canvas (visual investigation board)';
+  if (/^\/cases\/[^/]+\/board/.test(pathname)) return 'Case Board (kanban task board)';
+  if (/^\/cases\/[^/]+/.test(pathname)) return 'Case Detail page (specific case overview)';
+  if (/^\/cases/.test(pathname)) return 'Cases list (all cases)';
+  if (/^\/persons-of-interest\/create/.test(pathname)) return 'Create new Person of Interest';
+  if (/^\/persons-of-interest\/[^/]+/.test(pathname)) return 'Person of Interest detail page';
+  if (/^\/legal-corpus\/[^/]+/.test(pathname)) return 'Legal Corpus document detail';
+  if (/^\/demos\//.test(pathname)) return `Demo page (${pathname.split('/').pop()})`;
+  if (/^\/admin\//.test(pathname)) return `Admin page (${pathname.split('/').pop()})`;
+
+  return `page at ${pathname}`;
+}
 
 interface ContextDoc {
   content: string;
@@ -260,7 +316,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	if (!parsed.success) {
 		return new Response(parsed.error.issues[0]?.message ?? 'Invalid input', { status: 400 });
 	}
-	const { message, model, conversationId, emotionPrompt, emotionMood } = parsed.data;
+	const { message, model, conversationId, emotionPrompt, emotionMood, currentRoute } = parsed.data;
 
 	// Save user message to chatMessages table
 	try {
@@ -422,6 +478,16 @@ export const POST: RequestHandler = async ({ request }) => {
 				'Provide accurate, detailed, and actionable legal analysis. ' +
 				'Always cite relevant statutes and case law when possible.';
 
+			// Inject current page context so assistant knows what the user is viewing
+			if (currentRoute) {
+				const pageLabel = describeRoute(currentRoute);
+				systemPrompt += `\n\n[PAGE CONTEXT — IMPORTANT] ` +
+					`The user is chatting from within the application. Their current page is: ${pageLabel} (route: ${currentRoute}). ` +
+					'You KNOW what page they are on because the application tells you. ' +
+					'When they ask "what page am I on" or reference "this page", "this screen", "what I see", ' +
+					`answer with: "${pageLabel}". Do NOT say you cannot see their screen — you have page context from the app.`;
+			}
+
 			// Inject case context (case details, evidence, citations)
 			if (caseContext) {
 				systemPrompt += `\n\n${caseContext}`;
@@ -541,13 +607,17 @@ export const POST: RequestHandler = async ({ request }) => {
 					cachedAt: cacheResult.cachedAt
 				});
 
-				await db.insert(chatMessages).values({
-					id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-					chatId: conversationId,
-					role: 'assistant',
-					content: fullResponse,
-					metadata: assistantMetadata
-				});
+				try {
+					await db.insert(chatMessages).values({
+						id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+						chatId: conversationId,
+						role: 'assistant',
+						content: fullResponse,
+						metadata: assistantMetadata
+					});
+				} catch (dbErr) {
+					console.warn('[SSE Chat] Failed to persist cached assistant message:', dbErr instanceof Error ? dbErr.message : dbErr);
+				}
 
 				send({
 					id,
@@ -569,10 +639,16 @@ export const POST: RequestHandler = async ({ request }) => {
 			// Cache MISS — proceed with Ollama API call
 			try {
 				// Build multi-turn messages array for Ollama /api/chat
+				// Prepend page context to the user message so the model sees it inline
+				let augmentedMessage = message;
+				if (currentRoute) {
+					const pageLabel = describeRoute(currentRoute);
+					augmentedMessage = `[I am currently viewing: ${pageLabel}]\n\n${message}`;
+				}
 				const ollamaMessages = [
 					{ role: 'system', content: systemPrompt },
 					...conversationHistory,
-					{ role: 'user', content: message }
+					{ role: 'user', content: augmentedMessage }
 				];
 
 				// Stream from Ollama with RAG-enriched system prompt + conversation history
@@ -692,13 +768,17 @@ export const POST: RequestHandler = async ({ request }) => {
 					model: model ?? 'gemma3-legal:latest'
 				});
 
-				await db.insert(chatMessages).values({
-					id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-					chatId: conversationId,
-					role: 'assistant',
-					content: fullResponse,
-					metadata: assistantMetadata
-				});
+				try {
+					await db.insert(chatMessages).values({
+						id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+						chatId: conversationId,
+						role: 'assistant',
+						content: fullResponse,
+						metadata: assistantMetadata
+					});
+				} catch (dbErr) {
+					console.warn('[SSE Chat] Failed to persist assistant message:', dbErr instanceof Error ? dbErr.message : dbErr);
+				}
 
 				// Publish assistant response to chat.context queue (non-blocking)
 				import('$lib/server/queue/rabbitmq-manager-fixed.js').then(({ rabbitmq }) => {
@@ -711,26 +791,29 @@ export const POST: RequestHandler = async ({ request }) => {
 				}).catch(() => {});
 
 				// Store response in LLM cache for future lookups (non-blocking)
-				// Generate embedding for caching (reuses embedding from retrieveContext if available)
-				const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: message, keep_alive: '24h' }),
-					signal: AbortSignal.timeout(8000)
-				}).catch(() => null);
+				try {
+					const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: message, keep_alive: '24h' }),
+						signal: AbortSignal.timeout(8000)
+					}).catch(() => null);
 
-				if (embedRes?.ok) {
-					const embedData = await embedRes.json();
-					if (Array.isArray(embedData.embedding)) {
-						storeCachedResponse({
-							query: message,
-							queryEmbedding: embedData.embedding,
-							context: systemPrompt,
-							response: fullResponse,
-							model: model ?? 'gemma3-legal:latest',
-							confidence
-						}).catch(err => console.warn('[SSE Chat] Cache storage failed:', err));
+					if (embedRes?.ok) {
+						const embedData = await embedRes.json();
+						if (Array.isArray(embedData.embedding)) {
+							storeCachedResponse({
+								query: message,
+								queryEmbedding: embedData.embedding,
+								context: systemPrompt,
+								response: fullResponse,
+								model: model ?? 'gemma3-legal:latest',
+								confidence
+							}).catch(err => console.warn('[SSE Chat] Cache storage failed:', err));
+						}
 					}
+				} catch (cacheErr) {
+					console.warn('[SSE Chat] Response caching failed:', cacheErr instanceof Error ? cacheErr.message : cacheErr);
 				}
 
 				send({
@@ -745,11 +828,12 @@ export const POST: RequestHandler = async ({ request }) => {
 					conversationTurns: conversationHistory.length
 				});
 			} catch (error) {
-				console.error('Generation error:', error);
+				const errMsg = error instanceof Error ? error.message : String(error);
+				console.error('[SSE Chat] Generation error:', errMsg, error instanceof Error ? error.stack : '');
 				send({
 					id,
 					role: 'assistant',
-					content: 'Sorry, I encountered an error generating a response.',
+					content: fullResponse || `Sorry, I encountered an error: ${errMsg.slice(0, 100)}`,
 					status: 'error'
 				});
 			}

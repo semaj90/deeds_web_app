@@ -93,6 +93,7 @@ export class ChatSession {
 	private _chatId: string;
 	private _hasCaseContext: boolean;
 	private _cartridgePreFetched = false;
+	currentRoute = $state<string>('');
 
 	constructor(chatId: string, initialHistory: ChatMessage[] = [], hasCaseContext = false) {
 		this._chatId = chatId;
@@ -486,7 +487,8 @@ export class ChatSession {
 					conversationId: this._chatId,
 					model: SERVER_CHAT_MODEL,
 					emotionPrompt: emotionPrompt || undefined,
-					emotionMood: emotionState.composite.mood
+					emotionMood: emotionState.composite.mood,
+					...(this.currentRoute ? { currentRoute: this.currentRoute } : {})
 				}),
 				signal: this.abortController.signal
 			});

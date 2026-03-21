@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import type { LayoutData } from './$types';
 	import CaseDocumentWriter from '$lib/components/legal-ai/CaseDocumentWriter.svelte';
@@ -20,6 +21,7 @@
 	let { data, children }: Props = $props();
 	let showDocumentWriter = $state(false);
 	let showShortcuts = $state(false);
+	let currentPathname = $derived(page.url.pathname);
 
 	// Dynamic imports to avoid SSR TDZ crashes (browser-only components)
 	let AccessibilityPanel = $state<typeof import('$lib/components/ui/AccessibilityPanel.svelte').default | null>(null);
@@ -110,7 +112,7 @@
 	<AccessibilityPanel />
 {/if}
 {#if AIChatWidget}
-	<AIChatWidget />
+	<AIChatWidget currentRoute={currentPathname} />
 {/if}
 {#if SetupWizard && data.user}
 	<SetupWizard

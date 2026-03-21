@@ -12,6 +12,7 @@
 	interface Props {
 		chatId?: string;
 		hasCaseContext?: boolean;
+		currentRoute?: string;
 		height?: string;
 		class?: string;
 		enableVoice?: boolean;
@@ -23,6 +24,7 @@
 	let {
 		chatId = 'chat-' + Date.now(),
 		hasCaseContext = false,
+		currentRoute = '',
 		height = '500px',
 		class: className = '',
 		enableVoice = true,
@@ -35,7 +37,7 @@
 	let currentMessage = $state('');
 	let chatContainer: HTMLElement | undefined = $state(undefined);
 	let lastCompletedIdx = $state<number | null>(null);
-	let prevStatus = $state<string>('idle');
+	let prevStatus = 'idle'; // plain var, NOT $state — avoids effect_update_depth_exceeded
 
 	// Voice command feedback
 	let commandFeedback = $state<CommandFeedback | null>(null);
@@ -47,6 +49,7 @@
 		session = s;
 		return () => { s.destroy(); };
 	});
+
 
 	$effect(() => {
 		const len = session?.messages?.length;
@@ -76,6 +79,9 @@
 		const msg = currentMessage.trim();
 		currentMessage = '';
 		lastCompletedIdx = null;
+
+		// Set current page context before sending
+		session.currentRoute = currentRoute;
 
 		// Update conversation state
 		if (handsFreeEnabled) {
@@ -201,15 +207,17 @@
 		if (browser && enableVoice) {
 			// Check for Web Speech API support
 			const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-			sttSupported = !!SpeechRecognition;
+			const supported = !!SpeechRecognition;
+			sttSupported = supported;
 
-			if (sttSupported) {
-				recognition = new SpeechRecognition();
-				recognition.continuous = false;
-				recognition.interimResults = true;
-				recognition.lang = 'en-US';
+			if (supported) {
+				const rec = new SpeechRecognition();
+				rec.continuous = false;
+				rec.interimResults = true;
+				rec.lang = 'en-US';
 
-				recognition.onresult = async (event: any) => {
+				rec.onresult = async (event: any) => {
+					// Note: callbacks use closured 'rec' for the instance they belong to
 					let interim = '';
 					let final = '';
 
@@ -257,7 +265,7 @@
 					}
 				};
 
-				recognition.onend = () => {
+				rec.onend = () => {
 					isListening = false;
 					interimTranscript = '';
 					clearTimeout(silenceTimer!);
@@ -266,14 +274,14 @@
 					if (handsFreeEnabled && conversationState === 'listening') {
 						setTimeout(() => {
 							if (handsFreeEnabled && !isListening && conversationState === 'listening') {
-								recognition.start();
+								rec.start();
 								isListening = true;
 							}
 						}, 200);
 					}
 				};
 
-				recognition.onerror = (event: any) => {
+				rec.onerror = (event: any) => {
 					console.error('[STT] Recognition error:', event.error);
 					isListening = false;
 					interimTranscript = '';
@@ -289,6 +297,8 @@
 						}, 500);
 					}
 				};
+				// Assign to $state LAST — reading recognition back would create a dep cycle
+				recognition = rec;
 			}
 		}
 
