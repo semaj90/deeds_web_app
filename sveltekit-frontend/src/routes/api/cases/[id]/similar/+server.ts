@@ -260,9 +260,21 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 	} catch (err) {
 		console.error('[Case Similarity] Error:', err);
 		return json(
-			{ error: 'Failed to find similar cases', details: err instanceof Error ? err.message : String(err) },
-			{ status: 500 }
-		);
+      {
+        query: { caseId, title: '' },
+        results: [],
+        error: 'Similar cases are temporarily unavailable',
+        details: err instanceof Error ? err.message : String(err),
+        timing: {
+          embedMs: 0,
+          searchMs: 0,
+          rerankMs: 0,
+          aceMs: 0,
+          totalMs: Math.round(performance.now() - startTime),
+        },
+      },
+      { status: 200 }
+    );
 	}
 };
 

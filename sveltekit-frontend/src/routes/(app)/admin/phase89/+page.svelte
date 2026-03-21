@@ -4,7 +4,7 @@
 	// Migrated to $effect
 	import type { PageData } from './$types';
 
-	// TODO: Convert to $props - // TODO: Convert to $props - 
+	// TODO: Convert to $props - // TODO: Convert to $props -
 
 	// Tabs state
 	let activeTab = $state<'search' | 'clusters' | 'graph' | 'pipeline'>('search');
@@ -15,8 +15,14 @@
 	let isSearching = $state(false);
 
 	// Clusters state
-	let clusters = $state<Cluster[]>(data.clusters || []);
+	let clusters = $state<Cluster[]>([]);
 	let selectedCluster = $state<Cluster | null>(null);
+
+	$effect(() => {
+		if (clusters.length === 0 && data.clusters?.length) {
+			clusters = [...data.clusters];
+		}
+	});
 
 	// Merge summaries into clusters
 	$effect(() => {

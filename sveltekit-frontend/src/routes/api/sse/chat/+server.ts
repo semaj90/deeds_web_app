@@ -10,6 +10,9 @@ import { lookupCachedResponse, storeCachedResponse } from '$lib/server/ai/llm-ca
 import { getFragment, setFragment, getGlyphCacheMetrics, FragmentType } from '$lib/server/glyph-prompt-cache.js';
 import { createHash } from 'crypto';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
+import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self-prompt.js';
+import { orderByDependency, extractCitationRefs } from '$lib/server/retrieval/document-dag.js';
+import type { DAGDocument } from '$lib/server/retrieval/document-dag.js';
 import { z } from 'zod';
 
 const sseChatSchema = z.object({
@@ -38,6 +41,14 @@ const RAG_SCORE_THRESHOLD = 0.3;
 
 // Conversation memory: load last N messages for multi-turn context
 const CONVERSATION_HISTORY_LIMIT = 10;
+const PRELUDE_RAG_TIMEOUT_MS = 6000;
+const CACHE_LOOKUP_TIMEOUT_MS = 2000;
+
+// Corrective RAG: if top retrieval score is below this, reformulate query and retry
+const CORRECTIVE_RAG_THRESHOLD = 0.5;
+
+// ACE self-eval: evaluate response quality and retry once if below threshold
+const ACE_SELF_EVAL_ENABLED = true;
 
 // Strict caseId format: "case-" followed by a UUID
 const CASE_ID_PATTERN = /^case-([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
@@ -78,9 +89,12 @@ function describeRoute(pathname: string): string {
   if (routes[pathname]) return routes[pathname];
 
   // Pattern matches for dynamic routes
-  if (/^\/cases\/[^/]+\/evidence/.test(pathname)) return 'Case Evidence tab (evidence for a specific case)';
-  if (/^\/cases\/[^/]+\/notes/.test(pathname)) return 'Case Notes tab (notes and annotations for a case)';
-  if (/^\/cases\/[^/]+\/persons/.test(pathname)) return 'Case Persons tab (people linked to this case)';
+  if (/^\/cases\/[^/]+\/evidence/.test(pathname))
+    return 'Case Evidence tab (evidence for a specific case)';
+  if (/^\/cases\/[^/]+\/notes/.test(pathname))
+    return 'Case Notes tab (notes and annotations for a case)';
+  if (/^\/cases\/[^/]+\/persons/.test(pathname))
+    return 'Case Persons tab (people linked to this case)';
   if (/^\/cases\/[^/]+\/reports/.test(pathname)) return 'Case Reports tab (reports for this case)';
   if (/^\/cases\/[^/]+\/chat/.test(pathname)) return 'Case Chat tab (AI chat scoped to this case)';
   if (/^\/cases\/[^/]+\/ai/.test(pathname)) return 'Case AI tab (AI analysis for this case)';
@@ -202,6 +216,7 @@ const RAG_COLLECTIONS = [
   'evidence_vectors', // uploaded evidence: PDFs, images, documents
   'case_chunks', // court opinions, rulings, case law
   'law_sections', // statutes, constitutions, regulations, codes
+  'legal_documents', // ACE ingest, knowledge docs, summaries
 ] as const;
 
 /**
@@ -213,11 +228,13 @@ async function searchCollection(
   limit: number
 ): Promise<Array<Record<string, unknown>>> {
   try {
+    const vectorPayload = collection === 'legal_documents' ? { name: 'content', vector } : vector;
+
     const res = await fetch(`${QDRANT_URL}/collections/${collection}/points/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        vector,
+        vector: vectorPayload,
         limit,
         with_payload: true,
         score_threshold: RAG_SCORE_THRESHOLD,
@@ -290,7 +307,14 @@ async function retrieveContext(query: string, limit = RAG_MAX_CHUNKS): Promise<C
         if (pointModel && pointModel !== embeddingModel) return null;
         if (pointDims && pointDims !== embeddingDims) return null;
 
-        const rawContent = String(payload?.text ?? payload?.content ?? payload?.title ?? '');
+        const rawContent = String(
+          payload?.text ??
+            payload?.content_preview ??
+            payload?.full_text ??
+            payload?.content ??
+            payload?.title ??
+            ''
+        );
         const content =
           rawContent.length > RAG_CHUNK_MAX_CHARS
             ? rawContent.slice(0, RAG_CHUNK_MAX_CHARS) + '...'
@@ -310,549 +334,920 @@ async function retrieveContext(query: string, limit = RAG_MAX_CHUNKS): Promise<C
   }
 }
 
+async function retrieveContextWithBudget(
+  query: string,
+  limit = RAG_MAX_CHUNKS,
+  timeoutMs = PRELUDE_RAG_TIMEOUT_MS
+): Promise<ContextDoc[]> {
+  try {
+    return await Promise.race([
+      retrieveContext(query, limit),
+      new Promise<ContextDoc[]>((resolve) => setTimeout(() => resolve([]), timeoutMs)),
+    ]);
+  } catch {
+    return [];
+  }
+}
+
+async function lookupCachedResponseWithBudget(params: {
+  query: string;
+  context: string;
+  model?: string;
+  timeoutMs?: number;
+}) {
+  const { timeoutMs = CACHE_LOOKUP_TIMEOUT_MS, ...lookupParams } = params;
+  try {
+    return await Promise.race([
+      lookupCachedResponse(lookupParams),
+      new Promise<Awaited<ReturnType<typeof lookupCachedResponse>>>((resolve) =>
+        setTimeout(() => resolve({ hit: false }), timeoutMs)
+      ),
+    ]);
+  } catch {
+    return { hit: false };
+  }
+}
+
+/**
+ * Corrective RAG: if retrieval quality is low, ask the LLM to reformulate the query
+ * and perform a second retrieval pass. Returns improved context docs or original.
+ */
+async function correctiveRetrieval(
+  originalQuery: string,
+  originalDocs: ContextDoc[]
+): Promise<{ docs: ContextDoc[]; reformulated: boolean; newQuery?: string }> {
+  if (originalDocs.length === 0) {
+    return { docs: originalDocs, reformulated: false };
+  }
+
+  const topScore = originalDocs.length > 0 ? Math.max(...originalDocs.map((d) => d.similarity)) : 0;
+
+  // If top score is acceptable, keep original results
+  if (topScore >= CORRECTIVE_RAG_THRESHOLD) {
+    return { docs: originalDocs, reformulated: false };
+  }
+
+  // Low-quality retrieval — ask LLM to reformulate the query
+  try {
+    const reformulateRes = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gemma3-legal:latest',
+        prompt: `Rephrase this legal search query to improve retrieval results. Return ONLY the rephrased query, no explanation.\n\nOriginal query: "${originalQuery}"`,
+        stream: false,
+        keep_alive: '24h',
+        options: { temperature: 0.3, num_predict: 100 },
+      }),
+      signal: AbortSignal.timeout(8000),
+    });
+
+    if (!reformulateRes.ok) return { docs: originalDocs, reformulated: false };
+
+    const reformulateData = await reformulateRes.json();
+    const newQuery = String(reformulateData.response ?? '')
+      .trim()
+      .replace(/^["']|["']$/g, '');
+    if (!newQuery || newQuery.length < 5) return { docs: originalDocs, reformulated: false };
+
+    console.log(
+      `[Corrective RAG] Reformulated: "${originalQuery.slice(0, 60)}" → "${newQuery.slice(0, 60)}" (top score was ${topScore.toFixed(3)})`
+    );
+
+    // Second retrieval pass with reformulated query
+    const newDocs = await retrieveContext(newQuery);
+    const newTopScore = newDocs.length > 0 ? Math.max(...newDocs.map((d) => d.similarity)) : 0;
+
+    // Use reformulated results only if they're better
+    if (newTopScore > topScore) {
+      return { docs: newDocs, reformulated: true, newQuery };
+    }
+
+    // Merge both result sets, deduplicate, take top K
+    const allDocs = [...originalDocs, ...newDocs];
+    const seen = new Set<string>();
+    const merged = allDocs.filter((d) => {
+      if (seen.has(d.documentId)) return false;
+      seen.add(d.documentId);
+      return true;
+    });
+    merged.sort((a, b) => b.similarity - a.similarity);
+
+    return { docs: merged.slice(0, RAG_MAX_CHUNKS), reformulated: true, newQuery };
+  } catch (err) {
+    console.warn('[Corrective RAG] Reformulation failed, using original results:', err);
+    return { docs: originalDocs, reformulated: false };
+  }
+}
+
+/**
+ * DAG-order RAG context docs by citation dependency.
+ * Cited sources appear before citing sources for better context flow.
+ */
+function dagOrderContext(docs: ContextDoc[]): ContextDoc[] {
+  if (docs.length <= 1) return docs;
+
+  const knownIds = new Set(docs.map((d) => d.documentId));
+
+  // Build DAG documents with cross-references
+  const dagDocs: DAGDocument[] = docs.map((d) => ({
+    id: d.documentId,
+    title: d.documentId,
+    score: d.similarity,
+    citations: extractCitationRefs(d.content, knownIds),
+    content: d.content,
+  }));
+
+  const { ordered, cycles } = orderByDependency(dagDocs);
+  if (cycles.length > 0) {
+    console.log(`[DAG] Reordered ${docs.length} RAG chunks, broke ${cycles.length} cycle(s)`);
+  }
+
+  // Map back to ContextDocs preserving DAG order
+  const docMap = new Map(docs.map((d) => [d.documentId, d]));
+  return ordered
+    .map((dagDoc) => docMap.get(dagDoc.id))
+    .filter((d): d is ContextDoc => d !== undefined);
+}
+
 export const POST: RequestHandler = async ({ request }) => {
-	const raw = await request.json();
-	const parsed = sseChatSchema.safeParse(raw);
-	if (!parsed.success) {
-		return new Response(parsed.error.issues[0]?.message ?? 'Invalid input', { status: 400 });
-	}
-	const { message, model, conversationId, emotionPrompt, emotionMood, currentRoute } = parsed.data;
+  const raw = await request.json();
+  const parsed = sseChatSchema.safeParse(raw);
+  if (!parsed.success) {
+    return new Response(parsed.error.issues[0]?.message ?? 'Invalid input', { status: 400 });
+  }
+  const { message, model, conversationId, emotionPrompt, emotionMood, currentRoute } = parsed.data;
 
-	// Save user message to chatMessages table
-	try {
-		await db.insert(chatMessages).values({
-			id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-			chatId: conversationId,
-			role: 'user',
-			content: message
-		});
-	} catch (e) {
-		console.error('Failed to save user message', e);
-	}
+  // Save user message to chatMessages table
+  try {
+    await db.insert(chatMessages).values({
+      id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      chatId: conversationId,
+      role: 'user',
+      content: message,
+    });
+  } catch (e) {
+    console.error('Failed to save user message', e);
+  }
 
-	// Publish user message to chat.context queue for embedding indexing (non-blocking)
-	import('$lib/server/queue/rabbitmq-manager-fixed.js').then(({ rabbitmq }) => {
-		rabbitmq.publishChatContext({
-			sessionId: conversationId,
-			message,
-			role: 'user',
-			metadata: { emotionMood: emotionMood ?? undefined }
-		});
-	}).catch(() => { /* RabbitMQ unavailable — non-critical */ });
+  // Publish user message to chat.context queue for embedding indexing (non-blocking)
+  import('$lib/server/queue/rabbitmq-manager-fixed.js')
+    .then(({ rabbitmq }) => {
+      rabbitmq.publishChatContext({
+        sessionId: conversationId,
+        message,
+        role: 'user',
+        metadata: { emotionMood: emotionMood ?? undefined },
+      });
+    })
+    .catch(() => {
+      /* RabbitMQ unavailable — non-critical */
+    });
 
-	// Load conversation history for multi-turn context
-	let conversationHistory: Array<{ role: string; content: string }> = [];
-	try {
-		const historyRows = await db
-			.select({ role: chatMessages.role, content: chatMessages.content })
-			.from(chatMessages)
-			.where(eq(chatMessages.chatId, conversationId))
-			.orderBy(desc(chatMessages.timestamp))
-			.limit(CONVERSATION_HISTORY_LIMIT + 1); // +1 because we just inserted the current message
+  // Load conversation history for multi-turn context
+  let conversationHistory: Array<{ role: string; content: string }> = [];
+  try {
+    const historyRows = await db
+      .select({ role: chatMessages.role, content: chatMessages.content })
+      .from(chatMessages)
+      .where(eq(chatMessages.chatId, conversationId))
+      .orderBy(desc(chatMessages.timestamp))
+      .limit(CONVERSATION_HISTORY_LIMIT + 1); // +1 because we just inserted the current message
 
-		// Reverse to chronological order, exclude the current message (already sent separately)
-		conversationHistory = historyRows
-			.reverse()
-			.slice(0, -1) // remove last entry (current user message, added above)
-			.map(r => ({ role: r.role, content: r.content }));
-	} catch (e) {
-		console.warn('[Chat] History load failed — continuing without history:', e instanceof Error ? e.message : e);
-	}
+    // Reverse to chronological order, exclude the current message (already sent separately)
+    conversationHistory = historyRows
+      .reverse()
+      .slice(0, -1) // remove last entry (current user message, added above)
+      .map((r) => ({ role: r.role, content: r.content }));
+  } catch (e) {
+    console.warn(
+      '[Chat] History load failed — continuing without history:',
+      e instanceof Error ? e.message : e
+    );
+  }
 
-	const abortSignal = request.signal;
+  const abortSignal = request.signal;
 
-	const shared = { cleanup: () => {} };
-	const stream = new ReadableStream({
-		async start(controller) {
-			const encoder = new TextEncoder();
-			const id = crypto.randomUUID();
-			let closed = false;
+  const shared = { cleanup: () => {} };
+  const stream = new ReadableStream({
+    async start(controller) {
+      const encoder = new TextEncoder();
+      const id = crypto.randomUUID();
+      let closed = false;
 
-			const send = (data: unknown) => {
-				if (closed) return;
-				try {
-					controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
-				} catch { closed = true; }
-			};
+      const send = (data: unknown) => {
+        if (closed) return;
+        try {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+        } catch {
+          closed = true;
+        }
+      };
 
-			// Heartbeat every 25s to prevent proxy timeout
-			const heartbeat = setInterval(() => {
-				if (closed) { clearInterval(heartbeat); return; }
-				try { controller.enqueue(encoder.encode(`: heartbeat\n\n`)); } catch { closed = true; clearInterval(heartbeat); }
-			}, 25_000);
+      // Heartbeat every 25s to prevent proxy timeout
+      const heartbeat = setInterval(() => {
+        if (closed) {
+          clearInterval(heartbeat);
+          return;
+        }
+        try {
+          controller.enqueue(encoder.encode(`: heartbeat\n\n`));
+        } catch {
+          closed = true;
+          clearInterval(heartbeat);
+        }
+      }, 25_000);
 
-			// Clean up on client disconnect
-			shared.cleanup = () => {
-				closed = true;
-				clearInterval(heartbeat);
-			};
-			abortSignal.addEventListener('abort', shared.cleanup, { once: true });
+      // Clean up on client disconnect
+      shared.cleanup = () => {
+        closed = true;
+        clearInterval(heartbeat);
+      };
+      abortSignal.addEventListener('abort', shared.cleanup, { once: true });
 
-			// Set SSE reconnection interval (3s) for auto-reconnect on disconnect
-			controller.enqueue(encoder.encode('retry: 3000\n\n'));
+      // Set SSE reconnection interval (3s) for auto-reconnect on disconnect
+      controller.enqueue(encoder.encode('retry: 3000\n\n'));
 
-			send({ id, role: 'assistant', content: '', status: 'thinking' });
+      send({ id, role: 'assistant', content: '', status: 'thinking' });
 
-			// L0.5 Glyph Cache: emit diagnostic metrics
-			const glyphMetrics = getGlyphCacheMetrics();
-			if (glyphMetrics.entries > 0) {
-				console.log(`[Glyph L0.5] ${glyphMetrics.entries} entries, hit rate: ${(glyphMetrics.hitRate * 100).toFixed(1)}%, compression: ${(glyphMetrics.avgCompressionRatio * 100).toFixed(0)}%`);
-			}
+      // L0.5 Glyph Cache: emit diagnostic metrics
+      const glyphMetrics = getGlyphCacheMetrics();
+      if (glyphMetrics.entries > 0) {
+        console.log(
+          `[Glyph L0.5] ${glyphMetrics.entries} entries, hit rate: ${(glyphMetrics.hitRate * 100).toFixed(1)}%, compression: ${(glyphMetrics.avgCompressionRatio * 100).toFixed(0)}%`
+        );
+      }
 
-			// ── L0.5 Intercept 1: Case Context ──────────────────────────
-			// Cache case context per caseId (10min TTL) — identical for every
-			// message in a conversation, saves 1 DB query + 2 evidence/citation queries
-			let caseContext: string | null = null;
-			const caseMatch = conversationId.match(CASE_ID_PATTERN);
-			if (caseMatch) {
-				const caseGlyphKey = `glyph:case:${caseMatch[1]}`;
-				caseContext = getFragment(caseGlyphKey);
-				if (caseContext) {
-					console.log(`[Glyph L0.5] Case context HIT (${caseContext.length} chars)`);
-				} else {
-					caseContext = await loadCaseContext(caseMatch[1]);
-					if (caseContext) {
-						setFragment(caseGlyphKey, caseContext, FragmentType.CASE, 10 * 60_000);
-					}
-				}
-			}
+      // ── L0.5 Intercept 1: Case Context ──────────────────────────
+      // Cache case context per caseId (10min TTL) — identical for every
+      // message in a conversation, saves 1 DB query + 2 evidence/citation queries
+      let caseContext: string | null = null;
+      const caseMatch = conversationId.match(CASE_ID_PATTERN);
+      if (caseMatch) {
+        const caseGlyphKey = `glyph:case:${caseMatch[1]}`;
+        caseContext = getFragment(caseGlyphKey);
+        if (caseContext) {
+          console.log(`[Glyph L0.5] Case context HIT (${caseContext.length} chars)`);
+        } else {
+          caseContext = await loadCaseContext(caseMatch[1]);
+          if (caseContext) {
+            setFragment(caseGlyphKey, caseContext, FragmentType.CASE, 10 * 60_000);
+          }
+        }
+      }
 
-			// Code-intent gate: only run codebase retrieval for code-related queries
-			const CODE_HINT = /(svelte|sveltekit|drizzle|ts-morph|playwright|hooks\.server|schema-postgres|route|endpoint|api\/|\.ts\b|\.svelte\b|stack trace|error|typescrip|build|vite|qdrant|rabbitmq|proto|grpc|function|handler|component|database|query|schema|migration|server)/i;
-			const wantsCode = CODE_HINT.test(message) || message.includes('in this repo') || message.includes('codebase');
+      // Code-intent gate: only run codebase retrieval for code-related queries
+      const CODE_HINT =
+        /(svelte|sveltekit|drizzle|ts-morph|playwright|hooks\.server|schema-postgres|route|endpoint|api\/|\.ts\b|\.svelte\b|stack trace|error|typescrip|build|vite|qdrant|rabbitmq|proto|grpc|function|handler|component|database|query|schema|migration|server)/i;
+      const wantsCode =
+        CODE_HINT.test(message) || message.includes('in this repo') || message.includes('codebase');
+      const hasInlineAttachmentSource = message.includes('[ATTACHMENT SOURCE START]');
 
-			// RAG + Codebase: retrieve context sources in parallel
-			const caseUuid = caseMatch ? caseMatch[1] : undefined;
+      // RAG + Codebase: retrieve context sources in parallel
+      const caseUuid = caseMatch ? caseMatch[1] : undefined;
 
-			// ── L0.5 Intercept 2: Codebase Context ──────────────────────
-			// Cache codebase retrieval by query hash (5min TTL)
-			let codebaseResult: { context: string; chunks: Array<{ relativePath: string; symbol: string; score: number }> } | null = null;
-			let codeGlyphHit = false;
-			if (wantsCode) {
-				const codeGlyphKey = `glyph:code:${createHash('md5').update(message).digest('hex').slice(0, 12)}`;
-				const cachedCodeCtx = getFragment(codeGlyphKey);
-				if (cachedCodeCtx) {
-					codebaseResult = { context: cachedCodeCtx, chunks: [] };
-					codeGlyphHit = true;
-					console.log(`[Glyph L0.5] Codebase context HIT (${cachedCodeCtx.length} chars)`);
-				}
-			}
+      // ── L0.5 Intercept 2: Codebase Context ──────────────────────
+      // Cache codebase retrieval by query hash (5min TTL)
+      let codebaseResult: {
+        context: string;
+        chunks: Array<{ relativePath: string; symbol: string; score: number }>;
+      } | null = null;
+      let codeGlyphHit = false;
+      if (wantsCode) {
+        const codeGlyphKey = `glyph:code:${createHash('md5').update(message).digest('hex').slice(0, 12)}`;
+        const cachedCodeCtx = getFragment(codeGlyphKey);
+        if (cachedCodeCtx) {
+          codebaseResult = { context: cachedCodeCtx, chunks: [] };
+          codeGlyphHit = true;
+          console.log(`[Glyph L0.5] Codebase context HIT (${cachedCodeCtx.length} chars)`);
+        }
+      }
 
-			const [contextDocs, freshCodebaseResult] = await Promise.all([
-				retrieveContext(message),
-				(wantsCode && !codeGlyphHit) ? loadCodebaseContext(message).catch(() => null) : Promise.resolve(null)
-			]);
+      const [rawContextDocs, freshCodebaseResult] = await Promise.all([
+        hasInlineAttachmentSource ? Promise.resolve([]) : retrieveContextWithBudget(message),
+        wantsCode && !codeGlyphHit
+          ? loadCodebaseContext(message).catch(() => null)
+          : Promise.resolve(null),
+      ]);
 
-			// If we got fresh codebase context, cache it in L0.5
-			if (freshCodebaseResult && !codeGlyphHit) {
-				codebaseResult = freshCodebaseResult;
-				const codeGlyphKey = `glyph:code:${createHash('md5').update(message).digest('hex').slice(0, 12)}`;
-				setFragment(codeGlyphKey, freshCodebaseResult.context, FragmentType.CODE, 5 * 60_000);
-			}
+      // If we got fresh codebase context, cache it in L0.5
+      if (freshCodebaseResult && !codeGlyphHit) {
+        codebaseResult = freshCodebaseResult;
+        const codeGlyphKey = `glyph:code:${createHash('md5').update(message).digest('hex').slice(0, 12)}`;
+        setFragment(codeGlyphKey, freshCodebaseResult.context, FragmentType.CODE, 5 * 60_000);
+      }
 
-			const contextUsed = contextDocs.map((d) => d.documentId);
+      // ── Corrective RAG: auto-reformulate query on low retrieval scores ──
+      const {
+        docs: correctedDocs,
+        reformulated,
+        newQuery,
+      } = await correctiveRetrieval(message, rawContextDocs);
 
-			// ── L0.5 Intercept 3: KAG Graph Context ─────────────────────
-			// Cache graph traversal by evidence ID set (10min TTL)
-			let graphContext: { context: string; neighbors: Array<{ nodeId: string; title: string }> } | null = null;
-			if (contextDocs.length > 0) {
-				const evidenceIds = contextDocs
-					.map(d => d.documentId.split(':').pop())
-					.filter((id): id is string => !!id);
+      // ── DAG ordering: reorder context by citation dependency ──
+      const contextDocs = dagOrderContext(correctedDocs);
 
-				const kagGlyphKey = `glyph:kag:${createHash('md5').update(evidenceIds.sort().join(',')).digest('hex').slice(0, 12)}`;
-				const cachedKag = getFragment(kagGlyphKey);
-				if (cachedKag) {
-					graphContext = { context: cachedKag, neighbors: [] };
-					console.log(`[Glyph L0.5] KAG graph context HIT (${cachedKag.length} chars)`);
-				} else {
-					graphContext = await getGraphContext(evidenceIds, caseUuid).catch(() => null);
-					if (graphContext) {
-						setFragment(kagGlyphKey, graphContext.context, FragmentType.KAG, 10 * 60_000);
-					}
-				}
-			}
+      const contextUsed = contextDocs.map((d) => d.documentId);
 
-			let systemPrompt =
-				'You are a legal AI assistant specialized in prosecutor and detective workflows. ' +
-				'Provide accurate, detailed, and actionable legal analysis. ' +
-				'Always cite relevant statutes and case law when possible.';
+      // ── L0.5 Intercept 3: KAG Graph Context ─────────────────────
+      // Cache graph traversal by evidence ID set (10min TTL)
+      let graphContext: {
+        context: string;
+        neighbors: Array<{ nodeId: string; title: string }>;
+      } | null = null;
+      if (contextDocs.length > 0) {
+        const evidenceIds = contextDocs
+          .map((d) => d.documentId.split(':').pop())
+          .filter((id): id is string => !!id);
 
-			// Inject current page context so assistant knows what the user is viewing
-			if (currentRoute) {
-				const pageLabel = describeRoute(currentRoute);
-				systemPrompt += `\n\n[PAGE CONTEXT — IMPORTANT] ` +
-					`The user is chatting from within the application. Their current page is: ${pageLabel} (route: ${currentRoute}). ` +
-					'You KNOW what page they are on because the application tells you. ' +
-					'When they ask "what page am I on" or reference "this page", "this screen", "what I see", ' +
-					`answer with: "${pageLabel}". Do NOT say you cannot see their screen — you have page context from the app.`;
-			}
+        const kagGlyphKey = `glyph:kag:${createHash('md5').update(evidenceIds.sort().join(',')).digest('hex').slice(0, 12)}`;
+        const cachedKag = getFragment(kagGlyphKey);
+        if (cachedKag) {
+          graphContext = { context: cachedKag, neighbors: [] };
+          console.log(`[Glyph L0.5] KAG graph context HIT (${cachedKag.length} chars)`);
+        } else {
+          graphContext = await getGraphContext(evidenceIds, caseUuid).catch(() => null);
+          if (graphContext) {
+            setFragment(kagGlyphKey, graphContext.context, FragmentType.KAG, 10 * 60_000);
+          }
+        }
+      }
 
-			// Inject case context (case details, evidence, citations)
-			if (caseContext) {
-				systemPrompt += `\n\n${caseContext}`;
-			}
+      let systemPrompt =
+        'You are a legal AI assistant specialized in prosecutor and detective workflows. ' +
+        'Provide accurate, detailed, and actionable legal analysis. ' +
+        'Always cite relevant statutes and case law when possible. ' +
+        'When retrieved source context is provided, answer from that context first, quote or summarize the strongest source directly, and do not claim that you lack access to the provided materials.';
 
-			// Inject RAG context (vector-similar documents, budget-capped)
-			if (contextDocs.length > 0) {
-				const contextText = contextDocs
-					.map(
-						(d, i) =>
-							`[Source ${i + 1} (relevance: ${d.similarity.toFixed(2)})] ${d.content}`
-					)
-					.join('\n\n');
-				systemPrompt += `\n\nRelevant evidence from the knowledge base:\n${contextText}\n\nUse this context to inform your response. Cite source numbers when referencing specific evidence.`;
-			}
+      if (message.includes('[ATTACHMENT SOURCE START]')) {
+        systemPrompt +=
+          '\n\n[ATTACHMENT HANDLING RULES] The user message already contains attachment source text inline between [ATTACHMENT SOURCE START] and [ATTACHMENT SOURCE END]. Treat that text as a provided source document. Do not ask the user to provide the attachment, the excerpt, or the file contents again.';
+      }
 
-			// Inject KAG graph neighbors (related evidence from knowledge graph)
-			if (graphContext) {
-				systemPrompt += `\n${graphContext.context}`;
-			}
+      // Inject current page context so assistant knows what the user is viewing
+      if (currentRoute) {
+        const pageLabel = describeRoute(currentRoute);
+        systemPrompt +=
+          `\n\n[PAGE CONTEXT — IMPORTANT] ` +
+          `The user is chatting from within the application. Their current page is: ${pageLabel} (route: ${currentRoute}). ` +
+          'You KNOW what page they are on because the application tells you. ' +
+          'When they ask "what page am I on" or reference "this page", "this screen", "what I see", ' +
+          `answer with: "${pageLabel}". Do NOT say you cannot see their screen — you have page context from the app.`;
+      }
 
-			// Inject codebase context (recall→rerank pipeline)
-			if (codebaseResult) {
-				systemPrompt += `\n\n${codebaseResult.context}`;
-			}
+      // Inject case context (case details, evidence, citations)
+      if (caseContext) {
+        systemPrompt += `\n\n${caseContext}`;
+      }
 
-			// Inject emotion context from client-side detection (text + face + behavioral)
-			if (emotionPrompt) {
-				systemPrompt += `\n${emotionPrompt}`;
-			}
+      // Inject RAG context (vector-similar documents, DAG-ordered, budget-capped)
+      if (contextDocs.length > 0) {
+        const contextText = contextDocs
+          .map((d, i) => `[Source ${i + 1} (relevance: ${d.similarity.toFixed(2)})] ${d.content}`)
+          .join('\n\n');
+        systemPrompt += `\n\n## Retrieved Evidence (${contextDocs.length} sources${reformulated ? ', query-corrected' : ''})\n${contextText}`;
+        systemPrompt +=
+          '\n\n## Source Citation Rules (MANDATORY)' +
+          '\n1. When answering factual questions, START with the highest-relevance source.' +
+          '\n2. QUOTE a short phrase from the strongest source (use "..." quotation marks) then summarize.' +
+          '\n3. Always cite sources as [Source N] — e.g. "According to [Source 1], ..."' +
+          '\n4. If sources conflict, present both sides with their source numbers.' +
+          '\n5. NEVER say "I don\'t have access to" or "I can\'t see" when source context IS provided above.' +
+          '\n6. If no source is relevant to the question, say so explicitly rather than fabricating.';
+      }
 
-			let fullResponse = '';
+      // Inject KAG graph neighbors (related evidence from knowledge graph)
+      if (graphContext) {
+        systemPrompt += `\n${graphContext.context}`;
+      }
 
-			// LLM Response Cache: Check if we have a cached response for this query + context
-			const cacheResult = await lookupCachedResponse({
-				query: message,
-				context: systemPrompt,
-				model: model ?? 'gemma3-legal:latest'
-			});
+      // Inject codebase context (recall→rerank pipeline)
+      if (codebaseResult) {
+        systemPrompt += `\n\n${codebaseResult.context}`;
+      }
 
-			if (cacheResult.hit && cacheResult.response) {
-				// Cache HIT — stream the cached response in chunks to simulate live streaming
-				console.log(`[SSE Chat] Cache HIT — similarity: ${cacheResult.similarity?.toFixed(3)}`);
-				fullResponse = cacheResult.response;
+      // Inject emotion context from client-side detection (text + face + behavioral)
+      if (emotionPrompt) {
+        systemPrompt += `\n${emotionPrompt}`;
+      }
 
-				// Simulate streaming by sending chunks (improves UX, user sees progressive output)
-				const chunkSize = 50; // characters per chunk
-				for (let i = 0; i < fullResponse.length; i += chunkSize) {
-					const chunk = fullResponse.slice(i, i + chunkSize);
-					send({
-						id,
-						role: 'assistant',
-						content: fullResponse.slice(0, i + chunkSize),
-						status: 'streaming'
-					});
-					// Small delay to simulate natural typing speed
-					await new Promise(resolve => setTimeout(resolve, 20));
-				}
+      let fullResponse = '';
 
-				// Build confidence factors (use cached values if available)
-				const topScore =
-					contextDocs.length > 0
-						? Math.max(...contextDocs.map((d) => d.similarity))
-						: null;
+      // LLM Response Cache: Check if we have a cached response for this query + context
+      const cacheResult = hasInlineAttachmentSource
+        ? { hit: false }
+        : await lookupCachedResponseWithBudget({
+            query: message,
+            context: systemPrompt,
+            model: model ?? 'gemma3-legal:latest',
+          });
 
-				const confidenceFactors: ConfidenceFactors = {
-					caseContext: caseContext !== null,
-					ragHits: contextDocs.length,
-					topScore,
-					embeddingModel: EMBEDDING_MODEL,
-					codebaseHits: codebaseResult?.chunks.length ?? 0,
-					kagNeighbors: graphContext?.neighbors.length ?? 0
-				};
+      if (cacheResult.hit && cacheResult.response) {
+        // Cache HIT — stream the cached response in chunks to simulate live streaming
+        console.log(`[SSE Chat] Cache HIT — similarity: ${cacheResult.similarity?.toFixed(3)}`);
+        fullResponse = cacheResult.response;
 
-				let confidence = cacheResult.confidence ?? 0.8; // Use cached confidence or default
+        // Simulate streaming by sending chunks (improves UX, user sees progressive output)
+        const chunkSize = 50; // characters per chunk
+        for (let i = 0; i < fullResponse.length; i += chunkSize) {
+          const chunk = fullResponse.slice(i, i + chunkSize);
+          send({
+            id,
+            role: 'assistant',
+            content: fullResponse.slice(0, i + chunkSize),
+            status: 'streaming',
+          });
+          // Small delay to simulate natural typing speed
+          await new Promise((resolve) => setTimeout(resolve, 20));
+        }
 
-				// Extract citations
-				const extractedCitations: Array<{ sourceNum: number; documentId: string; similarity: number }> = [];
-				const sourceRefs = fullResponse.match(/\[Source\s+(\d+)[^\]]*\]/g) ?? [];
-				for (const ref of sourceRefs) {
-					const match = ref.match(/\[Source\s+(\d+)/);
-					if (match) {
-						const sourceNum = parseInt(match[1]) - 1;
-						if (sourceNum >= 0 && sourceNum < contextDocs.length) {
-							const doc = contextDocs[sourceNum];
-							if (!extractedCitations.some(c => c.documentId === doc.documentId)) {
-								extractedCitations.push({
-									sourceNum: sourceNum + 1,
-									documentId: doc.documentId,
-									similarity: doc.similarity
-								});
-							}
-						}
-					}
-				}
+        // Build confidence factors (use cached values if available)
+        const topScore =
+          contextDocs.length > 0 ? Math.max(...contextDocs.map((d) => d.similarity)) : null;
 
-				// Persist assistant message
-				const assistantMetadata = JSON.stringify({
-					confidenceFactors,
-					contextUsed: {
-						case: caseContext !== null,
-						ragDocIds: contextUsed,
-						ragScores: contextDocs.map((d) => ({
-							id: d.documentId,
-							score: d.similarity
-						})),
-						codebaseChunks: codebaseResult?.chunks.map((c) => ({
-							path: c.relativePath,
-							symbol: c.symbol,
-							score: c.score
-						})) ?? [],
-						citations: extractedCitations
-					},
-					conversationTurns: conversationHistory.length,
-					model: model ?? 'gemma3-legal:latest',
-					cachedResponse: true,
-					cachedAt: cacheResult.cachedAt
-				});
+        const confidenceFactors: ConfidenceFactors = {
+          caseContext: caseContext !== null,
+          ragHits: contextDocs.length,
+          topScore,
+          embeddingModel: EMBEDDING_MODEL,
+          codebaseHits: codebaseResult?.chunks.length ?? 0,
+          kagNeighbors: graphContext?.neighbors.length ?? 0,
+        };
 
-				try {
-					await db.insert(chatMessages).values({
-						id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-						chatId: conversationId,
-						role: 'assistant',
-						content: fullResponse,
-						metadata: assistantMetadata
-					});
-				} catch (dbErr) {
-					console.warn('[SSE Chat] Failed to persist cached assistant message:', dbErr instanceof Error ? dbErr.message : dbErr);
-				}
+        let confidence = cacheResult.confidence ?? 0.8; // Use cached confidence or default
 
-				send({
-					id,
-					role: 'assistant',
-					content: fullResponse,
-					status: 'done',
-					confidence,
-					confidenceFactors,
-					contextUsed,
-					citations: extractedCitations,
-					conversationTurns: conversationHistory.length,
-					cachedResponse: true
-				});
+        // Extract citations
+        const extractedCitations: Array<{
+          sourceNum: number;
+          documentId: string;
+          similarity: number;
+        }> = [];
+        const sourceRefs = fullResponse.match(/\[Source\s+(\d+)[^\]]*\]/g) ?? [];
+        for (const ref of sourceRefs) {
+          const match = ref.match(/\[Source\s+(\d+)/);
+          if (match) {
+            const sourceNum = parseInt(match[1]) - 1;
+            if (sourceNum >= 0 && sourceNum < contextDocs.length) {
+              const doc = contextDocs[sourceNum];
+              if (!extractedCitations.some((c) => c.documentId === doc.documentId)) {
+                extractedCitations.push({
+                  sourceNum: sourceNum + 1,
+                  documentId: doc.documentId,
+                  similarity: doc.similarity,
+                });
+              }
+            }
+          }
+        }
 
-				controller.close();
-				return;
-			}
+        // Persist assistant message
+        const assistantMetadata = JSON.stringify({
+          confidenceFactors,
+          contextUsed: {
+            case: caseContext !== null,
+            ragDocIds: contextUsed,
+            ragScores: contextDocs.map((d) => ({
+              id: d.documentId,
+              score: d.similarity,
+            })),
+            codebaseChunks:
+              codebaseResult?.chunks.map((c) => ({
+                path: c.relativePath,
+                symbol: c.symbol,
+                score: c.score,
+              })) ?? [],
+            citations: extractedCitations,
+          },
+          conversationTurns: conversationHistory.length,
+          model: model ?? 'gemma3-legal:latest',
+          cachedResponse: true,
+          cachedAt: cacheResult.cachedAt,
+        });
 
-			// Cache MISS — proceed with Ollama API call
-			try {
-				// Build multi-turn messages array for Ollama /api/chat
-				// Prepend page context to the user message so the model sees it inline
-				let augmentedMessage = message;
-				if (currentRoute) {
-					const pageLabel = describeRoute(currentRoute);
-					augmentedMessage = `[I am currently viewing: ${pageLabel}]\n\n${message}`;
-				}
-				const ollamaMessages = [
-					{ role: 'system', content: systemPrompt },
-					...conversationHistory,
-					{ role: 'user', content: augmentedMessage }
-				];
+        try {
+          await db.insert(chatMessages).values({
+            id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+            chatId: conversationId,
+            role: 'assistant',
+            content: fullResponse,
+            metadata: assistantMetadata,
+          });
+        } catch (dbErr) {
+          console.warn(
+            '[SSE Chat] Failed to persist cached assistant message:',
+            dbErr instanceof Error ? dbErr.message : dbErr
+          );
+        }
 
-				// Stream from Ollama with RAG-enriched system prompt + conversation history
-				const ollamaRes = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						model: model ?? 'gemma3-legal:latest',
-						messages: ollamaMessages,
-						stream: true,
-						keep_alive: '24h'
-					})
-				});
+        send({
+          id,
+          role: 'assistant',
+          content: fullResponse,
+          status: 'done',
+          confidence,
+          confidenceFactors,
+          contextUsed,
+          citations: extractedCitations,
+          conversationTurns: conversationHistory.length,
+          cachedResponse: true,
+        });
 
-				if (!ollamaRes.ok || !ollamaRes.body) {
-					throw new Error(`Ollama error: ${ollamaRes.status}`);
-				}
+        controller.close();
+        return;
+      }
 
-				const reader = ollamaRes.body.getReader();
-				const decoder = new TextDecoder();
+      // Cache MISS — proceed with Ollama API call
+      try {
+        // Build multi-turn messages array for Ollama /api/chat
+        // Prepend page context to the user message so the model sees it inline
+        let augmentedMessage = message;
+        if (currentRoute) {
+          const pageLabel = describeRoute(currentRoute);
+          augmentedMessage = `[I am currently viewing: ${pageLabel}]\n\n${message}`;
+        }
+        const ollamaMessages = [
+          { role: 'system', content: systemPrompt },
+          ...conversationHistory,
+          { role: 'user', content: augmentedMessage },
+        ];
 
-				while (true) {
-					const { done, value } = await reader.read();
-					if (done) break;
+        // Stream from Ollama with RAG-enriched system prompt + conversation history
+        const ollamaRes = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: model ?? 'gemma3-legal:latest',
+            messages: ollamaMessages,
+            stream: true,
+            keep_alive: '24h',
+          }),
+        });
 
-					const text = decoder.decode(value, { stream: true });
-					for (const line of text.split('\n').filter(Boolean)) {
-						try {
-							const parsed = JSON.parse(line);
-							// Ollama /api/chat returns message.content; /api/generate returns response
-							const chunk = parsed.message?.content ?? parsed.response;
-							if (chunk) {
-								fullResponse += chunk;
-								send({
-									id,
-									role: 'assistant',
-									content: fullResponse,
-									status: 'streaming'
-								});
-							}
-						} catch {
-							// skip malformed JSON lines
-						}
-					}
-				}
+        if (!ollamaRes.ok || !ollamaRes.body) {
+          throw new Error(`Ollama error: ${ollamaRes.status}`);
+        }
 
-				// Build confidence factors (auditable)
-				const topScore =
-					contextDocs.length > 0
-						? Math.max(...contextDocs.map((d) => d.similarity))
-						: null;
+        const reader = ollamaRes.body.getReader();
+        const decoder = new TextDecoder();
 
-				const confidenceFactors: ConfidenceFactors = {
-					caseContext: caseContext !== null,
-					ragHits: contextDocs.length,
-					topScore,
-					embeddingModel: EMBEDDING_MODEL,
-					codebaseHits: codebaseResult?.chunks.length ?? 0,
-					kagNeighbors: graphContext?.neighbors.length ?? 0
-				};
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
 
-				// Confidence: base 0.4, +0.15 for case context, +0.05 per RAG hit, +0.15 for high-quality top hit
-				let confidence = 0.4;
-				if (caseContext) confidence += 0.15;
-				if (contextDocs.length > 0) {
-					confidence += Math.min(contextDocs.length * 0.05, 0.25);
-				}
-				if (topScore !== null && topScore > 0.6) {
-					confidence += 0.15;
-				}
-				if (codebaseResult && codebaseResult.chunks.length > 0) {
-					confidence += Math.min(codebaseResult.chunks.length * 0.03, 0.1);
-				}
-				if (graphContext && graphContext.neighbors.length > 0) {
-					confidence += Math.min(graphContext.neighbors.length * 0.02, 0.1);
-				}
-				confidence = Math.min(confidence, 0.95);
+          const text = decoder.decode(value, { stream: true });
+          for (const line of text.split('\n').filter(Boolean)) {
+            try {
+              const parsed = JSON.parse(line);
+              // Ollama /api/chat returns message.content; /api/generate returns response
+              const chunk = parsed.message?.content ?? parsed.response;
+              if (chunk) {
+                fullResponse += chunk;
+                send({
+                  id,
+                  role: 'assistant',
+                  content: fullResponse,
+                  status: 'streaming',
+                });
+              }
+            } catch {
+              // skip malformed JSON lines
+            }
+          }
+        }
 
-				// Extract [Source N] citations from the LLM response
-				const extractedCitations: Array<{ sourceNum: number; documentId: string; similarity: number }> = [];
-				const sourceRefs = fullResponse.match(/\[Source\s+(\d+)[^\]]*\]/g) ?? [];
-				for (const ref of sourceRefs) {
-					const match = ref.match(/\[Source\s+(\d+)/);
-					if (match) {
-						const sourceNum = parseInt(match[1]) - 1;
-						if (sourceNum >= 0 && sourceNum < contextDocs.length) {
-							const doc = contextDocs[sourceNum];
-							if (!extractedCitations.some(c => c.documentId === doc.documentId)) {
-								extractedCitations.push({
-									sourceNum: sourceNum + 1,
-									documentId: doc.documentId,
-									similarity: doc.similarity
-								});
-							}
-						}
-					}
-				}
+        // Build confidence factors (auditable)
+        const topScore =
+          contextDocs.length > 0 ? Math.max(...contextDocs.map((d) => d.similarity)) : null;
 
-				// Persist assistant message with context metadata
-				const assistantMetadata = JSON.stringify({
-					confidenceFactors,
-					contextUsed: {
-						case: caseContext !== null,
-						ragDocIds: contextUsed,
-						ragScores: contextDocs.map((d) => ({
-							id: d.documentId,
-							score: d.similarity
-						})),
-						codebaseChunks: codebaseResult?.chunks.map((c) => ({
-							path: c.relativePath,
-							symbol: c.symbol,
-							score: c.score
-						})) ?? [],
-						citations: extractedCitations
-					},
-					conversationTurns: conversationHistory.length,
-					model: model ?? 'gemma3-legal:latest'
-				});
+        const confidenceFactors: ConfidenceFactors = {
+          caseContext: caseContext !== null,
+          ragHits: contextDocs.length,
+          topScore,
+          embeddingModel: EMBEDDING_MODEL,
+          codebaseHits: codebaseResult?.chunks.length ?? 0,
+          kagNeighbors: graphContext?.neighbors.length ?? 0,
+        };
 
-				try {
-					await db.insert(chatMessages).values({
-						id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-						chatId: conversationId,
-						role: 'assistant',
-						content: fullResponse,
-						metadata: assistantMetadata
-					});
-				} catch (dbErr) {
-					console.warn('[SSE Chat] Failed to persist assistant message:', dbErr instanceof Error ? dbErr.message : dbErr);
-				}
+        // Confidence: base 0.4, +0.15 for case context, +0.05 per RAG hit, +0.15 for high-quality top hit
+        let confidence = 0.4;
+        if (caseContext) confidence += 0.15;
+        if (contextDocs.length > 0) {
+          confidence += Math.min(contextDocs.length * 0.05, 0.25);
+        }
+        if (topScore !== null && topScore > 0.6) {
+          confidence += 0.15;
+        }
+        if (codebaseResult && codebaseResult.chunks.length > 0) {
+          confidence += Math.min(codebaseResult.chunks.length * 0.03, 0.1);
+        }
+        if (graphContext && graphContext.neighbors.length > 0) {
+          confidence += Math.min(graphContext.neighbors.length * 0.02, 0.1);
+        }
+        confidence = Math.min(confidence, 0.95);
 
-				// Publish assistant response to chat.context queue (non-blocking)
-				import('$lib/server/queue/rabbitmq-manager-fixed.js').then(({ rabbitmq }) => {
-					rabbitmq.publishChatContext({
-						sessionId: conversationId,
-						message: fullResponse.slice(0, 5000),
-						role: 'assistant',
-						metadata: { model: model ?? 'gemma3-legal:latest', confidence }
-					});
-				}).catch(() => {});
+        // Extract [Source N] citations from the LLM response
+        const extractedCitations: Array<{
+          sourceNum: number;
+          documentId: string;
+          similarity: number;
+        }> = [];
+        const sourceRefs = fullResponse.match(/\[Source\s+(\d+)[^\]]*\]/g) ?? [];
+        for (const ref of sourceRefs) {
+          const match = ref.match(/\[Source\s+(\d+)/);
+          if (match) {
+            const sourceNum = parseInt(match[1]) - 1;
+            if (sourceNum >= 0 && sourceNum < contextDocs.length) {
+              const doc = contextDocs[sourceNum];
+              if (!extractedCitations.some((c) => c.documentId === doc.documentId)) {
+                extractedCitations.push({
+                  sourceNum: sourceNum + 1,
+                  documentId: doc.documentId,
+                  similarity: doc.similarity,
+                });
+              }
+            }
+          }
+        }
 
-				// Store response in LLM cache for future lookups (non-blocking)
-				try {
-					const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: message, keep_alive: '24h' }),
-						signal: AbortSignal.timeout(8000)
-					}).catch(() => null);
+        // ── ACE Self-Evaluation: assess response quality, retry once if low ──
+        // Wrap in a 15s wallclock timeout to prevent GPU queue stalls
+        let aceEvaluation: {
+          quality: number;
+          completeness: number;
+          accuracy: number;
+          suggestions: string[];
+          shouldRetry: boolean;
+          evalMs: number;
+        } | null = null;
+        if (ACE_SELF_EVAL_ENABLED && fullResponse.length > 50) {
+          try {
+            send({ id, role: 'assistant', content: fullResponse, status: 'evaluating' });
 
-					if (embedRes?.ok) {
-						const embedData = await embedRes.json();
-						if (Array.isArray(embedData.embedding)) {
-							storeCachedResponse({
-								query: message,
-								queryEmbedding: embedData.embedding,
-								context: systemPrompt,
-								response: fullResponse,
-								model: model ?? 'gemma3-legal:latest',
-								confidence
-							}).catch(err => console.warn('[SSE Chat] Cache storage failed:', err));
-						}
-					}
-				} catch (cacheErr) {
-					console.warn('[SSE Chat] Response caching failed:', cacheErr instanceof Error ? cacheErr.message : cacheErr);
-				}
+            const evalTimeout = new Promise<null>((resolve) =>
+              setTimeout(() => resolve(null), 15000)
+            );
+            aceEvaluation = await Promise.race([
+              evaluateResponse({
+                query: message,
+                response: fullResponse,
+                context: {
+                  userProfile: null,
+                  caseContext,
+                  ragChunks: contextDocs.map((d) => ({
+                    content: d.content,
+                    score: d.similarity,
+                    source: d.documentId,
+                  })),
+                  kagNeighbors:
+                    graphContext?.neighbors.map((n) => ({
+                      nodeId: n.nodeId,
+                      title: n.title,
+                      relationship: 'related',
+                    })) ?? [],
+                  chatHistory: conversationHistory.map((h) => ({
+                    role: h.role as 'user' | 'assistant' | 'system',
+                    content: h.content,
+                  })),
+                  entities: { statutes: [], cases: [], persons: [], organizations: [], dates: [] },
+                  practiceTemplate: null,
+                  queryTags: [],
+                  webSearchContext: null,
+                  persona: 'formal',
+                  evidenceMetadata: null,
+                  evidenceConnections: null,
+                },
+                backend: 'ollama',
+              }),
+              evalTimeout,
+            ]);
 
-				send({
-					id,
-					role: 'assistant',
-					content: fullResponse,
-					status: 'done',
-					confidence,
-					confidenceFactors,
-					contextUsed,
-					citations: extractedCitations,
-					conversationTurns: conversationHistory.length
-				});
-			} catch (error) {
-				const errMsg = error instanceof Error ? error.message : String(error);
-				console.error('[SSE Chat] Generation error:', errMsg, error instanceof Error ? error.stack : '');
-				send({
-					id,
-					role: 'assistant',
-					content: fullResponse || `Sorry, I encountered an error: ${errMsg.slice(0, 100)}`,
-					status: 'error'
-				});
-			}
+            if (!aceEvaluation) {
+              console.warn('[ACE Self-Eval] Timed out after 15s — skipping');
+            } else {
+              console.log(
+                `[ACE Self-Eval] quality=${aceEvaluation.quality.toFixed(2)} completeness=${aceEvaluation.completeness.toFixed(2)} accuracy=${aceEvaluation.accuracy.toFixed(2)} evalMs=${aceEvaluation.evalMs}ms`
+              );
+            }
 
-			shared.cleanup();
-			controller.close();
-		},
+            // If quality is low, generate correction prompt and retry once
+            if (aceEvaluation?.shouldRetry && aceEvaluation.quality < 0.6) {
+              const correctionPrompt = generateCorrectionPrompt(
+                aceEvaluation,
+                message,
+                fullResponse
+              );
+              if (correctionPrompt) {
+                console.log(
+                  `[ACE Self-Eval] Retrying with correction (quality was ${aceEvaluation.quality.toFixed(2)})`
+                );
+                send({ id, role: 'assistant', content: fullResponse, status: 'improving' });
 
-		cancel() {
-			shared.cleanup();
-		}
-	});
+                const retryRes = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    model: model ?? 'gemma3-legal:latest',
+                    messages: [
+                      { role: 'system', content: systemPrompt },
+                      ...conversationHistory,
+                      { role: 'user', content: augmentedMessage },
+                      { role: 'assistant', content: fullResponse },
+                      { role: 'user', content: correctionPrompt },
+                    ],
+                    stream: true,
+                    keep_alive: '24h',
+                  }),
+                });
 
-	return new Response(stream, {
-		headers: {
-			'Content-Type': 'text/event-stream',
-			'Cache-Control': 'no-cache',
-			'Connection': 'keep-alive',
-			'X-Accel-Buffering': 'no'
-		}
-	});
+                if (retryRes.ok && retryRes.body) {
+                  let improvedResponse = '';
+                  const retryReader = retryRes.body.getReader();
+                  const retryDecoder = new TextDecoder();
+                  while (true) {
+                    const { done: retryDone, value: retryValue } = await retryReader.read();
+                    if (retryDone) break;
+                    const retryText = retryDecoder.decode(retryValue, { stream: true });
+                    for (const retryLine of retryText.split('\n').filter(Boolean)) {
+                      try {
+                        const retryParsed = JSON.parse(retryLine);
+                        const retryChunk = retryParsed.message?.content ?? retryParsed.response;
+                        if (retryChunk) {
+                          improvedResponse += retryChunk;
+                          send({
+                            id,
+                            role: 'assistant',
+                            content: improvedResponse,
+                            status: 'streaming',
+                          });
+                        }
+                      } catch {
+                        /* skip malformed */
+                      }
+                    }
+                  }
+                  if (improvedResponse.length > 50) {
+                    fullResponse = improvedResponse;
+                    console.log(
+                      `[ACE Self-Eval] Improved response accepted (${improvedResponse.length} chars)`
+                    );
+                  }
+                }
+              }
+            }
+
+            // Adjust confidence based on ACE evaluation
+            if (aceEvaluation && aceEvaluation.quality > 0.8)
+              confidence = Math.min(confidence + 0.1, 0.95);
+            else if (aceEvaluation && aceEvaluation.quality < 0.5)
+              confidence = Math.max(confidence - 0.1, 0.2);
+          } catch (aceErr) {
+            console.warn(
+              '[ACE Self-Eval] Evaluation failed:',
+              aceErr instanceof Error ? aceErr.message : aceErr
+            );
+          }
+        }
+
+        // Persist assistant message with context metadata
+        const assistantMetadata = JSON.stringify({
+          confidenceFactors,
+          contextUsed: {
+            case: caseContext !== null,
+            ragDocIds: contextUsed,
+            ragScores: contextDocs.map((d) => ({
+              id: d.documentId,
+              score: d.similarity,
+            })),
+            codebaseChunks:
+              codebaseResult?.chunks.map((c) => ({
+                path: c.relativePath,
+                symbol: c.symbol,
+                score: c.score,
+              })) ?? [],
+            citations: extractedCitations,
+          },
+          conversationTurns: conversationHistory.length,
+          model: model ?? 'gemma3-legal:latest',
+          ...(aceEvaluation
+            ? {
+                aceEvaluation: {
+                  quality: aceEvaluation.quality,
+                  completeness: aceEvaluation.completeness,
+                  accuracy: aceEvaluation.accuracy,
+                  evalMs: aceEvaluation.evalMs,
+                },
+              }
+            : {}),
+          ...(reformulated ? { correctiveRag: { reformulated: true, newQuery } } : {}),
+        });
+
+        try {
+          await db.insert(chatMessages).values({
+            id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+            chatId: conversationId,
+            role: 'assistant',
+            content: fullResponse,
+            metadata: assistantMetadata,
+          });
+        } catch (dbErr) {
+          console.warn(
+            '[SSE Chat] Failed to persist assistant message:',
+            dbErr instanceof Error ? dbErr.message : dbErr
+          );
+        }
+
+        // Publish assistant response to chat.context queue (non-blocking)
+        import('$lib/server/queue/rabbitmq-manager-fixed.js')
+          .then(({ rabbitmq }) => {
+            rabbitmq.publishChatContext({
+              sessionId: conversationId,
+              message: fullResponse.slice(0, 5000),
+              role: 'assistant',
+              metadata: { model: model ?? 'gemma3-legal:latest', confidence },
+            });
+          })
+          .catch(() => {});
+
+        // Store response in LLM cache for future lookups (non-blocking)
+        try {
+          const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: message, keep_alive: '24h' }),
+            signal: AbortSignal.timeout(8000),
+          }).catch(() => null);
+
+          if (embedRes?.ok) {
+            const embedData = await embedRes.json();
+            if (Array.isArray(embedData.embedding)) {
+              storeCachedResponse({
+                query: message,
+                queryEmbedding: embedData.embedding,
+                context: systemPrompt,
+                response: fullResponse,
+                model: model ?? 'gemma3-legal:latest',
+                confidence,
+              }).catch((err) => console.warn('[SSE Chat] Cache storage failed:', err));
+            }
+          }
+        } catch (cacheErr) {
+          console.warn(
+            '[SSE Chat] Response caching failed:',
+            cacheErr instanceof Error ? cacheErr.message : cacheErr
+          );
+        }
+
+        send({
+          id,
+          role: 'assistant',
+          content: fullResponse,
+          status: 'done',
+          confidence,
+          confidenceFactors,
+          contextUsed,
+          citations: extractedCitations,
+          conversationTurns: conversationHistory.length,
+          ...(aceEvaluation
+            ? {
+                aceEval: {
+                  quality: aceEvaluation.quality,
+                  completeness: aceEvaluation.completeness,
+                  accuracy: aceEvaluation.accuracy,
+                },
+              }
+            : {}),
+          ...(reformulated ? { correctiveRag: { reformulated: true, newQuery } } : {}),
+        });
+      } catch (error) {
+        const errMsg = error instanceof Error ? error.message : String(error);
+        console.error(
+          '[SSE Chat] Generation error:',
+          errMsg,
+          error instanceof Error ? error.stack : ''
+        );
+        send({
+          id,
+          role: 'assistant',
+          content: fullResponse || `Sorry, I encountered an error: ${errMsg.slice(0, 100)}`,
+          status: 'error',
+        });
+      }
+
+      shared.cleanup();
+      controller.close();
+    },
+
+    cancel() {
+      shared.cleanup();
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      Connection: 'keep-alive',
+      'X-Accel-Buffering': 'no',
+    },
+  });
 };

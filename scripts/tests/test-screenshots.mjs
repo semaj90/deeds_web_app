@@ -102,13 +102,48 @@ const args = process.argv.slice(2);
 const port = args.includes('--port') ? args[args.indexOf('--port') + 1] : '5173';
 const baseUrlArg = args.includes('--base-url') ? args[args.indexOf('--base-url') + 1] : null;
 const envBaseUrl = process.env.PLAYWRIGHT_BASE_URL || process.env.BASE_URL || null;
-const BASE = (baseUrlArg || envBaseUrl || `http://localhost:${port}`).replace(/\/$/, '');
+const defaultBaseUrl = `http://127.0.0.1:${port}`;
+const BASE = (baseUrlArg || envBaseUrl || defaultBaseUrl).replace(/\/$/, '');
 const useAll = args.includes('--all');
 const singleRoute = args.includes('--route') ? args[args.indexOf('--route') + 1] : null;
 const generateHtml = args.includes('--html') || useAll;
 const concurrency = args.includes('--concurrency')
   ? parseInt(args[args.indexOf('--concurrency') + 1], 10)
-  : (useAll ? 3 : 1);
+  : useAll
+    ? 3
+    : 1;
+
+async function waitForServerReady(baseUrl, timeoutMs = 60_000) {
+  const startedAt = Date.now();
+  let lastError = 'unknown';
+
+  while (Date.now() - startedAt < timeoutMs) {
+    try {
+      const response = await fetch(baseUrl, {
+        method: 'GET',
+        headers: { Accept: 'text/html' },
+      });
+
+      if (response.ok || response.status < 500) {
+        return;
+      }
+
+      lastError = `HTTP ${response.status}`;
+    } catch (error) {
+      lastError = error instanceof Error ? error.message : String(error);
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+  }
+
+  throw new Error(`Dev server not ready at ${baseUrl} within ${timeoutMs}ms (${lastError})`);
+}
+
+async function settlePage(page, routeName, waitMode = 'domcontentloaded') {
+  if (waitMode === 'domcontentloaded') await page.waitForTimeout(2000);
+  if (CSR_PAGES.has(routeName)) await page.waitForTimeout(3000);
+  if (CANVAS_PAGES.has(routeName)) await page.waitForTimeout(2000);
+}
 
 let routes;
 if (singleRoute) {
@@ -126,6 +161,9 @@ const outDir = path.join(SCREENSHOTS_DIR, timestamp);
 await fs.mkdir(outDir, { recursive: true });
 
 const startTime = Date.now();
+console.log(`  Base URL: ${BASE}`);
+console.log('  Waiting for dev server...');
+await waitForServerReady(BASE);
 console.log(`\n  Screenshot Test — ${new Date().toLocaleString()}`);
 console.log(`  Routes: ${routes.length} | Concurrency: ${concurrency} | Output: ${outDir}\n`);
 
@@ -169,7 +207,7 @@ async function testRoute(route, ctx) {
     result.failedRequests.push({
       url: reqUrl.slice(0, 150),
       method: req.method(),
-      failure: req.failure()?.errorText || 'unknown'
+      failure: req.failure()?.errorText || 'unknown',
     });
   });
 
@@ -186,50 +224,80 @@ async function testRoute(route, ctx) {
   try {
     const isSSE = route.sse || SSE_PAGES.has(route.name);
     const waitUntil = isSSE ? 'domcontentloaded' : 'networkidle';
-    const pageTimeout = isSSE ? 35000 : 15000;
+    const pageTimeout = isSSE ? 35000 : CSR_PAGES.has(route.name) ? 20000 : 15000;
     const response = await tab.goto(url, { waitUntil, timeout: pageTimeout });
 
-    if (waitUntil === 'domcontentloaded') await tab.waitForTimeout(2000);
-    if (CSR_PAGES.has(route.name)) await tab.waitForTimeout(3000);
-    if (CANVAS_PAGES.has(route.name)) await tab.waitForTimeout(2000);
+    await settlePage(tab, route.name, waitUntil);
 
     result.loadTimeMs = Date.now() - loadStart;
     result.status = response?.status() ?? 0;
     result.ok = result.status >= 200 && result.status < 400;
     result.resourceCount = resourceCount;
     result.resourceSizeKB = Math.round(resourceSize / 1024);
-    result.domElements = await tab.evaluate(() => document.querySelectorAll('*').length).catch(() => 0);
+    result.domElements = await tab
+      .evaluate(() => document.querySelectorAll('*').length)
+      .catch(() => 0);
 
-    let errorPageCount = await tab.locator('.error-page').count().catch(() => 0);
-    let viteErrorCount = await tab.locator('vite-error-overlay').count().catch(() => 0);
-    let has504Text = await tab.evaluate(() =>
-      document.body?.innerText?.includes('504') || document.body?.innerText?.includes('Outdated Optimize Dep')
-    ).catch(() => false);
+    let errorPageCount = await tab
+      .locator('.error-page')
+      .count()
+      .catch(() => 0);
+    let viteErrorCount = await tab
+      .locator('vite-error-overlay')
+      .count()
+      .catch(() => 0);
+    let has504Text = await tab
+      .evaluate(
+        () =>
+          document.body?.innerText?.includes('504') ||
+          document.body?.innerText?.includes('Outdated Optimize Dep')
+      )
+      .catch(() => false);
 
     const MAX_RETRIES = 3;
-    for (let retry = 0; retry < MAX_RETRIES && (errorPageCount > 0 || viteErrorCount > 0 || has504Text); retry++) {
+    for (
+      let retry = 0;
+      retry < MAX_RETRIES && (errorPageCount > 0 || viteErrorCount > 0 || has504Text);
+      retry++
+    ) {
       const backoff = 2000 + retry * 1500;
-      await new Promise(r => setTimeout(r, backoff));
+      await new Promise((r) => setTimeout(r, backoff));
       const retryWait = isSSE ? 'domcontentloaded' : 'networkidle';
       try {
         const retryRes = await tab.goto(url, { waitUntil: retryWait, timeout: 20000 });
-        if (retryWait === 'domcontentloaded') await tab.waitForTimeout(2000);
-        if (CSR_PAGES.has(route.name)) await tab.waitForTimeout(3000);
-        if (CANVAS_PAGES.has(route.name)) await tab.waitForTimeout(2000);
+        await settlePage(tab, route.name, retryWait);
         result.status = retryRes?.status() ?? result.status;
         result.ok = result.status >= 200 && result.status < 400;
-        result.domElements = await tab.evaluate(() => document.querySelectorAll('*').length).catch(() => 0);
-        errorPageCount = await tab.locator('.error-page').count().catch(() => 0);
-        viteErrorCount = await tab.locator('vite-error-overlay').count().catch(() => 0);
-        has504Text = await tab.evaluate(() =>
-          document.body?.innerText?.includes('504') || document.body?.innerText?.includes('Outdated Optimize Dep')
-        ).catch(() => false);
-      } catch { /* keep original error detection */ }
+        result.domElements = await tab
+          .evaluate(() => document.querySelectorAll('*').length)
+          .catch(() => 0);
+        errorPageCount = await tab
+          .locator('.error-page')
+          .count()
+          .catch(() => 0);
+        viteErrorCount = await tab
+          .locator('vite-error-overlay')
+          .count()
+          .catch(() => 0);
+        has504Text = await tab
+          .evaluate(
+            () =>
+              document.body?.innerText?.includes('504') ||
+              document.body?.innerText?.includes('Outdated Optimize Dep')
+          )
+          .catch(() => false);
+      } catch {
+        /* keep original error detection */
+      }
     }
 
     if (errorPageCount > 0 || viteErrorCount > 0 || has504Text) {
       result.ok = false;
-      result.error = has504Text ? 'Vite 504 Outdated Optimize Dep' : errorPageCount > 0 ? 'SvelteKit error page rendered' : 'Vite error overlay detected';
+      result.error = has504Text
+        ? 'Vite 504 Outdated Optimize Dep'
+        : errorPageCount > 0
+          ? 'SvelteKit error page rendered'
+          : 'Vite error overlay detected';
     }
 
     const filename = `${route.name}.png`;
@@ -238,16 +306,22 @@ async function testRoute(route, ctx) {
     result.file = filepath;
   } catch (err) {
     const errMsg = err.message.split('\n')[0];
-    if (errMsg.includes('ERR_CONNECTION_REFUSED') || errMsg.includes('ERR_CONNECTION_RESET')) {
-      await new Promise(r => setTimeout(r, 3000));
+    if (
+      errMsg.includes('ERR_CONNECTION_REFUSED') ||
+      errMsg.includes('ERR_CONNECTION_RESET') ||
+      errMsg.includes('Timeout')
+    ) {
+      await new Promise((r) => setTimeout(r, 3000));
       try {
-        const response2 = await tab.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
-        await tab.waitForTimeout(2000);
+        const response2 = await tab.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        await settlePage(tab, route.name, 'domcontentloaded');
         result.loadTimeMs = Date.now() - loadStart;
         result.status = response2?.status() ?? 0;
         result.ok = result.status >= 200 && result.status < 400;
         result.resourceCount = resourceCount;
-        result.domElements = await tab.evaluate(() => document.querySelectorAll('*').length).catch(() => 0);
+        result.domElements = await tab
+          .evaluate(() => document.querySelectorAll('*').length)
+          .catch(() => 0);
         const filepath = path.join(outDir, `${route.name}.png`);
         await tab.screenshot({ path: filepath, fullPage: true });
         result.file = filepath;
@@ -259,7 +333,9 @@ async function testRoute(route, ctx) {
           const filepath = path.join(outDir, `${route.name}-ERROR.png`);
           await tab.screenshot({ path: filepath, fullPage: true });
           result.file = filepath;
-        } catch { /* ignore */ }
+        } catch {
+          /* ignore */
+        }
       }
     } else {
       result.loadTimeMs = Date.now() - loadStart;
@@ -268,7 +344,9 @@ async function testRoute(route, ctx) {
         const filepath = path.join(outDir, `${route.name}-ERROR.png`);
         await tab.screenshot({ path: filepath, fullPage: true });
         result.file = filepath;
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     }
   }
 

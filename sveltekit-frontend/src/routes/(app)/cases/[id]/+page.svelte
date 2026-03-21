@@ -263,8 +263,10 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
    }
  ]);
 
+ const isValidUUID = $derived(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(caseId));
+
  $effect(() => {
-  if (!caseId || initializedCaseId === caseId) return;
+  if (!caseId || !isValidUUID || initializedCaseId === caseId) return;
 
   initializedCaseId = caseId;
   void (async () => {
@@ -275,7 +277,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
  });
 
  $effect(() => {
-    if (activeTab === 'canvas' && !hasLoadedCanvas) {
+    if (activeTab === 'canvas' && !hasLoadedCanvas && isValidUUID) {
       void loadCanvasState();
     }
  });

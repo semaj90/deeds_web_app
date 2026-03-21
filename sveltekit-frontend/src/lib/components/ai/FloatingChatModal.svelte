@@ -2,10 +2,18 @@
 	import { Dialog } from 'bits-ui';
 
 	interface Message {
-		role: 'user' | 'assistant';
+		role: 'user' | 'assistant' | 'system';
 		content: string;
 		status?: 'streaming' | 'done' | 'error';
 		confidence?: number;
+	}
+
+	interface AttachmentIngestResult {
+		title?: string;
+		filename?: string;
+		extractionMethod?: string;
+		contentPreview?: string;
+		yoloLabels?: string[];
 	}
 
 	interface Props {
@@ -18,10 +26,18 @@
 
 	let messages = $state<Message[]>([]);
 	let inputText = $state('');
+	let pendingAttachment = $state<File | null>(null);
 	let isStreaming = $state(false);
 	let messagesEnd = $state<HTMLElement | null>(null);
 	// Stable conversation ID for the session this modal is open
 	let conversationId = $state(`conv_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`);
+
+	function normalizeAttachmentPreview(value: string | undefined, maxLength = 320): string {
+		if (!value) return '';
+		const normalized = value.replace(/[\u0000-\u001F\u007F]+/g, ' ').replace(/\s+/g, ' ').trim();
+		if (normalized.length <= maxLength) return normalized;
+		return normalized.slice(0, maxLength) + '...';
+	}
 
 	$effect(() => {
 		// Reset conversation when modal is re-opened fresh
@@ -37,21 +53,75 @@
 		}
 	});
 
+	async function ingestAttachment(file: File): Promise<AttachmentIngestResult> {
+		const formData = new FormData();
+		formData.set('file', file, file.name);
+		if (caseId) {
+			formData.set('caseId', caseId);
+		}
+
+		const response = await fetch('/api/ace/ingest', {
+			method: 'POST',
+			body: formData
+		});
+
+		const payload = await response.json().catch(() => ({}));
+		if (!response.ok) {
+			throw new Error(payload.error || `Attachment ingest failed: HTTP ${response.status}`);
+		}
+
+		return payload as AttachmentIngestResult;
+	}
+
 	async function sendMessage() {
-		const text = inputText.trim();
-		if (!text || isStreaming) return;
+		const text = inputText.trim() || (pendingAttachment
+			? `Please analyze the attached document "${pendingAttachment.name}".`
+			: '');
+		if ((!text && !pendingAttachment) || isStreaming) return;
+
+		const attachment = pendingAttachment;
 		inputText = '';
+		pendingAttachment = null;
 
 		messages.push({ role: 'user', content: text, status: 'done' });
 		messages.push({ role: 'assistant', content: '', status: 'streaming' });
 		isStreaming = true;
 
 		try {
+			let routedText = text;
+			if (attachment) {
+				messages.splice(messages.length - 1, 0, {
+					role: 'system',
+					content: `Indexing attachment: ${attachment.name}`,
+					status: 'done'
+				});
+
+				const attachmentResult = await ingestAttachment(attachment);
+				const title = attachmentResult.title || attachmentResult.filename || attachment.name;
+				const details = [`Attachment ready: ${title}`];
+				if (attachmentResult.extractionMethod) {
+					details.push(`via ${attachmentResult.extractionMethod}`);
+				}
+				if (attachmentResult.yoloLabels?.length) {
+					details.push(`YOLO: ${attachmentResult.yoloLabels.join(', ')}`);
+				}
+				messages.splice(messages.length - 1, 0, {
+					role: 'system',
+					content: details.join(' · '),
+					status: 'done'
+				});
+				const normalizedPreview = normalizeAttachmentPreview(attachmentResult.contentPreview);
+				const previewBlock = normalizedPreview
+					? `\n\nATTACHMENT SOURCE TEXT PROVIDED BELOW. Do not ask the user to provide it again.\n[ATTACHMENT SOURCE START]\n${normalizedPreview}\n[ATTACHMENT SOURCE END]`
+					: '';
+				routedText = `${text}\n\nFresh attachment uploaded just now: "${title}".${previewBlock}\n\nUse the attachment source text above and any retrieved ACE context from this attachment as the primary basis for your answer. Quote or cite the attached source when answering. If the attachment source text is present above, do not ask the user to provide it again.`;
+			}
+
 			const res = await fetch('/api/sse/chat', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					message: text,
+					message: routedText,
 					conversationId,
 					...(caseId ? { caseId } : {}),
 					...(currentRoute ? { currentRoute } : {})
@@ -113,6 +183,11 @@
 			e.preventDefault();
 			sendMessage();
 		}
+	}
+
+	function handleAttachmentChange(event: Event) {
+		const target = event.currentTarget as HTMLInputElement;
+		pendingAttachment = target.files?.[0] ?? null;
 	}
 
 	function clear() {
@@ -184,6 +259,8 @@
 								class="max-w-[85%] px-3 py-2 rounded-lg text-xs font-mono leading-relaxed whitespace-pre-wrap
 									{msg.role === 'user'
 										? 'bg-warning/15 text-warning/90 border border-warning/20'
+										: msg.role === 'system'
+											? 'bg-accent/10 text-accent border border-accent/20'
 										: msg.status === 'error'
 											? 'bg-danger/10 text-danger/80 border border-danger/20'
 											: 'bg-panelSoft text-sand/85 border border-sand/10'}"
@@ -211,6 +288,16 @@
 
 			<!-- Input -->
 			<div class="flex-shrink-0 border-t border-sand/10 p-3">
+				<div class="mb-2 flex items-center gap-2">
+					<label class="inline-flex items-center justify-center rounded-lg border border-sand/15 bg-panelSoft px-2 py-1 text-[11px] font-mono text-sand/65 hover:border-warning/40 hover:text-warning cursor-pointer transition-colors">
+						<span class="i-lucide-paperclip mr-1 w-3.5 h-3.5 inline-block"></span>
+						Attach
+						<input type="file" class="hidden" onchange={handleAttachmentChange} />
+					</label>
+					{#if pendingAttachment}
+						<span class="text-[10px] font-mono text-sand/45">{pendingAttachment.name}</span>
+					{/if}
+				</div>
 				<div class="flex gap-2 items-end">
 					<textarea
 						bind:value={inputText}
@@ -223,7 +310,7 @@
 					<button
 						type="button"
 						onclick={sendMessage}
-						disabled={isStreaming || !inputText.trim()}
+						disabled={isStreaming || (!inputText.trim() && !pendingAttachment)}
 						class="flex-shrink-0 p-2.5 rounded-lg bg-warning/20 border border-warning/30 text-warning hover:bg-warning/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
 						title="Send (Enter)"
 					>

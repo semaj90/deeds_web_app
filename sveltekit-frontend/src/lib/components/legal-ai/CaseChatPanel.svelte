@@ -64,6 +64,7 @@
 	});
 
 	let inputValue = $state('');
+	let pendingAttachment = $state<File | null>(null);
 	let messagesContainer: HTMLElement;
 
 	let isLoading = $derived(
@@ -86,13 +87,25 @@
 	});
 
 	async function sendMessage() {
-		if (!inputValue.trim() || isLoading) return;
+		if ((!inputValue.trim() && !pendingAttachment) || isLoading) return;
 
-		const content = inputValue;
+		const content = inputValue.trim() || (pendingAttachment
+			? `Please analyze the attached document "${pendingAttachment.name}".`
+			: '');
+		const attachment = pendingAttachment;
 		inputValue = '';
+		pendingAttachment = null;
 
-		await session.sendMessage(content);
+		await session.sendMessage(content, {
+			attachment,
+			forceServer: !!attachment
+		});
 		scrollToBottom();
+	}
+
+	function handleAttachmentChange(event: Event) {
+		const target = event.currentTarget as HTMLInputElement;
+		pendingAttachment = target.files?.[0] ?? null;
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -132,7 +145,8 @@
 		const labels: Record<string, string> = {
 			evidence_vectors: 'Uploaded Evidence',
 			case_chunks: 'Reports / Case Files',
-			law_sections: 'Law & Statutes'
+			law_sections: 'Law & Statutes',
+			legal_documents: 'ACE Context Docs'
 		};
 
 		return Array.from(counts.entries()).map(([collection, count]) => ({
@@ -152,6 +166,8 @@
 				return `Report ${shortId}`;
 			case 'law_sections':
 				return `Law ${shortId}`;
+			case 'legal_documents':
+				return `ACE Doc ${shortId}`;
 			default:
 				return docId;
 		}
@@ -331,6 +347,15 @@
 
 	<!-- Input -->
 	<div class="chat-input-area">
+		<div class="chat-toolbar">
+			<label class="attach-btn" aria-label="Attach file">
+				📎
+				<input type="file" class="hidden-file-input" onchange={handleAttachmentChange} />
+			</label>
+			{#if pendingAttachment}
+				<span class="attachment-pill">{pendingAttachment.name}</span>
+			{/if}
+		</div>
 		<textarea
 			bind:value={inputValue}
 			onkeydown={handleKeydown}
@@ -342,7 +367,7 @@
 		<button
 			class="send-btn"
 			onclick={sendMessage}
-			disabled={isLoading || !inputValue.trim()}
+			disabled={isLoading || (!inputValue.trim() && !pendingAttachment)}
 			data-testid="case-chat-send"
 		>
 			{#if isLoading}
@@ -615,6 +640,39 @@
 		padding: 1rem;
 		background-color: #f5f1e8;
 		border-top: 2px solid #d4a574;
+		flex-wrap: wrap;
+	}
+
+	.chat-toolbar {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		width: 100%;
+	}
+
+	.attach-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2rem;
+		height: 2rem;
+		border-radius: 999px;
+		background: #f0ebe0;
+		border: 1px solid #d4a574;
+		cursor: pointer;
+	}
+
+	.hidden-file-input {
+		display: none;
+	}
+
+	.attachment-pill {
+		font-size: 0.78rem;
+		padding: 0.25rem 0.6rem;
+		border-radius: 999px;
+		background: #e8f4f8;
+		color: #0f4c81;
+		border: 1px solid #9fc3dd;
 	}
 
 	.chat-input {

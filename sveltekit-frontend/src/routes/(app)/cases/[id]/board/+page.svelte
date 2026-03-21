@@ -260,7 +260,8 @@
 		}
 
 		// Load cached layout from IndexedDB if no server state
-		if (!initialState && board) {
+		const validId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(caseId);
+		if (!initialState && board && validId) {
 			loadLayout(caseId).then((cached) => {
 				if (cached && cached.nodes?.length > 0) {
 					// Restore cached viewport/nodes via board methods
@@ -287,8 +288,9 @@
 	});
 
 	// Auto-save to IndexedDB when board is dirty (debounced 2s via scheduleSave)
+	const isValidCaseId = $derived(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(caseId));
 	$effect(() => {
-		if (isDirty && board) {
+		if (isDirty && board && isValidCaseId) {
 			const snapshot = board.serialize();
 			const layout: BoardLayout = {
 				caseId,

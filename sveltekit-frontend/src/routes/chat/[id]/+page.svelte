@@ -17,6 +17,12 @@
     const forceLocal = urlParams?.get('local') === '1';
     const forceServer = urlParams?.get('server') === '1';
     const showDebug = urlParams?.get('debug') === '1';
+    let pendingAttachment = $state<File | null>(null);
+
+    function handleAttachmentChange(event: Event) {
+        const target = event.currentTarget as HTMLInputElement;
+        pendingAttachment = target.files?.[0] ?? null;
+    }
 
     $effect(() => {
         return () => chat.destroy(); // Cleanup on unmount
@@ -83,12 +89,21 @@
 <form onsubmit={(e) => {
     e.preventDefault();
     const input = document.querySelector('input[name="message"]') as HTMLInputElement;
-    const text = input.value.trim();
-    if (!text) return;
+    const text = input.value.trim() || (pendingAttachment ? `Please analyze the attached document "${pendingAttachment.name}".` : '');
+    if (!text && !pendingAttachment) return;
+    const attachment = pendingAttachment;
+    pendingAttachment = null;
     input.value = '';
     input.focus();
-    chat.sendMessage(text, { forceLocal, forceServer });
+    chat.sendMessage(text, { forceLocal, forceServer: forceServer || !!attachment, attachment });
 }}>
+    <label class="attachment-label">
+        Attach
+        <input type="file" onchange={handleAttachmentChange} />
+    </label>
+    {#if pendingAttachment}
+        <span class="attachment-name">{pendingAttachment.name}</span>
+    {/if}
     <input
         type="text"
         name="message"
@@ -180,11 +195,26 @@
         border-radius: 4px;
         color: #856404;
     }
+    .attachment-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-right: 10px;
+        font-size: 0.9rem;
+    }
+    .attachment-name {
+        display: inline-block;
+        margin-right: 10px;
+        color: #555;
+        font-size: 0.85rem;
+        align-self: center;
+    }
     form {
         max-width: 800px;
         margin: 20px auto;
         display: flex;
         gap: 10px;
+        align-items: center;
     }
     input {
         flex: 1;

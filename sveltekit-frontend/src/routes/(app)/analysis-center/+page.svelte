@@ -39,6 +39,7 @@
 	let activeTool = $state<string | null>(null);
 	let ingestUrl = $state('');
 	let ingestCaseId = $state('');
+	let ingestFile = $state<File | null>(null);
 	let ingestLoading = $state(false);
 	let ingestResult = $state<any>(null);
 	let ingestError = $state<string | null>(null);
@@ -65,6 +66,41 @@
 		} finally {
 			ingestLoading = false;
 		}
+	}
+
+	async function ingestFileUpload() {
+		if (!ingestFile) return;
+		analytics.track('document_indexed', {
+			filename: ingestFile.name,
+			caseId: ingestCaseId,
+			sourceType: 'file'
+		});
+		ingestLoading = true;
+		ingestError = null;
+		ingestResult = null;
+		try {
+			const formData = new FormData();
+			formData.set('file', ingestFile);
+			if (ingestCaseId.trim()) formData.set('caseId', ingestCaseId.trim());
+
+			const res = await fetch('/api/ace/ingest', {
+				method: 'POST',
+				body: formData
+			});
+			const data = await res.json();
+			if (!res.ok) throw new Error(data.error || 'Ingestion failed');
+			ingestResult = data;
+			ingestFile = null;
+		} catch (e) {
+			ingestError = e instanceof Error ? e.message : 'Unknown error';
+		} finally {
+			ingestLoading = false;
+		}
+	}
+
+	function handleIngestFileChange(event: Event) {
+		const target = event.currentTarget as HTMLInputElement;
+		ingestFile = target.files?.[0] ?? null;
 	}
 
 	const analysisModes = [
@@ -505,9 +541,9 @@
 					<IntelligentModelOrchestrator caseId={selectedCaseId} initialQuery={analysisQuery} />
 				{:else if activeTool === 'ingest'}
 					<div class="web-ingest-panel">
-						<h3 style="margin: 0 0 0.75rem; color: #10b981;">WEB URL INGEST</h3>
+						<h3 style="margin: 0 0 0.75rem; color: #10b981;">ACE CONTEXT INGEST</h3>
 						<p style="color: #8b949e; font-size: 0.85rem; margin-bottom: 1rem;">
-							Paste a URL to fetch, chunk, embed, and store in the knowledge base for RAG search.
+							Paste a URL or upload PDF, TXT, Markdown, JSON, CSV, HTML, or image files to chunk, embed, OCR, and store in the knowledge base for chat and RAG search.
 						</p>
 						<div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
 							<input
@@ -533,6 +569,26 @@
 								{ingestLoading ? 'INGESTING...' : 'INGEST'}
 							</button>
 						</div>
+						<div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem; align-items: center; flex-wrap: wrap;">
+							<input
+								type="file"
+								accept=".pdf,.txt,.md,.json,.csv,.xml,.html,.htm,.log,.yaml,.yml,.png,.jpg,.jpeg,.webp,.bmp,.tif,.tiff"
+								onchange={handleIngestFileChange}
+								disabled={ingestLoading}
+								style="flex: 1; min-width: 260px; padding: 0.45rem 0.6rem; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #f0f6fc; font-family: inherit; font-size: 0.8rem;"
+							/>
+							<button
+								class="mode-btn"
+								onclick={ingestFileUpload}
+								disabled={ingestLoading || !ingestFile}
+								style="white-space: nowrap;"
+							>
+								{ingestLoading ? 'UPLOADING...' : 'UPLOAD FILE'}
+							</button>
+							{#if ingestFile}
+								<span style="color: #9ca3af; font-size: 0.78rem;">{ingestFile.name}</span>
+							{/if}
+						</div>
 						{#if ingestError}
 							<div style="color: #f85149; background: #f8514920; padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.85rem; margin-bottom: 0.5rem;">
 								{ingestError}
@@ -541,7 +597,14 @@
 						{#if ingestResult}
 							<div style="color: #10b981; background: #10b98120; padding: 0.75rem; border-radius: 6px; font-size: 0.85rem;">
 								<strong>Ingested:</strong> {ingestResult.title}<br/>
+								<strong>Source:</strong> {ingestResult.sourceType === 'file' ? ingestResult.filename : ingestResult.url}<br/>
 								<strong>Chunks:</strong> {ingestResult.chunksCreated} ({ingestResult.totalTokens} tokens)<br/>
+								{#if ingestResult.extractionMethod}
+									<strong>Extraction:</strong> {ingestResult.extractionMethod}<br/>
+								{/if}
+								{#if ingestResult.yoloLabels?.length}
+									<strong>YOLO:</strong> {ingestResult.yoloLabels.join(', ')}<br/>
+								{/if}
 								<strong>Model:</strong> {ingestResult.embeddingModel} | <strong>Time:</strong> {ingestResult.totalMs}ms
 							</div>
 						{/if}

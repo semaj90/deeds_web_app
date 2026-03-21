@@ -2,6 +2,11 @@
   Recommendation Widget
   Shows personalized document recommendations with 5-signal scoring breakdown
 
+  Uses async job pattern:
+    1. POST /api/recommendations → returns jobId immediately
+    2. Polls GET /api/recommendations/jobs/[jobId] every 1.5s
+    3. Displays results when complete
+
   Usage:
     <RecommendationWidget
       query="contract dispute evidence"
@@ -13,19 +18,18 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
-	// ScrollArea removed — bits-ui ScrollArea triggers $props() TDZ in Svelte 5.46.0
 	import { browser } from '$app/environment';
 	import type { GPURerankMetrics } from '$lib/gpu/gpu-search-reranker.js';
 
 	interface Props {
 		query: string;
 		caseId?: string;
-		documentId?: string; // Current document ID (to exclude from recommendations)
+		documentId?: string;
 		tags?: string[];
 		limit?: number;
 		onSelect?: (doc: RecommendedDocument) => void;
-		compact?: boolean; // Compact mode for sidebars
-		enableGPURerank?: boolean; // Enable client-side GPU reranking (default: false)
+		compact?: boolean;
+		enableGPURerank?: boolean;
 	}
 
 	interface RecommendedDocument {
@@ -40,7 +44,7 @@
 			profileMatch: number;
 		};
 		explanationTokens: string[];
-		gpuScore?: number; // Client-side GPU cosine similarity score
+		gpuScore?: number;
 	}
 
 	let {
@@ -60,64 +64,154 @@
 	let expanded = $state<string | null>(null);
 	let gpuMetrics = $state<GPURerankMetrics | null>(null);
 	let gpuReranking = $state(false);
+	let processingTime = $state<number | null>(null);
+	let pollTimer: ReturnType<typeof setInterval> | null = null;
 
 	// Fetch recommendations on mount and when query changes
 	$effect(() => {
 		if (query && query.trim().length > 0) {
 			fetchRecommendations();
 		}
+
+		// Cleanup poll timer on unmount or query change
+		return () => {
+			if (pollTimer) {
+				clearInterval(pollTimer);
+				pollTimer = null;
+			}
+		};
 	});
 
 	async function fetchRecommendations() {
 		loading = true;
 		error = null;
 		gpuMetrics = null;
+		processingTime = null;
+
+		// Clear any existing poll timer
+		if (pollTimer) {
+			clearInterval(pollTimer);
+			pollTimer = null;
+		}
+
+		const trimmedCaseId = typeof caseId === 'string' ? caseId.trim() : '';
+		const requestBody = {
+			query,
+			tags,
+			topK: limit + 1,
+			includeExplanations: true,
+			...(trimmedCaseId ? { caseId: trimmedCaseId } : {})
+		};
 
 		try {
 			const response = await fetch('/api/recommendations', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					query,
-					caseId,
-					tags,
-					topK: limit + 1, // Fetch one extra to exclude current document
-					includeExplanations: true
-				})
+				body: JSON.stringify(requestBody)
 			});
 
 			if (!response.ok) {
-				throw new Error(`Recommendation fetch failed: ${response.status}`);
+				if (response.status === 400 || response.status === 401) {
+					recommendations = [];
+					loading = false;
+					return;
+				}
+				throw new Error(`Recommendation request failed: ${response.status}`);
 			}
 
 			const data = await response.json();
 
-			if (data.success) {
-				// Filter out current document and limit to requested count
-				recommendations = (data.data.recommendations || [])
-					.filter((rec: RecommendedDocument) => rec.documentId !== documentId)
-					.slice(0, limit);
-
-				// Optional: GPU rerank after server results
-				if (enableGPURerank && browser && recommendations.length > 0) {
-					runGPURerank();
-				}
-			} else {
-				throw new Error(data.error || 'Failed to fetch recommendations');
+			if (!data.success) {
+				throw new Error(data.error || 'Failed to submit recommendation request');
 			}
+
+			const jobId = data.data?.jobId;
+			if (!jobId) {
+				// Fallback: server returned recommendations directly (shouldn't happen with new API)
+				if (data.data?.recommendations) {
+					handleResults(data.data.recommendations);
+					loading = false;
+				} else {
+					recommendations = [];
+					loading = false;
+				}
+				return;
+			}
+
+			// Start polling for results
+			startPolling(jobId);
 		} catch (err) {
 			console.error('[RecommendationWidget] Fetch error:', err);
 			error = err instanceof Error ? err.message : String(err);
 			recommendations = [];
-		} finally {
 			loading = false;
 		}
 	}
 
-	/**
-	 * Run client-side GPU reranking on server results.
-	 * Uses WebGPU cosine similarity to verify/adjust server scores.
-	 */
+	function startPolling(jobId: string) {
+		let attempts = 0;
+		const maxAttempts = 20; // 20 × 1.5s = 30s max wait
+		const pollStart = Date.now();
+
+		pollTimer = setInterval(async () => {
+			attempts++;
+
+			if (attempts > maxAttempts) {
+				clearInterval(pollTimer!);
+				pollTimer = null;
+				loading = false;
+				error = 'Recommendation processing timed out';
+				return;
+			}
+
+			try {
+				const res = await fetch(`/api/recommendations/jobs/${jobId}`);
+				if (!res.ok) {
+					if (res.status === 404) {
+						clearInterval(pollTimer!);
+						pollTimer = null;
+						loading = false;
+						error = 'Recommendation job expired';
+						return;
+					}
+					return; // Transient error — keep polling
+				}
+
+				const data = await res.json();
+				const status = data.data?.status;
+
+				if (status === 'complete') {
+					clearInterval(pollTimer!);
+					pollTimer = null;
+					processingTime = Date.now() - pollStart;
+
+					const recs = data.data?.recommendations || [];
+					handleResults(recs);
+
+					loading = false;
+				} else if (status === 'failed') {
+					clearInterval(pollTimer!);
+					pollTimer = null;
+					loading = false;
+					error = data.data?.error || 'Recommendation processing failed';
+				}
+				// else status === 'processing' → keep polling
+			} catch {
+				// Network error — keep polling, don't break
+			}
+		}, 1500);
+	}
+
+	function handleResults(recs: RecommendedDocument[]) {
+		recommendations = recs
+			.filter((rec: RecommendedDocument) => rec.documentId !== documentId)
+			.slice(0, limit);
+
+		if (enableGPURerank && browser && recommendations.length > 0) {
+			runGPURerank();
+		}
+	}
+
 	async function runGPURerank() {
 		if (!browser || recommendations.length === 0) return;
 		gpuReranking = true;
@@ -133,14 +227,12 @@
 			if (result) {
 				gpuMetrics = result.metrics;
 
-				// Merge GPU scores into recommendations
 				for (const item of result.items) {
 					if (item.index < recommendations.length && item.gpuScore >= 0) {
 						recommendations[item.index].gpuScore = item.gpuScore;
 					}
 				}
 
-				// Re-sort by blended score (70% server + 30% GPU)
 				recommendations = [...recommendations].sort((a, b) => {
 					const scoreA = a.gpuScore !== undefined ? 0.7 * a.score + 0.3 * a.gpuScore : a.score;
 					const scoreB = b.gpuScore !== undefined ? 0.7 * b.score + 0.3 * b.gpuScore : b.score;
@@ -163,7 +255,6 @@
 	}
 
 	async function handleSelect(doc: RecommendedDocument) {
-		// Track click interaction
 		try {
 			await fetch('/api/recommendations/track', {
 				method: 'POST',
@@ -218,10 +309,15 @@
 					{gpuMetrics.backend}
 				</span>
 			{/if}
+			{#if processingTime && !loading}
+				<span class="timing-badge" title="Background processing time">
+					{(processingTime / 1000).toFixed(1)}s
+				</span>
+			{/if}
 			{#if loading || gpuReranking}
 				<div class="flex items-center gap-2 text-xs text-sand-11">
 					<Icon name="loader-circle" class="animate-spin" />
-					<span>{gpuReranking ? 'GPU reranking...' : 'Loading...'}</span>
+					<span>{gpuReranking ? 'GPU reranking...' : 'Processing...'}</span>
 				</div>
 			{/if}
 		</div>
@@ -526,6 +622,15 @@
 		border-radius: 0.25rem;
 		font-weight: 600;
 		text-transform: uppercase;
+	}
+
+	.timing-badge {
+		font-size: 0.6rem;
+		padding: 0.1rem 0.35rem;
+		background: rgba(212, 199, 163, 0.1);
+		color: rgba(212, 199, 163, 0.5);
+		border-radius: 0.25rem;
+		font-family: 'Rajdhani', 'Courier New', monospace;
 	}
 
 	.gpu-label {

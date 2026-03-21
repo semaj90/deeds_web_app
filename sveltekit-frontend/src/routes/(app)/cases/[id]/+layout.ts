@@ -27,6 +27,11 @@ function normalizeCaseResponse(payload: unknown) {
 }
 
 export const load: LayoutLoad = async ({ fetch, params }) => {
+  const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(params.id);
+  if (!isValidUUID) {
+    return { caseData: null, fromCache: false, loadError: 'Invalid case ID format' };
+  }
+
   const cacheKey = `case-detail-${params.id}`;
 
   // Try cache first (if in browser)
