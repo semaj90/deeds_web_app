@@ -229,7 +229,29 @@ export const mcpTools: MCPTools = {
     },
     indexWebPage: async (url) => {
       try {
-        return { success: true, data: { indexed: true, id: `web-${Date.now()}` } };
+        // Call knowledge base ingestion API to crawl + embed + store in Qdrant
+        const response = await fetch('/api/knowledge', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            url,
+            source: 'mcp-index',
+            extraction_type: 'legal',
+          }),
+        });
+        if (!response.ok) {
+          throw new Error(`Knowledge ingestion failed: ${response.status}`);
+        }
+        const result = await response.json();
+        return {
+          success: true,
+          data: {
+            indexed: true,
+            id: result.documentId ?? result.id ?? `web-${Date.now()}`,
+            chunks: result.chunksIndexed ?? 0,
+            collection: result.collection ?? 'knowledge_base',
+          },
+        };
       } catch (error) {
         return { success: false, error: String(error) };
       }

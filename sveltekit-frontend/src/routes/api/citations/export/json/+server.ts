@@ -52,7 +52,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			citationCount: citationsData.length,
 			citations: citationsData.map((c) => ({
 				id: c.id,
-				citationText: c.citationText,
+				quotedText: c.quotedText,
 				caseId: c.caseId,
 				sourceUrl: c.sourceUrl,
 				createdAt: c.createdAt,
@@ -62,7 +62,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		if (includeStatutes) {
 			// Fetch related statutes (if citation text matches statute section)
 			const statuteCodes = citationsData
-				.map((c) => c.citationText)
+				.map((c) => c.quotedText)
 				.filter(Boolean);
 
 			if (statuteCodes.length > 0) {

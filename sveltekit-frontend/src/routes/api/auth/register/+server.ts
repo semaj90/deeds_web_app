@@ -26,8 +26,7 @@ interface RegisterRequest {
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	try {
-		const rawBody = await request.text();
-		const body = JSON.parse(rawBody) as RegisterRequest;
+		const body = await request.json() as RegisterRequest;
 
 		// Validate input
 		const validation = registerSchema.safeParse(body);

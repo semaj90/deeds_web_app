@@ -304,6 +304,15 @@ export const evidence = pgTable('evidence', {
  aiTags: jsonb('ai_tags'),
  aiAnalysis: jsonb('ai_analysis'),
  aiSummary: text('ai_summary'),
+ // DB-SYNC: columns present in native PG but previously missing from Drizzle
+ verifiedAt: timestamp('verified_at'),
+ verified: boolean('verified').default(false),
+ status: varchar('status', { length: 50 }).default('pending'),
+ extractedText: text('extracted_text'),
+ entities: jsonb('entities').default([]),
+ keywords: jsonb('keywords').default([]),
+ embedding: vector('embedding', { dimensions: 768 }),
+ deletedAt: timestamp('deleted_at', { withTimezone: true }),
 });
 
 // === ANALYSIS JOBS ===
@@ -730,13 +739,32 @@ export const citations = pgTable('citations', {
  .notNull(),
  documentId: uuid('document_id'), // FK to legalDocuments.id
  caseId: uuid('case_id'), // FK to cases.id
- citationText: text('citation_text').notNull(),
- sourceUrl: text('source_url'),
+ // DB-SYNC: actual column is 'quoted_text', NOT 'citation_text'
+ citationType: varchar('citation_type', { length: 100 }).notNull(),
+ relevanceScore: real('relevance_score'),
  pageNumber: integer('page_number'),
- confidence: real('confidence'),
+ pinpointCitation: varchar('pinpoint_citation', { length: 500 }),
+ quotedText: text('quoted_text'),
+ contextBefore: text('context_before'),
+ contextAfter: text('context_after'),
+ annotation: text('annotation'),
+ legalPrinciple: text('legal_principle'),
+ citationFormat: varchar('citation_format', { length: 50 }).default('bluebook'),
+ formattedCitation: text('formatted_citation'),
+ shepardsTreatment: varchar('shepards_treatment', { length: 100 }),
+ isKeyAuthority: boolean('is_key_authority').default(false),
  createdBy: uuid('created_by'), // FK to users.id
  createdAt: timestamp('created_at').defaultNow(),
  updatedAt: timestamp('updated_at').defaultNow(),
+ // DB-SYNC: additional columns present in native PG
+ title: varchar('title', { length: 500 }),
+ sourceType: varchar('source_type', { length: 100 }),
+ sourceName: varchar('source_name', { length: 500 }),
+ sourceUrl: text('source_url'),
+ notes: text('notes'),
+ tags: jsonb('tags').default([]),
+ embedding: vector('embedding', { dimensions: 768 }),
+ metadata: jsonb('metadata').default({}),
 });
 
 // === CITATION TAGS ===
@@ -828,6 +856,9 @@ export const reports = pgTable('reports', {
  status: reportStatusEnum('status').default('draft').notNull(),
  generatedAt: timestamp('generated_at').defaultNow().notNull(),
  metadata: jsonb('metadata'),
+ // DB-SYNC: columns present in native PG
+ reportType: varchar('report_type', { length: 100 }),
+ format: varchar('format', { length: 50 }).default('html'),
  createdAt: timestamp('created_at').defaultNow(),
  updatedAt: timestamp('updated_at').defaultNow(),
 });
@@ -916,6 +947,13 @@ export const personsOfInterest = pgTable('persons_of_interest', {
 	lastUpdated: timestamp('last_updated'),
 	crimes: text('crimes').array(),
 	caseIds: text('case_ids').array(),
+	caseId: uuid('case_id'),
+	profileData: jsonb('profile_data').default({}),
+	tags: jsonb('tags').default([]),
+	position: jsonb('position').default({}),
+	photoUrl: text('photo_url'),
+	notes: text('notes'),
+	metadata: jsonb('metadata').default({}),
 	createdBy: text('created_by'),
 	createdAt: timestamp('created_at').defaultNow(),
 	updatedAt: timestamp('updated_at').defaultNow(),
@@ -969,6 +1007,12 @@ export const timelineEvents = pgTable('timeline_events', {
 	location: varchar('location', { length: 500 }),
 	severity: varchar('severity', { length: 20 }).default('low'),
 	metadata: jsonb('metadata'),
+	// DB-SYNC: legacy columns present in native PG
+	timestamp: timestamp('timestamp'),
+	type: varchar('type', { length: 100 }),
+	evidenceIds: jsonb('evidence_ids').default([]),
+	personIds: jsonb('person_ids').default([]),
+	locationIds: jsonb('location_ids').default([]),
 	createdBy: uuid('created_by'),
 	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`),
 	updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`now()`),

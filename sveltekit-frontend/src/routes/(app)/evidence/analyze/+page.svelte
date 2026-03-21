@@ -1,5 +1,40 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import CitationHighlighter from '$lib/components/legal-ai/CitationHighlighter.svelte';
+
+	interface HighlightedCitation {
+		text: string;
+		startIndex: number;
+		endIndex: number;
+		summary?: string;
+		confidence?: number;
+	}
+
+	let savedCitations = $state<HighlightedCitation[]>([]);
+
+	async function handleSaveCitation(citation: any) {
+		savedCitations = [...savedCitations, citation];
+		// Persist to saved_citations table via API
+		try {
+			await fetch('/api/citations/saved', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					statute_code: citation.text.slice(0, 500),
+					highlighted_text: citation.text,
+					case_id: caseId || undefined,
+					source_type: 'auto_extracted',
+					notes: citation.summary || undefined
+				})
+			});
+		} catch (err) {
+			console.error('Failed to save citation:', err);
+		}
+	}
+
+	function handleRemoveCitation(citation: HighlightedCitation) {
+		savedCitations = savedCitations.filter(c => c.startIndex !== citation.startIndex);
+	}
 
 	type SearchResult = {
 		status: string;
@@ -268,8 +303,13 @@
 			</div>
 			<div class="ea-card-body">
 				<div class="ea-result-section">
-					<h3 class="ea-result-heading">Summary</h3>
-					<p class="ea-result-text">{results.analysisResults.summary || 'No summary available'}</p>
+					<h3 class="ea-result-heading">Summary <span class="ea-hint">(highlight text to save as citation)</span></h3>
+					<CitationHighlighter
+						content={results.analysisResults.summary || 'No summary available'}
+						citations={savedCitations}
+						onsave={handleSaveCitation}
+						onremove={handleRemoveCitation}
+					/>
 				</div>
 
 				<div class="ea-row-2">
@@ -325,6 +365,11 @@
 </main>
 
 <style>
+	.ea-hint {
+		font-size: 0.75rem;
+		color: #888;
+		font-weight: 400;
+	}
 	.ea-page {
 		min-height: 100vh;
 		background: #0e0d0b;

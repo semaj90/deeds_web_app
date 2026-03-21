@@ -76,13 +76,33 @@ let interactiveClasses = $derived(
 			</div>
 		{/if}
 	</a>
+{:else if isClickable}
+	<button
+		type="button"
+		class="w-full rounded-lg overflow-hidden text-left {variantClasses} {interactiveClasses} {className}"
+		onclick={onclick}
+	>
+		{#if header}
+			<div class="px-4 py-3 border-b border-sand/20">
+				{@render header()}
+			</div>
+		{/if}
+
+		<div class={paddingClasses}>
+			{#if children}
+				{@render children()}
+			{/if}
+		</div>
+
+		{#if footer}
+			<div class="px-4 py-3 border-t border-sand/20 bg-panel/50">
+				{@render footer()}
+			</div>
+		{/if}
+	</button>
 {:else}
 	<div
 		class="rounded-lg overflow-hidden {variantClasses} {interactiveClasses} {className}"
-		role={isClickable ? 'button' : undefined}
-		tabindex={isClickable ? 0 : undefined}
-		onclick={onclick}
-		onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && onclick?.()}
 	>
 		{#if header}
 			<div class="px-4 py-3 border-b border-sand/20">

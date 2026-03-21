@@ -49,6 +49,7 @@
 		{ href: '/demos/memory-palace', label: 'Memory Palace', description: 'Spatial memory visualization for legal knowledge using rooms, shelves, and mnemonic associations.', icon: 'home', lines: 320, category: 'visualization' },
 		{ href: '/demos/nes-routes', label: 'NES Route Map', description: 'Retro NES-style route visualization with pixel art styling and interactive navigation map.', icon: 'map', lines: 200, category: 'gaming' },
 		{ href: '/demos/nier-showcase', label: 'NieR:Automata UI', description: 'YoRHa-inspired UI components: diamond modals, CRT effects, terminal output, and system diagnostics.', icon: 'monitor', lines: 350, category: 'gaming' },
+		{ href: '/demos/yorha-icons', label: 'YoRHa Icon System', description: 'Celestial showcase of 12 monochrome legal SVG icons with interactive size, stroke, and glow controls.', icon: 'star', lines: 290, category: 'ui' },
 	];
 
 	const showcases: Demo[] = [

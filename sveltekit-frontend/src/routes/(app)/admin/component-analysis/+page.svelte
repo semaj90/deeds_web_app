@@ -163,7 +163,7 @@
 
 	// Filtered and sorted components
 	let filteredComponents = $derived.by(() => {
-		let filtered = components;
+		let filtered = [...components];
 
 		// Filter by search
 		if (searchQuery) {

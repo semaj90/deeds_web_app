@@ -193,6 +193,34 @@
  --input: 0 0% 16%;
  --ring: 51 100% 50%;
  --radius: 0.25rem;
+
+ /* ═══ Unified Theme Contract ═══ */
+ --t-bg: #0a0a0a;
+ --t-bg-elevated: #1a1a1a;
+ --t-panel: #1a1a1a;
+ --t-panel-2: #2a2a2a;
+ --t-text: #e0e0e0;
+ --t-text-muted: #808080;
+ --t-accent: var(--accent-override, #ffd700);
+ --t-accent-2: #00ff41;
+ --t-border: #3a3a3a;
+ --t-danger: #ff0041;
+ --t-warning: #fbbf24;
+ --t-success: #00ff41;
+ --t-shadow: rgba(0,0,0,0.5);
+ --t-scanline-opacity: 0.05;
+ --t-panel-noise: 0.02;
+ --t-focus-ring: #ffd700;
+ --t-font-primary: 'JetBrains Mono', 'Courier New', monospace;
+ --t-font-heading: 'Orbitron', 'Arial', sans-serif;
+ --t-grid-color: rgba(255, 215, 0, 0.05);
+ --t-scrollbar-thumb: linear-gradient(180deg, #ffd700 0%, #cc8800 100%);
+ --t-heading-glow: 0 0 10px #ffd700;
+ }
+
+ /* YoRHa Dark — explicit selector (inherits :root vars, sets contract) */
+ [data-theme="yorha-dark"] {
+  /* All --yorha-* vars inherited from :root — just ensure contract is present */
  }
 
  /* YoRHa Black & White Theme - Pure monochrome aesthetic */
@@ -245,7 +273,363 @@
   --input: 0 0% 8%;
   --ring: 0 0% 100%;
   --radius: 0.25rem;
+
+  /* Unified contract */
+  --t-bg: #000000;
+  --t-bg-elevated: #0a0a0a;
+  --t-panel: #0a0a0a;
+  --t-panel-2: #141414;
+  --t-text: #ffffff;
+  --t-text-muted: #999999;
+  --t-accent: var(--accent-override, #ffffff);
+  --t-accent-2: #cccccc;
+  --t-border: #444444;
+  --t-danger: #ffffff;
+  --t-warning: #cccccc;
+  --t-success: #ffffff;
+  --t-shadow: rgba(0,0,0,0.7);
+  --t-scanline-opacity: 0.03;
+  --t-panel-noise: 0;
+  --t-focus-ring: #ffffff;
+  --t-font-primary: 'JetBrains Mono', 'Courier New', monospace;
+  --t-font-heading: 'Orbitron', 'Arial', sans-serif;
+  --t-grid-color: rgba(255, 255, 255, 0.05);
+  --t-scrollbar-thumb: linear-gradient(180deg, #ffffff 0%, #cccccc 100%);
+  --t-heading-glow: 0 0 10px rgba(255,255,255,0.5);
  }
+
+ /* ═══ Parchment Archive — Legal Research ═══ */
+ [data-theme="parchment"] {
+  --yorha-primary: #2a2520;
+  --yorha-primary-dark: #4a4238;
+  --yorha-secondary: #c4752b;
+  --yorha-secondary-dark: #a05a1a;
+  --yorha-accent: #c4752b;
+  --yorha-accent-dark: #a05a1a;
+  --yorha-danger: #b91c1c;
+  --yorha-danger-dark: #991b1b;
+  --yorha-bg-primary: #f5f0e8;
+  --yorha-bg-secondary: #faf7f0;
+  --yorha-bg-tertiary: #e8e2d6;
+  --yorha-bg-overlay: rgba(245, 240, 232, 0.95);
+  --yorha-text-primary: #2a2520;
+  --yorha-text-secondary: #4a4238;
+  --yorha-text-muted: #8a7e6e;
+  --yorha-text-accent: #c4752b;
+  --yorha-font-primary: 'Inter', system-ui, sans-serif;
+  --yorha-font-secondary: 'Inter', system-ui, sans-serif;
+  --yorha-font-ui: 'Inter', system-ui, sans-serif;
+  --background: 36 33% 93%;
+  --foreground: 20 10% 15%;
+  --card: 38 38% 96%;
+  --card-foreground: 20 10% 15%;
+  --popover: 36 33% 93%;
+  --popover-foreground: 20 10% 15%;
+  --primary: 27 65% 47%;
+  --primary-foreground: 38 38% 96%;
+  --secondary: 36 20% 62%;
+  --secondary-foreground: 20 10% 15%;
+  --muted: 32 18% 88%;
+  --muted-foreground: 25 10% 45%;
+  --accent: 27 65% 47%;
+  --accent-foreground: 38 38% 96%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 38 38% 96%;
+  --border: 32 18% 78%;
+  --input: 32 18% 88%;
+  --ring: 27 65% 47%;
+  --radius: 0.375rem;
+  --t-bg: #f5f0e8;
+  --t-bg-elevated: #faf7f0;
+  --t-panel: #faf7f0;
+  --t-panel-2: #e8e2d6;
+  --t-text: #2a2520;
+  --t-text-muted: #8a7e6e;
+  --t-accent: var(--accent-override, #c4752b);
+  --t-accent-2: #b9aa86;
+  --t-border: #d4cbb8;
+  --t-danger: #b91c1c;
+  --t-warning: #d97706;
+  --t-success: #059669;
+  --t-shadow: rgba(42, 37, 32, 0.12);
+  --t-scanline-opacity: 0;
+  --t-panel-noise: 0.03;
+  --t-focus-ring: #c4752b;
+  --t-font-primary: 'Inter', system-ui, sans-serif;
+  --t-font-heading: 'Inter', system-ui, sans-serif;
+  --t-grid-color: rgba(196, 117, 43, 0.04);
+  --t-scrollbar-thumb: linear-gradient(180deg, #c4b998 0%, #a89f7c 100%);
+  --t-heading-glow: none;
+  color-scheme: light;
+ }
+
+ /* ═══ Investigation Tactical — Evidence Review ═══ */
+ [data-theme="investigation"] {
+  --yorha-primary: #e8e0cc;
+  --yorha-primary-dark: #c4b998;
+  --yorha-secondary: #c4a35a;
+  --yorha-secondary-dark: #a88a3e;
+  --yorha-accent: #3b82a0;
+  --yorha-accent-dark: #2a6478;
+  --yorha-danger: #ef4444;
+  --yorha-danger-dark: #dc2626;
+  --yorha-bg-primary: #0d1117;
+  --yorha-bg-secondary: #161b22;
+  --yorha-bg-tertiary: #21262d;
+  --yorha-bg-overlay: rgba(13, 17, 23, 0.95);
+  --yorha-text-primary: #e8e0cc;
+  --yorha-text-secondary: #a89f7c;
+  --yorha-text-muted: #6b6354;
+  --yorha-text-accent: #c4a35a;
+  --yorha-font-primary: 'JetBrains Mono', 'Courier New', monospace;
+  --yorha-font-secondary: 'Rajdhani', 'Arial', sans-serif;
+  --yorha-font-ui: 'Rajdhani', 'Arial', sans-serif;
+  --background: 213 32% 6%;
+  --foreground: 36 28% 85%;
+  --card: 215 22% 11%;
+  --card-foreground: 36 28% 85%;
+  --popover: 213 32% 6%;
+  --popover-foreground: 36 28% 85%;
+  --primary: 40 45% 56%;
+  --primary-foreground: 213 32% 6%;
+  --secondary: 36 20% 55%;
+  --secondary-foreground: 213 32% 6%;
+  --muted: 215 14% 15%;
+  --muted-foreground: 33 12% 37%;
+  --accent: 195 46% 42%;
+  --accent-foreground: 213 32% 6%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 36 28% 85%;
+  --border: 215 10% 22%;
+  --input: 215 14% 15%;
+  --ring: 40 45% 56%;
+  --radius: 0.25rem;
+  --t-bg: #0d1117;
+  --t-bg-elevated: #161b22;
+  --t-panel: #161b22;
+  --t-panel-2: #21262d;
+  --t-text: #e8e0cc;
+  --t-text-muted: #6b6354;
+  --t-accent: var(--accent-override, #c4a35a);
+  --t-accent-2: #3b82a0;
+  --t-border: #30363d;
+  --t-danger: #ef4444;
+  --t-warning: #f59e0b;
+  --t-success: #10b981;
+  --t-shadow: rgba(0,0,0,0.4);
+  --t-scanline-opacity: 0.02;
+  --t-panel-noise: 0.01;
+  --t-focus-ring: #c4a35a;
+  --t-font-primary: 'JetBrains Mono', 'Courier New', monospace;
+  --t-font-heading: 'Rajdhani', 'Arial', sans-serif;
+  --t-grid-color: rgba(196, 163, 90, 0.04);
+  --t-scrollbar-thumb: linear-gradient(180deg, #c4a35a 0%, #a88a3e 100%);
+  --t-heading-glow: 0 0 8px rgba(196, 163, 90, 0.4);
+ }
+
+ /* ═══ Research Light — Document Reading ═══ */
+ [data-theme="research-light"] {
+  --yorha-primary: #1a1a1a;
+  --yorha-primary-dark: #333333;
+  --yorha-secondary: #d97706;
+  --yorha-secondary-dark: #b45309;
+  --yorha-accent: #2563eb;
+  --yorha-accent-dark: #1d4ed8;
+  --yorha-danger: #dc2626;
+  --yorha-danger-dark: #b91c1c;
+  --yorha-bg-primary: #faf9f6;
+  --yorha-bg-secondary: #ffffff;
+  --yorha-bg-tertiary: #f5f3ef;
+  --yorha-bg-overlay: rgba(250, 249, 246, 0.95);
+  --yorha-text-primary: #1a1a1a;
+  --yorha-text-secondary: #5a5a5a;
+  --yorha-text-muted: #8a8a8a;
+  --yorha-text-accent: #d97706;
+  --yorha-font-primary: 'Inter', system-ui, sans-serif;
+  --yorha-font-secondary: 'Inter', system-ui, sans-serif;
+  --yorha-font-ui: 'Inter', system-ui, sans-serif;
+  --background: 40 20% 98%;
+  --foreground: 0 0% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 10%;
+  --popover: 40 20% 98%;
+  --popover-foreground: 0 0% 10%;
+  --primary: 36 90% 44%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 40 10% 92%;
+  --secondary-foreground: 0 0% 10%;
+  --muted: 40 10% 95%;
+  --muted-foreground: 0 0% 45%;
+  --accent: 221 83% 53%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 33 14% 87%;
+  --input: 40 10% 95%;
+  --ring: 36 90% 44%;
+  --radius: 0.5rem;
+  --t-bg: #faf9f6;
+  --t-bg-elevated: #ffffff;
+  --t-panel: #ffffff;
+  --t-panel-2: #f5f3ef;
+  --t-text: #1a1a1a;
+  --t-text-muted: #8a8a8a;
+  --t-accent: var(--accent-override, #d97706);
+  --t-accent-2: #2563eb;
+  --t-border: #e5e2da;
+  --t-danger: #dc2626;
+  --t-warning: #d97706;
+  --t-success: #16a34a;
+  --t-shadow: rgba(0,0,0,0.06);
+  --t-scanline-opacity: 0;
+  --t-panel-noise: 0;
+  --t-focus-ring: #d97706;
+  --t-font-primary: 'Inter', system-ui, sans-serif;
+  --t-font-heading: 'Inter', system-ui, sans-serif;
+  --t-grid-color: transparent;
+  --t-scrollbar-thumb: linear-gradient(180deg, #c8c3b8 0%, #a8a090 100%);
+  --t-heading-glow: none;
+  color-scheme: light;
+ }
+
+ /* ═══ NES Retro — Demo / Fun ═══ */
+ [data-theme="nes-retro"] {
+  --yorha-primary: #f8f4e3;
+  --yorha-primary-dark: #d4c9a9;
+  --yorha-secondary: #ffcc66;
+  --yorha-secondary-dark: #e0a830;
+  --yorha-accent: #4ade80;
+  --yorha-accent-dark: #22c55e;
+  --yorha-danger: #ff5c5c;
+  --yorha-danger-dark: #ef4444;
+  --yorha-bg-primary: #212529;
+  --yorha-bg-secondary: #2c3035;
+  --yorha-bg-tertiary: #383e44;
+  --yorha-bg-overlay: rgba(33, 37, 41, 0.95);
+  --yorha-text-primary: #f8f4e3;
+  --yorha-text-secondary: #d4c9a9;
+  --yorha-text-muted: #6b7280;
+  --yorha-text-accent: #ffcc66;
+  --yorha-font-primary: 'Press Start 2P', 'JetBrains Mono', monospace;
+  --yorha-font-secondary: 'Press Start 2P', monospace;
+  --yorha-font-ui: 'Press Start 2P', monospace;
+  --background: 210 6% 9%;
+  --foreground: 40 52% 93%;
+  --card: 210 5% 12%;
+  --card-foreground: 40 52% 93%;
+  --popover: 210 6% 9%;
+  --popover-foreground: 40 52% 93%;
+  --primary: 42 100% 70%;
+  --primary-foreground: 210 6% 9%;
+  --secondary: 40 14% 52%;
+  --secondary-foreground: 210 6% 9%;
+  --muted: 210 4% 18%;
+  --muted-foreground: 218 6% 46%;
+  --accent: 142 69% 58%;
+  --accent-foreground: 210 6% 9%;
+  --destructive: 0 100% 68%;
+  --destructive-foreground: 210 6% 9%;
+  --border: 40 52% 93%;
+  --input: 210 4% 18%;
+  --ring: 42 100% 70%;
+  --radius: 0;
+  --t-bg: #212529;
+  --t-bg-elevated: #2c3035;
+  --t-panel: #2c3035;
+  --t-panel-2: #383e44;
+  --t-text: #f8f4e3;
+  --t-text-muted: #6b7280;
+  --t-accent: var(--accent-override, #ffcc66);
+  --t-accent-2: #ff5c5c;
+  --t-border: #f8f4e3;
+  --t-danger: #ff5c5c;
+  --t-warning: #fbbf24;
+  --t-success: #4ade80;
+  --t-shadow: rgba(0,0,0,0.6);
+  --t-scanline-opacity: 0.06;
+  --t-panel-noise: 0;
+  --t-focus-ring: #ffcc66;
+  --t-font-primary: 'Press Start 2P', 'JetBrains Mono', monospace;
+  --t-font-heading: 'Press Start 2P', monospace;
+  --t-grid-color: rgba(248, 244, 227, 0.04);
+  --t-scrollbar-thumb: linear-gradient(180deg, #ffcc66 0%, #e0a830 100%);
+  --t-heading-glow: none;
+ }
+
+ /* ═══ High Contrast — Accessibility ═══ */
+ [data-theme="high-contrast"] {
+  --yorha-primary: #ffffff;
+  --yorha-primary-dark: #ffffff;
+  --yorha-secondary: #ffff00;
+  --yorha-secondary-dark: #cccc00;
+  --yorha-accent: #00ffff;
+  --yorha-accent-dark: #00cccc;
+  --yorha-danger: #ff0000;
+  --yorha-danger-dark: #cc0000;
+  --yorha-bg-primary: #000000;
+  --yorha-bg-secondary: #1a1a1a;
+  --yorha-bg-tertiary: #333333;
+  --yorha-bg-overlay: rgba(0, 0, 0, 0.98);
+  --yorha-text-primary: #ffffff;
+  --yorha-text-secondary: #ffffff;
+  --yorha-text-muted: #cccccc;
+  --yorha-text-accent: #ffff00;
+  --yorha-font-primary: 'JetBrains Mono', 'Courier New', monospace;
+  --yorha-font-secondary: 'Arial', sans-serif;
+  --yorha-font-ui: 'Arial', sans-serif;
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 10%;
+  --card-foreground: 0 0% 100%;
+  --popover: 0 0% 0%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 60 100% 50%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 180 100% 50%;
+  --secondary-foreground: 0 0% 0%;
+  --muted: 0 0% 20%;
+  --muted-foreground: 0 0% 80%;
+  --accent: 180 100% 50%;
+  --accent-foreground: 0 0% 0%;
+  --destructive: 0 100% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 100%;
+  --input: 0 0% 20%;
+  --ring: 60 100% 50%;
+  --radius: 0;
+  --t-bg: #000000;
+  --t-bg-elevated: #1a1a1a;
+  --t-panel: #1a1a1a;
+  --t-panel-2: #333333;
+  --t-text: #ffffff;
+  --t-text-muted: #cccccc;
+  --t-accent: var(--accent-override, #ffff00);
+  --t-accent-2: #00ffff;
+  --t-border: #ffffff;
+  --t-danger: #ff0000;
+  --t-warning: #ffff00;
+  --t-success: #00ff00;
+  --t-shadow: rgba(0,0,0,0.8);
+  --t-scanline-opacity: 0;
+  --t-panel-noise: 0;
+  --t-focus-ring: #ffff00;
+  --t-font-primary: 'JetBrains Mono', 'Courier New', monospace;
+  --t-font-heading: 'Arial', sans-serif;
+  --t-grid-color: transparent;
+  --t-scrollbar-thumb: linear-gradient(180deg, #ffff00 0%, #cccc00 100%);
+  --t-heading-glow: none;
+ }
+
+ /* ═══ Density & Border Variants ═══ */
+ [data-density="compact"] { --spacing-unit: 0.25rem; font-size: calc(var(--base-font-size, 1rem) * 0.92); }
+ [data-density="normal"]  { --spacing-unit: 0.5rem; font-size: var(--base-font-size, 1rem); }
+ [data-density="spacious"]{ --spacing-unit: 0.75rem; font-size: calc(var(--base-font-size, 1rem) * 1.04); }
+ [data-border="sharp"]    { --radius: 0; }
+ [data-border="rounded"]  { --radius: 0.25rem; }
+ [data-border="soft"]     { --radius: 0.75rem; }
+
+ /* Light theme color-scheme for proper native controls */
+ [data-theme="parchment"] *, [data-theme="research-light"] * { color-scheme: light; }
 
  * {
  border-color: hsl(var(--border));

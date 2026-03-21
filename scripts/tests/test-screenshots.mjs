@@ -100,7 +100,9 @@ const CANVAS_PAGES = new Set(['cases-board', 'cases-canvas', 'demos-memory-palac
 // ── CLI args ───────────────────────────────────────────────────────
 const args = process.argv.slice(2);
 const port = args.includes('--port') ? args[args.indexOf('--port') + 1] : '5173';
-const BASE = `http://localhost:${port}`;
+const baseUrlArg = args.includes('--base-url') ? args[args.indexOf('--base-url') + 1] : null;
+const envBaseUrl = process.env.PLAYWRIGHT_BASE_URL || process.env.BASE_URL || null;
+const BASE = (baseUrlArg || envBaseUrl || `http://localhost:${port}`).replace(/\/$/, '');
 const useAll = args.includes('--all');
 const singleRoute = args.includes('--route') ? args[args.indexOf('--route') + 1] : null;
 const generateHtml = args.includes('--html') || useAll;

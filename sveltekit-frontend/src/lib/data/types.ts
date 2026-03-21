@@ -41,7 +41,7 @@ export type NewEvidence = InferInsertModel<typeof evidence>;
 
 // Extended Evidence type with computed UI properties
 export interface ExtendedEvidence extends Evidence {
-	status?: string; // computed from isAdmissible and other fields
+	displayStatus?: string; // computed from isAdmissible and other fields
 }// Helper function to convert Evidence to ExtendedEvidence
 export function extendEvidence(evidenceItem: Evidence): ExtendedEvidence {
  return {

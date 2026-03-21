@@ -6,6 +6,8 @@
  import AccessibilitySettings from '$lib/components/ui/AccessibilitySettings.svelte';
   import Icon from '$lib/components/ui/Icon.svelte';
  import ThemeSelector from '$lib/components/ui/ThemeSelector.svelte';
+ import ThemeGallery from '$lib/components/ui/ThemeGallery.svelte';
+ import StyleSettings from '$lib/components/ui/StyleSettings.svelte';
  import SystemStatusCard from '$lib/components/ui/SystemStatusCard.svelte';
  import SystemStatusPanel from '$lib/components/dashboard/SystemStatusPanel.svelte';
  import SystemOverview from '$lib/components/yorha/dashboard/SystemOverview.svelte';
@@ -13,7 +15,7 @@
 
   const ONBOARDING_OPEN_EVENT = 'deeds:onboarding:open';
 
- let activeTab = $state<'general' | 'ai' | 'database' | 'gpu' | 'security' | 'accessibility' | 'status'>('general');
+ let activeTab = $state<'general' | 'appearance' | 'ai' | 'database' | 'gpu' | 'security' | 'accessibility' | 'status'>('general');
 
   const CONFIG_STORAGE_KEY = 'system-configuration:v1';
 
@@ -180,6 +182,14 @@
    </button>
 
    <button
+    class="nav-item {activeTab === 'appearance' ? 'active' : ''}"
+    onclick={() => activeTab = 'appearance'}
+   >
+    <span class="icon"><Icon name="palette" /></span>
+    APPEARANCE
+   </button>
+
+   <button
     class="nav-item {activeTab === 'ai' ? 'active' : ''}"
     onclick={() => activeTab = 'ai'}
    >
@@ -286,6 +296,17 @@
           </button>
         </div>
       </div>
+    </section>
+   {/if}
+
+   {#if activeTab === 'appearance'}
+    <section class="config-section">
+     <h2>INTERFACE_PROFILES</h2>
+     <ThemeGallery />
+
+     <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--t-border, #334155);">
+      <StyleSettings />
+     </div>
     </section>
    {/if}
 

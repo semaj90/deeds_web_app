@@ -6,7 +6,7 @@
  * Streams tokens as they're generated for responsive UI.
  */
 
-import { getKnowledgeSearcher } from '$lib/services/knowledge-search';
+import { getKnowledgeSearcher } from '$lib/services/knowledge-search/KnowledgeSearcher.js';
 import { getOllamaUrl } from '$lib/config/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ollamaFetch } from '$lib/server/ollama.js';

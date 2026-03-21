@@ -32,7 +32,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	// Check cache first (Memory → Redis, keyed by caseId+limit)
 	const cacheKey = `citations:${caseId ?? 'all'}:${limit}`;
 	const cached = getFromMemoryCache(cacheKey);
-	if (cached) {
+	if (Array.isArray(cached)) {
 		return json({ success: true, citations: cached, cache: true });
 	}
 
@@ -92,7 +92,8 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		const [newCitation] = await db
 			.insert(citations)
 			.values({
-				citationText: body.statute_code.trim(),
+				quotedText: body.statute_code.trim(),
+				citationType: body.source_type || 'statute',
 				caseId: body.case_id || null,
 				sourceUrl: body.source_type === 'manual' ? null : body.source_url || null,
 				createdBy: locals.user?.id ?? null,

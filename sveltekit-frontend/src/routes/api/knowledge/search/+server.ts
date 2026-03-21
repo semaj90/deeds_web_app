@@ -8,7 +8,7 @@
  * Requirements: 8.1
  */
 
-import { getKnowledgeSearcher } from '$lib/services/knowledge-search';
+import { getKnowledgeSearcher } from '$lib/services/knowledge-search/KnowledgeSearcher.js';
 import type { SearchRequest } from '$lib/services/knowledge-search/types';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { json } from '@sveltejs/kit';

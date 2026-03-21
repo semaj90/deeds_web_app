@@ -44,7 +44,7 @@ pool.on('error', (err) => {
   lastPoolErrorAt = new Date();
   console.error('Database pool error:', err.message);
 });
-export const db = drizzle(pool, { schema: mergedSchema, casing: 'snake_case', cache });
+export const db = drizzle(pool, { schema: mergedSchema, cache });
 
 const adminPool = new Pool({ connectionString: getAdminDatabaseUrl() });
 adminPool.on('error', (err) => {
@@ -53,7 +53,10 @@ adminPool.on('error', (err) => {
   lastPoolErrorAt = new Date();
   console.error('Admin database pool error:', err.message);
 });
-export const adminDb = drizzle(adminPool, { schema: mergedSchema, casing: 'snake_case' });
+// NOTE: Do NOT use casing: 'snake_case' — our schema uses explicit column names
+// (e.g. passwordHash: varchar('hashed_password')) and casing would override them
+// to password_hash, which doesn't exist in the DB.
+export const adminDb = drizzle(adminPool, { schema: mergedSchema });
 
 export async function closeConnections(): Promise<void> {
  await pool.end();

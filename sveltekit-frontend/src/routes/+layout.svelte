@@ -1,5 +1,6 @@
 <script lang="ts">
     import '../app.postcss';
+    import 'uno.css';
     import { appState, cleanupStores, initializeStores } from '$lib/stores';
     import type { Snippet } from 'svelte';
     import { onMount } from 'svelte';
@@ -89,6 +90,17 @@
 
     import CaseOverviewModal from '$lib/components/cases/CaseOverviewModal.svelte';
     import DocumentDetailModal from '$lib/components/DocumentDetailModal.svelte';
+    import AIAssistantButton from '$lib/components/ai/AIAssistantButton.svelte';
+    import FloatingChatModal from '$lib/components/ai/FloatingChatModal.svelte';
+    import CitationSaveTooltip from '$lib/components/legal/CitationSaveTooltip.svelte';
+
+    let showAIChat = $state(false);
+
+    // Extract caseId from URL when on a case route (/cases/[id]/...)
+    let activeCaseId = $derived.by(() => {
+        const match = page.url.pathname.match(/^\/cases\/([a-f0-9-]+)/i);
+        return match?.[1] ?? undefined;
+    });
 
     onMount(() => {
         mounted = true;
@@ -128,7 +140,14 @@
 </div>
 
 {#if mounted}
+    <CitationSaveTooltip caseId={activeCaseId} />
     <CaseDocumentWriter bind:isOpen={showDocumentWriter} />
+    <AIAssistantButton
+        variant="floating"
+        position="bottom-right"
+        onclick={() => showAIChat = !showAIChat}
+    />
+    <FloatingChatModal bind:open={showAIChat} caseId={activeCaseId} />
 {/if}
 
 {#if page.state.showCaseModal && page.state.caseId}
@@ -147,21 +166,22 @@
 
 <style>
     :global(:root) {
-        --shell-base: #060a12;
-        --shell-base-elevated: #0d1423;
-        --shell-base-deep: #121b30;
-        --shell-surface: rgba(17, 24, 39, 0.82);
-        --shell-surface-strong: rgba(17, 24, 39, 0.94);
-        --shell-border: rgba(120, 160, 220, 0.18);
-        --shell-border-strong: rgba(126, 231, 255, 0.28);
-        --shell-text: rgba(233, 240, 255, 0.88);
-        --shell-text-soft: rgba(184, 198, 226, 0.72);
-        --shell-muted: rgba(140, 160, 199, 0.52);
-        --shell-accent: #7ee7ff;
-        --shell-accent-strong: #53b7ff;
-        --shell-warm: #ffd479;
-        --shell-success: #53e2a4;
-        --shell-danger: #ff6b78;
+        /* Shell vars — bridged to unified theme contract (--t-*) */
+        --shell-base: var(--t-bg, #060a12);
+        --shell-base-elevated: var(--t-bg-elevated, #0d1423);
+        --shell-base-deep: var(--t-panel-2, #121b30);
+        --shell-surface: var(--t-panel, rgba(17, 24, 39, 0.82));
+        --shell-surface-strong: var(--t-panel-2, rgba(17, 24, 39, 0.94));
+        --shell-border: var(--t-border, rgba(120, 160, 220, 0.18));
+        --shell-border-strong: var(--t-accent-2, rgba(126, 231, 255, 0.28));
+        --shell-text: var(--t-text, rgba(233, 240, 255, 0.88));
+        --shell-text-soft: var(--t-text-muted, rgba(184, 198, 226, 0.72));
+        --shell-muted: var(--t-text-muted, rgba(140, 160, 199, 0.52));
+        --shell-accent: var(--t-accent-2, #7ee7ff);
+        --shell-accent-strong: var(--t-accent, #53b7ff);
+        --shell-warm: var(--t-accent, #ffd479);
+        --shell-success: var(--t-success, #53e2a4);
+        --shell-danger: var(--t-danger, #ff6b78);
         --shell-radius-sm: 12px;
         --shell-radius-md: 18px;
         --shell-radius-lg: 24px;
@@ -169,12 +189,8 @@
     }
 
     :global(body) {
-        background:
-            radial-gradient(circle at top left, rgba(126, 231, 255, 0.14), transparent 24%),
-            radial-gradient(circle at top right, rgba(255, 212, 121, 0.12), transparent 22%),
-            radial-gradient(circle at bottom, rgba(83, 183, 255, 0.14), transparent 30%),
-            linear-gradient(180deg, #0d1423 0%, #080d17 48%, #04070d 100%);
-        color: var(--shell-text);
+        background: var(--t-bg, #060a12);
+        color: var(--t-text, var(--shell-text));
         font-family: 'JetBrains Mono', 'Courier New', monospace;
         margin: 0;
         padding: 0;

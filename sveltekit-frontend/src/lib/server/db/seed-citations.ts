@@ -15,7 +15,7 @@ const { Pool } = pg;
 
 const DATABASE_URL =
 	process.env.DATABASE_URL ||
-	'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
+	'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
 
 const pool = new Pool({ connectionString: DATABASE_URL });
 const db = drizzle(pool, { schema });
@@ -91,49 +91,49 @@ async function seedCitations(): Promise<void> {
 		// Seed citations (references to statutes)
 		const sampleCitations = [
 			{
-				citationText: '18 U.S.C. § 1001',
+				quotedText: '18 U.S.C. § 1001',
 				caseId: null,
 				sourceUrl: 'https://www.law.cornell.edu/uscode/text/18/1001',
 				createdBy: null
 			},
 			{
-				citationText: '42 U.S.C. § 2000a',
+				quotedText: '42 U.S.C. § 2000a',
 				caseId: null,
 				sourceUrl: 'https://www.law.cornell.edu/uscode/text/42/2000a',
 				createdBy: null
 			},
 			{
-				citationText: '18 U.S.C. § 1343',
+				quotedText: '18 U.S.C. § 1343',
 				caseId: null,
 				sourceUrl: 'https://www.law.cornell.edu/uscode/text/18/1343',
 				createdBy: null
 			},
 			{
-				citationText: '5 U.S.C. § 552',
+				quotedText: '5 U.S.C. § 552',
 				caseId: null,
 				sourceUrl: 'https://www.law.cornell.edu/uscode/text/5/552',
 				createdBy: null
 			},
 			{
-				citationText: '42 U.S.C. § 12112',
+				quotedText: '42 U.S.C. § 12112',
 				caseId: null,
 				sourceUrl: 'https://www.law.cornell.edu/uscode/text/42/12112',
 				createdBy: null
 			},
 			{
-				citationText: 'Miranda v. Arizona, 384 U.S. 436 (1966)',
+				quotedText: 'Miranda v. Arizona, 384 U.S. 436 (1966)',
 				caseId: null,
 				sourceUrl: 'https://supreme.justia.com/cases/federal/us/384/436/',
 				createdBy: null
 			},
 			{
-				citationText: 'Brown v. Board of Education, 347 U.S. 483 (1954)',
+				quotedText: 'Brown v. Board of Education, 347 U.S. 483 (1954)',
 				caseId: null,
 				sourceUrl: 'https://supreme.justia.com/cases/federal/us/347/483/',
 				createdBy: null
 			},
 			{
-				citationText: 'Roe v. Wade, 410 U.S. 113 (1973)',
+				quotedText: 'Roe v. Wade, 410 U.S. 113 (1973)',
 				caseId: null,
 				sourceUrl: 'https://supreme.justia.com/cases/federal/us/410/113/',
 				createdBy: null
@@ -144,12 +144,12 @@ async function seedCitations(): Promise<void> {
 		let citationCount = 0;
 		for (const cit of sampleCitations) {
 			const existing = await db.select({ id: citations.id }).from(citations)
-				.where(eq(citations.citationText, cit.citationText)).limit(1);
+				.where(eq(citations.quotedText, cit.quotedText)).limit(1);
 			if (existing.length === 0) {
-				await db.insert(citations).values(cit);
-				console.log(`  + Created citation: ${cit.citationText}`);
+				await db.insert(citations).values({ ...cit, citationType: 'statute' });
+				console.log(`  + Created citation: ${cit.quotedText}`);
 			} else {
-				console.log(`  ~ Exists: ${cit.citationText}`);
+				console.log(`  ~ Exists: ${cit.quotedText}`);
 			}
 			citationCount++;
 		}

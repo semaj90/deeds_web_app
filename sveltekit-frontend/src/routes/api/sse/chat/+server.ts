@@ -106,8 +106,8 @@ async function loadCaseContext(caseId: string): Promise<string | null> {
           context += `- [${type}] "${e.title || 'Untitled'}" (${e.file_type || 'unknown'}) | Entities: ${entityCount} | ${forensicLabel}${summary ? '\n  ' + summary : ''}\n`;
         }
       }
-    } catch {
-      // Evidence table may not exist yet
+    } catch (e) {
+      console.warn('[Case Context] Evidence query failed:', e instanceof Error ? e.message : e);
     }
 
     // Load linked citations
@@ -125,8 +125,8 @@ async function loadCaseContext(caseId: string): Promise<string | null> {
           context += `- ${cit.statuteCode}: ${cit.statuteTitle ?? ''}\n`;
         }
       }
-    } catch {
-      // Citations table may not exist yet
+    } catch (e) {
+      console.warn('[Case Context] Citations query failed:', e instanceof Error ? e.message : e);
     }
 
     // Enforce token budget
@@ -299,8 +299,8 @@ export const POST: RequestHandler = async ({ request }) => {
 			.reverse()
 			.slice(0, -1) // remove last entry (current user message, added above)
 			.map(r => ({ role: r.role, content: r.content }));
-	} catch {
-		// DB may be unavailable — continue without history
+	} catch (e) {
+		console.warn('[Chat] History load failed — continuing without history:', e instanceof Error ? e.message : e);
 	}
 
 	const abortSignal = request.signal;

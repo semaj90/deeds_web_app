@@ -115,7 +115,16 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 		const embedStart = performance.now();
 		const caseEmbedding = await generateCaseEmbedding(caseId, sourceCase);
 		if (!caseEmbedding || caseEmbedding.length !== 768) {
-			return json({ error: 'Failed to generate case embedding' }, { status: 500 });
+			// Embedding unavailable — return empty results gracefully instead of 500
+			return json({
+				query: { caseId, title: sourceCase.title },
+				results: [],
+				timing: {
+					embedMs: Math.round(performance.now() - embedStart),
+					searchMs: 0, rerankMs: 0, aceMs: 0,
+					totalMs: Math.round(performance.now() - startTime)
+				}
+			});
 		}
 		const embedMs = performance.now() - embedStart;
 

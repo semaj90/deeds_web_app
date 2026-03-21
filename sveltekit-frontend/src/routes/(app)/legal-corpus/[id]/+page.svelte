@@ -9,6 +9,7 @@
 	import CitedSourcesOverlay from '$lib/components/legal/CitedSourcesOverlay.svelte';
 	import GlossaryTermCard from '$lib/components/legal/GlossaryTermCard.svelte';
 	import CitationViewModal from '$lib/components/citations/CitationViewModal.svelte';
+	import CitationHighlighter from '$lib/components/legal-ai/CitationHighlighter.svelte';
 	import LegalCorpusClassicView from '$lib/components/legal-corpus/LegalCorpusClassicView.svelte';
 	import LegalCorpusDemoView from '$lib/components/legal-corpus/LegalCorpusDemoView.svelte';
 	import { type LegalCorpusView, type DemoModel, legalCorpusViews, parseView, toDemoModel } from '$lib/adapters/legal-corpus';
@@ -52,6 +53,32 @@
 
 	// Source drawer
 	let drawerOpen = $state(false);
+
+	// Citation highlighter state
+	interface HighlightedCitation { text: string; startIndex: number; endIndex: number; summary?: string; confidence?: number; }
+	let textCitations = $state<HighlightedCitation[]>([]);
+
+	async function handleSaveTextCitation(citation: any) {
+		textCitations = [...textCitations, citation];
+		try {
+			await fetch('/api/citations/saved', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					statute_code: statute?.section || statute?.title || citation.text.slice(0, 200),
+					highlighted_text: citation.text,
+					source_type: 'auto_extracted',
+					notes: citation.summary || undefined
+				})
+			});
+		} catch (err) {
+			console.error('Failed to save citation:', err);
+		}
+	}
+
+	function handleRemoveTextCitation(citation: HighlightedCitation) {
+		textCitations = textCitations.filter(c => c.startIndex !== citation.startIndex);
+	}
 
 	// Citation modal state
 	let citationModalOpen = $state(false);
@@ -514,9 +541,15 @@
 					<section id="full-text" class="yorha-card">
 						<h2 class="section-heading">
 							<Icon name="scroll-text" size={16} class="text-amber" /> Official Text
+							<span class="highlight-hint">(highlight text to save as citation)</span>
 						</h2>
 						{#if statute.content}
-							<div class="yorha-reader official-text-reader">{statute.content}</div>
+							<CitationHighlighter
+								content={statute.content}
+								citations={textCitations}
+								onsave={handleSaveTextCitation}
+								onremove={handleRemoveTextCitation}
+							/>
 						{:else if data.chunks.length > 0}
 							{#each data.chunks as chunk}
 								<div class="chunk-row">
@@ -956,6 +989,12 @@
 {/if}
 
 <style>
+	.highlight-hint {
+		font-size: 0.72rem;
+		color: var(--t-text-muted, #888);
+		font-weight: 400;
+		margin-left: 0.5rem;
+	}
 	/* ═══════════════════════════════════════════════════════════════════════
 	   READER VIEW — Scoped CSS (bypasses UnoCSS extraction issues)
 	   ═══════════════════════════════════════════════════════════════════════ */

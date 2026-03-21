@@ -62,6 +62,16 @@
 	let tags = $derived<string[]>(doc?.tags ?? []);
 	let status = $derived(doc?.status ?? doc?.processingStatus ?? doc?.documentStatus ?? '');
 
+	// Image lightbox
+	let lightboxOpen = $state(false);
+	let lightboxScale = $state(1);
+
+	function openLightbox() { lightboxOpen = true; lightboxScale = 1; }
+	function closeLightbox() { lightboxOpen = false; }
+	function zoomIn() { lightboxScale = Math.min(lightboxScale + 0.25, 4); }
+	function zoomOut() { lightboxScale = Math.max(lightboxScale - 0.25, 0.25); }
+	function resetZoom() { lightboxScale = 1; }
+
 	// File-type color accent
 	let accentColor = $derived.by(() => {
 		const ft = fileType.toLowerCase();
@@ -142,17 +152,29 @@
 						<span>{loadError}</span>
 					</div>
 				{:else if doc}
-					<!-- File preview (images) -->
+					<!-- File preview (images with lightbox) -->
 					{#if isImage && fileUrl}
 						<div class="preview-wrap">
-							<img src={fileUrl} alt={doc.title ?? 'Evidence'} class="preview-img" />
+							<button type="button" class="preview-img-btn" onclick={openLightbox} title="Click to zoom">
+								<img src={fileUrl} alt={doc.title ?? 'Evidence'} class="preview-img" />
+								<span class="preview-zoom-hint">
+									<Icon name="zoom-in" class="w-4 h-4" />
+								</span>
+							</button>
 						</div>
 					{:else if isPdf && fileUrl}
-						<div class="preview-wrap pdf-wrap">
-							<a href={fileUrl} target="_blank" rel="noopener noreferrer" class="pdf-link">
-								<Icon name="external-link" class="w-4 h-4" />
-								Open PDF
-							</a>
+						<div class="preview-wrap pdf-embed-wrap">
+							<iframe
+								src={fileUrl}
+								title="PDF Document: {doc.title ?? 'Evidence'}"
+								class="pdf-iframe"
+							></iframe>
+							<div class="pdf-fallback">
+								<a href={fileUrl} target="_blank" rel="noopener noreferrer" class="pdf-link">
+									<Icon name="external-link" class="w-4 h-4" />
+									Open in new tab
+								</a>
+							</div>
 						</div>
 					{/if}
 
@@ -305,6 +327,43 @@
 					</div>
 				</div>
 			{/if}
+		</div>
+	</div>
+{/if}
+
+<!-- Image Lightbox -->
+{#if lightboxOpen && isImage && fileUrl}
+	<div
+		class="lightbox-backdrop"
+		role="dialog"
+		aria-modal="true"
+		aria-label="Image viewer"
+		onclick={closeLightbox}
+		onkeydown={(e) => { if (e.key === 'Escape') closeLightbox(); if (e.key === '+' || e.key === '=') zoomIn(); if (e.key === '-') zoomOut(); if (e.key === '0') resetZoom(); }}
+		tabindex="-1"
+	>
+		<div class="lightbox-toolbar" onclick={(e) => e.stopPropagation()}>
+			<button type="button" class="lb-btn" onclick={zoomOut} title="Zoom out (-)">
+				<Icon name="zoom-out" class="w-4 h-4" />
+			</button>
+			<span class="lb-zoom-label">{Math.round(lightboxScale * 100)}%</span>
+			<button type="button" class="lb-btn" onclick={zoomIn} title="Zoom in (+)">
+				<Icon name="zoom-in" class="w-4 h-4" />
+			</button>
+			<button type="button" class="lb-btn" onclick={resetZoom} title="Reset (0)">
+				<Icon name="maximize-2" class="w-4 h-4" />
+			</button>
+			<button type="button" class="lb-btn lb-close" onclick={closeLightbox} title="Close (Esc)">
+				<Icon name="x" class="w-4 h-4" />
+			</button>
+		</div>
+		<div class="lightbox-img-wrap" onclick={(e) => e.stopPropagation()}>
+			<img
+				src={fileUrl}
+				alt={doc?.title ?? 'Evidence'}
+				class="lightbox-img"
+				style="transform: scale({lightboxScale});"
+			/>
 		</div>
 	</div>
 {/if}
@@ -514,22 +573,120 @@
 		background: rgba(255, 255, 255, 0.02);
 		border: 1px solid rgba(212, 199, 163, 0.06);
 	}
+	.preview-img-btn {
+		position: relative;
+		display: block;
+		width: 100%;
+		background: none;
+		border: none;
+		padding: 0;
+		cursor: zoom-in;
+	}
 	.preview-img {
 		width: 100%;
 		max-height: 280px;
 		object-fit: contain;
 		display: block;
 	}
-	.pdf-wrap { padding: 1rem; }
+	.preview-zoom-hint {
+		position: absolute;
+		bottom: 8px;
+		right: 8px;
+		background: rgba(0, 0, 0, 0.6);
+		border-radius: 6px;
+		padding: 4px 6px;
+		color: rgba(212, 199, 163, 0.7);
+		opacity: 0;
+		transition: opacity 0.15s;
+	}
+	.preview-img-btn:hover .preview-zoom-hint { opacity: 1; }
+
+	/* Embedded PDF viewer */
+	.pdf-embed-wrap {
+		display: flex;
+		flex-direction: column;
+	}
+	.pdf-iframe {
+		width: 100%;
+		height: 420px;
+		border: none;
+		border-radius: 10px 10px 0 0;
+		background: #1a1a1a;
+	}
+	.pdf-fallback {
+		padding: 0.5rem 1rem;
+		border-top: 1px solid rgba(212, 199, 163, 0.06);
+		text-align: right;
+	}
 	.pdf-link {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.375rem;
-		font-size: 0.8rem;
+		font-size: 0.75rem;
 		color: #60a5fa;
 		text-decoration: none;
 	}
 	.pdf-link:hover { text-decoration: underline; }
+
+	/* Image Lightbox */
+	.lightbox-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 100;
+		background: rgba(0, 0, 0, 0.92);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		animation: fadeIn 0.15s ease;
+	}
+	.lightbox-toolbar {
+		position: absolute;
+		top: 12px;
+		right: 12px;
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		background: rgba(30, 30, 32, 0.85);
+		border: 1px solid rgba(212, 199, 163, 0.15);
+		border-radius: 8px;
+		padding: 4px 6px;
+		z-index: 101;
+	}
+	.lb-btn {
+		background: none;
+		border: none;
+		color: rgba(212, 199, 163, 0.6);
+		cursor: pointer;
+		padding: 4px;
+		border-radius: 4px;
+		display: flex;
+		align-items: center;
+	}
+	.lb-btn:hover { color: rgba(212, 199, 163, 0.9); background: rgba(255, 255, 255, 0.06); }
+	.lb-close:hover { color: #f87171; }
+	.lb-zoom-label {
+		font-size: 11px;
+		font-family: monospace;
+		color: rgba(212, 199, 163, 0.5);
+		min-width: 36px;
+		text-align: center;
+	}
+	.lightbox-img-wrap {
+		overflow: auto;
+		max-width: 95vw;
+		max-height: 90vh;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.lightbox-img {
+		max-width: none;
+		max-height: none;
+		transition: transform 0.15s ease;
+		cursor: grab;
+		border-radius: 4px;
+	}
 
 	/* Fields card */
 	.fields-card {

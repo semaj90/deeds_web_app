@@ -1,20 +1,57 @@
-<script lang="ts"> // Svelte, 5 runes are auto-imported import { fade } from 'svelte/transition';
- import type { Snippet } from 'svelte'; interface Props { open?: boolean; title?: string; size?: 'sm' | 'md' | 'lg' | 'xl'; closeOnOutsideClick?: boolean; closeOnEscape?: boolean; onclose?: () => void}
-  let { open = $bindable(false), title = '', size = 'md', closeOnOutsideClick = true, closeOnEscape = true, onclose, children, footer }: Props & { children?: Snippet; footer?: Snippet } = $props();
-   let modalElement = $state<HTMLDivElement>(); function handleClose() { open = false; onclose?.()}
-  function handleKeydown(_event: KeyboardEvent) { if (_event.key === 'Escape' && closeOnEscape) { handleClose()}
+<script lang="ts">
+  import type { Snippet } from 'svelte';
+
+  interface Props {
+    open?: boolean;
+    title?: string;
+    size?: 'sm' | 'md' | 'lg' | 'xl';
+    closeOnOutsideClick?: boolean;
+    closeOnEscape?: boolean;
+    onclose?: () => void;
   }
-  function handleOutsideClick(_event: MouseEvent) { if (closeOnOutsideClick && _event.target === modalElement) { handleClose()}
+
+  let {
+    open = $bindable(false),
+    title = '',
+    size = 'md',
+    closeOnOutsideClick = true,
+    closeOnEscape = true,
+    onclose,
+    children,
+    footer
+  }: Props & { children?: Snippet; footer?: Snippet } = $props();
+
+  let modalElement = $state<HTMLDivElement>();
+
+  function handleClose() {
+    open = false;
+    onclose?.();
   }
+
+  function handleKeydown(_event: KeyboardEvent) {
+    if (_event.key === 'Escape' && closeOnEscape) {
+      handleClose();
+    }
+  }
+
+  function handleOutsideClick(_event: MouseEvent) {
+    if (closeOnOutsideClick && _event.target === modalElement) {
+      handleClose();
+    }
+  }
+
   $effect(() => {
     const handleGlobalKeydown = (e: KeyboardEvent) => {
       if (open) handleKeydown(e);
     };
+
     document.addEventListener('keydown', handleGlobalKeydown);
+
     return () => {
       document.removeEventListener('keydown', handleGlobalKeydown);
     };
   });
+
   let sizeClasses = $derived.by(() => ({
     sm: 'max-w-md',
     md: 'max-w-lg',
@@ -26,7 +63,6 @@
     onclick={handleOutsideClick}
     role="presentation"
     aria-hidden="true"
-    transition:fade={{ duration: 200 }}
   >
     <div
       class={['modal-content', sizeClasses].filter(Boolean).join(' ')}

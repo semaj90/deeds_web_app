@@ -145,9 +145,6 @@ export function getRabbitMQManagementUrl(): string {
  return env?.RABBITMQ_MGMT_URL ?? `http://${isDocker ? 'rabbitmq' : 'localhost'}:15672`;
 }
 
-export function getGoMicroserviceUrl(): string {
- return env?.GO_MICROSERVICE_URL ?? `http://${isDocker ? 'go-microservice' : 'localhost'}:8080`;
-}
 
 export function getRagServiceUrl(): string {
  return env?.RAG_SERVICE_URL ?? `http://${isDocker ? 'rag-service' : 'localhost'}:8103`;

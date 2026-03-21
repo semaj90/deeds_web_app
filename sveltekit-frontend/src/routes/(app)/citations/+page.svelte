@@ -293,7 +293,7 @@
       const response = await fetch(`/api/citations?${params}`);
       if (response.ok) {
         const data = await response.json();
-        citations = data.citations ?? [];
+        citations = Array.isArray(data.citations) ? data.citations : [];
         // Backfill local cache with server results
         for (const c of citations) {
           citationCache.saveCitationLocal({
