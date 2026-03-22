@@ -25,12 +25,16 @@ export async function initializeNeo4jSchema(): Promise<void> {
 		await session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (e:Evidence) REQUIRE e.id IS UNIQUE');
 		await session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (s:Statute) REQUIRE s.code IS UNIQUE');
 		await session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (o:Organization) REQUIRE o.id IS UNIQUE');
+		await session.run(
+      'CREATE CONSTRAINT IF NOT EXISTS FOR (g:GlossaryTerm) REQUIRE g.key IS UNIQUE'
+    );
 
-		// Indexes for search performance
-		await session.run('CREATE INDEX IF NOT EXISTS FOR (p:Person) ON (p.name)');
-		await session.run('CREATE INDEX IF NOT EXISTS FOR (c:Case) ON (c.title)');
-		await session.run('CREATE INDEX IF NOT EXISTS FOR (c:Case) ON (c.caseNumber)');
-		await session.run('CREATE INDEX IF NOT EXISTS FOR (e:Evidence) ON (e.title)');
+    // Indexes for search performance
+    await session.run('CREATE INDEX IF NOT EXISTS FOR (p:Person) ON (p.name)');
+    await session.run('CREATE INDEX IF NOT EXISTS FOR (c:Case) ON (c.title)');
+    await session.run('CREATE INDEX IF NOT EXISTS FOR (c:Case) ON (c.caseNumber)');
+    await session.run('CREATE INDEX IF NOT EXISTS FOR (e:Evidence) ON (e.title)');
+    await session.run('CREATE INDEX IF NOT EXISTS FOR (g:GlossaryTerm) ON (g.term)');
 
 		initialized = true;
 		console.log('[Neo4j] Schema initialized');

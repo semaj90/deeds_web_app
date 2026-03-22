@@ -11,6 +11,23 @@ import { updateTextEmotion, getEmotionSystemPrompt, getEmotionState } from '$lib
 
 export type ChatRole = 'user' | 'assistant' | 'system';
 
+export interface GlossaryMatch {
+  id?: string | null;
+  term: string;
+  definition: string;
+  source: 'legal_glossary' | 'legal_definitions';
+  citation?: string | null;
+  confidence?: number | null;
+  jurisdiction?: string | null;
+  sourceNodeId?: string | null;
+}
+
+export interface AceEvalSummary {
+  quality: number;
+  completeness: number;
+  accuracy: number;
+}
+
 export interface ExtractedCitation {
   sourceNum: number;
   documentId: string;
@@ -28,6 +45,8 @@ export interface ChatMessage {
     citations?: string[];
     contextDocIds?: string[];
     extractedCitations?: ExtractedCitation[];
+    glossaryMatches?: GlossaryMatch[];
+    aceEval?: AceEvalSummary;
     graph_context?: string[];
     warnings?: string[];
     routerDecision?: RouterDecision;
@@ -41,6 +60,16 @@ export interface ConfidenceFactors {
 	embeddingModel: string;
 }
 
+function buildPersistedMetadata(
+  message: ChatMessage,
+  decision: RouterDecision
+): Record<string, unknown> {
+  return {
+    source: message.source ?? decision.source,
+    ...(message.metadata ?? {}),
+  };
+}
+
 export interface SSEChunk {
   id: string;
   role: 'assistant';
@@ -51,6 +80,8 @@ export interface SSEChunk {
   confidenceFactors?: ConfidenceFactors;
   contextUsed?: string[];
   citations?: ExtractedCitation[];
+  glossaryMatches?: GlossaryMatch[];
+  aceEval?: AceEvalSummary;
   conversationTurns?: number;
 }
 
@@ -61,6 +92,8 @@ type OnnxGenerationOutput = {
 };
 
 type AttachmentIngestResult = {
+  jobId?: string;
+  attachmentSourceHash?: string;
   title?: string;
   filename?: string;
   extractionMethod?: string;
@@ -68,12 +101,26 @@ type AttachmentIngestResult = {
   contentPreview?: string;
   yoloLabels?: string[];
   layoutRegions?: string[];
+  indexingStatus?: 'queued' | 'completed' | 'deferred';
+  statusMessage?: string;
+  statusStep?: string;
+  statusProgress?: number;
+};
+
+type AttachmentJobStatus = {
+  jobId: string;
+  status: 'queued' | 'running' | 'completed' | 'deferred' | 'error';
+  step: string;
+  progress: number;
+  message: string;
+  error?: string | null;
 };
 
 export interface SendMessageOptions {
   forceServer?: boolean;
   forceLocal?: boolean;
   attachment?: File | null;
+  attachmentSourceHash?: string;
 }
 
 function shouldDebugLogChunkStream(): boolean {
@@ -265,6 +312,10 @@ export class ChatSession {
         role: h.role as ChatRole,
         content: h.content,
         timestamp: new Date(h.timestamp).toISOString(),
+        metadata:
+          h.metadata && typeof h.metadata === 'object'
+            ? (h.metadata as ChatMessage['metadata'])
+            : undefined,
       }));
     }
   }
@@ -288,7 +339,38 @@ export class ChatSession {
   }
 
   private _getAceCaseId(): string | undefined {
-    return this._chatId.startsWith('case-') ? this._chatId : undefined;
+    return this._chatId.startsWith('case-') ? this._chatId.replace(/^case-/, '') : undefined;
+  }
+
+  async saveGlossaryConcept(match: GlossaryMatch): Promise<string> {
+    const caseId = this._getAceCaseId();
+    if (!caseId) {
+      throw new Error('Glossary concepts can only be saved from a case conversation.');
+    }
+
+    const response = await fetch(`/api/cases/${encodeURIComponent(caseId)}/authorities`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        category: 'glossary_concept',
+        term: match.term,
+        citationText: match.term,
+        definition: match.definition,
+        jurisdiction: match.jurisdiction,
+        source: match.source,
+        confidence: match.confidence,
+        relevanceScore: match.confidence,
+        nodeId: match.sourceNodeId || undefined,
+      }),
+    });
+
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(payload.error || `Glossary save failed: HTTP ${response.status}`);
+    }
+
+    this.addMessage('system', `Saved legal concept to case: ${match.term}`);
+    return payload.id as string;
   }
 
   private async _ingestAttachment(file: File): Promise<AttachmentIngestResult> {
@@ -313,6 +395,63 @@ export class ChatSession {
     return payload as AttachmentIngestResult;
   }
 
+  private async _fetchAttachmentJobStatus(jobId: string): Promise<AttachmentJobStatus> {
+    const response = await fetch(`/api/ace/status?jobId=${encodeURIComponent(jobId)}`);
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(payload.error || `Attachment status failed: HTTP ${response.status}`);
+    }
+
+    return payload as AttachmentJobStatus;
+  }
+
+  private async _watchAttachmentJob(jobId: string, title: string): Promise<void> {
+    let consecutiveFailures = 0;
+
+    for (let attempt = 0; attempt < 90; attempt += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      try {
+        const status = await this._fetchAttachmentJobStatus(jobId);
+        consecutiveFailures = 0;
+        if (status.status === 'completed') {
+          this.addMessage('system', `Attachment indexed for retrieval: ${title}`);
+          return;
+        }
+
+        if (status.status === 'deferred') {
+          this.addMessage(
+            'system',
+            `Attachment retrieval indexing deferred for ${title}. Preview-grounded answers remain available.`
+          );
+          return;
+        }
+
+        if (status.status === 'error') {
+          this.addMessage(
+            'system',
+            `Attachment indexing failed after preview extraction: ${status.error || status.message}`
+          );
+          return;
+        }
+      } catch {
+        consecutiveFailures += 1;
+        if (consecutiveFailures >= 5) {
+          this.addMessage(
+            'system',
+            `Attachment indexing status unavailable for ${title}. Preview-grounded answers are still available.`
+          );
+          return;
+        }
+      }
+    }
+
+    this.addMessage(
+      'system',
+      `Attachment indexing is still running for ${title}. Preview-grounded answers remain available.`
+    );
+  }
+
   /**
    * Send a message — routes through client router to decide local vs server.
    * Local ONNX path: TODO — wire onnxruntime-web InferenceSession here.
@@ -335,20 +474,43 @@ export class ChatSession {
         const attachmentResult = await this._ingestAttachment(options.attachment);
         const title =
           attachmentResult.title || attachmentResult.filename || options.attachment.name;
-        const details = [`Attachment ready: ${title}`];
+        const details = [
+          attachmentResult.indexingStatus === 'queued'
+            ? `Preview ready: ${title}`
+            : `Attachment indexed: ${title}`,
+        ];
         if (attachmentResult.extractionMethod) {
           details.push(`via ${attachmentResult.extractionMethod}`);
         }
         if (attachmentResult.yoloLabels?.length) {
           details.push(`YOLO: ${attachmentResult.yoloLabels.join(', ')}`);
         }
+        if (attachmentResult.statusMessage) {
+          details.push(attachmentResult.statusMessage);
+        }
+        if (attachmentResult.jobId) {
+          details.push(`job ${attachmentResult.jobId.slice(-8)}`);
+        }
         this.addMessage('system', details.join(' · '));
+        if (attachmentResult.indexingStatus === 'queued') {
+          this.addMessage(
+            'system',
+            'Answering from extracted preview while background indexing completes.'
+          );
+          if (attachmentResult.jobId) {
+            void this._watchAttachmentJob(attachmentResult.jobId, title);
+          }
+        }
         const normalizedPreview = normalizeAttachmentPreview(attachmentResult.contentPreview);
         const previewBlock = normalizedPreview
           ? `\n\nATTACHMENT SOURCE TEXT PROVIDED BELOW. Do not ask the user to provide it again.\n[ATTACHMENT SOURCE START]\n${normalizedPreview}\n[ATTACHMENT SOURCE END]`
           : '';
         routedMessage = `${lastUserMsg.content}\n\nFresh attachment uploaded just now: "${title}".${previewBlock}\n\nUse the attachment source text above and any retrieved ACE context from this attachment as the primary basis for your answer. Quote or cite the attached source when answering. If the attachment source text is present above, do not ask the user to provide it again.`;
-        effectiveOptions = { ...effectiveOptions, forceServer: true };
+        effectiveOptions = {
+          ...effectiveOptions,
+          forceServer: true,
+          attachmentSourceHash: attachmentResult.attachmentSourceHash,
+        };
       } catch (err: any) {
         const failureMessage = err?.message ?? 'Attachment ingest failed';
         this.addMessage('system', `Attachment ingest failed: ${failureMessage}`);
@@ -384,7 +546,7 @@ export class ChatSession {
     } else if (decision.source === 'retrieval-hybrid') {
       await this._handleRetrievalInference(routedMessage, decision);
     } else {
-      await this._handleServerInference(routedMessage, decision);
+      await this._handleServerInference(routedMessage, decision, effectiveOptions);
     }
   }
 
@@ -414,6 +576,10 @@ export class ChatSession {
         source: 'local-onnx',
         metadata: { routerDecision: decision },
       });
+      clientCache.saveChatMessage(this._chatId, 'assistant', cached.content, {
+        source: 'local-onnx',
+        routerDecision: decision,
+      });
       this.status = 'idle';
       this.lastSource = 'local-onnx';
       this.debugInfo = {
@@ -440,7 +606,10 @@ export class ChatSession {
 
       // Cache in IndexedDB (reply cache + chat history)
       await clientCache.putReply(message, content, 'local-onnx');
-      clientCache.saveChatMessage(this._chatId, 'assistant', content, { source: 'local-onnx' });
+      clientCache.saveChatMessage(this._chatId, 'assistant', content, {
+        source: 'local-onnx',
+        routerDecision: decision,
+      });
 
       this.status = 'idle';
       this.lastSource = 'local-onnx';
@@ -608,7 +777,11 @@ export class ChatSession {
   /**
    * Server SSE inference via /api/sse/chat (Ollama gemma3-legal:latest + RAG).
    */
-  private async _handleServerInference(message: string, decision: RouterDecision) {
+  private async _handleServerInference(
+    message: string,
+    decision: RouterDecision,
+    options?: SendMessageOptions
+  ) {
     const t0 = performance.now();
     this.status = 'thinking';
     this.error = null;
@@ -646,6 +819,7 @@ export class ChatSession {
           model: SERVER_CHAT_MODEL,
           emotionPrompt: emotionPrompt || undefined,
           emotionMood: emotionState.composite.mood,
+          attachmentSourceHash: options?.attachmentSourceHash || undefined,
           ...(this.currentRoute ? { currentRoute: this.currentRoute } : {}),
         }),
         signal: this.abortController.signal,
@@ -712,6 +886,12 @@ export class ChatSession {
                   ...(chunk.citations && {
                     extractedCitations: chunk.citations,
                   }),
+                  ...(chunk.glossaryMatches && {
+                    glossaryMatches: chunk.glossaryMatches,
+                  }),
+                  ...(chunk.aceEval && {
+                    aceEval: chunk.aceEval,
+                  }),
                 },
               };
             }
@@ -747,10 +927,12 @@ export class ChatSession {
       // Persist completed assistant message to IndexedDB
       const finalMsg = this.messages[assistantIdx];
       if (finalMsg?.content) {
-        clientCache.saveChatMessage(this._chatId, 'assistant', finalMsg.content, {
-          source: decision.source,
-          confidence: finalMsg.metadata?.confidence,
-        });
+        clientCache.saveChatMessage(
+          this._chatId,
+          'assistant',
+          finalMsg.content,
+          buildPersistedMetadata(finalMsg, decision)
+        );
       }
     } catch (err: any) {
       if (err.name === 'AbortError') return;

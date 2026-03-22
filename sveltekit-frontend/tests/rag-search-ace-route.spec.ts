@@ -1,0 +1,293 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+const mockCheck = vi.fn();
+const mockGetVectorCache = vi.fn();
+const mockSetVectorCache = vi.fn();
+const mockSetEmbeddingCache = vi.fn();
+const mockSparseHybridSearch = vi.fn();
+const mockSectionFilteredSearch = vi.fn();
+const mockAssembleACEContext = vi.fn();
+
+vi.mock('$env/dynamic/private', () => ({ env: {} }));
+vi.mock('$env/dynamic/public', () => ({ env: {} }));
+
+vi.mock('$lib/config/env.server.js', () => ({
+  getOllamaUrl: () => 'http://ollama.test',
+  getQdrantUrl: () => 'http://qdrant.test',
+}));
+
+vi.mock('$lib/server/production-logger.js', () => ({
+  productionLogger: {
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  },
+}));
+
+vi.mock('$lib/server/api/response-helper.js', () => ({
+  apiResponses: {
+    serviceUnavailable: (message: string) => new Response(JSON.stringify({ error: message }), { status: 503 }),
+    badRequest: (message: string) => new Response(JSON.stringify({ error: message }), { status: 400 }),
+    badGateway: (message: string) => new Response(JSON.stringify({ error: message }), { status: 502 }),
+    serverError: (message: string) => new Response(JSON.stringify({ error: message }), { status: 500 }),
+  },
+}));
+
+vi.mock('$lib/server/middleware/rate-limiter.js', () => ({
+  chatRateLimiter: {
+    check: mockCheck,
+  },
+}));
+
+vi.mock('$lib/server/retrieval/tfidf-scorer.js', () => ({
+  computeTFIDF: vi.fn(() => []),
+}));
+
+vi.mock('$lib/server/vector-cache.js', () => ({
+  getVectorCache: mockGetVectorCache,
+  setVectorCache: mockSetVectorCache,
+  getEmbeddingCache: vi.fn(),
+  setEmbeddingCache: mockSetEmbeddingCache,
+}));
+
+vi.mock('$lib/server/embedding/embed.js', () => ({
+  embedText: vi.fn(),
+}));
+
+vi.mock('$lib/server/observability/langfuse.js', () => ({
+  traceEmbedding: vi.fn(async (_query: string, _model: string, operation: () => Promise<unknown>) =>
+    operation()
+  ),
+}));
+
+vi.mock('$lib/server/ollama.js', () => ({
+  ollamaFetch: vi.fn(),
+}));
+
+vi.mock('$lib/server/env.server.js', () => ({
+  ENV: {
+    OLLAMA_BASE_URL: 'http://ollama.test',
+  },
+}));
+
+vi.mock('$lib/server/vector/qdrant-manager.js', () => ({
+  qdrant: {
+    sparseHybridSearch: mockSparseHybridSearch,
+    sectionFilteredSearch: mockSectionFilteredSearch,
+  },
+}));
+
+vi.mock('$lib/server/ace/context-assembler.js', () => ({
+  assembleACEContext: mockAssembleACEContext,
+}));
+
+describe('/api/rag/search ACE route integration', () => {
+  const caseId = '11111111-1111-4111-8111-111111111111';
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    mockCheck.mockReturnValue({ allowed: true, resetTime: Date.now() + 60_000 });
+    mockGetVectorCache.mockResolvedValue({ entry: null });
+    mockSetVectorCache.mockResolvedValue(undefined);
+    mockSetEmbeddingCache.mockResolvedValue(undefined);
+    mockSectionFilteredSearch.mockResolvedValue({ results: [] });
+    mockSparseHybridSearch.mockResolvedValue({
+      results: [
+        {
+          id: 'chunk-1',
+          score: 0.91,
+          payload: {
+            content: 'Probable cause analysis under California criminal procedure.',
+            title: 'Search Warrant Guide',
+            entities: ['probable cause'],
+            source_type: 'document',
+          },
+        },
+      ],
+      metadata: { searchType: 'hybrid-rrf' },
+    });
+    mockAssembleACEContext.mockResolvedValue({
+      entities: {
+        statutes: ['Cal. Penal Code 836'],
+        cases: ['People v. Superior Court'],
+        persons: ['Detective Hale'],
+        organizations: [],
+        dates: [],
+      },
+      kagNeighbors: [{ nodeId: 'kg-1', title: 'Related authority' }],
+    });
+  });
+
+  it('returns ACE metadata from the real rag/search handler when enableACE is on', async () => {
+    const { POST } = await import('../src/routes/api/rag/search/+server.js');
+
+    const request = new Request('http://localhost/api/rag/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: 'probable cause search warrant',
+        top_k: 5,
+        min_score: 0.3,
+        use_hybrid: true,
+        enableACE: true,
+        userId: 'user-1',
+        caseId,
+        conversationId: `case-${caseId}`,
+        precomputedEmbedding: Array.from({ length: 768 }, (_, index) => (index === 0 ? 1 : 0)),
+      }),
+    });
+
+    const response = await POST({
+      request,
+      url: new URL('http://localhost/api/rag/search'),
+    } as never);
+
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(mockAssembleACEContext).toHaveBeenCalledWith({
+      query: 'probable cause search warrant',
+      userId: 'user-1',
+      caseId,
+      conversationId: `case-${caseId}`,
+    });
+    expect(body.ace).toEqual({
+      entityCount: 3,
+      kagNeighborCount: 1,
+    });
+    expect(body.hybrid_search).toBe('bm42-rrf');
+    expect(body.total_found).toBeGreaterThan(0);
+    expect(body.chunks[0].source_title).toBe('Search Warrant Guide');
+  });
+
+  it('returns the cached response on a vector-cache hit without invoking ACE assembly', async () => {
+    const { POST } = await import('../src/routes/api/rag/search/+server.js');
+
+    mockGetVectorCache.mockResolvedValue({
+      entry: {
+        ts: Date.now() - 500,
+        results: [
+          {
+            query_id: 'cached-query-id',
+            query: 'probable cause search warrant',
+            case_id: caseId,
+            chunks: [
+              {
+                chunk_id: 'cached-chunk-1',
+                text: 'Cached probable cause result.',
+                snippet: 'Cached probable cause result.',
+                score: 0.94,
+                dense_score: 0.94,
+                confidence: 'high',
+                source_type: 'document',
+                source_id: 'cached-source-1',
+                source_title: 'Cached Search Warrant Guide',
+                related_entities: [],
+                graph_neighbors: [],
+                has_image: false,
+                has_table: false,
+              },
+            ],
+            total_found: 1,
+            search_time_ms: 7,
+            embedding_time_ms: 0,
+            embedding_model: 'embeddinggemma-onnx-client',
+            scoring_method: 'hybrid',
+            ace: {
+              entityCount: 3,
+              kagNeighborCount: 1,
+            },
+            timestamp: '2026-03-21T00:00:00.000Z',
+          },
+        ],
+      },
+    });
+
+    const request = new Request('http://localhost/api/rag/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: 'probable cause search warrant',
+        top_k: 5,
+        min_score: 0.3,
+        enableACE: true,
+        caseId,
+      }),
+    });
+
+    const response = await POST({
+      request,
+      url: new URL('http://localhost/api/rag/search'),
+    } as never);
+
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.cache).toEqual(
+      expect.objectContaining({
+        hit: true,
+        source: 'vector-cache',
+      })
+    );
+    expect(body.ace).toEqual({
+      entityCount: 3,
+      kagNeighborCount: 1,
+    });
+    expect(body.chunks[0].source_title).toBe('Cached Search Warrant Guide');
+    expect(mockAssembleACEContext).not.toHaveBeenCalled();
+    expect(mockSparseHybridSearch).not.toHaveBeenCalled();
+  });
+
+  it('returns 503 when the rate limiter rejects the request', async () => {
+    const { POST } = await import('../src/routes/api/rag/search/+server.js');
+
+    mockCheck.mockReturnValue({ allowed: false, resetTime: Date.now() + 4_000 });
+
+    const request = new Request('http://localhost/api/rag/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: 'probable cause search warrant',
+      }),
+    });
+
+    const response = await POST({
+      request,
+      url: new URL('http://localhost/api/rag/search'),
+    } as never);
+
+    const body = await response.json();
+
+    expect(response.status).toBe(503);
+    expect(body.error).toContain('Rate limit exceeded. Try again in');
+    expect(mockGetVectorCache).not.toHaveBeenCalled();
+    expect(mockAssembleACEContext).not.toHaveBeenCalled();
+    expect(mockSparseHybridSearch).not.toHaveBeenCalled();
+  });
+
+  it('returns 400 when query is missing', async () => {
+    const { POST } = await import('../src/routes/api/rag/search/+server.js');
+
+    const request = new Request('http://localhost/api/rag/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        top_k: 5,
+      }),
+    });
+
+    const response = await POST({
+      request,
+      url: new URL('http://localhost/api/rag/search'),
+    } as never);
+
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body).toEqual({ error: 'Invalid input: expected string, received undefined' });
+    expect(mockGetVectorCache).not.toHaveBeenCalled();
+    expect(mockAssembleACEContext).not.toHaveBeenCalled();
+    expect(mockSparseHybridSearch).not.toHaveBeenCalled();
+  });
+});

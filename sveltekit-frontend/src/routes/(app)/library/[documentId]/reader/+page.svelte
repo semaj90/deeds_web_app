@@ -530,6 +530,7 @@
 		color: rgba(212, 199, 163, 0.45);
 		line-height: 1.6;
 		display: -webkit-box;
+		line-clamp: 4;
 		-webkit-line-clamp: 4;
 		-webkit-box-orient: vertical;
 		overflow: hidden;

@@ -6,6 +6,7 @@
 import { expect, test } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
+import { cleanupSeededCases, registerTestUser, seedCasesForUser } from '../utils/seed-cases';
 
 const SCREENSHOT_DIR = path.join(process.cwd(), 'test-results', 'screenshots');
 let testCounter = 0;
@@ -23,7 +24,8 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
     // Mock ALL chat-related API endpoints to avoid OOM from real Ollama calls
     await page.route('**/api/sse/**', async (route) => {
       // Return SSEChunk format that ChatSession._handleServerInference expects
-      const mockContent = 'This is a mock AI response for testing purposes. The key elements of a valid contract include offer, acceptance, consideration, and mutual assent.';
+      const mockContent =
+        'This is a mock AI response for testing purposes. The key elements of a valid contract include offer, acceptance, consideration, and mutual assent.';
       const streamChunk = `data: {"id":"mock-1","role":"assistant","content":"${mockContent}","status":"streaming","confidence":0.85}\n\n`;
       const doneChunk = `data: {"id":"mock-1","role":"assistant","content":"${mockContent}","status":"done","confidence":0.85,"contextUsed":["Cal. Civ. Code § 1550"]}\n\n`;
 
@@ -36,7 +38,8 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
 
     await page.route('**/api/chat/stream**', async (route) => {
       // Return SSEChunk format that ChatSession._handleServerInference expects
-      const mockContent = 'This is a mock AI response for testing purposes. The key elements of a valid contract include offer, acceptance, consideration, and mutual assent.';
+      const mockContent =
+        'This is a mock AI response for testing purposes. The key elements of a valid contract include offer, acceptance, consideration, and mutual assent.';
       const streamChunk = `data: {"id":"mock-1","role":"assistant","content":"${mockContent}","status":"streaming","confidence":0.85}\n\n`;
       const doneChunk = `data: {"id":"mock-1","role":"assistant","content":"${mockContent}","status":"done","confidence":0.85,"contextUsed":["Cal. Civ. Code § 1550"]}\n\n`;
 
@@ -59,7 +62,7 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
         body: JSON.stringify({
           type: 'success',
           status: 200,
-          data: devalueData
+          data: devalueData,
         }),
       });
     });
@@ -136,11 +139,15 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
         expect(aiContent!.length).toBeGreaterThan(10);
         console.log(`✅ AI response received: ${aiContent!.substring(0, 80)}...`);
       } else {
-        console.log('⚠️  AI response not displayed (mocked SSE may not trigger ChatSession update)');
+        console.log(
+          '⚠️  AI response not displayed (mocked SSE may not trigger ChatSession update)'
+        );
       }
     } else {
       // Optimistic update didn't render — SvelteKit enhance deserialization issue
-      console.log('⚠️  User message not visible after send (enhance mock may need devalue serialization)');
+      console.log(
+        '⚠️  User message not visible after send (enhance mock may need devalue serialization)'
+      );
     }
 
     // Take final screenshot
@@ -211,7 +218,7 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
     await page.unroute('**/api/chat/stream**');
     // Override the mock with a delayed response so loading state is visible
     await page.route('**/api/chat/stream**', async (route) => {
-      await new Promise(resolve => setTimeout(resolve, 3000)); // 3s delay
+      await new Promise((resolve) => setTimeout(resolve, 3000)); // 3s delay
       const mockResponse = `data: {"type":"chunk","content":"Delayed response."}\n\ndata: {"type":"done"}\n\n`;
       await route.fulfill({
         status: 200,
@@ -226,7 +233,9 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
     await page.locator('[data-testid="chat-send"]').click();
 
     // Check for loading indicator (may be .loading, .thinking, or data-testid)
-    const loadingIndicator = page.locator('.loading, .thinking, [data-testid="loading"], [data-role="chat-streaming"]');
+    const loadingIndicator = page.locator(
+      '.loading, .thinking, [data-testid="loading"], [data-role="chat-streaming"]'
+    );
 
     // Should appear within 5 seconds
     const isVisible = await loadingIndicator.isVisible().catch(() => false);
@@ -275,7 +284,9 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
       console.log(`✅ Conversation: ${userCount} user messages displayed`);
     } else {
       // Soft pass — form was submitted 3 times without crashing
-      console.log(`⚠️  ${userCount} user messages rendered (enhance mock may not support optimistic updates)`);
+      console.log(
+        `⚠️  ${userCount} user messages rendered (enhance mock may not support optimistic updates)`
+      );
       console.log('✅ Form submission completed 3 times without errors');
     }
   });
@@ -473,6 +484,140 @@ test.describe('Phase 76: Case-Aware Stream Diagnostics', () => {
       path: path.join(SCREENSHOT_DIR, '11-case-context-stream.png'),
       fullPage: true,
     });
+  });
+
+  test('should save glossary concepts from case chat and persist them via authorities API', async ({
+    page,
+  }) => {
+    test.slow();
+
+    await registerTestUser(page.request);
+    const seeded = await seedCasesForUser({
+      request: page.request,
+      cases: [
+        {
+          title: 'Case Chat Glossary Save',
+          description: 'Seeded for glossary save regression coverage.',
+        },
+      ],
+    });
+
+    const caseId = seeded[0]?.id;
+    if (!caseId) {
+      throw new Error('Failed to seed case for glossary save regression test');
+    }
+
+    const glossaryTerm = 'Probable Cause';
+    const glossaryDefinition =
+      'Reasonable grounds to believe that a crime has been committed and that the accused is responsible.';
+    let ssePayload: any = null;
+
+    try {
+      page.on('request', (request) => {
+        if (request.url().includes('/api/sse/chat') && request.method() === 'POST') {
+          try {
+            ssePayload = JSON.parse(request.postData() || '{}');
+          } catch {
+            // ignore malformed test capture
+          }
+        }
+      });
+
+      const streamedChunks = [
+        {
+          id: 'case-glossary-1',
+          role: 'assistant',
+          content: 'Reviewing the saved case context and the legal definition now.',
+          status: 'streaming',
+          source: 'server-ollama',
+        },
+        {
+          id: 'case-glossary-1',
+          role: 'assistant',
+          content:
+            'Probable cause is present when the available facts would lead a reasonable person to believe the suspect committed the offense.',
+          status: 'done',
+          source: 'server-ollama',
+          confidence: 0.93,
+          confidenceFactors: {
+            caseContext: true,
+            ragHits: 2,
+            topScore: 0.88,
+            embeddingModel: 'embeddinggemma:latest',
+          },
+          glossaryMatches: [
+            {
+              id: 'glossary-probable-cause',
+              term: glossaryTerm,
+              definition: glossaryDefinition,
+              source: 'legal_glossary',
+              citation: 'Cal. Penal Code',
+              confidence: 0.98,
+              jurisdiction: 'California',
+              sourceNodeId: null,
+            },
+          ],
+        },
+      ];
+
+      await page.route('**/api/sse/chat', async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'text/event-stream',
+          headers: { 'Cache-Control': 'no-cache' },
+          body: streamedChunks.map((chunk) => `data: ${JSON.stringify(chunk)}\n\n`).join(''),
+        });
+      });
+
+      await page.goto(`/cases/${caseId}/chat?debug=1`, { waitUntil: 'networkidle' });
+
+      await expect(page.locator('[data-testid="case-chat-panel"]')).toBeVisible();
+      await page
+        .locator('[data-testid="case-chat-input"]')
+        .fill('Explain probable cause for this case.');
+      await page.locator('[data-testid="case-chat-send"]').click();
+
+      const glossaryPanel = page.locator('[data-testid="case-chat-glossary-matches"]').last();
+      await expect(glossaryPanel).toBeVisible();
+      await expect(glossaryPanel).toContainText(glossaryTerm);
+      await expect(glossaryPanel).toContainText(glossaryDefinition);
+
+      const glossaryCard = glossaryPanel
+        .locator('.glossary-card')
+        .filter({ hasText: glossaryTerm });
+      const saveButton = glossaryCard.locator('.glossary-save-btn');
+
+      await expect(saveButton).toContainText('Save');
+      await saveButton.click();
+      await expect(saveButton).toContainText('Saved');
+
+      await expect(
+        page.locator('[data-testid="case-chat-message"][data-role="system"]').last()
+      ).toContainText(`Saved legal concept to case: ${glossaryTerm}`);
+
+      expect(ssePayload?.conversationId).toBe(`case-${caseId}`);
+
+      const authoritiesResponse = await page.request.get(`/api/cases/${caseId}/authorities`);
+      expect(authoritiesResponse.ok()).toBeTruthy();
+
+      const authoritiesPayload = await authoritiesResponse.json();
+      const savedConcept = authoritiesPayload.authorities.find(
+        (authority: any) =>
+          authority.category === 'glossary_concept' && authority.glossaryTerm === glossaryTerm
+      );
+
+      expect(savedConcept).toBeTruthy();
+      expect(savedConcept.glossaryDefinition).toContain(glossaryDefinition);
+      expect(savedConcept.glossaryDefinition).toContain('Jurisdiction: California');
+      expect(savedConcept.glossaryDefinition).toContain('Source: legal_glossary');
+
+      await page.screenshot({
+        path: path.join(SCREENSHOT_DIR, '12-case-glossary-save.png'),
+        fullPage: true,
+      });
+    } finally {
+      await cleanupSeededCases({ request: page.request, caseIds: [caseId] });
+    }
   });
 });
 

@@ -32,6 +32,9 @@ export interface EmbeddingResult {
 	totalMs: number;
 }
 
+const HTTP_BATCH_TIMEOUT_MS = Number(process.env.EMBED_BATCH_TIMEOUT_MS ?? 180_000);
+const HTTP_SINGLE_TIMEOUT_MS = Number(process.env.EMBED_SINGLE_TIMEOUT_MS ?? 45_000);
+
 // ── gRPC client (lazy-loaded, singleton) ───────────────────────────────────
 
 let grpcClient: any = null;
@@ -39,96 +42,95 @@ let grpcLoadFailed = false;
 let grpcRetryAt = 0; // Timestamp for next retry after failure
 
 async function getGrpcClient(): Promise<any> {
-	if (grpcLoadFailed) {
-		// Retry after 30s instead of permanent disable
-		if (Date.now() < grpcRetryAt) return null;
-		grpcLoadFailed = false;
-		grpcClient = null;
-	}
-	if (grpcClient) return grpcClient;
+  if (grpcLoadFailed) {
+    // Retry after 30s instead of permanent disable
+    if (Date.now() < grpcRetryAt) return null;
+    grpcLoadFailed = false;
+    grpcClient = null;
+  }
+  if (grpcClient) return grpcClient;
 
-	try {
-		const grpc = await import('@grpc/grpc-js');
-		const protoLoader = await import('@grpc/proto-loader');
-		const { resolve } = await import('path');
+  try {
+    const grpc = await import('@grpc/grpc-js');
+    const protoLoader = await import('@grpc/proto-loader');
+    const { resolve } = await import('path');
 
-		// Use active proto definition (Go microservice archived, but proto still valid)
-		const PROTO_PATH = resolve(process.cwd(), '../proto/active/embedding.proto');
+    // Use active proto definition (Go microservice archived, but proto still valid)
+    const PROTO_PATH = resolve(process.cwd(), '../proto/active/embedding.proto');
 
-		const packageDefinition = await protoLoader.load(PROTO_PATH, {
-			keepCase: false,
-			longs: Number,
-			enums: String,
-			defaults: true,
-			oneofs: true
-		});
+    const packageDefinition = await protoLoader.load(PROTO_PATH, {
+      keepCase: false,
+      longs: Number,
+      enums: String,
+      defaults: true,
+      oneofs: true,
+    });
 
-		const protoDescriptor = grpc.loadPackageDefinition(packageDefinition) as any;
-		const EmbeddingService = protoDescriptor.embedding.EmbeddingService;
+    const protoDescriptor = grpc.loadPackageDefinition(packageDefinition) as any;
+    const EmbeddingService = protoDescriptor.embedding.EmbeddingService;
 
-		grpcClient = new EmbeddingService(
-			ENV.EMBEDDING_GRPC_URL,
-			grpc.credentials.createInsecure(),
-			{
-				// Keepalive: detect dead connections early (10s ping, 5s timeout)
-				'grpc.keepalive_time_ms': 10_000,
-				'grpc.keepalive_timeout_ms': 5_000,
-				'grpc.keepalive_permit_without_calls': 1,
-				// Connection lifecycle: prevent stale connections
-				'grpc.max_connection_idle_ms': 300_000,      // 5min idle disconnect
-				'grpc.max_connection_age_ms': 600_000,       // 10min max age
-				// Message size: 10MB for large batch embeddings
-				'grpc.max_send_message_length': 10 * 1024 * 1024,
-				'grpc.max_receive_message_length': 10 * 1024 * 1024,
-				// HTTP/2: allow pings without active streams
-				'grpc.http2.max_pings_without_data': 0,
-			}
-		);
+    grpcClient = new EmbeddingService(ENV.EMBEDDING_GRPC_URL, grpc.credentials.createInsecure(), {
+      // Keepalive: detect dead connections early (10s ping, 5s timeout)
+      'grpc.keepalive_time_ms': 10_000,
+      'grpc.keepalive_timeout_ms': 5_000,
+      'grpc.keepalive_permit_without_calls': 1,
+      // Connection lifecycle: prevent stale connections
+      'grpc.max_connection_idle_ms': 300_000, // 5min idle disconnect
+      'grpc.max_connection_age_ms': 600_000, // 10min max age
+      // Message size: 10MB for large batch embeddings
+      'grpc.max_send_message_length': 10 * 1024 * 1024,
+      'grpc.max_receive_message_length': 10 * 1024 * 1024,
+      // HTTP/2: allow pings without active streams
+      'grpc.http2.max_pings_without_data': 0,
+    });
 
-		return grpcClient;
-	} catch (err) {
-		console.warn('[embedding-client] gRPC client init failed, will retry in 30s:', (err as Error).message);
-		grpcLoadFailed = true;
-		grpcRetryAt = Date.now() + 30_000;
-		return null;
-	}
+    return grpcClient;
+  } catch (err) {
+    console.warn(
+      '[embedding-client] gRPC client init failed, will retry in 30s:',
+      (err as Error).message
+    );
+    grpcLoadFailed = true;
+    grpcRetryAt = Date.now() + 30_000;
+    return null;
+  }
 }
 
 // ── gRPC embedding call ────────────────────────────────────────────────────
 
 async function generateViaGrpc(texts: string[], timeoutMs = 5000): Promise<number[][] | null> {
-	const client = await getGrpcClient();
-	if (!client) return null;
+  const client = await getGrpcClient();
+  if (!client) return null;
 
-	return new Promise((resolve) => {
-		const deadline = new Date(Date.now() + timeoutMs);
+  return new Promise((resolve) => {
+    const deadline = new Date(Date.now() + timeoutMs);
 
-		// Go proto: GenerateEmbedding({ texts, normalize, use_cache, model_name })
-		client.generateEmbedding(
-			{ texts, normalize: true, useCache: true, modelName: SERVER_EMBEDDING_MODEL },
-			{ deadline },
-			(err: Error | null, response: any) => {
-				if (err) {
-					console.warn('[embedding-client] gRPC call failed:', err.message);
-					resolve(null);
-					return;
-				}
+    // Go proto: GenerateEmbedding({ texts, normalize, use_cache, model_name })
+    client.generateEmbedding(
+      { texts, normalize: true, useCache: true, modelName: SERVER_EMBEDDING_MODEL },
+      { deadline },
+      (err: Error | null, response: any) => {
+        if (err) {
+          console.warn('[embedding-client] gRPC call failed:', err.message);
+          resolve(null);
+          return;
+        }
 
-				if (!response || !response.success) {
-					console.warn('[embedding-client] gRPC response error:', response?.error);
-					resolve(null);
-					return;
-				}
+        if (!response || !response.success) {
+          console.warn('[embedding-client] gRPC response error:', response?.error);
+          resolve(null);
+          return;
+        }
 
-				// Go proto: EmbeddingVector.values (float[])
-				const vectors = (response.embeddings ?? []).map((e: any) =>
-					Array.isArray(e.values) ? e.values : []
-				);
+        // Go proto: EmbeddingVector.values (float[])
+        const vectors = (response.embeddings ?? []).map((e: any) =>
+          Array.isArray(e.values) ? e.values : []
+        );
 
-				resolve(vectors);
-			}
-		);
-	});
+        resolve(vectors);
+      }
+    );
+  });
 }
 
 // ── QUIC/NATS embedding call ──────────────────────────────────────────────
@@ -137,58 +139,59 @@ let natsConnection: any = null;
 let natsLoadFailed = false;
 
 async function getNatsConnection(): Promise<any> {
-	if (natsLoadFailed) return null;
-	if (natsConnection) return natsConnection;
+  if (natsLoadFailed) return null;
+  if (natsConnection) return natsConnection;
 
-	try {
-		const nats = await import('nats');
-		natsConnection = await nats.connect({
-			servers: [ENV.NATS_URL],
-			name: 'embedding-client',
-			maxReconnectAttempts: 2,
-			reconnectTimeWait: 500,
-			timeout: 3000
-		});
-		return natsConnection;
-	} catch (err) {
-		console.warn('[embedding-client] NATS/QUIC init failed, will skip QUIC tier:', (err as Error).message);
-		natsLoadFailed = true;
-		return null;
-	}
+  try {
+    const nats = await import('nats');
+    natsConnection = await nats.connect({
+      servers: [ENV.NATS_URL],
+      name: 'embedding-client',
+      maxReconnectAttempts: 2,
+      reconnectTimeWait: 500,
+      timeout: 3000,
+    });
+    return natsConnection;
+  } catch (err) {
+    console.warn(
+      '[embedding-client] NATS/QUIC init failed, will skip QUIC tier:',
+      (err as Error).message
+    );
+    natsLoadFailed = true;
+    return null;
+  }
 }
 
 async function generateViaQuic(texts: string[], timeoutMs = 5000): Promise<number[][] | null> {
-	const nc = await getNatsConnection();
-	if (!nc) return null;
+  const nc = await getNatsConnection();
+  if (!nc) return null;
 
-	try {
-		const codec = {
-			encode: (obj: any) => new TextEncoder().encode(JSON.stringify(obj)),
-			decode: (data: Uint8Array) => JSON.parse(new TextDecoder().decode(data))
-		};
+  try {
+    const codec = {
+      encode: (obj: any) => new TextEncoder().encode(JSON.stringify(obj)),
+      decode: (data: Uint8Array) => JSON.parse(new TextDecoder().decode(data)),
+    };
 
-		const request = {
-			texts,
-			model: SERVER_EMBEDDING_MODEL,
-			normalize: true,
-			timestamp: Date.now()
-		};
+    const request = {
+      texts,
+      model: SERVER_EMBEDDING_MODEL,
+      normalize: true,
+      timestamp: Date.now(),
+    };
 
-		const msg = await nc.request(
-			'legal.embedding.request',
-			codec.encode(request),
-			{ timeout: timeoutMs }
-		);
+    const msg = await nc.request('legal.embedding.request', codec.encode(request), {
+      timeout: timeoutMs,
+    });
 
-		const response = codec.decode(msg.data);
-		if (response.status === 'success' && Array.isArray(response.embeddings)) {
-			return response.embeddings;
-		}
-		return null;
-	} catch (err) {
-		console.warn('[embedding-client] QUIC/NATS embedding failed:', (err as Error).message);
-		return null;
-	}
+    const response = codec.decode(msg.data);
+    if (response.status === 'success' && Array.isArray(response.embeddings)) {
+      return response.embeddings;
+    }
+    return null;
+  } catch (err) {
+    console.warn('[embedding-client] QUIC/NATS embedding failed:', (err as Error).message);
+    return null;
+  }
 }
 
 // ── HTTP/Ollama fallback ───────────────────────────────────────────────────
@@ -198,45 +201,53 @@ async function generateViaQuic(texts: string[], timeoutMs = 5000): Promise<numbe
  * Falls back to sequential /api/embeddings if batch API is unavailable.
  */
 async function generateViaHttp(texts: string[]): Promise<number[][]> {
-	try {
-		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, input: texts }),
-			signal: AbortSignal.timeout(60_000)
-		});
+  try {
+    const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, input: texts }),
+      signal: AbortSignal.timeout(HTTP_BATCH_TIMEOUT_MS),
+    });
 
-		if (res.ok) {
-			const data = await res.json();
-			if (data.embeddings && Array.isArray(data.embeddings) && data.embeddings.length === texts.length) {
-				return data.embeddings;
-			}
-		}
-	} catch {
-		// Batch API unavailable — fall through to sequential
-	}
+    if (res.ok) {
+      const data = await res.json();
+      if (
+        data.embeddings &&
+        Array.isArray(data.embeddings) &&
+        data.embeddings.length === texts.length
+      ) {
+        return data.embeddings;
+      }
+    }
+  } catch (error) {
+    console.warn(
+      '[embedding-client] HTTP batch embedding failed, falling back to sequential:',
+      error instanceof Error ? error.message : error
+    );
+    // Batch API unavailable — fall through to sequential
+  }
 
-	return generateViaHttpSingle(texts);
+  return generateViaHttpSingle(texts);
 }
 
 /** Sequential fallback using old /api/embeddings (single prompt per request) */
 async function generateViaHttpSingle(texts: string[]): Promise<number[][]> {
-	const vectors: number[][] = [];
+  const vectors: number[][] = [];
 
-	for (const text of texts) {
-		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, prompt: text }),
-			signal: AbortSignal.timeout(15_000)
-		});
+  for (const text of texts) {
+    const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, prompt: text }),
+      signal: AbortSignal.timeout(HTTP_SINGLE_TIMEOUT_MS),
+    });
 
-		if (!res.ok) throw new Error(`Ollama embedding failed: ${res.status}`);
-		const data = await res.json();
-		vectors.push(data.embedding);
-	}
+    if (!res.ok) throw new Error(`Ollama embedding failed: ${res.status}`);
+    const data = await res.json();
+    vectors.push(data.embedding);
+  }
 
-	return vectors;
+  return vectors;
 }
 
 // ── Public API ─────────────────────────────────────────────────────────────

@@ -6,6 +6,7 @@
 	import LegalCaseForm from '$lib/components/forms/LegalCaseForm.svelte';
 	import EnhancedCaseForm from '$lib/components/forms/EnhancedCaseForm.svelte';
 	import AutoPopulatedCaseForm from '$lib/components/ui/AutoPopulatedCaseForm.svelte';
+	import { toast } from 'svelte-sonner';
 
 	let { data }: { data: PageData } = $props();
 
@@ -14,7 +15,12 @@
 	const { form, errors, enhance, submitting, delayed } = superForm(data.form, {
 		validators: zodClient(intakeCaseSchema as any),
 		resetForm: false,
-		invalidateAll: false
+		invalidateAll: false,
+		onResult({ result }) {
+			if (result.type === 'redirect') {
+				toast.success('Case created successfully');
+			}
+		}
 	});
 
 	// AI extraction state

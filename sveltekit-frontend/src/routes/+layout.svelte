@@ -8,7 +8,8 @@
     import YorhaSidebar from '$lib/components/layout/YorhaSidebar.svelte';
     import { notificationStore } from '$lib/stores/notifications.svelte';
     import { analytics } from '$lib/stores/analytics.svelte';
-    import { page } from '$app/state';
+    import { page, navigating } from '$app/state';
+    import { goto } from '$app/navigation';
     import { toast } from 'svelte-sonner';
     import { browser } from '$app/environment';
 
@@ -17,6 +18,10 @@
     let mounted = $state(false);
 
     function handleGlobalKeydown(e: KeyboardEvent) {
+        // Skip shortcuts when typing in inputs
+        const tag = (e.target as HTMLElement)?.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target as HTMLElement)?.isContentEditable) return;
+
         if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'd') {
             e.preventDefault();
             showDocumentWriter = !showDocumentWriter;
@@ -24,6 +29,16 @@
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
             e.preventDefault();
             showCommandPalette = !showCommandPalette;
+        }
+        // Ctrl+1-5 quick nav
+        if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
+            const routes: Record<string, string> = { '1': '/dashboard', '2': '/cases', '3': '/evidence', '4': '/global-search', '5': '/terminal' };
+            if (routes[e.key]) { e.preventDefault(); goto(routes[e.key]); }
+        }
+        // Ctrl+N = new case
+        if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'n') {
+            e.preventDefault();
+            goto('/cases/new');
         }
     }
 
@@ -125,6 +140,11 @@
 
 <!-- YoRHa Detective Sidebar -->
 <YorhaSidebar />
+
+<!-- Navigation loading bar -->
+{#if navigating.to}
+    <div class="nav-loading-bar"></div>
+{/if}
 
 <!-- Main Content Area -->
 <div class="app-shell">
@@ -278,6 +298,22 @@
             opacity: 1;
             transform: translateX(0);
         }
+    }
+
+    .nav-loading-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        z-index: 9999;
+        background: linear-gradient(90deg, transparent, var(--t-accent, #ffd700), transparent);
+        animation: navProgress 1.5s ease-in-out infinite;
+    }
+
+    @keyframes navProgress {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
     }
 
     /* ═══ Global Reset & Foundations ═══ */

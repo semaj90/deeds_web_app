@@ -753,3 +753,5 @@ scripts/tests/screenshots/2026-*/
 scripts/unsloth-training/COLAB_PACKAGE/@3_2_26Gemma3_12B_Legal_Production.ipynb
 # Archive directory — all subdirs are archived legacy code
 deeds_labs/
+
+lawpdfs/*.pdf

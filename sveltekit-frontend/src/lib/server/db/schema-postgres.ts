@@ -2695,8 +2695,14 @@ export const citationTypeEnum = pgEnum('citation_type', [
 ]);
 
 export const caseLinkCategoryEnum = pgEnum('case_link_category', [
-	'charged_under', 'cited_authority', 'defense_authority', 'court_ruling',
-	'related_regulation', 'constitutional_basis', 'sentencing_guideline',
+  'charged_under',
+  'cited_authority',
+  'defense_authority',
+  'court_ruling',
+  'related_regulation',
+  'constitutional_basis',
+  'sentencing_guideline',
+  'glossary_concept',
 ]);
 
 // --- Jurisdictions lookup ---

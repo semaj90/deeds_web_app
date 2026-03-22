@@ -132,274 +132,298 @@ function simpleHash(str: string): string {
 // ── Public API ───────────────────────────────────────────────────────────
 
 export const clientCache = {
-	/** Check if a reply is cached — LokiJS (hot) then IndexedDB (persistent) */
-	async getReply(prompt: string): Promise<{ content: string; source: string } | null> {
-		if (typeof window === 'undefined') return null;
-		const key = simpleHash(prompt);
+  /** Check if a reply is cached — LokiJS (hot) then IndexedDB (persistent) */
+  async getReply(prompt: string): Promise<{ content: string; source: string } | null> {
+    if (typeof window === 'undefined') return null;
+    const key = simpleHash(prompt);
 
-		// Hot path: LokiJS session cache (sync, ~0ms)
-		try {
-			const { replies } = ensureLoki();
-			const lokiHit = replies.findOne({ promptHash: key });
-			if (lokiHit) {
-				return { content: lokiHit.content, source: lokiHit.source };
-			}
-		} catch {
-			// LokiJS failure is non-critical
-		}
+    // Hot path: LokiJS session cache (sync, ~0ms)
+    try {
+      const { replies } = ensureLoki();
+      const lokiHit = replies.findOne({ promptHash: key });
+      if (lokiHit) {
+        return { content: lokiHit.content, source: lokiHit.source };
+      }
+    } catch {
+      // LokiJS failure is non-critical
+    }
 
-		// Cold path: IndexedDB persistent cache (async, ~1-5ms)
-		try {
-			const db = await getDB();
-			const entry = await db.get(STORES.replies, key);
-			if (!entry) return null;
-			if (Date.now() - entry.timestamp > TTL_MS) {
-				await db.delete(STORES.replies, key);
-				return null;
-			}
-			// Promote to LokiJS for subsequent hits
-			try {
-				const { replies } = ensureLoki();
-				replies.insert({ promptHash: key, content: entry.content, source: entry.source, ts: Date.now() });
-			} catch { /* non-critical */ }
-			return { content: entry.content, source: entry.source };
-		} catch {
-			return null;
-		}
-	},
+    // Cold path: IndexedDB persistent cache (async, ~1-5ms)
+    try {
+      const db = await getDB();
+      const entry = await db.get(STORES.replies, key);
+      if (!entry) return null;
+      if (Date.now() - entry.timestamp > TTL_MS) {
+        await db.delete(STORES.replies, key);
+        return null;
+      }
+      // Promote to LokiJS for subsequent hits
+      try {
+        const { replies } = ensureLoki();
+        replies.insert({
+          promptHash: key,
+          content: entry.content,
+          source: entry.source,
+          ts: Date.now(),
+        });
+      } catch {
+        /* non-critical */
+      }
+      return { content: entry.content, source: entry.source };
+    } catch {
+      return null;
+    }
+  },
 
-	/** Cache a reply — writes to both LokiJS (session) and IndexedDB (persistent) */
-	async putReply(prompt: string, content: string, source: string): Promise<void> {
-		if (typeof window === 'undefined') return;
-		const key = simpleHash(prompt);
+  /** Cache a reply — writes to both LokiJS (session) and IndexedDB (persistent) */
+  async putReply(prompt: string, content: string, source: string): Promise<void> {
+    if (typeof window === 'undefined') return;
+    const key = simpleHash(prompt);
 
-		// LokiJS: session cache (sync)
-		try {
-			const { replies } = ensureLoki();
-			const existing = replies.findOne({ promptHash: key });
-			if (existing) {
-				existing.content = content;
-				existing.source = source;
-				existing.ts = Date.now();
-				replies.update(existing);
-			} else {
-				replies.insert({ promptHash: key, content, source, ts: Date.now() });
-			}
-		} catch { /* non-critical */ }
+    // LokiJS: session cache (sync)
+    try {
+      const { replies } = ensureLoki();
+      const existing = replies.findOne({ promptHash: key });
+      if (existing) {
+        existing.content = content;
+        existing.source = source;
+        existing.ts = Date.now();
+        replies.update(existing);
+      } else {
+        replies.insert({ promptHash: key, content, source, ts: Date.now() });
+      }
+    } catch {
+      /* non-critical */
+    }
 
-		// IndexedDB: persistent cache (async)
-		try {
-			const db = await getDB();
-			await db.put(STORES.replies, {
-				promptHash: key,
-				content,
-				source,
-				timestamp: Date.now()
-			});
-		} catch {
-			// Cache write failure is non-critical
-		}
-	},
+    // IndexedDB: persistent cache (async)
+    try {
+      const db = await getDB();
+      await db.put(STORES.replies, {
+        promptHash: key,
+        content,
+        source,
+        timestamp: Date.now(),
+      });
+    } catch {
+      // Cache write failure is non-critical
+    }
+  },
 
-	/** Cache an embedding vector */
-	async putEmbedding(text: string, vector: number[]): Promise<void> {
-		if (typeof window === 'undefined') return;
-		try {
-			const db = await getDB();
-			await db.put(STORES.embeddings, {
-				chunkHash: simpleHash(text),
-				vector,
-				dims: vector.length,
-				timestamp: Date.now()
-			});
-		} catch {
-			// Non-critical
-		}
-	},
+  /** Cache an embedding vector */
+  async putEmbedding(text: string, vector: number[]): Promise<void> {
+    if (typeof window === 'undefined') return;
+    try {
+      const db = await getDB();
+      await db.put(STORES.embeddings, {
+        chunkHash: simpleHash(text),
+        vector,
+        dims: vector.length,
+        timestamp: Date.now(),
+      });
+    } catch {
+      // Non-critical
+    }
+  },
 
-	/** Retrieve a cached embedding */
-	async getEmbedding(text: string): Promise<number[] | null> {
-		if (typeof window === 'undefined') return null;
-		try {
-			const db = await getDB();
-			const key = simpleHash(text);
-			const entry = await db.get(STORES.embeddings, key);
-			if (!entry) return null;
-			if (Date.now() - entry.timestamp > TTL_MS) {
-				await db.delete(STORES.embeddings, key);
-				return null;
-			}
-			return entry.vector;
-		} catch {
-			return null;
-		}
-	},
+  /** Retrieve a cached embedding */
+  async getEmbedding(text: string): Promise<number[] | null> {
+    if (typeof window === 'undefined') return null;
+    try {
+      const db = await getDB();
+      const key = simpleHash(text);
+      const entry = await db.get(STORES.embeddings, key);
+      if (!entry) return null;
+      if (Date.now() - entry.timestamp > TTL_MS) {
+        await db.delete(STORES.embeddings, key);
+        return null;
+      }
+      return entry.vector;
+    } catch {
+      return null;
+    }
+  },
 
-	/** Persist chat message to IndexedDB for offline replay */
-	async saveChatMessage(chatId: string, role: string, content: string, metadata?: Record<string, unknown>): Promise<void> {
-		if (typeof window === 'undefined') return;
-		try {
-			const db = await getDB();
-			await db.add(STORES.chatHistory, {
-				chatId,
-				role,
-				content,
-				metadata,
-				timestamp: Date.now()
-			});
-		} catch {
-			// Non-critical
-		}
-	},
+  /** Persist chat message to IndexedDB for offline replay */
+  async saveChatMessage(
+    chatId: string,
+    role: string,
+    content: string,
+    metadata?: Record<string, unknown>
+  ): Promise<void> {
+    if (typeof window === 'undefined') return;
+    try {
+      const db = await getDB();
+      await db.add(STORES.chatHistory, {
+        chatId,
+        role,
+        content,
+        metadata,
+        timestamp: Date.now(),
+      });
+    } catch {
+      // Non-critical
+    }
+  },
 
-	/** Retrieve chat history for a conversation */
-	async getChatHistory(chatId: string): Promise<Array<{ role: string; content: string; timestamp: number }>> {
-		if (typeof window === 'undefined') return [];
-		try {
-			const db = await getDB();
-			const tx = db.transaction(STORES.chatHistory, 'readonly');
-			const index = tx.store.index('chatId');
-			return await index.getAll(chatId);
-		} catch {
-			return [];
-		}
-	},
+  /** Retrieve chat history for a conversation */
+  async getChatHistory(
+    chatId: string
+  ): Promise<
+    Array<{ role: string; content: string; timestamp: number; metadata?: Record<string, unknown> }>
+  > {
+    if (typeof window === 'undefined') return [];
+    try {
+      const db = await getDB();
+      const tx = db.transaction(STORES.chatHistory, 'readonly');
+      const index = tx.store.index('chatId');
+      return await index.getAll(chatId);
+    } catch {
+      return [];
+    }
+  },
 
-	/** Cache a router decision in LokiJS (session-only, 5min TTL) */
-	cacheRouterDecision(prompt: string, source: string, reason: string, confidence: number): void {
-		if (typeof window === 'undefined') return;
-		try {
-			const key = simpleHash(prompt);
-			const { router } = ensureLoki();
-			const existing = router.findOne({ promptHash: key });
-			if (existing) {
-				existing.source = source;
-				existing.reason = reason;
-				existing.confidence = confidence;
-				existing.ts = Date.now();
-				router.update(existing);
-			} else {
-				router.insert({ promptHash: key, source, reason, confidence, ts: Date.now() });
-			}
-		} catch { /* non-critical */ }
-	},
+  /** Cache a router decision in LokiJS (session-only, 5min TTL) */
+  cacheRouterDecision(prompt: string, source: string, reason: string, confidence: number): void {
+    if (typeof window === 'undefined') return;
+    try {
+      const key = simpleHash(prompt);
+      const { router } = ensureLoki();
+      const existing = router.findOne({ promptHash: key });
+      if (existing) {
+        existing.source = source;
+        existing.reason = reason;
+        existing.confidence = confidence;
+        existing.ts = Date.now();
+        router.update(existing);
+      } else {
+        router.insert({ promptHash: key, source, reason, confidence, ts: Date.now() });
+      }
+    } catch {
+      /* non-critical */
+    }
+  },
 
-	/** Get a cached router decision (LokiJS only — session-scoped) */
-	getCachedRouterDecision(prompt: string): { source: string; reason: string; confidence: number } | null {
-		if (typeof window === 'undefined') return null;
-		try {
-			const key = simpleHash(prompt);
-			const { router } = ensureLoki();
-			const hit = router.findOne({ promptHash: key });
-			if (!hit) return null;
-			return { source: hit.source, reason: hit.reason, confidence: hit.confidence };
-		} catch {
-			return null;
-		}
-	},
+  /** Get a cached router decision (LokiJS only — session-scoped) */
+  getCachedRouterDecision(
+    prompt: string
+  ): { source: string; reason: string; confidence: number } | null {
+    if (typeof window === 'undefined') return null;
+    try {
+      const key = simpleHash(prompt);
+      const { router } = ensureLoki();
+      const hit = router.findOne({ promptHash: key });
+      if (!hit) return null;
+      return { source: hit.source, reason: hit.reason, confidence: hit.confidence };
+    } catch {
+      return null;
+    }
+  },
 
-	/** Cache a CHR-ROM97 cartridge binary for a case (FP16 embeddings + graph metadata) */
-	async putCartridge(caseId: string, data: Uint8Array): Promise<void> {
-		if (typeof window === 'undefined') return;
-		try {
-			const db = await getDB();
-			await db.put(STORES.cartridges, {
-				caseId,
-				data,
-				size: data.byteLength,
-				timestamp: Date.now()
-			});
-		} catch {
-			// Non-critical — cartridge caching is an optimization
-		}
-	},
+  /** Cache a CHR-ROM97 cartridge binary for a case (FP16 embeddings + graph metadata) */
+  async putCartridge(caseId: string, data: Uint8Array): Promise<void> {
+    if (typeof window === 'undefined') return;
+    try {
+      const db = await getDB();
+      await db.put(STORES.cartridges, {
+        caseId,
+        data,
+        size: data.byteLength,
+        timestamp: Date.now(),
+      });
+    } catch {
+      // Non-critical — cartridge caching is an optimization
+    }
+  },
 
-	/** Retrieve a cached CHR-ROM97 cartridge for a case */
-	async getCartridge(caseId: string): Promise<Uint8Array | null> {
-		if (typeof window === 'undefined') return null;
-		try {
-			const db = await getDB();
-			const entry = await db.get(STORES.cartridges, caseId);
-			if (!entry) return null;
-			// Cartridges expire after 7 days (same as other cache entries)
-			if (Date.now() - entry.timestamp > TTL_MS) {
-				await db.delete(STORES.cartridges, caseId);
-				return null;
-			}
-			return entry.data;
-		} catch {
-			return null;
-		}
-	},
+  /** Retrieve a cached CHR-ROM97 cartridge for a case */
+  async getCartridge(caseId: string): Promise<Uint8Array | null> {
+    if (typeof window === 'undefined') return null;
+    try {
+      const db = await getDB();
+      const entry = await db.get(STORES.cartridges, caseId);
+      if (!entry) return null;
+      // Cartridges expire after 7 days (same as other cache entries)
+      if (Date.now() - entry.timestamp > TTL_MS) {
+        await db.delete(STORES.cartridges, caseId);
+        return null;
+      }
+      return entry.data;
+    } catch {
+      return null;
+    }
+  },
 
-	/** Cache a GPU computation result (reranking, similarity, etc.) */
-	async putGPUResult(key: string, result: unknown, backend: string): Promise<void> {
-		if (typeof window === 'undefined') return;
-		try {
-			const db = await getDB();
-			await db.put(STORES.gpuResults, {
-				computeHash: simpleHash(key),
-				result,
-				backend,
-				timestamp: Date.now()
-			});
-		} catch { /* non-critical */ }
-	},
+  /** Cache a GPU computation result (reranking, similarity, etc.) */
+  async putGPUResult(key: string, result: unknown, backend: string): Promise<void> {
+    if (typeof window === 'undefined') return;
+    try {
+      const db = await getDB();
+      await db.put(STORES.gpuResults, {
+        computeHash: simpleHash(key),
+        result,
+        backend,
+        timestamp: Date.now(),
+      });
+    } catch {
+      /* non-critical */
+    }
+  },
 
-	/** Retrieve a cached GPU computation result */
-	async getGPUResult(key: string): Promise<{ result: unknown; backend: string } | null> {
-		if (typeof window === 'undefined') return null;
-		try {
-			const db = await getDB();
-			const entry = await db.get(STORES.gpuResults, simpleHash(key));
-			if (!entry) return null;
-			// GPU results expire after 1 hour (shorter TTL for computation results)
-			if (Date.now() - entry.timestamp > 3_600_000) {
-				await db.delete(STORES.gpuResults, simpleHash(key));
-				return null;
-			}
-			return { result: entry.result, backend: entry.backend };
-		} catch {
-			return null;
-		}
-	},
+  /** Retrieve a cached GPU computation result */
+  async getGPUResult(key: string): Promise<{ result: unknown; backend: string } | null> {
+    if (typeof window === 'undefined') return null;
+    try {
+      const db = await getDB();
+      const entry = await db.get(STORES.gpuResults, simpleHash(key));
+      if (!entry) return null;
+      // GPU results expire after 1 hour (shorter TTL for computation results)
+      if (Date.now() - entry.timestamp > 3_600_000) {
+        await db.delete(STORES.gpuResults, simpleHash(key));
+        return null;
+      }
+      return { result: entry.result, backend: entry.backend };
+    } catch {
+      return null;
+    }
+  },
 
-	/** Get GPU cache stats */
-	async getGPUCacheStats(): Promise<{ count: number; oldestMs: number }> {
-		if (typeof window === 'undefined') return { count: 0, oldestMs: 0 };
-		try {
-			const db = await getDB();
-			const tx = db.transaction(STORES.gpuResults, 'readonly');
-			const all = await tx.store.getAll();
-			if (all.length === 0) return { count: 0, oldestMs: 0 };
-			const oldest = Math.min(...all.map((e: any) => e.timestamp));
-			return { count: all.length, oldestMs: Date.now() - oldest };
-		} catch {
-			return { count: 0, oldestMs: 0 };
-		}
-	},
+  /** Get GPU cache stats */
+  async getGPUCacheStats(): Promise<{ count: number; oldestMs: number }> {
+    if (typeof window === 'undefined') return { count: 0, oldestMs: 0 };
+    try {
+      const db = await getDB();
+      const tx = db.transaction(STORES.gpuResults, 'readonly');
+      const all = await tx.store.getAll();
+      if (all.length === 0) return { count: 0, oldestMs: 0 };
+      const oldest = Math.min(...all.map((e: any) => e.timestamp));
+      return { count: all.length, oldestMs: Date.now() - oldest };
+    } catch {
+      return { count: 0, oldestMs: 0 };
+    }
+  },
 
-	/** Evict expired entries across all stores. Called automatically on first cache access. */
-	async evictExpired(): Promise<number> {
-		if (typeof window === 'undefined') return 0;
-		let evicted = 0;
-		const cutoff = Date.now() - TTL_MS;
-		try {
-			const db = await getDB();
-			for (const storeName of [STORES.replies, STORES.embeddings, STORES.gpuResults]) {
-				const tx = db.transaction(storeName, 'readwrite');
-				let cursor = await tx.store.openCursor();
-				while (cursor) {
-					if (cursor.value.timestamp < cutoff) {
-						await cursor.delete();
-						evicted++;
-					}
-					cursor = await cursor.continue();
-				}
-			}
-		} catch {
-			// Non-critical
-		}
-		return evicted;
-	}
+  /** Evict expired entries across all stores. Called automatically on first cache access. */
+  async evictExpired(): Promise<number> {
+    if (typeof window === 'undefined') return 0;
+    let evicted = 0;
+    const cutoff = Date.now() - TTL_MS;
+    try {
+      const db = await getDB();
+      for (const storeName of [STORES.replies, STORES.embeddings, STORES.gpuResults]) {
+        const tx = db.transaction(storeName, 'readwrite');
+        let cursor = await tx.store.openCursor();
+        while (cursor) {
+          if (cursor.value.timestamp < cutoff) {
+            await cursor.delete();
+            evicted++;
+          }
+          cursor = await cursor.continue();
+        }
+      }
+    } catch {
+      // Non-critical
+    }
+    return evicted;
+  },
 };

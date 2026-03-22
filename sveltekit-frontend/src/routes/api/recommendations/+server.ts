@@ -16,7 +16,7 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import type { RankedDocument, DocumentCandidate } from '$lib/server/ml/multi-modal-ranker.js';
+import type { DocumentCandidate } from '$lib/server/ml/multi-modal-ranker.js';
 import { z } from 'zod';
 import { rankCombinedResults } from '$lib/server/ml/multi-modal-ranker.js';
 import { UserHistoryTracker } from '$lib/server/ml/user-history.js';

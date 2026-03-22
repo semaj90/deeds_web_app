@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import { toast } from 'svelte-sonner';
 	import { getTemplate, getTemplateTypes } from '$lib/data/report-templates';
 
 	let caseId = $derived(page.url.searchParams.get('caseId'));
@@ -56,7 +57,7 @@
 				reportId = data.data?.id;
 			}
 
-			if (reportId) { goto(`/reports/${reportId}/edit`); }
+			if (reportId) { toast.success('Report created successfully'); goto(`/reports/${reportId}/edit`); }
 			else { throw new Error('No report ID returned'); }
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to create report';

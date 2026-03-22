@@ -11,6 +11,7 @@ import { getFragment, setFragment, getGlyphCacheMetrics, FragmentType } from '$l
 import { createHash } from 'crypto';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self-prompt.js';
+import { fetchGlossaryMatches } from '$lib/server/ace/context-assembler.js';
 import { orderByDependency, extractCitationRefs } from '$lib/server/retrieval/document-dag.js';
 import type { DAGDocument } from '$lib/server/retrieval/document-dag.js';
 import { z } from 'zod';
@@ -21,6 +22,7 @@ const sseChatSchema = z.object({
   conversationId: z.string().min(1, 'Missing conversationId').max(200),
   emotionPrompt: z.string().max(5000).optional(),
   emotionMood: z.string().max(100).optional(),
+  attachmentSourceHash: z.string().max(64).optional(),
   currentRoute: z.string().max(500).optional(),
 });
 
@@ -127,6 +129,41 @@ interface ConfidenceFactors {
   kagNeighbors: number;
 }
 
+function extractResponseCitations(
+  response: string,
+  contextDocs: ContextDoc[]
+): Array<{
+  sourceNum: number;
+  documentId: string;
+  similarity: number;
+}> {
+  const extractedCitations: Array<{
+    sourceNum: number;
+    documentId: string;
+    similarity: number;
+  }> = [];
+  const sourceRefs = response.match(/\[Source\s+(\d+)[^\]]*\]/g) ?? [];
+
+  for (const ref of sourceRefs) {
+    const match = ref.match(/\[Source\s+(\d+)/);
+    if (!match) continue;
+
+    const sourceNum = parseInt(match[1]) - 1;
+    if (sourceNum < 0 || sourceNum >= contextDocs.length) continue;
+
+    const doc = contextDocs[sourceNum];
+    if (!extractedCitations.some((citation) => citation.documentId === doc.documentId)) {
+      extractedCitations.push({
+        sourceNum: sourceNum + 1,
+        documentId: doc.documentId,
+        similarity: doc.similarity,
+      });
+    }
+  }
+
+  return extractedCitations;
+}
+
 /**
  * Load case context from PostgreSQL for injection into AI prompts.
  * Fetches case details, recent evidence, and linked citations.
@@ -148,6 +185,29 @@ async function loadCaseContext(caseId: string): Promise<string | null> {
     if (c.court) context += `- **Court**: ${c.court}\n`;
     if (c.status) context += `- **Status**: ${c.status}\n`;
     if (c.description) context += `- **Description**: ${c.description}\n`;
+
+    try {
+      const glossaryResult = await db.execute(
+        sql`SELECT citation_text, notes
+            FROM case_library_links
+            WHERE case_id = ${caseId} AND category = 'glossary_concept'
+            ORDER BY created_at DESC
+            LIMIT 5`
+      );
+      const glossaryRows = glossaryResult.rows || [];
+
+      if (glossaryRows.length > 0) {
+        context += `\n## Saved Legal Concepts (${glossaryRows.length} items)\n`;
+        for (const row of glossaryRows as any[]) {
+          const term = String(row.citation_text ?? '').trim();
+          const definition = String(row.notes ?? '').trim();
+          if (!term) continue;
+          context += `- ${term}${definition ? `: ${definition.slice(0, 160)}` : ''}\n`;
+        }
+      }
+    } catch (e) {
+      console.warn('[Case Context] Glossary query failed:', e instanceof Error ? e.message : e);
+    }
 
     // Load recent evidence with metadata (type, forensic flags, entities)
     try {
@@ -211,6 +271,42 @@ async function loadCaseContext(caseId: string): Promise<string | null> {
   }
 }
 
+async function loadGlossaryPayload(query: string): Promise<{
+  text: string | null;
+  matches: Awaited<ReturnType<typeof fetchGlossaryMatches>>;
+}> {
+  const matches = await fetchGlossaryMatches(query);
+  if (!matches || matches.length === 0) {
+    return { text: null, matches: null };
+  }
+
+  const lines = matches.slice(0, 4).map((entry) => {
+    const meta = [entry.category, entry.jurisdiction, entry.citation].filter(Boolean).join(' | ');
+    const suffix = meta ? ` (${meta})` : '';
+    return `- ${entry.term}: ${entry.definition}${suffix}`;
+  });
+
+  return {
+    text: `## Legal Definitions\n${lines.join('\n')}`,
+    matches,
+  };
+}
+
+function serializeGlossaryMatches(matches: Awaited<ReturnType<typeof fetchGlossaryMatches>>) {
+  return (
+    matches?.map((entry) => ({
+      id: entry.id,
+      term: entry.term,
+      definition: entry.definition,
+      source: entry.source,
+      citation: entry.citation,
+      confidence: entry.confidence,
+      jurisdiction: entry.jurisdiction,
+      sourceNodeId: entry.sourceNodeId,
+    })) ?? []
+  );
+}
+
 // All legal RAG collections to search (768-dim Cosine, embeddinggemma)
 const RAG_COLLECTIONS = [
   'evidence_vectors', // uploaded evidence: PDFs, images, documents
@@ -225,7 +321,8 @@ const RAG_COLLECTIONS = [
 async function searchCollection(
   collection: string,
   vector: number[],
-  limit: number
+  limit: number,
+  filter?: Record<string, unknown>
 ): Promise<Array<Record<string, unknown>>> {
   try {
     const vectorPayload = collection === 'legal_documents' ? { name: 'content', vector } : vector;
@@ -238,6 +335,7 @@ async function searchCollection(
         limit,
         with_payload: true,
         score_threshold: RAG_SCORE_THRESHOLD,
+        ...(filter ? { filter } : {}),
       }),
       signal: AbortSignal.timeout(5000),
     });
@@ -342,6 +440,80 @@ async function retrieveContextWithBudget(
   try {
     return await Promise.race([
       retrieveContext(query, limit),
+      new Promise<ContextDoc[]>((resolve) => setTimeout(() => resolve([]), timeoutMs)),
+    ]);
+  } catch {
+    return [];
+  }
+}
+
+async function retrieveAttachmentContext(
+  query: string,
+  attachmentSourceHash: string,
+  caseUuid?: string,
+  limit = RAG_MAX_CHUNKS
+): Promise<ContextDoc[]> {
+  try {
+    const embedRes = await traceEmbedding(query, EMBEDDING_MODEL, () =>
+      ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: query, keep_alive: '24h' }),
+        signal: AbortSignal.timeout(8000),
+      })
+    );
+
+    if (!embedRes.ok) return [];
+    const embedData = await embedRes.json();
+    const vector = embedData.embedding;
+    if (!Array.isArray(vector) || vector.length === 0) return [];
+
+    const shouldFilterCase = typeof caseUuid === 'string' && caseUuid.length > 0;
+    const filter = {
+      must: [
+        { key: 'source_hash', match: { value: attachmentSourceHash } },
+        ...(shouldFilterCase ? [{ key: 'case_id', match: { value: caseUuid } }] : []),
+      ],
+    };
+
+    const hits = await searchCollection('legal_documents', vector, limit, filter);
+    hits.sort((a, b) => Number(b.score ?? 0) - Number(a.score ?? 0));
+
+    return hits
+      .map((r) => {
+        const payload = r.payload as Record<string, unknown> | undefined;
+        const rawContent = String(
+          payload?.full_text ?? payload?.content_preview ?? payload?.content ?? payload?.title ?? ''
+        );
+        const content =
+          rawContent.length > RAG_CHUNK_MAX_CHARS
+            ? rawContent.slice(0, RAG_CHUNK_MAX_CHARS) + '...'
+            : rawContent;
+
+        return {
+          content,
+          similarity: Number(r.score ?? 0),
+          documentId: `legal_documents:${r.id}`,
+          model: payload?.embedding_model as string | undefined,
+        };
+      })
+      .filter((r: ContextDoc | null): r is ContextDoc => r !== null && r.content.length > 0);
+  } catch (err) {
+    console.warn('[RAG] Attachment-scoped retrieval skipped:', err);
+    return [];
+  }
+}
+
+async function retrieveAttachmentContextWithBudget(
+  query: string,
+  attachmentSourceHash: string,
+  caseUuid?: string,
+  limit = RAG_MAX_CHUNKS,
+  timeoutMs = PRELUDE_RAG_TIMEOUT_MS
+): Promise<ContextDoc[]> {
+  try {
+    return await Promise.race([
+      retrieveAttachmentContext(query, attachmentSourceHash, caseUuid, limit),
       new Promise<ContextDoc[]>((resolve) => setTimeout(() => resolve([]), timeoutMs)),
     ]);
   } catch {
@@ -476,7 +648,15 @@ export const POST: RequestHandler = async ({ request }) => {
   if (!parsed.success) {
     return new Response(parsed.error.issues[0]?.message ?? 'Invalid input', { status: 400 });
   }
-  const { message, model, conversationId, emotionPrompt, emotionMood, currentRoute } = parsed.data;
+  const {
+    message,
+    model,
+    conversationId,
+    emotionPrompt,
+    emotionMood,
+    attachmentSourceHash,
+    currentRoute,
+  } = parsed.data;
 
   // Save user message to chatMessages table
   try {
@@ -596,6 +776,24 @@ export const POST: RequestHandler = async ({ request }) => {
         }
       }
 
+      // ── L0.5 Intercept 1b: Glossary Context ─────────────────────
+      // Cache glossary matches per query hash (5min TTL).
+      let glossaryContext: string | null = null;
+      let glossaryMatches: Awaited<ReturnType<typeof fetchGlossaryMatches>> = null;
+      const glossaryGlyphKey = `glyph:glossary:${createHash('md5').update(message).digest('hex').slice(0, 12)}`;
+      glossaryContext = getFragment(glossaryGlyphKey);
+      if (glossaryContext) {
+        console.log(`[Glyph L0.5] Glossary context HIT (${glossaryContext.length} chars)`);
+        glossaryMatches = await fetchGlossaryMatches(message).catch(() => null);
+      } else {
+        const glossaryPayload = await loadGlossaryPayload(message);
+        glossaryContext = glossaryPayload.text;
+        glossaryMatches = glossaryPayload.matches;
+        if (glossaryContext) {
+          setFragment(glossaryGlyphKey, glossaryContext, FragmentType.RAG, 5 * 60_000);
+        }
+      }
+
       // Code-intent gate: only run codebase retrieval for code-related queries
       const CODE_HINT =
         /(svelte|sveltekit|drizzle|ts-morph|playwright|hooks\.server|schema-postgres|route|endpoint|api\/|\.ts\b|\.svelte\b|stack trace|error|typescrip|build|vite|qdrant|rabbitmq|proto|grpc|function|handler|component|database|query|schema|migration|server)/i;
@@ -605,6 +803,9 @@ export const POST: RequestHandler = async ({ request }) => {
 
       // RAG + Codebase: retrieve context sources in parallel
       const caseUuid = caseMatch ? caseMatch[1] : undefined;
+      const attachmentScopedDocs = attachmentSourceHash
+        ? await retrieveAttachmentContextWithBudget(message, attachmentSourceHash, caseUuid)
+        : [];
 
       // ── L0.5 Intercept 2: Codebase Context ──────────────────────
       // Cache codebase retrieval by query hash (5min TTL)
@@ -624,7 +825,11 @@ export const POST: RequestHandler = async ({ request }) => {
       }
 
       const [rawContextDocs, freshCodebaseResult] = await Promise.all([
-        hasInlineAttachmentSource ? Promise.resolve([]) : retrieveContextWithBudget(message),
+        attachmentScopedDocs.length > 0
+          ? Promise.resolve(attachmentScopedDocs)
+          : hasInlineAttachmentSource
+            ? Promise.resolve([])
+            : retrieveContextWithBudget(message),
         wantsCode && !codeGlyphHit
           ? loadCodebaseContext(message).catch(() => null)
           : Promise.resolve(null),
@@ -698,6 +903,10 @@ export const POST: RequestHandler = async ({ request }) => {
       // Inject case context (case details, evidence, citations)
       if (caseContext) {
         systemPrompt += `\n\n${caseContext}`;
+      }
+
+      if (glossaryContext) {
+        systemPrompt += `\n\n${glossaryContext}`;
       }
 
       // Inject RAG context (vector-similar documents, DAG-ordered, budget-capped)
@@ -777,34 +986,15 @@ export const POST: RequestHandler = async ({ request }) => {
         let confidence = cacheResult.confidence ?? 0.8; // Use cached confidence or default
 
         // Extract citations
-        const extractedCitations: Array<{
-          sourceNum: number;
-          documentId: string;
-          similarity: number;
-        }> = [];
-        const sourceRefs = fullResponse.match(/\[Source\s+(\d+)[^\]]*\]/g) ?? [];
-        for (const ref of sourceRefs) {
-          const match = ref.match(/\[Source\s+(\d+)/);
-          if (match) {
-            const sourceNum = parseInt(match[1]) - 1;
-            if (sourceNum >= 0 && sourceNum < contextDocs.length) {
-              const doc = contextDocs[sourceNum];
-              if (!extractedCitations.some((c) => c.documentId === doc.documentId)) {
-                extractedCitations.push({
-                  sourceNum: sourceNum + 1,
-                  documentId: doc.documentId,
-                  similarity: doc.similarity,
-                });
-              }
-            }
-          }
-        }
+        const extractedCitations = extractResponseCitations(fullResponse, contextDocs);
 
         // Persist assistant message
         const assistantMetadata = JSON.stringify({
+          confidence,
           confidenceFactors,
           contextUsed: {
             case: caseContext !== null,
+            glossaryMatches: serializeGlossaryMatches(glossaryMatches),
             ragDocIds: contextUsed,
             ragScores: contextDocs.map((d) => ({
               id: d.documentId,
@@ -820,6 +1010,7 @@ export const POST: RequestHandler = async ({ request }) => {
           },
           conversationTurns: conversationHistory.length,
           model: model ?? 'gemma3-legal:latest',
+          glossaryMatches: serializeGlossaryMatches(glossaryMatches),
           cachedResponse: true,
           cachedAt: cacheResult.cachedAt,
         });
@@ -848,6 +1039,7 @@ export const POST: RequestHandler = async ({ request }) => {
           confidenceFactors,
           contextUsed,
           citations: extractedCitations,
+          glossaryMatches: serializeGlossaryMatches(glossaryMatches),
           conversationTurns: conversationHistory.length,
           cachedResponse: true,
         });
@@ -946,28 +1138,7 @@ export const POST: RequestHandler = async ({ request }) => {
         confidence = Math.min(confidence, 0.95);
 
         // Extract [Source N] citations from the LLM response
-        const extractedCitations: Array<{
-          sourceNum: number;
-          documentId: string;
-          similarity: number;
-        }> = [];
-        const sourceRefs = fullResponse.match(/\[Source\s+(\d+)[^\]]*\]/g) ?? [];
-        for (const ref of sourceRefs) {
-          const match = ref.match(/\[Source\s+(\d+)/);
-          if (match) {
-            const sourceNum = parseInt(match[1]) - 1;
-            if (sourceNum >= 0 && sourceNum < contextDocs.length) {
-              const doc = contextDocs[sourceNum];
-              if (!extractedCitations.some((c) => c.documentId === doc.documentId)) {
-                extractedCitations.push({
-                  sourceNum: sourceNum + 1,
-                  documentId: doc.documentId,
-                  similarity: doc.similarity,
-                });
-              }
-            }
-          }
-        }
+        let extractedCitations = extractResponseCitations(fullResponse, contextDocs);
 
         // ── ACE Self-Evaluation: assess response quality, retry once if low ──
         // Wrap in a 15s wallclock timeout to prevent GPU queue stalls
@@ -993,6 +1164,7 @@ export const POST: RequestHandler = async ({ request }) => {
                 context: {
                   userProfile: null,
                   caseContext,
+                  glossaryMatches,
                   ragChunks: contextDocs.map((d) => ({
                     content: d.content,
                     score: d.similarity,
@@ -1087,6 +1259,7 @@ export const POST: RequestHandler = async ({ request }) => {
                   }
                   if (improvedResponse.length > 50) {
                     fullResponse = improvedResponse;
+                    extractedCitations = extractResponseCitations(fullResponse, contextDocs);
                     console.log(
                       `[ACE Self-Eval] Improved response accepted (${improvedResponse.length} chars)`
                     );
@@ -1110,9 +1283,11 @@ export const POST: RequestHandler = async ({ request }) => {
 
         // Persist assistant message with context metadata
         const assistantMetadata = JSON.stringify({
+          confidence,
           confidenceFactors,
           contextUsed: {
             case: caseContext !== null,
+            glossaryMatches: serializeGlossaryMatches(glossaryMatches),
             ragDocIds: contextUsed,
             ragScores: contextDocs.map((d) => ({
               id: d.documentId,
@@ -1128,6 +1303,7 @@ export const POST: RequestHandler = async ({ request }) => {
           },
           conversationTurns: conversationHistory.length,
           model: model ?? 'gemma3-legal:latest',
+          glossaryMatches: serializeGlossaryMatches(glossaryMatches),
           ...(aceEvaluation
             ? {
                 aceEvaluation: {
@@ -1206,6 +1382,7 @@ export const POST: RequestHandler = async ({ request }) => {
           confidenceFactors,
           contextUsed,
           citations: extractedCitations,
+          glossaryMatches: serializeGlossaryMatches(glossaryMatches),
           conversationTurns: conversationHistory.length,
           ...(aceEvaluation
             ? {

@@ -144,7 +144,8 @@ async function getDockerContainers(): Promise<
 }
 
 export const load: PageServerLoad = async ({ url }) => {
-	const [services, qdrant, indexing, docker] = await Promise.all([
+	// 8s overall timeout to prevent SSR hangs under load
+	const dataPromise = Promise.all([
 		Promise.all([
 			checkServiceHealth('PostgreSQL', `${url.origin}/api/health/database`),
 			checkServiceHealth('Redis', `${url.origin}/api/health/redis`),
@@ -158,11 +159,29 @@ export const load: PageServerLoad = async ({ url }) => {
 		getDockerContainers()
 	]);
 
+	const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 8000));
+	const result = await Promise.race([dataPromise, timeoutPromise]);
+
+	if (!result) {
+		// Timed out — return empty shells
+		return {
+			services: [] as ServiceHealth[],
+			qdrant: { collections: [] as QdrantCollection[], totalPoints: 0 },
+			indexing: { codebase: null, errors: null } as IndexingStatus,
+			docker: [] as Array<{ name: string; status: string; image: string; ports: string }>,
+			timestamp: new Date().toISOString(),
+			loadError: 'Dev tools data loading timed out (8s)'
+		};
+	}
+
+	const [services, qdrant, indexing, docker] = result;
+
 	return {
 		services,
 		qdrant,
 		indexing,
 		docker,
-		timestamp: new Date().toISOString()
+		timestamp: new Date().toISOString(),
+		loadError: null
 	};
 };

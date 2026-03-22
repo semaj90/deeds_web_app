@@ -99,6 +99,8 @@
 				href={item.href}
 				class="nav-item"
 				class:active={isActive(item.href)}
+				aria-label={collapsed ? item.label : undefined}
+				title={collapsed ? item.label : undefined}
 			>
 				<Icon name={item.icon} size={14} />
 				{#if !collapsed}
@@ -122,6 +124,8 @@
 				href={item.href}
 				class="nav-item admin-item"
 				class:active={isActive(item.href)}
+				aria-label={collapsed ? item.label : undefined}
+				title={collapsed ? item.label : undefined}
 			>
 				<Icon name={item.icon} size={14} />
 				{#if !collapsed}

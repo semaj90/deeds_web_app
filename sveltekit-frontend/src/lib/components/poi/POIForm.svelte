@@ -1,6 +1,7 @@
 <script lang="ts">
   import { superForm } from 'sveltekit-superforms/client';
   import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
+  import { toast } from 'svelte-sonner';
   import { z } from 'zod';
 
   const poiSchema = z.object({
@@ -22,7 +23,12 @@
   // svelte-ignore state_referenced_locally
   const { form, errors, enhance, submitting } = superForm(formData, {
     validators: zodClient(poiSchema),
-    resetForm: false
+    resetForm: false,
+    onResult({ result }) {
+      if (result.type === 'redirect') {
+        toast.success('Person of interest created successfully');
+      }
+    }
   });
 
   const statusOptions = [

@@ -37,24 +37,25 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	try {
 		// 1. Self-evaluate the investigation result
 		const evaluation = await evaluateResponse({
-			query,
-			response: answer,
-			context: {
-				userProfile: null,
-				caseContext: caseId || null,
-				ragChunks: [],
-				kagNeighbors: [],
-				chatHistory: [],
-				entities: { statutes: [], cases: [], persons: [], organizations: [], dates: [] },
-				practiceTemplate: null,
-				queryTags: [],
-				webSearchContext: null,
-				persona: 'investigator',
-				evidenceMetadata: null,
-				evidenceConnections: null
-			},
-			backend: 'ollama'
-		});
+      query,
+      response: answer,
+      context: {
+        userProfile: null,
+        caseContext: caseId || null,
+        glossaryMatches: null,
+        ragChunks: [],
+        kagNeighbors: [],
+        chatHistory: [],
+        entities: { statutes: [], cases: [], persons: [], organizations: [], dates: [] },
+        practiceTemplate: null,
+        queryTags: [],
+        webSearchContext: null,
+        persona: 'investigator',
+        evidenceMetadata: null,
+        evidenceConnections: null,
+      },
+      backend: 'ollama',
+    });
 
 		// 2. Generate correction prompt if quality is low
 		const correctionPrompt = generateCorrectionPrompt(evaluation, query, answer);

@@ -6,13 +6,14 @@ import { libraryDocuments } from './library-documents';
 import { legalNodes } from './legal-nodes';
 
 export const caseLinkCategoryEnum = pgEnum('case_link_category', [
-	'charged_under',       // primary charging statute
-	'cited_authority',     // authority cited in brief/motion
-	'defense_authority',   // defense-cited authority
-	'court_ruling',        // court's cited authority
-	'related_regulation',  // administrative regulation
-	'constitutional_basis', // constitutional provision
-	'sentencing_guideline', // sentencing reference
+  'charged_under', // primary charging statute
+  'cited_authority', // authority cited in brief/motion
+  'defense_authority', // defense-cited authority
+  'court_ruling', // court's cited authority
+  'related_regulation', // administrative regulation
+  'constitutional_basis', // constitutional provision
+  'sentencing_guideline', // sentencing reference
+  'glossary_concept', // saved legal concept/definition for the case
 ]);
 
 /**

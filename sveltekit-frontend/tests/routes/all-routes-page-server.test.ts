@@ -78,16 +78,16 @@ function mergeRoutesWithDatabase(
 
       return {
         ...route,
-        status, dbMeta.status || route.status,
+        status: dbMeta.status || route.status,
         tags: dbMeta.badges ? [...(route.tags || []), ...dbMeta.badges] : route.tags,
-        errorCount, dbMeta.errorCount || 0,
-        warningCount, dbMeta.warningCount || 0,
-        infoCount, dbMeta.infoCount || 0,
-        suggestionCount, dbMeta.suggestionCount || 0,
+        errorCount: dbMeta.errorCount || 0,
+        warningCount: dbMeta.warningCount || 0,
+        infoCount: dbMeta.infoCount || 0,
+        suggestionCount: dbMeta.suggestionCount || 0,
         lastErrorAt: dbMeta.lastErrorAt?.toISOString?.() || undefined,
-        lastErrorMessage, dbMeta.lastErrorMessage || undefined,
+        lastErrorMessage: dbMeta.lastErrorMessage || undefined,
         errorState,
-        patchSuccessRate | undefined,
+        patchSuccessRate: route.patchSuccessRate,
       };
     }
     return route;
@@ -102,6 +102,7 @@ function calculateRouteHealth(
   warningCount: number,
   healthStatus?: string
 ): 'healthy' | 'flaky' | 'broken' {
+  if (healthStatus === 'healthy') return 'healthy';
   if (healthStatus === 'broken') return 'broken';
   if (healthStatus === 'flaky') return 'flaky';
   if (errorCount > 0) return errorCount > 10 ? 'broken' : 'flaky';
@@ -116,12 +117,12 @@ function astNodeToRouteNode(astNode: any): RouteNode {
   const nodeId = astNode.id || astNode.path || String(Math.random());
   const path = astNode.path || '';
   const groupMatch = path.match(/\(([^)]+)\)/);
-  const group = groupMatch ? `(${groupMatch[1]})`  | undefined;
+  const group = groupMatch ? `(${groupMatch[1]})` : undefined;
 
   let kind: RouteNode['kind'] = 'page';
-  if (astNode.file?.includes('+layout')) kind = 'layout';
+  if (astNode.file?.includes('api/')) kind = 'endpoint';
+  else if (astNode.file?.includes('+layout')) kind = 'layout';
   else if (astNode.file?.includes('+server')) kind = 'server';
-  else if (astNode.file?.includes('api/')) kind = 'endpoint';
 
   const tags: string[] = [];
   if (path.includes('cases')) tags.push('case');
@@ -139,7 +140,7 @@ function astNodeToRouteNode(astNode: any): RouteNode {
     kind,
     group,
     status: 'ok',
-    tags: tags.length ? tags  | undefined,
+    tags: tags.length ? tags : undefined,
     category: group ? `Routes/${group}` : 'Routes/root',
     lastModified: astNode.lastModified,
     hasLoad: astNode.hasLoad ?? false,

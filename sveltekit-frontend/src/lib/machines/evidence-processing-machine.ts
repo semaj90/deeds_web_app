@@ -586,14 +586,12 @@ export function getProcessingProgress(context: EvidenceProcessingContext): numbe
 }
 
 export function getCurrentStep(context: EvidenceProcessingContext): string {
- const inProgressUpdate = context.streamingUpdates.find(
- (update) => update.status === 'in_progress'
- );
- return inProgressUpdate?.step ?? 'idle';
+ const latestUpdate = context.streamingUpdates.at(-1);
+ return latestUpdate?.status === 'in_progress' ? latestUpdate.step : 'idle';
 }
 
 export function getStepProgress(context: EvidenceProcessingContext, step: string): number {
- const stepUpdate = context.streamingUpdates.find((update) => update.step === step);
+ const stepUpdate = [...context.streamingUpdates].reverse().find((update) => update.step === step);
  return stepUpdate?.progress ?? 0;
 }
 

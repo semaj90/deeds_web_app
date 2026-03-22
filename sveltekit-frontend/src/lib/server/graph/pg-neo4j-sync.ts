@@ -31,108 +31,144 @@ export async function syncCaseToGraph(caseId: string): Promise<SyncResult> {
 		const session = driver.session({ database: 'neo4j' });
 
 		try {
-			// 1. Load case from PostgreSQL
-			const caseRows = await db.execute(
-				sql`SELECT id, title, case_number, jurisdiction, court, status, practice_area, description
+      // 1. Load case from PostgreSQL
+      const caseRows = await db.execute(
+        sql`SELECT id, title, case_number, jurisdiction, court, status, practice_area, description
 					FROM cases WHERE id = ${caseId} LIMIT 1`
-			);
-			const caseData = [...caseRows][0] as Record<string, unknown> | undefined;
-			if (!caseData) {
-				result.errors.push(`Case ${caseId} not found`);
-				return result;
-			}
+      );
+      const caseData = [...caseRows][0] as Record<string, unknown> | undefined;
+      if (!caseData) {
+        result.errors.push(`Case ${caseId} not found`);
+        return result;
+      }
 
-			// MERGE Case node
-			await session.run(
-				`MERGE (c:Case {id: $id})
+      // MERGE Case node
+      await session.run(
+        `MERGE (c:Case {id: $id})
 				 SET c.title = $title, c.caseNumber = $caseNumber, c.jurisdiction = $jurisdiction,
 					 c.court = $court, c.status = $status, c.practiceArea = $practiceArea,
 					 c.updatedAt = datetime()`,
-				{
-					id: caseId,
-					title: caseData.title ?? '',
-					caseNumber: caseData.case_number ?? '',
-					jurisdiction: caseData.jurisdiction ?? '',
-					court: caseData.court ?? '',
-					status: caseData.status ?? '',
-					practiceArea: caseData.practice_area ?? ''
-				}
-			);
-			result.cases++;
+        {
+          id: caseId,
+          title: caseData.title ?? '',
+          caseNumber: caseData.case_number ?? '',
+          jurisdiction: caseData.jurisdiction ?? '',
+          court: caseData.court ?? '',
+          status: caseData.status ?? '',
+          practiceArea: caseData.practice_area ?? '',
+        }
+      );
+      result.cases++;
 
-			// 2. Load persons linked to this case
-			const personRows = await db.execute(
-				sql`SELECT id, name, role, description
+      // 2. Load persons linked to this case
+      const personRows = await db.execute(
+        sql`SELECT id, name, role, description
 					FROM persons_of_interest
 					WHERE ${caseId} = ANY(case_ids)
 					LIMIT 50`
-			);
-			for (const p of [...personRows] as Record<string, unknown>[]) {
-				await session.run(
-					`MERGE (p:Person {id: $id})
+      );
+      for (const p of [...personRows] as Record<string, unknown>[]) {
+        await session.run(
+          `MERGE (p:Person {id: $id})
 					 SET p.name = $name, p.role = $role
 					 WITH p
 					 MATCH (c:Case {id: $caseId})
 					 MERGE (p)-[:INVOLVED_IN {role: $role}]->(c)`,
-					{
-						id: p.id,
-						name: p.name ?? '',
-						role: p.role ?? 'unknown',
-						caseId
-					}
-				);
-				result.persons++;
-				result.relationships++;
-			}
+          {
+            id: p.id,
+            name: p.name ?? '',
+            role: p.role ?? 'unknown',
+            caseId,
+          }
+        );
+        result.persons++;
+        result.relationships++;
+      }
 
-			// 3. Load evidence linked to this case
-			const evidenceRows = await db.execute(
-				sql`SELECT id, title, file_type, description
+      // 3. Load evidence linked to this case
+      const evidenceRows = await db.execute(
+        sql`SELECT id, title, file_type, description
 					FROM evidence
 					WHERE case_id = ${caseId}
 					LIMIT 50`
-			);
-			for (const e of [...evidenceRows] as Record<string, unknown>[]) {
-				await session.run(
-					`MERGE (e:Evidence {id: $id})
+      );
+      for (const e of [...evidenceRows] as Record<string, unknown>[]) {
+        await session.run(
+          `MERGE (e:Evidence {id: $id})
 					 SET e.title = $title, e.fileType = $fileType
 					 WITH e
 					 MATCH (c:Case {id: $caseId})
 					 MERGE (e)-[:BELONGS_TO]->(c)`,
-					{
-						id: e.id,
-						title: e.title ?? '',
-						fileType: e.file_type ?? '',
-						caseId
-					}
-				);
-				result.evidence++;
-				result.relationships++;
-			}
+          {
+            id: e.id,
+            title: e.title ?? '',
+            fileType: e.file_type ?? '',
+            caseId,
+          }
+        );
+        result.evidence++;
+        result.relationships++;
+      }
 
-			// 4. Load citations linked to this case
-			const citationRows = await db.execute(
-				sql`SELECT id, statute_code, statute_title
+      // 4. Load citations linked to this case
+      const citationRows = await db.execute(
+        sql`SELECT id, statute_code, statute_title
 					FROM saved_citations
 					WHERE case_id = ${caseId}
 					LIMIT 30`
-			);
-			for (const cit of [...citationRows] as Record<string, unknown>[]) {
-				await session.run(
-					`MERGE (s:Statute {code: $code})
+      );
+      for (const cit of [...citationRows] as Record<string, unknown>[]) {
+        await session.run(
+          `MERGE (s:Statute {code: $code})
 					 SET s.title = $title
 					 WITH s
 					 MATCH (c:Case {id: $caseId})
 					 MERGE (c)-[:REFERENCES]->(s)`,
-					{
-						code: cit.statute_code ?? '',
-						title: cit.statute_title ?? '',
-						caseId
-					}
-				);
-				result.relationships++;
-			}
-		} finally {
+          {
+            code: cit.statute_code ?? '',
+            title: cit.statute_title ?? '',
+            caseId,
+          }
+        );
+        result.relationships++;
+      }
+
+      // 5. Load saved glossary concepts linked to this case
+      const glossaryRows = await db.execute(
+        sql`SELECT citation_text, notes, node_id
+					FROM case_library_links
+					WHERE case_id = ${caseId} AND category = 'glossary_concept'
+					LIMIT 30`
+      );
+      for (const concept of [...glossaryRows] as Record<string, unknown>[]) {
+        const rawTerm = String(concept.citation_text ?? '').trim();
+        if (!rawTerm) continue;
+        const key = rawTerm.toLowerCase();
+        const definition = String(concept.notes ?? '').trim();
+        const nodeId = concept.node_id ? String(concept.node_id) : null;
+
+        await session.run(
+          `MERGE (g:GlossaryTerm {key: $key})
+					 SET g.term = $term, g.definition = $definition, g.updatedAt = datetime()
+					 WITH g
+					 MATCH (c:Case {id: $caseId})
+					 MERGE (c)-[:USES_CONCEPT]->(g)`,
+          { key, term: rawTerm, definition, caseId }
+        );
+        result.relationships++;
+
+        if (nodeId) {
+          await session.run(
+            `MERGE (n:LegalNode {id: $nodeId})
+						 WITH n
+						 MATCH (g:GlossaryTerm {key: $key})
+						 MERGE (g)-[:DEFINED_IN]->(n)`,
+            { nodeId, key }
+          );
+          result.relationships++;
+        }
+      }
+    } finally {
 			await session.close();
 		}
 	} catch (err) {

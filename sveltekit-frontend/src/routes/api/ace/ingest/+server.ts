@@ -2,11 +2,16 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { chunkLegalDocument, type LegalChunk } from '$lib/server/indexer/legal-chunker.js';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { qdrant, deterministicPointId } from '$lib/server/vector/qdrant-manager.js';
-import { createHash } from 'crypto';
+import { createHash, randomBytes } from 'crypto';
 import { db } from '$lib/server/db/client';
 import { yorhaEvidenceNodes, yorhaEvidenceConnections } from '$lib/server/db/schema-postgres.js';
 import { extractTextHybrid } from '$lib/server/ocr/hybrid.js';
 import { createYOLOService } from '$lib/server/yolo.js';
+import {
+  createAceIngestJob,
+  updateAceIngestJob,
+  type AceIngestStep,
+} from '$lib/server/ace-ingest-progress.js';
 import { sql } from 'drizzle-orm';
 import { z } from 'zod';
 
@@ -21,6 +26,7 @@ const pdfFilePattern = /\.pdf$/i;
 const imageFilePattern = /\.(png|jpg|jpeg|tiff|tif|bmp|webp)$/i;
 const MIN_EXTRACTED_TEXT_LENGTH = 30;
 const MIN_PDF_TEXT_LENGTH = 100;
+const ACE_EMBED_BATCH_TIMEOUT_MS = Number(process.env.ACE_EMBED_BATCH_TIMEOUT_MS ?? 20_000);
 
 type ProgressEmitter = (stage: string, progress: number, extra?: Record<string, unknown>) => void;
 
@@ -45,6 +51,111 @@ type YoloSummary = {
   objectLabels: string[];
   layoutRegions: string[];
 };
+
+type PreparedIngest = {
+  resolved: ResolvedIngestSource;
+  chunks: LegalChunk[];
+  contentPreview: string;
+  totalTokens: number;
+};
+
+function createAceJobId(): string {
+  return `ace-${Date.now()}-${randomBytes(4).toString('hex')}`;
+}
+
+function normalizeProgressPercent(progress: number): number {
+  return Math.max(0, Math.min(100, Math.round(progress * 100)));
+}
+
+function normalizeAceStep(stage: string): AceIngestStep {
+  switch (stage) {
+    case 'fetching':
+    case 'extracting':
+    case 'chunking':
+    case 'embedding':
+    case 'storing':
+    case 'graph':
+    case 'neo4j_sync':
+    case 'deferred':
+    case 'complete':
+      return stage;
+    default:
+      return 'starting';
+  }
+}
+
+function describeProgress(stage: string, extra?: Record<string, unknown>): string {
+  switch (stage) {
+    case 'fetching':
+      return `Fetching ${typeof extra?.url === 'string' ? extra.url : 'source'}...`;
+    case 'extracting':
+      return `Extracting text from ${typeof extra?.filename === 'string' ? extra.filename : 'file'}...`;
+    case 'chunking':
+      return typeof extra?.chunks === 'number'
+        ? `Prepared ${extra.chunks} chunks for indexing.`
+        : 'Preparing document chunks...';
+    case 'embedding': {
+      const embedded = typeof extra?.embedded === 'number' ? extra.embedded : null;
+      const total = typeof extra?.total === 'number' ? extra.total : null;
+      if (embedded !== null && total !== null) {
+        return `Embedding ${embedded} of ${total} chunks...`;
+      }
+      return 'Generating embeddings...';
+    }
+    case 'storing':
+      return 'Storing vectors and metadata...';
+    case 'graph':
+      return 'Creating graph nodes and links...';
+    case 'neo4j_sync':
+      return 'Syncing graph relationships...';
+    case 'deferred':
+      return 'Background retrieval indexing deferred.';
+    case 'complete':
+      return 'Ingest completed.';
+    default:
+      return 'Processing ingest job...';
+  }
+}
+
+function isEmbeddingTimeoutError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+
+  return (
+    error.name === 'TimeoutError' ||
+    error.message.includes('The operation was aborted due to timeout')
+  );
+}
+
+async function generateEmbeddingsForAce(texts: string[]) {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+
+  try {
+    return await Promise.race([
+      generateEmbeddings(texts),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => {
+          const timeoutError = new Error(
+            `ACE background embedding exceeded ${ACE_EMBED_BATCH_TIMEOUT_MS}ms`
+          );
+          timeoutError.name = 'TimeoutError';
+          reject(timeoutError);
+        }, ACE_EMBED_BATCH_TIMEOUT_MS);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+function createProgressEmitter(jobId: string): ProgressEmitter {
+  return (stage, progress, extra) => {
+    updateAceIngestJob(jobId, {
+      step: normalizeAceStep(stage),
+      progress: normalizeProgressPercent(progress),
+      message: describeProgress(stage, extra),
+    });
+  };
+}
 
 function buildResponsePreview(text: string, maxLength = 800): string {
   const normalized = text.replace(/\s+/g, ' ').trim();
@@ -79,20 +190,45 @@ export const POST: RequestHandler = async ({ request, url: reqUrl, locals }) => 
     return json({ error: message }, { status: 400 });
   }
 
+  const jobId = createAceJobId();
+  createAceIngestJob({
+    jobId,
+    userId: user.id,
+    sourceType: ingestRequest.kind,
+    caseId: ingestRequest.caseId ?? null,
+    title: ingestRequest.title ?? null,
+    filename: ingestRequest.kind === 'file' ? ingestRequest.file.name : null,
+  });
+
+  const jobEmit = createProgressEmitter(jobId);
+
   // If streaming, return SSE response
   if (wantStream) {
     const stream = new ReadableStream({
       async start(controller) {
         const emit = (stage: string, progress: number, extra?: Record<string, unknown>) => {
+          jobEmit(stage, progress, extra);
           const data = JSON.stringify({ stage, progress, ...extra });
           controller.enqueue(new TextEncoder().encode(`data: ${data}\n\n`));
         };
 
         try {
           const result = await ingestSource(ingestRequest, user.id, start, emit);
+          updateAceIngestJob(jobId, {
+            step: 'complete',
+            progress: 100,
+            message: 'Ingest completed.',
+            result,
+          });
           emit('complete', 1.0, { result });
         } catch (e) {
           const msg = e instanceof Error ? e.message : 'Ingestion failed';
+          updateAceIngestJob(jobId, {
+            step: 'error',
+            progress: 100,
+            message: 'Ingestion failed.',
+            error: msg,
+          });
           const data = JSON.stringify({ stage: 'error', progress: 0, error: msg });
           controller.enqueue(new TextEncoder().encode(`data: ${data}\n\n`));
         } finally {
@@ -112,12 +248,193 @@ export const POST: RequestHandler = async ({ request, url: reqUrl, locals }) => 
 
   // Non-streaming mode — existing JSON response
   try {
-    return json(await ingestSource(ingestRequest, user.id, start));
+    if (ingestRequest.kind === 'file') {
+      const prepared = await prepareIngest(ingestRequest, start, jobEmit);
+
+      updateAceIngestJob(jobId, {
+        step: 'queued',
+        progress: 40,
+        message: 'Preview ready, background indexing queued.',
+      });
+
+      void continueIngestIndexing(prepared, ingestRequest, user.id, start, jobEmit)
+        .then((result) => {
+          updateAceIngestJob(jobId, {
+            step: 'complete',
+            progress: 100,
+            message: 'Background indexing complete.',
+            result,
+          });
+        })
+        .catch((error) => {
+          console.error('[api/ace/ingest] Background indexing failed:', error);
+          if (isEmbeddingTimeoutError(error)) {
+            const message =
+              'Background retrieval indexing deferred because the embedding service timed out.';
+            updateAceIngestJob(jobId, {
+              step: 'deferred',
+              progress: 100,
+              message,
+              result: buildDeferredIndexingResult(prepared, ingestRequest, start, message),
+            });
+            return;
+          }
+
+          updateAceIngestJob(jobId, {
+            step: 'error',
+            progress: 100,
+            message: 'Background indexing failed.',
+            error: error instanceof Error ? error.message : 'Ingestion failed',
+          });
+        });
+
+      return json(
+        buildPreparedResponse(prepared, ingestRequest, {
+          jobId,
+          embeddingModel: null,
+          graphNodeId: null,
+          indexingStatus: 'queued',
+          totalMs: Math.round(performance.now() - start),
+          statusStep: 'queued',
+          statusProgress: 40,
+          statusMessage: 'Preview ready, background indexing queued.',
+        })
+      );
+    }
+
+    const result = await ingestSource(ingestRequest, user.id, start, jobEmit);
+    updateAceIngestJob(jobId, {
+      step: 'complete',
+      progress: 100,
+      message: 'Ingest completed.',
+      result,
+    });
+    return json({
+      ...result,
+      jobId,
+      statusStep: 'complete',
+      statusProgress: 100,
+      statusMessage: 'Ingest completed.',
+    });
   } catch (e) {
     console.error('[api/ace/ingest] Failed:', e);
-    return json({ error: 'Ingestion failed' }, { status: 500 });
+    updateAceIngestJob(jobId, {
+      step: 'error',
+      progress: 100,
+      message: 'Ingestion failed.',
+      error: e instanceof Error ? e.message : 'Ingestion failed',
+    });
+    return json({ error: 'Ingestion failed', jobId }, { status: 500 });
   }
 };
+
+async function prepareIngest(
+  input: ParsedIngestRequest,
+  start: number,
+  emit?: ProgressEmitter
+): Promise<PreparedIngest> {
+  const resolved =
+    input.kind === 'url'
+      ? await resolveUrlSource(input, emit)
+      : await resolveFileSource(input, emit);
+
+  emit?.('chunking', 0.35);
+  const chunks = chunkLegalDocument(resolved.plainText, { maxTokens: 400, overlap: 50 });
+  if (chunks.length === 0) {
+    throw new Error('Document produced no chunks');
+  }
+
+  emit?.('chunking', 0.4, { chunks: chunks.length });
+
+  return {
+    resolved,
+    chunks,
+    contentPreview: buildResponsePreview(resolved.plainText),
+    totalTokens: chunks.reduce((sum, chunk) => sum + chunk.tokenCount, 0),
+  };
+}
+
+function buildPreparedResponse(
+  prepared: PreparedIngest,
+  input: ParsedIngestRequest,
+  options: {
+    jobId?: string | null;
+    embeddingModel: string | null;
+    graphNodeId: string | null;
+    indexingStatus: 'queued' | 'completed' | 'deferred';
+    totalMs: number;
+    statusStep?: string | null;
+    statusProgress?: number | null;
+    statusMessage?: string | null;
+  }
+) {
+  return {
+    success: true,
+    jobId: options.jobId ?? null,
+    attachmentSourceHash: prepared.resolved.sourceHash,
+    sourceType: input.kind,
+    url: input.kind === 'url' ? prepared.resolved.sourceUrl : undefined,
+    filename: input.kind === 'file' ? input.file.name || prepared.resolved.docTitle : undefined,
+    title: prepared.resolved.docTitle,
+    domain: prepared.resolved.sourceDomain,
+    chunksCreated: prepared.chunks.length,
+    totalTokens: prepared.totalTokens,
+    embeddingModel: options.embeddingModel,
+    caseId: input.caseId || null,
+    graphNodeId: options.graphNodeId,
+    totalMs: options.totalMs,
+    contentPreview: prepared.contentPreview,
+    indexingStatus: options.indexingStatus,
+    statusStep: options.statusStep ?? null,
+    statusProgress: options.statusProgress ?? null,
+    statusMessage: options.statusMessage ?? null,
+    ...prepared.resolved.responseMeta,
+  };
+}
+
+function buildDeferredIndexingResult(
+  prepared: PreparedIngest,
+  input: ParsedIngestRequest,
+  start: number,
+  message: string
+) {
+  return buildPreparedResponse(prepared, input, {
+    jobId: null,
+    embeddingModel: null,
+    graphNodeId: null,
+    indexingStatus: 'deferred',
+    totalMs: Math.round(performance.now() - start),
+    statusStep: 'deferred',
+    statusProgress: 100,
+    statusMessage: message,
+  });
+}
+
+async function continueIngestIndexing(
+  prepared: PreparedIngest,
+  input: ParsedIngestRequest,
+  userId: string,
+  start: number,
+  emit?: ProgressEmitter
+) {
+  const { embeddingModel, graphNodeId } = await persistPreparedIngest(
+    prepared,
+    input,
+    userId,
+    emit
+  );
+
+  return buildPreparedResponse(prepared, input, {
+    jobId: null,
+    embeddingModel,
+    graphNodeId,
+    indexingStatus: 'completed',
+    totalMs: Math.round(performance.now() - start),
+    statusStep: 'complete',
+    statusProgress: 100,
+    statusMessage: 'Ingest completed.',
+  });
+}
 
 async function parseIngestRequest(request: Request): Promise<ParsedIngestRequest> {
   const contentType = request.headers.get('content-type') ?? '';
@@ -165,26 +482,36 @@ async function ingestSource(
   start: number,
   emit?: ProgressEmitter
 ) {
-  const resolved =
-    input.kind === 'url'
-      ? await resolveUrlSource(input, emit)
-      : await resolveFileSource(input, emit);
+  const prepared = await prepareIngest(input, start, emit);
+  const { embeddingModel, graphNodeId } = await persistPreparedIngest(
+    prepared,
+    input,
+    userId,
+    emit
+  );
 
-  emit?.('chunking', 0.35);
-  const chunks = chunkLegalDocument(resolved.plainText, { maxTokens: 400, overlap: 50 });
-  if (chunks.length === 0) {
-    throw new Error('Document produced no chunks');
-  }
-  emit?.('chunking', 0.4, { chunks: chunks.length });
+  return buildPreparedResponse(prepared, input, {
+    embeddingModel,
+    graphNodeId,
+    indexingStatus: 'completed',
+    totalMs: Math.round(performance.now() - start),
+  });
+}
 
-  const chunkTexts = chunks.map((chunk) => chunk.text);
+async function persistPreparedIngest(
+  prepared: PreparedIngest,
+  input: ParsedIngestRequest,
+  userId: string,
+  emit?: ProgressEmitter
+) {
+  const chunkTexts = prepared.chunks.map((chunk) => chunk.text);
   const batchSize = 16;
   const allVectors: number[][] = [];
   let embeddingModel = '';
 
   for (let index = 0; index < chunkTexts.length; index += batchSize) {
     const batch = chunkTexts.slice(index, index + batchSize);
-    const result = await generateEmbeddings(batch);
+    const result = await generateEmbeddingsForAce(batch);
     allVectors.push(...result.vectors);
     if (!embeddingModel) embeddingModel = result.model;
     emit?.(
@@ -198,55 +525,42 @@ async function ingestSource(
   }
 
   emit?.('storing', 0.75);
-  const points = buildPoints(chunks, allVectors, resolved, input.caseId, userId);
+  const points = buildPoints(prepared.chunks, allVectors, prepared.resolved, input.caseId, userId);
   await qdrant.client.upsert(qdrant.collections.documents, { wait: true, points });
 
   emit?.('graph', 0.85);
   const graphNodeId = await createGraphNode(
-    chunks,
+    prepared.chunks,
     input.caseId,
-    resolved.docTitle,
-    resolved.sourceDomain,
-    resolved.sourceUrl,
-    resolved.sourceHash,
+    prepared.resolved.docTitle,
+    prepared.resolved.sourceDomain,
+    prepared.resolved.sourceUrl,
+    prepared.resolved.sourceHash,
     userId,
-    resolved.plainText,
+    prepared.resolved.plainText,
     allVectors,
-    resolved.documentType,
-    resolved.filePath,
-    resolved.fileType
+    prepared.resolved.documentType,
+    prepared.resolved.filePath,
+    prepared.resolved.fileType
   );
 
   if (graphNodeId && input.caseId) {
     emit?.('neo4j_sync', 0.9);
     import('$lib/server/graph/pg-neo4j-sync.js')
       .then(({ syncIngestedContent }) =>
-        syncIngestedContent(graphNodeId, input.caseId!, resolved.docTitle, resolved.sourceUrl)
+        syncIngestedContent(
+          graphNodeId,
+          input.caseId!,
+          prepared.resolved.docTitle,
+          prepared.resolved.sourceUrl
+        )
       )
       .catch(() => {
         /* non-fatal */
       });
   }
 
-  const totalMs = Math.round(performance.now() - start);
-  const contentPreview = buildResponsePreview(resolved.plainText);
-
-  return {
-    success: true,
-    sourceType: input.kind,
-    url: input.kind === 'url' ? resolved.sourceUrl : undefined,
-    filename: input.kind === 'file' ? input.file.name || resolved.docTitle : undefined,
-    title: resolved.docTitle,
-    domain: resolved.sourceDomain,
-    chunksCreated: chunks.length,
-    totalTokens: chunks.reduce((sum, chunk) => sum + chunk.tokenCount, 0),
-    embeddingModel,
-    caseId: input.caseId || null,
-    graphNodeId,
-    totalMs,
-    contentPreview,
-    ...resolved.responseMeta,
-  };
+  return { embeddingModel, graphNodeId };
 }
 
 async function resolveUrlSource(
@@ -455,6 +769,7 @@ function buildPoints(
         full_text: chunk.text,
         document_type: resolved.documentType,
         source_url: resolved.sourceUrl,
+        source_hash: resolved.sourceHash,
         source_domain: resolved.sourceDomain,
         case_id: caseId || null,
         chunk_index: idx,

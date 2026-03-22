@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const StorePayload = z.object({
-    text: z.string().min(1),
-    metadata: z.record(z.any()).optional()
+  text: z.string().min(1),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const SearchPayload = z.object({

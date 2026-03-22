@@ -42,8 +42,115 @@
 	let ingestFile = $state<File | null>(null);
 	let ingestLoading = $state(false);
 	let ingestResult = $state<any>(null);
+	let ingestJobStatus = $state<any>(null);
 	let ingestError = $state<string | null>(null);
 	let errorMessage = $state('');
+
+	function seedIngestJobStatus(result: any) {
+		if (!result?.jobId) {
+			ingestJobStatus = null;
+			return;
+		}
+
+		ingestJobStatus = {
+			jobId: result.jobId,
+			status:
+				result.indexingStatus === 'completed'
+					? 'completed'
+					: result.indexingStatus === 'deferred'
+						? 'deferred'
+					: result.indexingStatus === 'queued'
+						? 'queued'
+						: 'running',
+			step: result.statusStep ?? result.indexingStatus ?? 'starting',
+			progress: result.statusProgress ?? (result.indexingStatus === 'queued' ? 40 : 100),
+			message:
+				result.statusMessage ??
+				(result.indexingStatus === 'queued'
+					? 'Preview ready, background indexing queued.'
+					: result.indexingStatus === 'deferred'
+						? 'Background retrieval indexing deferred because the embedding service timed out.'
+						: 'Ingest completed.'),
+			error: null,
+			result
+		};
+	}
+
+	async function fetchIngestJobStatus(jobId: string) {
+		const res = await fetch(`/api/ace/status?jobId=${encodeURIComponent(jobId)}`);
+		const data = await res.json().catch(() => ({}));
+		if (!res.ok) {
+			throw new Error(data.error || 'Unable to load ingest status');
+		}
+		return data;
+	}
+
+	$effect(() => {
+		const jobId = ingestResult?.jobId as string | undefined;
+		const shouldPoll = jobId && ingestResult?.indexingStatus === 'queued';
+		if (!shouldPoll) return;
+
+		let cancelled = false;
+
+		const poll = async () => {
+			try {
+				const status = await fetchIngestJobStatus(jobId);
+				if (cancelled) return;
+
+				ingestJobStatus = status;
+				if (status.status === 'completed' && status.result) {
+					ingestResult = {
+						...ingestResult,
+						...status.result,
+						jobId: status.jobId,
+						indexingStatus: 'completed',
+						statusStep: status.step,
+						statusProgress: status.progress,
+						statusMessage: status.message
+					};
+					return;
+				}
+
+				if (status.status === 'deferred' && status.result) {
+					ingestResult = {
+						...ingestResult,
+						...status.result,
+						jobId: status.jobId,
+						indexingStatus: 'deferred',
+						statusStep: status.step,
+						statusProgress: status.progress,
+						statusMessage: status.message
+					};
+					ingestError = null;
+					return;
+				}
+
+				if (status.status === 'error') {
+					ingestError = status.error || status.message || 'Background indexing failed';
+				}
+			} catch (error) {
+				if (cancelled) return;
+				ingestJobStatus = {
+					jobId,
+					status: 'error',
+					step: 'error',
+					progress: 100,
+					message: error instanceof Error ? error.message : 'Unable to load ingest status',
+					error: error instanceof Error ? error.message : 'Unable to load ingest status'
+				};
+			}
+		};
+
+		void poll();
+		const timer = window.setInterval(() => {
+			void poll();
+		}, 2000);
+
+		return () => {
+			cancelled = true;
+			window.clearInterval(timer);
+		};
+	});
 
 	async function ingestWebUrl() {
 		if (!ingestUrl.trim()) return;
@@ -51,6 +158,7 @@
 		ingestLoading = true;
 		ingestError = null;
 		ingestResult = null;
+		ingestJobStatus = null;
 		try {
 			const res = await fetch('/api/ace/ingest', {
 				method: 'POST',
@@ -60,6 +168,7 @@
 			const data = await res.json();
 			if (!res.ok) throw new Error(data.error || 'Ingestion failed');
 			ingestResult = data;
+			seedIngestJobStatus(data);
 			ingestUrl = '';
 		} catch (e) {
 			ingestError = e instanceof Error ? e.message : 'Unknown error';
@@ -78,6 +187,7 @@
 		ingestLoading = true;
 		ingestError = null;
 		ingestResult = null;
+		ingestJobStatus = null;
 		try {
 			const formData = new FormData();
 			formData.set('file', ingestFile);
@@ -90,6 +200,7 @@
 			const data = await res.json();
 			if (!res.ok) throw new Error(data.error || 'Ingestion failed');
 			ingestResult = data;
+			seedIngestJobStatus(data);
 			ingestFile = null;
 		} catch (e) {
 			ingestError = e instanceof Error ? e.message : 'Unknown error';
@@ -598,6 +709,18 @@
 							<div style="color: #10b981; background: #10b98120; padding: 0.75rem; border-radius: 6px; font-size: 0.85rem;">
 								<strong>Ingested:</strong> {ingestResult.title}<br/>
 								<strong>Source:</strong> {ingestResult.sourceType === 'file' ? ingestResult.filename : ingestResult.url}<br/>
+								<strong>Status:</strong>
+								{#if ingestResult.indexingStatus === 'queued'}
+									<span style="color: #fbbf24;">Preview ready, background indexing queued</span>
+								{:else if ingestResult.indexingStatus === 'deferred'}
+									<span style="color: #f59e0b;">Retrieval indexing deferred</span>
+								{:else}
+									<span>Indexed</span>
+								{/if}
+								<br/>
+								{#if ingestJobStatus}
+									<strong>Job:</strong> {ingestJobStatus.message} ({ingestJobStatus.progress}%)<br/>
+								{/if}
 								<strong>Chunks:</strong> {ingestResult.chunksCreated} ({ingestResult.totalTokens} tokens)<br/>
 								{#if ingestResult.extractionMethod}
 									<strong>Extraction:</strong> {ingestResult.extractionMethod}<br/>
@@ -605,7 +728,10 @@
 								{#if ingestResult.yoloLabels?.length}
 									<strong>YOLO:</strong> {ingestResult.yoloLabels.join(', ')}<br/>
 								{/if}
-								<strong>Model:</strong> {ingestResult.embeddingModel} | <strong>Time:</strong> {ingestResult.totalMs}ms
+								{#if ingestResult.contentPreview}
+									<strong>Preview:</strong> {ingestResult.contentPreview}<br/>
+								{/if}
+								<strong>Model:</strong> {ingestResult.embeddingModel ?? 'pending'} | <strong>Time:</strong> {ingestResult.totalMs}ms
 							</div>
 						{/if}
 					</div>

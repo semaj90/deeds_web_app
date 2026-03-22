@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { ChatSession, type ChatMessage } from '$lib/models/ChatSession.svelte.js';
+	import { ChatSession, type ChatMessage, type GlossaryMatch } from '$lib/models/ChatSession.svelte.js';
 	import { onDestroy } from 'svelte';
 
 	interface Props {
@@ -23,7 +23,7 @@
 					'Hello. I am your Legal AI Assistant. How can I help you with this case?',
 				timestamp: new Date().toISOString()
 			}
-		]);
+		], !!id);
 	}
 
 	// Create a ChatSession keyed by caseId (or a generic session)
@@ -36,6 +36,9 @@
 			const newId = `case-${caseId}`;
 			if (session.chatId !== newId) {
 				session.destroy();
+				savingGlossaryKeys = {};
+				savedGlossaryKeys = {};
+				glossaryActionErrors = {};
 				session = new ChatSession(newId, [
 					{
 						role: 'system',
@@ -49,7 +52,7 @@
 							'Hello. I am your Legal AI Assistant. How can I help you with this case?',
 						timestamp: new Date().toISOString()
 					}
-				]);
+				], true);
 			}
 		}
 	});
@@ -66,6 +69,9 @@
 	let inputValue = $state('');
 	let pendingAttachment = $state<File | null>(null);
 	let messagesContainer: HTMLElement;
+	let savingGlossaryKeys = $state<Record<string, boolean>>({});
+	let savedGlossaryKeys = $state<Record<string, boolean>>({});
+	let glossaryActionErrors = $state<Record<string, string>>({});
 
 	let isLoading = $derived(
 		session.status === 'thinking' || session.status === 'streaming'
@@ -121,6 +127,34 @@
 			hour: '2-digit',
 			minute: '2-digit'
 		});
+	}
+
+	function glossaryKey(match: GlossaryMatch): string {
+		return [match.term, match.source, match.citation ?? '', match.sourceNodeId ?? '']
+			.join('::')
+			.toLowerCase();
+	}
+
+	async function saveGlossaryMatch(match: GlossaryMatch) {
+		if (!caseId) return;
+
+		const key = glossaryKey(match);
+		if (savingGlossaryKeys[key] || savedGlossaryKeys[key]) return;
+
+		savingGlossaryKeys = { ...savingGlossaryKeys, [key]: true };
+		glossaryActionErrors = { ...glossaryActionErrors, [key]: '' };
+
+		try {
+			await session.saveGlossaryConcept(match);
+			savedGlossaryKeys = { ...savedGlossaryKeys, [key]: true };
+		} catch (error) {
+			glossaryActionErrors = {
+				...glossaryActionErrors,
+				[key]: error instanceof Error ? error.message : 'Failed to save concept'
+			};
+		} finally {
+			savingGlossaryKeys = { ...savingGlossaryKeys, [key]: false };
+		}
 	}
 
 	function getContextDocIds(message: ChatMessage): string[] {
@@ -195,6 +229,9 @@
 
 	function clearChat() {
 		session.destroy();
+		savingGlossaryKeys = {};
+		savedGlossaryKeys = {};
+		glossaryActionErrors = {};
 		session = new ChatSession(
 			caseId ? `case-${caseId}` : `chat-${Date.now()}`,
 			[
@@ -210,7 +247,8 @@
 						'Hello. I am your Legal AI Assistant. How can I help you with this case?',
 					timestamp: new Date().toISOString()
 				}
-			]
+			],
+			!!caseId
 		);
 	}
 </script>
@@ -271,6 +309,61 @@
 				</div>
 				<div class="message-content">
 					{message.content}
+					{#if message.role === 'assistant' && message.metadata?.glossaryMatches && message.metadata.glossaryMatches.length > 0}
+						<div class="glossary-panel" data-testid="case-chat-glossary-matches">
+							<div class="glossary-header">
+								<span>Legal Definitions Used</span>
+								{#if caseId}
+									<span class="glossary-header-note">Save to case context</span>
+								{/if}
+							</div>
+							<div class="glossary-list">
+								{#each message.metadata.glossaryMatches as match}
+									{@const matchKey = glossaryKey(match)}
+									<div class="glossary-card">
+										<div class="glossary-card-top">
+											<div>
+												<div class="glossary-term">{match.term}</div>
+												<div class="glossary-definition">{match.definition}</div>
+											</div>
+											{#if caseId}
+												<button
+													type="button"
+													class:saved={savedGlossaryKeys[matchKey]}
+													class="glossary-save-btn"
+													onclick={() => saveGlossaryMatch(match)}
+													disabled={savingGlossaryKeys[matchKey] || savedGlossaryKeys[matchKey]}
+												>
+													{#if savedGlossaryKeys[matchKey]}
+														Saved
+													{:else if savingGlossaryKeys[matchKey]}
+														Saving...
+													{:else}
+														Save
+													{/if}
+												</button>
+											{/if}
+										</div>
+										<div class="glossary-meta-row">
+											<span class="glossary-chip">{match.source}</span>
+											{#if match.jurisdiction}
+												<span class="glossary-chip">{match.jurisdiction}</span>
+											{/if}
+											{#if match.citation}
+												<span class="glossary-chip">{match.citation}</span>
+											{/if}
+											{#if match.confidence !== undefined && match.confidence !== null}
+												<span class="glossary-chip">{Math.round(match.confidence * 100)}%</span>
+											{/if}
+										</div>
+										{#if glossaryActionErrors[matchKey]}
+											<div class="glossary-error">{glossaryActionErrors[matchKey]}</div>
+										{/if}
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/if}
 					{#if message.metadata?.citations && message.metadata.citations.length > 0}
 						<div class="context-badge">
 							📚 {message.metadata.citations.length} source{message.metadata
@@ -592,6 +685,113 @@
 	.case-context-chip-source {
 		background: rgba(0, 102, 204, 0.12);
 		color: #1d4ed8;
+	}
+
+	.glossary-panel {
+		margin-top: 0.75rem;
+		padding: 0.75rem;
+		background: rgba(14, 116, 144, 0.08);
+		border: 1px solid rgba(14, 116, 144, 0.18);
+		border-radius: 6px;
+	}
+
+	.glossary-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 0.75rem;
+		font-size: 0.72rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: #0f5f73;
+		margin-bottom: 0.6rem;
+	}
+
+	.glossary-header-note {
+		font-size: 0.68rem;
+		letter-spacing: normal;
+		text-transform: none;
+		color: #6b7280;
+	}
+
+	.glossary-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.6rem;
+	}
+
+	.glossary-card {
+		padding: 0.7rem;
+		border-radius: 6px;
+		background: rgba(255, 255, 255, 0.7);
+		border: 1px solid rgba(14, 116, 144, 0.12);
+	}
+
+	.glossary-card-top {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 0.75rem;
+	}
+
+	.glossary-term {
+		font-size: 0.82rem;
+		font-weight: 700;
+		color: #0f5f73;
+	}
+
+	.glossary-definition {
+		margin-top: 0.35rem;
+		font-size: 0.78rem;
+		line-height: 1.45;
+		color: #374151;
+	}
+
+	.glossary-save-btn {
+		flex-shrink: 0;
+		padding: 0.35rem 0.65rem;
+		border-radius: 999px;
+		border: 1px solid rgba(14, 116, 144, 0.28);
+		background: rgba(14, 116, 144, 0.1);
+		color: #0f5f73;
+		font-size: 0.68rem;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		cursor: pointer;
+	}
+
+	.glossary-save-btn.saved {
+		background: rgba(34, 197, 94, 0.12);
+		border-color: rgba(34, 197, 94, 0.28);
+		color: #15803d;
+	}
+
+	.glossary-save-btn:disabled {
+		opacity: 0.65;
+		cursor: not-allowed;
+	}
+
+	.glossary-meta-row {
+		margin-top: 0.55rem;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+	}
+
+	.glossary-chip {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.2rem 0.45rem;
+		border-radius: 999px;
+		font-size: 0.68rem;
+		background: rgba(107, 114, 128, 0.1);
+		color: #4b5563;
+	}
+
+	.glossary-error {
+		margin-top: 0.45rem;
+		font-size: 0.72rem;
+		color: #b91c1c;
 	}
 
 	.streaming-text {

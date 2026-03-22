@@ -1,20 +1,7 @@
 <script lang="ts">
 	import { Dialog } from 'bits-ui';
-
-	interface Message {
-		role: 'user' | 'assistant' | 'system';
-		content: string;
-		status?: 'streaming' | 'done' | 'error';
-		confidence?: number;
-	}
-
-	interface AttachmentIngestResult {
-		title?: string;
-		filename?: string;
-		extractionMethod?: string;
-		contentPreview?: string;
-		yoloLabels?: string[];
-	}
+	import { ChatSession, type GlossaryMatch } from '$lib/models/ChatSession.svelte.js';
+	import { onDestroy, untrack } from 'svelte';
 
 	interface Props {
 		open?: boolean;
@@ -24,157 +11,103 @@
 
 	let { open = $bindable(false), caseId = '', currentRoute = '' }: Props = $props();
 
-	let messages = $state<Message[]>([]);
 	let inputText = $state('');
 	let pendingAttachment = $state<File | null>(null);
-	let isStreaming = $state(false);
 	let messagesEnd = $state<HTMLElement | null>(null);
-	// Stable conversation ID for the session this modal is open
-	let conversationId = $state(`conv_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`);
+	let genericSessionId = $state(`conv_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`);
+	let savingGlossaryKeys = $state<Record<string, boolean>>({});
+	let savedGlossaryKeys = $state<Record<string, boolean>>({});
+	let glossaryActionErrors = $state<Record<string, string>>({});
 
-	function normalizeAttachmentPreview(value: string | undefined, maxLength = 320): string {
-		if (!value) return '';
-		const normalized = value.replace(/[\u0000-\u001F\u007F]+/g, ' ').replace(/\s+/g, ' ').trim();
-		if (normalized.length <= maxLength) return normalized;
-		return normalized.slice(0, maxLength) + '...';
+	function createSessionId(): string {
+		if (caseId) return `case-${caseId}`;
+		return genericSessionId;
 	}
 
-	$effect(() => {
-		// Reset conversation when modal is re-opened fresh
-		if (open && messages.length === 0) {
-			conversationId = `conv_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+	function createSession() {
+		return new ChatSession(createSessionId(), [], !!caseId);
+	}
+
+	let session = $state<ChatSession>(untrack(() => createSession()));
+	let isStreaming = $derived(session.status === 'thinking' || session.status === 'streaming');
+	let attachmentStateBanner = $derived.by(() => {
+		for (let index = session.messages.length - 1; index >= 0; index -= 1) {
+			const message = session.messages[index];
+			if (message.role !== 'system') continue;
+
+			if (message.content.startsWith('Attachment indexed for retrieval: ')) {
+				return {
+					tone: 'success' as const,
+					label: 'Attachment Ready',
+					icon: 'i-lucide-badge-check',
+					text: message.content
+				};
+			}
+
+			if (message.content.startsWith('Attachment retrieval indexing deferred for ')) {
+				return {
+					tone: 'warning' as const,
+					label: 'Attachment Status',
+					icon: 'i-lucide-clock-3',
+					text: message.content
+				};
+			}
 		}
+
+		return null;
+	});
+	let attachmentBannerClasses = $derived(
+		attachmentStateBanner?.tone === 'success'
+			? 'border border-accent/30 bg-accent/10 text-accent'
+			: 'border border-warning/30 bg-warning/10 text-warning/90'
+	);
+	let attachmentBannerLabelClasses = $derived(
+		attachmentStateBanner?.tone === 'success' ? 'text-accent/70' : 'text-warning/70'
+	);
+
+	onDestroy(() => {
+		session.destroy();
+	});
+
+	$effect(() => {
+		const nextId = createSessionId();
+		if (session.chatId !== nextId) {
+			session.destroy();
+			session = createSession();
+			savingGlossaryKeys = {};
+			savedGlossaryKeys = {};
+			glossaryActionErrors = {};
+		}
+	});
+
+	$effect(() => {
+		session.currentRoute = currentRoute;
 	});
 
 	$effect(() => {
 		// Scroll to bottom whenever messages change
-		if (messagesEnd) {
+		if (messagesEnd && session.messages.length > 0) {
 			messagesEnd.scrollIntoView({ behavior: 'smooth' });
 		}
 	});
-
-	async function ingestAttachment(file: File): Promise<AttachmentIngestResult> {
-		const formData = new FormData();
-		formData.set('file', file, file.name);
-		if (caseId) {
-			formData.set('caseId', caseId);
-		}
-
-		const response = await fetch('/api/ace/ingest', {
-			method: 'POST',
-			body: formData
-		});
-
-		const payload = await response.json().catch(() => ({}));
-		if (!response.ok) {
-			throw new Error(payload.error || `Attachment ingest failed: HTTP ${response.status}`);
-		}
-
-		return payload as AttachmentIngestResult;
-	}
 
 	async function sendMessage() {
 		const text = inputText.trim() || (pendingAttachment
 			? `Please analyze the attached document "${pendingAttachment.name}".`
 			: '');
-		if ((!text && !pendingAttachment) || isStreaming) return;
+		if ((!text && !pendingAttachment) || session.status !== 'idle') return;
 
 		const attachment = pendingAttachment;
 		inputText = '';
 		pendingAttachment = null;
 
-		messages.push({ role: 'user', content: text, status: 'done' });
-		messages.push({ role: 'assistant', content: '', status: 'streaming' });
-		isStreaming = true;
-
 		try {
-			let routedText = text;
-			if (attachment) {
-				messages.splice(messages.length - 1, 0, {
-					role: 'system',
-					content: `Indexing attachment: ${attachment.name}`,
-					status: 'done'
-				});
-
-				const attachmentResult = await ingestAttachment(attachment);
-				const title = attachmentResult.title || attachmentResult.filename || attachment.name;
-				const details = [`Attachment ready: ${title}`];
-				if (attachmentResult.extractionMethod) {
-					details.push(`via ${attachmentResult.extractionMethod}`);
-				}
-				if (attachmentResult.yoloLabels?.length) {
-					details.push(`YOLO: ${attachmentResult.yoloLabels.join(', ')}`);
-				}
-				messages.splice(messages.length - 1, 0, {
-					role: 'system',
-					content: details.join(' · '),
-					status: 'done'
-				});
-				const normalizedPreview = normalizeAttachmentPreview(attachmentResult.contentPreview);
-				const previewBlock = normalizedPreview
-					? `\n\nATTACHMENT SOURCE TEXT PROVIDED BELOW. Do not ask the user to provide it again.\n[ATTACHMENT SOURCE START]\n${normalizedPreview}\n[ATTACHMENT SOURCE END]`
-					: '';
-				routedText = `${text}\n\nFresh attachment uploaded just now: "${title}".${previewBlock}\n\nUse the attachment source text above and any retrieved ACE context from this attachment as the primary basis for your answer. Quote or cite the attached source when answering. If the attachment source text is present above, do not ask the user to provide it again.`;
-			}
-
-			const res = await fetch('/api/sse/chat', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					message: routedText,
-					conversationId,
-					...(caseId ? { caseId } : {}),
-					...(currentRoute ? { currentRoute } : {})
-				})
+			await session.sendMessage(text, {
+				attachment,
+				forceServer: !!attachment
 			});
-
-			if (!res.ok || !res.body) {
-				throw new Error(`HTTP ${res.status} — ${res.statusText}`);
-			}
-
-			const reader = res.body.getReader();
-			const decoder = new TextDecoder();
-			let buffer = '';
-
-			while (true) {
-				const { done, value } = await reader.read();
-				if (done) break;
-
-				buffer += decoder.decode(value, { stream: true });
-				const lines = buffer.split('\n');
-				buffer = lines.pop() ?? '';
-
-				for (const line of lines) {
-					if (!line.startsWith('data: ')) continue;
-					try {
-						const data = JSON.parse(line.slice(6));
-						const idx = messages.length - 1;
-						const last = messages[idx];
-						if (last?.role === 'assistant') {
-							messages[idx] = {
-								role: 'assistant',
-								content: data.content ?? last.content,
-								status: data.status ?? last.status,
-								confidence: data.confidence ?? last.confidence
-							};
-						}
-					} catch {
-						// skip malformed SSE line
-					}
-				}
-			}
 		} catch (e) {
-			const idx = messages.length - 1;
-			const last = messages[idx];
-			if (last?.role === 'assistant') {
-				messages[idx] = {
-					role: 'assistant',
-					content: `Connection error: ${e instanceof Error ? e.message : 'Unknown error'}`,
-					status: 'error'
-				};
-			}
-		} finally {
-			isStreaming = false;
+			session.error = e instanceof Error ? e.message : 'Unknown error';
 		}
 	}
 
@@ -190,9 +123,43 @@
 		pendingAttachment = target.files?.[0] ?? null;
 	}
 
+	function glossaryKey(match: GlossaryMatch): string {
+		return [match.term, match.source, match.citation ?? '', match.sourceNodeId ?? '']
+			.join('::')
+			.toLowerCase();
+	}
+
+	async function saveGlossaryMatch(match: GlossaryMatch) {
+		if (!caseId) return;
+
+		const key = glossaryKey(match);
+		if (savingGlossaryKeys[key] || savedGlossaryKeys[key]) return;
+
+		savingGlossaryKeys = { ...savingGlossaryKeys, [key]: true };
+		glossaryActionErrors = { ...glossaryActionErrors, [key]: '' };
+
+		try {
+			await session.saveGlossaryConcept(match);
+			savedGlossaryKeys = { ...savedGlossaryKeys, [key]: true };
+		} catch (error) {
+			glossaryActionErrors = {
+				...glossaryActionErrors,
+				[key]: error instanceof Error ? error.message : 'Failed to save concept'
+			};
+		} finally {
+			savingGlossaryKeys = { ...savingGlossaryKeys, [key]: false };
+		}
+	}
+
 	function clear() {
-		messages = [];
-		conversationId = `conv_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+		session.destroy();
+		if (!caseId) {
+			genericSessionId = `conv_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+		}
+		savingGlossaryKeys = {};
+		savedGlossaryKeys = {};
+		glossaryActionErrors = {};
+		session = createSession();
 	}
 </script>
 
@@ -221,7 +188,7 @@
 					{/if}
 				</div>
 				<div class="flex items-center gap-1">
-					{#if messages.length > 0}
+					{#if session.messages.length > 0}
 						<button
 							type="button"
 							onclick={clear}
@@ -240,9 +207,23 @@
 				</div>
 			</div>
 
+			{#if attachmentStateBanner}
+				<div
+					class={`mx-4 mt-3 rounded-lg px-3 py-2 text-[11px] font-mono flex items-start gap-2 flex-shrink-0 ${attachmentBannerClasses}`}
+				>
+					<span class="{attachmentStateBanner.icon} w-3.5 h-3.5 inline-block mt-0.5 flex-shrink-0"></span>
+					<div>
+						<div class={`text-[10px] uppercase tracking-wide ${attachmentBannerLabelClasses}`}>
+							{attachmentStateBanner.label}
+						</div>
+						<div>{attachmentStateBanner.text}</div>
+					</div>
+				</div>
+			{/if}
+
 			<!-- Messages -->
 			<div class="flex-1 overflow-y-auto px-4 py-3 space-y-3 min-h-0">
-				{#if messages.length === 0}
+				{#if session.messages.length === 0}
 					<div class="h-full flex flex-col items-center justify-center text-center gap-3 text-sand/40">
 						<span class="i-lucide-message-square-dashed w-10 h-10 inline-block opacity-30"></span>
 						<p class="text-xs font-mono">
@@ -253,7 +234,7 @@
 						{/if}
 					</div>
 				{:else}
-					{#each messages as msg}
+					{#each session.messages as msg, idx}
 						<div class="flex flex-col {msg.role === 'user' ? 'items-end' : 'items-start'} gap-1">
 							<div
 								class="max-w-[85%] px-3 py-2 rounded-lg text-xs font-mono leading-relaxed whitespace-pre-wrap
@@ -261,11 +242,11 @@
 										? 'bg-warning/15 text-warning/90 border border-warning/20'
 										: msg.role === 'system'
 											? 'bg-accent/10 text-accent border border-accent/20'
-										: msg.status === 'error'
+										: session.status === 'error' && idx === session.messages.length - 1
 											? 'bg-danger/10 text-danger/80 border border-danger/20'
 											: 'bg-panelSoft text-sand/85 border border-sand/10'}"
 							>
-								{#if msg.role === 'assistant' && msg.status === 'streaming' && !msg.content}
+								{#if msg.role === 'assistant' && idx === session.messages.length - 1 && session.status === 'streaming' && !msg.content}
 									<span class="inline-flex gap-0.5">
 										<span class="w-1 h-1 bg-sand/50 rounded-full animate-bounce" style="animation-delay:0ms"></span>
 										<span class="w-1 h-1 bg-sand/50 rounded-full animate-bounce" style="animation-delay:150ms"></span>
@@ -275,9 +256,65 @@
 									{msg.content}
 								{/if}
 							</div>
-							{#if msg.role === 'assistant' && msg.status === 'done' && msg.confidence !== undefined}
+							{#if msg.role === 'assistant' && msg.metadata?.glossaryMatches && msg.metadata.glossaryMatches.length > 0}
+								<div class="max-w-[85%] w-full rounded-lg border border-info/20 bg-info/8 px-3 py-2 text-[11px] font-mono text-sand/80">
+									<div class="mb-2 flex items-center justify-between gap-2">
+										<div class="text-[10px] uppercase tracking-[0.16em] text-info/70">
+											Legal Definitions Used
+										</div>
+										{#if caseId}
+											<div class="text-[10px] text-sand/40">Save to case context</div>
+										{/if}
+									</div>
+									<div class="space-y-2">
+										{#each msg.metadata.glossaryMatches as match}
+											{@const matchKey = glossaryKey(match)}
+											<div class="rounded-md border border-sand/10 bg-panel/70 px-2.5 py-2">
+												<div class="flex items-start justify-between gap-2">
+													<div class="min-w-0">
+														<div class="text-[11px] font-semibold text-info/90">{match.term}</div>
+														<div class="mt-1 text-[10px] leading-relaxed text-sand/65">{match.definition}</div>
+													</div>
+													{#if caseId}
+														<button
+															type="button"
+															onclick={() => saveGlossaryMatch(match)}
+															disabled={savingGlossaryKeys[matchKey] || savedGlossaryKeys[matchKey]}
+															class="shrink-0 rounded-md border px-2 py-1 text-[10px] uppercase tracking-wide transition-colors disabled:cursor-not-allowed disabled:opacity-60 {savedGlossaryKeys[matchKey] ? 'border-accent/30 bg-accent/12 text-accent' : 'border-info/30 bg-info/12 text-info hover:border-info/45 hover:bg-info/18'}"
+														>
+															{#if savedGlossaryKeys[matchKey]}
+																Saved
+															{:else if savingGlossaryKeys[matchKey]}
+																Saving...
+															{:else}
+																Save
+															{/if}
+														</button>
+													{/if}
+												</div>
+												<div class="mt-2 flex flex-wrap gap-1.5 text-[10px] text-sand/45">
+													<span class="rounded bg-sand/8 px-1.5 py-0.5">{match.source}</span>
+													{#if match.jurisdiction}
+														<span class="rounded bg-sand/8 px-1.5 py-0.5">{match.jurisdiction}</span>
+													{/if}
+													{#if match.citation}
+														<span class="rounded bg-sand/8 px-1.5 py-0.5">{match.citation}</span>
+													{/if}
+													{#if match.confidence !== undefined && match.confidence !== null}
+														<span class="rounded bg-sand/8 px-1.5 py-0.5">{Math.round(match.confidence * 100)}%</span>
+													{/if}
+												</div>
+												{#if glossaryActionErrors[matchKey]}
+													<div class="mt-1.5 text-[10px] text-danger/80">{glossaryActionErrors[matchKey]}</div>
+												{/if}
+											</div>
+										{/each}
+									</div>
+								</div>
+							{/if}
+							{#if msg.role === 'assistant' && msg.metadata?.confidence !== undefined}
 								<span class="text-[9px] font-mono text-sand/30">
-									confidence {Math.round(msg.confidence * 100)}%
+									confidence {Math.round(msg.metadata.confidence * 100)}%
 								</span>
 							{/if}
 						</div>

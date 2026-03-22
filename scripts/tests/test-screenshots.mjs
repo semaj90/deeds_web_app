@@ -201,9 +201,25 @@ async function testRoute(route, ctx) {
     }
   });
 
-  tab.on('requestfailed', (req) => {
+  function isIgnorableFailedRequest(req) {
     const reqUrl = req.url();
-    if (reqUrl.includes('favicon') || reqUrl.includes('__vite') || reqUrl.includes('ws:')) return;
+    const failure = req.failure()?.errorText || '';
+
+    if (reqUrl.includes('favicon') || reqUrl.includes('__vite') || reqUrl.includes('ws:')) {
+      return true;
+    }
+
+    // SvelteKit can abort stale __data.json loads during invalidation or route churn.
+    if (failure === 'net::ERR_ABORTED' && reqUrl.includes('/__data.json')) {
+      return true;
+    }
+
+    return false;
+  }
+
+  tab.on('requestfailed', (req) => {
+    if (isIgnorableFailedRequest(req)) return;
+    const reqUrl = req.url();
     result.failedRequests.push({
       url: reqUrl.slice(0, 150),
       method: req.method(),
