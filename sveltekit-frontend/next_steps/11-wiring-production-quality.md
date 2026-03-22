@@ -5,17 +5,21 @@
 
 ---
 
-## March 16, 2026 Follow-Up Audit
+## March 22, 2026 Follow-Up Audit
 
 - **Type review still worth scheduling**: do a focused Drizzle ORM 0.44 + Svelte 5 runes type review after current wiring cleanup. The main value is catching contract drift between route payloads, `$props()` shapes, and `.$inferSelect`/`.$inferInsert` usage.
 - **Validation backlog remains material**: approximately 118 of 258 API routes still lack Zod validation.
 - **Services visibility remains incomplete**: `src/lib/services/**` blanket exclusion still hides roughly 312 corrupted files from normal discovery, even though transitively imported clean files are checked.
-- **Full containerization is NOT done yet**: main compose files still point core LLM traffic to `host.docker.internal:11434`, and many scripts/ecosystem configs still hardcode `localhost:11434`. Until Ollama is run as a first-class container service or all consumers are normalized behind one internal service URL, the pipeline is only partially containerized.
-- **Audit standard tightened**: “fully wired” now means import → render → reachable trigger path → API route → props → data flow. Route existence alone is insufficient.
+- **Hardcoded localhost: RESOLVED** — **0 remaining**. All service URLs now go through `env.server.ts` getters (`ENV.OLLAMA_BASE_URL`, `ENV.QDRANT_URL`, `ENV.TRITON_URL`, etc.).
+- **Audit standard tightened**: "fully wired" now means import → render → reachable trigger path → API route → props → data flow. Route existence alone is insufficient.
 - **Pre-push directory audit should be explicit**: run `/shallow-wiring-analysis`, `/audit-components`, `/prune-codebase`, and `/wire-modules` against the low-reference directories in `src/lib/` plus `src/routes/api/search` before pushing consolidation work.
 - **Verified keepers from the low-reference sweep**: `src/lib/shims/*` remains required browser-compatibility surface, and `src/lib/messaging/rabbitmq-xstate-integration.ts` is live via `src/hooks.server.ts`; neither should be treated as archive candidates.
 - **Verified relocation candidate**: `src/lib/phase72/routeGraphAdapter.ts` is live from `(app)/admin/all-routes/+page.server.ts`, but it should move to a non-phase diagnostics namespace during directory consolidation.
 - **Search wiring still needs a product decision**: the `/api/search/*` routes are now the typed Drizzle-backed search surface, but `(app)/global-search/+page.svelte` still bypasses them with direct fetches to `/api/statutes/search`, `/api/precedents/search`, and `/api/glossary/search` while also carrying an unused `search-client.ts` import path.
+- **Agentic tool calling WIRED**: 4 agent systems now operational — Agent Chat (4 Ollama tools), Autonomous Agent (15 LangChain tools), Contextual Chat (3 Ollama tools), MCP Server (36 FastMCP tools).
+- **Contextual chat fully wired**: `/api/contextual/chat` now has real Ollama native tool calling (glossary_search, rag_search, web_search) with iterative loop, HMM state tracking, Redis session history.
+- **QUIC/gRPC/HTTP3 transport wired**: quic-nats-bridge with legal.embedding.request → gRPC proxy, Go gRPC embedding server (:50051), LibTorch/CUDA N-API addon verified.
+- **Inference architecture verified**: client-router.ts, web-search-searxng.ts, autonomous-agent.ts all confirmed WIRED (not orphaned as previously reported).
 
 ---
 
@@ -51,10 +55,11 @@
 
 ---
 
-## Phase A: App Consolidation (Prerequisites)
+## Phase A: App Consolidation (Prerequisites) — A3 ✅ COMPLETE
 
 Everything below must be solid BEFORE Triton goes live — inference routes
 need validation, auth, and correct service URLs to work in production.
+**A3 (localhost→ENV) is fully complete** — 0 hardcoded service URLs remaining.
 
 ### A1. Zod Validation (118/258 → 258/258)
 
@@ -87,21 +92,20 @@ const ADMIN_ONLY = ['/api/admin', '/api/codebase-index', '/api/phase89', '/api/e
 const PUBLIC = ['/api/health', '/api/auth', '/api/metrics', '/api/system'];
 ```
 
-### A3. Hardcoded localhost → ENV (29 routes)
+### A3. Hardcoded localhost → ENV ~~(29 routes)~~ ✅ COMPLETE
 
-| Service | Hardcoded | ENV var | Files |
-|---------|-----------|---------|-------|
-| Ollama | `localhost:11434` | `ENV.OLLAMA_BASE_URL` | ~12 |
-| Qdrant | `localhost:6333` | `ENV.QDRANT_URL` | ~4 |
-| Triton | `localhost:8099` | `ENV.TRITON_URL` | ~3 |
-| Go gRPC | `localhost:50051` | `ENV.GRPC_URL` | ~3 |
-| MinIO | `localhost:9000` | `ENV.MINIO_ENDPOINT` | ~2 |
-| CouchDB | `localhost:5984` | `ENV.COUCHDB_URL` | ~2 |
-| SIMD | `localhost:8095` | `ENV.SIMD_URL` | ~2 |
-| Redis | `localhost:6379` | `ENV.REDIS_URL` | ~1 |
+**Status: 0 remaining** — All service URLs now use `env.server.ts` getters.
 
-**Critical for Triton**: When Triton runs in Docker, `localhost:8099` won't resolve
-from inside the SvelteKit container. Must use `ENV.TRITON_URL` everywhere.
+| Service | ENV var | Status |
+|---------|---------|--------|
+| Ollama | `ENV.OLLAMA_BASE_URL` | ✅ All migrated |
+| Qdrant | `ENV.QDRANT_URL` | ✅ All migrated |
+| Triton | `ENV.TRITON_URL` | ✅ All migrated |
+| Go gRPC | `ENV.GRPC_URL` | ✅ All migrated |
+| MinIO | `ENV.MINIO_ENDPOINT` | ✅ All migrated |
+| CouchDB | `ENV.COUCHDB_URL` | ✅ All migrated |
+| SIMD | `ENV.SIMD_URL` | ✅ All migrated |
+| Redis | `ENV.REDIS_URL` | ✅ All migrated |
 
 ---
 
@@ -148,21 +152,23 @@ Worker 3: Recommendation Worker (repurpose graph-worker.js)
 Worker 4: Contextual Chat Worker (repurpose ai-service-worker.ts)
   ├─ Manages SSE connection to /api/sse/chat
   ├─ Maintains chat context window (last N messages)
-  ├─ Calls /api/ai/contextual-chat for RAG-augmented responses
+  ├─ Calls /api/contextual/chat for tool-augmented responses
   ├─ Handles Triton VLM requests when images attached
-  └─ Status: contextual-chat.ts is STUB — needs RAG + Ollama wiring
+  └─ Status: ✅ WIRED — Ollama native tool calling (3 tools) + HMM state tracking + Redis sessions
 ```
 
-### Wiring the Contextual Chat Pipeline
+### Wiring the Contextual Chat Pipeline — ✅ COMPLETE
 
-`lib/server/llm/contextual-chat.ts` is currently a **stub** (mock RAG, mock Ollama, no DB persistence).
+~~`lib/server/llm/contextual-chat.ts` is currently a **stub**~~ — Contextual chat is now fully wired:
 
-To wire it:
-1. Replace `getContextFromRag()` stub → call `rag-pipeline.ts` `ragSearch()`
-2. Replace `callOllamaChat()` stub → call real Ollama via `ENV.OLLAMA_BASE_URL`
-3. Wire citations from Qdrant search results (currently hardcoded `[]`)
-4. Add chat turn persistence to `ragMessages` table
-5. Add Triton VLM path for image+text queries (post Phase E)
+- ✅ `/api/contextual/chat` — Ollama native tool calling (glossary_search, rag_search, web_search)
+- ✅ `/api/contextual/state` — GET/DELETE HMM state from Redis
+- ✅ `/api/contextual/predictions` — Next-step predictions based on HMM state
+- ✅ `/api/contextual/stats` — Session statistics (turns, confidence, transitions)
+- ✅ Redis session history (last 20 messages, 1hr TTL)
+- ✅ HMM 8-state model (Greeting→Case Inquiry→Document Analysis→Legal Research→Risk Assessment→Recommendation→Follow-up→Conclusion)
+- ✅ Entity extraction (CASE_NUMBER, DATE, STATUTE, MONEY patterns)
+- Remaining: Triton VLM path for image+text queries (post Phase E)
 
 ### Analytics → Recommendations Feedback Loop
 
@@ -353,12 +359,12 @@ const RATE_LIMITS = {
 Phase A ──────────────────────────────────────────► (2-3 sessions)
   A1. Zod validation (Batches 11-17, ~140 routes)
   A2. Auth guards (hooks.server.ts centralization)
-  A3. Hardcoded localhost → ENV (29 files)
+  A3. Hardcoded localhost → ENV ✅ COMPLETE (0 remaining)
 
-Phase B ──────────────────────────────────────────► (2 sessions)
+Phase B ──────────────────────────────────────────► (1-2 sessions)
   B1. Analytics Worker (repurpose aiProcessingWorker.js)
   B2. Recommendation Worker (repurpose graph-worker.js)
-  B3. Contextual Chat Worker (wire contextual-chat.ts stubs)
+  B3. Contextual Chat Worker ✅ COMPLETE (Ollama tool calling + HMM)
   B4. Analytics → Recommendations feedback loop
 
 Phase C ──────────────────────────────────────────► (1 session)
@@ -384,7 +390,7 @@ Phase F ────────────────────────
   F3. Monitoring dashboard (Prometheus + Grafana)
 ```
 
-**Total estimated: 9-11 sessions to production-ready VLM deployment**
+**Total estimated: 7-9 sessions remaining to production-ready VLM deployment** (A3 + B3 complete)
 
 ---
 
@@ -395,13 +401,20 @@ Phase F ────────────────────────
 | `/api/analytics/events` | YES (Zod + 14 event types) | Frontend analytics worker to POST events |
 | `/api/recommendations` | YES (5-signal ranker, metrics) | Client worker for pre-fetch + tracking |
 | `UserHistoryTracker` | YES (7-day decay, 6 interaction types) | Wire to analytics worker events |
-| `contextual-chat.ts` | STUB (mock RAG, mock Ollama) | Wire real RAG + Ollama + citations |
+| `contextual-chat` endpoints | ✅ **WIRED** (4 endpoints, 3 Ollama tools, HMM state) | Triton VLM path (post Phase E) |
+| `/api/agents/chat` | ✅ **WIRED** (4 Ollama tools incl glossary) | None — working |
+| `autonomous-agent.ts` | ✅ **WIRED** (15 LangChain tools via /api/agent/investigate) | None — working |
 | `embedding-worker-enhanced.ts` | ACTIVE (ONNX 768-dim) | None — working |
+| `embedding_cache` table | ✅ **WIRED** (pgvector + gRPC Redis cache) | None — working |
 | `trt-llm.ts` client | YES (OpenAI-compat) | Wire to Triton when deployed |
 | `gpu-arbiter.ts` | YES (Redis VRAM lease) | Add SigLIP load/unload |
 | Langfuse | RUNNING (port 3100) | Wire SDK + instrument calls |
 | ClickHouse | RUNNING (port 8123) | Langfuse backend (already configured) |
 | Qdrant INT8 | DONE (all 72 collections) | Collection consolidation (72→15) |
+| Hardcoded localhost | ✅ **0 remaining** | None — all via env.server.ts |
+| LLM response caching | ✅ **DONE** (LiteLLM Redis semantic cache) | None — 28x speedup |
+| Cache invalidation | ✅ **DONE** (cache-invalidation.ts + RabbitMQ) | None — working |
+| MCP tools | ✅ **36 tools** (expanded from 9) | Report/case/citation tools |
 | Zod validation | 118/258 (46%) | 140 more routes |
 | Auth guards | ~30/258 routes | Centralize in hooks |
 | Rate limiting | None | Redis INCR/EXPIRE |

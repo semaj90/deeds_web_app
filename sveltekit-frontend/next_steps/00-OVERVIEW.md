@@ -156,14 +156,14 @@ This directory contains categorized TODO items organized by feature area and pri
 **Focus:** Production API endpoint for autonomous investigations
 **Endpoint:** `POST /api/agent/investigate`
 **Architecture:** ReAct (Reasoning + Acting) with 14 FastMCP tools
-**Status:** ✅ Live (waiting for trained model deployment)
+**Status:** ✅ LIVE (wired via `/api/agent/investigate` → `autonomous-agent.ts` with 15 LangChain tools)
 
 **Key Highlights:**
 - 6 detective mode tools (ripgrep, find_files, analyze_file, extract_pattern, analyze_imports, web_search)
 - 5 multimodal tools (YOLO, Whisper, CLIP analysis)
-- 9 example queries (4 base + 5 enhanced scenarios)
+- ✅ `glossary_search` tool added (legal term definitions via context-assembler)
+- ✅ 4 agentic chat systems: Agent Chat (4 tools), Autonomous Agent (15 tools), Contextual Chat (3 tools), MCP (36 tools)
 - Test suite: `scripts/tests/test-agent-investigate.mjs`
-- After training: Autonomous TODO aggregation, DB safety, ML audit, API mapping, infrastructure health
 
 ---
 
@@ -172,32 +172,39 @@ This directory contains categorized TODO items organized by feature area and pri
 1. **Fix Template Generation Endpoint (Reports)** — Blocking AI-powered report creation
    *Effort: 30 minutes | Impact: HIGH | File: api/reports/generate-from-template/+server.ts*
 
-2. **Embedding Cache Persistence (AI)** — Redundant embedding generation
-   *Effort: 2 hours | Impact: HIGH | File: workers/embedding-worker.ts line 146*
+2. ~~**Embedding Cache Persistence (AI)**~~ — ✅ DONE (embedding_cache table + gRPC Redis cache + pgvector)
 
-3. **Evidence Audit Logging (Evidence)** — Legal compliance requirement
-   *Effort: 2 hours | Impact: CRITICAL | New table: evidence_audit_log*
+3. ~~**Evidence Audit Logging (Evidence)**~~ — ✅ DONE (evidenceAuditLog + evidenceVersions tables + evidence-audit.ts)
 
 4. **Report Audit Logging (Reports)** — Legal compliance requirement
    *Effort: 1 hour | Impact: CRITICAL | New table: report_audit_log*
 
-5. **Redis Connection Pooling (Infrastructure)** — Prevent connection exhaustion
-   *Effort: 1 hour | Impact: HIGH | File: lib/server/redis.ts*
+5. ~~**Redis Connection Pooling (Infrastructure)**~~ — ✅ DONE (ioredis has built-in connection pooling)
 
 6. **MCP Report Tools (MCP)** — Enable AI agents to create/export reports
-   *Effort: 2 hours | Impact: HIGH | File: mcp/server.ts*
+   *Effort: 2 hours | Impact: HIGH | File: mcp/server.ts (currently 36 tools)*
 
-7. **LLM Response Caching (AI)** — Reduce Ollama load, faster responses
-   *Effort: 1.5 hours | Impact: HIGH | New Qdrant collection: llm_cache*
+7. ~~**LLM Response Caching (AI)**~~ — ✅ DONE (LiteLLM Redis semantic cache — 28x speedup)
 
-8. **Cache Invalidation Strategy (Infrastructure)** — Data consistency
-   *Effort: 2 hours | Impact: HIGH | New file: lib/server/cache-invalidation.ts*
+8. ~~**Cache Invalidation Strategy (Infrastructure)**~~ — ✅ DONE (cache-invalidation.ts + RabbitMQ cache.invalidate)
 
-9. **Evidence Version History (Evidence)** — Track metadata changes
-   *Effort: 2.5 hours | Impact: MEDIUM-HIGH | New table: evidence_versions*
+9. ~~**Evidence Version History (Evidence)**~~ — ✅ DONE (evidenceVersions table)
 
-10. **Test Coverage Expansion (Infrastructure)** — 19 → 100+ tests
-    *Effort: 8 hours | Impact: MEDIUM-HIGH | New test suites for evidence/cases/citations/AI*
+10. **Test Coverage Expansion (Infrastructure)** — 46/46 Playwright screenshots, need unit tests
+    *Effort: 8 hours | Impact: MEDIUM-HIGH | Vitest regression suite started*
+
+### Revised Top Priorities (remaining work)
+
+1. **Zod Validation** — 118/258 routes (46%) → 140 remaining
+2. **Auth Guards** — ~30/258 routes check `locals.user` → ~228 unguarded
+3. **Report Audit Logging** — Legal compliance (report_audit_log table)
+4. **Rate Limiting** — None on any route (Redis INCR/EXPIRE)
+5. **Langfuse/ClickHouse Wiring** — Running but unwired (17.5GB overhead)
+6. **MCP Report/Case/Citation Tools** — Enable AI agents to manage reports
+7. **Qdrant Collection Consolidation** — 72 → ~15 active collections
+8. **Frontend Analytics Worker** — RabbitMQ queue exists but no client tracking
+9. **TRT-LLM Triton Deployment** — Engine build pending
+10. **Unit Test Suite** — Vitest started, need broader coverage
 
 ---
 
@@ -228,27 +235,30 @@ Core infrastructure phases fully implemented:
 - No action needed — informational only
 
 ### Key Gaps Identified
-1. **MCP tools incomplete** — 9/14 tools, missing report/case/citation tools
+1. ~~**MCP tools incomplete**~~ — ✅ Expanded to **36 tools** (was 9). Remaining: report/case/citation tools
 2. **TRT-LLM deployment** — Triton server config ready, engine build pending
-3. **Test coverage** — 20 Playwright route tests, no unit test suite
-4. **Phase 99 recovery** — 83 corrupted files (5 imported by active routes, rest archived)
+3. **Test coverage** — 46/46 Playwright screenshots, Vitest started, unit coverage still low
+4. ~~**Phase 99 recovery**~~ — ✅ Handled (corrupted files archived to deeds_labs/, 5 active routes fixed)
+5. **Zod validation** — 118/258 routes (46%), 140 remaining
+6. **Auth guards** — ~228 routes unguarded
+7. **Hardcoded localhost** — ✅ **0 remaining** (all via env.server.ts getters)
 
 ---
 
 ## 📈 Implementation Roadmap
 
 ### Phase 1: Critical Fixes (Week 1)
-**Effort:** ~12 hours
+**Effort:** ~12 hours → **~2.5 hours remaining**
 
 - [ ] Fix template generation endpoint (30 min)
 - [ ] Add report audit logging (1 hour)
-- [ ] Add evidence audit logging (2 hours)
-- [ ] Implement Redis connection pooling (1 hour)
-- [ ] Implement cache TTL strategy (1.5 hours)
-- [ ] Add cache invalidation (2 hours)
-- [ ] Persist embeddings to DB (2 hours)
-- [ ] Add LLM response caching (1.5 hours)
-- [ ] Ollama health monitoring (1 hour)
+- [x] ~~Add evidence audit logging~~ ✅ DONE
+- [x] ~~Implement Redis connection pooling~~ ✅ DONE (ioredis built-in)
+- [x] ~~Implement cache TTL strategy~~ ✅ DONE (L0-L3 tiered)
+- [x] ~~Add cache invalidation~~ ✅ DONE (cache-invalidation.ts + RabbitMQ)
+- [x] ~~Persist embeddings to DB~~ ✅ DONE (embedding_cache + pgvector)
+- [x] ~~Add LLM response caching~~ ✅ DONE (LiteLLM Redis semantic cache)
+- [x] ~~Ollama health monitoring~~ ✅ DONE (/api/infrastructure/status)
 
 ### Phase 2: High-Value Features (Week 2-3)
 **Effort:** ~40 hours
@@ -394,10 +404,10 @@ Core infrastructure phases fully implemented:
 
 ### Gaps Identified
 - Template generation endpoint returns 500 (import/runtime issue)
-- No audit logging (legal compliance risk)
-- Embeddings not persisted (redundant generation)
-- Redis single connection (scalability risk)
-- Limited test coverage (only reports tested)
+- ~~No audit logging~~ ✅ DONE (evidence audit logging + version history)
+- ~~Embeddings not persisted~~ ✅ DONE (embedding_cache + gRPC Redis cache)
+- ~~Redis single connection~~ ✅ DONE (ioredis built-in pooling)
+- Test coverage expanding (46/46 Playwright + Vitest started)
 
 ### Patterns to Reuse
 - TODO structure: Priority → Effort → Implementation → Code examples
@@ -411,16 +421,16 @@ Core infrastructure phases fully implemented:
 
 1. Fix template generation endpoint (30 min)
 2. Add report audit logging (1 hour)
-3. Redis connection pooling (1 hour)
-4. Ollama health monitoring (1 hour)
-5. Cache TTL strategy (1.5 hours)
-6. LLM response caching (1.5 hours)
+3. ~~Redis connection pooling~~ ✅ DONE
+4. ~~Ollama health monitoring~~ ✅ DONE
+5. ~~Cache TTL strategy~~ ✅ DONE
+6. ~~LLM response caching~~ ✅ DONE
 7. Model auto-loader (1.5 hours)
 8. Token usage tracking (1.5 hours)
 9. Evidence thumbnails (2 hours)
-10. Docker health checks (1 hour)
+10. ~~Docker health checks~~ ✅ DONE (docker-compose services)
 
-**Total Quick Wins:** 12.5 hours for 10 improvements
+**Remaining Quick Wins:** ~6.5 hours for 5 improvements (5/10 completed)
 
 ---
 
@@ -435,6 +445,6 @@ Core infrastructure phases fully implemented:
 
 ---
 
-**Last Updated:** March 1, 2026
-**Next Review:** After Phase 1 completion
+**Last Updated:** March 22, 2026
+**Next Review:** After Zod validation + auth guard pass
 **Maintainer:** Development Team

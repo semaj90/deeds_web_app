@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
@@ -19,6 +20,12 @@
 	}: Props = $props();
 
 	let isOpen = $state(false);
+
+	onMount(() => {
+		const handleOpen = () => { isOpen = true; };
+		window.addEventListener('yorha:open-chat', handleOpen);
+		return () => window.removeEventListener('yorha:open-chat', handleOpen);
+	});
 	let widgetId = $state('widget-' + Math.random().toString(36).slice(2, 8));
 	let chatId = $derived(caseId ? `widget-case-${caseId}` : widgetId);
 </script>
