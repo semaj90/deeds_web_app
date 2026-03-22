@@ -24,6 +24,7 @@ import { storeCachedResponse } from '$lib/server/ai/llm-cache.js';
 import { ENV } from '$lib/server/env.server.js';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { createDefaultRegistry } from '$lib/server/queue/queue-worker.js';
 
 // ── Request Timeout Constants ────────────────────────────────────────────
 const DEFAULT_REQUEST_TIMEOUT = 30_000; // 30s for normal routes
@@ -79,8 +80,17 @@ if (shouldRunBootTasks) {
   // Idle re-engagement scanner (5-min interval, checks user activity → notifications)
   startIdleScanner();
 
-  // Note: Queue consumers are registered by startRabbitMQPipeline() above
-  // via rabbitmq.initialize() → startConsumers() (all 7 queues)
+  // Start typed queue-worker consumers (entity extraction, embedding, analytics, etc.)
+  createDefaultRegistry().startAll()
+    .then((stats) => {
+      console.log(`[Boot] Queue workers: ${stats.started}/${stats.started + stats.failed} started`);
+      if (stats.errors.length > 0) {
+        console.warn('[Boot] Queue worker errors:', stats.errors.join(', '));
+      }
+    })
+    .catch((err) => {
+      console.warn('[Boot] Queue workers failed (non-fatal):', (err as Error).message);
+    });
 
   // Option #6: Warm up export cache (pre-generate top 5 recent report exports)
   warmupExportCache()

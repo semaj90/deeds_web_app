@@ -15,6 +15,7 @@ import { fetchGlossaryMatches } from '$lib/server/ace/context-assembler.js';
 import { orderByDependency, extractCitationRefs } from '$lib/server/retrieval/document-dag.js';
 import type { DAGDocument } from '$lib/server/retrieval/document-dag.js';
 import { getCachedEmbedding, setCachedEmbedding } from '$lib/server/knowledge-cache.js';
+import { produceTokenChunk, trimTokenStream } from '$lib/server/redis-streams.js';
 import { z } from 'zod';
 
 const sseChatSchema = z.object({
@@ -1097,6 +1098,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
         const reader = ollamaRes.body.getReader();
         const decoder = new TextDecoder();
+        let tokenSeq = 0;
 
         while (true) {
           const { done, value } = await reader.read();
@@ -1116,12 +1118,17 @@ export const POST: RequestHandler = async ({ request }) => {
                   content: fullResponse,
                   status: 'streaming',
                 });
+                // Persist token chunk to Redis Stream for SSE crash recovery / replay
+                produceTokenChunk(conversationId, tokenSeq++, chunk).catch(() => {});
               }
             } catch {
               // skip malformed JSON lines
             }
           }
         }
+
+        // Trim the token stream to prevent unbounded growth
+        trimTokenStream(conversationId, 2000).catch(() => {});
 
         // Build confidence factors (auditable)
         const topScore =
