@@ -14,7 +14,9 @@ If argument provided: audit that specific subdirectory.
 
 For each subdirectory in `src/lib/`:
 1. Count total files
-2. Count files with **0 import references** across `src/routes/` and `src/lib/`
+2. Count files with **0 import references** across `src/routes/` and `src/lib/` — check BOTH:
+   - Static: `grep -r "from.*FILENAME" src/`
+   - Dynamic: `grep -r "import('.*FILENAME" src/` (MCP server, SSR-safe lazy loads, conditional modules)
 3. Calculate **dead ratio** = (dead files / total files)
 4. Flag directories with dead ratio > 50%
 
@@ -98,7 +100,12 @@ Apply gates IN ORDER. Stop at first fail.
 | G4: Integration Point | Natural route/layout/API that should host this? | Continue | → ARCHIVE |
 | G5: Effort | Wire in < 30 min (import + render, not deep refactor)? | → WIRE | → DEFER |
 
-**G0 detail**: Run `grep -r "from.*FILENAME" src/` and recursively trace importers. If any chain reaches a route file, this is a **transitive dependency**, not an orphan. Mark as TRANSITIVE_DEP and skip all further gates. This prevents false archival of cache helpers, persistence layers, and utility modules used by canonical facades.
+**G0 detail**: Run BOTH static and dynamic import checks:
+1. `grep -r "from.*FILENAME" src/` — static `import ... from` statements
+2. `grep -r "import('.*FILENAME" src/` — dynamic `await import()` expressions (MCP server, SSR-safe components, lazy-loaded modules)
+Recursively trace importers from both. If any chain reaches a route file, this is a **transitive dependency**, not an orphan. Mark as TRANSITIVE_DEP and skip all further gates. This prevents false archival of cache helpers, persistence layers, and utility modules used by canonical facades.
+
+**LESSON LEARNED**: `docling.ts` was scored 4 (dead chain) but had 2 active dynamic-import consumers (`mcp/server.ts`, `/api/ace/ingest`). `redis-service.ts` was scored 2 (superseded) but had 4 active consumers. Always check dynamic imports before archiving.
 
 **G3 detail**: When a file fails G1 or G2 but implements a feature that could enhance an existing pipeline (evidence, RAG, chat, search, cache, inference), apply the Production Value Scorecard from 5o. Score ≥ 5 → REWRITE candidate with `next_steps/` entry. Score < 5 → continue to G4.
 

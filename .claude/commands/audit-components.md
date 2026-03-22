@@ -52,13 +52,14 @@ embedding-cache.ts (0 route imports — looks dead)
 - Utility functions imported only by one canonical consumer
 - Service files re-exported via barrel `index.ts` → facade → route
 
-## Phase 2: Classification — 7-Gate Test
+## Phase 2: Classification — 8-Gate Test
 
 For each orphan, read the file and apply these gates IN ORDER:
 
 | Gate | Question | Pass | Fail |
 |------|----------|------|------|
 | **G0: Transitive Dep** | Is this file imported (directly or transitively) by any wired file? | → TRANSITIVE_DEP (skip all gates) | Continue |
+| **G0.5: Dynamic Import** | Is this file consumed via `await import()` anywhere? (115 files use dynamic imports!) | → HAS CONSUMERS (do not archive) | Continue |
 | **G1: Functional** | Does it compile? Clean Svelte 5 runes? No syntax errors? | Continue | → ARCHIVE (corrupted) |
 | **G2: Feature Gap** | Does it provide functionality no other component covers? | Continue | → ARCHIVE (redundant) |
 | **G3: Rewrite Potential** | If Svelte 4 or corrupted, is the feature valuable enough to rewrite? Does it enhance an existing pipeline (evidence, RAG, chat, search, cache, inference)? Could it serve a production use case? | → REWRITE candidate | Continue to G4 |
@@ -70,11 +71,29 @@ For each orphan, read the file and apply these gates IN ORDER:
 
 Before classifying ANY file, check if it's a transitive dependency:
 ```
-1. grep -r "from.*FILENAME" src/ — find all files that import this file
-2. For each importer, recursively check if THAT file is imported by routes
-3. If ANY chain leads to a route → mark TRANSITIVE_DEP, skip all other gates
+1. grep -r "from.*FILENAME" src/ — find all files that import this file (STATIC)
+2. grep -r "import(.*FILENAME" src/ — find all files that dynamically import this file (DYNAMIC)
+3. For each importer, recursively check if THAT file is imported by routes
+4. If ANY chain leads to a route → mark TRANSITIVE_DEP, skip all other gates
 ```
 This prevents false archival of cache helpers, persistence layers, and utility modules used by canonical facades (e.g., `embedding-cache.ts` imported by `embed.ts`).
+
+### Gate 0.5: Dynamic Import Detection (CRITICAL — added March 22, 2026)
+
+**Root cause:** `docling.ts` was incorrectly archived because `grep -r "from.*docling"` found 0 consumers. But `grep -r "import(.*docling"` found 3 active `await import('../lib/server/docling.js')` calls in `mcp/server.ts`, `api/ace/ingest`, and `api/evidence/upload`.
+
+**Dynamic import hotspots (115 files total):**
+| File | Count | Pattern |
+|------|-------|---------|
+| `mcp/server.ts` | 12 | Tool handlers lazy-load heavy deps |
+| `hooks.server.ts` | 3 | Shutdown cleanup |
+| `queue-worker.ts` | 1 | Worker isolation |
+| API routes | ~80+ | Server modules lazy-loaded |
+
+**MANDATORY check:**
+```bash
+grep -r "import(.*MODULE_NAME" src/
+```
 
 ### Gate 3: Rewrite Production Value Assessment
 

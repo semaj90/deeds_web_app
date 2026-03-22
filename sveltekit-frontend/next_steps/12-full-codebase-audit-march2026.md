@@ -3,8 +3,35 @@
 ## Audit Methodology
 - **7 parallel agents** scanning concurrently across all codebase layers
 - **Transitive dependency chain tracing** (G0 gate) — not just direct imports
+- **Dynamic import detection** (G0.5 gate) — `await import()` calls invisible to static grep (115 files use dynamic imports; `mcp/server.ts` alone has 12)
 - **Production value scoring** — Pipeline Enhancement (0-3) + Production Use (0-3) + Existing Infra (0-3) + Uniqueness (0-3) = max 12
-- **Gate system** — G0 (transitive dep?) → G1 (compiles?) → G2 (unique?) → G3 (value?) → G4 (integration point?) → G5 (effort?) → G6 (fully wired?)
+- **Gate system** — G0 (transitive dep?) → G0.5 (dynamic import consumer?) → G1 (compiles?) → G2 (unique?) → G3 (value?) → G4 (integration point?) → G5 (effort?) → G6 (fully wired?)
+
+### G0.5: Dynamic Import Gate (CRITICAL — Added March 22, 2026)
+
+**Problem**: Static `grep -r "from.*MODULE"` misses `await import('MODULE')` calls. The audit's original scoring was based on shallow analysis that missed dynamic imports. This caused `docling.ts` to be incorrectly archived (3 active consumers via `await import()` in `mcp/server.ts`, `api/ace/ingest`, `api/evidence/upload`).
+
+**Hotspots** (files with the most dynamic imports):
+| File | Dynamic Imports | Pattern |
+|------|----------------|---------|
+| `mcp/server.ts` | 12 | Tool handlers lazy-load heavy deps |
+| `hooks.server.ts` | 3 | Shutdown cleanup imports |
+| `lib/workers/queue-worker.ts` | 1 | Worker lazy-loads queue consumer |
+| `lib/webgpu/wire-telemetry.ts` | 1 | Browser telemetry lazy import |
+| `lib/cache/__tests__/cache.test.ts` | 10 | Test isolation pattern |
+| `routes/api/**` | ~80+ | Server routes lazy-load server modules |
+
+**Required check before archiving ANY file:**
+```bash
+# Static imports
+grep -r "from.*MODULE_NAME" src/
+
+# Dynamic imports (MUST ALSO CHECK)
+grep -r "import(.*MODULE_NAME" src/
+
+# require() calls (rare but exists in proto/ocr/astVectorizer)
+grep -r "require(.*MODULE_NAME" src/
+```
 
 ---
 

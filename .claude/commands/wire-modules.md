@@ -126,6 +126,7 @@ rg "href:.*'/demos/" src/routes/(app)/demos/+page.svelte -o --no-heading
 - NEVER create files unless the missing module is clearly needed
 - Prefer finding existing alternatives over creating stubs
 - **Trace transitive dependency chains** before classifying a missing import as MISSING_FILE — the file may exist under a different path and be re-exported via a barrel `index.ts` or facade module (e.g., `embedding-cache.ts` re-exported via `embed.ts`)
+- **Check dynamic imports**: Always search for `import('.*MODULE')` in addition to `from '.*MODULE'` — MCP server, SSR-safe components, and conditional modules use `await import()` which static grep misses
 - **Check facade re-exports**: When an import fails, check if the symbol is re-exported by a higher-level module (grep for `export.*symbolName` in the parent directory)
 - Use ripgrep (`rg`) for fast cross-file searches, NOT grep
 - Run `svelte-check` after any fixes

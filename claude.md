@@ -383,13 +383,17 @@ See `memory/corruption-patterns.md` for detection patterns and fix strategies.
 
 **BEFORE moving ANY directory to `deeds_labs/`, run this checklist:**
 
-1. `grep -r "from.*\$lib/MODULE" src/` — check ALL import consumers
-2. Check root layout (`+layout.svelte`) for dynamic imports
-3. Check all `+page.svelte` files for lazy/dynamic imports
-4. Check barrel `index.ts` re-exports and their downstream consumers
-5. Check API routes (`src/routes/api/`) for server-side imports
-6. Check `.svelte.ts` store files for cross-module references
-7. Verify SvelteKit 2 + Drizzle ORM adapter compatibility (schema refs)
+1. `grep -r "from.*\$lib/MODULE" src/` — check ALL static import consumers
+2. `grep -r "import(.*MODULE" src/` — check ALL dynamic `await import()` consumers **(CRITICAL — 115 files use dynamic imports; `mcp/server.ts` alone has 12)**
+3. `grep -r "require(.*MODULE" src/` — check CommonJS require() calls (rare: proto, OCR, astVectorizer)
+4. Check root layout (`+layout.svelte`) for dynamic imports
+5. Check all `+page.svelte` files for lazy/dynamic imports
+6. Check barrel `index.ts` re-exports and their downstream consumers
+7. Check API routes (`src/routes/api/`) for server-side imports
+8. Check `.svelte.ts` store files for cross-module references
+9. Verify SvelteKit 2 + Drizzle ORM adapter compatibility (schema refs)
+
+**Lesson learned (March 22, 2026):** `docling.ts` was incorrectly archived because static grep found 0 consumers. Dynamic grep found 3 active `await import('../lib/server/docling.js')` calls in `mcp/server.ts`, `api/ace/ingest`, and `api/evidence/upload`. Always check both static AND dynamic imports.
 
 **Key directories that LOOK dead but ARE wired:**
 - `$lib/webgpu/` — root layout WebGPU init (every page)
@@ -401,12 +405,14 @@ See `memory/corruption-patterns.md` for detection patterns and fix strategies.
 
 ---
 
-## Component Wiring Audit Methodology (6-Gate Test)
+## Component Wiring Audit Methodology (8-Gate Test)
 
-When auditing orphan components, apply this 6-gate test to decide **wire**, **rewrite**, or **archive**:
+When auditing orphan components, apply this 8-gate test to decide **wire**, **rewrite**, or **archive**:
 
 | Gate | Question | Pass | Fail |
 |------|----------|------|------|
+| G0: Static imports? | `grep -r "from.*MODULE" src/` finds consumers? | Continue | Continue to G0.5 |
+| G0.5: Dynamic imports? | `grep -r "import(.*MODULE" src/` finds `await import()` consumers? | → HAS CONSUMERS (do not archive) | Continue to G1 |
 | G1: Functional? | Clean code, compiles, Svelte 5 runes? | Continue | → ARCHIVE (corrupted) |
 | G2: Feature gap? | Unique functionality no other component covers? | Continue | → ARCHIVE (redundant) |
 | G3: Rewrite potential? | If broken/Svelte 4, is the feature valuable enough to rewrite? | → REWRITE candidate | Continue to G4 |
@@ -414,9 +420,21 @@ When auditing orphan components, apply this 6-gate test to decide **wire**, **re
 | G5: Low effort? | Wire in < 30 min (import + render, not deep refactor)? | → WIRE | → DEFER to backlog |
 | G6: Fully wired? | End-to-end: import → render → trigger path → API routes → props → data flow? | FULLY WIRED | → SHALLOW (incomplete) |
 
+**Gate 0.5 — Dynamic Import Detection** (CRITICAL — added March 22, 2026):
+
+115 files in `src/` use `await import()`. Static `grep -r "from.*MODULE"` misses these entirely.
+Key hotspots: `mcp/server.ts` (12 dynamic imports), `hooks.server.ts` (3), `queue-worker.ts` (1), API routes (~80+).
+
+**Before declaring any file "0 consumers":**
+```bash
+grep -r "from.*MODULE" src/           # static imports
+grep -r "import(.*MODULE" src/        # dynamic imports (MUST CHECK)
+grep -r "require(.*MODULE" src/       # CJS require (rare)
+```
+
 **Gate 6 — Deep Wiring Verification** (post-wire check):
 After wiring a component, verify the full chain is connected:
-1. **Import exists** — `grep -r "ComponentName" src/` shows the import
+1. **Import exists** — `grep -r "ComponentName" src/` shows the import (static OR dynamic)
 2. **Render exists** — The importing file actually renders it (`<ComponentName` or `{@render`)
 3. **Trigger reachable** — Rendered UI, `onMount`, form submit, load function, or machine transition actually calls the handler/fetch; no dead helper function or permanently-false branch
 4. **API routes exist** — If component calls `fetch('/api/...')`, verify `+server.ts` exists
@@ -454,12 +472,13 @@ After wiring a component, verify the full chain is connected:
 - `AIChat.stories.ts` → ARCHIVE: Fails G4 — Storybook not active, references non-existent component
 
 **Process:**
-1. `grep -r "ComponentName" src/routes/ src/lib/` — check import count
-2. If 0 imports → orphan candidate
-3. Read the file — assess code quality
-4. Apply gates G1→G5 in order (stop at first fail)
-5. Execute action: WIRE / REWRITE / ARCHIVE / DEFER
-6. After wiring, apply G6 to verify end-to-end connection
+1. `grep -r "ComponentName" src/routes/ src/lib/` — check static import count
+2. `grep -r "import(.*ComponentName" src/` — check dynamic import count
+3. If 0 static AND 0 dynamic imports → orphan candidate
+4. Read the file — assess code quality
+5. Apply gates G1→G5 in order (stop at first fail)
+6. Execute action: WIRE / REWRITE / ARCHIVE / DEFER
+7. After wiring, apply G6 to verify end-to-end connection
 
 ---
 
