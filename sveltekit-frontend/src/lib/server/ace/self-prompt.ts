@@ -7,6 +7,7 @@
  * Uses the LLM itself to evaluate its own output.
  * Stores evaluations in Redis for analytics.
  */
+import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { litellmChat, ollamaFetch } from '$lib/server/ollama.js';
@@ -18,18 +19,15 @@ const MODEL = 'gemma3-legal:latest';
 const EVAL_CACHE_TTL = 3600; // 1 hour
 const QUALITY_THRESHOLD = 0.6;
 
-// Ollama structured output: JSON schema guarantees valid JSON via GBNF grammar constraining
-const EVAL_FORMAT = {
-	type: 'object' as const,
-	properties: {
-		quality: { type: 'number' as const },
-		completeness: { type: 'number' as const },
-		accuracy: { type: 'number' as const },
-		suggestions: { type: 'array' as const, items: { type: 'string' as const } },
-		shouldRetry: { type: 'boolean' as const }
-	},
-	required: ['quality', 'completeness', 'accuracy', 'suggestions', 'shouldRetry']
-};
+// Zod schema for ACE self-evaluation output — converted to JSON Schema for Ollama GBNF constraining
+const evalSchema = z.object({
+	quality: z.number(),
+	completeness: z.number(),
+	accuracy: z.number(),
+	suggestions: z.array(z.string()),
+	shouldRetry: z.boolean()
+});
+const EVAL_FORMAT = z.toJSONSchema(evalSchema);
 
 /**
  * Evaluate the quality of an AI-generated response.
@@ -139,13 +137,26 @@ function parseEvaluation(text: string): SelfEvaluation {
 	}
 
 	try {
-		const parsed = JSON.parse(jsonMatch[0]);
-		const quality = clamp(Number(parsed.quality ?? 0.7));
+		const raw = JSON.parse(jsonMatch[0]);
+		const parsed = evalSchema.safeParse(raw);
+		if (parsed.success) {
+			const quality = clamp(parsed.data.quality);
+			return {
+				quality,
+				completeness: clamp(parsed.data.completeness),
+				accuracy: clamp(parsed.data.accuracy),
+				suggestions: parsed.data.suggestions.slice(0, 5),
+				shouldRetry: quality < QUALITY_THRESHOLD,
+				evalMs: 0
+			};
+		}
+		// Fallback: manual extraction if Zod parse fails
+		const quality = clamp(Number(raw.quality ?? 0.7));
 		return {
 			quality,
-			completeness: clamp(Number(parsed.completeness ?? 0.7)),
-			accuracy: clamp(Number(parsed.accuracy ?? 0.7)),
-			suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions.slice(0, 5) : [],
+			completeness: clamp(Number(raw.completeness ?? 0.7)),
+			accuracy: clamp(Number(raw.accuracy ?? 0.7)),
+			suggestions: Array.isArray(raw.suggestions) ? raw.suggestions.slice(0, 5) : [],
 			shouldRetry: quality < QUALITY_THRESHOLD,
 			evalMs: 0
 		};

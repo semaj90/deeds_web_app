@@ -13,6 +13,14 @@ const aceSummarizeSchema = z.object({
 	message: 'Must provide either content or evidenceId'
 });
 
+// Zod schema for Ollama structured output — GBNF grammar constraining guarantees valid JSON
+const summaryResponseSchema = z.object({
+	summary: z.string(),
+	keyInsights: z.array(z.string()),
+	confidence: z.number()
+});
+const summaryJsonSchema = z.toJSONSchema(summaryResponseSchema);
+
 /**
  * POST /api/ace/summarize
  * Generate AI summary with full ACE context for evidence items
@@ -55,7 +63,7 @@ Format as JSON:
 
 		const acePrompt = buildACEPrompt(context, summaryPrompt);
 
-		// Call Ollama with ACE-enhanced prompt
+		// Call Ollama with ACE-enhanced prompt + Zod-derived structured output
 		const response = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -63,6 +71,7 @@ Format as JSON:
 				model: 'gemma3-legal:latest',
 				prompt: `${acePrompt.systemPrompt}\n\n${summaryPrompt}`,
 				stream: false,
+				format: summaryJsonSchema,
 				options: {
 					temperature: 0.3,
 					num_predict: 512
@@ -78,19 +87,21 @@ Format as JSON:
 		const data = await response.json();
 		const rawResponse = data.response || '';
 
-		// Try to extract JSON from response
-		let parsedSummary: any = null;
+		// Parse structured output with Zod validation
+		let parsedSummary: { summary: string; keyInsights: string[]; confidence: number };
 		try {
-			// Look for JSON block in markdown
-			const jsonMatch = rawResponse.match(/```json\s*(\{[\s\S]*?\})\s*```/);
-			if (jsonMatch) {
-				parsedSummary = JSON.parse(jsonMatch[1]);
+			const raw = JSON.parse(rawResponse);
+			const validated = summaryResponseSchema.safeParse(raw);
+			if (validated.success) {
+				parsedSummary = validated.data;
 			} else {
-				// Try direct parsing
-				parsedSummary = JSON.parse(rawResponse);
+				parsedSummary = {
+					summary: raw.summary ?? rawResponse.trim(),
+					keyInsights: Array.isArray(raw.keyInsights) ? raw.keyInsights : [],
+					confidence: Number(raw.confidence) || 0.7
+				};
 			}
 		} catch {
-			// Fallback: treat whole response as summary
 			parsedSummary = {
 				summary: rawResponse.trim(),
 				keyInsights: [],
