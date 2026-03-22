@@ -1,6 +1,6 @@
 #!/bin/sh
-# Block large files (>10MB) and common binaries from being committed.
-MAX=10485760
+# Block large files (>20MB) and common binaries from being committed.
+MAX=20971520
 ERRORS=0
 
 STAGED=$(git diff --cached --name-only --diff-filter=AM)
