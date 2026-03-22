@@ -1,3 +1,7 @@
+-- !! ALREADY APPLIED — DO NOT RE-RUN !!
+-- Contains DROP TABLE evidence CASCADE.
+-- Re-running will destroy evidence data.
+
 -- Phase 14: Evidence Board Schema
 -- Created: 2025-12-06
 -- Purpose: Add evidence tables for YoRHa Detective UI

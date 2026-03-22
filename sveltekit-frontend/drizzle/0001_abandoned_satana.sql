@@ -1,3 +1,7 @@
+-- !! ALREADY APPLIED — DO NOT RE-RUN !!
+-- Contains DROP COLUMN "password_hash" and "name" on users table.
+-- Re-running will fail or destroy data.
+
 CREATE TABLE "ace_chunks" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"doc_id" uuid,

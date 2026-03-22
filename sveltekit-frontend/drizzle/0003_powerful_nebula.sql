@@ -1,3 +1,7 @@
+-- !! ALREADY APPLIED — DO NOT RE-RUN !!
+-- Contains 7+ DROP COLUMN statements across multiple tables.
+-- Re-running will fail or destroy data.
+
 ALTER TABLE "documents" ALTER COLUMN "title" SET DATA TYPE varchar(255);--> statement-breakpoint
 ALTER TABLE "documents" ALTER COLUMN "file_size" SET DATA TYPE integer;--> statement-breakpoint
 ALTER TABLE "documents" ALTER COLUMN "file_size" DROP DEFAULT;--> statement-breakpoint
