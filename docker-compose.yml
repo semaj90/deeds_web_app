@@ -57,9 +57,7 @@ services:
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
       - EMBEDDING_GRPC_URL=embedding-service:8094
       - EMBEDDING_GRPC_ENABLED=true
-      - EMBEDDING_QUIC_ENABLED=true
       - NATS_URL=nats://nats:4222
-      - QUIC_HEALTH_URL=http://quic-server:8095/health
       # ── MinIO (server-side uses Docker DNS, browser uses host port) ──
       - MINIO_ENDPOINT=minio
       - MINIO_PORT=9000
@@ -82,7 +80,6 @@ services:
       - rabbitmq
       - go-search-service
       - nats
-      - quic-server
     networks:
       - legal-ai-network
     restart: unless-stopped
@@ -572,48 +569,8 @@ services:
   #         devices:
   #           - driver: nvidia
   #             count: 1
-  #             capabilities: [gpu]  # QUIC Server for high-performance protocols
-  quic-server:
-    build:
-      context: .
-      dockerfile: Dockerfile.quic
-    container_name: legal-ai-quic
-    deploy:
-      resources:
-        limits:
-          memory: 2G
-        reservations:
-          memory: 1G
-    logging:
-      driver: json-file
-      options:
-        max-size: "50m"
-        max-file: "5"
-    ports:
-      - "4433:4433/udp"
-      - "4434:4434/udp"
-      - "8095:8095"
-    environment:
-      - DATABASE_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db
-      - REDIS_URL=redis://:redis@redis:6379/0
-      - REDIS_PASSWORD=redis
-      - QUIC_PORT=4433
-      - OLLAMA_URL=http://host.docker.internal:11434
-      - ENABLE_GPU=true
-      - MINIO_ENDPOINT=minio:9000
-      - MINIO_ACCESS_KEY=minio
-      - MINIO_SECRET_KEY=minio123
-      - MINIO_USE_SSL=false
-      - MINIO_BUCKET_NAME=legal-documents
-    networks:
-      - legal-ai-network
-    depends_on:
-      - postgres
-      - redis
-      - nats
-    restart: unless-stopped
-
-  # NATS — low-latency message transport for QUIC/embedding bridge
+  #             capabilities: [gpu]
+  # NATS — low-latency message transport for embedding bridge
   nats:
     image: nats:latest
     container_name: legal-ai-nats
