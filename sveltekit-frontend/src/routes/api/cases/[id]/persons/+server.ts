@@ -7,6 +7,17 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { personsOfInterest, casePersons } from '$lib/server/db/schema/persons';
 import { eq, and } from 'drizzle-orm';
+import { z } from 'zod';
+
+const personLinkSchema = z.object({
+  personId: z.string().uuid(),
+  relationshipType: z.string().max(100).optional(),
+  isPrimary: z.boolean().optional(),
+});
+
+const personDeleteSchema = z.object({
+  personId: z.string().uuid(),
+});
 
 /** GET — list all POI linked to a case with relationship metadata */
 export const GET: RequestHandler = async ({ params, locals }) => {
@@ -45,15 +56,11 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const caseId = params.id;
-	const body = await request.json();
-
-	const { personId, relationshipType, isPrimary } = body as {
-		personId: string;
-		relationshipType?: string;
-		isPrimary?: boolean;
-	};
-
-	if (!personId) return json({ error: 'personId required' }, { status: 400 });
+	const raw = await request.json().catch(() => ({}));
+  const parsed = personLinkSchema.safeParse(raw);
+  if (!parsed.success)
+    return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+  const { personId, relationshipType, isPrimary } = parsed.data;
 
 	const [link] = await db.insert(casePersons).values({
 		caseId,
@@ -70,10 +77,11 @@ export const DELETE: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const caseId = params.id;
-	const body = await request.json();
-	const { personId } = body as { personId: string };
-
-	if (!personId) return json({ error: 'personId required' }, { status: 400 });
+	const raw = await request.json().catch(() => ({}));
+  const parsed = personDeleteSchema.safeParse(raw);
+  if (!parsed.success)
+    return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+  const { personId } = parsed.data;
 
 	await db.delete(casePersons).where(
 		and(eq(casePersons.caseId, caseId), eq(casePersons.personId, personId))

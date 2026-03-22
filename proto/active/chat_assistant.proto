@@ -1,0 +1,238 @@
+syntax = "proto3";
+
+package yorha.chat;
+
+option go_package = "github.com/deeds-web-app/backend/proto/chat";
+
+/**
+ * Contextual AI Chat Assistant — gRPC Service
+ *
+ * Supports RAG-augmented legal Q&A with:
+ *   - Multi-turn conversation context
+ *   - Case-aware prompting (jurisdiction, legal area)
+ *   - ACE self-evaluation + correction
+ *   - SSE-compatible streaming via server-streaming RPC
+ *   - Evidence + citation grounding
+ *
+ * Transport: gRPC (primary) → QUIC/NATS (tier 2) → HTTP/SSE (fallback)
+ */
+
+service ChatAssistantService {
+  // Send a message and receive a complete response
+  rpc SendMessage(ChatRequest) returns (ChatResponse);
+
+  // Stream a response token-by-token (SSE-compatible)
+  rpc StreamMessage(ChatRequest) returns (stream ChatToken);
+
+  // Retrieve conversation history for a session
+  rpc GetHistory(HistoryRequest) returns (HistoryResponse);
+
+  // Create or resume a chat session
+  rpc CreateSession(CreateSessionRequest) returns (SessionInfo);
+
+  // RAG-augmented query: search → validate → answer in one call
+  rpc RAGQuery(RAGQueryRequest) returns (RAGQueryResponse);
+
+  // Health check
+  rpc Health(ChatHealthRequest) returns (ChatHealthResponse);
+}
+
+// ── Request Messages ────────────────────────────────────────────────────
+
+message ChatRequest {
+  string session_id = 1;           // Conversation session ID
+  string message = 2;              // User message text
+  string user_id = 3;              // Authenticated user ID
+  string case_id = 4;              // Case context (optional)
+  ChatOptions options = 5;         // Generation options
+  repeated Attachment attachments = 6;  // File/evidence attachments
+}
+
+message ChatOptions {
+  float temperature = 1;           // LLM temperature (0.0-2.0, default 0.3)
+  int32 max_tokens = 2;            // Max response tokens (default 2048)
+  bool enable_ace = 3;             // ACE self-evaluation + correction
+  bool enable_rag = 4;             // RAG context retrieval
+  bool include_citations = 5;      // Extract [Source N] citations
+  bool stream = 6;                 // Request streaming response
+  string jurisdiction = 7;         // Legal jurisdiction filter
+  string legal_area = 8;           // Legal area focus
+  string model = 9;                // Model override (default: gemma3-legal)
+  int32 rag_top_k = 10;            // RAG retrieval depth (default 10)
+  float rag_min_score = 11;        // RAG minimum score threshold (default 0.3)
+  bool use_hybrid_search = 12;     // BM42 hybrid search for RAG
+  bool use_dag_ordering = 13;      // DAG citation ordering
+}
+
+message Attachment {
+  string id = 1;                   // Evidence/document ID
+  string type = 2;                 // "evidence" | "document" | "citation" | "image"
+  string title = 3;                // Display title
+  string content = 4;              // Text content (if inline)
+  bytes data = 5;                  // Binary data (if file)
+}
+
+// ── Response Messages ───────────────────────────────────────────────────
+
+message ChatResponse {
+  string message_id = 1;           // Unique message ID
+  string session_id = 2;           // Session this belongs to
+  string content = 3;              // Full response text
+  string summary = 4;              // Short summary (first 200 chars)
+  repeated Citation citations = 5; // Extracted citations
+  repeated ActionItem actions = 6; // Extracted action items
+  ChatMetrics metrics = 7;         // Performance metrics
+  ACEResult ace = 8;               // ACE self-evaluation result (if enabled)
+  string model = 9;                // Model used
+  string timestamp = 10;           // ISO timestamp
+}
+
+message ChatToken {
+  string token = 1;                // Individual token text
+  int32 index = 2;                 // Token position in stream
+  bool done = 3;                   // Stream complete flag
+  string message_id = 4;           // Message this token belongs to
+  ChatMetrics metrics = 5;         // Final metrics (only on last token)
+  repeated Citation citations = 6; // Citations (only on last token)
+}
+
+message Citation {
+  string citation_id = 1;         // Unique citation ID
+  string chunk_id = 2;            // Source chunk ID
+  string source_title = 3;        // Source document title
+  string quote = 4;               // Quoted text
+  float relevance_score = 5;      // Relevance to query
+}
+
+message ActionItem {
+  string action_id = 1;           // Unique action ID
+  string description = 2;         // Action description
+  string priority = 3;            // "high" | "medium" | "low"
+  repeated string related_chunks = 4;  // Related source chunks
+}
+
+message ChatMetrics {
+  float generation_time_ms = 1;   // LLM generation time
+  float embedding_time_ms = 2;    // Embedding generation time
+  float search_time_ms = 3;       // RAG search time
+  int32 tokens_used = 4;          // Total tokens consumed
+  float answer_confidence = 5;    // Response confidence (0-1)
+  float grounding_score = 6;      // Citation grounding quality (0-1)
+  string embedding_transport = 7; // "grpc" | "quic" | "http-ollama"
+  int32 rag_chunks_found = 8;     // Number of RAG chunks retrieved
+  string scoring_method = 9;      // "hybrid" | "vector_only" | "tfidf_only"
+}
+
+message ACEResult {
+  float quality_score = 1;        // Self-evaluation score (0-1)
+  bool correction_applied = 2;    // Whether correction was needed
+  string original_response = 3;   // Pre-correction response (if corrected)
+  string correction_reason = 4;   // Why correction was applied
+}
+
+// ── Session Management ──────────────────────────────────────────────────
+
+message CreateSessionRequest {
+  string user_id = 1;             // User creating the session
+  string case_id = 2;             // Associated case (optional)
+  string title = 3;               // Session title (optional, auto-generated)
+}
+
+message SessionInfo {
+  string session_id = 1;          // Created session ID
+  string title = 2;               // Session title
+  string case_id = 3;             // Associated case
+  string created_at = 4;          // ISO timestamp
+  int32 message_count = 5;        // Number of messages
+}
+
+message HistoryRequest {
+  string session_id = 1;          // Session to retrieve
+  int32 limit = 2;                // Max messages (default 50)
+  int32 offset = 3;               // Pagination offset
+}
+
+message HistoryResponse {
+  repeated HistoryMessage messages = 1;
+  int32 total_count = 2;          // Total messages in session
+  SessionInfo session = 3;        // Session metadata
+}
+
+message HistoryMessage {
+  string id = 1;                  // Message ID
+  string role = 2;                // "user" | "assistant" | "system"
+  string content = 3;             // Message content
+  string timestamp = 4;           // ISO timestamp
+  repeated Citation citations = 5; // Citations (assistant messages only)
+  ChatMetrics metrics = 6;        // Metrics (assistant messages only)
+}
+
+// ── RAG Query (Combined Pipeline) ───────────────────────────────────────
+
+message RAGQueryRequest {
+  string query = 1;               // Search query
+  string case_id = 2;             // Case context
+  string user_id = 3;             // User context
+  int32 top_k = 4;                // Retrieval depth (default 10)
+  float min_score = 5;            // Minimum score threshold (default 0.3)
+  bool use_hybrid = 6;            // BM42 hybrid search
+  bool use_dag = 7;               // DAG citation ordering
+  bool use_corrective_rag = 8;    // Corrective RAG (reformulate on low confidence)
+  ChatOptions generation_options = 9;  // LLM generation options
+}
+
+message RAGQueryResponse {
+  string query_id = 1;            // Unique query ID
+  ChatResponse answer = 2;        // Generated answer with citations
+  repeated RetrievedChunk chunks = 3;  // Retrieved context chunks
+  RAGMetrics rag_metrics = 4;     // Pipeline metrics
+}
+
+message RetrievedChunk {
+  string chunk_id = 1;            // Chunk identifier
+  string text = 2;                // Chunk content
+  string snippet = 3;             // Short preview
+  float score = 4;                // Relevance score
+  string confidence = 5;          // "high" | "medium" | "low" | "marginal"
+  string source_type = 6;         // "document" | "evidence" | "statute"
+  string source_id = 7;           // Source document ID
+  string source_title = 8;        // Source title
+  string section = 9;             // Section heading
+}
+
+message RAGMetrics {
+  float total_time_ms = 1;        // Total pipeline time
+  float embedding_time_ms = 2;    // Embedding generation
+  float search_time_ms = 3;       // Vector search
+  float generation_time_ms = 4;   // LLM generation
+  int32 total_chunks_found = 5;   // Chunks before filtering
+  int32 chunks_used = 6;          // Chunks after filtering
+  string embedding_transport = 7; // Transport tier used
+  bool corrective_applied = 8;    // Corrective RAG triggered
+  string reformulated_query = 9;  // Reformulated query (if corrective)
+  bool dag_reordered = 10;        // DAG reordering applied
+  string search_method = 11;      // "hybrid-rrf" | "dense-only" | "sparse-only"
+}
+
+// ── Health Check ────────────────────────────────────────────────────────
+
+message ChatHealthRequest {
+  bool deep = 1;                  // Include dependency checks
+}
+
+message ChatHealthResponse {
+  string status = 1;              // "healthy" | "degraded" | "unhealthy"
+  int32 active_sessions = 2;      // Currently active sessions
+  int32 uptime_seconds = 3;       // Service uptime
+  map<string, bool> dependencies = 4;  // Dependency health (ollama, qdrant, redis, pg)
+  TransportStatus transport = 5;  // Transport tier status
+}
+
+message TransportStatus {
+  bool grpc_available = 1;        // gRPC tier (port 50051)
+  bool quic_available = 2;        // QUIC/NATS tier (port 4222)
+  bool http_available = 3;        // HTTP/Ollama tier
+  string active_tier = 4;         // Currently active tier
+  int32 grpc_latency_ms = 5;      // gRPC probe latency
+  int32 quic_latency_ms = 6;      // QUIC probe latency
+}

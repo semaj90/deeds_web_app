@@ -67,7 +67,23 @@ export const POST: RequestHandler = async ({ request }) => {
 				contextChunks = parsed.chunks ?? [];
 			}
 		} catch {
-			// Fall through — answer without context (degraded)
+			// Redis unavailable — try PostgreSQL fallback below
+		}
+
+		// PostgreSQL fallback: if Redis miss, try DB lookup (durable persistence)
+		if (!combinedContext) {
+			try {
+				const { db: pgDb } = await import('$lib/server/db/client');
+				const { ragSessions } = await import('$lib/server/db/schema-postgres.js');
+				const { eq: eqOp } = await import('drizzle-orm');
+				const rows = await pgDb.select().from(ragSessions)
+					.where(eqOp(ragSessions.id, context_id)).limit(1);
+				if (rows[0]?.title) {
+					combinedContext = rows[0].title;
+				}
+			} catch {
+				// Both Redis and PG unavailable — answer without context (degraded)
+			}
 		}
 
 		// Build the prompt with retrieved context

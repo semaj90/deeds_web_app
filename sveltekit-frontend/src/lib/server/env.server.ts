@@ -70,6 +70,9 @@ export const ENV = {
   GOOGLE_SEARCH_CX: privateEnv.GOOGLE_SEARCH_CX ?? '',
   // Go Legal Library Search Service (parallel fan-out: citation + FTS + pgvector + Qdrant)
   GO_SEARCH_URL: privateEnv.GO_SEARCH_URL ?? '',
+  GO_SEARCH_GRPC_URL: privateEnv.GO_SEARCH_GRPC_URL ?? '127.0.0.1:50055',
+  // QUIC server health endpoint (Go microservice on :8095)
+  QUIC_HEALTH_URL: privateEnv.QUIC_HEALTH_URL ?? 'http://127.0.0.1:8095/health',
   // FastAPI middleware (optional)
   FASTAPI_URL: privateEnv.FASTAPI_URL ?? 'http://localhost:8001',
   // Web Push (VAPID) — generate with: npx web-push generate-vapid-keys --json

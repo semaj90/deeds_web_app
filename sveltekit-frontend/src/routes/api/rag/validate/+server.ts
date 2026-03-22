@@ -116,8 +116,19 @@ export const POST: RequestHandler = async ({ request }) => {
 				'EX', 600
 			);
 		} catch {
-			// Non-blocking — answer endpoint can fall back to client-provided context
+			// Non-blocking — answer endpoint can fall back to DB or client-provided context
 		}
+
+		// Fire-and-forget: persist to PostgreSQL as durable fallback (survives Redis restart)
+		import('$lib/server/db/client').then(async ({ db: pgDb }) => {
+			const { ragSessions } = await import('$lib/server/db/schema-postgres.js');
+			await pgDb.insert(ragSessions).values({
+				id: response.context_id,
+				title: `RAG Context: ${query_id}`,
+				userId: user_id ?? 'system',
+				caseId: case_id,
+			}).onConflictDoNothing();
+		}).catch(() => {});
 
 		return json(response);
 	} catch (err) {

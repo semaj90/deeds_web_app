@@ -13,6 +13,7 @@ import { chatRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 import { computeTFIDF } from '$lib/server/retrieval/tfidf-scorer.js';
 import { getVectorCache, setVectorCache, getEmbeddingCache, setEmbeddingCache } from '$lib/server/vector-cache.js';
 import { embedText } from '$lib/server/embedding/embed.js';
+import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
@@ -298,10 +299,11 @@ export const POST: RequestHandler = async ({ request, url }) => {
       });
     }
 
-    // 1. Generate embedding (use precomputed from client if provided, else server-side)
+    // 1. Generate embedding (use precomputed from client if provided, else server-side 4-tier chain)
     const embedStart = performance.now();
     let embedding: number[];
     let embeddingSource = 'server';
+    let embeddingTransport: string = 'http-ollama';
 
     if (
       precomputedEmbedding &&
@@ -310,17 +312,29 @@ export const POST: RequestHandler = async ({ request, url }) => {
     ) {
       embedding = precomputedEmbedding;
       embeddingSource = 'client-precomputed';
+      embeddingTransport = 'client-onnx';
     } else {
       try {
-        const embeddingArray = await traceEmbedding(query, 'embeddinggemma:latest', () =>
-          embedText(query)
-        );
-        embedding = Array.from(embeddingArray);
+        // Use 4-tier fallback chain: gRPC → QUIC → HTTP batch → HTTP sequential
+        const result = await traceEmbedding(query, 'embeddinggemma:latest', async () => {
+          const embResult = await generateEmbeddings([query]);
+          embeddingTransport = embResult.source; // 'grpc' | 'quic' | 'http-ollama'
+          return embResult.vectors[0] as unknown as Float32Array;
+        });
+        embedding = Array.from(result);
 
         // Also cache in vector-cache for backward compatibility
         setEmbeddingCache(query, embedding, 'embeddinggemma:latest').catch(() => {});
-      } catch (err) {
-        return apiResponses.badGateway('Embedding generation failed');
+      } catch {
+        // Fallback to direct embedText if 4-tier chain fails entirely
+        try {
+          const embeddingArray = await embedText(query);
+          embedding = Array.from(embeddingArray);
+          embeddingTransport = 'http-ollama-fallback';
+          setEmbeddingCache(query, embedding, 'embeddinggemma:latest').catch(() => {});
+        } catch (err2) {
+          return apiResponses.badGateway('Embedding generation failed');
+        }
       }
     }
 
@@ -604,6 +618,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
     const response: RetrieveCandidatesResponse & {
       corrective_rag?: unknown;
       hybrid_search?: string;
+      embedding_transport?: string;
     } = {
       query_id: crypto.randomUUID(),
       query,
@@ -622,8 +637,19 @@ export const POST: RequestHandler = async ({ request, url }) => {
       hybrid_search: hybridSearchUsed ? 'bm42-rrf' : undefined,
       ace: aceMetadata ?? undefined,
       corrective_rag: correctiveMetadata ?? undefined,
+      embedding_transport: embeddingTransport,
       timestamp: new Date().toISOString(),
     };
+
+    // Fire-and-forget: persist search query to DB for analytics/audit
+    import('$lib/server/db/client').then(async ({ db: pgDb }) => {
+      const { ragMessages } = await import('$lib/server/db/schema-postgres.js');
+      await pgDb.insert(ragMessages).values({
+        content: query,
+        role: 'user',
+        sessionId: response.query_id,
+      });
+    }).catch(() => {});
 
     // Cache the full response (fire-and-forget, 30min TTL via vector-cache config)
     setVectorCache(

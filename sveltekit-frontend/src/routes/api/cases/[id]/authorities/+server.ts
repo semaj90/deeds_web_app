@@ -7,6 +7,25 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
 import { syncCaseToGraph } from '$lib/server/graph/pg-neo4j-sync.js';
+import { z } from 'zod';
+
+const authorityPostSchema = z.object({
+  documentId: z.string().uuid().optional(),
+  nodeId: z.string().uuid().optional(),
+  category: z.string().max(100).optional(),
+  citationText: z.string().max(2000).optional(),
+  notes: z.string().max(5000).optional(),
+  relevanceScore: z.number().min(0).max(1).optional(),
+  term: z.string().max(500).optional(),
+  definition: z.string().max(5000).optional(),
+  jurisdiction: z.string().max(500).optional(),
+  source: z.string().max(500).optional(),
+  confidence: z.number().min(0).max(1).optional(),
+});
+
+const authorityDeleteSchema = z.object({
+  linkId: z.string().uuid(),
+});
 
 /** GET — list all linked legal authorities for a case */
 export const GET: RequestHandler = async ({ params, locals }) => {
@@ -51,7 +70,10 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const id = params.id;
-	const body = await request.json();
+	const raw = await request.json().catch(() => ({}));
+  const parsed = authorityPostSchema.safeParse(raw);
+  if (!parsed.success)
+    return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 
 	const {
     documentId,
@@ -65,19 +87,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     jurisdiction,
     source,
     confidence,
-  } = body as {
-    documentId?: string;
-    nodeId?: string;
-    category?: string;
-    citationText?: string;
-    notes?: string;
-    relevanceScore?: number;
-    term?: string;
-    definition?: string;
-    jurisdiction?: string;
-    source?: string;
-    confidence?: number;
-  };
+  } = parsed.data;
 
 	const resolvedCategory = category || 'cited_authority';
   const isGlossaryConcept = resolvedCategory === 'glossary_concept';
@@ -148,10 +158,11 @@ export const DELETE: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const id = params.id;
-	const body = await request.json();
-	const { linkId } = body as { linkId: string };
-
-	if (!linkId) return json({ error: 'linkId required' }, { status: 400 });
+	const raw = await request.json().catch(() => ({}));
+  const parsed = authorityDeleteSchema.safeParse(raw);
+  if (!parsed.success)
+    return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+  const { linkId } = parsed.data;
 
 	await pool.query(
 		'DELETE FROM case_library_links WHERE id = $1 AND case_id = $2',

@@ -16,7 +16,8 @@ import { ENV } from '$lib/server/env.server.js';
 import type { PlatformSearchHit, PlatformSearchTiming } from '$lib/types/search.js';
 
 /**
- * Unified Platform Search — Two-layer architecture:
+ * Unified Platform Search — Three-layer architecture:
+ *   Layer 0: gRPC fast path (Go search service, binary protocol, lowest latency)
  *   Layer 1: Fan out to domain adapters in parallel via Promise.allSettled()
  *   Layer 2: Normalize to PlatformSearchHit[], merge, return grouped + timing
  *
@@ -43,13 +44,108 @@ async function timedAdapter(
 	}
 }
 
+// ── Go Search Hit Mapper ─────────────────────────────────────────────────
+
+/** Map raw Go search hit to PlatformSearchHit */
+function mapGoHit(h: Record<string, unknown>): PlatformSearchHit {
+	return {
+		id: (h.chunkId ?? h.chunk_id ?? h.id ?? '') as string,
+		entityType: 'document' as const,
+		title: (h.title ?? h.document_title ?? h.heading ?? 'Legal Document') as string,
+		snippet: (h.snippet ?? h.chunk_text ?? '') as string,
+		score: (h.score ?? h.rrf_score ?? 0) as number,
+		matchType: (h.matchType ?? h.match_type ?? 'fused') as PlatformSearchHit['matchType'],
+		route: h.nodeId ?? h.node_id
+			? `/library/${h.documentId ?? h.document_id}/node/${h.nodeId ?? h.node_id}`
+			: `/library/${h.documentId ?? h.document_id ?? ''}`,
+		documentId: (h.documentId ?? h.document_id ?? '') as string,
+		nodeId: (h.nodeId ?? h.node_id ?? '') as string,
+		chunkId: (h.chunkId ?? h.chunk_id ?? '') as string,
+		jurisdiction: (h.jurisdictionCode ?? h.jurisdiction ?? '') as string,
+		corpusType: (h.corpusType ?? h.corpus_type ?? '') as string,
+		sourceConfidence: (h.sourceConfidence ?? '') as string,
+	};
+}
+
+// ── gRPC Client for Go Search Service (lazy-loaded, singleton) ──────────
+
+let goGrpcClient: any = null;
+let goGrpcFailed = false;
+let goGrpcRetryAt = 0;
+
+async function tryGoGrpcSearch(q: string, limit: number): Promise<PlatformSearchHit[] | null> {
+	const grpcUrl = ENV.GO_SEARCH_GRPC_URL;
+	if (!grpcUrl) return null;
+
+	if (goGrpcFailed) {
+		if (Date.now() >= goGrpcRetryAt) {
+			goGrpcFailed = false;
+			goGrpcClient = null;
+		} else {
+			return null;
+		}
+	}
+
+	try {
+		if (!goGrpcClient) {
+			const grpc = await import('@grpc/grpc-js');
+			const protoLoader = await import('@grpc/proto-loader');
+			const { resolve } = await import('path');
+			const protoPath = resolve('proto/active/library_search.proto');
+			const packageDef = await protoLoader.load(protoPath, {
+				keepCase: true,
+				longs: String,
+				enums: String,
+				defaults: true,
+				oneofs: true,
+			});
+			const proto = grpc.loadPackageDefinition(packageDef) as any;
+			const ServiceClass = proto.yorha?.legal?.LibrarySearchService
+				?? proto.libsearch?.LibrarySearchService
+				?? proto.LibrarySearchService;
+			if (!ServiceClass) throw new Error('LibrarySearchService not found in proto');
+			goGrpcClient = new ServiceClass(
+				grpcUrl,
+				grpc.credentials.createInsecure(),
+				{
+					'grpc.keepalive_time_ms': 10000,
+					'grpc.keepalive_timeout_ms': 5000,
+					'grpc.max_receive_message_length': 10 * 1024 * 1024,
+				}
+			);
+		}
+
+		return await new Promise<PlatformSearchHit[]>((resolve, reject) => {
+			const deadline = new Date(Date.now() + 5000);
+			goGrpcClient.SearchLibrary(
+				{ query: q, limit, include_snippets: true },
+				{ deadline },
+				(err: any, response: any) => {
+					if (err) return reject(err);
+					const hits = (response?.hits ?? response?.results ?? []) as Record<string, unknown>[];
+					resolve(hits.map(mapGoHit));
+				}
+			);
+		});
+	} catch (err) {
+		console.warn('[search] Go gRPC unavailable, falling back to HTTP:', (err as Error).message);
+		goGrpcFailed = true;
+		goGrpcRetryAt = Date.now() + 30_000;
+		return null;
+	}
+}
+
 // ── Domain Adapters ───────────────────────────────────────────────────────
 
-/** Search the legal library via Go service (fast path) or inline SQL fallback */
+/** Search the legal library via Go service gRPC (fastest) → HTTP (fast) → SQL fallback */
 async function searchLegalLibrary(q: string, limit: number): Promise<PlatformSearchHit[]> {
 	const goUrl = (ENV as unknown as Record<string, string>).GO_SEARCH_URL;
 
-	// Fast path: Go search service (hybrid: citation + FTS + pgvector + Qdrant)
+	// Tier 1: gRPC fast path (binary protocol, lowest latency)
+	const grpcResult = await tryGoGrpcSearch(q, limit);
+	if (grpcResult && grpcResult.length > 0) return grpcResult;
+
+	// Tier 2: HTTP fast path (Go search service REST)
 	if (goUrl) {
 		try {
 			const res = await fetch(`${goUrl}/search`, {
@@ -60,30 +156,14 @@ async function searchLegalLibrary(q: string, limit: number): Promise<PlatformSea
 			});
 			if (res.ok) {
 				const data = await res.json();
-				return (data.results ?? data.hits ?? []).map((h: Record<string, unknown>) => ({
-					id: (h.chunkId ?? h.chunk_id ?? h.id ?? '') as string,
-					entityType: 'document' as const,
-					title: (h.title ?? h.document_title ?? h.heading ?? 'Legal Document') as string,
-					snippet: (h.snippet ?? h.chunk_text ?? '') as string,
-					score: (h.score ?? h.rrf_score ?? 0) as number,
-					matchType: (h.matchType ?? h.match_type ?? 'fused') as PlatformSearchHit['matchType'],
-					route: h.nodeId ?? h.node_id
-						? `/library/${h.documentId ?? h.document_id}/node/${h.nodeId ?? h.node_id}`
-						: `/library/${h.documentId ?? h.document_id ?? ''}`,
-					documentId: (h.documentId ?? h.document_id ?? '') as string,
-					nodeId: (h.nodeId ?? h.node_id ?? '') as string,
-					chunkId: (h.chunkId ?? h.chunk_id ?? '') as string,
-					jurisdiction: (h.jurisdictionCode ?? h.jurisdiction ?? '') as string,
-					corpusType: (h.corpusType ?? h.corpus_type ?? '') as string,
-					sourceConfidence: (h.sourceConfidence ?? '') as string,
-				}));
+				return (data.results ?? data.hits ?? []).map(mapGoHit);
 			}
-		} catch {
-			// Go service unavailable — fall through to SQL
+		} catch (err) {
+			console.warn('[search] Go HTTP unavailable, falling back to SQL:', (err as Error).message);
 		}
 	}
 
-	// Fallback: Inline SQL hybrid search
+	// Tier 3: Inline SQL hybrid search (PostgreSQL FTS)
 	try {
 		const res = await pool.query(
 			`SELECT lc.id as chunk_id,
