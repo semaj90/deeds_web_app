@@ -83,7 +83,7 @@ Respond with ONLY a JSON object:
 				body: JSON.stringify({
 					model: 'gemma3-legal:latest',
 					prompt,
-					format: 'json',
+					format: keyPointsResponseJsonSchema,
 					stream: false,
 					options: { temperature: 0.3, num_predict: 512 }
 				}),

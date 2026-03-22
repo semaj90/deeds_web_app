@@ -5,6 +5,15 @@ import { personsOfInterest, evidence, cases } from '$lib/server/db/schema-postgr
 import { eq, sql, arrayContains } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { z } from 'zod';
+
+/** GBNF-constrained response schema for POI risk assessment */
+const riskResponseSchema = z.object({
+	riskScore: z.number(),
+	patterns: z.array(z.string()),
+	recommendations: z.array(z.string()),
+});
+const riskResponseJsonSchema = z.toJSONSchema(riskResponseSchema);
 
 /**
  * GET /api/persons-of-interest/[id]/risk
@@ -111,7 +120,7 @@ Provide a JSON object with: riskScore (0-100), patterns (string[]), recommendati
 		const ollamaRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: 'gemma3-legal:latest', prompt, format: 'json', stream: false }),
+			body: JSON.stringify({ model: 'gemma3-legal:latest', prompt, format: riskResponseJsonSchema, stream: false }),
 			signal: AbortSignal.timeout(30000),
 		});
 		if (ollamaRes.ok) {

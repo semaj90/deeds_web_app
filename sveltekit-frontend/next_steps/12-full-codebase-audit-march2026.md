@@ -220,7 +220,17 @@ src/lib/utils/tsconfig.cjs.json
 - `smoke.config.ts` — empty file (1 line)
 - `playwright.config.js` — JS duplicate of `.ts` version
 
-### 2.7 Clean Proto Directory
+### 2.7 Archive 12 Dead Component Orphans
+
+Move to `deeds_labs/lib-dead-directories/components-orphans/`:
+```
+FilterPanel.svelte (422), PersonCard.svelte (381), PersonList.svelte (103),
+PersonForm.svelte (424), EvidenceGrid.svelte (388), YoRHaNavigation.svelte (191),
+YoRHaNotification.svelte (110), YoRHaDataGrid.svelte (96), POICard.svelte (160),
+ReportNode.svelte (88), RecursiveEvidenceNode.svelte (218), LegalAIDashboard.svelte (182)
+```
+
+### 2.8 Clean Proto Directory
 
 - Move 33 root-level `proto/*.proto` into `proto/archived/` (already have copies there)
 - Move `proto/gpu/`, `proto/ingest/`, `proto/embed/` generated Go code to `deeds_labs/`
@@ -423,7 +433,8 @@ Week 2 (Tier 2 — High-Value Cleanup):
   2.4 Archive 13 orphan HTML files                        [P1, 15 min]
   2.5 Archive 7 stale tsconfigs                           [P1, 10 min]
   2.6 Archive legacy env/config files                     [P1, 10 min]
-  2.7 Clean proto directory                               [P1, 15 min]
+  2.7 Archive 12 dead component orphans                   [P1, 10 min]
+  2.8 Clean proto directory                               [P1, 15 min]
 
 Week 3-4 (Tier 3 — Consolidation):
   3.1 Assess 6 medium-value server orphans (score 5-7)    [P2, 2h]
@@ -453,6 +464,6 @@ Backlog (Tier 4 — Enhancements):
 | JS/CJS/MJS/Barrels | 199 scripts + 72 barrels + 19 stores | 290 | ~7 min | 185 dead scripts, 22 zombie barrels |
 | CSS/HTML/SQL/Config | 21 CSS + 16 HTML + 84 SQL + 52 config | 173 | ~2 min | Broken app.postcss, 5 dangerous SQL migrations |
 | Go/C++/C | Go + SIMD bridge + CUDA + proto | 80+ | ~2 min | quic-server unbuildable, SIMD fully active |
-| Components | All .svelte components | 598+ | ~10 min | (Results pending — agent still running) |
+| Components | All 598 .svelte components | 598 | ~10 min | 22 orphans (7 high-value, 12 archive, 2 Phase 99 corrupted) |
 
 *Generated: March 22, 2026 — 7 parallel audit agents*

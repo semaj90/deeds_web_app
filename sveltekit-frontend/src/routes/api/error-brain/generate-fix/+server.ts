@@ -4,6 +4,16 @@ import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
+/** GBNF-constrained response schema for error fix generation */
+const fixResponseSchema = z.object({
+	fixedCode: z.string(),
+	explanation: z.string(),
+	confidence: z.number(),
+	citations: z.array(z.string()),
+	changeDescription: z.string(),
+});
+const fixResponseJsonSchema = z.toJSONSchema(fixResponseSchema);
+
 const generateFixSchema = z.object({
 	errorMessage: z.string().min(1, 'Missing errorMessage').max(50000),
 	filePath: z.string().min(1, 'Missing filePath').max(1000),
@@ -77,7 +87,7 @@ Respond in JSON format:
 			body: JSON.stringify({
 				model: 'gemma3-legal:latest',
 				prompt,
-				format: 'json',
+				format: fixResponseJsonSchema,
 				stream: false,
 				options: { temperature: 0.2, num_predict: 2048 },
 			}),

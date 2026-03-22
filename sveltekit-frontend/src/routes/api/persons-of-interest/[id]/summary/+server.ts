@@ -5,6 +5,14 @@ import { personsOfInterest } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { z } from 'zod';
+
+/** GBNF-constrained response schema for POI summary */
+const poiSummaryResponseSchema = z.object({
+	summary: z.string(),
+	confidence: z.number(),
+});
+const poiSummaryResponseJsonSchema = z.toJSONSchema(poiSummaryResponseSchema);
 
 /**
  * GET /api/persons-of-interest/[id]/summary
@@ -86,7 +94,7 @@ Respond with ONLY a JSON object:
 			body: JSON.stringify({
 				model: 'gemma3-legal:latest',
 				prompt,
-				format: 'json',
+				format: poiSummaryResponseJsonSchema,
 				stream: false,
 				options: { temperature: 0.3, num_predict: 512 }
 			}),

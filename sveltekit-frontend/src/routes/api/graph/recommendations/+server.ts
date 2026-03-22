@@ -12,6 +12,19 @@ import { embedText } from '$lib/server/embedding/embed.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
+/** GBNF-constrained response schema for recommendations */
+const recommendationsResponseSchema = z.object({
+	summary: z.string(),
+	recommendations: z.array(z.object({
+		title: z.string(),
+		rationale: z.string(),
+		confidence: z.string(),
+	})),
+	didYouMean: z.array(z.string()),
+	predictiveSignals: z.array(z.string()),
+});
+const recommendationsJsonSchema = z.toJSONSchema(recommendationsResponseSchema);
+
 const schema = z.object({
 	query: z.string().min(1).max(2000),
 	caseId: z.string().max(200).nullable().optional()
@@ -76,7 +89,7 @@ Provide 3-5 recommendations, 2-3 alternative queries, and 2-4 predictive signals
 				model: MODEL,
 				prompt,
 				stream: false,
-				format: 'json',
+				format: recommendationsJsonSchema,
 				options: { temperature: 0.4, num_predict: 1024 }
 			}),
 			signal: AbortSignal.timeout(30_000)

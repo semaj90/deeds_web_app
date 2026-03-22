@@ -7,6 +7,13 @@ import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
+/** GBNF-constrained response schema for evidence key points */
+const evidenceKeyPointsResponseSchema = z.object({
+	keyPoints: z.array(z.string()),
+	confidence: z.number(),
+});
+const evidenceKeyPointsJsonSchema = z.toJSONSchema(evidenceKeyPointsResponseSchema);
+
 const keyPointsSchema = z.object({
 	caseId: z.string().uuid().optional()
 });
@@ -100,7 +107,7 @@ Respond with ONLY a JSON object:
 			body: JSON.stringify({
 				model: 'gemma3-legal:latest',
 				prompt,
-				format: 'json',
+				format: evidenceKeyPointsJsonSchema,
 				stream: false,
 				options: { temperature: 0.3, num_predict: 512 }
 			}),

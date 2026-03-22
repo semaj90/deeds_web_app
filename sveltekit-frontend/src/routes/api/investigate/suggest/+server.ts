@@ -15,6 +15,14 @@ import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
+/** GBNF-constrained response schema for investigation suggestions */
+const suggestResponseSchema = z.array(z.object({
+	query: z.string(),
+	confidence: z.number(),
+	reason: z.string(),
+}));
+const suggestResponseJsonSchema = z.toJSONSchema(suggestResponseSchema);
+
 // Zod schema validates query (1-10K), answer (1-100K), optional caseId
 const investigateSuggestSchema = z.object({
 	query: z.string().min(1, 'query is required').max(10000),
@@ -77,7 +85,7 @@ Investigation Result: ${answer.slice(0, 800)}
 Return ONLY a JSON array:
 [{"query": "follow-up query", "confidence": 0.85, "reason": "why this is useful"}]`,
 					stream: false,
-					format: 'json',
+					format: suggestResponseJsonSchema,
 					options: { temperature: 0.5, num_predict: 512 }
 				}),
 				signal: AbortSignal.timeout(15000)
