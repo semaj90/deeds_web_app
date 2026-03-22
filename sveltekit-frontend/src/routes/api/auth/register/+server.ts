@@ -5,6 +5,7 @@
 
 import { db } from '$lib/server/db/client';
 import { users } from '$lib/server/db/schema';
+import { formatErrorResponse, ERROR_CODES } from '$lib/server/errors.js';
 import { createUserSession, hashPassword, setSessionCookie } from '$lib/server/lucia';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
@@ -17,16 +18,9 @@ const registerSchema = z.object({
 	lastName: z.string().min(1, 'Last name is required')
 });
 
-interface RegisterRequest {
-	email: string;
-	password: string;
-	firstName: string;
-	lastName: string;
-}
-
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	try {
-		const body = await request.json() as RegisterRequest;
+		const body = await request.json();
 
 		// Validate input
 		const validation = registerSchema.safeParse(body);
@@ -36,29 +30,30 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 				{ status: 400 }
 			);
 		}
+		const { email, password, firstName, lastName } = validation.data;
 
 		// Check if user already exists
 		const [existingUser] = await db
 			.select()
 			.from(users)
-			.where(eq(users.email, body.email))
+			.where(eq(users.email, email))
 			.limit(1);
 
 		if (existingUser) {
-			return json({ error: 'Email already registered' }, { status: 409 });
+			return json({ error: 'Email already registered', code: ERROR_CODES.EMAIL_TAKEN }, { status: 409 });
 		}
 
 		// Hash password
-		const passwordHash = await hashPassword(body.password);
+		const passwordHash = await hashPassword(password);
 
 		// Create user
 		const [newUser] = await db
 			.insert(users)
 			.values({
-				email: body.email,
+				email,
 				passwordHash,
-				firstName: body.firstName,
-				lastName: body.lastName,
+				firstName,
+				lastName,
 				role: 'prosecutor',
 				isActive: true,
 				createdAt: new Date().toISOString(),
@@ -87,6 +82,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		}, { status: 201 });
 	} catch (error) {
 		console.error('[Auth] Registration error:', error);
-		return json({ error: 'Registration failed' }, { status: 500 });
+		const formatted = formatErrorResponse(error);
+		return json(formatted, { status: formatted.error.status });
 	}
 };

@@ -15,7 +15,7 @@ export {
     CardHeader,
     CardTitle
 } from './ui/card';
-export * from './ui/form';
+// ARCHIVED: export * from './ui/form'; (barrel moved to deeds_labs/dead-barrels/)
 export * from './ui/input';
 export * from './ui/label';
 export * from './ui/separator';

@@ -25,6 +25,7 @@
   import Icon from '$lib/components/ui/Icon.svelte';
   import PipelineOverview from '$lib/components/dashboard/PipelineOverview.svelte';
   import GamificationWidget from '$lib/components/dashboard/GamificationWidget.svelte';
+  import StatsCard from '$lib/components/dashboard/StatsCard.svelte';
 
   // ═══ WWWH Use Case Generator ═══
   let wwwhNotes = $state('');
@@ -669,20 +670,14 @@
       <!-- Stats Grid -->
       <div class="dash-stats-grid">
         {#each [
-          { label: 'Active Cases', value: stats.activeCases, icon: 'briefcase', color: '#c8a84b' },
-          { label: 'Total Evidence', value: stats.totalEvidence, icon: 'file-text', color: '#60a5fa' },
-          { label: 'Persons of Interest', value: stats.personsOfInterest, icon: 'users', color: '#f87171' },
-          { label: 'Citations', value: stats.totalCitations, icon: 'bookmark', color: '#a78bfa' },
-          { label: 'Knowledge Base', value: stats.knowledgeBase.total, icon: 'database', color: '#34d399' },
-          { label: 'Total Cases', value: stats.recentActivity, icon: 'folder', color: '#38bdf8' },
+          { label: 'Active Cases', value: stats.activeCases, icon: 'briefcase', variant: 'warning' as const },
+          { label: 'Total Evidence', value: stats.totalEvidence, icon: 'file-text', variant: 'default' as const },
+          { label: 'Persons of Interest', value: stats.personsOfInterest, icon: 'users', variant: 'error' as const },
+          { label: 'Citations', value: stats.totalCitations, icon: 'bookmark', variant: 'default' as const },
+          { label: 'Knowledge Base', value: stats.knowledgeBase.total, icon: 'database', variant: 'success' as const },
+          { label: 'Total Cases', value: stats.recentActivity, icon: 'folder', variant: 'default' as const },
         ] as stat}
-          <div class="dash-stat-card">
-            <div class="dash-stat-icon" style="background: {stat.color}18; color: {stat.color};">
-              <Icon name={stat.icon} size={18} />
-            </div>
-            <div class="dash-stat-num">{stat.value}</div>
-            <div class="dash-stat-label">{stat.label}</div>
-          </div>
+          <StatsCard icon={stat.icon} label={stat.label} value={stat.value} variant={stat.variant} />
         {/each}
       </div>
 

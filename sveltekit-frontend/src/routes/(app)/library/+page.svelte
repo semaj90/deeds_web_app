@@ -2,10 +2,12 @@
 	import type { PageData } from './$types';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import CorpusStatsBar from '$lib/components/legal/CorpusStatsBar.svelte';
+	import IngestionProgress from '$lib/components/legal/IngestionProgress.svelte';
 
 	let { data }: { data: PageData } = $props();
 
 	let uploading = $state(false);
+	let ingestJobId = $state<string | null>(null);
 	let uploadProgress = $state<{ stage: string; stageLabel: string; progress: number; status: string } | null>(null);
 	let uploadError = $state<string | null>(null);
 	let searchQ = $state('');
@@ -83,25 +85,9 @@
 			if (!res.ok || !data.success) throw new Error(data.error ?? 'Upload failed');
 
 			const { jobId } = data;
-			const es = new EventSource(`/api/library/ingest/${jobId}`);
-			es.onmessage = (evt) => {
-				const info = JSON.parse(evt.data);
-				uploadProgress = info;
-				if (info.status === 'complete' || info.status === 'failed') {
-					es.close();
-					uploading = false;
-					if (info.status === 'complete') {
-						setTimeout(() => location.reload(), 800);
-					} else {
-						uploadError = info.errorText ?? 'Ingestion failed';
-					}
-				}
-			};
-			es.onerror = () => {
-				es.close();
-				uploading = false;
-				uploadError = 'Lost connection to server';
-			};
+			ingestJobId = jobId;
+			uploading = false;
+			// SSE progress handled by <IngestionProgress> component
 		} catch (err) {
 			uploading = false;
 			uploadError = err instanceof Error ? err.message : 'Upload failed';
@@ -192,19 +178,11 @@
 				</button>
 			</form>
 
-			{#if uploadProgress}
-				<div class="lib-progress">
-					<div class="lib-progress-header">
-						<span>{uploadProgress.stageLabel}</span>
-						<span>{Math.round(uploadProgress.progress)}%</span>
-					</div>
-					<div class="lib-progress-track">
-						<div class="lib-progress-fill" style:width="{uploadProgress.progress}%"></div>
-					</div>
-					{#if uploadProgress.status === 'complete'}
-						<p class="lib-progress-done">Indexing complete</p>
-					{/if}
-				</div>
+			{#if ingestJobId}
+				<IngestionProgress
+					jobId={ingestJobId}
+					onComplete={() => { ingestJobId = null; setTimeout(() => location.reload(), 800); }}
+				/>
 			{/if}
 
 			{#if uploadError}

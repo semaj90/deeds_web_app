@@ -5,6 +5,7 @@
 
 import { db } from '$lib/server/db/client';
 import { users } from '$lib/server/db/schema';
+import { formatErrorResponse, ERROR_CODES } from '$lib/server/errors.js';
 import { createUserSession, setSessionCookie, verifyPassword } from '$lib/server/lucia';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
@@ -32,18 +33,18 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			.limit(1);
 
 		if (!user) {
-			return json({ error: 'Invalid email or password' }, { status: 401 });
+			return json({ error: 'Invalid email or password', code: ERROR_CODES.INVALID_CREDENTIALS }, { status: 401 });
 		}
 
 		// Check if user is active
 		if (!user.isActive) {
-			return json({ error: 'Account is inactive' }, { status: 403 });
+			return json({ error: 'Account is inactive', code: ERROR_CODES.ACCOUNT_INACTIVE }, { status: 403 });
 		}
 
 		// Verify password (bcrypt.compare expects plaintext first, then hash)
 		const validPassword = await verifyPassword(password, user.passwordHash);
 		if (!validPassword) {
-			return json({ error: 'Invalid email or password' }, { status: 401 });
+			return json({ error: 'Invalid email or password', code: ERROR_CODES.INVALID_CREDENTIALS }, { status: 401 });
 		}
 
 		// Create session using Lucia v3
@@ -67,6 +68,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		});
 	} catch (err) {
 		console.error('[Auth] Login error:', err instanceof Error ? err.message : String(err));
-		return json({ error: 'Login failed — please try again later' }, { status: 500 });
+		const formatted = formatErrorResponse(err);
+		return json(formatted, { status: formatted.error.status });
 	}
 };

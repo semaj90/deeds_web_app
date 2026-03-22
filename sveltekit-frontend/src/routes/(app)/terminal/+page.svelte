@@ -11,6 +11,7 @@
 	import { voiceCommands, COMMAND_PATTERNS } from '$lib/services/voice-commands';
 	import AIRecommendation from '$lib/components/ai/AIRecommendation.svelte';
 	import ChatContextPanel from '$lib/components/ChatContextPanel.svelte';
+	import ThinkingStyleToggle from '$lib/components/ai/ThinkingStyleToggle.svelte';
 
 	let session = $state<ChatSession | null>(null);
 	let currentMessage = $state('');
