@@ -1,3 +1,4 @@
+-- APPLIED -- DO NOT RE-RUN: contains DROP TRIGGER IF EXISTS on line 53, migration already applied to legal_ai_db
 -- Drizzle-compatible raw SQL migration: 0001_create_reports_table.sql
 -- Creates `reports` table with pgvector column and recommended indexes
 

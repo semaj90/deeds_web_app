@@ -1,3 +1,4 @@
+-- APPLIED -- DO NOT RE-RUN: migration already applied to legal_ai_db
 -- Sprint 3.7: Durable dead-letter job tracking table
 CREATE TABLE IF NOT EXISTS "failed_jobs" (
     "id" uuid DEFAULT gen_random_uuid() PRIMARY KEY NOT NULL,

@@ -1,3 +1,4 @@
+-- APPLIED -- DO NOT RE-RUN: migration already applied to legal_ai_db
 -- ACE Web Ingestion Schema Migration
 -- Creates tables for web ingestion, RAG, and KAG pipeline
 -- Requires: PostgreSQL 17 with pgvector extension

@@ -59,16 +59,16 @@ export const actions = {
 		let newCase;
 		try {
 			[newCase] = await db
-				.insert(cases)
-				.values({
-					title: title.trim(),
-					description,
-					priority: priority as any,
-					userId: locals.user.id,
-					status: 'open' as any,
-					updatedAt: new Date().toISOString()
-				})
-				.returning();
+        .insert(cases)
+        .values({
+          title: title.trim(),
+          description,
+          priority: priority,
+          userId: locals.user.id,
+          status: 'open' as const,
+          updatedAt: new Date().toISOString(),
+        })
+        .returning();
 		} catch (error) {
 			console.error('Failed to create case:', error);
 			return message(form, 'Failed to create case. Please try again.', { status: 500 });
