@@ -47,7 +47,9 @@ For each candidate dead file X:
 
 **Example**: `embedding-cache.ts` has 0 route imports but is imported by `embedding/embed.ts` which is imported by multiple API routes. Archiving it breaks the canonical facade.
 
-**Rule**: Only count a file as "dead" if it has 0 importers at ALL levels of the dependency chain, OR all its importers are themselves confirmed dead (orphan cluster).
+**Rule**: Only count a file as "dead" if it has 0 importers at ALL levels of the dependency chain (static AND dynamic), OR all its importers are themselves confirmed dead (orphan cluster).
+
+**Lesson learned (March 22, 2026):** `docling.ts` was incorrectly archived because `grep -r "from.*docling"` found 0 static consumers. But `grep -r "import(.*docling"` found 3 active `await import()` calls in `mcp/server.ts`, `api/ace/ingest`, and `api/evidence/upload`. Dynamic imports are invisible to static grep and account for 115 files in `src/`. **Always check BOTH patterns.**
 
 ---
 
