@@ -5,7 +5,6 @@
 
 import { analyzeImageWithVision, generateText, embedText } from './ollama-service.js';
 import type { VisionAnalysisResponse } from './ollama-service.js';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 
 export interface DocumentAnalysisResult {
     documentId: string;

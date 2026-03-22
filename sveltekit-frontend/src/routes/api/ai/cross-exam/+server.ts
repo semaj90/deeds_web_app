@@ -4,6 +4,23 @@ import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
+/** GBNF-constrained response schema for cross-examination */
+const crossExamResponseSchema = z.object({
+	session: z.object({
+		id: z.string(),
+		witness: z.object({ name: z.string() }),
+		questions: z.array(z.object({
+			text: z.string(),
+			purpose: z.string(),
+			expectedAnswer: z.string(),
+			followUp: z.string(),
+		})),
+		strategy: z.string(),
+		generatedAt: z.string(),
+	}),
+});
+const crossExamResponseJsonSchema = z.toJSONSchema(crossExamResponseSchema);
+
 const crossExamSchema = z.object({
 	witness: z.object({
 		name: z.string().max(500).optional(),
@@ -58,7 +75,7 @@ Generate 5-8 strategic cross-examination questions.`;
 					{ role: 'user', content: userPrompt }
 				],
 				stream: false,
-				format: 'json',
+				format: crossExamResponseJsonSchema,
 				options: { temperature: 0.5 }
 			}),
 			signal: AbortSignal.timeout(60_000)

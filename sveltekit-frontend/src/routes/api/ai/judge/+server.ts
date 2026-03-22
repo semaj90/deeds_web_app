@@ -4,6 +4,40 @@ import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
+/** GBNF-constrained response schema for judicial analysis */
+const judgeResponseSchema = z.object({
+	analysis: z.object({
+		id: z.string(),
+		caseId: z.string().nullable(),
+		generatedAt: z.string(),
+		summary: z.string(),
+		admissibility: z.array(z.object({
+			evidence: z.string(),
+			ruling: z.string(),
+			reasoning: z.string(),
+			legalBasis: z.string(),
+		})),
+		probableCause: z.object({
+			assessment: z.string(),
+			reasoning: z.string(),
+			factors: z.array(z.string()),
+		}),
+		caseStrength: z.object({
+			overall: z.number(),
+			prosecution: z.number(),
+			defense: z.number(),
+			keyFactors: z.array(z.object({
+				factor: z.string(),
+				impact: z.string(),
+				weight: z.number(),
+			})),
+		}),
+		recommendations: z.array(z.string()),
+		risks: z.array(z.string()),
+	}),
+});
+const judgeResponseJsonSchema = z.toJSONSchema(judgeResponseSchema);
+
 const judgeSchema = z.object({
 	caseId: z.string().max(500).nullable().optional(),
 	evidence: z.array(z.object({
@@ -104,7 +138,7 @@ Your Honor, please evaluate this case. Rule on evidence admissibility, assess pr
 					{ role: 'user', content: userPrompt }
 				],
 				stream: false,
-				format: 'json',
+				format: judgeResponseJsonSchema,
 				options: { temperature: 0.5, num_predict: 4096 }
 			}),
 			signal: AbortSignal.timeout(120_000)

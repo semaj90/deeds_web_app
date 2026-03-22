@@ -1,7 +1,7 @@
 /**
  * NLP Analyzer — Sentiment + Document Classification via Ollama
  *
- * Uses Ollama's JSON mode (format: "json") to get structured output
+ * Uses Ollama's GBNF-constrained structured output (Zod → JSON Schema)
  * from gemma3-legal for:
  *   1. Sentiment analysis (positive/negative/neutral + confidence)
  *   2. Document classification (contract, deed, brief, motion, etc.)
@@ -13,6 +13,7 @@
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { z } from 'zod';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const MODEL = 'gemma3-legal:latest';
@@ -38,15 +39,32 @@ export interface NLPAnalysis {
 	processingMs: number;
 }
 
+/** Zod schemas for GBNF-constrained output */
+const sentimentSchema = z.object({
+	sentiment: z.enum(['positive', 'negative', 'neutral', 'mixed']),
+	confidence: z.number(),
+	reasoning: z.string(),
+	emotions: z.array(z.string()),
+});
+const sentimentJsonSchema = z.toJSONSchema(sentimentSchema);
+
+const classificationSchema = z.object({
+	documentType: z.string(),
+	subType: z.string(),
+	confidence: z.number(),
+	practiceArea: z.string(),
+	keyPhrases: z.array(z.string()),
+});
+const classificationJsonSchema = z.toJSONSchema(classificationSchema);
+
 /** Analyze sentiment of legal text via Ollama structured JSON output. */
 export async function analyzeSentiment(text: string): Promise<SentimentResult> {
-	const prompt = `Analyze the sentiment of this legal text. Respond ONLY with valid JSON matching this schema:
-{"sentiment": "positive|negative|neutral|mixed", "confidence": 0.0-1.0, "reasoning": "brief explanation", "emotions": ["list of detected emotions"]}
+	const prompt = `Analyze the sentiment of this legal text. Return JSON with sentiment, confidence, reasoning, and emotions.
 
 Text to analyze:
 ${text.slice(0, 2000)}`;
 
-	const result = await ollamaJSON<SentimentResult>(prompt);
+	const result = await ollamaJSON<SentimentResult>(prompt, sentimentJsonSchema);
 	return {
 		sentiment: result.sentiment ?? 'neutral',
 		confidence: Math.min(Math.max(result.confidence ?? 0.5, 0), 1),
@@ -57,13 +75,12 @@ ${text.slice(0, 2000)}`;
 
 /** Classify a legal document by type and practice area. */
 export async function classifyDocument(text: string): Promise<ClassificationResult> {
-	const prompt = `Classify this legal document. Respond ONLY with valid JSON matching this schema:
-{"documentType": "contract|deed|brief|motion|complaint|order|statute|regulation|letter|memo|report|other", "subType": "specific sub-type", "confidence": 0.0-1.0, "practiceArea": "civil|criminal|family|real-estate|corporate|ip|employment|immigration|tax|environmental|other", "keyPhrases": ["up to 5 key legal phrases"]}
+	const prompt = `Classify this legal document. Return JSON with documentType, subType, confidence, practiceArea, and keyPhrases.
 
 Document text:
 ${text.slice(0, 3000)}`;
 
-	const result = await ollamaJSON<ClassificationResult>(prompt);
+	const result = await ollamaJSON<ClassificationResult>(prompt, classificationJsonSchema);
 	return {
 		documentType: result.documentType ?? 'other',
 		subType: result.subType ?? '',
@@ -87,8 +104,8 @@ export async function analyzeText(text: string): Promise<NLPAnalysis> {
 	};
 }
 
-/** Call Ollama with JSON format mode and parse the response. */
-async function ollamaJSON<T>(prompt: string): Promise<T> {
+/** Call Ollama with GBNF-constrained JSON schema and parse the response. */
+async function ollamaJSON<T>(prompt: string, jsonSchema: Record<string, unknown>): Promise<T> {
 	return traceLLM('nlp-analyzer', { model: MODEL, prompt: prompt.slice(0, 500) }, async (gen) => {
 		const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
 			method: 'POST',
@@ -96,7 +113,7 @@ async function ollamaJSON<T>(prompt: string): Promise<T> {
 			body: JSON.stringify({
 				model: MODEL,
 				prompt,
-				format: 'json',
+				format: jsonSchema,
 				stream: false,
 				options: { temperature: 0.1, num_predict: 512 }
 			}),

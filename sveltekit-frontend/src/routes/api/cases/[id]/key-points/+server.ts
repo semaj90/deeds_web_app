@@ -5,6 +5,14 @@ import { evidence } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { z } from 'zod';
+
+/** GBNF-constrained response schema for key points */
+const keyPointsResponseSchema = z.object({
+	keyPoints: z.array(z.string()),
+	confidence: z.number(),
+});
+const keyPointsResponseJsonSchema = z.toJSONSchema(keyPointsResponseSchema);
 
 /**
  * POST /api/cases/[id]/key-points

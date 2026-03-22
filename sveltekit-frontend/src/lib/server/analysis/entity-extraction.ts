@@ -1,14 +1,25 @@
 /**
  * Entity extraction: LLM structured extraction (primary) + regex fallback.
- * Primary: Gemma3-legal structured JSON via Ollama format:'json'
+ * Primary: Gemma3-legal structured JSON via Ollama GBNF-constrained output
  * Fallback: regex for emails, phones, dates, citations, statutes, money.
  */
 
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { z } from 'zod';
 
 const MODEL = 'gemma3-legal:latest';
+
+/** Zod schema for structured entity extraction response — drives GBNF grammar */
+const entityResponseSchema = z.object({
+	entities: z.array(z.object({
+		text: z.string(),
+		label: z.string(),
+		score: z.number().optional(),
+	})),
+});
+const entityJsonSchema = z.toJSONSchema(entityResponseSchema);
 
 export interface Entity {
 	text: string;
@@ -46,11 +57,11 @@ export async function extractEntities(text: string, maxChars: number = 35_000): 
 }
 
 /**
- * LLM-based extraction via Ollama with format:'json' for structured output.
+ * LLM-based extraction via Ollama with GBNF-constrained structured output.
  */
 async function extractViaLLM(text: string): Promise<Entity[]> {
-	const prompt = `Extract named entities from the following legal document text as JSON only.
-Return an array of objects with fields: {"text": "...", "label": "..."}
+	const prompt = `Extract named entities from the following legal document text.
+Return an object with an "entities" array of objects with fields: {"text": "...", "label": "..."}
 where label is one of: PERSON, ORG, LOCATION, DATE, LAW, CASE, COURT, STATUTE, MONEY, EMAIL, PHONE.
 Only return entities that are clearly present. Do not fabricate.
 
@@ -65,7 +76,7 @@ ${text}`;
 				model: MODEL,
 				prompt,
 				stream: false,
-				format: 'json',
+				format: entityJsonSchema,
 				options: { temperature: 0.1, top_p: 0.9 },
 			}),
 			signal: AbortSignal.timeout(90_000),
@@ -81,9 +92,7 @@ ${text}`;
 
 		try {
 			const parsed = JSON.parse(raw);
-			const arr = Array.isArray(parsed) ? parsed
-				: Array.isArray(parsed.entities) ? parsed.entities
-				: [];
+			const arr = Array.isArray(parsed.entities) ? parsed.entities : [];
 			const entities = arr.filter(
 				(e: any) => typeof e?.text === 'string' && typeof e?.label === 'string' && e.text.length > 0
 			).map((e: any) => ({

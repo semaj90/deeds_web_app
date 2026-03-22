@@ -10,6 +10,18 @@ const analyzeEvidenceSchema = z.object({
 	metadata: z.any().optional().default({})
 });
 
+/** GBNF-constrained response schema for evidence analysis */
+const evidenceResponseSchema = z.object({
+	summary: z.string(),
+	keyTerms: z.array(z.string()),
+	sentiment: z.number(),
+	importance: z.number(),
+	confidence: z.number(),
+	legalRelevance: z.string(),
+	suggestedTags: z.array(z.string()),
+});
+const evidenceResponseJsonSchema = z.toJSONSchema(evidenceResponseSchema);
+
 /** POST /api/ai/analyze-evidence — Analyze evidence text and return structured insights */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
@@ -49,7 +61,7 @@ ${text.slice(0, 4000)}`;
 					{ role: 'user', content: userPrompt }
 				],
 				stream: false,
-				format: 'json',
+				format: evidenceResponseJsonSchema,
 				options: { temperature: 0.3 }
 			}),
 			signal: AbortSignal.timeout(60_000)

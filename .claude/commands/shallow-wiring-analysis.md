@@ -202,6 +202,7 @@ For each extracted route:
 
 - Do NOT flag working chains — only report broken ones
 - Trace FULL chain before classifying — a handler may look like a no-op but be called indirectly
+- **Trace transitive dependencies before flagging DEAD_CHAIN** — a file may appear to have no route consumers but be imported by a facade (e.g., `embedding-cache.ts` → `embed.ts` → API routes). Run `grep -r "from.*FILENAME" src/` and follow the chain up before concluding dead
 - Check both static imports AND dynamic `import()` patterns
 - Verify `goto()` targets against BOTH `(app)/` routes and `api/` routes
 - For `fetch()` calls, check the HTTP method matches (GET vs POST vs PATCH)

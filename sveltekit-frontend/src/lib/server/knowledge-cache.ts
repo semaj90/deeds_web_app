@@ -1,27 +1,9 @@
 /**
  * Redis caching layer for knowledge base queries
  */
-import type { QdrantSearchResult } from '$lib/types/qdrant';
+import type { ScoredPoint } from '$lib/types/qdrant';
 import crypto from 'crypto';
-import Redis from 'ioredis';
-import { ENV } from '$lib/server/env.server.js';
-
-// Redis connection
-// Use ioredis for this file as it was using it originally, separate from integrations/redis.ts which uses node-redis
-const redis = new Redis(ENV.REDIS_URL, {
-    retryStrategy(times) {
-        return Math.min(times * 50, 2000);
-    },
-	maxRetriesPerRequest: 3
-});
-
-redis.on('error', (err) => {
-    console.error('Redis error:', err);
-});
-
-redis.on('connect', () => {
-    console.log('✅ Redis connected for knowledge cache');
-});
+import { redis } from '$lib/server/redis.js';
 
 const TTL = {
     embeddings: 3600, // 1 hour
@@ -109,40 +91,40 @@ export async function setCachedEmbedding(text: string, model: string, embedding:
 
 // Search result cache
 export async function getCachedSearchResults(
-    collection: string,
-    query: string,
-    filters?: Record<string, unknown>
-): Promise<QdrantSearchResult[] | null> {
-    const queryHash = crypto.createHash('md5').update(query).digest('hex').substring(0, 12);
-    const cacheKey = getSearchCacheKey(collection, queryHash, filters);
+  collection: string,
+  query: string,
+  filters?: Record<string, unknown>
+): Promise<ScoredPoint[] | null> {
+  const queryHash = crypto.createHash('md5').update(query).digest('hex').substring(0, 12);
+  const cacheKey = getSearchCacheKey(collection, queryHash, filters);
 
-    try {
-        const cached = await redis.get(cacheKey);
-        if (cached) {
-            await recordCacheMetric('hit', 'search');
-            return JSON.parse(cached);
-        }
-        await recordCacheMetric('miss', 'search');
-        return null;
-    } catch {
-        await recordCacheMetric('miss', 'search');
-        return null;
+  try {
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      await recordCacheMetric('hit', 'search');
+      return JSON.parse(cached);
     }
+    await recordCacheMetric('miss', 'search');
+    return null;
+  } catch {
+    await recordCacheMetric('miss', 'search');
+    return null;
+  }
 }
 
 export async function setCachedSearchResults(
-    collection: string,
-    query: string,
-    results: QdrantSearchResult[],
-    filters?: Record<string, unknown>
+  collection: string,
+  query: string,
+  results: ScoredPoint[],
+  filters?: Record<string, unknown>
 ): Promise<void> {
-    const queryHash = crypto.createHash('md5').update(query).digest('hex').substring(0, 12);
-    const cacheKey = getSearchCacheKey(collection, queryHash, filters);
-    try {
-        await redis.setex(cacheKey, TTL.search, JSON.stringify(results));
-    } catch (error) {
-        console.error('Failed to cache search results', error);
-    }
+  const queryHash = crypto.createHash('md5').update(query).digest('hex').substring(0, 12);
+  const cacheKey = getSearchCacheKey(collection, queryHash, filters);
+  try {
+    await redis.setex(cacheKey, TTL.search, JSON.stringify(results));
+  } catch (error) {
+    console.error('Failed to cache search results', error);
+  }
 }
 
 // Invalidation

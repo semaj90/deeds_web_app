@@ -2,9 +2,19 @@
 	import { goto } from '$app/navigation';
 	import CodebaseSearch from '$lib/components/CodebaseSearch.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import type { TabId } from '$lib/command-center-manifest.js';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
+
+	let manifestTab = $state<TabId>('cases');
+	let manifestRoutes = $derived(data.manifest?.[manifestTab] ?? []);
+	const manifestTabs: { id: TabId; label: string }[] = [
+		{ id: 'cases', label: 'Cases' },
+		{ id: 'evidence', label: 'Evidence' },
+		{ id: 'persons', label: 'Persons' },
+		{ id: 'system', label: 'System' },
+	];
 
 	let now = $state(new Date());
 
@@ -409,6 +419,41 @@
 	</div>
 
 	<CodebaseSearch />
+
+	{#if data.manifest}
+		<section class="route-registry">
+			<header class="route-registry__header">
+				<span class="route-registry__label">&gt;_ ROUTE REGISTRY</span>
+				<nav class="route-registry__tabs">
+					{#each manifestTabs as tab}
+						<button
+							class="route-registry__tab"
+							class:active={manifestTab === tab.id}
+							onclick={() => (manifestTab = tab.id)}
+						>{tab.label}</button>
+					{/each}
+				</nav>
+			</header>
+			<ul class="route-registry__list">
+				{#each manifestRoutes as route}
+					<li class="route-card">
+						<a class="route-card__link" href={route.href} onclick={() => goto(route.href)}>
+							<span class="route-card__label">{route.label}</span>
+							<span class="route-card__desc">{route.description}</span>
+							<span class="route-card__href">{route.href}</span>
+						</a>
+						{#if route.badges?.length}
+							<div class="route-card__badges">
+								{#each route.badges as badge}
+									<span class="badge badge--{badge}">{badge}</span>
+								{/each}
+							</div>
+						{/if}
+					</li>
+				{/each}
+			</ul>
+		</section>
+	{/if}
 </div>
 
 <style>
@@ -1087,4 +1132,135 @@
 			flex-direction: column;
 		}
 	}
+
+	/* Route Registry */
+	.route-registry {
+		margin: 2rem auto;
+		max-width: 1200px;
+		background: var(--color-panel, #1a1a1a);
+		border: 1px solid var(--color-border, rgba(255,255,255,0.08));
+		border-radius: 4px;
+		overflow: hidden;
+	}
+
+	.route-registry__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.75rem 1.25rem;
+		border-bottom: 1px solid var(--color-border, rgba(255,255,255,0.08));
+		background: rgba(0,0,0,0.2);
+	}
+
+	.route-registry__label {
+		font-family: monospace;
+		font-size: 0.75rem;
+		letter-spacing: 0.08em;
+		color: var(--color-accent, #7eceab);
+		opacity: 0.7;
+	}
+
+	.route-registry__tabs {
+		display: flex;
+		gap: 0.25rem;
+	}
+
+	.route-registry__tab {
+		padding: 0.25rem 0.75rem;
+		font-family: monospace;
+		font-size: 0.7rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		background: transparent;
+		border: 1px solid rgba(255,255,255,0.1);
+		color: rgba(255,255,255,0.5);
+		border-radius: 2px;
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+
+	.route-registry__tab:hover {
+		border-color: rgba(255,255,255,0.3);
+		color: rgba(255,255,255,0.8);
+	}
+
+	.route-registry__tab.active {
+		background: var(--color-accent, #7eceab);
+		border-color: var(--color-accent, #7eceab);
+		color: #0a0a0a;
+	}
+
+	.route-registry__list {
+		list-style: none;
+		margin: 0;
+		padding: 0.5rem;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+		gap: 0.5rem;
+	}
+
+	.route-card {
+		position: relative;
+		border: 1px solid rgba(255,255,255,0.06);
+		border-radius: 3px;
+		background: rgba(255,255,255,0.02);
+		transition: border-color 0.15s, background 0.15s;
+	}
+
+	.route-card:hover {
+		border-color: var(--color-accent, #7eceab);
+		background: rgba(126,206,171,0.04);
+	}
+
+	.route-card__link {
+		display: block;
+		padding: 0.65rem 0.9rem;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.route-card__label {
+		display: block;
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: rgba(255,255,255,0.85);
+		margin-bottom: 0.2rem;
+	}
+
+	.route-card__desc {
+		display: block;
+		font-size: 0.7rem;
+		color: rgba(255,255,255,0.4);
+		line-height: 1.4;
+		margin-bottom: 0.3rem;
+	}
+
+	.route-card__href {
+		display: block;
+		font-family: monospace;
+		font-size: 0.65rem;
+		color: var(--color-accent, #7eceab);
+		opacity: 0.6;
+	}
+
+	.route-card__badges {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+		padding: 0 0.9rem 0.5rem;
+	}
+
+	.badge {
+		padding: 0.1rem 0.4rem;
+		font-size: 0.6rem;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		border-radius: 2px;
+		font-family: monospace;
+	}
+
+	.badge--ai { background: rgba(126,206,171,0.15); color: #7eceab; }
+	.badge--experimental { background: rgba(255,200,0,0.1); color: #ffc800; }
+	.badge--system { background: rgba(100,149,255,0.12); color: #6495ff; }
+	.badge--api { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
 </style>

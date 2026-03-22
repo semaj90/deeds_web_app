@@ -20,18 +20,71 @@ For each `.svelte`, `.svelte.ts`, or `.ts` file in the target directory:
 
 Report the orphan list with file sizes.
 
-## Phase 2: Classification — 5-Gate Test
+### 1b. Reverse Dependency Chain (Anti-False-Archive Gate)
+
+**CRITICAL**: Before classifying ANY file as an orphan, trace its **reverse dependency chain** to check if it's a transitive dependency of a wired file.
+
+A file with 0 route imports is NOT necessarily dead — it may be a helper/utility imported by a canonical facade that IS wired to routes.
+
+```
+For each candidate orphan X:
+1. Find all importers: grep -r "from.*X" src/
+2. For each importer Y, check if Y is itself imported by routes or wired files
+3. Recursively trace up the chain until you reach a route file OR exhaust all importers
+4. If ANY chain leads to an active route → X is a TRANSITIVE DEPENDENCY, not an orphan
+```
+
+**Example of false archival this prevents:**
+```
+embedding-cache.ts (0 route imports — looks dead)
+  ↑ imported by: embedding/embed.ts (canonical facade)
+    ↑ imported by: batch-embedder.ts, multiple API routes
+      ↑ imported by: /api/embed/+server.ts, /api/evidence/*/+server.ts
+        → WIRED — embedding-cache.ts is a transitive dependency, NOT dead
+```
+
+**Rule**: If file X has 0 direct route imports but IS imported by file Y, and Y (or Y's importers) trace back to an active route, mark X as **TRANSITIVE_DEP** and skip it. Never archive transitive dependencies.
+
+**Common patterns that trigger false positives:**
+- Cache helpers (`*-cache.ts`) imported only by facade modules (`embed.ts`, `rag-pipeline.ts`)
+- Persistence layers (`*-persist.ts`) imported only by service files
+- Type/schema files imported only by other server modules
+- Utility functions imported only by one canonical consumer
+- Service files re-exported via barrel `index.ts` → facade → route
+
+## Phase 2: Classification — 7-Gate Test
 
 For each orphan, read the file and apply these gates IN ORDER:
 
 | Gate | Question | Pass | Fail |
 |------|----------|------|------|
+| **G0: Transitive Dep** | Is this file imported (directly or transitively) by any wired file? | → TRANSITIVE_DEP (skip all gates) | Continue |
 | **G1: Functional** | Does it compile? Clean Svelte 5 runes? No syntax errors? | Continue | → ARCHIVE (corrupted) |
 | **G2: Feature Gap** | Does it provide functionality no other component covers? | Continue | → ARCHIVE (redundant) |
-| **G3: Rewrite Potential** | If Svelte 4 or corrupted, is the feature valuable enough to rewrite from scratch? | → REWRITE candidate | Continue to G4 |
+| **G3: Rewrite Potential** | If Svelte 4 or corrupted, is the feature valuable enough to rewrite? Does it enhance an existing pipeline (evidence, RAG, chat, search, cache, inference)? Could it serve a production use case? | → REWRITE candidate | Continue to G4 |
 | **G4: Integration Point** | Is there a natural route or layout that should host this? | Continue | → ARCHIVE (homeless) |
 | **G5: Effort** | Can it be wired with a simple import + render (< 30 min)? | → WIRE | → DEFER to backlog |
 | **G6: Route Reachability** | Is there a REACHABLE execution path from rendered UI → handler → API route? | FULLY WIRED | → SHALLOW (incomplete) |
+
+### Gate 0: Transitive Dependency Check (MUST run first)
+
+Before classifying ANY file, check if it's a transitive dependency:
+```
+1. grep -r "from.*FILENAME" src/ — find all files that import this file
+2. For each importer, recursively check if THAT file is imported by routes
+3. If ANY chain leads to a route → mark TRANSITIVE_DEP, skip all other gates
+```
+This prevents false archival of cache helpers, persistence layers, and utility modules used by canonical facades (e.g., `embedding-cache.ts` imported by `embed.ts`).
+
+### Gate 3: Rewrite Production Value Assessment
+
+When evaluating G3 for orphans that fail G1/G2 but may have production value, assess:
+- **Pipeline fit**: Does it enhance evidence (9-stage), RAG, chat (4 systems), search (8-adapter), cache (L0-L3), or inference pipelines?
+- **Production use**: Is it end-user facing, internal ops, dev tooling, or demo-only?
+- **Existing infra**: Do the required API routes, DB tables, and services already exist?
+- **Uniqueness**: Does any other file implement this feature?
+
+If the orphan scores well on these dimensions, classify as REWRITE and create a `next_steps/` entry with: file path, what it does, which pipeline it enhances, estimated rewrite effort, and what infrastructure already exists for it.
 
 ### Gate 6: Route Reachability Verification
 

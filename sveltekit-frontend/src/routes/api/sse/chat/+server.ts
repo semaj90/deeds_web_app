@@ -14,6 +14,7 @@ import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self
 import { fetchGlossaryMatches } from '$lib/server/ace/context-assembler.js';
 import { orderByDependency, extractCitationRefs } from '$lib/server/retrieval/document-dag.js';
 import type { DAGDocument } from '$lib/server/retrieval/document-dag.js';
+import { getCachedEmbedding, setCachedEmbedding } from '$lib/server/knowledge-cache.js';
 import { z } from 'zod';
 
 const sseChatSchema = z.object({
@@ -358,23 +359,38 @@ async function searchCollection(
  */
 async function retrieveContext(query: string, limit = RAG_MAX_CHUNKS): Promise<ContextDoc[]> {
   try {
-    // 1. Generate embedding for the user query
-    const embedRes = await traceEmbedding(query, EMBEDDING_MODEL, () =>
-      ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: query, keep_alive: '24h' }),
-        signal: AbortSignal.timeout(8000),
-      })
-    );
+    // 0. Check embedding cache — skip Ollama call on hit
+    const cachedVector = await getCachedEmbedding(query, EMBEDDING_MODEL).catch(() => null);
+    let vector: number[];
+    let embeddingDims: number;
+    let embeddingModel: string;
 
-    if (!embedRes.ok) return [];
-    const embedData = await embedRes.json();
-    const vector = embedData.embedding;
-    if (!Array.isArray(vector) || vector.length === 0) return [];
+    if (cachedVector) {
+      vector = cachedVector;
+      embeddingDims = cachedVector.length;
+      embeddingModel = EMBEDDING_MODEL;
+      console.log(`[RAG] Embedding cache HIT (${embeddingDims} dims)`);
+    } else {
+      // 1. Generate embedding for the user query
+      const embedRes = await traceEmbedding(query, EMBEDDING_MODEL, () =>
+        ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: query, keep_alive: '24h' }),
+          signal: AbortSignal.timeout(8000),
+        })
+      );
 
-    const embeddingDims = vector.length;
-    const embeddingModel = String(embedData.model ?? EMBEDDING_MODEL);
+      if (!embedRes.ok) return [];
+      const embedData = await embedRes.json();
+      vector = embedData.embedding;
+      if (!Array.isArray(vector) || vector.length === 0) return [];
+
+      embeddingDims = vector.length;
+      embeddingModel = String(embedData.model ?? EMBEDDING_MODEL);
+      // Store in cache for future queries (fire-and-forget)
+      setCachedEmbedding(query, EMBEDDING_MODEL, vector).catch(() => {});
+    }
 
     // 2. Search ALL legal collections in parallel
     const allHits = await Promise.all(

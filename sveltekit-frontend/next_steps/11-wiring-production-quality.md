@@ -115,16 +115,16 @@ const PUBLIC = ['/api/health', '/api/auth', '/api/metrics', '/api/system'];
 
 | Worker | Status | Purpose |
 |--------|--------|---------|
-| `embedding-worker-enhanced.ts` | ACTIVE | ONNX 768-dim embeddings (client-side) |
-| `queue-worker.ts` | ACTIVE | RabbitMQ queue registry init |
+| `embedding-worker-enhanced.ts` | ✅ ACTIVE | ONNX 768-dim embeddings (client-side) |
+| `queue-worker.ts` | ✅ ACTIVE | RabbitMQ queue registry init |
 | `gpu-tensor-worker.ts` | TYPE-ONLY | Multi-dimensional array types |
-| `ai-service-worker.ts` | ORPHAN | Candidate for contextual chat |
+| `ai-service-worker.ts` | ✅ WIRED (server-side) | Contextual chat backend fully wired (Ollama tools + HMM + Redis) |
 | `aiProcessingWorker.js` | ORPHAN | Candidate for analytics batching |
 | `error-analysis-worker.ts` | ORPHAN | Candidate for error-brain pipeline |
 | `graph-worker.js` | ORPHAN | Candidate for Neo4j graph ops |
 | `kmeans-worker.js` | ORPHAN | Candidate for topic clustering |
-| `rabbitmq-service-worker.ts` | ORPHAN | RabbitMQ client (browser) |
-| `transformersEmbeddingWorker.ts` | ORPHAN | HF Transformers.js (unused) |
+| `rabbitmq-service-worker.ts` | ORPHAN | RabbitMQ client (browser) — server-only, archive candidate |
+| `transformersEmbeddingWorker.ts` | ORPHAN | HF Transformers.js — superseded by ONNX worker, archive candidate |
 
 ### Target: 4 Active Web Workers
 
@@ -216,6 +216,8 @@ Archive 3 truly unused workers to `deeds_labs/`:
 
 Keep `kmeans-worker.js` and `graph-worker.js` for repurposing in Phase B.
 
+**MANDATORY**: Before archiving ANY worker, run the `/audit-components` G0 gate (transitive dependency chain check). Verify the worker is not imported by any active file. See `.claude/commands/audit-components.md` §1b and `.claude/commands/prune-codebase.md` §5n for the full protocol.
+
 ### C3. Indexing Pipeline Dedup
 
 Multiple overlapping indexing endpoints exist:
@@ -243,7 +245,10 @@ Langfuse provides **LLM observability** — essential when running Triton infere
 
 ### Current State
 - ClickHouse: Running on port 8123, **17.5GB overhead, 50KB actual data**
-- Langfuse: Running on port 3100, **never wired**
+- Langfuse: Running on port 3100, **partially wired**
+  - ✅ `observability/langfuse.ts` exists with `traceEmbedding()` wrapper
+  - ✅ Imported by 5 server files (batch-embedder, ollama-client, multimodal-fusion, embeddings-simple, ollama.ts)
+  - Remaining: wire env vars, instrument LLM chat calls (not just embeddings), Triton calls
 - Both already in `docker-compose.yml`
 
 ### Wiring Steps

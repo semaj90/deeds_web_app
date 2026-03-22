@@ -44,6 +44,10 @@ pool.on('error', (err) => {
   lastPoolErrorAt = new Date();
   console.error('Database pool error:', err.message);
 });
+// Enable pgvector iterative scanning for filtered HNSW queries (9x faster)
+pool.on('connect', (client) => {
+  client.query('SET hnsw.iterative_scan = relaxed_order').catch(() => {});
+});
 export const db = drizzle(pool, { schema: mergedSchema, cache });
 
 const adminPool = new Pool({ connectionString: getAdminDatabaseUrl() });

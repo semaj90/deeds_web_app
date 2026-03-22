@@ -529,6 +529,8 @@ export const handle: Handle = async ({ event, resolve }) => {
     response.headers.set('X-Content-Type-Options', 'nosniff');
     response.headers.set('X-Frame-Options', 'DENY');
     response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+    response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
     response.headers.set(
       'Content-Security-Policy',
       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws: wss:; font-src 'self' data:; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
