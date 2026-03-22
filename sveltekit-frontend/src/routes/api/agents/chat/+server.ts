@@ -69,6 +69,21 @@ const AGENT_TOOLS = [
 				}
 			}
 		}
+	},
+	{
+		type: 'function' as const,
+		function: {
+			name: 'glossary_search',
+			description: 'Search the legal glossary for term definitions, legal concepts, and terminology. Use this when the user asks "what is [legal term]?", "define [term]", or needs clarification on legal language, statutes, or concepts.',
+			parameters: {
+				type: 'object',
+				required: ['query'],
+				properties: {
+					query: { type: 'string', description: 'Legal term or concept to look up' },
+					limit: { type: 'number', description: 'Max results (default: 5)' }
+				}
+			}
+		}
 	}
 ];
 
@@ -120,6 +135,18 @@ async function executeTool(name: string, args: Record<string, unknown>): Promise
 					duration: Date.now() - start
 				};
 			}
+			case 'glossary_search': {
+				const { fetchGlossaryMatches } = await import('$lib/server/ace/context-assembler.js');
+				const matches = await fetchGlossaryMatches(String(args.query || ''));
+				if (!matches || matches.length === 0) {
+					return { result: 'No glossary matches found for that term.', duration: Date.now() - start };
+				}
+				const formatted = matches.slice(0, Number(args.limit ?? 5)).map((m: any, i: number) => {
+					const meta = [m.category, m.jurisdiction].filter(Boolean).join(' | ');
+					return `${i + 1}. **${m.term}**: ${m.definition}${meta ? ` (${meta})` : ''}`;
+				}).join('\n\n');
+				return { result: formatted, duration: Date.now() - start };
+			}
 			default:
 				return { result: `Unknown tool: ${name}`, duration: Date.now() - start };
 		}
@@ -146,11 +173,13 @@ export const POST: RequestHandler = async ({ request }) => {
 1. **web_search** — Search the web for legal research, case law, statutes, documentation
 2. **ripgrep_search** — Search project files for patterns (code, evidence references, text)
 3. **rag_search** — Semantic search through the legal document database
+4. **glossary_search** — Look up legal term definitions, concepts, and terminology from the legal glossary
 
 Use tools proactively when the user's question requires:
 - External knowledge or current legal information → web_search
 - Finding specific content in files → ripgrep_search
 - Finding similar or related documents → rag_search
+- Definitions or meanings of legal terms → glossary_search
 
 Provide structured, actionable responses with confidence levels where appropriate. When citing tool results, include the relevance score.`
 			},

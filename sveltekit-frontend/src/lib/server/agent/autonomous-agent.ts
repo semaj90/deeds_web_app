@@ -441,7 +441,38 @@ export class AutonomousAgent {
 			})
 		);
 
-		// 14. Unified AST Query Tool
+		// 14. Legal Glossary Search Tool
+		tools.push(
+			new DynamicStructuredTool({
+				name: 'glossary_search',
+				description: 'Search the legal glossary for term definitions, legal concepts, and terminology. Returns definitions with category, jurisdiction, and related terms.',
+				schema: z.object({
+					query: z.string().describe('Legal term or concept to look up'),
+					limit: z.number().optional().default(5).describe('Max results')
+				}),
+				func: async ({ query, limit }) => {
+					try {
+						const { fetchGlossaryMatches } = await import('$lib/server/ace/context-assembler.js');
+						const matches = await fetchGlossaryMatches(query);
+						if (!matches || matches.length === 0) {
+							return JSON.stringify({ results: [], message: 'No glossary matches found.' });
+						}
+						return JSON.stringify({
+							results: matches.slice(0, limit).map((m: any) => ({
+								term: m.term,
+								definition: m.definition,
+								category: m.category,
+								jurisdiction: m.jurisdiction
+							}))
+						});
+					} catch (error) {
+						return JSON.stringify({ error: String(error) });
+					}
+				}
+			})
+		);
+
+		// 15. Unified AST Query Tool
 		tools.push(
 			new DynamicStructuredTool({
 				name: 'ast_query',
@@ -489,6 +520,10 @@ export class AutonomousAgent {
 		}
 		if (q.includes('redis') || q.includes('embedding') || q.includes('docker')) {
 			selected.push('find_files', 'analyze_file', 'ripgrep_search');
+		}
+
+		if (q.includes('define') || q.includes('definition') || q.includes('what is') || q.includes('glossary') || q.includes('legal term') || q.includes('meaning of')) {
+			selected.push('glossary_search');
 		}
 
 		// Fallback: use general investigation tools

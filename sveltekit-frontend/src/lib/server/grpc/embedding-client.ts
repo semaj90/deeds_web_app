@@ -105,9 +105,16 @@ async function generateViaGrpc(texts: string[], timeoutMs = 5000): Promise<numbe
   return new Promise((resolve) => {
     const deadline = new Date(Date.now() + timeoutMs);
 
-    // Go proto: GenerateEmbedding({ texts, normalize, use_cache, model_name })
-    client.generateEmbedding(
-      { texts, normalize: true, useCache: true, modelName: SERVER_EMBEDDING_MODEL },
+    // Proto: rpc GenerateEmbeddings(EmbeddingRequest) returns (EmbeddingResponse)
+    // EmbeddingRequest uses `chunks` field with EmbeddingChunk messages
+    const chunks = texts.map((text, i) => ({
+      chunkId: `chunk-${i}`,
+      text,
+      language: 'en'
+    }));
+
+    client.generateEmbeddings(
+      { chunks, normalize: true, batchSize: texts.length, maxLength: 512 },
       { deadline },
       (err: Error | null, response: any) => {
         if (err) {
@@ -116,15 +123,15 @@ async function generateViaGrpc(texts: string[], timeoutMs = 5000): Promise<numbe
           return;
         }
 
-        if (!response || !response.success) {
-          console.warn('[embedding-client] gRPC response error:', response?.error);
+        if (!response || response.status === 'error') {
+          console.warn('[embedding-client] gRPC response error:', response?.status);
           resolve(null);
           return;
         }
 
-        // Go proto: EmbeddingVector.values (float[])
+        // Proto: EmbeddingResponse.embeddings[] each has .vector (repeated float)
         const vectors = (response.embeddings ?? []).map((e: any) =>
-          Array.isArray(e.values) ? e.values : []
+          Array.isArray(e.vector) ? e.vector : (Array.isArray(e.values) ? e.values : [])
         );
 
         resolve(vectors);

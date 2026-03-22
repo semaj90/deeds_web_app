@@ -1,6 +1,6 @@
 # Inference Architecture Analysis
 
-## Last Updated: March 10, 2026
+## Last Updated: March 21, 2026
 
 The whole architecture is a caching system with an inference engine behind it. On any hardware — RTX 3060 Ti or Intel i5 — the goal is the same: **run the math as few times as possible, cache everything, serve from cache.**
 
@@ -149,7 +149,7 @@ Ollama supports native function/tool calling with compatible models. The model d
 | Web search | SearXNG → DuckDuckGo → curated fallback | Working (needs `SEARXNG_URL`) |
 | MCP tools | FastMCP (9 tools: rag:search, cases:load, playwright, etc.) | Working |
 | Detective tools | 6 tools: ripgrep, findFiles, analyzeFile, extractPattern, analyzeImports, webSearch | Working |
-| Native Ollama tools | Not wired (using LangChain instead) | Available but unused |
+| Native Ollama tools | `/api/agents/chat` (4 tools) + `/api/contextual/chat` (3 tools) | Working |
 ### Web Search Fallback Chain
 ```
 1. SearXNG (self-hosted)     → docker run -d -p 8080:8080 searxng/searxng
@@ -160,6 +160,55 @@ Ollama supports native function/tool calling with compatible models. The model d
 ```
 ### Migration Path: LangChain → Native Ollama Tools
 Could simplify by removing `@langchain/ollama` dependency and using Ollama's native OpenAI-compatible `/api/chat` with `tools` parameter directly. LangChain adds ReAct agent orchestration but also adds dependency weight. Our `client-router.ts` keyword scoring already handles routing without LangChain.
+
+---
+
+## Legal Glossary System
+
+### Storage
+- `legal_glossary` table (PostgreSQL) — 280+ seeded terms across 20 categories
+- pgvector embeddings (768-dim via embeddinggemma) for semantic search
+- Full-text search (tsvector) + ILIKE prefix for fallback
+- `legal_definitions` table — document-extracted definitions with confidence scores
+
+### API Endpoints
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/glossary/search` | POST | 3-strategy search (semantic → FTS → prefix) |
+| `/api/glossary/terms` | GET | List/filter terms with pagination |
+
+### Integration Points
+| Consumer | How | File |
+|----------|-----|------|
+| SSE Chat | `fetchGlossaryMatches()` auto-injected into system prompt | `src/routes/api/sse/chat/+server.ts` |
+| Agent Chat | `glossary_search` Ollama native tool | `src/routes/api/agents/chat/+server.ts` |
+| Autonomous Agent | `glossary_search` LangChain DynamicStructuredTool | `src/lib/server/agent/autonomous-agent.ts` |
+| Contextual Chat | `glossary_search` Ollama native tool (when `enableFunctions=true`) | `src/routes/api/contextual/chat/+server.ts` |
+| Library UI | 5-tab research workspace (summary, definition, corpus, sources, related) | `src/routes/(app)/library/glossary/+page.svelte` |
+
+---
+
+## Agentic Tool Calling
+
+### Four Agent Systems
+
+| System | Endpoint | Tools | Architecture |
+|--------|----------|-------|-------------|
+| Agent Chat | `/api/agents/chat` | 4 (web_search, ripgrep, rag_search, glossary_search) | Ollama native tool calling, max 3 rounds |
+| Contextual Chat | `/api/contextual/chat` | 3 (glossary_search, rag_search, web_search) | Ollama native tool calling (when `enableFunctions=true`), HMM state tracking |
+| Autonomous Agent | `/api/agent/investigate` | 15 (evidence, multimodal, detective, glossary, RAG, AST) | LangChain DynamicStructuredTool, keyword-based selector |
+| MCP Server | `npm run rag:mcp` | 36 (cases, evidence, reports, citations, RAG, codebase, etc.) | FastMCP stdio transport, standalone |
+
+### Ollama Native Tool Calling Pattern
+```
+1. Send messages[] + tools[] to Ollama /api/chat
+2. Model returns message.tool_calls[] (or plain text if no tools needed)
+3. Execute each tool call server-side
+4. Append { role: 'tool', content: result } to messages[]
+5. Re-send to Ollama for synthesis (loop max 2-3 rounds)
+6. Final response includes toolResults[] metadata
+```
+
 ---
 ## Client Inference Chain (Browser)
 ### ONNX Session Factory (`src/lib/ai/onnx/session.ts`)
@@ -322,10 +371,9 @@ TIER 4 — Server Fallback (when local exhausted):
 | k-means (1000 vecs) | <1ms | ~50ms | 50x |
 | LLM inference (270M) | 8-12 tok/s | 1-2 tok/s | 6x |
 | Matrix multiply (768x768) | <1ms | ~30ms | 30x |
-Your 3 WGSL shader files already do everything the 6 C files would:
+Your 2 WGSL shader files already do everything the 6 C files would:
 - `src/lib/webgpu/kernels.wgsl` — 6 kernels (normalize, cosine sim, matmul, softmax, k-means)
 - `src/lib/webgpu/rag-compute-shaders.wgsl` — 4 kernels (vectorized sim, clustering, entity extraction, neural scoring)
-- `src/lib/evidence-canvas/webgpu-kernels.wgsl` — 4 kernels (force layout, similarity, reduction, highlighting)
 ---
 ## Binary Serialization Stack
 Everything in this architecture is binary serialization + caching at different tiers:
@@ -445,9 +493,13 @@ After a few conversations, **90%+ of queries resolve at L0-L1** without hitting 
 | `src/lib/server/grpc/embedding-client.ts` | 4-tier server embedding (gRPC → QUIC → HTTP) |
 | `src/lib/server/glyph-prompt-cache.ts` | L0.5 NES/CHR-ROM binary cache |
 | `src/lib/server/cache.ts` | L2/L3 memory + Redis cache |
-| `src/lib/server/agent/autonomous-agent.ts` | LangChain ReAct agent + tool calling |
+| `src/lib/server/agent/autonomous-agent.ts` | LangChain ReAct agent + 15 tools (wired via /api/agent/investigate) |
 | `src/lib/server/agent/tools/web-search-searxng.ts` | SearXNG → DuckDuckGo → curated search |
-| `src/mcp/server.ts` | FastMCP 9-tool server (stdio transport) |
+| `src/routes/api/agents/chat/+server.ts` | Agent chat with 4 Ollama native tools (web, ripgrep, RAG, glossary) |
+| `src/routes/api/contextual/chat/+server.ts` | Contextual chat with HMM + 3 Ollama tools (glossary, RAG, web) |
+| `src/routes/api/agent/investigate/+server.ts` | Autonomous investigation endpoint (15 tools) |
+| `src/routes/api/glossary/search/+server.ts` | 3-strategy glossary search (semantic + FTS + prefix) |
+| `src/routes/api/sse/chat/+server.ts` | Rich SSE chat (RAG + ACE + corrective RAG + glossary + DAG) |
+| `src/mcp/server.ts` | FastMCP 36-tool server (stdio transport) |
 | `src/lib/webgpu/kernels.wgsl` | 6 GPU compute kernels |
 | `src/lib/webgpu/rag-compute-shaders.wgsl` | 4 RAG GPU kernels |
-| `src/lib/evidence-canvas/webgpu-kernels.wgsl` | 4 graph GPU kernels |
