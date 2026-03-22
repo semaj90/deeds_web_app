@@ -7,47 +7,55 @@
  *   Body: { stateCode?: string; all?: boolean }
  */
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
 import { STATE_CONSTITUTION_SOURCES, getSource } from '$lib/server/legal/constitution-registry';
 
-function buildFallbackSources() {
-	const sources = STATE_CONSTITUTION_SOURCES.map((src) => ({
-		stateCode: src.stateCode,
-		stateName: src.stateName,
-		discoveryUrl: src.discoveryUrl,
-		sourceUrl: src.sourceUrl,
-		format: src.format,
-		isOfficial: src.isOfficial,
-		sourceConfidence: src.sourceConfidence,
-		notes: src.notes ?? null,
-		documentId: null,
-		processingStatus: 'not_started',
-		lastFetchedAt: null,
-		lastFetchStatus: null,
-		progress: 0,
-		stage: null,
-		wordCount: null,
-		nodeCount: 0,
-		chunkCount: 0,
-	}));
+const constitutionIngestSchema = z
+  .object({
+    stateCode: z.string().length(2).toUpperCase().optional(),
+    all: z.boolean().optional(),
+  })
+  .refine((d) => d.stateCode || d.all, { message: 'Provide stateCode or all=true' });
 
-	return {
-		sources,
-		stats: {
-			total: sources.length,
-			ingested: 0,
-			inProgress: 0,
-			failed: 0,
-			notStarted: sources.length,
-		},
-	};
+function buildFallbackSources() {
+  const sources = STATE_CONSTITUTION_SOURCES.map((src) => ({
+    stateCode: src.stateCode,
+    stateName: src.stateName,
+    discoveryUrl: src.discoveryUrl,
+    sourceUrl: src.sourceUrl,
+    format: src.format,
+    isOfficial: src.isOfficial,
+    sourceConfidence: src.sourceConfidence,
+    notes: src.notes ?? null,
+    documentId: null,
+    processingStatus: 'not_started',
+    lastFetchedAt: null,
+    lastFetchStatus: null,
+    progress: 0,
+    stage: null,
+    wordCount: null,
+    nodeCount: 0,
+    chunkCount: 0,
+  }));
+
+  return {
+    sources,
+    stats: {
+      total: sources.length,
+      ingested: 0,
+      inProgress: 0,
+      failed: 0,
+      notStarted: sources.length,
+    },
+  };
 }
 
 export const GET: RequestHandler = async () => {
-	try {
-		// Join registry rows with ingestion status
-		const res = await pool.query(`
+  try {
+    // Join registry rows with ingestion status
+    const res = await pool.query(`
 			SELECT
 				s.state_code, s.state_name, s.discovery_url, s.source_url,
 				s.format, s.is_official, s.source_confidence,
@@ -69,96 +77,99 @@ export const GET: RequestHandler = async () => {
 			ORDER BY s.state_name
 		`);
 
-		// Merge with static registry entries (for any states not yet in DB)
-		const dbMap = new Map(res.rows.map((r) => [r.state_code, r]));
-		const merged = STATE_CONSTITUTION_SOURCES.map((src) => {
-			const db = dbMap.get(src.stateCode);
-			return {
-				stateCode: src.stateCode,
-				stateName: src.stateName,
-				discoveryUrl: src.discoveryUrl,
-				sourceUrl: src.sourceUrl,
-				format: src.format,
-				isOfficial: src.isOfficial,
-				sourceConfidence: src.sourceConfidence,
-				notes: src.notes ?? db?.notes ?? null,
-				// DB fields
-				documentId: db?.document_id ?? null,
-				processingStatus: db?.processing_status ?? 'not_started',
-				lastFetchedAt: db?.last_fetched_at ?? null,
-				lastFetchStatus: db?.last_fetch_status ?? null,
-				progress: db?.progress ?? 0,
-				stage: db?.stage ?? null,
-				wordCount: db?.word_count ?? null,
-				nodeCount: db?.node_count ?? 0,
-				chunkCount: db?.chunk_count ?? 0,
-			};
-		});
+    // Merge with static registry entries (for any states not yet in DB)
+    const dbMap = new Map(res.rows.map((r) => [r.state_code, r]));
+    const merged = STATE_CONSTITUTION_SOURCES.map((src) => {
+      const db = dbMap.get(src.stateCode);
+      return {
+        stateCode: src.stateCode,
+        stateName: src.stateName,
+        discoveryUrl: src.discoveryUrl,
+        sourceUrl: src.sourceUrl,
+        format: src.format,
+        isOfficial: src.isOfficial,
+        sourceConfidence: src.sourceConfidence,
+        notes: src.notes ?? db?.notes ?? null,
+        // DB fields
+        documentId: db?.document_id ?? null,
+        processingStatus: db?.processing_status ?? 'not_started',
+        lastFetchedAt: db?.last_fetched_at ?? null,
+        lastFetchStatus: db?.last_fetch_status ?? null,
+        progress: db?.progress ?? 0,
+        stage: db?.stage ?? null,
+        wordCount: db?.word_count ?? null,
+        nodeCount: db?.node_count ?? 0,
+        chunkCount: db?.chunk_count ?? 0,
+      };
+    });
 
-		const stats = {
-			total: merged.length,
-			ingested: merged.filter((s) => s.processingStatus === 'complete').length,
-			inProgress: merged.filter((s) => s.processingStatus && !['complete', 'failed', 'not_started'].includes(s.processingStatus)).length,
-			failed: merged.filter((s) => s.processingStatus === 'failed').length,
-			notStarted: merged.filter((s) => s.processingStatus === 'not_started').length,
-		};
+    const stats = {
+      total: merged.length,
+      ingested: merged.filter((s) => s.processingStatus === 'complete').length,
+      inProgress: merged.filter(
+        (s) =>
+          s.processingStatus && !['complete', 'failed', 'not_started'].includes(s.processingStatus)
+      ).length,
+      failed: merged.filter((s) => s.processingStatus === 'failed').length,
+      notStarted: merged.filter((s) => s.processingStatus === 'not_started').length,
+    };
 
-		return json({ sources: merged, stats });
-	} catch (err) {
-		console.warn('[api/corpus/constitutions] GET fallback:', err);
-		return json(buildFallbackSources());
-	}
+    return json({ sources: merged, stats });
+  } catch (err) {
+    console.warn('[api/corpus/constitutions] GET fallback:', err);
+    return json(buildFallbackSources());
+  }
 };
 
 export const POST: RequestHandler = async ({ request }) => {
-	try {
-		const body = await request.json();
-		const { stateCode, all = false } = body as { stateCode?: string; all?: boolean };
+  try {
+    const raw = await request.json().catch(() => ({}));
+    const parsed = constitutionIngestSchema.safeParse(raw);
+    if (!parsed.success) {
+      return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+    }
+    const { stateCode, all = false } = parsed.data;
 
-		if (!stateCode && !all) {
-			return json({ error: 'Provide stateCode or all=true' }, { status: 400 });
-		}
+    const targets = all
+      ? STATE_CONSTITUTION_SOURCES
+      : stateCode
+        ? ([getSource(stateCode)].filter(Boolean) as typeof STATE_CONSTITUTION_SOURCES)
+        : [];
 
-		const targets = all
-			? STATE_CONSTITUTION_SOURCES
-			: stateCode
-				? [getSource(stateCode)].filter(Boolean) as typeof STATE_CONSTITUTION_SOURCES
-				: [];
+    if (targets.length === 0) {
+      return json({ error: `Unknown state code: ${stateCode}` }, { status: 400 });
+    }
 
-		if (targets.length === 0) {
-			return json({ error: `Unknown state code: ${stateCode}` }, { status: 400 });
-		}
+    // Fire-and-forget — the pipeline runs in background
+    // We return job IDs immediately; client polls SSE for progress
+    const { runConstitutionPipeline } = await import('$lib/server/legal/constitution-pipeline');
 
-		// Fire-and-forget — the pipeline runs in background
-		// We return job IDs immediately; client polls SSE for progress
-		const { runConstitutionPipeline } = await import('$lib/server/legal/constitution-pipeline');
+    const started: Array<{ stateCode: string; stateName: string }> = [];
 
-		const started: Array<{ stateCode: string; stateName: string }> = [];
+    if (all) {
+      // Run sequentially in background (1 state at a time to be polite)
+      (async () => {
+        for (const src of targets) {
+          try {
+            await runConstitutionPipeline(src, 'system-bulk');
+          } catch {
+            // Continue to next state on failure
+          }
+        }
+      })();
+      started.push(...targets.map((t) => ({ stateCode: t.stateCode, stateName: t.stateName })));
+    } else {
+      // Single state — run in background
+      const src = targets[0];
+      runConstitutionPipeline(src, 'system').catch((err) =>
+        console.error(`[corpus] Pipeline failed for ${src.stateCode}:`, err)
+      );
+      started.push({ stateCode: src.stateCode, stateName: src.stateName });
+    }
 
-		if (all) {
-			// Run sequentially in background (1 state at a time to be polite)
-			(async () => {
-				for (const src of targets) {
-					try {
-						await runConstitutionPipeline(src, 'system-bulk');
-					} catch {
-						// Continue to next state on failure
-					}
-				}
-			})();
-			started.push(...targets.map((t) => ({ stateCode: t.stateCode, stateName: t.stateName })));
-		} else {
-			// Single state — run in background
-			const src = targets[0];
-			runConstitutionPipeline(src, 'system').catch((err) =>
-				console.error(`[corpus] Pipeline failed for ${src.stateCode}:`, err)
-			);
-			started.push({ stateCode: src.stateCode, stateName: src.stateName });
-		}
-
-		return json({ started, count: started.length }, { status: 202 });
-	} catch (err) {
-		console.error('[api/corpus/constitutions] POST error:', err);
-		return json({ error: 'Failed to start ingestion' }, { status: 500 });
-	}
+    return json({ started, count: started.length }, { status: 202 });
+  } catch (err) {
+    console.error('[api/corpus/constitutions] POST error:', err);
+    return json({ error: 'Failed to start ingestion' }, { status: 500 });
+  }
 };
