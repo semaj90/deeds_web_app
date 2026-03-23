@@ -455,7 +455,7 @@
 		<section class="activity-section">
 			<div class="section-header">
 				<h2>RECENT ACTIVITY</h2>
-				<a href="/activity" class="view-all-btn">VIEW LOG →</a>
+				<a href="/dashboard" class="view-all-btn">VIEW LOG →</a>
 			</div>
 			<div class="activity-list">
 				{#each recentActivity as activity}
@@ -505,10 +505,10 @@
  <a href="/evidence" class="status-btn">
  <span class="icon">📊</span> EVIDENCE BOARD
  </a>
- <a href="/timeline-analysis" class="status-btn">
+ <a href="/analysis-center" class="status-btn">
  <span class="icon">⏱️</span> TIMELINE ANALYSIS
  </a>
- <a href="/quick-actions" class="status-btn">
+ <a href="/command-center" class="status-btn">
  <span class="icon">⚡</span> QUICK ACTIONS
  </a>
  </div>

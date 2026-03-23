@@ -63,7 +63,7 @@
     </div>
 
     <div class="error-footer">
-      <p>Need help? <a href="/support">Contact Support</a></p>
+      <p>Need help? <a href="/system-configuration">System Configuration</a></p>
     </div>
   </div>
 </main>
