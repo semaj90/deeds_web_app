@@ -5,15 +5,24 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { pool } from '$lib/server/db/client';
+
+const querySchema = z.object({
+	nodeId: z.string().uuid().optional(),
+	page: z.coerce.number().int().min(1).default(1),
+	limit: z.coerce.number().int().min(1).max(50).default(20)
+});
 
 export const GET: RequestHandler = async ({ params, url, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const { documentId } = params;
-	const nodeId = url.searchParams.get('nodeId');
-	const page   = Math.max(1, Number(url.searchParams.get('page') ?? 1));
-	const limit  = Math.min(50, Number(url.searchParams.get('limit') ?? 20));
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+	}
+	const { nodeId, page, limit } = parsed.data;
 	const offset = (page - 1) * limit;
 
 	let query: string;

@@ -23,6 +23,7 @@
   import ActiveCasesWidget from '$lib/components/yorha/dashboard/ActiveCasesWidget.svelte';
   import YoRHaDataViz from '$lib/components/yorha/_simulations/YoRHaDataViz.svelte';
   import Icon from '$lib/components/ui/Icon.svelte';
+  import { analytics } from '$lib/stores/analytics.svelte';
   import PipelineOverview from '$lib/components/dashboard/PipelineOverview.svelte';
   import GamificationWidget from '$lib/components/dashboard/GamificationWidget.svelte';
   import StatsCard from '$lib/components/dashboard/StatsCard.svelte';
@@ -136,6 +137,7 @@
       const data = await res.json();
       const newCaseId = data.case?.id ?? data.data?.case?.id;
       wwwhSuccess = `Case created successfully!`;
+      analytics.track('case_created', { source: 'dashboard_wwwh', caseId: newCaseId });
 
       // Refresh dashboard case list
       loadDashboard();

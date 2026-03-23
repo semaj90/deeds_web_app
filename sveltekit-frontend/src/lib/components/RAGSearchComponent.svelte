@@ -79,7 +79,7 @@
 		errorMessage = null;
 
 		try {
-			const response = await fetch('/api/rag/semantic-search', {
+			const response = await fetch('/api/rag/search', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -164,7 +164,7 @@
 
 			try {
 				const text = await file.text();
-				const response = await fetch('/api/embed/ingest', {
+				const response = await fetch('/api/embed', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({

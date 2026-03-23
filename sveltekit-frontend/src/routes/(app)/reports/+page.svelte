@@ -5,6 +5,7 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import ReportViewModal from '$lib/components/reports/ReportViewModal.svelte';
+	import { analytics } from '$lib/stores/analytics.svelte';
 
 	type ReportType = 'charging_memo' | 'intake_summary' | 'discovery_list' | 'hearing_prep' |
 		'analysis' | 'summary' | 'timeline' | 'evidence_review' | 'legal_memo' | 'custom';
@@ -50,6 +51,7 @@
 
 		try {
 			await reportStore.deleteReport(reportId);
+			analytics.track('patch_applied', { action: 'report_deleted', reportId });
 			await loadReports();
 		} catch (err) {
 			console.error('Delete failed:', err);

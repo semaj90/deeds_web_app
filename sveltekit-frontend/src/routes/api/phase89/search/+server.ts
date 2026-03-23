@@ -1,5 +1,11 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
+
+const searchSchema = z.object({
+	query: z.string().min(1).max(2000),
+	limit: z.number().int().min(1).max(100).optional().default(20),
+});
 
 /**
  * GET/POST /api/phase89/search
@@ -18,8 +24,10 @@ export const GET: RequestHandler = async ({ url }) => {
 };
 
 export const POST: RequestHandler = async ({ request }) => {
-	const body = await request.json().catch(() => ({}));
-	const query = (body as Record<string, unknown>).query as string ?? '';
+	const raw = await request.json().catch(() => ({}));
+	const parsed = searchSchema.safeParse(raw);
+	if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+	const { query } = parsed.data;
 	// TODO: Wire to Qdrant vector search over error_analysis collection
 	return json({
 		query,

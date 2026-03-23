@@ -1,16 +1,22 @@
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import pg from 'pg';
 import { getDatabaseUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 
 const pool = new pg.Pool({ connectionString: getDatabaseUrl() });
 
+const querySchema = z.object({
+	limit: z.coerce.number().int().min(1).max(100).default(20)
+});
+
 /**
  * GET /api/phase89/graph/top-errors?limit=20
  * Returns graph of files with most errors
  */
 export const GET: RequestHandler = async ({ url }) => {
-	const limit = parseInt(url.searchParams.get('limit') ?? '20');
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	const limit = parsed.success ? parsed.data.limit : 20;
 
 	try {
 		// Get top error files

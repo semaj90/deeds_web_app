@@ -6,6 +6,13 @@
  */
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const ollamaTagsSchema = z.object({
+	models: z.array(z.object({
+		name: z.string(),
+	}).passthrough()).optional().default([]),
+}).passthrough();
 
 export const GET: RequestHandler = async () => {
 	const ollamaUrl = ENV.OLLAMA_BASE_URL;
@@ -20,9 +27,9 @@ export const GET: RequestHandler = async () => {
 		});
 		if (res.ok) {
 			ollamaStatus = 'connected';
-			const data = await res.json();
-			const models = (data.models ?? []) as { name: string }[];
-			const names = models.map((m) => m.name);
+			const raw = await res.json();
+			const data = ollamaTagsSchema.parse(raw);
+			const names = data.models.map((m) => m.name);
 			if (names.some((n) => n.includes('embed'))) embeddingModel = names.find((n) => n.includes('embed')) ?? embeddingModel;
 			if (names.some((n) => n.includes('legal'))) llmModel = names.find((n) => n.includes('legal')) ?? llmModel;
 		}

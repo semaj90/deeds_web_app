@@ -29,6 +29,7 @@
 	import UploadProgress from '$lib/components/UploadProgress.svelte';
 	import UploadProgressCard from '$lib/components/evidence/UploadProgressCard.svelte';
 	import Dialog from '$lib/components/ui/Dialog.svelte';
+	import { analytics } from '$lib/stores/analytics.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -213,6 +214,7 @@
 			const result = await res.json();
 			semanticResults = result.results ?? result.hits ?? [];
 			searchTiming = result.timing ?? {};
+			analytics.track('rag_search', { query: query.slice(0, 200), source: 'evidence', resultCount: semanticResults.length });
 		} catch { searchMode = 'local'; }
 		finally { isSearching = false; }
 	}

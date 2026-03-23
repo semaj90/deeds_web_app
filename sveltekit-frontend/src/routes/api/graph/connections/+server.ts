@@ -3,12 +3,18 @@
  * Query: ?caseId=xxx
  */
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
+
+const querySchema = z.object({
+	caseId: z.string().min(1, 'caseId required').max(200)
+});
 
 export const GET: RequestHandler = async ({ url }) => {
-	const caseId = url.searchParams.get('caseId');
-	if (!caseId) {
-		return json({ error: 'caseId required' }, { status: 400 });
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'caseId required' }, { status: 400 });
 	}
+	const { caseId } = parsed.data;
 
 	try {
 		const { getNeo4jDriver } = await import('$lib/server/neo4j-driver.js');

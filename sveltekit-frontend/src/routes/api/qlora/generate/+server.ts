@@ -12,10 +12,16 @@
  */
 
 import { error, json } from '@sveltejs/kit';
+import { z } from 'zod';
 import type { RequestHandler } from './$types.js';
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
 import { sql, eq, and, isNotNull } from 'drizzle-orm';
+
+const querySchema = z.object({
+	caseId: z.string().max(200).optional(),
+	limit: z.coerce.number().int().min(1).max(500).default(100)
+});
 
 interface TrainingRecord {
 	messages: Array<{
@@ -26,8 +32,8 @@ interface TrainingRecord {
 }
 
 export const GET: RequestHandler = async ({ url }) => {
-	const caseId = url.searchParams.get('caseId');
-	const limit = Math.min(parseInt(url.searchParams.get('limit') || '100', 10), 500);
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	const { caseId, limit } = parsed.success ? parsed.data : { caseId: undefined, limit: 100 };
 
 	try {
 		// Query evidence with rich metadata (entities, summary, forensics)

@@ -392,7 +392,6 @@ function categorizeEndpoint(relativePath: string): string {
     orchestrator: 'Orchestrator',
     investigate: 'Investigation',
     demo: 'Demos & Experiments',
-    'dashboard-phase14': 'Dashboard',
     odin: 'Odin',
     test: 'Testing',
     'verify-drizzle': 'Drizzle Verify',

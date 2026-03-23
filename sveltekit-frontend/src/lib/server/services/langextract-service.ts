@@ -47,7 +47,6 @@ export interface LangExtractOutput {
  */
 const CANDIDATE_BASE_URLS = [
 	ENV.LANGEXTRACT_URL,
-	ENV.MINIO_SIMD_URL,
 	'http://localhost:8095', // python (phase66)
 	'http://localhost:8090' // go (langextract-go)
 ].filter((v, i, arr) => Boolean(v) && arr.indexOf(v) === i) as string[];

@@ -8,7 +8,13 @@
  */
 
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
+
+const querySchema = z.object({
+	period: z.enum(['24h', '7d', '30d']).default('7d'),
+	export: z.enum(['true', 'false']).default('false')
+});
 
 export const GET: RequestHandler = async ({ url }) => {
 	try {
@@ -16,8 +22,9 @@ export const GET: RequestHandler = async ({ url }) => {
 			'$lib/server/ml/recommendation-metrics.js'
 		);
 
-		const period = (url.searchParams.get('period') ?? '7d') as '24h' | '7d' | '30d';
-		const wantExport = url.searchParams.get('export') === 'true';
+		const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+		const { period, export: exportFlag } = parsed.success ? parsed.data : { period: '7d' as const, export: 'false' };
+		const wantExport = exportFlag === 'true';
 
 		if (wantExport) {
 			const data = await recommendationMetrics.getExportData(period);

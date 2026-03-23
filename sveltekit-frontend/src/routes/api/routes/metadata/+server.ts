@@ -1,5 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import {
 	getAllRouteEndpoints,
 	getActiveAPIEndpoints,
@@ -8,10 +9,15 @@ import {
 	getRouteStats
 } from '$lib/server/api-metadata-extractor';
 
+const querySchema = z.object({
+	includeArchived: z.enum(['true', 'false']).default('false')
+});
+
 /** GET /api/routes/metadata — Comprehensive route metadata for /all-routes UI */
 export const GET: RequestHandler = async ({ url }) => {
 	try {
-    const includeArchived = url.searchParams.get('includeArchived') === 'true';
+    const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+    const includeArchived = parsed.success ? parsed.data.includeArchived === 'true' : false;
 
     // Single scan — pass precomputed list to avoid repeated filesystem walks
     const allEndpoints = getAllRouteEndpoints(includeArchived);

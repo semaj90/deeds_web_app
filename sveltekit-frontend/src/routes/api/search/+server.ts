@@ -2,6 +2,13 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { pool } from '$lib/server/db/client';
+import { z } from 'zod';
+
+const searchQuerySchema = z.object({
+	q: z.string().min(2, 'Query must be at least 2 characters').max(1000),
+	type: z.enum(['all', 'cases', 'evidence', 'poi', 'citations', 'legal', 'glossary', 'reports', 'messages']).default('all'),
+	limit: z.coerce.number().int().min(1).max(50).default(10),
+});
 import {
 	cases,
 	evidence,
@@ -418,13 +425,15 @@ async function searchMessages(q: string, limit: number): Promise<PlatformSearchH
 // ── Main Handler ──────────────────────────────────────────────────────────
 
 export const GET: RequestHandler = async ({ url }) => {
-	const q = url.searchParams.get('q')?.trim() ?? '';
-	const type = url.searchParams.get('type') ?? 'all';
-	const limit = Math.min(50, Math.max(1, Number(url.searchParams.get('limit') ?? 10)));
-
-	if (!q || q.length < 2) {
-		return json({ error: 'Query must be at least 2 characters' }, { status: 400 });
+	const parsed = searchQuerySchema.safeParse({
+		q: url.searchParams.get('q')?.trim() ?? '',
+		type: url.searchParams.get('type') ?? undefined,
+		limit: url.searchParams.get('limit') ?? undefined,
+	});
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
 	}
+	const { q, type, limit } = parsed.data;
 
 	const startTime = performance.now();
 	const adapterTimings: AdapterTimings = {};

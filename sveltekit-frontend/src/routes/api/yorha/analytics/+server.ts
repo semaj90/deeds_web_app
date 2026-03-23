@@ -1,9 +1,14 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
+import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+
+const querySchema = z.object({
+	period: z.enum(['7d', '30d', '90d']).default('30d')
+});
 
 /**
  * GET /api/yorha/analytics
@@ -12,7 +17,8 @@ import { ollamaFetch } from '$lib/server/ollama.js';
 export const GET: RequestHandler = async ({ locals, url }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 
-	const period = url.searchParams.get('period') || '30d';
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	const period = parsed.success ? parsed.data.period : '30d';
 	const intervalDays = period === '7d' ? 7 : period === '90d' ? 90 : 30;
 
 	// Parallel aggregation queries

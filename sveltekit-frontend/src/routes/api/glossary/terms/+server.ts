@@ -13,14 +13,23 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { pool } from '$lib/server/db/client';
+
+const querySchema = z.object({
+	category: z.string().max(200).optional(),
+	q: z.string().max(500).optional(),
+	limit: z.coerce.number().int().min(1).max(500).default(100),
+	offset: z.coerce.number().int().min(0).default(0)
+});
 
 export const GET: RequestHandler = async ({ url }) => {
 	const start = performance.now();
-	const category = url.searchParams.get('category');
-	const q = url.searchParams.get('q');
-	const limit = Math.min(Math.max(Number(url.searchParams.get('limit')) || 100, 1), 500);
-	const offset = Math.max(Number(url.searchParams.get('offset')) || 0, 0);
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+	}
+	const { category, q, limit, offset } = parsed.data;
 
 	// Try fetching from legal_definitions (new hierarchical schema)
 	try {

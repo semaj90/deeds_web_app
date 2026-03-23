@@ -1,16 +1,22 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import { getRedis } from '$lib/server/redis.js';
+
+const querySchema = z.object({
+	sessionId: z.string().min(1, 'sessionId required').max(200)
+});
 
 /**
  * GET /api/contextual/state?sessionId=...&userId=...
  * Get HMM contextual state for a session
  */
 export const GET: RequestHandler = async ({ url }) => {
-	const sessionId = url.searchParams.get('sessionId');
-	if (!sessionId) {
-		return json({ success: false, error: 'sessionId required' }, { status: 400 });
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ success: false, error: parsed.error.issues[0]?.message ?? 'sessionId required' }, { status: 400 });
 	}
+	const { sessionId } = parsed.data;
 
 	try {
 		const redis = getRedis();
@@ -52,10 +58,11 @@ export const GET: RequestHandler = async ({ url }) => {
  * Clear session state and history
  */
 export const DELETE: RequestHandler = async ({ url }) => {
-	const sessionId = url.searchParams.get('sessionId');
-	if (!sessionId) {
-		return json({ success: false, error: 'sessionId required' }, { status: 400 });
+	const delParsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!delParsed.success) {
+		return json({ success: false, error: delParsed.error.issues[0]?.message ?? 'sessionId required' }, { status: 400 });
 	}
+	const sessionId = delParsed.data.sessionId;
 
 	try {
 		const redis = getRedis();

@@ -23,6 +23,14 @@ const caseBulkSchema = z.object({
 	priority: z.enum(CASE_PRIORITY).optional()
 });
 
+const caseListQuerySchema = z.object({
+	limit: z.coerce.number().int().min(1).max(100).default(10),
+	offset: z.coerce.number().int().min(0).default(0),
+	status: z.enum([...CASE_STATUS, 'active']).nullish(),
+	priority: z.enum(CASE_PRIORITY).nullish(),
+	search: z.string().max(500).nullish(),
+});
+
 /**
  * GET /api/cases
  * Fetch cases for authenticated user with optional filtering
@@ -32,11 +40,15 @@ export const GET: RequestHandler = async (event) => {
 	const auth = await requireAuth(event);
 
 	const { url } = event;
-	const limit = Number(url.searchParams.get('limit')) || 10;
-	const offset = Number(url.searchParams.get('offset')) || 0;
-	const status = url.searchParams.get('status');
-	const priority = url.searchParams.get('priority');
-	const search = url.searchParams.get('search');
+	const parsed = caseListQuerySchema.safeParse({
+		limit: url.searchParams.get('limit') ?? undefined,
+		offset: url.searchParams.get('offset') ?? undefined,
+		status: url.searchParams.get('status'),
+		priority: url.searchParams.get('priority'),
+		search: url.searchParams.get('search'),
+	});
+	if (!parsed.success) return apiResponses.badRequest(parsed.error.issues[0]?.message ?? 'Invalid query');
+	const { limit, offset, status, priority, search } = parsed.data;
 
 	try {
 		const filters = [];

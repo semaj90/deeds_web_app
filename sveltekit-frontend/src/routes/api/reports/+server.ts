@@ -3,7 +3,7 @@ import { reports } from '$lib/server/db/schema';
 import { error, json } from '@sveltejs/kit';
 import { and, desc, eq, inArray } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
-import { auditReportAction } from '$lib/server/reports/audit';
+import { auditReportAction, createReportVersion } from '$lib/server/reports/audit';
 import { invalidateReportCache, invalidateCaseCache } from '$lib/server/cache/invalidation.js';
 import { z } from 'zod';
 
@@ -43,6 +43,13 @@ function getReportType(
   return 'custom';
 }
 
+const reportListSchema = z.object({
+  caseId: z.string().max(100).nullish(),
+  ids: z.string().max(5000).nullish(),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+
 /**
  * GET /api/reports
  * Fetch reports with optional case filtering
@@ -53,10 +60,14 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     throw error(401, 'Unauthorized');
   }
 
-  const caseId = url.searchParams.get('caseId');
-  const idsParam = url.searchParams.get('ids');
-  const limit = Number(url.searchParams.get('limit')) || 20;
-  const offset = Number(url.searchParams.get('offset')) || 0;
+  const parsed = reportListSchema.safeParse({
+    caseId: url.searchParams.get('caseId'),
+    ids: url.searchParams.get('ids'),
+    limit: url.searchParams.get('limit') ?? undefined,
+    offset: url.searchParams.get('offset') ?? undefined,
+  });
+  if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
+  const { caseId, ids: idsParam, limit, offset } = parsed.data;
 
   try {
     // Filter by specific IDs if provided
@@ -205,6 +216,11 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 		if (body.contentHtml) updates.content = body.contentHtml;
 		if (body.title) updates.title = body.title;
 		if (body.status) updates.status = body.status;
+
+		// Snapshot current state before update (non-fatal)
+		await Promise.all(
+			body.ids.map(id => createReportVersion(id, { changedBy: locals.user.id, changeReason: 'bulk_update' }))
+		).catch(err => console.warn('[Reports] Version snapshot failed:', err));
 
 		const updated = await db.update(reports)
 			.set(updates)

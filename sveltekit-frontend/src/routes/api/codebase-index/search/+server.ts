@@ -5,7 +5,14 @@
  */
 import { getCodebaseIndexUrl } from '$lib/config/env.server.js';
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
+
+const querySchema = z.object({
+  q: z.string().max(500).default(''),
+  limit: z.coerce.number().int().min(1).max(50).default(10),
+  types: z.string().max(200).optional()
+});
 
 interface SearchResult {
   id: string;
@@ -18,9 +25,12 @@ interface SearchResult {
 }
 
 export const GET: RequestHandler = async ({ url, fetch }) => {
-  const query = url.searchParams.get('q') ?? '';
-  const limit = parseInt(url.searchParams.get('limit') ?? '10');
-  const types = url.searchParams.get('types')?.split(',').filter(Boolean) ?? [];
+  const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+  if (!parsed.success) {
+    return json({ results: [], query: '', error: parsed.error.issues[0]?.message }, { status: 400 });
+  }
+  const { q: query, limit, types: typesStr } = parsed.data;
+  const types = typesStr?.split(',').filter(Boolean) ?? [];
 
   if (!query.trim()) {
     return json({ results: [], query: '' });

@@ -1,7 +1,12 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import { z } from 'zod';
 import { db } from '$lib/server/db/index.js';
 import { sql } from 'drizzle-orm';
+
+const querySchema = z.object({
+	route: z.string().min(1, 'Missing "route" query parameter').max(500)
+});
 
 /**
  * GET /api/phase82/status?route=<path>
@@ -9,10 +14,11 @@ import { sql } from 'drizzle-orm';
  * Queries phase82_upgrade table if it exists, falls back to static response.
  */
 export const GET: RequestHandler = async ({ url }) => {
-	const route = url.searchParams.get('route');
-	if (!route) {
-		return json({ error: 'Missing "route" query parameter' }, { status: 400 });
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Missing "route" query parameter' }, { status: 400 });
 	}
+	const { route } = parsed.data;
 
 	try {
 		const result = await db.execute(

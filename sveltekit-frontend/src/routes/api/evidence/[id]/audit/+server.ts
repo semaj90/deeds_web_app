@@ -4,13 +4,19 @@
  */
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import db from '$lib/server/db';
 import { evidenceAuditLog, evidence, users } from '$lib/server/db/schema-postgres.js';
 import { eq, desc } from 'drizzle-orm';
 
+const querySchema = z.object({
+	limit: z.coerce.number().int().min(1).max(200).default(50)
+});
+
 export const GET: RequestHandler = async ({ params, url }) => {
 	const { id } = params;
-	const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '50'), 200);
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	const limit = parsed.success ? parsed.data.limit : 50;
 
 	// Verify evidence exists
 	const ev = await db.select({ id: evidence.id }).from(evidence).where(eq(evidence.id, id)).limit(1);

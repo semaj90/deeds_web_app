@@ -12,11 +12,20 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import type { ApiResponse } from '$lib/types/api.js';
 import { db } from '$lib/server/db/client';
 import { cases, documentTopics } from '$lib/server/db/schema-postgres.js';
 import { and, eq, gte, lte, inArray, sql } from 'drizzle-orm';
 import { requireAuth } from '$lib/server/auth-helpers.js';
+
+const querySchema = z.object({
+	dateStart: z.string().max(30).optional(),
+	dateEnd: z.string().max(30).optional(),
+	caseType: z.string().max(100).optional(),
+	priority: z.string().max(200).optional(),
+	includeClusters: z.enum(['true', 'false']).default('false')
+});
 
 interface DailyStats {
 	date: string;
@@ -57,12 +66,12 @@ export const GET: RequestHandler = async (event) => {
 	try {
 		const { url } = event;
 
-		// Parse query parameters
-		const dateStartParam = url.searchParams.get('dateStart');
-		const dateEndParam = url.searchParams.get('dateEnd');
-		const caseTypeParam = url.searchParams.get('caseType');
-		const priorityParam = url.searchParams.get('priority');
-		const includeClusters = url.searchParams.get('includeClusters') === 'true';
+		const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+		if (!parsed.success) {
+			return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		}
+		const { dateStart: dateStartParam, dateEnd: dateEndParam, priority: priorityParam, includeClusters: includeClusterStr } = parsed.data;
+		const includeClusters = includeClusterStr === 'true';
 
 		// Date range defaults (last 30 days)
 		const dateEnd = dateEndParam ? new Date(dateEndParam) : new Date();

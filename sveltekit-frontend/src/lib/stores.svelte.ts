@@ -303,7 +303,7 @@ export const chatStore = (() => {
 	// Actions
 		async loadChats() {
 			try {
-				const response = await fetch('/api/chats');
+				const response = await fetch('/api/chat');
 				if (response.ok) {
 					chats = await response.json();
 				}
@@ -315,7 +315,7 @@ export const chatStore = (() => {
 			activeChat = chatId;
 		},
 	async createChat(title: string, caseId?: string): Promise<string> {
-			const response = await fetch('/api/chats', {
+			const response = await fetch('/api/chat', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({ title, caseId })

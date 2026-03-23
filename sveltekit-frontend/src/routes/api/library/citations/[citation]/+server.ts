@@ -1,6 +1,11 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { getLawCitationDetail } from '$lib/server/legal/law-citations';
+
+const querySchema = z.object({
+	limit: z.coerce.number().int().min(1).max(200).default(24)
+});
 
 export const GET: RequestHandler = async ({ locals, params, url }) => {
 	if (!locals.user?.id) {
@@ -8,7 +13,8 @@ export const GET: RequestHandler = async ({ locals, params, url }) => {
 	}
 
 	const citation = decodeURIComponent(params.citation);
-	const limit = Math.min(200, Math.max(1, Number(url.searchParams.get('limit') ?? 24)));
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	const limit = parsed.success ? parsed.data.limit : 24;
 
 	try {
 		const detail = await getLawCitationDetail(citation, limit);

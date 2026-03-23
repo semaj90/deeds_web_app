@@ -16,17 +16,29 @@ const createPOISchema = z.object({
 	caseIds: z.array(z.string()).optional(),
 });
 
+const poiListSchema = z.object({
+	page: z.coerce.number().int().min(1).default(1),
+	limit: z.coerce.number().int().min(1).max(100).default(20),
+	search: z.string().max(500).optional().default(''),
+	status: z.enum(['surveillance', 'wanted', 'active', 'cleared']).or(z.literal('')).default(''),
+	threatLevel: z.enum(['low', 'medium', 'high', 'critical']).or(z.literal('')).default(''),
+});
+
 /**
  * GET /api/persons-of-interest
  * List all persons of interest with optional filtering and pagination
  */
 export const GET: RequestHandler = async ({ url }) => {
-	const page = Math.max(1, Number(url.searchParams.get('page') ?? 1));
-	const limit = Math.min(100, Math.max(1, Number(url.searchParams.get('limit') ?? 20)));
+	const parsed = poiListSchema.safeParse({
+		page: url.searchParams.get('page') ?? undefined,
+		limit: url.searchParams.get('limit') ?? undefined,
+		search: url.searchParams.get('search')?.trim(),
+		status: url.searchParams.get('status') ?? undefined,
+		threatLevel: url.searchParams.get('threatLevel') ?? undefined,
+	});
+	if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
+	const { page, limit, search, status, threatLevel } = parsed.data;
 	const offset = (page - 1) * limit;
-	const search = url.searchParams.get('search')?.trim() ?? '';
-	const status = url.searchParams.get('status') ?? '';
-	const threatLevel = url.searchParams.get('threatLevel') ?? '';
 
 	try {
 		const conditions = [];

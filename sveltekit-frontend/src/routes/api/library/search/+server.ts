@@ -12,18 +12,29 @@ import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
+
+const librarySearchSchema = z.object({
+	q: z.string().min(2).max(1000),
+	jurisdiction: z.string().max(50).nullish(),
+	corpusType: z.string().max(50).nullish(),
+	limit: z.coerce.number().int().min(1).max(50).default(20),
+});
 
 const GO_SEARCH_URL = (ENV as unknown as Record<string, string>).GO_SEARCH_URL || '';
 
 export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const q            = url.searchParams.get('q')?.trim() ?? '';
-	const jurisdiction = url.searchParams.get('jurisdiction');
-	const corpusType   = url.searchParams.get('corpusType');
-	const limit        = Math.min(50, Number(url.searchParams.get('limit') ?? 20));
+	const parsed = librarySearchSchema.safeParse({
+		q: url.searchParams.get('q')?.trim() ?? '',
+		jurisdiction: url.searchParams.get('jurisdiction'),
+		corpusType: url.searchParams.get('corpusType'),
+		limit: url.searchParams.get('limit') ?? undefined,
+	});
+	if (!parsed.success) return json({ hits: [], total: 0 });
 
-	if (q.length < 2) return json({ hits: [], total: 0 });
+	const { q, jurisdiction, corpusType, limit } = parsed.data;
 
 	// Fast-path: Go search service (parallel fan-out: citation + FTS + pgvector + Qdrant)
 	if (GO_SEARCH_URL) {

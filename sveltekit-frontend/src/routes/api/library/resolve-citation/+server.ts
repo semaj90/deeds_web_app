@@ -1,16 +1,21 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 import { pool } from '$lib/server/db/client';
+
+const querySchema = z.object({
+	q: z.string().min(1, 'Missing query').max(500)
+});
 
 /**
  * GET /api/library/resolve-citation?q=...
  * Resolves a citation string (e.g. "Art. I, § 1") to a specific legal node.
  */
 export const GET: RequestHandler = async ({ url }) => {
-	const query = url.searchParams.get('q')?.trim();
-
-	if (!query) {
-		return json({ error: 'Missing query' }, { status: 400 });
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Missing query' }, { status: 400 });
 	}
+	const query = parsed.data.q.trim();
 
 	try {
 		// 1. Try exact match on citation_label

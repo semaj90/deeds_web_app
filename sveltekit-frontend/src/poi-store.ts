@@ -156,7 +156,7 @@ class POIStore {
 	async createPOI(
 		poiData: Omit<PersonOfInterest, 'id' | 'createdAt' | 'updatedAt'>
 	): Promise<PersonOfInterest | null> {
-		const response = await fetch('/api/pois', {
+		const response = await fetch('/api/persons-of-interest', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(poiData),
@@ -177,7 +177,7 @@ class POIStore {
 		id: string,
 		updates: Partial<PersonOfInterest>
 	): Promise<PersonOfInterest | null> {
-		const response = await fetch(`/api/pois/${id}`, {
+		const response = await fetch(`/api/persons-of-interest/${id}`, {
 			method: 'PUT',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(updates),
@@ -196,7 +196,7 @@ class POIStore {
 	}
 
 	async deletePOI(id: string) {
-		const response = await fetch(`/api/pois/${id}`, {
+		const response = await fetch(`/api/persons-of-interest/${id}`, {
 			method: 'DELETE',
 			credentials: 'include'
 		});
@@ -228,7 +228,7 @@ class POIStore {
 		strength: number = 0.7
 	): Promise<POIRelationship | null> {
 		try {
-			const response = await fetch('/api/pois/relationships', {
+			const response = await fetch('/api/persons-of-interest/relationships', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ poiId1, poiId2, type, strength }),
@@ -264,7 +264,7 @@ class POIStore {
 
 	async buildTimeline(poiId: string): Promise<TimelineEvent[]> {
 		try {
-			const response = await fetch(`/api/pois/${poiId}/timeline`, { credentials: 'include' });
+			const response = await fetch(`/api/persons-of-interest/${poiId}/timeline`, { credentials: 'include' });
 			if (response.ok) {
 				const data = await response.json();
 				const events: TimelineEvent[] = data?.events || [];
@@ -287,7 +287,7 @@ class POIStore {
 		event: Omit<TimelineEvent, 'id'>
 	): Promise<TimelineEvent | null> {
 		try {
-			const response = await fetch(`/api/pois/${poiId}/timeline`, {
+			const response = await fetch(`/api/persons-of-interest/${poiId}/timeline`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(event),
@@ -318,7 +318,7 @@ class POIStore {
 
 	async predictRisk(poiId: string): Promise<number> {
 		try {
-			const response = await fetch(`/api/pois/${poiId}/risk`, {
+			const response = await fetch(`/api/persons-of-interest/${poiId}/risk`, {
 				method: 'POST',
 				credentials: 'include'
 			});

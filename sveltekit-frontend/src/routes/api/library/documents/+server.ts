@@ -5,17 +5,26 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { pool } from '$lib/server/db/client';
+
+const querySchema = z.object({
+	corpusType: z.string().max(100).optional(),
+	jurisdiction: z.string().max(100).optional(),
+	status: z.string().max(50).optional(),
+	q: z.string().max(500).optional(),
+	limit: z.coerce.number().int().min(1).max(200).default(50),
+	offset: z.coerce.number().int().min(0).default(0)
+});
 
 export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const corpusType = url.searchParams.get('corpusType');
-	const jurisdiction = url.searchParams.get('jurisdiction');
-	const status = url.searchParams.get('status');
-	const q = url.searchParams.get('q');
-	const limit = Math.min(Number(url.searchParams.get('limit')) || 50, 200);
-	const offset = Number(url.searchParams.get('offset')) || 0;
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+	}
+	const { corpusType, jurisdiction, status, q, limit, offset } = parsed.data;
 
 	const conditions: string[] = [];
 	const params: unknown[] = [];

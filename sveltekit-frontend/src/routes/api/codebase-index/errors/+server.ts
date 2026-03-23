@@ -5,10 +5,21 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 
 import { getQdrantUrl } from '$lib/config/env.server.js';
 const QDRANT_URL = getQdrantUrl();
 const ERROR_CARDS_COLLECTION = 'phase90_error_cards';
+
+const querySchema = z.object({
+	page: z.coerce.number().int().min(1).default(1),
+	pageSize: z.coerce.number().int().min(1).max(200).default(50),
+	search: z.string().max(500).optional(),
+	errorCode: z.string().max(50).optional(),
+	surface: z.string().max(100).optional(),
+	tech: z.string().max(100).optional(),
+	tool: z.string().max(100).optional()
+});
 
 interface QdrantFilter {
 	must?: Array<{
@@ -19,13 +30,11 @@ interface QdrantFilter {
 
 export const GET: RequestHandler = async ({ url }) => {
 	try {
-		const page = parseInt(url.searchParams.get('page') ?? '1');
-		const pageSize = parseInt(url.searchParams.get('pageSize') ?? '50');
-		const search = url.searchParams.get('search');
-		const errorCode = url.searchParams.get('errorCode');
-		const surface = url.searchParams.get('surface');
-		const tech = url.searchParams.get('tech');
-		const tool = url.searchParams.get('tool');
+		const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+		if (!parsed.success) {
+			return json({ errors: [], total: 0, page: 1, pageSize: 50, totalPages: 0, error: parsed.error.issues[0]?.message }, { status: 400 });
+		}
+		const { page, pageSize, search, errorCode, surface, tech, tool } = parsed.data;
 
 		// Build filter
 		const filter: QdrantFilter = { must: [] };

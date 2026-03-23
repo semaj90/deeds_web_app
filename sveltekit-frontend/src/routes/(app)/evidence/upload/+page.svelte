@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import EvidenceUploadProgress from '$lib/components/evidence/EvidenceUploadProgress.svelte';
+	import { analytics } from '$lib/stores/analytics.svelte';
 
 	let { data }: { data: PageData } = $props();
 	let user = $derived(data.user);
@@ -44,6 +45,7 @@
 			// Start SSE progress tracking via component
 			currentJobId = result.jobId;
 			error = null;
+			analytics.track('evidence_uploaded', { fileName: file.name, fileSize: file.size, jobId: result.jobId });
 		} catch (err) {
 			console.error('[Upload] Error:', err);
 			currentJobId = null;

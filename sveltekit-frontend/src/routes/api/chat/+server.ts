@@ -4,6 +4,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { trackTokenUsage, extractOllamaTokens } from '$lib/server/ai/token-tracker.js';
 
 const chatMessageSchema = z.object({
 	role: z.enum(['user', 'assistant', 'system']),
@@ -18,7 +19,7 @@ const chatRequestSchema = z.object({
 });
 
 /** POST /api/chat — Simple chat endpoint (also handles /api/chat-test callers) */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
 	try {
 		const raw = await request.json();
 		const parsed = chatRequestSchema.safeParse(raw);
@@ -42,6 +43,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		// Acquire GPU lease for Ollama (non-blocking — continue even if lease fails)
 		const lease = await acquireGpuLease('ollama', 60).catch(() => null);
+		const startMs = performance.now();
 
 		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
 			method: 'POST',
@@ -64,11 +66,24 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		const data = await res.json();
 		const responseText = data.message?.content || '';
+		const durationMs = Math.round(performance.now() - startMs);
+
+		// Track token usage (fire-and-forget)
+		const tokens = extractOllamaTokens(data);
+		trackTokenUsage({
+			userId: locals.user?.id,
+			endpoint: '/api/chat',
+			model: data.model || 'gemma3-legal:latest',
+			promptTokens: tokens.promptTokens,
+			completionTokens: tokens.completionTokens,
+			durationMs,
+		});
 
 		return json({
 			message: responseText,
 			response: responseText,
 			model: data.model || 'gemma3-legal:latest',
+			tokensUsed: tokens.promptTokens + tokens.completionTokens,
 			gpuLease: lease ? { backend: lease.backend, expiresAt: lease.expiresAt } : null
 		});
 	} catch (err) {

@@ -12,15 +12,20 @@ import {
 	streamOllamaResponse,
 	streamRAGResponse
 } from '$lib/server/streaming/chunked-response';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
 
-export const GET: RequestHandler = async ({ url }) => {
-	const query = url.searchParams.get('q');
-	const mode = url.searchParams.get('mode') ?? 'ollama';
+const querySchema = z.object({
+	q: z.string().min(1, 'Missing query parameter').max(5000),
+	mode: z.enum(['ollama', 'rag']).default('ollama')
+});
 
-	if (!query) {
-		return new Response('Missing query parameter', { status: 400 });
+export const GET: RequestHandler = async ({ url }) => {
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return new Response(parsed.error.issues[0]?.message ?? 'Missing query parameter', { status: 400 });
 	}
+	const { q: query, mode } = parsed.data;
 
 	try {
 		const stream = mode === 'rag'

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import TagInput from '$lib/components/ui/TagInput.svelte';
 	import { formatFileSize, formatDate, getIcon, getTypeLabel } from './evidence-utils.js';
 
 	let {
@@ -71,7 +72,30 @@
 	});
 	let summary = $derived(doc?.summary ?? doc?.aiSummary ?? doc?.ai_summary ?? null);
 	let entities = $derived(metadata?.entities ?? doc?.extractedEntities ?? null);
-	let tags = $derived<string[]>(doc?.tags ?? metadata?.suggestedTags ?? []);
+	let tags = $state<string[]>([]);
+	let tagsSaving = $state(false);
+
+	// Sync tags when doc loads
+	$effect(() => {
+		if (doc) tags = (doc.tags ?? (metadata as any)?.suggestedTags ?? []) as string[];
+	});
+
+	async function saveTags(newTags: string[]) {
+		if (!evidenceId || tagsSaving) return;
+		tagsSaving = true;
+		try {
+			const res = await fetch(`/api/evidence/${evidenceId}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ tags: newTags }),
+			});
+			if (!res.ok) console.error('[EvidenceViewModal] Tag save failed:', res.status);
+		} catch (e) {
+			console.error('[EvidenceViewModal] Tag save error:', e);
+		} finally {
+			tagsSaving = false;
+		}
+	}
 	let status = $derived(doc?.status ?? doc?.processingStatus ?? doc?.documentStatus ?? '');
 	let processingDiagnostics = $derived((metadata as any)?.processingDiagnostics ?? null);
 	let diagnosticStages = $derived.by(() => Object.entries((processingDiagnostics as any)?.stages ?? {}));
@@ -327,20 +351,15 @@
 						</div>
 					{/if}
 
-					<!-- Tags -->
-					{#if tags.length > 0}
+					<!-- Tags (editable) -->
 						<div class="section">
 							<h3 class="section-title">
 								<Icon name="hash" class="w-3.5 h-3.5" />
 								Tags
+								{#if tagsSaving}<span class="saving-indicator">saving…</span>{/if}
 							</h3>
-							<div class="entity-list">
-								{#each tags as tag}
-									<span class="tag-chip">#{tag}</span>
-								{/each}
-							</div>
+							<TagInput bind:tags={tags} onchange={saveTags} placeholder="Add tag (Enter to save)…" />
 						</div>
-					{/if}
 
 					<!-- Extracted text preview -->
 					{#if doc.extractedText ?? doc.extracted_text ?? doc.content}
@@ -932,6 +951,12 @@
 		background: rgba(168, 85, 247, 0.08);
 		border: 1px solid rgba(168, 85, 247, 0.18);
 		color: #c4b5fd;
+	}
+	.saving-indicator {
+		font-size: 0.6rem;
+		color: rgba(96, 165, 250, 0.6);
+		font-weight: 400;
+		margin-left: 0.5rem;
 	}
 	.tag-chip {
 		font-size: 0.68rem;

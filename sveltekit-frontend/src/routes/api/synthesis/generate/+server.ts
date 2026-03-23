@@ -39,6 +39,7 @@ import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self
 import { rabbitmq } from '$lib/server/queue/rabbitmq-manager-fixed.js';
 import { createHash } from 'crypto';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { trackTokenUsage } from '$lib/server/ai/token-tracker.js';
 
 // ── Types ─────────────────────────────────────────────────────────────
 
@@ -435,6 +436,16 @@ export const POST: RequestHandler = async (event) => {
 			distanceMetric: 'cosine',
 			threshold: 0
 		}).catch(() => {});
+
+		// Track token usage (fire-and-forget)
+		trackTokenUsage({
+			userId: auth.user.id,
+			endpoint: '/api/synthesis/generate',
+			model: MODEL,
+			promptTokens: 0,
+			completionTokens: tokensUsed,
+			durationMs: Math.round(totalMs),
+		});
 
 		return json(response);
 	} catch (err) {

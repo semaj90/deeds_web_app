@@ -3,8 +3,20 @@
  * Single document CRUD with full metadata + versions.
  */
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
+
+const documentUpdateSchema = z.object({
+	title: z.string().max(500).optional(),
+	shortTitle: z.string().max(200).optional(),
+	citation: z.string().max(500).optional(),
+	corpusType: z.string().max(100).optional(),
+	officialUrl: z.string().url().max(2000).optional(),
+	effectiveDate: z.string().max(50).optional(),
+	sourceConfidence: z.number().min(0).max(1).optional(),
+	isOfficial: z.boolean().optional()
+}).refine(obj => Object.keys(obj).length > 0, { message: 'No valid fields to update' });
 
 export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -70,20 +82,22 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const { documentId } = params;
-	const body = await request.json();
+	const raw = await request.json();
+	const parsed = documentUpdateSchema.safeParse(raw);
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+	}
+	const body = parsed.data;
 
 	const fields: string[] = [];
 	const values: unknown[] = [];
 	let idx = 1;
 
+	const camelToSnake = (s: string) => s.replace(/[A-Z]/g, c => `_${c.toLowerCase()}`);
 	for (const [key, val] of Object.entries(body)) {
-		const col = key.replace(/[A-Z]/g, c => `_${c.toLowerCase()}`); // camelCase → snake_case
-		const allowed = ['title', 'short_title', 'citation', 'corpus_type', 'official_url',
-			'effective_date', 'source_confidence', 'is_official'];
-		if (allowed.includes(col)) {
-			fields.push(`${col} = $${idx++}`);
-			values.push(val);
-		}
+		const col = camelToSnake(key);
+		fields.push(`${col} = $${idx++}`);
+		values.push(val);
 	}
 
 	if (fields.length === 0) return json({ error: 'No valid fields to update' }, { status: 400 });

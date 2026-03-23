@@ -4,15 +4,21 @@
  */
 
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import postgres from 'postgres';
 import type { RequestHandler } from './$types';
 import { getDatabaseUrl } from '$lib/config/env.server.js';
 
 const sql = postgres(getDatabaseUrl());
 
+const querySchema = z.object({
+  topK: z.coerce.number().int().min(1).max(50).default(5)
+});
+
 export const GET: RequestHandler = async ({ params, url }) => {
   const { id } = params;
-  const topK = parseInt(url.searchParams.get('topK') ?? '5');
+  const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+  const topK = parsed.success ? parsed.data.topK : 5;
 
   try {
     // Get node and its embedding

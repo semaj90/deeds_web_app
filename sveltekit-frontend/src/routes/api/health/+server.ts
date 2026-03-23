@@ -6,12 +6,17 @@
  * GET /api/health → { status, uptime, checks, breakers, embedding }
  */
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import { ollamaBreaker, qdrantBreaker, redisBreaker } from '$lib/server/circuit-breaker.js';
 import { getInFlightCount } from '$lib/server/embedding/embed.js';
 import { checkGrpcHealth } from '$lib/server/grpc/embedding-client.js';
 import { ENV } from '$lib/server/env.server.js';
 import { getTrtLlmUrl, getTritonUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
+
+const querySchema = z.object({
+	service: z.enum(['ollama', 'redis', 'qdrant', 'database', 'quic', 'go-search']).optional()
+});
 
 const startedAt = Date.now();
 
@@ -36,8 +41,11 @@ async function probe(url: string, timeoutMs = 5000): Promise<CheckResult> {
 }
 
 export const GET: RequestHandler = async ({ url }) => {
-	// Sub-endpoint routing: /api/health?service=ollama|redis|qdrant|database|quic|go-search
-	const service = url.searchParams.get('service');
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid service' }, { status: 400 });
+	}
+	const { service } = parsed.data;
 
 	if (service) {
 		return handleServiceHealth(service);
@@ -45,7 +53,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 	const trtllmUrl = getTrtLlmUrl();
 	const tritonUrl = getTritonUrl();
-	const langextractUrl = ENV.MINIO_SIMD_URL;
+	const langextractUrl = ENV.LANGEXTRACT_URL;
 
 	// Run all probes in parallel
 	const [ollama, qdrant, trtllm, triton, langextract, grpc, quicHealth, goSearch] = await Promise.all([

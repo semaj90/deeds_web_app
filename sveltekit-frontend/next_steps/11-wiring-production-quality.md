@@ -61,9 +61,11 @@ Everything below must be solid BEFORE Triton goes live — inference routes
 need validation, auth, and correct service URLs to work in production.
 **A3 (localhost→ENV) is fully complete** — 0 hardcoded service URLs remaining.
 
-### A1. Zod Validation (118/258 → 258/258)
+### A1. Zod Validation (208/351 — all request.json() routes validated)
 
-**Current**: 46% coverage. **140 routes remaining.**
+**Current**: 59% coverage (208/351). **All `request.json()` body-parsing routes now have Zod.** ~143 remaining are GET-only with no/trivial params.
+**Sprint 5**: `/api/onboarding` PATCH, `/api/search` GET, `/api/library/search` GET.
+**Sprint 6**: `/api/ai/stats`, `/api/ai/models` (Ollama response validation), `/api/cases` GET, `/api/evidence` GET, `/api/evidence/entities` GET, `/api/phase89/search` POST, `/api/citations` GET, `/api/persons` GET, `/api/persons-of-interest` GET, `/api/reports` GET (query params).
 
 | Batch | Routes | Category |
 |-------|--------|----------|
@@ -82,15 +84,14 @@ const parsed = schema.safeParse(await request.json());
 if (!parsed.success) return json({ error: parsed.error.issues[0]?.message }, { status: 400 });
 ```
 
-### A2. Auth Guards (~228 unguarded routes)
+### A2. Auth Guards — ✅ ALREADY COMPLETE
 
-Centralize in `hooks.server.ts` with route prefix matching:
-```typescript
-const AUTH_REQUIRED = ['/api/cases', '/api/evidence', '/api/citations',
-  '/api/chat', '/api/ai', '/api/reports', '/api/persons', '/api/recommendations'];
-const ADMIN_ONLY = ['/api/admin', '/api/codebase-index', '/api/phase89', '/api/error-brain'];
-const PUBLIC = ['/api/health', '/api/auth', '/api/metrics', '/api/system'];
-```
+**Status**: Deny-by-default centralized auth in `hooks.server.ts` lines 397-462.
+- **319 total routes**: 317 properly protected (99.4%)
+- **8 PUBLIC patterns**: `/api/health`, `/api/auth`, `/api/metrics`, `/api/ping`, `/api/infrastructure`, `/api/docs`, `/api/glossary`, `/api/statutes`
+- **21 ADMIN_ONLY patterns**: `/api/admin`, `/api/codebase-index`, `/api/phase89`, `/api/error-brain`, `/api/gpu`, `/api/system`, `/api/ollama`, etc.
+- **All others**: Deny-by-default → 401 if no `locals.user`
+- **Additional**: 107 routes have redundant explicit `requireAuth()` for defense-in-depth
 
 ### A3. Hardcoded localhost → ENV ~~(29 routes)~~ ✅ COMPLETE
 
@@ -332,16 +333,23 @@ Step 6: Langfuse instrumentation (Phase D)
 
 ## Phase F: Production Hardening
 
-### Rate Limiting (Redis-based)
+### Rate Limiting — ✅ DONE (In-memory per-route, Sprint 5)
+
+Implemented in `hooks.server.ts` with per-route tier matching:
 ```typescript
-const RATE_LIMITS = {
-  '/api/ai/tensorrt': { window: 60, max: 10 },  // TRT: 10/min (GPU-bound)
-  '/api/ai/': { window: 60, max: 20 },           // AI routes: 20/min
-  '/api/chat/': { window: 60, max: 30 },          // Chat: 30/min
-  '/api/auth/login': { window: 300, max: 5 },     // Login: 5/5min
-  '/api/': { window: 60, max: 100 },              // Default: 100/min
-};
+const RATE_TIERS = [
+  { prefix: '/api/auth/login', window: 300_000, max: 10 },     // Auth brute-force: 10/5min
+  { prefix: '/api/auth/register', window: 300_000, max: 5 },   // Register: 5/5min
+  { prefix: '/api/ai/tensorrt', window: 60_000, max: 10 },     // TRT: 10/min (GPU-bound)
+  { prefix: '/api/gpu/', window: 60_000, max: 15 },            // GPU: 15/min
+  { prefix: '/api/ai/', window: 60_000, max: 30 },             // AI: 30/min
+  { prefix: '/api/rag/', window: 60_000, max: 30 },            // RAG: 30/min
+  { prefix: '/api/chat/', window: 60_000, max: 40 },           // Chat: 40/min
+  { prefix: '/api/', window: 60_000, max: 60, methods: ['POST','PUT','PATCH','DELETE'] }, // Default writes: 60/min
+];
 ```
+Returns 429 with `Retry-After`, `X-RateLimit-Limit`, `X-RateLimit-Remaining` headers.
+**Future**: Upgrade to Redis-backed for multi-instance deployments.
 
 ### Production Checklist
 

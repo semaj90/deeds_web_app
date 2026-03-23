@@ -3,14 +3,19 @@
  * Query: ?entityId=xxx&depth=2
  */
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
+
+const querySchema = z.object({
+	entityId: z.string().min(1, 'entityId required').max(200),
+	depth: z.coerce.number().int().min(1).max(5).default(2)
+});
 
 export const GET: RequestHandler = async ({ url }) => {
-	const entityId = url.searchParams.get('entityId');
-	const depth = Math.min(Number(url.searchParams.get('depth') ?? 2), 5);
-
-	if (!entityId) {
-		return json({ error: 'entityId required' }, { status: 400 });
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'entityId required' }, { status: 400 });
 	}
+	const { entityId, depth } = parsed.data;
 
 	try {
 		const { getNeo4jDriver } = await import('$lib/server/neo4j-driver.js');

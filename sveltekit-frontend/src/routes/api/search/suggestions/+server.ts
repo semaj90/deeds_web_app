@@ -11,11 +11,18 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { cases, statutes, evidence, reports } from '$lib/server/db/schema-postgres.js';
 import { desc, ilike, or, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import type { PlatformSuggestion } from '$lib/types/search.js';
+
+const querySchema = z.object({
+	query: z.string().max(500).default(''),
+	type: z.enum(['all', 'cases', 'laws']).default('all'),
+	limit: z.coerce.number().int().min(1).max(20).default(10)
+});
 
 function uniqueByText(items: PlatformSuggestion[], max: number): PlatformSuggestion[] {
 	const seen = new Set<string>();
@@ -142,11 +149,13 @@ async function getReportSuggestions(query: string, limit: number): Promise<Platf
 }
 
 export const GET: RequestHandler = async ({ url }) => {
-	const query = url.searchParams.get('query')?.trim() ?? '';
-	const type = url.searchParams.get('type') ?? 'all';
-	const limit = Math.min(20, Math.max(1, parseInt(url.searchParams.get('limit') ?? '10', 10)));
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ suggestions: [], enrichedSuggestions: [], error: parsed.error.issues[0]?.message }, { status: 400 });
+	}
+	const { query, type, limit } = parsed.data;
 
-	if (!query || query.length < 2) {
+	if (!query.trim() || query.trim().length < 2) {
 		return json({ suggestions: [], enrichedSuggestions: [] });
 	}
 

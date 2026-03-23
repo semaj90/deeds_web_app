@@ -1,4 +1,5 @@
 import { json, error } from '@sveltejs/kit';
+import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import {
 	evidence,
@@ -13,6 +14,11 @@ import {
 } from '$lib/server/db/schema-postgres.js';
 import { eq, desc, sql, and, inArray } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
+
+const querySchema = z.object({
+	limit: z.coerce.number().int().min(1).max(200).default(50),
+	types: z.string().max(500).optional()
+});
 
 interface TimelineEvent {
 	id: string;
@@ -34,8 +40,11 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 
 	const caseId = params.id;
-	const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '50'), 200);
-	const typesParam = url.searchParams.get('types');
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+	}
+	const { limit, types: typesParam } = parsed.data;
 	const allowedTypes = typesParam
 		? new Set(typesParam.split(','))
 		: new Set(['evidence_upload', 'report', 'note', 'audit', 'ai_chat', 'connection']);

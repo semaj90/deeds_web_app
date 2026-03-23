@@ -17,10 +17,16 @@
  */
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { chunkFiles } from '$lib/server/indexer/ast-chunker.js';
 import { indexChunks } from '$lib/server/indexer/dual-embedder.js';
 import { resolve } from 'path';
 import { readdir, stat } from 'fs/promises';
+
+const postQuerySchema = z.object({
+	scope: z.enum(['routes', 'lib', 'tests', 'all']).default('all'),
+	async: z.enum(['true', 'false']).default('false')
+});
 
 const ROOT = resolve(process.cwd());
 
@@ -67,8 +73,9 @@ export const POST: RequestHandler = async ({ url, locals }) => {
 		throw error(401, 'Unauthorized');
 	}
 
-	const scope = url.searchParams.get('scope') ?? 'all';
-	const async_ = url.searchParams.get('async') === 'true';
+	const parsed = postQuerySchema.safeParse(Object.fromEntries(url.searchParams));
+	const scope = parsed.success ? parsed.data.scope : 'all';
+	const async_ = parsed.success ? parsed.data.async === 'true' : false;
 	const dirs = SCOPE_GLOBS[scope] ?? SCOPE_GLOBS.all;
 
 	// For large jobs (scope=all or async=true), enqueue via RabbitMQ if available

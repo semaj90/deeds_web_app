@@ -4,6 +4,7 @@
  * Query: ?category=Auth&q=search&status=active
  */
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 import {
 	API_REGISTRY,
 	getEndpointsByCategory,
@@ -12,10 +13,15 @@ import {
 	getRegistrySummary
 } from '$lib/server/api-registry.js';
 
+const querySchema = z.object({
+	category: z.string().max(100).optional(),
+	q: z.string().max(500).optional(),
+	status: z.string().max(50).optional()
+});
+
 export const GET: RequestHandler = async ({ url }) => {
-	const category = url.searchParams.get('category');
-	const query = url.searchParams.get('q');
-	const status = url.searchParams.get('status');
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	const { category, q: query, status } = parsed.success ? parsed.data : { category: undefined, q: undefined, status: undefined };
 
 	let endpoints = API_REGISTRY;
 

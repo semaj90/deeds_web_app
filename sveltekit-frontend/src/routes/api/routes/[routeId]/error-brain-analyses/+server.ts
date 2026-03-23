@@ -11,14 +11,20 @@ import {
 	errorBrainPatch,
 } from '$lib/db/schema/nes-command-center.js';
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import type { RequestHandler } from './$types.js';
+
+const querySchema = z.object({
+	limit: z.coerce.number().int().min(1).max(100).default(20),
+	offset: z.coerce.number().int().min(0).default(0)
+});
 
 export const GET: RequestHandler = async ({ params, url }) => {
 	const { routeId } = params;
 
 	try {
-		const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '20'), 100);
-		const offset = parseInt(url.searchParams.get('offset') ?? '0');
+		const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+		const { limit, offset } = parsed.success ? parsed.data : { limit: 20, offset: 0 };
 		const db = getDb();
 
 		// Get analyses with pagination

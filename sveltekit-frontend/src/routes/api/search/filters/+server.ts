@@ -6,10 +6,15 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { cases, statutes } from '$lib/server/db/schema-postgres.js';
 import { crimes } from '$lib/server/db/schema/legal-cases.js';
 import { isNotNull } from 'drizzle-orm';
+
+const querySchema = z.object({
+	type: z.enum(['cases', 'laws']).default('laws')
+});
 
 function distinctValues(rows: Array<{ value: string | null | undefined }>): string[] {
 	return Array.from(
@@ -18,7 +23,11 @@ function distinctValues(rows: Array<{ value: string | null | undefined }>): stri
 }
 
 export const GET: RequestHandler = async ({ url }) => {
-	const type = url.searchParams.get('type') ?? 'laws';
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ jurisdictions: [], categories: [], types: [], error: parsed.error.issues[0]?.message }, { status: 400 });
+	}
+	const { type } = parsed.data;
 
 	try {
 		if (type === 'cases') {

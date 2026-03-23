@@ -5,10 +5,16 @@
 
 import { getACPToolRegistry, toolSupportsDryRun } from '$lib/services/knowledge-search/ACPToolRegistry';
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import type { RequestHandler } from './$types.js';
 
+const querySchema = z.object({
+	category: z.string().max(100).optional()
+});
+
 export const GET: RequestHandler = async ({ url }) => {
-	const category = url.searchParams.get('category');
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	const category = parsed.success ? parsed.data.category : undefined;
 
 	const registry = getACPToolRegistry();
 	let tools = registry.list();

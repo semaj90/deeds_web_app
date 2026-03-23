@@ -1,6 +1,11 @@
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { subscribe, getJob } from '$lib/server/evidence-progress';
 import { getAnalysisJob } from '$lib/server/analysis/analysis-jobs.js';
+
+const querySchema = z.object({
+	jobId: z.string().min(1, 'Missing jobId parameter').max(200)
+});
 
 /**
  * GET /api/evidence/realtime?jobId=xxx
@@ -14,10 +19,11 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		return new Response('Unauthorized', { status: 401 });
 	}
 
-	const jobId = url.searchParams.get('jobId');
-	if (!jobId) {
-		return new Response('Missing jobId parameter', { status: 400 });
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return new Response(parsed.error.issues[0]?.message ?? 'Missing jobId parameter', { status: 400 });
 	}
+	const { jobId } = parsed.data;
 
 	const encoder = new TextEncoder();
 	let isClosed = false;

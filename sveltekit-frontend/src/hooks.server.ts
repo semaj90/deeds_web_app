@@ -36,16 +36,47 @@ const MAX_UPLOAD_SIZE = 100 * 1024 * 1024; // 100MB for file uploads
 const UPLOAD_PATHS = ['/api/evidence/upload', '/api/vision/analyze', '/api/persons-of-interest'];
 const shouldRunBootTasks = !building && process.env.NODE_ENV !== 'test';
 
-// ── Global Write Rate Limiting (Sprint 4) ────────────────────────────────
-// In-memory sliding window for write endpoints — 60 writes/min per IP
-const writeRateLimits = new Map<string, { count: number; resetTime: number }>();
-const WRITE_RATE_WINDOW = 60_000; // 1 minute
-const WRITE_RATE_MAX = 60; // 60 writes per minute per IP
+// ── Per-Route Rate Limiting (Sprint 4 → upgraded Sprint 5) ───────────────
+// In-memory sliding window — per route tier + IP
+// Entries: Map<"tier:ip", { count, resetTime }>
+const rateLimits = new Map<string, { count: number; resetTime: number }>();
+
+/** Route-specific rate limit tiers — matched in order, first match wins */
+const RATE_TIERS: Array<{ prefix: string; window: number; max: number; methods?: string[] }> = [
+  // Auth brute-force protection
+  { prefix: '/api/auth/login', window: 300_000, max: 10 },
+  { prefix: '/api/auth/register', window: 300_000, max: 5 },
+  { prefix: '/api/auth/reset-password', window: 300_000, max: 5 },
+  // GPU-bound inference (limited VRAM)
+  { prefix: '/api/ai/tensorrt', window: 60_000, max: 10 },
+  { prefix: '/api/gpu/', window: 60_000, max: 15 },
+  // AI/LLM routes (Ollama inference, moderate)
+  { prefix: '/api/ai/', window: 60_000, max: 30 },
+  { prefix: '/api/rag/', window: 60_000, max: 30 },
+  { prefix: '/api/synthesis/', window: 60_000, max: 20 },
+  { prefix: '/api/agents/', window: 60_000, max: 20 },
+  { prefix: '/api/contextual/', window: 60_000, max: 30 },
+  // Chat routes
+  { prefix: '/api/chat/', window: 60_000, max: 40 },
+  { prefix: '/api/sse/', window: 60_000, max: 40 },
+  // Write-heavy mutation routes (default write limiter)
+  { prefix: '/api/', window: 60_000, max: 60, methods: ['POST', 'PUT', 'PATCH', 'DELETE'] },
+];
+
+function getRateTier(path: string, method: string) {
+  for (const tier of RATE_TIERS) {
+    if (path.startsWith(tier.prefix)) {
+      if (!tier.methods || tier.methods.includes(method)) return tier;
+    }
+  }
+  return null;
+}
+
 if (shouldRunBootTasks) {
   setInterval(() => {
     const now = Date.now();
-    for (const [key, entry] of writeRateLimits) {
-      if (now > entry.resetTime) writeRateLimits.delete(key);
+    for (const [key, entry] of rateLimits) {
+      if (now > entry.resetTime) rateLimits.delete(key);
     }
   }, 60_000);
 }
@@ -327,33 +358,35 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
   }
 
-  // === GLOBAL WRITE RATE LIMITING (Sprint 4) ===
-  if (
-    event.url.pathname.startsWith('/api/') &&
-    ['POST', 'PUT', 'PATCH', 'DELETE'].includes(event.request.method) &&
-    !event.url.pathname.startsWith('/api/health')
-  ) {
-    const forwarded = event.request.headers.get('x-forwarded-for');
-    const ip = forwarded
-      ? forwarded.split(',')[0].trim()
-      : (event.getClientAddress?.() ?? 'unknown');
-    const now = Date.now();
-    const entry = writeRateLimits.get(ip);
+  // === PER-ROUTE RATE LIMITING (Sprint 4 → Sprint 5) ===
+  if (event.url.pathname.startsWith('/api/') && !event.url.pathname.startsWith('/api/health')) {
+    const tier = getRateTier(event.url.pathname, event.request.method);
+    if (tier) {
+      const forwarded = event.request.headers.get('x-forwarded-for');
+      const ip = forwarded
+        ? forwarded.split(',')[0].trim()
+        : (event.getClientAddress?.() ?? 'unknown');
+      const now = Date.now();
+      const key = `${tier.prefix}:${ip}`;
+      const entry = rateLimits.get(key);
 
-    if (!entry || now > entry.resetTime) {
-      writeRateLimits.set(ip, { count: 1, resetTime: now + WRITE_RATE_WINDOW });
-    } else if (entry.count >= WRITE_RATE_MAX) {
-      const retryAfter = Math.ceil((entry.resetTime - now) / 1000);
-      return new Response(JSON.stringify({ error: 'Rate limit exceeded', retryAfter }), {
-        status: 429,
-        headers: {
-          'Content-Type': 'application/json',
-          'Retry-After': String(retryAfter),
-          'X-Request-ID': requestId,
-        },
-      });
-    } else {
-      entry.count++;
+      if (!entry || now > entry.resetTime) {
+        rateLimits.set(key, { count: 1, resetTime: now + tier.window });
+      } else if (entry.count >= tier.max) {
+        const retryAfter = Math.ceil((entry.resetTime - now) / 1000);
+        return new Response(JSON.stringify({ error: 'Rate limit exceeded', retryAfter }), {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            'Retry-After': String(retryAfter),
+            'X-RateLimit-Limit': String(tier.max),
+            'X-RateLimit-Remaining': '0',
+            'X-Request-ID': requestId,
+          },
+        });
+      } else {
+        entry.count++;
+      }
     }
   }
 

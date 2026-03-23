@@ -14,19 +14,34 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
+import { z } from 'zod';
+
+const entitiesQuerySchema = z.object({
+	label: z.string().max(100).nullish(),
+	text: z.string().max(1000).nullish(),
+	caseId: z.string().max(100).nullish(),
+	flagType: z.string().max(100).nullish(),
+	severity: z.enum(['low', 'medium', 'high']).nullish(),
+	mode: z.enum(['entities', 'flags', 'both']).default('both'),
+	limit: z.coerce.number().int().min(1).max(500).default(50),
+});
 
 export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.user?.id) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
-	const label = url.searchParams.get('label');
-	const text = url.searchParams.get('text');
-	const caseId = url.searchParams.get('caseId');
-	const flagType = url.searchParams.get('flagType');
-	const severity = url.searchParams.get('severity');
-	const mode = url.searchParams.get('mode') ?? 'both';
-	const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '50', 10) || 50, 500);
+	const parsed = entitiesQuerySchema.safeParse({
+		label: url.searchParams.get('label'),
+		text: url.searchParams.get('text'),
+		caseId: url.searchParams.get('caseId'),
+		flagType: url.searchParams.get('flagType'),
+		severity: url.searchParams.get('severity'),
+		mode: url.searchParams.get('mode') ?? undefined,
+		limit: url.searchParams.get('limit') ?? undefined,
+	});
+	if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
+	const { label, text, caseId, flagType, severity, mode, limit } = parsed.data;
 
 	const results: { entities?: any[]; flags?: any[]; counts?: any } = {};
 

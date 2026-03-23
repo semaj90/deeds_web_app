@@ -133,24 +133,25 @@ All Phase 1 components from the enhancement plan already exist:
 ## Remaining Work
 
 ### Phase 2: Directory Consolidation UI
-- [ ] Add dedicated "Demos" section/tab to the all-routes page (26 demos need showcase)
+- [x] Add dedicated "Demos" section/tab to the all-routes page (26 demos need showcase) — DONE (Demos panel with grid cards)
 - [ ] Group standalone routes (acp, chat, health, etc.) into a "System" or "Standalone" section
-- [ ] Add page route cards alongside API endpoint cards (currently only API endpoints shown in explorer)
-- [ ] Show route file type badges (page, server, layout, API) in the tree view
+- [x] Add page route cards alongside API endpoint cards — DONE (type filter: API/PAGES/SERVER in RouteAPIExplorer)
+- [x] Show route file type badges (page, server, layout, API) in the tree view — DONE (PG/API/SRV/ARC badges)
 - [ ] Wire demo index page (`/demos`) as a feature showcase gallery
 
 ### Phase 3: Route-to-File Mapping
-- [ ] Add file path column to API explorer (already in data, needs UI column)
-- [ ] Show associated files per route (e.g., `/cases` → `+page.svelte` + `+page.server.ts` + `+page.ts`)
-- [ ] Add "Open in Editor" links using `vscode://` protocol
+- [x] Add file path column to API explorer — DONE (filePath + absolutePath per endpoint)
+- [x] Show associated files per route (e.g., `/cases` → `+page.svelte` + `+page.server.ts` + `+page.ts`) — DONE (sibling chips in RouteAPIExplorer + Associated tab in DevReviewPanel)
+- [x] Add "Open in Editor" links using `vscode://` protocol — DONE (vscode://file/ [EDIT] links)
 - [ ] Cross-reference: which API endpoints are consumed by which pages
 
 ### Phase 4: Dev Review Dashboard
-- [ ] Auth coverage report (60 endpoints have auth, ~455 don't)
-- [ ] SSE endpoint inventory (55 endpoints)
-- [ ] Orphan detection: API endpoints with no consuming page
+- [x] Auth coverage report — DONE (DevReviewPanel AUTH tab: per-group coverage bars)
+- [x] SSE endpoint inventory — DONE (DevReviewPanel SSE tab: list with auth status + vscode links)
+- [x] Method distribution — DONE (DevReviewPanel METHODS tab: bar chart + group breakdown)
+- [x] Orphan detection: API endpoints with no consuming page — DONE (DevReviewPanel ORPHANS tab)
 - [ ] Dead route detection: pages that import non-existent API endpoints
-- [ ] Category health heatmap
+- [x] Category health heatmap — DONE (DevReviewPanel HEATMAP tab: grid colored by auth coverage)
 
 ---
 
@@ -166,6 +167,7 @@ All Phase 1 components from the enhancement plan already exist:
 | `src/lib/components/RouteAPIExplorer.svelte` | API explorer component (454 lines) |
 | `src/lib/components/RouteTreeView.svelte` | Hierarchical tree view (345 lines) |
 | `src/lib/components/APITesterModal.svelte` | Postman-style API tester (422 lines) |
+| `src/lib/components/DevReviewPanel.svelte` | Dev review dashboard (auth, SSE, methods, associated files) |
 | `scripts/test-extractor.mjs` | Quick test script for verifying extractor output |
 
 ---

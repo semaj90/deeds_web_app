@@ -175,7 +175,7 @@ export default defineConfig(({ mode }) => {
           secure: false,
         },
         '/api/cuda': {
-          target: 'http://localhost:8097',
+          target: 'http://localhost:8000',
           changeOrigin: true,
           secure: false,
         },

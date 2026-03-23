@@ -26,8 +26,8 @@ This directory contains categorized TODO items organized by feature area and pri
 - 📋 Medium (11 items, 40 hours): Template marketplace, suggestions, batch generation, mobile
 
 **Key Highlights:**
-- Template generation endpoint returns 500 (blocking AI-powered reports)
-- Report audit logging required for legal compliance
+- ✅ Template generation endpoint VERIFIED WORKING (runtime tested → 201 SUCCESS)
+- ✅ Report audit logging DONE (report_audit_log + report_versions)
 - SSE streaming for better UX on long AI generations
 
 ---
@@ -169,20 +169,17 @@ This directory contains categorized TODO items organized by feature area and pri
 
 ## 🎯 Top 10 Priorities (Cross-Cutting)
 
-1. **Fix Template Generation Endpoint (Reports)** — Blocking AI-powered report creation
-   *Effort: 30 minutes | Impact: HIGH | File: api/reports/generate-from-template/+server.ts*
+1. ~~**Fix Template Generation Endpoint (Reports)**~~ — ✅ VERIFIED WORKING (runtime tested with real case ID → 201 SUCCESS)
 
 2. ~~**Embedding Cache Persistence (AI)**~~ — ✅ DONE (embedding_cache table + gRPC Redis cache + pgvector)
 
 3. ~~**Evidence Audit Logging (Evidence)**~~ — ✅ DONE (evidenceAuditLog + evidenceVersions tables + evidence-audit.ts)
 
-4. **Report Audit Logging (Reports)** — Legal compliance requirement
-   *Effort: 1 hour | Impact: CRITICAL | New table: report_audit_log*
+4. ~~**Report Audit Logging (Reports)**~~ — ✅ DONE (`report_audit_log` + `report_versions` tables, `createReportVersion()` helper, wired into PATCH)
 
 5. ~~**Redis Connection Pooling (Infrastructure)**~~ — ✅ DONE (ioredis has built-in connection pooling)
 
-6. **MCP Report Tools (MCP)** — Enable AI agents to create/export reports
-   *Effort: 2 hours | Impact: HIGH | File: mcp/server.ts (currently 36 tools)*
+6. ~~**MCP Report Tools (MCP)**~~ — ✅ **ALREADY DONE** (41 tools including report CRUD, template generation, case CRUD, citation tools)
 
 7. ~~**LLM Response Caching (AI)**~~ — ✅ DONE (LiteLLM Redis semantic cache — 28x speedup)
 
@@ -190,21 +187,21 @@ This directory contains categorized TODO items organized by feature area and pri
 
 9. ~~**Evidence Version History (Evidence)**~~ — ✅ DONE (evidenceVersions table)
 
-10. **Test Coverage Expansion (Infrastructure)** — 46/46 Playwright screenshots, need unit tests
-    *Effort: 8 hours | Impact: MEDIUM-HIGH | Vitest regression suite started*
+10. **Test Coverage Expansion (Infrastructure)** — 46/46 Playwright + 33 Vitest unit tests (token-tracker, cases schemas)
+    *Effort: 6 hours remaining | Impact: MEDIUM-HIGH | Vitest regression suite expanding*
 
 ### Revised Top Priorities (remaining work)
 
-1. **Zod Validation** — 118/258 routes (46%) → 140 remaining
-2. **Auth Guards** — ~30/258 routes check `locals.user` → ~228 unguarded
-3. **Report Audit Logging** — Legal compliance (report_audit_log table)
-4. **Rate Limiting** — None on any route (Redis INCR/EXPIRE)
+1. ~~**Zod Validation**~~ — **208/351 routes (59%)** have Zod. **All `request.json()` routes validated.** Remaining ~143 are GET-only with no/trivial params
+2. ~~**Auth Guards**~~ — ✅ **ALREADY DONE** — `hooks.server.ts` has deny-by-default centralized auth covering 99.4% of routes (317/319)
+3. ~~**Report Audit Logging**~~ — ✅ **DONE** — `report_audit_log` + `report_versions` tables + `createReportVersion()` helper + wired into PATCH handler
+4. ~~**Rate Limiting**~~ — ✅ **DONE** — Per-route rate limiting in hooks.server.ts (auth: 10/5min, TRT: 10/min, AI: 30/min, default writes: 60/min)
 5. **Langfuse/ClickHouse Wiring** — Running but unwired (17.5GB overhead)
-6. **MCP Report/Case/Citation Tools** — Enable AI agents to manage reports
-7. **Qdrant Collection Consolidation** — 72 → ~15 active collections
-8. **Frontend Analytics Worker** — RabbitMQ queue exists but no client tracking
+6. ~~**MCP Report/Case/Citation Tools**~~ — ✅ **ALREADY DONE** — 41 tools including reports (list/create/generate/update/delete/export), cases (load/create/update/delete), citations (search/list/add)
+7. **Qdrant Collection Consolidation** — 48 collections; 15 unreferenced but user chose to keep for now
+8. ~~**Frontend Analytics Worker**~~ — ✅ **DONE** — 12 `analytics.track()` calls across 10 routes (dashboard, cases, reports, evidence, POI, terminal, search, citations, analysis-center)
 9. **TRT-LLM Triton Deployment** — Engine build pending
-10. **Unit Test Suite** — Vitest started, need broader coverage
+10. **Unit Test Suite** — Vitest: 33 tests (token-tracker + cases schemas), Playwright: 46/46
 
 ---
 
@@ -250,8 +247,8 @@ Core infrastructure phases fully implemented:
 ### Phase 1: Critical Fixes (Week 1)
 **Effort:** ~12 hours → **~2.5 hours remaining**
 
-- [ ] Fix template generation endpoint (30 min)
-- [ ] Add report audit logging (1 hour)
+- [x] ~~Fix template generation endpoint~~ ✅ VERIFIED WORKING (runtime tested)
+- [x] ~~Add report audit logging~~ ✅ DONE (report_audit_log + report_versions + createReportVersion())
 - [x] ~~Add evidence audit logging~~ ✅ DONE
 - [x] ~~Implement Redis connection pooling~~ ✅ DONE (ioredis built-in)
 - [x] ~~Implement cache TTL strategy~~ ✅ DONE (L0-L3 tiered)
@@ -403,7 +400,7 @@ Core infrastructure phases fully implemented:
 - Comprehensive documentation (5 markdown files)
 
 ### Gaps Identified
-- Template generation endpoint returns 500 (import/runtime issue)
+- ~~Template generation endpoint returns 500~~ ✅ VERIFIED WORKING
 - ~~No audit logging~~ ✅ DONE (evidence audit logging + version history)
 - ~~Embeddings not persisted~~ ✅ DONE (embedding_cache + gRPC Redis cache)
 - ~~Redis single connection~~ ✅ DONE (ioredis built-in pooling)
@@ -419,18 +416,18 @@ Core infrastructure phases fully implemented:
 
 ## 🚀 Quick Wins (< 2 hours each)
 
-1. Fix template generation endpoint (30 min)
-2. Add report audit logging (1 hour)
+1. ~~Fix template generation endpoint~~ ✅ VERIFIED
+2. ~~Add report audit logging~~ ✅ DONE
 3. ~~Redis connection pooling~~ ✅ DONE
 4. ~~Ollama health monitoring~~ ✅ DONE
 5. ~~Cache TTL strategy~~ ✅ DONE
 6. ~~LLM response caching~~ ✅ DONE
-7. Model auto-loader (1.5 hours)
-8. Token usage tracking (1.5 hours)
+7. ~~Model auto-loader~~ ✅ DONE (warmupLLMCache + warmupTemplateCache + warmupExportCache on boot)
+8. ~~Token usage tracking~~ ✅ DONE (ai_usage_log table + trackTokenUsage() helper + /api/analytics/token-usage)
 9. Evidence thumbnails (2 hours)
 10. ~~Docker health checks~~ ✅ DONE (docker-compose services)
 
-**Remaining Quick Wins:** ~6.5 hours for 5 improvements (5/10 completed)
+**Remaining Quick Wins:** ~2 hours for 1 improvement (9/10 completed)
 
 ---
 

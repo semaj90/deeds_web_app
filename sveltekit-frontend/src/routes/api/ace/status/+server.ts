@@ -1,15 +1,21 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 import { getAceIngestJob } from '$lib/server/ace-ingest-progress.js';
+
+const querySchema = z.object({
+	jobId: z.string().min(1, 'Missing jobId parameter').max(200)
+});
 
 export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.user?.id) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
-	const jobId = url.searchParams.get('jobId');
-	if (!jobId) {
-		return json({ error: 'Missing jobId parameter' }, { status: 400 });
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Missing jobId parameter' }, { status: 400 });
 	}
+	const { jobId } = parsed.data;
 
 	const job = getAceIngestJob(jobId);
 	if (!job || job.userId !== locals.user.id) {

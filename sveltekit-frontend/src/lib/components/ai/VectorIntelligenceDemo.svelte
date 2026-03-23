@@ -131,7 +131,7 @@
 		const startTime = performance.now();
 
 		try {
-			const response = await fetch('/api/semantic-search', {
+			const response = await fetch('/api/rag/search', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ query: query.trim() })

@@ -5,15 +5,21 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { getQdrantUrl, getCodebaseIndexUrl } from '$lib/config/env.server.js';
 
 const QDRANT_URL = getQdrantUrl();
 const FASTAPI_URL = getCodebaseIndexUrl();
 const CLUSTER_COLLECTION = 'phase90_error_clusters';
 
+const querySchema = z.object({
+	limit: z.coerce.number().int().min(1).max(200).default(20)
+});
+
 export const GET: RequestHandler = async ({ url, fetch }) => {
 	try {
-		const limit = parseInt(url.searchParams.get('limit') ?? '20');
+		const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+		const limit = parsed.success ? parsed.data.limit : 20;
 
 		// Try FastAPI backend first (Task 16.3 integration)
 		try {

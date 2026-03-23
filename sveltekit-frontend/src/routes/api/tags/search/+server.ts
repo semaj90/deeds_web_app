@@ -3,17 +3,22 @@
  * Query: ?q=contract+law&limit=10
  */
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 import { searchTagsBySemantic } from '$lib/server/ace/tag-sync.js';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
-export const GET: RequestHandler = async ({ url }) => {
-	const query = url.searchParams.get('q') ?? '';
-	const limit = Math.min(Number(url.searchParams.get('limit') ?? 10), 50);
+const querySchema = z.object({
+	q: z.string().min(1, 'q parameter required').max(500),
+	limit: z.coerce.number().int().min(1).max(50).default(10)
+});
 
-	if (!query) {
-		return json({ error: 'q parameter required' }, { status: 400 });
+export const GET: RequestHandler = async ({ url }) => {
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'q parameter required' }, { status: 400 });
 	}
+	const { q: query, limit } = parsed.data;
 
 	try {
 		// Embed query

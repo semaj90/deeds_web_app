@@ -3,6 +3,14 @@ import type { RequestHandler } from '@sveltejs/kit';
 import { db, pool } from '$lib/server/db/client';
 import { users } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
+import { z } from 'zod';
+
+const onboardingPatchSchema = z.object({
+  hasCompletedOnboarding: z.boolean().optional(),
+  onboardingStep: z.number().int().min(0).max(100).optional(),
+}).refine(data => data.hasCompletedOnboarding !== undefined || data.onboardingStep !== undefined, {
+  message: 'At least one of hasCompletedOnboarding or onboardingStep is required',
+});
 
 const DEFAULT_ONBOARDING_STATE = {
   hasCompletedOnboarding: false,
@@ -77,22 +85,18 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
     return json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const body = await request.json();
+  const raw = await request.json().catch(() => null);
+  const parsed = onboardingPatchSchema.safeParse(raw);
+  if (!parsed.success) {
+    return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+  }
+
   const updates: Record<string, unknown> = {};
-
-  if (typeof body.hasCompletedOnboarding === 'boolean') {
-    updates.hasCompletedOnboarding = body.hasCompletedOnboarding;
+  if (parsed.data.hasCompletedOnboarding !== undefined) {
+    updates.hasCompletedOnboarding = parsed.data.hasCompletedOnboarding;
   }
-  if (
-    typeof body.onboardingStep === 'number' &&
-    Number.isInteger(body.onboardingStep) &&
-    body.onboardingStep >= 0
-  ) {
-    updates.onboardingStep = body.onboardingStep;
-  }
-
-  if (Object.keys(updates).length === 0) {
-    return json({ error: 'No valid fields to update' }, { status: 400 });
+  if (parsed.data.onboardingStep !== undefined) {
+    updates.onboardingStep = parsed.data.onboardingStep;
   }
 
   if (!(await hasOnboardingColumns())) {

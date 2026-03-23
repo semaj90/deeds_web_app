@@ -1,16 +1,22 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import { getRedis } from '$lib/server/redis.js';
+
+const querySchema = z.object({
+	sessionId: z.string().min(1, 'sessionId required').max(200)
+});
 
 /**
  * GET /api/contextual/stats?sessionId=...&userId=...
  * Get session statistics
  */
 export const GET: RequestHandler = async ({ url }) => {
-	const sessionId = url.searchParams.get('sessionId');
-	if (!sessionId) {
-		return json({ success: false, error: 'sessionId required' }, { status: 400 });
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ success: false, error: parsed.error.issues[0]?.message ?? 'sessionId required' }, { status: 400 });
 	}
+	const { sessionId } = parsed.data;
 
 	try {
 		const redis = getRedis();

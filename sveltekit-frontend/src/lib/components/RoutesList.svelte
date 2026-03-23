@@ -8,11 +8,12 @@
 
  (async () => {
  try {
- const response = await fetch('/api/routes');
+ const response = await fetch('/api/routes/metadata');
  if (!response.ok) {
  throw new Error('Failed to fetch routes');
  }
- routes = await response.json();
+ const result = await response.json();
+ routes = (result?.data?.allEndpoints ?? []).map((e: { path: string }) => e.path);
  } catch (e: any) {
  error = e.message;
  }

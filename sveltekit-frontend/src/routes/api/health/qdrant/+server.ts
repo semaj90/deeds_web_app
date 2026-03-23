@@ -10,6 +10,7 @@
  */
 
 import { json, error, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { ENV } from '$lib/server/env.server.js';
 import {
@@ -19,9 +20,19 @@ import {
 	type QdrantHealthReport
 } from '$lib/server/vector/qdrant-health.js';
 
+const getQuerySchema = z.object({
+	counts: z.enum(['true', 'false']).default('false'),
+	timeout: z.coerce.number().int().min(1000).max(30000).default(5000)
+});
+
+const postQuerySchema = z.object({
+	repair: z.enum(['true', 'false']).default('false')
+});
+
 export const GET: RequestHandler = async ({ url }) => {
-	const includeVectorCounts = url.searchParams.get('counts') === 'true';
-	const timeout = Number(url.searchParams.get('timeout')) || 5000;
+	const parsed = getQuerySchema.safeParse(Object.fromEntries(url.searchParams));
+	const { counts, timeout } = parsed.success ? parsed.data : { counts: 'false', timeout: 5000 };
+	const includeVectorCounts = counts === 'true';
 
 	try {
 		const client = new QdrantClient({ url: ENV.QDRANT_URL });
@@ -68,7 +79,8 @@ export const POST: RequestHandler = async ({ url, locals }) => {
 	// Optional: require auth for repair operations
 	// if (!locals.user) throw error(401, 'Unauthorized');
 
-	const repair = url.searchParams.get('repair') === 'true';
+	const postParsed = postQuerySchema.safeParse(Object.fromEntries(url.searchParams));
+	const repair = postParsed.success ? postParsed.data.repair === 'true' : false;
 
 	if (!repair) {
 		throw error(400, 'POST requires ?repair=true query parameter');

@@ -18,6 +18,13 @@ const personCreateSchema = z.object({
 	relationship: z.string().max(200).optional().default('person_of_interest')
 });
 
+const personListSchema = z.object({
+	caseId: z.string().max(100).nullish(),
+	threatLevel: z.enum(THREAT_LEVELS).nullish(),
+	limit: z.coerce.number().int().min(1).max(100).default(20),
+	offset: z.coerce.number().int().min(0).default(0),
+});
+
 /**
  * GET /api/persons
  * Fetch persons of interest with optional filtering
@@ -27,10 +34,14 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		throw error(401, 'Unauthorized');
 	}
 
-	const id = url.searchParams.get('caseId');
-	const threatLevel = url.searchParams.get('threatLevel');
-	const limit = Number(url.searchParams.get('limit')) || 20;
-	const offset = Number(url.searchParams.get('offset')) || 0;
+	const parsed = personListSchema.safeParse({
+		caseId: url.searchParams.get('caseId'),
+		threatLevel: url.searchParams.get('threatLevel'),
+		limit: url.searchParams.get('limit') ?? undefined,
+		offset: url.searchParams.get('offset') ?? undefined,
+	});
+	if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
+	const { caseId: id, threatLevel, limit, offset } = parsed.data;
 
 	try {
         const filters = [];

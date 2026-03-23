@@ -7,9 +7,17 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { statutes } from '$lib/server/db/schema-postgres.js';
 import { and, desc, eq, ilike, or, sql } from 'drizzle-orm';
+
+const querySchema = z.object({
+	query: z.string().max(500).default(''),
+	limit: z.coerce.number().int().min(1).max(50).default(10),
+	jurisdiction: z.string().max(200).optional(),
+	sectionType: z.string().max(200).optional()
+});
 
 type LawSearchRow = {
 	id: string;
@@ -27,12 +35,13 @@ type LawSearchRow = {
 export const GET: RequestHandler = async ({ url }) => {
 	const startTime = performance.now();
 
-	const query = url.searchParams.get('query')?.trim() ?? '';
-	const limit = Math.min(50, Math.max(1, parseInt(url.searchParams.get('limit') ?? '10', 10)));
-	const jurisdiction = url.searchParams.get('jurisdiction') ?? undefined;
-	const sectionType = url.searchParams.get('sectionType') ?? undefined;
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ results: [], total: 0, query: '', executionTimeMs: 0, error: parsed.error.issues[0]?.message }, { status: 400 });
+	}
+	const { query, limit, jurisdiction, sectionType } = parsed.data;
 
-	if (!query || query.length < 2) {
+	if (!query.trim() || query.trim().length < 2) {
 		return json({ results: [], total: 0, query, executionTimeMs: 0 });
 	}
 

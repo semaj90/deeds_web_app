@@ -1,7 +1,13 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
+
+const querySchema = z.object({
+	route: z.string().max(500).optional(),
+	limit: z.coerce.number().int().min(1).max(200).default(50)
+});
 
 /**
  * GET /api/phase72/errors?route=<path>&limit=50
@@ -9,8 +15,11 @@ import { sql } from 'drizzle-orm';
  * Route filter is optional — returns all errors if omitted.
  */
 export const GET: RequestHandler = async ({ url }) => {
-	const route = url.searchParams.get('route');
-	const limit = Math.min(parseInt(url.searchParams.get('limit') || '50', 10), 200);
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ errors: [], stats: null, error: parsed.error.issues[0]?.message }, { status: 400 });
+	}
+	const { route, limit } = parsed.data;
 
 	try {
 		const whereClause = route

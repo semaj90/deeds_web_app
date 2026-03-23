@@ -14,6 +14,7 @@
 	import RouteTreeView from '$lib/components/RouteTreeView.svelte';
 	import APITesterModal from '$lib/components/APITesterModal.svelte';
 	import ArchivedRoutesPanel from '$lib/components/ArchivedRoutesPanel.svelte';
+	import DevReviewPanel from '$lib/components/DevReviewPanel.svelte';
 	import type { RouteEndpoint } from '$lib/server/api-metadata-extractor';
 
 	const { data }: { data: PageData } = $props();
@@ -45,6 +46,7 @@
 	let showRouteTree = $state(false);
 	let showArchivedRoutes = $state(false);
 	let showDemos = $state(false);
+	let showDevReview = $state(false);
 	let selectedEndpoint = $state<RouteEndpoint | null>(null);
 	let apiTesterOpen = $state(false);
 
@@ -483,6 +485,9 @@
 		<button class="cap-item cap-demo" onclick={() => { showDemos = !showDemos; }}>
 			{showDemos ? '[-]' : '[+]'} DEMOS ({demoCount})
 		</button>
+		<button class="cap-item cap-review" onclick={() => { showDevReview = !showDevReview; }}>
+			{showDevReview ? '[-]' : '[+]'} DEV REVIEW
+		</button>
 
 		{#if serverStats.totalClusters > 0}
 			<button class="cap-item cap-clusters" onclick={() => (showClusters = !showClusters)}>
@@ -517,6 +522,7 @@
 		<div class="explorer-panel">
 			<RouteAPIExplorer
 				categories={apiMetadata.categories}
+				allEndpoints={apiMetadata.allEndpoints}
 				onTestEndpoint={handleTestEndpoint}
 			/>
 		</div>
@@ -570,6 +576,16 @@
 					</div>
 				{/each}
 			</div>
+		</div>
+	{/if}
+
+	<!-- Dev Review Panel (collapsible) -->
+	{#if showDevReview}
+		<div class="dev-review-wrapper">
+			<DevReviewPanel
+				endpoints={apiMetadata.allEndpoints}
+				stats={apiMetadata.stats}
+			/>
 		</div>
 	{/if}
 
@@ -1210,8 +1226,23 @@
 		background: rgba(51, 204, 204, 0.1);
 	}
 
+	.cap-item.cap-review {
+		color: #ff6633;
+		background: none;
+		border: 1px solid #ff6633;
+		padding: 0.15rem 0.4rem;
+		cursor: pointer;
+		font-family: inherit;
+		font-size: inherit;
+		letter-spacing: inherit;
+	}
+
+	.cap-item.cap-review:hover {
+		background: rgba(255, 102, 51, 0.1);
+	}
+
 	/* ── New Component Panels ── */
-	.explorer-panel, .tree-panel, .archived-panel-wrapper {
+	.explorer-panel, .tree-panel, .archived-panel-wrapper, .dev-review-wrapper {
 		margin-bottom: 1.5rem;
 	}
 

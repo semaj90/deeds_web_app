@@ -10,6 +10,7 @@
 	import EmptyState from '$lib/components/ui/EmptyState.svelte';
 	import POIPhotoModal from '$lib/components/POIPhotoModal.svelte';
 	import POIPhotoUploader from '$lib/client/ui/POIPhotoUploader.svelte';
+	import { analytics } from '$lib/stores/analytics.svelte';
 
 	// Toast notifications
 	let toasts = $state<{ id: number; message: string; type: 'success' | 'error' | 'info' }[]>([]);
@@ -592,6 +593,7 @@
 													data.pois = [...data.pois];
 												}
 												showToast(`${formData.name} updated successfully.`, 'success');
+												analytics.track('case_updated', { action: 'poi_updated', poiId: editingPoi.id, name: formData.name });
 											} else {
 												showToast('Failed to save changes.', 'error');
 											}

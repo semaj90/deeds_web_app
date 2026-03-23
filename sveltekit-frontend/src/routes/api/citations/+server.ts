@@ -17,6 +17,11 @@ const citationCreateSchema = z.object({
   source_url: z.string().max(2000).optional(),
 });
 
+const citationListSchema = z.object({
+  case_id: z.string().max(100).nullish(),
+  limit: z.coerce.number().int().min(1).max(200).default(50),
+});
+
 /**
  * GET /api/citations
  * Fetch citations with optional case filter.
@@ -27,8 +32,12 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     throw error(401, 'Unauthorized');
   }
 
-  const caseId = url.searchParams.get('case_id');
-  const limit = Number(url.searchParams.get('limit')) || 50;
+  const parsed = citationListSchema.safeParse({
+    case_id: url.searchParams.get('case_id'),
+    limit: url.searchParams.get('limit') ?? undefined,
+  });
+  if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
+  const { case_id: caseId, limit } = parsed.data;
 
   // Check cache first (Memory → Redis, keyed by caseId+limit)
   const cacheKey = `citations:${caseId ?? 'all'}:${limit}`;

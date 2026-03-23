@@ -5,17 +5,29 @@ import { evidence } from '$lib/server/db/schema-postgres.js';
 import { desc, eq, ilike, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
+const evidenceListSchema = z.object({
+	page: z.coerce.number().int().min(1).default(1),
+	limit: z.coerce.number().int().min(1).max(100).default(20),
+	search: z.string().max(500).optional().default(''),
+	caseId: z.string().max(100).optional().default(''),
+	type: z.string().max(100).optional().default(''),
+});
+
 /**
  * GET /api/evidence
  * List evidence items with optional filtering and pagination
  */
 export const GET: RequestHandler = async ({ url }) => {
-	const page = Math.max(1, Number(url.searchParams.get('page') ?? 1));
-	const limit = Math.min(100, Math.max(1, Number(url.searchParams.get('limit') ?? 20)));
+	const parsed = evidenceListSchema.safeParse({
+		page: url.searchParams.get('page') ?? undefined,
+		limit: url.searchParams.get('limit') ?? undefined,
+		search: url.searchParams.get('search')?.trim(),
+		caseId: url.searchParams.get('caseId'),
+		type: url.searchParams.get('type'),
+	});
+	if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
+	const { page, limit, search, caseId, type } = parsed.data;
 	const offset = (page - 1) * limit;
-	const search = url.searchParams.get('search')?.trim() ?? '';
-	const caseId = url.searchParams.get('caseId') ?? '';
-	const type = url.searchParams.get('type') ?? '';
 
 	try {
 		const conditions = [];

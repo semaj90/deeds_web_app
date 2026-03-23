@@ -46,7 +46,7 @@
 			loading = true;
 			message = '';
 
-			const response = await fetch('/api/poi', {
+			const response = await fetch('/api/persons-of-interest', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(formData)

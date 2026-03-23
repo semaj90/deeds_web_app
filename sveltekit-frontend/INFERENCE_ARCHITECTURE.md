@@ -169,7 +169,7 @@ Could simplify by removing `@langchain/ollama` dependency and using Ollama's nat
 - `legal_glossary` table (PostgreSQL) — 280+ seeded terms across 20 categories
 - pgvector embeddings (768-dim via embeddinggemma) for semantic search
 - Full-text search (tsvector) + ILIKE prefix for fallback
-- `legal_definitions` table — document-extracted definitions with confidence scores
+- `legal_definitions` table — document-extracted definitions with confidence rankings.
 
 ### API Endpoints
 | Endpoint | Method | Purpose |

@@ -7,6 +7,7 @@
  *   Index lawpdfs/ directory through the evidence upload pipeline
  */
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 import db from '$lib/server/db';
 import { legalGlossary, statutes, statuteChunks, legalPrecedents } from '$lib/server/db/schema-postgres.js';
 import { eq, and } from 'drizzle-orm';
@@ -15,6 +16,13 @@ import { glossaryTerms, statuteData, precedentData } from '$lib/server/data/lega
 import { readdir, readFile } from 'fs/promises';
 import { join } from 'path';
 import { ollamaFetch } from '$lib/server/ollama.js';
+
+const postQuerySchema = z.object({
+	embed: z.enum(['true', 'false']).default('false')
+});
+const getQuerySchema = z.object({
+	action: z.enum(['index-pdfs']).optional()
+});
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
@@ -53,7 +61,8 @@ function chunkContent(content: string, maxLen = 300): string[] {
 }
 
 export const POST: RequestHandler = async ({ url }) => {
-	const withEmbeddings = url.searchParams.get('embed') === 'true';
+	const postParsed = postQuerySchema.safeParse(Object.fromEntries(url.searchParams));
+	const withEmbeddings = postParsed.success ? postParsed.data.embed === 'true' : false;
 	const start = performance.now();
 	const results = { glossary: 0, statutes: 0, chunks: 0, precedents: 0, embeddings: 0, errors: [] as string[] };
 

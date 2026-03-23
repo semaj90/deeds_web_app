@@ -1,7 +1,12 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
+import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
+
+const querySchema = z.object({
+	limit: z.coerce.number().int().min(1).max(100).default(20)
+});
 
 /**
  * GET /api/error-brain/history/[filePath]
@@ -12,7 +17,8 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 
 	const filePath = decodeURIComponent(params.filePath);
-	const limit = Math.min(Number(url.searchParams.get('limit') || 20), 100);
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	const limit = parsed.success ? parsed.data.limit : 20;
 
 	try {
 		const results = await db.execute(sql`

@@ -12,6 +12,7 @@ import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { litellmChat } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { trackTokenUsage } from '$lib/server/ai/token-tracker.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
@@ -210,6 +211,14 @@ export const POST: RequestHandler = async ({ request }) => {
 			grounding_score: groundingScore,
 			timestamp: new Date().toISOString()
 		};
+
+		// Track token usage (fire-and-forget)
+		trackTokenUsage({
+			endpoint: '/api/rag/answer',
+			model: 'gemma3-legal:latest',
+			completionTokens: evalCount ?? Math.ceil(answerText.length / 4),
+			durationMs: Math.round(genTime),
+		});
 
 		return json(response);
 	} catch (err) {

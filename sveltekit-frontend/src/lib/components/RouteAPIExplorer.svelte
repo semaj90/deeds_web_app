@@ -8,11 +8,24 @@
 
 	let {
 		categories = [],
+		allEndpoints = [],
 		onTestEndpoint = (endpoint: RouteEndpoint) => {}
 	}: {
 		categories: RouteCategory[];
+		allEndpoints?: RouteEndpoint[];
 		onTestEndpoint?: (endpoint: RouteEndpoint) => void;
 	} = $props();
+
+	// Build associated files lookup: route path → sibling files
+	let associatedMap = $derived.by(() => {
+		const byPath: Record<string, RouteEndpoint[]> = {};
+		for (const ep of allEndpoints) {
+			if (ep.type === 'archived') continue;
+			if (!byPath[ep.path]) byPath[ep.path] = [];
+			byPath[ep.path].push(ep);
+		}
+		return byPath;
+	});
 
 	let expandedCategories = $state(new Set<string>());
 	let searchQuery = $state('');
@@ -216,7 +229,7 @@
 										</div>
 									{/if}
 
-									<!-- File Path -->
+									<!-- File Path + Associated Files -->
 									<div class="endpoint-file">
 										<span class="file-icon">📄</span>
 										<span class="file-path">{endpoint.filePath}</span>
@@ -224,6 +237,16 @@
 											<a href="vscode://file/{endpoint.absolutePath}" class="editor-link" title="Open in VS Code">[EDIT]</a>
 										{/if}
 									</div>
+									{#if associatedMap[endpoint.path]?.length > 1}
+										<div class="sibling-files">
+											<span class="sibling-label">ALSO:</span>
+											{#each associatedMap[endpoint.path].filter(s => s.filePath !== endpoint.filePath) as sibling}
+												<span class="sibling-chip" style="color: {sibling.type === 'api' ? '#33ff33' : sibling.type === 'page' ? '#cc99ff' : '#ff9933'}">
+													{sibling.type === 'api' ? '+server.ts' : sibling.type === 'page' ? '+page.svelte' : '+page.server.ts'}
+												</span>
+											{/each}
+										</div>
+									{/if}
 
 									<!-- Actions -->
 									<div class="endpoint-actions">
@@ -548,6 +571,29 @@
 	.editor-link:hover {
 		opacity: 1;
 		text-decoration: underline;
+	}
+
+	/* ── Sibling Files ── */
+	.sibling-files {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 0.6rem;
+		margin-bottom: 0.4rem;
+		padding-left: 1.2rem;
+	}
+
+	.sibling-label {
+		color: #664400;
+		font-weight: bold;
+	}
+
+	.sibling-chip {
+		padding: 0.05rem 0.3rem;
+		border: 1px solid currentColor;
+		font-weight: bold;
+		letter-spacing: 0.05em;
+		opacity: 0.7;
 	}
 
 	/* ── Actions ── */

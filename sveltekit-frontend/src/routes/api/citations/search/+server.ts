@@ -5,19 +5,28 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { savedCitations } from '$lib/server/db/schema';
 import { desc, ilike, or } from 'drizzle-orm';
+
+const querySchema = z.object({
+	q: z.string().max(500).default(''),
+	limit: z.coerce.number().int().min(1).max(100).default(20)
+});
 
 export const GET: RequestHandler = async ({ locals, url }) => {
 	if (!locals.user) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
-	const query = url.searchParams.get('q')?.trim();
-	const limit = Math.min(Number(url.searchParams.get('limit')) || 20, 100);
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+	}
+	const { q: query, limit } = parsed.data;
 
-	if (!query || query.length < 2) {
+	if (!query.trim() || query.trim().length < 2) {
 		return json({ success: true, citations: [] });
 	}
 

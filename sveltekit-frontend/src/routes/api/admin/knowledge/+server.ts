@@ -1,8 +1,14 @@
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import { getQdrantUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 
 const QDRANT_URL = getQdrantUrl();
+
+const querySchema = z.object({
+	file_path: z.string().min(1, 'file_path parameter required').max(500),
+	limit: z.coerce.number().int().min(1).max(100).default(10)
+});
 
 interface KBEntry { id: string, score: number;
 	content: string, tags: string[];
@@ -11,12 +17,11 @@ interface KBEntry { id: string, score: number;
 }
 
 export const GET: RequestHandler = async ({ url }) => {
-	const filePath = url.searchParams.get('file_path');
-	const limit = parseInt(url.searchParams.get('limit') ?? '10');
-
-	if (!filePath) {
-		return json({ error: 'file_path parameter required' }, { status: 400 });
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'file_path parameter required' }, { status: 400 });
 	}
+	const { file_path: filePath, limit } = parsed.data;
 
 	try {
 		// Query Qdrant for KB entries matching this file

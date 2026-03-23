@@ -1,7 +1,12 @@
 import { db } from '$lib/server/db/client';
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import { sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+
+const querySchema = z.object({
+	q: z.string().min(2, 'Search query must be at least 2 characters').max(500)
+});
 
 /**
  * GET /api/cases/[id]/notes/search?q=...
@@ -10,11 +15,11 @@ import type { RequestHandler } from './$types';
  */
 export const GET: RequestHandler = async ({ params, url }) => {
 	const caseId = params.id;
-	const query = url.searchParams.get('q')?.trim();
-
-	if (!query || query.length < 2) {
-		return json({ error: 'Search query must be at least 2 characters' }, { status: 400 });
+	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	}
+	const query = parsed.data.q.trim();
 
 	try {
 		// FTS ranked search

@@ -888,6 +888,33 @@ export const reportAuditLog = pgTable('report_audit_log', {
  timestampIdx: index('report_audit_log_timestamp_idx').on(table.timestamp),
 }));
 
+export const reportVersions = pgTable('report_versions', {
+ id: uuid('id')
+ .default(sql`gen_random_uuid()`)
+ .primaryKey()
+ .notNull(),
+ reportId: uuid('report_id')
+ .notNull()
+ .references(() => reports.id, { onDelete: 'cascade' }),
+ version: integer('version').notNull(),
+ title: varchar('title', { length: 255 }),
+ content: text('content'),
+ metadata: jsonb('metadata'),
+ changedBy: uuid('changed_by')
+ .references(() => users.id, { onDelete: 'set null' }),
+ changeReason: text('change_reason'),
+ createdAt: timestamp('created_at', { withTimezone: true })
+ .default(sql`now()`)
+ .notNull(),
+},
+(table) => ({
+ reportIdIdx: index('report_versions_report_id_idx').on(table.reportId),
+ versionIdx: index('report_versions_version_idx').on(table.reportId, table.version),
+}));
+
+export type ReportVersion = typeof reportVersions.$inferSelect;
+export type NewReportVersion = typeof reportVersions.$inferInsert;
+
 export const savedReports = pgTable('saved_reports', {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -993,6 +1020,22 @@ export const poiPhotos = pgTable('poi_photos',
  index('idx_poi_photos_uploaded_at').on(table.uploadedAt)],
  })
 );
+
+// POI Relationships table
+export const poiRelationships = pgTable('poi_relationships', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	poiId1: uuid('poi_id_1').notNull().references(() => personsOfInterest.id, { onDelete: 'cascade' }),
+	poiId2: uuid('poi_id_2').notNull().references(() => personsOfInterest.id, { onDelete: 'cascade' }),
+	relationshipType: varchar('relationship_type', { length: 100 }).notNull().default('unknown'),
+	strength: numeric('strength', { precision: 3, scale: 2 }).default('0.70'),
+	metadata: jsonb('metadata').default({}),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	poi1Idx: index('poi_relationships_poi1_idx').on(table.poiId1),
+	poi2Idx: index('poi_relationships_poi2_idx').on(table.poiId2),
+}));
+
+export type PoiRelationship = typeof poiRelationships.$inferSelect;
 
 // === TIMELINE EVENTS ===
 
@@ -2915,4 +2958,30 @@ export const ingestionJobs = pgTable('ingestion_jobs', {
 }));
 
 export type IngestionJob = typeof ingestionJobs.$inferSelect;
+
+// ============================================================================
+// AI USAGE LOG — Token tracking for LLM inference
+// ============================================================================
+
+export const aiUsageLog = pgTable('ai_usage_log', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+	endpoint: varchar('endpoint', { length: 255 }).notNull(),
+	model: varchar('model', { length: 100 }).notNull(),
+	promptTokens: integer('prompt_tokens').default(0).notNull(),
+	completionTokens: integer('completion_tokens').default(0).notNull(),
+	totalTokens: integer('total_tokens').default(0).notNull(),
+	durationMs: integer('duration_ms'),
+	cached: boolean('cached').default(false).notNull(),
+	metadata: jsonb('metadata'),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	userIdx: index('ai_usage_log_user_idx').on(table.userId),
+	endpointIdx: index('ai_usage_log_endpoint_idx').on(table.endpoint),
+	createdAtIdx: index('ai_usage_log_created_at_idx').on(table.createdAt),
+	modelIdx: index('ai_usage_log_model_idx').on(table.model),
+}));
+
+export type AiUsageLog = typeof aiUsageLog.$inferSelect;
+export type NewAiUsageLog = typeof aiUsageLog.$inferInsert;
 
