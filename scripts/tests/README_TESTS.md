@@ -4,6 +4,33 @@
 
 Playwright-based visual regression and integration testing for the Deeds Legal AI platform.
 
+## Diagnostics Regression Checkpoint
+
+Use this focused checkpoint after diagnostics-related changes in the Svelte frontend:
+
+```bash
+cd sveltekit-frontend
+npm run test:diagnostics
+```
+
+Variants:
+
+```bash
+npm run test:diagnostics:unit
+npm run test:diagnostics:e2e
+```
+
+VS Code tasks:
+- `Diagnostics Regression Slice`
+- `Diagnostics Regression Slice (Unit)`
+- `Diagnostics Regression Slice (E2E)`
+
+Coverage:
+- Evidence diagnostics rendering in the modal
+- `/api/evidence/[id]` metadata normalization and `404` handling
+- `/api/rag/search` diagnostics payload checks
+- Focused evidence upload Playwright flow
+
 ---
 
 ## Test Scripts

@@ -1,7 +1,7 @@
 /**
  * MCP Multi-Core Server Integration
  */
-import { logger } from '$lib/server/logger.js';
+import { logger } from '$lib/server/production-logger.js';
 
 export interface MCPWorkerCore {
     id: string;

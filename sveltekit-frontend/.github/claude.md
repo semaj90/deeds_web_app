@@ -1,5 +1,13 @@
 # Claude AI Context: Phase 76-87 RAG/KAG SvelteKit Error Analysis
 
+## Current Diagnostics Regression Checkpoint
+
+- Run `npm run test:diagnostics` from `sveltekit-frontend` after diagnostics-related changes.
+- Unit-only slice: `npm run test:diagnostics:unit`
+- Browser-only slice: `npm run test:diagnostics:e2e`
+- VS Code task labels: `Diagnostics Regression Slice`, `Diagnostics Regression Slice (Unit)`, and `Diagnostics Regression Slice (E2E)`.
+- Coverage includes evidence diagnostics rendering, `/api/evidence/[id]` metadata normalization and `404` handling, `/api/rag/search` diagnostics payloads, and the focused evidence upload Playwright flow.
+
 ## 🔍 Ripgrep Fix (MANDATORY on Windows)
 
 ### Problem: `--type mjs` Fails

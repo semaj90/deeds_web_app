@@ -173,6 +173,13 @@ Using fast-check with 100+ iterations per property for comprehensive validation.
 - bits-ui uses component-level imports for Svelte 5 (no barrel exports).
 - Prefer SSR-safe patterns and Drizzle ORM 0.44 queries.
 
+### Diagnostics Regression Checkpoint
+- Use `npm run test:diagnostics` from `sveltekit-frontend` after diagnostics-related changes.
+- Unit-only slice: `npm run test:diagnostics:unit`
+- Browser-only slice: `npm run test:diagnostics:e2e`
+- VS Code task labels: `Diagnostics Regression Slice`, `Diagnostics Regression Slice (Unit)`, and `Diagnostics Regression Slice (E2E)`.
+- This checkpoint covers evidence diagnostics rendering, `/api/evidence/[id]` metadata normalization and `404` handling, `/api/rag/search` diagnostics payloads, and the focused evidence upload Playwright flow.
+
 ## 🚨 **CRITICAL: Database Migration Safety Protocol**
 
 ### ⛔ **DO NOT PROCEED WITH THIS PUSH**

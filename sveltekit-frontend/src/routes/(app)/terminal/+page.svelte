@@ -362,6 +362,8 @@
 				</label>
 			{/if}
 			<div class="term-divider"></div>
+			<ThinkingStyleToggle bind:enabled={prefs.enableThinking} size="sm" />
+			<div class="term-divider"></div>
 			<Button onclick={clearChat} class="term-clear-btn">
 				<Icon name="trash-2" size={14} />
 				Clear chat

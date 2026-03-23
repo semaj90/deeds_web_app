@@ -5,6 +5,15 @@ import { cases, evidence } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
+function parseMetadata(value: unknown): unknown {
+  if (typeof value !== 'string') return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+}
+
 const updateEvidenceSchema = z.object({
   title: z.string().trim().min(1).max(255).optional(),
   description: z.string().max(5000).optional(),
@@ -28,7 +37,10 @@ export const GET: RequestHandler = async ({ params }) => {
       return json({ error: 'Evidence not found' }, { status: 404 });
     }
 
-    return json(item);
+    return json({
+      ...item,
+      metadata: parseMetadata(item.metadata),
+    });
   } catch (err) {
     console.error('[evidence] GET error:', err);
     return json({ error: 'Failed to fetch evidence' }, { status: 500 });

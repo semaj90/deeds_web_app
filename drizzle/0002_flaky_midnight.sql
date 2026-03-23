@@ -1,3 +1,5 @@
+-- APPLIED 2025-07 -- DO NOT RE-RUN: contains DROP TABLE and DROP COLUMN statements that will destroy production data
+-- Tables dropped: account, case_law_links, content_embeddings, export_history, law_paragraphs, report_templates, verificationToken
 CREATE TABLE "attachment_verifications" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"attachment_id" uuid NOT NULL,

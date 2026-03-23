@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-03-22T21-14-38",
+  "timestamp": "2026-03-23T00-04-31",
   "base": "http://127.0.0.1:5173",
-  "totalTimeMs": 77932,
+  "totalTimeMs": 94992,
   "results": [
     {
       "name": "evidence",
@@ -15,16 +15,15 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
-        "⚠️ Slow operation: http://127.0.0.1:5173/evidence took 2763ms",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 7191,
+      "loadTimeMs": 5914,
       "domElements": 1662,
       "resourceCount": 319,
-      "resourceSizeKB": 10253
+      "resourceSizeKB": 10248
     },
     {
       "name": "persons-of-interest",
@@ -43,10 +42,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 4294,
+      "loadTimeMs": 3747,
       "domElements": 721,
-      "resourceCount": 282,
-      "resourceSizeKB": 8710
+      "resourceCount": 281,
+      "resourceSizeKB": 8651
     },
     {
       "name": "cases-overview",
@@ -59,17 +58,13 @@
       "consoleErrors": [],
       "consoleWarnings": [
         "No available adapters.",
-        "WebGPU: No adapter available",
-        "⚠️ Slow operation: http://127.0.0.1:5173/cases/test-id/overview took 2762ms",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU: No adapter available"
       ],
       "failedRequests": [],
-      "loadTimeMs": 4665,
-      "domElements": 413,
-      "resourceCount": 205,
-      "resourceSizeKB": 7302
+      "loadTimeMs": 2388,
+      "domElements": 56,
+      "resourceCount": 187,
+      "resourceSizeKB": 6891
     },
     {
       "name": "cases-board",
@@ -88,10 +83,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 3575,
+      "loadTimeMs": 5288,
       "domElements": 397,
       "resourceCount": 210,
-      "resourceSizeKB": 7751
+      "resourceSizeKB": 7726
     },
     {
       "name": "cases-list",
@@ -110,10 +105,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1903,
+      "loadTimeMs": 3565,
       "domElements": 603,
       "resourceCount": 204,
-      "resourceSizeKB": 7822
+      "resourceSizeKB": 7772
     },
     {
       "name": "dashboard",
@@ -126,16 +121,13 @@
       "consoleErrors": [],
       "consoleWarnings": [
         "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU: No adapter available"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2343,
-      "domElements": 722,
-      "resourceCount": 233,
-      "resourceSizeKB": 8266
+      "loadTimeMs": 2260,
+      "domElements": 370,
+      "resourceCount": 83,
+      "resourceSizeKB": 2404
     },
     {
       "name": "citations",
@@ -154,10 +146,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1726,
+      "loadTimeMs": 3166,
       "domElements": 427,
       "resourceCount": 256,
-      "resourceSizeKB": 8499
+      "resourceSizeKB": 8474
     },
     {
       "name": "evidence-upload",
@@ -176,10 +168,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1716,
+      "loadTimeMs": 3448,
       "domElements": 338,
       "resourceCount": 202,
-      "resourceSizeKB": 7652
+      "resourceSizeKB": 7601
     },
     {
       "name": "active-cases",
@@ -198,10 +190,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2004,
+      "loadTimeMs": 3565,
       "domElements": 1223,
       "resourceCount": 209,
-      "resourceSizeKB": 7944
+      "resourceSizeKB": 7894
     },
     {
       "name": "analysis-center",
@@ -220,10 +212,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1684,
+      "loadTimeMs": 3197,
       "domElements": 569,
       "resourceCount": 224,
-      "resourceSizeKB": 8558
+      "resourceSizeKB": 8507
     },
     {
       "name": "command-center",
@@ -242,10 +234,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2223,
-      "domElements": 570,
-      "resourceCount": 195,
-      "resourceSizeKB": 7331
+      "loadTimeMs": 2220,
+      "domElements": 564,
+      "resourceCount": 186,
+      "resourceSizeKB": 7107
     },
     {
       "name": "evidence-library",
@@ -264,10 +256,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 4579,
+      "loadTimeMs": 6179,
       "domElements": 348,
       "resourceCount": 220,
-      "resourceSizeKB": 8076
+      "resourceSizeKB": 8026
     },
     {
       "name": "global-search",
@@ -286,10 +278,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1476,
+      "loadTimeMs": 3712,
       "domElements": 360,
       "resourceCount": 220,
-      "resourceSizeKB": 7835
+      "resourceSizeKB": 7810
     },
     {
       "name": "admin-dev-tools",
@@ -308,10 +300,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1621,
+      "loadTimeMs": 3796,
       "domElements": 431,
       "resourceCount": 242,
-      "resourceSizeKB": 8584
+      "resourceSizeKB": 8533
     },
     {
       "name": "admin-knowledge-search",
@@ -330,10 +322,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1461,
+      "loadTimeMs": 3696,
       "domElements": 310,
       "resourceCount": 195,
-      "resourceSizeKB": 7579
+      "resourceSizeKB": 7528
     },
     {
       "name": "admin-codebase-viewer",
@@ -352,10 +344,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1727,
+      "loadTimeMs": 3142,
       "domElements": 856,
       "resourceCount": 212,
-      "resourceSizeKB": 8006
+      "resourceSizeKB": 7956
     },
     {
       "name": "system-configuration",
@@ -374,10 +366,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1627,
+      "loadTimeMs": 3131,
       "domElements": 386,
       "resourceCount": 209,
-      "resourceSizeKB": 7852
+      "resourceSizeKB": 7801
     },
     {
       "name": "terminal",
@@ -396,10 +388,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 4499,
+      "loadTimeMs": 5654,
       "domElements": 341,
       "resourceCount": 199,
-      "resourceSizeKB": 7431
+      "resourceSizeKB": 7407
     },
     {
       "name": "admin-cache",
@@ -418,10 +410,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2067,
+      "loadTimeMs": 3557,
       "domElements": 528,
       "resourceCount": 198,
-      "resourceSizeKB": 7396
+      "resourceSizeKB": 7371
     },
     {
       "name": "analytics",
@@ -440,10 +432,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1516,
+      "loadTimeMs": 2281,
       "domElements": 336,
       "resourceCount": 192,
-      "resourceSizeKB": 7549
+      "resourceSizeKB": 7498
     },
     {
       "name": "cases-new",
@@ -462,10 +454,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1573,
+      "loadTimeMs": 2326,
       "domElements": 384,
       "resourceCount": 210,
-      "resourceSizeKB": 10324
+      "resourceSizeKB": 10290
     },
     {
       "name": "cases-detail",
@@ -484,10 +476,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1471,
+      "loadTimeMs": 1829,
       "domElements": 454,
       "resourceCount": 298,
-      "resourceSizeKB": 9157
+      "resourceSizeKB": 9132
     },
     {
       "name": "cases-ai",
@@ -506,10 +498,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1461,
+      "loadTimeMs": 2006,
       "domElements": 324,
       "resourceCount": 200,
-      "resourceSizeKB": 7600
+      "resourceSizeKB": 7549
     },
     {
       "name": "cases-chat",
@@ -528,10 +520,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2327,
+      "loadTimeMs": 2429,
       "domElements": 421,
       "resourceCount": 204,
-      "resourceSizeKB": 7735
+      "resourceSizeKB": 7684
     },
     {
       "name": "cases-notes",
@@ -550,10 +542,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1430,
+      "loadTimeMs": 1659,
       "domElements": 314,
       "resourceCount": 199,
-      "resourceSizeKB": 7578
+      "resourceSizeKB": 7528
     },
     {
       "name": "cases-persons",
@@ -572,10 +564,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1425,
+      "loadTimeMs": 1759,
       "domElements": 321,
       "resourceCount": 201,
-      "resourceSizeKB": 7608
+      "resourceSizeKB": 7557
     },
     {
       "name": "cases-reports",
@@ -594,10 +586,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 4416,
+      "loadTimeMs": 4646,
       "domElements": 322,
       "resourceCount": 205,
-      "resourceSizeKB": 7405
+      "resourceSizeKB": 7380
     },
     {
       "name": "cases-canvas",
@@ -616,10 +608,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 6270,
+      "loadTimeMs": 6707,
       "domElements": 321,
       "resourceCount": 202,
-      "resourceSizeKB": 7305
+      "resourceSizeKB": 7280
     },
     {
       "name": "poi-create",
@@ -638,10 +630,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1479,
+      "loadTimeMs": 1989,
       "domElements": 332,
       "resourceCount": 204,
-      "resourceSizeKB": 10037
+      "resourceSizeKB": 10003
     },
     {
       "name": "reports",
@@ -660,10 +652,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1391,
+      "loadTimeMs": 1692,
       "domElements": 402,
       "resourceCount": 196,
-      "resourceSizeKB": 7620
+      "resourceSizeKB": 7570
     },
     {
       "name": "reports-new",
@@ -682,10 +674,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1558,
+      "loadTimeMs": 1771,
       "domElements": 462,
       "resourceCount": 193,
-      "resourceSizeKB": 7649
+      "resourceSizeKB": 7599
     },
     {
       "name": "recommendations",
@@ -704,10 +696,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1468,
+      "loadTimeMs": 1764,
       "domElements": 397,
       "resourceCount": 198,
-      "resourceSizeKB": 7775
+      "resourceSizeKB": 7725
     },
     {
       "name": "evidence-analyze",
@@ -726,10 +718,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 4478,
+      "loadTimeMs": 4752,
       "domElements": 375,
       "resourceCount": 201,
-      "resourceSizeKB": 7689
+      "resourceSizeKB": 7638
     },
     {
       "name": "evidence-manage",
@@ -748,10 +740,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1583,
+      "loadTimeMs": 1838,
       "domElements": 783,
       "resourceCount": 200,
-      "resourceSizeKB": 7622
+      "resourceSizeKB": 7571
     },
     {
       "name": "evidence-upload-direct",
@@ -770,10 +762,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1501,
+      "loadTimeMs": 1811,
       "domElements": 341,
       "resourceCount": 200,
-      "resourceSizeKB": 7647
+      "resourceSizeKB": 7597
     },
     {
       "name": "admin-ai-dashboard",
@@ -792,10 +784,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 4499,
-      "domElements": 484,
-      "resourceCount": 285,
-      "resourceSizeKB": 9155
+      "loadTimeMs": 4780,
+      "domElements": 312,
+      "resourceCount": 195,
+      "resourceSizeKB": 7196
     },
     {
       "name": "admin-all-routes",
@@ -814,10 +806,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2434,
+      "loadTimeMs": 4309,
       "domElements": 392,
       "resourceCount": 213,
-      "resourceSizeKB": 8869
+      "resourceSizeKB": 8818
     },
     {
       "name": "admin-error-brain",
@@ -836,10 +828,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 5219,
+      "loadTimeMs": 5262,
       "domElements": 371,
       "resourceCount": 213,
-      "resourceSizeKB": 7489
+      "resourceSizeKB": 7464
     },
     {
       "name": "admin-phase89",
@@ -858,10 +850,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2260,
+      "loadTimeMs": 2353,
       "domElements": 310,
       "resourceCount": 195,
-      "resourceSizeKB": 7691
+      "resourceSizeKB": 7640
     },
     {
       "name": "admin-component-analysis",
@@ -875,16 +867,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
-        "⚠️ Slow operation: http://127.0.0.1:5173/admin/component-analysis took 3889ms",
+        "⚠️ Slow operation: http://127.0.0.1:5173/admin/component-analysis took 6806ms",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 5800,
+      "loadTimeMs": 8664,
       "domElements": 4455,
       "resourceCount": 198,
-      "resourceSizeKB": 7589
+      "resourceSizeKB": 7564
     },
     {
       "name": "demos-index",
@@ -898,16 +890,15 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
-        "⚠️ Slow operation: http://127.0.0.1:5173/demos took 3891ms",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 5272,
-      "domElements": 808,
+      "loadTimeMs": 8169,
+      "domElements": 821,
       "resourceCount": 198,
-      "resourceSizeKB": 7383
+      "resourceSizeKB": 7359
     },
     {
       "name": "demos-keyboard-shortcuts",
@@ -921,16 +912,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
-        "⚠️ Slow operation: http://127.0.0.1:5173/demos/keyboard-shortcuts took 3876ms",
+        "⚠️ Slow operation: http://127.0.0.1:5173/demos/keyboard-shortcuts took 6785ms",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 5259,
+      "loadTimeMs": 8151,
       "domElements": 409,
       "resourceCount": 195,
-      "resourceSizeKB": 7244
+      "resourceSizeKB": 7220
     },
     {
       "name": "demos-icons",
@@ -949,10 +940,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1888,
+      "loadTimeMs": 1876,
       "domElements": 394,
       "resourceCount": 192,
-      "resourceSizeKB": 7501
+      "resourceSizeKB": 7450
     },
     {
       "name": "demos-memory-palace",
@@ -971,10 +962,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 3871,
+      "loadTimeMs": 4056,
       "domElements": 390,
       "resourceCount": 199,
-      "resourceSizeKB": 7715
+      "resourceSizeKB": 7665
     },
     {
       "name": "demos-vector-search",
@@ -993,10 +984,10 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1866,
+      "loadTimeMs": 2138,
       "domElements": 313,
       "resourceCount": 193,
-      "resourceSizeKB": 7559
+      "resourceSizeKB": 7508
     },
     {
       "name": "legal-corpus",
@@ -1015,19 +1006,19 @@
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 1316,
+      "loadTimeMs": 1440,
       "domElements": 588,
       "resourceCount": 202,
-      "resourceSizeKB": 7822
+      "resourceSizeKB": 7772
     }
   ],
   "summary": {
     "passed": 46,
     "failed": 0,
     "total": 46,
-    "avgLoadMs": 2770,
-    "slowestRoute": "evidence",
-    "slowestLoadMs": 7191,
+    "avgLoadMs": 3567,
+    "slowestRoute": "admin-component-analysis",
+    "slowestLoadMs": 8664,
     "totalConsoleErrors": 0,
     "totalNetworkFailures": 0
   }

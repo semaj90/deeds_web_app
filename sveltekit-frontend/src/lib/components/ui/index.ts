@@ -12,7 +12,6 @@
 export { default as Button } from './button/Button.svelte';
 
 // Input & Form
-export { default as CustomCheckbox } from './checkbox/Checkbox.svelte';
 export { default as Input } from './input/Input.svelte';
 export { default as CustomLabel } from './label/Label.svelte';
 export { default as Textarea } from './textarea/Textarea.svelte';

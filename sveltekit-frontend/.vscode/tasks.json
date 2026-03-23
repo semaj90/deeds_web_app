@@ -86,6 +86,36 @@
 			"detail": "Phase 72: Check AST KB, Qdrant, and recommendations status"
 		},
 		{
+			"label": "Diagnostics Regression Slice",
+			"type": "shell",
+			"command": "npm run test:diagnostics",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": "test",
+			"detail": "Run the focused evidence/RAG diagnostics regression checkpoint"
+		},
+		{
+			"label": "Diagnostics Regression Slice (Unit)",
+			"type": "shell",
+			"command": "npm run test:diagnostics:unit",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": "test",
+			"detail": "Run the focused diagnostics Vitest subset"
+		},
+		{
+			"label": "Diagnostics Regression Slice (E2E)",
+			"type": "shell",
+			"command": "npm run test:diagnostics:e2e",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": "test",
+			"detail": "Run the focused diagnostics Playwright browser slice"
+		},
+		{
 			"label": "Phase 75: Knowledge Adapter",
 			"type": "shell",
 			"command": "node scripts/phase75-knowledge-adapter.mjs"

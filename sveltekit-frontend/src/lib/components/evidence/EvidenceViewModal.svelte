@@ -57,10 +57,33 @@
 	let isImage = $derived(fileType.startsWith('image/'));
 	let isPdf = $derived(fileType.includes('pdf'));
 	let fileUrl = $derived(doc?.fileUrl ?? doc?.file_url ?? null);
+	let metadata = $derived.by(() => {
+		const value = doc?.metadata;
+		if (!value) return {};
+		if (typeof value === 'string') {
+			try {
+				return JSON.parse(value);
+			} catch {
+				return {};
+			}
+		}
+		return value;
+	});
 	let summary = $derived(doc?.summary ?? doc?.aiSummary ?? doc?.ai_summary ?? null);
-	let entities = $derived(doc?.metadata?.entities ?? doc?.extractedEntities ?? null);
-	let tags = $derived<string[]>(doc?.tags ?? []);
+	let entities = $derived(metadata?.entities ?? doc?.extractedEntities ?? null);
+	let tags = $derived<string[]>(doc?.tags ?? metadata?.suggestedTags ?? []);
 	let status = $derived(doc?.status ?? doc?.processingStatus ?? doc?.documentStatus ?? '');
+	let processingDiagnostics = $derived((metadata as any)?.processingDiagnostics ?? null);
+	let diagnosticStages = $derived.by(() => Object.entries((processingDiagnostics as any)?.stages ?? {}));
+	let diagnosticWarnings = $derived<Array<{ stage: string; detail: string; at: string }>>((processingDiagnostics as any)?.warnings ?? []);
+
+	function statusTone(status: string): 'success' | 'warning' | 'failed' | 'pending' | 'skipped' {
+		if (status === 'success') return 'success';
+		if (status === 'warning') return 'warning';
+		if (status === 'failed') return 'failed';
+		if (status === 'pending') return 'pending';
+		return 'skipped';
+	}
 
 	// Image lightbox
 	let lightboxOpen = $state(false);
@@ -247,6 +270,45 @@
 								AI Summary
 							</h3>
 							<p class="section-body">{summary}</p>
+						</div>
+					{/if}
+
+					{#if processingDiagnostics && diagnosticStages.length > 0}
+						<div class="section diagnostics-section">
+							<h3 class="section-title">
+								<Icon name="activity" class="w-3.5 h-3.5" />
+								Processing Diagnostics
+							</h3>
+							<div class="diagnostics-meta">
+								<span>Started {formatDate((processingDiagnostics as any).startedAt)}</span>
+								{#if (processingDiagnostics as any).completedAt}
+									<span>Completed {formatDate((processingDiagnostics as any).completedAt)}</span>
+								{/if}
+								<span>{diagnosticWarnings.length} warning{diagnosticWarnings.length !== 1 ? 's' : ''}</span>
+							</div>
+							<div class="diagnostics-grid">
+								{#each diagnosticStages as [stage, record]}
+									<div class="diagnostic-card">
+										<div class="diagnostic-card-head">
+											<span class="diagnostic-stage">{stage.replace(/_/g, ' ')}</span>
+											<span class={`diagnostic-badge ${statusTone((record as any).status)}`}>{(record as any).status}</span>
+										</div>
+										{#if (record as any).detail}
+											<p class="diagnostic-detail">{(record as any).detail}</p>
+										{/if}
+									</div>
+								{/each}
+							</div>
+							{#if diagnosticWarnings.length > 0}
+								<div class="diagnostic-warning-list">
+									{#each diagnosticWarnings as warning}
+										<div class="diagnostic-warning-item">
+											<strong>{warning.stage.replace(/_/g, ' ')}</strong>
+											<span>{warning.detail}</span>
+										</div>
+									{/each}
+								</div>
+							{/if}
 						</div>
 					{/if}
 
@@ -758,6 +820,100 @@
 	.ai-icon-wrap {
 		display: inline-flex;
 		color: #a78bfa;
+	}
+	.diagnostics-section {
+		border-color: rgba(96, 165, 250, 0.16);
+		background: linear-gradient(135deg, rgba(96, 165, 250, 0.04) 0%, rgba(59, 130, 246, 0.02) 100%);
+	}
+	.diagnostics-meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem;
+		margin-bottom: 0.75rem;
+		font-size: 0.72rem;
+		color: rgba(212, 199, 163, 0.45);
+	}
+	.diagnostics-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		gap: 0.65rem;
+	}
+	.diagnostic-card {
+		padding: 0.75rem;
+		border-radius: 8px;
+		background: rgba(0, 0, 0, 0.18);
+		border: 1px solid rgba(212, 199, 163, 0.08);
+	}
+	.diagnostic-card-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+		margin-bottom: 0.4rem;
+	}
+	.diagnostic-stage {
+		font-size: 0.7rem;
+		font-weight: 600;
+		text-transform: capitalize;
+		color: rgba(212, 199, 163, 0.72);
+	}
+	.diagnostic-badge {
+		display: inline-flex;
+		padding: 0.12rem 0.45rem;
+		border-radius: 999px;
+		font-size: 0.62rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		border: 1px solid transparent;
+	}
+	.diagnostic-badge.success {
+		background: rgba(34, 197, 94, 0.1);
+		border-color: rgba(34, 197, 94, 0.2);
+		color: #4ade80;
+	}
+	.diagnostic-badge.warning {
+		background: rgba(245, 158, 11, 0.1);
+		border-color: rgba(245, 158, 11, 0.2);
+		color: #fbbf24;
+	}
+	.diagnostic-badge.failed {
+		background: rgba(239, 68, 68, 0.1);
+		border-color: rgba(239, 68, 68, 0.2);
+		color: #f87171;
+	}
+	.diagnostic-badge.pending {
+		background: rgba(96, 165, 250, 0.1);
+		border-color: rgba(96, 165, 250, 0.2);
+		color: #93c5fd;
+	}
+	.diagnostic-badge.skipped {
+		background: rgba(212, 199, 163, 0.06);
+		border-color: rgba(212, 199, 163, 0.12);
+		color: rgba(212, 199, 163, 0.55);
+	}
+	.diagnostic-detail {
+		margin: 0;
+		font-size: 0.74rem;
+		line-height: 1.45;
+		color: rgba(212, 199, 163, 0.58);
+	}
+	.diagnostic-warning-list {
+		margin-top: 0.8rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.45rem;
+	}
+	.diagnostic-warning-item {
+		display: flex;
+		flex-direction: column;
+		gap: 0.12rem;
+		padding: 0.6rem 0.7rem;
+		border-radius: 8px;
+		background: rgba(245, 158, 11, 0.08);
+		border: 1px solid rgba(245, 158, 11, 0.16);
+		font-size: 0.72rem;
+		color: rgba(251, 191, 36, 0.9);
 	}
 	.section-body {
 		font-size: 0.82rem;

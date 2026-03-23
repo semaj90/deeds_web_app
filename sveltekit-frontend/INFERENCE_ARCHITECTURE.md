@@ -1,6 +1,6 @@
 # Inference Architecture Analysis
 
-## Last Updated: March 21, 2026
+## Last Updated: March 22, 2026
 
 The whole architecture is a caching system with an inference engine behind it. On any hardware — RTX 3060 Ti or Intel i5 — the goal is the same: **run the math as few times as possible, cache everything, serve from cache.**
 

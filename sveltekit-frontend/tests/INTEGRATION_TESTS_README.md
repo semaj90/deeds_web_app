@@ -2,6 +2,28 @@
 
 This directory contains comprehensive integration tests for the Legal AI platform, covering POI management, error analysis, API endpoints, and end-to-end workflows.
 
+## Diagnostics Regression Checkpoint
+
+Run this focused checkpoint after diagnostics-related changes:
+
+```bash
+npm run test:diagnostics
+```
+
+Variants:
+
+```bash
+npm run test:diagnostics:unit
+npm run test:diagnostics:e2e
+```
+
+Matching VS Code tasks:
+- `Diagnostics Regression Slice`
+- `Diagnostics Regression Slice (Unit)`
+- `Diagnostics Regression Slice (E2E)`
+
+Coverage includes evidence diagnostics rendering, `/api/evidence/[id]` metadata normalization and `404` handling, `/api/rag/search` diagnostics payloads, and the focused evidence upload Playwright flow.
+
 ## Test Structure
 
 ### Test Files

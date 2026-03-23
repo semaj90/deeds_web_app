@@ -91,6 +91,28 @@ const ragSearchSchema = z.object({
 const QDRANT_URL = getQdrantUrl();
 const OLLAMA_URL = getOllamaUrl();
 
+type PhaseStatus = 'success' | 'warning' | 'skipped';
+
+type SearchPhaseDiagnostics = {
+  cache: { hit: boolean; source: string };
+  embedding: { status: PhaseStatus; source: string; transport: string; duration_ms?: number };
+  retrieval: {
+    status: PhaseStatus;
+    collections: string[];
+    sectionFilterUsed: boolean;
+    hybridUsed: boolean;
+    totalCandidates: number;
+  };
+  ace: { status: PhaseStatus; enabled: boolean; metadata?: Record<string, unknown> };
+  corrective_rag: {
+    status: PhaseStatus;
+    attempted: boolean;
+    reformulatedQuery?: string;
+    originalTopScore?: number;
+  };
+  dag: { status: PhaseStatus; enabled: boolean };
+};
+
 function toConfidence(score: number): ConfidenceLevel {
   if (score >= 0.85) return 'high';
   if (score >= 0.7) return 'medium';
@@ -288,13 +310,30 @@ export const POST: RequestHandler = async ({ request, url }) => {
       sectionTypes,
     } = body;
 
+    const diagnostics: SearchPhaseDiagnostics = {
+      cache: { hit: false, source: 'vector-cache' },
+      embedding: { status: 'skipped', source: 'unknown', transport: 'unknown' },
+      retrieval: {
+        status: 'skipped',
+        collections: [],
+        sectionFilterUsed: Boolean(sectionTypes?.length),
+        hybridUsed: false,
+        totalCandidates: 0,
+      },
+      ace: { status: enableACE ? 'skipped' : 'skipped', enabled: enableACE },
+      corrective_rag: { status: 'skipped', attempted: false },
+      dag: { status: 'skipped', enabled: url.searchParams.get('dag') === 'true' },
+    };
+
     // 0. Check vector result cache (Memory → Redis) for identical query+options
     const cacheOptions = { limit: top_k, threshold: min_score, documentType: caseId };
     const { entry: cachedResult } = await getVectorCache(query, cacheOptions);
     if (cachedResult) {
       const cached = cachedResult.results[0] as Record<string, unknown>;
+      diagnostics.cache = { hit: true, source: 'vector-cache' };
       return json({
         ...cached,
+        diagnostics: cached.diagnostics ?? diagnostics,
         cache: { hit: true, source: 'vector-cache', age_ms: Date.now() - cachedResult.ts },
       });
     }
@@ -313,6 +352,11 @@ export const POST: RequestHandler = async ({ request, url }) => {
       embedding = precomputedEmbedding;
       embeddingSource = 'client-precomputed';
       embeddingTransport = 'client-onnx';
+      diagnostics.embedding = {
+        status: 'success',
+        source: embeddingSource,
+        transport: embeddingTransport,
+      };
     } else {
       try {
         // Use 4-tier fallback chain: gRPC → QUIC → HTTP batch → HTTP sequential
@@ -322,6 +366,11 @@ export const POST: RequestHandler = async ({ request, url }) => {
           return embResult.vectors[0] as unknown as Float32Array;
         });
         embedding = Array.from(result);
+        diagnostics.embedding = {
+          status: 'success',
+          source: 'server-generated',
+          transport: embeddingTransport,
+        };
 
         // Also cache in vector-cache for backward compatibility
         setEmbeddingCache(query, embedding, 'embeddinggemma:latest').catch(() => {});
@@ -331,6 +380,11 @@ export const POST: RequestHandler = async ({ request, url }) => {
           const embeddingArray = await embedText(query);
           embedding = Array.from(embeddingArray);
           embeddingTransport = 'http-ollama-fallback';
+          diagnostics.embedding = {
+            status: 'warning',
+            source: 'server-fallback',
+            transport: embeddingTransport,
+          };
           setEmbeddingCache(query, embedding, 'embeddinggemma:latest').catch(() => {});
         } catch (err2) {
           return apiResponses.badGateway('Embedding generation failed');
@@ -339,6 +393,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
     }
 
     const embeddingTime = performance.now() - embedStart;
+    diagnostics.embedding.duration_ms = Math.round(embeddingTime);
 
     // 2. Search across Qdrant collections
     const collections = ['legal_documents', 'evidence_items'];
@@ -367,7 +422,13 @@ export const POST: RequestHandler = async ({ request, url }) => {
               confidence: toConfidence(r.score),
               source_type: payload.source_type ?? payload.source ?? 'document',
               source_id: String(payload.chunk_id ?? r.id),
-              source_title: payload.title ?? payload.doc_title ?? payload.heading ?? payload.file_path ?? payload.name ?? 'Unknown',
+              source_title:
+                payload.title ??
+                payload.doc_title ??
+                payload.heading ??
+                payload.file_path ??
+                payload.name ??
+                'Unknown',
               source_url: payload.url ?? undefined,
               page_num: payload.page_num ?? payload.page_start ?? undefined,
               section: payload.section ?? payload.heading ?? undefined,
@@ -378,6 +439,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
             });
           }
           if (hybridResult.metadata.searchType === 'hybrid-rrf') hybridSearchUsed = true;
+          diagnostics.retrieval.collections.push(collection);
         } catch {
           // BM42 unavailable for this collection — will fall through to dense-only below
         }
@@ -417,7 +479,13 @@ export const POST: RequestHandler = async ({ request, url }) => {
             confidence: toConfidence(r.score),
             source_type: payload.source_type ?? payload.source ?? 'document',
             source_id: String(payload.chunk_id ?? r.id),
-            source_title: payload.title ?? payload.doc_title ?? payload.heading ?? payload.file_path ?? payload.name ?? 'Unknown',
+            source_title:
+              payload.title ??
+              payload.doc_title ??
+              payload.heading ??
+              payload.file_path ??
+              payload.name ??
+              'Unknown',
             source_url: payload.url ?? undefined,
             page_num: payload.page_num ?? payload.page_start ?? undefined,
             section: payload.section ?? payload.heading ?? undefined,
@@ -427,6 +495,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
             graph_neighbors: [],
           });
         }
+        diagnostics.retrieval.collections.push(collection);
       } catch {
         // Skip unavailable collections
       }
@@ -466,6 +535,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
         // Section-filtered search unavailable — non-fatal
       }
     }
+    diagnostics.retrieval.hybridUsed = hybridSearchUsed;
 
     // Apply tag-based score boosting before final sort
     const queryTags = extractQueryTags(query);
@@ -518,9 +588,13 @@ export const POST: RequestHandler = async ({ request, url }) => {
           entityCount: aceEntityTags.length,
           kagNeighborCount: aceContext.kagNeighbors?.length ?? 0,
         };
+        diagnostics.ace = { status: 'success', enabled: true, metadata: aceMetadata };
       } catch (err) {
         console.warn('[rag/search] ACE enrichment failed (non-fatal):', err);
+        diagnostics.ace = { status: 'warning', enabled: true };
       }
+    } else {
+      diagnostics.ace = { status: 'skipped', enabled: enableACE };
     }
 
     allChunks.sort((a, b) => b.score - a.score);
@@ -529,6 +603,11 @@ export const POST: RequestHandler = async ({ request, url }) => {
     let correctiveMetadata: { reformulatedQuery?: string; originalTopScore?: number } | null = null;
     const topScore = allChunks[0]?.score ?? 0;
     if (topScore < CORRECTIVE_RAG_THRESHOLD && allChunks.length > 0) {
+      diagnostics.corrective_rag = {
+        status: 'warning',
+        attempted: true,
+        originalTopScore: topScore,
+      };
       const reformulated = await reformulateQuery(query, topScore);
       if (reformulated && reformulated !== query) {
         try {
@@ -583,10 +662,33 @@ export const POST: RequestHandler = async ({ request, url }) => {
           }
           allChunks.sort((a, b) => b.score - a.score);
           correctiveMetadata = { reformulatedQuery: reformulated, originalTopScore: topScore };
+          diagnostics.corrective_rag = {
+            status: 'success',
+            attempted: true,
+            reformulatedQuery: reformulated,
+            originalTopScore: topScore,
+          };
         } catch {
           // Corrective retry failed — non-fatal, proceed with original results
+          diagnostics.corrective_rag = {
+            status: 'warning',
+            attempted: true,
+            originalTopScore: topScore,
+          };
         }
+      } else {
+        diagnostics.corrective_rag = {
+          status: 'skipped',
+          attempted: true,
+          originalTopScore: topScore,
+        };
       }
+    } else {
+      diagnostics.corrective_rag = {
+        status: 'skipped',
+        attempted: false,
+        originalTopScore: topScore,
+      };
     }
 
     let topChunks = allChunks.slice(0, top_k);
@@ -610,15 +712,23 @@ export const POST: RequestHandler = async ({ request, url }) => {
         topChunks = topChunks.sort(
           (a, b) => idOrder.indexOf(a.source_id) - idOrder.indexOf(b.source_id)
         );
+        diagnostics.dag = { status: 'success', enabled: true };
       } catch (err) {
         console.warn('[rag/search] DAG reordering failed (non-fatal):', err);
+        diagnostics.dag = { status: 'warning', enabled: true };
       }
+    } else {
+      diagnostics.dag = { status: 'skipped', enabled: enableDAG };
     }
+
+    diagnostics.retrieval.status = allChunks.length > 0 ? 'success' : 'warning';
+    diagnostics.retrieval.totalCandidates = allChunks.length;
 
     const response: RetrieveCandidatesResponse & {
       corrective_rag?: unknown;
       hybrid_search?: string;
       embedding_transport?: string;
+      diagnostics?: SearchPhaseDiagnostics;
     } = {
       query_id: crypto.randomUUID(),
       query,
@@ -638,18 +748,21 @@ export const POST: RequestHandler = async ({ request, url }) => {
       ace: aceMetadata ?? undefined,
       corrective_rag: correctiveMetadata ?? undefined,
       embedding_transport: embeddingTransport,
+      diagnostics,
       timestamp: new Date().toISOString(),
     };
 
     // Fire-and-forget: persist search query to DB for analytics/audit
-    import('$lib/server/db/client').then(async ({ db: pgDb }) => {
-      const { ragMessages } = await import('$lib/server/db/schema-postgres.js');
-      await pgDb.insert(ragMessages).values({
-        content: query,
-        role: 'user',
-        sessionId: response.query_id,
-      });
-    }).catch(() => {});
+    import('$lib/server/db/client')
+      .then(async ({ db: pgDb }) => {
+        const { ragMessages } = await import('$lib/server/db/schema-postgres.js');
+        await pgDb.insert(ragMessages).values({
+          content: query,
+          role: 'user',
+          sessionId: response.query_id,
+        });
+      })
+      .catch(() => {});
 
     // Cache the full response (fire-and-forget, 30min TTL via vector-cache config)
     setVectorCache(

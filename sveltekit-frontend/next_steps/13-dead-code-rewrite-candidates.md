@@ -1,73 +1,85 @@
 # Dead Code Rewrite Candidates
 **Audit Date:** March 2026
-**Status:** Confirmed 0-importer orphans with HIGH/MEDIUM rewrite value
-**Rule applied:** Dead = 0 external importers at ALL chain levels, OR all importers are themselves dead
+**Status:** Refreshed against live wiring in March 2026 consolidation audit
+**Rule applied:** A rewrite candidate must still be dead. If a module is already imported by active routes, it is not a rewrite candidate.
 
 ---
 
 ## Summary
 
-Full orphan scan of `src/lib/` identified 14 confirmed dead files. After content review, 5 files have HIGH/MEDIUM rewrite value and stay in `src/lib/` as documented candidates. The remaining 9 were already absent (removed by prior sessions) and are documented below as low-priority future wiring candidates — useful when MCP tooling, RAG/KAG/DAG pipelines, OOD offline mode, or GPU dashboards get expanded.
+This file was partially stale. A live wiring check shows that several previously listed "rewrite candidates" are already in production use:
+
+- `src/lib/server/knowledge-cache.ts` is imported by the active SSE chat route
+- `src/lib/server/redis-streams.ts` is imported by active SSE routes and chat replay
+- `src/lib/command-center-manifest.ts` is imported by the active `/command-center` route
+
+That means they are no longer dead code and should be removed from the rewrite queue.
+
+Current classification after refresh:
+
+- **Defer:** `src/lib/server/vlm-document-analyzer.ts`
+- **Archive / harvest only:** `src/lib/server/document-processor.ts`
+- **Already wired, no rewrite needed:** `src/lib/server/knowledge-cache.ts`, `src/lib/server/redis-streams.ts`, `src/lib/command-center-manifest.ts`
+
+Production-readiness direction is therefore unchanged: consolidate the active evidence, RAG, and admin flows first; keep VLM-specific rewrite work last.
 
 ---
 
-## HIGH Priority Rewrite Candidates
+## Current Classification
 
-### 1. `src/lib/server/vlm-document-analyzer.ts` ← **ARCHIVED but rewrite in place**
-- **What it does:** Analyzes document images using Gemma3-Vision (via `ollama-service.ts`). Extracts legal concepts, entities, and context from document images. Generates summaries + 768-dim embeddings for RAG. Includes per-document-type prompt templates (contract, evidence, statute, case_law).
-- **Pipeline slot:** Evidence upload pipeline → stage 2 (text extraction) currently uses `pdf-parse` + OCR. Adding VLM analysis as an optional stage 2b would extract structured legal data from image-heavy documents.
-- **Integration point:** `src/routes/api/evidence/upload/+server.ts` after text extraction (line ~250).
-- **What needs changing:**
-  - Uses `detectEnvironment` from `enhanced-svelte5-types` (placeholder fn) — remove, not needed
-  - Doc ID generation: currently `doc-${Date.now()}` — use actual `evidence.id` passed in
-  - Hook into `api/evidence/upload` as an async post-processing stage (non-fatal like summarizer)
-- **Effort:** 2-3 hours (import + adapt function signature + wire to upload route)
-- **Approximate value:** Adds structured legal entity extraction from image documents — PDFs with scanned pages, photos of exhibits currently miss this.
+### 1. `src/lib/server/vlm-document-analyzer.ts` → **DEFER**
+- **Current status:** Deferred until consolidation and production-hardening are complete. See `next_steps/14-vlm-deferred-reference.md`.
+- **Why deferred:** The active evidence pipeline already includes image-aware analysis paths: YOLO object detection, `/api/vision/analyze`, and non-fatal VLM work in `api/evidence/upload`. The remaining gap is refinement, not a missing production path.
+- **When to resume:** After active evidence ingestion, RAG retrieval quality, and admin/operator surfaces are stabilized.
+- **Correct position in roadmap:** Last major ML rewrite, not a current production blocker.
 
 ---
 
-### 2. `src/lib/server/document-processor.ts` ← **ARCHIVED but rewrite in place**
-- **What it does:** Multi-engine document processing orchestrator. Runs Docling (layout + tables), Hybrid OCR (Tesseract), YOLO (object detection), ONNX (BERT-style), IBM Vision in a configurable pipeline. Returns unified `DocumentProcessingResult` with: text, entities, layout regions, detected objects, tables, images, processing method used.
-- **Pipeline slot:** Evidence upload pipeline sits between MinIO upload and embedding. The current upload route calls `extractTextHybrid(buffer, filename)` — a single-engine approach. `DocumentProcessor` would replace/wrap this with multi-engine fallback.
-- **Integration point:** `api/evidence/upload/+server.ts` around line 300 (replace `extractTextHybrid` call).
-- **What needs changing:**
-  - Replace `await fs.readFile(filePath)` with buffer passed in (MinIO already has the buffer)
-  - The Docling integration calls `isDoclingAvailable()` from `docling.js` — that file likely exists in the ML stack (check `src/lib/server/` for docling)
-  - OCR hybrid stub at line ~105 (catch block is empty) — fill in `extractTextHybrid` call
-  - Merge logic at bottom is incomplete (returns dummy result) — wire properly
-- **Effort:** 4-6 hours (fill in stubs, adapt buffer API, add to upload pipeline as feature-flagged stage)
-- **Approximate value:** Table extraction + layout detection for legal documents (PDFs with tables of statutes, contracts with clause numbering).
+### 2. `src/lib/server/document-processor.ts` → **ARCHIVE / HARVEST ONLY**
+- **Why not rewrite-now:** The live upload route already performs hybrid extraction, LangExtract sectioning, embeddings, Qdrant indexing, summarization, entity extraction, forensics, and parallel YOLO/VLM analysis. Reintroducing an older orchestrator would duplicate an already-active pipeline.
+- **What to keep:** Harvest ideas around table/layout orchestration only if a concrete gap appears in evidence ingestion quality.
+- **What not to do:** Do not spend consolidation time reviving this file as a parallel processor.
 
 ---
 
-## MEDIUM Priority Rewrite Candidates
+## Remove From Rewrite Queue
 
-### 3. `src/lib/server/knowledge-cache.ts` ← **ARCHIVED but rewrite in place**
-- **What it does:** Redis caching layer specifically for Qdrant search results and embeddings. Uses SHA-256 for embedding cache keys, MD5 for search result keys. TTLs: 1hr for embeddings, 30min for search, 5min for stats, 1min for health. Tracks cache hit/miss metrics in Redis counters.
-- **Pipeline slot:** RAG search pipeline. Currently `src/lib/server/vector/qdrant-manager.ts` does raw Qdrant queries on every request. This file would add a cache layer between the request and Qdrant.
-- **Integration point:** `src/lib/server/rag-pipeline.ts` — wrap the `qdrantManager.search()` call with `getSearchCacheKey()` + `cacheSearchResults()`.
-- **Issue:** Creates its own Redis connection (`new Redis(...)`) instead of using the singleton from `$lib/server/redis`. Should be refactored to import the singleton before wiring.
-- **Effort:** 2-3 hours (refactor Redis import, wire to rag-pipeline.ts)
-- **Approximate value:** Eliminates redundant Qdrant calls for repeated legal queries (same brief cited multiple times in a session).
+### 3. `src/lib/server/knowledge-cache.ts` → **ALREADY WIRED**
+- **Live evidence:** Imported by `src/routes/api/sse/chat/+server.ts` for cached embeddings.
+- **Implication:** This is active production code, not dead code.
+- **Action:** Remove from rewrite candidate tracking.
 
 ---
 
-### 4. `src/lib/server/redis-streams.ts` ← **ARCHIVED but rewrite in place**
-- **What it does:** Typed Redis Streams helpers (`XADD`, `XRANGE`, `XTRIM`). Produces/consumes token chunks keyed as `stream:tokens:{requestId}`. Each entry has `seq`, `chunk`, `meta`. Supports stream trimming (MAXLEN ~1000).
-- **Pipeline slot:** SSE chat streaming. Currently SSE streams are ephemeral — if the client disconnects and reconnects, the stream restarts. Redis Streams would enable resume semantics.
-- **Integration point:** `src/routes/api/sse/[id]/+server.ts` — on reconnect, read from `stream:tokens:{id}` to replay missed tokens.
-- **Note:** Uses `redis.xadd()` and `redis.xrange()` — the `ioredis` singleton in `$lib/server/redis` supports these methods. The `(redis as any)` casts can be replaced with typed calls.
-- **Effort:** 3-4 hours (wire to SSE route, add reconnect handling in SSE client)
-- **Approximate value:** Chat session resume after network drop — useful for long LLM responses.
+### 4. `src/lib/server/redis-streams.ts` → **ALREADY WIRED**
+- **Live evidence:** Imported by `src/routes/api/sse/[id]/+server.ts`, `src/routes/api/sse/chat/+server.ts`, and `src/routes/api/chat/replay/+server.ts`.
+- **Implication:** Resume/replay semantics are already part of the active SSE path.
+- **Action:** Remove from rewrite candidate tracking.
 
 ---
 
-### 5. `src/lib/command-center-manifest.ts` ← **ARCHIVED but rewrite in place**
-- **What it does:** Canonical route registry for the app. Defines `CommandCenterRoute` type (with `href`, `label`, `description`, `kind`, `group`, `badges`, `errorState`, `errorCount`). Contains `COMMAND_CENTER_MANIFEST` — a full map of all app routes organized by tab (cases, evidence, persons, system, routes). Also includes `Phase72Task` type definitions.
-- **Pipeline slot:** The `/command-center` route (`src/routes/(app)/command-center/`) already exists. This manifest would give it its data. Also useful for a global command palette (Ctrl+K) to search routes.
-- **Integration point:** `src/routes/(app)/command-center/+page.server.ts` — load the manifest, expose as `data.routes`. Or import directly in the page component.
-- **Effort:** 1-2 hours (import in /command-center route, render route list)
-- **Approximate value:** Gives the command center a live data source instead of hard-coded route lists. Could drive a Ctrl+K palette.
+### 5. `src/lib/command-center-manifest.ts` → **ALREADY WIRED**
+- **Live evidence:** Imported by `src/routes/(app)/command-center/+page.server.ts` and used by the active command-center UI.
+- **Implication:** The manifest is already the live data source.
+- **Action:** Remove from rewrite candidate tracking.
+
+---
+
+## Production-Readiness Notes
+
+### Evidence flow
+- `src/routes/api/evidence/upload/+server.ts` is the active production ingestion path.
+- It already combines MinIO upload, PostgreSQL persistence, OCR/Docling-aware extraction, LangExtract sectioning, embeddings, Qdrant indexing, summarization, entity extraction, forensics, and parallel YOLO/VLM analysis.
+- Recommendation: harden and validate this path rather than replacing it with legacy processors.
+
+### RAG flow
+- RAG is route-driven now, not centered on a single `rag-pipeline.ts` file.
+- Active retrieval and caching are present in route/server modules such as `src/routes/api/rag/search/+server.ts`, `src/lib/server/rag/evidenceRag.ts`, and the SSE chat route.
+- Recommendation: optimize retrieval quality and observability in-place; do not spend time reviving older "missing pipeline" abstractions.
+
+### Admin flow
+- `src/routes/(app)/admin/ai-dashboard/+page.svelte` remains an active browser-only operator surface, with SSR intentionally disabled in `+page.ts` because of ONNX/WebGPU/browser-only dependencies.
+- Recommendation: treat admin AI dashboard work as production hardening and operator UX cleanup, not dead-code revival.
 
 ---
 
@@ -154,12 +166,14 @@ All 9 files below were already absent from `src/lib/` (removed by prior sessions
 
 ## Execution Order (when ready to implement)
 
-**HIGH/MEDIUM — active pipeline improvements:**
-1. **command-center-manifest** — lowest effort, highest visibility, 1-2 hrs
-2. **knowledge-cache** — performance win, no new features needed, 2-3 hrs
-3. **vlm-document-analyzer** — adds new evidence capability, 2-3 hrs
-4. **redis-streams** — SSE resume, 3-4 hrs
-5. **document-processor** — largest scope, needs docling integration verified, 4-6 hrs
+**Current rewrite queue:**
+1. **vlm-document-analyzer** — defer until after consolidation and production hardening
+
+**Do not schedule as rewrites:**
+2. **document-processor** — archive / harvest only
+3. **knowledge-cache** — already active
+4. **redis-streams** — already active
+5. **command-center-manifest** — already active
 
 **LOW — deferred, wire when pipeline area expands:**
 6. **mcp-context72 + mcp-memory-read-graph** — MCP tool registration, 1-2 hrs each; prerequisite: MCP server expansion for RAG/KAG/DAG agent tools

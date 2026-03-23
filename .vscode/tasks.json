@@ -60,6 +60,57 @@
       }
     },
     {
+      "label": "Diagnostics Regression Slice",
+      "type": "shell",
+      "command": "npm run test:diagnostics",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "Diagnostics Regression Slice (Unit)",
+      "type": "shell",
+      "command": "npm run test:diagnostics:unit",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "Diagnostics Regression Slice (E2E)",
+      "type": "shell",
+      "command": "npm run test:diagnostics:e2e",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
       "label": "Vite Build",
       "type": "shell",
       "command": "npx vite build",

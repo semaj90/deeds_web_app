@@ -229,6 +229,36 @@ If the component is used ONLY by a `/demos/*` route:
 2. If not listed → the demo is unreachable from navigation → flag as **UNLISTED_DEMO**
 3. Verify the demo page loads without 500 errors (if dev server is running)
 
+## Pre-Archive "Should Keep?" Checklist
+
+Before archiving ANY file, run this checklist to prevent discarding genuinely useful assets:
+
+| # | Check | If YES → | Example |
+|---|-------|----------|---------|
+| 1 | **Reusable logic?** Does it contain generic patterns (error analysis, conflict resolution, validation frameworks) vs one-time hardcoded fixes? | KEEP — move to `scripts/` or appropriate lib dir | `analyze-errors.ps1` (generic error ranker) vs `fix-phase34b-semantic.ps1` (one-time) |
+| 2 | **Active dependency?** Is the underlying technology still in use? (`ts-morph`, `cmake`, `caddy`, `sse`, `rabbitmq`) | KEEP — tool is still needed | `setup-ts-morph.ps1` kept because `ast-chunker.ts` actively imports ts-morph |
+| 3 | **Health/diagnostic value?** Does it check infrastructure health, validate deployments, or smoke-test services? | KEEP — move to `scripts/health/` or `scripts/diagnostics/` | `quick-health.ps1` checks 10+ services |
+| 4 | **Test coverage gap?** Does it test something Playwright/Vitest doesn't cover (auth flows, RAG API, MCP tools)? | KEEP — move to `scripts/tests/` | `smoke-test.sh`, `test-rag-api.ps1` |
+| 5 | **Build pipeline?** Is it part of the GPU/CUDA/ONNX/Docker build process? | KEEP — move to `scripts/build/` | `build-cuda-rag.sh` (auto-detects GPU arch) |
+| 6 | **Parameterizable?** Could hardcoded paths/patterns be extracted into args to make it a general tool? | KEEP if effort < 15 min | `find-minio-endpoints.ps1` → generic endpoint discovery |
+| 7 | **Empty/stub?** Is it < 5 lines with no real content? | ARCHIVE — no value | Empty `.ps1` stubs |
+| 8 | **Phase-locked?** Does the filename contain a specific completed phase number (phase30, phase78, phase89)? | ARCHIVE — one-time migration tool | `PHASE78_VERIFY.ps1`, `RUN_PHASE89_ALL.ps1` |
+
+**Decision flow:**
+```
+File → Check 7 (empty?) → YES → ARCHIVE
+      → Check 8 (phase-locked?) → YES → ARCHIVE
+      → Check 1-6 (any YES?) → KEEP (organize into scripts/ subdirectory)
+      → All NO → ARCHIVE
+```
+
+**Organization targets for KEEP files:**
+- `scripts/setup/` — installation, environment configuration
+- `scripts/health/` — service health checks, production validation
+- `scripts/tests/` — manual test suites, smoke tests
+- `scripts/build/` — GPU, CUDA, Docker build tools
+- `scripts/diagnostics/` — code analysis, conflict resolution, endpoint discovery
+
 ## Rules
 
 - NEVER delete files — always move to `deeds_labs/`

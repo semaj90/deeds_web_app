@@ -156,6 +156,16 @@ describe('/api/rag/search ACE route integration', () => {
       entityCount: 3,
       kagNeighborCount: 1,
     });
+    expect(body.diagnostics).toEqual(
+      expect.objectContaining({
+        cache: expect.objectContaining({ hit: false, source: 'vector-cache' }),
+        embedding: expect.objectContaining({ status: 'success', source: 'client-precomputed', transport: 'client-onnx' }),
+        retrieval: expect.objectContaining({ status: 'success', hybridUsed: true, totalCandidates: expect.any(Number) }),
+        ace: expect.objectContaining({ status: 'success', enabled: true, metadata: { entityCount: 3, kagNeighborCount: 1 } }),
+        corrective_rag: expect.objectContaining({ status: expect.any(String), attempted: expect.any(Boolean) }),
+        dag: expect.objectContaining({ status: 'skipped', enabled: false }),
+      })
+    );
     expect(body.hybrid_search).toBe('bm42-rrf');
     expect(body.total_found).toBeGreaterThan(0);
     expect(body.chunks[0].source_title).toBe('Search Warrant Guide');
@@ -198,6 +208,20 @@ describe('/api/rag/search ACE route integration', () => {
               entityCount: 3,
               kagNeighborCount: 1,
             },
+            diagnostics: {
+              cache: { hit: false, source: 'vector-cache' },
+              embedding: { status: 'success', source: 'server-generated', transport: 'grpc', duration_ms: 4 },
+              retrieval: {
+                status: 'success',
+                collections: ['legal_documents'],
+                sectionFilterUsed: false,
+                hybridUsed: false,
+                totalCandidates: 1,
+              },
+              ace: { status: 'success', enabled: true, metadata: { entityCount: 3, kagNeighborCount: 1 } },
+              corrective_rag: { status: 'skipped', attempted: false, originalTopScore: 0.94 },
+              dag: { status: 'skipped', enabled: false },
+            },
             timestamp: '2026-03-21T00:00:00.000Z',
           },
         ],
@@ -234,6 +258,14 @@ describe('/api/rag/search ACE route integration', () => {
       entityCount: 3,
       kagNeighborCount: 1,
     });
+    expect(body.diagnostics).toEqual(
+      expect.objectContaining({
+        cache: { hit: false, source: 'vector-cache' },
+        embedding: expect.objectContaining({ status: 'success', source: 'server-generated', transport: 'grpc' }),
+        retrieval: expect.objectContaining({ status: 'success', totalCandidates: 1 }),
+        ace: { status: 'success', enabled: true, metadata: { entityCount: 3, kagNeighborCount: 1 } },
+      })
+    );
     expect(body.chunks[0].source_title).toBe('Cached Search Warrant Guide');
     expect(mockAssembleACEContext).not.toHaveBeenCalled();
     expect(mockSparseHybridSearch).not.toHaveBeenCalled();

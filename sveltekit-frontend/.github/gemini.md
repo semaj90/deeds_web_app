@@ -1,5 +1,13 @@
 # Google Gemini Context: Phase 76-87 RAG/KAG Pipeline & Knowledge Base
 
+## Current Diagnostics Regression Checkpoint
+
+- Run `npm run test:diagnostics` from `sveltekit-frontend` after diagnostics-related changes.
+- Unit-only slice: `npm run test:diagnostics:unit`
+- Browser-only slice: `npm run test:diagnostics:e2e`
+- VS Code task labels: `Diagnostics Regression Slice`, `Diagnostics Regression Slice (Unit)`, and `Diagnostics Regression Slice (E2E)`.
+- Coverage includes evidence diagnostics rendering, `/api/evidence/[id]` metadata normalization and `404` handling, `/api/rag/search` diagnostics payloads, and the focused evidence upload Playwright flow.
+
 ## 📚 Latest Technology Stack (Jan 2026)
 
 ### TypeScript 5.6+

@@ -50,6 +50,7 @@
 		{ href: '/demos/nes-routes', label: 'NES Route Map', description: 'Retro NES-style route visualization with pixel art styling and interactive navigation map.', icon: 'map', lines: 200, category: 'gaming' },
 		{ href: '/demos/nier-showcase', label: 'NieR:Automata UI', description: 'YoRHa-inspired UI components: diamond modals, CRT effects, terminal output, and system diagnostics.', icon: 'monitor', lines: 350, category: 'gaming' },
 		{ href: '/demos/yorha-icons', label: 'YoRHa Icon System', description: 'Celestial showcase of 12 monochrome legal SVG icons with interactive size, stroke, and glow controls.', icon: 'star', lines: 290, category: 'ui' },
+		{ href: '/demos/svelte5-components', label: 'Svelte 5 Components', description: 'Runes-based UI component showcase: Card, Tabs, Input, Avatar, Badge, Progress, and Dialog patterns.', icon: 'component', lines: 180, category: 'ui' },
 	];
 
 	const showcases: Demo[] = [
@@ -58,7 +59,7 @@
 		{ href: '/evidence-library', label: 'Evidence Library', description: 'Evidence analysis with custody timeline, police reports, stats panel, and RAG document grid.', icon: 'library', category: 'ai' },
 		{ href: '/citations', label: 'Citations & KB Search', description: 'Legal glossary, statutes, and precedents with RAG semantic search and pgvector cosine ranking.', icon: 'scroll', category: 'ai' },
 		{ href: '/cases', label: 'Case Management', description: 'Full CRUD with overview, evidence manager, AI document drafting, and case scoring integration.', icon: 'folder', category: 'ai' },
-		{ href: '/nier-showcase', label: 'NieR Showcase', description: 'YoRHa UI suite: CommandCenter, Terminal, SystemStatus, Dialogs, DiamondModal, and NES CRT.', icon: 'monitor', category: 'gaming' },
+		{ href: '/demos/nier-showcase', label: 'NieR Showcase', description: 'YoRHa UI suite: CommandCenter, Terminal, SystemStatus, Dialogs, DiamondModal, and NES CRT.', icon: 'monitor', category: 'gaming' },
 		{ href: '/system-status', label: 'System Status', description: 'System health dashboard with StatusCards, SystemStatusPanel, and SystemOverview.', icon: 'activity', category: 'system' },
 		{ href: '/admin/ai-dashboard', label: 'AI Dashboard', description: '35+ AI components: RAG pipeline, ONNX/Ollama chat, source validation, and case intake wizard.', icon: 'brain', category: 'ai' },
 		{ href: '/admin/dev-tools', label: 'Dev Tools', description: 'Cache dashboard, Redis stats, NES memory banks, GPU metrics, and knowledge base seeder.', icon: 'wrench', category: 'system' },
