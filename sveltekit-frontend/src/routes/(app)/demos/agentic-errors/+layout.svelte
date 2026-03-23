@@ -14,9 +14,9 @@
 					</h1>
 					<div class="flex gap-2">
 						<a
-							href="/agentic-errors"
+							href="/demos/agentic-errors"
 							class="px-3 py-1.5 rounded-lg text-sm font-semibold uppercase tracking-wide transition-all {
-								page.url.pathname === '/agentic-errors'
+								page.url.pathname === '/demos/agentic-errors'
 									? 'bg-accent text-white shadow-md'
 									: 'text-black/70 hover:text-black hover:bg-black/10'
 							}"
@@ -24,9 +24,9 @@
 							Dashboard
 						</a>
 						<a
-							href="/agentic-errors/analysis"
+							href="/demos/agentic-errors/analysis"
 							class="px-3 py-1.5 rounded-lg text-sm font-semibold uppercase tracking-wide transition-all {
-								page.url.pathname === '/agentic-errors/analysis'
+								page.url.pathname === '/demos/agentic-errors/analysis'
 									? 'bg-accent text-white shadow-md'
 									: 'text-black/70 hover:text-black hover:bg-black/10'
 							}"
@@ -34,9 +34,9 @@
 							AI Analysis
 						</a>
 						<a
-							href="/agentic-errors/rag-kag"
+							href="/demos/agentic-errors/rag-kag"
 							class="px-3 py-1.5 rounded-lg text-sm font-semibold uppercase tracking-wide transition-all {
-								page.url.pathname === '/agentic-errors/rag-kag'
+								page.url.pathname === '/demos/agentic-errors/rag-kag'
 									? 'bg-accent text-white shadow-md'
 									: 'text-black/70 hover:text-black hover:bg-black/10'
 							}"
@@ -44,9 +44,9 @@
 							RAG+KAG
 						</a>
 						<a
-							href="/agentic-errors/fastmcp"
+							href="/demos/agentic-errors/fastmcp"
 							class="px-3 py-1.5 rounded-lg text-sm font-semibold uppercase tracking-wide transition-all {
-								page.url.pathname === '/agentic-errors/fastmcp'
+								page.url.pathname === '/demos/agentic-errors/fastmcp'
 									? 'bg-accent text-white shadow-md'
 									: 'text-black/70 hover:text-black hover:bg-black/10'
 							}"

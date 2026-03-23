@@ -51,6 +51,8 @@
 		{ href: '/demos/nier-showcase', label: 'NieR:Automata UI', description: 'YoRHa-inspired UI components: diamond modals, CRT effects, terminal output, and system diagnostics.', icon: 'monitor', lines: 350, category: 'gaming' },
 		{ href: '/demos/yorha-icons', label: 'YoRHa Icon System', description: 'Celestial showcase of 12 monochrome legal SVG icons with interactive size, stroke, and glow controls.', icon: 'star', lines: 290, category: 'ui' },
 		{ href: '/demos/svelte5-components', label: 'Svelte 5 Components', description: 'Runes-based UI component showcase: Card, Tabs, Input, Avatar, Badge, Progress, and Dialog patterns.', icon: 'component', lines: 180, category: 'ui' },
+		{ href: '/demos/page-layouts', label: 'Page Layouts', description: 'Split/dark/warm layout modes with settings panel, tab navigation, and micro-interaction previews.', icon: 'columns', lines: 250, category: 'ui' },
+		{ href: '/demos/unified-dashboard', label: 'Unified Dashboard', description: 'Full sidebar navigation dashboard with command palette, collapsible nav, and section-based content routing.', icon: 'layout-dashboard', lines: 300, category: 'ui' },
 	];
 
 	const showcases: Demo[] = [

@@ -68,7 +68,7 @@
 		if (onclick) {
 			onclick();
 		} else {
-			goto('/ai-assistant');
+			goto('/terminal');
 		}
 		isActive = true;
 	}
