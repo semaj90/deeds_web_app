@@ -48,6 +48,7 @@ export interface RouteStats {
     dev: number;
     admin: number;
     api: number;
+    system: number;
     other: number;
     archived: number;
   };
@@ -416,6 +417,15 @@ function extractGroup(relativePath: string): string {
 
   if (relativePath.startsWith('api/')) return 'api';
   if (relativePath.startsWith('admin/')) return 'admin';
+
+  // Standalone system routes (auth, health, infra)
+  const systemPrefixes = [
+    'login', 'register', 'health', 'indexing', '.well-known',
+    'acp', 'couchdb-analytics', 'knowledge', 'legal-corpus-premium',
+    'chat', 'rag-search', 'studio', 'webgpu-similarity'
+  ];
+  const firstSegment = relativePath.split('/')[0];
+  if (systemPrefixes.includes(firstSegment)) return 'system';
 
   return 'other';
 }
