@@ -200,8 +200,9 @@ This directory contains categorized TODO items organized by feature area and pri
 6. ~~**MCP Report/Case/Citation Tools**~~ — ✅ **ALREADY DONE** — 41 tools including reports (list/create/generate/update/delete/export), cases (load/create/update/delete), citations (search/list/add)
 7. **Qdrant Collection Consolidation** — 48 collections; 15 unreferenced but user chose to keep for now
 8. ~~**Frontend Analytics Worker**~~ — ✅ **DONE** — 12 `analytics.track()` calls across 10 routes (dashboard, cases, reports, evidence, POI, terminal, search, citations, analysis-center)
-9. **TRT-LLM Triton Deployment** — Engine build pending
-10. **Unit Test Suite** — Vitest: 33 tests (token-tracker + cases schemas), Playwright: 46/46
+9. **TRT-LLM Triton Deployment** — DEFERRED (big feature, requires WSL2 for engine build + Triton server)
+10. **VLM Unsloth Fine-Tuning** — DEFERRED (Colab notebook for gemma3-VLM QLoRA, do after routes consolidation)
+11. **Unit Test Suite** — Vitest: 33 tests (token-tracker + cases schemas), Playwright: 46/46
 
 ---
 
@@ -225,7 +226,7 @@ Core infrastructure phases fully implemented:
 - Phase 13: Agentic tools (~55% — 9 of planned 14 MCP tools)
 - Phase 99: Svelte 5 auto-migration (ABANDONED — corrupted 83 files)
 - Phase 107+: Ongoing error remediation cycles
-- TRT-LLM/Triton deployment (planning complete, execution pending)
+- TRT-LLM/Triton deployment — DEFERRED (big feature, requires WSL2)
 
 ### Reference Documentation (19 files, 13%)
 - Design docs, architecture decisions, historical notes
@@ -233,7 +234,7 @@ Core infrastructure phases fully implemented:
 
 ### Key Gaps Identified
 1. ~~**MCP tools incomplete**~~ — ✅ Expanded to **36 tools** (was 9). Remaining: report/case/citation tools
-2. **TRT-LLM deployment** — Triton server config ready, engine build pending
+2. **TRT-LLM deployment** — Triton server config ready, engine build pending — DEFERRED (needs WSL2, big feature enhancement of Ollama pipeline)
 3. **Test coverage** — 46/46 Playwright screenshots, Vitest started, unit coverage still low
 4. ~~**Phase 99 recovery**~~ — ✅ Handled (corrupted files archived to deeds_labs/, 5 active routes fixed)
 5. **Zod validation** — 118/258 routes (46%), 140 remaining

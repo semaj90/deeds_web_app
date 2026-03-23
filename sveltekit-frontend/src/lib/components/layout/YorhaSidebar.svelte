@@ -158,13 +158,13 @@
 		background:
 			radial-gradient(circle at top left, rgba(200, 195, 160, 0.08), transparent 34%),
 			linear-gradient(180deg, #211d16 0%, #17140f 52%, #12100c 100%);
-		border-right: 1px solid rgba(138, 133, 94, 0.38);
+		border-right: 1px solid rgba(158, 150, 110, 0.5);
 		display: flex;
 		flex-direction: column;
 		z-index: 1000;
 		transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 		font-family: 'JetBrains Mono', monospace;
-		color: rgba(232, 228, 200, 0.88);
+		color: rgba(232, 228, 200, 0.95);
 		box-shadow:
 			inset -1px 0 0 rgba(255, 255, 255, 0.03),
 			12px 0 32px rgba(0, 0, 0, 0.35);
@@ -205,7 +205,7 @@
 	.subtitle {
 		font-size: 0.625rem;
 		margin: 0.25rem 0 0 0;
-		color: rgba(200, 195, 160, 0.46);
+		color: rgba(200, 195, 160, 0.65);
 		letter-spacing: 0.05em;
 	}
 
@@ -217,7 +217,7 @@
 		height: 24px;
 		border: 1px solid rgba(138, 133, 94, 0.28);
 		background: rgba(216, 212, 184, 0.04);
-		color: rgba(232, 228, 200, 0.7);
+		color: rgba(232, 228, 200, 0.85);
 		cursor: pointer;
 		display: flex;
 		align-items: center;
@@ -249,7 +249,7 @@
 		padding: 0.5rem 0.75rem;
 		margin: 1px 0.5rem;
 		text-decoration: none;
-		color: rgba(232, 228, 200, 0.68);
+		color: rgba(232, 228, 200, 0.88);
 		font-size: 0.6875rem;
 		font-weight: 500;
 		letter-spacing: 0.05em;
@@ -266,9 +266,9 @@
 	}
 
 	.nav-item:hover {
-		background: rgba(216, 212, 184, 0.06);
-		color: #f0edd4;
-		border-color: rgba(138, 133, 94, 0.18);
+		background: rgba(216, 212, 184, 0.1);
+		color: #f5f1db;
+		border-color: rgba(138, 133, 94, 0.28);
 	}
 
 	.nav-item.active {
@@ -287,7 +287,7 @@
 	}
 
 	.admin-item {
-		opacity: 0.72;
+		opacity: 0.85;
 	}
 
 	.admin-item:hover,
@@ -316,7 +316,7 @@
 	.section-label {
 		font-size: 0.5625rem;
 		font-weight: 700;
-		color: rgba(200, 195, 160, 0.46);
+		color: rgba(200, 195, 160, 0.68);
 		letter-spacing: 0.1em;
 	}
 
@@ -361,11 +361,11 @@
 
 	.system-status {
 		margin-bottom: 0.25rem;
-		color: rgba(200, 195, 160, 0.58);
+		color: rgba(200, 195, 160, 0.72);
 	}
 
 	.timestamp {
-		color: rgba(200, 195, 160, 0.36);
+		color: rgba(200, 195, 160, 0.52);
 		font-size: 0.5rem;
 		font-variant-numeric: tabular-nums;
 	}

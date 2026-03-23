@@ -466,8 +466,8 @@
 
 	.modal-panel {
 		width: 100%;
-		max-width: 680px;
-		max-height: 90vh;
+		max-width: 960px;
+		max-height: 92vh;
 		background: #131519;
 		border: 1px solid rgba(212, 199, 163, 0.1);
 		border-radius: 14px;
@@ -665,7 +665,7 @@
 	}
 	.preview-img {
 		width: 100%;
-		max-height: 280px;
+		max-height: 520px;
 		object-fit: contain;
 		display: block;
 	}
@@ -689,7 +689,7 @@
 	}
 	.pdf-iframe {
 		width: 100%;
-		height: 420px;
+		height: 560px;
 		border: none;
 		border-radius: 10px 10px 0 0;
 		background: #1a1a1a;

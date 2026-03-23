@@ -64,9 +64,11 @@
 			totalRoutes: 0, activeRoutes: 0, archivedRoutes: 0,
 			apiEndpoints: 0, pageServers: 0, pages: 0, categories: 0,
 			methodCounts: { GET: 0, POST: 0, PUT: 0, DELETE: 0, PATCH: 0, load: 0, actions: 0 },
-			groupCounts: { app: 0, dev: 0, admin: 0, api: 0, other: 0, archived: 0 },
+			groupCounts: { app: 0, dev: 0, admin: 0, api: 0, system: 0, other: 0, archived: 0 },
 			authRequired: 0, sse: 0
-		}
+		},
+		crossRefs: [] as any[],
+		deadRoutes: [] as any[]
 	};
 
 	const IDB_NAME = 'deeds-route-cache';
@@ -117,6 +119,8 @@
 	let demoCount = $derived(apiMetadata.allEndpoints.filter((e: RouteEndpoint) => e.path.includes('/demos/')).length);
 	let demoEndpoints = $derived(apiMetadata.allEndpoints.filter((e: RouteEndpoint) => e.path.includes('/demos/')));
 	let categoryCount = $derived(apiMetadata.categories.length);
+	let systemEndpoints = $derived(apiMetadata.allEndpoints.filter((e: RouteEndpoint) => e.group === 'system'));
+	let showSystem = $state(false);
 
 	async function loadErrorBrainHistory() {
 		if (errorBrainLoading) return;
@@ -448,6 +452,10 @@
 			<span class="stat-label">DEMOS</span>
 			<span class="stat-value">{demoCount}</span>
 		</button>
+		<button class="stat-box stat-system stat-clickable" onclick={() => { showSystem = !showSystem; }}>
+			<span class="stat-label">SYSTEM</span>
+			<span class="stat-value">{apiMetadata.stats.groupCounts.system}</span>
+		</button>
 		<div class="stat-box stat-cats">
 			<span class="stat-label">CATEGORIES</span>
 			<span class="stat-value">{categoryCount}</span>
@@ -487,6 +495,9 @@
 		</button>
 		<button class="cap-item cap-review" onclick={() => { showDevReview = !showDevReview; }}>
 			{showDevReview ? '[-]' : '[+]'} DEV REVIEW
+		</button>
+		<button class="cap-item cap-system" onclick={() => { showSystem = !showSystem; }}>
+			{showSystem ? '[-]' : '[+]'} SYSTEM ({systemEndpoints.length})
 		</button>
 
 		{#if serverStats.totalClusters > 0}
@@ -585,7 +596,48 @@
 			<DevReviewPanel
 				endpoints={apiMetadata.allEndpoints}
 				stats={apiMetadata.stats}
+				crossRefs={apiMetadata.crossRefs ?? []}
+				deadRoutes={apiMetadata.deadRoutes ?? []}
 			/>
+		</div>
+	{/if}
+
+	<!-- System Routes Panel (collapsible) -->
+	{#if showSystem}
+		<div class="system-panel">
+			<div class="system-header">
+				<span class="system-title">SYSTEM & STANDALONE ROUTES</span>
+				<span class="system-count">{systemEndpoints.length} routes</span>
+			</div>
+			<div class="system-desc">
+				Routes outside (app)/(dev)/api groups: auth, health, infra, tools
+			</div>
+			<div class="system-grid">
+				{#each systemEndpoints as ep}
+					<div class="system-card">
+						<div class="system-card-header">
+							<span class="system-type-badge" class:system-page={ep.type === 'page'} class:system-api={ep.type === 'api'} class:system-server={ep.type === 'page-server'}>
+								{ep.type === 'api' ? 'API' : ep.type === 'page-server' ? 'SRV' : 'PG'}
+							</span>
+							<span class="system-path">{ep.path}</span>
+							{#if ep.hasAuth}
+								<span class="system-auth">GUARDED</span>
+							{/if}
+						</div>
+						{#if ep.description}
+							<p class="system-card-desc">{ep.description}</p>
+						{/if}
+						<div class="system-card-actions">
+							{#if ep.type === 'page' || ep.type === 'page-server'}
+								<a href={ep.path} class="system-visit-btn">VISIT</a>
+							{/if}
+							{#if ep.absolutePath}
+								<a href="vscode://file/{ep.absolutePath}" class="system-edit-btn">[EDIT]</a>
+							{/if}
+						</div>
+					</div>
+				{/each}
+			</div>
 		</div>
 	{/if}
 
@@ -1241,8 +1293,30 @@
 		background: rgba(255, 102, 51, 0.1);
 	}
 
+	.cap-item.cap-system {
+		color: #cc99ff;
+		background: none;
+		border: 1px solid #cc99ff;
+		padding: 0.15rem 0.4rem;
+		cursor: pointer;
+		font-family: inherit;
+		font-size: inherit;
+		letter-spacing: inherit;
+	}
+
+	.cap-item.cap-system:hover {
+		background: rgba(204, 153, 255, 0.1);
+	}
+
+	.stat-system {
+		border-color: #cc99ff !important;
+	}
+
+	.stat-system .stat-label { color: #cc99ff; }
+	.stat-system .stat-value { color: #cc99ff; }
+
 	/* ── New Component Panels ── */
-	.explorer-panel, .tree-panel, .archived-panel-wrapper, .dev-review-wrapper {
+	.explorer-panel, .tree-panel, .archived-panel-wrapper, .dev-review-wrapper, .system-panel {
 		margin-bottom: 1.5rem;
 	}
 
@@ -1438,6 +1512,134 @@
 	}
 
 	.demo-edit-btn:hover {
+		color: #999;
+	}
+
+	/* ── System Routes Panel ── */
+	.system-panel {
+		border: 1px solid #cc99ff;
+		background: #0c0c0c;
+	}
+
+	.system-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.4rem 0.75rem;
+		background: #0f001a;
+		border-bottom: 1px solid #cc99ff;
+	}
+
+	.system-title {
+		font-weight: bold;
+		font-size: 0.8rem;
+		color: #cc99ff;
+		letter-spacing: 0.1em;
+	}
+
+	.system-count {
+		font-size: 0.7rem;
+		color: #9966cc;
+	}
+
+	.system-desc {
+		font-size: 0.6rem;
+		color: #664499;
+		padding: 0.3rem 0.75rem;
+		border-bottom: 1px solid #330066;
+	}
+
+	.system-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		gap: 0.5rem;
+		padding: 0.75rem;
+		max-height: 400px;
+		overflow-y: auto;
+	}
+
+	.system-card {
+		border: 1px solid #663399;
+		padding: 0.5rem 0.75rem;
+		background: #0a001a;
+	}
+
+	.system-card:hover {
+		border-color: #cc99ff;
+		background: #110022;
+	}
+
+	.system-card-header {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		margin-bottom: 0.3rem;
+	}
+
+	.system-type-badge {
+		font-size: 0.55rem;
+		font-weight: bold;
+		padding: 0.05rem 0.25rem;
+		border: 1px solid;
+		letter-spacing: 0.08em;
+		flex-shrink: 0;
+	}
+
+	.system-type-badge.system-page { color: #cc99ff; border-color: #cc99ff; }
+	.system-type-badge.system-api { color: #33ff33; border-color: #33ff33; }
+	.system-type-badge.system-server { color: #ff9933; border-color: #ff9933; }
+
+	.system-path {
+		font-size: 0.7rem;
+		color: #cc99ff;
+		flex: 1;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.system-auth {
+		font-size: 0.5rem;
+		color: #33ff33;
+		font-weight: bold;
+		flex-shrink: 0;
+	}
+
+	.system-card-desc {
+		font-size: 0.6rem;
+		color: #886699;
+		margin: 0 0 0.3rem 0;
+		line-height: 1.3;
+	}
+
+	.system-card-actions {
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+	}
+
+	.system-visit-btn {
+		font-size: 0.6rem;
+		color: #33ff99;
+		border: 1px solid #33ff99;
+		padding: 0.1rem 0.4rem;
+		text-decoration: none;
+		font-family: inherit;
+		letter-spacing: 0.05em;
+	}
+
+	.system-visit-btn:hover {
+		background: rgba(51, 255, 153, 0.15);
+	}
+
+	.system-edit-btn {
+		font-size: 0.6rem;
+		color: #666;
+		text-decoration: none;
+		font-family: inherit;
+	}
+
+	.system-edit-btn:hover {
 		color: #999;
 	}
 

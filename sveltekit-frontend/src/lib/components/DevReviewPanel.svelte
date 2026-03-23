@@ -1,20 +1,25 @@
 <script lang="ts">
 	/**
 	 * Dev Review Panel - NES Edition
-	 * Shows auth coverage, SSE inventory, method distribution, associated files, orphan APIs, category heatmap
+	 * Shows auth coverage, SSE inventory, method distribution, associated files,
+	 * orphan APIs, category heatmap, API cross-references, dead routes
 	 */
 
-	import type { RouteEndpoint, RouteStats } from '$lib/server/api-metadata-extractor';
+	import type { RouteEndpoint, RouteStats, APICrossRef, DeadRouteRef } from '$lib/server/api-metadata-extractor';
 
 	let {
 		endpoints = [],
-		stats
+		stats,
+		crossRefs = [],
+		deadRoutes = []
 	}: {
 		endpoints: RouteEndpoint[];
 		stats: RouteStats;
+		crossRefs: APICrossRef[];
+		deadRoutes: DeadRouteRef[];
 	} = $props();
 
-	let activeTab = $state<'auth' | 'sse' | 'methods' | 'files' | 'orphans' | 'heatmap'>('auth');
+	let activeTab = $state<'auth' | 'sse' | 'methods' | 'files' | 'orphans' | 'heatmap' | 'xref' | 'dead'>('auth');
 
 	// ── Auth Coverage ──
 	let authCoverage = $derived.by(() => {
@@ -181,6 +186,12 @@
 		</button>
 		<button class="tab-btn" class:tab-active={activeTab === 'heatmap'} onclick={() => activeTab = 'heatmap'}>
 			HEATMAP ({categoryHeatmap.length})
+		</button>
+		<button class="tab-btn" class:tab-active={activeTab === 'xref'} onclick={() => activeTab = 'xref'}>
+			XREF ({crossRefs.length})
+		</button>
+		<button class="tab-btn" class:tab-active={activeTab === 'dead'} onclick={() => activeTab = 'dead'}>
+			DEAD ({deadRoutes.length})
 		</button>
 	</div>
 
@@ -371,6 +382,64 @@
 					</div>
 				{/each}
 			</div>
+
+		{:else if activeTab === 'xref'}
+			<!-- API Cross-References Tab -->
+			<div class="xref-header-note">
+				Which pages consume which API endpoints (detected via fetch('/api/...') patterns).
+			</div>
+			{#if crossRefs.length === 0}
+				<div class="empty-tab">NO API CROSS-REFERENCES DETECTED</div>
+			{:else}
+				<div class="xref-list">
+					{#each crossRefs.slice(0, 80) as ref}
+						<div class="xref-row">
+							<div class="xref-api">
+								<span class="xref-api-path">{ref.apiPath}</span>
+								<span class="xref-consumer-count">{ref.consumers.length} consumer{ref.consumers.length !== 1 ? 's' : ''}</span>
+							</div>
+							<div class="xref-consumers">
+								{#each ref.consumers as consumer}
+									<div class="xref-consumer">
+										<span class="xref-page-path">{consumer.pagePath}</span>
+										<span class="xref-page-file">{consumer.pageFile.replace('src/routes/', '')}</span>
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/each}
+					{#if crossRefs.length > 80}
+						<div class="orphan-more">...and {crossRefs.length - 80} more</div>
+					{/if}
+				</div>
+			{/if}
+
+		{:else if activeTab === 'dead'}
+			<!-- Dead Routes Tab -->
+			<div class="dead-header-note">
+				Pages that fetch API paths which don't have corresponding +server.ts files.
+				These may indicate broken client-server wiring.
+			</div>
+			{#if deadRoutes.length === 0}
+				<div class="empty-tab dead-ok">NO DEAD ROUTE REFERENCES DETECTED</div>
+			{:else}
+				<div class="dead-list">
+					{#each deadRoutes as ref}
+						<div class="dead-row">
+							<div class="dead-page">
+								<span class="dead-page-path">{ref.pagePath}</span>
+								<span class="dead-page-file">{ref.pageFile.replace('src/routes/', '')}</span>
+							</div>
+							<div class="dead-missing">
+								<span class="dead-missing-label">MISSING APIs:</span>
+								{#each ref.missingAPIs as api}
+									<span class="dead-missing-api">{api}</span>
+								{/each}
+							</div>
+						</div>
+					{/each}
+				</div>
+			{/if}
 		{/if}
 	</div>
 </div>
@@ -917,6 +986,133 @@
 	.heatmap-sse {
 		color: #ff33ff;
 		border-color: #ff33ff;
+	}
+
+	/* ── API Cross-References ── */
+	.xref-header-note {
+		font-size: 0.65rem;
+		color: #664400;
+		margin-bottom: 0.75rem;
+		line-height: 1.4;
+	}
+
+	.xref-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+	}
+
+	.xref-row {
+		border: 1px solid #1a0800;
+		background: #0a0a0a;
+	}
+
+	.xref-api {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.4rem 0.6rem;
+		background: #001100;
+		border-bottom: 1px solid #1a0800;
+	}
+
+	.xref-api-path {
+		font-size: 0.75rem;
+		font-weight: bold;
+		color: #33ff33;
+	}
+
+	.xref-consumer-count {
+		font-size: 0.6rem;
+		color: #666;
+	}
+
+	.xref-consumers {
+		padding: 0.3rem 0.6rem;
+	}
+
+	.xref-consumer {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.15rem 0;
+		font-size: 0.65rem;
+	}
+
+	.xref-page-path {
+		color: #cc99ff;
+		font-weight: bold;
+	}
+
+	.xref-page-file {
+		color: #555;
+		font-size: 0.6rem;
+	}
+
+	/* ── Dead Routes ── */
+	.dead-header-note {
+		font-size: 0.65rem;
+		color: #993300;
+		margin-bottom: 0.75rem;
+		line-height: 1.4;
+	}
+
+	.dead-ok {
+		color: #33ff33 !important;
+	}
+
+	.dead-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+	}
+
+	.dead-row {
+		border: 1px solid #661a00;
+		background: #0a0505;
+	}
+
+	.dead-page {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.4rem 0.6rem;
+		background: #110800;
+		border-bottom: 1px solid #661a00;
+	}
+
+	.dead-page-path {
+		font-size: 0.75rem;
+		font-weight: bold;
+		color: #ff6633;
+	}
+
+	.dead-page-file {
+		font-size: 0.6rem;
+		color: #555;
+	}
+
+	.dead-missing {
+		padding: 0.3rem 0.6rem;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.3rem;
+		align-items: center;
+	}
+
+	.dead-missing-label {
+		font-size: 0.6rem;
+		color: #993300;
+		font-weight: bold;
+		flex-shrink: 0;
+	}
+
+	.dead-missing-api {
+		font-size: 0.65rem;
+		color: #ff3333;
+		padding: 0.05rem 0.3rem;
+		border: 1px solid #660000;
+		background: rgba(255, 0, 0, 0.05);
 	}
 
 	/* ── Scrollbar ── */

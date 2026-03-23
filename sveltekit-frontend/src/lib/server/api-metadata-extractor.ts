@@ -17,7 +17,8 @@ export interface RouteEndpoint {
   absolutePath?: string;
   hasAuth: boolean;
   responseType: string | null;
-  group: string; // (app), (dev), admin, api, etc.
+  group: string; // (app), (dev), admin, api, system, etc.
+  consumesAPIs?: string[]; // API paths fetched by page/page-server files
 }
 
 export interface RouteCategory {
@@ -278,6 +279,27 @@ function extractResponseType(content: string): string | null {
 }
 
 /**
+ * Extract API paths consumed by a page/server file (fetch('/api/...') patterns)
+ */
+function extractConsumedAPIs(content: string): string[] {
+  const apis = new Set<string>();
+  // Match fetch('/api/...'), fetch("/api/..."), fetch(`/api/...`)
+  const patterns = [
+    /fetch\(\s*['"`]\/api\/([^'"`$]+)['"`]/g,
+    /fetch\(\s*`\/api\/([^`$]+)`/g,
+  ];
+  for (const pattern of patterns) {
+    let match;
+    while ((match = pattern.exec(content)) !== null) {
+      // Normalize: strip trailing slashes, replace [id] params
+      let apiPath = '/api/' + match[1].replace(/\/+$/, '').replace(/\$\{[^}]+\}/g, ':param');
+      apis.add(apiPath);
+    }
+  }
+  return [...apis];
+}
+
+/**
  * Categorize endpoint by directory path
  */
 function categorizeEndpoint(relativePath: string): string {
@@ -495,6 +517,10 @@ function scanDirectory(
         const urlPath = filePathToURLPath(relativePath);
         const methods = extractMethods(content, filePattern);
 
+        const consumedAPIs = (type === 'page' || type === 'page-server')
+          ? extractConsumedAPIs(content)
+          : undefined;
+
         const endpoint: RouteEndpoint = {
           path: urlPath,
           type,
@@ -506,6 +532,7 @@ function scanDirectory(
           hasAuth: hasAuthentication(content),
           responseType: extractResponseType(content),
           group: type === 'archived' ? 'archived' : extractGroup(relativePath),
+          ...(consumedAPIs && consumedAPIs.length > 0 ? { consumesAPIs: consumedAPIs } : {}),
         };
 
         results.push(endpoint);
@@ -640,10 +667,89 @@ export function getRouteStats(precomputed?: RouteEndpoint[]): RouteStats {
         (e) => e.group === 'admin' || (e.group === '(app)' && e.path.includes('/admin'))
       ).length,
       api: activeEndpoints.filter((e) => e.group === 'api').length,
+      system: activeEndpoints.filter((e) => e.group === 'system').length,
       other: activeEndpoints.filter((e) => e.group === 'other').length,
       archived: archivedEndpoints.length,
     },
     authRequired: allEndpoints.filter((e) => e.hasAuth).length,
     sse: allEndpoints.filter((e) => e.responseType === 'text/event-stream').length,
   };
+}
+
+/**
+ * Cross-reference: which pages consume which API endpoints
+ */
+export interface APICrossRef {
+  apiPath: string;
+  consumers: { pagePath: string; pageFile: string }[];
+}
+
+export function getAPICrossReferences(precomputed?: RouteEndpoint[]): APICrossRef[] {
+  const endpoints = precomputed ?? getAllRouteEndpoints(false);
+
+  // Build reverse map: API path → list of consuming pages
+  const refMap = new Map<string, { pagePath: string; pageFile: string }[]>();
+
+  for (const ep of endpoints) {
+    if (!ep.consumesAPIs) continue;
+    for (const api of ep.consumesAPIs) {
+      // Normalize param placeholders for matching
+      const normalized = api.replace(/:param/g, ':id');
+      if (!refMap.has(normalized)) refMap.set(normalized, []);
+      refMap.get(normalized)!.push({ pagePath: ep.path, pageFile: ep.filePath });
+    }
+  }
+
+  return [...refMap.entries()]
+    .map(([apiPath, consumers]) => ({ apiPath, consumers }))
+    .sort((a, b) => b.consumers.length - a.consumers.length);
+}
+
+/**
+ * Dead route detection: pages that fetch API paths which don't exist as +server.ts
+ */
+export interface DeadRouteRef {
+  pagePath: string;
+  pageFile: string;
+  missingAPIs: string[];
+}
+
+export function getDeadRouteRefs(precomputed?: RouteEndpoint[]): DeadRouteRef[] {
+  const endpoints = precomputed ?? getAllRouteEndpoints(false);
+  const apiPaths = new Set(
+    endpoints.filter(e => e.type === 'api').map(e => e.path)
+  );
+
+  const results: DeadRouteRef[] = [];
+
+  for (const ep of endpoints) {
+    if (!ep.consumesAPIs || ep.consumesAPIs.length === 0) continue;
+
+    const missing: string[] = [];
+    for (const api of ep.consumesAPIs) {
+      // Normalize param placeholders
+      const normalized = api.replace(/:param/g, ':id');
+      // Check if any registered API path matches (exact or with param slots)
+      const exists = apiPaths.has(normalized) ||
+        [...apiPaths].some(p => {
+          // Allow param slot matching: /api/cases/:id matches /api/cases/:param
+          const pParts = p.split('/');
+          const nParts = normalized.split('/');
+          if (pParts.length !== nParts.length) return false;
+          return pParts.every((seg, i) =>
+            seg === nParts[i] || seg.startsWith(':') || nParts[i].startsWith(':')
+          );
+        });
+
+      if (!exists) {
+        missing.push(api);
+      }
+    }
+
+    if (missing.length > 0) {
+      results.push({ pagePath: ep.path, pageFile: ep.filePath, missingAPIs: missing });
+    }
+  }
+
+  return results.sort((a, b) => b.missingAPIs.length - a.missingAPIs.length);
 }
