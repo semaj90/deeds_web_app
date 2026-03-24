@@ -194,10 +194,37 @@ Could simplify by removing `@langchain/ollama` dependency and using Ollama's nat
 
 | System | Endpoint | Tools | Architecture |
 |--------|----------|-------|-------------|
-| Agent Chat | `/api/agents/chat` | 4 (web_search, ripgrep, rag_search, glossary_search) | Ollama native tool calling, max 3 rounds |
-| Contextual Chat | `/api/contextual/chat` | 3 (glossary_search, rag_search, web_search) | Ollama native tool calling (when `enableFunctions=true`), HMM state tracking |
-| Autonomous Agent | `/api/agent/investigate` | 15 (evidence, multimodal, detective, glossary, RAG, AST) | LangChain DynamicStructuredTool, keyword-based selector |
+| Agent Chat | `/api/agents/chat` | 4 (glossary_search, rag_search, web_search, ripgrep_search) | Ollama native tool calling, max 3 rounds, max 4 total calls |
+| Contextual Chat | `/api/contextual/chat` | 3 (glossary_search, rag_search, web_search) | Ollama native tool calling (when `enableFunctions=true`), HMM state tracking, max 2 rounds, max 3 total calls |
+| Autonomous Agent | `/api/agent/investigate` | 15 (evidence, multimodal, detective, glossary, RAG, AST) | LangChain DynamicStructuredTool, keyword-based selector with glossary score-boost |
 | MCP Server | `npm run rag:mcp` | 36 (cases, evidence, reports, citations, RAG, codebase, etc.) | FastMCP stdio transport, standalone |
+
+### Tool Callability Matrix
+
+| Tool | Wired | Agent Chat | Contextual Chat | Autonomous Agent | MCP | Notes |
+|------|-------|-----------|----------------|-----------------|-----|-------|
+| `glossary_search` | ✅ | ✅ (priority 1) | ✅ (priority 1) | ✅ (keyword boost) | ❌ | 3 ms timeout; definition-first bias |
+| `rag_search` | ✅ | ✅ (priority 2) | ✅ (priority 2, top-k=3, 150-char snippets) | ✅ | ✅ via `rag:search` | Qdrant hybridSearch, 768-dim |
+| `web_search` | ✅ | ✅ (priority 3, 8s timeout) | ✅ (priority 3, 8s timeout) | ✅ | ❌ | SearXNG → DDG → fallback |
+| `ripgrep_search` | ✅ | ✅ (priority 4, 5s timeout) | ❌ | ✅ | ❌ | Code/file pattern search |
+| `cases_load` | ⚠️ mock | ❌ | ❌ | ⚠️ stub | ✅ | Real DB in MCP; agent stub |
+| `unified_ast_query` | ✅ | ❌ | ❌ | ✅ | ✅ (FastMCP) | AST analysis |
+| `evidence_search` | ✅ | ❌ | ❌ | ✅ | ✅ | Qdrant evidence_items |
+| `system_health_check` | ✅ | ❌ | ❌ | ❌ | ✅ (FastMCP) | 9 FastMCP tools |
+
+### Tool Priority Order (implemented in system prompts)
+1. **glossary_search** — always try first for any definition/terminology question
+2. **rag_search** — use for document/evidence retrieval; fall back from glossary when 0 results
+3. **web_search** — only for freshness (current statutes, recent case law) that local corpus lacks
+4. **ripgrep_search** — code/file pattern search; not relevant to legal Q&A
+
+### Tool Hardening (implemented 2026-03-23)
+- **Per-tool timeouts**: glossary=3s, rag=6s, web_search=8s, ripgrep=5s
+- **Unified result shape**: `{ ok, tool, query, results, count, durationMs }` (agents) / `{ ok, tool, result, durationMs }` (contextual)
+- **Error continuation**: failed tools return structured `[tool failed: reason]` string so synthesis proceeds without 500
+- **Hard total-call cap**: agents/chat=4, contextual/chat=3
+- **Trace metadata** in response: `_trace.toolRounds`, `_trace.totalToolCalls`, `_trace.toolLatencyMs`
+- **GEMMA3_DEFAULTS** applied to all inference calls: temp=0.1, top_k=20, top_p=0.8, num_ctx=8192, repeat_penalty=1.05
 
 ### Ollama Native Tool Calling Pattern
 ```

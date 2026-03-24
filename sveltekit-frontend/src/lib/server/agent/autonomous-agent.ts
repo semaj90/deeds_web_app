@@ -502,37 +502,55 @@ export class AutonomousAgent {
 	 * TODO: Restore LangChain ReAct agent when import issue is resolved
 	 */
 	private selectTools(query: string): string[] {
-		const q = query.toLowerCase();
-		const selected: string[] = [];
+    const q = query.toLowerCase();
+    const selected: string[] = [];
 
-		// Enhanced Detective Mode scenarios
-		if (q.includes('todo') || q.includes('fixme')) {
-			selected.push('ripgrep_search', 'extract_pattern', 'analyze_file');
-		}
-		if (q.includes('drop table') || q.includes('migration') || q.includes('drizzle')) {
-			selected.push('find_files', 'ripgrep_search', 'analyze_file', 'web_search');
-		}
-		if (q.includes('dataset') || q.includes('training') || q.includes('multimodal')) {
-			selected.push('find_files', 'analyze_file', 'web_search');
-		}
-		if (q.includes('endpoint') || q.includes('api') || q.includes('500')) {
-			selected.push('find_files', 'ripgrep_search', 'analyze_file');
-		}
-		if (q.includes('redis') || q.includes('embedding') || q.includes('docker')) {
-			selected.push('find_files', 'analyze_file', 'ripgrep_search');
-		}
+    // Enhanced Detective Mode scenarios
+    if (q.includes('todo') || q.includes('fixme')) {
+      selected.push('ripgrep_search', 'extract_pattern', 'analyze_file');
+    }
+    if (q.includes('drop table') || q.includes('migration') || q.includes('drizzle')) {
+      selected.push('find_files', 'ripgrep_search', 'analyze_file', 'web_search');
+    }
+    if (q.includes('dataset') || q.includes('training') || q.includes('multimodal')) {
+      selected.push('find_files', 'analyze_file', 'web_search');
+    }
+    if (q.includes('endpoint') || q.includes('api') || q.includes('500')) {
+      selected.push('find_files', 'ripgrep_search', 'analyze_file');
+    }
+    if (q.includes('redis') || q.includes('embedding') || q.includes('docker')) {
+      selected.push('find_files', 'analyze_file', 'ripgrep_search');
+    }
 
-		if (q.includes('define') || q.includes('definition') || q.includes('what is') || q.includes('glossary') || q.includes('legal term') || q.includes('meaning of')) {
-			selected.push('glossary_search');
-		}
+    // Glossary keyword boost — include glossary_search whenever definition-style language is detected.
+    // This is a bias, not a hard-gate: other tools remain available so the model can still
+    // prefer glossary for indirect wording (e.g. "explain mens rea" matches rag but glossary is better).
+    const DEFINITION_KEYWORDS = [
+      'define',
+      'definition',
+      'what is',
+      'what are',
+      'meaning of',
+      'explain',
+      'describe',
+      'legal term',
+      'glossary',
+      'terminology',
+      'concept of',
+      'refers to',
+    ];
+    if (DEFINITION_KEYWORDS.some((kw) => q.includes(kw))) {
+      // Prepend so model sees it first in the selection
+      selected.unshift('glossary_search');
+    }
 
-		// Fallback: use general investigation tools
-		if (selected.length === 0) {
-			selected.push('ripgrep_search', 'analyze_file');
-		}
+    // Fallback: use general investigation tools — always include glossary so model can call it unprompted
+    if (selected.length === 0) {
+      selected.push('glossary_search', 'ripgrep_search', 'analyze_file');
+    }
 
-		return [...new Set(selected)]; // deduplicate
-	}
+    return [...new Set(selected)]; // deduplicate
+  }
 
 	/**
 	 * Investigate a query using simple keyword-based tool selection
