@@ -1,10 +1,11 @@
 import { ENV } from '$lib/server/env.server.js';
 import { Client } from 'minio';
 
-// Centralized MinIO client initialization
+// Centralized MinIO client initialization — singleton
 let minioClient: Client | null = null;
 
-function getMinioClient(): Client {
+/** Raw MinIO Client singleton — use for advanced ops (statObject, getPartialObject, streaming) */
+export function getMinioClient(): Client {
  if (!minioClient) {
  const endPoint = ENV.MINIO_ENDPOINT;
  const port = parseInt(ENV.MINIO_PORT, 10);

@@ -417,7 +417,8 @@ async function extractText(
   }
 
   if (isImage) {
-    // Resize large images before OCR (max 1280px for VLM/Docling quality)
+    // Resize large images before OCR (max 1280px — Tesseract quality sweet-spot)
+    // Note: VLM resize to Gemma3 native 896×896 is handled separately inside /api/vision/analyze
     let processBuffer = buffer;
     try {
       const sharp = (await import('sharp')).default;

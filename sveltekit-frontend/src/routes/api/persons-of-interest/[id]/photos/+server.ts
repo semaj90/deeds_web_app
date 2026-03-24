@@ -9,9 +9,10 @@ import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { resizeForVLM } from '$lib/server/image/resize-for-vlm.js';
 
 const deletePhotoSchema = z.object({
-	photoId: z.string().min(1, 'photoId required').max(500),
+  photoId: z.string().min(1, 'photoId required').max(500),
 });
 
 const BUCKET = 'poi-photos';
@@ -28,18 +29,18 @@ const VLM_TIMEOUT = 60_000; // 60s for vision analysis
  * List all photos for a POI (most recent first)
  */
 export const GET: RequestHandler = async ({ params }) => {
-	try {
-		const photos = await db
-			.select()
-			.from(poiPhotos)
-			.where(eq(poiPhotos.poiId, params.id))
-			.orderBy(desc(poiPhotos.uploadedAt));
+  try {
+    const photos = await db
+      .select()
+      .from(poiPhotos)
+      .where(eq(poiPhotos.poiId, params.id))
+      .orderBy(desc(poiPhotos.uploadedAt));
 
-		return json({ success: true, photos });
-	} catch (err) {
-		console.error('[poi-photos] GET error:', err);
-		return json({ success: true, photos: [] });
-	}
+    return json({ success: true, photos });
+  } catch (err) {
+    console.error('[poi-photos] GET error:', err);
+    return json({ success: true, photos: [] });
+  }
 };
 
 /**
@@ -56,95 +57,95 @@ export const GET: RequestHandler = async ({ params }) => {
  * 7. Background: LangExtract OCR for any text in image
  */
 export const POST: RequestHandler = async ({ params, request }) => {
-	const poiId = params.id;
+  const poiId = params.id;
 
-	try {
-		// Verify POI exists
-		const [poi] = await db
-			.select({ id: personsOfInterest.id, name: personsOfInterest.name })
-			.from(personsOfInterest)
-			.where(eq(personsOfInterest.id, poiId))
-			.limit(1);
+  try {
+    // Verify POI exists
+    const [poi] = await db
+      .select({ id: personsOfInterest.id, name: personsOfInterest.name })
+      .from(personsOfInterest)
+      .where(eq(personsOfInterest.id, poiId))
+      .limit(1);
 
-		if (!poi) {
-			return json({ error: 'Person of interest not found' }, { status: 404 });
-		}
+    if (!poi) {
+      return json({ error: 'Person of interest not found' }, { status: 404 });
+    }
 
-		const formData = await request.formData();
-		const file = formData.get('file') as File | null;
+    const formData = await request.formData();
+    const file = formData.get('file') as File | null;
 
-		if (!file || !(file instanceof File)) {
-			return json({ error: 'No file provided' }, { status: 400 });
-		}
+    if (!file || !(file instanceof File)) {
+      return json({ error: 'No file provided' }, { status: 400 });
+    }
 
-		if (!ALLOWED_TYPES.includes(file.type)) {
-			return json(
-				{ error: `Invalid file type. Allowed: ${ALLOWED_TYPES.join(', ')}` },
-				{ status: 400 }
-			);
-		}
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return json(
+        { error: `Invalid file type. Allowed: ${ALLOWED_TYPES.join(', ')}` },
+        { status: 400 }
+      );
+    }
 
-		if (file.size > MAX_SIZE) {
-			return json({ error: 'File too large. Max 10MB.' }, { status: 400 });
-		}
+    if (file.size > MAX_SIZE) {
+      return json({ error: 'File too large. Max 10MB.' }, { status: 400 });
+    }
 
-		const buffer = Buffer.from(await file.arrayBuffer());
-		const hash = createHash('sha256').update(buffer).digest('hex').slice(0, 16);
-		const ext = file.name.split('.').pop() || 'jpg';
-		const minioKey = `${poiId}/${hash}.${ext}`;
-		const thumbKey = `${poiId}/${hash}_thumb.webp`;
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const hash = createHash('sha256').update(buffer).digest('hex').slice(0, 16);
+    const ext = file.name.split('.').pop() || 'jpg';
+    const minioKey = `${poiId}/${hash}.${ext}`;
+    const thumbKey = `${poiId}/${hash}_thumb.webp`;
 
-		// 1. Upload original to MinIO
-		await uploadFile(BUCKET, minioKey, buffer, {
-			'Content-Type': file.type,
-			'X-POI-Id': poiId,
-			'X-Original-Name': file.name,
-		});
+    // 1. Upload original to MinIO
+    await uploadFile(BUCKET, minioKey, buffer, {
+      'Content-Type': file.type,
+      'X-POI-Id': poiId,
+      'X-Original-Name': file.name,
+    });
 
-		const url = `/minio/${BUCKET}/${minioKey}`;
+    const url = `/minio/${BUCKET}/${minioKey}`;
 
-		// 2. Generate thumbnail via Sharp (300px wide, webp)
-		let thumbnailUrl: string | null = null;
-		try {
-			const thumbBuffer = await sharp(buffer)
-				.resize(300, 300, { fit: 'inside', withoutEnlargement: true })
-				.webp({ quality: 80 })
-				.toBuffer();
+    // 2. Generate thumbnail via Sharp (300px wide, webp)
+    let thumbnailUrl: string | null = null;
+    try {
+      const thumbBuffer = await sharp(buffer)
+        .resize(300, 300, { fit: 'inside', withoutEnlargement: true })
+        .webp({ quality: 80 })
+        .toBuffer();
 
-			await uploadFile(THUMB_BUCKET, thumbKey, thumbBuffer, {
-				'Content-Type': 'image/webp',
-				'X-POI-Id': poiId,
-			});
-			thumbnailUrl = `/minio/${THUMB_BUCKET}/${thumbKey}`;
-		} catch (err) {
-			console.warn('[poi-photos] Thumbnail generation failed (non-fatal):', err);
-		}
+      await uploadFile(THUMB_BUCKET, thumbKey, thumbBuffer, {
+        'Content-Type': 'image/webp',
+        'X-POI-Id': poiId,
+      });
+      thumbnailUrl = `/minio/${THUMB_BUCKET}/${thumbKey}`;
+    } catch (err) {
+      console.warn('[poi-photos] Thumbnail generation failed (non-fatal):', err);
+    }
 
-		// 3. Insert DB record — return to client immediately
-		const [photo] = await db
-			.insert(poiPhotos)
-			.values({
-				poiId,
-				minioKey,
-				thumbnailKey: thumbnailUrl ? thumbKey : null,
-				url,
-				thumbnailUrl,
-				originalName: file.name,
-				mimeType: file.type,
-				size: file.size,
-			})
-			.returning();
+    // 3. Insert DB record — return to client immediately
+    const [photo] = await db
+      .insert(poiPhotos)
+      .values({
+        poiId,
+        minioKey,
+        thumbnailKey: thumbnailUrl ? thumbKey : null,
+        url,
+        thumbnailUrl,
+        originalName: file.name,
+        mimeType: file.type,
+        size: file.size,
+      })
+      .returning();
 
-		// 4. Fire-and-forget: VLM analysis pipeline
-		runVLMAnalysisPipeline(photo.id, buffer, poi.name ?? 'Unknown').catch((err) =>
-			console.warn('[poi-photos] Background VLM pipeline failed:', err)
-		);
+    // 4. Fire-and-forget: VLM analysis pipeline
+    runVLMAnalysisPipeline(photo.id, buffer, poi.name ?? 'Unknown').catch((err) =>
+      console.warn('[poi-photos] Background VLM pipeline failed:', err)
+    );
 
-		return json({ success: true, photo }, { status: 201 });
-	} catch (err) {
-		console.error('[poi-photos] POST error:', err);
-		return json({ error: 'Failed to upload photo' }, { status: 500 });
-	}
+    return json({ success: true, photo }, { status: 201 });
+  } catch (err) {
+    console.error('[poi-photos] POST error:', err);
+    return json({ error: 'Failed to upload photo' }, { status: 500 });
+  }
 };
 
 /**
@@ -153,36 +154,33 @@ export const POST: RequestHandler = async ({ params, request }) => {
  * Body: { photoId: string }
  */
 export const DELETE: RequestHandler = async ({ params, request }) => {
-	try {
-		const body = await request.json().catch(() => ({}));
-		const parsed = deletePhotoSchema.safeParse(body);
-		if (!parsed.success) {
-			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
-		}
-		const { photoId } = parsed.data;
+  try {
+    const body = await request.json().catch(() => ({}));
+    const parsed = deletePhotoSchema.safeParse(body);
+    if (!parsed.success) {
+      return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
+    }
+    const { photoId } = parsed.data;
 
-		const [deleted] = await db
-			.delete(poiPhotos)
-			.where(eq(poiPhotos.id, photoId))
-			.returning();
+    const [deleted] = await db.delete(poiPhotos).where(eq(poiPhotos.id, photoId)).returning();
 
-		if (!deleted) {
-			return json({ error: 'Photo not found' }, { status: 404 });
-		}
+    if (!deleted) {
+      return json({ error: 'Photo not found' }, { status: 404 });
+    }
 
-		// Clean up MinIO objects (non-fatal)
-		if (deleted.minioKey) {
-			deleteFile(BUCKET, deleted.minioKey).catch(() => {});
-		}
-		if (deleted.thumbnailKey) {
-			deleteFile(BUCKET, deleted.thumbnailKey).catch(() => {});
-		}
+    // Clean up MinIO objects (non-fatal)
+    if (deleted.minioKey) {
+      deleteFile(BUCKET, deleted.minioKey).catch(() => {});
+    }
+    if (deleted.thumbnailKey) {
+      deleteFile(BUCKET, deleted.thumbnailKey).catch(() => {});
+    }
 
-		return json({ success: true });
-	} catch (err) {
-		console.error('[poi-photos] DELETE error:', err);
-		return json({ error: 'Failed to delete photo' }, { status: 500 });
-	}
+    return json({ success: true });
+  } catch (err) {
+    console.error('[poi-photos] DELETE error:', err);
+    return json({ error: 'Failed to delete photo' }, { status: 500 });
+  }
 };
 
 // ─── Background VLM Analysis Pipeline ─────────────────────────────────
@@ -196,33 +194,31 @@ export const DELETE: RequestHandler = async ({ params, request }) => {
  *   Auto-tag → mirror to CouchDB + Qdrant + pgvector
  */
 async function runVLMAnalysisPipeline(
-	photoId: string,
-	imageBuffer: Buffer,
-	poiName: string
+  photoId: string,
+  imageBuffer: Buffer,
+  poiName: string
 ): Promise<void> {
-	const t0 = Date.now();
-	console.log(`[poi-photos] Starting VLM pipeline for photo ${photoId}...`);
+  const t0 = Date.now();
+  console.log(`[poi-photos] Starting VLM pipeline for photo ${photoId}...`);
 
-	// Resize for VLM input (max 1024px, keeps aspect ratio)
-	let vlmBuffer: Buffer;
-	try {
-		vlmBuffer = await sharp(imageBuffer)
-			.resize(1024, 1024, { fit: 'inside', withoutEnlargement: true })
-			.jpeg({ quality: 85 })
-			.toBuffer();
-	} catch {
-		vlmBuffer = imageBuffer; // fallback to original
-	}
+  // Resize to Gemma 3 native 896×896 for SigLIP vision encoder
+  let vlmBuffer: Buffer;
+  try {
+    const resizeResult = await resizeForVLM(imageBuffer);
+    vlmBuffer = resizeResult.buffer;
+  } catch {
+    vlmBuffer = imageBuffer; // fallback to original
+  }
 
-	const base64Image = vlmBuffer.toString('base64');
+  const base64Image = vlmBuffer.toString('base64');
 
-	// ── Step 1: Gemma3 VLM Analysis ──
-	let aiCaption = '';
-	let aiTags: string[] = [];
-	let forensicData: Record<string, unknown> = {};
+  // ── Step 1: Gemma3 VLM Analysis ──
+  let aiCaption = '';
+  let aiTags: string[] = [];
+  let forensicData: Record<string, unknown> = {};
 
-	try {
-		const vlmPrompt = `Analyze this photo of a person of interest named "${poiName}" for a legal investigation.
+  try {
+    const vlmPrompt = `Analyze this photo of a person of interest named "${poiName}" for a legal investigation.
 
 Provide your analysis in JSON format:
 {
@@ -243,199 +239,198 @@ Provide your analysis in JSON format:
 
 Return ONLY valid JSON.`;
 
-		const controller = new AbortController();
-		const timeout = setTimeout(() => controller.abort(), VLM_TIMEOUT);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), VLM_TIMEOUT);
 
-		const vlmRes = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: VLM_MODEL,
-				prompt: vlmPrompt,
-				images: [base64Image],
-				stream: false,
-				options: { temperature: 0.1, num_predict: 1024 },
-			}),
-			signal: controller.signal,
-		});
+    const vlmRes = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: VLM_MODEL,
+        prompt: vlmPrompt,
+        images: [base64Image],
+        stream: false,
+        options: { temperature: 0.1, num_predict: 1024 },
+      }),
+      signal: controller.signal,
+    });
 
-		clearTimeout(timeout);
+    clearTimeout(timeout);
 
-		if (vlmRes.ok) {
-			const vlmData = await vlmRes.json();
-			const responseText = vlmData.response ?? '';
-			const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (vlmRes.ok) {
+      const vlmData = await vlmRes.json();
+      const responseText = vlmData.response ?? '';
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
 
-			if (jsonMatch) {
-				const parsed = JSON.parse(jsonMatch[0]);
-				aiCaption = parsed.caption ?? responseText.slice(0, 500);
-				aiTags = Array.isArray(parsed.tags) ? parsed.tags : [];
-				if (parsed.forensicFlags) {
-					forensicData = parsed.forensicFlags;
-				}
-			} else {
-				aiCaption = responseText.slice(0, 500);
-			}
-		}
-	} catch (err) {
-		console.warn('[poi-photos] VLM analysis failed (non-fatal):', err);
-	}
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        aiCaption = parsed.caption ?? responseText.slice(0, 500);
+        aiTags = Array.isArray(parsed.tags) ? parsed.tags : [];
+        if (parsed.forensicFlags) {
+          forensicData = parsed.forensicFlags;
+        }
+      } else {
+        aiCaption = responseText.slice(0, 500);
+      }
+    }
+  } catch (err) {
+    console.warn('[poi-photos] VLM analysis failed (non-fatal):', err);
+  }
 
-	const vlmMs = Date.now() - t0;
-	console.log(`[poi-photos] VLM analysis: ${vlmMs}ms, caption=${aiCaption.length}ch, tags=${aiTags.length}`);
+  const vlmMs = Date.now() - t0;
+  console.log(
+    `[poi-photos] VLM analysis: ${vlmMs}ms, caption=${aiCaption.length}ch, tags=${aiTags.length}`
+  );
 
-	// ── Step 2: LangExtract OCR (if available) ──
-	let ocrText = '';
-	try {
-		const langextractRes = await fetch(`${ENV.LANGEXTRACT_URL}/extract`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				image_base64: base64Image,
-				extract_type: 'ocr',
-			}),
-			signal: AbortSignal.timeout(15_000),
-		});
+  // ── Step 2: LangExtract OCR (if available) ──
+  let ocrText = '';
+  try {
+    const langextractRes = await fetch(`${ENV.LANGEXTRACT_URL}/extract`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        image_base64: base64Image,
+        extract_type: 'ocr',
+      }),
+      signal: AbortSignal.timeout(15_000),
+    });
 
-		if (langextractRes.ok) {
-			const ocrData = await langextractRes.json();
-			ocrText = ocrData.text ?? ocrData.extracted_text ?? '';
-			if (ocrText.length > 10) {
-				forensicData = { ...forensicData, ocrText: ocrText.slice(0, 2000) };
-			}
-		}
-	} catch {
-		// LangExtract unavailable — non-fatal
-	}
+    if (langextractRes.ok) {
+      const ocrData = await langextractRes.json();
+      ocrText = ocrData.text ?? ocrData.extracted_text ?? '';
+      if (ocrText.length > 10) {
+        forensicData = { ...forensicData, ocrText: ocrText.slice(0, 2000) };
+      }
+    }
+  } catch {
+    // LangExtract unavailable — non-fatal
+  }
 
-	// ── Step 2b: Multi-modal Fusion ──
-	try {
-		const { fuseVLMResults } = await import('$lib/server/ai/multimodal-fusion.js');
-		const fused = await fuseVLMResults(aiCaption, ocrText, aiTags);
-		if (fused.keywords.length > 0) {
-			aiTags = [...new Set([...aiTags, ...fused.keywords])].slice(0, 30);
-		}
-	} catch {
-		// Fusion unavailable — non-fatal
-	}
+  // ── Step 2b: Multi-modal Fusion ──
+  try {
+    const { fuseVLMResults } = await import('$lib/server/ai/multimodal-fusion.js');
+    const fused = await fuseVLMResults(aiCaption, ocrText, aiTags);
+    if (fused.keywords.length > 0) {
+      aiTags = [...new Set([...aiTags, ...fused.keywords])].slice(0, 30);
+    }
+  } catch {
+    // Fusion unavailable — non-fatal
+  }
 
-	// ── Step 3: EmbeddingGemma → 768-dim caption embedding ──
-	let captionEmbedding: number[] = [];
-	const textToEmbed = [aiCaption, ...aiTags, ocrText].filter(Boolean).join(' ').slice(0, 4000);
+  // ── Step 3: EmbeddingGemma → 768-dim caption embedding ──
+  let captionEmbedding: number[] = [];
+  const textToEmbed = [aiCaption, ...aiTags, ocrText].filter(Boolean).join(' ').slice(0, 4000);
 
-	if (textToEmbed.length > 20) {
-		try {
-			const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embed`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ model: EMBED_MODEL, input: textToEmbed }),
-				signal: AbortSignal.timeout(15_000),
-			});
+  if (textToEmbed.length > 20) {
+    try {
+      const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embed`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: EMBED_MODEL, input: textToEmbed }),
+        signal: AbortSignal.timeout(15_000),
+      });
 
-			if (embedRes.ok) {
-				const embedData = await embedRes.json();
-				if (embedData.embeddings?.[0]?.length === 768) {
-					captionEmbedding = embedData.embeddings[0];
-				}
-			}
-		} catch {
-			// Embedding failed — non-fatal
-		}
-	}
+      if (embedRes.ok) {
+        const embedData = await embedRes.json();
+        if (embedData.embeddings?.[0]?.length === 768) {
+          captionEmbedding = embedData.embeddings[0];
+        }
+      }
+    } catch {
+      // Embedding failed — non-fatal
+    }
+  }
 
-	// ── Step 4: Store caption embedding in Qdrant (evidence_items collection) ──
-	if (captionEmbedding.length === 768) {
-		try {
-			const { QdrantClient } = await import('@qdrant/js-client-rest');
-			const qdrant = new QdrantClient({ url: ENV.QDRANT_URL });
+  // ── Step 4: Store caption embedding in Qdrant (evidence_items collection) ──
+  if (captionEmbedding.length === 768) {
+    try {
+      const { QdrantClient } = await import('@qdrant/js-client-rest');
+      const qdrant = new QdrantClient({ url: ENV.QDRANT_URL });
 
-			// Deterministic point ID from photoId
-			const pointId = parseInt(
-				createHash('md5').update(photoId).digest('hex').slice(0, 8),
-				16
-			) % 2147483647;
+      // Deterministic point ID from photoId
+      const pointId =
+        parseInt(createHash('md5').update(photoId).digest('hex').slice(0, 8), 16) % 2147483647;
 
-			await qdrant.upsert('evidence_items', {
-				wait: true,
-				points: [
-					{
-						id: pointId,
-						vector: captionEmbedding,
-						payload: {
-							type: 'poi_photo',
-							photo_id: photoId,
-							poi_name: poiName,
-							caption: aiCaption.slice(0, 1000),
-							tags: aiTags,
-							ocr_text: ocrText.slice(0, 500),
-							has_forensic_flags: Object.keys(forensicData).length > 0,
-						},
-					},
-				],
-			});
-			console.log(`[poi-photos] Qdrant stored: pointId=${pointId}`);
+      await qdrant.upsert('evidence_items', {
+        wait: true,
+        points: [
+          {
+            id: pointId,
+            vector: captionEmbedding,
+            payload: {
+              type: 'poi_photo',
+              photo_id: photoId,
+              poi_name: poiName,
+              caption: aiCaption.slice(0, 1000),
+              tags: aiTags,
+              ocr_text: ocrText.slice(0, 500),
+              has_forensic_flags: Object.keys(forensicData).length > 0,
+            },
+          },
+        ],
+      });
+      console.log(`[poi-photos] Qdrant stored: pointId=${pointId}`);
 
-			// Dual-write to poi_profiles collection for dedicated POI search
-			try {
-				await qdrant.upsert('poi_profiles', {
-					wait: false,
-					points: [
-						{
-							id: pointId,
-							vector: { embedding: captionEmbedding },
-							payload: {
-								poiId: poiName ? undefined : undefined, // use separate field
-								poi_id: photoId.split('/')[0] || photoId,
-								photo_id: photoId,
-								type: 'poi_photo',
-								caption: aiCaption.slice(0, 500),
-								tags: aiTags.slice(0, 20),
-							},
-						},
-					],
-				});
-				console.log(`[poi-photos] poi_profiles stored: pointId=${pointId}`);
-			} catch (poiErr) {
-				console.warn('[poi-photos] poi_profiles store failed (non-fatal):', poiErr);
-			}
-		} catch (err) {
-			console.warn('[poi-photos] Qdrant store failed (non-fatal):', err);
-		}
-	}
+      // Dual-write to poi_profiles collection for dedicated POI search
+      try {
+        await qdrant.upsert('poi_profiles', {
+          wait: false,
+          points: [
+            {
+              id: pointId,
+              vector: { embedding: captionEmbedding },
+              payload: {
+                poiId: poiName ? undefined : undefined, // use separate field
+                poi_id: photoId.split('/')[0] || photoId,
+                photo_id: photoId,
+                type: 'poi_photo',
+                caption: aiCaption.slice(0, 500),
+                tags: aiTags.slice(0, 20),
+              },
+            },
+          ],
+        });
+        console.log(`[poi-photos] poi_profiles stored: pointId=${pointId}`);
+      } catch (poiErr) {
+        console.warn('[poi-photos] poi_profiles store failed (non-fatal):', poiErr);
+      }
+    } catch (err) {
+      console.warn('[poi-photos] Qdrant store failed (non-fatal):', err);
+    }
+  }
 
-	// ── Step 5: Auto-tag via existing tag pipeline (mirror to CouchDB + Qdrant + pgvector) ──
-	if (aiTags.length > 0 || textToEmbed.length > 50) {
-		try {
-			const { autoTagDocument } = await import('$lib/server/ace/auto-tagger');
-			await autoTagDocument({
-				documentId: photoId,
-				text: `POI Photo: ${poiName}. ${aiCaption}. Tags: ${aiTags.join(', ')}. ${ocrText}`,
-				maxTags: 20,
-			});
-			console.log(`[poi-photos] Auto-tagged photo ${photoId}`);
-		} catch (err) {
-			console.warn('[poi-photos] Auto-tag failed (non-fatal):', err);
-		}
-	}
+  // ── Step 5: Auto-tag via existing tag pipeline (mirror to CouchDB + Qdrant + pgvector) ──
+  if (aiTags.length > 0 || textToEmbed.length > 50) {
+    try {
+      const { autoTagDocument } = await import('$lib/server/ace/auto-tagger');
+      await autoTagDocument({
+        documentId: photoId,
+        text: `POI Photo: ${poiName}. ${aiCaption}. Tags: ${aiTags.join(', ')}. ${ocrText}`,
+        maxTags: 20,
+      });
+      console.log(`[poi-photos] Auto-tagged photo ${photoId}`);
+    } catch (err) {
+      console.warn('[poi-photos] Auto-tag failed (non-fatal):', err);
+    }
+  }
 
-	// ── Step 6: Update DB record with analysis results ──
-	try {
-		await db
-			.update(poiPhotos)
-			.set({
-				aiCaption: aiCaption || null,
-				aiTags: aiTags.length > 0 ? aiTags : [],
-				forensicData: Object.keys(forensicData).length > 0 ? forensicData : null,
-				faceEmbedding:
-					captionEmbedding.length === 768 ? captionEmbedding : null,
-			})
-			.where(eq(poiPhotos.id, photoId));
-	} catch (err) {
-		console.warn('[poi-photos] DB update with analysis failed:', err);
-	}
+  // ── Step 6: Update DB record with analysis results ──
+  try {
+    await db
+      .update(poiPhotos)
+      .set({
+        aiCaption: aiCaption || null,
+        aiTags: aiTags.length > 0 ? aiTags : [],
+        forensicData: Object.keys(forensicData).length > 0 ? forensicData : null,
+        faceEmbedding: captionEmbedding.length === 768 ? captionEmbedding : null,
+      })
+      .where(eq(poiPhotos.id, photoId));
+  } catch (err) {
+    console.warn('[poi-photos] DB update with analysis failed:', err);
+  }
 
-	const totalMs = Date.now() - t0;
-	console.log(
-		`[poi-photos] VLM pipeline complete: ${totalMs}ms (vlm=${vlmMs}ms, caption=${aiCaption.length}ch, tags=${aiTags.length}, embedding=${captionEmbedding.length}d, ocr=${ocrText.length}ch)`
-	);
+  const totalMs = Date.now() - t0;
+  console.log(
+    `[poi-photos] VLM pipeline complete: ${totalMs}ms (vlm=${vlmMs}ms, caption=${aiCaption.length}ch, tags=${aiTags.length}, embedding=${captionEmbedding.length}d, ocr=${ocrText.length}ch)`
+  );
 }
