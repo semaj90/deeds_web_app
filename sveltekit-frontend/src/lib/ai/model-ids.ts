@@ -39,11 +39,18 @@ export const SERVER_EMBEDDING_DIMS = 768;
 export const SERVER_EMBEDDING_FALLBACK = 'nomic-embed-text';
 
 // ── Qdrant collection names ──────────────────────────────────────────────
-
+// These MUST match VECTOR_CONFIG.COLLECTIONS in src/lib/server/config/vector-config.ts
+// (server-only file cannot be imported here — keep in sync manually)
 export const QDRANT_COLLECTIONS = {
-	evidence_vectors: 'evidence_vectors',
-	case_chunks: 'case_chunks',
-	law_sections: 'law_sections'
+	documents: 'legal_documents',
+	cases: 'legal_cases',
+	evidence: 'evidence_items',
+	chat_history: 'chat_messages',
+	embeddings_cache: 'embedding_cache',
+	document_tags: 'document_tags',
+	topic_clusters: 'topic_clusters',
+	llm_cache: 'llm_response_cache',
+	poi_profiles: 'poi_profiles',
 } as const;
 
 // ── ONNX Runtime execution providers (priority order) ────────────────────

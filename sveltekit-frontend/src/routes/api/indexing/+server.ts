@@ -11,13 +11,12 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import crypto from 'crypto';
 import fs from 'fs/promises';
 import { glob } from 'glob';
-import { Client as MinIOClient } from 'minio';
+import { ensureBucket, putObject } from '$lib/server/minio-client.js';
 import path from 'path';
 import postgres from 'postgres';
-import { getQdrantUrl, getOllamaUrl, getMinioConfig, getDatabaseUrl } from '$lib/config/env.server.js';
+import { getQdrantUrl, getOllamaUrl, getDatabaseUrl } from '$lib/config/env.server.js';
 import { z } from 'zod';
 // Configuration
-const _minioEnv = getMinioConfig();
 const CONFIG = {
   qdrant: {
     url: getQdrantUrl(),
@@ -25,11 +24,6 @@ const CONFIG = {
     collectionErrors: 'phase79_error_analysis'
   },
   minio: {
-    endpoint: _minioEnv.endpoint.split(':')[0],
-    port: parseInt(_minioEnv.endpoint.split(':')[1] ?? '9000'),
-    accessKey: _minioEnv.accessKey,
-    secretKey: _minioEnv.secretKey,
-    useSSL: _minioEnv.useSSL,
     bucketCode: 'codebase-index',
     bucketErrors: 'error-analysis'
   },
@@ -44,15 +38,7 @@ const CONFIG = {
 
 // Helpers
 
-function getMinIOClient(): MinIOClient {
-  return new MinIOClient({
-    endPoint: CONFIG.minio.endpoint,
-    port: CONFIG.minio.port,
-    accessKey: CONFIG.minio.accessKey,
-    secretKey: CONFIG.minio.secretKey,
-    useSSL: CONFIG.minio.useSSL
-  });
-}
+// MinIO client consolidated into $lib/server/minio-client.ts
 
 async function generateEmbedding(text: string): Promise<number[]> {
   try {
@@ -158,16 +144,8 @@ export const POST: RequestHandler = async ({ request, url }) => {
       }
       const rootPath = parsed.data.rootPath;
 
-      const minio = getMinIOClient();
-
       // Ensure bucket exists
-      try {
-        await minio.makeBucket(CONFIG.minio.bucketCode, 'us-east-1');
-      } catch (err: any) {
-        if (err.code !== 'BucketAlreadyOwnedByYou') {
-          throw err;
-        }
-      }
+      await ensureBucket(CONFIG.minio.bucketCode);
 
       // Find files
       const patterns = ['**/*.ts', '**/*.svelte', '**/*.js'];
@@ -198,10 +176,10 @@ export const POST: RequestHandler = async ({ request, url }) => {
           const chunks = chunkFileContent(content, 500, 100);
 
           // Upload to MinIO
-          await minio.putObject(
+          await putObject(
             CONFIG.minio.bucketCode,
             `${fileHash}.ts`,
-            content,
+            Buffer.from(content),
             { 'X-Amz-Meta-RelativePath': relativePath }
           );
 
@@ -278,16 +256,8 @@ export const POST: RequestHandler = async ({ request, url }) => {
   if (pathname === '/api/indexing/errors' || action === 'errors') {
     try {
       const sql = postgres(CONFIG.postgres.url);
-      const minio = getMinIOClient();
-
       // Ensure bucket exists
-      try {
-        await minio.makeBucket(CONFIG.minio.bucketErrors, 'us-east-1');
-      } catch (err: any) {
-        if (err.code !== 'BucketAlreadyOwnedByYou') {
-          throw err;
-        }
-      }
+      await ensureBucket(CONFIG.minio.bucketErrors);
 
       // Fetch error clusters
       const errorClusters = await sql`
@@ -355,10 +325,10 @@ Phase: Phase 66-79 Error Analysis`.trim();
           }
 
           // Store in MinIO
-          await minio.putObject(
+          await putObject(
             CONFIG.minio.bucketErrors,
             `${error_code}_${Date.now()}.json`,
-            JSON.stringify({ file_path, error_code, message, error_count }, null, 2)
+            Buffer.from(JSON.stringify({ file_path, error_code, message, error_count }, null, 2))
           );
 
           results.push({

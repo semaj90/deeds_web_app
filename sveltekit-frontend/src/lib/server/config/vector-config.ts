@@ -21,7 +21,7 @@ export const VECTOR_CONFIG = {
 	DISTANCE_METRIC: {
 		POSTGRES: 'vector_cosine_ops',
 		QDRANT: 'Cosine',
-		FAISS: 'METRIC_INNER_PRODUCT',
+		// Note: FAISS is NOT used — Qdrant + pgvector are the only active vector stores
 	},
 
 	INDEX: {
@@ -31,8 +31,6 @@ export const VECTOR_CONFIG = {
 		QDRANT_ON_DISK: true,
 		QDRANT_HNSW_M: 16,
 		QDRANT_HNSW_EF: 128,
-		FAISS_NLIST: 100,
-		FAISS_NPROBE: 10,
 	},
 
 	/** Canonical Qdrant collection names — alias → actual name */

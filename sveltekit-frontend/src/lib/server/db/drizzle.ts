@@ -5,7 +5,7 @@
 
 import qdrantClient from '$lib/services/qdrant-client';
 import { eq, sql } from 'drizzle-orm';
-import { Client as MinioClient } from 'minio';
+import { getFile as getMinioFile } from '$lib/server/minio-client.js';
 import lazyDb from './client.js';
 import * as schema from './schema.js';
 import type { CachingTypes } from '$lib/types/enhanced-svelte5-types';
@@ -141,34 +141,12 @@ export async function storeEmbedding(
 	}
 }
 
-// MinIO helper
-function makeMinioClient(): MinioClient {
-	const endpoint = _CFG.MINIO_ENDPOINT ?? process.env.MINIO_ENDPOINT ?? 'localhost:9000';
-	const accessKey = _CFG.MINIO_ACCESS_KEY ?? process.env.MINIO_ACCESS_KEY ?? 'minioadmin';
-	const secretKey = _CFG.MINIO_SECRET_KEY ?? process.env.MINIO_SECRET_KEY ?? 'minioadmin';
-	const useSSL = String(endpoint).startsWith('https');
-
-	const [host, portStr] = endpoint.split(':');
-	const port = parseInt(portStr ?? '9000', 10);
-
-	return new MinioClient({
-		endPoint: host,
-		port,
-		useSSL,
-		accessKey,
-		secretKey
-	});
-}
-
 export async function fetchDocumentFromMinIO(bucket: string, key: string): Promise<string> {
 	try {
-		const client = makeMinioClient();
-		const stream = await client.getObject(bucket, key);
-		const chunks: Buffer[] = [];
-		for await (const chunk of stream) chunks.push(chunk as Buffer);
-		return Buffer.concat(chunks).toString('utf8');
+		const buf = await getMinioFile(bucket, key);
+		return buf.toString('utf8');
 	} catch (err) {
-		console.error(`❌ Failed to fetch from MinIO: ${bucket}/${key}`, err);
+		console.error(`Failed to fetch from MinIO: ${bucket}/${key}`, err);
 		return '';
 	}
 }

@@ -154,6 +154,98 @@ export async function getFile(bucketName: string, objectName: string): Promise<B
 }
 
 /**
+ * Ensure a bucket exists, creating it if necessary.
+ */
+export async function ensureBucket(bucketName: string): Promise<boolean> {
+ const client = getMinioClient();
+ const exists = await client.bucketExists(bucketName);
+ if (!exists) {
+  await client.makeBucket(bucketName);
+  console.log(`MinIO bucket '${bucketName}' created.`);
+ }
+ return true;
+}
+
+/**
+ * Get object stats (size, etag, content-type).
+ */
+export async function statObject(bucketName: string, objectName: string) {
+ return getMinioClient().statObject(bucketName, objectName);
+}
+
+/**
+ * Get a readable stream for an object (for streaming responses).
+ */
+export async function getStream(bucketName: string, objectName: string) {
+ return getMinioClient().getObject(bucketName, objectName);
+}
+
+/**
+ * Get a partial readable stream (for Range requests).
+ */
+export async function getPartialStream(bucketName: string, objectName: string, offset: number, length: number) {
+ return getMinioClient().getPartialObject(bucketName, objectName, offset, length);
+}
+
+/**
+ * List all buckets.
+ */
+export async function listBuckets() {
+ return getMinioClient().listBuckets();
+}
+
+/**
+ * Put an object with optional size + metadata (for streams/buffers with explicit size).
+ */
+export async function putObject(
+ bucketName: string,
+ objectName: string,
+ body: Buffer | import('stream').Readable,
+ sizeOrMeta?: number | Record<string, string>,
+ meta?: Record<string, string>
+) {
+ const client = getMinioClient();
+ await ensureBucket(bucketName);
+ if (typeof sizeOrMeta === 'number') {
+  await client.putObject(bucketName, objectName, body, sizeOrMeta, meta);
+ } else {
+  await client.putObject(bucketName, objectName, body, sizeOrMeta);
+ }
+}
+
+/**
+ * Remove an object.
+ */
+export async function removeObject(bucketName: string, objectName: string) {
+ return getMinioClient().removeObject(bucketName, objectName);
+}
+
+/**
+ * Check MinIO connectivity + bucket health.
+ */
+export async function checkHealth(): Promise<{
+ healthy: boolean;
+ connected: boolean;
+ endpoint: string;
+ buckets: { name: string }[];
+ latencyMs: number;
+ error?: string;
+}> {
+ const start = Date.now();
+ const endpoint = ENV.MINIO_ENDPOINT + ':' + ENV.MINIO_PORT;
+ try {
+  const client = getMinioClient();
+  const bucketList = await Promise.race([
+   client.listBuckets(),
+   new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000)),
+  ]);
+  return { healthy: true, connected: true, endpoint, buckets: bucketList, latencyMs: Date.now() - start };
+ } catch (err: any) {
+  return { healthy: false, connected: false, endpoint, buckets: [], latencyMs: Date.now() - start, error: err?.message };
+ }
+}
+
+/**
  * Get presigned URL for chat image
  */
 export async function getChatImageUrl(objectName: string): Promise<string> {

@@ -8,11 +8,10 @@
  */
 
 import { pool } from '$lib/server/db/client';
-import { minio, ensureBucket } from '$lib/server/minio/client.js';
+import { getFile, ensureBucket, putObject } from '$lib/server/minio-client.js';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { chunkLegalDocument } from '$lib/server/indexer/legal-chunker.js';
 import { randomUUID } from 'crypto';
-import { Readable } from 'stream';
 
 const BUCKET = process.env.MINIO_LIBRARY_BUCKET ?? 'legal-library';
 
@@ -181,15 +180,7 @@ export async function runIngestionPipeline(opts: IngestOptions): Promise<IngestR
 	// ── Stage A: Fetch file from MinIO ──────────────────────────────────────
 	await setStage(jobId, 'extracting', 5);
 
-	const fileBuffer = await new Promise<Buffer>((resolve, reject) => {
-		const chunks: Buffer[] = [];
-		minio.getObject(BUCKET, doc.minio_key, (err, stream) => {
-			if (err) return reject(err);
-			(stream as Readable).on('data', (c) => chunks.push(c));
-			(stream as Readable).on('end', () => resolve(Buffer.concat(chunks)));
-			(stream as Readable).on('error', reject);
-		});
-	});
+	const fileBuffer = await getFile(BUCKET, doc.minio_key);
 
 	await pool.query(
 		`UPDATE library_documents SET page_count = NULL WHERE id = $1`,
@@ -465,11 +456,8 @@ export async function uploadLibraryDocument(opts: {
 	const jobId = randomUUID();
 	const minioKey = `uploads/raw/${documentId}.pdf`;
 
-	// Ensure bucket exists
-	await ensureBucket(BUCKET);
-
-	// Upload to MinIO
-	await minio.putObject(BUCKET, minioKey, opts.fileBuffer, opts.fileBuffer.length, {
+	// Upload to MinIO (ensureBucket called inside putObject)
+	await putObject(BUCKET, minioKey, opts.fileBuffer, opts.fileBuffer.length, {
 		'Content-Type': 'application/pdf',
 		'x-original-filename': opts.fileName,
 	});

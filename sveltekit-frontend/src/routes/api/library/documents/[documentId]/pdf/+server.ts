@@ -6,7 +6,7 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
-import { minio } from '$lib/server/minio/client.js';
+import { statObject, getStream, getPartialStream } from '$lib/server/minio-client.js';
 
 const BUCKET = process.env.MINIO_LIBRARY_BUCKET ?? 'legal-library';
 
@@ -16,10 +16,9 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
 	const { documentId } = params;
 
 	// Fetch document metadata — we need the minio_key and mime type
-	const res = await pool.query(
-		`SELECT minio_key, title FROM library_documents WHERE id = $1`,
-		[documentId]
-	).catch(() => null);
+	const res = await pool
+		.query(`SELECT minio_key, title FROM library_documents WHERE id = $1`, [documentId])
+		.catch(() => null);
 
 	if (!res?.rows[0]) throw error(404, 'Document not found');
 	const { minio_key: minioKey, title } = res.rows[0];
@@ -27,7 +26,7 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
 	if (!minioKey) throw error(404, 'No source file stored for this document');
 
 	// Get object stats (size) for Content-Length + Range support
-	const stat = await minio.statObject(BUCKET, minioKey).catch(() => null);
+	const stat = await statObject(BUCKET, minioKey).catch(() => null);
 
 	if (!stat) throw error(404, 'File not found in storage');
 
@@ -46,13 +45,13 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
 
 		const chunkSize = end - start + 1;
 
-		const nodeStream = await minio.getPartialObject(BUCKET, minioKey, start, chunkSize);
+		const nodeStream = await getPartialStream(BUCKET, minioKey, start, chunkSize);
 
 		const body = new ReadableStream({
 			start(controller) {
 				nodeStream.on('data', (chunk: Buffer) => controller.enqueue(chunk));
 				nodeStream.on('end', () => controller.close());
-				nodeStream.on('error', (err) => controller.error(err));
+				nodeStream.on('error', (err: Error) => controller.error(err));
 			},
 		});
 
@@ -70,13 +69,13 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
 	}
 
 	// ── Full file ────────────────────────────────────────────────────────────
-	const nodeStream = await minio.getObject(BUCKET, minioKey);
+	const nodeStream = await getStream(BUCKET, minioKey);
 
 	const body = new ReadableStream({
 		start(controller) {
 			nodeStream.on('data', (chunk: Buffer) => controller.enqueue(chunk));
 			nodeStream.on('end', () => controller.close());
-			nodeStream.on('error', (err) => controller.error(err));
+			nodeStream.on('error', (err: Error) => controller.error(err));
 		},
 	});
 

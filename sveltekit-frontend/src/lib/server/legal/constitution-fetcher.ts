@@ -13,7 +13,7 @@
  */
 
 import { createHash } from 'crypto';
-import { minio, ensureBucket } from '$lib/server/minio/client';
+import { ensureBucket, putObject } from '$lib/server/minio-client.js';
 import { normalizeConstitutionHtml, normalizePlainText, type NormalizeResult } from './html-normalizer';
 import type { StateConstitutionSource } from './constitution-registry';
 
@@ -43,7 +43,7 @@ export interface FetchResult {
 	url: string;
 	format: 'html' | 'pdf';
 	hash: string;
-	skipped: boolean;          // true if hash matches last known — no reprocessing needed
+	skipped: boolean; // true if hash matches last known — no reprocessing needed
 	rawMinioKey: string;
 	normalizedMinioKey: string;
 	normalized: NormalizeResult;
@@ -79,7 +79,7 @@ export async function fetchConstitution(
 			const res = await fetch(fetchUrl, {
 				headers: {
 					'User-Agent': USER_AGENT,
-					'Accept': 'text/html,application/xhtml+xml,application/pdf,*/*',
+					Accept: 'text/html,application/xhtml+xml,application/pdf,*/*',
 				},
 				redirect: 'follow',
 				signal: AbortSignal.timeout(30_000),
@@ -139,7 +139,7 @@ export async function fetchConstitution(
 	// Save raw artifact to MinIO
 	await ensureBucket(BUCKET);
 	const rawKey = `constitutions/raw/${source.stateCode}/constitution.${source.format}`;
-	await minio.putObject(BUCKET, rawKey, rawBuffer, rawBuffer.length, {
+	await putObject(BUCKET, rawKey, rawBuffer, rawBuffer.length, {
 		'Content-Type': source.format === 'html' ? 'text/html' : 'application/pdf',
 		'x-state-code': source.stateCode,
 		'x-fetch-url': finalUrl,
@@ -150,7 +150,7 @@ export async function fetchConstitution(
 	const normalizedKey = `constitutions/normalized/${source.stateCode}/constitution.txt`;
 	if (normalized.textClean) {
 		const normalizedBuf = Buffer.from(normalized.textClean, 'utf-8');
-		await minio.putObject(BUCKET, normalizedKey, normalizedBuf, normalizedBuf.length, {
+		await putObject(BUCKET, normalizedKey, normalizedBuf, normalizedBuf.length, {
 			'Content-Type': 'text/plain; charset=utf-8',
 			'x-state-code': source.stateCode,
 			'x-word-count': String(normalized.wordCount),

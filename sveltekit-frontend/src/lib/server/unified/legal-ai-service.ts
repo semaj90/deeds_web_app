@@ -253,16 +253,9 @@ export class UnifiedLegalAIService {
 
 		// MinIO
 		try {
-			const { Client } = await import('minio');
-			const client = new Client({
-				endPoint: ENV.MINIO_ENDPOINT.split(':')[0],
-				port: parseInt(ENV.MINIO_PORT, 10),
-				useSSL: ENV.MINIO_USE_SSL === 'true',
-				accessKey: ENV.MINIO_ACCESS_KEY,
-				secretKey: ENV.MINIO_SECRET_KEY,
-			});
-			await client.bucketExists(EVIDENCE_BUCKET);
-			status.minio = true;
+			const { checkHealth } = await import('$lib/server/minio-client.js');
+			const health = await checkHealth();
+			status.minio = health.healthy;
 		} catch { /* down */ }
 
 		const upCount = [status.postgresql, status.qdrant, status.minio].filter(Boolean).length;

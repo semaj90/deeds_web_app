@@ -11,13 +11,12 @@
  *  - Stage F: Embedding (768-dim) → Postgres + Qdrant mirror
  *  - Stage G: Auto-tag nodes + Neo4j sync
  *
- * Reuses: pool, minio, generateEmbeddings, chunkLegalDocument, Neo4j helpers
+ * Reuses: pool, minio-client, generateEmbeddings, chunkLegalDocument, Neo4j helpers
  */
 
 import { randomUUID } from 'crypto';
-import { Readable } from 'stream';
 import { pool } from '$lib/server/db/client';
-import { minio } from '$lib/server/minio/client';
+import { getFile } from '$lib/server/minio-client.js';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client';
 import { chunkLegalDocument } from '$lib/server/indexer/legal-chunker';
 import { generateSparseVector } from '$lib/server/vector/bm42-sparse.js';
@@ -133,10 +132,12 @@ async function upsertToQdrant(
 		// Ensure sparse vector support on existing collection
 		try {
 			await client.updateCollection(COLLECTION, { sparse_vectors: { bm25: {} } });
-		} catch { /* already configured */ }
+		} catch {
+			/* already configured */
+		}
 
 		// Enrich points with BM42 sparse vectors
-		const hybridPoints = points.map(p => {
+		const hybridPoints = points.map((p) => {
 			const text = (p.payload.chunk_text as string) ?? (p.payload.text as string) ?? '';
 			const sparse = generateSparseVector(text);
 			return {
@@ -151,7 +152,10 @@ async function upsertToQdrant(
 
 		await client.upsert(COLLECTION, { wait: true, points: hybridPoints as any });
 	} catch (err) {
-		console.warn('[constitution-pipeline] Qdrant upsert skipped:', err instanceof Error ? err.message : err);
+		console.warn(
+			'[constitution-pipeline] Qdrant upsert skipped:',
+			err instanceof Error ? err.message : err
+		);
 	}
 }
 
@@ -163,7 +167,13 @@ async function syncNeo4j(
 	documentId: string,
 	stateCode: string,
 	stateName: string,
-	nodes: Array<{ id: string; parentId: string | null; heading: string; nodeType: string; nodePath: string }>
+	nodes: Array<{
+		id: string;
+		parentId: string | null;
+		heading: string;
+		nodeType: string;
+		nodePath: string;
+	}>
 ): Promise<void> {
 	try {
 		const { getNeo4jDriver } = await import('$lib/server/neo4j-driver');
@@ -199,7 +209,10 @@ async function syncNeo4j(
 			await session.close();
 		}
 	} catch (err) {
-		console.warn('[constitution-pipeline] Neo4j sync skipped:', err instanceof Error ? err.message : err);
+		console.warn(
+			'[constitution-pipeline] Neo4j sync skipped:',
+			err instanceof Error ? err.message : err
+		);
 	}
 }
 
@@ -226,10 +239,9 @@ export async function runConstitutionPipeline(
 	const jobId = randomUUID();
 
 	// Look up jurisdiction id for the state
-	const jRow = await pool.query(
-		`SELECT id FROM jurisdictions WHERE code = $1`,
-		[source.stateCode]
-	);
+	const jRow = await pool.query(`SELECT id FROM jurisdictions WHERE code = $1`, [
+		source.stateCode,
+	]);
 	const jurisdictionId: number | null = jRow.rows[0]?.id ?? null;
 
 	if (!existingDocId) {
@@ -278,7 +290,15 @@ export async function runConstitutionPipeline(
 				 WHERE state_code = $1`,
 				[source.stateCode]
 			);
-			return { documentId, jobId, stateCode: source.stateCode, skipped: true, nodeCount: 0, chunkCount: 0, qdrantPointCount: 0 };
+			return {
+				documentId,
+				jobId,
+				stateCode: source.stateCode,
+				skipped: true,
+				nodeCount: 0,
+				chunkCount: 0,
+				qdrantPointCount: 0,
+			};
 		}
 
 		// ── Stage C: Extract text ──────────────────────────────────────────────
@@ -289,15 +309,7 @@ export async function runConstitutionPipeline(
 
 		if (source.format === 'pdf') {
 			// For PDFs, read back from MinIO and extract via pdf-parse
-			const pdfBuffer = await new Promise<Buffer>((resolve, reject) => {
-				const chunks: Buffer[] = [];
-				minio.getObject(BUCKET, fetchResult.rawMinioKey, (err, stream) => {
-					if (err) return reject(err);
-					(stream as Readable).on('data', (c) => chunks.push(c));
-					(stream as Readable).on('end', () => resolve(Buffer.concat(chunks)));
-					(stream as Readable).on('error', reject);
-				});
-			});
+			const pdfBuffer = await getFile(BUCKET, fetchResult.rawMinioKey);
 
 			try {
 				const pdfParse = (await import('pdf-parse')).default;
@@ -367,7 +379,11 @@ export async function runConstitutionPipeline(
 		for (const chunk of chunks) {
 			if (!chunk.sectionPath?.length) continue;
 			for (let depth = 0; depth < chunk.sectionPath.length; depth++) {
-				const pathKey = chunk.sectionPath.slice(0, depth + 1).join('/').toLowerCase().replace(/\s+/g, '-');
+				const pathKey = chunk.sectionPath
+					.slice(0, depth + 1)
+					.join('/')
+					.toLowerCase()
+					.replace(/\s+/g, '-');
 				if (nodeMap.has(pathKey)) continue;
 
 				const nodeId = randomUUID();
@@ -375,7 +391,11 @@ export async function runConstitutionPipeline(
 				const heading = chunk.sectionPath[depth];
 				const parentPath =
 					depth > 0
-						? chunk.sectionPath.slice(0, depth).join('/').toLowerCase().replace(/\s+/g, '-')
+						? chunk.sectionPath
+								.slice(0, depth)
+								.join('/')
+								.toLowerCase()
+								.replace(/\s+/g, '-')
 						: null;
 				const parentId = parentPath ? (nodeMap.get(parentPath) ?? null) : null;
 
@@ -387,19 +407,38 @@ export async function runConstitutionPipeline(
 
 				const nodeText = chunks
 					.filter((c) =>
-						c.sectionPath?.join('/').toLowerCase().replace(/\s+/g, '-').startsWith(pathKey)
+						c.sectionPath
+							?.join('/')
+							.toLowerCase()
+							.replace(/\s+/g, '-')
+							.startsWith(pathKey)
 					)
 					.map((c) => c.text)
 					.join('\n\n')
 					.slice(0, 100_000);
 
-				nodeRows.push({ id: nodeId, parentId, nodeType, heading, citationLabel: heading, nodePath: pathKey, fullText: nodeText });
+				nodeRows.push({
+					id: nodeId,
+					parentId,
+					nodeType,
+					heading,
+					citationLabel: heading,
+					nodePath: pathKey,
+					fullText: nodeText,
+				});
 			}
 		}
 
 		// Insert nodes with tags + rank_score
 		for (const n of nodeRows) {
-			const tags = tagNode(n.heading, n.fullText, n.nodeType, source.stateCode, source.sourceConfidence, source.isOfficial);
+			const tags = tagNode(
+				n.heading,
+				n.fullText,
+				n.nodeType,
+				source.stateCode,
+				source.sourceConfidence,
+				source.isOfficial
+			);
 			const rankScore = computeRankScore(
 				n.nodePath.split('/').length,
 				n.nodeType,
@@ -414,8 +453,14 @@ export async function runConstitutionPipeline(
 				 VALUES ($1, $2, $3, $4, $5::legal_node_type, $6, $7, $8, $9, $10, $10, $11, $12)
 				 ON CONFLICT DO NOTHING`,
 				[
-					n.id, documentId, versionId, n.parentId,
-					n.nodeType, n.heading, n.citationLabel, n.nodePath,
+					n.id,
+					documentId,
+					versionId,
+					n.parentId,
+					n.nodeType,
+					n.heading,
+					n.citationLabel,
+					n.nodePath,
 					n.nodePath.split('/').length - 1,
 					n.fullText,
 					JSON.stringify(tags),
@@ -441,15 +486,30 @@ export async function runConstitutionPipeline(
 				   (id, legal_node_id, chunk_index, chunk_text, token_count, char_start, char_end)
 				 VALUES ($1, $2, $3, $4, $5, $6, $7)
 				 ON CONFLICT (legal_node_id, chunk_index) DO NOTHING`,
-				[chunkId, nodeId, chunk.chunkIndex, chunk.text, chunk.tokenCount ?? 0, chunk.startOffset, chunk.endOffset]
+				[
+					chunkId,
+					nodeId,
+					chunk.chunkIndex,
+					chunk.text,
+					chunk.tokenCount ?? 0,
+					chunk.startOffset,
+					chunk.endOffset,
+				]
 			);
 		}
 
-		await setStage(jobId, 'embedding', 65, { nodeCount: nodeRows.length, chunkCount: chunkRows.length });
+		await setStage(jobId, 'embedding', 65, {
+			nodeCount: nodeRows.length,
+			chunkCount: chunkRows.length,
+		});
 
 		// ── Stage F: Embeddings → Postgres + Qdrant ───────────────────────────
 		const embedTexts = chunkRows.map((c) => c.text.slice(0, 1024));
-		const qdrantPoints: Array<{ id: number; vector: number[]; payload: Record<string, unknown> }> = [];
+		const qdrantPoints: Array<{
+			id: number;
+			vector: number[];
+			payload: Record<string, unknown>;
+		}> = [];
 
 		for (let i = 0; i < chunkRows.length; i += EMBED_BATCH) {
 			const batch = chunkRows.slice(i, i + EMBED_BATCH);
@@ -463,10 +523,10 @@ export async function runConstitutionPipeline(
 					if (!vec) continue;
 
 					// Update pgvector
-					await pool.query(
-						`UPDATE legal_chunks SET embedding = $1 WHERE id = $2`,
-						[`[${vec.join(',')}]`, batch[j].id]
-					);
+					await pool.query(`UPDATE legal_chunks SET embedding = $1 WHERE id = $2`, [
+						`[${vec.join(',')}]`,
+						batch[j].id,
+					]);
 
 					// Queue for Qdrant
 					const pointId = Math.abs(

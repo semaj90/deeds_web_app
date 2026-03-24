@@ -31,6 +31,35 @@ function checkAuth(request: any): void {
 }
 
 // ─────────────────────────────────────────────────────────────────────
+// MinIO helper — single place for client creation + file fetch
+// ─────────────────────────────────────────────────────────────────────
+let _mcpMinioClient: any = null;
+async function getMcpMinioClient() {
+  if (!_mcpMinioClient) {
+    const { Client } = await import('minio');
+    _mcpMinioClient = new Client({
+      endPoint: process.env.MINIO_ENDPOINT?.split(':')[0] || 'localhost',
+      port: parseInt(process.env.MINIO_PORT || '9000', 10),
+      useSSL: process.env.MINIO_USE_SSL === 'true',
+      accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
+      secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
+    });
+  }
+  return _mcpMinioClient;
+}
+
+async function mcpGetFile(objectKey: string, bucket?: string): Promise<Buffer> {
+  const client = await getMcpMinioClient();
+  const bucketName = bucket || process.env.MINIO_EVIDENCE_BUCKET || 'evidence';
+  const chunks: Buffer[] = [];
+  const stream = await client.getObject(bucketName, objectKey);
+  for await (const chunk of stream) {
+    chunks.push(Buffer.from(chunk));
+  }
+  return Buffer.concat(chunks);
+}
+
+// ─────────────────────────────────────────────────────────────────────
 // Tool executor — enables compose:pipeline to call tools by name
 // ─────────────────────────────────────────────────────────────────────
 async function executeTool(
@@ -777,22 +806,8 @@ function setupToolHandlers() {
             };
           }
 
-          // Fetch audio from MinIO via minio npm client
-          const { Client } = await import('minio');
-          const minio = new Client({
-            endPoint: process.env.MINIO_ENDPOINT?.split(':')[0] || 'localhost',
-            port: parseInt(process.env.MINIO_PORT || '9000', 10),
-            useSSL: process.env.MINIO_USE_SSL === 'true',
-            accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
-            secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
-          });
-          const bucketName = process.env.MINIO_EVIDENCE_BUCKET || 'evidence';
-          const chunks: Buffer[] = [];
-          const stream = await minio.getObject(bucketName, audioUrl);
-          for await (const chunk of stream) {
-            chunks.push(Buffer.from(chunk));
-          }
-          const audioBuffer = Buffer.concat(chunks);
+          // Fetch audio from MinIO
+          const audioBuffer = await mcpGetFile(audioUrl);
 
           // Detect MIME from extension
           const ext = audioUrl.split('.').pop()?.toLowerCase() || '';
@@ -873,21 +888,7 @@ function setupToolHandlers() {
           const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
 
           // Fetch file from MinIO
-          const { Client } = await import('minio');
-          const minio = new Client({
-            endPoint: process.env.MINIO_ENDPOINT?.split(':')[0] || 'localhost',
-            port: parseInt(process.env.MINIO_PORT || '9000', 10),
-            useSSL: process.env.MINIO_USE_SSL === 'true',
-            accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
-            secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
-          });
-          const bucketName = process.env.MINIO_EVIDENCE_BUCKET || 'evidence';
-          const chunks: Buffer[] = [];
-          const stream = await minio.getObject(bucketName, fileUrl);
-          for await (const chunk of stream) {
-            chunks.push(Buffer.from(chunk));
-          }
-          const fileBuffer = Buffer.concat(chunks);
+          const fileBuffer = await mcpGetFile(fileUrl);
 
           // Call FastAPI multimodal endpoint
           const FormData = (await import('form-data')).default;
@@ -922,21 +923,7 @@ function setupToolHandlers() {
           const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
 
           // Fetch image from MinIO
-          const { Client } = await import('minio');
-          const minio = new Client({
-            endPoint: process.env.MINIO_ENDPOINT?.split(':')[0] || 'localhost',
-            port: parseInt(process.env.MINIO_PORT || '9000', 10),
-            useSSL: process.env.MINIO_USE_SSL === 'true',
-            accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
-            secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
-          });
-          const bucketName = process.env.MINIO_EVIDENCE_BUCKET || 'evidence';
-          const chunks: Buffer[] = [];
-          const stream = await minio.getObject(bucketName, imageUrl);
-          for await (const chunk of stream) {
-            chunks.push(Buffer.from(chunk));
-          }
-          const imageBuffer = Buffer.concat(chunks);
+          const imageBuffer = await mcpGetFile(imageUrl);
 
           // Call FastAPI vision endpoint
           const FormData = (await import('form-data')).default;
@@ -966,21 +953,7 @@ function setupToolHandlers() {
           const FASTAPI_URL = process.env.FASTAPI_MULTIMODAL_URL || 'http://localhost:8000';
 
           // Fetch audio from MinIO
-          const { Client } = await import('minio');
-          const minio = new Client({
-            endPoint: process.env.MINIO_ENDPOINT?.split(':')[0] || 'localhost',
-            port: parseInt(process.env.MINIO_PORT || '9000', 10),
-            useSSL: process.env.MINIO_USE_SSL === 'true',
-            accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
-            secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
-          });
-          const bucketName = process.env.MINIO_EVIDENCE_BUCKET || 'evidence';
-          const chunks: Buffer[] = [];
-          const stream = await minio.getObject(bucketName, audioUrl);
-          for await (const chunk of stream) {
-            chunks.push(Buffer.from(chunk));
-          }
-          const audioBuffer = Buffer.concat(chunks);
+          const audioBuffer = await mcpGetFile(audioUrl);
 
           // Call FastAPI audio endpoint
           const FormData = (await import('form-data')).default;

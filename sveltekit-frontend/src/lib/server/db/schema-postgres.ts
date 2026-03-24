@@ -548,293 +548,305 @@ export const caseScores = pgTable('case_scores',
 );
 
 // === EMBEDDING CACHE ===
-export const embeddingCache = pgTable('embedding_cache',
- {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- textHash: text('text_hash').notNull(),
- model: varchar('model', { length: 100 }).notNull(),
- createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
- embedding: text('embedding').notNull(), // Vector stored as text, converted in service layer
- },
-	(table) => [unique('embedding_cache_text_hash_unique').on(table.textHash)]
+export const embeddingCache = pgTable(
+  'embedding_cache',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    textHash: text('text_hash').notNull(),
+    model: varchar('model', { length: 100 }).notNull(),
+    createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+    // vector(768) — matches embeddinggemma:latest native dimensions
+    embedding: vector('embedding', { dimensions: 768 }).notNull(),
+  },
+  (table) => [unique('embedding_cache_text_hash_unique').on(table.textHash)]
 );
 
 // === USER AI QUERIES ===
-export const userAiQueries = pgTable('user_ai_queries',
- {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- userId: uuid('user_id').notNull(),
- caseId: uuid('case_id'),
- query: text('query').notNull(),
- response: text('response').notNull(),
- model: varchar('model', { length: 100 }).notNull(),
- queryType: varchar('query_type', { length: 50 }).notNull(),
- confidence: numeric('confidence', { precision: 3, scale: 2 }),
- processingTime: integer('processing_time'), // in ms
- contextUsed: jsonb('context_used').default([]).$type<string[]>(),
- createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
- },
-	(table) => ({
- foreignKeys: [
- foreignKey({
- columns: [table.userId],
- foreignColumns: [users.id],
- name: 'user_ai_queries_user_id_users_id_fk',
- }).onDelete('cascade'),
- foreignKey({
- columns: [table.caseId],
- foreignColumns: [cases.id],
- name: 'user_ai_queries_case_id_cases_id_fk',
- }).onDelete('set null')],
- })
+export const userAiQueries = pgTable(
+  'user_ai_queries',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    userId: uuid('user_id').notNull(),
+    caseId: uuid('case_id'),
+    query: text('query').notNull(),
+    response: text('response').notNull(),
+    model: varchar('model', { length: 100 }).notNull(),
+    queryType: varchar('query_type', { length: 50 }).notNull(),
+    confidence: numeric('confidence', { precision: 3, scale: 2 }),
+    processingTime: integer('processing_time'), // in ms
+    contextUsed: jsonb('context_used').default([]).$type<string[]>(),
+    createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+  },
+  (table) => ({
+    foreignKeys: [
+      foreignKey({
+        columns: [table.userId],
+        foreignColumns: [users.id],
+        name: 'user_ai_queries_user_id_users_id_fk',
+      }).onDelete('cascade'),
+      foreignKey({
+        columns: [table.caseId],
+        foreignColumns: [cases.id],
+        name: 'user_ai_queries_case_id_cases_id_fk',
+      }).onDelete('set null'),
+    ],
+  })
 );
 
 // === AUTO TAGS ===
-export const autoTags = pgTable('auto_tags',
- {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- entityId: uuid('entity_id').notNull(), // Polymorphic
- entityType: varchar('entity_type', { length: 50 }).notNull(), // e.g., 'evidence', 'document'
- tag: varchar('tag', { length: 100 }).notNull(),
- confidence: real('confidence').notNull(),
- source: varchar('source', { length: 100 }).notNull(), // e.g., 'ai_analysis', 'user'
- model: varchar('model', { length: 100 }),
- isConfirmed: boolean('is_confirmed').default(false).notNull(),
- confirmedBy: uuid('confirmed_by'), // FK to users.id
- confirmedAt: timestamp('confirmed_at', { mode: 'string' }),
- createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
- },
-	(table) => ({
- foreignKeys: [
- foreignKey({
- columns: [table.confirmedBy],
- foreignColumns: [users.id],
- name: 'auto_tags_confirmed_by_users_id_fk',
- }).onDelete('set null')],
- indexes: [index('idx_autotags_entity').on(table.entityId, table.entityType)],
- })
+export const autoTags = pgTable(
+  'auto_tags',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    entityId: uuid('entity_id').notNull(), // Polymorphic
+    entityType: varchar('entity_type', { length: 50 }).notNull(), // e.g., 'evidence', 'document'
+    tag: varchar('tag', { length: 100 }).notNull(),
+    confidence: real('confidence').notNull(),
+    source: varchar('source', { length: 100 }).notNull(), // e.g., 'ai_analysis', 'user'
+    model: varchar('model', { length: 100 }),
+    isConfirmed: boolean('is_confirmed').default(false).notNull(),
+    confirmedBy: uuid('confirmed_by'), // FK to users.id
+    confirmedAt: timestamp('confirmed_at', { mode: 'string' }),
+    createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+  },
+  (table) => ({
+    foreignKeys: [
+      foreignKey({
+        columns: [table.confirmedBy],
+        foreignColumns: [users.id],
+        name: 'auto_tags_confirmed_by_users_id_fk',
+      }).onDelete('set null'),
+    ],
+    indexes: [index('idx_autotags_entity').on(table.entityId, table.entityType)],
+  })
 );
 
 // === VECTOR OUTBOX ===
 export const vectorOutbox = pgTable('vector_outbox', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- ownerType: varchar('owner_type', { length: 256 }).notNull(),
- ownerId: varchar('owner_id', { length: 256 }).notNull(),
- event: varchar('event', { length: 256 }).notNull(),
- vector: text('vector'), // Using sql`vector(384)` for pgvector type
- payload: jsonb('payload').notNull(),
- createdAt: timestamp('created_at').defaultNow().notNull(),
- updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  ownerType: varchar('owner_type', { length: 256 }).notNull(),
+  ownerId: varchar('owner_id', { length: 256 }).notNull(),
+  event: varchar('event', { length: 256 }).notNull(),
+  // vector(768) — embeddinggemma:latest native dimensions (was incorrectly typed as text/384)
+  vector: vector('vector', { dimensions: 768 }),
+  payload: jsonb('payload').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const vectorJobs = pgTable('vector_jobs', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- status: varchar('status', { enum: ['pending', 'processing', 'success', 'failed'] }).notNull(),
- progress: integer('progress').default(0).notNull(),
- result: jsonb('result'),
- error: text('error'),
- createdAt: timestamp('created_at').defaultNow().notNull(),
- updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  status: varchar('status', { enum: ['pending', 'processing', 'success', 'failed'] }).notNull(),
+  progress: integer('progress').default(0).notNull(),
+  result: jsonb('result'),
+  error: text('error'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 // === ADDITIONAL TABLES ===
 export const caseActivities = pgTable('case_activities', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- caseId: uuid('case_id'),
- assignedTo: uuid('assigned_to'),
- createdBy: uuid('created_by'),
- activityType: varchar('activity_type', { length: 100 }),
- description: text('description'),
- status: activityStatusEnum('status'),
- dueDate: timestamp('due_date'),
- createdAt: timestamp('created_at').defaultNow(),
- updatedAt: timestamp('updated_at').defaultNow(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  caseId: uuid('case_id'),
+  assignedTo: uuid('assigned_to'),
+  createdBy: uuid('created_by'),
+  activityType: varchar('activity_type', { length: 100 }),
+  description: text('description'),
+  status: activityStatusEnum('status'),
+  dueDate: timestamp('due_date'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
 export const attachmentVerifications = pgTable('attachment_verifications', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- attachmentId: uuid('attachment_id'), // FK to evidence.id or legalDocuments.id
- verifiedBy: uuid('verified_by'), // FK to users.id
- status: verificationStatusEnum('status'),
- verificationDate: timestamp('verification_date'),
- notes: text('notes'),
- createdAt: timestamp('created_at').defaultNow(),
- updatedAt: timestamp('updatedAt').defaultNow(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  attachmentId: uuid('attachment_id'), // FK to evidence.id or legalDocuments.id
+  verifiedBy: uuid('verified_by'), // FK to users.id
+  status: verificationStatusEnum('status'),
+  verificationDate: timestamp('verification_date'),
+  notes: text('notes'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updatedAt').defaultNow(),
 });
 
 export const canvasStates = pgTable('canvas_states', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- caseId: uuid('case_id'), // FK to cases.id
- userId: uuid('user_id'), // FK to users.id
- stateData: jsonb('state_data').notNull(),
- createdAt: timestamp('created_at').defaultNow(),
- updatedAt: timestamp('updated_at').defaultNow(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  caseId: uuid('case_id'), // FK to cases.id
+  userId: uuid('user_id'), // FK to users.id
+  stateData: jsonb('state_data').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
 export const canvasAnnotations = pgTable('canvas_annotations', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- canvasStateId: uuid('canvas_state_id'), // FK to canvasStates
- createdBy: uuid('created_by'), // FK to users.id
- annotationData: jsonb('annotation_data').default({}).notNull(),
- createdAt: timestamp('created_at').defaultNow(),
- updatedAt: timestamp('updatedAt').defaultNow(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  canvasStateId: uuid('canvas_state_id'), // FK to canvasStates
+  createdBy: uuid('created_by'), // FK to users.id
+  annotationData: jsonb('annotation_data').default({}).notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updatedAt').defaultNow(),
 });
 
 export const canvasAutosaves = pgTable('canvas_autosaves', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- canvasStateId: uuid('canvas_state_id'), // FK to canvasStates
- createdAt: timestamp('created_at').defaultNow(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  canvasStateId: uuid('canvas_state_id'), // FK to canvasStates
+  createdAt: timestamp('created_at').defaultNow(),
 });
 
 export const aiReports = pgTable('ai_reports', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- caseId: uuid('case_id').references(() => cases.id, { onDelete: 'cascade' }), // FK to cases.id
- createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }), // FK to users.id
- reportType: varchar('report_type', { length: 100 }).notNull(),
- summary: text('summary'),
- fullReport: text('full_report'),
- generatedAt: timestamp('generated_at').defaultNow().notNull(),
- metadata: jsonb('metadata'),
- createdAt: timestamp('created_at').defaultNow(),
- updatedAt: timestamp('updatedAt').defaultNow(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  caseId: uuid('case_id').references(() => cases.id, { onDelete: 'cascade' }), // FK to cases.id
+  createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }), // FK to users.id
+  reportType: varchar('report_type', { length: 100 }).notNull(),
+  summary: text('summary'),
+  fullReport: text('full_report'),
+  generatedAt: timestamp('generated_at').defaultNow().notNull(),
+  metadata: jsonb('metadata'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updatedAt').defaultNow(),
 });
 
 export const citations = pgTable('citations', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- documentId: uuid('document_id'), // FK to legalDocuments.id
- caseId: uuid('case_id'), // FK to cases.id
- // DB-SYNC: actual column is 'quoted_text', NOT 'citation_text'
- citationType: varchar('citation_type', { length: 100 }).notNull(),
- relevanceScore: real('relevance_score'),
- pageNumber: integer('page_number'),
- pinpointCitation: varchar('pinpoint_citation', { length: 500 }),
- quotedText: text('quoted_text'),
- contextBefore: text('context_before'),
- contextAfter: text('context_after'),
- annotation: text('annotation'),
- legalPrinciple: text('legal_principle'),
- citationFormat: varchar('citation_format', { length: 50 }).default('bluebook'),
- formattedCitation: text('formatted_citation'),
- shepardsTreatment: varchar('shepards_treatment', { length: 100 }),
- isKeyAuthority: boolean('is_key_authority').default(false),
- createdBy: uuid('created_by'), // FK to users.id
- createdAt: timestamp('created_at').defaultNow(),
- updatedAt: timestamp('updated_at').defaultNow(),
- // DB-SYNC: additional columns present in native PG
- title: varchar('title', { length: 500 }),
- sourceType: varchar('source_type', { length: 100 }),
- sourceName: varchar('source_name', { length: 500 }),
- sourceUrl: text('source_url'),
- notes: text('notes'),
- tags: jsonb('tags').default([]),
- embedding: vector('embedding', { dimensions: 768 }),
- metadata: jsonb('metadata').default({}),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  documentId: uuid('document_id'), // FK to legalDocuments.id
+  caseId: uuid('case_id'), // FK to cases.id
+  // DB-SYNC: actual column is 'quoted_text', NOT 'citation_text'
+  citationType: varchar('citation_type', { length: 100 }).notNull(),
+  relevanceScore: real('relevance_score'),
+  pageNumber: integer('page_number'),
+  pinpointCitation: varchar('pinpoint_citation', { length: 500 }),
+  quotedText: text('quoted_text'),
+  contextBefore: text('context_before'),
+  contextAfter: text('context_after'),
+  annotation: text('annotation'),
+  legalPrinciple: text('legal_principle'),
+  citationFormat: varchar('citation_format', { length: 50 }).default('bluebook'),
+  formattedCitation: text('formatted_citation'),
+  shepardsTreatment: varchar('shepards_treatment', { length: 100 }),
+  isKeyAuthority: boolean('is_key_authority').default(false),
+  createdBy: uuid('created_by'), // FK to users.id
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+  // DB-SYNC: additional columns present in native PG
+  title: varchar('title', { length: 500 }),
+  sourceType: varchar('source_type', { length: 100 }),
+  sourceName: varchar('source_name', { length: 500 }),
+  sourceUrl: text('source_url'),
+  notes: text('notes'),
+  tags: jsonb('tags').default([]),
+  embedding: vector('embedding', { dimensions: 768 }),
+  metadata: jsonb('metadata').default({}),
 });
 
 // === CITATION TAGS ===
 // User-defined labels on citations (e.g., "key authority", "opposing", "supporting")
-export const citationTags = pgTable('citation_tags',
- {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- citationId: uuid('citation_id')
- .notNull()
- .references(() => citations.id, { onDelete: 'cascade' }),
- tag: varchar('tag', { length: 100 }).notNull(),
- color: varchar('color', { length: 7 }).default('#6b7280'),
- createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
- createdAt: timestamp('created_at', { withTimezone: true })
- .default(sql`now()`)
- .notNull(),
- },
-	(table) => ({
- citationIdIdx: index('citation_tags_citation_id_idx').on(table.citationId),
- uniqueTag: unique('citation_tags_unique').on(table.citationId, table.tag),
- })
+export const citationTags = pgTable(
+  'citation_tags',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    citationId: uuid('citation_id')
+      .notNull()
+      .references(() => citations.id, { onDelete: 'cascade' }),
+    tag: varchar('tag', { length: 100 }).notNull(),
+    color: varchar('color', { length: 7 }).default('#6b7280'),
+    createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+  },
+  (table) => ({
+    citationIdIdx: index('citation_tags_citation_id_idx').on(table.citationId),
+    uniqueTag: unique('citation_tags_unique').on(table.citationId, table.tag),
+  })
 );
 
 // === CITATION COLLECTIONS ===
 // User-created collections to organize citations
-export const citationCollections = pgTable('citation_collections', {
-	id: uuid('id')
-		.default(sql`gen_random_uuid()`)
-		.primaryKey()
-		.notNull(),
-	userId: uuid('user_id')
-		.notNull()
-		.references(() => users.id, { onDelete: 'cascade' }),
-	name: varchar('name', { length: 255 }).notNull(),
-	description: text('description'),
-	color: varchar('color', { length: 7 }).default('#8B2332'),
-	isPublic: boolean('is_public').default(false).notNull(),
-	createdAt: timestamp('created_at', { withTimezone: true })
-		.default(sql`now()`)
-		.notNull(),
-	updatedAt: timestamp('updated_at', { withTimezone: true })
-		.default(sql`now()`)
-		.notNull(),
-},
-	(table) => ({
-		userIdIdx: index('citation_collections_user_id_idx').on(table.userId),
-	})
+export const citationCollections = pgTable(
+  'citation_collections',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    name: varchar('name', { length: 255 }).notNull(),
+    description: text('description'),
+    color: varchar('color', { length: 7 }).default('#8B2332'),
+    isPublic: boolean('is_public').default(false).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+  },
+  (table) => ({
+    userIdIdx: index('citation_collections_user_id_idx').on(table.userId),
+  })
 );
 
 // === COLLECTION CITATIONS (M2M) ===
 // Junction table for many-to-many relationship between collections and citations
-export const collectionCitations = pgTable('collection_citations', {
-	collectionId: uuid('collection_id')
-		.notNull()
-		.references(() => citationCollections.id, { onDelete: 'cascade' }),
-	citationId: uuid('citation_id')
-		.notNull()
-		.references(() => citations.id, { onDelete: 'cascade' }),
-	addedAt: timestamp('added_at', { withTimezone: true })
-		.default(sql`now()`)
-		.notNull(),
-},
-	(table) => ({
-		pk: primaryKey({ columns: [table.collectionId, table.citationId] }),
-		collectionIdIdx: index('collection_citations_collection_id_idx').on(table.collectionId),
-		citationIdIdx: index('collection_citations_citation_id_idx').on(table.citationId),
-	})
+export const collectionCitations = pgTable(
+  'collection_citations',
+  {
+    collectionId: uuid('collection_id')
+      .notNull()
+      .references(() => citationCollections.id, { onDelete: 'cascade' }),
+    citationId: uuid('citation_id')
+      .notNull()
+      .references(() => citations.id, { onDelete: 'cascade' }),
+    addedAt: timestamp('added_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.collectionId, table.citationId] }),
+    collectionIdIdx: index('collection_citations_collection_id_idx').on(table.collectionId),
+    citationIdIdx: index('collection_citations_citation_id_idx').on(table.citationId),
+  })
 );
 
 // Citation Collections Type Exports
@@ -844,484 +856,512 @@ export type CollectionCitation = typeof collectionCitations.$inferSelect;
 export type NewCollectionCitation = typeof collectionCitations.$inferInsert;
 
 export const reports = pgTable('reports', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- caseId: uuid('case_id'), // FK to cases.id
- createdBy: uuid('created_by'), // FK to users.id
- title: varchar('title', { length: 255 }).notNull(),
- content: text('content'),
- type: varchar('type', { length: 64 }),
- status: reportStatusEnum('status').default('draft').notNull(),
- generatedAt: timestamp('generated_at').defaultNow().notNull(),
- metadata: jsonb('metadata'),
- // DB-SYNC: columns present in native PG
- reportType: varchar('report_type', { length: 100 }),
- format: varchar('format', { length: 50 }).default('html'),
- createdAt: timestamp('created_at').defaultNow(),
- updatedAt: timestamp('updated_at').defaultNow(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  caseId: uuid('case_id'), // FK to cases.id
+  createdBy: uuid('created_by'), // FK to users.id
+  title: varchar('title', { length: 255 }).notNull(),
+  content: text('content'),
+  type: varchar('type', { length: 64 }),
+  status: reportStatusEnum('status').default('draft').notNull(),
+  generatedAt: timestamp('generated_at').defaultNow().notNull(),
+  metadata: jsonb('metadata'),
+  // DB-SYNC: columns present in native PG
+  reportType: varchar('report_type', { length: 100 }),
+  format: varchar('format', { length: 50 }).default('html'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-export const reportAuditLog = pgTable('report_audit_log', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- reportId: uuid('report_id')
- .notNull()
- .references(() => reports.id, { onDelete: 'cascade' }),
- userId: uuid('user_id')
- .notNull()
- .references(() => users.id, { onDelete: 'set null' }),
- action: varchar('action', { length: 50 }).notNull(), // 'created', 'updated', 'deleted', 'published', 'exported'
- changes: jsonb('changes'), // What changed (old vs new values)
- ipAddress: varchar('ip_address', { length: 45 }),
- userAgent: text('user_agent'),
- timestamp: timestamp('timestamp', { withTimezone: true })
- .default(sql`now()`)
- .notNull(),
-},
-(table) => ({
- reportIdIdx: index('report_audit_log_report_id_idx').on(table.reportId),
- userIdIdx: index('report_audit_log_user_id_idx').on(table.userId),
- timestampIdx: index('report_audit_log_timestamp_idx').on(table.timestamp),
-}));
+export const reportAuditLog = pgTable(
+  'report_audit_log',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    reportId: uuid('report_id')
+      .notNull()
+      .references(() => reports.id, { onDelete: 'cascade' }),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'set null' }),
+    action: varchar('action', { length: 50 }).notNull(), // 'created', 'updated', 'deleted', 'published', 'exported'
+    changes: jsonb('changes'), // What changed (old vs new values)
+    ipAddress: varchar('ip_address', { length: 45 }),
+    userAgent: text('user_agent'),
+    timestamp: timestamp('timestamp', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+  },
+  (table) => ({
+    reportIdIdx: index('report_audit_log_report_id_idx').on(table.reportId),
+    userIdIdx: index('report_audit_log_user_id_idx').on(table.userId),
+    timestampIdx: index('report_audit_log_timestamp_idx').on(table.timestamp),
+  })
+);
 
-export const reportVersions = pgTable('report_versions', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- reportId: uuid('report_id')
- .notNull()
- .references(() => reports.id, { onDelete: 'cascade' }),
- version: integer('version').notNull(),
- title: varchar('title', { length: 255 }),
- content: text('content'),
- metadata: jsonb('metadata'),
- changedBy: uuid('changed_by')
- .references(() => users.id, { onDelete: 'set null' }),
- changeReason: text('change_reason'),
- createdAt: timestamp('created_at', { withTimezone: true })
- .default(sql`now()`)
- .notNull(),
-},
-(table) => ({
- reportIdIdx: index('report_versions_report_id_idx').on(table.reportId),
- versionIdx: index('report_versions_version_idx').on(table.reportId, table.version),
-}));
+export const reportVersions = pgTable(
+  'report_versions',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    reportId: uuid('report_id')
+      .notNull()
+      .references(() => reports.id, { onDelete: 'cascade' }),
+    version: integer('version').notNull(),
+    title: varchar('title', { length: 255 }),
+    content: text('content'),
+    metadata: jsonb('metadata'),
+    changedBy: uuid('changed_by').references(() => users.id, { onDelete: 'set null' }),
+    changeReason: text('change_reason'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+  },
+  (table) => ({
+    reportIdIdx: index('report_versions_report_id_idx').on(table.reportId),
+    versionIdx: index('report_versions_version_idx').on(table.reportId, table.version),
+  })
+);
 
 export type ReportVersion = typeof reportVersions.$inferSelect;
 export type NewReportVersion = typeof reportVersions.$inferInsert;
 
 export const savedReports = pgTable('saved_reports', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- userId: uuid('user_id').notNull(), // FK to users.id
- reportId: uuid('report_id').notNull(), // FK to reports.id
- caseId: uuid('case_id'), // FK to cases.id
- savedAt: timestamp('saved_at').defaultNow().notNull(),
- notes: text('notes'),
- createdAt: timestamp('created_at').defaultNow(),
- updatedAt: timestamp('updated_at').defaultNow(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  userId: uuid('user_id').notNull(), // FK to users.id
+  reportId: uuid('report_id').notNull(), // FK to reports.id
+  caseId: uuid('case_id'), // FK to cases.id
+  savedAt: timestamp('saved_at').defaultNow().notNull(),
+  notes: text('notes'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
 export const themes = pgTable('themes', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- userId: uuid('user_id').notNull(), // FK to users.id
- name: varchar('name', { length: 100 }).notNull(),
- config: jsonb('config').notNull(),
- isDefault: boolean('is_default').default(false).notNull(),
- createdAt: timestamp('created_at').defaultNow(),
- updatedAt: timestamp('updated_at').defaultNow(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  userId: uuid('user_id').notNull(), // FK to users.id
+  name: varchar('name', { length: 100 }).notNull(),
+  config: jsonb('config').notNull(),
+  isDefault: boolean('is_default').default(false).notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
 export const personsOfInterest = pgTable('persons_of_interest', {
-	id: uuid('id')
-		.default(sql`gen_random_uuid()`)
-		.primaryKey()
-		.notNull(),
-	name: text('name').notNull(),
-	aliases: text('aliases').array(),
-	description: text('description').default(''),
-	threatLevel: varchar('threat_level', { enum: ['low', 'medium', 'high', 'critical'] })
-		.default('low')
-		.notNull(),
-	status: varchar('status', { enum: ['surveillance', 'wanted', 'active', 'cleared'] })
-		.default('surveillance')
-		.notNull(),
-	relationship: text('relationship'),
-	aiProfile: jsonb('ai_profile').$type<{
-		riskScore: number;
-		patterns: string[];
-		recommendations: string[];
-		lastUpdated: string;
-	}>(),
-	who: jsonb('who'),
-	what: jsonb('what'),
-	why: jsonb('why'),
-	how: jsonb('how'),
-	risk: jsonb('risk'),
-	confidence: real('confidence'),
-	modelVersion: text('model_version'),
-	generatedAt: timestamp('generated_at'),
-	lastUpdated: timestamp('last_updated'),
-	crimes: text('crimes').array(),
-	caseIds: text('case_ids').array(),
-	caseId: uuid('case_id'),
-	profileData: jsonb('profile_data').default({}),
-	tags: jsonb('tags').default([]),
-	position: jsonb('position').default({}),
-	photoUrl: text('photo_url'),
-	notes: text('notes'),
-	metadata: jsonb('metadata').default({}),
-	createdBy: text('created_by'),
-	createdAt: timestamp('created_at').defaultNow(),
-	updatedAt: timestamp('updated_at').defaultNow(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  name: text('name').notNull(),
+  aliases: text('aliases').array(),
+  description: text('description').default(''),
+  threatLevel: varchar('threat_level', { enum: ['low', 'medium', 'high', 'critical'] })
+    .default('low')
+    .notNull(),
+  status: varchar('status', { enum: ['surveillance', 'wanted', 'active', 'cleared'] })
+    .default('surveillance')
+    .notNull(),
+  relationship: text('relationship'),
+  aiProfile: jsonb('ai_profile').$type<{
+    riskScore: number;
+    patterns: string[];
+    recommendations: string[];
+    lastUpdated: string;
+  }>(),
+  who: jsonb('who'),
+  what: jsonb('what'),
+  why: jsonb('why'),
+  how: jsonb('how'),
+  risk: jsonb('risk'),
+  confidence: real('confidence'),
+  modelVersion: text('model_version'),
+  generatedAt: timestamp('generated_at'),
+  lastUpdated: timestamp('last_updated'),
+  crimes: text('crimes').array(),
+  caseIds: text('case_ids').array(),
+  caseId: uuid('case_id'),
+  profileData: jsonb('profile_data').default({}),
+  tags: jsonb('tags').default([]),
+  position: jsonb('position').default({}),
+  photoUrl: text('photo_url'),
+  notes: text('notes'),
+  metadata: jsonb('metadata').default({}),
+  createdBy: text('created_by'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
 // POI Photos table for better organization
-export const poiPhotos = pgTable('poi_photos',
- {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- poiId: uuid('poi_id').notNull(),
- minioKey: text('minio_key').notNull(),
- thumbnailKey: text('thumbnail_key'),
- url: text('url').notNull(),
- thumbnailUrl: text('thumbnail_url'),
- originalName: text('original_name').notNull(),
- mimeType: text('mime_type').notNull(),
- size: bigint('size', { mode: 'number' }).notNull(),
- aiCaption: text('ai_caption'),
- aiTags: jsonb('ai_tags').default([]).$type<string[]>(),
- exifData: jsonb('exif_data'),
- forensicData: jsonb('forensic_data'),
- faceEmbedding: vector('face_embedding', { dimensions: 768 }),
- uploadedAt: timestamp('uploaded_at').defaultNow().notNull(),
- },
-	(table) => ({
- foreignKeys: [
- foreignKey({
- columns: [table.poiId],
- foreignColumns: [personsOfInterest.id],
- name: 'poi_photos_poi_id_persons_id_fk',
- }).onDelete('cascade')],
- indexes: [
- index('idx_poi_photos_poi_id').on(table.poiId),
- index('idx_poi_photos_uploaded_at').on(table.uploadedAt)],
- })
+export const poiPhotos = pgTable(
+  'poi_photos',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    poiId: uuid('poi_id').notNull(),
+    minioKey: text('minio_key').notNull(),
+    thumbnailKey: text('thumbnail_key'),
+    url: text('url').notNull(),
+    thumbnailUrl: text('thumbnail_url'),
+    originalName: text('original_name').notNull(),
+    mimeType: text('mime_type').notNull(),
+    size: bigint('size', { mode: 'number' }).notNull(),
+    aiCaption: text('ai_caption'),
+    aiTags: jsonb('ai_tags').default([]).$type<string[]>(),
+    exifData: jsonb('exif_data'),
+    forensicData: jsonb('forensic_data'),
+    faceEmbedding: vector('face_embedding', { dimensions: 768 }),
+    uploadedAt: timestamp('uploaded_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    foreignKeys: [
+      foreignKey({
+        columns: [table.poiId],
+        foreignColumns: [personsOfInterest.id],
+        name: 'poi_photos_poi_id_persons_id_fk',
+      }).onDelete('cascade'),
+    ],
+    indexes: [
+      index('idx_poi_photos_poi_id').on(table.poiId),
+      index('idx_poi_photos_uploaded_at').on(table.uploadedAt),
+    ],
+  })
 );
 
 // POI Relationships table
-export const poiRelationships = pgTable('poi_relationships', {
-	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
-	poiId1: uuid('poi_id_1').notNull().references(() => personsOfInterest.id, { onDelete: 'cascade' }),
-	poiId2: uuid('poi_id_2').notNull().references(() => personsOfInterest.id, { onDelete: 'cascade' }),
-	relationshipType: varchar('relationship_type', { length: 100 }).notNull().default('unknown'),
-	strength: numeric('strength', { precision: 3, scale: 2 }).default('0.70'),
-	metadata: jsonb('metadata').default({}),
-	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
-}, (table) => ({
-	poi1Idx: index('poi_relationships_poi1_idx').on(table.poiId1),
-	poi2Idx: index('poi_relationships_poi2_idx').on(table.poiId2),
-}));
+export const poiRelationships = pgTable(
+  'poi_relationships',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    poiId1: uuid('poi_id_1')
+      .notNull()
+      .references(() => personsOfInterest.id, { onDelete: 'cascade' }),
+    poiId2: uuid('poi_id_2')
+      .notNull()
+      .references(() => personsOfInterest.id, { onDelete: 'cascade' }),
+    relationshipType: varchar('relationship_type', { length: 100 }).notNull().default('unknown'),
+    strength: numeric('strength', { precision: 3, scale: 2 }).default('0.70'),
+    metadata: jsonb('metadata').default({}),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+  },
+  (table) => ({
+    poi1Idx: index('poi_relationships_poi1_idx').on(table.poiId1),
+    poi2Idx: index('poi_relationships_poi2_idx').on(table.poiId2),
+  })
+);
 
 export type PoiRelationship = typeof poiRelationships.$inferSelect;
 
 // === TIMELINE EVENTS ===
 
-export const timelineEvents = pgTable('timeline_events', {
-	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
-	poiId: uuid('poi_id').references(() => personsOfInterest.id, { onDelete: 'cascade' }),
-	caseId: uuid('case_id'),
-	title: varchar('title', { length: 500 }).notNull(),
-	description: text('description'),
-	eventDate: timestamp('event_date', { withTimezone: true }).notNull(),
-	eventType: varchar('event_type', { length: 100 }).default('general'),
-	location: varchar('location', { length: 500 }),
-	severity: varchar('severity', { length: 20 }).default('low'),
-	metadata: jsonb('metadata'),
-	// DB-SYNC: legacy columns present in native PG
-	timestamp: timestamp('timestamp'),
-	type: varchar('type', { length: 100 }),
-	evidenceIds: jsonb('evidence_ids').default([]),
-	personIds: jsonb('person_ids').default([]),
-	locationIds: jsonb('location_ids').default([]),
-	createdBy: uuid('created_by'),
-	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`),
-	updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`now()`),
-}, (table) => [
-	index('idx_timeline_events_poi_id').on(table.poiId),
-	index('idx_timeline_events_case_id').on(table.caseId),
-	index('idx_timeline_events_event_date').on(table.eventDate),
-]);
+export const timelineEvents = pgTable(
+  'timeline_events',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    poiId: uuid('poi_id').references(() => personsOfInterest.id, { onDelete: 'cascade' }),
+    caseId: uuid('case_id'),
+    title: varchar('title', { length: 500 }).notNull(),
+    description: text('description'),
+    eventDate: timestamp('event_date', { withTimezone: true }).notNull(),
+    eventType: varchar('event_type', { length: 100 }).default('general'),
+    location: varchar('location', { length: 500 }),
+    severity: varchar('severity', { length: 20 }).default('low'),
+    metadata: jsonb('metadata'),
+    // DB-SYNC: legacy columns present in native PG
+    timestamp: timestamp('timestamp'),
+    type: varchar('type', { length: 100 }),
+    evidenceIds: jsonb('evidence_ids').default([]),
+    personIds: jsonb('person_ids').default([]),
+    locationIds: jsonb('location_ids').default([]),
+    createdBy: uuid('created_by'),
+    createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`now()`),
+  },
+  (table) => [
+    index('idx_timeline_events_poi_id').on(table.poiId),
+    index('idx_timeline_events_case_id').on(table.caseId),
+    index('idx_timeline_events_event_date').on(table.eventDate),
+  ]
+);
 
 // === AI/VECTOR TABLES (Missing Definitions) ===
 
 export const hashVerifications = pgTable('hash_verifications', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- evidenceId: uuid('evidence_id').notNull(),
- verifiedBy: uuid('verified_by'),
- hashValue: text('hash_value').notNull(),
- algorithm: varchar('algorithm', { length: 50 }).notNull(),
- status: verificationStatusEnum('status').default('pending').notNull(),
- verificationDate: timestamp('verification_date').defaultNow().notNull(),
- createdAt: timestamp('created_at').defaultNow().notNull(),
- updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  evidenceId: uuid('evidence_id').notNull(),
+  verifiedBy: uuid('verified_by'),
+  hashValue: text('hash_value').notNull(),
+  algorithm: varchar('algorithm', { length: 50 }).notNull(),
+  status: verificationStatusEnum('status').default('pending').notNull(),
+  verificationDate: timestamp('verification_date').defaultNow().notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const contentEmbeddings = pgTable('content_embeddings', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- documentId: uuid('document_id').notNull(),
- embedding: vector('embedding', { dimensions: 768 }).notNull(),
- model: varchar('model', { length: 100 }).notNull(),
- createdAt: timestamp('created_at').defaultNow().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  documentId: uuid('document_id').notNull(),
+  embedding: vector('embedding', { dimensions: 768 }).notNull(),
+  model: varchar('model', { length: 100 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const userEmbeddings = pgTable('user_embeddings', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- userId: uuid('user_id').notNull(),
- embedding: vector('embedding', { dimensions: 768 }).notNull(),
- model: varchar('model', { length: 100 }).notNull(),
- createdAt: timestamp('created_at').defaultNow().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  userId: uuid('user_id').notNull(),
+  embedding: vector('embedding', { dimensions: 768 }).notNull(),
+  model: varchar('model', { length: 100 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const chatEmbeddings = pgTable('chat_embeddings', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- ragMessageId: uuid('rag_message_id').notNull(),
- embedding: vector('embedding', { dimensions: 768 }).notNull(),
- model: varchar('model', { length: 100 }).notNull(),
- createdAt: timestamp('created_at').defaultNow().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  ragMessageId: uuid('rag_message_id').notNull(),
+  embedding: vector('embedding', { dimensions: 768 }).notNull(),
+  model: varchar('model', { length: 100 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const evidenceVectors = pgTable('evidence_vectors', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- evidenceId: uuid('evidence_id').notNull(),
- vector: vector('vector', { dimensions: 768 }).notNull(),
- model: varchar('model', { length: 100 }).notNull(),
- createdAt: timestamp('created_at').defaultNow().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  evidenceId: uuid('evidence_id').notNull(),
+  vector: vector('vector', { dimensions: 768 }).notNull(),
+  model: varchar('model', { length: 100 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const caseEmbeddings = pgTable('case_embeddings', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- caseId: uuid('case_id').notNull(),
- embedding: vector('embedding', { dimensions: 768 }).notNull(),
- model: varchar('model', { length: 100 }).notNull(),
- createdAt: timestamp('created_at').defaultNow().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  caseId: uuid('case_id').notNull(),
+  embedding: vector('embedding', { dimensions: 768 }).notNull(),
+  model: varchar('model', { length: 100 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const ragSessions = pgTable('rag_sessions', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- userId: uuid('user_id').notNull(),
- caseId: uuid('case_id'),
- title: varchar('title', { length: 255 }),
- createdAt: timestamp('created_at').defaultNow().notNull(),
- updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  userId: uuid('user_id').notNull(),
+  caseId: uuid('case_id'),
+  title: varchar('title', { length: 255 }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const ragMessages = pgTable('rag_messages', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- sessionId: uuid('session_id').notNull(),
- role: varchar('role', { length: 50 }).notNull(), // e.g., 'user', 'assistant'
- content: text('content').notNull(),
- createdAt: timestamp('created_at').defaultNow().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  sessionId: uuid('session_id').notNull(),
+  role: varchar('role', { length: 50 }).notNull(), // e.g., 'user', 'assistant'
+  content: text('content').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const statutes = pgTable('statutes', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- title: varchar('title', { length: 255 }).notNull(),
- content: text('content').notNull(),
- jurisdiction: varchar('jurisdiction', { length: 100 }),
- section: varchar('section', { length: 100 }), // e.g., §187(a)
- category: varchar('category', { length: 100 }), // criminal, civil, probate, etc.
- sourceUrl: text('source_url'),
- effectiveDate: timestamp('effective_date'),
- createdAt: timestamp('created_at').defaultNow().notNull(),
- updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  title: varchar('title', { length: 255 }).notNull(),
+  content: text('content').notNull(),
+  jurisdiction: varchar('jurisdiction', { length: 100 }),
+  section: varchar('section', { length: 100 }), // e.g., §187(a)
+  category: varchar('category', { length: 100 }), // criminal, civil, probate, etc.
+  sourceUrl: text('source_url'),
+  effectiveDate: timestamp('effective_date'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 // === CASE ↔ STATUTE JUNCTION TABLE ===
 export const caseLinkTypeEnum = pgEnum('case_link_type', [
-	'CHARGED_UNDER',
-	'CITED_IN',
-	'RELATED_TO',
-	'OVERRULED_BY',
-	'AFFIRMED_BY',
+  'CHARGED_UNDER',
+  'CITED_IN',
+  'RELATED_TO',
+  'OVERRULED_BY',
+  'AFFIRMED_BY',
 ]);
 
-export const caseStatuteLinks = pgTable('case_statute_links',
-	{
-		id: uuid('id')
-			.default(sql`gen_random_uuid()`)
-			.primaryKey()
-			.notNull(),
-		caseId: uuid('case_id')
-			.notNull()
-			.references(() => cases.id, { onDelete: 'cascade' }),
-		statuteId: uuid('statute_id')
-			.references(() => statutes.id, { onDelete: 'set null' }),
-		citationId: uuid('citation_id')
-			.references(() => citations.id, { onDelete: 'set null' }),
-		linkType: caseLinkTypeEnum('link_type').notNull().default('CITED_IN'),
-		notes: text('notes'),
-		createdBy: uuid('created_by')
-			.references(() => users.id, { onDelete: 'set null' }),
-		createdAt: timestamp('created_at').defaultNow().notNull(),
-	},
-	(table) => ({
-		caseIdIdx: index('case_statute_links_case_id_idx').on(table.caseId),
-		statuteIdIdx: index('case_statute_links_statute_id_idx').on(table.statuteId),
-		citationIdIdx: index('case_statute_links_citation_id_idx').on(table.citationId),
-	})
+export const caseStatuteLinks = pgTable(
+  'case_statute_links',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    caseId: uuid('case_id')
+      .notNull()
+      .references(() => cases.id, { onDelete: 'cascade' }),
+    statuteId: uuid('statute_id').references(() => statutes.id, { onDelete: 'set null' }),
+    citationId: uuid('citation_id').references(() => citations.id, { onDelete: 'set null' }),
+    linkType: caseLinkTypeEnum('link_type').notNull().default('CITED_IN'),
+    notes: text('notes'),
+    createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    caseIdIdx: index('case_statute_links_case_id_idx').on(table.caseId),
+    statuteIdIdx: index('case_statute_links_statute_id_idx').on(table.statuteId),
+    citationIdIdx: index('case_statute_links_citation_id_idx').on(table.citationId),
+  })
 );
 
 // Chunked statute sections for RAG search
-export const statuteChunks = pgTable('statute_chunks',
- {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- statuteId: uuid('statute_id')
- .notNull()
- .references(() => statutes.id, { onDelete: 'cascade' }),
- chunkIndex: integer('chunk_index').notNull(),
- content: text('content').notNull(),
- embedding: vector('embedding', { dimensions: 768 }),
- createdAt: timestamp('created_at', { withTimezone: true })
- .default(sql`now()`)
- .notNull(),
- },
-	(table) => ({
- statuteIdIdx: index('statute_chunks_statute_id_idx').on(table.statuteId),
- chunkIndexIdx: index('statute_chunks_chunk_index_idx').on(table.chunkIndex),
- })
+export const statuteChunks = pgTable(
+  'statute_chunks',
+  {
+    id: uuid('id')
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    statuteId: uuid('statute_id')
+      .notNull()
+      .references(() => statutes.id, { onDelete: 'cascade' }),
+    chunkIndex: integer('chunk_index').notNull(),
+    content: text('content').notNull(),
+    embedding: vector('embedding', { dimensions: 768 }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+  },
+  (table) => ({
+    statuteIdIdx: index('statute_chunks_statute_id_idx').on(table.statuteId),
+    chunkIndexIdx: index('statute_chunks_chunk_index_idx').on(table.chunkIndex),
+  })
 );
 
 export const legalPrecedents = pgTable('legal_precedents', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- caseId: uuid('case_id'),
- title: varchar('title', { length: 255 }).notNull(),
- summary: text('summary').notNull(),
- citation: varchar('citation', { length: 255 }),
- court: varchar('court', { length: 200 }),
- decisionDate: timestamp('decision_date'),
- createdAt: timestamp('created_at').defaultNow().notNull(),
- updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  caseId: uuid('case_id'),
+  title: varchar('title', { length: 255 }).notNull(),
+  summary: text('summary').notNull(),
+  citation: varchar('citation', { length: 255 }),
+  court: varchar('court', { length: 200 }),
+  decisionDate: timestamp('decision_date'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const legalAnalysisSessions = pgTable('legal_analysis_sessions', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- userId: uuid('user_id').notNull(),
- caseId: uuid('case_id'),
- analysisType: varchar('analysis_type', { length: 100 }).notNull(),
- inputData: jsonb('input_data'),
- outputSummary: text('output_summary'),
- status: varchar('status', { length: 50 }).default('pending').notNull(),
- createdAt: timestamp('created_at').defaultNow().notNull(),
- updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  userId: uuid('user_id').notNull(),
+  caseId: uuid('case_id'),
+  analysisType: varchar('analysis_type', { length: 100 }).notNull(),
+  inputData: jsonb('input_data'),
+  outputSummary: text('output_summary'),
+  status: varchar('status', { length: 50 }).default('pending').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 // Legal glossary terms for search and education
 export const legalGlossary = pgTable('legal_glossary', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- term: varchar('term', { length: 255 }).notNull(),
- definition: text('definition').notNull(),
- category: varchar('category', { length: 100 }),
- jurisdiction: varchar('jurisdiction', { length: 100 }),
- relatedTerms: jsonb('related_terms'),
- sources: jsonb('sources'),
- embedding: vector('embedding', { dimensions: 768 }),
- createdAt: timestamp('created_at').defaultNow().notNull(),
- updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  term: varchar('term', { length: 255 }).notNull(),
+  definition: text('definition').notNull(),
+  category: varchar('category', { length: 100 }),
+  jurisdiction: varchar('jurisdiction', { length: 100 }),
+  relatedTerms: jsonb('related_terms'),
+  sources: jsonb('sources'),
+  embedding: vector('embedding', { dimensions: 768 }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const legalResearch = pgTable('legal_research', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- caseId: uuid('case_id'),
- createdBy: uuid('created_by').notNull(),
- query: text('query').notNull(),
- results: jsonb('results'),
- status: varchar('status', { length: 50 }).default('completed').notNull(),
- createdAt: timestamp('created_at').defaultNow().notNull(),
- updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  caseId: uuid('case_id'),
+  createdBy: uuid('created_by').notNull(),
+  query: text('query').notNull(),
+  results: jsonb('results'),
+  status: varchar('status', { length: 50 }).default('completed').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const documentProcessing = pgTable('document_processing', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- documentId: uuid('document_id').notNull(),
- status: documentStatusEnum('status').notNull().default('queued'),
- processor: varchar('processor', { length: 100 }),
- metadata: jsonb('metadata'),
- error: text('error'),
- startedAt: timestamp('started_at'),
- completedAt: timestamp('completed_at'),
- createdAt: timestamp('created_at').defaultNow().notNull(),
- updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  documentId: uuid('document_id').notNull(),
+  status: documentStatusEnum('status').notNull().default('queued'),
+  processor: varchar('processor', { length: 100 }),
+  metadata: jsonb('metadata'),
+  error: text('error'),
+  startedAt: timestamp('started_at'),
+  completedAt: timestamp('completed_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const documentChunks = pgTable('document_chunks', {
- id: uuid('id')
- .default(sql`gen_random_uuid()`)
- .primaryKey()
- .notNull(),
- documentId: uuid('document_id').notNull(),
- chunkIndex: integer('chunk_index').notNull(),
- content: text('content').notNull(),
- embedding: vector('embedding', { dimensions: 768 }),
- metadata: jsonb('metadata'),
- createdAt: timestamp('created_at').defaultNow().notNull(),
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  documentId: uuid('document_id').notNull(),
+  chunkIndex: integer('chunk_index').notNull(),
+  content: text('content').notNull(),
+  // embedding column removed — evidence chunks are stored in evidence_vectors (pgvector)
+  // and evidence_items (Qdrant). document_chunks.embedding had no active writer.
+  metadata: jsonb('metadata'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const documentSummaries = pgTable('document_summaries', {

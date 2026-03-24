@@ -557,8 +557,12 @@ async function fetchKAGNeighbors(
     } finally {
       await session.close();
     }
-  } catch {
-    // Neo4j unavailable — try PostgreSQL graph tables
+  } catch (neo4jErr: any) {
+    // Neo4j unavailable (connection refused or bolt error) — falling back to PostgreSQL graph tables.
+    // To enable graph traversal, ensure NEO4J_URI / NEO4J_USER / NEO4J_PASSWORD are set and Neo4j is running.
+    if (neo4jErr?.code !== 'ServiceUnavailable' || process.env.NODE_ENV !== 'production') {
+      console.warn('[KAG] Neo4j unavailable, using PostgreSQL fallback:', neo4jErr?.message ?? neo4jErr);
+    }
     try {
       const db = (await import('$lib/server/db')).default;
       const rows = await db.execute(
