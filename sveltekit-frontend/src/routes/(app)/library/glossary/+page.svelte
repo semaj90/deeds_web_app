@@ -125,22 +125,27 @@
 		civil: 'Civil Law',
 		constitutional: 'Constitutional',
 		criminal: 'Criminal Law',
+		'criminal-defense': 'Criminal Defense',
 		evidence: 'Evidence',
 		general: 'General',
 		procedure: 'Procedure',
 		cybercrime: 'Cybercrime',
+		cyber: 'Cyber Law',
 		regulatory: 'Regulatory',
 		family: 'Family Law',
 		property: 'Property',
 		corporate: 'Corporate',
 		employment: 'Employment',
 		bankruptcy: 'Bankruptcy',
+		'intellectual-property': 'IP Law',
 		intellectual_property: 'IP Law',
 		immigration: 'Immigration',
+		international: 'International',
 		estate: 'Estate',
 		environmental: 'Environmental',
 		administrative: 'Administrative',
 		contract: 'Contract',
+		tort: 'Tort Law',
 		tax: 'Tax Law',
 		uncategorized: 'Other',
 	};
@@ -149,22 +154,27 @@
 		civil: 'gl-cat-civil',
 		constitutional: 'gl-cat-constitutional',
 		criminal: 'gl-cat-criminal',
+		'criminal-defense': 'gl-cat-criminal-defense',
 		evidence: 'gl-cat-evidence',
 		general: 'gl-cat-general',
 		procedure: 'gl-cat-procedure',
 		cybercrime: 'gl-cat-cybercrime',
+		cyber: 'gl-cat-cybercrime',
 		regulatory: 'gl-cat-regulatory',
 		family: 'gl-cat-family',
 		property: 'gl-cat-property',
 		corporate: 'gl-cat-corporate',
 		employment: 'gl-cat-employment',
 		bankruptcy: 'gl-cat-bankruptcy',
+		'intellectual-property': 'gl-cat-ip',
 		intellectual_property: 'gl-cat-ip',
 		immigration: 'gl-cat-immigration',
+		international: 'gl-cat-international',
 		estate: 'gl-cat-estate',
 		environmental: 'gl-cat-environmental',
 		administrative: 'gl-cat-administrative',
 		contract: 'gl-cat-contract',
+		tort: 'gl-cat-tort',
 		tax: 'gl-cat-tax',
 		uncategorized: 'gl-cat-general',
 	};
@@ -308,7 +318,7 @@
 			</div>
 		</section>
 
-		<div class="grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)_300px]">
+		<div class="grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)]">
 			<aside class="overflow-hidden rounded-[26px] border border-slate-200 bg-white shadow-[0_18px_50px_-40px_rgba(15,23,42,0.42)]">
 				<div class="border-b border-slate-200 px-4 py-4">
 					<div class="flex items-center gap-2">
@@ -589,7 +599,7 @@
 									</div>
 									<div class="flex items-start justify-between gap-3">
 										<dt class="text-slate-500">Term ID</dt>
-										<dd class="max-w-[150px] text-right font-mono text-xs text-slate-600">{selectedTerm.id}</dd>
+										<dd class="max-w-[150px] truncate text-right font-mono text-xs text-slate-600" title={selectedTerm.id}>{selectedTerm.id}</dd>
 									</div>
 								</dl>
 							</div>
@@ -668,4 +678,7 @@
 	.gl-cat-administrative { background: rgba(99, 102, 241, 0.12); color: rgba(99, 102, 241, 0.9); }
 	.gl-cat-contract { background: rgba(245, 158, 11, 0.12); color: rgba(245, 158, 11, 0.9); }
 	.gl-cat-tax { background: rgba(107, 114, 128, 0.12); color: rgba(107, 114, 128, 0.9); }
+	.gl-cat-tort { background: rgba(251, 146, 60, 0.12); color: rgba(251, 146, 60, 0.9); }
+	.gl-cat-criminal-defense { background: rgba(220, 38, 38, 0.12); color: rgba(220, 38, 38, 0.9); }
+	.gl-cat-international { background: rgba(6, 182, 212, 0.12); color: rgba(6, 182, 212, 0.9); }
 </style>

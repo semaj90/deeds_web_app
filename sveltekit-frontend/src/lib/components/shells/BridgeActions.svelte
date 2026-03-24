@@ -173,8 +173,8 @@
 	}
 
 	.bridge-actions.research-context {
-		background: #f5f3ef;
-		border: 1px solid #e5e2da;
+		background: rgba(212, 199, 163, 0.06);
+		border: 1px solid rgba(212, 199, 163, 0.1);
 	}
 
 	.bridge-actions.inv-context {
@@ -194,7 +194,7 @@
 	}
 
 	.research-context .bridge-label {
-		color: #8a8a8a;
+		color: rgba(212, 199, 163, 0.4);
 	}
 
 	.inv-context .bridge-label {
@@ -215,12 +215,12 @@
 	}
 
 	.research-context .bridge-btn {
-		color: #5a5a5a;
+		color: rgba(212, 199, 163, 0.55);
 	}
 
 	.research-context .bridge-btn:hover {
-		background: #e5e2da;
-		color: #1a1a1a;
+		background: rgba(212, 199, 163, 0.1);
+		color: rgba(212, 199, 163, 0.9);
 	}
 
 	.inv-context .bridge-btn {
