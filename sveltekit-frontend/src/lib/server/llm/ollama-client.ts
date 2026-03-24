@@ -13,6 +13,18 @@ const DEFAULT_URL = ENV.OLLAMA_BASE_URL;
 const DEFAULT_MODEL = process.env.OLLAMA_MODEL_CHAT ?? process.env.OLLAMA_MODEL ?? 'gemma3-legal:latest';
 const MODEL_KEEP_ALIVE = process.env?.OLLAMA_KEEP_ALIVE ?? '24h';
 
+// Canonical model parameters — mirrors gemma3Q4_K_M/Modelfile PARAMETER values.
+// All TS callers previously missed num_ctx and repeat_penalty, letting Ollama
+// silently fall back to its own built-in defaults instead of the Modelfile values.
+const GEMMA3_DEFAULTS = {
+	temperature: 0.1,       // Modelfile: temperature 0.1  (legal precision, not creativity)
+	top_k: 20,              // Modelfile: top_k 20
+	top_p: 0.8,             // Modelfile: top_p 0.8
+	num_ctx: 8192,          // Modelfile: num_ctx 8192  — was MISSING from all TS callers
+	repeat_penalty: 1.05,   // Modelfile: repeat_penalty 1.05 — was MISSING from all TS callers
+	num_predict: 2048,      // sensible completion cap
+} as const;
+
 export interface LLMMessage {
 	role: 'system' | 'user' | 'assistant';
 	content: string;
@@ -68,10 +80,12 @@ export async function generateCompletion(
 				stream: false,
 				keep_alive: MODEL_KEEP_ALIVE,
 				options: {
-					temperature: options.temperature ?? 0.7,
-					num_predict: options.maxTokens ?? 2048,
-					top_p: options.topP ?? 0.9,
-					top_k: options.topK ?? 40,
+				temperature: options.temperature ?? GEMMA3_DEFAULTS.temperature,
+				num_predict: options.maxTokens ?? GEMMA3_DEFAULTS.num_predict,
+				top_p: options.topP ?? GEMMA3_DEFAULTS.top_p,
+				top_k: options.topK ?? GEMMA3_DEFAULTS.top_k,
+				num_ctx: GEMMA3_DEFAULTS.num_ctx,
+				repeat_penalty: GEMMA3_DEFAULTS.repeat_penalty,
 				},
 			}),
 		});
@@ -132,10 +146,12 @@ export async function chatCompletion(
 				stream: false,
 				keep_alive: MODEL_KEEP_ALIVE,
 				options: {
-					temperature: options.temperature ?? 0.7,
-					num_predict: options.maxTokens ?? 2048,
-					top_p: options.topP ?? 0.9,
-					top_k: options.topK ?? 40,
+					temperature: options.temperature ?? GEMMA3_DEFAULTS.temperature,
+					num_predict: options.maxTokens ?? GEMMA3_DEFAULTS.num_predict,
+					top_p: options.topP ?? GEMMA3_DEFAULTS.top_p,
+					top_k: options.topK ?? GEMMA3_DEFAULTS.top_k,
+					num_ctx: GEMMA3_DEFAULTS.num_ctx,
+					repeat_penalty: GEMMA3_DEFAULTS.repeat_penalty,
 				},
 			}),
 		});
