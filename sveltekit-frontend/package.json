@@ -494,6 +494,7 @@
     "oslo": "1.2.1",
     "pdf-lib": "1.17.1",
     "pdf-parse": "1.1.1",
+    "pdfjs-dist": "4.10.38",
     "pg": "8.16.3",
     "pgvector": "0.1.8",
     "piper-wasm": "0.1.4",

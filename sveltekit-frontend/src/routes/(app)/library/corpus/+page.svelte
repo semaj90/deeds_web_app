@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import IngestionProgress from '$lib/components/legal/IngestionProgress.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -11,6 +12,66 @@
 	let bulkRunning = $state(false);
 	let bulkMessage = $state<string | null>(null);
 	let perStateRunning = $state(new Set<string>());
+
+	// Upload modal state
+	let uploadModal = $state<{ stateCode: string; stateName: string } | null>(null);
+	let uploadFile = $state<File | null>(null);
+	let uploadRunning = $state(false);
+	let uploadJobId = $state<string | null>(null);
+	let uploadDocumentId = $state<string | null>(null);
+	let uploadError = $state<string | null>(null);
+	let fileInputEl = $state<HTMLInputElement | null>(null);
+
+	function openUpload(src: Source) {
+		uploadModal = { stateCode: src.stateCode, stateName: src.stateName };
+		uploadFile = null;
+		uploadRunning = false;
+		uploadJobId = null;
+		uploadDocumentId = null;
+		uploadError = null;
+	}
+
+	function closeUpload() {
+		if (uploadRunning) return;
+		uploadModal = null;
+	}
+
+	function onFileChange(e: Event) {
+		const input = e.target as HTMLInputElement;
+		uploadFile = input.files?.[0] ?? null;
+	}
+
+	async function submitUpload() {
+		if (!uploadModal || !uploadFile) return;
+		uploadRunning = true;
+		uploadError = null;
+		try {
+			const fd = new FormData();
+			fd.append('file', uploadFile);
+			fd.append('title', `${uploadModal.stateName} Constitution`);
+			fd.append('corpusType', 'constitution');
+			fd.append('jurisdiction', uploadModal.stateCode);
+			fd.append('jurisdictionType', 'state');
+			const res = await fetch('/api/library/upload', { method: 'POST', body: fd });
+			const d = await res.json();
+			if (!res.ok) {
+				uploadError = d.error ?? 'Upload failed';
+				uploadRunning = false;
+				return;
+			}
+			uploadJobId = d.jobId;
+			uploadDocumentId = d.documentId;
+		} catch (err) {
+			uploadError = String(err);
+			uploadRunning = false;
+		}
+	}
+
+	function onUploadComplete() {
+		uploadRunning = false;
+		// Give user time to read the success state then close
+		setTimeout(() => { uploadModal = null; }, 2000);
+	}
 
 	const filtered = $derived.by(() => {
 		let list = data.sources;
@@ -229,6 +290,13 @@
 							Ingest
 						{/if}
 					</button>
+					<button
+						onclick={() => openUpload(src)}
+						class="co-action-btn co-upload-btn"
+						title="Upload a local PDF for {src.stateName}"
+					>
+						Upload PDF
+					</button>
 					<a
 						href={src.sourceUrl ?? src.discoveryUrl}
 						target="_blank"
@@ -243,6 +311,70 @@
 		{/each}
 	</div>
 </div>
+
+<!-- Upload PDF modal -->
+{#if uploadModal}
+	<div class="co-modal-backdrop" onclick={closeUpload} role="presentation">
+		<div class="co-modal" onclick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Upload PDF for {uploadModal.stateName}">
+			<div class="co-modal-header">
+				<h2 class="co-modal-title">Upload PDF — {uploadModal.stateName}</h2>
+				<button onclick={closeUpload} class="co-modal-close" disabled={uploadRunning} aria-label="Close">
+					<Icon name="x" />
+				</button>
+			</div>
+
+			{#if uploadJobId}
+				<!-- Ingestion in progress -->
+				<IngestionProgress jobId={uploadJobId} onComplete={onUploadComplete} />
+				{#if uploadDocumentId}
+					<div class="co-modal-actions" style="margin-top:1rem">
+						<a href="/library/{uploadDocumentId}" class="co-action-btn">View Document</a>
+					</div>
+				{/if}
+			{:else}
+				<!-- File picker + submit -->
+				<div class="co-modal-body">
+					<p class="co-modal-hint">
+						Select the <strong>{uploadModal.stateName} Constitution</strong> PDF from your local files.
+						The document will be extracted, chunked (512 token windows), embedded (768-dim), and indexed in Qdrant + pgvector.
+					</p>
+					<label class="co-file-label">
+						<input
+							bind:this={fileInputEl}
+							type="file"
+							accept=".pdf,application/pdf"
+							onchange={onFileChange}
+							class="co-file-input"
+						/>
+						<div class="co-file-drop">
+							<Icon name="file-text" />
+							{#if uploadFile}
+								<span class="co-file-name">{uploadFile.name}</span>
+								<span class="co-file-size">({(uploadFile.size / 1_048_576).toFixed(1)} MB)</span>
+							{:else}
+								<span class="co-file-placeholder">Click to select PDF&hellip;</span>
+							{/if}
+						</div>
+					</label>
+
+					{#if uploadError}
+						<p class="co-upload-error">{uploadError}</p>
+					{/if}
+				</div>
+				<div class="co-modal-actions">
+					<button onclick={closeUpload} class="co-action-btn" disabled={uploadRunning}>Cancel</button>
+					<button
+						onclick={submitUpload}
+						class="co-ingest-btn"
+						disabled={!uploadFile || uploadRunning}
+					>
+						{#if uploadRunning}<span class="co-pulse">Uploading&hellip;</span>{:else}Upload & Ingest{/if}
+					</button>
+				</div>
+			{/if}
+		</div>
+	</div>
+{/if}
 
 <style>
 	/* ── Page ── */
@@ -498,5 +630,109 @@
 	@keyframes pulse {
 		0%, 100% { opacity: 1; }
 		50% { opacity: 0.5; }
+	}
+
+	/* ── Upload btn ── */
+	.co-upload-btn {
+		color: rgba(167, 139, 250, 0.6);
+	}
+	.co-upload-btn:hover {
+		color: rgba(167, 139, 250, 0.9);
+		background: rgba(167, 139, 250, 0.08);
+	}
+
+	/* ── Upload modal ── */
+	.co-modal-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 100;
+		background: rgba(0, 0, 0, 0.7);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 1.5rem;
+	}
+	.co-modal {
+		background: #141210;
+		border: 1px solid rgba(212, 199, 163, 0.12);
+		border-radius: 0.75rem;
+		width: 100%;
+		max-width: 28rem;
+		padding: 1.5rem;
+		box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+	}
+	.co-modal-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 1.25rem;
+	}
+	.co-modal-title {
+		font-size: 1rem;
+		font-weight: 600;
+		color: rgba(212, 199, 163, 0.95);
+		margin: 0;
+	}
+	.co-modal-close {
+		cursor: pointer;
+		color: rgba(212, 199, 163, 0.3);
+		transition: color 0.15s;
+		padding: 0.25rem;
+	}
+	.co-modal-close:hover { color: rgba(212, 199, 163, 0.7); }
+	.co-modal-close:disabled { opacity: 0.3; cursor: not-allowed; }
+	.co-modal-body { margin-bottom: 1.25rem; }
+	.co-modal-hint {
+		font-size: 0.8rem;
+		color: rgba(212, 199, 163, 0.4);
+		line-height: 1.5;
+		margin-bottom: 1rem;
+	}
+	.co-modal-hint strong { color: rgba(212, 199, 163, 0.7); font-weight: 600; }
+	.co-modal-actions {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 0.5rem;
+	}
+
+	/* ── File picker ── */
+	.co-file-label { display: block; cursor: pointer; }
+	.co-file-input {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		opacity: 0;
+		pointer-events: none;
+	}
+	.co-file-drop {
+		display: flex;
+		align-items: center;
+		gap: 0.625rem;
+		padding: 0.75rem 1rem;
+		border-radius: 0.5rem;
+		border: 1px dashed rgba(167, 139, 250, 0.3);
+		background: rgba(167, 139, 250, 0.04);
+		transition: border-color 0.15s, background 0.15s;
+	}
+	.co-file-label:hover .co-file-drop {
+		border-color: rgba(167, 139, 250, 0.55);
+		background: rgba(167, 139, 250, 0.08);
+	}
+	.co-file-drop :global(svg) { color: rgba(167, 139, 250, 0.5); flex-shrink: 0; }
+	.co-file-placeholder { font-size: 0.8rem; color: rgba(212, 199, 163, 0.3); }
+	.co-file-name {
+		font-size: 0.8rem;
+		color: rgba(212, 199, 163, 0.85);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		flex: 1;
+	}
+	.co-file-size { font-size: 0.7rem; color: rgba(212, 199, 163, 0.3); flex-shrink: 0; }
+	.co-upload-error {
+		margin-top: 0.5rem;
+		font-size: 0.75rem;
+		color: #f87171;
 	}
 </style>

@@ -7,7 +7,19 @@
 
 	let { data }: { data: PageData } = $props();
 
-	type Tab = 'text' | 'summary' | 'search';
+	type Tab = 'text' | 'pdf' | 'summary' | 'search';
+
+	// PDF viewer — lazy-loaded browser-only component
+	let PDFViewer: typeof import('$lib/components/legal/PDFViewer.svelte').default | null = $state(null);
+	let pdfTabActivated = $state(false);
+
+	async function activatePdfTab() {
+		pdfTabActivated = true;
+		if (!PDFViewer) {
+			const mod = await import('$lib/components/legal/PDFViewer.svelte');
+			PDFViewer = mod.default;
+		}
+	}
 
 	let activeTab = $state<Tab>('text');
 	let selectedNodeId = $state<string | null>(untrack(() => data.selectedNodeId ?? null));
@@ -150,9 +162,14 @@
 			<main class="lr-main">
 				<!-- Tab bar -->
 				<div class="lr-tab-bar">
-					{#each [['text', 'Official Text'], ['search', 'Search'], ['summary', 'Summary']] as [tab, label]}
+					{#each [['text', 'Official Text'], ['pdf', 'PDF'], ['search', 'Search'], ['summary', 'Summary']] as [tab, label]}
 						<button
-							onclick={() => (activeTab = tab as Tab)}
+							onclick={() => {
+								if (tab === 'pdf') activatePdfTab();
+								else activeTab = tab as Tab;
+								if (tab !== 'pdf') activeTab = tab as Tab;
+								else activeTab = 'pdf';
+							}}
 							class="lr-tab"
 							class:active={activeTab === tab}
 						>
@@ -185,6 +202,17 @@
 								initialChunks={data.initialChunks as any}
 								onCitationClick={openCitationDrawer}
 							/>
+						</div>
+
+					{:else if activeTab === 'pdf'}
+						<div class="lr-pdf-pane">
+							{#if pdfTabActivated && PDFViewer}
+								<PDFViewer documentId={doc.id} />
+							{:else if pdfTabActivated}
+								<div class="lr-pdf-loading">Loading PDF viewer…</div>
+							{:else}
+								<div class="lr-pdf-loading">Initializing…</div>
+							{/if}
 						</div>
 
 					{:else if activeTab === 'search'}
@@ -298,6 +326,22 @@
 <style>
 	/* ── Error ── */
 	.lr-error { padding: 2rem; text-align: center; color: #f87171; }
+
+	/* ── PDF pane ── */
+	.lr-pdf-pane {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+	}
+	.lr-pdf-loading {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+		font-size: 0.85rem;
+		color: rgba(212, 199, 163, 0.35);
+	}
 
 	/* ── Page ── */
 	.lr-page {
@@ -445,6 +489,7 @@
 	.lr-content {
 		flex: 1;
 		overflow-y: auto;
+		position: relative;
 	}
 	.lr-content-narrow {
 		max-width: 48rem;

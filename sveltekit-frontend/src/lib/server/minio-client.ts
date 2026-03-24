@@ -140,6 +140,19 @@ export async function uploadChatImage(opts: { caseId?: string, chatTurnId: strin
 }
 
 /**
+ * Fetches a file from MinIO as a Buffer.
+ */
+export async function getFile(bucketName: string, objectName: string): Promise<Buffer> {
+ const client = getMinioClient();
+ const stream = await client.getObject(bucketName, objectName);
+ const chunks: Buffer[] = [];
+ for await (const chunk of stream) {
+  chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+ }
+ return Buffer.concat(chunks);
+}
+
+/**
  * Get presigned URL for chat image
  */
 export async function getChatImageUrl(objectName: string): Promise<string> {
