@@ -730,8 +730,10 @@ sveltekit-frontend/scripts/cross-ref-imports.mjs
 sveltekit-frontend/build-debug/Debug/WardenNet.lib
 sveltekit-frontend/build-debug/CMakeFiles/
 
-# Playwright screenshot runs (keep latest/ only)
+# Playwright screenshot runs — ignore all generated PNGs and latest/ dir
+scripts/tests/screenshots/*.png
 scripts/tests/screenshots/2026-*/
+scripts/tests/screenshots/latest/
 
 ########################################
 # Source code EXCEPTIONS
