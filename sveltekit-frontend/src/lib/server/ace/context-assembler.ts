@@ -401,6 +401,55 @@ export async function fetchGlossaryMatches(query: string): Promise<ACEContext['g
       // legal_glossary not available or query failed — continue to definitions fallback
     }
 
+    // Semantic vector search fallback — uses 768-dim embeddings on legal_glossary
+    if (matches.length < 4) {
+      try {
+        const ollamaUrl = ENV.OLLAMA_BASE_URL;
+        const embedRes = await fetch(`${ollamaUrl}/api/embeddings`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: normalizedQuery }),
+          signal: AbortSignal.timeout(5000),
+        });
+        if (embedRes.ok) {
+          const embedData = await embedRes.json();
+          const embedding = embedData.embedding as number[];
+          if (embedding?.length === 768) {
+            const vecStr = '[' + embedding.join(',') + ']';
+            const semanticRes = await pool.query(
+              `SELECT id, term, definition, category, jurisdiction,
+                      1 - (embedding <=> $1::vector) AS confidence
+               FROM legal_glossary
+               WHERE embedding IS NOT NULL
+                 AND 1 - (embedding <=> $1::vector) > 0.4
+               ORDER BY embedding <=> $1::vector
+               LIMIT 4`,
+              [vecStr]
+            );
+            for (const row of semanticRes.rows as Record<string, unknown>[]) {
+              const dedupeKey = `glossary:${String(row.term ?? '').toLowerCase()}`;
+              if (seen.has(dedupeKey)) continue;
+              seen.add(dedupeKey);
+              matches.push({
+                id: row.id ? String(row.id) : null,
+                term: String(row.term ?? ''),
+                definition: String(row.definition ?? ''),
+                source: 'legal_glossary',
+                category: row.category ? String(row.category) : null,
+                jurisdiction: row.jurisdiction ? String(row.jurisdiction) : null,
+                citation: null,
+                confidence: row.confidence == null ? null : Number(row.confidence),
+                sourceNodeId: null,
+              });
+              if (matches.length >= 4) break;
+            }
+          }
+        }
+      } catch {
+        // Semantic search unavailable — continue to definitions fallback
+      }
+    }
+
     if (matches.length < 4) {
       try {
         const definitionRes = await pool.query(

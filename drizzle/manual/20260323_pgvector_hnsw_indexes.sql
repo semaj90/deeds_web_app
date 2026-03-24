@@ -43,17 +43,16 @@ ALTER TABLE document_chunks
 -- ef_construction=200: build-time queue depth (matches Qdrant HNSW config)
 -- vector_cosine_ops: L2-normalised cosine distance (same metric as Qdrant Cosine)
 
-CREATE INDEX CONCURRENTLY IF NOT EXISTS evidence_vectors_embedding_hnsw
-    ON evidence_vectors USING hnsw (embedding vector_cosine_ops)
-    WITH (m = 16, ef_construction = 200);
+-- evidence_vectors uses 'vector' column (not 'embedding'); HNSW already exists as idx_evidence_vectors_hnsw
+-- CREATE INDEX CONCURRENTLY IF NOT EXISTS evidence_vectors_embedding_hnsw
+--     ON evidence_vectors USING hnsw (vector vector_cosine_ops)
+--     WITH (m = 16, ef_construction = 200);
 
 CREATE INDEX CONCURRENTLY IF NOT EXISTS legal_documents_content_embedding_hnsw
     ON legal_documents USING hnsw (content_embedding vector_cosine_ops)
     WITH (m = 16, ef_construction = 200);
 
-CREATE INDEX CONCURRENTLY IF NOT EXISTS document_chunks_embedding_hnsw
-    ON document_chunks USING hnsw (embedding vector_cosine_ops)
-    WITH (m = 16, ef_construction = 200);
+-- document_chunks.embedding was dropped above (no active writer); no index needed
 
 CREATE INDEX CONCURRENTLY IF NOT EXISTS statute_chunks_embedding_hnsw
     ON statute_chunks USING hnsw (embedding vector_cosine_ops)
@@ -79,4 +78,4 @@ CREATE INDEX CONCURRENTLY IF NOT EXISTS chat_embeddings_embedding_hnsw
 -- ── 3. Set IVFFlat ef_search session default for query-time recall tuning ────
 -- Default ef_search=40 balances recall vs latency; increase per session for high-precision queries:
 --   SET hnsw.ef_search = 100;
-ALTER DATABASE CURRENT SET hnsw.ef_search = 40;
+ALTER DATABASE legal_ai_db SET hnsw.ef_search = 40;
