@@ -753,6 +753,12 @@ scripts/tests/screenshots/latest/
 # Jupyter notebooks with secrets
 @3_2_26Gemma3_12B_Legal_Production.ipynb
 scripts/unsloth-training/COLAB_PACKAGE/@3_2_26Gemma3_12B_Legal_Production.ipynb
+# Generated data & caches (case generator, analysis, court data)
+scripts/case_data/_cache/
+scripts/analysis_reports/
+scripts/court_data/
+scripts/tests/screenshots/glossary/
+
 # Archive directory — all subdirs are archived legacy code
 deeds_labs/
 

@@ -6,6 +6,7 @@
 	import AISummaryMiniModal from '$lib/components/legal/AISummaryMiniModal.svelte';
 	import { boardHistory } from '$lib/components/evidence/board-history.svelte.js';
 	import { scheduleSave, flushSave, loadLayout, type BoardLayout } from '$lib/components/evidence/board-persistence.svelte.js';
+	import WebGPUParticleOverlay from '$lib/components/evidence/WebGPUParticleOverlay.svelte';
 	import Fuse from 'fuse.js';
 	import type { PageData } from './$types';
 	import { onMount } from 'svelte';
@@ -48,6 +49,22 @@
 	let showSummaryModal = $state(false);
 	let summaryEvidenceId = $state<string | null>(null);
 	let summaryEvidenceTitle = $state<string | null>(null);
+
+	// WebGPU particle overlay state
+	let particlesEnabled = $state(true);
+	let crtEnabled = $state(true);
+	let boardMouseX = $state(0.5);
+	let boardMouseY = $state(0.5);
+	let isDraggingNode = $state(false);
+	let boardZoom = $state(1.0);
+	let canvasAreaEl: HTMLElement | null = $state(null);
+
+	function handleCanvasMouseMove(e: MouseEvent) {
+		if (!canvasAreaEl) return;
+		const rect = canvasAreaEl.getBoundingClientRect();
+		boardMouseX = (e.clientX - rect.left) / rect.width;
+		boardMouseY = (e.clientY - rect.top) / rect.height;
+	}
 
 	// Context menu
 	let contextMenu = $state<{ node: any; x: number; y: number } | null>(null);
@@ -359,6 +376,12 @@
 			activeView = 'file';
 		} else if (e.key === '4') {
 			activeView = 'list';
+		}
+		// FX toggles
+		else if (e.key === 'p') {
+			particlesEnabled = !particlesEnabled;
+		} else if (e.key === 'o') {
+			crtEnabled = !crtEnabled;
 		}
 	}
 
@@ -826,8 +849,27 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 			</button>
 		</div>
 
+		<div class="tool-group fx-toggles">
+			<button
+				class="tool-btn"
+				class:active={particlesEnabled}
+				onclick={() => (particlesEnabled = !particlesEnabled)}
+				title="Toggle Particles (P)"
+			>
+				<Icon name="sparkles" />
+			</button>
+			<button
+				class="tool-btn"
+				class:active={crtEnabled}
+				onclick={() => (crtEnabled = !crtEnabled)}
+				title="Toggle CRT Effect (O)"
+			>
+				<Icon name="monitor" />
+			</button>
+		</div>
+
 		<div class="keyboard-hint">
-			<span class="hint-text">V=Select • E=Evidence • C=Connect • N=Note • 1-4=Views • Ctrl+0=Fit</span>
+			<span class="hint-text">V=Select • E=Evidence • C=Connect • N=Note • 1-4=Views • P=Particles • O=CRT • Ctrl+0=Fit</span>
 		</div>
 	</div>
 
@@ -884,7 +926,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		</aside>
 
 		<!-- Center Canvas / Alt Views -->
-		<div class="canvas-area">
+		<div class="canvas-area" bind:this={canvasAreaEl} onmousemove={handleCanvasMouseMove}>
 			{#if activeView === 'wall'}
 				{#key caseId}
 					<HybridBoard
@@ -899,6 +941,17 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 						{caseId}
 					/>
 				{/key}
+				<!-- WebGPU Particle + CRT Overlay -->
+				<WebGPUParticleOverlay
+					particleCount={2048}
+					{crtEnabled}
+					crtIntensity={0.3}
+					{particlesEnabled}
+					mouseX={boardMouseX}
+					mouseY={boardMouseY}
+					isDragging={isDraggingNode}
+					boardZoom={boardZoom}
+				/>
 			{:else if activeView === 'line'}
 				<div class="alt-view">
 					<h3 class="alt-view-title">Timeline View</h3>

@@ -73,6 +73,7 @@ const ALL_ROUTES = [
   { name: 'demos-memory-palace', path: '/demos/memory-palace' },
   { name: 'demos-vector-search', path: '/demos/vector-search' },
   { name: 'legal-corpus', path: '/legal-corpus' },
+  { name: 'glossary', path: '/library/glossary' },
 ];
 
 // SSE / long-poll pages that never reach networkidle
@@ -265,7 +266,7 @@ async function testRoute(route, ctx) {
     let has504Text = await tab
       .evaluate(
         () =>
-          document.body?.innerText?.includes('504') ||
+          document.body?.innerText?.includes('504 Gateway') ||
           document.body?.innerText?.includes('Outdated Optimize Dep')
       )
       .catch(() => false);
@@ -298,7 +299,7 @@ async function testRoute(route, ctx) {
         has504Text = await tab
           .evaluate(
             () =>
-              document.body?.innerText?.includes('504') ||
+              document.body?.innerText?.includes('504 Gateway') ||
               document.body?.innerText?.includes('Outdated Optimize Dep')
           )
           .catch(() => false);
@@ -327,7 +328,9 @@ async function testRoute(route, ctx) {
       errMsg.includes('ERR_CONNECTION_RESET') ||
       errMsg.includes('Timeout')
     ) {
-      await new Promise((r) => setTimeout(r, 3000));
+      // Server likely crashed — wait for it to come back (up to 45s)
+      console.log(`    ⏳ Server down — waiting for recovery...`);
+      try { await waitForServerReady(BASE, 45000); } catch { /* will fail on retry */ }
       try {
         const response2 = await tab.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
         await settlePage(tab, route.name, 'domcontentloaded');
@@ -382,6 +385,16 @@ for (let i = 0; i < routes.length; i += concurrency) {
   const batchResults = await Promise.allSettled(
     batch.map(route => testRoute(route, ctx))
   );
+
+  // Health check between batches — if server crashed, wait for recovery
+  const anyRefused = batchResults.some(r =>
+    r.status === 'fulfilled' && r.value.error?.includes('ERR_CONNECTION_REFUSED')
+  );
+  if (anyRefused) {
+    console.log(`    ⏳ Server crash detected — waiting for recovery before next batch...`);
+    try { await waitForServerReady(BASE, 60000); } catch { console.log('    ⚠ Server did not recover'); }
+    await new Promise(r => setTimeout(r, 3000)); // Extra settle time
+  }
 
   for (const settled of batchResults) {
     const result = settled.status === 'fulfilled'

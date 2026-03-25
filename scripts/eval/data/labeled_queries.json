@@ -1,0 +1,163 @@
+{
+  "version": "1.0",
+  "description": "Ground-truth labeled query set for retrieval evaluation. query_id is stable, relevant_keywords lists terms that MUST appear in top-k results, min_relevant_docs is the minimum expected count.",
+  "queries": [
+    {
+      "query_id": "rq001",
+      "query": "elements of wire fraud federal statute 18 USC 1343",
+      "category": "federal_statute",
+      "relevant_keywords": ["wire fraud", "1343", "interstate", "wire communication"],
+      "min_relevant_docs": 1,
+      "difficulty": "easy"
+    },
+    {
+      "query_id": "rq002",
+      "query": "Fourth Amendment unreasonable search and seizure exclusionary rule",
+      "category": "constitutional",
+      "relevant_keywords": ["Fourth Amendment", "search", "seizure", "exclusionary"],
+      "min_relevant_docs": 2,
+      "difficulty": "easy"
+    },
+    {
+      "query_id": "rq003",
+      "query": "Miranda warnings custodial interrogation fifth amendment self-incrimination",
+      "category": "constitutional",
+      "relevant_keywords": ["Miranda", "custodial", "interrogation", "self-incrimination"],
+      "min_relevant_docs": 2,
+      "difficulty": "easy"
+    },
+    {
+      "query_id": "rq004",
+      "query": "probable cause standard arrest warrant affidavit",
+      "category": "criminal_procedure",
+      "relevant_keywords": ["probable cause", "warrant", "arrest"],
+      "min_relevant_docs": 1,
+      "difficulty": "easy"
+    },
+    {
+      "query_id": "rq005",
+      "query": "reasonable doubt standard criminal conviction proof beyond",
+      "category": "criminal_procedure",
+      "relevant_keywords": ["reasonable doubt", "proof", "conviction"],
+      "min_relevant_docs": 1,
+      "difficulty": "medium"
+    },
+    {
+      "query_id": "rq006",
+      "query": "RICO racketeer influenced corrupt organizations enterprise pattern",
+      "category": "federal_statute",
+      "relevant_keywords": ["RICO", "racketeering", "enterprise", "pattern"],
+      "min_relevant_docs": 1,
+      "difficulty": "medium"
+    },
+    {
+      "query_id": "rq007",
+      "query": "hearsay evidence rule exceptions Federal Rules of Evidence 803",
+      "category": "evidence",
+      "relevant_keywords": ["hearsay", "exception", "evidence"],
+      "min_relevant_docs": 1,
+      "difficulty": "medium"
+    },
+    {
+      "query_id": "rq008",
+      "query": "mens rea criminal intent specific general intent strict liability",
+      "category": "criminal_law",
+      "relevant_keywords": ["mens rea", "intent", "criminal"],
+      "min_relevant_docs": 1,
+      "difficulty": "medium"
+    },
+    {
+      "query_id": "rq009",
+      "query": "double jeopardy fifth amendment same offense attachment",
+      "category": "constitutional",
+      "relevant_keywords": ["double jeopardy", "same offense", "jeopardy attaches"],
+      "min_relevant_docs": 1,
+      "difficulty": "medium"
+    },
+    {
+      "query_id": "rq010",
+      "query": "Brady disclosure material exculpatory evidence prosecution",
+      "category": "criminal_procedure",
+      "relevant_keywords": ["Brady", "exculpatory", "material", "disclosure"],
+      "min_relevant_docs": 1,
+      "difficulty": "hard"
+    },
+    {
+      "query_id": "rq011",
+      "query": "Daubert standard expert witness scientific evidence admissibility",
+      "category": "evidence",
+      "relevant_keywords": ["Daubert", "expert", "scientific", "admissibility"],
+      "min_relevant_docs": 1,
+      "difficulty": "hard"
+    },
+    {
+      "query_id": "rq012",
+      "query": "constructive possession drug offense knowledge control",
+      "category": "criminal_law",
+      "relevant_keywords": ["constructive possession", "possession", "control"],
+      "min_relevant_docs": 1,
+      "difficulty": "hard"
+    },
+    {
+      "query_id": "rq013",
+      "query": "obstruction of justice 18 USC 1512 witness tampering",
+      "category": "federal_statute",
+      "relevant_keywords": ["obstruction", "1512", "witness tampering"],
+      "min_relevant_docs": 1,
+      "difficulty": "medium"
+    },
+    {
+      "query_id": "rq014",
+      "query": "computer fraud abuse act CFAA unauthorized access",
+      "category": "federal_statute",
+      "relevant_keywords": ["computer fraud", "CFAA", "unauthorized access"],
+      "min_relevant_docs": 1,
+      "difficulty": "medium"
+    },
+    {
+      "query_id": "rq015",
+      "query": "chain of custody evidence authentication foundation at trial",
+      "category": "evidence",
+      "relevant_keywords": ["chain of custody", "authentication", "evidence"],
+      "min_relevant_docs": 1,
+      "difficulty": "medium"
+    }
+  ],
+  "adversarial_queries": [
+    {
+      "query_id": "aq001",
+      "query": "Cybercrime Prevention Act of 2024 section 45 digital evidence requirements",
+      "is_fake": true,
+      "fake_element": "statute",
+      "description": "Entirely fabricated federal statute — should not match any real document"
+    },
+    {
+      "query_id": "aq002",
+      "query": "California 2022 Penal Code 187 murder definition intent malice aforethought",
+      "is_fake": false,
+      "fake_element": null,
+      "description": "Real statute — CA Penal Code 187 is murder; should match real documents"
+    },
+    {
+      "query_id": "aq003",
+      "query": "Federal Sentencing Guidelines 2B1.1 fraud loss table enhancement levels",
+      "is_fake": false,
+      "fake_element": null,
+      "description": "Real guidelines reference — should return relevant documents"
+    },
+    {
+      "query_id": "aq004",
+      "query": "Interstate Digital Commerce Act 18 USC 9981 electronic contraband penalties",
+      "is_fake": true,
+      "fake_element": "statute",
+      "description": "Made-up statute and section number — model should flag low confidence"
+    },
+    {
+      "query_id": "aq005",
+      "query": "Texas arrest without warrant for felony Texas Code of Criminal Procedure",
+      "is_fake": false,
+      "fake_element": null,
+      "description": "Real Texas law reference — should retrieve relevant state code documents"
+    }
+  ]
+}
