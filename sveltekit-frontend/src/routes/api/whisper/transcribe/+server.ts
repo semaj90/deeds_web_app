@@ -1,14 +1,45 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 
+const MAX_AUDIO_SIZE = 25 * 1024 * 1024; // 25MB
+const ALLOWED_AUDIO_TYPES = new Set([
+	'audio/wav', 'audio/wave', 'audio/x-wav',
+	'audio/mp3', 'audio/mpeg',
+	'audio/ogg', 'audio/webm',
+	'audio/flac', 'audio/x-flac',
+	'audio/mp4', 'audio/aac',
+	'application/octet-stream', '' // allow unknown MIME
+]);
+const ALLOWED_AUDIO_EXTENSIONS = new Set([
+	'.wav', '.mp3', '.ogg', '.webm', '.flac', '.m4a', '.aac', '.opus'
+]);
+
 /** POST /api/whisper/transcribe — Transcribe audio via Ollama/Whisper */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+
 	try {
 		const formData = await request.formData();
 		const audioFile = formData.get('file') as File | null;
 
 		if (!audioFile) {
 			return json({ error: 'No audio file provided' }, { status: 400 });
+		}
+
+		// Validate file size
+		if (audioFile.size > MAX_AUDIO_SIZE) {
+			return json({ error: `Audio file too large. Maximum ${MAX_AUDIO_SIZE / 1024 / 1024}MB.` }, { status: 400 });
+		}
+
+		// Validate MIME type
+		if (audioFile.type && !ALLOWED_AUDIO_TYPES.has(audioFile.type)) {
+			return json({ error: 'Invalid audio file type' }, { status: 400 });
+		}
+
+		// Validate extension
+		const ext = '.' + (audioFile.name.split('.').pop()?.toLowerCase() ?? '');
+		if (!ALLOWED_AUDIO_EXTENSIONS.has(ext)) {
+			return json({ error: 'Invalid audio file extension' }, { status: 400 });
 		}
 
 		const buffer = Buffer.from(await audioFile.arrayBuffer());

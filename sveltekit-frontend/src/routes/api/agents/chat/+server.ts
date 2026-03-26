@@ -165,8 +165,7 @@ async function executeTool(name: string, args: Record<string, unknown>): Promise
 		}
 	} catch (err) {
 		// Tool failed — return structured error so synthesis can continue without aborting
-		const msg = err instanceof Error ? err.message : 'unknown error';
-		return { ok: false, tool: name, query, results: `[${name} failed: ${msg}]`, count: 0, durationMs: Date.now() - start };
+		return { ok: false, tool: name, query, results: `[${name} failed]`, count: 0, durationMs: Date.now() - start };
 	}
 }
 

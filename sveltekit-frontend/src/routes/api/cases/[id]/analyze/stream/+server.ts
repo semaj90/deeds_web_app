@@ -148,7 +148,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
 			} catch (error) {
 				send({
 					type: 'error',
-					error: error instanceof Error ? error.message : 'Analysis failed'
+					error: 'Analysis failed'
 				});
 				controller.close();
 			}

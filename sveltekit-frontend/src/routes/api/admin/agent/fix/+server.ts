@@ -192,7 +192,7 @@ ${f.code}
 			status: 'failed',
 			file_path: filePath,
 			progress: 100,
-			message: error instanceof Error ? error.message : 'Unknown error'
+			message: 'Fix execution failed'
 		});
 		throw error;
 	}
@@ -227,8 +227,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json(
 			{
 				success: false,
-				error: 'Failed to generate fixes',
-				details: error instanceof Error ? error.message : String(error)
+				error: 'Failed to generate fixes'
 			},
 			{ status: 500 }
 		);

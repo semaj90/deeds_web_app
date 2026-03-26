@@ -24,6 +24,6 @@ export async function POST({ request, locals }: RequestEvent) {
 		const result = await analyzeSentiment(parsed.data.text.slice(0, 5000));
 		return json(result);
 	} catch (err) {
-		return json({ error: err instanceof Error ? err.message : 'Analysis failed' }, { status: 500 });
+		return json({ error: 'Analysis failed' }, { status: 500 });
 	}
 }

@@ -102,8 +102,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		console.error('Knowledge query error:', error);
 		return json(
 			{
-				error: 'Failed to query knowledge base',
-				details: error instanceof Error ? error.message : String(error)
+				error: 'Failed to query knowledge base'
 			},
 			{ status: 500 }
 		);

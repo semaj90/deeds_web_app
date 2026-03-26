@@ -229,12 +229,11 @@ export const POST: RequestHandler = async (event) => {
 		);
 	} catch (err) {
 		console.error('[cases-cluster] Request error:', err);
-		const message = err instanceof Error ? err.message : String(err);
 
 		return json(
 			{
 				success: false,
-				error: `Clustering failed: ${message}`
+				error: 'Clustering failed'
 			},
 			{ status: 500 }
 		);

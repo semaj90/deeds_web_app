@@ -56,21 +56,21 @@ export const GET: RequestHandler = async ({ params }) => {
     if (error instanceof Error) {
       if (error.message.includes('MinIO')) {
         return json(
-          { error: 'Storage service unavailable', details: error.message },
+          { error: 'Storage service unavailable' },
           { status: 503 }
         );
       }
 
       if (error.message.includes('Qdrant')) {
         return json(
-          { error: 'Search service unavailable', details: error.message },
+          { error: 'Search service unavailable' },
           { status: 503 }
         );
       }
     }
 
     return json(
-      { error: 'Internal server error', details: String(error) },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

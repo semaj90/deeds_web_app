@@ -61,12 +61,11 @@ export const GET: RequestHandler = async () => {
     );
   } catch (error: unknown) {
     console.error('Health check failed: ', error);
-    const msg = error instanceof Error ? error.message : String(error);
     return json(
       {
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
-        error: msg,
+        error: 'Health check failed',
         responseTimeMs: Date.now() - startTime,
       },
       { status: 503 }

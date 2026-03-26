@@ -115,7 +115,7 @@ export const POST: RequestHandler = async ({ request }) => {
 					if (chunk.done) break;
 				}
 			} catch (err) {
-				const errMsg = err instanceof Error ? err.message : 'Stream error';
+				const errMsg = 'Stream error';
 				controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: errMsg, done: true })}\n\n`));
 			} finally {
 				await releaseGpuLease('tensorrt').catch(() => {});

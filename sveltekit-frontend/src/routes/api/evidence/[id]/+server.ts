@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { cases, evidence } from '$lib/server/db/schema-postgres.js';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
 function parseMetadata(value: unknown): unknown {
@@ -29,7 +29,9 @@ const updateEvidenceSchema = z.object({
  * GET /api/evidence/[id]
  * Retrieve a single evidence item by ID
  */
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+
   try {
     const [item] = await db.select().from(evidence).where(eq(evidence.id, params.id)).limit(1);
 
@@ -51,7 +53,9 @@ export const GET: RequestHandler = async ({ params }) => {
  * PATCH /api/evidence/[id]
  * Update evidence metadata
  */
-export const PATCH: RequestHandler = async ({ params, request }) => {
+export const PATCH: RequestHandler = async ({ params, request, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+
   try {
     const body = await request.json().catch(() => ({}));
     const parsed = updateEvidenceSchema.safeParse(body);
@@ -95,7 +99,7 @@ export const PATCH: RequestHandler = async ({ params, request }) => {
     const [updated] = await db
       .update(evidence)
       .set(updates)
-      .where(eq(evidence.id, params.id))
+      .where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
       .returning();
 
     if (!updated) {
@@ -113,11 +117,13 @@ export const PATCH: RequestHandler = async ({ params, request }) => {
  * DELETE /api/evidence/[id]
  * Delete an evidence item
  */
-export const DELETE: RequestHandler = async ({ params }) => {
+export const DELETE: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+
 	try {
 		const [deleted] = await db
 			.delete(evidence)
-			.where(eq(evidence.id, params.id))
+			.where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
 			.returning({ id: evidence.id, title: evidence.title });
 
 		if (!deleted) {

@@ -41,7 +41,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json(
 			{
 				success: false,
-				error: err instanceof Error ? err.message : 'Unknown error',
+				error: 'Analysis failed',
 				provider: 'legal-orchestrator'
 			},
 			{ status: 500 }
@@ -67,7 +67,7 @@ export const GET: RequestHandler = async () => {
 			{
 				status: 'unhealthy',
 				service: 'legal-ai-orchestrator',
-				error: err instanceof Error ? err.message : 'Connection failed'
+				error: 'Connection failed'
 			},
 			{ status: 503 }
 		);

@@ -22,7 +22,8 @@ const updatePoiSchema = z.object({
  * GET /api/persons-of-interest/[id]
  * Retrieve a single person of interest by ID
  */
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   const parsedId = poiIdSchema.safeParse(params.id);
   if (!parsedId.success) {
     return json(
@@ -58,7 +59,8 @@ export const GET: RequestHandler = async ({ params }) => {
  * PATCH /api/persons-of-interest/[id]
  * Update a person of interest
  */
-export const PATCH: RequestHandler = async ({ params, request }) => {
+export const PATCH: RequestHandler = async ({ params, request, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   const parsedId = poiIdSchema.safeParse(params.id);
   if (!parsedId.success) {
     return json(
@@ -111,7 +113,8 @@ export const PATCH: RequestHandler = async ({ params, request }) => {
  * DELETE /api/persons-of-interest/[id]
  * Delete a person of interest and their photos (cascade)
  */
-export const DELETE: RequestHandler = async ({ params }) => {
+export const DELETE: RequestHandler = async ({ params, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   const parsedId = poiIdSchema.safeParse(params.id);
   if (!parsedId.success) {
     return json(

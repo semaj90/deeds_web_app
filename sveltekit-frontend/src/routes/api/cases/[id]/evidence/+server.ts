@@ -14,7 +14,9 @@ const evidenceDeleteSchema = z.object({
  * GET /api/cases/[id]/evidence
  * List all evidence items linked to a specific case
  */
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+
   const caseId = params.id;
 
   try {

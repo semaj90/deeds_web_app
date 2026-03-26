@@ -53,7 +53,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json(
 			{
 				success: false,
-				error: error instanceof Error ? error.message : 'Unknown error',
+				error: 'Similarity search failed',
 				similar: []
 			},
 			{ status: 500 }

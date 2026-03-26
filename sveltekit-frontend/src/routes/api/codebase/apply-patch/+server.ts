@@ -130,7 +130,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
     } catch (error) {
         console.error('Apply patch error:', error);
         return json({
-            error: error instanceof Error ? error.message : 'Unknown error'
+            error: 'Patch application failed'
         }, { status: 500 });
     }
 };

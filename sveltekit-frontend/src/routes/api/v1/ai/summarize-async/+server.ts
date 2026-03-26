@@ -81,7 +81,7 @@ export const POST: RequestHandler = async ({ request }) => {
 					`job:${jobId}`,
 					JSON.stringify({
 						status: 'failed',
-						error: err instanceof Error ? err.message : 'Unknown'
+						error: 'Summarization failed'
 					}),
 					'EX',
 					600

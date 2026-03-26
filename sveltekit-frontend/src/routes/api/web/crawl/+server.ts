@@ -48,7 +48,7 @@ export async function POST({ request, locals }: RequestEvent) {
 		try {
 			result = await crawlFallback(url);
 		} catch (err) {
-			return json({ error: `Crawl failed: ${err instanceof Error ? err.message : 'Unknown'}` }, { status: 502 });
+			return json({ error: 'Crawl failed' }, { status: 502 });
 		}
 	}
 

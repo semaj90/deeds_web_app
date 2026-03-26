@@ -175,7 +175,7 @@ export const POST: RequestHandler = async ({ request }) => {
       } catch (err) {
         results.push({
           file: file.name,
-          error: err instanceof Error ? err.message : 'Unknown error',
+          error: 'Processing failed',
           status: 'failed'
         });
       }
@@ -189,7 +189,7 @@ export const POST: RequestHandler = async ({ request }) => {
   } catch (err) {
     console.error('Upload error:', err);
     return json(
-      { error: err instanceof Error ? err.message : 'Upload failed' },
+      { error: 'Upload failed' },
       { status: 500 }
     );
   }
@@ -254,7 +254,7 @@ export const GET: RequestHandler = async ({ url }) => {
   } catch (err) {
     console.error('Search error:', err);
     return json(
-      { error: err instanceof Error ? err.message : 'Search failed' },
+      { error: 'Search failed' },
       { status: 500 }
     );
   }
@@ -371,7 +371,7 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
   } catch (err) {
     console.error('Generation error:', err);
     return json(
-      { error: err instanceof Error ? err.message : 'Generation failed' },
+      { error: 'Generation failed' },
       { status: 500 }
     );
   }

@@ -116,10 +116,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
       console.error('Error keys:', Object.keys(err));
       console.error('Error cause:', (err as any).cause);
     }
-    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-    const errorStack = err instanceof Error ? err.stack : '';
-    console.error('Full error:', errorMessage, errorStack);
-    throw error(500, `Failed to fetch reports: ${errorMessage}`);
+    throw error(500, 'Failed to fetch reports');
   }
 };
 

@@ -120,10 +120,17 @@
 			.attr('height', height)
 			.attr('viewBox', `0 0 ${width} ${height}`);
 
+		// Read theme colors from CSS custom properties
+		const cs = getComputedStyle(document.documentElement);
+		const tText = cs.getPropertyValue('--t-text').trim() || '#e0e0e0';
+		const tBorder = cs.getPropertyValue('--t-border').trim() || '#3a3a3a';
+		const tBg = cs.getPropertyValue('--t-bg').trim() || '#0a0a0a';
+		const tAccent = cs.getPropertyValue('--t-accent').trim() || '#ffd700';
+
 		// Subtle radial gradient background
 		const defs = svg.append('defs');
 		const radialGrad = defs.append('radialGradient').attr('id', 'graph-bg');
-		radialGrad.append('stop').attr('offset', '0%').attr('stop-color', 'rgba(212,199,163,0.03)');
+		radialGrad.append('stop').attr('offset', '0%').attr('stop-color', tAccent).attr('stop-opacity', '0.03');
 		radialGrad.append('stop').attr('offset', '100%').attr('stop-color', 'transparent');
 		svg.append('rect').attr('width', width).attr('height', height).attr('fill', 'url(#graph-bg)');
 
@@ -193,12 +200,13 @@
 				}
 			});
 
-		// Links with gradient
+		// Links
 		const link = svg.append('g')
 			.selectAll('line')
 			.data(links)
 			.join('line')
-			.attr('stroke', 'rgba(212, 199, 163, 0.08)')
+			.attr('stroke', tBorder)
+			.attr('stroke-opacity', 0.2)
 			.attr('stroke-width', 1);
 
 		// Category labels
@@ -210,7 +218,7 @@
 			.attr('y', (d) => catCenters[d].y - (height * 0.2))
 			.attr('text-anchor', 'middle')
 			.attr('font-size', '9px')
-			.attr('font-family', "'JetBrains Mono', monospace")
+			.attr('font-family', "var(--t-font-primary, 'JetBrains Mono', monospace)")
 			.attr('font-weight', '600')
 			.attr('letter-spacing', '0.12em')
 			.attr('fill', (d) => categoryMeta[d].color)
@@ -259,14 +267,17 @@
 		const tooltip = svg.append('g').attr('opacity', 0).attr('pointer-events', 'none');
 		const tooltipBg = tooltip.append('rect')
 			.attr('rx', 5)
-			.attr('fill', 'rgba(10,10,8,0.92)')
-			.attr('stroke', 'rgba(212,199,163,0.15)')
+			.attr('fill', tBg)
+			.attr('fill-opacity', 0.92)
+			.attr('stroke', tBorder)
+			.attr('stroke-opacity', 0.3)
 			.attr('stroke-width', 1);
 		const tooltipText = tooltip.append('text')
-			.attr('fill', 'rgba(212,199,163,0.9)')
+			.attr('fill', tText)
+			.attr('fill-opacity', 0.9)
 			.attr('font-size', '10px')
 			.attr('font-weight', '500')
-			.attr('font-family', "'JetBrains Mono', monospace");
+			.attr('font-family', "var(--t-font-primary, 'JetBrains Mono', monospace)");
 
 		node.on('mouseenter', (_event: MouseEvent, d: GraphNode) => {
 			tooltipText.text(d.label);
@@ -525,12 +536,12 @@
 
 <style>
 	/* ================================================================
-	   PAGE SHELL
+	   PAGE SHELL — Theme-aware via --t-* CSS custom properties
 	   ================================================================ */
 	.demos-page {
 		position: relative;
 		min-height: 100vh;
-		background: #0e0d0b;
+		background: var(--t-bg);
 		margin: -2.5rem;
 		padding: 2.5rem;
 	}
@@ -540,7 +551,7 @@
 		inset: 0;
 		pointer-events: none;
 		z-index: 0;
-		opacity: 0.025;
+		opacity: var(--t-panel-noise, 0.025);
 		background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 		background-repeat: repeat;
 		background-size: 256px;
@@ -586,7 +597,7 @@
 	.page-header {
 		margin-bottom: 1.75rem;
 		padding-bottom: 1.5rem;
-		border-bottom: 1px solid rgba(212, 199, 163, 0.06);
+		border-bottom: 1px solid color-mix(in srgb, var(--t-border) 30%, transparent);
 	}
 	.header-top {
 		display: flex;
@@ -605,9 +616,9 @@
 		width: 2.5rem;
 		height: 2.5rem;
 		border-radius: 0.625rem;
-		background: linear-gradient(135deg, rgba(250, 204, 21, 0.1), rgba(251, 146, 60, 0.08));
-		border: 1px solid rgba(250, 204, 21, 0.15);
-		color: rgba(250, 204, 21, 0.8);
+		background: color-mix(in srgb, var(--t-accent) 10%, transparent);
+		border: 1px solid color-mix(in srgb, var(--t-accent) 18%, transparent);
+		color: var(--t-accent);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -615,12 +626,13 @@
 	.brand-title {
 		font-size: 1.25rem;
 		font-weight: 700;
-		color: rgba(212, 199, 163, 0.92);
+		color: var(--t-text);
 		letter-spacing: 0.02em;
+		font-family: var(--t-font-heading, inherit);
 	}
 	.brand-sub {
 		font-size: 0.6875rem;
-		color: rgba(212, 199, 163, 0.3);
+		color: var(--t-text-muted);
 		margin-top: 0.125rem;
 		letter-spacing: 0.01em;
 	}
@@ -638,24 +650,24 @@
 	.stat-value {
 		font-size: 1rem;
 		font-weight: 700;
-		color: rgba(212, 199, 163, 0.75);
+		color: color-mix(in srgb, var(--t-text) 80%, transparent);
 		font-variant-numeric: tabular-nums;
 		letter-spacing: -0.02em;
 	}
 	.stat-label {
 		font-size: 0.5625rem;
 		font-weight: 500;
-		color: rgba(212, 199, 163, 0.3);
+		color: var(--t-text-muted);
 		text-transform: uppercase;
 		letter-spacing: 0.1em;
 	}
 	.stat-item.accent .stat-value {
-		color: rgba(250, 204, 21, 0.8);
+		color: var(--t-accent);
 	}
 	.stat-divider {
 		width: 1px;
 		height: 1.5rem;
-		background: rgba(212, 199, 163, 0.08);
+		background: color-mix(in srgb, var(--t-border) 40%, transparent);
 	}
 
 	/* ================================================================
@@ -663,8 +675,8 @@
 	   ================================================================ */
 	.view-toggle {
 		display: flex;
-		background: rgba(212, 199, 163, 0.04);
-		border: 1px solid rgba(212, 199, 163, 0.08);
+		background: color-mix(in srgb, var(--t-text) 4%, transparent);
+		border: 1px solid color-mix(in srgb, var(--t-border) 40%, transparent);
 		border-radius: 0.5rem;
 		padding: 3px;
 		gap: 2px;
@@ -676,17 +688,21 @@
 		padding: 0.375rem 0.75rem;
 		font-size: 0.6875rem;
 		font-weight: 500;
-		color: rgba(212, 199, 163, 0.4);
+		color: var(--t-text-muted);
 		border-radius: 0.375rem;
 		cursor: pointer;
-		transition: all 0.15s;
+		transition: color 0.15s, background 0.15s;
 	}
 	.toggle-btn:hover {
-		color: rgba(212, 199, 163, 0.7);
+		color: color-mix(in srgb, var(--t-text) 75%, transparent);
+	}
+	.toggle-btn:focus-visible {
+		outline: 2px solid var(--t-focus-ring);
+		outline-offset: -2px;
 	}
 	.toggle-btn.active {
-		color: rgba(212, 199, 163, 0.9);
-		background: rgba(212, 199, 163, 0.08);
+		color: var(--t-text);
+		background: color-mix(in srgb, var(--t-text) 8%, transparent);
 	}
 
 	/* ================================================================
@@ -710,21 +726,25 @@
 		padding: 0.375rem 0.75rem;
 		font-size: 0.6875rem;
 		font-weight: 500;
-		color: rgba(212, 199, 163, 0.4);
-		border: 1px solid rgba(212, 199, 163, 0.08);
+		color: var(--t-text-muted);
+		border: 1px solid color-mix(in srgb, var(--t-border) 35%, transparent);
 		border-radius: 9999px;
 		cursor: pointer;
-		transition: all 0.15s;
+		transition: color 0.15s, border-color 0.15s, background 0.15s;
 	}
 	.filter-chip:hover {
-		color: rgba(212, 199, 163, 0.7);
-		border-color: rgba(212, 199, 163, 0.15);
-		background: rgba(212, 199, 163, 0.03);
+		color: color-mix(in srgb, var(--t-text) 75%, transparent);
+		border-color: color-mix(in srgb, var(--t-border) 60%, transparent);
+		background: color-mix(in srgb, var(--t-text) 3%, transparent);
+	}
+	.filter-chip:focus-visible {
+		outline: 2px solid var(--t-focus-ring);
+		outline-offset: 1px;
 	}
 	.filter-chip.active {
-		color: var(--chip-color, rgba(212, 199, 163, 0.9));
-		border-color: color-mix(in srgb, var(--chip-color, #d4c7a3) 30%, transparent);
-		background: color-mix(in srgb, var(--chip-color, #d4c7a3) 8%, transparent);
+		color: var(--chip-color, var(--t-text));
+		border-color: color-mix(in srgb, var(--chip-color, var(--t-accent)) 30%, transparent);
+		background: color-mix(in srgb, var(--chip-color, var(--t-accent)) 8%, transparent);
 	}
 	.filter-dot {
 		width: 6px;
@@ -745,9 +765,9 @@
 		max-width: 68rem;
 		margin-left: auto;
 		margin-right: auto;
-		border: 1px solid rgba(212, 199, 163, 0.08);
+		border: 1px solid color-mix(in srgb, var(--t-border) 35%, transparent);
 		border-radius: 0.75rem;
-		background: rgba(0, 0, 0, 0.15);
+		background: var(--t-panel);
 		overflow: hidden;
 		position: relative;
 		z-index: 1;
@@ -757,17 +777,17 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: 0.75rem 1.25rem;
-		border-bottom: 1px solid rgba(212, 199, 163, 0.06);
+		border-bottom: 1px solid color-mix(in srgb, var(--t-border) 25%, transparent);
 	}
 	.graph-title {
 		font-size: 0.75rem;
 		font-weight: 600;
-		color: rgba(212, 199, 163, 0.6);
+		color: color-mix(in srgb, var(--t-text) 65%, transparent);
 		letter-spacing: 0.02em;
 	}
 	.graph-hint {
 		font-size: 0.625rem;
-		color: rgba(212, 199, 163, 0.25);
+		color: var(--t-text-muted);
 	}
 	.graph-canvas {
 		width: 100%;
@@ -779,7 +799,7 @@
 		align-items: center;
 		gap: 1rem;
 		padding: 0.625rem 1.25rem;
-		border-top: 1px solid rgba(212, 199, 163, 0.06);
+		border-top: 1px solid color-mix(in srgb, var(--t-border) 25%, transparent);
 		flex-wrap: wrap;
 	}
 	.legend-item {
@@ -787,7 +807,7 @@
 		align-items: center;
 		gap: 0.375rem;
 		font-size: 0.625rem;
-		color: rgba(212, 199, 163, 0.35);
+		color: var(--t-text-muted);
 	}
 	.legend-dot {
 		width: 7px;
@@ -798,7 +818,7 @@
 	.legend-line {
 		width: 14px;
 		height: 0;
-		border-top: 2px solid rgba(212, 199, 163, 0.3);
+		border-top: 2px solid color-mix(in srgb, var(--t-text) 30%, transparent);
 	}
 	.legend-line.dashed {
 		border-top-style: dashed;
@@ -816,32 +836,32 @@
 		gap: 0.625rem;
 		margin-bottom: 1rem;
 		padding-bottom: 0.625rem;
-		border-bottom: 1px solid rgba(212, 199, 163, 0.06);
+		border-bottom: 1px solid color-mix(in srgb, var(--t-border) 25%, transparent);
 	}
 	.section-indicator {
 		width: 3px;
 		height: 14px;
 		border-radius: 2px;
-		background: rgba(96, 165, 250, 0.6);
+		background: var(--t-accent-2);
 	}
 	.section-indicator.showcase {
-		background: rgba(52, 211, 153, 0.6);
+		background: var(--t-success);
 	}
 	.section-title {
 		font-size: 0.8125rem;
 		font-weight: 600;
-		color: rgba(212, 199, 163, 0.7);
+		color: color-mix(in srgb, var(--t-text) 75%, transparent);
 		letter-spacing: 0.02em;
 	}
 	.section-head.showcase .section-title {
-		color: rgba(52, 211, 153, 0.7);
+		color: color-mix(in srgb, var(--t-success) 80%, transparent);
 	}
 	.section-count {
 		margin-left: auto;
 		font-size: 0.625rem;
 		font-weight: 500;
-		color: rgba(212, 199, 163, 0.2);
-		background: rgba(212, 199, 163, 0.04);
+		color: var(--t-text-muted);
+		background: color-mix(in srgb, var(--t-text) 5%, transparent);
 		padding: 0.125rem 0.625rem;
 		border-radius: 9999px;
 		font-variant-numeric: tabular-nums;
@@ -853,35 +873,39 @@
 	.card-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-		gap: 0.625rem;
+		gap: 0.75rem;
 	}
 	.card {
 		display: flex;
 		flex-direction: column;
 		padding: 1rem 1rem 0.75rem;
-		border: 1px solid rgba(212, 199, 163, 0.07);
-		border-left: 3px solid var(--card-accent, rgba(96, 165, 250, 0.4));
+		border: 1px solid color-mix(in srgb, var(--t-border) 30%, transparent);
+		border-left: 3px solid color-mix(in srgb, var(--card-accent, var(--t-accent-2)) 50%, transparent);
 		border-radius: 0.5rem;
-		background: linear-gradient(135deg, rgba(20, 19, 16, 0.6), rgba(25, 24, 20, 0.4));
+		background: var(--t-panel);
 		text-align: left;
 		color: inherit;
 		cursor: pointer;
-		transition: all 0.2s ease;
+		transition: border-color 0.2s, background 0.2s, transform 0.2s, box-shadow 0.2s;
 	}
 	.card:hover {
-		border-color: rgba(212, 199, 163, 0.12);
-		background: linear-gradient(135deg, rgba(25, 24, 20, 0.8), rgba(30, 29, 24, 0.6));
+		border-color: color-mix(in srgb, var(--t-border) 55%, transparent);
+		background: var(--t-bg-elevated);
 		transform: translateY(-2px);
 		box-shadow:
-			0 8px 24px rgba(0, 0, 0, 0.4),
-			0 0 0 1px rgba(212, 199, 163, 0.04);
+			0 8px 24px var(--t-shadow),
+			0 0 0 1px color-mix(in srgb, var(--t-border) 15%, transparent);
+	}
+	.card:focus-visible {
+		outline: 2px solid var(--t-focus-ring);
+		outline-offset: 1px;
 	}
 	.card:hover .card-arrow {
 		opacity: 0.6;
 		transform: translateX(2px);
 	}
 	.card.showcase {
-		border-left-color: rgba(52, 211, 153, 0.4);
+		border-left-color: color-mix(in srgb, var(--t-success) 50%, transparent);
 	}
 
 	.card-top {
@@ -894,18 +918,18 @@
 		width: 2rem;
 		height: 2rem;
 		border-radius: 0.5rem;
-		background: color-mix(in srgb, var(--card-accent, #60a5fa) 8%, transparent);
-		border: 1px solid color-mix(in srgb, var(--card-accent, #60a5fa) 12%, transparent);
-		color: var(--card-accent, rgba(96, 165, 250, 0.8));
+		background: color-mix(in srgb, var(--card-accent, var(--t-accent-2)) 8%, transparent);
+		border: 1px solid color-mix(in srgb, var(--card-accent, var(--t-accent-2)) 12%, transparent);
+		color: var(--card-accent, var(--t-accent-2));
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		flex-shrink: 0;
 	}
 	.card-icon.showcase-icon {
-		background: rgba(52, 211, 153, 0.08);
-		border-color: rgba(52, 211, 153, 0.12);
-		color: rgba(52, 211, 153, 0.8);
+		background: color-mix(in srgb, var(--t-success) 8%, transparent);
+		border-color: color-mix(in srgb, var(--t-success) 15%, transparent);
+		color: var(--t-success);
 	}
 	.card-title-area {
 		flex: 1;
@@ -915,13 +939,13 @@
 		display: block;
 		font-size: 0.8125rem;
 		font-weight: 600;
-		color: rgba(212, 199, 163, 0.88);
+		color: var(--t-text);
 		line-height: 1.3;
 	}
 	.card-loc {
 		font-size: 0.5625rem;
-		color: rgba(212, 199, 163, 0.25);
-		font-family: 'JetBrains Mono', monospace;
+		color: var(--t-text-muted);
+		font-family: var(--t-font-primary, 'JetBrains Mono', monospace);
 		letter-spacing: 0.02em;
 		margin-top: 0.125rem;
 		display: block;
@@ -929,7 +953,7 @@
 	.card-desc {
 		font-size: 0.6875rem;
 		line-height: 1.55;
-		color: rgba(212, 199, 163, 0.38);
+		color: var(--t-text-muted);
 		flex: 1;
 		display: -webkit-box;
 		line-clamp: 3;
@@ -943,7 +967,7 @@
 		justify-content: space-between;
 		margin-top: 0.625rem;
 		padding-top: 0.5rem;
-		border-top: 1px solid rgba(212, 199, 163, 0.04);
+		border-top: 1px solid color-mix(in srgb, var(--t-border) 15%, transparent);
 	}
 	.card-tag {
 		display: inline-flex;
@@ -951,7 +975,7 @@
 		gap: 0.375rem;
 		font-size: 0.5625rem;
 		font-weight: 500;
-		color: var(--card-accent, rgba(212, 199, 163, 0.4));
+		color: var(--card-accent, var(--t-text-muted));
 		letter-spacing: 0.03em;
 		opacity: 0.7;
 	}
@@ -959,13 +983,13 @@
 		width: 5px;
 		height: 5px;
 		border-radius: 50%;
-		background: var(--card-accent, rgba(212, 199, 163, 0.4));
+		background: var(--card-accent, var(--t-text-muted));
 		opacity: 0.6;
 	}
 	.card-arrow {
-		color: rgba(212, 199, 163, 0.2);
+		color: var(--t-text-muted);
 		opacity: 0;
-		transition: all 0.2s;
+		transition: opacity 0.2s, transform 0.2s;
 	}
 
 	/* ================================================================
@@ -993,28 +1017,28 @@
 	}
 	.modal-loc {
 		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.4);
-		font-family: 'JetBrains Mono', monospace;
+		color: var(--t-text-muted);
+		font-family: var(--t-font-primary, 'JetBrains Mono', monospace);
 	}
 	.modal-desc {
 		font-size: 0.9375rem;
 		line-height: 1.75;
-		color: rgba(255, 255, 255, 0.75);
+		color: color-mix(in srgb, var(--t-text) 80%, transparent);
 	}
 	.modal-route {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
 		padding: 0.625rem 0.875rem;
-		background: rgba(0, 0, 0, 0.25);
-		border: 1px solid rgba(255, 255, 255, 0.06);
+		background: color-mix(in srgb, var(--t-bg) 50%, transparent);
+		border: 1px solid color-mix(in srgb, var(--t-border) 25%, transparent);
 		border-radius: 0.5rem;
-		color: rgba(255, 255, 255, 0.3);
+		color: var(--t-text-muted);
 		font-size: 0.75rem;
 	}
 	.modal-route code {
-		color: rgba(255, 255, 255, 0.55);
-		font-family: 'JetBrains Mono', monospace;
+		color: color-mix(in srgb, var(--t-text) 60%, transparent);
+		font-family: var(--t-font-primary, 'JetBrains Mono', monospace);
 	}
 	.modal-actions {
 		display: flex;
@@ -1027,16 +1051,20 @@
 		padding: 0.5rem 1.25rem;
 		font-size: 0.8125rem;
 		font-weight: 500;
-		color: rgba(255, 255, 255, 0.5);
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		color: var(--t-text-muted);
+		border: 1px solid color-mix(in srgb, var(--t-border) 45%, transparent);
 		border-radius: 0.5rem;
 		cursor: pointer;
-		transition: all 0.15s;
+		transition: color 0.15s, border-color 0.15s, background 0.15s;
 	}
 	.btn-secondary:hover {
-		color: rgba(255, 255, 255, 0.8);
-		border-color: rgba(255, 255, 255, 0.2);
-		background: rgba(255, 255, 255, 0.04);
+		color: var(--t-text);
+		border-color: color-mix(in srgb, var(--t-border) 70%, transparent);
+		background: color-mix(in srgb, var(--t-text) 4%, transparent);
+	}
+	.btn-secondary:focus-visible {
+		outline: 2px solid var(--t-focus-ring);
+		outline-offset: 1px;
 	}
 	.btn-primary {
 		display: inline-flex;
@@ -1045,16 +1073,50 @@
 		padding: 0.5rem 1.5rem;
 		font-size: 0.8125rem;
 		font-weight: 600;
-		color: #fff;
-		background: linear-gradient(135deg, rgba(138, 43, 226, 0.45), rgba(30, 144, 255, 0.45));
-		border: 1px solid rgba(255, 255, 255, 0.15);
+		color: var(--t-bg);
+		background: var(--t-accent);
+		border: 1px solid color-mix(in srgb, var(--t-accent) 80%, white);
 		border-radius: 0.5rem;
 		cursor: pointer;
-		transition: all 0.2s;
+		transition: filter 0.2s, transform 0.2s, box-shadow 0.2s;
 	}
 	.btn-primary:hover {
-		background: linear-gradient(135deg, rgba(138, 43, 226, 0.65), rgba(30, 144, 255, 0.65));
+		filter: brightness(1.15);
 		transform: translateY(-1px);
-		box-shadow: 0 6px 20px rgba(138, 43, 226, 0.25);
+		box-shadow: 0 6px 20px color-mix(in srgb, var(--t-accent) 30%, transparent);
+	}
+	.btn-primary:focus-visible {
+		outline: 2px solid var(--t-focus-ring);
+		outline-offset: 2px;
+	}
+
+	/* ================================================================
+	   RESPONSIVE
+	   ================================================================ */
+	@media (max-width: 640px) {
+		.demos-page {
+			padding: 1.25rem;
+			margin: -1.25rem;
+		}
+		.header-top {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 1rem;
+		}
+		.header-stats {
+			gap: 0.75rem;
+		}
+		.card-grid {
+			grid-template-columns: 1fr;
+			gap: 0.5rem;
+		}
+		.graph-canvas {
+			height: 360px;
+		}
+		.graph-header {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.25rem;
+		}
 	}
 </style>

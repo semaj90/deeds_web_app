@@ -171,12 +171,10 @@ export const POST: RequestHandler = async (event) => {
 		}
 	} catch (err) {
 		console.error('[autotag-trigger] Request error:', err);
-		const message = err instanceof Error ? err.message : String(err);
-
 		return json(
 			{
 				success: false,
-				error: `Worker trigger failed: ${message}`
+				error: 'Worker trigger failed'
 			},
 			{ status: 500 }
 		);

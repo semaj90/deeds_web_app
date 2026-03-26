@@ -115,7 +115,7 @@ export const POST: RequestHandler = async ({ request }) => {
     console.error('[KB Validate] Error:', error);
     return json({
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: 'Validation failed'
     }, { status: 500 });
   }
 };

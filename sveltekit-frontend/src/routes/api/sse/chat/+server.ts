@@ -1419,16 +1419,15 @@ export const POST: RequestHandler = async ({ request }) => {
           ...(reformulated ? { correctiveRag: { reformulated: true, newQuery } } : {}),
         });
       } catch (error) {
-        const errMsg = error instanceof Error ? error.message : String(error);
         console.error(
           '[SSE Chat] Generation error:',
-          errMsg,
+          error instanceof Error ? error.message : String(error),
           error instanceof Error ? error.stack : ''
         );
         send({
           id,
           role: 'assistant',
-          content: fullResponse || `Sorry, I encountered an error: ${errMsg.slice(0, 100)}`,
+          content: fullResponse || 'Sorry, I encountered an error processing your request.',
           status: 'error',
         });
       }

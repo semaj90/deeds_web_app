@@ -232,12 +232,11 @@ export const GET: RequestHandler = async (event) => {
 		);
 	} catch (err) {
 		console.error('[cases-analytics] Request error:', err);
-		const message = err instanceof Error ? err.message : String(err);
 
 		return json(
 			{
 				success: false,
-				error: `Analytics fetch failed: ${message}`
+				error: 'Analytics fetch failed'
 			},
 			{ status: 500 }
 		);

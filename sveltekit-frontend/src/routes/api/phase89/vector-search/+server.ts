@@ -81,7 +81,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json(
 			{
 				success: false,
-				error: error instanceof Error ? error.message : 'Unknown error',
+				error: 'Search failed',
 				results: []
 			},
 			{ status: 500 }

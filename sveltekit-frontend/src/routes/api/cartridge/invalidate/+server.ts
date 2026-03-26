@@ -34,7 +34,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const deleted = await invalidateCartridge(caseId);
 		return json({ caseId, invalidated: deleted });
 	} catch (err) {
-		const msg = err instanceof Error ? err.message : String(err);
-		return json({ error: `Invalidation failed: ${msg}` }, { status: 500 });
+		console.error('[cartridge-invalidate] Error:', err);
+		return json({ error: 'Invalidation failed' }, { status: 500 });
 	}
 };

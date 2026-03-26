@@ -61,6 +61,8 @@ const RATE_TIERS: Array<{ prefix: string; window: number; max: number; methods?:
   { prefix: '/api/sse/', window: 60_000, max: 40 },
   // Write-heavy mutation routes (default write limiter)
   { prefix: '/api/', window: 60_000, max: 60, methods: ['POST', 'PUT', 'PATCH', 'DELETE'] },
+  // Global GET read limiter (DoS protection)
+  { prefix: '/api/', window: 60_000, max: 200, methods: ['GET'] },
 ];
 
 function getRateTier(path: string, method: string) {
@@ -79,6 +81,19 @@ if (shouldRunBootTasks) {
       if (now > entry.resetTime) rateLimits.delete(key);
     }
   }, 60_000);
+}
+
+// ── Production Secret Guard ─────────────────────────────────────────────
+// Crash early if deploying with dev-only secrets
+if (shouldRunBootTasks && !dev) {
+  const JWT = ENV.JWT_SECRET;
+  const SVC = ENV.SERVICE_AUTH_TOKEN;
+  if (JWT === 'dev-only-jwt-secret-change-in-production' || SVC === 'dev-only-service-token') {
+    throw new Error(
+      'FATAL: Production deployment detected with dev-only secrets. ' +
+      'Set JWT_SECRET and SERVICE_AUTH_TOKEN environment variables before deploying.'
+    );
+  }
 }
 
 if (shouldRunBootTasks) {

@@ -94,7 +94,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		return json(response);
 	} catch (err) {
-		const msg = err instanceof Error ? err.message : String(err);
-		return json({ error: `Tensor search failed: ${msg}` }, { status: 500 });
+		console.error('[cartridge-search] Error:', err);
+		return json({ error: 'Tensor search failed' }, { status: 500 });
 	}
 };

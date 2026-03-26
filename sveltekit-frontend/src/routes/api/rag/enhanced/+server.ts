@@ -51,7 +51,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json(
 			{
 				success: false,
-				error: err instanceof Error ? err.message : 'Unknown error',
+				error: 'RAG query failed',
 				provider: 'enhanced-rag-simd'
 			},
 			{ status: 500 }
@@ -83,7 +83,7 @@ export const GET: RequestHandler = async () => {
 			{
 				status: 'unhealthy',
 				service: 'enhanced-rag-simd',
-				error: err instanceof Error ? err.message : 'Connection failed'
+				error: 'Connection failed'
 			},
 			{ status: 503 }
 		);

@@ -171,11 +171,10 @@ async function executeContextualTool(
         };
     }
   } catch (err) {
-    const msg = err instanceof Error ? err.message : 'unknown error';
     return {
       ok: false,
       tool: name,
-      result: `[${name} failed: ${msg}]`,
+      result: `[${name} failed]`,
       durationMs: Date.now() - start,
     };
   }

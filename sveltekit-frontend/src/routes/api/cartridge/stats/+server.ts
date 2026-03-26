@@ -16,7 +16,7 @@ export const GET: RequestHandler = async () => {
 			totalSizeMB: +(stats.totalSizeBytes / (1024 * 1024)).toFixed(2),
 		});
 	} catch (err) {
-		const msg = err instanceof Error ? err.message : String(err);
-		return json({ error: `Stats query failed: ${msg}` }, { status: 500 });
+		console.error('[cartridge-stats] Error:', err);
+		return json({ error: 'Stats query failed' }, { status: 500 });
 	}
 };

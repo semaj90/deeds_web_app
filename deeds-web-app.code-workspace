@@ -3,5 +3,14 @@
         {
             "path": "."
         }
-    ]
+    ],
+    "settings": {
+        "github.copilot.chat.agent.autoFix": true,
+        "github.copilot.chat.claudeAgent.enabled": false,
+        "github.copilot.chat.cloudAgent.enabled": false,
+        "github.copilot.chat.anthropic.toolSearchTool.mode": "client",
+        "github.copilot.chat.backgroundCompaction": true,
+        "github.copilot.chat.copilotMemory.enabled": true,
+        "github.copilot.chat.anthropic.tools.websearch.enabled": true
+    }
 }

@@ -50,7 +50,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	} catch (error) {
 		console.error('Pipeline API error:', error);
 		return json({
-			error: error instanceof Error ? error.message : 'Unknown error'
+			error: 'Pipeline execution failed'
 		}, { status: 500 });
 	}
 };

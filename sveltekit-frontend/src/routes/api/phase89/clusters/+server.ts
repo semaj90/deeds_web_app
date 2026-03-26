@@ -104,7 +104,7 @@ export const GET: RequestHandler = async () => {
 		return json(
       {
         success: true,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'Cluster analysis failed',
         clusters: [],
       },
       { status: 200 }

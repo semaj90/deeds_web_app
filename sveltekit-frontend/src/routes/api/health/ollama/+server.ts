@@ -34,14 +34,12 @@ export const GET: RequestHandler = async () => {
 			}
 		} catch (fetchError: unknown) {
 			// This catches network errors and timeouts.
-			const message = fetchError instanceof Error ? fetchError.message : 'Fetch failed';
 			return json(
 				{
 					status: 'unavailable',
 					service: 'ollama',
 					message: 'Ollama service not reachable',
 					details: { url: ollamaUrl,
-						error: message,
 						available: false
 					},
 					timestamp: new Date().toISOString()
@@ -51,12 +49,11 @@ export const GET: RequestHandler = async () => {
 		}
 	} catch (error: unknown) {
 		// This catches errors from the service itself (e.g., non-200 responses) or other unexpected errors.
-		const message = error instanceof Error ? error.message : 'Health check failed';
 		return json(
 			{
 				status: 'error',
 				service: 'ollama',
-				error: message,
+				error: 'Health check failed',
 				timestamp: new Date().toISOString()
 			},
 			{ status: 500 }

@@ -37,8 +37,7 @@ async function startValidationProcess(sse: SSE) {
         });
 
     } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : 'Unknown error';
-        sse.error(message);
+        sse.error('Validation failed');
         sse.close();
     }
 }

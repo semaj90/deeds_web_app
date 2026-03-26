@@ -97,8 +97,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			throw err; // Re-throw SvelteKit errors
 		}
 
-		const message = err instanceof Error ? err.message : 'Unknown error';
-		throw error(500, 'Failed to apply patch: ' + message);
+		throw error(500, 'Failed to apply patch');
 	}
 };
 

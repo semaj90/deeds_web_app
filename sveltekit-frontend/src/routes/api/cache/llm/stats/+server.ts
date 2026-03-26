@@ -63,7 +63,7 @@ export const GET: RequestHandler = async () => {
 		return json(
 			{
 				success: false,
-				error: error instanceof Error ? error.message : 'Unknown error',
+				error: 'Failed to retrieve cache stats',
 				timestamp: new Date().toISOString()
 			},
 			{ status: 500 }

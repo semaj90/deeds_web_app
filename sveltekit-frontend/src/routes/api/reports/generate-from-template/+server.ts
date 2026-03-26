@@ -210,6 +210,6 @@ Generate the complete report content in HTML format, maintaining the structure b
     }
 
     console.error('Unexpected error in template generation:', err);
-    throw error(500, `Failed to generate report from template: ${err instanceof Error ? err.message : String(err)}`);
+    throw error(500, 'Failed to generate report from template');
   }
 };

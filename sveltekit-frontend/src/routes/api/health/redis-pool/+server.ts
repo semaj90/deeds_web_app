@@ -24,7 +24,7 @@ export const GET: RequestHandler = async () => {
 		return json(
 			{
 				success: false,
-				error: err instanceof Error ? err.message : 'Unknown error',
+				error: 'Redis pool check failed',
 				timestamp: new Date().toISOString()
 			},
 			{ status: 500 }

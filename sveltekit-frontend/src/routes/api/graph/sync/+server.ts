@@ -27,7 +27,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		});
 	} catch (err) {
 		return json(
-			{ ok: false, error: err instanceof Error ? err.message : String(err) },
+			{ ok: false, error: 'Sync failed' },
 			{ status: 500 }
 		);
 	}

@@ -146,7 +146,7 @@ const handleDemoLogin: RequestHandler = async ({ request, cookies, url }) => {
 
     console.error('[Demo Login] Error:', err);
     return json(
-      { error: err instanceof Error ? err.message : 'Failed to create demo session' },
+      { error: 'Failed to create demo session' },
       { status: 500 }
     );
   }

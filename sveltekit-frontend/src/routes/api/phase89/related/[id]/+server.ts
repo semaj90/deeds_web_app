@@ -65,7 +65,7 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 		console.error('Related files API error:', error);
 		return json({
 			related: [],
-			error: error instanceof Error ? error.message : 'Unknown error'
+			error: 'Related search failed'
 		}, { status: 500 });
 	}
 };

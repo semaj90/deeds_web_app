@@ -1,6 +1,15 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB per file
+const MAX_FILES = 20;
+const ALLOWED_TYPES = new Set([
+	'application/pdf', 'text/plain', 'text/html', 'text/markdown',
+	'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+	'application/octet-stream', ''
+]);
+const ALLOWED_EXTENSIONS = new Set(['.pdf', '.txt', '.html', '.md', '.docx']);
+
 /** POST /api/rag/process — Process uploaded files through RAG pipeline */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
@@ -12,6 +21,21 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		if (!files.length) {
 			return json({ error: 'No files provided' }, { status: 400 });
+		}
+
+		if (files.length > MAX_FILES) {
+			return json({ error: `Too many files (max ${MAX_FILES})` }, { status: 400 });
+		}
+
+		// Validate each file
+		for (const file of files) {
+			if (file.size > MAX_FILE_SIZE) {
+				return json({ error: `File "${file.name}" exceeds 50MB limit` }, { status: 400 });
+			}
+			const ext = file.name.includes('.') ? '.' + file.name.split('.').pop()!.toLowerCase() : '';
+			if (!ALLOWED_EXTENSIONS.has(ext) && !ALLOWED_TYPES.has(file.type)) {
+				return json({ error: `Unsupported file type: ${file.name}` }, { status: 400 });
+			}
 		}
 
 		const results: Array<{
@@ -77,7 +101,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				results.push({
 					filename: file.name,
 					status: 'error',
-					error: err instanceof Error ? err.message : 'Processing failed'
+					error: 'Processing failed'
 				});
 			}
 		}

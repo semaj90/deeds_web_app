@@ -734,6 +734,7 @@ sveltekit-frontend/build-debug/CMakeFiles/
 scripts/tests/screenshots/*.png
 scripts/tests/screenshots/2026-*/
 scripts/tests/screenshots/latest/
+scripts/tests/screenshots/cases-ui/
 
 ########################################
 # Source code EXCEPTIONS

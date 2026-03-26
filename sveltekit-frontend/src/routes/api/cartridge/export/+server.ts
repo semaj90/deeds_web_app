@@ -104,8 +104,8 @@ export const POST: RequestHandler = async ({ request }) => {
 			if (!nextOffset) break;
 		}
 	} catch (err) {
-		const msg = err instanceof Error ? err.message : String(err);
-		return json({ error: `Qdrant scroll failed: ${msg}` }, { status: 502 });
+		console.error('[cartridge-export] Qdrant scroll error:', err);
+		return json({ error: 'Qdrant scroll failed' }, { status: 502 });
 	}
 
 	if (allPoints.length === 0) {

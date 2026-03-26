@@ -16,7 +16,7 @@ export const GET: RequestHandler = async ({ params }) => {
 		return json(doc);
 	} catch (err) {
 		return json(
-			{ error: 'Tag not found', message: err instanceof Error ? err.message : String(err) },
+			{ error: 'Tag not found' },
 			{ status: 404 }
 		);
 	}

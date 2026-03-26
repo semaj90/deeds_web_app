@@ -40,7 +40,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     console.error('[ACE Tools] Execution error:', error);
     return json({
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Tool execution failed',
       timestamp: new Date().toISOString()
     }, { status: 500 });
   }

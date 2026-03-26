@@ -56,8 +56,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		console.error('ACP Execute error:', error);
 		return json(
 			{
-				error: 'Execution failed',
-				details: error instanceof Error ? error.message : 'Unknown error'
+				error: 'Execution failed'
 			},
 			{ status: 500 }
 		);

@@ -24,8 +24,8 @@ SCRIPT_DIR = Path(__file__).parent
 REPORTS_DIR = SCRIPT_DIR.parent / "analysis_reports"
 REPORTS_DIR.mkdir(exist_ok=True)
 
-OLLAMA_URL = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
-LLM_MODEL = os.getenv("LLM_MODEL", "gemma3-legal:latest")
+sys.path.insert(0, str(SCRIPT_DIR.parent))
+from config.ollama_settings import OLLAMA_URL, LLM_MODEL, ADVERSARIAL_OPTIONS, LLM_TIMEOUT  # noqa: E402
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ADVERSARIAL TEST CASES
@@ -217,7 +217,7 @@ def query_llm(prompt: str, temperature: float = 0.2) -> str:
         "model": LLM_MODEL,
         "messages": [{"role": "user", "content": prompt}],
         "stream": False,
-        "options": {"temperature": temperature, "num_predict": 200},
+        "options": {**ADVERSARIAL_OPTIONS, "temperature": temperature},
     }).encode()
     req = urllib.request.Request(
         f"{OLLAMA_URL}/api/chat",
@@ -225,7 +225,7 @@ def query_llm(prompt: str, temperature: float = 0.2) -> str:
         headers={"Content-Type": "application/json"},
     )
     try:
-        with urllib.request.urlopen(req, timeout=240) as resp:
+        with urllib.request.urlopen(req, timeout=LLM_TIMEOUT) as resp:
             data = json.loads(resp.read())
             return data.get("message", {}).get("content", "")
     except Exception as e:

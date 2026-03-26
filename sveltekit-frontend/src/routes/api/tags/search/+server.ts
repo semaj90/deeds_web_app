@@ -44,7 +44,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		return json({ query, results, count: results.length });
 	} catch (err) {
 		return json(
-			{ error: 'Search failed', message: err instanceof Error ? err.message : String(err) },
+			{ error: 'Search failed' },
 			{ status: 500 }
 		);
 	}

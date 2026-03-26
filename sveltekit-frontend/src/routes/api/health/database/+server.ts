@@ -25,9 +25,7 @@ export const GET: RequestHandler = async () => {
       timestamp,
     });
 	} catch (error: unknown) {
-		const message =
-			error instanceof Error ? error.message : String(error);
-		console.warn('[Database Health] PostgreSQL unavailable:', message);
+		console.warn('[Database Health] PostgreSQL unavailable:', error);
 
 		return json(
       {
@@ -36,7 +34,6 @@ export const GET: RequestHandler = async () => {
         engine: 'postgresql',
         pool: poolStatus,
         message: 'PostgreSQL not configured or unreachable',
-        error: message,
         timestamp,
       },
       { status: 503 }

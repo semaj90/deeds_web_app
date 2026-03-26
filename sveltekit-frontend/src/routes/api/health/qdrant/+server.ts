@@ -61,7 +61,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		return json(
 			{
 				success: false,
-				error: err instanceof Error ? err.message : 'Unknown error',
+				error: 'Health check failed',
 				healthy: false,
 				collections: [],
 				totalVectors: 0,
@@ -133,7 +133,7 @@ export const POST: RequestHandler = async ({ url, locals }) => {
 		return json(
 			{
 				success: false,
-				error: err instanceof Error ? err.message : 'Unknown error',
+				error: 'Repair failed',
 				message: 'Failed to repair Qdrant collections'
 			},
 			{ status: 500 }

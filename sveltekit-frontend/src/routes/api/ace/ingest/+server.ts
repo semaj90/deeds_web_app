@@ -186,8 +186,7 @@ export const POST: RequestHandler = async ({ request, url: reqUrl, locals }) => 
   try {
     ingestRequest = await parseIngestRequest(request);
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Invalid input';
-    return json({ error: message }, { status: 400 });
+    return json({ error: 'Invalid input' }, { status: 400 });
   }
 
   const jobId = createAceJobId();
@@ -222,14 +221,13 @@ export const POST: RequestHandler = async ({ request, url: reqUrl, locals }) => 
           });
           emit('complete', 1.0, { result });
         } catch (e) {
-          const msg = e instanceof Error ? e.message : 'Ingestion failed';
           updateAceIngestJob(jobId, {
             step: 'error',
             progress: 100,
             message: 'Ingestion failed.',
-            error: msg,
+            error: 'Ingestion failed',
           });
-          const data = JSON.stringify({ stage: 'error', progress: 0, error: msg });
+          const data = JSON.stringify({ stage: 'error', progress: 0, error: 'Ingestion failed' });
           controller.enqueue(new TextEncoder().encode(`data: ${data}\n\n`));
         } finally {
           controller.close();
@@ -284,7 +282,7 @@ export const POST: RequestHandler = async ({ request, url: reqUrl, locals }) => 
             step: 'error',
             progress: 100,
             message: 'Background indexing failed.',
-            error: error instanceof Error ? error.message : 'Ingestion failed',
+            error: 'Ingestion failed',
           });
         });
 
@@ -322,7 +320,7 @@ export const POST: RequestHandler = async ({ request, url: reqUrl, locals }) => 
       step: 'error',
       progress: 100,
       message: 'Ingestion failed.',
-      error: e instanceof Error ? e.message : 'Ingestion failed',
+      error: 'Ingestion failed',
     });
     return json({ error: 'Ingestion failed', jobId }, { status: 500 });
   }

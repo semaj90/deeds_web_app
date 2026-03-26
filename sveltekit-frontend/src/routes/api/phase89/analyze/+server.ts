@@ -154,7 +154,7 @@ Provide your analysis in this JSON structure:
 		console.error('Analyze API error:', error);
 		return json({
 			success: false,
-			error: error instanceof Error ? error.message : 'Analysis failed'
+			error: 'Analysis failed'
 		}, { status: 500 });
 	}
 };

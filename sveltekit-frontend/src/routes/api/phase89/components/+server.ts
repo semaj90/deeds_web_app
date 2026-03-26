@@ -91,7 +91,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 				lastIndexed: '',
 				cudaEnabled: false
 			},
-			error: error instanceof Error ? error.message : 'Unknown error'
+			error: 'Component analysis failed'
 		}, { status: 500 });
 	}
 };

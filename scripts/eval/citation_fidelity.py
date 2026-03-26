@@ -26,9 +26,9 @@ REPORTS_DIR = SCRIPT_DIR.parent / "analysis_reports"
 REPORTS_DIR.mkdir(exist_ok=True)
 
 QDRANT_URL = os.getenv("QDRANT_URL", "http://127.0.0.1:6333")
-OLLAMA_URL = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
-EMBED_MODEL = os.getenv("EMBED_MODEL", "embeddinggemma:latest")
-LLM_MODEL = os.getenv("LLM_MODEL", "gemma3-legal:latest")
+
+sys.path.insert(0, str(SCRIPT_DIR.parent))
+from config.ollama_settings import OLLAMA_URL, LLM_MODEL, EMBED_MODEL, CITATION_OPTIONS, LLM_TIMEOUT  # noqa: E402
 
 # ── Citation extraction patterns ──────────────────────────────────────────────
 STAT_PATTERNS = [
@@ -178,7 +178,7 @@ def sample_from_ollama(prompt_template: str) -> str:
         "model": LLM_MODEL,
         "messages": [{"role": "user", "content": prompt}],
         "stream": False,
-        "options": {"temperature": 0.3, "num_predict": 300},
+        "options": CITATION_OPTIONS,
     }).encode()
     req = urllib.request.Request(
         f"{OLLAMA_URL}/api/chat",
@@ -187,7 +187,7 @@ def sample_from_ollama(prompt_template: str) -> str:
     )
     for attempt in range(2):
         try:
-            with urllib.request.urlopen(req, timeout=240) as resp:
+            with urllib.request.urlopen(req, timeout=LLM_TIMEOUT) as resp:
                 data = json.loads(resp.read())
                 return data.get("message", {}).get("content", "")
         except Exception as e:

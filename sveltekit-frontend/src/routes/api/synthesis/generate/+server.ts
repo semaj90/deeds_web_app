@@ -315,7 +315,7 @@ async function handleStream(body: SynthesisRequest, userId: string): Promise<Res
 					timestamp: new Date().toISOString()
 				} satisfies SynthesisResponse);
 			} catch (err) {
-				sendEvent('error', { message: err instanceof Error ? err.message : 'Synthesis failed' });
+				sendEvent('error', { message: 'Synthesis failed' });
 			} finally {
 				controller.close();
 			}

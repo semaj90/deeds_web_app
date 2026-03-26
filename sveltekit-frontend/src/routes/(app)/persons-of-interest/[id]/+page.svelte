@@ -11,6 +11,7 @@
 	import POIFaceMatchDialog from '$lib/components/poi/POIFaceMatchDialog.svelte';
 	import POIStats from '$lib/components/poi/POIStats.svelte';
 	import POIPhotoModal from '$lib/components/POIPhotoModal.svelte';
+	import PoiImageUpload from '$lib/components/poi/PoiImageUpload.svelte';
 	import CriminalProfile from '$lib/components/legal/CriminalProfile.svelte';
 	import type { FugitiveDexPerson } from '$lib/components/types';
 
@@ -28,8 +29,7 @@
 	let faceMatchLoading = $state(false);
 	let faceMatchError = $state<string | null>(null);
 	let photos = $state<any[]>([]);
-	let uploading = $state(false);
-	let uploadError = $state<string | null>(null);
+	// uploading/uploadError handled internally by PoiImageUpload
 	let similarPOIs = $state<any[]>([]);
 	let similarLoading = $state(false);
 	let similarError = $state<string | null>(null);
@@ -161,43 +161,10 @@
 		}
 	}
 
-	let fileInputEl = $state<HTMLInputElement | undefined>(undefined);
-
-	async function uploadPhoto(file: File) {
-		if (!data.poi?.id) return;
-		uploading = true;
-		uploadError = null;
-		try {
-			const formData = new FormData();
-			formData.append('file', file);
-			const res = await fetch(`/api/persons-of-interest/${data.poi.id}/photos`, {
-				method: 'POST',
-				body: formData
-			});
-			if (!res.ok) {
-				const err = await res.json().catch(() => ({}));
-				throw new Error(err.error ?? `Upload failed (${res.status})`);
-			}
-			const payload = await res.json();
-			const newPhoto = normalizePhoto(payload.photo ?? payload);
-			photos = [newPhoto, ...photos];
-		} catch (err) {
-			uploadError = err instanceof Error ? err.message : 'Upload failed';
-		} finally {
-			uploading = false;
-		}
-	}
-
-	function handleUploadClick() {
-		fileInputEl?.click();
-	}
-
-	function handleFileSelected(e: Event) {
-		const input = e.target as HTMLInputElement;
-		const file = input.files?.[0];
-		if (file) {
-			uploadPhoto(file);
-			input.value = '';
+	function handlePhotoUploaded(photo: unknown) {
+		const normalized = normalizePhoto(photo);
+		if (normalized) {
+			photos = [normalized, ...photos];
 		}
 	}
 
@@ -621,14 +588,8 @@
 						<span class="face-match-msg">{faceMatchError}</span>
 					{/if}
 				</div>
-				{#if uploading}
-					<div class="upload-status">Uploading photo...</div>
-				{/if}
-				{#if uploadError}
-					<div class="upload-error">{uploadError}</div>
-				{/if}
-				<POIPhotoGrid {photos} editable={true} onupload={handleUploadClick} ondelete={deletePhoto} onview={viewPhoto} />
-				<input type="file" bind:this={fileInputEl} onchange={handleFileSelected} accept="image/*" style="display:none" />
+				<POIPhotoGrid {photos} editable={true} ondelete={deletePhoto} onview={viewPhoto} />
+				<PoiImageUpload poiId={data.poi?.id} poiName={data.poi?.name} onuploaded={handlePhotoUploaded} />
 				{#if photos.length > 0}
 					<POIPhotoModal {photos} bind:currentIndex={photoModalIndex} bind:open={photoModalOpen} onclose={() => { photoModalOpen = false; }} />
 				{/if}

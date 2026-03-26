@@ -88,7 +88,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 				send(analysis, 'complete');
 			} catch (err) {
-				send({ message: err instanceof Error ? err.message : 'Analysis failed' }, 'error');
+				send({ message: 'Analysis failed' }, 'error');
 			} finally {
 				controller.close();
 			}

@@ -253,7 +253,7 @@ Respond in JSON format:
   } catch (err) {
     console.error('[vision] Analysis failed:', err);
     return json(
-      { error: err instanceof Error ? err.message : 'Vision analysis failed' },
+      { error: 'Vision analysis failed' },
       { status: 500 }
     );
   }

@@ -1,73 +1,47 @@
-# Desktop App Polish — Scoped CSS Conversion Plan
+# TipTap Editor Enhancement Plan
 
-## Problem
-~40 core pages use raw inline UnoCSS utilities that fail to extract in svelte-scoped mode, causing invisible/broken layouts. Converting to scoped `<style>` blocks makes styling reliable and professional.
+## Goal
+Upgrade `RichTextEditor.svelte` into a Word-like document editor with drag-drop file import, resizable editor area, and richer formatting toolbar.
 
-## Audit Summary (95 page routes)
+## Current State
+- **4 TipTap editors exist** — `RichTextEditor.svelte` is the most feature-rich (Image, Placeholder, StarterKit)
+- **Used in**: `cases/[id]`, `reports/[id]/edit`, `cases/[id]/reports`
+- **Installed packages**: `@tiptap/core@3.0.7`, `@tiptap/starter-kit@3.13.0`, `@tiptap/extension-image@3.20.4`, `@tiptap/extension-placeholder@3.17.1`
+- **Already bundled via StarterKit**: `@tiptap/extension-link@3.13.0`, `@tiptap/extension-underline@3.13.0`
 
-### Already Professional (scoped CSS done) — NO WORK NEEDED
-| Page | Style/Total | Status |
-|------|-------------|--------|
-| persons-of-interest | 1238/1932 | Excellent |
-| legal-corpus/[id] | 950/1862 | Excellent |
-| admin/all-routes | 1011/1948 | Excellent |
-| cases/[id]/board | 1234/2523 | Excellent |
-| global-search | 779/2216 | Excellent |
-| active-cases | 683/1086 | Excellent |
-| dashboard | 665/1291 | Excellent |
-| command-center | 637/1050 | Excellent |
-| analysis-center | 636/1190 | Excellent |
-| legal-corpus | 420/860 | Good |
-| persons-of-interest/[id] | 437/1094 | Good |
-| cases/new | 392/789 | Good |
-| reports | 232/471 | Good |
-| citations | 186/1132 | Good (just enhanced) |
-| system-configuration | 264/805 | Good |
-| Root +layout | 343/481 | Good |
-| App +layout | 68/202 | Good |
-| +error | 104/177 | Good |
-| login | 170/299 | Good |
-| register | 260/486 | Good |
+## Target: Enhance `RichTextEditor.svelte`
 
-### PRIORITY — Core User-Facing Pages (0 or minimal CSS)
+### Feature 1: Drag-and-Drop File Import (.txt, .md, .html)
+- Add `ondragover`/`ondragleave`/`ondrop` handlers to the editor wrapper
+- On drop of `.txt`/`.md`/`.html` files: read via FileReader, insert as editor content
+- On drop of images: convert to base64, insert via `setImage()`
+- Visual drag overlay with "Drop file to insert" indicator
 
-**Batch 1 — High-traffic pages users see daily:**
-1. `recommendations/+page.svelte` (369 lines, 0 CSS) — AI recommendations
-2. `library/+page.svelte` (326 lines, 10 CSS) — Document library
-3. `analytics/+page.svelte` (228 lines, 0 CSS) — Analytics dashboard
-4. `reports/new/+page.svelte` (250 lines, 0 CSS) — New report form
-5. `reports/[id]/edit/+page.svelte` (252 lines, 0 CSS) — Report editor
+### Feature 2: Resizable Editor Area
+- Add CSS `resize: vertical` on the editor wrapper with `overflow: auto`
+- Set `min-height: 300px`, no max-height (user controls size)
+- Optional: drag handle at bottom-right corner for visual affordance
 
-**Batch 2 — Case & evidence sub-pages:**
-6. `cases/[id]/reports/+page.svelte` (380 lines, 0 CSS)
-7. `terminal/+page.svelte` (721 lines, 19 CSS)
-8. `evidence/hash/+page.svelte` (431 lines, 0 CSS)
-9. `evidence/realtime/+page.svelte` (421 lines, 0 CSS)
-10. `evidence/analyze/+page.svelte` (361 lines, 17 CSS)
+### Feature 3: Word-Like Toolbar Expansion
+Add these controls to the existing toolbar (all available via StarterKit or already-installed extensions):
+- **Underline** (via StarterKit's bundled `@tiptap/extension-underline`)
+- **Strikethrough** (already in StarterKit)
+- **Blockquote** (already in StarterKit)
+- **Code block** (already in StarterKit)
+- **Horizontal rule** (already in StarterKit)
+- **Undo/Redo** (already in StarterKit)
+- **Link** (via StarterKit's bundled `@tiptap/extension-link`)
 
-**Batch 3 — Library sub-pages:**
-11. `library/glossary/+page.svelte` (617 lines, 0 CSS)
-12. `library/corpus/+page.svelte` (276 lines, 0 CSS)
-13. `library/[documentId]/+page.svelte` (209 lines, 0 CSS)
-14. `library/[documentId]/reader/+page.svelte` (300 lines, 0 CSS)
-15. `citations/law/+page.svelte` (115 lines, 0 CSS)
-16. `citations/law/[citation]/+page.svelte` (171 lines, 0 CSS)
+### Feature 4: Status Bar
+- Word count + character count
+- Current formatting indicator
+- File import status feedback
 
-### LOW PRIORITY — Demos & Admin (skip)
-- 20+ demo pages — internal/experimental
-- 15+ admin pages — developer-facing only
+## Files Modified
+1. `src/lib/components/ui/RichTextEditor.svelte` — Main enhancement target
 
-## Approach Per Page
-1. Read the full page
-2. Replace all inline UnoCSS utilities with semantic CSS class names
-3. Add scoped `<style>` block with consistent design language:
-   - Dark theme: `#131519` bg, `rgba(212,199,163,x)` sand text
-   - Accent colors: blue `rgba(96,165,250,x)`, amber `rgba(196,117,43,x)`
-   - Cards: `rgba(0,0,0,0.25)` bg, `rgba(212,199,163,0.08-0.12)` borders
-   - Stats grids, action bars, tab strips consistent with dashboard/citations
-4. Use Write tool (not Edit) to avoid linter reverts
-5. Run svelte-check after each batch
+## No New Dependencies Required
+All extensions are already installed via `@tiptap/starter-kit@3.13.0` (which bundles link, underline, code-block, blockquote, etc.)
 
-## Execution Order
-Start with Batch 1 (5 pages), then Batch 2 (5 pages), verify with svelte-check.
-Batches 3+ follow in subsequent sessions if needed.
+## Approach
+Single file edit to `RichTextEditor.svelte` — enhance the existing component rather than creating a new one. The component keeps backward-compatible props.

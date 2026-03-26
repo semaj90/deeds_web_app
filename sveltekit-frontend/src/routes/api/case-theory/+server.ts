@@ -160,9 +160,8 @@ export const POST: RequestHandler = async (event) => {
 		});
 	} catch (err) {
 		console.error('[case-theory] Error:', err);
-		const message = err instanceof Error ? err.message : String(err);
 		return json(
-			{ success: false, error: `Case theory generation failed: ${message}` },
+			{ success: false, error: 'Case theory generation failed' },
 			{ status: 500 }
 		);
 	}

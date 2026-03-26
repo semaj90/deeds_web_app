@@ -145,7 +145,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 				} catch (error) {
 					sendEvent('error', {
-						message: error instanceof Error ? error.message : 'Unknown error',
+						message: 'Stream error',
 						timestamp: Date.now()
 					});
 				} finally {
@@ -281,7 +281,7 @@ async function streamGeminiResponse(
 
 	} catch (error) {
 		sendEvent('error', {
-			message: `Gemini streaming failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+			message: 'Gemini streaming failed'
 		});
 	}
 }

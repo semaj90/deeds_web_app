@@ -45,10 +45,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	} catch (error) {
 		console.error('Error saving report:', error);
 		return json(
-			{
-				error: 'Failed to save report',
-				details: error instanceof Error ? error.message : 'Unknown error'
-			},
+			{ error: 'Failed to save report' },
 			{ status: 500 }
 		);
 	}

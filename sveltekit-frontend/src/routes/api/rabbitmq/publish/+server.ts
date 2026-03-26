@@ -82,7 +82,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		return new Response(
 			JSON.stringify({
 				success: false,
-				error: error instanceof Error ? error.message : 'Unknown error'
+				error: 'Message publish failed'
 			}),
 			{
 				status: 500,

@@ -89,7 +89,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json(
 			{
 				message: 'Failed to migrate chat history',
-				details: err instanceof Error ? err.message : 'Unknown error',
 			},
 			{ status: 500 }
 		);

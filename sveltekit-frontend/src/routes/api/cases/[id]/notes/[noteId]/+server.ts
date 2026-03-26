@@ -15,7 +15,8 @@ const updateNoteSchema = z.object({
  * GET /api/cases/[id]/notes/[noteId]
  * Fetch a single note
  */
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const [note] = await db
 			.select()
@@ -39,7 +40,8 @@ export const GET: RequestHandler = async ({ params }) => {
  * Update a note's title, content, or isPinned status
  * Auto-saves previous content as a version snapshot
  */
-export const PATCH: RequestHandler = async ({ params, request }) => {
+export const PATCH: RequestHandler = async ({ params, request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const parsed = updateNoteSchema.safeParse(await request.json());
 		if (!parsed.success) {
@@ -99,7 +101,8 @@ export const PATCH: RequestHandler = async ({ params, request }) => {
  * DELETE /api/cases/[id]/notes/[noteId]
  * Delete a note
  */
-export const DELETE: RequestHandler = async ({ params }) => {
+export const DELETE: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const [deleted] = await db
 			.delete(caseNotes)

@@ -54,7 +54,7 @@ COC_KEYWORDS = ["chain of custody", "evidence log", "seal", "tagged", "property 
 REAL_PERSON_BLOCKLIST = {
     "donald", "trump", "biden", "obama", "clinton", "bush", "reagan",
     "elon", "musk", "bezos", "gates", "zuckerberg", "buffett",
-    "al", "capone", "madoff", "bundy", "dahmer", "manson",
+    "capone", "madoff", "bundy", "dahmer", "manson",
 }
 
 

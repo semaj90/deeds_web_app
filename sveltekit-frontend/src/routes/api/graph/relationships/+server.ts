@@ -55,7 +55,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		}
 	} catch (err) {
 		return json(
-			{ error: 'Neo4j unavailable', message: err instanceof Error ? err.message : String(err) },
+			{ error: 'Neo4j unavailable' },
 			{ status: 503 }
 		);
 	}

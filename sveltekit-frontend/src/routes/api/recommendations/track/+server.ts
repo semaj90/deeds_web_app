@@ -179,12 +179,10 @@ export const POST: RequestHandler = async (event) => {
 		);
 	} catch (err) {
 		console.error('[track-interaction] Request error:', err);
-		const message = err instanceof Error ? err.message : String(err);
-
 		return json(
 			{
 				success: false,
-				error: `Interaction tracking failed: ${message}`
+				error: 'Interaction tracking failed'
 			},
 			{ status: 500 }
 		);

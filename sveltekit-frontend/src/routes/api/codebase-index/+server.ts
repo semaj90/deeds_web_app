@@ -130,7 +130,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		return json({
 			files: [],
 			stats: { totalFiles: 0, byRole: {}, byRisk: {}, bySurface: {} },
-			error: error instanceof Error ? error.message : 'Unknown error'
+			error: 'Indexing failed'
 		}, { status: 200 });
 	}
 };
@@ -191,7 +191,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	} catch (error) {
 		console.error('Semantic search error:', error);
 		return json({
-			error: error instanceof Error ? error.message : 'Unknown error'
+			error: 'Search failed'
 		}, { status: 500 });
 	}
 };

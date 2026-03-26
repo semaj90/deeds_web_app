@@ -21,7 +21,11 @@ import { buildCartridge, parseCartridge, type RuneData, type CartridgeMetadata, 
 import { embedAndCompare } from '$lib/gpu/gpu-embedding-bridge.js';
 import { embedGate, gated } from '../analysis/concurrency-gate.js';
 import { generateEmbeddings } from '../grpc/embedding-client.js';
+import { NESMemoryArchitecture, type MemoryStats } from '$lib/gpu/nes-memory-architecture.js';
 import pLimit from 'p-limit';
+
+// ── NES Memory Singleton ─────────────────────────────────────────────────
+const nesMemory = new NESMemoryArchitecture();
 
 // ── Config ───────────────────────────────────────────────────────────────
 
@@ -30,37 +34,37 @@ const CARTRIDGE_BUILD_GATE = pLimit(2); // Max 2 concurrent cartridge builds
 
 /** NES 8-bit priority → Redis TTL mapping (seconds) */
 const PRIORITY_TTL: Record<string, number> = {
-	critical: 24 * 3600,  // 24h — active case evidence
-	high:     12 * 3600,  // 12h — recent case data
-	medium:    6 * 3600,  //  6h — general documents
-	low:       1 * 3600,  //  1h — background/stale
-	background: 30 * 60,  // 30min — ephemeral
+  critical: 24 * 3600, // 24h — active case evidence
+  high: 12 * 3600, // 12h — recent case data
+  medium: 6 * 3600, //  6h — general documents
+  low: 1 * 3600, //  1h — background/stale
+  background: 30 * 60, // 30min — ephemeral
 };
 
 // ── Types ────────────────────────────────────────────────────────────────
 
 export interface TensorSearchResult {
-	runeId: number;
-	clusterId: number;
-	score: number;
-	manifold: [number, number, number, number];
-	text?: string;
+  runeId: number;
+  clusterId: number;
+  score: number;
+  manifold: [number, number, number, number];
+  text?: string;
 }
 
 export interface CartridgeCacheResult {
-	cartridge: ParsedCartridge;
-	source: 'redis' | 'built';
-	cacheKey: string;
-	buildTimeMs?: number;
+  cartridge: ParsedCartridge;
+  source: 'redis' | 'built';
+  cacheKey: string;
+  buildTimeMs?: number;
 }
 
 export interface TensorSearchResponse {
-	results: TensorSearchResult[];
-	totalRunes: number;
-	searchTimeMs: number;
-	cartridgeSource: 'redis' | 'built';
-	caseId: string;
-	embeddingModel: string;
+  results: TensorSearchResult[];
+  totalRunes: number;
+  searchTimeMs: number;
+  cartridgeSource: 'redis' | 'built';
+  caseId: string;
+  embeddingModel: string;
 }
 
 // ── NES Priority Scoring (8-bit) ─────────────────────────────────────────
@@ -68,36 +72,36 @@ export interface TensorSearchResponse {
 type PriorityLevel = 'critical' | 'high' | 'medium' | 'low' | 'background';
 
 function scorePriority(opts: {
-	hasActiveCase?: boolean;
-	entityCount?: number;
-	forensicFlags?: number;
-	ageHours?: number;
+  hasActiveCase?: boolean;
+  entityCount?: number;
+  forensicFlags?: number;
+  ageHours?: number;
 }): PriorityLevel {
-	let score = 128; // medium base
+  let score = 128; // medium base
 
-	if (opts.hasActiveCase) score += 64;
-	if ((opts.entityCount ?? 0) > 10) score += 32;
-	if ((opts.forensicFlags ?? 0) > 0) score += 48;
-	if ((opts.ageHours ?? 0) > 48) score -= 64;
-	if ((opts.ageHours ?? 0) > 168) score -= 32; // >1 week
+  if (opts.hasActiveCase) score += 64;
+  if ((opts.entityCount ?? 0) > 10) score += 32;
+  if ((opts.forensicFlags ?? 0) > 0) score += 48;
+  if ((opts.ageHours ?? 0) > 48) score -= 64;
+  if ((opts.ageHours ?? 0) > 168) score -= 32; // >1 week
 
-	score = Math.max(0, Math.min(255, score));
+  score = Math.max(0, Math.min(255, score));
 
-	if (score >= 224) return 'critical';
-	if (score >= 160) return 'high';
-	if (score >= 96) return 'medium';
-	if (score >= 48) return 'low';
-	return 'background';
+  if (score >= 224) return 'critical';
+  if (score >= 160) return 'high';
+  if (score >= 96) return 'medium';
+  if (score >= 48) return 'low';
+  return 'background';
 }
 
 function getTTL(priority: PriorityLevel): number {
-	return PRIORITY_TTL[priority] ?? PRIORITY_TTL.medium;
+  return PRIORITY_TTL[priority] ?? PRIORITY_TTL.medium;
 }
 
 // ── Redis Cartridge Cache ────────────────────────────────────────────────
 
 function getRedis(): any | null {
-	return ((redisService as any).getClient?.() || (globalThis as any).__REDIS) ?? null;
+  return ((redisService as any).getClient?.() || (globalThis as any).__REDIS) ?? null;
 }
 
 /**
@@ -105,42 +109,42 @@ function getRedis(): any | null {
  * Cartridges are stored as base64-encoded binary.
  */
 export async function getCachedCartridge(caseId: string): Promise<ParsedCartridge | null> {
-	const redis = getRedis();
-	if (!redis) return null;
+  const redis = getRedis();
+  if (!redis) return null;
 
-	try {
-		const data = await redis.get(`${REDIS_CARTRIDGE_PREFIX}${caseId}`);
-		if (!data) return null;
+  try {
+    const data = await redis.get(`${REDIS_CARTRIDGE_PREFIX}${caseId}`);
+    if (!data) return null;
 
-		const buffer = Buffer.from(data, 'base64');
-		return parseCartridge(new Uint8Array(buffer));
-	} catch (err) {
-		console.warn('[cartridge-bridge] Redis get failed:', err);
-		return null;
-	}
+    const buffer = Buffer.from(data, 'base64');
+    return parseCartridge(new Uint8Array(buffer));
+  } catch (err) {
+    console.warn('[cartridge-bridge] Redis get failed:', err);
+    return null;
+  }
 }
 
 /**
  * Cache a CHR-ROM97 cartridge in Redis with NES priority-based TTL.
  */
 export async function cacheCartridge(
-	caseId: string,
-	cartridgeBuffer: Buffer,
-	priority: PriorityLevel = 'medium'
+  caseId: string,
+  cartridgeBuffer: Buffer,
+  priority: PriorityLevel = 'medium'
 ): Promise<void> {
-	const redis = getRedis();
-	if (!redis) return;
+  const redis = getRedis();
+  if (!redis) return;
 
-	try {
-		const ttl = getTTL(priority);
-		await redis.setex(
-			`${REDIS_CARTRIDGE_PREFIX}${caseId}`,
-			ttl,
-			cartridgeBuffer.toString('base64')
-		);
-	} catch (err) {
-		console.warn('[cartridge-bridge] Redis cache failed:', err);
-	}
+  try {
+    const ttl = getTTL(priority);
+    await redis.setex(
+      `${REDIS_CARTRIDGE_PREFIX}${caseId}`,
+      ttl,
+      cartridgeBuffer.toString('base64')
+    );
+  } catch (err) {
+    console.warn('[cartridge-bridge] Redis cache failed:', err);
+  }
 }
 
 // ── Cartridge Build + Cache Pipeline ─────────────────────────────────────
@@ -150,53 +154,73 @@ export async function cacheCartridge(
  * Redis hit → parse + return. Miss → fetch Qdrant → build → cache → return.
  */
 export async function getOrBuildCartridge(
-	caseId: string,
-	fetchRunes: () => Promise<RuneData[]>,
-	opts: {
-		hasActiveCase?: boolean;
-		entityCount?: number;
-		forensicFlags?: number;
-	} = {}
+  caseId: string,
+  fetchRunes: () => Promise<RuneData[]>,
+  opts: {
+    hasActiveCase?: boolean;
+    entityCount?: number;
+    forensicFlags?: number;
+  } = {}
 ): Promise<CartridgeCacheResult> {
-	const cacheKey = `${REDIS_CARTRIDGE_PREFIX}${caseId}`;
+  const cacheKey = `${REDIS_CARTRIDGE_PREFIX}${caseId}`;
 
-	// 1. Check Redis cache
-	const cached = await getCachedCartridge(caseId);
-	if (cached) {
-		return { cartridge: cached, source: 'redis', cacheKey };
-	}
+  // 1. Check Redis cache
+  const cached = await getCachedCartridge(caseId);
+  if (cached) {
+    return { cartridge: cached, source: 'redis', cacheKey };
+  }
 
-	// 2. Build cartridge through concurrency gate (max 2 concurrent)
-	const buildStart = performance.now();
+  // 2. Build cartridge through concurrency gate (max 2 concurrent)
+  const buildStart = performance.now();
 
-	const cartridgeBuffer = await CARTRIDGE_BUILD_GATE(async () => {
-		const runes = await fetchRunes();
-		if (runes.length === 0) {
-			throw new Error(`No runes found for case ${caseId}`);
-		}
+  const cartridgeBuffer = await CARTRIDGE_BUILD_GATE(async () => {
+    const runes = await fetchRunes();
+    if (runes.length === 0) {
+      throw new Error(`No runes found for case ${caseId}`);
+    }
 
-		const metadata: CartridgeMetadata = {
-			caseId,
-			createdAt: new Date().toISOString(),
-			runeCount: runes.length,
-			embeddingDim: runes[0].embedding.length,
-			collections: ['evidence_items'],
-			sources: [...new Set(runes.map(r => r.sourceName).filter(Boolean))] as string[],
-		};
+    const metadata: CartridgeMetadata = {
+      caseId,
+      createdAt: new Date().toISOString(),
+      runeCount: runes.length,
+      embeddingDim: runes[0].embedding.length,
+      collections: ['evidence_items'],
+      sources: [...new Set(runes.map((r) => r.sourceName).filter(Boolean))] as string[],
+    };
 
-		return buildCartridge(runes, metadata);
-	});
+    return buildCartridge(runes, metadata);
+  });
 
-	const buildTimeMs = Math.round(performance.now() - buildStart);
+  const buildTimeMs = Math.round(performance.now() - buildStart);
 
-	// 3. Cache with adaptive TTL
-	const priority = scorePriority(opts);
-	await cacheCartridge(caseId, cartridgeBuffer, priority);
+  // 3. Cache with adaptive TTL
+  const priority = scorePriority(opts);
+  await cacheCartridge(caseId, cartridgeBuffer, priority);
 
-	// 4. Parse for return
-	const cartridge = parseCartridge(new Uint8Array(cartridgeBuffer));
+  // 3b. Allocate in NES memory banks for in-process lookups
+  nesMemory
+    .allocateDocument(
+      {
+        id: caseId,
+        type: 'evidence',
+        size: cartridgeBuffer.length,
+        priority: priority === 'critical' ? 1 : priority === 'high' ? 2 : 3,
+        confidenceLevel: priority === 'critical' ? 1.0 : priority === 'high' ? 0.8 : 0.6,
+        riskLevel: priority === 'critical' ? 'critical' : priority === 'high' ? 'high' : 'medium',
+        compressed: true,
+        metadata: { caseId },
+      },
+      cartridgeBuffer.buffer.slice(
+        cartridgeBuffer.byteOffset,
+        cartridgeBuffer.byteOffset + cartridgeBuffer.byteLength
+      ) as ArrayBuffer
+    )
+    .catch(() => {}); // Non-fatal
 
-	return { cartridge, source: 'built', cacheKey, buildTimeMs };
+  // 4. Parse for return
+  const cartridge = parseCartridge(new Uint8Array(cartridgeBuffer));
+
+  return { cartridge, source: 'built', cacheKey, buildTimeMs };
 }
 
 // ── Tensor Similarity Search ─────────────────────────────────────────────

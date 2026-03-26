@@ -42,6 +42,6 @@ export async function GET() {
         return json({ success: true, result });
     } catch (err) {
         console.error("\n❌ Ingestion Failed:", err);
-        return json({ success: false, error: err instanceof Error ? err.message : String(err) }, { status: 500 });
+        return json({ success: false, error: 'Ingestion failed' }, { status: 500 });
     }
 }

@@ -252,20 +252,20 @@ import AIDropdown from '$lib/components/ui/AIDropdown.svelte';
 				{/if}
 			</div>
 			{#if autoPatchResult}
-				<div class="p-3 rounded font-mono text-xs border {autoPatchResult.success ? 'bg-green-50 border-green-300' : 'bg-yellow-50 border-yellow-400'}">
-					<strong>{autoPatchResult.success ? 'Fix Verified' : 'Fix Failed'}</strong>
+				<div class="patch-result" class:patch-success={autoPatchResult.success} class:patch-fail={!autoPatchResult.success}>
+					<strong>{autoPatchResult.success ? '✓ Fix Verified' : '✗ Fix Failed'}</strong>
 					{#if autoPatchResult.message}
-						<div>{autoPatchResult.message}</div>
+						<div class="patch-message">{autoPatchResult.message}</div>
 					{/if}
 					{#if autoPatchResult.attempts}
-						<div class="mt-2">
+						<div class="patch-attempts">
 							{#each autoPatchResult.attempts as attempt}
 								<div>Attempt {attempt.attempt}: gen={attempt.fixGenerated ? 'ok' : 'fail'} apply={attempt.fixApplied ? 'ok' : 'fail'} verify={attempt.verified ? 'ok' : 'fail'}{attempt.error ? ` (${attempt.error})` : ''}</div>
 							{/each}
 						</div>
 					{/if}
 					{#if autoPatchResult.rollback}
-						<div class="text-yellow-700 mt-1">Original file restored (rollback)</div>
+						<div class="patch-rollback">Original file restored (rollback)</div>
 					{/if}
 				</div>
 			{/if}
@@ -308,4 +308,36 @@ import AIDropdown from '$lib/components/ui/AIDropdown.svelte';
  {/if}
 </div>
 
+<style>
+  .patch-result {
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    font-family: ui-monospace, monospace;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    border: 1px solid;
+  }
+  .patch-success {
+    background-color: #f0fdf4;
+    border-color: #86efac;
+    color: #166534;
+  }
+  .patch-fail {
+    background-color: #fefce8;
+    border-color: #fcd34d;
+    color: #92400e;
+  }
+  .patch-message {
+    margin-top: 0.25rem;
+  }
+  .patch-attempts {
+    margin-top: 0.5rem;
+    opacity: 0.85;
+  }
+  .patch-rollback {
+    margin-top: 0.25rem;
+    color: #b45309;
+    font-weight: 600;
+  }
+</style>
 

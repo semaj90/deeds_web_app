@@ -105,8 +105,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			}
 		}
 
-		const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-		return error(500, `Investigation failed: ${errorMessage}`);
+		return error(500, 'Investigation failed');
 	}
 };
 

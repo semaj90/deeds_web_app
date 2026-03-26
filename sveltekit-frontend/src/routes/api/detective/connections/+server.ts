@@ -113,7 +113,7 @@ export const POST: RequestHandler = async ({ request }) => {
 					}
 				}, 'complete');
 			} catch (err) {
-				send({ message: err instanceof Error ? err.message : 'Connection map failed' }, 'error');
+				send({ message: 'Connection map failed' }, 'error');
 			} finally {
 				controller.close();
 			}

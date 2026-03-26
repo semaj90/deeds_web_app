@@ -38,8 +38,9 @@ DB_CONFIG = {
     "password": os.environ.get("PGPASSWORD", "123456"),
 }
 QDRANT_URL  = os.environ.get("QDRANT_URL",  "http://127.0.0.1:6333")
-OLLAMA_URL  = os.environ.get("OLLAMA_URL",  "http://127.0.0.1:11434")
-LLM_MODEL   = os.environ.get("LLM_MODEL",   "gemma3-legal:latest")
+
+sys.path.insert(0, str(os.path.dirname(__file__)))
+from config.ollama_settings import OLLAMA_URL, LLM_MODEL, EVAL_OPTIONS, LLM_TIMEOUT  # noqa: E402
 COLLECTION  = "court_opinions"
 VECTOR_SIZE = 768
 
@@ -169,8 +170,8 @@ def summarize_via_ollama(text: str, practice_area: str) -> str:
         resp = requests.post(
             f"{OLLAMA_URL}/api/generate",
             json={"model": LLM_MODEL, "prompt": prompt, "stream": False,
-                  "options": {"num_predict": 100, "temperature": 0.1}},
-            timeout=25,
+                  "options": EVAL_OPTIONS},
+            timeout=LLM_TIMEOUT,
         )
         resp.raise_for_status()
         return resp.json().get("response", "").strip()

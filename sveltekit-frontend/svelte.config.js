@@ -44,6 +44,11 @@ const config = {
     // Ensure we explicitly use the Node adapter (not adapter-auto)
     adapter: nodeAdapter({ out: 'build', precompress: true }),
 
+    // CSRF protection — reject cross-origin form submissions and API mutations
+    csrf: {
+      checkOrigin: true,
+    },
+
     // Common path aliases (update to match your repo layout)
     alias: {
       '$lib/server/db/utils': './src/lib/server/db/utils.ts',

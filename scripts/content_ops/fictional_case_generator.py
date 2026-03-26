@@ -56,8 +56,8 @@ CASE_DATA_DIR.mkdir(exist_ok=True)
 CACHE_DIR = CASE_DATA_DIR / "_cache"
 CACHE_DIR.mkdir(exist_ok=True)
 
-OLLAMA_URL = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
-LLM_MODEL = os.getenv("LLM_MODEL", "gemma3-legal:latest")
+sys.path.insert(0, str(SCRIPT_DIR.parent))
+from config.ollama_settings import OLLAMA_URL, LLM_MODEL, GEN_OPTIONS, LLM_TIMEOUT  # noqa: E402
 
 # Retry config
 MAX_RETRIES = 4
@@ -368,7 +368,7 @@ def generate_case(case_id: str, category: str, template: dict, rng: random.Rando
         ],
         "stream": False,
         "keep_alive": "24h",
-        "options": {"temperature": 0.7, "num_predict": 600, "top_p": 0.9},
+        "options": GEN_OPTIONS,
     }).encode()
 
     narrative = ""

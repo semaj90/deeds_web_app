@@ -214,21 +214,21 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
     if (error instanceof Error) {
       if (error.message.includes('Ollama')) {
         return json(
-          { error: 'LLM service unavailable', details: error.message },
+          { error: 'LLM service unavailable' },
           { status: 503 }
         );
       }
 
       if (error.message.includes('Qdrant')) {
         return json(
-          { error: 'Search service unavailable', details: error.message },
+          { error: 'Search service unavailable' },
           { status: 503 }
         );
       }
     }
 
     return json(
-      { error: 'Internal server error', details: String(error) },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

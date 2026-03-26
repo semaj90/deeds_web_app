@@ -103,7 +103,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     return json(
       {
         error: 'Failed to generate report',
-        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );

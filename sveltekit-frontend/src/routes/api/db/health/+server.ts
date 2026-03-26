@@ -22,7 +22,7 @@ export const GET: RequestHandler = async () => {
 		return json(
 			{
 				status: 'unhealthy',
-				error: err instanceof Error ? err.message : 'Database connection failed',
+				error: 'Database connection failed',
 				timestamp: new Date().toISOString()
 			},
 			{ status: 503 }

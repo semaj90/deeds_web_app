@@ -95,7 +95,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			} catch (err) {
 				controller.enqueue(
 					encoder.encode(
-						`\n\nError: ${err instanceof Error ? err.message : 'Stream failed'}`
+						`\n\nError: Stream failed`
 					)
 				);
 				controller.close();

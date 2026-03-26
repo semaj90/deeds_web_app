@@ -152,8 +152,7 @@ export const GET: RequestHandler = async () => {
 		console.error('Phase89 status error:', error);
 		return json(
 			{
-				error: 'Failed to retrieve system status',
-				details: error instanceof Error ? error.message : String(error)
+				error: 'Failed to retrieve system status'
 			},
 			{ status: 500 }
 		);

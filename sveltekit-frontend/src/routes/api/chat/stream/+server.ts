@@ -187,7 +187,7 @@ function handleQueryMode(query: string, mode: string, caseId: string | null, per
 			} catch (error) {
 				send({
 					type: 'error',
-					error: error instanceof Error ? error.message : 'Unknown error'
+					error: 'Stream error'
 				});
 				controller.close();
 			}
@@ -489,7 +489,7 @@ async function generateAIResponse(
 			metadata: JSON.stringify({
 				error: true,
 				caseId,
-				message: error instanceof Error ? error.message : 'Unknown error'
+				message: 'Stream error'
 			})
 		});
 	}

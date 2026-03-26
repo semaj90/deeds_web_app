@@ -22,16 +22,13 @@ export const GET: RequestHandler = async () => {
 			timestamp,
 		});
 	} catch (error: unknown) {
-		const message =
-			error instanceof Error ? error.message : String(error);
-		console.warn('[Neo4j Health] Neo4j unavailable:', message);
+		console.warn('[Neo4j Health] Neo4j unavailable:', error);
 
 		return json(
 			{
 				status: 'unavailable',
 				service: 'neo4j',
 				message: 'Neo4j not configured or unreachable',
-				error: message,
 				timestamp,
 			},
 			{ status: 503 }

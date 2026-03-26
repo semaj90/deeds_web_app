@@ -28,7 +28,7 @@ export const POST: RequestHandler = async ({ locals }) => {
 		return json(
 			{
 				success: false,
-				error: error instanceof Error ? error.message : 'Unknown error',
+				error: 'Cache cleanup failed',
 				timestamp: new Date().toISOString()
 			},
 			{ status: 500 }
