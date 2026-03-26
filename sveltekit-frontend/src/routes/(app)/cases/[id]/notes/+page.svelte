@@ -1,9 +1,10 @@
 <script lang="ts">
 	import CaseNotesEditor from '$lib/components/cases/CaseNotesEditor.svelte';
+	import { page } from '$app/state';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
-	const caseId = $derived(data?.caseData?.id ?? '');
+	const caseId = $derived(data?.caseData?.id ?? page.params.id ?? '');
 </script>
 
 {#if caseId}

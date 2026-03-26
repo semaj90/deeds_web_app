@@ -37,7 +37,7 @@ export const GET: RequestHandler = async ({ params }) => {
  * Create a new note
  * Body: { title?, content, isAI? }
  */
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params, request, locals }) => {
 	const caseId = params.id;
 
 	try {
@@ -65,7 +65,8 @@ export const POST: RequestHandler = async ({ params, request }) => {
 				caseId,
 				title: body.title?.trim() || null,
 				content: body.content.trim(),
-				isAI: body.isAI
+				isAI: body.isAI,
+				createdBy: locals.user?.id ?? null
 			})
 			.returning();
 

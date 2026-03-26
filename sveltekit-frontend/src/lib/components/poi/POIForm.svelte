@@ -2,6 +2,7 @@
   import { superForm } from 'sveltekit-superforms/client';
   import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
   import { toast } from 'svelte-sonner';
+  import { goto } from '$app/navigation';
   import { z } from 'zod';
 
   const poiSchema = z.object({
@@ -20,13 +21,75 @@
 
   let { formData }: Props = $props();
 
+  let photoFile = $state<File | null>(null);
+  let photoPreview = $state('');
+  let uploadingPhoto = $state(false);
+
+  function handlePhotoSelect(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowed.includes(file.type)) {
+      toast.error('Only JPEG, PNG, WebP, and GIF images are allowed');
+      input.value = '';
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Image must be under 10MB');
+      input.value = '';
+      return;
+    }
+
+    photoFile = file;
+    if (photoPreview) URL.revokeObjectURL(photoPreview);
+    photoPreview = URL.createObjectURL(file);
+  }
+
+  function clearPhoto() {
+    if (photoPreview) URL.revokeObjectURL(photoPreview);
+    photoFile = null;
+    photoPreview = '';
+  }
+
   // svelte-ignore state_referenced_locally
   const { form, errors, enhance, submitting } = superForm(formData, {
     validators: zodClient(poiSchema),
     resetForm: false,
-    onResult({ result }) {
+    onResult({ result, cancel }) {
       if (result.type === 'redirect') {
-        toast.success('Person of interest created successfully');
+        const redirectUrl = (result as any).location as string;
+        const match = redirectUrl?.match(/\/persons-of-interest\/([a-f0-9-]+)/i);
+
+        if (match && photoFile) {
+          cancel();
+
+          const poiId = match[1];
+          uploadingPhoto = true;
+
+          const fd = new FormData();
+          fd.append('file', photoFile);
+
+          fetch(`/api/persons-of-interest/${poiId}/photos`, {
+            method: 'POST',
+            body: fd
+          }).then((res) => {
+            if (res.ok) {
+              toast.success('Person of interest created with photo');
+            } else {
+              toast.warning('POI created, but photo upload failed');
+            }
+          }).catch(() => {
+            toast.warning('POI created, but photo upload failed');
+          }).finally(() => {
+            uploadingPhoto = false;
+            clearPhoto();
+            goto(redirectUrl);
+          });
+        } else {
+          toast.success('Person of interest created successfully');
+        }
       }
     }
   });
@@ -150,9 +213,41 @@
     ></textarea>
   </div>
 
+  <!-- Photo Upload -->
+  <div class="form-group full-width">
+    <label for="photo">Photo (optional)</label>
+    <div class="photo-upload-area">
+      {#if photoPreview}
+        <div class="photo-preview-container">
+          <img src={photoPreview} alt="Preview" class="photo-preview" />
+          <button type="button" class="photo-remove" onclick={clearPhoto}>Remove</button>
+        </div>
+      {:else}
+        <label for="photo" class="photo-dropzone">
+          <span class="photo-icon">+</span>
+          <span>Click to add photo</span>
+          <span class="photo-hint">JPEG, PNG, WebP, GIF — max 10MB</span>
+        </label>
+      {/if}
+      <input
+        id="photo"
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        onchange={handlePhotoSelect}
+        class="photo-input"
+      />
+    </div>
+  </div>
+
   <div class="form-actions">
-    <button type="submit" disabled={$submitting} class="btn-primary">
-      {$submitting ? 'Saving...' : 'Save POI'}
+    <button type="submit" disabled={$submitting || uploadingPhoto} class="btn-primary">
+      {#if uploadingPhoto}
+        Uploading photo...
+      {:else if $submitting}
+        Saving...
+      {:else}
+        Save POI
+      {/if}
     </button>
   </div>
 </form>
@@ -172,6 +267,10 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .full-width {
+    grid-column: 1 / -1;
   }
 
   label {
@@ -211,6 +310,79 @@
     color: #ef4444;
     font-size: 0.75rem;
     margin-top: 0.25rem;
+  }
+
+  .photo-upload-area {
+    position: relative;
+  }
+
+  .photo-input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+  }
+
+  .photo-dropzone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 2rem;
+    border: 2px dashed #333;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    color: #9ca3af;
+    font-size: 0.875rem;
+  }
+
+  .photo-dropzone:hover {
+    border-color: #dc2626;
+    background: rgba(220, 38, 38, 0.05);
+  }
+
+  .photo-icon {
+    font-size: 2rem;
+    line-height: 1;
+    color: #555;
+  }
+
+  .photo-hint {
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+
+  .photo-preview-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .photo-preview {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    border: 2px solid #333;
+  }
+
+  .photo-remove {
+    padding: 0.4rem 0.75rem;
+    background: #7f1d1d;
+    color: #fecaca;
+    border: 1px solid #dc2626;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+
+  .photo-remove:hover {
+    background: #991b1b;
   }
 
   .form-actions {
