@@ -1,0 +1,23 @@
+MEMORANDUM OF LAW
+
+IN THE MATTER OF: State v. Anderson, Case No. 2026-CR-04517
+
+STATEMENT OF FACTS
+
+On January 15, 2026, the defendant, John Anderson, was observed by Officer Martinez (Badge #4421) operating a motor vehicle on Highway 101 near the intersection of Oak Street. The officer initiated a traffic stop after observing the vehicle crossing the center line on three occasions within a quarter-mile span.
+
+Upon approach, Officer Martinez detected a strong odor of alcohol emanating from the vehicle. The defendant exhibited slurred speech and bloodshot eyes. A field sobriety test was administered pursuant to 42 U.S.C. § 1983, and the defendant failed two of three standardized tests.
+
+LEGAL ANALYSIS
+
+Under the Fourth Amendment to the United States Constitution, a traffic stop constitutes a seizure. See Terry v. Ohio, 392 U.S. 1 (1968). The stop must be supported by reasonable suspicion of criminal activity. Illinois v. Wardlow, 528 U.S. 119 (2000).
+
+The prosecution bears the burden of proving beyond a reasonable doubt that the defendant operated a motor vehicle while under the influence, in violation of Cal. Veh. Code § 23152(a).
+
+CONCLUSION
+
+Based on the foregoing analysis, the evidence supports the charges as filed. The officer's observations provide sufficient probable cause for the arrest under established Fourth Amendment jurisprudence.
+
+Respectfully submitted,
+District Attorney's Office
+March 26, 2026
