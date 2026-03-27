@@ -8,7 +8,7 @@
  */
 
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { redis } from '$lib/server/redis.js';
 import { isUuid } from '$lib/server/validation.js';
 import { z } from 'zod';
