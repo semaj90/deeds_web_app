@@ -21,7 +21,7 @@ export async function GET() {
             title: 'California Constitution 2023-24',
             corpusType: 'constitution',
             jurisdictionCode: 'CA',
-            userId: null as any
+            userId: null!
         });
 
         console.log(`    Document ID: ${documentId}`);

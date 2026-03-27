@@ -81,7 +81,7 @@ export async function GET({ locals }: RequestEvent) {
 		const result = await db.execute(sql`
 			SELECT count(*)::int as cnt FROM evidence WHERE status = 'processed' AND content IS NOT NULL
 		`);
-		const rows = (result as any).rows ?? [...(result as any)];
+		const rows = Array.isArray(result) ? result : (result as { rows?: Record<string, any>[] }).rows ?? [];
 		datasetCount = rows[0]?.cnt ?? 0;
 	} catch { /* DB may be down */ }
 
@@ -93,7 +93,7 @@ export async function GET({ locals }: RequestEvent) {
 		});
 		if (res.ok) {
 			const data = await res.json();
-			models = (data.models ?? []).map((m: any) => m.name);
+			models = (data.models ?? []).map((m: Record<string, unknown>) => String(m.name));
 		}
 	} catch { /* Ollama may be down */ }
 
@@ -102,9 +102,9 @@ export async function GET({ locals }: RequestEvent) {
 		datasets: {
 			evidenceDocuments: datasetCount,
 			trainingFiles: [
-				{ name: 'legal-qa-pairs', format: 'jsonl', description: 'Question-answer pairs from legal corpus' },
-				{ name: 'case-summaries', format: 'jsonl', description: 'Case summary generation training data' },
-				{ name: 'statute-analysis', format: 'jsonl', description: 'Statute interpretation examples' }
+				{ name: 'legal-qa-pairs', format: 'jsonl', records: 153, description: 'Citation discipline Q&A from fictional cases + canon chunks' },
+				{ name: 'case-summaries', format: 'jsonl', records: 306, description: 'Fictional case narrative → structured analysis (153 cases × 2 formats)' },
+				{ name: 'statute-analysis', format: 'jsonl', records: 117, description: 'Canon chunk statute/rule plain-language analysis (59 chunks)' }
 			]
 		},
 		availableModels: models,

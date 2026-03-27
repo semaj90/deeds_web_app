@@ -162,7 +162,7 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 		const body = parsed.data;
 
 		// Build update object (only update provided fields)
-		const updates: any = {};
+		const updates: Record<string, unknown> = {};
 		if (body.name !== undefined) updates.name = body.name;
 		if (body.description !== undefined) updates.description = body.description?.trim() || null;
 		if (body.color !== undefined) updates.color = body.color;

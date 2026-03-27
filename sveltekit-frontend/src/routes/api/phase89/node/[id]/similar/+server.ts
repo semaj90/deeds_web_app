@@ -55,17 +55,17 @@ export const GET: RequestHandler = async ({ params, url }) => {
       LIMIT ${topK}
     `;
 
-    const results = similar.map((s: any) => ({
+    const results = similar.map((s: Record<string, unknown>) => ({
       id: s.id,
       kind: s.kind,
       label: s.label,
       meta: s.meta,
-      similarity: parseFloat(s.similarity),
+      similarity: parseFloat(String(s.similarity)),
     }));
 
     return json({ results });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error finding similar nodes:', error);
-    return json({ error: error?.message ?? 'Unknown error', results: [] }, { status: 500 });
+    return json({ error: error instanceof Error ? error.message : 'Unknown error', results: [] }, { status: 500 });
   }
 };

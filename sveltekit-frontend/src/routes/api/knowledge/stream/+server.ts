@@ -105,7 +105,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 					sendEvent('search_results', {
 						count: results.length,
-						results: results.map((r: any) => ({
+						results: results.map((r: Record<string, any>) => ({
 							id: r.id,
 							title: r.title,
 							score: r.scores ?? r.similarity ?? 0,

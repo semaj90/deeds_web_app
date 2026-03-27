@@ -194,7 +194,10 @@ function sanitizeFilename(name: string): string {
 	return name.replace(/[^a-z0-9\-_]/gi, '-').toLowerCase();
 }
 
-function generateCollectionHTML(collection: any, citationsList: any[]): string {
+function generateCollectionHTML(
+	collection: { name: string; color: string | null; description: string | null; createdAt: string | Date; updatedAt: string | Date },
+	citationsList: Array<{ quotedText: string; formattedCitation: string; citationType: string; pageNumber: number | null; relevanceScore: number; isKeyAuthority: boolean }>
+): string {
 	const citationRows = citationsList.map((c, i) => `
 		<tr>
 			<td style="padding: 8px; border: 1px solid #ddd;">${i + 1}</td>
@@ -254,7 +257,10 @@ function generateCollectionHTML(collection: any, citationsList: any[]): string {
 </html>`;
 }
 
-function generateCollectionMarkdown(collection: any, citationsList: any[]): string {
+function generateCollectionMarkdown(
+	collection: { name: string; color: string | null; description: string | null; createdAt: string | Date; updatedAt: string | Date },
+	citationsList: Array<{ quotedText: string; formattedCitation: string; citationType: string; pageNumber: number | null; relevanceScore: number; isKeyAuthority: boolean }>
+): string {
 	const citationRows = citationsList.map((c, i) => {
 		const text = c.quotedText || c.formattedCitation || 'N/A';
 		return `${i + 1}. **${text}**\n   - Type: ${c.citationType || 'N/A'}\n   - Page: ${c.pageNumber || 'N/A'}\n   - Relevance: ${c.relevanceScore ? (Number(c.relevanceScore) * 100).toFixed(1) + '%' : 'N/A'}\n`;

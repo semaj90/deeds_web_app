@@ -22,7 +22,7 @@ export const GET: RequestHandler = async () => {
     const activityKeys = await client.keys('phase89:activity:*');
     const activity: Array<{ id: string, type: 'fix' | 'embed' | 'learn';
       message: string, timestamp: string;
-      data?: any;
+      data?: Record<string, unknown>;
     }> = [];
 
     // Also get recent fix suggestions
@@ -54,7 +54,7 @@ export const GET: RequestHandler = async () => {
     return json({
       activity: activity.slice(0, 50)
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Activity error:', error);
     return json({
       activity: [],

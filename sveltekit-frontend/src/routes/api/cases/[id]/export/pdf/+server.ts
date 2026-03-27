@@ -123,7 +123,7 @@ export const POST: RequestHandler = async ({ params }) => {
 	const citRows = citationRows.length
 		? citationRows
 				.map(
-					(c: any) =>
+					(c: Record<string, any>) =>
 						`<tr><td>${esc(c.formattedCitation) || '—'}</td><td>${esc(c.citationType) || '—'}</td><td class="quoted">${esc(c.quotedText?.slice(0, 200)) || '—'}${(c.quotedText?.length ?? 0) > 200 ? '...' : ''}</td><td>${c.relevanceScore ? Math.round(c.relevanceScore * 100) + '%' : '—'}</td><td>${c.isKeyAuthority ? 'Yes' : '—'}</td></tr>`
 				)
 				.join('')

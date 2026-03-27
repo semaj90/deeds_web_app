@@ -14,7 +14,7 @@ const createMessageSchema = z.object({
 	ragResults: z.string().nullable().optional(),
 	confidence: z.string().nullable().optional(),
 	processingTime: z.string().nullable().optional(),
-	aiMetadata: z.record(z.string(), z.any()).nullable().optional()
+	aiMetadata: z.record(z.string(), z.unknown()).nullable().optional()
 });
 
 /** POST /api/v1/chat/messages — Save a chat message to a session */

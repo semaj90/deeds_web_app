@@ -9,7 +9,7 @@ const associationSchema = z.object({
 	reportId: z.string().min(1),
 	chatSessionId: z.string().min(1),
 	associationType: z.string().max(50).default('analysis'),
-	metadata: z.record(z.string(), z.any()).optional()
+	metadata: z.record(z.string(), z.unknown()).optional()
 });
 
 /** POST /api/v1/reports/chat-associations — Link a chat session to a report */

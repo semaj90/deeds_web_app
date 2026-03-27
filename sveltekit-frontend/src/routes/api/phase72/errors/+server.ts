@@ -46,7 +46,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			LIMIT ${limit}
 		`);
 
-		const errors = (errorsResult as any).rows ?? errorsResult ?? [];
+		const errors = Array.isArray(errorsResult) ? errorsResult : (errorsResult as { rows?: unknown[] }).rows ?? [];
 
 		// Stats aggregation
 		const statsResult = await db.execute(sql`
@@ -59,7 +59,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			${whereClause}
 		`);
 
-		const statsRow = ((statsResult as any).rows ?? statsResult ?? [])[0];
+		const statsRow = (Array.isArray(statsResult) ? statsResult : (statsResult as { rows?: unknown[] }).rows ?? [])[0] as Record<string, unknown> | undefined;
 		const stats = statsRow ? {
 			total_errors: statsRow.total_errors ?? 0,
 			unique_codes: statsRow.unique_codes ?? 0,

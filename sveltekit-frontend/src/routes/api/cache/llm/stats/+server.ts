@@ -24,7 +24,7 @@ export const GET: RequestHandler = async () => {
 			}
 		});
 
-		const recentEntries = scrollRes.points.map((p: any) => ({
+		const recentEntries = scrollRes.points.map((p: Record<string, any>) => ({
 			query: p.payload?.query?.slice(0, 50) + '...',
 			model: p.payload?.model,
 			cachedAt: p.payload?.cachedAt,
@@ -51,7 +51,7 @@ export const GET: RequestHandler = async () => {
 			success: true,
 			stats: {
 				totalEntries: collectionInfo.points_count,
-				vectorsDim: (collectionInfo.config?.params?.vectors as any)?.size ?? 768,
+				vectorsDim: (collectionInfo.config?.params?.vectors as { size?: number })?.size ?? 768,
 				expiredEntries: expiredRes.points.length > 0 ? '1+' : 0,
 				recentEntries,
 				collectionStatus: collectionInfo.status

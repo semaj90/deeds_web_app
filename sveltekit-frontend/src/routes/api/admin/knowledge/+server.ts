@@ -48,7 +48,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		const data = await response.json();
 		const points = data.result?.points ?? [];
 
-		const entries: KBEntry[] = points.map((point: any) => ({
+		const entries: KBEntry[] = points.map((point: Record<string, any>) => ({
 			id: point.id,
 			score: 1.0, // No scoring in scroll query
 			content: point.payload?.content ?? point.payload?.text ?? '',

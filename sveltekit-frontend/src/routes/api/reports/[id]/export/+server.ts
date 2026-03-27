@@ -233,7 +233,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 	}
 };
 
-function generateHTML(report: any): string {
+function generateHTML(report: Record<string, any>): string {
 	return `<!DOCTYPE html>
 <html lang="en">
 <head>

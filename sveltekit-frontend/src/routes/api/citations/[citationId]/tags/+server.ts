@@ -25,7 +25,7 @@ export const GET: RequestHandler = async ({ params }) => {
 		const result = await db.execute(
 			sql`SELECT id, tag, color, created_at FROM citation_tag_links WHERE citation_id = ${params.citationId} ORDER BY created_at`
 		);
-		const rows = (result as unknown as { rows?: any[] }).rows ?? [];
+		const rows = (result as unknown as { rows?: Record<string, unknown>[] }).rows ?? [];
 		return json({ success: true, tags: rows });
 	} catch (err) {
 		console.error('[citation-tags] GET error:', err);
@@ -54,7 +54,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 				ON CONFLICT (citation_id, tag) DO NOTHING
 				RETURNING id, tag, color, created_at`
 		);
-		const rows = (result as unknown as { rows?: any[] }).rows ?? [];
+		const rows = (result as unknown as { rows?: Record<string, unknown>[] }).rows ?? [];
 		const inserted = rows[0] ?? { tag, color };
 
 		// Invalidate citation cache

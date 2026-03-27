@@ -105,8 +105,8 @@ export const POST: RequestHandler = async (event) => {
 				title: body.title,
 				description: body.description,
 				userId: auth.user.id,
-				status: (body.status ?? 'open') as any,
-				priority: (body.priority ?? 'medium') as any,
+				status: (body.status ?? 'open') as typeof cases.status.enumValues[number],
+				priority: (body.priority ?? 'medium') as typeof cases.priority.enumValues[number],
 				updatedAt: new Date().toISOString()
 			})
 			.returning();

@@ -1,4 +1,5 @@
 import type { RequestHandler } from './$types';
+import type { GlyphRequest } from '$lib/server/glyph-diffusion-service.js';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 
@@ -7,7 +8,7 @@ const glyphSchema = z.object({
 	prompt: z.string().min(1).max(10000),
 	style: z.string().max(50).default('legal'),
 	dimensions: z.tuple([z.number().min(64).max(2048), z.number().min(64).max(2048)]).default([512, 512]),
-	neural_sprite_config: z.record(z.string(), z.any()).optional()
+	neural_sprite_config: z.record(z.string(), z.unknown()).optional()
 });
 
 /** POST /api/glyph/generate — Generate evidence visualization glyph */
@@ -81,7 +82,7 @@ Return JSON with these fields:
 				prompt,
 				style: style as 'detective' | 'corporate' | 'forensic' | 'legal',
 				dimensions: dimensions as [number, number],
-				neural_sprite_config: parsed.data.neural_sprite_config as any,
+				neural_sprite_config: parsed.data.neural_sprite_config as GlyphRequest['neural_sprite_config'],
 			});
 		} catch (diffErr) {
 			console.warn('[/api/glyph/generate] diffusion service unavailable:', diffErr);

@@ -31,7 +31,7 @@ export const GET: RequestHandler = async () => {
     `);
 
     // Build topology nodes
-    const nodes = errorsResult.rows.map((row: any, i: number) => ({
+    const nodes = errorsResult.rows.map((row: Record<string, string>, i: number) => ({
       id: row?.file_path || `unknown_${i}`,
       label: (row?.file_path ?? 'unknown').split('/').pop() ?? 'unknown',
       type: 'file' as const,
@@ -81,7 +81,7 @@ export const GET: RequestHandler = async () => {
         }
       }
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Topology error:', error);
     return json({
       topology: {

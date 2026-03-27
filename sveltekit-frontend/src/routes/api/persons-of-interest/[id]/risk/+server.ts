@@ -38,7 +38,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			? db.execute(sql`
 				SELECT COUNT(*)::int AS cnt FROM evidence
 				WHERE case_id = ANY(${sql.raw(`ARRAY[${poi.caseIds.map(id => `'${id}'`).join(',')}]::uuid[]`)})
-			`).then(r => Number((r.rows[0] as any)?.cnt ?? 0)).catch(() => 0)
+			`).then(r => Number((r.rows[0] as Record<string, any>)?.cnt ?? 0)).catch(() => 0)
 			: Promise.resolve(0),
 		// Get case priorities
 		poi.caseIds?.length
@@ -55,8 +55,8 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 
 	const threatScore = threatWeights[poi.threatLevel] ?? 10;
 	const caseCount = poi.caseIds?.length ?? 0;
-	const caseSeverity = caseData.reduce((sum, c) => sum + (priorityWeights[(c as any).priority] ?? 10), 0);
-	const activeCases = caseData.filter(c => ['open', 'active', 'investigating'].includes((c as any).status)).length;
+	const caseSeverity = caseData.reduce((sum, c) => sum + (priorityWeights[c.priority] ?? 10), 0);
+	const activeCases = caseData.filter(c => ['open', 'active', 'investigating'].includes(c.status)).length;
 
 	// Composite risk: 40% threat + 20% evidence + 20% case severity + 20% active cases
 	const evidenceSignal = Math.min(evidenceCount * 5, 100);

@@ -7,8 +7,8 @@ import { TIMEOUTS } from '$lib/server/timeouts.js';
 
 const suggestionsSchema = z.object({
 	caseId: z.string().uuid(),
-	evidenceData: z.any().optional(),
-	canvasData: z.any().optional()
+	evidenceData: z.unknown().optional(),
+	canvasData: z.unknown().optional()
 });
 
 /** POST /api/v1/ai/canvas-suggestions — AI-generated canvas layout suggestions */

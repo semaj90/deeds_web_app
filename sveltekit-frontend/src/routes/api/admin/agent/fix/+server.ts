@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
 // Stream endpoint not yet implemented
-function broadcastAgentProgress(_data: any) { /* no-op */ }
+function broadcastAgentProgress(_data: unknown) { /* no-op */ }
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
@@ -70,7 +70,7 @@ async function queryKnowledgeBase(filePath: string, errorContext: string): Promi
 
 		// Concatenate relevant knowledge
 		const knowledge = results
-			.map((r: any) => r.payload?.content ?? r.payload?.text ?? '')
+			.map((r: Record<string, any>) => r.payload?.content ?? r.payload?.text ?? '')
 			.filter(Boolean)
 			.join('\n\n');
 
@@ -163,7 +163,7 @@ Return fixes in JSON format:
 			const parsed = JSON.parse(jsonMatch[0]);
 			fixes.push(
 				...parsed.fixes.map(
-					(f: any) => `
+					(f: Record<string, any>) => `
 **Error:** ${f.error}
 **Solution:** ${f.solution}
 \`\`\`typescript

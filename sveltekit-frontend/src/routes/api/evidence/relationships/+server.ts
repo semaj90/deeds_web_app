@@ -70,7 +70,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				caseId,
 				fromEvidenceId,
 				toEvidenceId,
-				relationshipType: relationshipType as any,
+				relationshipType: relationshipType as typeof evidenceRelationships.relationshipType.enumValues[number],
 				strength,
 				label: label ?? relationshipType.replace(/_/g, ' ')
 			})

@@ -49,7 +49,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const embedMs = Date.now() - embedStart;
 
 		// 2. Build Qdrant filter
-		const mustConditions: any[] = [];
+		const mustConditions: Array<{ key: string; match: { value: string } }> = [];
 		if (jurisdiction) {
 			mustConditions.push({ key: 'jurisdiction', match: { value: jurisdiction } });
 		}
@@ -62,7 +62,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		// 3. Search Qdrant
 		const searchStart = Date.now();
-		let results: any[] = [];
+		let results: Array<Record<string, unknown>> = [];
 		try {
 			const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
 
@@ -74,7 +74,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				...(mustConditions.length > 0 ? { filter: { must: mustConditions } } : {}),
 			});
 
-			results = searchResult.map((hit: any) => ({
+			results = searchResult.map((hit: Record<string, any>) => ({
 				chunkId: hit.payload?.chunk_id,
 				docId: hit.payload?.doc_id,
 				docType: hit.payload?.doc_type,

@@ -41,7 +41,7 @@ export const GET: RequestHandler = async ({ params }) => {
 			status: doc.status ?? 'draft',
 			summary: doc.summary,
 			metadata: doc.metadata,
-			citations: (doc.metadata as any)?.citations ?? [],
+			citations: (doc.metadata as Record<string, unknown>)?.citations ?? [],
 			createdAt: doc.createdAt,
 			updatedAt: doc.updatedAt,
 		});

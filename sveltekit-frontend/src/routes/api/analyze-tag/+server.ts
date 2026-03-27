@@ -80,7 +80,7 @@ export async function POST({ request, locals }: RequestEvent) {
 			relatedTags: analysis.relatedTags,
 			timestamp: new Date().toISOString()
 		});
-	} catch (error: any) {
+	} catch (error) {
 		console.error('Tag analysis failed:', error);
 		return json({ success: false, error: 'Tag analysis failed' }, { status: 500 });
 	}
@@ -91,7 +91,7 @@ async function searchTagOccurrences(tag: string, collection: string) {
 		? await getCollections()
 		: [collection];
 
-	const results: any[] = [];
+	const results: Array<Record<string, any> & { collection: string }> = [];
 
 	for (const coll of collections) {
 		try {
@@ -123,7 +123,7 @@ async function searchTagOccurrences(tag: string, collection: string) {
 	return results;
 }
 
-async function analyzeTagWithLLM(tag: string, occurrences: any[]) {
+async function analyzeTagWithLLM(tag: string, occurrences: Array<Record<string, any> & { collection: string }>) {
 	// Sample occurrences for context
 	const samples = occurrences.slice(0, 5).map((o) => ({
 		message: o.payload?.message ?? o.payload?.text ?? '',

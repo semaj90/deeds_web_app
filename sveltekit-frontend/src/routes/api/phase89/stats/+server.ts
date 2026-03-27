@@ -26,7 +26,7 @@ export const GET: RequestHandler = async () => {
 		`);
 
 		return json(result.rows[0]);
-	} catch (error: any) {
+	} catch (error) {
 		console.error('Error fetching stats:', error);
 		return json({ error: 'Failed to fetch stats' }, { status: 500 });
 	}

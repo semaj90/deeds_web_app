@@ -7,7 +7,7 @@ import { gt } from 'drizzle-orm';
 
 const syncSchema = z.object({
 	lastSyncTime: z.number().min(0),
-	pendingChanges: z.array(z.record(z.string(), z.any())).default([])
+	pendingChanges: z.array(z.record(z.string(), z.unknown())).default([])
 });
 
 /** POST /api/sync/documents — Sync local document cache with server */

@@ -54,7 +54,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		const evidenceContext = searchResults.results
 			.slice(0, 5)
-			.map((r: any, i: number) => {
+			.map((r: Record<string, any>, i: number) => {
 				const p = r.payload ?? {};
 				return `[${i + 1}] ${p.title ?? p.file_name ?? 'Evidence'}: ${(p.content_preview ?? p.content ?? '').slice(0, 300)}`;
 			})
@@ -103,7 +103,7 @@ Provide 3-5 recommendations, 2-3 alternative queries, and 2-4 predictive signals
 		const responseText = ollamaData.response ?? '';
 
 		// 3. Parse LLM JSON response
-		let llmResult: any;
+		let llmResult: Record<string, unknown>;
 		try {
 			llmResult = JSON.parse(responseText);
 		} catch {

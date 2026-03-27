@@ -46,7 +46,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			conditions.push(sql`${fictionalCases.category} = ${category}`);
 		}
 		if (jurisdiction) {
-			conditions.push(eq(fictionalCases.jurisdiction, jurisdiction as any));
+			conditions.push(eq(fictionalCases.jurisdiction, jurisdiction as typeof fictionalCases.jurisdiction.enumValues[number]));
 		}
 		if (q) {
 			const pattern = `%${q}%`;

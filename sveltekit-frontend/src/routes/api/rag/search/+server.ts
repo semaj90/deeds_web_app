@@ -412,7 +412,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
             scoreThreshold: min_score,
           });
           for (const r of hybridResult.results) {
-            const payload = (r as any).payload ?? {};
+            const payload = (r as Record<string, any>).payload ?? {};
             allChunks.push({
               chunk_id: `${collection}:${r.id}`,
               text: payload.content ?? payload.text ?? payload.snippet ?? payload.summary ?? '',
@@ -513,7 +513,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
           scoreThreshold: min_score,
         });
         for (const r of sectionResults.results) {
-          const payload = (r as any).payload ?? {};
+          const payload = (r as Record<string, any>).payload ?? {};
           allChunks.push({
             chunk_id: `evidence_items:${r.id}`,
             text: payload.content_preview ?? payload.content ?? payload.text ?? '',

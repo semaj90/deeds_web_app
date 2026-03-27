@@ -58,7 +58,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 				isActive: true,
 				createdAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString()
-			} as any)
+			})
 			.returning();
 
 		// Create session

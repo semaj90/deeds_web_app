@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 const cacheSetSchema = z.object({
 	key: z.string().min(1).max(500),
-	value: z.any(),
+	value: z.unknown(),
 	ttl: z.number().min(1).max(604800).default(3600) // max 7 days
 });
 

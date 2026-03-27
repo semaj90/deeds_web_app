@@ -28,7 +28,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		}
 		const { citationIds, caseId, includeStatutes } = parsed.data;
 
-		let citationsData: any[];
+		let citationsData: typeof citations.$inferSelect[];
 
 		// Fetch citations based on provided filters
 		if (citationIds && citationIds.length > 0) {
@@ -47,7 +47,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		}
 
 		// Optionally include statute details
-		let exportData: any = {
+		let exportData: Record<string, unknown> = {
 			exportDate: new Date().toISOString(),
 			citationCount: citationsData.length,
 			citations: citationsData.map((c) => ({

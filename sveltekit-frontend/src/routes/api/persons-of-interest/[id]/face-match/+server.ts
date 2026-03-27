@@ -200,10 +200,14 @@ export const POST: RequestHandler = async ({ params, request }) => {
 				LIMIT ${limit * 2}
 			`);
 
-			const rows = (dbMatches as unknown as { rows: any[] }).rows ?? [];
+			const rows = (dbMatches as unknown as { rows: Record<string, any>[] }).rows ?? [];
 			if (rows.length > 0) {
 				// Group by POI, take best score per POI
-				const byPoi = new Map<string, { poi: any; similarity: number; photos: any[] }>();
+				const byPoi = new Map<string, {
+					poi: { id: string; name: string; threatLevel: string; photos: Array<{ url: string; thumbnailUrl: string }> };
+					similarity: number;
+					photos: Array<{ url: string; thumbnailUrl: string }>;
+				}>();
 				for (const row of rows) {
 					const pid = row.poi_id;
 					const sim = Number(row.similarity);

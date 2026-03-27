@@ -42,8 +42,8 @@ export const GET: RequestHandler = async ({ url }) => {
 
 	try {
 		const conditions = [];
-		if (status) conditions.push(eq(personsOfInterest.status, status as any));
-		if (threatLevel) conditions.push(eq(personsOfInterest.threatLevel, threatLevel as any));
+		if (status) conditions.push(eq(personsOfInterest.status, status as typeof personsOfInterest.status.enumValues[number]));
+		if (threatLevel) conditions.push(eq(personsOfInterest.threatLevel, threatLevel as typeof personsOfInterest.threatLevel.enumValues[number]));
 		if (search) {
 			conditions.push(
 				or(

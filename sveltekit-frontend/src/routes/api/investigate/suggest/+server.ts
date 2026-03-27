@@ -100,10 +100,10 @@ Return ONLY a JSON array:
 					const arr = JSON.parse(arrMatch[0]);
 					if (Array.isArray(arr)) {
 						suggestedQueries = arr
-							.filter((q: any) => typeof q?.query === 'string')
+							.filter((q: Record<string, unknown>) => typeof q?.query === 'string')
 							.slice(0, 5)
-							.map((q: any) => ({
-								query: q.query,
+							.map((q: Record<string, unknown>) => ({
+								query: String(q.query),
 								confidence: typeof q.confidence === 'number' ? Math.round(Math.min(1, Math.max(0, q.confidence)) * 100) / 100 : 0.5,
 								reason: typeof q.reason === 'string' ? q.reason : ''
 							}))
@@ -129,7 +129,7 @@ Return ONLY a JSON array:
 					limit: 5,
 					scoreThreshold: 0.5
 				});
-				relatedRecommendations = searchResult.results.map((r: any) => ({
+				relatedRecommendations = searchResult.results.map((r: Record<string, any>) => ({
 					documentId: String(r.id),
 					title: r.payload?.title || r.payload?.filename || 'Untitled',
 					confidence: Math.round(r.score * 100) / 100,

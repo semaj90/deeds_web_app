@@ -10,7 +10,7 @@ const createSessionSchema = z.object({
 	reportId: z.string().uuid().nullable().optional(),
 	userRole: z.string().max(100).optional(),
 	title: z.string().max(500).optional(),
-	sessionMetadata: z.record(z.string(), z.any()).optional()
+	sessionMetadata: z.record(z.string(), z.unknown()).optional()
 });
 
 /** POST /api/v1/chat/sessions — Create a new chat session */

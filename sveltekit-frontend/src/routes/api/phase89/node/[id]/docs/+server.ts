@@ -72,7 +72,7 @@ export const GET: RequestHandler = async ({ params }) => {
 
     const searchResults = await response.json();
 
-    const results = (searchResults?.result || []).map((hit: any) => ({
+    const results = (searchResults?.result || []).map((hit: Record<string, any>) => ({
       title: hit.payload?.title ?? hit.payload?.source ?? 'Unknown',
       snippet: hit.payload?.content?.substring(0, 200) ?? hit.payload?.text?.substring(0, 200) ?? '',
       score: hit.score,

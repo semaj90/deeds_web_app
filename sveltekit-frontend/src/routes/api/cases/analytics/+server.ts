@@ -84,7 +84,7 @@ export const GET: RequestHandler = async (event) => {
 		);
 
 		// Build filters
-		const filters: any[] = [
+		const filters: ReturnType<typeof eq>[] = [
 			eq(cases.userId, auth.user.id),
 			gte(cases.createdAt, dateStart.toISOString()),
 			lte(cases.createdAt, dateEnd.toISOString())
@@ -92,7 +92,7 @@ export const GET: RequestHandler = async (event) => {
 
 		if (priorityParam) {
 			const priorities = priorityParam.split(',');
-			filters.push(inArray(cases.priority, priorities as any));
+			filters.push(inArray(cases.priority, priorities as typeof cases.priority.enumValues));
 		}
 
 		// Step 1: Fetch all cases in date range

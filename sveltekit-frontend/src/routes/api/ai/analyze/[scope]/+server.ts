@@ -8,7 +8,7 @@ import { TIMEOUTS } from '$lib/server/timeouts.js';
 const VALID_SCOPES = ['case', 'evidence', 'poi', 'timeline'] as const;
 
 const analyzeSchema = z.object({
-	context: z.record(z.string(), z.any()).optional().default({})
+	context: z.record(z.string(), z.unknown()).optional().default({})
 });
 
 const SCOPE_PROMPTS: Record<string, string> = {
@@ -22,7 +22,7 @@ const SCOPE_PROMPTS: Record<string, string> = {
 export const POST: RequestHandler = async ({ params, request }) => {
 	const scope = params.scope;
 
-	if (!VALID_SCOPES.includes(scope as any)) {
+	if (!VALID_SCOPES.includes(scope as (typeof VALID_SCOPES)[number])) {
 		return json(
 			{ message: `Invalid scope: ${scope}. Valid: ${VALID_SCOPES.join(', ')}` },
 			{ status: 400 }

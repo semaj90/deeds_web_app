@@ -452,7 +452,7 @@ async function searchCanon(q: string, limit: number, jurisdiction?: string, auth
 		const sparseVec = generateSparseVector(q);
 
 		// Build payload filter for jurisdiction + authority level
-		const mustConditions: any[] = [];
+		const mustConditions: Array<{ key: string; match: { value: string } }> = [];
 		if (jurisdiction) {
 			mustConditions.push({ key: 'jurisdiction', match: { value: jurisdiction } });
 		}

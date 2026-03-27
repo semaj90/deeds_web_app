@@ -48,7 +48,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		const search = url.searchParams.get('search') ?? null;
 
 		// Build filter
-		const must: any[] = [];
+		const must: Array<{ key: string; match: { value: string } | { any: string[] } }> = [];
 		if (role) {
 			must.push({ key: 'role', match: { value: role } });
 		}
@@ -60,7 +60,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		}
 
 		// Scroll through Qdrant collection
-		const scrollPayload: any = {
+		const scrollPayload: Record<string, unknown> = {
 			limit,
 			with_payload: true,
 			with_vector: false

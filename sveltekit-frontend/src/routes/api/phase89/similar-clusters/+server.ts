@@ -28,7 +28,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			limit: limit + 1, // +1 to exclude the query cluster itself
 			with_payload: true,
 			with_vector: false
-		} as any);
+		});
 		const similar = searchResults
 			.filter((result) => result.payload?.cluster_id !== cluster_id)
 			.slice(0, limit)

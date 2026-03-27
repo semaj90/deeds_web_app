@@ -31,7 +31,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		}
 		const { citationIds, caseId, includeStatutes } = parsed.data;
 
-		let citationsData: any[];
+		let citationsData: Array<Record<string, any>>;
 
 		// Fetch citations based on provided filters
 		if (citationIds && citationIds.length > 0) {
@@ -63,17 +63,17 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			const citation = citationsData[i];
 			lines.push(`CITATION ${i + 1}`);
 			lines.push('-'.repeat(80));
-			lines.push(`Text: ${citation.citationText || 'N/A'}`);
+			lines.push(`Text: ${citation.quotedText || 'N/A'}`);
 			lines.push(`Case ID: ${citation.caseId || 'N/A'}`);
 			lines.push(`Source URL: ${citation.sourceUrl || 'N/A'}`);
 			lines.push(`Created: ${citation.createdAt ? new Date(citation.createdAt).toLocaleString() : 'N/A'}`);
 
 			// Include statute details if enabled
-			if (includeStatutes && citation.citationText) {
+			if (includeStatutes && citation.quotedText) {
 				const [statuteData] = await db
 					.select()
 					.from(statutes)
-					.where(eq(statutes.section, citation.citationText))
+					.where(eq(statutes.section, citation.quotedText))
 					.limit(1);
 
 				if (statuteData) {

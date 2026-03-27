@@ -101,7 +101,7 @@ async function executeContextualTool(
         const result = matches
           .slice(0, Number(args.limit ?? 5))
           .map(
-            (m: any) =>
+            (m: Record<string, any>) =>
               `**${m.term}**: ${m.definition.slice(0, 300)}${m.category ? ` (${m.category})` : ''}`
           )
           .join('\n\n');
@@ -127,7 +127,7 @@ async function executeContextualTool(
         const searchResult = await qdrant.hybridSearch({
           query: queryText,
           queryEmbedding: embResult.vectors[0],
-          collection: 'documents' as any,
+          collection: 'documents' as string,
           // Contextual chat uses smaller top-k and trimmed snippets to stay within context budget
           limit: Number(args.limit ?? 3),
           scoreThreshold: 0.5,
@@ -135,7 +135,7 @@ async function executeContextualTool(
         const result =
           searchResult.results
             .map(
-              (r: any, i: number) =>
+              (r: Record<string, any>, i: number) =>
                 `${i + 1}. [${(r.score * 100).toFixed(0)}%] ${r.payload?.title || 'Untitled'}\n   ${(r.payload?.content || '').slice(0, 150)}`
             )
             .join('\n\n') || 'No relevant documents found.';

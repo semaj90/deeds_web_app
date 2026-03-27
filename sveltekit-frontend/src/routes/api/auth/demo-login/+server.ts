@@ -65,7 +65,7 @@ async function upsertDemoUser(input: DemoLoginInput) {
         onboardingStep: DEMO_ONBOARDING_STEP,
         createdAt: now,
         updatedAt: now,
-      } as any)
+      })
       .returning();
 
     return { user: newUser, created: true };
@@ -83,7 +83,7 @@ async function upsertDemoUser(input: DemoLoginInput) {
       hasCompletedOnboarding: true,
       onboardingStep: DEMO_ONBOARDING_STEP,
       updatedAt: now,
-    } as any)
+    })
     .where(eq(users.id, existingUser.id))
     .returning();
 

@@ -68,6 +68,7 @@ export const POST: RequestHandler = async (event) => {
 		// Publish to RabbitMQ 'evidence.process' queue
 		try {
 			// Dynamic import to avoid server-side dependency issues
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const amqp = (await import('amqplib')) as any;
 			const rabbitmqUrl = getRabbitMQUrl();
 

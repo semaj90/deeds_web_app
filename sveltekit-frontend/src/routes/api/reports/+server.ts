@@ -114,7 +114,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     console.error('Error constructor:', err?.constructor?.name);
     if (err && typeof err === 'object') {
       console.error('Error keys:', Object.keys(err));
-      console.error('Error cause:', (err as any).cause);
+      console.error('Error cause:', (err as { cause?: unknown }).cause);
     }
     throw error(500, 'Failed to fetch reports');
   }
@@ -209,7 +209,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 		}
 		const body = parsed.data;
 
-		const updates: any = { updatedAt: new Date() };
+		const updates: Record<string, unknown> = { updatedAt: new Date() };
 		if (body.contentHtml) updates.content = body.contentHtml;
 		if (body.title) updates.title = body.title;
 		if (body.status) updates.status = body.status;

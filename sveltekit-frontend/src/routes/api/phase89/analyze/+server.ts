@@ -39,11 +39,11 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		// Build ACE contextual prompt
-		const sampleErrors = errorsResult.rows.map((e: any) =>
+		const sampleErrors = errorsResult.rows.map((e: Record<string, any>) =>
 			`- ${e.source}:${e.line_number}: ${e.raw_text.slice(0, 150)}`
 		).join('\n');
 
-		const sources = [...new Set(errorsResult.rows.map((e: any) => e.source))];
+		const sources = [...new Set(errorsResult.rows.map((e: Record<string, any>) => e.source))];
 
 		const prompt = `Analyze this cluster of ${errorsResult.rows.length} TypeScript/Svelte errors and provide actionable fix recommendations.
 
@@ -108,7 +108,7 @@ Provide your analysis in this JSON structure:
 		const content = ollamaData.message?.content ?? '';
 
 		// Try to parse JSON from response
-		let analysis: any = null;
+		let analysis: Record<string, any> | null = null;
 		try {
 			const jsonStart = content.indexOf('{');
 			const jsonEnd = content.lastIndexOf('}') + 1;

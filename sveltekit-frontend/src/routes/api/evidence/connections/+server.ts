@@ -34,7 +34,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				caseId,
 				fromEvidenceId: fromNodeId,
 				toEvidenceId: toNodeId,
-				relationshipType: 'related' as any,
+				relationshipType: 'related' as typeof evidenceRelationships.relationshipType.enumValues[number],
 				strength: strengthLabel,
 				label: 'board connection'
 			})

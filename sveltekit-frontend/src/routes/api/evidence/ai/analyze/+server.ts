@@ -9,7 +9,7 @@ const analyzeSchema = z.object({
 		type: z.string().optional(),
 		description: z.string().optional(),
 		confidence: z.number().optional(),
-		metadata: z.record(z.string(), z.any()).optional()
+		metadata: z.record(z.string(), z.unknown()).optional()
 	})
 });
 

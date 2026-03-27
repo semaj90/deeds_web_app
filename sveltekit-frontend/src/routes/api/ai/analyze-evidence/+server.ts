@@ -7,7 +7,7 @@ import { ollamaFetch } from '$lib/server/ollama.js';
 const analyzeEvidenceSchema = z.object({
 	evidenceId: z.string().max(500).optional().default(''),
 	text: z.string().trim().min(1, 'No evidence text provided').max(100000),
-	metadata: z.any().optional().default({})
+	metadata: z.unknown().optional().default({})
 });
 
 /** GBNF-constrained response schema for evidence analysis */
@@ -45,8 +45,9 @@ Respond in JSON format:
 }
 Where sentiment is -1 (negative) to 1 (positive), importance is 0-1, confidence is 0-1.`;
 
+		const meta = (metadata ?? {}) as Record<string, unknown>;
 		const userPrompt = `Evidence ID: ${evidenceId}
-${metadata.mimeType ? `Type: ${metadata.mimeType}` : ''}
+${meta.mimeType ? `Type: ${meta.mimeType}` : ''}
 
 Text (first 4000 chars):
 ${text.slice(0, 4000)}`;

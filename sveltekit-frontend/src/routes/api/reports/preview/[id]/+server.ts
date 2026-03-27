@@ -147,7 +147,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 /**
  * Generate HTML preview with enhanced styling for in-browser viewing
  */
-function generatePreviewHTML(report: any): string {
+function generatePreviewHTML(report: Record<string, any>): string {
 	return `<!DOCTYPE html>
 <html lang="en">
 <head>

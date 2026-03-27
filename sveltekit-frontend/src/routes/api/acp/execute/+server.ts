@@ -52,7 +52,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			}
 		});
 
-	} catch (error: any) {
+	} catch (error) {
 		console.error('ACP Execute error:', error);
 		return json(
 			{

@@ -29,7 +29,7 @@ export const GET: RequestHandler = async () => {
  client = createRedisConnection();
 
  // If the client exposes connect, ensure it's open before ping
- if (client && typeof client.connect === 'function' && (client as any).status !== 'ready') {
+ if (client && typeof client.connect === 'function' && (client as { status?: string }).status !== 'ready') {
  await client.connect();
  }
 

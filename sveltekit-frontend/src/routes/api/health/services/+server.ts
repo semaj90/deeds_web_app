@@ -76,6 +76,7 @@ export const GET: RequestHandler = async () => {
 /**
  * Check Qdrant connectivity
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function checkQdrant(qdrant: any): Promise<boolean> {
   try {
     await qdrant.search('legal_documents', { vector: Array(768).fill(0), limit: 1 });
@@ -87,6 +88,7 @@ async function checkQdrant(qdrant: any): Promise<boolean> {
 }/**
  * Check MinIO connectivity
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function checkMinIO(minio: any): Promise<boolean> {
  try {
  await minio.bucketExists?.('legal-evidence');
@@ -100,7 +102,8 @@ async function checkMinIO(minio: any): Promise<boolean> {
 /**
  * Check RabbitMQ connectivity
  */
-async function checkRabbitMQ(rabbitmq: any): Promise<boolean> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
+async function checkRabbitMQ(_rabbitmq: any): Promise<boolean> {
  try {
  // RabbitMQ health check is passive (connection established on init)
  return true;

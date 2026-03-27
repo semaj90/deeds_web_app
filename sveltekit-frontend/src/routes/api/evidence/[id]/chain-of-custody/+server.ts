@@ -95,7 +95,7 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
 		to: body.to ?? undefined,
 		notes: body.notes ?? undefined,
 		userId: locals.user.id,
-		userName: (locals.user as any).name ?? locals.user.email ?? undefined,
+		userName: (locals.user as { name?: string; email?: string }).name ?? locals.user.email ?? undefined,
 		timestamp: new Date().toISOString(),
 		location: body.location ?? undefined,
 		hash: body.hash ?? undefined,
