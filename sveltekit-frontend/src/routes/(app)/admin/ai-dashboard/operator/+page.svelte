@@ -135,7 +135,7 @@
 			const valRes = await fetch('/api/rag/validate', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ query_id: ragQueryId, case_id: 'default', validations }),
+				body: JSON.stringify({ query_id: ragQueryId, case_id: crypto.randomUUID(), validations }),
 			});
 			if (!valRes.ok) throw new Error(`Validate failed: ${valRes.status}`);
 			const context = await valRes.json();
@@ -146,7 +146,7 @@
 				body: JSON.stringify({
 					context_id: context.context_id,
 					query: ragQuery,
-					case_id: 'default',
+					case_id: crypto.randomUUID(),
 					include_citations: true,
 					include_todos: true,
 				}),

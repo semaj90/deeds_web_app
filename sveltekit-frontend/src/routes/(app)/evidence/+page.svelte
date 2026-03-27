@@ -390,7 +390,7 @@
 	/>
 
 	<EvidenceUploadModal
-		caseId={activeCaseId || data.evidence?.[0]?.caseId || 'default'}
+		caseId={activeCaseId || data.evidence?.[0]?.caseId || ''}
 		isOpen={showUploadPipeline}
 		onClose={() => (showUploadPipeline = false)}
 		onSuccess={(evidenceId, jobId) => { showUploadPipeline = false; invalidateAll(); }}

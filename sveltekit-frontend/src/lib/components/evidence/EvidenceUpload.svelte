@@ -161,7 +161,9 @@
         formData.append('tags', fileData.tags);
         formData.append('isAdmissible', fileData.isAdmissible.toString());
         formData.append('admissibilityNotes', fileData.admissibilityNotes);
-        formData.append('caseId', caseId);
+        if (caseId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(caseId)) {
+          formData.append('caseId', caseId);
+        }
 
         const response = await fetch('/api/evidence/upload', {
           method: 'POST',

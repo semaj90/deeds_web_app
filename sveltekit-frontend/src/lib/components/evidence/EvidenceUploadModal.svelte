@@ -126,7 +126,9 @@
 			advanceStage(0, 'running');
 			const formData = new FormData();
 			formData.append('file', selectedFile);
+			if (caseId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(caseId)) {
 			formData.append('caseId', caseId);
+		}
 			formData.append('title', selectedFile.name);
 			formData.append('evidenceType', isImageFile(selectedFile) ? 'photo' : 'document');
 
