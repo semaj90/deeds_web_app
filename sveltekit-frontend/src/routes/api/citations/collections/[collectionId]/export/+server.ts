@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/client';
 import { citationCollections, collectionCitations, citations } from '$lib/server/db/schema-postgres.js';
-import { error } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import { eq, and, sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import {
@@ -8,6 +8,7 @@ import {
 	cacheExport,
 } from '$lib/server/cache/pdf-export-cache.js';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 const collectionExportSchema = z.object({
 	format: z.enum(['html', 'markdown', 'json']).optional().default('html')
@@ -31,6 +32,7 @@ async function handleExport({ locals, params, format }: {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}
+	if (!isUuid(params.collectionId)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
 	const { collectionId } = params;
 

@@ -518,6 +518,8 @@ export const handle: Handle = async ({ event, resolve }) => {
     event.url.pathname.startsWith('/api/routes');
   const isAIRoute =
     event.url.pathname.startsWith('/api/ai/') ||
+    event.url.pathname.startsWith('/api/ollama/') ||
+    event.url.pathname.startsWith('/api/embed') ||
     event.url.pathname.startsWith('/api/nlp/') ||
     event.url.pathname.startsWith('/api/rag/') ||
     event.url.pathname.startsWith('/api/synthesis/') ||

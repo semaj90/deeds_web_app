@@ -21,6 +21,23 @@ const execAsync = promisify(exec);
 const OLLAMA_URL = getOllamaUrl();
 const PYTHON_PATH = 'C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\python.exe';
 
+interface ClusterSummary {
+  id: number;
+  errorCount: number;
+  summary: string;
+  tags: string[];
+  recommendations: string[];
+  cudaAnalysis: boolean;
+  redisCached: boolean;
+  neo4jPath: string | null;
+  timestamp: string;
+}
+
+interface ClusterCoordinate {
+  id: string | number;
+  [key: string]: unknown;
+}
+
 export async function POST({ locals }: RequestEvent) {
   if (!locals.user) return json({ success: false, error: 'Unauthorized' }, { status: 401 });
 
@@ -56,8 +73,8 @@ export async function POST({ locals }: RequestEvent) {
         timestamp: new Date().toISOString(),
       },
     });
-  } catch (error: any) {
-    console.error('Cluster summary generation failed:', error);
+  } catch (err) {
+    console.error('Cluster summary generation failed:', err);
     return json({ success: false, error: 'Cluster summary generation failed' }, { status: 500 });
   } finally {
     // Pool manages connection lifecycle
@@ -76,28 +93,28 @@ async function runCUDAClustering() {
 
     // Parse output
     const coordsMatch = stdout.match(/CLUSTER_COORDINATES: (.+)/);
-    const coordinates = coordsMatch ? JSON.parse(coordsMatch[1]) : [];
+    const coordinates: ClusterCoordinate[] = coordsMatch ? JSON.parse(coordsMatch[1]) : [];
 
     const clustersMatch = stdout.match(/CLUSTER_ASSIGNMENTS: (.+)/);
-    const clusters = clustersMatch ? JSON.parse(clustersMatch[1]) : {};
+    const clusters: Record<string, (string | number)[]> = clustersMatch ? JSON.parse(clustersMatch[1]) : {};
 
     return {
       cudaAccelerated: stdout.includes('CUDA: Available'),
       coordinates,
       clusters,
     };
-  } catch (err: any) {
-    console.warn('CUDA clustering failed, using fallback:', err.message);
+  } catch (err) {
+    console.warn('CUDA clustering failed, using fallback:', err instanceof Error ? err.message : err);
     return {
       cudaAccelerated: false,
-      coordinates: [],
-      clusters: {},
+      coordinates: [] as ClusterCoordinate[],
+      clusters: {} as Record<string, (string | number)[]>,
     };
   }
 }
 
-async function generateClusterSummaries(clusters: any) {
-  const summaries: any[] = [];
+async function generateClusterSummaries(clusters: Record<string, (string | number)[]>): Promise<ClusterSummary[]> {
+  const summaries: ClusterSummary[] = [];
 
   for (const [clusterId, errorIds] of Object.entries(clusters)) {
     if (!Array.isArray(errorIds) || errorIds.length === 0) continue;
@@ -132,7 +149,7 @@ async function generateClusterSummaries(clusters: any) {
   return summaries;
 }
 
-async function analyzeClusterWithLLM(clusterId: number, errors: any[]) {
+async function analyzeClusterWithLLM(clusterId: number, errors: Record<string, unknown>[]) {
   const prompt = `Cluster ID: ${clusterId}
 Error Count: ${errors.length}
 
@@ -185,7 +202,7 @@ Be concise and actionable.`;
   };
 }
 
-async function getClusterTags(errorIds: any[]): Promise<string[]> {
+async function getClusterTags(errorIds: (string | number)[]): Promise<string[]> {
   const tags = new Set<string>();
 
   // Sample Qdrant collections for tags
@@ -213,7 +230,7 @@ async function getClusterTags(errorIds: any[]): Promise<string[]> {
   return Array.from(tags).slice(0, 10);
 }
 
-async function updateQdrantTags(summaries: any[]) {
+async function updateQdrantTags(summaries: ClusterSummary[]) {
   for (const summary of summaries) {
     // Generate embedding for summary
     const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
@@ -249,7 +266,7 @@ async function updateQdrantTags(summaries: any[]) {
   }
 }
 
-async function cacheClusterCoordinates(coordinates: any[]) {
+async function cacheClusterCoordinates(coordinates: ClusterCoordinate[]) {
   const redis = getRedis();
   for (const coord of coordinates) {
     await redis.set(
@@ -261,12 +278,12 @@ async function cacheClusterCoordinates(coordinates: any[]) {
   }
 }
 
-async function updateNeo4jGraph(summaries: any[]) {
+async function updateNeo4jGraph(summaries: ClusterSummary[]) {
 	// TODO: Implement Neo4j Cypher queries
 	console.log('Neo4j graph update:', summaries.length, 'clusters');
 }
 
-async function syncToPostgreSQL(summaries: any[]) {
+async function syncToPostgreSQL(summaries: ClusterSummary[]) {
 	for (const summary of summaries) {
 		await db.execute(sql`
 			INSERT INTO phase89_cluster_summaries (
@@ -294,7 +311,7 @@ async function syncToPostgreSQL(summaries: any[]) {
 	}
 }
 
-async function syncToCouchDB(summaries: any[]) {
+async function syncToCouchDB(summaries: ClusterSummary[]) {
 	// TODO: Implement CouchDB sync
 	console.log('CouchDB sync:', summaries.length, 'documents');
 }

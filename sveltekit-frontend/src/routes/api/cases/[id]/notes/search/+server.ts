@@ -3,6 +3,7 @@ import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import { sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { isUuid } from '$lib/server/validation.js';
 
 const querySchema = z.object({
 	q: z.string().min(2, 'Search query must be at least 2 characters').max(500)
@@ -15,6 +16,8 @@ const querySchema = z.object({
  */
 export const GET: RequestHandler = async ({ params, url }) => {
 	const caseId = params.id;
+	if (!isUuid(caseId)) return json({ error: 'Invalid case ID format' }, { status: 400 });
+
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	if (!parsed.success) {
 		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });

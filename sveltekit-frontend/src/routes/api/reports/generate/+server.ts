@@ -16,6 +16,13 @@ const generateReportSchema = z.object({
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
+type CaseRow = typeof cases.$inferSelect;
+type EvidenceRow = typeof evidence.$inferSelect;
+type PersonRow = typeof personsOfInterest.$inferSelect;
+type CitationRow = typeof savedCitations.$inferSelect;
+
+interface ReportContent { html: string; json: Record<string, unknown>; raw: string }
+
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
@@ -37,7 +44,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     // Fetch evidence and persons for context
     const evidenceData = await db.select().from(evidence).where(eq(evidence.caseId, id));
-    let personsData: any[] = [];
+    let personsData: PersonRow[] = [];
     try {
       personsData = await db
         .select()
@@ -48,7 +55,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
 
     // Fetch saved citations linked to this case
-    let citationsData: any[] = [];
+    let citationsData: CitationRow[] = [];
     try {
       citationsData = await db
         .select()
@@ -69,7 +76,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     );
 
     // Create new report
-    let newReport: any = null;
+    let newReport: Record<string, unknown> | null = null;
     try {
       const { reports } = await import('$lib/server/db/schema');
       const [row] = await db
@@ -84,7 +91,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             type,
             contentJson: generatedContent.json,
             rawModelOutput: generatedContent.raw,
-            citationIds: citationsData.map((c: any) => c.id),
+            citationIds: citationsData.map((c) => c.id),
             citationCount: citationsData.length,
           },
         })
@@ -113,12 +120,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  * Try Ollama AI generation, fall back to template if unavailable
  */
 async function generateWithAI(
-  caseData: any,
-  evidenceData: any[],
-  personsData: any[],
+  caseData: CaseRow,
+  evidenceData: EvidenceRow[],
+  personsData: PersonRow[],
   type: string,
-  citationsData: any[] = []
-): Promise<{ html: string; json: any; raw: string }> {
+  citationsData: CitationRow[] = []
+): Promise<ReportContent> {
   const context = buildCaseContext(caseData, evidenceData, personsData, citationsData);
   const prompt = `You are a legal document generator. Generate a professional ${type === 'charging_memo' ? 'Charging Memorandum' : 'Legal Report'} in HTML format.
 
@@ -170,10 +177,10 @@ Output ONLY the HTML content (no markdown, no code fences). Use h1, h2, h3, p, u
 }
 
 function buildCaseContext(
-  caseData: any,
-  evidenceData: any[],
-  personsData: any[],
-  citationsData: any[] = []
+  caseData: CaseRow,
+  evidenceData: EvidenceRow[],
+  personsData: PersonRow[],
+  citationsData: CitationRow[] = []
 ): string {
   let ctx = `Title: ${caseData.title ?? 'Untitled'}\n`;
   ctx += `Status: ${caseData.status ?? 'Unknown'}\n`;
@@ -185,7 +192,7 @@ function buildCaseContext(
   if (personsData.length) {
     ctx += `\nPersons of Interest (${personsData.length}):\n`;
     for (const p of personsData) {
-      ctx += `- ${p.name ?? 'Unknown'} (${p.relationship ?? p.role ?? 'POI'}, threat: ${p.threatLevel ?? 'unknown'})\n`;
+      ctx += `- ${p.name ?? 'Unknown'} (${p.relationship ?? 'POI'}, threat: ${p.threatLevel ?? 'unknown'})\n`;
     }
   }
 
@@ -209,12 +216,12 @@ function buildCaseContext(
 }
 
 function generateTemplate(
-  caseData: any,
-  evidenceData: any[],
-  personsData: any[],
+  caseData: CaseRow,
+  evidenceData: EvidenceRow[],
+  personsData: PersonRow[],
   type: string,
-  citationsData: any[] = []
-): { html: string; json: any; raw: string } {
+  citationsData: CitationRow[] = []
+): ReportContent {
   let html = '';
 
   switch (type) {
@@ -227,13 +234,13 @@ function generateTemplate(
 <p><strong>Priority:</strong> ${caseData.priority || 'Normal'}</p>
 <p><strong>Opened:</strong> ${caseData.createdAt ? new Date(caseData.createdAt).toLocaleDateString() : 'Unknown'}</p>
 <h3>Persons of Interest</h3>
-${personsData.length > 0 ? `<ul>${personsData.map((p) => `<li><strong>${p.name || 'Unknown'}</strong> — ${p.relationship ?? p.role ?? 'Person of interest'}</li>`).join('')}</ul>` : '<p>No persons of interest identified.</p>'}
+${personsData.length > 0 ? `<ul>${personsData.map((p) => `<li><strong>${p.name || 'Unknown'}</strong> — ${p.relationship ?? 'Person of interest'}</li>`).join('')}</ul>` : '<p>No persons of interest identified.</p>'}
 <h3>Evidence Summary</h3>
 ${evidenceData.length > 0 ? `<ul>${evidenceData.map((e) => `<li><strong>${e.evidenceType ?? e.type ?? 'Document'}</strong>: ${e.description || 'No description'}</li>`).join('')}</ul>` : '<p>No evidence currently associated with this case.</p>'}
 ${
   citationsData.length > 0
     ? `<h3>Applicable Statutes &amp; Citations</h3>
-<ul>${citationsData.map((c: any) => `<li><strong>${c.statuteCode}</strong>${c.statuteTitle ? ': ' + c.statuteTitle : ''}${c.jurisdiction ? ' <em>(' + c.jurisdiction + ')</em>' : ''}${c.highlightedText ? '<br/><small>' + String(c.highlightedText).slice(0, 200) + '</small>' : ''}</li>`).join('')}</ul>`
+<ul>${citationsData.map((c) => `<li><strong>${c.statuteCode}</strong>${c.statuteTitle ? ': ' + c.statuteTitle : ''}${c.jurisdiction ? ' <em>(' + c.jurisdiction + ')</em>' : ''}${c.highlightedText ? '<br/><small>' + String(c.highlightedText).slice(0, 200) + '</small>' : ''}</li>`).join('')}</ul>`
     : ''
 }
 <h3>Recommended Charges</h3>
@@ -257,13 +264,13 @@ ${
 <h3>Initial Assessment</h3>
 <p><strong>Case Description:</strong> ${caseData.description || 'No description provided.'}</p>
 <h3>Persons Involved</h3>
-${personsData.length > 0 ? `<ul>${personsData.map((p) => `<li><strong>${p.name || 'Unknown'}</strong> (${p.relationship ?? p.role ?? 'Unknown role'})</li>`).join('')}</ul>` : '<p>No persons identified yet.</p>'}
+${personsData.length > 0 ? `<ul>${personsData.map((p) => `<li><strong>${p.name || 'Unknown'}</strong> (${p.relationship ?? 'Unknown role'})</li>`).join('')}</ul>` : '<p>No persons identified yet.</p>'}
 <h3>Initial Evidence</h3>
 ${evidenceData.length > 0 ? `<ul>${evidenceData.map((e) => `<li>${e.title ?? e.fileName ?? 'Untitled'} (${e.evidenceType ?? 'Document'})</li>`).join('')}</ul>` : '<p>No evidence uploaded yet.</p>'}
 ${
   citationsData.length > 0
     ? `<h3>Applicable Legal Authorities</h3>
-<ul>${citationsData.map((c: any) => `<li><strong>${c.statuteCode}</strong>${c.statuteTitle ? ': ' + c.statuteTitle : ''}${c.jurisdiction ? ' <em>(' + c.jurisdiction + ')</em>' : ''}${c.notes ? ' — ' + c.notes : ''}</li>`).join('')}</ul>`
+<ul>${citationsData.map((c) => `<li><strong>${c.statuteCode}</strong>${c.statuteTitle ? ': ' + c.statuteTitle : ''}${c.jurisdiction ? ' <em>(' + c.jurisdiction + ')</em>' : ''}${c.notes ? ' — ' + c.notes : ''}</li>`).join('')}</ul>`
     : ''
 }
 <h3>Recommended Next Steps</h3>
@@ -312,11 +319,11 @@ ${evidenceData
 <h3>Outstanding Discovery Requests</h3>
 <p><em>(List discovery requests and responses here)</em></p>
 <h3>Persons with Relevant Knowledge</h3>
-${personsData.length > 0 ? `<ul>${personsData.map((p) => `<li><strong>${p.name || 'Unknown'}</strong> — ${p.relationship ?? p.role ?? 'Witness'}</li>`).join('')}</ul>` : '<p>No persons identified.</p>'}
+${personsData.length > 0 ? `<ul>${personsData.map((p) => `<li><strong>${p.name || 'Unknown'}</strong> — ${p.relationship ?? 'Witness'}</li>`).join('')}</ul>` : '<p>No persons identified.</p>'}
 ${
   citationsData.length > 0
     ? `<h3>Relevant Legal Authorities</h3>
-<ul>${citationsData.map((c: any) => `<li><strong>${c.statuteCode}</strong>${c.statuteTitle ? ': ' + c.statuteTitle : ''}${c.jurisdiction ? ' <em>(' + c.jurisdiction + ')</em>' : ''}${c.highlightedText ? '<br/><small>' + String(c.highlightedText).slice(0, 200) + '</small>' : ''}</li>`).join('')}</ul>`
+<ul>${citationsData.map((c) => `<li><strong>${c.statuteCode}</strong>${c.statuteTitle ? ': ' + c.statuteTitle : ''}${c.jurisdiction ? ' <em>(' + c.jurisdiction + ')</em>' : ''}${c.highlightedText ? '<br/><small>' + String(c.highlightedText).slice(0, 200) + '</small>' : ''}</li>`).join('')}</ul>`
     : ''
 }`.trim();
       break;
@@ -339,7 +346,7 @@ ${evidenceData.length > 0 ? `<ul>${evidenceData.map((e) => `<li><strong>${e.titl
 <h3>Witnesses</h3>
 ${personsData.length > 0 ? `<ul>${personsData.map((p) => `<li><strong>${p.name || 'Unknown'}</strong> — Testimony focus: <em>(Brief description)</em></li>`).join('')}</ul>` : '<p>No witnesses identified.</p>'}
 <h3>Legal Citations</h3>
-${citationsData.length > 0 ? `<ul>${citationsData.map((c: any) => `<li><strong>${c.statuteCode}</strong>${c.statuteTitle ? ': ' + c.statuteTitle : ''}${c.jurisdiction ? ' <em>(' + c.jurisdiction + ')</em>' : ''}${c.highlightedText ? '<br/><small>' + String(c.highlightedText).slice(0, 200) + '</small>' : ''}</li>`).join('')}</ul>` : '<p><em>(List relevant statutes, cases, and legal authorities)</em></p>'}
+${citationsData.length > 0 ? `<ul>${citationsData.map((c) => `<li><strong>${c.statuteCode}</strong>${c.statuteTitle ? ': ' + c.statuteTitle : ''}${c.jurisdiction ? ' <em>(' + c.jurisdiction + ')</em>' : ''}${c.highlightedText ? '<br/><small>' + String(c.highlightedText).slice(0, 200) + '</small>' : ''}</li>`).join('')}</ul>` : '<p><em>(List relevant statutes, cases, and legal authorities)</em></p>'}
 <h3>Questions to Prepare For</h3>
 <p><em>1. (Potential question from judge)</em></p>
 <p><em>2. (Potential question from opposing counsel)</em></p>

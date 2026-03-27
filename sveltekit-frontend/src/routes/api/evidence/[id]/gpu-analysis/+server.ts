@@ -11,9 +11,11 @@ import type { RequestHandler } from './$types';
 import db from '$lib/server/db';
 import { evidence } from '$lib/server/db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
+import { isUuid } from '$lib/server/validation.js';
 
 export const GET: RequestHandler = async ({ params }) => {
 	const { id } = params;
+	if (!isUuid(id)) throw error(400, 'Invalid evidence ID format');
 
 	const rows = await db
 		.select({ metadata: evidence.metadata, caseId: evidence.caseId })
@@ -38,6 +40,7 @@ export const GET: RequestHandler = async ({ params }) => {
 
 export const POST: RequestHandler = async ({ params }) => {
 	const { id } = params;
+	if (!isUuid(id)) throw error(400, 'Invalid evidence ID format');
 
 	const rows = await db
 		.select({ caseId: evidence.caseId })

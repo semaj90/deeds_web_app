@@ -12,6 +12,21 @@ const { Pool } = pg;
 
 const pgPool = new Pool({ connectionString: getDatabaseUrl() });
 
+interface RouteInfo {
+	id: string;
+	path: string;
+	type: string;
+	errors: number;
+	complexity: number;
+	dependencies: string[];
+	exports: string[];
+	imports: string[];
+	lines: number;
+	functions: string[];
+	kb_vectors: number;
+	last_modified: string;
+}
+
 export const GET: RequestHandler = async () => {
 	try {
 		const srcPath = path.join(process.cwd(), 'src');
@@ -28,17 +43,17 @@ export const GET: RequestHandler = async () => {
 			GROUP BY file_path
 		`);
 
-		const errorMap = new Map();
-		errorResult.rows.forEach((row: any) => {
+		const errorMap = new Map<string, { errors: number; metadata: Record<string, unknown> }>();
+		errorResult.rows.forEach((row: { file_path: string; error_count: string; metadata: string | Record<string, unknown> }) => {
 			errorMap.set(row.file_path, {
 				errors: parseInt(row.error_count),
-				metadata: typeof row.metadata === 'string' ? JSON.parse(row.metadata) : row.metadata
+				metadata: typeof row.metadata === 'string' ? JSON.parse(row.metadata) : row.metadata as Record<string, unknown>
 			});
 		});
 
 		const kbCounts = await getKBCounts();
 
-		const enrichedRoutes = routes.map((route: any) => {
+		const enrichedRoutes = routes.map((route) => {
 			const errorData = errorMap.get(route.path) || { errors: 0, metadata: {} };
 			const kbCount = kbCounts.get(route.path) ?? 0;
 
@@ -54,8 +69,8 @@ export const GET: RequestHandler = async () => {
 			routes: enrichedRoutes,
 			summary: {
 				total: enrichedRoutes.length,
-				with_errors: enrichedRoutes.filter((r: any) => r.errors > 0).length,
-				in_kb: enrichedRoutes.filter((r: any) => r.kb_vectors > 0).length
+				with_errors: enrichedRoutes.filter((r) => r.errors > 0).length,
+				in_kb: enrichedRoutes.filter((r) => r.kb_vectors > 0).length
 			}
 		});
 
@@ -65,8 +80,8 @@ export const GET: RequestHandler = async () => {
 	}
 };
 
-async function scanDirectory(dir: string, basePath = ''): Promise<any[]> {
-	const routes: any[] = [];
+async function scanDirectory(dir: string, basePath = ''): Promise<RouteInfo[]> {
+	const routes: RouteInfo[] = [];
 	const entries = await fs.readdir(dir, { withFileTypes: true });
 
 	for (const entry of entries) {
@@ -90,7 +105,7 @@ async function scanDirectory(dir: string, basePath = ''): Promise<any[]> {
 	return routes;
 }
 
-async function analyzeFile(fullPath: string, relativePath: string) {
+async function analyzeFile(fullPath: string, relativePath: string): Promise<RouteInfo> {
 	const content = await fs.readFile(fullPath, 'utf-8');
 	const stats = await fs.stat(fullPath);
 	const lines = content.split('\n').length;
@@ -150,22 +165,22 @@ async function analyzeCode(content: string, ext: string) {
 		});
 
 		traverse.default(ast, {
-			FunctionDeclaration(path: any) {
-				if (path.node.id) {
-					result.functions.push(path.node.id.name);
+			FunctionDeclaration(p: { node: { id?: { name: string } } }) {
+				if (p.node.id) {
+					result.functions.push(p.node.id.name);
 				}
 			},
-			ArrowFunctionExpression(path: any) {
-				if (path.parent.type === 'VariableDeclarator' && path.parent.id) {
-					result.functions.push(path.parent.id.name);
+			ArrowFunctionExpression(p: { parent: { type: string; id?: { name: string } } }) {
+				if (p.parent.type === 'VariableDeclarator' && p.parent.id) {
+					result.functions.push(p.parent.id.name);
 				}
 			},
-			ImportDeclaration(path: any) {
-				result.imports.push(path.node.source.value);
+			ImportDeclaration(p: { node: { source: { value: string } } }) {
+				result.imports.push(p.node.source.value);
 			},
-			ExportNamedDeclaration(path: any) {
-				if (path.node?.declaration && path.node.declaration.id) {
-					result.exports.push(path.node.declaration.id.name);
+			ExportNamedDeclaration(p: { node?: { declaration?: { id?: { name: string } } } }) {
+				if (p.node?.declaration && p.node.declaration.id) {
+					result.exports.push(p.node.declaration.id.name);
 				}
 			}
 		});
@@ -177,7 +192,7 @@ async function analyzeCode(content: string, ext: string) {
 }
 
 async function getKBCounts(): Promise<Map<string, number>> {
-	const counts = new Map();
+	const counts = new Map<string, number>();
 
 	try {
 		const response = await fetch(`${QDRANT_URL}/collections/phase76_knowledge_base/points/scroll`, {
@@ -192,10 +207,10 @@ async function getKBCounts(): Promise<Map<string, number>> {
 
 		const data = await response.json();
 		if (data.result?.points) {
-			data.result.points.forEach((point: any) => {
+			data.result.points.forEach((point: { payload?: Record<string, unknown> }) => {
 				const filePath = point.payload?.file_path ?? point.payload?.path;
 				if (filePath) {
-					counts.set(filePath, (counts.get(filePath) ?? 0) + 1);
+					counts.set(filePath as string, (counts.get(filePath as string) ?? 0) + 1);
 				}
 			});
 		}

@@ -477,6 +477,10 @@ export class RabbitMQManager extends EventEmitter {
           console.warn('⚠️ Analytics DB persist failed (non-fatal):', this.formatError(dbErr));
         }
       }
+      // Sync user interaction to Neo4j graph + embed search queries to Qdrant (fire-and-forget)
+      import('../graph/user-interaction-sync.js')
+        .then(({ syncUserInteractionToGraph }) => syncUserInteractionToGraph(data))
+        .catch(() => {});
       this.channel.ack(msg);
     } catch (error) {
       console.error('❌ Analytics track error:', this.formatError(error));

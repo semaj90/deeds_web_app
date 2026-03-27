@@ -111,7 +111,7 @@ async function persistProcessingDiagnostics(
 /** Check Redis for cached extraction result by file SHA-256 hash. */
 async function getCachedExtraction(
   fileHash: string
-): Promise<{ text: string; method: string; doclingBlocks?: any[] } | null> {
+): Promise<{ text: string; method: string; doclingBlocks?: Record<string, unknown>[] } | null> {
   try {
     const cached = await redis.get(`${EXTRACTION_CACHE_PREFIX}${fileHash}`);
     if (cached) return JSON.parse(cached);
@@ -124,7 +124,7 @@ async function getCachedExtraction(
 /** Cache extraction result in Redis keyed by file SHA-256 hash. */
 async function setCachedExtraction(
   fileHash: string,
-  result: { text: string; method: string; doclingBlocks?: any[] }
+  result: { text: string; method: string; doclingBlocks?: Record<string, unknown>[] }
 ): Promise<void> {
   try {
     // Only cache results with meaningful text (>50 chars)
@@ -249,7 +249,8 @@ export async function POST({ request, locals }: RequestEvent) {
 			)
 			RETURNING id
 		`);
-    const inserted = { id: (insertResult as any).rows?.[0]?.id ?? (insertResult as any)[0]?.id };
+    const resultRows = Array.isArray(insertResult) ? insertResult : (insertResult as { rows?: Record<string, any>[] }).rows ?? [];
+    const inserted = { id: (resultRows[0] as Record<string, any>)?.id };
 
     const evidenceId = inserted.id;
     updateJob(jobId, {
@@ -335,7 +336,7 @@ async function extractText(
   fileName: string,
   buffer: Buffer,
   mimeType?: string
-): Promise<{ text: string; method: string; doclingBlocks?: any[] }> {
+): Promise<{ text: string; method: string; doclingBlocks?: Record<string, unknown>[] }> {
   const isPDF = /\.pdf$/i.test(fileName);
   const isImage = /\.(png|jpg|jpeg|tiff|tif|bmp|webp)$/i.test(fileName);
   const isAudio =
@@ -957,7 +958,7 @@ async function processAndEmbed(
 
   // 6b. YOLO + VLM image analysis in parallel (both independent, non-fatal)
   const isImage = /\.(png|jpg|jpeg|tiff|tif|bmp|webp)$/i.test(fileName);
-  let yoloDetections: { objects: any[]; layout: any; modelType: string } | null = null;
+  let yoloDetections: { objects: { class: string; confidence: number }[]; layout: Record<string, unknown>; modelType: string } | null = null;
   let visionAnalysis: {
     summary?: string;
     keyFindings?: string[];
@@ -1005,7 +1006,7 @@ async function processAndEmbed(
           signal: AbortSignal.timeout(30_000),
         });
         if (visionRes.ok) {
-          const result = (await visionRes.json()) as any;
+          const result = (await visionRes.json()) as Record<string, any>;
           console.log(
             `[Upload] VLM analysis complete for ${fileName}: ${result?.keyFindings?.length ?? 0} findings`
           );
@@ -1051,7 +1052,7 @@ async function processAndEmbed(
   }
 
   // 6c. LangExtract + NLP classification in parallel (both independent, non-fatal)
-  let evidenceProfile: any = null;
+  let evidenceProfile: Record<string, any> | null = null;
   let nlpClassification: {
     documentType: string;
     practiceArea: string;
@@ -1287,7 +1288,7 @@ async function processAndEmbed(
       suggestedTags: [
         ...(evidenceProfile?.suggested_tags ?? []),
         ...(visionAnalysis?.suggestedTags ?? []),
-        ...(yoloDetections?.objects?.map((o: any) => `detected:${o.class}`) ?? []),
+        ...(yoloDetections?.objects?.map((o) => `detected:${o.class}`) ?? []),
       ].filter(Boolean),
       analysisTimestamp: diagnostics.completedAt,
     });

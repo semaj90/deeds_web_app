@@ -3,13 +3,16 @@ import { personsOfInterest } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
 import { eq, ne, and, sql, inArray } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { isUuid } from '$lib/server/validation.js';
 
 /**
  * GET /api/persons-of-interest/[id]/associates
  * Returns persons who share cases with the target person (implicit associates).
  * No separate join table needed — derives from shared caseIds arrays.
  */
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+	if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
 	const poiId = params.id;
 
 	try {

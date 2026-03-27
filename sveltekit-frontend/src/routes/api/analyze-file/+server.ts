@@ -46,7 +46,7 @@ export async function POST({ request, locals }: RequestEvent) {
 		const patterns = await searchPatterns(filePath);
 
 		// 4. PostgreSQL: Get errors for this file
-		const errors: any = await db.execute(sql`
+		const errors = await db.execute(sql`
 			SELECT message, code, line_number, timestamp
 			FROM raw_error_embeddings
 			WHERE source = ${filePath}
@@ -101,8 +101,8 @@ export async function POST({ request, locals }: RequestEvent) {
 			qdrantTag,
 			patterns
 		});
-	} catch (error: any) {
-		console.error('File analysis failed:', error);
+	} catch (err) {
+		console.error('File analysis failed:', err);
 		return json({ success: false, error: 'File analysis failed' }, { status: 500 });
 	}
 }
@@ -124,8 +124,16 @@ async function extractComments(filePath: string): Promise<string[]> {
 	}
 }
 
-async function searchPatterns(filePath: string): Promise<any> {
-	const patterns = {
+interface PatternCounts {
+	todoComments: number;
+	fixmeComments: number;
+	anyTypes: number;
+	errorHandlers: number;
+	svelte5Runes: number;
+}
+
+async function searchPatterns(filePath: string): Promise<PatternCounts> {
+	const patterns: PatternCounts = {
 		todoComments: 0,
 		fixmeComments: 0,
 		anyTypes: 0,
@@ -155,7 +163,7 @@ async function analyzeFileWithLLM(
 	filePath: string,
 	content: string,
 	comments: string[],
-	errors: any[]
+	errors: Record<string, unknown>[]
 ) {
 	const prompt = `
 File: ${filePath}
@@ -223,7 +231,7 @@ Be concise and actionable.`;
 	}
 }
 
-async function generateEnhancedTag(filePath: string, analysis: any) {
+async function generateEnhancedTag(filePath: string, analysis: { summary: string; recommendations: string[] }) {
 	const fileName = filePath.split(/[\\/]/).pop() ?? '';
 	const fileType = fileName.split('.').pop() ?? '';
 

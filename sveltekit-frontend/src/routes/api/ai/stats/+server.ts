@@ -48,10 +48,10 @@ export const GET: RequestHandler = async () => {
 		const db = (await import('$lib/server/db')).default;
 
 		const [chats, docs, cites, cases] = await Promise.all([
-			db.execute(sql`SELECT COUNT(*)::int AS c FROM chat_metadata`).then((r) => [...r][0] as any).catch(() => ({ c: 0 })),
-			db.execute(sql`SELECT COUNT(*)::int AS c FROM evidence`).then((r) => [...r][0] as any).catch(() => ({ c: 0 })),
-			db.execute(sql`SELECT COUNT(*)::int AS c FROM saved_citations`).then((r) => [...r][0] as any).catch(() => ({ c: 0 })),
-			db.execute(sql`SELECT COUNT(*)::int AS c FROM cases`).then((r) => [...r][0] as any).catch(() => ({ c: 0 }))
+			db.execute(sql`SELECT COUNT(*)::int AS c FROM chat_metadata`).then((r) => [...r][0] as { c: number } | undefined).catch(() => ({ c: 0 })),
+			db.execute(sql`SELECT COUNT(*)::int AS c FROM evidence`).then((r) => [...r][0] as { c: number } | undefined).catch(() => ({ c: 0 })),
+			db.execute(sql`SELECT COUNT(*)::int AS c FROM saved_citations`).then((r) => [...r][0] as { c: number } | undefined).catch(() => ({ c: 0 })),
+			db.execute(sql`SELECT COUNT(*)::int AS c FROM cases`).then((r) => [...r][0] as { c: number } | undefined).catch(() => ({ c: 0 }))
 		]);
 		activeChats = Number(chats?.c ?? 0);
 		documentsAnalyzed = Number(docs?.c ?? 0);

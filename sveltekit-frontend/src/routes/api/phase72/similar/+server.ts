@@ -36,7 +36,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			WHERE error_hash = ${hash}
 			LIMIT 1
 		`);
-		const source = ((sourceResult as any).rows ?? sourceResult ?? [])[0];
+		const source = (sourceResult.rows as Record<string, any>[])[0];
 		if (!source) {
 			return json({ success: false, error: 'Error not found' }, { status: 404 });
 		}
@@ -67,7 +67,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			LIMIT ${limit}
 		`);
 
-		const similarErrors = (similarResult as any).rows ?? similarResult ?? [];
+		const similarErrors = similarResult.rows as Record<string, any>[];
 
 		// Try to get cluster summary if phase72_cluster tables exist
 		let clusterSummary = null;
@@ -80,7 +80,7 @@ export const GET: RequestHandler = async ({ url }) => {
 				ORDER BY cs.created_at DESC
 				LIMIT 1
 			`);
-			const row = ((clusterResult as any).rows ?? clusterResult ?? [])[0];
+			const row = (clusterResult.rows as Record<string, any>[])[0];
 			if (row) {
 				clusterSummary = { summary: row.summary, suggested_fixes: null };
 			}
@@ -123,7 +123,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			SELECT code, file_path, message, severity, COALESCE(line, 0) AS line_num
 			FROM phase72_error WHERE error_hash = ${error_hash} LIMIT 1
 		`);
-		const source = ((sourceResult as any).rows ?? sourceResult ?? [])[0];
+		const source = (sourceResult.rows as Record<string, any>[])[0];
 		if (source) {
 			prompt += `**Error:** ${source.code} at ${source.file_path}:${source.line_num}\n`;
 			prompt += `**Message:** ${source.message}\n`;

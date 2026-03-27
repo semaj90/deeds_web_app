@@ -4,10 +4,10 @@ import { z } from 'zod';
 
 const canvasSaveSchema = z.object({
 	caseId: z.string().uuid(),
-	canvasData: z.any().optional(),
-	evidenceNodes: z.array(z.any()).optional(),
-	connections: z.array(z.any()).optional(),
-	annotations: z.array(z.any()).optional(),
+	canvasData: z.unknown().optional(),
+	evidenceNodes: z.array(z.unknown()).optional(),
+	connections: z.array(z.unknown()).optional(),
+	annotations: z.array(z.unknown()).optional(),
 	timestamp: z.string().optional()
 });
 

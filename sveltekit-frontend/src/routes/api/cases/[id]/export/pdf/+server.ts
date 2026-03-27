@@ -2,6 +2,7 @@ import { db } from '$lib/server/db/client';
 import { cases, evidence, caseNotes, citations, personsOfInterest } from '$lib/server/db/schema';
 import { arrayContains, eq, desc, sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { isUuid } from '$lib/server/validation.js';
 
 const safe = <T>(p: Promise<T>, fallback: T): Promise<T> =>
 	Promise.race([p, new Promise<T>((_, reject) => setTimeout(() => reject('timeout'), 5000))]).catch(
@@ -37,6 +38,12 @@ function fmtDate(d: string | Date | null | undefined): string {
  */
 export const POST: RequestHandler = async ({ params }) => {
 	const id = params.id;
+	if (!isUuid(id)) {
+		return new Response(JSON.stringify({ error: 'Invalid case ID format' }), {
+			status: 400,
+			headers: { 'Content-Type': 'application/json' }
+		});
+	}
 
 	const caseRows = await safe(
 		db.select().from(cases).where(eq(cases.id, id)).limit(1),

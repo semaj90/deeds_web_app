@@ -6,6 +6,7 @@ import { eq, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { isUuid } from '$lib/server/validation.js';
 
 /** GBNF-constrained response schema for evidence key points */
 const evidenceKeyPointsResponseSchema = z.object({
@@ -24,6 +25,7 @@ const keyPointsSchema = z.object({
  */
 export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+	if (!isUuid(params.id)) return json({ error: 'Invalid evidence ID format' }, { status: 400 });
 
 	const rows = await db
 		.select({ aiAnalysis: evidence.aiAnalysis })
@@ -48,6 +50,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
  */
 export const POST: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+	if (!isUuid(params.id)) return json({ error: 'Invalid evidence ID format' }, { status: 400 });
 
 	let rawBody: unknown;
 	try { rawBody = await request.json(); } catch { rawBody = {}; }

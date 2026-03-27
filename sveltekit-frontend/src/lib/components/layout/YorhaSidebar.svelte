@@ -33,6 +33,7 @@
 		{ label: 'EVIDENCE LIBRARY', icon: 'library', href: '/evidence-library' },
 		{ label: 'CITATIONS', icon: 'scroll-text', href: '/citations' },
 		{ label: 'LEGAL CORPUS', icon: 'book-open', href: '/legal-corpus' },
+		{ label: 'FICTIONAL CASES', icon: 'flask-conical', href: '/fictional-cases' },
 		{ label: 'LEGAL LIBRARY', icon: 'library-big', href: '/library' },
 		{ label: 'GLOSSARY', icon: 'book-open-text', href: '/library/glossary' },
 		{ label: 'PERSONS OF INTEREST', icon: 'users', href: '/persons-of-interest' },

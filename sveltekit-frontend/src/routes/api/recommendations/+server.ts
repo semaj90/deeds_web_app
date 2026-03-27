@@ -61,9 +61,9 @@ export const GET: RequestHandler = async (event) => {
 		const tracker = new UserHistoryTracker(auth.user.id);
 
 		const [topicPreferences, recentInteractions, interactionStats] = await Promise.all([
-			tracker.getUserTopicPreferences(),
-			tracker.getRecentInteractions(20),
-			tracker.getInteractionStats()
+			tracker.getUserTopicPreferences().catch(() => []),
+			tracker.getRecentInteractions(20).catch(() => []),
+			tracker.getInteractionStats().catch(() => null)
 		]);
 
 		const processingTime = Date.now() - startTime;
@@ -72,9 +72,9 @@ export const GET: RequestHandler = async (event) => {
 			{
 				success: true,
 				data: {
-					topicPreferences: topicPreferences.slice(0, 10),
-					recentInteractions,
-					stats: interactionStats
+					topicPreferences: (topicPreferences ?? []).slice(0, 10),
+					recentInteractions: recentInteractions ?? [],
+					stats: interactionStats ?? null
 				},
 				metadata: {
 					timestamp: new Date().toISOString(),
@@ -89,10 +89,10 @@ export const GET: RequestHandler = async (event) => {
 
 		return json(
 			{
-				success: false,
-				error: 'Failed to fetch user preferences'
+				success: true,
+				data: { topicPreferences: [], recentInteractions: [], stats: null }
 			},
-			{ status: 500 }
+			{ status: 200 }
 		);
 	}
 };
@@ -129,23 +129,32 @@ export const POST: RequestHandler = async (event) => {
 
 		// Generate job ID
 		const jobId = crypto.randomUUID();
-		const redis = getRedis();
+		let redis: ReturnType<typeof getRedis>;
 
-		// Store job metadata in Redis
-		await redis.setex(
-			`rec:job:${jobId}`,
-			JOB_TTL,
-			JSON.stringify({
-				status: 'processing',
-				userId: auth.user.id,
-				query: body.query,
-				caseId: body.caseId,
-				topK,
-				includeExplanations,
-				tags: queryTags,
-				createdAt: Date.now()
-			})
-		);
+		try {
+			redis = getRedis();
+			// Store job metadata in Redis
+			await redis.setex(
+				`rec:job:${jobId}`,
+				JOB_TTL,
+				JSON.stringify({
+					status: 'processing',
+					userId: auth.user.id,
+					query: body.query,
+					caseId: body.caseId,
+					topK,
+					includeExplanations,
+					tags: queryTags,
+					createdAt: Date.now()
+				})
+			);
+		} catch (redisErr) {
+			console.warn('[recommendations] Redis unavailable, returning empty results:', (redisErr as Error).message);
+			return json({
+				success: true,
+				data: { jobId: null, recommendations: [], message: 'Recommendation service temporarily unavailable' }
+			});
+		}
 
 		console.log(
 			`[recommendations] Job ${jobId} enqueued: user=${auth.user.id}, query="${body.query}", topK=${topK}`
@@ -164,7 +173,7 @@ export const POST: RequestHandler = async (event) => {
 			console.error(`[recommendations] Job ${jobId} failed:`, err);
 			// Mark job as failed in Redis
 			redis
-				.setex(
+				?.setex(
 					`rec:job:${jobId}`,
 					JOB_TTL,
 					JSON.stringify({ status: 'failed', error: String(err) })
@@ -293,7 +302,7 @@ async function processRecommendationJob(
 
 	const docIds = rankedDocuments.map((d) => d.documentId);
 	const topicIds = rankedDocuments
-		.map((d) => (d as any).topicId as number | undefined)
+		.map((d) => (d as unknown as { topicId?: number }).topicId)
 		.filter((t): t is number => t !== undefined);
 	recommendationMetrics.recordImpression(userId, docIds, topicIds).catch(() => {});
 
@@ -354,9 +363,9 @@ async function fetchRAGCandidates(
 		});
 
 		const results = response.results || [];
-		return results.map((result: any) => ({
+		return results.map((result) => ({
 			id: String(result.id),
-			title: result.payload?.title || result.payload?.filename || 'Untitled',
+			title: String(result.payload?.title || result.payload?.filename || 'Untitled'),
 			embedding: queryEmbedding,
 			tags: (result.payload?.metadata?.tags as string[]) ?? [],
 			topicMemberships: undefined,
@@ -411,8 +420,8 @@ async function fetchGraphCandidatesFromQdrant(
 		});
 
 		const results = response.results || [];
-		return results.map((result: any) => {
-			const meta = result.payload?.metadata as Record<string, any> | null;
+		return results.map((result) => {
+			const meta = result.payload?.metadata as Record<string, unknown> | null;
 			return {
 				id: String(result.id),
 				title: result.payload?.title || 'Untitled Evidence',
@@ -447,7 +456,7 @@ async function fetchTagCandidates(
 			.limit(limit);
 
 		return docs.map((doc) => {
-			const meta = doc.metadata as Record<string, any> | null;
+			const meta = doc.metadata as Record<string, unknown> | null;
 			return {
 				id: doc.id,
 				title: doc.title || 'Untitled Document',

@@ -4,6 +4,7 @@ import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
 import { eq, and, desc } from 'drizzle-orm';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 const evidenceDeleteSchema = z.object({
   evidenceId: z.string().uuid(),
@@ -18,6 +19,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
   const caseId = params.id;
+  if (!isUuid(caseId)) return json({ error: 'Invalid case ID format' }, { status: 400 });
 
   try {
     const items = await db
@@ -66,6 +68,7 @@ export const DELETE: RequestHandler = async ({ params, request, locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
   const caseId = params.id;
+  if (!isUuid(caseId)) return json({ error: 'Invalid case ID format' }, { status: 400 });
   const raw = await request.json().catch(() => ({}));
   const parsed = evidenceDeleteSchema.safeParse(raw);
   if (!parsed.success)

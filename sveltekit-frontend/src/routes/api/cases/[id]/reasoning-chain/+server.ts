@@ -11,6 +11,7 @@ import type { RequestHandler } from './$types';
 import { generateReasoningChain } from '$lib/server/ai/legal-reasoning-chain.js';
 import { requireAuth } from '$lib/server/auth-helpers.js';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 const reasoningChainSchema = z.object({
 	summary: z.string().trim().min(10, 'summary is required (minimum 10 characters)').max(50000),
@@ -22,6 +23,9 @@ const reasoningChainSchema = z.object({
 export const POST: RequestHandler = async (event) => {
 	await requireAuth(event);
 	const caseId = event.params.id;
+	if (!isUuid(caseId)) {
+		return json({ error: 'Invalid case ID format' }, { status: 400 });
+	}
 	const startTime = Date.now();
 
 	try {

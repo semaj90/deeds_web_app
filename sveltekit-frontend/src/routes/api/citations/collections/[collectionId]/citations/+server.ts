@@ -4,6 +4,7 @@ import { db } from '$lib/server/db/client';
 import { citationCollections, collectionCitations, citations } from '$lib/server/db/schema-postgres.js';
 import { eq, and, sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 const collectionCitationSchema = z.object({
 	citationId: z.string().min(1, 'Missing required field: citationId').max(500),
@@ -18,6 +19,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}
+	if (!isUuid(params.collectionId)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
 	const { collectionId } = params;
 
@@ -97,6 +99,7 @@ export const DELETE: RequestHandler = async ({ locals, params, request }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}
+	if (!isUuid(params.collectionId)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
 	const { collectionId } = params;
 
@@ -162,6 +165,7 @@ export const GET: RequestHandler = async ({ locals, params }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}
+	if (!isUuid(params.collectionId)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
 	const { collectionId } = params;
 

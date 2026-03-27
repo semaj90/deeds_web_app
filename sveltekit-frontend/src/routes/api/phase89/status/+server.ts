@@ -95,7 +95,7 @@ export const GET: RequestHandler = async () => {
 
 		const clusters = {
 			total: clusterResult?.rowCount ?? 0,
-			top_patterns: clusterResult.rows.map((row: any) => ({
+			top_patterns: clusterResult.rows.map((row: Record<string, any>) => ({
 				pattern: row?.cluster_pattern ?? 'Unknown',
 				count: parseInt(row.count),
 				confidence: parseFloat(row?.avg_confidence ?? '0')
@@ -113,7 +113,7 @@ export const GET: RequestHandler = async () => {
 			LIMIT 20
 		`);
 
-		const timeline = timelineResult.rows.map((row: any) => ({
+		const timeline = timelineResult.rows.map((row: Record<string, any>) => ({
 			timestamp: row.timestamp,
 			event_type: row.event_type,
 			file_path: row.file_path,
@@ -133,7 +133,7 @@ export const GET: RequestHandler = async () => {
 			LIMIT 10
 		`);
 
-		const cosine_rankings = rankingsResult.rows.map((row: any) => ({
+		const cosine_rankings = rankingsResult.rows.map((row: Record<string, any>) => ({
 			query: row.query_text,
 			top_match: row.top_match,
 			similarity: parseFloat(row.similarity_score),

@@ -6,8 +6,10 @@ import { z } from 'zod';
 
 const searchQuerySchema = z.object({
 	q: z.string().min(2, 'Query must be at least 2 characters').max(1000),
-	type: z.enum(['all', 'cases', 'evidence', 'poi', 'citations', 'legal', 'glossary', 'reports', 'messages']).default('all'),
+	type: z.enum(['all', 'cases', 'evidence', 'poi', 'citations', 'legal', 'glossary', 'reports', 'messages', 'canon']).default('all'),
 	limit: z.coerce.number().int().min(1).max(50).default(10),
+	jurisdiction: z.string().max(20).optional(),
+	authority: z.enum(['primary', 'persuasive', 'secondary', 'fictional']).optional(),
 });
 import {
 	cases,
@@ -76,7 +78,21 @@ function mapGoHit(h: Record<string, unknown>): PlatformSearchHit {
 
 // ── gRPC Client for Go Search Service (lazy-loaded, singleton) ──────────
 
-let goGrpcClient: any = null;
+interface GrpcSearchClient {
+	SearchLibrary(
+		req: Record<string, unknown>,
+		opts: Record<string, unknown>,
+		cb: (err: Error | null, response: Record<string, unknown>) => void
+	): void;
+}
+
+interface QdrantPoint {
+	id?: string | number;
+	score: number;
+	payload?: Record<string, unknown>;
+}
+
+let goGrpcClient: GrpcSearchClient | null = null;
 let goGrpcFailed = false;
 let goGrpcRetryAt = 0;
 
@@ -106,7 +122,7 @@ async function tryGoGrpcSearch(q: string, limit: number): Promise<PlatformSearch
 				defaults: true,
 				oneofs: true,
 			});
-			const proto = grpc.loadPackageDefinition(packageDef) as any;
+			const proto = grpc.loadPackageDefinition(packageDef) as Record<string, any>;
 			const ServiceClass = proto.yorha?.legal?.LibrarySearchService
 				?? proto.libsearch?.LibrarySearchService
 				?? proto.LibrarySearchService;
@@ -127,7 +143,7 @@ async function tryGoGrpcSearch(q: string, limit: number): Promise<PlatformSearch
 			goGrpcClient.SearchLibrary(
 				{ query: q, limit, include_snippets: true },
 				{ deadline },
-				(err: any, response: any) => {
+				(err: Error | null, response: Record<string, unknown>) => {
 					if (err) return reject(err);
 					const hits = (response?.hits ?? response?.results ?? []) as Record<string, unknown>[];
 					resolve(hits.map(mapGoHit));
@@ -422,6 +438,77 @@ async function searchMessages(q: string, limit: number): Promise<PlatformSearchH
 	}));
 }
 
+/** Search canonical legal knowledge via Qdrant hybrid dense+sparse search */
+async function searchCanon(q: string, limit: number, jurisdiction?: string, authority?: string): Promise<PlatformSearchHit[]> {
+	try {
+		const { generateEmbeddings } = await import('$lib/server/grpc/embedding-client.js');
+		const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
+		const { generateSparseVector } = await import('$lib/server/vector/bm42-sparse.js');
+
+		const embedResult = await generateEmbeddings([q]);
+		const queryVec = embedResult.vectors[0];
+		if (!queryVec || queryVec.length !== 768) return [];
+
+		const sparseVec = generateSparseVector(q);
+
+		// Build payload filter for jurisdiction + authority level
+		const mustConditions: any[] = [];
+		if (jurisdiction) {
+			mustConditions.push({ key: 'jurisdiction', match: { value: jurisdiction } });
+		}
+		if (authority) {
+			mustConditions.push({ key: 'authority_level', match: { value: authority } });
+		}
+		const filter = mustConditions.length > 0 ? { must: mustConditions } : undefined;
+
+		// Hybrid search: dense (content) + sparse (bm25) with RRF fusion
+		let points: QdrantPoint[];
+		try {
+			const response = await qdrant.client.query('legal_canon_chunks', {
+				prefetch: [
+					{ query: queryVec, using: 'content', limit: limit * 3, ...(filter ? { filter } : {}) },
+					...(sparseVec.indices.length > 0
+						? [{ query: sparseVec, using: 'bm25', limit: limit * 3, ...(filter ? { filter } : {}) }]
+						: []),
+				],
+				query: { fusion: 'rrf' },
+				limit,
+				with_payload: true,
+				...(filter ? { filter } : {}),
+			});
+			points = ((response as { points?: QdrantPoint[] }).points ?? []);
+		} catch {
+			// Fallback to dense-only if hybrid fails
+			const fallback = await qdrant.client.search('legal_canon_chunks', {
+				vector: { name: 'content', vector: queryVec },
+				limit,
+				score_threshold: 0.3,
+				...(filter ? { filter } : {}),
+			});
+			points = fallback as QdrantPoint[];
+		}
+
+		return points.map((r) => ({
+			id: (r.payload?.chunk_id ?? r.id) as string,
+			entityType: 'statute' as const,
+			title: (r.payload?.citation ?? r.payload?.doc_title ?? 'Canon Chunk') as string,
+			snippet: ((r.payload?.content as string) ?? '').slice(0, 250),
+			score: r.score,
+			matchType: 'fused' as const,
+			route: '/legal-corpus',
+			jurisdiction: (r.payload?.jurisdiction ?? '') as string,
+			metadata: {
+				docType: r.payload?.doc_type,
+				authorityLevel: r.payload?.authority_level,
+				semanticLabel: r.payload?.semantic_label,
+				domains: r.payload?.domains,
+			},
+		}));
+	} catch {
+		return [];
+	}
+}
+
 // ── Main Handler ──────────────────────────────────────────────────────────
 
 export const GET: RequestHandler = async ({ url }) => {
@@ -429,11 +516,13 @@ export const GET: RequestHandler = async ({ url }) => {
 		q: url.searchParams.get('q')?.trim() ?? '',
 		type: url.searchParams.get('type') ?? undefined,
 		limit: url.searchParams.get('limit') ?? undefined,
+		jurisdiction: url.searchParams.get('jurisdiction') ?? undefined,
+		authority: url.searchParams.get('authority') ?? undefined,
 	});
 	if (!parsed.success) {
 		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
 	}
-	const { q, type, limit } = parsed.data;
+	const { q, type, limit, jurisdiction, authority } = parsed.data;
 
 	const startTime = performance.now();
 	const adapterTimings: AdapterTimings = {};
@@ -465,6 +554,9 @@ export const GET: RequestHandler = async ({ url }) => {
 		}
 		if (type === 'all' || type === 'messages') {
 			adapters.push({ name: 'messages', fn: () => searchMessages(q, limit) });
+		}
+		if (type === 'all' || type === 'canon') {
+			adapters.push({ name: 'canon', fn: () => searchCanon(q, limit, jurisdiction, authority) });
 		}
 
 		// Fan out with Promise.allSettled — individual failures don't break the search

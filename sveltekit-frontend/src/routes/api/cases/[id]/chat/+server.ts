@@ -4,6 +4,7 @@ import { chatMessages } from '$lib/server/db/schema-postgres';
 import { chatMetadata } from '$lib/server/db/schema-chat';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 const chatMessageItemSchema = z.object({
 	role: z.enum(['user', 'assistant', 'system']),
@@ -29,6 +30,9 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 
 		if (!user) {
 			return json({ error: 'Unauthorized' }, { status: 401 });
+		}
+		if (!isUuid(id)) {
+			return json({ error: 'Invalid case ID format' }, { status: 400 });
 		}
 
 		const raw = await request.json();
@@ -101,6 +105,9 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 
 		if (!user) {
 			return json({ error: 'Unauthorized' }, { status: 401 });
+		}
+		if (!isUuid(id)) {
+			return json({ error: 'Invalid case ID format' }, { status: 400 });
 		}
 
 		const chatId = url.searchParams.get('chatId') || `board-${id}`;

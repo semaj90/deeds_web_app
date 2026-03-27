@@ -3,12 +3,16 @@ import { caseNoteVersions } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
 import { eq, desc } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { validateUuidParams } from '$lib/server/validation.js';
 
 /**
  * GET /api/cases/[id]/notes/[noteId]/versions
  * List all versions for a note (most recent first)
  */
 export const GET: RequestHandler = async ({ params }) => {
+	const invalid = validateUuidParams(params, 'id', 'noteId');
+	if (invalid) return invalid;
+
 	try {
 		const versions = await db
 			.select()

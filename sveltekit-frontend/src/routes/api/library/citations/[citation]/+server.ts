@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { getLawCitationDetail } from '$lib/server/legal/law-citations';
+import { isValidCitation } from '$lib/server/validation.js';
 
 const querySchema = z.object({
 	limit: z.coerce.number().int().min(1).max(200).default(24)
@@ -13,6 +14,7 @@ export const GET: RequestHandler = async ({ locals, params, url }) => {
 	}
 
 	const citation = decodeURIComponent(params.citation);
+	if (!isValidCitation(citation)) return json({ error: 'Invalid citation format' }, { status: 400 });
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	const limit = parsed.success ? parsed.data.limit : 24;
 

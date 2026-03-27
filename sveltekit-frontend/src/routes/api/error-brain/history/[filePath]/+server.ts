@@ -3,6 +3,7 @@ import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
+import { isValidFilePath } from '$lib/server/validation.js';
 
 const querySchema = z.object({
 	limit: z.coerce.number().int().min(1).max(100).default(20)
@@ -17,6 +18,7 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 
 	const filePath = decodeURIComponent(params.filePath);
+	if (!isValidFilePath(filePath)) throw error(400, 'Invalid file path format');
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	const limit = parsed.success ? parsed.data.limit : 20;
 

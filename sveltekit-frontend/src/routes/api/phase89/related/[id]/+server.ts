@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 import { getQdrantUrl } from '$lib/config/env.server.js';
+import { isUuid } from '$lib/server/validation.js';
 // Phase 89: Related Files API
 // Uses cosine similarity from Qdrant to find related components
 
@@ -10,8 +11,8 @@ const QDRANT_URL = getQdrantUrl();
 export const GET: RequestHandler = async ({ params, fetch }) => {
 	const componentId = params.id;
 
-	if (!componentId) {
-		return json({ related: [], error: 'Missing component ID' }, { status: 400 });
+	if (!isUuid(componentId)) {
+		return json({ related: [], error: 'Invalid ID format' }, { status: 400 });
 	}
 
 	try {
@@ -51,8 +52,8 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 
 		// Filter out the original component and format results
 		const related = results
-			.filter((r: any) => r.id !== componentId)
-			.map((r: any) => ({
+			.filter((r: Record<string, any>) => r.id !== componentId)
+			.map((r: Record<string, any>) => ({
 				path: r.payload?.file_path ?? '',
 				similarity: r.score,
 				shared_imports: findSharedImports(pointData.result?.payload, r.payload),
@@ -70,14 +71,14 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 	}
 };
 
-function findSharedImports(payload1: any, payload2: any): string[] {
+function findSharedImports(payload1: Record<string, unknown> | undefined, payload2: Record<string, unknown> | undefined): string[] {
 	if (!payload1 || !payload2) return [];
 
 	// Extract import sources from signature text or uses
-	const uses1 = new Set<string>(payload1?.uses|| []);
+	const uses1 = new Set<string>((payload1?.uses as string[]) || []);
 
 const QDRANT_URL = getQdrantUrl();
-	const uses2 = new Set<string>(payload2?.uses|| []);
+	const uses2 = new Set<string>((payload2?.uses as string[]) || []);
 
 	const shared: string[] = [];
 	for (const use of uses1) {

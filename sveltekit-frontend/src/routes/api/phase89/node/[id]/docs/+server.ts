@@ -9,6 +9,7 @@ import type { RequestHandler } from './$types';
 
 import { getDatabaseUrl, getQdrantUrl, getOllamaUrl } from '$lib/config/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { isUuid } from '$lib/server/validation.js';
 const sql = postgres(getDatabaseUrl());
 const QDRANT_URL = getQdrantUrl();
 const OLLAMA_URL = getOllamaUrl();
@@ -29,6 +30,10 @@ async function generateEmbedding(text: string): Promise<number[]> {
 
 export const GET: RequestHandler = async ({ params }) => {
   const { id } = params;
+
+  if (!isUuid(id)) {
+    return json({ error: 'Invalid ID format' }, { status: 400 });
+  }
 
   try {
     // Get node details

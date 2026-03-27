@@ -1,9 +1,11 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
+import { isUuid } from '$lib/server/validation.js';
 
 export const GET: RequestHandler = async ({ params }) => {
 	const { id } = params;
+	if (!isUuid(id)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
 	const [documentResult, versionsResult] = await Promise.all([
 		pool.query(

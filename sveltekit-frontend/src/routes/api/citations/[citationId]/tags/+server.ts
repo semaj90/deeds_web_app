@@ -4,6 +4,7 @@ import { sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { invalidateCitationCache } from '$lib/server/cache/invalidation.js';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 const addTagSchema = z.object({
 	tag: z.string().trim().min(1, 'Tag is required').max(200),
@@ -19,6 +20,7 @@ const removeTagSchema = z.object({
  * List all tags for a citation (from citation_tag_links table)
  */
 export const GET: RequestHandler = async ({ params }) => {
+	if (!isUuid(params.citationId)) return json({ error: 'Invalid ID format' }, { status: 400 });
 	try {
 		const result = await db.execute(
 			sql`SELECT id, tag, color, created_at FROM citation_tag_links WHERE citation_id = ${params.citationId} ORDER BY created_at`
@@ -38,6 +40,7 @@ export const GET: RequestHandler = async ({ params }) => {
  */
 export const POST: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
+	if (!isUuid(params.citationId)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
 	const parsed = addTagSchema.safeParse(await request.json());
 	if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
@@ -72,6 +75,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
  */
 export const DELETE: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
+	if (!isUuid(params.citationId)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
 	const delParsed = removeTagSchema.safeParse(await request.json());
 	if (!delParsed.success) return json({ error: delParsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });

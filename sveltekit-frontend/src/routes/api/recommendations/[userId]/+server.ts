@@ -27,6 +27,7 @@ import { UserHistoryTracker } from '$lib/server/ml/user-history.js';
 import { getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { isUuid } from '$lib/server/validation.js';
 
 // Zod schema validates POST body: interactionType enum, documentId, topicPreferences array
 const userInteractionSchema = z.object({
@@ -93,7 +94,7 @@ async function fetchCandidates(
 		const searchData = await searchResp.json();
 		const results = searchData?.result ?? [];
 
-		return results.map((r: any) => {
+		return results.map((r: Record<string, any>) => {
 			const payload = r.payload ?? {};
 			const vector = Array.isArray(r.vector)
 				? r.vector
@@ -107,7 +108,7 @@ async function fetchCandidates(
 					...(payload.entities ?? []),
 					...(payload.tags ?? []),
 					...(payload.practice_area ? [payload.practice_area] : [])
-				].map((t: any) => String(t).toLowerCase()),
+				].map((t: unknown) => String(t).toLowerCase()),
 				centrality: payload.centrality ?? 0,
 				caseIds: payload.case_ids ?? []
 			};
@@ -183,6 +184,10 @@ function extractQueryTags(query: string): string[] {
 export const GET: RequestHandler = async ({ params, url, locals }) => {
 	const startTime = performance.now();
 
+	if (!isUuid(params.userId)) {
+		return json({ error: 'Invalid ID format' }, { status: 400 });
+	}
+
 	try {
 		const { userId } = params;
 		const query = url.searchParams.get('query') || '';
@@ -191,7 +196,7 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 
 		// Auth check: user can only access own recommendations (or admin)
 		if (locals.user && locals.user.id !== userId) {
-			const userRole = (locals.user as any).role;
+			const userRole = (locals.user as { role?: string }).role;
 			if (userRole !== 'admin') {
 				return json({ error: 'Forbidden' }, { status: 403 });
 			}
@@ -278,6 +283,10 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
  *   }
  */
 export const POST: RequestHandler = async ({ params, request, locals }) => {
+	if (!isUuid(params.userId)) {
+		return json({ error: 'Invalid ID format' }, { status: 400 });
+	}
+
 	try {
 		const { userId } = params;
 

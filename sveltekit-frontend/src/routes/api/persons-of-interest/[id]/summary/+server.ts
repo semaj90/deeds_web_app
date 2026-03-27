@@ -6,6 +6,7 @@ import { eq, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 /** GBNF-constrained response schema for POI summary */
 const poiSummaryResponseSchema = z.object({
@@ -20,6 +21,7 @@ const poiSummaryResponseJsonSchema = z.toJSONSchema(poiSummaryResponseSchema);
  */
 export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+	if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
 	const poi = await db.select({
 		aiProfile: personsOfInterest.aiProfile,
@@ -49,6 +51,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
  */
 export const POST: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+	if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
 	const poi = await db.select().from(personsOfInterest)
 		.where(eq(personsOfInterest.id, params.id))

@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
+import { isUuid } from '$lib/server/validation.js';
 import {
 	evidence,
 	reports,
@@ -40,6 +41,8 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 
 	const caseId = params.id;
+	if (!isUuid(caseId)) return json({ error: 'Invalid case ID format' }, { status: 400 });
+
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	if (!parsed.success) {
 		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });

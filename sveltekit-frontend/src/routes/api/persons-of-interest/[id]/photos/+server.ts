@@ -10,6 +10,7 @@ import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { resizeForVLM } from '$lib/server/image/resize-for-vlm.js';
+import { isUuid } from '$lib/server/validation.js';
 
 const deletePhotoSchema = z.object({
   photoId: z.string().min(1, 'photoId required').max(500),
@@ -28,7 +29,9 @@ const VLM_TIMEOUT = 60_000; // 60s for vision analysis
  * GET /api/persons-of-interest/[id]/photos
  * List all photos for a POI (most recent first)
  */
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!isUuid(params.id)) return json({ error: 'Invalid POI ID format' }, { status: 400 });
   try {
     const photos = await db
       .select()
@@ -56,8 +59,10 @@ export const GET: RequestHandler = async ({ params }) => {
  * 6. Background: Auto-tag + mirror to stores
  * 7. Background: LangExtract OCR for any text in image
  */
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params, request, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const poiId = params.id;
+  if (!isUuid(poiId)) return json({ error: 'Invalid POI ID format' }, { status: 400 });
 
   try {
     // Verify POI exists
@@ -137,7 +142,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
       .returning();
 
     // 4. Fire-and-forget: VLM analysis pipeline
-    runVLMAnalysisPipeline(photo.id, buffer, poi.name ?? 'Unknown').catch((err) =>
+    runVLMAnalysisPipeline(photo.id, poiId, buffer, poi.name ?? 'Unknown').catch((err) =>
       console.warn('[poi-photos] Background VLM pipeline failed:', err)
     );
 
@@ -153,7 +158,8 @@ export const POST: RequestHandler = async ({ params, request }) => {
  * Remove a photo by photoId in JSON body
  * Body: { photoId: string }
  */
-export const DELETE: RequestHandler = async ({ params, request }) => {
+export const DELETE: RequestHandler = async ({ params, request, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const body = await request.json().catch(() => ({}));
     const parsed = deletePhotoSchema.safeParse(body);
@@ -195,6 +201,7 @@ export const DELETE: RequestHandler = async ({ params, request }) => {
  */
 async function runVLMAnalysisPipeline(
   photoId: string,
+  poiId: string,
   imageBuffer: Buffer,
   poiName: string
 ): Promise<void> {
@@ -427,6 +434,17 @@ Return ONLY valid JSON.`;
       .where(eq(poiPhotos.id, photoId));
   } catch (err) {
     console.warn('[poi-photos] DB update with analysis failed:', err);
+  }
+
+  // ── Step 7: GPU background analysis (fire-and-forget) ──
+  if (captionEmbedding.length === 768) {
+    try {
+      const { triggerPoiGpuAnalysis } = await import('$lib/server/gpu/background-analyzer.js');
+      triggerPoiGpuAnalysis(photoId, poiId);
+      console.log(`[poi-photos] GPU analysis triggered for photo ${photoId}`);
+    } catch {
+      // GPU analyzer unavailable — non-fatal
+    }
   }
 
   const totalMs = Date.now() - t0;

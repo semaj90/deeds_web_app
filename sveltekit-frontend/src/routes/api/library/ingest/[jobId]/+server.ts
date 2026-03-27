@@ -6,6 +6,7 @@
  */
 import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
+import { isUuid } from '$lib/server/validation.js';
 
 const STAGES = ['queued', 'extracting', 'ocr', 'structuring', 'chunking', 'embedding', 'graphing', 'complete'];
 
@@ -28,7 +29,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user?.id) return new Response('Unauthorized', { status: 401 });
 
 	const { jobId } = params;
-	if (!jobId) return new Response('Missing jobId', { status: 400 });
+	if (!isUuid(jobId)) return new Response(JSON.stringify({ error: 'Invalid ID format' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
 
 	const encoder = new TextEncoder();
 	let closed = false;

@@ -61,6 +61,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         persona: 'investigator',
         evidenceMetadata: null,
         evidenceConnections: null,
+        userAnalyticsContext: null,
       },
       backend: 'ollama',
     });

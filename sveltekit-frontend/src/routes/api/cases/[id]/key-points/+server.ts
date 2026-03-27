@@ -6,6 +6,7 @@ import { eq, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 /** GBNF-constrained response schema for key points */
 const keyPointsResponseSchema = z.object({
@@ -23,6 +24,7 @@ export const POST: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const caseId = params.id;
+	if (!isUuid(caseId)) return json({ error: 'Invalid case ID format' }, { status: 400 });
 
 	const rows = await db
 		.select({

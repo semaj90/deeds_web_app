@@ -3,9 +3,14 @@ import { evidence } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { isUuid } from '$lib/server/validation.js';
 
 export const GET: RequestHandler = async ({ params }) => {
 	const { docId } = params;
+
+	if (!isUuid(docId)) {
+		return json({ error: 'Invalid ID format' }, { status: 400 });
+	}
 
 	try {
 		const [doc] = await db

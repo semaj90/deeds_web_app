@@ -11,6 +11,23 @@ import { generateSparseVector } from '$lib/server/vector/bm42-sparse.js';
 const sql = postgres(getDatabaseUrl());
 const qdrant = new QdrantClient({ url: getQdrantUrl() });
 
+/** Scored point returned by Qdrant search/query */
+interface QdrantScoredPoint {
+  id: number | string;
+  score: number;
+  payload?: Record<string, unknown>;
+}
+
+// Qdrant client with extended methods (query/upsert with named vectors)
+// beyond what @qdrant/js-client-rest types currently expose
+/** Qdrant query response wrapper */
+interface QdrantQueryResponse { points: QdrantScoredPoint[] }
+
+const qd = qdrant as QdrantClient & {
+  query(collection: string, params: Record<string, unknown>): Promise<QdrantQueryResponse>;
+  upsert(collection: string, params: Record<string, unknown>): Promise<void>;
+};
+
 const OLLAMA_URL_VAR = getOllamaUrl();
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
@@ -78,7 +95,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
  */
 async function ensureQdrantCollection() {
   try {
-    await (qdrant as any).getCollection('knowledge_base');
+    await qdrant.getCollection('knowledge_base');
     // Ensure sparse vectors configured on existing collection
     try {
       await qdrant.updateCollection('knowledge_base', {
@@ -139,7 +156,7 @@ export const POST: RequestHandler = async ({ request }) => {
           const sparse = generateSparseVector(chunk);
 
           // Store in Qdrant (dense + sparse vectors)
-          await (qdrant as any).upsert('knowledge_base', {
+          await qd.upsert('knowledge_base', {
             points: [
               {
                 id: pointId,
@@ -214,9 +231,9 @@ export const GET: RequestHandler = async ({ url }) => {
 
     // Hybrid search: dense + BM42 sparse with RRF fusion
     const querySparse = generateSparseVector(query);
-    let results: any[];
+    let results: QdrantScoredPoint[];
     try {
-      results = await (qdrant as any).query('knowledge_base', {
+      const queryRes = await qd.query('knowledge_base', {
         prefetch: [
           { query: queryEmbedding, using: '', limit: limit * 2 },
           { query: querySparse, using: 'bm25', limit: limit * 2 },
@@ -225,16 +242,17 @@ export const GET: RequestHandler = async ({ url }) => {
         limit,
         score_threshold: 0.4,
       });
+      results = queryRes.points;
     } catch {
       // Fallback to dense-only if sparse not configured
-      results = await (qdrant as any).search('knowledge_base', {
+      results = await qd.search('knowledge_base', {
         vector: queryEmbedding,
         limit,
         score_threshold: 0.6,
       });
     }
 
-    const matches = (results as any[]).map(r => ({
+    const matches = results.map(r => ({
       id: r.id,
       score: r.score,
       document: r.payload?.document_name,
@@ -283,9 +301,9 @@ export const PATCH: RequestHandler = async ({ request }) => {
     // 1. Hybrid search knowledge base for context (dense + BM42)
     const queryEmbedding = await generateEmbedding(prompt);
     const promptSparse = generateSparseVector(prompt);
-    let searchResults: any[];
+    let searchResults: QdrantScoredPoint[];
     try {
-      searchResults = await (qdrant as any).query('knowledge_base', {
+      const searchRes = await qd.query('knowledge_base', {
         prefetch: [
           { query: queryEmbedding, using: '', limit: max_context_chunks * 2 },
           { query: promptSparse, using: 'bm25', limit: max_context_chunks * 2 },
@@ -294,20 +312,21 @@ export const PATCH: RequestHandler = async ({ request }) => {
         limit: max_context_chunks,
         score_threshold: 0.4,
       });
+      searchResults = searchRes.points;
     } catch {
-      searchResults = await (qdrant as any).search('knowledge_base', {
+      searchResults = await qd.search('knowledge_base', {
         vector: queryEmbedding,
         limit: max_context_chunks,
         score_threshold: 0.6,
       });
     }
 
-    const contextText = (searchResults as any[])
+    const contextText = searchResults
       .map(r => `[${r.payload?.document_name}] ${r.payload?.content}`)
       .join('\n\n');
 
-    const avgScore = (searchResults as any[]).length > 0
-      ? (searchResults as any[]).reduce((sum, r) => sum + r.score, 0) / (searchResults as any[]).length
+    const avgScore = searchResults.length > 0
+      ? searchResults.reduce((sum, r) => sum + r.score, 0) / searchResults.length
       : 0;
 
     // 2. Build augmented prompt
@@ -363,9 +382,9 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
       response,
       llm_used: llmUsed,
       rag_context: {
-        matches: (searchResults as any[]).length,
+        matches: searchResults.length,
         avg_similarity: avgScore.toFixed(2),
-        documents: (searchResults as any[]).map(r => r.payload?.document_name)
+        documents: searchResults.map(r => r.payload?.document_name)
       }
     });
   } catch (err) {

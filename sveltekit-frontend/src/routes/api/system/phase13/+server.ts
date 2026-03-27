@@ -10,7 +10,7 @@ import { ollamaFetch } from '$lib/server/ollama.js';
  * No side effects
  */
 export async function GET() {
-	const health: any = {
+	const health: { timestamp: string; services: Record<string, Record<string, unknown>> } = {
 		timestamp: new Date().toISOString(),
 		services: {},
 	};
@@ -31,10 +31,11 @@ export async function GET() {
 		// Check PostgreSQL + pgvector
 		try {
 			const result = await db.execute(sql`SELECT version(), current_database()`);
+			const pgRow = (result.rows[0] ?? {}) as Record<string, unknown>;
 			health.services.postgres = {
 				ok: result.rows.length > 0,
-				version: (result.rows[0] as any)?.version?.substring(0, 40) ?? 'unknown',
-				database: (result.rows[0] as any)?.current_database ?? 'unknown',
+				version: String(pgRow.version ?? 'unknown').substring(0, 40),
+				database: String(pgRow.current_database ?? 'unknown'),
 			};
 		} catch (e) {
 			health.services.postgres = { ok: false, message: (e as Error).message };
@@ -74,7 +75,7 @@ export async function GET() {
 
 		return json(health);
 	} catch (e) {
-		return json({ error: (e as any).message }, { status: 500 });
+		return json({ error: (e as Error).message }, { status: 500 });
 	}
 }
 

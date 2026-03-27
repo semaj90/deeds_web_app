@@ -3,6 +3,7 @@ import { error, isHttpError, json } from '@sveltejs/kit';
 import { eq, sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 function hasPgErrorCode(err: unknown, code: string): boolean {
   return (
@@ -44,6 +45,8 @@ export const GET: RequestHandler = async ({ locals, params }) => {
   }
 
   const caseId = params.id;
+  if (!isUuid(caseId)) throw error(400, 'Invalid case ID format');
+
   const hasLinksTable = await hasCaseStatuteLinksTable();
 
   if (!hasLinksTable) {
@@ -97,6 +100,8 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
   }
 
   const caseId = params.id;
+  if (!isUuid(caseId)) throw error(400, 'Invalid case ID format');
+
   const hasLinksTable = await hasCaseStatuteLinksTable();
 
   if (!hasLinksTable) {

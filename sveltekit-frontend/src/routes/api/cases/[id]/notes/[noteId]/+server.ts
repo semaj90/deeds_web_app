@@ -4,6 +4,7 @@ import { json } from '@sveltejs/kit';
 import { and, eq, sql, desc, count } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { validateUuidParams } from '$lib/server/validation.js';
 
 const updateNoteSchema = z.object({
 	title: z.string().max(1000).optional(),
@@ -17,6 +18,8 @@ const updateNoteSchema = z.object({
  */
 export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+	const invalid = validateUuidParams(params, 'id', 'noteId');
+	if (invalid) return invalid;
 	try {
 		const [note] = await db
 			.select()
@@ -42,6 +45,8 @@ export const GET: RequestHandler = async ({ params, locals }) => {
  */
 export const PATCH: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+	const invalidPatch = validateUuidParams(params, 'id', 'noteId');
+	if (invalidPatch) return invalidPatch;
 	try {
 		const parsed = updateNoteSchema.safeParse(await request.json());
 		if (!parsed.success) {
@@ -103,6 +108,8 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
  */
 export const DELETE: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+	const invalidDel = validateUuidParams(params, 'id', 'noteId');
+	if (invalidDel) return invalidDel;
 	try {
 		const [deleted] = await db
 			.delete(caseNotes)

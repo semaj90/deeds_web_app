@@ -5,6 +5,7 @@ import { evidence, evidenceVersions, users } from '$lib/server/db/schema-postgre
 import { eq, desc, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { createEvidenceVersion } from '$lib/server/audit/evidence-audit.js';
+import { isUuid } from '$lib/server/validation.js';
 
 const createVersionSchema = z.object({
 	changeReason: z.string().max(1000).optional(),
@@ -18,6 +19,8 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 
 	const { id } = params;
+	if (!isUuid(id)) throw error(400, 'Invalid evidence ID format');
+
 	const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '50'), 200);
 
 	// Verify evidence exists
@@ -62,6 +65,7 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 
 	const { id } = params;
+	if (!isUuid(id)) throw error(400, 'Invalid evidence ID format');
 
 	// Verify evidence exists
 	const [ev] = await db

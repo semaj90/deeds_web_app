@@ -161,23 +161,23 @@ function parseGraphResponse(
 		if (match) {
 			const parsed = JSON.parse(match[0]);
 
-			const nodes = (parsed.nodes || []).map((n: any) => ({
+			const nodes = (parsed.nodes || []).map((n: Record<string, unknown>) => ({
 				id: String(n.id || ''),
 				type: String(n.type || 'unknown'),
 				label: String(n.label || n.id || ''),
-				color: TYPE_COLORS[n.type] || '#64748b'
+				color: TYPE_COLORS[String(n.type)] || '#64748b'
 			}));
 
 			const edges = (parsed.edges || [])
-				.filter((e: any) => (Number(e.weight) || 0) >= minStrength)
-				.map((e: any) => ({
+				.filter((e: Record<string, unknown>) => (Number(e.weight) || 0) >= minStrength)
+				.map((e: Record<string, unknown>) => ({
 					source: String(e.source || ''),
 					target: String(e.target || ''),
 					label: String(e.label || ''),
 					weight: Number(e.weight) || 0.5
 				}));
 
-			const clusters = (parsed.clusters || []).map((c: any) => ({
+			const clusters = (parsed.clusters || []).map((c: Record<string, unknown>) => ({
 				name: String(c.name || ''),
 				nodeIds: Array.isArray(c.nodeIds) ? c.nodeIds.map(String) : []
 			}));

@@ -16,8 +16,15 @@ import {
 import type { NewErrorCluster } from '$lib/db/schema/nes-command-center.js';
 import { error, json } from '@sveltejs/kit';
 import { _broadcastErrorCountChange, _broadcastHealthChange } from '../../events/+server.js';
+import { isValidRouteId } from '$lib/server/validation.js';
 import type { RequestHandler } from './$types.js';
 import { z } from 'zod';
+
+interface ErrorClusterRow {
+	severity: string;
+	resolvedAt: Date | null;
+	[key: string]: unknown;
+}
 
 const errorClusterSchema = z.object({
     tool: z.string().min(1).max(200),
@@ -41,6 +48,7 @@ const errorClusterSchema = z.object({
  */
 export const POST: RequestHandler = async ({ params, request }) => {
   const { routeId } = params;
+  if (!isValidRouteId(routeId)) return error(400, { message: 'Invalid route ID format' });
 
   try {
     const raw = await request.json();
@@ -74,9 +82,9 @@ export const POST: RequestHandler = async ({ params, request }) => {
 
     // Recalculate route health status
     const allErrorsResult = await getErrorClusters(routeId, { limit: 1000, offset: 0 });
-    const unresolvedErrors = allErrorsResult.clusters.filter((e: any) => !e.resolvedAt);
-    const hasErrors = unresolvedErrors.some((e: any) => e.severity === 'error');
-    const hasWarnings = unresolvedErrors.some((e: any) => e.severity === 'warning');
+    const unresolvedErrors = allErrorsResult.clusters.filter((e: ErrorClusterRow) => !e.resolvedAt);
+    const hasErrors = unresolvedErrors.some((e: ErrorClusterRow) => e.severity === 'error');
+    const hasWarnings = unresolvedErrors.some((e: ErrorClusterRow) => e.severity === 'warning');
 
     let newStatus = 'healthy';
     if (hasErrors) newStatus = 'broken';
@@ -102,9 +110,9 @@ export const POST: RequestHandler = async ({ params, request }) => {
     }
 
     // Count errors by severity
-    const errorCount = unresolvedErrors.filter((e: any) => e.severity === 'error').length;
-    const warningCount = unresolvedErrors.filter((e: any) => e.severity === 'warning').length;
-    const infoCount = unresolvedErrors.filter((e: any) => e.severity === 'info').length;
+    const errorCount = unresolvedErrors.filter((e: ErrorClusterRow) => e.severity === 'error').length;
+    const warningCount = unresolvedErrors.filter((e: ErrorClusterRow) => e.severity === 'warning').length;
+    const infoCount = unresolvedErrors.filter((e: ErrorClusterRow) => e.severity === 'info').length;
 
     // Broadcast error count change via SSE
     _broadcastErrorCountChange({
@@ -131,6 +139,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
  */
 export const GET: RequestHandler = async ({ params, url }) => {
   const { routeId } = params;
+  if (!isValidRouteId(routeId)) return error(400, { message: 'Invalid route ID format' });
 
   try {
     // Validate route exists
@@ -151,9 +160,9 @@ export const GET: RequestHandler = async ({ params, url }) => {
 
     let filtered = errorsResult.clusters;
     if (resolved === 'true') {
-      filtered = errorsResult.clusters.filter((e: any) => e.resolvedAt);
+      filtered = errorsResult.clusters.filter((e: ErrorClusterRow) => e.resolvedAt);
     } else if (resolved === 'false') {
-      filtered = errorsResult.clusters.filter((e: any) => !e.resolvedAt);
+      filtered = errorsResult.clusters.filter((e: ErrorClusterRow) => !e.resolvedAt);
     }
 
     // Get total count

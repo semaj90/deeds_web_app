@@ -11,15 +11,16 @@ import { getKnowledgeSearcher } from '$lib/services/knowledge-search/KnowledgeSe
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+import { isUuid } from '$lib/server/validation.js';
 
 export const GET: RequestHandler = async ({ params }) => {
   try {
     const { id } = params;
 
     // Validate ID
-    if (!id || typeof id !== 'string') {
+    if (!isUuid(id)) {
       return json(
-        { error: 'Document ID is required' },
+        { error: 'Invalid ID format' },
         { status: 400 }
       );
     }

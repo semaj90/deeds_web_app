@@ -7,6 +7,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { pool } from '$lib/server/db/client';
+import { isUuid } from '$lib/server/validation.js';
 
 const querySchema = z.object({
 	nodeId: z.string().uuid().optional(),
@@ -18,6 +19,8 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const { documentId } = params;
+	if (!isUuid(documentId)) return json({ error: 'Invalid ID format' }, { status: 400 });
+
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	if (!parsed.success) {
 		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });

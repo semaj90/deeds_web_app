@@ -4,6 +4,7 @@ import { json } from '@sveltejs/kit';
 import { and, eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { validateUuidParams } from '$lib/server/validation.js';
 
 // Zod schema validates evidenceId for POST and DELETE
 const noteEvidenceSchema = z.object({
@@ -15,6 +16,9 @@ const noteEvidenceSchema = z.object({
  * List all evidence items linked to a note
  */
 export const GET: RequestHandler = async ({ params }) => {
+	const invalid = validateUuidParams(params, 'id', 'noteId');
+	if (invalid) return invalid;
+
 	try {
 		const refs = await db
 			.select({
@@ -41,6 +45,9 @@ export const GET: RequestHandler = async ({ params }) => {
  * Body: { evidenceId: string }
  */
 export const POST: RequestHandler = async ({ params, request }) => {
+	const invalid = validateUuidParams(params, 'id', 'noteId');
+	if (invalid) return invalid;
+
 	try {
 		const parsed = noteEvidenceSchema.safeParse(await request.json());
 		if (!parsed.success) {
@@ -93,6 +100,9 @@ export const POST: RequestHandler = async ({ params, request }) => {
  * Body: { evidenceId: string }
  */
 export const DELETE: RequestHandler = async ({ params, request }) => {
+	const invalid = validateUuidParams(params, 'id', 'noteId');
+	if (invalid) return invalid;
+
 	try {
 		const delParsed = noteEvidenceSchema.safeParse(await request.json());
 		if (!delParsed.success) {

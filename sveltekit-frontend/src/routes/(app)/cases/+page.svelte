@@ -151,6 +151,7 @@
 	function openCaseDetail(caseId: string) {
 		viewCaseId = caseId;
 		showViewModal = true;
+		analytics.track('case_updated', { action: 'view_detail', caseId });
 	}
 
 	function isFictional(caseItem: any): boolean {

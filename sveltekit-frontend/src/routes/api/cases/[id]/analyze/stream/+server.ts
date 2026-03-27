@@ -2,6 +2,7 @@ import { db } from '$lib/server/db/client';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 const analyzeStreamSchema = z.object({
 	analysisType: z.enum(['summary', 'legal_issues', 'risks', 'evidence_review']).optional().default('summary')
@@ -93,6 +94,9 @@ async function loadCaseContext(caseId: string): Promise<string> {
 
 export const POST: RequestHandler = async ({ params, request }) => {
 	const caseId = params.id;
+	if (!isUuid(caseId)) {
+		return new Response(JSON.stringify({ error: 'Invalid case ID format' }), { status: 400 });
+	}
 	let raw: unknown;
 
 	try {

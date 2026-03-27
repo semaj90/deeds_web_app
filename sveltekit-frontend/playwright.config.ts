@@ -20,8 +20,19 @@ export default defineConfig({
   // Only match .spec.ts files (exclude vitest .test.ts files)
   testMatch: '**/*.spec.ts',
 
-  // Ignore vitest-based spec files that conflict with Playwright's expect
-  testIgnore: ['**/vector-routes.spec.ts'],
+  // Ignore vitest-based spec files that conflict with Playwright's expect (use vi.fn/vi.mock)
+  testIgnore: [
+    '**/vector-routes.spec.ts',
+    '**/evidence-view-modal.spec.ts',
+    '**/rag-search-ace-route.spec.ts',
+    '**/sse-chat-glossary-metadata.spec.ts',
+    '**/sse-chat-attachment-metadata.spec.ts',
+    '**/chat-session-attachment-handoff.spec.ts',
+    '**/ace-ingest-route.spec.ts',
+    '**/ace-status-route.spec.ts',
+    '**/ace-summarize-route.spec.ts',
+    '**/ace-context-glossary.spec.ts',
+  ],
 
   // Sequential execution for user flow tests (login → case creation → evidence upload)
   fullyParallel: false,

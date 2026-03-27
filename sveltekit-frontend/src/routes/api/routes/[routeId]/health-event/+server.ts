@@ -13,6 +13,7 @@ import {
     getHealthEvents,
     getRouteMetadata
 } from '$lib/db/queries/nes-command-center';
+import { isValidRouteId } from '$lib/server/validation.js';
 import { error, json } from '@sveltejs/kit';
 import { _broadcastHealthChange } from '../../events/+server.js';
 import type { RequestHandler } from './$types.js';
@@ -38,6 +39,7 @@ interface NewRouteHealthEvent {
  */
 export const POST: RequestHandler = async ({ params, request }) => {
   const { routeId } = params;
+  if (!isValidRouteId(routeId)) return error(400, { message: 'Invalid route ID format' });
 
   try {
     const raw = await request.json();
@@ -89,6 +91,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
  */
 export const GET: RequestHandler = async ({ params, url }) => {
   const { routeId } = params;
+  if (!isValidRouteId(routeId)) return error(400, { message: 'Invalid route ID format' });
 
   try {
     const limit = parseInt(url.searchParams.get('limit') ?? '50');

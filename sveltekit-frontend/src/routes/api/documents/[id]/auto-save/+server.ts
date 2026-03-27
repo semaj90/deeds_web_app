@@ -4,6 +4,7 @@ import { db } from '$lib/server/db/client';
 import { documents } from '$lib/server/db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 const autoSaveSchema = z.object({
 	content: z.string().max(5_000_000),
@@ -15,6 +16,10 @@ const autoSaveSchema = z.object({
  */
 export const POST: RequestHandler = async ({ params, request }) => {
 	const { id } = params;
+
+	if (!isUuid(id)) {
+		return json({ error: 'Invalid ID format' }, { status: 400 });
+	}
 
 	try {
 		const parsed = autoSaveSchema.safeParse(await request.json());

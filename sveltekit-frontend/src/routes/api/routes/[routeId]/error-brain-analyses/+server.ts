@@ -10,6 +10,7 @@ import {
 	errorBrainAnalysis,
 	errorBrainPatch,
 } from '$lib/db/schema/nes-command-center.js';
+import { isValidRouteId } from '$lib/server/validation.js';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types.js';
@@ -21,6 +22,7 @@ const querySchema = z.object({
 
 export const GET: RequestHandler = async ({ params, url }) => {
 	const { routeId } = params;
+	if (!isValidRouteId(routeId)) return json({ error: 'Invalid route ID format' }, { status: 400 });
 
 	try {
 		const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));

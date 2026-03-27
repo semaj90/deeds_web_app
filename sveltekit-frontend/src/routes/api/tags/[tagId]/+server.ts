@@ -2,12 +2,13 @@
  * GET /api/tags/:tagId — Tag detail from CouchDB catalog
  */
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { isValidSafeId } from '$lib/server/validation.js';
 
 export const GET: RequestHandler = async ({ params }) => {
 	const { tagId } = params;
 
-	if (!tagId) {
-		return json({ error: 'tagId required' }, { status: 400 });
+	if (!isValidSafeId(tagId)) {
+		return json({ error: 'Invalid tag ID format' }, { status: 400 });
 	}
 
 	try {

@@ -188,6 +188,7 @@
 		viewEvidenceId = id;
 		showViewModal = true;
 		pushState(window.location.pathname, { showDocumentModal: true, documentId: id });
+		analytics.track('evidence_uploaded', { action: 'view_detail', evidenceId: id });
 	}
 
 	// Semantic search effect

@@ -56,7 +56,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 				${caseId ? sql`WHERE id = ${caseId}` : sql`WHERE user_id = ${locals.user.id}`}
 				ORDER BY created_at DESC LIMIT ${limit}
 			`).then(r => {
-				for (const row of r.rows as any[]) {
+				for (const row of r.rows as Record<string, any>[]) {
 					nodes.push({
 						id: row.id, type: 'case', title: row.title ?? 'Untitled Case',
 						timestamp: row.created_at, metadata: { status: row.status, priority: row.priority },
@@ -74,7 +74,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 				${caseId ? sql`WHERE case_id = ${caseId}` : sql``}
 				ORDER BY created_at DESC LIMIT ${limit}
 			`).then(r => {
-				for (const row of r.rows as any[]) {
+				for (const row of r.rows as Record<string, any>[]) {
 					nodes.push({
 						id: row.id, type: 'evidence', title: row.title ?? 'Evidence',
 						timestamp: row.created_at, metadata: { fileType: row.file_type },
@@ -92,7 +92,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 				${caseId ? sql`WHERE ${caseId} = ANY(case_ids)` : sql``}
 				ORDER BY created_at DESC LIMIT ${limit}
 			`).then(r => {
-				for (const row of r.rows as any[]) {
+				for (const row of r.rows as Record<string, any>[]) {
 					nodes.push({
 						id: row.id, type: 'person', title: row.name ?? 'Unknown',
 						timestamp: row.created_at, metadata: { threatLevel: row.threat_level, status: row.status },
@@ -110,7 +110,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 				${caseId ? sql`WHERE case_id = ${caseId}` : sql``}
 				ORDER BY created_at DESC LIMIT ${limit}
 			`).then(r => {
-				for (const row of r.rows as any[]) {
+				for (const row of r.rows as Record<string, any>[]) {
 					nodes.push({
 						id: row.id, type: 'citation', title: (row.citation_text ?? '').slice(0, 100),
 						timestamp: row.created_at, metadata: {},
@@ -128,7 +128,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 				${caseId ? sql`WHERE case_id = ${caseId}` : sql``}
 				ORDER BY created_at DESC LIMIT ${limit}
 			`).then(r => {
-				for (const row of r.rows as any[]) {
+				for (const row of r.rows as Record<string, any>[]) {
 					nodes.push({
 						id: row.id, type: 'report', title: row.title ?? 'Report',
 						timestamp: row.created_at, metadata: { status: row.status },

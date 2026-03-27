@@ -159,7 +159,7 @@ function handleQueryMode(query: string, mode: string, caseId: string | null, per
 				let systemPrefix = '';
 				if (persona && persona !== 'neutral') {
 					const { getPersona } = await import('$lib/server/ace/style-adapter.js');
-					const config = getPersona(persona as any);
+					const config = getPersona(persona as Parameters<typeof getPersona>[0]);
 					systemPrefix = config.systemPrefix + '\n\n';
 				}
 
@@ -264,15 +264,16 @@ function handleSessionMode(sessionId: string, caseId: string | null): Response {
 			}, 30000);
 
 			// Store cleanup ref for cancel()
-			(controller as any)._cleanup = () => {
+			(controller as unknown as { _cleanup: () => void })._cleanup = () => {
 				clearInterval(pollInterval);
 				clearInterval(keepAlive);
 			};
 		},
 
-		cancel(controller: any) {
+		cancel(controller) {
 			console.log('SSE client disconnected — cleaning up intervals');
-			if (typeof controller?._cleanup === 'function') controller._cleanup();
+			const ctrl = controller as unknown as { _cleanup?: () => void };
+			if (typeof ctrl._cleanup === 'function') ctrl._cleanup();
 		}
 	});
 

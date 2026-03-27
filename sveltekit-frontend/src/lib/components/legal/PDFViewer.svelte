@@ -13,10 +13,10 @@
 
 	// State
 	let container: HTMLDivElement;
-	let canvas: HTMLCanvasElement;
+	let canvas = $state<HTMLCanvasElement>();
 	let loadError = $state<string | null>(null);
 	let loading = $state(true);
-	let currentPage = $state(initialPage);
+	let currentPage = $state(1);
 	let totalPages = $state(0);
 	let scale = $state(1.2);
 	let rendering = $state(false);
@@ -25,7 +25,12 @@
 	let pdfDoc: import('pdfjs-dist').PDFDocumentProxy | null = null;
 	let renderTask: import('pdfjs-dist').RenderTask | null = null;
 
-	const pdfUrl = `/api/library/documents/${documentId}/pdf`;
+	const pdfUrl = $derived(`/api/library/documents/${documentId}/pdf`);
+
+	// Sync currentPage when initialPage prop changes
+	$effect(() => {
+		currentPage = initialPage;
+	});
 
 	onMount(async () => {
 		try {
@@ -94,11 +99,7 @@
 		if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goToPage(currentPage - 1);
 	}
 
-	let pageInputValue = $state(String(initialPage));
-
-	$effect(() => {
-		pageInputValue = String(currentPage);
-	});
+	let pageInputValue = $derived(String(currentPage));
 
 	function handlePageInput(e: Event) {
 		const val = parseInt((e.target as HTMLInputElement).value, 10);
@@ -206,7 +207,7 @@
 		flex-direction: column;
 		height: 100%;
 		outline: none;
-		background: #1a1916;
+		background: var(--t-bg, #1a1916);
 	}
 
 	/* ── Toolbar ── */
@@ -215,8 +216,8 @@
 		align-items: center;
 		gap: 0.75rem;
 		padding: 0.5rem 1rem;
-		background: #232220;
-		border-bottom: 1px solid rgba(212, 199, 163, 0.1);
+		background: var(--t-panel, #232220);
+		border-bottom: 1px solid color-mix(in srgb, var(--t-border) 30%, transparent);
 		flex-shrink: 0;
 		flex-wrap: wrap;
 	}
@@ -230,10 +231,10 @@
 	.pv-nav-btn, .pv-zoom-btn {
 		width: 2rem;
 		height: 2rem;
-		background: rgba(212, 199, 163, 0.08);
-		border: 1px solid rgba(212, 199, 163, 0.15);
+		background: color-mix(in srgb, var(--t-text) 8%, transparent);
+		border: 1px solid color-mix(in srgb, var(--t-border) 40%, transparent);
 		border-radius: 4px;
-		color: rgba(212, 199, 163, 0.8);
+		color: color-mix(in srgb, var(--t-text) 80%, transparent);
 		font-size: 1.1rem;
 		cursor: pointer;
 		display: flex;
@@ -242,7 +243,7 @@
 		transition: background 0.15s;
 	}
 	.pv-nav-btn:hover:not(:disabled), .pv-zoom-btn:hover:not(:disabled) {
-		background: rgba(212, 199, 163, 0.15);
+		background: color-mix(in srgb, var(--t-text) 15%, transparent);
 	}
 	.pv-nav-btn:disabled, .pv-zoom-btn:disabled {
 		opacity: 0.35;
@@ -253,27 +254,27 @@
 		display: flex;
 		align-items: center;
 		gap: 0.25rem;
-		color: rgba(212, 199, 163, 0.7);
+		color: var(--t-text-muted, rgba(212, 199, 163, 0.7));
 		font-size: 0.85rem;
 	}
 
 	.pv-page-input {
 		width: 3.5rem;
 		height: 1.75rem;
-		background: rgba(212, 199, 163, 0.06);
-		border: 1px solid rgba(212, 199, 163, 0.2);
+		background: color-mix(in srgb, var(--t-text) 6%, transparent);
+		border: 1px solid color-mix(in srgb, var(--t-border) 50%, transparent);
 		border-radius: 4px;
-		color: rgba(212, 199, 163, 0.9);
+		color: var(--t-text, rgba(212, 199, 163, 0.9));
 		font-size: 0.85rem;
 		text-align: center;
 		padding: 0 0.25rem;
 	}
 	.pv-page-input:focus {
 		outline: none;
-		border-color: rgba(212, 199, 163, 0.5);
+		border-color: var(--t-accent, rgba(212, 199, 163, 0.5));
 	}
 	.pv-page-sep {
-		color: rgba(212, 199, 163, 0.45);
+		color: color-mix(in srgb, var(--t-text) 45%, transparent);
 	}
 
 	.pv-zoom {
@@ -284,7 +285,7 @@
 	}
 	.pv-zoom-label {
 		font-size: 0.8rem;
-		color: rgba(212, 199, 163, 0.6);
+		color: color-mix(in srgb, var(--t-text) 60%, transparent);
 		min-width: 3rem;
 		text-align: center;
 	}
@@ -292,16 +293,16 @@
 	.pv-open-btn {
 		margin-left: auto;
 		font-size: 0.78rem;
-		color: rgba(212, 199, 163, 0.55);
+		color: color-mix(in srgb, var(--t-text) 55%, transparent);
 		text-decoration: none;
-		border: 1px solid rgba(212, 199, 163, 0.15);
+		border: 1px solid color-mix(in srgb, var(--t-border) 40%, transparent);
 		border-radius: 4px;
 		padding: 0.25rem 0.6rem;
 		transition: color 0.15s, border-color 0.15s;
 	}
 	.pv-open-btn:hover {
-		color: rgba(212, 199, 163, 0.9);
-		border-color: rgba(212, 199, 163, 0.35);
+		color: var(--t-text, rgba(212, 199, 163, 0.9));
+		border-color: color-mix(in srgb, var(--t-border) 70%, transparent);
 	}
 
 	/* ── Canvas area ── */
@@ -326,7 +327,7 @@
 		top: 1rem;
 		right: 1rem;
 		font-size: 0.75rem;
-		color: rgba(212, 199, 163, 0.45);
+		color: color-mix(in srgb, var(--t-text) 45%, transparent);
 	}
 
 	/* ── Loading / error ── */
@@ -337,15 +338,15 @@
 		justify-content: center;
 		gap: 0.75rem;
 		padding: 3rem;
-		color: rgba(212, 199, 163, 0.6);
+		color: var(--t-text-muted, rgba(212, 199, 163, 0.6));
 		font-size: 0.9rem;
 	}
 
 	.pv-spinner {
 		width: 2rem;
 		height: 2rem;
-		border: 2px solid rgba(212, 199, 163, 0.15);
-		border-top-color: rgba(212, 199, 163, 0.6);
+		border: 2px solid color-mix(in srgb, var(--t-border) 40%, transparent);
+		border-top-color: color-mix(in srgb, var(--t-text) 60%, transparent);
 		border-radius: 50%;
 		animation: spin 0.8s linear infinite;
 	}
@@ -353,7 +354,7 @@
 
 	.pv-error-headline {
 		font-weight: 600;
-		color: rgba(212, 199, 163, 0.8);
+		color: var(--t-text, rgba(212, 199, 163, 0.8));
 	}
 	.pv-error-detail {
 		font-size: 0.8rem;

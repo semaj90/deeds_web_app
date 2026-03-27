@@ -832,7 +832,7 @@ async function createGraphNode(
     if (graphNodeId && allVectors.length > 0) {
       try {
         const { results: similar } = await qdrant.hybridSearch({
-          collection: 'evidence_items' as any,
+          collection: 'evidence_items',
           query: plainText.slice(0, 300),
           queryEmbedding: allVectors[0],
           limit: 5,
@@ -840,7 +840,7 @@ async function createGraphNode(
         });
 
         for (const hit of similar) {
-          const evidenceId = (hit.payload as any)?.evidence_id;
+          const evidenceId = (hit.payload as Record<string, unknown>)?.evidence_id;
           if (!evidenceId) continue;
 
           const existingNodes = await db
@@ -854,7 +854,7 @@ async function createGraphNode(
             )
             .catch(() => ({ rows: [] }));
 
-          const targetId = (existingNodes.rows[0] as any)?.id;
+          const targetId = String((existingNodes.rows[0] as Record<string, unknown>)?.id ?? '');
           if (targetId && targetId !== graphNodeId) {
             await db
               .insert(yorhaEvidenceConnections)

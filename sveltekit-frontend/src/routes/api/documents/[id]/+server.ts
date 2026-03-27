@@ -4,6 +4,7 @@ import { db } from '$lib/server/db/client';
 import { documents } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 const documentUpdateSchema = z.object({
 	content: z.string().max(5_000_000).optional(),
@@ -16,6 +17,10 @@ const documentUpdateSchema = z.object({
  */
 export const GET: RequestHandler = async ({ params }) => {
 	const { id } = params;
+
+	if (!isUuid(id)) {
+		return json({ error: 'Invalid ID format' }, { status: 400 });
+	}
 
 	try {
 		const [doc] = await db
@@ -52,6 +57,10 @@ export const GET: RequestHandler = async ({ params }) => {
  */
 export const PUT: RequestHandler = async ({ params, request }) => {
 	const { id } = params;
+
+	if (!isUuid(id)) {
+		return json({ error: 'Invalid ID format' }, { status: 400 });
+	}
 
 	try {
 		const raw = await request.json();

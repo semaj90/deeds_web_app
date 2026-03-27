@@ -14,6 +14,7 @@ import { eq, and } from 'drizzle-orm';
 import { auditReportAction } from '$lib/server/reports/audit.js';
 import { CACHE_PATTERNS, cacheInvalidation } from '$lib/server/cache/invalidation.js';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 const reportPreviewSchema = z.object({
 	format: z.enum(['html', 'json']).optional().default('html')
@@ -27,6 +28,10 @@ async function generatePreview({ locals, params, format, request }: {
 }) {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
+	}
+
+	if (!isUuid(params.id)) {
+		throw error(400, 'Invalid ID format');
 	}
 
 	const reportId = params.id;

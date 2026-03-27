@@ -10,6 +10,7 @@ import {
 	type CachedExport
 } from '$lib/server/cache/pdf-export-cache.js';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 const reportExportSchema = z.object({
 	format: z.enum(['html', 'markdown', 'json', 'pdf', 'docx']).optional().default('html')
@@ -34,6 +35,10 @@ async function handleExport({ locals, params, format, request }: {
 }) {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
+	}
+
+	if (!isUuid(params.id)) {
+		throw error(400, 'Invalid ID format');
 	}
 
 	const reportId = params.id;

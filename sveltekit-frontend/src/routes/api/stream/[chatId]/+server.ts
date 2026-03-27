@@ -1,8 +1,14 @@
 
 import { getRedis } from '$lib/server/redis.js';
+import { isUuid } from '$lib/server/validation.js';
+import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params }) => {
+  if (!isUuid(params.chatId)) {
+    return json({ error: 'Invalid ID format' }, { status: 400 });
+  }
+
   // ioredis needs a dedicated connection for pub/sub (subscriber mode)
   const subscriber = getRedis().duplicate();
   const channel = `chat_stream:${params.chatId}`;

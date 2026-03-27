@@ -72,7 +72,32 @@ Return JSON with these fields:
 			};
 		}
 
-		return json({ success: true, glyph });
+		// Generate tensor-cached diffusion artifact via GlyphDiffusionService
+		let diffusionResult = null;
+		try {
+			const { glyphDiffusionService } = await import('$lib/server/glyph-diffusion-service.js');
+			diffusionResult = await glyphDiffusionService.generateGlyph({
+				evidence_id: parseInt(evidence_id) || 0,
+				prompt,
+				style: style as 'detective' | 'corporate' | 'forensic' | 'legal',
+				dimensions: dimensions as [number, number],
+				neural_sprite_config: parsed.data.neural_sprite_config as any,
+			});
+		} catch (diffErr) {
+			console.warn('[/api/glyph/generate] diffusion service unavailable:', diffErr);
+		}
+
+		return json({
+			success: true,
+			glyph,
+			data: diffusionResult ? {
+				glyph_url: diffusionResult.glyph_url,
+				tensor_ids: diffusionResult.tensor_ids,
+				generation_time_ms: diffusionResult.generation_time_ms,
+				cache_hits: diffusionResult.cache_hits,
+				preview_with_tensors: diffusionResult.preview_with_tensors,
+			} : undefined,
+		});
 	} catch (err) {
 		console.error('[/api/glyph/generate] error:', err);
 		return json({ success: false, error: 'Glyph generation failed' }, { status: 500 });

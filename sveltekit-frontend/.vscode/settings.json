@@ -102,9 +102,6 @@
   },
   "diffEditor.codeLens": false,
   "diffEditor.wordWrap": "off",
-  "github.copilot.advanced": {
-    "debug.overrideEngine": "nodejs"
-  },
   "editor.acceptSuggestionOnEnter": "on",
   // ========================================
   // COPILOT DIFF AND CODE ACTIONS SETTINGS

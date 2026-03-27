@@ -6,6 +6,7 @@ import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
+import { isUuid } from '$lib/server/validation.js';
 
 const documentUpdateSchema = z.object({
 	title: z.string().max(500).optional(),
@@ -22,6 +23,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const { documentId } = params;
+	if (!isUuid(documentId)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
 	const docRes = await pool.query(`
 		SELECT ld.*, j.name AS jurisdiction_name, j.code AS jurisdiction_code,
@@ -82,6 +84,8 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const { documentId } = params;
+	if (!isUuid(documentId)) return json({ error: 'Invalid ID format' }, { status: 400 });
+
 	const raw = await request.json();
 	const parsed = documentUpdateSchema.safeParse(raw);
 	if (!parsed.success) {
@@ -117,6 +121,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const { documentId } = params;
+	if (!isUuid(documentId)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
 	// Cascading delete: nodes, chunks, versions, page_artifacts, ingestion_jobs
 	await pool.query('DELETE FROM library_documents WHERE id = $1', [documentId]);

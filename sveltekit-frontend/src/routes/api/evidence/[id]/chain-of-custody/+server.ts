@@ -4,6 +4,7 @@ import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 const custodyEventSchema = z.object({
 	action: z.enum(['received', 'transferred', 'analyzed', 'stored', 'retrieved', 'exported', 'sealed']),
@@ -32,6 +33,7 @@ interface CustodyEvent {
  */
 export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
+	if (!isUuid(params.id)) throw error(400, 'Invalid evidence ID format');
 
 	const item = await db.select({
 		id: evidence.id,
@@ -66,6 +68,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
  */
 export const POST: RequestHandler = async ({ params, locals, request }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
+	if (!isUuid(params.id)) throw error(400, 'Invalid evidence ID format');
 
 	// Zod schema validates action enum (received|transferred|analyzed|stored|retrieved|exported|sealed)
 	const parsed = custodyEventSchema.safeParse(await request.json());

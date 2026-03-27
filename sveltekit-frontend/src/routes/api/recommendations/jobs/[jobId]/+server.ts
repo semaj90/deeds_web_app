@@ -87,10 +87,11 @@ export const GET: RequestHandler = async ({ params }) => {
 			data: { status: 'unknown', jobId }
 		}, { status: 500 });
 	} catch (err) {
-		console.error(`[recommendations] Job poll error for ${jobId}:`, err);
-		return json(
-			{ success: false, error: 'Failed to check job status' },
-			{ status: 500 }
-		);
+		console.warn(`[recommendations] Job poll error for ${jobId}:`, (err as Error).message);
+		return json({
+			success: false,
+			error: 'Recommendation service temporarily unavailable',
+			status: 'not_found'
+		}, { status: 404 });
 	}
 };

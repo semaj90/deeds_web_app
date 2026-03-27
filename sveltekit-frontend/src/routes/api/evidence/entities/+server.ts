@@ -43,12 +43,12 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
 	const { label, text, caseId, flagType, severity, mode, limit } = parsed.data;
 
-	const results: { entities?: any[]; flags?: any[]; counts?: any } = {};
+	const results: { entities?: Record<string, unknown>[]; flags?: Record<string, unknown>[]; counts?: Record<string, unknown> | null } = {};
 
 	// Cross-evidence entity search
 	if (mode === 'entities' || mode === 'both') {
 		const conditions: string[] = [];
-		const params: any[] = [];
+		const params: string[] = [];
 
 		if (label) {
 			conditions.push(`ee.entity_label = $${params.length + 1}`);
@@ -86,7 +86,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	// Cross-evidence forensic flag search
 	if (mode === 'flags' || mode === 'both') {
 		const conditions: string[] = [];
-		const params: any[] = [];
+		const params: string[] = [];
 
 		if (flagType) {
 			conditions.push(`ef.flag_type = $${params.length + 1}`);

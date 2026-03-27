@@ -194,7 +194,7 @@ function parseEntities(text: string): { name: string; type: string }[] {
 		const match = text.match(/\{[\s\S]*\}/);
 		if (match) {
 			const parsed = JSON.parse(match[0]);
-			return (parsed.entities || []).map((e: any) => ({
+			return (parsed.entities || []).map((e: Record<string, unknown>) => ({
 				name: String(e.name || ''),
 				type: String(e.type || 'unknown')
 			}));
@@ -208,7 +208,7 @@ function parseConnections(text: string): { description: string; confidence: numb
 		const match = text.match(/\{[\s\S]*\}/);
 		if (match) {
 			const parsed = JSON.parse(match[0]);
-			return (parsed.connections || []).map((c: any) => ({
+			return (parsed.connections || []).map((c: Record<string, unknown>) => ({
 				description: String(c.description || ''),
 				confidence: Number(c.confidence) || 0.5
 			}));
@@ -222,7 +222,7 @@ function parseAnomalies(text: string): { description: string; severity: string }
 		const match = text.match(/\{[\s\S]*\}/);
 		if (match) {
 			const parsed = JSON.parse(match[0]);
-			return (parsed.anomalies || []).map((a: any) => ({
+			return (parsed.anomalies || []).map((a: Record<string, unknown>) => ({
 				description: String(a.description || ''),
 				severity: String(a.severity || 'medium')
 			}));

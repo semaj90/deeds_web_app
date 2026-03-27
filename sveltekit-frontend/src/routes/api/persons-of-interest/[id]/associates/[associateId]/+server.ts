@@ -1,6 +1,7 @@
 import { json, error, type RequestHandler } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { auditLog } from '$lib/server/db/schema-postgres.js';
+import { validateUuidParams } from '$lib/server/validation.js';
 
 /**
  * DELETE /api/persons-of-interest/[id]/associates/[associateId]
@@ -11,6 +12,8 @@ import { auditLog } from '$lib/server/db/schema-postgres.js';
  */
 export const DELETE: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
+	const invalid = validateUuidParams(params, 'id', 'associateId');
+	if (invalid) return invalid;
 
 	const { id: poiId, associateId } = params;
 

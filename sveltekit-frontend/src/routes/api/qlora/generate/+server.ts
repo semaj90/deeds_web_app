@@ -62,11 +62,11 @@ export const GET: RequestHandler = async ({ url }) => {
 		const records: TrainingRecord[] = [];
 
 		for (const row of rows) {
-			const metadata = row.metadata as any;
-			const entities = metadata?.entities ?? [];
-			const summary = metadata?.summary ?? '';
-			const forensicFlags = metadata?.forensicFlags ?? [];
-			const entityCount = metadata?.entityCount ?? 0;
+			const metadata = (row.metadata ?? {}) as Record<string, unknown>;
+			const entities = (metadata.entities as Record<string, unknown>[]) ?? [];
+			const summary = String(metadata.summary ?? '');
+			const forensicFlags = (metadata.forensicFlags as Record<string, unknown>[]) ?? [];
+			const entityCount = Number(metadata.entityCount ?? 0);
 
 			// Record 1: Analysis Q&A with entities tool_call
 			records.push({
@@ -91,10 +91,10 @@ export const GET: RequestHandler = async ({ url }) => {
 									arguments: JSON.stringify({
 										document_id: row.id,
 										entity_count: entityCount,
-										entities: entities.slice(0, 20).map((e: any) => ({
+										entities: entities.slice(0, 20).map((e) => ({
 											type: e.type,
 											value: e.value,
-											confidence: e.confidence ?? 0.9
+											confidence: (e.confidence as number) ?? 0.9
 										}))
 									})
 								}
@@ -106,7 +106,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 			// Record 2: Forensic detection with forensic flags tool_call
 			if (forensicFlags.length > 0) {
-				const highSeverity = forensicFlags.filter((f: any) => f.severity === 'high');
+				const highSeverity = forensicFlags.filter((f) => f.severity === 'high');
 				records.push({
 					messages: [
 						{
@@ -130,11 +130,11 @@ export const GET: RequestHandler = async ({ url }) => {
 											document_id: row.id,
 											total_flags: forensicFlags.length,
 											high_severity_count: highSeverity.length,
-											patterns: forensicFlags.slice(0, 15).map((f: any) => ({
+											patterns: forensicFlags.slice(0, 15).map((f) => ({
 												type: f.type,
 												pattern: f.pattern,
 												severity: f.severity,
-												context: f.context?.slice(0, 100)
+												context: (f.context as string)?.slice(0, 100)
 											}))
 										})
 									}

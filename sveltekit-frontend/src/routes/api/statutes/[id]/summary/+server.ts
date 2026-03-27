@@ -11,8 +11,7 @@ import { eq } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { redis } from '$lib/server/redis.js';
-
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+import { isUuid } from '$lib/server/validation.js';
 const CACHE_TTL = 86400; // 24 hours
 const LLM_MODEL = 'gemma3-legal:latest';
 
@@ -22,7 +21,7 @@ export const POST: RequestHandler = async ({ params, locals }) => {
 	}
 
 	const statuteId = params.id;
-	if (!UUID_PATTERN.test(statuteId)) {
+	if (!isUuid(statuteId)) {
 		return json({ error: 'Invalid statute ID' }, { status: 400 });
 	}
 

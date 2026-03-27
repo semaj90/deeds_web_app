@@ -117,8 +117,10 @@ async function executeTool(name: string, args: Record<string, unknown>): Promise
 					webSearch({ query, maxResults: Number(args.maxResults ?? 5), searchType: (args.searchType as 'general' | 'stackoverflow' | 'github' | 'docs') || 'general' }),
 					new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
 				]);
-				const results = formatWebSearchResults(searchResult as Awaited<ReturnType<typeof webSearch>>);
-				return { ok: true, tool: name, query, results, count: (searchResult as any).results?.length ?? 0, durationMs: Date.now() - start };
+				const typedSearch = searchResult as Awaited<ReturnType<typeof webSearch>>;
+				const results = formatWebSearchResults(typedSearch);
+				const searchItems = (typedSearch as unknown as Record<string, unknown>).results;
+				return { ok: true, tool: name, query, results, count: Array.isArray(searchItems) ? searchItems.length : 0, durationMs: Date.now() - start };
 			}
 			case 'ripgrep_search': {
 				const { ripgrepSearch, formatRipgrepResults } = await import('$lib/server/agent/tools/ripgrep-search.js');
@@ -126,8 +128,10 @@ async function executeTool(name: string, args: Record<string, unknown>): Promise
 					ripgrepSearch({ pattern: String(args.pattern || ''), fileType: args.fileType ? String(args.fileType) : undefined, ignoreCase: Boolean(args.ignoreCase ?? false), maxResults: Number(args.maxResults ?? 20) }),
 					new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
 				]);
-				const results = formatRipgrepResults(rgResult as Awaited<ReturnType<typeof ripgrepSearch>>);
-				return { ok: true, tool: name, query, results, count: (rgResult as any).matches?.length ?? 0, durationMs: Date.now() - start };
+				const typedRg = rgResult as Awaited<ReturnType<typeof ripgrepSearch>>;
+				const results = formatRipgrepResults(typedRg);
+				const rgMatches = (typedRg as unknown as Record<string, unknown>).matches;
+				return { ok: true, tool: name, query, results, count: Array.isArray(rgMatches) ? rgMatches.length : 0, durationMs: Date.now() - start };
 			}
 			case 'rag_search': {
 				const { generateEmbeddings } = await import('$lib/server/grpc/embedding-client.js');
@@ -136,13 +140,15 @@ async function executeTool(name: string, args: Record<string, unknown>): Promise
 					generateEmbeddings([query]),
 					new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
 				]);
-				if (!(embResult as any).vectors[0]?.length)
+				const embVectors = (embResult as { vectors: number[][] }).vectors;
+				if (!embVectors[0]?.length)
 					return { ok: false, tool: name, query, results: 'Embedding failed.', count: 0, durationMs: Date.now() - start };
 				const collection = (args.collection as string) || 'documents';
-				const searchResult = await qdrant.hybridSearch({ query, queryEmbedding: (embResult as any).vectors[0], collection: collection as any, limit: Number(args.limit ?? 5), scoreThreshold: 0.5 });
-				const results = searchResult.results.map((r: any, i: number) =>
-					`${i + 1}. [${(r.score * 100).toFixed(0)}%] ${r.payload?.title || r.payload?.filename || 'Untitled'}\n   ${(r.payload?.content_preview || r.payload?.content || '').slice(0, 200)}`
-				).join('\n\n') || 'No relevant documents found.';
+				const searchResult = await qdrant.hybridSearch({ query, queryEmbedding: embVectors[0], collection, limit: Number(args.limit ?? 5), scoreThreshold: 0.5 });
+				const results = searchResult.results.map((r: { score: number; payload?: Record<string, unknown> }, i: number) => {
+					const p = r.payload ?? {};
+					return `${i + 1}. [${(r.score * 100).toFixed(0)}%] ${String(p.title || p.filename || 'Untitled')}\n   ${String(p.content_preview || p.content || '').slice(0, 200)}`;
+				}).join('\n\n') || 'No relevant documents found.';
 				return { ok: true, tool: name, query, results, count: searchResult.results.length, durationMs: Date.now() - start };
 			}
 			case 'glossary_search': {
@@ -154,7 +160,7 @@ async function executeTool(name: string, args: Record<string, unknown>): Promise
 				if (!matches || matches.length === 0)
 					return { ok: true, tool: name, query, results: 'No glossary matches found for that term.', count: 0, durationMs: Date.now() - start };
 				const cap = Number(args.limit ?? 5);
-				const results = matches.slice(0, cap).map((m: any, i: number) => {
+				const results = matches.slice(0, cap).map((m: { term: string; definition: string; category?: string; jurisdiction?: string }, i: number) => {
 					const meta = [m.category, m.jurisdiction].filter(Boolean).join(' | ');
 					return `${i + 1}. **${m.term}**: ${m.definition.slice(0, 300)}${meta ? ` (${meta})` : ''}`;
 				}).join('\n\n');

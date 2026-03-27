@@ -48,7 +48,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			LIMIT ${limit}
 		`).catch(() => ({ rows: [] }));
 
-		for (const row of dbResults.rows as any[]) {
+		for (const row of dbResults.rows as Record<string, any>[]) {
 			sources.push({
 				type: 'historical_fix',
 				id: row.id,
@@ -70,7 +70,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		if (embedding?.length) {
 			const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
 			const { results: hits } = await qdrant.hybridSearch({
-				collection: 'codebase_chunks_768' as any,
+				collection: 'codebase_chunks_768',
 				query: queryText,
 				queryEmbedding: embedding,
 				limit: Math.min(limit, 5),
@@ -78,14 +78,15 @@ export const POST: RequestHandler = async ({ request }) => {
 			});
 
 			for (const hit of hits) {
+				const p = (hit.payload ?? {}) as Record<string, unknown>;
 				sources.push({
 					type: 'codebase_chunk',
 					id: String(hit.id),
-					content: (hit.payload as any)?.content ?? (hit.payload as any)?.text ?? '',
+					content: (p.content ?? p.text ?? '') as string,
 					relevance: hit.score ?? 0.5,
 					metadata: {
-						filePath: (hit.payload as any)?.filePath ?? '',
-						language: (hit.payload as any)?.language ?? 'typescript',
+						filePath: (p.filePath ?? '') as string,
+						language: (p.language ?? 'typescript') as string,
 					},
 				});
 			}

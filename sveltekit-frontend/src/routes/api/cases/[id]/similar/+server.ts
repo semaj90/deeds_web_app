@@ -23,6 +23,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { cases, evidence } from '$lib/server/db/schema-postgres.js';
+import { isUuid } from '$lib/server/validation.js';
 import { eq, sql, desc } from 'drizzle-orm';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
@@ -70,7 +71,7 @@ interface SimilarityResponse {
 		embedding?: number[];
 	};
 	results: SimilarCase[];
-	aceContext?: any;
+	aceContext?: Record<string, unknown> | null;
 	timing: {
 		embedMs: number;
 		searchMs: number;
@@ -87,6 +88,9 @@ interface SimilarityResponse {
 export const GET: RequestHandler = async ({ params, url, locals }) => {
 	const startTime = performance.now();
 	const caseId = params.id;
+	if (!isUuid(caseId)) {
+		return json({ error: 'Invalid case ID format' }, { status: 400 });
+	}
 
 	const queryParsed = caseSimilarQuerySchema.safeParse({
 		limit: url.searchParams.get('limit') ?? undefined,
@@ -97,7 +101,7 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 		return json({ error: queryParsed.error.issues[0]?.message ?? 'Invalid query parameters' }, { status: 400 });
 	}
 	const { limit, includeEmbedding, triggerGraph } = queryParsed.data;
-	const userId = (locals as any).user?.id ?? null;
+	const userId = locals.user?.id ?? null;
 
 	try {
 		// Step 1: Load source case from database
@@ -287,9 +291,11 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
  * - Top 3 evidence summaries (secondary)
  * - Practice area + jurisdiction (tertiary)
  */
+type CaseRow = typeof cases.$inferSelect;
+
 async function generateCaseEmbedding(
 	caseId: string,
-	caseData: any
+	caseData: CaseRow
 ): Promise<number[] | null> {
 	// Build composite text representation
 	let compositeText = caseData.title || '';
@@ -418,26 +424,29 @@ async function searchQdrantCases(
 	});
 
 	return results
-		.filter((r: any) => r.payload?.case_id !== excludeCaseId)
-		.map((r: any) => ({
-			caseId: r.payload?.case_id ?? '',
-			title: r.payload?.title ?? '',
-			description: r.payload?.description ?? '',
-			jurisdiction: r.payload?.jurisdiction ?? '',
-			status: r.payload?.status ?? '',
-			priority: r.payload?.priority ?? '',
-			practiceArea: r.payload?.practice_area,
-			similarity: r.score ?? 0,
-			breakdown: {
-				vector: r.score ?? 0,
-				tags: 0,
-				topic: 0,
-				centrality: 0,
-				userHistory: 0
-			},
-			sharedTags: r.payload?.tags ?? [],
-			topicCluster: r.payload?.topic_cluster
-		}));
+		.filter((r) => (r.payload as Record<string, unknown>)?.case_id !== excludeCaseId)
+		.map((r) => {
+			const p = (r.payload ?? {}) as Record<string, unknown>;
+			return {
+				caseId: (p.case_id as string) ?? '',
+				title: (p.title as string) ?? '',
+				description: (p.description as string) ?? '',
+				jurisdiction: (p.jurisdiction as string) ?? '',
+				status: (p.status as string) ?? '',
+				priority: (p.priority as string) ?? '',
+				practiceArea: p.practice_area as string | undefined,
+				similarity: r.score ?? 0,
+				breakdown: {
+					vector: r.score ?? 0,
+					tags: 0,
+					topic: 0,
+					centrality: 0,
+					userHistory: 0
+				},
+				sharedTags: (p.tags as string[]) ?? [],
+				topicCluster: p.topic_cluster as number | undefined
+			};
+		});
 }
 
 /**
@@ -462,10 +471,10 @@ async function searchPgvectorCases(
 		LIMIT ${limit}
 	`;
 
-	const result = await db.execute(query as any);
-	const rows = (result as any).rows ?? result;
+	const result = await db.execute(query);
+	const rows: Record<string, any>[] = Array.isArray(result) ? result : (result as { rows: Record<string, any>[] }).rows ?? [];
 
-	return rows.map((row: any) => ({
+	return rows.map((row) => ({
 		caseId: row.id,
 		title: row.title ?? '',
 		description: row.description ?? '',
@@ -529,7 +538,7 @@ async function triggerGraphAnalysis(
 async function storeSynthesisInCouchDB(
 	caseId: string,
 	results: SimilarCase[],
-	aceContext: any
+	aceContext: Record<string, unknown> | null
 ): Promise<void> {
 	if (!ENV.COUCHDB_URL) {
 		console.warn('[Case Similarity] CouchDB URL not configured — skipping synthesis storage');

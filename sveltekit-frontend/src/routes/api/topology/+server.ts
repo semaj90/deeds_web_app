@@ -66,14 +66,14 @@ export const GET: RequestHandler = async () => {
             };
         }).sort((a, b) => b.importance - a.importance);
 
-        const total_errors = components.reduce((sum: number, c: any) => sum + c.errors, 0);
+        const total_errors = components.reduce((sum: number, c: ComponentEntry) => sum + c.errors, 0);
 
         return json({
             components,
             summary: { total_components: components.length,
                 total_errors,
-                high_priority: components.filter((c: any) => c.recommended_action === 'urgent_refactor').length,
-                avg_complexity: components.length > 0 ? components.reduce((sum: number, c: any) => sum + c.complexity, 0) / components.length : 0
+                high_priority: components.filter((c: ComponentEntry) => c.recommended_action === 'urgent_refactor').length,
+                avg_complexity: components.length > 0 ? components.reduce((sum: number, c: ComponentEntry) => sum + c.complexity, 0) / components.length : 0
             }
         });
 
@@ -99,7 +99,19 @@ function extractComponent(filePath: string): string {
 	return filePath;
 }
 
-function generateTags(comp: any): Set<string> {
+interface ComponentEntry {
+	name: string;
+	path: string;
+	errors: number;
+	complexity: number;
+	tags: Set<string> | string[];
+	error_codes: Set<string> | string[];
+	dependencies: Set<string> | string[];
+	recommended_action?: string;
+	importance?: number;
+}
+
+function generateTags(comp: ComponentEntry): Set<string> {
 	const tags = new Set<string>();
 	if (comp.errors > 10) tags.add('buggy');
 	if (comp.complexity > 20) tags.add('complex');
@@ -108,7 +120,7 @@ function generateTags(comp: any): Set<string> {
 	return tags;
 }
 
-function recommendAction(comp: any): string {
+function recommendAction(comp: ComponentEntry): string {
 	if (comp.errors > 20) return 'urgent_refactor';
 	if (comp.errors > 5) return 'investigate';
 	if (comp.complexity > 30) return 'simplify';

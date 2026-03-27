@@ -84,9 +84,9 @@ export const POST: RequestHandler = async ({ request }) => {
 							});
 							if (sectionResults.results.length > 0) {
 								sectionContext = sectionResults.results
-									.map((r: any, i: number) => {
-										const label = r.payload?.section_type?.toUpperCase() ?? 'UNKNOWN';
-										const text = r.payload?.content_preview ?? r.payload?.content ?? '';
+									.map((r: { payload?: Record<string, unknown> }, i: number) => {
+										const label = String(r.payload?.section_type ?? 'UNKNOWN').toUpperCase();
+										const text = String(r.payload?.content_preview ?? r.payload?.content ?? '');
 										return `[SECTION ${i + 1} — ${label}] ${text.slice(0, 400)}`;
 									})
 									.join('\n\n');
@@ -108,15 +108,15 @@ export const POST: RequestHandler = async ({ request }) => {
 						results: results.map((r: any) => ({
 							id: r.id,
 							title: r.title,
-							score: r.score,
-							url: r.url
+							score: r.scores ?? r.similarity ?? 0,
+							url: r.url ?? ''
 						}))
 					});
 
 					// Build context from results (prepend section context if available)
 					const knowledgeContext = results
 						.slice(0, topK)
-						.map((r: any, idx: number) => `[${idx + 1}] ${r.title}: ${r?.summary || (r.content?.slice(0, 500) ?? 'No content')}`)
+						.map((r, idx: number) => `[${idx + 1}] ${r.title}: ${r?.summary || (r.content?.slice(0, 500) ?? 'No content')}`)
 						.join('\n\n');
 
 					const fullContext = sectionContext
@@ -185,7 +185,7 @@ async function streamOllamaResponse(
 	prompt: string,
 	_controller: ReadableStreamDefaultController,
 	_encoder: TextEncoder,
-	sendEvent: (event: string, data: any) => void
+	sendEvent: (event: string, data: unknown) => void
 ): Promise<void> {
 	const OLLAMA_URL = getOllamaUrl();
 	const MODEL = process.env?.OLLAMA_MODEL ?? 'gemma3-legal:latest';
@@ -253,7 +253,7 @@ async function streamGeminiResponse(
 	prompt: string,
 	_controller: ReadableStreamDefaultController,
 	_encoder: TextEncoder,
-	sendEvent: (event: string, data: any) => void
+	sendEvent: (event: string, data: unknown) => void
 ): Promise<void> {
 	const apiKey = process.env.GEMINI_API_KEY;
 	if (!apiKey) {

@@ -55,8 +55,13 @@
 
 	// Derived helpers
 	let fileType = $derived(doc?.fileType ?? doc?.file_type ?? doc?.mimeType ?? doc?.mime_type ?? '');
+	let fileName = $derived(doc?.fileName ?? doc?.file_name ?? '');
 	let isImage = $derived(fileType.startsWith('image/'));
 	let isPdf = $derived(fileType.includes('pdf'));
+	let isAudio = $derived(fileType.startsWith('audio/'));
+	let isVideo = $derived(fileType.startsWith('video/'));
+	let isText = $derived(fileType === 'text/plain' || fileType === 'text/csv' || fileName.endsWith('.txt') || fileName.endsWith('.csv'));
+	let isMarkdown = $derived(fileType === 'text/markdown' || fileName.endsWith('.md'));
 	let fileUrl = $derived(doc?.fileUrl ?? doc?.file_url ?? null);
 	let metadata = $derived.by(() => {
 		const value = doc?.metadata;
@@ -124,6 +129,9 @@
 		const ft = fileType.toLowerCase();
 		if (ft.includes('pdf')) return { bg: 'rgba(239, 68, 68, 0.12)', border: 'rgba(239, 68, 68, 0.3)', text: '#f87171', strip: '#ef4444' };
 		if (ft.startsWith('image/')) return { bg: 'rgba(168, 85, 247, 0.12)', border: 'rgba(168, 85, 247, 0.3)', text: '#c4b5fd', strip: '#a855f7' };
+		if (ft.startsWith('audio/')) return { bg: 'rgba(245, 158, 11, 0.12)', border: 'rgba(245, 158, 11, 0.3)', text: '#fbbf24', strip: '#f59e0b' };
+		if (ft.startsWith('video/')) return { bg: 'rgba(236, 72, 153, 0.12)', border: 'rgba(236, 72, 153, 0.3)', text: '#f472b6', strip: '#ec4899' };
+		if (ft.includes('markdown') || fileName.endsWith('.md')) return { bg: 'rgba(56, 189, 248, 0.12)', border: 'rgba(56, 189, 248, 0.3)', text: '#7dd3fc', strip: '#38bdf8' };
 		if (ft.includes('word') || ft.includes('text') || ft.includes('document')) return { bg: 'rgba(96, 165, 250, 0.12)', border: 'rgba(96, 165, 250, 0.3)', text: '#93c5fd', strip: '#60a5fa' };
 		if (ft.includes('sheet') || ft.includes('csv') || ft.includes('excel')) return { bg: 'rgba(34, 197, 94, 0.12)', border: 'rgba(34, 197, 94, 0.3)', text: '#4ade80', strip: '#22c55e' };
 		return { bg: 'rgba(212, 199, 163, 0.08)', border: 'rgba(212, 199, 163, 0.15)', text: 'rgba(212, 199, 163, 0.7)', strip: 'rgba(212, 199, 163, 0.3)' };
@@ -223,6 +231,65 @@
 								</a>
 							</div>
 						</div>
+					{:else if isVideo && fileUrl}
+						<div class="preview-wrap media-wrap">
+							<!-- svelte-ignore a11y_media_has_caption -->
+							<video
+								controls
+								preload="metadata"
+								class="video-player"
+								src={fileUrl}
+							>
+								<track kind="captions" />
+								Your browser does not support video playback.
+							</video>
+						</div>
+					{:else if isAudio && fileUrl}
+						<div class="preview-wrap media-wrap audio-wrap">
+							<div class="audio-visual">
+								<span class="audio-icon">
+									<Icon name="music" class="w-8 h-8" />
+								</span>
+								<span class="audio-filename">{fileName || 'Audio file'}</span>
+							</div>
+							<audio controls preload="metadata" class="audio-player" src={fileUrl}>
+								Your browser does not support audio playback.
+							</audio>
+						</div>
+					{:else if isMarkdown}
+						{@const rawText = doc.extractedText ?? doc.extracted_text ?? doc.content ?? ''}
+						{#if rawText}
+							<div class="preview-wrap markdown-wrap">
+								<div class="markdown-header">
+									<Icon name="file-text" class="w-3.5 h-3.5" />
+									<span>Markdown</span>
+								</div>
+								<div class="markdown-body">
+									{@html rawText
+										.replace(/^### (.+)$/gm, '<h3>$1</h3>')
+										.replace(/^## (.+)$/gm, '<h2>$1</h2>')
+										.replace(/^# (.+)$/gm, '<h1>$1</h1>')
+										.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+										.replace(/\*(.+?)\*/g, '<em>$1</em>')
+										.replace(/`(.+?)`/g, '<code>$1</code>')
+										.replace(/^- (.+)$/gm, '<li>$1</li>')
+										.replace(/\n/g, '<br />')
+									}
+								</div>
+							</div>
+						{/if}
+					{:else if isText}
+						{@const rawText = doc.extractedText ?? doc.extracted_text ?? doc.content ?? ''}
+						{#if rawText}
+							<div class="preview-wrap text-file-wrap">
+								<div class="text-file-header">
+									<Icon name="file-text" class="w-3.5 h-3.5" />
+									<span>{fileName || 'Text file'}</span>
+									<span class="text-file-lines">{rawText.split('\n').length} lines</span>
+								</div>
+								<pre class="text-file-content">{rawText.slice(0, 5000)}{rawText.length > 5000 ? '\n… (truncated)' : ''}</pre>
+							</div>
+						{/if}
 					{/if}
 
 					<!-- Core fields -->
@@ -708,6 +775,130 @@
 		text-decoration: none;
 	}
 	.pdf-link:hover { text-decoration: underline; }
+
+	/* Video player */
+	.media-wrap {
+		display: flex;
+		flex-direction: column;
+	}
+	.video-player {
+		width: 100%;
+		max-height: 520px;
+		border-radius: 10px;
+		background: #000;
+		outline: none;
+	}
+
+	/* Audio player */
+	.audio-wrap {
+		padding: 1.5rem;
+		gap: 1rem;
+		align-items: center;
+	}
+	.audio-visual {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 1rem 0;
+	}
+	.audio-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 56px;
+		height: 56px;
+		border-radius: 14px;
+		background: rgba(245, 158, 11, 0.1);
+		border: 1px solid rgba(245, 158, 11, 0.2);
+		color: #fbbf24;
+	}
+	.audio-filename {
+		font-size: 0.78rem;
+		color: rgba(212, 199, 163, 0.6);
+		max-width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.audio-player {
+		width: 100%;
+		height: 40px;
+		border-radius: 8px;
+		outline: none;
+	}
+
+	/* Markdown viewer */
+	.markdown-wrap {
+		display: flex;
+		flex-direction: column;
+	}
+	.markdown-header {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.5rem 1rem;
+		font-size: 0.72rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: rgba(212, 199, 163, 0.45);
+		border-bottom: 1px solid rgba(212, 199, 163, 0.06);
+	}
+	.markdown-body {
+		padding: 1rem;
+		font-size: 0.82rem;
+		line-height: 1.7;
+		color: rgba(212, 199, 163, 0.75);
+		max-height: 400px;
+		overflow-y: auto;
+	}
+	.markdown-body :global(h1) { font-size: 1.3rem; font-weight: 700; color: rgba(212, 199, 163, 0.9); margin: 0.75rem 0 0.5rem; }
+	.markdown-body :global(h2) { font-size: 1.1rem; font-weight: 600; color: rgba(212, 199, 163, 0.85); margin: 0.6rem 0 0.4rem; }
+	.markdown-body :global(h3) { font-size: 0.95rem; font-weight: 600; color: rgba(212, 199, 163, 0.8); margin: 0.5rem 0 0.3rem; }
+	.markdown-body :global(code) {
+		font-family: 'JetBrains Mono', 'Courier New', monospace;
+		font-size: 0.78rem;
+		padding: 0.12rem 0.35rem;
+		border-radius: 4px;
+		background: rgba(212, 199, 163, 0.06);
+		color: #7dd3fc;
+	}
+	.markdown-body :global(strong) { font-weight: 600; color: rgba(212, 199, 163, 0.88); }
+	.markdown-body :global(li) { margin-left: 1rem; list-style: disc; }
+
+	/* Text file viewer */
+	.text-file-wrap {
+		display: flex;
+		flex-direction: column;
+	}
+	.text-file-header {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.5rem 1rem;
+		font-size: 0.72rem;
+		font-weight: 600;
+		color: rgba(212, 199, 163, 0.45);
+		border-bottom: 1px solid rgba(212, 199, 163, 0.06);
+	}
+	.text-file-lines {
+		margin-left: auto;
+		font-weight: 400;
+		color: rgba(212, 199, 163, 0.3);
+	}
+	.text-file-content {
+		font-family: 'JetBrains Mono', 'Courier New', monospace;
+		font-size: 0.72rem;
+		line-height: 1.55;
+		color: rgba(212, 199, 163, 0.6);
+		white-space: pre-wrap;
+		word-break: break-word;
+		margin: 0;
+		padding: 1rem;
+		max-height: 400px;
+		overflow-y: auto;
+	}
 
 	/* Image Lightbox */
 	.lightbox-backdrop {

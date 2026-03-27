@@ -22,6 +22,7 @@ import { getTopQueryPatterns, getWeeklySummary } from '$lib/server/analytics/eve
 import { applyStyle, type LegalPersona } from './style-adapter.js';
 import { webSearch, formatWebResultsAsContext } from '$lib/server/retrieval/web-search.js';
 import { searchWikipedia, formatWikipediaAsContext } from '$lib/server/retrieval/wikipedia-search.js';
+import { fetchUserAnalyticsContext } from './user-analytics-context.js';
 
 /**
  * Assemble a complete ACE context from all data sources.
@@ -60,6 +61,7 @@ export async function assembleACEContext(opts: {
     chatHistory,
     webResults,
     wikiResults,
+    userAnalyticsContext,
   ] = await Promise.all([
     userId ? fetchUserProfile(userId) : Promise.resolve(null),
     caseId ? fetchCaseContext(caseId) : Promise.resolve(null),
@@ -71,6 +73,7 @@ export async function assembleACEContext(opts: {
     (opts.enableWikipedia ?? true)
       ? searchWikipedia(query, 3).catch(() => null)
       : Promise.resolve(null),
+    userId ? fetchUserAnalyticsContext(userId, query, caseId).catch(() => null) : Promise.resolve(null),
   ]);
 
   // Fetch evidence metadata and connections separately (avoids hoisting issues)
@@ -110,6 +113,7 @@ export async function assembleACEContext(opts: {
     persona: opts.persona ?? 'neutral',
     evidenceMetadata,
     evidenceConnections,
+    userAnalyticsContext,
   };
 }
 
@@ -254,7 +258,13 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
     confidenceFactors.webSearch = 0.6;
   }
 
-  // 10. Self-prompting instructions
+  // 13. User analytics context (search patterns, graph neighbors, similar queries)
+  if (context.userAnalyticsContext) {
+    lines.push(`\n${context.userAnalyticsContext}`);
+    confidenceFactors.userAnalytics = 0.5;
+  }
+
+  // 14. Self-prompting instructions
   const selfPrompt =
     'After answering, briefly assess: Did you cite specific statutes/precedents? ' +
     'Is the answer jurisdiction-appropriate? Flag any uncertainty.';

@@ -6,14 +6,14 @@ import { join } from 'path';
  * Phase 96: MCP-Enhanced All Routes Test
  *
  * This test suite:
- * 1. Tests all routes against http://localhost:5175 (dev:quic server)
+ * 1. Tests all routes against http://127.0.0.1:5173 (dev server)
  * 2. Takes full-page screenshots with error annotations
  * 3. Captures console errors, network failures, and exceptions
  * 4. Generates MCP-compatible JSON report for AI analysis
  * 5. Identifies broken routes and consolidation opportunities
  */
 
-const BASE_URL = 'http://localhost:5175';
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
 
 interface RouteTestResult {
   route: string;

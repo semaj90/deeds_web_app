@@ -33,7 +33,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			LIMIT $1
 		`, [limit]);
 
-		const nodes: any[] = filesResult.rows.map((row: any) => ({
+		const nodes: Record<string, any>[] = filesResult.rows.map((row: Record<string, any>) => ({
 			uri: row.uri,
 			label: row.label,
 			kind: row.kind,
@@ -59,7 +59,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			LIMIT 100
 		`, [fileUris]);
 
-		nodes.push(...errorsResult.rows.map((row: any) => ({
+		nodes.push(...errorsResult.rows.map((row: Record<string, any>) => ({
 			uri: row.uri,
 			label: row.label,
 			kind: row.kind,
@@ -83,7 +83,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			  AND e.type IN ('ERROR_IN_FILE', 'FILE_IMPORTS_FILE')
 		`, [fileUris]);
 
-		const links = linksResult.rows.map((row: any) => ({
+		const links = linksResult.rows.map((row: Record<string, any>) => ({
 			source: row.source_uri,
 			target: row.target_uri,
 			type: row.type,
@@ -91,7 +91,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		}));
 
 		return json({ nodes, links });
-	} catch (error: any) {
+	} catch (error) {
 		console.error('Error fetching graph:', error);
 		return json({ error: 'Failed to fetch graph data' }, { status: 500 });
 	}

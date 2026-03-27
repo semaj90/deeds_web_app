@@ -18,7 +18,7 @@
 import { cosineSimilarity } from '$lib/ai/client-embed.js';
 import { db } from '$lib/server/db/client';
 import { documentTopics, userInteractionHistory } from '$lib/server/db/schema-postgres';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { feedbackStore } from '$lib/server/ml/feedback-store.js';
 
 export interface RankingSignal {
@@ -140,9 +140,86 @@ export async function inferUserTopicPreferences(
 	return preferences;
 }
 
+interface UserProfileMatch {
+	practiceAreas: string[];
+	jurisdiction: string | null;
+}
+
+/** Fetch user practice areas + jurisdiction for profile match signal */
+async function fetchUserProfileMatch(userId: string): Promise<UserProfileMatch> {
+	try {
+		const result = await db.execute(
+			sql`SELECT practice_area, jurisdiction FROM users WHERE id = ${userId} LIMIT 1`
+		);
+		const rows = result.rows ?? [];
+		const row = rows[0] as Record<string, unknown> | undefined;
+		if (!row) return { practiceAreas: [], jurisdiction: null };
+
+		const practiceArea = row.practice_area as string | null;
+		return {
+			practiceAreas: practiceArea ? practiceArea.split(',').map((s: string) => s.trim().toLowerCase()) : [],
+			jurisdiction: (row.jurisdiction as string | null)?.toLowerCase() ?? null,
+		};
+	} catch {
+		return { practiceAreas: [], jurisdiction: null };
+	}
+}
+
+/** Score profile match: 1.0 = exact match, 0.5 = partial, 0.2 = unrelated */
+function computeProfileMatch(
+	userProfile: UserProfileMatch,
+	documentTags: string[]
+): number {
+	if (userProfile.practiceAreas.length === 0 && !userProfile.jurisdiction) return 0.5;
+
+	const docTagsLower = documentTags.map((t) => t.toLowerCase());
+	let score = 0.2; // Baseline for unrelated
+
+	// Practice area match
+	if (userProfile.practiceAreas.length > 0) {
+		const hasExact = userProfile.practiceAreas.some((pa) =>
+			docTagsLower.some((t) => t.includes(pa) || pa.includes(t))
+		);
+		if (hasExact) score = 1.0;
+		else {
+			// Partial: check if any doc tag is in the same legal domain
+			const legalDomains: Record<string, string[]> = {
+				criminal: ['criminal', 'felony', 'misdemeanor', 'prosecution', 'defense'],
+				civil: ['civil', 'tort', 'contract', 'negligence', 'liability'],
+				family: ['family', 'custody', 'divorce', 'adoption', 'child'],
+				corporate: ['corporate', 'business', 'merger', 'securities', 'compliance'],
+				constitutional: ['constitutional', 'amendment', 'rights', 'liberty'],
+			};
+			for (const [, keywords] of Object.entries(legalDomains)) {
+				const userInDomain = userProfile.practiceAreas.some((pa) =>
+					keywords.some((k) => pa.includes(k))
+				);
+				const docInDomain = docTagsLower.some((t) =>
+					keywords.some((k) => t.includes(k))
+				);
+				if (userInDomain && docInDomain) {
+					score = Math.max(score, 0.7);
+					break;
+				}
+			}
+		}
+	}
+
+	// Jurisdiction match boost
+	if (userProfile.jurisdiction) {
+		const jurisdictionMatch = docTagsLower.some(
+			(t) => t.includes(userProfile.jurisdiction!) || userProfile.jurisdiction!.includes(t)
+		);
+		if (jurisdictionMatch) score = Math.min(score + 0.2, 1.0);
+	}
+
+	return score;
+}
+
 export class MultiModalRanker {
 	private userId: string;
 	private userTopicPreferences: Map<number, number> | null = null;
+	private userProfile: UserProfileMatch | null = null;
 
 	constructor(userId: string) {
 		this.userId = userId;
@@ -161,9 +238,12 @@ export class MultiModalRanker {
 			return [];
 		}
 
-		// Pre-compute user topic preferences (cached for entire ranking session)
+		// Pre-compute user topic preferences + profile (cached for entire ranking session)
 		if (!this.userTopicPreferences) {
 			this.userTopicPreferences = await inferUserTopicPreferences(this.userId);
+		}
+		if (!this.userProfile) {
+			this.userProfile = await fetchUserProfileMatch(this.userId);
 		}
 
 		// Track already-returned embeddings for novelty computation
@@ -239,9 +319,10 @@ export class MultiModalRanker {
 		// Signal 4: Graph Centrality (normalized 0-1)
 		const graphCentrality = Math.min(1, document.centrality ?? 0);
 
-		// Signal 5: Profile Match (placeholder - 0.5 neutral)
-		// In production: query user role + practice area vs document case types
-		const profileMatch = 0.5;
+		// Signal 5: Profile Match (user practice area + jurisdiction vs document tags)
+		const profileMatch = this.userProfile
+			? computeProfileMatch(this.userProfile, document.tags)
+			: 0.5;
 
 		// Signal 6: Feedback Boost (user rating history with decay)
 		const feedbackBoost = feedbackStore.getFeedbackBoost(document.id);

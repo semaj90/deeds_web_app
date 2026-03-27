@@ -329,9 +329,11 @@ export async function getCartridgeCacheStats(): Promise<{
 	cachedCases: number;
 	totalSizeBytes: number;
 	redisConnected: boolean;
+	nesMemory: MemoryStats;
 }> {
+	const nesStats = nesMemory.getMemoryStats();
 	const redis = getRedis();
-	if (!redis) return { cachedCases: 0, totalSizeBytes: 0, redisConnected: false };
+	if (!redis) return { cachedCases: 0, totalSizeBytes: 0, redisConnected: false, nesMemory: nesStats };
 
 	try {
 		const keys = await redis.keys(`${REDIS_CARTRIDGE_PREFIX}*`);
@@ -340,9 +342,9 @@ export async function getCartridgeCacheStats(): Promise<{
 			const len = await redis.strlen(key);
 			totalSize += len;
 		}
-		return { cachedCases: keys.length, totalSizeBytes: totalSize, redisConnected: true };
+		return { cachedCases: keys.length, totalSizeBytes: totalSize, redisConnected: true, nesMemory: nesStats };
 	} catch {
-		return { cachedCases: 0, totalSizeBytes: 0, redisConnected: false };
+		return { cachedCases: 0, totalSizeBytes: 0, redisConnected: false, nesMemory: nesStats };
 	}
 }
 
@@ -350,6 +352,9 @@ export async function getCartridgeCacheStats(): Promise<{
  * Invalidate cached cartridge (e.g., after new evidence upload).
  */
 export async function invalidateCartridge(caseId: string): Promise<boolean> {
+	// Evict from NES memory banks
+	nesMemory.removeDocument(caseId);
+
 	const redis = getRedis();
 	if (!redis) return false;
 
@@ -359,4 +364,9 @@ export async function invalidateCartridge(caseId: string): Promise<boolean> {
 	} catch {
 		return false;
 	}
+}
+
+/** Get the NES memory singleton for external access (e.g., stats endpoints). */
+export function getNESMemory(): NESMemoryArchitecture {
+	return nesMemory;
 }

@@ -8,6 +8,7 @@ import { z } from 'zod';
 import postgres from 'postgres';
 import type { RequestHandler } from './$types';
 import { getDatabaseUrl } from '$lib/config/env.server.js';
+import { isUuid } from '$lib/server/validation.js';
 
 const sql = postgres(getDatabaseUrl());
 
@@ -17,6 +18,11 @@ const querySchema = z.object({
 
 export const GET: RequestHandler = async ({ params, url }) => {
   const { id } = params;
+
+  if (!isUuid(id)) {
+    return json({ error: 'Invalid ID format' }, { status: 400 });
+  }
+
   const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
   const topK = parsed.success ? parsed.data.topK : 5;
 

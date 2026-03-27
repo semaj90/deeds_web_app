@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 const layoutSchema = z.object({
 	caseId: z.string().uuid(),
-	evidenceData: z.any().optional(),
+	evidenceData: z.unknown().optional(),
 	layoutType: z.enum(['force', 'grid', 'radial', 'timeline', 'hierarchical']).default('force')
 });
 
@@ -18,14 +18,14 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		const { evidenceData, layoutType } = parsed.data;
-		const nodes = Array.isArray(evidenceData) ? evidenceData : [];
+		const nodes = (Array.isArray(evidenceData) ? evidenceData : []) as Array<{ id?: string }>;
 		const positions: Record<string, { x: number; y: number }> = {};
 		const count = nodes.length || 1;
 
 		switch (layoutType) {
 			case 'grid': {
 				const cols = Math.ceil(Math.sqrt(count));
-				nodes.forEach((node: any, i: number) => {
+				nodes.forEach((node, i: number) => {
 					positions[node.id || `node-${i}`] = {
 						x: 100 + (i % cols) * 200,
 						y: 100 + Math.floor(i / cols) * 180
@@ -35,7 +35,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			}
 			case 'radial': {
 				const cx = 500, cy = 400, radius = Math.min(300, count * 30);
-				nodes.forEach((node: any, i: number) => {
+				nodes.forEach((node, i: number) => {
 					const angle = (2 * Math.PI * i) / count;
 					positions[node.id || `node-${i}`] = {
 						x: cx + radius * Math.cos(angle),
@@ -45,7 +45,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				break;
 			}
 			case 'timeline': {
-				nodes.forEach((node: any, i: number) => {
+				nodes.forEach((node, i: number) => {
 					positions[node.id || `node-${i}`] = {
 						x: 100 + i * 180,
 						y: 300 + (i % 2 === 0 ? 0 : 80)
@@ -55,7 +55,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			}
 			default: {
 				// Force-directed initial placement (random with spacing)
-				nodes.forEach((node: any, i: number) => {
+				nodes.forEach((node, i: number) => {
 					positions[node.id || `node-${i}`] = {
 						x: 200 + Math.random() * 600,
 						y: 150 + Math.random() * 500

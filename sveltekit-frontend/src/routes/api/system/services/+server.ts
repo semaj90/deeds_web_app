@@ -3,6 +3,18 @@ import { getOllamaUrl, getQdrantUrl, getRedisUrl, getDatabaseUrl, getMinioConfig
 import { json } from '@sveltejs/kit';
 import { sql } from 'drizzle-orm';
 
+interface ServiceStatus {
+  url?: string;
+  endpoint?: string;
+  bucket?: string;
+  reachable?: boolean;
+  error?: string;
+  purpose?: string;
+  models?: string[];
+  database?: string;
+  extensions?: string[];
+}
+
 /**
  * GET /api/system/services
  * Detailed service probe results + readiness
@@ -10,7 +22,7 @@ import { sql } from 'drizzle-orm';
  */
 export async function GET({ locals }: { locals: App.Locals }) {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
-  const services: Record<string, any> = {};
+  const services: Record<string, ServiceStatus> = {};
 
   // Redis health
   {
@@ -44,11 +56,11 @@ export async function GET({ locals }: { locals: App.Locals }) {
         reachable: resp?.ok ?? false,
         purpose: 'Error cache, session storage, fix memory',
       };
-    } catch (e: any) {
+    } catch (e) {
       services.redis = {
         url: getRedisUrl().substring(0, 30) + '...',
         reachable: false,
-        error: e.message,
+        error: e instanceof Error ? e.message : String(e),
       };
     }
   }
@@ -62,11 +74,11 @@ export async function GET({ locals }: { locals: App.Locals }) {
         reachable: resp.ok,
         purpose: 'Vector embeddings for semantic search',
       };
-    } catch (e: any) {
+    } catch (e) {
       services.qdrant = {
         url: getQdrantUrl(),
         reachable: false,
-        error: e.message,
+        error: e instanceof Error ? e.message : String(e),
       };
     }
   }
@@ -79,14 +91,14 @@ export async function GET({ locals }: { locals: App.Locals }) {
       services.ollama = {
         url: getOllamaUrl(),
         reachable: resp.ok,
-        models: data.models?.map((m: any) => m.name) || [],
+        models: data.models?.map((m: { name: string }) => m.name) || [],
         purpose: 'Local LLM inference (Gemma3-legal, embeddings)',
       };
-    } catch (e: any) {
+    } catch (e) {
       services.ollama = {
         url: getOllamaUrl(),
         reachable: false,
-        error: e.message,
+        error: e instanceof Error ? e.message : String(e),
       };
     }
   }
@@ -102,11 +114,11 @@ export async function GET({ locals }: { locals: App.Locals }) {
         extensions: ['pgvector', 'pg_trgm'],
         purpose: 'Case evidence, case timelines, vector storage',
       };
-    } catch (e: any) {
+    } catch (e) {
       services.postgres = {
         url: getDatabaseUrl().substring(0, 40) + '...',
         reachable: false,
-        error: e.message,
+        error: e instanceof Error ? e.message : String(e),
       };
     }
   }

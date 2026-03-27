@@ -6,9 +6,12 @@
 import { json } from '@sveltejs/kit';
 import { pool } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
+import { validateUuidParams } from '$lib/server/validation.js';
 
 export async function GET({ params }) {
 	const { id, nodeId } = params;
+	const invalid = validateUuidParams(params, 'id', 'nodeId');
+	if (invalid) return invalid;
 
 	// Go fast-path: only works with integer IDs (Go service uses int32)
 	const goUrl = (ENV as unknown as Record<string, string>).GO_SEARCH_URL;

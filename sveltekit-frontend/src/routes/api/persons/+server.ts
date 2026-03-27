@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/client';
 import { personsOfInterest } from '$lib/server/db/schema';
 import { error, json } from '@sveltejs/kit';
-import { and, desc, eq, arrayContains } from 'drizzle-orm';
+import { and, desc, eq, arrayContains, type SQL } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 
@@ -44,7 +44,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	const { caseId: id, threatLevel, limit, offset } = parsed.data;
 
 	try {
-        const filters = [];
+        const filters: SQL[] = [];
 
         if (id) {
             // Check if id is in the caseIds array
@@ -52,14 +52,12 @@ export const GET: RequestHandler = async ({ locals, url }) => {
         }
 
         if (threatLevel) {
-            // @ts-ignore
             filters.push(eq(personsOfInterest.threatLevel, threatLevel));
         }
 
-        let query = db.select().from(personsOfInterest);
+        let query = db.select().from(personsOfInterest).$dynamic();
 
         if (filters.length > 0) {
-            // @ts-ignore
             query = query.where(and(...filters));
         }
 

@@ -5,6 +5,7 @@ import { poiPhotos, personsOfInterest } from '$lib/server/db/schema-postgres.js'
 import { eq, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 const faceMatchSchema = z.object({
 	photoId: z.string().max(500).optional(),
@@ -18,6 +19,7 @@ const faceMatchSchema = z.object({
  * Falls back to pgvector cosine similarity if Qdrant is unavailable.
  */
 export const POST: RequestHandler = async ({ params, request }) => {
+	if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
 	const poiId = params.id;
 	const raw = await request.json().catch(() => ({}));
 	const parsed = faceMatchSchema.safeParse(raw);

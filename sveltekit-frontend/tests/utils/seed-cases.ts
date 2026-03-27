@@ -40,7 +40,15 @@ export async function registerTestUser(request: APIRequestContext) {
     role: 'admin',
   };
 
-	const res = await request.post('/api/auth/demo-login', { data: user });
+	let res = await request.post('/api/auth/demo-login', { data: user });
+
+	// Retry once on 429 (rate limit) after waiting the suggested retry-after
+	if (res.status() === 429) {
+		const retryAfter = Number(res.headers()['retry-after'] ?? 3);
+		await new Promise(r => setTimeout(r, retryAfter * 1000 + 500));
+		res = await request.post('/api/auth/demo-login', { data: user });
+	}
+
 	if (!res.ok()) {
 		const body = await res.text();
 		throw new Error(`Demo login failed (${res.status()}): ${body}`);

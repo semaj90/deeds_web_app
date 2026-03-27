@@ -7,6 +7,7 @@ import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
 import { statObject, getStream, getPartialStream } from '$lib/server/minio-client.js';
+import { isUuid } from '$lib/server/validation.js';
 
 const BUCKET = process.env.MINIO_LIBRARY_BUCKET ?? 'legal-library';
 
@@ -14,6 +15,7 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 
 	const { documentId } = params;
+	if (!isUuid(documentId)) throw error(400, 'Invalid ID format');
 
 	// Fetch document metadata — we need the minio_key and mime type
 	const res = await pool

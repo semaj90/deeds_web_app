@@ -4,6 +4,7 @@ import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 const approveRejectSchema = z.object({
 	action: z.enum(['approve', 'reject']).default('approve'),
@@ -17,6 +18,7 @@ const approveRejectSchema = z.object({
  */
 export const POST: RequestHandler = async ({ params, request }) => {
 	const evidenceId = params.id;
+	if (!isUuid(evidenceId)) return json({ error: 'Invalid evidence ID format' }, { status: 400 });
 
 	try {
 		const body = await request.json().catch(() => ({}));

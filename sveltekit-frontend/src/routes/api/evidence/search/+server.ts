@@ -65,6 +65,14 @@ const evidenceSearchSchema = z.object({
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
+/** Extract rows from db.execute() result — handles both {rows: [...]} and raw array formats */
+/** Extract rows from db.execute() results (may be array or { rows: [...] } depending on driver) */
+function extractRows(result: unknown): Record<string, any>[] {
+  if (Array.isArray(result)) return result;
+  if (result && typeof result === 'object' && 'rows' in result) return (result as { rows: Record<string, any>[] }).rows;
+  return [];
+}
+
 /** SHA-256 hex digest (truncated to 16 chars for cache key brevity). */
 function sha256(input: string): string {
   return createHash('sha256').update(input).digest('hex').slice(0, 16);
@@ -154,7 +162,7 @@ export async function POST({ request, locals }: RequestEvent) {
     } = parsed.data;
 
     const start = performance.now();
-    const userId = (locals as any).user?.id ?? null;
+    const userId = locals.user?.id ?? null;
 
     // ── gRPC fast-path: delegate to RetrievalService if available ────
     const grpcResult = await searchEvidenceViaGrpc({
@@ -460,22 +468,25 @@ async function searchQdrant(
 			scoreThreshold: 0.3,
 		});
 
-	return results.map((r: any) => ({
-		evidenceId: r.payload?.evidence_id ?? '',
-		chunkIndex: r.payload?.chunk_index ?? 0,
-		content: r.payload?.content_preview ?? '',
-		score: r.score ?? 0,
-		metadata: {
-			sectionPath: r.payload?.section_path ?? [],
-			heading: r.payload?.heading ?? '',
-			citations: r.payload?.citations ?? [],
-			fileName: r.payload?.file_name ?? '',
-			tokenCount: r.payload?.token_count ?? 0,
-			extractionMethod: r.payload?.extraction_method ?? '',
-			jurisdiction: r.payload?.jurisdiction ?? '',
-			sectionType: r.payload?.section_type ?? null,
-		},
-	}));
+	return results.map((r) => {
+		const p = (r.payload ?? {}) as Record<string, unknown>;
+		return {
+			evidenceId: (p.evidence_id as string) ?? '',
+			chunkIndex: (p.chunk_index as number) ?? 0,
+			content: (p.content_preview as string) ?? '',
+			score: r.score ?? 0,
+			metadata: {
+				sectionPath: (p.section_path as string[]) ?? [],
+				heading: (p.heading as string) ?? '',
+				citations: (p.citations as string[]) ?? [],
+				fileName: (p.file_name as string) ?? '',
+				tokenCount: (p.token_count as number) ?? 0,
+				extractionMethod: (p.extraction_method as string) ?? '',
+				jurisdiction: (p.jurisdiction as string) ?? '',
+				sectionType: (p.section_type as string) ?? null,
+			},
+		};
+	});
 }
 
 // ── pgvector search ──────────────────────────────────────────────────────
@@ -513,9 +524,9 @@ async function searchPgvector(
 		`;
 
 	const result = await db.execute(query);
-	const rows = (result as any).rows ?? result;
+	const rows = extractRows(result);
 
-	return rows.map((row: any) => ({
+	return rows.map((row) => ({
 		evidenceId: row.evidence_id,
 		chunkIndex: row.chunk_index,
 		content: row.content,
@@ -570,8 +581,8 @@ async function expandToSections(
 				`;
 			const siblingResult = await db.execute(siblingQuery);
 
-			const sibRows = (siblingResult as any).rows ?? siblingResult;
-			siblings = sibRows.map((row: any) => ({
+			const sibRows = extractRows(siblingResult);
+			siblings = sibRows.map((row) => ({
 				evidenceId: row.evidence_id,
 				chunkIndex: row.chunk_index,
 				content: row.content,
@@ -630,17 +641,17 @@ async function enrichWithGraphNeighbors(
 			`),
 		]);
 
-		const pathRows = (byPath as any).rows ?? byPath;
-		const idRows = (byId as any).rows ?? byId;
+		const pathRows = extractRows(byPath);
+		const idRows = extractRows(byId);
 		// Deduplicate by node_id
-		const nodeMap = new Map<string, any>();
+		const nodeMap = new Map<string, Record<string, unknown>>();
 		for (const row of [...pathRows, ...idRows]) {
 			nodeMap.set(row.node_id, row);
 		}
 		const nodeRows = [...nodeMap.values()];
 		if (nodeRows.length === 0) return;
 
-		const nodeIds = nodeRows.map((r: any) => r.node_id);
+		const nodeIds = nodeRows.map((r) => r.node_id as string);
 		const nodeIdStr = nodeIds.map((id: string) => `'${id}'`).join(',');
 
 		// 1-hop graph traversal — UNION ALL pattern for sargable index joins.
@@ -670,7 +681,7 @@ async function enrichWithGraphNeighbors(
 			ORDER BY strength DESC, confidence_score DESC
 			LIMIT 20
 		`);
-		const connRows = (connResult as any).rows ?? connResult;
+		const connRows = extractRows(connResult);
 
 		const neighborMap = new Map<string, GraphNeighbor[]>();
 		for (const row of connRows) {
@@ -691,11 +702,11 @@ async function enrichWithGraphNeighbors(
 		}
 
 		for (const bundle of bundles) {
-			const matchingNode = nodeRows.find((n: any) =>
+			const matchingNode = nodeRows.find((n) =>
 				n.file_path === bundle.hit.evidenceId || n.node_id === bundle.hit.evidenceId
 			);
 			if (matchingNode) {
-				bundle.graphNeighbors = neighborMap.get(matchingNode.node_id) ?? [];
+				bundle.graphNeighbors = neighborMap.get(matchingNode.node_id as string) ?? [];
 			}
 		}
 	} catch (err) {
@@ -716,7 +727,7 @@ async function enrichWithDocumentContext(bundles: ContextBundle[]): Promise<void
 			FROM evidence
 			WHERE id IN ${sql.raw(`(${idList})`)}
 		`);
-		const rows = (result as any).rows ?? result;
+		const rows = extractRows(result);
 
 		const docMap = new Map<string, DocumentContext>();
 		for (const row of rows) {
@@ -735,7 +746,7 @@ async function enrichWithDocumentContext(bundles: ContextBundle[]): Promise<void
 			WHERE n.file_path IN ${sql.raw(`(${idList})`)}
 			OR n.id::text IN ${sql.raw(`(${idList})`)}
 		`);
-		const yorhaRows = (yorhaResult as any).rows ?? yorhaResult;
+		const yorhaRows = extractRows(yorhaResult);
 		for (const row of yorhaRows) {
 			const evId = row.file_path ?? row.id;
 			const existing = docMap.get(evId);

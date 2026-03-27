@@ -72,10 +72,11 @@ test.describe('Case Notes Lifecycle', () => {
 			timeout: 60_000,
 		});
 
-		// Page should load without 500 errors
-		const body = await page.textContent('body');
-		expect(body).not.toContain('Internal Error');
-		expect(body).not.toContain('500');
+		// Page should load without 500 errors — check URL didn't redirect to error page
+		// (avoid body text scan — SvelteKit serialized __data may contain numbers like 500)
+		expect(page.url()).toContain(`/cases/${testCase.id}/notes`);
+		const errorHeading = page.locator('h1').filter({ hasText: /^500$/ });
+		expect(await errorHeading.count()).toBe(0);
 
 		// CaseNotesEditor or notes area should be present
 		await page.waitForTimeout(2000);

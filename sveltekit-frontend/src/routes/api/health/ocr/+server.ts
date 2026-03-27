@@ -44,15 +44,15 @@ function getOCRBase(): string {
  return g.__OCR_BASE__ ?? '/api/ocr';
 }
 
-function safeNumber(value: any, fallback = 0): number {
+function safeNumber(value: unknown, fallback = 0): number {
  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 }
 
-function isAbortError(err: any): boolean {
- return typeof err === 'object' && err !== null && (err as any).name === 'AbortError';
+function isAbortError(err: unknown): boolean {
+ return typeof err === 'object' && err !== null && (err as { name?: string }).name === 'AbortError';
 }
 
-function getErrorMessage(err: any): string {
+function getErrorMessage(err: unknown): string {
  if (err instanceof Error) return err.message;
  try {
  return String(err);

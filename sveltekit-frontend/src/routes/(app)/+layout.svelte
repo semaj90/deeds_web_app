@@ -12,6 +12,7 @@
 	import OfflineIndicator from '$lib/components/cache/OfflineIndicator.svelte';
 	import Breadcrumbs from '$lib/components/ui/Breadcrumbs.svelte';
 	import { initTypingDetector } from '$lib/utils/telemetry.js';
+	import { analytics } from '$lib/stores/analytics.svelte.js';
 
 	interface Props {
 		data: LayoutData;
@@ -55,13 +56,21 @@
 		}
 	});
 
-	// Initialize user activity telemetry (typing/idle detection)
+	// Initialize user activity telemetry (typing/idle detection) + analytics
 	$effect(() => {
 		if (browser) {
 			let sid = sessionStorage.getItem('yorha-session-id');
 			if (!sid) { sid = crypto.randomUUID(); sessionStorage.setItem('yorha-session-id', sid); }
 			const sessionId = sid;
 			initTypingDetector(() => sessionId, () => data.user?.id ?? undefined);
+			analytics.init(data.user?.id);
+		}
+	});
+
+	// Track page views on navigation
+	$effect(() => {
+		if (browser) {
+			analytics.trackPageView(currentPathname);
 		}
 	});
 

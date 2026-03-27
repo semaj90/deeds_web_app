@@ -8,6 +8,7 @@ import { z } from 'zod';
 import db from '$lib/server/db';
 import { evidenceAuditLog, evidence, users } from '$lib/server/db/schema-postgres.js';
 import { eq, desc } from 'drizzle-orm';
+import { isUuid } from '$lib/server/validation.js';
 
 const querySchema = z.object({
 	limit: z.coerce.number().int().min(1).max(200).default(50)
@@ -15,6 +16,8 @@ const querySchema = z.object({
 
 export const GET: RequestHandler = async ({ params, url }) => {
 	const { id } = params;
+	if (!isUuid(id)) throw error(400, 'Invalid evidence ID format');
+
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	const limit = parsed.success ? parsed.data.limit : 50;
 

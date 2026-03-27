@@ -32,7 +32,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			[seed_uris, depth]
 		);
 
-		const expandedUris = expandedResult.rows.map((r: any) => r.uri);
+		const expandedUris = expandedResult.rows.map((r: Record<string, any>) => r.uri);
 
 		// Get full node data
 		const nodesResult = await pool.query(`
@@ -44,7 +44,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			WHERE uri = ANY($1)
 		`, [expandedUris]);
 
-		const nodes = nodesResult.rows.map((row: any) => ({
+		const nodes = nodesResult.rows.map((row: Record<string, any>) => ({
 			uri: row.uri,
 			label: row.label,
 			kind: row.kind,
@@ -62,7 +62,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			WHERE n1.uri = ANY($1) AND n2.uri = ANY($1)
 		`, [expandedUris]);
 
-		const links = linksResult.rows.map((row: any) => ({
+		const links = linksResult.rows.map((row: Record<string, any>) => ({
 			source: row.source_uri,
 			target: row.target_uri,
 			type: row.type,
@@ -70,7 +70,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		}));
 
 		return json({ nodes, links });
-	} catch (error: any) {
+	} catch (error) {
 		console.error('Error expanding graph:', error);
 		return json({ error: 'Failed to expand graph data' }, { status: 500 });
 	}

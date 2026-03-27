@@ -19,6 +19,7 @@ type NewRouteInteractionLog = {
     userId: string | null;
     metadata: Record<string, unknown> | null;
 };
+import { isValidRouteId } from '$lib/server/validation.js';
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { z } from 'zod';
@@ -43,6 +44,7 @@ const interactionSchema = z.object({
  */
 export const POST: RequestHandler = async ({ params, request }) => {
     const { routeId } = params;
+    if (!isValidRouteId(routeId)) return error(400, { message: 'Invalid route ID format' });
 
     try {
         // Parse and validate request body
@@ -101,6 +103,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
  */
 export const GET: RequestHandler = async ({ params, url }) => {
     const { routeId } = params;
+    if (!isValidRouteId(routeId)) return error(400, { message: 'Invalid route ID format' });
 
     try {
         // Parse query parameters

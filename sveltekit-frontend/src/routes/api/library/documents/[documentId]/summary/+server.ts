@@ -5,11 +5,13 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
+import { isUuid } from '$lib/server/validation.js';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const { documentId } = params;
+	if (!isUuid(documentId)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
 	const [docRes, statsRes] = await Promise.all([
 		pool.query(

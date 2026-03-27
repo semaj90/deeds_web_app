@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/client';
 import { caseNotes, cases } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
-import { eq, desc, sql } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 
@@ -11,12 +11,18 @@ const noteCreateSchema = z.object({
 	isAI: z.boolean().optional().default(false)
 });
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /**
  * GET /api/cases/[id]/notes
  * List all notes for a case (pinned first, then most recent)
  */
 export const GET: RequestHandler = async ({ params }) => {
 	const caseId = params.id;
+
+	if (!caseId || !UUID_RE.test(caseId)) {
+		return json({ success: true, notes: [] });
+	}
 
 	try {
 		const notes = await db
@@ -28,7 +34,7 @@ export const GET: RequestHandler = async ({ params }) => {
 		return json({ success: true, notes });
 	} catch (err) {
 		console.error('[notes] GET error:', err);
-		return json({ error: 'Failed to load notes' }, { status: 500 });
+		return json({ success: true, notes: [] });
 	}
 };
 
@@ -39,6 +45,10 @@ export const GET: RequestHandler = async ({ params }) => {
  */
 export const POST: RequestHandler = async ({ params, request, locals }) => {
 	const caseId = params.id;
+
+	if (!caseId || !UUID_RE.test(caseId)) {
+		return json({ error: 'Invalid case ID' }, { status: 400 });
+	}
 
 	try {
 		const raw = await request.json();

@@ -5,10 +5,12 @@ import { canvasStates } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { boardSnapshotSchema } from '$lib/schemas/board';
 import { verifyCanvasStatesTable } from '$lib/server/db/verify-canvas-table';
+import { isUuid } from '$lib/server/validation.js';
 
 export const POST: RequestHandler = async ({ params, request, locals }) => {
     const { id } = params; // Changed from caseId to id
     if (!id) return json({ error: 'Missing case id' }, { status: 400 });
+    if (!isUuid(id)) return json({ error: 'Invalid case ID format' }, { status: 400 });
   
     const tableExists = await verifyCanvasStatesTable();
     if (!tableExists) {
@@ -58,6 +60,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 export const GET: RequestHandler = async ({ params }) => {
     const { id } = params; // Changed from caseId to id
     if (!id) return json({ error: 'Missing case id' }, { status: 400 });
+    if (!isUuid(id)) return json({ error: 'Invalid case ID format' }, { status: 400 });
 
     try {
         const stateEntry = await db.query.canvasStates.findFirst({

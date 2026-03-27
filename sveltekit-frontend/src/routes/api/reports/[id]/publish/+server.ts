@@ -3,6 +3,7 @@ import { reports } from '$lib/server/db/schema';
 import { error, json } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { isUuid } from '$lib/server/validation.js';
 
 /**
  * POST /api/reports/[id]/publish
@@ -11,6 +12,10 @@ import type { RequestHandler } from './$types';
 export const POST: RequestHandler = async ({ locals, params }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
+	}
+
+	if (!isUuid(params.id)) {
+		throw error(400, 'Invalid ID format');
 	}
 
 	const reportId = params.id;
@@ -59,6 +64,10 @@ export const POST: RequestHandler = async ({ locals, params }) => {
 export const DELETE: RequestHandler = async ({ locals, params }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
+	}
+
+	if (!isUuid(params.id)) {
+		throw error(400, 'Invalid ID format');
 	}
 
 	const reportId = params.id;

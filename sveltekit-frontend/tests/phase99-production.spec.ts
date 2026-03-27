@@ -11,7 +11,7 @@ import { expect, test } from '@playwright/test';
  */
 
 // Configure base URL for all tests
-test.use({ baseURL: 'http://localhost:5175' });
+test.use({ baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173' });
 
 test.describe('Phase 99: Cases Route Production Tests', () => {
   test.beforeEach(async ({ page }) => {

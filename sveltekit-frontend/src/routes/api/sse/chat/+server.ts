@@ -200,7 +200,7 @@ async function loadCaseContext(caseId: string): Promise<string | null> {
 
       if (glossaryRows.length > 0) {
         context += `\n## Saved Legal Concepts (${glossaryRows.length} items)\n`;
-        for (const row of glossaryRows as any[]) {
+        for (const row of glossaryRows as Record<string, unknown>[]) {
           const term = String(row.citation_text ?? '').trim();
           const definition = String(row.notes ?? '').trim();
           if (!term) continue;
@@ -222,13 +222,13 @@ async function loadCaseContext(caseId: string): Promise<string | null> {
 
       if (evidenceRows.length > 0) {
         context += `\n## Evidence on File (${evidenceRows.length} items)\n`;
-        for (const e of evidenceRows as any[]) {
+        for (const e of evidenceRows as Record<string, any>[]) {
           const type = (e.evidence_type || 'unknown').toUpperCase();
           const meta = (typeof e.metadata === 'string' ? JSON.parse(e.metadata) : e.metadata) || {};
           const entityCount =
             meta.entityCount ?? (Array.isArray(meta.entities) ? meta.entities.length : 0);
           const flags = Array.isArray(meta.forensicFlags) ? meta.forensicFlags : [];
-          const highFlags = flags.filter((f: any) => f.severity === 'high');
+          const highFlags = flags.filter((f: Record<string, unknown>) => f.severity === 'high');
           const forensicLabel = highFlags.length
             ? `Forensic: HIGH (${highFlags.length})`
             : flags.length
@@ -659,7 +659,7 @@ function dagOrderContext(docs: ContextDoc[]): ContextDoc[] {
     .filter((d): d is ContextDoc => d !== undefined);
 }
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
   const raw = await request.json();
   const parsed = sseChatSchema.safeParse(raw);
   if (!parsed.success) {
@@ -957,6 +957,20 @@ export const POST: RequestHandler = async ({ request }) => {
         systemPrompt += `\n${emotionPrompt}`;
       }
 
+      // Inject user analytics context (search patterns, graph neighbors, similar past queries)
+      const chatUserId = (locals as { user?: { id?: string } })?.user?.id;
+      if (chatUserId) {
+        try {
+          const { fetchUserAnalyticsContext } = await import('$lib/server/ace/user-analytics-context.js');
+          const analyticsCtx = await fetchUserAnalyticsContext(chatUserId, message, caseUuid);
+          if (analyticsCtx) {
+            systemPrompt += `\n\n${analyticsCtx}`;
+          }
+        } catch {
+          // Analytics context unavailable — non-fatal
+        }
+      }
+
       let fullResponse = '';
 
       // LLM Response Cache: Check if we have a cached response for this query + context
@@ -1210,6 +1224,7 @@ export const POST: RequestHandler = async ({ request }) => {
                   persona: 'formal',
                   evidenceMetadata: null,
                   evidenceConnections: null,
+                  userAnalyticsContext: null,
                 },
                 backend: 'ollama',
               }),

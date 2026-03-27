@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import { isUuid } from '$lib/server/validation.js';
 
 /**
  * GET /api/pipeline/status/[jobId]
@@ -7,6 +8,10 @@ import type { RequestHandler } from './$types.js';
  */
 export const GET: RequestHandler = async ({ params }) => {
 	const { jobId } = params;
+
+	if (!isUuid(jobId)) {
+		return json({ error: 'Invalid ID format' }, { status: 400 });
+	}
 
 	try {
 		const { getRedis } = await import('$lib/server/redis.js');

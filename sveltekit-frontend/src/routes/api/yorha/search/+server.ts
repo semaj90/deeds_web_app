@@ -104,7 +104,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			if (embedding?.length) {
 				const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
 				const { results: vectorHits } = await qdrant.hybridSearch({
-					collection: 'evidence_items' as any,
+					collection: 'evidence_items',
 					query,
 					queryEmbedding: embedding,
 					limit: Math.min(limit, 10),
@@ -119,8 +119,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 						results.push({
 							type: 'vector_match',
 							id: String(hit.id),
-							title: (hit.payload as any)?.title ?? 'Vector match',
-							snippet: ((hit.payload as any)?.content ?? '').slice(0, 200),
+							title: String((hit.payload as Record<string, unknown>)?.title ?? 'Vector match'),
+							snippet: String((hit.payload as Record<string, unknown>)?.content ?? '').slice(0, 200),
 							score: hit.score ?? 0.5,
 							metadata: { source: 'qdrant' },
 						});

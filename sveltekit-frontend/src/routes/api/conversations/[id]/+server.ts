@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { chatMetadata, chatMessages } from '$lib/server/db/schema.js';
 import { eq, and } from 'drizzle-orm';
+import { isUuid } from '$lib/server/validation.js';
 
 const updateConversationSchema = z.object({
 	messages: z
@@ -21,6 +22,10 @@ const updateConversationSchema = z.object({
 export const PUT: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user) {
 		return json({ message: 'Unauthorized' }, { status: 401 });
+	}
+
+	if (!isUuid(params.id)) {
+		return json({ error: 'Invalid ID format' }, { status: 400 });
 	}
 
 	const conversationId = params.id;
@@ -84,6 +89,10 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 export const DELETE: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user) {
 		return json({ message: 'Unauthorized' }, { status: 401 });
+	}
+
+	if (!isUuid(params.id)) {
+		return json({ error: 'Invalid ID format' }, { status: 400 });
 	}
 
 	const conversationId = params.id;

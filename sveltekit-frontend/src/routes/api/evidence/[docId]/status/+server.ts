@@ -4,6 +4,7 @@ import { getJob } from '$lib/server/evidence-progress';
 import db from '$lib/server/db';
 import { evidence } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
+import { isUuid } from '$lib/server/validation.js';
 
 /**
  * GET /api/evidence/[docId]/status
@@ -12,6 +13,7 @@ import { eq } from 'drizzle-orm';
  */
 export const GET: RequestHandler = async ({ params }) => {
 	const { docId } = params;
+	if (!isUuid(docId)) return json({ error: 'Invalid evidence ID format' }, { status: 400 });
 
 	// 1. Check in-memory progress store (for active jobs)
 	//    docId could be a jobId or an evidenceId

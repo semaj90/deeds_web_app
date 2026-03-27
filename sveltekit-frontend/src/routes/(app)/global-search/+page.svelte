@@ -340,6 +340,7 @@
 		ragResults = data.chunks ?? [];
 		ragTiming = data;
 		totalFound = data.total_found ?? ragResults.length;
+		analytics.track('rag_search', { query: searchQuery.slice(0, 200), resultCount: ragResults.length });
 
 		// GPU rerank after server results arrive
 		if (gpuRerankEnabled && ragResults.length > 0) {

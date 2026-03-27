@@ -75,6 +75,8 @@ export interface ACEContext {
     notes: string | null;
     strength: number;
   }> | null;
+  /** User analytics context (search patterns, graph neighbors, similar queries) */
+  userAnalyticsContext: string | null;
 }
 
 export interface ACEPrompt {

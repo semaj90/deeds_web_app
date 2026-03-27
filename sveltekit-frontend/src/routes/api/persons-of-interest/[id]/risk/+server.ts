@@ -6,6 +6,7 @@ import { eq, sql, arrayContains } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 /** GBNF-constrained response schema for POI risk assessment */
 const riskResponseSchema = z.object({
@@ -21,6 +22,7 @@ const riskResponseJsonSchema = z.toJSONSchema(riskResponseSchema);
  */
 export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
+	if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
 	const poi = await db.select().from(personsOfInterest)
 		.where(eq(personsOfInterest.id, params.id))
@@ -96,6 +98,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
  */
 export const POST: RequestHandler = async ({ params, locals, request }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
+	if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
 	const poi = await db.select().from(personsOfInterest)
 		.where(eq(personsOfInterest.id, params.id))

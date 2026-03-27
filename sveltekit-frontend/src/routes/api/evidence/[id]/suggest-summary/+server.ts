@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
+import { isUuid } from '$lib/server/validation.js';
 
 /**
  * POST /api/evidence/[id]/suggest-summary
@@ -10,6 +11,7 @@ import { eq } from 'drizzle-orm';
  */
 export const POST: RequestHandler = async ({ params }) => {
 	const evidenceId = params.id;
+	if (!isUuid(evidenceId)) return json({ error: 'Invalid evidence ID format' }, { status: 400 });
 
 	try {
 		const [item] = await db

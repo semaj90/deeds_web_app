@@ -9,6 +9,7 @@ import IORedis from 'ioredis';
 import { getRedisUrl } from '$lib/config/env.server.js';
 import { produceTokenChunk, readTokenStream } from '$lib/server/redis-streams.js';
 import type { RequestHandler } from './$types';
+import { isUuid } from '$lib/server/validation.js';
 
 const REDIS_URL = getRedisUrl();
 
@@ -19,8 +20,8 @@ function sseFormat(event: string, data: unknown): string {
 export const GET: RequestHandler = async ({ params, request }) => {
   const chatId = params.id;
 
-  if (!chatId) {
-    return new Response('Chat ID required', { status: 400 });
+  if (!isUuid(chatId)) {
+    return new Response('Invalid ID format', { status: 400 });
   }
 
   // Replay missed tokens if client reconnects with Last-Event-ID

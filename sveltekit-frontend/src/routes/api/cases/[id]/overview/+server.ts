@@ -3,6 +3,7 @@ import { db } from '$lib/server/db/client';
 import { cases, evidence, personsOfInterest } from '$lib/server/db/schema-postgres.js';
 import { arrayContains, eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { isUuid } from '$lib/server/validation.js';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user) {
@@ -10,6 +11,8 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	}
 
 	const id = params.id;
+	if (!isUuid(id)) throw error(400, 'Invalid case ID format');
+
 	const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
 
 	const caseRows = await safe(

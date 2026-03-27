@@ -85,7 +85,9 @@ async function ensureQdrantCollection(collectionName: string): Promise<void> {
   }
 }
 
-function extractFileMetadata(content: string, filePath: string): any {
+interface FileMetadata { language: string; imports: string[]; exports: string[]; typeCount: number; functionCount: number }
+
+function extractFileMetadata(content: string, filePath: string): FileMetadata {
   const lines = content.split('\n');
   const imports = lines
     .filter(l => l.match(/^import\s+/))
@@ -164,7 +166,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
 
       // Process files
       let indexed = 0;
-      const results: any[] = [];
+      const results: { file: string; chunks?: number; vectors?: number; code?: string; count?: string }[] = [];
 
       for (const filePath of files.slice(0, 50)) {
         try {
@@ -247,7 +249,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
         indexed: results,
         message: `Indexed ${indexed} of ${Math.min(50, files.length)} files`
       });
-    } catch (err: any) {
+    } catch (err) {
       return json({ success: false, error: 'Indexing operation failed' }, { status: 500 });
     }
   }
@@ -277,7 +279,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
 
       // Index error clusters
       let indexed = 0;
-      const results: any[] = [];
+      const results: { file: string; chunks?: number; vectors?: number; code?: string; count?: string }[] = [];
 
       for (const cluster of errorClusters) {
         try {
@@ -350,7 +352,7 @@ Phase: Phase 66-79 Error Analysis`.trim();
         indexed: results,
         message: `Indexed ${indexed} error clusters`
       });
-    } catch (err: any) {
+    } catch (err) {
       return json({ success: false, error: 'Indexing operation failed' }, { status: 500 });
     }
   }
@@ -393,15 +395,15 @@ Phase: Phase 66-79 Error Analysis`.trim();
 
       return json({
         success: true,
-        results: results.map((r: any) => ({
+        results: results.map((r: { score: number; payload?: Record<string, unknown> }) => ({
           file: r.payload?.file_path,
           chunk: r.payload?.chunk_index,
           similarity: (r.score * 100).toFixed(1),
           language: r.payload?.language,
-          content: r.payload?.content?.substring(0, 150) + '...'
+          content: String(r.payload?.content ?? '').substring(0, 150) + '...'
         }))
       });
-    } catch (err: any) {
+    } catch (err) {
       return json({ success: false, error: 'Indexing operation failed' }, { status: 500 });
     }
   }
@@ -444,15 +446,15 @@ Phase: Phase 66-79 Error Analysis`.trim();
 
       return json({
         success: true,
-        results: results.map((r: any) => ({
+        results: results.map((r: { score: number; payload?: Record<string, unknown> }) => ({
           code: r.payload?.error_code,
           file: r.payload?.file_path,
           count: r.payload?.error_count,
           similarity: (r.score * 100).toFixed(1),
-          message: r.payload?.message?.substring(0, 100) + '...'
+          message: String(r.payload?.message ?? '').substring(0, 100) + '...'
         }))
       });
-    } catch (err: any) {
+    } catch (err) {
       return json({ success: false, error: 'Indexing operation failed' }, { status: 500 });
     }
   }
@@ -487,7 +489,7 @@ export const GET: RequestHandler = async () => {
       },
       timestamp: new Date().toISOString()
     });
-  } catch (err: any) {
+  } catch (err) {
     return json(
       {
         success: false,

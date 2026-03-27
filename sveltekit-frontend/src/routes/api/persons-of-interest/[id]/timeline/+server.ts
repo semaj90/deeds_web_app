@@ -20,7 +20,8 @@ const createTimelineSchema = z.object({
  * GET /api/persons-of-interest/[id]/timeline
  * List timeline events for a POI, ordered by event date descending
  */
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsedId = poiIdSchema.safeParse(params.id);
 	if (!parsedId.success) {
 		return json({ error: 'Invalid POI id' }, { status: 400 });
@@ -52,6 +53,7 @@ export const GET: RequestHandler = async ({ params }) => {
  * Create a new timeline event for a POI
  */
 export const POST: RequestHandler = async ({ params, request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsedId = poiIdSchema.safeParse(params.id);
 	if (!parsedId.success) {
 		return json({ error: 'Invalid POI id' }, { status: 400 });

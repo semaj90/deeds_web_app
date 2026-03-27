@@ -3,6 +3,7 @@ import { sql } from 'drizzle-orm';
 import {
     bigint,
     boolean,
+    date,
     foreignKey,
     index,
     integer,
@@ -3024,4 +3025,195 @@ export const aiUsageLog = pgTable('ai_usage_log', {
 
 export type AiUsageLog = typeof aiUsageLog.$inferSelect;
 export type NewAiUsageLog = typeof aiUsageLog.$inferInsert;
+
+// === CANONICAL LEGAL DOCUMENTS (Prosecutor Simulation — Phase 1) ===
+// Real laws, opinions, and rules with jurisdiction tags and authority levels
+
+export const authorityLevelEnum = pgEnum('authority_level', [
+	'primary',      // statutes, regulations, binding opinions, jury instructions
+	'persuasive',   // non-binding opinions, treatises, agency guidance
+	'secondary',    // LII, Shouse, legal encyclopedias
+	'fictional',    // generated fictional case materials
+]);
+
+export const jurisdictionEnum = pgEnum('jurisdiction', [
+	'US-FED', 'CA', 'NY', 'TX', 'FL', 'IL', 'PA', 'OH', 'GA', 'NC',
+	'MI', 'NJ', 'VA', 'WA', 'AZ', 'MA', 'TN', 'IN', 'MO', 'MD',
+	'WI', 'CO', 'MN', 'SC', 'AL', 'LA', 'KY', 'OR', 'OK', 'CT',
+	'UT', 'IA', 'NV', 'AR', 'MS', 'KS', 'NM', 'NE', 'ID', 'WV',
+	'HI', 'NH', 'ME', 'MT', 'RI', 'DE', 'SD', 'ND', 'AK', 'VT', 'WY', 'DC',
+]);
+
+export const canonicalDocuments = pgTable('canonical_documents', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	title: varchar('title', { length: 500 }).notNull(),
+	docType: varchar('doc_type', { length: 100 }).notNull(), // 'statute', 'opinion', 'rule', 'jury_instruction', 'treatise'
+	citation: varchar('citation', { length: 500 }),           // e.g. "18 U.S.C. § 1343" or "FRE 401"
+	jurisdiction: jurisdictionEnum('jurisdiction').notNull(),
+	authorityLevel: authorityLevelEnum('authority_level').notNull(),
+	sourceUrl: text('source_url'),
+	sourceName: varchar('source_name', { length: 200 }),      // 'CourtListener', 'CAP', 'Cornell LII'
+	licenseTag: varchar('license_tag', { length: 100 }),       // 'CC0', 'public_domain', 'pointer_only'
+	retrievedAt: timestamp('retrieved_at', { withTimezone: true }),
+	fullText: text('full_text'),
+	metadata: jsonb('metadata').default({}),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	jurisdictionIdx: index('canonical_docs_jurisdiction_idx').on(table.jurisdiction),
+	authorityIdx: index('canonical_docs_authority_idx').on(table.authorityLevel),
+	docTypeIdx: index('canonical_docs_doc_type_idx').on(table.docType),
+	citationIdx: index('canonical_docs_citation_idx').on(table.citation),
+}));
+
+export type CanonicalDocument = typeof canonicalDocuments.$inferSelect;
+export type NewCanonicalDocument = typeof canonicalDocuments.$inferInsert;
+
+// === CANONICAL CHUNKS ===
+// Stable chunk IDs: {doc_id}:{chunk_index}:{sha256_16}
+
+export const canonicalChunks = pgTable('canonical_chunks', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	chunkId: varchar('chunk_id', { length: 200 }).notNull().unique(), // deterministic: {doc_id_short}:{index}:{sha16}
+	documentId: uuid('document_id').notNull().references(() => canonicalDocuments.id, { onDelete: 'cascade' }),
+	chunkIndex: integer('chunk_index').notNull(),
+	content: text('content').notNull(),
+	tokenCount: integer('token_count'),
+	semanticLabel: varchar('semantic_label', { length: 200 }), // 'elements_of_offense', 'standard_of_review', 'holding'
+	domains: jsonb('domains').default([]),       // ['criminal', 'evidence', 'constitutional']
+	keyTerms: jsonb('key_terms').default([]),     // ['probable_cause', 'fourth_amendment']
+	embedding: vector('embedding', { dimensions: 768 }),
+	metadata: jsonb('metadata').default({}),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	documentIdx: index('canonical_chunks_document_idx').on(table.documentId),
+	chunkIdIdx: index('canonical_chunks_chunk_id_idx').on(table.chunkId),
+	semanticLabelIdx: index('canonical_chunks_semantic_label_idx').on(table.semanticLabel),
+}));
+
+export type CanonicalChunk = typeof canonicalChunks.$inferSelect;
+export type NewCanonicalChunk = typeof canonicalChunks.$inferInsert;
+
+// === LEGAL TERMS (Glossary / ExampleBank) ===
+
+export const legalTerms = pgTable('legal_terms', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	term: varchar('term', { length: 300 }).notNull(),
+	domain: varchar('domain', { length: 100 }).notNull(),      // 'criminal', 'evidence', 'civil_procedure'
+	jurisdiction: jurisdictionEnum('jurisdiction'),
+	formalDefinition: text('formal_definition').notNull(),
+	plainDefinition: text('plain_definition'),
+	relatedChunkIds: jsonb('related_chunk_ids').default([]),     // references to canonical_chunks.chunk_id
+	metadata: jsonb('metadata').default({}),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	termIdx: index('legal_terms_term_idx').on(table.term),
+	domainIdx: index('legal_terms_domain_idx').on(table.domain),
+}));
+
+export type LegalTerm = typeof legalTerms.$inferSelect;
+export type NewLegalTerm = typeof legalTerms.$inferInsert;
+
+// === TERM EXAMPLES (ExampleBank M2M) ===
+
+export const termExamples = pgTable('term_examples', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	termId: uuid('term_id').notNull().references(() => legalTerms.id, { onDelete: 'cascade' }),
+	exampleText: text('example_text').notNull(),
+	relationship: varchar('relationship', { length: 50 }).notNull(), // 'illustrates', 'contrast_with', 'element_of'
+	sourceChunkId: varchar('source_chunk_id', { length: 200 }),      // reference to canonical_chunks.chunk_id
+	metadata: jsonb('metadata').default({}),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	termIdx: index('term_examples_term_idx').on(table.termId),
+	relationshipIdx: index('term_examples_relationship_idx').on(table.relationship),
+}));
+
+// === FICTIONAL CASES (Prosecutor Simulation — Phase 3) ===
+// Generated cases with full procedural structure, linked to canonical legal authority
+
+export const fictionalCaseCategoryEnum = pgEnum('fictional_case_category', [
+	'wire_fraud', 'drug_trafficking', 'firearms', 'cybercrime', 'obstruction',
+	'verbal_contracts', 'tort_federal', 'federal_employee_liability',
+]);
+
+export const fictionalCases = pgTable('fictional_cases', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	caseId: varchar('case_id', { length: 200 }).notNull().unique(),   // deterministic: category_hash
+	category: fictionalCaseCategoryEnum('category').notNull(),
+	charge: varchar('charge', { length: 300 }).notNull(),
+	primaryStatute: varchar('primary_statute', { length: 200 }),       // e.g. "18 U.S.C. § 1343"
+	defendantName: varchar('defendant_name', { length: 200 }).notNull(),
+	incidentDate: date('incident_date'),
+	jurisdictionCity: varchar('jurisdiction_city', { length: 200 }),
+	jurisdiction: jurisdictionEnum('jurisdiction'),
+	financialLoss: real('financial_loss'),
+	narrative: text('narrative').notNull(),
+	disclaimer: text('disclaimer'),
+	isFictional: boolean('is_fictional').default(true).notNull(),
+	generatedBy: varchar('generated_by', { length: 100 }),            // model name
+	guardrailTriggered: boolean('guardrail_triggered').default(false),
+	metadata: jsonb('metadata').default({}),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	caseIdIdx: index('fictional_cases_case_id_idx').on(table.caseId),
+	categoryIdx: index('fictional_cases_category_idx').on(table.category),
+	jurisdictionIdx: index('fictional_cases_jurisdiction_idx').on(table.jurisdiction),
+}));
+
+export type FictionalCase = typeof fictionalCases.$inferSelect;
+export type NewFictionalCase = typeof fictionalCases.$inferInsert;
+
+// === FICTIONAL CASE CHARGES ===
+// Each charge linked to canonical chunks for citation-faithful generation
+
+export const fictionalCaseCharges = pgTable('fictional_case_charges', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	fictionalCaseId: uuid('fictional_case_id').notNull().references(() => fictionalCases.id, { onDelete: 'cascade' }),
+	chargeName: varchar('charge_name', { length: 300 }).notNull(),
+	statute: varchar('statute', { length: 200 }),
+	elements: jsonb('elements').default([]),                           // array of element strings
+	canonChunkIds: jsonb('canon_chunk_ids').default([]),                // references to canonical_chunks.chunk_id
+	isPrimary: boolean('is_primary').default(false),
+	metadata: jsonb('metadata').default({}),
+}, (table) => ({
+	caseIdx: index('fictional_charges_case_idx').on(table.fictionalCaseId),
+}));
+
+// === FICTIONAL CASE ACTORS ===
+// Parties: defendant, prosecutor, judge, witnesses, victims, agents
+
+export const fictionalCaseActorRoleEnum = pgEnum('fictional_actor_role', [
+	'defendant', 'prosecutor', 'judge', 'defense_attorney',
+	'witness', 'victim', 'agent', 'expert_witness', 'informant',
+]);
+
+export const fictionalCaseActors = pgTable('fictional_case_actors', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	fictionalCaseId: uuid('fictional_case_id').notNull().references(() => fictionalCases.id, { onDelete: 'cascade' }),
+	name: varchar('name', { length: 200 }).notNull(),
+	role: fictionalCaseActorRoleEnum('role').notNull(),
+	description: text('description'),
+	metadata: jsonb('metadata').default({}),
+}, (table) => ({
+	caseIdx: index('fictional_actors_case_idx').on(table.fictionalCaseId),
+	roleIdx: index('fictional_actors_role_idx').on(table.role),
+}));
+
+// === FICTIONAL CASE EVENTS ===
+// Procedural timeline: arrest, arraignment, discovery, motions, trial, verdict
+
+export const fictionalCaseEvents = pgTable('fictional_case_events', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	fictionalCaseId: uuid('fictional_case_id').notNull().references(() => fictionalCases.id, { onDelete: 'cascade' }),
+	eventType: varchar('event_type', { length: 100 }).notNull(),       // 'arrest', 'arraignment', 'discovery', 'motion', 'trial', 'verdict'
+	eventDate: date('event_date'),
+	description: text('description'),
+	canonChunkIds: jsonb('canon_chunk_ids').default([]),                // supporting legal authority
+	orderIndex: integer('order_index').default(0),
+	metadata: jsonb('metadata').default({}),
+}, (table) => ({
+	caseIdx: index('fictional_events_case_idx').on(table.fictionalCaseId),
+	typeIdx: index('fictional_events_type_idx').on(table.eventType),
+}));
 

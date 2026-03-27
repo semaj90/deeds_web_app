@@ -1,8 +1,7 @@
 <script lang="ts">
-  let { data }: { data: PageData } = $props();
-
-	// Migrated to $effect
 	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
 
 	// TODO: Convert to $props - // TODO: Convert to $props - 
 

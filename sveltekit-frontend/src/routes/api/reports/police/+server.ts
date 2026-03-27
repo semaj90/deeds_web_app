@@ -13,7 +13,7 @@ import { z } from 'zod';
 
 const policeReportSchema = z.object({
 	narrative: z.string().min(1, 'Narrative is required').max(50000),
-	evidence: z.array(z.any()).optional().default([]),
+	evidence: z.array(z.object({ title: z.string().optional(), fileName: z.string().optional(), description: z.string().optional() }).passthrough()).optional().default([]),
 	caseId: z.string().max(500).optional(),
 });
 
@@ -30,7 +30,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const { narrative, evidence, caseId } = parsed.data;
 
 	const evidenceSummary = evidence.length > 0
-		? evidence.map((e: any, i: number) => `${i + 1}. ${e.title ?? e.fileName ?? 'Item'}: ${e.description ?? 'No description'}`).join('\n')
+		? evidence.map((e, i) => `${i + 1}. ${e.title ?? e.fileName ?? 'Item'}: ${e.description ?? 'No description'}`).join('\n')
 		: 'No physical evidence listed.';
 
 	const prompt = `You are a police report writing assistant. Generate a formal police incident report in HTML format based on the following narrative and evidence.
@@ -90,14 +90,14 @@ Output ONLY HTML content. Use h1, h2, h3, p, ul, li, strong, em tags.`;
 <p>${narrative.replace(/\n/g, '</p><p>')}</p>
 <h2>Evidence Collected</h2>
 ${evidence.length > 0
-	? `<ul>${evidence.map((e: any) => `<li><strong>${e.title ?? 'Item'}</strong>: ${e.description ?? 'No description'}</li>`).join('')}</ul>`
+	? `<ul>${evidence.map((e) => `<li><strong>${e.title ?? 'Item'}</strong>: ${e.description ?? 'No description'}</li>`).join('')}</ul>`
 	: '<p>No evidence items listed.</p>'}
 <h2>Disposition</h2>
 <p><em>(AI generation unavailable — complete manually)</em></p>`.trim();
 		}
 
 		// Save to DB if caseId provided
-		let savedReport: any = null;
+		let savedReport: Record<string, unknown> | null = null;
 		if (caseId) {
 			try {
 				const [row] = await db.insert(reports).values({
