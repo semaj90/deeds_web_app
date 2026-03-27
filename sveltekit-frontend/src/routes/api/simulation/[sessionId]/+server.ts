@@ -156,6 +156,9 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 		session.dialogueHistory.push(...newDialogue);
 		await saveSession(session);
 
+		// Audit log: append action + new dialogue to Redis list (fire-and-forget)
+		auditSimulationAction(session.id, locals.user.id, action, newDialogue).catch(() => {});
+
 		return json({
 			status: session.status,
 			currentPhase: session.currentPhase,
@@ -398,4 +401,29 @@ function generateTemplateTurn(
 		canonRefs,
 		timestamp: new Date().toISOString(),
 	};
+}
+
+// ── Audit logging ──
+const AUDIT_PREFIX = 'sim:audit:';
+const AUDIT_TTL = 60 * 60 * 24 * 7; // 7 days
+
+async function auditSimulationAction(
+	sessionId: string,
+	userId: string,
+	action: string,
+	dialogue: SimulationSession['dialogueHistory'],
+): Promise<void> {
+	const entry = JSON.stringify({
+		sessionId,
+		userId,
+		action,
+		dialogueCount: dialogue.length,
+		speakers: dialogue.map((d) => d.speaker),
+		canonRefs: dialogue.flatMap((d) => d.canonRefs),
+		timestamp: new Date().toISOString(),
+	});
+
+	const key = AUDIT_PREFIX + sessionId;
+	await redis.rpush(key, entry);
+	await redis.expire(key, AUDIT_TTL);
 }
