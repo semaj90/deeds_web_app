@@ -79,8 +79,6 @@ function findSharedImports(payload1: Record<string, unknown> | undefined, payloa
 
 	// Extract import sources from signature text or uses
 	const uses1 = new Set<string>((payload1?.uses as string[]) || []);
-
-const QDRANT_URL = getQdrantUrl();
 	const uses2 = new Set<string>((payload2?.uses as string[]) || []);
 
 	const shared: string[] = [];

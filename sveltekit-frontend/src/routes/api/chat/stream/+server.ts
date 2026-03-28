@@ -207,6 +207,9 @@ function handleQueryMode(query: string, mode: string, caseId: string | null, per
  * Session Mode: Full chat history + streaming with case context
  */
 function handleSessionMode(sessionId: string, caseId: string | null): Response {
+	let pollIntervalId: ReturnType<typeof setInterval>;
+	let keepAliveId: ReturnType<typeof setInterval>;
+
 	const stream = new ReadableStream({
 		async start(controller) {
 			const encoder = new TextEncoder();
@@ -220,7 +223,7 @@ function handleSessionMode(sessionId: string, caseId: string | null): Response {
 
 			// Poll for new messages
 			let lastMessageId: string | null = null;
-			const pollInterval = setInterval(async () => {
+			pollIntervalId = setInterval(async () => {
 				try {
 					const messages = await db
 						.select()
@@ -259,21 +262,14 @@ function handleSessionMode(sessionId: string, caseId: string | null): Response {
 			}, 1000);
 
 			// Keep-alive ping every 30 seconds
-			const keepAlive = setInterval(() => {
+			keepAliveId = setInterval(() => {
 				send('ping', { timestamp: new Date().toISOString() });
 			}, 30000);
-
-			// Store cleanup ref for cancel()
-			(controller as unknown as { _cleanup: () => void })._cleanup = () => {
-				clearInterval(pollInterval);
-				clearInterval(keepAlive);
-			};
 		},
 
-		cancel(controller) {
-			console.log('SSE client disconnected — cleaning up intervals');
-			const ctrl = controller as unknown as { _cleanup?: () => void };
-			if (typeof ctrl._cleanup === 'function') ctrl._cleanup();
+		cancel() {
+			clearInterval(pollIntervalId);
+			clearInterval(keepAliveId);
 		}
 	});
 
