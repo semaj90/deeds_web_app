@@ -25,6 +25,8 @@
     ondelete
   }: Props = $props();
 
+  let failedSrcs = $state(new Set<string>());
+
   function handlePhotoClick(photo: Photo, index: number) {
     onview?.(photo);
   }
@@ -84,11 +86,19 @@
               }
             }}
           >
-            <img
-              src={photo.thumbnailUrl ?? photo.url ?? ''}
-              alt="POI photo {index + 1}"
-              class="w-full h-full object-cover"
-            />
+            {#if failedSrcs.has(photo.thumbnailUrl ?? photo.url ?? '')}
+              <div class="w-full h-full flex flex-col items-center justify-center text-sand/40">
+                <span class="i-lucide-image-off w-8 h-8 inline-block mb-1"></span>
+                <span class="text-xs">Unavailable</span>
+              </div>
+            {:else}
+              <img
+                src={photo.thumbnailUrl ?? photo.url ?? ''}
+                alt="POI photo {index + 1}"
+                class="w-full h-full object-cover"
+                onerror={() => { failedSrcs = new Set([...failedSrcs, photo.thumbnailUrl ?? photo.url ?? '']); }}
+              />
+            {/if}
           </div>
 
           <!-- Overlay with actions -->

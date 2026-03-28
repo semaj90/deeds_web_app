@@ -588,7 +588,7 @@
 						<span class="face-match-msg">{faceMatchError}</span>
 					{/if}
 				</div>
-				<POIPhotoGrid {photos} editable={true} ondelete={deletePhoto} onview={viewPhoto} />
+				<POIPhotoGrid {photos} editable={true} ondelete={deletePhoto} onview={viewPhoto} onupload={() => { (document.querySelector('.poi-upload') as HTMLElement)?.click(); }} />
 				<PoiImageUpload poiId={data.poi?.id} poiName={data.poi?.name} onuploaded={handlePhotoUploaded} />
 				{#if photos.length > 0}
 					<POIPhotoModal {photos} bind:currentIndex={photoModalIndex} bind:open={photoModalOpen} onclose={() => { photoModalOpen = false; }} />
