@@ -27,16 +27,29 @@ export const GET: RequestHandler = async ({ request, locals }) => {
       statsIntervalId = setInterval(async () => {
         try {
           if (isConnected) {
-            const embKeys = await redis.keys('emb:*');
-            const fixKeys = await redis.keys('fix:*');
+            // Use SCAN instead of KEYS to avoid blocking Redis
+            let embCount = 0;
+            let fixCount = 0;
+            let cursor = '0';
+            do {
+              const [next, keys] = await redis.scan(cursor, 'MATCH', 'emb:*', 'COUNT', 100);
+              cursor = next;
+              embCount += keys.length;
+            } while (cursor !== '0');
+            cursor = '0';
+            do {
+              const [next, keys] = await redis.scan(cursor, 'MATCH', 'fix:*', 'COUNT', 100);
+              cursor = next;
+              fixCount += keys.length;
+            } while (cursor !== '0');
 
             controller.enqueue(
               encoder.encode(
                 `data: ${JSON.stringify({
                   type: 'stats',
                   data: {
-                    embeddingCache: embKeys.length,
-                    fixSuggestions: fixKeys.length,
+                    embeddingCache: embCount,
+                    fixSuggestions: fixCount,
                     timestamp: Date.now(),
                   },
                 })}\n\n`

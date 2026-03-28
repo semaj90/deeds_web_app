@@ -16,6 +16,18 @@ import { getTemplateCacheStats } from '$lib/server/cache/report-template-cache.j
 import { getExportCacheStats } from '$lib/server/cache/pdf-export-cache.js';
 // redis-metrics module removed — inline fallback below
 
+/** Count keys matching a pattern using SCAN (non-blocking, unlike KEYS) */
+async function scanCount(redis: ReturnType<typeof redisPool.getConnection>, pattern: string): Promise<number> {
+	let count = 0;
+	let cursor = '0';
+	do {
+		const [next, keys] = await redis.scan(cursor, 'MATCH', pattern, 'COUNT', 200);
+		cursor = next;
+		count += keys.length;
+	} while (cursor !== '0');
+	return count;
+}
+
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
@@ -55,18 +67,13 @@ export const GET: RequestHandler = async ({ locals }) => {
 		const statsInfo = parseInfo(infoStats);
 		const serverInfo = parseInfo(infoServer);
 
-		// Get key pattern counts
-		const keyPatterns = await Promise.all([
-			redis.keys('template:*').then(keys => ({ pattern: 'template:*', count: keys.length })),
-			redis.keys('llm:response:*').then(keys => ({ pattern: 'llm:response:*', count: keys.length })),
-			redis.keys('case:*').then(keys => ({ pattern: 'case:*', count: keys.length })),
-			redis.keys('evidence:*').then(keys => ({ pattern: 'evidence:*', count: keys.length })),
-			redis.keys('report:*').then(keys => ({ pattern: 'report:*', count: keys.length })),
-			redis.keys('user:*').then(keys => ({ pattern: 'user:*', count: keys.length })),
-		]);
+		// Get key pattern counts using SCAN (non-blocking)
+		const patterns = ['template:*', 'llm:response:*', 'case:*', 'evidence:*', 'report:*', 'user:*'];
+		const counts = await Promise.all(patterns.map(p => scanCount(redis, p)));
+		const keyPatterns = patterns.map((pattern, i) => ({ pattern, count: counts[i] }));
 
-		// LLM response cache stats
-		const llmKeys = await redis.keys('llm:response:*');
+		// LLM response cache stats (reuse count from above)
+		const llmKeyCount = counts[1];
 		const llmHits = parseInt(statsInfo.keyspace_hits || '0', 10);
 		const llmMisses = parseInt(statsInfo.keyspace_misses || '0', 10);
 		const llmTotal = llmHits + llmMisses;
@@ -95,7 +102,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 				template: templateStats,
 				export: exportStats,
 				llm: {
-					totalResponses: llmKeys.length,
+					totalResponses: llmKeyCount,
 					hits: llmHits,
 					misses: llmMisses,
 					hitRate: llmHitRate

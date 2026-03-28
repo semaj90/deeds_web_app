@@ -95,10 +95,8 @@ const luciaInstanceReused = !!globalThis?.__lucia_instance && globalThis.__lucia
  counts: { userCount: sessionCount,
  recentSessions: countsError,
  },
- environment: { nodeVersion: process.version,
- pid: process.pid,
- uptime: process.uptime(),
- platform: process.platform,
+ environment: {
+ runtime: 'node',
  },
  warnings,
  },
