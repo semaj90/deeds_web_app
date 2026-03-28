@@ -70,7 +70,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 		for (const collection of qdrantCollections) {
 			try {
-				const response = await fetch(`${QDRANT_URL}/collections/${collection}`);
+				const response = await fetch(`${QDRANT_URL}/collections/${collection}`, { signal: AbortSignal.timeout(5_000) });
 				if (response.ok) {
 					const data = await response.json();
 					qdrantStats[collection] = data.result?.points_count ?? 0;

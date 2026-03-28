@@ -43,7 +43,8 @@ export const GET: RequestHandler = async ({ fetch, locals }) => {
 					limit: 10000,
 					with_payload: true,
 					with_vector: false
-				})
+				}),
+				signal: AbortSignal.timeout(15_000)
 			}
 		);
 
@@ -89,7 +90,8 @@ export const GET: RequestHandler = async ({ fetch, locals }) => {
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({})
+				body: JSON.stringify({}),
+				signal: AbortSignal.timeout(5_000)
 			}
 		);
 

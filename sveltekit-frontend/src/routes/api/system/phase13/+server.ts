@@ -44,7 +44,7 @@ export async function GET() {
 
 		// Check Qdrant
 		try {
-			const resp = await fetch(`${ENV.QDRANT_URL}/health`);
+			const resp = await fetch(`${ENV.QDRANT_URL}/health`, { signal: AbortSignal.timeout(5_000) });
 			health.services.qdrant = { ok: resp.ok, status: resp.status };
 		} catch (e) {
 			health.services.qdrant = { ok: false, message: (e as Error).message };

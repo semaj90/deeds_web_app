@@ -64,7 +64,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 					limit: 10000,
 					with_payload: true,
 					with_vector: false
-				})
+				}),
+				signal: AbortSignal.timeout(15_000)
 			}
 		);
 

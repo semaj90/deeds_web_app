@@ -48,7 +48,8 @@ async function generateEmbedding(text: string): Promise<number[]> {
       body: JSON.stringify({
         model: CONFIG.ollama.embeddingModel,
         prompt: text.substring(0, 8000)
-      })
+      }),
+      signal: AbortSignal.timeout(15_000)
     });
 
     const data = await response.json();
@@ -61,7 +62,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
 
 async function ensureQdrantCollection(collectionName: string): Promise<void> {
   try {
-    const response = await fetch(`${CONFIG.qdrant.url}/collections/${collectionName}`);
+    const response = await fetch(`${CONFIG.qdrant.url}/collections/${collectionName}`, { signal: AbortSignal.timeout(5_000) });
     if (response.status === 404) {
       throw new Error('Collection not found');
     }
@@ -77,7 +78,8 @@ async function ensureQdrantCollection(collectionName: string): Promise<void> {
           size: 768,
           distance: 'Cosine'
         }
-      })
+      }),
+      signal: AbortSignal.timeout(10_000)
     });
     if (!createResponse.ok) {
       throw new Error(`Failed to create collection: ${createResponse.statusText}`);
@@ -223,7 +225,8 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
                       }
                     }
                   ]
-                })
+                }),
+                signal: AbortSignal.timeout(10_000)
               }
             );
             if (!upsertResponse.ok) {
@@ -320,7 +323,8 @@ Phase: Phase 66-79 Error Analysis`.trim();
                     }
                   }
                 ]
-              })
+              }),
+              signal: AbortSignal.timeout(10_000)
             }
           );
           if (!upsertResponse.ok) {
@@ -383,7 +387,8 @@ Phase: Phase 66-79 Error Analysis`.trim();
             vector: Array.from(embedding),
             limit,
             with_payload: true
-          })
+          }),
+          signal: AbortSignal.timeout(10_000)
         }
       );
 
@@ -434,7 +439,8 @@ Phase: Phase 66-79 Error Analysis`.trim();
             vector: Array.from(embedding),
             limit,
             with_payload: true
-          })
+          }),
+          signal: AbortSignal.timeout(10_000)
         }
       );
 
@@ -468,8 +474,8 @@ Phase: Phase 66-79 Error Analysis`.trim();
 export const GET: RequestHandler = async ({ locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
-    const codebaseResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionCode}`);
-    const errorsResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}`);
+    const codebaseResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionCode}`, { signal: AbortSignal.timeout(5_000) });
+    const errorsResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}`, { signal: AbortSignal.timeout(5_000) });
 
     const codebaseData = codebaseResponse.ok ? await codebaseResponse.json() : null;
     const errorsData = errorsResponse.ok ? await errorsResponse.json() : null;

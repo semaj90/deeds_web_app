@@ -36,7 +36,8 @@ export const POST: RequestHandler = async ({ request, fetch, locals }) => {
                 with_payload: true,
                 filter: { must: [{ key: 'cluster_id', match: { value: clusterId } }]
                 }
-            })
+            }),
+            signal: AbortSignal.timeout(10_000)
         });
 
         if (!clusterResponse.ok) {
@@ -58,7 +59,8 @@ export const POST: RequestHandler = async ({ request, fetch, locals }) => {
                 with_payload: true,
                 filter: { must: [{ key: 'clusterId', match: { value: clusterId } }]
                 }
-            })
+            }),
+            signal: AbortSignal.timeout(10_000)
         });
 
         let members: Array<Record<string, unknown>> = [];

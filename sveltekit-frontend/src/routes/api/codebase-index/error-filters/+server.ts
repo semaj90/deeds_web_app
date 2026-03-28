@@ -22,7 +22,8 @@ export const GET: RequestHandler = async ({ locals }) => {
 				body: JSON.stringify({ limit: 10000,
 					with_payload: true,
 					with_vector: false
-				})
+				}),
+				signal: AbortSignal.timeout(15_000)
 			}
 		);
 

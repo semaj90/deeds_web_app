@@ -69,6 +69,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
         limit: 5,
         with_payload: true,
       }),
+      signal: AbortSignal.timeout(10_000),
     });
 
     const searchResults = await response.json();

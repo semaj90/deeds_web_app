@@ -22,7 +22,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(body)
+			body: JSON.stringify(body),
+			signal: AbortSignal.timeout(30_000)
 		});
 
 		if (!response.ok) {
@@ -54,7 +55,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
-		const response = await fetch(`${ORCHESTRATOR_URL}/health`);
+		const response = await fetch(`${ORCHESTRATOR_URL}/health`, { signal: AbortSignal.timeout(5_000) });
 		const data = await response.json();
 
 		return json({

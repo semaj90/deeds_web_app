@@ -72,7 +72,8 @@ export const POST: RequestHandler = async (event) => {
 						limit: 1000,
 						with_vector: true,
 						with_payload: false
-					})
+					}),
+					signal: AbortSignal.timeout(15_000)
 				}
 			);
 

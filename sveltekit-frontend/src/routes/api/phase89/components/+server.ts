@@ -27,7 +27,8 @@ export const GET: RequestHandler = async ({ fetch, locals }) => {
 			body: JSON.stringify({ limit: 500,
 				with_payload: true,
 				with_vector: false
-			})
+			}),
+			signal: AbortSignal.timeout(10_000)
 		});
 
 		let components: ComponentUnit[] = [];
@@ -66,7 +67,7 @@ export const GET: RequestHandler = async ({ fetch, locals }) => {
 		let cudaEnabled = false;
 		const CUDA_SERVICE_URL = getCudaServiceUrl();
 		try {
-			const gpuCheck = await fetch(`${CUDA_SERVICE_URL}/health`).catch(() => null);
+			const gpuCheck = await fetch(`${CUDA_SERVICE_URL}/health`, { signal: AbortSignal.timeout(3_000) }).catch(() => null);
 			if (gpuCheck?.ok) {
 				const health = await gpuCheck.json();
 				cudaEnabled = health.cuda_enabled ?? false;

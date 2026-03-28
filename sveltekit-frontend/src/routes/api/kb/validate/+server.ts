@@ -44,7 +44,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       try {
         const response = await fetch(`${QDRANT_URL}/collections/embeddings/points/${chunkId}`, {
           method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
+          signal: AbortSignal.timeout(5_000)
         });
 
         if (response.ok) {

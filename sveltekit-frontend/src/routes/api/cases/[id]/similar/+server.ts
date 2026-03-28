@@ -559,7 +559,8 @@ async function storeSynthesisInCouchDB(
 		const res = await fetch(`${ENV.COUCHDB_URL}/ace_synthesis`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(synthesis)
+			body: JSON.stringify(synthesis),
+			signal: AbortSignal.timeout(10_000)
 		});
 
 		if (!res.ok) {

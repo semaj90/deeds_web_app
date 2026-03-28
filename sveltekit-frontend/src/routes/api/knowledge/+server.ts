@@ -363,7 +363,8 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ parts: [{ text: augmentedPrompt }] }]
-          })
+          }),
+          signal: AbortSignal.timeout(30_000)
         }
       );
 

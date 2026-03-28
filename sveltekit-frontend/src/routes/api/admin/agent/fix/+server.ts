@@ -58,7 +58,8 @@ async function queryKnowledgeBase(filePath: string, errorContext: string): Promi
 						}
 					]
 				}
-			})
+			}),
+			signal: AbortSignal.timeout(10_000)
 		});
 
 		if (!searchResponse.ok) {

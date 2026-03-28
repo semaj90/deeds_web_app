@@ -20,7 +20,8 @@ export const GET: RequestHandler = async ({ params, fetch, locals }) => {
 		// First, get the vector for this component
 		const pointResponse = await fetch(`${QDRANT_URL}/collections/phase89_code_units/points/${componentId}`, {
 			method: 'GET',
-			headers: { 'Content-Type': 'application/json' }
+			headers: { 'Content-Type': 'application/json' },
+			signal: AbortSignal.timeout(5_000)
 		});
 
 		if (!pointResponse.ok) {
@@ -41,7 +42,8 @@ export const GET: RequestHandler = async ({ params, fetch, locals }) => {
 			body: JSON.stringify({ vector, limit: 10,
 				with_payload: true,
 				score_threshold: 0.7
-			})
+			}),
+			signal: AbortSignal.timeout(10_000)
 		});
 
 		if (!searchResponse.ok) {

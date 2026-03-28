@@ -31,7 +31,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(raw)
+			body: JSON.stringify(raw),
+			signal: AbortSignal.timeout(30_000)
 		});
 
 		if (!response.ok) {

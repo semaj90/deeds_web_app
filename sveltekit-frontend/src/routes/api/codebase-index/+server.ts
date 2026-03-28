@@ -86,7 +86,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		const response = await fetch(`${QDRANT_URL}/collections/${COLLECTION_NAME}/points/scroll`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(scrollPayload)
+			body: JSON.stringify(scrollPayload),
+			signal: AbortSignal.timeout(10_000)
 		});
 
 		if (!response.ok) {
@@ -185,7 +186,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				vector,
 				limit,
 				with_payload: true
-			})
+			}),
+			signal: AbortSignal.timeout(10_000)
 		});
 
 		if (!searchResponse.ok) {

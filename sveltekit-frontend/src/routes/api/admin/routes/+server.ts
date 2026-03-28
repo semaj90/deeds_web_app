@@ -203,7 +203,8 @@ async function getKBCounts(): Promise<Map<string, number>> {
 				limit: 10000,
 				with_payload: true,
 				with_vector: false
-			})
+			}),
+			signal: AbortSignal.timeout(15_000)
 		});
 
 		const data = await response.json();

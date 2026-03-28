@@ -19,7 +19,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		if (fileUrl && !compareText) {
 			// Attempt to fetch and extract text from the file URL
 			try {
-				const res = await fetch(fileUrl);
+				const res = await fetch(fileUrl, { signal: AbortSignal.timeout(15_000) });
 				if (res.ok) {
 					const contentType = res.headers.get('content-type') || '';
 					if (contentType.includes('pdf')) {

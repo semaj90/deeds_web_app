@@ -51,7 +51,8 @@ async function refreshMetadataCache(): Promise<void> {
 				limit: 10000,
 				with_payload: true,
 				with_vector: false
-			})
+			}),
+			signal: AbortSignal.timeout(15_000)
 		});
 
 		if (!res.ok) {

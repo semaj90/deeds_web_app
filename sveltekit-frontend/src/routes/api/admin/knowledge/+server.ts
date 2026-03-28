@@ -39,7 +39,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 				limit,
 				with_payload: true,
 				with_vector: false
-			})
+			}),
+			signal: AbortSignal.timeout(10_000)
 		});
 
 		if (!response.ok) {
@@ -73,7 +74,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 				limit: 5,
 				with_payload: true,
 				with_vector: false
-			})
+			}),
+			signal: AbortSignal.timeout(10_000)
 		});
 
 		if (errorResponse.ok) {

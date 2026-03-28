@@ -50,7 +50,8 @@ export const GET: RequestHandler = async ({ url, fetch, locals }) => {
 					limit,
 					with_payload: true,
 					with_vector: false
-				})
+				}),
+				signal: AbortSignal.timeout(10_000)
 			}
 		);
 
