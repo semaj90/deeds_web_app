@@ -165,7 +165,7 @@ Return ONLY a JSON array:
 	} catch (e) {
 		console.error('[api/investigate/suggest] Failed:', e);
 		return json(
-			{ error: e instanceof Error ? e.message : 'Suggestion generation failed' },
+			{ error: 'Suggestion generation failed' },
 			{ status: 500 }
 		);
 	}

@@ -78,8 +78,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
  return json({ ok: true, done: true, last: lastLine });
  } catch (e: unknown) {
- const msg = e instanceof Error ? e.message : 'pull failed';
- return json({ ok: false, error: msg }, { status: 500 });
+ console.error('[api/ollama/pull] Failed:', e);
+ return json({ ok: false, error: 'Model pull failed' }, { status: 500 });
  }
 };
 

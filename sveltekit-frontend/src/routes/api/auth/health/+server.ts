@@ -76,9 +76,9 @@ const luciaInstanceReused = !!globalThis?.__lucia_instance && globalThis.__lucia
  .limit(5);
  } catch (e: unknown) {
  status = status === 'healthy' ? 'degraded' : status;
- const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred';
- countsError = errorMessage;
- warnings.push({ code: 'COUNT_QUERY_FAILED', message: errorMessage });
+ console.error('[auth/health] Count query failed:', e);
+ countsError = 'Database query failed';
+ warnings.push({ code: 'COUNT_QUERY_FAILED', message: 'Database query failed' });
  }
 
  const durationMs = Date.now() - started;
