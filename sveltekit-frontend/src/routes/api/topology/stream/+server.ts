@@ -23,8 +23,13 @@ export function _broadcastUpdate(event: string, data: unknown) {
 
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+	let heartbeatId: ReturnType<typeof setInterval>;
+	let pollId: ReturnType<typeof setInterval>;
+	let activeController: ReadableStreamDefaultController | null = null;
+
 	const stream = new ReadableStream({
 		start(controller) {
+			activeController = controller;
 			clients.add(controller);
 
 			// Send initial connection message
@@ -32,17 +37,18 @@ export const GET: RequestHandler = async ({ locals }) => {
 			controller.enqueue(new TextEncoder().encode(welcomeMsg));
 
 			// Heartbeat to keep connection alive
-			const heartbeat = setInterval(() => {
+			heartbeatId = setInterval(() => {
 				try {
 					controller.enqueue(new TextEncoder().encode(': heartbeat\n\n'));
 				} catch {
-					clearInterval(heartbeat);
+					clearInterval(heartbeatId);
+					clearInterval(pollId);
 					clients.delete(controller);
 				}
 			}, 30000);
 
 			// Poll for changes every 5 seconds
-			const pollInterval = setInterval(async () => {
+			pollId = setInterval(async () => {
 				try {
 					// Check for recent error changes
 					const result = await pgPool.query(`
@@ -78,9 +84,9 @@ export const GET: RequestHandler = async ({ locals }) => {
 		},
 
 		cancel() {
-			clearInterval(heartbeat);
-			clearInterval(pollInterval);
-			clients.delete(controller);
+			clearInterval(heartbeatId);
+			clearInterval(pollId);
+			if (activeController) clients.delete(activeController);
 		}
 	});
 
