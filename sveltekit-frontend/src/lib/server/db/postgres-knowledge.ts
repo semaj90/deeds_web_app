@@ -11,7 +11,7 @@
  * - Read: Qdrant (fast search) → Fetch metadata from Postgres
  */
 
-import { db } from '$lib/server/db/index-clean.js'; // Assuming this is where db export is
+import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 
 export interface KnowledgeDocument {
@@ -65,9 +65,7 @@ export async function insertKnowledgeDocument(
             RETURNING id
         `);
 
-        // Drizzle .execute result handling depends on driver.
-        // Postgres.js usually behaves like array or row list.
-        const insertedId = (result as any)[0]?.id;
+        const insertedId = (result as any).rows[0]?.id;
 		console.log(`✅ Inserted knowledge document (ID: ${insertedId})`);
 		return insertedId;
 	} catch (error) {
@@ -88,9 +86,7 @@ export async function updateKnowledgeDocument(
         // For robustness using simple raw query construction loop or similar logic as before but cleaner
         // Note: Drizzle update would be cleaner if schema imported.
 
-        // Falling back to a simpler pattern if schema not imported or known.
-        // If we use `knowledge_documents` table via generic execute: const, setParts: any[] = [];
-        const params: any[] = [];
+        const setParts: any[] = [];
 
         if (updates.title !== undefined) { setParts.push(sql`title = ${updates.title}`); }
         if (updates.content !== undefined) { setParts.push(sql`content = ${updates.content}`); }
@@ -140,7 +136,7 @@ export async function searchByEmbedding(
             LIMIT ${limit}
         `);
 
-		return (result as any[]).map((row) => ({
+		return (result as any).rows.map((row: any) => ({
 			id: row.id,
 			title: row.title,
 			content: row.content,
@@ -173,7 +169,7 @@ export async function searchByText(
             LIMIT ${limit}
         `);
 
-		return (result as any[]).map((row) => ({
+		return (result as any).rows.map((row: any) => ({
 			id: row.id,
 			title: row.title,
 			content: row.content,
@@ -201,7 +197,7 @@ export async function getDocumentsNeedingSync(): Promise<KnowledgeDocument[]> {
             ORDER BY updated_at DESC
         `);
 
-		return (result as any[]).map((row) => ({
+		return (result as any).rows.map((row: any) => ({
 			id: row.id,
 			title: row.title,
 			content: '', // Not needed for sync
@@ -313,7 +309,7 @@ export async function getRelatedDocuments(
                ORDER BY kr.weight DESC`;
 
 		const result = await db.execute(query);
-		return result as any[] as KnowledgeDocument[];
+		return (result as any).rows as KnowledgeDocument[];
 	} catch (error) {
 		console.error('❌ Get related documents failed:', error);
 		return [];
@@ -326,7 +322,7 @@ export async function getRelatedDocuments(
 export async function postgresHealthCheck(): Promise<boolean> {
 	try {
         const result = await db.execute(sql`SELECT 1 AS health`);
-		return (result as any)[0]?.health === 1;
+		return (result as any).rows[0]?.health === 1;
 	} catch {
 		return false;
 	}

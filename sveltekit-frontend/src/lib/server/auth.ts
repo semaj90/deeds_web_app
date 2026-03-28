@@ -8,7 +8,7 @@ import type { RequestEvent } from '@sveltejs/kit';
 import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
 import { Lucia, type Session, type User } from 'lucia';
-import db from './db/drizzle.js';
+import { db } from './db/client';
 import * as schema from './db/schema.js';
 import { ENV } from './env.server.js';
 import {

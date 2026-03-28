@@ -72,6 +72,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			throw err; // Re-throw SvelteKit errors
 		}
 
-		throw error(500, `Failed to invalidate cache: ${(err as Error).message}`);
+		throw error(500, 'Failed to invalidate cache');
 	}
 };

@@ -13,7 +13,7 @@
  */
 
 import { CONFIG } from '$lib/config/env.server.js';
-import { db } from '$lib/server/db/index-clean.js'; // Assuming clean export
+import { db } from '$lib/server/db/client';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import {
 	getDocumentsNeedingSync,
@@ -157,17 +157,15 @@ export async function processSyncQueue(): Promise<number> {
             LIMIT 100
         `);
 
-        // @ts-ignore
-		if (result.length === 0) {
+		const rows = (result as any).rows;
+		if (rows.length === 0) {
 			return 0;
 		}
 
-        // @ts-ignore
-		console.log(`🔄 Processing ${result.length} sync queue items...`);
+		console.log(`🔄 Processing ${rows.length} sync queue items...`);
 
 		let successCount = 0;
-        // @ts-ignore
-		for (const row of result) {
+		for (const row of rows) {
 			try {
 				if (row.operation === 'delete') {
 					// Delete from Qdrant
@@ -207,8 +205,7 @@ export async function processSyncQueue(): Promise<number> {
 			}
 		}
 
-        // @ts-ignore
-		console.log(`✅ Processed ${successCount}/${result.length} queue items`);
+		console.log(`✅ Processed ${successCount}/${rows.length} queue items`);
 		return successCount;
 	} catch (error) {
 		console.error('❌ Process sync queue failed:', error);
@@ -349,17 +346,16 @@ export async function fullResync(): Promise<number> {
             WHERE embedding IS NOT NULL
         `);
 
-        // @ts-ignore
-		console.log(`📦 Found ${allDocs.length} documents to sync`);
+		const allRows = (allDocs as any).rows;
+		console.log(`📦 Found ${allRows.length} documents to sync`);
 
 		let successCount = 0;
-        // @ts-ignore
-		for (const row of allDocs) {
+		for (const row of allRows) {
 			const doc: KnowledgeDocument = {
 				id: row.id,
 				title: row.title,
 				content: row.content,
-				embedding: typeof row.embedding === 'string' ? JSON.parse(row.embedding) : row.embedding, // handle string format if pgvector returns string
+				embedding: typeof row.embedding === 'string' ? JSON.parse(row.embedding) : row.embedding,
 				couchdb_id: row.couchdb_id,
 				metadata: row.metadata,
 				blob_url: row.blob_url
@@ -369,8 +365,7 @@ export async function fullResync(): Promise<number> {
 			if (success) successCount++;
 		}
 
-        // @ts-ignore
-		console.log(`✅ Full re-sync complete: ${successCount}/${allDocs.length} documents`);
+		console.log(`✅ Full re-sync complete: ${successCount}/${allRows.length} documents`);
 		return successCount;
 	} catch (error) {
 		console.error('❌ Full re-sync failed:', error);

@@ -4,7 +4,7 @@
  * and processed by the worker loop with p-limit concurrency gates.
  */
 
-import db from '$lib/server/db/index.js';
+import { db } from '$lib/server/db/client';
 import { analysisJobs } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
 
