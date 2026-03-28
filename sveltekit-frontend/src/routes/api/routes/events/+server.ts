@@ -26,11 +26,13 @@ const connections = new Set<ReadableStreamDefaultController>();
  */
 export const GET: RequestHandler = async ({ locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+  let heartbeatId: ReturnType<typeof setInterval>;
+  let activeController: ReadableStreamDefaultController | null = null;
+
   const stream = new ReadableStream({
     start(controller) {
-      // Add to active connections
+      activeController = controller;
       connections.add(controller);
-      console.log(`[SSE] Client connected. Total connections: ${connections.size}`);
 
       // Send initial connection message
       try {
@@ -44,22 +46,19 @@ export const GET: RequestHandler = async ({ locals }) => {
       }
 
       // Heartbeat every 30 seconds to keep connection alive
-      const heartbeat = setInterval(() => {
+      heartbeatId = setInterval(() => {
         try {
           controller.enqueue(`: heartbeat\n\n`);
-        } catch (error) {
-          console.error('[SSE] Heartbeat failed, cleaning up connection:', error);
-          clearInterval(heartbeat);
+        } catch {
+          clearInterval(heartbeatId);
           connections.delete(controller);
         }
       }, 30000);
+    },
 
-      // Cleanup on close
-      return () => {
-        clearInterval(heartbeat);
-        connections.delete(controller);
-        console.log(`[SSE] Client disconnected. Total connections: ${connections.size}`);
-      };
+    cancel() {
+      clearInterval(heartbeatId);
+      if (activeController) connections.delete(activeController);
     },
   });
 

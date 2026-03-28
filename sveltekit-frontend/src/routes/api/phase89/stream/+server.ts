@@ -14,6 +14,8 @@ export const GET: RequestHandler = async ({ request, locals }) => {
 
   const encoder = new TextEncoder();
 
+  let statsIntervalId: ReturnType<typeof setInterval>;
+
   const stream = new ReadableStream({
     async start(controller) {
       // Send initial connection message
@@ -22,10 +24,9 @@ export const GET: RequestHandler = async ({ request, locals }) => {
       );
 
       // Send periodic stats updates
-      const statsInterval = setInterval(async () => {
+      statsIntervalId = setInterval(async () => {
         try {
           if (isConnected) {
-            // Get some quick stats
             const embKeys = await redis.keys('emb:*');
             const fixKeys = await redis.keys('fix:*');
 
@@ -42,23 +43,20 @@ export const GET: RequestHandler = async ({ request, locals }) => {
               )
             );
           } else {
-            // Just send a heartbeat
             controller.enqueue(
               encoder.encode(
                 `data: ${JSON.stringify({ type: 'heartbeat', timestamp: Date.now() })}\n\n`
               )
             );
           }
-        } catch (e) {
-          // Ignore errors, client may have disconnected
+        } catch {
+          // Client may have disconnected
         }
       }, 5000);
+    },
 
-      // Handle client disconnect
-      request.signal.addEventListener('abort', () => {
-        clearInterval(statsInterval);
-        try { controller.close(); } catch { /* already closed */ }
-      });
+    cancel() {
+      clearInterval(statsIntervalId);
     },
   });
 
