@@ -96,11 +96,12 @@ export const GET: RequestHandler = async ({ locals }) => {
 				}
 			}, 5000);
 
-			return () => {
-				clearInterval(heartbeat);
-				clearInterval(monitor);
-				clients.delete(controller);
-			};
+		},
+
+		cancel() {
+			clearInterval(heartbeat);
+			clearInterval(monitor);
+			clients.delete(controller);
 		}
 	});
 

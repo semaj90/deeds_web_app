@@ -1,5 +1,6 @@
 import { db } from '$lib/server/db/client';
 import { getOllamaUrl, getQdrantUrl, getRedisUrl, getDatabaseUrl, getMinioConfig } from '$lib/config/env.server.js';
+import { ENV } from '$lib/server/env.server.js';
 import { json } from '@sveltejs/kit';
 import { sql } from 'drizzle-orm';
 
@@ -68,7 +69,7 @@ export async function GET({ locals }: { locals: App.Locals }) {
   // Qdrant vector DB
   {
     try {
-      const resp = await fetch(`${getQdrantUrl()}/health`);
+      const resp = await fetch(`${getQdrantUrl()}/health`, { signal: AbortSignal.timeout(5000) });
       services.qdrant = {
         url: getQdrantUrl(),
         reachable: resp.ok,
@@ -86,7 +87,7 @@ export async function GET({ locals }: { locals: App.Locals }) {
   // Ollama LLM
   {
     try {
-      const resp = await fetch(`${getOllamaUrl()}/api/tags`);
+      const resp = await fetch(`${getOllamaUrl()}/api/tags`, { signal: AbortSignal.timeout(5000) });
       const data = await resp.json();
       services.ollama = {
         url: getOllamaUrl(),
@@ -127,14 +128,14 @@ export async function GET({ locals }: { locals: App.Locals }) {
   {
     services.minio = {
       endpoint: getMinioConfig().endpoint,
-      bucket: process.env?.MINIO_BUCKET ?? 'legal-evidence',
+      bucket: ENV.MINIO_EVIDENCE_BUCKET,
       purpose: 'Evidence staging, raw artifacts',
     };
   }
 
   return json({
     timestamp: new Date().toISOString(),
-    environment: process.env?.NODE_ENV ?? 'development',
+    environment: ENV.NODE_ENV,
     services,
   });
 }

@@ -75,16 +75,12 @@ export const GET: RequestHandler = async ({ locals }) => {
 				}
 			}, 5000);
 
-			// Cleanup on disconnect
-			return () => {
-				clearInterval(heartbeat);
-				clearInterval(pollInterval);
-				clients.delete(controller);
-			};
 		},
 
 		cancel() {
-			// Client disconnected
+			clearInterval(heartbeat);
+			clearInterval(pollInterval);
+			clients.delete(controller);
 		}
 	});
 

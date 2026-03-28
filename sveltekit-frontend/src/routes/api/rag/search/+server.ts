@@ -35,7 +35,7 @@ async function reformulateQuery(query: string, topScore: number): Promise<string
         model: 'gemma3-legal:latest',
         prompt: `Rephrase this legal search query to improve retrieval. Return ONLY the rephrased query, nothing else.\n\nOriginal: ${query.slice(0, 500)}`,
         stream: false,
-        keep_alive: process.env?.OLLAMA_KEEP_ALIVE ?? '24h',
+        keep_alive: '24h',
         options: { temperature: 0.3, num_predict: 128 },
       }),
       signal: AbortSignal.timeout(5000),

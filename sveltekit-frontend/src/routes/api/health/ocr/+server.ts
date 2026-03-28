@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
 const ocrHealthActionSchema = z.object({
 	action: z.enum(['test-processing', 'detailed-status']).optional(),
@@ -159,7 +160,7 @@ export const GET: RequestHandler = async () => {
  status: overallStatus,
  timestamp: new Date().toISOString(),
  ocr: ocrHealth,
- metadata: { checkDuration, environment: process.env?.NODE_ENV ?? 'development',
+ metadata: { checkDuration, environment: ENV.NODE_ENV,
  },
  };
 
@@ -189,7 +190,7 @@ export const GET: RequestHandler = async () => {
  timestamp: new Date().toISOString(),
  error: 'OCR health check system failure',
  message: getErrorMessage(err),
- metadata: { checkDuration, environment: process.env?.NODE_ENV ?? 'development',
+ metadata: { checkDuration, environment: ENV.NODE_ENV,
  },
  },
  {
@@ -290,7 +291,7 @@ export const POST: RequestHandler = async ({ request }) => {
  timestamp: new Date().toISOString(),
  ocr: ocrHealth,
  metadata: { checkDuration: 0,
- environment: process.env?.NODE_ENV ?? 'development',
+ environment: ENV.NODE_ENV,
  },
  };
 

@@ -191,7 +191,7 @@ async function streamOllamaResponse(
 	sendEvent: (event: string, data: unknown) => void
 ): Promise<void> {
 	const OLLAMA_URL = getOllamaUrl();
-	const MODEL = process.env?.OLLAMA_MODEL ?? 'gemma3-legal:latest';
+	const MODEL = 'gemma3-legal:latest';
 
 	const response = await traceLLM('knowledge-stream', { model: MODEL, prompt: prompt.slice(0, 500) }, async (gen) => {
 		const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
@@ -201,7 +201,7 @@ async function streamOllamaResponse(
 				model: MODEL,
 				prompt,
 				stream: true,
-				keep_alive: process.env?.OLLAMA_KEEP_ALIVE ?? '24h',
+				keep_alive: '24h',
 				options: { temperature: 0.3, num_predict: 2048 }
 			})
 		});
@@ -268,7 +268,7 @@ async function streamGeminiResponse(
 		const { GoogleGenerativeAI } = await import('@google/generative-ai');
 		const genAI = new GoogleGenerativeAI(apiKey);
 		const model = genAI.getGenerativeModel({
-			model: process.env?.GEMINI_MODEL ?? 'gemini-2.0-flash-exp'
+			model: 'gemini-2.0-flash-exp'
 		});
 
 		const result = await model.generateContentStream(prompt);
