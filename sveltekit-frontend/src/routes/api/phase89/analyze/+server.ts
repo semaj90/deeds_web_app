@@ -1,15 +1,9 @@
 import { json } from '@sveltejs/kit';
-import pg from 'pg';
-import { getDatabaseUrl, getOllamaUrl } from '$lib/config/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { getOllamaUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-
-const { Pool } = pg;
-
-const pool = new Pool({
-	connectionString: getDatabaseUrl()
-});
+import { pool } from '$lib/server/db/client';
 
 const analyzeSchema = z.object({
 	cluster_id: z.number().int().min(1, 'Missing cluster_id'),
