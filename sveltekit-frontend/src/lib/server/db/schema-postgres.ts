@@ -3217,3 +3217,29 @@ export const fictionalCaseEvents = pgTable('fictional_case_events', {
 	typeIdx: index('fictional_events_type_idx').on(table.eventType),
 }));
 
+// === API AUDIT LOG ===
+// Immutable audit trail for all API requests (batched insert from hooks.server.ts)
+
+export const apiAuditLog = pgTable('api_audit_log', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	requestId: varchar('request_id', { length: 64 }),
+	method: varchar('method', { length: 10 }).notNull(),
+	path: varchar('path', { length: 500 }).notNull(),
+	statusCode: integer('status_code').notNull(),
+	durationMs: integer('duration_ms'),
+	userId: uuid('user_id'),
+	ipAddress: varchar('ip_address', { length: 45 }),
+	userAgent: varchar('user_agent', { length: 500 }),
+	requestBodySize: integer('request_body_size'),
+	errorMessage: text('error_message'),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	createdAtIdx: index('api_audit_created_at_idx').on(table.createdAt),
+	userIdIdx: index('api_audit_user_id_idx').on(table.userId),
+	pathIdx: index('api_audit_path_idx').on(table.path),
+	statusCodeIdx: index('api_audit_status_code_idx').on(table.statusCode),
+}));
+
+export type ApiAuditLogEntry = typeof apiAuditLog.$inferSelect;
+export type NewApiAuditLogEntry = typeof apiAuditLog.$inferInsert;
+

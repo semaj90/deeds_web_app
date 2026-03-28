@@ -1,0 +1,132 @@
+# Legal AI Platform — Unified Caddy Configuration
+# Caddy v2.8 — HTTP/3 (QUIC) reverse proxy
+#
+# Environment variables (set via docker-compose or shell):
+#   CADDY_DOMAIN       — Domain binding (default: localhost)
+#   CADDY_PORT         — Listen port (default: 5178)
+#   SVELTEKIT_UPSTREAM — Backend address (default: host.docker.internal:5173)
+#   CADDY_DEV_MODE     — "true" enables permissive CORS + verbose logging
+
+{
+	# Process directives in the right order
+	order handle_path before reverse_proxy
+
+	# Global options
+	servers {
+		protocols h1 h2 h3
+	}
+}
+
+# Snippets for reuse
+(security_headers) {
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		X-XSS-Protection "1; mode=block"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+}
+
+(proxy_headers) {
+	header_up Host {host}
+	header_up X-Real-IP {remote_host}
+	header_up X-Forwarded-For {remote_host}
+	header_up X-Forwarded-Proto {scheme}
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Main site block
+# ═══════════════════════════════════════════════════════════════
+{$CADDY_DOMAIN:localhost}:{$CADDY_PORT:5178} {
+	# HTTP/3 Alt-Svc advertisement
+	header Alt-Svc "h3=\":{$CADDY_PORT:5178}\"; ma=2592000"
+
+	# Security headers on all responses
+	import security_headers
+
+	# HSTS (production only — dev can override with CADDY_DEV_MODE)
+	header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+	# Content-Security-Policy (permissive enough for SvelteKit)
+	header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' wss: https:;"
+
+	# ───── Health check ─────
+	handle /health {
+		respond "OK" 200
+	}
+
+	# ───── SSE / Streaming routes (disable buffering) ─────
+	handle /api/sse/* {
+		reverse_proxy {$SVELTEKIT_UPSTREAM:host.docker.internal:5173} {
+			flush_interval -1
+			import proxy_headers
+		}
+	}
+	handle /api/ai/* {
+		reverse_proxy {$SVELTEKIT_UPSTREAM:host.docker.internal:5173} {
+			flush_interval -1
+			import proxy_headers
+		}
+	}
+	handle /api/*/stream* {
+		reverse_proxy {$SVELTEKIT_UPSTREAM:host.docker.internal:5173} {
+			flush_interval -1
+			import proxy_headers
+		}
+	}
+	handle /api/synthesis/* {
+		reverse_proxy {$SVELTEKIT_UPSTREAM:host.docker.internal:5173} {
+			flush_interval -1
+			import proxy_headers
+		}
+	}
+	handle /api/detective/* {
+		reverse_proxy {$SVELTEKIT_UPSTREAM:host.docker.internal:5173} {
+			flush_interval -1
+			import proxy_headers
+		}
+	}
+
+	# ───── Static assets (immutable cache) ─────
+	handle /_app/* {
+		header Cache-Control "public, max-age=31536000, immutable"
+		reverse_proxy {$SVELTEKIT_UPSTREAM:host.docker.internal:5173} {
+			import proxy_headers
+		}
+	}
+
+	# ───── Vector service proxy (Go SIMD sidecar) ─────
+	handle_path /vector/* {
+		reverse_proxy {$VECTOR_BACKEND:host.docker.internal:8095}
+	}
+
+	# ───── Default: all other traffic to SvelteKit ─────
+	reverse_proxy {$SVELTEKIT_UPSTREAM:host.docker.internal:5173} {
+		transport http {
+			keepalive 30s
+			keepalive_idle_conns 10
+		}
+
+		import proxy_headers
+
+		# Health-checked upstream
+		health_uri /api/health
+		health_interval 30s
+		health_timeout 10s
+
+		# Graceful retry on upstream restart
+		fail_duration 5s
+		max_fails 3
+	}
+
+	# ───── Compression ─────
+	encode zstd gzip
+
+	# ───── Logging ─────
+	log {
+		output stdout
+		format json
+	}
+}

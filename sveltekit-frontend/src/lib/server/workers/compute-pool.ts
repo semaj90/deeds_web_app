@@ -34,7 +34,9 @@ export class ComputePool {
 	private disposed = false;
 
 	constructor(private poolSize?: number) {
-		this.poolSize = poolSize ?? Math.max(1, Math.min(os.cpus().length - 2, 4));
+		// In cluster mode, reduce pool size to avoid thread explosion (N workers * M threads)
+		const isClusterWorker = process.env.CLUSTER_WORKERS && parseInt(process.env.CLUSTER_WORKERS) > 1;
+		this.poolSize = poolSize ?? (isClusterWorker ? 1 : Math.max(1, Math.min(os.cpus().length - 2, 4)));
 		this.initWorkers();
 	}
 

@@ -25,6 +25,7 @@ import { ENV } from '$lib/server/env.server.js';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { createDefaultRegistry } from '$lib/server/queue/queue-worker.js';
+import { auditBuffer } from '$lib/server/audit/api-audit-buffer';
 
 // ── Request Timeout Constants ────────────────────────────────────────────
 const DEFAULT_REQUEST_TIMEOUT = 30_000; // 30s for normal routes
@@ -35,6 +36,11 @@ const MAX_BODY_SIZE = 50 * 1024 * 1024; // 50MB default
 const MAX_UPLOAD_SIZE = 100 * 1024 * 1024; // 100MB for file uploads
 const UPLOAD_PATHS = ['/api/evidence/upload', '/api/vision/analyze', '/api/persons-of-interest'];
 const shouldRunBootTasks = !building && process.env.NODE_ENV !== 'test';
+
+// In cluster mode, only worker 1 runs singleton boot tasks (RabbitMQ, Qdrant, warmup)
+// Audit buffer + rate limiting run on ALL workers independently
+const isClusterWorker1 = !process.env.CLUSTER_WORKER_ID || process.env.CLUSTER_WORKER_ID === '1';
+const shouldRunSingletonTasks = shouldRunBootTasks && isClusterWorker1;
 
 // ── Per-Route Rate Limiting (Sprint 4 → upgraded Sprint 5) ───────────────
 // In-memory sliding window — per route tier + IP
@@ -97,9 +103,16 @@ if (shouldRunBootTasks && !dev) {
 }
 
 if (shouldRunBootTasks) {
+  // ── Per-worker tasks (run on ALL workers in cluster mode) ──
   // Start the analysis worker on server boot (idempotent)
   startWorker();
 
+  // Start API audit buffer (batched writes to api_audit_log every 5s)
+  auditBuffer.start();
+}
+
+if (shouldRunSingletonTasks) {
+  // ── Singleton tasks (only worker 1 in cluster mode) ──
   // Start RabbitMQ 7-queue pipeline (XState v5 with auto-reconnect, non-blocking)
   startRabbitMQPipeline()
     .then(() => {
@@ -572,6 +585,18 @@ export const handle: Handle = async ({ event, resolve }) => {
     userId: event.locals.user?.id,
   });
 
+  // Push to persistent audit log (batched, best-effort)
+  auditBuffer.push({
+    requestId,
+    method: event.request.method,
+    path: event.url.pathname,
+    statusCode: response.status,
+    durationMs: duration,
+    userId: event.locals.user?.id,
+    ipAddress: (() => { try { return event.getClientAddress?.(); } catch { return event.request.headers.get('x-forwarded-for') ?? undefined; } })(),
+    userAgent: event.request.headers.get('user-agent') ?? undefined,
+  });
+
   // CORS origin header on API responses (Sprint 1: credentials + expose-headers)
   if (event.url.pathname.startsWith('/api/')) {
     const allowedOrigin = dev ? '*' : ENV.PUBLIC_API_URL || event.url.origin;
@@ -673,6 +698,13 @@ if (typeof process !== 'undefined') {
 		try {
 			const { shutdownLangfuse } = await import('$lib/server/observability/langfuse.js');
 			await shutdownLangfuse();
+		} catch {
+			// Non-fatal
+		}
+
+		// Flush audit buffer
+		try {
+			await auditBuffer.shutdown();
 		} catch {
 			// Non-fatal
 		}

@@ -3,14 +3,11 @@ import traverse from '@babel/traverse';
 import { json } from '@sveltejs/kit';
 import fs from 'fs/promises';
 import path from 'path';
-import pg from 'pg';
 import type { RequestHandler } from './$types';
-import { getDatabaseUrl, getQdrantUrl } from '$lib/config/env.server.js';
+import { getQdrantUrl } from '$lib/config/env.server.js';
+import { pool as pgPool } from '$lib/server/db/client';
 
 const QDRANT_URL = getQdrantUrl();
-const { Pool } = pg;
-
-const pgPool = new Pool({ connectionString: getDatabaseUrl() });
 
 interface RouteInfo {
 	id: string;

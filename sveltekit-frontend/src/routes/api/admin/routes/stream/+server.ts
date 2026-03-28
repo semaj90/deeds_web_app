@@ -1,11 +1,6 @@
 import { json } from '@sveltejs/kit';
-import pg from 'pg';
 import type { RequestHandler } from './$types';
-
-import { getDatabaseUrl } from '$lib/config/env.server.js';
-const { Pool } = pg;
-
-const pgPool = new Pool({ connectionString: getDatabaseUrl() });
+import { pool as pgPool } from '$lib/server/db/client';
 
 const clients = new Set<ReadableStreamDefaultController>();
 

@@ -1,17 +1,11 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { json } from '@sveltejs/kit';
-import pg from 'pg';
-import { getQdrantUrl, getDatabaseUrl } from '$lib/config/env.server.js';
+import { getQdrantUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
-
-const { Pool } = pg;
+import { pool as aiPool } from '$lib/server/db/client';
 
 const qdrant = new QdrantClient({
 	url: getQdrantUrl()
-});
-
-const aiPool = new Pool({
-	connectionString: getDatabaseUrl()
 });
 
 function isMissingRelationError(error: unknown): boolean {

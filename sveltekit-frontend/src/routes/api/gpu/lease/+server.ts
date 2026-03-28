@@ -21,12 +21,17 @@ const gpuReleaseSchema = z.object({
 });
 
 export async function GET() {
-	const lease = await getGpuLeaseStatus();
-	return json({
-		lease,
-		free: !lease,
-		remainingMs: lease ? Math.max(0, lease.expiresAt - Date.now()) : null
-	});
+	try {
+		const lease = await getGpuLeaseStatus();
+		return json({
+			lease,
+			free: !lease,
+			remainingMs: lease ? Math.max(0, lease.expiresAt - Date.now()) : null
+		});
+	} catch (err) {
+		console.error('GPU lease status error:', err);
+		return json({ error: 'Failed to get GPU lease status' }, { status: 500 });
+	}
 }
 
 export async function POST({ request, locals }: RequestEvent) {
@@ -39,16 +44,21 @@ export async function POST({ request, locals }: RequestEvent) {
 	}
 	const { backend, ttlSeconds } = parsed.data;
 
-	const lease = await acquireGpuLease(backend, ttlSeconds);
-	if (!lease) {
-		const current = await getGpuLeaseStatus();
-		return json({
-			error: 'GPU is held by another backend',
-			currentLease: current
-		}, { status: 409 });
-	}
+	try {
+		const lease = await acquireGpuLease(backend, ttlSeconds);
+		if (!lease) {
+			const current = await getGpuLeaseStatus();
+			return json({
+				error: 'GPU is held by another backend',
+				currentLease: current
+			}, { status: 409 });
+		}
 
-	return json({ lease, acquired: true });
+		return json({ lease, acquired: true });
+	} catch (err) {
+		console.error('GPU lease acquire error:', err);
+		return json({ error: 'Failed to acquire GPU lease' }, { status: 500 });
+	}
 }
 
 export async function DELETE({ request, locals }: RequestEvent) {
@@ -61,6 +71,11 @@ export async function DELETE({ request, locals }: RequestEvent) {
 	}
 	const { backend } = parsed.data;
 
-	const released = await releaseGpuLease(backend);
-	return json({ released, backend });
+	try {
+		const released = await releaseGpuLease(backend);
+		return json({ released, backend });
+	} catch (err) {
+		console.error('GPU lease release error:', err);
+		return json({ error: 'Failed to release GPU lease' }, { status: 500 });
+	}
 }

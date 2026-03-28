@@ -23,17 +23,22 @@ export async function GET({ url, locals }: RequestEvent) {
 
 	const evidenceId = url.searchParams.get('evidenceId');
 
-	if (evidenceId) {
-		const jobs = await getJobsForEvidence(evidenceId);
-		return json({ evidenceId, jobs });
+	try {
+		if (evidenceId) {
+			const jobs = await getJobsForEvidence(evidenceId);
+			return json({ evidenceId, jobs });
+		}
+
+		const [worker, counts] = await Promise.all([
+			Promise.resolve(getWorkerStats()),
+			getJobCounts(),
+		]);
+
+		return json({ worker, jobCounts: counts });
+	} catch (err) {
+		console.error('Evidence analysis GET error:', err);
+		return json({ error: 'Failed to fetch analysis status' }, { status: 500 });
 	}
-
-	const [worker, counts] = await Promise.all([
-		Promise.resolve(getWorkerStats()),
-		getJobCounts(),
-	]);
-
-	return json({ worker, jobCounts: counts });
 }
 
 /**
@@ -54,20 +59,25 @@ export async function POST({ request, locals }: RequestEvent) {
 		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	}
 
-	const validStages: JobType[] = ['entity_extraction', 'forensics', 'summarization'];
-	const requested: JobType[] = parsed.data.stages?.length
-		? parsed.data.stages
-		: validStages;
+	try {
+		const validStages: JobType[] = ['entity_extraction', 'forensics', 'summarization'];
+		const requested: JobType[] = parsed.data.stages?.length
+			? parsed.data.stages
+			: validStages;
 
-	const enqueued: { jobType: string; jobId: string }[] = [];
-	for (const stage of requested) {
-		const jobId = await enqueueJob({
-			evidenceId: parsed.data.evidenceId,
-			caseId: parsed.data.caseId ?? null,
-			jobType: stage,
-		});
-		enqueued.push({ jobType: stage, jobId });
+		const enqueued: { jobType: string; jobId: string }[] = [];
+		for (const stage of requested) {
+			const jobId = await enqueueJob({
+				evidenceId: parsed.data.evidenceId,
+				caseId: parsed.data.caseId ?? null,
+				jobType: stage,
+			});
+			enqueued.push({ jobType: stage, jobId });
+		}
+
+		return json({ enqueued }, { status: 201 });
+	} catch (err) {
+		console.error('Evidence analysis POST error:', err);
+		return json({ error: 'Failed to enqueue analysis jobs' }, { status: 500 });
 	}
-
-	return json({ enqueued }, { status: 201 });
 }

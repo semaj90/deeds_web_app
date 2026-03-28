@@ -9,14 +9,11 @@ import { json } from '@sveltejs/kit';
 import IORedis from 'ioredis';
 import { getRedisUrl } from '$lib/config/env.server.js';
 import { produceTokenChunk, readTokenStream } from '$lib/server/redis-streams.js';
+import { sseFormat, sseHeaders } from '$lib/server/streaming/sse-utils.js';
 import type { RequestHandler } from './$types';
 import { isUuid } from '$lib/server/validation.js';
 
 const REDIS_URL = getRedisUrl();
-
-function sseFormat(event: string, data: unknown): string {
-	return `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
-}
 
 export const GET: RequestHandler = async ({ params, request, locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -168,12 +165,5 @@ export const GET: RequestHandler = async ({ params, request, locals }) => {
     }
   });
 
-  return new Response(stream, {
-    headers: {
-      'Content-Type': 'text/event-stream; charset=utf-8',
-      'Cache-Control': 'no-cache, no-transform',
-      Connection: 'keep-alive',
-      'X-Accel-Buffering': 'no', // Disable nginx buffering for real-time streaming
-    },
-  });
+  return new Response(stream, { headers: sseHeaders() });
 };

@@ -1,10 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
-import pg from 'pg';
-import { getDatabaseUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
-
-const pool = new pg.Pool({ connectionString: getDatabaseUrl() });
+import { pool } from '$lib/server/db/client';
 
 const querySchema = z.object({
 	limit: z.coerce.number().int().min(1).max(100).default(20)

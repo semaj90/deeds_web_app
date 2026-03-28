@@ -67,17 +67,22 @@ export async function POST({ request, locals }: RequestEvent) {
 	}
 	const { type, payload, backend, isRealtime, batchSize } = parsed.data;
 
-	const task = createGpuTask(type, payload, { backend, isRealtime, batchSize });
-	taskQueue.push(task);
-	stats.totalSubmitted++;
+	try {
+		const task = createGpuTask(type, payload, { backend, isRealtime, batchSize });
+		taskQueue.push(task);
+		stats.totalSubmitted++;
 
-	// Auto-classify priority
-	const priority = classifyTaskPriority(type, { isRealtime, batchSize });
+		// Auto-classify priority
+		const priority = classifyTaskPriority(type, { isRealtime, batchSize });
 
-	return json({
-		taskId: task.id,
-		priority,
-		position: taskQueue.filter(t => !t.startedAt).length,
-		queueDepth: taskQueue.length
-	}, { status: 201 });
+		return json({
+			taskId: task.id,
+			priority,
+			position: taskQueue.filter(t => !t.startedAt).length,
+			queueDepth: taskQueue.length
+		}, { status: 201 });
+	} catch (err) {
+		console.error('GPU queue submit error:', err);
+		return json({ error: 'Failed to submit GPU task' }, { status: 500 });
+	}
 }

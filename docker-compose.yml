@@ -205,6 +205,45 @@ services:
       timeout: 20s
       retries: 3
 
+  # Caddy — HTTP/3 reverse proxy (QUIC-enabled)
+  # Fronts SvelteKit with H3, SSE streaming, compression, security headers
+  caddy:
+    image: caddy:2.8-alpine
+    container_name: legal-ai-caddy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    ports:
+      - "${CADDY_PORT:-5178}:${CADDY_PORT:-5178}"
+      - "${CADDY_PORT:-5178}:${CADDY_PORT:-5178}/udp"  # QUIC/HTTP3
+    volumes:
+      - ./sveltekit-frontend/docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      CADDY_DOMAIN: ${CADDY_DOMAIN:-localhost}
+      CADDY_PORT: ${CADDY_PORT:-5178}
+      SVELTEKIT_UPSTREAM: ${SVELTEKIT_UPSTREAM:-host.docker.internal:5173}
+      VECTOR_BACKEND: ${VECTOR_BACKEND:-host.docker.internal:8095}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:${CADDY_PORT:-5178}/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
   # ═══════════════════════════════════════════════════════════════════
   # FULL PROFILE — optional services (~2GB additional)
   # Usage: docker compose --profile full up -d

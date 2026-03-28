@@ -1,13 +1,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
-import pg from 'pg';
 import { getRedis } from '$lib/server/redis.js';
-import { getDatabaseUrl, getQdrantUrl } from '$lib/config/env.server.js';
-
-const { Pool } = pg;
-
-const pgPool = new Pool({
-	connectionString: getDatabaseUrl()
-});
+import { getQdrantUrl } from '$lib/config/env.server.js';
+import { pool as pgPool } from '$lib/server/db/client';
 
 const QDRANT_URL = getQdrantUrl();
 

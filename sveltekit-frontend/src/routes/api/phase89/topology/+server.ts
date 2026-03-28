@@ -4,13 +4,7 @@
  */
 
 import { json, type RequestHandler } from '@sveltejs/kit';
-import pg from 'pg';
-
-import { getDatabaseUrl } from '$lib/config/env.server.js';
-const { Pool } = pg;
-
-const DATABASE_URL = getDatabaseUrl();
-const pool = new Pool({ connectionString: DATABASE_URL });
+import { pool } from '$lib/server/db/client';
 
 export const GET: RequestHandler = async ({ locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });

@@ -1,11 +1,7 @@
-import { getDatabaseUrl } from '$lib/config/env.server.js';
 import { json } from '@sveltejs/kit';
-import pg from 'pg';
 import type { RequestHandler } from './$types';
-
-const { Pool } = pg;
-
-const pgPool = new Pool({ connectionString: getDatabaseUrl() });
+import { pool as pgPool } from '$lib/server/db/client';
+import { extractComponent } from '$lib/server/utils/extract-component.js';
 
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -84,21 +80,6 @@ export const GET: RequestHandler = async ({ locals }) => {
 	}
 };
 
-function extractComponent(filePath: string): string {
-	const parts = filePath.split(/[\/\\]/);
-
-	if (parts.includes('routes')) {
-		const idx = parts.indexOf('routes');
-		return parts.slice(idx, idx + 2).join('/');
-	}
-
-	if (parts.includes('lib')) {
-		const idx = parts.indexOf('lib');
-		return parts.slice(idx, idx + 2).join('/');
-	}
-
-	return filePath;
-}
 
 interface ComponentEntry {
 	name: string;

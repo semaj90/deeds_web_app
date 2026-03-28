@@ -40,6 +40,7 @@ WORKDIR /app
 COPY --from=builder --chown=sveltekit:nodejs /app/build ./build
 COPY --from=builder --chown=sveltekit:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=sveltekit:nodejs /app/package.json ./
+COPY --from=builder --chown=sveltekit:nodejs /app/server.js ./
 
 # Switch to non-root user
 USER sveltekit
@@ -48,6 +49,8 @@ USER sveltekit
 ENV NODE_ENV=production \
     PORT=3000 \
     HOST=0.0.0.0 \
+    # Cluster mode: set >1 or "auto" for multi-worker
+    CLUSTER_WORKERS=1 \
     # Memory optimization flags
     NODE_OPTIONS="--max-old-space-size=2048 --optimize-for-size --gc-interval=100" \
     # Pointer compression enabled by node-caged base image
@@ -63,5 +66,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
 
-# Start the SvelteKit server
-CMD ["node", "build/index.js"]
+# Start via cluster wrapper (defaults to single-process when CLUSTER_WORKERS=1)
+CMD ["node", "server.js"]

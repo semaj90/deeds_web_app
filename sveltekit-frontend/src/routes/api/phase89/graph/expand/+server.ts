@@ -1,15 +1,12 @@
 import { json } from '@sveltejs/kit';
-import pg from 'pg';
-import { getDatabaseUrl } from '$lib/config/env.server.js';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { pool } from '$lib/server/db/client';
 
 const graphExpandSchema = z.object({
 	seed_uris: z.array(z.string().max(1000)).min(1, 'seed_uris must be a non-empty array').max(100),
 	depth: z.number().int().min(1).max(10).optional().default(1)
 });
-
-const pool = new pg.Pool({ connectionString: getDatabaseUrl() });
 
 /**
  * POST /api/phase89/graph/expand

@@ -1,11 +1,8 @@
 import { json } from '@sveltejs/kit';
-import { getDatabaseUrl } from '$lib/config/env.server.js';
-import pg from 'pg';
 import type { RequestHandler } from './$types';
-
-const { Pool } = pg;
-
-const pgPool = new Pool({ connectionString: getDatabaseUrl() });
+import { pool as pgPool } from '$lib/server/db/client';
+import { extractComponent } from '$lib/server/utils/extract-component.js';
+import { sseHeaders } from '$lib/server/streaming/sse-utils.js';
 
 const clients = new Set<ReadableStreamDefaultController>();
 
@@ -90,28 +87,6 @@ export const GET: RequestHandler = async ({ locals }) => {
 		}
 	});
 
-	return new Response(stream, {
-		headers: {
-			'Content-Type': 'text/event-stream',
-			'Cache-Control': 'no-cache',
-			'Connection': 'keep-alive',
-			'X-Accel-Buffering': 'no'
-		}
-	});
+	return new Response(stream, { headers: sseHeaders() });
 };
 
-function extractComponent(filePath: string): string {
-	const parts = filePath.split(/[\/\\]/);
-
-	if (parts.includes('routes')) {
-		const idx = parts.indexOf('routes');
-		return parts.slice(idx, idx + 2).join('/');
-	}
-
-	if (parts.includes('lib')) {
-		const idx = parts.indexOf('lib');
-		return parts.slice(idx, idx + 2).join('/');
-	}
-
-	return parts.slice(-2).join('/');
-}

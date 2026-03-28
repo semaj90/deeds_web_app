@@ -23,6 +23,11 @@ export async function POST({ request, locals }: RequestEvent) {
 	}
 	const { query, maxResults } = parsed.data;
 
-	const response = await webSearch(query, maxResults);
-	return json(response);
+	try {
+		const response = await webSearch(query, maxResults);
+		return json(response);
+	} catch (err) {
+		console.error('Web search error:', err);
+		return json({ error: 'Web search failed' }, { status: 500 });
+	}
 }

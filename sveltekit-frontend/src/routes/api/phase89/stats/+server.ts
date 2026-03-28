@@ -1,10 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import pg from 'pg';
-
-import { getDatabaseUrl } from '$lib/config/env.server.js';
-const DATABASE_URL = getDatabaseUrl();
-const pool = new pg.Pool({ connectionString: DATABASE_URL });
+import { pool } from '$lib/server/db/client';
 
 /**
  * GET /api/phase89/stats
