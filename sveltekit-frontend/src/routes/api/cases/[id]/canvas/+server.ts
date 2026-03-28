@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { db } from '$lib/server/db';
+import { db } from '$lib/server/db/client';
 import { canvasStates } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { boardSnapshotSchema } from '$lib/schemas/board';

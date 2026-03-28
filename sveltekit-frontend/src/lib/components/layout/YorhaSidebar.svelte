@@ -34,6 +34,8 @@
 		{ label: 'CITATIONS', icon: 'scroll-text', href: '/citations' },
 		{ label: 'LEGAL CORPUS', icon: 'book-open', href: '/legal-corpus' },
 		{ label: 'FICTIONAL CASES', icon: 'flask-conical', href: '/fictional-cases' },
+		{ label: 'SIMULATION', icon: 'scale', href: '/simulation' },
+		{ label: 'COURTROOM SIM', icon: 'gavel', href: '/demos/courtroom-sim' },
 		{ label: 'LEGAL LIBRARY', icon: 'library-big', href: '/library' },
 		{ label: 'GLOSSARY', icon: 'book-open-text', href: '/library/glossary' },
 		{ label: 'PERSONS OF INTEREST', icon: 'users', href: '/persons-of-interest' },

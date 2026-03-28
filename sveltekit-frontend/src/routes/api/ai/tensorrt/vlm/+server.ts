@@ -73,7 +73,8 @@ async function checkTritonHealth(): Promise<boolean> {
   }
 }
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   const contentType = request.headers.get('content-type') ?? '';
   let body: VlmRequest;
 

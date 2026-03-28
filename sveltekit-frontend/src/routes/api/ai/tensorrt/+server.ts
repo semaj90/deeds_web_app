@@ -19,7 +19,8 @@ const tensorrtSchema = z.object({
 	fallbackToOllama: z.boolean().optional().default(true)
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	const raw = await request.json();
 	const parsed = tensorrtSchema.safeParse(raw);
 	if (!parsed.success) {

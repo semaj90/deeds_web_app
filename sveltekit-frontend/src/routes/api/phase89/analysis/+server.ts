@@ -6,7 +6,8 @@ import type { RequestHandler } from './$types';
  * Triggers regeneration of the Phase89 error analysis report.
  * Currently a stub — returns placeholder data.
  */
-export const POST: RequestHandler = async () => {
+export const POST: RequestHandler = async ({ locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	// TODO: Wire to real Gemini/Qdrant analysis pipeline when Phase89 is promoted
 	return json({
 		success: true,

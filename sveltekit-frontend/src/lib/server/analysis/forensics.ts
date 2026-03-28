@@ -2,7 +2,11 @@
  * Forensic pattern detection for legal documents.
  * Flags: PII (SSN, credit cards, banking), legal keywords, contact density,
  * date clusters, large dollar amounts.
+ *
+ * For large documents (>10KB), offloads regex work to worker_threads.
  */
+
+import { getComputePool } from '$lib/server/workers/compute-pool.js';
 
 export interface ForensicFlag {
 	type: string;
@@ -186,4 +190,23 @@ export function detectForensicPatterns(text: string): ForensicFlag[] {
 function likelyCard(s: string): boolean {
 	const digits = s.replace(/\D/g, '');
 	return digits.length >= 13 && digits.length <= 19;
+}
+
+/**
+ * Async forensics — offloads to worker_threads for large documents.
+ * Falls back to synchronous detectForensicPatterns() for small text or if workers are unavailable.
+ */
+export async function detectForensicPatternsAsync(text: string): Promise<ForensicFlag[]> {
+	// Small text: run inline (overhead of worker dispatch not worth it)
+	if (!text || text.length < 10_000) {
+		return detectForensicPatterns(text);
+	}
+
+	try {
+		const pool = getComputePool();
+		return await pool.run<ForensicFlag[]>('forensics', { text }, 10_000);
+	} catch {
+		// Worker unavailable — fall back to sync
+		return detectForensicPatterns(text);
+	}
 }

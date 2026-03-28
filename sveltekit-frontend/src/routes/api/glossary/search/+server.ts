@@ -10,7 +10,7 @@
  * Response: { results: GlossaryResult[], timing: Timing }
  */
 import { json, type RequestHandler } from '@sveltejs/kit';
-import db from '$lib/server/db';
+import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
@@ -128,7 +128,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				`);
 			timing.semantic_ms = Math.round(performance.now() - semanticStart);
 
-			const rows = [...semanticResults] as Record<string, unknown>[];
+			const rows = (semanticResults as any).rows as Record<string, unknown>[];
 			for (const r of rows) {
 				const id = String(r.id);
 				if (!seen.has(id)) {
@@ -178,7 +178,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				`);
 			timing.fulltext_ms = Math.round(performance.now() - ftsStart);
 
-			const rows = [...ftsResults] as Record<string, unknown>[];
+			const rows = (ftsResults as any).rows as Record<string, unknown>[];
 			for (const r of rows) {
 				const id = String(r.id);
 				if (!seen.has(id)) {
@@ -221,7 +221,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				`);
 			timing.prefix_ms = Math.round(performance.now() - prefixStart);
 
-			const rows = [...prefixResults] as Record<string, unknown>[];
+			const rows = (prefixResults as any).rows as Record<string, unknown>[];
 			for (const r of rows) {
 				const id = String(r.id);
 				if (!seen.has(id)) {

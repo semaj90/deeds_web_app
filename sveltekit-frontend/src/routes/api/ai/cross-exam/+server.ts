@@ -30,7 +30,8 @@ const crossExamSchema = z.object({
 });
 
 /** POST /api/ai/cross-exam — Generate cross-examination questions for a witness */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const validated = crossExamSchema.safeParse(raw);

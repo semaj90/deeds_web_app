@@ -39,7 +39,8 @@ Format with markdown headings.`
 };
 
 /** POST /api/ai/generate-report/[scope] — AI-generated structured reports */
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params, request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	const scope = params.scope;
 
 	if (!VALID_SCOPES.includes(scope as (typeof VALID_SCOPES)[number])) {

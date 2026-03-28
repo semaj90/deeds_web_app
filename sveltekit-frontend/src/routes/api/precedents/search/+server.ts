@@ -9,7 +9,7 @@
  * Response: { results: PrecedentSearchResult[], timing: Timing }
  */
 import { json, type RequestHandler } from '@sveltejs/kit';
-import db from '$lib/server/db';
+import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
@@ -203,7 +203,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				}
 
 				timing.pg_search_ms = Math.round(performance.now() - pgStart);
-				const rows = [...results] as Record<string, unknown>[];
+				const rows = (results as any).rows as Record<string, unknown>[];
 				return rows.map(mapPgRow);
 			} catch (err) {
 				console.error('[Precedents] PostgreSQL search failed:', err);

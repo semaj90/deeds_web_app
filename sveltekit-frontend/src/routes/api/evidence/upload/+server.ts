@@ -1,7 +1,7 @@
 import { json, type RequestEvent } from '@sveltejs/kit';
 import crypto from 'crypto';
 import { uploadFile } from '$lib/server/minio-client';
-import db from '$lib/server/db';
+import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { createJob, updateJob } from '$lib/server/evidence-progress';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';

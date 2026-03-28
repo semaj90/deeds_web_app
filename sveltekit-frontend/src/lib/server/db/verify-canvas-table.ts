@@ -1,4 +1,4 @@
-import { db } from '$lib/server/db';
+import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 
 // Cache the check result for 60 seconds to avoid repeated DB hits

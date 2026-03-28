@@ -17,11 +17,15 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
  * GET /api/cases/[id]/notes
  * List all notes for a case (pinned first, then most recent)
  */
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
 	const caseId = params.id;
 
 	if (!caseId || !UUID_RE.test(caseId)) {
-		return json({ success: true, notes: [] });
+		return json({ error: 'Invalid case ID' }, { status: 400 });
 	}
 
 	try {
@@ -44,6 +48,10 @@ export const GET: RequestHandler = async ({ params }) => {
  * Body: { title?, content, isAI? }
  */
 export const POST: RequestHandler = async ({ params, request, locals }) => {
+	if (!locals.user) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
 	const caseId = params.id;
 
 	if (!caseId || !UUID_RE.test(caseId)) {
@@ -76,7 +84,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 				title: body.title?.trim() || null,
 				content: body.content.trim(),
 				isAI: body.isAI,
-				createdBy: locals.user?.id ?? null
+				createdBy: locals.user.id
 			})
 			.returning();
 

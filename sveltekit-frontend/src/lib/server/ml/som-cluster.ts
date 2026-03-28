@@ -22,6 +22,7 @@
  */
 
 import type { SOMConfig, ClusterResult, DocumentCluster } from '$lib/types/api.js';
+import { getComputePool } from '$lib/server/workers/compute-pool.js';
 
 export interface SOMResult {
 	clusters: number[]; // document index → neuron ID (0-24 for 5×5 grid)
@@ -172,10 +173,28 @@ export class SOMClusterer {
 			throw new Error('Cannot train SOM on empty dataset');
 		}
 
+		// Offload to worker pool (non-blocking)
+		try {
+			const pool = getComputePool();
+			const result = await pool.run<SOMResult>('som', {
+				embeddings: data,
+				gridWidth: this.gridWidth,
+				gridHeight: this.gridHeight,
+				maxIterations: this.maxIterations,
+				learningRate: this.initialLearningRate,
+				radius: this.initialRadius,
+			}, 120_000);
+			// Sync grid from worker result for subsequent computeNovelty/crossCluster calls
+			this.grid = result.grid;
+			return result;
+		} catch {
+			console.warn('[SOM] Worker pool unavailable, running on main thread');
+		}
+
 		console.log(`[SOM] Training ${this.gridWidth}×${this.gridHeight} grid on ${data.length} samples...`);
 		const startTime = Date.now();
 
-		// Training loop
+		// Training loop (main-thread fallback)
 		for (let iter = 0; iter < this.maxIterations; iter++) {
 			// Decay learning rate and radius linearly
 			const progress = iter / this.maxIterations;

@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
@@ -16,7 +17,8 @@ const routeIntentSchema = z.object({
 });
 
 /** POST /api/ai/route-intent — Analyze statute intent and provide legal explanation (SSE streaming) */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = routeIntentSchema.safeParse(raw);

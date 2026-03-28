@@ -23,7 +23,8 @@ const suggestFixSchema = z.object({
  * AI-powered fix suggestions using local Ollama (gemma3-legal).
  * Falls back to static suggestions if Ollama is unavailable.
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = suggestFixSchema.safeParse(raw);

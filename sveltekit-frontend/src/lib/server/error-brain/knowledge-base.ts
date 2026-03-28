@@ -10,9 +10,10 @@
  * Uses pgvector for storage and Ollama for embeddings.
  */
 
-import { env } from '$lib/env';
-import db from '$lib/server/db';
+import { ENV } from '$lib/server/env.server.js';
+import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 // Types
 export interface ErrorPattern {
@@ -60,9 +61,8 @@ export class KnowledgeBase {
 	private initialized = false;
 
 	constructor() {
-		// Use process.env if $lib/env is missing or invalid
-		this.ollamaUrl = env?.OLLAMA_URL ?? (process.env.OLLAMA_URL || 'http://localhost:11434');
-		this.embeddingModel = 'nomic-embed-text:latest';
+		this.ollamaUrl = ENV.OLLAMA_BASE_URL;
+		this.embeddingModel = 'embeddinggemma:latest';
 	}
 
 	/**
@@ -118,9 +118,9 @@ export class KnowledgeBase {
 			`);
 
 			this.initialized = true;
-			console.log('✅ Knowledge base initialized');
+			console.log('[knowledge-base] Initialized');
 		} catch (error) {
-			console.error('❌ Failed to initialize knowledge base:', error);
+			console.error('[knowledge-base] Failed to initialize:', error);
 			throw error;
 		}
 	}
@@ -130,11 +130,11 @@ export class KnowledgeBase {
 	 */
 	private async generateEmbedding(text: string): Promise<number[]> {
 		try {
-			const response = await fetch(`${this.ollamaUrl}/api/embeddings`, {
+			const response = await ollamaFetch(`${this.ollamaUrl}/api/embeddings`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	model: this.embeddingModel,
+				body: JSON.stringify({
+					model: this.embeddingModel,
 					prompt: text
 				})
 			});
@@ -185,13 +185,13 @@ export class KnowledgeBase {
 				)
 				VALUES (
 					${patternId},
-	${errorMessage},
-	${options?.errorCode ?? null},
-	${filePath},
-	${options?.lineNumber ?? null},
-	${errorVector},
-	1, ${success ? 1.0 : 0.0},
-	NOW(), ${options?.metadata ?? {}}
+					${errorMessage},
+					${options?.errorCode ?? null},
+					${filePath},
+					${options?.lineNumber ?? null},
+					${errorVector},
+					1, ${success ? 1.0 : 0.0},
+					NOW(), ${options?.metadata ?? {}}
 				)
 				ON CONFLICT (id) DO UPDATE SET
 					fix_count = error_patterns.fix_count + 1,
@@ -211,16 +211,16 @@ export class KnowledgeBase {
 				)
 				VALUES (
 					${patchId},
-	${patch},
-	${filePath},
-	${errorMessage},
-	${patchVector},
-	true, ${success},
-	NOW(), ${runId}
+					${patch},
+					${filePath},
+					${errorMessage},
+					${patchVector},
+					true, ${success},
+					NOW(), ${runId}
 				)
 			`);
 
-			console.log(`📚 Learned from ${success ? 'successful' : 'failed'} fix: ${errorMessage}`);
+			console.log(`[knowledge-base] Learned from ${success ? 'successful' : 'failed'} fix: ${errorMessage}`);
 		} catch (error) {
 			console.error('Failed to learn from fix:', error);
 			throw error;
@@ -262,9 +262,10 @@ export class KnowledgeBase {
 				LIMIT ${limit}
 			`);
 
-			return results.map((row: any) => ({
+			const rows = (results as any).rows as Record<string, any>[];
+			return rows.map((row) => ({
 				pattern: {
-	id: row.id,
+					id: row.id,
 					errorMessage: row.error_message,
 					errorCode: row.error_code,
 					filePath: row.file_path,
@@ -275,7 +276,7 @@ export class KnowledgeBase {
 					metadata: row.metadata
 				} as ErrorPattern,
 				similarity: row.similarity,
-				relevance: row.success_rate * row.similarity // Simple relevance score
+				relevance: row.success_rate * row.similarity
 			}));
 		} catch (error) {
 			console.error('Failed to search knowledge base:', error);
@@ -283,4 +284,3 @@ export class KnowledgeBase {
 		}
 	}
 }
-

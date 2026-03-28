@@ -6,7 +6,7 @@
  * Used by both /api/sse/chat and /api/evidence/search.
  */
 import { sql } from 'drizzle-orm';
-import db from '$lib/server/db';
+import { db } from '$lib/server/db/client';
 
 export interface GraphNeighbor {
 	nodeId: string;

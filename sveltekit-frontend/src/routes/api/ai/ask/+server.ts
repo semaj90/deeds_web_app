@@ -15,7 +15,8 @@ const aiAskSchema = z.object({
 );
 
 /** POST /api/ai/ask — General-purpose legal AI Q&A */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = aiAskSchema.safeParse(raw);

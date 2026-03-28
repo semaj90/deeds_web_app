@@ -101,7 +101,8 @@ export const GET: RequestHandler = async ({ url }) => {
  * POST /api/persons-of-interest
  * Create a new person of interest
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const body = await request.json().catch(() => ({}));
 		const parsed = createPOISchema.safeParse(body);

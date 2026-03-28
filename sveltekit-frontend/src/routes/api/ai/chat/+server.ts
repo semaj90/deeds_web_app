@@ -26,7 +26,8 @@ const aiChatSchema = z
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 /** POST /api/ai/chat — Simple JSON chat endpoint (non-streaming) */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const raw = await request.json();
     const parsed = aiChatSchema.safeParse(raw);

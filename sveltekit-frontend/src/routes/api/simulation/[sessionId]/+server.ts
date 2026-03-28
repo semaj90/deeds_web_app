@@ -283,7 +283,53 @@ async function generateDialogueTurn(
 		.join('\n');
 
 	const chargeList = charges.map((c) => `${c.chargeName}${c.statute ? ' (' + c.statute + ')' : ''}`).join('; ');
-	const canonRefs = charges.flatMap((c) => c.canonChunkIds).slice(0, 5);
+	const fallbackCanonRefs = charges.flatMap((c) => c.canonChunkIds).slice(0, 5);
+
+	// RAG: Retrieve legal canon chunks relevant to current phase + charges
+	let canonRefs = fallbackCanonRefs;
+	let legalAuthorityBlock = '';
+	try {
+		const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
+		const { generateEmbeddings } = await import('$lib/server/grpc/embedding-client.js');
+
+		const ragQuery = `${phase.replace(/_/g, ' ')} ${chargeList} ${caseData.jurisdiction}`;
+		const embedResult = await generateEmbeddings([ragQuery]);
+		const queryVector = embedResult.vectors?.[0];
+
+		if (queryVector && queryVector.length === 768) {
+			const mustConditions: Array<{ key: string; match: { value: string } }> = [];
+			if (caseData.jurisdiction) {
+				mustConditions.push({ key: 'jurisdiction', match: { value: caseData.jurisdiction } });
+			}
+
+			const searchResult = await qdrant.hybridSearch({
+				collection: 'legal_canon_chunks',
+				queryEmbedding: queryVector,
+				query: ragQuery,
+				limit: 3,
+				scoreThreshold: 0.35,
+				filters: mustConditions.length > 0 ? { must: mustConditions } : undefined,
+			}).catch(() => ({ results: [] }));
+
+			const hits = searchResult.results ?? [];
+			if (hits.length > 0) {
+				canonRefs = hits
+					.map((h: Record<string, any>) => h.payload?.chunk_id || h.payload?.citation)
+					.filter(Boolean) as string[];
+
+				legalAuthorityBlock = '\n\nRelevant Legal Authority:\n' + hits
+					.map((h: Record<string, any>) => {
+						const p = h.payload ?? {};
+						const cite = p.citation || p.chunk_id || 'Unknown';
+						const text = (p.content || '').slice(0, 250);
+						return `[${cite}] ${text}`;
+					})
+					.join('\n');
+			}
+		}
+	} catch {
+		// RAG unavailable — continue with fallback canonRefs
+	}
 
 	const systemPrompt = `You are generating dialogue for a fictional courtroom simulation. You are playing the role of ${speaker} (${role}).
 
@@ -292,11 +338,11 @@ Defendant: ${caseData.defendantName}
 Charges: ${chargeList}
 Jurisdiction: ${caseData.jurisdiction}
 Current Phase: ${phase.replace(/_/g, ' ')}
-Procedure: ${session.procedureType}
+Procedure: ${session.procedureType}${legalAuthorityBlock}
 
 RULES:
 - Stay in character as ${speaker}
-- Reference applicable law when relevant
+- Reference applicable law and cite specific statutes/rules when relevant
 - Keep responses concise (2-4 paragraphs max)
 - This is a FICTIONAL simulation for training purposes
 - End your response with [FICTIONAL SIMULATION]`;

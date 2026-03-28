@@ -14,7 +14,7 @@ import { uploadFile } from '$lib/server/minio-client.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { getVectorCache, setVectorCache } from '$lib/server/vector-cache.js';
-import db from '$lib/server/db';
+import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';

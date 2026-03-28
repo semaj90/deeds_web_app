@@ -1,161 +1,36 @@
-# NOTE: The top-level `services:` block was consolidated into a single section
-# later in this file. The original duplicated block was removed to prevent
-# "mapping key 'services' already defined" YAML errors when parsing.
-
-# Temporarily commented out due to missing native/autoencoder directory
-# x-phaseh-bridge-build: &phaseh-bridge-build
-#   context: .
-#   dockerfile: native/autoencoder/Dockerfile.bridge
+# Legal AI Platform — Docker Compose (Profiled)
+#
+# Architecture: Docker data services + native Ollama + native Node.js
+#
+# NATIVE (do NOT run in Docker):
+#   - Ollama       → port 11434 (native ollama.exe, GPU-accelerated)
+#   - Node.js      → port 5173 (npm run dev)
+#
+# DOCKER (all data services):
+#   Default:       postgres, redis, qdrant, minio, rabbitmq    (~6GB)
+#   --profile full: + couchdb, neo4j, nats, go-search          (~8GB)
+#   --profile gpu:  + tensorrt-llm (stop Ollama first!)        (~16GB)
+#
+# IMPORTANT: Stop native postgres.exe and rabbitmq before starting!
+#   taskkill /F /IM postgres.exe   (or net stop postgresql-x64-17)
+#   rabbitmqctl stop
+#
+# Usage:
+#   docker compose up -d                          # Essential only (~6GB)
+#   docker compose --profile full up -d           # All services (~8GB)
+#   docker compose --profile gpu up -d            # + TensorRT (~16GB)
+#   docker compose --profile full --profile gpu up -d  # Everything
 
 services:
-  # SvelteKit Frontend Service - Main
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: legal-ai-frontend
-    deploy:
-      resources:
-        limits:
-          memory: 8G
-        reservations:
-          memory: 4G
-    ports:
-      # Main SvelteKit ports
-      - "5173:5173"
-      - "5174:5174"
-      - "5175:5175"
-      - "5176:5176"
-      - "5177:5177"
-      - "5178:5178"
-      - "5179:5179"
-      # HMR WebSocket ports (original + 1000)
-      - "6173:6173"
-      - "6174:6174"
-      - "6175:6175"
-      - "6176:6176"
-      - "6177:6177"
-      - "6178:6178"
-      - "6179:6179"
-      # Custom WebSocket ports (original + 2000)
-      - "7173:7173"
-      - "7174:7174"
-      - "7175:7175"
-      - "7176:7176"
-      - "7177:7177"
-      - "7178:7178"
-      - "7179:7179"
-    environment:
-      - NODE_ENV=development
-      - PUBLIC_API_URL=http://localhost:8080
-      # ── Core data stores ──
-      - DATABASE_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db
-      - REDIS_URL=redis://redis:6379
-      - QDRANT_URL=http://qdrant:6333
-      - RABBITMQ_URL=amqp://legal_admin:secret123@rabbitmq:5672
-      # ── AI / Embedding ──
-      - OLLAMA_BASE_URL=http://host.docker.internal:11434
-      - EMBEDDING_GRPC_URL=embedding-service:8094
-      - EMBEDDING_GRPC_ENABLED=true
-      - NATS_URL=nats://nats:4222
-      # ── MinIO (server-side uses Docker DNS, browser uses host port) ──
-      - MINIO_ENDPOINT=minio
-      - MINIO_PORT=9000
-      - MINIO_ACCESS_KEY=minio
-      - MINIO_SECRET_KEY=minio123
-      - MINIO_USE_SSL=false
-      - MINIO_EVIDENCE_BUCKET=legal-evidence
-      # ── Go Search Service ──
-      - GO_SEARCH_URL=http://go-search-service:8096
-    volumes:
-      - ./src:/app/src
-      - ./static:/app/static
-      - ./svelte.config.js:/app/svelte.config.js
-      - ./vite.config.ts:/app/vite.config.ts
-    depends_on:
-      - postgres
-      - redis
-      - qdrant
-      - minio
-      - rabbitmq
-      - go-search-service
-      - nats
-    networks:
-      - legal-ai-network
-    restart: unless-stopped
-    logging:
-      driver: json-file
-      options:
-        max-size: "50m"
-        max-file: "5"
+  # ═══════════════════════════════════════════════════════════════════
+  # ESSENTIAL SERVICES (always start) — ~6GB total
+  # ═══════════════════════════════════════════════════════════════════
 
-  # Caddy Reverse Proxy
-  caddy:
-    image: caddy:latest
-    container_name: legal-ai-caddy
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-        reservations:
-          memory: 256M
-    logging:
-      driver: json-file
-      options:
-        max-size: "50m"
-        max-file: "5"
-    ports:
-      - "443:443/tcp"    # HTTPS
-      - "443:443/udp"    # QUIC/HTTP3
-      - "80:80/tcp"      # HTTP redirect
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - ./Caddyfile.ws:/etc/caddy/Caddyfile.ws
-      - caddy_data:/data
-      - caddy_config:/config
-    networks:
-      - legal-ai-network
-    restart: unless-stopped
-
+  # PostgreSQL 17 + pgvector — primary database
+  # NOTE: Stop native postgres.exe first to free port 5432
   postgres:
-    image: postgres:17
-    container_name: postgres-pgvector
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: 4G
-        reservations:
-          memory: 2G
-    logging:
-      driver: json-file
-      options:
-        max-size: "50m"
-        max-file: "5"
-    environment:
-      - POSTGRES_DB=legal_ai_db
-      - POSTGRES_USER=legal_admin
-      - POSTGRES_PASSWORD=123456
-      - POSTGRES_HOST_AUTH_METHOD=md5
-    ports:
-      - "5432:5432"  # Map to 5432 to match user requirements
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./sql/init/00-init-db.sql:/docker-entrypoint-initdb.d/00-init-db.sql
-      - ./sql/init/01-install-pgvector.sql:/docker-entrypoint-initdb.d/01-install-pgvector.sql
-      - ./sql/init:/docker-entrypoint-initdb.d
-    networks:
-      - legal-ai-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U legal_admin -d legal_ai_db"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-
-  minio:
-    image: minio/minio:latest
-    container_name: legal-ai-minio
+    image: pgvector/pgvector:pg17
+    container_name: legal-ai-postgres
     restart: unless-stopped
     deploy:
       resources:
@@ -166,8 +41,153 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: "50m"
-        max-file: "5"
+        max-size: "20m"
+        max-file: "3"
+    environment:
+      - POSTGRES_DB=legal_ai_db
+      - POSTGRES_USER=legal_admin
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_HOST_AUTH_METHOD=md5
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/init:/docker-entrypoint-initdb.d
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U legal_admin -d legal_ai_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # RabbitMQ — message broker (7 queues, 5 exchanges)
+  # NOTE: Stop native rabbitmq first to free port 5672
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: legal-ai-rabbitmq
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    environment:
+      - RABBITMQ_DEFAULT_USER=legal_admin
+      - RABBITMQ_DEFAULT_PASS=secret123
+      - RABBITMQ_DEFAULT_VHOST=/
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Redis — caching, sessions, semantic cache, pub/sub
+  # Using redis-stack-server (no RedisInsight UI = less memory)
+  redis:
+    image: redis/redis-stack-server:latest
+    container_name: legal-ai-redis
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    ports:
+      - "6379:6379"
+    command: >
+      redis-server
+      --appendonly yes
+      --port 6379
+      --protected-mode no
+      --bind 0.0.0.0
+      --loadmodule /opt/redis-stack/lib/redisearch.so
+      --loadmodule /opt/redis-stack/lib/redistimeseries.so
+      --loadmodule /opt/redis-stack/lib/rejson.so
+      --loadmodule /opt/redis-stack/lib/redisbloom.so
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lfu
+      --save 900 1
+      --save 300 10
+    volumes:
+      - redis_data:/data
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Qdrant — vector search (72 INT8-quantized collections)
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: legal-ai-qdrant
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - legal-ai-network
+    environment:
+      - QDRANT__SERVICE__HTTP_PORT=6333
+      - QDRANT__SERVICE__GRPC_PORT=6334
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/collections"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MinIO — evidence file storage (S3-compatible)
+  minio:
+    image: minio/minio:latest
+    container_name: legal-ai-minio
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
     command: server /data --console-address ":9001"
     environment:
       - MINIO_ROOT_USER=minio
@@ -185,309 +205,165 @@ services:
       timeout: 20s
       retries: 3
 
-  redis:
-    image: redis/redis-stack:latest
-    container_name: legal-ai-redis
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: 3G
-        reservations:
-          memory: 2G
-    logging:
-      driver: json-file
-      options:
-        max-size: "50m"
-        max-file: "5"
-    ports:
-      - "6379:6379"   # Redis port
-      - "18001:8001"   # RedisInsight port (shifted to avoid analytics bridge port)
-    command: >
-      redis-server
-      --appendonly yes
-      --port 6379
-      --protected-mode no
-      --bind 0.0.0.0
-      --loadmodule /opt/redis-stack/lib/redisearch.so
-      --loadmodule /opt/redis-stack/lib/redistimeseries.so
-      --loadmodule /opt/redis-stack/lib/rejson.so
-      --loadmodule /opt/redis-stack/lib/redisbloom.so
-      --maxmemory 2gb
-      --maxmemory-policy allkeys-lfu
-      --save 900 1
-      --save 300 10
-      --save 60 10000
-    volumes:
-      - redis_data:/data
-    networks:
-      - legal-ai-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+  # ═══════════════════════════════════════════════════════════════════
+  # FULL PROFILE — optional services (~2GB additional)
+  # Usage: docker compose --profile full up -d
+  # ═══════════════════════════════════════════════════════════════════
 
-  # RabbitMQ message broker
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    container_name: legal-ai-rabbitmq
+  # CouchDB — document store (Phase 87)
+  couchdb:
+    image: couchdb:3.3
+    container_name: legal-ai-couchdb
     restart: unless-stopped
+    profiles: ["full"]
     deploy:
       resources:
         limits:
-          memory: 2G
+          memory: 512M
         reservations:
-          memory: 1G
+          memory: 256M
     logging:
       driver: json-file
       options:
-        max-size: "50m"
-        max-file: "5"
-    environment:
-      - RABBITMQ_DEFAULT_USER=legal_admin
-      - RABBITMQ_DEFAULT_PASS=secret123
-      - RABBITMQ_DEFAULT_VHOST=/
+        max-size: "20m"
+        max-file: "3"
     ports:
-      - "5672:5672"   # AMQP port
-      - "15672:15672" # Management UI port
+      - "5984:5984"
+    environment:
+      COUCHDB_USER: admin
+      COUCHDB_PASSWORD: legal_ai_pass
     volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
+      - couchdb_data:/opt/couchdb/data
+      - couchdb_config:/opt/couchdb/etc/local.d
     networks:
       - legal-ai-network
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      test: ["CMD", "curl", "-f", "http://localhost:5984/_up"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  # Neo4j — graph database (knowledge graph, case relationships)
+  neo4j:
+    image: neo4j:5-community
+    container_name: legal-ai-neo4j
+    restart: unless-stopped
+    profiles: ["full"]
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    environment:
+      - NEO4J_AUTH=neo4j/neo4j123
+      - NEO4J_PLUGINS=["graph-data-science"]
+      - NEO4J_dbms_memory_heap_initial__size=256m
+      - NEO4J_dbms_memory_heap_max__size=512m
+      - NEO4J_dbms_memory_pagecache_size=256m
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "neo4j123", "MATCH () RETURN count(*) limit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
 
-  # Optional: Qdrant vector database for advanced vector operations
-  qdrant:
-    image: qdrant/qdrant:latest
-    container_name: legal-ai-qdrant
+  # NATS — low-latency message transport (QUIC bridge)
+  nats:
+    image: nats:latest
+    container_name: legal-ai-nats
     restart: unless-stopped
+    profiles: ["full"]
     deploy:
       resources:
         limits:
-          memory: 4G
+          memory: 256M
         reservations:
-          memory: 2G
+          memory: 64M
     logging:
       driver: json-file
       options:
-        max-size: "50m"
-        max-file: "5"
+        max-size: "20m"
+        max-file: "3"
     ports:
-      - "6333:6333"
-      - "6334:6334"
+      - "4222:4222"
+      - "8222:8222"
+    command: ["--js", "--sd", "/data", "-m", "8222"]
     volumes:
-      - qdrant_data:/qdrant/storage
+      - nats_data:/data
     networks:
       - legal-ai-network
+
+  # Go Legal Library Search Service
+  go-search-service:
+    build:
+      context: ./services/go-search-service
+      dockerfile: Dockerfile
+    container_name: legal-ai-go-search
+    restart: unless-stopped
+    profiles: ["full"]
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+    ports:
+      - "8096:8096"
+      - "50055:50055"
     environment:
-      - QDRANT__SERVICE__HTTP_PORT=6333
-      - QDRANT__SERVICE__GRPC_PORT=6334
+      DATABASE_URL: postgresql://legal_admin:123456@postgres:5432/legal_ai_db
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_GRPC_HOST: qdrant
+      QDRANT_GRPC_PORT: "6334"
+      REDIS_URL: redis://redis:6379
+      OLLAMA_URL: http://host.docker.internal:11434
+      GRPC_PORT: "50055"
+      HTTP_PORT: "8096"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - postgres
+      - redis
+      - qdrant
+    networks:
+      - legal-ai-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:6333/collections"]
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8096/health"]
       interval: 30s
-      timeout: 10s
+      timeout: 5s
       retries: 3
 
-  # Temporarily commented out due to missing python-workers/fastapi-embed directory
-  # fastapi-embed:
-  #   build:
-  #     context: ./python-workers/fastapi-embed
-  #     dockerfile: Dockerfile
-  #   container_name: legal-ai-fastapi-embed
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 4G
-  #       reservations:
-  #         memory: 2G
-  #   ports:
-  #     - "8000:8000"
-  #   environment:
-  #     - PYTHONUNBUFFERED=1
-  #     - TRANSFORMERS_CACHE=/app/cache
-  #     - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
-  #   volumes:
-  #     - fastapi_cache:/app/cache
-  #   networks:
-  #     - legal-ai-network
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-  #   depends_on:
-  #     - redis
-
-  # Temporarily commented out due to missing native/autoencoder directory
-  # analytics-bridge:
-  #   build:
-  #     <<: *phaseh-bridge-build
-  #   container_name: phase-h-analytics-bridge
-  #   command: ["uvicorn", "native.autoencoder.analytics_bridge:app", "--host", "0.0.0.0", "--port", "8001"]
-  #   environment:
-  #     - REDIS_URL=redis://redis:6379/0
-  #     - USER_ANALYTICS_STREAM=user.analytics
-  #     - USER_INTENT_HASH_NAMESPACE=user:intent
-  #     - RL_FEEDBACK_STREAM=rl.feedback
-  #     - TRITON_URL=http://triton:8000
-  #     - PG_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db
-  #     - PG_INTENT_TABLE=user_intent_transitions
-  #     - PORT=8001
-  #   ports:
-  #     - "8001:8001"
-  #   volumes:
-  #     - ./native/autoencoder/artifacts:/app/native/autoencoder/artifacts
-  #   depends_on:
-  #     redis:
-  #       condition: service_healthy
-  #     postgres:
-  #       condition: service_healthy
-  #     triton:
-  #       condition: service_started
-  #   networks:
-  #     - legal-ai-network
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "/app/native/autoencoder/scripts/healthcheck.sh analytics-bridge"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-  #     start_period: 30s
-
-  # Temporarily commented out due to missing native/autoencoder directory
-  # cpu-synthesizer:
-  #   build:
-  #     <<: *phaseh-bridge-build
-  #   container_name: phase-h-cpu-synthesizer
-  #   command: ["uvicorn", "native.autoencoder.cpu_synthesizer:app", "--host", "0.0.0.0", "--port", "8101"]
-  #   environment:
-  #     - REDIS_URL=redis://redis:6379/0
-  #     - CPU_SYNTH_MAX_TOKENS=256
-  #   ports:
-  #     - "8101:8101"
-  #   depends_on:
-  #     redis:
-  #       condition: service_healthy
-  #   networks:
-  #     - legal-ai-network
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "/app/native/autoencoder/scripts/healthcheck.sh http http://127.0.0.1:8101/health"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-  #     start_period: 30s
-
-  # Temporarily commented out due to missing native/autoencoder directory
-  # behavior-router:
-  #   build:
-  #     <<: *phaseh-bridge-build
-  #   container_name: phase-h-behavior-router
-  #   command: ["python", "-m", "native.autoencoder.behavior_router"]
-  #   environment:
-  #     - REDIS_URL=redis://redis:6379/0
-  #     - USER_ANALYTICS_STREAM=user.analytics
-  #     - USER_INTENT_HASH_NAMESPACE=user:intent
-  #     - RL_FEEDBACK_STREAM=rl.feedback
-  #     - PG_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db
-  #     - PG_INTENT_TABLE=user_intent_transitions
-  #   volumes:
-  #     - ./native/autoencoder/artifacts:/app/native/autoencoder/artifacts
-  #   depends_on:
-  #     redis:
-  #       condition: service_healthy
-  #     postgres:
-  #       condition: service_healthy
-  #     analytics-bridge:
-  #       condition: service_started
-  #   networks:
-  #     - legal-ai-network
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "/app/native/autoencoder/scripts/healthcheck.sh redis"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-  #     start_period: 30s
-
-  # Temporarily commented out due to missing native/autoencoder directory
-  # qlora-trainer:
-  #   build:
-  #     <<: *phaseh-bridge-build
-  #   container_name: phase-h-qlora-trainer
-  #   command: ["python", "-m", "native.autoencoder.qlora_trainer_stream"]
-  #   runtime: nvidia
-  #   environment:
-  #     - REDIS_URL=redis://redis:6379/0
-  #     - RL_FEEDBACK_STREAM=rl.feedback
-  #     - TRITON_URL=http://triton:8000
-  #     - ADAPTER_ARTIFACT_DIR=/app/native/autoencoder/artifacts
-  #     - TRITON_MODEL_NAME=gemma3_legal
-  #     - QLORA_BASE_MODEL=google/gemma-2b-it
-  #   volumes:
-  #     - ./native/autoencoder/artifacts:/app/native/autoencoder/artifacts
-  #     - ./native/autoencoder/triton_model_repository:/models:ro
-  #   depends_on:
-  #     redis:
-  #       condition: service_healthy
-  #     triton:
-  #       condition: service_started
-  #   networks:
-  #     - legal-ai-network
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "/app/native/autoencoder/scripts/healthcheck.sh redis"]
-  #     interval: 60s
-  #     timeout: 15s
-  #     retries: 3
-  #     start_period: 60s
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 16G
-  #       reservations:
-  #         memory: 8G
-  #         devices:
-  #           - driver: nvidia
-  #             count: 1
-  #             capabilities: [gpu]  # Temporarily commented out due to missing native/autoencoder directory
-  # adapter-merge-worker:
-  #   build:
-  #     <<: *phaseh-bridge-build
-  #   container_name: phase-h-adapter-merge-worker
-  #   command: ["python", "-m", "native.autoencoder.adapter_merge_worker"]
-  #   environment:
-  #     - REDIS_URL=redis://redis:6379/0
-  #     - TRITON_URL=http://triton:8000
-  #   volumes:
-  #     - ./native/autoencoder/artifacts:/app/native/autoencoder/artifacts
-  #     - ./native/autoencoder/triton_model_repository:/models
-  #   depends_on:
-  #     redis:
-  #       condition: service_healthy
-  #     qlora-trainer:
-  #       condition: service_started
-  #   networks:
-  #     - legal-ai-network
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "/app/native/autoencoder/scripts/healthcheck.sh redis"]
-  #     interval: 60s
-  #     timeout: 15s
-  #     retries: 3
-  #     start_period: 60s
+  # ═══════════════════════════════════════════════════════════════════
+  # GPU PROFILE — TensorRT-LLM (stop Ollama first!)
+  # Usage: docker compose --profile gpu up -d
+  # WARNING: Cannot run simultaneously with native Ollama (GPU contention)
+  # ═══════════════════════════════════════════════════════════════════
 
   tensorrt-llm:
     image: nvcr.io/nvidia/tensorrt-llm/release:latest
     container_name: legal-ai-tensorrt-llm
     runtime: nvidia
+    profiles: ["gpu"]
     deploy:
       resources:
         limits:
-          memory: 12G
-        reservations:
           memory: 8G
+        reservations:
+          memory: 4G
           devices:
             - driver: nvidia
               count: 1
@@ -498,18 +374,16 @@ services:
       - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
       - HF_HUB_CACHE=/workspace/cache
       - DATABASE_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db
-      - REDIS_URL=redis://:redis@redis:6379/0
-      - REDIS_PASSWORD=redis
+      - REDIS_URL=redis://redis:6379/0
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
-      - "${TENSORRT_HTTP_PORT:-8096}:8096"
-      - "${TENSORRT_WS_PORT:-8097}:8097"
+      - "${TENSORRT_HTTP_PORT:-8099}:8096"
       - "${TENSORRT_HEALTH_PORT:-8098}:8098"
     volumes:
       - ${TENSORRT_MODEL_DIR:-./docker/tensorrt-llm/models}:/workspace/models
       - ${TENSORRT_ENGINE_DIR:-./docker/tensorrt-llm/engines}:/workspace/engines
       - ${TENSORRT_CACHE_DIR:-./.cache/tensorrt-llm}:/workspace/cache
-      - ./scripts:/workspace/scripts
-      - ./custom_model:/workspace/custom_model
     command:
       - bash
       - -lc
@@ -532,472 +406,42 @@ services:
       timeout: 10s
       retries: 3
     depends_on:
-      redis:
-        condition: service_started
-    networks:
-      - legal-ai-network
-    restart: unless-stopped
-
-  # Temporarily commented out due to missing native/autoencoder directory
-  # triton:
-  #   image: nvcr.io/nvidia/tritonserver:23.09-py3
-  #   container_name: phase-h-triton
-  #   shm_size: 1g
-  #   command: ["tritonserver", "--model-repository=/models", "--log-verbose=0"]
-  #   runtime: nvidia
-  #   environment:
-  #     - NVIDIA_VISIBLE_DEVICES=all
-  #   ports:
-  #     - "8000:8000"
-  #     - "8002:8002"
-  #   volumes:
-  #     - ./native/autoencoder/triton_model_repository:/models
-  #     - ./native/autoencoder/artifacts:/adapters
-  #   networks:
-  #     - legal-ai-network
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-fsS", "http://localhost:8000/v2/health/ready"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 5
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 8G
-  #       reservations:
-  #         memory: 4G
-  #         devices:
-  #           - driver: nvidia
-  #             count: 1
-  #             capabilities: [gpu]
-  # NATS — low-latency message transport for embedding bridge
-  nats:
-    image: nats:latest
-    container_name: legal-ai-nats
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-        reservations:
-          memory: 128M
-    logging:
-      driver: json-file
-      options:
-        max-size: "50m"
-        max-file: "5"
-    ports:
-      - "4222:4222"
-      - "8222:8222"
-    command: ["--js", "--sd", "/data", "-m", "8222"]
-    volumes:
-      - nats_data:/data
-    networks:
-      - legal-ai-network
-    restart: unless-stopped
-
-  # Neo4j graph database
-  neo4j:
-    image: neo4j:5-community
-    container_name: legal-ai-neo4j
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: 4G
-        reservations:
-          memory: 2G
-    logging:
-      driver: json-file
-      options:
-        max-size: "50m"
-        max-file: "5"
-    environment:
-      - NEO4J_AUTH=neo4j/neo4j123
-      - NEO4J_PLUGINS=["graph-data-science"]
-      - NEO4J_dbms_memory_heap_initial__size=512m
-      - NEO4J_dbms_memory_heap_max__size=2G
-      - NEO4J_dbms_memory_pagecache_size=1G
-    ports:
-      - "7474:7474"
-      - "7687:7687"
-    volumes:
-      - neo4j_data:/data
-      - neo4j_logs:/logs
-    networks:
-      - legal-ai-network
-    healthcheck:
-      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "neo4j123", "MATCH () RETURN count(*) limit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-
-  # Temporarily commented out due to missing tensor_services directory
-  # tensorrt-llm-service:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.trtllm
-  #   container_name: legal-ai-tensorrt-llm-service
-  #   runtime: nvidia
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 8G
-  #       reservations:
-  #         memory: 4G
-  #         devices:
-  #           - driver: nvidia
-  #             count: 1
-  #             capabilities: [gpu]
-  #   environment:
-  #     - CUDA_VISIBLE_DEVICES=0
-  #     - TORCH_CUDA_DEVICE=0
-  #     - DATABASE_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db
-  #     - REDIS_URL=redis://:redis@redis:6379/0
-  #     - REDIS_PASSWORD=redis
-  #   ports:
-  #     - "8099:8099"
-  #   volumes:
-  #     - tensorrt_engines:/app/tensorrt_engines
-  #     - tokenizers:/app/tokenizers
-  #     - models:/app/models
-  #   command: ["python3", "python-services/tensorrt_llm_service.py"]
-  #   networks:
-  #     - legal-ai-network
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:8099/health"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-  #   depends_on:
-  #     - redis
-  #     - postgres
-  #   restart: unless-stopped  # Temporarily commented out due to missing tensor_services directory
-  # pytorch-fallback-service:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.trtllm
-  #   container_name: legal-ai-pytorch-fallback
-  #   runtime: nvidia
-  #   command: ["python3", "python-services/pytorch_fallback_service.py"]
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 6G
-  #       reservations:
-  #         memory: 3G
-  #         devices:
-  #           - driver: nvidia
-  #             count: 1
-  #             capabilities: [gpu]
-  #   environment:
-  #     - CUDA_VISIBLE_DEVICES=0
-  #     - TORCH_CUDA_DEVICE=0
-  #     - DATABASE_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db
-  #     - REDIS_URL=redis://:redis@redis:6379/0
-  #     - REDIS_PASSWORD=redis
-  #   ports:
-  #     - "8100:8100"
-  #   networks:
-  #     - legal-ai-network
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:8100/health"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-  #   depends_on:
-  #     - redis
-  #     - postgres
-  #   restart: unless-stopped  # Phase 70: OCR Service
-  # ocr-service:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.trtllm
-  #   container_name: legal-ai-ocr
-  #   command: ["python3", "python-services/ocr_tesseract.py"]
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 2G
-  #       reservations:
-  #         memory: 1G
-  #     environment:
-  #       - TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata/
-  #       - DATABASE_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db
-  #       - REDIS_URL=redis://:redis@redis:6379/0
-  #       - REDIS_PASSWORD=redis
-  #   ports:
-  #     - "8101:8101"
-  #   networks:
-  #     - legal-ai-network
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:8101/health"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-  #   depends_on:
-  #     - redis
-  #     - postgres
-  #   restart: unless-stopped
-
-  # Phase 70: Language Extraction Service
-  # lang-extract-service:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.trtllm
-  #   container_name: legal-ai-lang-extract
-  #   command: ["python3", "python-services/lang_extract.py"]
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 2G
-  #       reservations:
-  #         memory: 1G
-  #   environment:
-  #     - DATABASE_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db
-  #     - REDIS_URL=redis://:redis@redis:6379/0
-  #     - REDIS_PASSWORD=redis
-  #   ports:
-  #     - "8102:8102"
-  #   networks:
-  #     - legal-ai-network
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:8102/health"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-  #   depends_on:
-  #     - redis
-  #     - postgres
-  #   restart: unless-stopped
-
-  # Phase 70: Web Crawl Service
-  # web-crawl-service:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.trtllm
-  #   container_name: legal-ai-web-crawl
-  #   command: ["python3", "python-services/web_crawl.py"]
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 2G
-  #       reservations:
-  #         memory: 1G
-  #   environment:
-  #     - DATABASE_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db
-  #     - REDIS_URL=redis://:redis@redis:6379/0
-  #     - REDIS_PASSWORD=redis
-  #   ports:
-  #     - "8103:8103"
-  #   networks:
-  #     - legal-ai-network
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:8103/health"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-  #   depends_on:
-  #     - redis
-  #     - postgres
-  #   restart: unless-stopped
-
-  # EmbeddingGemma ONNX Service
-  embedding-service:
-    build:
-      context: .
-      dockerfile: python-services/Dockerfile.embedding
-    container_name: legal-ai-embedding
-    command: ["python", "embedding_service.py"]
-    deploy:
-      resources:
-        limits:
-          memory: 4G
-          cpus: '2.0'
-        reservations:
-          memory: 2G
-          cpus: '1.0'
-    environment:
-      - PYTHONUNBUFFERED=1
-      - CUDA_VISIBLE_DEVICES=0
-    ports:
-      - "8094:8094"
-    volumes:
-      - ./models:/app/models:ro
-      - ./python-services:/app
-    networks:
-      - legal-ai-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8094/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: unless-stopped
-
-  # Phase 70: RAG Ingest Service
-  # rag-ingest-service:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.trtllm
-  #   container_name: legal-ai-rag-ingest
-  #   command: ["python3", "python-services/rag_ingest.py"]
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 4G
-  #       reservations:
-  #         memory: 2G
-  #   environment:
-  #     - DATABASE_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db
-  #     - REDIS_URL=redis://:redis@redis:6379/0
-  #     - REDIS_PASSWORD=redis
-  #   ports:
-  #     - "8104:8104"
-  #   volumes:
-  #     - chroma_db:/app/chroma_db
-  #   networks:
-  #     - legal-ai-network
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:8104/health"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-  #   depends_on:
-  #     - redis
-  #     - postgres
-  #   restart: unless-stopped
-
-  couchdb:
-    image: couchdb:3.3
-    container_name: phase87-couchdb
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-        reservations:
-          memory: 512M
-    logging:
-      driver: json-file
-      options:
-        max-size: "50m"
-        max-file: "5"
-    ports:
-      - "5984:5984"
-    environment:
-      COUCHDB_USER: admin
-      COUCHDB_PASSWORD: legal_ai_pass
-    volumes:
-      - couchdb_data:/opt/couchdb/data
-      - couchdb_config:/opt/couchdb/etc/local.d
-    networks:
-      - legal-ai-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5984/_up"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  rag-kag-middleware:
-    build:
-      context: ./python-services/rag-kag-middleware
-      dockerfile: Dockerfile
-    container_name: phase87-rag-middleware
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: 2G
-        reservations:
-          memory: 1G
-    logging:
-      driver: json-file
-      options:
-        max-size: "50m"
-        max-file: "5"
-    ports:
-      - "8765:8765"
-    environment:
-      COUCHDB_URL: http://admin:legal_ai_pass@couchdb:5984
-      POSTGRES_URL: postgresql://user:pass@postgres:5432/legal
-      QDRANT_URL: http://qdrant:6333
-      REDIS_URL: redis://redis:6379
-      OLLAMA_URL: http://host.docker.internal:11434
-      EMBEDDING_MODEL: embeddinggemma:latest
-      LLM_MODEL: gemma3-legal:latest
-    depends_on:
-      - couchdb
-      - postgres
-      - qdrant
       - redis
     networks:
       - legal-ai-network
-    volumes:
-      - ./checkpoints:/app/checkpoints
-
-  # ── Go Legal Library Search Service ──────────────────────────────────────
-  go-search-service:
-    build:
-      context: ./services/go-search-service
-      dockerfile: Dockerfile
-    container_name: legal-ai-go-search
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-        reservations:
-          memory: 128M
-    ports:
-      - "8096:8096"
-      - "50055:50055"
-    environment:
-      DATABASE_URL: postgresql://legal_admin:123456@postgres:5432/legal_ai_db
-      QDRANT_URL: http://qdrant:6333
-      QDRANT_GRPC_HOST: qdrant
-      QDRANT_GRPC_PORT: "6334"
-      REDIS_URL: redis://redis:6379
-      OLLAMA_URL: http://host.docker.internal:11434
-      GRPC_PORT: "50055"
-      HTTP_PORT: "8096"
-    depends_on:
-      - postgres
-      - redis
-      - qdrant
-    networks:
-      - legal-ai-network
-    healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8096/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
 
+# ═══════════════════════════════════════════════════════════════════
+# VOLUMES — names preserved for existing data compatibility
+# ═══════════════════════════════════════════════════════════════════
 volumes:
-  couchdb_data:
-    driver: local
-  couchdb_config:
-    driver: local
-  postgres_data:
-    driver: local
-  minio_data:
-    driver: local
   redis_data:
-    driver: local
-  rabbitmq_data:
     driver: local
   qdrant_data:
     driver: local
-  fastapi_cache:
+  minio_data:
     driver: local
-  caddy_data:
+  couchdb_data:
     driver: local
-  caddy_config:
+  couchdb_config:
     driver: local
   neo4j_data:
     driver: local
   neo4j_logs:
     driver: local
-  # Phase 70 volumes
+  nats_data:
+    driver: local
+  # Legacy volumes (kept for data preservation, referenced by older compose files)
+  postgres_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+  caddy_data:
+    driver: local
+  caddy_config:
+    driver: local
+  fastapi_cache:
+    driver: local
   tensorrt_engines:
     driver: local
   tokenizers:
@@ -1007,8 +451,6 @@ volumes:
   chroma_db:
     driver: local
   training_data:
-    driver: local
-  nats_data:
     driver: local
 
 networks:

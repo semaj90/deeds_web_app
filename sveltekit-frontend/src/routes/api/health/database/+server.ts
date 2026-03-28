@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import db, { sql } from '$lib/server/db';
+import { db } from '$lib/server/db/client';
+import { sql } from 'drizzle-orm';
 import { getPoolStatus, resetPoolHealth } from '$lib/server/db/client';
 
 /**

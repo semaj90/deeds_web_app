@@ -26,7 +26,8 @@ const batchEventSchema = z.object({
 	batch: z.array(singleEventSchema).min(1).max(200)
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ ok: false, error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 
@@ -83,7 +84,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	const limit = Math.min(Number(url.searchParams.get('limit') ?? 50), 200);
 
 	try {
-		const db = (await import('$lib/server/db')).default;
+		const { db } = await import('$lib/server/db/client');
 		const rows = await db.execute(
 			sql`SELECT id, user_id, session_id, event_type, payload, created_at
 				FROM user_analytics_events
@@ -91,7 +92,7 @@ export const GET: RequestHandler = async ({ url }) => {
 				ORDER BY created_at DESC
 				LIMIT ${limit}`
 		);
-		return json({ events: [...rows] });
+		return json({ events: (rows as any).rows });
 	} catch {
 		return json({ events: [], error: 'Database unavailable' }, { status: 503 });
 	}

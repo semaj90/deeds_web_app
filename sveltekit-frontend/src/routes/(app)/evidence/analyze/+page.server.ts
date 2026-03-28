@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import db from '$lib/server/db';
+import { db } from '$lib/server/db/client';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	// Phase 79: Lucia v3 Authentication Guard
@@ -12,5 +12,3 @@ export const load: PageServerLoad = async ({ locals }) => {
 		user: locals.user
 	};
 };
-
-

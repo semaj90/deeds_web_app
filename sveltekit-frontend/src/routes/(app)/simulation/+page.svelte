@@ -38,6 +38,7 @@
 	let selectedCategory = $state('all');
 	let searchQuery = $state('');
 	let dialogueContainer = $state<HTMLElement | null>(null);
+	let showCaseBrief = $state(false);
 
 	// --- Derived ---
 	let filteredCases = $derived.by(() => {

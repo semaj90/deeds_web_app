@@ -15,6 +15,7 @@
  */
 
 import { cosineSimilarity } from '$lib/ai/client-embed.js';
+import { getComputePool } from '$lib/server/workers/compute-pool.js';
 
 export interface ClusterResult {
 	clusters: number[]; // document index → cluster ID mapping
@@ -270,8 +271,9 @@ export class KMeansClusterer {
 	}
 
 	/**
-	 * Fit k-means clustering to document embeddings
-	 * Returns cluster assignments, centroids, and quality metrics
+	 * Fit k-means clustering to document embeddings.
+	 * Offloads to worker_threads to avoid blocking the event loop.
+	 * Falls back to main-thread execution if workers are unavailable.
 	 */
 	async fit(embeddings: number[][]): Promise<ClusterResult> {
 		if (embeddings.length === 0) {
@@ -284,27 +286,37 @@ export class KMeansClusterer {
 			this.k = Math.max(1, embeddings.length - 1);
 		}
 
+		// Offload to worker pool (non-blocking)
+		try {
+			const pool = getComputePool();
+			return await pool.run<ClusterResult>('kmeans', {
+				embeddings,
+				k: this.k,
+				maxIterations: this.maxIterations,
+				epsilon: this.epsilon,
+			}, 60_000);
+		} catch {
+			// Worker unavailable — fall back to main thread
+			console.warn('[KMeans] Worker pool unavailable, running on main thread');
+		}
+
+		return this.fitMainThread(embeddings);
+	}
+
+	/** Main-thread fallback for fit() */
+	private fitMainThread(embeddings: number[][]): ClusterResult {
 		const dims = embeddings[0].length;
-
-		// Initialize centroids via k-means++
 		let centroids = initializeCentroidsKMeansPlusPlus(embeddings, this.k);
-
 		let assignments = assignClusters(embeddings, centroids);
 		let iterations = 0;
 
-		// Iterate until convergence
 		while (iterations < this.maxIterations) {
 			const newCentroids = updateCentroids(embeddings, assignments, this.k, dims);
 			const shift = centroidShift(centroids, newCentroids);
-
 			centroids = newCentroids;
 			assignments = assignClusters(embeddings, centroids);
 			iterations++;
-
-			if (shift < this.epsilon) {
-				console.info(`[KMeans] Converged after ${iterations} iterations (shift=${shift.toFixed(6)})`);
-				break;
-			}
+			if (shift < this.epsilon) break;
 		}
 
 		const inertia = computeInertia(embeddings, assignments, centroids);

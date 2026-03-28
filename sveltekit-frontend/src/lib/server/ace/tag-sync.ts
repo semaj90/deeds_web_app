@@ -57,7 +57,7 @@ export async function getDocumentTags(
 ): Promise<GeneratedTag[]> {
 	// Primary: pgvector
 	try {
-		const db = (await import('$lib/server/db')).default;
+		const { db } = await import('$lib/server/db/client');
 		const rows = await db.execute(sql`
 			SELECT tag_label, tag_category, confidence, source
 			FROM document_tags
@@ -65,7 +65,7 @@ export async function getDocumentTags(
 			ORDER BY confidence DESC
 			LIMIT 30
 		`);
-		const tags = [...rows] as Array<{
+		const tags = (rows as any).rows as Array<{
 			tag_label: string;
 			tag_category: string;
 			confidence: number;
@@ -151,7 +151,7 @@ async function mirrorToPgvector(
 	documentId: string,
 	embedding: number[]
 ): Promise<void> {
-	const db = (await import('$lib/server/db')).default;
+	const { db } = await import('$lib/server/db/client');
 	const vectorStr = `[${embedding.join(',')}]`;
 	await db.execute(sql`
 		INSERT INTO document_tags (document_id, tag_label, tag_category, embedding, confidence, source)

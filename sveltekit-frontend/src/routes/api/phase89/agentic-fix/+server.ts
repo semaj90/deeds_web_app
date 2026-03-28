@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 import { spawn } from 'child_process';
 import fs from 'fs/promises';
 import path from 'path';
@@ -17,7 +18,8 @@ const agenticFixSchema = z.object({
 	}).optional().default({ summary: '', tags: [], similar_clusters: [] }),
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = agenticFixSchema.safeParse(await request.json());
 	if (!parsed.success) {
 		return new Response(JSON.stringify({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }), {

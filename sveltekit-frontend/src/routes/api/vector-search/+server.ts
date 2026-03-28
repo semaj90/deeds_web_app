@@ -9,7 +9,8 @@ const vectorSearchSchema = z.object({
 });
 
 /** POST /api/vector-search — Qdrant vector similarity search across evidence/documents */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = vectorSearchSchema.safeParse(raw);

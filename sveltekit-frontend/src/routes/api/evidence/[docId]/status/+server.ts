@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getJob } from '$lib/server/evidence-progress';
-import db from '$lib/server/db';
+import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { isUuid } from '$lib/server/validation.js';

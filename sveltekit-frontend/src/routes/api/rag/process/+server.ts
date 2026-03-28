@@ -11,7 +11,8 @@ const ALLOWED_TYPES = new Set([
 const ALLOWED_EXTENSIONS = new Set(['.pdf', '.txt', '.html', '.md', '.docx']);
 
 /** POST /api/rag/process — Process uploaded files through RAG pipeline */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const formData = await request.formData();
 		const files = formData.getAll('files') as File[];

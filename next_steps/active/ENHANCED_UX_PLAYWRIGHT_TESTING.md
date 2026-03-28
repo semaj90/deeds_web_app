@@ -1,6 +1,6 @@
 # Enhanced UX Playwright Testing
 
-## Status: IN PROGRESS
+## Status: COMPLETE
 ## Priority: High
 ## Created: 2026-03-26
 
@@ -52,4 +52,4 @@ Comprehensive end-to-end Playwright test suite covering all critical user flows 
 - [x] Vector search & RAG tests
 - [x] POI photo lifecycle tests
 - [x] Run full suite, verify all pass or gracefully skip (28/28 + 54 validation audit)
-- [ ] Add CI pipeline integration
+- [x] Add CI pipeline integration — DONE (sveltekit-ci.yml: postgres+redis services, pgvector, drizzle push, playwright test, artifact upload)

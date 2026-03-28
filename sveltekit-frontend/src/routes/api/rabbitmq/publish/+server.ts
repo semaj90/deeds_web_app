@@ -26,7 +26,8 @@ const publishSchema = z.object({
 /**
  * Publish message to RabbitMQ queue
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
 	try {
 		const raw = await request.json();
 		const parsed = publishSchema.safeParse(raw);

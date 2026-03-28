@@ -26,7 +26,7 @@ export async function syncCaseToGraph(caseId: string): Promise<SyncResult> {
 
 	try {
 		await initializeNeo4jSchema();
-		const db = (await import('$lib/server/db')).default;
+		const { db } = await import('$lib/server/db/client');
 		const driver = getNeo4jDriver();
 		const session = driver.session({ database: 'neo4j' });
 
@@ -36,7 +36,7 @@ export async function syncCaseToGraph(caseId: string): Promise<SyncResult> {
         sql`SELECT id, title, case_number, jurisdiction, court, status, practice_area, description
 					FROM cases WHERE id = ${caseId} LIMIT 1`
       );
-      const caseData = [...caseRows][0] as Record<string, unknown> | undefined;
+      const caseData = ((caseRows as any).rows)[0] as Record<string, unknown> | undefined;
       if (!caseData) {
         result.errors.push(`Case ${caseId} not found`);
         return result;
@@ -67,7 +67,7 @@ export async function syncCaseToGraph(caseId: string): Promise<SyncResult> {
 					WHERE ${caseId} = ANY(case_ids)
 					LIMIT 50`
       );
-      for (const p of [...personRows] as Record<string, unknown>[]) {
+      for (const p of (personRows as any).rows as Record<string, unknown>[]) {
         await session.run(
           `MERGE (p:Person {id: $id})
 					 SET p.name = $name, p.role = $role
@@ -92,7 +92,7 @@ export async function syncCaseToGraph(caseId: string): Promise<SyncResult> {
 					WHERE case_id = ${caseId}
 					LIMIT 50`
       );
-      for (const e of [...evidenceRows] as Record<string, unknown>[]) {
+      for (const e of (evidenceRows as any).rows as Record<string, unknown>[]) {
         await session.run(
           `MERGE (e:Evidence {id: $id})
 					 SET e.title = $title, e.fileType = $fileType
@@ -117,7 +117,7 @@ export async function syncCaseToGraph(caseId: string): Promise<SyncResult> {
 					WHERE case_id = ${caseId}
 					LIMIT 30`
       );
-      for (const cit of [...citationRows] as Record<string, unknown>[]) {
+      for (const cit of (citationRows as any).rows as Record<string, unknown>[]) {
         await session.run(
           `MERGE (s:Statute {code: $code})
 					 SET s.title = $title
@@ -140,7 +140,7 @@ export async function syncCaseToGraph(caseId: string): Promise<SyncResult> {
 					WHERE case_id = ${caseId} AND category = 'glossary_concept'
 					LIMIT 30`
       );
-      for (const concept of [...glossaryRows] as Record<string, unknown>[]) {
+      for (const concept of (glossaryRows as any).rows as Record<string, unknown>[]) {
         const rawTerm = String(concept.citation_text ?? '').trim();
         if (!rawTerm) continue;
         const key = rawTerm.toLowerCase();
@@ -212,7 +212,7 @@ export async function syncIngestedContent(
 			);
 
 			// Sync edges from yorha_evidence_connections
-			const db = (await import('$lib/server/db')).default;
+			const { db } = await import('$lib/server/db/client');
 			const connections = await db.execute(
 				sql`SELECT target_node_id, connection_type, strength
 					FROM yorha_evidence_connections
@@ -220,7 +220,7 @@ export async function syncIngestedContent(
 					LIMIT 20`
 			);
 
-			for (const conn of [...connections] as Record<string, unknown>[]) {
+			for (const conn of (connections as any).rows as Record<string, unknown>[]) {
 				const targetId = conn.target_node_id as string;
 				const connType = (conn.connection_type as string) ?? 'RELATED_TO';
 				const strength = (conn.strength as number) ?? 50;
@@ -253,10 +253,10 @@ export async function syncAllCasesToGraph(): Promise<SyncResult> {
 	const total: SyncResult = { cases: 0, persons: 0, evidence: 0, relationships: 0, errors: [], durationMs: 0 };
 
 	try {
-		const db = (await import('$lib/server/db')).default;
+		const { db } = await import('$lib/server/db/client');
 		const caseIds = await db.execute(sql`SELECT id FROM cases LIMIT 500`);
 
-		for (const row of [...caseIds] as { id: string }[]) {
+		for (const row of (caseIds as any).rows as { id: string }[]) {
 			const r = await syncCaseToGraph(row.id);
 			total.cases += r.cases;
 			total.persons += r.persons;

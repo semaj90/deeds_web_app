@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import pg from 'pg';
 import { getDatabaseUrl, getOllamaUrl } from '$lib/config/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 
@@ -16,7 +17,8 @@ const analyzeSchema = z.object({
 	ace_context: z.boolean().optional().default(true),
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const parsed = analyzeSchema.safeParse(await request.json());
 		if (!parsed.success) {
@@ -83,7 +85,7 @@ Provide your analysis in this JSON structure:
 
 		// Call Ollama for analysis
 		const ollamaBaseUrl = getOllamaUrl();
-		const ollamaRes = await fetch(`${ollamaBaseUrl}/api/chat`, {
+		const ollamaRes = await ollamaFetch(`${ollamaBaseUrl}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

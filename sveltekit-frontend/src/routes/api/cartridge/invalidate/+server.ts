@@ -15,7 +15,8 @@ const invalidateSchema = z.object({
 	caseId: z.string().min(1).max(500),
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	let raw: unknown;
 	try {
 		raw = await request.json();

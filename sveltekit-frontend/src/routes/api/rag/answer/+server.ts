@@ -32,7 +32,8 @@ const ragAnswerSchema = z.object({
  * POST /api/rag/answer
  * Step 3: Generate answer with citations from approved context via Ollama
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	const startTime = performance.now();
 
 	try {

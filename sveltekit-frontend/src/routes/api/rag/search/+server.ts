@@ -277,7 +277,8 @@ function applyTagBoost(
  * POST /api/rag/search
  * Step 1: Search knowledge base for relevant chunks via Qdrant + Ollama embeddings
  */
-export const POST: RequestHandler = async ({ request, url }) => {
+export const POST: RequestHandler = async ({ request, url, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   // Rate limit: 30 requests/min per client
   const rateCheck = chatRateLimiter.check(request);
   if (!rateCheck.allowed) {

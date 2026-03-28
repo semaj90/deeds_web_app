@@ -4,7 +4,7 @@
  * Creates version snapshots when evidence metadata changes.
  * Non-fatal — logs warnings on failure but never blocks the caller.
  */
-import db from '$lib/server/db';
+import { db } from '$lib/server/db/client';
 import { evidenceAuditLog, evidenceVersions, evidence } from '$lib/server/db/schema-postgres.js';
 import { eq, desc, sql } from 'drizzle-orm';
 

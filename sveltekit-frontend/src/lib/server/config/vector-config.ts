@@ -44,6 +44,8 @@ export const VECTOR_CONFIG = {
 		topic_clusters: 'topic_clusters',
 		llm_cache: 'llm_response_cache',
 		poi_profiles: 'poi_profiles',
+		legal_canon_chunks: 'legal_canon_chunks',
+		fictional_case_chunks: 'fictional_case_chunks',
 	},
 
 	/** Per-collection vector schema (vector name → used by health checks + init) */
@@ -57,6 +59,8 @@ export const VECTOR_CONFIG = {
 		topic_clusters: { vectors: ['default'] },
 		llm_response_cache: { vectors: ['query'] },
 		poi_profiles: { vectors: ['default'] },
+		legal_canon_chunks: { vectors: ['content'], on_disk_payload: true },
+		fictional_case_chunks: { vectors: ['content'], on_disk_payload: true },
 	},
 
 	/** Qdrant HNSW config applied to all collections */

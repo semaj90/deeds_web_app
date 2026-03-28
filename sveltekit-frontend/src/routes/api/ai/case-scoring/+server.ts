@@ -8,7 +8,8 @@ const caseScoringSchema = z.object({
 });
 
 /** POST /api/ai/case-scoring — Evidence-weighted case strength scoring */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const parsed = caseScoringSchema.safeParse(await request.json());
 		if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });

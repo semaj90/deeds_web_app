@@ -38,7 +38,8 @@ interface FixSource {
  * Generate a fix using Ollama with validated KB sources as context
  * Human-in-the-loop: returns fix for review, does NOT auto-apply
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	// Zod schema validates errorMessage, filePath required + sources array structure
 	const parsed = generateFixSchema.safeParse(await request.json());
 	if (!parsed.success) throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');

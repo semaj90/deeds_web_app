@@ -15,7 +15,8 @@ const imageGenSchema = z.object({
 });
 
 /** POST /api/ai/generate-image — Generate an image from a text prompt */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = imageGenSchema.safeParse(raw);

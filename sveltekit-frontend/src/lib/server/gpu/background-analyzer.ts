@@ -12,7 +12,7 @@
 
 import { graphSimilarity, clusterEmbeddings, computeCaseEmbedding, isCudaAvailable } from './libtorch-bridge.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
-import db from '$lib/server/db';
+import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 
 export interface GpuAnalysisResult {

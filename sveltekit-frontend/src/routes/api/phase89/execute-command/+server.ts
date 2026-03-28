@@ -7,7 +7,8 @@ const commandSchema = z.object({
 });
 
 /** POST /api/phase89/execute-command — Execute an agentic command (sandboxed) */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ success: false, error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = commandSchema.safeParse(raw);

@@ -1,4 +1,4 @@
-import { db } from '$lib/server/db';
+import { db } from '$lib/server/db/client';
 import { cases } from '$lib/server/db/schema-postgres';
 import { error, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';

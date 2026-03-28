@@ -102,7 +102,8 @@ const cacheSetSchema = z.object({
 	}).optional()
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ success: false, error: 'Unauthorized' }, { status: 401 });
 	let raw: unknown;
 	try { raw = await request.json(); } catch { return json({ success: false, error: 'Invalid JSON body' }, { status: 400 }); }
 	const parsed = cacheSetSchema.safeParse(raw);
@@ -126,7 +127,8 @@ export const POST: RequestHandler = async ({ request }) => {
 	return json({ success: true, key, ttl });
 };
 
-export const DELETE: RequestHandler = async ({ url }) => {
+export const DELETE: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user) return json({ success: false, error: 'Unauthorized' }, { status: 401 });
 	const action = url.searchParams.get('action');
 	const key = url.searchParams.get('key');
 

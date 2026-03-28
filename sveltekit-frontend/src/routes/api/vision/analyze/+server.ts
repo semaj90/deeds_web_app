@@ -46,7 +46,8 @@ interface VisionResponse {
  * POST /api/vision/analyze
  * Pipeline: SHA-256 hash → Redis cache check → YOLO detection → Gemma3 VLM analysis → cache result
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   const timings: Record<string, number> = {};
   const t0 = Date.now();
 

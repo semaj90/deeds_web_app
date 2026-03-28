@@ -50,7 +50,8 @@ async function getOllamaEmbedding(
 	});
 }
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	// Rate limit: 60 requests/min per client
 	const rateCheck = embedRateLimiter.check(request);
 	if (!rateCheck.allowed) {

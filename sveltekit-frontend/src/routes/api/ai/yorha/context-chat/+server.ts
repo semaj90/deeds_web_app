@@ -30,12 +30,12 @@ export const POST: RequestHandler = async ({ request }) => {
 	let systemPrompt = 'You are YorHA, a legal AI assistant. Provide concise, accurate legal analysis.';
 	if (caseId) {
 		try {
-			const db = (await import('$lib/server/db')).default;
+			const { db } = await import('$lib/server/db/client');
 			const { sql } = await import('drizzle-orm');
 			const rows = await db.execute(
 				sql`SELECT title, description, jurisdiction, court, status FROM cases WHERE id = ${caseId} LIMIT 1`
 			);
-			const c = [...rows][0] as Record<string, unknown> | undefined;
+			const c = (rows as any).rows[0] as Record<string, unknown> | undefined;
 			if (c) {
 				systemPrompt += `\n\nActive Case: ${c.title ?? 'Unknown'}`;
 				if (c.jurisdiction) systemPrompt += ` | Jurisdiction: ${c.jurisdiction}`;

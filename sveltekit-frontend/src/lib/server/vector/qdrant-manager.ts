@@ -97,6 +97,15 @@ export class QdrantManager {
       // documents: filtered by case_id and document_type in storeDocument()
       { collection: this.collections.documents, field: 'case_id', schema: 'keyword' },
       { collection: this.collections.documents, field: 'document_type', schema: 'keyword' },
+      // legal_canon_chunks: filtered by jurisdiction, authority_level, doc_type in /api/canon/search
+      { collection: this.collections.legal_canon_chunks, field: 'jurisdiction', schema: 'keyword' },
+      { collection: this.collections.legal_canon_chunks, field: 'authority_level', schema: 'keyword' },
+      { collection: this.collections.legal_canon_chunks, field: 'doc_type', schema: 'keyword' },
+      { collection: this.collections.legal_canon_chunks, field: 'semantic_label', schema: 'keyword' },
+      // fictional_case_chunks: filtered by case_id, category, jurisdiction
+      { collection: this.collections.fictional_case_chunks, field: 'case_id', schema: 'keyword' },
+      { collection: this.collections.fictional_case_chunks, field: 'category', schema: 'keyword' },
+      { collection: this.collections.fictional_case_chunks, field: 'jurisdiction', schema: 'keyword' },
     ];
 
     for (const { collection, field, schema } of indexConfigs) {

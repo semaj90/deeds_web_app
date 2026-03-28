@@ -4,7 +4,7 @@
  */
 import { dev } from '$app/environment';
 import { evidenceUploadSchema } from '$lib/schemas/evidence-upload';
-import db from '$lib/server/db';
+import { db } from '$lib/server/db/client';
 import { cases, evidence } from '$lib/server/db/schema';
 import { fail } from '@sveltejs/kit';
 import crypto from 'crypto';
@@ -343,7 +343,8 @@ export const actions: Actions = {
           fileType: fileType, // Legacy: MIME type
           fileSize: fileSize, // Legacy: file size in bytes
           hash: `sha256:${fileHash}`, // Legacy: hash with algorithm prefix
-          source: formData.get('source')?.toString() ?? 'upload', // Legacy: source, dateObtained: new Date(), // Legacy: upload date
+          source: formData.get('source')?.toString() ?? 'upload',
+          dateObtained: new Date(),
           chainOfCustody: finalMetadata.chainOfCustody, // Legacy: custody chain
           metadata: finalMetadata, // Legacy: all metadata
 

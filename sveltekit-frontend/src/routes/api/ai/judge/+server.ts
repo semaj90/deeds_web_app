@@ -57,7 +57,8 @@ const judgeSchema = z.object({
  * evidence admissibility, probable cause, case strength for both sides,
  * and issues strategic recommendations. Button-press → full courtroom simulation.
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const parsed = judgeSchema.safeParse(await request.json());
 		if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });

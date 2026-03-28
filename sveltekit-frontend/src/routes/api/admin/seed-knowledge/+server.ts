@@ -8,7 +8,7 @@
  */
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
-import db from '$lib/server/db';
+import { db } from '$lib/server/db/client';
 import { legalGlossary, statutes, statuteChunks, legalPrecedents } from '$lib/server/db/schema-postgres.js';
 import { eq, and } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
@@ -60,7 +60,8 @@ function chunkContent(content: string, maxLen = 300): string[] {
 	return chunks.length > 0 ? chunks : [content];
 }
 
-export const POST: RequestHandler = async ({ url }) => {
+export const POST: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	const postParsed = postQuerySchema.safeParse(Object.fromEntries(url.searchParams));
 	const withEmbeddings = postParsed.success ? postParsed.data.embed === 'true' : false;
 	const start = performance.now();

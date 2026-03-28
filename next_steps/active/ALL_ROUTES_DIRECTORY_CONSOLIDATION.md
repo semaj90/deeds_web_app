@@ -1,7 +1,7 @@
 # All-Routes Directory Consolidation
 
 ## Date: March 18, 2026
-## Status: In Progress
+## Status: COMPLETE
 
 ---
 
@@ -134,23 +134,23 @@ All Phase 1 components from the enhancement plan already exist:
 
 ### Phase 2: Directory Consolidation UI
 - [x] Add dedicated "Demos" section/tab to the all-routes page (26 demos need showcase) — DONE (Demos panel with grid cards)
-- [ ] Group standalone routes (acp, chat, health, etc.) into a "System" or "Standalone" section
+- [x] Group standalone routes (acp, chat, health, etc.) into a "System" or "Standalone" section — DONE (subcategorized by function with Icon headers)
 - [x] Add page route cards alongside API endpoint cards — DONE (type filter: API/PAGES/SERVER in RouteAPIExplorer)
 - [x] Show route file type badges (page, server, layout, API) in the tree view — DONE (PG/API/SRV/ARC badges)
-- [ ] Wire demo index page (`/demos`) as a feature showcase gallery
+- [x] Wire demo index page (`/demos`) as a feature showcase gallery — DONE (29 demos + 10 showcases, grid/graph views, D3 force-directed, 5 category filters, DiamondModal preview)
 
 ### Phase 3: Route-to-File Mapping
 - [x] Add file path column to API explorer — DONE (filePath + absolutePath per endpoint)
 - [x] Show associated files per route (e.g., `/cases` → `+page.svelte` + `+page.server.ts` + `+page.ts`) — DONE (sibling chips in RouteAPIExplorer + Associated tab in DevReviewPanel)
 - [x] Add "Open in Editor" links using `vscode://` protocol — DONE (vscode://file/ [EDIT] links)
-- [ ] Cross-reference: which API endpoints are consumed by which pages
+- [x] Cross-reference: which API endpoints are consumed by which pages — DONE (api-metadata-extractor getAPICrossReferences() + DevReviewPanel XREF tab)
 
 ### Phase 4: Dev Review Dashboard
 - [x] Auth coverage report — DONE (DevReviewPanel AUTH tab: per-group coverage bars)
 - [x] SSE endpoint inventory — DONE (DevReviewPanel SSE tab: list with auth status + vscode links)
 - [x] Method distribution — DONE (DevReviewPanel METHODS tab: bar chart + group breakdown)
 - [x] Orphan detection: API endpoints with no consuming page — DONE (DevReviewPanel ORPHANS tab)
-- [ ] Dead route detection: pages that import non-existent API endpoints
+- [x] Dead route detection: pages that import non-existent API endpoints — DONE (api-metadata-extractor getDeadRouteRefs() + DevReviewPanel DEAD tab)
 - [x] Category health heatmap — DONE (DevReviewPanel HEATMAP tab: grid colored by auth coverage)
 
 ---

@@ -22,7 +22,7 @@
  */
 import { createHash } from 'node:crypto';
 import { json, type RequestEvent } from '@sveltejs/kit';
-import db from '$lib/server/db';
+import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { embedText } from '$lib/server/embedding/embed.js';

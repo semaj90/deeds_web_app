@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
@@ -12,7 +13,8 @@ const memoSkeletonSchema = z.object({
 });
 
 /** POST /api/ai/memo-skeleton — Generate legal memo outline (SSE streaming) */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const parsed = memoSkeletonSchema.safeParse(await request.json());
 		if (!parsed.success) {

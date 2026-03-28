@@ -19,7 +19,8 @@ const acpExecuteSchema = z.object({
 	dryRun: z.boolean().optional().default(false)
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	const startTime = Date.now();
 
 	try {

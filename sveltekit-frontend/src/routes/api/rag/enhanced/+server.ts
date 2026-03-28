@@ -10,7 +10,8 @@ const ragEnhancedSchema = z.object({
 	mode: z.enum(['query', 'process']).optional().default('query')
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = ragEnhancedSchema.safeParse(raw);

@@ -15,6 +15,7 @@
 	import APITesterModal from '$lib/components/APITesterModal.svelte';
 	import ArchivedRoutesPanel from '$lib/components/ArchivedRoutesPanel.svelte';
 	import DevReviewPanel from '$lib/components/DevReviewPanel.svelte';
+	import Icon from '$lib/components/ui/Icon.svelte';
 	import type { RouteEndpoint } from '$lib/server/api-metadata-extractor';
 
 	const { data }: { data: PageData } = $props();
@@ -121,6 +122,35 @@
 	let categoryCount = $derived(apiMetadata.categories.length);
 	let systemEndpoints = $derived(apiMetadata.allEndpoints.filter((e: RouteEndpoint) => e.group === 'system'));
 	let showSystem = $state(false);
+
+	// Group standalone/system routes by functional subcategory
+	const standaloneSubgroupMap: Record<string, { label: string; icon: string }> = {
+		login: { label: 'Authentication', icon: 'lock' },
+		register: { label: 'Authentication', icon: 'lock' },
+		health: { label: 'Health & Monitoring', icon: 'activity' },
+		indexing: { label: 'Search & Indexing', icon: 'search' },
+		'.well-known': { label: 'Well-Known', icon: 'globe' },
+		acp: { label: 'Agent Protocol', icon: 'bot' },
+		'couchdb-analytics': { label: 'Analytics', icon: 'bar-chart-2' },
+		knowledge: { label: 'Knowledge Base', icon: 'book-open' },
+		'legal-corpus-premium': { label: 'Legal Corpus', icon: 'scroll' },
+		chat: { label: 'Chat', icon: 'message-circle' },
+		'rag-search': { label: 'RAG Search', icon: 'search' },
+		studio: { label: 'Studio', icon: 'palette' },
+		'webgpu-similarity': { label: 'GPU Compute', icon: 'cpu' },
+	};
+
+	let groupedSystemEndpoints = $derived.by(() => {
+		const groups: Record<string, { label: string; icon: string; endpoints: RouteEndpoint[] }> = {};
+		for (const ep of systemEndpoints) {
+			const firstSeg = ep.path.replace(/^\//, '').split('/')[0] || 'other';
+			const meta = standaloneSubgroupMap[firstSeg] ?? { label: firstSeg.charAt(0).toUpperCase() + firstSeg.slice(1), icon: 'file' };
+			const key = meta.label;
+			if (!groups[key]) groups[key] = { label: meta.label, icon: meta.icon, endpoints: [] };
+			groups[key].endpoints.push(ep);
+		}
+		return Object.values(groups).sort((a, b) => b.endpoints.length - a.endpoints.length);
+	});
 
 	async function loadErrorBrainHistory() {
 		if (errorBrainLoading) return;
@@ -602,42 +632,51 @@
 		</div>
 	{/if}
 
-	<!-- System Routes Panel (collapsible) -->
+	<!-- System Routes Panel (collapsible) — grouped by subcategory -->
 	{#if showSystem}
 		<div class="system-panel">
 			<div class="system-header">
 				<span class="system-title">SYSTEM & STANDALONE ROUTES</span>
-				<span class="system-count">{systemEndpoints.length} routes</span>
+				<span class="system-count">{systemEndpoints.length} routes &middot; {groupedSystemEndpoints.length} groups</span>
 			</div>
 			<div class="system-desc">
-				Routes outside (app)/(dev)/api groups: auth, health, infra, tools
+				Routes outside (app)/(dev)/api groups, organized by function
 			</div>
-			<div class="system-grid">
-				{#each systemEndpoints as ep}
-					<div class="system-card">
-						<div class="system-card-header">
-							<span class="system-type-badge" class:system-page={ep.type === 'page'} class:system-api={ep.type === 'api'} class:system-server={ep.type === 'page-server'}>
-								{ep.type === 'api' ? 'API' : ep.type === 'page-server' ? 'SRV' : 'PG'}
-							</span>
-							<span class="system-path">{ep.path}</span>
-							{#if ep.hasAuth}
-								<span class="system-auth">GUARDED</span>
-							{/if}
-						</div>
-						{#if ep.description}
-							<p class="system-card-desc">{ep.description}</p>
-						{/if}
-						<div class="system-card-actions">
-							{#if ep.type === 'page' || ep.type === 'page-server'}
-								<a href={ep.path} class="system-visit-btn">VISIT</a>
-							{/if}
-							{#if ep.absolutePath}
-								<a href="vscode://file/{ep.absolutePath}" class="system-edit-btn">[EDIT]</a>
-							{/if}
-						</div>
+			{#each groupedSystemEndpoints as group}
+				<div class="system-subgroup">
+					<div class="system-subgroup-header">
+						<Icon name={group.icon} size={13} />
+						<span class="system-subgroup-label">{group.label}</span>
+						<span class="system-subgroup-count">{group.endpoints.length}</span>
 					</div>
-				{/each}
-			</div>
+					<div class="system-grid">
+						{#each group.endpoints as ep}
+							<div class="system-card">
+								<div class="system-card-header">
+									<span class="system-type-badge" class:system-page={ep.type === 'page'} class:system-api={ep.type === 'api'} class:system-server={ep.type === 'page-server'}>
+										{ep.type === 'api' ? 'API' : ep.type === 'page-server' ? 'SRV' : 'PG'}
+									</span>
+									<span class="system-path">{ep.path}</span>
+									{#if ep.hasAuth}
+										<span class="system-auth">GUARDED</span>
+									{/if}
+								</div>
+								{#if ep.description}
+									<p class="system-card-desc">{ep.description}</p>
+								{/if}
+								<div class="system-card-actions">
+									{#if ep.type === 'page' || ep.type === 'page-server'}
+										<a href={ep.path} class="system-visit-btn">VISIT</a>
+									{/if}
+									{#if ep.absolutePath}
+										<a href="vscode://file/{ep.absolutePath}" class="system-edit-btn">[EDIT]</a>
+									{/if}
+								</div>
+							</div>
+						{/each}
+					</div>
+				</div>
+			{/each}
 		</div>
 	{/if}
 
@@ -1519,6 +1558,8 @@
 	.system-panel {
 		border: 1px solid #cc99ff;
 		background: #0c0c0c;
+		max-height: 600px;
+		overflow-y: auto;
 	}
 
 	.system-header {
@@ -1549,13 +1590,42 @@
 		border-bottom: 1px solid #330066;
 	}
 
+	.system-subgroup {
+		border-bottom: 1px solid #330066;
+	}
+
+	.system-subgroup:last-child {
+		border-bottom: none;
+	}
+
+	.system-subgroup-header {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.4rem 0.75rem;
+		background: #0d0015;
+		color: #bb88dd;
+		font-size: 0.7rem;
+		font-weight: bold;
+		letter-spacing: 0.08em;
+		border-bottom: 1px solid #220044;
+	}
+
+	.system-subgroup-label {
+		flex: 1;
+	}
+
+	.system-subgroup-count {
+		font-size: 0.6rem;
+		color: #7744aa;
+		font-weight: normal;
+	}
+
 	.system-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 		gap: 0.5rem;
-		padding: 0.75rem;
-		max-height: 400px;
-		overflow-y: auto;
+		padding: 0.5rem 0.75rem;
 	}
 
 	.system-card {

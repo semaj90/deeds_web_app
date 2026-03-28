@@ -28,7 +28,8 @@ const QDRANT_URL = getQdrantUrl();
  * Step 2: Validate and approve sources (human-in-the-loop)
  * Accepts chunk validations and returns the approved context for answer generation.
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = ragValidateSchema.safeParse(raw);

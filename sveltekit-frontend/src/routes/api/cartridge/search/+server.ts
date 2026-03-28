@@ -24,7 +24,8 @@ const searchSchema = z.object({
 	collection: z.string().max(200).optional(),
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	let raw: unknown;
 	try {
 		raw = await request.json();

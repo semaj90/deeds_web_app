@@ -16,7 +16,8 @@ const fixTriggerSchema = z.object({
   message: 'file or errorId required',
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const parsed = fixTriggerSchema.safeParse(await request.json());
     if (!parsed.success) {

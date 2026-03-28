@@ -105,7 +105,8 @@ export const GET: RequestHandler = async ({ url }) => {
  * Stream AI fix suggestion via Ollama for a given error + similar errors context.
  * Returns SSE stream with { text } chunks.
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	const raw = await request.json();
 	const parsed = phase72SimilarSchema.safeParse(raw);
 	if (!parsed.success) {

@@ -40,7 +40,8 @@ const vectorSearchSchema = z.object({
 	threshold: z.number().min(0).max(1).optional().default(0.7),
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const parsed = vectorSearchSchema.safeParse(await request.json());
 		if (!parsed.success) {

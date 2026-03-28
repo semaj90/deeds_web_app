@@ -12,7 +12,8 @@ const pipelineSchema = z.object({
 	maxErrors: z.number().int().min(1).optional(),
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const parsed = pipelineSchema.safeParse(await request.json());
 		if (!parsed.success) {

@@ -314,12 +314,12 @@ async function fetchUserProfile(userId: string): Promise<ACEUserProfile | null> 
 
 async function fetchCaseContext(caseId: string): Promise<string | null> {
   try {
-    const db = (await import('$lib/server/db')).default;
+    const { db } = await import('$lib/server/db/client');
     const rows = await db.execute(
       sql`SELECT title, description, jurisdiction, court, status, practice_area
 				FROM cases WHERE id = ${caseId} LIMIT 1`
     );
-    const c = [...rows][0] as Record<string, unknown> | undefined;
+    const c = (rows as any).rows[0] as Record<string, unknown> | undefined;
     if (!c) return null;
 
     const parts: string[] = [];
@@ -336,7 +336,7 @@ async function fetchCaseContext(caseId: string): Promise<string | null> {
 				ORDER BY created_at DESC
 				LIMIT 5`
     );
-    const glossaryLines = [...glossaryRows]
+    const glossaryLines = (glossaryRows as any).rows
       .map((row: any) => {
         const term = String(row.citation_text ?? '').trim();
         const definition = String(row.notes ?? '').trim();
@@ -623,14 +623,14 @@ async function fetchKAGNeighbors(
       console.warn('[KAG] Neo4j unavailable, using PostgreSQL fallback:', neo4jErr?.message ?? neo4jErr);
     }
     try {
-      const db = (await import('$lib/server/db')).default;
+      const { db } = await import('$lib/server/db/client');
       const rows = await db.execute(
         sql`SELECT target_id AS node_id, label AS title, relationship_type AS relationship
 					FROM yorha_evidence_connections
 					WHERE source_id = ${caseId}
 					LIMIT 10`
       );
-      return [...rows].map((r: any) => ({
+      return (rows as any).rows.map((r: any) => ({
         nodeId: String(r.node_id ?? ''),
         title: String(r.title ?? ''),
         relationship: String(r.relationship ?? ''),
@@ -645,14 +645,14 @@ async function fetchChatHistory(
   conversationId: string
 ): Promise<Array<{ role: 'user' | 'assistant' | 'system'; content: string }>> {
   try {
-    const db = (await import('$lib/server/db')).default;
+    const { db } = await import('$lib/server/db/client');
     const rows = await db.execute(
       sql`SELECT role, content FROM chat_messages
 				WHERE chat_id = ${conversationId}
 				ORDER BY created_at DESC
 				LIMIT 10`
     );
-    return [...rows].reverse().map((r: any) => ({
+    return (rows as any).rows.reverse().map((r: any) => ({
       role: r.role as 'user' | 'assistant' | 'system',
       content: String(r.content ?? ''),
     }));
@@ -665,13 +665,13 @@ async function fetchEvidenceMetadataForCase(
   caseId: string
 ): Promise<ACEContext['evidenceMetadata']> {
   try {
-    const db = (await import('$lib/server/db')).default;
+    const { db } = await import('$lib/server/db/client');
     const rows = await db.execute(
       sql`SELECT id, title, evidence_type, file_type, metadata
 				FROM evidence WHERE case_id = ${caseId}
 				ORDER BY created_at DESC LIMIT 10`
     );
-    return [...rows].map((r: any) => {
+    return (rows as any).rows.map((r: any) => {
       const meta = (typeof r.metadata === 'string' ? JSON.parse(r.metadata) : r.metadata) || {};
       return {
         id: String(r.id ?? ''),
@@ -692,7 +692,7 @@ async function fetchEvidenceConnections(
   caseId: string
 ): Promise<ACEContext['evidenceConnections']> {
   try {
-    const db = (await import('$lib/server/db')).default;
+    const { db } = await import('$lib/server/db/client');
     const rows = await db.execute(
       sql`SELECT
 				ebc.connection_type, ebc.label, ebc.notes, ebc.strength,
@@ -704,7 +704,7 @@ async function fetchEvidenceConnections(
 			ORDER BY ebc.strength DESC
 			LIMIT 20`
     );
-    return [...rows].map((r: any) => ({
+    return (rows as any).rows.map((r: any) => ({
       fromTitle: String(r.from_title ?? 'Unknown'),
       toTitle: String(r.to_title ?? 'Unknown'),
       connectionType: String(r.connection_type ?? 'related'),

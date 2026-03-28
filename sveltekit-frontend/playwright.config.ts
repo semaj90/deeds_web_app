@@ -115,14 +115,13 @@ export default defineConfig({
     },
   ],
 
-  // Web server configuration
-  // Web server configuration
-  // webServer: {
-  //   command: 'npm run dev',
-  //   url: 'http://127.0.0.1:5173',
-  //   reuseExistingServer: true, // Always reuse if server is running
-  //   timeout: 120000,
-  // },
+  // Web server: auto-start in CI, reuse existing locally
+  webServer: {
+    command: 'npm run build && npm run preview -- --port 5173',
+    url: 'http://127.0.0.1:5173',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
+  },
 
   // Output directory for test artifacts (screenshots, videos, traces)
   outputDir: 'test-results/',

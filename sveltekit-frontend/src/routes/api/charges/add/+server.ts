@@ -11,7 +11,8 @@ const chargeSchema = z.object({
 });
 
 /** POST /api/charges/add — Attach a statute/charge to a case */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = chargeSchema.safeParse(raw);

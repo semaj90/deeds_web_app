@@ -16,7 +16,8 @@ const summarizeSchema = z.object({
 	text: z.string().trim().min(10, 'Text too short to summarize').max(50000)
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = summarizeSchema.safeParse(raw);

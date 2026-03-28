@@ -4,6 +4,7 @@
  * SSE streaming inference via TensorRT-LLM engine.
  * GPU lease is acquired before streaming, released on completion.
  */
+import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 import { streamLLM, healthCheck as trtHealthCheck } from '$lib/server/trt-llm.js';
@@ -16,7 +17,8 @@ const trtStreamSchema = z.object({
 	temperature: z.number().min(0).max(2).optional()
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = trtStreamSchema.safeParse(await request.json());
 	if (!parsed.success) {
 		return new Response(JSON.stringify({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }), {

@@ -72,6 +72,9 @@ const ALL_ROUTES = [
   { name: 'demos-icons', path: '/demos/icons' },
   { name: 'demos-memory-palace', path: '/demos/memory-palace' },
   { name: 'demos-vector-search', path: '/demos/vector-search' },
+  { name: 'demos-courtroom-sim', path: '/demos/courtroom-sim' },
+  { name: 'simulation', path: '/simulation' },
+  { name: 'fictional-cases', path: '/fictional-cases' },
   { name: 'legal-corpus', path: '/legal-corpus' },
   { name: 'glossary', path: '/library/glossary' },
 ];

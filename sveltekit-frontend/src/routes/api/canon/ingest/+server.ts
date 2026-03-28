@@ -67,7 +67,8 @@ function makeChunkId(docId: string, index: number, content: string): string {
 	return `${docShort}:${index}:${sha16}`;
 }
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = ingestSchema.safeParse(raw);
