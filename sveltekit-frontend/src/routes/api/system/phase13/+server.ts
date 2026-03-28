@@ -3,6 +3,7 @@ import { db } from '$lib/server/db/client';
 import { json } from '@sveltejs/kit';
 import { sql } from 'drizzle-orm';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { ENV } from '$lib/server/env.server.js';
 
 /**
  * GET /api/system/phase13
@@ -41,42 +42,34 @@ export async function GET() {
 			health.services.postgres = { ok: false, message: (e as Error).message };
 		}
 
-		// Check Qdrant (if configured)
-		if (process.env.QDRANT_URL) {
-			try {
-				const resp = await fetch(`${process.env.QDRANT_URL}/health`);
-				health.services.qdrant = { ok: resp.ok, status: resp.status };
-			} catch (e) {
-				health.services.qdrant = { ok: false, message: (e as Error).message };
-			}
+		// Check Qdrant
+		try {
+			const resp = await fetch(`${ENV.QDRANT_URL}/health`);
+			health.services.qdrant = { ok: resp.ok, status: resp.status };
+		} catch (e) {
+			health.services.qdrant = { ok: false, message: (e as Error).message };
 		}
 
-		// Check Ollama (if configured)
-		if (process.env.OLLAMA_URL) {
-			try {
-				const resp = await ollamaFetch(`${process.env.OLLAMA_URL}/api/tags`);
-				const data = await resp.json();
-				health.services.ollama = {
-					ok: resp.ok,
-					modelCount: data.models?.length ?? 0,
-				};
-			} catch (e) {
-				health.services.ollama = { ok: false, message: (e as Error).message };
-			}
-		}
-
-		// Check MinIO (if configured)
-		if (process.env.MINIO_ENDPOINT) {
-			health.services.minio = {
-				ok: true,
-				endpoint: process.env.MINIO_ENDPOINT,
+		// Check Ollama
+		try {
+			const resp = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`);
+			const data = await resp.json();
+			health.services.ollama = {
+				ok: resp.ok,
+				modelCount: data.models?.length ?? 0,
 			};
+		} catch (e) {
+			health.services.ollama = { ok: false, message: (e as Error).message };
 		}
+
+		// Check MinIO
+		health.services.minio = {
+			ok: true,
+			endpoint: ENV.MINIO_ENDPOINT,
+		};
 
 		return json(health);
 	} catch (e) {
 		return json({ error: (e as Error).message }, { status: 500 });
 	}
 }
-
-

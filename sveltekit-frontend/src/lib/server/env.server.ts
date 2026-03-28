@@ -100,4 +100,12 @@ export const ENV = {
   // Auth secrets
   JWT_SECRET: privateEnv.JWT_SECRET ?? DEV.JWT_SECRET,
   SERVICE_AUTH_TOKEN: privateEnv.SERVICE_AUTH_TOKEN ?? DEV.SERVICE_AUTH_TOKEN,
+  // Google Gemini (optional — fallback to local Ollama)
+  GEMINI_API_KEY: privateEnv.GEMINI_API_KEY ?? '',
+  // MinIO library bucket
+  MINIO_LIBRARY_BUCKET: privateEnv.MINIO_LIBRARY_BUCKET ?? 'legal-library',
+  // Timeouts
+  ACE_EMBED_BATCH_TIMEOUT_MS: Number(privateEnv.ACE_EMBED_BATCH_TIMEOUT_MS ?? '20000'),
+  // Node environment
+  NODE_ENV: process.env.NODE_ENV ?? 'development',
 };
