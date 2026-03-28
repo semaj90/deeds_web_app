@@ -72,6 +72,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 								})}\n\n`));
 							} catch { /* skip malformed lines */ }
 						}
+					},
+					cancel() {
+						reader.cancel();
 					}
 				});
 

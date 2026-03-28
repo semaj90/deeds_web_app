@@ -79,6 +79,9 @@ Draft a legal memorandum outline.`;
 						// skip non-JSON lines
 					}
 				}
+			},
+			cancel() {
+				reader.cancel();
 			}
 		});
 

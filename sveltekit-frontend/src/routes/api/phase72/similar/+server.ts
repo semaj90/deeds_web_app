@@ -179,6 +179,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					} catch { /* skip malformed */ }
 				}
 			},
+			cancel() {
+				reader.cancel();
+			},
 		});
 
 		return new Response(stream, {

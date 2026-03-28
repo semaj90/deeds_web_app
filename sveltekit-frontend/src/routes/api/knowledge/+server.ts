@@ -4,6 +4,7 @@ import { JSDOM } from 'jsdom';
 import pdfParse from 'pdf-parse';
 import postgres from 'postgres';
 import { getDatabaseUrl, getQdrantUrl, getOllamaUrl } from '$lib/config/env.server.js';
+import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { generateSparseVector } from '$lib/server/vector/bm42-sparse.js';
@@ -29,7 +30,7 @@ const qd = qdrant as QdrantClient & {
 };
 
 const OLLAMA_URL_VAR = getOllamaUrl();
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_API_KEY = ENV.GEMINI_API_KEY;
 
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
 const LOCAL_LLM = 'gemma3-legal:latest';

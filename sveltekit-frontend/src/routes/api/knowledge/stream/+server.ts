@@ -9,6 +9,7 @@ import { json } from '@sveltejs/kit';
 
 import { getKnowledgeSearcher } from '$lib/services/knowledge-search/KnowledgeSearcher.js';
 import { getOllamaUrl } from '$lib/config/env.server.js';
+import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
@@ -257,7 +258,7 @@ async function streamGeminiResponse(
 	_encoder: TextEncoder,
 	sendEvent: (event: string, data: unknown) => void
 ): Promise<void> {
-	const apiKey = process.env.GEMINI_API_KEY;
+	const apiKey = ENV.GEMINI_API_KEY;
 	if (!apiKey) {
 		sendEvent('synthesis_chunk', { text: 'Gemini API key not configured. Falling back to summary.' });
 		return;

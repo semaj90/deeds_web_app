@@ -17,6 +17,7 @@
 import { getServiceAdapters, healthCheckServices } from '$lib/server/adapters/service-integrations';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import { ENV } from '$lib/server/env.server.js';
 
 export const GET: RequestHandler = async () => {
  const startTime = Date.now();
@@ -39,7 +40,7 @@ export const GET: RequestHandler = async () => {
       },
       urls: serviceUrls,
       responseTimeMs: Date.now() - startTime,
-      environment: process.env.NODE_ENV ?? 'development',
+      environment: ENV.NODE_ENV,
     };
 
     // Overall health status

@@ -86,6 +86,9 @@ application scope, relevant case law, and practical implications.`;
 						// skip non-JSON lines
 					}
 				}
+			},
+			cancel() {
+				reader.cancel();
 			}
 		});
 

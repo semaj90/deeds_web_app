@@ -34,6 +34,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const { text, caseId, evidence, analysisType } = parsed.data;
 
 	const encoder = new TextEncoder();
+	const abortController = new AbortController();
 	const stream = new ReadableStream({
 		async start(controller) {
 			const send = (data: unknown, event?: string) => {
@@ -50,7 +51,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 				const entityPrompt = buildEntityPrompt(text, evidence);
 				const entityResult = await streamOllamaAnalysis(
-					entityPrompt, controller, encoder, 'entity_extraction'
+					entityPrompt, controller, encoder, 'entity_extraction', abortController.signal
 				);
 
 				send({ step: 'entity_extraction', percentage: 30, entities: entityResult }, 'progress');
@@ -60,7 +61,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 				const connectionPrompt = buildConnectionPrompt(text, entityResult, evidence);
 				const connectionResult = await streamOllamaAnalysis(
-					connectionPrompt, controller, encoder, 'connection_analysis'
+					connectionPrompt, controller, encoder, 'connection_analysis', abortController.signal
 				);
 
 				send({ step: 'connection_analysis', percentage: 60, connections: connectionResult }, 'progress');
@@ -70,7 +71,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 				const anomalyPrompt = buildAnomalyPrompt(text, entityResult, evidence);
 				const anomalyResult = await streamOllamaAnalysis(
-					anomalyPrompt, controller, encoder, 'anomaly_detection'
+					anomalyPrompt, controller, encoder, 'anomaly_detection', abortController.signal
 				);
 
 				send({ step: 'anomaly_detection', percentage: 85, anomalies: anomalyResult }, 'progress');
@@ -94,6 +95,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			} finally {
 				controller.close();
 			}
+		},
+		cancel() {
+			abortController.abort();
 		}
 	});
 
@@ -111,7 +115,8 @@ async function streamOllamaAnalysis(
 	prompt: string,
 	controller: ReadableStreamDefaultController,
 	encoder: TextEncoder,
-	step: string
+	step: string,
+	signal?: AbortSignal
 ): Promise<string> {
 	const response = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
 		method: 'POST',
@@ -121,7 +126,8 @@ async function streamOllamaAnalysis(
 			prompt,
 			stream: true,
 			options: { temperature: 0.3, num_predict: 2048 }
-		})
+		}),
+		signal
 	});
 
 	if (!response.ok) {

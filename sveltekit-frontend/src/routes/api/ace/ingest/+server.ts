@@ -14,6 +14,7 @@ import {
 } from '$lib/server/ace-ingest-progress.js';
 import { sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
 const aceIngestSchema = z.object({
 	url: z.string().min(1, 'url is required').max(5000),
@@ -26,7 +27,7 @@ const pdfFilePattern = /\.pdf$/i;
 const imageFilePattern = /\.(png|jpg|jpeg|tiff|tif|bmp|webp)$/i;
 const MIN_EXTRACTED_TEXT_LENGTH = 30;
 const MIN_PDF_TEXT_LENGTH = 100;
-const ACE_EMBED_BATCH_TIMEOUT_MS = Number(process.env.ACE_EMBED_BATCH_TIMEOUT_MS ?? 20_000);
+const ACE_EMBED_BATCH_TIMEOUT_MS = ENV.ACE_EMBED_BATCH_TIMEOUT_MS;
 
 type ProgressEmitter = (stage: string, progress: number, extra?: Record<string, unknown>) => void;
 

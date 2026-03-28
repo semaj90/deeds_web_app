@@ -38,6 +38,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	const prompt = body.query || body.message || '';
 
+	let activeReader: ReadableStreamDefaultReader<Uint8Array> | null = null;
+
 	const stream = new ReadableStream({
 		async start(controller) {
 			const encoder = new TextEncoder();
@@ -69,6 +71,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				}
 
 				const reader = res.body.getReader();
+				activeReader = reader;
 				const decoder = new TextDecoder();
 				let buffer = '';
 
@@ -102,6 +105,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				);
 				controller.close();
 			}
+		},
+		cancel() {
+			activeReader?.cancel();
 		}
 	});
 

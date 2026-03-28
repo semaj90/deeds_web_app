@@ -8,8 +8,9 @@ import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
 import { statObject, getStream, getPartialStream } from '$lib/server/minio-client.js';
 import { isUuid } from '$lib/server/validation.js';
+import { ENV } from '$lib/server/env.server.js';
 
-const BUCKET = process.env.MINIO_LIBRARY_BUCKET ?? 'legal-library';
+const BUCKET = ENV.MINIO_LIBRARY_BUCKET;
 
 export const GET: RequestHandler = async ({ params, locals, request }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
@@ -55,6 +56,9 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
 				nodeStream.on('end', () => controller.close());
 				nodeStream.on('error', (err: Error) => controller.error(err));
 			},
+			cancel() {
+				nodeStream.destroy();
+			},
 		});
 
 		return new Response(body, {
@@ -78,6 +82,9 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
 			nodeStream.on('data', (chunk: Buffer) => controller.enqueue(chunk));
 			nodeStream.on('end', () => controller.close());
 			nodeStream.on('error', (err: Error) => controller.error(err));
+		},
+		cancel() {
+			nodeStream.destroy();
 		},
 	});
 
