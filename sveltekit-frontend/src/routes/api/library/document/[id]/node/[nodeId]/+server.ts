@@ -8,7 +8,8 @@ import { pool } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
 import { validateUuidParams } from '$lib/server/validation.js';
 
-export async function GET({ params }) {
+export async function GET({ params, locals }) {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const { id, nodeId } = params;
 	const invalid = validateUuidParams(params, 'id', 'nodeId');
 	if (invalid) return invalid;

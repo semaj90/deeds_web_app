@@ -79,9 +79,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 };
 
-export const GET: RequestHandler = async ({ url }) => {
-	const userId = url.searchParams.get('userId');
-	const limit = Math.min(Number(url.searchParams.get('limit') ?? 50), 200);
+const eventListQuerySchema = z.object({
+	userId: z.string().uuid().optional(),
+	limit: z.coerce.number().int().min(1).max(200).default(50),
+});
+
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+	const parsed = eventListQuerySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
+	}
+	const { userId, limit } = parsed.data;
 
 	try {
 		const { db } = await import('$lib/server/db/client');

@@ -3,7 +3,8 @@ import { uploadLibraryDocument, runIngestionPipeline } from '$lib/server/legal/i
 import { promises as fs } from 'fs';
 import path from 'path';
 
-export async function GET() {
+export async function GET({ locals }) {
+    if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
     console.log("=================================================");
     console.log("  California Constitution Ingestion Pipeline    ");
     console.log("=================================================");

@@ -213,17 +213,21 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 };
 
+const knowledgeSearchSchema = z.object({
+  q: z.string().min(1, 'Query parameter required').max(5000),
+  limit: z.coerce.number().int().min(1).max(50).default(5),
+});
+
 /**
  * GET /api/knowledge - Search knowledge base with RAG
  */
 export const GET: RequestHandler = async ({ url, locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
-  const query = url.searchParams.get('q');
-  const limit = parseInt(url.searchParams.get('limit') ?? '5');
-
-  if (!query) {
-    return json({ error: 'Query parameter required' }, { status: 400 });
+  const parsed = knowledgeSearchSchema.safeParse(Object.fromEntries(url.searchParams));
+  if (!parsed.success) {
+    return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
   }
+  const { q: query, limit } = parsed.data;
 
   try {
     await ensureQdrantCollection();

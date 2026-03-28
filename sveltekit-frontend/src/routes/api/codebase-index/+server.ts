@@ -38,15 +38,23 @@ interface QdrantScrollResponse {
 	status: string;
 }
 
+const codebaseIndexQuerySchema = z.object({
+	limit: z.coerce.number().int().min(1).max(500).default(100),
+	offset: z.coerce.number().int().min(0).optional(),
+	role: z.string().max(100).optional(),
+	risk: z.string().max(100).optional(),
+	surface: z.string().max(200).optional(),
+	search: z.string().max(1000).optional(),
+});
+
 export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
-		const limit = parseInt(url.searchParams.get('limit') ?? '100');
-		const offset = url.searchParams.get('offset') ?? null;
-		const role = url.searchParams.get('role') ?? null;
-		const risk = url.searchParams.get('risk') ?? null;
-		const surface = url.searchParams.get('surface') ?? null;
-		const search = url.searchParams.get('search') ?? null;
+		const parsed = codebaseIndexQuerySchema.safeParse(Object.fromEntries(url.searchParams));
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query params' }, { status: 400 });
+		}
+		const { limit, offset, role, risk, surface, search } = parsed.data;
 
 		// Build filter
 		const must: Array<{ key: string; match: { value: string } | { any: string[] } }> = [];
@@ -67,8 +75,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			with_vector: false
 		};
 
-		if (offset) {
-			scrollPayload.offset = parseInt(offset);
+		if (offset != null) {
+			scrollPayload.offset = offset;
 		}
 
 		if (must.length > 0) {

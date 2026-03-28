@@ -8,10 +8,15 @@ const errorBrainRunSchema = z.object({
 	filePath: z.string().max(1000).optional()
 });
 
+const runListQuerySchema = z.object({
+	limit: z.coerce.number().int().min(1).max(100).default(20),
+});
+
 /** GET /api/internal/error-brain/runs — Error analysis run history */
 export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
-	const limit = Math.min(Number(url.searchParams.get('limit') || 20), 100);
+	const parsed = runListQuerySchema.safeParse(Object.fromEntries(url.searchParams));
+	const limit = parsed.success ? parsed.data.limit : 20;
 
 	try {
 		const runs = await db.execute(sql`

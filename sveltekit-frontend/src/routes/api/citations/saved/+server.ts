@@ -24,15 +24,23 @@ const saveCitationSchema = z.object({
 	message: 'Missing required field: statute_code'
 });
 
+const savedCitationQuerySchema = z.object({
+	caseId: z.string().uuid().optional(),
+	statute_code: z.string().max(500).optional(),
+	limit: z.coerce.number().int().min(1).max(500).default(100),
+});
+
 /**
  * GET /api/citations/saved
  * List the current user's saved citations
  */
 export const GET: RequestHandler = async ({ locals, url }) => {
 	const userId = locals.user?.id ?? 'anonymous';
-	const caseId = url.searchParams.get('caseId');
-	const statuteCode = url.searchParams.get('statute_code');
-	const limit = Math.min(Number(url.searchParams.get('limit')) || 100, 500);
+	const parsed = savedCitationQuerySchema.safeParse(Object.fromEntries(url.searchParams));
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
+	}
+	const { caseId, statute_code: statuteCode, limit } = parsed.data;
 
 	try {
 		let query = db

@@ -18,12 +18,20 @@ const caseStatusValues = [
 
 const casePriorityValues = ['low', 'medium', 'high', 'critical', 'urgent'] as const;
 
+const caseListQuerySchema = z.object({
+	limit: z.coerce.number().int().min(1).max(50).default(10),
+	status: z.enum(caseStatusValues).optional(),
+});
+
 /** GET /api/yorha/cases — List cases for YoRHa command center */
 export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
-		const limit = Math.min(Number(url.searchParams.get('limit')) || 10, 50);
-		const status = url.searchParams.get('status');
+		const parsed = caseListQuerySchema.safeParse(Object.fromEntries(url.searchParams));
+		if (!parsed.success) {
+			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
+		}
+		const { limit, status } = parsed.data;
 
 		const baseQuery = db
 			.select({
