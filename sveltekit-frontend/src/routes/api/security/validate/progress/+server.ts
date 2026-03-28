@@ -1,7 +1,9 @@
+import { json } from '@sveltejs/kit';
 import { SSE } from '$lib/server/sse';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ request, locals }) => {
+    if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
     const sse = new SSE();
     startValidationProcess(sse);
     return sse.toResponse();

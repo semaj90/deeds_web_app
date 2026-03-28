@@ -49,7 +49,8 @@ function tfidfScore(query: string, text: string): number {
   return Math.min(score / qTokens.length, 1);
 }
 
-export const POST: RequestHandler = async ({ request, fetch }) => {
+export const POST: RequestHandler = async ({ request, fetch, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const parsed = knowledgeSearchSchema.safeParse(await request.json());
     if (!parsed.success) {

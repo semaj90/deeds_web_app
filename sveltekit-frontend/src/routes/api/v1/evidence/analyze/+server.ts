@@ -13,7 +13,8 @@ const evidenceAnalyzeSchema = z.object({
 });
 
 /** POST /api/v1/evidence/analyze — Proxy to /api/evidence/analysis + Ollama */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = evidenceAnalyzeSchema.safeParse(raw);

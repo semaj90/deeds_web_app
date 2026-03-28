@@ -10,7 +10,8 @@ const graphSyncSchema = z.object({
 	caseId: z.string().max(500).optional(),
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const body = await request.json().catch(() => ({}));
 		const parsed = graphSyncSchema.safeParse(body);

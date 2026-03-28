@@ -10,7 +10,8 @@ const querySchema = z.object({
 	limit: z.coerce.number().int().min(1).max(50).default(10)
 });
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	if (!parsed.success) {
 		return json({ error: parsed.error.issues[0]?.message ?? 'userId required' }, { status: 400 });

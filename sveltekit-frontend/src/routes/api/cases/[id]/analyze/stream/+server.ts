@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
@@ -92,7 +93,8 @@ async function loadCaseContext(caseId: string): Promise<string> {
 	return context || 'No case context available.';
 }
 
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params, request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const caseId = params.id;
 	if (!isUuid(caseId)) {
 		return new Response(JSON.stringify({ error: 'Invalid case ID format' }), { status: 400 });

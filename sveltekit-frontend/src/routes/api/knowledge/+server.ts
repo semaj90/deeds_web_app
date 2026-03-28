@@ -118,7 +118,8 @@ async function ensureQdrantCollection() {
 /**
  * POST /api/knowledge - Upload documents for ingestion
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const formData = await request.formData();
     const files = formData.getAll('files') as File[];
@@ -215,7 +216,8 @@ export const POST: RequestHandler = async ({ request }) => {
 /**
  * GET /api/knowledge - Search knowledge base with RAG
  */
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const query = url.searchParams.get('q');
   const limit = parseInt(url.searchParams.get('limit') ?? '5');
 
@@ -287,7 +289,8 @@ const knowledgeQuerySchema = z.object({
 /**
  * PATCH /api/knowledge - Generate response using RAG + LLM
  */
-export const PATCH: RequestHandler = async ({ request }) => {
+export const PATCH: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const raw = await request.json();
     const parsed = knowledgeQuerySchema.safeParse(raw);

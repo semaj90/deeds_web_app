@@ -10,7 +10,8 @@ const querySchema = z.object({
 	depth: z.coerce.number().int().min(1).max(5).default(2)
 });
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	if (!parsed.success) {
 		return json({ error: parsed.error.issues[0]?.message ?? 'entityId required' }, { status: 400 });

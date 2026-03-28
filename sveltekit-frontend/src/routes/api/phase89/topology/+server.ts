@@ -12,7 +12,8 @@ const { Pool } = pg;
 const DATABASE_URL = getDatabaseUrl();
 const pool = new Pool({ connectionString: DATABASE_URL });
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     // Get errors grouped by file
     const errorsResult = await pool.query(`

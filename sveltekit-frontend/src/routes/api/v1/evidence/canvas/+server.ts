@@ -12,7 +12,8 @@ const canvasSaveSchema = z.object({
 });
 
 /** POST /api/v1/evidence/canvas — Save canvas state */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = canvasSaveSchema.safeParse(raw);

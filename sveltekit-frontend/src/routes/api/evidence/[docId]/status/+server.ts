@@ -11,7 +11,8 @@ import { isUuid } from '$lib/server/validation.js';
  * Returns processing status for an evidence upload job.
  * Checks in-memory progress store first, falls back to DB query.
  */
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const { docId } = params;
 	if (!isUuid(docId)) return json({ error: 'Invalid evidence ID format' }, { status: 400 });
 

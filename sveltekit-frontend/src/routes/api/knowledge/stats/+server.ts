@@ -11,7 +11,8 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { getKnowledgeSearcher } from '$lib/services/knowledge-search/KnowledgeSearcher.js';
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     // Fetch statistics
     const searcher = getKnowledgeSearcher();

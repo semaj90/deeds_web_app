@@ -46,7 +46,8 @@ const errorClusterSchema = z.object({
  * Task 3.1: Implement POST /api/routes/:routeId/errors
  * Task 10.2: Broadcast error count changes via SSE
  */
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params, request, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const { routeId } = params;
   if (!isValidRouteId(routeId)) return error(400, { message: 'Invalid route ID format' });
 
@@ -137,7 +138,8 @@ export const POST: RequestHandler = async ({ params, request }) => {
  *
  * Task 3.2: Implement GET /api/routes/:routeId/errors
  */
-export const GET: RequestHandler = async ({ params, url }) => {
+export const GET: RequestHandler = async ({ params, url, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const { routeId } = params;
   if (!isValidRouteId(routeId)) return error(400, { message: 'Invalid route ID format' });
 

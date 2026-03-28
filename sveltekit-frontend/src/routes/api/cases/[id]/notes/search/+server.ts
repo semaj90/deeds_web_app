@@ -14,7 +14,8 @@ const querySchema = z.object({
  * Full-text search across case notes (title + content)
  * Uses PostgreSQL to_tsvector/plainto_tsquery with ILIKE fallback
  */
-export const GET: RequestHandler = async ({ params, url }) => {
+export const GET: RequestHandler = async ({ params, url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const caseId = params.id;
 	if (!isUuid(caseId)) return json({ error: 'Invalid case ID format' }, { status: 400 });
 

@@ -28,7 +28,8 @@ const magnetizeSchema = z.object({
  * POST /api/evidence/ai/magnetize — Compute force-directed layout forces for evidence board nodes.
  * Uses spring-embedder physics: connected nodes attract, unconnected nodes repel.
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = magnetizeSchema.safeParse(raw);

@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 import pg from 'pg';
 import type { RequestHandler } from './$types';
 
@@ -41,7 +42,8 @@ export function _broadcastKBSync(data: unknown) {
 	});
 }
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const stream = new ReadableStream({
 		start(controller) {
 			clients.add(controller);

@@ -15,7 +15,8 @@ const createRelationshipSchema = z.object({
 });
 
 /** GET /api/evidence/relationships — List relationships for a case/evidence item */
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const caseId = url.searchParams.get('caseId');
 	const evidenceId = url.searchParams.get('evidenceId');
 
@@ -50,7 +51,8 @@ export const GET: RequestHandler = async ({ url }) => {
 };
 
 /** POST /api/evidence/relationships — Create a relationship between evidence items */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = createRelationshipSchema.safeParse(raw);

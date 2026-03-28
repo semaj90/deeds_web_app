@@ -4,7 +4,8 @@ import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 
 /** GET /api/internal/error-brain/status — Aggregate error analysis status */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const stats = await db.execute(sql`
 			SELECT

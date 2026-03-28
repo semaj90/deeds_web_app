@@ -189,7 +189,8 @@ const gpuWasmActionSchema = z.object({
 	action: z.enum(['status', 'health', 'shaders']).optional().default('status'),
 });
 
-export const POST: RequestHandler = async ({ request, fetch: skFetch }) => {
+export const POST: RequestHandler = async ({ request, fetch: skFetch, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const body = await request.json().catch(() => ({}));
 	const parsed = gpuWasmActionSchema.safeParse(body);
 	if (!parsed.success) {
@@ -265,7 +266,8 @@ export const POST: RequestHandler = async ({ request, fetch: skFetch }) => {
 	});
 };
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const [lease, ollama] = await Promise.all([
 		getGpuLeaseStatus().catch(() => null),
 		fetchOllamaStatus()

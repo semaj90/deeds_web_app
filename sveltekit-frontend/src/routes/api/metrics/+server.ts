@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { ollamaBreaker, qdrantBreaker, redisBreaker } from '$lib/server/circuit-breaker.js';
 
@@ -16,7 +17,8 @@ let errorCount = 0;
 export function _incrementRequestCount(): void { requestCount++; }
 export function _incrementErrorCount(): void { errorCount++; }
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const uptime = process.uptime();
 	const mem = process.memoryUsage();
 

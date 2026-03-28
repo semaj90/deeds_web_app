@@ -10,7 +10,8 @@ const pool = new pg.Pool({ connectionString: DATABASE_URL });
  * GET /api/phase89/stats
  * Returns knowledge graph statistics
  */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const result = await pool.query(`
 			SELECT

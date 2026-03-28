@@ -7,7 +7,8 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { QdrantManager } from '$lib/server/vector/qdrant-manager.js';
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const qdrant = new QdrantManager();
 

@@ -12,7 +12,8 @@ const contextSchema = z.object({
 });
 
 /** POST /api/ai/context — Retrieve relevant documents and citations for a query */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = contextSchema.safeParse(raw);

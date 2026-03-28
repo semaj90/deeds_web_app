@@ -115,7 +115,8 @@ function mapPgRow(r: Record<string, unknown>): PrecedentSearchResult {
 	};
 }
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const start = performance.now();
 	const parsed = precedentSearchSchema.safeParse(await request.json());
 	if (!parsed.success) {

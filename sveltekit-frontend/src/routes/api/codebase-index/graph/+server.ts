@@ -23,7 +23,8 @@ interface GraphEdge { source: string, target:string;
   type: 'import' | 'export' | 'dependency';
 }
 
-export const GET: RequestHandler = async ({ url, fetch }) => {
+export const GET: RequestHandler = async ({ url, fetch, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     // Try to fetch from FastAPI backend (Task 16.2 integration)
     const backendUrl = getCodebaseIndexUrl();

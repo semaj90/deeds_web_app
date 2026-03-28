@@ -14,7 +14,8 @@ const analyzeSchema = z.object({
 });
 
 /** POST /api/evidence/ai/analyze — AI analysis of an evidence node */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = analyzeSchema.safeParse(raw);

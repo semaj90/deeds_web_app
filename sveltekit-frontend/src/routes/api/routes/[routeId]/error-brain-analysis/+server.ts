@@ -21,7 +21,8 @@ const errorBrainAnalysisSchema = z.object({
 	error_message: z.string().max(5000).optional()
 });
 
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params, request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const { routeId } = params;
 	if (!isValidRouteId(routeId)) return json({ error: 'Invalid route ID format' }, { status: 400 });
 

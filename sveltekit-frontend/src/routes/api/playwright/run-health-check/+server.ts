@@ -7,7 +7,8 @@ const healthCheckSchema = z.object({
 });
 
 /** POST /api/playwright/run-health-check — Run a Playwright health check on a route */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = healthCheckSchema.safeParse(raw);

@@ -14,7 +14,8 @@ const approveSchema = z.object({
  * POST /api/evidence/summary/[id]/approve
  * Approve a suggested summary and write it to the evidence record
  */
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params, request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const summaryId = params.id;
 
 	try {

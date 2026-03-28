@@ -14,7 +14,8 @@ const querySchema = z.object({
 	limit: z.coerce.number().int().min(1).max(200).default(50)
 });
 
-export const GET: RequestHandler = async ({ params, url }) => {
+export const GET: RequestHandler = async ({ params, url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const { id } = params;
 	if (!isUuid(id)) throw error(400, 'Invalid evidence ID format');
 

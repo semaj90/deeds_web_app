@@ -2,7 +2,8 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 
 /** GET /api/ai/suggestions — Return suggested queries for the AI assistant */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const suggestions = [
 		'Summarize the key evidence in this case',
 		'What are the strongest legal arguments for the plaintiff?',

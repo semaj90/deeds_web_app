@@ -184,7 +184,8 @@ async function executeContextualTool(
  * POST /api/contextual/chat
  * Contextual chat with HMM state tracking + optional agentic tool calling
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const raw = await request.json();
     const parsed = contextualChatSchema.safeParse(raw);

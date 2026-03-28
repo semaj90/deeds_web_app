@@ -19,7 +19,8 @@ const caseStatusValues = [
 const casePriorityValues = ['low', 'medium', 'high', 'critical', 'urgent'] as const;
 
 /** GET /api/yorha/cases — List cases for YoRHa command center */
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const limit = Math.min(Number(url.searchParams.get('limit')) || 10, 50);
 		const status = url.searchParams.get('status');
@@ -56,7 +57,8 @@ const createCaseSchema = z.object({
 });
 
 /** POST /api/yorha/cases — Create a new case */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = createCaseSchema.safeParse(raw);

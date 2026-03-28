@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 /**
  * Knowledge Search SSE Stream Endpoint
  * POST /api/knowledge/stream
@@ -27,7 +28,8 @@ const knowledgeStreamSchema = z.object({
 	])).max(11).optional(),
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const parsed = knowledgeStreamSchema.safeParse(await request.json());
 		if (!parsed.success) {

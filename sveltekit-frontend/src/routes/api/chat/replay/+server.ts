@@ -16,7 +16,8 @@ const replaySchema = z.object({
 	count: z.coerce.number().int().min(1).max(1000).default(100),
 });
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = replaySchema.safeParse({
 		conversationId: url.searchParams.get('conversationId'),
 		fromId: url.searchParams.get('fromId') ?? '0-0',

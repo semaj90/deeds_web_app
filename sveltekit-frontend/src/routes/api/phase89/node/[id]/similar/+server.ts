@@ -16,7 +16,8 @@ const querySchema = z.object({
   topK: z.coerce.number().int().min(1).max(50).default(5)
 });
 
-export const GET: RequestHandler = async ({ params, url }) => {
+export const GET: RequestHandler = async ({ params, url, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const { id } = params;
 
   if (!isUuid(id)) {

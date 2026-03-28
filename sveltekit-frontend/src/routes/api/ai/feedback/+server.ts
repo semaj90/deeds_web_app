@@ -10,7 +10,8 @@ const aiFeedbackSchema = z.object({
 });
 
 /** POST /api/ai/feedback — Store user feedback on AI responses */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = aiFeedbackSchema.safeParse(raw);

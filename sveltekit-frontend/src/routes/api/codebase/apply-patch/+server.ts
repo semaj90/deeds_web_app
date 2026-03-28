@@ -18,7 +18,8 @@ interface PatchResult { success: boolean, clusterId: string;
     }>;
 }
 
-export const POST: RequestHandler = async ({ request, fetch }) => {
+export const POST: RequestHandler = async ({ request, fetch, locals }) => {
+    if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
     try {
         const raw = await request.json();
         const parsed = applyPatchSchema.safeParse(raw);

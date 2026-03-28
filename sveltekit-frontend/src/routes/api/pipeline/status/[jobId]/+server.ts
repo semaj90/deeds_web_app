@@ -6,7 +6,8 @@ import { isUuid } from '$lib/server/validation.js';
  * GET /api/pipeline/status/[jobId]
  * Query Redis for pipeline job status. Falls back to 'not_found' if no record.
  */
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const { jobId } = params;
 
 	if (!isUuid(jobId)) {

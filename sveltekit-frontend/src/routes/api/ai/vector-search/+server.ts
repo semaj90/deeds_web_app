@@ -12,7 +12,8 @@ const bodySchema = z.object({
  * POST /api/ai/vector-search — Alias for /api/vector-search
  * Delegates to the main vector-search endpoint for consistency.
  */
-export const POST: RequestHandler = async ({ request, fetch: kitFetch }) => {
+export const POST: RequestHandler = async ({ request, fetch: kitFetch, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = bodySchema.safeParse(raw);

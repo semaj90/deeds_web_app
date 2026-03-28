@@ -511,7 +511,8 @@ async function searchCanon(q: string, limit: number, jurisdiction?: string, auth
 
 // ── Main Handler ──────────────────────────────────────────────────────────
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = searchQuerySchema.safeParse({
 		q: url.searchParams.get('q')?.trim() ?? '',
 		type: url.searchParams.get('type') ?? undefined,

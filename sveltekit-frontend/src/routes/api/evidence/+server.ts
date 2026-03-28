@@ -17,7 +17,8 @@ const evidenceListSchema = z.object({
  * GET /api/evidence
  * List evidence items with optional filtering and pagination
  */
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = evidenceListSchema.safeParse({
 		page: url.searchParams.get('page') ?? undefined,
 		limit: url.searchParams.get('limit') ?? undefined,

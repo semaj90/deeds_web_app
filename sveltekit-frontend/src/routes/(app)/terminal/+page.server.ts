@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { db } from '$lib/server/db/index.js';
+import { db } from '$lib/server/db/client';
 import { chatMessages } from '$lib/server/db/schema.js';
 import { desc, like } from 'drizzle-orm';
 

@@ -12,7 +12,8 @@ const FASTAPI_URL = getCodebaseIndexUrl();
 const ERROR_CARDS_COLLECTION = 'phase90_error_cards';
 const CLUSTER_COLLECTION = 'phase90_error_clusters';
 
-export const GET: RequestHandler = async ({ fetch }) => {
+export const GET: RequestHandler = async ({ fetch, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		// Try FastAPI backend first
 		try {

@@ -33,7 +33,8 @@ interface PatchAttempt {
  * - Rollback on failure after max attempts
  * - Only writes under sveltekit-frontend/src/
  */
-export const POST: RequestHandler = async ({ request, url, fetch: svelteKitFetch }) => {
+export const POST: RequestHandler = async ({ request, url, fetch: svelteKitFetch, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const raw = await request.json();
 	const parsed = autoPatchSchema.safeParse(raw);
 	if (!parsed.success) {

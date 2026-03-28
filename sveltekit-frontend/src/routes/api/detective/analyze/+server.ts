@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 /**
  * Detective Analysis SSE Endpoint
  * Streams LLM-powered evidence analysis results in real-time.
@@ -18,7 +19,8 @@ const analyzeSchema = z.object({
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const body = await request.json().catch(() => null);
 	if (!body) {
 		return new Response(JSON.stringify({ error: 'Invalid JSON' }), { status: 400 });

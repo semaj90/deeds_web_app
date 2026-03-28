@@ -7,7 +7,8 @@ const checkSchema = z.object({
 });
 
 /** POST /api/phase78/playwright-check — Trigger Playwright health check for a route */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = checkSchema.safeParse(raw);

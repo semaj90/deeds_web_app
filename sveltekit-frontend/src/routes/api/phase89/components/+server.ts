@@ -15,7 +15,8 @@ interface ComponentUnit { unit_id: string, file_path: string;
 	diff_status: 'clean' | 'modified' | 'new' | 'deleted';
 }
 
-export const GET: RequestHandler = async ({ fetch }) => {
+export const GET: RequestHandler = async ({ fetch, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const qdrantBaseUrl = getQdrantUrl();
 

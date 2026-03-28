@@ -13,7 +13,8 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getRedis } from '$lib/server/redis.js';
 
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const { jobId } = params;
 
 	if (!jobId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(jobId)) {

@@ -16,7 +16,8 @@ const querySchema = z.object({
 	limit: z.coerce.number().int().min(1).max(200).default(20)
 });
 
-export const GET: RequestHandler = async ({ url, fetch }) => {
+export const GET: RequestHandler = async ({ url, fetch, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 		const limit = parsed.success ? parsed.data.limit : 20;

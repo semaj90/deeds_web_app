@@ -335,6 +335,7 @@ async function handleStream(body: SynthesisRequest, userId: string): Promise<Res
 // ── POST Handler ──────────────────────────────────────────────────────
 
 export const POST: RequestHandler = async (event) => {
+	if (!event.locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const auth = await requireAuth(event);
 	const totalStart = performance.now();
 

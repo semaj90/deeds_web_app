@@ -24,7 +24,8 @@ interface SearchResult {
   snippet?: string;
 }
 
-export const GET: RequestHandler = async ({ url, fetch }) => {
+export const GET: RequestHandler = async ({ url, fetch, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
   if (!parsed.success) {
     return json({ results: [], query: '', error: parsed.error.issues[0]?.message }, { status: 400 });

@@ -49,6 +49,7 @@ const JOB_TTL = 300; // 5 minutes
  * Get user's interaction history and topic preferences
  */
 export const GET: RequestHandler = async (event) => {
+	if (!event.locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	let auth: Awaited<ReturnType<typeof requireAuth>>;
 	try {
 		auth = await requireAuth(event);
@@ -103,6 +104,7 @@ export const GET: RequestHandler = async (event) => {
  * Pipeline executes in background; client polls /api/recommendations/jobs/[jobId].
  */
 export const POST: RequestHandler = async (event) => {
+	if (!event.locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	let auth: Awaited<ReturnType<typeof requireAuth>>;
 	try {
 		auth = await requireAuth(event);

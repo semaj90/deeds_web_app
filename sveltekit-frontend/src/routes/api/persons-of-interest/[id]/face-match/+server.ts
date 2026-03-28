@@ -18,7 +18,8 @@ const faceMatchSchema = z.object({
  * Search for similar POI faces using embeddings stored in Qdrant.
  * Falls back to pgvector cosine similarity if Qdrant is unavailable.
  */
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params, request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
 	const poiId = params.id;
 	const raw = await request.json().catch(() => ({}));

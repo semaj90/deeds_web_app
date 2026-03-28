@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 /**
  * Server-Sent Events (SSE) Endpoint for Real-Time Route Health Updates
  *
@@ -23,7 +24,8 @@ const connections = new Set<ReadableStreamDefaultController>();
  * - Auto-cleanup on client disconnect
  * - Broadcasts health changes to all connected clients
  */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const stream = new ReadableStream({
     start(controller) {
       // Add to active connections

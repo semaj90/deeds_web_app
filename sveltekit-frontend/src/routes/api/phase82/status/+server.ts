@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { z } from 'zod';
-import { db } from '$lib/server/db/index.js';
+import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 
 const querySchema = z.object({
@@ -13,7 +13,8 @@ const querySchema = z.object({
  * Returns Svelte 5 runes upgrade status for a given route.
  * Queries phase82_upgrade table if it exists, falls back to static response.
  */
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	if (!parsed.success) {
 		return json({ error: parsed.error.issues[0]?.message ?? 'Missing "route" query parameter' }, { status: 400 });
@@ -27,7 +28,7 @@ export const GET: RequestHandler = async ({ url }) => {
 				WHERE route_path = ${route}
 				LIMIT 1`
 		);
-		const rows = Array.isArray(result) ? result : [];
+		const rows = (result as any).rows ?? [];
 		const row = rows[0] as Record<string, unknown> | undefined;
 		if (row) {
 			return json({

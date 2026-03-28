@@ -68,7 +68,8 @@ function mapRow(r: Record<string, unknown>, matchType: GlossaryResult['matchType
 	};
 }
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const start = performance.now();
 	const parsed = glossarySearchSchema.safeParse(await request.json());
 	if (!parsed.success) {

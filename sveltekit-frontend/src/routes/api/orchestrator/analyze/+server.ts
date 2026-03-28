@@ -7,7 +7,8 @@ const ORCHESTRATOR_URL = getOrchestratorUrl();
 
 const orchestratorTaskSchema = z.object({}).passthrough();
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const parsed = orchestratorTaskSchema.safeParse(await request.json());
 		if (!parsed.success) {
@@ -50,7 +51,8 @@ export const POST: RequestHandler = async ({ request }) => {
 };
 
 // GET endpoint for health check
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const response = await fetch(`${ORCHESTRATOR_URL}/health`);
 		const data = await response.json();

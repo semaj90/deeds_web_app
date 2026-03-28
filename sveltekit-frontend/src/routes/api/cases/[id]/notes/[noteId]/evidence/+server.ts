@@ -15,7 +15,8 @@ const noteEvidenceSchema = z.object({
  * GET /api/cases/[id]/notes/[noteId]/evidence
  * List all evidence items linked to a note
  */
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const invalid = validateUuidParams(params, 'id', 'noteId');
 	if (invalid) return invalid;
 
@@ -44,7 +45,8 @@ export const GET: RequestHandler = async ({ params }) => {
  * Link an evidence item to a note
  * Body: { evidenceId: string }
  */
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params, request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const invalid = validateUuidParams(params, 'id', 'noteId');
 	if (invalid) return invalid;
 
@@ -99,7 +101,8 @@ export const POST: RequestHandler = async ({ params, request }) => {
  * Unlink an evidence item from a note
  * Body: { evidenceId: string }
  */
-export const DELETE: RequestHandler = async ({ params, request }) => {
+export const DELETE: RequestHandler = async ({ params, request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const invalid = validateUuidParams(params, 'id', 'noteId');
 	if (invalid) return invalid;
 

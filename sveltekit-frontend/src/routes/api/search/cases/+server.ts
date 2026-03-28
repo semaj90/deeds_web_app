@@ -37,7 +37,8 @@ type CaseSearchRow = {
 	score: number;
 };
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const startTime = performance.now();
 
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));

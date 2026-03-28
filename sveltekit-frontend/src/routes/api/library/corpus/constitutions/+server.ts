@@ -52,7 +52,8 @@ function buildFallbackSources() {
   };
 }
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     // Join registry rows with ingestion status
     const res = await pool.query(`
@@ -121,7 +122,8 @@ export const GET: RequestHandler = async () => {
   }
 };
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const raw = await request.json().catch(() => ({}));
     const parsed = constitutionIngestSchema.safeParse(raw);

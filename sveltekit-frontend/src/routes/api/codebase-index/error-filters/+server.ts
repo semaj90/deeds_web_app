@@ -12,7 +12,8 @@ import { getQdrantUrl } from '$lib/config/env.server.js';
 const QDRANT_URL = getQdrantUrl();
 const ERROR_CARDS_COLLECTION = 'phase90_error_cards';
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const response = await fetch(`${QDRANT_URL}/collections/${ERROR_CARDS_COLLECTION}/points/scroll`,
 			{

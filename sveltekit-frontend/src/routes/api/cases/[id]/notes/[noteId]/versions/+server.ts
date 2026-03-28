@@ -9,7 +9,8 @@ import { validateUuidParams } from '$lib/server/validation.js';
  * GET /api/cases/[id]/notes/[noteId]/versions
  * List all versions for a note (most recent first)
  */
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const invalid = validateUuidParams(params, 'id', 'noteId');
 	if (invalid) return invalid;
 

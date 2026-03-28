@@ -96,6 +96,7 @@ const caseTheorySchema = z.object({
 });
 
 export const POST: RequestHandler = async (event) => {
+	if (!event.locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	await requireAuth(event);
 	const startTime = Date.now();
 

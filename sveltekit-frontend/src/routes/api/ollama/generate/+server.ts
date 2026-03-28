@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
@@ -18,7 +19,8 @@ const generateSchema = z.object({
 });
 
 /** POST /api/ollama/generate — Proxy to Ollama /api/generate with streaming support */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	let body: z.infer<typeof generateSchema>;
 	try {
 		const raw = await request.json();

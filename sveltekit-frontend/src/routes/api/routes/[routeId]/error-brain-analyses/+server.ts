@@ -20,7 +20,8 @@ const querySchema = z.object({
 	offset: z.coerce.number().int().min(0).default(0)
 });
 
-export const GET: RequestHandler = async ({ params, url }) => {
+export const GET: RequestHandler = async ({ params, url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const { routeId } = params;
 	if (!isValidRouteId(routeId)) return json({ error: 'Invalid route ID format' }, { status: 400 });
 

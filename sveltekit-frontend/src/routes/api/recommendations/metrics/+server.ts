@@ -16,7 +16,8 @@ const querySchema = z.object({
 	export: z.enum(['true', 'false']).default('false')
 });
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const { recommendationMetrics } = await import(
 			'$lib/server/ml/recommendation-metrics.js'

@@ -10,7 +10,8 @@ const ollamaPullSchema = z.object({
 
 const OLLAMA_BASE = getOllamaUrl();
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+ if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
  return json({
  status: 'healthy',
  service: 'ollama',
@@ -21,7 +22,8 @@ export const GET: RequestHandler = async () => {
  });
 };
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+ if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
  try {
  const parsed = ollamaPullSchema.safeParse(await request.json());
  if (!parsed.success) {

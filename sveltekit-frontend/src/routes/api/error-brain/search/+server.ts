@@ -18,7 +18,8 @@ const errorSearchSchema = z.object({
  * Search knowledge base sources for error fix candidates
  * Sources: phase72_error table (DB) + Qdrant codebase_chunks_768 (vector) + CouchDB ace_synthesis (docs)
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	// Zod schema validates errorMessage/filePath (at least one required) + limit range
 	const parsed = errorSearchSchema.safeParse(await request.json());
 	if (!parsed.success) {

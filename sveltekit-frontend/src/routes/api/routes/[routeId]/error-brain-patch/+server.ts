@@ -21,7 +21,8 @@ const errorBrainPatchSchema = z.object({
 	risk_level: z.string().max(50).optional()
 });
 
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params, request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const { routeId } = params;
 	if (!isValidRouteId(routeId)) return json({ error: 'Invalid route ID format' }, { status: 400 });
 

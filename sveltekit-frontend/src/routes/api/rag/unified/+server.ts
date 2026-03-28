@@ -2,7 +2,8 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 
 /** GET /api/rag/unified — RAG service health check */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const services: Record<string, { status: string; latency?: number }> = {};
 
 	// Check Ollama

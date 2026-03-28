@@ -28,7 +28,8 @@ async function generateEmbedding(text: string): Promise<number[]> {
   return data.embedding;
 }
 
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const { id } = params;
 
   if (!isUuid(id)) {

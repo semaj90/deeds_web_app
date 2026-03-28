@@ -11,7 +11,8 @@ const upgradeRouteSchema = z.object({
  * Svelte 5 runes migration is complete — this endpoint now returns success.
  * Kept for backward compatibility with RouteInspectorDetectiveBoard.
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const raw = await request.json().catch(() => ({}));
 	const parsed = upgradeRouteSchema.safeParse(raw);
 	if (!parsed.success) {

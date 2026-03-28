@@ -42,7 +42,8 @@ const interactionSchema = z.object({
  * - Create route_interaction_log record
  * - Return created interaction record
  */
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params, request, locals }) => {
+    if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
     const { routeId } = params;
     if (!isValidRouteId(routeId)) return error(400, { message: 'Invalid route ID format' });
 
@@ -101,7 +102,8 @@ export const POST: RequestHandler = async ({ params, request }) => {
  * - When archived=true, query archive tables
  * - When archived=false (default), query main tables
  */
-export const GET: RequestHandler = async ({ params, url }) => {
+export const GET: RequestHandler = async ({ params, url, locals }) => {
+    if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
     const { routeId } = params;
     if (!isValidRouteId(routeId)) return error(400, { message: 'Invalid route ID format' });
 

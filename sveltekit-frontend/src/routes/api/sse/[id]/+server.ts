@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 /**
  * Phase 76: Server-Sent Events (SSE) Endpoint
  * Enhanced with heartbeat, error handling, and proper cleanup
@@ -17,7 +18,8 @@ function sseFormat(event: string, data: unknown): string {
 	return `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
 }
 
-export const GET: RequestHandler = async ({ params, request }) => {
+export const GET: RequestHandler = async ({ params, request, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const chatId = params.id;
 
   if (!isUuid(chatId)) {

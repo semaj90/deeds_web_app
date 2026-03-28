@@ -37,6 +37,7 @@ interface ClusterRequest {
  * Cluster similar legal cases based on embeddings
  */
 export const POST: RequestHandler = async (event) => {
+	if (!event.locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const auth = await requireAuth(event);
 	const startTime = Date.now();
 

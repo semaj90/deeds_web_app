@@ -30,7 +30,8 @@ const schema = z.object({
 	caseId: z.string().max(200).nullable().optional()
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = schema.safeParse(await request.json().catch(() => ({})));
 	if (!parsed.success) {
 		return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });

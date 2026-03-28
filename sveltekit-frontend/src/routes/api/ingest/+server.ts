@@ -8,7 +8,8 @@ const jsonBodySchema = z.object({
 });
 
 /** POST /api/ingest — Ingest documents into the RAG pipeline */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const contentType = request.headers.get('content-type') ?? '';
 

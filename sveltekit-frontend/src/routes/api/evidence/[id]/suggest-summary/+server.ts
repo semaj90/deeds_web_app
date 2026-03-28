@@ -9,7 +9,8 @@ import { isUuid } from '$lib/server/validation.js';
  * POST /api/evidence/[id]/suggest-summary
  * Generate an AI-suggested summary for an evidence item using Ollama
  */
-export const POST: RequestHandler = async ({ params }) => {
+export const POST: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const evidenceId = params.id;
 	if (!isUuid(evidenceId)) return json({ error: 'Invalid evidence ID format' }, { status: 400 });
 

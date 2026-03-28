@@ -19,7 +19,8 @@ const SCOPE_PROMPTS: Record<string, string> = {
 };
 
 /** POST /api/ai/analyze/[scope] — AI-powered analysis for case/evidence/poi/timeline */
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params, request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const scope = params.scope;
 
 	if (!VALID_SCOPES.includes(scope as (typeof VALID_SCOPES)[number])) {

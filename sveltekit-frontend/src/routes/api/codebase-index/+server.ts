@@ -38,7 +38,8 @@ interface QdrantScrollResponse {
 	status: string;
 }
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const limit = parseInt(url.searchParams.get('limit') ?? '100');
 		const offset = url.searchParams.get('offset') ?? null;
@@ -141,7 +142,8 @@ const codebaseSearchSchema = z.object({
 });
 
 // POST for semantic search using embedding
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = codebaseSearchSchema.safeParse(raw);

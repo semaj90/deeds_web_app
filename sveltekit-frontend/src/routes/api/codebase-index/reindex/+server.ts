@@ -18,7 +18,8 @@ const reindexSchema = z.object({
 	runClustering: z.boolean().optional().default(true)
 });
 
-export const POST: RequestHandler = async ({ request, fetch }) => {
+export const POST: RequestHandler = async ({ request, fetch, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		// Parse request body for options
 		const raw = await request.json().catch(() => ({}));

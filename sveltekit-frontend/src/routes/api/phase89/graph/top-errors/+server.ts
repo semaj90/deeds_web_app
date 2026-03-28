@@ -14,7 +14,8 @@ const querySchema = z.object({
  * GET /api/phase89/graph/top-errors?limit=20
  * Returns graph of files with most errors
  */
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	const limit = parsed.success ? parsed.data.limit : 20;
 

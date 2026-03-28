@@ -23,7 +23,8 @@ function isMissingRelationError(error: unknown): boolean {
   );
 }
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		// Fetch clusters with the new interface fields
 		const result = await aiPool

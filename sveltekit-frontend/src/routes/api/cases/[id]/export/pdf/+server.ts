@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { cases, evidence, caseNotes, citations, personsOfInterest } from '$lib/server/db/schema';
 import { arrayContains, eq, desc, sql } from 'drizzle-orm';
@@ -36,7 +37,8 @@ function fmtDate(d: string | Date | null | undefined): string {
  * Generates a print-friendly HTML case packet for download.
  * The user can open the HTML and use browser Print > Save as PDF.
  */
-export const POST: RequestHandler = async ({ params }) => {
+export const POST: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const id = params.id;
 	if (!isUuid(id)) {
 		return new Response(JSON.stringify({ error: 'Invalid case ID format' }), {

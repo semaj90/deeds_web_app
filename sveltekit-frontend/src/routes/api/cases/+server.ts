@@ -37,6 +37,7 @@ const caseListQuerySchema = z.object({
  * Query params: limit, offset, status, priority, search
  */
 export const GET: RequestHandler = async (event) => {
+	if (!event.locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const auth = await requireAuth(event);
 
 	const { url } = event;
@@ -89,6 +90,7 @@ export const GET: RequestHandler = async (event) => {
  * Create a new case
  */
 export const POST: RequestHandler = async (event) => {
+	if (!event.locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const auth = await requireAuth(event);
 
 	try {
@@ -135,6 +137,7 @@ export const POST: RequestHandler = async (event) => {
  * Bulk update multiple cases
  */
 export const PATCH: RequestHandler = async (event) => {
+  if (!event.locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const auth = await requireAuth(event);
 
   try {
@@ -178,6 +181,7 @@ export const PATCH: RequestHandler = async (event) => {
  * Bulk delete cases (soft delete by setting status to 'archived')
  */
 export const DELETE: RequestHandler = async (event) => {
+  if (!event.locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const auth = await requireAuth(event);
 
   try {

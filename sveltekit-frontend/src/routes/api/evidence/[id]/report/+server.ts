@@ -9,7 +9,8 @@ import { isUuid } from '$lib/server/validation.js';
  * GET /api/evidence/[id]/report
  * Generate an evidence analysis report for a single evidence item
  */
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const evidenceId = params.id;
 	if (!isUuid(evidenceId)) return json({ error: 'Invalid evidence ID format' }, { status: 400 });
 

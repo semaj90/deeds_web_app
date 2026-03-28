@@ -148,7 +148,8 @@ async function getReportSuggestions(query: string, limit: number): Promise<Platf
 		.map((r) => ({ text: r.value!, source: 'report' as const }));
 }
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	if (!parsed.success) {
 		return json({ suggestions: [], enrichedSuggestions: [], error: parsed.error.issues[0]?.message }, { status: 400 });

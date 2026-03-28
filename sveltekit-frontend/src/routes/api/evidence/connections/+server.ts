@@ -12,7 +12,8 @@ const connectionSchema = z.object({
 });
 
 /** POST /api/evidence/connections — Create a board-level connection between evidence nodes */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = connectionSchema.safeParse(raw);

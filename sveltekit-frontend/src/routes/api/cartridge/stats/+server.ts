@@ -8,7 +8,8 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getCartridgeCacheStats } from '$lib/server/cache/cartridge-tensor-bridge.js';
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const stats = await getCartridgeCacheStats();
 		return json({

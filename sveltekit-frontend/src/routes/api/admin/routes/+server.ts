@@ -27,7 +27,8 @@ interface RouteInfo {
 	last_modified: string;
 }
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const srcPath = path.join(process.cwd(), 'src');
 		const routes = await scanDirectory(srcPath);

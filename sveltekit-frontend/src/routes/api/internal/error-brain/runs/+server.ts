@@ -9,7 +9,8 @@ const errorBrainRunSchema = z.object({
 });
 
 /** GET /api/internal/error-brain/runs — Error analysis run history */
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const limit = Math.min(Number(url.searchParams.get('limit') || 20), 100);
 
 	try {
@@ -40,7 +41,8 @@ export const GET: RequestHandler = async ({ url }) => {
 };
 
 /** POST /api/internal/error-brain/runs — Trigger a new analysis run */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = errorBrainRunSchema.safeParse(raw);

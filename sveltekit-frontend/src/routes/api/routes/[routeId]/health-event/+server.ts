@@ -37,7 +37,8 @@ interface NewRouteHealthEvent {
  *
  * Create a health event for a route
  */
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params, request, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const { routeId } = params;
   if (!isValidRouteId(routeId)) return error(400, { message: 'Invalid route ID format' });
 
@@ -89,7 +90,8 @@ export const POST: RequestHandler = async ({ params, request }) => {
  *
  * Get health event history for a route
  */
-export const GET: RequestHandler = async ({ params, url }) => {
+export const GET: RequestHandler = async ({ params, url, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const { routeId } = params;
   if (!isValidRouteId(routeId)) return error(400, { message: 'Invalid route ID format' });
 

@@ -16,7 +16,8 @@ import { getTemplateCacheStats } from '$lib/server/cache/report-template-cache.j
 import { getExportCacheStats } from '$lib/server/cache/pdf-export-cache.js';
 // redis-metrics module removed — inline fallback below
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const redis = redisPool.getConnection();
 

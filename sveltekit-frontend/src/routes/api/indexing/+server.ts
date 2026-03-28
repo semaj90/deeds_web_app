@@ -132,7 +132,8 @@ const indexSearchSchema = z.object({
 
 // POST /api/indexing
 
-export const POST: RequestHandler = async ({ request, url }) => {
+export const POST: RequestHandler = async ({ request, url, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const pathname = url.pathname;
   const action = url.searchParams.get('action');
 
@@ -464,7 +465,8 @@ Phase: Phase 66-79 Error Analysis`.trim();
 
 // GET /api/indexing/status
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const codebaseResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionCode}`);
     const errorsResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}`);

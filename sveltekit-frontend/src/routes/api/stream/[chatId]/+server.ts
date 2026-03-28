@@ -4,7 +4,8 @@ import { isUuid } from '$lib/server/validation.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   if (!isUuid(params.chatId)) {
     return json({ error: 'Invalid ID format' }, { status: 400 });
   }

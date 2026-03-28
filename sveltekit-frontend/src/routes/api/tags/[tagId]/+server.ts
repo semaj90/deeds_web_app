@@ -4,7 +4,8 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { isValidSafeId } from '$lib/server/validation.js';
 
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const { tagId } = params;
 
 	if (!isValidSafeId(tagId)) {

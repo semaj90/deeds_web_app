@@ -40,7 +40,8 @@ async function embedQuery(query: string): Promise<number[] | null> {
 	}
 }
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const start = performance.now();
 	let body;
 	try {

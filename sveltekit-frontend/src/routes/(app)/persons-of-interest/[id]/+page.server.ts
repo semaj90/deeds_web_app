@@ -41,6 +41,8 @@ export const load: PageServerLoad = async ({ params }) => {
     []
   );
 
+  const profileData = (poi.profileData ?? {}) as Record<string, unknown>;
+
   return {
     poi: {
       id: poi.id,
@@ -60,6 +62,15 @@ export const load: PageServerLoad = async ({ params }) => {
       how: poi.how,
       risk: poi.risk,
       confidence: poi.confidence,
+      photoUrl: poi.photoUrl,
+      notes: poi.notes,
+      tags: poi.tags,
+      profileData,
+      physicalDescription: profileData.physicalDescription ?? null,
+      dateOfBirth: profileData.dateOfBirth ?? null,
+      lastKnownLocation: profileData.lastKnownLocation ?? null,
+      lastSeen: profileData.lastSeen ?? null,
+      lastLocation: profileData.lastLocation ?? null,
       createdAt: poi.createdAt?.toISOString() ?? '',
       updatedAt: poi.updatedAt?.toISOString() ?? '',
     },

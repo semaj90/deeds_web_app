@@ -19,7 +19,8 @@ const recentQuerySchema = z.object({
 const RECENT_KEY = 'cache:recent_queries';
 const MAX_RECENT = 20;
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		// Get recent queries from Redis sorted set (newest first)
 		const entries = await redis.zrevrange(RECENT_KEY, 0, MAX_RECENT - 1, 'WITHSCORES');
@@ -43,7 +44,8 @@ export const GET: RequestHandler = async () => {
 };
 
 /** POST to record a new query (called internally by search endpoints) */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = recentQuerySchema.safeParse(raw);

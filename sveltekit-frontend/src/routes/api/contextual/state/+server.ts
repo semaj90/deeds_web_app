@@ -11,7 +11,8 @@ const querySchema = z.object({
  * GET /api/contextual/state?sessionId=...&userId=...
  * Get HMM contextual state for a session
  */
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	if (!parsed.success) {
 		return json({ success: false, error: parsed.error.issues[0]?.message ?? 'sessionId required' }, { status: 400 });
@@ -57,7 +58,8 @@ export const GET: RequestHandler = async ({ url }) => {
  * DELETE /api/contextual/state?sessionId=...
  * Clear session state and history
  */
-export const DELETE: RequestHandler = async ({ url }) => {
+export const DELETE: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const delParsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	if (!delParsed.success) {
 		return json({ success: false, error: delParsed.error.issues[0]?.message ?? 'sessionId required' }, { status: 400 });

@@ -198,7 +198,8 @@ ${f.code}
 	}
 }
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const parsed = agentFixSchema.safeParse(await request.json());
 		if (!parsed.success) {

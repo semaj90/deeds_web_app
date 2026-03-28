@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 /**
  * SSE Streaming Endpoint
  * Provides real-time LLM responses via Server-Sent Events
@@ -20,7 +21,8 @@ const querySchema = z.object({
 	mode: z.enum(['ollama', 'rag']).default('ollama')
 });
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	if (!parsed.success) {
 		return new Response(parsed.error.issues[0]?.message ?? 'Missing query parameter', { status: 400 });

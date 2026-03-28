@@ -2,7 +2,8 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { getDatabaseUrl, getRedisUrl, getQdrantUrl, getOllamaUrl } from '$lib/config/env.server.js';
 import { env } from '$env/dynamic/private';
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const config = {
 		// PostgreSQL Configuration
 		postgres: { connectionString: getDatabaseUrl(),

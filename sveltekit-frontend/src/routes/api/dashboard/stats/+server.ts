@@ -8,7 +8,8 @@ import { savedCitations } from '$lib/server/db/client';
  * GET /api/dashboard/stats
  * Aggregate counts for the dashboard overview + knowledge base
  */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const exec = async (query: ReturnType<typeof sql>): Promise<Record<string, unknown>> => {
 		try {
 			const result = await db.execute(query);

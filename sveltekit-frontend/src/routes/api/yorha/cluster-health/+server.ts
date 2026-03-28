@@ -2,7 +2,8 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 
 /** GET /api/yorha/cluster-health — Cluster health metrics for YoRHa dashboard */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		// Collect system metrics
 		const memUsage = process.memoryUsage();

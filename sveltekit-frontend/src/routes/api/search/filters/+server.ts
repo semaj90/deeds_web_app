@@ -22,7 +22,8 @@ function distinctValues(rows: Array<{ value: string | null | undefined }>): stri
 	).sort((left, right) => left.localeCompare(right));
 }
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	if (!parsed.success) {
 		return json({ jurisdictions: [], categories: [], types: [], error: parsed.error.issues[0]?.message }, { status: 400 });

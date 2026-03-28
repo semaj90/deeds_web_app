@@ -18,7 +18,8 @@ const createMessageSchema = z.object({
 });
 
 /** POST /api/v1/chat/messages — Save a chat message to a session */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = createMessageSchema.safeParse(raw);

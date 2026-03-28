@@ -14,7 +14,8 @@ const routeHealthSchema = z.object({
 });
 
 /** POST /api/phase78/route-health — Update route health status */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = routeHealthSchema.safeParse(raw);

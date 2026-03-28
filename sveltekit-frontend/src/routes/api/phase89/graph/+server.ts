@@ -12,7 +12,8 @@ import type { RequestHandler } from './$types';
 
 const sql = postgres(getDatabaseUrl());
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     // Check if graph export exists
     const exportPath = path.resolve('reports/phase89-error-graph.json');

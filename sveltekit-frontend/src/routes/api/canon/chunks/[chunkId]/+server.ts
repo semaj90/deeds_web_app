@@ -9,7 +9,8 @@ import { canonicalChunks, canonicalDocuments } from '$lib/server/db/schema-postg
 import { eq } from 'drizzle-orm';
 import { isValidSafeId } from '$lib/server/validation.js';
 
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const { chunkId } = params;
 
 	if (!isValidSafeId(chunkId)) {

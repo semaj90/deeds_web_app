@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { chatMessages } from '$lib/server/db/schema';
@@ -660,6 +661,7 @@ function dagOrderContext(docs: ContextDoc[]): ContextDoc[] {
 }
 
 export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const raw = await request.json();
   const parsed = sseChatSchema.safeParse(raw);
   if (!parsed.success) {

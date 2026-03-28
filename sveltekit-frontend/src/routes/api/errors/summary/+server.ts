@@ -7,7 +7,8 @@ import type { RequestHandler } from '@sveltejs/kit';
  * GET /api/errors/summary
  * Error counts aggregated by route — used by /cases/[id]/overview diagnostics
  */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const result = await db.execute(sql`
 			SELECT code, file_path, COUNT(*) as count

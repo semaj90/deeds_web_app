@@ -16,7 +16,8 @@ const querySchema = z.object({
 });
 
 /** GET /api/routes/metadata — Comprehensive route metadata for /all-routes UI */
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
     const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
     const includeArchived = parsed.success ? parsed.data.includeArchived === 'true' : false;

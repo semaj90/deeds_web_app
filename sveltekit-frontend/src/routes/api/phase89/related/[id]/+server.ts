@@ -8,7 +8,8 @@ import { isUuid } from '$lib/server/validation.js';
 
 const QDRANT_URL = getQdrantUrl();
 
-export const GET: RequestHandler = async ({ params, fetch }) => {
+export const GET: RequestHandler = async ({ params, fetch, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const componentId = params.id;
 
 	if (!isUuid(componentId)) {

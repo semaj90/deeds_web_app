@@ -7,7 +7,8 @@ const cacheCheckSchema = z.object({
 });
 
 /** POST /api/v1/ai/summary-cache — Check if a summary is cached by text hash */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = cacheCheckSchema.safeParse(raw);

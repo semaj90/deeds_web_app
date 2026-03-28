@@ -14,7 +14,8 @@ const autoSaveSchema = z.object({
  * POST /api/documents/[id]/auto-save
  * Auto-save document content (debounced by client)
  */
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params, request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const { id } = params;
 
 	if (!isUuid(id)) {

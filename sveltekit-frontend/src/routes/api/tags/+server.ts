@@ -4,7 +4,8 @@ import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 
 /** GET /api/tags — List all unique tags from evidence and cases */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		// Extract unique tags from evidence metadata JSONB
 		const result = await db.execute(sql`

@@ -22,7 +22,8 @@ const gpuComputeSchema = z.object({
 	query: z.string().max(2048).optional(),
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const raw = await request.json();
 	const parsed = gpuComputeSchema.safeParse(raw);
 	if (!parsed.success) {

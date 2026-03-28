@@ -7,7 +7,8 @@ import { sql, eq } from 'drizzle-orm';
  * GET /api/consolidation/status
  * Returns real error cluster and route health statistics from the database.
  */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const [clusterRows, errorCount, healthyRoutes, degradedRoutes] = await Promise.all([
 			db.select({ count: sql<number>`count(*)::int` }).from(errorClusters),

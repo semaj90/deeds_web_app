@@ -27,7 +27,8 @@ interface ValidatedSource { chunk_id: string, content: string;
   selected: boolean;
 }
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const raw = await request.json();
     const parsed = validateSourcesSchema.safeParse(raw);
@@ -120,7 +121,8 @@ export const POST: RequestHandler = async ({ request }) => {
   }
 };
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const queryId = url.searchParams.get('query_id');
   const caseId = url.searchParams.get('case_id');
 

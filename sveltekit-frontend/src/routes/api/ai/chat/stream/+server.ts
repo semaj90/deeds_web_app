@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
@@ -15,7 +16,8 @@ const streamSchema = z.object({
 }).refine((d) => d.query?.trim() || d.message?.trim(), { message: 'query or message required' });
 
 /** POST /api/ai/chat/stream — Streaming chat via Ollama (ReadableStream, not SSE) */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	let body: z.infer<typeof streamSchema>;
 	try {
 		const raw = await request.json();

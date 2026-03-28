@@ -7,7 +7,8 @@ import { json } from '@sveltejs/kit';
 import { getRedis } from '$lib/server/redis.js';
 import type { RequestHandler } from './$types';
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const client = getRedis();
 

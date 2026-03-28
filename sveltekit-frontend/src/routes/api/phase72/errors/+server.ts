@@ -14,7 +14,8 @@ const querySchema = z.object({
  * Returns errors from phase72_error table for Phase72ErrorBrain modal.
  * Route filter is optional — returns all errors if omitted.
  */
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	if (!parsed.success) {
 		return json({ errors: [], stats: null, error: parsed.error.issues[0]?.message }, { status: 400 });

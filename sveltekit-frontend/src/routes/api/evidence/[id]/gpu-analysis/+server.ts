@@ -13,7 +13,8 @@ import { evidence } from '$lib/server/db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
 import { isUuid } from '$lib/server/validation.js';
 
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const { id } = params;
 	if (!isUuid(id)) throw error(400, 'Invalid evidence ID format');
 
@@ -38,7 +39,8 @@ export const GET: RequestHandler = async ({ params }) => {
 	});
 };
 
-export const POST: RequestHandler = async ({ params }) => {
+export const POST: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const { id } = params;
 	if (!isUuid(id)) throw error(400, 'Invalid evidence ID format');
 

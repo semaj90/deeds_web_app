@@ -20,7 +20,8 @@ const execAsync = promisify(exec);
  * Body: { filePath: string, fixId?: string }
  * Returns: { verified: boolean, errors: string[], fixId }
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	// Zod schema validates filePath required + fixId optional
 	const parsed = verifyFixSchema.safeParse(await request.json());
 	if (!parsed.success) {

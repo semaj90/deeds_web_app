@@ -60,6 +60,7 @@ interface AnalyticsData {
  * Query params: dateStart, dateEnd, caseType, priority, includeClusters
  */
 export const GET: RequestHandler = async (event) => {
+	if (!event.locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const auth = await requireAuth(event);
 	const startTime = Date.now();
 

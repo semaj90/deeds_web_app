@@ -15,7 +15,8 @@ const documentUpdateSchema = z.object({
  * GET /api/documents/[id]
  * Fetch a single document by ID
  */
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const { id } = params;
 
 	if (!isUuid(id)) {
@@ -55,7 +56,8 @@ export const GET: RequestHandler = async ({ params }) => {
  * PUT /api/documents/[id]
  * Update document content and status
  */
-export const PUT: RequestHandler = async ({ params, request }) => {
+export const PUT: RequestHandler = async ({ params, request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const { id } = params;
 
 	if (!isUuid(id)) {

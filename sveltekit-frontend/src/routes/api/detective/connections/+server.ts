@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 /**
  * Detective Connections SSE Endpoint
  * Streams entity relationship graph generation for case evidence.
@@ -31,7 +32,8 @@ const TYPE_COLORS: Record<string, string> = {
 	evidence: '#e11d48'
 };
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const body = await request.json().catch(() => null);
 	if (!body) {
 		return new Response(JSON.stringify({ error: 'Invalid JSON' }), { status: 400 });

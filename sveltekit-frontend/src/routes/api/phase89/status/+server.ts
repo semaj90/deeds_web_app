@@ -11,7 +11,8 @@ const pgPool = new Pool({
 
 const QDRANT_URL = getQdrantUrl();
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		// PostgreSQL Stats
 		const [errorStats, embeddingsCount, fixAttempts, kbCards] = await Promise.all([

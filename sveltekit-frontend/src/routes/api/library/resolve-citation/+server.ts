@@ -10,7 +10,8 @@ const querySchema = z.object({
  * GET /api/library/resolve-citation?q=...
  * Resolves a citation string (e.g. "Art. I, § 1") to a specific legal node.
  */
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	if (!parsed.success) {
 		return json({ error: parsed.error.issues[0]?.message ?? 'Missing query' }, { status: 400 });

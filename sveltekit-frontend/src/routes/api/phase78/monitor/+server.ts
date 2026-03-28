@@ -3,7 +3,8 @@ import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 
 /** GET /api/phase78/monitor — Phase78 error monitoring dashboard stats */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const { routeHealth } = await import('$lib/server/db/schema.js');
 		const { desc } = await import('drizzle-orm');

@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 /**
  * Phase 89: SSE Stream Endpoint
  * Real-time event stream for topology updates
@@ -6,7 +7,8 @@
 import type { RequestHandler } from './$types';
 import { getRedis } from '$lib/server/redis.js';
 
-export const GET: RequestHandler = async ({ request }) => {
+export const GET: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const redis = getRedis();
   const isConnected = redis.status === 'ready';
 

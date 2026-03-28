@@ -20,7 +20,8 @@ const yorhaChatSchema = z.object({
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const MODEL = 'gemma3-legal:latest';
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = yorhaChatSchema.safeParse(await request.json());
 	if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	const message = parsed.data.message;

@@ -16,7 +16,8 @@ const approveRejectSchema = z.object({
  * POST /api/evidence/[id]/approve
  * Approve or reject an evidence item (updates metadata with review status)
  */
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params, request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const evidenceId = params.id;
 	if (!isUuid(evidenceId)) return json({ error: 'Invalid evidence ID format' }, { status: 400 });
 

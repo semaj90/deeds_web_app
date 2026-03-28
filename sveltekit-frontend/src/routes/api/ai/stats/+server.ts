@@ -14,7 +14,8 @@ const ollamaTagsSchema = z.object({
 	}).passthrough()).optional().default([]),
 }).passthrough();
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const ollamaUrl = ENV.OLLAMA_BASE_URL;
 	let ollamaStatus = 'disconnected';
 	let embeddingModel = 'embeddinggemma:latest';

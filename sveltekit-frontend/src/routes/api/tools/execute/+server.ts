@@ -17,6 +17,7 @@ const executeToolSchema = z.object({
 });
 
 export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const raw = await request.json();
     const parsed = executeToolSchema.safeParse(raw);
@@ -46,7 +47,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 };
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   // Return list of available tools
   const tools = toolRegistry.list().map(name => {
     const tool = toolRegistry.get(name);
