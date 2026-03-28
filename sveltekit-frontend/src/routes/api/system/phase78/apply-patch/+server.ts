@@ -1,4 +1,4 @@
-import db from '$lib/server/db/drizzle.js';
+import { db } from '$lib/server/db/client';
 import { errorSuggestionsTable } from '$lib/server/db/schema/index.js';
 import { error, json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
