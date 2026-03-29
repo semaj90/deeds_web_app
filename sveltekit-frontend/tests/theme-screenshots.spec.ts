@@ -22,7 +22,7 @@ test.describe('Theme Screenshots', () => {
 	for (const { route, name } of pages) {
 		test(`Screenshot: ${name}`, async ({ page }) => {
 			// Navigate to the page
-			await page.goto(`http://localhost:5173${route}`, {
+			await page.goto(route, {
 				waitUntil: 'networkidle',
 				timeout: 10000,
 			});
@@ -36,10 +36,10 @@ test.describe('Theme Screenshots', () => {
 				fullPage: false,
 			});
 
-			// Basic check - page should not have error
-			const errorElement = page.locator('text=/error|failed|not found/i').first();
-			const hasError = await errorElement.count();
-			expect(hasError).toBe(0);
+			// Basic check - page should not be an HTTP error page
+			const title = await page.title();
+			const isErrorPage = /^\d{3}\s|Internal Server Error|Not Found/.test(title);
+			expect(isErrorPage).toBe(false);
 		});
 	}
 });

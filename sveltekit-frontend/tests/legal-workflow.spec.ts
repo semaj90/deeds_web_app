@@ -12,7 +12,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Test configuration
-const BASE_URL = 'http://localhost:5177';
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
 const TEST_PDF_PATH = path.join(__dirname, 'complaint.pdf');
 
 // Routes to test from navigation
