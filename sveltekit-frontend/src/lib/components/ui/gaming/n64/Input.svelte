@@ -19,7 +19,7 @@
     pattern?: string;
     readonly?: boolean;
     disabled?: boolean;
-    autocomplete?: string;
+    autocomplete?: HTMLInputElement['autocomplete'];
 
     // N64 Props
     era?: string;

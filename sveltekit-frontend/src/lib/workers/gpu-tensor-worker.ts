@@ -182,7 +182,7 @@ class GPUTensorWorker {
 		});
 
 		const bindGroup = device.createBindGroup({
-			layout: pipeline.getBindGroupLayout(0),
+			layout: pipeline.getBindGroupLayout(0) as unknown as GPUBindGroupLayout,
 			entries: [
 				{ binding: 0, resource: { buffer: paramsBuf } },
 				{ binding: 1, resource: { buffer: vectorBuf } }

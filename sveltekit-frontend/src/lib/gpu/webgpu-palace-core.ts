@@ -304,7 +304,7 @@ export class WebGPUPalaceCore {
 		this.device.queue.writeBuffer(this.uniformBuffer, 0, uniformData);
 
 		const bindGroup = this.device.createBindGroup({
-			layout: this.renderPipeline.getBindGroupLayout(0),
+			layout: this.renderPipeline.getBindGroupLayout(0) as unknown as GPUBindGroupLayout,
 			entries: [{ binding: 0, resource: { buffer: this.uniformBuffer } }]
 		});
 		renderPass.setBindGroup(0, bindGroup);
