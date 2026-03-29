@@ -45,6 +45,7 @@ const shouldRunSingletonTasks = shouldRunBootTasks && isClusterWorker1;
 // ── Per-Route Rate Limiting (Sprint 4 → upgraded Sprint 5) ───────────────
 // In-memory sliding window — per route tier + IP
 // Entries: Map<"tier:ip", { count, resetTime }>
+const RATE_LIMIT_MAX_ENTRIES = 50_000;
 const rateLimits = new Map<string, { count: number; resetTime: number }>();
 
 /** Route-specific rate limit tiers — matched in order, first match wins */
@@ -399,6 +400,11 @@ export const handle: Handle = async ({ event, resolve }) => {
       const entry = rateLimits.get(key);
 
       if (!entry || now > entry.resetTime) {
+        // Evict oldest if at capacity (prevent unbounded growth from unique IPs)
+        if (!rateLimits.has(key) && rateLimits.size >= RATE_LIMIT_MAX_ENTRIES) {
+          const oldest = rateLimits.keys().next().value;
+          if (oldest) rateLimits.delete(oldest);
+        }
         rateLimits.set(key, { count: 1, resetTime: now + tier.window });
       } else if (entry.count >= tier.max) {
         const retryAfter = Math.ceil((entry.resetTime - now) / 1000);

@@ -337,7 +337,12 @@ export class CachingLayer {
 		const idx = this.lruAccessOrder.indexOf(key);
 		if (idx !== -1) {
 			this.lruAccessOrder.splice(idx, 1);
-			this.lruAccessOrder.push(key);
+		}
+		this.lruAccessOrder.push(key);
+
+		// Compact if access order has diverged from cache (stale entries)
+		if (this.lruAccessOrder.length > this.lruCache.size * 2) {
+			this.lruAccessOrder = this.lruAccessOrder.filter(k => this.lruCache.has(k));
 		}
 	}
 

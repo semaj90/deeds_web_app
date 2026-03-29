@@ -2,39 +2,42 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { pool as pgPool } from '$lib/server/db/client';
 
-const clients = new Set<ReadableStreamDefaultController>();
+const MAX_SSE_CLIENTS = 200;
+const ZOMBIE_TIMEOUT_MS = 120_000;
+const clients = new Map<ReadableStreamDefaultController, number>();
+
+// Periodic zombie cleanup
+setInterval(() => {
+	const now = Date.now();
+	for (const [ctrl, lastActive] of clients) {
+		if (now - lastActive > ZOMBIE_TIMEOUT_MS) {
+			clients.delete(ctrl);
+			try { ctrl.close(); } catch { /* already closed */ }
+		}
+	}
+}, 60_000).unref();
+
+function broadcastToClients(message: Uint8Array) {
+	for (const [controller] of clients) {
+		try {
+			controller.enqueue(message);
+			clients.set(controller, Date.now());
+		} catch {
+			clients.delete(controller);
+		}
+	}
+}
 
 export function _broadcastRouteUpdate(data: unknown) {
-	const message = `event: route_updated\ndata: ${JSON.stringify(data)}\n\n`;
-	clients.forEach(controller => {
-		try {
-			controller.enqueue(new TextEncoder().encode(message));
-		} catch (error) {
-			// Client disconnected
-		}
-	});
+	broadcastToClients(new TextEncoder().encode(`event: route_updated\ndata: ${JSON.stringify(data)}\n\n`));
 }
 
 export function _broadcastAgentProgress(data: unknown) {
-	const message = `event: agent_progress\ndata: ${JSON.stringify(data)}\n\n`;
-	clients.forEach(controller => {
-		try {
-			controller.enqueue(new TextEncoder().encode(message));
-		} catch (error) {
-			// Client disconnected
-		}
-	});
+	broadcastToClients(new TextEncoder().encode(`event: agent_progress\ndata: ${JSON.stringify(data)}\n\n`));
 }
 
 export function _broadcastKBSync(data: unknown) {
-	const message = `event: kb_synced\ndata: ${JSON.stringify(data)}\n\n`;
-	clients.forEach(controller => {
-		try {
-			controller.enqueue(new TextEncoder().encode(message));
-		} catch (error) {
-			// Client disconnected
-		}
-	});
+	broadcastToClients(new TextEncoder().encode(`event: kb_synced\ndata: ${JSON.stringify(data)}\n\n`));
 }
 
 export const GET: RequestHandler = async ({ locals }) => {
@@ -45,8 +48,13 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 	const stream = new ReadableStream({
 		start(controller) {
+			// Reject if at capacity
+			if (clients.size >= MAX_SSE_CLIENTS) {
+				controller.close();
+				return;
+			}
 			activeController = controller;
-			clients.add(controller);
+			clients.set(controller, Date.now());
 
 			// Welcome message
 			const welcomeMsg = `event: connected\ndata: ${JSON.stringify({ message: 'Connected to route explorer stream' })}\n\n`;
@@ -56,6 +64,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 			heartbeatId = setInterval(() => {
 				try {
 					controller.enqueue(new TextEncoder().encode(': heartbeat\n\n'));
+					clients.set(controller, Date.now());
 				} catch {
 					clearInterval(heartbeatId);
 					clearInterval(monitorId);
@@ -63,10 +72,9 @@ export const GET: RequestHandler = async ({ locals }) => {
 				}
 			}, 30000);
 
-			// Monitor for changes
+			// Monitor for changes (with error cleanup + LIMIT)
 			monitorId = setInterval(async () => {
 				try {
-					// Check for recent file changes
 					const result = await pgPool.query(`
 						SELECT
 							file_path,
@@ -76,6 +84,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 						WHERE source = 'svelte-check'
 						  AND created_at > NOW() - INTERVAL '10 seconds'
 						GROUP BY file_path
+						LIMIT 100
 					`);
 
 					if (result.rows.length > 0) {
@@ -94,6 +103,11 @@ export const GET: RequestHandler = async ({ locals }) => {
 					}
 				} catch (error) {
 					console.error('Monitor error:', error);
+					// Clean up on DB failure to prevent zombie polling
+					clearInterval(monitorId);
+					clearInterval(heartbeatId);
+					clients.delete(controller);
+					try { controller.close(); } catch { /* already closed */ }
 				}
 			}, 5000);
 

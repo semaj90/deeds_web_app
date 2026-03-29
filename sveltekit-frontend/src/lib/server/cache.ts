@@ -88,7 +88,19 @@ export function getFromMemoryCache(key: string): {
   return { found: true, value: entry.value };
 }
 
+const TOKEN_BUCKET_MAX_ENTRIES = 10_000;
 const tokenBuckets = new Map<string, { tokens: number; lastRefill: number }>();
+
+// Periodic cleanup: evict stale buckets every 60s
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, bucket] of tokenBuckets) {
+    // Bucket is stale if it hasn't been refilled in 2 windows
+    if (now - bucket.lastRefill > RATE_LIMIT_REFILL_MS * 2) {
+      tokenBuckets.delete(key);
+    }
+  }
+}, 60_000).unref();
 
 export function checkRateLimit(key = 'global'): {
   ok: boolean;
@@ -109,6 +121,12 @@ export function checkRateLimit(key = 'global'): {
   if (bucket.tokens <= 0) {
     tokenBuckets.set(key, bucket);
     return { ok: false, remaining: 0 };
+  }
+
+  // Enforce max entries — evict oldest if at capacity
+  if (!tokenBuckets.has(key) && tokenBuckets.size >= TOKEN_BUCKET_MAX_ENTRIES) {
+    const oldest = tokenBuckets.keys().next().value;
+    if (oldest) tokenBuckets.delete(oldest);
   }
 
   bucket.tokens -= 1;

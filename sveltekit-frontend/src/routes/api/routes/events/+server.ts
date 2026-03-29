@@ -10,8 +10,21 @@ import { json } from '@sveltejs/kit';
 
 import type { RequestHandler } from './$types.js';
 
-// Store active SSE connections
-const connections = new Set<ReadableStreamDefaultController>();
+// Store active SSE connections with last-active timestamps for zombie detection
+const MAX_SSE_CONNECTIONS = 500;
+const ZOMBIE_TIMEOUT_MS = 120_000; // 2 minutes without heartbeat = zombie
+const connections = new Map<ReadableStreamDefaultController, number>();
+
+// Periodic zombie cleanup every 60s
+setInterval(() => {
+  const now = Date.now();
+  for (const [ctrl, lastActive] of connections) {
+    if (now - lastActive > ZOMBIE_TIMEOUT_MS) {
+      connections.delete(ctrl);
+      try { ctrl.close(); } catch { /* already closed */ }
+    }
+  }
+}, 60_000).unref();
 
 /**
  * GET /api/routes/events
@@ -31,8 +44,13 @@ export const GET: RequestHandler = async ({ locals }) => {
 
   const stream = new ReadableStream({
     start(controller) {
+      // Reject if at capacity
+      if (connections.size >= MAX_SSE_CONNECTIONS) {
+        controller.close();
+        return;
+      }
       activeController = controller;
-      connections.add(controller);
+      connections.set(controller, Date.now());
 
       // Send initial connection message
       try {
@@ -49,6 +67,7 @@ export const GET: RequestHandler = async ({ locals }) => {
       heartbeatId = setInterval(() => {
         try {
           controller.enqueue(`: heartbeat\n\n`);
+          connections.set(controller, Date.now()); // refresh timestamp
         } catch {
           clearInterval(heartbeatId);
           connections.delete(controller);
@@ -92,16 +111,17 @@ export function _broadcastHealthChange(data: { routeId: string,
   let successCount = 0;
   let failureCount = 0;
 
-  connections.forEach((controller) => {
+  for (const [controller] of connections) {
     try {
       controller.enqueue(message);
+      connections.set(controller, Date.now());
       successCount++;
     } catch (error) {
       console.error('[SSE] Failed to send to client, removing connection:', error);
       connections.delete(controller);
       failureCount++;
     }
-  });
+  }
 
   console.log(`[SSE] Broadcast complete: ${successCount} success, ${failureCount} failures`);
 }
@@ -124,14 +144,15 @@ export function _broadcastErrorCountChange(data: { routeId: string,
 
   console.log(`[SSE] Broadcasting error count change for route ${data.routeId}: ${data.errorCount} errors`);
 
-  connections.forEach((controller) => {
+  for (const [controller] of connections) {
     try {
       controller.enqueue(message);
+      connections.set(controller, Date.now());
     } catch (error) {
       console.error('[SSE] Failed to send error count update:', error);
       connections.delete(controller);
     }
-  });
+  }
 }
 
 /**

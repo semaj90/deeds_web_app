@@ -15,6 +15,52 @@ import { isUuid } from '$lib/server/validation.js';
 
 const REDIS_URL = getRedisUrl();
 
+// Shared Redis pub/sub connection — ONE connection for ALL SSE clients
+// Each client registers a callback; the shared subscriber fans out messages
+let sharedSubscriber: IORedis | null = null;
+const channelCallbacks = new Map<string, Set<(message: string) => void>>();
+
+function getSharedSubscriber(): IORedis {
+  if (!sharedSubscriber || sharedSubscriber.status === 'end') {
+    sharedSubscriber = new IORedis(REDIS_URL, {
+      maxRetriesPerRequest: 2,
+      enableReadyCheck: true,
+      lazyConnect: false,
+    });
+    sharedSubscriber.on('message', (channel: string, message: string) => {
+      const cbs = channelCallbacks.get(channel);
+      if (cbs) {
+        for (const cb of cbs) {
+          try { cb(message); } catch { /* individual callback error */ }
+        }
+      }
+    });
+    sharedSubscriber.on('error', (err) => {
+      console.warn('[SSE shared sub] Redis error:', err.message);
+    });
+  }
+  return sharedSubscriber;
+}
+
+async function subscribeChannel(channel: string, cb: (message: string) => void): Promise<void> {
+  const sub = getSharedSubscriber();
+  if (!channelCallbacks.has(channel)) {
+    channelCallbacks.set(channel, new Set());
+    await sub.subscribe(channel);
+  }
+  channelCallbacks.get(channel)!.add(cb);
+}
+
+async function unsubscribeChannel(channel: string, cb: (message: string) => void): Promise<void> {
+  const cbs = channelCallbacks.get(channel);
+  if (!cbs) return;
+  cbs.delete(cb);
+  if (cbs.size === 0) {
+    channelCallbacks.delete(channel);
+    try { await sharedSubscriber?.unsubscribe(channel); } catch { /* ignore */ }
+  }
+}
+
 export const GET: RequestHandler = async ({ params, request, locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const chatId = params.id;
@@ -25,16 +71,13 @@ export const GET: RequestHandler = async ({ params, request, locals }) => {
 
   // Replay missed tokens if client reconnects with Last-Event-ID
   const lastEventId = request.headers.get('last-event-id');
-  // Create a dedicated Redis connection for pub/sub (ioredis auto-connects)
-  const redisSubscriber = new IORedis(REDIS_URL, {
-    maxRetriesPerRequest: 2,
-    enableReadyCheck: true,
-  });
 
   let closed = false;
   let heartbeatInterval: ReturnType<typeof setInterval> | null = null;
+  let messageCallback: ((message: string) => void) | null = null;
+  const channel = `updates:${chatId}`;
 
-  console.log(`📡 SSE connection request for chat:${chatId}`);
+  console.log(`[SSE] connection request for chat:${chatId}`);
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -45,26 +88,11 @@ export const GET: RequestHandler = async ({ params, request, locals }) => {
         try {
           controller.enqueue(encoder.encode(sseFormat(event, data)));
         } catch (e) {
-          // Controller may be closed
           console.warn('SSE write failed:', e);
         }
       };
 
       try {
-        // Wait for Redis to be ready
-        await new Promise<void>((resolve, reject) => {
-          if (redisSubscriber.status === 'ready') {
-            resolve();
-            return;
-          }
-          redisSubscriber.once('ready', resolve);
-          redisSubscriber.once('error', reject);
-          // Timeout after 5 seconds
-          setTimeout(() => reject(new Error('Redis connection timeout')), 5000);
-        });
-
-        console.log(`📡 SSE Redis connected for chat:${chatId}`);
-
         // Replay any missed messages since the client's last-event-id
         if (lastEventId) {
           try {
@@ -81,41 +109,33 @@ export const GET: RequestHandler = async ({ params, request, locals }) => {
               console.log(`[SSE] Replayed ${missed.length} missed tokens for chat:${chatId}`);
             }
           } catch {
-            // Replay is best-effort — don't fail the connection
+            // Replay is best-effort
           }
         }
 
-        // Send initial ready event so tests can detect connection
+        // Send initial ready event
         write('ready', { chatId, timestamp: new Date().toISOString() });
 
-        // Subscribe to the specific Redis channel for this chat ID
-        const channel = `updates:${chatId}`;
-
-        redisSubscriber.on('message', (ch: string, message: string) => {
-          if (ch !== channel) return;
-
+        // Subscribe via shared pub/sub connection (1 Redis conn for ALL clients)
+        messageCallback = (message: string) => {
           try {
-            // Parse and forward the message
             const data = JSON.parse(message);
             write('message', data);
-            // Persist delta chunks to Redis Stream for replay on reconnect
             if (data.type === 'delta' && typeof data.content === 'string') {
               const seq = data.seq ?? Date.now();
               produceTokenChunk(chatId, seq, data.content, { model: data.model ?? '' }).catch(
                 () => {}
               );
             }
-            console.log(`📨 SSE forwarded ${data.type} to chat:${chatId}`);
-          } catch (error) {
-            // If not JSON, send as raw content
+          } catch {
             write('message', { type: 'delta', content: message });
           }
-        });
+        };
 
-        await redisSubscriber.subscribe(channel);
-        console.log(`📡 SSE subscribed to ${channel}`);
+        await subscribeChannel(channel, messageCallback);
+        console.log(`[SSE] subscribed to ${channel}`);
 
-        // Keepalive ping every 15 seconds (some proxies kill idle streams)
+        // Keepalive ping every 15 seconds
         heartbeatInterval = setInterval(() => {
           write('ping', { t: Date.now() });
         }, 15000);
@@ -127,23 +147,15 @@ export const GET: RequestHandler = async ({ params, request, locals }) => {
     },
 
     cancel() {
-      console.log(`🔌 SSE connection closed for chat:${chatId}`);
+      console.log(`[SSE] connection closed for chat:${chatId}`);
       closed = true;
-
-      // Clear heartbeat
       if (heartbeatInterval) {
         clearInterval(heartbeatInterval);
         heartbeatInterval = null;
       }
-
-      // Cleanup Redis connection safely
-      try {
-        if (redisSubscriber.status === 'ready' || redisSubscriber.status === 'connect') {
-          redisSubscriber.unsubscribe(`updates:${chatId}`).catch(() => {});
-          redisSubscriber.quit().catch(() => {});
-        }
-      } catch (e) {
-        // Ignore cleanup errors - connection may already be closed
+      if (messageCallback) {
+        unsubscribeChannel(channel, messageCallback).catch(() => {});
+        messageCallback = null;
       }
     },
   });
@@ -155,13 +167,9 @@ export const GET: RequestHandler = async ({ params, request, locals }) => {
       clearInterval(heartbeatInterval);
       heartbeatInterval = null;
     }
-    try {
-      if (redisSubscriber.status === 'ready' || redisSubscriber.status === 'connect') {
-        redisSubscriber.unsubscribe(`updates:${chatId}`).catch(() => {});
-        redisSubscriber.quit().catch(() => {});
-      }
-    } catch (e) {
-      // Ignore cleanup errors
+    if (messageCallback) {
+      unsubscribeChannel(channel, messageCallback).catch(() => {});
+      messageCallback = null;
     }
   });
 

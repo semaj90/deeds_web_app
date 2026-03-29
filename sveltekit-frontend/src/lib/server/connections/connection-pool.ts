@@ -248,7 +248,7 @@ export async function ensureRabbitChannel(): Promise<AmqpChannel> {
 	const connection = await ensureRabbitConnection();
 	rabbitChannelInstance = await connection.createChannel();
 
-	// Handle channel errors
+	// Handle channel errors (listeners auto-GC when channel object is replaced)
 	rabbitChannelInstance.on('error', (err: any) => {
 		console.error('RabbitMQ channel error: ', err);
 		rabbitChannelInstance = null;

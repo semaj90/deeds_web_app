@@ -286,9 +286,16 @@ export async function phase90_query_glyphs(
 ): Promise<GlyphData[]> {
 	const redisClient = await getRedisClient();
 
-	const pattern = 'glyph:*';
-	const allKeys = await redisClient.keys(pattern);
-	const keys = allKeys.slice(0, limit * 10);
+	// Use SCAN instead of .keys() to avoid loading all keys into memory
+	const maxKeys = limit * 10;
+	const keys: string[] = [];
+	let cursor = '0';
+	do {
+		const [nextCursor, batch] = await redisClient.scan(cursor, 'MATCH', 'glyph:*', 'COUNT', 200);
+		cursor = nextCursor;
+		keys.push(...batch);
+		if (keys.length >= maxKeys) break;
+	} while (cursor !== '0');
 
 	const glyphs: GlyphData[] = [];
 
@@ -335,8 +342,22 @@ export async function phase90_get_stats(): Promise<{
 	const recs = await qdrantClient.getCollection('phase90_fix_recommendations');
 
 	const totalKeys = await redisClient.dbsize();
-	const glyphKeys = await redisClient.keys('glyph:*');
-	const embedKeys = await redisClient.keys('embed:*');
+
+	// Use SCAN to count keys instead of .keys() which loads all into memory
+	let glyphCount = 0;
+	let embedCount = 0;
+	let cursor = '0';
+	do {
+		const [nextCursor, batch] = await redisClient.scan(cursor, 'MATCH', 'glyph:*', 'COUNT', 500);
+		cursor = nextCursor;
+		glyphCount += batch.length;
+	} while (cursor !== '0');
+	cursor = '0';
+	do {
+		const [nextCursor, batch] = await redisClient.scan(cursor, 'MATCH', 'embed:*', 'COUNT', 500);
+		cursor = nextCursor;
+		embedCount += batch.length;
+	} while (cursor !== '0');
 
 	return {
 		qdrant: {
@@ -346,8 +367,8 @@ export async function phase90_get_stats(): Promise<{
 		},
 	redis: {
 			totalKeys,
-			glyphKeys: glyphKeys.length,
-			embedKeys: embedKeys.length
+			glyphKeys: glyphCount,
+			embedKeys: embedCount
 		}
 	};
 }
