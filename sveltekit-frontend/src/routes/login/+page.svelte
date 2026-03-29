@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { dev } from '$app/environment';
+	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { authMachine } from '$lib/machines/auth-machine.js';
 	import { createActor } from 'xstate';
@@ -11,8 +11,6 @@
 
 	let email = $state('');
 	let password = $state('');
-	let isSeedingDemo = $state(false);
-	let demoSeedError = $state('');
 
 	// XState v5 auth actor — manages login lifecycle, attempt tracking, lockout
 	const actor = createActor(authMachine);
@@ -45,9 +43,21 @@
 		}
 	});
 
+	// Auto-fill demo credentials from ?demo=true query param
+	$effect(() => {
+		const isDemo = $page.url.searchParams.get('demo') === 'true';
+		if (isDemo && !email && !isLoading && !isAuthenticated) {
+			email = demoCredentials.email;
+			password = demoCredentials.password;
+			// Small delay to let fields render before submitting
+			setTimeout(() => {
+				actor.send({ type: 'START_LOGIN', data: { email: demoCredentials.email, password: demoCredentials.password } });
+			}, 100);
+		}
+	});
+
 	function handleSubmit(e: Event) {
 		e.preventDefault();
-		demoSeedError = '';
 		if (!email.trim() || !password) return;
 		actor.send({ type: 'START_LOGIN', data: { email: email.trim(), password } });
 	}
@@ -56,34 +66,11 @@
 		actor.send({ type: 'UNLOCK_ACCOUNT' });
 	}
 
-	async function handleSeedDemoUser() {
-		if (!dev || isSeedingDemo || isLoading) return;
-
-		demoSeedError = '';
-		isSeedingDemo = true;
-
-		try {
-			const res = await fetch('/api/auth/demo-login', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				credentials: 'include',
-				body: JSON.stringify({ email: demoCredentials.email, role: 'admin' })
-			});
-
-			const data = await res.json().catch(() => ({}));
-			if (!res.ok) {
-				demoSeedError = typeof data.error === 'string' ? data.error : 'Demo seed failed';
-				return;
-			}
-
-			email = demoCredentials.email;
-			password = demoCredentials.password;
-			await goto('/');
-		} catch {
-			demoSeedError = 'Demo seed failed';
-		} finally {
-			isSeedingDemo = false;
-		}
+	function handleDemoLogin() {
+		if (isLoading) return;
+		email = demoCredentials.email;
+		password = demoCredentials.password;
+		actor.send({ type: 'START_LOGIN', data: { email: demoCredentials.email, password: demoCredentials.password } });
 	}
 </script>
 
@@ -151,28 +138,21 @@
 			</form>
 		{/if}
 
-		{#if dev}
-			<div class="demo-panel">
-				<p class="demo-title">Development Demo</p>
-				<p class="demo-copy">
-					Creates or refreshes <code>{demoCredentials.email}</code> / <code>{demoCredentials.password}</code>
-					in the database and signs in as admin.
-				</p>
+		<div class="demo-panel">
+			<p class="demo-title">Demo Account</p>
+			<p class="demo-copy">
+				<code>{demoCredentials.email}</code> / <code>{demoCredentials.password}</code>
+			</p>
 
-				{#if demoSeedError}
-					<div class="error-banner demo-error" role="alert">{demoSeedError}</div>
+			<button type="button" class="demo-btn" onclick={handleDemoLogin} disabled={isLoading}>
+				{#if isLoading}
+					<span class="spinner"></span>
+					Signing in...
+				{:else}
+					Demo Login
 				{/if}
-
-				<button type="button" class="demo-btn" onclick={handleSeedDemoUser} disabled={isLoading || isSeedingDemo}>
-					{#if isSeedingDemo}
-						<span class="spinner"></span>
-						Seeding demo user...
-					{:else}
-						Seed Demo User
-					{/if}
-				</button>
-			</div>
-		{/if}
+			</button>
+		</div>
 
 		<p class="register-link">
 			Don't have an account?
@@ -402,10 +382,6 @@
 	.demo-btn:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
-	}
-
-	.demo-error {
-		margin-bottom: 0.875rem;
 	}
 
 	.register-link a {

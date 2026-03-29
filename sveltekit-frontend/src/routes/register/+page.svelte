@@ -220,6 +220,14 @@
 				Already have an account?
 				<a href="/login">Sign in</a>
 			</p>
+
+			<div class="demo-panel">
+				<p class="demo-title">Demo Account</p>
+				<p class="demo-copy">
+					<code>demo@legal-ai.local</code> / <code>password123</code>
+				</p>
+				<a href="/login?demo=true" class="demo-btn">Login as Demo</a>
+			</div>
 		</div>
 	{/if}
 </div>
@@ -414,6 +422,53 @@
 
 	.login-link a:hover {
 		text-decoration: underline;
+	}
+
+	.demo-panel {
+		margin-top: 1.5rem;
+		padding-top: 1.25rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.12);
+	}
+
+	.demo-title {
+		margin: 0 0 0.375rem;
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: #c4a882;
+	}
+
+	.demo-copy {
+		margin: 0 0 0.875rem;
+		font-size: 0.8125rem;
+		line-height: 1.5;
+		color: rgba(255, 255, 255, 0.65);
+	}
+
+	.demo-copy code {
+		padding: 0.125rem 0.375rem;
+		border-radius: 4px;
+		background: rgba(0, 0, 0, 0.25);
+		color: #f3dfbf;
+	}
+
+	.demo-btn {
+		display: block;
+		width: 100%;
+		padding: 0.75rem;
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: #f3dfbf;
+		text-align: center;
+		text-decoration: none;
+		background: rgba(196, 168, 130, 0.12);
+		border: 1px solid rgba(196, 168, 130, 0.35);
+		border-radius: 6px;
+		transition: background 0.2s, border-color 0.2s;
+	}
+
+	.demo-btn:hover {
+		background: rgba(196, 168, 130, 0.2);
+		border-color: rgba(196, 168, 130, 0.5);
 	}
 
 	/* Success state */

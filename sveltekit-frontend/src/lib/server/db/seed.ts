@@ -16,7 +16,7 @@ const { Pool } = pg;
 
 const DATABASE_URL =
 	process.env.DATABASE_URL ||
-	'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
+	'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
 
 const pool = new Pool({ connectionString: DATABASE_URL });
 const db = drizzle(pool, { schema });
@@ -39,9 +39,8 @@ async function seed(): Promise<void> {
 		`);
 		console.log('[seed] Sessions table ready.');
 
-		// Hash passwords
-		const demoHash = await bcrypt.hash('demo123', 12);
-		const defaultHash = await bcrypt.hash('password123', 12);
+		// All users share password123 for demo simplicity
+		const passwordHash = await bcrypt.hash('password123', 12);
 
 		const seedUsers = [
 			{
@@ -50,8 +49,10 @@ async function seed(): Promise<void> {
 				firstName: 'Demo',
 				lastName: 'User',
 				role: 'admin' as const,
-				passwordHash: demoHash,
-				isActive: true
+				passwordHash,
+				isActive: true,
+				hasCompletedOnboarding: true,
+				onboardingStep: 10
 			},
 			{
 				email: 'prosecutor@legal.ai',
@@ -59,8 +60,10 @@ async function seed(): Promise<void> {
 				firstName: 'John',
 				lastName: 'Prosecutor',
 				role: 'prosecutor' as const,
-				passwordHash: defaultHash,
-				isActive: true
+				passwordHash,
+				isActive: true,
+				hasCompletedOnboarding: true,
+				onboardingStep: 10
 			},
 			{
 				email: 'detective@legal.ai',
@@ -68,8 +71,10 @@ async function seed(): Promise<void> {
 				firstName: 'Jane',
 				lastName: 'Detective',
 				role: 'detective' as const,
-				passwordHash: defaultHash,
-				isActive: true
+				passwordHash,
+				isActive: true,
+				hasCompletedOnboarding: true,
+				onboardingStep: 10
 			},
 			{
 				email: 'admin@legal.ai',
@@ -77,8 +82,10 @@ async function seed(): Promise<void> {
 				firstName: 'Admin',
 				lastName: 'User',
 				role: 'admin' as const,
-				passwordHash: defaultHash,
-				isActive: true
+				passwordHash,
+				isActive: true,
+				hasCompletedOnboarding: true,
+				onboardingStep: 10
 			}
 		];
 
@@ -100,7 +107,9 @@ async function seed(): Promise<void> {
 					firstName: user.firstName,
 					lastName: user.lastName,
 					role: user.role,
-					isActive: user.isActive
+					isActive: user.isActive,
+					hasCompletedOnboarding: user.hasCompletedOnboarding,
+					onboardingStep: user.onboardingStep
 				});
 				console.log(`  + Created: ${user.email}`);
 			} else {
@@ -113,6 +122,8 @@ async function seed(): Promise<void> {
 						name: user.name,
 						role: user.role,
 						isActive: user.isActive,
+						hasCompletedOnboarding: user.hasCompletedOnboarding,
+						onboardingStep: user.onboardingStep,
 						updatedAt: new Date().toISOString()
 					})
 					.where(eq(users.email, user.email));
@@ -123,11 +134,11 @@ async function seed(): Promise<void> {
 
 		console.log(`\n[seed] Done. ${count} users ready.`);
 		console.log('');
-		console.log('Login Credentials:');
-		console.log('  demo@legal-ai.local  / demo123');
-		console.log('  prosecutor@legal.ai  / password123');
-		console.log('  detective@legal.ai   / password123');
-		console.log('  admin@legal.ai       / password123');
+		console.log('Login Credentials (all use password123):');
+		console.log('  demo@legal-ai.local  (admin)');
+		console.log('  prosecutor@legal.ai  (prosecutor)');
+		console.log('  detective@legal.ai   (detective)');
+		console.log('  admin@legal.ai       (admin)');
 	} catch (error) {
 		console.error('[seed] Fatal error:', error);
 		throw error;
