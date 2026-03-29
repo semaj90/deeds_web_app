@@ -35,7 +35,7 @@ async function probe(url: string, timeoutMs = 5000): Promise<CheckResult> {
 		return {
 			ok: false,
 			latencyMs: Math.round(performance.now() - start),
-			error: (err as Error).message
+			error: 'Service unreachable'
 		};
 	}
 }
@@ -134,7 +134,7 @@ async function handleServiceHealth(service: string) {
 				return json({
 					service: 'database',
 					ok: false,
-					error: (err as Error).message,
+					error: 'Service unreachable',
 				});
 			}
 		}

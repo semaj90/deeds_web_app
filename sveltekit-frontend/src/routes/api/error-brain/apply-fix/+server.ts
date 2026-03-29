@@ -74,7 +74,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			return json({
 				success: false,
 				fixId,
-				error: `File write failed: ${(writeErr as Error).message}`,
+				error: 'File write failed',
 				dryRun,
 			}, { status: 500 });
 		}

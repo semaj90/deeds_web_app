@@ -176,7 +176,7 @@ export const POST: RequestHandler = async (event) => {
 				?.setex(
 					`rec:job:${jobId}`,
 					JOB_TTL,
-					JSON.stringify({ status: 'failed', error: String(err) })
+					JSON.stringify({ status: 'failed', error: 'Processing failed' })
 				)
 				.catch(() => {});
 		});

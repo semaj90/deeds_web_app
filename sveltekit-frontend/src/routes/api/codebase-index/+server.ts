@@ -191,8 +191,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		});
 
 		if (!searchResponse.ok) {
-			const errorText = await searchResponse.text();
-			return json({ error: `Qdrant search failed: ${errorText}` }, { status: 500 });
+			console.error('[codebase-index] Qdrant search failed:', searchResponse.status);
+			return json({ error: 'Search service unavailable' }, { status: 502 });
 		}
 
 		const data = await searchResponse.json();

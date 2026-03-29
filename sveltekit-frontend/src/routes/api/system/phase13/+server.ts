@@ -70,6 +70,7 @@ export async function GET() {
 
 		return json(health);
 	} catch (e) {
-		return json({ error: (e as Error).message }, { status: 500 });
+		console.error('[system/phase13] Health check failed:', e);
+		return json({ error: 'Health check failed' }, { status: 500 });
 	}
 }

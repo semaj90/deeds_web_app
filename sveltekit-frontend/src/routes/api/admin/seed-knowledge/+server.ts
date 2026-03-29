@@ -234,7 +234,8 @@ export const GET: RequestHandler = async ({ url, fetch: svelteFetch }) => {
 			files = entries.filter((f) => f.toLowerCase().endsWith('.pdf'));
 			results.total = files.length;
 		} catch (e) {
-			return json({ error: `Cannot read lawpdfs/: ${String(e)}`, tried: [lawpdfsDir] }, { status: 500 });
+			console.error('[seed-knowledge] Cannot read lawpdfs/:', e);
+			return json({ error: 'Cannot read PDF directory' }, { status: 500 });
 		}
 	}
 

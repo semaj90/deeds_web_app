@@ -91,7 +91,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		console.error('[error-brain/verify-fix] Check failed:', (err as Error).message);
 		return json({
 			verified: false,
-			errors: [`Verification failed: ${(err as Error).message}`],
+			errors: ['Verification failed'],
 			fixId: fixId || undefined,
 			filePath,
 		}, { status: 500 });

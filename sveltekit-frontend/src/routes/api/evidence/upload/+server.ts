@@ -284,7 +284,7 @@ export async function POST({ request, locals }: RequestEvent) {
         step: 'error',
         progress: 60,
         message: 'Embedding generation failed (upload succeeded)',
-        error: String(err),
+        error: 'Processing failed',
       });
     });
 

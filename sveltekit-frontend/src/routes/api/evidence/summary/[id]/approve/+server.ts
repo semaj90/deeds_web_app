@@ -4,6 +4,7 @@ import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 const approveSchema = z.object({
 	evidenceId: z.string().uuid(),
@@ -16,14 +17,18 @@ const approveSchema = z.object({
  */
 export const POST: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+	if (!isUuid(params.id)) return json({ error: 'Invalid summary ID' }, { status: 400 });
 	const summaryId = params.id;
 
 	try {
 		const body = await request.json().catch(() => ({}));
 		const parsed = approveSchema.safeParse(body);
+		if (!parsed.success) {
+			return json({ error: 'Invalid request body' }, { status: 400 });
+		}
 
-		const evidenceId = parsed.success ? parsed.data.evidenceId : (body.evidenceId as string);
-		const approvedText = parsed.success ? parsed.data.approvedText : (body.approvedText as string);
+		const evidenceId = parsed.data.evidenceId;
+		const approvedText = parsed.data.approvedText;
 
 		if (!evidenceId) {
 			return json({ error: 'evidenceId is required' }, { status: 400 });
