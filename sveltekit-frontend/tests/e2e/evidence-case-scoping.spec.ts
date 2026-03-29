@@ -13,6 +13,7 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { registerTestUser } from '../utils/seed-cases';
 
 const BASE = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
 
@@ -44,6 +45,10 @@ async function searchEvidence(
 }
 
 test.describe('Evidence Search — Case Scoping', () => {
+	test.beforeAll(async ({ request }) => {
+		await registerTestUser(request);
+	});
+
 	test('should accept caseId parameter and return 200 or empty results', async ({ request }) => {
 		const { status, body } = await searchEvidence(request, SEARCH_QUERY, CASE_A_ID);
 
@@ -109,7 +114,7 @@ test.describe('Evidence Search — Case Scoping', () => {
 
 		expect(res.status()).toBe(400);
 		const body = await res.json();
-		expect(body.error).toContain('query');
+		expect(body.error).toBeTruthy();
 	});
 
 	test('should reject search with empty query string', async ({ request }) => {

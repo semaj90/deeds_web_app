@@ -1,0 +1,127 @@
+/**
+ * Related Files API — Qdrant semantic search for similar code files.
+ *
+ * POST /api/codebase-index/related
+ * Body: { filePath: string, limit?: number }
+ *
+ * Reads the file, generates an embedding, queries codebase_chunks_768,
+ * and returns semantically similar files ranked by score.
+ *
+ * Uses the hybrid-ranker pattern: semantic (Qdrant) + fuzzy (Fuse.js) fusion.
+ */
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
+import { resolve, relative } from 'path';
+import { readFileSync } from 'fs';
+import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
+import { qdrant } from '$lib/server/vector/qdrant-manager.js';
+
+const PROJECT_ROOT = resolve(process.cwd());
+
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+
+	let body: { filePath?: string; limit?: number };
+	try {
+		body = await request.json();
+	} catch {
+		return json({ error: 'Invalid JSON body' }, { status: 400 });
+	}
+
+	const filePath = body.filePath;
+	const limit = Math.min(body.limit ?? 8, 20);
+
+	if (!filePath || typeof filePath !== 'string') {
+		return json({ error: 'filePath is required' }, { status: 400 });
+	}
+
+	// Resolve path
+	const normalizedPath = filePath.startsWith('src/')
+		? resolve(PROJECT_ROOT, filePath)
+		: resolve(PROJECT_ROOT, 'src', filePath);
+
+	if (!normalizedPath.startsWith(PROJECT_ROOT)) {
+		return json({ error: 'Path outside project boundary' }, { status: 400 });
+	}
+
+	// Read file for embedding
+	let fileContent: string;
+	try {
+		fileContent = readFileSync(normalizedPath, 'utf-8');
+	} catch {
+		return json({ error: 'File not found' }, { status: 404 });
+	}
+
+	const relPath = relative(PROJECT_ROOT, normalizedPath).replace(/\\/g, '/');
+
+	// Truncate content for embedding (first 2KB is enough for semantic similarity)
+	const embeddingText = `${relPath}\n${fileContent.slice(0, 2048)}`;
+
+	const startMs = Date.now();
+
+	try {
+		// Generate embedding via the 4-tier fallback chain (gRPC → QUIC → HTTP → sequential)
+		const queryEmbedding = await generateSingleEmbedding(embeddingText);
+
+		// Search Qdrant codebase_chunks_768 (dual-vector: content + signature)
+		const { results: hits, metadata: searchMeta } = await qdrant.hybridSearch({
+			collection: 'codebase_chunks_768',
+			query: embeddingText.slice(0, 512),
+			queryEmbedding,
+			limit: limit * 3, // Over-fetch for dedup
+			scoreThreshold: 0.25,
+		});
+
+		// Deduplicate by file path (multiple chunks from same file)
+		const seenPaths = new Set<string>();
+		seenPaths.add(relPath); // Exclude the query file itself
+
+		const related = hits
+			.map(hit => {
+				const p = (hit.payload ?? {}) as Record<string, unknown>;
+				const hitPath = ((p.relativePath ?? p.filePath ?? p.path ?? '') as string).replace(/\\/g, '/');
+				return {
+					id: hit.id,
+					score: hit.score,
+					filePath: hitPath,
+					symbol: (p.symbol ?? '') as string,
+					kind: (p.kind ?? '') as string,
+					content: ((p.content ?? p.text ?? '') as string).slice(0, 200),
+					signature: ((p.signature ?? '') as string).slice(0, 150),
+					language: (p.language ?? 'typescript') as string,
+					httpMethod: (p.httpMethod ?? '') as string,
+					tags: (p.tags ?? []) as string[],
+				};
+			})
+			.filter(hit => {
+				// Deduplicate by file path
+				const normPath = hit.filePath.replace(/^src\//, '');
+				if (seenPaths.has(hit.filePath) || seenPaths.has(normPath)) return false;
+				seenPaths.add(hit.filePath);
+				seenPaths.add(normPath);
+				return true;
+			})
+			.slice(0, limit);
+
+		return json({
+			queryFile: relPath,
+			related,
+			timing: {
+				totalMs: Date.now() - startMs,
+				searchType: searchMeta.searchType,
+				cached: searchMeta.cached,
+			},
+		});
+	} catch (err) {
+		console.error('[codebase-related] Search error:', err);
+		return json(
+			{
+				queryFile: relPath,
+				related: [],
+				error: 'Vector search unavailable',
+				timing: { totalMs: Date.now() - startMs },
+			},
+			{ status: 503 }
+		);
+	}
+};

@@ -72,6 +72,11 @@ extern "C" int bridge_relu(const float* in, float* out, int n);
 // SOM cache (som_cache.cu)
 extern "C" void runSOMCache(const float* in, float* out, int n);
 
+// simdjson bridge (simdjson_bridge.cc)
+extern "C" napi_value RegisterSimdJsonParse(napi_env env, napi_callback_info info);
+extern "C" napi_value RegisterSimdJsonValidate(napi_env env, napi_callback_info info);
+extern "C" napi_value RegisterSimdJsonExtractNumbers(napi_env env, napi_callback_info info);
+
 // ── Helpers ──────────────────────────────────────────────────────────
 
 static napi_value throw_type_error(napi_env env, const char *msg) {
@@ -418,6 +423,10 @@ static napi_value Init(napi_env env, napi_value exports) {
   registerFn(env, exports, "dotProduct", DotProductWrapper);
   registerFn(env, exports, "scale", ScaleWrapper);
   registerFn(env, exports, "relu", ReLUWrapper);
+  // simdjson functions
+  registerFn(env, exports, "simdJsonParse", RegisterSimdJsonParse);
+  registerFn(env, exports, "simdJsonValidate", RegisterSimdJsonValidate);
+  registerFn(env, exports, "simdJsonExtractNumbers", RegisterSimdJsonExtractNumbers);
   return exports;
 }
 

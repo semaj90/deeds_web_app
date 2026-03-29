@@ -54,11 +54,9 @@
 
   #include <cuda_runtime.h>
 
-  // Include host-only C++ headers when compiling host code (avoid C headers flagged as unused)
-  #if !defined(__CUDA_ARCH__)
-    #include <cstring>
-    #include <cstdlib>
-  #endif
+  // Host-only C++ headers (needed by host-side fallback paths)
+  #include <cstring>
+  #include <cstdlib>
 
   // Simple device kernel: copy input to output
   __global__ static void somCopyKernel(const float* in, float* out, int n) {

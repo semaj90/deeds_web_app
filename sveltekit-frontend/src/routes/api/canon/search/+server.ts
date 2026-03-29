@@ -97,20 +97,20 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				filters: mustConditions.length > 0 ? { must: mustConditions } : undefined,
 			});
 
-			results = hits.map((hit: Record<string, any>) => ({
-				chunkId: hit.payload?.chunk_id ?? '',
-				docId: hit.payload?.doc_id ?? '',
-				docType: hit.payload?.doc_type ?? '',
-				citation: hit.payload?.citation ?? '',
-				jurisdiction: hit.payload?.jurisdiction ?? '',
-				authorityLevel: hit.payload?.authority_level ?? '',
-				content: hit.payload?.content ?? '',
-				tokenCount: hit.payload?.token_count ?? 0,
-				domains: hit.payload?.domains ?? [],
-				keyTerms: hit.payload?.key_terms ?? [],
-				score: hit.score ?? 0,
-				source: 'qdrant' as const,
-			}));
+			results = hits.results.map((hit: Record<string, any>) => ({
+        chunkId: hit.payload?.chunk_id ?? '',
+        docId: hit.payload?.doc_id ?? '',
+        docType: hit.payload?.doc_type ?? '',
+        citation: hit.payload?.citation ?? '',
+        jurisdiction: hit.payload?.jurisdiction ?? '',
+        authorityLevel: hit.payload?.authority_level ?? '',
+        content: hit.payload?.content ?? '',
+        tokenCount: hit.payload?.token_count ?? 0,
+        domains: hit.payload?.domains ?? [],
+        keyTerms: hit.payload?.key_terms ?? [],
+        score: hit.score ?? 0,
+        source: 'qdrant' as const,
+      }));
 		} catch (qdrantErr) {
 			console.warn('[canon/search] Qdrant unavailable, falling back to pgvector:', (qdrantErr as Error).message);
 		}

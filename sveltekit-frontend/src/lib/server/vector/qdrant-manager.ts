@@ -4,9 +4,24 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 import { ENV } from '$lib/server/env.server.js';
 import { VECTOR_CONFIG } from '$lib/server/config/vector-config.js';
 import { generateSparseVector, type SparseVector } from './bm42-sparse.js';
+import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 
 // Re-export for existing consumers
 export { generateSparseVector, type SparseVector };
+
+/** Shared return shape for all search methods (hybridSearch, _denseSearch, sectionFilteredSearch, sparseHybridSearch). */
+export interface QdrantSearchResult {
+  results: { id: string | number; score: number; payload?: Record<string, unknown> }[];
+  metadata: {
+    query: string;
+    collection: string;
+    responseTime: number;
+    total_results: number;
+    cached: boolean;
+    searchType: string;
+    [key: string]: unknown;
+  };
+}
 
 /**
  * Generate a deterministic integer point ID from a string key.
@@ -14,9 +29,9 @@ export { generateSparseVector, type SparseVector };
  * Ensures idempotent upserts: same chunk_id always maps to the same Qdrant point ID.
  */
 export function deterministicPointId(key: string): number {
-    const hash = createHash('md5').update(key).digest();
-    const raw = hash.readUInt32BE(0);
-    return raw % 2147483648;
+  const hash = createHash('md5').update(key).digest();
+  const raw = hash.readUInt32BE(0);
+  return raw % 2147483648;
 }
 
 export class QdrantManager {
@@ -99,13 +114,25 @@ export class QdrantManager {
       { collection: this.collections.documents, field: 'document_type', schema: 'keyword' },
       // legal_canon_chunks: filtered by jurisdiction, authority_level, doc_type in /api/canon/search
       { collection: this.collections.legal_canon_chunks, field: 'jurisdiction', schema: 'keyword' },
-      { collection: this.collections.legal_canon_chunks, field: 'authority_level', schema: 'keyword' },
+      {
+        collection: this.collections.legal_canon_chunks,
+        field: 'authority_level',
+        schema: 'keyword',
+      },
       { collection: this.collections.legal_canon_chunks, field: 'doc_type', schema: 'keyword' },
-      { collection: this.collections.legal_canon_chunks, field: 'semantic_label', schema: 'keyword' },
+      {
+        collection: this.collections.legal_canon_chunks,
+        field: 'semantic_label',
+        schema: 'keyword',
+      },
       // fictional_case_chunks: filtered by case_id, category, jurisdiction
       { collection: this.collections.fictional_case_chunks, field: 'case_id', schema: 'keyword' },
       { collection: this.collections.fictional_case_chunks, field: 'category', schema: 'keyword' },
-      { collection: this.collections.fictional_case_chunks, field: 'jurisdiction', schema: 'keyword' },
+      {
+        collection: this.collections.fictional_case_chunks,
+        field: 'jurisdiction',
+        schema: 'keyword',
+      },
     ];
 
     for (const { collection, field, schema } of indexConfigs) {
@@ -141,7 +168,7 @@ export class QdrantManager {
     limit?: number;
     scoreThreshold?: number;
     skipCache?: boolean;
-  }) {
+  }): Promise<QdrantSearchResult> {
     return this.sparseHybridSearch({
       query: params.query,
       queryEmbedding: params.queryEmbedding,
@@ -165,7 +192,7 @@ export class QdrantManager {
     limit?: number;
     scoreThreshold?: number;
     skipCache?: boolean;
-  }) {
+  }): Promise<QdrantSearchResult> {
     const startTime = Date.now();
 
     // Check Redis cache for identical query+collection+filters
@@ -177,7 +204,7 @@ export class QdrantManager {
         if (redis) {
           const cached = await redis.get(cacheKey);
           if (cached) {
-            const parsed = JSON.parse(cached);
+            const parsed = fastJsonParse<QdrantSearchResult>(cached);
             parsed.metadata.responseTime = Date.now() - startTime;
             parsed.metadata.cached = true;
             return parsed;
@@ -253,7 +280,7 @@ export class QdrantManager {
     caseId?: string | null;
     limit?: number;
     scoreThreshold?: number;
-  }) {
+  }): Promise<QdrantSearchResult> {
     const startTime = Date.now();
     const mustConditions: any[] = [{ key: 'section_type', match: { any: params.sectionTypes } }];
     if (params.caseId) {
@@ -283,6 +310,7 @@ export class QdrantManager {
           responseTime: Date.now() - startTime,
           total_results: results.length,
           cached: false,
+          searchType: 'section-filtered',
         },
       };
     } catch (error: any) {
@@ -295,6 +323,7 @@ export class QdrantManager {
           responseTime: Date.now() - startTime,
           total_results: 0,
           cached: false,
+          searchType: 'section-filtered',
         },
       };
     }
@@ -578,7 +607,7 @@ export class QdrantManager {
     filters?: any;
     limit?: number;
     scoreThreshold?: number;
-  }) {
+  }): Promise<QdrantSearchResult> {
     const startTime = Date.now();
     const collectionName = this.collections[params.collection] ?? params.collection;
     const denseVecName = params.denseVectorName ?? 'content';

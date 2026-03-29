@@ -350,91 +350,92 @@ async function processRecommendationJob(
 // ── Candidate Fetchers ──
 
 async function fetchRAGCandidates(
-	queryEmbedding: number[],
-	limit: number
+  queryEmbedding: number[],
+  limit: number
 ): Promise<DocumentCandidate[]> {
-	try {
-		const response = await qdrant.hybridSearch({
-			query: '',
-			queryEmbedding,
-			collection: 'documents',
-			limit,
-			scoreThreshold: 0.5
-		});
+  try {
+    const response = await qdrant.hybridSearch({
+      query: '',
+      queryEmbedding,
+      collection: 'documents',
+      limit,
+      scoreThreshold: 0.5,
+    });
 
-		const results = response.results || [];
-		return results.map((result) => ({
-			id: String(result.id),
-			title: String(result.payload?.title || result.payload?.filename || 'Untitled'),
-			embedding: queryEmbedding,
-			tags: (result.payload?.metadata?.tags as string[]) ?? [],
-			topicMemberships: undefined,
-			centrality: undefined,
-			caseIds: result.payload?.case_id ? [String(result.payload.case_id)] : undefined
-		}));
-	} catch (err) {
-		console.warn('[recommendations] RAG candidate fetch failed:', err);
-		return [];
-	}
+    const results = response.results || [];
+    return results.map((result) => ({
+      id: String(result.id),
+      title: String(result.payload?.title || result.payload?.filename || 'Untitled'),
+      embedding: queryEmbedding,
+      tags:
+        ((result.payload?.metadata as Record<string, unknown> | undefined)?.tags as string[]) ?? [],
+      topicMemberships: undefined,
+      centrality: undefined,
+      caseIds: result.payload?.case_id ? [String(result.payload.case_id)] : undefined,
+    }));
+  } catch (err) {
+    console.warn('[recommendations] RAG candidate fetch failed:', err);
+    return [];
+  }
 }
 
 async function fetchGraphCandidates(
-	id: string | undefined,
-	limit: number
+  id: string | undefined,
+  limit: number
 ): Promise<DocumentCandidate[]> {
-	if (!id) return [];
+  if (!id) return [];
 
-	try {
-		const graphResult = await fetchGraphDocuments(id, limit);
+  try {
+    const graphResult = await fetchGraphDocuments(id, limit);
 
-		if (graphResult.documents.length > 0) {
-			return graphResult.documents.map((doc) => ({
-				id: doc.id,
-				title: doc.title,
-				embedding: new Array(768).fill(0),
-				tags: [],
-				centrality: doc.centrality,
-				caseIds: doc.caseIds
-			}));
-		}
+    if (graphResult.documents.length > 0) {
+      return graphResult.documents.map((doc) => ({
+        id: doc.id,
+        title: doc.title,
+        embedding: new Array(768).fill(0),
+        tags: [],
+        centrality: doc.centrality,
+        caseIds: doc.caseIds,
+      }));
+    }
 
-		return await fetchGraphCandidatesFromQdrant(id, limit);
-	} catch (err) {
-		console.warn('[recommendations] Graph candidate fetch failed:', err);
-		return await fetchGraphCandidatesFromQdrant(id, limit);
-	}
+    return await fetchGraphCandidatesFromQdrant(id, limit);
+  } catch (err) {
+    console.warn('[recommendations] Graph candidate fetch failed:', err);
+    return await fetchGraphCandidatesFromQdrant(id, limit);
+  }
 }
 
 async function fetchGraphCandidatesFromQdrant(
-	id: string,
-	limit: number
+  id: string,
+  limit: number
 ): Promise<DocumentCandidate[]> {
-	try {
-		const response = await qdrant.hybridSearch({
-			query: '',
-			queryEmbedding: new Array(768).fill(0),
-			collection: 'evidence',
-			filters: { case_id: id },
-			limit,
-			scoreThreshold: 0
-		});
+  try {
+    const response = await qdrant.hybridSearch({
+      query: '',
+      queryEmbedding: new Array(768).fill(0),
+      collection: 'evidence',
+      filters: { case_id: id },
+      limit,
+      scoreThreshold: 0,
+    });
 
-		const results = response.results || [];
-		return results.map((result) => {
-			const meta = result.payload?.metadata as Record<string, unknown> | null;
-			return {
-				id: String(result.id),
-				title: result.payload?.title || 'Untitled Evidence',
-				embedding: result.payload?.vector || new Array(768).fill(0),
-				tags: (meta?.tags as string[]) ?? [],
-				centrality: 0.5,
-				caseIds: [id]
-			};
-		});
-	} catch (err) {
-		console.warn('[recommendations] Qdrant fallback also failed:', err);
-		return [];
-	}
+    const results = response.results || [];
+    return results.map((result) => {
+      const meta = result.payload?.metadata as Record<string, unknown> | null;
+      return {
+        id: String(result.id),
+        title: String(result.payload?.title || 'Untitled Evidence'),
+        embedding: (result.payload?.vector as number[]) || new Array(768).fill(0),
+        tags: (meta?.tags as string[]) ?? [],
+        centrality: 0.5,
+        caseIds: [id],
+      };
+    });
+  } catch (err) {
+    console.warn('[recommendations] Qdrant fallback also failed:', err);
+    return [];
+  }
 }
 
 async function fetchTagCandidates(

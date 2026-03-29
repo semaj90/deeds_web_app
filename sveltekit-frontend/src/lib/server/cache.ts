@@ -1,6 +1,7 @@
 import type Redis from 'ioredis';
 import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
+import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 
 const SHOULD_USE_REDIS =
   process.env.CACHE_BACKEND === 'redis' ||
@@ -179,7 +180,7 @@ export const cognitiveCache = {
     try {
       const result = await withBackoff(() => client.get(key));
       if (!result || typeof result !== 'string') return null;
-      return JSON.parse(result) as T;
+      return fastJsonParse<T>(result);
     } catch (err) {
       console.warn('[cache] Redis GET failed:', err);
       return null;

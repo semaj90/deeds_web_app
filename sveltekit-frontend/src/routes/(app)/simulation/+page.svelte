@@ -1,8 +1,18 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import CourtroomHUD from '$lib/components/courtroom/CourtroomHUD.svelte';
 
 	let { data } = $props();
+
+	// --- Code Review Mode (from codebase-graph "Prosecute Code") ---
+	let codeReviewMode = $state(false);
+	let codeReviewFile = $state('');
+	let codeReviewCharge = $state('');
+	let codeReviewActive = $state(false);
+	let codeReviewDialogue = $state<DialogueEntry[]>([]);
+	let codeReviewLoading = $state(false);
 
 	// --- Types ---
 	interface DialogueEntry {
@@ -72,6 +82,17 @@
 	// --- Lifecycle ---
 	onMount(() => {
 		loadActiveSessions();
+
+		// Check for code-review mode from query params
+		const params = new URLSearchParams(window.location.search);
+		if (params.get('mode') === 'code-review') {
+			codeReviewMode = true;
+			codeReviewFile = params.get('file') || '';
+			codeReviewCharge = decodeURIComponent(params.get('charge') || '');
+			if (codeReviewFile && codeReviewCharge) {
+				startCodeReview();
+			}
+		}
 	});
 
 	$effect(() => {
@@ -189,7 +210,108 @@
 		sessionData = null;
 		dialogue = [];
 		view = 'lobby';
+		codeReviewActive = false;
+		codeReviewMode = false;
+		// Clear query params
+		window.history.replaceState({}, '', window.location.pathname);
 		loadActiveSessions();
+	}
+
+	// --- Code Review Functions ---
+	async function startCodeReview() {
+		codeReviewLoading = true;
+		codeReviewActive = true;
+		view = 'courtroom';
+		error = '';
+
+		// Build initial prosecution dialogue from LLM
+		const fileName = codeReviewFile.split('/').pop() || codeReviewFile;
+		codeReviewDialogue = [
+			{
+				phase: 'opening_statements',
+				turn: 0,
+				speaker: 'Judge',
+				role: 'judge',
+				content: `Court is now in session for Code Review Case: ${fileName}. The prosecution may present their charges.`,
+				canonRefs: [],
+				timestamp: new Date().toISOString(),
+			},
+			{
+				phase: 'opening_statements',
+				turn: 1,
+				speaker: 'Prosecutor',
+				role: 'prosecutor',
+				content: `Your Honor, the prosecution brings the following charges against file "${fileName}":\n\n${codeReviewCharge}`,
+				canonRefs: [],
+				timestamp: new Date().toISOString(),
+			},
+		];
+		dialogue = codeReviewDialogue;
+
+		// Build a mock session for the HUD
+		sessionData = {
+			caseData: {
+				caseNumber: `CR-${Date.now().toString(36).toUpperCase()}`,
+				charge: `Code Quality Violations: ${fileName}`,
+				defendantName: fileName,
+			},
+			currentPhase: 0,
+			phases: ['opening_statements', 'evidence_presentation', 'cross_examination', 'closing_arguments', 'verdict'],
+			status: 'active',
+		};
+
+		// Call LLM for analysis verdict
+		try {
+			const res = await fetch('/api/codebase-index/analyze', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ filePath: codeReviewFile }),
+			});
+			if (res.ok) {
+				const data = await res.json();
+				const analysis = data.analysis;
+				const grade = analysis?.healthGrade || 'C';
+				const risks = (analysis?.risks || []).map((r: string) => `  - ${r}`).join('\n');
+				const suggestions = (analysis?.suggestions || []).map((s: string) => `  - ${s}`).join('\n');
+
+				codeReviewDialogue = [
+					...codeReviewDialogue,
+					{
+						phase: 'evidence_presentation',
+						turn: 2,
+						speaker: 'Expert Witness (AI Analyzer)',
+						role: 'witness',
+						content: `Your Honor, I have completed my analysis.\n\nHealth Grade: ${grade}\nComplexity Score: ${analysis?.complexityScore ?? 'N/A'}/10\nCoupling Score: ${analysis?.couplingScore ?? 'N/A'}/10\n\nSummary: ${analysis?.summary || 'Analysis complete.'}\n\nIdentified Risks:\n${risks || '  (none)'}`,
+						canonRefs: [],
+						timestamp: new Date().toISOString(),
+					},
+					{
+						phase: 'closing_arguments',
+						turn: 3,
+						speaker: 'Prosecutor',
+						role: 'prosecutor',
+						content: `Based on the evidence presented, the prosecution recommends the following remediation:\n\n${suggestions || '  No specific suggestions.'}`,
+						canonRefs: [],
+						timestamp: new Date().toISOString(),
+					},
+					{
+						phase: 'verdict',
+						turn: 4,
+						speaker: 'Judge',
+						role: 'judge',
+						content: `The court renders its verdict: Grade ${grade}.\n\n${grade === 'A' || grade === 'B' ? 'This file is found NOT GUILTY of significant code quality violations. The defendant is acquitted.' : grade === 'C' ? 'The court finds MINOR VIOLATIONS. The defendant is sentenced to refactoring review.' : 'The court finds GUILTY of code quality violations. Immediate refactoring is ORDERED.'}`,
+						canonRefs: [],
+						timestamp: new Date().toISOString(),
+					},
+				];
+				dialogue = codeReviewDialogue;
+				sessionData = { ...sessionData!, currentPhase: 4, status: 'completed' };
+			}
+		} catch {
+			error = 'Failed to analyze code for review';
+		} finally {
+			codeReviewLoading = false;
+		}
 	}
 
 	function roleIcon(role: string): string {
@@ -378,9 +500,9 @@
 			This is not legal advice.
 		</div>
 
-		<!-- Dialogue Area -->
+		<!-- Dialogue Transcript (scrollable history) -->
 		<div class="dialogue-area" bind:this={dialogueContainer}>
-			{#each dialogue as entry, i}
+			{#each dialogue.slice(0, -1) as entry, i}
 				<div class="dialogue-entry" style="--role-color: {roleColor(entry.role)}">
 					<div class="dialogue-speaker">
 						<Icon name={roleIcon(entry.role)} size={16} />
@@ -401,18 +523,6 @@
 				</div>
 			{/each}
 
-			{#if isAdvancing}
-				<div class="dialogue-entry loading-entry">
-					<div class="dialogue-speaker">
-						<Icon name="loader" size={16} />
-						<span class="speaker-name">Generating...</span>
-					</div>
-					<div class="dialogue-content typing-indicator">
-						<span></span><span></span><span></span>
-					</div>
-				</div>
-			{/if}
-
 			{#if dialogue.length === 0 && !isLoading}
 				<div class="empty-dialogue">
 					<Icon name="message-square" size={32} />
@@ -426,59 +536,26 @@
 			<div class="error-banner">{error}</div>
 		{/if}
 
-		<!-- Action Bar -->
-		<div class="action-bar">
-			{#if sessionData?.status === 'completed'}
-				<div class="completed-msg">
-					<Icon name="check-circle" size={18} />
-					Proceedings concluded. All phases complete.
-				</div>
-				<button class="btn-action secondary" onclick={backToLobby}>Return to Lobby</button>
-			{:else}
-				<button
-					class="btn-action primary"
-					onclick={() => advanceTurn('next_turn')}
-					disabled={isAdvancing}
-				>
-					<Icon name="message-square" size={16} /> Next Turn
-				</button>
-				<button
-					class="btn-action secondary"
-					onclick={() => advanceTurn('next_phase')}
-					disabled={isAdvancing}
-				>
-					<Icon name="skip-forward" size={16} /> Next Phase
-				</button>
+		<!-- Code Review banner -->
+		{#if codeReviewActive}
+			<div class="code-review-banner">
+				<Icon name="code" size={14} />
+				<span>CODE REVIEW MODE — File: <strong>{codeReviewFile.split('/').pop()}</strong></span>
+				{#if codeReviewLoading}
+					<span class="cr-loading">Analyzing...</span>
+				{/if}
+			</div>
+		{/if}
 
-				<div class="objection-group">
-					<button
-						class="btn-action objection"
-						onclick={() => advanceTurn('objection', { objectionType: 'hearsay', objectionBasis: 'Rule 802 - Hearsay' })}
-						disabled={isAdvancing}
-					>
-						Objection: Hearsay
-					</button>
-					<button
-						class="btn-action objection"
-						onclick={() => advanceTurn('objection', { objectionType: 'relevance', objectionBasis: 'Rule 401/403 - Relevance' })}
-						disabled={isAdvancing}
-					>
-						Objection: Relevance
-					</button>
-					<button
-						class="btn-action objection"
-						onclick={() => advanceTurn('objection', { objectionType: 'foundation', objectionBasis: 'Insufficient foundation' })}
-						disabled={isAdvancing}
-					>
-						Objection: Foundation
-					</button>
-				</div>
-
-				<button class="btn-action danger" onclick={abandonSession}>
-					<Icon name="x" size={16} /> Abandon
-				</button>
-			{/if}
-		</div>
+		<!-- Game-style HUD (Phoenix Wright mode) -->
+		<CourtroomHUD
+			currentEntry={dialogue.length > 0 ? dialogue[dialogue.length - 1] : null}
+			{sessionData}
+			isAdvancing={codeReviewActive ? false : isAdvancing}
+			status={sessionData?.status ?? 'active'}
+			onAction={codeReviewActive ? () => {} : advanceTurn}
+			onAbandon={codeReviewActive ? backToLobby : abandonSession}
+		/>
 	</div>
 {/if}
 
@@ -1053,5 +1130,31 @@
 
 	.courtroom-status {
 		flex-shrink: 0;
+	}
+
+	/* ===== CODE REVIEW MODE ===== */
+	.code-review-banner {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.4rem 1.5rem;
+		font-size: 0.75rem;
+		text-align: center;
+		color: var(--t-accent);
+		background: color-mix(in srgb, var(--t-accent) 8%, transparent);
+		border-bottom: 1px solid var(--t-border);
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+
+	.cr-loading {
+		margin-left: auto;
+		opacity: 0.7;
+		animation: pulse 1.5s infinite;
+	}
+
+	@keyframes pulse {
+		0%, 100% { opacity: 0.4; }
+		50% { opacity: 1; }
 	}
 </style>

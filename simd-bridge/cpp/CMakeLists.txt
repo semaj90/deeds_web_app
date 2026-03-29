@@ -65,11 +65,25 @@ else()
   target_compile_definitions(cuda_kernels PRIVATE NO_CUDA=1 SOM_HAVE_CUDA=0)
 endif()
 
+# ── simdjson (single-header, compiled as part of addon) ──────────────
+set(SIMDJSON_SRC "${CMAKE_CURRENT_SOURCE_DIR}/vendor/simdjson.cpp")
+if(EXISTS "${SIMDJSON_SRC}")
+  message(STATUS "simdjson: found vendor/simdjson.cpp")
+else()
+  message(WARNING "simdjson: vendor/simdjson.cpp not found — simdJson* functions will be stubs")
+endif()
+
 # ── Main addon: tensorrt_bridge.node ────────────────────────────────
 set(ADDON_SOURCES
   binding.cc
   tensor_bridge.cc
+  simdjson_bridge.cc
 )
+
+# Add simdjson implementation if available
+if(EXISTS "${SIMDJSON_SRC}")
+  list(APPEND ADDON_SOURCES vendor/simdjson.cpp)
+endif()
 
 # Add libtorch_graph.cc if LibTorch available, otherwise stubs
 if(Torch_FOUND)

@@ -1,5 +1,5 @@
-import type { exec  } from 'child_process';
-import type { promisify  } from 'util';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 
 const execPromise = promisify(exec);
 

@@ -1,9 +1,9 @@
 /**
  * Playwright Global Setup — seeds test case data before the test suite runs.
  *
- * Strategy: POST to /api/cases via the running dev server (DEV_BYPASS_AUTH provides
- * automatic auth as the dev admin user). Created IDs are written to a JSON file so
- * global-teardown.ts can delete them after the suite completes.
+ * Strategy: POST to /api/cases via the running dev server. DEV_BYPASS_AUTH auto-authenticates
+ * as the dev admin user (00000000-0000-0000-0000-000000000001), which is the same identity
+ * that browser tests use. This ensures seeded cases appear when navigating /cases.
  *
  * Also hard-deletes any stale [PW-TEST] cases from previous runs before seeding.
  */
@@ -12,7 +12,6 @@ import path from 'path';
 import pg from 'pg';
 import { request as playwrightRequest } from '@playwright/test';
 import {
-  PLAYWRIGHT_DEV_SESSION_USER,
   TEST_CASE_SEED,
   TEST_CASE_PREFIX,
   TEST_IDS_FILE,
@@ -47,28 +46,14 @@ export default async function globalSetup() {
     await pool.end();
   }
 
-  console.log('🌱  [global-setup] Creating DB-backed Playwright session …');
+  // Use a plain API context (no demo-login). DEV_BYPASS_AUTH auto-authenticates
+  // as user 00000000-0000-0000-0000-000000000001 — the same identity browser tests get.
+  console.log('🌱  [global-setup] Seeding test cases via /api/cases (DEV_BYPASS_AUTH) …');
 
   const createdIds: string[] = [];
   const apiContext = await playwrightRequest.newContext({ baseURL: BASE_URL });
 
   try {
-    const loginRes = await apiContext.post('/api/auth/demo-login', {
-      data: PLAYWRIGHT_DEV_SESSION_USER,
-    });
-
-    if (!loginRes.ok()) {
-      const body = await loginRes.text().catch(() => '');
-      throw new Error(`Demo login failed (${loginRes.status()}): ${body}`);
-    }
-
-    const loginPayload = await loginRes.json();
-    console.log(
-      `   ✅  Authenticated as ${loginPayload.user?.email ?? PLAYWRIGHT_DEV_SESSION_USER.email}`
-    );
-
-    console.log('🌱  [global-setup] Seeding test cases via /api/cases …');
-
     for (const seedCase of TEST_CASE_SEED) {
       const res = await apiContext.post('/api/cases', {
         data: seedCase,

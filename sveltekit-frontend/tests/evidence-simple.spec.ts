@@ -1,12 +1,6 @@
 import { test, expect } from '@playwright/test';
-import type { getTestBaseURL  } from './helpers/port-detector';
 
-let BASE_URL: string;
-
-test.beforeAll(async () => {
-  BASE_URL = await getTestBaseURL();
-  console.log(`🔍 Using base URL: ${BASE_URL}`);
-});
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
 
 test.describe('Evidence Routes', () => {
   test('homepage loads successfully', async ({ page }) => {

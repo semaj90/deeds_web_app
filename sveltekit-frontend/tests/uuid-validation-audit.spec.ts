@@ -51,11 +51,9 @@ test.describe('Validation Audit', () => {
 		expect((await api.get(`/api/cases/${BAD_UUID}/evidence`)).status()).toBe(400);
 	});
 
-	test('3. GET /api/cases/[bad]/notes → graceful empty (not 500)', async () => {
+	test('3. GET /api/cases/[bad]/notes → 400 (not 500)', async () => {
 		const res = await api.get(`/api/cases/${BAD_UUID}/notes`);
-		expect(res.status()).not.toBe(500);
-		const body = await res.json();
-		expect(body.notes).toEqual([]);
+		expect(res.status()).toBe(400);
 	});
 
 	test('4. GET /api/cases/[bad]/citations → 400', async () => {

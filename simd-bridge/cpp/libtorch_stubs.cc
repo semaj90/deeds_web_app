@@ -22,4 +22,21 @@ extern "C" int checkCudaAvailable() {
     return 0;  // No CUDA without LibTorch
 }
 
+// LSTM/math bridge stubs (defined in binding.cc as extern, need implementations)
+extern "C" int bridge_run_lstm(const float*, const float*, float*, int) {
+    return -99;
+}
+
+extern "C" int bridge_dot_product(const float*, const float*, float*, int) {
+    return -99;
+}
+
+extern "C" int bridge_scale(const float*, float*, float, int) {
+    return -99;
+}
+
+extern "C" int bridge_relu(const float*, float*, int) {
+    return -99;
+}
+
 #endif

@@ -60,15 +60,11 @@ const routes = [
   '/chat',
   '/chat/test-chat-1', // Replace [id] with test data
   '/couchdb-analytics',
-  '/demo/svelte5-components',
   '/indexing',
   '/knowledge',
   '/odin',
-  '/phase89/error-map',
   '/rag-search',
-  '/test',
   '/test-source-validation',
-  '/test-user-store',
 ];
 
 test.describe('All Routes Screenshot Test', () => {
