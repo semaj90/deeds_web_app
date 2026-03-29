@@ -82,7 +82,7 @@ export async function claimNextJob(jobType?: JobType): Promise<{
 		RETURNING id, evidence_id, case_id, job_type, result
 	`);
 
-	const row = (rows as any).rows?.[0] ?? (rows as any)[0];
+	const row = (rows as any).rows?.[0];
 	if (!row) return null;
 
 	return {
@@ -163,7 +163,7 @@ export async function getJobCounts(): Promise<Record<string, number>> {
 		GROUP BY status
 	`);
 	const result: Record<string, number> = { queued: 0, running: 0, completed: 0, failed: 0 };
-	for (const row of (rows as any).rows ?? rows) {
+	for (const row of (rows as any).rows) {
 		result[(row as any).status] = (row as any).count;
 	}
 	return result;

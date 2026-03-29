@@ -65,7 +65,7 @@ export async function searchSimilarDocuments(
 			LIMIT ${limit}
 		`);
 
-		return (results as any[]).map((row) => ({
+		return (results as any).rows.map((row: any) => ({
 			id: row.id !== undefined ? String(row.id) : '',
 			title: typeof row.title === 'string' ? row.title  : undefined,
 			content: typeof row.content === 'string' ? row.content : '',
@@ -215,7 +215,7 @@ export async function hybridSearch(
 			LIMIT ${Math.floor(limit * 0.3)}
 		`);
 
-		const textSearchResults: SimilarityResult[] = (textResults as any[]).map((row) => ({
+		const textSearchResults: SimilarityResult[] = (textResults as any).rows.map((row: any) => ({
 			id: row.id !== undefined ? String(row.id) : '',
 			title: typeof row.title === 'string' ? row.title  : undefined,
 			content: typeof row.content === 'string' ? row.content : '',

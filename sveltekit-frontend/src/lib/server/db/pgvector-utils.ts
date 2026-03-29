@@ -3,7 +3,7 @@
  * Provides vector similarity search and embedding operations
  */
 
-import { db } from './index.js';
+import { pool } from './client';
 
 // Type definitions
 type Row = Record<string, unknown>;
@@ -103,10 +103,10 @@ export function vectorToArray(vectorString: string): number[] {
 export async function initializePgVector(): Promise<boolean> {
 	try {
 		// Enable pgvector extension
-		await db.execute(`CREATE EXTENSION IF NOT EXISTS vector`);
+		await pool.query(`CREATE EXTENSION IF NOT EXISTS vector`);
 
 		// Create cosine similarity function
-		await db.execute(`
+		await pool.query(`
 			CREATE OR REPLACE FUNCTION cosine_similarity(a vector, b vector)
 			RETURNS float AS $$
 			SELECT 1 - (a <=> b);
@@ -145,9 +145,9 @@ export async function searchSimilarMessages(
 			LIMIT ${limit}
 		`;
 
-		const results = (await db.execute(sql)) as Array<Row>;
+		const { rows: results } = await pool.query(sql);
 
-		return (results || []).map((row) => ({
+		return (results || []).map((row: Row) => ({
 			id: asString(row.id),
 			content: asString(row.content),
 			similarity: asNumber(row.similarity),
@@ -193,9 +193,9 @@ export async function searchSimilarEvidence(
 			LIMIT ${limit}
 		`;
 
-		const results = (await db.execute(sql)) as Array<Row>;
+		const { rows: results } = await pool.query(sql);
 
-		return (results || []).map((row) => ({
+		return (results || []).map((row: Row) => ({
 			id: asString(row.id),
 			content: asString(row.description || row.title),
 			similarity: asNumber(row.similarity),
@@ -241,7 +241,7 @@ export async function insertChatMessageWithEmbedding(messageData: {
 			)
 		`;
 
-		await db.execute(sql);
+		await pool.query(sql);
 		return true;
 	} catch (error) {
 		console.error('Failed to insert chat message embedding:', error);
@@ -277,7 +277,7 @@ export async function updateEvidenceEmbeddings(
 			WHERE id = ${escapeLiteral(evidenceId)}::uuid
 		`;
 
-		await db.execute(sql);
+		await pool.query(sql);
 		return true;
 	} catch (error) {
 		console.error('Failed to update embeddings:', error);
@@ -356,14 +356,14 @@ export function calculateCosineSimilarity(a: number[], b: number[]): number {
  */
 export async function pgvectorHealthCheck(): Promise<PgVectorHealthResult> {
 	try {
-		const extensionCheck = (await db.execute(`
+		const { rows: extensionRows } = await pool.query(`
 			SELECT EXISTS (
 				SELECT 1 FROM pg_extension WHERE extname = 'vector'
 			) as has_vector,
 			(SELECT extversion FROM pg_extension WHERE extname = 'vector') as version
-		`)) as Array<{ has_vector?: boolean; version?: string }>;
+		`);
 
-		const first = extensionCheck?.[0];
+		const first = extensionRows?.[0] as { has_vector?: boolean; version?: string } | undefined;
 		if (!first?.has_vector) {
 			return {
 				available: false,
@@ -372,15 +372,15 @@ export async function pgvectorHealthCheck(): Promise<PgVectorHealthResult> {
 			};
 		}
 
-		const functionsCheck = (await db.execute(`
+		const { rows: functionRows } = await pool.query(`
 			SELECT routine_name
 			FROM information_schema.routines
 			WHERE routine_schema = 'public'
 			AND routine_name IN ('cosine_similarity', 'search_similar_messages', 'search_similar_evidence')
-		`)) as Array<{ routine_name?: string }>;
+		`);
 
-		const availableFunctions = (functionsCheck || [])
-			.map((row) => row?.routine_name ?? '')
+		const availableFunctions = (functionRows || [])
+			.map((row: any) => row?.routine_name ?? '')
 			.filter(Boolean);
 
 		return {
