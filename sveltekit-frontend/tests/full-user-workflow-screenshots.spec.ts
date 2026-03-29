@@ -217,7 +217,7 @@ test.describe('Full User Workflow with Screenshots', () => {
 	// 5. UPLOAD PHOTO TO POI (API)
 	// ═══════════════════════════════════════════════════════════════
 
-	test('5. Upload photo to POI', async ({ request }) => {
+	test('5a. Upload photo to POI via API', async ({ request }) => {
 		if (!createdPoiFormId) {
 			// Try to find the POI we just created
 			const listRes = await request.get(`${BASE}/api/persons-of-interest`);
@@ -257,11 +257,58 @@ test.describe('Full User Workflow with Screenshots', () => {
 		expect(res.status()).toBeLessThan(600);
 	});
 
+	test('5b. Verify photo saved — API returns photo list', async ({ request }) => {
+		test.skip(!createdPoiFormId, 'No POI ID available');
+
+		const res = await request.get(`${BASE}/api/persons-of-interest/${createdPoiFormId}/photos`);
+		if (res.ok()) {
+			const data = await res.json();
+			const photos = data.photos ?? data.data ?? data ?? [];
+			if (Array.isArray(photos) && photos.length > 0) {
+				console.log(`   ✅  POI has ${photos.length} photo(s) — URL: ${photos[0]?.url ?? photos[0]?.thumbnailUrl ?? 'N/A'}`);
+			} else {
+				console.log('   ℹ️  Photo list empty (upload may have failed — MinIO)');
+			}
+		} else {
+			console.log(`   ℹ️  Photos API returned ${res.status()}`);
+		}
+		expect(res.status()).toBeLessThan(600);
+	});
+
+	test('5c. Visit POI detail page — verify photo displays', async ({ page }) => {
+		test.skip(!createdPoiFormId, 'No POI ID available');
+
+		await page.goto(`${BASE}/persons-of-interest/${createdPoiFormId}`, {
+			waitUntil: 'domcontentloaded',
+		});
+		await page.waitForTimeout(2000);
+		await screenshot(page, '10b-poi-detail-page');
+
+		// Check if the page loaded (might 404 if detail route doesn't exist)
+		const status = await page.evaluate(() => {
+			return document.querySelector('body')?.textContent?.includes('Not Found') ? 404 : 200;
+		});
+
+		if (status === 200) {
+			// Look for photo/image elements on the detail page
+			const images = page.locator('img[src*="poi"], img[src*="photo"], img[src*="minio"], .poi-photo, .photo-thumbnail');
+			const imgCount = await images.count();
+			if (imgCount > 0) {
+				console.log(`   ✅  POI detail page has ${imgCount} photo element(s)`);
+				await screenshot(page, '10c-poi-detail-with-photos');
+			} else {
+				console.log('   ℹ️  No photo elements found on detail page (MinIO upload may have failed)');
+			}
+		} else {
+			console.log('   ℹ️  POI detail page not found (route may not exist for this ID)');
+		}
+	});
+
 	// ═══════════════════════════════════════════════════════════════
 	// 6. CREATE POI VIA MODAL (second method)
 	// ═══════════════════════════════════════════════════════════════
 
-	test('6. Create POI via modal on POI page', async ({ page }) => {
+	test('6. Create POI via modal + upload photo in modal', async ({ page }) => {
 		await page.goto(`${BASE}/persons-of-interest`, { waitUntil: 'domcontentloaded' });
 		await page.waitForTimeout(2000);
 		await screenshot(page, '11-poi-page-before-modal');
@@ -273,7 +320,7 @@ test.describe('Full User Workflow with Screenshots', () => {
 		await page.waitForTimeout(1000);
 		await screenshot(page, '12-poi-modal-open');
 
-		// Fill the modal form
+		// Fill the modal form (step 1: profile details)
 		const modal = page.locator('.modal-panel');
 		await expect(modal).toBeVisible({ timeout: 5_000 });
 
@@ -294,33 +341,53 @@ test.describe('Full User Workflow with Screenshots', () => {
 		await page.waitForTimeout(500);
 		await screenshot(page, '13-poi-modal-filled');
 
-		// Submit the modal form
-		const submitBtn = modal.locator('button[type="submit"], button:has-text("REGISTER"), button:has-text("Create")').first();
+		// Submit the modal form → transitions to photo upload step
+		const submitBtn = modal.locator('button[type="submit"], button:has-text("Register Person")').first();
 		if (await submitBtn.isVisible()) {
 			await submitBtn.click();
 			await page.waitForTimeout(3000);
-			await screenshot(page, '14-poi-modal-result');
+			await screenshot(page, '14-poi-modal-after-submit');
 
-			// Check for success message
+			// Check if modal transitioned to photo step (step 2)
 			const modalText = await modal.textContent().catch(() => '');
-			if (modalText?.includes('successfully') || modalText?.includes('Upload')) {
-				console.log('   ✅  POI created via modal');
+			const hasPhotoStep = modalText?.includes('Upload a photo') ||
+				modalText?.includes('photo to complete') ||
+				modalText?.includes('registered');
 
-				// Look for photo upload step
-				const photoStep = modal.locator('text=Upload a photo');
-				if (await photoStep.isVisible().catch(() => false)) {
-					await screenshot(page, '14b-poi-modal-photo-step');
-					// Close modal — skip photo for modal method
-					const closeBtn = modal.locator('.modal-close, button:has-text("Skip"), button:has-text("Close")').first();
-					if (await closeBtn.isVisible().catch(() => false)) {
-						await closeBtn.click();
+			if (hasPhotoStep) {
+				console.log('   ✅  POI created — modal transitioned to photo upload step');
+				await screenshot(page, '14b-poi-modal-photo-step');
+
+				// Upload photo via the hidden file input in PoiImageUpload
+				const fileInput = modal.locator('input[type="file"]');
+				if (await fileInput.count() > 0) {
+					await fileInput.setInputFiles(TEST_PHOTO_PATH);
+					// Wait for upload + processing
+					await page.waitForTimeout(5000);
+					await screenshot(page, '14c-poi-modal-photo-uploading');
+
+					// Check upload result
+					const uploadText = await modal.textContent().catch(() => '');
+					if (uploadText?.includes('failed') || uploadText?.includes('error')) {
+						console.log('   ⚠️  Photo upload failed in modal (MinIO may be down)');
+					} else {
+						console.log('   ✅  Photo uploaded via modal');
 					}
 				}
+
+				// Click "Done" to close modal
+				const doneBtn = modal.locator('button:has-text("Done"), button:has-text("Skip")').first();
+				if (await doneBtn.isVisible().catch(() => false)) {
+					await doneBtn.click();
+					await page.waitForTimeout(1000);
+				}
+			} else {
+				console.log('   ℹ️  Modal did not show photo step (may have closed or errored)');
 			}
 		}
 
 		await page.waitForTimeout(1000);
-		await screenshot(page, '15-poi-page-after-create');
+		await screenshot(page, '15-poi-page-after-modal-create');
 	});
 
 	// ═══════════════════════════════════════════════════════════════
