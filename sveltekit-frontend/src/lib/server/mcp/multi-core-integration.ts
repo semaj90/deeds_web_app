@@ -2,6 +2,7 @@
  * MCP Multi-Core Server Integration
  */
 import { logger } from '$lib/server/production-logger.js';
+import { getMcpMulticoreUrl } from '$lib/config/env.server.js';
 
 export interface MCPWorkerCore {
     id: string;
@@ -48,7 +49,7 @@ export class MCPMultiCoreClient {
     private healthCheckInterval: NodeJS.Timeout | null = null;
     private loadBalancingStrategy: 'round-robin' | 'least-loaded' | 'capability-based' = 'least-loaded';
 
-    constructor(baseUrl = 'http://localhost:3002') {
+    constructor(baseUrl = getMcpMulticoreUrl()) {
         this.baseUrl = baseUrl;
         this.initializeClient();
     }

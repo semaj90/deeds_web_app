@@ -62,9 +62,7 @@ export const POST: RequestHandler = async (event) => {
 		}
 		const body = parsed.data;
 
-		console.log(
-			`[track-interaction] User ${auth.user.id}, type=${body.interactionType}, doc=${body.documentId}`
-		);
+		console.log(`[track-interaction] type=${body.interactionType}`);
 
 		const tracker = new UserHistoryTracker(auth.user.id);
 

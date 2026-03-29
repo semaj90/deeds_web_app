@@ -1,6 +1,8 @@
 import type { User } from '$lib/types';
 import { setup, assign, fromPromise } from 'xstate';
 
+const MCP_BASE_URL = import.meta.env.VITE_MCP_URL || 'http://localhost:3001';
+
 /**
  * XState v5 Machine for User Typing States
  * Tracks user typing behavior for contextual prompting and analytics
@@ -56,7 +58,7 @@ export const userTypingStateMachine = setup({
     processContextualContent: fromPromise(
       async ({ input }: { input: { text: string; context: TypingContext } }) => {
         try {
-          const response = await fetch('http://localhost:3002/mcp/contextual-process', {
+          const response = await fetch(`${MCP_BASE_URL}/mcp/contextual-process`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -35,10 +35,7 @@ export async function GET({ locals }) {
         // Since it's a local script, we can just await it.
         const result = await runIngestionPipeline({ documentId, jobId });
         
-        console.log("\n=================================================");
-        console.log("  ✅ Ingestion Complete!                         ");
-        console.log("=================================================");
-        console.log(JSON.stringify(result, null, 2));
+        console.log('[ingest-constitution] Ingestion complete');
 
         return json({ success: true, result });
     } catch (err) {

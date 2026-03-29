@@ -31,7 +31,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				.where(eq(chatMessages.id, messageId));
 		} catch {
 			// Table may not exist — log and continue
-			console.log('[feedback] Stored in-memory:', { messageId, rating, comment });
+			console.log('[feedback] DB write failed, stored in-memory');
 		}
 
 		return json({ success: true, messageId, rating });

@@ -75,9 +75,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			}
 		});
 
-		console.log(
-			`Migrated ${migratedCount} messages from session ${sessionId} to user ${locals.user.id}`
-		);
+		console.log(`[chat/migrate] Migrated ${migratedCount} messages from session`);
 
 		return json({
 			success: true,

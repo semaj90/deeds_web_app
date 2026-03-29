@@ -34,7 +34,7 @@
     element = $bindable(),
     enableContextualPrompts = true,
     enableAnalytics = true,
-    mcpEndpoint = 'http://localhost:3002',
+    mcpEndpoint = 'http://localhost:3001',
     onstateChange,
     oncontextualPrompt,
     onanalyticsUpdate

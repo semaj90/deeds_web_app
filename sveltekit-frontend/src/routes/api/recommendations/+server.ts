@@ -158,9 +158,7 @@ export const POST: RequestHandler = async (event) => {
 			});
 		}
 
-		console.log(
-			`[recommendations] Job ${jobId} enqueued: user=${auth.user.id}, query="${body.query}", topK=${topK}`
-		);
+		console.log(`[recommendations] Job ${jobId} enqueued, topK=${topK}`);
 
 		// Fire-and-forget: run pipeline in background
 		processRecommendationJob(

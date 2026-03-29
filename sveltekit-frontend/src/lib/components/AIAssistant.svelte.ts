@@ -1,9 +1,11 @@
+import { ENV_CONFIG } from '$lib/config/env.js';
+
 export class AIAssistant {
     isLoading = $state(false);
     response = $state('');
 
     private resolveOllamaEndpoint() {
-        return 'http://localhost:11434';
+        return ENV_CONFIG.OLLAMA_URL;
     }
 
     async queryOllama(prompt: string) {

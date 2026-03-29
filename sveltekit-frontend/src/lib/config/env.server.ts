@@ -104,6 +104,11 @@ export function getCouchDbUrl(): string {
  return env?.COUCHDB_URL ?? 'http://admin:password@localhost:5984';
 }
 
+export function getMcpMulticoreUrl(): string {
+ const port = env?.MCP_PORT ?? '3001';
+ return env?.MCP_MULTICORE_URL ?? `http://${isDocker ? 'mcp' : 'localhost'}:${port}`;
+}
+
 export function getMinioConfig() {
  return {
    endpoint: normalizeMinioEndpoint(env?.MINIO_ENDPOINT ?? env?.MINIO_URL),

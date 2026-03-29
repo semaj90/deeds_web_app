@@ -57,8 +57,8 @@ export const POST: RequestHandler = async ({ request }) => {
 			expiresAt,
 		});
 
-		// Log token for admin relay (no email service configured)
-		console.log(`[auth/reset-password] Reset token for ${email}: ${token} (expires ${expiresAt})`);
+		// Token stored in DB — retrieve via admin panel if needed
+		console.log(`[auth/reset-password] Reset token generated for user (expires ${expiresAt})`);
 	} catch (err) {
 		console.error('[auth/reset-password] Error generating reset token:', err);
 	}
