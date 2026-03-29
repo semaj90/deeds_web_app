@@ -38,6 +38,7 @@ class SSEStatusStore {
 
 	private eventSource: EventSource | null = null;
 	private reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+	private registeredListeners: Array<{ type: string; handler: EventListener }> = [];
 
 	// Derived
 	connectionStatus = $derived.by(() => {
@@ -100,13 +101,13 @@ class SSEStatusStore {
 		}
 	}
 
-	on(eventType: string, callback: (event: ProcessingEvent) => void) {
+	on(eventType: string, callback: (event: ProcessingEvent) => void): () => void {
 		if (!this.eventSource) {
 			console.warn('[SSE] EventSource not initialized');
-			return;
+			return () => {};
 		}
 
-		this.eventSource.addEventListener(eventType, (event: Event) => {
+		const handler = (event: Event) => {
 			try {
 				const customEvent = event as MessageEvent;
 				const data = JSON.parse(customEvent.data) as ProcessingEvent;
@@ -115,29 +116,28 @@ class SSEStatusStore {
 			} catch (error) {
 				console.error(`[SSE] Error parsing ${eventType} event:`, error);
 			}
-		});
+		};
+
+		this.eventSource.addEventListener(eventType, handler);
+		this.registeredListeners.push({ type: eventType, handler });
+
+		return () => {
+			this.eventSource?.removeEventListener(eventType, handler);
+			this.registeredListeners = this.registeredListeners.filter(l => l.handler !== handler);
+		};
 	}
 
-	onMessage(callback: (event: ProcessingEvent) => void) {
-		if (!this.eventSource) {
-			console.warn('[SSE] EventSource not initialized');
-			return;
-		}
-
-		this.eventSource.addEventListener('message', (event: Event) => {
-			try {
-				const customEvent = event as MessageEvent;
-				const data = JSON.parse(customEvent.data) as ProcessingEvent;
-				this.lastMessageTime = new Date();
-				callback(data);
-			} catch (error) {
-				console.error('[SSE] Error parsing message event:', error);
-			}
-		});
+	onMessage(callback: (event: ProcessingEvent) => void): () => void {
+		return this.on('message', callback);
 	}
 
 	disconnect() {
 		if (this.eventSource) {
+			// Remove all tracked listeners before closing
+			for (const { type, handler } of this.registeredListeners) {
+				this.eventSource.removeEventListener(type, handler);
+			}
+			this.registeredListeners = [];
 			this.eventSource.close();
 			this.eventSource = null;
 		}

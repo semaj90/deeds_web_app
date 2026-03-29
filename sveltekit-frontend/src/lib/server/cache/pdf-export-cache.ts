@@ -117,6 +117,8 @@ export async function getCachedExport(
 /**
  * Cache an exported file
  */
+const MAX_EXPORT_SIZE_BYTES = 10 * 1024 * 1024; // 10MB — skip caching oversized exports
+
 export async function cacheExport(
 	reportId: string,
 	format: string,
@@ -125,6 +127,11 @@ export async function cacheExport(
 	filename: string,
 	reportUpdatedAt: Date
 ): Promise<void> {
+	const contentSize = Buffer.byteLength(content, 'utf8');
+	if (contentSize > MAX_EXPORT_SIZE_BYTES) {
+		console.warn(`[ExportCache] SKIP: content too large (${contentSize} bytes > ${MAX_EXPORT_SIZE_BYTES})`);
+		return;
+	}
 	const redis = redisPool.getConnection();
 	try {
 		const cacheKey = EXPORT_CACHE_KEYS.export(reportId, format);
@@ -190,10 +197,11 @@ export async function invalidateExportCache(reportId: string): Promise<void> {
  */
 export async function getExportCacheStats(): Promise<ExportCacheStats> {
 	const redis = redisPool.getConnection();
+	const MAX_STAT_KEYS = 500; // Cap keys scanned to prevent OOM on large caches
 	try {
 		const pattern = `report:export:*:${CACHE_VERSION}`;
 
-		// Scan for all export cache keys
+		// Scan for export cache keys with cap
 		const keys: string[] = [];
 		let cursor = '0';
 
@@ -207,37 +215,44 @@ export async function getExportCacheStats(): Promise<ExportCacheStats> {
 			);
 			cursor = nextCursor;
 			keys.push(...batch);
+			if (keys.length >= MAX_STAT_KEYS) break;
 		} while (cursor !== '0');
 
-		// Aggregate statistics
+		// Aggregate statistics — use pipeline to batch fetch metadata only
 		const formats: Record<string, number> = {};
 		let totalSizeBytes = 0;
 		let oldestExport: string | null = null;
 		let newestExport: string | null = null;
 
-		for (const key of keys) {
-			try {
-				const cached = await redis.get(key);
-				if (!cached) continue;
+		// Process in batches of 50 to avoid loading all content at once
+		const BATCH_SIZE = 50;
+		for (let i = 0; i < keys.length; i += BATCH_SIZE) {
+			const batch = keys.slice(i, i + BATCH_SIZE);
+			const pipeline = redis.pipeline();
+			for (const key of batch) {
+				pipeline.get(key);
+			}
+			const results = await pipeline.exec();
+			if (!results) continue;
 
-				const parsed = JSON.parse(cached) as CachedExport;
+			for (const [err, cached] of results) {
+				if (err || !cached || typeof cached !== 'string') continue;
+				try {
+					const parsed = JSON.parse(cached) as CachedExport;
 
-				// Count formats
-				formats[parsed.format] = (formats[parsed.format] || 0) + 1;
+					formats[parsed.format] = (formats[parsed.format] || 0) + 1;
+					totalSizeBytes += parsed.sizeBytes;
 
-				// Sum sizes
-				totalSizeBytes += parsed.sizeBytes;
-
-				// Track oldest/newest
-				const exportTime = new Date(parsed.exportedAt).getTime();
-				if (!oldestExport || exportTime < new Date(oldestExport).getTime()) {
-					oldestExport = parsed.exportedAt;
+					const exportTime = new Date(parsed.exportedAt).getTime();
+					if (!oldestExport || exportTime < new Date(oldestExport).getTime()) {
+						oldestExport = parsed.exportedAt;
+					}
+					if (!newestExport || exportTime > new Date(newestExport).getTime()) {
+						newestExport = parsed.exportedAt;
+					}
+				} catch {
+					// Skip malformed entries
 				}
-				if (!newestExport || exportTime > new Date(newestExport).getTime()) {
-					newestExport = parsed.exportedAt;
-				}
-			} catch {
-				// Skip malformed entries
 			}
 		}
 

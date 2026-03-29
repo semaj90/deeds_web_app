@@ -23,6 +23,8 @@ const subscribers = new Map<string, Set<ProgressCallback>>();
 
 const CLEANUP_INTERVAL_MS = 60_000; // Check every minute
 const MAX_AGE_MS = 10 * 60_000; // Remove after 10 minutes
+const MAX_JOBS = 1_000;
+const MAX_SUBSCRIBERS_PER_JOB = 50;
 
 // Auto-cleanup old jobs
 setInterval(() => {
@@ -33,7 +35,7 @@ setInterval(() => {
 			subscribers.delete(jobId);
 		}
 	}
-}, CLEANUP_INTERVAL_MS);
+}, CLEANUP_INTERVAL_MS).unref();
 
 export function createJob(jobId: string): JobProgress {
 	const job: JobProgress = {
@@ -44,6 +46,14 @@ export function createJob(jobId: string): JobProgress {
 		createdAt: Date.now(),
 		updatedAt: Date.now(),
 	};
+	// Evict oldest if at capacity
+	if (!jobs.has(jobId) && jobs.size >= MAX_JOBS) {
+		const oldest = jobs.keys().next().value;
+		if (oldest) {
+			jobs.delete(oldest);
+			subscribers.delete(oldest);
+		}
+	}
 	jobs.set(jobId, job);
 	return job;
 }
@@ -71,7 +81,13 @@ export function subscribe(jobId: string, callback: ProgressCallback): () => void
 	if (!subscribers.has(jobId)) {
 		subscribers.set(jobId, new Set());
 	}
-	subscribers.get(jobId)!.add(callback);
+	const subs = subscribers.get(jobId)!;
+	// Cap subscribers per job to prevent closure accumulation
+	if (subs.size >= MAX_SUBSCRIBERS_PER_JOB) {
+		const first = subs.values().next().value;
+		if (first) subs.delete(first);
+	}
+	subs.add(callback);
 
 	// Send current state immediately
 	const job = jobs.get(jobId);

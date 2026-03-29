@@ -32,6 +32,7 @@ const jobs = new Map<string, AceIngestJob>();
 
 const CLEANUP_INTERVAL_MS = 60_000;
 const MAX_AGE_MS = 10 * 60_000;
+const MAX_JOBS = 1_000;
 
 setInterval(() => {
 	const now = Date.now();
@@ -40,7 +41,7 @@ setInterval(() => {
 			jobs.delete(jobId);
 		}
 	}
-}, CLEANUP_INTERVAL_MS);
+}, CLEANUP_INTERVAL_MS).unref();
 
 export function createAceIngestJob(input: {
 	jobId: string;
@@ -64,6 +65,11 @@ export function createAceIngestJob(input: {
 		updatedAt: Date.now(),
 	};
 
+	// Evict oldest if at capacity
+	if (!jobs.has(input.jobId) && jobs.size >= MAX_JOBS) {
+		const oldest = jobs.keys().next().value;
+		if (oldest) jobs.delete(oldest);
+	}
 	jobs.set(input.jobId, job);
 	return job;
 }
