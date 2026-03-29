@@ -104,13 +104,13 @@
   let hasContent = $derived(value.length > 0);
   let inputElement = $state<HTMLInputElement | null>(null);
 
-  const effectiveRenderOptions = {
+  const effectiveRenderOptions = $derived.by(() => ({
     ...N64_TEXTURE_PRESETS.balanced,
     enableTextureFiltering,
     enableMipMapping,
     enableFog,
     ...renderOptions
-  };
+  }));
 
   function handleInput(e: Event) {
     if (disabled) return;

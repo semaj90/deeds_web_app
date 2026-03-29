@@ -112,13 +112,13 @@
       : options
   );
 
-  const effectiveRenderOptions = {
+  const effectiveRenderOptions = $derived.by(() => ({
     ...N64_TEXTURE_PRESETS.balanced,
     enableTextureFiltering,
     enableMipMapping,
     enableFog,
     ...renderOptions
-  };
+  }));
 
   function toggleDropdown() {
       if (disabled || loading) return;

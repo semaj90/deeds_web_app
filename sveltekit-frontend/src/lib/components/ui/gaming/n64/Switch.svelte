@@ -96,13 +96,13 @@
   let audioContext: AudioContext | null = null;
   let particleStyleElement: HTMLStyleElement | null = null;
 
-  const effectiveRenderOptions = {
+  const effectiveRenderOptions = $derived.by(() => ({
     ...N64_TEXTURE_PRESETS.balanced,
     enableTextureFiltering,
     enableMipMapping,
     enableFog,
     ...renderOptions
-  };
+  }));
 
   async function playSwitchSound(isOn: boolean) {
     if (!enableSpatialAudio || typeof window === 'undefined') return;

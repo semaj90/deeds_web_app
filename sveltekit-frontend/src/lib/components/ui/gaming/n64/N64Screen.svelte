@@ -31,7 +31,7 @@
   aria-label={ariaLabel}
   style="width: {width}; height: {height};"
 >
-  <div class="screen-content" tabindex="0" role="group">
+  <div class="screen-content" role="group">
     {#if children}
         {@render children()}
     {/if}

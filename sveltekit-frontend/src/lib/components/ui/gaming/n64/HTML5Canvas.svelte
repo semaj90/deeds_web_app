@@ -100,13 +100,13 @@
   let animationFrameId: number | null = null;
   let lastTime = 0;
 
-  const effectiveRenderOptions = {
+  const effectiveRenderOptions = $derived.by(() => ({
     ...N64_TEXTURE_PRESETS.highQuality,
     enableTextureFiltering,
     enableMipMapping,
     enableFog,
     ...renderOptions
-  };
+  }));
 
   // Fixed Shader Source
   const vertexShaderSource = `

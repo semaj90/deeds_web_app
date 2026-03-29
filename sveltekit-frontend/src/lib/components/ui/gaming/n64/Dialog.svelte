@@ -98,10 +98,10 @@
 
   let dialogElement = $state<HTMLElement | null>(null);
 
-  const effectiveRenderOptions = {
+  const effectiveRenderOptions = $derived.by(() => ({
     ...N64_TEXTURE_PRESETS.highQuality,
     ...renderOptions
-  };
+  }));
 
   function closeDialog() {
       if (preventClose) return;

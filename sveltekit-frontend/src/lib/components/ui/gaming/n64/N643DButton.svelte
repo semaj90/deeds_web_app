@@ -80,11 +80,11 @@
   let isPressed = $state(false);
   let isHovered = $state(false);
 
-  const effectiveRenderOptions = {
+  const effectiveRenderOptions = $derived.by(() => ({
     ...N64_TEXTURE_PRESETS.balanced,
     enableTextureFiltering,
     ...renderOptions
-  };
+  }));
 
   function handleClick(e: MouseEvent) {
       if (disabled || loading) return;
