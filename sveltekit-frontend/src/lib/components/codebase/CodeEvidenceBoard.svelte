@@ -165,6 +165,7 @@
 	}
 </script>
 
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
 	class="code-evidence-board"
 	bind:this={boardEl}

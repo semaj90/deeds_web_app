@@ -6,6 +6,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getQdrantUrl, getCodebaseIndexUrl } from '$lib/config/env.server.js';
+import { fastJsonParse, isSimdJsonAvailable } from '$lib/server/gpu/simdjson-bridge.js';
 
 const QDRANT_URL = getQdrantUrl();
 const FASTAPI_URL = getCodebaseIndexUrl();
@@ -14,6 +15,7 @@ const CLUSTER_COLLECTION = 'phase90_error_clusters';
 
 export const GET: RequestHandler = async ({ fetch, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+	const requestStart = performance.now();
 	try {
 		// Try FastAPI backend first
 		try {
@@ -55,7 +57,10 @@ export const GET: RequestHandler = async ({ fetch, locals }) => {
 		let lastIndexed: string | null = null;
 
 		if (errorCardsResponse.ok) {
-			const errorData = await errorCardsResponse.json();
+			const rawText = await errorCardsResponse.text();
+			const parseStart = performance.now();
+			const errorData = fastJsonParse<{ result?: { points?: Array<{ payload: Record<string, unknown> }> } }>(rawText);
+			const parseMs = performance.now() - parseStart;
 			const points = errorData.result?.points ?? [];
 			totalErrors = points.length;
 
@@ -109,7 +114,12 @@ export const GET: RequestHandler = async ({ fetch, locals }) => {
 			topErrorCodes,
 			surfaceBreakdown,
 			techBreakdown,
-			lastIndexed
+			lastIndexed,
+			_perf: {
+				totalMs: Math.round(performance.now() - requestStart),
+				simdAvailable: isSimdJsonAvailable(),
+				parser: isSimdJsonAvailable() && totalErrors > 0 ? 'simdjson' : 'v8',
+			},
 		});
 	} catch (error) {
 		console.error('Failed to get codebase stats:', error);

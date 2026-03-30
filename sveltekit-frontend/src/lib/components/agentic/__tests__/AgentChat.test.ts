@@ -81,7 +81,7 @@ describe('AgentChat Component', () => {
  const textarea = {
  className: 'message-input',
  placeholder: 'Ask about legal documents...',
- disabled:false, rows: 3 3,
+ disabled:false, rows: 3,
  };
 
  expect(textarea).toHaveProperty('className');
@@ -315,9 +315,9 @@ describe('AgentChat Component', () => {
 
  for (let i = 0; i < 10; i++) {
  componentState.messages.push({
- id: String(i, role: i % 2 === 0 ? 'user' : 'assistant',
+ id: String(i), role: i % 2 === 0 ? 'user' : 'assistant',
  content: `Message ${i}`,
- timestamp, new Date(),
+ timestamp: new Date(),
  });
  }
 

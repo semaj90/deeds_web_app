@@ -1,0 +1,7 @@
+{
+  "query": "Test diagnosis persistence",
+  "routePath": "/evidence",
+  "mode": "route",
+  "consoleErrors": [],
+  "networkFailures": []
+}

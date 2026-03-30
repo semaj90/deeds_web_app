@@ -1,8 +1,6 @@
 <!-- LegalResearchSpellbook.svelte — Game-style RAG Engine UI ("Spellbook") -->
 <!-- Corpus search, AI analysis scanning, source results with relevance -->
 <script lang="ts">
-	import Icon from '$lib/components/ui/Icon.svelte';
-
 	interface SearchResult {
 		id: string;
 		title: string;
@@ -280,9 +278,9 @@
 						{#if result.jurisdiction}
 							<span class="result-jurisdiction">{result.jurisdiction}</span>
 						{/if}
-						<button class="pin-btn {pinnedResults.has(result.id) ? 'pinned' : ''}" onclick={(e) => { e.stopPropagation(); togglePin(result.id); }}>
+						<span class="pin-btn {pinnedResults.has(result.id) ? 'pinned' : ''}" role="button" tabindex="0" onclick={(e) => { e.stopPropagation(); togglePin(result.id); }} onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); e.preventDefault(); togglePin(result.id); } }}>
 							{pinnedResults.has(result.id) ? '★' : '☆'}
-						</button>
+						</span>
 					</div>
 				</button>
 			{/each}
@@ -552,6 +550,7 @@
 		overflow: hidden;
 		display: -webkit-box;
 		-webkit-line-clamp: 3;
+		line-clamp: 3;
 		-webkit-box-orient: vertical;
 	}
 	.result-footer { display: flex; align-items: center; gap: 10px; }

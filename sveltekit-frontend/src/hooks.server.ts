@@ -29,7 +29,7 @@ import { auditBuffer } from '$lib/server/audit/api-audit-buffer';
 
 // ── Request Timeout Constants ────────────────────────────────────────────
 const DEFAULT_REQUEST_TIMEOUT = 30_000; // 30s for normal routes
-const AI_REQUEST_TIMEOUT = 120_000; // 120s for AI/inference routes
+const AI_REQUEST_TIMEOUT = 300_000; // 300s for AI/inference routes (LLM can take 2-3min)
 
 // ── Request Body Size Limits (Sprint 4) ──────────────────────────────────
 const MAX_BODY_SIZE = 50 * 1024 * 1024; // 50MB default
@@ -98,7 +98,7 @@ if (shouldRunBootTasks && !dev) {
   if (JWT === 'dev-only-jwt-secret-change-in-production' || SVC === 'dev-only-service-token') {
     throw new Error(
       'FATAL: Production deployment detected with dev-only secrets. ' +
-      'Set JWT_SECRET and SERVICE_AUTH_TOKEN environment variables before deploying.'
+        'Set JWT_SECRET and SERVICE_AUTH_TOKEN environment variables before deploying.'
     );
   }
 }
@@ -141,7 +141,8 @@ if (shouldRunSingletonTasks) {
   startIdleScanner();
 
   // Start typed queue-worker consumers (entity extraction, embedding, analytics, etc.)
-  createDefaultRegistry().startAll()
+  createDefaultRegistry()
+    .startAll()
     .then((stats) => {
       console.log(`[Boot] Queue workers: ${stats.started}/${stats.started + stats.failed} started`);
       if (stats.errors.length > 0) {
@@ -337,7 +338,6 @@ async function warmupLLMCache(): Promise<WarmupStatus> {
     reason: cached === 0 ? 'all embeddings failed' : undefined,
   };
 }
-
 
 /**
  * Main request handler with Lucia v3 session validation
@@ -542,6 +542,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     event.url.pathname.startsWith('/api/nlp/') ||
     event.url.pathname.startsWith('/api/rag/') ||
     event.url.pathname.startsWith('/api/synthesis/') ||
+    event.url.pathname.startsWith('/api/error-brain/diagnose') ||
     event.url.pathname.startsWith('/api/evidence/upload');
 
   if (isStreamRoute) {
@@ -599,7 +600,13 @@ export const handle: Handle = async ({ event, resolve }) => {
     statusCode: response.status,
     durationMs: duration,
     userId: event.locals.user?.id,
-    ipAddress: (() => { try { return event.getClientAddress?.(); } catch { return event.request.headers.get('x-forwarded-for') ?? undefined; } })(),
+    ipAddress: (() => {
+      try {
+        return event.getClientAddress?.();
+      } catch {
+        return event.request.headers.get('x-forwarded-for') ?? undefined;
+      }
+    })(),
     userAgent: event.request.headers.get('user-agent') ?? undefined,
   });
 
@@ -620,8 +627,14 @@ export const handle: Handle = async ({ event, resolve }) => {
     response.headers.set('X-Content-Type-Options', 'nosniff');
     response.headers.set('X-Frame-Options', 'DENY');
     response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-    response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
-    response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
+    response.headers.set(
+      'Strict-Transport-Security',
+      'max-age=63072000; includeSubDomains; preload'
+    );
+    response.headers.set(
+      'Permissions-Policy',
+      'camera=(), microphone=(), geolocation=(), payment=()'
+    );
     response.headers.set(
       'Content-Security-Policy',
       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws: wss:; font-src 'self' data:; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"

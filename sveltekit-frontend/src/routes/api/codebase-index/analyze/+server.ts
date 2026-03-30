@@ -15,12 +15,16 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { resolve, relative } from 'path';
 import { readFileSync, statSync } from 'fs';
+import { createHash } from 'crypto';
 import { callOllamaChat } from '$lib/server/ollama.js';
+import { setCache, cognitiveCache } from '$lib/server/cache.js';
+import { fastJsonParse, isSimdJsonAvailable } from '$lib/server/gpu/simdjson-bridge.js';
 
 const SRC_ROOT = resolve(process.cwd(), 'src');
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+	const requestStart = performance.now();
 
 	let body: { filePath?: string };
 	try {
@@ -65,6 +69,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	const relPath = relative(projectRoot, normalizedPath).replace(/\\/g, '/');
 
+	// Check cache (keyed by file path + size for invalidation on change)
+	const ANALYZE_CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+	const cacheKey = `ast:analyze:${createHash('sha256').update(`${relPath}:${fileStats.size}`).digest('hex').slice(0, 16)}`;
+	const cached = await cognitiveCache.getJsonbDocument<Record<string, unknown>>(cacheKey);
+	if (cached) {
+		return json({ ...cached, cached: true });
+	}
+
 	const systemPrompt = `You are a senior software architect analyzing a TypeScript/Svelte codebase.
 Analyze the file and return a JSON object with these fields:
 - "summary": 1-2 sentence description of what this file does
@@ -97,7 +109,7 @@ ${contentForLLM}
 
 		let analysis: Record<string, unknown>;
 		try {
-			analysis = JSON.parse(cleaned);
+			analysis = fastJsonParse<Record<string, unknown>>(cleaned);
 		} catch {
 			// LLM returned non-JSON — wrap it
 			analysis = {
@@ -111,13 +123,22 @@ ${contentForLLM}
 			};
 		}
 
-		return json({
+		const result = {
 			filePath: relPath,
 			fileStats,
 			truncated,
 			analysis,
 			analyzedAt: new Date().toISOString(),
-		});
+			_perf: {
+				totalMs: Math.round(performance.now() - requestStart),
+				parser: isSimdJsonAvailable() ? 'simdjson' : 'v8',
+			},
+		};
+
+		// Store in cache
+		await setCache(cacheKey, result, ANALYZE_CACHE_TTL_MS);
+
+		return json(result);
 	} catch (err) {
 		console.error('[codebase-analyze] LLM error:', err);
 		return json(

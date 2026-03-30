@@ -39,6 +39,7 @@
 		{ category: 'System', icon: 'settings', items: [
 			{ keys: ['?'], action: 'Show This Panel' },
 			{ keys: ['Ctrl', 'Shift', 'D'], action: 'Toggle Document Writer' },
+			{ keys: ['Ctrl', 'Shift', 'G'], action: 'Toggle Analysis Panel' },
 			{ keys: ['Ctrl', 'S'], action: 'Save Current Note' },
 			{ keys: ['Ctrl', 'Z'], action: 'Undo' },
 		]},

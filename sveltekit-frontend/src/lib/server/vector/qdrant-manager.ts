@@ -664,10 +664,13 @@ export class QdrantManager {
       };
     } catch (error: any) {
       // Fallback to dense-only if collection doesn't have sparse vectors
+      const errMsg = String(error?.message ?? '') + String(error?.data?.status?.error ?? '');
       if (
-        error?.message?.includes('sparse') ||
-        error?.message?.includes('not found') ||
-        error?.message?.includes('does not exist')
+        errMsg.includes('sparse') ||
+        errMsg.includes('not found') ||
+        errMsg.includes('does not exist') ||
+        errMsg.includes('not configured') ||
+        error?.status === 400
       ) {
         console.warn(
           `[qdrant] Sparse vector not available on ${collectionName}, falling back to dense-only`

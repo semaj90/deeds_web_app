@@ -18,5 +18,4 @@ export { Avatar, Button, Checkbox, Popover, Select, Tabs, Tooltip } from 'bits-u
 export { default as Svelte5Button } from './Svelte5Button.svelte';
 export { default as BitsButton } from './Button.svelte';
 
-// Export types
-export * from './types.js';
+// Types are available directly from 'bits-ui'

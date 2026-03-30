@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 
 	interface DialogueEntry {
@@ -84,6 +85,78 @@
 	let showEvidencePanel = $state(false);
 	let showObjectionMenu = $state(false);
 
+	// ── Keyboard shortcuts ──────────────────────────────────────
+	function handleKeyboard(e: KeyboardEvent) {
+		// Don't capture when typing in inputs
+		if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement) return;
+		if (status === 'completed') return;
+
+		switch (e.key) {
+			case 'Enter':
+			case ' ':
+				e.preventDefault();
+				if (!typewriterDone) {
+					skipTypewriter();
+				} else if (!isAdvancing) {
+					onAction('next_turn');
+				}
+				break;
+			case 'o':
+			case 'O':
+				if (!isAdvancing) {
+					e.preventDefault();
+					showObjectionMenu = !showObjectionMenu;
+					showEvidencePanel = false;
+				}
+				break;
+			case 'p':
+			case 'P':
+				if (!isAdvancing) {
+					e.preventDefault();
+					onAction('cross_examine');
+				}
+				break;
+			case 'e':
+			case 'E':
+				if (!isAdvancing) {
+					e.preventDefault();
+					showEvidencePanel = !showEvidencePanel;
+					showObjectionMenu = false;
+				}
+				break;
+			case 'n':
+			case 'N':
+				if (!isAdvancing) {
+					e.preventDefault();
+					onAction('next_phase');
+				}
+				break;
+			case 'Escape':
+				showObjectionMenu = false;
+				showEvidencePanel = false;
+				break;
+			case '1': case '2': case '3': case '4':
+				if (showObjectionMenu) {
+					e.preventDefault();
+					const objections = [
+						{ type: 'hearsay', basis: 'Rule 802 - Hearsay' },
+						{ type: 'relevance', basis: 'Rule 401/403 - Relevance' },
+						{ type: 'foundation', basis: 'Insufficient Foundation' },
+						{ type: 'speculation', basis: 'Rule 701 - Speculation' },
+					];
+					const idx = parseInt(e.key) - 1;
+					triggerObjection(objections[idx].type, objections[idx].basis);
+					showObjectionMenu = false;
+				}
+				break;
+		}
+	}
+
+	onMount(() => {
+		window.addEventListener('keydown', handleKeyboard);
+		return () => window.removeEventListener('keydown', handleKeyboard);
+	});
+
 	// ── Role helpers ────────────────────────────────────────────
 	function roleColor(role: string): string {
 		const map: Record<string, string> = {
@@ -155,18 +228,18 @@
 	<div class="objection-menu" onclick={(e) => e.stopPropagation()}>
 		<div class="objection-menu-title">⚖ SELECT GROUNDS</div>
 		<button onclick={() => { triggerObjection('hearsay', 'Rule 802 - Hearsay'); showObjectionMenu = false; }}>
-			Hearsay <span class="rule-tag">FRE 802</span>
+			<span class="obj-num">1</span> Hearsay <span class="rule-tag">FRE 802</span>
 		</button>
 		<button onclick={() => { triggerObjection('relevance', 'Rule 401/403 - Relevance'); showObjectionMenu = false; }}>
-			Relevance <span class="rule-tag">FRE 401</span>
+			<span class="obj-num">2</span> Relevance <span class="rule-tag">FRE 401</span>
 		</button>
 		<button onclick={() => { triggerObjection('foundation', 'Insufficient Foundation'); showObjectionMenu = false; }}>
-			Foundation <span class="rule-tag">FRE 602</span>
+			<span class="obj-num">3</span> Foundation <span class="rule-tag">FRE 602</span>
 		</button>
 		<button onclick={() => { triggerObjection('speculation', 'Rule 701 - Speculation'); showObjectionMenu = false; }}>
-			Speculation <span class="rule-tag">FRE 701</span>
+			<span class="obj-num">4</span> Speculation <span class="rule-tag">FRE 701</span>
 		</button>
-		<button class="cancel-btn" onclick={() => showObjectionMenu = false}>CANCEL</button>
+		<button class="cancel-btn" onclick={() => showObjectionMenu = false}>ESC TO CANCEL</button>
 	</div>
 {/if}
 
@@ -222,10 +295,10 @@
 					</div>
 				{/if}
 			{:else}
-				<p class="dialogue-empty">Simulation ready. Advance to begin proceedings.</p>
+				<p class="dialogue-empty">Simulation ready. Press <kbd>ENTER</kbd> to begin proceedings.</p>
 			{/if}
 			{#if !typewriterDone}
-				<span class="skip-hint">CLICK TO SKIP ▶</span>
+				<span class="skip-hint">ENTER / CLICK TO SKIP ▶</span>
 			{/if}
 		</div>
 
@@ -241,45 +314,45 @@
 					class="hud-btn btn-next"
 					onclick={() => onAction('next_turn')}
 					disabled={isAdvancing || !typewriterDone}
-					title="Advance to next turn"
+					title="Advance to next turn (Enter)"
 				>
-					<Icon name="chevron-right" size={14} /> NEXT
+					<Icon name="chevron-right" size={14} /> NEXT <kbd class="key-hint">⏎</kbd>
 				</button>
 
 				<button
 					class="hud-btn btn-press"
 					onclick={() => onAction('cross_examine')}
 					disabled={isAdvancing}
-					title="Press the witness"
+					title="Press the witness (P)"
 				>
-					<Icon name="message-square" size={14} /> PRESS
+					<Icon name="message-square" size={14} /> PRESS <kbd class="key-hint">P</kbd>
 				</button>
 
 				<button
 					class="hud-btn btn-object"
 					onclick={() => showObjectionMenu = !showObjectionMenu}
 					disabled={isAdvancing}
-					title="Object to statement"
+					title="Object to statement (O)"
 				>
-					<Icon name="zap" size={14} /> OBJECTION
+					<Icon name="zap" size={14} /> OBJECTION <kbd class="key-hint">O</kbd>
 				</button>
 
 				<button
 					class="hud-btn btn-present"
 					onclick={() => showEvidencePanel = !showEvidencePanel}
 					disabled={isAdvancing}
-					title="Present evidence"
+					title="Present evidence (E)"
 				>
-					<Icon name="paperclip" size={14} /> PRESENT
+					<Icon name="paperclip" size={14} /> PRESENT <kbd class="key-hint">E</kbd>
 				</button>
 
 				<button
 					class="hud-btn btn-phase"
 					onclick={() => onAction('next_phase')}
 					disabled={isAdvancing}
-					title="Advance to next phase"
+					title="Advance to next phase (N)"
 				>
-					<Icon name="skip-forward" size={12} /> PHASE+
+					<Icon name="skip-forward" size={12} /> PHASE+ <kbd class="key-hint">N</kbd>
 				</button>
 
 				{#if onAbandon}
@@ -403,7 +476,7 @@
 		width: 100%;
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
+		gap: 0.4rem;
 		padding: 0.5rem 0.75rem;
 		font-size: 0.65rem;
 		color: rgba(220, 240, 255, 0.8);
@@ -426,6 +499,19 @@
 		border-bottom: none;
 	}
 
+	.obj-num {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 16px;
+		height: 16px;
+		border: 1px solid rgba(255, 80, 80, 0.35);
+		border-radius: 2px;
+		font-size: 0.5rem;
+		color: rgba(255, 80, 80, 0.6);
+		flex-shrink: 0;
+	}
+
 	.rule-tag {
 		font-size: 0.5rem;
 		padding: 0.1rem 0.35rem;
@@ -433,12 +519,14 @@
 		border-radius: 2px;
 		color: rgba(255, 80, 80, 0.65);
 		background: rgba(255, 80, 80, 0.06);
+		margin-left: auto;
 	}
 
 	.cancel-btn {
 		color: rgba(255, 255, 255, 0.3) !important;
 		font-size: 0.55rem !important;
 		letter-spacing: 0.12em !important;
+		justify-content: center !important;
 	}
 
 	/* ══ EVIDENCE PANEL ══════════════════════════════════════════ */
@@ -666,6 +754,16 @@
 		display: flex;
 		align-items: center;
 		font-style: italic;
+		gap: 0.3rem;
+	}
+
+	.dialogue-empty kbd {
+		font-size: 0.6rem;
+		padding: 0.08rem 0.35rem;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 2px;
+		background: rgba(255, 255, 255, 0.06);
+		font-style: normal;
 	}
 
 	.cursor {
@@ -739,6 +837,16 @@
 		white-space: nowrap;
 	}
 	.hud-btn:disabled { opacity: 0.28; cursor: not-allowed; }
+
+	.key-hint {
+		font-size: 0.45rem;
+		padding: 0.05rem 0.25rem;
+		border: 1px solid currentColor;
+		border-radius: 2px;
+		opacity: 0.45;
+		margin-left: auto;
+		font-weight: 400;
+	}
 
 	/* NEXT — green */
 	.btn-next {

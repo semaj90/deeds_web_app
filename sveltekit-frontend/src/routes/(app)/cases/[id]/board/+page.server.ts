@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 
 const safe = <T>(p: Promise<T>, fb: T): Promise<T> =>
-	Promise.race([p, new Promise<T>((r) => setTimeout(() => r(fb), 5000))]);
+	Promise.race([p, new Promise<T>((r) => setTimeout(() => r(fb), 5000))]).catch(() => fb);
 
 export const load: PageServerLoad = async ({ params }) => {
 	const { id } = params;

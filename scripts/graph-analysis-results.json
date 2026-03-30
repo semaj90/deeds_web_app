@@ -1,0 +1,9 @@
+{
+  "totalNodes": 500,
+  "totalEdges": 394,
+  "totalLines": 87485,
+  "avgComplexity": 13.2,
+  "avgLines": 175,
+  "orphanCount": 222,
+  "orphanPct": 44
+}

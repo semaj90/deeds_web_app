@@ -16,7 +16,9 @@ import type { RequestHandler } from './$types';
 import { Worker } from 'worker_threads';
 import { resolve, relative, basename, dirname, extname } from 'path';
 import { readdirSync, statSync } from 'fs';
+import { createHash } from 'crypto';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
+import { setCache, cognitiveCache } from '$lib/server/cache.js';
 
 interface GraphNode {
 	id: string;
@@ -287,6 +289,15 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		return json({ error: 'Invalid directory' }, { status: 400 });
 	}
 
+	const GRAPH_CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
+	const cacheKey = `ast:graph:${createHash('sha256').update(`${scanDir}:${maxFiles}`).digest('hex').slice(0, 16)}`;
+
+	// Check cache first
+	const cached = await cognitiveCache.getJsonbDocument<{ nodes: GraphNode[]; edges: GraphEdge[]; metadata: Record<string, unknown> }>(cacheKey);
+	if (cached) {
+		return json({ ...cached, cached: true });
+	}
+
 	try {
 		let result;
 
@@ -300,6 +311,9 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		} else {
 			result = await buildGraphInline(scanDir, maxFiles);
 		}
+
+		// Store in cache
+		await setCache(cacheKey, result, GRAPH_CACHE_TTL_MS);
 
 		return json(result);
 	} catch (error) {

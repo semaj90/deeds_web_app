@@ -2493,6 +2493,54 @@ export const errorFeedback = pgTable('error_feedback',
 );
 
 // ============================================================================
+// DIAGNOSIS HISTORY (Page-aware AI diagnosis persistence)
+// ============================================================================
+
+/**
+ * diagnosis_events: Persisted AI diagnosis results from the error-brain pipeline.
+ * Stores the full typed DiagnosisResult so we can:
+ *   - Learn from past diagnoses (reranking, pattern detection)
+ *   - Show diagnosis history per route
+ *   - Track accuracy via feedback (was the root cause correct?)
+ *   - Measure latency trends
+ */
+export const diagnosisEvents = pgTable('diagnosis_events',
+	{
+		id: uuid('id').primaryKey().defaultRandom(),
+		routePath: varchar('route_path', { length: 255 }),
+		filePath: varchar('file_path', { length: 500 }),
+		query: text('query').notNull(),
+		mode: varchar('mode', { length: 20 }).notNull().default('route'),
+		probableRootCauseType: varchar('probable_root_cause_type', { length: 50 }).notNull().default('unknown'),
+		riskLevel: varchar('risk_level', { length: 10 }).notNull().default('medium'),
+		diagnosis: text('diagnosis').notNull(),
+		likelyFiles: jsonb('likely_files').default([]).notNull(),
+		impactedFiles: jsonb('impacted_files').default([]).notNull(),
+		fixPlan: jsonb('fix_plan').default([]).notNull(),
+		evidence: jsonb('evidence').default([]).notNull(),
+		rankedFiles: jsonb('ranked_files').default([]).notNull(),
+		suggestedTests: jsonb('suggested_tests').default([]).notNull(),
+		sources: jsonb('sources').default({}).notNull(),
+		needsHumanReview: boolean('needs_human_review').notNull().default(true),
+		unsafeToAutoPatch: boolean('unsafe_to_auto_patch').notNull().default(false),
+		cached: boolean('cached').notNull().default(false),
+		totalMs: integer('total_ms'),
+		stages: jsonb('stages').default({}).notNull(),
+		userId: uuid('user_id'),
+		feedbackAccurate: boolean('feedback_accurate'),
+		feedbackHelpful: boolean('feedback_helpful'),
+		queryEmbedding: vector('query_embedding', { dimensions: 768 }),
+		createdAt: timestamp('created_at').notNull().defaultNow(),
+	},
+	(table) => ({
+		idxRoutePath: index('idx_diagnosis_events_route').on(table.routePath),
+		idxMode: index('idx_diagnosis_events_mode').on(table.mode),
+		idxRootCause: index('idx_diagnosis_events_root_cause').on(table.probableRootCauseType),
+		idxCreatedAt: index('idx_diagnosis_events_created').on(table.createdAt),
+	})
+);
+
+// ============================================================================
 // PHASE 78 TYPE EXPORTS
 // ============================================================================
 
@@ -2519,6 +2567,9 @@ export type NewErrorSuggestionState = typeof errorSuggestionStates.$inferInsert;
 
 export type ErrorFeedback = typeof errorFeedback.$inferSelect;
 export type NewErrorFeedback = typeof errorFeedback.$inferInsert;
+
+export type DiagnosisEvent = typeof diagnosisEvents.$inferSelect;
+export type NewDiagnosisEvent = typeof diagnosisEvents.$inferInsert;
 
 // === CASE REPORTS ===
 export const caseReports = pgTable('case_reports', {

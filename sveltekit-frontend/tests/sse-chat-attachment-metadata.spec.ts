@@ -210,7 +210,7 @@ describe('/api/sse/chat attachment metadata', () => {
       }),
     });
 
-    const response = await POST({ request } as never);
+    const response = await POST({ request, locals: { user: { id: 'test-user' } } } as never);
     const events = await readSseEvents(response);
     const doneEvent = events.at(-1);
 
@@ -307,7 +307,7 @@ describe('/api/sse/chat attachment metadata', () => {
       }),
     });
 
-    const response = await POST({ request } as never);
+    const response = await POST({ request, locals: { user: { id: 'test-user' } } } as never);
     const events = await readSseEvents(response);
     const doneEvent = events.at(-1);
 
@@ -410,7 +410,7 @@ describe('/api/sse/chat attachment metadata', () => {
       }),
     });
 
-    const response = await POST({ request } as never);
+    const response = await POST({ request, locals: { user: { id: 'test-user' } } } as never);
     const events = await readSseEvents(response);
     const doneEvent = events.at(-1);
 
@@ -551,7 +551,7 @@ describe('/api/sse/chat attachment metadata', () => {
       }),
     });
 
-    const response = await POST({ request } as never);
+    const response = await POST({ request, locals: { user: { id: 'test-user' } } } as never);
     const events = await readSseEvents(response);
     const doneEvent = events.at(-1);
 
@@ -657,7 +657,7 @@ describe('/api/sse/chat attachment metadata', () => {
       }),
     });
 
-    const response = await POST({ request } as never);
+    const response = await POST({ request, locals: { user: { id: 'test-user' } } } as never);
     const events = await readSseEvents(response);
     const doneEvent = events.at(-1);
 
@@ -744,7 +744,7 @@ describe('/api/sse/chat attachment metadata', () => {
       }),
     });
 
-    const response = await POST({ request } as never);
+    const response = await POST({ request, locals: { user: { id: 'test-user' } } } as never);
     const events = await readSseEvents(response);
     const doneEvent = events.at(-1);
 
@@ -853,7 +853,7 @@ describe('/api/sse/chat attachment metadata', () => {
       }),
     });
 
-    const response = await POST({ request } as never);
+    const response = await POST({ request, locals: { user: { id: 'test-user' } } } as never);
     const events = await readSseEvents(response);
     const doneEvent = events.at(-1);
 
@@ -973,7 +973,7 @@ describe('/api/sse/chat attachment metadata', () => {
       }),
     });
 
-    const response = await POST({ request } as never);
+    const response = await POST({ request, locals: { user: { id: 'test-user' } } } as never);
     const events = await readSseEvents(response);
     const doneEvent = events.at(-1);
 
@@ -1154,7 +1154,7 @@ describe('/api/sse/chat attachment metadata', () => {
       }),
     });
 
-    const response = await POST({ request } as never);
+    const response = await POST({ request, locals: { user: { id: 'test-user' } } } as never);
     const events = await readSseEvents(response);
     const doneEvent = events.at(-1);
 
@@ -1338,7 +1338,7 @@ describe('/api/sse/chat attachment metadata', () => {
       }),
     });
 
-    const response = await POST({ request } as never);
+    const response = await POST({ request, locals: { user: { id: 'test-user' } } } as never);
     const events = await readSseEvents(response);
     const doneEvent = events.at(-1);
 
@@ -1503,7 +1503,7 @@ describe('/api/sse/chat attachment metadata', () => {
       }),
     });
 
-    const response = await POST({ request } as never);
+    const response = await POST({ request, locals: { user: { id: 'test-user' } } } as never);
     const events = await readSseEvents(response);
     const doneEvent = events.at(-1);
 
@@ -1645,7 +1645,7 @@ describe('/api/sse/chat attachment metadata', () => {
       }),
     });
 
-    const response = await POST({ request } as never);
+    const response = await POST({ request, locals: { user: { id: 'test-user' } } } as never);
     const events = await readSseEvents(response);
     const doneEvent = events.at(-1);
 
@@ -1765,7 +1765,7 @@ describe('/api/sse/chat attachment metadata', () => {
       }),
     });
 
-    const response = await POST({ request } as never);
+    const response = await POST({ request, locals: { user: { id: 'test-user' } } } as never);
     const events = await readSseEvents(response);
     const doneEvent = events.at(-1);
 
@@ -1859,7 +1859,7 @@ describe('/api/sse/chat attachment metadata', () => {
       }),
     });
 
-    const response = await POST({ request } as never);
+    const response = await POST({ request, locals: { user: { id: 'test-user' } } } as never);
     const events = await readSseEvents(response);
     const doneEvent = events.at(-1);
 
@@ -1983,7 +1983,7 @@ describe('/api/sse/chat attachment metadata', () => {
       }),
     });
 
-    const response = await POST({ request } as never);
+    const response = await POST({ request, locals: { user: { id: 'test-user' } } } as never);
     const events = await readSseEvents(response);
     const doneEvent = events.at(-1);
 
@@ -2167,7 +2167,7 @@ describe('/api/sse/chat attachment metadata', () => {
       }),
     });
 
-    const response = await POST({ request } as never);
+    const response = await POST({ request, locals: { user: { id: 'test-user' } } } as never);
     const events = await readSseEvents(response);
     const doneEvent = events.at(-1);
 
@@ -2335,7 +2335,7 @@ describe('/api/sse/chat attachment metadata', () => {
       }),
     });
 
-    const response = await POST({ request } as never);
+    const response = await POST({ request, locals: { user: { id: 'test-user' } } } as never);
     const events = await readSseEvents(response);
     const doneEvent = events.at(-1);
 

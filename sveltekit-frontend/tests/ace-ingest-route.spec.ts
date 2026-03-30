@@ -10,6 +10,15 @@ const mockUpdateAceIngestJob = vi.fn();
 const mockExtractTextHybrid = vi.fn();
 const mockCreateYOLOService = vi.fn();
 
+vi.mock('$env/dynamic/private', () => ({ env: {} }));
+vi.mock('$env/dynamic/public', () => ({ env: {} }));
+vi.mock('$lib/server/env.server.js', () => ({
+  ENV: {
+    OLLAMA_BASE_URL: 'http://ollama.test',
+    QDRANT_URL: 'http://qdrant.test',
+  },
+}));
+
 vi.mock('$lib/server/indexer/legal-chunker.js', () => ({
   chunkLegalDocument: mockChunkLegalDocument,
 }));
@@ -156,23 +165,24 @@ describe('/api/ace/ingest route', () => {
     } as never);
 
     expect(response.status).toBe(400);
-    expect(await response.json()).toEqual({ error: 'Invalid input: expected string, received undefined' });
+    expect(await response.json()).toEqual({ error: 'Invalid input' });
     expect(mockCreateAceIngestJob).not.toHaveBeenCalled();
   });
 
   it('ingests a URL synchronously and returns completed status metadata', async () => {
     const { POST } = await import('../src/routes/api/ace/ingest/+server.js');
 
-    const fetchMock = vi.fn(async () =>
-      new Response(
-        '<html><head><title>Search Warrant Notes</title></head><body><p>' +
-          longPlainText +
-          '</p></body></html>',
-        {
-          status: 200,
-          headers: { 'content-type': 'text/html' },
-        }
-      )
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(
+          '<html><head><title>Search Warrant Notes</title></head><body><p>' +
+            longPlainText +
+            '</p></body></html>',
+          {
+            status: 200,
+            headers: { 'content-type': 'text/html' },
+          }
+        )
     );
     vi.stubGlobal('fetch', fetchMock);
 
@@ -336,7 +346,8 @@ describe('/api/ace/ingest route', () => {
         expect.objectContaining({
           step: 'deferred',
           progress: 100,
-          message: 'Background retrieval indexing deferred because the embedding service timed out.',
+          message:
+            'Background retrieval indexing deferred because the embedding service timed out.',
           result: expect.objectContaining({
             indexingStatus: 'deferred',
             statusStep: 'deferred',
@@ -352,11 +363,12 @@ describe('/api/ace/ingest route', () => {
 
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () =>
-        new Response('bad gateway', {
-          status: 502,
-          headers: { 'content-type': 'text/plain' },
-        })
+      vi.fn(
+        async () =>
+          new Response('bad gateway', {
+            status: 502,
+            headers: { 'content-type': 'text/plain' },
+          })
       )
     );
 
@@ -382,7 +394,7 @@ describe('/api/ace/ingest route', () => {
         step: 'error',
         progress: 100,
         message: 'Ingestion failed.',
-        error: 'Fetch failed: HTTP 502',
+        error: 'Ingestion failed',
       })
     );
   });
@@ -390,16 +402,17 @@ describe('/api/ace/ingest route', () => {
   it('streams progress events and a final complete event when stream mode is enabled', async () => {
     const { POST } = await import('../src/routes/api/ace/ingest/+server.js');
 
-    const fetchMock = vi.fn(async () =>
-      new Response(
-        '<html><head><title>Streamed Brief</title></head><body><p>' +
-          longPlainText +
-          '</p></body></html>',
-        {
-          status: 200,
-          headers: { 'content-type': 'text/html' },
-        }
-      )
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(
+          '<html><head><title>Streamed Brief</title></head><body><p>' +
+            longPlainText +
+            '</p></body></html>',
+          {
+            status: 200,
+            headers: { 'content-type': 'text/html' },
+          }
+        )
     );
     vi.stubGlobal('fetch', fetchMock);
 
@@ -457,11 +470,12 @@ describe('/api/ace/ingest route', () => {
 
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () =>
-        new Response('bad gateway', {
-          status: 502,
-          headers: { 'content-type': 'text/plain' },
-        })
+      vi.fn(
+        async () =>
+          new Response('bad gateway', {
+            status: 502,
+            headers: { 'content-type': 'text/plain' },
+          })
       )
     );
 
@@ -485,7 +499,7 @@ describe('/api/ace/ingest route', () => {
     expect(events.at(-1)).toEqual({
       stage: 'error',
       progress: 0,
-      error: 'Fetch failed: HTTP 502',
+      error: 'Ingestion failed',
     });
     expect(mockUpdateAceIngestJob).toHaveBeenLastCalledWith(
       expect.any(String),
@@ -493,7 +507,7 @@ describe('/api/ace/ingest route', () => {
         step: 'error',
         progress: 100,
         message: 'Ingestion failed.',
-        error: 'Fetch failed: HTTP 502',
+        error: 'Ingestion failed',
       })
     );
   });

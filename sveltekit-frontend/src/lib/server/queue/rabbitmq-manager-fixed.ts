@@ -68,6 +68,7 @@ export class RabbitMQManager extends EventEmitter {
     analytics_track: 'analytics.track',
     codebase_index: 'codebase.index',
     ace_evaluate: 'ace.evaluate',
+    error_embed: 'error.embed',
   };
 
   constructor() {
@@ -180,6 +181,7 @@ export class RabbitMQManager extends EventEmitter {
       'analytics.track',
       'codebase.index',
       'ace.evaluate',
+      'error.embed',
     ];
     for (const queue of queuesToMigrate) {
       try {
@@ -230,6 +232,11 @@ export class RabbitMQManager extends EventEmitter {
       this.exchanges.document_processing,
       'ace.evaluate'
     );
+    await this.bindQueue(
+      this.queues.error_embed,
+      this.exchanges.document_processing,
+      'error.embed'
+    );
 
     console.log('✅ Queue bindings configured (with DLQ)');
   }
@@ -255,8 +262,9 @@ export class RabbitMQManager extends EventEmitter {
     await this.consume(this.queues.analytics_track, this.handleAnalyticsTrack.bind(this)); // fast
     await this.consume(this.queues.codebase_index, this.handleCodebaseIndex.bind(this)); // slow
     await this.consume(this.queues.ace_evaluate, this.handleACEEvaluate.bind(this)); // slow (LLM call)
+    await this.consume(this.queues.error_embed, this.handleErrorEmbed.bind(this)); // medium (embedding)
 
-    console.log('👂 All 8 RabbitMQ consumers started (prefetch: 10)');
+    console.log('👂 All 9 RabbitMQ consumers started (prefetch: 10)');
 
     // Start DLQ consumers — drain dead-lettered messages for logging/monitoring
     await this.startDLQConsumers();
@@ -685,6 +693,57 @@ export class RabbitMQManager extends EventEmitter {
     });
   }
 
+  // --- Error Embedding Handler ---
+
+  private async handleErrorEmbed(msg: AmqpMessage): Promise<void> {
+    if (!msg || !this.channel) return;
+    try {
+      const data = this.parseMessage(msg);
+      if (!data?.errorMessage) {
+        this.channel.ack(msg);
+        return;
+      }
+
+      const { embedErrorEvent } = await import('../pipeline/error-embedding-pipeline.js');
+      const result = await embedErrorEvent({
+        errorMessage: data.errorMessage,
+        filePath: data.filePath,
+        routePath: data.routePath,
+        stackTrace: data.stackTrace,
+        severity: data.severity,
+        tsCode: data.tsCode,
+        clusterId: data.clusterId,
+      });
+
+      console.log(
+        `[error.embed] Embedded error → point ${result.pointId}, cluster: ${result.matchedCluster ?? 'new'}, ${result.totalMs}ms`
+      );
+
+      this.channel.ack(msg);
+    } catch (error) {
+      console.error('[error.embed] Handler error:', this.formatError(error));
+      this.retryOrDLQ(msg as AmqpMessageObj, error);
+    }
+  }
+
+  // --- Error Embed Publisher ---
+
+  async publishErrorEmbed(data: {
+    errorMessage: string;
+    filePath?: string;
+    routePath?: string;
+    stackTrace?: string;
+    severity?: string;
+    tsCode?: string;
+  }): Promise<boolean> {
+    if (!this.isReady()) return false;
+    await this.publish(this.exchanges.document_processing, 'error.embed', {
+      ...data,
+      enqueuedAt: new Date().toISOString(),
+    });
+    return true;
+  }
+
   private async publish(exchange: string, routingKey: string, data: any): Promise<void> {
     if (!this.channel) return;
     try {
@@ -820,7 +879,7 @@ export class RabbitMQManager extends EventEmitter {
         { noAck: false }
       );
     }
-    console.log('☠️ DLQ consumers started for all 8 dead-letter queues');
+    console.log('☠️ DLQ consumers started for all 9 dead-letter queues');
   }
 
   /** Get DLQ message counts for monitoring */

@@ -168,61 +168,83 @@ export async function generateText(prompt: string): Promise<string> {
 	});
 }
 
-export async function callOllamaChat(systemPrompt: string, userPrompt: string): Promise<string> {
-	// Route through LiteLLM proxy when enabled (gets semantic caching)
-	if (ENV.LITELLM_ENABLED) {
-		return traceLLM('ollama-chat', { model: CHAT_MODEL, prompt: userPrompt.slice(0, 500) }, async (gen) => {
-			const content = await litellmChat(
-				[
-					{ role: 'system', content: systemPrompt },
-					{ role: 'user', content: userPrompt },
-				],
-				CHAT_MODEL
-			);
-			gen.end({ output: content.slice(0, 1000) });
-			return content;
-		});
-	}
+export async function callOllamaChat(
+  systemPrompt: string,
+  userPrompt: string,
+  options?: { format?: 'json'; num_predict?: number; temperature?: number }
+): Promise<string> {
+  // Route through LiteLLM proxy when enabled (gets semantic caching)
+  if (ENV.LITELLM_ENABLED) {
+    return traceLLM(
+      'ollama-chat',
+      { model: CHAT_MODEL, prompt: userPrompt.slice(0, 500) },
+      async (gen) => {
+        const content = await litellmChat(
+          [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+          ],
+          CHAT_MODEL
+        );
+        gen.end({ output: content.slice(0, 1000) });
+        return content;
+      }
+    );
+  }
 
-	const body = {
-		model: CHAT_MODEL,
-		messages: [
-			{ role: 'system', content: systemPrompt },
-			{ role: 'user', content: userPrompt },
-		],
-		stream: false,
-		keep_alive: MODEL_KEEP_ALIVE,
-	};
+  const body: Record<string, unknown> = {
+    model: CHAT_MODEL,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ],
+    stream: false,
+    keep_alive: MODEL_KEEP_ALIVE,
+  };
+  if (options?.format) body.format = options.format;
+  if (options?.num_predict || options?.temperature !== undefined) {
+    body.options = {
+      ...(options.num_predict ? { num_predict: options.num_predict } : {}),
+      ...(options.temperature !== undefined ? { temperature: options.temperature } : {}),
+    };
+  }
 
-	const startTime = Date.now();
+  const startTime = Date.now();
 
-	return traceLLM('ollama-chat', { model: CHAT_MODEL, prompt: userPrompt.slice(0, 500) }, async (gen) => {
-		const content = await ollamaBreaker.call(() =>
-			retry(async () => {
-				const res = await ollamaFetch(`${OLLAMA_BASE_URL}/api/chat`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(body),
-					signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-				});
+  return traceLLM(
+    'ollama-chat',
+    { model: CHAT_MODEL, prompt: userPrompt.slice(0, 500) },
+    async (gen) => {
+      const content = await ollamaBreaker.call(() =>
+        retry(
+          async () => {
+            const res = await ollamaFetch(`${OLLAMA_BASE_URL}/api/chat`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(body),
+              signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+            });
 
-				const duration = Date.now() - startTime;
+            const duration = Date.now() - startTime;
 
-				if (!res.ok) {
-					const text = await res.text().catch(() => '');
-					console.error('[ollama] /api/chat error:', res.status, text.slice(0, 200));
-					throw new Error(`Ollama chat failed: ${res.status}`);
-				}
+            if (!res.ok) {
+              const text = await res.text().catch(() => '');
+              console.error('[ollama] /api/chat error:', res.status, text.slice(0, 200));
+              throw new Error(`Ollama chat failed: ${res.status}`);
+            }
 
-				const data = (await res.json()) as { message?: { content: string } };
-				const result = data.message?.content ?? '';
-				console.log(`[ollama] Chat completed in ${duration}ms (${result.length} chars)`);
-				return result;
-			}, { maxAttempts: 2, baseDelayMs: 500, isRetryable: retryPredicates.networkOrServer })
-		);
-		gen.end({ output: content.slice(0, 1000) });
-		return content;
-	});
+            const data = (await res.json()) as { message?: { content: string } };
+            const result = data.message?.content ?? '';
+            console.log(`[ollama] Chat completed in ${duration}ms (${result.length} chars)`);
+            return result;
+          },
+          { maxAttempts: 2, baseDelayMs: 500, isRetryable: retryPredicates.networkOrServer }
+        )
+      );
+      gen.end({ output: content.slice(0, 1000) });
+      return content;
+    }
+  );
 }
 
 // ── Health & Model Discovery ────────────────────────────────────────────

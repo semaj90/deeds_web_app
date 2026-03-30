@@ -141,6 +141,7 @@ describe('/api/rag/search ACE route integration', () => {
     const response = await POST({
       request,
       url: new URL('http://localhost/api/rag/search'),
+      locals: { user: { id: 'user-1' } },
     } as never);
 
     const body = await response.json();
@@ -243,6 +244,7 @@ describe('/api/rag/search ACE route integration', () => {
     const response = await POST({
       request,
       url: new URL('http://localhost/api/rag/search'),
+      locals: { user: { id: 'user-1' } },
     } as never);
 
     const body = await response.json();
@@ -287,6 +289,7 @@ describe('/api/rag/search ACE route integration', () => {
     const response = await POST({
       request,
       url: new URL('http://localhost/api/rag/search'),
+      locals: { user: { id: 'user-1' } },
     } as never);
 
     const body = await response.json();
@@ -312,6 +315,7 @@ describe('/api/rag/search ACE route integration', () => {
     const response = await POST({
       request,
       url: new URL('http://localhost/api/rag/search'),
+      locals: { user: { id: 'user-1' } },
     } as never);
 
     const body = await response.json();

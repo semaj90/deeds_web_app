@@ -20,12 +20,12 @@ const evidenceListSchema = z.object({
 export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = evidenceListSchema.safeParse({
-		page: url.searchParams.get('page') ?? undefined,
-		limit: url.searchParams.get('limit') ?? undefined,
-		search: url.searchParams.get('search')?.trim(),
-		caseId: url.searchParams.get('caseId'),
-		type: url.searchParams.get('type'),
-	});
+    page: url.searchParams.get('page') ?? undefined,
+    limit: url.searchParams.get('limit') ?? undefined,
+    search: url.searchParams.get('search')?.trim(),
+    caseId: url.searchParams.get('caseId') ?? undefined,
+    type: url.searchParams.get('type') ?? undefined,
+  });
 	if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
 	const { page, limit, search, caseId, type } = parsed.data;
 	const offset = (page - 1) * limit;

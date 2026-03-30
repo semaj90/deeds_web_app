@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import CourtroomHUD from '$lib/components/courtroom/CourtroomHUD.svelte';
 
@@ -48,7 +47,6 @@
 	let selectedCategory = $state('all');
 	let searchQuery = $state('');
 	let dialogueContainer = $state<HTMLElement | null>(null);
-	let showCaseBrief = $state(false);
 
 	// --- Derived ---
 	let filteredCases = $derived.by(() => {
@@ -78,6 +76,8 @@
 	let progress = $derived(
 		sessionData ? ((sessionData.currentPhase + 1) / (sessionData.phases?.length ?? 1)) * 100 : 0
 	);
+	// Transcript entries = all except the last (shown in HUD typewriter); empty if only 1 entry
+	let transcriptEntries = $derived(dialogue.length > 1 ? dialogue.slice(0, -1) : []);
 
 	// --- Lifecycle ---
 	onMount(() => {
@@ -89,8 +89,14 @@
 			codeReviewMode = true;
 			codeReviewFile = params.get('file') || '';
 			codeReviewCharge = decodeURIComponent(params.get('charge') || '');
-			if (codeReviewFile && codeReviewCharge) {
+			if (codeReviewFile) {
+				if (!codeReviewCharge) {
+					codeReviewCharge = 'General code quality review requested';
+				}
 				startCodeReview();
+			} else {
+				error = 'Code review mode requires a file path (?file=...)';
+				codeReviewMode = false;
 			}
 		}
 	});
@@ -159,8 +165,9 @@
 		const res = await fetch(`/api/simulation/${sid}`);
 		if (!res.ok) throw new Error('Failed to load session');
 		const result = await res.json();
-		sessionData = result.session;
-		dialogue = result.session?.dialogueHistory ?? [];
+		// GET /api/simulation/[sessionId] returns session fields at top level
+		sessionData = result;
+		dialogue = result.dialogueHistory ?? [];
 	}
 
 	async function advanceTurn(action: string, extra?: Record<string, string>) {
@@ -178,9 +185,7 @@
 				error = result.error ?? 'Failed to advance';
 				return;
 			}
-			// Reload full state to sync
 			await loadSessionState(sessionId);
-
 			if (result.status === 'completed') {
 				sessionData = { ...sessionData!, status: 'completed' };
 			}
@@ -212,9 +217,14 @@
 		view = 'lobby';
 		codeReviewActive = false;
 		codeReviewMode = false;
-		// Clear query params
 		window.history.replaceState({}, '', window.location.pathname);
 		loadActiveSessions();
+	}
+
+	// --- Inline objection from transcript ---
+	function inlineObjection(entry: DialogueEntry) {
+		if (codeReviewActive || isAdvancing) return;
+		advanceTurn('objection', { objectionType: 'relevance', objectionBasis: `Objection to ${entry.speaker}'s statement` });
 	}
 
 	// --- Code Review Functions ---
@@ -224,7 +234,6 @@
 		view = 'courtroom';
 		error = '';
 
-		// Build initial prosecution dialogue from LLM
 		const fileName = codeReviewFile.split('/').pop() || codeReviewFile;
 		codeReviewDialogue = [
 			{
@@ -248,7 +257,6 @@
 		];
 		dialogue = codeReviewDialogue;
 
-		// Build a mock session for the HUD
 		sessionData = {
 			caseData: {
 				caseNumber: `CR-${Date.now().toString(36).toUpperCase()}`,
@@ -260,19 +268,50 @@
 			status: 'active',
 		};
 
-		// Call LLM for analysis verdict
 		try {
 			const res = await fetch('/api/codebase-index/analyze', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ filePath: codeReviewFile }),
 			});
-			if (res.ok) {
-				const data = await res.json();
-				const analysis = data.analysis;
-				const grade = analysis?.healthGrade || 'C';
-				const risks = (analysis?.risks || []).map((r: string) => `  - ${r}`).join('\n');
-				const suggestions = (analysis?.suggestions || []).map((s: string) => `  - ${s}`).join('\n');
+			const analysisResult = await res.json().catch(() => ({}));
+			const analysis = analysisResult.analysis;
+			const grade = analysis?.healthGrade || '?';
+			const risks = (analysis?.risks || []).map((r: string) => `  - ${r}`).join('\n');
+			const suggestions = (analysis?.suggestions || []).map((s: string) => `  - ${s}`).join('\n');
+
+			if (!res.ok && !analysis) {
+				codeReviewDialogue = [
+					...codeReviewDialogue,
+					{
+						phase: 'evidence_presentation',
+						turn: 2,
+						speaker: 'Court Clerk',
+						role: 'narrator',
+						content: `Your Honor, the AI analysis service is currently unavailable. The prosecution's charges stand as presented:\n\n${codeReviewCharge}`,
+						canonRefs: [],
+						timestamp: new Date().toISOString(),
+					},
+					{
+						phase: 'verdict',
+						turn: 3,
+						speaker: 'Judge',
+						role: 'judge',
+						content: `The court notes the charges on file. Without expert testimony, the court orders a manual code review of "${fileName}". Case adjourned pending analysis.`,
+						canonRefs: [],
+						timestamp: new Date().toISOString(),
+					},
+				];
+				dialogue = codeReviewDialogue;
+				sessionData = { ...sessionData!, currentPhase: 4, status: 'completed' };
+			} else {
+				const verdictText = grade === 'A' || grade === 'B'
+					? 'This file is found NOT GUILTY of significant code quality violations. The defendant is acquitted.'
+					: grade === 'C'
+						? 'The court finds MINOR VIOLATIONS. The defendant is sentenced to refactoring review.'
+						: grade === '?'
+							? 'The court cannot determine a grade. Manual review is ordered.'
+							: 'The court finds GUILTY of code quality violations. Immediate refactoring is ORDERED.';
 
 				codeReviewDialogue = [
 					...codeReviewDialogue,
@@ -299,7 +338,7 @@
 						turn: 4,
 						speaker: 'Judge',
 						role: 'judge',
-						content: `The court renders its verdict: Grade ${grade}.\n\n${grade === 'A' || grade === 'B' ? 'This file is found NOT GUILTY of significant code quality violations. The defendant is acquitted.' : grade === 'C' ? 'The court finds MINOR VIOLATIONS. The defendant is sentenced to refactoring review.' : 'The court finds GUILTY of code quality violations. Immediate refactoring is ORDERED.'}`,
+						content: `The court renders its verdict: Grade ${grade}.\n\n${verdictText}`,
 						canonRefs: [],
 						timestamp: new Date().toISOString(),
 					},
@@ -308,45 +347,37 @@
 				sessionData = { ...sessionData!, currentPhase: 4, status: 'completed' };
 			}
 		} catch {
-			error = 'Failed to analyze code for review';
+			codeReviewDialogue = [
+				...codeReviewDialogue,
+				{
+					phase: 'verdict',
+					turn: 2,
+					speaker: 'Judge',
+					role: 'judge',
+					content: `The court cannot proceed — the analysis service is unreachable. Case "${fileName}" is adjourned. Please ensure the dev server is running and retry.`,
+					canonRefs: [],
+					timestamp: new Date().toISOString(),
+				},
+			];
+			dialogue = codeReviewDialogue;
+			sessionData = { ...sessionData!, currentPhase: 4, status: 'completed' };
+			error = 'Analysis service unreachable — verdict based on filed charges only';
 		} finally {
 			codeReviewLoading = false;
 		}
 	}
 
-	function roleIcon(role: string): string {
-		switch (role) {
-			case 'prosecutor':
-				return 'scale';
-			case 'defense':
-				return 'shield';
-			case 'judge':
-				return 'gavel';
-			case 'witness':
-				return 'user';
-			case 'narrator':
-				return 'book-open';
-			default:
-				return 'message-square';
-		}
-	}
-
-	function roleColor(role: string): string {
-		switch (role) {
-			case 'prosecutor':
-				return 'var(--t-accent)';
-			case 'defense':
-				return '#e57373';
-			case 'judge':
-				return '#ffd54f';
-			case 'witness':
-				return '#81c784';
-			case 'narrator':
-				return 'var(--t-text-muted)';
-			default:
-				return 'var(--t-text)';
-		}
-	}
+	// Role helpers — theme-aware variants for transcript area
+	const ROLE_ICONS: Record<string, string> = {
+		prosecutor: 'scale', defense: 'shield', judge: 'gavel',
+		witness: 'user', narrator: 'book-open',
+	};
+	const ROLE_COLORS: Record<string, string> = {
+		prosecutor: 'var(--t-accent)', defense: '#e57373', judge: '#ffd54f',
+		witness: '#81c784', narrator: 'var(--t-text-muted)',
+	};
+	function roleIcon(role: string): string { return ROLE_ICONS[role] ?? 'message-square'; }
+	function roleColor(role: string): string { return ROLE_COLORS[role] ?? 'var(--t-text)'; }
 
 	function formatCategory(cat: string): string {
 		return cat.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
@@ -354,7 +385,7 @@
 </script>
 
 <svelte:head>
-	<title>Courtroom Simulation — Deeds</title>
+	<title>{codeReviewActive ? 'Code Review — Courtroom' : 'Courtroom Simulation'} — Deeds</title>
 </svelte:head>
 
 {#if view === 'lobby'}
@@ -457,24 +488,38 @@
 {:else}
 	<!-- ====== COURTROOM VIEW ====== -->
 	<div class="courtroom">
+		<!-- Scanline overlay for courtroom immersion -->
+		<div class="courtroom-scanlines" aria-hidden="true"></div>
+
 		<!-- Top Bar -->
 		<header class="courtroom-header">
 			<button class="btn-back" onclick={backToLobby}>
-				<Icon name="arrow-left" size={16} /> Back
+				<Icon name="arrow-left" size={16} /> {codeReviewActive ? 'Exit Review' : 'Back'}
 			</button>
 			<div class="courtroom-info">
-				<span class="court-case">
-					{sessionData?.caseData?.caseNumber ?? ''}
-				</span>
-				<span class="court-charge">
-					{sessionData?.caseData?.charge ?? ''}
-				</span>
-				<span class="court-defendant">
-					v. {sessionData?.caseData?.defendantName ?? ''}
-				</span>
+				{#if codeReviewActive}
+					<span class="court-case">
+						<Icon name="code" size={12} /> CODE REVIEW
+					</span>
+					<span class="court-charge">
+						{codeReviewFile.split('/').pop() ?? ''}
+					</span>
+				{:else}
+					<span class="court-case">
+						{sessionData?.caseData?.caseNumber ?? ''}
+					</span>
+					<span class="court-charge">
+						{sessionData?.caseData?.charge ?? ''}
+					</span>
+					<span class="court-defendant">
+						v. {sessionData?.caseData?.defendantName ?? ''}
+					</span>
+				{/if}
 			</div>
 			<div class="courtroom-status">
-				{#if sessionData?.status === 'completed'}
+				{#if codeReviewActive}
+					<span class="badge-code-review">CODE REVIEW</span>
+				{:else if sessionData?.status === 'completed'}
 					<span class="badge-completed">COMPLETED</span>
 				{:else}
 					<span class="badge-active">ACTIVE</span>
@@ -496,14 +541,25 @@
 
 		<!-- Disclaimer -->
 		<div class="courtroom-disclaimer">
-			FICTIONAL TRAINING SCENARIO — All persons, events, and legal proceedings are entirely fictional.
-			This is not legal advice.
+			{#if codeReviewActive}
+				CODE QUALITY REVIEW — AI-generated analysis for educational purposes. Not a substitute for manual code review.
+			{:else}
+				FICTIONAL TRAINING SCENARIO — All persons, events, and legal proceedings are entirely fictional. Not legal advice.
+			{/if}
 		</div>
+
+		<!-- Loading overlay -->
+		{#if isLoading}
+			<div class="courtroom-loading">
+				<div class="loading-spinner"></div>
+				<span>Loading session...</span>
+			</div>
+		{/if}
 
 		<!-- Dialogue Transcript (scrollable history) -->
 		<div class="dialogue-area" bind:this={dialogueContainer}>
-			{#each dialogue.slice(0, -1) as entry, i}
-				<div class="dialogue-entry" style="--role-color: {roleColor(entry.role)}">
+			{#each transcriptEntries as entry, i}
+				<div class="dialogue-entry shader-glow" style="--role-color: {roleColor(entry.role)}">
 					<div class="dialogue-speaker">
 						<Icon name={roleIcon(entry.role)} size={16} />
 						<span class="speaker-name">{entry.speaker}</span>
@@ -520,13 +576,33 @@
 							{/each}
 						</div>
 					{/if}
+					<!-- Inline objection button on witness/prosecutor entries -->
+					{#if !codeReviewActive && (entry.role === 'witness' || entry.role === 'prosecutor') && sessionData?.status !== 'completed'}
+						<button
+							class="btn-inline-objection"
+							onclick={() => inlineObjection(entry)}
+							disabled={isAdvancing}
+							title="Object to this statement"
+						>
+							<Icon name="zap" size={11} /> OBJECT
+						</button>
+					{/if}
 				</div>
 			{/each}
+
+			<!-- Typing indicator when LLM is thinking -->
+			{#if isAdvancing}
+				<div class="dialogue-entry" style="--role-color: var(--t-text-muted)">
+					<div class="typing-indicator">
+						<span></span><span></span><span></span>
+					</div>
+				</div>
+			{/if}
 
 			{#if dialogue.length === 0 && !isLoading}
 				<div class="empty-dialogue">
 					<Icon name="message-square" size={32} />
-					<p>Simulation ready. Advance to begin proceedings.</p>
+					<p>Simulation ready. Press <strong>Enter</strong> to begin proceedings.</p>
 				</div>
 			{/if}
 		</div>
@@ -550,10 +626,10 @@
 		<!-- Game-style HUD (Phoenix Wright mode) -->
 		<CourtroomHUD
 			currentEntry={dialogue.length > 0 ? dialogue[dialogue.length - 1] : null}
-			{sessionData}
+			sessionData={codeReviewActive ? { ...sessionData, status: 'completed' } : sessionData}
 			isAdvancing={codeReviewActive ? false : isAdvancing}
-			status={sessionData?.status ?? 'active'}
-			onAction={codeReviewActive ? () => {} : advanceTurn}
+			status={codeReviewActive ? 'completed' : (sessionData?.status ?? 'active')}
+			onAction={codeReviewActive ? (_action: string) => {} : advanceTurn}
 			onAbandon={codeReviewActive ? backToLobby : abandonSession}
 		/>
 	</div>
@@ -572,6 +648,22 @@
 		flex-direction: column;
 		height: calc(100vh - 60px);
 		background: var(--t-bg);
+		position: relative;
+	}
+
+	/* ===== SCANLINE OVERLAY (shader effect) ===== */
+	.courtroom-scanlines {
+		position: absolute;
+		inset: 0;
+		background: repeating-linear-gradient(
+			0deg,
+			transparent,
+			transparent 3px,
+			rgba(255, 255, 255, 0.008) 3px,
+			rgba(255, 255, 255, 0.008) 6px
+		);
+		pointer-events: none;
+		z-index: 10;
 	}
 
 	/* ===== HEADER ===== */
@@ -805,6 +897,8 @@
 		padding: 0.75rem 1.5rem;
 		background: var(--t-panel);
 		border-bottom: 1px solid var(--t-border);
+		position: relative;
+		z-index: 1;
 	}
 
 	.btn-back {
@@ -848,6 +942,10 @@
 		color: var(--t-text-muted);
 	}
 
+	.courtroom-status {
+		flex-shrink: 0;
+	}
+
 	.badge-active {
 		font-size: 0.7rem;
 		padding: 0.2rem 0.6rem;
@@ -870,6 +968,17 @@
 		font-weight: 600;
 	}
 
+	.badge-code-review {
+		font-size: 0.7rem;
+		padding: 0.2rem 0.6rem;
+		border-radius: 4px;
+		background: color-mix(in srgb, #a855f7 80%, transparent);
+		color: #fff;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		font-weight: 600;
+	}
+
 	/* ===== PHASE BAR ===== */
 	.phase-bar {
 		display: flex;
@@ -878,6 +987,8 @@
 		padding: 0.5rem 1.5rem;
 		background: var(--t-panel);
 		border-bottom: 1px solid var(--t-border);
+		position: relative;
+		z-index: 1;
 	}
 
 	.phase-label {
@@ -914,6 +1025,34 @@
 		border-bottom: 1px solid var(--t-border);
 		text-transform: uppercase;
 		letter-spacing: 0.03em;
+		position: relative;
+		z-index: 1;
+	}
+
+	/* ===== LOADING OVERLAY ===== */
+	.courtroom-loading {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.75rem;
+		padding: 2rem;
+		color: var(--t-text-muted);
+		font-size: 0.85rem;
+		position: relative;
+		z-index: 1;
+	}
+
+	.loading-spinner {
+		width: 20px;
+		height: 20px;
+		border: 2px solid var(--t-border);
+		border-top-color: var(--t-accent);
+		border-radius: 50%;
+		animation: spin 0.8s linear infinite;
+	}
+
+	@keyframes spin {
+		to { transform: rotate(360deg); }
 	}
 
 	/* ===== DIALOGUE ===== */
@@ -924,6 +1063,8 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;
+		position: relative;
+		z-index: 1;
 	}
 
 	.dialogue-entry {
@@ -931,6 +1072,19 @@
 		padding: 0.75rem 1rem;
 		background: var(--t-panel);
 		border-radius: 0 6px 6px 0;
+		position: relative;
+	}
+
+	/* Shader glow effect on dialogue entries */
+	.shader-glow {
+		box-shadow: inset 2px 0 8px -4px var(--role-color, transparent);
+		transition: box-shadow 0.2s ease;
+	}
+
+	.shader-glow:hover {
+		box-shadow:
+			inset 2px 0 12px -3px var(--role-color, transparent),
+			0 0 8px -4px var(--role-color, transparent);
 	}
 
 	.dialogue-speaker {
@@ -983,16 +1137,55 @@
 		font-family: monospace;
 	}
 
-	/* Typing indicator */
+	/* ===== INLINE OBJECTION BUTTON ===== */
+	.btn-inline-objection {
+		position: absolute;
+		top: 0.5rem;
+		right: 0.5rem;
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+		padding: 0.2rem 0.5rem;
+		font-size: 0.6rem;
+		font-weight: 600;
+		font-family: inherit;
+		letter-spacing: 0.05em;
+		color: #e57373;
+		border: 1px solid #e57373;
+		border-radius: 3px;
+		background: transparent;
+		cursor: pointer;
+		opacity: 0;
+		transition: opacity 0.15s, background 0.15s;
+		text-transform: uppercase;
+	}
+
+	.dialogue-entry:hover .btn-inline-objection {
+		opacity: 0.7;
+	}
+
+	.btn-inline-objection:hover {
+		opacity: 1 !important;
+		background: #e57373;
+		color: var(--t-bg);
+	}
+
+	.btn-inline-objection:disabled {
+		opacity: 0.2 !important;
+		cursor: not-allowed;
+	}
+
+	/* ===== TYPING INDICATOR ===== */
 	.typing-indicator {
 		display: flex;
-		gap: 4px;
+		gap: 5px;
 		padding: 0.5rem 0;
+		align-items: center;
 	}
 
 	.typing-indicator span {
-		width: 6px;
-		height: 6px;
+		width: 7px;
+		height: 7px;
 		background: var(--t-text-muted);
 		border-radius: 50%;
 		animation: typing 1.2s infinite ease-in-out;
@@ -1008,7 +1201,7 @@
 
 	@keyframes typing {
 		0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
-		30% { opacity: 1; transform: translateY(-3px); }
+		30% { opacity: 1; transform: translateY(-4px); }
 	}
 
 	.empty-dialogue {
@@ -1022,91 +1215,6 @@
 		opacity: 0.6;
 	}
 
-	/* ===== ACTION BAR ===== */
-	.action-bar {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.75rem 1.5rem;
-		background: var(--t-panel);
-		border-top: 1px solid var(--t-border);
-		flex-wrap: wrap;
-	}
-
-	.btn-action {
-		display: flex;
-		align-items: center;
-		gap: 0.4rem;
-		padding: 0.45rem 0.9rem;
-		border: 1px solid var(--t-border);
-		border-radius: 6px;
-		font-size: 0.8rem;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.15s;
-		font-family: inherit;
-		background: transparent;
-		color: var(--t-text);
-	}
-
-	.btn-action.primary {
-		background: var(--t-accent);
-		color: var(--t-bg);
-		border-color: var(--t-accent);
-	}
-
-	.btn-action.primary:hover:not(:disabled) {
-		opacity: 0.85;
-	}
-
-	.btn-action.secondary:hover:not(:disabled) {
-		border-color: var(--t-accent);
-		color: var(--t-accent);
-	}
-
-	.btn-action.objection {
-		font-size: 0.75rem;
-		color: #e57373;
-		border-color: #e57373;
-	}
-
-	.btn-action.objection:hover:not(:disabled) {
-		background: #e57373;
-		color: var(--t-bg);
-	}
-
-	.btn-action.danger {
-		color: #e57373;
-		border-color: transparent;
-		margin-left: auto;
-	}
-
-	.btn-action.danger:hover {
-		border-color: #e57373;
-	}
-
-	.btn-action:disabled {
-		opacity: 0.4;
-		cursor: not-allowed;
-	}
-
-	.objection-group {
-		display: flex;
-		gap: 0.35rem;
-		margin-left: 0.5rem;
-		padding-left: 0.5rem;
-		border-left: 1px solid var(--t-border);
-	}
-
-	.completed-msg {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		color: var(--t-accent);
-		font-size: 0.85rem;
-		font-weight: 500;
-	}
-
 	/* ===== ERROR ===== */
 	.error-banner {
 		padding: 0.5rem 1rem;
@@ -1115,6 +1223,8 @@
 		border-radius: 6px;
 		font-size: 0.85rem;
 		margin: 0.5rem 1.5rem;
+		position: relative;
+		z-index: 1;
 	}
 
 	/* ===== EMPTY STATE ===== */
@@ -1126,10 +1236,6 @@
 		padding: 3rem;
 		color: var(--t-text-muted);
 		opacity: 0.6;
-	}
-
-	.courtroom-status {
-		flex-shrink: 0;
 	}
 
 	/* ===== CODE REVIEW MODE ===== */
@@ -1145,6 +1251,8 @@
 		border-bottom: 1px solid var(--t-border);
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
+		position: relative;
+		z-index: 1;
 	}
 
 	.cr-loading {

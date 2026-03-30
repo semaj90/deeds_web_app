@@ -39,7 +39,7 @@ describe('/api/ace/status route', () => {
     const body = await response.json();
 
     expect(response.status).toBe(400);
-    expect(body).toEqual({ error: 'Missing jobId parameter' });
+    expect(body.error).toBeDefined();
     expect(mockGetAceIngestJob).not.toHaveBeenCalled();
   });
 

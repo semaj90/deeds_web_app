@@ -14,6 +14,9 @@ vi.mock('$lib/server/db', () => ({
 }));
 
 vi.mock('$lib/server/db/client', () => ({
+  db: {
+    execute: mockDbExecute,
+  },
   pool: {
     query: mockPoolQuery,
   },
@@ -100,29 +103,32 @@ describe('assembleACEContext glossary reuse', () => {
       const sqlText = getSqlText(query);
 
       if (sqlText.includes('from cases')) {
-        return [
-          {
-            title: 'Case Chat Glossary Reuse',
-            description: 'Seeded for saved glossary concept context reuse coverage.',
-            jurisdiction: 'California',
-            court: 'Superior Court',
-            status: 'open',
-            practice_area: 'criminal-defense',
-          },
-        ];
+        return {
+          rows: [
+            {
+              title: 'Case Chat Glossary Reuse',
+              description: 'Seeded for saved glossary concept context reuse coverage.',
+              jurisdiction: 'California',
+              court: 'Superior Court',
+              status: 'open',
+              practice_area: 'criminal-defense',
+            },
+          ],
+        };
       }
 
       if (sqlText.includes('from case_library_links')) {
-        return [
-          {
-            citation_text: glossaryTerm,
-            notes:
-              `${glossaryDefinition}\nJurisdiction: California\nSource: legal_glossary\nConfidence: 0.97`,
-          },
-        ];
+        return {
+          rows: [
+            {
+              citation_text: glossaryTerm,
+              notes: `${glossaryDefinition}\nJurisdiction: California\nSource: legal_glossary\nConfidence: 0.97`,
+            },
+          ],
+        };
       }
 
-      return [];
+      return { rows: [] };
     });
   });
 
@@ -140,7 +146,9 @@ describe('assembleACEContext glossary reuse', () => {
     expect(context.caseContext).toBeTruthy();
     expect(context.caseContext).toContain('Saved concepts:');
     expect(context.caseContext).toContain(glossaryTerm);
-    expect(context.caseContext).toContain('Reasonable grounds to believe that a crime has been committed');
+    expect(context.caseContext).toContain(
+      'Reasonable grounds to believe that a crime has been committed'
+    );
     expect(mockDbExecute).toHaveBeenCalled();
   });
 

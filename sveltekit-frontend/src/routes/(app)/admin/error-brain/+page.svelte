@@ -24,6 +24,35 @@ import AIDropdown from '$lib/components/ui/AIDropdown.svelte';
  let showErrorBrain = $state(false);
  let selectedRoute = $state<string | null>(null);
 
+ // Diagnosis state
+ let diagnosisQuery = $state('');
+ let diagnosisFilePath = $state('');
+ let diagnosisRunning = $state(false);
+ let diagnosisResult = $state<any>(null);
+
+ async function runDiagnosis() {
+	if (!diagnosisQuery.trim()) return;
+	diagnosisRunning = true;
+	diagnosisResult = null;
+	try {
+		const res = await fetch('/api/error-brain/diagnose', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				query: diagnosisQuery,
+				filePath: diagnosisFilePath || undefined,
+				routePath: selectedRoute || undefined,
+				limit: 10,
+			}),
+		});
+		diagnosisResult = await res.json();
+	} catch (err) {
+		diagnosisResult = { diagnosis: 'Request failed: ' + (err as Error).message, impactedFiles: [], fixPlan: [], riskLevel: 'high' };
+	} finally {
+		diagnosisRunning = false;
+	}
+ }
+
  // Auto-patch state
  let autoPatchTarget = $state('');
  let autoPatchError = $state('');
@@ -227,6 +256,124 @@ import AIDropdown from '$lib/components/ui/AIDropdown.svelte';
 	</CardContent>
  </Card>
 
+ <!-- AST Diagnosis Section -->
+ <Card>
+	<CardHeader>
+		<CardTitle>AST-Powered Diagnosis</CardTitle>
+		<CardDescription>Ask about errors — retrieves AST subgraph, searches similar failures, reranks, and generates a fix plan</CardDescription>
+	</CardHeader>
+	<CardContent>
+		<div class="flex flex-col gap-3">
+			<div class="flex gap-3 items-start">
+				<label for="diag-query" class="text-sm font-semibold min-w-20 pt-2">Query:</label>
+				<textarea id="diag-query" placeholder="Why is this route failing? / Paste an error message..." bind:value={diagnosisQuery} rows="2" class="flex-1 px-2 py-1.5 border border-gray-300 rounded font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+			</div>
+			<div class="flex gap-3 items-center">
+				<label for="diag-file" class="text-sm font-semibold min-w-20">File (opt):</label>
+				<input id="diag-file" type="text" placeholder="src/routes/api/evidence/..." bind:value={diagnosisFilePath} class="flex-1 px-2 py-1.5 border border-gray-300 rounded font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+			</div>
+			<div class="flex gap-3 items-center">
+				<Button onclick={runDiagnosis} disabled={diagnosisRunning || !diagnosisQuery.trim()}>
+					{diagnosisRunning ? 'Diagnosing...' : 'Diagnose'}
+				</Button>
+				{#if diagnosisRunning}
+					<span class="text-sm text-gray-400">AST → Search → Rerank → LLM...</span>
+				{/if}
+				{#if diagnosisResult?.timing}
+					<span class="text-xs text-gray-400 font-mono">{diagnosisResult.timing.totalMs}ms (AST:{diagnosisResult.timing.astMs}ms Search:{diagnosisResult.timing.searchMs}ms LLM:{diagnosisResult.timing.llmMs}ms)</span>
+				{/if}
+			</div>
+			{#if diagnosisResult}
+				<div class="diagnosis-result">
+					<div class="flex items-center gap-2 mb-2">
+						<strong class="text-base">Diagnosis</strong>
+						{#if diagnosisResult.riskLevel}
+							<Badge variant={diagnosisResult.riskLevel === 'low' ? 'default' : diagnosisResult.riskLevel === 'high' ? 'destructive' : 'secondary'}>
+								{diagnosisResult.riskLevel} risk
+							</Badge>
+						{/if}
+						{#if diagnosisResult.cached}
+							<Badge variant="outline">cached</Badge>
+						{/if}
+					</div>
+					<p class="text-sm mb-3">{diagnosisResult.diagnosis}</p>
+
+					{#if diagnosisResult.impactedFiles?.length > 0}
+						<div class="mb-3">
+							<strong class="text-sm">Impacted Files:</strong>
+							<div class="mt-1 space-y-1">
+								{#each diagnosisResult.impactedFiles as file}
+									<div class="text-xs font-mono flex items-center gap-2 p-1 rounded bg-gray-50 dark:bg-gray-900">
+										<span class="font-semibold">{file.path}</span>
+										<span class="text-gray-400">— {file.reason}</span>
+										<span class="text-gray-300">({(file.confidence * 100).toFixed(0)}%)</span>
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/if}
+
+					{#if diagnosisResult.fixPlan?.length > 0}
+						<div class="mb-3">
+							<strong class="text-sm">Fix Plan:</strong>
+							<div class="mt-1 space-y-1">
+								{#each diagnosisResult.fixPlan as step}
+									<div class="text-xs font-mono p-1.5 rounded bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800">
+										<span class="font-bold">Step {step.step}:</span> {step.action}
+										{#if step.file}
+											<span class="text-gray-400 ml-1">({step.file})</span>
+										{/if}
+										{#if step.code}
+											<pre class="mt-1 text-xs bg-gray-100 dark:bg-gray-800 rounded p-1 overflow-x-auto">{step.code}</pre>
+										{/if}
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/if}
+
+					{#if diagnosisResult.similarPastErrors?.length > 0}
+						<div class="mb-3">
+							<strong class="text-sm">Similar Past Errors:</strong>
+							<div class="mt-1 space-y-1">
+								{#each diagnosisResult.similarPastErrors as err}
+									<div class="text-xs font-mono p-1 rounded bg-yellow-50 dark:bg-yellow-950">
+										<div>{err.message}</div>
+										{#if err.resolution}
+											<div class="text-green-700 dark:text-green-400 mt-0.5">→ {err.resolution}</div>
+										{/if}
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/if}
+
+					{#if diagnosisResult.rankedFiles?.length > 0}
+						<details class="text-xs">
+							<summary class="cursor-pointer text-gray-500 hover:text-gray-700">Reranking Details ({diagnosisResult.rankedFiles.length} candidates)</summary>
+							<div class="mt-1 space-y-1 font-mono">
+								{#each diagnosisResult.rankedFiles as rf}
+									<div class="p-1 rounded bg-gray-50 dark:bg-gray-900">
+										<span class="font-semibold">{rf.filePath}</span>
+										<span class="ml-2 text-gray-400">score:{rf.finalScore.toFixed(3)}</span>
+										<span class="ml-1 text-gray-300">sem:{rf.signals.semantic.toFixed(2)} graph:{rf.signals.graphProximity.toFixed(2)} err:{rf.signals.errorFrequency.toFixed(2)}</span>
+									</div>
+								{/each}
+							</div>
+						</details>
+					{/if}
+
+					{#if diagnosisResult.sources}
+						<div class="text-xs text-gray-400 mt-2 font-mono">
+							Sources: AST({diagnosisResult.sources.astSubgraph?.nodeCount ?? 0} nodes, {diagnosisResult.sources.astSubgraph?.edgeCount ?? 0} edges) Semantic({diagnosisResult.sources.semanticMatches ?? 0}) Errors({diagnosisResult.sources.errorHistoryMatches ?? 0}) Graph({diagnosisResult.sources.graphNeighborMatches ?? 0})
+						</div>
+					{/if}
+				</div>
+			{/if}
+		</div>
+	</CardContent>
+ </Card>
+
  <!-- Auto-Patch Section -->
  <Card>
 	<CardHeader>
@@ -338,6 +485,12 @@ import AIDropdown from '$lib/components/ui/AIDropdown.svelte';
     margin-top: 0.25rem;
     color: #b45309;
     font-weight: 600;
+  }
+  .diagnosis-result {
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--t-border, #e5e7eb);
+    background: var(--t-surface, #fafafa);
   }
 </style>
 

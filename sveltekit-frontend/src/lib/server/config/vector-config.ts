@@ -15,81 +15,87 @@
 import { ENV } from '$lib/server/env.server.js';
 
 export const VECTOR_CONFIG = {
-	MODEL: 'embeddinggemma:latest',
-	DIMENSIONS: 768,
+  MODEL: 'embeddinggemma:latest',
+  DIMENSIONS: 768,
 
-	DISTANCE_METRIC: {
-		POSTGRES: 'vector_cosine_ops',
-		QDRANT: 'Cosine',
-		// Note: FAISS is NOT used — Qdrant + pgvector are the only active vector stores
-	},
+  DISTANCE_METRIC: {
+    POSTGRES: 'vector_cosine_ops',
+    QDRANT: 'Cosine',
+    // Note: FAISS is NOT used — Qdrant + pgvector are the only active vector stores
+  },
 
-	INDEX: {
-		HNSW_M: 16,
-		HNSW_EF_CONSTRUCTION: 64,
-		HNSW_EF_SEARCH: 40,
-		QDRANT_ON_DISK: true,
-		QDRANT_HNSW_M: 16,
-		QDRANT_HNSW_EF: 128,
-	},
+  INDEX: {
+    HNSW_M: 16,
+    HNSW_EF_CONSTRUCTION: 64,
+    HNSW_EF_SEARCH: 40,
+    QDRANT_ON_DISK: true,
+    QDRANT_HNSW_M: 16,
+    QDRANT_HNSW_EF: 128,
+  },
 
-	/** Canonical Qdrant collection names — alias → actual name */
-	COLLECTIONS: {
-		documents: 'legal_documents',
-		cases: 'legal_cases',
-		evidence: 'evidence_items',
-		chat_history: 'chat_messages',
-		embeddings_cache: 'embedding_cache',
-		document_tags: 'document_tags',
-		topic_clusters: 'topic_clusters',
-		llm_cache: 'llm_response_cache',
-		poi_profiles: 'poi_profiles',
-		legal_canon_chunks: 'legal_canon_chunks',
-		fictional_case_chunks: 'fictional_case_chunks',
-	},
+  /** Canonical Qdrant collection names — alias → actual name */
+  COLLECTIONS: {
+    documents: 'legal_documents',
+    cases: 'legal_cases',
+    evidence: 'evidence_items',
+    chat_history: 'chat_messages',
+    embeddings_cache: 'embedding_cache',
+    document_tags: 'document_tags',
+    topic_clusters: 'topic_clusters',
+    llm_cache: 'llm_response_cache',
+    poi_profiles: 'poi_profiles',
+    legal_canon_chunks: 'legal_canon_chunks',
+    fictional_case_chunks: 'fictional_case_chunks',
+    codebase_chunks: 'codebase_chunks_768',
+    error_embeddings: 'error_embeddings',
+    diagnosis_embeddings: 'diagnosis_embeddings',
+  },
 
-	/** Per-collection vector schema (vector name → used by health checks + init) */
-	COLLECTION_VECTORS: {
-		legal_documents: { vectors: ['content', 'summary'], on_disk_payload: true },
-		legal_cases: { vectors: ['description'] },
-		evidence_items: { vectors: ['content'], on_disk_payload: true },
-		chat_messages: { vectors: ['message'] },
-		embedding_cache: { vectors: ['embedding'] },
-		document_tags: { vectors: ['default'] },
-		topic_clusters: { vectors: ['default'] },
-		llm_response_cache: { vectors: ['query'] },
-		poi_profiles: { vectors: ['default'] },
-		legal_canon_chunks: { vectors: ['content'], on_disk_payload: true },
-		fictional_case_chunks: { vectors: ['content'], on_disk_payload: true },
-	},
+  /** Per-collection vector schema (vector name → used by health checks + init) */
+  COLLECTION_VECTORS: {
+    legal_documents: { vectors: ['content', 'summary'], on_disk_payload: true },
+    legal_cases: { vectors: ['description'] },
+    evidence_items: { vectors: ['content'], on_disk_payload: true },
+    chat_messages: { vectors: ['message'] },
+    embedding_cache: { vectors: ['embedding'] },
+    document_tags: { vectors: ['default'] },
+    topic_clusters: { vectors: ['default'] },
+    llm_response_cache: { vectors: ['query'] },
+    poi_profiles: { vectors: ['default'] },
+    legal_canon_chunks: { vectors: ['content'], on_disk_payload: true },
+    fictional_case_chunks: { vectors: ['content'], on_disk_payload: true },
+    codebase_chunks_768: { vectors: ['content', 'signature'], on_disk_payload: true },
+    error_embeddings: { vectors: ['error'], on_disk_payload: true },
+    diagnosis_embeddings: { vectors: ['diagnosis'], on_disk_payload: true },
+  },
 
-	/** Qdrant HNSW config applied to all collections */
-	QDRANT_HNSW: { m: 16, ef_construct: 200 },
+  /** Qdrant HNSW config applied to all collections */
+  QDRANT_HNSW: { m: 16, ef_construct: 200 },
 
-	/** INT8 scalar quantization — ~4x compression, minimal recall loss */
-	QDRANT_QUANTIZATION: {
-		scalar: { type: 'int8' as const, quantile: 0.99, always_ram: false },
-	},
+  /** INT8 scalar quantization — ~4x compression, minimal recall loss */
+  QDRANT_QUANTIZATION: {
+    scalar: { type: 'int8' as const, quantile: 0.99, always_ram: false },
+  },
 
-	DOCKER_SERVICES: {
-		QDRANT_URL: ENV.QDRANT_URL,
-		POSTGRES_URL: ENV.DATABASE_URL,
-		OLLAMA_URL: ENV.OLLAMA_BASE_URL,
-		REDIS_URL: ENV.REDIS_URL,
-	},
+  DOCKER_SERVICES: {
+    QDRANT_URL: ENV.QDRANT_URL,
+    POSTGRES_URL: ENV.DATABASE_URL,
+    OLLAMA_URL: ENV.OLLAMA_BASE_URL,
+    REDIS_URL: ENV.REDIS_URL,
+  },
 
-	BATCH_SIZE: {
-		EMBEDDING_GENERATION: 100,
-		DATABASE_INSERT: 1000,
-		SEARCH_LIMIT: 50,
-	},
+  BATCH_SIZE: {
+    EMBEDDING_GENERATION: 100,
+    DATABASE_INSERT: 1000,
+    SEARCH_LIMIT: 50,
+  },
 
-	PERFORMANCE: {
-		ENABLE_CACHE: true,
-		CACHE_TTL_SECONDS: 3600,
-		PARALLEL_REQUESTS: 4,
-		TIMEOUT_MS: 30000,
-	},
+  PERFORMANCE: {
+    ENABLE_CACHE: true,
+    CACHE_TTL_SECONDS: 3600,
+    PARALLEL_REQUESTS: 4,
+    TIMEOUT_MS: 30000,
+  },
 } as const;
 
 // Type exports

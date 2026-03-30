@@ -29,82 +29,85 @@ describe('/api/evidence/[id] GET route', () => {
 	});
 
 	it('returns 404 when the evidence row does not exist', async () => {
-		mockLimit.mockResolvedValueOnce([]);
+    mockLimit.mockResolvedValueOnce([]);
 
-		const { GET } = await import('../src/routes/api/evidence/[id]/+server.js');
+    const { GET } = await import('../src/routes/api/evidence/[id]/+server.js');
 
-		const response = await GET({
-			params: { id: 'missing-evidence' },
-		} as never);
+    const response = await GET({
+      params: { id: 'missing-evidence' },
+      locals: { user: { id: 'test-user' } },
+    } as never);
 
-		const body = await response.json();
+    const body = await response.json();
 
-		expect(response.status).toBe(404);
-		expect(body).toEqual({ error: 'Evidence not found' });
-	});
+    expect(response.status).toBe(404);
+    expect(body).toEqual({ error: 'Evidence not found' });
+  });
 
-	it('parses stringified metadata so diagnostics are returned as JSON', async () => {
-		mockLimit.mockResolvedValueOnce([
-			{
-				id: 'evidence-1',
-				title: 'Processing log',
-				metadata: JSON.stringify({
-					processingDiagnostics: {
-						startedAt: '2026-03-22T10:00:00.000Z',
-						stages: {
-							extraction: {
-								status: 'success',
-								detail: 'Text extracted',
-							},
-						},
-						warnings: [],
-					},
-				}),
-			},
-		]);
+  it('parses stringified metadata so diagnostics are returned as JSON', async () => {
+    mockLimit.mockResolvedValueOnce([
+      {
+        id: 'evidence-1',
+        title: 'Processing log',
+        metadata: JSON.stringify({
+          processingDiagnostics: {
+            startedAt: '2026-03-22T10:00:00.000Z',
+            stages: {
+              extraction: {
+                status: 'success',
+                detail: 'Text extracted',
+              },
+            },
+            warnings: [],
+          },
+        }),
+      },
+    ]);
 
-		const { GET } = await import('../src/routes/api/evidence/[id]/+server.js');
+    const { GET } = await import('../src/routes/api/evidence/[id]/+server.js');
 
-		const response = await GET({
-			params: { id: 'evidence-1' },
-		} as never);
+    const response = await GET({
+      params: { id: 'evidence-1' },
+      locals: { user: { id: 'test-user' } },
+    } as never);
 
-		const body = await response.json();
+    const body = await response.json();
 
-		expect(response.status).toBe(200);
-		expect(body.metadata).toEqual({
-			processingDiagnostics: {
-				startedAt: '2026-03-22T10:00:00.000Z',
-				stages: {
-					extraction: {
-						status: 'success',
-						detail: 'Text extracted',
-					},
-				},
-				warnings: [],
-			},
-		});
-		expect(mockEq).toHaveBeenCalled();
-	});
+    expect(response.status).toBe(200);
+    expect(body.metadata).toEqual({
+      processingDiagnostics: {
+        startedAt: '2026-03-22T10:00:00.000Z',
+        stages: {
+          extraction: {
+            status: 'success',
+            detail: 'Text extracted',
+          },
+        },
+        warnings: [],
+      },
+    });
+    expect(mockEq).toHaveBeenCalled();
+  });
 
-	it('leaves invalid metadata strings unchanged instead of throwing', async () => {
-		mockLimit.mockResolvedValueOnce([
-			{
-				id: 'evidence-2',
-				title: 'Corrupt metadata payload',
-				metadata: '{not-valid-json',
-			},
-		]);
+  it('leaves invalid metadata strings unchanged instead of throwing', async () => {
+    mockLimit.mockResolvedValueOnce([
+      {
+        id: 'evidence-2',
+        title: 'Corrupt metadata payload',
+        metadata: '{not-valid-json',
+      },
+    ]);
 
-		const { GET } = await import('../src/routes/api/evidence/[id]/+server.js');
+    const { GET } = await import('../src/routes/api/evidence/[id]/+server.js');
 
-		const response = await GET({
-			params: { id: 'evidence-2' },
-		} as never);
+    const response = await GET({
+      params: { id: 'evidence-2' },
+      locals: { user: { id: 'test-user' } },
+    } as never);
 
-		const body = await response.json();
+    const body = await response.json();
 
-		expect(response.status).toBe(200);
-		expect(body.metadata).toBe('{not-valid-json');
-	});
+    expect(response.status).toBe(200);
+    expect(body.metadata).toBe('{not-valid-json');
+  });
 });

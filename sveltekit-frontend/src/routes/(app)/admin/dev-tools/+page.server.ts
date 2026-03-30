@@ -53,19 +53,23 @@ function extractVectorSize(result: Record<string, unknown>): number {
 	return typeof size === 'number' ? size : 0;
 }
 
-async function getQdrantCollections(): Promise<{
+async function getQdrantCollections(signal?: AbortSignal): Promise<{
 	collections: QdrantCollection[];
 	totalPoints: number;
 }> {
 	try {
-		const res = await fetch(`${getQdrantUrl()}/collections`);
+		const res = await fetch(`${getQdrantUrl()}/collections`, { signal });
 		if (!res.ok) return { collections: [], totalPoints: 0 };
 		const data = await res.json();
 
+		const allCols = data.result?.collections ?? [];
+		// Limit to first 30 collections to prevent connection exhaustion
+		const colSlice = allCols.slice(0, 30);
+
 		const collections = await Promise.all(
-			(data.result?.collections ?? []).map(async (col: { name: string }) => {
+			colSlice.map(async (col: { name: string }) => {
 				try {
-					const info = await fetch(`${getQdrantUrl()}/collections/${col.name}`);
+					const info = await fetch(`${getQdrantUrl()}/collections/${col.name}`, { signal });
 					const infoData = await info.json();
 					const result = infoData.result ?? {};
 					return {
@@ -89,10 +93,10 @@ async function getQdrantCollections(): Promise<{
 	}
 }
 
-async function getIndexingStatus(): Promise<IndexingStatus> {
+async function getIndexingStatus(signal?: AbortSignal): Promise<IndexingStatus> {
 	const result: IndexingStatus = { codebase: null, errors: null };
 	try {
-		const codeRes = await fetch(`${getQdrantUrl()}/collections/phase79_codebase`);
+		const codeRes = await fetch(`${getQdrantUrl()}/collections/phase79_codebase`, { signal });
 		if (codeRes.ok) {
 			const data = await codeRes.json();
 			const r = data.result ?? {};
@@ -102,10 +106,10 @@ async function getIndexingStatus(): Promise<IndexingStatus> {
 			};
 		}
 	} catch {
-		/* Qdrant not running */
+		/* Qdrant not running or aborted */
 	}
 	try {
-		const errRes = await fetch(`${getQdrantUrl()}/collections/phase79_error_analysis`);
+		const errRes = await fetch(`${getQdrantUrl()}/collections/phase79_error_analysis`, { signal });
 		if (errRes.ok) {
 			const data = await errRes.json();
 			const r = data.result ?? {};
@@ -115,18 +119,18 @@ async function getIndexingStatus(): Promise<IndexingStatus> {
 			};
 		}
 	} catch {
-		/* Qdrant not running */
+		/* Qdrant not running or aborted */
 	}
 	return result;
 }
 
-async function getDockerContainers(): Promise<
+async function getDockerContainers(signal?: AbortSignal): Promise<
 	Array<{ name: string; status: string; image: string; ports: string }>
 > {
 	try {
 		const { env } = await import('$env/dynamic/private');
 		const dockerApiUrl = env?.DOCKER_API_URL ?? 'http://localhost:2375';
-		const res = await fetch(`${dockerApiUrl}/containers/json?all=true`);
+		const res = await fetch(`${dockerApiUrl}/containers/json?all=true`, { signal });
 		if (!res.ok) return [];
 		const containers = await res.json();
 		return containers.map((c: Record<string, unknown>) => ({
@@ -144,26 +148,39 @@ async function getDockerContainers(): Promise<
 }
 
 export const load: PageServerLoad = async ({ url }) => {
-	// 8s overall timeout to prevent SSR hangs under load
-	const dataPromise = Promise.all([
-		Promise.all([
-			checkServiceHealth('PostgreSQL', `${url.origin}/api/health/database`),
-			checkServiceHealth('Redis', `${url.origin}/api/health/redis`),
-			checkServiceHealth('Ollama', `${getOllamaUrl()}/api/tags`),
-			checkServiceHealth('Qdrant', getQdrantUrl()),
-			checkServiceHealth('Neo4j', `${url.origin}/api/health/neo4j`),
-			checkServiceHealth('MinIO', `http://${getMinioConfig().endpoint}/minio/health/live`)
-		]),
-		getQdrantCollections(),
-		getIndexingStatus(),
-		getDockerContainers()
-	]);
+	// AbortController cancels ALL pending fetches when timeout fires (no connection leak)
+	const controller = new AbortController();
+	const { signal } = controller;
+	const timer = setTimeout(() => controller.abort(), 8000);
 
-	const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 8000));
-	const result = await Promise.race([dataPromise, timeoutPromise]);
+	try {
+		const [services, qdrant, indexing, docker] = await Promise.all([
+			Promise.all([
+				checkServiceHealth('PostgreSQL', `${url.origin}/api/health/database`),
+				checkServiceHealth('Redis', `${url.origin}/api/health/redis`),
+				checkServiceHealth('Ollama', `${getOllamaUrl()}/api/tags`),
+				checkServiceHealth('Qdrant', getQdrantUrl()),
+				checkServiceHealth('Neo4j', `${url.origin}/api/health/neo4j`),
+				checkServiceHealth('MinIO', `http://${getMinioConfig().endpoint}/minio/health/live`)
+			]),
+			getQdrantCollections(signal),
+			getIndexingStatus(signal),
+			getDockerContainers(signal)
+		]);
 
-	if (!result) {
-		// Timed out — return empty shells
+		clearTimeout(timer);
+
+		return {
+			services,
+			qdrant,
+			indexing,
+			docker,
+			timestamp: new Date().toISOString(),
+			loadError: null
+		};
+	} catch {
+		clearTimeout(timer);
+		// Timed out or aborted — return empty shells
 		return {
 			services: [] as ServiceHealth[],
 			qdrant: { collections: [] as QdrantCollection[], totalPoints: 0 },
@@ -173,15 +190,4 @@ export const load: PageServerLoad = async ({ url }) => {
 			loadError: 'Dev tools data loading timed out (8s)'
 		};
 	}
-
-	const [services, qdrant, indexing, docker] = result;
-
-	return {
-		services,
-		qdrant,
-		indexing,
-		docker,
-		timestamp: new Date().toISOString(),
-		loadError: null
-	};
 };
