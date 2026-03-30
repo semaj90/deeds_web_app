@@ -44,6 +44,8 @@ export default defineConfig({
       'tests/vision-gpu-tools-topology-routes.spec.ts',
       'tests/ai-routes-comprehensive.spec.ts',
       'tests/yorha-v1-routes.spec.ts',
+      'tests/docs-sync-cartridge-system-routes.spec.ts',
+      'tests/cases-sub-routes.spec.ts',
       'tests/routes/all-routes-page-server.test.ts',
       'tests/routes/all-routes-page.test.ts',
     ],

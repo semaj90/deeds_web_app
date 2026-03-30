@@ -641,9 +641,8 @@ export const handle: Handle = async ({ event, resolve }) => {
     );
   }
 
-  // Enable streaming for AI endpoints
-  if (event.url.pathname.startsWith('/api/ai/')) {
-    response.headers.set('Content-Type', 'application/x-ndjson');
+  // Disable proxy buffering for streaming AI endpoints (SSE/ndjson only)
+  if (isStreamRoute && event.url.pathname.startsWith('/api/ai/')) {
     response.headers.set('Cache-Control', 'no-cache');
     response.headers.set('X-Accel-Buffering', 'no');
   }

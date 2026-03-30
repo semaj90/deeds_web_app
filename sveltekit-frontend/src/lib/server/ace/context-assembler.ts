@@ -625,15 +625,24 @@ async function fetchKAGNeighbors(
     try {
       const { db } = await import('$lib/server/db/client');
       const rows = await db.execute(
-        sql`SELECT target_id AS node_id, label AS title, relationship_type AS relationship
-					FROM yorha_evidence_connections
-					WHERE source_id = ${caseId}
-					LIMIT 10`
+        sql`SELECT
+          c.target_node_id AS node_id,
+          n.title AS title,
+          c.connection_type AS relationship,
+          c.strength AS score
+        FROM yorha_evidence_connections c
+        JOIN yorha_evidence_nodes n ON n.id = c.target_node_id
+        WHERE c.source_node_id IN (
+          SELECT id FROM yorha_evidence_nodes WHERE case_id = ${caseId} AND status = 'active'
+        )
+        ORDER BY c.strength DESC, c.confidence_score DESC
+        LIMIT 10`
       );
       return (rows as any).rows.map((r: any) => ({
         nodeId: String(r.node_id ?? ''),
         title: String(r.title ?? ''),
         relationship: String(r.relationship ?? ''),
+        score: r.score != null ? Number(r.score) : undefined,
       }));
     } catch {
       return [];

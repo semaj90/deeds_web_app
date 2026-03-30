@@ -6,7 +6,7 @@ import { z } from 'zod';
 /**
  * POST /api/agent/investigate
  *
- * Autonomous investigation using LangChain ReAct agent with 14 FastMCP tools.
+ * - detect_objects: YOLO object detection (doc-layout preferred, COCO fallback)
  *
  * Request Body:
  * {
@@ -133,7 +133,7 @@ export const GET: RequestHandler = async () => {
 			{
 				name: 'detect_objects',
 				category: 'Multimodal',
-				description: 'YOLOv8 object detection with 80 COCO classes'
+				description: 'YOLO object detection using the installed ONNX model; live repo currently falls back to yolov8n COCO while yolo-doc.onnx remains missing'
 			},
 			{
 				name: 'transcribe_audio',

@@ -956,33 +956,38 @@ async function processAndEmbed(
     }
   }
 
-  // 6b. YOLO + VLM image analysis in parallel (both independent, non-fatal)
+  // 6b. YOLO + VLM + LLM analysis pipeline (Redis-cached, LLM escalation, graph connections)
   const isImage = /\.(png|jpg|jpeg|tiff|tif|bmp|webp)$/i.test(fileName);
-  let yoloDetections: { objects: { class: string; confidence: number }[]; layout: Record<string, unknown>; modelType: string } | null = null;
+  let yoloDetections: {
+    objects: { class: string; confidence: number }[];
+    layout: Record<string, unknown>;
+    modelType: string;
+  } | null = null;
   let visionAnalysis: {
     summary?: string;
     keyFindings?: string[];
     suggestedTags?: string[];
   } | null = null;
+  let analysisPipelineResult: Awaited<
+    ReturnType<
+      typeof import('$lib/server/analysis/evidence-analysis-pipeline.js').runEvidenceAnalysisPipeline
+    >
+  > | null = null;
 
   if (isImage) {
-    const [yoloResult, vlmResult] = await Promise.allSettled([
-      // YOLO object detection
+    const [pipelineResult, vlmResult] = await Promise.allSettled([
+      // Full analysis pipeline: YOLO (Redis-cached) → LLM escalation → graph connections → DB cache
       (async () => {
-        const yolo = createYOLOService();
-        if (await yolo.isModelAvailable()) {
-          const result = await yolo.analyzeDocument(buffer, fileName);
-          const objectLabels = result.objects?.map((o) => o.class) ?? [];
-          console.log(
-            `[Upload] YOLO detected ${result.objects?.length ?? 0} objects [${objectLabels.slice(0, 5).join(', ')}] in ${fileName} (${result.modelType}, ${result.processingTime}ms)`
-          );
-          return {
-            objects: result.objects ?? [],
-            layout: result.layout,
-            modelType: result.modelType,
-          };
-        }
-        return null;
+        const { runEvidenceAnalysisPipeline } = await import(
+          '$lib/server/analysis/evidence-analysis-pipeline.js'
+        );
+        return runEvidenceAnalysisPipeline({
+          evidenceId,
+          caseId,
+          fileName,
+          buffer,
+          existingText: fullText,
+        });
       })(),
       // VLM vision analysis (cached by SHA256)
       (async () => {
@@ -1024,26 +1029,42 @@ async function processAndEmbed(
       })(),
     ]);
 
-    yoloDetections = yoloResult.status === 'fulfilled' ? yoloResult.value : null;
+    // Extract pipeline results
+    analysisPipelineResult = pipelineResult.status === 'fulfilled' ? pipelineResult.value : null;
+    if (analysisPipelineResult?.yolo) {
+      yoloDetections = {
+        objects: analysisPipelineResult.yolo.objects ?? [],
+        layout: analysisPipelineResult.yolo.layout,
+        modelType: analysisPipelineResult.yolo.modelType,
+      };
+    }
     visionAnalysis = vlmResult.status === 'fulfilled' ? vlmResult.value : null;
-    if (yoloResult.status === 'rejected')
-      console.warn('[Upload] YOLO detection skipped:', yoloResult.reason);
+
+    if (pipelineResult.status === 'rejected')
+      console.warn('[Upload] Analysis pipeline skipped:', pipelineResult.reason);
     if (vlmResult.status === 'rejected')
       console.warn('[Upload] VLM analysis skipped:', vlmResult.reason);
-    if (yoloResult.status === 'rejected' || vlmResult.status === 'rejected') {
+
+    const pipelineOk = pipelineResult.status === 'fulfilled';
+    const vlmOk = vlmResult.status === 'fulfilled';
+    if (!pipelineOk || !vlmOk) {
       markStage(
         diagnostics,
         'vision',
         'warning',
         'One or more image analysis passes were skipped',
         {
-          yoloStatus: yoloResult.status,
+          pipelineStatus: pipelineResult.status,
           vlmStatus: vlmResult.status,
         }
       );
     } else {
-      markStage(diagnostics, 'vision', 'success', 'Completed image analysis passes', {
+      markStage(diagnostics, 'vision', 'success', 'Completed image analysis pipeline', {
         yoloObjects: yoloDetections?.objects?.length ?? 0,
+        yoloCacheHit: analysisPipelineResult?.yoloCacheHit ?? false,
+        llmEscalated: analysisPipelineResult?.llmEscalated ?? false,
+        graphConnections: analysisPipelineResult?.graphConnectionsCreated ?? 0,
+        cachedToDb: analysisPipelineResult?.cachedToDb ?? false,
         vlmFindings: visionAnalysis?.keyFindings?.length ?? 0,
       });
     }
@@ -1289,7 +1310,18 @@ async function processAndEmbed(
         ...(evidenceProfile?.suggested_tags ?? []),
         ...(visionAnalysis?.suggestedTags ?? []),
         ...(yoloDetections?.objects?.map((o) => `detected:${o.class}`) ?? []),
+        ...(analysisPipelineResult?.tags ?? []),
       ].filter(Boolean),
+      analysisPipeline: analysisPipelineResult
+        ? {
+            llmEscalated: analysisPipelineResult.llmEscalated,
+            llmSynthesis: analysisPipelineResult.llmSynthesis,
+            graphConnectionsCreated: analysisPipelineResult.graphConnectionsCreated,
+            yoloCacheHit: analysisPipelineResult.yoloCacheHit,
+            cachedToDb: analysisPipelineResult.cachedToDb,
+            processingTimeMs: analysisPipelineResult.processingTimeMs,
+          }
+        : null,
       analysisTimestamp: diagnostics.completedAt,
     });
   } catch (err) {

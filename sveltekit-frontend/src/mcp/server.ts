@@ -180,7 +180,7 @@ function setupToolHandlers() {
       {
         name: 'evidence:detect_objects',
         description:
-          'Detect objects in image evidence using YOLOv8 (GPU). Returns bounding boxes, class names, confidence scores for 80 COCO classes (person, weapon, vehicle, etc).',
+          'Detect objects in image evidence using the installed YOLO ONNX model. The live repo currently uses a restored yolov8n COCO fallback; document-layout mode still requires models/yolo-doc.onnx.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -605,14 +605,25 @@ function setupToolHandlers() {
               items: {
                 type: 'object',
                 properties: {
-                  tool: { type: 'string', description: 'Tool name to call (e.g., "codebase:search")' },
-                  args: { type: 'object', description: 'Arguments for the tool. Use {{stepN.field}} to reference output of step N (0-indexed).' },
+                  tool: {
+                    type: 'string',
+                    description: 'Tool name to call (e.g., "codebase:search")',
+                  },
+                  args: {
+                    type: 'object',
+                    description:
+                      'Arguments for the tool. Use {{stepN.field}} to reference output of step N (0-indexed).',
+                  },
                 },
                 required: ['tool', 'args'],
               },
               description: 'Ordered list of tool invocations',
             },
-            stopOnError: { type: 'boolean', description: 'Stop pipeline on first error', default: true },
+            stopOnError: {
+              type: 'boolean',
+              description: 'Stop pipeline on first error',
+              default: true,
+            },
           },
           required: ['steps'],
         },

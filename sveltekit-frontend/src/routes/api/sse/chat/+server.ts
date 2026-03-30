@@ -10,6 +10,8 @@ import { getGraphContext } from '$lib/server/retrieval/graph-context.js';
 import { lookupCachedResponse, storeCachedResponse } from '$lib/server/ai/llm-cache.js';
 import { getFragment, setFragment, getGlyphCacheMetrics, FragmentType } from '$lib/server/glyph-prompt-cache.js';
 import { createHash } from 'crypto';
+import { synthesisKey, getCaseVersion, TTL } from '$lib/server/cache-keys.js';
+import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self-prompt.js';
 import { fetchGlossaryMatches } from '$lib/server/ace/context-assembler.js';
@@ -963,7 +965,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       const chatUserId = (locals as { user?: { id?: string } })?.user?.id;
       if (chatUserId) {
         try {
-          const { fetchUserAnalyticsContext } = await import('$lib/server/ace/user-analytics-context.js');
+          const { fetchUserAnalyticsContext } = await import(
+            '$lib/server/ace/user-analytics-context.js'
+          );
           const analyticsCtx = await fetchUserAnalyticsContext(chatUserId, message, caseUuid);
           if (analyticsCtx) {
             systemPrompt += `\n\n${analyticsCtx}`;
@@ -975,14 +979,55 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
       let fullResponse = '';
 
-      // LLM Response Cache: Check if we have a cached response for this query + context
-      const cacheResult = hasInlineAttachmentSource
-        ? { hit: false }
-        : await lookupCachedResponseWithBudget({
-            query: message,
-            context: systemPrompt,
-            model: model ?? 'gemma3-legal:latest',
-          });
+      // Versioned synthesis cache check (case-scoped, version-stamped)
+      const synthCaseId = caseMatch?.[1];
+      let synthCaseVersion = 0;
+      let versionedSynthHit = false;
+      if (synthCaseId && !hasInlineAttachmentSource) {
+        synthCaseVersion = await getCaseVersion(synthCaseId);
+        const sKey = synthesisKey.forQuery(
+          synthCaseId,
+          message,
+          model ?? 'gemma3-legal:latest',
+          'v1',
+          synthCaseVersion
+        );
+        const memHit = getFromMemoryCache(sKey);
+        if (memHit.found && typeof (memHit.value as any)?.response === 'string') {
+          fullResponse = (memHit.value as any).response;
+          versionedSynthHit = true;
+          console.log(`[SSE Chat] Versioned synthesis cache HIT (memory, v${synthCaseVersion})`);
+        } else {
+          try {
+            const { getRedis: getR } = await import('$lib/server/redis.js');
+            const redis = getR();
+            const hit = await redis.get(sKey);
+            if (hit) {
+              const parsed = JSON.parse(hit);
+              if (parsed?.response) {
+                fullResponse = parsed.response;
+                versionedSynthHit = true;
+                console.log(
+                  `[SSE Chat] Versioned synthesis cache HIT (redis, v${synthCaseVersion})`
+                );
+              }
+            }
+          } catch {
+            /* miss */
+          }
+        }
+      }
+
+      // Fallback: LLM Response Cache (semantic similarity based)
+      const cacheResult = versionedSynthHit
+        ? { hit: true, response: fullResponse, similarity: 1.0 }
+        : hasInlineAttachmentSource
+          ? { hit: false }
+          : await lookupCachedResponseWithBudget({
+              query: message,
+              context: systemPrompt,
+              model: model ?? 'gemma3-legal:latest',
+            });
 
       if (cacheResult.hit && cacheResult.response) {
         // Cache HIT — stream the cached response in chunks to simulate live streaming
@@ -1411,6 +1456,22 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             '[SSE Chat] Response caching failed:',
             cacheErr instanceof Error ? cacheErr.message : cacheErr
           );
+        }
+
+        // Versioned synthesis cache persist (case-scoped, separate from LLM cache)
+        if (synthCaseId && fullResponse) {
+          const sKey = synthesisKey.forQuery(
+            synthCaseId,
+            message,
+            model ?? 'gemma3-legal:latest',
+            'v1',
+            synthCaseVersion
+          );
+          setCache(
+            sKey,
+            { response: fullResponse, confidence, model: model ?? 'gemma3-legal:latest' },
+            TTL.SYNTHESIS * 1000
+          ).catch(() => {});
         }
 
         send({

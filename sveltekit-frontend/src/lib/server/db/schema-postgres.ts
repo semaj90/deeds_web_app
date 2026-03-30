@@ -1167,6 +1167,36 @@ export const evidenceVectors = pgTable('evidence_vectors', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+/**
+ * Evidence Analysis Cache — queryable analysis results for fast client hits.
+ * Stores YOLO detections, VLM findings, LLM synthesis, and graph connections
+ * so the client can query by case_id + analysis_type without parsing JSONB metadata.
+ */
+export const evidenceAnalysisCache = pgTable('evidence_analysis_cache', {
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  evidenceId: uuid('evidence_id').notNull(),
+  caseId: uuid('case_id'),
+  analysisType: varchar('analysis_type', { length: 50 }).notNull(), // 'yolo', 'vlm', 'llm_synthesis', 'combined'
+  result: jsonb('result').notNull(), // full analysis payload
+  resultEmbedding: vector('result_embedding', { dimensions: 768 }), // embedded summary for semantic search
+  confidence: real('confidence').default(0.0),
+  objectCount: integer('object_count').default(0),
+  tags: jsonb('tags').$type<string[]>().default([]),
+  llmEscalated: boolean('llm_escalated').default(false),
+  processingTimeMs: integer('processing_time_ms').default(0),
+  expiresAt: timestamp('expires_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  evidenceIdIdx: index('evidence_analysis_cache_evidence_id_idx').on(table.evidenceId),
+  caseIdIdx: index('evidence_analysis_cache_case_id_idx').on(table.caseId),
+  analysisTypeIdx: index('evidence_analysis_cache_type_idx').on(table.analysisType),
+  caseTypeIdx: index('evidence_analysis_cache_case_type_idx').on(table.caseId, table.analysisType),
+}));
+
 export const caseEmbeddings = pgTable('case_embeddings', {
   id: uuid('id')
     .default(sql`gen_random_uuid()`)

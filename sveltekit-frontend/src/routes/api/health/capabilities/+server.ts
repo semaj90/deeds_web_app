@@ -2,7 +2,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { getTritonUrl, getQdrantUrl } from '$lib/config/env.server.js';
 import { getGpuLeaseStatus } from '$lib/server/inference/gpu-arbiter.js';
-import { getSIMDStatus } from '$lib/server/minio-simd-client.js';
+import { getLangExtractStatus } from '$lib/server/langextract-client.js';
 import { checkGrpcHealth } from '$lib/server/grpc/embedding-client.js';
 
 /**
@@ -45,7 +45,7 @@ export const GET: RequestHandler = async () => {
 	const qdrantUrl = getQdrantUrl();
 
 	// Parallel checks — all with 2s timeout
-	const [ollamaRes, qdrantHealth, postgresOk, redisOk, tensorrtOk, gpuLease, simdStatus, grpcStatus] = await Promise.all([
+	const [ollamaRes, qdrantHealth, postgresOk, redisOk, tensorrtOk, gpuLease, langExtractStatus, grpcStatus] = await Promise.all([
 		// Ollama: fetch model list (proves LLM + embedding available)
 		fetch(`${ollamaUrl}/api/tags`, { signal: AbortSignal.timeout(TIMEOUT) })
 			.then(async (r) => {
@@ -113,8 +113,8 @@ export const GET: RequestHandler = async () => {
 		// GPU lease status
 		getGpuLeaseStatus().catch(() => null),
 
-		// SIMD sidecar health
-		getSIMDStatus().catch(() => ({ healthy: false, minioConnected: false, latencyMs: -1 })),
+		// LangExtract service health
+		getLangExtractStatus().catch(() => ({ healthy: false, services: {}, version: '', latencyMs: -1 })),
 
 		// gRPC embedding health
 		checkGrpcHealth().catch(() => ({ enabled: false, url: '', available: false })),
@@ -141,7 +141,7 @@ export const GET: RequestHandler = async () => {
 			postgres: postgresOk,
 			redis: redisOk,
 			tensorrt: tensorrtOk,
-			simd: simdStatus,
+			langextract: langExtractStatus,
 			grpc: grpcStatus,
 			gpu: {
 				leaseHolder: gpuLease?.backend ?? null,

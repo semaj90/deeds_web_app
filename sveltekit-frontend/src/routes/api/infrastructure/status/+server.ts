@@ -2,7 +2,7 @@
  * GET /api/infrastructure/status
  *
  * Aggregated infrastructure health for monitoring dashboard.
- * Returns detailed status of all tiers: gRPC, SIMD, TRT-LLM, QUIC/NATS, GPU, cache, queues.
+ * Returns detailed status of all tiers: gRPC, LangExtract, TRT-LLM, QUIC/NATS, GPU, cache, queues.
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
@@ -10,7 +10,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { getRabbitMQManagementUrl } from '$lib/config/env.server.js';
 import { getGpuLeaseStatus } from '$lib/server/inference/gpu-arbiter.js';
 import { getRouterStatus } from '$lib/server/inference/inference-router.js';
-import { getSIMDStatus } from '$lib/server/minio-simd-client.js';
+import { getLangExtractStatus } from '$lib/server/langextract-client.js';
 import { checkGrpcHealth } from '$lib/server/grpc/embedding-client.js';
 import { healthCheck as trtHealthCheck } from '$lib/server/trt-llm.js';
 import { isCudaAvailable } from '$lib/server/gpu/libtorch-bridge.js';
@@ -23,7 +23,7 @@ export const GET: RequestHandler = async () => {
 
 	const [
 		grpc,
-		simd,
+		langextract,
 		trtOk,
 		routerStatus,
 		gpuLease,
@@ -34,7 +34,7 @@ export const GET: RequestHandler = async () => {
 		rabbitmqInfo,
 	] = await Promise.all([
 		checkGrpcHealth().catch(() => ({ enabled: false, url: '', available: false })),
-		getSIMDStatus().catch(() => ({ healthy: false, minioConnected: false, latencyMs: -1 })),
+		getLangExtractStatus().catch(() => ({ healthy: false, services: {}, version: '', latencyMs: -1 })),
 		trtHealthCheck().catch(() => false),
 		getRouterStatus().catch(() => null),
 		getGpuLeaseStatus().catch(() => null),
@@ -139,7 +139,7 @@ export const GET: RequestHandler = async () => {
 			redis: redisInfo.ok,
 			qdrant: qdrantInfo.ok,
 			rabbitmq: rabbitmqInfo.ok,
-			simd,
+			langextract,
 		},
 		cache: {
 			redis: redisInfo.ok ? {

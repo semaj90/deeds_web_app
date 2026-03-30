@@ -194,7 +194,8 @@ function generateDescription(urlPath: string, methods: string[]): string {
     tags: 'Evidence tag listing and management',
     'tags/search': 'Tag search with embeddings across CouchDB + Qdrant + pgvector',
     'v1/evidence/analyze': 'API v1 — evidence analysis via Ollama',
-    'vision/analyze': 'Vision — YOLO + VLM image analysis pipeline',
+    'vision/analyze':
+      'Vision — YOLO + VLM image analysis pipeline (doc-layout preferred, COCO fallback restored)',
   };
 
   // Check exact path match (without params)

@@ -354,6 +354,31 @@ export class RabbitMQManager extends EventEmitter {
         `✅ Evidence ${data.evidenceId}: ${entities.length} entities, ${forensics.length} forensic flags`
       );
 
+      // Run YOLO + LLM analysis pipeline for image evidence (Redis-cached, graph connections)
+      if (
+        data.fileName &&
+        /\.(png|jpg|jpeg|tiff|tif|bmp|webp)$/i.test(data.fileName) &&
+        data.buffer
+      ) {
+        try {
+          const { runEvidenceAnalysisPipeline } = await import(
+            '../analysis/evidence-analysis-pipeline.js'
+          );
+          const pipelineResult = await runEvidenceAnalysisPipeline({
+            evidenceId: data.evidenceId,
+            caseId: data.caseId,
+            fileName: data.fileName,
+            buffer: Buffer.from(data.buffer, 'base64'),
+            existingText: text,
+          });
+          console.log(
+            `🎯 Analysis pipeline: ${pipelineResult.yolo?.objects.length ?? 0} objects, LLM=${pipelineResult.llmEscalated}, graph=${pipelineResult.graphConnectionsCreated}`
+          );
+        } catch (pipelineErr) {
+          console.warn('⚠️ Analysis pipeline failed (non-fatal):', pipelineErr);
+        }
+      }
+
       // Publish for embedding if text is available
       if (text.length > 0) {
         await this.publish(this.exchanges.document_processing, 'document.embed', {

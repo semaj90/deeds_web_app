@@ -45,12 +45,10 @@ export const ENV = {
   EMBEDDING_GRPC_ENABLED: (privateEnv.EMBEDDING_GRPC_ENABLED ?? 'false') === 'true',
   RETRIEVAL_GRPC_URL: privateEnv.RETRIEVAL_GRPC_URL ?? '127.0.0.1:50053',
   RETRIEVAL_GRPC_ENABLED: (privateEnv.RETRIEVAL_GRPC_ENABLED ?? 'false') === 'true',
-  // SIMD sidecar (Go minio-simd-service)
-  MINIO_SIMD_ENABLED: (privateEnv.MINIO_SIMD_ENABLED ?? 'false') === 'true',
-  MINIO_SIMD_URL: privateEnv.MINIO_SIMD_URL ?? 'http://127.0.0.1:8095',
-  // LangExtract legal section extraction (phase66-langextract container)
+  // LangExtract service (Python FastAPI + spaCy + NER, container: phase66-langextract)
+  LANGEXTRACT_ENABLED: (privateEnv.LANGEXTRACT_ENABLED ?? privateEnv.MINIO_SIMD_ENABLED ?? 'false') === 'true',
   LANGEXTRACT_URL:
-    privateEnv.LANGEXTRACT_URL ?? privateEnv.LANGEXTRACT_API_URL ?? 'http://127.0.0.1:8095',
+    privateEnv.LANGEXTRACT_URL ?? privateEnv.LANGEXTRACT_API_URL ?? privateEnv.MINIO_SIMD_URL ?? 'http://127.0.0.1:8095',
   // QUIC/NATS embedding transport
   EMBEDDING_QUIC_ENABLED:
     (privateEnv.EMBEDDING_QUIC_ENABLED ?? privateEnv.QUIC_ENABLED ?? 'false') === 'true',

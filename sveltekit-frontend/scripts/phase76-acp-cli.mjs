@@ -57,8 +57,16 @@ const TOOLS = [
       properties: {
         title: { type: 'string', description: 'Case title' },
         description: { type: 'string', description: 'Case description' },
-        status: { type: 'string', enum: ['open', 'active', 'closed', 'archived'], description: 'Status' },
-        priority: { type: 'string', enum: ['low', 'medium', 'high', 'critical'], description: 'Priority' },
+        status: {
+          type: 'string',
+          enum: ['open', 'active', 'closed', 'archived'],
+          description: 'Status',
+        },
+        priority: {
+          type: 'string',
+          enum: ['low', 'medium', 'high', 'critical'],
+          description: 'Priority',
+        },
       },
       required: ['title'],
     },
@@ -123,7 +131,11 @@ const TOOLS = [
       required: ['url'],
     },
     async execute(args) {
-      return httpPost('/api/knowledge', { url: args.url, source: 'mcp-cli', extraction_type: 'legal' });
+      return httpPost('/api/knowledge', {
+        url: args.url,
+        source: 'mcp-cli',
+        extraction_type: 'legal',
+      });
     },
   },
   {
@@ -135,7 +147,11 @@ const TOOLS = [
         query: { type: 'string', description: 'Search query' },
         limit: { type: 'number', description: 'Max results (1-50)', default: 10 },
         contentWeight: { type: 'number', description: 'Content vector weight (0-1)', default: 0.6 },
-        signatureWeight: { type: 'number', description: 'Signature vector weight (0-1)', default: 0.4 },
+        signatureWeight: {
+          type: 'number',
+          description: 'Signature vector weight (0-1)',
+          default: 0.4,
+        },
       },
       required: ['query'],
     },
@@ -184,7 +200,11 @@ const TOOLS = [
       properties: {
         evidenceId: { type: 'string', description: 'Evidence record ID' },
         fileUrl: { type: 'string', description: 'MinIO object key' },
-        evidenceType: { type: 'string', enum: ['image', 'video', 'audio'], description: 'File type' },
+        evidenceType: {
+          type: 'string',
+          enum: ['image', 'video', 'audio'],
+          description: 'File type',
+        },
         analyzeVision: { type: 'boolean', default: true },
         analyzeAudio: { type: 'boolean', default: true },
         extractEmbeddings: { type: 'boolean', default: true },
@@ -202,7 +222,8 @@ const TOOLS = [
   {
     name: 'evidence:detect_objects',
     category: 'Evidence',
-    description: 'YOLOv8 object detection on image evidence',
+    description:
+      'YOLO object detection on image evidence using the installed ONNX model (currently yolov8n COCO fallback)',
     inputSchema: {
       properties: {
         evidenceId: { type: 'string', description: 'Evidence record ID' },
@@ -300,7 +321,10 @@ const TOOLS = [
     inputSchema: {
       properties: {
         caseId: { type: 'string', description: 'Case ID' },
-        citationText: { type: 'string', description: "Citation text (e.g., 'Miranda v. Arizona...')" },
+        citationText: {
+          type: 'string',
+          description: "Citation text (e.g., 'Miranda v. Arizona...')",
+        },
         sourceTitle: { type: 'string', description: 'Source document title' },
         pageNumber: { type: 'number', description: 'Page number' },
       },
@@ -341,7 +365,11 @@ const TOOLS = [
         caseId: { type: 'string', description: 'Case ID' },
         title: { type: 'string', default: 'Untitled Report' },
         contentHtml: { type: 'string', default: '<p>Start writing...</p>' },
-        status: { type: 'string', enum: ['draft', 'in_review', 'finalized', 'published'], default: 'draft' },
+        status: {
+          type: 'string',
+          enum: ['draft', 'in_review', 'finalized', 'published'],
+          default: 'draft',
+        },
       },
       required: ['caseId'],
     },
@@ -357,9 +385,18 @@ const TOOLS = [
       properties: {
         templateType: {
           type: 'string',
-          enum: ['charging_memo', 'search_warrant', 'case_summary', 'evidence_inventory',
-            'witness_interview', 'plea_agreement', 'motion_suppress', 'trial_brief',
-            'sentencing_memo', 'discovery_index'],
+          enum: [
+            'charging_memo',
+            'search_warrant',
+            'case_summary',
+            'evidence_inventory',
+            'witness_interview',
+            'plea_agreement',
+            'motion_suppress',
+            'trial_brief',
+            'sentencing_memo',
+            'discovery_index',
+          ],
           description: 'Template type',
         },
         caseId: { type: 'string', description: 'Case ID' },
@@ -512,7 +549,11 @@ const TOOLS = [
     description: 'Execute browser action (goto, click, fill, screenshot)',
     inputSchema: {
       properties: {
-        action: { type: 'string', enum: ['goto', 'click', 'fill', 'screenshot'], description: 'Action type' },
+        action: {
+          type: 'string',
+          enum: ['goto', 'click', 'fill', 'screenshot'],
+          description: 'Action type',
+        },
         url: { type: 'string', description: 'Target URL' },
         selector: { type: 'string', description: 'CSS selector' },
         value: { type: 'string', description: 'Fill value' },

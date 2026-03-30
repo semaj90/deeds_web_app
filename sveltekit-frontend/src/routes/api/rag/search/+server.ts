@@ -19,6 +19,9 @@ import { ollamaFetch } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
+import { retrievalKey, getCaseVersion, TTL } from '$lib/server/cache-keys.js';
+import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
+import { getRedis } from '$lib/server/redis.js';
 
 // ── BM42 hybrid search collections (must have sparse 'bm25' vector configured) ──
 const BM42_COLLECTIONS = ['legal_documents', 'evidence_items'];
@@ -326,7 +329,39 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
       dag: { status: 'skipped', enabled: url.searchParams.get('dag') === 'true' },
     };
 
-    // 0. Check vector result cache (Memory → Redis) for identical query+options
+    // 0a. Versioned retrieval cache check (case-scoped, version-stamped)
+    const effectiveCaseId = caseId || body.case_id;
+    let caseVersion = 0;
+    if (effectiveCaseId) {
+      caseVersion = await getCaseVersion(effectiveCaseId);
+      const rKey = retrievalKey.forQuery(effectiveCaseId, query, caseVersion);
+      const memHit = getFromMemoryCache(rKey);
+      if (memHit.found) {
+        diagnostics.cache = { hit: true, source: 'retrieval-cache-memory' };
+        return json({
+          ...(memHit.value as Record<string, unknown>),
+          diagnostics,
+          cache: { hit: true, source: 'retrieval-cache-memory', caseVersion },
+        });
+      }
+      try {
+        const redis = getRedis();
+        const redisHit = await redis.get(rKey);
+        if (redisHit) {
+          const parsed = JSON.parse(redisHit);
+          diagnostics.cache = { hit: true, source: 'retrieval-cache-redis' };
+          return json({
+            ...parsed,
+            diagnostics,
+            cache: { hit: true, source: 'retrieval-cache-redis', caseVersion },
+          });
+        }
+      } catch {
+        /* miss — continue */
+      }
+    }
+
+    // 0b. Fallback: legacy vector result cache (Memory → Redis) for identical query+options
     const cacheOptions = { limit: top_k, threshold: min_score, documentType: caseId };
     const { entry: cachedResult } = await getVectorCache(query, cacheOptions);
     if (cachedResult) {
@@ -694,8 +729,8 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
 
     let topChunks = allChunks.slice(0, top_k);
 
-    // Optional DAG reordering: cited documents appear before citing documents
-    const enableDAG = url.searchParams.get('dag') === 'true';
+    // DAG reordering: cited documents appear before citing documents (default: on)
+    const enableDAG = url.searchParams.get('dag') !== 'false';
     if (enableDAG && topChunks.length > 1) {
       try {
         const { orderByDependency, extractCitationRefs } = await import(
@@ -765,7 +800,16 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
       })
       .catch(() => {});
 
-    // Cache the full response (fire-and-forget, 30min TTL via vector-cache config)
+    // Cache retrieval bundle separately (versioned, case-scoped)
+    if (effectiveCaseId) {
+      const rKey = retrievalKey.forQuery(effectiveCaseId, query, caseVersion);
+      setCache(rKey, response, TTL.RETRIEVAL * 1000).catch(() => {});
+    } else {
+      const rKey = retrievalKey.global(query);
+      setCache(rKey, response, TTL.RETRIEVAL * 1000).catch(() => {});
+    }
+
+    // Legacy vector-cache (backward compat, 30min TTL)
     setVectorCache(
       query,
       [response],

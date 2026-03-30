@@ -115,7 +115,7 @@ YOLOService.analyzeDocument(imageBuffer, filename)
 
 **Document classes (10):** text, image, table, header, footer, signature, checkbox, form_field, stamp, signature_line
 
-**Status:** Working infrastructure, needs `models/yolo-doc.onnx` model file.
+**Status:** Working infrastructure. Preferred doc-layout alias `models/yolo-doc.onnx` is still missing; the live repo currently falls back to restored `models/yolov8n.onnx` for COCO detection.
 
 ---
 
@@ -559,7 +559,7 @@ pgvector (evidence_vectors)     Qdrant (evidence_items)
 
 | Gap | Severity | Description |
 |-----|----------|-------------|
-| **YOLO model missing** | HIGH | `models/yolo-doc.onnx` not present — Layer A has no model to load |
+| **Preferred doc-layout model missing** | HIGH | `models/yolo-doc.onnx` is still not present; Layer A currently falls back to restored `models/yolov8n.onnx` (COCO) instead of document-layout detection |
 | **Python YOLO not wired** | MEDIUM | `yolo_service.py` is in `deeds_labs/` (archived), not called by active pipeline |
 | **C++ TensorRT stub** | LOW | `detect()` returns `{}` — inference not implemented |
 | **Video evidence** | MEDIUM | Upload pipeline handles images via `/api/vision/analyze` but no video frame extraction |
