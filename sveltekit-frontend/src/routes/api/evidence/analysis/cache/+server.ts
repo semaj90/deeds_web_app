@@ -15,51 +15,58 @@ import { getRedis } from '$lib/server/redis.js';
 
 export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.user) {
-		return json({ error: 'Unauthorized' }, { status: 401 });
-	}
+    return json({ error: 'Unauthorized', data: [], cacheHit: false, count: 0 }, { status: 401 });
+  }
 
-	const evidenceId = url.searchParams.get('evidenceId');
-	const caseId = url.searchParams.get('caseId');
-	const analysisType = url.searchParams.get('type'); // 'yolo' | 'vlm' | 'llm_synthesis' | 'combined'
-	const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '20', 10), 100);
+  const evidenceId = url.searchParams.get('evidenceId');
+  const caseId = url.searchParams.get('caseId');
+  const analysisType = url.searchParams.get('type'); // 'yolo' | 'vlm' | 'llm_synthesis' | 'combined'
+  const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '20', 10), 100);
 
-	if (!evidenceId && !caseId) {
-		return json({ error: 'Provide evidenceId or caseId' }, { status: 400 });
-	}
+  if (!evidenceId && !caseId) {
+    return json(
+      { error: 'Provide evidenceId or caseId', data: [], cacheHit: false, count: 0 },
+      { status: 400 }
+    );
+  }
 
-	// L0: Memory cache check
-	const cacheKey = `analysis_cache:${evidenceId ?? ''}:${caseId ?? ''}:${analysisType ?? 'all'}`;
-	const mem = getFromMemoryCache(cacheKey);
-	if (mem.found) {
-		return json({ data: mem.value, cacheHit: 'memory' });
-	}
+  // L0: Memory cache check
+  const cacheKey = `analysis_cache:${evidenceId ?? ''}:${caseId ?? ''}:${analysisType ?? 'all'}`;
+  const mem = getFromMemoryCache(cacheKey);
+  if (mem.found) {
+    const data = Array.isArray(mem.value) ? mem.value : [];
+    return json({ data, cacheHit: 'memory', count: data.length });
+  }
 
-	// L1: Redis cache check
-	try {
-		const redis = getRedis();
-		const cached = await redis.get(cacheKey);
-		if (cached) {
-			const parsed = JSON.parse(cached);
-			return json({ data: parsed, cacheHit: 'redis' });
-		}
-	} catch { /* miss */ }
+  // L1: Redis cache check
+  try {
+    const redis = getRedis();
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      const data = Array.isArray(parsed) ? parsed : [];
+      return json({ data, cacheHit: 'redis', count: data.length });
+    }
+  } catch {
+    /* miss */
+  }
 
-	// L2: Drizzle query
-	try {
-		let rows;
-		if (evidenceId && !caseId && !analysisType) {
-			rows = await db.execute(
-				sql`SELECT id, evidence_id, case_id, analysis_type, result, confidence,
+  // L2: Drizzle query
+  try {
+    let rows;
+    if (evidenceId && !caseId && !analysisType) {
+      rows = await db.execute(
+        sql`SELECT id, evidence_id, case_id, analysis_type, result, confidence,
 					object_count, tags, llm_escalated, processing_time_ms, created_at
 				FROM evidence_analysis_cache
 				WHERE evidence_id = ${evidenceId}
 				AND (expires_at IS NULL OR expires_at > NOW())
 				ORDER BY created_at DESC
 				LIMIT ${limit}`
-			);
-		} else if (caseId && !evidenceId) {
-			rows = await db.execute(
-				sql`SELECT id, evidence_id, case_id, analysis_type, result, confidence,
+      );
+    } else if (caseId && !evidenceId) {
+      rows = await db.execute(
+        sql`SELECT id, evidence_id, case_id, analysis_type, result, confidence,
 					object_count, tags, llm_escalated, processing_time_ms, created_at
 				FROM evidence_analysis_cache
 				WHERE case_id = ${caseId}
@@ -67,10 +74,10 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 				AND (expires_at IS NULL OR expires_at > NOW())
 				ORDER BY confidence DESC, created_at DESC
 				LIMIT ${limit}`
-			);
-		} else {
-			rows = await db.execute(
-				sql`SELECT id, evidence_id, case_id, analysis_type, result, confidence,
+      );
+    } else {
+      rows = await db.execute(
+        sql`SELECT id, evidence_id, case_id, analysis_type, result, confidence,
 					object_count, tags, llm_escalated, processing_time_ms, created_at
 				FROM evidence_analysis_cache
 				WHERE evidence_id = ${evidenceId}
@@ -79,17 +86,20 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 				AND (expires_at IS NULL OR expires_at > NOW())
 				ORDER BY created_at DESC
 				LIMIT ${limit}`
-			);
-		}
+      );
+    }
 
-		const data = (rows as any).rows ?? [];
+    const data = (rows as any).rows ?? [];
 
-		// Cache for 5 minutes (memory + Redis)
-		await setCache(cacheKey, data, 5 * 60 * 1000).catch(() => {});
+    // Cache for 5 minutes (memory + Redis)
+    await setCache(cacheKey, data, 5 * 60 * 1000).catch(() => {});
 
-		return json({ data, cacheHit: false, count: data.length });
-	} catch (err) {
-		console.error('[analysis/cache] Query failed:', err);
-		return json({ error: 'Analysis cache query failed', data: [] }, { status: 500 });
-	}
+    return json({ data, cacheHit: false, count: data.length });
+  } catch (err) {
+    console.error('[analysis/cache] Query failed:', err);
+    return json(
+      { error: 'Analysis cache query failed', data: [], cacheHit: false, count: 0 },
+      { status: 500 }
+    );
+  }
 };

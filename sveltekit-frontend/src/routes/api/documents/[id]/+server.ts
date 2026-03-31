@@ -48,7 +48,22 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		});
 	} catch (err) {
 		console.error('[documents] GET error:', err);
-		return json({ error: 'Failed to fetch document' }, { status: 500 });
+		return json(
+      {
+        id: null,
+        title: '',
+        content: '',
+        type: 'document',
+        status: 'draft',
+        summary: null,
+        metadata: null,
+        citations: [],
+        createdAt: null,
+        updatedAt: null,
+        error: 'Failed to fetch document',
+      },
+      { status: 500 }
+    );
 	}
 };
 

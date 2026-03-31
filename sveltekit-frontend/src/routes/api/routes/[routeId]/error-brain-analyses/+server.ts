@@ -82,6 +82,9 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 		return json({ data, total, limit, offset });
 	} catch (err) {
 		console.error('[GET /api/routes/:routeId/error-brain-analyses] Error:', err);
-		return json({ error: 'Failed to fetch analyses' }, { status: 500 });
+		return json(
+      { data: [], total: 0, limit: 20, offset: 0, error: 'Failed to fetch analyses' },
+      { status: 500 }
+    );
 	}
 };

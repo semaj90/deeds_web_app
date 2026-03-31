@@ -26,14 +26,15 @@ export function apiSuccess<T>(data: T, status = 200): Response {
 
 export function apiError(error: string | object, status = 500, requestId?: string): Response {
 	return json(
-		{
-			success: false,
-			error,
-			timestamp: Date.now(),
-			requestId
-		},
-	{ status }
-	);
+    {
+      success: false,
+      data: null,
+      error,
+      timestamp: Date.now(),
+      requestId,
+    },
+    { status }
+  );
 }
 
 /**

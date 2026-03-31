@@ -140,6 +140,9 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 		});
 	} catch (e) {
 		console.error('[api/cases/[id]/chat] GET failed:', e);
-		return json({ error: 'Internal server error' }, { status: 500 });
+		return json(
+      { success: false, chatId: null, messages: [], metadata: {}, error: 'Internal server error' },
+      { status: 500 }
+    );
 	}
 };

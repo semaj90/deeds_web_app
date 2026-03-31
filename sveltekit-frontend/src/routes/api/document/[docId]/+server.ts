@@ -26,6 +26,6 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 
 		return json({ document: doc });
 	} catch {
-		return json({ error: 'Database unavailable' }, { status: 500 });
+		return json({ document: null, error: 'Database unavailable' }, { status: 500 });
 	}
 };

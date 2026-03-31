@@ -18,6 +18,22 @@ export const GET: RequestHandler = async ({ locals }) => {
 		});
 	} catch (err) {
 		console.error('[cartridge-stats] Error:', err);
-		return json({ error: 'Stats query failed' }, { status: 500 });
+		return json(
+      {
+        cachedCases: 0,
+        totalSizeBytes: 0,
+        redisConnected: false,
+        nesMemory: {
+          totalDocuments: 0,
+          allocatedBanks: 0,
+          bankSizeBytes: 0,
+          totalMemoryBytes: 0,
+          utilizationPercent: 0,
+        },
+        totalSizeMB: 0,
+        error: 'Stats query failed',
+      },
+      { status: 500 }
+    );
 	}
 };
