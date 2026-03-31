@@ -170,74 +170,72 @@ export async function runEvidenceAnalysisPipeline(
 // ── Redis YOLO Cache ───────────────────────────────────────────────────────
 
 async function getYoloCache(hash: string): Promise<YOLOResult | null> {
-	try {
-		const { redis } = await import('$lib/server/redis.js');
-		const cached = await redis.get(`${YOLO_CACHE_PREFIX}${hash}`);
-		if (!cached) return null;
-		return JSON.parse(cached);
-	} catch {
-		return null;
-	}
+  try {
+    const { getFromRedisCache } = await import('$lib/server/cache.js');
+    return await getFromRedisCache<YOLOResult>(`${YOLO_CACHE_PREFIX}${hash}`);
+  } catch {
+    return null;
+  }
 }
 
 async function setYoloCache(hash: string, result: YOLOResult): Promise<void> {
-	try {
-		const { redis } = await import('$lib/server/redis.js');
-		await redis.set(
-			`${YOLO_CACHE_PREFIX}${hash}`,
-			JSON.stringify(result),
-			'EX',
-			YOLO_CACHE_TTL_S
-		);
-	} catch {
-		// Redis unavailable — non-fatal
-	}
+  try {
+    const { redis } = await import('$lib/server/redis.js');
+    await redis.set(`${YOLO_CACHE_PREFIX}${hash}`, JSON.stringify(result), 'EX', YOLO_CACHE_TTL_S);
+  } catch {
+    // Redis unavailable — non-fatal
+  }
 }
 
 // ── LLM Escalation Logic ──────────────────────────────────────────────────
 
 function checkLLMEscalation(yolo: YOLOResult | null, text?: string): boolean {
-	if (!yolo) return false;
+  if (!yolo) return false;
 
-	// Escalate if enough objects detected
-	if (yolo.objects.length >= LLM_ESCALATION_THRESHOLD) return true;
+  // Escalate if enough objects detected
+  if (yolo.objects.length >= LLM_ESCALATION_THRESHOLD) return true;
 
-	// Escalate if specific legal-significant types found
-	const hasSignificantType = yolo.objects.some((o) => LLM_ESCALATION_TYPES.has(o.class)) ||
-		yolo.layout.regions.some((r) => LLM_ESCALATION_TYPES.has(r.type));
-	if (hasSignificantType) return true;
+  // Escalate if specific legal-significant types found
+  const hasSignificantType =
+    yolo.objects.some((o) => LLM_ESCALATION_TYPES.has(o.class)) ||
+    yolo.layout.regions.some((r) => LLM_ESCALATION_TYPES.has(r.type));
+  if (hasSignificantType) return true;
 
-	// Escalate if layout is complex (many distinct region types)
-	const regionTypes = new Set(yolo.layout.regions.map((r) => r.type));
-	if (regionTypes.size >= 4) return true;
+  // Escalate if layout is complex (many distinct region types)
+  const regionTypes = new Set(yolo.layout.regions.map((r) => r.type));
+  if (regionTypes.size >= 4) return true;
 
-	// Escalate if existing text is short but image is complex
-	if (text && text.length < 200 && yolo.objects.length > 0) return true;
+  // Escalate if existing text is short but image is complex
+  if (text && text.length < 200 && yolo.objects.length > 0) return true;
 
-	return false;
+  return false;
 }
 
 async function synthesizeWithLLM(
-	input: AnalysisPipelineInput,
-	yolo: YOLOResult | null,
-	tags: string[]
+  input: AnalysisPipelineInput,
+  yolo: YOLOResult | null,
+  tags: string[]
 ): Promise<LLMSynthesis | null> {
-	const { ollamaFetch } = await import('$lib/server/ollama.js');
-	const { ENV } = await import('$lib/server/env.server.js');
+  const { ollamaFetch } = await import('$lib/server/ollama.js');
+  const { ENV } = await import('$lib/server/env.server.js');
 
-	// Check Redis for cached synthesis
-	const synthCacheKey = `llm_synthesis:${input.evidenceId}`;
-	try {
-		const { redis } = await import('$lib/server/redis.js');
-		const cached = await redis.get(synthCacheKey);
-		if (cached) return JSON.parse(cached);
-	} catch { /* miss */ }
+  // Check Redis for cached synthesis
+  const synthCacheKey = `llm_synthesis:${input.evidenceId}`;
+  try {
+    const { getFromRedisCache } = await import('$lib/server/cache.js');
+    const cached = await getFromRedisCache<LLMSynthesis>(synthCacheKey);
+    if (cached) return cached;
+  } catch {
+    /* miss */
+  }
 
-	const objectSummary = yolo?.objects.map((o) => `${o.class} (${(o.confidence * 100).toFixed(0)}%)`).join(', ') ?? 'none';
-	const layoutSummary = yolo?.layout.regions.map((r) => `${r.type} region`).join(', ') ?? 'none';
-	const textContext = input.existingText?.slice(0, 2000) || '(no extracted text available)';
+  const objectSummary =
+    yolo?.objects.map((o) => `${o.class} (${(o.confidence * 100).toFixed(0)}%)`).join(', ') ??
+    'none';
+  const layoutSummary = yolo?.layout.regions.map((r) => `${r.type} region`).join(', ') ?? 'none';
+  const textContext = input.existingText?.slice(0, 2000) || '(no extracted text available)';
 
-	const prompt = `You are a legal evidence analyst. Analyze this document evidence and provide structured findings.
+  const prompt = `You are a legal evidence analyst. Analyze this document evidence and provide structured findings.
 
 ## Evidence: ${input.fileName}
 ## Detected Objects: ${objectSummary}
@@ -254,38 +252,40 @@ Respond with ONLY valid JSON (no markdown):
   "escalationReason": "Why this evidence needed deeper analysis"
 }`;
 
-	try {
-		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: 'gemma3-legal:latest',
-				prompt,
-				stream: false,
-				options: { temperature: 0.3, num_predict: 800 },
-			}),
-		});
+  try {
+    const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gemma3-legal:latest',
+        prompt,
+        stream: false,
+        options: { temperature: 0.3, num_predict: 800 },
+      }),
+    });
 
-		if (!res.ok) return null;
-		const data = await res.json();
-		const responseText = data.response?.trim();
-		if (!responseText) return null;
+    if (!res.ok) return null;
+    const data = await res.json();
+    const responseText = data.response?.trim();
+    if (!responseText) return null;
 
-		// Parse JSON from response (handle markdown code blocks)
-		const jsonStr = responseText.replace(/^```json?\n?|\n?```$/g, '').trim();
-		const synthesis: LLMSynthesis = JSON.parse(jsonStr);
+    // Parse JSON from response (handle markdown code blocks)
+    const jsonStr = responseText.replace(/^```json?\n?|\n?```$/g, '').trim();
+    const synthesis: LLMSynthesis = JSON.parse(jsonStr);
 
-		// Cache the synthesis result
-		try {
-			const { redis } = await import('$lib/server/redis.js');
-			await redis.set(synthCacheKey, JSON.stringify(synthesis), 'EX', 24 * 60 * 60);
-		} catch { /* non-fatal */ }
+    // Cache the synthesis result
+    try {
+      const { redis } = await import('$lib/server/redis.js');
+      await redis.set(synthCacheKey, JSON.stringify(synthesis), 'EX', 24 * 60 * 60);
+    } catch {
+      /* non-fatal */
+    }
 
-		return synthesis;
-	} catch (err) {
-		console.warn('[AnalysisPipeline] LLM synthesis parse/fetch failed:', err);
-		return null;
-	}
+    return synthesis;
+  } catch (err) {
+    console.warn('[AnalysisPipeline] LLM synthesis parse/fetch failed:', err);
+    return null;
+  }
 }
 
 // ── Graph Connection Creation ──────────────────────────────────────────────

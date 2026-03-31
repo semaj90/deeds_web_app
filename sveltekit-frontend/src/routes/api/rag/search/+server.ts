@@ -20,7 +20,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { retrievalKey, getCaseVersion, TTL } from '$lib/server/cache-keys.js';
-import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
+import { setCache, getFromMemoryCache, getFromRedisCache } from '$lib/server/cache.js';
 import { getRedis } from '$lib/server/redis.js';
 
 // ── BM42 hybrid search collections (must have sparse 'bm25' vector configured) ──
@@ -345,13 +345,11 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
         });
       }
       try {
-        const redis = getRedis();
-        const redisHit = await redis.get(rKey);
+        const redisHit = await getFromRedisCache<Record<string, unknown>>(rKey);
         if (redisHit) {
-          const parsed = JSON.parse(redisHit);
           diagnostics.cache = { hit: true, source: 'retrieval-cache-redis' };
           return json({
-            ...parsed,
+            ...redisHit,
             diagnostics,
             cache: { hit: true, source: 'retrieval-cache-redis', caseVersion },
           });

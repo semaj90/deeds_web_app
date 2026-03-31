@@ -999,18 +999,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           console.log(`[SSE Chat] Versioned synthesis cache HIT (memory, v${synthCaseVersion})`);
         } else {
           try {
-            const { getRedis: getR } = await import('$lib/server/redis.js');
-            const redis = getR();
-            const hit = await redis.get(sKey);
-            if (hit) {
-              const parsed = JSON.parse(hit);
-              if (parsed?.response) {
-                fullResponse = parsed.response;
-                versionedSynthHit = true;
-                console.log(
-                  `[SSE Chat] Versioned synthesis cache HIT (redis, v${synthCaseVersion})`
-                );
-              }
+            const { getFromRedisCache } = await import('$lib/server/cache.js');
+            const parsed = await getFromRedisCache<{ response?: string }>(sKey);
+            if (parsed?.response) {
+              fullResponse = parsed.response;
+              versionedSynthHit = true;
+              console.log(`[SSE Chat] Versioned synthesis cache HIT (redis, v${synthCaseVersion})`);
             }
           } catch {
             /* miss */

@@ -68,9 +68,16 @@ export async function setCache(
   const payload = typeof value === 'string' ? value : JSON.stringify(value);
   const exSeconds = Math.max(1, Math.ceil(ttlMs / 1000));
 
+  const start = performance.now();
   try {
     await withBackoff(() => client.set(key, payload, 'EX', exSeconds));
+    const elapsed = performance.now() - start;
+    cacheMetrics.recordRedisLatency(elapsed);
+    if (elapsed > 500) {
+      console.warn(`[cache] Slow Redis SET: ${key.slice(0, 60)} took ${Math.round(elapsed)}ms`);
+    }
   } catch (err) {
+    cacheMetrics.recordRedisLatency(performance.now() - start);
     console.warn('[cache] Redis SET failed (best-effort):', err);
   }
 }
