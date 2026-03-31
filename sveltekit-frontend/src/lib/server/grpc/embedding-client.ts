@@ -144,9 +144,15 @@ async function generateViaGrpc(texts: string[], timeoutMs = 5000): Promise<numbe
 
 let natsConnection: any = null;
 let natsLoadFailed = false;
+let natsRetryAt = 0; // Timestamp for next retry after failure
 
 async function getNatsConnection(): Promise<any> {
-  if (natsLoadFailed) return null;
+  if (natsLoadFailed) {
+    // Retry after 30s instead of permanent disable
+    if (Date.now() < natsRetryAt) return null;
+    natsLoadFailed = false;
+    natsConnection = null;
+  }
   if (natsConnection) return natsConnection;
 
   try {
@@ -161,10 +167,11 @@ async function getNatsConnection(): Promise<any> {
     return natsConnection;
   } catch (err) {
     console.warn(
-      '[embedding-client] NATS/QUIC init failed, will skip QUIC tier:',
+      '[embedding-client] NATS/QUIC init failed, will retry in 30s:',
       (err as Error).message
     );
     natsLoadFailed = true;
+    natsRetryAt = Date.now() + 30_000;
     return null;
   }
 }

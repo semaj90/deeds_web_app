@@ -307,7 +307,8 @@ async function fetchUserProfile(userId: string): Promise<ACEUserProfile | null> 
       jurisdiction: null,
       experienceLevel: null,
     };
-  } catch {
+  } catch (err) {
+    console.warn('[ACE context] user profile fetch failed:', (err as Error)?.message ?? err);
     return null;
   }
 }
@@ -348,7 +349,8 @@ async function fetchCaseContext(caseId: string): Promise<string | null> {
       parts.push(`Saved concepts:\n${glossaryLines.join('\n')}`);
     }
     return parts.join('\n');
-  } catch {
+  } catch (err) {
+    console.warn('[ACE context] case context fetch failed:', (err as Error)?.message ?? err);
     return null;
   }
 }
@@ -407,8 +409,9 @@ export async function fetchGlossaryMatches(query: string): Promise<ACEContext['g
           sourceNodeId: null,
         });
       }
-    } catch {
+    } catch (err) {
       // legal_glossary not available or query failed — continue to definitions fallback
+      console.warn('[ACE context] glossary text search failed:', (err as Error)?.message ?? err);
     }
 
     // Semantic vector search fallback — uses 768-dim embeddings on legal_glossary
@@ -455,8 +458,9 @@ export async function fetchGlossaryMatches(query: string): Promise<ACEContext['g
             }
           }
         }
-      } catch {
+      } catch (err) {
         // Semantic search unavailable — continue to definitions fallback
+        console.warn('[ACE context] glossary vector search failed:', (err as Error)?.message ?? err);
       }
     }
 
@@ -507,13 +511,15 @@ export async function fetchGlossaryMatches(query: string): Promise<ACEContext['g
           });
           if (matches.length >= 4) break;
         }
-      } catch {
+      } catch (err) {
         // legal_definitions unavailable or query failed
+        console.warn('[ACE context] definitions search failed:', (err as Error)?.message ?? err);
       }
     }
 
     return matches.length > 0 ? matches.slice(0, 4) : null;
-  } catch {
+  } catch (err) {
+    console.warn('[ACE context] glossary match assembly failed:', (err as Error)?.message ?? err);
     return null;
   }
 }
@@ -588,7 +594,8 @@ async function fetchRAGChunks(
 
     // Sort by score descending, keep top 5
     return mapped.sort((a, b) => b.score - a.score).slice(0, 5);
-  } catch {
+  } catch (err) {
+    console.warn('[ACE context] RAG chunk retrieval failed:', (err as Error)?.message ?? err);
     return [];
   }
 }
@@ -644,7 +651,8 @@ async function fetchKAGNeighbors(
         relationship: String(r.relationship ?? ''),
         score: r.score != null ? Number(r.score) : undefined,
       }));
-    } catch {
+    } catch (err) {
+      console.warn('[ACE context] KAG PostgreSQL fallback failed:', (err as Error)?.message ?? err);
       return [];
     }
   }
@@ -665,7 +673,8 @@ async function fetchChatHistory(
       role: r.role as 'user' | 'assistant' | 'system',
       content: String(r.content ?? ''),
     }));
-  } catch {
+  } catch (err) {
+    console.warn('[ACE context] chat history fetch failed:', (err as Error)?.message ?? err);
     return [];
   }
 }
@@ -692,7 +701,8 @@ async function fetchEvidenceMetadataForCase(
         summary: meta.summary ? String(meta.summary).slice(0, 200) : undefined,
       };
     });
-  } catch {
+  } catch (err) {
+    console.warn('[ACE context] evidence metadata fetch failed:', (err as Error)?.message ?? err);
     return null;
   }
 }
@@ -721,7 +731,8 @@ async function fetchEvidenceConnections(
       notes: r.notes ? String(r.notes) : null,
       strength: Number(r.strength ?? 1.0),
     }));
-  } catch {
+  } catch (err) {
+    console.warn('[ACE context] evidence connections fetch failed:', (err as Error)?.message ?? err);
     return null;
   }
 }

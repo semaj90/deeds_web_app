@@ -393,7 +393,9 @@ async function retrieveContext(query: string, limit = RAG_MAX_CHUNKS): Promise<C
       embeddingDims = vector.length;
       embeddingModel = String(embedData.model ?? EMBEDDING_MODEL);
       // Store in cache for future queries (fire-and-forget)
-      setCachedEmbedding(query, EMBEDDING_MODEL, vector).catch(() => {});
+      setCachedEmbedding(query, EMBEDDING_MODEL, vector).catch((err) => {
+        console.warn('[SSE chat] embedding cache persist failed:', (err as Error)?.message ?? err);
+      });
     }
 
     // 2. Search ALL legal collections in parallel
@@ -1174,7 +1176,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                   status: 'streaming',
                 });
                 // Persist token chunk to Redis Stream for SSE crash recovery / replay
-                produceTokenChunk(conversationId, tokenSeq++, chunk).catch(() => {});
+                produceTokenChunk(conversationId, tokenSeq++, chunk).catch((err) => {
+                  console.warn(
+                    '[SSE chat] token chunk persist failed:',
+                    (err as Error)?.message ?? err
+                  );
+                });
               }
             } catch {
               // skip malformed JSON lines
@@ -1183,7 +1190,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         }
 
         // Trim the token stream to prevent unbounded growth
-        trimTokenStream(conversationId, 2000).catch(() => {});
+        trimTokenStream(conversationId, 2000).catch((err) => {
+          console.warn('[SSE chat] token stream trim failed:', (err as Error)?.message ?? err);
+        });
 
         // Build confidence factors (auditable)
         const topScore =
@@ -1421,7 +1430,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
               metadata: { model: model ?? 'gemma3-legal:latest', confidence },
             });
           })
-          .catch(() => {});
+          .catch((err) => {
+            console.warn(
+              '[SSE chat] RabbitMQ chat context publish failed:',
+              (err as Error)?.message ?? err
+            );
+          });
 
         // Store response in LLM cache for future lookups (non-blocking)
         try {
@@ -1465,7 +1479,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             sKey,
             { response: fullResponse, confidence, model: model ?? 'gemma3-legal:latest' },
             TTL.SYNTHESIS * 1000
-          ).catch(() => {});
+          ).catch((err) => {
+            console.warn(
+              '[SSE chat] synthesis cache persist failed:',
+              (err as Error)?.message ?? err
+            );
+          });
         }
 
         send({

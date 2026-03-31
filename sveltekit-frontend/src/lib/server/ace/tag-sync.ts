@@ -79,8 +79,8 @@ export async function getDocumentTags(
 				source: t.source as GeneratedTag['source']
 			}));
 		}
-	} catch {
-		// fallback to Qdrant
+	} catch (err) {
+		console.warn('[tag-sync] PostgreSQL tag lookup failed, falling back to Qdrant:', (err as Error)?.message ?? err);
 	}
 
 	// Fallback: Qdrant
@@ -100,8 +100,8 @@ export async function getDocumentTags(
 				source: p.payload?.source ?? 'llm'
 			}));
 		}
-	} catch {
-		// fallback to CouchDB
+	} catch (err) {
+		console.warn('[tag-sync] Qdrant tag lookup failed, falling back to CouchDB:', (err as Error)?.message ?? err);
 	}
 
 	// Catalog: CouchDB
@@ -110,7 +110,8 @@ export async function getDocumentTags(
 		const doc = (await couchdb.get('ace_tags', `doc:${documentId}`)) as Record<string, unknown>;
 		const tags = (doc.tags as GeneratedTag[]) ?? [];
 		return tags;
-	} catch {
+	} catch (err) {
+		console.warn('[tag-sync] CouchDB tag lookup failed:', (err as Error)?.message ?? err);
 		return [];
 	}
 }
@@ -139,7 +140,8 @@ export async function searchTagsBySemantic(
 			score: r.score,
 			documentIds: r.payload?.document_ids ?? []
 		}));
-	} catch {
+	} catch (err) {
+		console.warn('[tag-sync] semantic tag search failed:', (err as Error)?.message ?? err);
 		return [];
 	}
 }
@@ -201,7 +203,8 @@ async function mirrorToCouchDB(tag: GeneratedTag, documentId: string): Promise<v
 		const tags = ((existing.tags as GeneratedTag[]) ?? []).filter((t) => t.label !== tag.label);
 		tags.push(tag);
 		await couchdb.put('ace_tags', docKey, { ...existing, tags, updatedAt: new Date().toISOString() });
-	} catch {
+	} catch (err) {
+		console.warn('[tag-sync] CouchDB upsert fallback — creating new doc:', (err as Error)?.message ?? err);
 		// Document doesn't exist — create it
 		await couchdb.put('ace_tags', docKey, {
 			documentId,

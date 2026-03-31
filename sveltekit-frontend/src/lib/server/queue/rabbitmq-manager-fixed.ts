@@ -91,6 +91,7 @@ export class RabbitMQManager extends EventEmitter {
       await this.setupInfrastructure();
       await this.startConsumers();
       this.isInitialized = true;
+      this.reconnectAttempts = 0; // Reset on successful connect
       this.emit('initialized');
       console.log('🚀 RabbitMQ Manager initialized successfully');
       return true;
@@ -824,9 +825,23 @@ export class RabbitMQManager extends EventEmitter {
   }
 
   private async attemptReconnect(): Promise<void> {
-    if (this.reconnectAttempts >= this.maxReconnectAttempts) return;
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      console.error(
+        `☠️ RabbitMQ: exhausted ${this.maxReconnectAttempts} reconnect attempts — giving up. ` +
+        'Restart process or call initialize() manually to retry.'
+      );
+      this.emit('connection_failed', {
+        attempts: this.reconnectAttempts,
+        lastAttempt: Date.now(),
+      });
+      return;
+    }
     this.reconnectAttempts++;
-    setTimeout(() => this.initialize(), 5000);
+    const delay = Math.min(5000 * Math.pow(2, this.reconnectAttempts - 1), 60_000);
+    console.warn(
+      `🔄 RabbitMQ: reconnect attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts} in ${Math.round(delay / 1000)}s`
+    );
+    setTimeout(() => this.initialize(), delay);
   }
 
   /**
