@@ -19,75 +19,109 @@ export interface BreakerStatus {
 	lastSuccess: number | null;
 }
 
+export interface BreakerEvent {
+  breaker: string;
+  from: BreakerState;
+  to: BreakerState;
+  failures: number;
+  time: number;
+}
+
+/** Rolling log of circuit breaker state transitions (last 50). */
+export const breakerEventLog: BreakerEvent[] = [];
+
 export class CircuitBreaker {
-	private state: BreakerState = 'CLOSED';
-	private failures = 0;
-	private lastFailure: number | null = null;
-	private lastSuccess: number | null = null;
+  private state: BreakerState = 'CLOSED';
+  private failures = 0;
+  private lastFailure: number | null = null;
+  private lastSuccess: number | null = null;
 
-	constructor(
-		public readonly name: string,
-		private readonly threshold: number = 5,
-		private readonly resetTimeoutMs: number = 30_000
-	) {}
+  constructor(
+    public readonly name: string,
+    private readonly threshold: number = 5,
+    private readonly resetTimeoutMs: number = 30_000
+  ) {}
 
-	getStatus(): BreakerStatus {
-		// Auto-transition OPEN → HALF_OPEN after timeout
-		if (this.state === 'OPEN' && this.lastFailure) {
-			if (Date.now() - this.lastFailure >= this.resetTimeoutMs) {
-				this.state = 'HALF_OPEN';
-			}
-		}
-		return {
-			state: this.state,
-			failures: this.failures,
-			lastFailure: this.lastFailure,
-			lastSuccess: this.lastSuccess,
-		};
-	}
+  getStatus(): BreakerStatus {
+    // Auto-transition OPEN → HALF_OPEN after timeout
+    if (this.state === 'OPEN' && this.lastFailure) {
+      if (Date.now() - this.lastFailure >= this.resetTimeoutMs) {
+        this.transition('HALF_OPEN');
+      }
+    }
+    return {
+      state: this.state,
+      failures: this.failures,
+      lastFailure: this.lastFailure,
+      lastSuccess: this.lastSuccess,
+    };
+  }
 
-	recordSuccess(): void {
-		this.failures = 0;
-		this.lastSuccess = Date.now();
-		this.state = 'CLOSED';
-	}
+  private transition(to: BreakerState): void {
+    if (this.state === to) return;
+    const from = this.state;
+    this.state = to;
+    const event: BreakerEvent = {
+      breaker: this.name,
+      from,
+      to,
+      failures: this.failures,
+      time: Date.now(),
+    };
+    breakerEventLog.push(event);
+    if (breakerEventLog.length > 50) breakerEventLog.shift();
 
-	recordFailure(): void {
-		this.failures++;
-		this.lastFailure = Date.now();
-		if (this.failures >= this.threshold) {
-			this.state = 'OPEN';
-		}
-	}
+    if (to === 'OPEN') {
+      console.warn(`[CircuitBreaker] ${this.name} TRIPPED OPEN after ${this.failures} failures`);
+    } else if (to === 'CLOSED' && from !== 'CLOSED') {
+      console.log(`[CircuitBreaker] ${this.name} RECOVERED → CLOSED`);
+    } else if (to === 'HALF_OPEN') {
+      console.log(`[CircuitBreaker] ${this.name} → HALF_OPEN (probing)`);
+    }
+  }
 
-	isOpen(): boolean {
-		const status = this.getStatus();
-		return status.state === 'OPEN';
-	}
+  recordSuccess(): void {
+    this.failures = 0;
+    this.lastSuccess = Date.now();
+    this.transition('CLOSED');
+  }
 
-	/**
-	 * Execute a function through the circuit breaker.
-	 * If the breaker is OPEN, calls fallback immediately.
-	 * If HALF_OPEN, allows one probe request.
-	 */
-	async call<T>(fn: () => Promise<T>, fallback?: () => T | Promise<T>): Promise<T> {
-		const status = this.getStatus();
+  recordFailure(): void {
+    this.failures++;
+    this.lastFailure = Date.now();
+    if (this.failures >= this.threshold) {
+      this.transition('OPEN');
+    }
+  }
 
-		if (status.state === 'OPEN') {
-			if (fallback) return fallback();
-			throw new Error(`Circuit breaker [${this.name}] is OPEN (${this.failures} failures)`);
-		}
+  isOpen(): boolean {
+    const status = this.getStatus();
+    return status.state === 'OPEN';
+  }
 
-		try {
-			const result = await fn();
-			this.recordSuccess();
-			return result;
-		} catch (err) {
-			this.recordFailure();
-			if (fallback && this.isOpen()) return fallback();
-			throw err;
-		}
-	}
+  /**
+   * Execute a function through the circuit breaker.
+   * If the breaker is OPEN, calls fallback immediately.
+   * If HALF_OPEN, allows one probe request.
+   */
+  async call<T>(fn: () => Promise<T>, fallback?: () => T | Promise<T>): Promise<T> {
+    const status = this.getStatus();
+
+    if (status.state === 'OPEN') {
+      if (fallback) return fallback();
+      throw new Error(`Circuit breaker [${this.name}] is OPEN (${this.failures} failures)`);
+    }
+
+    try {
+      const result = await fn();
+      this.recordSuccess();
+      return result;
+    } catch (err) {
+      this.recordFailure();
+      if (fallback && this.isOpen()) return fallback();
+      throw err;
+    }
+  }
 }
 
 // ── Named breakers for infrastructure services ──────────────────────────────

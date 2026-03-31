@@ -2,6 +2,7 @@ import type Redis from 'ioredis';
 import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
+import { cacheMetrics } from '$lib/server/cache-metrics.js';
 
 const SHOULD_USE_REDIS =
   process.env.CACHE_BACKEND === 'redis' ||
@@ -79,13 +80,18 @@ export function getFromMemoryCache(key: string): {
   value?: unknown;
 } {
   const entry = memoryCache.get(key);
-  if (!entry) return { found: false };
-
-  if (Date.now() > entry.expiresAt) {
-    memoryCache.delete(key);
+  if (!entry) {
+    cacheMetrics.recordMiss('memory', key);
     return { found: false };
   }
 
+  if (Date.now() > entry.expiresAt) {
+    memoryCache.delete(key);
+    cacheMetrics.recordMiss('memory', key);
+    return { found: false };
+  }
+
+  cacheMetrics.recordHit('memory', key);
   return { found: true, value: entry.value };
 }
 
@@ -177,11 +183,19 @@ export const cognitiveCache = {
     const client = await getRedisClient();
     if (!client) return null;
 
+    const start = performance.now();
     try {
       const result = await withBackoff(() => client.get(key));
-      if (!result || typeof result !== 'string') return null;
+      cacheMetrics.recordRedisLatency(performance.now() - start);
+      if (!result || typeof result !== 'string') {
+        cacheMetrics.recordMiss('redis', key);
+        return null;
+      }
+      cacheMetrics.recordHit('redis', key);
       return fastJsonParse<T>(result);
     } catch (err) {
+      cacheMetrics.recordRedisLatency(performance.now() - start);
+      cacheMetrics.recordMiss('redis', key);
       console.warn('[cache] Redis GET failed:', err);
       return null;
     }
@@ -190,3 +204,35 @@ export const cognitiveCache = {
     await setCache(key, value, Math.max(1, ttlSeconds) * 1000);
   },
 };
+
+/**
+ * Instrumented Redis GET — records hit/miss + latency in cacheMetrics.
+ * Returns parsed JSON or null. Use for structured cache lookups.
+ */
+export async function getFromRedisCache<T = unknown>(key: string): Promise<T | null> {
+  const client = await getRedisClient();
+  if (!client) {
+    cacheMetrics.recordMiss('redis', key);
+    return null;
+  }
+
+  const start = performance.now();
+  try {
+    const raw = await withBackoff(() => client.get(key));
+    cacheMetrics.recordRedisLatency(performance.now() - start);
+    if (!raw) {
+      cacheMetrics.recordMiss('redis', key);
+      return null;
+    }
+    cacheMetrics.recordHit('redis', key);
+    try {
+      return JSON.parse(raw) as T;
+    } catch {
+      return raw as unknown as T;
+    }
+  } catch {
+    cacheMetrics.recordRedisLatency(performance.now() - start);
+    cacheMetrics.recordMiss('redis', key);
+    return null;
+  }
+}

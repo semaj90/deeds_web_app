@@ -2,12 +2,15 @@
  * /api/cache/metrics — Cache performance metrics
  * Used by: CachePerformanceDashboard.svelte
  *
- * Returns { retrieval, embedding, memory, performance } shape
- * Pulls real stats from Redis INFO when available, falls back to defaults
+ * Returns { retrieval, embedding, memory, performance, application, breakers } shape
+ * Combines Redis INFO stats with application-level hit/miss counters from CacheMetrics.
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { redis } from '$lib/server/redis.js';
+import { cacheMetrics } from '$lib/server/cache-metrics.js';
+import { memoryCache } from '$lib/server/cache.js';
+import { ollamaBreaker, qdrantBreaker, redisBreaker, breakerEventLog } from '$lib/server/circuit-breaker.js';
 
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -32,6 +35,9 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 	const dbSize = await redis.dbsize().catch(() => 0);
 
+	// Application-level metrics from CacheMetrics singleton
+	const appMetrics = cacheMetrics.snapshot();
+
 	return json({
 		retrieval: {
 			hits: redisInfo.keyspace_hits,
@@ -48,7 +54,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 			costSavings: ((redisInfo.keyspace_hits * 0.002)).toFixed(2)
 		},
 		memory: {
-			l1Usage: 0,
+			l1Usage: memoryCache.size,
 			l2Usage: (redisInfo.used_memory / (1024 * 1024)),
 			l3Usage: (redisInfo.used_memory / (1024 * 1024)) * 0.8,
 			totalCachedItems: dbSize
@@ -58,6 +64,18 @@ export const GET: RequestHandler = async ({ locals }) => {
 			p95ResponseTime: hitRate > 50 ? 150 : 500,
 			throughputQPS: redisInfo.total_connections_received > 0 ? Math.min(redisInfo.total_connections_received / 60, 50) : 0,
 			errorRate: redisInfo.keyspace_misses > 0 ? Math.min((redisInfo.keyspace_misses / (totalQueries || 1)) * 5, 5) : 0
-		}
+		},
+		application: {
+			uptimeSeconds: appMetrics.uptimeSeconds,
+			memory: appMetrics.memory,
+			redis: appMetrics.redis,
+			byPrefix: appMetrics.byPrefix,
+		},
+		breakers: {
+			ollama: ollamaBreaker.getStatus(),
+			qdrant: qdrantBreaker.getStatus(),
+			redis: redisBreaker.getStatus(),
+			recentEvents: breakerEventLog.slice(-10),
+		},
 	});
 };
