@@ -48,7 +48,10 @@ export const GET: RequestHandler = async ({ cookies }) => {
 		});
 	} catch (error) {
 		console.error('[Auth] Session validation error:', error);
-		return json({ error: 'Session validation failed' }, { status: 500 });
+		return json(
+      { authenticated: false, session: null, user: null, error: 'Session validation failed' },
+      { status: 500 }
+    );
 	}
 };
 

@@ -49,6 +49,6 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		return json({ success: true, chunk: rows[0] });
 	} catch (err) {
 		console.error('[canon/chunks] GET error:', err);
-		return json({ error: 'Failed to fetch chunk' }, { status: 500 });
+		return json({ success: false, chunk: null, error: 'Failed to fetch chunk' }, { status: 500 });
 	}
 };

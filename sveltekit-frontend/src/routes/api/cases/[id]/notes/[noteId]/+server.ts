@@ -34,7 +34,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		return json({ success: true, note });
 	} catch (err) {
 		console.error('[notes] GET single error:', err);
-		return json({ error: 'Failed to load note' }, { status: 500 });
+		return json({ success: false, note: null, error: 'Failed to load note' }, { status: 500 });
 	}
 };
 
