@@ -1,22 +1,16 @@
 // This module uses Google's official LangExtract library via the Python service.
 // The service runs on port 8095 and uses gemma3-legal via Ollama.
 import { OLLAMA_BASE_URL } from '$env/static/private';
-import { ENV } from '$lib/server/env.server.js';
-
-// Service URL (Python LangExtract service)
-const LANGEXTRACT_URL = ENV.LANGEXTRACT_URL;
+import { langextractFetch } from '$lib/server/langextract-client.js';
 
 /**
  * Extract keywords from text using the LangExtract service.
  * Falls back to regex extraction if service unavailable.
  */
 export async function extractKeywords(text: string): Promise<string[]> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
     try {
-        // Try the LangExtract service first (more accurate)
-        const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
+        // Try the LangExtract service first (more accurate, with health/URL resolution)
+        const response = await langextractFetch('/extract', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -25,10 +19,10 @@ export async function extractKeywords(text: string): Promise<string[]> {
                 extraction_passes: 1,
                 temperature: 0.3,
             }),
-            signal: controller.signal
+            signal: AbortSignal.timeout(10_000),
         });
 
-        if (response.ok) {
+        if (response?.ok) {
             const data = await response.json();
             // Extract unique keywords from entity texts
             const keywords = new Set<string>();
@@ -43,8 +37,6 @@ export async function extractKeywords(text: string): Promise<string[]> {
         }
     } catch {
         // Fall through to legacy method
-    } finally {
-        clearTimeout(timeoutId);
     }
 
     // Legacy fallback: direct Ollama call

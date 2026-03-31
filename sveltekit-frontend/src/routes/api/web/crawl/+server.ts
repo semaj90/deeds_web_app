@@ -8,8 +8,7 @@ import { json, type RequestEvent } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
-
-const LANGEXTRACT_URL = ENV.LANGEXTRACT_URL;
+import { langextractFetch } from '$lib/server/langextract-client.js';
 
 const webCrawlSchema = z.object({
 	url: z.string().min(1, 'url is required').max(2000).url('Invalid URL format'),
@@ -76,17 +75,17 @@ export async function POST({ request, locals }: RequestEvent) {
 	});
 }
 
-/** Crawl via langextract Docker service (Phase 66 infrastructure). */
+/** Crawl via langextract Docker service (via shared adapter). */
 async function crawlViaLangextract(url: string): Promise<CrawlResult> {
-	const res = await fetch(`${LANGEXTRACT_URL}/extract`, {
+	const res = await langextractFetch('/extract', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ url, extract_text: true }),
 		signal: AbortSignal.timeout(15_000)
 	});
 
-	if (!res.ok) {
-		throw new Error(`langextract ${res.status}`);
+	if (!res?.ok) {
+		throw new Error(`langextract ${res?.status ?? 'unavailable'}`);
 	}
 
 	const data = await res.json();

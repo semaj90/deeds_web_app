@@ -7,6 +7,10 @@ const mockSetEmbeddingCache = vi.fn();
 const mockSparseHybridSearch = vi.fn();
 const mockSectionFilteredSearch = vi.fn();
 const mockAssembleACEContext = vi.fn();
+const mockGetCaseVersion = vi.fn();
+const mockGetFromMemoryCache = vi.fn();
+const mockSetCache = vi.fn();
+const mockGetRedis = vi.fn();
 
 vi.mock('$env/dynamic/private', () => ({ env: {} }));
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
@@ -26,10 +30,14 @@ vi.mock('$lib/server/production-logger.js', () => ({
 
 vi.mock('$lib/server/api/response-helper.js', () => ({
   apiResponses: {
-    serviceUnavailable: (message: string) => new Response(JSON.stringify({ error: message }), { status: 503 }),
-    badRequest: (message: string) => new Response(JSON.stringify({ error: message }), { status: 400 }),
-    badGateway: (message: string) => new Response(JSON.stringify({ error: message }), { status: 502 }),
-    serverError: (message: string) => new Response(JSON.stringify({ error: message }), { status: 500 }),
+    serviceUnavailable: (message: string) =>
+      new Response(JSON.stringify({ error: message }), { status: 503 }),
+    badRequest: (message: string) =>
+      new Response(JSON.stringify({ error: message }), { status: 400 }),
+    badGateway: (message: string) =>
+      new Response(JSON.stringify({ error: message }), { status: 502 }),
+    serverError: (message: string) =>
+      new Response(JSON.stringify({ error: message }), { status: 500 }),
   },
 }));
 
@@ -48,6 +56,28 @@ vi.mock('$lib/server/vector-cache.js', () => ({
   setVectorCache: mockSetVectorCache,
   getEmbeddingCache: vi.fn(),
   setEmbeddingCache: mockSetEmbeddingCache,
+}));
+
+vi.mock('$lib/server/cache-keys.js', () => ({
+  retrievalKey: {
+    forQuery: (_caseId: string, _query: string, _ver: number) => 'test-retrieval-key',
+    global: (_query: string) => 'test-retrieval-global-key',
+  },
+  getCaseVersion: mockGetCaseVersion,
+  TTL: { RETRIEVAL: 1800, SYNTHESIS: 900, CLIENT_VIEW: 300 },
+}));
+
+vi.mock('$lib/server/cache.js', () => ({
+  setCache: mockSetCache,
+  getFromMemoryCache: mockGetFromMemoryCache,
+}));
+
+vi.mock('$lib/server/redis.js', () => ({
+  getRedis: mockGetRedis,
+}));
+
+vi.mock('$lib/server/grpc/embedding-client.js', () => ({
+  generateEmbeddings: vi.fn(),
 }));
 
 vi.mock('$lib/server/embedding/embed.js', () => ({
@@ -91,6 +121,10 @@ describe('/api/rag/search ACE route integration', () => {
     mockGetVectorCache.mockResolvedValue({ entry: null });
     mockSetVectorCache.mockResolvedValue(undefined);
     mockSetEmbeddingCache.mockResolvedValue(undefined);
+    mockGetCaseVersion.mockResolvedValue(0);
+    mockGetFromMemoryCache.mockReturnValue({ found: false });
+    mockSetCache.mockResolvedValue(undefined);
+    mockGetRedis.mockReturnValue({ get: vi.fn().mockResolvedValue(null) });
     mockSectionFilteredSearch.mockResolvedValue({ results: [] });
     mockSparseHybridSearch.mockResolvedValue({
       results: [
@@ -160,11 +194,26 @@ describe('/api/rag/search ACE route integration', () => {
     expect(body.diagnostics).toEqual(
       expect.objectContaining({
         cache: expect.objectContaining({ hit: false, source: 'vector-cache' }),
-        embedding: expect.objectContaining({ status: 'success', source: 'client-precomputed', transport: 'client-onnx' }),
-        retrieval: expect.objectContaining({ status: 'success', hybridUsed: true, totalCandidates: expect.any(Number) }),
-        ace: expect.objectContaining({ status: 'success', enabled: true, metadata: { entityCount: 3, kagNeighborCount: 1 } }),
-        corrective_rag: expect.objectContaining({ status: expect.any(String), attempted: expect.any(Boolean) }),
-        dag: expect.objectContaining({ status: 'skipped', enabled: false }),
+        embedding: expect.objectContaining({
+          status: 'success',
+          source: 'client-precomputed',
+          transport: 'client-onnx',
+        }),
+        retrieval: expect.objectContaining({
+          status: 'success',
+          hybridUsed: true,
+          totalCandidates: expect.any(Number),
+        }),
+        ace: expect.objectContaining({
+          status: 'success',
+          enabled: true,
+          metadata: { entityCount: 3, kagNeighborCount: 1 },
+        }),
+        corrective_rag: expect.objectContaining({
+          status: expect.any(String),
+          attempted: expect.any(Boolean),
+        }),
+        dag: expect.objectContaining({ status: expect.any(String) }),
       })
     );
     expect(body.hybrid_search).toBe('bm42-rrf');
@@ -211,7 +260,12 @@ describe('/api/rag/search ACE route integration', () => {
             },
             diagnostics: {
               cache: { hit: false, source: 'vector-cache' },
-              embedding: { status: 'success', source: 'server-generated', transport: 'grpc', duration_ms: 4 },
+              embedding: {
+                status: 'success',
+                source: 'server-generated',
+                transport: 'grpc',
+                duration_ms: 4,
+              },
               retrieval: {
                 status: 'success',
                 collections: ['legal_documents'],
@@ -219,7 +273,11 @@ describe('/api/rag/search ACE route integration', () => {
                 hybridUsed: false,
                 totalCandidates: 1,
               },
-              ace: { status: 'success', enabled: true, metadata: { entityCount: 3, kagNeighborCount: 1 } },
+              ace: {
+                status: 'success',
+                enabled: true,
+                metadata: { entityCount: 3, kagNeighborCount: 1 },
+              },
               corrective_rag: { status: 'skipped', attempted: false, originalTopScore: 0.94 },
               dag: { status: 'skipped', enabled: false },
             },
@@ -263,9 +321,17 @@ describe('/api/rag/search ACE route integration', () => {
     expect(body.diagnostics).toEqual(
       expect.objectContaining({
         cache: { hit: false, source: 'vector-cache' },
-        embedding: expect.objectContaining({ status: 'success', source: 'server-generated', transport: 'grpc' }),
+        embedding: expect.objectContaining({
+          status: 'success',
+          source: 'server-generated',
+          transport: 'grpc',
+        }),
         retrieval: expect.objectContaining({ status: 'success', totalCandidates: 1 }),
-        ace: { status: 'success', enabled: true, metadata: { entityCount: 3, kagNeighborCount: 1 } },
+        ace: {
+          status: 'success',
+          enabled: true,
+          metadata: { entityCount: 3, kagNeighborCount: 1 },
+        },
       })
     );
     expect(body.chunks[0].source_title).toBe('Cached Search Warrant Guide');

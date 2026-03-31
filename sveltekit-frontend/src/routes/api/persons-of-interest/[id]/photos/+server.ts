@@ -8,6 +8,7 @@ import sharp from 'sharp';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
+import { langextractFetch } from '$lib/server/langextract-client.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { resizeForVLM } from '$lib/server/image/resize-for-vlm.js';
 import { isUuid } from '$lib/server/validation.js';
@@ -292,7 +293,7 @@ Return ONLY valid JSON.`;
   // ── Step 2: LangExtract OCR (if available) ──
   let ocrText = '';
   try {
-    const langextractRes = await fetch(`${ENV.LANGEXTRACT_URL}/extract`, {
+    const langextractRes = await langextractFetch('/extract', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -302,7 +303,7 @@ Return ONLY valid JSON.`;
       signal: AbortSignal.timeout(15_000),
     });
 
-    if (langextractRes.ok) {
+    if (langextractRes?.ok) {
       const ocrData = await langextractRes.json();
       ocrText = ocrData.text ?? ocrData.extracted_text ?? '';
       if (ocrText.length > 10) {

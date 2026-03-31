@@ -174,6 +174,24 @@ export function invalidateLangExtractResolution(): void {
 	lastHealthCheck = 0;
 }
 
+// ── Low-level fetch (shared by all callers) ──────────────────────────────
+
+/**
+ * Low-level fetch through the langextract adapter.
+ * Handles URL resolution, health gating, and enabled check.
+ * Returns null if service is disabled or unhealthy.
+ */
+export async function langextractFetch(
+	path: string,
+	init?: RequestInit
+): Promise<Response | null> {
+	if (!ENV.LANGEXTRACT_ENABLED) return null;
+	const healthy = await checkHealth();
+	if (!healthy) return null;
+	const baseUrl = await getBaseUrl();
+	return fetch(`${baseUrl}${path}`, init);
+}
+
 // ── Extraction API ────────────────────────────────────────────────────────
 
 /**

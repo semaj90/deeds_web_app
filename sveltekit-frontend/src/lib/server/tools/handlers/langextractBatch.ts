@@ -14,9 +14,9 @@ import {
 } from '../registry.js';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { langextractFetch } from '$lib/server/langextract-client.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-const LANGEXTRACT_URL = ENV.LANGEXTRACT_URL;
 
 interface ExtractedEntity {
   type: string;
@@ -39,12 +39,9 @@ async function extractFromDocument(
   timeout: number
 ): Promise<{
 	entities: ExtractedEntity[], relations: ExtractedRelation[] }> {
-  // Try LangExtract first
+  // Try LangExtract first (via shared adapter with health/URL resolution)
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-    const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
+    const response = await langextractFetch('/extract', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -53,12 +50,10 @@ async function extractFromDocument(
         relation_types: relationTypes,
         model
       }),
-      signal: controller.signal
+      signal: AbortSignal.timeout(timeout),
     });
 
-    clearTimeout(timeoutId);
-
-    if (response.ok) {
+    if (response?.ok) {
       return await response.json() as { entities: ExtractedEntity[];
 	relations: ExtractedRelation[] };
     }
