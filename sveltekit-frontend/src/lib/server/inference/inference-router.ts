@@ -45,6 +45,7 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
 		const trtResult = await tryTensorRT(request);
 		if (trtResult) {
 			trtResult.latencyMs = Math.round(performance.now() - start);
+			console.info(`[inference-router] backend=tensorrt latency=${trtResult.latencyMs}ms`);
 			return trtResult;
 		}
 	}
@@ -52,11 +53,16 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
 	// Try LiteLLM proxy (semantic caching via Redis) when enabled
 	if (ENV.LITELLM_ENABLED) {
 		const litellmResult = await tryLiteLLM(request, start);
-		if (litellmResult) return litellmResult;
+		if (litellmResult) {
+			console.info(`[inference-router] backend=litellm latency=${litellmResult.latencyMs}ms`);
+			return litellmResult;
+		}
 	}
 
 	// Fall back to direct Ollama
-	return ollamaInference(request, start);
+	const result = await ollamaInference(request, start);
+	console.info(`[inference-router] backend=ollama latency=${result.latencyMs}ms${result.error ? ` error=${result.error}` : ''}`);
+	return result;
 }
 
 async function tryTensorRT(request: InferenceRequest): Promise<InferenceResponse | null> {

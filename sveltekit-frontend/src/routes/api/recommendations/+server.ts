@@ -236,7 +236,7 @@ async function processRecommendationJob(
 		);
 	} catch (embeddingError) {
 		console.warn(`[recommendations] Job ${jobId}: embedding failed:`, embeddingError);
-		// Store empty result (embedding unavailable)
+		// Store empty result with error — mark job as FAILED (not complete)
 		await redis.setex(
 			`rec:result:${jobId}`,
 			JOB_TTL,
@@ -248,14 +248,15 @@ async function processRecommendationJob(
 				metadata: {
 					timestamp: new Date().toISOString(),
 					processing_time: Date.now() - startTime,
-					error: 'Embedding generation unavailable'
+					error: 'Embedding generation unavailable',
+					retryable: true
 				}
 			})
 		);
 		await redis.setex(
 			`rec:job:${jobId}`,
 			JOB_TTL,
-			JSON.stringify({ status: 'complete', completedAt: Date.now() })
+			JSON.stringify({ status: 'failed', error: 'embedding_unavailable', completedAt: Date.now() })
 		);
 		return;
 	}

@@ -29,6 +29,7 @@ export const GET: RequestHandler = async ({ locals }) => {
       { status: 401 }
     );
   }
+	let dbErrors = 0;
 	const exec = async (query: ReturnType<typeof sql>): Promise<Record<string, unknown>> => {
 		try {
 			const result = await db.execute(query);
@@ -36,7 +37,9 @@ export const GET: RequestHandler = async ({ locals }) => {
 			const res = result as unknown as { rows?: Record<string, unknown>[] };
 			const rows = res.rows ?? [];
 			return rows[0] ?? {};
-		} catch {
+		} catch (err) {
+			dbErrors++;
+			console.warn('[dashboard/stats] DB query failed:', (err as Error).message);
 			return {};
 		}
 	};
@@ -68,5 +71,6 @@ export const GET: RequestHandler = async ({ locals }) => {
 			precedents: Number(precedentCount),
 			total: Number(glossaryCount) + Number(statuteCount) + Number(precedentCount),
 		},
+		...(dbErrors > 0 && { _dbDegraded: true, _dbErrors: dbErrors }),
 	});
 };

@@ -89,12 +89,13 @@ export async function evaluateResponse(opts: {
     await redis.set(cacheKey, JSON.stringify(evaluation), 'EX', EVAL_CACHE_TTL).catch(() => {});
 
     return evaluation;
-  } catch {
+  } catch (err) {
+    console.warn('[ace-self-eval] Evaluation failed, skipping retry:', (err as Error).message ?? err);
     return {
-      quality: 0.7,
-      completeness: 0.7,
-      accuracy: 0.7,
-      suggestions: [],
+      quality: 0.5,
+      completeness: 0.5,
+      accuracy: 0.5,
+      suggestions: ['Evaluation unavailable — scores are placeholder'],
       shouldRetry: false,
       evalMs: Date.now() - start,
     };
