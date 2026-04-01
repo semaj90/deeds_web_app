@@ -44,7 +44,7 @@ export const GET: RequestHandler = async ({ locals, params }) => {
     return json({ success: true, data: caseData[0] });
   } catch (err) {
     console.error('[api/cases/[id]] GET failed:', err);
-    return json({ message: 'Internal server error' }, { status: 500 });
+    return json({ success: false, data: null, _degraded: true });
   }
 };
 

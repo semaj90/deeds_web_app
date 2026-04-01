@@ -84,7 +84,6 @@ export const GET: RequestHandler = async ({ params, locals }) => {
         updatedAt: '',
         error: 'Failed to fetch person of interest',
       },
-      { status: 500 }
     );
   }
 };

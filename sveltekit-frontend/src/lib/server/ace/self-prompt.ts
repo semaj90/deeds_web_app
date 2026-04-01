@@ -136,7 +136,8 @@ AI Response: ${response.slice(0, 1000)}`;
 function parseEvaluation(text: string): SelfEvaluation {
 	const jsonMatch = text.match(/\{[\s\S]*\}/);
 	if (!jsonMatch) {
-		return { quality: 0.7, completeness: 0.7, accuracy: 0.7, suggestions: [], shouldRetry: false, evalMs: 0 };
+		console.warn('[ace-self-eval] No JSON found in LLM response, using placeholder scores');
+		return { quality: 0.5, completeness: 0.5, accuracy: 0.5, suggestions: ['LLM returned non-JSON response'], shouldRetry: false, evalMs: 0 };
 	}
 
 	try {
@@ -164,7 +165,8 @@ function parseEvaluation(text: string): SelfEvaluation {
 			evalMs: 0
 		};
 	} catch {
-		return { quality: 0.7, completeness: 0.7, accuracy: 0.7, suggestions: [], shouldRetry: false, evalMs: 0 };
+		console.warn('[ace-self-eval] JSON parse failed for evaluation response');
+		return { quality: 0.5, completeness: 0.5, accuracy: 0.5, suggestions: ['Evaluation parse failed'], shouldRetry: false, evalMs: 0 };
 	}
 }
 

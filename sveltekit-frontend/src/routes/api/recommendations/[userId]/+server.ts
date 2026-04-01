@@ -260,10 +260,13 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 		});
 	} catch (err) {
 		console.error('[recommendations] GET error:', err);
-		return json(
-			{ success: false, error: 'Failed to generate recommendations' },
-			{ status: 500 }
-		);
+		return json({
+			success: false,
+			recommendations: [],
+			userPreferences: [],
+			metadata: { error: 'Failed to generate recommendations', timestamp: new Date().toISOString() },
+			_degraded: true,
+		});
 	}
 };
 

@@ -313,8 +313,8 @@ export async function POST({ request, locals }: RequestEvent) {
         fileName: file.name,
         metadata: { fileSize: file.size, mimeType: file.type, hash: fileHash },
       });
-    } catch {
-      // RabbitMQ publish is non-critical
+    } catch (err) {
+      console.warn('[Upload] RabbitMQ publish failed (non-critical):', (err as Error).message);
     }
 
     // 7. Invalidate evidence and case caches

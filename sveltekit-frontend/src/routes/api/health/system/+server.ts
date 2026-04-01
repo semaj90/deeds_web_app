@@ -28,6 +28,6 @@ export const GET: RequestHandler = async () => {
 			timestamp: new Date().toISOString()
 		});
 	} catch {
-		return json({ status: 'error', timestamp: new Date().toISOString() }, { status: 500 });
+		return json({ status: 'error', timestamp: new Date().toISOString() });
 	}
 };

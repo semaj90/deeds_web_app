@@ -14,7 +14,6 @@ import { isUuid } from '$lib/server/validation.js';
 export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const { docId } = params;
-	if (!isUuid(docId)) return json({ error: 'Invalid evidence ID format' }, { status: 400 });
 
 	// 1. Check in-memory progress store (for active jobs)
 	//    docId could be a jobId or an evidenceId
@@ -29,6 +28,8 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			error: job.error,
 		});
 	}
+
+	if (!isUuid(docId)) return json({ error: 'Invalid evidence ID format' }, { status: 400 });
 
 	// 2. Fall back to database query (for completed uploads)
 	try {
