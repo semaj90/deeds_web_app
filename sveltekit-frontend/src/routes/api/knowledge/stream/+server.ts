@@ -11,7 +11,7 @@ import { getKnowledgeSearcher } from '$lib/services/knowledge-search/KnowledgeSe
 import { getOllamaUrl } from '$lib/config/env.server.js';
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { getChatModelKeepAlive, ollamaFetch } from '$lib/server/ollama.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { embedText } from '$lib/server/embedding/embed.js';
 import type { RequestHandler } from './$types.js';
@@ -195,16 +195,16 @@ async function streamOllamaResponse(
 
 	const response = await traceLLM('knowledge-stream', { model: MODEL, prompt: prompt.slice(0, 500) }, async (gen) => {
 		const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: MODEL,
-				prompt,
-				stream: true,
-				keep_alive: '24h',
-				options: { temperature: 0.3, num_predict: 2048 }
-			})
-		});
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: MODEL,
+        prompt,
+        stream: true,
+        keep_alive: getChatModelKeepAlive(),
+        options: { temperature: 0.3, num_predict: 2048 },
+      }),
+    });
 		gen.end({ output: 'streaming' });
 		return res;
 	});

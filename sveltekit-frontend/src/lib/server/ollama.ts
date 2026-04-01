@@ -65,19 +65,116 @@ const ollamaDispatcher = new Agent({
 	pipelining: 1,
 });
 
-/** Model keep-alive duration (keeps model loaded in VRAM between requests) */
-const MODEL_KEEP_ALIVE = process.env?.OLLAMA_KEEP_ALIVE ?? '24h';
+/**
+ * Keep the smaller embedding model resident, but let the large chat model
+ * age out quickly on 8 GB GPUs to reduce eviction/reload churn.
+ */
+const CHAT_MODEL_KEEP_ALIVE = process.env?.OLLAMA_CHAT_KEEP_ALIVE ?? '2m';
+const EMBEDDING_MODEL_KEEP_ALIVE =
+	process.env?.OLLAMA_EMBED_KEEP_ALIVE ?? process.env?.OLLAMA_KEEP_ALIVE ?? '24h';
+const OLLAMA_DIAGNOSTICS_ENABLED =
+	(process.env?.OLLAMA_DIAGNOSTICS_ENABLED ?? (ENV.NODE_ENV === 'development' ? 'true' : 'false')) ===
+	'true';
+
+export function getChatModelKeepAlive(): string {
+	return CHAT_MODEL_KEEP_ALIVE;
+}
+
+export function getEmbeddingModelKeepAlive(): string {
+	return EMBEDDING_MODEL_KEEP_ALIVE;
+}
+
+function parseKeepAliveMs(value: unknown): number | null {
+	if (typeof value === 'number' && Number.isFinite(value) && value >= 0) {
+		return value;
+	}
+
+	if (typeof value !== 'string') return null;
+	const trimmed = value.trim().toLowerCase();
+	const match = trimmed.match(/^(\d+)(ms|s|m|h)$/);
+	if (!match) return null;
+
+	const amount = Number(match[1]);
+	const unit = match[2];
+	if (unit === 'ms') return amount;
+	if (unit === 's') return amount * 1000;
+	if (unit === 'm') return amount * 60_000;
+	return amount * 3_600_000;
+}
+
+function extractOllamaRequestMeta(url: string, init?: RequestInit): {
+	endpoint: string;
+	model?: string;
+	keepAlive?: string | number;
+} {
+	const endpoint = new URL(url, OLLAMA_BASE_URL).pathname;
+	if (typeof init?.body !== 'string') return { endpoint };
+
+	try {
+		const parsed = JSON.parse(init.body) as { model?: string; keep_alive?: string | number };
+		return {
+			endpoint,
+			model: parsed.model,
+			keepAlive: parsed.keep_alive,
+		};
+	} catch {
+		return { endpoint };
+	}
+}
+
+function logOllamaDiagnostics(
+	phase: 'success' | 'error',
+	meta: ReturnType<typeof extractOllamaRequestMeta>,
+	durationMs: number,
+	status?: number,
+	error?: unknown
+): void {
+	if (!OLLAMA_DIAGNOSTICS_ENABLED) return;
+
+	const keepAliveMs = parseKeepAliveMs(meta.keepAlive);
+	const residentUntil =
+		keepAliveMs !== null && keepAliveMs > 0 ? new Date(Date.now() + keepAliveMs).toISOString() : null;
+	const details = [
+		`endpoint=${meta.endpoint}`,
+		`model=${meta.model ?? 'unknown'}`,
+		`keep_alive=${String(meta.keepAlive ?? 'unset')}`,
+		`duration_ms=${durationMs}`,
+	];
+
+	if (typeof status === 'number') details.push(`status=${status}`);
+	if (residentUntil && (meta.endpoint === '/api/chat' || meta.endpoint === '/api/generate')) {
+		details.push(`resident_until~=${residentUntil}`);
+	}
+
+	if (phase === 'success') {
+		console.log(`[ollama-diag] ${details.join(' ')}`);
+		return;
+	}
+
+	const errorMessage = error instanceof Error ? error.message : String(error ?? 'unknown error');
+	console.warn(`[ollama-diag] ${details.join(' ')} error=${errorMessage}`);
+}
 
 /**
  * Shared fetch wrapper for Ollama requests with connection pooling.
  * All Ollama HTTP calls should use this instead of raw fetch().
  */
-export function ollamaFetch(url: string, init?: RequestInit): Promise<Response> {
-	return fetch(url, {
-		...init,
-		// @ts-ignore -- undici dispatcher option (Node.js 18+)
-		dispatcher: ollamaDispatcher,
-	});
+export async function ollamaFetch(url: string, init?: RequestInit): Promise<Response> {
+	const meta = extractOllamaRequestMeta(url, init);
+	const startedAt = Date.now();
+
+	try {
+		const response = await fetch(url, {
+			...init,
+			// @ts-ignore -- undici dispatcher option (Node.js 18+)
+			dispatcher: ollamaDispatcher,
+		});
+		logOllamaDiagnostics('success', meta, Date.now() - startedAt, response.status);
+		return response;
+	} catch (error) {
+		logOllamaDiagnostics('error', meta, Date.now() - startedAt, undefined, error);
+		throw error;
+	}
 }
 
 // ── LiteLLM Proxy (OpenAI-compatible gateway with semantic caching) ─────
@@ -140,7 +237,7 @@ export async function generateText(prompt: string): Promise<string> {
 		model: CHAT_MODEL,
 		messages: [{ role: 'user', content: prompt }],
 		stream: false,
-		keep_alive: MODEL_KEEP_ALIVE,
+		keep_alive: getChatModelKeepAlive(),
 	};
 
 	return traceLLM('generate-text', { model: CHAT_MODEL, prompt: prompt.slice(0, 500) }, async (gen) => {
@@ -199,7 +296,7 @@ export async function callOllamaChat(
       { role: 'user', content: userPrompt },
     ],
     stream: false,
-    keep_alive: MODEL_KEEP_ALIVE,
+		keep_alive: getChatModelKeepAlive(),
   };
   if (options?.format) body.format = options.format;
   if (options?.num_predict || options?.temperature !== undefined) {

@@ -15,7 +15,7 @@ import { getVectorCache, setVectorCache, getEmbeddingCache, setEmbeddingCache } 
 import { embedText } from '$lib/server/embedding/embed.js';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { getChatModelKeepAlive, ollamaFetch } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
@@ -38,7 +38,7 @@ async function reformulateQuery(query: string, topScore: number): Promise<string
         model: 'gemma3-legal:latest',
         prompt: `Rephrase this legal search query to improve retrieval. Return ONLY the rephrased query, nothing else.\n\nOriginal: ${query.slice(0, 500)}`,
         stream: false,
-        keep_alive: '24h',
+        keep_alive: getChatModelKeepAlive(),
         options: { temperature: 0.3, num_predict: 128 },
       }),
       signal: AbortSignal.timeout(5000),
@@ -98,7 +98,18 @@ type PhaseStatus = 'success' | 'warning' | 'skipped';
 
 type SearchPhaseDiagnostics = {
   cache: { hit: boolean; source: string };
-  embedding: { status: PhaseStatus; source: string; transport: string; duration_ms?: number };
+  embedding: {
+    status: PhaseStatus;
+    source: string;
+    transport: string;
+    duration_ms?: number;
+    attempts?: Array<{
+      transport: string;
+      status: string;
+      detail?: string;
+      durationMs?: number;
+    }>;
+  };
   retrieval: {
     status: PhaseStatus;
     collections: string[];
@@ -115,6 +126,11 @@ type SearchPhaseDiagnostics = {
   };
   dag: { status: PhaseStatus; enabled: boolean };
 };
+
+function getFinalEmbeddingAttempt(diagnostics: SearchPhaseDiagnostics) {
+  const attempts = diagnostics.embedding.attempts ?? [];
+  return attempts.length > 0 ? attempts[attempts.length - 1] : null;
+}
 
 function toConfidence(score: number): ConfidenceLevel {
   if (score >= 0.85) return 'high';
@@ -291,6 +307,16 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
   }
 
   const startTime = performance.now();
+  const embeddingOnly = url.searchParams.get('embedding_only') === 'true';
+  const uncachedProbe = embeddingOnly && url.searchParams.get('probe_uncached') === 'true';
+  const uncachedProbeStrategy =
+    embeddingOnly && url.searchParams.get('probe_strategy') === 'batch-first'
+      ? 'batch-first'
+      : 'sequential';
+  const uncachedProbeTimeoutMs = Math.min(
+    Math.max(Number(url.searchParams.get('probe_timeout_ms') ?? 15000), 1000),
+    120000
+  );
 
   try {
     const raw = await request.json();
@@ -332,7 +358,7 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
     // 0a. Versioned retrieval cache check (case-scoped, version-stamped)
     const effectiveCaseId = caseId || body.case_id;
     let caseVersion = 0;
-    if (effectiveCaseId) {
+    if (effectiveCaseId && !uncachedProbe) {
       caseVersion = await getCaseVersion(effectiveCaseId);
       const rKey = retrievalKey.forQuery(effectiveCaseId, query, caseVersion);
       const memHit = getFromMemoryCache(rKey);
@@ -361,15 +387,17 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
 
     // 0b. Fallback: legacy vector result cache (Memory → Redis) for identical query+options
     const cacheOptions = { limit: top_k, threshold: min_score, documentType: caseId };
-    const { entry: cachedResult } = await getVectorCache(query, cacheOptions);
-    if (cachedResult) {
-      const cached = cachedResult.results[0] as Record<string, unknown>;
-      diagnostics.cache = { hit: true, source: 'vector-cache' };
-      return json({
-        ...cached,
-        diagnostics: cached.diagnostics ?? diagnostics,
-        cache: { hit: true, source: 'vector-cache', age_ms: Date.now() - cachedResult.ts },
-      });
+    if (!uncachedProbe) {
+      const { entry: cachedResult } = await getVectorCache(query, cacheOptions);
+      if (cachedResult) {
+        const cached = cachedResult.results[0] as Record<string, unknown>;
+        diagnostics.cache = { hit: true, source: 'vector-cache' };
+        return json({
+          ...cached,
+          diagnostics: cached.diagnostics ?? diagnostics,
+          cache: { hit: true, source: 'vector-cache', age_ms: Date.now() - cachedResult.ts },
+        });
+      }
     }
 
     // 1. Generate embedding (use precomputed from client if provided, else server-side 4-tier chain)
@@ -395,8 +423,25 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
       try {
         // Use 4-tier fallback chain: gRPC → QUIC → HTTP batch → HTTP sequential
         const result = await traceEmbedding(query, 'embeddinggemma:latest', async () => {
-          const embResult = await generateEmbeddings([query]);
+          const embResult = await generateEmbeddings(
+            [query],
+            embeddingOnly
+              ? {
+                  preferSequentialHttp: uncachedProbe
+                    ? uncachedProbeStrategy !== 'batch-first'
+                    : true,
+                  httpBatchTimeoutMs: uncachedProbe ? uncachedProbeTimeoutMs : 5000,
+                  httpSingleTimeoutMs: uncachedProbe ? uncachedProbeTimeoutMs : 60000,
+                  skipCacheRead: uncachedProbe,
+                  skipCacheWrite: uncachedProbe,
+                }
+              : undefined
+          );
           embeddingTransport = embResult.source; // 'grpc' | 'quic' | 'http-ollama'
+          if (embResult.cacheHit) {
+            diagnostics.cache = { hit: true, source: 'embedding-cache' };
+          }
+          diagnostics.embedding.attempts = embResult.attempts;
           return embResult.vectors[0] as unknown as Float32Array;
         });
         embedding = Array.from(result);
@@ -404,11 +449,48 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
           status: 'success',
           source: 'server-generated',
           transport: embeddingTransport,
+          attempts: diagnostics.embedding.attempts,
         };
 
         // Also cache in vector-cache for backward compatibility
         setEmbeddingCache(query, embedding, 'embeddinggemma:latest').catch(() => {});
-      } catch {
+      } catch (err) {
+        const embeddingAttempts =
+          typeof err === 'object' && err !== null && 'attempts' in err && Array.isArray((err as any).attempts)
+            ? ((err as any).attempts as SearchPhaseDiagnostics['embedding']['attempts'])
+            : diagnostics.embedding.attempts;
+        const probeErrorMessage = err instanceof Error ? err.message : 'Embedding generation failed';
+        if (embeddingOnly && uncachedProbe) {
+          const finalAttempt = embeddingAttempts?.length
+            ? embeddingAttempts[embeddingAttempts.length - 1]
+            : null;
+          diagnostics.cache = { hit: false, source: 'uncached-probe' };
+          diagnostics.embedding = {
+            status: 'warning',
+            source: 'server-generated',
+            transport: 'http-ollama-sequential',
+            duration_ms: Math.round(performance.now() - embedStart),
+            attempts: embeddingAttempts,
+          };
+
+          return json({
+            query,
+            embedding_transport: 'http-ollama-sequential',
+            embedding_source: 'server',
+            embedding_model: 'embeddinggemma:latest',
+            embedding_time_ms: Math.round(performance.now() - embedStart),
+            embedding_status: 'degraded',
+            final_attempted_transport: finalAttempt?.transport ?? null,
+            final_attempt_status: finalAttempt?.status ?? null,
+            uncached_probe: true,
+            probe_strategy: uncachedProbeStrategy,
+            probe_timeout_ms: uncachedProbeTimeoutMs,
+            error: probeErrorMessage,
+            diagnostics,
+            timestamp: new Date().toISOString(),
+          });
+        }
+
         // Fallback to direct embedText if 4-tier chain fails entirely
         try {
           const embeddingArray = await embedText(query);
@@ -418,6 +500,19 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
             status: 'warning',
             source: 'server-fallback',
             transport: embeddingTransport,
+            attempts: [
+              ...(embeddingAttempts ?? []),
+              {
+                transport: 'http-ollama-sequential',
+                status: 'failed',
+                detail: probeErrorMessage,
+              },
+              {
+                transport: 'http-ollama',
+                status: 'success',
+                detail: 'direct embedText fallback',
+              },
+            ],
           };
           setEmbeddingCache(query, embedding, 'embeddinggemma:latest').catch(() => {});
         } catch (err2) {
@@ -428,6 +523,24 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
 
     const embeddingTime = performance.now() - embedStart;
     diagnostics.embedding.duration_ms = Math.round(embeddingTime);
+
+    if (embeddingOnly) {
+      const finalAttempt = getFinalEmbeddingAttempt(diagnostics);
+      return json({
+        query,
+        embedding_transport: embeddingTransport,
+        embedding_source: embeddingSource,
+        embedding_model:
+          embeddingSource === 'client-precomputed'
+            ? 'embeddinggemma-onnx-client'
+            : 'embeddinggemma:latest',
+        embedding_time_ms: Math.round(embeddingTime),
+        final_attempted_transport: finalAttempt?.transport ?? null,
+        final_attempt_status: finalAttempt?.status ?? null,
+        diagnostics,
+        timestamp: new Date().toISOString(),
+      });
+    }
 
     // 2. Search across Qdrant collections
     const collections = ['legal_documents', 'evidence_items'];

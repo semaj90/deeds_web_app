@@ -4,11 +4,20 @@ import { db } from '$lib/server/db/client';
 import { chatMessages } from '$lib/server/db/schema';
 import { eq, desc, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import {
+  getChatModelKeepAlive,
+  getEmbeddingModelKeepAlive,
+  ollamaFetch,
+} from '$lib/server/ollama.js';
 import { loadCodebaseContext } from '$lib/server/retrieval/codebase-context.js';
 import { getGraphContext } from '$lib/server/retrieval/graph-context.js';
 import { lookupCachedResponse, storeCachedResponse } from '$lib/server/ai/llm-cache.js';
-import { getFragment, setFragment, getGlyphCacheMetrics, FragmentType } from '$lib/server/glyph-prompt-cache.js';
+import {
+  getFragment,
+  setFragment,
+  getGlyphCacheMetrics,
+  FragmentType,
+} from '$lib/server/glyph-prompt-cache.js';
 import { createHash } from 'crypto';
 import { synthesisKey, getCaseVersion, TTL } from '$lib/server/cache-keys.js';
 import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
@@ -54,8 +63,9 @@ const CACHE_LOOKUP_TIMEOUT_MS = 2000;
 // Corrective RAG: if top retrieval score is below this, reformulate query and retry
 const CORRECTIVE_RAG_THRESHOLD = 0.5;
 
-// ACE self-eval: evaluate response quality and retry once if below threshold
-const ACE_SELF_EVAL_ENABLED = true;
+// ACE self-eval adds a second Ollama pass and 10s timeout noise on interactive chat.
+// Keep it opt-in here; other non-interactive routes can still use self-eval directly.
+const ACE_SELF_EVAL_ENABLED = (process.env?.ACE_CHAT_SELF_EVAL_ENABLED ?? 'false') === 'true';
 
 // Strict caseId format: "case-" followed by a UUID
 const CASE_ID_PATTERN = /^case-([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
@@ -380,7 +390,11 @@ async function retrieveContext(query: string, limit = RAG_MAX_CHUNKS): Promise<C
         ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: query, keep_alive: '24h' }),
+          body: JSON.stringify({
+            model: EMBEDDING_MODEL,
+            prompt: query,
+            keep_alive: getEmbeddingModelKeepAlive(),
+          }),
           signal: AbortSignal.timeout(8000),
         })
       );
@@ -480,7 +494,11 @@ async function retrieveAttachmentContext(
       ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: query, keep_alive: '24h' }),
+        body: JSON.stringify({
+          model: EMBEDDING_MODEL,
+          prompt: query,
+          keep_alive: getEmbeddingModelKeepAlive(),
+        }),
         signal: AbortSignal.timeout(8000),
       })
     );
@@ -590,10 +608,10 @@ async function correctiveRetrieval(
         model: 'gemma3-legal:latest',
         prompt: `Rephrase this legal search query to improve retrieval results. Return ONLY the rephrased query, no explanation.\n\nOriginal query: "${originalQuery}"`,
         stream: false,
-        keep_alive: '24h',
+        keep_alive: getChatModelKeepAlive(),
         options: { temperature: 0.3, num_predict: 100 },
       }),
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(15_000),
     });
 
     if (!reformulateRes.ok) return { docs: originalDocs, reformulated: false };
@@ -1145,7 +1163,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             model: model ?? 'gemma3-legal:latest',
             messages: ollamaMessages,
             stream: true,
-            keep_alive: '24h',
+            keep_alive: getChatModelKeepAlive(),
           }),
         });
 
@@ -1315,7 +1333,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                       { role: 'user', content: correctionPrompt },
                     ],
                     stream: true,
-                    keep_alive: '24h',
+                    keep_alive: getChatModelKeepAlive(),
                   }),
                 });
 
@@ -1442,7 +1460,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: message, keep_alive: '24h' }),
+            body: JSON.stringify({
+              model: EMBEDDING_MODEL,
+              prompt: message,
+              keep_alive: getEmbeddingModelKeepAlive(),
+            }),
             signal: AbortSignal.timeout(8000),
           }).catch(() => null);
 

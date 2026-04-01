@@ -7,176 +7,174 @@
  */
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { litellmChat, ollamaFetch } from '$lib/server/ollama.js';
+import { getChatModelKeepAlive, litellmChat, ollamaFetch } from '$lib/server/ollama.js';
 
 const DEFAULT_URL = ENV.OLLAMA_BASE_URL;
-const DEFAULT_MODEL = process.env.OLLAMA_MODEL_CHAT ?? process.env.OLLAMA_MODEL ?? 'gemma3-legal:latest';
-const MODEL_KEEP_ALIVE = process.env?.OLLAMA_KEEP_ALIVE ?? '24h';
+const DEFAULT_MODEL =
+  process.env.OLLAMA_MODEL_CHAT ?? process.env.OLLAMA_MODEL ?? 'gemma3-legal:latest';
 
 // Canonical model parameters — mirrors gemma3Q4_K_M/Modelfile PARAMETER values.
 // All TS callers previously missed num_ctx and repeat_penalty, letting Ollama
 // silently fall back to its own built-in defaults instead of the Modelfile values.
 const GEMMA3_DEFAULTS = {
-	temperature: 0.1,       // Modelfile: temperature 0.1  (legal precision, not creativity)
-	top_k: 20,              // Modelfile: top_k 20
-	top_p: 0.8,             // Modelfile: top_p 0.8
-	num_ctx: 8192,          // Modelfile: num_ctx 8192  — was MISSING from all TS callers
-	repeat_penalty: 1.05,   // Modelfile: repeat_penalty 1.05 — was MISSING from all TS callers
-	num_predict: 2048,      // sensible completion cap
+  temperature: 0.1, // Modelfile: temperature 0.1  (legal precision, not creativity)
+  top_k: 20, // Modelfile: top_k 20
+  top_p: 0.8, // Modelfile: top_p 0.8
+  num_ctx: 8192, // Modelfile: num_ctx 8192  — was MISSING from all TS callers
+  repeat_penalty: 1.05, // Modelfile: repeat_penalty 1.05 — was MISSING from all TS callers
+  num_predict: 2048, // sensible completion cap
 } as const;
 
 export interface LLMMessage {
-	role: 'system' | 'user' | 'assistant';
-	content: string;
+  role: 'system' | 'user' | 'assistant';
+  content: string;
 }
 
 export interface LLMOptions {
-	model?: string;
-	temperature?: number;
-	maxTokens?: number;
-	topP?: number;
-	topK?: number;
-	stream?: boolean;
+  model?: string;
+  temperature?: number;
+  maxTokens?: number;
+  topP?: number;
+  topK?: number;
+  stream?: boolean;
 }
 
 export interface LLMResponse {
-	content: string;
-	model: string;
-	totalDuration?: number;
-	promptEvalCount?: number;
-	evalCount?: number;
+  content: string;
+  model: string;
+  totalDuration?: number;
+  promptEvalCount?: number;
+  evalCount?: number;
 }
 
 /**
  * Generate a completion using Ollama (or LiteLLM when enabled)
  */
 export async function generateCompletion(
-	prompt: string,
-	options: LLMOptions = {}
+  prompt: string,
+  options: LLMOptions = {}
 ): Promise<LLMResponse> {
-	const model = options.model ?? DEFAULT_MODEL;
+  const model = options.model ?? DEFAULT_MODEL;
 
-	// Route through LiteLLM proxy when enabled (gets semantic caching)
-	if (ENV.LITELLM_ENABLED) {
-		return traceLLM('generate-completion', { model, prompt: prompt.slice(0, 500) }, async (gen) => {
-			const content = await litellmChat(
-				[{ role: 'user', content: prompt }],
-				model,
-				{ temperature: options.temperature, maxTokens: options.maxTokens }
-			);
-			const result: LLMResponse = { content, model };
-			gen.end({ output: content.slice(0, 1000) });
-			return result;
-		});
-	}
+  // Route through LiteLLM proxy when enabled (gets semantic caching)
+  if (ENV.LITELLM_ENABLED) {
+    return traceLLM('generate-completion', { model, prompt: prompt.slice(0, 500) }, async (gen) => {
+      const content = await litellmChat([{ role: 'user', content: prompt }], model, {
+        temperature: options.temperature,
+        maxTokens: options.maxTokens,
+      });
+      const result: LLMResponse = { content, model };
+      gen.end({ output: content.slice(0, 1000) });
+      return result;
+    });
+  }
 
-	return traceLLM('generate-completion', { model, prompt: prompt.slice(0, 500) }, async (gen) => {
-		const response = await ollamaFetch(`${DEFAULT_URL}/api/generate`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model,
-				prompt,
-				stream: false,
-				keep_alive: MODEL_KEEP_ALIVE,
-				options: {
-				temperature: options.temperature ?? GEMMA3_DEFAULTS.temperature,
-				num_predict: options.maxTokens ?? GEMMA3_DEFAULTS.num_predict,
-				top_p: options.topP ?? GEMMA3_DEFAULTS.top_p,
-				top_k: options.topK ?? GEMMA3_DEFAULTS.top_k,
-				num_ctx: GEMMA3_DEFAULTS.num_ctx,
-				repeat_penalty: GEMMA3_DEFAULTS.repeat_penalty,
-				},
-			}),
-		});
+  return traceLLM('generate-completion', { model, prompt: prompt.slice(0, 500) }, async (gen) => {
+    const response = await ollamaFetch(`${DEFAULT_URL}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model,
+        prompt,
+        stream: false,
+        keep_alive: getChatModelKeepAlive(),
+        options: {
+          temperature: options.temperature ?? GEMMA3_DEFAULTS.temperature,
+          num_predict: options.maxTokens ?? GEMMA3_DEFAULTS.num_predict,
+          top_p: options.topP ?? GEMMA3_DEFAULTS.top_p,
+          top_k: options.topK ?? GEMMA3_DEFAULTS.top_k,
+          num_ctx: GEMMA3_DEFAULTS.num_ctx,
+          repeat_penalty: GEMMA3_DEFAULTS.repeat_penalty,
+        },
+      }),
+    });
 
-		if (!response.ok) {
-			const error = await response.text();
-			throw new Error(`Ollama error: ${response.status} - ${error}`);
-		}
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Ollama error: ${response.status} - ${error}`);
+    }
 
-		const data = await response.json();
-		const result: LLMResponse = {
-			content: data.response,
-			model: data.model,
-			totalDuration: data.total_duration,
-			promptEvalCount: data.prompt_eval_count,
-			evalCount: data.eval_count,
-		};
+    const data = await response.json();
+    const result: LLMResponse = {
+      content: data.response,
+      model: data.model,
+      totalDuration: data.total_duration,
+      promptEvalCount: data.prompt_eval_count,
+      evalCount: data.eval_count,
+    };
 
-		gen.end({
-			output: result.content.slice(0, 1000),
-			usage: { promptTokens: result.promptEvalCount, completionTokens: result.evalCount },
-		});
+    gen.end({
+      output: result.content.slice(0, 1000),
+      usage: { promptTokens: result.promptEvalCount, completionTokens: result.evalCount },
+    });
 
-		return result;
-	});
+    return result;
+  });
 }
 
 /**
  * Chat completion with message history
  */
 export async function chatCompletion(
-	messages: LLMMessage[],
-	options: LLMOptions = {}
+  messages: LLMMessage[],
+  options: LLMOptions = {}
 ): Promise<LLMResponse> {
-	const model = options.model ?? DEFAULT_MODEL;
+  const model = options.model ?? DEFAULT_MODEL;
 
-	// Route through LiteLLM proxy when enabled (gets semantic caching)
-	if (ENV.LITELLM_ENABLED) {
-		return traceLLM('chat-completion', { model, messages: messages.slice(-3) }, async (gen) => {
-			const content = await litellmChat(
-				messages,
-				model,
-				{ temperature: options.temperature, maxTokens: options.maxTokens }
-			);
-			const result: LLMResponse = { content, model };
-			gen.end({ output: content.slice(0, 1000) });
-			return result;
-		});
-	}
+  // Route through LiteLLM proxy when enabled (gets semantic caching)
+  if (ENV.LITELLM_ENABLED) {
+    return traceLLM('chat-completion', { model, messages: messages.slice(-3) }, async (gen) => {
+      const content = await litellmChat(messages, model, {
+        temperature: options.temperature,
+        maxTokens: options.maxTokens,
+      });
+      const result: LLMResponse = { content, model };
+      gen.end({ output: content.slice(0, 1000) });
+      return result;
+    });
+  }
 
-	return traceLLM('chat-completion', { model, messages: messages.slice(-3) }, async (gen) => {
-		const response = await ollamaFetch(`${DEFAULT_URL}/api/chat`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model,
-				messages,
-				stream: false,
-				keep_alive: MODEL_KEEP_ALIVE,
-				options: {
-					temperature: options.temperature ?? GEMMA3_DEFAULTS.temperature,
-					num_predict: options.maxTokens ?? GEMMA3_DEFAULTS.num_predict,
-					top_p: options.topP ?? GEMMA3_DEFAULTS.top_p,
-					top_k: options.topK ?? GEMMA3_DEFAULTS.top_k,
-					num_ctx: GEMMA3_DEFAULTS.num_ctx,
-					repeat_penalty: GEMMA3_DEFAULTS.repeat_penalty,
-				},
-			}),
-		});
+  return traceLLM('chat-completion', { model, messages: messages.slice(-3) }, async (gen) => {
+    const response = await ollamaFetch(`${DEFAULT_URL}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model,
+        messages,
+        stream: false,
+        keep_alive: getChatModelKeepAlive(),
+        options: {
+          temperature: options.temperature ?? GEMMA3_DEFAULTS.temperature,
+          num_predict: options.maxTokens ?? GEMMA3_DEFAULTS.num_predict,
+          top_p: options.topP ?? GEMMA3_DEFAULTS.top_p,
+          top_k: options.topK ?? GEMMA3_DEFAULTS.top_k,
+          num_ctx: GEMMA3_DEFAULTS.num_ctx,
+          repeat_penalty: GEMMA3_DEFAULTS.repeat_penalty,
+        },
+      }),
+    });
 
-		if (!response.ok) {
-			const error = await response.text();
-			throw new Error(`Ollama chat error: ${response.status} - ${error}`);
-		}
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Ollama chat error: ${response.status} - ${error}`);
+    }
 
-		const data = await response.json();
-		const result: LLMResponse = {
-			content: data.message?.content ?? '',
-			model: data.model,
-			totalDuration: data.total_duration,
-			promptEvalCount: data.prompt_eval_count,
-			evalCount: data.eval_count,
-		};
+    const data = await response.json();
+    const result: LLMResponse = {
+      content: data.message?.content ?? '',
+      model: data.model,
+      totalDuration: data.total_duration,
+      promptEvalCount: data.prompt_eval_count,
+      evalCount: data.eval_count,
+    };
 
-		gen.end({
-			output: result.content.slice(0, 1000),
-			usage: { promptTokens: result.promptEvalCount, completionTokens: result.evalCount },
-		});
+    gen.end({
+      output: result.content.slice(0, 1000),
+      usage: { promptTokens: result.promptEvalCount, completionTokens: result.evalCount },
+    });
 
-		return result;
-	});
+    return result;
+  });
 }
 
 /**

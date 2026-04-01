@@ -10,7 +10,7 @@
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { litellmChat, ollamaFetch } from '$lib/server/ollama.js';
+import { getChatModelKeepAlive, litellmChat, ollamaFetch } from '$lib/server/ollama.js';
 import { redis } from '$lib/server/redis.js';
 import type { ACEContext, SelfEvaluation } from './types.js';
 
@@ -21,11 +21,11 @@ const QUALITY_THRESHOLD = 0.6;
 
 // Zod schema for ACE self-evaluation output — converted to JSON Schema for Ollama GBNF constraining
 const evalSchema = z.object({
-	quality: z.number(),
-	completeness: z.number(),
-	accuracy: z.number(),
-	suggestions: z.array(z.string()),
-	shouldRetry: z.boolean()
+  quality: z.number(),
+  completeness: z.number(),
+  accuracy: z.number(),
+  suggestions: z.array(z.string()),
+  shouldRetry: z.boolean(),
 });
 const EVAL_FORMAT = z.toJSONSchema(evalSchema);
 
@@ -34,69 +34,71 @@ const EVAL_FORMAT = z.toJSONSchema(evalSchema);
  * Returns a structured evaluation with quality scores.
  */
 export async function evaluateResponse(opts: {
-	query: string;
-	response: string;
-	context: ACEContext;
-	backend: 'ollama' | 'tensorrt';
+  query: string;
+  response: string;
+  context: ACEContext;
+  backend: 'ollama' | 'tensorrt';
 }): Promise<SelfEvaluation> {
-	const start = Date.now();
+  const start = Date.now();
 
-	try {
-		const evalPrompt = buildEvalPrompt(opts.query, opts.response);
+  try {
+    const evalPrompt = buildEvalPrompt(opts.query, opts.response);
 
-		const responseText = await traceLLM('ace-self-eval', { model: MODEL, prompt: opts.query.slice(0, 300) }, async (gen) => {
-			// Route through LiteLLM proxy when enabled (gets semantic caching)
-			if (ENV.LITELLM_ENABLED) {
-				const text = await litellmChat(
-					[{ role: 'user', content: evalPrompt }],
-					MODEL,
-					{ temperature: 0.1, maxTokens: 256, timeoutMs: 10000 }
-				);
-				gen.end({ output: text.slice(0, 500) });
-				return text;
-			}
+    const responseText = await traceLLM(
+      'ace-self-eval',
+      { model: MODEL, prompt: opts.query.slice(0, 300) },
+      async (gen) => {
+        // Route through LiteLLM proxy when enabled (gets semantic caching)
+        if (ENV.LITELLM_ENABLED) {
+          const text = await litellmChat([{ role: 'user', content: evalPrompt }], MODEL, {
+            temperature: 0.1,
+            maxTokens: 256,
+            timeoutMs: 15_000,
+          });
+          gen.end({ output: text.slice(0, 500) });
+          return text;
+        }
 
-			const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					model: MODEL,
-					prompt: evalPrompt,
-					stream: false,
-					format: EVAL_FORMAT,
-					keep_alive: process.env?.OLLAMA_KEEP_ALIVE ?? '24h',
-					options: { temperature: 0.1, num_predict: 256 }
-				}),
-				signal: AbortSignal.timeout(10000)
-			});
+        const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: MODEL,
+            prompt: evalPrompt,
+            stream: false,
+            format: EVAL_FORMAT,
+            keep_alive: getChatModelKeepAlive(),
+            options: { temperature: 0.1, num_predict: 256 },
+          }),
+          signal: AbortSignal.timeout(15_000),
+        });
 
-			if (!res.ok) throw new Error(`Ollama ${res.status}`);
+        if (!res.ok) throw new Error(`Ollama ${res.status}`);
 
-			const data = await res.json();
-			const text = String(data.response ?? '');
-			gen.end({ output: text.slice(0, 500) });
-			return text;
-		});
-		const evaluation = parseEvaluation(responseText);
-		evaluation.evalMs = Date.now() - start;
+        const data = await res.json();
+        const text = String(data.response ?? '');
+        gen.end({ output: text.slice(0, 500) });
+        return text;
+      }
+    );
+    const evaluation = parseEvaluation(responseText);
+    evaluation.evalMs = Date.now() - start;
 
-		// Cache evaluation
-		const cacheKey = `ace:eval:${hashString(opts.query + opts.response)}`;
-		await redis
-			.set(cacheKey, JSON.stringify(evaluation), 'EX', EVAL_CACHE_TTL)
-			.catch(() => {});
+    // Cache evaluation
+    const cacheKey = `ace:eval:${hashString(opts.query + opts.response)}`;
+    await redis.set(cacheKey, JSON.stringify(evaluation), 'EX', EVAL_CACHE_TTL).catch(() => {});
 
-		return evaluation;
-	} catch {
-		return {
-			quality: 0.7,
-			completeness: 0.7,
-			accuracy: 0.7,
-			suggestions: [],
-			shouldRetry: false,
-			evalMs: Date.now() - start
-		};
-	}
+    return evaluation;
+  } catch {
+    return {
+      quality: 0.7,
+      completeness: 0.7,
+      accuracy: 0.7,
+      suggestions: [],
+      shouldRetry: false,
+      evalMs: Date.now() - start,
+    };
+  }
 }
 
 /**
