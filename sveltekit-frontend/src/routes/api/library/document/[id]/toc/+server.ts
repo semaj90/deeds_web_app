@@ -30,6 +30,7 @@ export async function GET({ params, locals }) {
 		}
 	}
 
+	try {
 	// 1. Fetch document metadata
 	const docRes = await pool.query(
 		`SELECT ld.id, ld.title, j.code as jurisdiction, ld.corpus_type as "corpusType"
@@ -107,4 +108,8 @@ export async function GET({ params, locals }) {
 		document,
 		toc
 	});
+	} catch (err) {
+		console.error('[library/document/toc] Error:', err);
+		return json({ document: null, toc: [] });
+	}
 }

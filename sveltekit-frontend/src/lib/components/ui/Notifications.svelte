@@ -3,7 +3,7 @@
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { quintOut } from 'svelte/easing';
 	import { fly } from 'svelte/transition';
-	import { notifications, type Notification } from '../../stores/notification';
+	import { notificationStore, type Notification } from '$lib/stores/notifications.svelte';
 
 	const colorClasses: Record<string, string> = {
 		success: 'bg-accent/5 border-accent/20 text-accent',
@@ -20,7 +20,7 @@
 	};
 
 	function handleClose(notification: Notification) {
-		(notifications as any).remove?.(notification.id);
+		notificationStore.remove(notification.id);
 	}
 
 	function handleAction(
@@ -32,13 +32,13 @@
 		} catch (err) {
 			console.error('notification action failed', err);
 		} finally {
-			(notifications as any).remove?.(notification.id);
+			notificationStore.remove(notification.id);
 		}
 	}
 </script>
 
 <div class="space-y-4">
-	{#each $notifications.notifications as notification (notification.id)}
+	{#each notificationStore.notifications as notification (notification.id)}
 		<div
 			class="relative p-4 rounded-lg border shadow-lg backdrop-blur-sm {colorClasses[notification.type ?? 'info']}"
 			in:fly={{ x: 300, duration: 300, easing: quintOut }}

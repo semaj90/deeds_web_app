@@ -59,6 +59,10 @@
 				uploadRunning = false;
 				return;
 			}
+			if (d.documentId && d.alreadyExists && !d.jobId) {
+				location.href = `/library/${d.documentId}`;
+				return;
+			}
 			uploadJobId = d.jobId;
 			uploadDocumentId = d.documentId;
 		} catch (err) {

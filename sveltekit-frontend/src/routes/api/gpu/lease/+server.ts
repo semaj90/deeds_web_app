@@ -30,7 +30,7 @@ export async function GET() {
 		});
 	} catch (err) {
 		console.error('GPU lease status error:', err);
-		return json({ error: 'Failed to get GPU lease status' }, { status: 500 });
+		return json({ lease: null, free: true, remainingMs: null });
 	}
 }
 

@@ -61,7 +61,32 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		});
 	} catch (err) {
 		console.error('[fictional-cases/id] GET error:', err);
-		return json({ error: 'Failed to load fictional case' }, { status: 500 });
+		return json(
+      {
+        id: params.id,
+        caseId: '',
+        category: 'wire_fraud',
+        charge: '',
+        primaryStatute: null,
+        defendantName: '',
+        incidentDate: null,
+        jurisdictionCity: null,
+        jurisdiction: null,
+        financialLoss: null,
+        narrative: '',
+        disclaimer: null,
+        isFictional: true,
+        generatedBy: null,
+        guardrailTriggered: false,
+        metadata: {},
+        createdAt: null,
+        charges: [],
+        actors: [],
+        events: [],
+        error: 'Failed to load fictional case',
+      },
+      { status: 500 }
+    );
 	}
 };
 

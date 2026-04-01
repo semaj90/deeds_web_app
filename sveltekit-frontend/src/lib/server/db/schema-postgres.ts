@@ -3324,3 +3324,69 @@ export const apiAuditLog = pgTable('api_audit_log', {
 export type ApiAuditLogEntry = typeof apiAuditLog.$inferSelect;
 export type NewApiAuditLogEntry = typeof apiAuditLog.$inferInsert;
 
+// === MODEL REGISTRY ===
+// Central registry of all AI models available across backends (Ollama, TRT-LLM, PyTorch, ONNX)
+
+export const inferenceBackendEnum = pgEnum('inference_backend', [
+	'ollama', 'tensorrt', 'litellm', 'pytorch', 'onnx',
+]);
+
+export const modelCapabilityEnum = pgEnum('model_capability', [
+	'chat', 'embedding', 'vlm', 'code', 'summarization', 'rerank',
+]);
+
+export const modelRegistry = pgTable('model_registry', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	name: varchar('name', { length: 200 }).notNull(),
+	backend: inferenceBackendEnum('backend').notNull(),
+	capability: modelCapabilityEnum('capability').notNull().default('chat'),
+	version: varchar('version', { length: 50 }),
+	parameterCount: bigint('parameter_count', { mode: 'number' }),
+	quantization: varchar('quantization', { length: 50 }),
+	contextWindow: integer('context_window'),
+	embeddingDims: integer('embedding_dims'),
+	isActive: boolean('is_active').default(true).notNull(),
+	isDefault: boolean('is_default').default(false).notNull(),
+	healthEndpoint: varchar('health_endpoint', { length: 500 }),
+	metadata: jsonb('metadata'),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	backendIdx: index('model_registry_backend_idx').on(table.backend),
+	capabilityIdx: index('model_registry_capability_idx').on(table.capability),
+	activeIdx: index('model_registry_active_idx').on(table.isActive),
+	nameBackend: unique('model_registry_name_backend_unique').on(table.name, table.backend),
+}));
+
+export type ModelRegistryEntry = typeof modelRegistry.$inferSelect;
+export type NewModelRegistryEntry = typeof modelRegistry.$inferInsert;
+
+// === SERVICE CAPABILITY MATRIX ===
+// Tracks live infrastructure services, their tier, and health state
+
+export const serviceTierEnum = pgEnum('service_tier', [
+	'core', 'data', 'inference', 'future',
+]);
+
+export const serviceCapabilities = pgTable('service_capabilities', {
+	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+	serviceName: varchar('service_name', { length: 100 }).notNull(),
+	tier: serviceTierEnum('tier').notNull(),
+	port: integer('port'),
+	healthEndpoint: varchar('health_endpoint', { length: 500 }),
+	fallbackService: varchar('fallback_service', { length: 100 }),
+	isRequired: boolean('is_required').default(false).notNull(),
+	dockerProfile: varchar('docker_profile', { length: 50 }),
+	lastHealthCheck: timestamp('last_health_check', { withTimezone: true }),
+	lastHealthStatus: boolean('last_health_status'),
+	lastLatencyMs: integer('last_latency_ms'),
+	metadata: jsonb('metadata'),
+	createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => ({
+	tierIdx: index('svc_capabilities_tier_idx').on(table.tier),
+	nameUnique: unique('svc_capabilities_name_unique').on(table.serviceName),
+}));
+
+export type ServiceCapability = typeof serviceCapabilities.$inferSelect;
+export type NewServiceCapability = typeof serviceCapabilities.$inferInsert;
+

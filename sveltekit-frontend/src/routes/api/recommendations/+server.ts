@@ -88,13 +88,15 @@ export const GET: RequestHandler = async (event) => {
 	} catch (err) {
 		console.error('[recommendations] GET request error:', err);
 
-		return json(
-			{
-				success: true,
-				data: { topicPreferences: [], recentInteractions: [], stats: null }
-			},
-			{ status: 200 }
-		);
+		return json({
+			success: true,
+			data: { topicPreferences: [], recentInteractions: [], stats: null },
+			metadata: {
+				timestamp: new Date().toISOString(),
+				version: '1.0',
+				processing_time: Date.now() - startTime
+			}
+		});
 	}
 };
 

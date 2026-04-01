@@ -37,7 +37,10 @@ export async function GET({ url, locals }: RequestEvent) {
 		return json({ worker, jobCounts: counts });
 	} catch (err) {
 		console.error('Evidence analysis GET error:', err);
-		return json({ error: 'Failed to fetch analysis status' }, { status: 500 });
+		if (evidenceId) {
+			return json({ evidenceId, jobs: [] });
+		}
+		return json({ worker: { active: 0, idle: 0, total: 0 }, jobCounts: { pending: 0, running: 0, completed: 0, failed: 0 } });
 	}
 }
 

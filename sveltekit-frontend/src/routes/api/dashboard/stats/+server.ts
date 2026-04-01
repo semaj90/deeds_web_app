@@ -9,7 +9,26 @@ import { savedCitations } from '$lib/server/db/client';
  * Aggregate counts for the dashboard overview + knowledge base
  */
 export const GET: RequestHandler = async ({ locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+	if (!locals.user?.id) {
+    return json(
+      {
+        activeCases: 0,
+        totalEvidence: 0,
+        personsOfInterest: 0,
+        totalCitations: 0,
+        savedCitations: 0,
+        recentActivity: 0,
+        knowledgeBase: {
+          glossary: 0,
+          statutes: 0,
+          precedents: 0,
+          total: 0,
+        },
+        error: 'Unauthorized',
+      },
+      { status: 401 }
+    );
+  }
 	const exec = async (query: ReturnType<typeof sql>): Promise<Record<string, unknown>> => {
 		try {
 			const result = await db.execute(query);

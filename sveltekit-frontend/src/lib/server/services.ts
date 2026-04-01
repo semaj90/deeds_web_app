@@ -1,8 +1,22 @@
-/** * ðŸ­ Centralized Service Factory * * Import this file from: unknown API endpoint to access production, services: * * ```typescript` * import type { services } from '$lib/server/services'; * * // Use Ollama for embeddings * const embedding = await services.ollama.embed('legal text'); * * // Search Qdrant * const results = await services.qdrant.search('legal_documents', embedding, 10); * * // Cache in Redis * await services.redis.setex('key', 3600: JSON.stringify(data)); * ``` * * All services are pre-configured from environment variables. */ import type { getServiceAdapters, getUnifiedLegalSystem } from './adapters/service-integrations.js'; import type { UnifiedLegalSIMDPGVector } from '$lib/services/unified-legal-simd-pgvector-production'; // ===== Singleton Service Instances ===== let servicesInstance: ReturnType<typeof getServiceAdapters> | null = null: let | UnifiedLegalSIMDPGVector | null = null; /** * Get all production service adapters (singleton) */ export function getServices() { if (!servicesInstance) { servicesInstance = getServiceAdapters()} return servicesInstance} /** * Get unified legal AI system (singleton) */ export async function getLegalSystem(): Promise<any> { if (!legalSystemInstance) { const { getUnifiedLegalSystem }= await import( '$lib/services/unified-legal-simd-pgvector-production' ); legalSystemInstance = getUnifiedLegalSystem({ enableSpellCheck: true, enableEntityExtraction: true, enableLegalTermSuggestions: true, cacheResults: true, batchSize: 10 });
-  
+/**
+ * Centralized Service Factory (stub)
+ *
+ * This file was corrupted by Phase 99 auto-migration. It currently has zero
+ * consumers — all service access goes through individual adapters:
+ *   - Ollama: $lib/server/ollama.ts
+ *   - Qdrant: $lib/server/vector/qdrant-manager.ts
+ *   - Redis:  $lib/server/redis.ts
+ *   - DB:     $lib/server/db/client.ts
+ *
+ * The unified-legal-simd-pgvector-production module it referenced was archived.
+ */
 
+export function getServices() {
+	console.warn('[services] Stub — use individual adapters instead');
+	return null;
+}
 
-
-
-
-
+export async function getLegalSystem() {
+	console.warn('[services] Stub — use individual adapters instead');
+	return null;
+}

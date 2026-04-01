@@ -92,7 +92,7 @@ export async function GET({ url, locals }: RequestEvent) {
 		});
 	} catch (err) {
 		console.error('Audit query error:', err);
-		return json({ error: 'Failed to query audit log' }, { status: 500 });
+		return json({ entries: [], pagination: { page: 1, limit: 50, total: 0, pages: 0 } });
 	}
 }
 

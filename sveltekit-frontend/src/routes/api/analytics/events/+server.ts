@@ -16,8 +16,8 @@ const ANALYTICS_EVENT_TYPES = [
 ] as const;
 
 const singleEventSchema = z.object({
-	userId: z.string().max(200).optional(),
-	sessionId: z.string().max(100).optional(),
+	userId: z.string().max(200).nullish(),
+	sessionId: z.string().max(100).nullish(),
 	eventType: z.enum(ANALYTICS_EVENT_TYPES),
 	payload: z.record(z.string(), z.unknown()).optional().default({})
 });

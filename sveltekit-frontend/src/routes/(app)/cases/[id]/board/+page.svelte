@@ -399,6 +399,7 @@
 
 	// Persist a new connection to the API
 	async function persistConnection(fromEvidenceId: string, toEvidenceId: string, connectionType = 'related', label?: string) {
+		if (!isValidCaseId) return null;
 		try {
 			const res = await fetch(`/api/cases/${caseId}/connections`, {
 				method: 'POST',
@@ -417,6 +418,7 @@
 
 	// Delete a connection from the API
 	async function deleteConnectionFromApi(connectionId: string) {
+		if (!isValidCaseId) return;
 		try {
 			await fetch(`/api/cases/${caseId}/connections`, {
 				method: 'DELETE',
@@ -430,6 +432,7 @@
 
 	// Fetch timeline events client-side
 	async function loadTimeline() {
+		if (!isValidCaseId) { timelineLoading = false; return; }
 		timelineLoading = true;
 		try {
 			const res = await fetch(`/api/cases/${caseId}/timeline?limit=30`);
@@ -551,7 +554,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 
 	// Save chat history to database
 	async function saveChatToDatabase() {
-		if (!chatSession || chatSession.messages.length === 0) return;
+		if (!chatSession || chatSession.messages.length === 0 || !isValidCaseId) return;
 
 		try {
 			const chatId = `board-${caseId}`;
@@ -655,7 +658,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 	}
 
 	async function save() {
-		if (!board) return;
+		if (!board || !isValidCaseId) return;
 		isSaving = true;
 
 		try {

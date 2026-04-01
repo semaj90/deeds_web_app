@@ -157,9 +157,12 @@
 		};
 	});
 
+	const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 	async function loadNotes() {
 		isLoading = true;
 		error = null;
+		if (!UUID_RE.test(caseId)) { isLoading = false; return; }
 		try {
 			const response = await fetch(`/api/cases/${caseId}/notes`);
 			if (!response.ok) throw new Error('Failed to load notes');
@@ -198,6 +201,7 @@
 			error = 'Note content cannot be empty';
 			return;
 		}
+		if (!UUID_RE.test(caseId)) { error = 'Invalid case ID'; return; }
 
 		isSaving = true;
 		error = null;
@@ -242,6 +246,7 @@
 
 	async function deleteNote(noteId: string) {
 		if (!confirm('Are you sure you want to delete this note?')) return;
+		if (!UUID_RE.test(caseId)) return;
 		try {
 			const response = await fetch(`/api/cases/${caseId}/notes/${noteId}`, { method: 'DELETE' });
 			if (!response.ok) throw new Error('Failed to delete note');
@@ -258,6 +263,7 @@
 	}
 
 	async function togglePin(note: CaseNote) {
+		if (!UUID_RE.test(caseId)) return;
 		try {
 			const response = await fetch(`/api/cases/${caseId}/notes/${note.id}`, {
 				method: 'PATCH',
@@ -274,6 +280,7 @@
 
 	async function loadVersions(noteId: string) {
 		versionsLoading = true;
+		if (!UUID_RE.test(caseId)) { versionsLoading = false; return; }
 		try {
 			const res = await fetch(`/api/cases/${caseId}/notes/${noteId}/versions`);
 			if (!res.ok) throw new Error('Failed to load versions');

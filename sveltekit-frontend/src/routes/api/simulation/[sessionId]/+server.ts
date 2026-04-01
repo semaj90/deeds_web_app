@@ -60,7 +60,38 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		});
 	} catch (err) {
 		console.error('[simulation/session] GET error:', err);
-		return json({ error: 'Failed to load session' }, { status: 500 });
+		return json(
+      {
+        id: params.sessionId,
+        status: 'abandoned',
+        caseData: {
+          caseNumber: '',
+          category: '',
+          charge: '',
+          primaryStatute: null,
+          defendantName: '',
+          jurisdiction: '',
+          jurisdictionCity: null,
+          financialLoss: null,
+          narrative: '',
+        },
+        charges: [],
+        actors: [],
+        procedureType: 'criminal',
+        phases: [],
+        currentPhase: 0,
+        currentPhaseName: 'unknown',
+        currentTurn: 0,
+        totalPhases: 0,
+        progress: '0/0',
+        dialogueHistory: [],
+        rulings: [],
+        createdAt: null,
+        updatedAt: null,
+        error: 'Failed to load session',
+      },
+      { status: 500 }
+    );
 	}
 };
 

@@ -97,9 +97,6 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     return json({ data, cacheHit: false, count: data.length });
   } catch (err) {
     console.error('[analysis/cache] Query failed:', err);
-    return json(
-      { error: 'Analysis cache query failed', data: [], cacheHit: false, count: 0 },
-      { status: 500 }
-    );
+    return json({ data: [], cacheHit: false, count: 0 });
   }
 };

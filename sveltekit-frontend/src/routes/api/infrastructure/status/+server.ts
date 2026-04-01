@@ -61,7 +61,7 @@ export const GET: RequestHandler = async () => {
 		// Postgres
 		(async () => {
 			try {
-				const { db } = await import('$lib/server/db/index.js');
+				const { db } = await import('$lib/server/db/client');
 				const { sql } = await import('drizzle-orm');
 				await db.execute(sql`SELECT 1`);
 				return true;

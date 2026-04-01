@@ -163,6 +163,26 @@ async function syncToNeo4j(
 export async function runIngestionPipeline(opts: IngestOptions): Promise<IngestResult> {
 	const { documentId, jobId } = opts;
 
+	try {
+		return await _runPipeline(documentId, jobId);
+	} catch (err) {
+		// Mark job as failed so it doesn't stay stuck at the last stage
+		const msg = err instanceof Error ? err.message : String(err);
+		console.error(`[ingestion] Pipeline failed for ${documentId}:`, msg);
+		await pool.query(
+			`UPDATE ingestion_jobs SET stage = 'failed', status = 'failed', progress = 0,
+			 metrics_json = $1, updated_at = now() WHERE id = $2`,
+			[JSON.stringify({ error: msg }), jobId]
+		).catch(() => {});
+		await pool.query(
+			`UPDATE library_documents SET processing_status = 'failed', updated_at = now() WHERE id = $1`,
+			[documentId]
+		).catch(() => {});
+		throw err;
+	}
+}
+
+async function _runPipeline(documentId: string, jobId: string): Promise<IngestResult> {
 	// Fetch document metadata
 	const docRes = await pool.query(
 		`SELECT id, title, minio_key, corpus_type, jurisdiction_id FROM library_documents WHERE id = $1`,
@@ -262,6 +282,20 @@ export async function runIngestionPipeline(opts: IngestOptions): Promise<IngestR
 		}
 	}
 
+	// If no structured nodes were found, create a root node so chunks have a parent
+	if (nodeRows.length === 0) {
+		const rootId = randomUUID();
+		nodeMap.set('root', rootId);
+		nodeRows.push({
+			id: rootId,
+			parentId: null,
+			nodeType: 'document',
+			heading: doc.title,
+			citationLabel: null,
+			nodePath: 'root',
+		});
+	}
+
 	// Insert legal_nodes
 	for (const n of nodeRows) {
 		const fullNodeText = chunks
@@ -357,11 +391,11 @@ export async function runIngestionPipeline(opts: IngestOptions): Promise<IngestR
 	}
 
 	// ── Stage F2: Extract Legal Definitions ──────────────────────────────────
-	await setStage(jobId, 'definitions', 90);
-	
+	await setStage(jobId, 'embedding', 90);
+
 	const glossaryRes = await pool.query(`SELECT term FROM legal_glossary`);
 	const allTerms = glossaryRes.rows.map(r => r.term.toLowerCase());
-	
+
 	const definitionRows: Array<[string, string, string, string, string]> = [];
 	for (const chunk of chunkRows) {
 		const textLower = chunk.text.toLowerCase();
@@ -377,12 +411,12 @@ export async function runIngestionPipeline(opts: IngestOptions): Promise<IngestR
 				let excerpt = chunk.text.substring(start, end);
 				if (start > 0) excerpt = '...' + excerpt;
 				if (end < chunk.text.length) excerpt = excerpt + '...';
-				
+
 				definitionRows.push([defId, term, term, chunk.nodeId, excerpt.trim()]);
 			}
 		}
 	}
-	
+
 	if (definitionRows.length > 0) {
 		// Bulk insert definitions
 		// Max length is small enough, but let's do it in a transaction
@@ -395,7 +429,7 @@ export async function runIngestionPipeline(opts: IngestOptions): Promise<IngestR
 				const key = `${t}-${nodeId}`;
 				if (seenDef.has(key)) continue;
 				seenDef.add(key);
-				
+
 				await client.query(
 					`INSERT INTO legal_definitions (id, term, normalized_term, defined_in_node_id, definition_text)
 					 VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING`,
@@ -443,59 +477,88 @@ export async function runIngestionPipeline(opts: IngestOptions): Promise<IngestR
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function uploadLibraryDocument(opts: {
-	fileBuffer: Buffer;
-	fileName: string;
-	title: string;
-	corpusType: string;
-	jurisdictionCode: string;
-	officialUrl?: string;
-	effectiveDate?: string;
-	userId: string;
-}): Promise<{ documentId: string; jobId: string }> {
-	const documentId = randomUUID();
-	const jobId = randomUUID();
-	const minioKey = `uploads/raw/${documentId}.pdf`;
+  fileBuffer: Buffer;
+  fileName: string;
+  title: string;
+  corpusType: string;
+  jurisdictionCode: string;
+  officialUrl?: string;
+  effectiveDate?: string;
+  userId: string;
+}): Promise<{
+  documentId: string;
+  jobId: string | null;
+  alreadyExists?: boolean;
+  processingStatus?: string | null;
+}> {
+  const documentId = randomUUID();
+  const jobId = randomUUID();
+  const minioKey = `uploads/raw/${documentId}.pdf`;
 
-	// Upload to MinIO (ensureBucket called inside putObject)
-	await putObject(BUCKET, minioKey, opts.fileBuffer, opts.fileBuffer.length, {
-		'Content-Type': 'application/pdf',
-		'x-original-filename': opts.fileName,
-	});
+  // Compute SHA-256 before storage so duplicate uploads can be treated as idempotent.
+  const { createHash } = await import('crypto');
+  const sourceHash = createHash('sha256').update(opts.fileBuffer).digest('hex');
 
-	// Compute SHA-256
-	const { createHash } = await import('crypto');
-	const sourceHash = createHash('sha256').update(opts.fileBuffer).digest('hex');
+  const existingRes = await pool.query(
+    `SELECT ld.id, ld.processing_status, latest_job.id AS job_id
+		 FROM library_documents ld
+		 LEFT JOIN LATERAL (
+		 	SELECT id
+		 	FROM ingestion_jobs
+		 	WHERE document_id = ld.id
+		 	ORDER BY created_at DESC NULLS LAST, id DESC
+		 	LIMIT 1
+		 ) latest_job ON true
+		 WHERE ld.source_hash = $1
+		 LIMIT 1`,
+    [sourceHash]
+  );
 
-	// Resolve jurisdiction ID
-	const jRes = await pool.query(`SELECT id FROM jurisdictions WHERE code = $1`, [
-		opts.jurisdictionCode,
-	]);
-	const jurisdictionId = jRes.rows[0]?.id ?? null;
+  if (existingRes.rowCount && existingRes.rows[0]) {
+    return {
+      documentId: existingRes.rows[0].id as string,
+      jobId: (existingRes.rows[0].job_id as string | null) ?? null,
+      alreadyExists: true,
+      processingStatus: (existingRes.rows[0].processing_status as string | null) ?? null,
+    };
+  }
 
-	// Insert library_documents row
-	await pool.query(
-		`INSERT INTO library_documents
+  // Upload to MinIO (ensureBucket called inside putObject)
+  await putObject(BUCKET, minioKey, opts.fileBuffer, opts.fileBuffer.length, {
+    'Content-Type': 'application/pdf',
+    'x-original-filename': opts.fileName,
+  });
+
+  // Resolve jurisdiction ID
+  const jRes = await pool.query(`SELECT id FROM jurisdictions WHERE code = $1`, [
+    opts.jurisdictionCode,
+  ]);
+  const jurisdictionId = jRes.rows[0]?.id ?? null;
+
+  // Insert library_documents row
+  await pool.query(
+    `INSERT INTO library_documents
 		   (id, source_type, corpus_type, jurisdiction_id, title, official_url, source_hash,
 		    mime_type, minio_key, effective_date, processing_status, uploaded_by)
 		 VALUES ($1, 'upload', $2::corpus_type, $3, $4, $5, $6, 'application/pdf', $7, $8, 'queued', $9)`,
-		[
-			documentId,
-			opts.corpusType || 'other',
-			jurisdictionId,
-			opts.title,
-			opts.officialUrl ?? null,
-			sourceHash,
-			minioKey,
-			opts.effectiveDate ?? null,
-			opts.userId,
-		]
-	);
+    [
+      documentId,
+      opts.corpusType || 'other',
+      jurisdictionId,
+      opts.title,
+      opts.officialUrl || null,
+      sourceHash,
+      minioKey,
+      opts.effectiveDate || null,
+      opts.userId,
+    ]
+  );
 
-	// Insert ingestion_jobs row
-	await pool.query(
-		`INSERT INTO ingestion_jobs (id, document_id, stage, status) VALUES ($1, $2, 'queued', 'running')`,
-		[jobId, documentId]
-	);
+  // Insert ingestion_jobs row
+  await pool.query(
+    `INSERT INTO ingestion_jobs (id, document_id, stage, status) VALUES ($1, $2, 'queued', 'running')`,
+    [jobId, documentId]
+  );
 
-	return { documentId, jobId };
+  return { documentId, jobId, alreadyExists: false, processingStatus: 'queued' };
 }

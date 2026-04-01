@@ -129,6 +129,35 @@ Write back to L0-L3
 
 ---
 
+## Degraded Response Contract (API Routes)
+
+**All GET API routes MUST return the same JSON shape on error as on success.** Clients destructure responses identically — a shape mismatch causes `undefined` reads and console errors.
+
+```typescript
+// SUCCESS path
+return json({ sessions: [...data], total: 5 });
+
+// DEGRADED path (catch block) — SAME top-level keys, empty/zero defaults
+return json({ sessions: [], total: 0 });
+
+// WRONG — missing sessions/total keys, client breaks
+return json({ error: 'Failed' }, { status: 500 });
+```
+
+**Rules:**
+- Catch blocks on GET handlers return **200** with empty-but-valid data (not 500 with error-only JSON)
+- Every top-level key from the success response must appear in the degraded response
+- Use empty arrays `[]`, zero `0`, `null`, or empty string `''` as defaults
+- POST/DELETE/PATCH action routes can return `{ error: '...' }` since clients check `response.ok`
+- Client-side fetches for GETs should always be able to destructure without `?.` on top-level keys
+
+**UUID validation on client fetch calls:**
+- Any component that fetches `/api/cases/${caseId}/...` must validate `caseId` is a UUID before fetching
+- Use `const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i` guard
+- Return early (skip fetch) if ID is empty string or non-UUID — prevents noisy 400s in console
+
+---
+
 ## Svelte 5 Runes (REQUIRED — No Svelte 4 Patterns)
 
 ```typescript

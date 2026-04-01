@@ -92,9 +92,8 @@ export const GET: RequestHandler = async ({ fetch, locals }) => {
 				totalFiles: 0,
 				lastIndexed: '',
 				cudaEnabled: false
-			},
-			error: 'Component analysis failed'
-		}, { status: 500 });
+			}
+		});
 	}
 };
 

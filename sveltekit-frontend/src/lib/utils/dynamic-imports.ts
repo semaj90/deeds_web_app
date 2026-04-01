@@ -78,44 +78,20 @@ export const loadAIServices = {
     }
   },
 
-  async gpuSomEmbeddings() {
-    try {
-      const mod = await import('$lib/services/gpu-som-embeddings');
-      return (mod as any).GPUSOMEmbeddings;
-    } catch {
-      console.warn('[dynamic-imports] GPU SOM embeddings not yet available');
-      return null;
-    }
-  },
-
   async contextualIntelligence() {
-    try {
-      const service = await import('$lib/services/contextual-intelligence-service');
-      return service;
-    } catch {
-      console.warn('[dynamic-imports] Contextual intelligence service not yet available');
-      return null;
-    }
+    // contextual-intelligence-service archived to deeds_labs (Phase 99 corruption)
+    // Server-side contextual chat is at /api/contextual/chat (fully wired)
+    return null;
   },
 
   async quantumCache() {
-    try {
-      const cache = await import('$lib/quantum/rag-cache');
-      return cache;
-    } catch {
-      console.warn('[dynamic-imports] RAG cache not yet available');
-      return null;
-    }
+    // rag-cache consolidated into server-side RAG pipeline
+    return null;
   },
 
   async simdGpuTiling() {
-    try {
-      const { simdGPUTilingEngine } = await import('$lib/evidence/simd-gpu-tiling-engine');
-      return simdGPUTilingEngine;
-    } catch {
-      console.warn('[dynamic-imports] SIMD GPU tiling engine not yet available');
-      return null;
-    }
+    // SIMD GPU tiling uses server-side compute-pool.ts + worker_threads
+    return null;
   }
 };
 

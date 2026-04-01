@@ -15,7 +15,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
 		const sessionId = cookies.get('auth_session');
 
 		if (!sessionId) {
-			return json({ authenticated: false, user: null }, { status: 401 });
+			return json({ authenticated: false, session: null, user: null }, { status: 401 });
 		}
 
 		// Validate session with Lucia v3
@@ -24,7 +24,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
 		if (!session || !user) {
 			// Session invalid, clear cookie
 			deleteSessionCookie(cookies);
-			return json({ authenticated: false, user: null }, { status: 401 });
+			return json({ authenticated: false, session: null, user: null }, { status: 401 });
 		}
 
 		// Refresh session cookie if needed (Lucia automatically handles session refresh)

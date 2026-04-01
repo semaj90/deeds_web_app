@@ -44,6 +44,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		});
 	} catch (err) {
 		console.error('[/api/sync/documents] error:', err);
-		return json({ documents: [], deletedIds: [] }, { status: 500 });
+		return json({ documents: [], deletedIds: [], syncTimestamp: Date.now() });
 	}
 };

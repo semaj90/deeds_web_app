@@ -3,7 +3,24 @@ import { json } from '@sveltejs/kit';
 
 /** GET /api/yorha/cluster-health — Cluster health metrics for YoRHa dashboard */
 export const GET: RequestHandler = async ({ locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+	if (!locals.user?.id) {
+    return json(
+      {
+        timestamp: new Date().toISOString(),
+        metrics: {},
+        thresholds: {
+          cpu_warning: 70,
+          cpu_critical: 90,
+          memory_warning: 75,
+          memory_critical: 90,
+          gpu_warning: 80,
+          gpu_critical: 95,
+        },
+        error: 'Unauthorized',
+      },
+      { status: 401 }
+    );
+  }
 	try {
 		// Collect system metrics
 		const memUsage = process.memoryUsage();

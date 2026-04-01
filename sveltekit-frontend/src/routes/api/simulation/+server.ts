@@ -122,15 +122,18 @@ const startSchema = z.object({
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user?.id) {
-		return json({ error: 'Unauthorized' }, { status: 401 });
+		return json({ success: false, error: 'Unauthorized' }, { status: 401 });
 	}
 
 	const body = await request.json().catch(() => null);
-	if (!body) return json({ error: 'Invalid JSON body' }, { status: 400 });
+	if (!body) return json({ success: false, error: 'Invalid JSON body' }, { status: 400 });
 
 	const parsed = startSchema.safeParse(body);
 	if (!parsed.success) {
-		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+		return json(
+      { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' },
+      { status: 400 }
+    );
 	}
 
 	const { fictionalCaseId } = parsed.data;
@@ -144,7 +147,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			.limit(1);
 
 		if (!caseRow) {
-			return json({ error: 'Fictional case not found' }, { status: 404 });
+			return json({ success: false, error: 'Fictional case not found' }, { status: 404 });
 		}
 
 		// Load related data in parallel
@@ -225,21 +228,26 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		// Track user's sessions
 		await redis.sadd(USER_SESSIONS_PREFIX + locals.user.id, sessionId);
 
-		return json({
-			sessionId,
-			status: 'active',
-			procedureType: session.procedureType,
-			currentPhase: phases[0],
-			totalPhases: phases.length,
-			caseNumber: caseRow.caseId,
-			charge: caseRow.charge,
-			defendant: caseRow.defendantName,
-			jurisdiction: caseRow.jurisdiction,
-			dialogue: session.dialogueHistory,
-		}, { status: 201 });
+		const responseData = {
+      sessionId,
+      status: 'active',
+      procedureType: session.procedureType,
+      currentPhase: phases[0],
+      totalPhases: phases.length,
+      caseNumber: caseRow.caseId,
+      charge: caseRow.charge,
+      defendant: caseRow.defendantName,
+      jurisdiction: caseRow.jurisdiction,
+      dialogue: session.dialogueHistory,
+    };
+
+    return json({ success: true, data: responseData, ...responseData }, { status: 201 });
 	} catch (err) {
 		console.error('[simulation] POST error:', err);
-		return json({ error: 'Failed to start simulation' }, { status: 500 });
+		return json(
+      { success: false, error: 'Failed to start simulation', data: null },
+      { status: 500 }
+    );
 	}
 };
 
@@ -285,7 +293,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 		});
 	} catch (err) {
 		console.error('[simulation] GET error:', err);
-		return json({ error: 'Failed to list sessions' }, { status: 500 });
+		return json({ sessions: [] });
 	}
 };
 

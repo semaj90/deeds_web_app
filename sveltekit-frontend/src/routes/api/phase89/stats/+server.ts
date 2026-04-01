@@ -25,7 +25,21 @@ export const GET: RequestHandler = async ({ locals }) => {
 		return json(result.rows[0]);
 	} catch (error) {
 		console.error('Error fetching stats:', error);
-		return json({ error: 'Failed to fetch stats' }, { status: 500 });
+		return json(
+      {
+        file_nodes: 0,
+        error_nodes: 0,
+        symbol_nodes: 0,
+        doc_nodes: 0,
+        import_edges: 0,
+        symbol_edges: 0,
+        error_symbol_edges: 0,
+        indexed_files: 0,
+        error_embeddings: 0,
+        error: 'Failed to fetch stats',
+      },
+      { status: 500 }
+    );
 	}
 };
 

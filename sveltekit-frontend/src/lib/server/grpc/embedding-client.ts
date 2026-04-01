@@ -24,12 +24,53 @@ export interface ProtoEmbeddingRequest { texts: string[]; model?: string; dimens
 export interface ProtoEmbeddingResponse { embeddings: number[][]; model: string; dimensions: number; }
 export interface ProtoHealthResponse { status: string; model: string; ready: boolean; }
 
+export interface EmbeddingOptions {
+  httpBatchTimeoutMs?: number;
+  httpSingleTimeoutMs?: number;
+  preferSequentialHttp?: boolean;
+  skipCacheRead?: boolean;
+  skipCacheWrite?: boolean;
+}
+
+type EmbeddingSource = 'grpc' | 'quic' | 'http-ollama' | 'http-ollama-sequential';
+
+export type EmbeddingAttemptStatus = 'success' | 'failed' | 'skipped' | 'cache-hit';
+
+export interface EmbeddingAttempt {
+  transport: EmbeddingSource;
+  status: EmbeddingAttemptStatus;
+  detail?: string;
+  durationMs?: number;
+}
+
 export interface EmbeddingResult {
-	vectors: number[][];
-	model: string;
-	dimension: number;
-	source: 'grpc' | 'quic' | 'http-ollama';
-	totalMs: number;
+  vectors: number[][];
+  model: string;
+  dimension: number;
+  source: EmbeddingSource;
+  totalMs: number;
+  cacheHit?: boolean;
+  attempts?: EmbeddingAttempt[];
+}
+
+interface CachedEmbeddingEntry {
+  vector: number[];
+  source?: EmbeddingSource;
+}
+
+class EmbeddingGenerationError extends Error {
+  attempts: EmbeddingAttempt[];
+
+  constructor(message: string, attempts: EmbeddingAttempt[]) {
+    super(message);
+    this.name = 'EmbeddingGenerationError';
+    this.attempts = attempts;
+  }
+}
+
+interface EmbeddingCallResult {
+  vectors: number[][] | null;
+  detail?: string;
 }
 
 const HTTP_BATCH_TIMEOUT_MS = Number(process.env.EMBED_BATCH_TIMEOUT_MS ?? 180_000);
@@ -40,6 +81,7 @@ const HTTP_SINGLE_TIMEOUT_MS = Number(process.env.EMBED_SINGLE_TIMEOUT_MS ?? 45_
 let grpcClient: any = null;
 let grpcLoadFailed = false;
 let grpcRetryAt = 0; // Timestamp for next retry after failure
+let grpcFailLogged = false; // Only log first failure to avoid spam
 
 async function getGrpcClient(): Promise<any> {
   if (grpcLoadFailed) {
@@ -86,10 +128,13 @@ async function getGrpcClient(): Promise<any> {
 
     return grpcClient;
   } catch (err) {
-    console.warn(
-      '[embedding-client] gRPC client init failed, will retry in 30s:',
-      (err as Error).message
-    );
+    if (!grpcFailLogged) {
+      console.warn(
+        '[embedding-client] gRPC client init failed, will retry silently:',
+        (err as Error).message
+      );
+      grpcFailLogged = true;
+    }
     grpcLoadFailed = true;
     grpcRetryAt = Date.now() + 30_000;
     return null;
@@ -98,9 +143,9 @@ async function getGrpcClient(): Promise<any> {
 
 // ── gRPC embedding call ────────────────────────────────────────────────────
 
-async function generateViaGrpc(texts: string[], timeoutMs = 5000): Promise<number[][] | null> {
+async function generateViaGrpc(texts: string[], timeoutMs = 5000): Promise<EmbeddingCallResult> {
   const client = await getGrpcClient();
-  if (!client) return null;
+  if (!client) return { vectors: null, detail: 'client unavailable' };
 
   return new Promise((resolve) => {
     const deadline = new Date(Date.now() + timeoutMs);
@@ -110,7 +155,7 @@ async function generateViaGrpc(texts: string[], timeoutMs = 5000): Promise<numbe
     const chunks = texts.map((text, i) => ({
       chunkId: `chunk-${i}`,
       text,
-      language: 'en'
+      language: 'en',
     }));
 
     client.generateEmbeddings(
@@ -118,23 +163,22 @@ async function generateViaGrpc(texts: string[], timeoutMs = 5000): Promise<numbe
       { deadline },
       (err: Error | null, response: any) => {
         if (err) {
-          console.warn('[embedding-client] gRPC call failed:', err.message);
-          resolve(null);
+          resolve({ vectors: null, detail: err.message });
           return;
         }
 
         if (!response || response.status === 'error') {
           console.warn('[embedding-client] gRPC response error:', response?.status);
-          resolve(null);
+          resolve({ vectors: null, detail: response?.status ?? 'response error' });
           return;
         }
 
         // Proto: EmbeddingResponse.embeddings[] each has .vector (repeated float)
         const vectors = (response.embeddings ?? []).map((e: any) =>
-          Array.isArray(e.vector) ? e.vector : (Array.isArray(e.values) ? e.values : [])
+          Array.isArray(e.vector) ? e.vector : Array.isArray(e.values) ? e.values : []
         );
 
-        resolve(vectors);
+        resolve({ vectors, detail: 'ok' });
       }
     );
   });
@@ -145,6 +189,7 @@ async function generateViaGrpc(texts: string[], timeoutMs = 5000): Promise<numbe
 let natsConnection: any = null;
 let natsLoadFailed = false;
 let natsRetryAt = 0; // Timestamp for next retry after failure
+let natsFailLogged = false; // Only log first failure to avoid spam
 
 async function getNatsConnection(): Promise<any> {
   if (natsLoadFailed) {
@@ -166,19 +211,22 @@ async function getNatsConnection(): Promise<any> {
     });
     return natsConnection;
   } catch (err) {
-    console.warn(
-      '[embedding-client] NATS/QUIC init failed, will retry in 30s:',
-      (err as Error).message
-    );
+    if (!natsFailLogged) {
+      console.warn(
+        '[embedding-client] NATS/QUIC init failed, will retry silently:',
+        (err as Error).message
+      );
+      natsFailLogged = true;
+    }
     natsLoadFailed = true;
     natsRetryAt = Date.now() + 30_000;
     return null;
   }
 }
 
-async function generateViaQuic(texts: string[], timeoutMs = 5000): Promise<number[][] | null> {
+async function generateViaQuic(texts: string[], timeoutMs = 5000): Promise<EmbeddingCallResult> {
   const nc = await getNatsConnection();
-  if (!nc) return null;
+  if (!nc) return { vectors: null, detail: 'connection unavailable' };
 
   try {
     const codec = {
@@ -199,12 +247,13 @@ async function generateViaQuic(texts: string[], timeoutMs = 5000): Promise<numbe
 
     const response = codec.decode(msg.data);
     if (response.status === 'success' && Array.isArray(response.embeddings)) {
-      return response.embeddings;
+      return { vectors: response.embeddings, detail: 'ok' };
     }
-    return null;
+    return { vectors: null, detail: response?.status ?? 'response error' };
   } catch (err) {
-    console.warn('[embedding-client] QUIC/NATS embedding failed:', (err as Error).message);
-    return null;
+    const message = err instanceof Error ? err.message : String(err);
+    console.warn('[embedding-client] QUIC/NATS embedding failed:', message);
+    return { vectors: null, detail: message };
   }
 }
 
@@ -214,13 +263,58 @@ async function generateViaQuic(texts: string[], timeoutMs = 5000): Promise<numbe
  * Batch embedding via Ollama /api/embed (input: string[] → embeddings: number[][]).
  * Falls back to sequential /api/embeddings if batch API is unavailable.
  */
-async function generateViaHttp(texts: string[]): Promise<number[][]> {
+async function generateViaHttp(
+  texts: string[],
+  options: EmbeddingOptions = {}
+): Promise<{
+  vectors: number[][];
+  source: Extract<EmbeddingSource, 'http-ollama' | 'http-ollama-sequential'>;
+  attempts: EmbeddingAttempt[];
+}> {
+  const attempts: EmbeddingAttempt[] = [];
+
+  if (options.preferSequentialHttp) {
+    attempts.push({
+      transport: 'http-ollama',
+      status: 'skipped',
+      detail: 'preferSequentialHttp enabled',
+    });
+
+    const sequentialStart = performance.now();
+    try {
+      return {
+        vectors: await generateViaHttpSingle(texts, options),
+        source: 'http-ollama-sequential',
+        attempts: [
+          ...attempts,
+          {
+            transport: 'http-ollama-sequential',
+            status: 'success',
+            durationMs: Math.round(performance.now() - sequentialStart),
+          },
+        ],
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new EmbeddingGenerationError(message, [
+        ...attempts,
+        {
+          transport: 'http-ollama-sequential',
+          status: 'failed',
+          detail: message,
+          durationMs: Math.round(performance.now() - sequentialStart),
+        },
+      ]);
+    }
+  }
+
+  const batchStart = performance.now();
   try {
     const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, input: texts }),
-      signal: AbortSignal.timeout(HTTP_BATCH_TIMEOUT_MS),
+      signal: AbortSignal.timeout(options.httpBatchTimeoutMs ?? HTTP_BATCH_TIMEOUT_MS),
     });
 
     if (res.ok) {
@@ -230,22 +324,78 @@ async function generateViaHttp(texts: string[]): Promise<number[][]> {
         Array.isArray(data.embeddings) &&
         data.embeddings.length === texts.length
       ) {
-        return data.embeddings;
+        return {
+          vectors: data.embeddings,
+          source: 'http-ollama',
+          attempts: [
+            {
+              transport: 'http-ollama',
+              status: 'success',
+              durationMs: Math.round(performance.now() - batchStart),
+            },
+            {
+              transport: 'http-ollama-sequential',
+              status: 'skipped',
+              detail: 'batch embedding succeeded',
+            },
+          ],
+        };
       }
+
+      attempts.push({
+        transport: 'http-ollama',
+        status: 'failed',
+        detail: `unexpected response shape${res.status ? ` (${res.status})` : ''}`,
+        durationMs: Math.round(performance.now() - batchStart),
+      });
     }
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
     console.warn(
       '[embedding-client] HTTP batch embedding failed, falling back to sequential:',
-      error instanceof Error ? error.message : error
+      message
     );
-    // Batch API unavailable — fall through to sequential
+    attempts.push({
+      transport: 'http-ollama',
+      status: 'failed',
+      detail: message,
+      durationMs: Math.round(performance.now() - batchStart),
+    });
   }
 
-  return generateViaHttpSingle(texts);
+  const sequentialStart = performance.now();
+  try {
+    return {
+      vectors: await generateViaHttpSingle(texts, options),
+      source: 'http-ollama-sequential',
+      attempts: [
+        ...attempts,
+        {
+          transport: 'http-ollama-sequential',
+          status: 'success',
+          durationMs: Math.round(performance.now() - sequentialStart),
+        },
+      ],
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new EmbeddingGenerationError(message, [
+      ...attempts,
+      {
+        transport: 'http-ollama-sequential',
+        status: 'failed',
+        detail: message,
+        durationMs: Math.round(performance.now() - sequentialStart),
+      },
+    ]);
+  }
 }
 
 /** Sequential fallback using old /api/embeddings (single prompt per request) */
-async function generateViaHttpSingle(texts: string[]): Promise<number[][]> {
+async function generateViaHttpSingle(
+  texts: string[],
+  options: EmbeddingOptions = {}
+): Promise<number[][]> {
   const vectors: number[][] = [];
 
   for (const text of texts) {
@@ -253,7 +403,7 @@ async function generateViaHttpSingle(texts: string[]): Promise<number[][]> {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, prompt: text }),
-      signal: AbortSignal.timeout(HTTP_SINGLE_TIMEOUT_MS),
+      signal: AbortSignal.timeout(options.httpSingleTimeoutMs ?? HTTP_SINGLE_TIMEOUT_MS),
     });
 
     if (!res.ok) throw new Error(`Ollama embedding failed: ${res.status}`);
@@ -271,31 +421,57 @@ async function generateViaHttpSingle(texts: string[]): Promise<number[][]> {
 const EMBED_CACHE_TTL = 24 * 60 * 60; // 24h — embeddings are deterministic for same model+text
 
 async function getCachedEmbedding(text: string): Promise<number[] | null> {
-	try {
-		const { getRedis } = await import('../redis.js');
-		const redis = getRedis();
-		if (!redis) return null;
-		const { createHash } = await import('crypto');
-		const key = `embed:${SERVER_EMBEDDING_MODEL}:${createHash('sha256').update(text).digest('hex').slice(0, 16)}`;
-		const cached = await redis.get(key);
-		if (!cached) return null;
-		return JSON.parse(cached);
-	} catch {
-		return null;
-	}
+  try {
+    const { getRedis } = await import('../redis.js');
+    const redis = getRedis();
+    if (!redis) return null;
+    const { createHash } = await import('crypto');
+    const key = `embed:${SERVER_EMBEDDING_MODEL}:${createHash('sha256').update(text).digest('hex').slice(0, 16)}`;
+    const cached = await redis.get(key);
+    if (!cached) return null;
+    const parsed = JSON.parse(cached) as number[] | CachedEmbeddingEntry;
+    if (Array.isArray(parsed)) return parsed;
+    return Array.isArray(parsed.vector) ? parsed.vector : null;
+  } catch {
+    return null;
+  }
 }
 
-async function setCachedEmbedding(text: string, vector: number[]): Promise<void> {
-	try {
-		const { getRedis } = await import('../redis.js');
-		const redis = getRedis();
-		if (!redis) return;
-		const { createHash } = await import('crypto');
-		const key = `embed:${SERVER_EMBEDDING_MODEL}:${createHash('sha256').update(text).digest('hex').slice(0, 16)}`;
-		await redis.set(key, JSON.stringify(vector), 'EX', EMBED_CACHE_TTL);
-	} catch {
-		// Cache write failure is non-fatal
-	}
+async function getCachedEmbeddingEntry(text: string): Promise<CachedEmbeddingEntry | null> {
+  try {
+    const { getRedis } = await import('../redis.js');
+    const redis = getRedis();
+    if (!redis) return null;
+    const { createHash } = await import('crypto');
+    const key = `embed:${SERVER_EMBEDDING_MODEL}:${createHash('sha256').update(text).digest('hex').slice(0, 16)}`;
+    const cached = await redis.get(key);
+    if (!cached) return null;
+    const parsed = JSON.parse(cached) as number[] | CachedEmbeddingEntry;
+    if (Array.isArray(parsed)) {
+      return { vector: parsed, source: 'http-ollama' };
+    }
+    if (!Array.isArray(parsed.vector)) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+async function setCachedEmbedding(
+  text: string,
+  vector: number[],
+  source: EmbeddingSource
+): Promise<void> {
+  try {
+    const { getRedis } = await import('../redis.js');
+    const redis = getRedis();
+    if (!redis) return;
+    const { createHash } = await import('crypto');
+    const key = `embed:${SERVER_EMBEDDING_MODEL}:${createHash('sha256').update(text).digest('hex').slice(0, 16)}`;
+    await redis.set(key, JSON.stringify({ vector, source }), 'EX', EMBED_CACHE_TTL);
+  } catch {
+    // Cache write failure is non-fatal
+  }
 }
 
 /**
@@ -303,74 +479,146 @@ async function setCachedEmbedding(text: string, vector: number[]): Promise<void>
  * Checks Redis cache first, then falls back through 4-tier chain.
  * 4-tier fallback: gRPC → QUIC/NATS → HTTP batch → HTTP sequential.
  */
-export async function generateEmbeddings(texts: string[]): Promise<EmbeddingResult> {
-	const start = performance.now();
+export async function generateEmbeddings(
+  texts: string[],
+  options: EmbeddingOptions = {}
+): Promise<EmbeddingResult> {
+  const start = performance.now();
+  const attempts: EmbeddingAttempt[] = [];
 
-	// Check cache for each text
-	const cachedResults = await Promise.all(texts.map(getCachedEmbedding));
-	const uncachedIndices = cachedResults.map((v, i) => v === null ? i : -1).filter(i => i >= 0);
+  const cachedEntries = options.skipCacheRead
+    ? texts.map(() => null)
+    : await Promise.all(texts.map(getCachedEmbeddingEntry));
 
-	// All cached — return immediately
-	if (uncachedIndices.length === 0) {
-		return {
-			vectors: cachedResults as number[][],
-			model: SERVER_EMBEDDING_MODEL,
-			dimension: cachedResults[0]?.length ?? 768,
-			source: 'http-ollama',
-			totalMs: Math.round(performance.now() - start)
-		};
-	}
+  // Check cache for each text
+  const cachedResults = cachedEntries.map((entry) => entry?.vector ?? null);
+  const uncachedIndices = cachedResults.map((v, i) => (v === null ? i : -1)).filter((i) => i >= 0);
 
-	// Generate only uncached embeddings
-	const uncachedTexts = uncachedIndices.map(i => texts[i]);
-	let newVectors: number[][] | null = null;
-	let source: EmbeddingResult['source'] = 'http-ollama';
-	let model = SERVER_EMBEDDING_MODEL;
+  // All cached — return immediately
+  if (uncachedIndices.length === 0) {
+    const cachedSource = cachedEntries[0]?.source ?? 'http-ollama';
+    return {
+      vectors: cachedResults as number[][],
+      model: SERVER_EMBEDDING_MODEL,
+      dimension: cachedResults[0]?.length ?? 768,
+      source: cachedSource,
+      totalMs: Math.round(performance.now() - start),
+      cacheHit: true,
+      attempts: [
+        {
+          transport: cachedSource,
+          status: 'cache-hit',
+          detail: 'embedding-cache',
+        },
+      ],
+    };
+  }
 
-	// Tier 1: gRPC (binary protocol, lowest latency)
-	if (ENV.EMBEDDING_GRPC_ENABLED) {
-		const grpcVectors = await generateViaGrpc(uncachedTexts);
-		if (grpcVectors && grpcVectors.length === uncachedTexts.length && grpcVectors[0]?.length > 0) {
-			newVectors = grpcVectors;
-			source = 'grpc';
-			model = 'embeddinggemma-grpc';
-		}
-	}
+  // Generate only uncached embeddings
+  const uncachedTexts = uncachedIndices.map((i) => texts[i]);
+  let newVectors: number[][] | null = null;
+  let source: EmbeddingResult['source'] = 'http-ollama';
+  let model = SERVER_EMBEDDING_MODEL;
 
-	// Tier 2: QUIC/NATS (HTTP/3, 0-RTT, multiplexed)
-	if (!newVectors && ENV.EMBEDDING_QUIC_ENABLED) {
-		const quicVectors = await generateViaQuic(uncachedTexts);
-		if (quicVectors && quicVectors.length === uncachedTexts.length && quicVectors[0]?.length > 0) {
-			newVectors = quicVectors;
-			source = 'quic';
-			model = 'embeddinggemma-quic';
-		}
-	}
+  // Tier 1: gRPC (binary protocol, lowest latency)
+  if (ENV.EMBEDDING_GRPC_ENABLED) {
+    const grpcStart = performance.now();
+    const grpcResult = await generateViaGrpc(uncachedTexts);
+    const grpcVectors = grpcResult.vectors;
+    if (grpcVectors && grpcVectors.length === uncachedTexts.length && grpcVectors[0]?.length > 0) {
+      newVectors = grpcVectors;
+      source = 'grpc';
+      model = 'embeddinggemma-grpc';
+      attempts.push({
+        transport: 'grpc',
+        status: 'success',
+        detail: grpcResult.detail,
+        durationMs: Math.round(performance.now() - grpcStart),
+      });
+    } else {
+      attempts.push({
+        transport: 'grpc',
+        status: 'failed',
+        detail: grpcResult.detail ?? 'unavailable',
+        durationMs: Math.round(performance.now() - grpcStart),
+      });
+    }
+  } else {
+    attempts.push({ transport: 'grpc', status: 'skipped', detail: 'disabled by config' });
+  }
 
-	// Tier 3+4: HTTP/Ollama (batch → sequential fallback)
-	if (!newVectors) {
-		newVectors = await generateViaHttp(uncachedTexts);
-	}
+  // Tier 2: QUIC/NATS (HTTP/3, 0-RTT, multiplexed)
+  if (!newVectors && ENV.EMBEDDING_QUIC_ENABLED) {
+    const quicStart = performance.now();
+    const quicResult = await generateViaQuic(uncachedTexts);
+    const quicVectors = quicResult.vectors;
+    if (quicVectors && quicVectors.length === uncachedTexts.length && quicVectors[0]?.length > 0) {
+      newVectors = quicVectors;
+      source = 'quic';
+      model = 'embeddinggemma-quic';
+      attempts.push({
+        transport: 'quic',
+        status: 'success',
+        detail: quicResult.detail,
+        durationMs: Math.round(performance.now() - quicStart),
+      });
+    } else {
+      attempts.push({
+        transport: 'quic',
+        status: 'failed',
+        detail: quicResult.detail ?? 'unavailable',
+        durationMs: Math.round(performance.now() - quicStart),
+      });
+    }
+  } else if (!newVectors) {
+    attempts.push({ transport: 'quic', status: 'skipped', detail: 'disabled by config' });
+  }
 
-	// Merge cached + new, and cache new results
-	const vectors = [...cachedResults] as number[][];
-	for (let j = 0; j < uncachedIndices.length; j++) {
-		const idx = uncachedIndices[j];
-		vectors[idx] = newVectors[j];
-	}
+  // Tier 3+4: HTTP/Ollama (batch → sequential fallback)
+  if (!newVectors) {
+    try {
+      const httpResult = await generateViaHttp(uncachedTexts, options);
+      newVectors = httpResult.vectors;
+      source = httpResult.source;
+      attempts.push(...httpResult.attempts);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      const httpAttempts =
+        error instanceof EmbeddingGenerationError
+          ? error.attempts
+          : [
+              {
+                transport: 'http-ollama-sequential' as const,
+                status: 'failed' as const,
+                detail: message,
+              },
+            ];
+      attempts.push(...httpAttempts);
+      throw new EmbeddingGenerationError(message, attempts);
+    }
+  }
 
-	// Fire-and-forget cache writes for new embeddings
-	for (let j = 0; j < uncachedIndices.length; j++) {
-		setCachedEmbedding(texts[uncachedIndices[j]], newVectors[j]).catch(() => {});
-	}
+  // Merge cached + new, and cache new results
+  const vectors = [...cachedResults] as number[][];
+  for (let j = 0; j < uncachedIndices.length; j++) {
+    const idx = uncachedIndices[j];
+    vectors[idx] = newVectors[j];
+  }
 
-	return {
-		vectors,
-		model,
-		dimension: vectors[0]?.length ?? 768,
-		source,
-		totalMs: Math.round(performance.now() - start)
-	};
+  // Fire-and-forget cache writes for new embeddings
+  for (let j = 0; !options.skipCacheWrite && j < uncachedIndices.length; j++) {
+    setCachedEmbedding(texts[uncachedIndices[j]], newVectors[j], source).catch(() => {});
+  }
+
+  return {
+    vectors,
+    model,
+    dimension: vectors[0]?.length ?? 768,
+    source,
+    totalMs: Math.round(performance.now() - start),
+    cacheHit: false,
+    attempts,
+  };
 }
 
 /**

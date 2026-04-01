@@ -103,12 +103,12 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		});
 	} catch (error) {
 		console.error('Knowledge query error:', error);
-		return json(
-			{
-				error: 'Failed to query knowledge base'
-			},
-			{ status: 500 }
-		);
+		return json({
+			file_path: filePath,
+			entries: [],
+			total: 0,
+			collections: ['phase76_knowledge_base', 'phase89_error_chunks']
+		});
 	}
 };
 

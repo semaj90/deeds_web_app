@@ -15,6 +15,17 @@ import { isUuid } from '$lib/server/validation.js';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+  const emptyDocument = {
+    id: params.id,
+    title: '',
+    url: '',
+    content: '',
+    summary: '',
+    entities: [],
+    tags: [],
+    scrapedAt: '',
+    minioKey: '',
+  };
   try {
     const { id } = params;
 
@@ -58,21 +69,21 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     if (error instanceof Error) {
       if (error.message.includes('MinIO')) {
         return json(
-          { error: 'Storage service unavailable' },
+          { success: false, document: emptyDocument, error: 'Storage service unavailable' },
           { status: 503 }
         );
       }
 
       if (error.message.includes('Qdrant')) {
         return json(
-          { error: 'Search service unavailable' },
+          { success: false, document: emptyDocument, error: 'Search service unavailable' },
           { status: 503 }
         );
       }
     }
 
     return json(
-      { error: 'Internal server error' },
+      { success: false, document: emptyDocument, error: 'Internal server error' },
       { status: 500 }
     );
   }

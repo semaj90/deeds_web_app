@@ -84,6 +84,6 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     return json({ results, query });
   } catch (error) {
     console.error('Error retrieving docs:', error);
-    return json({ error: 'Document lookup failed' }, { status: 500 });
+    return json({ results: [], query: '', error: 'Document lookup failed' }, { status: 500 });
   }
 };

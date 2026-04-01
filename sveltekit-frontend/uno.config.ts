@@ -1,17 +1,12 @@
 import extractorSvelte from '@unocss/extractor-svelte';
-import { defineConfig, presetUno, presetIcons, presetTypography, presetWebFonts } from 'unocss';
+import { defineConfig, presetUno, presetIcons, presetTypography } from 'unocss';
 
 export default defineConfig({
   presets: [
     presetUno(),
     presetIcons(),
     presetTypography(),
-    presetWebFonts({
-      fonts: {
-        sans: 'Inter:400,500,600,700',
-        mono: 'JetBrains Mono:400,500,600',
-      },
-    }),
+    // Web fonts loaded via app.html <link> + static/fonts/ — no need for presetWebFonts
   ],
   extractors: [extractorSvelte()],
   theme: {

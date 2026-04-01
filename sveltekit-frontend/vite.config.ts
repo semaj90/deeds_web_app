@@ -216,13 +216,14 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       target: 'ES2022',
+      manifest: true, // Required for SvelteKit compile step to find .vite/manifest.json
       minify: 'esbuild',
       cssMinify: 'esbuild', // Use esbuild for CSS (lightningcss has issues with @apply and malformed var())
       sourcemap: false,
       // Skip processing large binary assets (ONNX models, WASM files)
       assetsInlineLimit: 0, // Don't inline any assets (keeps them as separate files)
       rollupOptions: {
-        external: ['@xenova/transformers', 'piper-wasm', 'nats'],
+        external: ['@xenova/transformers', 'piper-wasm', 'nats', 'dockerode', 'ssh2'],
         output: {
           manualChunks: (id) => {
             // Rolldown requires manualChunks to be a function, not an object
@@ -298,6 +299,7 @@ export default defineConfig(({ mode }) => {
         '@xenova/transformers',
         'piper-wasm',
         'nats',
+        'ssh2',
       ],
     },
     resolve: {

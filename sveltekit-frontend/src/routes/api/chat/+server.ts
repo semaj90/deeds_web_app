@@ -79,6 +79,23 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			durationMs,
 		});
 
+		// Publish both messages to chat.context queue for embedding indexing (non-blocking)
+		import('$lib/server/queue/rabbitmq-manager-fixed.js')
+			.then(({ rabbitmq }) => {
+				rabbitmq.publishChatContext({
+					sessionId: 'api-chat',
+					message: userContent,
+					role: 'user',
+				});
+				rabbitmq.publishChatContext({
+					sessionId: 'api-chat',
+					message: responseText.slice(0, 5000),
+					role: 'assistant',
+					metadata: { model: data.model || 'gemma3-legal:latest' },
+				});
+			})
+			.catch(() => {});
+
 		return json({
 			message: responseText,
 			response: responseText,

@@ -44,6 +44,15 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		});
 	} catch (err) {
 		console.error('[chat/replay] Redis stream read failed:', (err as Error).message);
-		return json({ error: 'Stream replay unavailable' }, { status: 503 });
+		return json(
+      {
+        conversationId,
+        entries: 0,
+        lastId: fromId,
+        text: '',
+        error: 'Stream replay unavailable',
+      },
+      { status: 503 }
+    );
 	}
 };

@@ -15,7 +15,23 @@ const ollamaTagsSchema = z.object({
 }).passthrough();
 
 export const GET: RequestHandler = async ({ locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+	if (!locals.user?.id) {
+    return json(
+      {
+        activeChats: 0,
+        ragQueries: 0,
+        documentsAnalyzed: 0,
+        citationsFound: 0,
+        casesProcessed: 0,
+        assistantSessions: 0,
+        embeddingModel: 'embeddinggemma:latest',
+        llmModel: 'gemma3-legal:latest',
+        ollamaStatus: 'unauthorized',
+        error: 'Unauthorized',
+      },
+      { status: 401 }
+    );
+  }
 	const ollamaUrl = ENV.OLLAMA_BASE_URL;
 	let ollamaStatus = 'disconnected';
 	let embeddingModel = 'embeddinggemma:latest';

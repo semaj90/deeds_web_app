@@ -45,7 +45,55 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     });
   } catch (err) {
     console.error('[evidence] GET error:', err);
-    return json({ error: 'Failed to fetch evidence' }, { status: 500 });
+    return json(
+      {
+        id: params.id,
+        caseId: null,
+        userId: null,
+        title: '',
+        description: null,
+        filePath: null,
+        fileType: null,
+        fileSize: null,
+        hash: null,
+        source: null,
+        dateObtained: null,
+        chainOfCustody: null,
+        metadata: null,
+        createdAt: null,
+        updatedAt: null,
+        criminalId: null,
+        evidenceType: null,
+        subType: null,
+        fileUrl: null,
+        fileName: null,
+        canvasPosition: {},
+        uploadedBy: null,
+        uploadedAt: null,
+        evidenceNumber: null,
+        type: null,
+        summary: null,
+        posX: null,
+        posY: null,
+        collectedAt: null,
+        collectedBy: null,
+        mimeType: null,
+        tags: [],
+        aiTags: [],
+        aiAnalysis: null,
+        aiSummary: null,
+        verifiedAt: null,
+        verified: false,
+        status: 'pending',
+        extractedText: null,
+        entities: [],
+        keywords: [],
+        embedding: null,
+        deletedAt: null,
+        error: 'Failed to fetch evidence',
+      },
+      { status: 500 }
+    );
   }
 };
 

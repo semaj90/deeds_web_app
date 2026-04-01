@@ -151,7 +151,7 @@ async function setCachedExtraction(
 export async function POST({ request, locals }: RequestEvent) {
   // Auth guard: reject unauthenticated uploads
   if (!locals.user?.id) {
-    return json({ error: 'Unauthorized' }, { status: 401 });
+    return json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
 
   // Rate limit: 10 uploads/min per client (heavy operation)
@@ -159,6 +159,7 @@ export async function POST({ request, locals }: RequestEvent) {
   if (!rateCheck.allowed) {
     return json(
       {
+        success: false,
         error: `Rate limit exceeded. Try again in ${Math.ceil((rateCheck.resetTime - Date.now()) / 1000)}s`,
       },
       { status: 429 }
@@ -172,7 +173,7 @@ export async function POST({ request, locals }: RequestEvent) {
     const file = formData.get('file') as File | null;
 
     if (!file || typeof file.arrayBuffer !== 'function') {
-      return json({ error: 'No file provided' }, { status: 400 });
+      return json({ success: false, error: 'No file provided' }, { status: 400 });
     }
 
     // Validate form fields with Zod
@@ -184,7 +185,10 @@ export async function POST({ request, locals }: RequestEvent) {
     };
     const parsed = evidenceUploadSchema.safeParse(formFields);
     if (!parsed.success) {
-      return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+      return json(
+        { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' },
+        { status: 400 }
+      );
     }
     const caseId = parsed.data.caseId ?? null;
     const title = parsed.data.title ?? '';
@@ -195,7 +199,7 @@ export async function POST({ request, locals }: RequestEvent) {
 
     if (file.size > MAX_FILE_SIZE) {
       return json(
-        { error: `File too large. Maximum ${MAX_FILE_SIZE / 1024 / 1024}MB.` },
+        { success: false, error: `File too large. Maximum ${MAX_FILE_SIZE / 1024 / 1024}MB.` },
         { status: 400 }
       );
     }
@@ -229,9 +233,16 @@ export async function POST({ request, locals }: RequestEvent) {
     updateJob(jobId, { step: 'db-insert', progress: 50, message: 'Saving to database...' });
 
     const evidenceNumber = `EV-${Date.now().toString(36).toUpperCase()}`;
+    const initialMetadata = JSON.stringify({
+      textLength: null,
+      extractionMethod: null,
+      extractionStatus: 'pending',
+      uploadedVia: 'api',
+    });
     const insertResult = await db.execute(sql`
 			INSERT INTO evidence (case_id, evidence_number, title, type, summary, description,
-				evidence_type, file_type, file_url, file_name, file_size, hash, uploaded_at)
+				evidence_type, file_type, file_url, file_name, file_size, hash, uploaded_at, status, metadata,
+				user_id, uploaded_by)
 			VALUES (
 				${caseId ?? '00000000-0000-0000-0000-000000000000'},
 				${evidenceNumber},
@@ -245,7 +256,11 @@ export async function POST({ request, locals }: RequestEvent) {
 				${file.name},
 				${file.size},
 				${'sha256:' + fileHash},
-				NOW()
+				NOW(),
+				'uploaded',
+				${initialMetadata}::jsonb,
+				${locals.user.id},
+				${locals.user.id}
 			)
 			RETURNING id
 		`);
@@ -308,21 +323,27 @@ export async function POST({ request, locals }: RequestEvent) {
       caseId ? invalidateCaseCache(caseId, 'evidence_create') : Promise.resolve(),
     ]).catch((err) => console.warn('[Upload] Cache invalidation failed:', err));
 
+    const responseData = {
+      id: evidenceId,
+      jobId,
+      status: 'uploaded',
+      fileName: file.name,
+      minioKey: objectKey,
+      hash: fileHash,
+    };
+
     return json(
       {
-        id: evidenceId,
-        jobId,
-        status: 'uploaded',
-        fileName: file.name,
-        minioKey: objectKey,
-        hash: fileHash,
+        success: true,
+        data: responseData,
+        ...responseData,
       },
       { status: 201 }
     );
   } catch (err) {
     console.error('[Upload] Pipeline error:', err);
     updateJob(jobId, { step: 'error', progress: 0, message: 'Upload failed', error: String(err) });
-    return json({ error: 'Upload failed', jobId }, { status: 500 });
+    return json({ success: false, error: 'Upload failed', jobId, data: null }, { status: 500 });
   }
 }
 
@@ -562,8 +583,20 @@ async function processAndEmbed(
     diagnostics.completedAt = new Date().toISOString();
     await persistProcessingDiagnostics(evidenceId, diagnostics, {
       extractionMethod,
+      textLength: 0,
       analysisTimestamp: diagnostics.completedAt,
     });
+    // Update status so it doesn't stay 'pending' forever
+    await db.execute(sql`
+      UPDATE evidence
+      SET status = 'complete',
+          metadata = COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({
+            textLength: 0,
+            extractionMethod,
+            note: 'No text extracted from file',
+          })}::jsonb
+      WHERE id = ${evidenceId}
+    `).catch(() => {});
     updateJob(jobId, {
       step: 'complete',
       progress: 100,
@@ -575,6 +608,22 @@ async function processAndEmbed(
   console.log(
     `[Upload] Extracted ${fullText.length} chars via ${extractionMethod} from ${fileName}`
   );
+
+  // Persist extracted text + method to evidence row (was missing — caused textLength: 0)
+  try {
+    await db.execute(sql`
+      UPDATE evidence
+      SET extracted_text = ${fullText.slice(0, 500_000)},
+          metadata = COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({
+            textLength: fullText.length,
+            extractionMethod,
+          })}::jsonb,
+          status = 'processing'
+      WHERE id = ${evidenceId}
+    `);
+  } catch (err) {
+    console.warn('[Upload] Failed to persist extracted text:', err);
+  }
 
   // Structure-aware chunking: detects ARTICLE/SECTION/§ headings, preserves section paths
   const legalChunks = chunkLegalDocument(fullText, { maxTokens: 512, overlap: 128 });
@@ -1368,6 +1417,24 @@ async function processAndEmbed(
   }
 
   const highSeverity = forensicFlags.filter((f) => f.severity === 'high');
+
+  // Mark evidence as complete (was staying 'pending' forever)
+  try {
+    await db.execute(sql`
+      UPDATE evidence
+      SET status = 'complete',
+          metadata = COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({
+            chunkCount: stored,
+            entityCount: entities.length,
+            forensicFlagCount: forensicFlags.length,
+            sectionCount: sectionsSeen.size,
+            citationCount: allCitations.length,
+          })}::jsonb
+      WHERE id = ${evidenceId}
+    `);
+  } catch (err) {
+    console.warn('[Upload] Failed to mark evidence complete:', err);
+  }
 
   updateJob(jobId, {
     step: 'complete',

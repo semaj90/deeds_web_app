@@ -451,18 +451,23 @@ export class RabbitMQManager extends EventEmitter {
       }
       // Store chat message embedding for context retrieval
       if (data.message && embedding?.length) {
-        const { qdrant } = await import('../vector/qdrant-manager.js');
+        const { deterministicPointId, qdrant } = await import('../vector/qdrant-manager.js');
+        const timestamp = Date.now();
         await qdrant.batchUpsert({
-          collection: 'chat_messages' as any,
+          collection: 'chat_history',
           points: [
             {
-              id: `chat-${data.sessionId}-${Date.now()}`,
-              vector: embedding,
+              id: deterministicPointId(
+                `chat:${data.sessionId}:${data.role ?? 'user'}:${timestamp}:${data.message.slice(0, 128)}`
+              ),
+              vector: {
+                message: embedding,
+              },
               payload: {
                 sessionId: data.sessionId,
                 role: data.role ?? 'user',
                 content: data.message.slice(0, 500),
-                timestamp: Date.now(),
+                timestamp,
               },
             },
           ],

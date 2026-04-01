@@ -51,7 +51,41 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     });
   } catch (err) {
     console.error('[poi] GET error:', err);
-    return json({ error: 'Failed to fetch person of interest' }, { status: 500 });
+    return json(
+      {
+        id: parsedId.data,
+        name: '',
+        aliases: [],
+        description: '',
+        threatLevel: 'low',
+        status: 'surveillance',
+        relationship: null,
+        aiProfile: null,
+        who: null,
+        what: null,
+        why: null,
+        how: null,
+        risk: null,
+        confidence: null,
+        modelVersion: null,
+        generatedAt: null,
+        lastUpdated: null,
+        crimes: [],
+        caseIds: [],
+        caseId: null,
+        profileData: {},
+        tags: [],
+        position: {},
+        photoUrl: null,
+        notes: null,
+        metadata: {},
+        createdBy: null,
+        createdAt: '',
+        updatedAt: '',
+        error: 'Failed to fetch person of interest',
+      },
+      { status: 500 }
+    );
   }
 };
 

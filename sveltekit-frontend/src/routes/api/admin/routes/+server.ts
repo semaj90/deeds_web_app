@@ -74,7 +74,18 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 	} catch (error) {
 		console.error('Routes API error:', error);
-		return json({ error: 'Failed to load routes' }, { status: 500 });
+		return json(
+      {
+        routes: [],
+        summary: {
+          total: 0,
+          with_errors: 0,
+          in_kb: 0,
+        },
+        error: 'Failed to load routes',
+      },
+      { status: 500 }
+    );
 	}
 };
 
