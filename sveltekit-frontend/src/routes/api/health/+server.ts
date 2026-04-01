@@ -407,7 +407,8 @@ async function persistServiceHealth(checks: Record<string, CheckResult>): Promis
           .where(eq(serviceCapabilities.serviceName, serviceName))
       )
     );
-  } catch {
+  } catch (err) {
     // Best-effort persistence only; health endpoint should still respond.
+    console.warn('[health] Service health persistence failed:', (err as Error).message);
   }
 }

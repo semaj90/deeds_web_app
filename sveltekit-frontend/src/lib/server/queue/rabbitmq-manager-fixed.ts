@@ -776,12 +776,16 @@ export class RabbitMQManager extends EventEmitter {
   }
 
   private async publish(exchange: string, routingKey: string, data: any): Promise<void> {
-    if (!this.channel) return;
+    if (!this.channel) {
+      console.warn(`[RabbitMQ] Publish skipped — no channel (${exchange}/${routingKey})`);
+      return;
+    }
     try {
       const message = Buffer.from(JSON.stringify(data));
       this.channel.publish(exchange, routingKey, message, { persistent: true });
     } catch (error) {
-      console.error('❌ Publish failed:', this.formatError(error));
+      console.error(`[RabbitMQ] Publish failed (${exchange}/${routingKey}):`, this.formatError(error));
+      throw error; // Propagate so callers can handle
     }
   }
 

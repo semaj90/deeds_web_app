@@ -207,10 +207,11 @@ export abstract class QueueWorker<TMessage> {
 				payload: dlqData
 			});
 		} catch (dlqErr) {
-			// DLQ publish failure logged separately — don't crash the worker
+			// DLQ publish failure — log full message payload so it can be recovered manually
 			console.error(
-				`[Worker:${this.queue}] DLQ publish failed:`,
-				dlqErr instanceof Error ? dlqErr.message : String(dlqErr)
+				`[Worker:${this.queue}] DLQ publish failed — MESSAGE LOST:`,
+				dlqErr instanceof Error ? dlqErr.message : String(dlqErr),
+				'\n  Payload:', originalMsg.content.toString().slice(0, 2000)
 			);
 		}
 	}
