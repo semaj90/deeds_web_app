@@ -34,6 +34,12 @@ The remaining uncertainty is runtime proof, not code existence.
 - [x] Full screenshot suite passed `50/50` routes
 - [x] `/api/health/gpu` responds and reports current GPU state
 - [x] `/api/gpu/compute` responds for `device_info`
+- [x] Frontend dev server restarted cleanly on `http://localhost:5173`
+- [x] Dev runtime still injects `OLLAMA_CHAT_KEEP_ALIVE=2m`, `OLLAMA_EMBED_KEEP_ALIVE=24h`, and `ACE_CHAT_SELF_EVAL_ENABLED=false`
+- [x] `GET /api/infrastructure/status` returns `200`
+- [x] `/api/infrastructure/status` reports router `preferredBackend: ollama` with GPU lease free
+- [x] `POST /api/ai/tensorrt` returns `backend: ollama` and `trtAvailable: false` for a valid prompt
+- [x] `docker compose config --profiles` still reports `full` and `gpu` as the defined compose profiles
 
 ### Observed Runtime Truth
 
@@ -74,33 +80,41 @@ The live legacy container still needs one clean recreate to fully apply that fix
 Current truth:
 
 - The route streams MinIO objects and resolves `minio://`, HTTP MinIO URLs, and bare keys.
-- This is implemented, but not yet browser-proven in this pass.
+- A proper multipart `POST /api/evidence/upload` with a real text file succeeded and returned `201` with:
+  - evidence id `18b31909-e011-444b-b5ee-3288a4c3f34f`
+  - job id `job-1775085343308-b1c995b3`
+  - MinIO key `evidence/default/2026-04-01T23-15-43-316Z-47541611.txt`
+- `GET /api/evidence/job-1775085343308-b1c995b3/status` returned `200` with `status: complete` and the final processing summary.
+- `GET /api/evidence/realtime?jobId=job-1775085343308-b1c995b3` emitted `connected`, `progress`, and `complete` SSE events for the live upload job.
+- `GET /api/evidence/18b31909-e011-444b-b5ee-3288a4c3f34f/download` returned `200` and streamed back the uploaded file contents exactly: `runtime proof upload test`.
+- The earlier `500 Upload failed` result was caused by an invalid probe method (`Invoke-RestMethod -Form` body parse failure), not by a real application pipeline defect.
+- `GET /api/evidence/[docId]/status` was also corrected in source so active in-memory upload job IDs are checked before UUID-only DB fallback.
 
 Validation to run:
 
-1. upload a real file to evidence or evidence-library
-2. open the evidence detail page
-3. trigger the browser download action
-4. confirm the file downloads and opens correctly
+1. open the evidence detail page for a real uploaded item
+2. trigger the browser download action
+3. confirm the browser save/open flow matches the already-proven API stream behavior
 
 ### 2. `chat.context` Publish And Consume
 
 - [x] Publisher method exists in RabbitMQ manager
 - [x] Chat routes call it
-- [ ] Publish and consume proven end-to-end in a live SSE chat session
+- [x] Publish and consume proven end-to-end in runtime via `/api/chat` and `/api/sse/chat`
 
 Current truth:
 
 - `publishChatContext()` exists in `rabbitmq-manager-fixed.ts`
 - call sites exist in `src/routes/api/sse/chat/+server.ts`
 - call sites also exist in `src/routes/api/chat/+server.ts`
+- a live `POST /api/chat` request succeeded and returned an Ollama response in this pass
+- live dev-server output shows `RabbitMQ Manager initialized successfully`, active consumers, `Chat context update: api-chat`, and `Upserted 1 points to chat_messages` for both user and assistant messages after the `/api/chat` request
+- a live `POST /api/sse/chat` request returned SSE frames (`thinking` + heartbeat), completed the Ollama chat pass, logged `Chat context update: copilot-runtime-proof`, and upserted `chat_messages`
+- RabbitMQ management queue inventory remained unhelpful in this pass, but the consumer-side logs and vector upserts are enough to treat publish/consume as runtime-proven
 
 What still needs proof:
 
-1. send a real chat message
-2. confirm publish succeeds
-3. confirm a consumer receives or processes it
-4. capture queue activity or logs
+1. no additional runtime proof required for `chat.context` unless queue-level broker screenshots are specifically wanted
 
 ### 3. Active Docker Profile
 
@@ -108,10 +122,10 @@ What still needs proof:
 
 Current truth:
 
-- running containers show the phase66-style data stack is active
-- CouchDB and Neo4j are also running
-- TRT-LLM is not running
-- this suggests a mixed runtime rather than a clean single-profile proof
+- the app can currently reach postgres, redis, qdrant, rabbitmq, minio, couchdb, ollama, quic, and langextract through live health endpoints
+- `docker compose config --profiles` shows `full` and `gpu` are the defined profiles
+- local Docker CLI calls are blocked in this session because `//./pipe/dockerDesktopLinuxEngine` is unavailable
+- exact active compose project and profile selection therefore remain unproven from Docker itself in this pass
 
 What still needs proof:
 
@@ -126,6 +140,8 @@ What still needs proof:
 Current truth:
 
 - `/api/health` currently reports gRPC unavailable
+- `/api/infrastructure/status` reports `tier1_grpc.enabled: false` and `tier1_grpc.available: false`
+- `/api/infrastructure/status` reports HTTP/Ollama tier available at `http://127.0.0.1:11434`
 - embedding transport tiers show HTTP fallback surfaces are configured
 - the app is functioning with fallback behavior, not a live gRPC tier
 
@@ -137,7 +153,10 @@ Current truth:
 Current truth:
 
 - `/api/health` reports `trtllm: false`
+- `/api/infrastructure/status` reports router `preferredBackend: ollama`
+- `POST /api/ai/tensorrt` currently returns `backend: ollama` and `trtAvailable: false`
 - router fallback wording is accurate: Ollama is the current dependable backend
+- `getRouterStatus()` is exposed on a live route, but `routeInference()` itself is not currently wired to a confirmed live request path in this pass
 
 ---
 
