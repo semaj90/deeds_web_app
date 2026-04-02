@@ -21,6 +21,32 @@
 #include <cstdio>
 #include <vector>
 
+// ── Reusable CUDA Buffer Pool ───────────────────────────────────────
+// Avoids cudaMalloc/cudaFree per call. Thread-local to avoid contention.
+// Grows on demand, never shrinks (typical allocation pattern: same-size vectors).
+
+struct CudaBuffer {
+    float* ptr = nullptr;
+    size_t capacity = 0;  // in floats
+
+    float* ensure(int n) {
+        size_t need = (size_t)n;
+        if (need <= capacity && ptr) return ptr;
+        if (ptr) cudaFree(ptr);
+        capacity = need;
+        if (cudaMalloc((void**)&ptr, capacity * sizeof(float)) != cudaSuccess) {
+            ptr = nullptr;
+            capacity = 0;
+        }
+        return ptr;
+    }
+
+    ~CudaBuffer() { if (ptr) cudaFree(ptr); }
+};
+
+// 3 slots: A input, B input, output — covers all kernel signatures
+static thread_local CudaBuffer tl_buf_a, tl_buf_b, tl_buf_out;
+
 // ── CUDA Kernels ────────────────────────────────────────────────────
 
 extern "C" __global__ void lstm_add_kernel(const float* a, const float* b, float* out, int n) {
@@ -74,42 +100,26 @@ static const int BLOCK_SIZE = 256;
 extern "C" int run_lstm_add(const float* a, const float* b, float* out, int n) {
     if (n <= 0 || !a || !b || !out) return -1;
 
-    float *d_a = nullptr, *d_b = nullptr, *d_out = nullptr;
+    float* d_a = tl_buf_a.ensure(n);
+    float* d_b = tl_buf_b.ensure(n);
+    float* d_out = tl_buf_out.ensure(n);
+    if (!d_a || !d_b || !d_out) return -2;
+
     size_t sz = sizeof(float) * (size_t)n;
-    cudaError_t err = cudaSuccess;
-
-    err = cudaMalloc((void**)&d_a, sz);
-    if (err != cudaSuccess) return -2;
-
-    err = cudaMalloc((void**)&d_b, sz);
-    if (err != cudaSuccess) { cudaFree(d_a); return -3; }
-
-    err = cudaMalloc((void**)&d_out, sz);
-    if (err != cudaSuccess) { cudaFree(d_a); cudaFree(d_b); return -4; }
-
     cudaMemcpy(d_a, a, sz, cudaMemcpyHostToDevice);
     cudaMemcpy(d_b, b, sz, cudaMemcpyHostToDevice);
 
     int grid = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;
     lstm_add_kernel<<<grid, BLOCK_SIZE>>>(d_a, d_b, d_out, n);
 
-    err = cudaGetLastError();
-    if (err != cudaSuccess) goto fail;
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess) return -99;
 
     err = cudaDeviceSynchronize();
-    if (err != cudaSuccess) goto fail;
+    if (err != cudaSuccess) return -99;
 
-    err = cudaMemcpy(out, d_out, sz, cudaMemcpyDeviceToHost);
-    if (err != cudaSuccess) goto fail;
-
-    cudaFree(d_a); cudaFree(d_b); cudaFree(d_out);
+    cudaMemcpy(out, d_out, sz, cudaMemcpyDeviceToHost);
     return 0;
-
-fail:
-    if (d_a) cudaFree(d_a);
-    if (d_b) cudaFree(d_b);
-    if (d_out) cudaFree(d_out);
-    return -99;
 }
 
 // ── run_dot_product ─────────────────────────────────────────────────
@@ -118,20 +128,16 @@ extern "C" int run_dot_product(const float* a, const float* b, float* out, int n
     if (n <= 0 || !a || !b || !out) return -1;
 
     size_t sz = sizeof(float) * (size_t)n;
-    float *d_a = nullptr, *d_b = nullptr, *d_partial = nullptr;
-
-    if (cudaMalloc((void**)&d_a, sz) != cudaSuccess) return -2;
-    if (cudaMalloc((void**)&d_b, sz) != cudaSuccess) { cudaFree(d_a); return -3; }
+    float* d_a = tl_buf_a.ensure(n);
+    float* d_b = tl_buf_b.ensure(n);
+    if (!d_a || !d_b) return -2;
 
     cudaMemcpy(d_a, a, sz, cudaMemcpyHostToDevice);
     cudaMemcpy(d_b, b, sz, cudaMemcpyHostToDevice);
 
     int grid = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;
-
-    if (cudaMalloc((void**)&d_partial, grid * sizeof(float)) != cudaSuccess) {
-        cudaFree(d_a); cudaFree(d_b);
-        return -4;
-    }
+    float* d_partial = tl_buf_out.ensure(grid);
+    if (!d_partial) return -3;
 
     dot_product_kernel<<<grid, BLOCK_SIZE, BLOCK_SIZE * sizeof(float)>>>(d_a, d_b, d_partial, n);
     cudaDeviceSynchronize();
@@ -146,7 +152,6 @@ extern "C" int run_dot_product(const float* a, const float* b, float* out, int n
     }
     *out = sum;
 
-    cudaFree(d_a); cudaFree(d_b); cudaFree(d_partial);
     return (cudaGetLastError() == cudaSuccess) ? 0 : -99;
 }
 
@@ -156,10 +161,9 @@ extern "C" int run_scale(const float* in, float* out, float scalar, int n) {
     if (n <= 0 || !in || !out) return -1;
 
     size_t sz = sizeof(float) * (size_t)n;
-    float *d_in = nullptr, *d_out = nullptr;
-
-    if (cudaMalloc((void**)&d_in, sz) != cudaSuccess) return -2;
-    if (cudaMalloc((void**)&d_out, sz) != cudaSuccess) { cudaFree(d_in); return -3; }
+    float* d_in = tl_buf_a.ensure(n);
+    float* d_out = tl_buf_out.ensure(n);
+    if (!d_in || !d_out) return -2;
 
     cudaMemcpy(d_in, in, sz, cudaMemcpyHostToDevice);
 
@@ -169,7 +173,6 @@ extern "C" int run_scale(const float* in, float* out, float scalar, int n) {
     cudaDeviceSynchronize();
     cudaMemcpy(out, d_out, sz, cudaMemcpyDeviceToHost);
 
-    cudaFree(d_in); cudaFree(d_out);
     return (cudaGetLastError() == cudaSuccess) ? 0 : -99;
 }
 
@@ -179,10 +182,9 @@ extern "C" int run_relu(const float* in, float* out, int n) {
     if (n <= 0 || !in || !out) return -1;
 
     size_t sz = sizeof(float) * (size_t)n;
-    float *d_in = nullptr, *d_out = nullptr;
-
-    if (cudaMalloc((void**)&d_in, sz) != cudaSuccess) return -2;
-    if (cudaMalloc((void**)&d_out, sz) != cudaSuccess) { cudaFree(d_in); return -3; }
+    float* d_in = tl_buf_a.ensure(n);
+    float* d_out = tl_buf_out.ensure(n);
+    if (!d_in || !d_out) return -2;
 
     cudaMemcpy(d_in, in, sz, cudaMemcpyHostToDevice);
 
@@ -192,7 +194,6 @@ extern "C" int run_relu(const float* in, float* out, int n) {
     cudaDeviceSynchronize();
     cudaMemcpy(out, d_out, sz, cudaMemcpyDeviceToHost);
 
-    cudaFree(d_in); cudaFree(d_out);
     return (cudaGetLastError() == cudaSuccess) ? 0 : -99;
 }
 

@@ -14,9 +14,33 @@
 #include <vector>
 #include <cmath>
 #include <cstring>
+#include <algorithm>
+#include <thread>
+#include <mutex>
+
+/**
+ * One-time LibTorch threading configuration, called lazily on first use.
+ * Pin intra-op threads to min(4, hardware) to avoid starving Node.js event loop.
+ */
+static std::once_flag _init_flag;
+static void initLibTorch() {
+    std::call_once(_init_flag, [] {
+        int hw = std::max(1, (int)std::thread::hardware_concurrency());
+        int intra = std::min(4, hw);
+        torch::set_num_threads(intra);
+        // set_num_interop_threads must be called before any parallel region;
+        // safe here since call_once runs before first op
+        try {
+            torch::set_num_interop_threads(std::min(2, hw));
+        } catch (...) {
+            // Already set or not supported — ignore
+        }
+    });
+}
 
 // Device selection: CUDA if available, else CPU
 static torch::Device getDevice() {
+    initLibTorch();
     if (torch::cuda::is_available()) {
         return torch::kCUDA;
     }
@@ -36,6 +60,7 @@ extern "C" int graphSimilarity(
     if (output_len < n * n) return -2;
 
     try {
+        torch::NoGradGuard no_grad;  // skip autograd tracking (inference only)
         auto device = getDevice();
 
         // Create tensor from input data
@@ -77,6 +102,7 @@ extern "C" int clusterEmbeddings(
     if (max_iters <= 0) max_iters = 100;
 
     try {
+        torch::NoGradGuard no_grad;  // skip autograd tracking (inference only)
         auto device = getDevice();
         auto opts = torch::TensorOptions().dtype(torch::kFloat32);
 
@@ -139,6 +165,7 @@ extern "C" int computeCaseEmbedding(
     if (output_len < dim) return -2;
 
     try {
+        torch::NoGradGuard no_grad;  // skip autograd tracking (inference only)
         auto device = getDevice();
         auto opts = torch::TensorOptions().dtype(torch::kFloat32);
 

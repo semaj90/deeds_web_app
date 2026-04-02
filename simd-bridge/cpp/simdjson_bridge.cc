@@ -171,6 +171,17 @@ static napi_value SimdJsonExtractNumbers(napi_env env, napi_callback_info info) 
   return result;
 }
 
+// ── simdJsonBackend() → string ──────────────────────────────────────
+// Returns the active SIMD implementation name (e.g. "haswell" = AVX2).
+
+static napi_value SimdJsonBackend(napi_env env, napi_callback_info info) {
+  (void)info;
+  const char* name = simdjson::get_active_implementation()->name().data();
+  napi_value result;
+  napi_create_string_utf8(env, name, NAPI_AUTO_LENGTH, &result);
+  return result;
+}
+
 // ── Registration (called from binding.cc Init) ──────────────────────
 
 extern "C" {
@@ -185,6 +196,10 @@ napi_value RegisterSimdJsonValidate(napi_env env, napi_callback_info info) {
 
 napi_value RegisterSimdJsonExtractNumbers(napi_env env, napi_callback_info info) {
   return SimdJsonExtractNumbers(env, info);
+}
+
+napi_value RegisterSimdJsonBackend(napi_env env, napi_callback_info info) {
+  return SimdJsonBackend(env, info);
 }
 
 } // extern "C"
