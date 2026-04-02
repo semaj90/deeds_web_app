@@ -110,13 +110,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     return json({ success: true, data: userReports });
   } catch (err) {
     console.error('Error fetching reports:', err);
-    console.error('Error type:', typeof err);
-    console.error('Error constructor:', err?.constructor?.name);
-    if (err && typeof err === 'object') {
-      console.error('Error keys:', Object.keys(err));
-      console.error('Error cause:', (err as { cause?: unknown }).cause);
-    }
-    throw error(500, 'Failed to fetch reports');
+    return json({ success: false, data: [] });
   }
 };
 

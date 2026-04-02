@@ -155,8 +155,10 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
         }
     } catch (err) {
         console.error('[GET /api/routes/: routeId/interactions], Error:', err);
-        return error(500, {
-            message: 'Failed to fetch interactions',
+        return json({
+            interactions: [],
+            pagination: { total: 0, limit: 50, offset: 0, hasMore: false },
+            includesArchived: false,
         });
     }
 };

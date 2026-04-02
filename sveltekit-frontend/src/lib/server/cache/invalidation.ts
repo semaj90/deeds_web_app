@@ -303,7 +303,7 @@ export const invalidateCaseCache = async (
   userId?: string
 ) => {
   // Bump versioned cache counter so retrieval + synthesis caches auto-expire
-  bumpCaseVersion(caseId).catch(() => {});
+  bumpCaseVersion(caseId).catch((err) => console.warn('[CacheInvalidation] bumpCaseVersion failed:', (err as Error).message ?? err));
 
   return cacheInvalidation.invalidateMultiple(
     [
@@ -330,7 +330,7 @@ export const invalidateEvidenceCache = async (
   if (caseId) {
     patterns.push(CACHE_PATTERNS.EVIDENCE_LIST(caseId));
     patterns.push(CACHE_PATTERNS.CASE(caseId)); // Case evidence list cached
-    bumpCaseVersion(caseId).catch(() => {});
+    bumpCaseVersion(caseId).catch((err) => console.warn('[CacheInvalidation] bumpCaseVersion failed:', (err as Error).message ?? err));
   }
 
   return cacheInvalidation.invalidateMultiple(patterns, { type, userId });

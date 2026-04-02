@@ -76,7 +76,7 @@ export const GET: RequestHandler = async ({ locals, params }) => {
     }
 
     console.error('Error fetching case laws:', err);
-    throw error(500, 'Failed to fetch case laws');
+    return json({ success: false, data: [] });
   }
 };
 

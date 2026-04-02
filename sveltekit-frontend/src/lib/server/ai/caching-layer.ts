@@ -133,8 +133,8 @@ export class CachingLayer {
 
 				return parsed;
 			}
-		} catch {
-			// Redis failure is non-fatal
+		} catch (err) {
+			console.warn('[CachingLayer] Redis get failed:', (err as Error).message ?? err);
 		}
 
 		this.totalMisses++;
@@ -174,8 +174,8 @@ export class CachingLayer {
 				}
 				await pipeline.exec();
 			}
-		} catch {
-			// Redis failure is non-fatal
+		} catch (err) {
+			console.warn('[CachingLayer] Redis set failed:', (err as Error).message ?? err);
 		}
 	}
 
@@ -210,8 +210,8 @@ export class CachingLayer {
 					invalidated += keys.length;
 				}
 			}
-		} catch {
-			// Redis failure is non-fatal
+		} catch (err) {
+			console.warn('[CachingLayer] Redis invalidateByTags failed:', (err as Error).message ?? err);
 		}
 
 		return invalidated;

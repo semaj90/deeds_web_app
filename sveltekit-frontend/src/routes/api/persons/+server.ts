@@ -73,7 +73,11 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		});
 	} catch (err) {
 		console.error('Error fetching persons of interest:', err);
-		throw error(500, 'Failed to fetch persons of interest');
+		return json({
+			success: false,
+			data: [],
+			pagination: { limit: 20, offset: 0, count: 0 }
+		});
 	}
 };
 

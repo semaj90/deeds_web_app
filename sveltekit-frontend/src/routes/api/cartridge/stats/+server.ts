@@ -51,7 +51,6 @@ export const GET: RequestHandler = async ({ locals }) => {
         totalSizeMB: 0,
         error: 'Stats query failed',
       },
-      { status: 500 }
     );
 	}
 };

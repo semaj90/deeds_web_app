@@ -82,7 +82,7 @@ export const GET: RequestHandler = async ({ locals, params }) => {
     }
 
     console.error('Error fetching case citations:', err);
-    throw error(500, 'Failed to fetch case citations');
+    return json({ success: false, data: [] });
   }
 };
 

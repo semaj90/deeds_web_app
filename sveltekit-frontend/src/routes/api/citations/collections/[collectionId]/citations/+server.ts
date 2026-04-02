@@ -212,7 +212,12 @@ export const GET: RequestHandler = async ({ locals, params }) => {
 			totalCitations: citationsList.length,
 		});
 	} catch (err) {
+		if (err instanceof Error && 'status' in err) throw err;
 		console.error('Error fetching collection citations:', err);
-		throw error(500, 'Failed to fetch collection citations');
+		return json({
+			collectionId: params.collectionId,
+			citations: [],
+			totalCitations: 0,
+		});
 	}
 };
