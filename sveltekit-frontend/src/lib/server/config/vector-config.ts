@@ -53,7 +53,7 @@ export const VECTOR_CONFIG = {
 
   /** Per-collection vector schema (vector name → used by health checks + init) */
   COLLECTION_VECTORS: {
-    legal_documents: { vectors: ['content', 'summary'], on_disk_payload: true },
+    legal_documents: { vectors: ['content'], on_disk_payload: true },
     legal_cases: { vectors: ['description'] },
     evidence_items: { vectors: ['content'], on_disk_payload: true },
     chat_messages: { vectors: ['message'] },

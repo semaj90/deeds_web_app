@@ -1,7 +1,7 @@
 /**
  * TensorRT-LLM Inference Client
  *
- * GPU-accelerated inference via TRT-LLM container (port 8000).
+ * GPU-accelerated inference via TRT-LLM container (host port 8099 by default).
  * Uses /v1/completions endpoint (OpenAI-compatible API).
  * Requires GPU arbiter lease before calling.
  */

@@ -185,7 +185,7 @@
     {
       "label": "Docker Services Up",
       "type": "shell",
-      "command": "docker start deeds-postgres-prod deeds-redis-prod deeds-qdrant-prod phase66-minio phase66-rabbitmq phase66-couchdb",
+      "command": "$ErrorActionPreference = 'Stop'; if (-not (Get-Command docker -ErrorAction SilentlyContinue)) { Write-Error 'Docker CLI is not installed or not on PATH.'; exit 1 }; try { docker version | Out-Null } catch { Write-Error 'Docker Desktop Linux engine is unavailable. Start Docker Desktop or switch to the Linux containers backend, then retry.'; exit 1 }; $serviceAliases = @(@('deeds-postgres-prod','postgres-pgvector','phase66-postgres'), @('deeds-redis-prod','phase66-redis','legal-ai-redis'), @('deeds-qdrant-prod','phase66-qdrant','legal-ai-qdrant'), @('phase66-minio','legal-ai-minio'), @('phase66-rabbitmq','legal-ai-rabbitmq'), @('phase66-couchdb','legal-ai-couchdb')); $toStart = @(); foreach ($aliases in $serviceAliases) { $matches = @(); foreach ($name in $aliases) { $status = docker inspect --format '{{.State.Status}}' $name 2>$null; if ($LASTEXITCODE -eq 0) { $matches += @{ Name = $name; Status = $status.Trim() } } } if ($matches.Count -eq 0) { Write-Host ('Skipping missing service aliases: ' + ($aliases -join ', ')) -ForegroundColor Yellow; continue } $running = $matches | Where-Object { $_.Status -eq 'running' } | Select-Object -First 1; if ($running) { Write-Host ('Already running: ' + $running.Name) -ForegroundColor DarkGray; continue } $toStart += ($matches | Select-Object -First 1).Name }; if ($toStart.Count -eq 0) { Write-Host 'All requested services are already running.' -ForegroundColor Green; exit 0 }; docker start @toStart",
       "group": "build",
       "presentation": {
         "echo": true,
@@ -327,6 +327,173 @@
         "panel": "shared",
         "showReuseMessage": false,
         "clear": true
+      }
+    },
+    // ============================================
+    // CMake: C++ GPU Addon Build (simd-bridge)
+    // ============================================
+    {
+      "label": "CMake: Configure (CUDA Release)",
+      "type": "shell",
+      "command": "cmake --preset windows-cuda",
+      "options": {
+        "cwd": "${workspaceFolder}/simd-bridge/cpp"
+      },
+      "group": "build",
+      "problemMatcher": "$msCompile",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "CMake: Configure (Debug)",
+      "type": "shell",
+      "command": "cmake --preset windows-debug",
+      "options": {
+        "cwd": "${workspaceFolder}/simd-bridge/cpp"
+      },
+      "group": "build",
+      "problemMatcher": "$msCompile",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "CMake: Build Release",
+      "type": "shell",
+      "command": "cmake --build build --config Release",
+      "options": {
+        "cwd": "${workspaceFolder}/simd-bridge/cpp"
+      },
+      "group": "build",
+      "dependsOn": "CMake: Configure (CUDA Release)",
+      "problemMatcher": "$msCompile",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "CMake: Build Debug",
+      "type": "shell",
+      "command": "cmake --build build-debug --config Debug",
+      "options": {
+        "cwd": "${workspaceFolder}/simd-bridge/cpp"
+      },
+      "group": "build",
+      "dependsOn": "CMake: Configure (Debug)",
+      "problemMatcher": "$msCompile",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "CMake: Clean All Builds",
+      "type": "shell",
+      "command": "if (Test-Path build) { Remove-Item -Recurse -Force build }; if (Test-Path build-debug) { Remove-Item -Recurse -Force build-debug }; if (Test-Path build-cpu) { Remove-Item -Recurse -Force build-cpu }; Write-Host 'All build dirs cleaned'",
+      "options": {
+        "cwd": "${workspaceFolder}/simd-bridge/cpp"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "CMake: Test Addon (CUDA Check)",
+      "type": "shell",
+      "command": "node -e \"const b=require('./simd-bridge/cpp/build/Release/tensorrt_bridge.node'); console.log('CUDA:',b.checkCudaAvailable()===1?'GPU':'CPU'); console.log('ReLU:',Array.from(b.relu(new Float32Array([1,2,3,-1,-2,0]),6))); console.log('Dot:',Array.from(b.dotProduct(new Float32Array([1,2,3]),new Float32Array([4,5,6]),3))); console.log('Sim:',Array.from(b.graphSimilarity(new Float32Array([1,0,0,0,1,0]),2,3))); console.log('KMeans:',Array.from(b.clusterEmbeddings(new Float32Array([0,0,1,1,10,10,11,11]),4,2,2,50))); console.log('All 5 GPU tests passed');\"",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "PATH": "C:\\libtorch-win-shared-with-deps-2.9.0+cu130\\libtorch\\lib;${env:PATH}",
+          "CUDA_VISIBLE_DEVICES": "0"
+        }
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "CMake: Full GPU Build + Test",
+      "dependsOn": [
+        "CMake: Build Release",
+        "CMake: Test Addon (CUDA Check)"
+      ],
+      "dependsOrder": "sequence",
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "GPU: nvidia-smi",
+      "type": "shell",
+      "command": "nvidia-smi",
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "CMake: Auto-Build on Startup",
+      "type": "shell",
+      "command": "if (Test-Path '${workspaceFolder}/simd-bridge/cpp/build/Release/tensorrt_bridge.node') { Write-Host 'tensorrt_bridge.node already built — skipping' } else { Write-Host 'Building tensorrt_bridge.node...'; cmake --preset windows-cuda; cmake --build build --config Release }",
+      "options": {
+        "cwd": "${workspaceFolder}/simd-bridge/cpp"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "group": "build",
+      "problemMatcher": "$msCompile",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
       }
     },
     // ============================================

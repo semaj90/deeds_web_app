@@ -1,0 +1,52 @@
+{
+  "$schema": "https://raw.githubusercontent.com/maximhq/bifrost/main/core/schemas/config.schema.json",
+  "accounts": [
+    {
+      "id": "ollama-local",
+      "provider": "openai",
+      "api_key": "ollama",
+      "settings": {
+        "base_url": "http://host.docker.internal:11434/v1"
+      }
+    }
+  ],
+  "routing": {
+    "default": {
+      "account": "ollama-local",
+      "model": "gemma3-legal:latest"
+    }
+  },
+  "models": {
+    "gemma3-legal": {
+      "account": "ollama-local",
+      "model": "gemma3-legal:latest"
+    },
+    "gemma3-legal:latest": {
+      "account": "ollama-local",
+      "model": "gemma3-legal:latest"
+    },
+    "embeddinggemma": {
+      "account": "ollama-local",
+      "model": "embeddinggemma:latest"
+    },
+    "embeddinggemma:latest": {
+      "account": "ollama-local",
+      "model": "embeddinggemma:latest"
+    },
+    "gemma3": {
+      "account": "ollama-local",
+      "model": "gemma3:latest"
+    },
+    "gemma3:latest": {
+      "account": "ollama-local",
+      "model": "gemma3:latest"
+    }
+  },
+  "plugins": {
+    "semantic_cache": {
+      "enabled": true,
+      "similarity_threshold": 0.92,
+      "ttl_seconds": 3600
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 18
+    },
+    "configurePresets": [
+        {
+            "name": "windows-cuda",
+            "displayName": "Windows CUDA (RTX 3060 Ti)",
+            "description": "Release build: RTX 3060 Ti SM86 + LibTorch + AVX2",
+            "generator": "Visual Studio 17 2022",
+            "architecture": "x64",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_PREFIX_PATH": "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch",
+                "CMAKE_CUDA_ARCHITECTURES": "86",
+                "TORCH_CUDA_ARCH_LIST": "8.6",
+                "CMAKE_CUDA_FLAGS": "-use_fast_math -lineinfo",
+                "CMAKE_CXX_FLAGS_RELEASE": "/O2 /arch:AVX2"
+            }
+        },
+        {
+            "name": "windows-debug",
+            "displayName": "Windows Debug (CUDA + symbols)",
+            "description": "Debug build with CUDA and full debug symbols",
+            "generator": "Visual Studio 17 2022",
+            "architecture": "x64",
+            "binaryDir": "${sourceDir}/build-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_PREFIX_PATH": "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch",
+                "CMAKE_CUDA_ARCHITECTURES": "86",
+                "TORCH_CUDA_ARCH_LIST": "8.6",
+                "CMAKE_CUDA_FLAGS": "-G -lineinfo"
+            }
+        },
+        {
+            "name": "windows-cpu-only",
+            "displayName": "Windows CPU Only (no CUDA)",
+            "description": "Debug build without CUDA for quick iteration",
+            "generator": "Visual Studio 17 2022",
+            "architecture": "x64",
+            "binaryDir": "${sourceDir}/build-cpu",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            },
+            "environment": {
+                "CUDA_PATH": ""
+            }
+        },
+        {
+            "name": "wsl2-cuda",
+            "displayName": "WSL2 CUDA (Ubuntu + Ninja)",
+            "description": "Linux build under WSL2 with CUDA",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build-wsl",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_CUDA_ARCHITECTURES": "86",
+                "TORCH_CUDA_ARCH_LIST": "8.6",
+                "CMAKE_CUDA_FLAGS": "-use_fast_math -lineinfo"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "release",
+            "configurePreset": "windows-cuda",
+            "configuration": "Release"
+        },
+        {
+            "name": "debug",
+            "configurePreset": "windows-debug",
+            "configuration": "Debug"
+        },
+        {
+            "name": "cpu-only",
+            "configurePreset": "windows-cpu-only",
+            "configuration": "Debug"
+        }
+    ]
+}

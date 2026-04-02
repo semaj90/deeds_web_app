@@ -42,6 +42,10 @@ if(CUDAToolkit_FOUND)
   if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
     set(CMAKE_CUDA_ARCHITECTURES "86")  # RTX 3060 Ti = SM 8.6
   endif()
+  # PyTorch/LibTorch ignores CMAKE_CUDA_ARCHITECTURES — set TORCH_CUDA_ARCH_LIST
+  if(NOT DEFINED TORCH_CUDA_ARCH_LIST)
+    set(TORCH_CUDA_ARCH_LIST "8.6")
+  endif()
 else()
   message(STATUS "CUDA not found -> CPU-only build")
 endif()
@@ -78,6 +82,7 @@ set(ADDON_SOURCES
   binding.cc
   tensor_bridge.cc
   simdjson_bridge.cc
+  lstm_bridge.cc
 )
 
 # Add simdjson implementation if available

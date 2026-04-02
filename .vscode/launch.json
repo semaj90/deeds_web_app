@@ -1,66 +1,123 @@
 {
-"version": "0.2.0",
-"configurations": [
+  "version": "0.2.0",
+  "configurations": [
+    // ============================================
+    // C++ / CUDA GPU Debug Configurations
+    // ============================================
     {
-    "name": "Python: MLP Scheduler",
-    "type": "debugpy",
-    "request": "launch",
-    "program": "${workspaceFolder}/backend/mlp_scheduler.py",
-    "console": "integratedTerminal",
-    "justMyCode": true,
-    "env": {
-        "PYTHONUNBUFFERED": "1"
+      "name": "C++: Debug Node Addon (.node)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "node",
+      "args": [
+        "-e",
+        "const b = require('./simd-bridge/cpp/build/Release/tensorrt_bridge.node'); console.log('CUDA:', b.checkCudaAvailable()); console.log('ReLU:', Array.from(b.relu(new Float32Array([1,2,3,-1]),4))); console.log('Sim:', Array.from(b.graphSimilarity(new Float32Array([1,0,0,0,1,0]),2,3)));"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [
+        { "name": "CUDA_VISIBLE_DEVICES", "value": "0" },
+        {
+          "name": "PATH",
+          "value": "C:\\libtorch-win-shared-with-deps-2.9.0+cu130\\libtorch\\lib;${env:PATH}"
+        }
+      ],
+      "console": "integratedTerminal",
+      "symbolSearchPath": "${workspaceFolder}/simd-bridge/cpp/build/Debug",
+      "sourceFileMap": {}
     },
-    "args": []
-},
-{
-    "name": "Python: Mirror Service",
-    "type": "debugpy",
-    "request": "launch",
-    "program": "${workspaceFolder}/backend/mirror_service.py",
-    "console": "integratedTerminal",
-    "justMyCode": true,
-    "env": {
-        "PYTHONUNBUFFERED": "1"
+    {
+      "name": "C++: Debug Node Addon (Debug Build)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "node",
+      "args": [
+        "-e",
+        "const b = require('./simd-bridge/cpp/build-debug/Debug/tensorrt_bridge.node'); console.log('CUDA:', b.checkCudaAvailable()); console.log('Similarity:', Array.from(b.graphSimilarity(new Float32Array([1,0,0,0,1,0]),2,3))); console.log('Cluster:', Array.from(b.clusterEmbeddings(new Float32Array([0,0,1,1,10,10,11,11]),4,2,2,50)));"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [
+        { "name": "CUDA_VISIBLE_DEVICES", "value": "0" },
+        {
+          "name": "PATH",
+          "value": "C:\\libtorch-win-shared-with-deps-2.9.0+cu130\\libtorch\\lib;${env:PATH}"
+        }
+      ],
+      "console": "integratedTerminal"
     },
-    "args": []
-},
-{
-    "name": "Python: DocLing Gateway",
-    "type": "debugpy",
-    "request": "launch",
-    "module": "backend.docling_gateway.app",
-    "console": "integratedTerminal",
-    "justMyCode": true,
-    "env": {
+    {
+      "name": "C++: Attach to Node Process",
+      "type": "cppvsdbg",
+      "request": "attach",
+      "processId": "${command:pickProcess}",
+      "sourceFileMap": {
+        "${workspaceFolder}/simd-bridge/cpp": "${workspaceFolder}/simd-bridge/cpp"
+      }
+    },
+    // ============================================
+    // Python Debug Configurations
+    // ============================================
+    {
+      "name": "Python: MLP Scheduler",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/mlp_scheduler.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "args": []
+    },
+    {
+      "name": "Python: Mirror Service",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/mirror_service.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "args": []
+    },
+    {
+      "name": "Python: DocLing Gateway",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "backend.docling_gateway.app",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
         "PYTHONUNBUFFERED": "1",
         "CUDA_VISIBLE_DEVICES": "0"
+      },
+      "args": []
     },
-    "args": []
-},
-{
-    "name": "Python: Sync Worker",
-    "type": "debugpy",
-    "request": "launch",
-    "program": "${workspaceFolder}/backend/sync_worker.py",
-    "console": "integratedTerminal",
-    "justMyCode": true,
-    "env": {
-        "PYTHONUNBUFFERED": "1"
-    },
-    "args": []
-}
-],
-"compounds": [
     {
-    "name": "All MLP Workers",
-    "configurations": [
+      "name": "Python: Sync Worker",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/sync_worker.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "args": []
+    }
+  ],
+  "compounds": [
+    {
+      "name": "All MLP Workers",
+      "configurations": [
         "Python: MLP Scheduler",
         "Python: Mirror Service",
         "Python: DocLing Gateway",
         "Python: Sync Worker"
-    ],
-    "stopAll": true
-}
-]
+      ],
+      "stopAll": true
+    }
+  ]
 }

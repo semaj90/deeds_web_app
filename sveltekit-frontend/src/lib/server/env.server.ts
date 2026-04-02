@@ -46,16 +46,20 @@ export const ENV = {
   RETRIEVAL_GRPC_URL: privateEnv.RETRIEVAL_GRPC_URL ?? '127.0.0.1:50053',
   RETRIEVAL_GRPC_ENABLED: (privateEnv.RETRIEVAL_GRPC_ENABLED ?? 'false') === 'true',
   // LangExtract service (Python FastAPI + spaCy + NER, container: phase66-langextract)
-  LANGEXTRACT_ENABLED: (privateEnv.LANGEXTRACT_ENABLED ?? privateEnv.MINIO_SIMD_ENABLED ?? 'false') === 'true',
+  LANGEXTRACT_ENABLED:
+    (privateEnv.LANGEXTRACT_ENABLED ?? privateEnv.MINIO_SIMD_ENABLED ?? 'false') === 'true',
   LANGEXTRACT_URL:
-    privateEnv.LANGEXTRACT_URL ?? privateEnv.LANGEXTRACT_API_URL ?? privateEnv.MINIO_SIMD_URL ?? 'http://127.0.0.1:8095',
+    privateEnv.LANGEXTRACT_URL ??
+    privateEnv.LANGEXTRACT_API_URL ??
+    privateEnv.MINIO_SIMD_URL ??
+    'http://127.0.0.1:8095',
   // QUIC/NATS embedding transport
   EMBEDDING_QUIC_ENABLED:
     (privateEnv.EMBEDDING_QUIC_ENABLED ?? privateEnv.QUIC_ENABLED ?? 'false') === 'true',
   NATS_URL: privateEnv.NATS_URL ?? 'nats://127.0.0.1:4222',
-  // TensorRT-LLM inference (primary, port 8000 from existing container)
+  // TensorRT-LLM inference (main gpu profile exposes 8099; Triton uses TRITON_URL on 8000)
   TENSORRT_URL:
-    privateEnv.TENSORRT_URL ?? privateEnv.TENSORRT_SERVICE_URL ?? 'http://localhost:8000',
+    privateEnv.TENSORRT_URL ?? privateEnv.TENSORRT_SERVICE_URL ?? 'http://localhost:8099',
   // Neo4j graph database
   NEO4J_URI: privateEnv.NEO4J_URI ?? privateEnv.NEO4J_URL ?? 'bolt://localhost:7687',
   NEO4J_USER: privateEnv.NEO4J_USER ?? privateEnv.NEO4J_USERNAME ?? 'neo4j',
@@ -69,8 +73,8 @@ export const ENV = {
   // Go Legal Library Search Service (parallel fan-out: citation + FTS + pgvector + Qdrant)
   GO_SEARCH_URL: privateEnv.GO_SEARCH_URL ?? '',
   GO_SEARCH_GRPC_URL: privateEnv.GO_SEARCH_GRPC_URL ?? '127.0.0.1:50055',
-  // QUIC server health endpoint (Go microservice on :8095)
-  QUIC_HEALTH_URL: privateEnv.QUIC_HEALTH_URL ?? 'http://127.0.0.1:8095/health',
+  // QUIC/HTTP3 proxy health endpoint (Caddy on :5178 by default)
+  QUIC_HEALTH_URL: privateEnv.QUIC_HEALTH_URL ?? 'http://127.0.0.1:5178/health',
   // FastAPI middleware (optional)
   FASTAPI_URL: privateEnv.FASTAPI_URL ?? 'http://localhost:8001',
   // Web Push (VAPID) — generate with: npx web-push generate-vapid-keys --json

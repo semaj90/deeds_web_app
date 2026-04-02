@@ -51,12 +51,13 @@ export interface LangExtractResponse {
 }
 
 export interface LangExtractHealthStatus {
-	healthy: boolean;
-	services: { spacy?: boolean; transformers_ner?: boolean; gpu?: boolean };
-	version: string;
-	latencyMs: number;
-	source?: 'env' | 'discovery' | 'fallback';
-	resolvedUrl?: string;
+  enabled: boolean;
+  healthy: boolean;
+  services: { spacy?: boolean; transformers_ner?: boolean; gpu?: boolean };
+  version: string;
+  latencyMs: number;
+  source?: 'env' | 'discovery' | 'fallback';
+  resolvedUrl?: string;
 }
 
 /** @deprecated Use LangExtractHealthStatus */
@@ -65,12 +66,12 @@ export type SIMDHealthStatus = LangExtractHealthStatus;
 // ── Service Discovery Config ──────────────────────────────────────────────
 
 const LANGEXTRACT_SERVICE_CONFIG: ServiceConfig = {
-	envVar: 'LANGEXTRACT_URL',
-	fallback: 'http://127.0.0.1:8095',
-	containerName: 'phase66-langextract',
-	port: 8095,
-	verify: true,
-	verifyTimeout: 3000,
+  envVar: 'LANGEXTRACT_URL',
+  fallback: 'http://127.0.0.1:8095',
+  containerName: 'phase66-langextract',
+  port: 8095,
+  verify: true,
+  verifyTimeout: 3000,
 };
 
 /** Port range for dynamic discovery (Docker compose overrides or QUIC/Caddy proxy) */
@@ -84,61 +85,61 @@ let lastResolution = 0;
 const RESOLUTION_TTL = 5 * 60_000; // 5 min cache
 
 async function getBaseUrl(): Promise<string> {
-	const now = Date.now();
-	if (resolvedUrl && now - lastResolution < RESOLUTION_TTL) {
-		return resolvedUrl;
-	}
+  const now = Date.now();
+  if (resolvedUrl && now - lastResolution < RESOLUTION_TTL) {
+    return resolvedUrl;
+  }
 
-	// Priority 1: Explicit env var
-	const explicit = ENV.LANGEXTRACT_URL?.trim();
-	if (explicit && explicit !== 'http://127.0.0.1:8095') {
-		resolvedUrl = explicit;
-		resolvedSource = 'env';
-		lastResolution = now;
-		return resolvedUrl;
-	}
+  // Priority 1: Explicit env var
+  const explicit = ENV.LANGEXTRACT_URL?.trim();
+  if (explicit && explicit !== 'http://127.0.0.1:8095') {
+    resolvedUrl = explicit;
+    resolvedSource = 'env';
+    lastResolution = now;
+    return resolvedUrl;
+  }
 
-	// Priority 2: Docker service discovery with port range scan
-	try {
-		const discovery = getServiceDiscovery();
-		const result = await discovery.getServiceUrl('langextract', LANGEXTRACT_SERVICE_CONFIG);
-		if (result.source === 'discovery' || result.source === 'env') {
-			resolvedUrl = result.url;
-			resolvedSource = result.source;
-			lastResolution = now;
-			return resolvedUrl;
-		}
+  // Priority 2: Docker service discovery with port range scan
+  try {
+    const discovery = getServiceDiscovery();
+    const result = await discovery.getServiceUrl('langextract', LANGEXTRACT_SERVICE_CONFIG);
+    if (result.source === 'discovery' || result.source === 'env') {
+      resolvedUrl = result.url;
+      resolvedSource = result.source;
+      lastResolution = now;
+      return resolvedUrl;
+    }
 
-		// Scan port range (Docker compose may assign dynamic ports via Caddy/QUIC proxy)
-		for (let port = PORT_RANGE.min; port <= PORT_RANGE.max; port++) {
-			if (port === 8095) continue; // Already tried via default
-			try {
-				const probe = await fetch(`http://127.0.0.1:${port}/health`, {
-					signal: AbortSignal.timeout(1000),
-				});
-				if (probe.ok) {
-					const data = await probe.json().catch(() => null);
-					// Verify it's the LangExtract service (has spaCy/NER services)
-					if (data?.services?.spacy !== undefined || data?.version) {
-						resolvedUrl = `http://127.0.0.1:${port}`;
-						resolvedSource = 'discovery';
-						lastResolution = now;
-						return resolvedUrl;
-					}
-				}
-			} catch {
-				// Port not listening
-			}
-		}
-	} catch {
-		// Discovery unavailable
-	}
+    // Scan port range (Docker compose may assign dynamic ports via Caddy/QUIC proxy)
+    for (let port = PORT_RANGE.min; port <= PORT_RANGE.max; port++) {
+      if (port === 8095) continue; // Already tried via default
+      try {
+        const probe = await fetch(`http://127.0.0.1:${port}/health`, {
+          signal: AbortSignal.timeout(1000),
+        });
+        if (probe.ok) {
+          const data = await probe.json().catch(() => null);
+          // Verify it's the LangExtract service (has spaCy/NER services)
+          if (data?.services?.spacy !== undefined || data?.version) {
+            resolvedUrl = `http://127.0.0.1:${port}`;
+            resolvedSource = 'discovery';
+            lastResolution = now;
+            return resolvedUrl;
+          }
+        }
+      } catch {
+        // Port not listening
+      }
+    }
+  } catch {
+    // Discovery unavailable
+  }
 
-	// Priority 3: Default
-	resolvedUrl = LANGEXTRACT_SERVICE_CONFIG.fallback;
-	resolvedSource = 'fallback';
-	lastResolution = now;
-	return resolvedUrl;
+  // Priority 3: Default
+  resolvedUrl = LANGEXTRACT_SERVICE_CONFIG.fallback;
+  resolvedSource = 'fallback';
+  lastResolution = now;
+  return resolvedUrl;
 }
 
 // ── Health ─────────────────────────────────────────────────────────────────
@@ -148,30 +149,30 @@ let lastHealthCheck = 0;
 const HEALTH_CHECK_INTERVAL = 30_000;
 
 async function checkHealth(): Promise<boolean> {
-	const now = Date.now();
-	if (serviceHealthy !== null && now - lastHealthCheck < HEALTH_CHECK_INTERVAL) {
-		return serviceHealthy;
-	}
+  const now = Date.now();
+  if (serviceHealthy !== null && now - lastHealthCheck < HEALTH_CHECK_INTERVAL) {
+    return serviceHealthy;
+  }
 
-	try {
-		const baseUrl = await getBaseUrl();
-		const resp = await fetch(`${baseUrl}/health`, {
-			signal: AbortSignal.timeout(2000),
-		});
-		serviceHealthy = resp.ok;
-	} catch {
-		serviceHealthy = false;
-	}
-	lastHealthCheck = now;
-	return serviceHealthy;
+  try {
+    const baseUrl = await getBaseUrl();
+    const resp = await fetch(`${baseUrl}/health`, {
+      signal: AbortSignal.timeout(2000),
+    });
+    serviceHealthy = resp.ok;
+  } catch {
+    serviceHealthy = false;
+  }
+  lastHealthCheck = now;
+  return serviceHealthy;
 }
 
 /** Force re-resolution (e.g., after container restart) */
 export function invalidateLangExtractResolution(): void {
-	resolvedUrl = null;
-	lastResolution = 0;
-	serviceHealthy = null;
-	lastHealthCheck = 0;
+  resolvedUrl = null;
+  lastResolution = 0;
+  serviceHealthy = null;
+  lastHealthCheck = 0;
 }
 
 // ── Low-level fetch (shared by all callers) ──────────────────────────────
@@ -181,15 +182,12 @@ export function invalidateLangExtractResolution(): void {
  * Handles URL resolution, health gating, and enabled check.
  * Returns null if service is disabled or unhealthy.
  */
-export async function langextractFetch(
-	path: string,
-	init?: RequestInit
-): Promise<Response | null> {
-	if (!ENV.LANGEXTRACT_ENABLED) return null;
-	const healthy = await checkHealth();
-	if (!healthy) return null;
-	const baseUrl = await getBaseUrl();
-	return fetch(`${baseUrl}${path}`, init);
+export async function langextractFetch(path: string, init?: RequestInit): Promise<Response | null> {
+  if (!ENV.LANGEXTRACT_ENABLED) return null;
+  const healthy = await checkHealth();
+  if (!healthy) return null;
+  const baseUrl = await getBaseUrl();
+  return fetch(`${baseUrl}${path}`, init);
 }
 
 // ── Extraction API ────────────────────────────────────────────────────────
@@ -199,47 +197,47 @@ export async function langextractFetch(
  * Returns null if service unavailable.
  */
 export async function extractDocument(
-	content: string,
-	options?: {
-		documentType?: string;
-		extractEntities?: boolean;
-		extractStructure?: boolean;
-		language?: string;
-	}
+  content: string,
+  options?: {
+    documentType?: string;
+    extractEntities?: boolean;
+    extractStructure?: boolean;
+    language?: string;
+  }
 ): Promise<LangExtractResponse | null> {
-	if (!ENV.LANGEXTRACT_ENABLED) return null;
+  if (!ENV.LANGEXTRACT_ENABLED) return null;
 
-	const healthy = await checkHealth();
-	if (!healthy) return null;
+  const healthy = await checkHealth();
+  if (!healthy) return null;
 
-	try {
-		const baseUrl = await getBaseUrl();
-		const body: LangExtractRequest = {
-			content,
-			document_type: options?.documentType ?? 'legal',
-			extract_entities: options?.extractEntities ?? true,
-			extract_structure: options?.extractStructure ?? true,
-			language: options?.language ?? 'en',
-		};
+  try {
+    const baseUrl = await getBaseUrl();
+    const body: LangExtractRequest = {
+      content,
+      document_type: options?.documentType ?? 'legal',
+      extract_entities: options?.extractEntities ?? true,
+      extract_structure: options?.extractStructure ?? true,
+      language: options?.language ?? 'en',
+    };
 
-		const resp = await fetch(`${baseUrl}/extract`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(body),
-			signal: AbortSignal.timeout(30_000),
-		});
+    const resp = await fetch(`${baseUrl}/extract`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(30_000),
+    });
 
-		if (!resp.ok) {
-			console.warn(`[langextract] Extract failed: ${resp.status}`);
-			return null;
-		}
+    if (!resp.ok) {
+      console.warn(`[langextract] Extract failed: ${resp.status}`);
+      return null;
+    }
 
-		return await resp.json();
-	} catch (err) {
-		console.warn('[langextract] Extract error:', (err as Error).message);
-		serviceHealthy = false;
-		return null;
-	}
+    return await resp.json();
+  } catch (err) {
+    console.warn('[langextract] Extract error:', (err as Error).message);
+    serviceHealthy = false;
+    return null;
+  }
 }
 
 /**
@@ -247,98 +245,107 @@ export async function extractDocument(
  * Returns null if service unavailable.
  */
 export async function extractFile(
-	file: File | Blob,
-	options?: { documentType?: string; extractEntities?: boolean }
+  file: File | Blob,
+  options?: { documentType?: string; extractEntities?: boolean }
 ): Promise<LangExtractResponse | null> {
-	if (!ENV.LANGEXTRACT_ENABLED) return null;
+  if (!ENV.LANGEXTRACT_ENABLED) return null;
 
-	const healthy = await checkHealth();
-	if (!healthy) return null;
+  const healthy = await checkHealth();
+  if (!healthy) return null;
 
-	try {
-		const baseUrl = await getBaseUrl();
-		const formData = new FormData();
-		formData.append('file', file);
+  try {
+    const baseUrl = await getBaseUrl();
+    const formData = new FormData();
+    formData.append('file', file);
 
-		const params = new URLSearchParams();
-		if (options?.documentType) params.set('document_type', options.documentType);
-		if (options?.extractEntities !== undefined) params.set('extract_entities', String(options.extractEntities));
+    const params = new URLSearchParams();
+    if (options?.documentType) params.set('document_type', options.documentType);
+    if (options?.extractEntities !== undefined)
+      params.set('extract_entities', String(options.extractEntities));
 
-		const url = `${baseUrl}/extract/file${params.toString() ? `?${params}` : ''}`;
+    const url = `${baseUrl}/extract/file${params.toString() ? `?${params}` : ''}`;
 
-		const resp = await fetch(url, {
-			method: 'POST',
-			body: formData,
-			signal: AbortSignal.timeout(60_000), // files can be large
-		});
+    const resp = await fetch(url, {
+      method: 'POST',
+      body: formData,
+      signal: AbortSignal.timeout(60_000), // files can be large
+    });
 
-		if (!resp.ok) {
-			console.warn(`[langextract] File extract failed: ${resp.status}`);
-			return null;
-		}
+    if (!resp.ok) {
+      console.warn(`[langextract] File extract failed: ${resp.status}`);
+      return null;
+    }
 
-		return await resp.json();
-	} catch (err) {
-		console.warn('[langextract] File extract error:', (err as Error).message);
-		serviceHealthy = false;
-		return null;
-	}
+    return await resp.json();
+  } catch (err) {
+    console.warn('[langextract] File extract error:', (err as Error).message);
+    serviceHealthy = false;
+    return null;
+  }
 }
 
 // ── Legacy Aliases (backwards compat for infrastructure/status consumers) ──
 
 /** @deprecated Use extractDocument() */
 export async function getEvidenceViaSIMD(): Promise<null> {
-	return null; // MinIO SIMD proxy no longer exists — use minio-js directly
+  return null; // MinIO SIMD proxy no longer exists — use minio-js directly
 }
 
 /** @deprecated Use extractDocument() */
 export async function getChunksViaSIMD(): Promise<null> {
-	return null;
+  return null;
 }
 
 /** @deprecated Use extractDocument() */
 export async function getManifestViaSIMD(): Promise<null> {
-	return null;
+  return null;
 }
 
 /**
  * Health status for monitoring dashboard.
  */
 export async function getLangExtractStatus(): Promise<LangExtractHealthStatus> {
-	if (!ENV.LANGEXTRACT_ENABLED) {
-		return { healthy: false, services: {}, version: '', latencyMs: -1 };
-	}
+  const start = Date.now();
+  const enabled = ENV.LANGEXTRACT_ENABLED;
 
-	const start = Date.now();
-	try {
-		const baseUrl = await getBaseUrl();
-		const resp = await fetch(`${baseUrl}/health`, {
-			signal: AbortSignal.timeout(3_000),
-		});
-		const latencyMs = Date.now() - start;
+  try {
+    const baseUrl = await getBaseUrl();
+    const resp = await fetch(`${baseUrl}/health`, {
+      signal: AbortSignal.timeout(3_000),
+    });
+    const latencyMs = Date.now() - start;
 
-		if (!resp.ok) {
-			return { healthy: false, services: {}, version: '', latencyMs, source: resolvedSource, resolvedUrl: resolvedUrl ?? undefined };
-		}
+    if (!resp.ok) {
+      return {
+        enabled,
+        healthy: false,
+        services: {},
+        version: '',
+        latencyMs,
+        source: resolvedSource,
+        resolvedUrl: resolvedUrl ?? undefined,
+      };
+    }
 
-		const data = await resp.json();
-		return {
-			healthy: data.status === 'healthy' || data.status === 'degraded',
-			services: data.services ?? {},
-			version: data.version ?? '',
-			latencyMs,
-			source: resolvedSource,
-			resolvedUrl: resolvedUrl ?? undefined,
-		};
-	} catch {
-		return {
-			healthy: false,
-			services: {},
-			version: '',
-			latencyMs: Date.now() - start,
-			source: resolvedSource,
-			resolvedUrl: resolvedUrl ?? undefined,
-		};
-	}
+    const data = await resp.json();
+    return {
+      enabled,
+      healthy: data.status === 'healthy' || data.status === 'degraded',
+      services: data.services ?? {},
+      version: data.version ?? '',
+      latencyMs,
+      source: resolvedSource,
+      resolvedUrl: resolvedUrl ?? undefined,
+    };
+  } catch {
+    return {
+      enabled,
+      healthy: false,
+      services: {},
+      version: '',
+      latencyMs: Date.now() - start,
+      source: resolvedSource,
+      resolvedUrl: resolvedUrl ?? undefined,
+    };
+  }
 }
