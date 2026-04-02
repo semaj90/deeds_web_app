@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { litellmChat } from '$lib/server/ollama.js';
+import { bifrostChat } from '$lib/server/ollama.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { TIMEOUTS } from '$lib/server/timeouts.js';
@@ -47,10 +47,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       'ai-chat',
       { model: 'gemma3-legal:latest', prompt: message.slice(0, 500) },
       async (gen) => {
-        // Route through LiteLLM proxy when enabled (gets semantic caching)
-        if (ENV.LITELLM_ENABLED) {
+        // Route through Bifrost gateway when enabled (gets semantic caching)
+        if (ENV.BIFROST_ENABLED) {
           try {
-            const content = await litellmChat(
+            const content = await bifrostChat(
               [
                 { role: 'system', content: systemPrompt },
                 ...(body.history || []),
@@ -62,7 +62,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             gen.end({ output: content.slice(0, 1000) });
             return { message: { content }, model: 'gemma3-legal:latest' };
           } catch {
-            gen.end({ output: 'litellm-fallthrough', level: 'WARNING' });
+            gen.end({ output: 'bifrost-fallthrough', level: 'WARNING' });
             // Fall through to direct Ollama
           }
         }

@@ -13,7 +13,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { acquireGpuLease, releaseGpuLease, getGpuLeaseStatus } from './gpu-arbiter.js';
 import { inferLLM, healthCheck as trtHealthCheck } from '$lib/server/trt-llm.js';
-import { litellmChat } from '$lib/server/ollama.js';
+import { bifrostChat } from '$lib/server/ollama.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
 export interface InferenceRequest {
@@ -27,7 +27,7 @@ export interface InferenceRequest {
 export interface InferenceResponse {
 	text: string;
 	model: string;
-	backend: 'tensorrt' | 'litellm' | 'ollama';
+	backend: 'tensorrt' | 'bifrost' | 'ollama';
 	usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
 	latencyMs: number;
 	error?: string;
@@ -50,12 +50,12 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
 		}
 	}
 
-	// Try LiteLLM proxy (semantic caching via Redis) when enabled
-	if (ENV.LITELLM_ENABLED) {
-		const litellmResult = await tryLiteLLM(request, start);
-		if (litellmResult) {
-			console.info(`[inference-router] backend=litellm latency=${litellmResult.latencyMs}ms`);
-			return litellmResult;
+	// Try Bifrost gateway (semantic caching) when enabled
+	if (ENV.BIFROST_ENABLED) {
+		const bifrostResult = await tryBifrost(request, start);
+		if (bifrostResult) {
+			console.info(`[inference-router] backend=bifrost latency=${bifrostResult.latencyMs}ms`);
+			return bifrostResult;
 		}
 	}
 
@@ -102,15 +102,15 @@ async function tryTensorRT(request: InferenceRequest): Promise<InferenceResponse
 	}
 }
 
-async function tryLiteLLM(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
+async function tryBifrost(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
 	const model = 'gemma3-legal';
 	const messages: Array<{ role: string; content: string }> = [];
 	if (request.systemPrompt) messages.push({ role: 'system', content: request.systemPrompt });
 	messages.push({ role: 'user', content: request.prompt });
 
 	try {
-		const text = await traceLLM('inference-router-litellm', { model, prompt: request.prompt.slice(0, 500) }, async (gen) => {
-			const content = await litellmChat(messages, model, {
+		const text = await traceLLM('inference-router-bifrost', { model, prompt: request.prompt.slice(0, 500) }, async (gen) => {
+			const content = await bifrostChat(messages, model, {
 				temperature: request.temperature,
 				maxTokens: request.maxTokens,
 				timeoutMs: 120_000
@@ -121,8 +121,8 @@ async function tryLiteLLM(request: InferenceRequest, startTime: number): Promise
 
 		return {
 			text,
-			model: 'gemma3-legal-litellm',
-			backend: 'litellm',
+			model: 'gemma3-legal-bifrost',
+			backend: 'bifrost',
 			latencyMs: Math.round(performance.now() - startTime)
 		};
 	} catch {
@@ -200,12 +200,12 @@ export async function getRouterStatus() {
 
 	return {
 		tensorrt: { available: trtOk, url: ENV.TENSORRT_URL },
-		litellm: { enabled: ENV.LITELLM_ENABLED, url: ENV.LITELLM_URL },
+		bifrost: { enabled: ENV.BIFROST_ENABLED, url: ENV.BIFROST_URL },
 		ollama: { url: ENV.OLLAMA_BASE_URL },
 		gpu: {
 			leaseHolder: lease?.backend ?? null,
 			leaseFree: !lease,
 		},
-		preferredBackend: trtOk && !lease ? 'tensorrt' : ENV.LITELLM_ENABLED ? 'litellm' : 'ollama'
+		preferredBackend: trtOk && !lease ? 'tensorrt' : ENV.BIFROST_ENABLED ? 'bifrost' : 'ollama'
 	};
 }

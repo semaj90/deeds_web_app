@@ -3,11 +3,11 @@
  *
  * Provides a clean interface for LLM integration with the RAG system.
  * Supports both streaming and non-streaming responses.
- * Routes through LiteLLM proxy when LITELLM_ENABLED=true for semantic caching.
+ * Routes through Bifrost gateway when BIFROST_ENABLED=true for semantic caching.
  */
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { getChatModelKeepAlive, litellmChat, ollamaFetch } from '$lib/server/ollama.js';
+import { getChatModelKeepAlive, bifrostChat, ollamaFetch } from '$lib/server/ollama.js';
 
 const DEFAULT_URL = ENV.OLLAMA_BASE_URL;
 const DEFAULT_MODEL =
@@ -48,7 +48,7 @@ export interface LLMResponse {
 }
 
 /**
- * Generate a completion using Ollama (or LiteLLM when enabled)
+ * Generate a completion using Ollama (or Bifrost when enabled)
  */
 export async function generateCompletion(
   prompt: string,
@@ -56,10 +56,10 @@ export async function generateCompletion(
 ): Promise<LLMResponse> {
   const model = options.model ?? DEFAULT_MODEL;
 
-  // Route through LiteLLM proxy when enabled (gets semantic caching)
-  if (ENV.LITELLM_ENABLED) {
+  // Route through Bifrost gateway when enabled (gets semantic caching)
+  if (ENV.BIFROST_ENABLED) {
     return traceLLM('generate-completion', { model, prompt: prompt.slice(0, 500) }, async (gen) => {
-      const content = await litellmChat([{ role: 'user', content: prompt }], model, {
+      const content = await bifrostChat([{ role: 'user', content: prompt }], model, {
         temperature: options.temperature,
         maxTokens: options.maxTokens,
       });
@@ -121,10 +121,10 @@ export async function chatCompletion(
 ): Promise<LLMResponse> {
   const model = options.model ?? DEFAULT_MODEL;
 
-  // Route through LiteLLM proxy when enabled (gets semantic caching)
-  if (ENV.LITELLM_ENABLED) {
+  // Route through Bifrost gateway when enabled (gets semantic caching)
+  if (ENV.BIFROST_ENABLED) {
     return traceLLM('chat-completion', { model, messages: messages.slice(-3) }, async (gen) => {
-      const content = await litellmChat(messages, model, {
+      const content = await bifrostChat(messages, model, {
         temperature: options.temperature,
         maxTokens: options.maxTokens,
       });
@@ -250,7 +250,7 @@ JSON:`;
 }
 
 /**
- * Check if Ollama is available (always checks Ollama directly, not LiteLLM)
+ * Check if Ollama is available (always checks Ollama directly, not Bifrost)
  */
 export async function checkOllamaHealth(): Promise<{
 	available: boolean;
@@ -288,7 +288,7 @@ export function getModelConfig() {
 		url: DEFAULT_URL,
 		chatModel: DEFAULT_MODEL,
 		embedModel: process.env.OLLAMA_MODEL_EMBED ?? 'nomic-embed-text',
-		litellmEnabled: ENV.LITELLM_ENABLED,
-		litellmUrl: ENV.LITELLM_URL,
+		bifrostEnabled: ENV.BIFROST_ENABLED,
+		bifrostUrl: ENV.BIFROST_URL,
 	};
 }

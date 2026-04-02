@@ -95,10 +95,9 @@ export const ENV = {
   LANGFUSE_SECRET_KEY: privateEnv.LANGFUSE_SECRET_KEY ?? '',
   LANGFUSE_HOST: privateEnv.LANGFUSE_HOST ?? 'http://localhost:3030',
   LANGFUSE_ENABLED: (privateEnv.LANGFUSE_ENABLED ?? 'false') === 'true',
-  // LiteLLM proxy (OpenAI-compatible gateway with semantic caching)
-  LITELLM_URL: privateEnv.LITELLM_URL ?? 'http://localhost:4000',
-  LITELLM_API_KEY: privateEnv.LITELLM_API_KEY ?? 'sk-deeds-litellm-2026',
-  LITELLM_ENABLED: (privateEnv.LITELLM_ENABLED ?? 'false') === 'true',
+  // Bifrost AI gateway (Go, OpenAI-compatible, built-in semantic cache -- replaces LiteLLM)
+  BIFROST_URL: privateEnv.BIFROST_URL ?? 'http://localhost:3040',
+  BIFROST_ENABLED: (privateEnv.BIFROST_ENABLED ?? 'false') === 'true',
   // Auth secrets
   JWT_SECRET: privateEnv.JWT_SECRET ?? DEV.JWT_SECRET,
   SERVICE_AUTH_TOKEN: privateEnv.SERVICE_AUTH_TOKEN ?? DEV.SERVICE_AUTH_TOKEN,

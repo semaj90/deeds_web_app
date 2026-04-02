@@ -10,7 +10,7 @@
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { getChatModelKeepAlive, litellmChat, ollamaFetch } from '$lib/server/ollama.js';
+import { getChatModelKeepAlive, bifrostChat, ollamaFetch } from '$lib/server/ollama.js';
 import { redis } from '$lib/server/redis.js';
 import type { ACEContext, SelfEvaluation } from './types.js';
 
@@ -48,9 +48,9 @@ export async function evaluateResponse(opts: {
       'ace-self-eval',
       { model: MODEL, prompt: opts.query.slice(0, 300) },
       async (gen) => {
-        // Route through LiteLLM proxy when enabled (gets semantic caching)
-        if (ENV.LITELLM_ENABLED) {
-          const text = await litellmChat([{ role: 'user', content: evalPrompt }], MODEL, {
+        // Route through Bifrost gateway when enabled (gets semantic caching)
+        if (ENV.BIFROST_ENABLED) {
+          const text = await bifrostChat([{ role: 'user', content: evalPrompt }], MODEL, {
             temperature: 0.1,
             maxTokens: 256,
             timeoutMs: 15_000,

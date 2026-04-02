@@ -3328,7 +3328,7 @@ export type NewApiAuditLogEntry = typeof apiAuditLog.$inferInsert;
 // Central registry of all AI models available across backends (Ollama, TRT-LLM, PyTorch, ONNX)
 
 export const inferenceBackendEnum = pgEnum('inference_backend', [
-	'ollama', 'tensorrt', 'litellm', 'pytorch', 'onnx',
+	'ollama', 'tensorrt', 'bifrost', 'litellm', 'pytorch', 'onnx',
 ]);
 
 export const modelCapabilityEnum = pgEnum('model_capability', [

@@ -11,7 +11,7 @@ import type { RequestHandler } from './$types';
 import { requireAuth } from '$lib/server/auth-helpers.js';
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { litellmChat } from '$lib/server/ollama.js';
+import { bifrostChat } from '$lib/server/ollama.js';
 import { z } from 'zod';
 
 const synthesisRequestSchema = z.object({
@@ -138,9 +138,9 @@ async function callOllama(
 
 	const start = performance.now();
 	return traceLLM('synthesis-generate', { model: MODEL, prompt: query.slice(0, 500) }, async (gen) => {
-		// Route through LiteLLM proxy when enabled (gets semantic caching)
-		if (ENV.LITELLM_ENABLED) {
-			const text = await litellmChat(
+		// Route through Bifrost gateway when enabled (gets semantic caching)
+		if (ENV.BIFROST_ENABLED) {
+			const text = await bifrostChat(
 				[
 					{ role: 'system', content: systemPrompt },
 					{ role: 'user', content: userPrompt }

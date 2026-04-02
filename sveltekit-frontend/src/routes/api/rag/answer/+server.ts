@@ -9,7 +9,7 @@ import type {
 } from '$lib/types/rag-source-validation';
 import { getRedis } from '$lib/server/redis.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { litellmChat } from '$lib/server/ollama.js';
+import { bifrostChat } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { trackTokenUsage } from '$lib/server/ai/token-tracker.js';
@@ -107,11 +107,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		const prompt = `${systemPrompt}${contextBlock}Question: ${query}\n\nProvide a comprehensive legal analysis. Include [Source N] citations where applicable.${include_todos ? ' Also list any recommended action items.' : ''}`;
 
-		// Call Ollama (or LiteLLM) for generation
+		// Call Ollama (or Bifrost) for generation
 		const { answerText, genTime, evalCount } = await traceLLM('rag-answer', { model: 'gemma3-legal:latest', prompt: query.slice(0, 500), case_id }, async (gen) => {
-			// Route through LiteLLM proxy when enabled (gets semantic caching)
-			if (ENV.LITELLM_ENABLED) {
-				const text = await litellmChat(
+			// Route through Bifrost gateway when enabled (gets semantic caching)
+			if (ENV.BIFROST_ENABLED) {
+				const text = await bifrostChat(
 					[{ role: 'user', content: prompt }],
 					'gemma3-legal',
 					{ maxTokens: max_tokens, temperature, timeoutMs: 30_000 }

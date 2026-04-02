@@ -5,7 +5,7 @@
  *   - getOllamaEndpoint(): string — resolve Ollama URL from env
  *   - generateText(prompt): string — simple chat (non-streaming)
  *   - callOllamaChat(system, user): string — system+user chat with logging
- *   - litellmChat(messages, model, options): string — OpenAI-format call via LiteLLM proxy
+ *   - bifrostChat(messages, model, options): string — OpenAI-format call via Bifrost gateway
  *   - checkOllamaHealth(): boolean — health probe via /api/tags
  *   - listAvailableModels(): string[] — available model names
  *   - VLM_MODELS — model name constants
@@ -177,25 +177,24 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
 	}
 }
 
-// ── LiteLLM Proxy (OpenAI-compatible gateway with semantic caching) ─────
+// ── Bifrost Gateway (OpenAI-compatible gateway with semantic caching) ─────
 
 /**
- * Call LiteLLM proxy using OpenAI-compatible format.
- * LiteLLM applies semantic caching via Redis + RediSearch before
+ * Call Bifrost gateway using OpenAI-compatible format.
+ * Bifrost applies semantic caching before
  * forwarding to Ollama. Returns the content string.
  *
  * Exported so other modules can use it directly.
  */
-export async function litellmChat(
+export async function bifrostChat(
 	messages: Array<{ role: string; content: string }>,
 	model: string,
 	options?: { temperature?: number; maxTokens?: number; timeoutMs?: number }
 ): Promise<string> {
-	const res = await fetch(`${ENV.LITELLM_URL}/v1/chat/completions`, {
+	const res = await fetch(`${ENV.BIFROST_URL}/v1/chat/completions`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${ENV.LITELLM_API_KEY}`,
 		},
 		body: JSON.stringify({
 			model,
@@ -209,7 +208,7 @@ export async function litellmChat(
 
 	if (!res.ok) {
 		const text = await res.text().catch(() => '');
-		throw new Error(`LiteLLM error: ${res.status} ${text.slice(0, 200)}`);
+		throw new Error(`Bifrost error: ${res.status} ${text.slice(0, 200)}`);
 	}
 
 	const data = (await res.json()) as {
@@ -221,10 +220,10 @@ export async function litellmChat(
 // ── Chat Functions (merged from ollama-service.ts) ──────────────────────
 
 export async function generateText(prompt: string): Promise<string> {
-	// Route through LiteLLM proxy when enabled (gets semantic caching)
-	if (ENV.LITELLM_ENABLED) {
+	// Route through Bifrost gateway when enabled (gets semantic caching)
+	if (ENV.BIFROST_ENABLED) {
 		return traceLLM('generate-text', { model: CHAT_MODEL, prompt: prompt.slice(0, 500) }, async (gen) => {
-			const content = await litellmChat(
+			const content = await bifrostChat(
 				[{ role: 'user', content: prompt }],
 				CHAT_MODEL
 			);
@@ -270,13 +269,13 @@ export async function callOllamaChat(
   userPrompt: string,
   options?: { format?: 'json'; num_predict?: number; temperature?: number }
 ): Promise<string> {
-  // Route through LiteLLM proxy when enabled (gets semantic caching)
-  if (ENV.LITELLM_ENABLED) {
+  // Route through Bifrost gateway when enabled (gets semantic caching)
+  if (ENV.BIFROST_ENABLED) {
     return traceLLM(
       'ollama-chat',
       { model: CHAT_MODEL, prompt: userPrompt.slice(0, 500) },
       async (gen) => {
-        const content = await litellmChat(
+        const content = await bifrostChat(
           [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt },
