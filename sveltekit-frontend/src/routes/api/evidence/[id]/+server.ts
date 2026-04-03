@@ -128,6 +128,14 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
       return json({ error: 'Evidence not found' }, { status: 404 });
     }
 
+    // Sync parent case to Neo4j graph (non-blocking)
+    const syncCaseId = (updated as Record<string, unknown>).caseId as string | null;
+    if (syncCaseId) {
+      import('$lib/server/graph/pg-neo4j-sync.js').then(({ syncCaseToGraph }) =>
+        syncCaseToGraph(syncCaseId).catch(err => console.warn('[neo4j-sync] evidence update:', err))
+      ).catch(() => {});
+    }
+
     return json(updated);
   } catch (err) {
     console.error('[evidence] PATCH error:', err);
@@ -146,10 +154,17 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 		const [deleted] = await db
 			.delete(evidence)
 			.where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
-			.returning({ id: evidence.id, title: evidence.title });
+			.returning({ id: evidence.id, title: evidence.title, caseId: evidence.caseId });
 
 		if (!deleted) {
 			return json({ error: 'Evidence not found' }, { status: 404 });
+		}
+
+		// Sync parent case to Neo4j graph (non-blocking)
+		if (deleted.caseId) {
+			import('$lib/server/graph/pg-neo4j-sync.js').then(({ syncCaseToGraph }) =>
+				syncCaseToGraph(deleted.caseId!).catch(err => console.warn('[neo4j-sync] evidence delete:', err))
+			).catch(() => {});
 		}
 
 		return json({ success: true, deleted });

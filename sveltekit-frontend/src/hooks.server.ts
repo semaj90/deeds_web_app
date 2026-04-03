@@ -720,6 +720,14 @@ if (typeof process !== 'undefined') {
 			// Non-fatal
 		}
 
+		// Flush inference log buffer to CouchDB
+		try {
+			const { flushInferenceLog } = await import('$lib/server/observability/inference-log.js');
+			await flushInferenceLog();
+		} catch {
+			// Non-fatal
+		}
+
 		// Flush audit buffer
 		try {
 			await auditBuffer.shutdown();

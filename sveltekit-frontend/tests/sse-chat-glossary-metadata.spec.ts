@@ -1,4 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+const originalAceChatSelfEvalEnabled = process.env.ACE_CHAT_SELF_EVAL_ENABLED;
 
 const mockInsertValues = vi.fn();
 const mockInsert = vi.fn(() => ({ values: mockInsertValues }));
@@ -49,6 +51,8 @@ vi.mock('$lib/server/db/schema', () => ({
 
 vi.mock('$lib/server/ollama.js', () => ({
   ollamaFetch: mockOllamaFetch,
+  getChatModelKeepAlive: vi.fn(() => '5m'),
+  getEmbeddingModelKeepAlive: vi.fn(() => '5m'),
 }));
 
 vi.mock('$lib/server/retrieval/codebase-context.js', () => ({
@@ -57,6 +61,17 @@ vi.mock('$lib/server/retrieval/codebase-context.js', () => ({
 
 vi.mock('$lib/server/retrieval/graph-context.js', () => ({
   getGraphContext: mockGetGraphContext,
+  getCaseGraphNeighborIds: vi.fn(async () => []),
+  buildGraphShouldFilter: vi.fn(() => null),
+  applyGraphAuthorityScoring: vi.fn((docs: unknown[]) => docs),
+}));
+
+vi.mock('$lib/server/retrieval/graph-informed-retrieval.js', () => ({
+  graphExpandRetrieval: vi.fn(async (_qv: unknown, docs: unknown[]) => docs),
+}));
+
+vi.mock('$lib/server/retrieval/authority-chain.js', () => ({
+  authorityChainExpansion: vi.fn(async (_qv: unknown, docs: unknown[]) => ({ docs, hops: 0, expanded: 0, authorities: { statutes: [], cases: [] } })),
 }));
 
 vi.mock('$lib/server/ai/llm-cache.js', () => ({
@@ -79,6 +94,9 @@ vi.mock('$lib/server/glyph-prompt-cache.js', () => ({
 vi.mock('$lib/server/observability/langfuse.js', () => ({
   traceEmbedding: vi.fn(async (_query: string, _model: string, operation: () => Promise<unknown>) =>
     operation()
+  ),
+  traceCouchDB: vi.fn(
+    async (_operation: string, _details: unknown, action: () => Promise<unknown>) => action()
   ),
 }));
 
@@ -149,7 +167,9 @@ describe('/api/sse/chat glossary metadata', () => {
   };
 
   beforeEach(() => {
+    vi.resetModules();
     vi.clearAllMocks();
+    process.env.ACE_CHAT_SELF_EVAL_ENABLED = 'true';
 
     mockInsertValues.mockResolvedValue(undefined);
     mockHistoryLimit.mockResolvedValue([]);
@@ -168,6 +188,14 @@ describe('/api/sse/chat glossary metadata', () => {
     mockGenerateCorrectionPrompt.mockReturnValue(null);
     mockLoadCodebaseContext.mockResolvedValue(null);
     mockGetGraphContext.mockResolvedValue(null);
+  });
+
+  afterEach(() => {
+    if (typeof originalAceChatSelfEvalEnabled === 'string') {
+      process.env.ACE_CHAT_SELF_EVAL_ENABLED = originalAceChatSelfEvalEnabled;
+    } else {
+      delete process.env.ACE_CHAT_SELF_EVAL_ENABLED;
+    }
   });
 
   it('emits glossary matches in the final SSE metadata payload', async () => {
@@ -510,7 +538,9 @@ describe('/api/sse/chat glossary metadata', () => {
     };
     const assistantMetadata = JSON.parse(assistantInsertCall.metadata ?? '{}');
 
-    expect(assistantInsertCall.content).toBe('Improved legal answer with explicit support [Source 1].');
+    expect(assistantInsertCall.content).toBe(
+      'Improved legal answer with explicit support [Source 1].'
+    );
     expect(assistantMetadata.confidence).toBe(doneEvent?.confidence);
     expect(assistantMetadata.contextUsed?.ragDocIds).toEqual(['legal_documents:legal-doc-retry-1']);
     expect(assistantMetadata.contextUsed?.citations).toEqual(doneEvent?.citations);
@@ -681,7 +711,10 @@ describe('/api/sse/chat glossary metadata', () => {
 
     mockLookupCachedResponse.mockResolvedValue({ hit: false });
     mockHistoryLimit.mockResolvedValue([
-      { role: 'user', content: 'Explain this route handler in this repo with supporting legal context.' },
+      {
+        role: 'user',
+        content: 'Explain this route handler in this repo with supporting legal context.',
+      },
       { role: 'assistant', content: 'Earlier route summary.' },
       { role: 'user', content: 'Earlier route facts.' },
     ]);
@@ -698,7 +731,11 @@ describe('/api/sse/chat glossary metadata', () => {
         '## Codebase Context\n- src/routes/api/sse/chat/+server.ts handles SSE streaming\n- retry branch preserves conversation history',
       chunks: [
         { relativePath: 'src/routes/api/sse/chat/+server.ts', symbol: 'POST', score: 0.81 },
-        { relativePath: 'src/lib/server/ai/llm-cache.ts', symbol: 'storeCachedResponse', score: 0.74 },
+        {
+          relativePath: 'src/lib/server/ai/llm-cache.ts',
+          symbol: 'storeCachedResponse',
+          score: 0.74,
+        },
       ],
     });
     mockGetGraphContext.mockResolvedValue({
@@ -880,8 +917,7 @@ describe('/api/sse/chat glossary metadata', () => {
                 id: 'legal-doc-kag-only-1',
                 score: 0.86,
                 payload: {
-                  full_text:
-                    'Retrieved legal grounding text for a KAG-only high-quality response.',
+                  full_text: 'Retrieved legal grounding text for a KAG-only high-quality response.',
                   embedding_model: 'embeddinggemma:latest',
                 },
               },
@@ -944,7 +980,7 @@ describe('/api/sse/chat glossary metadata', () => {
           {
             sourceNum: 1,
             documentId: 'legal_documents:legal-doc-kag-only-1',
-            similarity: 0.86,
+            similarity: 1,
           },
         ],
         conversationTurns: 2,
@@ -959,7 +995,7 @@ describe('/api/sse/chat glossary metadata', () => {
     expect(doneEvent?.confidenceFactors).toEqual({
       caseContext: false,
       ragHits: 1,
-      topScore: 0.86,
+      topScore: 1,
       embeddingModel: 'embeddinggemma:latest',
       codebaseHits: 0,
       kagNeighbors: 2,
@@ -1024,7 +1060,11 @@ describe('/api/sse/chat glossary metadata', () => {
         '## Codebase Context\n- src/routes/api/sse/chat/+server.ts builds SSE responses\n- src/lib/server/ai/llm-cache.ts stores semantic cache entries',
       chunks: [
         { relativePath: 'src/routes/api/sse/chat/+server.ts', symbol: 'POST', score: 0.8 },
-        { relativePath: 'src/lib/server/ai/llm-cache.ts', symbol: 'storeCachedResponse', score: 0.72 },
+        {
+          relativePath: 'src/lib/server/ai/llm-cache.ts',
+          symbol: 'storeCachedResponse',
+          score: 0.72,
+        },
       ],
     });
     mockGetGraphContext.mockResolvedValue(null);
@@ -1049,8 +1089,7 @@ describe('/api/sse/chat glossary metadata', () => {
                 id: 'legal-doc-code-cache-1',
                 score: 0.86,
                 payload: {
-                  full_text:
-                    'Retrieved legal grounding text for a code-aware cached response.',
+                  full_text: 'Retrieved legal grounding text for a code-aware cached response.',
                   embedding_model: 'embeddinggemma:latest',
                 },
               },
@@ -1122,7 +1161,9 @@ describe('/api/sse/chat glossary metadata', () => {
     expect(assistantMetadata.confidence).toBe(doneEvent?.confidence);
     expect(assistantMetadata.cachedResponse).toBe(true);
     expect(assistantMetadata.confidenceFactors).toEqual(doneEvent?.confidenceFactors);
-    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual(['legal_documents:legal-doc-code-cache-1']);
+    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual([
+      'legal_documents:legal-doc-code-cache-1',
+    ]);
     expect(assistantMetadata.contextUsed?.codebaseChunks).toEqual([
       { path: 'src/routes/api/sse/chat/+server.ts', symbol: 'POST', score: 0.8 },
       { path: 'src/lib/server/ai/llm-cache.ts', symbol: 'storeCachedResponse', score: 0.72 },
@@ -1187,8 +1228,7 @@ describe('/api/sse/chat glossary metadata', () => {
                 id: 'legal-doc-kag-cache-1',
                 score: 0.86,
                 payload: {
-                  full_text:
-                    'Retrieved legal grounding text for a KAG-aware cached response.',
+                  full_text: 'Retrieved legal grounding text for a KAG-aware cached response.',
                   embedding_model: 'embeddinggemma:latest',
                 },
               },
@@ -1231,7 +1271,7 @@ describe('/api/sse/chat glossary metadata', () => {
           {
             sourceNum: 1,
             documentId: 'legal_documents:legal-doc-kag-cache-1',
-            similarity: 0.86,
+            similarity: 1,
           },
         ],
         conversationTurns: 2,
@@ -1240,7 +1280,7 @@ describe('/api/sse/chat glossary metadata', () => {
     expect(doneEvent?.confidenceFactors).toEqual({
       caseContext: false,
       ragHits: 1,
-      topScore: 0.86,
+      topScore: 1,
       embeddingModel: 'embeddinggemma:latest',
       codebaseHits: 0,
       kagNeighbors: 2,
@@ -1260,7 +1300,9 @@ describe('/api/sse/chat glossary metadata', () => {
     expect(assistantMetadata.confidence).toBe(doneEvent?.confidence);
     expect(assistantMetadata.cachedResponse).toBe(true);
     expect(assistantMetadata.confidenceFactors).toEqual(doneEvent?.confidenceFactors);
-    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual(['legal_documents:legal-doc-kag-cache-1']);
+    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual([
+      'legal_documents:legal-doc-kag-cache-1',
+    ]);
     expect(assistantMetadata.contextUsed?.codebaseChunks).toEqual([]);
     expect(assistantMetadata.contextUsed?.citations).toEqual(doneEvent?.citations);
 
@@ -1292,7 +1334,10 @@ describe('/api/sse/chat glossary metadata', () => {
       cachedAt: '2026-03-21T12:20:00.000Z',
     });
     mockHistoryLimit.mockResolvedValue([
-      { role: 'user', content: 'Explain this route handler in this repo with supporting legal context.' },
+      {
+        role: 'user',
+        content: 'Explain this route handler in this repo with supporting legal context.',
+      },
       { role: 'assistant', content: 'Earlier route summary.' },
       { role: 'user', content: 'Earlier route facts.' },
     ]);
@@ -1301,7 +1346,11 @@ describe('/api/sse/chat glossary metadata', () => {
         '## Codebase Context\n- src/routes/api/sse/chat/+server.ts handles SSE streaming\n- retry branch preserves conversation history',
       chunks: [
         { relativePath: 'src/routes/api/sse/chat/+server.ts', symbol: 'POST', score: 0.81 },
-        { relativePath: 'src/lib/server/ai/llm-cache.ts', symbol: 'storeCachedResponse', score: 0.74 },
+        {
+          relativePath: 'src/lib/server/ai/llm-cache.ts',
+          symbol: 'storeCachedResponse',
+          score: 0.74,
+        },
       ],
     });
     mockGetGraphContext.mockResolvedValue({
@@ -1406,7 +1455,9 @@ describe('/api/sse/chat glossary metadata', () => {
     expect(assistantMetadata.confidence).toBe(doneEvent?.confidence);
     expect(assistantMetadata.cachedResponse).toBe(true);
     expect(assistantMetadata.confidenceFactors).toEqual(doneEvent?.confidenceFactors);
-    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual(['legal_documents:legal-doc-code-kag-cache-1']);
+    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual([
+      'legal_documents:legal-doc-code-kag-cache-1',
+    ]);
     expect(assistantMetadata.contextUsed?.codebaseChunks).toEqual([
       { path: 'src/routes/api/sse/chat/+server.ts', symbol: 'POST', score: 0.81 },
       { path: 'src/lib/server/ai/llm-cache.ts', symbol: 'storeCachedResponse', score: 0.74 },
@@ -1447,7 +1498,11 @@ describe('/api/sse/chat glossary metadata', () => {
         '## Codebase Context\n- src/routes/api/sse/chat/+server.ts builds SSE responses\n- src/lib/server/ai/llm-cache.ts stores semantic cache entries',
       chunks: [
         { relativePath: 'src/routes/api/sse/chat/+server.ts', symbol: 'POST', score: 0.8 },
-        { relativePath: 'src/lib/server/ai/llm-cache.ts', symbol: 'storeCachedResponse', score: 0.72 },
+        {
+          relativePath: 'src/lib/server/ai/llm-cache.ts',
+          symbol: 'storeCachedResponse',
+          score: 0.72,
+        },
       ],
     });
     mockGetGraphContext.mockResolvedValue(null);
@@ -1533,7 +1588,9 @@ describe('/api/sse/chat glossary metadata', () => {
     expect(cacheStoreCall.query).toBe(lookupCall.query);
     expect(cacheStoreCall.model).toBe(lookupCall.model);
     expect(cacheStoreCall.context).toBe(lookupCall.context);
-    expect(cacheStoreCall.context).toContain('Retrieved legal grounding text for cache context parity on the live path.');
+    expect(cacheStoreCall.context).toContain(
+      'Retrieved legal grounding text for cache context parity on the live path.'
+    );
     expect(cacheStoreCall.context).toContain('## Codebase Context');
   });
 
@@ -1575,9 +1632,7 @@ describe('/api/sse/chat glossary metadata', () => {
 
     mockOllamaFetch.mockImplementation(async (url: string) => {
       if (url.endsWith('/api/chat')) {
-        return makeStreamingResponse([
-          JSON.stringify({ message: { content: longResponse } }),
-        ]);
+        return makeStreamingResponse([JSON.stringify({ message: { content: longResponse } })]);
       }
 
       if (url.endsWith('/api/embeddings')) {
@@ -1654,7 +1709,11 @@ describe('/api/sse/chat glossary metadata', () => {
         '## Codebase Context\n- src/routes/api/sse/chat/+server.ts builds SSE responses\n- src/lib/server/ai/llm-cache.ts stores semantic cache entries',
       chunks: [
         { relativePath: 'src/routes/api/sse/chat/+server.ts', symbol: 'POST', score: 0.8 },
-        { relativePath: 'src/lib/server/ai/llm-cache.ts', symbol: 'storeCachedResponse', score: 0.72 },
+        {
+          relativePath: 'src/lib/server/ai/llm-cache.ts',
+          symbol: 'storeCachedResponse',
+          score: 0.72,
+        },
       ],
     });
     mockGetGraphContext.mockResolvedValue(null);

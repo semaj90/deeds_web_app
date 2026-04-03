@@ -297,12 +297,16 @@ Located in `deeds_labs/projects/legacy-projects/ingestion-phase66/`:
 
 ## 9. Data Migration & Volume Audit (April 1–2, 2026)
 
-### Orphan Volume Cleanup Results
+> **NOTE: HISTORICAL SNAPSHOT** — The 20 volumes below were deleted on April 1, 2026.
+> This section documents what was found and exported before cleanup.
+> Do NOT use this table for future volume management — run `docker volume ls` for current state.
+
+### Orphan Volume Cleanup Results (COMPLETED)
 
 | Volume | Size | Data Found | Action |
 |--------|------|-----------|--------|
 | `deeds-web-app_qdrant-data-384` | 4.8 GB | 129,809 error_embeddings (dim=384, AST errors) + 3 phase44_fingerprints | **EXPORTED → deleted** |
-| `deeds-web-app_postgres_data` | 200 MB | 46 tables, ALL 0 rows | **SCHEMA ARCHIVED** (in use by container) |
+| `deeds-web-app_postgres_data` | 200 MB | 46 tables, ALL 0 rows | **SCHEMA ARCHIVED** (in use by container — kept) |
 | `deeds-web-app_postgres-data-384` | ~100 MB | DB exists, 0 tables | Deleted |
 | `legal_ai_postgres_data` | ~50 MB | 0 tables | Deleted |
 | `ingestion-phase66_postgres_data` | ~50 MB | 0 tables | Deleted |
@@ -325,14 +329,17 @@ Located in `deeds_labs/projects/legacy-projects/ingestion-phase66/`:
 
 | Volume | Size | Reason |
 |--------|------|--------|
-| `langfuse-clickhouse-data` | **18 GB** | Real traces — keep if wiring Langfuse |
+| `langfuse-clickhouse-data` | **18 GB** | 20 instrumented call sites ready — keep if activating Langfuse |
 | `trt_llm_weights` | **9 GB** | TensorRT engine weights |
 
 ---
 
 ## 10. Honest Feature Wiring Status
 
-### WORKING (end-to-end verified)
+> **Corrected April 2, 2026** — 7 inaccuracies from initial review fixed.
+> Principle: "implemented but runtime-down" ≠ "not built". Code-complete features with disabled runtime are PARTIAL, not absent.
+
+### WORKING (end-to-end verified, running in dev)
 
 | Feature | Evidence |
 |---------|----------|
@@ -344,83 +351,91 @@ Located in `deeds_labs/projects/legacy-projects/ingestion-phase66/`:
 | Evidence pipeline | 9-stage upload → GPU analysis |
 | Chat system | Terminal + SimpleWorkingChat + AIChatWidget |
 | RabbitMQ | 8 queues, all consumers wired |
-| LibTorch/CUDA addon | 3 GPU functions verified on RTX 3060 Ti |
-| LangExtract | Running, called from evidence upload + POI photos |
+| LibTorch/CUDA addon | 7 GPU functions verified on RTX 3060 Ti |
+| LangExtract | Running, called from 6 API routes (evidence upload, POI photos, etc.) |
+| RAG pipeline | **7 live endpoints** (`/api/rag/search`, `validate`, `answer`, `unified`, `process`, `documents`, `enhanced`), corrective RAG with query reformulation (threshold 0.5), BM42 hybrid search, ACE enrichment, DAG reordering, 14 active consumer integrations |
+| KAG (graph-context) | `graph-context.ts` ACTIVE in SSE chat — 1-hop evidence neighbor traversal via `yorha_evidence_*` tables, glyph-cached (10min TTL), confidence boosting (+0.02/neighbor, max +0.1), ACE evaluation context |
 
-### PARTIAL (code exists, needs wiring)
+### PARTIAL (code-complete, runtime-down or partially triggered)
 
-| Feature | What Exists | What's Missing |
-|---------|------------|---------------|
-| Neo4j graph | 12 server files, Cypher queries | Sync triggers, UI, GPU acceleration |
-| Search orchestrator | 8-adapter fan-out | Go binary archived, URL empty |
-| Bifrost gateway | Docker config + code done | `BIFROST_ENABLED=true` |
-| RAG pipeline | `rag-pipeline.ts` with corrective RAG | **0 consumers** |
-| Langfuse | `traceLLM()` wraps all LLM calls | Disabled, ClickHouse stopped |
+| Feature | What Exists | What's Needed to Activate |
+|---------|------------|--------------------------|
+| Neo4j graph | 12 server files, real Cypher queries, `/api/graph/sync` endpoint, `syncCaseToGraph()` fire-and-forget on glossary-concept saves | More trigger points (case CRUD, evidence upload, POI), UI visualization, GPU acceleration |
+| Search orchestrator | 8-adapter fan-out, `/api/search` with 3-tier fallback (gRPC → HTTP → PostgreSQL FTS) | Go binary not running (archived in `deeds_labs/`), `GO_SEARCH_URL` defaults to empty — PG FTS fallback is active |
+| Bifrost AI gateway | Docker config, `docker/bifrost/config.json`, code wired in 3 API routes (`ai/chat`, `rag/answer`, `synthesis/generate`), conditional `if (ENV.BIFROST_ENABLED)` | Start container (`docker compose --profile full up bifrost`) + set `BIFROST_ENABLED=true` in `.env` (default is `false` in `env.server.ts`) |
+| Langfuse observability | **Instrumented code with disabled runtime**: `traceLLM()`, `traceEmbedding()`, `traceRAG()` across **20 call sites**, zero-overhead no-ops when disabled, lazy SDK initialization | Start Langfuse + ClickHouse containers, set `LANGFUSE_ENABLED=true` + API keys in `.env` (18 GB ClickHouse data volume preserved) |
+| Go microservice | **Implemented but not running**: 42 `.go` source files archived in `deeds_labs/archived-dead-code/go-microservice/` (gRPC, HTTP search, RAG, embedding, auth, SIMD, TRT bridges), build scripts preserved | Restore to active directory, build, add to docker-compose. Frontend gracefully degrades via PG FTS when Go is absent |
+| KAG (KAGTraverser) | `KAGTraverser.ts` (764 lines): Neo4j error graph traversal, root cause identification, strategy augmentation | Lives in `/lib/services/` (blanket-excluded), 0 active imports — needs move to `/lib/server/` + wiring to error-brain |
 
 ### NOT BUILT / ARCHIVED
 
 | Feature | Status |
 |---------|--------|
-| Go microservice | All `.go` archived to `deeds_labs/` |
-| TRT-LLM on WSL2 | 83 GB image, WSL2 GPU passthrough not configured |
-| GPU Workers (Python) | 13 GB image, archived, superseded |
-| MCP Server container | 7.2 GB image, not running |
-| Neo4j GPU/CUDA | No GPU graph code, standard Cypher only |
-| KAG module | Concept only, no dedicated module |
+| TRT-LLM on WSL2 | 83 GB image exists, WSL2 GPU passthrough not configured |
+| GPU Workers (Python) | 13 GB image, archived in `deeds_labs/`, superseded by native pipeline |
+| MCP Server container | 7.2 GB image, not running (MCP server runs in-process via `mcp/server.ts`) |
+| Neo4j GPU/CUDA | No GPU graph code (cuGraph/RAPIDS not integrated), standard Cypher only |
 
 ---
 
 ## 11. Consolidated Roadmap
 
-### Tier 1 — Wire What Exists (days)
+> **Corrected April 2, 2026** — RAG pipeline and corrective RAG are already live; Bifrost and Langfuse are activation-only tasks.
 
-1. **Neo4j user analytics + recommendations** — wire sync triggers on case/evidence CRUD
-2. **Langfuse observability** — `LANGFUSE_ENABLED=true`, restart ClickHouse
-3. **Bifrost gateway** — `docker compose --profile full up bifrost` + enable
-4. **RAG pipeline wiring** — replace direct Ollama calls with `rag-pipeline.ts`
+### Tier 1 — Activate Runtime-Down Features (hours)
 
-### Tier 2 — Build What's Missing (weeks)
+1. **Bifrost gateway** — `docker compose --profile full up bifrost` + set `BIFROST_ENABLED=true` in `.env` (code already wired in 3 routes)
+2. **Langfuse observability** — start containers, set `LANGFUSE_ENABLED=true` + API keys (20 call sites already instrumented, 18 GB ClickHouse data preserved)
 
-5. **FastMCP Docker** — Dockerfile for `mcp/server.ts`, container with restart
-6. **ACE error pattern detection** — wire 129K error_embeddings into ACE context
-7. **Error embeddings re-embed** — 768-dim for unified vector search
-8. **Corrective RAG** — wire query reformulation path
+### Tier 2 — Expand Existing Wiring (days)
+
+3. **Neo4j sync triggers** — add `syncCaseToGraph()` calls to case CRUD, evidence upload, POI analysis (currently only fires on glossary-concept saves)
+4. **KAGTraverser activation** — move from `/lib/services/` to `/lib/server/`, wire into error-brain UI
+5. **ACE error pattern detection** — wire 129K exported error_embeddings into ACE context
+6. **Error embeddings re-embed** — 384→768-dim for unified vector search with current collections
+
+### Tier 3 — Build What's Missing (weeks)
+
+7. **FastMCP Docker** — Dockerfile for `mcp/server.ts`, container with restart policy
+8. **Go microservice revival** — restore from `deeds_labs/`, build binary, add to docker-compose (PG FTS fallback works in the meantime)
 9. **Redis matrix compute** — JSONB serialization for ACE search acceleration
+10. **Neo4j UI visualization** — graph explorer component for case relationships
 
-### Tier 3 — GPU Acceleration (WSL2 Docker bridge)
+### Tier 4 — GPU Acceleration (WSL2 Docker bridge)
 
-10. **WSL2 GPU passthrough** — Docker Desktop → WSL2 → NVIDIA Container Toolkit
-11. **TRT-LLM container** — 83 GB image ready, need WSL2 bridge
-12. **GPU-accelerated ingestion** — compressed data → RabbitMQ → GPU worker → Qdrant
-13. **Neo4j GPU graph** — cuGraph/RAPIDS for centrality on RTX 3060 Ti
+11. **WSL2 GPU passthrough** — Docker Desktop → WSL2 → NVIDIA Container Toolkit
+12. **TRT-LLM container** — 83 GB image ready, need WSL2 bridge
+13. **GPU-accelerated ingestion** — compressed data → RabbitMQ → GPU worker → Qdrant
+14. **Neo4j GPU graph** — cuGraph/RAPIDS for centrality on RTX 3060 Ti
 
-### Tier 4 — Data Optimization
+### Tier 5 — Data Optimization
 
-14. **QLoRA distillation** — fine-tune embeddinggemma on legal corpus
-15. **Docker image diet** — remove 120 GB unused images
-16. **Qdrant binary quantization** — 32x compression for cold collections
-17. **PG compressed partitions** — archive old case data
+15. **QLoRA distillation** — fine-tune embeddinggemma on legal corpus
+16. **Docker image diet** — remove 120 GB unused images
+17. **Qdrant binary quantization** — 32x compression for cold collections
+18. **PG compressed partitions** — archive old case data
 
-### Data Flow Vision
+### Data Flow Vision (Current State Annotated)
 
 ```
-User Query → Client Router (local ONNX or server)
+User Query → Client Router (local ONNX or server)        ← WORKING
   ↓
-Bifrost Gateway (semantic cache)
+Bifrost Gateway (semantic cache)                          ← PARTIAL (code wired, container not running)
   ↓
-RAG Pipeline (corrective reformulation)
-  ├─ Qdrant hybrid search (BM42 sparse + dense 768-dim)
-  ├─ Neo4j graph traversal (centrality + recommendations)
-  ├─ Redis matrix compute (ACE pattern matching)
-  └─ FastMCP tools (web_search, codebase analysis)
+RAG Pipeline (corrective reformulation)                   ← WORKING (7 endpoints, 14 consumers)
+  ├─ Qdrant hybrid search (BM42 sparse + dense 768-dim)  ← WORKING
+  ├─ KAG graph-context (1-hop evidence neighbors)         ← WORKING (SSE chat)
+  ├─ Neo4j graph sync (case → graph)                      ← PARTIAL (1 trigger, needs more)
+  ├─ Redis matrix compute (ACE pattern matching)          ← NOT BUILT
+  └─ FastMCP tools (36 tools, in-process)                 ← WORKING
   ↓
-Ollama gemma3-legal (or TRT-LLM when WSL2 ready)
+Ollama gemma3-legal (or TRT-LLM when WSL2 ready)         ← WORKING (Ollama) / NOT BUILT (TRT)
   ↓
-ACE self-eval → retry if quality < threshold
+ACE self-eval → retry if quality < threshold              ← WORKING
   ↓
-Langfuse trace → ClickHouse analytics
+Langfuse trace → ClickHouse analytics                     ← PARTIAL (instrumented, runtime disabled)
   ↓
-Response + user analytics → Neo4j sync
+Response + user analytics → Neo4j sync                    ← PARTIAL (glossary trigger only)
 ```
 
 ---
@@ -449,4 +464,148 @@ Response + user analytics → Neo4j sync
 
 ---
 
-*Updated: April 2, 2026 — Data migration, volume audit, feature status, consolidated roadmap*
+## 13. Monkey Patch & Runtime Override Audit
+
+### 13a. Global Monkey Patches (10 locations)
+
+| # | File | What | Risk | Notes |
+|---|------|------|------|-------|
+| 1 | `app.html:34-93` | `global`, `process`, `Buffer` polyfills + WebGPU feature-detect (`window.__webgpuSupported`) | **HIGH** | Runs on every page load. Required for ONNX/WebGPU browser compat. Duplicated in `polyfills.ts` |
+| 2 | `lib/ai/onnx/session.ts:36` | `globalThis.require` override (no-op CJS shim) | **HIGH** | Prevents ONNX Runtime `require()` crash in browser. Required — ONNX SDK calls `require('fs')` internally |
+| 3 | `lib/polyfills.ts:28-50` | `window.global`, `window.process`, `window.Buffer` | **HIGH** | **Duplicate** of `app.html` polyfills. Both run — wastes parse time, risk of version drift |
+| 4 | `lib/shims/commonjs-shim.js:5-16` | `globalThis.global`, `.module`, `.exports`, `.require` | MEDIUM | CJS compat shim. Required by CLAUDE.md — "must be preserved". Guards with `typeof` checks |
+| 5 | `bits-overrides.ts:18-32` | `globalThis.__BITS_OVERRIDES__` | MEDIUM | Dev/test component override registry. Lazy-init, no production consumers found |
+| 6 | `accessibility-validator.ts:258-260` | `window.accessibilityValidator`, `window.keyboardNavigationHelper` | MEDIUM | Dev tools exposed on window. No production consumers |
+| 7 | `n64/parallaxDynamic.js:262,391` | `window.parallaxCleanup`, `window.parallaxDynamic` | MEDIUM | Cleanup/debug handles for N64 parallax effect. Scoped to gaming UI |
+| 8 | `api/auth/health/+server.ts:31-55` | `globalThis.__users_ref`, `__sessions_ref`, `__lucia_instance` | LOW | Singleton reference tracking for auth health diagnostic — read-only after first set |
+| 9 | `cache.test.ts:308` | `global.fetch = vi.fn()` | LOW | Test-only mock, vitest sandbox |
+| 10 | `lib/config/env.ts` | `Object.freeze()` on env config | LOW | Defensive immutability, not a patch |
+
+### Remediation Recommendations
+
+| Priority | Action | Impact |
+|----------|--------|--------|
+| **P1** | **Deduplicate polyfills**: Remove `polyfills.ts` lines 28-50 (duplicate of `app.html`). Keep `app.html` as single source since it runs before any JS module | Eliminates version drift risk, saves ~1KB parse |
+| **P2** | **Guard `bits-overrides.ts`**: Wrap in `if (import.meta.env.DEV)` so the override registry is tree-shaken in production | Zero prod overhead |
+| **P3** | **Guard `accessibility-validator.ts`**: Same `import.meta.env.DEV` guard for window property injection | Zero prod overhead |
+| **P4** | **Document required shims**: `app.html` polyfills + `commonjs-shim.js` + `onnx/session.ts` require override are all load-bearing. Add inline `// REQUIRED:` comments explaining why | Prevents accidental removal |
+
+### 13b. Langfuse Observability — 27 Active Trace Sites
+
+All sites use zero-overhead no-op wrappers when `LANGFUSE_ENABLED=false` (default). When activated, traces flow to Langfuse server for LLM cost/latency/quality monitoring.
+
+**8 trace wrapper functions** in `lib/server/observability/langfuse.ts` (362 lines):
+
+| Wrapper | Purpose | Consumers | Key Call Sites |
+|---------|---------|-----------|----------------|
+| `traceLLM` | LLM completions | **12** | ollama.ts, inference-router, ace/self-prompt, summarizer, entity-extraction, nlp/analyzer, llm/ollama-client, gemmaReports, gemmaIntake, ai/chat, synthesis/generate, knowledge/stream, rag/answer |
+| `traceEmbedding` | Embedding generation | **9** | batch-embedder, embeddings/ollama, embeddings-simple, ollama-client, multimodal-fusion, sse/chat, evidence/upload, evidence/search, embed, rag/search, knowledge/search |
+| `traceDB` | PostgreSQL queries | **1** | db/client.ts (wraps all queries via pool) |
+| `traceVectorSearch` | Qdrant searches | **1** | qdrant-manager.ts (wraps all vector queries) |
+| `traceQueue` | RabbitMQ pub/consume | **1** | rabbitmq-manager-fixed.ts |
+| `traceWorker` | Worker thread tasks | **1** | compute-pool.ts (K-Means, SOM, forensics) |
+| `traceCouchDB` | CouchDB operations | **1** | ace/tag-sync.ts |
+| `shutdownLangfuse` | Graceful shutdown | **1** | hooks.server.ts (SIGTERM handler) |
+| `traceRAG` | RAG pipeline spans | **0** | Defined but **no consumers** — dead code candidate |
+| `flushLangfuse` | Flush pending events | **0** | Defined but **no consumers** — dead code candidate |
+
+**Total: 27 active trace sites + 1 shutdown + 2 unused wrappers**
+
+### Data Quality Assessment
+
+| Wrapper | Data Passed | Grade | Enhancement Needed |
+|---------|-------------|-------|--------------------|
+| `traceLLM` | name, metadata (model/prompt/caseId), usage tokens | **Good** | Add `userId` for per-user cost tracking |
+| `traceEmbedding` | text (truncated 200 chars), model, duration | Adequate | Add `batchSize`, `dimensions` |
+| `traceDB` | operation, table, row count, duration | Adequate | Add `queryType` (select/insert/update/delete) |
+| `traceVectorSearch` | collection, metadata (500 chars), result count, duration | **Good** | Add `topScore` for retrieval quality dashboards |
+| `traceQueue` | operation, queue, metadata, duration | **Good** | No changes needed |
+| `traceWorker` | task type, metadata, duration | **Good** | Add `threadId` for utilization |
+| `traceCouchDB` | operation, db name, duration | Minimal | Add `docId`, `docSize` |
+| `traceRAG` | query, metadata, nested span support | **Unused** | Wire to `/api/rag/answer` (currently uses `traceLLM` only) |
+
+### Langfuse Activation Roadmap
+
+**Current state**: 27 trace sites are no-ops. Zero runtime overhead.
+
+**To activate** (new infrastructure required):
+
+1. **Docker services needed** (not in any compose file):
+   - ClickHouse: `clickhouse/clickhouse-server:latest` (~1.5 GB image, ~1.5 GB RAM)
+   - Langfuse Server: `langfuse/langfuse:latest` (~500 MB image, ~500 MB RAM)
+
+2. **Environment variables**:
+   ```
+   LANGFUSE_ENABLED=true
+   LANGFUSE_PUBLIC_KEY=pk-lf-...
+   LANGFUSE_SECRET_KEY=sk-lf-...
+   LANGFUSE_HOST=http://localhost:3001
+   ```
+
+3. **Estimated cost**: +2 GB RAM, ~3 GB disk, API keys from Langfuse UI
+
+4. **Post-activation enhancements** (P2):
+   - Add `userId` to `traceLLM` calls for per-user cost dashboards
+   - Wire `traceRAG` to `/api/rag/answer` for full pipeline visibility
+   - Add `topScore` to `traceVectorSearch` for retrieval quality monitoring
+
+---
+
+---
+
+## 14. Retrieval & Synthesis Enhancements (April 2, 2026 — Session 2)
+
+### 14a. P0 Phase 1: SSE Chat Retrieval Pipeline
+
+| Enhancement | File | Status |
+|------------|------|--------|
+| `graphBoostRerank()` — re-rank by +0.15 for graph-connected docs | `api/sse/chat/+server.ts` | COMPLETE |
+| Query-time entity extraction — STATUTE/CASE/CA_CODE regex | `api/sse/chat/+server.ts` | COMPLETE |
+| DAG ordering — Kahn's topological sort on citation deps | `api/sse/chat/+server.ts` | COMPLETE |
+| Vector name fix — `''` → `'content'` for `legal_canon_chunks` | `lib/server/legal/constitution-pipeline.ts` | COMPLETE |
+| `knowledge_base` collection added to VECTOR_CONFIG | `lib/server/config/vector-config.ts` | COMPLETE |
+
+**Eval test**: SSE chat returned full legal analysis with corrective RAG reformulation, glossary match, 2 RAG chunks. Entity extraction detected statute references in query.
+
+### 14b. P0b: RabbitMQ Synthesis Worker
+
+**Problem**: Synthesis endpoint was synchronous — ACE context (2-5s) + Ollama LLM (10-60s) + ACE eval blocked a single HTTP request. Bifrost's 30s timeout caused orphaned Ollama requests.
+
+**Solution**: Async publish→consume→poll via RabbitMQ (10th queue: `synthesis.generate`).
+
+| Component | Change |
+|-----------|--------|
+| `rabbitmq-manager-fixed.ts` | +queue `synthesis.generate`, +consumer `handleSynthesisGenerate`, +publisher `publishSynthesisGenerate` |
+| `api/synthesis/generate/+server.ts` | JSON mode → publish to queue, return 202 `{ synthesisId, pollUrl }`. Sync fallback if RabbitMQ down |
+| `api/synthesis/evaluation/[id]/+server.ts` | Unified polling: `synthesis:result:{id}` + `synthesis:status:{id}` + `ace:result:{id}` |
+
+**Worker pipeline**: Redis status→generating → assembleACEContext → DAG-order → direct Ollama (5min timeout) → citations → confidence → Redis result → publish ace.evaluate → CouchDB inference log
+
+**Status tracking**: `pending` → `generating` → `complete`/`failed` (Redis, 1hr TTL)
+
+### 14c. Bifrost Timeout Root Cause
+
+`routeInference()` chain: TRT → Bifrost → Ollama. Bifrost Go server ignores `default_request_timeout` config (both top-level and `network_config`). Hard-coded 30s timeout → 504, but Ollama continues processing → orphaned GPU request blocks queue.
+
+**Mitigation**: Synthesis worker bypasses Bifrost entirely (direct Ollama). SSE chat was never affected.
+
+### 14d. CouchDB Inference Log
+
+`src/lib/server/observability/inference-log.ts` — buffered CouchDB writes (flush at 50 entries or 5s). Wired into RabbitMQ synthesis worker. Remaining: wire into SSE chat, RAG pipeline, Qdrant manager.
+
+### 14e. Updated RabbitMQ Queue Inventory
+
+| # | Queue | Exchange | Routing Key | Consumer | Status |
+|---|-------|----------|-------------|----------|--------|
+| 1 | cache.invalidate | cache.events | cache.invalidate | handleCacheInvalidate | ACTIVE |
+| 2 | document.embed | document.processing | document.embed | handleDocumentEmbed | ACTIVE |
+| 3 | evidence.process | document.processing | evidence.process | handleEvidenceProcess | ACTIVE |
+| 4 | vector.index | document.processing | vector.index | handleVectorIndex | ACTIVE |
+| 5 | chat.context | chat.events | chat.context | handleChatContext | ACTIVE |
+| 6 | analytics.track | analytics.events | analytics.track | handleAnalyticsTrack | ACTIVE |
+| 7 | codebase.index | document.processing | codebase.index | handleCodebaseIndex | ACTIVE |
+| 8 | ace.evaluate | document.processing | ace.evaluate | handleACEEvaluate | ACTIVE |
+| 9 | error.embed | document.processing | error.embed | handleErrorEmbed | ACTIVE |
+| 10 | **synthesis.generate** | document.processing | synthesis.generate | **handleSynthesisGenerate** | **NEW** |
+
+*Updated: April 2, 2026 — Section 14 added (retrieval enhancements, RabbitMQ synthesis worker, Bifrost diagnosis, inference logging)*

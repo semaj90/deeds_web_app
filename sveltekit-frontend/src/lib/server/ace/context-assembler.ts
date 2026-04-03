@@ -23,6 +23,14 @@ import { applyStyle, type LegalPersona } from './style-adapter.js';
 import { webSearch, formatWebResultsAsContext } from '$lib/server/retrieval/web-search.js';
 import { searchWikipedia, formatWikipediaAsContext } from '$lib/server/retrieval/wikipedia-search.js';
 import { fetchUserAnalyticsContext } from './user-analytics-context.js';
+import {
+  getCaseGraphNeighborIds,
+  buildGraphShouldFilter,
+  applyGraphAuthorityScoring,
+  type GraphNeighbor,
+} from '$lib/server/retrieval/graph-context.js';
+import { authorityChainExpansion, type EmbedFn } from '$lib/server/retrieval/authority-chain.js';
+import { traceGraph, traceCache, traceVectorSearch } from '$lib/server/observability/langfuse.js';
 
 /**
  * Assemble a complete ACE context from all data sources.
@@ -37,6 +45,7 @@ export async function assembleACEContext(opts: {
   persona?: LegalPersona;
   enableWebSearch?: boolean;
   enableWikipedia?: boolean;
+  enableCodebaseContext?: boolean;
   sectionTypes?: string[];
 }): Promise<ACEContext> {
   const { query, userId, caseId, conversationId } = opts;
@@ -52,21 +61,23 @@ export async function assembleACEContext(opts: {
   };
 
   // Run all data fetches in parallel (includes optional web search)
+  // Tiered retrieval: KB (corpus) + Case (evidence) run as one call, split internally
   const [
     userProfile,
     caseContext,
     glossaryMatches,
-    ragChunks,
+    ragResult,
     kagNeighbors,
     chatHistory,
     webResults,
     wikiResults,
     userAnalyticsContext,
+    codebaseContext,
   ] = await Promise.all([
     userId ? fetchUserProfile(userId) : Promise.resolve(null),
     caseId ? fetchCaseContext(caseId) : Promise.resolve(null),
     fetchGlossaryMatches(query),
-    fetchRAGChunks(query, opts.sectionTypes),
+    fetchRAGChunks(query, opts.sectionTypes, caseId),
     caseId ? fetchKAGNeighbors(caseId) : Promise.resolve([]),
     conversationId ? fetchChatHistory(conversationId) : Promise.resolve([]),
     opts.enableWebSearch ? webSearch(query, 3).catch(() => null) : Promise.resolve(null),
@@ -74,7 +85,10 @@ export async function assembleACEContext(opts: {
       ? searchWikipedia(query, 3).catch(() => null)
       : Promise.resolve(null),
     userId ? fetchUserAnalyticsContext(userId, query, caseId).catch(() => null) : Promise.resolve(null),
+    opts.enableCodebaseContext ? fetchCodebaseContext(query).catch(() => null) : Promise.resolve(null),
   ]);
+
+  const { ragChunks, kbChunks, caseChunks } = ragResult;
 
   // Fetch evidence metadata and connections separately (avoids hoisting issues)
   const [evidenceMetadata, evidenceConnections] = await Promise.all([
@@ -98,6 +112,8 @@ export async function assembleACEContext(opts: {
     caseContext,
     glossaryMatches,
     ragChunks,
+    kbChunks,
+    caseChunks,
     kagNeighbors,
     chatHistory,
     entities,
@@ -114,6 +130,7 @@ export async function assembleACEContext(opts: {
     evidenceMetadata,
     evidenceConnections,
     userAnalyticsContext,
+    codebaseContext,
   };
 }
 
@@ -171,8 +188,26 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
     confidenceFactors.glossary = 0.8;
   }
 
-  // 6. RAG chunks (highest priority retrieval)
-  if (context.ragChunks.length > 0) {
+  // 6. Retrieved context — tiered (KB corpus first, then case evidence)
+  let sourceIndex = 0;
+  if (context.kbChunks?.length) {
+    const kbText = context.kbChunks
+      .slice(0, 4)
+      .map((c) => { sourceIndex++; return `[Source ${sourceIndex} (score: ${c.score.toFixed(2)}, corpus)] ${truncate(c.content, 300)}`; })
+      .join('\n');
+    lines.push(`\n## Legal Corpus Context\n${kbText}`);
+    confidenceFactors.kbChunks = Math.max(...context.kbChunks.map((c) => c.score));
+  }
+  if (context.caseChunks?.length) {
+    const caseText = context.caseChunks
+      .slice(0, 5)
+      .map((c) => { sourceIndex++; return `[Source ${sourceIndex} (score: ${c.score.toFixed(2)}, evidence)] ${truncate(c.content, 300)}`; })
+      .join('\n');
+    lines.push(`\n## Case Evidence Context\n${caseText}`);
+    confidenceFactors.caseChunks = Math.max(...context.caseChunks.map((c) => c.score));
+  }
+  // Fallback: if tiered chunks not populated, use merged ragChunks
+  if (!context.kbChunks?.length && !context.caseChunks?.length && context.ragChunks.length > 0) {
     const chunksText = context.ragChunks
       .slice(0, 5)
       .map((c, i) => `[Source ${i + 1} (score: ${c.score.toFixed(2)})] ${truncate(c.content, 300)}`)
@@ -264,7 +299,20 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
     confidenceFactors.userAnalytics = 0.5;
   }
 
-  // 14. Self-prompting instructions
+  // 14. Codebase/AST context (dual-vector code search results)
+  if (context.codebaseContext && context.codebaseContext.length > 0) {
+    const codeLines = context.codebaseContext
+      .slice(0, 5)
+      .map((c) => {
+        const loc = c.lineStart ? `:${c.lineStart}${c.lineEnd ? `-${c.lineEnd}` : ''}` : '';
+        return `[${c.filePath}${loc}] (score: ${c.score.toFixed(2)})\n${truncate(c.content, 300)}`;
+      })
+      .join('\n\n');
+    lines.push(`\n## Codebase Context\n${codeLines}`);
+    confidenceFactors.codebaseContext = Math.max(...context.codebaseContext.map((c) => c.score));
+  }
+
+  // 15. Self-prompting instructions
   const selfPrompt =
     'After answering, briefly assess: Did you cite specific statutes/precedents? ' +
     'Is the answer jurisdiction-appropriate? Flag any uncertainty.';
@@ -524,33 +572,139 @@ export async function fetchGlossaryMatches(query: string): Promise<ACEContext['g
   }
 }
 
-async function fetchRAGChunks(
-  query: string,
-  sectionTypes?: string[]
-): Promise<Array<{ content: string; score: number; source: string }>> {
+// ── Tiered Retrieval: KB (stable corpus) + Case (user evidence) ──
+
+type RAGChunk = { content: string; score: number; source: string };
+
+/** Generate query embedding (shared by both tiers). */
+async function getQueryEmbedding(query: string): Promise<number[] | null> {
   try {
-    const ollamaUrl = ENV.OLLAMA_BASE_URL;
-    // Generate embedding for the query
-    const embedRes = await fetch(`${ollamaUrl}/api/embeddings`, {
+    const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: query }),
       signal: AbortSignal.timeout(5000),
     });
-    if (!embedRes.ok) return [];
+    if (!res.ok) return null;
+    const data = await res.json();
+    const embedding = data.embedding as number[];
+    return embedding?.length ? embedding : null;
+  } catch {
+    return null;
+  }
+}
 
-    const embedData = await embedRes.json();
-    const embedding = embedData.embedding as number[];
-    if (!embedding?.length) return [];
+/** Bundle cache key for retrieval tier results. */
+function bundleCacheKey(tier: 'kb' | 'case' | 'ace', queryHash: string, caseId?: string): string {
+  return `${tier}_bundle:${queryHash}${caseId ? ':' + caseId.slice(0, 8) : ''}`;
+}
 
-    // Use qdrant singleton (reuses connection + gets payload indexes)
+/** Try Redis bundle cache for a retrieval tier. */
+async function getCachedBundle(key: string): Promise<RAGChunk[] | null> {
+  try {
+    const { redis } = await import('$lib/server/redis.js');
+    const raw = await redis.get(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Store retrieval bundle in Redis with tier-appropriate TTL. */
+async function setCachedBundle(key: string, chunks: RAGChunk[], ttlSeconds: number): Promise<void> {
+  try {
+    const { redis } = await import('$lib/server/redis.js');
+    await redis.set(key, JSON.stringify(chunks), 'EX', ttlSeconds);
+  } catch {}
+}
+
+/**
+ * KB Tier — Knowledge Base / Legal Corpus retrieval.
+ * Searches: legal_documents, legal_canon_chunks
+ * Stable, heavily cached (10min TTL).
+ */
+async function fetchKBChunks(
+  embedding: number[],
+  queryHash: string,
+  graphFilter?: Record<string, unknown>
+): Promise<RAGChunk[]> {
+  // Check KB bundle cache (stable corpus → long TTL)
+  const cacheKey = bundleCacheKey('kb', queryHash);
+  const cached = await getCachedBundle(cacheKey);
+  if (cached) {
+    console.log(`[ACE KB] bundle cache HIT (${cached.length} chunks)`);
+    return cached;
+  }
+
+  try {
     const { qdrant: qdrantMgr } = await import('$lib/server/vector/qdrant-manager.js');
 
-    // When sectionTypes provided, use section-filtered evidence search
-    const evidenceSearch = sectionTypes?.length
-      ? qdrantMgr
+    const searchOpts = (limit: number, threshold: number) => ({
+      vector: { name: 'content', vector: embedding },
+      limit,
+      score_threshold: threshold,
+      with_payload: true,
+      ...(graphFilter ? { filter: graphFilter } : {}),
+    });
+
+    const [docResults, canonResults] = await Promise.all([
+      qdrantMgr.client
+        .search('legal_documents', searchOpts(3, 0.5))
+        .catch(() => []),
+      qdrantMgr.client
+        .search('legal_canon_chunks', searchOpts(2, 0.45))
+        .catch(() => []),
+    ]);
+
+    const chunks: RAGChunk[] = [
+      ...docResults.map((r: any) => ({
+        content: String(r.payload?.content_preview ?? r.payload?.full_text ?? ''),
+        score: r.score,
+        source: String(r.payload?.source_url ?? r.payload?.document_type ?? 'kb:document'),
+      })),
+      ...canonResults.map((r: any) => ({
+        content: String(r.payload?.content ?? r.payload?.text ?? ''),
+        score: r.score,
+        source: String(r.payload?.source ?? 'kb:canon'),
+      })),
+    ].sort((a, b) => b.score - a.score).slice(0, 4);
+
+    // Cache KB bundle (10 min — corpus is stable)
+    setCachedBundle(cacheKey, chunks, 600).catch(() => {});
+    return chunks;
+  } catch (err) {
+    console.warn('[ACE KB] retrieval failed:', (err as Error)?.message ?? err);
+    return [];
+  }
+}
+
+/**
+ * Case Tier — User Evidence / Case-Specific RAG retrieval.
+ * Searches: evidence_items (with optional section filtering)
+ * Case-scoped, shorter cache (2min TTL, invalidated on evidence upload).
+ */
+async function fetchCaseChunks(
+  embedding: number[],
+  queryHash: string,
+  caseId?: string,
+  sectionTypes?: string[],
+  graphFilter?: Record<string, unknown>
+): Promise<RAGChunk[]> {
+  // Check case bundle cache (case-scoped → short TTL)
+  const cacheKey = bundleCacheKey('case', queryHash, caseId);
+  const cached = await getCachedBundle(cacheKey);
+  if (cached) {
+    console.log(`[ACE Case] bundle cache HIT (${cached.length} chunks)`);
+    return cached;
+  }
+
+  try {
+    const { qdrant: qdrantMgr } = await import('$lib/server/vector/qdrant-manager.js');
+
+    const results = sectionTypes?.length
+      ? await qdrantMgr
           .sectionFilteredSearch({
-            query,
+            query: '', // unused when embedding provided
             queryEmbedding: embedding,
             sectionTypes,
             limit: 5,
@@ -558,46 +712,104 @@ async function fetchRAGChunks(
           })
           .then((r) => r.results)
           .catch(() => [])
-      : qdrantMgr.client
+      : await qdrantMgr.client
           .search('evidence_items', {
             vector: { name: 'content', vector: embedding },
             limit: 5,
             score_threshold: 0.5,
             with_payload: true,
+            ...(graphFilter ? { filter: graphFilter } : {}),
           })
           .catch(() => []);
 
-    const [evidenceResults, docResults] = await Promise.all([
-      evidenceSearch,
-      qdrantMgr.client
-        .search('legal_documents', {
-          vector: { name: 'content', vector: embedding },
-          limit: 3,
-          score_threshold: 0.5,
-          with_payload: true,
-        })
-        .catch(() => []),
-    ]);
-
-    const mapped = [
-      ...evidenceResults.map((r: any) => ({
+    const chunks: RAGChunk[] = results
+      .map((r: any) => ({
         content: String(r.payload?.content ?? r.payload?.content_preview ?? ''),
         score: r.score,
-        source: String(r.payload?.source ?? 'evidence'),
-      })),
-      ...docResults.map((r: any) => ({
-        content: String(r.payload?.content_preview ?? r.payload?.full_text ?? ''),
-        score: r.score,
-        source: String(r.payload?.source_url ?? r.payload?.document_type ?? 'document'),
-      })),
-    ];
+        source: String(r.payload?.source ?? 'case:evidence'),
+      }))
+      .sort((a: RAGChunk, b: RAGChunk) => b.score - a.score)
+      .slice(0, 5);
 
-    // Sort by score descending, keep top 5
-    return mapped.sort((a, b) => b.score - a.score).slice(0, 5);
+    // Cache case bundle (2 min — invalidates on new evidence upload)
+    setCachedBundle(cacheKey, chunks, 120).catch(() => {});
+    return chunks;
   } catch (err) {
-    console.warn('[ACE context] RAG chunk retrieval failed:', (err as Error)?.message ?? err);
+    console.warn('[ACE Case] retrieval failed:', (err as Error)?.message ?? err);
     return [];
   }
+}
+
+/** Merged RAG retrieval (backward compat) — calls both tiers in parallel.
+ *  When a caseId is provided, fetches graph neighbors BEFORE retrieval
+ *  and passes them as Qdrant `should` filters + post-retrieval authority scoring.
+ */
+async function fetchRAGChunks(
+  query: string,
+  sectionTypes?: string[],
+  caseId?: string
+): Promise<{ ragChunks: RAGChunk[]; kbChunks: RAGChunk[]; caseChunks: RAGChunk[] }> {
+  const embedding = await getQueryEmbedding(query);
+  if (!embedding) return { ragChunks: [], kbChunks: [], caseChunks: [] };
+
+  const { createHash } = await import('crypto');
+  const queryHash = createHash('md5').update(query).digest('hex').slice(0, 12);
+
+  // Pre-retrieval KAG: fetch graph neighbors for the case to build Qdrant filters
+  let graphNeighbors: GraphNeighbor[] = [];
+  let graphFilter: Record<string, unknown> | undefined;
+  if (caseId) {
+    graphNeighbors = await getCaseGraphNeighborIds(caseId).catch(() => []);
+    if (graphNeighbors.length > 0) {
+      graphFilter = buildGraphShouldFilter(graphNeighbors) ?? undefined;
+    }
+  }
+
+  const [kbChunks, caseChunks] = await Promise.all([
+    fetchKBChunks(embedding, queryHash, graphFilter),
+    fetchCaseChunks(embedding, queryHash, caseId, sectionTypes, graphFilter),
+  ]);
+
+  // Merge + sort for backward compat (ragChunks = combined)
+  let ragChunks = [...kbChunks, ...caseChunks]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 7);
+
+  // Authority chain drill-down: when top results cite statutes/cases,
+  // embed those citations and search for their full text (max 2 hops).
+  if (embedding && ragChunks.length > 0) {
+    try {
+      const embedAuth: EmbedFn = (text) => getQueryEmbedding(text);
+      const contextDocs = ragChunks.map((c) => ({
+        content: c.content,
+        similarity: c.score,
+        documentId: c.source,
+      }));
+      const authResult = await authorityChainExpansion(embedding, contextDocs, embedAuth, {
+        qdrantUrl: ENV.QDRANT_URL,
+      });
+      if (authResult.expanded > 0) {
+        ragChunks = authResult.docs.map((d) => ({
+          content: d.content,
+          score: d.similarity,
+          source: d.documentId,
+        }));
+      }
+    } catch {
+      // Authority chain failed — non-fatal, continue with existing chunks
+    }
+  }
+
+  // Post-retrieval KAG: apply authority-weighted scoring from graph connections
+  if (graphNeighbors.length > 0 && ragChunks.length > 0) {
+    const scored = applyGraphAuthorityScoring(
+      ragChunks.map((c) => ({ content: c.content, similarity: c.score, documentId: c.source })),
+      graphNeighbors,
+    );
+    ragChunks = scored.map((s) => ({ content: s.content, score: s.similarity, source: s.documentId }));
+  }
+
+  return { ragChunks, kbChunks, caseChunks };
 }
 
 async function fetchKAGNeighbors(
@@ -801,6 +1013,35 @@ function extractGlossaryCandidateTerms(query: string): { exact: string[]; prefix
   const prefix = exact.map((term) => `${term}%`);
 
   return { exact, prefix };
+}
+
+async function fetchCodebaseContext(
+  query: string
+): Promise<ACEContext['codebaseContext']> {
+  try {
+    // Use dual-vector search (content 0.6 + signature 0.4) for higher precision
+    const { searchCodebase } = await import('$lib/server/indexer/dual-embedder.js');
+    const results = await searchCodebase(query, {
+      limit: 5,
+      contentWeight: 0.6,
+      signatureWeight: 0.4,
+    });
+
+    if (!results.length) return null;
+
+    return results
+      .filter((r) => r.score >= 0.5)
+      .map((r) => ({
+        filePath: String(r.chunk.path ?? r.chunk.relativePath ?? 'unknown'),
+        content: String(r.chunk.content ?? ''),
+        score: r.score,
+        lineStart: typeof r.chunk.lineStart === 'number' ? r.chunk.lineStart : undefined,
+        lineEnd: typeof r.chunk.lineEnd === 'number' ? r.chunk.lineEnd : undefined,
+      }));
+  } catch (err) {
+    console.warn('[ACE context] codebase context fetch failed:', (err as Error)?.message ?? err);
+    return null;
+  }
 }
 
 function extractPracticeArea(

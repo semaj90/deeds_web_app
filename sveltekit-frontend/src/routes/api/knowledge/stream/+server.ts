@@ -12,6 +12,8 @@ import { getOllamaUrl } from '$lib/config/env.server.js';
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { getChatModelKeepAlive, ollamaFetch } from '$lib/server/ollama.js';
+import { routeStreamingInference } from '$lib/server/inference/inference-router.js';
+import { logInference } from '$lib/server/observability/inference-log.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { embedText } from '$lib/server/embedding/embed.js';
 import type { RequestHandler } from './$types.js';
@@ -182,7 +184,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 };
 
 /**
- * Stream Ollama response token by token
+ * Stream LLM response token by token via inference cascade (TRT-LLM → Triton → Ollama).
  */
 async function streamOllamaResponse(
 	prompt: string,
@@ -190,63 +192,35 @@ async function streamOllamaResponse(
 	_encoder: TextEncoder,
 	sendEvent: (event: string, data: unknown) => void
 ): Promise<void> {
-	const OLLAMA_URL = getOllamaUrl();
-	const MODEL = 'gemma3-legal:latest';
-
-	const response = await traceLLM('knowledge-stream', { model: MODEL, prompt: prompt.slice(0, 500) }, async (gen) => {
-		const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: MODEL,
-        prompt,
-        stream: true,
-        keep_alive: getChatModelKeepAlive(),
-        options: { temperature: 0.3, num_predict: 2048 },
-      }),
-    });
-		gen.end({ output: 'streaming' });
-		return res;
-	});
-
-	if (!response?.ok || !response?.body) {
-		throw new Error(`Ollama request failed: ${(response as Response)?.statusText ?? 'unknown'}`);
-	}
-
-	const reader = response.body.getReader();
-	const decoder = new TextDecoder();
+	const start = performance.now();
 	let fullResponse = '';
+	let backend: string = 'ollama';
+	let tokenCount = 0;
 
-	try {
-		while (true) {
-			const { done, value } = await reader.read();
-			if (done) break;
-
-			const chunk = decoder.decode(value, { stream: true });
-			const lines = chunk.split('\n').filter(line => line.trim());
-
-			for (const line of lines) {
-				try {
-					const parsed = JSON.parse(line);
-					if (parsed.response) {
-						fullResponse += parsed.response;
-						sendEvent('synthesis_chunk', { text: parsed.response });
-					}
-					if (parsed.done) {
-						sendEvent('synthesis_complete', {
-							fullResponse,
-							evalCount: parsed.eval_count,
-							evalDuration: parsed.eval_duration
-						});
-					}
-				} catch {
-					// Skip malformed JSON lines
-				}
-			}
+	for await (const chunk of routeStreamingInference({ prompt, temperature: 0.3, maxTokens: 2048 })) {
+		if (chunk.done) {
+			sendEvent('synthesis_complete', {
+				fullResponse,
+				backend: chunk.backend ?? backend,
+			});
+			break;
 		}
-	} finally {
-		reader.releaseLock();
+		if (chunk.content) {
+			fullResponse += chunk.content;
+			tokenCount++;
+			sendEvent('synthesis_chunk', { text: chunk.content });
+			if (chunk.backend) backend = chunk.backend;
+		}
 	}
+
+	logInference({
+		type: 'llm',
+		model: backend === 'ollama' ? 'gemma3-legal:latest' : backend,
+		backend: backend as 'ollama' | 'tensorrt' | 'triton',
+		latencyMs: Math.round(performance.now() - start),
+		tokenCount,
+		cacheHit: false,
+	});
 }
 
 /**

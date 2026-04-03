@@ -6,6 +6,7 @@
  */
 import { sql } from 'drizzle-orm';
 import type { GeneratedTag } from './types.js';
+import { traceCouchDB, traceDB, traceVectorSearch } from '$lib/server/observability/langfuse.js';
 
 // ── Mirror a tag to all 3 stores ──────────────────────────────────────
 
@@ -106,10 +107,12 @@ export async function getDocumentTags(
 
 	// Catalog: CouchDB
 	try {
-		const { couchdb } = await import('$lib/services/couchdb-client.js');
-		const doc = (await couchdb.get('ace_tags', `doc:${documentId}`)) as Record<string, unknown>;
-		const tags = (doc.tags as GeneratedTag[]) ?? [];
-		return tags;
+		return await traceCouchDB('get-tags', 'ace_tags', async () => {
+			const { couchdb } = await import('$lib/services/couchdb-client.js');
+			const doc = (await couchdb.get('ace_tags', `doc:${documentId}`)) as Record<string, unknown>;
+			const tags = (doc.tags as GeneratedTag[]) ?? [];
+			return tags;
+		});
 	} catch (err) {
 		console.warn('[tag-sync] CouchDB tag lookup failed:', (err as Error)?.message ?? err);
 		return [];
@@ -195,21 +198,23 @@ async function mirrorToQdrant(
 }
 
 async function mirrorToCouchDB(tag: GeneratedTag, documentId: string): Promise<void> {
-	const { couchdb } = await import('$lib/services/couchdb-client.js');
-	const docKey = `doc:${documentId}`;
+	return traceCouchDB('upsert-tag', 'ace_tags', async () => {
+		const { couchdb } = await import('$lib/services/couchdb-client.js');
+		const docKey = `doc:${documentId}`;
 
-	try {
-		const existing = (await couchdb.get('ace_tags', docKey)) as Record<string, unknown>;
-		const tags = ((existing.tags as GeneratedTag[]) ?? []).filter((t) => t.label !== tag.label);
-		tags.push(tag);
-		await couchdb.put('ace_tags', docKey, { ...existing, tags, updatedAt: new Date().toISOString() });
-	} catch (err) {
-		console.warn('[tag-sync] CouchDB upsert fallback — creating new doc:', (err as Error)?.message ?? err);
-		// Document doesn't exist — create it
-		await couchdb.put('ace_tags', docKey, {
-			documentId,
-			tags: [tag],
-			createdAt: new Date().toISOString()
-		});
-	}
+		try {
+			const existing = (await couchdb.get('ace_tags', docKey)) as Record<string, unknown>;
+			const tags = ((existing.tags as GeneratedTag[]) ?? []).filter((t) => t.label !== tag.label);
+			tags.push(tag);
+			await couchdb.put('ace_tags', docKey, { ...existing, tags, updatedAt: new Date().toISOString() });
+		} catch (err) {
+			console.warn('[tag-sync] CouchDB upsert fallback — creating new doc:', (err as Error)?.message ?? err);
+			// Document doesn't exist — create it
+			await couchdb.put('ace_tags', docKey, {
+				documentId,
+				tags: [tag],
+				createdAt: new Date().toISOString()
+			});
+		}
+	});
 }

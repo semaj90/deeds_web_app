@@ -20,270 +20,311 @@ vi.mock('$env/dynamic/private', () => ({ env: {} }));
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
 
 vi.mock('$lib/server/env.server.js', () => ({
-	ENV: {
-		OLLAMA_BASE_URL: 'http://ollama.test',
-		QDRANT_URL: 'http://qdrant.test:6333',
-		TENSORRT_URL: 'http://trt.test:8001',
-		NATS_URL: 'nats://localhost:4222',
-		EMBEDDING_QUIC_ENABLED: false,
-	},
+  ENV: {
+    OLLAMA_BASE_URL: 'http://ollama.test',
+    QDRANT_URL: 'http://qdrant.test:6333',
+    TENSORRT_URL: 'http://trt.test:8001',
+    TRITON_URL: 'http://triton.test:8000',
+    TRITON_LLM_MODEL: 'legal-llm',
+    TRITON_VLM_MODEL: 'gemma_vlm_ensemble',
+    TRITON_VISION_MODEL: 'siglip_vision',
+    NATS_URL: 'nats://localhost:4222',
+    EMBEDDING_QUIC_ENABLED: false,
+  },
 }));
 
 vi.mock('$lib/config/env.server.js', () => ({
-	getOllamaUrl: () => 'http://ollama.test',
-	getRabbitMQManagementUrl: () => 'http://rabbitmq.test:15672',
+  getOllamaUrl: () => 'http://ollama.test',
+  getRabbitMQManagementUrl: () => 'http://rabbitmq.test:15672',
 }));
 
 const mockOllamaFetch = vi.fn();
 vi.mock('$lib/server/ollama.js', () => ({
-	ollamaFetch: (...args: unknown[]) => mockOllamaFetch(...args),
+  ollamaFetch: (...args: unknown[]) => mockOllamaFetch(...args),
 }));
 
 // ── DB mock ────────────────────────────────────────────────────
 const mockExecute = vi.fn(async () => ({ rows: [{ ok: 1, server_time: '2026-03-29T00:00:00Z' }] }));
 const mockSelectChain = (data: unknown[] = []) => {
-	const withCache = vi.fn(async () => data);
-	const whereFn = vi.fn(() => ({ $withCache: withCache }));
-	return { from: vi.fn(() => ({ where: whereFn, $withCache: withCache })) };
+  const withCache = vi.fn(async () => data);
+  const whereFn = vi.fn(() => ({ $withCache: withCache }));
+  return { from: vi.fn(() => ({ where: whereFn, $withCache: withCache })) };
 };
 
 vi.mock('$lib/server/db/client', () => ({
-	db: {
-		select: vi.fn(() => mockSelectChain()),
-		execute: (...args: unknown[]) => mockExecute(...args),
-	},
-	savedCitations: { id: 'id' },
+  db: {
+    select: vi.fn(() => mockSelectChain()),
+    execute: (...args: unknown[]) => mockExecute(...args),
+  },
+  savedCitations: { id: 'id' },
 }));
 
 vi.mock('$lib/server/db/index.js', () => ({
-	db: { execute: (...args: unknown[]) => mockExecute(...args) },
+  db: { execute: (...args: unknown[]) => mockExecute(...args) },
 }));
 
 vi.mock('$lib/server/db/schema', () => ({
-	errorClusters: { id: 'id' },
-	errorEvents: { id: 'id' },
-	routeHealth: { id: 'id', state: 'state' },
+  errorClusters: { id: 'id' },
+  errorEvents: { id: 'id' },
+  routeHealth: { id: 'id', state: 'state' },
 }));
 
 vi.mock('$lib/server/db/schema-postgres.js', () => ({
-	legalGlossary: { id: 'id' },
-	statutes: { id: 'id' },
-	legalPrecedents: { id: 'id' },
-	errorClusters: { id: 'id' },
-	errorEvents: { id: 'id' },
-	routeHealth: { id: 'id', state: 'state' },
+  legalGlossary: { id: 'id' },
+  statutes: { id: 'id' },
+  legalPrecedents: { id: 'id' },
+  errorClusters: { id: 'id' },
+  errorEvents: { id: 'id' },
+  routeHealth: { id: 'id', state: 'state' },
 }));
 
 vi.mock('drizzle-orm', () => ({
-	eq: vi.fn((...args: unknown[]) => ({ type: 'eq', args })),
-	desc: vi.fn((...args: unknown[]) => ({ type: 'desc', args })),
-	and: vi.fn((...args: unknown[]) => ({ type: 'and', args })),
-	count: vi.fn(() => 'count_fn'),
-	sql: Object.assign(vi.fn((...args: unknown[]) => ({ type: 'sql', args })), {
-		raw: vi.fn((s: string) => s),
-	}),
+  eq: vi.fn((...args: unknown[]) => ({ type: 'eq', args })),
+  desc: vi.fn((...args: unknown[]) => ({ type: 'desc', args })),
+  and: vi.fn((...args: unknown[]) => ({ type: 'and', args })),
+  count: vi.fn(() => 'count_fn'),
+  sql: Object.assign(
+    vi.fn((...args: unknown[]) => ({ type: 'sql', args })),
+    {
+      raw: vi.fn((s: string) => s),
+    }
+  ),
 }));
 
 // ── Infrastructure mocks ───────────────────────────────────────
 vi.mock('$lib/server/inference/gpu-arbiter.js', () => ({
-	getGpuLeaseStatus: vi.fn(async () => null),
-	acquireGpuLease: vi.fn(async () => null),
-	releaseGpuLease: vi.fn(async () => {}),
+  getGpuLeaseStatus: vi.fn(async () => null),
+  acquireGpuLease: vi.fn(async () => null),
+  releaseGpuLease: vi.fn(async () => {}),
 }));
 
 vi.mock('$lib/server/inference/inference-router.js', () => ({
-	getRouterStatus: vi.fn(async () => ({ activeTier: 'http', queue: 0 })),
+  getRouterStatus: vi.fn(async () => ({ activeTier: 'http', queue: 0 })),
 }));
 
 vi.mock('$lib/server/minio-simd-client.js', () => ({
-	getSIMDStatus: vi.fn(async () => ({ healthy: true, minioConnected: true, latencyMs: 5 })),
+  getSIMDStatus: vi.fn(async () => ({ healthy: true, minioConnected: true, latencyMs: 5 })),
 }));
 
 vi.mock('$lib/server/grpc/embedding-client.js', () => ({
-	checkGrpcHealth: vi.fn(async () => ({ enabled: true, url: 'grpc://localhost:50051', available: true })),
-	generateEmbeddings: vi.fn(async () => ({
-		vectors: [Array.from({ length: 768 }, (_, i) => Math.sin(i / 100) * 0.5)],
-	})),
+  checkGrpcHealth: vi.fn(async () => ({
+    enabled: true,
+    url: 'grpc://localhost:50051',
+    available: true,
+  })),
+  generateEmbeddings: vi.fn(async () => ({
+    vectors: [Array.from({ length: 768 }, (_, i) => Math.sin(i / 100) * 0.5)],
+  })),
 }));
 
 vi.mock('$lib/server/trt-llm.js', () => ({
-	healthCheck: vi.fn(async () => true),
+  healthCheck: vi.fn(async () => true),
+}));
+
+vi.mock('$lib/server/triton-llm.js', () => ({
+  healthCheckModel: vi.fn(async () => true),
 }));
 
 vi.mock('$lib/server/gpu/libtorch-bridge.js', () => ({
-	isCudaAvailable: vi.fn(() => false),
+  isCudaAvailable: vi.fn(() => false),
 }));
 
 vi.mock('$lib/gpu/runtime-optimizations.js', () => ({
-	NODE_RUNTIME_CONFIG: {
-		maxOldSpaceSize: 4096,
-		gpuBatchSize: 32,
-		gpuConcurrencyLimit: 2,
-		experimentalWasmSimd: true,
-		experimentalWasmThreads: true,
-	},
-	GPU_MARKDOWN_ENV: {
-		GPU_MARKDOWN_SERVICE_URL: 'http://gpu-md.test',
-		FALLBACK_TO_CPU: true,
-	},
+  NODE_RUNTIME_CONFIG: {
+    maxOldSpaceSize: 4096,
+    gpuBatchSize: 32,
+    gpuConcurrencyLimit: 2,
+    experimentalWasmSimd: true,
+    experimentalWasmThreads: true,
+  },
+  GPU_MARKDOWN_ENV: {
+    GPU_MARKDOWN_SERVICE_URL: 'http://gpu-md.test',
+    FALLBACK_TO_CPU: true,
+  },
 }));
 
 // ── Redis mock ─────────────────────────────────────────────────
 const mockRedis = {
-	ping: vi.fn(async () => 'PONG'),
-	info: vi.fn(async (section: string) => {
-		if (section === 'memory') return 'used_memory:1048576\r\nused_memory_human:1M\r\nused_memory_peak:2097152\r\nused_memory_peak_human:2M\r\n';
-		if (section === 'keyspace') return 'db0:keys=150,expires=50,avg_ttl=300000\r\n';
-		if (section === 'stats') return 'keyspace_hits:1000\r\nkeyspace_misses:200\r\nconnected_clients:3\r\n';
-		if (section === 'server') return 'uptime_in_seconds:86400\r\n';
-		return '';
-	}),
-	dbsize: vi.fn(async () => 150),
-	scan: vi.fn(async () => ['0', ['key1', 'key2']]),
+  ping: vi.fn(async () => 'PONG'),
+  info: vi.fn(async (section: string) => {
+    if (section === 'memory')
+      return 'used_memory:1048576\r\nused_memory_human:1M\r\nused_memory_peak:2097152\r\nused_memory_peak_human:2M\r\n';
+    if (section === 'keyspace') return 'db0:keys=150,expires=50,avg_ttl=300000\r\n';
+    if (section === 'stats')
+      return 'keyspace_hits:1000\r\nkeyspace_misses:200\r\nconnected_clients:3\r\n';
+    if (section === 'server') return 'uptime_in_seconds:86400\r\n';
+    return '';
+  }),
+  dbsize: vi.fn(async () => 150),
+  scan: vi.fn(async () => ['0', ['key1', 'key2']]),
 };
 
 vi.mock('$lib/server/redis.js', () => ({
-	redis: mockRedis,
-	redisPool: { getConnection: () => mockRedis },
+  redis: mockRedis,
+  redisPool: { getConnection: () => mockRedis },
 }));
 
 vi.mock('$lib/server/cache/report-template-cache.js', () => ({
-	getTemplateCacheStats: vi.fn(async () => ({ totalKeys: 10, metadataKeys: 3, aiContentKeys: 4, renderedKeys: 3 })),
+  getTemplateCacheStats: vi.fn(async () => ({
+    totalKeys: 10,
+    metadataKeys: 3,
+    aiContentKeys: 4,
+    renderedKeys: 3,
+  })),
 }));
 
 vi.mock('$lib/server/cache/pdf-export-cache.js', () => ({
-	getExportCacheStats: vi.fn(async () => ({ totalKeys: 5, htmlKeys: 2, mdKeys: 2, jsonKeys: 1 })),
+  getExportCacheStats: vi.fn(async () => ({ totalKeys: 5, htmlKeys: 2, mdKeys: 2, jsonKeys: 1 })),
 }));
 
 // ── Case theory mocks ──────────────────────────────────────────
 const mockGenerateCompletion = vi.fn();
 vi.mock('$lib/server/ai/ollama-client.js', () => ({
-	generateCompletion: (...args: unknown[]) => mockGenerateCompletion(...args),
+  generateCompletion: (...args: unknown[]) => mockGenerateCompletion(...args),
 }));
 
 vi.mock('$lib/server/auth-helpers.js', () => ({
-	requireAuth: vi.fn(async () => {}),
+  requireAuth: vi.fn(async () => {}),
 }));
 
 vi.mock('$lib/types/case-theory.js', () => ({}));
 
 // ── Qdrant mock (for vector-search) ───────────────────────────
 vi.mock('@qdrant/js-client-rest', () => ({
-	QdrantClient: vi.fn().mockImplementation(() => ({
-		search: vi.fn(async (collection: string) => {
-			if (collection === 'evidence_items') {
-				return [
-					{ id: 'ev-1', score: 0.92, payload: { title: 'Evidence A', tags: ['fraud'] } },
-					{ id: 'ev-2', score: 0.85, payload: { title: 'Evidence B', tags: [] } },
-				];
-			}
-			if (collection === 'legal_documents') {
-				return [
-					{ id: 'doc-1', score: 0.88, payload: { title: 'Legal Doc A' } },
-				];
-			}
-			return [];
-		}),
-	})),
+  QdrantClient: vi.fn().mockImplementation(() => ({
+    search: vi.fn(async (collection: string) => {
+      if (collection === 'evidence_items') {
+        return [
+          { id: 'ev-1', score: 0.92, payload: { title: 'Evidence A', tags: ['fraud'] } },
+          { id: 'ev-2', score: 0.85, payload: { title: 'Evidence B', tags: [] } },
+        ];
+      }
+      if (collection === 'legal_documents') {
+        return [{ id: 'doc-1', score: 0.88, payload: { title: 'Legal Doc A' } }];
+      }
+      return [];
+    }),
+  })),
 }));
 
 // ── Helpers ────────────────────────────────────────────────────
 function mkRequest(body?: unknown): Request {
-	return new Request('http://localhost/api/test', {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: body !== undefined ? JSON.stringify(body) : undefined,
-	});
+  return new Request('http://localhost/api/test', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
 }
 
 const authedLocals = { user: { id: 'user-1', email: 'test@test.com', role: 'admin' } } as any;
 const anonLocals = { user: null } as any;
 
 beforeEach(() => {
-	vi.clearAllMocks();
-	mockOllamaFetch.mockReset();
-	mockGenerateCompletion.mockReset();
-	mockExecute.mockReset();
-	mockExecute.mockResolvedValue({ rows: [{ ok: 1, server_time: '2026-03-29T00:00:00Z' }] });
+  vi.clearAllMocks();
+  mockOllamaFetch.mockReset();
+  mockGenerateCompletion.mockReset();
+  mockExecute.mockReset();
+  mockExecute.mockResolvedValue({ rows: [{ ok: 1, server_time: '2026-03-29T00:00:00Z' }] });
 });
 
 // ════════════════════════════════════════════════════════════════
 // INFRASTRUCTURE STATUS: /api/infrastructure/status
 // ════════════════════════════════════════════════════════════════
 describe('/api/infrastructure/status (GET)', () => {
-	let GET: Function;
+  let GET: Function;
 
-	beforeEach(async () => {
-		// Mock global fetch for Qdrant + RabbitMQ checks
-		vi.stubGlobal('fetch', vi.fn(async (url: string) => {
-			if (typeof url === 'string' && url.includes('/collections')) {
-				return { ok: true, json: async () => ({ result: { collections: [{ name: 'evidence_items' }, { name: 'legal_documents' }] } }) };
-			}
-			if (typeof url === 'string' && url.includes('/api/overview')) {
-				return { ok: true, json: async () => ({ object_totals: { queues: 7 }, queue_totals: { messages_ready: 3, messages_unacknowledged: 1 }, message_stats: { publish_details: { rate: 5 }, deliver_get_details: { rate: 4 } } }) };
-			}
-			if (typeof url === 'string' && url.includes('/api/tags')) {
-				return { ok: true };
-			}
-			return { ok: false };
-		}));
-		// ollamaFetch uses the mocked version
-		mockOllamaFetch.mockResolvedValue({ ok: true });
-		const mod = await import('../src/routes/api/infrastructure/status/+server');
-		GET = mod.GET;
-	});
+  beforeEach(async () => {
+    // Mock global fetch for Qdrant + RabbitMQ checks
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => {
+        if (typeof url === 'string' && url.includes('/collections')) {
+          return {
+            ok: true,
+            json: async () => ({
+              result: { collections: [{ name: 'evidence_items' }, { name: 'legal_documents' }] },
+            }),
+          };
+        }
+        if (typeof url === 'string' && url.includes('/api/overview')) {
+          return {
+            ok: true,
+            json: async () => ({
+              object_totals: { queues: 7 },
+              queue_totals: { messages_ready: 3, messages_unacknowledged: 1 },
+              message_stats: { publish_details: { rate: 5 }, deliver_get_details: { rate: 4 } },
+            }),
+          };
+        }
+        if (typeof url === 'string' && url.includes('/api/tags')) {
+          return { ok: true };
+        }
+        return { ok: false };
+      })
+    );
+    // ollamaFetch uses the mocked version
+    mockOllamaFetch.mockResolvedValue({ ok: true });
+    const mod = await import('../src/routes/api/infrastructure/status/+server');
+    GET = mod.GET;
+  });
 
-	afterEach(() => {
-		vi.unstubAllGlobals();
-	});
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
-	it('returns infrastructure status overview', async () => {
-		const res = await GET({ locals: authedLocals });
-		const data = await res.json();
-		expect(res.status).toBe(200);
-		expect(data.tiers).toBeDefined();
-		expect(data.tiers.tier1_grpc.label).toContain('gRPC');
-		expect(data.inference).toBeDefined();
-		expect(data.gpu).toBeDefined();
-		expect(data.services).toBeDefined();
-		expect(data.latencyMs).toBeGreaterThanOrEqual(0);
-		expect(data.ts).toBeTruthy();
-	});
+  it('returns infrastructure status overview', async () => {
+    const res = await GET({ locals: authedLocals });
+    const data = await res.json();
+    expect(res.status).toBe(200);
+    expect(data.tiers).toBeDefined();
+    expect(data.tiers.tier1_grpc.label).toContain('gRPC');
+    expect(data.inference).toBeDefined();
+    expect(data.inference.tritonVlm).toEqual({
+      available: true,
+      url: 'http://triton.test:8000',
+      model: 'gemma_vlm_ensemble',
+      visionModel: 'siglip_vision',
+    });
+    expect(data.gpu).toBeDefined();
+    expect(data.services).toBeDefined();
+    expect(data.latencyMs).toBeGreaterThanOrEqual(0);
+    expect(data.ts).toBeTruthy();
+  });
 
-	it('includes GPU information', async () => {
-		const res = await GET({ locals: authedLocals });
-		const data = await res.json();
-		expect(data.gpu.cudaAddon).toBe(false);
-		expect(data.gpu.leaseFree).toBe(true);
-		expect(data.gpu.device).toContain('CPU fallback');
-	});
+  it('includes GPU information', async () => {
+    const res = await GET({ locals: authedLocals });
+    const data = await res.json();
+    expect(data.gpu.cudaAddon).toBe(false);
+    expect(data.gpu.leaseFree).toBe(true);
+    expect(data.gpu.device).toContain('CPU fallback');
+  });
 
-	it('includes runtime config', async () => {
-		const res = await GET({ locals: authedLocals });
-		const data = await res.json();
-		expect(data.runtimeConfig.maxOldSpaceSize).toBe(4096);
-		expect(data.runtimeConfig.wasmSimd).toBe(true);
-	});
+  it('includes runtime config', async () => {
+    const res = await GET({ locals: authedLocals });
+    const data = await res.json();
+    expect(data.runtimeConfig.maxOldSpaceSize).toBe(4096);
+    expect(data.runtimeConfig.wasmSimd).toBe(true);
+  });
 
-	it('includes service statuses', async () => {
-		const res = await GET({ locals: authedLocals });
-		const data = await res.json();
-		expect(data.services.redis).toBe(true);
-		expect(data.services.postgres).toBe(true);
-	});
+  it('includes service statuses', async () => {
+    const res = await GET({ locals: authedLocals });
+    const data = await res.json();
+    expect(data.services.redis).toBe(true);
+    expect(data.services.postgres).toBe(true);
+  });
 
-	it('includes cache and queue stats', async () => {
-		const res = await GET({ locals: authedLocals });
-		const data = await res.json();
-		expect(data.cache.redis).toBeDefined();
-		expect(data.queues).toBeDefined();
-		expect(data.queues.total).toBe(7);
-	});
+  it('includes cache and queue stats', async () => {
+    const res = await GET({ locals: authedLocals });
+    const data = await res.json();
+    expect(data.cache.redis).toBeDefined();
+    expect(data.queues).toBeDefined();
+    expect(data.queues.total).toBe(7);
+  });
 
-	it('sets Cache-Control header', async () => {
-		const res = await GET({ locals: authedLocals });
-		expect(res.headers.get('Cache-Control')).toContain('max-age=15');
-	});
+  it('sets Cache-Control header', async () => {
+    const res = await GET({ locals: authedLocals });
+    expect(res.headers.get('Cache-Control')).toContain('max-age=15');
+  });
 });
 
 // ════════════════════════════════════════════════════════════════

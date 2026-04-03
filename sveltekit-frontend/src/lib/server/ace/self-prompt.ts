@@ -37,7 +37,7 @@ export async function evaluateResponse(opts: {
   query: string;
   response: string;
   context: ACEContext;
-  backend: 'ollama' | 'tensorrt';
+  backend: 'ollama' | 'tensorrt' | 'triton';
 }): Promise<SelfEvaluation> {
   const start = Date.now();
 

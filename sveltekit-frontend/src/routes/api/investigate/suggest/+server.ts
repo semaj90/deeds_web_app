@@ -62,6 +62,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         evidenceMetadata: null,
         evidenceConnections: null,
         userAnalyticsContext: null,
+        codebaseContext: null,
+        kbChunks: [],
+        caseChunks: [],
       },
       backend: 'ollama',
     });

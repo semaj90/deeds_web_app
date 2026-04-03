@@ -1,12 +1,8 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
-import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { bifrostChat } from '$lib/server/ollama.js';
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { TIMEOUTS } from '$lib/server/timeouts.js';
-import { llmRouter } from '$lib/server/llm-router.js';
+import { routeInference } from '$lib/server/inference/inference-router.js';
 
 const chatMessageSchema = z.object({
   role: z.enum(['user', 'assistant', 'system']),
@@ -22,8 +18,6 @@ const aiChatSchema = z
     history: z.array(chatMessageSchema).max(50).optional().default([]),
   })
   .refine((d) => d.message?.trim() || d.prompt?.trim(), { message: 'Message is required' });
-
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 /** POST /api/ai/chat — Simple JSON chat endpoint (non-streaming) */
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -43,84 +37,25 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       ? `You are a legal AI assistant for case ${caseId}. Provide concise, professional legal analysis.`
       : 'You are a legal AI assistant. Provide concise, professional legal analysis.';
 
-    const data = await traceLLM(
+    const result = await traceLLM(
       'ai-chat',
-      { model: 'gemma3-legal:latest', prompt: message.slice(0, 500) },
+      { model: 'inference-router', prompt: message.slice(0, 500) },
       async (gen) => {
-        // Route through Bifrost gateway when enabled (gets semantic caching)
-        if (ENV.BIFROST_ENABLED) {
-          try {
-            const content = await bifrostChat(
-              [
-                { role: 'system', content: systemPrompt },
-                ...(body.history || []),
-                { role: 'user', content: message },
-              ],
-              'gemma3-legal',
-              { temperature, timeoutMs: 30_000 }
-            );
-            gen.end({ output: content.slice(0, 1000) });
-            return { message: { content }, model: 'gemma3-legal:latest' };
-          } catch {
-            gen.end({ output: 'bifrost-fallthrough', level: 'WARNING' });
-            // Fall through to direct Ollama
-          }
-        }
-
-        const res = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'gemma3-legal:latest',
-            messages: [
-              { role: 'system', content: systemPrompt },
-              ...(body.history || []),
-              { role: 'user', content: message },
-            ],
-            stream: false,
-            options: { temperature },
-          }),
-          signal: AbortSignal.timeout(TIMEOUTS.USER_FACING),
+        const routed = await routeInference({
+          prompt: message,
+          systemPrompt,
+          temperature,
         });
-
-        if (!res.ok) {
-          gen.end({ output: `error:${res.status}`, level: 'WARNING' });
-          return null;
-        }
-
-        const d = await res.json();
-        gen.end({ output: (d.message?.content || '').slice(0, 1000) });
-        return d;
+        gen.end({ output: (routed.text || '').slice(0, 1000) });
+        return routed;
       }
     );
 
-    if (!data) {
-      // Tertiary fallback: llmRouter (TensorRT → Ollama /api/generate → Gemini)
-      try {
-        const fullPrompt = [
-          ...(body.history ?? []).map(
-            (m: { role: string; content: string }) => `${m.role}: ${m.content}`
-          ),
-          `user: ${message}`,
-        ].join('\n');
-        const result = await llmRouter.generate({ prompt: fullPrompt, systemPrompt, temperature });
-        return json({
-          response: result.content,
-          model: result.metadata?.model ?? 'llm-router',
-          performance: {},
-        });
-      } catch {
-        return json({ error: 'AI service unavailable' }, { status: 503 });
-      }
-    }
-
     return json({
-      response: data.message?.content || data.response || '',
-      model: data.model || 'gemma3-legal:latest',
-      performance: {
-        total_duration: data.total_duration,
-        eval_count: data.eval_count,
-      },
+      response: result.text || '',
+      model: result.model || 'gemma3-legal:latest',
+      backend: result.backend,
+      performance: { latencyMs: result.latencyMs },
     });
   } catch (err) {
     console.error('[/api/ai/chat] Error:', err);

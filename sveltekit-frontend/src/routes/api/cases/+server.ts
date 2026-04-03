@@ -6,6 +6,7 @@ import { apiResponses, validateRequest } from '$lib/server/api/response-helper.j
 import { requireAuth } from '$lib/server/auth-helpers.js';
 import { invalidateCaseCache } from '$lib/server/cache/invalidation.js';
 import { z } from 'zod';
+import { syncCaseToGraph } from '$lib/server/graph/pg-neo4j-sync.js';
 
 const CASE_STATUS = ['open', 'in_progress', 'pending_review', 'closed', 'archived'] as const;
 const CASE_PRIORITY = ['low', 'medium', 'high', 'urgent'] as const;
@@ -117,6 +118,9 @@ export const POST: RequestHandler = async (event) => {
 		await invalidateCaseCache(newCase[0].id, 'case_update', auth.user.id)
 			.catch(err => console.warn('[Cases] Cache invalidation failed:', err));
 
+		// Sync new case to Neo4j graph (non-blocking)
+		syncCaseToGraph(newCase[0].id).catch(err => console.warn('[neo4j-sync] case create:', err));
+
 		// Track analytics event (non-blocking)
 		import('$lib/server/queue/rabbitmq-manager-fixed.js').then(({ rabbitmq }) =>
 			rabbitmq.publishAnalyticsEvent({ eventType: 'case_create', payload: { caseId: newCase[0].id, userId: auth.user.id } })
@@ -166,6 +170,11 @@ export const PATCH: RequestHandler = async (event) => {
       updated.map((c) => invalidateCaseCache(c.id, 'case_update', auth.user.id))
     ).catch((err) => console.warn('[Cases] Cache invalidation failed:', err));
 
+    // Sync updated cases to Neo4j graph (non-blocking)
+    for (const c of updated) {
+      syncCaseToGraph(c.id).catch(err => console.warn('[neo4j-sync] case update:', err));
+    }
+
     return apiResponses.ok({
       updated: updated.length,
       message: `Updated ${updated.length} cases`,
@@ -205,6 +214,11 @@ export const DELETE: RequestHandler = async (event) => {
     await Promise.all(
       archived.map((c) => invalidateCaseCache(c.id, 'case_update', auth.user.id))
     ).catch((err) => console.warn('[Cases] Cache invalidation failed:', err));
+
+    // Sync archived status to Neo4j graph (non-blocking)
+    for (const c of archived) {
+      syncCaseToGraph(c.id).catch(err => console.warn('[neo4j-sync] case archive:', err));
+    }
 
     return apiResponses.ok({
       archived: archived.length,

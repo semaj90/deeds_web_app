@@ -11,7 +11,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 import { ENV } from '$lib/server/env.server.js';
-import { getTrtLlmUrl, getOllamaUrl } from '$lib/config/env.server.js';
+import { getOllamaUrl } from '$lib/config/env.server.js';
 import { z } from 'zod';
 import { resizeForVLM } from '$lib/server/image/resize-for-vlm.js';
 
@@ -22,7 +22,9 @@ const vlmJsonSchema = z.object({
   temperature: z.number().min(0).max(2).optional(),
 });
 
-const getTritonUrl = () => getTrtLlmUrl();
+const getTritonUrl = () => (ENV.TRITON_URL ?? 'http://localhost:8000').replace(/\/$/, '');
+const getVlmModel = () => ENV.TRITON_VLM_MODEL ?? 'gemma_vlm_ensemble';
+const getVisionModel = () => ENV.TRITON_VISION_MODEL ?? 'siglip_vision';
 
 interface VlmRequest {
   prompt: string;
@@ -37,12 +39,15 @@ interface VlmRequest {
  */
 async function loadVisionModel(): Promise<boolean> {
   try {
-    const res = await fetch(`${getTritonUrl()}/v2/repository/models/siglip_vision/load`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({}),
-      signal: AbortSignal.timeout(30000),
-    });
+    const res = await fetch(
+      `${getTritonUrl()}/v2/repository/models/${encodeURIComponent(getVisionModel())}/load`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+        signal: AbortSignal.timeout(30000),
+      }
+    );
     return res.ok;
   } catch {
     return false;
@@ -51,12 +56,15 @@ async function loadVisionModel(): Promise<boolean> {
 
 async function unloadVisionModel(): Promise<void> {
   try {
-    await fetch(`${getTritonUrl()}/v2/repository/models/siglip_vision/unload`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({}),
-      signal: AbortSignal.timeout(5000),
-    });
+    await fetch(
+      `${getTritonUrl()}/v2/repository/models/${encodeURIComponent(getVisionModel())}/unload`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+        signal: AbortSignal.timeout(5000),
+      }
+    );
   } catch {
     // Non-fatal — model may already be unloaded
   }
@@ -74,7 +82,7 @@ async function checkTritonHealth(): Promise<boolean> {
 }
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   const contentType = request.headers.get('content-type') ?? '';
   let body: VlmRequest;
 
@@ -176,32 +184,35 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
 
     // Call Triton ensemble: SigLIP → Projector → Gemma3
-    const res = await fetch(`${getTritonUrl()}/v2/models/gemma_vlm_ensemble/infer`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        inputs: [
-          {
-            name: 'pixel_values',
-            // Gemma3 SigLIP encoder native resolution: 896×896
-            shape: [1, 3, 896, 896],
-            datatype: 'FP32',
-            data: imageBase64, // Triton Python backend decodes base64
+    const res = await fetch(
+      `${getTritonUrl()}/v2/models/${encodeURIComponent(getVlmModel())}/infer`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          inputs: [
+            {
+              name: 'pixel_values',
+              // Gemma3 SigLIP encoder native resolution: 896×896
+              shape: [1, 3, 896, 896],
+              datatype: 'FP32',
+              data: imageBase64, // Triton Python backend decodes base64
+            },
+            {
+              name: 'input_ids',
+              shape: [1, -1],
+              datatype: 'INT64',
+              data: prompt, // Tokenized by backend
+            },
+          ],
+          parameters: {
+            max_tokens: maxTokens,
+            temperature: temperature,
           },
-          {
-            name: 'input_ids',
-            shape: [1, -1],
-            datatype: 'INT64',
-            data: prompt, // Tokenized by backend
-          },
-        ],
-        parameters: {
-          max_tokens: maxTokens,
-          temperature: temperature,
-        },
-      }),
-      signal: AbortSignal.timeout(120000),
-    });
+        }),
+        signal: AbortSignal.timeout(120000),
+      }
+    );
 
     if (!res.ok) {
       const errText = await res.text().catch(() => '');
@@ -219,8 +230,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     return json({
       text: logits ? 'VLM inference complete' : '',
-      model: 'gemma3-vlm-ensemble',
-      pipeline: ['siglip_vision', 'gemma_projector', 'gemma_legal'],
+      model: getVlmModel(),
+      pipeline: [getVisionModel(), 'gemma_projector', getVlmModel()],
       tritonAvailable: true,
     });
   } finally {

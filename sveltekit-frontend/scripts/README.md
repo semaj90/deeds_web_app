@@ -67,7 +67,7 @@ npm run import:errors svelte-check-top1000.txt
 ## Environment
 
 All scripts require:
-- `DATABASE_URL` environment variable or defaults to `postgresql://legal_admin:123456@localhost:5432/legal_ai_db`
+- `DATABASE_URL` environment variable or defaults to `postgresql://legal_admin:123456@localhost:5434/legal_ai_db`
 - PostgreSQL with NES Command Center tables created (see migration: `drizzle/migrations/20251221_add_nes_command_center_tables.sql`)
 
 ## Development

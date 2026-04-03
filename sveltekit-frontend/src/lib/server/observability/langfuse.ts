@@ -164,6 +164,242 @@ export async function traceRAG<T>(
 	});
 }
 
+// ── Infrastructure Trace Wrappers ────────────────────────────────────────
+
+/**
+ * Trace a vector database search (Qdrant).
+ */
+export async function traceVectorSearch<T>(
+	collection: string,
+	metadata: Record<string, unknown>,
+	callback: () => Promise<T>
+): Promise<T> {
+	const langfuse = getLangfuse();
+	if (!langfuse) return callback();
+
+	const trace = langfuse.trace({
+		name: `vector:${collection}`,
+		metadata: { collection, ...metadata },
+		tags: ['qdrant', collection],
+	});
+
+	const span = trace.span({
+		name: 'vector-search',
+		input: JSON.stringify(metadata).slice(0, 500),
+	});
+	const start = Date.now();
+
+	try {
+		const result = await callback();
+		const ms = Date.now() - start;
+		const count = Array.isArray(result) ? result.length : (result as any)?.length ?? 1;
+		span.end({ output: `${count} results (${ms}ms)` });
+		return result;
+	} catch (err) {
+		span.end({ statusMessage: (err as Error).message, level: 'ERROR' });
+		throw err;
+	}
+}
+
+/**
+ * Trace a database query (PostgreSQL).
+ */
+export async function traceDB<T>(
+	operation: string,
+	metadata: Record<string, unknown>,
+	callback: () => Promise<T>
+): Promise<T> {
+	const langfuse = getLangfuse();
+	if (!langfuse) return callback();
+
+	const trace = langfuse.trace({
+		name: `db:${operation}`,
+		metadata,
+		tags: ['postgresql', operation],
+	});
+
+	const span = trace.span({
+		name: operation,
+		input: metadata.table ? String(metadata.table) : undefined,
+	});
+	const start = Date.now();
+
+	try {
+		const result = await callback();
+		const ms = Date.now() - start;
+		const rowCount = (result as any)?.rows?.length ?? (result as any)?.rowCount ?? '?';
+		span.end({ output: `${rowCount} rows (${ms}ms)` });
+		return result;
+	} catch (err) {
+		span.end({ statusMessage: (err as Error).message, level: 'ERROR' });
+		throw err;
+	}
+}
+
+/**
+ * Trace a message queue operation (RabbitMQ publish/consume).
+ */
+export async function traceQueue<T>(
+	operation: 'publish' | 'consume',
+	queue: string,
+	metadata: Record<string, unknown>,
+	callback: () => Promise<T>
+): Promise<T> {
+	const langfuse = getLangfuse();
+	if (!langfuse) return callback();
+
+	const trace = langfuse.trace({
+		name: `queue:${operation}:${queue}`,
+		metadata: { queue, operation, ...metadata },
+		tags: ['rabbitmq', operation, queue],
+	});
+
+	const span = trace.span({
+		name: `${operation}-${queue}`,
+		input: JSON.stringify(metadata).slice(0, 300),
+	});
+	const start = Date.now();
+
+	try {
+		const result = await callback();
+		span.end({ output: `${operation} ok (${Date.now() - start}ms)` });
+		return result;
+	} catch (err) {
+		span.end({ statusMessage: (err as Error).message, level: 'ERROR' });
+		throw err;
+	}
+}
+
+/**
+ * Trace a worker thread task (compute-pool).
+ */
+export async function traceWorker<T>(
+	taskType: string,
+	metadata: Record<string, unknown>,
+	callback: () => Promise<T>
+): Promise<T> {
+	const langfuse = getLangfuse();
+	if (!langfuse) return callback();
+
+	const trace = langfuse.trace({
+		name: `worker:${taskType}`,
+		metadata: { taskType, ...metadata },
+		tags: ['worker-thread', taskType],
+	});
+
+	const span = trace.span({
+		name: `compute-${taskType}`,
+		input: JSON.stringify(metadata).slice(0, 300),
+	});
+	const start = Date.now();
+
+	try {
+		const result = await callback();
+		span.end({ output: `${taskType} done (${Date.now() - start}ms)` });
+		return result;
+	} catch (err) {
+		span.end({ statusMessage: (err as Error).message, level: 'ERROR' });
+		throw err;
+	}
+}
+
+/**
+ * Trace a CouchDB operation.
+ */
+export async function traceCouchDB<T>(
+	operation: string,
+	dbName: string,
+	callback: () => Promise<T>
+): Promise<T> {
+	const langfuse = getLangfuse();
+	if (!langfuse) return callback();
+
+	const trace = langfuse.trace({
+		name: `couchdb:${operation}`,
+		metadata: { dbName, operation },
+		tags: ['couchdb', operation],
+	});
+
+	const span = trace.span({ name: `${operation}-${dbName}` });
+	const start = Date.now();
+
+	try {
+		const result = await callback();
+		span.end({ output: `${operation} ok (${Date.now() - start}ms)` });
+		return result;
+	} catch (err) {
+		span.end({ statusMessage: (err as Error).message, level: 'ERROR' });
+		throw err;
+	}
+}
+
+/**
+ * Trace a cache operation (Redis/memory).
+ */
+export async function traceCache<T>(
+	operation: string,
+	metadata: Record<string, unknown>,
+	callback: () => Promise<T>
+): Promise<T> {
+	const langfuse = getLangfuse();
+	if (!langfuse) return callback();
+
+	const trace = langfuse.trace({
+		name: `cache:${operation}`,
+		metadata: { operation, ...metadata },
+		tags: ['cache', operation],
+	});
+
+	const span = trace.span({ name: `cache-${operation}` });
+	const start = Date.now();
+
+	try {
+		const result = await callback();
+		const ms = Date.now() - start;
+		const hit = metadata.hit ?? (result !== null && result !== undefined);
+		span.end({ output: `${hit ? 'HIT' : 'MISS'} (${ms}ms)` });
+		return result;
+	} catch (err) {
+		span.end({ statusMessage: (err as Error).message, level: 'ERROR' });
+		throw err;
+	}
+}
+
+/**
+ * Trace a graph/KAG operation (Neo4j/pgvector graph queries).
+ */
+export async function traceGraph<T>(
+	operation: string,
+	metadata: Record<string, unknown>,
+	callback: () => Promise<T>
+): Promise<T> {
+	const langfuse = getLangfuse();
+	if (!langfuse) return callback();
+
+	const trace = langfuse.trace({
+		name: `graph:${operation}`,
+		metadata: { operation, ...metadata },
+		tags: ['kag', operation],
+	});
+
+	const span = trace.span({
+		name: `graph-${operation}`,
+		input: JSON.stringify(metadata).slice(0, 300),
+	});
+	const start = Date.now();
+
+	try {
+		const result = await callback();
+		const ms = Date.now() - start;
+		const count = Array.isArray(result) ? result.length : (result as any)?.length ?? 1;
+		span.end({ output: `${count} results (${ms}ms)` });
+		return result;
+	} catch (err) {
+		span.end({ statusMessage: (err as Error).message, level: 'ERROR' });
+		throw err;
+	}
+}
+
 /**
  * Flush pending events (call during graceful shutdown).
  */

@@ -185,7 +185,21 @@
     {
       "label": "Docker Services Up",
       "type": "shell",
-      "command": "$ErrorActionPreference = 'Stop'; if (-not (Get-Command docker -ErrorAction SilentlyContinue)) { Write-Error 'Docker CLI is not installed or not on PATH.'; exit 1 }; try { docker version | Out-Null } catch { Write-Error 'Docker Desktop Linux engine is unavailable. Start Docker Desktop or switch to the Linux containers backend, then retry.'; exit 1 }; $serviceAliases = @(@('deeds-postgres-prod','postgres-pgvector','phase66-postgres'), @('deeds-redis-prod','phase66-redis','legal-ai-redis'), @('deeds-qdrant-prod','phase66-qdrant','legal-ai-qdrant'), @('phase66-minio','legal-ai-minio'), @('phase66-rabbitmq','legal-ai-rabbitmq'), @('phase66-couchdb','legal-ai-couchdb')); $toStart = @(); foreach ($aliases in $serviceAliases) { $matches = @(); foreach ($name in $aliases) { $status = docker inspect --format '{{.State.Status}}' $name 2>$null; if ($LASTEXITCODE -eq 0) { $matches += @{ Name = $name; Status = $status.Trim() } } } if ($matches.Count -eq 0) { Write-Host ('Skipping missing service aliases: ' + ($aliases -join ', ')) -ForegroundColor Yellow; continue } $running = $matches | Where-Object { $_.Status -eq 'running' } | Select-Object -First 1; if ($running) { Write-Host ('Already running: ' + $running.Name) -ForegroundColor DarkGray; continue } $toStart += ($matches | Select-Object -First 1).Name }; if ($toStart.Count -eq 0) { Write-Host 'All requested services are already running.' -ForegroundColor Green; exit 0 }; docker start @toStart",
+      "command": "$ErrorActionPreference = 'Stop'; if (-not (Get-Command docker -ErrorAction SilentlyContinue)) { Write-Error 'Docker CLI is not installed or not on PATH.'; exit 1 }; try { docker version | Out-Null } catch { Write-Error 'Docker Desktop Linux engine is unavailable. Start Docker Desktop or switch to the Linux containers backend, then retry.'; exit 1 }; $serviceAliases = @(@('deeds-postgres-prod'), @('deeds-postgres-prod-proxy'), @('deeds-redis-prod','phase66-redis','legal-ai-redis'), @('deeds-qdrant-prod','phase66-qdrant','legal-ai-qdrant'), @('phase66-minio','legal-ai-minio'), @('phase66-rabbitmq','legal-ai-rabbitmq'), @('phase66-couchdb','legal-ai-couchdb')); $toStart = @(); foreach ($aliases in $serviceAliases) { $matches = @(); foreach ($name in $aliases) { $status = docker inspect --format '{{.State.Status}}' $name 2>$null; if ($LASTEXITCODE -eq 0) { $matches += @{ Name = $name; Status = $status.Trim() } } } if ($matches.Count -eq 0) { Write-Host ('Skipping missing service aliases: ' + ($aliases -join ', ')) -ForegroundColor Yellow; continue } $running = $matches | Where-Object { $_.Status -eq 'running' } | Select-Object -First 1; if ($running) { Write-Host ('Already running: ' + $running.Name) -ForegroundColor DarkGray; continue } $toStart += ($matches | Select-Object -First 1).Name }; if ($toStart.Count -eq 0) { Write-Host 'All requested services are already running.' -ForegroundColor Green; exit 0 }; docker start @toStart",
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "DB Proxy Up",
+      "type": "shell",
+      "command": "$ErrorActionPreference = 'Stop'; if (-not (Get-Command docker -ErrorAction SilentlyContinue)) { Write-Error 'Docker CLI is not installed or not on PATH.'; exit 1 }; $dbContainer = 'deeds-postgres-prod'; $proxyContainer = 'deeds-postgres-prod-proxy'; $targetPort = 5434; $dbStatus = docker inspect --format '{{.State.Status}}' $dbContainer 2>$null; if ($LASTEXITCODE -ne 0) { Write-Error ('Required database container not found: ' + $dbContainer); exit 1 }; if ($dbStatus.Trim() -ne 'running') { docker start $dbContainer | Out-Null }; $proxyStatus = docker inspect --format '{{.State.Status}}' $proxyContainer 2>$null; if ($LASTEXITCODE -eq 0 -and $proxyStatus.Trim() -eq 'running') { Write-Host ('Already running: ' + $proxyContainer) -ForegroundColor Green; exit 0 }; if ($LASTEXITCODE -eq 0) { docker rm -f $proxyContainer | Out-Null }; $networksJson = docker inspect $dbContainer --format '{{json .NetworkSettings.Networks}}'; $networks = $networksJson | ConvertFrom-Json; $networkName = ($networks.PSObject.Properties | Select-Object -First 1).Name; if (-not $networkName) { Write-Error ('No Docker network found for ' + $dbContainer); exit 1 }; docker run -d --name $proxyContainer --restart unless-stopped --network $networkName -p ${targetPort}:${targetPort} alpine/socat TCP-LISTEN:${targetPort},fork,reuseaddr TCP:${dbContainer}:5432 | Out-Null; Write-Host ('Started ' + $proxyContainer + ' on localhost:' + $targetPort) -ForegroundColor Green",
       "group": "build",
       "presentation": {
         "echo": true,
@@ -1260,7 +1274,7 @@
         "10"
       ],
       "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend"
+          "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
       "presentation": {

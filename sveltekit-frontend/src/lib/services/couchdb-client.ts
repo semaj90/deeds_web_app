@@ -9,7 +9,7 @@ import { ollamaFetch } from '$lib/server/ollama.js';
 
 const COUCHDB_URL = process.env.COUCHDB_URL ?? 'http://localhost:5984';
 const COUCHDB_USER = process.env.COUCHDB_USER ?? 'admin';
-const COUCHDB_PASS = process.env.COUCHDB_PASS ?? '123456';
+const COUCHDB_PASS = process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass';
 
 function authHeader(): string {
   return 'Basic ' + Buffer.from(COUCHDB_USER + ':' + COUCHDB_PASS).toString('base64');

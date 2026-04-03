@@ -191,13 +191,14 @@ export async function bifrostChat(
 	model: string,
 	options?: { temperature?: number; maxTokens?: number; timeoutMs?: number }
 ): Promise<string> {
+	const bifrostModel = model.includes('/') ? model : `ollama-local/${model}`;
 	const res = await fetch(`${ENV.BIFROST_URL}/v1/chat/completions`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
 		},
 		body: JSON.stringify({
-			model,
+			model: bifrostModel,
 			messages,
 			temperature: options?.temperature ?? 0.7,
 			max_tokens: options?.maxTokens ?? 2048,

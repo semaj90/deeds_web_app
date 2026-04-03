@@ -36,6 +36,8 @@ export const TTL = {
 	EVIDENCE_LLM: 24 * 60 * 60, // 24 hours
 	/** Graph neighborhood cache */
 	GRAPH: 20 * 60,            // 20 min
+	/** Authority chain drill-down (multi-hop statute/case expansion) */
+	AUTHORITY_CHAIN: 15 * 60,  // 15 min
 	/** Embedding vectors: long-lived, content-addressed */
 	EMBEDDING: 7 * 24 * 60 * 60, // 7 days
 	/** Job status: short, polled frequently */

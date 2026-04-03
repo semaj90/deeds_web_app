@@ -16,7 +16,7 @@ function getDatabaseConfig() {
 }
 
 function getConnectionString(): string {
-    return ENV_CONFIG.DATABASE_URL || 'postgresql://localhost:5432/legal_ai';
+    return ENV_CONFIG.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
 }
 
 /**

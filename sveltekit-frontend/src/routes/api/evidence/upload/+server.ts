@@ -1,6 +1,6 @@
 import { json, type RequestEvent } from '@sveltejs/kit';
 import crypto from 'crypto';
-import { uploadFile } from '$lib/server/minio-client';
+import { deleteFile, uploadFile } from '$lib/server/minio-client';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { createJob, updateJob } from '$lib/server/evidence-progress';
@@ -9,7 +9,7 @@ import { extractTextHybrid } from '$lib/server/ocr/hybrid.js';
 import { generateSingleEmbedding, generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { embedTexts } from '$lib/server/batch-embedder.js';
 import { chunkLegalDocument, type LegalChunk } from '$lib/server/indexer/legal-chunker.js';
-import { getEmbeddingCache, setEmbeddingCache, getVLMCache, setVLMCache } from '$lib/server/vector-cache.js';
+import { getEmbeddingCache, setEmbeddingCache } from '$lib/server/vector-cache.js';
 import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
 import { detectForensicPatterns } from '$lib/server/analysis/forensics.js';
 import { summarizeDocument } from '$lib/server/analysis/summarizer.js';
@@ -63,6 +63,23 @@ type ProcessingDiagnostics = {
   warnings: Array<{ stage: string; detail: string; at: string }>;
 };
 
+const FALLBACK_UPLOAD_CASE_TITLE = 'General Evidence Uploads';
+const FALLBACK_UPLOAD_CASE_DESCRIPTION =
+  'Auto-created catchall case for evidence uploaded outside a specific case context.';
+
+function getResultRows(result: unknown): Record<string, unknown>[] {
+  if (Array.isArray(result)) {
+    return result as Record<string, unknown>[];
+  }
+
+  if (result && typeof result === 'object' && 'rows' in result) {
+    const rows = (result as { rows?: Record<string, unknown>[] }).rows;
+    return Array.isArray(rows) ? rows : [];
+  }
+
+  return [];
+}
+
 function createProcessingDiagnostics(): ProcessingDiagnostics {
   return {
     startedAt: new Date().toISOString(),
@@ -100,12 +117,59 @@ async function persistProcessingDiagnostics(
   extraMetadata: Record<string, unknown> = {}
 ): Promise<void> {
   await db.execute(sql`
-		UPDATE evidence SET metadata = COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({
+		UPDATE evidence SET ai_analysis = COALESCE(ai_analysis, '{}'::jsonb) || ${JSON.stringify({
       processingDiagnostics: diagnostics,
       ...extraMetadata,
     })}::jsonb
 		WHERE id = ${evidenceId}
 	`);
+}
+
+async function resolveEvidenceCaseId(requestedCaseId: string | null): Promise<string> {
+  if (requestedCaseId) {
+    const existingCase = getResultRows(
+      await db.execute(sql`
+        SELECT id
+        FROM cases
+        WHERE id = ${requestedCaseId}
+        LIMIT 1
+      `)
+    )[0];
+
+    if (!existingCase?.id || typeof existingCase.id !== 'string') {
+      throw new Error('Selected case was not found');
+    }
+
+    return existingCase.id;
+  }
+
+  const fallbackCase = getResultRows(
+    await db.execute(sql`
+      SELECT id
+      FROM cases
+      WHERE title = ${FALLBACK_UPLOAD_CASE_TITLE}
+      ORDER BY created_at ASC
+      LIMIT 1
+    `)
+  )[0];
+
+  if (fallbackCase?.id && typeof fallbackCase.id === 'string') {
+    return fallbackCase.id;
+  }
+
+  const createdFallbackCase = getResultRows(
+    await db.execute(sql`
+      INSERT INTO cases (title, description)
+      VALUES (${FALLBACK_UPLOAD_CASE_TITLE}, ${FALLBACK_UPLOAD_CASE_DESCRIPTION})
+      RETURNING id
+    `)
+  )[0];
+
+  if (!createdFallbackCase?.id || typeof createdFallbackCase.id !== 'string') {
+    throw new Error('Failed to resolve a fallback case for uploaded evidence');
+  }
+
+  return createdFallbackCase.id;
 }
 
 /** Check Redis for cached extraction result by file SHA-256 hash. */
@@ -167,6 +231,7 @@ export async function POST({ request, locals }: RequestEvent) {
   }
 
   const jobId = `job-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+  let uploadedObjectKey: string | null = null;
 
   try {
     const formData = await request.formData();
@@ -190,12 +255,13 @@ export async function POST({ request, locals }: RequestEvent) {
         { status: 400 }
       );
     }
-    const caseId = parsed.data.caseId ?? null;
+    const requestedCaseId = parsed.data.caseId ?? null;
     const title = parsed.data.title ?? '';
     const description = parsed.data.description ?? null;
     const userType = parsed.data.evidenceType;
     const autoType = detectEvidenceType(file.type, file.name);
     const evidenceType = userType && userType !== 'UNKNOWN' ? userType : autoType;
+    const caseId = await resolveEvidenceCaseId(requestedCaseId);
 
     if (file.size > MAX_FILE_SIZE) {
       return json(
@@ -226,6 +292,7 @@ export async function POST({ request, locals }: RequestEvent) {
       'Content-Type': file.type || 'application/octet-stream',
       'X-Evidence-Hash': fileHash,
     });
+    uploadedObjectKey = objectKey;
 
     const minioUrl = `minio://${BUCKET}/${objectKey}`;
 
@@ -233,7 +300,7 @@ export async function POST({ request, locals }: RequestEvent) {
     updateJob(jobId, { step: 'db-insert', progress: 50, message: 'Saving to database...' });
 
     const evidenceNumber = `EV-${Date.now().toString(36).toUpperCase()}`;
-    const initialMetadata = JSON.stringify({
+    const initialAnalysis = JSON.stringify({
       textLength: null,
       extractionMethod: null,
       extractionStatus: 'pending',
@@ -241,10 +308,10 @@ export async function POST({ request, locals }: RequestEvent) {
     });
     const insertResult = await db.execute(sql`
 			INSERT INTO evidence (case_id, evidence_number, title, type, summary, description,
-				evidence_type, file_type, file_url, file_name, file_size, hash, uploaded_at, status, metadata,
-				user_id, uploaded_by)
+        evidence_type, file_type, mime_type, file_url, file_name, file_size, hash, uploaded_at,
+        ai_analysis, uploaded_by)
 			VALUES (
-				${caseId ?? '00000000-0000-0000-0000-000000000000'},
+        ${caseId},
 				${evidenceNumber},
 				${title || file.name},
 				'document',
@@ -252,19 +319,18 @@ export async function POST({ request, locals }: RequestEvent) {
 				${description},
 				${evidenceType},
 				${file.type},
+        ${file.type || null},
 				${minioUrl},
 				${file.name},
 				${file.size},
 				${'sha256:' + fileHash},
 				NOW(),
-				'uploaded',
-				${initialMetadata}::jsonb,
-				${locals.user.id},
+        ${initialAnalysis}::jsonb,
 				${locals.user.id}
 			)
 			RETURNING id
 		`);
-    const resultRows = Array.isArray(insertResult) ? insertResult : (insertResult as { rows?: Record<string, any>[] }).rows ?? [];
+    const resultRows = getResultRows(insertResult);
     const inserted = { id: (resultRows[0] as Record<string, any>)?.id };
 
     const evidenceId = inserted.id;
@@ -323,8 +389,19 @@ export async function POST({ request, locals }: RequestEvent) {
       caseId ? invalidateCaseCache(caseId, 'evidence_create') : Promise.resolve(),
     ]).catch((err) => console.warn('[Upload] Cache invalidation failed:', err));
 
+    // 8. Sync case to Neo4j graph (non-blocking) — includes new evidence relationships
+    if (caseId) {
+      import('$lib/server/graph/pg-neo4j-sync.js')
+        .then(({ syncCaseToGraph }) =>
+          syncCaseToGraph(caseId).catch((err) => console.warn('[neo4j-sync] evidence upload:', err))
+        )
+        .catch(() => {});
+    }
+
     const responseData = {
       id: evidenceId,
+      evidenceId,
+      caseId,
       jobId,
       status: 'uploaded',
       fileName: file.name,
@@ -342,6 +419,9 @@ export async function POST({ request, locals }: RequestEvent) {
     );
   } catch (err) {
     console.error('[Upload] Pipeline error:', err);
+    if (uploadedObjectKey) {
+      await deleteFile(BUCKET, uploadedObjectKey).catch(() => false);
+    }
     updateJob(jobId, { step: 'error', progress: 0, message: 'Upload failed', error: String(err) });
     return json({ success: false, error: 'Upload failed', jobId, data: null }, { status: 500 });
   }
@@ -587,16 +667,19 @@ async function processAndEmbed(
       analysisTimestamp: diagnostics.completedAt,
     });
     // Update status so it doesn't stay 'pending' forever
-    await db.execute(sql`
+    await db
+      .execute(
+        sql`
       UPDATE evidence
-      SET status = 'complete',
-          metadata = COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({
-            textLength: 0,
-            extractionMethod,
-            note: 'No text extracted from file',
-          })}::jsonb
+      SET ai_analysis = COALESCE(ai_analysis, '{}'::jsonb) || ${JSON.stringify({
+        textLength: 0,
+        extractionMethod,
+        note: 'No text extracted from file',
+      })}::jsonb
       WHERE id = ${evidenceId}
-    `).catch(() => {});
+    `
+      )
+      .catch(() => {});
     updateJob(jobId, {
       step: 'complete',
       progress: 100,
@@ -613,12 +696,12 @@ async function processAndEmbed(
   try {
     await db.execute(sql`
       UPDATE evidence
-      SET extracted_text = ${fullText.slice(0, 500_000)},
-          metadata = COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({
-            textLength: fullText.length,
-            extractionMethod,
-          })}::jsonb,
-          status = 'processing'
+      SET ai_analysis = COALESCE(ai_analysis, '{}'::jsonb) || ${JSON.stringify({
+        textLength: fullText.length,
+        extractionMethod,
+        extractedTextPreview: fullText.slice(0, 4000),
+      })}::jsonb,
+          ai_summary = COALESCE(ai_summary, ${fullText.slice(0, 2000)})
       WHERE id = ${evidenceId}
     `);
   } catch (err) {
@@ -1038,43 +1121,12 @@ async function processAndEmbed(
           existingText: fullText,
         });
       })(),
-      // VLM vision analysis (cached by SHA256)
+      // VLM vision analysis: direct server call (Triton → Ollama fallback), cached by SHA256
       (async () => {
-        const imageHash = crypto.createHash('sha256').update(new Uint8Array(buffer)).digest('hex');
-        const { entry: cachedVLM } = await getVLMCache(imageHash, 'evidence');
-        if (cachedVLM) {
-          console.log(`[Upload] VLM cache HIT for ${fileName} (hash=${imageHash.slice(0, 8)})`);
-          return {
-            summary: cachedVLM.result.description,
-            keyFindings: cachedVLM.result.labels.map(
-              (l) => `${l.label} (${(l.confidence * 100).toFixed(0)}%)`
-            ),
-            suggestedTags: cachedVLM.result.labels.map((l) => l.label),
-          };
-        }
-        const formDataVLM = new FormData();
-        formDataVLM.append('file', new Blob([new Uint8Array(buffer)]), fileName);
-        const visionRes = await fetch(`${ENV.PUBLIC_API_URL}/api/vision/analyze`, {
-          method: 'POST',
-          body: formDataVLM,
-          signal: AbortSignal.timeout(30_000),
-        });
-        if (visionRes.ok) {
-          const result = (await visionRes.json()) as Record<string, any>;
-          console.log(
-            `[Upload] VLM analysis complete for ${fileName}: ${result?.keyFindings?.length ?? 0} findings`
-          );
-          await setVLMCache(imageHash, {
-            labels: (result?.suggestedTags ?? []).map((t: string) => ({
-              label: t,
-              confidence: 0.8,
-            })),
-            description: result?.summary ?? '',
-            analysisType: 'evidence',
-          }).catch(() => {});
-          return result;
-        }
-        return null;
+        const { analyzeEvidenceImage } = await import(
+          '$lib/server/analysis/vlm-evidence-analyzer.js'
+        );
+        return analyzeEvidenceImage({ buffer, fileName });
       })(),
     ]);
 
@@ -1095,7 +1147,7 @@ async function processAndEmbed(
       console.warn('[Upload] VLM analysis skipped:', vlmResult.reason);
 
     const pipelineOk = pipelineResult.status === 'fulfilled';
-    const vlmOk = vlmResult.status === 'fulfilled';
+    const vlmOk = vlmResult.status === 'fulfilled' && vlmResult.value?.model !== 'none';
     if (!pipelineOk || !vlmOk) {
       markStage(
         diagnostics,
@@ -1105,6 +1157,7 @@ async function processAndEmbed(
         {
           pipelineStatus: pipelineResult.status,
           vlmStatus: vlmResult.status,
+          vlmModel: vlmResult.status === 'fulfilled' ? vlmResult.value?.model : undefined,
         }
       );
     } else {
@@ -1115,6 +1168,8 @@ async function processAndEmbed(
         graphConnections: analysisPipelineResult?.graphConnectionsCreated ?? 0,
         cachedToDb: analysisPipelineResult?.cachedToDb ?? false,
         vlmFindings: visionAnalysis?.keyFindings?.length ?? 0,
+        vlmModel: visionAnalysis?.model ?? 'unknown',
+        vlmCached: visionAnalysis?.cached ?? false,
       });
     }
   } else {
@@ -1422,14 +1477,13 @@ async function processAndEmbed(
   try {
     await db.execute(sql`
       UPDATE evidence
-      SET status = 'complete',
-          metadata = COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({
-            chunkCount: stored,
-            entityCount: entities.length,
-            forensicFlagCount: forensicFlags.length,
-            sectionCount: sectionsSeen.size,
-            citationCount: allCitations.length,
-          })}::jsonb
+      SET ai_analysis = COALESCE(ai_analysis, '{}'::jsonb) || ${JSON.stringify({
+        chunkCount: stored,
+        entityCount: entities.length,
+        forensicFlagCount: forensicFlags.length,
+        sectionCount: sectionsSeen.size,
+        citationCount: allCitations.length,
+      })}::jsonb
       WHERE id = ${evidenceId}
     `);
   } catch (err) {

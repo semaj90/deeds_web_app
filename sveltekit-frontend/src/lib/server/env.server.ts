@@ -3,11 +3,14 @@ import { env as publicEnv } from '$env/dynamic/public';
 
 // Development fallback defaults (localhost)
 const DEV = {
-  DATABASE_URL: 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db',
+  DATABASE_URL: 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db',
   REDIS_URL: 'redis://localhost:6379',
   QDRANT_URL: 'http://localhost:6333',
   RABBITMQ_URL: 'amqp://guest:guest@localhost:5672',
   OLLAMA_URL: 'http://localhost:11434',
+  TRITON_URL: 'http://localhost:8000',
+  TRITON_VLM_MODEL: 'gemma_vlm_ensemble',
+  TRITON_VISION_MODEL: 'siglip_vision',
   PUBLIC_API_URL: 'http://localhost:5173',
   MINIO_ENDPOINT: 'localhost',
   MINIO_PORT: '9000',
@@ -60,6 +63,10 @@ export const ENV = {
   // TensorRT-LLM inference (main gpu profile exposes 8099; Triton uses TRITON_URL on 8000)
   TENSORRT_URL:
     privateEnv.TENSORRT_URL ?? privateEnv.TENSORRT_SERVICE_URL ?? 'http://localhost:8099',
+  TRITON_URL: privateEnv.TRITON_URL ?? DEV.TRITON_URL,
+  TRITON_LLM_MODEL: privateEnv.TRITON_LLM_MODEL ?? 'legal-llm',
+  TRITON_VLM_MODEL: privateEnv.TRITON_VLM_MODEL ?? DEV.TRITON_VLM_MODEL,
+  TRITON_VISION_MODEL: privateEnv.TRITON_VISION_MODEL ?? DEV.TRITON_VISION_MODEL,
   // Neo4j graph database
   NEO4J_URI: privateEnv.NEO4J_URI ?? privateEnv.NEO4J_URL ?? 'bolt://localhost:7687',
   NEO4J_USER: privateEnv.NEO4J_USER ?? privateEnv.NEO4J_USERNAME ?? 'neo4j',

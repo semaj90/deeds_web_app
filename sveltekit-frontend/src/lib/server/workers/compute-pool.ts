@@ -12,6 +12,7 @@
 import { Worker } from 'worker_threads';
 import path from 'path';
 import os from 'os';
+import { traceWorker } from '$lib/server/observability/langfuse.js';
 
 export type TaskType = 'kmeans' | 'som' | 'forensics' | 'silhouette';
 
@@ -108,6 +109,7 @@ export class ComputePool {
 	async run<T = unknown>(type: TaskType, payload: unknown, timeoutMs = 30_000): Promise<T> {
 		if (this.disposed) throw new Error('ComputePool is disposed');
 
+		return traceWorker<T>(type, { timeoutMs, poolSize: this.poolSize, queueSize: this.taskQueue.length }, () => {
 		const taskId = this.taskIdCounter++;
 
 		return new Promise<T>((resolve, reject) => {
@@ -135,6 +137,7 @@ export class ComputePool {
 				this.taskQueue.push({ type, payload, task: pending });
 			}
 		});
+		}); // end traceWorker
 	}
 
 	private dispatch(

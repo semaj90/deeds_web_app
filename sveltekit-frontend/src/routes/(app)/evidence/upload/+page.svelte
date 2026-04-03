@@ -5,6 +5,7 @@
 
 	let { data }: { data: PageData } = $props();
 	let user = $derived(data.user);
+	let availableCases = $derived(data.cases ?? []);
 
 	let dragActive = $state(false);
 	let fileInput: HTMLInputElement | undefined = $state();
@@ -12,7 +13,20 @@
 	let currentFileName = $state<string | null>(null);
 	let uploadComplete = $state(false);
 	let completedEvidenceId = $state<string | null>(null);
+	let completedCaseId = $state<string | null>(null);
 	let error = $state<string | null>(null);
+	let selectedCaseId = $state<string>('');
+
+	let selectedDestinationLabel = $derived.by(() => {
+		if (!selectedCaseId) return 'General Evidence Uploads';
+
+		const selectedCase = availableCases.find((entry) => entry.id === selectedCaseId);
+		if (!selectedCase) return 'Selected case';
+
+		return selectedCase.case_number
+			? `${selectedCase.title} (${selectedCase.case_number})`
+			: selectedCase.title;
+	});
 
 	async function uploadFile(file: File) {
 		if (!file) return;
@@ -29,6 +43,9 @@
 		try {
 			const formData = new FormData();
 			formData.append('file', file);
+			if (selectedCaseId) {
+				formData.append('caseId', selectedCaseId);
+			}
 
 			const response = await fetch('/api/evidence/upload', {
 				method: 'POST',
@@ -44,8 +61,15 @@
 
 			// Start SSE progress tracking via component
 			currentJobId = result.jobId;
+			completedCaseId = result.caseId ?? null;
 			error = null;
-			analytics.track('evidence_uploaded', { fileName: file.name, fileSize: file.size, jobId: result.jobId });
+			analytics.track('evidence_uploaded', {
+				fileName: file.name,
+				fileSize: file.size,
+				jobId: result.jobId,
+				caseId: result.caseId ?? (selectedCaseId || null),
+				destination: selectedDestinationLabel,
+			});
 		} catch (err) {
 			console.error('[Upload] Error:', err);
 			currentJobId = null;
@@ -124,6 +148,7 @@
 		currentFileName = null;
 		uploadComplete = false;
 		completedEvidenceId = null;
+		completedCaseId = null;
 		error = null;
 		if (fileInput) {
 			fileInput.value = '';
@@ -137,6 +162,27 @@
 		<h1>📤 Upload Evidence</h1>
 		<p>Upload legal documents for processing and analysis</p>
 	</div>
+
+	{#if user}
+		<div class="destination-panel">
+			<label class="destination-label" for="case-destination">Destination case</label>
+			<select id="case-destination" bind:value={selectedCaseId} class="destination-select">
+				<option value="">General Evidence Uploads</option>
+				{#each availableCases as entry (entry.id)}
+					<option value={entry.id}>
+						{entry.title}{entry.case_number ? ` (${entry.case_number})` : ''}
+					</option>
+				{/each}
+			</select>
+			<p class="destination-help">
+				{#if selectedCaseId}
+					This upload will be attached to {selectedDestinationLabel}.
+				{:else}
+					This upload will be saved to the fallback case <strong>General Evidence Uploads</strong>.
+				{/if}
+			</p>
+		</div>
+	{/if}
 
 	<div
 		class="upload-zone"
@@ -186,6 +232,9 @@
 
 			{#if uploadComplete && completedEvidenceId}
 				<div class="completion-actions">
+					{#if completedCaseId}
+						<p class="completion-note">Saved under {selectedDestinationLabel}.</p>
+					{/if}
 					<a href="/evidence/{completedEvidenceId}" class="view-button">
 						View Evidence
 					</a>
@@ -224,6 +273,38 @@
 	.upload-header p {
 		color: #666;
 		margin: 0;
+	}
+
+	.destination-panel {
+		background: #f6f1e6;
+		border: 1px solid #e2d5b8;
+		border-radius: 8px;
+		padding: 1rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.destination-label {
+		display: block;
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: #2d2d2d;
+		margin-bottom: 0.5rem;
+	}
+
+	.destination-select {
+		width: 100%;
+		padding: 0.75rem 0.9rem;
+		border: 1px solid #c8b88f;
+		border-radius: 6px;
+		background: #fffdfa;
+		color: #2d2d2d;
+		font-size: 0.95rem;
+	}
+
+	.destination-help {
+		margin-top: 0.65rem;
+		font-size: 0.9rem;
+		color: #5f5746;
 	}
 
 	.upload-zone {
@@ -275,9 +356,17 @@
 
 	.completion-actions {
 		display: flex;
+		flex-wrap: wrap;
 		gap: 1rem;
 		margin-top: 1.5rem;
 		justify-content: center;
+	}
+
+	.completion-note {
+		width: 100%;
+		text-align: center;
+		color: #2d2d2d;
+		margin: 0;
 	}
 
 	.view-button {

@@ -176,9 +176,12 @@ static napi_value SimdJsonExtractNumbers(napi_env env, napi_callback_info info) 
 
 static napi_value SimdJsonBackend(napi_env env, napi_callback_info info) {
   (void)info;
-  const char* name = simdjson::get_active_implementation()->name().data();
+  const simdjson::implementation* impl = simdjson::get_active_implementation();
+  std::string name(impl->name());
+  std::string desc(impl->description());
+  std::string result_str = name + " (" + desc + ")";
   napi_value result;
-  napi_create_string_utf8(env, name, NAPI_AUTO_LENGTH, &result);
+  napi_create_string_utf8(env, result_str.c_str(), result_str.size(), &result);
   return result;
 }
 

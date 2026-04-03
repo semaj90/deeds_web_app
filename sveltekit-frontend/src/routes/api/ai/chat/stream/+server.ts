@@ -1,8 +1,8 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { routeStreamingInference } from '$lib/server/inference/inference-router.js';
+import { logInference } from '$lib/server/observability/inference-log.js';
 
 const streamSchema = z.object({
 	query: z.string().min(1).max(50000).optional(),
@@ -38,77 +38,50 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	const prompt = body.query || body.message || '';
 
-	let activeReader: ReadableStreamDefaultReader<Uint8Array> | null = null;
-
 	const stream = new ReadableStream({
 		async start(controller) {
 			const encoder = new TextEncoder();
+			const start = performance.now();
+			let tokenCount = 0;
+			let backend = 'ollama';
+
 			try {
-				const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						model: 'gemma3-legal:latest',
-						messages: [
-							{
-								role: 'system',
-								content:
-									'You are a legal AI assistant. Provide concise, professional legal analysis.'
-							},
-							...body.history,
-							{ role: 'user', content: prompt }
-						],
-						stream: true,
-						options: { temperature: body.temperature }
-					}),
-					signal: AbortSignal.timeout(120_000)
-				});
+				const systemPrompt = 'You are a legal AI assistant. Provide concise, professional legal analysis.';
+				const messages = [
+					{ role: 'system', content: systemPrompt },
+					...body.history,
+					{ role: 'user', content: prompt },
+				];
 
-				if (!res.ok || !res.body) {
-					controller.enqueue(encoder.encode('Error: AI service unavailable'));
-					controller.close();
-					return;
-				}
-
-				const reader = res.body.getReader();
-				activeReader = reader;
-				const decoder = new TextDecoder();
-				let buffer = '';
-
-				while (true) {
-					const { done, value } = await reader.read();
-					if (done) break;
-
-					buffer += decoder.decode(value, { stream: true });
-					const lines = buffer.split('\n');
-					buffer = lines.pop() || '';
-
-					for (const line of lines) {
-						if (!line.trim()) continue;
-						try {
-							const chunk = JSON.parse(line);
-							if (chunk.message?.content) {
-								controller.enqueue(encoder.encode(chunk.message.content));
-							}
-						} catch {
-							// Skip malformed JSON lines
-						}
+				for await (const chunk of routeStreamingInference({
+					prompt,
+					systemPrompt,
+					messages,
+					temperature: body.temperature,
+				})) {
+					if (chunk.done) break;
+					if (chunk.content) {
+						controller.enqueue(encoder.encode(chunk.content));
+						tokenCount++;
+						if (chunk.backend) backend = chunk.backend;
 					}
 				}
 
+				logInference({
+					type: 'llm',
+					model: backend === 'ollama' ? 'gemma3-legal:latest' : backend,
+					backend: backend as 'ollama' | 'tensorrt' | 'triton',
+					latencyMs: Math.round(performance.now() - start),
+					tokenCount,
+					cacheHit: false,
+				});
+
 				controller.close();
-			} catch (err) {
-				controller.enqueue(
-					encoder.encode(
-						`\n\nError: Stream failed`
-					)
-				);
+			} catch {
+				controller.enqueue(encoder.encode('\n\nError: Stream failed'));
 				controller.close();
 			}
 		},
-		cancel() {
-			activeReader?.cancel();
-		}
 	});
 
 	return new Response(stream, {

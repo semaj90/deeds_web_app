@@ -2,9 +2,10 @@ import { QdrantClient } from '@qdrant/js-client-rest';
 import { createHash } from 'crypto';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 import { ENV } from '$lib/server/env.server.js';
-import { VECTOR_CONFIG } from '$lib/server/config/vector-config.js';
+import { VECTOR_CONFIG, buildVectorPayload } from '$lib/server/config/vector-config.js';
 import { generateSparseVector, type SparseVector } from './bm42-sparse.js';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
+import { traceVectorSearch } from '$lib/server/observability/langfuse.js';
 
 // Re-export for existing consumers
 export { generateSparseVector, type SparseVector };
@@ -193,6 +194,7 @@ export class QdrantManager {
     scoreThreshold?: number;
     skipCache?: boolean;
   }): Promise<QdrantSearchResult> {
+    return traceVectorSearch(params.collection, { searchType: 'dense-cosine', query: params.query, limit: params.limit }, async () => {
     const startTime = Date.now();
 
     // Check Redis cache for identical query+collection+filters
@@ -216,8 +218,12 @@ export class QdrantManager {
     }
 
     try {
+      // Resolve collection name and build correct vector payload from VECTOR_CONFIG
+      const collectionName = this.collections[params.collection as keyof typeof this.collections] ?? params.collection;
+      const vectorField = buildVectorPayload(collectionName, params.queryEmbedding);
+
       const searchRequest: any = {
-        vector: { name: 'content', vector: params.queryEmbedding },
+        vector: vectorField,
         limit: params.limit ?? 10,
         score_threshold: params.scoreThreshold ?? 0.7,
         with_payload: true,
@@ -228,7 +234,6 @@ export class QdrantManager {
         searchRequest.filter = this.buildQdrantFilter(params.filters);
       }
 
-      const collectionName = this.collections[params.collection];
       const results = await this.client.search(collectionName, searchRequest);
 
       const responseTime = Date.now() - startTime;
@@ -267,6 +272,7 @@ export class QdrantManager {
       console.error('Qdrant dense search error:', error);
       throw new Error(`Qdrant search failed: ${error.message}`);
     }
+    }); // end traceVectorSearch
   }
 
   /**
@@ -281,6 +287,7 @@ export class QdrantManager {
     limit?: number;
     scoreThreshold?: number;
   }): Promise<QdrantSearchResult> {
+    return traceVectorSearch('evidence', { searchType: 'section-filtered', query: params.query, sectionTypes: params.sectionTypes }, async () => {
     const startTime = Date.now();
     const mustConditions: any[] = [{ key: 'section_type', match: { any: params.sectionTypes } }];
     if (params.caseId) {
@@ -327,6 +334,7 @@ export class QdrantManager {
         },
       };
     }
+    }); // end traceVectorSearch
   }
 
   private async buildSearchCacheKey(params: {
@@ -608,6 +616,7 @@ export class QdrantManager {
     limit?: number;
     scoreThreshold?: number;
   }): Promise<QdrantSearchResult> {
+    return traceVectorSearch(params.collection, { searchType: 'hybrid-rrf', query: params.query, limit: params.limit }, async () => {
     const startTime = Date.now();
     const collectionName = this.collections[params.collection] ?? params.collection;
     const denseVecName = params.denseVectorName ?? 'content';
@@ -687,6 +696,7 @@ export class QdrantManager {
       console.error('Qdrant sparse hybrid search error:', error);
       throw new Error(`Qdrant hybrid search failed: ${error.message}`);
     }
+    }); // end traceVectorSearch
   }
 
   /**

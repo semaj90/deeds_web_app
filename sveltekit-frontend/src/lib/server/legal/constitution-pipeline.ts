@@ -143,7 +143,7 @@ async function upsertToQdrant(
 			return {
 				id: p.id,
 				vector: {
-					'': p.vector,
+					content: p.vector,
 					bm25: { indices: sparse.indices, values: sparse.values },
 				},
 				payload: p.payload,

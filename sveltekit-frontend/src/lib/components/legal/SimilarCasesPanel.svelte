@@ -16,13 +16,23 @@
 	let timing = $state<any>(null);
 	let aceContext = $state<any>(null);
 	let showBreakdown = $state(false);
+	const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 	// Load similar cases on mount
 	$effect(() => {
-		loadSimilarCases();
+		void loadSimilarCases();
 	});
 
 	async function loadSimilarCases() {
+		if (!UUID_RE.test(caseId)) {
+			similarCases = [];
+			timing = null;
+			aceContext = null;
+			error = null;
+			loading = false;
+			return;
+		}
+
 		loading = true;
 		error = null;
 

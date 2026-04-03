@@ -1,6 +1,7 @@
 // amqplib: Named/namespace imports fail with moduleResolution: "bundler"
 // Use local interfaces + dynamic import pattern per CLAUDE.md
 import { EventEmitter } from 'events';
+import { traceQueue } from '$lib/server/observability/langfuse.js';
 
 interface AmqpConnection {
     createChannel(): Promise<AmqpChannel>;
@@ -69,6 +70,7 @@ export class RabbitMQManager extends EventEmitter {
     codebase_index: 'codebase.index',
     ace_evaluate: 'ace.evaluate',
     error_embed: 'error.embed',
+    synthesis_generate: 'synthesis.generate',
   };
 
   constructor() {
@@ -183,6 +185,7 @@ export class RabbitMQManager extends EventEmitter {
       'codebase.index',
       'ace.evaluate',
       'error.embed',
+      'synthesis.generate',
     ];
     for (const queue of queuesToMigrate) {
       try {
@@ -238,6 +241,11 @@ export class RabbitMQManager extends EventEmitter {
       this.exchanges.document_processing,
       'error.embed'
     );
+    await this.bindQueue(
+      this.queues.synthesis_generate,
+      this.exchanges.document_processing,
+      'synthesis.generate'
+    );
 
     console.log('✅ Queue bindings configured (with DLQ)');
   }
@@ -264,8 +272,9 @@ export class RabbitMQManager extends EventEmitter {
     await this.consume(this.queues.codebase_index, this.handleCodebaseIndex.bind(this)); // slow
     await this.consume(this.queues.ace_evaluate, this.handleACEEvaluate.bind(this)); // slow (LLM call)
     await this.consume(this.queues.error_embed, this.handleErrorEmbed.bind(this)); // medium (embedding)
+    await this.consume(this.queues.synthesis_generate, this.handleSynthesisGenerate.bind(this)); // slow (LLM call)
 
-    console.log('👂 All 9 RabbitMQ consumers started (prefetch: 10)');
+    console.log('👂 All 10 RabbitMQ consumers started (prefetch: 10)');
 
     // Start DLQ consumers — drain dead-lettered messages for logging/monitoring
     await this.startDLQConsumers();
@@ -775,18 +784,252 @@ export class RabbitMQManager extends EventEmitter {
     return true;
   }
 
+  // --- Synthesis Generate Handler ---
+
+  private async handleSynthesisGenerate(msg: AmqpMessage): Promise<void> {
+    if (!msg || !this.channel) return;
+    try {
+      const data = this.parseMessage(msg);
+      if (!data?.synthesisId || !data?.query) {
+        this.channel.nack(msg, false, false);
+        return;
+      }
+      console.log('🧪 Synthesis generate:', data.synthesisId);
+
+      // Update status → generating
+      if (this.redisService) {
+        await this.redisService.set(
+          `synthesis:status:${data.synthesisId}`,
+          JSON.stringify({ status: 'generating', startedAt: new Date().toISOString() }),
+          'EX', 3600
+        );
+      }
+
+      const t0 = performance.now();
+
+      // Stage 1: ACE context assembly
+      const { assembleACEContext, buildACEPrompt } = await import('../ace/context-assembler.js');
+      const { orderByDependency, extractCitationRefs } = await import('../retrieval/document-dag.js');
+      const context = await assembleACEContext({
+        query: data.query,
+        userId: data.userId,
+        caseId: data.caseId,
+        conversationId: data.conversationId,
+        persona: data.persona,
+        sectionTypes: data.sectionTypes,
+        enableCodebaseContext: data.enableCodebaseContext,
+      });
+
+      // DAG-order RAG chunks
+      if (context.ragChunks.length > 1) {
+        type RAGChunk = { content: string; score: number; source: string };
+        const knownIds = new Set(context.ragChunks.map((_: RAGChunk, i: number) => `chunk-${i}`));
+        const dagDocs = context.ragChunks.map((c: RAGChunk, i: number) => ({
+          id: `chunk-${i}`, title: c.source, score: c.score,
+          citations: extractCitationRefs(c.content, knownIds), content: c.content,
+        }));
+        const { ordered } = orderByDependency(dagDocs);
+        const chunkMap = new Map<string, RAGChunk>(context.ragChunks.map((c: RAGChunk, i: number) => [`chunk-${i}`, c]));
+        context.ragChunks = ordered
+          .map((d: { id: string }) => chunkMap.get(d.id))
+          .filter((c): c is RAGChunk => c !== undefined);
+      }
+
+      const acePrompt = buildACEPrompt(context, data.query);
+      const contextMs = performance.now() - t0;
+
+      // Stage 2: Direct Ollama LLM call (no Bifrost — single Ollama request)
+      const { ollamaFetch } = await import('../ollama.js');
+      const { ENV } = await import('../env.server.js');
+      const MODEL = 'gemma3-legal:latest';
+      const maxTokens = data.maxTokens ?? 2048;
+      const temperature = data.temperature ?? 0.3;
+
+      const userPrompt = `${acePrompt.contextWindow}\n\nQuestion: ${data.query}\n\nProvide a comprehensive legal analysis. Include [Source N] citations where applicable.`;
+
+      const llmStart = performance.now();
+      const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: MODEL,
+          messages: [
+            { role: 'system', content: acePrompt.systemPrompt },
+            { role: 'user', content: userPrompt },
+          ],
+          stream: false,
+          options: { num_predict: maxTokens, temperature },
+        }),
+        signal: AbortSignal.timeout(300_000), // 5 minutes — worker has no user-facing timeout
+      });
+
+      if (!res.ok) throw new Error(`Ollama ${res.status}: ${res.statusText}`);
+
+      const llmData = await res.json();
+      const answer = (llmData.message?.content ?? '').trim();
+      const tokensUsed = llmData.eval_count ?? Math.ceil(answer.length / 4);
+      const generateMs = performance.now() - llmStart;
+
+      // Stage 3: Extract citations
+      const citations: Array<{ id: string; sourceTitle: string; quote: string }> = [];
+      const refs = answer.match(/\[Source\s+(\d+)[^\]]*\]/g) ?? [];
+      const seen = new Set<string>();
+      for (const ref of refs) {
+        const match = ref.match(/\[Source\s+(\d+)/);
+        if (match && !seen.has(match[1])) {
+          seen.add(match[1]);
+          const idx = parseInt(match[1], 10) - 1;
+          const chunk = context.ragChunks[idx];
+          citations.push({
+            id: crypto.randomUUID(),
+            sourceTitle: chunk?.source ?? `Source ${match[1]}`,
+            quote: ref,
+          });
+        }
+      }
+
+      // Stage 4: Compute confidence
+      let confidence = 0.4;
+      if (answer.length > 100) confidence += 0.15;
+      if (answer.length > 300) confidence += 0.1;
+      if (citations.length > 0) confidence += 0.15;
+      if (citations.length >= 3) confidence += 0.1;
+      confidence = Math.min(0.95, confidence);
+
+      const totalMs = performance.now() - t0;
+
+      // Store full result in Redis
+      const result = {
+        synthesisId: data.synthesisId,
+        query: data.query,
+        answer,
+        citations,
+        evaluation: null, // ACE eval will be separate
+        confidence,
+        model: MODEL,
+        tokensUsed,
+        timing: {
+          contextMs: Math.round(contextMs),
+          generateMs: Math.round(generateMs),
+          evalMs: 0,
+          totalMs: Math.round(totalMs),
+        },
+        cached: false,
+        timestamp: new Date().toISOString(),
+        evaluationUrl: data.enableACE !== false ? `/api/synthesis/evaluation/${data.synthesisId}` : null,
+        contextSources: {
+          ragChunks: context.ragChunks.length,
+          kagNeighbors: context.kagNeighbors.length,
+          codebaseChunks: context.codebaseContext?.length ?? 0,
+          hasEvidence: !!context.evidenceMetadata?.length,
+          hasGlossary: !!context.glossaryMatches?.length,
+          hasCaseContext: !!context.caseContext,
+          hasWebSearch: !!context.webSearchContext,
+        },
+      };
+
+      if (this.redisService) {
+        await this.redisService.set(
+          `synthesis:result:${data.synthesisId}`,
+          JSON.stringify(result),
+          'EX', 3600
+        );
+        await this.redisService.set(
+          `synthesis:status:${data.synthesisId}`,
+          JSON.stringify({ status: 'complete', completedAt: new Date().toISOString(), totalMs: Math.round(totalMs) }),
+          'EX', 3600
+        );
+      }
+
+      // Fire ACE evaluation asynchronously
+      if (data.enableACE !== false) {
+        await this.publish(this.exchanges.document_processing, 'ace.evaluate', {
+          responseId: data.synthesisId,
+          query: data.query,
+          response: answer,
+          context: {
+            ragChunks: context.ragChunks,
+            kagNeighbors: context.kagNeighbors,
+            persona: context.persona,
+          },
+          enqueuedAt: new Date().toISOString(),
+        });
+      }
+
+      // Log inference to CouchDB (fire-and-forget)
+      import('../observability/inference-log.js')
+        .then(({ logLLMInference }) => logLLMInference({
+          model: MODEL, backend: 'ollama', latencyMs: Math.round(generateMs),
+          tokenCount: tokensUsed, cacheHit: false,
+        }))
+        .catch(() => {});
+
+      console.log(`✅ Synthesis complete: ${data.synthesisId} (${Math.round(totalMs)}ms, ${tokensUsed} tokens)`);
+      this.channel.ack(msg);
+    } catch (error) {
+      console.error('❌ Synthesis generate error:', this.formatError(error));
+
+      // Store failure status
+      if (this.redisService) {
+        const data = this.parseMessage(msg);
+        if (data?.synthesisId) {
+          await this.redisService.set(
+            `synthesis:status:${data.synthesisId}`,
+            JSON.stringify({ status: 'failed', error: this.formatError(error), failedAt: new Date().toISOString() }),
+            'EX', 3600
+          ).catch(() => {});
+        }
+      }
+
+      this.retryOrDLQ(msg as AmqpMessageObj, error);
+    }
+  }
+
+  // --- Synthesis Generate Publisher ---
+
+  async publishSynthesisGenerate(data: {
+    synthesisId: string;
+    query: string;
+    userId: string;
+    caseId?: string;
+    conversationId?: string;
+    persona?: string;
+    maxTokens?: number;
+    temperature?: number;
+    enableACE?: boolean;
+    enableCodebaseContext?: boolean;
+    sectionTypes?: string[];
+  }): Promise<boolean> {
+    if (!this.isReady()) return false;
+    // Set initial status
+    if (this.redisService) {
+      await this.redisService.set(
+        `synthesis:status:${data.synthesisId}`,
+        JSON.stringify({ status: 'pending', enqueuedAt: new Date().toISOString() }),
+        'EX', 3600
+      );
+    }
+    await this.publish(this.exchanges.document_processing, 'synthesis.generate', {
+      ...data,
+      enqueuedAt: new Date().toISOString(),
+    });
+    return true;
+  }
+
   private async publish(exchange: string, routingKey: string, data: any): Promise<void> {
     if (!this.channel) {
       console.warn(`[RabbitMQ] Publish skipped — no channel (${exchange}/${routingKey})`);
       return;
     }
-    try {
-      const message = Buffer.from(JSON.stringify(data));
-      this.channel.publish(exchange, routingKey, message, { persistent: true });
-    } catch (error) {
-      console.error(`[RabbitMQ] Publish failed (${exchange}/${routingKey}):`, this.formatError(error));
-      throw error; // Propagate so callers can handle
-    }
+    return traceQueue('publish', routingKey, { exchange }, async () => {
+      try {
+        const message = Buffer.from(JSON.stringify(data));
+        this.channel!.publish(exchange, routingKey, message, { persistent: true });
+      } catch (error) {
+        console.error(`[RabbitMQ] Publish failed (${exchange}/${routingKey}):`, this.formatError(error));
+        throw error; // Propagate so callers can handle
+      }
+    });
   }
 
   // --- Helpers ---

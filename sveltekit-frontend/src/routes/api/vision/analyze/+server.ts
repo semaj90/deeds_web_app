@@ -1,3 +1,10 @@
+/**
+ * POST /api/vision/analyze
+ * Pipeline: SHA-256 hash → Redis cache check → YOLO detection → VLM analysis (Triton → Ollama) → cache
+ *
+ * GET /api/vision/analyze?hash=<sha256>
+ * Check if a cached analysis exists for a given image hash
+ */
 import { json } from '@sveltejs/kit';
 import crypto from 'crypto';
 import type { RequestHandler } from './$types';
@@ -6,12 +13,10 @@ import { redis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 import { uploadFile } from '$lib/server/minio-client.js';
 import { createYOLOService, type YOLOResult } from '$lib/server/yolo.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { resizeForVLM, GEMMA3_VLM_SIZE } from '$lib/server/image/resize-for-vlm.js';
+import { GEMMA3_VLM_SIZE } from '$lib/server/image/resize-for-vlm.js';
+import { analyzeEvidenceImage } from '$lib/server/analysis/vlm-evidence-analyzer.js';
 
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
-const CACHE_TTL = 24 * 60 * 60; // 24h
 
 interface VisionBox {
   x: number;
@@ -42,10 +47,6 @@ interface VisionResponse {
   };
 }
 
-/**
- * POST /api/vision/analyze
- * Pipeline: SHA-256 hash → Redis cache check → YOLO detection → Gemma3 VLM analysis → cache result
- */
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   const timings: Record<string, number> = {};
@@ -59,7 +60,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       return json({ error: 'No image file provided' }, { status: 400 });
     }
 
-    // Validate image type
     if (!file.type.startsWith('image/')) {
       return json({ error: 'File must be an image (JPEG, PNG, WebP, etc.)' }, { status: 400 });
     }
@@ -84,21 +84,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         { status: 400 }
       );
     }
-    const { caseId, evidenceId, skipCache } = metaParsed.data;
+    const { caseId, skipCache } = metaParsed.data;
+    // evidenceId available in metaParsed.data if needed for future per-evidence tracking
 
-    // 1. Read buffer + compute hash (hash on ORIGINAL bytes for stable cache key)
+    // 1. Read buffer + compute hash
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const hash = crypto.createHash('sha256').update(buffer).digest('hex');
     timings.hash = Date.now() - t0;
 
-    // 1b. Resize to Gemma 3 native 896×896 for VLM (SigLIP encoder)
-    // YOLO uses original buffer (needs pixel-accurate coords); VLM gets rescaled copy.
-    const tResize = Date.now();
-    const vlmResizeResult = await resizeForVLM(buffer);
-    timings.resize = Date.now() - tResize;
-
-    // 2. Check Redis cache
+    // 2. Check Redis full-response cache (includes YOLO boxes + VLM analysis)
     if (!skipCache) {
       try {
         const cached = await redis.get(`vision:${hash}`);
@@ -109,12 +104,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           return json(result);
         }
       } catch {
-        // Redis unavailable — proceed without cache
+        // Redis unavailable
       }
     }
     timings.cacheCheck = Date.now() - t0;
 
-    // 3. Upload to MinIO (async, non-blocking for analysis)
+    // 3. Upload to MinIO (async, non-blocking)
     let minioUrl: string | undefined;
     const minioPromise = (async () => {
       try {
@@ -131,17 +126,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       }
     })();
 
-    // 4. YOLO detection
+    // 4. YOLO detection (uses original buffer for pixel-accurate coords)
     const tYolo = Date.now();
     let boxes: VisionBox[] = [];
-    let yoloResult: YOLOResult | null = null;
 
     try {
       const yolo = createYOLOService();
       const modelAvailable = await yolo.isModelAvailable();
 
       if (modelAvailable) {
-        yoloResult = await yolo.analyzeDocument(buffer, file.name);
+        const yoloResult: YOLOResult = await yolo.analyzeDocument(buffer, file.name);
         boxes = (yoloResult.objects ?? []).map((obj) => ({
           x: obj.bbox[0],
           y: obj.bbox[1],
@@ -151,7 +145,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           conf: obj.confidence,
         }));
 
-        // Also add layout regions as boxes
         for (const region of yoloResult.layout?.regions ?? []) {
           boxes.push({
             x: region.bbox[0],
@@ -168,66 +161,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
     timings.yolo = Date.now() - tYolo;
 
-    // 5. Gemma3 VLM analysis via Ollama
+    // 5. VLM analysis (Triton → Ollama fallback) via shared analyzer
     const tVlm = Date.now();
-    let analysis = {
-      summary: 'Image analysis unavailable',
-      keyFindings: [] as string[],
-      suggestedTags: [] as string[],
-    };
+    const detectionContext = boxes.length > 0
+      ? boxes.map((b) => `${b.label} (${(b.conf * 100).toFixed(0)}%)`).join(', ')
+      : undefined;
 
-    try {
-      const detectionContext =
-        boxes.length > 0
-          ? `\nDetected regions: ${boxes.map((b) => `${b.label} (${(b.conf * 100).toFixed(0)}%)`).join(', ')}`
-          : '';
-
-      const prompt = `Analyze this document/evidence image for a legal case investigation.${detectionContext}
-
-Provide:
-1. A brief summary of what the image contains (1-2 sentences)
-2. Key findings relevant to legal proceedings (bullet points)
-3. Suggested tags for categorization
-
-Respond in JSON format:
-{"summary": "...", "keyFindings": ["..."], "suggestedTags": ["..."]}`;
-
-      // Use the 896×896 resized buffer for Ollama — matches Gemma3 SigLIP native resolution
-      const base64Image = vlmResizeResult.buffer.toString('base64');
-
-      const ollamaRes = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'gemma3-legal:latest',
-          prompt,
-          images: [base64Image],
-          stream: false,
-          options: { temperature: 0.1, num_predict: 512 },
-        }),
-      });
-
-      if (ollamaRes.ok) {
-        const ollamaData = await ollamaRes.json();
-        const responseText = ollamaData.response ?? '';
-
-        // Try to parse JSON from response
-        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          analysis = {
-            summary: parsed.summary ?? analysis.summary,
-            keyFindings: Array.isArray(parsed.keyFindings) ? parsed.keyFindings : [],
-            suggestedTags: Array.isArray(parsed.suggestedTags) ? parsed.suggestedTags : [],
-          };
-        } else {
-          // Fallback: use raw text as summary
-          analysis.summary = responseText.slice(0, 500);
-        }
-      }
-    } catch (err) {
-      console.warn('[vision] VLM analysis failed (non-critical):', err);
-    }
+    const vlmResult = await analyzeEvidenceImage({
+      buffer,
+      fileName: file.name,
+      detectionContext,
+      skipCache,
+    });
     timings.vlm = Date.now() - tVlm;
 
     // Wait for MinIO upload
@@ -238,17 +183,28 @@ Respond in JSON format:
       cacheHit: false,
       hash,
       boxes,
-      analysis,
+      analysis: {
+        summary: vlmResult.summary,
+        keyFindings: vlmResult.keyFindings,
+        suggestedTags: vlmResult.suggestedTags,
+      },
       timingsMs: timings,
       minioUrl,
       vlmMeta: {
-        resized: vlmResizeResult.resized,
-        originalWidth: vlmResizeResult.originalWidth,
-        originalHeight: vlmResizeResult.originalHeight,
+        resized: vlmResult.resizeMeta.resized,
+        originalWidth: vlmResult.resizeMeta.originalWidth,
+        originalHeight: vlmResult.resizeMeta.originalHeight,
         vlmWidth: GEMMA3_VLM_SIZE,
         vlmHeight: GEMMA3_VLM_SIZE,
       },
     };
+
+    // Cache the full response in Redis (24h TTL)
+    try {
+      await redis.set(`vision:${hash}`, JSON.stringify(result), 'EX', 24 * 60 * 60);
+    } catch {
+      /* non-fatal */
+    }
 
     return json(result);
   } catch (err) {
@@ -260,10 +216,6 @@ Respond in JSON format:
   }
 };
 
-/**
- * GET /api/vision/analyze?hash=<sha256>
- * Check if a cached analysis exists for a given image hash
- */
 export const GET: RequestHandler = async ({ url }) => {
 	const hash = url.searchParams.get('hash');
 	if (!hash) {

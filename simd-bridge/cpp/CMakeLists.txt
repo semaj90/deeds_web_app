@@ -42,7 +42,7 @@ if(CUDAToolkit_FOUND)
   if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
     set(CMAKE_CUDA_ARCHITECTURES "86")  # RTX 3060 Ti = SM 8.6
   endif()
-  # PyTorch/LibTorch ignores CMAKE_CUDA_ARCHITECTURES — set TORCH_CUDA_ARCH_LIST
+  # PyTorch/LibTorch ignores CMAKE_CUDA_ARCHITECTURES — set TORCH_CUDA_ARCH_LIST instead
   if(NOT DEFINED TORCH_CUDA_ARCH_LIST)
     set(TORCH_CUDA_ARCH_LIST "8.6")
   endif()
@@ -51,7 +51,14 @@ else()
 endif()
 
 # ── LibTorch ────────────────────────────────────────────────────────
+# Save and unset CMAKE_CUDA_ARCHITECTURES before find_package(Torch) —
+# LibTorch's Caffe2Config.cmake warns if it's set (it uses TORCH_CUDA_ARCH_LIST instead).
+set(_SAVED_CUDA_ARCHS "${CMAKE_CUDA_ARCHITECTURES}")
+unset(CMAKE_CUDA_ARCHITECTURES CACHE)
+unset(CMAKE_CUDA_ARCHITECTURES)
 find_package(Torch QUIET)
+# Restore for our own CUDA targets
+set(CMAKE_CUDA_ARCHITECTURES "${_SAVED_CUDA_ARCHS}")
 if(Torch_FOUND)
   message(STATUS "LibTorch found: ${TORCH_CXX_FLAGS}")
 else()

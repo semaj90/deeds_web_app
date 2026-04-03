@@ -490,6 +490,30 @@ function setupToolHandlers() {
           required: ['query'],
         },
       },
+      {
+        name: 'codebase:ace_context',
+        description:
+          'Run full ACE (Agentic Contextual Engineering) synthesis with optional codebase/AST context. Assembles user profile, case context, RAG chunks, KAG graph, glossary, evidence, and codebase semantic search into a single LLM prompt, then generates and self-evaluates the response.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: { type: 'string', description: 'Natural language query' },
+            caseId: { type: 'string', description: 'Optional case UUID for case-specific context' },
+            enableCodebaseContext: {
+              type: 'boolean',
+              description: 'Include codebase/AST semantic search in context',
+              default: true,
+            },
+            persona: {
+              type: 'string',
+              enum: ['neutral', 'prosecutor', 'defense', 'plain-language', 'academic'],
+              default: 'neutral',
+            },
+            maxTokens: { type: 'number', description: 'Max tokens for LLM output', default: 2048 },
+          },
+          required: ['query'],
+        },
+      },
       // ─────────────────────────────────────────────────────────────────────
       // LangExtract Tools — Google's official structured extraction library
       // Uses local Ollama (gemma3-legal) instead of Gemini API
@@ -1115,6 +1139,66 @@ function setupToolHandlers() {
                     routeId: r.chunk.routeId,
                     tags: r.chunk.tags,
                   })),
+                }),
+              },
+            ],
+          };
+        }
+
+        case 'codebase:ace_context': {
+          const { query: aceQuery, caseId: aceCaseId, enableCodebaseContext, persona: acePersona, maxTokens: aceMaxTokens } = args as {
+            query: string;
+            caseId?: string;
+            enableCodebaseContext?: boolean;
+            persona?: string;
+            maxTokens?: number;
+          };
+          const { assembleACEContext, buildACEPrompt } = await import('../lib/server/ace/context-assembler.js');
+          const { ollamaFetch } = await import('../lib/server/ollama.js');
+
+          const context = await assembleACEContext({
+            query: aceQuery,
+            caseId: aceCaseId,
+            enableCodebaseContext: enableCodebaseContext ?? true,
+            enableWebSearch: false,
+            enableWikipedia: true,
+            persona: acePersona as any,
+          });
+          const acePrompt = buildACEPrompt(context, aceQuery);
+
+          const ollamaUrl = process.env.OLLAMA_HOST || 'http://127.0.0.1:11434';
+          const llmRes = await ollamaFetch(`${ollamaUrl}/api/generate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: process.env.LLM_MODEL || 'gemma3-legal:latest',
+              prompt: aceQuery,
+              system: acePrompt.systemPrompt,
+              stream: false,
+              options: { num_predict: aceMaxTokens ?? 2048, temperature: 0.4 },
+            }),
+          });
+          const llmData = await llmRes.json();
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  query: aceQuery,
+                  answer: llmData.response ?? '',
+                  confidenceFactors: acePrompt.confidenceFactors,
+                  contextSources: {
+                    ragChunks: context.ragChunks.length,
+                    kagNeighbors: context.kagNeighbors.length,
+                    codebaseChunks: context.codebaseContext?.length ?? 0,
+                    hasEvidence: !!context.evidenceMetadata?.length,
+                    hasGlossary: !!context.glossaryMatches?.length,
+                    hasUserProfile: !!context.userProfile,
+                    hasCaseContext: !!context.caseContext,
+                  },
+                  model: llmData.model,
+                  tokensUsed: llmData.prompt_eval_count + (llmData.eval_count ?? 0),
                 }),
               },
             ],

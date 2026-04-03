@@ -144,18 +144,18 @@ export const VECTOR_SEARCH_CONFIG = {
 // DATABASE CONFIGURATION
 // ============================================================================
 export const DATABASE_CONFIG = {
-	url: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db',
-	postgres: {
-	host: process.env.DATABASE_HOST || 'localhost',
-		port: parseInt(process.env.DATABASE_PORT || '5432', 10),
-		database: process.env.DATABASE_NAME || 'legal_ai_db',
-		username: process.env.DATABASE_USER || 'legal_admin',
-		password: process.env.DATABASE_PASSWORD || '123456',
-		max: parseInt(process.env.DATABASE_MAX_CONNECTIONS || '20', 10),
-		idleTimeout: parseInt(process.env.DATABASE_IDLE_TIMEOUT || '20', 10),
-		connectionTimeout: parseInt(process.env.DATABASE_CONNECT_TIMEOUT || '10', 10),
-		ssl: process.env.NODE_ENV === 'production' ? ('require' as const) : (false as const)
-	}
+  url: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db',
+  postgres: {
+    host: process.env.DATABASE_HOST || 'localhost',
+    port: parseInt(process.env.DATABASE_PORT || '5434', 10),
+    database: process.env.DATABASE_NAME || 'legal_ai_db',
+    username: process.env.DATABASE_USER || 'legal_admin',
+    password: process.env.DATABASE_PASSWORD || '123456',
+    max: parseInt(process.env.DATABASE_MAX_CONNECTIONS || '20', 10),
+    idleTimeout: parseInt(process.env.DATABASE_IDLE_TIMEOUT || '20', 10),
+    connectionTimeout: parseInt(process.env.DATABASE_CONNECT_TIMEOUT || '10', 10),
+    ssl: process.env.NODE_ENV === 'production' ? ('require' as const) : (false as const),
+  },
 };
 
 // ============================================================================

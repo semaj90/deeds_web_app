@@ -23,36 +23,8 @@ declare global {
 	}
 }
 
-// Polyfill process.env for browser
-if (typeof window !== 'undefined') {
-	window.global = window?.global || globalThis;
-
-	if (!window.process) {
-		window.process = {
-			env: {
-	NODE_ENV: import.meta.env?.MODE ?? 'development',
-				PUBLIC_ENV: 'browser'
-			},
-	browser: true,
-			cwd: () => '/',
-			nextTick: (callback: () => void) => setTimeout(callback, 0),
-			version: 'v18.0.0',
-			versions: {
-	node: '18.0.0' },
-	platform: 'browser',
-			arch: 'x64'
-		} as any;
-	}
-}
-
-// Polyfill Buffer for browser if needed
-if (typeof window !== 'undefined' && !window.Buffer) {
-	window.Buffer = {
-		from: (str: string, encoding?: string) => new TextEncoder().encode(str),
-		isBuffer: (obj: any) => obj instanceof Uint8Array,
-		alloc: (size: number) => new Uint8Array(size)
-	} as any;
-}
+// NOTE: global, process, and Buffer polyfills live in app.html (blocking inline script).
+// They are NOT duplicated here to avoid version drift.
 
 // Path manipulation utilities for browser
 export const pathUtils = {
@@ -199,12 +171,6 @@ export const storage = {
 	}
 };
 
-// Initialize polyfills
-if (typeof window !== 'undefined') {
-	// Ensure all polyfills are applied
-	console.log('Browser polyfills initialized for Legal AI Platform');
-}
-
 // Lightweight WebGPU utilities (safe in non-supporting browsers)
 export const webGPU = {
 	isSupported: () =>
@@ -237,8 +203,6 @@ export const webGPU = {
 	}
 };
 
-if (typeof window !== 'undefined') {
-	(window as any).__WEBGPU_SUPPORTED__ = webGPU.isSupported();
-}
+// NOTE: __WEBGPU_SUPPORTED__ detection lives in app.html (blocking inline script).
 
 export default { pathUtils, urlUtils, enhancedFetch, debounce, throttle, storage, webGPU };

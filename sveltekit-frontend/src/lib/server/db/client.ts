@@ -4,9 +4,10 @@ import { canvasAutosaves } from './schema-canvas-autosaves.js';
 import * as schema from './schema.js'; // Changed from schema-postgres to schema
 import { ENV } from '$lib/server/env.server.js';
 import { createDrizzleCache } from './drizzle-cache.js';
+import { traceDB } from '$lib/server/observability/langfuse.js';
 
 function getDatabaseUrl(): string {
- return 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db'; // Hardcoded bypass for active :5432 db
+ return ENV.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 }
 
 function getAdminDatabaseUrl(): string {
@@ -61,6 +62,21 @@ adminPool.on('error', (err) => {
 // (e.g. passwordHash: varchar('hashed_password')) and casing would override them
 // to password_hash, which doesn't exist in the DB.
 export const adminDb = drizzle(adminPool, { schema: mergedSchema });
+
+/**
+ * Traced pool query — wraps pool.query with Langfuse tracing.
+ * Use for raw SQL queries that need observability.
+ */
+export async function tracedQuery<T = any>(
+	operation: string,
+	queryText: string,
+	params?: any[]
+): Promise<T> {
+	return traceDB(operation, { table: queryText.slice(0, 100) }, async () => {
+		const result = await pool.query(queryText, params);
+		return result as T;
+	});
+}
 
 export async function closeConnections(): Promise<void> {
  await pool.end();

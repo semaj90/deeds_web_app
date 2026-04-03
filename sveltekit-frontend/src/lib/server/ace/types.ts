@@ -34,8 +34,12 @@ export interface ACEContext {
     confidence: number | null;
     sourceNodeId: string | null;
   }> | null;
-  /** RAG chunks from Qdrant vector search */
+  /** RAG chunks from Qdrant vector search (merged KB + Case for backward compat) */
   ragChunks: Array<{ content: string; score: number; source: string }>;
+  /** Knowledge base chunks — statutes, glossary, templates, doctrine (stable, heavily cached) */
+  kbChunks: Array<{ content: string; score: number; source: string }>;
+  /** Case/evidence chunks — uploaded PDFs, notes, POI data (case-scoped, invalidates often) */
+  caseChunks: Array<{ content: string; score: number; source: string }>;
   /** KAG graph neighbors from Neo4j or PostgreSQL */
   kagNeighbors: Array<{ nodeId: string; title: string; relationship: string; score?: number }>;
   /** Chat history (recent turns) */
@@ -77,6 +81,14 @@ export interface ACEContext {
   }> | null;
   /** User analytics context (search patterns, graph neighbors, similar queries) */
   userAnalyticsContext: string | null;
+  /** Codebase/AST context from dual-vector semantic search (optional) */
+  codebaseContext: Array<{
+    filePath: string;
+    content: string;
+    score: number;
+    lineStart?: number;
+    lineEnd?: number;
+  }> | null;
 }
 
 export interface ACEPrompt {
@@ -127,6 +139,7 @@ export const TOKEN_BUDGET = {
   kagNeighbors: 200,
   chatHistory: 400,
   userProfile: 100,
+  codebaseContext: 200,
   selfPrompt: 100,
-  total: 2050,
+  total: 2250,
 } as const;

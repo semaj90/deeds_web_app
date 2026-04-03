@@ -5,6 +5,7 @@ import { json } from '@sveltejs/kit';
 import { and, eq, sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { syncCaseToGraph } from '$lib/server/graph/pg-neo4j-sync.js';
 
 const CASE_STATUS = ['open', 'in_progress', 'pending_review', 'closed', 'archived'] as const;
 const CASE_PRIORITY = ['low', 'medium', 'high', 'urgent'] as const;
@@ -92,6 +93,9 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
       console.warn('[api/cases/[id]] Cache invalidation failed:', err)
     );
 
+    // Sync updated case to Neo4j graph (non-blocking)
+    syncCaseToGraph(id).catch(err => console.warn('[neo4j-sync] case update:', err));
+
     return json({
       success: true,
       data: updated[0],
@@ -135,6 +139,9 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
     await invalidateCaseCache(id, 'case_update', locals.user.id).catch((err) =>
       console.warn('[api/cases/[id]] Cache invalidation failed:', err)
     );
+
+    // Sync archived status to Neo4j graph (non-blocking)
+    syncCaseToGraph(id).catch(err => console.warn('[neo4j-sync] case archive:', err));
 
     return json({
       success: true,

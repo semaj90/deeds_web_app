@@ -1,4 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+const originalAceChatSelfEvalEnabled = process.env.ACE_CHAT_SELF_EVAL_ENABLED;
 
 const mockInsertValues = vi.fn();
 const mockInsert = vi.fn(() => ({ values: mockInsertValues }));
@@ -49,6 +51,8 @@ vi.mock('$lib/server/db/schema', () => ({
 
 vi.mock('$lib/server/ollama.js', () => ({
   ollamaFetch: mockOllamaFetch,
+  getChatModelKeepAlive: vi.fn(() => '5m'),
+  getEmbeddingModelKeepAlive: vi.fn(() => '5m'),
 }));
 
 vi.mock('$lib/server/retrieval/codebase-context.js', () => ({
@@ -57,6 +61,17 @@ vi.mock('$lib/server/retrieval/codebase-context.js', () => ({
 
 vi.mock('$lib/server/retrieval/graph-context.js', () => ({
   getGraphContext: mockGetGraphContext,
+  getCaseGraphNeighborIds: vi.fn(async () => []),
+  buildGraphShouldFilter: vi.fn(() => null),
+  applyGraphAuthorityScoring: vi.fn((docs: unknown[]) => docs),
+}));
+
+vi.mock('$lib/server/retrieval/graph-informed-retrieval.js', () => ({
+  graphExpandRetrieval: vi.fn(async (_qv: unknown, docs: unknown[]) => docs),
+}));
+
+vi.mock('$lib/server/retrieval/authority-chain.js', () => ({
+  authorityChainExpansion: vi.fn(async (_qv: unknown, docs: unknown[]) => ({ docs, hops: 0, expanded: 0, authorities: { statutes: [], cases: [] } })),
 }));
 
 vi.mock('$lib/server/ai/llm-cache.js', () => ({
@@ -79,6 +94,9 @@ vi.mock('$lib/server/glyph-prompt-cache.js', () => ({
 vi.mock('$lib/server/observability/langfuse.js', () => ({
   traceEmbedding: vi.fn(async (_query: string, _model: string, operation: () => Promise<unknown>) =>
     operation()
+  ),
+  traceCouchDB: vi.fn(
+    async (_operation: string, _details: unknown, action: () => Promise<unknown>) => action()
   ),
 }));
 
@@ -137,8 +155,10 @@ async function readSseEvents(response: Response) {
 
 describe('/api/sse/chat attachment metadata', () => {
   beforeEach(() => {
+    vi.resetModules();
     vi.clearAllMocks();
     vi.unstubAllGlobals();
+    process.env.ACE_CHAT_SELF_EVAL_ENABLED = 'true';
 
     mockInsertValues.mockResolvedValue(undefined);
     mockHistoryLimit.mockResolvedValue([]);
@@ -167,6 +187,14 @@ describe('/api/sse/chat attachment metadata', () => {
 
       return makeJsonResponse({}, false);
     });
+  });
+
+  afterEach(() => {
+    if (typeof originalAceChatSelfEvalEnabled === 'string') {
+      process.env.ACE_CHAT_SELF_EVAL_ENABLED = originalAceChatSelfEvalEnabled;
+    } else {
+      delete process.env.ACE_CHAT_SELF_EVAL_ENABLED;
+    }
   });
 
   it('uses attachment-scoped retrieval and exposes the attachment doc in final SSE metadata', async () => {
@@ -245,7 +273,9 @@ describe('/api/sse/chat attachment metadata', () => {
     expect(mockLookupCachedResponse).toHaveBeenCalledWith(
       expect.objectContaining({
         query: 'Use the newly uploaded attachment to answer this question.',
-        context: expect.stringContaining('Uploaded attachment text showing probable cause analysis'),
+        context: expect.stringContaining(
+          'Uploaded attachment text showing probable cause analysis'
+        ),
       })
     );
 
@@ -344,7 +374,9 @@ describe('/api/sse/chat attachment metadata', () => {
     expect(assistantInsertCall.role).toBe('assistant');
     expect(assistantMetadata.confidence).toBe(doneEvent?.confidence);
     expect(assistantMetadata.cachedResponse).toBe(true);
-    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual(['legal_documents:attachment-doc-case-1']);
+    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual([
+      'legal_documents:attachment-doc-case-1',
+    ]);
   });
 
   it('persists cached confidence parity when attachment grounding and codebase context both contribute', async () => {
@@ -361,7 +393,11 @@ describe('/api/sse/chat attachment metadata', () => {
         '## Codebase Context\n- src/routes/api/sse/chat/+server.ts builds SSE responses\n- src/lib/server/ai/llm-cache.ts stores semantic cache entries',
       chunks: [
         { relativePath: 'src/routes/api/sse/chat/+server.ts', symbol: 'POST', score: 0.8 },
-        { relativePath: 'src/lib/server/ai/llm-cache.ts', symbol: 'storeCachedResponse', score: 0.72 },
+        {
+          relativePath: 'src/lib/server/ai/llm-cache.ts',
+          symbol: 'storeCachedResponse',
+          score: 0.72,
+        },
       ],
     });
 
@@ -455,7 +491,9 @@ describe('/api/sse/chat attachment metadata', () => {
     expect(assistantMetadata.confidence).toBe(doneEvent?.confidence);
     expect(assistantMetadata.cachedResponse).toBe(true);
     expect(assistantMetadata.confidenceFactors).toEqual(doneEvent?.confidenceFactors);
-    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual(['legal_documents:attachment-doc-code-cache-1']);
+    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual([
+      'legal_documents:attachment-doc-code-cache-1',
+    ]);
     expect(assistantMetadata.contextUsed?.codebaseChunks).toEqual([
       { path: 'src/routes/api/sse/chat/+server.ts', symbol: 'POST', score: 0.8 },
       { path: 'src/lib/server/ai/llm-cache.ts', symbol: 'storeCachedResponse', score: 0.72 },
@@ -484,14 +522,20 @@ describe('/api/sse/chat attachment metadata', () => {
       cachedAt: '2026-03-21T12:40:00.000Z',
     });
     mockGetFragment.mockImplementation((key: string) =>
-      key === `glyph:case:${caseId}` ? '## Active Case Context\n- **Title**: Cached scoped code and graph case' : null
+      key === `glyph:case:${caseId}`
+        ? '## Active Case Context\n- **Title**: Cached scoped code and graph case'
+        : null
     );
     mockLoadCodebaseContext.mockResolvedValue({
       context:
         '## Codebase Context\n- src/routes/api/sse/chat/+server.ts handles SSE streaming\n- retry branch preserves conversation history',
       chunks: [
         { relativePath: 'src/routes/api/sse/chat/+server.ts', symbol: 'POST', score: 0.81 },
-        { relativePath: 'src/lib/server/ai/llm-cache.ts', symbol: 'storeCachedResponse', score: 0.74 },
+        {
+          relativePath: 'src/lib/server/ai/llm-cache.ts',
+          symbol: 'storeCachedResponse',
+          score: 0.74,
+        },
       ],
     });
     mockGetGraphContext.mockResolvedValue({
@@ -778,7 +822,9 @@ describe('/api/sse/chat attachment metadata', () => {
     expect(assistantMetadata.model).toBe('gemma3-legal:latest');
     expect(assistantMetadata.conversationTurns).toBe(0);
     expect(assistantMetadata.cachedResponse).toBeUndefined();
-    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual(['legal_documents:attachment-doc-live-1']);
+    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual([
+      'legal_documents:attachment-doc-live-1',
+    ]);
     expect(assistantMetadata.contextUsed?.citations).toEqual(doneEvent?.citations);
     expect(assistantMetadata.confidenceFactors).toEqual(doneEvent?.confidenceFactors);
   });
@@ -827,7 +873,9 @@ describe('/api/sse/chat attachment metadata', () => {
       if (url.endsWith('/api/chat')) {
         chatRequestBody = JSON.parse(String(init?.body ?? '{}'));
         return makeStreamingResponse([
-          JSON.stringify({ message: { content: 'Multi-turn attachment answer cites [Source 1].' } }),
+          JSON.stringify({
+            message: { content: 'Multi-turn attachment answer cites [Source 1].' },
+          }),
         ]);
       }
 
@@ -1007,7 +1055,8 @@ describe('/api/sse/chat attachment metadata', () => {
     expect(doneEvent).toEqual(
       expect.objectContaining({
         status: 'done',
-        content: 'Improved attachment answer with preserved history and citation support [Source 1].',
+        content:
+          'Improved attachment answer with preserved history and citation support [Source 1].',
         contextUsed: ['legal_documents:attachment-doc-retry-1'],
         citations: [
           {
@@ -1035,7 +1084,9 @@ describe('/api/sse/chat attachment metadata', () => {
       'Improved attachment answer with preserved history and citation support [Source 1].'
     );
     expect(assistantMetadata.conversationTurns).toBe(2);
-    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual(['legal_documents:attachment-doc-retry-1']);
+    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual([
+      'legal_documents:attachment-doc-retry-1',
+    ]);
     expect(assistantMetadata.contextUsed?.citations).toEqual(doneEvent?.citations);
     expect(assistantMetadata.aceEvaluation).toEqual({
       quality: 0.42,
@@ -1054,7 +1105,9 @@ describe('/api/sse/chat attachment metadata', () => {
       { role: 'user', content: 'Earlier scoped attachment facts.' },
     ]);
     mockGetFragment.mockImplementation((key: string) =>
-      key === `glyph:case:${caseId}` ? '## Active Case Context\n- **Title**: Retry scoped case' : null
+      key === `glyph:case:${caseId}`
+        ? '## Active Case Context\n- **Title**: Retry scoped case'
+        : null
     );
     mockEvaluateResponse.mockResolvedValue({
       quality: 0.38,
@@ -1188,7 +1241,8 @@ describe('/api/sse/chat attachment metadata', () => {
     expect(doneEvent).toEqual(
       expect.objectContaining({
         status: 'done',
-        content: 'Improved scoped attachment answer for this case with preserved history [Source 1].',
+        content:
+          'Improved scoped attachment answer for this case with preserved history [Source 1].',
         contextUsed: ['legal_documents:attachment-doc-case-retry-1'],
         citations: [
           {
@@ -1217,7 +1271,9 @@ describe('/api/sse/chat attachment metadata', () => {
       'Improved scoped attachment answer for this case with preserved history [Source 1].'
     );
     expect(assistantMetadata.conversationTurns).toBe(2);
-    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual(['legal_documents:attachment-doc-case-retry-1']);
+    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual([
+      'legal_documents:attachment-doc-case-retry-1',
+    ]);
     expect(assistantMetadata.contextUsed?.citations).toEqual(doneEvent?.citations);
     expect(assistantMetadata.aceEvaluation).toEqual({
       quality: 0.38,
@@ -1230,7 +1286,8 @@ describe('/api/sse/chat attachment metadata', () => {
       expect(mockStoreCachedResponse).toHaveBeenCalledWith(
         expect.objectContaining({
           query: 'Use the attachment only for this case timeline.',
-          response: 'Improved scoped attachment answer for this case with preserved history [Source 1].',
+          response:
+            'Improved scoped attachment answer for this case with preserved history [Source 1].',
           model: 'gemma3-legal:latest',
           context: expect.stringMatching(
             /## Active Case Context[\s\S]*Case-scoped attachment grounding text that must survive retry and preserve citations\./
@@ -1250,7 +1307,10 @@ describe('/api/sse/chat attachment metadata', () => {
   it('applies the low-quality ACE confidence decrement when attachment grounding and codebase context both contribute on the live path', async () => {
     mockLookupCachedResponse.mockResolvedValue({ hit: false });
     mockHistoryLimit.mockResolvedValue([
-      { role: 'user', content: 'Use the uploaded attachment to explain this endpoint in the repo.' },
+      {
+        role: 'user',
+        content: 'Use the uploaded attachment to explain this endpoint in the repo.',
+      },
       { role: 'assistant', content: 'Earlier attachment endpoint summary.' },
       { role: 'user', content: 'Earlier attachment endpoint facts.' },
     ]);
@@ -1259,7 +1319,11 @@ describe('/api/sse/chat attachment metadata', () => {
         '## Codebase Context\n- src/routes/api/sse/chat/+server.ts builds SSE responses\n- src/lib/server/ai/llm-cache.ts stores semantic cache entries',
       chunks: [
         { relativePath: 'src/routes/api/sse/chat/+server.ts', symbol: 'POST', score: 0.8 },
-        { relativePath: 'src/lib/server/ai/llm-cache.ts', symbol: 'storeCachedResponse', score: 0.72 },
+        {
+          relativePath: 'src/lib/server/ai/llm-cache.ts',
+          symbol: 'storeCachedResponse',
+          score: 0.72,
+        },
       ],
     });
     mockEvaluateResponse.mockResolvedValue({
@@ -1401,19 +1465,28 @@ describe('/api/sse/chat attachment metadata', () => {
     const caseId = '45454545-4545-4454-8454-454545454545';
     mockLookupCachedResponse.mockResolvedValue({ hit: false });
     mockHistoryLimit.mockResolvedValue([
-      { role: 'user', content: 'Use the attachment for this case and explain the route behavior in the repo.' },
+      {
+        role: 'user',
+        content: 'Use the attachment for this case and explain the route behavior in the repo.',
+      },
       { role: 'assistant', content: 'Earlier scoped attachment route summary.' },
       { role: 'user', content: 'Earlier scoped route facts.' },
     ]);
     mockGetFragment.mockImplementation((key: string) =>
-      key === `glyph:case:${caseId}` ? '## Active Case Context\n- **Title**: Low-quality scoped code and graph case' : null
+      key === `glyph:case:${caseId}`
+        ? '## Active Case Context\n- **Title**: Low-quality scoped code and graph case'
+        : null
     );
     mockLoadCodebaseContext.mockResolvedValue({
       context:
         '## Codebase Context\n- src/routes/api/sse/chat/+server.ts handles SSE streaming\n- retry branch preserves conversation history',
       chunks: [
         { relativePath: 'src/routes/api/sse/chat/+server.ts', symbol: 'POST', score: 0.81 },
-        { relativePath: 'src/lib/server/ai/llm-cache.ts', symbol: 'storeCachedResponse', score: 0.74 },
+        {
+          relativePath: 'src/lib/server/ai/llm-cache.ts',
+          symbol: 'storeCachedResponse',
+          score: 0.74,
+        },
       ],
     });
     mockGetGraphContext.mockResolvedValue({
@@ -1570,7 +1643,11 @@ describe('/api/sse/chat attachment metadata', () => {
         '## Codebase Context\n- src/routes/api/sse/chat/+server.ts builds SSE responses\n- src/lib/server/ai/llm-cache.ts stores semantic cache entries',
       chunks: [
         { relativePath: 'src/routes/api/sse/chat/+server.ts', symbol: 'POST', score: 0.8 },
-        { relativePath: 'src/lib/server/ai/llm-cache.ts', symbol: 'storeCachedResponse', score: 0.72 },
+        {
+          relativePath: 'src/lib/server/ai/llm-cache.ts',
+          symbol: 'storeCachedResponse',
+          score: 0.72,
+        },
       ],
     });
     mockEvaluateResponse.mockResolvedValue({
@@ -1592,8 +1669,7 @@ describe('/api/sse/chat attachment metadata', () => {
                 id: 'attachment-doc-publish-1',
                 score: 0.89,
                 payload: {
-                  full_text:
-                    'Uploaded attachment text for a queue-publish parity answer.',
+                  full_text: 'Uploaded attachment text for a queue-publish parity answer.',
                   embedding_model: 'embeddinggemma:latest',
                 },
               },
@@ -1677,7 +1753,10 @@ describe('/api/sse/chat attachment metadata', () => {
   it('uses the same effective context string for cache lookup and cache store on a live attachment path', async () => {
     mockLookupCachedResponse.mockResolvedValue({ hit: false });
     mockHistoryLimit.mockResolvedValue([
-      { role: 'user', content: 'Use the uploaded attachment to explain this endpoint in the repo.' },
+      {
+        role: 'user',
+        content: 'Use the uploaded attachment to explain this endpoint in the repo.',
+      },
       { role: 'assistant', content: 'Earlier attachment endpoint summary.' },
       { role: 'user', content: 'Earlier attachment endpoint facts.' },
     ]);
@@ -1686,7 +1765,11 @@ describe('/api/sse/chat attachment metadata', () => {
         '## Codebase Context\n- src/routes/api/sse/chat/+server.ts builds SSE responses\n- src/lib/server/ai/llm-cache.ts stores semantic cache entries',
       chunks: [
         { relativePath: 'src/routes/api/sse/chat/+server.ts', symbol: 'POST', score: 0.8 },
-        { relativePath: 'src/lib/server/ai/llm-cache.ts', symbol: 'storeCachedResponse', score: 0.72 },
+        {
+          relativePath: 'src/lib/server/ai/llm-cache.ts',
+          symbol: 'storeCachedResponse',
+          score: 0.72,
+        },
       ],
     });
     mockEvaluateResponse.mockResolvedValue({
@@ -1713,8 +1796,7 @@ describe('/api/sse/chat attachment metadata', () => {
                 id: 'attachment-doc-context-parity-1',
                 score: 0.89,
                 payload: {
-                  full_text:
-                    'Uploaded attachment text for cache context parity on the live path.',
+                  full_text: 'Uploaded attachment text for cache context parity on the live path.',
                   embedding_model: 'embeddinggemma:latest',
                 },
               },
@@ -1783,11 +1865,15 @@ describe('/api/sse/chat attachment metadata', () => {
       model?: string;
     };
 
-    expect(lookupCall.query).toBe('Use the uploaded attachment to explain this endpoint in the repo.');
+    expect(lookupCall.query).toBe(
+      'Use the uploaded attachment to explain this endpoint in the repo.'
+    );
     expect(cacheStoreCall.query).toBe(lookupCall.query);
     expect(cacheStoreCall.model).toBe(lookupCall.model);
     expect(cacheStoreCall.context).toBe(lookupCall.context);
-    expect(cacheStoreCall.context).toContain('Uploaded attachment text for cache context parity on the live path.');
+    expect(cacheStoreCall.context).toContain(
+      'Uploaded attachment text for cache context parity on the live path.'
+    );
     expect(cacheStoreCall.context).toContain('## Codebase Context');
   });
 
@@ -1832,9 +1918,7 @@ describe('/api/sse/chat attachment metadata', () => {
 
     mockOllamaFetch.mockImplementation(async (url: string) => {
       if (url.endsWith('/api/chat')) {
-        return makeStreamingResponse([
-          JSON.stringify({ message: { content: longResponse } }),
-        ]);
+        return makeStreamingResponse([JSON.stringify({ message: { content: longResponse } })]);
       }
 
       if (url.endsWith('/api/embeddings')) {
@@ -1895,7 +1979,10 @@ describe('/api/sse/chat attachment metadata', () => {
   it('applies the positive ACE confidence bump when attachment grounding and codebase context both contribute on the live path', async () => {
     mockLookupCachedResponse.mockResolvedValue({ hit: false });
     mockHistoryLimit.mockResolvedValue([
-      { role: 'user', content: 'Use the uploaded attachment to explain this endpoint in the repo.' },
+      {
+        role: 'user',
+        content: 'Use the uploaded attachment to explain this endpoint in the repo.',
+      },
       { role: 'assistant', content: 'Earlier attachment endpoint summary.' },
       { role: 'user', content: 'Earlier attachment endpoint facts.' },
     ]);
@@ -1904,7 +1991,11 @@ describe('/api/sse/chat attachment metadata', () => {
         '## Codebase Context\n- src/routes/api/sse/chat/+server.ts builds SSE responses\n- src/lib/server/ai/llm-cache.ts stores semantic cache entries',
       chunks: [
         { relativePath: 'src/routes/api/sse/chat/+server.ts', symbol: 'POST', score: 0.8 },
-        { relativePath: 'src/lib/server/ai/llm-cache.ts', symbol: 'storeCachedResponse', score: 0.72 },
+        {
+          relativePath: 'src/lib/server/ai/llm-cache.ts',
+          symbol: 'storeCachedResponse',
+          score: 0.72,
+        },
       ],
     });
     mockEvaluateResponse.mockResolvedValue({
@@ -1931,8 +2022,7 @@ describe('/api/sse/chat attachment metadata', () => {
                 id: 'attachment-doc-live-code-1',
                 score: 0.89,
                 payload: {
-                  full_text:
-                    'Uploaded attachment text for a live code-aware endpoint answer.',
+                  full_text: 'Uploaded attachment text for a live code-aware endpoint answer.',
                   embedding_model: 'embeddinggemma:latest',
                 },
               },
@@ -2030,7 +2120,9 @@ describe('/api/sse/chat attachment metadata', () => {
     );
     expect(assistantMetadata.confidence).toBeCloseTo(0.76, 10);
     expect(assistantMetadata.confidenceFactors).toEqual(doneEvent?.confidenceFactors);
-    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual(['legal_documents:attachment-doc-live-code-1']);
+    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual([
+      'legal_documents:attachment-doc-live-code-1',
+    ]);
     expect(assistantMetadata.contextUsed?.codebaseChunks).toEqual([
       { path: 'src/routes/api/sse/chat/+server.ts', symbol: 'POST', score: 0.8 },
       { path: 'src/lib/server/ai/llm-cache.ts', symbol: 'storeCachedResponse', score: 0.72 },
@@ -2065,19 +2157,28 @@ describe('/api/sse/chat attachment metadata', () => {
     const caseId = '34343434-3434-4343-8343-343434343434';
     mockLookupCachedResponse.mockResolvedValue({ hit: false });
     mockHistoryLimit.mockResolvedValue([
-      { role: 'user', content: 'Use the attachment for this case and explain the route behavior in the repo.' },
+      {
+        role: 'user',
+        content: 'Use the attachment for this case and explain the route behavior in the repo.',
+      },
       { role: 'assistant', content: 'Earlier scoped attachment route summary.' },
       { role: 'user', content: 'Earlier scoped route facts.' },
     ]);
     mockGetFragment.mockImplementation((key: string) =>
-      key === `glyph:case:${caseId}` ? '## Active Case Context\n- **Title**: Live scoped code and graph case' : null
+      key === `glyph:case:${caseId}`
+        ? '## Active Case Context\n- **Title**: Live scoped code and graph case'
+        : null
     );
     mockLoadCodebaseContext.mockResolvedValue({
       context:
         '## Codebase Context\n- src/routes/api/sse/chat/+server.ts handles SSE streaming\n- retry branch preserves conversation history',
       chunks: [
         { relativePath: 'src/routes/api/sse/chat/+server.ts', symbol: 'POST', score: 0.81 },
-        { relativePath: 'src/lib/server/ai/llm-cache.ts', symbol: 'storeCachedResponse', score: 0.74 },
+        {
+          relativePath: 'src/lib/server/ai/llm-cache.ts',
+          symbol: 'storeCachedResponse',
+          score: 0.74,
+        },
       ],
     });
     mockGetGraphContext.mockResolvedValue({
@@ -2254,7 +2355,9 @@ describe('/api/sse/chat attachment metadata', () => {
       { role: 'user', content: 'Earlier case-specific attachment facts.' },
     ]);
     mockGetFragment.mockImplementation((key: string) =>
-      key === `glyph:case:${caseId}` ? '## Active Case Context\n- **Title**: Positive bump scoped case' : null
+      key === `glyph:case:${caseId}`
+        ? '## Active Case Context\n- **Title**: Positive bump scoped case'
+        : null
     );
     mockEvaluateResponse.mockResolvedValue({
       quality: 0.92,
@@ -2373,7 +2476,9 @@ describe('/api/sse/chat attachment metadata', () => {
       'High-quality case-scoped attachment answer with explicit support [Source 1] and enough detail for evaluation.'
     );
     expect(assistantMetadata.confidence).toBeCloseTo(0.85, 10);
-    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual(['legal_documents:attachment-doc-case-positive-1']);
+    expect(assistantMetadata.contextUsed?.ragDocIds).toEqual([
+      'legal_documents:attachment-doc-case-positive-1',
+    ]);
     expect(assistantMetadata.contextUsed?.citations).toEqual(doneEvent?.citations);
     expect(assistantMetadata.aceEvaluation).toEqual({
       quality: 0.92,
