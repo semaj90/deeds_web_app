@@ -48,6 +48,7 @@ export async function assembleACEContext(opts: {
   enableCodebaseContext?: boolean;
   sectionTypes?: string[];
 }): Promise<ACEContext> {
+  return traceGraph('ace-assembly', { query: opts.query.slice(0, 100), caseId: opts.caseId, userId: opts.userId }, async () => {
   const { query, userId, caseId, conversationId } = opts;
 
   // Extract entities immediately (regex, no async)
@@ -132,6 +133,7 @@ export async function assembleACEContext(opts: {
     userAnalyticsContext,
     codebaseContext,
   };
+  }); // end traceGraph ace-assembly
 }
 
 /**
@@ -601,13 +603,15 @@ function bundleCacheKey(tier: 'kb' | 'case' | 'ace', queryHash: string, caseId?:
 
 /** Try Redis bundle cache for a retrieval tier. */
 async function getCachedBundle(key: string): Promise<RAGChunk[] | null> {
-  try {
-    const { redis } = await import('$lib/server/redis.js');
-    const raw = await redis.get(key);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
+  return traceCache('rag-bundle-get', { key: key.slice(0, 40) }, async () => {
+    try {
+      const { redis } = await import('$lib/server/redis.js');
+      const raw = await redis.get(key);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
 }
 
 /** Store retrieval bundle in Redis with tier-appropriate TTL. */
@@ -815,6 +819,7 @@ async function fetchRAGChunks(
 async function fetchKAGNeighbors(
   caseId: string
 ): Promise<Array<{ nodeId: string; title: string; relationship: string; score?: number }>> {
+  return traceGraph('ace-kag-neighbors', { caseId }, async () => {
   // Try Neo4j first, fallback to PostgreSQL
   try {
     const { getNeo4jDriver } = await import('$lib/server/neo4j-driver.js');
@@ -868,6 +873,7 @@ async function fetchKAGNeighbors(
       return [];
     }
   }
+  }); // end traceGraph ace-kag-neighbors
 }
 
 async function fetchChatHistory(

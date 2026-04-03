@@ -80,64 +80,66 @@ export async function graphExpandRetrieval(
 
 	if (!neighbors.length || !queryVector.length) return initialDocs;
 
-	// 1. Find neighbor IDs not already in the initial result set
-	const existingIds = new Set(
-		initialDocs.map((d) => d.sourceId ?? d.documentId.split(':').pop() ?? d.documentId)
-	);
-	const newNeighbors = neighbors.filter((n) => !existingIds.has(n.nodeId));
+	return traceGraph('graph-expand-retrieval', { neighborCount: neighbors.length, initialDocCount: initialDocs.length }, async () => {
+		// 1. Find neighbor IDs not already in the initial result set
+		const existingIds = new Set(
+			initialDocs.map((d) => d.sourceId ?? d.documentId.split(':').pop() ?? d.documentId)
+		);
+		const newNeighbors = neighbors.filter((n) => !existingIds.has(n.nodeId));
 
-	if (newNeighbors.length === 0) {
-		console.log('[KAG Expand] All graph neighbors already in retrieval set — skipping expansion');
-		return initialDocs;
-	}
+		if (newNeighbors.length === 0) {
+			console.log('[KAG Expand] All graph neighbors already in retrieval set — skipping expansion');
+			return initialDocs;
+		}
 
-	console.log(
-		`[KAG Expand] Expanding retrieval with ${newNeighbors.length} graph neighbors ` +
-			`(${neighbors.length} total, ${neighbors.length - newNeighbors.length} already present)`
-	);
+		console.log(
+			`[KAG Expand] Expanding retrieval with ${newNeighbors.length} graph neighbors ` +
+				`(${neighbors.length} total, ${neighbors.length - newNeighbors.length} already present)`
+		);
 
-	// 2. Search Qdrant for chunks from neighbor documents
-	const expansionHits = await fetchNeighborChunks(
-		queryVector,
-		newNeighbors,
-		cfg
-	);
+		// 2. Search Qdrant for chunks from neighbor documents
+		const expansionHits = await fetchNeighborChunks(
+			queryVector,
+			newNeighbors,
+			cfg
+		);
 
-	if (expansionHits.length === 0) {
-		console.log('[KAG Expand] No expansion chunks found from graph neighbors');
-		return initialDocs;
-	}
+		if (expansionHits.length === 0) {
+			console.log('[KAG Expand] No expansion chunks found from graph neighbors');
+			return initialDocs;
+		}
 
-	// 3. Apply authority weight: score = cosine * (1 + authorityWeight * normalizedStrength)
-	const weightedHits = expansionHits.map((hit) => {
-		const neighbor = newNeighbors.find((n) => (hit.sourceId ?? hit.documentId).includes(n.nodeId));
-		const normalizedStrength = neighbor ? neighbor.strength / 100 : 0.5;
-		const authorityBoost = 1 + cfg.authorityWeight * normalizedStrength;
-		return {
-			...hit,
-			similarity: Math.min(hit.similarity * authorityBoost, 1.0),
-		};
-	});
+		// 3. Apply authority weight: score = cosine * (1 + authorityWeight * normalizedStrength)
+		const weightedHits = expansionHits.map((hit) => {
+			const neighbor = newNeighbors.find((n) => (hit.sourceId ?? hit.documentId).includes(n.nodeId));
+			const normalizedStrength = neighbor ? neighbor.strength / 100 : 0.5;
+			const authorityBoost = 1 + cfg.authorityWeight * normalizedStrength;
+			return {
+				...hit,
+				similarity: Math.min(hit.similarity * authorityBoost, 1.0),
+			};
+		});
 
-	// 4. Merge + deduplicate (initial docs take priority)
-	const merged = [...initialDocs];
-	const seenIds = new Set(initialDocs.map((d) => d.documentId));
+		// 4. Merge + deduplicate (initial docs take priority)
+		const merged = [...initialDocs];
+		const seenIds = new Set(initialDocs.map((d) => d.documentId));
 
-	for (const hit of weightedHits) {
-		if (seenIds.has(hit.documentId)) continue;
-		seenIds.add(hit.documentId);
-		merged.push(hit);
-	}
+		for (const hit of weightedHits) {
+			if (seenIds.has(hit.documentId)) continue;
+			seenIds.add(hit.documentId);
+			merged.push(hit);
+		}
 
-	// 5. Re-sort by similarity and cap
-	merged.sort((a, b) => b.similarity - a.similarity);
+		// 5. Re-sort by similarity and cap
+		merged.sort((a, b) => b.similarity - a.similarity);
 
-	console.log(
-		`[KAG Expand] Merged ${expansionHits.length} expansion chunks → ` +
-			`${merged.length} total (was ${initialDocs.length})`
-	);
+		console.log(
+			`[KAG Expand] Merged ${expansionHits.length} expansion chunks → ` +
+				`${merged.length} total (was ${initialDocs.length})`
+		);
 
-	return merged;
+		return merged;
+	}); // end traceGraph
 }
 
 /**

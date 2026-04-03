@@ -156,16 +156,18 @@ async function mirrorToPgvector(
 	documentId: string,
 	embedding: number[]
 ): Promise<void> {
-	const { db } = await import('$lib/server/db/client');
-	const vectorStr = `[${embedding.join(',')}]`;
-	await db.execute(sql`
-		INSERT INTO document_tags (document_id, tag_label, tag_category, embedding, confidence, source)
-		VALUES (${documentId}, ${tag.label}, ${tag.category}, ${vectorStr}::vector, ${tag.confidence}, ${tag.source})
-		ON CONFLICT (document_id, tag_label) DO UPDATE SET
-			confidence = EXCLUDED.confidence,
-			embedding = EXCLUDED.embedding,
-			source = EXCLUDED.source
-	`);
+	return traceDB('tag-mirror-pgvector', { tag: tag.label, documentId: documentId.slice(0, 8) }, async () => {
+		const { db } = await import('$lib/server/db/client');
+		const vectorStr = `[${embedding.join(',')}]`;
+		await db.execute(sql`
+			INSERT INTO document_tags (document_id, tag_label, tag_category, embedding, confidence, source)
+			VALUES (${documentId}, ${tag.label}, ${tag.category}, ${vectorStr}::vector, ${tag.confidence}, ${tag.source})
+			ON CONFLICT (document_id, tag_label) DO UPDATE SET
+				confidence = EXCLUDED.confidence,
+				embedding = EXCLUDED.embedding,
+				source = EXCLUDED.source
+		`);
+	});
 }
 
 async function mirrorToQdrant(
@@ -173,27 +175,29 @@ async function mirrorToQdrant(
 	documentId: string,
 	embedding: number[]
 ): Promise<void> {
-	const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
-	const client = (qdrant as any).client;
-	const tagId = `${documentId}:${tag.label}`.replace(/[^a-zA-Z0-9_:-]/g, '_');
+	return traceVectorSearch('document_tags', { tag: tag.label, documentId: documentId.slice(0, 8), op: 'upsert' }, async () => {
+		const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
+		const client = (qdrant as any).client;
+		const tagId = `${documentId}:${tag.label}`.replace(/[^a-zA-Z0-9_:-]/g, '_');
 
-	await client.upsert('document_tags', {
-		wait: false,
-		points: [
-			{
-				id: tagId,
-				vector: embedding,
-				payload: {
-					tag_label: tag.label,
-					tag_category: tag.category,
-					confidence: tag.confidence,
-					source: tag.source,
-					document_id: documentId,
-					document_ids: [documentId],
-					created_at: new Date().toISOString()
+		await client.upsert('document_tags', {
+			wait: false,
+			points: [
+				{
+					id: tagId,
+					vector: embedding,
+					payload: {
+						tag_label: tag.label,
+						tag_category: tag.category,
+						confidence: tag.confidence,
+						source: tag.source,
+						document_id: documentId,
+						document_ids: [documentId],
+						created_at: new Date().toISOString()
+					}
 				}
-			}
-		]
+			]
+		});
 	});
 }
 
