@@ -43,6 +43,17 @@ const esbuildCommonJsResolverPatch = {
   },
 };
 
+// Fix piper-wasm: api.js imports ./expressions.js which is missing from the npm package (v0.1.4)
+// Redirect the import to our local shim that provides a no-op Expressions class
+const fixPiperWasmExpressions = {
+  name: 'fix-piper-wasm-expressions',
+  resolveId(id: string, importer: string | undefined) {
+    if (id === './expressions.js' && importer?.includes('piper-wasm')) {
+      return path.resolve('src/lib/shims/piper-expressions-shim.js');
+    }
+  },
+};
+
 // Stub out native .node addons (canvas, etc.) that can't be bundled by Rollup
 const stubNativeAddons = {
   name: 'stub-native-addons',
@@ -118,6 +129,7 @@ export default defineConfig(({ mode }) => {
       SVELTEKIT_dev: mode === 'development' ? 'true' : 'false',
     },
     plugins: [
+      fixPiperWasmExpressions,
       stubNativeAddons,
       stripDashedDefineKeys,
       ENABLE_CJS_RESOLVER_PATCH && esbuildCommonJsResolverPatch,
@@ -252,7 +264,7 @@ export default defineConfig(({ mode }) => {
       reportCompressedSize: false,
     },
     optimizeDeps: {
-      exclude: ['@webgpu/types', 'lucide-svelte'],
+      exclude: ['@webgpu/types', 'lucide-svelte', '@huggingface/transformers'],
       include: [
         '@grpc/grpc-js',
         '@grpc/proto-loader',
@@ -262,7 +274,6 @@ export default defineConfig(({ mode }) => {
         'svelte',
         '@sveltejs/kit',
         'onnxruntime-web',
-        '@huggingface/transformers',
       ],
       esbuildOptions: {
         target: 'ES2022',
@@ -274,6 +285,17 @@ export default defineConfig(({ mode }) => {
               build.onResolve({ filter: /^worker_threads$/ }, () => ({
                 path: path.resolve('src/lib/shims/worker-threads-browser-shim.js'),
               }));
+            },
+          },
+          {
+            name: 'piper-expressions-shim',
+            setup(build: any) {
+              // piper-wasm v0.1.4 api.js imports ./expressions.js which is missing from npm package
+              build.onResolve({ filter: /^\.\/expressions\.js$/ }, (args: any) => {
+                if (args.importer?.includes('piper-wasm')) {
+                  return { path: path.resolve('src/lib/shims/piper-expressions-shim.js') };
+                }
+              });
             },
           },
         ],
@@ -297,6 +319,7 @@ export default defineConfig(({ mode }) => {
         'simdjson-wasm',
         'onnxruntime-web',
         '@xenova/transformers',
+        '@huggingface/transformers', // v4.0.1 exports broken (.mjs missing) — browser-only dynamic import
         'piper-wasm',
         'nats',
         'ssh2',
@@ -306,6 +329,8 @@ export default defineConfig(({ mode }) => {
       alias: {
         __SERVER__: serverInternals,
         __PUBLIC__: publicInternals,
+        // @huggingface/transformers v4.0.1 has broken exports (missing .mjs files) — point to .js directly
+        '@huggingface/transformers': path.resolve('node_modules/@huggingface/transformers/dist/transformers.js'),
         // Shim worker_threads for onnxruntime-web (Emscripten WASM loaders import it at module level)
         worker_threads: path.resolve('src/lib/shims/worker-threads-browser-shim.js'),
       },

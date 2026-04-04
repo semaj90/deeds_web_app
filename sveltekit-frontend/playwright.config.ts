@@ -118,7 +118,7 @@ export default defineConfig({
     },
     {
       name: 'chromium-webgpu',
-      testMatch: '**/client-inference*',
+      testMatch: ['**/client-inference*', '**/e2b-client-inference*'],
       use: {
         ...devices['Desktop Chrome'],
         launchOptions: {

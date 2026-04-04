@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { ChatSession } from '$lib/models/ChatSession.svelte.js';
 	import TypewriterResponse from '$lib/components/ai/TypewriterResponse.svelte';
+	import ChatFeedback from '$lib/components/ai/ChatFeedback.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	// ScrollArea removed — bits-ui ScrollArea triggers $props() TDZ in Svelte 5.46.0
 	import Icon from '$lib/components/ui/Icon.svelte';
@@ -112,6 +113,13 @@
 			copiedIdx = idx;
 			setTimeout(() => { copiedIdx = null; }, 2000);
 		} catch { /* clipboard unavailable */ }
+	}
+
+	// Rate message quality (thumbs up/down)
+	function handleFeedback(messageIndex: number, helpful: boolean) {
+		if (session) {
+			session.rateFeedback(messageIndex, helpful);
+		}
 	}
 
 	// Clear chat conversation
@@ -583,7 +591,7 @@
 								<span>{formatTime(msg.timestamp)}</span>
 								{#if msg.source}
 									<span class="px-1 py-px rounded bg-white/5 text-[9px]">
-										{msg.source === 'local-onnx' ? 'LOCAL' : 'SERVER'}
+										{msg.source === 'local-e2b' ? 'E2B' : msg.source === 'local-onnx' ? 'LOCAL' : 'SERVER'}
 									</span>
 								{/if}
 								<button
@@ -630,10 +638,19 @@
 								{/if}
 							</div>
 
-							{#if msg.role === 'assistant' && msg.metadata?.confidence}
-								<span class="text-[10px] opacity-30 mt-0.5">
-									{Math.round((msg.metadata.confidence ?? 0) * 100)}% confidence
-								</span>
+							{#if msg.role === 'assistant'}
+								<div class="flex items-center gap-1 text-[10px] opacity-30 mt-0.5">
+									{#if msg.metadata?.confidence}
+										<span>
+											{Math.round((msg.metadata.confidence ?? 0) * 100)}% confidence
+										</span>
+									{/if}
+									<ChatFeedback
+										messageIndex={idx}
+										source={msg.source ?? 'unknown'}
+										onfeedback={handleFeedback}
+									/>
+								</div>
 							{/if}
 						</div>
 					</div>

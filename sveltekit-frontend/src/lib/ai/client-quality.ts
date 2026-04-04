@@ -15,8 +15,6 @@
  * Consumed by ChatSession.svelte.ts and client-llm-synthesis.ts.
  */
 
-import { clientCache } from './client-cache.js';
-
 // ── Types ────────────────────────────────────────────────────────────────
 
 /** Pre-retrieval confidence signals from RAG/KAG/DAG pipeline. */
@@ -89,7 +87,8 @@ const DEFAULT_THRESHOLDS = {
 	ragMinScore: 0.4,
 } as const;
 
-let _thresholds = { ...DEFAULT_THRESHOLDS };
+type Thresholds = { -readonly [K in keyof typeof DEFAULT_THRESHOLDS]: number };
+let _thresholds: Thresholds = { ...DEFAULT_THRESHOLDS };
 
 // ── Pre-Retrieval Confidence ─────────────────────────────────────────────
 
@@ -177,9 +176,10 @@ export function evaluateSynthesisQuality(
 	const queryLower = query.toLowerCase();
 	const responseLower = trimmed.toLowerCase();
 	const queryTerms = LEGAL_QUALITY_TERMS.filter(t => queryLower.includes(t));
+	let termCoverageScore: number;
 	if (queryTerms.length === 0) {
 		// Non-legal query — term coverage is not relevant
-		var termCoverageScore = 0.8;
+		termCoverageScore = 0.8;
 	} else {
 		const covered = queryTerms.filter(t => responseLower.includes(t));
 		termCoverageScore = covered.length / queryTerms.length;
@@ -331,7 +331,7 @@ async function _saveFeedbackHistory(history: QualityFeedback[]): Promise<void> {
 }
 
 /** Get current threshold values (useful for debug UI). */
-export function getThresholds(): typeof DEFAULT_THRESHOLDS {
+export function getThresholds(): Thresholds {
 	return { ..._thresholds };
 }
 

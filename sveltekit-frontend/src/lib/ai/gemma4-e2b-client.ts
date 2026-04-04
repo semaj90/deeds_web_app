@@ -70,7 +70,8 @@ async function estimateGPUMemoryMB(): Promise<number | null> {
 	if (typeof navigator === 'undefined' || !navigator.gpu) return null;
 
 	try {
-		const adapter = await navigator.gpu.requestAdapter();
+		const gpu = navigator.gpu as { requestAdapter(): Promise<{ limits: Record<string, number> } | null> };
+		const adapter = await gpu.requestAdapter();
 		if (!adapter) return null;
 
 		// maxBufferSize is the best proxy for total GPU memory available
