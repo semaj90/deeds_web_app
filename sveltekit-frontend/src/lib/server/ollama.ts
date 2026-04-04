@@ -13,9 +13,12 @@
 
 // VLM model configurations
 export const VLM_MODELS = {
-	vision: 'gemma3-vision:latest',
+	/** Gemma 4 E4B Q4_K_M — native multimodal (vision + audio), 131K context */
+	vision: 'gemma4:e4b-it-q4_K_M',
 	embedding: 'embeddinggemma:latest',
 	legal: 'gemma3-legal:latest',
+	/** Gemma 4 E4B Q4_K_M — 8B params, 131K context, native tool calling + thinking */
+	gemma4: 'gemma4:e4b-it-q4_K_M',
 } as const;
 
 export type VLMModel = (typeof VLM_MODELS)[keyof typeof VLM_MODELS];

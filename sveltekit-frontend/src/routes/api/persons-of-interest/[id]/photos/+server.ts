@@ -22,7 +22,7 @@ const THUMB_BUCKET = 'poi-photos';
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-const VLM_MODEL = 'gemma3-legal:latest';
+const VLM_MODEL = ENV.GEMMA4_MODEL ?? 'gemma3-legal:latest';
 const EMBED_MODEL = 'embeddinggemma:latest';
 const VLM_TIMEOUT = 60_000; // 60s for vision analysis
 

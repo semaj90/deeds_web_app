@@ -1,10 +1,11 @@
 /**
- * Client Inference Router — 3-tier routing: local ONNX vs retrieval-hybrid vs server.
+ * Client Inference Router — 4-tier routing: E2B → 270M ONNX → retrieval-hybrid → server.
  *
- * Three routing tiers:
- *   LOCAL     (score < 0.3): gemma270m ONNX — greetings, UI help, simple lookups
- *   RETRIEVAL (0.3–0.6):    Hybrid client+server — factual queries needing search
- *   SERVER    (score > 0.6): gemma3-legal full pipeline — legal reasoning, drafting
+ * Four routing tiers:
+ *   LOCAL-E2B  (score < 0.3, E2B ready):  Gemma 4 E2B 2.3B via Transformers.js
+ *   LOCAL-ONNX (score < 0.3, E2B unready): gemma270m ONNX fallback
+ *   RETRIEVAL  (0.3–0.6):    Hybrid client+server — factual queries needing search
+ *   SERVER     (score > 0.6): gemma3-legal full pipeline — legal reasoning, drafting
  *
  * Health-aware: polls /api/health/capabilities (30s cache) to know which
  * server services are actually available before escalating.
@@ -227,6 +228,8 @@ export function shouldEscalateToServer(
 		hasCaseContext?: boolean;
 		/** Pre-fetched capabilities (avoids async in sync decision path) */
 		capabilities?: ServerCapabilities | null;
+		/** Whether E2B model is loaded and ready (avoids async check) */
+		e2bReady?: boolean;
 	}
 ): RouterDecision {
 	// Classify intent via KAG system
@@ -234,7 +237,8 @@ export function shouldEscalateToServer(
 
 	// Explicit overrides
 	if (options?.forceLocal) {
-		return { source: 'local-onnx', reason: 'user-forced-local', confidence: 0.5, intent };
+		const localSource = options?.e2bReady ? 'local-e2b' : 'local-onnx';
+		return { source: localSource, reason: 'user-forced-local', confidence: 0.5, intent };
 	}
 
 	const caps = options?.capabilities ?? _cachedCaps;
@@ -253,7 +257,8 @@ export function shouldEscalateToServer(
 	// Only if message is short (< 200 chars) — prevents "hello, analyze this case" → local
 	const localHit = LOCAL_PATTERNS.some(p => lower.includes(p));
 	if (localHit && message.length < 200) {
-		return { source: 'local-onnx', reason: 'local-pattern', confidence: 0.9, intent: 'greeting' };
+		const localSource = options?.e2bReady ? 'local-e2b' : 'local-onnx';
+		return { source: localSource, reason: 'local-pattern', confidence: 0.9, intent: 'greeting' };
 	}
 
 	let serverScore = 0;
@@ -304,8 +309,9 @@ export function shouldEscalateToServer(
 	if (serverScore >= SERVER_THRESHOLD) {
 		// Health check: if server is down, fall to retrieval or local
 		if (caps && !caps.ollama) {
+			const localSource = options?.e2bReady ? 'local-e2b' : 'local-onnx';
 			return {
-				source: 'local-onnx',
+				source: localSource,
 				reason: reasonStr + '+server-unavailable',
 				confidence: 0.3,
 				intent
@@ -322,8 +328,9 @@ export function shouldEscalateToServer(
 	if (serverScore >= RETRIEVAL_THRESHOLD) {
 		// Health check: if RAG/server not available, fall to local
 		if (caps && (!caps.ollama || !caps.rag)) {
+			const localSource = options?.e2bReady ? 'local-e2b' : 'local-onnx';
 			return {
-				source: 'local-onnx',
+				source: localSource,
 				reason: reasonStr + '+rag-unavailable',
 				confidence: 0.4,
 				intent
@@ -337,8 +344,9 @@ export function shouldEscalateToServer(
 		};
 	}
 
+	const localSource = options?.e2bReady ? 'local-e2b' : 'local-onnx';
 	return {
-		source: 'local-onnx',
+		source: localSource,
 		reason: reasonStr,
 		confidence: 1.0 - serverScore,
 		intent

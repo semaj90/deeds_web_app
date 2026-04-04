@@ -36,6 +36,8 @@ export const ENV = {
   QDRANT_URL: privateEnv.QDRANT_URL ?? qdrantUrlFromParts() ?? DEV.QDRANT_URL,
   RABBITMQ_URL: privateEnv.RABBITMQ_URL ?? DEV.RABBITMQ_URL,
   OLLAMA_BASE_URL: privateEnv.OLLAMA_BASE_URL ?? privateEnv.OLLAMA_URL ?? DEV.OLLAMA_URL,
+  /** Gemma 4 E4B model tag for tool-calling / complex reasoning (131K ctx, native thinking) */
+  GEMMA4_MODEL: privateEnv.GEMMA4_MODEL ?? 'gemma4:e4b-it-q4_K_M',
   PUBLIC_API_URL: publicEnv.PUBLIC_API_URL ?? DEV.PUBLIC_API_URL,
   MINIO_ENDPOINT: privateEnv.MINIO_ENDPOINT ?? DEV.MINIO_ENDPOINT,
   MINIO_PORT: privateEnv.MINIO_PORT ?? DEV.MINIO_PORT,

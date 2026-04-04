@@ -25,6 +25,20 @@ const GEMMA3_DEFAULTS = {
   num_predict: 2048, // sensible completion cap
 } as const;
 
+const GEMMA4_DEFAULTS = {
+  temperature: 0.1,
+  top_k: 20,
+  top_p: 0.8,
+  num_ctx: 32768, // Gemma 4 supports 131K; 32K is practical for 8GB VRAM with Q8_0 KV
+  repeat_penalty: 1.05,
+  num_predict: 4096, // Gemma 4 can handle longer completions
+} as const;
+
+/** Pick model defaults based on model name */
+function getModelDefaults(model: string) {
+  return model.startsWith('gemma4') ? GEMMA4_DEFAULTS : GEMMA3_DEFAULTS;
+}
+
 export interface LLMMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
@@ -79,12 +93,12 @@ export async function generateCompletion(
         stream: false,
         keep_alive: getChatModelKeepAlive(),
         options: {
-          temperature: options.temperature ?? GEMMA3_DEFAULTS.temperature,
-          num_predict: options.maxTokens ?? GEMMA3_DEFAULTS.num_predict,
-          top_p: options.topP ?? GEMMA3_DEFAULTS.top_p,
-          top_k: options.topK ?? GEMMA3_DEFAULTS.top_k,
-          num_ctx: GEMMA3_DEFAULTS.num_ctx,
-          repeat_penalty: GEMMA3_DEFAULTS.repeat_penalty,
+          temperature: options.temperature ?? getModelDefaults(model).temperature,
+          num_predict: options.maxTokens ?? getModelDefaults(model).num_predict,
+          top_p: options.topP ?? getModelDefaults(model).top_p,
+          top_k: options.topK ?? getModelDefaults(model).top_k,
+          num_ctx: getModelDefaults(model).num_ctx,
+          repeat_penalty: getModelDefaults(model).repeat_penalty,
         },
       }),
     });
@@ -144,12 +158,12 @@ export async function chatCompletion(
         stream: false,
         keep_alive: getChatModelKeepAlive(),
         options: {
-          temperature: options.temperature ?? GEMMA3_DEFAULTS.temperature,
-          num_predict: options.maxTokens ?? GEMMA3_DEFAULTS.num_predict,
-          top_p: options.topP ?? GEMMA3_DEFAULTS.top_p,
-          top_k: options.topK ?? GEMMA3_DEFAULTS.top_k,
-          num_ctx: GEMMA3_DEFAULTS.num_ctx,
-          repeat_penalty: GEMMA3_DEFAULTS.repeat_penalty,
+          temperature: options.temperature ?? getModelDefaults(model).temperature,
+          num_predict: options.maxTokens ?? getModelDefaults(model).num_predict,
+          top_p: options.topP ?? getModelDefaults(model).top_p,
+          top_k: options.topK ?? getModelDefaults(model).top_k,
+          num_ctx: getModelDefaults(model).num_ctx,
+          repeat_penalty: getModelDefaults(model).repeat_penalty,
         },
       }),
     });

@@ -68,13 +68,14 @@ function ensureLoki(): { replies: Collection<LokiReplyEntry>; router: Collection
 // ── IndexedDB: Persistent Cache ──────────────────────────────────────────
 
 const DB_NAME = 'deeds-ai-cache';
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 const STORES = {
 	replies: 'replies',
 	embeddings: 'embeddings',
 	chatHistory: 'chatHistory',
 	cartridges: 'cartridges',
-	gpuResults: 'gpuResults'
+	gpuResults: 'gpuResults',
+	llmSynthesis: 'llmSynthesis'
 } as const;
 
 /** 7-day TTL for persistent cache entries */
@@ -103,6 +104,9 @@ function getDB(): Promise<IDBPDatabase> {
 				}
 				if (!db.objectStoreNames.contains(STORES.gpuResults)) {
 					db.createObjectStore(STORES.gpuResults, { keyPath: 'computeHash' });
+				}
+				if (!db.objectStoreNames.contains(STORES.llmSynthesis)) {
+					db.createObjectStore(STORES.llmSynthesis, { keyPath: 'queryHash' });
 				}
 			}
 		});
@@ -410,7 +414,7 @@ export const clientCache = {
     const cutoff = Date.now() - TTL_MS;
     try {
       const db = await getDB();
-      for (const storeName of [STORES.replies, STORES.embeddings, STORES.gpuResults]) {
+      for (const storeName of [STORES.replies, STORES.embeddings, STORES.gpuResults, STORES.llmSynthesis]) {
         const tx = db.transaction(storeName, 'readwrite');
         let cursor = await tx.store.openCursor();
         while (cursor) {
@@ -425,5 +429,40 @@ export const clientCache = {
       // Non-critical
     }
     return evicted;
+  },
+
+  /** Cache an LLM synthesis result (RAG/KAG/DAG response) — 1hr TTL */
+  async putSynthesis(queryHash: string, response: string, source: string, ragContext?: string): Promise<void> {
+    if (typeof window === 'undefined') return;
+    try {
+      const db = await getDB();
+      await db.put(STORES.llmSynthesis, {
+        queryHash,
+        response,
+        source,
+        ragContext: ragContext ?? '',
+        timestamp: Date.now(),
+      });
+    } catch {
+      /* non-critical */
+    }
+  },
+
+  /** Retrieve a cached LLM synthesis result (1hr TTL) */
+  async getSynthesis(queryHash: string): Promise<{ response: string; source: string } | null> {
+    if (typeof window === 'undefined') return null;
+    try {
+      const db = await getDB();
+      const entry = await db.get(STORES.llmSynthesis, queryHash);
+      if (!entry) return null;
+      // Synthesis cache has shorter TTL — 1 hour
+      if (Date.now() - entry.timestamp > 3_600_000) {
+        await db.delete(STORES.llmSynthesis, queryHash);
+        return null;
+      }
+      return { response: entry.response, source: entry.source };
+    } catch {
+      return null;
+    }
   },
 };

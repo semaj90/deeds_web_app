@@ -1275,8 +1275,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           graphContext?.neighbors?.map((n) => ({
             nodeId: n.nodeId,
             title: n.title,
-            relationship: n.relationship,
-            score: n.score,
+            relationship: n.connectionType,
           })) ?? [],
         chatHistory: conversationHistory
           .filter(
@@ -1766,6 +1765,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                   codebaseContext: null,
                   kbChunks: [],
                   caseChunks: [],
+                  policyDecision: null,
                 },
                 backend: inferenceBackend,
               }),
@@ -1809,10 +1809,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 let retryStreamed = false;
 
                 // Use same backend cascade for retry: TRT-LLM → Triton → Ollama
-                if (inferenceBackend === 'tensorrt' || inferenceBackend === 'triton') {
+                const retryBackend = inferenceBackend as 'tensorrt' | 'triton' | 'ollama';
+                if (retryBackend === 'tensorrt' || retryBackend === 'triton') {
                   try {
                     const retryStream =
-                      inferenceBackend === 'tensorrt'
+                      retryBackend === 'tensorrt'
                         ? streamTrtLLM({ prompt: retryFlatPrompt, temperature: 0.7 })
                         : streamTritonLLM({ prompt: retryFlatPrompt, temperature: 0.7 });
                     for await (const chunk of retryStream) {

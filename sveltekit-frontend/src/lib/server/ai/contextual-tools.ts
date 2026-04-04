@@ -1,12 +1,16 @@
 /**
  * Shared contextual tool definitions and executor for agentic chat endpoints.
  * Used by /api/sse/chat and /api/contextual/chat.
+ *
+ * Uses SIMD JSON parsing for Ollama response deserialization (fastJsonParse)
+ * and Zod schema validation for tool call arguments.
  */
 import {
 	completeToolParameters,
 	shouldUseWebSearchFallback,
 	type ToolExecutionPolicyContext,
 } from '$lib/server/ace/policy.js';
+import { z } from 'zod';
 
 export interface ContextualToolResult {
 	ok: boolean;
@@ -123,6 +127,44 @@ const TOOL_TIMEOUT_MS: Record<string, number> = {
 	authority_drill: 8_000,
 	case_search: 6_000,
 };
+
+// ── Zod schemas for tool call argument validation ─────────────────────
+
+const TOOL_ARG_SCHEMAS: Record<string, z.ZodType> = {
+	glossary_search: z.object({
+		query: z.string().min(1),
+		limit: z.number().int().min(1).max(20).optional(),
+	}),
+	rag_search: z.object({
+		query: z.string().min(1),
+		limit: z.number().int().min(1).max(20).optional(),
+	}),
+	web_search: z.object({
+		query: z.string().min(1),
+		maxResults: z.number().int().min(1).max(10).optional(),
+	}),
+	graph_expand: z.object({
+		caseId: z.string().uuid(),
+		limit: z.number().int().min(1).max(20).optional(),
+	}),
+	authority_drill: z.object({
+		query: z.string().min(1),
+		maxHops: z.number().int().min(1).max(4).optional(),
+	}),
+	case_search: z.object({
+		query: z.string().min(1),
+		limit: z.number().int().min(1).max(20).optional(),
+	}),
+};
+
+/** Validate tool call arguments against Zod schema. Returns sanitized args or null. */
+function validateToolArgs(name: string, args: Record<string, unknown>): Record<string, unknown> | null {
+	const schema = TOOL_ARG_SCHEMAS[name];
+	if (!schema) return args; // Unknown tool — pass through
+	const result = schema.safeParse(args);
+	if (result.success) return result.data as Record<string, unknown>;
+	return null; // Invalid args
+}
 
 /** Execute a contextual tool call and return a normalized result */
 export async function executeContextualTool(
@@ -412,11 +454,11 @@ export async function runToolDetectionPass(
 						temperature: 0.1,
 						top_k: 20,
 						top_p: 0.8,
-						num_ctx: 2048,
-						num_predict: 128,
+						num_ctx: 4096,
+						num_predict: 256, // Gemma 4 uses thinking tokens before tool calls
 					},
 				}),
-				signal: AbortSignal.timeout(8_000),
+				signal: AbortSignal.timeout(15_000),
 			});
 		} catch {
 			// Timeout or network error — abort tool detection silently
@@ -427,7 +469,10 @@ export async function runToolDetectionPass(
 
 		let data: any;
 		try {
-			data = await res.json();
+			// Use SIMD JSON parsing for large Ollama responses (thinking tokens can be 10KB+)
+			const rawText = await res.text();
+			const { fastJsonParse } = await import('$lib/server/gpu/simdjson-bridge.js');
+			data = fastJsonParse(rawText);
 		} catch {
 			break;
 		}
@@ -440,8 +485,22 @@ export async function runToolDetectionPass(
 		for (const tc of toolCalls) {
 			if (totalToolCalls >= MAX_TOTAL_TOOL_CALLS) break;
 			const toolName = tc.function?.name;
-			const toolArgs = tc.function?.arguments || {};
+			const rawArgs = tc.function?.arguments || {};
 			if (!toolName) continue;
+
+			// Validate arguments against Zod schema before execution
+			const toolArgs = validateToolArgs(toolName, rawArgs);
+			if (!toolArgs) {
+				allResults.push({
+					ok: false,
+					tool: toolName,
+					result: `Invalid tool arguments for ${toolName}`,
+					durationMs: 0,
+				});
+				totalToolCalls++;
+				messages.push({ role: 'tool', content: `Invalid arguments for ${toolName}` });
+				continue;
+			}
 
 			const tr = await executeContextualTool(toolName, toolArgs, {
 				...policyContext,

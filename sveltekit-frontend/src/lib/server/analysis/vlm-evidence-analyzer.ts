@@ -178,7 +178,7 @@ async function inferOllamaVLM(
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma3-legal:latest',
+				model: ENV.GEMMA4_MODEL ?? 'gemma3-legal:latest',
 				prompt,
 				images: [base64Image],
 				stream: false,

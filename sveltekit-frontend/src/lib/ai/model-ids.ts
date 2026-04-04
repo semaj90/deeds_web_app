@@ -10,9 +10,18 @@
  *   - embeddinggemma:latest for embeddings (768-dim)
  */
 
-// ── Client-side ONNX models (browser inference via Dawn/WebGPU) ──────────
+// ── Client-side Gemma 4 E2B (Transformers.js + WebGPU, primary) ──────────
 
-/** 270M Gemma3 — W8A16 quantized ONNX for client chat/routing */
+/** Gemma 4 E2B 2.3B — Q4F16 via @huggingface/transformers v4 */
+export const CLIENT_E2B_MODEL_ID = 'onnx-community/gemma-4-E2B-it-ONNX';
+export const CLIENT_E2B_DTYPE = 'q4f16' as const;
+export const CLIENT_E2B_DEVICE = 'webgpu' as const;
+/** Minimum WebGPU adapter memory (bytes) to attempt E2B loading */
+export const CLIENT_E2B_MIN_GPU_MB = 2048;
+
+// ── Client-side ONNX models (browser inference via Dawn/WebGPU, fallback) ─
+
+/** 270M Gemma3 — W8A16 quantized ONNX for client chat/routing (fallback) */
 export const CLIENT_LLM_MODEL = 'gemma3-client-onnx';
 export const CLIENT_LLM_ONNX_PATH = '/gemma3_270m_onnx/gemma3_270m_w8a16.onnx';
 export const CLIENT_LLM_QUANTIZED_PATH = '/gemma3_270m_onnx/gemma3_client_quantized.onnx';
@@ -30,6 +39,9 @@ export const CLIENT_EMBEDDING_TOKENIZER_PATH = '/embeddinggemma_300m_onnx/tokeni
 
 /** gemma3-legal:latest — 12B fine-tuned legal LLM via Ollama */
 export const SERVER_CHAT_MODEL = 'gemma3-legal:latest';
+
+/** gemma4:e4b Q4_K_M — 8B params, 131K context, native tool calling + thinking via Ollama */
+export const SERVER_GEMMA4_MODEL = 'gemma4:e4b-it-q4_K_M';
 
 /** embeddinggemma:latest — 768-dim server embeddings via Ollama */
 export const SERVER_EMBEDDING_MODEL = 'embeddinggemma:latest';
@@ -59,6 +71,6 @@ export const ONNX_EXECUTION_PROVIDERS = ['webgpu', 'wasm', 'cpu'] as const;
 
 // ── Inference source tags (for SSE chunk attribution) ────────────────────
 
-export type InferenceSource = 'local-onnx' | 'local-wasm' | 'server-ollama' | 'server-gemini' | 'retrieval-hybrid';
+export type InferenceSource = 'local-e2b' | 'local-onnx' | 'local-wasm' | 'server-ollama' | 'server-gemini' | 'retrieval-hybrid';
 
 // WASM llama.cpp worker ARCHIVED → deeds_labs/wasm-archive/ (ONNX Runtime WebGPU is superior path)
