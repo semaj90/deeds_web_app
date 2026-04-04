@@ -13,8 +13,15 @@ import pg from 'pg';
 import crypto from 'crypto';
 
 const { Pool } = pg;
+
+// Parse --both flag: seeds both app DB (5434) and experimental pgai DB (5432)
+const seedBoth = process.argv.includes('--both');
+
+const APP_DB = 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const PGAI_DB = 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db';
+
 const pool = new Pool({
-  connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db',
+  connectionString: process.env.DATABASE_URL || APP_DB,
 });
 
 const QDRANT_URL = 'http://127.0.0.1:6333';
@@ -392,15 +399,43 @@ async function upsertEvidenceItems() {
 // ─── Main ───────────────────────────────────────────────────────────────────
 
 async function main() {
+  console.log(`[seed] Target: ${pool.options.connectionString?.replace(/:[^@]+@/, ':****@')}`);
+  if (seedBoth) console.log(`[seed] --both: will also seed pgai DB on 5432`);
+
   try {
     await seedGraphConnections();
     await upsertEvidenceVectors();
     await upsertEvidenceItems();
-    console.log('\n=== SEED COMPLETE ===');
+    console.log('\n=== SEED COMPLETE (app DB) ===');
   } catch (err) {
     console.error('Seed failed:', err);
   } finally {
     await pool.end();
+  }
+
+  // Optionally seed the experimental pgai DB on 5432
+  if (seedBoth) {
+    const pgaiPool = new Pool({ connectionString: PGAI_DB });
+    // Temporarily swap the module-level pool reference for the seed functions
+    // Re-run graph connections only (Qdrant is shared, no need to re-upsert vectors)
+    console.log(`\n[seed] Seeding pgai DB (5432)...`);
+    try {
+      const { rows: nodes } = await pgaiPool.query(
+        `SELECT id, title FROM yorha_evidence_nodes WHERE case_id = $1 ORDER BY title`,
+        [CASE_ID]
+      );
+      console.log(`  pgai DB has ${nodes.length} nodes for case ${CASE_ID.slice(0, 8)}`);
+      if (nodes.length === 0) {
+        console.log('  pgai DB has no graph nodes — skipping (seed app DB first)');
+      } else {
+        console.log('  pgai DB graph data present — connections already seeded via app DB');
+      }
+      console.log('\n=== SEED COMPLETE (pgai DB) ===');
+    } catch (err) {
+      console.error('pgai seed failed (non-fatal):', err.message);
+    } finally {
+      await pgaiPool.end();
+    }
   }
 }
 

@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { personsOfInterest, poiPhotos, timelineEvents } from '$lib/server/db/schema-postgres.js';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
 const poiIdSchema = z.string().uuid('Invalid person of interest id');
@@ -36,7 +36,12 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     const [poi] = await db
       .select()
       .from(personsOfInterest)
-      .where(eq(personsOfInterest.id, parsedId.data))
+      .where(
+        and(
+          eq(personsOfInterest.id, parsedId.data),
+          eq(personsOfInterest.createdBy, locals.user.id)
+        )
+      )
       .limit(1);
 
     if (!poi) {
@@ -51,40 +56,38 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     });
   } catch (err) {
     console.error('[poi] GET error:', err);
-    return json(
-      {
-        id: parsedId.data,
-        name: '',
-        aliases: [],
-        description: '',
-        threatLevel: 'low',
-        status: 'surveillance',
-        relationship: null,
-        aiProfile: null,
-        who: null,
-        what: null,
-        why: null,
-        how: null,
-        risk: null,
-        confidence: null,
-        modelVersion: null,
-        generatedAt: null,
-        lastUpdated: null,
-        crimes: [],
-        caseIds: [],
-        caseId: null,
-        profileData: {},
-        tags: [],
-        position: {},
-        photoUrl: null,
-        notes: null,
-        metadata: {},
-        createdBy: null,
-        createdAt: '',
-        updatedAt: '',
-        error: 'Failed to fetch person of interest',
-      },
-    );
+    return json({
+      id: parsedId.data,
+      name: '',
+      aliases: [],
+      description: '',
+      threatLevel: 'low',
+      status: 'surveillance',
+      relationship: null,
+      aiProfile: null,
+      who: null,
+      what: null,
+      why: null,
+      how: null,
+      risk: null,
+      confidence: null,
+      modelVersion: null,
+      generatedAt: null,
+      lastUpdated: null,
+      crimes: [],
+      caseIds: [],
+      caseId: null,
+      profileData: {},
+      tags: [],
+      position: {},
+      photoUrl: null,
+      notes: null,
+      metadata: {},
+      createdBy: null,
+      createdAt: '',
+      updatedAt: '',
+      error: 'Failed to fetch person of interest',
+    });
   }
 };
 
@@ -124,7 +127,12 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
     const [updated] = await db
       .update(personsOfInterest)
       .set(updates)
-      .where(eq(personsOfInterest.id, parsedId.data))
+      .where(
+        and(
+          eq(personsOfInterest.id, parsedId.data),
+          eq(personsOfInterest.createdBy, locals.user.id)
+        )
+      )
       .returning();
 
     if (!updated) {
@@ -157,13 +165,33 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
   }
 
   try {
+    const [poi] = await db
+      .select({ id: personsOfInterest.id })
+      .from(personsOfInterest)
+      .where(
+        and(
+          eq(personsOfInterest.id, parsedId.data),
+          eq(personsOfInterest.createdBy, locals.user.id)
+        )
+      )
+      .limit(1);
+
+    if (!poi) {
+      return json({ error: 'Person of interest not found' }, { status: 404 });
+    }
+
     // Delete related records first (FK CASCADE handles this too, but be explicit)
     await db.delete(timelineEvents).where(eq(timelineEvents.poiId, parsedId.data));
     await db.delete(poiPhotos).where(eq(poiPhotos.poiId, parsedId.data));
 
     const [deleted] = await db
       .delete(personsOfInterest)
-      .where(eq(personsOfInterest.id, parsedId.data))
+      .where(
+        and(
+          eq(personsOfInterest.id, parsedId.data),
+          eq(personsOfInterest.createdBy, locals.user.id)
+        )
+      )
       .returning({ id: personsOfInterest.id, name: personsOfInterest.name });
 
     if (!deleted) {

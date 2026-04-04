@@ -1,75 +1,117 @@
-# 🚀 Phase 96: Langfuse v3 + ClickHouse + Neo4j + PyTorch
-# Advanced LLM Observability with Knowledge Graph Integration
-# Uses your existing: Postgres 17, Neo4j, PyTorch
-# Usage: docker-compose -f docker/langfuse.yml up -d
-
-version: '3.8'
+# Langfuse v3 — LLM Observability with ClickHouse
+# Integrates with: Neo4j (traceGraph), RabbitMQ (traceQueue), Ollama (traceLLM/traceEmbedding)
+# Reuses existing: deeds-postgres-prod, deeds-redis-prod, phase66-minio
+# Only adds: ClickHouse + Langfuse Web + Langfuse Worker
+# Usage: docker compose -f docker/langfuse.yml up -d
 
 services:
-  # ClickHouse - Fast analytics database for traces (Langfuse v3 requirement)
-  clickhouse:
-    image: clickhouse/clickhouse-server:latest
+  # ClickHouse — OLAP store for traces/observations/scores (required by Langfuse v3)
+  langfuse-clickhouse:
+    image: clickhouse/clickhouse-server
     container_name: langfuse-clickhouse
     restart: unless-stopped
-    ports:
-      - "5123:8123"  # HTTP interface on port 5123 (safe range)
-      - "5900:9000"  # Native protocol on port 5900 (fallback range)
+    user: "101:101"
     environment:
-      CLICKHOUSE_DB: langfuse
-      CLICKHOUSE_USER: default
-      CLICKHOUSE_PASSWORD: clickhouse_password
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_USER: clickhouse
+      CLICKHOUSE_PASSWORD: clickhouse_langfuse
     volumes:
-      - clickhouse-data:/var/lib/clickhouse
-      - ./clickhouse/init:/docker-entrypoint-initdb.d  # Auto-create tables on first start
-      - ./clickhouse/config/keeper.xml:/etc/clickhouse-server/config.d/keeper.xml
+      - langfuse_clickhouse_data:/var/lib/clickhouse
+      - langfuse_clickhouse_logs:/var/log/clickhouse-server
+    ports:
+      - "127.0.0.1:8124:8123"   # HTTP (8124 to avoid conflicts)
+      - "127.0.0.1:9009:9000"   # Native (9009 to avoid MinIO on 9000)
+    networks:
+      - default
+      - deeds-bridge
     healthcheck:
-      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
-      interval: 10s
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1"]
+      interval: 5s
       timeout: 5s
-      retries: 5
-    ulimits:
-      nofile:
-        soft: 262144
-        hard: 262144
+      retries: 10
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 256M
 
-  # Langfuse v3 - Main observability server
-  langfuse-server:
-    image: langfuse/langfuse:2
-    container_name: langfuse-server
+  # Langfuse Worker — async trace processing
+  langfuse-worker:
+    image: langfuse/langfuse-worker:3
+    container_name: langfuse-worker
     restart: unless-stopped
     depends_on:
-      clickhouse:
+      langfuse-clickhouse:
         condition: service_healthy
-    ports:
-      - "3030:3000"  # Langfuse UI at http://localhost:3030
-    environment:
-      # Postgres (metadata) - Uses existing deeds-postgres-prod container
+    environment: &langfuse-env
+      # Postgres (metadata) — reuses existing deeds-postgres-prod
       DATABASE_URL: postgresql://legal_admin:123456@deeds-postgres-prod:5432/langfuse?connect_timeout=10&pool_timeout=10
 
-      # ClickHouse disabled for v2 (Postgres-only mode)
-      # CLICKHOUSE_URL: http://clickhouse:8123
-      # CLICKHOUSE_MIGRATION_URL: clickhouse://default:clickhouse_password@clickhouse:9000/langfuse
+      # ClickHouse (traces/observations/scores)
+      CLICKHOUSE_URL: http://langfuse-clickhouse:8123
+      CLICKHOUSE_MIGRATION_URL: clickhouse://clickhouse:clickhouse_langfuse@langfuse-clickhouse:9000
+      CLICKHOUSE_USER: clickhouse
+      CLICKHOUSE_PASSWORD: clickhouse_langfuse
+      CLICKHOUSE_CLUSTER_ENABLED: "false"
+
+      # S3/MinIO — reuses existing phase66-minio
+      LANGFUSE_S3_EVENT_UPLOAD_BUCKET: langfuse
+      LANGFUSE_S3_EVENT_UPLOAD_REGION: auto
+      LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: admin
+      LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: password
+      LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: http://phase66-minio:9000
+      LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: "true"
+      LANGFUSE_S3_EVENT_UPLOAD_PREFIX: events/
+      LANGFUSE_S3_MEDIA_UPLOAD_BUCKET: langfuse
+      LANGFUSE_S3_MEDIA_UPLOAD_REGION: auto
+      LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID: admin
+      LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY: password
+      LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT: http://phase66-minio:9000
+      LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE: "true"
+      LANGFUSE_S3_MEDIA_UPLOAD_PREFIX: media/
+      LANGFUSE_USE_AZURE_BLOB: "false"
+
+      # Redis — reuses existing deeds-redis-prod (no auth)
+      REDIS_HOST: deeds-redis-prod
+      REDIS_PORT: "6379"
+      # REDIS_AUTH not set — deeds-redis-prod has no auth
+      REDIS_TLS_ENABLED: "false"
 
       # Server
       NEXTAUTH_URL: http://localhost:3030
-      NEXTAUTH_SECRET: langfuse-secret-key-change-in-production-min-32-chars
       SALT: langfuse-salt-change-in-production
       ENCRYPTION_KEY: 8754be3c748398a38dd9a797fbb84747cb8b94d34dd15a2d5237851dbbe1b671
 
-      # Redis (existing deeds-redis-prod on host port 6379)
-      REDIS_CONNECTION_STRING: redis://deeds-redis-prod:6379
-
-      # Auth (disable for local dev)
-      AUTH_DISABLE_USERNAME_PASSWORD: "false"
-      AUTH_DISABLE_SIGNUP: "false"
-
       # Telemetry
       TELEMETRY_ENABLED: "false"
-
-      # Feature flags
       LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: "true"
+    networks:
+      - default
+      - deeds-bridge
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
 
-      # Auto-seed project with API keys (runs on first boot only)
+  # Langfuse Web — UI + API on port 3030
+  langfuse-web:
+    image: langfuse/langfuse:3
+    container_name: langfuse-server
+    restart: unless-stopped
+    depends_on:
+      langfuse-clickhouse:
+        condition: service_healthy
+    ports:
+      - "3030:3000"
+    environment:
+      <<: *langfuse-env
+      NEXTAUTH_SECRET: langfuse-secret-key-change-in-production-min-32-chars
+
+      # Auto-seed project with API keys (first boot only)
       LANGFUSE_INIT_ORG_ID: deeds-legal-ai
       LANGFUSE_INIT_ORG_NAME: Deeds Legal AI
       LANGFUSE_INIT_PROJECT_ID: deeds-observability
@@ -83,110 +125,54 @@ services:
       - default
       - deeds-bridge
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/public/health || exit 1"]
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://$(hostname):3000/api/public/health || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
+      start_period: 30s
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
-  # Data Mirror Service - Syncs Postgres/Qdrant → ClickHouse with Ollama auto-tagging
-  clickhouse-mirror:
-    build:
-      context: ./clickhouse-mirror
-      dockerfile: Dockerfile
-    container_name: clickhouse-mirror
-    restart: unless-stopped
-    depends_on:
-      clickhouse:
-        condition: service_healthy
-    environment:
-      POSTGRES_URL: postgresql://user:pass@172.23.32.1:5434/legal
-      CLICKHOUSE_HOST: clickhouse
-      CLICKHOUSE_PORT: "8123"  # Internal Docker network port
-      CLICKHOUSE_USER: default
-      CLICKHOUSE_PASSWORD: clickhouse_password
-      OLLAMA_URL: http://172.23.32.1:11434
-      OLLAMA_MODEL: gemma3-legal:latest
-      SYNC_INTERVAL: "60"  # Sync every 60 seconds
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 256M
 
 networks:
   deeds-bridge:
     external: true
 
 volumes:
-  clickhouse-data:
-    name: langfuse-clickhouse-data
+  langfuse_clickhouse_data:
+  langfuse_clickhouse_logs:
 
-# 📊 ARCHITECTURE:
-# ┌─────────────────────────────────────────────────────────┐
-# │                   CrewAI Agents                         │
-# │              (Legal, Document, Case)                    │
-# └────────────┬────────────────────────────────────────────┘
-#              │
-#              ▼
-# ┌─────────────────────────────────────────────────────────┐
-# │              Langfuse v3 (Port 3030)                    │
-# │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐     │
-# │  │  Postgres   │  │ ClickHouse  │  │   Neo4j     │     │
-# │  │ (metadata)  │  │  (traces)   │  │  (graphs)   │     │
-# │  └─────────────┘  └─────────────┘  └─────────────┘     │
-# └─────────────────────────────────────────────────────────┘
-#              │
-#              ▼
-# ┌─────────────────────────────────────────────────────────┐
-# │           PyTorch Analytics Service                     │
-# │  - Trace embedding generation                           │
-# │  - Agent behavior clustering                            │
-# │  - Anomaly detection in LLM calls                       │
-# │  - Cost optimization recommendations                    │
-# └─────────────────────────────────────────────────────────┘
+# ARCHITECTURE (v3 — ClickHouse + existing infra):
+#   Langfuse Web (Port 3030) ──→ Langfuse Worker (async processing)
+#     ├── deeds-postgres-prod (metadata, langfuse DB)
+#     ├── langfuse-clickhouse (traces/observations/scores)
+#     ├── deeds-redis-prod (cache/queues, no auth)
+#     └── phase66-minio (S3 event/media upload, langfuse bucket)
 #
-# 🚀 USAGE:
-# 1. Start stack:
-#    docker-compose -f docker/langfuse.yml up -d
+#   SDK Trace Wrappers (in SvelteKit — langfuse.ts):
+#     traceLLM()        → Ollama inference calls
+#     traceEmbedding()  → embeddinggemma/nomic embedding calls
+#     traceRAG()        → Qdrant vector search + retrieval pipeline
+#     traceGraph()      → Neo4j knowledge graph queries
+#     traceQueue()      → RabbitMQ publish/consume operations
+#     traceDB()         → PostgreSQL database queries
+#     traceCache()      → Redis cache operations
+#     traceCouchDB()    → CouchDB document operations
+#     traceWorker()     → Worker thread operations
+#     traceVectorSearch() → Qdrant direct search calls
 #
-# 2. Access UI: http://localhost:3030
-#    - Create account (first visit)
-#    - Settings > API Keys → Get keys
+# USAGE:
+#   docker compose -f docker/langfuse.yml up -d
+#   UI: http://localhost:3030 (admin@deeds-legal.ai / admin123)
+#   Keys auto-seeded via LANGFUSE_INIT_PROJECT_* env vars
 #
-# 3. Integration:
-#    export LANGFUSE_PUBLIC_KEY="pk-lf-..."
-#    export LANGFUSE_SECRET_KEY="sk-lf-..."
-#    export LANGFUSE_HOST="http://localhost:3030"
-#
-# 4. CrewAI with Langfuse:
-#    from langfuse import Langfuse
-#    langfuse = Langfuse()  # Auto-reads env vars
-#
-# 📈 FEATURES:
-# ✅ ClickHouse: Fast trace storage (10x faster than Postgres for analytics)
-# ✅ Neo4j: Agent relationship graphs, decision trees
-# ✅ PyTorch: Embedding-based search, clustering, anomaly detection
-# ✅ Your stack: Postgres 17, Qdrant, Redis, MinIO
-#
-# 🔍 MONITORING:
-# - Langfuse UI: http://localhost:3030
-# - ClickHouse: http://localhost:8123/play
-# - Neo4j Browser: http://localhost:7474 (your existing instance)
-#
-# 📊 QUERY EXAMPLES:
-# # ClickHouse: Top 10 slowest traces
-# SELECT name, avg(latency) FROM langfuse.traces GROUP BY name ORDER BY avg(latency) DESC LIMIT 10
-#
-# # Neo4j: Agent interaction graph
-# MATCH (a1:Agent)-[r:CALLED]->(a2:Agent) RETURN a1, r, a2
-#
-# 🐳 COMMANDS:
-# - Start: docker-compose -f docker/langfuse.yml up -d
-# - Stop: docker-compose -f docker/langfuse.yml down
-# - Logs: docker-compose -f docker/langfuse.yml logs -f langfuse-server
-# - ClickHouse shell: docker exec -it langfuse-clickhouse clickhouse-client
-# - Reset (CAUTION): docker-compose -f docker/langfuse.yml down -v
+# COMMANDS:
+#   Start: docker compose -f docker/langfuse.yml up -d
+#   Stop:  docker compose -f docker/langfuse.yml down
+#   Logs:  docker compose -f docker/langfuse.yml logs -f langfuse-server
+#   CH:    docker compose -f docker/langfuse.yml logs -f langfuse-clickhouse

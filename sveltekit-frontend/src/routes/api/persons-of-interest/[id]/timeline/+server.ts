@@ -1,8 +1,8 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
-import { timelineEvents } from '$lib/server/db/schema-postgres.js';
-import { eq, desc } from 'drizzle-orm';
+import { personsOfInterest, timelineEvents } from '$lib/server/db/schema-postgres.js';
+import { and, eq, desc } from 'drizzle-orm';
 import { z } from 'zod';
 
 const poiIdSchema = z.string().uuid('Invalid POI id');
@@ -28,6 +28,21 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	}
 
 	try {
+		const [poi] = await db
+      .select({ id: personsOfInterest.id })
+      .from(personsOfInterest)
+      .where(
+        and(
+          eq(personsOfInterest.id, parsedId.data),
+          eq(personsOfInterest.createdBy, locals.user.id)
+        )
+      )
+      .limit(1);
+
+    if (!poi) {
+      return json({ events: [] });
+    }
+
 		const events = await db
 			.select()
 			.from(timelineEvents)
@@ -60,6 +75,21 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 	}
 
 	try {
+		const [poi] = await db
+      .select({ id: personsOfInterest.id })
+      .from(personsOfInterest)
+      .where(
+        and(
+          eq(personsOfInterest.id, parsedId.data),
+          eq(personsOfInterest.createdBy, locals.user.id)
+        )
+      )
+      .limit(1);
+
+    if (!poi) {
+      return json({ error: 'Person of interest not found' }, { status: 404 });
+    }
+
 		const body = await request.json().catch(() => ({}));
 		const parsed = createTimelineSchema.safeParse(body);
 		if (!parsed.success) {

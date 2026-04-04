@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { getChatModelKeepAlive } from '$lib/server/ollama.js';
 import { isUuid } from '$lib/server/validation.js';
 
@@ -16,7 +16,11 @@ export const GET: RequestHandler = async ({ params, locals }) => {
   if (!isUuid(evidenceId)) return json({ error: 'Invalid evidence ID format' }, { status: 400 });
 
   try {
-    const [item] = await db.select().from(evidence).where(eq(evidence.id, evidenceId)).limit(1);
+    const [item] = await db
+      .select()
+      .from(evidence)
+      .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, locals.user.id)))
+      .limit(1);
 
     if (!item) {
       return json({ error: 'Evidence not found' }, { status: 404 });

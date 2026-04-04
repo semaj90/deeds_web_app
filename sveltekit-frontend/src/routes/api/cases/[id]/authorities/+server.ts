@@ -32,6 +32,12 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const id = params.id;
+  const caseCheck = await pool.query(
+    'SELECT id FROM cases WHERE id = $1 AND user_id = $2 LIMIT 1',
+    [id, locals.user.id]
+  );
+
+  if (caseCheck.rowCount === 0) return json({ error: 'Case not found' }, { status: 404 });
 
 	const res = await pool.query(`
 		SELECT cll.id AS link_id, cll.category, cll.relevance_score,
@@ -70,6 +76,13 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const id = params.id;
+  const caseCheck = await pool.query(
+    'SELECT id FROM cases WHERE id = $1 AND user_id = $2 LIMIT 1',
+    [id, locals.user.id]
+  );
+
+  if (caseCheck.rowCount === 0) return json({ error: 'Case not found' }, { status: 404 });
+
 	const raw = await request.json().catch(() => ({}));
   const parsed = authorityPostSchema.safeParse(raw);
   if (!parsed.success)
@@ -158,6 +171,13 @@ export const DELETE: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const id = params.id;
+  const caseCheck = await pool.query(
+    'SELECT id FROM cases WHERE id = $1 AND user_id = $2 LIMIT 1',
+    [id, locals.user.id]
+  );
+
+  if (caseCheck.rowCount === 0) return json({ error: 'Case not found' }, { status: 404 });
+
 	const raw = await request.json().catch(() => ({}));
   const parsed = authorityDeleteSchema.safeParse(raw);
   if (!parsed.success)

@@ -12,7 +12,7 @@ import pg from 'pg';
 
 const { Pool } = pg;
 const pool = new Pool({
-	connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db',
+	connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
 });
 
 // ── Canon Chunk IDs (verified from legal_canon_chunks collection) ──

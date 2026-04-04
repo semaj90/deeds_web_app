@@ -14,6 +14,15 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	const { documentId } = params;
 	if (!isUuid(documentId)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
+	const accessRes = await pool.query(
+    `SELECT id FROM library_documents WHERE id = $1 AND (uploaded_by IS NULL OR uploaded_by = $2)`,
+    [documentId, locals.user.id]
+  );
+
+  if (!accessRes.rows[0]) {
+    return json({ error: 'Document not found' }, { status: 404 });
+  }
+
 	// Fetch all nodes for this document ordered by path (depth-first)
 	const res = await pool.query(
 		`SELECT id, parent_node_id, node_type, ordinal, heading, citation_label, node_path, depth,

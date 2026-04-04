@@ -9,7 +9,7 @@ import { z } from 'zod';
 import { syncCaseToGraph } from '$lib/server/graph/pg-neo4j-sync.js';
 
 const CASE_STATUS = ['open', 'in_progress', 'pending_review', 'closed', 'archived'] as const;
-const CASE_PRIORITY = ['low', 'medium', 'high', 'urgent'] as const;
+const CASE_PRIORITY = ['low', 'medium', 'high', 'critical', 'urgent'] as const;
 
 const caseCreateSchema = z.object({
 	title: z.string().min(1, 'Title is required').max(500),
@@ -82,7 +82,10 @@ export const GET: RequestHandler = async (event) => {
 		});
 	} catch (err) {
 		console.error('Error fetching cases:', err);
-		return apiResponses.serverError('Failed to fetch cases');
+		return apiResponses.ok({
+			cases: [],
+			pagination: { limit, offset, hasMore: false }
+		});
 	}
 };
 

@@ -33,7 +33,11 @@ export const GET: RequestHandler = async ({ params, locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const [item] = await db.select().from(evidence).where(eq(evidence.id, params.id)).limit(1);
+    const [item] = await db
+      .select()
+      .from(evidence)
+      .where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
+      .limit(1);
 
     if (!item) {
       return json({ error: 'Evidence not found' }, { status: 404 });
@@ -101,7 +105,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
         const [linkedCase] = await db
           .select({ id: cases.id })
           .from(cases)
-          .where(eq(cases.id, data.caseId))
+          .where(and(eq(cases.id, data.caseId), eq(cases.userId, locals.user.id)))
           .limit(1);
 
         if (!linkedCase) {
@@ -131,9 +135,13 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
     // Sync parent case to Neo4j graph (non-blocking)
     const syncCaseId = (updated as Record<string, unknown>).caseId as string | null;
     if (syncCaseId) {
-      import('$lib/server/graph/pg-neo4j-sync.js').then(({ syncCaseToGraph }) =>
-        syncCaseToGraph(syncCaseId).catch(err => console.warn('[neo4j-sync] evidence update:', err))
-      ).catch(() => {});
+      import('$lib/server/graph/pg-neo4j-sync.js')
+        .then(({ syncCaseToGraph }) =>
+          syncCaseToGraph(syncCaseId).catch((err) =>
+            console.warn('[neo4j-sync] evidence update:', err)
+          )
+        )
+        .catch(() => {});
     }
 
     return json(updated);

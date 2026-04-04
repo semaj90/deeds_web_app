@@ -1,9 +1,10 @@
 import { db } from '$lib/server/db/client';
 import { reports } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 const saveReportSchema = z.object({
 	reportId: z.string().min(1, 'Report ID is required').max(500),
@@ -23,16 +24,20 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 		const { reportId, title, contentHtml } = parsed.data;
 
+		if (!isUuid(reportId)) {
+      return json({ error: 'Invalid report ID format' }, { status: 400 });
+    }
+
 		// Update existing report
 		const [updated] = await db
-			.update(reports)
-			.set({
-				title: title || 'Untitled Report',
-				content: contentHtml || '',
-				updatedAt: new Date()
-			})
-			.where(eq(reports.id, reportId))
-			.returning();
+      .update(reports)
+      .set({
+        title: title || 'Untitled Report',
+        content: contentHtml || '',
+        updatedAt: new Date(),
+      })
+      .where(and(eq(reports.id, reportId), eq(reports.createdBy, locals.user.id)))
+      .returning();
 
 		if (!updated) {
 			return json({ error: 'Report not found' }, { status: 404 });

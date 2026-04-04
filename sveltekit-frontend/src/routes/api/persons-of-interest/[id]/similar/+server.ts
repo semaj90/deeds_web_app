@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/client';
 import { personsOfInterest, poiPhotos } from '$lib/server/db/schema-postgres';
 import { json } from '@sveltejs/kit';
-import { eq, ne, desc, sql } from 'drizzle-orm';
+import { and, eq, ne, desc, sql } from 'drizzle-orm';
 import { generateEmbedding } from '$lib/server/ai/embeddings-simple.js';
 import type { RequestHandler } from './$types';
 import { isUuid } from '$lib/server/validation.js';
@@ -11,87 +11,101 @@ import { isUuid } from '$lib/server/validation.js';
  * Find similar POIs via vector embeddings with text-based fallback.
  */
 export const GET: RequestHandler = async ({ params, locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
-	if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
-	const poiId = params.id;
-	try {
-		const [target] = await db
-			.select()
-			.from(personsOfInterest)
-			.where(eq(personsOfInterest.id, poiId))
-			.limit(1);
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
+  const poiId = params.id;
+  try {
+    const [target] = await db
+      .select()
+      .from(personsOfInterest)
+      .where(and(eq(personsOfInterest.id, poiId), eq(personsOfInterest.createdBy, locals.user.id)))
+      .limit(1);
 
-		if (!target) {
-			return json({ similar: [], method: 'none', error: 'POI not found' });
-		}
+    if (!target) {
+      return json({ similar: [], method: 'none', error: 'POI not found' });
+    }
 
-		const targetProfile = buildProfile(target);
+    const targetProfile = buildProfile(target);
 
-		const candidates = await db
-			.select({
-				id: personsOfInterest.id,
-				name: personsOfInterest.name,
-				status: personsOfInterest.status,
-				threatLevel: personsOfInterest.threatLevel,
-				description: personsOfInterest.description,
-				aliases: personsOfInterest.aliases,
-				caseIds: personsOfInterest.caseIds,
-				photoUrl: sql<string | null>`(
+    const candidates = await db
+      .select({
+        id: personsOfInterest.id,
+        name: personsOfInterest.name,
+        status: personsOfInterest.status,
+        threatLevel: personsOfInterest.threatLevel,
+        description: personsOfInterest.description,
+        aliases: personsOfInterest.aliases,
+        caseIds: personsOfInterest.caseIds,
+        photoUrl: sql<string | null>`(
 					SELECT ${poiPhotos.thumbnailUrl} FROM ${poiPhotos}
 					WHERE ${poiPhotos.poiId} = ${personsOfInterest.id}
 					ORDER BY ${poiPhotos.uploadedAt} DESC LIMIT 1
 				)`.as('photo_url'),
-			})
-			.from(personsOfInterest)
-			.where(ne(personsOfInterest.id, poiId))
-			.orderBy(desc(personsOfInterest.updatedAt))
-			.limit(50);
+      })
+      .from(personsOfInterest)
+      .where(and(ne(personsOfInterest.id, poiId), eq(personsOfInterest.createdBy, locals.user.id)))
+      .orderBy(desc(personsOfInterest.updatedAt))
+      .limit(50);
 
-		if (candidates.length === 0) {
-			return json({ similar: [], method: 'none' });
-		}
+    if (candidates.length === 0) {
+      return json({ similar: [], method: 'none' });
+    }
 
-		// Fetch face embeddings for blending (non-fatal)
-		let targetFaceEmb: number[] | null = null;
-		const candidateFaceEmbs = new Map<string, number[]>();
-		try {
-			const [targetPhoto] = await db
-				.select({ faceEmbedding: poiPhotos.faceEmbedding })
-				.from(poiPhotos)
-				.where(eq(poiPhotos.poiId, poiId))
-				.orderBy(desc(poiPhotos.uploadedAt))
-				.limit(1);
-			if (targetPhoto?.faceEmbedding && Array.isArray(targetPhoto.faceEmbedding) && targetPhoto.faceEmbedding.length === 768) {
-				targetFaceEmb = targetPhoto.faceEmbedding as number[];
-				const candIds = candidates.map((c) => c.id);
-				if (candIds.length > 0) {
-					const candPhotos = await db
-						.select({ poiId: poiPhotos.poiId, faceEmbedding: poiPhotos.faceEmbedding })
-						.from(poiPhotos)
-						.where(sql`${poiPhotos.poiId} = ANY(${candIds})`)
-						.orderBy(desc(poiPhotos.uploadedAt));
-					for (const cp of candPhotos) {
-						if (cp.poiId && !candidateFaceEmbs.has(cp.poiId) && Array.isArray(cp.faceEmbedding) && (cp.faceEmbedding as number[]).length === 768) {
-							candidateFaceEmbs.set(cp.poiId, cp.faceEmbedding as number[]);
-						}
-					}
-				}
-			}
-		} catch {
-			// Face embeddings unavailable — text-only ranking
-		}
+    // Fetch face embeddings for blending (non-fatal)
+    let targetFaceEmb: number[] | null = null;
+    const candidateFaceEmbs = new Map<string, number[]>();
+    try {
+      const [targetPhoto] = await db
+        .select({ faceEmbedding: poiPhotos.faceEmbedding })
+        .from(poiPhotos)
+        .where(eq(poiPhotos.poiId, poiId))
+        .orderBy(desc(poiPhotos.uploadedAt))
+        .limit(1);
+      if (
+        targetPhoto?.faceEmbedding &&
+        Array.isArray(targetPhoto.faceEmbedding) &&
+        targetPhoto.faceEmbedding.length === 768
+      ) {
+        targetFaceEmb = targetPhoto.faceEmbedding as number[];
+        const candIds = candidates.map((c) => c.id);
+        if (candIds.length > 0) {
+          const candPhotos = await db
+            .select({ poiId: poiPhotos.poiId, faceEmbedding: poiPhotos.faceEmbedding })
+            .from(poiPhotos)
+            .where(sql`${poiPhotos.poiId} = ANY(${candIds})`)
+            .orderBy(desc(poiPhotos.uploadedAt));
+          for (const cp of candPhotos) {
+            if (
+              cp.poiId &&
+              !candidateFaceEmbs.has(cp.poiId) &&
+              Array.isArray(cp.faceEmbedding) &&
+              (cp.faceEmbedding as number[]).length === 768
+            ) {
+              candidateFaceEmbs.set(cp.poiId, cp.faceEmbedding as number[]);
+            }
+          }
+        }
+      }
+    } catch {
+      // Face embeddings unavailable — text-only ranking
+    }
 
-		const vectorResults = await tryVectorSimilarity(targetProfile, candidates, targetFaceEmb, candidateFaceEmbs);
-		if (vectorResults) {
-			return json({ similar: vectorResults.slice(0, 5), method: 'vector' });
-		}
+    const vectorResults = await tryVectorSimilarity(
+      targetProfile,
+      candidates,
+      targetFaceEmb,
+      candidateFaceEmbs
+    );
+    if (vectorResults) {
+      return json({ similar: vectorResults.slice(0, 5), method: 'vector' });
+    }
 
-		const textResults = textSimilarity(target, candidates);
-		return json({ similar: textResults.slice(0, 5), method: 'text' });
-	} catch (err) {
-		console.error('Similar POI search error:', err);
-		return json({ similar: [], method: 'error', error: 'Search failed' });
-	}
+    const textResults = textSimilarity(target, candidates);
+    return json({ similar: textResults.slice(0, 5), method: 'text' });
+  } catch (err) {
+    console.error('Similar POI search error:', err);
+    return json({ similar: [], method: 'error', error: 'Search failed' });
+  }
 };
 
 function buildProfile(poi: {

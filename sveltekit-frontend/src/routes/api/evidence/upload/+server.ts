@@ -520,7 +520,6 @@ async function extractText(
 
   if (isImage) {
     // Resize large images before OCR (max 1280px — Tesseract quality sweet-spot)
-    // Note: VLM resize to Gemma3 native 896×896 is handled separately inside /api/vision/analyze
     let processBuffer = buffer;
     try {
       const sharp = (await import('sharp')).default;
@@ -538,6 +537,38 @@ async function extractText(
     }
 
     const ocrResult = await extractTextHybrid(processBuffer, fileName);
+
+    // If OCR returned meaningful text, use it
+    if (ocrResult.text.trim().length >= MIN_PDF_TEXT_LENGTH) {
+      return { text: ocrResult.text, method: `ocr-${ocrResult.method}` };
+    }
+
+    // VLM fallback: when OCR fails or returns too little text, use Gemma3-vision to describe the image
+    console.log(
+      `[Upload] OCR text too short (${ocrResult.text.trim().length} chars), trying VLM for ${fileName}`
+    );
+    try {
+      const { analyzeEvidenceImage } = await import(
+        '$lib/server/analysis/vlm-evidence-analyzer.js'
+      );
+      const vlmResult = await analyzeEvidenceImage({
+        buffer,
+        fileName,
+        promptOverride: `Extract ALL visible text from this image. Include every word, number, date, name, and label you can read. If this is a document, preserve the structure (headings, paragraphs, lists). If text is not clearly readable, describe what the image contains in detail for legal evidence purposes.\n\nRespond in JSON format:\n{"extractedText": "...", "description": "...", "confidence": 0.0}`,
+      });
+      // Combine VLM description with any partial OCR text
+      const vlmText = vlmResult.summary || '';
+      if (vlmText.length > ocrResult.text.trim().length) {
+        const combined = ocrResult.text.trim()
+          ? `${ocrResult.text.trim()}\n\n[VLM Analysis]\n${vlmText}`
+          : vlmText;
+        return { text: combined, method: `vlm-ocr-fallback (${vlmResult.model})` };
+      }
+    } catch (err) {
+      console.warn('[Upload] VLM OCR fallback failed:', err);
+    }
+
+    // Return whatever OCR gave us (may be empty)
     return { text: ocrResult.text, method: `ocr-${ocrResult.method}` };
   }
 
@@ -1099,6 +1130,8 @@ async function processAndEmbed(
     summary?: string;
     keyFindings?: string[];
     suggestedTags?: string[];
+    model?: string;
+    cached?: boolean;
   } | null = null;
   let analysisPipelineResult: Awaited<
     ReturnType<

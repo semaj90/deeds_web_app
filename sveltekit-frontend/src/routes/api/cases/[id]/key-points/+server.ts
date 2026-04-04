@@ -1,8 +1,8 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
-import { evidence } from '$lib/server/db/schema-postgres.js';
-import { eq, sql } from 'drizzle-orm';
+import { cases, evidence } from '$lib/server/db/schema-postgres.js';
+import { and, eq, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
@@ -26,18 +26,26 @@ export const POST: RequestHandler = async ({ params, locals }) => {
 	const caseId = params.id;
 	if (!isUuid(caseId)) return json({ error: 'Invalid case ID format' }, { status: 400 });
 
+	const [targetCase] = await db
+    .select({ id: cases.id })
+    .from(cases)
+    .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
+    .limit(1);
+
+  if (!targetCase) return json({ error: 'Case not found' }, { status: 404 });
+
 	const rows = await db
-		.select({
-			id: evidence.id,
-			title: evidence.title,
-			description: evidence.description,
-			summary: evidence.summary,
-			aiSummary: evidence.aiSummary,
-			aiAnalysis: evidence.aiAnalysis,
-			type: evidence.type
-		})
-		.from(evidence)
-		.where(eq(evidence.caseId, caseId));
+    .select({
+      id: evidence.id,
+      title: evidence.title,
+      description: evidence.description,
+      summary: evidence.summary,
+      aiSummary: evidence.aiSummary,
+      aiAnalysis: evidence.aiAnalysis,
+      type: evidence.type,
+    })
+    .from(evidence)
+    .where(and(eq(evidence.caseId, caseId), eq(evidence.userId, locals.user.id)));
 
 	if (rows.length === 0) {
 		return json({ generated: 0, skipped: 0, total: 0, message: 'No evidence found for this case' });

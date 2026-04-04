@@ -67,11 +67,55 @@
 	});
 
 	let inputValue = $state('');
-	let pendingAttachment = $state<File | null>(null);
+	let pendingAttachments = $state<File[]>([]);
+	let dropActive = $state(false);
 	let messagesContainer: HTMLElement;
 	let savingGlossaryKeys = $state<Record<string, boolean>>({});
 	let savedGlossaryKeys = $state<Record<string, boolean>>({});
 	let glossaryActionErrors = $state<Record<string, string>>({});
+
+	const ACCEPTED_TYPES = new Set([
+		'application/pdf', 'text/plain', 'text/csv', 'text/html',
+		'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+		'image/jpeg', 'image/png', 'image/webp', 'image/gif',
+		'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/webm', 'audio/flac',
+		'video/mp4', 'video/webm', 'video/quicktime'
+	]);
+
+	function formatFileSize(bytes: number): string {
+		if (bytes < 1024) return `${bytes} B`;
+		if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+		return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+	}
+
+	function fileTypeIcon(type: string): string {
+		if (type.startsWith('image/')) return '🖼️';
+		if (type.startsWith('audio/')) return '🎵';
+		if (type.startsWith('video/')) return '🎬';
+		if (type.includes('pdf')) return '📄';
+		return '📎';
+	}
+
+	function handleDrop(event: DragEvent) {
+		event.preventDefault();
+		dropActive = false;
+		if (event.dataTransfer?.files?.length) {
+			addFiles(event.dataTransfer.files);
+		}
+	}
+
+	function addFiles(fileList: FileList | File[]) {
+		const newFiles = Array.from(fileList).filter(f =>
+			ACCEPTED_TYPES.has(f.type) || f.name.match(/\.(pdf|docx?|txt|csv|jpe?g|png|webp|gif|mp[34]|wav|ogg|webm|flac|mov)$/i)
+		);
+		if (newFiles.length) {
+			pendingAttachments = [...pendingAttachments, ...newFiles];
+		}
+	}
+
+	function removeAttachment(index: number) {
+		pendingAttachments = pendingAttachments.filter((_, i) => i !== index);
+	}
 
 	let isLoading = $derived(
 		session.status === 'thinking' || session.status === 'streaming'
@@ -93,14 +137,14 @@
 	});
 
 	async function sendMessage() {
-		if ((!inputValue.trim() && !pendingAttachment) || isLoading) return;
+		if ((!inputValue.trim() && pendingAttachments.length === 0) || isLoading) return;
 
-		const content = inputValue.trim() || (pendingAttachment
-			? `Please analyze the attached document "${pendingAttachment.name}".`
+		const attachment = pendingAttachments[0] ?? null;
+		const content = inputValue.trim() || (attachment
+			? `Please analyze the attached file "${attachment.name}".`
 			: '');
-		const attachment = pendingAttachment;
 		inputValue = '';
-		pendingAttachment = null;
+		pendingAttachments = [];
 
 		await session.sendMessage(content, {
 			attachment,
@@ -111,7 +155,10 @@
 
 	function handleAttachmentChange(event: Event) {
 		const target = event.currentTarget as HTMLInputElement;
-		pendingAttachment = target.files?.[0] ?? null;
+		if (target.files?.length) {
+			addFiles(target.files);
+		}
+		target.value = '';
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -282,7 +329,24 @@
 	</div>
 
 	<!-- Messages -->
-	<div class="messages-container" bind:this={messagesContainer}>
+	<div
+		class="messages-container"
+		class:drop-highlight={dropActive}
+		bind:this={messagesContainer}
+		ondragenter={(e) => { e.preventDefault(); dropActive = true; }}
+		ondragover={(e) => { e.preventDefault(); dropActive = true; }}
+		ondragleave={(e) => { if (e.currentTarget === e.target) dropActive = false; }}
+		ondrop={handleDrop}
+	>
+		{#if dropActive}
+			<div class="drop-zone-overlay">
+				<div class="drop-zone-content">
+					<span class="drop-zone-icon">📁</span>
+					<span>Drop files here</span>
+					<span class="drop-zone-hint">PDF, images, audio, video</span>
+				</div>
+			</div>
+		{/if}
 		{#each session.messages as message, i (i)}
 			{@const contextDocIds = getContextDocIds(message)}
 			{@const contextCollections = summarizeContextCollections(contextDocIds)}
@@ -443,16 +507,36 @@
 		<div class="chat-toolbar">
 			<label class="attach-btn" aria-label="Attach file">
 				📎
-				<input type="file" class="hidden-file-input" onchange={handleAttachmentChange} />
+				<input
+					type="file"
+					class="hidden-file-input"
+					accept=".pdf,.doc,.docx,.txt,.csv,.jpg,.jpeg,.png,.webp,.gif,.mp3,.wav,.ogg,.mp4,.webm,.mov,.flac"
+					multiple
+					onchange={handleAttachmentChange}
+				/>
 			</label>
-			{#if pendingAttachment}
-				<span class="attachment-pill">{pendingAttachment.name}</span>
+			{#if pendingAttachments.length > 0}
+				<div class="attachment-chips">
+					{#each pendingAttachments as file, idx}
+						<span class="attachment-chip">
+							<span class="attachment-chip-icon">{fileTypeIcon(file.type)}</span>
+							<span class="attachment-chip-name">{file.name}</span>
+							<span class="attachment-chip-size">({formatFileSize(file.size)})</span>
+							<button
+								type="button"
+								class="attachment-chip-remove"
+								onclick={() => removeAttachment(idx)}
+								aria-label="Remove {file.name}"
+							>&times;</button>
+						</span>
+					{/each}
+				</div>
 			{/if}
 		</div>
 		<textarea
 			bind:value={inputValue}
 			onkeydown={handleKeydown}
-			placeholder="Ask a legal question about this case..."
+			placeholder={pendingAttachments.length > 0 ? 'Ask about the attached files...' : 'Ask a legal question about this case...'}
 			class="chat-input"
 			disabled={isLoading}
 			data-testid="case-chat-input"
@@ -460,7 +544,7 @@
 		<button
 			class="send-btn"
 			onclick={sendMessage}
-			disabled={isLoading || (!inputValue.trim() && !pendingAttachment)}
+			disabled={isLoading || (!inputValue.trim() && pendingAttachments.length === 0)}
 			data-testid="case-chat-send"
 		>
 			{#if isLoading}
@@ -559,11 +643,13 @@
 
 	.messages-container {
 		flex: 1;
+		min-height: 0; /* critical: allows flex item to shrink below content size */
 		overflow-y: auto;
 		padding: 1rem;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+		position: relative;
 	}
 
 	.message {
@@ -841,6 +927,7 @@
 		background-color: #f5f1e8;
 		border-top: 2px solid #d4a574;
 		flex-wrap: wrap;
+		flex-shrink: 0; /* stay pinned at bottom, never compress */
 	}
 
 	.chat-toolbar {
@@ -866,13 +953,100 @@
 		display: none;
 	}
 
-	.attachment-pill {
-		font-size: 0.78rem;
-		padding: 0.25rem 0.6rem;
+	.drop-highlight {
+		outline: 2px dashed #8b4513;
+		outline-offset: -4px;
+		background-color: rgba(139, 69, 19, 0.04);
+	}
+
+	.drop-zone-overlay {
+		position: absolute;
+		inset: 0;
+		z-index: 10;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(245, 241, 232, 0.92);
+		border: 2px dashed #8b4513;
+		border-radius: 4px;
+		pointer-events: none;
+	}
+
+	.drop-zone-content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+		color: #8b4513;
+		font-weight: 600;
+	}
+
+	.drop-zone-icon {
+		font-size: 2rem;
+	}
+
+	.drop-zone-hint {
+		font-size: 0.75rem;
+		font-weight: 400;
+		color: #6b7280;
+	}
+
+	.attachment-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+		flex: 1;
+	}
+
+	.attachment-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		font-size: 0.76rem;
+		padding: 0.25rem 0.5rem;
 		border-radius: 999px;
 		background: #e8f4f8;
 		color: #0f4c81;
 		border: 1px solid #9fc3dd;
+		max-width: 220px;
+	}
+
+	.attachment-chip-icon {
+		flex-shrink: 0;
+	}
+
+	.attachment-chip-name {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.attachment-chip-size {
+		flex-shrink: 0;
+		color: #6b7280;
+		font-size: 0.7rem;
+	}
+
+	.attachment-chip-remove {
+		flex-shrink: 0;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.1rem;
+		height: 1.1rem;
+		border-radius: 50%;
+		border: none;
+		background: rgba(0, 0, 0, 0.1);
+		color: #333;
+		font-size: 0.85rem;
+		line-height: 1;
+		cursor: pointer;
+		padding: 0;
+	}
+
+	.attachment-chip-remove:hover {
+		background: rgba(185, 28, 28, 0.2);
+		color: #b91c1c;
 	}
 
 	.chat-input {

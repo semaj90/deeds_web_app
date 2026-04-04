@@ -17,27 +17,28 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 
 	try {
 		const [target] = await db
-			.select({ caseIds: personsOfInterest.caseIds })
-			.from(personsOfInterest)
-			.where(eq(personsOfInterest.id, poiId))
-			.limit(1);
+      .select({ caseIds: personsOfInterest.caseIds })
+      .from(personsOfInterest)
+      .where(and(eq(personsOfInterest.id, poiId), eq(personsOfInterest.createdBy, locals.user.id)))
+      .limit(1);
 
-		if (!target || !target.caseIds?.length) {
-			return json({ associates: [] });
-		}
+    if (!target || !target.caseIds?.length) {
+      return json({ associates: [] });
+    }
 
-		// PostgreSQL array overlap (&&) with parameterized array
-		const caseArray = target.caseIds;
-		const associates = await db
-			.select()
-			.from(personsOfInterest)
-			.where(
-				and(
-					ne(personsOfInterest.id, poiId),
-					sql`${personsOfInterest.caseIds} && ${caseArray}::text[]`
-				)
-			)
-			.limit(20);
+    // PostgreSQL array overlap (&&) with parameterized array
+    const caseArray = target.caseIds;
+    const associates = await db
+      .select()
+      .from(personsOfInterest)
+      .where(
+        and(
+          ne(personsOfInterest.id, poiId),
+          eq(personsOfInterest.createdBy, locals.user.id),
+          sql`${personsOfInterest.caseIds} && ${caseArray}::text[]`
+        )
+      )
+      .limit(20);
 
 		return json({
 			associates: associates.map((a) => ({

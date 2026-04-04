@@ -1153,7 +1153,7 @@ function setupToolHandlers() {
             persona?: string;
             maxTokens?: number;
           };
-          const { assembleACEContext, buildACEPrompt } = await import('../lib/server/ace/context-assembler.js');
+          const { assembleACEContext, buildACEPromptCached } = await import('../lib/server/ace/context-assembler.js');
           const { ollamaFetch } = await import('../lib/server/ollama.js');
 
           const context = await assembleACEContext({
@@ -1164,7 +1164,7 @@ function setupToolHandlers() {
             enableWikipedia: true,
             persona: acePersona as any,
           });
-          const acePrompt = buildACEPrompt(context, aceQuery);
+          const acePrompt = await buildACEPromptCached(context, aceQuery);
 
           const ollamaUrl = process.env.OLLAMA_HOST || 'http://127.0.0.1:11434';
           const llmRes = await ollamaFetch(`${ollamaUrl}/api/generate`, {

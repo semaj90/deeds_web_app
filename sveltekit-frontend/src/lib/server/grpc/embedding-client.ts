@@ -53,6 +53,17 @@ export interface EmbeddingResult {
   attempts?: EmbeddingAttempt[];
 }
 
+export interface EmbeddingTransportHealth {
+  status: 'ok' | 'degraded' | 'disabled';
+  detail: string;
+  stateScope?: 'process';
+  observedSinceAt?: string;
+  retryAt?: string;
+  lastFailureAt?: string;
+  lastFailureDetail?: string;
+  lastSuccessAt?: string;
+}
+
 interface CachedEmbeddingEntry {
   vector: number[];
   source?: EmbeddingSource;
@@ -190,6 +201,69 @@ let natsConnection: any = null;
 let natsLoadFailed = false;
 let natsRetryAt = 0; // Timestamp for next retry after failure
 let natsFailLogged = false; // Only log first failure to avoid spam
+let natsLastFailureAt = 0;
+let natsLastFailureDetail: string | null = null;
+let natsLastSuccessAt = 0;
+const quicStateObservedSinceAt = new Date().toISOString();
+
+function markQuicFailure(detail: string, retryDelayMs = 30_000): void {
+  natsLoadFailed = true;
+  natsRetryAt = Date.now() + retryDelayMs;
+  natsLastFailureAt = Date.now();
+  natsLastFailureDetail = detail;
+}
+
+function markQuicSuccess(): void {
+  natsLoadFailed = false;
+  natsRetryAt = 0;
+  natsLastSuccessAt = Date.now();
+}
+
+export function getQuicEmbeddingHealth(): EmbeddingTransportHealth {
+  if (!ENV.EMBEDDING_QUIC_ENABLED) {
+    return {
+      status: 'disabled',
+      detail: 'disabled by config',
+      stateScope: 'process',
+      observedSinceAt: quicStateObservedSinceAt,
+    };
+  }
+
+  if (natsLoadFailed) {
+    return {
+      status: 'degraded',
+      detail: 'recent connection or request failure',
+      stateScope: 'process',
+      observedSinceAt: quicStateObservedSinceAt,
+      retryAt: natsRetryAt > 0 ? new Date(natsRetryAt).toISOString() : undefined,
+      lastFailureAt: natsLastFailureAt > 0 ? new Date(natsLastFailureAt).toISOString() : undefined,
+      lastFailureDetail: natsLastFailureDetail ?? undefined,
+      lastSuccessAt: natsLastSuccessAt > 0 ? new Date(natsLastSuccessAt).toISOString() : undefined,
+    };
+  }
+
+  if (natsConnection) {
+    return {
+      status: 'ok',
+      detail: 'connected',
+      stateScope: 'process',
+      observedSinceAt: quicStateObservedSinceAt,
+      lastSuccessAt: natsLastSuccessAt > 0 ? new Date(natsLastSuccessAt).toISOString() : undefined,
+      lastFailureAt: natsLastFailureAt > 0 ? new Date(natsLastFailureAt).toISOString() : undefined,
+      lastFailureDetail: natsLastFailureDetail ?? undefined,
+    };
+  }
+
+  return {
+    status: 'degraded',
+    detail: 'enabled but not yet proven healthy',
+    stateScope: 'process',
+    observedSinceAt: quicStateObservedSinceAt,
+    lastFailureAt: natsLastFailureAt > 0 ? new Date(natsLastFailureAt).toISOString() : undefined,
+    lastFailureDetail: natsLastFailureDetail ?? undefined,
+    lastSuccessAt: natsLastSuccessAt > 0 ? new Date(natsLastSuccessAt).toISOString() : undefined,
+  };
+}
 
 async function getNatsConnection(): Promise<any> {
   if (natsLoadFailed) {
@@ -209,17 +283,15 @@ async function getNatsConnection(): Promise<any> {
       reconnectTimeWait: 500,
       timeout: 3000,
     });
+    markQuicSuccess();
     return natsConnection;
   } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
     if (!natsFailLogged) {
-      console.warn(
-        '[embedding-client] NATS/QUIC init failed, will retry silently:',
-        (err as Error).message
-      );
+      console.warn('[embedding-client] NATS/QUIC init failed, will retry silently:', message);
       natsFailLogged = true;
     }
-    natsLoadFailed = true;
-    natsRetryAt = Date.now() + 30_000;
+    markQuicFailure(message);
     return null;
   }
 }
@@ -247,12 +319,16 @@ async function generateViaQuic(texts: string[], timeoutMs = 5000): Promise<Embed
 
     const response = codec.decode(msg.data);
     if (response.status === 'success' && Array.isArray(response.embeddings)) {
+      markQuicSuccess();
       return { vectors: response.embeddings, detail: 'ok' };
     }
-    return { vectors: null, detail: response?.status ?? 'response error' };
+    const detail = response?.status ?? 'response error';
+    markQuicFailure(detail);
+    return { vectors: null, detail };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.warn('[embedding-client] QUIC/NATS embedding failed:', message);
+    markQuicFailure(message);
     return { vectors: null, detail: message };
   }
 }

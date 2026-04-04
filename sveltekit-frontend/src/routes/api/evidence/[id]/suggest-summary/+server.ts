@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { getChatModelKeepAlive } from '$lib/server/ollama.js';
 import { isUuid } from '$lib/server/validation.js';
 
@@ -25,7 +25,7 @@ export const POST: RequestHandler = async ({ params, locals }) => {
         type: evidence.type,
       })
       .from(evidence)
-      .where(eq(evidence.id, evidenceId))
+      .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, locals.user.id)))
       .limit(1);
 
     if (!item) {

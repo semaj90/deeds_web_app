@@ -12,7 +12,7 @@ import {
     uuid,
     varchar
 } from 'drizzle-orm/pg-core';
-import { users } from './schema-postgres';
+import { users, cases } from './schema-postgres';
 
 // Enum for chat message roles
 export const chatMessageRoleEnum = pgEnum('chat_message_role', ['user', 'assistant', 'system']);
@@ -52,7 +52,7 @@ export const chatMetadata = pgTable('chat_metadata', {
 	chatId: varchar('chat_id', { length: 255 }).primaryKey(),
 	userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
 	title: varchar('title', { length: 500 }), // Auto-generated or user-provided
-	caseId: uuid('case_id'), // Optional case association
+	caseId: uuid('case_id').references(() => cases.id, { onDelete: 'set null' }), // FK to cases table
 	messageCount: varchar('message_count', { length: 50 }).default('0'),
 	lastMessageAt: timestamp('last_message_at', { withTimezone: true }),
 	isArchived: varchar('is_archived', { length: 10 }).default('false'),

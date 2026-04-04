@@ -373,10 +373,49 @@ services:
     networks:
       - legal-ai-network
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/health"]
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8080/health"]
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
+
+  # Docling VLM — Document understanding + YOLO object detection + Whisper transcription
+  # FastAPI service consolidating: docling-parse, ultralytics, whisper
+  docling-vlm:
+    build:
+      context: ./docker/docling-vlm
+      dockerfile: Dockerfile
+    container_name: legal-ai-docling-vlm
+    restart: unless-stopped
+    profiles: ["full"]
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    ports:
+      - "8085:8085"
+    environment:
+      OLLAMA_URL: http://host.docker.internal:11434
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   # Go Legal Library Search Service
   go-search-service:

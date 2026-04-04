@@ -105,6 +105,9 @@ export const ENV = {
   // Bifrost AI gateway (Go, OpenAI-compatible, built-in semantic cache -- replaces LiteLLM)
   BIFROST_URL: privateEnv.BIFROST_URL ?? 'http://localhost:3040',
   BIFROST_ENABLED: (privateEnv.BIFROST_ENABLED ?? 'false') === 'true',
+  // OpenAI-compatible base URL (via Bifrost → Ollama) for pgai, LangChain, external tools
+  OPENAI_BASE_URL: privateEnv.OPENAI_BASE_URL ?? 'http://localhost:3040/v1',
+  OPENAI_API_KEY: privateEnv.OPENAI_API_KEY ?? 'dummy',
   // Auth secrets
   JWT_SECRET: privateEnv.JWT_SECRET ?? DEV.JWT_SECRET,
   SERVICE_AUTH_TOKEN: privateEnv.SERVICE_AUTH_TOKEN ?? DEV.SERVICE_AUTH_TOKEN,

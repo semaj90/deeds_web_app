@@ -11,7 +11,7 @@ import { randomUUID } from 'node:crypto';
 
 const { Pool } = pg;
 const pool = new Pool({
-	connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db',
+	connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
 });
 
 function mapJurisdiction(city) {

@@ -69,7 +69,7 @@ const ollamaDispatcher = new Agent({
  * Keep the smaller embedding model resident, but let the large chat model
  * age out quickly on 8 GB GPUs to reduce eviction/reload churn.
  */
-const CHAT_MODEL_KEEP_ALIVE = process.env?.OLLAMA_CHAT_KEEP_ALIVE ?? '2m';
+const CHAT_MODEL_KEEP_ALIVE = process.env?.OLLAMA_CHAT_KEEP_ALIVE ?? '10m';
 const EMBEDDING_MODEL_KEEP_ALIVE =
 	process.env?.OLLAMA_EMBED_KEEP_ALIVE ?? process.env?.OLLAMA_KEEP_ALIVE ?? '24h';
 const OLLAMA_DIAGNOSTICS_ENABLED =

@@ -9,8 +9,8 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!isUuid(id)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
 	const [documentResult, versionsResult] = await Promise.all([
-		pool.query(
-			`SELECT ld.*, j.name AS jurisdiction_name, j.code AS jurisdiction_code,
+    pool.query(
+      `SELECT ld.*, j.name AS jurisdiction_name, j.code AS jurisdiction_code,
 			        COALESCE(nc.c, 0)::int AS node_count,
 			        COALESCE(cc.c, 0)::int AS chunk_count
 			 FROM library_documents ld
@@ -22,17 +22,17 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			 	JOIN legal_nodes ln ON ln.id = lc.legal_node_id
 			 	WHERE ln.document_id = ld.id
 			 ) cc ON true
-			 WHERE ld.id = $1`,
-			[id]
-		),
-		pool.query(
-			`SELECT id, version_label, source_date, is_current, amendment_note, created_at
+			 WHERE ld.id = $1 AND (ld.uploaded_by IS NULL OR ld.uploaded_by = $2)`,
+      [id, locals.user.id]
+    ),
+    pool.query(
+      `SELECT id, version_label, source_date, is_current, amendment_note, created_at
 			 FROM library_document_versions
 			 WHERE document_id = $1
 			 ORDER BY created_at DESC`,
-			[id]
-		),
-	]).catch(() => [{ rows: [] }, { rows: [] }]);
+      [id]
+    ),
+  ]).catch(() => [{ rows: [] }, { rows: [] }]);
 
 	if (!documentResult.rows[0]) {
 		return json({ error: 'Document not found' }, { status: 404 });

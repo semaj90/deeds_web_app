@@ -2,6 +2,8 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
+import { personsOfInterest, poiRelationships } from '$lib/server/db/schema-postgres.js';
+import { and, eq, sql } from 'drizzle-orm';
 
 const relationshipSchema = z.object({
 	poiId1: z.string().uuid(),
@@ -25,17 +27,26 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		const { poiId1, poiId2, type, strength } = parsed.data;
 
-		const { poiRelationships } = await import('$lib/server/db/schema.js');
+		const ownedPois = await db
+      .select({ id: personsOfInterest.id })
+      .from(personsOfInterest)
+      .where(
+        sql`${personsOfInterest.id} IN (${poiId1}, ${poiId2}) AND ${personsOfInterest.createdBy} = ${locals.user.id}`
+      );
+
+    if (ownedPois.length !== 2) {
+      return json({ error: 'One or both persons of interest were not found' }, { status: 404 });
+    }
 
 		const [relationship] = await db
-			.insert(poiRelationships)
-			.values({
-				poiId1,
-				poiId2,
-				relationshipType: type,
-				strength: String(strength)
-			})
-			.returning();
+      .insert(poiRelationships)
+      .values({
+        poiId1,
+        poiId2,
+        relationshipType: type,
+        strength: String(strength),
+      })
+      .returning();
 
 		return json({ relationship });
 	} catch (err) {

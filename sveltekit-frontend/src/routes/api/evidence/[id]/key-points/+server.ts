@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
@@ -28,10 +28,10 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!isUuid(params.id)) return json({ error: 'Invalid evidence ID format' }, { status: 400 });
 
 	const rows = await db
-		.select({ aiAnalysis: evidence.aiAnalysis })
-		.from(evidence)
-		.where(eq(evidence.id, params.id))
-		.limit(1);
+    .select({ aiAnalysis: evidence.aiAnalysis })
+    .from(evidence)
+    .where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
+    .limit(1);
 
 	if (!rows[0]) return json({ error: 'Evidence not found' }, { status: 404 });
 
@@ -58,18 +58,18 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 	if (!parsed.success) return json({ error: 'Invalid input' }, { status: 400 });
 
 	const rows = await db
-		.select({
-			title: evidence.title,
-			description: evidence.description,
-			summary: evidence.summary,
-			aiSummary: evidence.aiSummary,
-			aiAnalysis: evidence.aiAnalysis,
-			type: evidence.type,
-			caseId: evidence.caseId
-		})
-		.from(evidence)
-		.where(eq(evidence.id, params.id))
-		.limit(1);
+    .select({
+      title: evidence.title,
+      description: evidence.description,
+      summary: evidence.summary,
+      aiSummary: evidence.aiSummary,
+      aiAnalysis: evidence.aiAnalysis,
+      type: evidence.type,
+      caseId: evidence.caseId,
+    })
+    .from(evidence)
+    .where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
+    .limit(1);
 
 	if (!rows[0]) return json({ error: 'Evidence not found' }, { status: 404 });
 
@@ -140,12 +140,12 @@ Respond with ONLY a JSON object:
 		await db.execute(sql`
 			UPDATE evidence
 			SET ai_analysis = COALESCE(ai_analysis, '{}'::jsonb) || ${JSON.stringify({
-				keyPoints,
-				keyPointsConfidence: confidence,
-				keyPointsGeneratedAt: generatedAt
-			})}::jsonb,
+        keyPoints,
+        keyPointsConfidence: confidence,
+        keyPointsGeneratedAt: generatedAt,
+      })}::jsonb,
 			updated_at = NOW()
-			WHERE id = ${params.id}
+			WHERE id = ${params.id} AND user_id = ${locals.user.id}
 		`);
 	} catch {
 		return json({ error: 'Failed to store key points' }, { status: 500 });

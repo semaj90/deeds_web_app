@@ -24,7 +24,7 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { cases, evidence } from '$lib/server/db/schema-postgres.js';
 import { isUuid } from '$lib/server/validation.js';
-import { eq, sql, desc } from 'drizzle-orm';
+import { and, eq, sql, desc } from 'drizzle-orm';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { assembleACEContext } from '$lib/server/ace/context-assembler.js';
@@ -88,6 +88,9 @@ interface SimilarityResponse {
 export const GET: RequestHandler = async ({ params, url, locals }) => {
 	const startTime = performance.now();
 	const caseId = params.id;
+	if (!locals.user?.id) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
 	if (!isUuid(caseId)) {
 		return json({ error: 'Invalid case ID format' }, { status: 400 });
 	}
@@ -101,15 +104,15 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 		return json({ error: queryParsed.error.issues[0]?.message ?? 'Invalid query parameters' }, { status: 400 });
 	}
 	const { limit, includeEmbedding, triggerGraph } = queryParsed.data;
-	const userId = locals.user?.id ?? null;
+	const userId = locals.user.id;
 
 	try {
 		// Step 1: Load source case from database
 		const [sourceCase] = await db
-			.select()
-			.from(cases)
-			.where(eq(cases.id, caseId))
-			.limit(1);
+      .select()
+      .from(cases)
+      .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
+      .limit(1);
 
 		if (!sourceCase) {
 			return json({ error: 'Case not found' }, { status: 404 });

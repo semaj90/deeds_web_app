@@ -16,7 +16,7 @@
     "db:migrate-safe": "npm run db:check-duplicates && npm run db:snapshot-before && npm run db:migrate && npm run db:snapshot-after && npm run db:compare-snapshots",
     "phase90:backfill": "tsx scripts/phase90-backfill-content-hash.ts",
     "phase90:full-migration": "npm run preflight && npm run db:migrate-safe && npm run phase90:backfill && npm run db:compare-snapshots",
-    "dev": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" DEV_BYPASS_AUTH=true BODY_SIZE_LIMIT=52428800 REDIS_URL=redis://127.0.0.1:6379 REDIS_PASSWORD=redis DATABASE_URL=postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db OLLAMA_BASE_URL=http://127.0.0.1:11434 OLLAMA_EMBED_MODEL=embeddinggemma:latest OLLAMA_CHAT_KEEP_ALIVE=2m OLLAMA_EMBED_KEEP_ALIVE=24h ACE_CHAT_SELF_EVAL_ENABLED=false vite dev --host 0.0.0.0 --port 5173",
+    "dev": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" DEV_BYPASS_AUTH=true BODY_SIZE_LIMIT=52428800 REDIS_URL=redis://127.0.0.1:6379 REDIS_PASSWORD=redis DATABASE_URL=postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db OLLAMA_BASE_URL=http://127.0.0.1:11434 OLLAMA_EMBED_MODEL=embeddinggemma:latest OLLAMA_CHAT_KEEP_ALIVE=10m OLLAMA_EMBED_KEEP_ALIVE=24h ACE_CHAT_SELF_EVAL_ENABLED=false vite dev --host 0.0.0.0 --port 5173",
     "dev:solo": "vite dev --host 0.0.0.0 --strictPort",
     "rag:mcp": "tsx src/mcp/server.ts",
     "dev:gpu": "docker start phase66-postgres phase66-redis phase66-minio phase66-qdrant && cross-env DEV_BYPASS_AUTH=true NODE_OPTIONS=\"--max-old-space-size=8192\" ENABLE_GPU=true RTX_3060_OPTIMIZATION=true CONTEXT7_MULTICORE=true OLLAMA_GPU_LAYERS=30 SIMD_JSON_PARSER=true REDIS_COMPRESS=true vite dev --host 0.0.0.0 --port 5173",

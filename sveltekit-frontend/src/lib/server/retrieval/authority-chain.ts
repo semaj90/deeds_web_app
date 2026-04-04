@@ -199,9 +199,9 @@ export async function authorityChainExpansion(
 	config: AuthorityChainConfig
 ): Promise<AuthorityChainResult> {
 	const maxHops = config.maxHops ?? 2;
-	const maxPerHop = config.maxPerHop ?? 3;
+	const maxPerHop = config.maxPerHop ?? 6;
 	const scoreThreshold = config.scoreThreshold ?? 0.3;
-	const chunkMaxChars = config.chunkMaxChars ?? 600;
+	const chunkMaxChars = config.chunkMaxChars ?? 1500;
 	const searchTimeoutMs = config.searchTimeoutMs ?? 3000;
 	const cacheTtlMs = config.cacheTtlMs ?? 15 * 60 * 1000;
 	const startTime = performance.now();

@@ -10,7 +10,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { isUuid } from '$lib/server/validation.js';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
@@ -19,10 +19,10 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!isUuid(id)) throw error(400, 'Invalid evidence ID format');
 
 	const rows = await db
-		.select({ metadata: evidence.metadata, caseId: evidence.caseId })
-		.from(evidence)
-		.where(eq(evidence.id, id))
-		.limit(1);
+    .select({ metadata: evidence.metadata, caseId: evidence.caseId })
+    .from(evidence)
+    .where(and(eq(evidence.id, id), eq(evidence.userId, locals.user.id)))
+    .limit(1);
 
 	if (!rows[0]) {
 		throw error(404, 'Evidence not found');
@@ -45,10 +45,10 @@ export const POST: RequestHandler = async ({ params, locals }) => {
 	if (!isUuid(id)) throw error(400, 'Invalid evidence ID format');
 
 	const rows = await db
-		.select({ caseId: evidence.caseId })
-		.from(evidence)
-		.where(eq(evidence.id, id))
-		.limit(1);
+    .select({ caseId: evidence.caseId })
+    .from(evidence)
+    .where(and(eq(evidence.id, id), eq(evidence.userId, locals.user.id)))
+    .limit(1);
 
 	if (!rows[0]) {
 		throw error(404, 'Evidence not found');

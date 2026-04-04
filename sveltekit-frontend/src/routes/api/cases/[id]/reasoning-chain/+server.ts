@@ -10,7 +10,10 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { generateReasoningChain } from '$lib/server/ai/legal-reasoning-chain.js';
 import { requireAuth } from '$lib/server/auth-helpers.js';
+import { db } from '$lib/server/db/client';
+import { cases } from '$lib/server/db/schema-postgres.js';
 import { z } from 'zod';
+import { and, eq } from 'drizzle-orm';
 import { isUuid } from '$lib/server/validation.js';
 
 const reasoningChainSchema = z.object({
@@ -27,6 +30,14 @@ export const POST: RequestHandler = async (event) => {
 	if (!isUuid(caseId)) {
 		return json({ error: 'Invalid case ID format' }, { status: 400 });
 	}
+	const [targetCase] = await db
+    .select({ id: cases.id })
+    .from(cases)
+    .where(and(eq(cases.id, caseId), eq(cases.userId, event.locals.user.id)))
+    .limit(1);
+  if (!targetCase) {
+    return json({ error: 'Case not found' }, { status: 404 });
+  }
 	const startTime = Date.now();
 
 	try {

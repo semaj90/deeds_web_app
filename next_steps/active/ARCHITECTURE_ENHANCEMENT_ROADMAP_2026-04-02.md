@@ -47,16 +47,16 @@ User Query
 | **Qdrant** | 9 collections, INT8, BM42 sparse | Full (payload indexes, hybrid RRF) | None |
 | **pgvector** | 6 halfvec HNSW tables | Active (iterative scan enabled) | None |
 | **CouchDB** | ACE tag mirror, cluster summaries | Light (2 API routes only) | Underutilized |
-| **Bifrost** | AI gateway + semantic cache | Available (disabled by default) | Not enabled |
-| **Langfuse** | LLM observability traces | 8 functions, all zero-cost when off | Not deployed |
+| **Bifrost** | AI gateway + semantic cache | **ENABLED** — :3040 /v1/chat + /v1/embeddings + /v1/models verified, BIFROST_ENABLED=true | None |
+| **Langfuse** | LLM observability traces | **OPERATIONAL** — v3.163.0, 10 trace functions, 18 files wired, ClickHouse+Worker+Web healthy | None |
 | **Worker Threads** | K-Means, SOM, forensics, silhouette | Active (cluster-aware pool) | None |
 | **Go Microservices** | gRPC :50051, SIMD :8095, search :8096 | Docker profile:full | Optional |
 | **CHR97 Cartridge** | Binary tensor cache format | Internal (/api/cartridge/* endpoints) | Not exposed in UI |
-| **TensorRT** | GPU inference accelerator | Optional (--profile gpu, :8099) | Conflicts with native Ollama |
-| **VLM** | Vision Language Model (Gemma3 12B) | resize-for-vlm.ts only active | Not wired to API routes |
-| **Unsloth/QLoRA** | Fine-tuning adapter merging | Archived (notebook only) | Not integrated |
+| **TensorRT** | GPU inference accelerator | Not started — Docker compacted, reconsidering for Gemma 4 | Needs C: drive space for Triton image + TRT-LLM engine |
+| **VLM** | Vision Language Model (Gemma3→Gemma4) | Code wired — vlm-evidence-analyzer.ts (Triton→Ollama fallback) | Not runtime-tested with live VLM inference |
+| **Unsloth/GRPO** | LoRA fine-tuning + RL alignment | **IN PROGRESS** — 4 notebooks + merge-and-export.sh pipeline | Gemma4_E4B_Legal_GRPO.ipynb ready, needs Colab A100 run |
 | **Neo4j** | Graph DB for KAG/entity relationships | Active in ACE, optional Docker | Profile:full required |
-| **LibTorch CUDA** | N-API addon (similarity, clustering, embedding) | Verified (3 functions, RTX 3060 Ti) | Only /api/gpu/compute |
+| **LibTorch CUDA** | N-API addon (similarity, clustering, embedding) | Verified (6 functions, RTX 3060 Ti) — added getCudaMemory, batchCosineSimilarity, graphSimilarityHalf | Only /api/gpu/compute |
 
 ---
 
@@ -316,16 +316,26 @@ CHR97 Binary Format:
 | **P0c** | Tiered Retrieval + Pre-Retrieval KAG | 1 | P0 complete | **COMPLETE** |
 | **P0d** | Qdrant Schema Drift Fix | 0.5 | Qdrant running | **COMPLETE** |
 | **P0e** | Node→Evidence ID Mapping Fix | 0.5 | P0d complete | **COMPLETE** |
-| **P1** | Unsloth QLoRA Pipeline | 2-3 | CUDA, WSL2, Unsloth pip | Not started |
-| **P2** | VLM Enhancement + Wiring | 1-2 | Ollama gemma3-vision | Not started |
+| **P1** | Unsloth LoRA/GRPO Training | 2-3 | Colab A100, Unsloth pip | **IN PROGRESS** — Gemma4_E4B_Legal_GRPO.ipynb created (GRPO RL + 5 reward fns), needs Colab execution |
+| **P2** | VLM Enhancement + Wiring | 1-2 | Ollama gemma3-vision | **CODE WIRED** — vlm-evidence-analyzer.ts + endpoints exist, not runtime-tested with live Ollama VLM |
 | **P3** | CouchDB Topological Cache | 1 | CouchDB (already running) | **COMPLETE** — `dag-cache.ts` wired |
 | **P4** | Recursive Multi-Hop Retrieval | 2 | P0 + P0c + P3 completed | **COMPLETE** — `authority-chain.ts` wired into SSE chat |
 | **P5** | Langfuse/CouchDB Inference Log | 1-2 | CouchDB or Docker compose | **COMPLETE** — 6 SSE chat sites + synthesis worker |
-| **P6** | TensorRT/Ollama Coexistence | 1 | TensorRT Docker image | Not started |
+| **P6** | TensorRT/Ollama Coexistence | 1 | TensorRT Docker image, C: drive space | **NOT STARTED** — inference-router.ts code exists; Docker Desktop compacted to free C: space; reconsidering for Gemma 4 TRT-LLM |
+
+**Status (2026-04-03)**:
+- P0-P0e, P3-P5: **COMPLETE** (code + runtime verified)
+- P1: **IN PROGRESS** — GRPO notebook created, needs Colab A100 execution
+- P2: **CODE WIRED** — vlm-evidence-analyzer.ts exists, not runtime-tested
+- P6: **NOT STARTED** — code scaffolding exists, Docker Desktop compacted to free C: drive space for Triton; reconsidering for Gemma 4 TRT-LLM
+- Runtime proof: **17/17 PASS** (scripts/runtime-proof-pipeline.mjs)
 
 **Recommended next**:
-1. Runtime-proof new retrieval path (graph expansion fires, DAG cache hits, inference logs written)
-2. P4 (recursive multi-hop) → P2 (VLM) → P1 (Unsloth) → P6 (TRT coexistence)
+1. **P1**: Run Gemma4_E4B_Legal_GRPO.ipynb on Colab A100 (3-5 hours, ~$10)
+2. **P1**: Deploy resulting GGUF to Ollama: `ollama create gemma4-legal:latest -f Modelfile`
+3. **P2**: Runtime-test VLM pipeline with live Ollama (evidence upload + /api/vision/analyze)
+4. **P6**: Pull Triton TRT-LLM Docker image for Gemma 4 (needs ~8GB C: drive); build INT4 engine
+5. Watch TurboQuant for Ollama (~Q3 2026) — free 6x KV cache memory savings
 
 ---
 

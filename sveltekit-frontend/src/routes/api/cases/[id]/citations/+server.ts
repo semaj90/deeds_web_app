@@ -1,6 +1,6 @@
 import { caseStatuteLinks, citations, cases, db } from '$lib/server/db/client';
 import { error, isHttpError, json } from '@sveltejs/kit';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
@@ -46,6 +46,16 @@ export const GET: RequestHandler = async ({ locals, params }) => {
 
   const caseId = params.id;
   if (!isUuid(caseId)) return json({ error: 'Invalid case ID format' }, { status: 400 });
+
+  const [targetCase] = await db
+    .select({ id: cases.id })
+    .from(cases)
+    .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
+    .limit(1);
+
+  if (!targetCase) {
+    return json({ success: true, data: [] });
+  }
 
   const hasLinksTable = await hasCaseStatuteLinksTable();
 
@@ -126,7 +136,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
     const [targetCase] = await db
       .select({ id: cases.id })
       .from(cases)
-      .where(eq(cases.id, caseId))
+      .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
       .limit(1);
 
     if (!targetCase) {

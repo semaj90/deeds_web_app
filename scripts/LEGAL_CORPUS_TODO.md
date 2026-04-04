@@ -1,7 +1,7 @@
 # Legal Corpus Expansion — TODO / Research Backlog
 
 > **As of March 24, 2026** — Current corpus: 789 glossary terms (100% embedded) + 7,825 SCOTUS court opinions (100% embedded, Qdrant indexed).
-> All inserts target: PostgreSQL `legal_ai_db` on `127.0.0.1:5432`, user `legal_admin`
+> All inserts target: PostgreSQL `legal_ai_db` on `127.0.0.1:5434`, user `legal_admin`
 > Ingest script: `scripts/ingest_court_opinions.py`
 > Fetch script: `scripts/fetch_court_datasets.py`
 > Target table for constitutions/statutes: `court_opinions` (or new `legal_statutes` table — see §5)

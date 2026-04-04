@@ -6,6 +6,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { personsOfInterest, casePersons } from '$lib/server/db/schema/persons';
+import { cases } from '$lib/server/db/schema-postgres.js';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 
@@ -24,6 +25,14 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const caseId = params.id;
+
+	const [targetCase] = await db
+    .select({ id: cases.id })
+    .from(cases)
+    .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
+    .limit(1);
+
+  if (!targetCase) return json({ error: 'Case not found' }, { status: 404 });
 
 	const rows = await db
 		.select({
@@ -56,6 +65,14 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const caseId = params.id;
+	const [targetCase] = await db
+    .select({ id: cases.id })
+    .from(cases)
+    .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
+    .limit(1);
+
+  if (!targetCase) return json({ error: 'Case not found' }, { status: 404 });
+
 	const raw = await request.json().catch(() => ({}));
   const parsed = personLinkSchema.safeParse(raw);
   if (!parsed.success)
@@ -77,6 +94,14 @@ export const DELETE: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const caseId = params.id;
+	const [targetCase] = await db
+    .select({ id: cases.id })
+    .from(cases)
+    .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
+    .limit(1);
+
+  if (!targetCase) return json({ error: 'Case not found' }, { status: 404 });
+
 	const raw = await request.json().catch(() => ({}));
   const parsed = personDeleteSchema.safeParse(raw);
   if (!parsed.success)

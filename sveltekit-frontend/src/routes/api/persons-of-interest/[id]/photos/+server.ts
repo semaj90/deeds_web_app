@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/client';
 import { poiPhotos, personsOfInterest } from '$lib/server/db/schema-postgres';
 import { json } from '@sveltejs/kit';
-import { eq, desc } from 'drizzle-orm';
+import { and, eq, desc } from 'drizzle-orm';
 import { uploadFile, deleteFile } from '$lib/server/minio-client';
 import { createHash } from 'crypto';
 import sharp from 'sharp';
@@ -34,6 +34,18 @@ export const GET: RequestHandler = async ({ params, locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   if (!isUuid(params.id)) return json({ error: 'Invalid POI ID format' }, { status: 400 });
   try {
+    const [poi] = await db
+      .select({ id: personsOfInterest.id })
+      .from(personsOfInterest)
+      .where(
+        and(eq(personsOfInterest.id, params.id), eq(personsOfInterest.createdBy, locals.user.id))
+      )
+      .limit(1);
+
+    if (!poi) {
+      return json({ success: true, photos: [] });
+    }
+
     const photos = await db
       .select()
       .from(poiPhotos)
@@ -70,7 +82,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     const [poi] = await db
       .select({ id: personsOfInterest.id, name: personsOfInterest.name })
       .from(personsOfInterest)
-      .where(eq(personsOfInterest.id, poiId))
+      .where(and(eq(personsOfInterest.id, poiId), eq(personsOfInterest.createdBy, locals.user.id)))
       .limit(1);
 
     if (!poi) {
@@ -169,7 +181,22 @@ export const DELETE: RequestHandler = async ({ params, request, locals }) => {
     }
     const { photoId } = parsed.data;
 
-    const [deleted] = await db.delete(poiPhotos).where(eq(poiPhotos.id, photoId)).returning();
+    const [poi] = await db
+      .select({ id: personsOfInterest.id })
+      .from(personsOfInterest)
+      .where(
+        and(eq(personsOfInterest.id, params.id), eq(personsOfInterest.createdBy, locals.user.id))
+      )
+      .limit(1);
+
+    if (!poi) {
+      return json({ error: 'Person of interest not found' }, { status: 404 });
+    }
+
+    const [deleted] = await db
+      .delete(poiPhotos)
+      .where(and(eq(poiPhotos.id, photoId), eq(poiPhotos.poiId, params.id)))
+      .returning();
 
     if (!deleted) {
       return json({ error: 'Photo not found' }, { status: 404 });

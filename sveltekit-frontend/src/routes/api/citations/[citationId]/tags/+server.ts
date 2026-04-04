@@ -3,8 +3,17 @@ import { json, error } from '@sveltejs/kit';
 import { sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { invalidateCitationCache } from '$lib/server/cache/invalidation.js';
+import { citations } from '$lib/server/db/schema-postgres.js';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
+
+async function userOwnsCitation(citationId: string, userId: string): Promise<boolean> {
+  const result = await db.execute(
+    sql`SELECT id FROM citations WHERE id = ${citationId} AND created_by = ${userId} LIMIT 1`
+  );
+  const rows = (result as unknown as { rows?: Record<string, unknown>[] }).rows ?? [];
+  return rows.length > 0;
+}
 
 const addTagSchema = z.object({
 	tag: z.string().trim().min(1, 'Tag is required').max(200),
@@ -19,18 +28,23 @@ const removeTagSchema = z.object({
  * GET /api/citations/[citationId]/tags
  * List all tags for a citation (from citation_tag_links table)
  */
-export const GET: RequestHandler = async ({ params }) => {
-	if (!isUuid(params.citationId)) return json({ error: 'Invalid ID format' }, { status: 400 });
-	try {
-		const result = await db.execute(
-			sql`SELECT id, tag, color, created_at FROM citation_tag_links WHERE citation_id = ${params.citationId} ORDER BY created_at`
-		);
-		const rows = (result as unknown as { rows?: Record<string, unknown>[] }).rows ?? [];
-		return json({ success: true, tags: rows });
-	} catch (err) {
-		console.error('[citation-tags] GET error:', err);
-		return json({ success: true, tags: [] });
-	}
+export const GET: RequestHandler = async ({ params, locals }) => {
+  if (!locals.user) throw error(401, 'Unauthorized');
+  if (!isUuid(params.citationId)) return json({ error: 'Invalid ID format' }, { status: 400 });
+  try {
+    if (!(await userOwnsCitation(params.citationId, locals.user.id))) {
+      return json({ success: true, tags: [] });
+    }
+
+    const result = await db.execute(
+      sql`SELECT id, tag, color, created_at FROM citation_tag_links WHERE citation_id = ${params.citationId} ORDER BY created_at`
+    );
+    const rows = (result as unknown as { rows?: Record<string, unknown>[] }).rows ?? [];
+    return json({ success: true, tags: rows });
+  } catch (err) {
+    console.error('[citation-tags] GET error:', err);
+    return json({ success: true, tags: [] });
+  }
 };
 
 /**
@@ -48,6 +62,10 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 	const color = parsed.data.color;
 
 	try {
+		if (!(await userOwnsCitation(params.citationId, locals.user.id))) {
+      return json({ error: 'Citation not found' }, { status: 404 });
+    }
+
 		const result = await db.execute(
 			sql`INSERT INTO citation_tag_links (citation_id, tag, color, created_by)
 				VALUES (${params.citationId}, ${tag}, ${color}, ${locals.user.id})
@@ -81,6 +99,10 @@ export const DELETE: RequestHandler = async ({ params, request, locals }) => {
 	if (!delParsed.success) return json({ error: delParsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 
 	try {
+		if (!(await userOwnsCitation(params.citationId, locals.user.id))) {
+      return json({ error: 'Citation not found' }, { status: 404 });
+    }
+
 		await db.execute(
 			sql`DELETE FROM citation_tag_links WHERE citation_id = ${params.citationId} AND tag = ${delParsed.data.tag}`
 		);

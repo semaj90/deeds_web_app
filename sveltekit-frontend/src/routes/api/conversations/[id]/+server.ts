@@ -31,6 +31,16 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 	const conversationId = params.id;
 
 	try {
+		const [existingConversation] = await db
+      .select({ chatId: chatMetadata.chatId, userId: chatMetadata.userId })
+      .from(chatMetadata)
+      .where(eq(chatMetadata.chatId, conversationId))
+      .limit(1);
+
+    if (existingConversation && existingConversation.userId !== locals.user.id) {
+      return json({ message: 'Conversation not found' }, { status: 404 });
+    }
+
 		const raw = await request.json();
 		const parsed = updateConversationSchema.safeParse(raw);
 		if (!parsed.success) {
@@ -98,10 +108,20 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 	const conversationId = params.id;
 
 	try {
+		const [existingConversation] = await db
+      .select({ chatId: chatMetadata.chatId })
+      .from(chatMetadata)
+      .where(and(eq(chatMetadata.chatId, conversationId), eq(chatMetadata.userId, locals.user.id)))
+      .limit(1);
+
+    if (!existingConversation) {
+      return json({ message: 'Conversation not found' }, { status: 404 });
+    }
+
 		// Delete messages first (FK constraint)
 		await db
-			.delete(chatMessages)
-			.where(eq(chatMessages.chatId, conversationId));
+      .delete(chatMessages)
+      .where(and(eq(chatMessages.chatId, conversationId), eq(chatMessages.userId, locals.user.id)));
 
 		// Delete metadata
 		await db

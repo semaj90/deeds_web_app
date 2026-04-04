@@ -28,12 +28,21 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 	const { nodeId, page, limit } = parsed.data;
 	const offset = (page - 1) * limit;
 
-	let query: string;
-	let queryParams: unknown[];
+	const accessRes = await pool.query(
+    `SELECT id FROM library_documents WHERE id = $1 AND (uploaded_by IS NULL OR uploaded_by = $2)`,
+    [documentId, locals.user.id]
+  );
 
-	if (nodeId) {
-		// All chunks for a specific node
-		query = `
+  if (!accessRes.rows[0]) {
+    return json({ error: 'Document not found' }, { status: 404 });
+  }
+
+  let query: string;
+  let queryParams: unknown[];
+
+  if (nodeId) {
+    // All chunks for a specific node
+    query = `
 			SELECT lc.id,
 			       lc.chunk_index,
 			       lc.chunk_text AS content,
@@ -54,13 +63,13 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 			       ln.depth
 			FROM legal_chunks lc
 			JOIN legal_nodes ln ON ln.id = lc.legal_node_id
-			WHERE lc.legal_node_id = $1
+			WHERE ln.document_id = $1 AND lc.legal_node_id = $2
 			ORDER BY lc.chunk_index
-			LIMIT $2 OFFSET $3`;
-		queryParams = [nodeId, limit, offset];
-	} else {
-		// All chunks for document, ordered by node path + chunk index
-		query = `
+			LIMIT $3 OFFSET $4`;
+    queryParams = [documentId, nodeId, limit, offset];
+  } else {
+    // All chunks for document, ordered by node path + chunk index
+    query = `
 			SELECT lc.id,
 			       lc.chunk_index,
 			       lc.chunk_text AS content,
@@ -84,18 +93,21 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 			WHERE ln.document_id = $1
 			ORDER BY ln.node_path, lc.chunk_index
 			LIMIT $2 OFFSET $3`;
-		queryParams = [documentId, limit, offset];
-	}
+    queryParams = [documentId, limit, offset];
+  }
 
-	const [res, countRes] = await Promise.all([
-		pool.query(query, queryParams),
-		nodeId
-			? pool.query(`SELECT count(*) FROM legal_chunks WHERE legal_node_id = $1`, [nodeId])
-			: pool.query(
-				`SELECT count(*) FROM legal_chunks lc JOIN legal_nodes ln ON ln.id = lc.legal_node_id WHERE ln.document_id = $1`,
-				[documentId]
-			),
-	]);
+  const [res, countRes] = await Promise.all([
+    pool.query(query, queryParams),
+    nodeId
+      ? pool.query(
+          `SELECT count(*) FROM legal_chunks lc JOIN legal_nodes ln ON ln.id = lc.legal_node_id WHERE ln.document_id = $1 AND lc.legal_node_id = $2`,
+          [documentId, nodeId]
+        )
+      : pool.query(
+          `SELECT count(*) FROM legal_chunks lc JOIN legal_nodes ln ON ln.id = lc.legal_node_id WHERE ln.document_id = $1`,
+          [documentId]
+        ),
+  ]);
 
 	const total = Number(countRes.rows[0]?.count ?? 0);
 

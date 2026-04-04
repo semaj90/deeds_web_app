@@ -1,6 +1,7 @@
 import { json, error, type RequestHandler } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
-import { auditLog } from '$lib/server/db/schema-postgres.js';
+import { auditLog, personsOfInterest } from '$lib/server/db/schema-postgres.js';
+import { and, eq } from 'drizzle-orm';
 import { validateUuidParams } from '$lib/server/validation.js';
 
 /**
@@ -11,24 +12,34 @@ import { validateUuidParams } from '$lib/server/validation.js';
  * returns 200 so the frontend can filter the associate from its local list.
  */
 export const DELETE: RequestHandler = async ({ params, locals }) => {
-	if (!locals.user) throw error(401, 'Unauthorized');
-	const invalid = validateUuidParams(params, 'id', 'associateId');
-	if (invalid) return invalid;
+  if (!locals.user) throw error(401, 'Unauthorized');
+  const invalid = validateUuidParams(params, 'id', 'associateId');
+  if (invalid) return invalid;
 
-	const { id: poiId, associateId } = params;
+  const { id: poiId, associateId } = params;
 
-	try {
-		await db.insert(auditLog).values({
-			userId: locals.user.id,
-			action: 'poi_dissociate',
-			resourceType: 'person_of_interest',
-			resourceId: poiId,
-			details: { dissociatedFrom: associateId },
-		});
-	} catch (err) {
-		// Non-fatal — audit log failure shouldn't block the dissociation
-		console.error('Audit log insert failed:', err);
-	}
+  try {
+    const [poi] = await db
+      .select({ id: personsOfInterest.id })
+      .from(personsOfInterest)
+      .where(and(eq(personsOfInterest.id, poiId), eq(personsOfInterest.createdBy, locals.user.id)))
+      .limit(1);
 
-	return json({ success: true, poiId, dissociatedFrom: associateId });
+    if (!poi) {
+      return json({ error: 'Person of interest not found' }, { status: 404 });
+    }
+
+    await db.insert(auditLog).values({
+      userId: locals.user.id,
+      action: 'poi_dissociate',
+      resourceType: 'person_of_interest',
+      resourceId: poiId,
+      details: { dissociatedFrom: associateId },
+    });
+  } catch (err) {
+    // Non-fatal — audit log failure shouldn't block the dissociation
+    console.error('Audit log insert failed:', err);
+  }
+
+  return json({ success: true, poiId, dissociatedFrom: associateId });
 };

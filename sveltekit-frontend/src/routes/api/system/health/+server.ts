@@ -5,6 +5,7 @@ import { sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { getQuicEmbeddingHealth } from '$lib/server/grpc/embedding-client.js';
 
 async function checkService(name: string, fn: () => Promise<void>): Promise<'ok' | 'error'> {
 	try {
@@ -36,18 +37,24 @@ export const GET: RequestHandler = async () => {
 		}),
 	]);
 
+	const embeddingQuic = getQuicEmbeddingHealth();
+
 	const allOk = database === 'ok' && redis === 'ok' && ollama === 'ok' && qdrant === 'ok';
+	const overallStatus = allOk && embeddingQuic.status !== 'degraded' ? 'ok' : 'degraded';
 
 	const health = {
-		status: allOk ? 'ok' : 'degraded',
-		timestamp: new Date().toISOString(),
-		system: {
-			uptime: os.uptime(),
-			loadavg: os.loadavg(),
-			memory: { total: os.totalmem(), free: os.freemem() },
-		},
-		services: { database, redis, ollama, qdrant },
-	};
+    status: overallStatus,
+    timestamp: new Date().toISOString(),
+    system: {
+      uptime: os.uptime(),
+      loadavg: os.loadavg(),
+      memory: { total: os.totalmem(), free: os.freemem() },
+    },
+    services: { database, redis, ollama, qdrant },
+    embeddings: {
+      quic: embeddingQuic,
+    },
+  };
 
 	return json(health);
 };

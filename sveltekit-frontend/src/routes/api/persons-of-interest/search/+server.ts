@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/client';
 import { personsOfInterest, poiPhotos } from '$lib/server/db/schema-postgres';
 import { json, error } from '@sveltejs/kit';
-import { sql, desc } from 'drizzle-orm';
+import { and, eq, sql, desc } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 
@@ -34,23 +34,25 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		const searchTerm = `%${query.toLowerCase()}%`;
 
 		const results = await db
-			.select({
-				id: personsOfInterest.id,
-				name: personsOfInterest.name,
-				status: personsOfInterest.status,
-				threatLevel: personsOfInterest.threatLevel,
-				description: personsOfInterest.description,
-				aliases: personsOfInterest.aliases,
-				relationship: personsOfInterest.relationship,
-				photoUrl: sql<string | null>`(
+      .select({
+        id: personsOfInterest.id,
+        name: personsOfInterest.name,
+        status: personsOfInterest.status,
+        threatLevel: personsOfInterest.threatLevel,
+        description: personsOfInterest.description,
+        aliases: personsOfInterest.aliases,
+        relationship: personsOfInterest.relationship,
+        photoUrl: sql<string | null>`(
 					SELECT ${poiPhotos.thumbnailUrl} FROM ${poiPhotos}
 					WHERE ${poiPhotos.poiId} = ${personsOfInterest.id}
 					ORDER BY ${poiPhotos.uploadedAt} DESC LIMIT 1
 				)`.as('photo_url'),
-			})
-			.from(personsOfInterest)
-			.where(
-				sql`(
+      })
+      .from(personsOfInterest)
+      .where(
+        and(
+          eq(personsOfInterest.createdBy, locals.user.id),
+          sql`(
 					lower(${personsOfInterest.name}) LIKE ${searchTerm}
 					OR lower(coalesce(${personsOfInterest.description}, '')) LIKE ${searchTerm}
 					OR lower(coalesce(${personsOfInterest.relationship}, '')) LIKE ${searchTerm}
@@ -58,10 +60,12 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 						SELECT 1 FROM unnest(${personsOfInterest.aliases}) alias
 						WHERE lower(alias) LIKE ${searchTerm}
 					)
-				)${excludeId ? sql` AND ${personsOfInterest.id} != ${excludeId}` : sql``}`
-			)
-			.orderBy(desc(personsOfInterest.updatedAt))
-			.limit(limit);
+				)`,
+          excludeId ? sql`${personsOfInterest.id} != ${excludeId}` : sql`true`
+        )
+      )
+      .orderBy(desc(personsOfInterest.updatedAt))
+      .limit(limit);
 
 		// Score results by match quality
 		const scored = results.map((r) => {

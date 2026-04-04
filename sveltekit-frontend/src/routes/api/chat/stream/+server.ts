@@ -1,9 +1,10 @@
 import { db } from '$lib/server/db/client';
 import { chatMessages, chatMetadata } from '$lib/server/db/schema';
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { acquireGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 const chatStreamPostSchema = z.object({
 	sessionId: z.string().min(1, 'Missing sessionId').max(200),
@@ -28,7 +29,13 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 
 	// Query mode: Simple streaming without authentication/session
 	if (query && !sessionId) {
-		return handleQueryMode(query, mode, caseId, persona);
+		if (!locals.user?.id) {
+      return new Response('Unauthorized', { status: 401 });
+    }
+    if (caseId && !isUuid(caseId)) {
+      return new Response('Invalid case ID format', { status: 400 });
+    }
+    return handleQueryMode(query, mode, caseId, persona, locals.user.id);
 	}
 
 	// Session mode: Requires authentication
@@ -54,233 +61,238 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	// Get case association from metadata
 	const sessionCaseId = sessionMeta[0]?.caseId ?? caseId ?? null;
 
-	return handleSessionMode(sessionId, sessionCaseId);
+	return handleSessionMode(sessionId, sessionCaseId, locals.user.id);
 };
 
 /**
  * Load case context from DB for injection into AI prompts
  */
-async function loadCaseContext(caseId: string): Promise<string | null> {
-	try {
-		const { cases } = await import('$lib/server/db/schema');
+async function loadCaseContext(caseId: string, userId?: string): Promise<string | null> {
+  try {
+    const { cases } = await import('$lib/server/db/schema');
 
-		const caseRows = await db
-			.select()
-			.from(cases)
-			.where(eq(cases.id, caseId))
-			.limit(1);
+    const caseRows = await db
+      .select()
+      .from(cases)
+      .where(userId ? and(eq(cases.id, caseId), eq(cases.userId, userId)) : eq(cases.id, caseId))
+      .limit(1);
 
-		if (!caseRows.length) return null;
+    if (!caseRows.length) return null;
 
-		const c = caseRows[0];
-		let context = `## Active Case Context\n`;
-		context += `- **Title**: ${c.title}\n`;
-		if (c.caseNumber) context += `- **Case #**: ${c.caseNumber}\n`;
-		if (c.jurisdiction) context += `- **Jurisdiction**: ${c.jurisdiction}\n`;
-		if (c.court) context += `- **Court**: ${c.court}\n`;
-		if (c.status) context += `- **Status**: ${c.status}\n`;
-		if (c.description) context += `- **Description**: ${c.description}\n`;
+    const c = caseRows[0];
+    let context = `## Active Case Context\n`;
+    context += `- **Title**: ${c.title}\n`;
+    if (c.caseNumber) context += `- **Case #**: ${c.caseNumber}\n`;
+    if (c.jurisdiction) context += `- **Jurisdiction**: ${c.jurisdiction}\n`;
+    if (c.court) context += `- **Court**: ${c.court}\n`;
+    if (c.status) context += `- **Status**: ${c.status}\n`;
+    if (c.description) context += `- **Description**: ${c.description}\n`;
 
-		// Load recent evidence for this case
-		try {
-			const { evidence } = await import('$lib/server/db/schema');
-			const evidenceRows = await db
-				.select()
-				.from(evidence)
-				.where(eq(evidence.caseId, caseId))
-				.limit(5);
+    // Load recent evidence for this case
+    try {
+      const { evidence } = await import('$lib/server/db/schema');
+      const evidenceRows = await db
+        .select()
+        .from(evidence)
+        .where(eq(evidence.caseId, caseId))
+        .limit(5);
 
-			if (evidenceRows.length > 0) {
-				context += `\n## Evidence (${evidenceRows.length} items)\n`;
-				for (const e of evidenceRows) {
-					context += `- ${e.title ?? e.fileType ?? 'Untitled'}: ${e.description ?? ''}\n`;
-				}
-			}
-		} catch {
-			// Evidence table may not exist yet
-		}
+      if (evidenceRows.length > 0) {
+        context += `\n## Evidence (${evidenceRows.length} items)\n`;
+        for (const e of evidenceRows) {
+          context += `- ${e.title ?? e.fileType ?? 'Untitled'}: ${e.description ?? ''}\n`;
+        }
+      }
+    } catch {
+      // Evidence table may not exist yet
+    }
 
-		// Load citations linked to this case
-		try {
-			const { savedCitations } = await import('$lib/server/db/schema');
-			const citationRows = await db
-				.select()
-				.from(savedCitations)
-				.where(eq(savedCitations.caseId, caseId))
-				.limit(10);
+    // Load citations linked to this case
+    try {
+      const { savedCitations } = await import('$lib/server/db/schema');
+      const citationRows = await db
+        .select()
+        .from(savedCitations)
+        .where(eq(savedCitations.caseId, caseId))
+        .limit(10);
 
-			if (citationRows.length > 0) {
-				context += `\n## Citations (${citationRows.length} items)\n`;
-				for (const cit of citationRows) {
-					context += `- ${cit.statuteCode}: ${cit.statuteTitle ?? ''}\n`;
-				}
-			}
-		} catch {
-			// Citations table may not exist yet
-		}
+      if (citationRows.length > 0) {
+        context += `\n## Citations (${citationRows.length} items)\n`;
+        for (const cit of citationRows) {
+          context += `- ${cit.statuteCode}: ${cit.statuteTitle ?? ''}\n`;
+        }
+      }
+    } catch {
+      // Citations table may not exist yet
+    }
 
-		return context;
-	} catch (error) {
-		console.warn('Failed to load case context:', error);
-		return null;
-	}
+    return context;
+  } catch (error) {
+    console.warn('Failed to load case context:', error);
+    return null;
+  }
 }
 
 /**
  * Query Mode: Simple streaming with optional case context
  */
-function handleQueryMode(query: string, mode: string, caseId: string | null, persona: string = 'neutral'): Response {
-	const stream = new ReadableStream({
-		async start(controller) {
-			const encoder = new TextEncoder();
+function handleQueryMode(
+  query: string,
+  mode: string,
+  caseId: string | null,
+  persona: string = 'neutral',
+  userId?: string
+): Response {
+  const stream = new ReadableStream({
+    async start(controller) {
+      const encoder = new TextEncoder();
 
-			const send = (data: unknown) => {
-				const message = `data: ${JSON.stringify(data)}\n\n`;
-				controller.enqueue(encoder.encode(message));
-			};
+      const send = (data: unknown) => {
+        const message = `data: ${JSON.stringify(data)}\n\n`;
+        controller.enqueue(encoder.encode(message));
+      };
 
-			try {
-				// Acquire GPU lease for Ollama streaming (non-blocking)
-				await acquireGpuLease('ollama', 120).catch(() => null);
+      try {
+        // Acquire GPU lease for Ollama streaming (non-blocking)
+        await acquireGpuLease('ollama', 120).catch(() => null);
 
-				send({ type: 'start', query, mode, caseId, timestamp: new Date().toISOString() });
+        send({ type: 'start', query, mode, caseId, timestamp: new Date().toISOString() });
 
-				// Load case context if available
-				let caseContext = '';
-				if (caseId) {
-					const ctx = await loadCaseContext(caseId);
-					if (ctx) {
-						caseContext = ctx;
-						send({ type: 'case_context', caseId, hasContext: true });
-					}
-				}
+        // Load case context if available
+        let caseContext = '';
+        if (caseId) {
+          const ctx = await loadCaseContext(caseId, userId);
+          if (ctx) {
+            caseContext = ctx;
+            send({ type: 'case_context', caseId, hasContext: true });
+          }
+        }
 
-				// Apply persona styling to prompt
-				let systemPrefix = '';
-				if (persona && persona !== 'neutral') {
-					const { getPersona } = await import('$lib/server/ace/style-adapter.js');
-					const config = getPersona(persona as Parameters<typeof getPersona>[0]);
-					systemPrefix = config.systemPrefix + '\n\n';
-				}
+        // Apply persona styling to prompt
+        let systemPrefix = '';
+        if (persona && persona !== 'neutral') {
+          const { getPersona } = await import('$lib/server/ace/style-adapter.js');
+          const config = getPersona(persona as Parameters<typeof getPersona>[0]);
+          systemPrefix = config.systemPrefix + '\n\n';
+        }
 
-				// Build prompt with case context + persona
-				const prompt = systemPrefix + (caseContext
-					? `${caseContext}\n\n## User Question\n${query}`
-					: query);
+        // Build prompt with case context + persona
+        const prompt =
+          systemPrefix + (caseContext ? `${caseContext}\n\n## User Question\n${query}` : query);
 
-				// Import LLM router dynamically
-				const { llmRouter } = await import('$lib/server/llm-router');
+        // Import LLM router dynamically
+        const { llmRouter } = await import('$lib/server/llm-router');
 
-				// Stream response
-				const responseStream = await llmRouter.generateStream({
-					prompt,
-					provider: mode === 'rag' ? 'gemini' : 'ollama',
-					model: mode === 'rag' ? 'gemini-2.0-flash-exp' : 'gemma3-legal:latest'
-				});
+        // Stream response
+        const responseStream = await llmRouter.generateStream({
+          prompt,
+          provider: mode === 'rag' ? 'gemini' : 'ollama',
+          model: mode === 'rag' ? 'gemini-2.0-flash-exp' : 'gemma3-legal:latest',
+        });
 
-				for await (const chunk of responseStream) {
-					send({ type: 'token', content: chunk?.content || chunk.text });
-				}
+        for await (const chunk of responseStream) {
+          send({ type: 'token', content: chunk?.content || chunk.text });
+        }
 
-				send({ type: 'done' });
-				controller.close();
-			} catch (error) {
-				send({
-					type: 'error',
-					error: 'Stream error'
-				});
-				controller.close();
-			}
-		}
-	});
+        send({ type: 'done' });
+        controller.close();
+      } catch (error) {
+        send({
+          type: 'error',
+          error: 'Stream error',
+        });
+        controller.close();
+      }
+    },
+  });
 
-	return new Response(stream, {
-		headers: {
-			'Content-Type': 'text/event-stream',
-			'Cache-Control': 'no-cache',
-			Connection: 'keep-alive'
-		}
-	});
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      Connection: 'keep-alive',
+    },
+  });
 }
 
 /**
  * Session Mode: Full chat history + streaming with case context
  */
-function handleSessionMode(sessionId: string, caseId: string | null): Response {
-	let pollIntervalId: ReturnType<typeof setInterval>;
-	let keepAliveId: ReturnType<typeof setInterval>;
+function handleSessionMode(sessionId: string, caseId: string | null, userId: string): Response {
+  let pollIntervalId: ReturnType<typeof setInterval>;
+  let keepAliveId: ReturnType<typeof setInterval>;
 
-	const stream = new ReadableStream({
-		async start(controller) {
-			const encoder = new TextEncoder();
+  const stream = new ReadableStream({
+    async start(controller) {
+      const encoder = new TextEncoder();
 
-			const send = (event: string, data: unknown) => {
-				const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
-				controller.enqueue(encoder.encode(message));
-			};
+      const send = (event: string, data: unknown) => {
+        const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+        controller.enqueue(encoder.encode(message));
+      };
 
-			send('connected', { sessionId, caseId, timestamp: new Date().toISOString() });
+      send('connected', { sessionId, caseId, timestamp: new Date().toISOString() });
 
-			// Poll for new messages
-			let lastMessageId: string | null = null;
-			pollIntervalId = setInterval(async () => {
-				try {
-					const messages = await db
-						.select()
-						.from(chatMessages)
-						.where(eq(chatMessages.chatId, sessionId))
-						.orderBy(desc(chatMessages.createdAt))
-						.limit(10);
+      // Poll for new messages
+      let lastMessageId: string | null = null;
+      pollIntervalId = setInterval(async () => {
+        try {
+          const messages = await db
+            .select()
+            .from(chatMessages)
+            .where(and(eq(chatMessages.chatId, sessionId), eq(chatMessages.userId, userId)))
+            .orderBy(desc(chatMessages.createdAt))
+            .limit(10);
 
-					if (lastMessageId) {
-						const newMessages = messages.filter((m) => m.id > lastMessageId!);
+          if (lastMessageId) {
+            const newMessages = messages.filter((m) => m.id > lastMessageId!);
 
-						for (const msg of newMessages.reverse()) {
-							send('message', {
-								id: msg.id,
-								role: msg.role,
-								content: msg.content,
-								timestamp: msg.createdAt
-							});
-							lastMessageId = msg.id;
-						}
-					} else {
-						if (messages.length > 0) {
-							lastMessageId = messages[0].id;
-							send('message', {
-								id: messages[0].id,
-								role: messages[0].role,
-								content: messages[0].content,
-								timestamp: messages[0].createdAt
-							});
-						}
-					}
-				} catch (error) {
-					console.error('SSE poll error:', error);
-					send('error', { message: 'Failed to fetch messages' });
-				}
-			}, 1000);
+            for (const msg of newMessages.reverse()) {
+              send('message', {
+                id: msg.id,
+                role: msg.role,
+                content: msg.content,
+                timestamp: msg.createdAt,
+              });
+              lastMessageId = msg.id;
+            }
+          } else {
+            if (messages.length > 0) {
+              lastMessageId = messages[0].id;
+              send('message', {
+                id: messages[0].id,
+                role: messages[0].role,
+                content: messages[0].content,
+                timestamp: messages[0].createdAt,
+              });
+            }
+          }
+        } catch (error) {
+          console.error('SSE poll error:', error);
+          send('error', { message: 'Failed to fetch messages' });
+        }
+      }, 1000);
 
-			// Keep-alive ping every 30 seconds
-			keepAliveId = setInterval(() => {
-				send('ping', { timestamp: new Date().toISOString() });
-			}, 30000);
-		},
+      // Keep-alive ping every 30 seconds
+      keepAliveId = setInterval(() => {
+        send('ping', { timestamp: new Date().toISOString() });
+      }, 30000);
+    },
 
-		cancel() {
-			clearInterval(pollIntervalId);
-			clearInterval(keepAliveId);
-		}
-	});
+    cancel() {
+      clearInterval(pollIntervalId);
+      clearInterval(keepAliveId);
+    },
+  });
 
-	return new Response(stream, {
-		headers: {
-			'Content-Type': 'text/event-stream',
-			'Cache-Control': 'no-cache',
-			Connection: 'keep-alive',
-			'X-Accel-Buffering': 'no'
-		}
-	});
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      Connection: 'keep-alive',
+      'X-Accel-Buffering': 'no',
+    },
+  });
 }
 
 /**
@@ -300,6 +312,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const { sessionId, message, caseId } = parsed.data;
 
 	try {
+		if (caseId) {
+      const ctx = await loadCaseContext(caseId, locals.user.id);
+      if (!ctx) {
+        return new Response('Case not found', { status: 404 });
+      }
+    }
+
 		// Ensure chat metadata exists (upsert session with case association)
 		await db
 			.insert(chatMetadata)
@@ -365,7 +384,7 @@ async function generateAIResponse(
 		// Load case context
 		let caseContext = '';
 		if (caseId) {
-			const ctx = await loadCaseContext(caseId);
+			const ctx = await loadCaseContext(caseId, userId);
 			if (ctx) caseContext = ctx;
 		}
 

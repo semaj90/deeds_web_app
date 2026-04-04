@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { cases, evidence, caseNotes, citations, personsOfInterest } from '$lib/server/db/schema';
-import { arrayContains, eq, desc, sql } from 'drizzle-orm';
+import { and, arrayContains, eq, desc, sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { isUuid } from '$lib/server/validation.js';
 
@@ -48,9 +48,13 @@ export const POST: RequestHandler = async ({ params, locals }) => {
 	}
 
 	const caseRows = await safe(
-		db.select().from(cases).where(eq(cases.id, id)).limit(1),
-		[]
-	);
+    db
+      .select()
+      .from(cases)
+      .where(and(eq(cases.id, id), eq(cases.userId, locals.user.id)))
+      .limit(1),
+    []
+  );
 
 	const caseRow = caseRows[0];
 	if (!caseRow) {
@@ -61,45 +65,49 @@ export const POST: RequestHandler = async ({ params, locals }) => {
 	}
 
 	const [evidenceRows, noteRows, personRows, citationRows] = await Promise.all([
-		safe(
-			db.select().from(evidence).where(eq(evidence.caseId, id)).limit(200),
-			[]
-		),
-		safe(
-			db
-				.select()
-				.from(caseNotes)
-				.where(eq(caseNotes.caseId, id))
-				.orderBy(desc(caseNotes.isPinned), desc(caseNotes.updatedAt))
-				.limit(100),
-			[]
-		),
-		safe(
-			db
-				.select()
-				.from(personsOfInterest)
-				.where(arrayContains(personsOfInterest.caseIds, [id]))
-				.limit(50),
-			[]
-		),
-		safe(
-			db
-				.select({
-					id: citations.id,
-					pageNumber: citations.pageNumber,
-					createdAt: citations.createdAt,
-					quotedText: sql<string>`"citations"."quoted_text"`,
-					citationType: sql<string>`"citations"."citation_type"`,
-					relevanceScore: sql<number>`"citations"."relevance_score"`,
-					formattedCitation: sql<string>`"citations"."formatted_citation"`,
-					isKeyAuthority: sql<boolean>`"citations"."is_key_authority"`,
-				})
-				.from(citations)
-				.where(eq(citations.caseId, id))
-				.limit(100),
-			[]
-		)
-	]);
+    safe(
+      db
+        .select()
+        .from(evidence)
+        .where(and(eq(evidence.caseId, id), eq(evidence.userId, locals.user.id)))
+        .limit(200),
+      []
+    ),
+    safe(
+      db
+        .select()
+        .from(caseNotes)
+        .where(eq(caseNotes.caseId, id))
+        .orderBy(desc(caseNotes.isPinned), desc(caseNotes.updatedAt))
+        .limit(100),
+      []
+    ),
+    safe(
+      db
+        .select()
+        .from(personsOfInterest)
+        .where(arrayContains(personsOfInterest.caseIds, [id]))
+        .limit(50),
+      []
+    ),
+    safe(
+      db
+        .select({
+          id: citations.id,
+          pageNumber: citations.pageNumber,
+          createdAt: citations.createdAt,
+          quotedText: sql<string>`"citations"."quoted_text"`,
+          citationType: sql<string>`"citations"."citation_type"`,
+          relevanceScore: sql<number>`"citations"."relevance_score"`,
+          formattedCitation: sql<string>`"citations"."formatted_citation"`,
+          isKeyAuthority: sql<boolean>`"citations"."is_key_authority"`,
+        })
+        .from(citations)
+        .where(eq(citations.caseId, id))
+        .limit(100),
+      []
+    ),
+  ]);
 
 	const title = esc(caseRow.title) || 'Untitled Case';
 	const caseNum = esc(caseRow.caseNumber) || `#${id}`;

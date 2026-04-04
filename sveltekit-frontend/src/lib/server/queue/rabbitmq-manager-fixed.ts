@@ -808,7 +808,7 @@ export class RabbitMQManager extends EventEmitter {
       const t0 = performance.now();
 
       // Stage 1: ACE context assembly
-      const { assembleACEContext, buildACEPrompt } = await import('../ace/context-assembler.js');
+      const { assembleACEContext, buildACEPromptCached } = await import('../ace/context-assembler.js');
       const { orderByDependency, extractCitationRefs } = await import('../retrieval/document-dag.js');
       const context = await assembleACEContext({
         query: data.query,
@@ -835,7 +835,7 @@ export class RabbitMQManager extends EventEmitter {
           .filter((c): c is RAGChunk => c !== undefined);
       }
 
-      const acePrompt = buildACEPrompt(context, data.query);
+      const acePrompt = await buildACEPromptCached(context, data.query);
       const contextMs = performance.now() - t0;
 
       // Stage 2: Direct Ollama LLM call (no Bifrost — single Ollama request)

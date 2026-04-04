@@ -114,6 +114,16 @@ type AttachmentJobStatus = {
   progress: number;
   message: string;
   error?: string | null;
+  result?: {
+    title?: string;
+    contentPreview?: string;
+    chunksCreated?: number;
+    graphNodeId?: string | null;
+    extractionMethod?: string;
+    yoloLabels?: string[];
+    layoutRegions?: string[];
+    totalTokens?: number;
+  } | null;
 };
 
 export interface SendMessageOptions {
@@ -415,7 +425,7 @@ export class ChatSession {
         const status = await this._fetchAttachmentJobStatus(jobId);
         consecutiveFailures = 0;
         if (status.status === 'completed') {
-          this.addMessage('system', `Attachment indexed for retrieval: ${title}`);
+          this._injectAnalysisContext(title, status.result);
           return;
         }
 
@@ -450,6 +460,46 @@ export class ChatSession {
       'system',
       `Attachment indexing is still running for ${title}. Preview-grounded answers remain available.`
     );
+  }
+
+  /** Inject a system message with the full analysis context so subsequent questions can reference it */
+  private _injectAnalysisContext(title: string, result?: AttachmentJobStatus['result']): void {
+    if (!result) {
+      this.addMessage('system', `Attachment indexed for retrieval: ${title}`);
+      return;
+    }
+
+    const parts = [`[File Analysis Complete: ${result.title || title}]`];
+
+    if (result.extractionMethod || result.chunksCreated) {
+      const extraction = [
+        result.extractionMethod ? `via ${result.extractionMethod}` : '',
+        result.chunksCreated ? `${result.chunksCreated} chunks indexed` : '',
+        result.totalTokens ? `${result.totalTokens} tokens` : '',
+      ].filter(Boolean).join(', ');
+      if (extraction) parts.push(`Extraction: ${extraction}`);
+    }
+
+    if (result.yoloLabels?.length) {
+      parts.push(`Visual objects detected: ${result.yoloLabels.join(', ')}`);
+    }
+
+    if (result.layoutRegions?.length) {
+      parts.push(`Layout regions: ${result.layoutRegions.join(', ')}`);
+    }
+
+    if (result.contentPreview) {
+      const preview = result.contentPreview.length > 2000
+        ? result.contentPreview.slice(0, 2000) + '...'
+        : result.contentPreview;
+      parts.push(`Content summary: ${preview}`);
+    }
+
+    if (result.graphNodeId) {
+      parts.push(`Graph node: ${result.graphNodeId}`);
+    }
+
+    this.addMessage('system', parts.join('\n'));
   }
 
   /**

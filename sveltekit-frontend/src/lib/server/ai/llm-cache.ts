@@ -6,7 +6,7 @@
  * - Query embedding (768-dim) stored in Qdrant llm_response_cache collection
  * - Context hash (MD5) ensures cache hits only for semantically similar queries with identical context
  * - TTL metadata for cache expiration (default 24 hours)
- * - Similarity threshold 0.85 for cache hits (high precision to avoid incorrect answers)
+ * - Similarity threshold 0.88 for cache hits (high precision for legal domain safety)
  */
 
 import { createHash } from 'crypto';
@@ -17,11 +17,34 @@ import { ollamaFetch } from '$lib/server/ollama.js';
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
 
-// Cache hit threshold — only return cached response if similarity >= 0.85
-const CACHE_HIT_THRESHOLD = 0.85;
+// Cache hit threshold — only return cached response if similarity >= 0.88
+// Bumped from 0.85 to 0.88 for legal domain safety (incorrect cached answers are worse than cache misses)
+const CACHE_HIT_THRESHOLD = 0.88;
 
-// Cache TTL in seconds (24 hours)
-const CACHE_TTL_SECONDS = 24 * 60 * 60;
+// Model version — included in cache key so cache auto-invalidates when model changes
+// Bump this when deploying a new fine-tuned model (e.g. gemma3-legal → gemma4-legal)
+const CACHE_MODEL_VERSION = 'v2';
+
+// Tiered TTL by query type (seconds)
+const CACHE_TTL = {
+	precedent: 48 * 60 * 60,   // 48h — statutes/case law rarely change
+	analysis:   4 * 60 * 60,   // 4h  — case analysis evolves during investigation
+	evidence:  30 * 60,         // 30m — active evidence, data changes frequently
+	chat:       5 * 60,         // 5m  — conversational, ephemeral
+	default:   24 * 60 * 60,   // 24h — fallback
+} as const;
+
+type CacheTier = keyof typeof CACHE_TTL;
+
+/** Classify a query into a cache tier based on content keywords */
+function classifyQueryTier(query: string): CacheTier {
+	const q = query.toLowerCase();
+	if (/\b(statute|u\.?s\.?c|cfr|code|section|§|precedent|case law|ruling)\b/.test(q)) return 'precedent';
+	if (/\b(evidence|exhibit|chain of custody|forensic|upload)\b/.test(q)) return 'evidence';
+	if (/\b(analyz|review|assess|evaluat|summariz|interpret)\b/.test(q)) return 'analysis';
+	if (q.length < 80) return 'chat'; // Short messages are likely conversational
+	return 'default';
+}
 
 interface CacheEntry {
 	query: string;
@@ -158,11 +181,14 @@ export async function storeCachedResponse(params: {
 
 	try {
 		const contextHash = hashContext(context);
+		const tier = classifyQueryTier(query);
+		const ttlSeconds = CACHE_TTL[tier];
 		const now = new Date();
-		const expiresAt = new Date(now.getTime() + CACHE_TTL_SECONDS * 1000);
+		const expiresAt = new Date(now.getTime() + ttlSeconds * 1000);
 
-		// Generate deterministic point ID from query + context hash
-		const pointId = deterministicPointId(`${query}:${contextHash}:${model}`);
+		// Generate deterministic point ID from query + context hash + model version
+		// Model version ensures cache auto-invalidates when deploying a new fine-tuned model
+		const pointId = deterministicPointId(`${query}:${contextHash}:${model}:${CACHE_MODEL_VERSION}`);
 
 		const qdrant = new QdrantManager();
 
@@ -186,7 +212,7 @@ export async function storeCachedResponse(params: {
 			]
 		});
 
-		console.log(`[LLM Cache] 💾 STORED — query: "${query.slice(0, 50)}...", expires: ${expiresAt.toISOString()}`);
+		console.log(`[LLM Cache] STORED — tier: ${tier}, ttl: ${ttlSeconds}s, query: "${query.slice(0, 50)}...", expires: ${expiresAt.toISOString()}`);
 	} catch (error) {
 		// Cache storage failures should not block the response
 		console.warn('[LLM Cache] Storage failed:', error);

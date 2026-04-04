@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
+import { cases } from '$lib/server/db/schema-postgres.js';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
@@ -99,6 +100,14 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 	if (!isUuid(caseId)) {
 		return new Response(JSON.stringify({ error: 'Invalid case ID format' }), { status: 400 });
 	}
+	const [targetCase] = await db
+    .select({ id: cases.id })
+    .from(cases)
+    .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
+    .limit(1);
+  if (!targetCase) {
+    return new Response(JSON.stringify({ error: 'Case not found' }), { status: 404 });
+  }
 	let raw: unknown;
 
 	try {

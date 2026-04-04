@@ -1,5 +1,5 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { assembleACEContext, buildACEPrompt } from '$lib/server/ace/context-assembler.js';
+import { assembleACEContext, buildACEPromptCached } from '$lib/server/ace/context-assembler.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
@@ -61,7 +61,7 @@ Format as JSON:
   "confidence": 0.0-1.0
 }`;
 
-		const acePrompt = buildACEPrompt(context, summaryPrompt);
+		const acePrompt = await buildACEPromptCached(context, summaryPrompt);
 
 		// Call Ollama with ACE-enhanced prompt + Zod-derived structured output
 		const response = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {

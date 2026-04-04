@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { documents } from '$lib/server/db/schema-postgres.js';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
 
@@ -25,10 +25,10 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 
 	try {
 		const [doc] = await db
-			.select()
-			.from(documents)
-			.where(eq(documents.id, id))
-			.limit(1);
+      .select()
+      .from(documents)
+      .where(and(eq(documents.id, id), eq(documents.userId, locals.user.id)))
+      .limit(1);
 
 		if (!doc) {
 			return json({ error: 'Document not found' }, { status: 404 });
@@ -83,14 +83,24 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 		}
 		const { content, status } = parsed.data;
 
+		const [ownedDoc] = await db
+      .select({ id: documents.id })
+      .from(documents)
+      .where(and(eq(documents.id, id), eq(documents.userId, locals.user.id)))
+      .limit(1);
+
+    if (!ownedDoc) {
+      return json({ error: 'Document not found' }, { status: 404 });
+    }
+
 		await db
-			.update(documents)
-			.set({
-				...(content !== undefined ? { content } : {}),
-				...(status !== undefined ? { status } : {}),
-				updatedAt: new Date(),
-			})
-			.where(eq(documents.id, id));
+      .update(documents)
+      .set({
+        ...(content !== undefined ? { content } : {}),
+        ...(status !== undefined ? { status } : {}),
+        updatedAt: new Date(),
+      })
+      .where(and(eq(documents.id, id), eq(documents.userId, locals.user.id)));
 
 		return json({ success: true, updatedAt: new Date().toISOString() });
 	} catch (err) {

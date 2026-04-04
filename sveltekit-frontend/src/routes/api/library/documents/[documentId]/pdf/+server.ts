@@ -20,11 +20,17 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
 
 	// Fetch document metadata — we need the minio_key and mime type
 	const res = await pool
-		.query(`SELECT minio_key, title FROM library_documents WHERE id = $1`, [documentId])
-		.catch(() => null);
+    .query(`SELECT minio_key, title, uploaded_by FROM library_documents WHERE id = $1`, [
+      documentId,
+    ])
+    .catch(() => null);
 
-	if (!res?.rows[0]) throw error(404, 'Document not found');
-	const { minio_key: minioKey, title } = res.rows[0];
+  if (!res?.rows[0]) throw error(404, 'Document not found');
+  const { minio_key: minioKey, title, uploaded_by: uploadedBy } = res.rows[0];
+
+  if (uploadedBy && uploadedBy !== locals.user.id) {
+    throw error(404, 'Document not found');
+  }
 
 	if (!minioKey) throw error(404, 'No source file stored for this document');
 

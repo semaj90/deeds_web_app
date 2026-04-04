@@ -23,7 +23,7 @@ import { cacheExport } from '$lib/server/cache/pdf-export-cache.js';
 import { storeCachedResponse } from '$lib/server/ai/llm-cache.js';
 import { ENV } from '$lib/server/env.server.js';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { getChatModelKeepAlive, ollamaFetch } from '$lib/server/ollama.js';
 import { createDefaultRegistry } from '$lib/server/queue/queue-worker.js';
 import { auditBuffer } from '$lib/server/audit/api-audit-buffer';
 
@@ -171,6 +171,13 @@ if (shouldRunSingletonTasks) {
     )
     .catch((err) => console.warn('[Boot] LLM cache: failed:', (err as Error).message));
 
+  // Warm the primary chat model so the first contextual request avoids cold-load penalty.
+  warmupChatModel()
+    .then((s) =>
+      console.log(`[Boot] Chat model warmup: ${s.status}${s.reason ? ` — ${s.reason}` : ''}`)
+    )
+    .catch((err) => console.warn('[Boot] Chat model warmup: failed:', (err as Error).message));
+
   // ── VAPID Key Validation ─────────────────────────────────────────────────
   if (ENV.VAPID_PUBLIC_KEY && ENV.VAPID_PRIVATE_KEY) {
     console.log('[Boot] VAPID keys configured — Web Push enabled');
@@ -178,6 +185,21 @@ if (shouldRunSingletonTasks) {
     console.warn(
       '[Boot] VAPID keys empty — Web Push notifications disabled. Generate with: npx web-push generate-vapid-keys --json'
     );
+  }
+
+  // ── Infrastructure Diagnostic ─────────────────────────────────────────
+  const dbUrl = ENV.DATABASE_URL || process.env.DATABASE_URL || '(not set)';
+  const dbHost = dbUrl.match(/@([^:/]+):?(\d+)?/);
+  console.log(`[Boot] DB: ${dbHost ? dbHost[1] + ':' + (dbHost[2] || '5432') : dbUrl.slice(0, 40)}`);
+  console.log(`[Boot] Bifrost: ${ENV.BIFROST_ENABLED ? 'ENABLED → ' + ENV.BIFROST_URL : 'disabled'}`);
+  console.log(`[Boot] OpenAI-compat: ${ENV.OPENAI_BASE_URL}`);
+  console.log(`[Boot] Langfuse: ${ENV.LANGFUSE_ENABLED ? 'ENABLED → ' + ENV.LANGFUSE_HOST : 'disabled'}`);
+  // Quick Bifrost reachability check (non-blocking)
+  if (ENV.BIFROST_ENABLED) {
+    fetch(`${ENV.BIFROST_URL}/health`, { signal: AbortSignal.timeout(3000) })
+      .then(r => r.json())
+      .then(d => console.log(`[Boot] Bifrost health: ${(d as { status?: string }).status || 'unknown'}`))
+      .catch(() => console.warn('[Boot] Bifrost: unreachable'));
   }
 }
 
@@ -337,6 +359,52 @@ async function warmupLLMCache(): Promise<WarmupStatus> {
     total: commonQueries.length,
     reason: cached === 0 ? 'all embeddings failed' : undefined,
   };
+}
+
+/**
+ * Warm the primary chat model during boot so first-hit contextual/chat requests
+ * do not pay the full cold-load cost.
+ */
+async function warmupChatModel(): Promise<WarmupStatus> {
+  const OLLAMA_URL = ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+
+  try {
+    const ping = await ollamaFetch(`${OLLAMA_URL}/api/tags`, { signal: AbortSignal.timeout(3000) });
+    if (!ping.ok) return { status: 'skipped', reason: `Ollama returned ${ping.status}` };
+  } catch {
+    return { status: 'skipped', reason: 'Ollama unreachable' };
+  }
+
+  try {
+    const warmRes = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gemma3-legal:latest',
+        messages: [
+          { role: 'system', content: 'You are a legal AI assistant.' },
+          { role: 'user', content: 'Reply with OK.' },
+        ],
+        stream: false,
+        keep_alive: getChatModelKeepAlive(),
+        options: {
+          temperature: 0,
+          num_predict: 1,
+          num_ctx: 512,
+        },
+      }),
+      signal: AbortSignal.timeout(90_000),
+    });
+
+    if (!warmRes.ok) {
+      return { status: 'failed', reason: `warmup returned ${warmRes.status}` };
+    }
+
+    await warmRes.json().catch(() => null);
+    return { status: 'warmed' };
+  } catch (err) {
+    return { status: 'failed', reason: (err as Error).message };
+  }
 }
 
 /**
@@ -541,6 +609,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     event.url.pathname.startsWith('/api/embed') ||
     event.url.pathname.startsWith('/api/nlp/') ||
     event.url.pathname.startsWith('/api/rag/') ||
+    event.url.pathname.startsWith('/api/contextual/') ||
     event.url.pathname.startsWith('/api/synthesis/') ||
     event.url.pathname.startsWith('/api/error-brain/diagnose') ||
     event.url.pathname.startsWith('/api/evidence/upload');
@@ -645,6 +714,18 @@ export const handle: Handle = async ({ event, resolve }) => {
   if (isStreamRoute && event.url.pathname.startsWith('/api/ai/')) {
     response.headers.set('Cache-Control', 'no-cache');
     response.headers.set('X-Accel-Buffering', 'no');
+  }
+
+  // Default cache headers for API routes that don't set their own
+  if (event.url.pathname.startsWith('/api/') && !response.headers.has('Cache-Control')) {
+    const method = event.request.method;
+    if (method === 'GET' || method === 'HEAD') {
+      // Store but always revalidate — safe for user-specific legal data
+      response.headers.set('Cache-Control', 'private, no-cache');
+    } else {
+      // Mutations must never be cached
+      response.headers.set('Cache-Control', 'no-store');
+    }
   }
 
   return response;

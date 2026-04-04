@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/client';
 import { reports } from '$lib/server/db/schema';
-import { error, json } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
 import { and, desc, eq, inArray } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { auditReportAction, createReportVersion } from '$lib/server/reports/audit';
@@ -57,7 +57,7 @@ const reportListSchema = z.object({
  */
 export const GET: RequestHandler = async ({ locals, url }) => {
   if (!locals.user) {
-    throw error(401, 'Unauthorized');
+    return json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   const parsed = reportListSchema.safeParse({
@@ -88,7 +88,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
       const userReports = await db
         .select()
         .from(reports)
-        .where(eq(reports.caseId, caseId))
+        .where(and(eq(reports.caseId, caseId), eq(reports.createdBy, locals.user.id)))
         .orderBy(desc(reports.createdAt))
         .limit(limit)
         .offset(offset)
@@ -120,16 +120,17 @@ export const GET: RequestHandler = async ({ locals, url }) => {
  */
 export const POST: RequestHandler = async ({ locals, request }) => {
   if (!locals.user) {
-    throw error(401, 'Unauthorized');
+    return json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const raw = await request.json();
+  const parsed = reportCreateSchema.safeParse(raw);
+  if (!parsed.success) {
+    return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+  }
+  const body = parsed.data;
+
   try {
-    const raw = await request.json();
-    const parsed = reportCreateSchema.safeParse(raw);
-    if (!parsed.success) {
-      throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
-    }
-    const body = parsed.data;
     const reportType = getReportType(body.type, body.metadata);
 
     const newReport = await db
@@ -181,8 +182,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     );
   } catch (err) {
     console.error('Error creating report:', err);
-    if (err instanceof Error && 'status' in err) throw err;
-    throw error(500, 'Failed to create report');
+    return json({ error: 'Failed to create report' }, { status: 500 });
   }
 };
 
@@ -192,16 +192,17 @@ export const POST: RequestHandler = async ({ locals, request }) => {
  */
 export const PATCH: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user) {
-		throw error(401, 'Unauthorized');
+		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
+	const rawPatch = await request.json();
+	const parsedPatch = reportBulkUpdateSchema.safeParse(rawPatch);
+	if (!parsedPatch.success) {
+		return json({ error: parsedPatch.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+	}
+	const body = parsedPatch.data;
+
 	try {
-		const raw = await request.json();
-		const parsed = reportBulkUpdateSchema.safeParse(raw);
-		if (!parsed.success) {
-			throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
-		}
-		const body = parsed.data;
 
 		const updates: Record<string, unknown> = { updatedAt: new Date() };
 		if (body.contentHtml) updates.content = body.contentHtml;
@@ -248,8 +249,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 		});
 	} catch (err) {
 		console.error('Error updating reports:', err);
-		if (err instanceof Error && 'status' in err) throw err;
-		throw error(500, 'Failed to update reports');
+		return json({ error: 'Failed to update reports' }, { status: 500 });
 	}
 };
 
@@ -259,16 +259,17 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
  */
 export const DELETE: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user) {
-		throw error(401, 'Unauthorized');
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
+	const rawDel = await request.json();
+	const parsedDel = reportBulkDeleteSchema.safeParse(rawDel);
+	if (!parsedDel.success) {
+		return json({ error: parsedDel.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	}
 
 	try {
-		const raw = await request.json();
-		const parsed = reportBulkDeleteSchema.safeParse(raw);
-		if (!parsed.success) {
-			throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
-		}
-		const body = parsed.data;
+		const body = parsedDel.data;
 
 		const deleted = await db.delete(reports)
 			.where(
@@ -304,7 +305,6 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 		});
 	} catch (err) {
 		console.error('Error deleting reports:', err);
-		if (err instanceof Error && 'status' in err) throw err;
-		throw error(500, 'Failed to delete reports');
+		return json({ error: 'Failed to delete reports' }, { status: 500 });
 	}
 };

@@ -442,7 +442,7 @@ def ingest_to_db(cases: list[dict]) -> int:
     import psycopg2
     conn_str = os.getenv(
         "DATABASE_URL",
-        "postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db"
+        "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db"
     )
     try:
         conn = psycopg2.connect(conn_str)

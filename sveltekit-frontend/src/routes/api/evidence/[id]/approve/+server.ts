@@ -2,14 +2,14 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
 
 const approveRejectSchema = z.object({
-	action: z.enum(['approve', 'reject']).default('approve'),
-	rejectionReason: z.string().max(2000).optional(),
-	reviewedBy: z.string().max(255).optional(),
+  action: z.enum(['approve', 'reject']).default('approve'),
+  rejectionReason: z.string().max(2000).optional(),
+  reviewedBy: z.string().max(255).optional(),
 });
 
 /**
@@ -17,53 +17,53 @@ const approveRejectSchema = z.object({
  * Approve or reject an evidence item (updates metadata with review status)
  */
 export const POST: RequestHandler = async ({ params, request, locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
-	const evidenceId = params.id;
-	if (!isUuid(evidenceId)) return json({ error: 'Invalid evidence ID format' }, { status: 400 });
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+  const evidenceId = params.id;
+  if (!isUuid(evidenceId)) return json({ error: 'Invalid evidence ID format' }, { status: 400 });
 
-	try {
-		const body = await request.json().catch(() => ({}));
-		const parsed = approveRejectSchema.safeParse(body);
-		if (!parsed.success) {
-			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
-		}
+  try {
+    const body = await request.json().catch(() => ({}));
+    const parsed = approveRejectSchema.safeParse(body);
+    if (!parsed.success) {
+      return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+    }
 
-		const { action, rejectionReason, reviewedBy } = parsed.data;
+    const { action, rejectionReason, reviewedBy } = parsed.data;
 
-		const [item] = await db
-			.select({ id: evidence.id, metadata: evidence.metadata })
-			.from(evidence)
-			.where(eq(evidence.id, evidenceId))
-			.limit(1);
+    const [item] = await db
+      .select({ id: evidence.id, metadata: evidence.metadata })
+      .from(evidence)
+      .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, locals.user.id)))
+      .limit(1);
 
-		if (!item) {
-			return json({ error: 'Evidence not found' }, { status: 404 });
-		}
+    if (!item) {
+      return json({ error: 'Evidence not found' }, { status: 404 });
+    }
 
-		const existingMeta = (item.metadata as Record<string, unknown>) ?? {};
-		const reviewMeta = {
-			...existingMeta,
-			reviewStatus: action === 'approve' ? 'approved' : 'rejected',
-			reviewedAt: new Date().toISOString(),
-			reviewedBy: reviewedBy ?? null,
-			rejectionReason: action === 'reject' ? (rejectionReason ?? null) : null,
-		};
+    const existingMeta = (item.metadata as Record<string, unknown>) ?? {};
+    const reviewMeta = {
+      ...existingMeta,
+      reviewStatus: action === 'approve' ? 'approved' : 'rejected',
+      reviewedAt: new Date().toISOString(),
+      reviewedBy: reviewedBy ?? null,
+      rejectionReason: action === 'reject' ? (rejectionReason ?? null) : null,
+    };
 
-		const [updated] = await db
-			.update(evidence)
-			.set({ metadata: reviewMeta, updatedAt: sql`now()` })
-			.where(eq(evidence.id, evidenceId))
-			.returning({ id: evidence.id, metadata: evidence.metadata });
+    const [updated] = await db
+      .update(evidence)
+      .set({ metadata: reviewMeta, updatedAt: sql`now()` })
+      .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, locals.user.id)))
+      .returning({ id: evidence.id, metadata: evidence.metadata });
 
-		return json({
-			success: true,
-			evidenceId: updated.id,
-			action,
-			reviewStatus: action === 'approve' ? 'approved' : 'rejected',
-			updatedAt: new Date().toISOString(),
-		});
-	} catch (err) {
-		console.error(`[evidence/${evidenceId}/approve] error:`, err);
-		return json({ error: 'Failed to process review' }, { status: 500 });
-	}
+    return json({
+      success: true,
+      evidenceId: updated.id,
+      action,
+      reviewStatus: action === 'approve' ? 'approved' : 'rejected',
+      updatedAt: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error(`[evidence/${evidenceId}/approve] error:`, err);
+    return json({ error: 'Failed to process review' }, { status: 500 });
+  }
 };

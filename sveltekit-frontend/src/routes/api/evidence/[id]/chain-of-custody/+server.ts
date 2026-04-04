@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
 
@@ -32,34 +32,43 @@ interface CustodyEvent {
  * Return the chain of custody log for an evidence item
  */
 export const GET: RequestHandler = async ({ params, locals }) => {
-	if (!locals.user) throw error(401, 'Unauthorized');
-	if (!isUuid(params.id)) throw error(400, 'Invalid evidence ID format');
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+	if (!isUuid(params.id)) return json({ error: 'Invalid evidence ID format' }, { status: 400 });
 
-	const item = await db.select({
-		id: evidence.id,
-		title: evidence.title,
-		hash: evidence.hash,
-		chainOfCustody: evidence.chainOfCustody,
-		createdAt: evidence.createdAt,
-	}).from(evidence)
-		.where(eq(evidence.id, params.id))
-		.limit(1)
-		.then(r => r[0]);
+	try {
+		const item = await db
+			.select({
+				id: evidence.id,
+				title: evidence.title,
+				hash: evidence.hash,
+				chainOfCustody: evidence.chainOfCustody,
+				createdAt: evidence.createdAt,
+			})
+			.from(evidence)
+			.where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
+			.limit(1)
+			.then((r) => r[0]);
 
-	if (!item) throw error(404, 'Evidence not found');
+		if (!item) {
+			return json({ error: 'Evidence not found' }, { status: 404 });
+		}
 
-	const chain: CustodyEvent[] = Array.isArray(item.chainOfCustody) ? item.chainOfCustody as CustodyEvent[] : [];
+		const chain: CustodyEvent[] = Array.isArray(item.chainOfCustody) ? item.chainOfCustody as CustodyEvent[] : [];
 
-	return json({
-		evidenceId: item.id,
-		title: item.title,
-		fileHash: item.hash,
-		chain,
-		totalEvents: chain.length,
-		firstEvent: chain[0] ?? null,
-		lastEvent: chain[chain.length - 1] ?? null,
-		createdAt: item.createdAt,
-	});
+		return json({
+			evidenceId: item.id,
+			title: item.title,
+			fileHash: item.hash,
+			chain,
+			totalEvents: chain.length,
+			firstEvent: chain[0] ?? null,
+			lastEvent: chain[chain.length - 1] ?? null,
+			createdAt: item.createdAt,
+		});
+	} catch (err) {
+		console.error('[chain-of-custody] GET error:', err);
+		return json({ evidenceId: params.id, title: null, fileHash: null, chain: [], totalEvents: 0, firstEvent: null, lastEvent: null, createdAt: null });
+	}
 };
 
 /**
@@ -67,25 +76,27 @@ export const GET: RequestHandler = async ({ params, locals }) => {
  * Append a new custody event to the chain
  */
 export const POST: RequestHandler = async ({ params, locals, request }) => {
-	if (!locals.user) throw error(401, 'Unauthorized');
-	if (!isUuid(params.id)) throw error(400, 'Invalid evidence ID format');
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+	if (!isUuid(params.id)) return json({ error: 'Invalid evidence ID format' }, { status: 400 });
 
 	// Zod schema validates action enum (received|transferred|analyzed|stored|retrieved|exported|sealed)
 	const parsed = custodyEventSchema.safeParse(await request.json());
 	if (!parsed.success) {
-		throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	}
 	const body = parsed.data;
 
-	const item = await db.select({
-		id: evidence.id,
-		chainOfCustody: evidence.chainOfCustody,
-	}).from(evidence)
-		.where(eq(evidence.id, params.id))
-		.limit(1)
-		.then(r => r[0]);
+	const item = await db
+    .select({
+      id: evidence.id,
+      chainOfCustody: evidence.chainOfCustody,
+    })
+    .from(evidence)
+    .where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
+    .limit(1)
+    .then((r) => r[0]);
 
-	if (!item) throw error(404, 'Evidence not found');
+	if (!item) return json({ error: 'Evidence not found' }, { status: 404 });
 
 	const chain: CustodyEvent[] = Array.isArray(item.chainOfCustody) ? item.chainOfCustody as CustodyEvent[] : [];
 
@@ -103,12 +114,13 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
 
 	chain.push(newEvent);
 
-	await db.update(evidence)
-		.set({
-			chainOfCustody: chain,
-			updatedAt: new Date(),
-		})
-		.where(eq(evidence.id, params.id));
+	await db
+    .update(evidence)
+    .set({
+      chainOfCustody: chain,
+      updatedAt: new Date(),
+    })
+    .where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)));
 
 	return json({ success: true, event: newEvent, totalEvents: chain.length }, { status: 201 });
 };

@@ -47,7 +47,7 @@ const synthesisRequestSchema = z.object({
     .optional(),
 });
 import { getVectorCache, setVectorCache } from '$lib/server/vector-cache.js';
-import { assembleACEContext, buildACEPrompt } from '$lib/server/ace/context-assembler.js';
+import { assembleACEContext, buildACEPromptCached } from '$lib/server/ace/context-assembler.js';
 import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self-prompt.js';
 import { rabbitmq } from '$lib/server/queue/rabbitmq-manager-fixed.js';
 import { createHash } from 'crypto';
@@ -312,7 +312,7 @@ async function handleStream(body: SynthesisRequest, userId: string): Promise<Res
         });
         // DAG-order RAG chunks so cited sources appear before citing sources
         context.ragChunks = dagOrderRAGChunks(context.ragChunks);
-        const acePrompt = buildACEPrompt(context, query);
+        const acePrompt = await buildACEPromptCached(context, query);
         sendEvent('context_assembled', {
           ragChunks: context.ragChunks.length,
           kagNeighbors: context.kagNeighbors.length,
@@ -563,7 +563,7 @@ export const POST: RequestHandler = async (event) => {
       enableCodebaseContext: body.enableCodebaseContext,
     });
     context.ragChunks = dagOrderRAGChunks(context.ragChunks);
-    const acePrompt = buildACEPrompt(context, query);
+    const acePrompt = await buildACEPromptCached(context, query);
     const contextMs = performance.now() - ctxStart;
     timer.mark('ace-context-done');
 

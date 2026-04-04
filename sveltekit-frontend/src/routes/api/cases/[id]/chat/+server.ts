@@ -1,5 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
+import { cases } from '$lib/server/db/schema-postgres.js';
 import { chatMessages } from '$lib/server/db/schema-postgres';
 import { chatMetadata } from '$lib/server/db/schema-chat';
 import { eq, and } from 'drizzle-orm';
@@ -34,6 +35,16 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 		if (!isUuid(id)) {
 			return json({ error: 'Invalid case ID format' }, { status: 400 });
 		}
+
+		const [targetCase] = await db
+      .select({ id: cases.id })
+      .from(cases)
+      .where(and(eq(cases.id, id), eq(cases.userId, user.id)))
+      .limit(1);
+
+    if (!targetCase) {
+      return json({ error: 'Case not found' }, { status: 404 });
+    }
 
 		const raw = await request.json();
 		const parsed = caseChatSchema.safeParse(raw);
@@ -110,6 +121,16 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 			return json({ error: 'Invalid case ID format' }, { status: 400 });
 		}
 
+		const [targetCase] = await db
+      .select({ id: cases.id })
+      .from(cases)
+      .where(and(eq(cases.id, id), eq(cases.userId, user.id)))
+      .limit(1);
+
+    if (!targetCase) {
+      return json({ error: 'Case not found' }, { status: 404 });
+    }
+
 		const chatId = url.searchParams.get('chatId') || `board-${id}`;
 
 		// Fetch messages for this chat
@@ -127,10 +148,16 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 
 		// Fetch metadata
 		const [meta] = await db
-			.select()
-			.from(chatMetadata)
-			.where(eq(chatMetadata.chatId, chatId))
-			.limit(1);
+      .select()
+      .from(chatMetadata)
+      .where(
+        and(
+          eq(chatMetadata.chatId, chatId),
+          eq(chatMetadata.userId, user.id),
+          eq(chatMetadata.caseId, id)
+        )
+      )
+      .limit(1);
 
 		return json({
 			success: true,

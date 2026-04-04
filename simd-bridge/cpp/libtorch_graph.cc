@@ -204,3 +204,109 @@ extern "C" int computeCaseEmbedding(
 extern "C" int checkCudaAvailable() {
     return torch::cuda::is_available() ? 1 : 0;
 }
+
+/**
+ * Query free and total CUDA memory (bytes).
+ * Output: free_bytes[0] = free, total_bytes[0] = total
+ * Returns 0 on success, -1 if CUDA unavailable, -2 on error.
+ */
+extern "C" int getCudaMemory(int64_t* free_bytes, int64_t* total_bytes) {
+    if (!free_bytes || !total_bytes) return -1;
+    if (!torch::cuda::is_available()) return -1;
+
+    try {
+        // Use cudaMemGetInfo via PyTorch's CUDA allocator stats
+        size_t free_mem = 0, total_mem = 0;
+        cudaMemGetInfo(&free_mem, &total_mem);
+        *free_bytes = static_cast<int64_t>(free_mem);
+        *total_bytes = static_cast<int64_t>(total_mem);
+        return 0;
+    } catch (...) {
+        return -2;
+    }
+}
+
+/**
+ * Batch cosine similarity: query[1,dim] vs corpus[n,dim] → scores[n]
+ * Useful for GPU-accelerated nearest-neighbor pre-filtering.
+ * Input:  query[dim], corpus[n][dim] as flat float arrays
+ * Output: scores[n] (cosine similarity of query vs each corpus row)
+ */
+extern "C" int batchCosineSimilarity(
+    const float* query, int dim,
+    const float* corpus, int n,
+    float* scores, int scores_len
+) {
+    if (!query || !corpus || !scores || n <= 0 || dim <= 0) return -1;
+    if (scores_len < n) return -2;
+
+    try {
+        torch::NoGradGuard no_grad;
+        auto device = getDevice();
+        auto opts = torch::TensorOptions().dtype(torch::kFloat32);
+
+        auto q = torch::from_blob(
+            const_cast<float*>(query), {1, dim}, opts
+        ).to(device);
+
+        auto c = torch::from_blob(
+            const_cast<float*>(corpus), {n, dim}, opts
+        ).to(device);
+
+        // L2 normalize
+        auto q_norm = q / q.norm(2, 1, true).clamp_min(1e-12);
+        auto c_norm = c / c.norm(2, 1, true).clamp_min(1e-12);
+
+        // Cosine similarity: q[1,dim] @ c[dim,n] → [1,n]
+        auto sim = torch::mm(q_norm, c_norm.t()).squeeze(0);
+
+        auto sim_cpu = sim.to(torch::kCPU).contiguous();
+        std::memcpy(scores, sim_cpu.data_ptr<float>(), n * sizeof(float));
+
+        return 0;
+    } catch (const std::exception& e) {
+        return -3;
+    }
+}
+
+/**
+ * Half-precision cosine similarity matrix (FP16).
+ * Uses 50% less VRAM than graphSimilarity for large embedding sets (>10K vectors).
+ * Input:  embeddings[n][dim] as flat float array (FP32 input, internally cast to FP16)
+ * Output: similarity[n][n] as flat float array (FP32 output)
+ */
+extern "C" int graphSimilarityHalf(
+    const float* embeddings, int n, int dim,
+    float* output, int output_len
+) {
+    if (!embeddings || !output || n <= 0 || dim <= 0) return -1;
+    if (output_len < n * n) return -2;
+
+    try {
+        torch::NoGradGuard no_grad;
+        auto device = getDevice();
+        auto opts = torch::TensorOptions().dtype(torch::kFloat32);
+
+        auto mat = torch::from_blob(
+            const_cast<float*>(embeddings), {n, dim}, opts
+        ).to(device);
+
+        // Cast to half precision for VRAM savings
+        auto mat_half = mat.to(torch::kFloat16);
+
+        // L2 normalize
+        auto norms = mat_half.norm(2, 1, true).clamp_min(1e-6f);
+        auto normalized = mat_half / norms;
+
+        // Cosine similarity via matmul in FP16
+        auto sim = torch::mm(normalized, normalized.t());
+
+        // Cast back to FP32 for output
+        auto sim_cpu = sim.to(torch::kFloat32).to(torch::kCPU).contiguous();
+        std::memcpy(output, sim_cpu.data_ptr<float>(), n * n * sizeof(float));
+
+        return 0;
+    } catch (const std::exception& e) {
+        return -3;
+    }
+}

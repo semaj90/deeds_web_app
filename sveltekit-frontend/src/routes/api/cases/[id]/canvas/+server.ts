@@ -2,16 +2,26 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { canvasStates } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { cases } from '$lib/server/db/schema-postgres.js';
+import { and, eq } from 'drizzle-orm';
 import { boardSnapshotSchema } from '$lib/schemas/board';
 import { verifyCanvasStatesTable } from '$lib/server/db/verify-canvas-table';
 import { isUuid } from '$lib/server/validation.js';
 
 export const POST: RequestHandler = async ({ params, request, locals }) => {
+    if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
     const { id } = params; // Changed from caseId to id
     if (!id) return json({ error: 'Missing case id' }, { status: 400 });
     if (!isUuid(id)) return json({ error: 'Invalid case ID format' }, { status: 400 });
-  
+
+    const [targetCase] = await db
+      .select({ id: cases.id })
+      .from(cases)
+      .where(and(eq(cases.id, id), eq(cases.userId, locals.user.id)))
+      .limit(1);
+
+    if (!targetCase) return json({ error: 'Case not found' }, { status: 404 });
+
     const tableExists = await verifyCanvasStatesTable();
     if (!tableExists) {
         return json({
@@ -57,30 +67,42 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     }
 };
 
-export const GET: RequestHandler = async ({ params }) => {
-    const { id } = params; // Changed from caseId to id
-    if (!id) return json({ error: 'Missing case id' }, { status: 400 });
-    if (!isUuid(id)) return json({ error: 'Invalid case ID format' }, { status: 400 });
+export const GET: RequestHandler = async ({ params, locals }) => {
+  const { id } = params; // Changed from caseId to id
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!id) return json({ error: 'Missing case id' }, { status: 400 });
+  if (!isUuid(id)) return json({ error: 'Invalid case ID format' }, { status: 400 });
 
-    try {
-        const stateEntry = await db.query.canvasStates.findFirst({
-            where: eq(canvasStates.caseId, id)
-        });
+  const [targetCase] = await db
+    .select({ id: cases.id })
+    .from(cases)
+    .where(and(eq(cases.id, id), eq(cases.userId, locals.user.id)))
+    .limit(1);
 
-        if (!stateEntry) return json(null);
+  if (!targetCase) return json({ error: 'Case not found' }, { status: 404 });
 
-        return json(stateEntry.stateData);
-    } catch (e: unknown) {
-        console.error('Error loading canvas:', e);
+  try {
+    const stateEntry = await db.query.canvasStates.findFirst({
+      where: eq(canvasStates.caseId, id),
+    });
 
-        const errorMessage = e instanceof Error ? e.message : String(e);
-        if (errorMessage.includes('relation') && errorMessage.includes('does not exist')) {
-            return json({
-                error: 'canvas_states table missing; run db, push:dev to apply migrations',
-                code: 'TABLE_MISSING'
-            }, { status: 503 });
-        }
+    if (!stateEntry) return json(null);
 
-        return json({ error: 'Internal Server Error' }, { status: 500 });
+    return json(stateEntry.stateData);
+  } catch (e: unknown) {
+    console.error('Error loading canvas:', e);
+
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    if (errorMessage.includes('relation') && errorMessage.includes('does not exist')) {
+      return json(
+        {
+          error: 'canvas_states table missing; run db, push:dev to apply migrations',
+          code: 'TABLE_MISSING',
+        },
+        { status: 503 }
+      );
     }
+
+    return json({ error: 'Internal Server Error' }, { status: 500 });
+  }
 };

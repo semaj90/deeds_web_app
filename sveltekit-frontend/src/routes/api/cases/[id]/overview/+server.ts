@@ -1,7 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { cases, evidence, personsOfInterest } from '$lib/server/db/schema-postgres.js';
-import { arrayContains, eq } from 'drizzle-orm';
+import { and, arrayContains, eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { isUuid } from '$lib/server/validation.js';
 
@@ -16,9 +16,13 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
 
 	const caseRows = await safe(
-		db.select().from(cases).where(eq(cases.id, id)).limit(1),
-		[]
-	);
+    db
+      .select()
+      .from(cases)
+      .where(and(eq(cases.id, id), eq(cases.userId, locals.user.id)))
+      .limit(1),
+    []
+  );
 
 	const caseRow = caseRows[0];
 
@@ -27,17 +31,23 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	}
 
 	const [evidenceRows, personRows] = await Promise.all([
-		safe(
-			db.select().from(evidence).where(eq(evidence.caseId, id)).limit(50),
-			[]
-		),
-		safe(
-			db.select().from(personsOfInterest)
-				.where(arrayContains(personsOfInterest.caseIds, [id]))
-				.limit(20),
-			[]
-		)
-	]);
+    safe(
+      db
+        .select()
+        .from(evidence)
+        .where(and(eq(evidence.caseId, id), eq(evidence.userId, locals.user.id)))
+        .limit(50),
+      []
+    ),
+    safe(
+      db
+        .select()
+        .from(personsOfInterest)
+        .where(arrayContains(personsOfInterest.caseIds, [id]))
+        .limit(20),
+      []
+    ),
+  ]);
 
 	const whoParts: string[] = [];
 	if (caseRow.clientName) whoParts.push(caseRow.clientName);

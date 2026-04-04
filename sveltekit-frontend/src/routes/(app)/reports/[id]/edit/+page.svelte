@@ -5,7 +5,11 @@
 	import TiptapWithAIAssistant from '$lib/components/editor/TiptapWithAIAssistant.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 
-	let reportId = $derived(page.params.id);
+	let { data } = $props();
+	let serverReport = $derived(data?.report ?? null);
+	let serverLoadError = $derived(data?.loadError ?? null);
+
+	let reportId = $derived(serverReport?.id ?? page.params.id);
 
 	let report = $state<any>(null);
 	let loading = $state(true);
@@ -17,7 +21,24 @@
 
 	let editorContent = $state('');
 
-	onMount(async () => { await loadReport(); });
+	$effect(() => {
+		if (serverReport && !report) {
+			report = serverReport;
+			editorContent = serverReport.content || '<p>Start writing...</p>';
+		}
+		if (serverLoadError && !error) {
+			error = serverLoadError;
+		}
+		if (serverReport || serverLoadError) {
+			loading = false;
+		}
+	});
+
+	onMount(async () => {
+		if (!report) {
+			await loadReport();
+		}
+	});
 
 	async function loadReport() {
 		loading = true;

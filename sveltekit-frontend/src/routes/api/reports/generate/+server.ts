@@ -1,13 +1,14 @@
 import { db } from '$lib/server/db/client';
 import { cases, evidence } from '$lib/server/db/schema';
-import { personsOfInterest } from '$lib/server/db/schema';
+import { personsOfInterest } from '$lib/server/db/schema-postgres.js';
 import { savedCitations } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { eq, arrayContains } from 'drizzle-orm';
+import { and, eq, arrayContains } from 'drizzle-orm';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { isUuid } from '$lib/server/validation.js';
 
 const generateReportSchema = z.object({
 	caseId: z.string().min(1, 'Case ID is required').max(500),
@@ -35,21 +36,37 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
     const { caseId: id, type } = parsed.data;
 
+    if (!isUuid(id)) {
+      return json({ error: 'Invalid case ID format' }, { status: 400 });
+    }
+
     // Fetch case data
-    const [caseData] = await db.select().from(cases).where(eq(cases.id, id)).limit(1);
+    const [caseData] = await db
+      .select()
+      .from(cases)
+      .where(and(eq(cases.id, id), eq(cases.userId, locals.user.id)))
+      .limit(1);
 
     if (!caseData) {
       return json({ error: 'Case not found' }, { status: 404 });
     }
 
     // Fetch evidence and persons for context
-    const evidenceData = await db.select().from(evidence).where(eq(evidence.caseId, id));
+    const evidenceData = await db
+      .select()
+      .from(evidence)
+      .where(and(eq(evidence.caseId, id), eq(evidence.userId, locals.user.id)));
     let personsData: PersonRow[] = [];
     try {
       personsData = await db
         .select()
         .from(personsOfInterest)
-        .where(arrayContains(personsOfInterest.caseIds, [id]));
+        .where(
+          and(
+            arrayContains(personsOfInterest.caseIds, [id]),
+            eq(personsOfInterest.createdBy, locals.user.id)
+          )
+        );
     } catch {
       /* table may not exist */
     }
@@ -60,7 +77,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       citationsData = await db
         .select()
         .from(savedCitations)
-        .where(eq(savedCitations.caseId, id))
+        .where(and(eq(savedCitations.caseId, id), eq(savedCitations.userId, locals.user.id)))
         .limit(20);
     } catch {
       /* table may not exist */

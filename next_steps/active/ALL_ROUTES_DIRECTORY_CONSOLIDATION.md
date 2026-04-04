@@ -1,13 +1,26 @@
 # All-Routes Directory Consolidation
 
 ## Date: March 18, 2026
-## Status: COMPLETE
+## Status: ROUTE DIRECTORY COMPLETE — production-readiness audit still partial
 
 ---
 
 ## Overview
 
 Comprehensive audit and enhancement of the `/admin/all-routes` page to display the **entire web app** — every API endpoint, page, demo, and archived route — as a dev review directory with proper categorization and mapping.
+
+### April 3, 2026 Scope Clarification
+
+This document proves that the route directory and cross-reference tooling were built out. It does **not** prove all of the following for every route:
+
+- SSR correctness
+- hydration correctness
+- successful render under live data dependencies
+- stable degraded JSON shapes on GET failures
+- Zod coverage on every write surface
+- schema/runtime parity between Drizzle, database, and UI payloads
+
+Use this file as the route inventory and explorer reference, not as the canonical production-readiness verdict.
 
 ---
 
@@ -131,6 +144,12 @@ All Phase 1 components from the enhancement plan already exist:
 ---
 
 ## Remaining Work
+
+### Production-Readiness Follow-Up (April 2026)
+- [ ] Re-run route counts against the live tree and update older docs that still report different totals
+- [ ] Layer SSR/render verification status onto the route inventory instead of treating presence as proof
+- [ ] Add validation/auth/degraded-shape status columns for high-risk API groups
+- [ ] Mark route groups as inventory-only vs runtime-verified vs production-hardened
 
 ### Phase 2: Directory Consolidation UI
 - [x] Add dedicated "Demos" section/tab to the all-routes page (26 demos need showcase) — DONE (Demos panel with grid cards)

@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db/client';
-import { caseNotes, caseNoteVersions } from '$lib/server/db/schema';
+import { caseNotes, caseNoteVersions, cases } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
 import { and, eq, sql, desc, count } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
@@ -21,6 +21,16 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	const invalid = validateUuidParams(params, 'id', 'noteId');
 	if (invalid) return invalid;
 	try {
+		const [targetCase] = await db
+      .select({ id: cases.id })
+      .from(cases)
+      .where(and(eq(cases.id, params.id), eq(cases.userId, locals.user.id)))
+      .limit(1);
+
+    if (!targetCase) {
+      return json({ error: 'Case not found' }, { status: 404 });
+    }
+
 		const [note] = await db
 			.select()
 			.from(caseNotes)
@@ -34,7 +44,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		return json({ success: true, note });
 	} catch (err) {
 		console.error('[notes] GET single error:', err);
-		return json({ success: false, note: null, error: 'Failed to load note' }, { status: 500 });
+		return json({ success: false, note: null });
 	}
 };
 
@@ -48,6 +58,16 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
 	const invalidPatch = validateUuidParams(params, 'id', 'noteId');
 	if (invalidPatch) return invalidPatch;
 	try {
+		const [targetCase] = await db
+      .select({ id: cases.id })
+      .from(cases)
+      .where(and(eq(cases.id, params.id), eq(cases.userId, locals.user.id)))
+      .limit(1);
+
+    if (!targetCase) {
+      return json({ error: 'Case not found' }, { status: 404 });
+    }
+
 		const parsed = updateNoteSchema.safeParse(await request.json());
 		if (!parsed.success) {
 			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
@@ -111,6 +131,16 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 	const invalidDel = validateUuidParams(params, 'id', 'noteId');
 	if (invalidDel) return invalidDel;
 	try {
+		const [targetCase] = await db
+      .select({ id: cases.id })
+      .from(cases)
+      .where(and(eq(cases.id, params.id), eq(cases.userId, locals.user.id)))
+      .limit(1);
+
+    if (!targetCase) {
+      return json({ error: 'Case not found' }, { status: 404 });
+    }
+
 		const [deleted] = await db
 			.delete(caseNotes)
 			.where(and(eq(caseNotes.id, params.noteId), eq(caseNotes.caseId, params.id)))

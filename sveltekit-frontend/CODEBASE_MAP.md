@@ -1,5 +1,13 @@
 # Deeds Web App — Codebase Map
 ## Last Updated: March 17, 2026 (Verification Audit — corrected counts, clarified historical status)
+
+## April 3, 2026 Audit Note
+
+- This file is an inventory and architecture map, not a certification that every route, API contract, or SSR path is production-ready.
+- Several newer docs and live checks have moved faster than this map, so counts and readiness statements may drift until the next full recount.
+- Recent verified runtime work since this map was last updated includes: case/report SSR preload fixes, contextual chat cold-start stabilization, native CUDA runtime proof, and a broad route smoke validation pass.
+- Still open as of April 3: a full cross-check of API validation coverage, GET degraded-shape consistency, Drizzle schema/runtime parity, and route-by-route SSR/render status.
+
 ---
 ## Grand Totals
 | Metric | Count |
@@ -74,7 +82,7 @@ sveltekit-frontend/
 ├── src/
 │   ├── lib/           ← 22 top-level dirs, 236 nested subdirs (components, server, ai, stores, types, utils...)
 │   ├── routes/        ← (app)/ pages + api/ endpoints
-│   ├── mcp/           ← FastMCP server (26 listed tools, stdio)
+│   ├── mcp/           ← FastMCP server (29 tools, stdio)
 │   ├── native/        ← Native bridge stubs
 │   ├── proto/         ← Proto definitions for frontend gRPC clients
 │   ├── scripts/       ← Build/utility scripts
@@ -296,7 +304,7 @@ Status note: `ACTIVE` in this table means the route group is present in `src/rou
 | `lib/server/circuit-breaker.ts` | 100+ | Ollama/Qdrant/Redis circuit breakers |
 | `lib/server/env.server.ts` | 100+ | Server environment variables |
 | `src/hooks.server.ts` | 350+ | Request handling, CORS, CSP, auth, COOP/COEP |
-| `src/mcp/server.ts` | 400+ | FastMCP server — 26 listed tools (cases, evidence, RAG, citations, LangExtract, Playwright) |
+| `src/mcp/server.ts` | 1400+ | FastMCP server — 29 tools (cases, evidence, RAG, citations, LangExtract, codebase, Playwright, compose) |
 ## Key Client Infrastructure Files
 | File | Lines | Purpose |
 |------|-------|---------|
@@ -345,7 +353,7 @@ Status note: `ACTIVE` in this table means the route group is present in `src/rou
 - Graph centrality computation
 ### RabbitMQ Queues (8)
 `cache.invalidate`, `document.embed`, `evidence.process`, `vector.index`, `chat.context`, `analytics.track`, `codebase.index`, `ace.evaluate`
-### FastMCP Tools (26 listed in src/mcp/server.ts)
+### FastMCP Tools (29 in src/mcp/server.ts)
 **Cases (4):** `cases:load`, `cases:create`, `cases:update`, `cases:delete`
 **Reports (6):** `reports:list`, `reports:create`, `reports:generate_from_template`, `reports:update`, `reports:delete`, `reports:export`
 **RAG (2):** `rag:search`, `rag:index_page`
@@ -353,7 +361,9 @@ Status note: `ACTIVE` in this table means the route group is present in `src/rou
 **Evidence (5):** `evidence:analyze`, `evidence:analyze_multimodal`, `evidence:detect_objects`, `evidence:transcribe_gpu`, `evidence:search_similar`
 **Audio (1):** `transcribe_audio`
 **LangExtract (4):** `langextract:legal`, `langextract:evidence`, `langextract:file`, `langextract:custom`
+**Codebase (2):** `codebase:search`, `codebase:ace_context`
 **Browser (1):** `playwright:browser_action`
+**Composition (1):** `compose:pipeline`
 ---
 ## Infrastructure Wiring (Documented architecture overview)
 Status note: the diagrams, service states, and completion language in this section are preserved as documented architecture notes and were not live-revalidated during the March 17 audit.

@@ -1,28 +1,28 @@
 <script lang="ts">
- import { page } from '$app/state';
- import CaseChatPanel from '$lib/components/legal-ai/CaseChatPanel.svelte';
- import LegalAILayout from '$lib/components/legal-ai/LegalAILayout.svelte';
+	import { page } from '$app/state';
+	import CaseChatPanel from '$lib/components/legal-ai/CaseChatPanel.svelte';
 
- let caseId = $derived(page.params.id);
+	let caseId = $derived(page.params.id);
 </script>
 
-<LegalAILayout title="Case Analysis" subtitle="Chat with AI Legal Assistant about this case">
- <div class="case-chat-container">
- <CaseChatPanel {caseId} />
- </div>
-</LegalAILayout>
+<div class="case-chat-wrapper">
+	<CaseChatPanel {caseId} />
+</div>
 
 <style>
- .case-chat-container {
- display: grid;
- grid-template-columns: 1fr;
-	gap: 1.5rem;
- height: calc(100vh - 200px);
- }
+	.case-chat-wrapper {
+		display: flex;
+		flex-direction: column;
+		/* Fill all available space from the parent <main> in the cases layout */
+		height: calc(100vh - 10rem);
+		min-height: 400px;
+		max-height: calc(100vh - 8rem);
+	}
 
- @media (max-width: 768px) {
- .case-chat-container {
- height: auto;
- }
- }
+	@media (max-width: 768px) {
+		.case-chat-wrapper {
+			height: calc(100vh - 7rem);
+			min-height: 300px;
+		}
+	}
 </style>

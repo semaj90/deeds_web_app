@@ -35,6 +35,27 @@ export interface WeightedEmbeddingResult {
 	source: 'gpu' | 'cpu';
 }
 
+export interface CudaMemoryInfo {
+	freeBytes: number;
+	totalBytes: number;
+	freeMB: number;
+	totalMB: number;
+	usedMB: number;
+	available: boolean;
+}
+
+export interface BatchSimilarityResult {
+	scores: number[];
+	n: number;
+	source: 'gpu' | 'cpu';
+}
+
+export interface HalfPrecisionSimilarityResult {
+	matrix: number[][];
+	n: number;
+	source: 'gpu' | 'cpu';
+}
+
 // ── Addon loading ──────────────────────────────────────────────────────────
 
 interface NativeAddon {
@@ -48,6 +69,9 @@ interface NativeAddon {
 	dotProduct?: (a: Float32Array, b: Float32Array, n: number) => Float32Array;
 	scale?: (input: Float32Array, scalar: number, n: number) => Float32Array;
 	relu?: (input: Float32Array, n: number) => Float32Array;
+	getCudaMemory?: (freeOut: BigInt64Array, totalOut: BigInt64Array) => number;
+	batchCosineSimilarity?: (query: Float32Array, dim: number, corpus: Float32Array, n: number, scores: Float32Array, scoresLen: number) => number;
+	graphSimilarityHalf?: (embeddings: Float32Array, n: number, dim: number, output: Float32Array, outputLen: number) => number;
 }
 
 let addon: NativeAddon | null = null;
@@ -465,4 +489,119 @@ export async function reluActivation(input: number[]): Promise<ReLUResult> {
 		output[i] = input[i] > 0 ? input[i] : 0;
 	}
 	return { output, n, source: 'cpu' };
+}
+
+// ── CUDA Memory ───────────────────────────────────────────────────────
+
+/**
+ * Query CUDA GPU free/total VRAM via native addon.
+ * Returns memory info if CUDA available, zeros with available=false otherwise.
+ */
+export function getCudaMemoryInfo(): CudaMemoryInfo {
+	const native = getAddon();
+	if (native?.getCudaMemory) {
+		try {
+			const freeBuf = new BigInt64Array(1);
+			const totalBuf = new BigInt64Array(1);
+			const rc = native.getCudaMemory(freeBuf, totalBuf);
+			if (rc === 0) {
+				const freeBytes = Number(freeBuf[0]);
+				const totalBytes = Number(totalBuf[0]);
+				return {
+					freeBytes,
+					totalBytes,
+					freeMB: Math.round(freeBytes / (1024 * 1024)),
+					totalMB: Math.round(totalBytes / (1024 * 1024)),
+					usedMB: Math.round((totalBytes - freeBytes) / (1024 * 1024)),
+					available: true
+				};
+			}
+		} catch {
+			// fall through
+		}
+	}
+	return { freeBytes: 0, totalBytes: 0, freeMB: 0, totalMB: 0, usedMB: 0, available: false };
+}
+
+// ── Batch Cosine Similarity ───────────────────────────────────────────
+
+/**
+ * Cosine similarity between a single query vector and a corpus of vectors.
+ * GPU: L2-normalized matmul via libtorch CUDA. CPU: sequential fallback.
+ */
+export async function batchCosineSimilarity(
+	query: number[],
+	corpus: number[][]
+): Promise<BatchSimilarityResult> {
+	const n = corpus.length;
+	const dim = query.length;
+	if (n === 0 || dim === 0) return { scores: [], n: 0, source: 'cpu' };
+
+	const native = getAddon();
+	if (native?.batchCosineSimilarity) {
+		try {
+			const qArr = new Float32Array(query);
+			const cFlat = new Float32Array(n * dim);
+			for (let i = 0; i < n; i++) {
+				cFlat.set(corpus[i], i * dim);
+			}
+			const scoresArr = new Float32Array(n);
+			const rc = native.batchCosineSimilarity(qArr, dim, cFlat, n, scoresArr, n);
+			if (rc === 0) {
+				return { scores: Array.from(scoresArr), n, source: 'gpu' };
+			}
+		} catch {
+			// fall through to CPU
+		}
+	}
+
+	// CPU fallback
+	const qNorm = Math.sqrt(query.reduce((s, x) => s + x * x, 0)) || 1e-12;
+	const scores = new Array(n);
+	for (let i = 0; i < n; i++) {
+		let dot = 0;
+		let cNorm = 0;
+		for (let d = 0; d < dim; d++) {
+			dot += query[d] * corpus[i][d];
+			cNorm += corpus[i][d] * corpus[i][d];
+		}
+		scores[i] = dot / (qNorm * (Math.sqrt(cNorm) || 1e-12));
+	}
+	return { scores, n, source: 'cpu' };
+}
+
+// ── Half-Precision Similarity Matrix ──────────────────────────────────
+
+/**
+ * Similarity matrix using FP16 (half-precision) for 50% VRAM savings.
+ * GPU: casts to kFloat16, matmul, casts back. CPU: falls back to FP32.
+ */
+export async function graphSimilarityHalf(embeddings: number[][]): Promise<HalfPrecisionSimilarityResult> {
+	const n = embeddings.length;
+	const dim = embeddings[0]?.length ?? 0;
+	if (n === 0 || dim === 0) return { matrix: [], n: 0, source: 'cpu' };
+
+	const native = getAddon();
+	if (native?.graphSimilarityHalf) {
+		try {
+			const flat = new Float32Array(n * dim);
+			for (let i = 0; i < n; i++) {
+				flat.set(embeddings[i], i * dim);
+			}
+			const outputArr = new Float32Array(n * n);
+			const rc = native.graphSimilarityHalf(flat, n, dim, outputArr, n * n);
+			if (rc === 0) {
+				const matrix: number[][] = [];
+				for (let i = 0; i < n; i++) {
+					matrix.push(Array.from(outputArr.slice(i * n, (i + 1) * n)));
+				}
+				return { matrix, n, source: 'gpu' };
+			}
+		} catch {
+			// fall through to CPU
+		}
+	}
+
+	// CPU fallback: FP32 cosine similarity
+	return { matrix: cpuCosineSimilarity(embeddings), n, source: 'cpu' };
 }

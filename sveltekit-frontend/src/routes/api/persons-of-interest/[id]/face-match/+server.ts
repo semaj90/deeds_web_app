@@ -2,14 +2,14 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { poiPhotos, personsOfInterest } from '$lib/server/db/schema-postgres.js';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
 
 const faceMatchSchema = z.object({
-	photoId: z.string().max(500).optional(),
-	limit: z.number().int().min(1).max(50).optional().default(10)
+  photoId: z.string().max(500).optional(),
+  limit: z.number().int().min(1).max(50).optional().default(10),
 });
 
 /**
@@ -19,171 +19,181 @@ const faceMatchSchema = z.object({
  * Falls back to pgvector cosine similarity if Qdrant is unavailable.
  */
 export const POST: RequestHandler = async ({ params, request, locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
-	if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
-	const poiId = params.id;
-	const raw = await request.json().catch(() => ({}));
-	const parsed = faceMatchSchema.safeParse(raw);
-	const limit = parsed.success ? parsed.data.limit : 10;
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
+  const poiId = params.id;
+  const raw = await request.json().catch(() => ({}));
+  const parsed = faceMatchSchema.safeParse(raw);
+  const limit = parsed.success ? parsed.data.limit : 10;
 
-	try {
-		// Get photos with embeddings for this POI
-		const myPhotos = await db
-			.select({
-				id: poiPhotos.id,
-				faceEmbedding: poiPhotos.faceEmbedding,
-				thumbnailUrl: poiPhotos.thumbnailUrl,
-			})
-			.from(poiPhotos)
-			.where(eq(poiPhotos.poiId, poiId))
-			.limit(10);
+  try {
+    const [poi] = await db
+      .select({ id: personsOfInterest.id })
+      .from(personsOfInterest)
+      .where(and(eq(personsOfInterest.id, poiId), eq(personsOfInterest.createdBy, locals.user.id)))
+      .limit(1);
 
-		// faceEmbedding is native vector(768) — Drizzle returns number[]
-		const photosWithEmbeddings = myPhotos.filter(
-			(p) => Array.isArray(p.faceEmbedding) && p.faceEmbedding.length === 768
-		);
+    if (!poi) {
+      return json({ error: 'Person of interest not found' }, { status: 404 });
+    }
 
-		if (photosWithEmbeddings.length === 0) {
-			return json({
-				matches: [],
-				method: 'none',
-				message: 'No analyzed photos with embeddings found for this POI',
-			});
-		}
+    // Get photos with embeddings for this POI
+    const myPhotos = await db
+      .select({
+        id: poiPhotos.id,
+        faceEmbedding: poiPhotos.faceEmbedding,
+        thumbnailUrl: poiPhotos.thumbnailUrl,
+      })
+      .from(poiPhotos)
+      .where(eq(poiPhotos.poiId, poiId))
+      .limit(10);
 
-		const queryVector = photosWithEmbeddings[0].faceEmbedding as number[];
+    // faceEmbedding is native vector(768) — Drizzle returns number[]
+    const photosWithEmbeddings = myPhotos.filter(
+      (p) => Array.isArray(p.faceEmbedding) && p.faceEmbedding.length === 768
+    );
 
-		// Try Qdrant vector search — poi_profiles first, evidence_items fallback
-		let qdrantMatches: Array<{
-			poiId: string;
-			photoId: string;
-			poiName: string;
-			caption: string;
-			score: number;
-			collection: string;
-		}> = [];
+    if (photosWithEmbeddings.length === 0) {
+      return json({
+        matches: [],
+        method: 'none',
+        message: 'No analyzed photos with embeddings found for this POI',
+      });
+    }
 
-		try {
-			const { QdrantClient } = await import('@qdrant/js-client-rest');
-			const qdrant = new QdrantClient({ url: ENV.QDRANT_URL });
+    const queryVector = photosWithEmbeddings[0].faceEmbedding as number[];
 
-			// Get current POI name for filtering
-			const [currentPoi] = await db
-				.select({ name: personsOfInterest.name })
-				.from(personsOfInterest)
-				.where(eq(personsOfInterest.id, poiId))
-				.limit(1);
+    // Try Qdrant vector search — poi_profiles first, evidence_items fallback
+    let qdrantMatches: Array<{
+      poiId: string;
+      photoId: string;
+      poiName: string;
+      caption: string;
+      score: number;
+      collection: string;
+    }> = [];
 
-			const currentPoiName = currentPoi?.name ?? '';
+    try {
+      const { QdrantClient } = await import('@qdrant/js-client-rest');
+      const qdrant = new QdrantClient({ url: ENV.QDRANT_URL });
 
-			// Primary search: poi_profiles collection (dedicated POI vectors)
-			try {
-				const poiResults = await qdrant.search('poi_profiles', {
-					vector: { name: 'embedding', vector: queryVector },
-					limit: 20,
-					score_threshold: 0.7,
-					with_payload: true,
-					filter: {
-						must: [
-							{ key: 'type', match: { value: 'poi_photo' } },
-						],
-						must_not: [
-							{ key: 'poi_id', match: { value: poiId } },
-						],
-					},
-				});
+      // Get current POI name for filtering
+      const [currentPoi] = await db
+        .select({ name: personsOfInterest.name })
+        .from(personsOfInterest)
+        .where(eq(personsOfInterest.id, poiId))
+        .limit(1);
 
-				qdrantMatches = poiResults.map((r) => {
-					const payload = r.payload as Record<string, unknown>;
-					return {
-						poiId: (payload?.poi_id as string) ?? '',
-						photoId: (payload?.photo_id as string) ?? '',
-						poiName: (payload?.poi_name as string) ?? 'Unknown',
-						caption: (payload?.caption as string) ?? '',
-						score: r.score,
-						collection: 'poi_profiles',
-					};
-				});
-			} catch {
-				// poi_profiles collection may not exist yet — fall through
-			}
+      const currentPoiName = currentPoi?.name ?? '';
 
-			// Fallback: evidence_items collection (broader, lower threshold)
-			if (qdrantMatches.length === 0) {
-				const results = await qdrant.search('evidence_items', {
-					vector: queryVector,
-					limit: 20,
-					score_threshold: 0.5,
-					with_payload: true,
-					filter: {
-						must: [
-							{ key: 'type', match: { value: 'poi_photo' } },
-						],
-					},
-				});
+      // Primary search: poi_profiles collection (dedicated POI vectors)
+      try {
+        const poiResults = await qdrant.search('poi_profiles', {
+          vector: { name: 'embedding', vector: queryVector },
+          limit: 20,
+          score_threshold: 0.7,
+          with_payload: true,
+          filter: {
+            must: [{ key: 'type', match: { value: 'poi_photo' } }],
+            must_not: [{ key: 'poi_id', match: { value: poiId } }],
+          },
+        });
 
-				qdrantMatches = results
-					.filter((r) => {
-						const payload = r.payload as Record<string, unknown>;
-						return payload?.poi_name !== currentPoiName;
-					})
-					.map((r) => {
-						const payload = r.payload as Record<string, unknown>;
-						return {
-							poiId: '',
-							photoId: (payload?.photo_id as string) ?? '',
-							poiName: (payload?.poi_name as string) ?? 'Unknown',
-							caption: (payload?.caption as string) ?? '',
-							score: r.score,
-							collection: 'evidence_items',
-						};
-					});
-			}
-		} catch (err) {
-			console.warn('[face-match] Qdrant search failed, falling back to DB:', err);
-		}
+        qdrantMatches = poiResults.map((r) => {
+          const payload = r.payload as Record<string, unknown>;
+          return {
+            poiId: (payload?.poi_id as string) ?? '',
+            photoId: (payload?.photo_id as string) ?? '',
+            poiName: (payload?.poi_name as string) ?? 'Unknown',
+            caption: (payload?.caption as string) ?? '',
+            score: r.score,
+            collection: 'poi_profiles',
+          };
+        });
+      } catch {
+        // poi_profiles collection may not exist yet — fall through
+      }
 
-		// Resolve Qdrant matches to POI records
-		if (qdrantMatches.length > 0) {
-			const photoIds = qdrantMatches.map((m) => m.photoId).filter(Boolean);
+      // Fallback: evidence_items collection (broader, lower threshold)
+      if (qdrantMatches.length === 0) {
+        const results = await qdrant.search('evidence_items', {
+          vector: queryVector,
+          limit: 20,
+          score_threshold: 0.5,
+          with_payload: true,
+          filter: {
+            must: [{ key: 'type', match: { value: 'poi_photo' } }],
+          },
+        });
 
-			if (photoIds.length > 0) {
-				// Look up which POIs own these photos
-				const photoOwners = await db
-					.select({
-						photoId: poiPhotos.id,
-						poiId: poiPhotos.poiId,
-						url: poiPhotos.url,
-						thumbnailUrl: poiPhotos.thumbnailUrl,
-						originalName: poiPhotos.originalName,
-					})
-					.from(poiPhotos)
-					.where(
-						sql`${poiPhotos.id} IN (${sql.join(
-							photoIds.map((id) => sql`${id}`),
-							sql`, `
-						)})`
-					);
+        qdrantMatches = results
+          .filter((r) => {
+            const payload = r.payload as Record<string, unknown>;
+            return payload?.poi_name !== currentPoiName;
+          })
+          .map((r) => {
+            const payload = r.payload as Record<string, unknown>;
+            return {
+              poiId: '',
+              photoId: (payload?.photo_id as string) ?? '',
+              poiName: (payload?.poi_name as string) ?? 'Unknown',
+              caption: (payload?.caption as string) ?? '',
+              score: r.score,
+              collection: 'evidence_items',
+            };
+          });
+      }
+    } catch (err) {
+      console.warn('[face-match] Qdrant search failed, falling back to DB:', err);
+    }
 
-				// Get unique POI IDs (excluding self)
-				const uniquePoiIds = [
-					...new Set(
-						photoOwners
-							.filter((p) => p.poiId !== poiId)
-							.map((p) => p.poiId)
-					),
-				];
+    // Resolve Qdrant matches to POI records
+    if (qdrantMatches.length > 0) {
+      const photoIds = qdrantMatches.map((m) => m.photoId).filter(Boolean);
 
-				if (uniquePoiIds.length > 0) {
-					return json(await buildMatchResponse(uniquePoiIds, qdrantMatches, photoOwners, poiId, limit, photosWithEmbeddings[0].id, qdrantMatches[0]?.collection ?? 'evidence_items'));
-				}
-			}
-		}
+      if (photoIds.length > 0) {
+        // Look up which POIs own these photos
+        const photoOwners = await db
+          .select({
+            photoId: poiPhotos.id,
+            poiId: poiPhotos.poiId,
+            url: poiPhotos.url,
+            thumbnailUrl: poiPhotos.thumbnailUrl,
+            originalName: poiPhotos.originalName,
+          })
+          .from(poiPhotos)
+          .where(
+            sql`${poiPhotos.id} IN (${sql.join(
+              photoIds.map((id) => sql`${id}`),
+              sql`, `
+            )})`
+          );
 
-		// DB fallback: pgvector cosine similarity (HNSW indexed)
-		try {
-			const vectorStr = `[${queryVector.join(',')}]`;
-			const dbMatches = await db.execute(sql`
+        // Get unique POI IDs (excluding self)
+        const uniquePoiIds = [
+          ...new Set(photoOwners.filter((p) => p.poiId !== poiId).map((p) => p.poiId)),
+        ];
+
+        if (uniquePoiIds.length > 0) {
+          return json(
+            await buildMatchResponse(
+              uniquePoiIds,
+              qdrantMatches,
+              photoOwners,
+              poiId,
+              limit,
+              photosWithEmbeddings[0].id,
+              qdrantMatches[0]?.collection ?? 'evidence_items'
+            )
+          );
+        }
+      }
+    }
+
+    // DB fallback: pgvector cosine similarity (HNSW indexed)
+    try {
+      const vectorStr = `[${queryVector.join(',')}]`;
+      const dbMatches = await db.execute(sql`
 				SELECT
 					pp.id as photo_id,
 					pp.poi_id,
@@ -201,66 +211,81 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 				LIMIT ${limit * 2}
 			`);
 
-			const rows = (dbMatches as unknown as { rows: Record<string, any>[] }).rows ?? [];
-			if (rows.length > 0) {
-				// Group by POI, take best score per POI
-				const byPoi = new Map<string, {
-					poi: { id: string; name: string; threatLevel: string; photos: Array<{ url: string; thumbnailUrl: string }> };
-					similarity: number;
-					photos: Array<{ url: string; thumbnailUrl: string }>;
-				}>();
-				for (const row of rows) {
-					const pid = row.poi_id;
-					const sim = Number(row.similarity);
-					if (sim < 0.5) continue;
-					const existing = byPoi.get(pid);
-					if (!existing) {
-						byPoi.set(pid, {
-							poi: { id: pid, name: row.poi_name ?? 'Unknown', threatLevel: row.threat_level ?? 'unknown', photos: [] },
-							similarity: sim,
-							photos: [{ url: row.url, thumbnailUrl: row.thumbnail_url ?? row.url }],
-						});
-					} else {
-						if (sim > existing.similarity) existing.similarity = sim;
-						existing.photos.push({ url: row.url, thumbnailUrl: row.thumbnail_url ?? row.url });
-					}
-				}
+      const rows = (dbMatches as unknown as { rows: Record<string, any>[] }).rows ?? [];
+      if (rows.length > 0) {
+        // Group by POI, take best score per POI
+        const byPoi = new Map<
+          string,
+          {
+            poi: {
+              id: string;
+              name: string;
+              threatLevel: string;
+              photos: Array<{ url: string; thumbnailUrl: string }>;
+            };
+            similarity: number;
+            photos: Array<{ url: string; thumbnailUrl: string }>;
+          }
+        >();
+        for (const row of rows) {
+          const pid = row.poi_id;
+          const sim = Number(row.similarity);
+          if (sim < 0.5) continue;
+          const existing = byPoi.get(pid);
+          if (!existing) {
+            byPoi.set(pid, {
+              poi: {
+                id: pid,
+                name: row.poi_name ?? 'Unknown',
+                threatLevel: row.threat_level ?? 'unknown',
+                photos: [],
+              },
+              similarity: sim,
+              photos: [{ url: row.url, thumbnailUrl: row.thumbnail_url ?? row.url }],
+            });
+          } else {
+            if (sim > existing.similarity) existing.similarity = sim;
+            existing.photos.push({ url: row.url, thumbnailUrl: row.thumbnail_url ?? row.url });
+          }
+        }
 
-				const matches = [...byPoi.values()]
-					.sort((a, b) => b.similarity - a.similarity)
-					.slice(0, limit)
-					.map(m => ({
-						poi: { ...m.poi, photos: m.photos.slice(0, 5) },
-						similarity: m.similarity,
-						confidence: m.similarity >= 0.85 ? 'high' as const : m.similarity >= 0.65 ? 'medium' as const : 'low' as const,
-					}));
+        const matches = [...byPoi.values()]
+          .sort((a, b) => b.similarity - a.similarity)
+          .slice(0, limit)
+          .map((m) => ({
+            poi: { ...m.poi, photos: m.photos.slice(0, 5) },
+            similarity: m.similarity,
+            confidence:
+              m.similarity >= 0.85
+                ? ('high' as const)
+                : m.similarity >= 0.65
+                  ? ('medium' as const)
+                  : ('low' as const),
+          }));
 
-				if (matches.length > 0) {
-					return json({
-						matches,
-						method: 'pgvector-cosine',
-						queryPhotoId: photosWithEmbeddings[0].id,
-						totalCandidates: rows.length,
-					});
-				}
-			}
-		} catch (err) {
-			console.warn('[face-match] pgvector fallback failed:', err);
-		}
+        if (matches.length > 0) {
+          return json({
+            matches,
+            method: 'pgvector-cosine',
+            queryPhotoId: photosWithEmbeddings[0].id,
+            totalCandidates: rows.length,
+          });
+        }
+      }
+    } catch (err) {
+      console.warn('[face-match] pgvector fallback failed:', err);
+    }
 
-		// Fallback: No matches found
-		return json({
-			matches: [],
-			method: qdrantMatches.length > 0 ? 'qdrant-no-other-pois' : 'fallback',
-			message: 'No similar faces found from other persons of interest',
-		});
-	} catch (err) {
-		console.error('[face-match] Error:', err);
-		return json(
-			{ error: 'Face match search failed', matches: [] },
-			{ status: 500 }
-		);
-	}
+    // Fallback: No matches found
+    return json({
+      matches: [],
+      method: qdrantMatches.length > 0 ? 'qdrant-no-other-pois' : 'fallback',
+      message: 'No similar faces found from other persons of interest',
+    });
+  } catch (err) {
+    console.error('[face-match] Error:', err);
+    return json({ error: 'Face match search failed', matches: [] }, { status: 500 });
+  }
 };
 
 /** Build structured match response from Qdrant results + DB lookups */

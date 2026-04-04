@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { syncCaseToGraph } from '$lib/server/graph/pg-neo4j-sync.js';
 
 const CASE_STATUS = ['open', 'in_progress', 'pending_review', 'closed', 'archived'] as const;
-const CASE_PRIORITY = ['low', 'medium', 'high', 'urgent'] as const;
+const CASE_PRIORITY = ['low', 'medium', 'high', 'critical', 'urgent'] as const;
 
 const caseUpdateSchema = z.object({
   title: z.string().min(1).max(500).optional(),
@@ -36,7 +36,11 @@ export const GET: RequestHandler = async ({ locals, params }) => {
       return json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const caseData = await db.select().from(cases).where(eq(cases.id, id)).limit(1);
+    const caseData = await db
+      .select()
+      .from(cases)
+      .where(and(eq(cases.id, id), eq(cases.userId, locals.user.id)))
+      .limit(1);
 
     if (caseData.length === 0) {
       return json({ message: 'Case not found' }, { status: 404 });

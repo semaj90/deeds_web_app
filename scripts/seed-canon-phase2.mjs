@@ -7,7 +7,7 @@
  *
  * Usage: node scripts/seed-canon-phase2.mjs
  *
- * Requires: PostgreSQL running on 127.0.0.1:5432
+ * Requires: PostgreSQL running on 127.0.0.1:5434 (deeds-postgres-prod via proxy)
  * Optional: Ollama running on 127.0.0.1:11434 (for embeddings)
  */
 
@@ -16,7 +16,7 @@ import { createHash, randomUUID } from 'node:crypto';
 
 const { Pool } = pg;
 const pool = new Pool({
-	connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db',
+	connectionString: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
 });
 
 const OLLAMA_URL = 'http://localhost:11434';

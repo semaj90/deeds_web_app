@@ -1,0 +1,32 @@
+{
+  "success": true,
+  "data": {
+    "response": "The evidence upload pipeline typically begins with a user submitting files (documents, images, videos) through a web interface or API. These files are then validated for format and size, stored temporarily, and often undergo virus scanning and metadata extraction. Next, they're processed – potentially involving OCR for text extraction, image enhancement, or video transcoding – before being indexed and linked to relevant cases or records within a database, making them searchable and accessible to authorized users. Finally, audit trails are created to track the entire process, ensuring accountability and traceability.\n\n\n\n",
+    "model": "gemma3-legal:latest",
+    "sessionId": "contextual-cap-test-after-timeout-fix-2",
+    "_diagnostics": {
+      "routeDurationMs": 18096,
+      "ollama": {
+        "callCount": 1,
+        "totalDurationMs": 18082,
+        "loadDurationMs": 201,
+        "promptEvalDurationMs": 1203,
+        "evalDurationMs": 16528,
+        "promptEvalCount": 22,
+        "evalCount": 110,
+        "approxNonOllamaMs": 150,
+        "calls": [
+          {
+            "stage": "simple",
+            "totalDurationMs": 18082,
+            "loadDurationMs": 201,
+            "promptEvalDurationMs": 1203,
+            "evalDurationMs": 16528,
+            "promptEvalCount": 22,
+            "evalCount": 110
+          }
+        ]
+      }
+    }
+  }
+}

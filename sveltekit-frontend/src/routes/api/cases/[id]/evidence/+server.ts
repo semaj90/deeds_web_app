@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
-import { evidence } from '$lib/server/db/schema-postgres.js';
+import { cases, evidence } from '$lib/server/db/schema-postgres.js';
 import { eq, and, desc } from 'drizzle-orm';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
@@ -22,6 +22,14 @@ export const GET: RequestHandler = async ({ params, locals }) => {
   if (!isUuid(caseId)) return json({ error: 'Invalid case ID format' }, { status: 400 });
 
   try {
+    const [targetCase] = await db
+      .select({ id: cases.id })
+      .from(cases)
+      .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
+      .limit(1);
+
+    if (!targetCase) return json({ error: 'Case not found' }, { status: 404 });
+
     const items = await db
       .select({
         id: evidence.id,
@@ -74,6 +82,14 @@ export const DELETE: RequestHandler = async ({ params, request, locals }) => {
   if (!parsed.success)
     return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
   const { evidenceId, hard } = parsed.data;
+
+  const [targetCase] = await db
+    .select({ id: cases.id })
+    .from(cases)
+    .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
+    .limit(1);
+
+  if (!targetCase) return json({ error: 'Case not found' }, { status: 404 });
 
   if (hard) {
     await db.delete(evidence).where(and(eq(evidence.id, evidenceId), eq(evidence.caseId, caseId)));

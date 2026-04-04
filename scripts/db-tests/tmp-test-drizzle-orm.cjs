@@ -7,7 +7,7 @@ const { Pool } = require('pg');
 const origQuery = Pool.prototype.query;
 const interceptedQueries = [];
 
-const pool = new Pool({ connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5432/legal_ai_db' });
+const pool = new Pool({ connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db' });
 
 // Patch the pool's query to log SQL
 const origPoolQuery = pool.query.bind(pool);

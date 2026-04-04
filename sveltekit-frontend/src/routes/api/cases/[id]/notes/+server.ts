@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/client';
 import { caseNotes, cases } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
-import { eq, desc } from 'drizzle-orm';
+import { and, eq, desc } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 
@@ -29,6 +29,16 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	}
 
 	try {
+		const [targetCase] = await db
+      .select({ id: cases.id })
+      .from(cases)
+      .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
+      .limit(1);
+
+    if (!targetCase) {
+      return json({ error: 'Case not found' }, { status: 404 });
+    }
+
 		const notes = await db
 			.select()
 			.from(caseNotes)
@@ -68,10 +78,10 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 
 		// Verify case exists
 		const [targetCase] = await db
-			.select({ id: cases.id })
-			.from(cases)
-			.where(eq(cases.id, caseId))
-			.limit(1);
+      .select({ id: cases.id })
+      .from(cases)
+      .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
+      .limit(1);
 
 		if (!targetCase) {
 			return json({ error: 'Case not found' }, { status: 404 });
