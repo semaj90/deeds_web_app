@@ -1,5 +1,3 @@
-// Minimal declaration so TS accepts dynamic imports of: 'd3' declare module, 'd3';
-
 // Lightweight ambient types for 'd3' to satisfy the TypeScript compiler.
 // Replace with real @types/d3 when you want precise typings (npm i -D d3 @types/d3).
 
