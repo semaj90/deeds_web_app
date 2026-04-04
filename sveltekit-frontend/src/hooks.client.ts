@@ -127,18 +127,32 @@ window.addEventListener('pagehide', () => flushErrors());
 // first chat inference doesn't pay cold-start penalty.
 // Falls back silently if WebGPU unavailable or VRAM too low.
 
+async function preloadE2BAndWarmCache(): Promise<void> {
+  try {
+    const { initE2B } = await import('$lib/ai/gemma4-e2b-client.js');
+    await initE2B();
+    console.info('[E2B] Preloaded during idle');
+  } catch {
+    /* E2B unavailable — 270M ONNX fallback active */
+  }
+
+  // Warm synthesis cache with common legal queries (best-effort)
+  try {
+    const { warmSynthesisCache } = await import('$lib/ai/client-llm-synthesis.js');
+    const warmed = await warmSynthesisCache([
+      { query: 'What is habeas corpus?' },
+      { query: 'Explain due process' },
+      { query: 'What is the statute of limitations?' },
+      { query: 'Define negligence in tort law' },
+    ]);
+    if (warmed > 0) console.info(`[Synthesis] Warmed ${warmed} cache entries`);
+  } catch {
+    /* non-critical */
+  }
+}
+
 if ('requestIdleCallback' in window) {
-  window.requestIdleCallback(() => {
-    import('$lib/ai/gemma4-e2b-client.js')
-      .then(({ initE2B }) => initE2B())
-      .then(() => console.info('[E2B] Preloaded during idle'))
-      .catch(() => { /* E2B unavailable — 270M ONNX fallback active */ });
-  }, { timeout: 10_000 });
+  window.requestIdleCallback(() => { preloadE2BAndWarmCache(); }, { timeout: 10_000 });
 } else {
-  // Safari fallback — delay 5s after load
-  setTimeout(() => {
-    import('$lib/ai/gemma4-e2b-client.js')
-      .then(({ initE2B }) => initE2B())
-      .catch(() => { /* silent fallback */ });
-  }, 5_000);
+  setTimeout(() => { preloadE2BAndWarmCache(); }, 5_000);
 }

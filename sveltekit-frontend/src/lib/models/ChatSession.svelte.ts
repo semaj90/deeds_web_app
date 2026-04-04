@@ -9,7 +9,8 @@ import type { InferenceSource } from '$lib/ai/model-ids.js';
 import { clientCache } from '$lib/ai/client-cache.js';
 import { updateTextEmotion, getEmotionSystemPrompt, getEmotionState } from '$lib/ai/emotion-context.js';
 import { isE2BReady } from '$lib/ai/gemma4-e2b-client.js';
-import { evaluateSynthesisQuality } from '$lib/ai/client-quality.js';
+import { evaluateSynthesisQuality, scoreRetrievalConfidence, type RetrievalSignals } from '$lib/ai/client-quality.js';
+import { synthesize } from '$lib/ai/client-llm-synthesis.js';
 
 export type ChatRole = 'user' | 'assistant' | 'system';
 
@@ -848,6 +849,27 @@ export class ChatSession {
         return;
       }
 
+      // Step 2.5: Pre-retrieval confidence check — skip local if context too weak
+      const retrievalSignals: RetrievalSignals = {
+        ragTopScore: rawChunks[0]?.score ?? 0,
+        ragHitCount: rawChunks.filter((c) => c.score >= 0.5).length,
+        kagNeighborCount: ragData.kagNeighbors ?? 0,
+        dagCacheHit: ragData.dagCached ?? false,
+        kagGlossaryHits: ragData.glossaryHits ?? 0,
+      };
+      const retrievalConfidence = scoreRetrievalConfidence(retrievalSignals);
+      console.info(`[ChatRouter] Retrieval confidence: ${retrievalConfidence.toFixed(2)}`, retrievalSignals);
+
+      if (retrievalConfidence < 0.35) {
+        console.info('[ChatRouter] Retrieval confidence too low, escalating to server');
+        await this._handleServerInference(message, {
+          ...decision,
+          source: 'server-ollama',
+          reason: `retrieval-confidence-low(${retrievalConfidence.toFixed(2)})`,
+        });
+        return;
+      }
+
       // Step 3: GPU rerank chunks client-side (WebGPU → WASM → CPU fallback)
       let rankedChunks = rawChunks;
       try {
@@ -869,19 +891,62 @@ export class ChatSession {
         // GPU rerank failed — use server-ranked order
       }
 
-      // Step 4: Build context-augmented prompt for local ONNX
+      // Step 4: Build RAG context for synthesis
       const topChunks = rankedChunks.slice(0, 3);
-      const contextBlock = topChunks
+      const ragContext = topChunks
         .map((c, i) => `[Document ${i + 1}]: ${(c.text || c.snippet).slice(0, 800)}`)
         .join('\n\n');
-      const augmentedMessage = `Based on these legal documents:\n${contextBlock}\n\nAnswer this question concisely: ${message}`;
 
       console.info(
-        `[ChatRouter] Retrieval-hybrid: ${topChunks.length} chunks, attempting local generation`
+        `[ChatRouter] Retrieval-hybrid: ${topChunks.length} chunks (confidence=${retrievalConfidence.toFixed(2)}), attempting local synthesis`
       );
 
-      // Step 5: Local ONNX inference with augmented prompt
+      // Step 5: Try synthesis cache first (RAG-context-aware), then E2B/ONNX
       try {
+        const synthResult = await synthesize(message, ragContext);
+
+        if (synthResult.cached || (synthResult.text && synthResult.source !== 'local-onnx')) {
+          // Cache hit or successful E2B generation — check quality
+          if (synthResult.text) {
+            const quality = evaluateSynthesisQuality(synthResult.text, message);
+            if (quality.shouldEscalate) {
+              console.warn(`[ChatRouter] Synthesis quality low (${quality.score.toFixed(2)}): ${quality.reason}, escalating`);
+              await this._handleServerInference(message, {
+                ...decision,
+                source: 'server-ollama',
+                reason: `retrieval-synthesis-quality-low(${quality.reason})`,
+              });
+              return;
+            }
+
+            const source: InferenceSource = synthResult.cached ? 'retrieval-hybrid' : 'local-e2b';
+            this.messages.push({
+              role: 'assistant',
+              content: synthResult.text,
+              timestamp: new Date().toISOString(),
+              source,
+              metadata: { routerDecision: decision, confidence: retrievalConfidence },
+            });
+            clientCache.saveChatMessage(this._chatId, 'assistant', synthResult.text, {
+              source,
+              routerDecision: decision,
+            });
+            this.status = 'idle';
+            this.lastSource = source;
+            this.lastConfidence = retrievalConfidence;
+            this.debugInfo = {
+              ...this.debugInfo,
+              cacheHit: synthResult.cached ? 'synthesis' : 'none',
+              latencyMs: Math.round(performance.now() - t0),
+              provider: `retrieval-${synthResult.source}`,
+            };
+            console.info(`[ChatRouter] Retrieval synthesis: ${synthResult.source} in ${synthResult.durationMs}ms`);
+            return;
+          }
+        }
+
+        // Synthesis returned empty (E2B not ready, no cache) → fall through to ONNX
+        const augmentedMessage = `Based on these legal documents:\n${ragContext}\n\nAnswer this question concisely: ${message}`;
         await this._handleLocalInference(augmentedMessage, {
           ...decision,
           source: 'retrieval-hybrid',
@@ -890,16 +955,16 @@ export class ChatSession {
 
         // Verify answer quality via quality schema — escalate if insufficient
         const lastMsg = this.messages[this.messages.length - 1];
-        const retrievalQuality = lastMsg?.role === 'assistant'
+        const postQuality = lastMsg?.role === 'assistant'
           ? evaluateSynthesisQuality(lastMsg.content, message)
           : null;
-        if (retrievalQuality?.shouldEscalate) {
-          console.warn(`[ChatRouter] Retrieval answer quality low (${retrievalQuality.score.toFixed(2)}): ${retrievalQuality.reason}, escalating`);
+        if (postQuality?.shouldEscalate) {
+          console.warn(`[ChatRouter] Retrieval answer quality low (${postQuality.score.toFixed(2)}): ${postQuality.reason}, escalating`);
           this.messages.pop();
           await this._handleServerInference(message, {
             ...decision,
             source: 'server-ollama',
-            reason: `retrieval-escalated(short-answer)`,
+            reason: `retrieval-escalated(${postQuality.reason})`,
           });
         } else {
           this.debugInfo = {
@@ -909,11 +974,11 @@ export class ChatSession {
           };
         }
       } catch {
-        console.warn('[ChatRouter] Retrieval local ONNX failed, escalating to server');
+        console.warn('[ChatRouter] Retrieval local synthesis failed, escalating to server');
         await this._handleServerInference(message, {
           ...decision,
           source: 'server-ollama',
-          reason: `retrieval-fallback(onnx-failed)`,
+          reason: `retrieval-fallback(synthesis-failed)`,
         });
       }
     } catch (err: any) {
