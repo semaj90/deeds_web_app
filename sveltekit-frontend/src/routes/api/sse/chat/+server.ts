@@ -23,7 +23,7 @@ import {
 import { createHash } from 'crypto';
 import { synthesisKey, getCaseVersion, TTL } from '$lib/server/cache-keys.js';
 import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
-import { traceEmbedding } from '$lib/server/observability/langfuse.js';
+import { traceEmbedding, traceLLM } from '$lib/server/observability/langfuse.js';
 import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self-prompt.js';
 import { fetchGlossaryMatches } from '$lib/server/ace/context-assembler.js';
 import { orderByDependency, extractCitationRefs } from '$lib/server/retrieval/document-dag.js';
@@ -34,10 +34,20 @@ import { getCachedDAG, setCachedDAG } from '$lib/server/cache/dag-cache.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { authorityChainExpansion, type EmbedFn } from '$lib/server/retrieval/authority-chain.js';
 import { streamLLM as streamTrtLLM, healthCheck as trtHealthCheck } from '$lib/server/trt-llm.js';
-import { streamLLM as streamTritonLLM, healthCheck as tritonHealthCheck } from '$lib/server/triton-llm.js';
-import { acquireGpuLease, releaseGpuLease, getGpuLeaseStatus } from '$lib/server/inference/gpu-arbiter.js';
+import {
+  streamLLM as streamTritonLLM,
+  healthCheck as tritonHealthCheck,
+} from '$lib/server/triton-llm.js';
+import {
+  acquireGpuLease,
+  releaseGpuLease,
+  getGpuLeaseStatus,
+} from '$lib/server/inference/gpu-arbiter.js';
 import { produceTokenChunk, trimTokenStream } from '$lib/server/redis-streams.js';
 import { z } from 'zod';
+import { determineACEPolicy } from '$lib/server/ace/policy.js';
+import type { ACEContext, ACEPolicyDecision } from '$lib/server/ace/types.js';
+import type { ContextualToolResult } from '$lib/server/ai/contextual-tools.js';
 
 const sseChatSchema = z.object({
   message: z.string().min(1, 'Message is required').max(50000),
@@ -47,6 +57,7 @@ const sseChatSchema = z.object({
   emotionMood: z.string().max(100).optional(),
   attachmentSourceHash: z.string().max(64).optional(),
   currentRoute: z.string().max(500).optional(),
+  enableTools: z.boolean().optional(),
 });
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
@@ -55,17 +66,17 @@ const QDRANT_URL = ENV.QDRANT_URL;
 // Embedding model used for both indexing and retrieval — must match
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
 
-// Token budget caps (chars, ~4 chars per token)
-const CASE_CONTEXT_MAX_CHARS = 1200;
-const RAG_CHUNK_MAX_CHARS = 600;
-const RAG_MAX_CHUNKS = 5;
+// Token budget caps (chars, ~4 chars per token) — expanded for 128K+ context models
+const CASE_CONTEXT_MAX_CHARS = 3200;
+const RAG_CHUNK_MAX_CHARS = 1500;
+const RAG_MAX_CHUNKS = 12;
 
 // Qdrant uses cosine distance — score is already 0..1 similarity.
 // For cosine with embeddinggemma, useful hits typically score > 0.30.
 const RAG_SCORE_THRESHOLD = 0.3;
 
 // Conversation memory: load last N messages for multi-turn context
-const CONVERSATION_HISTORY_LIMIT = 10;
+const CONVERSATION_HISTORY_LIMIT = 20;
 const PRELUDE_RAG_TIMEOUT_MS = 6000;
 const CACHE_LOOKUP_TIMEOUT_MS = 2000;
 
@@ -248,7 +259,7 @@ async function loadCaseContext(caseId: string): Promise<string | null> {
       const evidenceResult = await db.execute(
         sql`SELECT title, evidence_type, file_type, file_size, metadata
 					FROM evidence WHERE case_id = ${caseId}
-					ORDER BY created_at DESC LIMIT 10`
+					ORDER BY created_at DESC LIMIT 15`
       );
       const evidenceRows = evidenceResult.rows || [];
 
@@ -281,7 +292,7 @@ async function loadCaseContext(caseId: string): Promise<string | null> {
         .select()
         .from(savedCitations)
         .where(eq(savedCitations.caseId, caseId))
-        .limit(10);
+        .limit(15);
 
       if (citationRows.length > 0) {
         context += `\n## Citations (${citationRows.length} items)\n`;
@@ -427,7 +438,11 @@ async function searchCollection(
  * merges results by score, validates embedding consistency.
  * Returns empty array if embedding or search fails (chat continues without RAG).
  */
-async function retrieveContext(query: string, limit = RAG_MAX_CHUNKS, graphFilter?: Record<string, unknown>): Promise<ContextDoc[]> {
+async function retrieveContext(
+  query: string,
+  limit = RAG_MAX_CHUNKS,
+  graphFilter?: Record<string, unknown>
+): Promise<ContextDoc[]> {
   try {
     // 0. Check embedding cache — skip Ollama call on hit
     const cachedVector = await getCachedEmbedding(query, EMBEDDING_MODEL).catch(() => null);
@@ -837,6 +852,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     emotionMood,
     attachmentSourceHash,
     currentRoute,
+    enableTools,
   } = parsed.data;
 
   // Save user message to chatMessages table
@@ -1016,7 +1032,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           preRetrievalFilter = buildGraphShouldFilter(preRetrievalNeighbors) ?? undefined;
           console.log(
             `[KAG Pre-Retrieval] ${preRetrievalNeighbors.length} neighbors → ` +
-            `${preRetrievalFilter ? 'filter built' : 'no strong neighbors'}`
+              `${preRetrievalFilter ? 'filter built' : 'no strong neighbors'}`
           );
         }
       }
@@ -1026,7 +1042,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           ? Promise.resolve(attachmentScopedDocs)
           : hasInlineAttachmentSource
             ? Promise.resolve([])
-            : retrieveContextWithBudget(message, RAG_MAX_CHUNKS, PRELUDE_RAG_TIMEOUT_MS, preRetrievalFilter),
+            : retrieveContextWithBudget(
+                message,
+                RAG_MAX_CHUNKS,
+                PRELUDE_RAG_TIMEOUT_MS,
+                preRetrievalFilter
+              ),
         wantsCode && !codeGlyphHit
           ? loadCodebaseContext(message).catch(() => null)
           : Promise.resolve(null),
@@ -1061,7 +1082,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       // When top results cite specific statutes or cases, embed those citations
       // and search for their full text to give the LLM primary authority sources.
       {
-        const authQueryVector = await getCachedEmbedding(message, EMBEDDING_MODEL).catch(() => null);
+        const authQueryVector = await getCachedEmbedding(message, EMBEDDING_MODEL).catch(
+          () => null
+        );
         if (authQueryVector && contextDocs.length > 0) {
           const embedAuthority: EmbedFn = async (text) => {
             try {
@@ -1150,10 +1173,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
       // ── Graph authority scoring: strength + confidence weighted re-ranking ──
       // Combines pre-retrieval neighbors (from case graph) with post-retrieval neighbors
-      const allGraphNeighbors = [
-        ...preRetrievalNeighbors,
-        ...(graphContext?.neighbors ?? []),
-      ];
+      const allGraphNeighbors = [...preRetrievalNeighbors, ...(graphContext?.neighbors ?? [])];
       if (allGraphNeighbors.length > 0) {
         contextDocs = applyGraphAuthorityScoring(contextDocs, allGraphNeighbors);
       }
@@ -1233,6 +1253,104 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           }
         } catch {
           // Analytics context unavailable — non-fatal
+        }
+      }
+
+      // ── Agentic Tool Calling: pre-stream tool detection ──────────
+      // If enableTools is true (default for case-bound sessions), do a quick
+      // non-streaming pass to check if the LLM wants to call tools (web search,
+      // glossary, RAG). Tool results are injected into the system prompt.
+      const ssePolicyContext: ACEContext = {
+        userProfile: null,
+        caseContext,
+        glossaryMatches,
+        ragChunks: contextDocs.map((d) => ({
+          content: d.content,
+          score: d.similarity,
+          source: d.sourceId ?? d.documentId,
+        })),
+        kbChunks: [],
+        caseChunks: [],
+        kagNeighbors:
+          graphContext?.neighbors?.map((n) => ({
+            nodeId: n.nodeId,
+            title: n.title,
+            relationship: n.relationship,
+            score: n.score,
+          })) ?? [],
+        chatHistory: conversationHistory
+          .filter(
+            (m): m is { role: 'user' | 'assistant' | 'system'; content: string } =>
+              m.role === 'user' || m.role === 'assistant' || m.role === 'system'
+          )
+          .map((m) => ({ role: m.role, content: m.content })),
+        entities: {
+          statutes: queryEntities.statutes,
+          cases: queryEntities.cases,
+          persons: [],
+          organizations: [],
+          dates: [],
+        },
+        practiceTemplate: null,
+        queryTags: [...queryEntities.statutes.slice(0, 3), ...queryEntities.cases.slice(0, 3)],
+        webSearchContext: null,
+        persona: 'neutral',
+        evidenceMetadata: null,
+        evidenceConnections: null,
+        userAnalyticsContext: null,
+        codebaseContext:
+          codebaseResult?.chunks.map((chunk) => ({
+            filePath: chunk.relativePath,
+            content: chunk.symbol,
+            score: chunk.score,
+          })) ?? null,
+        policyDecision: null,
+      };
+      const policyDecision: ACEPolicyDecision = determineACEPolicy(message, ssePolicyContext);
+
+      let toolResults: ContextualToolResult[] = [];
+      const shouldRunTools = enableTools ?? !!caseMatch;
+      if (shouldRunTools && !hasInlineAttachmentSource) {
+        try {
+          const { runToolDetectionPass } = await import('$lib/server/ai/contextual-tools.js');
+          toolResults = await Promise.race([
+            runToolDetectionPass(
+              OLLAMA_URL,
+              model ?? 'gemma3-legal:latest',
+              systemPrompt,
+              conversationHistory,
+              message,
+              getChatModelKeepAlive(),
+              {
+                message,
+                caseId: caseUuid,
+                retrievalConfidence: policyDecision.retrievalConfidence,
+                parameterHints: {
+                  query: message,
+                  caseId: caseUuid,
+                },
+              }
+            ),
+            new Promise<typeof toolResults>((resolve) => setTimeout(() => resolve([]), 10_000)),
+          ]);
+          if (toolResults.length > 0) {
+            const toolContext = toolResults
+              .filter((r) => r.ok && r.result)
+              .map((r) => `[Tool: ${r.tool}] ${r.result}`)
+              .join('\n\n');
+            if (toolContext) {
+              systemPrompt += `\n\n## Tool Results\n${toolContext}`;
+            }
+            console.log(
+              `[SSE Chat] Tool detection: ${toolResults.length} tool(s) called — ` +
+                toolResults.map((r) => `${r.tool}:${r.durationMs}ms`).join(', ')
+            );
+          }
+        } catch (toolErr) {
+          console.warn(
+            '[SSE Chat] Tool detection failed (non-fatal):',
+            toolErr instanceof Error ? toolErr.message : toolErr
+          );
         }
       }
 
@@ -1323,6 +1441,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         const assistantMetadata = JSON.stringify({
           confidence,
           confidenceFactors,
+          policyDecision,
           contextUsed: {
             case: caseContext !== null,
             glossaryMatches: serializeGlossaryMatches(glossaryMatches),
@@ -1344,6 +1463,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           glossaryMatches: serializeGlossaryMatches(glossaryMatches),
           cachedResponse: true,
           cachedAt: cacheResult.cachedAt,
+          ...(toolResults.length > 0 ? { toolResults } : {}),
         });
 
         try {
@@ -1373,6 +1493,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           glossaryMatches: serializeGlossaryMatches(glossaryMatches),
           conversationTurns: conversationHistory.length,
           cachedResponse: true,
+          policyDecision,
+          ...(toolResults.length > 0 ? { toolResults } : {}),
         });
 
         controller.close();
@@ -1392,8 +1514,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         // Flatten conversation into a single prompt for TRT-LLM/Triton (non-chat APIs)
         const flatPrompt = [
           `<|system|>\n${systemPrompt}`,
-          ...conversationHistory.map((m: { role: string; content: string }) =>
-            `<|${m.role}|>\n${m.content}`
+          ...conversationHistory.map(
+            (m: { role: string; content: string }) => `<|${m.role}|>\n${m.content}`
           ),
           `<|user|>\n${augmentedMessage}`,
           '<|assistant|>',
@@ -1409,108 +1531,150 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         let tokenSeq = 0;
         let inferenceBackend: 'tensorrt' | 'triton' | 'ollama' = 'ollama';
 
-        // Helper: consume an async generator and stream chunks to client
-        const consumeStream = async (
-          stream: AsyncGenerator<{ content: string; done: boolean }>
-        ) => {
-          for await (const chunk of stream) {
-            if (chunk.done) break;
-            if (chunk.content) {
-              fullResponse += chunk.content;
-              send({ id, role: 'assistant', content: fullResponse, status: 'streaming' });
-              produceTokenChunk(conversationId, tokenSeq++, chunk.content).catch((err) => {
-                console.warn('[SSE chat] token chunk persist failed:', (err as Error)?.message ?? err);
-              });
-            }
-          }
-        };
-
-        // ── Tier 1: TRT-LLM streaming (fastest, requires GPU lease) ──
-        let streamed = false;
-        try {
-          const trtHealthy = await trtHealthCheck().catch(() => false);
-          if (trtHealthy) {
-            const lease = await acquireGpuLease('tensorrt', 120).catch(() => null);
-            if (lease) {
-              try {
-                await consumeStream(streamTrtLLM({ prompt: flatPrompt, temperature: 0.7 }));
-                inferenceBackend = 'tensorrt';
-                streamed = true;
-              } finally {
-                releaseGpuLease('tensorrt').catch(() => {});
-              }
-            }
-          }
-        } catch (trtErr) {
-          console.warn('[SSE chat] TRT-LLM streaming failed:', (trtErr as Error)?.message ?? trtErr);
-        }
-
-        // ── Tier 2: Triton streaming (GPU, no arbiter needed — separate server) ──
-        if (!streamed) {
-          try {
-            const tritonHealthy = await tritonHealthCheck().catch(() => false);
-            if (tritonHealthy) {
-              await consumeStream(streamTritonLLM({ prompt: flatPrompt, temperature: 0.7 }));
-              inferenceBackend = 'triton';
-              streamed = true;
-            }
-          } catch (tritonErr) {
-            console.warn('[SSE chat] Triton streaming failed:', (tritonErr as Error)?.message ?? tritonErr);
-          }
-        }
-
-        // ── Tier 3: Ollama streaming (development fallback) ──
-        if (!streamed) {
-          const ollamaRes = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              model: model ?? 'gemma3-legal:latest',
-              messages: ollamaMessages,
-              stream: true,
-              keep_alive: getChatModelKeepAlive(),
-            }),
-          });
-
-          if (!ollamaRes.ok || !ollamaRes.body) {
-            throw new Error(`Ollama error: ${ollamaRes.status}`);
-          }
-
-          const reader = ollamaRes.body.getReader();
-          const decoder = new TextDecoder();
-
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            const text = decoder.decode(value, { stream: true });
-            for (const line of text.split('\n').filter(Boolean)) {
-              try {
-                const parsed = JSON.parse(line);
-                const chunk = parsed.message?.content ?? parsed.response;
-                if (chunk) {
-                  fullResponse += chunk;
+        await traceLLM(
+          'sse-chat-generation',
+          {
+            model: model ?? 'gemma3-legal:latest',
+            backend: 'auto',
+            prompt: flatPrompt,
+            policyAction: policyDecision.action,
+            budgetTier: policyDecision.budget.tier,
+            retrievalConfidence: policyDecision.retrievalConfidence,
+          },
+          async (generation) => {
+            // Helper: consume an async generator and stream chunks to client
+            const consumeStream = async (
+              stream: AsyncGenerator<{ content: string; done: boolean }>
+            ) => {
+              for await (const chunk of stream) {
+                if (chunk.done) break;
+                if (chunk.content) {
+                  fullResponse += chunk.content;
                   send({ id, role: 'assistant', content: fullResponse, status: 'streaming' });
-                  produceTokenChunk(conversationId, tokenSeq++, chunk).catch((err) => {
-                    console.warn('[SSE chat] token chunk persist failed:', (err as Error)?.message ?? err);
+                  produceTokenChunk(conversationId, tokenSeq++, chunk.content).catch((err) => {
+                    console.warn(
+                      '[SSE chat] token chunk persist failed:',
+                      (err as Error)?.message ?? err
+                    );
                   });
                 }
-              } catch {
-                // skip malformed JSON lines
+              }
+            };
+
+            // ── Tier 1: TRT-LLM streaming (fastest, requires GPU lease) ──
+            let streamed = false;
+            try {
+              const trtHealthy = await trtHealthCheck().catch(() => false);
+              if (trtHealthy) {
+                const lease = await acquireGpuLease('tensorrt', 120).catch(() => null);
+                if (lease) {
+                  try {
+                    await consumeStream(streamTrtLLM({ prompt: flatPrompt, temperature: 0.7 }));
+                    inferenceBackend = 'tensorrt';
+                    streamed = true;
+                  } finally {
+                    releaseGpuLease('tensorrt').catch(() => {});
+                  }
+                }
+              }
+            } catch (trtErr) {
+              console.warn(
+                '[SSE chat] TRT-LLM streaming failed:',
+                (trtErr as Error)?.message ?? trtErr
+              );
+            }
+
+            // ── Tier 2: Triton streaming (GPU, no arbiter needed — separate server) ──
+            if (!streamed) {
+              try {
+                const tritonHealthy = await tritonHealthCheck().catch(() => false);
+                if (tritonHealthy) {
+                  await consumeStream(streamTritonLLM({ prompt: flatPrompt, temperature: 0.7 }));
+                  inferenceBackend = 'triton';
+                  streamed = true;
+                }
+              } catch (tritonErr) {
+                console.warn(
+                  '[SSE chat] Triton streaming failed:',
+                  (tritonErr as Error)?.message ?? tritonErr
+                );
               }
             }
+
+            // ── Tier 3: Ollama streaming (development fallback) ──
+            if (!streamed) {
+              const ollamaRes = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  model: model ?? 'gemma3-legal:latest',
+                  messages: ollamaMessages,
+                  stream: true,
+                  keep_alive: getChatModelKeepAlive(),
+                }),
+              });
+
+              if (!ollamaRes.ok || !ollamaRes.body) {
+                throw new Error(`Ollama error: ${ollamaRes.status}`);
+              }
+
+              const reader = ollamaRes.body.getReader();
+              const decoder = new TextDecoder();
+
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const text = decoder.decode(value, { stream: true });
+                for (const line of text.split('\n').filter(Boolean)) {
+                  try {
+                    const parsed = JSON.parse(line);
+                    const chunk = parsed.message?.content ?? parsed.response;
+                    if (chunk) {
+                      fullResponse += chunk;
+                      send({ id, role: 'assistant', content: fullResponse, status: 'streaming' });
+                      produceTokenChunk(conversationId, tokenSeq++, chunk).catch((err) => {
+                        console.warn(
+                          '[SSE chat] token chunk persist failed:',
+                          (err as Error)?.message ?? err
+                        );
+                      });
+                    }
+                  } catch {
+                    // skip malformed JSON lines
+                  }
+                }
+              }
+              inferenceBackend = 'ollama';
+            }
+
+            generation.end({
+              output: fullResponse.slice(0, 4000),
+              usage: {
+                completionTokens: tokenSeq,
+                totalTokens: tokenSeq,
+              },
+              statusMessage: inferenceBackend,
+            });
           }
-          inferenceBackend = 'ollama';
-        }
+        );
 
         // Log LLM inference to CouchDB (fire-and-forget)
         logInference({
           type: 'llm',
-          model: inferenceBackend === 'ollama' ? (model ?? 'gemma3-legal:latest') : inferenceBackend,
+          model:
+            inferenceBackend === 'ollama' ? (model ?? 'gemma3-legal:latest') : inferenceBackend,
           backend: inferenceBackend,
           latencyMs: Math.round(performance.now() - llmStreamStart),
           tokenCount: tokenSeq,
           cacheHit: false,
+          metadata: {
+            policyDecision,
+            toolResults,
+            codebaseHits: codebaseResult?.chunks.length ?? 0,
+            kagNeighbors: graphContext?.neighbors.length ?? 0,
+            ragHits: contextDocs.length,
+          },
         });
 
         // Trim the token stream to prevent unbounded growth
@@ -1632,8 +1796,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 // Build retry prompt with correction context
                 const retryFlatPrompt = [
                   `<|system|>\n${systemPrompt}`,
-                  ...conversationHistory.map((m: { role: string; content: string }) =>
-                    `<|${m.role}|>\n${m.content}`
+                  ...conversationHistory.map(
+                    (m: { role: string; content: string }) => `<|${m.role}|>\n${m.content}`
                   ),
                   `<|user|>\n${augmentedMessage}`,
                   `<|assistant|>\n${fullResponse}`,
@@ -1647,14 +1811,20 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 // Use same backend cascade for retry: TRT-LLM → Triton → Ollama
                 if (inferenceBackend === 'tensorrt' || inferenceBackend === 'triton') {
                   try {
-                    const retryStream = inferenceBackend === 'tensorrt'
-                      ? streamTrtLLM({ prompt: retryFlatPrompt, temperature: 0.7 })
-                      : streamTritonLLM({ prompt: retryFlatPrompt, temperature: 0.7 });
+                    const retryStream =
+                      inferenceBackend === 'tensorrt'
+                        ? streamTrtLLM({ prompt: retryFlatPrompt, temperature: 0.7 })
+                        : streamTritonLLM({ prompt: retryFlatPrompt, temperature: 0.7 });
                     for await (const chunk of retryStream) {
                       if (chunk.done) break;
                       if (chunk.content) {
                         improvedResponse += chunk.content;
-                        send({ id, role: 'assistant', content: improvedResponse, status: 'streaming' });
+                        send({
+                          id,
+                          role: 'assistant',
+                          content: improvedResponse,
+                          status: 'streaming',
+                        });
                       }
                     }
                     retryStreamed = true;
@@ -1694,7 +1864,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                           const retryChunk = retryParsed.message?.content ?? retryParsed.response;
                           if (retryChunk) {
                             improvedResponse += retryChunk;
-                            send({ id, role: 'assistant', content: improvedResponse, status: 'streaming' });
+                            send({
+                              id,
+                              role: 'assistant',
+                              content: improvedResponse,
+                              status: 'streaming',
+                            });
                           }
                         } catch {
                           /* skip malformed */
@@ -1731,6 +1906,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         const assistantMetadata = JSON.stringify({
           confidence,
           confidenceFactors,
+          policyDecision,
           contextUsed: {
             case: caseContext !== null,
             glossaryMatches: serializeGlossaryMatches(glossaryMatches),
@@ -1761,6 +1937,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
               }
             : {}),
           ...(reformulated ? { correctiveRag: { reformulated: true, newQuery } } : {}),
+          ...(toolResults.length > 0 ? { toolResults } : {}),
         });
 
         try {
@@ -1860,6 +2037,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           citations: extractedCitations,
           glossaryMatches: serializeGlossaryMatches(glossaryMatches),
           conversationTurns: conversationHistory.length,
+          policyDecision,
           ...(aceEvaluation
             ? {
                 aceEval: {
@@ -1870,6 +2048,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
               }
             : {}),
           ...(reformulated ? { correctiveRag: { reformulated: true, newQuery } } : {}),
+          ...(toolResults.length > 0 ? { toolResults } : {}),
         });
       } catch (error) {
         console.error(

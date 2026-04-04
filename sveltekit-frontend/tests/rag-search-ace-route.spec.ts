@@ -85,6 +85,13 @@ vi.mock('$lib/server/embedding/embed.js', () => ({
 }));
 
 vi.mock('$lib/server/observability/langfuse.js', () => ({
+  traceLLM: vi.fn(
+    async (
+      _name: string,
+      _meta: unknown,
+      fn: (handle: { end: ReturnType<typeof vi.fn> }) => Promise<unknown>
+    ) => fn({ end: vi.fn() })
+  ),
   traceEmbedding: vi.fn(async (_query: string, _model: string, operation: () => Promise<unknown>) =>
     operation()
   ),

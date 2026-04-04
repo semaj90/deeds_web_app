@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockAssembleACEContext = vi.fn();
-const mockBuildACEPrompt = vi.fn();
+const mockBuildACEPromptCached = vi.fn();
 const mockOllamaFetch = vi.fn();
 
 vi.mock('$env/dynamic/private', () => ({ env: {} }));
@@ -9,7 +9,7 @@ vi.mock('$env/dynamic/public', () => ({ env: {} }));
 
 vi.mock('$lib/server/ace/context-assembler.js', () => ({
   assembleACEContext: mockAssembleACEContext,
-  buildACEPrompt: mockBuildACEPrompt,
+  buildACEPromptCached: mockBuildACEPromptCached,
 }));
 
 vi.mock('$lib/server/env.server.js', () => ({
@@ -42,7 +42,7 @@ describe('/api/ace/summarize route', () => {
       practiceTemplate: { name: 'Criminal Procedure' },
     });
 
-    mockBuildACEPrompt.mockReturnValue({
+    mockBuildACEPromptCached.mockResolvedValue({
       systemPrompt: 'ACE SYSTEM PROMPT',
       confidenceFactors: {
         caseContext: 0.95,
@@ -92,7 +92,7 @@ describe('/api/ace/summarize route', () => {
       conversationId: `board-${caseId}`,
       maxTokens: 2000,
     });
-    expect(mockBuildACEPrompt).toHaveBeenCalled();
+    expect(mockBuildACEPromptCached).toHaveBeenCalled();
 
     expect(mockOllamaFetch).toHaveBeenCalledWith(
       'http://ollama.test/api/generate',
@@ -139,7 +139,7 @@ describe('/api/ace/summarize route', () => {
     expect(response.status).toBe(401);
     expect(body).toEqual({ error: 'Unauthorized' });
     expect(mockAssembleACEContext).not.toHaveBeenCalled();
-    expect(mockBuildACEPrompt).not.toHaveBeenCalled();
+    expect(mockBuildACEPromptCached).not.toHaveBeenCalled();
     expect(mockOllamaFetch).not.toHaveBeenCalled();
   });
 
@@ -173,7 +173,7 @@ describe('/api/ace/summarize route', () => {
     expect(response.status).toBe(500);
     expect(body).toEqual({ error: 'Summarization failed' });
     expect(mockAssembleACEContext).toHaveBeenCalledTimes(1);
-    expect(mockBuildACEPrompt).toHaveBeenCalledTimes(1);
+    expect(mockBuildACEPromptCached).toHaveBeenCalledTimes(1);
     expect(mockOllamaFetch).toHaveBeenCalledTimes(1);
   });
 
@@ -201,7 +201,7 @@ describe('/api/ace/summarize route', () => {
     expect(response.status).toBe(400);
     expect(body).toEqual({ error: 'Must provide either content or evidenceId' });
     expect(mockAssembleACEContext).not.toHaveBeenCalled();
-    expect(mockBuildACEPrompt).not.toHaveBeenCalled();
+    expect(mockBuildACEPromptCached).not.toHaveBeenCalled();
     expect(mockOllamaFetch).not.toHaveBeenCalled();
   });
 });

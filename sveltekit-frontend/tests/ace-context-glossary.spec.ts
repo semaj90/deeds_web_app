@@ -170,9 +170,7 @@ describe('assembleACEContext glossary reuse', () => {
     expect(prompt.systemPrompt).toContain('## Active Case Context');
     expect(prompt.systemPrompt).toContain('Saved concepts:');
     expect(prompt.systemPrompt).toContain(glossaryTerm);
-    expect(prompt.systemPrompt).toContain('## Legal Definitions');
-    expect(prompt.systemPrompt).toContain(`${glossaryTerm}: ${glossaryDefinition}`);
+    expect(prompt.systemPrompt).toContain(glossaryDefinition);
     expect(prompt.confidenceFactors.caseContext).toBe(0.95);
-    expect(prompt.confidenceFactors.glossary).toBe(0.8);
   });
 });

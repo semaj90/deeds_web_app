@@ -16,29 +16,33 @@ import { ENV } from '$lib/server/env.server.js';
 
 // Lazy singleton — only created when LANGFUSE_ENABLED=true
 let _langfuse: any = null;
+let _langfuseCtorPromise: Promise<any> | null = null;
 
-function getLangfuse() {
-	if (_langfuse) return _langfuse;
-	if (!ENV.LANGFUSE_ENABLED || !ENV.LANGFUSE_PUBLIC_KEY || !ENV.LANGFUSE_SECRET_KEY) {
-		return null;
-	}
+async function getLangfuse() {
+  if (_langfuse) return _langfuse;
+  if (!ENV.LANGFUSE_ENABLED || !ENV.LANGFUSE_PUBLIC_KEY || !ENV.LANGFUSE_SECRET_KEY) {
+    return null;
+  }
 
-	try {
-		// Dynamic import avoids loading the SDK when disabled
-		const { Langfuse } = require('langfuse');
-		_langfuse = new Langfuse({
-			publicKey: ENV.LANGFUSE_PUBLIC_KEY,
-			secretKey: ENV.LANGFUSE_SECRET_KEY,
-			baseUrl: ENV.LANGFUSE_HOST,
-			flushAt: 15,
-			flushInterval: 5000,
-		});
-		console.log(`[Langfuse] Connected to ${ENV.LANGFUSE_HOST}`);
-		return _langfuse;
-	} catch (err) {
-		console.warn('[Langfuse] SDK init failed (non-fatal):', (err as Error).message);
-		return null;
-	}
+  try {
+    if (!_langfuseCtorPromise) {
+      _langfuseCtorPromise = import('langfuse').then((mod) => mod.Langfuse);
+    }
+
+    const Langfuse = await _langfuseCtorPromise;
+    _langfuse = new Langfuse({
+      publicKey: ENV.LANGFUSE_PUBLIC_KEY,
+      secretKey: ENV.LANGFUSE_SECRET_KEY,
+      baseUrl: ENV.LANGFUSE_HOST,
+      flushAt: 15,
+      flushInterval: 5000,
+    });
+    console.log(`[Langfuse] Connected to ${ENV.LANGFUSE_HOST}`);
+    return _langfuse;
+  } catch (err) {
+    console.warn('[Langfuse] SDK init failed (non-fatal):', (err as Error).message);
+    return null;
+  }
 }
 
 export interface TraceGenerationHandle {
@@ -59,17 +63,17 @@ export async function traceLLM<T>(
 	metadata: Record<string, unknown>,
 	callback: (gen: TraceGenerationHandle) => Promise<T>
 ): Promise<T> {
-	const langfuse = getLangfuse();
+	const langfuse = await getLangfuse();
 	if (!langfuse) {
 		// No-op handle when disabled
 		return callback({ end: () => {} });
 	}
 
 	const trace = langfuse.trace({
-		name,
-		metadata,
-		tags: ['ollama', metadata.model as string ?? 'gemma3-legal'],
-	});
+    name,
+    metadata,
+    tags: [(metadata.backend as string) ?? 'llm', (metadata.model as string) ?? 'gemma3-legal'],
+  });
 
 	const generation = trace.generation({
 		name: `${name}-generation`,
@@ -109,7 +113,7 @@ export async function traceEmbedding<T>(
 	model: string,
 	callback: () => Promise<T>
 ): Promise<T> {
-	const langfuse = getLangfuse();
+	const langfuse = await getLangfuse();
 	if (!langfuse) return callback();
 
 	const trace = langfuse.trace({
@@ -139,7 +143,7 @@ export async function traceRAG<T>(
 	metadata: Record<string, unknown>,
 	callback: (trace: { span: (name: string) => { end: (output?: string) => void } }) => Promise<T>
 ): Promise<T> {
-	const langfuse = getLangfuse();
+	const langfuse = await getLangfuse();
 	if (!langfuse) {
 		// No-op trace
 		return callback({
@@ -174,7 +178,7 @@ export async function traceVectorSearch<T>(
 	metadata: Record<string, unknown>,
 	callback: () => Promise<T>
 ): Promise<T> {
-	const langfuse = getLangfuse();
+	const langfuse = await getLangfuse();
 	if (!langfuse) return callback();
 
 	const trace = langfuse.trace({
@@ -209,7 +213,7 @@ export async function traceDB<T>(
 	metadata: Record<string, unknown>,
 	callback: () => Promise<T>
 ): Promise<T> {
-	const langfuse = getLangfuse();
+	const langfuse = await getLangfuse();
 	if (!langfuse) return callback();
 
 	const trace = langfuse.trace({
@@ -245,7 +249,7 @@ export async function traceQueue<T>(
 	metadata: Record<string, unknown>,
 	callback: () => Promise<T>
 ): Promise<T> {
-	const langfuse = getLangfuse();
+	const langfuse = await getLangfuse();
 	if (!langfuse) return callback();
 
 	const trace = langfuse.trace({
@@ -278,7 +282,7 @@ export async function traceWorker<T>(
 	metadata: Record<string, unknown>,
 	callback: () => Promise<T>
 ): Promise<T> {
-	const langfuse = getLangfuse();
+	const langfuse = await getLangfuse();
 	if (!langfuse) return callback();
 
 	const trace = langfuse.trace({
@@ -311,7 +315,7 @@ export async function traceCouchDB<T>(
 	dbName: string,
 	callback: () => Promise<T>
 ): Promise<T> {
-	const langfuse = getLangfuse();
+	const langfuse = await getLangfuse();
 	if (!langfuse) return callback();
 
 	const trace = langfuse.trace({
@@ -341,7 +345,7 @@ export async function traceCache<T>(
 	metadata: Record<string, unknown>,
 	callback: () => Promise<T>
 ): Promise<T> {
-	const langfuse = getLangfuse();
+	const langfuse = await getLangfuse();
 	if (!langfuse) return callback();
 
 	const trace = langfuse.trace({
@@ -373,7 +377,7 @@ export async function traceGraph<T>(
 	metadata: Record<string, unknown>,
 	callback: () => Promise<T>
 ): Promise<T> {
-	const langfuse = getLangfuse();
+	const langfuse = await getLangfuse();
 	if (!langfuse) return callback();
 
 	const trace = langfuse.trace({
@@ -393,6 +397,39 @@ export async function traceGraph<T>(
 		const ms = Date.now() - start;
 		const count = Array.isArray(result) ? result.length : (result as any)?.length ?? 1;
 		span.end({ output: `${count} results (${ms}ms)` });
+		return result;
+	} catch (err) {
+		span.end({ statusMessage: (err as Error).message, level: 'ERROR' });
+		throw err;
+	}
+}
+
+/**
+ * Trace a deterministic ACE policy evaluation.
+ */
+export async function tracePolicy<T>(
+	operation: string,
+	metadata: Record<string, unknown>,
+	callback: () => Promise<T>
+): Promise<T> {
+	const langfuse = await getLangfuse();
+	if (!langfuse) return callback();
+
+	const trace = langfuse.trace({
+		name: `policy:${operation}`,
+		metadata: { operation, ...metadata },
+		tags: ['ace-policy', operation],
+	});
+
+	const span = trace.span({
+		name: `policy-${operation}`,
+		input: JSON.stringify(metadata).slice(0, 300),
+	});
+	const start = Date.now();
+
+	try {
+		const result = await callback();
+		span.end({ output: `policy ok (${Date.now() - start}ms)` });
 		return result;
 	} catch (err) {
 		span.end({ statusMessage: (err as Error).message, level: 'ERROR' });

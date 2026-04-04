@@ -30,7 +30,14 @@ import {
   type GraphNeighbor,
 } from '$lib/server/retrieval/graph-context.js';
 import { authorityChainExpansion, type EmbedFn } from '$lib/server/retrieval/authority-chain.js';
-import { traceGraph, traceCache, traceVectorSearch } from '$lib/server/observability/langfuse.js';
+import {
+  traceGraph,
+  traceCache,
+  tracePolicy,
+  traceVectorSearch,
+} from '$lib/server/observability/langfuse.js';
+import { logInference } from '$lib/server/observability/inference-log.js';
+import { determineACEPolicy } from './policy.js';
 
 /**
  * Assemble a complete ACE context from all data sources.
@@ -48,92 +55,206 @@ export async function assembleACEContext(opts: {
   enableCodebaseContext?: boolean;
   sectionTypes?: string[];
 }): Promise<ACEContext> {
-  return traceGraph('ace-assembly', { query: opts.query.slice(0, 100), caseId: opts.caseId, userId: opts.userId }, async () => {
-  const { query, userId, caseId, conversationId } = opts;
+  return traceGraph(
+    'ace-assembly',
+    { query: opts.query.slice(0, 100), caseId: opts.caseId, userId: opts.userId },
+    async () => {
+      const policyStartedAt = Date.now();
+      const { query, userId, caseId, conversationId } = opts;
 
-  // Extract entities immediately (regex, no async)
-  const legalTags = extractLegalTags(query);
-  const entities = {
-    statutes: legalTags.statutes,
-    cases: legalTags.cases,
-    persons: [] as string[],
-    organizations: [] as string[],
-    dates: [] as string[],
-  };
+      // Extract entities immediately (regex, no async)
+      const legalTags = extractLegalTags(query);
+      const entities = {
+        statutes: legalTags.statutes,
+        cases: legalTags.cases,
+        persons: [] as string[],
+        organizations: [] as string[],
+        dates: [] as string[],
+      };
 
-  // Run all data fetches in parallel (includes optional web search)
-  // Tiered retrieval: KB (corpus) + Case (evidence) run as one call, split internally
-  const [
-    userProfile,
-    caseContext,
-    glossaryMatches,
-    ragResult,
-    kagNeighbors,
-    chatHistory,
-    webResults,
-    wikiResults,
-    userAnalyticsContext,
-    codebaseContext,
-  ] = await Promise.all([
-    userId ? fetchUserProfile(userId) : Promise.resolve(null),
-    caseId ? fetchCaseContext(caseId) : Promise.resolve(null),
-    fetchGlossaryMatches(query),
-    fetchRAGChunks(query, opts.sectionTypes, caseId),
-    caseId ? fetchKAGNeighbors(caseId) : Promise.resolve([]),
-    conversationId ? fetchChatHistory(conversationId) : Promise.resolve([]),
-    opts.enableWebSearch ? webSearch(query, 3).catch(() => null) : Promise.resolve(null),
-    (opts.enableWikipedia ?? true)
-      ? searchWikipedia(query, 3).catch(() => null)
-      : Promise.resolve(null),
-    userId ? fetchUserAnalyticsContext(userId, query, caseId).catch(() => null) : Promise.resolve(null),
-    opts.enableCodebaseContext ? fetchCodebaseContext(query).catch(() => null) : Promise.resolve(null),
-  ]);
+      // Run all data fetches in parallel (includes optional web search)
+      // Tiered retrieval: KB (corpus) + Case (evidence) run as one call, split internally
+      const [
+        userProfile,
+        caseContext,
+        glossaryMatches,
+        ragResult,
+        kagNeighbors,
+        chatHistory,
+        webResults,
+        wikiResults,
+        userAnalyticsContext,
+        codebaseContext,
+      ] = await Promise.all([
+        userId ? fetchUserProfile(userId) : Promise.resolve(null),
+        caseId ? fetchCaseContext(caseId) : Promise.resolve(null),
+        fetchGlossaryMatches(query),
+        fetchRAGChunks(query, opts.sectionTypes, caseId),
+        caseId ? fetchKAGNeighbors(caseId) : Promise.resolve([]),
+        conversationId ? fetchChatHistory(conversationId) : Promise.resolve([]),
+        opts.enableWebSearch ? webSearch(query, 3).catch(() => null) : Promise.resolve(null),
+        (opts.enableWikipedia ?? true)
+          ? searchWikipedia(query, 3).catch(() => null)
+          : Promise.resolve(null),
+        userId
+          ? fetchUserAnalyticsContext(userId, query, caseId).catch(() => null)
+          : Promise.resolve(null),
+        opts.enableCodebaseContext
+          ? fetchCodebaseContext(query).catch(() => null)
+          : Promise.resolve(null),
+      ]);
 
-  const { ragChunks, kbChunks, caseChunks } = ragResult;
+      const { ragChunks, kbChunks, caseChunks } = ragResult;
 
-  // Fetch evidence metadata and connections separately (avoids hoisting issues)
-  const [evidenceMetadata, evidenceConnections] = await Promise.all([
-    caseId ? fetchEvidenceMetadataForCase(caseId) : Promise.resolve(null),
-    caseId ? fetchEvidenceConnections(caseId) : Promise.resolve(null),
-  ]);
+      // Fetch evidence metadata and connections separately (avoids hoisting issues)
+      const [evidenceMetadata, evidenceConnections] = await Promise.all([
+        caseId ? fetchEvidenceMetadataForCase(caseId) : Promise.resolve(null),
+        caseId ? fetchEvidenceConnections(caseId) : Promise.resolve(null),
+      ]);
 
-  // Determine practice area from case or user profile
-  const practiceArea = extractPracticeArea(caseContext, userProfile);
-  const practiceTemplate = selectPracticeTemplate(practiceArea);
+      // Determine practice area from case or user profile
+      const practiceArea = extractPracticeArea(caseContext, userProfile);
+      const practiceTemplate = selectPracticeTemplate(practiceArea);
 
-  // Generate query tags from entities + practice area
-  const queryTags: string[] = [
-    ...legalTags.statutes.slice(0, 3),
-    ...legalTags.cases.slice(0, 3),
-    ...(practiceArea ? [practiceArea] : []),
+      // Generate query tags from entities + practice area
+      const queryTags: string[] = [
+        ...legalTags.statutes.slice(0, 3),
+        ...legalTags.cases.slice(0, 3),
+        ...(practiceArea ? [practiceArea] : []),
+      ];
+
+      const baseContext: ACEContext = {
+        userProfile,
+        caseContext,
+        glossaryMatches,
+        ragChunks,
+        kbChunks,
+        caseChunks,
+        kagNeighbors,
+        chatHistory,
+        entities,
+        practiceTemplate,
+        queryTags,
+        webSearchContext:
+          [
+            webResults ? formatWebResultsAsContext(webResults) : '',
+            wikiResults ? formatWikipediaAsContext(wikiResults) : '',
+          ]
+            .filter(Boolean)
+            .join('\n') || null,
+        persona: opts.persona ?? 'neutral',
+        evidenceMetadata,
+        evidenceConnections,
+        userAnalyticsContext,
+        codebaseContext,
+        policyDecision: null,
+      };
+
+      const policyDecision = await tracePolicy(
+        'ace-context',
+        { query: query.slice(0, 120), caseId, userId },
+        async () => determineACEPolicy(query, baseContext)
+      );
+
+      logInference({
+        type: 'policy',
+        backend: 'ace-policy',
+        latencyMs: Date.now() - policyStartedAt,
+        cacheHit: false,
+        metadata: {
+          action: policyDecision.action,
+          confidence: policyDecision.confidence,
+          retrievalConfidence: policyDecision.retrievalConfidence,
+          budgetTier: policyDecision.budget.tier,
+          allowWebSearch: policyDecision.allowWebSearch,
+          missingParameters: policyDecision.missingParameters,
+          reasons: policyDecision.reasons,
+        },
+      });
+
+      return {
+        ...baseContext,
+        policyDecision,
+      };
+    }
+  ); // end traceGraph ace-assembly
+}
+
+/**
+ * Compute a stable fingerprint of the ACE context for cache keying.
+ * Changes when any meaningful input changes (new chunks, neighbors, history, etc.).
+ */
+function computeContextFingerprint(context: ACEContext, query: string): string {
+  const parts = [
+    query.slice(0, 80),
+    context.caseContext?.slice(0, 40) ?? '',
+    String(context.ragChunks.length),
+    context.ragChunks[0]?.score.toFixed(3) ?? '0',
+    String(context.kbChunks?.length ?? 0),
+    String(context.caseChunks?.length ?? 0),
+    String(context.kagNeighbors.length),
+    String(context.chatHistory.length),
+    context.chatHistory.at(-1)?.content.slice(0, 30) ?? '',
+    String(context.evidenceMetadata?.length ?? 0),
+    String(context.evidenceConnections?.length ?? 0),
+    String(context.glossaryMatches?.length ?? 0),
+    context.persona ?? 'neutral',
   ];
+  // Fast non-crypto hash (FNV-1a 32-bit)
+  let h = 0x811c9dc5;
+  const s = parts.join('|');
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(36);
+}
 
-  return {
-    userProfile,
-    caseContext,
-    glossaryMatches,
-    ragChunks,
-    kbChunks,
-    caseChunks,
-    kagNeighbors,
-    chatHistory,
-    entities,
-    practiceTemplate,
-    queryTags,
-    webSearchContext:
-      [
-        webResults ? formatWebResultsAsContext(webResults) : '',
-        wikiResults ? formatWikipediaAsContext(wikiResults) : '',
-      ]
-        .filter(Boolean)
-        .join('\n') || null,
-    persona: opts.persona ?? 'neutral',
-    evidenceMetadata,
-    evidenceConnections,
-    userAnalyticsContext,
-    codebaseContext,
-  };
-  }); // end traceGraph ace-assembly
+/** Try Redis for a cached ACE prompt bundle. */
+async function getCachedACEBundle(key: string): Promise<ACEPrompt | null> {
+  return traceCache('ace-prompt-get', { key }, async () => {
+    try {
+      const { redis } = await import('$lib/server/redis.js');
+      const raw = await redis.get(key);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
+}
+
+/** Store ACE prompt bundle in Redis. */
+async function setCachedACEBundle(
+  key: string,
+  prompt: ACEPrompt,
+  ttlSeconds: number
+): Promise<void> {
+  try {
+    const { redis } = await import('$lib/server/redis.js');
+    await redis.set(key, JSON.stringify(prompt), 'EX', ttlSeconds);
+  } catch {}
+}
+
+/**
+ * Build ACE prompt with Redis caching (Stage 4 — ace_context_bundle).
+ * Returns cached prompt if context fingerprint hasn't changed (2min TTL).
+ * Falls through to sync buildACEPrompt() on cache miss.
+ */
+export async function buildACEPromptCached(context: ACEContext, query: string): Promise<ACEPrompt> {
+  const fingerprint = computeContextFingerprint(context, query);
+  const cacheKey = bundleCacheKey('ace', fingerprint);
+
+  const cached = await getCachedACEBundle(cacheKey);
+  if (cached) {
+    console.log(`[ACE Prompt] bundle cache HIT (key: ${fingerprint})`);
+    return cached;
+  }
+
+  const prompt = buildACEPrompt(context, query);
+
+  // Cache assembled prompt (2 min — invalidated when any input tier changes)
+  setCachedACEBundle(cacheKey, prompt, 120).catch(() => {});
+  return prompt;
 }
 
 /**
@@ -142,6 +263,10 @@ export async function assembleACEContext(opts: {
 export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
   const lines: string[] = [];
   const confidenceFactors: Record<string, number> = {};
+  const policyDecision = context.policyDecision ?? determineACEPolicy(query, context);
+  const budgetProfile = policyDecision.budget;
+  const budget = budgetProfile.allocations;
+  const limits = budgetProfile.limits;
 
   // 1. System instructions
   lines.push('You are YorHA, a legal AI assistant. Provide accurate, well-cited legal analysis.');
@@ -169,7 +294,7 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
   // 4. Case context
   if (context.caseContext) {
     lines.push(
-      `\n## Active Case Context\n${truncate(context.caseContext, TOKEN_BUDGET.caseContext * 4)}`
+      `\n## Active Case Context\n${truncate(context.caseContext, budget.caseContext * 4)}`
     );
     confidenceFactors.caseContext = 0.95;
   }
@@ -177,7 +302,7 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
   // 5. Glossary definitions relevant to the current query
   if (context.glossaryMatches && context.glossaryMatches.length > 0) {
     const glossaryText = context.glossaryMatches
-      .slice(0, 4)
+      .slice(0, limits.glossaryEntries)
       .map((entry) => {
         const meta = [entry.category, entry.jurisdiction, entry.citation]
           .filter(Boolean)
@@ -194,16 +319,22 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
   let sourceIndex = 0;
   if (context.kbChunks?.length) {
     const kbText = context.kbChunks
-      .slice(0, 4)
-      .map((c) => { sourceIndex++; return `[Source ${sourceIndex} (score: ${c.score.toFixed(2)}, corpus)] ${truncate(c.content, 300)}`; })
+      .slice(0, limits.kbChunkCount)
+      .map((c) => {
+        sourceIndex++;
+        return `[Source ${sourceIndex} (score: ${c.score.toFixed(2)}, corpus)] ${truncate(c.content, limits.chunkChars)}`;
+      })
       .join('\n');
     lines.push(`\n## Legal Corpus Context\n${kbText}`);
     confidenceFactors.kbChunks = Math.max(...context.kbChunks.map((c) => c.score));
   }
   if (context.caseChunks?.length) {
     const caseText = context.caseChunks
-      .slice(0, 5)
-      .map((c) => { sourceIndex++; return `[Source ${sourceIndex} (score: ${c.score.toFixed(2)}, evidence)] ${truncate(c.content, 300)}`; })
+      .slice(0, limits.caseChunkCount)
+      .map((c) => {
+        sourceIndex++;
+        return `[Source ${sourceIndex} (score: ${c.score.toFixed(2)}, evidence)] ${truncate(c.content, limits.chunkChars)}`;
+      })
       .join('\n');
     lines.push(`\n## Case Evidence Context\n${caseText}`);
     confidenceFactors.caseChunks = Math.max(...context.caseChunks.map((c) => c.score));
@@ -211,8 +342,11 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
   // Fallback: if tiered chunks not populated, use merged ragChunks
   if (!context.kbChunks?.length && !context.caseChunks?.length && context.ragChunks.length > 0) {
     const chunksText = context.ragChunks
-      .slice(0, 5)
-      .map((c, i) => `[Source ${i + 1} (score: ${c.score.toFixed(2)})] ${truncate(c.content, 300)}`)
+      .slice(0, limits.mergedChunkCount)
+      .map(
+        (c, i) =>
+          `[Source ${i + 1} (score: ${c.score.toFixed(2)})] ${truncate(c.content, limits.chunkChars)}`
+      )
       .join('\n');
     lines.push(`\n## Retrieved Context\n${chunksText}`);
     confidenceFactors.ragChunks = Math.max(...context.ragChunks.map((c) => c.score));
@@ -221,7 +355,7 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
   // 7. KAG graph neighbors
   if (context.kagNeighbors.length > 0) {
     const neighborsText = context.kagNeighbors
-      .slice(0, 5)
+      .slice(0, limits.kagNeighborCount)
       .map((n) => `- ${n.title} (${n.relationship})`)
       .join('\n');
     lines.push(`\n## Related Entities\n${neighborsText}`);
@@ -231,8 +365,8 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
   // 8. Chat history (last N turns)
   if (context.chatHistory.length > 0) {
     const historyText = context.chatHistory
-      .slice(-6) // last 3 exchanges
-      .map((m) => `${m.role}: ${truncate(m.content, 200)}`)
+      .slice(-limits.chatHistoryMessages)
+      .map((m) => `${m.role}: ${truncate(m.content, limits.chatMessageChars)}`)
       .join('\n');
     lines.push(`\n## Conversation History\n${historyText}`);
     confidenceFactors.chatHistory = 0.6;
@@ -252,7 +386,7 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
   // 10. Evidence metadata (types, forensics, entities)
   if (context.evidenceMetadata && context.evidenceMetadata.length > 0) {
     const evidenceLines = context.evidenceMetadata
-      .slice(0, 10)
+      .slice(0, limits.evidenceMetadataCount)
       .map((e) => {
         const type = e.evidenceType?.toUpperCase() || 'UNKNOWN';
         const flags = e.forensicFlags?.length
@@ -274,7 +408,7 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
   // 11. Evidence connections/relationships
   if (context.evidenceConnections && context.evidenceConnections.length > 0) {
     const connLines = context.evidenceConnections
-      .slice(0, 15)
+      .slice(0, limits.evidenceConnectionCount)
       .map((c) => {
         const strengthLabel =
           c.strength >= 0.8 ? 'STRONG' : c.strength >= 0.5 ? 'MODERATE' : 'WEAK';
@@ -304,15 +438,17 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
   // 14. Codebase/AST context (dual-vector code search results)
   if (context.codebaseContext && context.codebaseContext.length > 0) {
     const codeLines = context.codebaseContext
-      .slice(0, 5)
+      .slice(0, limits.codebaseContextCount)
       .map((c) => {
         const loc = c.lineStart ? `:${c.lineStart}${c.lineEnd ? `-${c.lineEnd}` : ''}` : '';
-        return `[${c.filePath}${loc}] (score: ${c.score.toFixed(2)})\n${truncate(c.content, 300)}`;
+        return `[${c.filePath}${loc}] (score: ${c.score.toFixed(2)})\n${truncate(c.content, limits.chunkChars)}`;
       })
       .join('\n\n');
     lines.push(`\n## Codebase Context\n${codeLines}`);
     confidenceFactors.codebaseContext = Math.max(...context.codebaseContext.map((c) => c.score));
   }
+
+  confidenceFactors.policy = policyDecision.confidence;
 
   // 15. Self-prompting instructions
   const selfPrompt =
@@ -327,10 +463,12 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
   return {
     systemPrompt: styledPrompt,
     contextWindow: lines.slice(1).join('\n'), // everything after system instruction
-    maxTokenBudget: TOKEN_BUDGET.total,
+    maxTokenBudget: budget.total,
     confidenceFactors,
     selfPromptInstructions: selfPrompt,
     preferredBackend: 'auto',
+    budgetProfile,
+    policyDecision,
   };
 }
 
@@ -378,7 +516,7 @@ async function fetchCaseContext(caseId: string): Promise<string | null> {
     if (c.jurisdiction) parts.push(`Jurisdiction: ${c.jurisdiction}`);
     if (c.court) parts.push(`Court: ${c.court}`);
     if (c.status) parts.push(`Status: ${c.status}`);
-    if (c.description) parts.push(`Description: ${String(c.description).slice(0, 500)}`);
+    if (c.description) parts.push(`Description: ${String(c.description).slice(0, 1200)}`);
 
     const glossaryRows = await db.execute(
       sql`SELECT citation_text, notes
@@ -510,7 +648,10 @@ export async function fetchGlossaryMatches(query: string): Promise<ACEContext['g
         }
       } catch (err) {
         // Semantic search unavailable — continue to definitions fallback
-        console.warn('[ACE context] glossary vector search failed:', (err as Error)?.message ?? err);
+        console.warn(
+          '[ACE context] glossary vector search failed:',
+          (err as Error)?.message ?? err
+        );
       }
     }
 
@@ -652,12 +793,8 @@ async function fetchKBChunks(
     });
 
     const [docResults, canonResults] = await Promise.all([
-      qdrantMgr.client
-        .search('legal_documents', searchOpts(3, 0.5))
-        .catch(() => []),
-      qdrantMgr.client
-        .search('legal_canon_chunks', searchOpts(2, 0.45))
-        .catch(() => []),
+      qdrantMgr.client.search('legal_documents', searchOpts(6, 0.45)).catch(() => []),
+      qdrantMgr.client.search('legal_canon_chunks', searchOpts(4, 0.4)).catch(() => []),
     ]);
 
     const chunks: RAGChunk[] = [
@@ -671,7 +808,9 @@ async function fetchKBChunks(
         score: r.score,
         source: String(r.payload?.source ?? 'kb:canon'),
       })),
-    ].sort((a, b) => b.score - a.score).slice(0, 4);
+    ]
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 8);
 
     // Cache KB bundle (10 min — corpus is stable)
     setCachedBundle(cacheKey, chunks, 600).catch(() => {});
@@ -711,16 +850,16 @@ async function fetchCaseChunks(
             query: '', // unused when embedding provided
             queryEmbedding: embedding,
             sectionTypes,
-            limit: 5,
-            scoreThreshold: 0.5,
+            limit: 10,
+            scoreThreshold: 0.45,
           })
           .then((r) => r.results)
           .catch(() => [])
       : await qdrantMgr.client
           .search('evidence_items', {
             vector: { name: 'content', vector: embedding },
-            limit: 5,
-            score_threshold: 0.5,
+            limit: 10,
+            score_threshold: 0.45,
             with_payload: true,
             ...(graphFilter ? { filter: graphFilter } : {}),
           })
@@ -733,7 +872,7 @@ async function fetchCaseChunks(
         source: String(r.payload?.source ?? 'case:evidence'),
       }))
       .sort((a: RAGChunk, b: RAGChunk) => b.score - a.score)
-      .slice(0, 5);
+      .slice(0, 10);
 
     // Cache case bundle (2 min — invalidates on new evidence upload)
     setCachedBundle(cacheKey, chunks, 120).catch(() => {});
@@ -775,9 +914,7 @@ async function fetchRAGChunks(
   ]);
 
   // Merge + sort for backward compat (ragChunks = combined)
-  let ragChunks = [...kbChunks, ...caseChunks]
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 7);
+  let ragChunks = [...kbChunks, ...caseChunks].sort((a, b) => b.score - a.score).slice(0, 15);
 
   // Authority chain drill-down: when top results cite statutes/cases,
   // embed those citations and search for their full text (max 2 hops).
@@ -808,9 +945,13 @@ async function fetchRAGChunks(
   if (graphNeighbors.length > 0 && ragChunks.length > 0) {
     const scored = applyGraphAuthorityScoring(
       ragChunks.map((c) => ({ content: c.content, similarity: c.score, documentId: c.source })),
-      graphNeighbors,
+      graphNeighbors
     );
-    ragChunks = scored.map((s) => ({ content: s.content, score: s.similarity, source: s.documentId }));
+    ragChunks = scored.map((s) => ({
+      content: s.content,
+      score: s.similarity,
+      source: s.documentId,
+    }));
   }
 
   return { ragChunks, kbChunks, caseChunks };
@@ -820,36 +961,39 @@ async function fetchKAGNeighbors(
   caseId: string
 ): Promise<Array<{ nodeId: string; title: string; relationship: string; score?: number }>> {
   return traceGraph('ace-kag-neighbors', { caseId }, async () => {
-  // Try Neo4j first, fallback to PostgreSQL
-  try {
-    const { getNeo4jDriver } = await import('$lib/server/neo4j-driver.js');
-    const driver = getNeo4jDriver();
-    const session = driver.session({ database: 'neo4j' });
+    // Try Neo4j first, fallback to PostgreSQL
     try {
-      const result = await session.run(
-        `MATCH (c:Case {id: $caseId})-[r]-(n)
+      const { getNeo4jDriver } = await import('$lib/server/neo4j-driver.js');
+      const driver = getNeo4jDriver();
+      const session = driver.session({ database: 'neo4j' });
+      try {
+        const result = await session.run(
+          `MATCH (c:Case {id: $caseId})-[r]-(n)
 				 RETURN n.id AS nodeId, n.title AS title, type(r) AS relationship
 				 LIMIT 10`,
-        { caseId }
-      );
-      return result.records.map((rec) => ({
-        nodeId: String(rec.get('nodeId') ?? ''),
-        title: String(rec.get('title') ?? ''),
-        relationship: String(rec.get('relationship') ?? ''),
-      }));
-    } finally {
-      await session.close();
-    }
-  } catch (neo4jErr: any) {
-    // Neo4j unavailable (connection refused or bolt error) — falling back to PostgreSQL graph tables.
-    // To enable graph traversal, ensure NEO4J_URI / NEO4J_USER / NEO4J_PASSWORD are set and Neo4j is running.
-    if (neo4jErr?.code !== 'ServiceUnavailable' || process.env.NODE_ENV !== 'production') {
-      console.warn('[KAG] Neo4j unavailable, using PostgreSQL fallback:', neo4jErr?.message ?? neo4jErr);
-    }
-    try {
-      const { db } = await import('$lib/server/db/client');
-      const rows = await db.execute(
-        sql`SELECT
+          { caseId }
+        );
+        return result.records.map((rec) => ({
+          nodeId: String(rec.get('nodeId') ?? ''),
+          title: String(rec.get('title') ?? ''),
+          relationship: String(rec.get('relationship') ?? ''),
+        }));
+      } finally {
+        await session.close();
+      }
+    } catch (neo4jErr: any) {
+      // Neo4j unavailable (connection refused or bolt error) — falling back to PostgreSQL graph tables.
+      // To enable graph traversal, ensure NEO4J_URI / NEO4J_USER / NEO4J_PASSWORD are set and Neo4j is running.
+      if (neo4jErr?.code !== 'ServiceUnavailable' || process.env.NODE_ENV !== 'production') {
+        console.warn(
+          '[KAG] Neo4j unavailable, using PostgreSQL fallback:',
+          neo4jErr?.message ?? neo4jErr
+        );
+      }
+      try {
+        const { db } = await import('$lib/server/db/client');
+        const rows = await db.execute(
+          sql`SELECT
           c.target_node_id AS node_id,
           n.title AS title,
           c.connection_type AS relationship,
@@ -861,18 +1005,21 @@ async function fetchKAGNeighbors(
         )
         ORDER BY c.strength DESC, c.confidence_score DESC
         LIMIT 10`
-      );
-      return (rows as any).rows.map((r: any) => ({
-        nodeId: String(r.node_id ?? ''),
-        title: String(r.title ?? ''),
-        relationship: String(r.relationship ?? ''),
-        score: r.score != null ? Number(r.score) : undefined,
-      }));
-    } catch (err) {
-      console.warn('[ACE context] KAG PostgreSQL fallback failed:', (err as Error)?.message ?? err);
-      return [];
+        );
+        return (rows as any).rows.map((r: any) => ({
+          nodeId: String(r.node_id ?? ''),
+          title: String(r.title ?? ''),
+          relationship: String(r.relationship ?? ''),
+          score: r.score != null ? Number(r.score) : undefined,
+        }));
+      } catch (err) {
+        console.warn(
+          '[ACE context] KAG PostgreSQL fallback failed:',
+          (err as Error)?.message ?? err
+        );
+        return [];
+      }
     }
-  }
   }); // end traceGraph ace-kag-neighbors
 }
 
@@ -885,7 +1032,7 @@ async function fetchChatHistory(
       sql`SELECT role, content FROM chat_messages
 				WHERE chat_id = ${conversationId}
 				ORDER BY created_at DESC
-				LIMIT 10`
+				LIMIT 20`
     );
     return (rows as any).rows.reverse().map((r: any) => ({
       role: r.role as 'user' | 'assistant' | 'system',
@@ -905,7 +1052,7 @@ async function fetchEvidenceMetadataForCase(
     const rows = await db.execute(
       sql`SELECT id, title, evidence_type, file_type, metadata
 				FROM evidence WHERE case_id = ${caseId}
-				ORDER BY created_at DESC LIMIT 10`
+				ORDER BY created_at DESC LIMIT 15`
     );
     return (rows as any).rows.map((r: any) => {
       const meta = (typeof r.metadata === 'string' ? JSON.parse(r.metadata) : r.metadata) || {};
@@ -939,7 +1086,7 @@ async function fetchEvidenceConnections(
 			JOIN evidence et ON et.id = ebc.to_evidence_id
 			WHERE ebc.case_id = ${caseId} AND ebc.is_visible = true
 			ORDER BY ebc.strength DESC
-			LIMIT 20`
+			LIMIT 25`
     );
     return (rows as any).rows.map((r: any) => ({
       fromTitle: String(r.from_title ?? 'Unknown'),
@@ -950,7 +1097,10 @@ async function fetchEvidenceConnections(
       strength: Number(r.strength ?? 1.0),
     }));
   } catch (err) {
-    console.warn('[ACE context] evidence connections fetch failed:', (err as Error)?.message ?? err);
+    console.warn(
+      '[ACE context] evidence connections fetch failed:',
+      (err as Error)?.message ?? err
+    );
     return null;
   }
 }

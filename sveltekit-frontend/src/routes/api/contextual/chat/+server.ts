@@ -1,193 +1,135 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import type { OllamaResponse } from '$lib/server/ollama.js';
+import { getChatModelKeepAlive, ollamaFetch } from '$lib/server/ollama.js';
 import { getRedis } from '$lib/server/redis.js';
 import { z } from 'zod';
+import {
+  CONTEXTUAL_TOOLS,
+  executeContextualTool,
+  type ContextualToolResult,
+} from '$lib/server/ai/contextual-tools.js';
 
-const contextualChatSchema = z.object({
-	message: z.string().min(1).max(10000),
-	sessionId: z.string().max(200).optional(),
-	userId: z.string().max(200).optional(),
-	enableFunctions: z.boolean().optional()
-});
+const SIMPLE_HISTORY_LIMIT = 4;
+const TOOL_HISTORY_LIMIT = 6;
+const SIMPLE_NUM_CTX = 4096;
+const TOOL_NUM_CTX = 6144;
+const SIMPLE_NUM_PREDICT = 128;
+const TOOL_NUM_PREDICT = 320;
+const SIMPLE_TIMEOUT_MS = 60_000;
+const TOOL_TIMEOUT_MS = 75_000;
+const MAX_STORED_HISTORY = 12;
 
-/** Tool definitions for Ollama native function calling */
-const CONTEXTUAL_TOOLS = [
-	{
-		type: 'function' as const,
-		function: {
-			name: 'glossary_search',
-			description: 'Search the legal glossary for term definitions and legal concepts. Use when the user asks "what is [term]?", "define [term]", or needs clarification on legal terminology.',
-			parameters: {
-				type: 'object',
-				required: ['query'],
-				properties: {
-					query: { type: 'string', description: 'Legal term or concept to look up' },
-					limit: { type: 'number', description: 'Max results (default: 5)' }
-				}
-			}
-		}
-	},
-	{
-		type: 'function' as const,
-		function: {
-			name: 'rag_search',
-			description: 'Semantic search through legal documents using vector similarity. Use to find relevant evidence, case documents, or legal precedents.',
-			parameters: {
-				type: 'object',
-				required: ['query'],
-				properties: {
-					query: { type: 'string', description: 'Semantic search query' },
-					limit: { type: 'number', description: 'Max results (default: 5)' }
-				}
-			}
-		}
-	},
-	{
-		type: 'function' as const,
-		function: {
-			name: 'web_search',
-			description: 'Search the web for legal research, case law, or documentation.',
-			parameters: {
-				type: 'object',
-				required: ['query'],
-				properties: {
-					query: { type: 'string', description: 'Search query' },
-					maxResults: { type: 'number', description: 'Max results (default: 5)' }
-				}
-			}
-		}
-	}
-];
+const SIMPLE_SYSTEM_PROMPT =
+  'You are a helpful legal AI assistant. Provide clear, accurate responses about legal topics. Track conversation context to give relevant follow-up responses. Unless the user asks for depth, answer in a single concise paragraph of no more than 5 sentences.';
 
-interface ContextualToolResult {
-  ok: boolean;
-  tool: string;
-  result: string;
-  durationMs: number;
+const TOOL_SYSTEM_PROMPT = `You are a contextual legal AI assistant with agentic tool-calling capabilities.
+
+Tool priority order (MUST follow):
+1. **glossary_search** - ALWAYS try this first for legal term definitions, meanings, or concepts
+2. **rag_search** - Use for relevant documents, evidence, or precedents; also fall back here if glossary returns no results
+3. **web_search** - Use only for up-to-date external information that glossary and RAG cannot provide
+
+Track conversation context and provide structured, well-cited responses. Prefer concise answers unless the user explicitly asks for detail.`;
+
+type OllamaCallStage = 'simple' | 'tool-round' | 'tool-final';
+
+interface OllamaCallDiagnostic {
+  stage: OllamaCallStage;
+  totalDurationMs: number | null;
+  loadDurationMs: number | null;
+  promptEvalDurationMs: number | null;
+  evalDurationMs: number | null;
+  promptEvalCount: number | null;
+  evalCount: number | null;
 }
 
-const CONTEXTUAL_TOOL_TIMEOUT_MS: Record<string, number> = {
-  glossary_search: 3_000,
-  rag_search: 6_000,
-  web_search: 8_000,
-};
+function toDurationMs(value?: number): number | null {
+  return typeof value === 'number' ? Math.round(value / 1e6) : null;
+}
 
-/** Execute a contextual tool call and return a normalised result */
-async function executeContextualTool(
-  name: string,
-  args: Record<string, unknown>
-): Promise<ContextualToolResult> {
-  const start = Date.now();
-  const timeout = CONTEXTUAL_TOOL_TIMEOUT_MS[name] ?? 5_000;
-  try {
-    switch (name) {
-      case 'glossary_search': {
-        const { fetchGlossaryMatches } = await import('$lib/server/ace/context-assembler.js');
-        const matches = (await Promise.race([
-          fetchGlossaryMatches(String(args.query || '')),
-          new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error('timeout')), timeout)
-          ),
-        ])) as Awaited<ReturnType<typeof fetchGlossaryMatches>>;
-        if (!matches || matches.length === 0)
-          return {
-            ok: true,
-            tool: name,
-            result: 'No glossary matches found.',
-            durationMs: Date.now() - start,
-          };
-        const result = matches
-          .slice(0, Number(args.limit ?? 5))
-          .map(
-            (m: Record<string, any>) =>
-              `**${m.term}**: ${m.definition.slice(0, 300)}${m.category ? ` (${m.category})` : ''}`
-          )
-          .join('\n\n');
-        return { ok: true, tool: name, result, durationMs: Date.now() - start };
-      }
-      case 'rag_search': {
-        const { generateEmbeddings } = await import('$lib/server/grpc/embedding-client.js');
-        const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
-        const queryText = String(args.query || '');
-        const embResult = (await Promise.race([
-          generateEmbeddings([queryText]),
-          new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error('timeout')), timeout)
-          ),
-        ])) as Awaited<ReturnType<typeof generateEmbeddings>>;
-        if (!embResult.vectors[0]?.length)
-          return {
-            ok: false,
-            tool: name,
-            result: 'Failed to generate embedding.',
-            durationMs: Date.now() - start,
-          };
-        const searchResult = await qdrant.hybridSearch({
-          query: queryText,
-          queryEmbedding: embResult.vectors[0],
-          collection: 'documents' as string,
-          // Contextual chat uses smaller top-k and trimmed snippets to stay within context budget
-          limit: Number(args.limit ?? 3),
-          scoreThreshold: 0.5,
-        });
-        const result =
-          searchResult.results
-            .map(
-              (r: Record<string, any>, i: number) =>
-                `${i + 1}. [${(r.score * 100).toFixed(0)}%] ${r.payload?.title || 'Untitled'}\n   ${(r.payload?.content || '').slice(0, 150)}`
-            )
-            .join('\n\n') || 'No relevant documents found.';
-        return { ok: true, tool: name, result, durationMs: Date.now() - start };
-      }
-      case 'web_search': {
-        const { webSearch, formatWebSearchResults } = await import(
-          '$lib/server/agent/tools/web-search-searxng.js'
-        );
-        const searchResult = await Promise.race([
-          webSearch({
-            query: String(args.query || ''),
-            maxResults: Number(args.maxResults ?? 5),
-            searchType: 'general',
-          }),
-          new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error('timeout')), timeout)
-          ),
-        ]);
-        return {
-          ok: true,
-          tool: name,
-          result: formatWebSearchResults(searchResult as Awaited<ReturnType<typeof webSearch>>),
-          durationMs: Date.now() - start,
-        };
-      }
-      default:
-        return {
-          ok: false,
-          tool: name,
-          result: `Unknown tool: ${name}`,
-          durationMs: Date.now() - start,
-        };
-    }
-  } catch (err) {
+function collectOllamaDiagnostic(
+  stage: OllamaCallStage,
+  data: Partial<OllamaResponse> | null | undefined
+): OllamaCallDiagnostic {
+  return {
+    stage,
+    totalDurationMs: toDurationMs(data?.total_duration),
+    loadDurationMs: toDurationMs(data?.load_duration),
+    promptEvalDurationMs: toDurationMs(data?.prompt_eval_duration),
+    evalDurationMs: toDurationMs(data?.eval_duration),
+    promptEvalCount: typeof data?.prompt_eval_count === 'number' ? data.prompt_eval_count : null,
+    evalCount: typeof data?.eval_count === 'number' ? data.eval_count : null,
+  };
+}
+
+function summarizeOllamaDiagnostics(calls: OllamaCallDiagnostic[]) {
+  const totalDurationMs = calls.reduce((sum, call) => sum + (call.totalDurationMs ?? 0), 0);
+  const loadDurationMs = calls.reduce((sum, call) => sum + (call.loadDurationMs ?? 0), 0);
+  const promptEvalDurationMs = calls.reduce(
+    (sum, call) => sum + (call.promptEvalDurationMs ?? 0),
+    0
+  );
+  const evalDurationMs = calls.reduce((sum, call) => sum + (call.evalDurationMs ?? 0), 0);
+  const promptEvalCount = calls.reduce((sum, call) => sum + (call.promptEvalCount ?? 0), 0);
+  const evalCount = calls.reduce((sum, call) => sum + (call.evalCount ?? 0), 0);
+
+  return {
+    callCount: calls.length,
+    totalDurationMs,
+    loadDurationMs,
+    promptEvalDurationMs,
+    evalDurationMs,
+    promptEvalCount,
+    evalCount,
+    approxNonOllamaMs: Math.max(
+      0,
+      totalDurationMs - loadDurationMs - promptEvalDurationMs - evalDurationMs
+    ),
+    calls,
+  };
+}
+
+const contextualChatSchema = z.object({
+  message: z.string().min(1).max(10000),
+  sessionId: z.string().max(200).optional(),
+  userId: z.string().max(200).optional(),
+  caseId: z.string().max(200).optional(),
+  enableFunctions: z.boolean().optional(),
+});
+
+/**
+ * Parse request body from either JSON or FormData.
+ * The ContextualEvidenceChatModal sends FormData while direct API callers send JSON.
+ */
+async function parseRequest(request: Request): Promise<z.infer<typeof contextualChatSchema>> {
+  const contentType = request.headers.get('content-type') ?? '';
+
+  if (contentType.includes('multipart/form-data')) {
+    const formData = await request.formData();
     return {
-      ok: false,
-      tool: name,
-      result: `[${name} failed]`,
-      durationMs: Date.now() - start,
+      message: String(formData.get('message') ?? ''),
+      sessionId: formData.get('sessionId') ? String(formData.get('sessionId')) : undefined,
+      userId: formData.get('userId') ? String(formData.get('userId')) : undefined,
+      caseId: formData.get('caseId') ? String(formData.get('caseId')) : undefined,
+      enableFunctions: formData.get('enableFunctions') === 'true' ? true : undefined,
     };
   }
+
+  return await request.json();
 }
 
 /**
  * POST /api/contextual/chat
- * Contextual chat with HMM state tracking + optional agentic tool calling
+ * Contextual chat with HMM state tracking + optional agentic tool calling.
+ * Accepts both JSON and FormData (for file upload modal compatibility).
  */
 export const POST: RequestHandler = async ({ request, locals }) => {
-  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
-    const raw = await request.json();
+    const requestStartedAt = performance.now();
+    const raw = await parseRequest(request);
     const parsed = contextualChatSchema.safeParse(raw);
     if (!parsed.success) {
       return json(
@@ -200,6 +142,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       message,
       sessionId = `session-${Date.now()}`,
       userId = 'anonymous',
+      caseId,
       enableFunctions = false,
     } = parsed.data;
 
@@ -215,30 +158,46 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       // Redis unavailable — proceed without history
     }
 
-    // Build system prompt
-    const systemPrompt = enableFunctions
-      ? `You are a contextual legal AI assistant with agentic tool-calling capabilities.
+    // Load case context if caseId provided
+    let caseContext: string | null = null;
+    if (caseId) {
+      try {
+        const { db } = await import('$lib/server/db/client');
+        const { cases } = await import('$lib/server/db/schema');
+        const { eq } = await import('drizzle-orm');
+        const caseRows = await db.select().from(cases).where(eq(cases.id, caseId)).limit(1);
+        if (caseRows[0]) {
+          const c = caseRows[0];
+          caseContext = `Active Case: "${c.title}" (${c.caseNumber || 'No case number'})`;
+          if (c.jurisdiction) caseContext += ` | Jurisdiction: ${c.jurisdiction}`;
+          if (c.status) caseContext += ` | Status: ${c.status}`;
+        }
+      } catch {
+        // Case context unavailable — non-fatal
+      }
+    }
 
-Tool priority order (MUST follow):
-1. **glossary_search** — ALWAYS try this first for legal term definitions, meanings, or concepts
-2. **rag_search** — Use for relevant documents, evidence, or precedents; also fall back here if glossary returns no results
-3. **web_search** — Use only for up-to-date external information that glossary and RAG cannot provide
+    const systemMessages: Array<{ role: 'system'; content: string }> = [
+      { role: 'system', content: enableFunctions ? TOOL_SYSTEM_PROMPT : SIMPLE_SYSTEM_PROMPT },
+    ];
 
-Track conversation context and provide structured, well-cited responses.`
-      : `You are a helpful legal AI assistant. Provide clear, accurate responses about legal topics. Track conversation context to give relevant follow-up responses.`;
+    if (caseContext) {
+      systemMessages.push({ role: 'system', content: `## Case Context\n${caseContext}` });
+    }
 
     const messages: Array<{ role: string; content: string }> = [
-      { role: 'system', content: systemPrompt },
-      ...conversationHistory.slice(-10),
+      ...systemMessages,
+      ...conversationHistory.slice(-(enableFunctions ? TOOL_HISTORY_LIMIT : SIMPLE_HISTORY_LIMIT)),
       { role: 'user', content: message },
     ];
 
     let responseText = '';
     const toolResultsCtx: Array<ContextualToolResult> = [];
+    const ollamaCallDiagnostics: OllamaCallDiagnostic[] = [];
 
     if (enableFunctions) {
       // Agentic mode: Ollama native tool calling with iterative loop
-      const MAX_TOOL_ROUNDS = 2;
+      const MAX_TOOL_ROUNDS = 1;
       const MAX_TOTAL_TOOL_CALLS = 3;
       let toolRounds = 0;
       let totalToolCalls = 0;
@@ -251,16 +210,18 @@ Track conversation context and provide structured, well-cited responses.`
             model: 'gemma3-legal:latest',
             messages,
             stream: false,
+            keep_alive: getChatModelKeepAlive(),
             tools: CONTEXTUAL_TOOLS,
             options: {
               temperature: 0.1,
               top_k: 20,
               top_p: 0.8,
-              num_ctx: 8192,
+              num_ctx: TOOL_NUM_CTX,
+              num_predict: TOOL_NUM_PREDICT,
               repeat_penalty: 1.05,
             },
           }),
-          signal: AbortSignal.timeout(30_000),
+          signal: AbortSignal.timeout(TOOL_TIMEOUT_MS),
         });
 
         if (!res.ok) {
@@ -271,6 +232,7 @@ Track conversation context and provide structured, well-cited responses.`
         }
 
         const data = await res.json();
+        ollamaCallDiagnostics.push(collectOllamaDiagnostic('tool-round', data));
         const toolCalls = data.message?.tool_calls;
 
         if (!toolCalls || toolCalls.length === 0) {
@@ -288,7 +250,10 @@ Track conversation context and provide structured, well-cited responses.`
           const toolArgs = tc.function?.arguments || {};
           if (!toolName) continue;
 
-          const tr = await executeContextualTool(toolName, toolArgs);
+          const tr = await executeContextualTool(toolName, toolArgs, {
+            message,
+            caseId,
+          });
           toolResultsCtx.push(tr);
           totalToolCalls++;
           // Append even on failure so model can synthesise gracefully
@@ -307,17 +272,22 @@ Track conversation context and provide structured, well-cited responses.`
             model: 'gemma3-legal:latest',
             messages,
             stream: false,
+            keep_alive: getChatModelKeepAlive(),
             options: {
               temperature: 0.1,
               top_k: 20,
               top_p: 0.8,
-              num_ctx: 8192,
+              num_ctx: TOOL_NUM_CTX,
+              num_predict: TOOL_NUM_PREDICT,
               repeat_penalty: 1.05,
             },
           }),
-          signal: AbortSignal.timeout(30_000),
+          signal: AbortSignal.timeout(TOOL_TIMEOUT_MS),
         });
         const finalData = finalRes.ok ? await finalRes.json() : null;
+        if (finalData) {
+          ollamaCallDiagnostics.push(collectOllamaDiagnostic('tool-final', finalData));
+        }
         responseText =
           finalData?.message?.content ||
           'Tool calls completed but could not generate a final response.';
@@ -331,9 +301,17 @@ Track conversation context and provide structured, well-cited responses.`
           model: 'gemma3-legal:latest',
           messages,
           stream: false,
-          options: { temperature: 0.1, top_k: 20, top_p: 0.8, num_ctx: 8192, repeat_penalty: 1.05 },
+          keep_alive: getChatModelKeepAlive(),
+          options: {
+            temperature: 0.1,
+            top_k: 20,
+            top_p: 0.8,
+            num_ctx: SIMPLE_NUM_CTX,
+            num_predict: SIMPLE_NUM_PREDICT,
+            repeat_penalty: 1.05,
+          },
         }),
-        signal: AbortSignal.timeout(30_000),
+        signal: AbortSignal.timeout(SIMPLE_TIMEOUT_MS),
       });
 
       if (!res.ok) {
@@ -344,8 +322,12 @@ Track conversation context and provide structured, well-cited responses.`
       }
 
       const data = await res.json();
+      ollamaCallDiagnostics.push(collectOllamaDiagnostic('simple', data));
       responseText = data.message?.content || '';
     }
+
+    const ollamaDiagnostics = summarizeOllamaDiagnostics(ollamaCallDiagnostics);
+    const routeDurationMs = Math.round(performance.now() - requestStartedAt);
 
     // Update conversation history + HMM state in Redis
     try {
@@ -356,7 +338,7 @@ Track conversation context and provide structured, well-cited responses.`
       );
       await redis.set(
         `contextual:history:${sessionId}`,
-        JSON.stringify(conversationHistory.slice(-20)),
+        JSON.stringify(conversationHistory.slice(-MAX_STORED_HISTORY)),
         'EX',
         3600
       );
@@ -385,6 +367,7 @@ Track conversation context and provide structured, well-cited responses.`
         response: responseText,
         model: 'gemma3-legal:latest',
         sessionId,
+        ...(caseId ? { caseId } : {}),
         ...(toolResultsCtx.length > 0 && {
           toolResults: toolResultsCtx,
           _trace: {
@@ -392,6 +375,10 @@ Track conversation context and provide structured, well-cited responses.`
             toolLatencyMs: toolResultsCtx.reduce((s, r) => s + r.durationMs, 0),
           },
         }),
+        _diagnostics: {
+          routeDurationMs,
+          ollama: ollamaDiagnostics,
+        },
       },
     });
   } catch (err) {

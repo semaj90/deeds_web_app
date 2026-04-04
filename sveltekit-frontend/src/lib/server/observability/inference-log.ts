@@ -22,17 +22,26 @@ const FLUSH_INTERVAL_MS = 5_000;
 const FLUSH_THRESHOLD = 50;
 
 export interface InferenceLogEntry {
-	type: 'llm' | 'embedding' | 'vector_search' | 'graph_query' | 'dag_ordering';
-	model?: string;
-	backend?: 'ollama' | 'tensorrt' | 'triton' | 'bifrost' | 'qdrant' | 'pgvector' | 'neo4j' | 'couchdb';
-	latencyMs: number;
-	tokenCount?: number;
-	cacheHit: boolean;
-	queryHash?: string;
-	collection?: string;
-	resultCount?: number;
-	error?: string;
-	metadata?: Record<string, unknown>;
+  type: 'llm' | 'embedding' | 'vector_search' | 'graph_query' | 'dag_ordering' | 'policy';
+  model?: string;
+  backend?:
+    | 'ollama'
+    | 'tensorrt'
+    | 'triton'
+    | 'bifrost'
+    | 'qdrant'
+    | 'pgvector'
+    | 'neo4j'
+    | 'couchdb'
+    | 'ace-policy';
+  latencyMs: number;
+  tokenCount?: number;
+  cacheHit: boolean;
+  queryHash?: string;
+  collection?: string;
+  resultCount?: number;
+  error?: string;
+  metadata?: Record<string, unknown>;
 }
 
 interface BufferedEntry extends InferenceLogEntry {

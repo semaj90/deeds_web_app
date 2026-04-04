@@ -137,8 +137,8 @@ vi.mock('$lib/server/retrieval/web-search.js', () => ({
 
 // ── Observability mock ──
 vi.mock('$lib/server/observability/langfuse.js', () => ({
-	traceLLM: vi.fn((_a: any, _b: any, fn: any) => fn()),
-	traceEmbedding: vi.fn((_a: any, _b: any, fn: any) => fn()),
+  traceLLM: vi.fn((_a: any, _b: any, fn: any) => fn({ end: vi.fn() })),
+  traceEmbedding: vi.fn((_a: any, _b: any, fn: any) => fn()),
 }));
 
 // ── Knowledge search internal fetch (used by /knowledge/search) ──

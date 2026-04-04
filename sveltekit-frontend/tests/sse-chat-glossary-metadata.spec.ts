@@ -92,6 +92,13 @@ vi.mock('$lib/server/glyph-prompt-cache.js', () => ({
 }));
 
 vi.mock('$lib/server/observability/langfuse.js', () => ({
+  traceLLM: vi.fn(
+    async (
+      _name: string,
+      _meta: unknown,
+      fn: (handle: { end: ReturnType<typeof vi.fn> }) => Promise<unknown>
+    ) => fn({ end: vi.fn() })
+  ),
   traceEmbedding: vi.fn(async (_query: string, _model: string, operation: () => Promise<unknown>) =>
     operation()
   ),
@@ -980,7 +987,7 @@ describe('/api/sse/chat glossary metadata', () => {
           {
             sourceNum: 1,
             documentId: 'legal_documents:legal-doc-kag-only-1',
-            similarity: 1,
+            similarity: 0.86,
           },
         ],
         conversationTurns: 2,
@@ -995,7 +1002,7 @@ describe('/api/sse/chat glossary metadata', () => {
     expect(doneEvent?.confidenceFactors).toEqual({
       caseContext: false,
       ragHits: 1,
-      topScore: 1,
+      topScore: 0.86,
       embeddingModel: 'embeddinggemma:latest',
       codebaseHits: 0,
       kagNeighbors: 2,
@@ -1271,7 +1278,7 @@ describe('/api/sse/chat glossary metadata', () => {
           {
             sourceNum: 1,
             documentId: 'legal_documents:legal-doc-kag-cache-1',
-            similarity: 1,
+            similarity: 0.86,
           },
         ],
         conversationTurns: 2,
@@ -1280,7 +1287,7 @@ describe('/api/sse/chat glossary metadata', () => {
     expect(doneEvent?.confidenceFactors).toEqual({
       caseContext: false,
       ragHits: 1,
-      topScore: 1,
+      topScore: 0.86,
       embeddingModel: 'embeddinggemma:latest',
       codebaseHits: 0,
       kagNeighbors: 2,

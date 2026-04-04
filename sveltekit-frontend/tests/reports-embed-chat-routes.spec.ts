@@ -154,7 +154,14 @@ vi.mock('$lib/server/embedding/embed.js', () => ({
 }));
 
 vi.mock('$lib/server/observability/langfuse.js', () => ({
-	traceEmbedding: vi.fn(async (_text: string, _model: string, fn: () => Promise<unknown>) => fn()),
+  traceLLM: vi.fn(
+    async (
+      _name: string,
+      _meta: unknown,
+      fn: (handle: { end: ReturnType<typeof vi.fn> }) => Promise<unknown>
+    ) => fn({ end: vi.fn() })
+  ),
+  traceEmbedding: vi.fn(async (_text: string, _model: string, fn: () => Promise<unknown>) => fn()),
 }));
 
 vi.mock('$lib/server/ai/token-tracker.js', () => ({

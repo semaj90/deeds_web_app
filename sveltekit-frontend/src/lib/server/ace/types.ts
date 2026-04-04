@@ -17,6 +17,63 @@ export interface ACEUserProfile {
 	experienceLevel: string | null;
 }
 
+export type ACEPolicyAction =
+  | 'answer_direct'
+  | 'fill_parameters'
+  | 'expand_retrieval'
+  | 'call_web_search'
+  | 'ask_clarification'
+  | 'escalate_model';
+
+export type ACEBudgetTier = 'small' | 'medium' | 'large' | 'authority_heavy' | 'web_augmented';
+
+export type ACEParameterSource =
+  | 'user_message'
+  | 'active_case'
+  | 'parameter_hint'
+  | 'case_context'
+  | 'chat_history'
+  | 'entity_extraction'
+  | 'kag'
+  | 'rag'
+  | 'web_search';
+
+export interface ACEParameterCompletion {
+  args: Record<string, unknown>;
+  sources: Record<string, ACEParameterSource>;
+  confidence: Record<string, number>;
+  missing: string[];
+  filled: Record<string, boolean>;
+}
+
+export interface ACEBudgetProfile {
+  tier: ACEBudgetTier;
+  allocations: typeof TOKEN_BUDGET;
+  limits: {
+    glossaryEntries: number;
+    kbChunkCount: number;
+    caseChunkCount: number;
+    mergedChunkCount: number;
+    chunkChars: number;
+    kagNeighborCount: number;
+    chatHistoryMessages: number;
+    chatMessageChars: number;
+    evidenceMetadataCount: number;
+    evidenceConnectionCount: number;
+    codebaseContextCount: number;
+  };
+}
+
+export interface ACEPolicyDecision {
+  action: ACEPolicyAction;
+  confidence: number;
+  retrievalConfidence: number;
+  reasons: string[];
+  missingParameters: string[];
+  allowWebSearch: boolean;
+  budget: ACEBudgetProfile;
+}
+
 export interface ACEContext {
   /** User behavioral profile from analytics */
   userProfile: ACEUserProfile | null;
@@ -89,6 +146,8 @@ export interface ACEContext {
     lineStart?: number;
     lineEnd?: number;
   }> | null;
+  /** Deterministic policy decision used to size context and route tools */
+  policyDecision: ACEPolicyDecision | null;
 }
 
 export interface ACEPrompt {
@@ -104,6 +163,10 @@ export interface ACEPrompt {
   selfPromptInstructions: string | null;
   /** Which inference backend to prefer */
   preferredBackend: 'tensorrt' | 'ollama' | 'auto';
+  /** Budget profile selected for this prompt */
+  budgetProfile: ACEBudgetProfile;
+  /** Policy decision that produced the prompt budget */
+  policyDecision: ACEPolicyDecision;
 }
 
 export interface SelfEvaluation {
@@ -128,18 +191,18 @@ export interface GeneratedTag {
   source: 'regex' | 'ner' | 'llm' | 'manual';
 }
 
-/** Token budget allocation per context source */
+/** Token budget allocation per context source (expanded for 128K+ context models) */
 export const TOKEN_BUDGET = {
-  system: 200,
-  caseContext: 300,
-  glossary: 150,
-  ragChunks: 400,
-  evidenceMetadata: 200,
-  evidenceConnections: 150,
-  kagNeighbors: 200,
-  chatHistory: 400,
-  userProfile: 100,
-  codebaseContext: 200,
+  system: 300,
+  caseContext: 800,
+  glossary: 250,
+  ragChunks: 1200,
+  evidenceMetadata: 400,
+  evidenceConnections: 300,
+  kagNeighbors: 400,
+  chatHistory: 800,
+  userProfile: 150,
+  codebaseContext: 400,
   selfPrompt: 100,
-  total: 2250,
+  total: 5100,
 } as const;
