@@ -9,7 +9,7 @@ import type { InferenceSource } from '$lib/ai/model-ids.js';
 import { clientCache } from '$lib/ai/client-cache.js';
 import { updateTextEmotion, getEmotionSystemPrompt, getEmotionState } from '$lib/ai/emotion-context.js';
 import { isE2BReady } from '$lib/ai/gemma4-e2b-client.js';
-import { evaluateSynthesisQuality, scoreRetrievalConfidence, type RetrievalSignals } from '$lib/ai/client-quality.js';
+import { evaluateSynthesisQuality, scoreRetrievalConfidence, recordFeedback, getThresholds, type RetrievalSignals } from '$lib/ai/client-quality.js';
 import { synthesize } from '$lib/ai/client-llm-synthesis.js';
 
 export type ChatRole = 'user' | 'assistant' | 'system';
@@ -297,7 +297,7 @@ export class ChatSession {
   lastConfidence = $state<number>(1.0);
   lastSource = $state<InferenceSource>('server-ollama');
   connectionStatus = $state<'connected' | 'disconnected'>('disconnected');
-  debugInfo = $state({ reason: '', latencyMs: 0, cacheHit: 'none', provider: 'unknown' });
+  debugInfo = $state({ reason: '', latencyMs: 0, cacheHit: 'none', provider: 'unknown', e2bReady: false, inferenceTier: 'unknown' as string });
 
   private abortController: AbortController | null = null;
   private _chatId: string;
@@ -594,7 +594,7 @@ export class ChatSession {
     );
 
     this.lastSource = decision.source;
-    this.debugInfo = { ...this.debugInfo, reason: decision.reason };
+    this.debugInfo = { ...this.debugInfo, reason: decision.reason, e2bReady, inferenceTier: decision.source };
 
     if (decision.source === 'local-e2b') {
       await this._handleE2BInference(routedMessage, decision);
@@ -1173,6 +1173,44 @@ export class ChatSession {
         this.status = 'idle';
       }
     }
+  }
+
+  /**
+   * Record user feedback on a response (thumbs up/down).
+   * Adjusts local synthesis quality thresholds over time.
+   *
+   * @param messageIndex — Index of the assistant message in this.messages
+   * @param helpful — Whether the user found the response helpful
+   */
+  async rateFeedback(messageIndex: number, helpful: boolean): Promise<void> {
+    const msg = this.messages[messageIndex];
+    if (!msg || msg.role !== 'assistant') return;
+
+    const source = msg.source ?? this.lastSource;
+    const queryMsg = this.messages.slice(0, messageIndex).reverse().find((m) => m.role === 'user');
+    const queryHash = queryMsg?.content
+      ? `feedback_${queryMsg.content.slice(0, 60)}`
+      : `feedback_${messageIndex}`;
+
+    await recordFeedback({
+      queryHash,
+      helpful,
+      source,
+      ts: Date.now(),
+    });
+
+    console.info(`[ChatSession] Feedback recorded: ${helpful ? 'helpful' : 'unhelpful'} for ${source}`);
+  }
+
+  /** Get current inference pipeline status for debug UI. */
+  getInferenceStatus() {
+    return {
+      e2bReady: isE2BReady(),
+      lastSource: this.lastSource,
+      lastConfidence: this.lastConfidence,
+      qualityThresholds: getThresholds(),
+      debugInfo: this.debugInfo,
+    };
   }
 
   destroy() {
