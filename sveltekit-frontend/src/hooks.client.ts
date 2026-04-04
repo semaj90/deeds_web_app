@@ -121,3 +121,24 @@ window.addEventListener('visibilitychange', () => {
 });
 
 window.addEventListener('pagehide', () => flushErrors());
+
+// ── E2B Model Preload (idle time) ─────────────────────────
+// Load Gemma 4 E2B (2.3B Q4F16 WebGPU) during idle time so
+// first chat inference doesn't pay cold-start penalty.
+// Falls back silently if WebGPU unavailable or VRAM too low.
+
+if ('requestIdleCallback' in window) {
+  window.requestIdleCallback(() => {
+    import('$lib/ai/gemma4-e2b-client.js')
+      .then(({ initE2B }) => initE2B())
+      .then(() => console.info('[E2B] Preloaded during idle'))
+      .catch(() => { /* E2B unavailable — 270M ONNX fallback active */ });
+  }, { timeout: 10_000 });
+} else {
+  // Safari fallback — delay 5s after load
+  setTimeout(() => {
+    import('$lib/ai/gemma4-e2b-client.js')
+      .then(({ initE2B }) => initE2B())
+      .catch(() => { /* silent fallback */ });
+  }, 5_000);
+}

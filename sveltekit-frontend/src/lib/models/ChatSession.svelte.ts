@@ -8,6 +8,8 @@ import { SERVER_CHAT_MODEL, CLIENT_LLM_ONNX_PATH, CLIENT_LLM_TOKENIZER_PATH } fr
 import type { InferenceSource } from '$lib/ai/model-ids.js';
 import { clientCache } from '$lib/ai/client-cache.js';
 import { updateTextEmotion, getEmotionSystemPrompt, getEmotionState } from '$lib/ai/emotion-context.js';
+import { isE2BReady } from '$lib/ai/gemma4-e2b-client.js';
+import { evaluateSynthesisQuality } from '$lib/ai/client-quality.js';
 
 export type ChatRole = 'user' | 'assistant' | 'system';
 
@@ -573,11 +575,13 @@ export class ChatSession {
 
     // ── Client Router Decision (health-aware + LokiJS cache) ───────
     const capabilities = await fetchCapabilities();
+    const e2bReady = isE2BReady();
     const decision = shouldEscalateToServer(routedMessage, this.messages, {
       forceServer: effectiveOptions.forceServer,
       forceLocal: effectiveOptions.forceLocal,
       hasCaseContext: this._hasCaseContext,
       capabilities,
+      e2bReady,
     });
 
     // Cache the router decision for fast repeated lookups
@@ -591,12 +595,107 @@ export class ChatSession {
     this.lastSource = decision.source;
     this.debugInfo = { ...this.debugInfo, reason: decision.reason };
 
-    if (decision.source === 'local-onnx') {
+    if (decision.source === 'local-e2b') {
+      await this._handleE2BInference(routedMessage, decision);
+    } else if (decision.source === 'local-onnx') {
       await this._handleLocalInference(routedMessage, decision);
     } else if (decision.source === 'retrieval-hybrid') {
       await this._handleRetrievalInference(routedMessage, decision);
     } else {
       await this._handleServerInference(routedMessage, decision, effectiveOptions);
+    }
+  }
+
+  /**
+   * E2B inference via Gemma 4 E2B 2.3B (Transformers.js + WebGPU).
+   * Primary client-side path when E2B model is loaded.
+   * Falls back to 270M ONNX on failure.
+   */
+  private async _handleE2BInference(message: string, decision: RouterDecision) {
+    const t0 = performance.now();
+    this.status = 'thinking';
+    this.error = null;
+
+    // Check synthesis cache first (shared with ONNX path)
+    const cached = await clientCache.getReply(message);
+    if (cached) {
+      console.info('[ChatRouter] Cache hit (IndexedDB)', { source: cached.source });
+      this.messages.push({
+        role: 'assistant',
+        content: cached.content,
+        timestamp: new Date().toISOString(),
+        source: 'local-e2b',
+        metadata: { routerDecision: decision },
+      });
+      clientCache.saveChatMessage(this._chatId, 'assistant', cached.content, {
+        source: 'local-e2b',
+        routerDecision: decision,
+      });
+      this.status = 'idle';
+      this.lastSource = 'local-e2b';
+      this.debugInfo = {
+        ...this.debugInfo,
+        cacheHit: 'idb',
+        latencyMs: Math.round(performance.now() - t0),
+        provider: 'cache',
+      };
+      return;
+    }
+
+    try {
+      this.status = 'streaming';
+      const { generateE2B } = await import('$lib/ai/gemma4-e2b-client.js');
+      const history = this.messages
+        .filter((m) => m.role !== 'system')
+        .slice(-10)
+        .map((m) => ({ role: m.role, content: m.content }));
+
+      const result = await generateE2B(message, history);
+
+      // Quality gate — evaluate before accepting
+      const quality = evaluateSynthesisQuality(result.text, message);
+      if (quality.shouldEscalate) {
+        console.warn(`[ChatRouter] E2B quality low (${quality.score.toFixed(2)}): ${quality.reason}, escalating`);
+        await this._handleServerInference(message, {
+          ...decision,
+          source: 'server-ollama',
+          reason: `e2b-quality-low(${quality.reason})`,
+        });
+        return;
+      }
+
+      this.messages.push({
+        role: 'assistant',
+        content: result.text,
+        timestamp: new Date().toISOString(),
+        source: 'local-e2b',
+        metadata: { routerDecision: decision },
+      });
+
+      await clientCache.putReply(message, result.text, 'local-e2b');
+      clientCache.saveChatMessage(this._chatId, 'assistant', result.text, {
+        source: 'local-e2b',
+        routerDecision: decision,
+      });
+
+      this.status = 'idle';
+      this.lastSource = 'local-e2b';
+      this.lastConfidence = decision.confidence;
+      this.debugInfo = {
+        ...this.debugInfo,
+        cacheHit: 'none',
+        latencyMs: Math.round(performance.now() - t0),
+        provider: `e2b(${result.tokPerSec}tok/s)`,
+      };
+      console.info(`[ChatRouter] E2B response: ${result.tokensGenerated} tokens in ${result.durationMs}ms (${result.tokPerSec} tok/s)`);
+    } catch (err: any) {
+      // E2B failed → fall back to 270M ONNX
+      console.warn('[ChatRouter] E2B failed, falling back to ONNX:', err.message);
+      await this._handleLocalInference(message, {
+        ...decision,
+        source: 'local-onnx',
+        reason: `e2b-fallback(${decision.reason}): ${err.message}`,
+      });
     }
   }
 
@@ -789,10 +888,13 @@ export class ChatSession {
           reason: `retrieval(${topChunks.length}-chunks)+local-onnx`,
         });
 
-        // Verify answer quality — if too short, escalate to server
+        // Verify answer quality via quality schema — escalate if insufficient
         const lastMsg = this.messages[this.messages.length - 1];
-        if (lastMsg?.role === 'assistant' && lastMsg.content.length < 50) {
-          console.warn('[ChatRouter] Local answer too short, escalating to server');
+        const retrievalQuality = lastMsg?.role === 'assistant'
+          ? evaluateSynthesisQuality(lastMsg.content, message)
+          : null;
+        if (retrievalQuality?.shouldEscalate) {
+          console.warn(`[ChatRouter] Retrieval answer quality low (${retrievalQuality.score.toFixed(2)}): ${retrievalQuality.reason}, escalating`);
           this.messages.pop();
           await this._handleServerInference(message, {
             ...decision,
