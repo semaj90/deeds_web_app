@@ -152,13 +152,11 @@ export async function cacheEmbedding(
 	model: string = 'nomic-embed-text'
 ): Promise<void> {
 	try {
-		await db
-			.insert(embeddingCache)
-			.values({
-				textHash,
-				embedding: arrayToPgVector(embedding),
-				model
-			});
+		await db.insert(embeddingCache).values({
+      textHash,
+      embedding,
+      model,
+    });
 	} catch (error) {
 		console.error('Failed to cache embedding:', stringifyError(error));
 	}
@@ -176,15 +174,18 @@ export async function getCachedEmbedding(textHash: string): Promise<number[] | n
 			.limit(1);
 
 		if (result.length > 0) {
-			const vectorString = result[0].embedding;
-			if (typeof vectorString === 'string') {
-				const nums = vectorString
-					.replace(/^\[|\]$/g, '')
-					.split(',')
-					.map((n) => parseFloat(n))
-					.filter((n) => !Number.isNaN(n));
-				return nums;
-			}
+			const vectorValue = result[0].embedding as unknown;
+      if (Array.isArray(vectorValue)) {
+        return vectorValue.map((value) => Number(value)).filter((value) => !Number.isNaN(value));
+      }
+      if (typeof vectorValue === 'string') {
+        const nums = vectorValue
+          .replace(/^\[|\]$/g, '')
+          .split(',')
+          .map((n) => parseFloat(n))
+          .filter((n) => !Number.isNaN(n));
+        return nums;
+      }
 			return null;
 		}
 		return null;

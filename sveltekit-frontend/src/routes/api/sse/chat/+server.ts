@@ -855,6 +855,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     enableTools,
   } = parsed.data;
 
+  // Extract case UUID from conversationId (format: "case-{uuid}")
+  const caseIdMatch = conversationId.match(CASE_ID_PATTERN);
+  const caseUuidForDb = caseIdMatch ? caseIdMatch[1] : undefined;
+
   // Save user message to chatMessages table
   try {
     await db.insert(chatMessages).values({
@@ -862,6 +866,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       chatId: conversationId,
       role: 'user',
       content: message,
+      ...(caseUuidForDb ? { caseId: caseUuidForDb } : {}),
     });
   } catch (e) {
     console.error('Failed to save user message', e);
@@ -1472,6 +1477,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             role: 'assistant',
             content: fullResponse,
             metadata: assistantMetadata,
+            ...(caseUuidForDb ? { caseId: caseUuidForDb } : {}),
           });
         } catch (dbErr) {
           console.warn(
@@ -1948,6 +1954,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             role: 'assistant',
             content: fullResponse,
             metadata: assistantMetadata,
+            ...(caseUuidForDb ? { caseId: caseUuidForDb } : {}),
           });
         } catch (dbErr) {
           console.warn(

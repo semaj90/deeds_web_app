@@ -3,7 +3,7 @@
   import { DropdownMenu } from "bits-ui";
 import Icon from '$lib/components/ui/Icon.svelte';
   // Migrated to $effect
-  import { fly } from "svelte/transition";
+
 import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
   interface Props {
@@ -155,8 +155,6 @@ import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
     <DropdownMenu.Content
       class="z-50 min-w-[20rem] max-w-[24rem] bg-background border rounded-lg shadow-xl p-1"
       sideOffset={8}
-      transition={fly}
-      transitionConfig={{ duration: 150, y: -8 }}
     >
       <DropdownMenu.Group>
         <div

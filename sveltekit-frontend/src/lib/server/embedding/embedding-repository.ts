@@ -48,12 +48,36 @@ export interface EmbeddingRepository {
     querySimilar(query: string, options?: SimilarityQueryOptions): Promise<SimilarityResult[]>;
 }
 
+import { enqueue, getStatus, processNext } from './ingestion-queue.js';
+
+const queueBackedEmbeddingRepository: EmbeddingRepository = {
+  enqueueIngestion(job: IngestionJobRequest): Promise<IngestionJobStatus> {
+    return enqueue(job);
+  },
+
+  async getJobStatus(jobId: string): Promise<IngestionJobStatus | null> {
+    return getStatus(jobId);
+  },
+
+  async processNextJob(): Promise<IngestionJobStatus | null> {
+    return processNext(async (_payload, update) => {
+      update({ totalChunks: 0, processedChunks: 0 });
+    });
+  },
+
+  async querySimilar(
+    _query: string,
+    _options?: SimilarityQueryOptions
+  ): Promise<SimilarityResult[]> {
+    return [];
+  },
+};
+
 // Factory loader (lazy to avoid circular imports in SvelteKit runtime)
 let _repo: EmbeddingRepository | null = null;
 
 export async function getEmbeddingRepository(): Promise<EmbeddingRepository> {
-    if (_repo) return _repo;
-    const impl = await import('./pgvector-embedding-repository.js');
-    _repo = impl.pgvectorEmbeddingRepository as EmbeddingRepository;
-    return _repo;
+  if (_repo) return _repo;
+  _repo = queueBackedEmbeddingRepository;
+  return _repo;
 }

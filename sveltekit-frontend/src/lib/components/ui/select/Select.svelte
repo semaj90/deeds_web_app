@@ -17,7 +17,6 @@
 	 */
 	interface Props {
 		value?: string;
-		type?: 'single' | 'multiple';
 		placeholder?: string;
 		disabled?: boolean;
 		class?: string;
@@ -28,7 +27,6 @@
 
 	let {
 		value = $bindable(''),
-		type = 'single',
 		placeholder = 'Select...',
 		disabled = false,
 		class: className = '',
@@ -38,7 +36,7 @@
 	}: Props = $props();
 </script>
 
-<SelectRoot bind:value {type} {disabled} {onValueChange} class={className}>
+<SelectRoot bind:value {disabled} {onValueChange} class={className}>
 	<SelectTrigger {disabled}>
 		{value || placeholder}
 	</SelectTrigger>

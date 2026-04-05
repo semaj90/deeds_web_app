@@ -32,9 +32,12 @@
     { id: '3', name: 'Mike Johnson', role: 'legal_assistant' }
   ]);
 
+  // Capture initial values for form init (intentionally non-reactive)
+  function getInitialData() { return initialData; }
+
   // Initialize superForm with Zod validation
   const { form, errors, constraints, enhance, submitting, delayed, message } = superForm(
-    initialData as any,
+    getInitialData() as any,
     {
       validators: zodClient(caseFormSchema),
       resetForm: false,

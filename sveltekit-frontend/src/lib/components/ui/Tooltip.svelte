@@ -2,14 +2,13 @@
   import { cn } from "$lib";
   import { Tooltip } from "bits-ui";
 import { fade } from "svelte/transition";
-import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 
   let {
     children,
     content,
     delayDuration = 500,
     class: className = "",
-    side = "top",
+    side = "top" as "top" | "right" | "bottom" | "left",
     ...rest
   } = $props();
 </script>

@@ -25,6 +25,7 @@ export const chatMessages = pgTable('chat_messages', {
 	id: varchar('id', { length: 255 }).primaryKey(), // msg_1735123456789_abc123
 	chatId: varchar('chat_id', { length: 255 }).notNull(), // Groups messages by conversation
 	userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }), // Nullable for anonymous (pre-migration)
+	caseId: uuid('case_id').references(() => cases.id, { onDelete: 'set null' }), // FK to cases — nullable (non-case chats)
 	role: chatMessageRoleEnum('role').notNull(), // 'user' | 'assistant' | 'system'
 	content: text('content').notNull(), // Message text
 	timestamp: timestamp('timestamp', { withTimezone: true }).notNull().defaultNow(), // When sent
@@ -36,6 +37,7 @@ export const chatMessages = pgTable('chat_messages', {
 	(table) => ({
 	chatIdIdx: index('idx_chat_messages_chat_id').on(table.chatId),
 	userIdIdx: index('idx_chat_messages_user_id').on(table.userId),
+	caseIdIdx: index('idx_chat_messages_case_id').on(table.caseId),
 	timestampIdx: index('idx_chat_messages_timestamp').on(table.timestamp),
 	migratedFromIdx: index('idx_chat_messages_migrated_from').on(table.migratedFrom)
 }));

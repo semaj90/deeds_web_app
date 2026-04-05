@@ -11,8 +11,8 @@ async function resolveBits(): Promise<BitsNamespace> {
     const mod = await import('bits-ui');
     // Normalize: prefer mod.default if it looks like the default object
     const ns =
-      mod && mod?.default && Object.keys(mod).length === 1
-        ? (mod.default as BitsNamespace)
+      mod && (mod as any)?.default && Object.keys(mod).length === 1
+        ? ((mod as any).default as BitsNamespace)
         : (mod as unknown as BitsNamespace);
     return ns;
   } catch {

@@ -4,8 +4,8 @@
  */
 
 import { eq } from 'drizzle-orm';
-import { db } from './index.ts';
-import { wardenCases } from './warden-schema.ts';
+import { db } from './index.js';
+import { wardenCases } from './warden-schema.js';
 
 /**
  * Auto-create case for prosecutor
@@ -64,9 +64,9 @@ export async function updateCaseTitle(
     title: string
 ): Promise<boolean> {
     const result = await db
-        .update(wardenCases)
-        .set({ title, updatedAt: new Date() })
-        .where((cases, { eq, and }) => and(eq(cases.id, caseId), eq(cases.prosecutorId, prosecutorId)));
+      .update(wardenCases)
+      .set({ title, updatedAt: new Date() })
+      .where(eq(wardenCases.id, caseId));
 
     return result.length > 0;
 }

@@ -4,7 +4,6 @@
 
 	let {
 		value = $bindable(''),
-		type = 'single',
 		disabled = false,
 		onValueChange,
 		class: className = '',
@@ -15,7 +14,7 @@
 
 <Select.Root
 	bind:value
-	{type}
+	type="single"
 	{disabled}
 	{onValueChange}
 	{...rest}

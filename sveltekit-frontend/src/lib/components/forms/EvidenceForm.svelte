@@ -6,12 +6,19 @@ import type { Document } from '$lib/types';
     data = null
   }: Props = $props();
   import { invalidateAll } from "$app/navigation";
-  import superForm from "sveltekit-superforms/client";
-  // cast server data to Record to allow property access
-  const serverData = data as Record<string, any> | null;
-  const initialValues = evidence || (serverData?.form ?? {});
+  import { superForm } from "sveltekit-superforms/client";
+
+  // Capture server data for template access (intentionally non-reactive)
+  function getServerData() { return data as Record<string, any> | null; }
+  const serverData = getServerData();
+
+  // Capture initial values for form init (intentionally non-reactive)
+  function getInitialValues() {
+    return evidence || (serverData?.form ?? {});
+  }
+
   const { form, enhance, errors, submitting } = superForm(
-    initialValues, {
+    getInitialValues(), {
       onUpdated: async ({ form }) => {
         if (form.valid) {
           await invalidateAll()}

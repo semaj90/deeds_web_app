@@ -46,7 +46,7 @@ const config = {
 
     // CSRF protection — reject cross-origin form submissions and API mutations
     csrf: {
-      checkOrigin: true,
+      trustedOrigins: ['self'],
     },
 
     // Common path aliases (update to match your repo layout)

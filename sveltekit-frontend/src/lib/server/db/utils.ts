@@ -1,5 +1,5 @@
 // Centralized Drizzle ORM helpers and DB exports for the project
-import { db } from '../unified-client.js';
+import { db } from './unified-client.js';
 import { sql } from 'drizzle-orm';
 import * as pgCore from 'drizzle-orm/pg-core';
 import { eq, and, or, gt, lt, like, not, asc, desc } from 'drizzle-orm';
