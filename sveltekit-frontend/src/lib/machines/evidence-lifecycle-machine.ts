@@ -193,7 +193,7 @@ const runSynthesis = fromPromise(
 			body: JSON.stringify({
 				message: input.query,
 				conversationId: `case-${input.caseId}`,
-				model: 'gemma3-legal:latest',
+				model: 'gemma4-legal:latest',
 			}),
 		});
 

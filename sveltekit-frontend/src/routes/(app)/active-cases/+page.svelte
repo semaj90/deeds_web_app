@@ -323,7 +323,7 @@
 						</div>
 						<div class="service-info">
 							<strong>Service:</strong> Legal AI Orchestrator (Port 8102)<br/>
-							<strong>Backend:</strong> Ollama gemma3-legal:latest
+							<strong>Backend:</strong> Ollama gemma4-legal:latest
 						</div>
 						<button
 							class="retry-btn"

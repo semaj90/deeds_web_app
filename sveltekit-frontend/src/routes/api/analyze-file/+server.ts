@@ -1,7 +1,7 @@
 /**
  * Phase 89: File Analysis API
  * - ripgrep search for comments/patterns
- * - gemma3-legal analysis
+ * - gemma4-legal analysis
  * - PostgreSQL raw_error_embeddings lookup
  * - Enhanced Qdrant tag generation
  */
@@ -54,7 +54,7 @@ export async function POST({ request, locals }: RequestEvent) {
 			LIMIT 20
 		`);
 
-		// 5. gemma3-legal: Analyze file
+		// 5. gemma4-legal: Analyze file
 		const analysis = await analyzeFileWithLLM(filePath, content, comments, errors.rows || []);
 
 		// 6. Generate enhanced Qdrant tag
@@ -188,7 +188,7 @@ Be concise and actionable.`;
 		const response = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: 'gemma3-legal:latest',
+			body: JSON.stringify({ model: 'gemma4-legal:latest',
 				messages: [
 					{
 						role: 'system',

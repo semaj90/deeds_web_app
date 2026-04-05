@@ -37,7 +37,7 @@ Google released **Gemma 4** on April 2, 2026 — a major leap from Gemma 3.
 |-------|--------------|------------------------|---------|
 | gemma4 (E4B) | ~6GB | ~2GB | **Fits — recommended for VLM** |
 | gemma4:e2b | ~1.5GB | ~6.5GB | Fits — lightweight, vision + audio |
-| gemma3-legal (11.8B) | ~7.3GB | ~0.7GB | Currently loaded — tight |
+| gemma4-legal (11.8B) | ~7.3GB | ~0.7GB | Currently loaded — tight |
 | gemma4:26b | ~18GB | None | **Does NOT fit** (needs 16GB+) |
 | gemma4:31b | ~20GB | None | **Does NOT fit** (needs 24GB+) |
 
@@ -45,7 +45,7 @@ Google released **Gemma 4** on April 2, 2026 — a major leap from Gemma 3.
 
 **Dual-model strategy** (hot-swap via Ollama `keep_alive`):
 
-1. **`gemma3-legal:latest`** — Text-only LLM (fine-tuned for legal domain)
+1. **`gemma4-legal:latest`** — Text-only LLM (fine-tuned for legal domain)
    - Used by: SSE chat, synthesis, summarization, entity extraction
    - VRAM: ~7.3GB (loaded when doing text tasks)
 
@@ -54,7 +54,7 @@ Google released **Gemma 4** on April 2, 2026 — a major leap from Gemma 3.
    - VRAM: ~6GB (loaded when doing vision tasks)
    - Advantage: Better OCR, variable visual token budget, audio support
 
-Ollama handles model swap automatically — when `gemma4` is requested, it unloads `gemma3-legal` (or vice versa). The `keep_alive` setting controls how long a model stays loaded.
+Ollama handles model swap automatically — when `gemma4` is requested, it unloads `gemma4-legal` (or vice versa). The `keep_alive` setting controls how long a model stays loaded.
 
 ---
 
@@ -175,7 +175,7 @@ When GPU is upgraded (16GB+):
 | License for fine-tuning | Restricted (custom Google license) | **Apache 2.0 (fully open)** |
 | Unsloth support | Yes | **Day-0** |
 | QLoRA support | Yes | Yes |
-| Base model for legal fine-tune | gemma3-legal (11.8B) | gemma4:e4b (4B) or gemma4:26b (26B) |
+| Base model for legal fine-tune | gemma4-legal (11.8B) | gemma4:e4b (4B) or gemma4:26b (26B) |
 
 ### Recommended Fine-Tuning Target
 
@@ -227,7 +227,7 @@ Existing training datasets (created this session):
 | 2 | Add `GEMMA4_VLM_MODEL` to env.server.ts | `env.server.ts` |
 | 3 | Update `vlm-evidence-analyzer.ts` to prefer gemma4 for vision | `vlm-evidence-analyzer.ts` |
 | 4 | Update `vision/analyze` endpoint model selection | `api/vision/analyze/+server.ts` |
-| 5 | Keep gemma3-legal for text-only tasks | No change |
+| 5 | Keep gemma4-legal for text-only tasks | No change |
 | 6 | Verify: upload image evidence → VLM analysis uses gemma4 | Manual test |
 
 ### Phase 2: TurboQuant Integration — When Available (~Q3 2026)
@@ -264,7 +264,7 @@ Existing training datasets (created this session):
 ```
 User Query
     │
-    ├─ Text-only query → gemma3-legal (fine-tuned, 11.8B Q4_K_M)
+    ├─ Text-only query → gemma4-legal (fine-tuned, 11.8B Q4_K_M)
     │   └─ SSE chat, synthesis, summarization, entities
     │
     ├─ Vision query → gemma4:e4b (native multimodal, 4B Q4)
@@ -278,7 +278,7 @@ User Query
     ├─ Embeddings → embeddinggemma:latest (768-dim, always loaded)
     │
     └─ Future: gemma4-legal:e4b (unified fine-tuned text+vision+audio)
-        └─ Replaces both gemma3-legal AND gemma4:e4b
+        └─ Replaces both gemma4-legal AND gemma4:e4b
         └─ Single model for all inference tasks
 ```
 
@@ -288,7 +288,7 @@ User Query
 
 | Risk | Likelihood | Mitigation |
 |------|-----------|------------|
-| E4B vision quality worse than Gemma 3 12B | Low (benchmarks show improvement) | Keep gemma3-legal as fallback, A/B test |
+| E4B vision quality worse than Gemma 3 12B | Low (benchmarks show improvement) | Keep gemma4-legal as fallback, A/B test |
 | Ollama gemma4 tag changes/breaks | Low | Pin specific version in Modelfile |
 | TurboQuant delayed past Q3 | Medium | Current Q8_0 KV works fine, no urgency |
 | VRAM contention (gemma4 + embeddings) | Medium | Ollama auto-swap; set `keep_alive: '5m'` on VLM |

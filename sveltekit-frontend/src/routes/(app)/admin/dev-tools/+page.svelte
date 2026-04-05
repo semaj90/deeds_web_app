@@ -723,14 +723,14 @@
 		<div class="space-y-4">
 			<h3 class="text-lg font-semibold text-black uppercase tracking-wide">AI Backend Status Monitor</h3>
 			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-				<AIStatusIndicator isReady={true} provider="local" model="gemma3-legal:latest" />
+				<AIStatusIndicator isReady={true} provider="local" model="gemma4-legal:latest" />
 				<AIStatusIndicator isReady={true} provider="local" model="embeddinggemma:latest" />
 				<AIStatusIndicator isLoading={true} provider="cloud" model="vLLM legal-bert" />
 				<AIStatusIndicator provider="hybrid" model="ONNX gemma-270m" />
 			</div>
 			<div class="mt-4">
 				<h4 class="text-sm font-semibold text-black/80 mb-2 uppercase tracking-wide">Error State Demo</h4>
-				<AIStatusIndicator error="Connection to Ollama timed out after 30s" provider="local" model="gemma3-legal:latest" />
+				<AIStatusIndicator error="Connection to Ollama timed out after 30s" provider="local" model="gemma4-legal:latest" />
 			</div>
 		</div>
 	{/if}

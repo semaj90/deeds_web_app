@@ -56,7 +56,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma3-legal:latest',
+				model: 'gemma4-legal:latest',
 				prompt: `Transcribe the following audio content. The audio is a voice recording related to a legal case. Provide only the transcription text, no commentary.\n\n[Audio file: ${audioFile.name}, size: ${buffer.length} bytes]`,
 				stream: false,
 				options: { temperature: 0.1 }

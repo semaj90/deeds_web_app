@@ -4,7 +4,7 @@
  * Routes LLM inference through the best available backend:
  *   1. TensorRT-LLM (OpenAI-compatible service on :8099) — if GPU lease available
  *   2. Triton TensorRT service (:8000) — production GPU fallback before Ollama
- *   3. Ollama (gemma3-legal, FP16) — default local/dev fallback
+ *   3. Ollama (gemma4-legal, FP16) — default local/dev fallback
  *
  * GPU arbiter ensures TRT-LLM and Ollama don't fight for VRAM.
  * All backends return the same response shape.
@@ -119,7 +119,7 @@ async function tryTensorRT(request: InferenceRequest): Promise<InferenceResponse
 
 		return {
 			text: result.text,
-			model: 'gemma3-legal-trt',
+			model: 'gemma4-legal-trt',
 			backend: 'tensorrt',
 			usage: result.usage,
 			latencyMs: 0
@@ -160,7 +160,7 @@ async function tryTriton(request: InferenceRequest): Promise<InferenceResponse |
 }
 
 async function tryBifrost(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
-	const model = 'gemma3-legal';
+	const model = 'gemma4-legal';
 	const messages: Array<{ role: string; content: string }> = [];
 	if (request.systemPrompt) messages.push({ role: 'system', content: request.systemPrompt });
 	messages.push({ role: 'user', content: request.prompt });
@@ -178,7 +178,7 @@ async function tryBifrost(request: InferenceRequest, startTime: number): Promise
 
 		return {
 			text,
-			model: 'gemma3-legal-bifrost',
+			model: 'gemma4-legal-bifrost',
 			backend: 'bifrost',
 			latencyMs: Math.round(performance.now() - startTime)
 		};
@@ -188,7 +188,7 @@ async function tryBifrost(request: InferenceRequest, startTime: number): Promise
 }
 
 async function ollamaInference(request: InferenceRequest, startTime: number): Promise<InferenceResponse> {
-	const model = 'gemma3-legal:latest';
+	const model = 'gemma4-legal:latest';
 	const prompt = request.systemPrompt
 		? `${request.systemPrompt}\n\n${request.prompt}`
 		: request.prompt;
@@ -321,7 +321,7 @@ export async function* routeStreamingInference(
 
 	// Tier 3: Ollama (uses /api/chat if messages provided, /api/generate otherwise)
 	const ollamaUrl = ENV.OLLAMA_BASE_URL;
-	const model = request.model ?? 'gemma3-legal:latest';
+	const model = request.model ?? 'gemma4-legal:latest';
 
 	const [endpoint, body] = request.messages
 		? [`${ollamaUrl}/api/chat`, { model, messages: request.messages, stream: true, keep_alive: '24h' }]

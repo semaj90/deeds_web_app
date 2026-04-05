@@ -383,7 +383,7 @@
 							<li>Stream errors from PostgreSQL (batch_size=5000)</li>
 							<li>Generate embeddings with embeddinggemma:latest (768-dim)</li>
 							<li>CUDA GPU clustering with DBSCAN (cosine similarity)</li>
-							<li>LLM summarization with Ollama gemma3-legal</li>
+							<li>LLM summarization with Ollama gemma4-legal</li>
 							<li>Auto-tag with ripgrep pattern detection</li>
 							<li>Store in Qdrant for vector search</li>
 							<li>Update copilot.md knowledge base</li>

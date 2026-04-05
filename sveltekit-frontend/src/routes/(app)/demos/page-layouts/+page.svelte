@@ -10,7 +10,7 @@
 		language: 'en',
 		autoSave: true,
 		notifications: true,
-		model: 'gemma3-legal',
+		model: 'gemma4-legal',
 		temperature: 0.7,
 		maxTokens: 2048,
 		enableGPU: true,
@@ -105,7 +105,7 @@
 							<div class="dark-field">
 								<label>Active Model</label>
 								<select bind:value={config.model}>
-									<option value="gemma3-legal">gemma3-legal:latest</option>
+									<option value="gemma4-legal">gemma4-legal:latest</option>
 									<option value="llama3">llama3:8b</option>
 								</select>
 							</div>
@@ -235,7 +235,7 @@
 							<div class="warm-field">
 								<label>Active Model</label>
 								<select bind:value={config.model}>
-									<option value="gemma3-legal">gemma3-legal:latest</option>
+									<option value="gemma4-legal">gemma4-legal:latest</option>
 									<option value="llama3">llama3:8b</option>
 								</select>
 							</div>

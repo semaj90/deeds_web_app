@@ -382,7 +382,7 @@ export async function extractSectionsBatch(
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Google LangExtract Integration (Official Library)
-// Uses gemma3-legal via Ollama — much better structured extraction
+// Uses gemma4-legal via Ollama — much better structured extraction
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface GoogleLangExtractEntity {

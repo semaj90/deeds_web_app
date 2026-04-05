@@ -101,7 +101,7 @@
       // Logic for Contextual Chat via Ollama or RAG
       const ollamaUrl = getOllamaEndpoint();
       const payload = {
-        model: 'gemma3-legal:latest', // Per project convention
+        model: 'gemma4-legal:latest', // Per project convention
         messages: messages.map(m => ({
           role: m.role === 'assistant' ? 'assistant' : 'user',
           content: m.content

@@ -1,6 +1,6 @@
 /**
  * Ollama Client for AI operations
- * Uses gemma3-legal:latest for legal document analysis
+ * Uses gemma4-legal:latest for legal document analysis
  */
 
 import { getOllamaEndpoint } from '$lib/utils/ollama-endpoint';
@@ -72,7 +72,7 @@ OUTPUT:
 5) Recommended Next Actions`;
 
 	return ollamaChat({
-		model: 'gemma3-legal:latest',
+		model: 'gemma4-legal:latest',
 		system,
 		prompt,
 		temperature: 0.3 // Lower temperature for more factual output
@@ -102,7 +102,7 @@ Write:
 - Recommended Next Actions (bullet points)`;
 
 	return ollamaChat({
-		model: 'gemma3-legal:latest',
+		model: 'gemma4-legal:latest',
 		system,
 		prompt,
 		temperature: 0.3
@@ -161,7 +161,7 @@ LEGAL MEMORANDUM
 Focus on creating a prosecution-ready document that analyzes the evidence, legal issues, and provides strategic guidance for the case.`;
 
 	return ollamaChat({
-		model: 'gemma3-legal:latest',
+		model: 'gemma4-legal:latest',
 		system,
 		prompt,
 		temperature: 0.2
@@ -201,7 +201,7 @@ Format as:
 - Action Items (if any)`;
 
 	return ollamaChat({
-		model: 'gemma3-legal:latest',
+		model: 'gemma4-legal:latest',
 		system,
 		prompt,
 		temperature: 0.3

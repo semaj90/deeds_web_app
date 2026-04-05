@@ -6,8 +6,8 @@ const QUEUE_NAME = "summarization_tasks";
 
 export async function summarizeWithQueue(content: string, documentId: string): Promise<any> {
     try {
-        const { connect } = await import("amqplib");
-        const connection = await connect(RABBITMQ_URL);
+        const amqplib = await import("amqplib") as any;
+        const connection = await (amqplib.connect ?? amqplib.default)(RABBITMQ_URL);
         const channel = await connection.createChannel();
         await channel.assertQueue(QUEUE_NAME, { durable: true });
 

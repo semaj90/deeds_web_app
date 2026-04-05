@@ -1,5 +1,5 @@
 // This module uses Google's official LangExtract library via the Python service.
-// The service runs on port 8095 and uses gemma3-legal via Ollama.
+// The service runs on port 8095 and uses gemma4-legal via Ollama.
 import { OLLAMA_BASE_URL } from '$env/static/private';
 import { langextractFetch } from '$lib/server/langextract-client.js';
 

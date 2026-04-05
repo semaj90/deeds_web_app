@@ -49,7 +49,7 @@
 
 			status = {
 				active: false,
-				model: 'gemma3-legal:latest',
+				model: 'gemma4-legal:latest',
 				epoch: 0,
 				totalEpochs: 0,
 				loss: 0,

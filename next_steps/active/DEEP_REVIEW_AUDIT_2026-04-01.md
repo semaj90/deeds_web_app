@@ -33,7 +33,7 @@
 
 | Model | Location | Size | Purpose | Status |
 |-------|----------|------|---------|--------|
-| gemma3-legal Q4_K_M | `gemma3Q4_K_M/` | 7.38 GB | Unsloth fine-tuned LLM (GGUF) | ACTIVE — Ollama |
+| gemma4-legal Q4_K_M | `gemma3Q4_K_M/` | 7.38 GB | Unsloth fine-tuned LLM (GGUF) | ACTIVE — Ollama |
 | embeddinggemma 300M | `models/embeddinggemma_300m/` | 1.16 GB | 768-dim embeddings (safetensors) | ACTIVE — Ollama |
 | gemma3 270M ONNX | `sveltekit-frontend/static/gemma3_270m_onnx/` | 0.83 GB | Client-side inference (WebGPU/WASM) | ACTIVE — browser |
 | gemma3 270M ONNX (master) | `models/gemma3-client-onnx/` | 0.83 GB | Source copy of ONNX models | MASTER |
@@ -148,7 +148,7 @@ Located in `deeds_labs/projects/legacy-projects/ingestion-phase66/`:
 
 | Layer | Technology | Status | Performance |
 |-------|-----------|--------|-------------|
-| **LLM Inference** | Ollama (native, GPU) | RUNNING | gemma3-legal Q4_K_M on RTX 3060 Ti |
+| **LLM Inference** | Ollama (native, GPU) | RUNNING | gemma4-legal Q4_K_M on RTX 3060 Ti |
 | **Embeddings** | Ollama (native, GPU) | RUNNING | embeddinggemma 768-dim |
 | **N-API CUDA Addon** | tensorrt_bridge.node | BUILT TODAY | 7 GPU functions verified |
 | **Client ONNX** | WebGPU → WASM → CPU | ACTIVE | gemma3 270M in-browser |
@@ -221,7 +221,7 @@ Located in `deeds_labs/projects/legacy-projects/ingestion-phase66/`:
 - Vector DB (Qdrant INT8 quantized, 72 collections)
 - Message Queue (RabbitMQ, 8 queues, all consumers wired)
 - Object Storage (MinIO)
-- LLM Inference (Ollama, GPU, gemma3-legal + embeddinggemma)
+- LLM Inference (Ollama, GPU, gemma4-legal + embeddinggemma)
 - Frontend (110 pages, 267+ endpoints, 0 svelte-check errors)
 - Builds (vite build passes, Playwright 698/698)
 - Auth (358/386 routes guarded, 28 correctly public)
@@ -347,7 +347,7 @@ Located in `deeds_labs/projects/legacy-projects/ingestion-phase66/`:
 | PostgreSQL + Drizzle | 70+ tables, pgvector HNSW |
 | Redis caching | L0-L3 hierarchy, sessions, job state |
 | Qdrant vector search | 52+ collections, hybrid BM42+dense |
-| Ollama LLM | gemma3-legal + embeddinggemma, GPU |
+| Ollama LLM | gemma4-legal + embeddinggemma, GPU |
 | Evidence pipeline | 9-stage upload → GPU analysis |
 | Chat system | Terminal + SimpleWorkingChat + AIChatWidget |
 | RabbitMQ | 8 queues, all consumers wired |
@@ -429,7 +429,7 @@ RAG Pipeline (corrective reformulation)                   ← WORKING (7 endpoin
   ├─ Redis matrix compute (ACE pattern matching)          ← NOT BUILT
   └─ FastMCP tools (36 tools, in-process)                 ← WORKING
   ↓
-Ollama gemma3-legal (or TRT-LLM when WSL2 ready)         ← WORKING (Ollama) / NOT BUILT (TRT)
+Ollama gemma4-legal (or TRT-LLM when WSL2 ready)         ← WORKING (Ollama) / NOT BUILT (TRT)
   ↓
 ACE self-eval → retry if quality < threshold              ← WORKING
   ↓

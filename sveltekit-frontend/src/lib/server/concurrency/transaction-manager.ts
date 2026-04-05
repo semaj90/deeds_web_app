@@ -1,4 +1,4 @@
-import { sql } from '$lib/db/connection';
+import { sql } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 import { advisoryLocks, LOCK_MODES, type LockMode, type LockType } from './advisory-locks.js';
 
@@ -68,7 +68,7 @@ export class TransactionManager {
             // @ts-ignore - sql.begin signature matching
 			return await sql.begin(async (tx) => {
 				if (isolationLevel) {
-					await tx`SET TRANSACTION ISOLATION LEVEL ${sql.unsafe(isolationLevel)}`;
+					await tx`SET TRANSACTION ISOLATION LEVEL ${sql.raw(isolationLevel)}`;
 				}
 
 				if (timeout) {

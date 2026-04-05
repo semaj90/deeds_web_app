@@ -61,7 +61,7 @@ const mockOllamaFetch = vi.fn(async (_url: string, opts?: any) => {
 	return new Response(JSON.stringify({
 		message: { content: 'Legal AI response here.' },
 		response: 'Legal AI response here.',
-		model: 'gemma3-legal:latest',
+		model: 'gemma4-legal:latest',
 	}), { status: 200, headers: { 'Content-Type': 'application/json' } });
 });
 vi.mock('$lib/server/ollama.js', () => ({

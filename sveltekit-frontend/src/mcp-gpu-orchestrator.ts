@@ -4,7 +4,30 @@
  * Integrates existing 37 Go services and Ollama cluster
  */
 
-import { productionServiceClient, type ServiceResponse } from '$lib/api/production-service-client';
+/** Local type — original module `$lib/api/production-service-client` does not exist */
+interface ServiceResponse {
+	success: boolean;
+	data?: unknown;
+	protocol?: string;
+	latency?: number;
+}
+
+interface ProductionServiceClient {
+	callService(path: string, body: Record<string, unknown>, opts?: Record<string, unknown>): Promise<ServiceResponse>;
+}
+
+const productionServiceClient: ProductionServiceClient = {
+	async callService(path, body, opts) {
+		const res = await fetch(path, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(body),
+			signal: opts?.timeout ? AbortSignal.timeout(opts.timeout as number) : undefined,
+		});
+		const data = await res.json();
+		return { success: res.ok, data, protocol: 'http', latency: 0 };
+	}
+};
 
 export interface GPUTask {
 	id: string;
@@ -95,8 +118,8 @@ class MCPGPUOrchestrator {
 
 	private initializeModels(): void {
 		// Gemma3 Legal Configuration
-		this.modelConfigs.set('gemma3-legal', {
-			name: 'gemma3-legal, latest',
+		this.modelConfigs.set('gemma4-legal', {
+			name: 'gemma4-legal, latest',
 			port: 11434,
 			capabilities: ['legal_analysis', 'document_processing', 'contract_review'],
 			gpu_layers: 35,
@@ -235,7 +258,7 @@ class MCPGPUOrchestrator {
 			'/api/v1/ai/legal-analysis',
 			{
 				prompt,
-				model: task.config?.model ?? 'gemma3-legal',
+				model: task.config?.model ?? 'gemma4-legal',
 				useGPU: task.config?.useGPU !== false,
 				temperature: task.config?.temperature ?? 0.1,
 				maxTokens: task.config?.maxTokens ?? 2048
@@ -311,7 +334,7 @@ class MCPGPUOrchestrator {
 			'/api/v1/ai/attention-analysis',
 			{
 				text: task.data.text,
-				model: task.config?.model ?? 'gemma3-legal',
+				model: task.config?.model ?? 'gemma4-legal',
 				layer_analysis: true
 			},
 			{

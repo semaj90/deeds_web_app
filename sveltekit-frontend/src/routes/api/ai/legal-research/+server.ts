@@ -32,7 +32,7 @@ Format your response with clear sections: Summary, Key Legal Principles, Relevan
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma3-legal:latest',
+				model: 'gemma4-legal:latest',
 				messages: [
 					{ role: 'system', content: systemPrompt },
 					{ role: 'user', content: topic }
@@ -50,7 +50,7 @@ Format your response with clear sections: Summary, Key Legal Principles, Relevan
 			research: data.message?.content || data.response || '',
 			topic,
 			jurisdiction,
-			model: data.model || 'gemma3-legal:latest',
+			model: data.model || 'gemma4-legal:latest',
 		});
 	} catch (err) {
 		console.error('[ai/legal-research] Error:', err);

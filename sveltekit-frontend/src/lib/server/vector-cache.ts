@@ -377,7 +377,7 @@ export async function getVLMCache(
 export async function setVLMCache(
 	imageHash: string,
 	result: VLMCacheEntry['result'],
-	model: string = 'gemma3-legal'
+	model: string = 'gemma4-legal'
 ): Promise<void> {
 	const key = generateVLMKey(imageHash, result.analysisType);
 	const now = Date.now();

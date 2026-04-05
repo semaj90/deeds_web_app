@@ -296,7 +296,7 @@
         {#if aiLoading}
           <div class="ai-loading">
             <div class="ai-spinner"></div>
-            <span>Analyzing with gemma3-legal...</span>
+            <span>Analyzing with gemma4-legal...</span>
           </div>
         {/if}
 

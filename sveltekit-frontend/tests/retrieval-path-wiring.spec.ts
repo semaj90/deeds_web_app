@@ -69,7 +69,7 @@ vi.mock('$lib/server/ollama.js', () => ({
 		ok: true,
 		json: async () => ({
 			response: 'test response',
-			model: 'gemma3-legal',
+			model: 'gemma4-legal',
 			embedding: new Array(768).fill(0.1),
 		}),
 	})),

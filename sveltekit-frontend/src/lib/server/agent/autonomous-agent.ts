@@ -91,7 +91,7 @@ export class AutonomousAgent {
 		// Initialize Ollama LLM
 		this.llm = new ChatOllama({
 			baseUrl: ENV.OLLAMA_BASE_URL,
-			model: 'gemma3-legal:latest',
+			model: 'gemma4-legal:latest',
 			temperature: this.config.temperature,
 		});
 
@@ -749,7 +749,7 @@ export class AutonomousAgent {
 			toolCount: this.tools.length,
 			maxIterations: this.config.maxIterations,
 			temperature: this.config.temperature,
-			model: 'gemma3-legal:latest',
+			model: 'gemma4-legal:latest',
 			hasACEContext: !!(this.config.userId || this.config.caseId)
 		};
 	}

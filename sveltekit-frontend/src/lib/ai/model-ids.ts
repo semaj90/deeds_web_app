@@ -6,7 +6,7 @@
  *   - Loaded by onnxruntime-web with WebGPU EP (Dawn)
  *
  * Server models (Ollama):
- *   - gemma3-legal:latest for LLM (CUDA RTX)
+ *   - gemma4-legal:latest for LLM (CUDA RTX)
  *   - embeddinggemma:latest for embeddings (768-dim)
  */
 
@@ -37,8 +37,8 @@ export const CLIENT_EMBEDDING_TOKENIZER_PATH = '/embeddinggemma_300m_onnx/tokeni
 
 // ── Server-side models (Ollama + CUDA RTX) ───────────────────────────────
 
-/** gemma3-legal:latest — 12B fine-tuned legal LLM via Ollama */
-export const SERVER_CHAT_MODEL = 'gemma3-legal:latest';
+/** gemma4-legal:latest — Gemma 4 E4B fine-tuned legal LLM via Ollama (GRPO-trained) */
+export const SERVER_CHAT_MODEL = 'gemma4-legal:latest';
 
 /** gemma4:e4b Q4_K_M — 8B params, 131K context, native tool calling + thinking via Ollama */
 export const SERVER_GEMMA4_MODEL = 'gemma4:e4b-it-q4_K_M';

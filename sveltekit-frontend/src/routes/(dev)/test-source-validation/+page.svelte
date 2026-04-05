@@ -218,7 +218,7 @@ function extractRelationships(
 					{caseId}
 					{query}
 					onAnswerGenerated={handleAnswerGenerated}
-					llmProvider="gemma3-legal"
+					llmProvider="gemma4-legal"
 				/>
 
 				{#if kagUpdateStatus}

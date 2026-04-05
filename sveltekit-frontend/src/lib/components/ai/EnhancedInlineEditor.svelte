@@ -10,7 +10,7 @@
 	let {
 		value = $bindable(''),
 		placeholder = 'Start typing to get AI suggestions...',
-		aiModel = 'gemma3-legal',
+		aiModel = 'gemma4-legal',
 		enableAutoComplete = true,
 		enableGrammarCheck = true,
 		enableSemanticSuggestions = true,

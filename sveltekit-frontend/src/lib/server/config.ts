@@ -34,7 +34,7 @@ export const AI_CONFIG = {
 	ollama: {
 	baseUrl: ENV.OLLAMA_BASE_URL,
 		models: {
-	legal: process.env.GEMMA_LEGAL_MODEL || 'gemma3-legal:latest',
+	legal: process.env.GEMMA_LEGAL_MODEL || 'gemma4-legal:latest',
 			embedding: process.env.GEMMA_EMBEDDING_MODEL || 'embeddinggemma:latest',
 			fallback: process.env.EMBEDDING_FALLBACK_MODEL || 'nomic-embed-text'
 		},

@@ -1,5 +1,5 @@
 /**
- * Legal document summarization via Ollama (gemma3-legal).
+ * Legal document summarization via Ollama (gemma4-legal).
  * Generates a concise summary for each uploaded evidence document.
  * Ported from evidence-service/src/services/summarizer.ts
  */
@@ -8,7 +8,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
-const MODEL = 'gemma3-legal:latest';
+const MODEL = 'gemma4-legal:latest';
 
 export async function summarizeDocument(text: string, maxWords: number = 150): Promise<string> {
 	if (!text || text.trim().length < 100) return '';

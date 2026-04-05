@@ -2,7 +2,7 @@
   "success": true,
   "data": {
     "response": "The evidence upload pipeline typically begins with a user submitting evidence files (documents, images, videos) through a web interface or API. These files are then validated for format, size, and potential malware. Successful files are stored in a secure, scalable storage solution (like cloud storage) and assigned a unique identifier. Metadata, such as uploader information, timestamp, and file type, is extracted and associated with the file. Finally, the evidence is indexed and made searchable within a system, often triggering notifications or workflows depending on the context (e.g., legal proceedings, investigations).\n\n\n\n",
-    "model": "gemma3-legal:latest",
+    "model": "gemma4-legal:latest",
     "sessionId": "contextual-cap-test-c",
     "_diagnostics": {
       "routeDurationMs": 27564,

@@ -57,7 +57,7 @@ ${text.slice(0, 4000)}`;
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma3-legal:latest',
+				model: 'gemma4-legal:latest',
 				messages: [
 					{ role: 'system', content: systemPrompt },
 					{ role: 'user', content: userPrompt }
@@ -94,7 +94,7 @@ ${text.slice(0, 4000)}`;
 			legalRelevance: analysis.legalRelevance || '',
 			suggestedTags: Array.isArray(analysis.suggestedTags) ? analysis.suggestedTags : [],
 			evidenceId,
-			model: 'gemma3-legal:latest'
+			model: 'gemma4-legal:latest'
 		});
 	} catch (err) {
 		console.error('[ai/analyze-evidence] Error:', err);

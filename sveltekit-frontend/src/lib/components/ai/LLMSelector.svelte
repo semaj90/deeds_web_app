@@ -36,8 +36,8 @@
 
 	let availableModels = $state<LLMModel[]>([
 		{
-			id: 'gemma3-legal',
-			name: 'gemma3-legal:latest',
+			id: 'gemma4-legal',
+			name: 'gemma4-legal:latest',
 			displayName: 'Gemma3 Legal Specialist',
 			provider: 'ollama',
 			size: '7.3GB',

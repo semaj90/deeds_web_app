@@ -117,7 +117,7 @@ export const POST: RequestHandler = async (event) => {
 
 		const result = await generateCompletion({
 			prompt: userPrompt,
-			model: 'gemma3-legal:latest',
+			model: 'gemma4-legal:latest',
 			systemPrompt: SYSTEM_PROMPT,
 			temperature: 0.4,
 			maxTokens: 4096,
@@ -156,7 +156,7 @@ export const POST: RequestHandler = async (event) => {
 			metadata: {
 				timestamp: new Date().toISOString(),
 				processingTime,
-				model: 'gemma3-legal:latest'
+				model: 'gemma4-legal:latest'
 			}
 		});
 	} catch (err) {

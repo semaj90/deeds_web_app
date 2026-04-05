@@ -7,7 +7,7 @@ import { pool } from '$lib/server/db/client';
 
 const analyzeSchema = z.object({
 	cluster_id: z.number().int().min(1, 'Missing cluster_id'),
-	model: z.string().max(200).optional().default('gemma3-legal'),
+	model: z.string().max(200).optional().default('gemma4-legal'),
 	ace_context: z.boolean().optional().default(true),
 });
 

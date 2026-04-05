@@ -188,7 +188,7 @@
 			answerCitations = data.citations ?? [];
 			answerActionItems = data.action_items ?? [];
 			answerConfidence = data.answer_confidence ?? 0;
-			answerModel = data.model ?? 'gemma3-legal';
+			answerModel = data.model ?? 'gemma4-legal';
 			generationTimeMs = data.generation_time_ms ?? 0;
 
 			pipelineStep = 'complete';
@@ -228,7 +228,7 @@
 	const pipelineSteps = [
 		{ id: 'searching', label: 'RAG Search', desc: 'Embed → Dual Search → Rerank', icon: 'search' },
 		{ id: 'validating', label: 'Source Validation', desc: 'Approve/reject retrieved chunks', icon: 'circle-check' },
-		{ id: 'generating', label: 'LLM Generation', desc: 'gemma3-legal with citations', icon: 'brain' }
+		{ id: 'generating', label: 'LLM Generation', desc: 'gemma4-legal with citations', icon: 'brain' }
 	] as const;
 
 	function getStepStatus(stepId: string): 'pending' | 'active' | 'done' | 'error' {

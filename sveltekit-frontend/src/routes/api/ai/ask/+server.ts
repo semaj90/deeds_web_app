@@ -35,7 +35,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma3-legal:latest',
+				model: 'gemma4-legal:latest',
 				messages: [
 					{ role: 'system', content: systemPrompt },
 					{ role: 'user', content: question }
@@ -51,7 +51,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const data = await res.json();
 		return json({
 			answer: data.message?.content || data.response || '',
-			model: data.model || 'gemma3-legal:latest',
+			model: data.model || 'gemma4-legal:latest',
 		});
 	} catch (err) {
 		console.error('[ai/ask] Error:', err);

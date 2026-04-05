@@ -5,7 +5,7 @@
  *   LOCAL-E2B  (score < 0.3, E2B ready):  Gemma 4 E2B 2.3B via Transformers.js
  *   LOCAL-ONNX (score < 0.3, E2B unready): gemma270m ONNX fallback
  *   RETRIEVAL  (0.3–0.6):    Hybrid client+server — factual queries needing search
- *   SERVER     (score > 0.6): gemma3-legal full pipeline — legal reasoning, drafting
+ *   SERVER     (score > 0.6): gemma4-legal full pipeline — legal reasoning, drafting
  *
  * Health-aware: polls /api/health/capabilities (30s cache) to know which
  * server services are actually available before escalating.
@@ -214,7 +214,7 @@ export interface RouterDecision {
  * Determine whether a user message should be handled:
  *   - locally (ONNX gemma270m)
  *   - via retrieval-hybrid (client embed + server search + local answer)
- *   - via server (Ollama gemma3-legal full RAG pipeline)
+ *   - via server (Ollama gemma4-legal full RAG pipeline)
  */
 export function shouldEscalateToServer(
 	message: string,

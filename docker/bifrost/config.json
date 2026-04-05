@@ -7,7 +7,7 @@
           "name": "ollama-key",
           "value": "dummy",
           "models": [
-            "gemma3-legal:latest",
+            "gemma4-legal:latest",
             "embeddinggemma:latest",
             "gemma3:latest",
             "nomic-embed-text:latest",

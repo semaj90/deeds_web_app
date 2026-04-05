@@ -623,7 +623,7 @@
 				{:else if activeTool === 'graph'}
 					<GraphVisualizationGallery />
 				{:else if activeTool === 'research'}
-					<AutomatedLegalResearch research={{ query: '', jurisdiction: '', case_type: '', research_depth: 'comprehensive', metadata: { research_timestamp: '', model_used: 'gemma3-legal' } }} />
+					<AutomatedLegalResearch research={{ query: '', jurisdiction: '', case_type: '', research_depth: 'comprehensive', metadata: { research_timestamp: '', model_used: 'gemma4-legal' } }} />
 				{:else if activeTool === 'detective'}
 					<ContextualDetectiveBoard caseId={selectedCaseId || ''} initialEvidence={evidencePool} />
 				{:else if activeTool === 'whiteboard'}

@@ -48,7 +48,7 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					cluster_id: cluster.id,
-					model: 'gemma3-legal',
+					model: 'gemma4-legal',
 					ace_context: true
 				})
 			});
@@ -119,7 +119,7 @@
 	<div>
 		<h1 class="text-3xl font-bold text-black tracking-wide uppercase">RAG+KAG Error Pipeline</h1>
 		<p class="text-black/60 mt-2">
-			Select error clusters for LLM analysis (Ollama gemma3-legal) and agentic fix recommendations
+			Select error clusters for LLM analysis (Ollama gemma4-legal) and agentic fix recommendations
 		</p>
 	</div>
 
@@ -173,7 +173,7 @@
 			{#if analyzing}
 				<div class="bg-panel border-2 border-accent rounded-lg p-6 text-center">
 					<div class="text-4xl mb-4 animate-pulse">🧠</div>
-					<p class="text-black font-bold">Analyzing with gemma3-legal...</p>
+					<p class="text-black font-bold">Analyzing with gemma4-legal...</p>
 					<p class="text-black/60 text-sm mt-2">LLM is generating root cause analysis and fix recommendations</p>
 				</div>
 			{:else if analysis && selectedCluster}

@@ -18,7 +18,7 @@ const yorhaChatSchema = z.object({
 });
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-const MODEL = 'gemma3-legal:latest';
+const MODEL = 'gemma4-legal:latest';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });

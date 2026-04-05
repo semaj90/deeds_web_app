@@ -42,7 +42,7 @@ export const POST: RequestHandler = async ({ params, locals }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma3-legal:latest',
+          model: 'gemma4-legal:latest',
           prompt: `Summarize this evidence item for a legal case review. Be concise (2-3 sentences).\n\nEvidence: ${context}`,
           stream: false,
           keep_alive: getChatModelKeepAlive(),
@@ -61,7 +61,7 @@ export const POST: RequestHandler = async ({ params, locals }) => {
       evidenceId,
       suggestedText,
       confidence: 0.85,
-      model: 'gemma3-legal',
+      model: 'gemma4-legal',
       createdAt: new Date().toISOString(),
     });
   } catch (err) {

@@ -17,7 +17,7 @@ export const GET: RequestHandler = async ({ locals }) => {
  service: 'ollama',
  version: '0.11.10',
  url: OLLAMA_BASE,
- model: 'gemma3-legal',
+ model: 'gemma4-legal',
  timestamp: new Date().toISOString(),
  });
 };

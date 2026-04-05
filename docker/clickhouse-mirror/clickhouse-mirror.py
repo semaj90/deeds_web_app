@@ -24,7 +24,7 @@ CLICKHOUSE_PORT = int(os.getenv("CLICKHOUSE_PORT", "8123"))
 CLICKHOUSE_USER = os.getenv("CLICKHOUSE_USER", "default")
 CLICKHOUSE_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD", "clickhouse_password")
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://host.docker.internal:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma3-legal:latest")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma4-legal:latest")
 SYNC_INTERVAL = int(os.getenv("SYNC_INTERVAL", "60"))  # seconds
 
 class ClickHouseMirror:
@@ -51,7 +51,7 @@ class ClickHouseMirror:
         logger.info("✅ Connected to Postgres and ClickHouse")
 
     async def auto_tag_with_ollama(self, text: str, context: str = "legal") -> List[str]:
-        """Auto-tag text using Ollama gemma3-legal model"""
+        """Auto-tag text using Ollama gemma4-legal model"""
         try:
             prompt = f"""Extract 3-5 relevant tags from this {context} text.
 Return ONLY the tags as a comma-separated list, no explanation.

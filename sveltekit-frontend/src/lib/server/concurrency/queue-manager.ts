@@ -23,7 +23,7 @@ export const QueueJobSchema = z.object({
 	entityType: z.enum(['case', 'evidence', 'document', 'user', 'workflow', 'analysis', 'vector_index', 'chain_of_custody']),
 	entityId: z.string(),
 	priority: z.number().min(1).max(10).default(5),
-	payload: z.record(z.any()),
+	payload: z.record(z.string(), z.any()),
 	userId: z.string().optional(),
 	sessionId: z.string().optional(),
 	timeout: z.number().default(30000),
@@ -32,7 +32,7 @@ export const QueueJobSchema = z.object({
 	createdAt: z.date().default(() => new Date()),
 	scheduledFor: z.date().optional(),
 	dependencies: z.array(cuidSchema).default([]),
-	metadata: z.record(z.any()).default({})
+	metadata: z.record(z.string(), z.any()).default({})
 });
 
 export type QueueJob = z.infer<typeof QueueJobSchema>;
@@ -252,8 +252,8 @@ export class QueueManager {
 	 * Document Processing Processor (with OCR and text extraction)
 	 */
 	private async processDocumentProcessing(job: QueueJob): Promise<any> {
-		const { documentId, operations = ['ocr', 'extract', 'classify'] } = job.payload;
-		console.log(`📄 Processing document ${documentId} (operations: ${operations.join(', ')})`);
+		const { documentId, operations = ['ocr', 'extract', 'classify'] } = job.payload as Record<string, any>;
+		console.log(`📄 Processing document ${documentId} (operations: ${(operations as string[]).join(', ')})`);
 		// Simulate document processing pipeline
 		await new Promise(resolve => setTimeout(resolve, 3000));
 		return {
@@ -269,13 +269,13 @@ export class QueueManager {
 	 * Case Synthesis Processor (with LLM integration)
 	 */
 	private async processCaseSynthesis(job: QueueJob): Promise<any> {
-		const { caseId, evidenceIds = [] } = job.payload;
-		console.log(`⚖️ Synthesizing case ${caseId} with ${evidenceIds.length} evidence items`);
+		const { caseId, evidenceIds = [] } = job.payload as Record<string, any>;
+		console.log(`⚖️ Synthesizing case ${caseId} with ${(evidenceIds as any[]).length} evidence items`);
 		// Simulate case synthesis with LLM
 		await new Promise(resolve => setTimeout(resolve, 5000));
 		return {
 			caseId,
-			evidenceCount: evidenceIds.length,
+			evidenceCount: (evidenceIds as any[]).length,
 			synthesis: 'Generated case synthesis...',
 			recommendations: ['Review additional evidence', 'Consider expert testimony'],
 			processedAt: new Date()

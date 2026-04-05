@@ -215,7 +215,7 @@ async function streamOllamaResponse(
 
 	logInference({
 		type: 'llm',
-		model: backend === 'ollama' ? 'gemma3-legal:latest' : backend,
+		model: backend === 'ollama' ? 'gemma4-legal:latest' : backend,
 		backend: backend as 'ollama' | 'tensorrt' | 'triton',
 		latencyMs: Math.round(performance.now() - start),
 		tokenCount,

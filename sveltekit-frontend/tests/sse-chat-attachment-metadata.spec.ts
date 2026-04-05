@@ -826,7 +826,7 @@ describe('/api/sse/chat attachment metadata', () => {
 
     expect(assistantInsertCall.role).toBe('assistant');
     expect(assistantInsertCall.content).toBe('Live attachment answer cites [Source 1].');
-    expect(assistantMetadata.model).toBe('gemma3-legal:latest');
+    expect(assistantMetadata.model).toBe('gemma4-legal:latest');
     expect(assistantMetadata.conversationTurns).toBe(0);
     expect(assistantMetadata.cachedResponse).toBeUndefined();
     expect(assistantMetadata.contextUsed?.ragDocIds).toEqual([
@@ -1295,7 +1295,7 @@ describe('/api/sse/chat attachment metadata', () => {
           query: 'Use the attachment only for this case timeline.',
           response:
             'Improved scoped attachment answer for this case with preserved history [Source 1].',
-          model: 'gemma3-legal:latest',
+          model: 'gemma4-legal:latest',
           context: expect.stringMatching(
             /## Active Case Context[\s\S]*Case-scoped attachment grounding text that must survive retry and preserve citations\./
           ),
@@ -1751,7 +1751,7 @@ describe('/api/sse/chat attachment metadata', () => {
         'High-quality attachment queue publish answer with explicit support [Source 1] and codebase analysis.',
       role: 'assistant',
       metadata: {
-        model: 'gemma3-legal:latest',
+        model: 'gemma4-legal:latest',
         confidence: doneEvent?.confidence,
       },
     });
@@ -2142,7 +2142,7 @@ describe('/api/sse/chat attachment metadata', () => {
           query: 'Use the uploaded attachment to explain this endpoint in the repo.',
           response:
             'High-quality attachment-aware endpoint answer with explicit support [Source 1] and codebase analysis.',
-          model: 'gemma3-legal:latest',
+          model: 'gemma4-legal:latest',
           context: expect.stringMatching(
             /Uploaded attachment text for a live code-aware endpoint answer\.[\s\S]*## Codebase Context/
           ),
@@ -2337,7 +2337,7 @@ describe('/api/sse/chat attachment metadata', () => {
           query: 'Use the attachment for this case and explain the route behavior in the repo.',
           response:
             'High-quality scoped attachment answer with explicit support [Source 1], graph context, and route analysis.',
-          model: 'gemma3-legal:latest',
+          model: 'gemma4-legal:latest',
           context: expect.stringMatching(
             /## Active Case Context[\s\S]*Case-scoped attachment grounding text for a live answer with codebase and graph support\.[\s\S]*## Knowledge Graph Context[\s\S]*## Codebase Context/
           ),
@@ -2500,7 +2500,7 @@ describe('/api/sse/chat attachment metadata', () => {
           query: 'Use the attachment for this case analysis.',
           response:
             'High-quality case-scoped attachment answer with explicit support [Source 1] and enough detail for evaluation.',
-          model: 'gemma3-legal:latest',
+          model: 'gemma4-legal:latest',
           context: expect.stringMatching(
             /## Active Case Context[\s\S]*Case-scoped attachment grounding text for a high-quality supported answer\./
           ),

@@ -147,13 +147,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const ollamaRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: 'gemma3-legal:latest', prompt, stream: true }),
+			body: JSON.stringify({ model: 'gemma4-legal:latest', prompt, stream: true }),
 			signal: AbortSignal.timeout(30_000),
 		});
 
 		if (!ollamaRes.ok || !ollamaRes.body) {
 			return new Response(
-				`data: ${JSON.stringify({ text: 'Ollama unavailable. Check that gemma3-legal is running.' })}\n\n`,
+				`data: ${JSON.stringify({ text: 'Ollama unavailable. Check that gemma4-legal is running.' })}\n\n`,
 				{ headers: { 'Content-Type': 'text/event-stream' } }
 			);
 		}

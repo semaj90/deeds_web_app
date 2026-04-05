@@ -992,7 +992,7 @@ export class ChatSession {
   }
 
   /**
-   * Server SSE inference via /api/sse/chat (Ollama gemma3-legal:latest + RAG).
+   * Server SSE inference via /api/sse/chat (Ollama gemma4-legal:latest + RAG).
    */
   private async _handleServerInference(
     message: string,

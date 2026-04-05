@@ -22,7 +22,7 @@ export function getOllamaModelEndpoint(model: string): string {
     // Ollama typically uses /api/generate or /api/embeddings for models.
     // This example assumes a common pattern, adjust based on actual Ollama API.
     switch (model) {
-        case 'gemma3-legal:latest':
+        case 'gemma4-legal:latest':
             return `${baseUrl}/api/generate`; // Or specific path for generation
 
         case 'embeddinggemma:latest':

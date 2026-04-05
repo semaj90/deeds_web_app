@@ -549,7 +549,7 @@
 					{#if step.id === 'models'}
 						<div class="model-info">
 							<div class="model-row">
-								<span class="model-name">gemma3-legal</span>
+								<span class="model-name">gemma4-legal</span>
 								<span class="model-detail">11.8B params — Legal reasoning</span>
 							</div>
 							<div class="model-row">
@@ -557,7 +557,7 @@
 								<span class="model-detail">307M params — Document search</span>
 							</div>
 							<div class="model-cmds">
-								<code class="model-cmd">ollama pull gemma3-legal:latest</code>
+								<code class="model-cmd">ollama pull gemma4-legal:latest</code>
 								<code class="model-cmd">ollama pull embeddinggemma:latest</code>
 							</div>
 							<p class="model-note">

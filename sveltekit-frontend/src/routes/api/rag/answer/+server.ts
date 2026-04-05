@@ -108,12 +108,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const prompt = `${systemPrompt}${contextBlock}Question: ${query}\n\nProvide a comprehensive legal analysis. Include [Source N] citations where applicable.${include_todos ? ' Also list any recommended action items.' : ''}`;
 
 		// Call Ollama (or Bifrost) for generation
-		const { answerText, genTime, evalCount } = await traceLLM('rag-answer', { model: 'gemma3-legal:latest', prompt: query.slice(0, 500), case_id }, async (gen) => {
+		const { answerText, genTime, evalCount } = await traceLLM('rag-answer', { model: 'gemma4-legal:latest', prompt: query.slice(0, 500), case_id }, async (gen) => {
 			// Route through Bifrost gateway when enabled (gets semantic caching)
 			if (ENV.BIFROST_ENABLED) {
 				const text = await bifrostChat(
 					[{ role: 'user', content: prompt }],
-					'gemma3-legal',
+					'gemma4-legal',
 					{ maxTokens: max_tokens, temperature, timeoutMs: 30_000 }
 				);
 				gen.end({ output: text.slice(0, 1000) });
@@ -124,7 +124,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					model: 'gemma3-legal:latest',
+					model: 'gemma4-legal:latest',
 					prompt,
 					stream: false,
 					options: {
@@ -205,7 +205,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			summary: answerText.slice(0, 200) + (answerText.length > 200 ? '...' : ''),
 			citations,
 			action_items: actionItems,
-			model: 'gemma3-legal:latest',
+			model: 'gemma4-legal:latest',
 			tokens_used: evalCount ?? Math.ceil(answerText.length / 4),
 			generation_time_ms: Math.round(genTime),
 			answer_confidence: answerConfidence,
@@ -216,7 +216,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		// Track token usage (fire-and-forget)
 		trackTokenUsage({
 			endpoint: '/api/rag/answer',
-			model: 'gemma3-legal:latest',
+			model: 'gemma4-legal:latest',
 			completionTokens: evalCount ?? Math.ceil(answerText.length / 4),
 			durationMs: Math.round(genTime),
 		});

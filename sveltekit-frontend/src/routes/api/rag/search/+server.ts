@@ -35,7 +35,7 @@ async function reformulateQuery(query: string, topScore: number): Promise<string
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma3-legal:latest',
+        model: 'gemma4-legal:latest',
         prompt: `Rephrase this legal search query to improve retrieval. Return ONLY the rephrased query, nothing else.\n\nOriginal: ${query.slice(0, 500)}`,
         stream: false,
         keep_alive: getChatModelKeepAlive(),

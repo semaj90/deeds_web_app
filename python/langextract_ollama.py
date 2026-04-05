@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 LangExtract Ollama Service — Direct Ollama API for structured extraction
-Uses gemma3-legal for legal entity extraction with few-shot prompting
+Uses gemma4-legal for legal entity extraction with few-shot prompting
 """
 
 import os
@@ -17,11 +17,11 @@ import uvicorn
 
 # Configuration
 OLLAMA_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-DEFAULT_MODEL = os.getenv("LANGEXTRACT_MODEL", "gemma3-legal:latest")
+DEFAULT_MODEL = os.getenv("LANGEXTRACT_MODEL", "gemma4-legal:latest")
 
 app = FastAPI(
     title="LangExtract Ollama Service",
-    description="Structured extraction using Ollama + gemma3-legal",
+    description="Structured extraction using Ollama + gemma4-legal",
     version="2.1.0"
 )
 

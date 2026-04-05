@@ -68,7 +68,7 @@ Format as JSON:
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma3-legal:latest',
+				model: 'gemma4-legal:latest',
 				prompt: `${acePrompt.systemPrompt}\n\n${summaryPrompt}`,
 				stream: false,
 				format: summaryJsonSchema,

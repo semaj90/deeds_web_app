@@ -44,7 +44,7 @@ export async function POST({ locals }: RequestEvent) {
   try {
     const clusterAnalysis = await runCUDAClustering();
 
-    // 2. Generate summaries with gemma3-legal
+    // 2. Generate summaries with gemma4-legal
     const summaries = await generateClusterSummaries(clusterAnalysis.clusters);
 
     // 3. Update Qdrant tags with cluster info
@@ -127,7 +127,7 @@ async function generateClusterSummaries(clusters: Record<string, (string | numbe
 			LIMIT 10
 		`);
 
-    // Analyze with gemma3-legal
+    // Analyze with gemma4-legal
     const summary = await analyzeClusterWithLLM(parseInt(clusterId), errors.rows);
 
     // Get enhanced tags from Qdrant
@@ -167,7 +167,7 @@ Be concise and actionable.`;
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'gemma3-legal:latest',
+      model: 'gemma4-legal:latest',
       messages: [
         {
           role: 'system',

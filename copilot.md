@@ -128,7 +128,7 @@ Using fast-check with 100+ iterations per property for comprehensive validation.
 - **Ollama-driven analysis:** Uses `OllamaService` for embeddings and completions
 - **Dynamic DB import:** Lazy-loads drizzle to avoid crashes when DB unavailable
 - **Async flow fixed:** Proper handling for embeddings, auto-tags, document chunks
-- **Models:** `gemma3-legal:latest` for LLM, `embeddinggemma:latest` for embeddings
+- **Models:** `gemma4-legal:latest` for LLM, `embeddinggemma:latest` for embeddings
 
 ### Contextual Chat System Verified
 - **chat-store.svelte.ts:** Clean Svelte 5 runes (`$state`, `$derived`, `$derived.by`)
@@ -454,7 +454,7 @@ Error Extraction → Embedding → Neo4j Graph → GPU Clustering
 - **Error Extraction**: Automatic svelte-check integration
 - **Graph Analysis**: Neo4j relationship mapping
 - **GPU Clustering**: CUDA-accelerated K-means
-- **AI Patches**: gemma3-legal model integration
+- **AI Patches**: gemma4-legal model integration
 - **Validation**: Automatic rollback on failure
 - **Self-Healing**: Iterative error reduction
 

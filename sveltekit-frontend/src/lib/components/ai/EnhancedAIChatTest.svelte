@@ -60,7 +60,7 @@ What would you like to explore today?`,
 						timestamp: new Date(),
 						metadata: {
 							provider: 'local',
-							model: 'gemma3-legal-enhanced'
+							model: 'gemma4-legal-enhanced'
 						}
 					}
 				];
@@ -191,7 +191,7 @@ What would you like to explore today?`,
 				timestamp: new Date(),
 				metadata: {
 					provider: 'local',
-					model: 'gemma3-legal-enhanced',
+					model: 'gemma4-legal-enhanced',
 					gpu: 'RTX 3060 Ti'
 				}
 			};
@@ -275,7 +275,7 @@ What would you like to explore today?`,
 				timestamp: new Date(),
 				metadata: {
 					provider: 'local',
-					model: 'gemma3-legal-enhanced'
+					model: 'gemma4-legal-enhanced'
 				}
 			}
 		];

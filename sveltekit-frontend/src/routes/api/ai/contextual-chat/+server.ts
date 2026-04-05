@@ -54,7 +54,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			suggestions: result.suggestions,
 			citations: result.citations,
 			latencyMs: result.latencyMs,
-			model: 'gemma3-legal:latest',
+			model: 'gemma4-legal:latest',
 		});
 	} catch (err) {
 		console.error('[ai/contextual-chat] Error:', err);

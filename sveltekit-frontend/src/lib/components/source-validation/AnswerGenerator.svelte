@@ -20,7 +20,7 @@ let {
 	caseId,
 	query,
 	onAnswerGenerated,
-	llmProvider = 'gemma3-legal'
+	llmProvider = 'gemma4-legal'
 }: AnswerGeneratorProps = $props();
 
 // State

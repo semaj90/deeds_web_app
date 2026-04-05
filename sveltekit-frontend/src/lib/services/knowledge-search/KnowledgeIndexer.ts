@@ -33,7 +33,7 @@ const DEFAULT_CONFIG: KnowledgeIndexerConfig = {
   redisUrl: process.env?.REDIS_URL ?? 'redis://localhost:6379',
   ollamaUrl: process.env?.OLLAMA_URL ?? 'http://localhost:11434',
   embeddingModel: process.env?.EMBEDDING_MODEL ?? 'nomic-embed-text:latest',
-  summaryModel: process.env?.OLLAMA_MODEL ?? 'gemma3-legal:latest'
+  summaryModel: process.env?.OLLAMA_MODEL ?? 'gemma4-legal:latest'
 };
 
 /**
@@ -56,7 +56,7 @@ export class KnowledgeIndexer {
    * Index a single document
    * Flow:
    * 1. Generate 768-dim embedding using embeddinggemma
-   * 2. Generate AI summary using gemma3-legal
+   * 2. Generate AI summary using gemma4-legal
    * 3. Extract entities and tags
    * 4. Compute TF-IDF vector
    * 5. Store in Qdrant: PostgreSQL, MinIO

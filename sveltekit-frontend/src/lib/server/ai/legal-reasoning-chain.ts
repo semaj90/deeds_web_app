@@ -46,7 +46,7 @@ export interface ReasoningChainResult {
 	totalDurationMs: number;
 }
 
-const MODEL = 'gemma3-legal:latest';
+const MODEL = 'gemma4-legal:latest';
 const TIMEOUT_MS = 60_000;
 
 function buildStepPrompt(stepName: string, context: string): string {

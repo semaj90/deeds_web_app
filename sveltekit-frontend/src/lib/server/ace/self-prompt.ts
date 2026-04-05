@@ -15,7 +15,7 @@ import { redis } from '$lib/server/redis.js';
 import type { ACEContext, SelfEvaluation } from './types.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-const MODEL = 'gemma3-legal:latest';
+const MODEL = 'gemma4-legal:latest';
 const EVAL_CACHE_TTL = 3600; // 1 hour
 const QUALITY_THRESHOLD = 0.6;
 

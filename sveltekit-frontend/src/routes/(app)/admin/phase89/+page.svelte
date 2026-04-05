@@ -445,7 +445,7 @@ cluster_id: cluster.cluster_id,
 						<li>📊 Embeddings: embeddinggemma, latest (768-dim)</li>
 						<li>💾 Cache: Redis (7-day TTL)</li>
 						<li>🎯 Clustering: DBSCAN with cosine similarity</li>
-						<li>🧠 Summarization: gemma3-legal</li>
+						<li>🧠 Summarization: gemma4-legal</li>
 					</ul>
 				</div>
 			</section>

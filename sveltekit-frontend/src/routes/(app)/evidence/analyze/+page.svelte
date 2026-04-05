@@ -148,7 +148,7 @@
 					legalRelevance: data.data?.analysis?.legalRelevance ?? 'Unknown',
 					keyFindings: data.data?.analysis?.keyFindings ?? [],
 					recommendations: data.data?.analysis?.recommendations ?? [],
-					model: data.data?.model ?? 'gemma3-legal',
+					model: data.data?.model ?? 'gemma4-legal',
 					processedAt: data.data?.processedAt
 				}
 			};

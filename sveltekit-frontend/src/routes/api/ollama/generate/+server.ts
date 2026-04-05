@@ -5,7 +5,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
 const generateSchema = z.object({
-	model: z.string().max(100).default('gemma3-legal'),
+	model: z.string().max(100).default('gemma4-legal'),
 	prompt: z.string().min(1).max(100000),
 	stream: z.boolean().default(true),
 	options: z

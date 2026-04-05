@@ -37,7 +37,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma3-legal:latest',
+				model: 'gemma4-legal:latest',
 				prompt: `Analyze the following legal document sections. For each section, provide a relevance score (0-1) and brief explanation.
 
 Sections:

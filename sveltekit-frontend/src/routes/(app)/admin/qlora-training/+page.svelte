@@ -49,7 +49,7 @@
 
 	// New job form state
 	let newJob = $state({
-		model: 'gemma3-legal:latest',
+		model: 'gemma4-legal:latest',
 		dataset: 'legal-qa-pairs',
 		epochs: 3,
 		batchSize: 4,
@@ -214,7 +214,7 @@
 							<option value={model}>{model}</option>
 						{/each}
 						{#if availableModels.length === 0}
-							<option value="gemma3-legal:latest">gemma3-legal:latest</option>
+							<option value="gemma4-legal:latest">gemma4-legal:latest</option>
 						{/if}
 					</select>
 				</label>

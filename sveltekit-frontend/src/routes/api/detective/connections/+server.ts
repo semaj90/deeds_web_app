@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 /**
  * Detective Connections SSE Endpoint
  * Streams entity relationship graph generation for case evidence.
- * Uses Ollama gemma3-legal to identify people, orgs, locations,
+ * Uses Ollama gemma4-legal to identify people, orgs, locations,
  * and their connections for the detective connection map.
  */
 import type { RequestHandler } from './$types';
@@ -64,7 +64,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
-						model: 'gemma3-legal:latest',
+						model: 'gemma4-legal:latest',
 						prompt,
 						stream: true,
 						options: { temperature: 0.2, num_predict: 4096 }

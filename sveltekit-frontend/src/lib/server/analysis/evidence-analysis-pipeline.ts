@@ -1,7 +1,7 @@
 /**
  * Evidence Analysis Pipeline
  *
- * Orchestrates: YOLO detection → Redis cache → LLM escalation (gemma3-legal)
+ * Orchestrates: YOLO detection → Redis cache → LLM escalation (gemma4-legal)
  * → graph connection creation → Drizzle analysis cache persist → Qdrant tag update
  *
  * Called from evidence upload route (step 6b) and RabbitMQ evidence.process handler.
@@ -257,7 +257,7 @@ Respond with ONLY valid JSON (no markdown):
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma3-legal:latest',
+        model: 'gemma4-legal:latest',
         prompt,
         stream: false,
         options: { temperature: 0.3, num_predict: 800 },

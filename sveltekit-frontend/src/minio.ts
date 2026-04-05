@@ -46,7 +46,7 @@ export class MinIOStorageService {
         this.config = {
             endPoint: config.endPoint || process.env.MINIO_ENDPOINT || 'localhost',
             port: config.port || Number(process.env.MINIO_PORT) || 9000,
-            useSSL: config.useSSL ?? (process.env.MINIO_USE_SSL === 'true') ?? false,
+            useSSL: config.useSSL ?? (process.env.MINIO_USE_SSL === 'true'),
             accessKey: config.accessKey || process.env.MINIO_ACCESS_KEY || 'minioadmin',
             secretKey: config.secretKey || process.env.MINIO_SECRET_KEY || 'minioadmin',
             region: config.region || process.env.MINIO_REGION || 'us-east-1'
@@ -107,7 +107,7 @@ export class MinIOStorageService {
     async uploadStream(
         bucketName: string,
         objectName: string,
-        stream: NodeJS.ReadableStream,
+        stream: import('stream').Readable,
         size: number,
         options?: UploadOptions
     ): Promise<{ etag: string; versionId?: string }> {

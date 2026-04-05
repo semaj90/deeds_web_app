@@ -57,7 +57,7 @@ function validateAndBuildEnv(): EnvConfig {
 
 	const cfg: EnvConfig = {
 		OLLAMA_URL: RAW_ENV?.OLLAMA_URL ?? 'http://localhost:11434',
-		OLLAMA_MODEL: RAW_ENV?.OLLAMA_MODEL ?? 'gemma3-legal:latest',
+		OLLAMA_MODEL: RAW_ENV?.OLLAMA_MODEL ?? 'gemma4-legal:latest',
 		OPENAI_API_KEY: RAW_ENV?.OPENAI_API_KEY ?? '',
 		DATABASE_URL: RAW_ENV?.DATABASE_URL ?? '',
 		PUBLIC_APP_URL: RAW_ENV?.PUBLIC_APP_URL ?? 'http://localhost:5173',

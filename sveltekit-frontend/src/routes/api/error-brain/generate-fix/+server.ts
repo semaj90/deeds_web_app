@@ -86,7 +86,7 @@ Respond in JSON format:
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma3-legal:latest',
+				model: 'gemma4-legal:latest',
 				prompt,
 				format: fixResponseJsonSchema,
 				stream: false,
@@ -128,7 +128,7 @@ Respond in JSON format:
 				filePath,
 				errorMessage,
 				sourcesUsed: sources.length,
-				model: 'gemma3-legal:latest',
+				model: 'gemma4-legal:latest',
 				generatedAt: new Date().toISOString(),
 				tokenCount: data.eval_count ?? null,
 				durationMs: data.total_duration ? Math.round(data.total_duration / 1e6) : null,
@@ -140,7 +140,7 @@ Respond in JSON format:
 			success: false,
 			error: 'Fix generation failed — Ollama unavailable',
 			fix: null,
-			metadata: { filePath, errorMessage, model: 'gemma3-legal:latest' },
+			metadata: { filePath, errorMessage, model: 'gemma4-legal:latest' },
 		}, { status: 503 });
 	}
 };

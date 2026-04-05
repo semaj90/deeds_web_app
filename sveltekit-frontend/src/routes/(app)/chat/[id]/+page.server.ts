@@ -10,7 +10,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { ollamaFetch } from '$lib/server/ollama.js';
 
 const OLLAMA_URL = getOllamaUrl();
-const OLLAMA_MODEL = process.env?.OLLAMA_MODEL ?? 'gemma3-legal:latest';
+const OLLAMA_MODEL = process.env?.OLLAMA_MODEL ?? 'gemma4-legal:latest';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	let history: any[] = [];

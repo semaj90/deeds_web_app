@@ -46,7 +46,7 @@ export class OllamaService {
 		this.config = {
 			url: config?.url ?? process.env?.OLLAMA_URL ?? 'http://localhost:11434',
 			embeddingModel: config?.embeddingModel ?? process.env?.OLLAMA_EMBEDDING_MODEL ?? 'embeddinggemma:latest',
-			generationModel: config?.generationModel ?? process.env?.OLLAMA_MODEL ?? 'gemma3-legal:latest',
+			generationModel: config?.generationModel ?? process.env?.OLLAMA_MODEL ?? 'gemma4-legal:latest',
 			timeout: config?.timeout ?? 30000,
 			maxRetries: config?.maxRetries ?? 3,
 			retryDelay: config?.retryDelay ?? 1000
@@ -58,7 +58,7 @@ export class OllamaService {
 		return {
 			url: process.env?.OLLAMA_URL ?? 'http://localhost:11434',
 			embeddingModel: process.env?.OLLAMA_EMBEDDING_MODEL ?? 'embeddinggemma:latest',
-			generationModel: process.env?.OLLAMA_MODEL ?? 'gemma3-legal:latest',
+			generationModel: process.env?.OLLAMA_MODEL ?? 'gemma4-legal:latest',
 			timeout: 30000,
 			maxRetries: 3,
 			retryDelay: 1000

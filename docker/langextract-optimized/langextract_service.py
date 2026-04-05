@@ -159,7 +159,7 @@ JSON array:"""
             response = await client.post(
                 f"{OLLAMA_URL}/api/generate",
                 json={
-                    "model": "gemma3-legal:latest",
+                    "model": "gemma4-legal:latest",
                     "prompt": prompt,
                     "stream": False,
                     "options": {"num_predict": 1000, "temperature": 0.1}
@@ -324,7 +324,7 @@ JSON array:"""
             structure=structure,
             entities=unique_entities,
             metadata={
-                'model': SPACY_MODEL if not request.use_ollama_ner else 'ollama/gemma3-legal',
+                'model': SPACY_MODEL if not request.use_ollama_ner else 'ollama/gemma4-legal',
                 'entity_count': len(unique_entities),
                 'section_count': len(structure['sections'])
             },

@@ -70,7 +70,7 @@ export const userAiQueries = pgTable('user_ai_queries', {
  errorMessage: text('error_message'),
  processingTimeMs: integer('processing_time_ms'),
  tokensUsed: integer('tokens_used'),
- model: varchar('model', { length: 100 }).default('gemma3-legal').notNull(),
+ model: varchar('model', { length: 100 }).default('gemma4-legal').notNull(),
  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
 });
 

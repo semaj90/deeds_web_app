@@ -43,7 +43,7 @@
       "type": "object",
       "properties": {
         "generate_summaries": { "type": "boolean", "default": true },
-        "model": { "type": "string", "default": "gemma3-legal:latest" },
+        "model": { "type": "string", "default": "gemma4-legal:latest" },
         "update_qdrant": { "type": "boolean", "default": true }
       },
       "additionalProperties": false

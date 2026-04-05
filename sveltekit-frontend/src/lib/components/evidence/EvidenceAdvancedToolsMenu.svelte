@@ -122,7 +122,7 @@
 									verificationResults={{ aiAnalysisScore: 0.94, tamperedIndicators: [] }}
 									originalHash={firstEvidence?.id ?? ''}
 									currentHash={firstEvidence?.id ?? ''}
-									aiAnalysis={{ riskLevel: 'low', confidence: 0.96, models: ['gemma3-legal'] }}
+									aiAnalysis={{ riskLevel: 'low', confidence: 0.96, models: ['gemma4-legal'] }}
 									showDetails={true}
 								/>
 							{:else if section.id === 'relationships'}

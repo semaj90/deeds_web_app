@@ -49,7 +49,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma3-legal:latest',
+				model: 'gemma4-legal:latest',
 				messages: [
 					{ role: 'system', content: 'You are a helpful legal AI assistant.' },
 					...(body.messages || [{ role: 'user', content: userContent }])
@@ -73,7 +73,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		trackTokenUsage({
 			userId: locals.user?.id,
 			endpoint: '/api/chat',
-			model: data.model || 'gemma3-legal:latest',
+			model: data.model || 'gemma4-legal:latest',
 			promptTokens: tokens.promptTokens,
 			completionTokens: tokens.completionTokens,
 			durationMs,
@@ -91,7 +91,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					sessionId: 'api-chat',
 					message: responseText.slice(0, 5000),
 					role: 'assistant',
-					metadata: { model: data.model || 'gemma3-legal:latest' },
+					metadata: { model: data.model || 'gemma4-legal:latest' },
 				});
 			})
 			.catch(() => {});
@@ -99,7 +99,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json({
 			message: responseText,
 			response: responseText,
-			model: data.model || 'gemma3-legal:latest',
+			model: data.model || 'gemma4-legal:latest',
 			tokensUsed: tokens.promptTokens + tokens.completionTokens,
 			gpuLease: lease ? { backend: lease.backend, expiresAt: lease.expiresAt } : null
 		});

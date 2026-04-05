@@ -60,7 +60,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
-						model: 'gemma3-legal:latest',
+						model: 'gemma4-legal:latest',
 						prompt: `${systemPrompts[type]}\n\nEvidence text:\n${text.slice(0, 8000)}`,
 						stream: false,
 						options: { temperature: 0.3 }

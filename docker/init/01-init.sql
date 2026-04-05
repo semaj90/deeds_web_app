@@ -303,7 +303,7 @@ VALUES (
 -- Insert AI engine status (prevents AI API 500s)
 INSERT INTO ai_engine_status (engine_name, is_online, version, capabilities)
 VALUES
-  ('gemma3-legal', true, '3.0.0', '{"analysis": true, "chat": true, "embeddings": true}'),
+  ('gemma4-legal', true, '3.0.0', '{"analysis": true, "chat": true, "embeddings": true}'),
   ('cuda-gpu-server', true, '1.2.0', '{"inference": true, "vectorization": true}')
 ON CONFLICT (engine_name) DO UPDATE SET
   is_online = EXCLUDED.is_online,

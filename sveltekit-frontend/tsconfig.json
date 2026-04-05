@@ -92,33 +92,27 @@
     "src/lib/workers/queue-worker.ts",
     "src/lib/features/evidence-command-center/**",
 
-    // ── Corrupted store files ──
-    "src/lib/stores/machines/**",
-
     // ── Corrupted individual lib/ files (verified exist) ──
     "src/lib/utils/simd-markdown-parser.ts",
-    "src/lib/index.ts",
-    "src/lib/__tests__/**",
     "src/lib/utils/dynamic-imports.ts",
-    "src/mcp-gpu-orchestrator.ts",
-    "src/minio.ts",
 
     // ── Server: corrupted individual files (verified exist) ──
     "src/lib/server/clients/ollama.ts",
     "src/lib/server/messaging/rabbitmq.ts",
     "src/lib/server/api/**",
     "src/lib/server/error-brain/**",
-    "src/lib/server/pdf/**",
-    "src/lib/server/rabbitmq/**",
-    "src/lib/server/concurrency/**",
+    // ── Batch 1: small server dirs (un-excluded, verified clean) ──
+    // "src/lib/server/pdf/**",        // 2 files — clean
+    // "src/lib/server/rabbitmq/**",    // 1 file — clean
+    // "src/lib/server/concurrency/**", // 2 files — clean
+    // "src/lib/server/storage/**",     // 2 files — clean
+    // "src/lib/server/langextract/**", // 1 file — clean
+    // "src/lib/server/phase72/**",     // 3 files — clean
+    // "src/lib/server/pgai/**",        // 3 files — clean
     "src/lib/server/evidence/**",
     "src/lib/server/graph/**",
     "src/lib/server/rag/**",
-    "src/lib/server/storage/**",
     "src/lib/server/utils/**",
-    "src/lib/server/langextract/**",
-    "src/lib/server/phase72/**",
-    "src/lib/server/pgai/**",
 
     // ── Server: corrupted individual files (verified exist) ──
     "src/lib/server/minio/client.ts",
@@ -140,21 +134,11 @@
     "src/lib/server/mcp/multi-core-integration.ts",
 
     // ── Corrupted component files (verified exist) ──
-    "src/lib/components/editor/RichTextEditor.svelte",
-    "src/lib/components/editor/index.ts",
-    "src/lib/components/ui/ContextMenuTrigger.svelte",
-    "src/lib/components/ui/DialogWrapper.svelte",
-    "src/lib/components/ui/GoldenLayout.svelte",
     "src/lib/components/ui/enhanced-bits.ts",
-    "src/lib/components/canvas/CollaborativeEvidenceCanvas.svelte",
-    "src/lib/components/DocumentUploadMachineIntegration.svelte",
 
     // ── Routes ──
     "src/routes/test-*/**",
     "src/routes/rag-*/**",
-    "src/routes/(app)/admin/phase89/**",
-    "src/routes/knowledge/**",
-    "src/routes/indexing/**",
-    "src/routes/(dev)/**"
+    "src/routes/(app)/admin/phase89/**"
   ]
 }

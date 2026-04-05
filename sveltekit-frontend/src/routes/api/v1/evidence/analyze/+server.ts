@@ -40,7 +40,7 @@ ${textToAnalyze.slice(0, 2000)}`;
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma3-legal:latest',
+				model: 'gemma4-legal:latest',
 				messages: [
 					{ role: 'system', content: 'You are a legal evidence analyst. Extract structured data from evidence.' },
 					{ role: 'user', content: prompt }
@@ -60,7 +60,7 @@ ${textToAnalyze.slice(0, 2000)}`;
 			analysis: data.message?.content || '',
 			evidenceId: evidenceId || null,
 			type: type || 'unknown',
-			model: 'gemma3-legal:latest',
+			model: 'gemma4-legal:latest',
 			timestamp: new Date().toISOString()
 		});
 	} catch (err) {

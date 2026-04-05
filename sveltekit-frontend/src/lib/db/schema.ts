@@ -1,6 +1,6 @@
 /**
  * Legal AI Database Schema with Drizzle ORM
- * Optimized for pgvector embeddings and gemma3-legal:latest integration
+ * Optimized for pgvector embeddings and gemma4-legal:latest integration
  * Production-ready schema for SvelteKit 2 + TensorRT-LLM stack
  */
 import {
@@ -29,7 +29,7 @@ export const documents = pgTable(
         content: text('content').notNull(),
         documentType: text('document_type').notNull(), // 'contract', 'brief', 'evidence', 'correspondence'
 
-        // Vector embeddings from gemma3-legal:latest (512 dimensions)
+        // Vector embeddings from gemma4-legal:latest (512 dimensions)
         embedding: vector('embedding', { dimensions: 512 }).notNull(),
 
         // Legal metadata
@@ -44,7 +44,7 @@ export const documents = pgTable(
 
         // Performance and versioning
         processingTimeMs: real('processing_time_ms'),
-        modelVersion: text('model_version').default('gemma3-legal:latest'),
+        modelVersion: text('model_version').default('gemma4-legal:latest'),
         documentHash: text('document_hash'), // SHA-256 for duplicate detection
 
         // File metadata
@@ -124,7 +124,7 @@ export const legalAnalysisCache = pgTable(
         analysisEmbedding: vector('analysis_embedding', { dimensions: 512 }),
 
         // Metadata
-        modelVersion: text('model_version').default('gemma3-legal:latest'),
+        modelVersion: text('model_version').default('gemma4-legal:latest'),
         processingTimeMs: real('processing_time_ms'),
         tokenCount: real('token_count'),
 
@@ -331,7 +331,7 @@ export const personsOfInterest = pgTable(
 
         // Metadata
         confidence: real('confidence'), // AI confidence score 0.0-1.0
-        modelVersion: text('model_version').default('gemma3-legal'),
+        modelVersion: text('model_version').default('gemma4-legal'),
         generatedAt: timestamp('generated_at'),
         lastUpdated: timestamp('last_updated').defaultNow(),
 

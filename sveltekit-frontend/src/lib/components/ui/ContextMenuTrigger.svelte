@@ -1,19 +1,16 @@
 <script lang="ts">
-  // Replaced melt with bits-ui components
-  import { setContext } from 'svelte';
-  interface Props {
-    children?: import('svelte').Snippet;
-  }
-  let { children }: Props = $props();
-  // Create the context menu and set it in context for child components
-  const contextMenu = createContextMenu();
-  setContext('contextMenu', contextMenu);
-  const { elements } = contextMenu;
-  const { trigger } = element;
+	import type { Snippet } from 'svelte';
+
+	interface Props {
+		class?: string;
+		children?: Snippet;
+	}
+
+	let { class: className = '', children }: Props = $props();
 </script>
 
-<div>
-  {@render children?.()}
+<div class="context-menu-trigger {className}" role="button" tabindex="0">
+	{#if children}
+		{@render children()}
+	{/if}
 </div>
-
-

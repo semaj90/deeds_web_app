@@ -7,7 +7,7 @@
  *
  * Inference path:
  *   1. Triton VLM ensemble (SigLIP → Projector → Gemma3) — fastest when available
- *   2. Ollama multimodal (gemma3-legal + images[]) — always-available fallback
+ *   2. Ollama multimodal (gemma4-legal + images[]) — always-available fallback
  *
  * Resizes images to 896×896 (Gemma3 SigLIP native resolution) before inference.
  */
@@ -178,7 +178,7 @@ async function inferOllamaVLM(
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: ENV.GEMMA4_MODEL ?? 'gemma3-legal:latest',
+				model: ENV.GEMMA4_MODEL ?? 'gemma4-legal:latest',
 				prompt,
 				images: [base64Image],
 				stream: false,
@@ -267,7 +267,7 @@ export async function analyzeEvidenceImage(input: VLMAnalysisInput): Promise<VLM
 	if (!responseText) {
 		responseText = await inferOllamaVLM(base64Image, prompt, maxTokens);
 		if (responseText) {
-			model = 'gemma3-legal (ollama)';
+			model = 'gemma4-legal (ollama)';
 			console.log(`[VLM] Ollama inference complete for ${input.fileName}`);
 		}
 	}

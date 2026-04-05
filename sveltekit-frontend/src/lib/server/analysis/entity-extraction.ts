@@ -9,7 +9,7 @@ import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
 
-const MODEL = 'gemma3-legal:latest';
+const MODEL = 'gemma4-legal:latest';
 
 /** Zod schema for structured entity extraction response — drives GBNF grammar */
 const entityResponseSchema = z.object({

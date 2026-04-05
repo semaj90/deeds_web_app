@@ -841,7 +841,7 @@ export class RabbitMQManager extends EventEmitter {
       // Stage 2: Direct Ollama LLM call (no Bifrost — single Ollama request)
       const { ollamaFetch } = await import('../ollama.js');
       const { ENV } = await import('../env.server.js');
-      const MODEL = 'gemma3-legal:latest';
+      const MODEL = 'gemma4-legal:latest';
       const maxTokens = data.maxTokens ?? 2048;
       const temperature = data.temperature ?? 0.3;
 

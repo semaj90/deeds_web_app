@@ -1,6 +1,10 @@
 import type { CaseSynthesis } from '$lib/server/cases/caseSynthesis';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
+interface ExtendedSynthesis extends CaseSynthesis {
+    analysis?: string;
+}
+
 interface CaseData {
     id: string;
 	title: string;
@@ -11,7 +15,7 @@ interface CaseData {
 
 interface PacketData {
     caseData: CaseData;
-	synthesis: CaseSynthesis;
+	synthesis: ExtendedSynthesis;
 }
 
 /**
@@ -24,7 +28,7 @@ export async function generateLegalPacketPDF(data: PacketData): Promise<Uint8Arr
     // Create new PDF document
     const pdfDoc = await PDFDocument.create();
     const font = await pdfDoc.embedFont(StandardFonts.TimesRoman);
-    const boldFont = await pdfDoc.embedFont(StandardFonts.TimesBold);
+    const boldFont = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
 
     // Add title page
     const titlePage = pdfDoc.addPage();

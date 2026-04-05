@@ -37,7 +37,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'gemma3-legal:latest',
+            model: 'gemma4-legal:latest',
             prompt: `Write a brief forensic analysis report (3-4 sentences) for this evidence item:\nTitle: ${item.title}\nType: ${item.type ?? item.evidenceType ?? 'unknown'}\nDescription: ${item.description ?? 'N/A'}\nSource: ${item.source ?? 'N/A'}`,
             stream: false,
             keep_alive: getChatModelKeepAlive(),

@@ -50,7 +50,7 @@ describe('extractOllamaTokens', () => {
 		const result = extractOllamaTokens({
 			prompt_eval_count: 150,
 			eval_count: 287,
-			model: 'gemma3-legal:latest',
+			model: 'gemma4-legal:latest',
 		});
 		expect(result).toEqual({
 			promptTokens: 150,
@@ -60,7 +60,7 @@ describe('extractOllamaTokens', () => {
 
 	it('returns 0 for missing token fields', () => {
 		const result = extractOllamaTokens({
-			model: 'gemma3-legal:latest',
+			model: 'gemma4-legal:latest',
 			response: 'hello',
 		});
 		expect(result).toEqual({
@@ -120,7 +120,7 @@ describe('trackTokenUsage', () => {
 		expect(() => {
 			trackTokenUsage({
 				endpoint: '/api/chat',
-				model: 'gemma3-legal:latest',
+				model: 'gemma4-legal:latest',
 				promptTokens: 100,
 				completionTokens: 200,
 			});
@@ -131,7 +131,7 @@ describe('trackTokenUsage', () => {
 		expect(() => {
 			trackTokenUsage({
 				endpoint: '/api/rag/answer',
-				model: 'gemma3-legal:latest',
+				model: 'gemma4-legal:latest',
 			});
 		}).not.toThrow();
 	});
@@ -141,7 +141,7 @@ describe('trackTokenUsage', () => {
 			trackTokenUsage({
 				userId: '123e4567-e89b-12d3-a456-426614174000',
 				endpoint: '/api/synthesis/generate',
-				model: 'gemma3-legal:latest',
+				model: 'gemma4-legal:latest',
 				promptTokens: 500,
 				completionTokens: 1000,
 				durationMs: 2500,
@@ -156,10 +156,10 @@ describe('TokenUsageParams type checks', () => {
 	it('requires endpoint and model', () => {
 		const params: TokenUsageParams = {
 			endpoint: '/api/chat',
-			model: 'gemma3-legal:latest',
+			model: 'gemma4-legal:latest',
 		};
 		expect(params.endpoint).toBe('/api/chat');
-		expect(params.model).toBe('gemma3-legal:latest');
+		expect(params.model).toBe('gemma4-legal:latest');
 		expect(params.promptTokens).toBeUndefined();
 		expect(params.completionTokens).toBeUndefined();
 	});

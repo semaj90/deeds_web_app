@@ -31,7 +31,7 @@
 - **Root cause**: `wget -q --spider` sends HEAD request which Bifrost rejects (exit code 8)
 - **Fix**: Changed healthcheck in `docker-compose.yml` to `wget -q -O /dev/null` + added `start_period: 10s`
 - Verified: `/health` returns `{"status":"ok"}`, `/v1/chat/completions` routes to Ollama successfully
-- **Status: HEALTHY** — chat completion confirmed (gemma3-legal responded "Hi!")
+- **Status: HEALTHY** — chat completion confirmed (gemma4-legal responded "Hi!")
 
 ### 5. Langfuse SDK Wiring Verification
 - **10/10 trace wrappers** defined in `langfuse.ts` (429 lines)

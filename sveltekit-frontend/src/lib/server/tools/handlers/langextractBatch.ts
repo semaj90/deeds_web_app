@@ -115,7 +115,7 @@ async function fetchDocumentContent(url: string, textRef: string): Promise<strin
 }
 
 async function langextractBatchHandler(request: LangExtractBatchRequest): Promise<ToolResult<LangExtractResult>> {
-  const model = request.options?.model ?? 'gemma3-legal:latest';
+  const model = request.options?.model ?? 'gemma4-legal:latest';
   const timeout = request.options?.timeout_ms ?? 30000;
 
   const extractions: Array<{

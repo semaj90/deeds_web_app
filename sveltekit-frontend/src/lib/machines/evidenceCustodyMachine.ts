@@ -182,7 +182,7 @@ export const evidenceCustodyMachine = setup({
         2500: {
           target: 'collaboration',
           actions: assign(({ context }) => {
-            const analysis = { riskLevel: 'low', confidence: 0.92, models: ['gemma3-legal'] };
+            const analysis = { riskLevel: 'low', confidence: 0.92, models: ['gemma4-legal'] };
             return {
               progress: 50,
               workflowStage: 'collaboration',
@@ -194,7 +194,7 @@ export const evidenceCustodyMachine = setup({
                 annotations: [],
               },
               activeCollaborators: [context.userId],
-              custodyEvents: [...context.custodyEvents, createCustodyEvent('analysis', context.userId, { aiAnalysis: analysis, models: ['gemma3-legal'] })],
+              custodyEvents: [...context.custodyEvents, createCustodyEvent('analysis', context.userId, { aiAnalysis: analysis, models: ['gemma4-legal'] })],
             };
           }),
         },

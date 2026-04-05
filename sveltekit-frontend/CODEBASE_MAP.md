@@ -406,7 +406,7 @@ simd-bridge/cpp/
 5. Dual storage: pgvector `evidence_vectors` + Qdrant `evidence_items`
 6. Entity extraction (EMAIL, PHONE, DATE, CITATION, STATUTE, MONEY)
 7. Forensic pattern detection (SSN, CC, contact density, legal keywords)
-8. Summarization via Ollama gemma3-legal (non-fatal)
+8. Summarization via Ollama gemma4-legal (non-fatal)
 9. **GPU Background Analysis** (fire-and-forget) — similarity, clustering, case embedding via LibTorch CUDA
 ### Active Go Microservice Entry Points
 | Service | Port | Protocol | Purpose |
@@ -431,7 +431,7 @@ simd-bridge/cpp/
 |-----------|--------|---------|
 | RTX 3060 Ti | ACTIVE | 8192 MiB VRAM, driver 580.88 |
 | Ollama (native) | RUNNING | Port 11434, GPU, 4 models loaded |
-| gemma3-legal | LOADED | 11.8B Q4_K_M (7.3GB) |
+| gemma4-legal | LOADED | 11.8B Q4_K_M (7.3GB) |
 | embeddinggemma | LOADED | 307M BF16 (622MB, 768-dim) |
 | TRT-LLM | AVAILABLE | API routes exist, engine not built |
 ---
@@ -468,7 +468,7 @@ Client Router (client-router.ts)
   │   ├── Client GPU reranks with cosine similarity
   │   └── Falls back to server if local answer < confidence
   │
-  └── COMPLEX (score > 0.6): gemma3-legal server — full pipeline
+  └── COMPLEX (score > 0.6): gemma4-legal server — full pipeline
       ├── RAG+KAG+DAG (dual search, graph-hop, doc context)
       ├── Entity extraction + forensic detection
       ├── Citation-grounded answers

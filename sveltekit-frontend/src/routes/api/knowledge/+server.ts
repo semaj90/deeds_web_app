@@ -33,7 +33,7 @@ const OLLAMA_URL_VAR = getOllamaUrl();
 const GEMINI_API_KEY = ENV.GEMINI_API_KEY;
 
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
-const LOCAL_LLM = 'gemma3-legal:latest';
+const LOCAL_LLM = 'gemma4-legal:latest';
 
 /**
  * Extract text from various document formats
@@ -371,7 +371,7 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
       const geminiData = await geminiRes.json();
       response = geminiData.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
     } else {
-      llmUsed = 'gemma3-legal:latest';
+      llmUsed = 'gemma4-legal:latest';
       const ollamaRes = await ollamaFetch(`${OLLAMA_URL_VAR}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

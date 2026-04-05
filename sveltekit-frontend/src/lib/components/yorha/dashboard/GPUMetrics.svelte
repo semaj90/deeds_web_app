@@ -5,7 +5,7 @@
   // - WebGPU Compute Status: DeedsGPUCompute pipeline status (shader compilation, buffer alloc, dispatch count)
   // - ONNX Inference Monitor: Model load time, inference latency, token/s, session backend (WebGPU/WASM/CPU)
   // - Triton/TRT-LLM Inference: Port 8099 health, batch queue depth, INT4 throughput, model versions
-  // - LLM Eval Dashboard: gemma3-legal response quality metrics, hallucination rate, citation accuracy
+  // - LLM Eval Dashboard: gemma4-legal response quality metrics, hallucination rate, citation accuracy
   // - Admin Testing: One-click inference benchmarks, A/B model comparison, GPU memory profiling
 
   /** Real WebGPU capabilities detected from the browser */

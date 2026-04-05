@@ -314,7 +314,7 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					message,
-					model: 'gemma3-legal:latest',
+					model: 'gemma4-legal:latest',
 					conversationId
 				}),
 				signal: controller.signal

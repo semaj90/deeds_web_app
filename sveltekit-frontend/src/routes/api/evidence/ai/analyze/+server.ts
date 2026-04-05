@@ -36,7 +36,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma3-legal:latest',
+				model: 'gemma4-legal:latest',
 				prompt: `Analyze this evidence item and provide: 1) A brief analysis of its legal significance, 2) Suggestions for further investigation.
 
 Evidence type: ${node.type ?? 'unknown'}

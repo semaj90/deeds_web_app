@@ -364,7 +364,7 @@
 						<div class="settings-form">
 							<div class="form-field">
 								<label>Active Model</label>
-								<select><option>gemma3-legal:latest (11.8B)</option><option>llama3:8b</option></select>
+								<select><option>gemma4-legal:latest (11.8B)</option><option>llama3:8b</option></select>
 							</div>
 							<div class="form-field">
 								<label>Temperature</label>

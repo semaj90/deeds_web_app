@@ -411,7 +411,7 @@ function setupToolHandlers() {
             },
             useAI: {
               type: 'boolean',
-              description: 'Use AI (Ollama gemma3-legal) to generate case-specific content',
+              description: 'Use AI (Ollama gemma4-legal) to generate case-specific content',
               default: false,
             },
           },
@@ -516,12 +516,12 @@ function setupToolHandlers() {
       },
       // ─────────────────────────────────────────────────────────────────────
       // LangExtract Tools — Google's official structured extraction library
-      // Uses local Ollama (gemma3-legal) instead of Gemini API
+      // Uses local Ollama (gemma4-legal) instead of Gemini API
       // ─────────────────────────────────────────────────────────────────────
       {
         name: 'langextract:legal',
         description:
-          'Extract structured legal entities from text using Google LangExtract + gemma3-legal. Returns parties (plaintiff/defendant), dates, citations, money amounts, statutes, obligations with exact text locations for source grounding.',
+          'Extract structured legal entities from text using Google LangExtract + gemma4-legal. Returns parties (plaintiff/defendant), dates, citations, money amounts, statutes, obligations with exact text locations for source grounding.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -1171,7 +1171,7 @@ function setupToolHandlers() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              model: process.env.LLM_MODEL || 'gemma3-legal:latest',
+              model: process.env.LLM_MODEL || 'gemma4-legal:latest',
               prompt: aceQuery,
               system: acePrompt.systemPrompt,
               stream: false,

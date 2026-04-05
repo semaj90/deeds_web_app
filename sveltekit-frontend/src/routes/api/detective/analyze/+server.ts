@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 /**
  * Detective Analysis SSE Endpoint
  * Streams LLM-powered evidence analysis results in real-time.
- * Uses Ollama gemma3-legal for entity extraction, connection mapping,
+ * Uses Ollama gemma4-legal for entity extraction, connection mapping,
  * anomaly detection, and timeline gap analysis.
  */
 import type { RequestHandler } from './$types';
@@ -122,7 +122,7 @@ async function streamOllamaAnalysis(
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
-			model: 'gemma3-legal:latest',
+			model: 'gemma4-legal:latest',
 			prompt,
 			stream: true,
 			options: { temperature: 0.3, num_predict: 2048 }

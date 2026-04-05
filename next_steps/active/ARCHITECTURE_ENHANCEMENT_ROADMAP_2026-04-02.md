@@ -28,7 +28,7 @@ User Query
     ├─► Bifrost Gateway (semantic cache, Go :3040, disabled by default)
     │       └── Redis-backed semantic similarity cache (28x speedup)
     │
-    ├─► Ollama gemma3-legal:latest (RTX 3060 Ti, Flash Attention, Q8_0 KV)
+    ├─► Ollama gemma4-legal:latest (RTX 3060 Ti, Flash Attention, Q8_0 KV)
     │       └── Structured output via GBNF grammar
     │
     ├─► ACE Self-Evaluation (async via RabbitMQ → Redis → /api/synthesis/evaluation/[id])
@@ -101,7 +101,7 @@ User Query
 **Current state**: Archived notebook (`phase77-unsloth-finetuning.ipynb`), conversion scripts in `deeds_labs/`.
 
 **What needs to happen**:
-1. **Fine-tune gemma3-legal with legal corpus** via Unsloth 4-bit QLoRA
+1. **Fine-tune gemma4-legal with legal corpus** via Unsloth 4-bit QLoRA
 2. **Merge LoRA adapters** back into base model weights
 3. **Export to GGUF** for Ollama consumption
 4. **Validate** legal domain accuracy vs base model
@@ -124,7 +124,7 @@ legal_corpus (PostgreSQL + Qdrant chunks)
     │     └── llama.cpp convert-hf-to-gguf.py
     │
     └─► Create Ollama Modelfile + push
-          └── ollama create gemma3-legal-finetuned -f Modelfile
+          └── ollama create gemma4-legal-finetuned -f Modelfile
 ```
 
 **Dependencies**: Unsloth (pip), CUDA 13.0, 8GB+ VRAM, ~2-4 hours training

@@ -27,7 +27,7 @@ See `memory/ide-linter-workarounds.md` for full details.
 - **Server Cache**: Redis (SSR pages + sessions)
 - **Database**: PostgreSQL 16 + Drizzle ORM 0.44 + pgvector
 - **Vector DB**: Qdrant (GPU-accelerated)
-- **AI Models**: Ollama (`embeddinggemma:latest` + `gemma3-legal:latest`)
+- **AI Models**: Ollama (`embeddinggemma:latest` + `gemma4-legal:latest`)
 - **Client AI**: ONNX Runtime (WebGPU → WASM SIMD → CPU) + gemma 270M quantized
 - **Real-Time**: Server-Sent Events (SSE)
 - **State Machines**: XState v5 (client orchestration) + RabbitMQ (server async)
@@ -50,7 +50,7 @@ Client Router (src/lib/ai/client-router.ts)
   │   └─ Auto-escalate on failure → SERVER
   │
   └─ Legal/complex query → SERVER Ollama
-      ├─ LLM: gemma3-legal:latest
+      ├─ LLM: gemma4-legal:latest
       ├─ Embeddings: embeddinggemma:latest (768-dim)
       └─ SSE stream via /api/sse/chat
 ```
@@ -100,7 +100,7 @@ Write back to L0-L3
 5. Dual storage: pgvector `evidence_vectors` + Qdrant `evidence_items`
 6. Entity extraction (EMAIL, PHONE, DATE, CITATION, STATUTE, MONEY)
 7. Forensic pattern detection (SSN, CC, contact density, legal keywords)
-8. Summarization via Ollama gemma3-legal (non-fatal)
+8. Summarization via Ollama gemma4-legal (non-fatal)
 
 ### Key Client-Side Files
 | File | Purpose |

@@ -218,7 +218,7 @@ Rules:
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					model: 'gemma3-legal:latest',
+					model: 'gemma4-legal:latest',
 					messages,
 					stream: false,
 					tools: AGENT_TOOLS,
@@ -240,7 +240,7 @@ Rules:
 				return json({
 					response: data.message?.content || '',
 					toolResults,
-					model: 'gemma3-legal:latest',
+					model: 'gemma4-legal:latest',
 					_trace: { toolRounds, totalToolCalls, toolLatencyMs: toolResults.reduce((s, r) => s + r.durationMs, 0) }
 				});
 			}
@@ -269,7 +269,7 @@ Rules:
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma3-legal:latest',
+				model: 'gemma4-legal:latest',
 				messages,
 				stream: false,
 				options: { temperature: 0.1, top_k: 20, top_p: 0.8, num_ctx: 8192, repeat_penalty: 1.05 }
@@ -281,7 +281,7 @@ Rules:
 		return json({
 			response: finalData?.message?.content || 'Agent completed tool calls but could not generate a final response.',
 			toolResults,
-			model: 'gemma3-legal:latest',
+			model: 'gemma4-legal:latest',
 			_trace: { toolRounds, totalToolCalls, toolLatencyMs: toolResults.reduce((s, r) => s + r.durationMs, 0) }
 		});
 	} catch (err) {

@@ -414,7 +414,7 @@
 									{/if}
 									<div class="source-row">
 										<span class="source-label">Model</span>
-										<span class="source-val mono">gemma3-legal:latest</span>
+										<span class="source-val mono">gemma4-legal:latest</span>
 									</div>
 									<p class="source-disclaimer">This summary was AI-generated and may contain inaccuracies. Always verify against official sources before relying on this content for legal purposes.</p>
 								</div>
@@ -431,7 +431,7 @@
 						{:else}
 							<div class="placeholder-card">
 								<Icon name="sparkles" size={24} />
-								<p>Click <strong>AI Analysis</strong> to generate an executive summary, key provisions, and legal implications using gemma3-legal.</p>
+								<p>Click <strong>AI Analysis</strong> to generate an executive summary, key provisions, and legal implications using gemma4-legal.</p>
 							</div>
 						{/if}
 					</section>

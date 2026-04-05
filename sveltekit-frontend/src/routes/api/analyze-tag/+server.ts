@@ -1,6 +1,6 @@
 /**
  * Phase 89: Enhanced Tag Analysis API
- * - Analyze Qdrant tags with gemma3-legal
+ * - Analyze Qdrant tags with gemma4-legal
  * - ripgrep search for tag occurrences
  * - Generate embeddings for tag summaries
  * - Update Qdrant metadata with enhanced tags
@@ -36,7 +36,7 @@ export async function POST({ request, locals }: RequestEvent) {
 		// 1. Search tag occurrences in Qdrant
 		const occurrences = await searchTagOccurrences(tag, collection);
 
-		// 2. Analyze with gemma3-legal
+		// 2. Analyze with gemma4-legal
 		const analysis = await analyzeTagWithLLM(tag, occurrences);
 
 		// 3. Generate embedding for summary
@@ -149,7 +149,7 @@ Related: [tag1, tag2, tag3]`;
 	const response = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ model: 'gemma3-legal:latest',
+		body: JSON.stringify({ model: 'gemma4-legal:latest',
 			messages: [
 				{
 					role: 'system',

@@ -664,7 +664,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
        <EnhancedInlineEditor
          bind:value={caseDescription}
          placeholder="Type case description — AI suggestions appear as you type..."
-         aiModel="gemma3-legal"
+         aiModel="gemma4-legal"
          enableAutoComplete={true}
          enableGrammarCheck={true}
          enableSemanticSuggestions={true}

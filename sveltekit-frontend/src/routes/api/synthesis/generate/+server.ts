@@ -108,7 +108,7 @@ interface SynthesisResponse {
 
 // ── Helpers ───────────────────────────────────────────────────────────
 
-const MODEL = 'gemma3-legal:latest';
+const MODEL = 'gemma4-legal:latest';
 const QUALITY_THRESHOLD = 0.6;
 
 /**

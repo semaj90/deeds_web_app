@@ -11,7 +11,7 @@ import { getChatModelKeepAlive, bifrostChat, ollamaFetch } from '$lib/server/oll
 
 const DEFAULT_URL = ENV.OLLAMA_BASE_URL;
 const DEFAULT_MODEL =
-  process.env.OLLAMA_MODEL_CHAT ?? process.env.OLLAMA_MODEL ?? 'gemma3-legal:latest';
+  process.env.OLLAMA_MODEL_CHAT ?? process.env.OLLAMA_MODEL ?? 'gemma4-legal:latest';
 
 // Canonical model parameters — mirrors gemma3Q4_K_M/Modelfile PARAMETER values.
 // All TS callers previously missed num_ctx and repeat_penalty, letting Ollama

@@ -60,7 +60,7 @@ Output ONLY HTML content. Use h1, h2, h3, p, ul, li, strong, em tags.`;
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					model: 'gemma3-legal:latest',
+					model: 'gemma4-legal:latest',
 					prompt,
 					stream: false,
 					options: { temperature: 0.3, num_predict: 2048 }

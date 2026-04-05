@@ -29,7 +29,7 @@ export interface AnswerGenerationRequest {
 	validation_id: string;
 	case_id: string;
 	query: string;
-	llm_provider?: string; // Default: "gemma3-legal"
+	llm_provider?: string; // Default: "gemma4-legal"
 	max_tokens?: number; // Default: 2000
 }
 

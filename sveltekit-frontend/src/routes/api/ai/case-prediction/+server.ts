@@ -42,7 +42,7 @@ Provide: 1) Likelihood of favorable outcome (0-100%), 2) Key risk factors, 3) Re
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma3-legal:latest',
+				model: 'gemma4-legal:latest',
 				messages: [
 					{ role: 'system', content: 'You are a legal case outcome analyst. Provide data-driven predictions.' },
 					{ role: 'user', content: prompt }
@@ -61,7 +61,7 @@ Provide: 1) Likelihood of favorable outcome (0-100%), 2) Key risk factors, 3) Re
 			caseId,
 			caseTitle: caseRow.title,
 			evidenceCount: evidenceCount?.count || 0,
-			model: 'gemma3-legal:latest'
+			model: 'gemma4-legal:latest'
 		});
 	} catch (err) {
 		console.error('[/api/ai/case-prediction]', err);

@@ -37,7 +37,7 @@ Draft a legal memorandum outline.`;
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma3-legal:latest',
+				model: 'gemma4-legal:latest',
 				messages: [
 					{ role: 'system', content: systemPrompt },
 					{ role: 'user', content: userPrompt }

@@ -187,7 +187,7 @@ function handleQueryMode(
         const responseStream = await llmRouter.generateStream({
           prompt,
           provider: mode === 'rag' ? 'gemini' : 'ollama',
-          model: mode === 'rag' ? 'gemini-2.0-flash-exp' : 'gemma3-legal:latest',
+          model: mode === 'rag' ? 'gemini-2.0-flash-exp' : 'gemma4-legal:latest',
         });
 
         for await (const chunk of responseStream) {

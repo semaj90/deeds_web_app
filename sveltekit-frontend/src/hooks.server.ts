@@ -343,7 +343,7 @@ async function warmupLLMCache(): Promise<WarmupStatus> {
         queryEmbedding,
         context: item.context,
         response: item.response,
-        model: 'gemma3-legal:latest',
+        model: 'gemma4-legal:latest',
         confidence: 0.95,
       });
 
@@ -380,7 +380,7 @@ async function warmupChatModel(): Promise<WarmupStatus> {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma3-legal:latest',
+        model: 'gemma4-legal:latest',
         messages: [
           { role: 'system', content: 'You are a legal AI assistant.' },
           { role: 'user', content: 'Reply with OK.' },

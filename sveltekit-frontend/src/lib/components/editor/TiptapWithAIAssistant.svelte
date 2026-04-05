@@ -112,7 +112,7 @@ const res = await fetch('/api/chat', {
 	method: 'POST',
 	headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-		model: 'gemma3-legal:latest',
+		model: 'gemma4-legal:latest',
 		prompt: contextPrompt,
 		stream: false,
 		options: { temperature: 0.7, num_predict: 512 }

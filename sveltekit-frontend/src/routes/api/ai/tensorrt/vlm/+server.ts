@@ -140,7 +140,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma3-legal:latest',
+          model: 'gemma4-legal:latest',
           prompt,
           images: [imageBase64],
           stream: false,
@@ -152,7 +152,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         const ollamaData = await ollamaRes.json();
         return json({
           text: ollamaData.response ?? '',
-          model: 'gemma3-legal (ollama fallback)',
+          model: 'gemma4-legal (ollama fallback)',
           pipeline: ['ollama-multimodal'],
           tritonAvailable: false,
         });
@@ -164,7 +164,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       {
         error: 'Triton and Ollama VLM both unavailable',
         fallback: 'ollama',
-        hint: 'Start Ollama with gemma3-legal or start Triton container',
+        hint: 'Start Ollama with gemma4-legal or start Triton container',
       },
       { status: 503 }
     );

@@ -399,7 +399,7 @@ Response:`;
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma3-legal',
+          model: 'gemma4-legal',
           prompt: enhancedPrompt,
           stream: true,
           options: {
@@ -460,7 +460,7 @@ Response:`;
           metadata: { documentsProcessed: context.documentIds?.length || 0 }
         },
         metadata: {
-          model: 'gemma3-legal',
+          model: 'gemma4-legal',
           streaming: true,
           userRole,
           caseId,
@@ -596,7 +596,7 @@ Response:`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma3-legal',
+        model: 'gemma4-legal',
         prompt: enhancedPrompt,
         stream: false,
         options: {
@@ -634,7 +634,7 @@ Response:`;
         metadata: { documentsProcessed: context.documentIds?.length || 0 }
       },
       metadata: {
-        model: 'gemma3-legal',
+        model: 'gemma4-legal',
         userRole,
         caseId,
         enabledFeatures: {
@@ -702,7 +702,7 @@ Response:`;
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma3-legal',
+          model: 'gemma4-legal',
           prompt: `Perform a comprehensive legal analysis of the following text. Extract and analyze:
 
 1. Legal entities (parties, courts, statutes, cases)
@@ -744,7 +744,7 @@ Provide a structured analysis:`,
 ${analysis.response}
 
 **System Status:** ✅ All services operational
-**Model:** gemma3-legal
+**Model:** gemma4-legal
 **Processing Complete**`);
     } catch (error: any) {
       await addSystemMessage(`❌ Analysis failed: ${error.message}`);
@@ -762,7 +762,7 @@ ${analysis.response}
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma3-legal',
+          model: 'gemma4-legal',
           prompt: `Research legal topic: "${topic}" for ${userRole}
 
 Provide comprehensive analysis with:
@@ -796,7 +796,7 @@ Topic: ${topic}`,
 **Research Quality:** ${Math.round(confidenceScore)}%
 **Keyword Relevance:** ${keywordMatches} matches found
 **Response Length:** ${responseLength} characters
-**Model:** gemma3-legal
+**Model:** gemma4-legal
 
 **Research Findings:**
 ${research.response}
@@ -863,7 +863,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma3-legal',
+          model: 'gemma4-legal',
           prompt,
           stream: true,
           options: {

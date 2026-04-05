@@ -56,7 +56,7 @@
 				gpuStatus = {
 					available: data.ollama || data.tensorrt || false,
 					utilization: 0,
-					model: data.models?.[0] ?? 'gemma3-legal:latest',
+					model: data.models?.[0] ?? 'gemma4-legal:latest',
 					backend: data.tensorrt ? 'tensorrt' : data.ollama ? 'ollama' : 'none',
 				};
 			}
@@ -154,7 +154,7 @@
 			const res = await fetch('/api/ai/chat', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ message: query, model: 'gemma3-legal:latest' }),
+				body: JSON.stringify({ message: query, model: 'gemma4-legal:latest' }),
 			});
 			if (!res.ok) throw new Error(`${res.status}`);
 			const data = await res.json();

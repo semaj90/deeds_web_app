@@ -118,7 +118,7 @@ export const GET: RequestHandler = async () => {
 	return json({
 		name: 'Autonomous Investigation Agent',
 		architecture: 'ReAct (Reasoning + Acting)',
-		model: 'gemma3-legal:latest',
+		model: 'gemma4-legal:latest',
 		tools: [
 			{
 				name: 'evidence_analyze',

@@ -680,7 +680,7 @@ async function correctiveRetrieval(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma3-legal:latest',
+        model: 'gemma4-legal:latest',
         prompt: `Rephrase this legal search query to improve retrieval results. Return ONLY the rephrased query, no explanation.\n\nOriginal query: "${originalQuery}"`,
         stream: false,
         keep_alive: getChatModelKeepAlive(),
@@ -1320,7 +1320,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           toolResults = await Promise.race([
             runToolDetectionPass(
               OLLAMA_URL,
-              model ?? 'gemma3-legal:latest',
+              model ?? 'gemma4-legal:latest',
               systemPrompt,
               conversationHistory,
               message,
@@ -1369,7 +1369,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         const sKey = synthesisKey.forQuery(
           synthCaseId,
           message,
-          model ?? 'gemma3-legal:latest',
+          model ?? 'gemma4-legal:latest',
           'v1',
           synthCaseVersion
         );
@@ -1401,7 +1401,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           : await lookupCachedResponseWithBudget({
               query: message,
               context: systemPrompt,
-              model: model ?? 'gemma3-legal:latest',
+              model: model ?? 'gemma4-legal:latest',
             });
 
       if (cacheResult.hit && cacheResult.response) {
@@ -1463,7 +1463,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             citations: extractedCitations,
           },
           conversationTurns: conversationHistory.length,
-          model: model ?? 'gemma3-legal:latest',
+          model: model ?? 'gemma4-legal:latest',
           glossaryMatches: serializeGlossaryMatches(glossaryMatches),
           cachedResponse: true,
           cachedAt: cacheResult.cachedAt,
@@ -1539,7 +1539,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         await traceLLM(
           'sse-chat-generation',
           {
-            model: model ?? 'gemma3-legal:latest',
+            model: model ?? 'gemma4-legal:latest',
             backend: 'auto',
             prompt: flatPrompt,
             policyAction: policyDecision.action,
@@ -1612,7 +1612,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                  model: model ?? 'gemma3-legal:latest',
+                  model: model ?? 'gemma4-legal:latest',
                   messages: ollamaMessages,
                   stream: true,
                   keep_alive: getChatModelKeepAlive(),
@@ -1668,7 +1668,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         logInference({
           type: 'llm',
           model:
-            inferenceBackend === 'ollama' ? (model ?? 'gemma3-legal:latest') : inferenceBackend,
+            inferenceBackend === 'ollama' ? (model ?? 'gemma4-legal:latest') : inferenceBackend,
           backend: inferenceBackend,
           latencyMs: Math.round(performance.now() - llmStreamStart),
           tokenCount: tokenSeq,
@@ -1845,7 +1845,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                      model: model ?? 'gemma3-legal:latest',
+                      model: model ?? 'gemma4-legal:latest',
                       messages: [
                         { role: 'system', content: systemPrompt },
                         ...conversationHistory,
@@ -1931,7 +1931,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             citations: extractedCitations,
           },
           conversationTurns: conversationHistory.length,
-          model: model ?? 'gemma3-legal:latest',
+          model: model ?? 'gemma4-legal:latest',
           glossaryMatches: serializeGlossaryMatches(glossaryMatches),
           ...(aceEvaluation
             ? {
@@ -1970,7 +1970,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
               sessionId: conversationId,
               message: fullResponse.slice(0, 5000),
               role: 'assistant',
-              metadata: { model: model ?? 'gemma3-legal:latest', confidence },
+              metadata: { model: model ?? 'gemma4-legal:latest', confidence },
             });
           })
           .catch((err) => {
@@ -2001,7 +2001,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 queryEmbedding: embedData.embedding,
                 context: systemPrompt,
                 response: fullResponse,
-                model: model ?? 'gemma3-legal:latest',
+                model: model ?? 'gemma4-legal:latest',
                 confidence,
               }).catch((err) => console.warn('[SSE Chat] Cache storage failed:', err));
             }
@@ -2018,13 +2018,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           const sKey = synthesisKey.forQuery(
             synthCaseId,
             message,
-            model ?? 'gemma3-legal:latest',
+            model ?? 'gemma4-legal:latest',
             'v1',
             synthCaseVersion
           );
           setCache(
             sKey,
-            { response: fullResponse, confidence, model: model ?? 'gemma3-legal:latest' },
+            { response: fullResponse, confidence, model: model ?? 'gemma4-legal:latest' },
             TTL.SYNTHESIS * 1000
           ).catch((err) => {
             console.warn(

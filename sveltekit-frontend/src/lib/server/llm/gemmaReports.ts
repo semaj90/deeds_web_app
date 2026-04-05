@@ -6,7 +6,7 @@ import { ollamaFetch } from '$lib/server/ollama.js';
 export type ReportTemplate = 'charging_memo' | 'intake_summary';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'gemma3-legal:latest';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'gemma4-legal:latest';
 
 export async function generateReportWithGemma(opts: {
 	caseTitle: string;

@@ -72,12 +72,12 @@ export async function traceLLM<T>(
 	const trace = langfuse.trace({
     name,
     metadata,
-    tags: [(metadata.backend as string) ?? 'llm', (metadata.model as string) ?? 'gemma3-legal'],
+    tags: [(metadata.backend as string) ?? 'llm', (metadata.model as string) ?? 'gemma4-legal'],
   });
 
 	const generation = trace.generation({
 		name: `${name}-generation`,
-		model: (metadata.model as string) ?? 'gemma3-legal:latest',
+		model: (metadata.model as string) ?? 'gemma4-legal:latest',
 		input: metadata.prompt ?? metadata.messages ?? undefined,
 		metadata,
 	});

@@ -18,7 +18,7 @@
     { id: 'rerank', label: 'Legal Rerank', detail: 'cosine 75% + citations 15% + jurisdiction 10%', type: 'process' },
     { id: 'dag', label: 'DAG Context', detail: 'Document dependency ordering', type: 'process' },
     { id: 'history', label: 'Conv. Memory', detail: 'Last 10 turns from chatMessages', type: 'process' },
-    { id: 'llm', label: 'LLM Generation', detail: 'gemma3-legal via Ollama /api/chat', type: 'process' },
+    { id: 'llm', label: 'LLM Generation', detail: 'gemma4-legal via Ollama /api/chat', type: 'process' },
     { id: 'cite', label: 'Citation Extract', detail: '[Source N] → document mapping', type: 'process' },
     { id: 'stream', label: 'SSE Stream', detail: '/api/sse/chat → ChatSession', type: 'output' },
   ];

@@ -16,7 +16,7 @@ Memory-efficient legal document extraction service.
 
 1. **Smaller spaCy Model**: Uses `en_core_web_md` (medium, 40MB) instead of `en_core_web_trf` (transformer, 500MB). Slightly lower accuracy but 10x smaller.
 
-2. **Ollama-based NER**: Instead of loading a separate BERT model, NER can use your existing Ollama `gemma3-legal` instance via HTTP. Pass `use_ollama_ner: true` in requests for higher quality.
+2. **Ollama-based NER**: Instead of loading a separate BERT model, NER can use your existing Ollama `gemma4-legal` instance via HTTP. Pass `use_ollama_ner: true` in requests for higher quality.
 
 3. **Lazy Model Loading**: spaCy model loads on first request, not at startup. Faster cold starts.
 
