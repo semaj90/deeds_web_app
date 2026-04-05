@@ -1,3 +1,9 @@
+export interface NotificationAction {
+  label: string;
+  action: () => void;
+  variant?: 'primary' | 'default' | 'secondary' | 'destructive' | 'outline' | 'ghost';
+}
+
 export interface Notification {
   id: string;
   type: 'info' | 'success' | 'warning' | 'error' | 'system';
@@ -5,6 +11,7 @@ export interface Notification {
   message: string;
   duration?: number;
   closable?: boolean;
+  actions?: NotificationAction[];
 }
 
 class NotificationStore {
