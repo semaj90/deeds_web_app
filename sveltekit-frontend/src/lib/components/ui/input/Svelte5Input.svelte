@@ -16,7 +16,7 @@ interface Props {
 	required?: boolean;
 	name?: string;
 	id?: string;
-	autocomplete?: string;
+	autocomplete?: HTMLInputElement['autocomplete'];
 	min?: string | number;
 	max?: string | number;
 	step?: string | number;

@@ -127,7 +127,6 @@ function handleEscapeKeyDown(e: KeyboardEvent) {
 			bind:ref={contentRef}
 			class={contentClasses}
 			onInteractOutside={handleInteractOutside}
-			onEscapeKeyDown={handleEscapeKeyDown}
 		>
 			<!-- Close button -->
 			<Dialog.Close

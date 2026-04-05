@@ -6,6 +6,6 @@
 
 <Input
   variant="default"
-  enableTextureStreaming={true}
+  enableTextureFiltering={true}
   {...rest}
 />

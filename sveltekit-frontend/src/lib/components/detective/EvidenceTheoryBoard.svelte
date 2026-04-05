@@ -1,8 +1,6 @@
 <!-- EvidenceTheoryBoard.svelte — Game-style Detective Mode evidence board -->
 <!-- Drag-connect nodes, confidence % bubbles, theory hypothesis panel -->
 <script lang="ts">
-	import Icon from '$lib/components/ui/Icon.svelte';
-
 	interface EvidenceNode {
 		id: string;
 		label: string;
@@ -64,6 +62,13 @@
 	let showTheoryPanel = $state(true);
 	let mousePos = $state({ x: 0, y: 0 });
 	let svgRef = $state<SVGSVGElement | null>(null);
+	let selectedNodeConnections = $derived.by(() => {
+		if (!selectedNode) {
+			return [] as Connection[];
+		}
+
+		return connections.filter((connection) => connection.from === selectedNode.id || connection.to === selectedNode.id);
+	});
 
 	const CANVAS_W = 900;
 	const CANVAS_H = 600;
@@ -360,9 +365,8 @@
 							<div class="inspector-summary">{selectedNode.summary}</div>
 						{/if}
 						<div class="inspector-connections">
-							{@const nodeConns = connections.filter((c) => c.from === selectedNode?.id || c.to === selectedNode?.id)}
-							<span class="inspector-label">LINKS ({nodeConns.length})</span>
-							{#each nodeConns as conn}
+							<span class="inspector-label">LINKS ({selectedNodeConnections.length})</span>
+							{#each selectedNodeConnections as conn}
 								{@const otherNode = getNodeById(conn.from === selectedNode?.id ? conn.to : conn.from)}
 								{#if otherNode}
 									<div class="inspector-link">

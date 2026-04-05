@@ -205,22 +205,26 @@ const runSynthesis = fromPromise(
 		let fullText = '';
 
 		if (reader) {
-			while (true) {
-				const { done, value } = await reader.read();
-				if (done) break;
-				const chunk = decoder.decode(value, { stream: true });
-				// Parse SSE data lines
-				for (const line of chunk.split('\n')) {
-					if (line.startsWith('data: ')) {
-						try {
-							const parsed = JSON.parse(line.slice(6));
-							if (parsed.content) fullText = parsed.content;
-						} catch {
-							/* partial JSON */
-						}
-					}
-				}
-			}
+			let streamComplete = false;
+      while (!streamComplete) {
+        const { done, value } = await reader.read();
+        if (done) {
+          streamComplete = true;
+          continue;
+        }
+        const chunk = decoder.decode(value, { stream: true });
+        // Parse SSE data lines
+        for (const line of chunk.split('\n')) {
+          if (line.startsWith('data: ')) {
+            try {
+              const parsed = JSON.parse(line.slice(6));
+              if (parsed.content) fullText = parsed.content;
+            } catch {
+              /* partial JSON */
+            }
+          }
+        }
+      }
 		}
 
 		return {
