@@ -82,10 +82,9 @@
     "src/lib/engines/**",
     "src/lib/gpu/**",
 
-    // ── Corrupted services (312/564 corrupted, 20K+ errors if included) ──
-    // Clean services are transitively checked via route imports
-    "src/lib/services/error-analysis/**",
-    "src/lib/server/services/**",
+    // ── Previously excluded services (now clean) ──
+    // "src/lib/services/error-analysis/**",  // FIXED: 17 files, 0 errors — clean types + barrel exports
+    // "src/lib/server/services/**",  // FIXED: 2 files (langextract-service, pipeline-orchestrator) — 0 errors
 
     // ── Previously excluded lib/ directories (now clean / fixed) ──
     // "src/lib/webgpu/**",  // FIXED: 7 files cleaned (polyfill rewrite, rag-service imports, som-cache await, tensor-store property)
