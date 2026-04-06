@@ -93,12 +93,12 @@
     "src/lib/features/evidence-command-center/**",
 
     // ── Corrupted individual lib/ files (verified exist) ──
-    "src/lib/utils/simd-markdown-parser.ts",
-    "src/lib/utils/dynamic-imports.ts",
+    // "src/lib/utils/simd-markdown-parser.ts",  // 289 lines — clean, un-excluded
+    // "src/lib/utils/dynamic-imports.ts",  // has @ts-nocheck, un-excluded
 
     // ── Server: corrupted individual files (verified exist) ──
     // ── Batch 3: server dirs + individual files (un-excluded, verified clean) ──
-    "src/lib/server/clients/ollama.ts",  // corrupted Phase 99 (3 lines)
+    // "src/lib/server/clients/ollama.ts",  // rewritten clean, un-excluded
     // "src/lib/server/messaging/rabbitmq.ts",
     // "src/lib/server/api/**",
     // "src/lib/server/error-brain/**",
