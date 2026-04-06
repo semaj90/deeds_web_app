@@ -48,8 +48,8 @@ export const load: PageServerLoad = async () => {
 						(SELECT count(DISTINCT jurisdiction) FROM statutes WHERE jurisdiction IS NOT NULL) AS jurisdiction_count
 				`)
 				.then((r) => {
-					const rows = r as unknown as Record<string, unknown>[];
-					const row = rows[0];
+					const rows = (r as any).rows as Record<string, unknown>[];
+					const row = rows?.[0];
 					return {
 						statutes: Number(row?.statute_count ?? 0),
 						glossary: Number(row?.glossary_count ?? 0),

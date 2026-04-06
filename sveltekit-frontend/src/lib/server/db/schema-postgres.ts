@@ -754,6 +754,13 @@ export const citations = pgTable('citations', {
   createdBy: uuid('created_by'), // FK to users.id
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+  // Added columns (April 2026 migration)
+  citationType: varchar('citation_type', { length: 100 }),
+  title: varchar('title', { length: 500 }),
+  annotation: text('annotation'),
+  isKeyAuthority: boolean('is_key_authority').default(false),
+  tags: jsonb('tags').default([]),
+  embedding: vector('embedding', { dimensions: 768 }),
 });
 
 // === CITATION TAGS ===

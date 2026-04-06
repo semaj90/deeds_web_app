@@ -1,5 +1,5 @@
 import { citations, statutes, db } from '$lib/server/db/client';
-import { error, json } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
 import { eq, desc } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { getFromMemoryCache, setCache } from '$lib/server/cache.js';
@@ -15,6 +15,23 @@ const citationCreateSchema = z.object({
   case_id: z.string().uuid().optional(),
   source_type: z.string().max(50).optional(),
   source_url: z.string().max(2000).optional(),
+  // New columns (April 2026)
+  title: z.string().max(500).optional(),
+  annotation: z.string().max(10000).optional(),
+  is_key_authority: z.boolean().optional(),
+  tags: z.array(z.string().max(100)).max(20).optional(),
+});
+
+const citationUpdateSchema = z.object({
+  id: z.string().uuid(),
+  citation_text: z.string().min(1).max(500).optional(),
+  citation_type: z.string().max(100).optional(),
+  title: z.string().max(500).optional(),
+  annotation: z.string().max(10000).optional(),
+  is_key_authority: z.boolean().optional(),
+  tags: z.array(z.string().max(100)).max(20).optional(),
+  source_url: z.string().max(2000).optional(),
+  confidence: z.number().min(0).max(1).optional(),
 });
 
 const citationListSchema = z.object({
@@ -29,14 +46,14 @@ const citationListSchema = z.object({
  */
 export const GET: RequestHandler = async ({ locals, url }) => {
   if (!locals.user) {
-    throw error(401, 'Unauthorized');
+    return json({ success: false, citations: [] }, { status: 401 });
   }
 
   const parsed = citationListSchema.safeParse({
     case_id: url.searchParams.get('case_id'),
     limit: url.searchParams.get('limit') ?? undefined,
   });
-  if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
+  if (!parsed.success) return json({ success: false, citations: [], error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
   const { case_id: caseId, limit } = parsed.data;
 
   // Check cache first (Memory → Redis, keyed by caseId+limit)
@@ -57,19 +74,17 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     return json({ success: true, citations: results });
   } catch (err) {
     console.error('Error fetching citations:', err);
-    return json({ success: false, citations: [], error: 'Database unavailable' }, { status: 200 });
+    return json({ success: false, citations: [], error: 'Database unavailable' });
   }
 };
 
 /**
  * POST /api/citations
  * Create a new citation (optionally also creates/links a statute)
- * Body: { statute_code, statute_title?, jurisdiction?, severity?, year?,
- *         highlighted_text?, notes?, case_id?, source_type? }
  */
 export const POST: RequestHandler = async ({ locals, request }) => {
   if (!locals.user) {
-    throw error(401, 'Unauthorized');
+    return json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
@@ -102,11 +117,16 @@ export const POST: RequestHandler = async ({ locals, request }) => {
       statuteId = newStatute.id;
     }
 
-    // Create citation record
+    // Create citation record with all fields
     const [newCitation] = await db
       .insert(citations)
       .values({
         citationText: body.statute_code.trim(),
+        citationType: body.source_type || 'statute',
+        title: body.title || body.statute_title || null,
+        annotation: body.annotation || body.highlighted_text || null,
+        isKeyAuthority: body.is_key_authority ?? false,
+        tags: body.tags ?? [],
         caseId: body.case_id || null,
         sourceUrl: body.source_type === 'manual' ? null : body.source_url || null,
         createdBy: locals.user?.id ?? null,
@@ -128,10 +148,63 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     );
   } catch (err) {
     console.error('Error creating citation:', err);
-    if (err instanceof Error && 'status' in err) {
-      throw err;
+    return json({ success: false, error: 'Failed to create citation' }, { status: 500 });
+  }
+};
+
+/**
+ * PATCH /api/citations
+ * Update an existing citation
+ * Body: { id, citation_text?, citation_type?, title?, annotation?, is_key_authority?, tags?, source_url?, confidence? }
+ */
+export const PATCH: RequestHandler = async ({ locals, request }) => {
+  if (!locals.user) {
+    return json({ success: false, error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const raw = await request.json();
+    const parsed = citationUpdateSchema.safeParse(raw);
+    if (!parsed.success) {
+      return json(
+        { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' },
+        { status: 400 }
+      );
     }
-    throw error(500, 'Failed to create citation');
+    const body = parsed.data;
+
+    const updates: Record<string, unknown> = {};
+    if (body.citation_text !== undefined) updates.citationText = body.citation_text;
+    if (body.citation_type !== undefined) updates.citationType = body.citation_type;
+    if (body.title !== undefined) updates.title = body.title;
+    if (body.annotation !== undefined) updates.annotation = body.annotation;
+    if (body.is_key_authority !== undefined) updates.isKeyAuthority = body.is_key_authority;
+    if (body.tags !== undefined) updates.tags = body.tags;
+    if (body.source_url !== undefined) updates.sourceUrl = body.source_url;
+    if (body.confidence !== undefined) updates.confidence = body.confidence;
+    updates.updatedAt = new Date();
+
+    if (Object.keys(updates).length <= 1) {
+      return json({ success: false, error: 'No fields to update' }, { status: 400 });
+    }
+
+    const [updated] = await db
+      .update(citations)
+      .set(updates)
+      .where(eq(citations.id, body.id))
+      .returning();
+
+    if (!updated) {
+      return json({ success: false, error: 'Citation not found' }, { status: 404 });
+    }
+
+    // Invalidate cache
+    setCache('citations:all:50', null, 0);
+
+    return json({ success: true, citation: updated });
+  } catch (err) {
+    console.error('Error updating citation:', err);
+    return json({ success: false, error: 'Failed to update citation' }, { status: 500 });
   }
 };
 
@@ -146,7 +219,7 @@ const deleteCitationSchema = z.object({
  */
 export const DELETE: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user) {
-		throw error(401, 'Unauthorized');
+		return json({ success: false, error: 'Unauthorized' }, { status: 401 });
 	}
 
 	try {
@@ -171,9 +244,6 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 		return json({ success: true, message: 'Citation deleted' });
 	} catch (err) {
 		console.error('Error deleting citation:', err);
-		if (err instanceof Error && 'status' in err) {
-			throw err;
-		}
-		throw error(500, 'Failed to delete citation');
+		return json({ success: false, error: 'Failed to delete citation' }, { status: 500 });
 	}
 };

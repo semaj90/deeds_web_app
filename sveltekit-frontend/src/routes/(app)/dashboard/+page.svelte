@@ -940,25 +940,16 @@
 <svelte:window onkeydown={handleGlobalKeydown} />
 
 <style>
-  /* Full-bleed dark wrapper */
+  /* Full-bleed dark wrapper -- fills parent flex container */
   .dashboard-dark {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     min-height: 100vh;
-    background: #0e0d0b;
+    background: var(--t-bg, #0e0d0b);
     margin: -2.5rem;
     padding: 2.5rem;
-    color: rgb(212 199 163);
-  }
-
-  /* Neutralize root layout light-theme globals */
-  .dashboard-dark :global(h1),
-  .dashboard-dark :global(h2),
-  .dashboard-dark :global(h3),
-  .dashboard-dark :global(h4),
-  .dashboard-dark :global(p) {
-    color: inherit;
-    text-transform: none;
-    letter-spacing: normal;
-    margin: 0;
+    color: var(--t-text, rgb(212 199 163));
   }
 
   .dashboard-dark :global(a) {
