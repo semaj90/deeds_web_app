@@ -55,21 +55,19 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			try {
 				const { citations: citationsTable } = await import('$lib/server/db/schema-postgres.js');
 				const citationRows = await db
-					.select({
-						id: citationsTable.id,
-						citationType: citationsTable.citationType,
-						quotedText: citationsTable.quotedText,
-						formattedCitation: citationsTable.formattedCitation
-					})
-					.from(citationsTable)
-					.where(eq(citationsTable.caseId, caseId))
-					.limit(limit);
+          .select({
+            id: citationsTable.id,
+            citationText: citationsTable.citationText,
+          })
+          .from(citationsTable)
+          .where(eq(citationsTable.caseId, caseId))
+          .limit(limit);
 
 				for (const row of citationRows) {
 					citations.push({
-						id: row.id,
-						text: row.formattedCitation || row.quotedText || row.citationType
-					});
+            id: row.id,
+            text: row.citationText,
+          });
 				}
 			} catch {
 				// Citations table may not exist
