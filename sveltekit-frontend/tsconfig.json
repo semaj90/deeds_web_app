@@ -87,9 +87,9 @@
     "src/lib/services/error-analysis/**",
     "src/lib/server/services/**",
 
-    // ── Corrupted lib/ directories (verified exist + corrupted) ──
-    "src/lib/webgpu/**",
-    "src/lib/workers/queue-worker.ts",
+    // ── Previously excluded lib/ directories (now clean / fixed) ──
+    // "src/lib/webgpu/**",  // FIXED: 7 files cleaned (polyfill rewrite, rag-service imports, som-cache await, tensor-store property)
+    // "src/lib/workers/queue-worker.ts",  // ARCHIVED to deeds_labs (orphan, superseded by server/queue/)
     // "src/lib/features/evidence-command-center/**",  // rewritten + wired to cases/[id]/evidence
 
     // ── Corrupted individual lib/ files (verified exist) ──

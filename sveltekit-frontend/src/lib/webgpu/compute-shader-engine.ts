@@ -27,7 +27,7 @@ export class ComputeShaderEngine {
 				return false;
 			}
 
-			this.adapter = await navigator.gpu.requestAdapter({
+			this.adapter = await (navigator.gpu as GPU).requestAdapter({
 				powerPreference: 'high-performance',
 			});
 
@@ -109,8 +109,8 @@ export class ComputeShaderEngine {
 			usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST,
 		});
 
-		this.device.queue.writeBuffer(bufferA, 0, vectorA);
-		this.device.queue.writeBuffer(bufferB, 0, vectorB);
+		this.device.queue.writeBuffer(bufferA, 0, vectorA as unknown as BufferSource);
+		this.device.queue.writeBuffer(bufferB, 0, vectorB as unknown as BufferSource);
 
 		const bindGroupLayout = this.device.createBindGroupLayout({
 			entries: [
@@ -247,8 +247,8 @@ export class ComputeShaderEngine {
 			usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST,
 		});
 
-		this.device.queue.writeBuffer(bufA, 0, matrixA);
-		this.device.queue.writeBuffer(bufB, 0, matrixB);
+		this.device.queue.writeBuffer(bufA, 0, matrixA as unknown as BufferSource);
+		this.device.queue.writeBuffer(bufB, 0, matrixB as unknown as BufferSource);
 
 		const bindGroupLayout = this.device.createBindGroupLayout({
 			entries: [

@@ -26,7 +26,7 @@ export class LegalComputeShaders {
                 return false;
             }
 
-            const adapter = await navigator.gpu.requestAdapter();
+            const adapter = await (navigator.gpu as GPU).requestAdapter();
             if (!adapter) {
                 console.warn('WebGPU adapter not found');
                 return false;
@@ -174,12 +174,12 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
         });
 
         // Upload data to GPU
-        this.queue.writeBuffer(vec1Buffer, 0, vec1);
-        this.queue.writeBuffer(vec2Buffer, 0, vec2);
+        this.queue.writeBuffer(vec1Buffer, 0, vec1 as unknown as BufferSource);
+        this.queue.writeBuffer(vec2Buffer, 0, vec2 as unknown as BufferSource);
 
         // Create bind group
         const bindGroup = this.device.createBindGroup({
-            layout: this.similarityPipeline.getBindGroupLayout(0),
+            layout: this.similarityPipeline.getBindGroupLayout(0) as any,
             entries: [
                 { binding: 0, resource: { buffer: vec1Buffer } },
                 { binding: 1, resource: { buffer: vec2Buffer } },
@@ -254,11 +254,11 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
         });
 
         // Upload data
-        this.queue.writeBuffer(inputBuffer, 0, inputData);
+        this.queue.writeBuffer(inputBuffer, 0, inputData as unknown as BufferSource);
 
         // Create bind group
         const bindGroup = this.device.createBindGroup({
-            layout: this.fingerprintPipeline.getBindGroupLayout(0),
+            layout: this.fingerprintPipeline.getBindGroupLayout(0) as any,
             entries: [
                 { binding: 0, resource: { buffer: inputBuffer } },
                 { binding: 1, resource: { buffer: outputBuffer } },

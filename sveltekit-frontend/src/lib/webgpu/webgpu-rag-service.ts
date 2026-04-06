@@ -1,7 +1,4 @@
-import type { ensureFloat32Array,
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
-    batchProcessArrays,
-    adaptiveQuantization, QuantizationConfig, ArrayConversionResult } from '$lib/utils/webgpu-array-utils';
+import type { QuantizationConfig, ArrayConversionResult } from '$lib/utils/webgpu-array-utils';
 
 // --- Type Definitions ---
 interface WebGPUInitialization {
@@ -51,7 +48,7 @@ export async function initializeWebGPU(): Promise<WebGPUInitialization> {
 
     try {
         if (!cachedAdapter) {
-            cachedAdapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
+            cachedAdapter = await (navigator.gpu as GPU).requestAdapter({ powerPreference: 'high-performance' });
         }
 
         if (!cachedAdapter) {

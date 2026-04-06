@@ -49,7 +49,7 @@ export class N64TextureLODSystem {
                 return false;
             }
 
-            const adapter = await navigator.gpu.requestAdapter({
+            const adapter = await (navigator.gpu as GPU).requestAdapter({
                 powerPreference: 'high-performance'
             });
 

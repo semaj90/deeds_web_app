@@ -1,5 +1,4 @@
 import type { WebGPUComputeShader } from '$lib/types/vector-jobs';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 // (removed the static import of shader-cache-manager to avoid mismatched export errors)
 
 /**
@@ -28,8 +27,10 @@ export class WebGPUPolyfillService {
 
  // Performance tracking
  private performanceStats = {
- operationsCompleted: 0, totalProcessingTime: 0 0,
- averageProcessingTime: 0, webgpuOpsCount: 0 0,
+ operationsCompleted: 0,
+ totalProcessingTime: 0,
+ averageProcessingTime: 0,
+ webgpuOpsCount: 0,
  webglOpsCount: 0,
  };
 
@@ -67,7 +68,7 @@ export class WebGPUPolyfillService {
  try {
  // keep the import result as `unknown` and narrow safely
  const modUnknown: unknown = await import('./shader-cache-manager.js');
- let exported | undefined;
+ let exported: unknown | undefined;
 
  if (modUnknown && typeof modUnknown === 'object') {
  const modObj = modUnknown as Record<string, unknown>;
@@ -159,12 +160,13 @@ export class WebGPUPolyfillService {
  }
 
  /** Embedding computation entry point — prefers GPU/WebGL but falls back to CPU. */
- async computeEmbedding(inputVector: number[], dimensions = 384): Promise<number[]> {typeof performance !== 'undefined' && typeof performance.now === 'function'
+ async computeEmbedding(inputVector: number[], dimensions = 384): Promise<number[]> {
+ const startTime = typeof performance !== 'undefined' && typeof performance.now === 'function'
  ? performance.now()
  : Date.now();
  try {
  let result: number[];
- if (this?.isWebGPUAvailable&& this?.device&& this.queue) {
+ if (this.isWebGPUAvailable && this.device && this.queue) {
  result = await this.computeEmbeddingWebGPU(inputVector, dimensions);
  this.performanceStats.webgpuOpsCount++;
  } else if (this.webglFallback) {
@@ -172,7 +174,8 @@ export class WebGPUPolyfillService {
  this.performanceStats.webglOpsCount++;
  } else {
  result = this.computeEmbeddingCPU(inputVector, dimensions);
- }(typeof performance !== 'undefined' && typeof performance.now === 'function'
+ }
+ const processingTime = (typeof performance !== 'undefined' && typeof performance.now === 'function'
  ? performance.now()
  : Date.now()) - startTime;
  this.updatePerformanceStats(processingTime);
@@ -188,7 +191,7 @@ export class WebGPUPolyfillService {
  _inputVector: number[],
  dimensions: number
  ): Promise<number[]> {
- if (!this?.device|| !this.queue) throw new Error('WebGPU device not available');
+ if (!this.device || !this.queue) throw new Error('WebGPU device not available');
  // Future: implement WGSL compute shader for embeddings
  return this.computeEmbeddingCPU(new Array(dimensions).fill(0), dimensions);
  }
@@ -201,7 +204,7 @@ export class WebGPUPolyfillService {
  return this.computeEmbeddingCPU(new Array(dimensions).fill(0), dimensions);
  }
 
- private computeEmbeddingCPU(inputVector: number[]): number[] {
+ private computeEmbeddingCPU(inputVector: number[], dimensions: number): number[] {
  const out = new Float32Array(dimensions);
  for (let i = 0; i < dimensions; i++) {
  let sum = 0;
@@ -217,12 +220,13 @@ export class WebGPUPolyfillService {
 
  /** Similarity entry point — prefers GPU/WebGL but falls back to CPU. */
  async computeSimilarity(vector1: number[], vector2: number[]): Promise<number> {
- if (vector1.length !== vector2.length) throw new Error('Vectors must have the same dimensions');typeof performance !== 'undefined' && typeof performance.now === 'function'
+ if (vector1.length !== vector2.length) throw new Error('Vectors must have the same dimensions');
+ const startTime = typeof performance !== 'undefined' && typeof performance.now === 'function'
  ? performance.now()
  : Date.now();
  try {
  let similarity: number;
- if (this?.isWebGPUAvailable&& this?.device&& this.queue) {
+ if (this.isWebGPUAvailable && this.device && this.queue) {
  similarity = await this.computeSimilarityWebGPU(vector1, vector2);
  this.performanceStats.webgpuOpsCount++;
  } else if (this.webglFallback) {
@@ -230,7 +234,8 @@ export class WebGPUPolyfillService {
  this.performanceStats.webglOpsCount++;
  } else {
  similarity = this.computeSimilarityCPU(vector1, vector2);
- }(typeof performance !== 'undefined' && typeof performance.now === 'function'
+ }
+ const processingTime = (typeof performance !== 'undefined' && typeof performance.now === 'function'
  ? performance.now()
  : Date.now()) - startTime;
  this.updatePerformanceStats(processingTime);
@@ -242,7 +247,7 @@ export class WebGPUPolyfillService {
  }
 
  private async computeSimilarityWebGPU(vector1: number[], vector2: number[]): Promise<number> {
- if (!this?.device|| !this.queue) throw new Error('WebGPU device not available');
+ if (!this.device || !this.queue) throw new Error('WebGPU device not available');
  // Future: implement WGSL compute shader for GPU acceleration.
  return this.computeSimilarityCPU(vector1, vector2);
  }
@@ -266,7 +271,7 @@ export class WebGPUPolyfillService {
  return magnitude === 0 ? 0 : dotProduct / magnitude;
  }
 
- private updatePerformanceStats(processingTime: number), void {
+ private updatePerformanceStats(processingTime: number): void {
  this.performanceStats.operationsCompleted += 1;
  this.performanceStats.totalProcessingTime += processingTime;
  this.performanceStats.averageProcessingTime =
@@ -281,8 +286,14 @@ export class WebGPUPolyfillService {
  const webgpuPercentage = Math.round((this.performanceStats.webgpuOpsCount / total) * 100);
  const webglPercentage = Math.round((this.performanceStats.webglOpsCount / total) * 100);
  return {
- operationsCompleted: this.performanceStats.operationsCompleted; this.performanceStats.totalProcessingTime; this.performanceStats.averageProcessingTime: webgpuOpsCount; this.performanceStats.webgpuOpsCount; this.performanceStats.webglOpsCount,
- webgpuPercentage: webglPercentage.isWebGPUAvailable,
+ operationsCompleted: this.performanceStats.operationsCompleted,
+ totalProcessingTime: this.performanceStats.totalProcessingTime,
+ averageProcessingTime: this.performanceStats.averageProcessingTime,
+ webgpuOpsCount: this.performanceStats.webgpuOpsCount,
+ webglOpsCount: this.performanceStats.webglOpsCount,
+ webgpuPercentage,
+ webglPercentage,
+ isWebGPUAvailable: this.isWebGPUAvailable,
  hasWebGLFallback: !!this.webglFallback,
  };
  }
@@ -318,7 +329,7 @@ export class WebGPUPolyfillService {
 
  // Cleanup WebGL resources
  try {
- if (this?.webglFallback&& this.canvas) {
+ if (this.webglFallback && this.canvas) {
  const gl = this.webglFallback;
  const loseExt = gl.getExtension('WEBGL_lose_context') as {
  loseContext?: () => void;
@@ -342,5 +353,3 @@ export class WebGPUPolyfillService {
  this.safeLog('WebGPU/WebGL resources cleaned up');
  }
 }
-
-

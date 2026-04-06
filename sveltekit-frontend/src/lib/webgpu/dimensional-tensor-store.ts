@@ -234,7 +234,8 @@ export class DimensionalTensorStore {
     this.memoryLayout = {
       baseAddress: 0,
       stride: [strideX, strideY, strideZ],
-      alignment: totalSize,
+      alignment,
+      totalSize,
       fragmentCount: Math.ceil(totalElements / 1024), // 1024 elements per fragment
     };
 
@@ -447,7 +448,7 @@ export class DimensionalTensorStore {
     // In production, would adhere strictly to: bytesPerRow * rowsPerImage
     this.device.queue.writeTexture(
       { texture, origin },
-	data,
+	data as unknown as BufferSource,
       { bytesPerRow, rowsPerImage: copyHeight },
 	{ width: copyWidth, height: copyHeight, depthOrArrayLayers: 1 }
     );

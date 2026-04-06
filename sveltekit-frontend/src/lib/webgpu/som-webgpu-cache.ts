@@ -629,7 +629,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 
       encoder.copyBufferToBuffer(newScoresBuffer, 0, scoresBuffer, 0, pageRankScores.byteLength);
       this.device.queue.submit([encoder.finish()]);
-      await.device.queue.onSubmittedWorkDone();
+      await this.device!.queue.onSubmittedWorkDone();
     }
 
     const encoder = this.device.createCommandEncoder();
