@@ -90,69 +90,72 @@ async function seedCitations(): Promise<void> {
 
 		// Seed citations (references to statutes)
 		const sampleCitations = [
-			{
-				quotedText: '18 U.S.C. § 1001',
-				caseId: null,
-				sourceUrl: 'https://www.law.cornell.edu/uscode/text/18/1001',
-				createdBy: null
-			},
-			{
-				quotedText: '42 U.S.C. § 2000a',
-				caseId: null,
-				sourceUrl: 'https://www.law.cornell.edu/uscode/text/42/2000a',
-				createdBy: null
-			},
-			{
-				quotedText: '18 U.S.C. § 1343',
-				caseId: null,
-				sourceUrl: 'https://www.law.cornell.edu/uscode/text/18/1343',
-				createdBy: null
-			},
-			{
-				quotedText: '5 U.S.C. § 552',
-				caseId: null,
-				sourceUrl: 'https://www.law.cornell.edu/uscode/text/5/552',
-				createdBy: null
-			},
-			{
-				quotedText: '42 U.S.C. § 12112',
-				caseId: null,
-				sourceUrl: 'https://www.law.cornell.edu/uscode/text/42/12112',
-				createdBy: null
-			},
-			{
-				quotedText: 'Miranda v. Arizona, 384 U.S. 436 (1966)',
-				caseId: null,
-				sourceUrl: 'https://supreme.justia.com/cases/federal/us/384/436/',
-				createdBy: null
-			},
-			{
-				quotedText: 'Brown v. Board of Education, 347 U.S. 483 (1954)',
-				caseId: null,
-				sourceUrl: 'https://supreme.justia.com/cases/federal/us/347/483/',
-				createdBy: null
-			},
-			{
-				quotedText: 'Roe v. Wade, 410 U.S. 113 (1973)',
-				caseId: null,
-				sourceUrl: 'https://supreme.justia.com/cases/federal/us/410/113/',
-				createdBy: null
-			}
-		];
+      {
+        citationText: '18 U.S.C. § 1001',
+        caseId: null,
+        sourceUrl: 'https://www.law.cornell.edu/uscode/text/18/1001',
+        createdBy: null,
+      },
+      {
+        citationText: '42 U.S.C. § 2000a',
+        caseId: null,
+        sourceUrl: 'https://www.law.cornell.edu/uscode/text/42/2000a',
+        createdBy: null,
+      },
+      {
+        citationText: '18 U.S.C. § 1343',
+        caseId: null,
+        sourceUrl: 'https://www.law.cornell.edu/uscode/text/18/1343',
+        createdBy: null,
+      },
+      {
+        citationText: '5 U.S.C. § 552',
+        caseId: null,
+        sourceUrl: 'https://www.law.cornell.edu/uscode/text/5/552',
+        createdBy: null,
+      },
+      {
+        citationText: '42 U.S.C. § 12112',
+        caseId: null,
+        sourceUrl: 'https://www.law.cornell.edu/uscode/text/42/12112',
+        createdBy: null,
+      },
+      {
+        citationText: 'Miranda v. Arizona, 384 U.S. 436 (1966)',
+        caseId: null,
+        sourceUrl: 'https://supreme.justia.com/cases/federal/us/384/436/',
+        createdBy: null,
+      },
+      {
+        citationText: 'Brown v. Board of Education, 347 U.S. 483 (1954)',
+        caseId: null,
+        sourceUrl: 'https://supreme.justia.com/cases/federal/us/347/483/',
+        createdBy: null,
+      },
+      {
+        citationText: 'Roe v. Wade, 410 U.S. 113 (1973)',
+        caseId: null,
+        sourceUrl: 'https://supreme.justia.com/cases/federal/us/410/113/',
+        createdBy: null,
+      },
+    ];
 
-		console.log('[seed-citations] Upserting citations...');
-		let citationCount = 0;
-		for (const cit of sampleCitations) {
-			const existing = await db.select({ id: citations.id }).from(citations)
-				.where(eq(citations.quotedText, cit.quotedText)).limit(1);
-			if (existing.length === 0) {
-				await db.insert(citations).values({ ...cit, citationType: 'statute' });
-				console.log(`  + Created citation: ${cit.quotedText}`);
-			} else {
-				console.log(`  ~ Exists: ${cit.quotedText}`);
-			}
-			citationCount++;
-		}
+    console.log('[seed-citations] Upserting citations...');
+    let citationCount = 0;
+    for (const cit of sampleCitations) {
+      const existing = await db
+        .select({ id: citations.id })
+        .from(citations)
+        .where(eq(citations.citationText, cit.citationText))
+        .limit(1);
+      if (existing.length === 0) {
+        await db.insert(citations).values(cit);
+        console.log(`  + Created citation: ${cit.citationText}`);
+      } else {
+        console.log(`  ~ Exists: ${cit.citationText}`);
+      }
+      citationCount++;
+    }
 		console.log(`[seed-citations] ✓ ${citationCount} citations processed`);
 
 		console.log('[seed-citations] ✓ Seed complete!');

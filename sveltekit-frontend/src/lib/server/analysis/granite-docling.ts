@@ -151,8 +151,11 @@ function parseDocTags(raw: string, pageNumber = 1): DoclingBlock[] {
  * @napi-rs/canvas as pdfjs-dist peer dependency).
  */
 async function renderPdfPageToImage(pdfBuffer: Buffer, pageNumber: number): Promise<Buffer> {
-	const { getDocument } = await import('pdfjs-dist/legacy/build/pdf.mjs');
-	const { createCanvas } = await import('@napi-rs/canvas');
+	// Runtime-constructed paths prevent Rollup from statically resolving native .node binaries
+	const pdfjsPath = ['pdfjs-dist', 'legacy', 'build', 'pdf.mjs'].join('/');
+	const canvasPath = ['@napi-rs', 'canvas'].join('/');
+	const { getDocument } = await import(/* @vite-ignore */ pdfjsPath);
+	const { createCanvas } = await import(/* @vite-ignore */ canvasPath);
 
 	const pdfDoc = await getDocument({ data: new Uint8Array(pdfBuffer) }).promise;
 	if (pageNumber > pdfDoc.numPages) {
@@ -182,7 +185,8 @@ async function renderPdfPageToImage(pdfBuffer: Buffer, pageNumber: number): Prom
  * Get the number of pages in a PDF.
  */
 async function getPdfPageCount(pdfBuffer: Buffer): Promise<number> {
-	const { getDocument } = await import('pdfjs-dist/legacy/build/pdf.mjs');
+	const pdfjsPath = ['pdfjs-dist', 'legacy', 'build', 'pdf.mjs'].join('/');
+	const { getDocument } = await import(/* @vite-ignore */ pdfjsPath);
 	const pdfDoc = await getDocument({ data: new Uint8Array(pdfBuffer) }).promise;
 	const count = pdfDoc.numPages;
 	pdfDoc.destroy();

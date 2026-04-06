@@ -747,32 +747,13 @@ export const citations = pgTable('citations', {
     .notNull(),
   documentId: uuid('document_id'), // FK to legalDocuments.id
   caseId: uuid('case_id'), // FK to cases.id
-  // DB-SYNC: actual column is 'quoted_text', NOT 'citation_text'
-  citationType: varchar('citation_type', { length: 100 }).notNull(),
-  relevanceScore: real('relevance_score'),
-  pageNumber: integer('page_number'),
-  pinpointCitation: varchar('pinpoint_citation', { length: 500 }),
-  quotedText: text('quoted_text'),
-  contextBefore: text('context_before'),
-  contextAfter: text('context_after'),
-  annotation: text('annotation'),
-  legalPrinciple: text('legal_principle'),
-  citationFormat: varchar('citation_format', { length: 50 }).default('bluebook'),
-  formattedCitation: text('formatted_citation'),
-  shepardsTreatment: varchar('shepards_treatment', { length: 100 }),
-  isKeyAuthority: boolean('is_key_authority').default(false),
-  createdBy: uuid('created_by'), // FK to users.id
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
-  // DB-SYNC: additional columns present in native PG
-  title: varchar('title', { length: 500 }),
-  sourceType: varchar('source_type', { length: 100 }),
-  sourceName: varchar('source_name', { length: 500 }),
+  citationText: text('citation_text').notNull(),
   sourceUrl: text('source_url'),
-  notes: text('notes'),
-  tags: jsonb('tags').default([]),
-  embedding: vector('embedding', { dimensions: 768 }),
-  metadata: jsonb('metadata').default({}),
+  pageNumber: integer('page_number'),
+  confidence: real('confidence'),
+  createdBy: uuid('created_by'), // FK to users.id
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
 
 // === CITATION TAGS ===

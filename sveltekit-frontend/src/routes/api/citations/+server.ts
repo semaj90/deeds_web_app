@@ -106,8 +106,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     const [newCitation] = await db
       .insert(citations)
       .values({
-        quotedText: body.statute_code.trim(),
-        citationType: body.source_type || 'statute',
+        citationText: body.statute_code.trim(),
         caseId: body.case_id || null,
         sourceUrl: body.source_type === 'manual' ? null : body.source_url || null,
         createdBy: locals.user?.id ?? null,

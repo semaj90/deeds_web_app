@@ -75,31 +75,33 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			const citation = citationsData[i];
 			lines.push(`CITATION ${i + 1}`);
 			lines.push('-'.repeat(80));
-			lines.push(`Text: ${citation.quotedText || 'N/A'}`);
+			lines.push(`Text: ${citation.citationText || 'N/A'}`);
 			lines.push(`Case ID: ${citation.caseId || 'N/A'}`);
 			lines.push(`Source URL: ${citation.sourceUrl || 'N/A'}`);
 			lines.push(`Created: ${citation.createdAt ? new Date(citation.createdAt).toLocaleString() : 'N/A'}`);
 
 			// Include statute details if enabled
-			if (includeStatutes && citation.quotedText) {
-				const [statuteData] = await db
-					.select()
-					.from(statutes)
-					.where(eq(statutes.section, citation.quotedText))
-					.limit(1);
+			if (includeStatutes && citation.citationText) {
+        const [statuteData] = await db
+          .select()
+          .from(statutes)
+          .where(eq(statutes.section, citation.citationText))
+          .limit(1);
 
-				if (statuteData) {
-					lines.push('');
-					lines.push('STATUTE DETAILS:');
-					lines.push(`  Title: ${statuteData.title || 'N/A'}`);
-					lines.push(`  Section: ${statuteData.section || 'N/A'}`);
-					lines.push(`  Jurisdiction: ${statuteData.jurisdiction || 'N/A'}`);
-					lines.push(`  Category: ${statuteData.category || 'N/A'}`);
-					if (statuteData.content) {
-						lines.push(`  Content: ${statuteData.content.slice(0, 200)}${statuteData.content.length > 200 ? '...' : ''}`);
-					}
-				}
-			}
+        if (statuteData) {
+          lines.push('');
+          lines.push('STATUTE DETAILS:');
+          lines.push(`  Title: ${statuteData.title || 'N/A'}`);
+          lines.push(`  Section: ${statuteData.section || 'N/A'}`);
+          lines.push(`  Jurisdiction: ${statuteData.jurisdiction || 'N/A'}`);
+          lines.push(`  Category: ${statuteData.category || 'N/A'}`);
+          if (statuteData.content) {
+            lines.push(
+              `  Content: ${statuteData.content.slice(0, 200)}${statuteData.content.length > 200 ? '...' : ''}`
+            );
+          }
+        }
+      }
 
 			lines.push('');
 			lines.push('');

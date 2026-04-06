@@ -235,7 +235,7 @@ export default defineConfig(({ mode }) => {
       // Skip processing large binary assets (ONNX models, WASM files)
       assetsInlineLimit: 0, // Don't inline any assets (keeps them as separate files)
       rollupOptions: {
-        external: ['@xenova/transformers', 'piper-wasm', 'nats', 'dockerode', 'ssh2'],
+        external: ['@xenova/transformers', 'piper-wasm', 'nats', 'dockerode', 'ssh2', '@napi-rs/canvas'],
         output: {
           manualChunks: (id) => {
             // Rolldown requires manualChunks to be a function, not an object

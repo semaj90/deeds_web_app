@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		// Document metadata
 		const docRes = await pool.query(
 			`SELECT ld.id, ld.title, ld.citation, ld.corpus_type, ld.processing_status,
-			        ld.page_count, ld.word_count, ld.is_official, ld.official_url,
+			        ld.page_count, ld.is_official, ld.official_url,
 			        j.name AS jurisdiction_name, j.code AS jurisdiction_code
 			 FROM library_documents ld
 			 LEFT JOIN jurisdictions j ON j.id = ld.jurisdiction_id
@@ -70,7 +70,6 @@ export const load: PageServerLoad = async ({ params, url }) => {
 				corpusType: row.corpus_type,
 				processingStatus: row.processing_status,
 				pageCount: row.page_count,
-				wordCount: row.word_count,
 				isOfficial: row.is_official,
 				officialUrl: row.official_url,
 				jurisdiction: row.jurisdiction_code

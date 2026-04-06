@@ -60,22 +60,20 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 
 		// Optionally include statute details
 		let exportData: Record<string, unknown> = {
-			exportDate: new Date().toISOString(),
-			citationCount: citationsData.length,
-			citations: citationsData.map((c) => ({
-				id: c.id,
-				quotedText: c.quotedText,
-				caseId: c.caseId,
-				sourceUrl: c.sourceUrl,
-				createdAt: c.createdAt,
-			})),
-		};
+      exportDate: new Date().toISOString(),
+      citationCount: citationsData.length,
+      citations: citationsData.map((c) => ({
+        id: c.id,
+        citationText: c.citationText,
+        caseId: c.caseId,
+        sourceUrl: c.sourceUrl,
+        createdAt: c.createdAt,
+      })),
+    };
 
 		if (includeStatutes) {
 			// Fetch related statutes (if citation text matches statute section)
-			const statuteCodes = citationsData
-				.map((c) => c.quotedText)
-				.filter(Boolean);
+			const statuteCodes = citationsData.map((c) => c.citationText).filter(Boolean);
 
 			if (statuteCodes.length > 0) {
 				const statutesData = await db

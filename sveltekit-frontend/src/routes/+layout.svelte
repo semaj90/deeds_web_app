@@ -16,6 +16,7 @@
     let { children, data }: { children: Snippet; data: { user?: { id: string } | null } } = $props();
     let showDocumentWriter = $state(false);
     let mounted = $state(false);
+    let showGlobalSidebar = $derived(page.url.pathname !== '/');
 
     function handleGlobalKeydown(e: KeyboardEvent) {
         // Skip shortcuts when typing in inputs
@@ -139,7 +140,9 @@
 <GlobalCommandPalette bind:open={showCommandPalette} />
 
 <!-- YoRHa Detective Sidebar -->
-<YorhaSidebar />
+{#if showGlobalSidebar}
+    <YorhaSidebar />
+{/if}
 
 <!-- Navigation loading bar -->
 {#if navigating.to}
@@ -147,7 +150,7 @@
 {/if}
 
 <!-- Main Content Area -->
-<div class="app-shell">
+<div class="app-shell" class:with-global-sidebar={showGlobalSidebar} class:without-global-sidebar={!showGlobalSidebar}>
     <main class="main-content">
         {#if appState.globalError}
             <div class="error-toast">{appState.globalError}</div>
@@ -222,7 +225,6 @@
 
     .app-shell {
         min-height: 100vh;
-        padding-left: 210px;
         transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         background:
             radial-gradient(circle at top left, rgba(126, 231, 255, 0.14), transparent 30%),
@@ -232,6 +234,14 @@
         position: relative;
     }
 
+    .app-shell.with-global-sidebar {
+        padding-left: 210px;
+    }
+
+    .app-shell.without-global-sidebar {
+        padding-left: 0;
+    }
+
     :global(body:has(.yorha-sidebar.collapsed)) .app-shell {
         padding-left: 60px;
     }
@@ -239,7 +249,6 @@
     .app-shell::before {
         content: '';
         position: fixed;
-        inset: 0 0 0 210px;
         pointer-events: none;
         background:
             linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 32%),
@@ -253,6 +262,14 @@
         mix-blend-mode: screen;
         opacity: 0.45;
         transition: inset 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .app-shell.with-global-sidebar::before {
+        inset: 0 0 0 210px;
+    }
+
+    .app-shell.without-global-sidebar::before {
+        inset: 0;
     }
 
     :global(body:has(.yorha-sidebar.collapsed)) .app-shell::before {

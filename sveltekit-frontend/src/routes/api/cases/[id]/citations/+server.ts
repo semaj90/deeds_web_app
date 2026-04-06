@@ -73,13 +73,8 @@ export const GET: RequestHandler = async ({ locals, params }) => {
         notes: caseStatuteLinks.notes,
         createdAt: caseStatuteLinks.createdAt,
         citationId: citations.id,
-        citationText: sql<string | null>`COALESCE(
-          "citations"."formatted_citation",
-          "citations"."quoted_text",
-          "citations"."annotation",
-          "citations"."legal_principle"
-        )`,
-        sourceUrl: sql<string | null>`NULL`,
+        citationText: citations.citationText,
+        sourceUrl: citations.sourceUrl,
       })
       .from(caseStatuteLinks)
       .leftJoin(citations, eq(caseStatuteLinks.citationId, citations.id))
