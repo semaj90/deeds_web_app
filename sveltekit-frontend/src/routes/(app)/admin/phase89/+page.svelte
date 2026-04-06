@@ -30,7 +30,7 @@
 			const summaryMap = new Map<string, { title?: string; description?: string; tags?: string[] }>(data.summaries.map((s: any) => {
 				const meta = typeof s.metadata === 'string' ? JSON.parse(s.metadata) : s.metadata;
 				// Handle both string and number cluster_id
-				return [String(meta.cluster_id), s];
+				return [String(meta.cluster_id), s] as [string, { title?: string; description?: string; tags?: string[] }];
 			}));
 
 			clusters = clusters.map(c => {
@@ -75,6 +75,7 @@
 		title?: string;
 		description?: string;
 		tags?: string[];
+		fix_strategy?: string;
 	}
 
 	interface GraphNode { id: string, label: string;

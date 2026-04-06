@@ -75,12 +75,12 @@
     "**/service-worker.ts",
 
     // ── Experimental / GPU ──
-    "src/lib/experimental/**",
-    "src/lib/ai/_experimental/**",
-    "src/lib/examples/**",
-    "src/routes/api/ai/gpu/**",
-    "src/lib/engines/**",
-    "src/lib/gpu/**",
+    // "src/lib/experimental/**",  // REMOVED: directory does not exist
+    // "src/lib/ai/_experimental/**",  // REMOVED: directory does not exist
+    // "src/lib/examples/**",  // REMOVED: directory does not exist
+    // "src/routes/api/ai/gpu/**",  // REMOVED: directory does not exist
+    // "src/lib/engines/**",  // REMOVED: directory does not exist
+    // "src/lib/gpu/**",  // FIXED: 15 files, hybrid-gpu-context broken comment fixed
 
     // ── Previously excluded services (now clean) ──
     // "src/lib/services/error-analysis/**",  // FIXED: 17 files, 0 errors — clean types + barrel exports
@@ -138,8 +138,8 @@
     // "src/lib/components/ui/enhanced-bits.ts",  // ARCHIVED to deeds_labs (phantom BitsDropdown/ imports)
 
     // ── Routes ──
-    "src/routes/test-*/**",
-    "src/routes/rag-*/**",
-    "src/routes/(app)/admin/phase89/**"
+    // "src/routes/test-*/**",  // REMOVED: no matching directories exist
+    // "src/routes/rag-*/**",  // REMOVED: no matching directories exist
+    // "src/routes/(app)/admin/phase89/**"  // TESTING: un-exclude - 2 files
   ]
 }
