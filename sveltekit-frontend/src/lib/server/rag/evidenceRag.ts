@@ -1,6 +1,6 @@
 import { GemmaVectorStore } from './uiComplianceRag.js';
 
-let evidenceStore: null = null;
+let evidenceStore: any = null;
 
 export async function initEvidenceRAG(): Promise<GemmaVectorStore> {
  if (evidenceStore) return evidenceStore;

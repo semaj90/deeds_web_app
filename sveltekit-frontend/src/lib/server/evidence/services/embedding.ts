@@ -7,7 +7,7 @@ export async function embedText(text: string): Promise<number[]> {
         // @ts-ignore
         const transformers = await import('@xenova/transformers'); // Dynamic import for ESM/CJS compat attempt
         if (transformers) {
-            const pipe = await transformers.pipeline('feature-extraction');
+            const pipe = await (transformers as any).pipeline('feature-extraction');
             const embeddings = await pipe(text);
             // Normalize to a flat number[] if nested
             const flat = Array.isArray(embeddings) ? embeddings.flat(Infinity).map(Number) : [];

@@ -496,10 +496,24 @@ async function extractText(
         return { text, method: 'pdf-parse' };
       }
 
-      // Scanned PDF — pdf-parse returned near-empty text, try OCR
+      // Scanned PDF — pdf-parse returned near-empty text, try Granite-Docling (renders pages to images)
       console.log(
-        `[Upload] PDF text too short (${text.trim().length} chars), trying OCR for ${fileName}`
+        `[Upload] PDF text too short (${text.trim().length} chars), trying Granite-Docling for ${fileName}`
       );
+      try {
+        const { isGraniteDoclingAvailable, analyzePdfWithGraniteDocling } =
+          await import('$lib/server/analysis/granite-docling.js');
+        if (await isGraniteDoclingAvailable()) {
+          const gdResult = await analyzePdfWithGraniteDocling(buffer);
+          if (gdResult.fullText.trim().length >= MIN_PDF_TEXT_LENGTH) {
+            return { text: gdResult.fullText, method: 'granite-docling-pdf', doclingBlocks: gdResult.blocks };
+          }
+          console.log(`[Upload] Granite-Docling PDF text too short (${gdResult.fullText.trim().length} chars), falling back to OCR`);
+        }
+      } catch (gdErr) {
+        console.warn('[Upload] Granite-Docling PDF failed, falling back to OCR:', gdErr);
+      }
+
       const ocrResult = await extractTextHybrid(buffer, fileName);
       if (ocrResult.text.trim().length > text.trim().length) {
         return { text: ocrResult.text, method: `ocr-${ocrResult.method}` };
@@ -519,6 +533,21 @@ async function extractText(
   }
 
   if (isImage) {
+    // Try Granite-Docling first for layout-aware document understanding (tables, equations, structure)
+    try {
+      const { isGraniteDoclingAvailable, analyzeImageWithGraniteDocling } =
+        await import('$lib/server/analysis/granite-docling.js');
+      if (await isGraniteDoclingAvailable()) {
+        const gdResult = await analyzeImageWithGraniteDocling(buffer);
+        if (gdResult.fullText.trim().length >= MIN_PDF_TEXT_LENGTH) {
+          return { text: gdResult.fullText, method: 'granite-docling', doclingBlocks: gdResult.blocks };
+        }
+        console.log(`[Upload] Granite-Docling text too short (${gdResult.fullText.trim().length} chars), falling back to OCR`);
+      }
+    } catch (err) {
+      console.warn('[Upload] Granite-Docling failed, falling back to OCR:', err);
+    }
+
     // Resize large images before OCR (max 1280px — Tesseract quality sweet-spot)
     let processBuffer = buffer;
     try {

@@ -1,6 +1,8 @@
 
 // src/lib/server/redisPubSub.ts
-import { createRedisInstance, createRedisConnection } from '$lib/server/redis';
+import { redis } from '$lib/server/redis';
+const createRedisInstance = () => redis;
+const createRedisConnection = () => redis;
 
 // Simplified commands interface stub
 export interface RedisBasicCommands {

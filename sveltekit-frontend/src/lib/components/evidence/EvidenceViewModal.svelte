@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import TagInput from '$lib/components/ui/TagInput.svelte';
+	import DoclingExtractionViewer from './DoclingExtractionViewer.svelte';
 	import { formatFileSize, formatDate, getIcon, getTypeLabel } from './evidence-utils.js';
 
 	let {
@@ -112,6 +113,39 @@
 		if (status === 'failed') return 'failed';
 		if (status === 'pending') return 'pending';
 		return 'skipped';
+	}
+
+	// Docling extraction viewer
+	let showDoclingViewer = $state(false);
+	let doclingFileBase64 = $state<string | undefined>(undefined);
+	let doclingLoading = $state(false);
+
+	let canRunDocling = $derived(
+		(isPdf || isImage) && !!fileUrl
+	);
+
+	async function openDoclingViewer() {
+		if (!fileUrl) return;
+		doclingLoading = true;
+		try {
+			const res = await fetch(fileUrl);
+			if (!res.ok) throw new Error('Failed to fetch file');
+			const blob = await res.blob();
+			const reader = new FileReader();
+			const base64 = await new Promise<string>((resolve) => {
+				reader.onload = () => {
+					const dataUrl = reader.result as string;
+					resolve(dataUrl.split(',')[1]);
+				};
+				reader.readAsDataURL(blob);
+			});
+			doclingFileBase64 = base64;
+			showDoclingViewer = true;
+		} catch (e) {
+			console.error('[EvidenceViewModal] Docling fetch error:', e);
+		} finally {
+			doclingLoading = false;
+		}
 	}
 
 	// Image lightbox
@@ -460,6 +494,17 @@
 								Download
 							</a>
 						{/if}
+						{#if canRunDocling}
+							<button
+								type="button"
+								class="footer-btn secondary"
+								onclick={openDoclingViewer}
+								disabled={doclingLoading}
+							>
+								<Icon name="file-search" class="w-3.5 h-3.5" />
+								{doclingLoading ? 'Loading…' : 'Docling Extract'}
+							</button>
+						{/if}
 						{#if onAnalyze}
 							<button type="button" class="footer-btn secondary" onclick={() => { onAnalyze?.(doc); close(); }}>
 								<Icon name="sparkles" class="w-3.5 h-3.5" />
@@ -515,6 +560,14 @@
 		</div>
 	</div>
 {/if}
+
+<!-- Docling Extraction Viewer -->
+<DoclingExtractionViewer
+	bind:open={showDoclingViewer}
+	evidenceId={evidenceId ?? undefined}
+	fileName={fileName}
+	fileBase64={doclingFileBase64}
+/>
 
 <style>
 	.modal-backdrop {

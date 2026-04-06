@@ -1,5 +1,7 @@
-import * as amqp from 'amqplib';
-import type { Connection, Channel, Options } from 'amqplib';
+import amqp from 'amqplib';
+type Connection = any;
+type Channel = any;
+type Options = { Publish: any };
 
 let connection: Connection | null = null;
 let channel: Channel | null = null;
@@ -33,7 +35,7 @@ const connectWithFallback = async (): Promise<Connection | null> => {
             const safeUrl = maskCredentials(url);
             console.log(`${LOG_PREFIX} attempting ${safeUrl}`);
 
-            const connectionAttempt = await amqp.connect(url, {
+            const connectionAttempt = await (amqp as any).connect(url, {
                 heartbeat: 60,
                 timeout: 5000,
             } as any);
@@ -121,7 +123,7 @@ export const closeRabbitMQConnection = async (): Promise<void> => {
 export const publishMessage = async (
     queueName: string,
     message: Record<string, unknown>,
-    options?: Options.Publish
+    options?: Options["Publish"]
 ): Promise<boolean> => {
     const ch = await ensureChannel();
     if (!ch) return false;

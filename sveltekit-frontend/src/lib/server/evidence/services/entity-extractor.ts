@@ -6,7 +6,7 @@ export async function extractEntities(text: string): Promise<Entity[]> {
         // @ts-ignore
         const transformers = await import('@xenova/transformers');
         if (transformers) {
-            const ner = await transformers.pipeline('ner');
+            const ner = await (transformers as any).pipeline('ner');
             const results = await ner(text);
             return results.map((r: any) => ({
                 text: r.word,

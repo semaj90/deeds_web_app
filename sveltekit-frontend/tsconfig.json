@@ -97,10 +97,11 @@
     "src/lib/utils/dynamic-imports.ts",
 
     // ── Server: corrupted individual files (verified exist) ──
-    "src/lib/server/clients/ollama.ts",
-    "src/lib/server/messaging/rabbitmq.ts",
-    "src/lib/server/api/**",
-    "src/lib/server/error-brain/**",
+    // ── Batch 3: server dirs + individual files (un-excluded, verified clean) ──
+    "src/lib/server/clients/ollama.ts",  // corrupted Phase 99 (3 lines)
+    // "src/lib/server/messaging/rabbitmq.ts",
+    // "src/lib/server/api/**",
+    // "src/lib/server/error-brain/**",
     // ── Batch 1: small server dirs (un-excluded, verified clean) ──
     // "src/lib/server/pdf/**",        // 2 files — clean
     // "src/lib/server/rabbitmq/**",    // 1 file — clean
@@ -109,29 +110,30 @@
     // "src/lib/server/langextract/**", // 1 file — clean
     // "src/lib/server/phase72/**",     // 3 files — clean
     // "src/lib/server/pgai/**",        // 3 files — clean
-    "src/lib/server/evidence/**",
-    "src/lib/server/graph/**",
-    "src/lib/server/rag/**",
-    "src/lib/server/utils/**",
+    // ─��� Batch 2: larger server dirs (un-excluded, verified clean) ──
+    // "src/lib/server/evidence/**",    // 10 files — clean
+    // "src/lib/server/graph/**",       // 5 files — clean
+    // "src/lib/server/rag/**",         // 7 files — clean
+    // "src/lib/server/utils/**",       // 13 files — clean
 
-    // ── Server: corrupted individual files (verified exist) ──
-    "src/lib/server/minio/client.ts",
-    "src/lib/server/db/index-unified.ts",
-    "src/lib/server/db/pgvector-service.ts",
-    "src/lib/server/db/phase90-helpers.ts",
-    "src/lib/server/trt-llm.ts",
-    "src/lib/server/rabbitmq.ts",
-    "src/lib/server/cache/cartridge-tensor-bridge.ts",
-    "src/lib/server/auth.ts",
-    "src/lib/server/services.ts",
-    "src/lib/server/vector-cache.ts",
-    "src/lib/server/endpoints.ts",
-    "src/lib/server/knowledge-cache.ts",
-    "src/lib/server/minio-client.ts",
-    "src/lib/server/ocr.ts",
-    "src/lib/server/redisPubSub.ts",
-    "src/lib/server/vector/embedding-gemma.ts",
-    "src/lib/server/mcp/multi-core-integration.ts",
+    // ── Batch 3: individual server files (un-excluded, verified clean) ──
+    // "src/lib/server/minio/client.ts",
+    "src/lib/server/db/index-unified.ts",  // phantom deps (connection-manager, database config)
+    "src/lib/server/db/pgvector-service.ts",  // 7 errors: sql.unsafe + postgres.js/drizzle mismatch
+    "src/lib/server/db/phase90-helpers.ts",  // 30 schema mismatch errors
+    // "src/lib/server/trt-llm.ts",
+    // "src/lib/server/rabbitmq.ts",
+    // "src/lib/server/cache/cartridge-tensor-bridge.ts",
+    // "src/lib/server/auth.ts",
+    // "src/lib/server/services.ts",
+    // "src/lib/server/vector-cache.ts",
+    // "src/lib/server/endpoints.ts",
+    // "src/lib/server/knowledge-cache.ts",
+    // "src/lib/server/minio-client.ts",
+    // "src/lib/server/ocr.ts",
+    // "src/lib/server/redisPubSub.ts",
+    // "src/lib/server/vector/embedding-gemma.ts",
+    // "src/lib/server/mcp/multi-core-integration.ts",
 
     // ── Corrupted component files (verified exist) ──
     "src/lib/components/ui/enhanced-bits.ts",

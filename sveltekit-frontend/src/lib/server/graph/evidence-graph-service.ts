@@ -65,7 +65,7 @@ export async function upsertEvidenceGraph(data: EvidenceGraphUpsertInput): Promi
     const session = driver.session();
     let relationshipsCreated = 0;
     try {
-        await session.writeTransaction(async (tx: Transaction) => {
+        await (session as any).writeTransaction(async (tx: any) => {
             // Upsert evidence node
             await tx.run(
                 `MERGE (e:Evidence {id: $evidenceId})
@@ -136,7 +136,7 @@ export async function createSimilarityLinks(
     const driver = getDriver();
     const session = driver.session();
     try {
-        await session.writeTransaction(async (tx: Transaction) => {
+        await (session as any).writeTransaction(async (tx: any) => {
             for (const n of neighbors) {
                 if (n.similarity >= SIMILARITY_THRESHOLD) {
                     await tx.run(

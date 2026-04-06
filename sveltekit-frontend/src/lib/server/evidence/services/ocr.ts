@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-export async function runOcrFromFile(filePath: string): Promise<{ text, string }> {
+export async function runOcrFromFile(filePath: string): Promise<{ text: string }> {
  // Try to dynamically require tesseract if available.
  try {
  // eslint-disable-next-line @typescript-eslint/no-var-requires

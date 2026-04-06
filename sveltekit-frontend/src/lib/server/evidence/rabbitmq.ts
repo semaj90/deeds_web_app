@@ -3,8 +3,8 @@ import amqp from 'amqplib';
 const RABBITMQ_URL = process.env.RABBITMQ_URL ?? 'amqp://localhost';
 
 export async function connectRabbit(): Promise<{
-	conn: amqp.Connection, channel: amqp.Channel }> {
-    const conn = await amqp.connect(RABBITMQ_URL);
+	conn: any, channel: any }> {
+    const conn = await (amqp as any).connect(RABBITMQ_URL);
     const channel = await conn.createChannel();
     return { conn, channel };
 }

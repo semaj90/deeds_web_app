@@ -682,6 +682,20 @@ async function extractUploadedFile(
         return { text, method: 'pdf-parse', documentType: 'pdf_ingest' };
       }
 
+      // Scanned PDF — try Granite-Docling (renders pages to images)
+      try {
+        const { isGraniteDoclingAvailable, analyzePdfWithGraniteDocling } =
+          await import('$lib/server/analysis/granite-docling.js');
+        if (await isGraniteDoclingAvailable()) {
+          const gdResult = await analyzePdfWithGraniteDocling(buffer);
+          if (gdResult.fullText.trim().length >= MIN_PDF_TEXT_LENGTH) {
+            return { text: gdResult.fullText, method: 'granite-docling-pdf', documentType: 'pdf_ingest' };
+          }
+        }
+      } catch (gdErr) {
+        console.warn('[ace/ingest] Granite-Docling PDF failed:', gdErr);
+      }
+
       const ocrResult = await extractTextHybrid(buffer, fileName);
       if (ocrResult.text.trim().length > text.length) {
         return {
@@ -704,6 +718,26 @@ async function extractUploadedFile(
   }
 
   if (imageFilePattern.test(fileName) || mimeType?.startsWith('image/')) {
+    // Try Granite-Docling first for layout-aware document understanding
+    try {
+      const { isGraniteDoclingAvailable, analyzeImageWithGraniteDocling } =
+        await import('$lib/server/analysis/granite-docling.js');
+      if (await isGraniteDoclingAvailable()) {
+        const gdResult = await analyzeImageWithGraniteDocling(buffer);
+        if (gdResult.fullText.trim().length >= MIN_PDF_TEXT_LENGTH) {
+          const yolo = await analyzeImageWithYolo(buffer, fileName);
+          return {
+            text: gdResult.fullText,
+            method: 'granite-docling',
+            documentType: 'image_ingest',
+            yolo,
+          };
+        }
+      }
+    } catch (err) {
+      console.warn('[ace/ingest] Granite-Docling failed, falling back to OCR:', err);
+    }
+
     const ocrResult = await extractTextHybrid(buffer, fileName);
     const yolo = await analyzeImageWithYolo(buffer, fileName);
     return {

@@ -41,7 +41,7 @@ export function createTransport(type: TransportType): ErrorBrainTransport {
 /**
  * Singleton for current transport
  */
-let currentTransport: null = null;
+let currentTransport: ErrorBrainTransport | null = null;
 
 export function getTransport(): ErrorBrainTransport {
  if (!currentTransport) {

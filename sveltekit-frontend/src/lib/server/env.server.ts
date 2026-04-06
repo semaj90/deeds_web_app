@@ -38,6 +38,9 @@ export const ENV = {
   OLLAMA_BASE_URL: privateEnv.OLLAMA_BASE_URL ?? privateEnv.OLLAMA_URL ?? DEV.OLLAMA_URL,
   /** Gemma 4 E4B model tag for tool-calling / complex reasoning (131K ctx, native thinking) */
   GEMMA4_MODEL: privateEnv.GEMMA4_MODEL ?? 'gemma4:e4b-it-q4_K_M',
+  /** Granite-Docling-258M for layout-aware document extraction (Ollama multimodal) */
+  GRANITE_DOCLING_MODEL: privateEnv.GRANITE_DOCLING_MODEL ?? 'ibm/granite-docling:258m',
+  GRANITE_DOCLING_ENABLED: (privateEnv.GRANITE_DOCLING_ENABLED ?? 'true') === 'true',
   PUBLIC_API_URL: publicEnv.PUBLIC_API_URL ?? DEV.PUBLIC_API_URL,
   MINIO_ENDPOINT: privateEnv.MINIO_ENDPOINT ?? DEV.MINIO_ENDPOINT,
   MINIO_PORT: privateEnv.MINIO_PORT ?? DEV.MINIO_PORT,

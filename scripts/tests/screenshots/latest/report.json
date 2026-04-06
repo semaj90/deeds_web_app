@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-04-04T03-39-00",
+  "timestamp": "2026-04-06T05-14-17",
   "base": "http://127.0.0.1:5173",
-  "totalTimeMs": 194697,
+  "totalTimeMs": 177336,
   "results": [
     {
       "name": "evidence",
@@ -15,15 +15,333 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "No available adapters.",
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
-      "failedRequests": [],
-      "loadTimeMs": 14370,
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PLDDJCW6.js?v=91ecaf1c",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/ui/badge/Badge.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/ui/GlobalCommandPalette.svelte?svelte&type=style&lang.css",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/evidence/EvidenceBulkUploadDialog.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/evidence/evidence-utils.ts",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/lokijs.js?v=91ecaf1c",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/svelte_easing.js?v=91ecaf1c",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/legal/DocumentDetails.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/shells/BridgeActions.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/@sveltejs/kit/src/runtime/app/state/server.js?v=91ecaf1c",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/@sveltejs/kit/src/runtime/app/forms.js?v=91ecaf1c",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/UploadProgress.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/cache/OfflineIndicator.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/ui/Dialog.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/@sveltejs/kit/src/runtime/app/state/client.js?v=91ecaf1c",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-KEW3NMB2.js?v=91ecaf1c",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/CodebaseSearch.svelte?svelte&type=style&lang.css",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/stores/preferences.svelte.ts",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/svelte_transition.js?v=91ecaf1c",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/evidence/EvidenceToolbar.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/utils/telemetry.ts",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/LegalCorpusSearch.svelte?svelte&type=style&lang.css",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/stores/unified/notification-store.svelte.ts",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/evidence/UploadProgressCard.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/evidence/EvidenceList.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/legal-ai/CaseDocumentWriter.svelte?svelte&type=style&lang.css",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/evidence/EvidenceFiltersDrawer.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/ai/AIAssistantButton.svelte?svelte&type=style&lang.css",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/idb.js?v=91ecaf1c",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/routes/(app)/evidence/+page.svelte?svelte&type=style&lang.css",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/routes/(app)/+layout.svelte?svelte&type=style&lang.css",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/evidence/EvidenceUploadModal.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/shells/InvestigationShell.svelte?svelte&type=style&lang.css",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/stores/auth-store.svelte.ts",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/ui/ErrorBoundary.svelte?svelte&type=style&lang.css",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/cases/CaseOverview.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/stores/appState.svelte.ts",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/stores/analysis-panel.svelte.ts",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RTOOWPHF.js?v=91ecaf1c",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/ui/Breadcrumbs.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/models/ChatSession.svelte.ts",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/evidence/LinkEvidenceToCaseDialog.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/ui/Icon.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/machines/retrieval-machine.ts",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/ui/Button.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/evidence/EvidencePrimaryUpload.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/evidence/EvidenceAdvancedToolsMenu.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/legal/CitationSaveTooltip.svelte?svelte&type=style&lang.css",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/utils/xstate-svelte5.svelte.ts",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/utils.ts",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/ActionPopup.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/CaseSelector.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/modals/EvidenceCRUDModal.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/evidence/EvidenceStatsRow.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/evidence/EvidencePageHeader.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/editor/TipTapEditor.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/layout/YorhaSidebar.svelte?svelte&type=style&lang.css",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/evidence/EvidenceViewModal.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/evidence/EvidenceAiAssistantDrawer.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/bits-ui.js?v=91ecaf1c",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-7RQDXF5S.js?v=91ecaf1c",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/stores/user.svelte.ts",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 26385,
       "domElements": 438,
-      "resourceCount": 334,
-      "resourceSizeKB": 14274
+      "resourceCount": 744,
+      "resourceSizeKB": 0
     },
     {
       "name": "persons-of-interest",
@@ -37,25 +355,136 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra",
         "No available adapters.",
         "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "No available adapters."
       ],
       "failedRequests": [
         {
-          "url": "http://127.0.0.1:5173/api/analytics/events",
-          "method": "POST",
+          "url": "http://127.0.0.1:5173/persons-of-interest",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/poi/PersonOfInterestDetailView.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/models/ChatSession.svelte.ts",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/ai/AIAssistantButton.svelte?svelte&type=style&lang.css",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/@sveltejs/kit/src/runtime/app/environment/index.js?v=91ecaf1c",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/ui/badge/Badge.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/poi/AddPoiModal.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/utils.ts",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/ui/Kbd.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/legal/CitationSaveTooltip.svelte?svelte&type=style&lang.css",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/svelte_internal_disclose-version.js?v=91ecaf1c",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/ui/MicroInteraction.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/ui/EmptyState.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/routes/(app)/persons-of-interest/+page.svelte?svelte&type=style&lang.css",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/xstate.js?v=91ecaf1c",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/poi/POIEditor.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/ai/client-cache.ts",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/svelte_legacy.js?v=91ecaf1c",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/cases/CaseOverview.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/legal/DocumentDetails.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/svelte_internal_client.js?v=91ecaf1c",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/client/ui/POIPhotoUploader.svelte",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/ui/Button.svelte?svelte&type=style&lang.css",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/POIPhotoModal.svelte",
+          "method": "GET",
           "failure": "net::ERR_ABORTED"
         }
       ],
-      "loadTimeMs": 17785,
-      "domElements": 392,
-      "resourceCount": 572,
+      "loadTimeMs": 18686,
+      "domElements": 293,
+      "resourceCount": 216,
       "resourceSizeKB": 0
     },
     {
@@ -72,10 +501,10 @@
         "WebGPU: No adapter available"
       ],
       "failedRequests": [],
-      "loadTimeMs": 4670,
+      "loadTimeMs": 4959,
       "domElements": 31,
-      "resourceCount": 83,
-      "resourceSizeKB": 1973
+      "resourceCount": 77,
+      "resourceSizeKB": 1823
     },
     {
       "name": "cases-board",
@@ -89,17 +518,37 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra",
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
-      "failedRequests": [],
-      "loadTimeMs": 15879,
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:5173/api/analytics/events",
+          "method": "POST",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PLDDJCW6.js?v=34e38653",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 15008,
       "domElements": 419,
-      "resourceCount": 225,
-      "resourceSizeKB": 12318
+      "resourceCount": 441,
+      "resourceSizeKB": 16876
     },
     {
       "name": "cases-list",
@@ -114,162 +563,54 @@
         "No available adapters.",
         "WebGPU: No adapter available",
         "No available adapters.",
+        "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [
         {
-          "url": "http://127.0.0.1:5173/src/lib/components/cases/CaseNotesEditor.svelte",
+          "url": "http://127.0.0.1:5173/src/lib/components/onboarding/SetupWizard.svelte",
           "method": "GET",
           "failure": "net::ERR_ABORTED"
         },
         {
-          "url": "http://127.0.0.1:5173/src/lib/components/legal/CitationSaveTooltip.svelte?svelte&type=style&lang.css",
+          "url": "http://127.0.0.1:5173/src/lib/components/analysis/AnalysisPanel.svelte",
           "method": "GET",
           "failure": "net::ERR_ABORTED"
         },
         {
-          "url": "http://127.0.0.1:5173/src/routes/(app)/cases/+page.svelte?svelte&type=style&lang.css",
+          "url": "http://127.0.0.1:5173/src/lib/components/ai/AIChatWidget.svelte",
           "method": "GET",
           "failure": "net::ERR_ABORTED"
         },
         {
-          "url": "http://127.0.0.1:5173/src/lib/index.ts",
+          "url": "http://127.0.0.1:5173/src/lib/components/ui/AccessibilityPanel.svelte",
           "method": "GET",
           "failure": "net::ERR_ABORTED"
         },
         {
-          "url": "http://127.0.0.1:5173/src/lib/components/nes/NesModal.svelte",
+          "url": "http://127.0.0.1:5173/api/analytics/events",
+          "method": "POST",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/src/lib/components/KeyboardShortcutsPanel.svelte",
           "method": "GET",
           "failure": "net::ERR_ABORTED"
         },
         {
-          "url": "http://127.0.0.1:5173/src/lib/components/cases/CaseOverview.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/legal/SimilarCasesPanel.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/SearchBar.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/utils/xstate-svelte5.svelte.ts",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/ui/Breadcrumbs.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/LegalCorpusSearch.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/db/client-db.ts",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/editor/TipTapEditor.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/ai/AIAssistantButton.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/CaseSelector.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/ui/Button.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/cases/CaseViewModal.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/ai/LegalDocumentDrafting.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/evidence/EvidenceManager.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/legal/DocumentDetails.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/ui/ErrorBoundary.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/machines/retrieval-machine.ts",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/types/enhanced-svelte5-types.ts",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/cache/cache-service.svelte.ts",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/node_modules/@sveltejs/kit/src/runtime/app/forms.js?v=9cc0612f",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/cases/CaseCard.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/ui/Skeleton.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/models/ChatSession.svelte.ts",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/CodebaseSearch.svelte?svelte&type=style&lang.css",
+          "url": "http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts",
           "method": "GET",
           "failure": "net::ERR_ABORTED"
         }
       ],
-      "loadTimeMs": 20910,
-      "domElements": 381,
-      "resourceCount": 336,
-      "resourceSizeKB": 0
+      "loadTimeMs": 12998,
+      "domElements": 658,
+      "resourceCount": 417,
+      "resourceSizeKB": 16084
     },
     {
       "name": "dashboard",
@@ -282,16 +623,13 @@
       "consoleErrors": [],
       "consoleWarnings": [
         "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU: No adapter available"
       ],
       "failedRequests": [],
-      "loadTimeMs": 22834,
-      "domElements": 418,
-      "resourceCount": 218,
-      "resourceSizeKB": 8470
+      "loadTimeMs": 10135,
+      "domElements": 379,
+      "resourceCount": 66,
+      "resourceSizeKB": 2043
     },
     {
       "name": "citations",
@@ -305,15 +643,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 6123,
+      "loadTimeMs": 3605,
       "domElements": 437,
-      "resourceCount": 261,
-      "resourceSizeKB": 9121
+      "resourceCount": 263,
+      "resourceSizeKB": 8883
     },
     {
       "name": "evidence-upload",
@@ -327,15 +666,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 6853,
+      "loadTimeMs": 3620,
       "domElements": 348,
-      "resourceCount": 211,
-      "resourceSizeKB": 8091
+      "resourceCount": 209,
+      "resourceSizeKB": 7957
     },
     {
       "name": "active-cases",
@@ -349,15 +689,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 7284,
-      "domElements": 561,
-      "resourceCount": 214,
-      "resourceSizeKB": 8776
+      "loadTimeMs": 3886,
+      "domElements": 757,
+      "resourceCount": 216,
+      "resourceSizeKB": 8205
     },
     {
       "name": "analysis-center",
@@ -371,15 +712,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 7821,
+      "loadTimeMs": 6465,
       "domElements": 473,
-      "resourceCount": 229,
-      "resourceSizeKB": 9469
+      "resourceCount": 231,
+      "resourceSizeKB": 8874
     },
     {
       "name": "command-center",
@@ -393,15 +735,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 3480,
-      "domElements": 56,
-      "resourceCount": 183,
-      "resourceSizeKB": 7302
+      "loadTimeMs": 2468,
+      "domElements": 575,
+      "resourceCount": 196,
+      "resourceSizeKB": 7735
     },
     {
       "name": "evidence-library",
@@ -415,15 +758,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 11073,
+      "loadTimeMs": 9367,
       "domElements": 358,
-      "resourceCount": 225,
-      "resourceSizeKB": 9002
+      "resourceCount": 227,
+      "resourceSizeKB": 8417
     },
     {
       "name": "global-search",
@@ -437,15 +781,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 8385,
+      "loadTimeMs": 7112,
       "domElements": 370,
-      "resourceCount": 236,
-      "resourceSizeKB": 13482
+      "resourceCount": 239,
+      "resourceSizeKB": 9622
     },
     {
       "name": "admin-dev-tools",
@@ -459,15 +804,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 10350,
+      "loadTimeMs": 8854,
       "domElements": 441,
-      "resourceCount": 247,
-      "resourceSizeKB": 9520
+      "resourceCount": 249,
+      "resourceSizeKB": 8931
     },
     {
       "name": "admin-knowledge-search",
@@ -481,15 +827,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 8368,
+      "loadTimeMs": 7023,
       "domElements": 320,
-      "resourceCount": 213,
-      "resourceSizeKB": 12126
+      "resourceCount": 211,
+      "resourceSizeKB": 8967
     },
     {
       "name": "admin-codebase-viewer",
@@ -503,15 +850,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 9084,
+      "loadTimeMs": 6010,
       "domElements": 954,
-      "resourceCount": 217,
-      "resourceSizeKB": 9034
+      "resourceCount": 219,
+      "resourceSizeKB": 8450
     },
     {
       "name": "system-configuration",
@@ -525,15 +873,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 7726,
+      "loadTimeMs": 4386,
       "domElements": 396,
-      "resourceCount": 214,
-      "resourceSizeKB": 8831
+      "resourceCount": 216,
+      "resourceSizeKB": 8242
     },
     {
       "name": "terminal",
@@ -547,15 +896,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 7161,
+      "loadTimeMs": 7005,
       "domElements": 351,
-      "resourceCount": 209,
-      "resourceSizeKB": 10382
+      "resourceCount": 208,
+      "resourceSizeKB": 8083
     },
     {
       "name": "admin-cache",
@@ -569,15 +919,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 6589,
-      "domElements": 526,
-      "resourceCount": 204,
-      "resourceSizeKB": 8515
+      "loadTimeMs": 12224,
+      "domElements": 538,
+      "resourceCount": 205,
+      "resourceSizeKB": 7809
     },
     {
       "name": "analytics",
@@ -591,15 +942,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 4762,
+      "loadTimeMs": 3892,
       "domElements": 346,
-      "resourceCount": 197,
-      "resourceSizeKB": 8494
+      "resourceCount": 199,
+      "resourceSizeKB": 7910
     },
     {
       "name": "cases-new",
@@ -613,15 +965,32 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "No available adapters.",
+        "WebGPU: No adapter available",
+        "No available adapters."
       ],
-      "failedRequests": [],
-      "loadTimeMs": 6076,
-      "domElements": 391,
-      "resourceCount": 215,
-      "resourceSizeKB": 11285
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/sveltekit-superforms_adapters.js?v=9d42f734",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/zod.js?v=1dd0b38f",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/sveltekit-superforms_client.js?v=5143a088",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 17770,
+      "domElements": 314,
+      "resourceCount": 301,
+      "resourceSizeKB": 0
     },
     {
       "name": "cases-detail",
@@ -631,19 +1000,30 @@
       "ok": true,
       "error": null,
       "file": "cases-detail.png",
-      "consoleErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
       "consoleWarnings": [
         "No available adapters.",
-        "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "WebGPU: No adapter available"
       ],
-      "failedRequests": [],
-      "loadTimeMs": 6483,
-      "domElements": 464,
-      "resourceCount": 303,
-      "resourceSizeKB": 9818
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-WRMRSDJC.js?v=34e38653",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-ARCDTGGQ.js?v=34e38653",
+          "method": "GET",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "loadTimeMs": 2034,
+      "domElements": 31,
+      "resourceCount": 80,
+      "resourceSizeKB": 1855
     },
     {
       "name": "cases-ai",
@@ -657,15 +1037,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 6472,
+      "loadTimeMs": 4293,
       "domElements": 334,
-      "resourceCount": 205,
-      "resourceSizeKB": 8562
+      "resourceCount": 208,
+      "resourceSizeKB": 7964
     },
     {
       "name": "cases-chat",
@@ -679,15 +1060,13 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
-        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
-        "No available adapters.",
-        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
+        "No available adapters."
       ],
       "failedRequests": [],
-      "loadTimeMs": 6709,
-      "domElements": 431,
-      "resourceCount": 209,
-      "resourceSizeKB": 8732
+      "loadTimeMs": 3481,
+      "domElements": 344,
+      "resourceCount": 193,
+      "resourceSizeKB": 7413
     },
     {
       "name": "cases-notes",
@@ -701,15 +1080,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 5121,
+      "loadTimeMs": 2478,
       "domElements": 335,
-      "resourceCount": 204,
-      "resourceSizeKB": 8558
+      "resourceCount": 207,
+      "resourceSizeKB": 7945
     },
     {
       "name": "cases-persons",
@@ -723,15 +1103,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 4923,
+      "loadTimeMs": 2585,
       "domElements": 331,
-      "resourceCount": 206,
-      "resourceSizeKB": 8587
+      "resourceCount": 209,
+      "resourceSizeKB": 7973
     },
     {
       "name": "cases-reports",
@@ -745,15 +1126,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 8041,
+      "loadTimeMs": 5470,
       "domElements": 332,
-      "resourceCount": 210,
-      "resourceSizeKB": 8083
+      "resourceCount": 213,
+      "resourceSizeKB": 7821
     },
     {
       "name": "cases-canvas",
@@ -767,15 +1149,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 7516,
+      "loadTimeMs": 8132,
       "domElements": 331,
-      "resourceCount": 208,
-      "resourceSizeKB": 8460
+      "resourceCount": 210,
+      "resourceSizeKB": 7724
     },
     {
       "name": "poi-create",
@@ -789,15 +1172,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2942,
+      "loadTimeMs": 3115,
       "domElements": 350,
       "resourceCount": 212,
-      "resourceSizeKB": 10557
+      "resourceSizeKB": 10437
     },
     {
       "name": "reports",
@@ -811,15 +1195,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 2979,
+      "loadTimeMs": 3154,
       "domElements": 337,
       "resourceCount": 204,
-      "resourceSizeKB": 8084
+      "resourceSizeKB": 7983
     },
     {
       "name": "reports-new",
@@ -833,15 +1218,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 5519,
+      "loadTimeMs": 3377,
       "domElements": 472,
-      "resourceCount": 198,
-      "resourceSizeKB": 8631
+      "resourceCount": 201,
+      "resourceSizeKB": 8019
     },
     {
       "name": "recommendations",
@@ -855,15 +1241,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 5948,
+      "loadTimeMs": 3852,
       "domElements": 407,
-      "resourceCount": 203,
-      "resourceSizeKB": 8756
+      "resourceCount": 206,
+      "resourceSizeKB": 8144
     },
     {
       "name": "evidence-analyze",
@@ -877,15 +1264,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 8512,
+      "loadTimeMs": 6396,
       "domElements": 385,
-      "resourceCount": 206,
-      "resourceSizeKB": 8670
+      "resourceCount": 209,
+      "resourceSizeKB": 8058
     },
     {
       "name": "evidence-manage",
@@ -899,15 +1287,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 5788,
+      "loadTimeMs": 2892,
       "domElements": 385,
-      "resourceCount": 205,
-      "resourceSizeKB": 8567
+      "resourceCount": 208,
+      "resourceSizeKB": 7955
     },
     {
       "name": "evidence-upload-direct",
@@ -921,15 +1310,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 6028,
-      "domElements": 364,
-      "resourceCount": 206,
-      "resourceSizeKB": 8648
+      "loadTimeMs": 2978,
+      "domElements": 378,
+      "resourceCount": 209,
+      "resourceSizeKB": 8040
     },
     {
       "name": "admin-ai-dashboard",
@@ -943,15 +1333,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 8200,
+      "loadTimeMs": 5759,
       "domElements": 322,
-      "resourceCount": 200,
-      "resourceSizeKB": 7900
+      "resourceCount": 203,
+      "resourceSizeKB": 7640
     },
     {
       "name": "admin-all-routes",
@@ -965,15 +1356,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 9227,
+      "loadTimeMs": 8872,
       "domElements": 412,
-      "resourceCount": 224,
-      "resourceSizeKB": 10098
+      "resourceCount": 227,
+      "resourceSizeKB": 9487
     },
     {
       "name": "admin-error-brain",
@@ -987,15 +1379,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 5231,
-      "domElements": 327,
-      "resourceCount": 200,
-      "resourceSizeKB": 7530
+      "loadTimeMs": 5208,
+      "domElements": 477,
+      "resourceCount": 227,
+      "resourceSizeKB": 8632
     },
     {
       "name": "admin-phase89",
@@ -1008,13 +1401,14 @@
       "consoleErrors": [],
       "consoleWarnings": [
         "No available adapters.",
-        "WebGPU: No adapter available"
+        "WebGPU: No adapter available",
+        "No available adapters."
       ],
       "failedRequests": [],
-      "loadTimeMs": 3518,
+      "loadTimeMs": 2692,
       "domElements": 242,
-      "resourceCount": 65,
-      "resourceSizeKB": 2344
+      "resourceCount": 80,
+      "resourceSizeKB": 2284
     },
     {
       "name": "admin-component-analysis",
@@ -1027,13 +1421,18 @@
       "consoleErrors": [],
       "consoleWarnings": [
         "No available adapters.",
-        "WebGPU: No adapter available"
+        "WebGPU: No adapter available",
+        "⚠️ Slow operation: http://127.0.0.1:5173/admin/component-analysis took 6238ms",
+        "No available adapters.",
+        "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
+        "No available adapters.",
+        "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 15288,
-      "domElements": 31,
-      "resourceCount": 70,
-      "resourceSizeKB": 1729
+      "loadTimeMs": 8146,
+      "domElements": 4465,
+      "resourceCount": 206,
+      "resourceSizeKB": 8021
     },
     {
       "name": "demos-index",
@@ -1047,113 +1446,17 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "⚠️ Slow operation: http://127.0.0.1:5173/demos took 6234ms",
         "No available adapters.",
-        "WebGPU: No adapter available",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
-      "failedRequests": [
-        {
-          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-G3KIWQPJ.js?v=9cc0612f",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/utils/type-guards.ts",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/polyfills.ts",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/lokijs.js?v=9cc0612f",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/cases/CaseNotesEditor.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/ai/LegalDocumentDrafting.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/ui/Button.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-ET4DRD6C.js?v=9cc0612f",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/CodebaseSearch.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/legal/SimilarCasesPanel.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/xstate.js?v=9cc0612f",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/dexie.js?v=9cc0612f",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-TLDQY5KM.js?v=9cc0612f",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/machines/retrieval-machine.ts",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/types/index.ts",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/nes/NesModal.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-TE5VMGJO.js?v=9cc0612f",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/idb.js?v=9cc0612f",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/evidence/EvidenceManager.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        }
-      ],
-      "loadTimeMs": 20443,
+      "failedRequests": [],
+      "loadTimeMs": 8001,
       "domElements": 857,
-      "resourceCount": 365,
-      "resourceSizeKB": 0
+      "resourceCount": 206,
+      "resourceSizeKB": 7824
     },
     {
       "name": "demos-keyboard-shortcuts",
@@ -1167,113 +1470,17 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "⚠️ Slow operation: http://127.0.0.1:5173/demos/keyboard-shortcuts took 6233ms",
         "No available adapters.",
-        "WebGPU: No adapter available",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
-      "failedRequests": [
-        {
-          "url": "http://127.0.0.1:5173/src/lib/ai/client-router.ts",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/xstate.js?v=9cc0612f",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/legal/SimilarCasesPanel.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/cases/CaseOverview.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/CaseSelector.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-G3KIWQPJ.js?v=9cc0612f",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/ui/Button.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/db/client-db.ts",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/nes/NesModal.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/evidence/EvidenceManager.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/legal/DocumentDetails.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/ai/model-ids.ts",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/editor/TipTapEditor.svelte?svelte&type=style&lang.css",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/cases/CaseNotesEditor.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/components/ai/LegalDocumentDrafting.svelte",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/index.ts",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/ai/emotion-context.ts",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-ET4DRD6C.js?v=9cc0612f",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        },
-        {
-          "url": "http://127.0.0.1:5173/src/lib/ai/client-cache.ts",
-          "method": "GET",
-          "failure": "net::ERR_ABORTED"
-        }
-      ],
-      "loadTimeMs": 20438,
+      "failedRequests": [],
+      "loadTimeMs": 7902,
       "domElements": 419,
-      "resourceCount": 348,
-      "resourceSizeKB": 0
+      "resourceCount": 203,
+      "resourceSizeKB": 7677
     },
     {
       "name": "demos-icons",
@@ -1287,15 +1494,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 8790,
+      "loadTimeMs": 2954,
       "domElements": 404,
-      "resourceCount": 197,
-      "resourceSizeKB": 8508
+      "resourceCount": 200,
+      "resourceSizeKB": 7897
     },
     {
       "name": "demos-memory-palace",
@@ -1309,16 +1517,17 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
-        "⚠️ Slow operation: http://127.0.0.1:5173/demos/memory-palace took 8618ms",
+        "⚠️ Slow operation: http://127.0.0.1:5173/demos/memory-palace took 1246ms",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 12983,
-      "domElements": 321,
-      "resourceCount": 206,
-      "resourceSizeKB": 8165
+      "loadTimeMs": 4953,
+      "domElements": 335,
+      "resourceCount": 207,
+      "resourceSizeKB": 8097
     },
     {
       "name": "demos-vector-search",
@@ -1332,15 +1541,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 8790,
+      "loadTimeMs": 2949,
       "domElements": 323,
-      "resourceCount": 198,
-      "resourceSizeKB": 8566
+      "resourceCount": 201,
+      "resourceSizeKB": 7955
     },
     {
       "name": "demos-courtroom-sim",
@@ -1354,15 +1564,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 6067,
+      "loadTimeMs": 12288,
       "domElements": 333,
-      "resourceCount": 255,
-      "resourceSizeKB": 8516
+      "resourceCount": 258,
+      "resourceSizeKB": 8257
     },
     {
       "name": "simulation",
@@ -1376,15 +1587,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 6497,
+      "loadTimeMs": 12322,
       "domElements": 317,
-      "resourceCount": 203,
-      "resourceSizeKB": 8209
+      "resourceCount": 204,
+      "resourceSizeKB": 8138
     },
     {
       "name": "fictional-cases",
@@ -1398,15 +1610,16 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 6422,
+      "loadTimeMs": 12636,
       "domElements": 336,
-      "resourceCount": 200,
-      "resourceSizeKB": 8600
+      "resourceCount": 203,
+      "resourceSizeKB": 7989
     },
     {
       "name": "legal-corpus",
@@ -1420,16 +1633,17 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
-        "⚠️ Slow operation: http://127.0.0.1:5173/legal-corpus took 1664ms",
+        "⚠️ Slow operation: http://127.0.0.1:5173/legal-corpus took 4109ms",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 3297,
+      "loadTimeMs": 7774,
       "domElements": 420,
-      "resourceCount": 207,
-      "resourceSizeKB": 8808
+      "resourceCount": 210,
+      "resourceSizeKB": 8198
     },
     {
       "name": "glossary",
@@ -1443,25 +1657,26 @@
       "consoleWarnings": [
         "No available adapters.",
         "WebGPU: No adapter available",
+        "No available adapters.",
         "The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127",
         "No available adapters.",
         "WebGPU initialization failed, falling back to WebGL/CPU: Error: No WebGPU adapter found\n    at WebGPUInit.initialize (http://127.0.0.1:5173/src/lib/webgpu/webgpu-init.ts:27:15)\n    at async Module.tra"
       ],
       "failedRequests": [],
-      "loadTimeMs": 3294,
+      "loadTimeMs": 7742,
       "domElements": 415,
-      "resourceCount": 205,
-      "resourceSizeKB": 8756
+      "resourceCount": 208,
+      "resourceSizeKB": 8146
     }
   ],
   "summary": {
     "passed": 50,
     "failed": 0,
     "total": 50,
-    "avgLoadMs": 8581,
-    "slowestRoute": "dashboard",
-    "slowestLoadMs": 22834,
-    "totalConsoleErrors": 0,
-    "totalNetworkFailures": 68
+    "avgLoadMs": 7126,
+    "slowestRoute": "evidence",
+    "slowestLoadMs": 26385,
+    "totalConsoleErrors": 2,
+    "totalNetworkFailures": 100
   }
 }

@@ -50,6 +50,9 @@ export const SERVER_EMBEDDING_DIMS = 768;
 /** Fallback embedding model (if embeddinggemma unavailable) */
 export const SERVER_EMBEDDING_FALLBACK = 'nomic-embed-text';
 
+/** IBM Granite-Docling-258M — document understanding VLM via Ollama (522 MB) */
+export const SERVER_GRANITE_DOCLING_MODEL = 'ibm/granite-docling:258m';
+
 // ── Qdrant collection names ──────────────────────────────────────────────
 // These MUST match VECTOR_CONFIG.COLLECTIONS in src/lib/server/config/vector-config.ts
 // (server-only file cannot be imported here — keep in sync manually)

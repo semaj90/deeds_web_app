@@ -55,19 +55,6 @@ export const auth = new Lucia(adapter, {
 
 export type Auth = typeof auth;
 
-declare module 'lucia' {
-  interface Register {
-    Lucia: typeof auth;
-    DatabaseUserAttributes: {
-	email: string;
-      firstName: string | null;
-      lastName: string | null;
-      role: string;
-	isActive: boolean;
-      avatarUrl: string | null;
-    };
-  }
-}
 
 /**
  * MicroserviceError for external service calls

@@ -46,7 +46,7 @@ export class SSETransport implements ErrorBrainTransport {
 /**
  * Singleton instance
  */
-let instance: null = null;
+let instance: SSETransport | null = null;
 
 export function getSSETransport(): SSETransport {
  if (!instance) {

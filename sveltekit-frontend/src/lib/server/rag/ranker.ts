@@ -1,6 +1,6 @@
 // src/lib/server/rag/ranker.ts
 
-import type { QdrantHit } from './qdrant';
+type QdrantHit = { score?: number; payload?: Record<string, any> };
 
 export type RankExplain = {
     cosine: number; // Semantic similarity score
@@ -81,5 +81,5 @@ export function createQdrantFilter(opts: {
 	any: opts.tagIds } });
     }
 
-    return conditions.length > 0 ? { must: conditions }  | undefined;
+    return conditions.length > 0 ? { must: conditions } : undefined;
 }
