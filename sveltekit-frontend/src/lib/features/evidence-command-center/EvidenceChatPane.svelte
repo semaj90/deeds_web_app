@@ -1,14 +1,15 @@
 <script lang="ts">
-	import type { ActionData, PageData } from '../../../routes/cases/[id]/evidence/$types';
-
-	interface Props {
-		data: PageData;
-		actionData?: ActionData, null;
+	interface ChatTurn {
+		created_at: string;
+		message: string;
+		answer?: string;
 	}
 
-	const { data }: Props = $props();
+	interface Props {
+		recentChat?: ChatTurn[];
+	}
 
-	const { recentChat = [] } = data;
+	const { recentChat = [] }: Props = $props();
 </script>
 
 <div class="flex flex-col gap-2 h-full">
@@ -42,5 +43,3 @@
 		{/if}
 	</div>
 </div>
-
-

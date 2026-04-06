@@ -90,7 +90,7 @@
     // ── Corrupted lib/ directories (verified exist + corrupted) ──
     "src/lib/webgpu/**",
     "src/lib/workers/queue-worker.ts",
-    "src/lib/features/evidence-command-center/**",
+    // "src/lib/features/evidence-command-center/**",  // rewritten + wired to cases/[id]/evidence
 
     // ── Corrupted individual lib/ files (verified exist) ──
     // "src/lib/utils/simd-markdown-parser.ts",  // 289 lines — clean, un-excluded
@@ -118,9 +118,9 @@
 
     // ── Batch 3: individual server files (un-excluded, verified clean) ──
     // "src/lib/server/minio/client.ts",
-    "src/lib/server/db/index-unified.ts",  // phantom deps (connection-manager, database config)
-    "src/lib/server/db/pgvector-service.ts",  // 7 errors: sql.unsafe + postgres.js/drizzle mismatch
-    "src/lib/server/db/phase90-helpers.ts",  // 30 schema mismatch errors
+    // "src/lib/server/db/index-unified.ts",  // ARCHIVED to deeds_labs (phantom deps, superseded by client.ts)
+    // "src/lib/server/db/pgvector-service.ts",  // ARCHIVED to deeds_labs (wrong driver, superseded by Qdrant)
+    // "src/lib/server/db/phase90-helpers.ts",  // ARCHIVED to deeds_labs (30 schema mismatches, zero consumers)
     // "src/lib/server/trt-llm.ts",
     // "src/lib/server/rabbitmq.ts",
     // "src/lib/server/cache/cartridge-tensor-bridge.ts",
@@ -135,8 +135,8 @@
     // "src/lib/server/vector/embedding-gemma.ts",
     // "src/lib/server/mcp/multi-core-integration.ts",
 
-    // ── Corrupted component files (verified exist) ──
-    "src/lib/components/ui/enhanced-bits.ts",
+    // ── Corrupted component files (archived) ──
+    // "src/lib/components/ui/enhanced-bits.ts",  // ARCHIVED to deeds_labs (phantom BitsDropdown/ imports)
 
     // ── Routes ──
     "src/routes/test-*/**",

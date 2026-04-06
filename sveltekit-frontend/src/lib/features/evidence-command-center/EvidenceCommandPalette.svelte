@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { evidenceCommandCenter } from '$lib/stores/evidenceCommandCenter.store';
+	import { evidenceCommandCenter } from '$lib/stores/evidenceCommandCenter.store.svelte';
 
 	const commands = [
 		{ id: 'board', label: 'Go to Evidence Board', hint: 'B' },
-	{ id: 'graph', label: 'Open Evidence Graph Analyzer', hint: 'G' },
-	{ id: 'chat', label: 'Focus AI Transcript', hint: 'C' }
+		{ id: 'graph', label: 'Open Evidence Graph Analyzer', hint: 'G' },
+		{ id: 'chat', label: 'Focus AI Transcript', hint: 'C' }
 	] as const;
 
 	function runCommand(id: (typeof commands)[number]['id']) {
@@ -21,7 +21,7 @@
 	}
 </script>
 
-{#if $evidenceCommandCenter.commandPaletteOpen}
+{#if evidenceCommandCenter.commandPaletteOpen}
 	<div
 		class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center"
 		role="dialog"
@@ -39,7 +39,7 @@
 				Command Palette
 			</div>
 			<p class="text-[10px] text-[#aaa] mb-2">
-				Use ↑↓ to choose, Enter to execute. ESC to close.
+				Use arrows to choose, Enter to execute. ESC to close.
 			</p>
 
 			<ul class="flex flex-col gap-1 text-[11px]">
@@ -59,5 +59,3 @@
 		</div>
 	</div>
 {/if}
-
-

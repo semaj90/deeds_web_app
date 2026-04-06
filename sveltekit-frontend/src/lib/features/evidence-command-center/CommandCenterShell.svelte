@@ -1,25 +1,24 @@
 <script lang="ts">
-	import type { CommandCenterView } from '$lib/stores/evidenceCommandCenter.store';
-	import { evidenceCommandCenter, hasSelection } from '$lib/stores/evidenceCommandCenter.store';
+	import type { CommandCenterView } from '$lib/stores/evidenceCommandCenter.store.svelte';
+	import { evidenceCommandCenter, hasSelection } from '$lib/stores/evidenceCommandCenter.store.svelte';
+	import type { Snippet } from 'svelte';
 
 	interface Props {
 		caseId: string;
 		caseTitle?: string | null;
+		children?: Snippet;
 	}
 
 	const { children, caseId, caseTitle = null }: Props = $props();
 
-	const views: {
-	id: CommandCenterView, label: string;
-	icon: string }[] = [
+	const views: { id: CommandCenterView; label: string; icon: string }[] = [
 		{ id: 'board', icon: '📁', label: 'Evidence' },
-	{ id: 'graph', icon: '📊', label: 'Graph' },
-	{ id: 'chat', icon: '🤖', label: 'AI Chat' }
+		{ id: 'graph', icon: '📊', label: 'Graph' },
+		{ id: 'chat', icon: '🤖', label: 'AI Chat' }
 	];
 </script>
 
 <div class="h-[calc(100vh-4rem)] flex flex-col gap-2 p-2 bg-[#101018] text-[#f5f5f5]">
-	<!-- NES header -->
 	<header
 		class="border-[3px] border-[#f5f5f5] bg-[#1b1b24] px-3 py-2 flex items-center justify-between shadow-[4px_4px_0_0_#000]"
 	>
@@ -28,7 +27,7 @@
 				YoRHa Legal NES // Command Center
 			</div>
 			<div class="text-[11px] font-bold">
-				Case: {caseTitle ?? `#${ caseId }`}
+				Case: {caseTitle ?? `#${caseId}`}
 			</div>
 		</div>
 
@@ -36,7 +35,7 @@
 			<div class="px-2 py-0.5 border border-[#f5f5f5] bg-[#262636]">
 				<span class="mr-1 text-[#ff6ba3]">SEL</span>
 				<span class="text-[#b5ff6b]">
-					{#if $hasSelection}
+					{#if hasSelection.current}
 						Evidence selected
 					{:else}
 						No selection
@@ -53,8 +52,7 @@
 		</div>
 	</header>
 
-	<div class="flex-1 grid grid-cols-[220px 1fr] gap-2">
-		<!-- Left sidebar, views + status -->
+	<div class="flex-1 grid grid-cols-[220px_1fr] gap-2">
 		<aside
 			class="border-[3px] border-[#f5f5f5] bg-[#15151f] p-2 flex flex-col gap-2 text-[11px] shadow-[4px_4px_0_0_#000]"
 		>
@@ -67,11 +65,11 @@
 						<button
 							type="button"
 							class="flex items-center justify-between px-2 py-1 border border-[#f5f5f5] bg-[#101018] hover:bg-[#262636] transition-colors"
-							class:bg-[#34344a]={$evidenceCommandCenter.activeView === view.id}
+							class:bg-[#34344a]={evidenceCommandCenter.activeView === view.id}
 							onclick={() => evidenceCommandCenter.setActiveView(view.id)}
 						>
 							<span>{view.icon} {view.label}</span>
-							{#if $evidenceCommandCenter.activeView === view.id}
+							{#if evidenceCommandCenter.activeView === view.id}
 								<span class="text-[9px] text-[#b5ff6b]">ACTIVE</span>
 							{/if}
 						</button>
@@ -96,13 +94,8 @@
 			</div>
 		</aside>
 
-		<!-- Main panel, slot for active view content -->
 		<main class="border-[3px] border-[#f5f5f5] bg-[#15151f] p-2 shadow-[4px_4px_0_0_#000]">
 			{@render children?.()}
 		</main>
 	</div>
 </div>
-
-
-
-
