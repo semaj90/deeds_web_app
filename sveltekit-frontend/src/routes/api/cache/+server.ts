@@ -27,69 +27,76 @@ function getMemoryStats() {
 	return { totalSize, expired, active: totalSize - expired };
 }
 
-export const GET: RequestHandler = async ({ url }) => {
-	const action = url.searchParams.get('action');
-	const key = url.searchParams.get('key');
+export const GET: RequestHandler = async ({ url, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+  const action = url.searchParams.get('action');
+  const key = url.searchParams.get('key');
 
-	if (action === 'stats') {
-		const mem = getMemoryStats();
-		let redisKeys = 0;
-		let redisMemory = '0';
-		try {
-			redisKeys = await redis.dbsize();
-			const info = await redis.info('memory');
-			const match = info.match(/used_memory_human:(\S+)/);
-			redisMemory = match?.[1] ?? '0';
-		} catch { /* Redis unavailable */ }
+  if (action === 'stats') {
+    const mem = getMemoryStats();
+    let redisKeys = 0;
+    let redisMemory = '0';
+    try {
+      redisKeys = await redis.dbsize();
+      const info = await redis.info('memory');
+      const match = info.match(/used_memory_human:(\S+)/);
+      redisMemory = match?.[1] ?? '0';
+    } catch {
+      /* Redis unavailable */
+    }
 
-		return json({
-			success: true,
-			stats: {
-				memory: { items: mem.active, expired: mem.expired, total: mem.totalSize },
-				redis: { keys: redisKeys, memoryUsed: redisMemory },
-				combined: { totalItems: mem.active + redisKeys }
-			}
-		});
-	}
+    return json({
+      success: true,
+      stats: {
+        memory: { items: mem.active, expired: mem.expired, total: mem.totalSize },
+        redis: { keys: redisKeys, memoryUsed: redisMemory },
+        combined: { totalItems: mem.active + redisKeys },
+      },
+    });
+  }
 
-	if (action === 'health') {
-		let redisHealthy = false;
-		try {
-			const pong = await redis.ping();
-			redisHealthy = pong === 'PONG';
-		} catch { /* Redis down */ }
+  if (action === 'health') {
+    let redisHealthy = false;
+    try {
+      const pong = await redis.ping();
+      redisHealthy = pong === 'PONG';
+    } catch {
+      /* Redis down */
+    }
 
-		return json({
-			success: true,
-			health: {
-				memory: { status: 'healthy', items: getMemoryStats().active },
-				redis: { status: redisHealthy ? 'healthy' : 'unavailable' },
-				overall: redisHealthy ? 'healthy' : 'degraded'
-			}
-		});
-	}
+    return json({
+      success: true,
+      health: {
+        memory: { status: 'healthy', items: getMemoryStats().active },
+        redis: { status: redisHealthy ? 'healthy' : 'unavailable' },
+        overall: redisHealthy ? 'healthy' : 'degraded',
+      },
+    });
+  }
 
-	if (key) {
-		// Try memory first
-		const memEntry = memoryCache.get(key);
-		if (memEntry && memEntry.expires > Date.now()) {
-			return json({ success: true, cached: true, value: memEntry.value, source: 'memory' });
-		}
-		// Try Redis
-		try {
-			const result = await redis.get(key);
-			if (result) {
-				try {
-					return json({ success: true, cached: true, value: JSON.parse(result), source: 'redis' });
-				} catch {
-					return json({ success: true, cached: true, value: result, source: 'redis' });
-				}
-			}
-		} catch { /* Redis unavailable */ }
-		return json({ success: true, cached: false });
-	}
+  if (key) {
+    // Try memory first
+    const memEntry = memoryCache.get(key);
+    if (memEntry && memEntry.expires > Date.now()) {
+      return json({ success: true, cached: true, value: memEntry.value, source: 'memory' });
+    }
+    // Try Redis
+    try {
+      const result = await redis.get(key);
+      if (result) {
+        try {
+          return json({ success: true, cached: true, value: JSON.parse(result), source: 'redis' });
+        } catch {
+          return json({ success: true, cached: true, value: result, source: 'redis' });
+        }
+      }
+    } catch {
+      /* Redis unavailable */
+    }
+    return json({ success: true, cached: false });
+  }
 
-	return json({ success: false, error: 'Missing action or key parameter' }, { status: 400 });
+  return json({ success: false, error: 'Missing action or key parameter' }, { status: 400 });
 };
 
 const cacheSetSchema = z.object({

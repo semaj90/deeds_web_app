@@ -576,6 +576,13 @@ async function resolveUrlSource(
     throw new Error('Invalid URL');
   }
 
+  // SSRF protection: block internal/private IPs and cloud metadata
+  const { validateExternalUrl } = await import('$lib/server/security/url-validator.js');
+  const urlCheck = validateExternalUrl(input.url);
+  if (!urlCheck.valid) {
+    throw new Error(urlCheck.error ?? 'URL not allowed');
+  }
+
   emit?.('fetching', 0.1, { url: input.url });
   const fetchRes = await fetch(input.url, {
     headers: {

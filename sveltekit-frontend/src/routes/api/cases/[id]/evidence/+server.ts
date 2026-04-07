@@ -55,7 +55,8 @@ export const GET: RequestHandler = async ({ params, locals }) => {
       })
       .from(evidence)
       .where(eq(evidence.caseId, caseId))
-      .orderBy(desc(evidence.createdAt));
+      .orderBy(desc(evidence.createdAt))
+      .limit(1000);
 
     const total = items.length;
 

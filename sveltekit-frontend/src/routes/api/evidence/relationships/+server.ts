@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { evidenceRelationships } from '$lib/server/db/schema-postgres.js';
 import { eq, and, or } from 'drizzle-orm';
+import { isUuid } from '$lib/server/validation.js';
 
 const createRelationshipSchema = z.object({
 	caseId: z.string().uuid(),
@@ -23,6 +24,12 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!caseId) {
 		return json({ message: 'caseId required' }, { status: 400 });
 	}
+	if (!isUuid(caseId)) {
+    return json({ message: 'Invalid caseId format' }, { status: 400 });
+  }
+  if (evidenceId && !isUuid(evidenceId)) {
+    return json({ message: 'Invalid evidenceId format' }, { status: 400 });
+  }
 
 	try {
 		let query = db.select().from(evidenceRelationships).where(eq(evidenceRelationships.caseId, caseId));

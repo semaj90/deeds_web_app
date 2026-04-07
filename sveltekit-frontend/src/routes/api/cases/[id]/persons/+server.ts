@@ -20,9 +20,12 @@ const personDeleteSchema = z.object({
   personId: z.string().uuid(),
 });
 
+import { isUuid } from '$lib/server/validation.js';
+
 /** GET — list all POI linked to a case with relationship metadata */
 export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+	if (!isUuid(params.id)) return json({ error: 'Invalid case ID format' }, { status: 400 });
 
 	const caseId = params.id;
 

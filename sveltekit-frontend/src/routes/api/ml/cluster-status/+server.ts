@@ -21,61 +21,62 @@ const clusterTriggerSchema = z.object({
  * GET /api/ml/cluster-status
  * Returns clustering job status + document_topics table stats
  */
-export const GET: RequestHandler = async () => {
-	try {
-		const status = getClusteringStatus();
+export const GET: RequestHandler = async ({ locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const status = getClusteringStatus();
 
-		// Get document_topics statistics
-		const allTopics = await db.select().from(documentTopics);
-		const topicStats: Record<number, { count: number; avgProbability: number }> = {};
+    // Get document_topics statistics (capped to prevent OOM)
+    const allTopics = await db.select().from(documentTopics).limit(50000);
+    const topicStats: Record<number, { count: number; avgProbability: number }> = {};
 
-		for (const record of allTopics) {
-			if (!topicStats[record.topicId]) {
-				topicStats[record.topicId] = { count: 0, avgProbability: 0 };
-			}
-			topicStats[record.topicId].count++;
-			topicStats[record.topicId].avgProbability += record.membershipProbability;
-		}
+    for (const record of allTopics) {
+      if (!topicStats[record.topicId]) {
+        topicStats[record.topicId] = { count: 0, avgProbability: 0 };
+      }
+      topicStats[record.topicId].count++;
+      topicStats[record.topicId].avgProbability += record.membershipProbability;
+    }
 
-		// Normalize averages
-		for (const topicId in topicStats) {
-			topicStats[topicId].avgProbability /= topicStats[topicId].count;
-		}
+    // Normalize averages
+    for (const topicId in topicStats) {
+      topicStats[topicId].avgProbability /= topicStats[topicId].count;
+    }
 
-		return json({
-			success: true,
-			job: {
-				id: status.jobId,
-				status: status.status,
-				startTime: new Date(status.startTime).toISOString(),
-				endTime: status.endTime ? new Date(status.endTime).toISOString() : null,
-				durationMs: status.endTime ? status.endTime - status.startTime : null,
-				documentsProcessed: status.documentsProcessed,
-				silhouetteScore: status.silhouetteScore ?? null,
-				cacheInvalidated: status.cacheInvalidated,
-				error: status.error ?? null
-			},
-			statistics: {
-				totalDocumentsWithTopics: allTopics.length,
-				topicCount: 15,
-				topicDistribution: topicStats,
-				qualityMetrics: {
-					silhouetteScore: status.silhouetteScore ?? null,
-					recommendedAction: (status.silhouetteScore ?? 0) >= 0.6 ? 'none' : 'rerun_clustering'
-				}
-			},
-			timestamp: new Date().toISOString()
-		});
-	} catch (err) {
-		console.error('[cluster-status] GET error:', err);
-		return json(
-			{
-				success: false,
-				error: 'Failed to retrieve clustering status'
-			},
-			{ status: 500 }
-		);
-	}
+    return json({
+      success: true,
+      job: {
+        id: status.jobId,
+        status: status.status,
+        startTime: new Date(status.startTime).toISOString(),
+        endTime: status.endTime ? new Date(status.endTime).toISOString() : null,
+        durationMs: status.endTime ? status.endTime - status.startTime : null,
+        documentsProcessed: status.documentsProcessed,
+        silhouetteScore: status.silhouetteScore ?? null,
+        cacheInvalidated: status.cacheInvalidated,
+        error: status.error ?? null,
+      },
+      statistics: {
+        totalDocumentsWithTopics: allTopics.length,
+        topicCount: 15,
+        topicDistribution: topicStats,
+        qualityMetrics: {
+          silhouetteScore: status.silhouetteScore ?? null,
+          recommendedAction: (status.silhouetteScore ?? 0) >= 0.6 ? 'none' : 'rerun_clustering',
+        },
+      },
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error('[cluster-status] GET error:', err);
+    return json(
+      {
+        success: false,
+        error: 'Failed to retrieve clustering status',
+      },
+      { status: 500 }
+    );
+  }
 };
 
 /**

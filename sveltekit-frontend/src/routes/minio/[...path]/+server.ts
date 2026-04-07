@@ -18,38 +18,39 @@ const MIME_MAP: Record<string, string> = {
 	'.mp3': 'audio/mpeg',
 };
 
-export const GET: RequestHandler = async ({ params }) => {
-	const fullPath = params.path;
-	if (!fullPath) throw error(400, 'Missing path');
+export const GET: RequestHandler = async ({ params, locals }) => {
+  if (!locals.user) throw error(401, 'Unauthorized');
+  const fullPath = params.path;
+  if (!fullPath) throw error(400, 'Missing path');
 
-	// Split: first segment = bucket, rest = object key
-	const slashIdx = fullPath.indexOf('/');
-	if (slashIdx < 1) throw error(400, 'Invalid path — expected /minio/{bucket}/{key}');
+  // Split: first segment = bucket, rest = object key
+  const slashIdx = fullPath.indexOf('/');
+  if (slashIdx < 1) throw error(400, 'Invalid path — expected /minio/{bucket}/{key}');
 
-	const bucket = fullPath.substring(0, slashIdx);
-	const objectKey = fullPath.substring(slashIdx + 1);
+  const bucket = fullPath.substring(0, slashIdx);
+  const objectKey = fullPath.substring(slashIdx + 1);
 
-	if (!objectKey) throw error(400, 'Missing object key');
+  if (!objectKey) throw error(400, 'Missing object key');
 
-	try {
-		const body = await getFile(bucket, objectKey);
+  try {
+    const body = await getFile(bucket, objectKey);
 
-		// Determine content type from extension
-		const ext = '.' + objectKey.split('.').pop()?.toLowerCase();
-		const contentType = MIME_MAP[ext] || 'application/octet-stream';
+    // Determine content type from extension
+    const ext = '.' + objectKey.split('.').pop()?.toLowerCase();
+    const contentType = MIME_MAP[ext] || 'application/octet-stream';
 
-		return new Response(new Uint8Array(body), {
-			headers: {
-				'Content-Type': contentType,
-				'Content-Length': String(body.length),
-				'Cache-Control': 'public, max-age=86400, immutable',
-			},
-		});
-	} catch (err: any) {
-		if (err?.code === 'NoSuchKey' || err?.code === 'NoSuchBucket') {
-			throw error(404, 'File not found');
-		}
-		console.error('[minio-proxy] Error fetching object:', err?.message ?? err);
-		throw error(500, 'Failed to fetch file from storage');
-	}
+    return new Response(new Uint8Array(body), {
+      headers: {
+        'Content-Type': contentType,
+        'Content-Length': String(body.length),
+        'Cache-Control': 'public, max-age=86400, immutable',
+      },
+    });
+  } catch (err: any) {
+    if (err?.code === 'NoSuchKey' || err?.code === 'NoSuchBucket') {
+      throw error(404, 'File not found');
+    }
+    console.error('[minio-proxy] Error fetching object:', err?.message ?? err);
+    throw error(500, 'Failed to fetch file from storage');
+  }
 };

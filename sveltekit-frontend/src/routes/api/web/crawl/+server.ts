@@ -9,70 +9,82 @@ import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { langextractFetch } from '$lib/server/langextract-client.js';
+import { validateExternalUrl } from '$lib/server/security/url-validator.js';
 
 const webCrawlSchema = z.object({
-	url: z.string().min(1, 'url is required').max(2000).url('Invalid URL format'),
-	extractText: z.boolean().optional().default(true),
-	generateEmbedding: z.boolean().optional().default(false)
+  url: z.string().min(1, 'url is required').max(2000).url('Invalid URL format'),
+  extractText: z.boolean().optional().default(true),
+  generateEmbedding: z.boolean().optional().default(false),
 });
 
 interface CrawlResult {
-	url: string;
-	title: string;
-	text: string;
-	html?: string;
-	extractedAt: string;
-	contentLength: number;
-	source: 'langextract' | 'fallback';
+  url: string;
+  title: string;
+  text: string;
+  html?: string;
+  extractedAt: string;
+  contentLength: number;
+  source: 'langextract' | 'fallback';
 }
 
 export async function POST({ request, locals }: RequestEvent) {
-	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const raw = await request.json();
-	const parsed = webCrawlSchema.safeParse(raw);
-	if (!parsed.success) {
-		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
-	}
-	const { url, generateEmbedding } = parsed.data;
+  const raw = await request.json();
+  const parsed = webCrawlSchema.safeParse(raw);
+  if (!parsed.success) {
+    return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+  }
+  const { url, generateEmbedding } = parsed.data;
 
-	const start = performance.now();
+  // SSRF protection: block internal/private IPs and cloud metadata
+  const urlCheck = validateExternalUrl(url);
+  if (!urlCheck.valid) {
+    return json({ error: urlCheck.error }, { status: 400 });
+  }
 
-	// Try langextract Docker service first
-	let result: CrawlResult;
-	try {
-		result = await crawlViaLangextract(url);
-	} catch {
-		// Fallback: basic fetch + text extraction
-		try {
-			result = await crawlFallback(url);
-		} catch (err) {
-			return json({ error: 'Crawl failed' }, { status: 502 });
-		}
-	}
+  const start = performance.now();
 
-	// Optionally generate embedding for the extracted text
-	let embedding: number[] | null = null;
-	if (generateEmbedding && result.text.length > 0) {
-		try {
-			const embedRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: result.text.slice(0, 4000) }),
-				signal: AbortSignal.timeout(10_000)
-			});
-			if (embedRes.ok) {
-				const data = await embedRes.json();
-				embedding = data.embedding ?? null;
-			}
-		} catch { /* embedding is optional */ }
-	}
+  // Try langextract Docker service first
+  let result: CrawlResult;
+  try {
+    result = await crawlViaLangextract(url);
+  } catch {
+    // Fallback: basic fetch + text extraction
+    try {
+      result = await crawlFallback(url);
+    } catch (err) {
+      return json({ error: 'Crawl failed' }, { status: 502 });
+    }
+  }
 
-	return json({
-		...result,
-		embedding: embedding ? { dims: embedding.length, vector: embedding } : null,
-		timing: { totalMs: Math.round(performance.now() - start) }
-	});
+  // Optionally generate embedding for the extracted text
+  let embedding: number[] | null = null;
+  if (generateEmbedding && result.text.length > 0) {
+    try {
+      const embedRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'embeddinggemma:latest',
+          prompt: result.text.slice(0, 4000),
+        }),
+        signal: AbortSignal.timeout(10_000),
+      });
+      if (embedRes.ok) {
+        const data = await embedRes.json();
+        embedding = data.embedding ?? null;
+      }
+    } catch {
+      /* embedding is optional */
+    }
+  }
+
+  return json({
+    ...result,
+    embedding: embedding ? { dims: embedding.length, vector: embedding } : null,
+    timing: { totalMs: Math.round(performance.now() - start) },
+  });
 }
 
 /** Crawl via langextract Docker service (via shared adapter). */

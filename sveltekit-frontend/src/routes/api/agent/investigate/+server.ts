@@ -61,10 +61,11 @@ const investigateSchema = z.object({
 });
 
 export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   const raw = await request.json();
   const parsed = investigateSchema.safeParse(raw);
   if (!parsed.success) {
-    return error(400, { message: parsed.error.issues[0]?.message ?? 'Invalid input' });
+    return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
   }
   const { query, useACE, maxIterations, caseId, verbose, mode, stream: useStream } = parsed.data;
 

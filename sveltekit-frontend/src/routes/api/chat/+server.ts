@@ -20,6 +20,7 @@ const chatRequestSchema = z.object({
 
 /** POST /api/chat — Simple chat endpoint (also handles /api/chat-test callers) */
 export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ message: 'Unauthorized', response: '' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = chatRequestSchema.safeParse(raw);

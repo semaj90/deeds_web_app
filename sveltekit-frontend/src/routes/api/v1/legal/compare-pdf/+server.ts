@@ -1,5 +1,6 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
+import { validateInternalUrl } from '$lib/server/security/url-validator.js';
 
 /** POST /api/v1/legal/compare-pdf — Compare document against legal corpus */
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -11,19 +12,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const tagsRaw = formData.get('tags') as string | null;
     const topK = Math.min(Number(formData.get('topK')) || 8, 50);
 
-    // SSRF protection: only allow internal MinIO/localhost URLs
+    // SSRF protection: only allow internal MinIO service URLs
     if (fileUrl) {
-      try {
-        const parsed = new URL(fileUrl);
-        const allowed = ['localhost', '127.0.0.1', 'minio', 'legal-ai-minio'];
-        if (!allowed.includes(parsed.hostname)) {
-          return json(
-            { success: false, error: 'Only internal file URLs are allowed' },
-            { status: 400 }
-          );
-        }
-      } catch {
-        return json({ success: false, error: 'Invalid file URL' }, { status: 400 });
+      const urlCheck = validateInternalUrl(fileUrl, ['minio', 'legal-ai-minio']);
+      if (!urlCheck.valid) {
+        return json(
+          { success: false, error: urlCheck.error ?? 'Only internal MinIO URLs are allowed' },
+          { status: 400 }
+        );
       }
     }
 
