@@ -38,7 +38,7 @@
   let wwwhStatus = $state('open');
   let wwwhLocation = $state('');
   let wwwhDate = $state('');
-  let wwwhCollapsed = $state(false);
+  let wwwhCollapsed = $state(true);
 
   let wwwhSummary = $derived.by(() => {
     const parts: string[] = [];
@@ -184,13 +184,25 @@
       // Superforms returns data in a specific structure
       const extraction = result?.data?.extraction ?? result?.extraction;
       if (extraction) {
+        // Map IntakeExtractionResult → WWWH fields
+        if (extraction.suggestedTitle && !wwwhTitle.trim()) wwwhTitle = extraction.suggestedTitle;
         if (extraction.title && !wwwhTitle.trim()) wwwhTitle = extraction.title;
+        // Derive WHO from extracted persons list
+        if (extraction.persons?.length && !wwwhWho.trim()) {
+          wwwhWho = extraction.persons
+            .map((p: { fullName: string; role: string }) => `${p.fullName} (${p.role})`)
+            .join(', ');
+        }
         if (extraction.who) wwwhWho = extraction.who;
         if (extraction.what) wwwhWhat = extraction.what;
         if (extraction.why) wwwhWhy = extraction.why;
         if (extraction.how) wwwhHow = extraction.how;
         if (extraction.when) wwwhDate = extraction.when;
         if (extraction.where) wwwhLocation = extraction.where;
+        // Populate statute if available
+        if (extraction.primaryStatute && !wwwhWhat.trim()) {
+          wwwhWhat = `Potential violation: ${extraction.primaryStatute}`;
+        }
         wwwhSuccess = 'AI analysis complete — fields updated.';
       } else {
         wwwhSuccess = 'AI analysis returned no extractions.';
@@ -952,6 +964,18 @@
     color: var(--t-text, rgb(212 199 163));
   }
 
+  /* Neutralize root layout light-theme globals */
+  .dashboard-dark :global(h1),
+  .dashboard-dark :global(h2),
+  .dashboard-dark :global(h3),
+  .dashboard-dark :global(h4),
+  .dashboard-dark :global(p) {
+    color: inherit;
+    text-transform: none;
+    letter-spacing: normal;
+    margin: 0;
+  }
+
   .dashboard-dark :global(a) {
     color: inherit;
     border-bottom: none;
@@ -987,7 +1011,9 @@
 
   /* Page container */
   .dashboard-page {
+    flex: 1;
     max-width: 72rem;
+    width: 100%;
     margin: 0 auto;
     padding: 2rem 1rem;
   }

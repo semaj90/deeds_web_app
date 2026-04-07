@@ -362,7 +362,7 @@ file: nodeId })
               {#if selectedNode === node.id}
                 <div class="error-actions">
                   <button class="action-btn fix" onclick={() => triggerFix(node.id)}>
-                    🔧 Fix with Gemma3
+                    🔧 Fix with Gemma4
                   </button>
                   <button class="action-btn view">
                     👁️ View Details

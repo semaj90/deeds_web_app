@@ -456,7 +456,7 @@ Response:`;
           complexity: { legalComplexity: 0.7 }
         },
         ragResults: {
-          sources: ['Gemma3-Legal Model (Streaming)'],
+          sources: ['Gemma4-Legal Model (Streaming)'],
           metadata: { documentsProcessed: context.documentIds?.length || 0 }
         },
         metadata: {
@@ -630,7 +630,7 @@ Response:`;
       },
       legalAnalysis: analysisData,
       ragResults: {
-        sources: ['Gemma3-Legal Model'],
+        sources: ['Gemma4-Legal Model'],
         metadata: { documentsProcessed: context.documentIds?.length || 0 }
       },
       metadata: {

@@ -163,11 +163,16 @@ vi.mock('$lib/server/yolo.js', () => ({
 	})),
 }));
 vi.mock('$lib/server/image/resize-for-vlm.js', () => ({
-	resizeForVLM: vi.fn(async (buf: Buffer) => ({
-		buffer: buf, resized: false, originalWidth: 800, originalHeight: 600,
-		vlmWidth: 896, vlmHeight: 896,
-	})),
-	GEMMA3_VLM_SIZE: 896,
+  resizeForVLM: vi.fn(async (buf: Buffer) => ({
+    buffer: buf,
+    resized: false,
+    originalWidth: 800,
+    originalHeight: 600,
+    vlmWidth: 2048,
+    vlmHeight: 2048,
+  })),
+  GEMMA4_VLM_MAX_EDGE: 2048,
+  GEMMA3_VLM_SIZE: 2048, // deprecated alias
 }));
 
 // ── gRPC embedding mock ──

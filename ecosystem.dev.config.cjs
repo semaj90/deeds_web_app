@@ -11,7 +11,7 @@ module.exports = {
       exec_mode: 'fork',
       env: {
         NODE_ENV: 'development',
-        PORT: process.env.SVELTEKIT_PORT || '5173'
+        PORT: process.env.SVELTEKIT_PORT || '5173',
       },
       max_restarts: 10,
       time: true,
@@ -34,10 +34,10 @@ module.exports = {
       env: {
         SUMMARIZER_HTTP_PORT: process.env.SUMMARIZER_HTTP_PORT || '8091',
         OLLAMA_BASE_URL: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
-        OLLAMA_MODEL: process.env.OLLAMA_MODEL || 'gemma3-legal',
+        OLLAMA_MODEL: process.env.OLLAMA_MODEL || 'gemma4-legal',
       },
       watch: false,
       windowsHide: true,
-    }
-  ]
+    },
+  ],
 };

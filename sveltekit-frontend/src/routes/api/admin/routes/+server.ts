@@ -205,15 +205,15 @@ async function getKBCounts(): Promise<Map<string, number>> {
 
 	try {
 		const response = await fetch(`${QDRANT_URL}/collections/phase76_knowledge_base/points/scroll`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				limit: 10000,
-				with_payload: true,
-				with_vector: false
-			}),
-			signal: AbortSignal.timeout(15_000)
-		});
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        limit: 1000,
+        with_payload: true,
+        with_vector: false,
+      }),
+      signal: AbortSignal.timeout(15_000),
+    });
 
 		const data = await response.json();
 		if (data.result?.points) {

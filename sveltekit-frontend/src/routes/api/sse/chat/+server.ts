@@ -10,7 +10,7 @@ import {
   ollamaFetch,
 } from '$lib/server/ollama.js';
 import { loadCodebaseContext } from '$lib/server/retrieval/codebase-context.js';
-import { getGraphContext, getCaseGraphNeighborIds, buildGraphShouldFilter, applyGraphAuthorityScoring, type GraphNeighbor } from '$lib/server/retrieval/graph-context.js';
+import { getGraphContext, getCaseGraphNeighborIds, buildGraphShouldFilter, applyGraphAuthorityScoring, getNeo4jMultiHopNeighbors, formatNeo4jContext, type GraphNeighbor } from '$lib/server/retrieval/graph-context.js';
 import { graphExpandRetrieval } from '$lib/server/retrieval/graph-informed-retrieval.js';
 import { buildVectorPayload } from '$lib/server/config/vector-config.js';
 import { lookupCachedResponse, storeCachedResponse } from '$lib/server/ai/llm-cache.js';
@@ -1042,21 +1042,72 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         }
       }
 
+      // ── Neo4j Multi-Hop KAG: 2-3 hop Cypher traversal ──
+      // Complements PG 1-hop with cross-case entity traversal.
+      // Non-fatal: skipped if Neo4j unavailable.
+      let neo4jContext: string | null = null;
+      if (caseUuid) {
+        const neo4jNeighbors = await getNeo4jMultiHopNeighbors(caseUuid).catch(() => []);
+        if (neo4jNeighbors.length > 0) {
+          // Deduplicate against PG neighbors
+          const pgIds = new Set(preRetrievalNeighbors.map((n) => n.nodeId));
+          const uniqueNeo4j = neo4jNeighbors.filter((n) => !pgIds.has(n.nodeId));
+          if (uniqueNeo4j.length > 0) {
+            preRetrievalNeighbors = [...preRetrievalNeighbors, ...uniqueNeo4j];
+            preRetrievalFilter = buildGraphShouldFilter(preRetrievalNeighbors) ?? undefined;
+            neo4jContext = formatNeo4jContext(uniqueNeo4j);
+            console.log(
+              `[KAG Neo4j] ${uniqueNeo4j.length} unique multi-hop neighbors ` +
+                `(${neo4jNeighbors.length} total, ${preRetrievalNeighbors.length} combined)`
+            );
+          }
+        }
+      }
+
+      // ── L0.5 Intercept: RAG Retrieval Cache (P2f) ──
+      // Cache Qdrant retrieval results by (query, case) to skip embedding + search
+      // on repeated queries within 2 minutes. Invalidated on new evidence upload.
+      const ragGlyphKey = `glyph:rag:${createHash('md5').update(message + (caseUuid ?? '')).digest('hex').slice(0, 12)}`;
+      let ragGlyphHit = false;
+      let cachedRagDocs: ContextDoc[] | null = null;
+      if (!attachmentScopedDocs.length && !hasInlineAttachmentSource) {
+        const cachedRag = getFragment(ragGlyphKey);
+        if (cachedRag) {
+          try {
+            cachedRagDocs = JSON.parse(cachedRag);
+            ragGlyphHit = true;
+            console.log(`[Glyph L0.5] RAG retrieval HIT (${cachedRagDocs?.length ?? 0} docs)`);
+          } catch {}
+        }
+      }
+
       const [rawContextDocs, freshCodebaseResult] = await Promise.all([
-        attachmentScopedDocs.length > 0
-          ? Promise.resolve(attachmentScopedDocs)
-          : hasInlineAttachmentSource
-            ? Promise.resolve([])
-            : retrieveContextWithBudget(
-                message,
-                RAG_MAX_CHUNKS,
-                PRELUDE_RAG_TIMEOUT_MS,
-                preRetrievalFilter
-              ),
+        cachedRagDocs
+          ? Promise.resolve(cachedRagDocs)
+          : attachmentScopedDocs.length > 0
+            ? Promise.resolve(attachmentScopedDocs)
+            : hasInlineAttachmentSource
+              ? Promise.resolve([])
+              : retrieveContextWithBudget(
+                  message,
+                  RAG_MAX_CHUNKS,
+                  PRELUDE_RAG_TIMEOUT_MS,
+                  preRetrievalFilter
+                ),
         wantsCode && !codeGlyphHit
           ? loadCodebaseContext(message).catch(() => null)
           : Promise.resolve(null),
       ]);
+
+      // Cache fresh RAG results for 2 minutes
+      if (!ragGlyphHit && rawContextDocs.length > 0 && !attachmentScopedDocs.length) {
+        try {
+          const ragJson = JSON.stringify(rawContextDocs);
+          if (ragJson.length < 60000) { // Stay under glyph 65535 byte limit
+            setFragment(ragGlyphKey, ragJson, FragmentType.RAG, 2 * 60_000);
+          }
+        } catch {}
+      }
 
       // If we got fresh codebase context, cache it in L0.5
       if (freshCodebaseResult && !codeGlyphHit) {
@@ -1233,6 +1284,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       // Inject KAG graph neighbors (related evidence from knowledge graph)
       if (graphContext) {
         systemPrompt += `\n${graphContext.context}`;
+      }
+
+      // Inject Neo4j multi-hop graph context (cross-case connections)
+      if (neo4jContext) {
+        systemPrompt += neo4jContext;
       }
 
       // Inject codebase context (recall→rerank pipeline)

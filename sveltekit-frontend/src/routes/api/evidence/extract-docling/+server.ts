@@ -10,12 +10,12 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
 
 const bodySchema = z.object({
-	/** Base64-encoded file content */
-	fileBase64: z.string().min(1),
-	/** Original filename for type detection */
-	fileName: z.string().min(1),
-	/** Max PDF pages to process (default 10) */
-	maxPages: z.number().int().min(1).max(50).optional(),
+  /** Base64-encoded file content (max ~75MB decoded) */
+  fileBase64: z.string().min(1).max(100_000_000),
+  /** Original filename for type detection */
+  fileName: z.string().min(1).max(500),
+  /** Max PDF pages to process (default 10) */
+  maxPages: z.number().int().min(1).max(50).optional(),
 });
 
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -61,9 +61,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		});
 	} catch (err) {
 		console.error('[extract-docling] Error:', err);
-		return json(
-			{ error: err instanceof Error ? err.message : 'Extraction failed' },
-			{ status: 500 }
-		);
+		return json({ error: 'Extraction failed' }, { status: 500 });
 	}
 };

@@ -361,3 +361,9 @@ export async function loadCodebaseContext(query: string): Promise<{
 		return null;
 	}
 }
+
+// ── Eager pre-warm on first import ─────────────────────────────────────────
+// Eliminates Fuse.js cold-start latency on first search request.
+refreshMetadataCache().catch(() => {
+	/* Qdrant may not be ready at startup — first search will retry */
+});

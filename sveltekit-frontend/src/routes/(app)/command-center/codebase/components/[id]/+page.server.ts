@@ -88,10 +88,10 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
     } catch (error) {
         console.error('Failed to load file profile:', error);
         return {
-            profile: null,
-            fileId,
-            relatedErrors: [],
-            error: error instanceof Error ? error.message : 'Unknown error'
+          profile: null,
+          fileId,
+          relatedErrors: [],
+          error: 'Failed to load file profile',
         };
     }
 };

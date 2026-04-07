@@ -128,13 +128,13 @@ export const actions: Actions = {
 			// Publish error event
 			try {
 				await redis.publish(
-					channel,
-					JSON.stringify({
-						type: 'AI_ERROR',
-						error: error.message || 'Failed to generate response',
-						timestamp: new Date().toISOString()
-					})
-				);
+          channel,
+          JSON.stringify({
+            type: 'AI_ERROR',
+            error: 'Failed to generate response',
+            timestamp: new Date().toISOString(),
+          })
+        );
 			} catch (e) {
 				console.warn('Failed to publish error event:', e);
 			}

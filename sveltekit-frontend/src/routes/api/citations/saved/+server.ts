@@ -91,7 +91,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     return json({ success: true, citations: results });
   } catch (err) {
     console.error('Error fetching saved citations:', err);
-    return json({ success: true, citations: [] });
+    return json({ success: false, citations: [], error: 'Failed to fetch saved citations' });
   }
 };
 

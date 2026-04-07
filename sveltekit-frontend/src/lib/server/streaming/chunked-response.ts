@@ -255,15 +255,19 @@ export async function* streamRAGResponse(
 		let context = '';
 		if (embedding.length > 0) {
 			try {
-				const searchResponse = await fetch(`${QDRANT_URL}/collections/${qdrantCollection}/points/search`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	vector: embedding,
-						limit: 5,
-						with_payload: true
-					})
-				});
+				const searchResponse = await fetch(
+          `${QDRANT_URL}/collections/${qdrantCollection}/points/search`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            signal: AbortSignal.timeout(10_000),
+            body: JSON.stringify({
+              vector: embedding,
+              limit: 5,
+              with_payload: true,
+            }),
+          }
+        );
 
 				if (searchResponse.ok) {
 					const searchResults = await searchResponse.json();

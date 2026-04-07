@@ -652,7 +652,7 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend",
         "env": {
           "LLM_PROVIDER": "ollama",
-          "OLLAMA_MODEL": "gemma3-legal:latest"
+          "OLLAMA_MODEL": "gemma4-legal:latest"
         }
       },
       "group": "build",

@@ -152,10 +152,7 @@ export const actions: Actions = {
       };
     } catch (err) {
       console.error('Upload failed:', err);
-      return {
-        success: false,
-        error: err instanceof Error ? err.message : 'Upload failed',
-      };
+      return fail(500, { form, error: 'Upload failed' });
     }
   },
   // Delete evidence
@@ -180,10 +177,7 @@ export const actions: Actions = {
       return { success: true };
     } catch (err) {
       console.error('Delete failed:', err);
-      return {
-        success: false,
-        error: err instanceof Error ? err.message : 'Delete failed',
-      };
+      return fail(500, { form, error: 'Delete failed' });
     }
   },
   // Update evidence metadata
@@ -216,10 +210,7 @@ export const actions: Actions = {
       };
     } catch (err) {
       console.error('Update failed:', err);
-      return {
-        success: false,
-        error: err instanceof Error ? err.message : 'Update failed',
-      };
+      return fail(500, { form, error: 'Update failed' });
     }
   },
 };

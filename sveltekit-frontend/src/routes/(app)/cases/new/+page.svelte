@@ -51,7 +51,7 @@
 		return 'low';
 	}
 
-	// AI-powered analysis: sends WHO/WHAT/WHY/HOW to Gemma3-Legal
+	// AI-powered analysis: sends WHO/WHAT/WHY/HOW to Gemma4-Legal
 	async function analyzeWithAI() {
 		if (!$form.narrative?.trim() && !$form.what?.trim()) {
 			analysisError = 'Describe what happened first (narrative or "What" field).';
@@ -299,7 +299,7 @@
 			<!-- AI Analyze Button -->
 			<div class="ai-section">
 				<button type="button" onclick={analyzeWithAI} disabled={analyzing} class="btn-analyze">
-					{analyzing ? 'Analyzing with Gemma3-Legal...' : 'Analyze with AI'}
+					{analyzing ? 'Analyzing with Gemma4-Legal...' : 'Analyze with AI'}
 				</button>
 				<p class="ai-hint">Extracts persons of interest, suggests title, identifies statutes and severity.</p>
 				{#if analysisError}
@@ -375,7 +375,7 @@
 			{:else if analyzing}
 				<div class="extraction-placeholder">
 					<div class="spinner"></div>
-					<p>Gemma3-Legal is analyzing your intake...</p>
+					<p>Gemma4-Legal is analyzing your intake...</p>
 				</div>
 			{:else}
 				<div class="extraction-placeholder">

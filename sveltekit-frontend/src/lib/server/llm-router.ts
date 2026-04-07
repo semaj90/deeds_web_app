@@ -3,7 +3,7 @@
  *
  * Providers:
  *   - tensorrt: TensorRT-LLM on GPU (primary, requires GPU arbiter lease)
- *   - ollama: Local Gemma3-legal model (fallback)
+ *   - ollama: Local Gemma4-legal model (fallback)
  *   - gemini: Google Gemini API with web search grounding
  *
  * Auto-fallback: tensorrt → ollama → gemini (if keys available)

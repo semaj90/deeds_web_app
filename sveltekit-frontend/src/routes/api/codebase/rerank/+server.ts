@@ -94,6 +94,7 @@ function applyPathBoosts(
 }
 
 export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = rerankSchema.safeParse(await request.json());
 	if (!parsed.success) {
 		throw error(400, parsed.error.issues[0]?.message ?? 'Invalid request');

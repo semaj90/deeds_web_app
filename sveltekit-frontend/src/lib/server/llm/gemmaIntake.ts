@@ -34,13 +34,20 @@ You will receive:
 
 Your task:
 1. Suggest a concise case title (max ~120 characters).
-2. Identify persons of interest with role for each: suspect, victim, witness, or other.
-3. For each person, optionally estimate risk_level: low, medium, or high.
-4. Optionally guess a primary statute label and severity (1-5) **only if obvious**.
-5. Return STRICT JSON, no explanations, matching this TypeScript type:
+2. Extract WHO / WHAT / WHEN / WHERE / WHY / HOW from the narrative. Fill in any missing fields.
+3. Identify persons of interest with role for each: suspect, victim, witness, or other.
+4. For each person, optionally estimate risk_level: low, medium, or high.
+5. Optionally guess a primary statute label and severity (1-5) **only if obvious**.
+6. Return STRICT JSON, no explanations, matching this TypeScript type:
 
 type Result = {
  suggestedTitle: string | null;
+ who?: string;
+ what?: string;
+ when?: string;
+ where?: string;
+ why?: string;
+ how?: string;
  primaryStatute?: string | null;
  severityLevel?: number | null;
  persons: {
@@ -62,7 +69,7 @@ WHY: ${why ?? ''}
 HOW: ${how ?? ''}
 
 NARRATIVE:
-${ narrative }
+${narrative}
 `;
 
  const data = await traceLLM('gemma-intake', { model: 'gemma4-legal', prompt: narrative.slice(0, 500) }, async (gen) => {
@@ -77,7 +84,7 @@ ${ narrative }
 	});
 
 	if (!res.ok) {
-		throw new Error(`Gemma3 intake extraction failed: ${res.status} ${res.statusText}`);
+		throw new Error(`Gemma4 intake extraction failed: ${res.status} ${res.statusText}`);
 	}
 
 	const d = (await res.json()) as { response: string };
@@ -89,7 +96,7 @@ ${ narrative }
  try {
  parsed = JSON.parse(data.response) as IntakeExtractionResult;
  } catch (err) {
- console.error('Failed to parse Gemma3 intake JSON:', data.response);
+ console.error('Failed to parse Gemma4 intake JSON:', data.response);
  throw new Error('Could not parse intake JSON from LLM');
  }
 

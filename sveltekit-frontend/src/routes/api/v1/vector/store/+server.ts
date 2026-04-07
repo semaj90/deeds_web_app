@@ -3,15 +3,15 @@ import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 
 const vectorStoreSchema = z.object({
-	embedding: z.array(z.number()).min(1),
-	text: z.string().min(1).max(100000),
-	documentId: z.string().min(1),
-	metadata: z
-		.object({
-			wordCount: z.number().optional(),
-			timestamp: z.string().optional()
-		})
-		.optional()
+  embedding: z.array(z.number()).min(1).max(2048),
+  text: z.string().min(1).max(100000),
+  documentId: z.string().min(1).max(500),
+  metadata: z
+    .object({
+      wordCount: z.number().optional(),
+      timestamp: z.string().optional(),
+    })
+    .optional(),
 });
 
 /** POST /api/v1/vector/store — Store a vector embedding in Qdrant */

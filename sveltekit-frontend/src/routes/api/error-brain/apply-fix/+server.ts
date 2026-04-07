@@ -128,7 +128,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 };
 
 async function insertProvenance(fixId: string, body: Record<string, unknown>, userId: string) {
-	await db.execute(sql`
+	const sourceIds = (body.sourceIds ?? []) as string[];
+  await db.execute(sql`
 		INSERT INTO kb_provenance_graph (
 			fix_id, file_path, error_context, original_code, fixed_code,
 			explanation, source_ids, confidence, applied_by, user_approved, success
@@ -139,7 +140,7 @@ async function insertProvenance(fixId: string, body: Record<string, unknown>, us
 			${(body.originalCode as string) ?? ''},
 			${body.fixedCode as string},
 			${(body.explanation as string) ?? ''},
-			${sql.raw(`ARRAY[${((body.sourceIds ?? []) as string[]).map((s: string) => `'${s.replace(/'/g, "''")}'`).join(',')}]::text[]`)},
+			${sourceIds}::text[],
 			${(body.confidence as number) ?? 0},
 			${userId},
 			${(body.userApproved as boolean) ?? false},

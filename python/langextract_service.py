@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 LangExtract Service — Uses Google's official library with local Ollama
-Replaces the 1GB Docker container with ~50MB using existing gemma3-legal
+Replaces the 1GB Docker container with ~50MB using existing gemma4-legal
 
 Memory comparison:
   - Old: spaCy (500MB) + BERT (400MB) + EasyOCR (100MB) = 1GB
@@ -28,7 +28,7 @@ except ImportError:
 
 # Configuration
 OLLAMA_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-DEFAULT_MODEL = os.getenv("LANGEXTRACT_MODEL", "gemma3-legal:latest")
+DEFAULT_MODEL = os.getenv("LANGEXTRACT_MODEL", "gemma4-legal:latest")
 
 app = FastAPI(
     title="LangExtract Service (Ollama)",

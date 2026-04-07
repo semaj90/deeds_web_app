@@ -175,8 +175,7 @@ export class KnowledgeBase {
 			// Update or create error pattern
 			const patternId = `${options?.errorCode ?? 'unknown'}-${filePath}`;
 
-			// Use sql tag correctly for pg_vector formatting
-			const errorVector = sql`'[${sql.raw(errorEmbedding.join(','))}]'::vector`;
+			const errorVectorStr = `[${errorEmbedding.join(',')}]`;
 
 			await db.execute(sql`
 				INSERT INTO error_patterns (
@@ -189,7 +188,7 @@ export class KnowledgeBase {
 					${options?.errorCode ?? null},
 					${filePath},
 					${options?.lineNumber ?? null},
-					${errorVector},
+					${errorVectorStr}::vector,
 					1, ${success ? 1.0 : 0.0},
 					NOW(), ${options?.metadata ?? {}}
 				)
@@ -202,7 +201,7 @@ export class KnowledgeBase {
 
 			// Store patch knowledge
 			const patchId = `${runId}-${Date.now()}`;
-			const patchVector = sql`'[${sql.raw(patchEmbedding.join(','))}]'::vector`;
+			const patchVectorStr = `[${patchEmbedding.join(',')}]`;
 
 			await db.execute(sql`
 				INSERT INTO patch_knowledge (
@@ -214,7 +213,7 @@ export class KnowledgeBase {
 					${patch},
 					${filePath},
 					${errorMessage},
-					${patchVector},
+					${patchVectorStr}::vector,
 					true, ${success},
 					NOW(), ${runId}
 				)
@@ -247,17 +246,17 @@ export class KnowledgeBase {
 			// Generate query embedding
 			const queryText = `Error: ${context.errorMessage} in ${context.filePath}`;
 			const queryEmbedding = await this.generateEmbedding(queryText);
-			const queryVector = sql`'[${sql.raw(queryEmbedding.join(','))}]'::vector`;
+			const queryVectorStr = `[${queryEmbedding.join(',')}]`;
 
 			// Search for similar patterns
 			const results = await db.execute(sql`
 				SELECT
 					id, error_message, error_code, file_path, line_number,
 					fix_count, success_rate, last_seen, metadata,
-					1 - (embedding <=> ${queryVector}) as similarity
+					1 - (embedding <=> ${queryVectorStr}::vector) as similarity
 				FROM error_patterns
 				WHERE
-					1 - (embedding <=> ${queryVector}) > ${minSimilarity}
+					1 - (embedding <=> ${queryVectorStr}::vector) > ${minSimilarity}
 				ORDER BY similarity DESC
 				LIMIT ${limit}
 			`);

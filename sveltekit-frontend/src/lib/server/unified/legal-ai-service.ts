@@ -195,9 +195,9 @@ export class UnifiedLegalAIService {
 			const vectorStr = `[${embedding.join(',')}]`;
 			const pgResults = await db.execute(sql`
 				SELECT ev.evidence_id, ev.chunk_index, ev.content,
-					1 - (ev.embedding <=> ${sql.raw(`'${vectorStr}'::vector`)}) AS score
+					1 - (ev.embedding <=> ${vectorStr}::vector) AS score
 				FROM evidence_vectors ev
-				WHERE 1 - (ev.embedding <=> ${sql.raw(`'${vectorStr}'::vector`)}) > ${threshold}
+				WHERE 1 - (ev.embedding <=> ${vectorStr}::vector) > ${threshold}
 				ORDER BY score DESC
 				LIMIT ${limit}
 			`);

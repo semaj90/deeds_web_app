@@ -465,6 +465,57 @@ function setupToolHandlers() {
         },
       },
       // ─────────────────────────────────────────────────────────────────────
+      // GPU Direct — bypass HTTP for hot-path operations
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        name: 'embedding:generate',
+        description:
+          'Generate 768-dim embeddings via gRPC direct (bypasses HTTP, ~50ms vs ~180ms). Falls back to Ollama HTTP if gRPC unavailable.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            texts: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Text(s) to embed (max 32 items, 2048 chars each)',
+            },
+          },
+          required: ['texts'],
+        },
+      },
+      {
+        name: 'gpu:similarity',
+        description:
+          'Compute pairwise cosine similarity matrix on GPU via LibTorch CUDA (bypasses HTTP, ~5-20ms). Falls back to CPU if GPU unavailable.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            embeddings: {
+              type: 'array',
+              items: { type: 'array', items: { type: 'number' } },
+              description: 'Array of embedding vectors (768-dim float arrays)',
+            },
+          },
+          required: ['embeddings'],
+        },
+      },
+      {
+        name: 'inference:route',
+        description:
+          'Route an inference request through the optimal backend: TRT→Triton→Bifrost→Ollama cascade. Direct import bypasses HTTP layer.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            prompt: { type: 'string', description: 'The inference prompt' },
+            model: { type: 'string', description: 'Model name (default: gemma4-legal:latest)' },
+            maxTokens: { type: 'number', description: 'Max output tokens', default: 2048 },
+            temperature: { type: 'number', description: 'Sampling temperature', default: 0.3 },
+            stream: { type: 'boolean', description: 'Enable streaming', default: false },
+          },
+          required: ['prompt'],
+        },
+      },
+      // ─────────────────────────────────────────────────────────────────────
       // Codebase Search — Dual-vector semantic search (Qdrant 768-dim)
       // ─────────────────────────────────────────────────────────────────────
       {
@@ -1103,6 +1154,101 @@ function setupToolHandlers() {
         case 'citations:add_to_case': {
           const result = await mcpTools.citations.addToCase(args as any);
           return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // GPU Direct — bypass HTTP for hot-path operations
+        // ─────────────────────────────────────────────────────────────────────
+        case 'embedding:generate': {
+          const { texts } = args as { texts: string[] };
+          if (!Array.isArray(texts) || texts.length === 0) {
+            throw new Error('texts must be a non-empty array');
+          }
+          const capped = texts.slice(0, 32).map((t) => t.slice(0, 2048));
+          const { generateEmbeddings } = await import('../lib/server/grpc/embedding-client.js');
+          const embeddings = await generateEmbeddings(capped);
+          return {
+            content: [{ type: 'text', text: JSON.stringify({
+              count: embeddings.length,
+              dimensions: embeddings[0]?.length ?? 0,
+              embeddings,
+            }) }],
+          };
+        }
+
+        case 'gpu:similarity': {
+          const { embeddings } = args as { embeddings: number[][] };
+          if (!Array.isArray(embeddings) || embeddings.length < 2) {
+            throw new Error('embeddings must contain at least 2 vectors');
+          }
+          try {
+            const { graphSimilarity } = await import('../lib/server/gpu/libtorch-bridge.js');
+            const matrix = await graphSimilarity(embeddings);
+            return {
+              content: [{ type: 'text', text: JSON.stringify({
+                size: embeddings.length,
+                backend: 'libtorch-cuda',
+                matrix,
+              }) }],
+            };
+          } catch {
+            // CPU fallback: manual cosine similarity
+            const dot = (a: number[], b: number[]) => a.reduce((s, v, i) => s + v * b[i], 0);
+            const norm = (a: number[]) => Math.sqrt(dot(a, a));
+            const matrix = embeddings.map((a) =>
+              embeddings.map((b) => {
+                const d = norm(a) * norm(b);
+                return d > 0 ? Math.round((dot(a, b) / d) * 1000) / 1000 : 0;
+              })
+            );
+            return {
+              content: [{ type: 'text', text: JSON.stringify({
+                size: embeddings.length,
+                backend: 'cpu-fallback',
+                matrix,
+              }) }],
+            };
+          }
+        }
+
+        case 'inference:route': {
+          const { prompt, model, maxTokens, temperature, stream } = args as {
+            prompt: string; model?: string; maxTokens?: number; temperature?: number; stream?: boolean;
+          };
+          try {
+            const { routeInference } = await import('../lib/server/inference/inference-router.js');
+            const result = await routeInference({
+              prompt,
+              model: model ?? 'gemma4-legal:latest',
+              maxTokens: maxTokens ?? 2048,
+              temperature: temperature ?? 0.3,
+              stream: stream ?? false,
+            });
+            return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+          } catch {
+            // Direct Ollama fallback
+            const { ollamaFetch } = await import('../lib/server/ollama.js');
+            const ollamaUrl = process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434';
+            const res = await ollamaFetch(`${ollamaUrl}/api/generate`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                model: model ?? 'gemma4-legal:latest',
+                prompt,
+                stream: false,
+                options: { num_predict: maxTokens ?? 2048, temperature: temperature ?? 0.3 },
+              }),
+            });
+            const data = await res.json();
+            return {
+              content: [{ type: 'text', text: JSON.stringify({
+                response: data.response ?? '',
+                model: data.model,
+                backend: 'ollama-direct-fallback',
+                evalCount: data.eval_count,
+              }) }],
+            };
+          }
         }
 
         // ─────────────────────────────────────────────────────────────────────

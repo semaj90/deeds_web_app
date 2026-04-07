@@ -65,9 +65,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 export const GET: RequestHandler = async () => {
 	try {
 		const [healthRes, statsRes] = await Promise.all([
-			fetch(`${RAG_SERVICE_URL}/health`),
-			fetch(`${RAG_SERVICE_URL}/api/v1/rag/stats`)
-		]);
+      fetch(`${RAG_SERVICE_URL}/health`, { signal: AbortSignal.timeout(5_000) }),
+      fetch(`${RAG_SERVICE_URL}/api/v1/rag/stats`, { signal: AbortSignal.timeout(10_000) }),
+    ]);
 
 		const health = await healthRes.json();
 		const stats = await statsRes.json();

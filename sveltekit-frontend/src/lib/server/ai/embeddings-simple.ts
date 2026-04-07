@@ -100,58 +100,64 @@ export async function generateEmbedding(text: string, options: EmbeddingOptions 
 
 // OpenAI single embedding
 async function generateOpenAIEmbedding(text: string): Promise<number[]> {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) throw new Error('OPENAI_API_KEY not set');
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error('OPENAI_API_KEY not set');
 
-    const body = { input: text, model: 'text-embedding-3-small' };
+  const body = { input: text, model: 'text-embedding-3-small' };
 
-    const res = await fetch('https://api.openai.com/v1/embeddings', {
-        method: 'POST',
-        headers: {
-	Authorization: `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
-        },
-	body: JSON.stringify(body)
-    });
+  const res = await fetch('https://api.openai.com/v1/embeddings', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(30_000),
+  });
 
-    if (!res.ok) {
-        const errBody = await res.text().catch(() => '');
-        throw new Error(`OpenAI error ${res.status},
+  if (!res.ok) {
+    const errBody = await res.text().catch(() => '');
+    throw new Error(`OpenAI error ${res.status},
 	${errBody}`);
-    }
+  }
 
-    const data = await res.json();
-    // supports OpenAI's { data: [ { embedding } ] }
-    const emb = Array.isArray(data?.data) ? data.data[0]?.embedding : data?.embedding;
+  const data = await res.json();
+  // supports OpenAI's { data: [ { embedding } ] }
+  const emb = Array.isArray(data?.data) ? data.data[0]?.embedding : data?.embedding;
 
-    if (!Array.isArray(emb)) throw new Error('Invalid OpenAI embedding response');
-    return emb as number[];
+  if (!Array.isArray(emb)) throw new Error('Invalid OpenAI embedding response');
+  return emb as number[];
 }
 
 // Ollama single embedding
 async function generateOllamaEmbedding(text: string, model: string): Promise<number[]> {
-    return traceEmbedding(text, model, async () => {
+  return traceEmbedding(text, model, async () => {
     const url = ENV.OLLAMA_BASE_URL;
 
     const res = await fetch(`${url}/api/embeddings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({ model, prompt: text })
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model, prompt: text }),
+      signal: AbortSignal.timeout(30_000),
     });
 
     if (!res.ok) {
-        const body = await res.text().catch(() => '');
-        throw new Error(`Ollama error ${res.status} with model ${model},
+      const body = await res.text().catch(() => '');
+      throw new Error(`Ollama error ${res.status} with model ${model},
 	${body}`);
     }
 
     const data = await res.json();
     if (Array.isArray(data?.embedding)) return data.embedding as number[];
-    if (Array.isArray(data?.embeddings)) return Array.isArray(data.embeddings[0]) ? (data.embeddings[0] as number[]) : (data.embeddings as number[]);
-    if (Array.isArray(data?.data) && Array.isArray(data.data[0]?.embedding)) return data.data[0].embedding as number[];
+    if (Array.isArray(data?.embeddings))
+      return Array.isArray(data.embeddings[0])
+        ? (data.embeddings[0] as number[])
+        : (data.embeddings as number[]);
+    if (Array.isArray(data?.data) && Array.isArray(data.data[0]?.embedding))
+      return data.data[0].embedding as number[];
 
     throw new Error(`Invalid Ollama embedding response for model ${model}`);
-    });
+  });
 }
 
 // CPU embedding using xenova transformers (optional)

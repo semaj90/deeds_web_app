@@ -14,6 +14,7 @@ import { graphSimilarity, clusterEmbeddings, computeCaseEmbedding, isCudaAvailab
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
+import { cacheGpuAnalysis, type CachedGpuAnalysis } from '$lib/server/cache/cartridge-tensor-bridge.js';
 
 export interface GpuAnalysisResult {
 	evidenceId: string;
@@ -162,17 +163,164 @@ export async function analyzeEvidenceGpu(
 	}
 }
 
+// ─── Batch Accumulator ────────────────────────────────────────────────
+// Groups evidence uploads by caseId over a debounce window so that
+// N uploads for the same case trigger ONE Qdrant scroll + GPU analysis
+// instead of N redundant passes.
+
+const batchAccumulator = new Map<string, Set<string>>(); // caseId → Set<evidenceId>
+let batchTimer: ReturnType<typeof setTimeout> | null = null;
+const BATCH_DEBOUNCE_MS = 150;
+
+function drainBatch(): void {
+	batchTimer = null;
+	const snapshot = new Map(batchAccumulator);
+	batchAccumulator.clear();
+
+	for (const [caseId, evidenceIds] of snapshot) {
+		analyzeEvidenceBatchGpu(caseId, [...evidenceIds]).catch((err) => {
+			console.warn(`[GPU Batch] Case ${caseId} batch analysis failed:`, err);
+		});
+	}
+}
+
 /**
- * Trigger GPU analysis for an evidence item (fire-and-forget).
+ * Batched GPU analysis — one Qdrant scroll + GPU pass for all queued evidence in a case.
+ * Replaces per-evidence analyzeEvidenceGpu for bulk uploads.
+ */
+async function analyzeEvidenceBatchGpu(
+	caseId: string,
+	evidenceIds: string[]
+): Promise<void> {
+	const start = performance.now();
+
+	try {
+		// 1. Fetch all evidence embeddings for this case (once, shared across batch)
+		const casePoints = await qdrant.client.scroll(qdrant.collections.evidence, {
+			filter: { must: [{ key: 'case_id', match: { value: caseId } }] },
+			with_vector: true,
+			limit: 200,
+		});
+
+		const points = casePoints?.points ?? [];
+		if (points.length < 2) return;
+
+		const embeddings: number[][] = [];
+		const pointIds: string[] = [];
+		for (const pt of points) {
+			const vec = (pt.vector as { content?: number[] })?.content ?? (pt.vector as number[]);
+			if (Array.isArray(vec) && vec.length === 768) {
+				embeddings.push(vec);
+				pointIds.push(String(pt.id));
+			}
+		}
+		if (embeddings.length < 2) return;
+
+		const cudaStatus = isCudaAvailable() ? 'GPU' : 'CPU';
+		console.log(
+			`[GPU Batch] Case ${caseId}: ${evidenceIds.length} items batched, ${embeddings.length} embeddings (${cudaStatus})`
+		);
+
+		// 2. ONE GPU pass: similarity + clustering + case embedding
+		const simResult = await graphSimilarity(embeddings);
+		const k = Math.min(Math.max(2, Math.floor(embeddings.length / 3)), 10);
+		const clusterResult = await clusterEmbeddings(embeddings, k);
+		const weights = new Array(embeddings.length).fill(1.0 / embeddings.length);
+		const caseEmbResult = await computeCaseEmbedding(weights, embeddings);
+
+		// 3. Distribute results to each queued evidence item
+		for (const evidenceId of evidenceIds) {
+			const currentIdx = pointIds.indexOf(evidenceId);
+			const similarEvidence: Array<{ id: string; score: number }> = [];
+
+			if (currentIdx >= 0 && simResult.matrix) {
+				const row = simResult.matrix[currentIdx];
+				for (let j = 0; j < row.length; j++) {
+					if (j !== currentIdx && row[j] > 0.5) {
+						similarEvidence.push({ id: pointIds[j], score: row[j] });
+					}
+				}
+				similarEvidence.sort((a, b) => b.score - a.score);
+			}
+
+			const clusterAssignment = currentIdx >= 0 ? clusterResult.assignments[currentIdx] : -1;
+			const gpuAnalysis = {
+				similarEvidence: similarEvidence.slice(0, 10),
+				clusterAssignment,
+				clusterCount: k,
+				totalEvidenceInCase: embeddings.length,
+				source: simResult.source,
+				analyzedAt: new Date().toISOString(),
+				batchSize: evidenceIds.length,
+			};
+
+			try {
+				await db.execute(sql`
+					UPDATE evidence SET metadata = COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({
+						gpuAnalysis,
+					})}::jsonb
+					WHERE id = ${evidenceId}
+				`);
+			} catch {}
+		}
+
+		// 4. Update case aggregate embedding (once per batch)
+		if (caseEmbResult.embedding.length === 768) {
+			try {
+				await qdrant.client.upsert(qdrant.collections.cases, {
+					wait: false,
+					points: [{
+						id: caseId,
+						vector: { content: caseEmbResult.embedding },
+						payload: {
+							case_id: caseId,
+							type: 'case_aggregate',
+							evidence_count: embeddings.length,
+							source: caseEmbResult.source,
+							updated_at: new Date().toISOString(),
+						},
+					}],
+				});
+			} catch {}
+		}
+
+		// 5. Cache GPU results for reuse by later queries/uploads (P2e)
+		cacheGpuAnalysis(caseId, {
+			clusterAssignments: clusterResult.assignments,
+			centroids: clusterResult.centroids,
+			clusterK: k,
+			caseEmbedding: caseEmbResult.embedding,
+			pointIds,
+			source: simResult.source,
+			cachedAt: new Date().toISOString(),
+			embeddingCount: embeddings.length,
+		} satisfies CachedGpuAnalysis).catch(() => {});
+
+		const latencyMs = Math.round(performance.now() - start);
+		console.log(
+			`[GPU Batch] Case ${caseId}: ${evidenceIds.length} items processed in ${latencyMs}ms (${simResult.source})`
+		);
+	} catch (err) {
+		console.error(`[GPU Batch] Failed for case ${caseId}:`, err);
+	}
+}
+
+/**
+ * Trigger GPU analysis for an evidence item (fire-and-forget, batched).
  * Call this after evidence upload Stage 8 completes.
+ * Items for the same case within 150ms are batched into a single GPU pass.
  */
 export function triggerEvidenceGpuAnalysis(evidenceId: string, caseId: string): void {
 	if (!caseId) return;
 
-	// Fire-and-forget — don't await, don't block upload response
-	analyzeEvidenceGpu(evidenceId, caseId).catch(err => {
-		console.warn(`[GPU Analyzer] Background analysis failed for ${evidenceId}:`, err);
-	});
+	if (!batchAccumulator.has(caseId)) {
+		batchAccumulator.set(caseId, new Set());
+	}
+	batchAccumulator.get(caseId)!.add(evidenceId);
+
+	// Reset debounce timer — waits for upload burst to finish
+	if (batchTimer) clearTimeout(batchTimer);
+	batchTimer = setTimeout(drainBatch, BATCH_DEBOUNCE_MS);
 }
 
 // ─── POI Photo GPU Analysis ──────────────────────────────────────────────

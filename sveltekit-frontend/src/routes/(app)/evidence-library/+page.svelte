@@ -63,11 +63,12 @@
 	];
 </script>
 
+<div class="evidence-library-page">
 <div class="report-section" style="padding-bottom: 0;">
 	<div style="display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 6px; margin-bottom: 1rem;">
 		<div style="flex: 1;">
-			<div style="font-size: 0.95rem; font-weight: 600; color: #d6d3d1;">Evidence Library</div>
-			<div style="font-size: 0.8rem; color: #78716c; margin-top: 0.25rem;">Upload and manage case evidence. Below are demo components and sample data.</div>
+			<div style="font-size: 0.95rem; font-weight: 600; color: var(--t-text, #d6d3d1);">Evidence Library</div>
+			<div style="font-size: 0.8rem; color: var(--t-text-muted, #78716c); margin-top: 0.25rem;">Upload and manage case evidence. Below are demo components and sample data.</div>
 		</div>
 		<a href="/evidence/upload" style="padding: 0.5rem 1rem; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #10b981; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; text-decoration: none; white-space: nowrap; transition: background 0.2s;">
 			Upload Evidence
@@ -230,12 +231,19 @@
 		<RagDocumentGrid />
 	</div>
 {/if}
+</div>
 
 {#if browser && showEvidenceModal}
 	<EvidenceModal item={selectedEvidence} bind:open={showEvidenceModal} onSave={(updated) => { selectedEvidence = updated; showEvidenceModal = false; }} />
 {/if}
 
 <style>
+	.evidence-library-page {
+		min-height: 100vh;
+		background: var(--t-bg, #0a0a0a);
+		color: var(--t-text, #e0e0e0);
+	}
+
 	.report-section {
 		padding: 1rem 2rem;
 	}

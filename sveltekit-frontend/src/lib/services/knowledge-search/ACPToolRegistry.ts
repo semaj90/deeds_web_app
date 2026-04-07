@@ -18,25 +18,32 @@ const CONFIG = {
   },
   models: {
     embedding: process.env.EMBEDDING_MODEL || 'embeddinggemma:latest',
-    chat: process.env.OLLAMA_MODEL || 'gemma4-legal:latest'
+    chat: process.env.OLLAMA_MODEL || 'gemma4-legal:latest',
   },
   timeouts: {
     default: 30000,
     llm: 120000,
-    crawl: 15000
+    crawl: 15000,
   },
   sql: {
     maxLength: 4096,
     maxRows: 500,
     /** Keywords that must not appear anywhere in the query */
-    forbidden: /\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE|COPY|CALL|DO|GRANT|REVOKE|SET|LOCK|EXEC)\b/i
+    forbidden:
+      /\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE|COPY|CALL|DO|GRANT|REVOKE|SET|LOCK|EXEC|MERGE|REPLACE|VACUUM|REINDEX|CLUSTER|COMMENT|NOTIFY|LISTEN|UNLISTEN|LOAD|REFRESH)\b/i,
+    /** PostgreSQL system catalog and dangerous functions */
+    forbiddenTargets:
+      /\b(pg_shadow|pg_authid|pg_roles|pg_user|pg_catalog\.pg_auth|information_schema\.role|pg_read_file|pg_read_binary_file|lo_import|lo_export|pg_ls_dir|pg_stat_file|dblink|pg_execute_server_program|pg_sleep|current_setting\s*\(\s*'superuser)\b/i,
+    /** Only allow queries against known safe tables */
+    allowedTables:
+      /\b(cases|evidence|citations|documents|persons_of_interest|analysis_jobs|error_patterns|patch_knowledge|rag_sessions|rag_messages|evidence_vectors|legal_documents|legal_cases|yorha_evidence_nodes|yorha_evidence_connections|case_notes|case_statute_links|statutes|statute_chunks|legal_precedents|workspaces|route_health|document_chunks|embedding_cache)\b/i,
   },
   cache: {
     maxKeyLength: 256,
     /** Keys must start with one of these prefixes */
     allowedPrefixes: ['phase72:', 'rag:', 'search:', 'session:', 'embedding:', 'acp:', 'llm:'],
-    maxValueLength: 1_048_576 // 1 MB
-  }
+    maxValueLength: 1_048_576, // 1 MB
+  },
 };
 
 export interface ACPToolOptions {
@@ -81,6 +88,15 @@ function validateSQL(query: string): string | null {
 
   if (CONFIG.sql.forbidden.test(stripped)) {
     return 'Query contains a forbidden keyword';
+  }
+
+  if (CONFIG.sql.forbiddenTargets.test(stripped)) {
+    return 'Query references a restricted system table or function';
+  }
+
+  // Must reference at least one known application table
+  if (!CONFIG.sql.allowedTables.test(stripped)) {
+    return 'Query must reference a known application table';
   }
 
   return null; // valid
@@ -171,7 +187,8 @@ const handlers: Record<string, HandlerFn> = {
         duration: Date.now() - startTime
       };
     } catch (error: any) {
-      return fail(error.message, startTime);
+      console.error('[ACP dbQuery] Query failed:', error.message);
+      return fail('Query execution failed', startTime);
     }
   },
 

@@ -6,20 +6,21 @@ const getServerEnv = () => {
     try {
       return {
         OLLAMA_URL: process.env.OLLAMA_URL || 'http://localhost:11434',
-        GEMMA3_LEGAL_MODEL: process.env.GEMMA3_LEGAL_MODEL || 'gemma4-legal:latest',
+        GEMMA4_LEGAL_MODEL:
+          process.env.GEMMA4_LEGAL_MODEL || process.env.GEMMA3_LEGAL_MODEL || 'gemma4-legal:latest',
         EMBEDDING_MODEL: process.env.EMBEDDING_MODEL || 'embeddinggemma:latest',
       };
     } catch {
       return {
         OLLAMA_URL: 'http://localhost:11434',
-        GEMMA3_LEGAL_MODEL: 'gemma4-legal:latest',
+        GEMMA4_LEGAL_MODEL: 'gemma4-legal:latest',
         EMBEDDING_MODEL: 'embeddinggemma:latest',
       };
     }
   }
   return {
     OLLAMA_URL: 'http://localhost:11434',
-    GEMMA3_LEGAL_MODEL: 'gemma4-legal:latest',
+    GEMMA4_LEGAL_MODEL: 'gemma4-legal:latest',
     EMBEDDING_MODEL: 'embeddinggemma:latest',
   };
 };
@@ -66,7 +67,7 @@ export function getOllamaEndpoint(path: string = ''): string {
  */
 export function getChatModel(): string {
   const env = getServerEnv();
-  return env.GEMMA3_LEGAL_MODEL;
+  return env.GEMMA4_LEGAL_MODEL;
 }
 
 /**

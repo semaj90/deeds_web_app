@@ -158,7 +158,8 @@ export async function createSimilarityLinks(
 ensureSchema().catch((e) => console.debug('neo4j schema init failed', e));
 
 const EvidenceGraphService = {
-    upsertEvidenceGraph: createSimilarityLinks,
+    upsertEvidenceGraph,
+    createSimilarityLinks,
     ensureSchema,
 };
 

@@ -118,7 +118,7 @@ export async function resetStaleJobs(staleMinutes: number = 10): Promise<number>
 		UPDATE analysis_jobs
 		SET status = 'queued', started_at = NULL, updated_at = NOW()
 		WHERE status = 'running'
-		  AND started_at < NOW() - INTERVAL '${sql.raw(String(staleMinutes))} minutes'
+		  AND started_at < NOW() - make_interval(mins => ${staleMinutes})
 	`);
 	return (result as any).rowCount ?? 0;
 }

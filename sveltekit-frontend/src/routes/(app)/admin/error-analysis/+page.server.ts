@@ -65,10 +65,10 @@ export const load: PageServerLoad = async () => {
 		await aiPool.end();
 
 		return {
-			clusters: [],
-			total: 0,
-			error: err.message
-		};
+      clusters: [],
+      total: 0,
+      error: 'Failed to load error analysis',
+    };
 	}
 };
 

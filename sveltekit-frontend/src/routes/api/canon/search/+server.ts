@@ -144,14 +144,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 						cc.token_count,
 						cc.domains,
 						cc.key_terms,
-						1 - (cc.embedding::vector <=> ${sql.raw(`'${vectorLiteral}'`)}::vector) AS score
+						1 - (cc.embedding::vector <=> ${vectorLiteral}::vector) AS score
 					FROM canonical_chunks cc
 					JOIN canonical_documents cd ON cd.id = cc.document_id
 					WHERE cc.embedding IS NOT NULL
 						${jurisdictionFilter}
 						${authorityFilter}
 						${docTypeFilter}
-					ORDER BY cc.embedding::vector <=> ${sql.raw(`'${vectorLiteral}'`)}::vector
+					ORDER BY cc.embedding::vector <=> ${vectorLiteral}::vector
 					LIMIT ${topK}
 				`);
 

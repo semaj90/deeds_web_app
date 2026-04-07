@@ -52,7 +52,9 @@ export async function GET() {
 
 		// Check Ollama
 		try {
-			const resp = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`);
+			const resp = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, {
+        signal: AbortSignal.timeout(10_000),
+      });
 			const data = await resp.json();
 			health.services.ollama = {
 				ok: resp.ok,

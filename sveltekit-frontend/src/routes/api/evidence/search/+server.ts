@@ -497,42 +497,45 @@ async function searchPgvector(
 	limit: number,
 	sectionTypes?: string[]
 ): Promise<SearchResult[]> {
-	const vectorStr = `[${embedding.join(',')}]`;
+  const vectorStr = `[${embedding.join(',')}]`;
 
-	// Build optional section-type filter (values are Zod-validated enums, safe for sql.raw)
-	const sectionFilter = sectionTypes?.length
-		? sql.raw(` AND ev.metadata->>'sectionType' IN (${sectionTypes.map(t => `'${t}'`).join(',')})`)
-		: sql.raw('');
+  // Build optional section-type filter (Zod-validated enums)
+  const sectionFilter = sectionTypes?.length
+    ? sql` AND ev.metadata->>'sectionType' IN (${sql.join(
+        sectionTypes.map((t) => sql`${t}`),
+        sql`, `
+      )})`
+    : sql``;
 
-	const query = caseId
-		? sql`
+  const query = caseId
+    ? sql`
 			SELECT ev.evidence_id, ev.chunk_index, ev.content, ev.metadata,
-				1 - (ev.embedding <=> ${sql.raw(`'${vectorStr}'::vector`)}) AS score
+				1 - (ev.embedding <=> ${vectorStr}::vector) AS score
 			FROM evidence_vectors ev
 			JOIN evidence e ON e.id = ev.evidence_id
 			WHERE e.case_id = ${caseId}${sectionFilter}
-			ORDER BY ev.embedding <=> ${sql.raw(`'${vectorStr}'::vector`)}
+			ORDER BY ev.embedding <=> ${vectorStr}::vector
 			LIMIT ${limit}
 		`
-		: sql`
+    : sql`
 			SELECT ev.evidence_id, ev.chunk_index, ev.content, ev.metadata,
-				1 - (ev.embedding <=> ${sql.raw(`'${vectorStr}'::vector`)}) AS score
+				1 - (ev.embedding <=> ${vectorStr}::vector) AS score
 			FROM evidence_vectors ev
 			WHERE 1=1${sectionFilter}
-			ORDER BY ev.embedding <=> ${sql.raw(`'${vectorStr}'::vector`)}
+			ORDER BY ev.embedding <=> ${vectorStr}::vector
 			LIMIT ${limit}
 		`;
 
-	const result = await db.execute(query);
-	const rows = extractRows(result);
+  const result = await db.execute(query);
+  const rows = extractRows(result);
 
-	return rows.map((row) => ({
-		evidenceId: row.evidence_id,
-		chunkIndex: row.chunk_index,
-		content: row.content,
-		score: parseFloat(row.score) || 0,
-		metadata: typeof row.metadata === 'string' ? JSON.parse(row.metadata) : (row.metadata ?? {}),
-	}));
+  return rows.map((row) => ({
+    evidenceId: row.evidence_id,
+    chunkIndex: row.chunk_index,
+    content: row.content,
+    score: parseFloat(row.score) || 0,
+    metadata: typeof row.metadata === 'string' ? JSON.parse(row.metadata) : (row.metadata ?? {}),
+  }));
 }
 
 // ── Graph hop expansion ──────────────────────────────────────────────────
@@ -556,25 +559,26 @@ async function expandToSections(
 
 		if (sectionPath.length > 0) {
 			const sectionPathJson = JSON.stringify(sectionPath);
+			const jsonbFilter = JSON.stringify({ sectionPath: sectionPath });
 			const siblingQuery = caseId
-				? sql`
+        ? sql`
 					SELECT ev.evidence_id, ev.chunk_index, ev.content, ev.metadata
 					FROM evidence_vectors ev
 					JOIN evidence e ON e.id = ev.evidence_id
 					WHERE ev.evidence_id = ${hit.evidenceId}
 					AND e.case_id = ${caseId}
 					AND ev.metadata->>'sectionPath' IS NOT NULL
-					AND ev.metadata @> ${sql.raw(`'{"sectionPath":${sectionPathJson}}'::jsonb`)}
+					AND ev.metadata @> ${jsonbFilter}::jsonb
 					AND ev.chunk_index != ${hit.chunkIndex}
 					ORDER BY ev.chunk_index
 					LIMIT 10
 				`
-				: sql`
+        : sql`
 					SELECT evidence_id, chunk_index, content, metadata
 					FROM evidence_vectors
 					WHERE evidence_id = ${hit.evidenceId}
 					AND metadata->>'sectionPath' IS NOT NULL
-					AND metadata @> ${sql.raw(`'{"sectionPath":${sectionPathJson}}'::jsonb`)}
+					AND metadata @> ${jsonbFilter}::jsonb
 					AND chunk_index != ${hit.chunkIndex}
 					ORDER BY chunk_index
 					LIMIT 10
@@ -620,26 +624,27 @@ async function enrichWithGraphNeighbors(
 	if (evidenceIds.length === 0) return;
 
 	try {
-		const idList = evidenceIds.map(id => `'${id}'`).join(',');
+		const idParams = evidenceIds.map((id) => sql`${id}`);
+    const idTuple = sql`(${sql.join(idParams, sql`, `)})`;
 
 		// Split OR into two queries for sargability — avoids BitmapOr / Seq Scan.
 		// id::text cast prevents PK index usage, so we query file_path and id separately.
 		const [byPath, byId] = await Promise.all([
-			db.execute(sql`
+      db.execute(sql`
 				SELECT n.id AS node_id, n.title, n.evidence_type, n.file_path
 				FROM yorha_evidence_nodes n
 				WHERE n.case_id = ${caseId}
 				AND n.status = 'active'
-				AND n.file_path IN ${sql.raw(`(${idList})`)}
+				AND n.file_path IN ${idTuple}
 			`),
-			db.execute(sql`
+      db.execute(sql`
 				SELECT n.id AS node_id, n.title, n.evidence_type, n.file_path
 				FROM yorha_evidence_nodes n
 				WHERE n.case_id = ${caseId}
 				AND n.status = 'active'
-				AND n.id IN ${sql.raw(`(${idList})`)}
+				AND n.id IN ${idTuple}
 			`),
-		]);
+    ]);
 
 		const pathRows = extractRows(byPath);
 		const idRows = extractRows(byId);
@@ -652,7 +657,10 @@ async function enrichWithGraphNeighbors(
 		if (nodeRows.length === 0) return;
 
 		const nodeIds = nodeRows.map((r) => r.node_id as string);
-		const nodeIdStr = nodeIds.map((id: string) => `'${id}'`).join(',');
+		const nodeIdTuple = sql`(${sql.join(
+      nodeIds.map((id) => sql`${id}`),
+      sql`, `
+    )})`;
 
 		// 1-hop graph traversal — UNION ALL pattern for sargable index joins.
 		// Each branch hits its composite index directly instead of CASE expression.
@@ -665,7 +673,7 @@ async function enrichWithGraphNeighbors(
 				FROM yorha_evidence_connections c
 				JOIN yorha_evidence_nodes tn ON tn.id = c.target_node_id
 				WHERE c.case_id = ${caseId}
-				AND c.source_node_id IN ${sql.raw(`(${nodeIdStr})`)}
+				AND c.source_node_id IN ${nodeIdTuple}
 			)
 			UNION ALL
 			(
@@ -676,7 +684,7 @@ async function enrichWithGraphNeighbors(
 				FROM yorha_evidence_connections c
 				JOIN yorha_evidence_nodes tn ON tn.id = c.source_node_id
 				WHERE c.case_id = ${caseId}
-				AND c.target_node_id IN ${sql.raw(`(${nodeIdStr})`)}
+				AND c.target_node_id IN ${nodeIdTuple}
 			)
 			ORDER BY strength DESC, confidence_score DESC
 			LIMIT 20
@@ -721,11 +729,14 @@ async function enrichWithDocumentContext(bundles: ContextBundle[]): Promise<void
 	if (evidenceIds.length === 0) return;
 
 	try {
-		const idList = evidenceIds.map(id => `'${id}'`).join(',');
+		const idTuple = sql`(${sql.join(
+      evidenceIds.map((id) => sql`${id}`),
+      sql`, `
+    )})`;
 		const result = await db.execute(sql`
 			SELECT id, title, kind, ai_summary, description
 			FROM evidence
-			WHERE id IN ${sql.raw(`(${idList})`)}
+			WHERE id IN ${idTuple}
 		`);
 		const rows = extractRows(result);
 
@@ -743,8 +754,8 @@ async function enrichWithDocumentContext(bundles: ContextBundle[]): Promise<void
 		const yorhaResult = await db.execute(sql`
 			SELECT n.file_path, n.ai_summary, n.ai_tags, n.key_entities, n.file_type
 			FROM yorha_evidence_nodes n
-			WHERE n.file_path IN ${sql.raw(`(${idList})`)}
-			OR n.id::text IN ${sql.raw(`(${idList})`)}
+			WHERE n.file_path IN ${idTuple}
+			OR n.id::text IN ${idTuple}
 		`);
 		const yorhaRows = extractRows(yorhaResult);
 		for (const row of yorhaRows) {

@@ -514,18 +514,19 @@ async function triggerGraphAnalysis(
 
 	// Fire-and-forget: POST to Neo4j sync endpoint
 	fetch('/api/graph/sync', {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			jobId,
-			sourceCaseId,
-			similarCaseIds,
-			analysisType: 'case-similarity-graph',
-			priority: 'low'
-		})
-	}).catch((err) => {
-		console.warn('[Case Similarity] Neo4j graph trigger failed (non-fatal):', err);
-	});
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jobId,
+      sourceCaseId,
+      similarCaseIds,
+      analysisType: 'case-similarity-graph',
+      priority: 'low',
+    }),
+    signal: AbortSignal.timeout(30_000),
+  }).catch((err) => {
+    console.warn('[Case Similarity] Neo4j graph trigger failed (non-fatal):', err);
+  });
 
 	return jobId;
 }

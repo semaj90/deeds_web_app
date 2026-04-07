@@ -79,11 +79,11 @@ export async function persistEmbedding(
 		const vectorLiteral = toVectorLiteral(embedding);
 
 		await db.execute(
-			sql`INSERT INTO embedding_cache (text_hash, model, embedding)
-			    VALUES (${hash}, ${model}, ${sql.raw(`'${vectorLiteral}'::vector`)} )
+      sql`INSERT INTO embedding_cache (text_hash, model, embedding)
+			    VALUES (${hash}, ${model}, ${vectorLiteral}::vector )
 			    ON CONFLICT (text_hash) DO UPDATE
 			    SET embedding = EXCLUDED.embedding, model = EXCLUDED.model, created_at = now()`
-		);
+    );
 	} catch (err) {
 		// Non-fatal — Redis is primary cache
 		console.warn('embedding-persist: PG write error (non-fatal)', err);

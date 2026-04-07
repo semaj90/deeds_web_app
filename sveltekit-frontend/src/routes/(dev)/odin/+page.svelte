@@ -51,7 +51,7 @@
       await new Promise(r => setTimeout(r, 1000));
 
       processingLog = [...processingLog, '> GENERATING TOPOLOGICAL TOPIC MAP...'];
-      processingLog = [...processingLog, '> BATCHING TO GEMMA3-LEGAL...'];
+      processingLog = [...processingLog, '> BATCHING TO GEMMA4-LEGAL...'];
 
       processingStatus = 'complete';
       processingLog = [...processingLog, '> INGESTION SEQUENCE COMPLETE. ARTIFACTS INDEXED.'];
@@ -163,7 +163,7 @@
           <div class="nes-panel-header bg-nes-accent2/10 text-nes-accent2">
             <span>SECURE INGESTION PROTOCOL</span>
             <span>DOCLING-258M</span>
-            <span>GEMMA3-LEGAL</span>
+            <span>GEMMA4-LEGAL</span>
           </div>
 
           <div class="p-8 flex flex-col gap-8 h-full">

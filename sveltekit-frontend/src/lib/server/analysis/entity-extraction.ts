@@ -1,6 +1,6 @@
 /**
  * Entity extraction: LLM structured extraction (primary) + regex fallback.
- * Primary: Gemma3-legal structured JSON via Ollama GBNF-constrained output
+ * Primary: Gemma4-legal structured JSON via Ollama GBNF-constrained output
  * Fallback: regex for emails, phones, dates, citations, statutes, money.
  */
 

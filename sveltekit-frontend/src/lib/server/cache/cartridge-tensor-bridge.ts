@@ -370,3 +370,67 @@ export async function invalidateCartridge(caseId: string): Promise<boolean> {
 export function getNESMemory(): NESMemoryArchitecture {
 	return nesMemory;
 }
+
+// ── GPU Analysis Result Cache ────────────────────────────────────────────
+// Caches GPU computation results (clusters, case embedding) so that
+// subsequent uploads or dashboard queries reuse GPU results without
+// re-running graphSimilarity/clusterEmbeddings/computeCaseEmbedding.
+
+const GPU_RESULT_PREFIX = 'chr97:gpu:';
+
+export interface CachedGpuAnalysis {
+	clusterAssignments: number[];
+	centroids: number[][];
+	clusterK: number;
+	caseEmbedding: number[];
+	pointIds: string[];
+	source: 'gpu' | 'cpu';
+	cachedAt: string;
+	embeddingCount: number;
+}
+
+/**
+ * Retrieve cached GPU analysis results for a case.
+ * Returns null on miss or Redis unavailable.
+ */
+export async function getCachedGpuAnalysis(caseId: string): Promise<CachedGpuAnalysis | null> {
+	const redis = getRedis();
+	if (!redis) return null;
+
+	try {
+		const data = await redis.get(`${GPU_RESULT_PREFIX}${caseId}`);
+		if (!data) return null;
+		return JSON.parse(data);
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Cache GPU analysis results with priority-based TTL.
+ * Called after batch GPU analysis completes.
+ */
+export async function cacheGpuAnalysis(
+	caseId: string,
+	analysis: CachedGpuAnalysis,
+	priority: PriorityLevel = 'medium'
+): Promise<void> {
+	const redis = getRedis();
+	if (!redis) return;
+
+	try {
+		const ttl = getTTL(priority);
+		await redis.setex(`${GPU_RESULT_PREFIX}${caseId}`, ttl, JSON.stringify(analysis));
+	} catch {}
+}
+
+/**
+ * Invalidate cached GPU analysis (e.g., after new evidence upload changes the set).
+ */
+export async function invalidateGpuAnalysis(caseId: string): Promise<void> {
+	const redis = getRedis();
+	if (!redis) return;
+	try {
+		await redis.del(`${GPU_RESULT_PREFIX}${caseId}`);
+	} catch {}
+}

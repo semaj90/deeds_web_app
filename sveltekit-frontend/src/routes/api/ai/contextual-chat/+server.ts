@@ -26,6 +26,7 @@ const contextualChatSchema = z.object({
 
 /** POST /api/ai/contextual-chat — RAG-augmented case-context-aware chat */
 export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = contextualChatSchema.safeParse(raw);
@@ -37,14 +38,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const { caseId, sessionId, tags, jurisdiction, sectionTypes } = parsed.data;
 
 		const result = await contextualChat({
-			message,
-			caseId: caseId || null,
-			sessionId: sessionId || null,
-			userId: locals.user?.id ?? null,
-			tags: tags ?? null,
-			jurisdiction: jurisdiction || null,
-			sectionTypes: sectionTypes ?? null,
-		});
+      message,
+      caseId: caseId || null,
+      sessionId: sessionId || null,
+      userId: locals.user.id,
+      tags: tags ?? null,
+      jurisdiction: jurisdiction || null,
+      sectionTypes: sectionTypes ?? null,
+    });
 
 		return json({
 			response: result.answer,

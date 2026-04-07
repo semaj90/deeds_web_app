@@ -136,7 +136,7 @@
 		<div class="panel-block">
 			<p class="section-kicker">Vision + VLM</p>
 			<button class="panel-toggle" onclick={() => (showVlm = !showVlm)}>
-				{showVlm ? 'Hide VLM Analyzer' : 'VLM Image Analysis (Client ONNX + YOLO + Gemma3 Vision)'}
+				{showVlm ? 'Hide VLM Analyzer' : 'VLM Image Analysis (Client ONNX + YOLO + Gemma4 Vision)'}
 			</button>
 			{#if showVlm}<div class="panel-body"><Gemma270MWebAssembly /></div>{/if}
 		</div>

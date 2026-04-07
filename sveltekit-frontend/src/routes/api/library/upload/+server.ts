@@ -79,7 +79,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     console.error('[library/upload] upload failed:', errMsg);
     if (errStack) console.error('[library/upload] stack:', errStack);
     return json(
-      { success: false, documentId: null, jobId: null, data: null, error: `Upload failed: ${errMsg}` },
+      { success: false, documentId: null, jobId: null, data: null, error: 'Upload failed' },
       { status: 500 }
     );
   }

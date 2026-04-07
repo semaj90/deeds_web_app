@@ -398,6 +398,19 @@ export class RabbitMQManager extends EventEmitter {
           metadata: { entities: entities.length, forensicFlags: forensics.length },
         });
       }
+
+      // Auto-sync case to Neo4j graph (fire-and-forget)
+      if (data.caseId) {
+        import('../graph/pg-neo4j-sync.js')
+          .then(({ syncCaseToGraph }) => syncCaseToGraph(data.caseId))
+          .then((r) => {
+            if (r.errors.length === 0) {
+              console.log(`🔗 Neo4j sync: case ${data.caseId} (${r.relationships} rels, ${r.durationMs}ms)`);
+            }
+          })
+          .catch(() => {}); // Non-fatal — PG data is sufficient
+      }
+
       this.channel.ack(msg);
     } catch (error) {
       console.error('❌ Evidence process error:', this.formatError(error));

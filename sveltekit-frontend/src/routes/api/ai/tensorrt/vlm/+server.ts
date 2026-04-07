@@ -2,10 +2,10 @@
  * POST /api/ai/tensorrt/vlm
  *
  * Vision-Language inference via Triton ensemble pipeline:
- *   SigLIP vision encoder → Projector → Gemma3 12B text decoder
+ *   SigLIP vision encoder → Projector → Gemma4 text decoder
  *
  * Accepts multipart form data with an image + text prompt.
- * Falls back to Ollama gemma3 multimodal if Triton is unavailable.
+ * Falls back to Ollama gemma4 multimodal if Triton is unavailable.
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
@@ -94,7 +94,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     let imageBase64: string | undefined;
     if (imageFile) {
       const buffer = Buffer.from(await imageFile.arrayBuffer());
-      // Resize to Gemma3 native 896×896 before base64 encoding
+      // resizeForVLM clamps to GEMMA4_VLM_MAX_EDGE (2048); Triton SigLIP re-resizes server-side
       const resized = await resizeForVLM(buffer).catch(() => ({ buffer }));
       imageBase64 = resized.buffer.toString('base64');
     }
@@ -105,6 +105,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       maxTokens: parseInt(formData.get('maxTokens') as string) || undefined,
       temperature: parseFloat(formData.get('temperature') as string) || undefined,
     };
+    // Validate formdata fields with the same schema as JSON path
+    const formParsed = vlmJsonSchema.safeParse(body);
+    if (!formParsed.success) {
+      return json(
+        { error: formParsed.error.issues[0]?.message ?? 'Invalid input' },
+        { status: 400 }
+      );
+    }
+    body = formParsed.data as VlmRequest;
   } else {
     const rawJson = await request.json();
     const jsonParsed = vlmJsonSchema.safeParse(rawJson);
@@ -133,14 +142,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   // Check Triton health — fall back to Ollama if unavailable
   const tritonReady = await checkTritonHealth();
   if (!tritonReady) {
-    // Ollama VLM fallback: gemma3 supports multimodal (image + text)
+    // Ollama VLM fallback: gemma4 supports multimodal (image + text)
     try {
       const ollamaUrl = getOllamaUrl();
+      const vlmModel = ENV.GEMMA4_MODEL ?? 'gemma4:e4b-it-q4_K_M';
       const ollamaRes = await fetch(`${ollamaUrl}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma4-legal:latest',
+          model: vlmModel,
           prompt,
           images: [imageBase64],
           stream: false,
@@ -152,7 +162,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         const ollamaData = await ollamaRes.json();
         return json({
           text: ollamaData.response ?? '',
-          model: 'gemma4-legal (ollama fallback)',
+          model: `${vlmModel} (ollama fallback)`,
           pipeline: ['ollama-multimodal'],
           tritonAvailable: false,
         });
@@ -183,7 +193,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       return json({ error: 'Failed to load vision encoder' }, { status: 500 });
     }
 
-    // Call Triton ensemble: SigLIP → Projector → Gemma3
+    // Call Triton ensemble: SigLIP → Projector → Gemma4
     const res = await fetch(
       `${getTritonUrl()}/v2/models/${encodeURIComponent(getVlmModel())}/infer`,
       {
@@ -193,7 +203,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           inputs: [
             {
               name: 'pixel_values',
-              // Gemma3 SigLIP encoder native resolution: 896×896
+              // SigLIP vision encoder trained at 896×896 (Triton resizes from input)
               shape: [1, 3, 896, 896],
               datatype: 'FP32',
               data: imageBase64, // Triton Python backend decodes base64
@@ -226,10 +236,26 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
 
     const result = await res.json();
-    const logits = result.outputs?.[0]?.data;
+
+    // Extract generated text from Triton v2 inference response
+    // TRT-LLM backends return text in an output named 'text_output' (BYTES datatype)
+    let generatedText = '';
+    if (result.outputs && Array.isArray(result.outputs)) {
+      const textOutput =
+        result.outputs.find(
+          (o: { name?: string; datatype?: string }) =>
+            o.name === 'text_output' || o.name === 'output' || o.datatype === 'BYTES'
+        ) ?? result.outputs[0];
+
+      if (textOutput?.data) {
+        generatedText = Array.isArray(textOutput.data)
+          ? textOutput.data.map(String).join('')
+          : String(textOutput.data);
+      }
+    }
 
     return json({
-      text: logits ? 'VLM inference complete' : '',
+      text: generatedText,
       model: getVlmModel(),
       pipeline: [getVisionModel(), 'gemma_projector', getVlmModel()],
       tritonAvailable: true,

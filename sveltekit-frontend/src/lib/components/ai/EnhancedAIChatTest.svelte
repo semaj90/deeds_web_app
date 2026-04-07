@@ -48,7 +48,7 @@ import Button from "$lib/components/ui/Button.svelte";
 					{
 						id: 'welcome',
 						role: 'assistant',
-						content: `Hello! I'm your enhanced AI legal assistant powered by Gemma3 running on your RTX 3060 Ti GPU. I can help you with:
+						content: `Hello! I'm your enhanced AI legal assistant powered by Gemma4 running on your RTX 3060 Ti GPU. I can help you with:
 
 • Legal research and case analysis
 • Document review and interpretation
@@ -156,7 +156,7 @@ What would you like to explore today?`,
 					messages: [
 						{
 							role: 'system',
-							content: `You are an expert legal AI assistant with access to legal databases and case law. You are running locally on an RTX 3060 Ti GPU using the Gemma3-legal-enhanced model. Provide accurate, helpful legal information while noting that you provide general information only and not legal advice.${caseId ? ` Context: Case ID ${caseId}` : ''}`
+							content: `You are an expert legal AI assistant with access to legal databases and case law. You are running locally on an RTX 3060 Ti GPU using the Gemma4-legal-enhanced model. Provide accurate, helpful legal information while noting that you provide general information only and not legal advice.${caseId ? ` Context: Case ID ${caseId}` : ''}`
 						},
 						...messages
 							.filter((m) => !m.loading && !m.error)
@@ -466,7 +466,7 @@ What would you like to explore today?`,
 				<div class="flex items-center justify-between mt-2">
 					<div class="text-xs text-sand/60 dark:text-sand/40">
 						{#if isConnected}
-							🟢 Ready • Gemma3 Legal Enhanced • RTX 3060 Ti GPU
+							🟢 Ready • Gemma4 Legal Enhanced • RTX 3060 Ti GPU
 						{:else}
 							🔴 Checking connection to Ollama service...
 						{/if}

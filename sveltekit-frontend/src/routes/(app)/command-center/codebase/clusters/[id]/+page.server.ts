@@ -76,10 +76,10 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
     } catch (error) {
         console.error('Failed to load cluster:', error);
         return {
-            cluster: null,
-            members: [],
-            clusterId,
-            error: error instanceof Error ? error.message : 'Unknown error'
+          cluster: null,
+          members: [],
+          clusterId,
+          error: 'Failed to load cluster',
         };
     }
 };

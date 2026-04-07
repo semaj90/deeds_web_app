@@ -76,8 +76,7 @@ export const GET: RequestHandler = async ({ url }) => {
 };
 
 export const POST: RequestHandler = async ({ url, locals }) => {
-	// Optional: require auth for repair operations
-	// if (!locals.user) throw error(401, 'Unauthorized');
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const postParsed = postQuerySchema.safeParse(Object.fromEntries(url.searchParams));
 	const repair = postParsed.success ? postParsed.data.repair === 'true' : false;

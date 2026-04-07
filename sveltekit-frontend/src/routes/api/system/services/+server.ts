@@ -93,7 +93,7 @@ export async function GET({ locals }: { locals: App.Locals }) {
         url: getOllamaUrl(),
         reachable: resp.ok,
         models: data.models?.map((m: { name: string }) => m.name) || [],
-        purpose: 'Local LLM inference (Gemma3-legal, embeddings)',
+        purpose: 'Local LLM inference (Gemma4-legal, embeddings)',
       };
     } catch (e) {
       services.ollama = {

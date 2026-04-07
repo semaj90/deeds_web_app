@@ -1,0 +1,46 @@
+use_default_settings: true
+
+general:
+  instance_name: "Legal AI Search"
+  enable_metrics: false
+
+search:
+  safe_search: 0
+  autocomplete: ""
+  default_lang: "en"
+  formats:
+    - html
+    - json
+
+server:
+  secret_key: "legal-ai-searxng-local-dev"
+  limiter: false
+  image_proxy: false
+  port: 8080
+  bind_address: "0.0.0.0"
+
+engines:
+  - name: google
+    engine: google
+    shortcut: g
+    disabled: false
+  - name: duckduckgo
+    engine: duckduckgo
+    shortcut: ddg
+    disabled: false
+  - name: bing
+    engine: bing
+    shortcut: b
+    disabled: false
+  - name: wikipedia
+    engine: wikipedia
+    shortcut: wp
+    disabled: false
+  - name: google scholar
+    engine: google_scholar
+    shortcut: gs
+    disabled: false
+
+outgoing:
+  request_timeout: 5.0
+  useragent_suffix: ""

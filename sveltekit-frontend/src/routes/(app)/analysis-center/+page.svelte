@@ -489,7 +489,7 @@
 					{#if analysisResults.length === 0}
 						<div class="empty-results">
 							<p>No analyses yet. Enter a query and run AI analysis.</p>
-							<p class="hint">Uses Gemma3-Legal for pattern detection, correlation mapping, and threat prediction.</p>
+							<p class="hint">Uses Gemma4-Legal for pattern detection, correlation mapping, and threat prediction.</p>
 						</div>
 					{/if}
 

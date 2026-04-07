@@ -150,6 +150,12 @@ export function getRabbitMQManagementUrl(): string {
  return env?.RABBITMQ_MGMT_URL ?? `http://${isDocker ? 'rabbitmq' : 'localhost'}:15672`;
 }
 
+export function getRabbitMQManagementAuth(): string {
+  const user = env?.RABBITMQ_MGMT_USER ?? env?.RABBITMQ_USER ?? 'guest';
+  const pass = env?.RABBITMQ_MGMT_PASS ?? env?.RABBITMQ_PASS ?? 'guest';
+  return 'Basic ' + btoa(`${user}:${pass}`);
+}
+
 
 export function getRagServiceUrl(): string {
  return env?.RAG_SERVICE_URL ?? `http://${isDocker ? 'rag-service' : 'localhost'}:8103`;

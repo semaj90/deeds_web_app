@@ -159,7 +159,7 @@ caseId: form.caseId || undefined,
  <header class="panel nes-container is-dark">
  <div>
  <p class="title">Case Theory Constructor</p>
- <p class="muted">Phoenix-Pro strategy builder powered by Gemma3-Legal</p>
+ <p class="muted">Phoenix-Pro strategy builder powered by Gemma4-Legal</p>
  </div>
  <button class="nes-btn is-primary" onclick={buildTheory} disabled={isSubmitting}>
  {isSubmitting ? 'Synthesizing…' : 'Generate Theory'}

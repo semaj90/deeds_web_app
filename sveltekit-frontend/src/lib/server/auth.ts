@@ -369,6 +369,7 @@ export class AuthService {
         headers: {
           Authorization: `Bearer ${ENV.SERVICE_AUTH_TOKEN}`,
         },
+        signal: AbortSignal.timeout(10000),
       });
 
       if (!response.ok) {
@@ -403,6 +404,7 @@ export class AuthService {
         headers: {
           Authorization: `Bearer ${ENV.SERVICE_AUTH_TOKEN}`,
         },
+        signal: AbortSignal.timeout(10000),
       });
 
       if (!response.ok) {
@@ -425,6 +427,7 @@ export class AuthService {
         headers: {
           Authorization: `Bearer ${ENV.SERVICE_AUTH_TOKEN}`,
         },
+        signal: AbortSignal.timeout(10000),
       });
 
       if (!response.ok) {
@@ -448,6 +451,7 @@ export class AuthService {
         headers: {
           Authorization: `Bearer ${ENV.SERVICE_AUTH_TOKEN}`,
         },
+        signal: AbortSignal.timeout(10000),
       });
 
       if (!response.ok) {
@@ -471,6 +475,7 @@ export class AuthService {
         headers: {
           Authorization: `Bearer ${ENV.SERVICE_AUTH_TOKEN}`,
         },
+        signal: AbortSignal.timeout(10000),
       });
 
       if (!response.ok) {

@@ -411,17 +411,18 @@
         line-height: 1.6;
     }
 
-    /* Professional Panels & Cards */
+    /* Professional Panels & Cards — glassmorphism, borderless */
     :global(.panel),
     :global(.card),
     :global([class*="panel"]) {
-        background: linear-gradient(180deg, rgba(23, 31, 48, 0.95) 0%, rgba(10, 15, 25, 0.98) 100%);
-        border: 1px solid var(--shell-border);
+        background: linear-gradient(180deg, rgba(18, 24, 38, 0.72) 0%, rgba(8, 12, 22, 0.78) 100%);
+        border: none;
         border-radius: var(--shell-radius-lg);
         box-shadow:
-            0 20px 40px rgba(0, 0, 0, 0.3),
-            0 0 0 1px rgba(126, 231, 255, 0.04),
-            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            0 20px 50px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        backdrop-filter: blur(24px) saturate(1.3);
+        -webkit-backdrop-filter: blur(24px) saturate(1.3);
         color: var(--shell-text);
         padding: 1.5rem;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -430,10 +431,9 @@
     :global(.panel:hover),
     :global(.card:hover) {
         box-shadow:
-            0 24px 48px rgba(0, 0, 0, 0.38),
-            0 0 0 1px rgba(126, 231, 255, 0.08),
+            0 24px 56px rgba(0, 0, 0, 0.48),
             inset 0 1px 0 rgba(255, 255, 255, 0.06);
-        border-color: var(--shell-border-strong);
+        background: linear-gradient(180deg, rgba(22, 30, 46, 0.78) 0%, rgba(10, 15, 26, 0.82) 100%a(22, 30, 46, 0.78) 0%, rgba(10, 15, 26, 0.82) 100%);
         transform: translateY(-1px);
     }
 
@@ -441,28 +441,27 @@
     :global(input),
     :global(textarea),
     :global(select) {
-        background: linear-gradient(180deg, rgba(8, 12, 20, 0.92) 0%, rgba(14, 19, 31, 0.96) 100%);
-        border: 1px solid var(--shell-border);
+        background: rgba(8, 12, 22, 0.6);
+        border: none;
         border-radius: var(--shell-radius-sm);
         color: var(--shell-text);
         font-family: 'JetBrains Mono', monospace;
         font-size: 0.875rem;
         padding: 0.75rem 1rem;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(12px);
         box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.04),
-            inset 0 -1px 0 rgba(255, 255, 255, 0.02),
-            0 10px 20px rgba(0, 0, 0, 0.12);
+            inset 0 1px 0 rgba(255, 255, 255, 0.03),
+            0 8px 16px rgba(0, 0, 0, 0.15);
     }
 
     :global(input:focus),
     :global(textarea:focus),
     :global(select:focus) {
         outline: none;
-        border-color: var(--shell-border-strong);
         box-shadow:
-            0 0 0 3px rgba(126, 231, 255, 0.12),
-            0 10px 24px rgba(0, 0, 0, 0.18),
+            0 0 0 2px rgba(126, 231, 255, 0.18),
+            0 10px 24px rgba(0, 0, 0, 0.22),
             inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
 
@@ -473,16 +472,16 @@
 
     :global(input[type='file']) {
 		padding: 0.625rem;
-		border-style: dashed;
-		background: linear-gradient(180deg, rgba(10, 15, 25, 0.88) 0%, rgba(19, 27, 42, 0.92) 100%);
+		border-style: none;
+		background: rgba(10, 15, 25, 0.5);
     }
 
     :global(input[type='file']::file-selector-button) {
 		margin-right: 0.85rem;
 		padding: 0.625rem 1rem;
-		border: 1px solid var(--shell-border);
+		border: none;
 		border-radius: 999px;
-		background: linear-gradient(135deg, rgba(126, 231, 255, 0.18) 0%, rgba(83, 183, 255, 0.18) 100%);
+		background: rgba(126, 231, 255, 0.12);
 		color: var(--shell-text);
 		font: inherit;
 		font-size: 0.75rem;
@@ -493,8 +492,7 @@
     }
 
     :global(input[type='file']::file-selector-button:hover) {
-		border-color: var(--shell-border-strong);
-		background: linear-gradient(135deg, rgba(126, 231, 255, 0.26) 0%, rgba(255, 212, 121, 0.18) 100%);
+		background: rgba(126, 231, 255, 0.2);
     }
 
     /* Professional Button Styling */
@@ -511,9 +509,9 @@
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-		border: 1px solid var(--shell-border);
+		border: 1px solid rgba(126, 231, 255, 0.12);
         border-radius: var(--shell-radius-md);
-		background: linear-gradient(180deg, rgba(24, 33, 50, 0.96) 0%, rgba(11, 15, 25, 0.98) 100%);
+		background: rgba(18, 25, 40, 0.6);
 		color: var(--shell-text);
         padding: 0.75rem 1.5rem;
         cursor: pointer;
@@ -522,10 +520,10 @@
         overflow: hidden;
         isolation: isolate;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(12px);
         box-shadow:
-			0 14px 26px rgba(0, 0, 0, 0.22),
-			0 0 0 1px rgba(126, 231, 255, 0.04),
-			inset 0 1px 0 rgba(255, 255, 255, 0.05);
+			0 12px 24px rgba(0, 0, 0, 0.2),
+			inset 0 1px 0 rgba(255, 255, 255, 0.04);
     }
 
     :global(button)::before,
@@ -544,11 +542,10 @@
     :global(button:hover:not(:disabled)),
     :global(a[class*="btn"]:hover),
     :global(a.empty-action:hover) {
-        background: linear-gradient(180deg, rgba(34, 46, 70, 0.98) 0%, rgba(15, 21, 33, 1) 100%);
-        border-color: var(--shell-border-strong);
+        background: rgba(26, 36, 56, 0.72);
+        border-color: rgba(126, 231, 255, 0.22);
         box-shadow:
-            0 18px 34px rgba(0, 0, 0, 0.3),
-            0 0 0 1px rgba(126, 231, 255, 0.08),
+            0 16px 32px rgba(0, 0, 0, 0.28),
             inset 0 1px 0 rgba(255, 255, 255, 0.06);
         transform: translateY(-1px);
     }
@@ -572,7 +569,7 @@
     :global(button[class*="btn-danger"]) {
         background: linear-gradient(135deg, #ff7585 0%, #ff5b71 48%, #db3d58 100%);
         color: #fff;
-        border-color: rgba(255, 107, 120, 0.45);
+        border-color: transparent;
     }
 
     :global(button.danger:hover:not(:disabled)),
@@ -586,7 +583,7 @@
     :global(button[class*="btn-primary"]) {
         background: linear-gradient(135deg, #7ee7ff 0%, #53b7ff 45%, #ffd479 100%);
         color: #06101b;
-        border-color: rgba(255, 255, 255, 0.2);
+        border-color: transparent;
         font-weight: 700;
     }
 
@@ -605,12 +602,11 @@
         text-decoration: none;
         font-family: 'JetBrains Mono', monospace;
         font-weight: 500;
-		border-bottom: 1px solid rgba(126, 231, 255, 0.16);
+        border-bottom: none;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     :global(a:hover) {
-		border-bottom-color: rgba(126, 231, 255, 0.45);
 		color: #f6fbff;
     }
 
@@ -651,19 +647,19 @@
     }
 
     :global(th) {
-        background: linear-gradient(135deg, rgba(22, 31, 48, 0.98) 0%, rgba(14, 20, 32, 1) 100%);
+        background: rgba(18, 26, 42, 0.7);
         color: rgba(213, 233, 255, 0.88);
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         padding: 0.75rem 1rem;
         text-align: left;
-        border-bottom: 2px solid rgba(126, 231, 255, 0.14);
+        border-bottom: 1px solid rgba(126, 231, 255, 0.08);
     }
 
     :global(td) {
         padding: 0.75rem 1rem;
-        border-bottom: 1px solid rgba(120, 160, 220, 0.12);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         color: rgba(214, 226, 248, 0.82);
     }
 
@@ -690,7 +686,7 @@
         text-transform: uppercase;
         letter-spacing: 0.05em;
         background: rgba(212, 199, 163, 0.08);
-        border: 1px solid rgba(212, 199, 163, 0.15);
+        border: none;
         color: #d4c7a5;
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     }

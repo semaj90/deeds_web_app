@@ -47,26 +47,23 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 
 	// Cross-evidence entity search
 	if (mode === 'entities' || mode === 'both') {
-		const conditions: string[] = [];
-		const params: string[] = [];
+		const conditions: ReturnType<typeof sql>[] = [];
 
 		if (label) {
-			conditions.push(`ee.entity_label = $${params.length + 1}`);
-			params.push(label);
+			conditions.push(sql`ee.entity_label = ${label}`);
 		}
 		if (text) {
-			conditions.push(`ee.entity_text ILIKE $${params.length + 1}`);
-			params.push(`%${text}%`);
+			conditions.push(sql`ee.entity_text ILIKE ${'%' + text + '%'}`);
 		}
 		if (caseId) {
-			conditions.push(`ee.case_id = $${params.length + 1}`);
-			params.push(caseId);
+			conditions.push(sql`ee.case_id = ${caseId}`);
 		}
 
-		const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+		const whereClause =
+      conditions.length > 0 ? sql`WHERE ${sql.join(conditions, sql` AND `)}` : sql``;
 
 		try {
-			const entityResult = await db.execute(sql.raw(`
+			const entityResult = await db.execute(sql`
 				SELECT ee.id, ee.evidence_id, ee.case_id, ee.entity_text, ee.entity_label,
 					ee.confidence, ee.source, ee.created_at,
 					e.title AS evidence_title, e.evidence_type, e.file_type
@@ -75,7 +72,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 				${whereClause}
 				ORDER BY ee.confidence DESC NULLS LAST, ee.created_at DESC
 				LIMIT ${limit}
-			`));
+			`);
 			results.entities = entityResult.rows ?? [];
 		} catch (err) {
 			console.warn('[Entities API] Query failed:', err);
@@ -85,26 +82,23 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 
 	// Cross-evidence forensic flag search
 	if (mode === 'flags' || mode === 'both') {
-		const conditions: string[] = [];
-		const params: string[] = [];
+		const conditions: ReturnType<typeof sql>[] = [];
 
 		if (flagType) {
-			conditions.push(`ef.flag_type = $${params.length + 1}`);
-			params.push(flagType);
+			conditions.push(sql`ef.flag_type = ${flagType}`);
 		}
 		if (severity) {
-			conditions.push(`ef.severity = $${params.length + 1}`);
-			params.push(severity);
+			conditions.push(sql`ef.severity = ${severity}`);
 		}
 		if (caseId) {
-			conditions.push(`ef.case_id = $${params.length + 1}`);
-			params.push(caseId);
+			conditions.push(sql`ef.case_id = ${caseId}`);
 		}
 
-		const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+		const whereClause =
+      conditions.length > 0 ? sql`WHERE ${sql.join(conditions, sql` AND `)}` : sql``;
 
 		try {
-			const flagResult = await db.execute(sql.raw(`
+			const flagResult = await db.execute(sql`
 				SELECT ef.id, ef.evidence_id, ef.case_id, ef.flag_type, ef.description,
 					ef.severity, ef.metadata, ef.created_at,
 					e.title AS evidence_title, e.evidence_type, e.file_type
@@ -115,7 +109,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 					CASE ef.severity WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END,
 					ef.created_at DESC
 				LIMIT ${limit}
-			`));
+			`);
 			results.flags = flagResult.rows ?? [];
 		} catch (err) {
 			console.warn('[Entities API] Forensic flags query failed:', err);

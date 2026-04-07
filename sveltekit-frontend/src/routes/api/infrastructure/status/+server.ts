@@ -7,7 +7,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
-import { getRabbitMQManagementUrl } from '$lib/config/env.server.js';
+import { getRabbitMQManagementUrl, getRabbitMQManagementAuth } from '$lib/config/env.server.js';
 import { getGpuLeaseStatus } from '$lib/server/inference/gpu-arbiter.js';
 import { getRouterStatus } from '$lib/server/inference/inference-router.js';
 import { getLangExtractStatus } from '$lib/server/langextract-client.js';
@@ -112,7 +112,7 @@ export const GET: RequestHandler = async () => {
     (async () => {
       try {
         const res = await fetch(`${getRabbitMQManagementUrl()}/api/overview`, {
-          headers: { Authorization: 'Basic ' + btoa('guest:guest') },
+          headers: { Authorization: getRabbitMQManagementAuth() },
           signal: AbortSignal.timeout(TIMEOUT),
         });
         if (!res.ok) return { ok: false };

@@ -9,40 +9,41 @@ import type { OllamaConfig, ModelConfig } from './types.js';
  */
 // Model configurations aligned with the blueprint architecture
 export const MODELS: Record<string, ModelConfig> = {
-	'gemma4-legal:latest': {
-	name: 'gemma4-legal:latest',
-		type: 'local',
-		capabilities: ['text-generation', 'embeddings', 'legal-analysis'],
-		contextWindow: 8192,
-		embeddingDimension: 768,
-		temperature: 0.7,
-		topP: 0.9,
-		topK: 40,
-		systemPrompt: `You are a sophisticated legal AI assistant powered by Gemma3, specialized in legal document analysis, contract review, and case law research. You provide accurate, context-aware legal insights while maintaining strict confidentiality and professional standards. Your responses are based on deep understanding of legal terminology, precedents, and regulatory frameworks.`,
-		options: {
-	num_gpu: 1, // Use GPU acceleration
-			num_thread: 8, // Parallel processing threads
-			repeat_penalty: 1.1,
-			seed: 42,
-			stop: ['User: ', 'Human: ', '\n\n\n']
-		}
-	},
-	'nomic-embed-text': {
-	name: 'nomic-embed-text',
-		type: 'embedding',
-		capabilities: ['embeddings'],
-		embeddingDimension: 768,
-		contextWindow: 8192
-	},
-	embeddinggemma: {
-	name: 'embeddinggemma',
-		type: 'embedding',
-		capabilities: ['embeddings'],
-		embeddingDimension: 768,
-		contextWindow: 8192,
-		temperature: 0.0, // Deterministic embeddings
-		systemPrompt: 'Generate high-quality semantic embeddings for legal document analysis and retrieval.'
-	}
+  'gemma4-legal:latest': {
+    name: 'gemma4-legal:latest',
+    type: 'local',
+    capabilities: ['text-generation', 'embeddings', 'legal-analysis'],
+    contextWindow: 8192,
+    embeddingDimension: 768,
+    temperature: 0.7,
+    topP: 0.9,
+    topK: 40,
+    systemPrompt: `You are a sophisticated legal AI assistant powered by Gemma4, specialized in legal document analysis, contract review, and case law research. You provide accurate, context-aware legal insights while maintaining strict confidentiality and professional standards. Your responses are based on deep understanding of legal terminology, precedents, and regulatory frameworks.`,
+    options: {
+      num_gpu: 1, // Use GPU acceleration
+      num_thread: 8, // Parallel processing threads
+      repeat_penalty: 1.1,
+      seed: 42,
+      stop: ['User: ', 'Human: ', '\n\n\n'],
+    },
+  },
+  'nomic-embed-text': {
+    name: 'nomic-embed-text',
+    type: 'embedding',
+    capabilities: ['embeddings'],
+    embeddingDimension: 768,
+    contextWindow: 8192,
+  },
+  embeddinggemma: {
+    name: 'embeddinggemma',
+    type: 'embedding',
+    capabilities: ['embeddings'],
+    embeddingDimension: 768,
+    contextWindow: 8192,
+    temperature: 0.0, // Deterministic embeddings
+    systemPrompt:
+      'Generate high-quality semantic embeddings for legal document analysis and retrieval.',
+  },
 };
 
 // Fallback chain configuration - llama3.2 removed

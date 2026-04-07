@@ -123,13 +123,20 @@ function chunkFileContent(content: string, chunkSize: number = 500, overlap: num
   return chunks;
 }
 
+const PROJECT_ROOT = path.resolve(process.cwd());
+
 const indexCodebaseSchema = z.object({
-  rootPath: z.string().max(500).optional().default('./src')
+  rootPath: z
+    .string()
+    .max(500)
+    .optional()
+    .default('./src')
+    .refine((p) => !p.includes('..'), 'Path traversal not allowed'),
 });
 
 const indexSearchSchema = z.object({
   query: z.string().min(1, 'query is required').max(5000),
-  limit: z.number().int().min(1).max(100).optional().default(5)
+  limit: z.number().int().min(1).max(100).optional().default(5),
 });
 
 // POST /api/indexing
@@ -145,9 +152,21 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
       const raw = await request.json();
       const parsed = indexCodebaseSchema.safeParse(raw);
       if (!parsed.success) {
-        return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+        return json(
+          { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' },
+          { status: 400 }
+        );
       }
       const rootPath = parsed.data.rootPath;
+
+      // Verify rootPath resolves within project directory
+      const resolvedRoot = path.resolve(PROJECT_ROOT, rootPath);
+      if (!resolvedRoot.startsWith(PROJECT_ROOT)) {
+        return json(
+          { success: false, error: 'rootPath must be within the project directory' },
+          { status: 400 }
+        );
+      }
 
       // Ensure bucket exists
       await ensureBucket(CONFIG.minio.bucketCode);
@@ -159,7 +178,7 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
       for (const pattern of patterns) {
         const fullPattern = path.join(rootPath, pattern);
         const matches = glob.sync(fullPattern, {
-          ignore: ['**/node_modules/**', '**/.svelte-kit/**', '**/dist/**']
+          ignore: ['**/node_modules/**', '**/.svelte-kit/**', '**/dist/**'],
         });
         files.push(...matches);
       }
@@ -169,7 +188,13 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
 
       // Process files
       let indexed = 0;
-      const results: { file: string; chunks?: number; vectors?: number; code?: string; count?: string }[] = [];
+      const results: {
+        file: string;
+        chunks?: number;
+        vectors?: number;
+        code?: string;
+        count?: string;
+      }[] = [];
 
       for (const filePath of files.slice(0, 50)) {
         try {
@@ -181,12 +206,9 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
           const chunks = chunkFileContent(content, 500, 100);
 
           // Upload to MinIO
-          await putObject(
-            CONFIG.minio.bucketCode,
-            `${fileHash}.ts`,
-            Buffer.from(content),
-            { 'X-Amz-Meta-RelativePath': relativePath }
-          );
+          await putObject(CONFIG.minio.bucketCode, `${fileHash}.ts`, Buffer.from(content), {
+            'X-Amz-Meta-RelativePath': relativePath,
+          });
 
           // Store in Qdrant
           const pointIds = [];
@@ -196,10 +218,12 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
 
             if (!embedding || embedding.length === 0) continue;
 
-            const pointId = parseInt(
-              crypto.createHash('md5').update(`${filePath}_${idx}`).digest('hex').slice(0, 8),
-              16
-            ) % (10 ** 8);
+            const pointId =
+              parseInt(
+                crypto.createHash('md5').update(`${filePath}_${idx}`).digest('hex').slice(0, 8),
+                16
+              ) %
+              10 ** 8;
 
             const upsertResponse = await fetch(
               `${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionCode}/points`,
@@ -221,12 +245,12 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
                         exports: metadata.exports.slice(0, 5),
                         type_count: metadata.typeCount,
                         function_count: metadata.functionCount,
-                        indexed_at: new Date().toISOString()
-                      }
-                    }
-                  ]
+                        indexed_at: new Date().toISOString(),
+                      },
+                    },
+                  ],
                 }),
-                signal: AbortSignal.timeout(10_000)
+                signal: AbortSignal.timeout(10_000),
               }
             );
             if (!upsertResponse.ok) {
@@ -239,7 +263,7 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
           results.push({
             file: relativePath,
             chunks: chunks.length,
-            vectors: pointIds.length
+            vectors: pointIds.length,
           });
 
           indexed++;
@@ -251,7 +275,7 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
       return json({
         success: true,
         indexed: results,
-        message: `Indexed ${indexed} of ${Math.min(50, files.length)} files`
+        message: `Indexed ${indexed} of ${Math.min(50, files.length)} files`,
       });
     } catch (err) {
       return json({ success: false, error: 'Indexing operation failed' }, { status: 500 });
@@ -283,7 +307,13 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
 
       // Index error clusters
       let indexed = 0;
-      const results: { file: string; chunks?: number; vectors?: number; code?: string; count?: string }[] = [];
+      const results: {
+        file: string;
+        chunks?: number;
+        vectors?: number;
+        code?: string;
+        count?: string;
+      }[] = [];
 
       for (const cluster of errorClusters) {
         try {
@@ -298,10 +328,9 @@ Phase: Phase 66-79 Error Analysis`.trim();
 
           if (!embedding || embedding.length === 0) continue;
 
-          const pointId = parseInt(
-            crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8),
-            16
-          ) % (10 ** 8);
+          const pointId =
+            parseInt(crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8), 16) %
+            10 ** 8;
 
           const upsertResponse = await fetch(
             `${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}/points`,
@@ -319,12 +348,12 @@ Phase: Phase 66-79 Error Analysis`.trim();
                       message,
                       error_count,
                       phase: 'phase66-79',
-                      indexed_at: new Date().toISOString()
-                    }
-                  }
-                ]
+                      indexed_at: new Date().toISOString(),
+                    },
+                  },
+                ],
               }),
-              signal: AbortSignal.timeout(10_000)
+              signal: AbortSignal.timeout(10_000),
             }
           );
           if (!upsertResponse.ok) {
@@ -341,7 +370,7 @@ Phase: Phase 66-79 Error Analysis`.trim();
           results.push({
             code: error_code,
             file: file_path,
-            count: error_count
+            count: error_count,
           });
 
           indexed++;
@@ -355,7 +384,7 @@ Phase: Phase 66-79 Error Analysis`.trim();
       return json({
         success: true,
         indexed: results,
-        message: `Indexed ${indexed} error clusters`
+        message: `Indexed ${indexed} error clusters`,
       });
     } catch (err) {
       return json({ success: false, error: 'Indexing operation failed' }, { status: 500 });
@@ -368,7 +397,10 @@ Phase: Phase 66-79 Error Analysis`.trim();
       const raw = await request.json();
       const parsed = indexSearchSchema.safeParse(raw);
       if (!parsed.success) {
-        return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+        return json(
+          { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' },
+          { status: 400 }
+        );
       }
       const { query, limit } = parsed.data;
 
@@ -386,9 +418,9 @@ Phase: Phase 66-79 Error Analysis`.trim();
           body: JSON.stringify({
             vector: Array.from(embedding),
             limit,
-            with_payload: true
+            with_payload: true,
           }),
-          signal: AbortSignal.timeout(10_000)
+          signal: AbortSignal.timeout(10_000),
         }
       );
 
@@ -406,8 +438,8 @@ Phase: Phase 66-79 Error Analysis`.trim();
           chunk: r.payload?.chunk_index,
           similarity: (r.score * 100).toFixed(1),
           language: r.payload?.language,
-          content: String(r.payload?.content ?? '').substring(0, 150) + '...'
-        }))
+          content: String(r.payload?.content ?? '').substring(0, 150) + '...',
+        })),
       });
     } catch (err) {
       return json({ success: false, error: 'Indexing operation failed' }, { status: 500 });
@@ -420,7 +452,10 @@ Phase: Phase 66-79 Error Analysis`.trim();
       const raw = await request.json();
       const parsed = indexSearchSchema.safeParse(raw);
       if (!parsed.success) {
-        return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+        return json(
+          { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' },
+          { status: 400 }
+        );
       }
       const { query, limit } = parsed.data;
 
@@ -438,9 +473,9 @@ Phase: Phase 66-79 Error Analysis`.trim();
           body: JSON.stringify({
             vector: Array.from(embedding),
             limit,
-            with_payload: true
+            with_payload: true,
           }),
-          signal: AbortSignal.timeout(10_000)
+          signal: AbortSignal.timeout(10_000),
         }
       );
 
@@ -458,8 +493,8 @@ Phase: Phase 66-79 Error Analysis`.trim();
           file: r.payload?.file_path,
           count: r.payload?.error_count,
           similarity: (r.score * 100).toFixed(1),
-          message: String(r.payload?.message ?? '').substring(0, 100) + '...'
-        }))
+          message: String(r.payload?.message ?? '').substring(0, 100) + '...',
+        })),
       });
     } catch (err) {
       return json({ success: false, error: 'Indexing operation failed' }, { status: 500 });

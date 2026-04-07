@@ -57,7 +57,7 @@ message ChatOptions {
   bool stream = 6;                 // Request streaming response
   string jurisdiction = 7;         // Legal jurisdiction filter
   string legal_area = 8;           // Legal area focus
-  string model = 9;                // Model override (default: gemma3-legal)
+  string model = 9;                // Model override (default: gemma4-legal)
   int32 rag_top_k = 10;            // RAG retrieval depth (default 10)
   float rag_min_score = 11;        // RAG minimum score threshold (default 0.3)
   bool use_hybrid_search = 12;     // BM42 hybrid search for RAG

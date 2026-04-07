@@ -1,5 +1,5 @@
 /**
- * Ollama/Gemma3 LLM Client - Task 5.3
+ * Ollama/Gemma4 LLM Client - Task 5.3
  *
  * Provides a clean interface for LLM integration with the RAG system.
  * Supports both streaming and non-streaming responses.

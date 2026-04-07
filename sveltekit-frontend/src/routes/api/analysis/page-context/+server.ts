@@ -58,7 +58,10 @@ export const POST: RequestHandler = async ({ request, locals, url, fetch: skFetc
 		(async () => {
 			const t = Date.now();
 			try {
-				const res = await skFetch(`/api/codebase-index/route-components?route=${encodeURIComponent(route)}`);
+				const res = await skFetch(
+          `/api/codebase-index/route-components?route=${encodeURIComponent(route)}`,
+          { signal: AbortSignal.timeout(10_000) }
+        );
 				timings.componentsMs = Date.now() - t;
 				if (!res.ok) return null;
 				return await res.json();

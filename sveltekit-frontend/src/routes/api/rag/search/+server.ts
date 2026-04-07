@@ -459,7 +459,7 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
           typeof err === 'object' && err !== null && 'attempts' in err && Array.isArray((err as any).attempts)
             ? ((err as any).attempts as SearchPhaseDiagnostics['embedding']['attempts'])
             : diagnostics.embedding.attempts;
-        const probeErrorMessage = err instanceof Error ? err.message : 'Embedding generation failed';
+        const probeErrorMessage = 'Embedding generation failed';
         if (embeddingOnly && uncachedProbe) {
           const finalAttempt = embeddingAttempts?.length
             ? embeddingAttempts[embeddingAttempts.length - 1]

@@ -1559,11 +1559,6 @@ async function processAndEmbed(
   });
 }
 
-/** Escape a string for safe use in raw SQL (single-quote doubling) */
-function escapeSql(s: string): string {
-	return `'${s.replace(/'/g, "''")}'`;
-}
-
 /**
  * Create yorha_evidence_nodes for each section and connect them with edges.
  */
@@ -1573,11 +1568,11 @@ async function createGraphNodes(
 	fileName: string,
 	sections: Map<string, { heading: string; path: string[]; chunkIds: string[] }>
 ): Promise<void> {
-	const DEV_USER = '00000000-0000-0000-0000-000000000001';
-	const nodeIds: Map<string, string> = new Map();
+  const DEV_USER = '00000000-0000-0000-0000-000000000001';
+  const nodeIds: Map<string, string> = new Map();
 
-	// Ensure yorha_cases record exists (FK constraint: yorha_evidence_nodes.case_id → yorha_cases.id)
-	await db.execute(sql`
+  // Ensure yorha_cases record exists (FK constraint: yorha_evidence_nodes.case_id → yorha_cases.id)
+  await db.execute(sql`
 		INSERT INTO yorha_cases (id, case_number, title, description, status, priority, created_by)
 		SELECT id, COALESCE(case_number, 'AUTO-' || LEFT(id::text, 8)), title,
 			COALESCE(description, ''), COALESCE(status, 'open'), COALESCE(priority, 'medium'), ${DEV_USER}
@@ -1585,47 +1580,53 @@ async function createGraphNodes(
 		ON CONFLICT (id) DO NOTHING
 	`);
 
-	// Build all node rows in memory, then batch INSERT
-	const nodeRows: Array<{ id: string; heading: string; path: string[]; chunkCount: number }> = [];
-	for (const [sectionKey, section] of sections) {
-		const nodeId = crypto.randomUUID();
-		nodeIds.set(sectionKey, nodeId);
-		nodeRows.push({ id: nodeId, heading: section.heading, path: section.path, chunkCount: section.chunkIds.length });
-	}
+  // Build all node rows in memory, then batch INSERT
+  const nodeRows: Array<{ id: string; heading: string; path: string[]; chunkCount: number }> = [];
+  for (const [sectionKey, section] of sections) {
+    const nodeId = crypto.randomUUID();
+    nodeIds.set(sectionKey, nodeId);
+    nodeRows.push({
+      id: nodeId,
+      heading: section.heading,
+      path: section.path,
+      chunkCount: section.chunkIds.length,
+    });
+  }
 
-	// Batch INSERT nodes (single round-trip instead of N)
-	if (nodeRows.length > 0) {
-		const nodeValues = nodeRows.map(n =>
-			`('${n.id}', '${caseId}', ${escapeSql(n.heading.slice(0, 500))}, ${escapeSql(`Section from ${fileName}: ${n.path.join(' > ')}`)}, 'document-section', ${escapeSql(fileName)}, ${escapeSql(`evidence/${evidenceId}/section/${n.path.join('/')}`)}, '${JSON.stringify(n.path).replace(/'/g, "''")}'::jsonb, '${JSON.stringify({ chunkCount: n.chunkCount, sectionPath: n.path }).replace(/'/g, "''")}'::jsonb, 'active', '${DEV_USER}')`
-		).join(',\n');
-		await db.execute(sql.raw(`
+  // Batch INSERT nodes — parameterized (no sql.raw interpolation)
+  if (nodeRows.length > 0) {
+    const valueFragments = nodeRows.map(
+      (n) =>
+        sql`(${n.id}, ${caseId}, ${n.heading.slice(0, 500)}, ${`Section from ${fileName}: ${n.path.join(' > ')}`}, 'document-section', ${fileName}, ${`evidence/${evidenceId}/section/${n.path.join('/')}`}, ${JSON.stringify(n.path)}::jsonb, ${JSON.stringify({ chunkCount: n.chunkCount, sectionPath: n.path })}::jsonb, 'active', ${DEV_USER})`
+    );
+    await db.execute(sql`
 			INSERT INTO yorha_evidence_nodes
 				(id, case_id, title, description, evidence_type, source, file_path, ai_tags, key_entities, status, created_by)
-			VALUES ${nodeValues}
-		`));
-	}
+			VALUES ${sql.join(valueFragments, sql`, `)}
+		`);
+  }
 
-	// Batch INSERT edges (single round-trip instead of N)
-	const edgeValues: string[] = [];
-	for (const [key, section] of sections) {
-		if (section.path.length > 1) {
-			const parentPath = section.path.slice(0, -1).join(' > ');
-			const parentId = nodeIds.get(parentPath);
-			const childId = nodeIds.get(key);
-			if (parentId && childId) {
-				edgeValues.push(
-					`('${caseId}', '${parentId}', '${childId}', 'HAS_SECTION', 100, ${escapeSql(`${section.path.slice(0, -1).join(' > ')} contains ${section.heading}`)}, '${DEV_USER}')`
-				);
-			}
-		}
-	}
-	if (edgeValues.length > 0) {
-		await db.execute(sql.raw(`
+  // Batch INSERT edges — parameterized
+  const edgeFragments: ReturnType<typeof sql>[] = [];
+  for (const [key, section] of sections) {
+    if (section.path.length > 1) {
+      const parentPath = section.path.slice(0, -1).join(' > ');
+      const parentId = nodeIds.get(parentPath);
+      const childId = nodeIds.get(key);
+      if (parentId && childId) {
+        edgeFragments.push(
+          sql`(${caseId}, ${parentId}, ${childId}, 'HAS_SECTION', 100, ${`${section.path.slice(0, -1).join(' > ')} contains ${section.heading}`}, ${DEV_USER})`
+        );
+      }
+    }
+  }
+  if (edgeFragments.length > 0) {
+    await db.execute(sql`
 			INSERT INTO yorha_evidence_connections
 				(case_id, source_node_id, target_node_id, connection_type, strength, description, created_by)
-			VALUES ${edgeValues.join(',\n')}
-		`));
-	}
+			VALUES ${sql.join(edgeFragments, sql`, `)}
+		`);
+  }
 }
 
 /**
@@ -1711,7 +1712,7 @@ async function storeChunkVector(
 			${evidenceId},
 			${chunkIndex},
 			${content},
-			${sql.raw(`'${vectorStr}'::vector`)},
+			${vectorStr}::vector,
 			'upload-embedding',
 			${metadata}::jsonb
 		)

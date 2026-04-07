@@ -117,8 +117,9 @@ async function getASTSubgraph(
 	try {
 		// Reuse the cached graph API
 		const res = await fetch(new URL('/api/codebase-index/graph?maxFiles=300', origin), {
-			headers: { cookie: '' }, // Internal call, auth bypassed below
-		});
+      headers: { cookie: '' }, // Internal call, auth bypassed below
+      signal: AbortSignal.timeout(15_000),
+    });
 
 		if (!res.ok) return { nodes: [], edges: [], neighborFiles: [] };
 

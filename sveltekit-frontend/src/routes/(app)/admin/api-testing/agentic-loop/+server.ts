@@ -23,10 +23,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		});
 	} catch (error) {
 		console.error('[agentic-loop] Failed to start pipeline:', error);
-		return json(
-			{ error: error instanceof Error ? error.message : 'Pipeline start failed' },
-			{ status: 500 }
-		);
+		return json({ error: 'Pipeline start failed' }, { status: 500 });
 	}
 };
 

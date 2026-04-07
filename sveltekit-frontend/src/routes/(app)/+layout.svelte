@@ -166,11 +166,9 @@
 
 <style>
 	.dev-banner {
-		background:
-			radial-gradient(circle at left, rgba(126, 231, 255, 0.12), transparent 24%),
-			linear-gradient(135deg, rgba(12, 18, 31, 0.98) 0%, rgba(20, 28, 45, 0.96) 100%);
+		background: rgba(12, 18, 31, 0.65);
 		color: rgba(255, 221, 145, 0.96);
-		border-bottom: 1px solid rgba(126, 231, 255, 0.18);
+		border-bottom: none;
 		padding: 0.375rem 1rem;
 		text-align: center;
 		font-size: 0.75rem;
@@ -180,7 +178,7 @@
 		position: sticky;
 		top: 0;
 		z-index: 100;
-		backdrop-filter: blur(8px);
+		backdrop-filter: blur(12px);
 	}
 
 	.app-content {
@@ -191,8 +189,8 @@
 
 	.breadcrumb-bar {
 		padding: 0.5rem 2rem 0.25rem;
-		border-bottom: 1px solid rgba(126, 231, 255, 0.08);
-		background: linear-gradient(180deg, rgba(9, 14, 23, 0.78) 0%, rgba(9, 14, 23, 0.18) 100%);
+		border-bottom: none;
+		background: linear-gradient(180deg, rgba(9, 14, 23, 0.48) 0%, transparent 100%);
 		backdrop-filter: blur(18px);
 	}
 
@@ -216,12 +214,11 @@
 		border-radius: 1rem;
 		font-size: 0.75rem;
 		font-family: 'JetBrains Mono', monospace;
-		border: 1px solid rgba(126, 231, 255, 0.08);
+		border: none;
 		box-shadow:
-			0 18px 34px rgba(0, 0, 0, 0.28),
-			0 0 0 1px rgba(0, 0, 0, 0.2);
+			0 18px 34px rgba(0, 0, 0, 0.35);
 		animation: toast-in 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-		backdrop-filter: blur(12px);
+		backdrop-filter: blur(16px);
 	}
 
 	@keyframes toast-in {
@@ -230,24 +227,20 @@
 	}
 
 	.toast-info {
-		background: linear-gradient(135deg, rgba(14, 27, 44, 0.96) 0%, rgba(10, 19, 31, 0.98) 100%);
+		background: rgba(14, 27, 44, 0.75);
 		color: #8adfff;
-		border-color: rgba(126, 231, 255, 0.2);
 	}
 	.toast-success {
-		background: linear-gradient(135deg, rgba(11, 32, 26, 0.96) 0%, rgba(8, 20, 16, 0.98) 100%);
+		background: rgba(11, 32, 26, 0.75);
 		color: #7df0ba;
-		border-color: rgba(83, 226, 164, 0.2);
 	}
 	.toast-warning {
-		background: linear-gradient(135deg, rgba(34, 25, 11, 0.96) 0%, rgba(22, 16, 7, 0.98) 100%);
+		background: rgba(34, 25, 11, 0.75);
 		color: #ffd479;
-		border-color: rgba(255, 212, 121, 0.22);
 	}
 	.toast-error {
-		background: linear-gradient(135deg, rgba(40, 16, 22, 0.96) 0%, rgba(24, 10, 14, 0.98) 100%);
+		background: rgba(40, 16, 22, 0.75);
 		color: #ff99a3;
-		border-color: rgba(255, 107, 120, 0.2);
 	}
 
 	.toast-msg { flex: 1; }

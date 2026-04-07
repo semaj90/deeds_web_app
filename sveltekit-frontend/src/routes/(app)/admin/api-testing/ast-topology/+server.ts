@@ -84,8 +84,7 @@ export const GET: RequestHandler = async () => {
 
 	} catch (error: any) {
 		console.error('Failed to load topology:', error);
-		return json({ error: error.message },
-	{ status: 500 });
+		return json({ error: 'Failed to load topology' }, { status: 500 });
 	}
 };
 

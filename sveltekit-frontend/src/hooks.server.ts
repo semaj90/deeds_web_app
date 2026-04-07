@@ -609,6 +609,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     event.url.pathname.startsWith('/api/embed') ||
     event.url.pathname.startsWith('/api/nlp/') ||
     event.url.pathname.startsWith('/api/rag/') ||
+    event.url.pathname.startsWith('/api/agent/') ||
     event.url.pathname.startsWith('/api/contextual/') ||
     event.url.pathname.startsWith('/api/synthesis/') ||
     event.url.pathname.startsWith('/api/error-brain/diagnose') ||

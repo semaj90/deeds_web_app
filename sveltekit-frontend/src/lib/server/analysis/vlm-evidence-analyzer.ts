@@ -6,16 +6,16 @@
  *   - /api/vision/analyze (standalone vision endpoint)
  *
  * Inference path:
- *   1. Triton VLM ensemble (SigLIP → Projector → Gemma3) — fastest when available
- *   2. Ollama multimodal (gemma4-legal + images[]) — always-available fallback
+ *   1. Triton VLM ensemble (SigLIP → Projector → Gemma4) — fastest when available
+ *   2. Ollama multimodal (gemma4:e4b + images[]) — always-available fallback
  *
- * Resizes images to 896×896 (Gemma3 SigLIP native resolution) before inference.
+ * Resizes images to max 2048px edge (Gemma4 variable token budget) before inference.
  */
 
 import crypto from 'crypto';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
-import { resizeForVLM, GEMMA3_VLM_SIZE } from '$lib/server/image/resize-for-vlm.js';
+import { resizeForVLM, GEMMA4_VLM_MAX_EDGE } from '$lib/server/image/resize-for-vlm.js';
 import { getVLMCache, setVLMCache } from '$lib/server/vector-cache.js';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -133,30 +133,30 @@ async function inferTritonVLM(
 ): Promise<string | null> {
 	try {
 		const res = await fetch(
-			`${getTritonUrl()}/v2/models/${encodeURIComponent(getVlmModel())}/infer`,
-			{
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					inputs: [
-						{
-							name: 'pixel_values',
-							shape: [1, 3, GEMMA3_VLM_SIZE, GEMMA3_VLM_SIZE],
-							datatype: 'FP32',
-							data: base64Image,
-						},
-						{
-							name: 'input_ids',
-							shape: [1, -1],
-							datatype: 'INT64',
-							data: prompt,
-						},
-					],
-					parameters: { max_tokens: maxTokens, temperature: 0.1 },
-				}),
-				signal: AbortSignal.timeout(TRITON_TIMEOUT),
-			}
-		);
+      `${getTritonUrl()}/v2/models/${encodeURIComponent(getVlmModel())}/infer`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          inputs: [
+            {
+              name: 'pixel_values',
+              shape: [1, 3, GEMMA4_VLM_MAX_EDGE, GEMMA4_VLM_MAX_EDGE],
+              datatype: 'FP32',
+              data: base64Image,
+            },
+            {
+              name: 'input_ids',
+              shape: [1, -1],
+              datatype: 'INT64',
+              data: prompt,
+            },
+          ],
+          parameters: { max_tokens: maxTokens, temperature: 0.1 },
+        }),
+        signal: AbortSignal.timeout(TRITON_TIMEOUT),
+      }
+    );
 
 		if (!res.ok) return null;
 		const result = await res.json();
@@ -175,17 +175,17 @@ async function inferOllamaVLM(
 ): Promise<string | null> {
 	try {
 		const ollamaRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: ENV.GEMMA4_MODEL ?? 'gemma4-legal:latest',
-				prompt,
-				images: [base64Image],
-				stream: false,
-				options: { temperature: 0.1, num_predict: maxTokens },
-			}),
-			signal: AbortSignal.timeout(OLLAMA_TIMEOUT),
-		});
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: ENV.GEMMA4_MODEL ?? 'gemma4:e4b-it-q4_K_M',
+        prompt,
+        images: [base64Image],
+        stream: false,
+        options: { temperature: 0.1, num_predict: maxTokens },
+      }),
+      signal: AbortSignal.timeout(OLLAMA_TIMEOUT),
+    });
 
 		if (!ollamaRes.ok) return null;
 		const data = await ollamaRes.json();
@@ -207,7 +207,7 @@ export async function analyzeEvidenceImage(input: VLMAnalysisInput): Promise<VLM
 	// 1. Compute hash for cache key
 	const imageHash = crypto.createHash('sha256').update(input.buffer).digest('hex');
 
-	// 2. Resize to Gemma3 native 896×896
+	// 2. Resize to Gemma4 variable-resolution (max 2048px edge)
 	const resized = await resizeForVLM(input.buffer).catch(() => ({
 		buffer: input.buffer,
 		originalWidth: 0,
@@ -217,11 +217,11 @@ export async function analyzeEvidenceImage(input: VLMAnalysisInput): Promise<VLM
 	}));
 
 	const resizeMeta = {
-		resized: resized.resized,
-		originalWidth: resized.originalWidth,
-		originalHeight: resized.originalHeight,
-		vlmSize: GEMMA3_VLM_SIZE,
-	};
+    resized: resized.resized,
+    originalWidth: resized.originalWidth,
+    originalHeight: resized.originalHeight,
+    vlmSize: GEMMA4_VLM_MAX_EDGE,
+  };
 
 	// 3. Check cache
 	if (!input.skipCache) {
@@ -267,7 +267,7 @@ export async function analyzeEvidenceImage(input: VLMAnalysisInput): Promise<VLM
 	if (!responseText) {
 		responseText = await inferOllamaVLM(base64Image, prompt, maxTokens);
 		if (responseText) {
-			model = 'gemma4-legal (ollama)';
+			model = `${ENV.GEMMA4_MODEL ?? 'gemma4:e4b-it-q4_K_M'} (ollama)`;
 			console.log(`[VLM] Ollama inference complete for ${input.fileName}`);
 		}
 	}

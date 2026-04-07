@@ -13,7 +13,7 @@ import { redis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 import { uploadFile } from '$lib/server/minio-client.js';
 import { createYOLOService, type YOLOResult } from '$lib/server/yolo.js';
-import { GEMMA3_VLM_SIZE } from '$lib/server/image/resize-for-vlm.js';
+import { GEMMA4_VLM_MAX_EDGE } from '$lib/server/image/resize-for-vlm.js';
 import { analyzeEvidenceImage } from '$lib/server/analysis/vlm-evidence-analyzer.js';
 
 const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
@@ -48,7 +48,7 @@ interface VisionResponse {
 }
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   const timings: Record<string, number> = {};
   const t0 = Date.now();
 
@@ -163,9 +163,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     // 5. VLM analysis (Triton → Ollama fallback) via shared analyzer
     const tVlm = Date.now();
-    const detectionContext = boxes.length > 0
-      ? boxes.map((b) => `${b.label} (${(b.conf * 100).toFixed(0)}%)`).join(', ')
-      : undefined;
+    const detectionContext =
+      boxes.length > 0
+        ? boxes.map((b) => `${b.label} (${(b.conf * 100).toFixed(0)}%)`).join(', ')
+        : undefined;
 
     const vlmResult = await analyzeEvidenceImage({
       buffer,
@@ -194,8 +195,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         resized: vlmResult.resizeMeta.resized,
         originalWidth: vlmResult.resizeMeta.originalWidth,
         originalHeight: vlmResult.resizeMeta.originalHeight,
-        vlmWidth: GEMMA3_VLM_SIZE,
-        vlmHeight: GEMMA3_VLM_SIZE,
+        vlmWidth: GEMMA4_VLM_MAX_EDGE,
+        vlmHeight: GEMMA4_VLM_MAX_EDGE,
       },
     };
 
@@ -209,10 +210,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     return json(result);
   } catch (err) {
     console.error('[vision] Analysis failed:', err);
-    return json(
-      { error: 'Vision analysis failed' },
-      { status: 500 }
-    );
+    return json({ error: 'Vision analysis failed' }, { status: 500 });
   }
 };
 

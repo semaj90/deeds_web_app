@@ -158,19 +158,18 @@
 		top: 0;
 		bottom: 0;
 		width: 210px;
-		background:
-			radial-gradient(circle at top left, rgba(200, 195, 160, 0.08), transparent 34%),
-			linear-gradient(180deg, #211d16 0%, #17140f 52%, #12100c 100%);
-		border-right: 1px solid rgba(158, 150, 110, 0.5);
+		background: rgba(16, 14, 10, 0.72);
+		border-right: none;
 		display: flex;
 		flex-direction: column;
 		z-index: 1000;
 		transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 		font-family: 'JetBrains Mono', monospace;
 		color: rgba(232, 228, 200, 0.95);
+		backdrop-filter: blur(32px) saturate(1.4);
+		-webkit-backdrop-filter: blur(32px) saturate(1.4);
 		box-shadow:
-			inset -1px 0 0 rgba(255, 255, 255, 0.03),
-			12px 0 32px rgba(0, 0, 0, 0.35);
+			12px 0 40px rgba(0, 0, 0, 0.4);
 	}
 
 	.yorha-sidebar.collapsed {
@@ -180,9 +179,9 @@
 	/* Header */
 	.sidebar-header {
 		padding: 1.5rem 1rem;
-		border-bottom: 1px solid rgba(138, 133, 94, 0.18);
+		border-bottom: 1px solid rgba(138, 133, 94, 0.1);
 		position: relative;
-		background: rgba(0, 0, 0, 0.12);
+		background: transparent;
 	}
 
 	.branding {
@@ -218,8 +217,8 @@
 		right: 0.5rem;
 		width: 24px;
 		height: 24px;
-		border: 1px solid rgba(138, 133, 94, 0.28);
-		background: rgba(216, 212, 184, 0.04);
+		border: none;
+		background: rgba(216, 212, 184, 0.06);
 		color: rgba(232, 228, 200, 0.85);
 		cursor: pointer;
 		display: flex;
@@ -231,9 +230,8 @@
 	}
 
 	.collapse-btn:hover {
-		background: rgba(216, 212, 184, 0.1);
+		background: rgba(216, 212, 184, 0.12);
 		color: #f0edd4;
-		border-color: rgba(138, 133, 94, 0.42);
 	}
 
 	/* Navigation */
@@ -271,16 +269,13 @@
 	.nav-item:hover {
 		background: rgba(216, 212, 184, 0.1);
 		color: #f5f1db;
-		border-color: rgba(138, 133, 94, 0.28);
 	}
 
 	.nav-item.active {
-		background: linear-gradient(180deg, rgba(216, 212, 184, 0.14) 0%, rgba(216, 212, 184, 0.08) 100%);
+		background: rgba(216, 212, 184, 0.1);
 		color: #f7f2df;
-		border-color: rgba(138, 133, 94, 0.36);
 		box-shadow:
-			inset 3px 0 0 #c4b78f,
-			inset 0 1px 0 rgba(255, 255, 255, 0.03);
+			inset 3px 0 0 #c4b78f;
 	}
 
 	.collapsed .nav-item.active {
@@ -313,7 +308,7 @@
 	.section-divider {
 		padding: 0.5rem 1rem;
 		margin-top: 0.5rem;
-		border-top: 1px solid rgba(138, 133, 94, 0.16);
+		border-top: 1px solid rgba(138, 133, 94, 0.08);
 	}
 
 	.section-label {
@@ -326,10 +321,10 @@
 	/* Footer */
 	.sidebar-footer {
 		padding: 1rem;
-		border-top: 1px solid rgba(138, 133, 94, 0.16);
+		border-top: 1px solid rgba(138, 133, 94, 0.08);
 		font-size: 0.625rem;
 		opacity: 1;
-		background: rgba(0, 0, 0, 0.16);
+		background: transparent;
 	}
 
 	.status-indicator {

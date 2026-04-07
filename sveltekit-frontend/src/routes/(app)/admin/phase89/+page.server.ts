@@ -116,7 +116,7 @@ export const actions: Actions = {
 
         } catch (error) {
             console.error('Gemini analysis failed:', error);
-            return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+            return { success: false, error: 'Analysis failed' };
         }
     }
 };

@@ -320,6 +320,36 @@ services:
       retries: 3
       start_period: 30s
 
+  # SearXNG — privacy-respecting metasearch engine for agent web search
+  searxng:
+    image: searxng/searxng:latest
+    container_name: legal-ai-searxng
+    restart: unless-stopped
+    profiles: ["full"]
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    ports:
+      - "8888:8080"
+    volumes:
+      - ./docker/searxng/settings.yml:/etc/searxng/settings.yml:ro
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
   # NATS — low-latency message transport (QUIC bridge)
   nats:
     image: nats:latest
@@ -416,6 +446,141 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+
+  # Langfuse ClickHouse — OLAP store for traces/observations/scores (required by Langfuse v3)
+  langfuse-clickhouse:
+    image: clickhouse/clickhouse-server
+    container_name: langfuse-clickhouse
+    restart: unless-stopped
+    profiles: ["full"]
+    user: "101:101"
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    environment:
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_USER: clickhouse
+      CLICKHOUSE_PASSWORD: clickhouse_langfuse
+    volumes:
+      - langfuse_clickhouse_data:/var/lib/clickhouse
+      - langfuse_clickhouse_logs:/var/log/clickhouse-server
+    ports:
+      - "127.0.0.1:8124:8123"
+      - "127.0.0.1:9009:9000"
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  # Langfuse Worker — async trace processing
+  langfuse-worker:
+    image: langfuse/langfuse-worker:3
+    container_name: langfuse-worker
+    restart: unless-stopped
+    profiles: ["full"]
+    depends_on:
+      langfuse-clickhouse:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    environment: &langfuse-env
+      DATABASE_URL: postgresql://legal_admin:123456@postgres:5432/langfuse?connect_timeout=10&pool_timeout=10
+      CLICKHOUSE_URL: http://langfuse-clickhouse:8123
+      CLICKHOUSE_MIGRATION_URL: clickhouse://clickhouse:clickhouse_langfuse@langfuse-clickhouse:9000
+      CLICKHOUSE_USER: clickhouse
+      CLICKHOUSE_PASSWORD: clickhouse_langfuse
+      CLICKHOUSE_CLUSTER_ENABLED: "false"
+      LANGFUSE_S3_EVENT_UPLOAD_BUCKET: langfuse
+      LANGFUSE_S3_EVENT_UPLOAD_REGION: auto
+      LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: minio
+      LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: minio123
+      LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: http://minio:9000
+      LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: "true"
+      LANGFUSE_S3_EVENT_UPLOAD_PREFIX: events/
+      LANGFUSE_S3_MEDIA_UPLOAD_BUCKET: langfuse
+      LANGFUSE_S3_MEDIA_UPLOAD_REGION: auto
+      LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID: minio
+      LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY: minio123
+      LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT: http://minio:9000
+      LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE: "true"
+      LANGFUSE_S3_MEDIA_UPLOAD_PREFIX: media/
+      LANGFUSE_USE_AZURE_BLOB: "false"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      REDIS_TLS_ENABLED: "false"
+      NEXTAUTH_URL: http://localhost:3030
+      SALT: langfuse-salt-change-in-production
+      ENCRYPTION_KEY: 8754be3c748398a38dd9a797fbb84747cb8b94d34dd15a2d5237851dbbe1b671
+      TELEMETRY_ENABLED: "false"
+      LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: "true"
+    networks:
+      - legal-ai-network
+
+  # Langfuse Web — LLM observability UI + API on port 3030
+  langfuse-web:
+    image: langfuse/langfuse:3
+    container_name: langfuse-server
+    restart: unless-stopped
+    profiles: ["full"]
+    depends_on:
+      langfuse-clickhouse:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    ports:
+      - "3030:3000"
+    environment:
+      <<: *langfuse-env
+      NEXTAUTH_SECRET: langfuse-secret-key-change-in-production-min-32-chars
+      LANGFUSE_INIT_ORG_ID: deeds-legal-ai
+      LANGFUSE_INIT_ORG_NAME: Deeds Legal AI
+      LANGFUSE_INIT_PROJECT_ID: deeds-observability
+      LANGFUSE_INIT_PROJECT_NAME: Deeds LLM Observability
+      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: pk-lf-4e3db8a0107de7872b894e309494252b
+      LANGFUSE_INIT_PROJECT_SECRET_KEY: sk-lf-3941aba7500ce9fabbe0c513ad6c3a58
+      LANGFUSE_INIT_USER_EMAIL: admin@deeds-legal.ai
+      LANGFUSE_INIT_USER_NAME: Admin
+      LANGFUSE_INIT_USER_PASSWORD: admin123
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://$(hostname):3000/api/public/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   # Go Legal Library Search Service
   go-search-service:
@@ -540,6 +705,10 @@ volumes:
   neo4j_logs:
     driver: local
   nats_data:
+    driver: local
+  langfuse_clickhouse_data:
+    driver: local
+  langfuse_clickhouse_logs:
     driver: local
   # Legacy volumes (kept for data preservation, referenced by older compose files)
   postgres_data:

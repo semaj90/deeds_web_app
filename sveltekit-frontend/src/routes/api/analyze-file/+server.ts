@@ -8,45 +8,62 @@
 
 import { db } from '$lib/server/db/client';
 import { json, type RequestEvent } from '@sveltejs/kit';
-import { exec } from 'child_process';
+import { execFile } from 'child_process';
 import { sql } from 'drizzle-orm';
 import { readFile } from 'fs/promises';
+import { resolve } from 'path';
 import { promisify } from 'util';
 
 import { getOllamaUrl } from '$lib/config/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 const OLLAMA_URL = getOllamaUrl();
 
 const analyzeFileSchema = z.object({
-	filePath: z.string().min(1, 'filePath is required').max(1000)
-		.refine(p => !p.includes('..'), 'Path traversal not allowed')
-		.refine(p => !p.startsWith('/'), 'Absolute paths not allowed')
+  filePath: z
+    .string()
+    .min(1, 'filePath is required')
+    .max(1000)
+    .refine((p) => !p.includes('..'), 'Path traversal not allowed')
+    .refine((p) => !p.startsWith('/'), 'Absolute paths not allowed')
+    .refine((p) => /^[\w.\-/\\]+$/.test(p), 'Path contains invalid characters'),
 });
+
+const PROJECT_ROOT = resolve(process.cwd());
+const ALLOWED_SRC = resolve(PROJECT_ROOT, 'src');
 
 export async function POST({ request, locals }: RequestEvent) {
 	if (!locals.user) return json({ success: false, error: 'Unauthorized' }, { status: 401 });
 
 	try {
-		const raw = await request.json();
-		const parsed = analyzeFileSchema.safeParse(raw);
-		if (!parsed.success) {
-			return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
-		}
-		const { filePath } = parsed.data;
+    const raw = await request.json();
+    const parsed = analyzeFileSchema.safeParse(raw);
+    if (!parsed.success) {
+      return json(
+        { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' },
+        { status: 400 }
+      );
+    }
+    const { filePath } = parsed.data;
 
-		// 1. Read file content
-		const content = await readFile(filePath, 'utf-8');
+    // Resolve and verify path is within src/
+    const resolvedPath = resolve(PROJECT_ROOT, filePath);
+    if (!resolvedPath.startsWith(ALLOWED_SRC)) {
+      return json({ success: false, error: 'Path must be within src/' }, { status: 400 });
+    }
 
-		// 2. ripgrep: Extract comments
-		const comments = await extractComments(filePath);
+    // 1. Read file content
+    const content = await readFile(resolvedPath, 'utf-8');
 
-		// 3. Pattern search
-		const patterns = await searchPatterns(filePath);
+    // 2. ripgrep: Extract comments
+    const comments = await extractComments(resolvedPath);
 
-		// 4. PostgreSQL: Get errors for this file
-		const errors = await db.execute(sql`
+    // 3. Pattern search
+    const patterns = await searchPatterns(resolvedPath);
+
+    // 4. PostgreSQL: Get errors for this file
+    const errors = await db.execute(sql`
 			SELECT message, code, line_number, timestamp
 			FROM raw_error_embeddings
 			WHERE source = ${filePath}
@@ -54,14 +71,14 @@ export async function POST({ request, locals }: RequestEvent) {
 			LIMIT 20
 		`);
 
-		// 5. gemma4-legal: Analyze file
-		const analysis = await analyzeFileWithLLM(filePath, content, comments, errors.rows || []);
+    // 5. gemma4-legal: Analyze file
+    const analysis = await analyzeFileWithLLM(filePath, content, comments, errors.rows || []);
 
-		// 6. Generate enhanced Qdrant tag
-		const qdrantTag = await generateEnhancedTag(filePath, analysis);
+    // 6. Generate enhanced Qdrant tag
+    const qdrantTag = await generateEnhancedTag(filePath, analysis);
 
-		// 7. Store analysis in PostgreSQL
-		await db.execute(sql`
+    // 7. Store analysis in PostgreSQL
+    await db.execute(sql`
 			INSERT INTO phase89_file_analyses (
 				file_path,
 				summary,
@@ -91,37 +108,36 @@ export async function POST({ request, locals }: RequestEvent) {
 				updated_at = NOW()
 		`);
 
-		return json({
-			success: true,
-			filePath,
-			summary: analysis.summary,
-			comments,
-			errors: errors.rows || [],
-			recommendations: analysis.recommendations,
-			qdrantTag,
-			patterns
-		});
-	} catch (err) {
-		console.error('File analysis failed:', err);
-		return json({ success: false, error: 'File analysis failed' }, { status: 500 });
-	}
+    return json({
+      success: true,
+      filePath,
+      summary: analysis.summary,
+      comments,
+      errors: errors.rows || [],
+      recommendations: analysis.recommendations,
+      qdrantTag,
+      patterns,
+    });
+  } catch (err) {
+    console.error('File analysis failed:', err);
+    return json({ success: false, error: 'File analysis failed' }, { status: 500 });
+  }
 }
 
 async function extractComments(filePath: string): Promise<string[]> {
 	try {
-		// ripgrep: Find single-line and multi-line comments
-		const { stdout } = await execAsync(
-			`rg "(//.*|/\\*[\\s\\S]*?\\*/)" "${filePath}" --no-heading --no-line-number`,
-			{ timeout: 5000 }
-		);
+    // ripgrep: Find single-line and multi-line comments (using execFile to avoid shell injection)
+    const { stdout } = await execFileAsync(
+      'rg',
+      ['(//.*|/\\*[\\s\\S]*?\\*/)', filePath, '--no-heading', '--no-line-number'],
+      { timeout: 5000 }
+    );
 
-	const lines = stdout.split('\n');
-	return lines
-		.filter((line) => line.trim().length > 0)
-		.map((line) => line.trim());
-	} catch {
-		return [];
-	}
+    const lines = stdout.split('\n');
+    return lines.filter((line) => line.trim().length > 0).map((line) => line.trim());
+  } catch {
+    return [];
+  }
 }
 
 interface PatternCounts {
@@ -143,7 +159,7 @@ async function searchPatterns(filePath: string): Promise<PatternCounts> {
 
 	const runRgCount = async (pattern: string) => {
 		try {
-			const { stdout } = await execAsync(`rg -c "${pattern}" "${filePath}"`, { timeout: 2000 });
+			const { stdout } = await execFileAsync('rg', ['-c', pattern, filePath], { timeout: 2000 });
 			return parseInt(stdout.trim()) || 0;
 		} catch {
 			return 0;

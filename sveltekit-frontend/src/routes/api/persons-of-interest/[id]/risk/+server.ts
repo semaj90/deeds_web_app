@@ -43,7 +43,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
           .execute(
             sql`
 				SELECT COUNT(*)::int AS cnt FROM evidence
-				WHERE case_id = ANY(${sql.raw(`ARRAY[${poi.caseIds.map((id) => `'${id}'`).join(',')}]::uuid[]`)})
+				WHERE case_id = ANY(${poi.caseIds}::uuid[])
 			`
           )
           .then((r) => Number((r.rows[0] as Record<string, any>)?.cnt ?? 0))
@@ -55,7 +55,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
           .execute(
             sql`
 				SELECT priority, status FROM cases
-				WHERE id = ANY(${sql.raw(`ARRAY[${poi.caseIds.map((id) => `'${id}'`).join(',')}]::uuid[]`)})
+				WHERE id = ANY(${poi.caseIds}::uuid[])
 			`
           )
           .then((r) => r.rows as Array<{ priority: string; status: string }>)

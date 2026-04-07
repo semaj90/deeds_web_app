@@ -38,7 +38,7 @@
 		{
 			id: 'gemma4-legal',
 			name: 'gemma4-legal:latest',
-			displayName: 'Gemma3 Legal Specialist',
+			displayName: 'Gemma4 Legal Specialist',
 			provider: 'ollama',
 			size: '7.3GB',
 			specialization: 'legal',

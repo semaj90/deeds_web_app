@@ -24,12 +24,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const parsed = searchAnalyticsSchema.safeParse(body);
 
 		const {
-			query = '',
-			resultCount = 0,
-			executionTimeMs = 0,
-			type = 'laws',
-			timestamp = new Date().toISOString()
-		} = parsed.success ? parsed.data : body;
+      query = '',
+      resultCount = 0,
+      executionTimeMs = 0,
+      type = 'laws',
+      timestamp = new Date().toISOString(),
+    } = parsed.success ? parsed.data : searchAnalyticsSchema.parse({});
 
 		// Publish to RabbitMQ analytics.track queue (fire-and-forget)
 		try {

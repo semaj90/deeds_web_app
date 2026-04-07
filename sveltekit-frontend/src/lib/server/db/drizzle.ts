@@ -88,10 +88,11 @@ export async function hybridVectorSearch<T = unknown>(
 
   // Fallback to pgvector
   try {
+    const vectorStr = `[${embedding.join(',')}]`;
     const rows = await (db as any)
       .select()
       .from(table as any)
-      .orderBy(sql`${column as any} <#> ARRAY[${sql.raw(embedding.join(','))}]::vector`)
+      .orderBy(sql`${column as any} <#> ${vectorStr}::vector`)
       .limit(limit)
       .execute();
     return Array.isArray(rows) ? rows : [];

@@ -104,14 +104,14 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
         console.error('Failed to load error cards:', error);
 
         return {
-            errors: [],
-            totalErrors: 0,
-            errorCodeCounts: {},
-            surfaceCounts: {},
-            techCounts: {},
-            filters: { errorCode, surface, tech, clusterId },
-            hasNextPage: false,
-            error: error instanceof Error ? error.message : 'Unknown error'
+          errors: [],
+          totalErrors: 0,
+          errorCodeCounts: {},
+          surfaceCounts: {},
+          techCounts: {},
+          filters: { errorCode, surface, tech, clusterId },
+          hasNextPage: false,
+          error: 'Failed to load errors',
         };
     }
 };

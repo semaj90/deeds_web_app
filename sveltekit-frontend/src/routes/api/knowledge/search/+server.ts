@@ -96,9 +96,24 @@ export const POST: RequestHandler = async ({ request, fetch, locals }) => {
           llmProvider: body.llmProvider,
         })
       ),
-      fetch('/api/glossary/search', { method: 'POST', headers: hdrs, body: searchBody }),
-      fetch('/api/statutes/search', { method: 'POST', headers: hdrs, body: searchBody }),
-      fetch('/api/precedents/search', { method: 'POST', headers: hdrs, body: searchBody }),
+      fetch('/api/glossary/search', {
+        method: 'POST',
+        headers: hdrs,
+        body: searchBody,
+        signal: AbortSignal.timeout(10_000),
+      }),
+      fetch('/api/statutes/search', {
+        method: 'POST',
+        headers: hdrs,
+        body: searchBody,
+        signal: AbortSignal.timeout(10_000),
+      }),
+      fetch('/api/precedents/search', {
+        method: 'POST',
+        headers: hdrs,
+        body: searchBody,
+        signal: AbortSignal.timeout(10_000),
+      }),
     ]);
 
     // Collect KnowledgeSearcher (Qdrant) results

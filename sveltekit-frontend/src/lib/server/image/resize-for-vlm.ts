@@ -1,25 +1,25 @@
 /**
  * resize-for-vlm.ts
  *
- * Gemma 3 VLM image preprocessing utility.
+ * Gemma 4 VLM image preprocessing utility.
  *
- * Google's official spec (from the Gemma 3 model card on Hugging Face):
- *   "Images normalized to 896 × 896 resolution, encoded to 256 tokens each"
+ * Gemma 4 uses variable-resolution tokenisation (70–1120 tokens per image).
+ * Community testing (gemma4-ocr) confirms --max-edge 2048 @ 300 DPI fills the
+ * 1120-token budget for dense documents without exceeding it.
  *
- * The SigLIP vision encoder inside Gemma 3 operates at a fixed 896×896 grid.
- * Sending oversized images wastes VRAM (Ollama still has to rescale internally)
- * and increases base64 payload size dramatically.
+ * Strategy: fit within 2048×2048 while preserving aspect ratio via `contain`,
+ * then pad with mid-grey (127) so the model doesn't false-positive on borders.
  *
- * Strategy: fit within 896×896 while preserving aspect ratio via `contain`,
- * then pad to exactly 896×896 with a neutral background (127,127,127 = mid-grey).
- * This matches what the Gemma preprocessor does before SigLIP tokenisation.
- *
- * Reference: https://huggingface.co/google/gemma-3-12b-it
+ * Reference:
+ *   https://huggingface.co/google/gemma-4-e4b-it
+ *   https://github.com/BitcoinerRay/gemma4-ocr (--dpi 300 --max-edge 2048)
  */
 import sharp from 'sharp';
 
-/** Gemma 3 SigLIP encoder native resolution */
-export const GEMMA3_VLM_SIZE = 896;
+/** Gemma 4 variable-resolution max edge (fills 1120-token budget) */
+export const GEMMA4_VLM_MAX_EDGE = 2048;
+/** @deprecated Use GEMMA4_VLM_MAX_EDGE */
+export const GEMMA3_VLM_SIZE = GEMMA4_VLM_MAX_EDGE;
 
 export interface ResizeResult {
 	buffer: Buffer;
@@ -31,7 +31,7 @@ export interface ResizeResult {
 }
 
 /**
- * Resize + pad any image to GEMMA3_VLM_SIZE × GEMMA3_VLM_SIZE for VLM inference.
+ * Resize + pad any image to GEMMA4_VLM_MAX_EDGE × GEMMA4_VLM_MAX_EDGE for VLM inference.
  *
  * - Does nothing (returns original bytes) if the image already fits within
  *   the target bounds AND is already jpeg — avoids double-transcoding small images.
@@ -45,7 +45,7 @@ export async function resizeForVLM(input: Buffer): Promise<ResizeResult> {
 	const w = meta.width ?? 0;
 	const h = meta.height ?? 0;
 
-	const alreadyFits = w <= GEMMA3_VLM_SIZE && h <= GEMMA3_VLM_SIZE;
+	const alreadyFits = w <= GEMMA4_VLM_MAX_EDGE && h <= GEMMA4_VLM_MAX_EDGE;
 	const isJpeg = meta.format === 'jpeg';
 
 	if (alreadyFits && isJpeg) {
@@ -59,7 +59,7 @@ export async function resizeForVLM(input: Buffer): Promise<ResizeResult> {
 	}
 
 	const buffer = await sharp(input)
-		.resize(GEMMA3_VLM_SIZE, GEMMA3_VLM_SIZE, {
+		.resize(GEMMA4_VLM_MAX_EDGE, GEMMA4_VLM_MAX_EDGE, {
 			fit: 'contain',
 			background: { r: 127, g: 127, b: 127, alpha: 1 },
 		})

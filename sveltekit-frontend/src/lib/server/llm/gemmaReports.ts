@@ -102,7 +102,7 @@ Requirements:
         });
 
         if (!res.ok) {
-            throw new Error(`Gemma3 request failed: ${res.status} ${res.statusText}`);
+            throw new Error(`Gemma4 request failed: ${res.status} ${res.statusText}`);
         }
 
         const data = (await res.json()) as { response: string };
