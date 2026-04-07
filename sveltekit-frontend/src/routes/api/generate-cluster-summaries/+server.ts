@@ -74,7 +74,7 @@ export async function POST({ locals }: RequestEvent) {
       },
     });
   } catch (err) {
-    console.error('Cluster summary generation failed:', err);
+    console.error('Cluster summary generation failed:', err instanceof Error ? err.message : err);
     return json({ success: false, error: 'Cluster summary generation failed' }, { status: 500 });
   } finally {
     // Pool manages connection lifecycle

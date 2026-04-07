@@ -444,8 +444,9 @@ async function extractText(
     /\.(mp3|wav|m4a|ogg|flac|aac|wma)$/i.test(fileName) ||
     (mimeType?.startsWith('audio/') ?? false);
 
-  // Audio files: transcribe via Docling ASR
+  // Audio files: transcribe via Docling ASR → Whisper fallback
   if (isAudio) {
+    // Tier 1: Docling ASR
     try {
       const { isDoclingAvailable, transcribeAudio } = await import('$lib/server/docling.js');
       if (await isDoclingAvailable()) {
@@ -455,7 +456,52 @@ async function extractText(
         }
       }
     } catch (err) {
-      console.warn('[Upload] Audio transcription failed:', err);
+      console.warn('[Upload] Docling ASR failed, trying whisper:', err instanceof Error ? err.message : err);
+    }
+    // Tier 2: Whisper (nodejs-whisper) — multilingual base model
+    try {
+      const { writeFile: writeTmp, unlink: unlinkTmp, readFile: readTmp } = await import('fs/promises');
+      const { tmpdir } = await import('os');
+      const { join } = await import('path');
+      const { randomUUID } = await import('crypto');
+      const ext = '.' + (fileName.split('.').pop()?.toLowerCase() ?? 'wav');
+      const tmpPath = join(tmpdir(), `whisper-evidence-${randomUUID()}${ext}`);
+      await writeTmp(tmpPath, buffer);
+      try {
+        const { nodewhisper } = await import('nodejs-whisper');
+        const whisperModel = process.env.WHISPER_MODEL ?? 'base';
+        const transcript = await nodewhisper(tmpPath, {
+          modelName: whisperModel,
+          removeWavFileAfterTranscription: false,
+          withCuda: (process.env.WHISPER_CUDA ?? 'true') === 'true',
+          whisperOptions: { outputInText: true, outputInJsonFull: true },
+        });
+        const text = Array.isArray(transcript)
+          ? transcript.map((t: any) => t.speech ?? t.text ?? '').join(' ').trim()
+          : String(transcript ?? '').trim();
+        // Try reading JSON output for language + segments
+        const wavBase = tmpPath.replace(/\.[^.]+$/, '.wav');
+        const jsonPath = wavBase + '.json';
+        let detectedLang: string | null = null;
+        try {
+          const jsonData = await readTmp(jsonPath, 'utf-8');
+          const parsed = JSON.parse(jsonData);
+          detectedLang = parsed?.result?.language ?? parsed?.params?.language ?? null;
+          await unlinkTmp(jsonPath).catch(() => {});
+        } catch { /* no JSON output */ }
+        await unlinkTmp(tmpPath).catch(() => {});
+        const txtPath = wavBase + '.txt';
+        await unlinkTmp(txtPath).catch(() => {});
+        if (wavBase !== tmpPath) await unlinkTmp(wavBase).catch(() => {});
+        if (text.length > 0) {
+          return { text, method: `whisper-${whisperModel}${detectedLang ? `-${detectedLang}` : ''}` };
+        }
+      } finally {
+        await writeTmp(tmpPath, '').catch(() => {}); // ensure cleanup
+        await (await import('fs/promises')).unlink(tmpPath).catch(() => {});
+      }
+    } catch (err) {
+      console.warn('[Upload] Whisper transcription failed:', err instanceof Error ? err.message : err);
     }
     return { text: `Audio evidence file: ${fileName}`, method: 'audio-placeholder' };
   }
@@ -894,6 +940,7 @@ async function processAndEmbed(
           citations: chunk.citations,
           token_count: chunk.tokenCount,
           section_type: sectionType,
+          content_type: extractionMethod.startsWith('whisper-') || extractionMethod === 'docling-asr' ? 'audio_transcription' : 'document',
           created_at: new Date().toISOString(),
         },
       });
@@ -1437,6 +1484,33 @@ async function processAndEmbed(
     });
   }
 
+  // 7b. Enrich Qdrant evidence points with VLM/YOLO/tag metadata (post-analysis update)
+  const allSuggestedTags = [
+    ...(evidenceProfile?.suggested_tags ?? []),
+    ...(visionAnalysis?.suggestedTags ?? []),
+    ...(yoloDetections?.objects?.map((o: { class: string }) => `detected:${o.class}`) ?? []),
+    ...(analysisPipelineResult?.tags ?? []),
+  ].filter(Boolean);
+
+  if (allSuggestedTags.length > 0 || visionAnalysis?.keyFindings?.length) {
+    try {
+      await qdrant.client.setPayload('evidence', {
+        payload: {
+          ...(allSuggestedTags.length > 0 && { suggested_tags: allSuggestedTags }),
+          ...(visionAnalysis?.keyFindings?.length && { vlm_key_findings: visionAnalysis.keyFindings }),
+          ...(visionAnalysis?.model && { vlm_model: visionAnalysis.model }),
+          ...(yoloDetections?.objects?.length && { yolo_objects: yoloDetections.objects.map((o: { class: string }) => o.class) }),
+        },
+        filter: {
+          must: [{ key: 'evidence_id', match: { value: evidenceId } }],
+        },
+      });
+      console.log(`[Upload] Enriched Qdrant points with ${allSuggestedTags.length} tags + VLM metadata for ${evidenceId}`);
+    } catch (err) {
+      console.warn('[Upload] Qdrant payload enrichment failed (non-fatal):', err);
+    }
+  }
+
   // 8. Persist analysis results to evidence.metadata
   try {
     diagnostics.completedAt = new Date().toISOString();
@@ -1489,6 +1563,17 @@ async function processAndEmbed(
           }
         : null,
       analysisTimestamp: diagnostics.completedAt,
+      // Audio transcription metadata (when evidence was audio)
+      ...(extractionMethod.startsWith('whisper-') || extractionMethod === 'docling-asr'
+        ? {
+            transcription: {
+              method: extractionMethod,
+              textLength: fullText.length,
+              language: extractionMethod.match(/whisper-\w+-(\w+)/)?.[1] ?? null,
+              timestamp: new Date().toISOString(),
+            },
+          }
+        : {}),
     });
   } catch (err) {
     console.warn('[Upload] Analysis persistence failed (vectors are safe):', err);

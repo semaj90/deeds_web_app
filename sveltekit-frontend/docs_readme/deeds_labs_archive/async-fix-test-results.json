@@ -1,0 +1,1727 @@
+{
+  "totalFiles": 1149,
+  "validFiles": 1149,
+  "asyncPatternsFound": [],
+  "syntaxErrors": [
+    {
+      "file": "src\\lib\\canvas\\AdvancedEvidenceCanvas.svelte",
+      "issues": [
+        "Unbalanced braces: 99 open, 97 close"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\AgentOrchestrator.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\AIAssistantChat.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\cognitive\\WebGPUVisualization.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\EnhancedAIChat.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\EnhancedFileUpload.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\EnhancedLegalAIChatWithSynthesis.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\EnhancedMCPIntegration.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\FindModal.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\Gemma270MWebAssembly.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\GPUAIAssistant.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\GPUStreamingChat.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\IntelligentWebAnalysisDemo.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\LegalDocumentSummarizer.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\MultiLLMOrchestrator.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\OCRTensorDemo.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\Phase8Demo.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\rag\\EnhancedRAGInterface.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\RAGAssistantChat.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\SIMDTextTilingDemo.svelte",
+      "issues": [
+        "Unbalanced braces: 90 open, 88 close"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\SmartSearchInterface.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\SOMVisualization.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\UnifiedAIAssistant.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\webgpu\\CacheOptimizerDemo.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\webgpu-viewer.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\AIChatAssistant.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\canvas\\CollaborativeEvidenceCanvas.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\canvas\\FabricEvidenceCanvas.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\canvas\\RecursiveEvidenceVisualization.svelte",
+      "issues": [
+        "Unbalanced braces: 135 open, 134 close"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\chat\\LegalAIChat.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\chat\\SSRQLorAChatInterface.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\chr-rom\\DocumentListCHRROM.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\citations\\CitationEditor.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\citations\\CitationsManager.svelte",
+      "issues": [
+        "Unbalanced braces: 73 open, 69 close",
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\detective\\ContextMenu.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\detective\\ContextualDetectiveBoard.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\detective\\DetectiveBoard.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\EditableCanvasSystem.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\editor\\ReportEditor.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\editor\\RichTextEditor.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\editor\\TiptapWithAIAssistant.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\editor\\WysiwygEditor.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\EnhancedLegalAIDemo.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\EnhancedLegalCaseManager.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\evidence\\CaseEvidenceOrganizer.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\evidence\\EnhancedEvidenceBoard.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\evidence\\EvidenceBoard.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\evidence\\EvidenceCanvas.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\GraphExplorer.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\keyboard\\KeyboardShortcuts.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\layout\\EnhancedPageLayout.svelte",
+      "issues": [
+        "Unbalanced braces: 12 open, 11 close",
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\layout\\ProductionLayout.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\legal\\CaseManager.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\legal\\LegalAnalysisDialog.svelte",
+      "issues": [
+        "Unbalanced braces: 27 open, 26 close"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\legal\\SimpleCaseManager.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\LegalCaseManager.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\LLMInference.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\modals\\EvidenceModal.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\monitoring\\AIPerformanceDashboard.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\Neo4jRecommendation3DViewer.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\notifications\\DocumentUpdateNotifications.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\observability\\ObservabilityPanel.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\OllamaChatInterface.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\prosecutor\\EnhancedAIChatAssistant.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\recommendations\\DidYouMeanSuggestions.svelte",
+      "issues": [
+        "Unbalanced braces: 46 open, 44 close",
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\recommendations\\FOAFModal.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\redis\\AdvancedRedisMonitoringDashboard.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\search\\InstantLegalSearch.svelte",
+      "issues": [
+        "Unbalanced braces: 59 open, 57 close"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\search\\UnifiedSearchBar.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\search\\VectorSearchInterface.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\system\\RustBridgeDemo.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\three\\yorha-ui\\YoRHaAAShaderCache.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\three\\YoRHaQuantumVisualization.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\AdaptiveRenderingEngine.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\bits\\ChatMessage.svelte",
+      "issues": [
+        "Unbalanced braces: 7 open, 6 close"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\bits\\FullStackLegalAI.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\bits\\GlyphEngineRenderer.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\bits\\SPACanvasRenderer.svelte",
+      "issues": [
+        "Unbalanced braces: 77 open, 76 close",
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\bits\\WebAssemblyIntegrationDemo.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\date-picker\\BitsDatePicker.svelte",
+      "issues": [
+        "Unbalanced braces: 13 open, 11 close"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\gaming\\effects\\NES3DLODProcessor.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\gaming\\n64\\N64Slider.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\gaming\\n64\\N64TextureFilteringCache.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\gaming\\N64DetectiveUI.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\n64\\N64Card.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\n64\\N64Dialog.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\n64\\N64Input.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\SIMDTiledShaderEmbeds.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\unified\\UnifiedCanvasIntegration.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\unified\\UnifiedSystemDashboard.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\upload\\N64MinIOUpload.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\upload\\OptimizedMinIOUpload.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\vector\\VectorIntelligenceDemo.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\visualization\\Advanced3DEvidenceMap.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\visualization\\DocumentLODViewer.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\visualization\\EvidenceTimelineLOD.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\visualization\\InteractiveNetworkAnalysis.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\visualization\\Legal3DVisualizationLOD.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\visualization\\LegalDocumentGraphViewer.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\visualizations\\WebGPUEvidenceGraphVisualization.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\_archive\\svelte4\\AccessibilityPanel.svelte",
+      "issues": [
+        "Unbalanced braces: 101 open, 99 close"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\_archive\\svelte4\\ComprehensiveSummaryEngine.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\_archive\\svelte4\\ReportEditor.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\_archive\\test-demo\\demo\\EnhancedSemanticIntegration.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\_archive\\test-demo\\demo\\GamingCacheDemo.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\_archive\\test-demo\\demo\\IntegratedSystemDemo.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\_archive\\test-demo\\demo\\SOMIntelligentTodoGenerator.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\_archive\\test-demo\\demo\\VectorIntelligenceDemo.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\_archive\\test-demo\\demo\\WebGPUQuantizationDemo.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\_archive\\test-demo\\storybook\\DiffusionEmbeddingEffects.stories.svelte",
+      "issues": [
+        "Unbalanced braces: 73 open, 71 close",
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\_archive\\test-demo\\storybook\\PS1ParallaxDynamic.stories.svelte",
+      "issues": [
+        "Unbalanced braces: 58 open, 56 close"
+      ]
+    },
+    {
+      "file": "src\\lib\\stories\\SubsampleAADemo.stories.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\(ai)\\gpu-chat\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\(ai)\\processing\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\(evidence)\\main\\organize\\[caseId]\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\(evidence)\\main\\realtime\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\(tools)\\editor\\+page.svelte",
+      "issues": [
+        "Unbalanced braces: 15 open, 13 close"
+      ]
+    },
+    {
+      "file": "src\\routes\\admin\\gpu-demo\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\auth\\test\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\authenticated-crud-test\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\dev\\copilot-optimizer\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\dev\\route-explorer\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\dev\\suggestions\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\dev\\webgl-fallback-test\\enhanced-test.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\dev\\webgpu-diagnostics\\+page.svelte",
+      "issues": [
+        "Unbalanced braces: 6 open, 4 close"
+      ]
+    },
+    {
+      "file": "src\\routes\\evidence\\organize\\[caseId]\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\evidence\\realtime\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\graph\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\laws\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\legal\\case-theory\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\legal\\documents\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\legal\\research\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\legal-ai\\embedding-search-test\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\legal-ai-suite\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\logout\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\mcp\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\memory-dashboard\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\nier-showcase\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\prosecutor\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\reports-generator\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\shader_search\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\spa\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    },
+    {
+      "file": "src\\routes\\state\\machines\\+page.svelte",
+      "issues": [
+        "Unbalanced braces: 25 open, 23 close"
+      ]
+    },
+    {
+      "file": "src\\routes\\state\\persistence\\+page.svelte",
+      "issues": [
+        "Unbalanced braces: 35 open, 33 close"
+      ]
+    },
+    {
+      "file": "src\\routes\\text-editor\\+page.svelte",
+      "issues": [
+        "Unbalanced braces: 19 open, 17 close"
+      ]
+    },
+    {
+      "file": "src\\routes\\yorha\\components\\+page.svelte",
+      "issues": [
+        "IIFE may not be properly closed"
+      ]
+    }
+  ],
+  "cleanupIssues": [],
+  "warnings": [
+    {
+      "file": "src\\lib\\components\\ai\\AgentOrchestrator.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\AIAssistantChat.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\cognitive\\WebGPUVisualization.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\CudaSearch.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\EnhancedAIChat.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\EnhancedAIChatTest.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\EnhancedLegalAIChatWithSynthesis.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\EvidenceCanvas.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\FindModal.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\Gemma270MWebAssembly.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\Gemma3LegalChat.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\GPUAIAssistant.svelte",
+      "warnings": [
+        "Cleanup function inside IIFE - should be outside"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\GPUStreamingChat.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\IngestAIAssistant.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\LegalDocumentSummarizer.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\MultiLLMOrchestrator.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\NESTextureStreamer.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\NeuralTopology3DDemo.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\OCRTensorDemo.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\Phase8Demo.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\rag\\EnhancedRAGInterface.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\RAGAssistantChat.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\SimpleFileUpload.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\SmartSearchInterface.svelte",
+      "warnings": [
+        "Cleanup function inside IIFE - should be outside"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\SOMVisualization.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\SoraGraphVisualization.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\UnifiedAIAssistant.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\webgpu\\CacheOptimizerDemo.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ai\\XStatePhase8Integration.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\AIChatAssistant.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\canvas\\EvidenceCanvasEditor.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function",
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\chat\\LegalAIChat.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\citations\\CitationEditor.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\citations\\CitationsManager.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\detective\\ContextMenu.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\detective\\ContextualDetectiveBoard.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\EditableCanvasSystem.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\editor\\TiptapWithAIAssistant.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\editor\\WysiwygEditor.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\EnhancedDocumentUpload.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\EnhancedLegalAIDemo.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\evidence\\CaseEvidenceOrganizer.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\evidence\\Enhanced3DEvidenceBoard.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\evidence\\EnhancedEvidenceBoard.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\evidence\\EvidenceBoard.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\evidence\\EvidenceCanvas.svelte",
+      "warnings": [
+        "Cleanup function inside IIFE - should be outside"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\EvidenceUpload.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\GraphExplorer.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\keyboard\\KeyboardShortcuts.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\layout\\EnhancedPageLayout.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\legal\\CaseManager.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\legal\\SimpleCaseManager.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\LegalCaseManager.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\LLMInference.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\modals\\EvidenceModal.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\navigation\\EnhancedLegalNav.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\Neo4jRecommendation3DViewer.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\observability\\ObservabilityPanel.svelte",
+      "warnings": [
+        "Cleanup function inside IIFE - should be outside"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\OllamaChatInterface.svelte",
+      "warnings": [
+        "Cleanup function inside IIFE - should be outside"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\recommendations\\AIRecommendationAssistant.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\recommendations\\FOAFModal.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\recommendations\\LastSearchedModal.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\recommendations\\LastWorkedModal.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\redis\\AdvancedRedisMonitoringDashboard.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\search\\UnifiedSearchBar.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\search\\VectorSearchInterface.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\system\\RustBridgeDemo.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\three\\yorha-ui\\YoRHaAAShaderCache.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\three\\YoRHaQuantumVisualization.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\bits\\FullStackLegalAI.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\bits\\WebAssemblyIntegrationDemo.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\dropdown-menu\\DropdownMenuContent.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\EnhancedButton.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\gaming\\effects\\NES3DLODProcessor.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\gaming\\n64\\N64Slider.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\gaming\\n64\\N64TextureFilteringCache.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\n64\\N64Card.svelte",
+      "warnings": [
+        "Cleanup function inside IIFE - should be outside"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\n64\\N64Dialog.svelte",
+      "warnings": [
+        "Cleanup function inside IIFE - should be outside"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\n64\\N64Input.svelte",
+      "warnings": [
+        "Cleanup function inside IIFE - should be outside"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\SIMDTiledShaderEmbeds.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\wrappers\\bits\\DialogRoot.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\unified\\UnifiedCanvasIntegration.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\unified\\UnifiedSystemDashboard.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\upload\\OptimizedMinIOUpload.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\UploadProgress.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\vector\\VectorIntelligenceDemo.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\visualization\\LegalDocumentGraphViewer.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\yorha\\YoRHaAIChat.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\_archive\\svelte4\\ComprehensiveSummaryEngine.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\_archive\\test-demo\\demo\\EnhancedSemanticIntegration.svelte",
+      "warnings": [
+        "Cleanup function inside IIFE - should be outside"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\_archive\\test-demo\\demo\\IntegratedSystemDemo.svelte",
+      "warnings": [
+        "Cleanup function inside IIFE - should be outside"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\_archive\\test-demo\\demo\\SOMIntelligentTodoGenerator.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\_archive\\test-demo\\demo\\VectorIntelligenceDemo.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\_archive\\test-demo\\demo\\WebGPUQuantizationDemo.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\_archive\\test-demo\\storybook\\DiffusionEmbeddingEffects.stories.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\lib\\stories\\SubsampleAADemo.stories.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\(ai)\\enhanced-mcp\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\(ai)\\gpu-chat\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\(ai)\\modular\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\(ai)\\orchestrator\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\(legal)\\citations\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\admin\\gpu-demo\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\admin\\service-graph\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\agent-demo\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\agent-demo\\page-backup.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\ai\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\ai\\recommendations\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\auth\\test\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\authenticated-crud-test\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\demo\\browser-rag\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\demo\\hybrid-ml\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\dev\\copilot-optimizer\\+page.svelte",
+      "warnings": [
+        "Cleanup function inside IIFE - should be outside"
+      ]
+    },
+    {
+      "file": "src\\routes\\dev\\gpu-som-test\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\dev\\suggestions\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\dev\\webgl-fallback-test\\enhanced-test.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\graph\\+page.svelte",
+      "warnings": [
+        "Cleanup function inside IIFE - should be outside"
+      ]
+    },
+    {
+      "file": "src\\routes\\law\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\laws\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\legal\\case-theory\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function",
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\legal\\documents\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\legal\\research\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\legal-ai\\embedding-search-test\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\legal-ai-suite\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\logout\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\mcp\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\mcp-demo\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\memory-dashboard\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\nier-showcase\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\original-home\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\prosecutor\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\reports\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\reports-generator\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\search.bak\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\spa\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\system-dashboard\\cases\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\text-editor\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\yorha\\components\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\yorha\\dashboard\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    },
+    {
+      "file": "src\\routes\\yorha\\detective\\+page.svelte",
+      "warnings": [
+        "Effect/onMount with async IIFE but no cleanup function"
+      ]
+    }
+  ]
+}

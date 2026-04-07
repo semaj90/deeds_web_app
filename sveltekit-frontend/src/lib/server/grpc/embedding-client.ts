@@ -94,6 +94,16 @@ let grpcLoadFailed = false;
 let grpcRetryAt = 0; // Timestamp for next retry after failure
 let grpcFailLogged = false; // Only log first failure to avoid spam
 
+function getGrpcMethod(client: any, candidates: string[]): ((...args: any[]) => void) | null {
+  for (const name of candidates) {
+    if (typeof client?.[name] === 'function') {
+      return client[name].bind(client);
+    }
+  }
+
+  return null;
+}
+
 async function getGrpcClient(): Promise<any> {
   if (grpcLoadFailed) {
     // Retry after 30s instead of permanent disable
@@ -701,48 +711,56 @@ export async function generateEmbeddings(
  * Generate a single embedding (convenience wrapper).
  */
 export async function generateSingleEmbedding(text: string): Promise<number[]> {
-	const result = await generateEmbeddings([text]);
-	return result.vectors[0];
+  const result = await generateEmbeddings([text]);
+  return result.vectors[0];
 }
 
 /**
  * Check gRPC service health.
  */
 export async function checkGrpcHealth(): Promise<{
-	available: boolean;
-	enabled: boolean;
-	url: string;
-	status?: string;
-	device?: string;
+  available: boolean;
+  enabled: boolean;
+  url: string;
+  status?: string;
+  device?: string;
 }> {
-	const base = {
-		enabled: ENV.EMBEDDING_GRPC_ENABLED,
-		url: ENV.EMBEDDING_GRPC_URL
-	};
+  const base = {
+    enabled: ENV.EMBEDDING_GRPC_ENABLED,
+    url: ENV.EMBEDDING_GRPC_URL,
+  };
 
-	if (!ENV.EMBEDDING_GRPC_ENABLED) {
-		return { ...base, available: false };
-	}
+  if (!ENV.EMBEDDING_GRPC_ENABLED) {
+    return { ...base, available: false };
+  }
 
-	const client = await getGrpcClient();
-	if (!client) {
-		return { ...base, available: false };
-	}
+  const client = await getGrpcClient();
+  if (!client) {
+    return { ...base, available: false };
+  }
 
-	return new Promise((resolve) => {
-		const deadline = new Date(Date.now() + 3000);
-		// Go proto: HealthCheck({ check_gpu, check_redis })
-		client.healthCheck({ checkGpu: true, checkRedis: true }, { deadline }, (err: Error | null, response: any) => {
-			if (err) {
-				resolve({ ...base, available: false });
-				return;
-			}
-			resolve({
-				...base,
-				available: response.healthy === true,
-				status: response.healthy ? 'healthy' : 'unhealthy',
-				device: response.gpuAvailable ? 'cuda' : 'cpu'
-			});
-		});
-	});
+  const healthMethod = getGrpcMethod(client, ['health', 'healthCheck', 'Health', 'HealthCheck']);
+  if (!healthMethod) {
+    return { ...base, available: false, status: 'unavailable' };
+  }
+
+  return new Promise((resolve) => {
+    const deadline = new Date(Date.now() + 3000);
+    const request = healthMethod.name.toLowerCase().includes('healthcheck')
+      ? { checkGpu: true, checkRedis: true }
+      : { service: 'embedding' };
+
+    healthMethod(request, { deadline }, (err: Error | null, response: any) => {
+      if (err) {
+        resolve({ ...base, available: false });
+        return;
+      }
+      resolve({
+        ...base,
+        available: response.healthy === true || response.status === 'healthy',
+        status: response.status ?? (response.healthy ? 'healthy' : 'unhealthy'),
+        device: response.device ?? (response.gpuAvailable ? 'cuda' : 'cpu'),
+      });
+    });
+  });
 }

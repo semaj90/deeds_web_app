@@ -1,0 +1,209 @@
+{
+  "patterns": [
+    {
+      "id": "db-import",
+      "description": "Named db import instead of default",
+      "regex": "import.*\\{.*db.*\\}.*from.*\\$lib\\/server\\/db",
+      "fixTemplate": "import db from '$lib/server/db';",
+      "priority": 1,
+      "severityWeight": 5,
+      "domains": ["backend", "database"],
+      "scope": "ts",
+      "risk": "safe",
+      "requires": ["fileExists:src/lib/server/db.ts"],
+      "patchKind": "replace",
+      "examples": [
+        {
+          "before": "import { db } from '$lib/server/db';",
+          "after": "import db from '$lib/server/db';"
+        }
+      ]
+    },
+    {
+      "id": "drizzle-enum",
+      "description": "Drizzle enum mismatch (active→open)",
+      "regex": "eq\\(cases\\.status.*active.*\\)",
+      "fixTemplate": "eq(cases.status, 'open')",
+      "priority": 2,
+      "severityWeight": 4,
+      "domains": ["database"],
+      "scope": "ts",
+      "risk": "medium",
+      "requires": ["contains:cases.status"],
+      "patchKind": "replace",
+      "examples": [
+        {
+          "before": "eq(cases.status, 'active')",
+          "after": "eq(cases.status, 'open')"
+        }
+      ]
+    },
+    {
+      "id": "lucia-adapter",
+      "description": "Lucia PostgreSQL adapter type mismatch",
+      "regex": "DrizzlePostgreSQLAdapter.*not assignable",
+      "fixTemplate": "new DrizzlePostgreSQLAdapter(db, sessionTable, userTable)",
+      "priority": 3,
+      "severityWeight": 10,
+      "domains": ["auth"],
+      "scope": "ts",
+      "risk": "high",
+      "requires": ["contains:DrizzlePostgreSQLAdapter"],
+      "patchKind": "manual",
+      "manual": true,
+      "notes": "Requires verification of table names and schema"
+    },
+    {
+      "id": "import-type-runtime",
+      "description": "Type-only import used at runtime",
+      "regex": "import type.*cannot be used as a value",
+      "fixTemplate": "import { TYPE } from 'MODULE';",
+      "priority": 3,
+      "severityWeight": 3,
+      "domains": ["frontend", "backend"],
+      "scope": "ts",
+      "risk": "safe",
+      "requires": [],
+      "patchKind": "replace",
+      "examples": [
+        {
+          "before": "import type { User } from '$lib/types';",
+          "after": "import { type User } from '$lib/types';"
+        }
+      ]
+    },
+    {
+      "id": "env-type-declarations",
+      "description": "Environment variable type declarations",
+      "regex": "Cannot find name '(DATABASE_URL|REDIS_URL|OLLAMA_URL|QDRANT_URL)'",
+      "fixTemplate": "import { DATABASE_URL, REDIS_URL, OLLAMA_URL, QDRANT_URL } from '$env/static/private';",
+      "priority": 4,
+      "severityWeight": 2,
+      "domains": ["backend"],
+      "scope": "env",
+      "risk": "high",
+      "requires": ["within:src/lib/env"],
+      "patchKind": "manual",
+      "examples": [
+        {
+          "before": "const url = DATABASE_URL;",
+          "after": "import { DATABASE_URL } from '$env/static/private';\nconst url = DATABASE_URL;"
+        }
+      ]
+    },
+    {
+      "id": "async-effect-unwrap",
+      "description": "Async $effect needs manual unwrapping",
+      "regex": "\\$effect\\(async",
+      "fixTemplate": "$effect(() => { const run = async () => { ... }; run(); });",
+      "priority": 5,
+      "severityWeight": 6,
+      "domains": ["frontend"],
+      "scope": "svelte",
+      "risk": "medium",
+      "requires": ["contains:$effect"],
+      "patchKind": "manual",
+      "manual": true,
+      "notes": "Cannot auto-fix - requires manual Promise handling"
+    },
+    {
+      "id": "readonly-mutation",
+      "description": "Attempted mutation of readonly property",
+      "regex": "Cannot assign to '.*' because it is a read-only property",
+      "priority": 6,
+      "severityWeight": 4,
+      "domains": ["frontend", "backend"],
+      "scope": "ts",
+      "risk": "medium",
+      "requires": [],
+      "patchKind": "manual",
+      "manual": true
+    },
+    {
+      "id": "missing-await",
+      "description": "Promise not awaited",
+      "regex": "Promise.*void.*not assignable",
+      "fixTemplate": "await functionCall();",
+      "priority": 7,
+      "severityWeight": 3,
+      "domains": ["frontend", "backend"],
+      "scope": "ts",
+      "risk": "medium",
+      "requires": ["contains:await"],
+      "patchKind": "replace"
+    },
+    {
+      "id": "type-any-fallback",
+      "description": "Implicit any type",
+      "regex": "implicitly has an 'any' type",
+      "priority": 8,
+      "severityWeight": 1,
+      "domains": ["frontend", "backend"],
+      "scope": "ts",
+      "risk": "safe",
+      "requires": [],
+      "patchKind": "manual",
+      "manual": true,
+      "notes": "Low priority - cosmetic type annotation"
+    },
+    {
+      "id": "duplicate-identifier",
+      "description": "Duplicate identifier declaration",
+      "regex": "Duplicate identifier",
+      "priority": 2,
+      "severityWeight": 8,
+      "domains": ["frontend", "backend"],
+      "scope": "ts",
+      "risk": "medium",
+      "requires": [],
+      "patchKind": "manual",
+      "manual": true
+    },
+    {
+      "id": "grpc-type-mismatch",
+      "description": "gRPC protobuf type incompatibility",
+      "regex": "grpc.*not assignable.*expected",
+      "priority": 5,
+      "severityWeight": 7,
+      "domains": ["grpc", "backend"],
+      "scope": "ts",
+      "risk": "high",
+      "requires": ["contains:grpc"],
+      "patchKind": "manual",
+      "manual": true
+    },
+    {
+      "id": "flatbuffers-schema",
+      "description": "FlatBuffers schema version mismatch",
+      "regex": "flatbuffers.*incompatible",
+      "priority": 6,
+      "severityWeight": 5,
+      "domains": ["flatbuffers", "backend"],
+      "scope": "ts",
+      "risk": "medium",
+      "requires": [],
+      "patchKind": "manual"
+    },
+    {
+      "id": "quic-protocol-error",
+      "description": "QUIC protocol configuration error",
+      "regex": "quic.*configuration.*invalid",
+      "priority": 7,
+      "severityWeight": 6,
+      "domains": ["quic", "backend"],
+      "scope": "ts",
+      "risk": "medium",
+      "requires": ["contains:quic"],
+      "patchKind": "manual"
+    }
+  ],
+  "metadata": {
+    "version": "1.1.0",
+    "phase": 79,
+    "lastUpdated": "2025-01-25",
+    "totalPatterns": 13,
+    "autoFixable": 7,
+    "manualOnly": 6,
+    "schema": ["scope", "risk", "requires", "patchKind"]
+  }
+}

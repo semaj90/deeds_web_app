@@ -1,7 +1,7 @@
 # Multi-Modal Implementation Roadmap: Existing → Production
 
 **Date**: March 1, 2026
-**Status**: Gap Analysis + Implementation Path
+**Status**: PARTIALLY SUPERSEDED (re-audit Apr 7: Whisper done via nodejs-whisper, YOLO in docling-vlm Docker, CLIP not integrated)
 **Existing Code**: 1,346 lines Python (mostly stubs)
 **Target**: Full FastAPI + FastMCP + Agentic production stack
 
@@ -592,4 +592,4 @@ The **architecture is already designed**, we just need to **fill in the GPU serv
 
 **Document Version**: 1.0
 **Last Updated**: March 1, 2026
-**Status**: Ready for Implementation 🚀
+**Status**: PARTIALLY SUPERSEDED � Python stubs not implemented; Node.js approach used instead

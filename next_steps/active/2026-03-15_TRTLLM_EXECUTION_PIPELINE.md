@@ -1,22 +1,23 @@
 # TRT-LLM Triton Inference — Execution Pipeline
 
 ## Date: March 15, 2026
-## Status: READY TO EXECUTE
+## Status: NOT RUNNING (re-audit Apr 7: Docker image deleted, compose archived, engines never built)
 ## Hardware: RTX 3060 Ti (8GB VRAM, SM 86, Ampere)
 
 ---
 
 ## Quick Reference
 
-### What's Already Done
+### What's Already Done (re-audit April 7)
 | Component | Status | Location |
 |-----------|--------|----------|
-| Docker image (`legal-ai-tensorrt-llm:latest`) | ✅ 83GB | Local Docker |
-| Colab notebook | ✅ Ready | `scripts/unsloth-training/Gemma3_12B_INT4_Quantize_and_Export.ipynb` |
-| docker-compose.triton.yml | ✅ Configured | Root directory |
-| SvelteKit routes | ✅ Wired | `/api/ai/tensorrt/*` |
-| GPU arbiter (VRAM mutex) | ✅ Wired | `lib/server/inference/gpu-arbiter.ts` |
-| Inference router | ✅ Wired | `lib/server/inference/inference-router.ts` |
+| Docker image (`legal-ai-tensorrt-llm:latest`) | ❌ DELETED (freed C: space) | Was 83GB local Docker |
+| Colab notebook | ✅ Ready (not executed) | `scripts/unsloth-training/Gemma3_12B_INT4_Quantize_and_Export.ipynb` |
+| docker-compose.triton.yml | ❌ ARCHIVED | `deeds_labs/snapshots/2026-03-15-root/docker/` (not at root) |
+| TRT engines | ❌ NEVER BUILT | No `/engines/` directory, no `.engine` files |
+| SvelteKit routes | ✅ Wired (fallback to Ollama) | `/api/ai/tensorrt/*` — TRT path never reached |
+| GPU arbiter (VRAM mutex) | ✅ Wired (dead code path) | `lib/server/inference/gpu-arbiter.ts` — lease never acquired |
+| Inference router | ✅ Wired (always falls through) | `lib/server/inference/inference-router.ts` — TRT→Triton→Ollama, always lands on Ollama |
 
 ---
 

@@ -249,6 +249,63 @@ async function main() {
     check('Qdrant search works', false, err.message);
   }
 
+  // ─── Phase 7: Infrastructure Status ───
+  console.log('\n─── Phase 7: Infrastructure ───\n');
+
+  // Neo4j health
+  try {
+    const neo4jRes = await fetch(`${BASE}/api/health/neo4j`, { signal: AbortSignal.timeout(5000) });
+    const neo4jData = await neo4jRes.json().catch(() => ({}));
+    check('Neo4j healthy', neo4jRes.ok, `status=${neo4jRes.status}`);
+  } catch (err) {
+    check('Neo4j reachable', false, err.message);
+  }
+
+  // Langfuse health
+  try {
+    const lfRes = await fetch('http://127.0.0.1:3030/api/public/health', { signal: AbortSignal.timeout(5000) });
+    check('Langfuse healthy', lfRes.ok, `status=${lfRes.status}`);
+  } catch (err) {
+    check('Langfuse reachable', false, err.message);
+  }
+
+  // gRPC embedding server
+  try {
+    const grpcRes = await fetch('http://127.0.0.1:50051', { signal: AbortSignal.timeout(3000) });
+    check('gRPC embedding server', grpcRes.ok || grpcRes.status < 500, `status=${grpcRes.status}`);
+  } catch (err) {
+    // Connection refused means not running, which is valid info
+    check('gRPC embedding server', false, `${err.cause?.code ?? err.message} (optional — Ollama fallback active)`);
+  }
+
+  // Inference router status
+  try {
+    const routerRes = await fetch(`${BASE}/api/infrastructure/status`, { signal: AbortSignal.timeout(5000) });
+    if (routerRes.ok) {
+      const routerData = await routerRes.json();
+      console.log(`  Inference backends: ${JSON.stringify(routerData.backends ?? routerData.services ?? {}).slice(0, 200)}`);
+      check('Inference router responds', true);
+    } else {
+      check('Inference router responds', false, `status=${routerRes.status}`);
+    }
+  } catch (err) {
+    check('Inference router responds', false, err.message);
+  }
+
+  // Docker profile detection
+  try {
+    const { execSync } = await import('child_process');
+    const containers = execSync('docker ps --format "{{.Names}}" 2>/dev/null', { encoding: 'utf8', timeout: 5000 });
+    const running = containers.trim().split('\n').filter(Boolean);
+    const hasGpu = running.some(c => c.includes('triton') || c.includes('trt'));
+    const hasFull = running.some(c => c.includes('neo4j'));
+    const profile = hasGpu ? 'GPU' : hasFull ? 'Full' : 'Essential';
+    console.log(`  Docker profile: ${profile} (${running.length} containers)`);
+    check('Docker containers running', running.length >= 4, `${running.length} containers`);
+  } catch (err) {
+    console.log(`  Docker check: ${err.message}`);
+  }
+
   printSummary();
 }
 
@@ -281,6 +338,10 @@ function printSummary() {
     { name: 'Graph Expansion', check: null },
     { name: 'Authority Scoring', check: 'KAG neighbors found' },
     { name: 'Inference Log', check: 'Recent inference log entry (< 2min)' },
+    { name: 'Neo4j Graph', check: 'Neo4j healthy' },
+    { name: 'Langfuse Tracing', check: 'Langfuse healthy' },
+    { name: 'gRPC Embedding', check: 'gRPC embedding server' },
+    { name: 'Inference Router', check: 'Inference router responds' },
   ];
 
   for (const stage of stages) {

@@ -469,6 +469,56 @@ export async function analyzePoiPhotoGpu(
 	}
 }
 
+// ─── GPU Cache Warm-up ────────────────────────────────────────────────
+// On app boot, pre-populate the CHR97 GPU cache for recently active cases
+// so that the first dashboard load or chat query avoids a cold GPU pass.
+
+/**
+ * Warm up GPU result cache for the N most recently updated cases that have evidence.
+ * Non-fatal — intended to be called from hooks.server.ts at boot time.
+ */
+export async function warmupGpuCache(maxCases = 5): Promise<{ warmed: number; skipped: number; errors: number }> {
+	const { getCachedGpuAnalysis } = await import('$lib/server/cache/cartridge-tensor-bridge.js');
+	let warmed = 0, skipped = 0, errors = 0;
+
+	try {
+		// Find recently active cases that have at least 2 evidence items
+		const result = await db.execute(sql`
+			SELECT case_id, COUNT(*) AS cnt
+			FROM evidence
+			WHERE case_id IS NOT NULL
+			GROUP BY case_id
+			HAVING COUNT(*) >= 2
+			ORDER BY MAX(created_at) DESC
+			LIMIT ${maxCases}
+		`);
+
+		const rows = (result as any).rows ?? [];
+		if (rows.length === 0) return { warmed: 0, skipped: 0, errors: 0 };
+
+		for (const row of rows) {
+			const caseId = row.case_id as string;
+			try {
+				// Skip if already cached
+				const existing = await getCachedGpuAnalysis(caseId);
+				if (existing) {
+					skipped++;
+					continue;
+				}
+				// Run a full batch analysis (same as upload-triggered path)
+				await analyzeEvidenceBatchGpu(caseId, []);
+				warmed++;
+			} catch {
+				errors++;
+			}
+		}
+	} catch (err) {
+		console.warn('[GPU Warmup] Failed to query active cases:', err);
+	}
+
+	return { warmed, skipped, errors };
+}
+
 /**
  * Trigger GPU analysis for a POI photo (fire-and-forget).
  * Call this after POI photo VLM pipeline completes.

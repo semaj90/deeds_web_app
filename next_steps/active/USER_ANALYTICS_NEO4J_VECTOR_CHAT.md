@@ -1,50 +1,57 @@
 # User Analytics — Neo4j + embeddinggemma + Qdrant → ACE Contextual Chat
 
-## Status: INCOMPLETE (pipeline wired, dashboard + Neo4j reads MISSING)
+## Status: CODE EXISTS, NEEDS DATA + VALIDATION
 ## Priority: Medium-High
 ## Created: 2026-03-26
-## Audited: 2026-04-06
+## Re-Audited: 2026-04-07 (codebase-verified)
 
 ---
 
-## Audit Results (April 6, 2026)
+## Re-Audit Results (April 7, 2026)
 
-### What WORKS (verified in codebase)
-- Client-side tracking: `analytics.svelte.ts` — 19 routes wired, batched flush
-- Server API: `POST /api/analytics/events` — Zod validated, auth required
-- PostgreSQL: `analytics_events` table with indexes (event_type, user_id, created_at)
-- RabbitMQ: `analytics.track` queue consumer → Redis + PostgreSQL + Neo4j sync
-- Neo4j write sync: `user-interaction-sync.ts` — VIEWED/CREATED/SEARCHED relationships
-- Qdrant: `user_searches` collection — 768-dim embeddings of search queries
-- Event logger: `event-logger.ts` — `getWeeklySummary()`, `getTopQueryPatterns()`
-- Load function: `analytics/+page.server.ts` — calls summary + patterns
-
-### What's MISSING (not in codebase)
-- **Analytics dashboard UI** — NO `analytics/+page.svelte` exists
-- **Neo4j reads** — Neo4j is write-only, nothing queries it for analytics/recs
-- **Graph centrality** — `lib/server/neo4j/centrality.ts` does NOT exist
-- **Recommendation engine** — `lib/server/recommendation/engine.ts` does NOT exist
-- **ACE context enrichment** — No analytics injected into chat system prompt
-- **Neo4j Cypher in RAG** — KAG uses PG `yorha_evidence_*` tables, NOT Neo4j
+Previous audit (April 6) incorrectly marked 5 components as MISSING. Codebase verification confirms they exist.
 
 ### Correct Path Map
+
 | Component | File | Status |
 |-----------|------|--------|
-| Analytics store | `src/lib/stores/analytics.svelte.ts` | WORKING |
-| Event logger | `src/lib/server/analytics/event-logger.ts` | WORKING |
-| Analytics API | `src/routes/api/analytics/events/+server.ts` | WORKING |
-| RabbitMQ consumer | `src/lib/server/queue/rabbitmq-manager-fixed.ts` (line 505) | WORKING |
-| Neo4j driver | `src/lib/server/neo4j-driver.ts` | WORKING |
+| Analytics store | `src/lib/stores/analytics.svelte.ts` | WORKING — 19 routes wired, batched flush |
+| Event logger | `src/lib/server/analytics/event-logger.ts` | WORKING — `getWeeklySummary()`, `getTopQueryPatterns()` |
+| Analytics API | `src/routes/api/analytics/events/+server.ts` | WORKING — Zod validated, auth required |
+| RabbitMQ consumer | `src/lib/server/queue/rabbitmq-manager-fixed.ts` (line 505) | WORKING — analytics.track queue |
+| Neo4j driver | `src/lib/server/neo4j-driver.ts` | WORKING — bolt connection |
 | Neo4j schema | `src/lib/server/graph/neo4j-schema.ts` | WORKING |
-| Neo4j write sync | `src/lib/server/graph/user-interaction-sync.ts` | WORKING |
-| PG→Neo4j case sync | `src/lib/server/graph/pg-neo4j-sync.ts` | WORKING |
-| Evidence graph | `src/lib/server/graph/evidence-graph-service.ts` | WORKING |
-| Page server load | `src/routes/(app)/analytics/+page.server.ts` | WORKING |
-| **Dashboard UI** | `src/routes/(app)/analytics/+page.svelte` | **MISSING** |
-| **Graph centrality** | `src/lib/server/graph/centrality.ts` | **MISSING** |
-| **Recommendation engine** | — | **MISSING** |
-| **ACE analytics context** | — | **MISSING** |
-| **Neo4j read queries** | — | **MISSING** |
+| Neo4j write sync | `src/lib/server/graph/user-interaction-sync.ts` | WORKING — VIEWED/CREATED/SEARCHED |
+| PG→Neo4j case sync | `src/lib/server/graph/pg-neo4j-sync.ts` | WORKING — `syncCaseToGraph()` |
+| Evidence graph | `src/lib/server/graph/evidence-graph-service.ts` | WORKING — MERGE + SIMILAR_TO |
+| Page server load | `src/routes/(app)/analytics/+page.server.ts` | WORKING — loads summary + patterns |
+| **Dashboard UI** | `src/routes/(app)/analytics/+page.svelte` | **EXISTS** — 473 lines, 3 tabs (overview, patterns, cache) |
+| **Graph centrality** | `src/lib/server/graph/graph-centrality.ts` | **EXISTS** — 274 lines, 3 Cypher functions |
+| **Recommendations API** | `src/routes/api/recommendations/+server.ts` | **EXISTS** — 477 lines, 5-signal ranking pipeline |
+| **Graph recommendations** | `src/routes/api/graph/recommendations/+server.ts` | **EXISTS** — 145 lines, LLM-based |
+| **Multi-modal ranker** | `src/lib/server/ml/multi-modal-ranker.ts` | **EXISTS** — `rankCombinedResults()` |
+| **User history tracker** | `src/lib/server/ml/user-history.ts` | **EXISTS** — `UserHistoryTracker` class |
+| **ACE analytics context** | `src/lib/server/ace/user-analytics-context.ts` | **EXISTS** — 3-source parallel fetch |
+| **Neo4j multi-hop** | `src/lib/server/retrieval/graph-context.ts` | **EXISTS** — `getNeo4jMultiHopNeighbors()` |
+| Neo4j seed script | `scripts/seed-neo4j.mjs` | **EXISTS** — 362 lines, PG→Neo4j MERGE |
+
+### Neo4j Read Queries (4 distinct Cypher queries exist)
+
+| Function | File | Cypher | Used By |
+|----------|------|--------|---------|
+| `fetchGraphDocuments(caseId)` | `graph-centrality.ts` | 2-hop traversal + degree centrality | `/api/recommendations` |
+| `computeCentralityForNodes(nodeIds)` | `graph-centrality.ts` | Batch degree centrality | `/api/recommendations` (enrichment) |
+| `findConnectedCases(caseId)` | `graph-centrality.ts` | 2-hop via shared entities | `user-analytics-context.ts` |
+| `getNeo4jMultiHopNeighbors(caseId)` | `graph-context.ts` | 1-3 hop traversal, 25 results | `/api/sse/chat` (line 1050) |
+
+### ACE Context Injection (verified in SSE chat)
+
+`/api/sse/chat/+server.ts` dynamically imports `fetchUserAnalyticsContext()` which runs 3 parallel queries:
+1. **PG**: Recent search patterns (top 3 from event-logger)
+2. **Neo4j**: Related cases (top 3 from `findConnectedCases()`)
+3. **Qdrant**: Similar past queries (top 3 from `user_searches` embeddings)
+
+Injects ≤400 chars into LLM system prompt. Non-fatal catch wrapper.
 
 ---
 
@@ -57,64 +64,81 @@ Client Events (analytics.svelte.ts)  ← WORKING
       → event-logger.ts → PostgreSQL   ← WORKING
       → RabbitMQ analytics.track queue ← WORKING
         → Redis sorted set             ← WORKING
-        → Neo4j sync (WRITE-ONLY)      ← WORKING (but nothing reads)
-        → Qdrant user_searches embed   ← WORKING (but no similarity query)
+        → Neo4j sync (WRITE)           ← WORKING
+        → Qdrant user_searches embed   ← WORKING
 
-MISSING CHAIN:
-  Neo4j graph → Cypher traversal queries → ❌ NOT BUILT
-  Neo4j centrality → PageRank/degree → ❌ NOT BUILT
-  Recommendation engine → multi-source ranking → ❌ NOT BUILT
-  ACE chat context → inject analytics → ❌ NOT BUILT
-  Dashboard UI → render summary + patterns → ❌ NOT BUILT (server load exists)
+Neo4j READ chain:                      ← CODE EXISTS, RETURNS EMPTY (no data)
+  graph-centrality.ts → 3 Cypher queries → recommendations API
+  graph-context.ts → getNeo4jMultiHopNeighbors → SSE chat
+  user-analytics-context.ts → findConnectedCases → ACE system prompt
+
+Dashboard UI:                           ← EXISTS (473 lines)
+  analytics/+page.svelte → 3 tabs (overview, patterns, cache)
+  analytics/+page.server.ts → loads summary + patterns from PG
+
+Recommendation pipeline:                ← CODE EXISTS, NEEDS VALIDATION
+  /api/recommendations → embed → candidates (RAG+graph+tags) → rank → cache
+  /api/graph/recommendations → LLM Ollama → GBNF JSON → Qdrant search
 ```
+
+---
+
+## Problem: Code Exists But Returns Empty
+
+All Neo4j-reading code degrades gracefully to empty results. The graph reads are wired but produce no data because:
+
+1. **Neo4j has no data** — needs seeding from PostgreSQL
+2. **Neo4j not in essential profile** — only starts with `docker compose --profile full up -d`
+3. **Recommendation pipeline not validated end-to-end** — never tested with real Neo4j data
 
 ---
 
 ## Remaining TODOs
 
-### TODO 1: Analytics Dashboard UI (~30 min)
-Create `src/routes/(app)/analytics/+page.svelte`:
-- `+page.server.ts` already loads `summary` + `patterns` data
-- Render: total queries (weekly), avg latency, cache hit rate, top 10 query patterns
-- Use existing `event-logger.ts` functions: `getWeeklySummary()`, `getTopQueryPatterns()`
+### TODO 1: Activate Neo4j + Seed Data (~20 min)
+```bash
+docker compose --profile full up -d neo4j
+node scripts/seed-neo4j.mjs          # PG → Neo4j (cases, persons, evidence, citations, glossary)
+node scripts/seed-neo4j.mjs --verify  # Check node/relationship counts
+```
+This unlocks: graph centrality, multi-hop case connections, recommendations, ACE context enrichment.
 
-### TODO 2: Neo4j Read Queries (~4 hrs)
-Create `src/lib/server/graph/neo4j-analytics.ts`:
-- `getRelatedCases(caseId)` — Cypher 2-3 hop traversal for case connections
-- `getUserBehaviorPattern(userId)` — most viewed cases, frequent searches
-- `getCaseConnections(caseId)` — entities shared between cases
-- Wire into `/api/graph/connections` (route exists but uses simple query)
+### TODO 2: End-to-End Validation (~2 hrs)
+After seeding:
+- [ ] Test `/api/recommendations` POST with a real caseId → verify 5-signal ranking returns results
+- [ ] Test `/api/graph/recommendations` POST → verify LLM-based recommendations
+- [ ] Test SSE chat with a case → verify Neo4j multi-hop appears in system prompt
+- [ ] Test analytics dashboard → verify 3 tabs render with real data
+- [ ] Test `fetchUserAnalyticsContext()` → verify all 3 sources return non-empty
 
-### TODO 3: Neo4j in KAG Pre-Retrieval (~8 hrs) — P1b from deep-review
-- Current: `graph-context.ts` queries PG `yorha_evidence_connections` only
-- Add: Cypher `MATCH (c:Case)-[*1..3]-(related) WHERE c.id = $caseId RETURN related`
-- Wire: After PG graph context, UNION with Neo4j results, deduplicate
-- This is the biggest remaining Neo4j gap
+### TODO 3: User Recommendation from Graph Analysis (~4 hrs)
+Currently missing: **user-specific** graph recommendations. Existing recs are case-scoped.
+- [ ] Add user→case interaction graph (VIEWED, SEARCHED, ANALYZED edges)
+- [ ] PageRank on user interaction graph → personalized case suggestions
+- [ ] Wire user-specific recommendations into dashboard "For You" section
+- [ ] Store recommendation scores as Neo4j node properties for fast retrieval
 
-### TODO 4: Graph Centrality (~2 hrs)
-Create `src/lib/server/graph/centrality.ts`:
-- Run degree centrality on Case→Evidence→Entity graph
-- Run PageRank on User→Case interaction graph
-- Store scores as Neo4j node properties
-- Use for recommendation ranking
+### ~~TODO 4: Qdrant user_searches Similarity Query~~ ✅ DONE (Apr 7, 2026)
+- [x] `/api/analytics/similar-queries` endpoint created — embeds query → searches `user_searches` collection
+- [ ] Wire into ACE context (currently `fetchUserAnalyticsContext` attempts this but may fail silently)
 
-### TODO 5: Recommendation Engine (~4 hrs)
-Create recommendation function combining:
-- Neo4j graph proximity (cases connected to current via shared entities)
-- Qdrant vector similarity (similar user searches → similar cases)
-- PostgreSQL analytics frequency (most viewed related cases)
-- Existing `/api/graph/recommendations` route uses Qdrant+Ollama — extend with Neo4j
+### TODO 5: Analytics Dashboard Enhancements (~2 hrs)
+Dashboard exists but could show more:
+- [ ] Neo4j-powered tab: case connections graph visualization
+- [ ] Recommendation history: show past recommendations + click-through rate
+- [ ] User interaction timeline (from Neo4j VIEWED/SEARCHED edges)
 
-### TODO 6: ACE Context Enrichment (~2 hrs)
-Inject analytics into SSE chat system prompt in `/api/sse/chat`:
-- Recently viewed cases (from Neo4j VIEWED relationships)
-- Frequent search patterns (from event-logger)
-- Related evidence (from Neo4j graph traversal)
+### TODO 6: Add Missing Env Vars to .env.example
+- [ ] `SEARXNG_URL=http://localhost:8080`
+- [ ] `DOCLING_SERVICE_URL=http://localhost:8085`
+- [ ] `WHISPER_MODEL=base`
+- [ ] `WHISPER_CUDA=true`
 
 ---
 
 ## Dependencies
-- Neo4j running (`docker compose --profile full up -d`)
+- Neo4j running (`docker compose --profile full up -d neo4j`)
+- Neo4j seeded (`node scripts/seed-neo4j.mjs`)
 - Ollama with embeddinggemma loaded
 - Qdrant with write access
 - RabbitMQ analytics.track queue consumer (already wired)

@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-11-02T05:12:47.384Z",
+  "inputFile": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\svelte-check-output.txt",
+  "outputFile": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\normalized-errors.jsonl",
+  "totalErrors": 0,
+  "errorsByType": {
+    "preprocessing": 0,
+    "typescript": 0,
+    "svelte": 0,
+    "css": 0,
+    "other": 0
+  },
+  "filesAffected": 0,
+  "topFiles": [],
+  "sampleErrors": []
+}

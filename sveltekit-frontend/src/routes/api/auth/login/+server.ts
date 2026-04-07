@@ -68,7 +68,6 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		});
 	} catch (err) {
 		console.error('[Auth] Login error:', err instanceof Error ? err.message : String(err));
-		const formatted = formatErrorResponse(err);
-		return json(formatted, { status: formatted.error.status });
+		return json({ error: 'Authentication failed' }, { status: 500 });
 	}
 };

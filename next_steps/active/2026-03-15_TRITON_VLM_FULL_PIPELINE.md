@@ -1,23 +1,65 @@
 # Triton Inference + VLM + Full Pipeline Roadmap
 
 ## Date: March 15, 2026
-## Status: READY TO EXECUTE
+## Status: NOT RUNNING — re-audit Apr 7: Docker image deleted, compose archived, engines never built
 ## Hardware: RTX 3060 Ti (8GB VRAM, SM 86, Ampere)
 
 ---
 
-## Docker Image Status (Post-Cleanup)
+## Docker Image Status (Re-audit Apr 7, 2026)
 
 | Image | Size | Status |
 |-------|------|--------|
-| `legal-ai-tensorrt-llm:latest` | 83 GB | **KEEP** — CUDA 12.9, PyTorch 2.7, TRT-LLM 0.20.0, transformers 4.51.3, onnxruntime-gpu 1.23.2 |
+| `legal-ai-tensorrt-llm:latest` | 83 GB | **PRUNED** — was deleted during `docker image prune`; rebuild from `Dockerfile.trtllm` |
 | `legal-ai-trt-llm:custom-gemma` | DELETED | Duplicate, transformers too old |
 | `legal-ai:phase14` | DELETED | Exact duplicate |
 | `deeds-web-app-frontend:latest` | DELETED | Misnamed duplicate |
 | `nvcr.io/nvidia/tensorrt-llm/release:latest` | DELETED | Base only, re-pullable |
 
-**Freed**: ~20GB build cache. Layer sharing meant image deletes freed tags, not bytes.
-**Remaining**: `legal-ai-tensorrt-llm:latest` (83GB) — has everything needed.
+**Apr 7 Reality**: All TRT images pruned. `docker-compose.triton.yml` archived. TRT engines **never built**. SvelteKit routes (`/api/ai/tensorrt/*`) always fall through to Ollama.
+
+---
+
+## What's Needed to Make ONNX Inference Work
+
+### Prerequisites (must complete first)
+1. **Run Colab notebook** (`Gemma3_12B_INT4_Quantize_and_Export.ipynb`) on A100 — exports:
+   - `siglip_vision.onnx` (~1.5 GB) — SigLIP vision encoder
+   - `gemma_projector.onnx` (~50 MB) — VLM projection layers
+   - `text_only_model/` (~21 GB) — extracted text decoder (for TRT-LLM conversion)
+2. **Download artifacts** to `trt_artifacts/` (~22 GB from Google Drive)
+
+### Option A: ONNX Runtime GPU (simpler, no TRT engine build)
+| Requirement | How | Status |
+|-------------|-----|--------|
+| `onnxruntime-gpu` | `pip install onnxruntime-gpu` or use `onnxruntime-node` | NOT INSTALLED locally |
+| CUDA 12.x runtime | Already installed (CUDA 13.0 toolkit on system) | READY |
+| SigLIP ONNX model | From Colab notebook step above | NOT EXPORTED |
+| Projector ONNX model | From Colab notebook step above | NOT EXPORTED |
+| Text decoder | NOT available as ONNX — too large for ONNX, needs TRT-LLM | N/A |
+
+**ONNX gives you**: Vision encoder + projector inference (image → visual tokens). Text generation still goes through Ollama.
+
+### Option B: TRT Engine Build (full pipeline, faster inference)
+| Requirement | How | Status |
+|-------------|-----|--------|
+| Docker image | Rebuild: `docker build -f Dockerfile.trtllm -t legal-ai-trtllm:latest .` | NEEDS REBUILD (~83 GB) |
+| INT4 checkpoint | `convert_checkpoint.py --use-weight-only-with-precision int4` inside container | NOT CONVERTED |
+| TRT text engine | `trtllm-build` inside container → `rank0.engine` (~6.5 GB) | NOT BUILT |
+| SigLIP TRT engine | `trtexec --onnx=siglip_vision.onnx` → `siglip_vision.engine` (~1.5 GB) | NOT BUILT |
+| Projector TRT engine | `trtexec --onnx=gemma_projector.onnx` → `gemma_projector.engine` (~50 MB) | NOT BUILT |
+| Triton configs | Restore from `deeds_labs/legacy-projects/triton_models/` | ARCHIVED |
+| Triton compose | Restore from `deeds_labs/` or recreate | ARCHIVED |
+
+**TRT gives you**: Full VLM inference (vision + text) at ~100ms/token on RTX 3060 Ti.
+
+### Current Fallback (what runs today)
+| Component | Service | Status |
+|-----------|---------|--------|
+| Text LLM | Ollama `gemma4:e4b-it-q4_K_M` | RUNNING |
+| VLM (image analysis) | Ollama `gemma4:e4b-it-q4_K_M` multimodal | RUNNING |
+| Embeddings | Ollama `embeddinggemma:latest` | RUNNING |
+| inference-router.ts | tryTensorRT() fails → tryOllama() succeeds | WORKING |
 
 ---
 

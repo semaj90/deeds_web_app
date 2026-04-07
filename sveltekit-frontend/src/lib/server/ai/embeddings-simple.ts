@@ -79,6 +79,14 @@ export async function generateEmbedding(text: string, options: EmbeddingOptions 
         }
 
         // Fallback to CPU embedding if Ollama fails
+        // Try server-side ONNX embeddinggemma (faster than CPU xenova, no network dependency)
+        if (!embedding) {
+            embedding = await generateOnnxEmbedding(truncated).catch(e => {
+                console.warn('ONNX server embedding failed, falling back to CPU: ', e?.message ?? e);
+                return null;
+            });
+        }
+
         if (!embedding) {
             embedding = await generateCpuEmbedding(truncated).catch(e => {
                 console.error('All local embedding providers failed: ', e?.message ?? e);
@@ -158,6 +166,14 @@ async function generateOllamaEmbedding(text: string, model: string): Promise<num
 
     throw new Error(`Invalid Ollama embedding response for model ${model}`);
   });
+}
+
+// Server-side ONNX embedding using onnxruntime-node
+async function generateOnnxEmbedding(text: string): Promise<number[]> {
+    const { runEmbedding } = await import('$lib/server/ai/onnx-server.js');
+    const result = await runEmbedding(text);
+    if (!result || result.length === 0) throw new Error('ONNX embedding returned empty result');
+    return result;
 }
 
 // CPU embedding using xenova transformers (optional)

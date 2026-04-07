@@ -24,11 +24,13 @@ import { getGpuStats, type GpuMemory } from '$lib/server/gpu/gpu-monitor.js';
 const TRT_MIN_VRAM_MB = 4000;
 
 export interface InferenceRequest {
-	prompt: string;
-	maxTokens?: number;
-	temperature?: number;
-	systemPrompt?: string;
-	preferTensorrt?: boolean;
+  prompt: string;
+  model?: string;
+  maxTokens?: number;
+  temperature?: number;
+  systemPrompt?: string;
+  preferTensorrt?: boolean;
+  stream?: boolean;
 }
 
 export interface InferenceResponse {

@@ -10,7 +10,7 @@
 
 	let {
 		placeholder = 'Search legal documents...',
-		searchEndpoint = '/api/v1/search',
+		searchEndpoint = '/search',
 		onResults = () => {},
 		className = '',
 	}: Props = $props();

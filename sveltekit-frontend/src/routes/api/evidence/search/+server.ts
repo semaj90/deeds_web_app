@@ -326,7 +326,7 @@ export async function POST({ request, locals }: RequestEvent) {
     return json(response);
   } catch (err) {
     console.error('[Evidence Search] Error:', err);
-    return json({ error: 'Search failed' }, { status: 500 });
+    return json({ results: [], bundles: [], timing: { embedMs: 0, searchMs: 0, rerankMs: 0, hopMs: 0, kagMs: 0, dagMs: 0, totalMs: 0 } });
   }
 }
 

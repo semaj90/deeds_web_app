@@ -68,7 +68,7 @@ export const GET: RequestHandler = async ({ locals }) => {
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
-    console.error('[cluster-status] GET error:', err);
+    console.error('[cluster-status] GET error:', err instanceof Error ? err.message : err);
     return json(
       {
         success: false,
@@ -115,7 +115,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			{ status: 202 }
 		);
 	} catch (err) {
-		console.error('[cluster-status] POST error:', err);
+		console.error('[cluster-status] POST error:', err instanceof Error ? err.message : err);
 		return json(
 			{
 				success: false,

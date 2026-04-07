@@ -1,0 +1,63 @@
+{
+  "timestamp": "2025-11-10T07:03:30.238Z",
+  "totalBatches": 826,
+  "errorBatches": 826,
+  "totalErrors": 55494,
+  "topErrorBatches": [
+    {
+      "batch": 96,
+      "errorCount": 826,
+      "files": [
+        "src/lib/optimization/ultra-json-processor.ts",
+        "src/lib/orchestration/autoencoder-context-switcher.ts",
+        "src/lib/orchestration/cognitive-routing-orchestrator.ts",
+        "src/lib/orchestration/complete-legal-ai-orchestrator.ts",
+        "src/lib/orchestration/index.ts"
+      ]
+    },
+    {
+      "batch": 220,
+      "errorCount": 816,
+      "files": [
+        "src/lib/state/documentUploadMachine.ts",
+        "src/lib/state/evidence-processing-machine-corrupted.ts",
+        "src/lib/state/evidence-processing-machine.ts",
+        "src/lib/state/evidenceCustodyMachine.ts",
+        "src/lib/state/evidenceProcessingMachine.ts"
+      ]
+    },
+    {
+      "batch": 743,
+      "errorCount": 789,
+      "files": [
+        "src/routes/api/test/shader-cache/+server.ts",
+        "src/routes/api/test/webgpu/+server.ts",
+        "src/routes/api/test-rag/search/+server.ts",
+        "src/routes/api/test-rag/upload/+server.ts",
+        "src/routes/api/testing/generate-playwright/+server.ts"
+      ]
+    },
+    {
+      "batch": 201,
+      "errorCount": 777,
+      "files": [
+        "src/lib/services/sveltekit-gpu-cache-integration.ts",
+        "src/lib/services/system-integration.ts",
+        "src/lib/services/system-monitor-client.ts",
+        "src/lib/services/tauri-llm-types.ts",
+        "src/lib/services/tauri-llm.ts"
+      ]
+    },
+    {
+      "batch": 14,
+      "errorCount": 705,
+      "files": [
+        "src/lib/ai/cognitive-smart-router-fixed.ts",
+        "src/lib/ai/cognitive-smart-router.ts",
+        "src/lib/ai/comprehensive-ai-synthesis-orchestrator.ts",
+        "src/lib/ai/context7-adapter.ts",
+        "src/lib/ai/crewai-legal-agents.ts"
+      ]
+    }
+  ]
+}

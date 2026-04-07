@@ -120,6 +120,9 @@ export const ENV = {
   GEMINI_API_KEY: privateEnv.GEMINI_API_KEY ?? '',
   // MinIO library bucket
   MINIO_LIBRARY_BUCKET: privateEnv.MINIO_LIBRARY_BUCKET ?? 'legal-library',
+  // Whisper persistent server (whisper-server.exe HTTP mode — eliminates cold start)
+  WHISPER_SERVER_URL: privateEnv.WHISPER_SERVER_URL ?? 'http://127.0.0.1:8178',
+  WHISPER_USE_SERVER: (privateEnv.WHISPER_USE_SERVER ?? 'false') === 'true',
   // Timeouts
   ACE_EMBED_BATCH_TIMEOUT_MS: Number(privateEnv.ACE_EMBED_BATCH_TIMEOUT_MS ?? '20000'),
   // Node environment

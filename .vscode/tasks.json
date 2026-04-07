@@ -600,38 +600,14 @@
       }
     },
     // ============================================
-    // Phase 76: Agentic IDE - MCP & RAG/KAG
+    // Phase 76: MCP / ACP Local Agent Workflows
     // ============================================
-    {
-      "label": "🔌 Phase 76: Start MCP Server",
-      "type": "shell",
-      "command": "node scripts/phase76-mcp-server.mjs",
-      "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend",
-        "env": {
-          "MCP_PORT": "3002"
-        }
-      },
-      "isBackground": true,
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "dedicated",
-        "showReuseMessage": false,
-        "clear": true
-      }
-    },
     {
       "label": "🔌 Phase 76: Start FastMCP Server",
       "type": "shell",
-      "command": "node scripts/fastmcp-server.mjs",
+      "command": "npm run mcp:server",
       "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend",
-        "env": {
-          "MCP_PORT": "3003"
-        }
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "isBackground": true,
       "group": "build",
@@ -642,16 +618,16 @@
         "panel": "dedicated",
         "showReuseMessage": false,
         "clear": true
-      }
+      },
+      "detail": "Start the live FastMCP tool server used by ACP and the local agent orchestrator"
     },
     {
       "label": "🤖 Phase 76: ACE Agent (Ollama)",
       "type": "shell",
-      "command": "node scripts/phase76-ace-prompt-engineer.mjs --task \"${input:aceTask}\"",
+      "command": "npm run mcp:agent:ollama -- \"${input:agentQuery}\"",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend",
         "env": {
-          "LLM_PROVIDER": "ollama",
           "OLLAMA_MODEL": "gemma4-legal:latest"
         }
       },
@@ -663,97 +639,13 @@
         "panel": "dedicated",
         "showReuseMessage": false,
         "clear": true
-      }
-    },
-    {
-      "label": "🤖 Phase 76: ACE Agent (Gemini + Search)",
-      "type": "shell",
-      "command": "node scripts/phase76-ace-prompt-engineer.mjs --task \"${input:aceTask}\" --iterations 3",
-      "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend",
-        "env": {
-          "LLM_PROVIDER": "gemini",
-          "GEMINI_MODEL": "gemini-2.0-flash-exp",
-          "GEMINI_ENABLE_SEARCH": "true"
-        }
       },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "showReuseMessage": false,
-        "clear": true
-      }
+      "detail": "Run the local MCP agent through Ollama with Gemma4 legal defaults and live tool calling"
     },
     {
-      "label": "🧠 Phase 76: ACE Agent (Gemini 3.0 Thinking)",
+      "label": "🤖 Phase 76: ACE Agent (Triton)",
       "type": "shell",
-      "command": "node scripts/phase76-ace-prompt-engineer.mjs --task \"${input:aceTask}\" --iterations 3",
-      "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend",
-        "env": {
-          "LLM_PROVIDER": "gemini",
-          "GEMINI_MODEL": "gemini-3-pro-preview",
-          "GEMINI_ENABLE_SEARCH": "true",
-          "GEMINI_THINKING_LEVEL": "HIGH"
-        }
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "showReuseMessage": false,
-        "clear": true
-      }
-    },
-    {
-      "label": "🤖 Phase 76: ACE Agent (Claude)",
-      "type": "shell",
-      "command": "node scripts/phase76-ace-prompt-engineer.mjs --task \"${input:aceTask}\"",
-      "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend",
-        "env": {
-          "LLM_PROVIDER": "claude"
-        }
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "showReuseMessage": false,
-        "clear": true
-      }
-    },
-    {
-      "label": "🤖 Phase 76: ACE Agent (GPT-4)",
-      "type": "shell",
-      "command": "node scripts/phase76-ace-prompt-engineer.mjs --task \"${input:aceTask}\"",
-      "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend",
-        "env": {
-          "LLM_PROVIDER": "openai"
-        }
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "showReuseMessage": false,
-        "clear": true
-      }
-    },
-    {
-      "label": "🧠 Phase 76: Knowledge Builder",
-      "type": "shell",
-      "command": "node scripts/phase76-knowledge-builder.mjs",
+      "command": "npm run mcp:agent:triton -- \"${input:agentQuery}\"",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -761,33 +653,17 @@
       "presentation": {
         "echo": true,
         "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false
-      }
-    },
-    {
-      "label": "🧠 Phase 76: Knowledge Consolidator",
-      "type": "shell",
-      "command": "node scripts/phase76-ace-knowledge-consolidator.mjs",
-      "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend"
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
       },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false
-      }
+      "detail": "Run the local MCP agent against the Triton backend for GPU-backed inference experiments"
     },
     {
-      "label": "🔍 Phase 76: Test Knowledge Query",
+      "label": "🔍 Phase 76: Test MCP Web Search",
       "type": "shell",
-      "command": "node scripts/test-knowledge-query.mjs",
+      "command": "npm run mcp:test:search",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -799,12 +675,13 @@
         "panel": "shared",
         "showReuseMessage": true,
         "clear": false
-      }
+      },
+      "detail": "Smoke-test MCP tool calling against the live web search tool path"
     },
     {
-      "label": "🔬 Phase 76: LLM Health Check",
+      "label": "🧠 Phase 76: Test MCP Knowledge Base",
       "type": "shell",
-      "command": "node scripts/llm-router.mjs --health-check",
+      "command": "npm run mcp:test:kb",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -812,16 +689,17 @@
       "presentation": {
         "echo": true,
         "reveal": "always",
-        "focus": true,
+        "focus": false,
         "panel": "shared",
         "showReuseMessage": true,
         "clear": false
-      }
+      },
+      "detail": "Smoke-test MCP vector retrieval against the current knowledge-base path"
     },
     {
-      "label": "🔬 Phase 76: Compare All LLM Providers",
+      "label": "🕸️ Phase 76: Test MCP Knowledge Graph",
       "type": "shell",
-      "command": "node scripts/llm-router.mjs --compare --prompt \"${input:llmPrompt}\"",
+      "command": "npm run mcp:test:graph",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -829,16 +707,17 @@
       "presentation": {
         "echo": true,
         "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "showReuseMessage": false,
-        "clear": true
-      }
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Smoke-test MCP graph querying before using agentic retrieval or topology flows"
     },
     {
       "label": "🌐 Phase 76: Open Knowledge UI",
       "type": "shell",
-      "command": "Start-Process 'http://localhost:5175/knowledge'",
+      "command": "npm run knowledge:ui",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -850,36 +729,13 @@
         "panel": "shared",
         "showReuseMessage": false,
         "clear": false
-      }
-    },
-    {
-      "label": "🚀 Phase 76: Full Agent Stack",
-      "type": "shell",
-      "command": "npm run phase76:mcp",
-      "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
-      "isBackground": true,
-      "dependsOn": [
-        "Dev: QUIC (Phase 14 env)"
-      ],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "dedicated",
-        "showReuseMessage": false,
-        "clear": true
-      }
+      "detail": "Open the current local knowledge UI surface in the browser"
     },
-    // ============================================
-    // Phase 76: ACP Tool Tasks
-    // ============================================
     {
       "label": "🔧 Phase 76: ACP - List All Tools",
       "type": "shell",
-      "command": "node scripts/phase76-acp-cli.mjs tools",
+      "command": "npm run phase76:cli:list",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -887,16 +743,17 @@
       "presentation": {
         "echo": true,
         "reveal": "always",
-        "focus": true,
+        "focus": false,
         "panel": "shared",
-        "showReuseMessage": false,
-        "clear": true
-      }
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "List the currently registered ACP tools instead of relying on stale hardcoded task options"
     },
     {
       "label": "🔧 Phase 76: ACP - Execute Tool",
       "type": "shell",
-      "command": "node scripts/phase76-acp-cli.mjs execute ${input:acpTool} --query \"${input:acpArgs}\"",
+      "command": "node scripts/phase76-acp-cli.mjs --tool ${input:acpTool} --args '${input:acpArgs}'",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -908,46 +765,31 @@
         "panel": "dedicated",
         "showReuseMessage": false,
         "clear": true
-      }
+      },
+      "detail": "Invoke a single ACP tool directly with JSON args against the running FastMCP server"
     },
     {
-      "label": "📊 Phase 76: ACP - System Statistics",
+      "label": "🧬 Phase 76: Proto Generate",
       "type": "shell",
-      "command": "node scripts/phase76-acp-cli.mjs stats",
+      "command": "npm run proto:generate",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
-      "group": "test",
+      "group": "build",
       "presentation": {
         "echo": true,
         "reveal": "always",
-        "focus": true,
+        "focus": false,
         "panel": "shared",
-        "showReuseMessage": false,
-        "clear": true
-      }
-    },
-    {
-      "label": "🤖 Phase 76: ACP - Interactive Mode",
-      "type": "shell",
-      "command": "node scripts/phase76-acp-cli.mjs interactive",
-      "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend"
+        "showReuseMessage": true,
+        "clear": false
       },
-      "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "showReuseMessage": false,
-        "clear": true
-      }
+      "detail": "Regenerate protobuf client artifacts for revived gRPC workflows"
     },
     {
-      "label": "🚀 Phase 76: ACP - Start All Servers",
+      "label": "🧬 Phase 76: Proto Watch",
       "type": "shell",
-      "command": "npm run phase76:full-stack",
+      "command": "npm run proto:watch",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -960,12 +802,68 @@
         "panel": "dedicated",
         "showReuseMessage": false,
         "clear": true
-      }
+      },
+      "detail": "Watch proto definitions and regenerate client artifacts on change"
     },
     {
-      "label": "🏥 Phase 76: ACP - System Health Check",
+      "label": "🏥 Phase 76: Embedding gRPC Health",
       "type": "shell",
-      "command": "node scripts/phase76-acp-cli.mjs execute system:health",
+      "command": "npm run grpc:health:embedding",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Directly check embedding gRPC health without requiring the dev server runtime"
+    },
+    {
+      "label": "🏥 Phase 76: Retrieval gRPC Health",
+      "type": "shell",
+      "command": "npm run grpc:health:retrieval",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Check retrieval gRPC health against the live Go search gRPC service by default, or the legacy retrieval service when explicitly enabled"
+    },
+    {
+      "label": "🚀 Local: Start Go Search gRPC",
+      "type": "shell",
+      "command": "npm run go:search:service",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Start the live Go library search service that exposes HTTP on 8096 and gRPC on 50055"
+    },
+    {
+      "label": "🤖 Phase 76: ACP - Interactive Mode",
+      "type": "shell",
+      "command": "npm run phase76:cli",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -974,40 +872,21 @@
         "echo": true,
         "reveal": "always",
         "focus": true,
-        "panel": "shared",
-        "showReuseMessage": false,
-        "clear": true
-      }
-    },
-    {
-      "label": "📊 Phase 76: ACE Interactive CLI",
-      "type": "shell",
-      "command": "node scripts/phase76-ace-cli.mjs",
-      "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend"
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
         "panel": "dedicated",
         "showReuseMessage": false,
         "clear": true
-      }
+      },
+      "detail": "Drop into the maintained ACP CLI for interactive local tool execution"
     },
     // ============================================
-    // Phase 72: Error Vectorization & GPU Pipeline
+    // Phase 72 / 78: AST Graph & Error Analysis Pipelines
     // ============================================
     {
-      "label": "🔮 Phase 72: GPU Error Pipeline",
+      "label": "🔮 Phase 72: Build Route AST Graph",
       "type": "shell",
-      "command": "node scripts/phase72-gpu-pipeline.mjs",
+      "command": "npm run phase72:build",
       "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend",
-        "env": {
-          "PHASE72_PYTHON": "C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\python.exe"
-        }
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
       "presentation": {
@@ -1017,35 +896,32 @@
         "panel": "shared",
         "showReuseMessage": true,
         "clear": false
-      }
+      },
+      "detail": "Build the current Phase 72 route/AST graph used by downstream error clustering and analysis"
     },
     {
-      "label": "🔮 Phase 72: Auto-Iterate (3 cycles)",
+      "label": "🔮 Phase 72: Watch Route AST Graph",
       "type": "shell",
-      "command": "node scripts/phase72-auto-iterate.mjs",
+      "command": "npm run phase72:build:watch",
       "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend",
-        "env": {
-          "PHASE72_PYTHON": "C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\python.exe"
-        }
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
+      "isBackground": true,
       "group": "build",
       "presentation": {
         "echo": true,
         "reveal": "always",
-        "focus": true,
+        "focus": false,
         "panel": "dedicated",
         "showReuseMessage": false,
         "clear": true
-      }
+      },
+      "detail": "Keep the route AST graph refreshed while iterating on diagnostics or topology work"
     },
-    // ============================================
-    // Phase 78: Error Collection & Suggestions
-    // ============================================
     {
       "label": "📋 Phase 78: Collect Errors",
       "type": "shell",
-      "command": "npx tsx scripts/phase78-collect-errors.mts",
+      "command": "npm run phase78:collect-errors",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -1057,7 +933,26 @@
         "panel": "shared",
         "showReuseMessage": true,
         "clear": false
-      }
+      },
+      "detail": "Collect the current diagnostics slice into the Phase 78 error-analysis pipeline"
+    },
+    {
+      "label": "⚡ Phase 78: Embed Clusters in Qdrant",
+      "type": "shell",
+      "command": "npm run phase78:embed-clusters:qdrant",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Push clustered error embeddings into Qdrant for local retrieval and repair ranking"
     },
     {
       "label": "📋 Phase 78: Full Pipeline",
@@ -1074,142 +969,16 @@
         "panel": "dedicated",
         "showReuseMessage": false,
         "clear": true
-      }
+      },
+      "detail": "Run the full error clustering and suggestion pipeline backed by the current Phase 78 scripts"
     },
     // ============================================
-    // Phase 76: Database & Cache Tools
+    // Local Data / SIMD / GPU Dev Workflows
     // ============================================
     {
-      "label": "🗄️ Phase 76: Query Database",
+      "label": "🗄️ Local: Check DB Schemas",
       "type": "shell",
-      "command": "node scripts/phase76-acp-cli.mjs execute db:query --query \"${input:sqlQuery}\"",
-      "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend"
-      },
-      "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false
-      }
-    },
-    {
-      "label": "📊 Phase 76: List Database Tables",
-      "type": "shell",
-      "command": "node scripts/phase76-acp-cli.mjs execute db:tables",
-      "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend"
-      },
-      "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false
-      }
-    },
-    {
-      "label": "💾 Phase 76: Redis Cache - Get",
-      "type": "shell",
-      "command": "node scripts/phase76-acp-cli.mjs execute cache:get --key \"${input:cacheKey}\"",
-      "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend"
-      },
-      "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false
-      }
-    },
-    {
-      "label": "📈 Phase 76: Cache Statistics",
-      "type": "shell",
-      "command": "node scripts/phase76-acp-cli.mjs execute cache:stats",
-      "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend"
-      },
-      "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false
-      }
-    },
-    {
-      "label": "📦 Phase 76: MinIO - List Objects",
-      "type": "shell",
-      "command": "node scripts/phase76-acp-cli.mjs execute minio:list --bucket \"legal-documents\"",
-      "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend"
-      },
-      "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false
-      }
-    },
-    {
-      "label": "🔄 Phase 76: Batch Execute - Health Check",
-      "type": "shell",
-      "command": "node scripts/phase76-acp-batch.mjs --template health-check --verbose",
-      "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend"
-      },
-      "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "showReuseMessage": false,
-        "clear": true
-      }
-    },
-    {
-      "label": "⚡ Phase 76: Batch Execute - Database Overview",
-      "type": "shell",
-      "command": "node scripts/phase76-acp-batch.mjs --template database-overview --parallel --verbose",
-      "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend"
-      },
-      "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "showReuseMessage": false,
-        "clear": true
-      }
-    },
-    // ============================================
-    // Phase 66: Automated Error Fixing - Object Literals & Type Imports
-    // ============================================
-    {
-      "label": "🔧 Phase 66: Fix Object Literals (Limited)",
-      "type": "shell",
-      "command": "node",
-      "args": [
-        "scripts/fix-object-literals.mjs",
-        "--limit",
-        "${input:fileLimit}"
-      ],
+      "command": "npm run db:check",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -1221,15 +990,13 @@
         "panel": "shared",
         "showReuseMessage": true,
         "clear": false
-      }
+      },
+      "detail": "Validate the active Drizzle schema files parse before running local DB or retrieval work"
     },
     {
-      "label": "🔧 Phase 66: Fix Object Literals (All Files)",
+      "label": "🗄️ Local: Open DB Studio",
       "type": "shell",
-      "command": "node",
-      "args": [
-        "scripts/fix-object-literals.mjs"
-      ],
+      "command": "npm run db:studio",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -1241,40 +1008,15 @@
         "panel": "dedicated",
         "showReuseMessage": false,
         "clear": true
-      }
+      },
+      "detail": "Open Drizzle Studio against the local Postgres schema for inspection"
     },
     {
-      "label": "🔧 Phase 66: Fix Type Imports",
+      "label": "📊 Local: Services Check",
       "type": "shell",
-      "command": "node",
-      "args": [
-        "scripts/fix-type-imports.mjs"
-      ],
+      "command": "npm run services:check",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false
-      }
-    },
-    {
-      "label": "🔧 Phase 66: Fix CSS Selectors (Dry-Run)",
-      "type": "shell",
-      "command": "node",
-      "args": [
-        "scripts/fix-css-selectors.mjs",
-        "--dry-run",
-        "--limit",
-        "10"
-      ],
-      "options": {
-          "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
       "presentation": {
@@ -1284,16 +1026,49 @@
         "panel": "shared",
         "showReuseMessage": true,
         "clear": false
-      }
+      },
+      "detail": "Verify the live local Qdrant and Ollama services before agentic or retrieval tasks"
     },
     {
-      "label": "✅ Phase 66: Verify Error Count",
+      "label": "📊 Local: Qdrant Health",
       "type": "shell",
-      "command": "powershell",
-      "args": [
-        "-Command",
-        "npx svelte-check --threshold error 2>&1 | Select-String -Pattern 'found \\d+ error'"
-      ],
+      "command": "npm run qdrant:health",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Inspect the live Qdrant collections endpoint used by retrieval and Phase 78 embedding flows"
+    },
+    {
+      "label": "💾 Local: Redis Info",
+      "type": "shell",
+      "command": "npm run redis:info",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Inspect the live local Redis instance used by caching and chat/runtime workflows"
+    },
+    {
+      "label": "💾 Local: Redis CLI",
+      "type": "shell",
+      "command": "npm run redis:cli",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -1305,37 +1080,181 @@
         "panel": "dedicated",
         "showReuseMessage": false,
         "clear": true
-      }
+      },
+      "detail": "Open a direct Redis CLI session for local cache inspection or manual debugging"
     },
     {
-      "label": "🤖 Phase 66: Run Python Agent",
+      "label": "🧩 Phase 79: SIMD EXE Build",
       "type": "shell",
-      "command": "${env:PHASE72_PYTHON}",
-      "args": [
-        "scripts/phase66_automated_error_fixer.py"
-      ],
+      "command": "npm run simd:build",
       "options": {
-        "cwd": "${workspaceFolder}"
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Build the Windows SIMD sidecar executable used by local accelerated parsing"
+    },
+    {
+      "label": "🧩 Phase 79: SIMD EXE Start",
+      "type": "shell",
+      "command": "npm run simd:exe:start",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Start the Windows SIMD executable path from VS Code without relying on a separate shell"
+    },
+    {
+      "label": "🧩 Phase 79: SIMD Microservice Start",
+      "type": "shell",
+      "command": "npm run phase79:simd:start",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Start the Go SIMD sidecar used for local accelerated parsing and retrieval-adjacent workloads"
+    },
+    {
+      "label": "🧩 Phase 79: SIMD Microservice Health",
+      "type": "shell",
+      "command": "npm run phase79:simd:health",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Check the local SIMD sidecar health endpoint on port 8103"
+    },
+    {
+      "label": "🧱 Local: Build Go Service EXE",
+      "type": "shell",
+      "command": "npm run go:build",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Build the Windows Go service executable for local service experiments"
+    },
+    {
+      "label": "🗂️ Phase 79: Codebase Indexer",
+      "type": "shell",
+      "command": "npm run phase79:indexer",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Run the maintained Phase 79 agentic indexer over the local codebase"
+    },
+    {
+      "label": "🗂️ Phase 79: Codebase Indexer (Dry Run)",
+      "type": "shell",
+      "command": "npm run phase79:indexer:dry",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Preview Phase 79 indexer actions before mutating index state or caches"
+    },
+    {
+      "label": "🚀 Phase 79: Ultimate Cognitive Repair",
+      "type": "shell",
+      "command": "npm run phase79:ultimate",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Run the current high-level Phase 79 repair/orchestration workflow"
+    },
+    {
+      "label": "⚙️ Local: GPU Dev (RTX + SIMD)",
+      "type": "shell",
+      "command": "npm run dev:gpu",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Start the local dev server with RTX-optimized GPU flags, SIMD parsing, Redis compression, and Qdrant-side services"
+    },
+    {
+      "label": "🚀 Local: Parallel MCP + Proto + SIMD",
+      "dependsOrder": "parallel",
       "dependsOn": [
-        "✅ Phase 66: Verify Error Count"
-      ],
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "showReuseMessage": false,
-        "clear": true
-      }
-    },
-    {
-      "label": "🚀 Phase 66: Full Workflow",
-      "dependsOn": [
-        "🔧 Phase 66: Fix Object Literals (All Files)",
-        "🔧 Phase 66: Fix Type Imports",
-        "✅ Phase 66: Verify Error Count"
+        "🔌 Phase 76: Start FastMCP Server",
+        "🧬 Phase 76: Proto Watch",
+        "🧩 Phase 79: SIMD EXE Start"
       ],
       "group": {
         "kind": "build",
@@ -1344,11 +1263,12 @@
       "presentation": {
         "echo": true,
         "reveal": "always",
-        "focus": true,
+        "focus": false,
         "panel": "dedicated",
         "showReuseMessage": false,
         "clear": true
-      }
+      },
+      "detail": "Run the revived FastMCP server, proto watcher, and Windows SIMD executable concurrently from VS Code"
     },
     // ============================================
     // Phase 94: Unified AST Graph - Error Analysis & Fixing
@@ -1480,28 +1400,6 @@
       "problemMatcher": []
     },
     {
-      "label": "🚀 Phase 94: Batch Fix Cluster 0 (Dry-Run)",
-      "type": "shell",
-      "command": ".\\scripts\\phase94-cluster0-batch-fix.ps1",
-      "args": [
-        "-DryRun",
-        "-Verbose"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "dedicated",
-        "showReuseMessage": false,
-        "clear": false
-      },
-      "problemMatcher": []
-    },
-    {
       "label": "✅ Phase 94: Validate Fix",
       "type": "shell",
       "command": "npx svelte-kit sync; npx svelte-check --threshold error --tsconfig ./tsconfig.json",
@@ -1519,24 +1417,6 @@
         "clear": false
       },
       "problemMatcher": []
-    },
-    {
-      "label": "📖 Phase 94: Open How-To Guide",
-      "type": "shell",
-      "command": "code",
-      "args": [
-        "docs\\PHASE94_HOW_TO_GUIDE.md"
-      ],
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "silent",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": false,
-        "clear": false
-      },
-      "problemMatcher": []
     }
   ],
   "inputs": [
@@ -1547,72 +1427,28 @@
       "default": "/dashboard"
     },
     {
-      "id": "aceTask",
+      "id": "agentQuery",
       "type": "promptString",
-      "description": "Enter the task for the ACE Agent (e.g., 'Analyze Postgres login errors', 'Fix TypeScript import errors')",
-      "default": "Analyze the most common TypeScript errors and suggest fixes"
-    },
-    {
-      "id": "llmPrompt",
-      "type": "promptString",
-      "description": "Enter a prompt to compare across all LLM providers",
-      "default": "Explain the difference between Svelte 5 runes and Svelte 4 reactivity"
+      "description": "Enter the MCP agent task or question",
+      "default": "Search the codebase for Svelte 5 migration hotspots and summarize the highest-priority fixes"
     },
     {
       "id": "acpTool",
-      "type": "pickString",
-      "description": "Select an ACP tool to execute",
-      "options": [
-        "knowledge:search",
-        "knowledge:stats",
-        "llm:generate",
-        "llm:embed",
-        "llm:models",
-        "code:analyze",
-        "code:search",
-        "db:query",
-        "db:tables",
-        "cache:get",
-        "cache:set",
-        "cache:stats",
-        "minio:list",
-        "minio:stats",
-        "agent:discover",
-        "agent:delegate",
-        "fix:svelte5",
-        "system:health"
-      ],
-      "default": "knowledge:search"
+      "type": "promptString",
+      "description": "Enter an ACP tool name (run 'ACP - List All Tools' first to see the current registry)",
+      "default": "cases:load"
     },
     {
       "id": "acpArgs",
       "type": "promptString",
-      "description": "Enter tool arguments (e.g., query for knowledge:search, prompt for llm:generate)",
-      "default": "Svelte 5 runes"
-    },
-    {
-      "id": "sqlQuery",
-      "type": "promptString",
-      "description": "Enter a SQL SELECT query",
-      "default": "SELECT table_name FROM information_schema.tables WHERE table_schema='public' LIMIT 10"
-    },
-    {
-      "id": "cacheKey",
-      "type": "promptString",
-      "description": "Enter a Redis cache key",
-      "default": "knowledge:graph"
+      "description": "Enter ACP JSON args for the selected tool",
+      "default": "{\"limit\":5}"
     },
     {
       "id": "clusterId",
       "type": "promptString",
       "description": "Enter cluster ID (0-11)",
       "default": "0"
-    },
-    {
-      "id": "fileLimit",
-      "type": "promptString",
-      "description": "Number of files to fix (default: all)",
-      "default": "50"
     },
     {
       "id": "errorType",

@@ -171,7 +171,7 @@ Drizzle ORM 0.44 (PostgreSQL storage):
 | 3 | Table chunks: preserve as whole units with OTSL metadata | legal-chunker.ts |
 | 4 | Add `granite_docling` stage to RabbitMQ evidence.process consumer | [queue-worker.ts](sveltekit-frontend/src/lib/server/queue/) |
 | 5 | Update XState document-processing machine with new state | [document-processing machine](sveltekit-frontend/src/lib/machines/) |
-| 6 | Update dashboard GrpcStatusAdapter (already has stage label!) | [GrpcStatusAdapter.ts](sveltekit-frontend/src/lib/stores/dashboard/GrpcStatusAdapter.ts) |
+| 6 | Update dashboard GrpcStatusAdapter (needs stage label added) | [GrpcStatusAdapter.ts](sveltekit-frontend/src/lib/stores/dashboard/GrpcStatusAdapter.ts) |
 
 ### Phase 3: Replace Docling Service (Optional)
 
@@ -361,7 +361,7 @@ Drizzle ORM 0.44 (PostgreSQL persistence):
 - [ ] Qdrant chunks tagged with element type (`table`, `section_header`, etc.)
 - [ ] RabbitMQ evidence.process queue triggers extraction
 - [ ] XState document-processing machine shows "extracting" state in UI
-- [ ] Dashboard GrpcStatusAdapter shows "Granite-Docling Parsing" stage label (already wired!)
+- [ ] Dashboard GrpcStatusAdapter shows "Granite-Docling Parsing" stage label (NOT YET WIRED — needs implementation)
 - [ ] VRAM stays under 8 GB during concurrent Granite-Docling + embeddinggemma
 
 ---

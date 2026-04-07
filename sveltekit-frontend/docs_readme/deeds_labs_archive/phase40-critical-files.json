@@ -1,0 +1,769 @@
+{
+  "severeFiles": [
+    {
+      "file": "src/routes/api/documents/templates/+server.ts",
+      "errorCount": 623,
+      "priority": 3475,
+      "errorCodes": [
+        "TS1127",
+        "TS1005",
+        "TS1128",
+        "TS1003",
+        "TS1434",
+        "TS1435",
+        "TS1109",
+        "TS1228",
+        "TS1443"
+      ]
+    },
+    {
+      "file": "src/routes/api/ai/document-drafting/templates/+server.ts",
+      "errorCount": 249,
+      "priority": 2084,
+      "errorCodes": [
+        "TS1005",
+        "TS1136",
+        "TS1003",
+        "TS1472",
+        "TS1489",
+        "TS1121",
+        "TS1434",
+        "TS1002",
+        "TS1128",
+        "TS1131",
+        "TS1435",
+        "TS1127"
+      ]
+    },
+    {
+      "file": "src/routes/api/v1/nats/legal/+server.ts",
+      "errorCount": 186,
+      "priority": 1823,
+      "errorCodes": [
+        "TS1005",
+        "TS1003",
+        "TS1121",
+        "TS1109",
+        "TS1434",
+        "TS1129",
+        "TS1002",
+        "TS1128",
+        "TS1181",
+        "TS1138",
+        "TS1136"
+      ]
+    },
+    {
+      "file": "src/routes/api/ai/find/+server.ts",
+      "errorCount": 192,
+      "priority": 1766,
+      "errorCodes": [
+        "TS1005",
+        "TS1131",
+        "TS1109",
+        "TS1128",
+        "TS1434",
+        "TS1443",
+        "TS1003",
+        "TS1472",
+        "TS2809"
+      ]
+    },
+    {
+      "file": "src/routes/api/ai/process-evidence/+server.ts",
+      "errorCount": 201,
+      "priority": 1568,
+      "errorCodes": [
+        "TS1131",
+        "TS1011",
+        "TS1109",
+        "TS1128",
+        "TS1134",
+        "TS1005",
+        "TS1434",
+        "TS1003",
+        "TS1443",
+        "TS1435",
+        "TS1002"
+      ]
+    },
+    {
+      "file": "src/lib/server/graph/evidence-graph-service.ts",
+      "errorCount": 172,
+      "priority": 1460,
+      "errorCodes": [
+        "TS1005",
+        "TS1109",
+        "TS1472",
+        "TS1131",
+        "TS1359",
+        "TS1138",
+        "TS1128",
+        "TS1442",
+        "TS1434",
+        "TS1068",
+        "TS1003",
+        "TS1136"
+      ]
+    },
+    {
+      "file": "src/routes/api/ai/suggestions/+server.ts",
+      "errorCount": 235,
+      "priority": 1440,
+      "errorCodes": [
+        "TS1005",
+        "TS1131",
+        "TS1434",
+        "TS1003",
+        "TS1435",
+        "TS1128",
+        "TS1002",
+        "TS1472"
+      ]
+    },
+    {
+      "file": "src/lib/server/db/schema-postgres.ts",
+      "errorCount": 124,
+      "priority": 1331,
+      "errorCodes": [
+        "TS1128",
+        "TS1005",
+        "TS1003"
+      ]
+    },
+    {
+      "file": "src/routes/api/rtx/+server.ts",
+      "errorCount": 128,
+      "priority": 1207,
+      "errorCodes": [
+        "TS1005",
+        "TS1136",
+        "TS1128",
+        "TS1434",
+        "TS1228",
+        "TS1127",
+        "TS1003",
+        "TS1443",
+        "TS1002",
+        "TS1472"
+      ]
+    },
+    {
+      "file": "src/routes/api/mcp/+server.ts",
+      "errorCount": 109,
+      "priority": 1161,
+      "errorCodes": [
+        "TS1109",
+        "TS1005",
+        "TS1472",
+        "TS1128",
+        "TS1434"
+      ]
+    },
+    {
+      "file": "src/lib/server/lokiHybridStore.ts",
+      "errorCount": 132,
+      "priority": 1051,
+      "errorCodes": [
+        "TS1005",
+        "TS1109",
+        "TS1134",
+        "TS1434",
+        "TS1068",
+        "TS1128",
+        "TS1011",
+        "TS1359",
+        "TS1003",
+        "TS1160"
+      ]
+    },
+    {
+      "file": "src/routes/api/ai/tag/+server.ts",
+      "errorCount": 123,
+      "priority": 1031,
+      "errorCodes": [
+        "TS1435",
+        "TS1434",
+        "TS1005",
+        "TS1128",
+        "TS1109",
+        "TS1002",
+        "TS1003"
+      ]
+    },
+    {
+      "file": "src/routes/api/ai-boilerplate/+server.ts",
+      "errorCount": 171,
+      "priority": 998,
+      "errorCodes": [
+        "TS1128",
+        "TS1434",
+        "TS1005",
+        "TS1435",
+        "TS1443",
+        "TS1003",
+        "TS1127",
+        "TS1228",
+        "TS1109",
+        "TS1181",
+        "TS1472",
+        "TS1136"
+      ]
+    },
+    {
+      "file": "src/lib/server/services/background-job-queue.ts",
+      "errorCount": 188,
+      "priority": 972,
+      "errorCodes": [
+        "TS1434",
+        "TS1068",
+        "TS1139",
+        "TS1109",
+        "TS1005",
+        "TS1131",
+        "TS1128",
+        "TS1127",
+        "TS1443",
+        "TS1435",
+        "TS1002",
+        "TS1136",
+        "TS1161",
+        "TS1160"
+      ]
+    },
+    {
+      "file": "src/routes/api/ai/enhanced-grpo/+server.ts",
+      "errorCount": 160,
+      "priority": 969,
+      "errorCodes": [
+        "TS1435",
+        "TS1434",
+        "TS1005",
+        "TS1161",
+        "TS1003",
+        "TS1128",
+        "TS1002",
+        "TS1109",
+        "TS1011",
+        "TS1136",
+        "TS1134",
+        "TS1135",
+        "TS1472",
+        "TS1389"
+      ]
+    },
+    {
+      "file": "src/routes/api/ai/prompt/+server.ts",
+      "errorCount": 188,
+      "priority": 952,
+      "errorCodes": [
+        "TS1005",
+        "TS1109",
+        "TS1435",
+        "TS1128",
+        "TS1434",
+        "TS1003",
+        "TS1228",
+        "TS1472"
+      ]
+    },
+    {
+      "file": "src/lib/server/api-ssr-helpers.ts",
+      "errorCount": 101,
+      "priority": 939,
+      "errorCodes": [
+        "TS1131",
+        "TS1005",
+        "TS1128",
+        "TS1109",
+        "TS1434",
+        "TS1110",
+        "TS2809",
+        "TS1160"
+      ]
+    },
+    {
+      "file": "src/routes/api/metrics/gpu/+server.ts",
+      "errorCount": 106,
+      "priority": 879,
+      "errorCodes": [
+        "TS1005",
+        "TS1128",
+        "TS1434",
+        "TS1003",
+        "TS1435",
+        "TS1002",
+        "TS1472"
+      ]
+    },
+    {
+      "file": "src/routes/api/evidence-enhancement/+server.ts",
+      "errorCount": 93,
+      "priority": 848,
+      "errorCodes": [
+        "TS1128",
+        "TS1434",
+        "TS1005",
+        "TS1228",
+        "TS1443",
+        "TS1109",
+        "TS1435"
+      ]
+    },
+    {
+      "file": "src/routes/api/legal/precedent/search/+server.ts",
+      "errorCount": 76,
+      "priority": 840,
+      "errorCodes": [
+        "TS1005",
+        "TS1131",
+        "TS1011",
+        "TS1128",
+        "TS1472",
+        "TS1137",
+        "TS1003",
+        "TS1435",
+        "TS1434",
+        "TS1002"
+      ]
+    },
+    {
+      "file": "src/routes/api/v1/gpu/orchestrate/+server.ts",
+      "errorCount": 79,
+      "priority": 834,
+      "errorCodes": [
+        "TS1128",
+        "TS1109",
+        "TS1005",
+        "TS1136",
+        "TS1359",
+        "TS1135"
+      ]
+    },
+    {
+      "file": "src/routes/api/v1/vector/matrix/+server.ts",
+      "errorCount": 108,
+      "priority": 818,
+      "errorCodes": [
+        "TS1131",
+        "TS1011",
+        "TS1109",
+        "TS1005",
+        "TS1128",
+        "TS1002",
+        "TS2809",
+        "TS1136",
+        "TS1434",
+        "TS1443"
+      ]
+    },
+    {
+      "file": "src/routes/api/legal-ai/orchestrator/+server.ts",
+      "errorCount": 89,
+      "priority": 817,
+      "errorCodes": [
+        "TS1005",
+        "TS1131",
+        "TS1128",
+        "TS1434",
+        "TS1109",
+        "TS1003",
+        "TS1136",
+        "TS1011"
+      ]
+    },
+    {
+      "file": "src/routes/api/ai/+server.ts",
+      "errorCount": 106,
+      "priority": 816,
+      "errorCodes": [
+        "TS1005",
+        "TS1442",
+        "TS1434",
+        "TS1443",
+        "TS1109",
+        "TS1435",
+        "TS1003",
+        "TS1131"
+      ]
+    },
+    {
+      "file": "src/routes/api/cluster/discovery/+server.ts",
+      "errorCount": 71,
+      "priority": 790,
+      "errorCodes": [
+        "TS1005",
+        "TS1131",
+        "TS1011",
+        "TS1109",
+        "TS1128",
+        "TS1434",
+        "TS1002",
+        "TS1472"
+      ]
+    },
+    {
+      "file": "src/routes/api/ai/recommendation-assistant/+server.ts",
+      "errorCount": 122,
+      "priority": 787,
+      "errorCodes": [
+        "TS1005",
+        "TS1131",
+        "TS1011",
+        "TS1109",
+        "TS1128",
+        "TS1121",
+        "TS1434",
+        "TS1435",
+        "TS1003",
+        "TS1002",
+        "TS1472"
+      ]
+    },
+    {
+      "file": "src/routes/api/v1/storage/delete/+server.ts",
+      "errorCount": 67,
+      "priority": 786,
+      "errorCodes": [
+        "TS1005",
+        "TS1003",
+        "TS1128",
+        "TS1109",
+        "TS1472"
+      ]
+    },
+    {
+      "file": "src/routes/api/rag/enhanced-process/+server.ts",
+      "errorCount": 68,
+      "priority": 778,
+      "errorCodes": [
+        "TS1005",
+        "TS1136",
+        "TS1109",
+        "TS1128",
+        "TS1160"
+      ]
+    },
+    {
+      "file": "src/lib/server/workers/legal-ai-worker.ts",
+      "errorCount": 91,
+      "priority": 776,
+      "errorCodes": [
+        "TS1443",
+        "TS1434",
+        "TS1005",
+        "TS1127",
+        "TS1128",
+        "TS1002",
+        "TS1109",
+        "TS1134",
+        "TS1003",
+        "TS1160"
+      ]
+    },
+    {
+      "file": "src/routes/api/evidence/hash/bulk/+server.ts",
+      "errorCount": 63,
+      "priority": 773,
+      "errorCodes": [
+        "TS1005",
+        "TS1128",
+        "TS1109",
+        "TS1134"
+      ]
+    },
+    {
+      "file": "src/lib/services/quic-auth-client.ts",
+      "errorCount": 85,
+      "priority": 760,
+      "errorCodes": [
+        "TS1131",
+        "TS1011",
+        "TS1128",
+        "TS1434",
+        "TS1068",
+        "TS1005",
+        "TS1136",
+        "TS1109"
+      ]
+    },
+    {
+      "file": "src/lib/services/client-server-sync.ts",
+      "errorCount": 82,
+      "priority": 739,
+      "errorCodes": [
+        "TS1005",
+        "TS1131",
+        "TS1003",
+        "TS1128",
+        "TS1434",
+        "TS1109",
+        "TS1002",
+        "TS1136"
+      ]
+    },
+    {
+      "file": "src/routes/api/ai/multi-agent/+server.ts",
+      "errorCount": 90,
+      "priority": 737,
+      "errorCodes": [
+        "TS1131",
+        "TS1011",
+        "TS1128",
+        "TS1068",
+        "TS1472",
+        "TS1005",
+        "TS1127",
+        "TS1434",
+        "TS1435",
+        "TS1181",
+        "TS1109"
+      ]
+    },
+    {
+      "file": "src/routes/api/ai/lawpdfs/+server.ts",
+      "errorCount": 64,
+      "priority": 729,
+      "errorCodes": [
+        "TS1005",
+        "TS1434",
+        "TS1003",
+        "TS1134",
+        "TS1160"
+      ]
+    },
+    {
+      "file": "src/routes/api/v1/vector/embeddings/+server.ts",
+      "errorCount": 64,
+      "priority": 711,
+      "errorCodes": [
+        "TS1131",
+        "TS1005",
+        "TS1128",
+        "TS1011",
+        "TS1109",
+        "TS1136"
+      ]
+    },
+    {
+      "file": "src/routes/api/mcp/context72/get-library-docs/+server.ts",
+      "errorCount": 64,
+      "priority": 711,
+      "errorCodes": [
+        "TS1109",
+        "TS1005",
+        "TS1127",
+        "TS1161",
+        "TS1110",
+        "TS1128"
+      ]
+    },
+    {
+      "file": "src/routes/api/rag/search/+server.ts",
+      "errorCount": 62,
+      "priority": 709,
+      "errorCodes": [
+        "TS1128",
+        "TS1011",
+        "TS1005",
+        "TS1003",
+        "TS1472",
+        "TS1434",
+        "TS1443",
+        "TS1160"
+      ]
+    },
+    {
+      "file": "src/lib/server/cache/redis.ts",
+      "errorCount": 66,
+      "priority": 688,
+      "errorCodes": [
+        "TS1005",
+        "TS1011",
+        "TS1472",
+        "TS1136",
+        "TS1139"
+      ]
+    },
+    {
+      "file": "src/routes/api/ai/document-drafting/+server.ts",
+      "errorCount": 101,
+      "priority": 685,
+      "errorCodes": [
+        "TS1005",
+        "TS1131",
+        "TS1134",
+        "TS1109",
+        "TS1434",
+        "TS1127",
+        "TS1435",
+        "TS1472"
+      ]
+    },
+    {
+      "file": "src/routes/api/modules/+server.ts",
+      "errorCount": 54,
+      "priority": 674,
+      "errorCodes": [
+        "TS1005",
+        "TS1128",
+        "TS1351",
+        "TS1136",
+        "TS1002"
+      ]
+    },
+    {
+      "file": "src/routes/api/migrations/+server.ts",
+      "errorCount": 54,
+      "priority": 674,
+      "errorCodes": [
+        "TS1005",
+        "TS1129",
+        "TS1128",
+        "TS1472"
+      ]
+    },
+    {
+      "file": "src/routes/api/v1/observability/client/+server.ts",
+      "errorCount": 58,
+      "priority": 651,
+      "errorCodes": [
+        "TS1128",
+        "TS1005",
+        "TS1127",
+        "TS1434",
+        "TS1443",
+        "TS1160"
+      ]
+    },
+    {
+      "file": "src/routes/api/v1/evidence/strategy/[endpoint]/+server.ts",
+      "errorCount": 100,
+      "priority": 648,
+      "errorCodes": [
+        "TS1434",
+        "TS1002",
+        "TS1435",
+        "TS1005",
+        "TS1003",
+        "TS1109",
+        "TS1160"
+      ]
+    },
+    {
+      "file": "src/routes/api/ai/process-document/+server.ts",
+      "errorCount": 72,
+      "priority": 647,
+      "errorCodes": [
+        "TS1131",
+        "TS1011",
+        "TS1128",
+        "TS1109",
+        "TS1005",
+        "TS1434",
+        "TS1435",
+        "TS1134",
+        "TS1472"
+      ]
+    },
+    {
+      "file": "src/lib/server/integrations/ollama.ts",
+      "errorCount": 64,
+      "priority": 632,
+      "errorCodes": [
+        "TS1434",
+        "TS1068",
+        "TS1005",
+        "TS1109",
+        "TS1128",
+        "TS1359",
+        "TS1472",
+        "TS1160"
+      ]
+    },
+    {
+      "file": "src/routes/api/v1/startup/+server.ts",
+      "errorCount": 47,
+      "priority": 622,
+      "errorCodes": [
+        "TS1005",
+        "TS1129",
+        "TS1128"
+      ]
+    },
+    {
+      "file": "src/lib/server/ai/enhanced-orchestrator.ts",
+      "errorCount": 103,
+      "priority": 608,
+      "errorCodes": [
+        "TS1128",
+        "TS1005",
+        "TS1434",
+        "TS1127",
+        "TS1443",
+        "TS1180",
+        "TS1109",
+        "TS1435"
+      ]
+    },
+    {
+      "file": "src/routes/api/benchmark/simd/+server.ts",
+      "errorCount": 47,
+      "priority": 604,
+      "errorCodes": [
+        "TS1005",
+        "TS1128",
+        "TS1109",
+        "TS1127",
+        "TS1160"
+      ]
+    },
+    {
+      "file": "src/routes/api/orchestrator/existing/+server.ts",
+      "errorCount": 87,
+      "priority": 599,
+      "errorCodes": [
+        "TS1005",
+        "TS1359",
+        "TS1180",
+        "TS1109",
+        "TS1434",
+        "TS1435",
+        "TS1003",
+        "TS1228",
+        "TS1127",
+        "TS1443",
+        "TS1128"
+      ]
+    },
+    {
+      "file": "src/routes/api/orchestrator/query/+server.ts",
+      "errorCount": 95,
+      "priority": 598,
+      "errorCodes": [
+        "TS1005",
+        "TS1128",
+        "TS1435",
+        "TS1434",
+        "TS1109",
+        "TS1003",
+        "TS1351",
+        "TS1127",
+        "TS1002"
+      ]
+    }
+  ],
+  "recommendations": [
+    "Fix Critical category first (routes, hooks, layouts)",
+    "Then Important (server APIs, schemas)",
+    "Infrastructure can be deferred if not actively used",
+    "Optional files can be archived or ignored"
+  ],
+  "categoryCounts": {
+    "critical": 576,
+    "infrastructure": 243,
+    "important": 157,
+    "optional": 24
+  },
+  "timestamp": "2025-11-03T10:32:19.8663184-08:00"
+}

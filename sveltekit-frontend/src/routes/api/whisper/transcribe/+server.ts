@@ -5,6 +5,123 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
+import { ENV } from '$lib/server/env.server.js';
+import { extractDocument } from '$lib/server/langextract-client.js';
+import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
+import { generateEmbedding } from '$lib/server/ai/embeddings-simple.js';
+
+interface TranscriptionEnrichment {
+	entities?: Array<{ text: string; label: string; confidence?: number; source?: string }>;
+	ragContext?: Array<{ text: string; score: number; collection: string }>;
+	graphNeighbors?: Array<{ id: string; type: string; label: string }>;
+	summary?: string;
+}
+
+/**
+ * Post-transcription enrichment pipeline:
+ * 1. LangExtract (spaCy NER) + LLM entity extraction (parallel)
+ * 2. If caseId: RAG vector search + KAG graph neighbors + LLM summary
+ */
+async function enrichTranscription(
+	text: string,
+	language: string | null,
+	caseId?: string,
+): Promise<TranscriptionEnrichment> {
+	const enrichment: TranscriptionEnrichment = {};
+	if (!text || text.length < 10) return enrichment;
+
+	// ── Stage 1: Entity extraction (LangExtract + LLM in parallel) ──
+	const [langExtractResult, llmEntities] = await Promise.allSettled([
+		extractDocument(text, {
+			documentType: 'legal',
+			extractEntities: true,
+			language: language ?? 'en',
+		}),
+		extractEntities(text, 20_000),
+	]);
+
+	const allEntities: TranscriptionEnrichment['entities'] = [];
+
+	if (langExtractResult.status === 'fulfilled' && langExtractResult.value?.entities) {
+		for (const e of langExtractResult.value.entities) {
+			allEntities.push({ text: e.text, label: e.label, confidence: e.confidence, source: 'langextract' });
+		}
+	}
+	if (llmEntities.status === 'fulfilled' && llmEntities.value) {
+		for (const e of llmEntities.value) {
+			// Dedupe by text+label
+			if (!allEntities.some(x => x.text === e.text && x.label === e.label)) {
+				allEntities.push({ text: e.text, label: e.label, confidence: e.score, source: e.source ?? 'llm' });
+			}
+		}
+	}
+	if (allEntities.length > 0) enrichment.entities = allEntities;
+
+	// ── Stage 2: RAG + KAG + LLM summary (only with caseId) ──
+	if (caseId) {
+		try {
+			const embedding = await generateEmbedding(text.slice(0, 8000));
+			if (embedding) {
+				const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
+				const searchResult = await qdrant._denseSearch({
+					query: text.slice(0, 500),
+					queryEmbedding: embedding,
+					collection: 'evidence_items',
+					filters: { must: [{ key: 'case_id', match: { value: caseId } }] },
+					limit: 5,
+				});
+				if (searchResult.results.length > 0) {
+					enrichment.ragContext = searchResult.results.map((r: any) => ({
+						text: (r.payload?.text ?? '').slice(0, 300),
+						score: r.score ?? 0,
+						collection: 'evidence_items',
+					}));
+				}
+			}
+		} catch (ragErr) {
+			console.warn('[whisper/enrich] RAG search failed:', (ragErr as Error).message);
+		}
+
+		try {
+			const { getNeo4jMultiHopNeighbors } = await import('$lib/server/retrieval/graph-context.js');
+			const neighbors = await getNeo4jMultiHopNeighbors(caseId);
+			if (neighbors.length > 0) {
+				enrichment.graphNeighbors = neighbors.slice(0, 10).map(n => ({
+					id: n.nodeId,
+					type: n.connectionType ?? 'unknown',
+					label: n.title ?? n.nodeId,
+				}));
+			}
+		} catch (kagErr) {
+			console.warn('[whisper/enrich] KAG graph failed:', (kagErr as Error).message);
+		}
+
+		// LLM summary of transcription + context
+		if (enrichment.ragContext && enrichment.ragContext.length > 0) {
+			try {
+				const { ollamaFetch } = await import('$lib/server/ollama.js');
+				const contextSnippets = enrichment.ragContext.map(r => r.text).join('\n---\n');
+				const summaryResp = await ollamaFetch('/api/generate', {
+					method: 'POST',
+					body: JSON.stringify({
+						model: 'gemma4-legal:latest',
+						prompt: `Summarize this audio transcription in the context of the legal case. Identify key facts, dates, names, and legal relevance.\n\nTranscription:\n${text.slice(0, 6000)}\n\nRelated evidence:\n${contextSnippets.slice(0, 3000)}\n\nProvide a concise 2-3 paragraph summary:`,
+						stream: false,
+						options: { temperature: 0.2, num_predict: 512 },
+					}),
+				});
+				if (summaryResp?.ok) {
+					const summaryData = await summaryResp.json();
+					enrichment.summary = summaryData.response?.trim() ?? null;
+				}
+			} catch (llmErr) {
+				console.warn('[whisper/enrich] LLM summary failed:', (llmErr as Error).message);
+			}
+		}
+	}
+
+	return enrichment;
+}
 
 const MAX_AUDIO_SIZE = 25 * 1024 * 1024; // 25MB
 const ALLOWED_AUDIO_TYPES = new Set([
@@ -32,11 +149,60 @@ const VALID_LANGUAGES = new Set([
 	'ha', 'ba', 'jw', 'su', 'yue',
 ]);
 
+/**
+ * Transcribe via persistent whisper-server.exe HTTP API.
+ * Server keeps model in GPU VRAM — no cold start overhead.
+ */
+async function transcribeViaServer(
+	buffer: Buffer,
+	filename: string,
+	language: string,
+	translate: boolean,
+): Promise<{ ok: true; text: string; language: string | null; segments?: any[] } | null> {
+	const serverUrl = ENV.WHISPER_SERVER_URL;
+
+	// Health check first (fast fail)
+	try {
+		const healthRes = await fetch(`${serverUrl}/health`, { signal: AbortSignal.timeout(2000) });
+		if (!healthRes.ok) return null;
+	} catch {
+		return null;
+	}
+
+	// POST /inference with multipart form
+	const form = new FormData();
+	form.append('file', new Blob([new Uint8Array(buffer)]), filename);
+	form.append('temperature', '0.0');
+	form.append('response_format', 'json');
+	if (language && language !== 'auto') {
+		form.append('language', language);
+	}
+	if (translate) {
+		form.append('translate', 'true');
+	}
+
+	const res = await fetch(`${serverUrl}/inference`, {
+		method: 'POST',
+		body: form,
+		signal: AbortSignal.timeout(120_000), // 2 min max for long audio
+	});
+
+	if (!res.ok) return null;
+
+	const data = await res.json();
+	// whisper-server returns { text: "...", segments: [...] } or similar
+	const text = (data.text ?? '').trim();
+	const detectedLang = data.language ?? null;
+	const segments = Array.isArray(data.segments) ? data.segments : undefined;
+
+	return { ok: true, text, language: detectedLang, segments };
+}
+
 /** POST /api/whisper/transcribe — Transcribe audio via whisper.cpp (CUDA) */
 export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	try {
+  try {
     const formData = await request.formData();
     const audioFile = formData.get('file') as File | null;
 
@@ -67,6 +233,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const languageParam = (formData.get('language') as string | null)?.toLowerCase() ?? 'auto';
     const translate = formData.get('translate') === 'true';
     const timestamps = formData.get('timestamps') === 'true';
+    const enrich = formData.get('enrich') !== 'false'; // default: true
+    const caseId = (formData.get('caseId') as string | null) ?? undefined;
 
     // Validate language code
     if (!VALID_LANGUAGES.has(languageParam)) {
@@ -75,7 +243,55 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     const buffer = Buffer.from(await audioFile.arrayBuffer());
 
-    // Write audio to a temp file — nodejs-whisper requires a file path
+    // ── Tier 1: Persistent whisper-server.exe (no cold start) ──
+    if (ENV.WHISPER_USE_SERVER) {
+      try {
+        const serverResult = await traceLLM(
+          'whisper:transcribe',
+          {
+            model: 'whisper-server',
+            backend: 'whisper-server-cuda',
+            language: languageParam,
+            translate,
+            timestamps,
+            fileSizeBytes: buffer.length,
+            fileType: ext,
+          },
+          async (gen) => {
+            const result = await transcribeViaServer(
+              buffer,
+              audioFile.name,
+              languageParam,
+              translate
+            );
+            gen.end({ output: result ? result.text.slice(0, 500) : 'server-unavailable' });
+            return result;
+          }
+        );
+
+        if (serverResult) {
+          const enrichment = enrich
+            ? await enrichTranscription(serverResult.text, serverResult.language, caseId).catch(() => ({}))
+            : {};
+          return json({
+            ok: true,
+            text: serverResult.text,
+            language: serverResult.language,
+            translated: translate,
+            duration: null,
+            model: 'whisper-server',
+            cuda: true,
+            ...(timestamps && serverResult.segments ? { segments: serverResult.segments } : {}),
+            ...enrichment,
+          });
+        }
+        console.warn('[whisper/transcribe] Server unavailable, falling back to nodejs-whisper');
+      } catch (serverErr) {
+        console.warn('[whisper/transcribe] Server error, falling back:', serverErr);
+      }
+    }
+
+    // ── Tier 2: nodejs-whisper child process (cold start per request) ──
     const tmpPath = join(tmpdir(), `whisper-${randomUUID()}${ext}`);
     try {
       await writeFile(tmpPath, buffer);
@@ -161,12 +377,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
       // Cleanup temp files
       await unlink(tmpPath).catch(() => {});
-      // whisper may also create a .txt file
       const txtPath = wavBase + '.txt';
       await unlink(txtPath).catch(() => {});
-      // Clean up the intermediate .wav if different from input
       if (wavBase !== tmpPath) await unlink(wavBase).catch(() => {});
 
+      const enrichment = enrich
+        ? await enrichTranscription(text, detectedLanguage, caseId).catch(() => ({}))
+        : {};
       return json({
         ok: true,
         text,
@@ -176,6 +393,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         model: whisperModel,
         cuda: useCuda,
         ...(timestamps && segments ? { segments } : {}),
+        ...enrichment,
       });
     } catch (whisperErr) {
       await unlink(tmpPath).catch(() => {});

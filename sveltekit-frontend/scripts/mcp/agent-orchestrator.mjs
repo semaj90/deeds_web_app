@@ -11,6 +11,7 @@ class AgentOrchestrator {
         this.ollamaUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
         this.tritonUrl = process.env.TRITON_URL || 'http://localhost:8000';
         this.mcpUrl = process.env.MCP_URL || 'http://localhost:3003';
+        this.apiToolUrl = process.env.TOOL_API_URL || process.env.APP_URL || 'http://localhost:5173';
         this.conversationState = [];
         this.toolCallLog = [];
 
@@ -200,15 +201,16 @@ class AgentOrchestrator {
      */
     async _callOllama(messages) {
         try {
+            const model = process.env.OLLAMA_MODEL || 'gemma4-legal:latest';
             const response = await fetch(`${this.ollamaUrl}/api/chat`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: 'gemma3-legal:latest',
-                    messages: messages,
-                    tools: this.tools,
-                    stream: false
-                })
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                model,
+                messages: messages,
+                tools: this.tools,
+                stream: false,
+              }),
             });
 
             if (response.ok) {
@@ -366,6 +368,88 @@ class AgentOrchestrator {
         return llmResponse.message?.tool_calls || [];
     }
 
+    _getToolAliases(toolName) {
+        const aliases = {
+            web_search: ['web_search_tool'],
+            web_search_tool: ['web_search'],
+            graph_upsert_edges: ['graph_upsert_relationships'],
+            graph_upsert_relationships: ['graph_upsert_edges']
+        };
+
+        return [toolName, ...(aliases[toolName] || [])];
+    }
+
+    async _callToolEndpoint(toolName, args) {
+        const attempts = [];
+        const aliases = this._getToolAliases(toolName);
+
+        for (const candidateName of aliases) {
+            const directUrl = `${this.mcpUrl.replace(/\/$/, '')}/tools/${candidateName}`;
+            attempts.push({
+                url: directUrl,
+                init: {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(args)
+                },
+                parser: async (response) => await response.json(),
+                candidateName,
+                kind: 'fastmcp-direct'
+            });
+        }
+
+        for (const candidateName of aliases) {
+            const apiUrl = `${this.apiToolUrl.replace(/\/$/, '')}/api/tools/execute`;
+            attempts.push({
+                url: apiUrl,
+                init: {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tool: candidateName, args })
+                },
+                parser: async (response) => await response.json(),
+                candidateName,
+                kind: 'svelte-api-execute'
+            });
+        }
+
+        const failures = [];
+
+        for (const attempt of attempts) {
+            try {
+                const response = await fetch(attempt.url, attempt.init);
+                const payload = await attempt.parser(response);
+
+                if (!response.ok) {
+                    failures.push(`${attempt.kind}:${attempt.candidateName}:${response.status}`);
+                    continue;
+                }
+
+                if (payload?.success === false) {
+                    failures.push(`${attempt.kind}:${attempt.candidateName}:${payload.error || 'execution failed'}`);
+                    continue;
+                }
+
+                return {
+                    ok: true,
+                    candidateName: attempt.candidateName,
+                    endpointKind: attempt.kind,
+                    result: payload?.result ?? payload
+                };
+            } catch (error) {
+                failures.push(`${attempt.kind}:${attempt.candidateName}:${error.message}`);
+            }
+        }
+
+        return {
+            ok: false,
+            result: {
+                error: `Tool execution failed for ${toolName}`,
+                attempts: failures
+            }
+        };
+    }
+
     /**
      * Execute tool calls via MCP server
      */
@@ -387,19 +471,15 @@ class AgentOrchestrator {
             });
 
             try {
-                const response = await fetch(`${this.mcpUrl}/tools/${toolName}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(args)
-                });
+                const execution = await this._callToolEndpoint(toolName, args);
+                const result = execution.result;
 
-                let result;
-                if (response.ok) {
-                    result = await response.json();
-                    console.log(`   ✅ ${toolName} succeeded`);
+                if (execution.ok) {
+                  console.log(
+                    `   ✅ ${toolName} succeeded via ${execution.endpointKind} (${execution.candidateName})`
+                  );
                 } else {
-                    result = { error: `Tool call failed: ${response.status}` };
-                    console.log(`   ❌ ${toolName} failed: ${response.status}`);
+                  console.log(`   ❌ ${toolName} failed across all configured tool endpoints`);
                 }
 
                 results.push({

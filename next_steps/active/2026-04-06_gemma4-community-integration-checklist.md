@@ -73,8 +73,8 @@ config = AgentConfig(
 )
 ```
 **Our implementation**: `AutonomousAgent` class (`autonomous-agent.ts`), 14 LangChain DynamicStructuredTools, `gemma4-legal:latest` LLM.
-**Gap**: AgentExecutor/ReAct agent is commented out — using keyword-based tool selector temporarily.
-**Action**: Restore full LangChain ReAct agent — see `autonomous-agent.ts` TODO comment (import issue to fix).
+**Status**: ✅ LangChain ReAct agent is ACTIVE (re-audit Apr 7: `createReactAgent` imported and used, NOT commented out).
+**Bonus**: LangGraph `SupervisorAgent` with 5 domain-specific subagents also wired at `/api/agent/investigate`.
 
 ---
 
@@ -87,47 +87,31 @@ config = AgentConfig(
 
 ## Gaps to Close 🔧
 
-### G1: Audio Transcription — `whisper/transcribe/+server.ts` ❌ → nodejs-whisper
-**Community**: 0 repos have audio. Confirmed we're pioneering this.
-**Current state**: Returns honest HTTP 501 (fixed this session).
-**Action**:
-```bash
-cd sveltekit-frontend
-npm i nodejs-whisper
-```
-Then wire TODO comment in `src/routes/api/whisper/transcribe/+server.ts`:
-```typescript
-import { nodewhisper } from 'nodejs-whisper';
-const tmpPath = await writeTempFile(buffer, ext);  // write buffer to temp file
-const transcript = await nodewhisper(tmpPath, { modelName: 'base.en', removeWavFileAfterTranscription: true });
-return json({ ok: true, text: transcript });
-```
-Downloads whisper.cpp + `base.en` model (~150 MB) on first run.
+### G1: Audio Transcription — `whisper/transcribe/+server.ts` ✅ DONE (re-audit Apr 7)
+**Community**: 0 repos have audio. We're pioneering this.
+**Current state**: FULLY IMPLEMENTED — `nodejs-whisper` v0.2.9 installed, CUDA acceleration, 99 languages.
+**Features**: Language detection, translate to English, word-level timestamps, JSON segment output.
+**Route**: 25MB limit, 9 MIME types, 8 extensions, auth guard, Langfuse tracing.
 
 ---
 
-### G2: LangChain ReAct Agent — `autonomous-agent.ts` ⚠️ (commented out)
+### G2: LangChain ReAct Agent — `autonomous-agent.ts` ✅ DONE (re-audit Apr 7)
 **Community** (`Chaperone-RAG`, `gemma4-agent-toolkit`): Full agent loops working with LangChain + Gemma4.
-**Current state**: `createReactAgent`/`AgentExecutor` commented out, keyword-based fallback only.
-**Action**: Uncomment and test — the import issue was likely resolved by newer `@langchain/ollama`. Alternatively use LangGraph for the agent loop (what Chaperone-RAG uses):
-```typescript
-import { createReactAgent } from 'langchain/agents';
-import { AgentExecutor } from 'langchain/agents';
-```
-Check `sveltekit-frontend/package.json` for current langchain version first.
+**Current state**: ALL ACTIVE — `createReactAgent` from `@langchain/langgraph/prebuilt` imported and used (NOT commented out).
+**Installed packages**: `@langchain/ollama` v1.0.1, `@langchain/langgraph` v1.2.7, `@langchain/core` v1.0.4, `langchain` v1.0.4
+**3 agent files**:
+- `autonomous-agent.ts` — `ChatOllama` + `createReactAgent` + 14 `DynamicStructuredTool`s
+- `subagents.ts` — 5 domain-specific ReAct agents (audio, document, case, codebase, general)
+- `supervisor.ts` — LangGraph `StateGraph` with LLM intent routing + keyword fallback
+**Note**: Chaperone-RAG is a community reference repo, not our code.
 
 ---
 
-### G3: Image resize for Gemma4 variable token budgets — `vlm-evidence-analyzer.ts` ⚠️
+### G3: Image resize for Gemma4 variable token budgets — `resize-for-vlm.ts` ✅ DONE (re-audit Apr 7)
 **Community pattern** (`gemma4-ocr`): `--max-edge 2048`, DPI 300, auto thumbnail.
-**Current state**: Uses `GEMMA3_VLM_SIZE` constant (896×896 — Gemma3 SigLIP spec).
-**Action**: Update constant name and value for Gemma4's token budgets:
-```typescript
-// Gemma4 E4B variable resolution: 70/140/280/560/1120 tokens
-// 2048px max edge → fills 1120-token budget
-const GEMMA4_VLM_MAX_EDGE = 2048;  // replaces GEMMA3_VLM_SIZE = 896
-```
-File: `sveltekit-frontend/src/lib/server/image/resize-for-vlm.ts`
+**Current state**: ALREADY UPDATED — uses `GEMMA4_VLM_MAX_EDGE = 2048` (not the old `GEMMA3_VLM_SIZE = 896`).
+**File**: `sveltekit-frontend/src/lib/server/image/resize-for-vlm.ts`
+**VLM analyzer**: `vlm-evidence-analyzer.ts` imports `GEMMA4_VLM_MAX_EDGE` correctly.
 
 ---
 
@@ -226,14 +210,14 @@ Testing: Playwright 23-route screenshot suite, graceful AI service skipping
 | VLM OCR | `gemma4-ocr` (poppler+Ollama) | ✅ Same + Triton ensemble fallback |
 | Embeddings | EmbeddingGemma 300M (llama.cpp) | ✅ Same (Ollama, 621 MB) |
 | Hybrid RAG | BM25+RRF (jryhu2gh) | ✅ Fuse.js+Qdrant+PG (stronger) |
-| Tool calling | 14-tool agent (toolkit) | ✅ 14 LangChain tools (ReAct TODO) |
+| Tool calling | 14-tool agent (toolkit) | ✅ 14 LangChain tools + LangGraph supervisor |
 | PDF parsing | PyPDF / poppler | ✅ Granite-Docling 258M (unique) |
 | Legal domain | ❌ None | ✅ GRPO fine-tune |
 | Graph RAG | ❌ None | ✅ KAG Neo4j |
-| Audio | ❌ None | ⚠️ 501 (nodejs-whisper pending) |
+| Audio | ❌ None | ✅ nodejs-whisper CUDA + multilingual (99 langs) |
 | Multi-tenant DB | ❌ None | ✅ PG 16 + Drizzle ORM |
 | Frontend | ❌ CLI / Streamlit | ✅ SvelteKit 5 SSR + SSE |
 | Message queue | ❌ None | ✅ RabbitMQ 7 queues |
 | Playwright tests | ❌ None | ✅ 23-route screenshot suite |
 
-**Bottom line**: The community confirms our VLM + embedding model choices are correct. Our stack is 5-6 layers deeper than anything published. The only gap is audio (nodejs-whisper, ~30 min to wire).
+**Bottom line**: The community confirms our VLM + embedding model choices are correct. Our stack is 5-6 layers deeper than anything published. All gaps (G1-G3) have been closed as of April 7 re-audit. Audio (nodejs-whisper), LangChain ReAct agent, and Gemma4 VLM resize are all implemented.

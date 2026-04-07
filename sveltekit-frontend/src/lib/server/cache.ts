@@ -10,6 +10,7 @@ const SHOULD_USE_REDIS =
   Boolean(process.env.REDIS_URL);
 
 export const MEMORY_CACHE_TTL_MS = 5 * 60 * 1000;
+const MEMORY_CACHE_MAX_ENTRIES = 10_000;
 export const memoryCache = new Map<string, { value: unknown; expiresAt: number }>();
 
 const RATE_LIMIT_TOKENS = Number(process.env.CACHE_RATE_LIMIT_TOKENS ?? 10);
@@ -60,6 +61,13 @@ export async function setCache(
   ttlMs: number = MEMORY_CACHE_TTL_MS
 ): Promise<void> {
   const expiresAt = Date.now() + Math.max(ttlMs, 1);
+
+  // Evict oldest entries if at capacity
+  if (!memoryCache.has(key) && memoryCache.size >= MEMORY_CACHE_MAX_ENTRIES) {
+    const oldest = memoryCache.keys().next().value;
+    if (oldest) memoryCache.delete(oldest);
+  }
+
   memoryCache.set(key, { value, expiresAt });
 
   const client = await getRedisClient();
@@ -105,14 +113,24 @@ export function getFromMemoryCache(key: string): {
 const TOKEN_BUCKET_MAX_ENTRIES = 10_000;
 const tokenBuckets = new Map<string, { tokens: number; lastRefill: number }>();
 
-// Periodic cleanup: evict stale buckets every 60s
+// Periodic cleanup: evict stale buckets + expired cache entries every 60s
 setInterval(() => {
   const now = Date.now();
   for (const [key, bucket] of tokenBuckets) {
-    // Bucket is stale if it hasn't been refilled in 2 windows
     if (now - bucket.lastRefill > RATE_LIMIT_REFILL_MS * 2) {
       tokenBuckets.delete(key);
     }
+  }
+  // Sweep expired memoryCache entries
+  let swept = 0;
+  for (const [key, entry] of memoryCache) {
+    if (now > entry.expiresAt) {
+      memoryCache.delete(key);
+      swept++;
+    }
+  }
+  if (swept > 0) {
+    console.log(`[cache] Swept ${swept} expired entries, ${memoryCache.size} remaining`);
   }
 }, 60_000).unref();
 

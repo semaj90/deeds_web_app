@@ -153,9 +153,16 @@ export async function invalidateModelCache(model: string) {
 // Event driven
 export async function onDocumentIndexed(docId: string): Promise<void> {
     console.log(`📝 Document indexed: ${docId}`);
-    await invalidateAllSearchCaches();
-    await redis.del('stats:knowledge_base');
-    await redis.publish('kb:invalidate', JSON.stringify({ action: 'document_indexed', timestamp: Date.now() }));
+    try {
+      await invalidateAllSearchCaches();
+      await redis.del('stats:knowledge_base');
+      await redis.publish(
+        'kb:invalidate',
+        JSON.stringify({ action: 'document_indexed', timestamp: Date.now() })
+      );
+    } catch (error) {
+      console.error('[knowledge-cache] onDocumentIndexed cache invalidation failed:', error);
+    }
 }
 
 export async function onModelUpdated(model: string): Promise<void> {

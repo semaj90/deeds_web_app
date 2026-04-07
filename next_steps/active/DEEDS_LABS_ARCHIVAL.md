@@ -123,7 +123,7 @@ matched zero files. Always verify dynamic route segments with `ls` or `find`.
 
 ## Type Safety Audit (Backlog)
 
-- **Zod validation**: 118/258 API routes (46%) have validation — 140 remaining
-- **Auth guards**: ~30/258 routes check `locals.user` — ~228 unguarded
+- **Zod validation**: 282/386 API routes (73%) as of Apr 7 — remaining use imported schemas or formData
+- **Auth guards**: 358/386 routes (92.7%) as of Apr 7 — 28 remaining are correctly public
 - **src/lib/services/**: 312 corrupted files blanket-excluded from tsconfig
 - **Drizzle 0.44 + Svelte 5 runes**: Full type review deferred

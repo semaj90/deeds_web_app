@@ -8,7 +8,7 @@
 #
 # DOCKER (all data services):
 #   Default:       postgres, redis, qdrant, minio, rabbitmq    (~6GB)
-#   --profile full: + couchdb, neo4j, nats, go-search          (~8GB)
+#   --profile full: + couchdb, neo4j, nats, go-search, go-embed (~8GB)
 #   --profile gpu:  + tensorrt-llm (stop Ollama first!)        (~16GB)
 #
 # IMPORTANT: Stop native postgres.exe and rabbitmq before starting!
@@ -457,9 +457,9 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 2G
         reservations:
-          memory: 256M
+          memory: 512M
     logging:
       driver: json-file
       options:
@@ -469,6 +469,8 @@ services:
       CLICKHOUSE_DB: default
       CLICKHOUSE_USER: clickhouse
       CLICKHOUSE_PASSWORD: clickhouse_langfuse
+      # Cap ClickHouse memory to prevent OOM crashes (was 1G, kept segfaulting)
+      CLICKHOUSE_MAX_SERVER_MEMORY_USAGE_RATIO: "0.8"
     volumes:
       - langfuse_clickhouse_data:/var/lib/clickhouse
       - langfuse_clickhouse_logs:/var/log/clickhouse-server
@@ -618,6 +620,42 @@ services:
       - legal-ai-network
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:8096/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Go gRPC Embedding Server (Ollama proxy + Redis cache, port 50051)
+  go-embedding-service:
+    build:
+      context: ./services/go-embedding-service
+      dockerfile: Dockerfile
+    container_name: legal-ai-go-embedding
+    restart: unless-stopped
+    profiles: ["full", "gpu"]
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+    ports:
+      - "50051:50051"
+      - "8097:8097"
+    environment:
+      OLLAMA_URL: http://host.docker.internal:11434
+      REDIS_URL: redis://redis:6379
+      EMBED_MODEL: "embeddinggemma:latest"
+      EMBED_BATCH_MAX: "4"
+      GRPC_PORT: "50051"
+      HTTP_PORT: "8097"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - redis
+    networks:
+      - legal-ai-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8097/health"]
       interval: 30s
       timeout: 5s
       retries: 3

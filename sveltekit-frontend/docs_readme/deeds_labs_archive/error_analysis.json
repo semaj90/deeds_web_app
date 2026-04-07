@@ -1,0 +1,402 @@
+[
+  {
+    "Name": "src/lib/server/db/pgvector-service.ts",
+    "Count": 92
+  },
+  {
+    "Name": "src/lib/testing/gpu-markdown.test.ts",
+    "Count": 90
+  },
+  {
+    "Name": "src/lib/server/llm/gemmaIntake.ts",
+    "Count": 78
+  },
+  {
+    "Name": "src/lib/server/services/grpoThinkingService.ts",
+    "Count": 78
+  },
+  {
+    "Name": "src/lib/server/keyword-extractor.ts",
+    "Count": 77
+  },
+  {
+    "Name": "src/lib/server/error-brain/run-tracker.ts",
+    "Count": 76
+  },
+  {
+    "Name": "src/lib/server/config.ts",
+    "Count": 75
+  },
+  {
+    "Name": "src/lib/server/services/unified-vector-service.ts",
+    "Count": 73
+  },
+  {
+    "Name": "src/lib/text/base64-fp32-quantizer.ts",
+    "Count": 72
+  },
+  {
+    "Name": "src/lib/server/db/pgvector-utils.temp.ts",
+    "Count": 71
+  },
+  {
+    "Name": "src/lib/server/db/jsonb-legal-schema.ts",
+    "Count": 69
+  },
+  {
+    "Name": "src/lib/server/acp/phase90-tools.ts",
+    "Count": 68
+  },
+  {
+    "Name": "src/lib/server/terminalFunctions.ts",
+    "Count": 67
+  },
+  {
+    "Name": "src/lib/server/services/statute-search.service.ts",
+    "Count": 67
+  },
+  {
+    "Name": "src/lib/server/error-brain/patch-generator.ts",
+    "Count": 67
+  },
+  {
+    "Name": "src/lib/server/context/contextual.ts",
+    "Count": 66
+  },
+  {
+    "Name": "src/lib/server/llm/ollamaClient.ts",
+    "Count": 66
+  },
+  {
+    "Name": "src/lib/server/db/schema-phase78.ts",
+    "Count": 65
+  },
+  {
+    "Name": "src/lib/server/chrrom/patterns.ts",
+    "Count": 65
+  },
+  {
+    "Name": "src/lib/server/db/vector-operations.ts",
+    "Count": 64
+  },
+  {
+    "Name": "src/lib/storage/unified-dimensional-store.ts",
+    "Count": 64
+  },
+  {
+    "Name": "src/lib/server/logging/production-logger.ts",
+    "Count": 63
+  },
+  {
+    "Name": "src/lib/server/services/advanced-search.ts",
+    "Count": 63
+  },
+  {
+    "Name": "src/lib/server/services/vector.service.ts",
+    "Count": 62
+  },
+  {
+    "Name": "src/lib/server/tensor-acceleration.ts",
+    "Count": 62
+  },
+  {
+    "Name": "src/lib/server/evidence-processing.ts",
+    "Count": 62
+  },
+  {
+    "Name": "src/lib/server/phase78/contextBuilder.ts",
+    "Count": 62
+  },
+  {
+    "Name": "src/lib/services/enhanced-file-upload.ts",
+    "Count": 62
+  },
+  {
+    "Name": "src/lib/server/storage/contextual-attachment-helper.ts",
+    "Count": 61
+  },
+  {
+    "Name": "src/lib/server/db/phase90-helpers.ts",
+    "Count": 61
+  },
+  {
+    "Name": "src/lib/server/api-ssr-helpers.ts",
+    "Count": 59
+  },
+  {
+    "Name": "src/lib/server/services/summarization/gemma-legal-summarizer.ts",
+    "Count": 59
+  },
+  {
+    "Name": "src/lib/server/services/qdrant/dual-collection-strategy.ts",
+    "Count": 59
+  },
+  {
+    "Name": "src/lib/server/db/connection-manager.ts",
+    "Count": 58
+  },
+  {
+    "Name": "src/lib/server/services/gpu-pipeline.ts",
+    "Count": 58
+  },
+  {
+    "Name": "src/lib/moogle/stage6-production-orchestrator.ts",
+    "Count": 58
+  },
+  {
+    "Name": "src/pgvector-indexing-service.ts",
+    "Count": 58
+  },
+  {
+    "Name": "src/lib/server/ingest/extractors.ts",
+    "Count": 58
+  },
+  {
+    "Name": "src/lib/server/vector-cache.ts",
+    "Count": 58
+  },
+  {
+    "Name": "src/lib/server/services/ingestion/embedding-indexer.ts",
+    "Count": 57
+  },
+  {
+    "Name": "src/lib/testing/gpu-markdown-benchmark.ts",
+    "Count": 56
+  },
+  {
+    "Name": "src/lib/errors/featureErrors.ts",
+    "Count": 55
+  },
+  {
+    "Name": "src/lib/server/services/statute-ingestion-service.ts",
+    "Count": 54
+  },
+  {
+    "Name": "src/lib/server/db/couchdb.ts",
+    "Count": 52
+  },
+  {
+    "Name": "src/lib/server/pdf/processor.ts",
+    "Count": 52
+  },
+  {
+    "Name": "src/multi-layer-cache.ts",
+    "Count": 52
+  },
+  {
+    "Name": "src/lib/server/workers/legal-ai-worker.ts",
+    "Count": 51
+  },
+  {
+    "Name": "src/lib/server/services/citation-management.service.ts",
+    "Count": 51
+  },
+  {
+    "Name": "src/lib/services/cognitive-cache-integration.ts",
+    "Count": 51
+  },
+  {
+    "Name": "src/lib/proto/legal-ai-types.ts",
+    "Count": 50
+  },
+  {
+    "Name": "src/lib/server/ingest/embed.ts",
+    "Count": 50
+  },
+  {
+    "Name": "src/lib/server/services/elasticsearch-indexing-service.ts",
+    "Count": 49
+  },
+  {
+    "Name": "src/lib/server/api/response-helper.ts",
+    "Count": 49
+  },
+  {
+    "Name": "src/lib/server/embedding-cache-middleware.ts",
+    "Count": 49
+  },
+  {
+    "Name": "src/lib/server/storage/storage-utils.ts",
+    "Count": 49
+  },
+  {
+    "Name": "src/lib/storage/rag-storage.ts",
+    "Count": 49
+  },
+  {
+    "Name": "src/lib/components/ui/enhanced/Button.stories.ts",
+    "Count": 49
+  },
+  {
+    "Name": "src/lib/server/sse.ts",
+    "Count": 49
+  },
+  {
+    "Name": "src/lib/themes/palette-animations.ts",
+    "Count": 49
+  },
+  {
+    "Name": "src/rabbitmq-service-worker.ts",
+    "Count": 48
+  },
+  {
+    "Name": "src/lib/server/services/audit-service.ts",
+    "Count": 48
+  },
+  {
+    "Name": "src/lib/server/services/streaming-ingestion-pipeline.ts",
+    "Count": 48
+  },
+  {
+    "Name": "src/lib/server/services/clustering/kmeans-service.ts",
+    "Count": 47
+  },
+  {
+    "Name": "src/lib/vector/metadata-encoder.ts",
+    "Count": 47
+  },
+  {
+    "Name": "src/lib/services/chat-vector-storage.ts",
+    "Count": 46
+  },
+  {
+    "Name": "src/lib/server/db/postgres-knowledge.ts",
+    "Count": 46
+  },
+  {
+    "Name": "src/lib/server/services/rag-retrieval-service.ts",
+    "Count": 45
+  },
+  {
+    "Name": "src/lib/db/schema.ts",
+    "Count": 44
+  },
+  {
+    "Name": "src/lib/demos/neural-intent-demo.ts",
+    "Count": 44
+  },
+  {
+    "Name": "src/lib/server/db/seed-simple.ts",
+    "Count": 44
+  },
+  {
+    "Name": "src/lib/gemma3Client.ts",
+    "Count": 44
+  },
+  {
+    "Name": "src/lib/server/concurrent-json-serializer.ts",
+    "Count": 43
+  },
+  {
+    "Name": "src/lib/server/storage/minio-service.ts",
+    "Count": 43
+  },
+  {
+    "Name": "src/lib/server/db/qdrant-sync.ts",
+    "Count": 43
+  },
+  {
+    "Name": "src/lib/server/db/schema-phase90-hardened.ts",
+    "Count": 42
+  },
+  {
+    "Name": "src/lib/server/services/unified-search-service.ts",
+    "Count": 42
+  },
+  {
+    "Name": "src/lib/server/http-cache-headers.ts",
+    "Count": 42
+  },
+  {
+    "Name": "src/lib/server/db/mirror-query.ts",
+    "Count": 41
+  },
+  {
+    "Name": "src/lib/server/db/unified-client.ts",
+    "Count": 40
+  },
+  {
+    "Name": "src/lib/server/auth/custom-adapter.ts",
+    "Count": 40
+  },
+  {
+    "Name": "src/lib/taxonomy/types.ts",
+    "Count": 40
+  },
+  {
+    "Name": "src/lib/server/services/vector-operations.ts",
+    "Count": 39
+  },
+  {
+    "Name": "src/lib/server/services/clustering/xstate-machine.ts",
+    "Count": 39
+  },
+  {
+    "Name": "src/lib/server/services/citation-library.service.ts",
+    "Count": 39
+  },
+  {
+    "Name": "src/lib/server/redis-cache.ts",
+    "Count": 39
+  },
+  {
+    "Name": "src/lib/server/cache/redis-cache.ts",
+    "Count": 39
+  },
+  {
+    "Name": "src/nintendo-memory-manager.ts",
+    "Count": 39
+  },
+  {
+    "Name": "src/lib/server/services/clustering/som-service.ts",
+    "Count": 38
+  },
+  {
+    "Name": "src/lib/server/chat/ssr-qlora-gpu-chat-assistant.ts",
+    "Count": 38
+  },
+  {
+    "Name": "src/lib/systems/contextual-engineering-machine.ts",
+    "Count": 37
+  },
+  {
+    "Name": "src/lib/server/embedding-cache-service.ts",
+    "Count": 37
+  },
+  {
+    "Name": "src/lib/testing/run-json-validation-pipeline.ts",
+    "Count": 36
+  },
+  {
+    "Name": "src/lib/server/db/schema-actual.ts",
+    "Count": 36
+  },
+  {
+    "Name": "src/lib/server/contradictionEngine/llm/reasoningPass.ts",
+    "Count": 36
+  },
+  {
+    "Name": "src/lib/server/lokiHybridStore.ts",
+    "Count": 36
+  },
+  {
+    "Name": "src/lib/server/cases/caseSynthesis.ts",
+    "Count": 36
+  },
+  {
+    "Name": "src/lib/server/helpers/docker-discovery.ts",
+    "Count": 35
+  },
+  {
+    "Name": "src/lib/server/evidence-detective.ts",
+    "Count": 34
+  },
+  {
+    "Name": "src/lib/gpu/markdown-processor.ts",
+    "Count": 33
+  },
+  {
+    "Name": "src/lib/server/redisRateLimit.ts",
+    "Count": 33
+  }
+]

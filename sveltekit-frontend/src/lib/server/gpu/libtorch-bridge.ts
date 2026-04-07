@@ -24,9 +24,10 @@ export interface SimilarityResult {
 }
 
 export interface ClusterResult {
-	assignments: number[];
-	k: number;
-	source: 'gpu' | 'cpu';
+  assignments: number[];
+  centroids?: number[][];
+  k: number;
+  source: 'gpu' | 'cpu';
 }
 
 export interface WeightedEmbeddingResult {

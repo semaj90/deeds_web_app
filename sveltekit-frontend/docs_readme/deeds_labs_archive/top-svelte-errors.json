@@ -1,0 +1,89 @@
+{
+  "timestamp": "2025-11-11T19:27:42.108Z",
+  "top20": [
+    {
+      "code": "unknown",
+      "count": 82573,
+      "severity": "error",
+      "examples": [
+        {
+          "file": "src\\lib\\server\\db\\schema-postgres.ts",
+          "line": 836,
+          "message": "Cannot redeclare block-scoped variable 'documentChunks'."
+        },
+        {
+          "file": "src\\lib\\server\\cache\\redis.ts",
+          "line": 17,
+          "message": "Property 'isReady' does not exist on type 'SimpleRedis'."
+        },
+        {
+          "file": "src\\lib\\server\\cache\\redis.ts",
+          "line": 139,
+          "message": "Property 'isOpen' does not exist on type 'SimpleRedis'."
+        }
+      ]
+    }
+  ],
+  "topFiles": [
+    {
+      "file": "src\\lib\\cache\\loki-redis-integration-fixed.ts",
+      "total": 902,
+      "errors": 902,
+      "warnings": 0
+    },
+    {
+      "file": "src\\lib\\services\\crewai-service.ts",
+      "total": 826,
+      "errors": 826,
+      "warnings": 0
+    },
+    {
+      "file": "src\\lib\\services\\rag-minio-gpu-som-cache.ts",
+      "total": 772,
+      "errors": 772,
+      "warnings": 0
+    },
+    {
+      "file": "src\\lib\\services\\qlora-rl-langextract-integration.ts",
+      "total": 763,
+      "errors": 763,
+      "warnings": 0
+    },
+    {
+      "file": "src\\lib\\services\\advanced_cache_manager.ts",
+      "total": 701,
+      "errors": 701,
+      "warnings": 0
+    },
+    {
+      "file": "src\\lib\\state\\evidenceCustodyMachine.ts",
+      "total": 566,
+      "errors": 566,
+      "warnings": 0
+    },
+    {
+      "file": "src\\routes\\api\\ai\\document-drafting\\templates\\+server.ts",
+      "total": 563,
+      "errors": 563,
+      "warnings": 0
+    },
+    {
+      "file": "src\\lib\\services\\native-windows-service-manager.ts",
+      "total": 553,
+      "errors": 553,
+      "warnings": 0
+    },
+    {
+      "file": "src\\lib\\types\\langchain-ollama-types.ts",
+      "total": 517,
+      "errors": 517,
+      "warnings": 0
+    },
+    {
+      "file": "src\\routes\\help\\+page.svelte",
+      "total": 516,
+      "errors": 516,
+      "warnings": 0
+    }
+  ]
+}

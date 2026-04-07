@@ -477,6 +477,12 @@ async function retrieveContext(
 
       embeddingDims = vector.length;
       embeddingModel = String(embedData.model ?? EMBEDDING_MODEL);
+
+      if (embeddingDims !== 768) {
+        console.warn(`[RAG] Embedding dimension mismatch: expected 768, got ${embeddingDims}`);
+        return [];
+      }
+
       // Store in cache for future queries (fire-and-forget)
       setCachedEmbedding(query, EMBEDDING_MODEL, vector).catch((err) => {
         console.warn('[SSE chat] embedding cache persist failed:', (err as Error)?.message ?? err);

@@ -42,7 +42,7 @@
     const startTime = Date.now();
 
     try {
-      const response = await fetch(`${cudaServiceUrl}/api/v1/search`, {
+      const response = await fetch(`${cudaServiceUrl}/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({

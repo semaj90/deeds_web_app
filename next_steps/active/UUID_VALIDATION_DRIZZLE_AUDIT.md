@@ -139,6 +139,6 @@
 
 ## Verification
 
-- **svelte-check**: 0 errors, 0 warnings after all fixes
-- **Playwright**: 28/28 tests passing
+- **svelte-check**: 0 errors at time of writing (Mar 2026); as of Apr 7: 2 pre-existing errors (dag-cache CouchDB type, mcp/server model property) unrelated to UUID validation
+- **Playwright**: 28/28 UUID validation tests passing (698 total suite as of Apr 7)
 - Validation is additive — only rejects malformed input, no behavior change for valid UUIDs

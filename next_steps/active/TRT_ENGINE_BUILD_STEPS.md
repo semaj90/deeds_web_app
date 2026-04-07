@@ -1,7 +1,7 @@
 # TRT-LLM INT4 Engine Build — Step-by-Step Plan
 
 ## Date: March 10, 2026
-## Status: READY TO EXECUTE
+## Status: NOT EXECUTED — engines never built, docker-compose archived (re-audit Apr 7)
 
 ---
 

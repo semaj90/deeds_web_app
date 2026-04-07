@@ -1,0 +1,50 @@
+{
+  "timestamp": "2025-09-12T06:22:21.025Z",
+  "summary": {
+    "total_endpoints": 90,
+    "already_optimized": 78,
+    "pending_optimization": 12,
+    "categories": 7
+  },
+  "categories": {
+    "utilities_health": {
+      "count": 12,
+      "strategy": "bypass",
+      "memory_bank": "SAVE_RAM",
+      "priority": 50,
+      "redis_type": "generic",
+      "complexity_breakdown": {
+        "high": 3,
+        "medium": 5,
+        "low": 4
+      }
+    },
+    "already_optimized": {
+      "count": 78,
+      "strategy": "skip",
+      "complexity_breakdown": {
+        "high": 39,
+        "medium": 17,
+        "low": 22
+      }
+    }
+  },
+  "performance_projections": {
+    "expected_cache_hit_rate": "75-85%",
+    "expected_response_time_improvement": "40-2500x faster",
+    "expected_cost_reduction": "75%",
+    "expected_memory_savings": "60%"
+  },
+  "deployment_plan": {
+    "phase_1": "Critical endpoints (chat, search, analysis)",
+    "phase_2": "Bulk endpoints (document, generation, utilities)",
+    "phase_3": "Fine-tuning and optimization",
+    "estimated_total_time": "2-3 weeks"
+  },
+  "nintendo_optimizations": {
+    "chr_rom_cache": "Instant UI pattern rendering",
+    "memory_banking": "4-tier Nintendo-style memory management",
+    "background_processing": "Queue complex tasks for non-blocking UX",
+    "agent_memory": "Persistent conversation context"
+  }
+}

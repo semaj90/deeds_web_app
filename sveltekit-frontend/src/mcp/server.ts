@@ -1168,11 +1168,16 @@ function setupToolHandlers() {
           const { generateEmbeddings } = await import('../lib/server/grpc/embedding-client.js');
           const embeddings = await generateEmbeddings(capped);
           return {
-            content: [{ type: 'text', text: JSON.stringify({
-              count: embeddings.length,
-              dimensions: embeddings[0]?.length ?? 0,
-              embeddings,
-            }) }],
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  count: embeddings.vectors.length,
+                  dimensions: embeddings.vectors[0]?.length ?? 0,
+                  embeddings: embeddings.vectors,
+                }),
+              },
+            ],
           };
         }
 

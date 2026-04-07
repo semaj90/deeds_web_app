@@ -1,20 +1,22 @@
 // Package main — Go Legal Library Search Service
 //
 // gRPC server implementing LibrarySearchService proto:
-//   SearchLibrary    — unary parallel fan-out (citation + FTS + pgvector + Qdrant) → RRF
-//   StreamLibrary    — server streaming progressive delivery
-//   GetDocumentToc   — document table-of-contents tree
-//   GetNodeContext   — node with children + chunks + breadcrumb
-//   ResolveCitation  — citation label lookup
-//   Health           — deep health check (pg + redis + qdrant + ollama)
+//
+//	SearchLibrary    — unary parallel fan-out (citation + FTS + pgvector + Qdrant) → RRF
+//	StreamLibrary    — server streaming progressive delivery
+//	GetDocumentToc   — document table-of-contents tree
+//	GetNodeContext   — node with children + chunks + breadcrumb
+//	ResolveCitation  — citation label lookup
+//	Health           — deep health check (pg + redis + qdrant + ollama)
 //
 // Also exposes HTTP on :8096 for SvelteKit direct calls:
-//   GET  /health           — deep health check
-//   POST /search           — parallel search with RRF fusion
-//   GET  /suggest?q=       — autocomplete suggestions
-//   GET  /toc/:id          — document table-of-contents
-//   GET  /node/:id         — node context with chunks + children
-//   POST /citation         — citation resolution
+//
+//	GET  /health           — deep health check
+//	POST /search           — parallel search with RRF fusion
+//	GET  /suggest?q=       — autocomplete suggestions
+//	GET  /toc/:id          — document table-of-contents
+//	GET  /node/:id         — node context with chunks + children
+//	POST /citation         — citation resolution
 //
 // ENV:
 //
@@ -542,7 +544,7 @@ func (s *libraryServer) parallelSearch(ctx context.Context, req *searchRequest) 
 	}
 
 	var wg sync.WaitGroup
-	results := make(chan result, 4)
+	results := make(chan result, 5)
 
 	// 1. Exact citation match
 	wg.Add(1)
@@ -586,6 +588,19 @@ func (s *libraryServer) parallelSearch(ctx context.Context, req *searchRequest) 
 		t := time.Now()
 		hits := s.searchQdrant(searchCtx, embedding, req)
 		results <- result{hits, "qdrant", time.Since(t).Milliseconds()}
+	}()
+
+	// 5. Knowledge base (Qdrant unnamed-vector collection from KB builder)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if embedding == nil {
+			results <- result{nil, "knowledge", 0}
+			return
+		}
+		t := time.Now()
+		hits := s.searchKnowledgeBase(searchCtx, embedding, req)
+		results <- result{hits, "knowledge", time.Since(t).Milliseconds()}
 	}()
 
 	go func() {
@@ -781,12 +796,14 @@ func (s *libraryServer) searchQdrantHybrid(ctx context.Context, embedding []floa
 	}
 
 	// Build hybrid query: dense + sparse prefetch → RRF fusion
+	contentVecName := "content"
 	bm25VecName := "bm25"
 	queryReq := &qdrantclient.QueryPoints{
 		CollectionName: "legal_documents",
 		Prefetch: []*qdrantclient.PrefetchQuery{
 			{
 				Query:  qdrantclient.NewQuery(embedding...),
+				Using:  &contentVecName,
 				Limit:  &prefetchLimit,
 				Filter: filter,
 			},
@@ -832,9 +849,11 @@ func (s *libraryServer) searchQdrantNative(ctx context.Context, embedding []floa
 		conditions = append(conditions, qdrantclient.NewMatch("corpus_type", req.CorpusType))
 	}
 
+	contentVecName := "content"
 	queryReq := &qdrantclient.QueryPoints{
 		CollectionName: "legal_documents",
 		Query:          qdrantclient.NewQuery(embedding...),
+		Using:          &contentVecName,
 		Limit:          &limit,
 		WithPayload:    qdrantclient.NewWithPayload(true),
 	}
@@ -884,14 +903,14 @@ func (s *libraryServer) searchQdrantREST(ctx context.Context, embedding []float3
 		Must []map[string]any `json:"must,omitempty"`
 	}
 	type qdrantReq struct {
-		Vector      []float32     `json:"vector"`
+		Vector      any           `json:"vector"`
 		Limit       int           `json:"limit"`
 		WithPayload bool          `json:"with_payload"`
 		Filter      *qdrantFilter `json:"filter,omitempty"`
 	}
 
 	body := qdrantReq{
-		Vector:      embedding,
+		Vector:      map[string]any{"name": "content", "vector": embedding},
 		Limit:       req.Limit * 2,
 		WithPayload: true,
 	}
@@ -964,6 +983,83 @@ func (s *libraryServer) searchQdrantREST(ctx context.Context, embedding []float3
 		if hit.ChunkID == "" {
 			hit.ChunkID = fmt.Sprintf("qd-%v", r.ID)
 		}
+		hits = append(hits, hit)
+	}
+	return hits
+}
+
+// searchKnowledgeBase searches the knowledge_base Qdrant collection (unnamed vectors, 768-dim).
+// This collection is populated by the knowledge-base-builder and holds web-sourced legal reference content.
+func (s *libraryServer) searchKnowledgeBase(ctx context.Context, embedding []float32, req *searchRequest) []libraryHit {
+	type qdrantReq struct {
+		Vector      []float32 `json:"vector"`
+		Limit       int       `json:"limit"`
+		WithPayload bool      `json:"with_payload"`
+	}
+
+	body := qdrantReq{
+		Vector:      embedding,
+		Limit:       req.Limit * 2,
+		WithPayload: true,
+	}
+
+	jsonBody, _ := json.Marshal(body)
+
+	httpReq, err := http.NewRequestWithContext(ctx, "POST",
+		s.cfg.QdrantURL+"/collections/knowledge_base/points/search",
+		strings.NewReader(string(jsonBody)))
+	if err != nil {
+		return nil
+	}
+	httpReq.Header.Set("Content-Type", "application/json")
+
+	resp, err := s.httpClient.Do(httpReq)
+	if err != nil {
+		slog.Warn("knowledge_base search failed", "error", err)
+		return nil
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		slog.Warn("knowledge_base non-200", "status", resp.StatusCode)
+		return nil
+	}
+
+	var qdResp struct {
+		Result []struct {
+			ID      any            `json:"id"`
+			Score   float64        `json:"score"`
+			Payload map[string]any `json:"payload"`
+		} `json:"result"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&qdResp); err != nil {
+		slog.Warn("knowledge_base decode failed", "error", err)
+		return nil
+	}
+
+	var hits []libraryHit
+	for _, r := range qdResp.Result {
+		hit := libraryHit{
+			Score:     r.Score,
+			MatchType: "knowledge",
+		}
+		if p := r.Payload; p != nil {
+			hit.Title = strVal(p, "title")
+			if hit.Title == "" {
+				hit.Title = strVal(p, "document_name")
+			}
+			hit.Heading = strVal(p, "section")
+			if hit.Heading == "" {
+				hit.Heading = strVal(p, "topic")
+			}
+			hit.Snippet = strVal(p, "content")
+			hit.SourceType = strVal(p, "source")
+			if url := strVal(p, "source_url"); url != "" {
+				hit.OfficialURL = url
+			}
+			hit.CorpusType = "knowledge_base"
+		}
+		hit.ChunkID = fmt.Sprintf("kb-%v", r.ID)
 		hits = append(hits, hit)
 	}
 	return hits
@@ -1058,10 +1154,11 @@ func rrfFusion(allHits map[string][]rankEntry, req *searchRequest) []libraryHit 
 	}
 
 	weights := map[string]float64{
-		"citation": 1.0,
-		"fts":      req.FTSWeight,
-		"vector":   req.VectorWeight,
-		"qdrant":   0.5,
+		"citation":  1.0,
+		"fts":       req.FTSWeight,
+		"vector":    req.VectorWeight,
+		"qdrant":    0.5,
+		"knowledge": 0.5,
 	}
 
 	fused := map[string]*fusedEntry{}
@@ -1218,8 +1315,37 @@ func (s *libraryServer) getQueryEmbedding(ctx context.Context, query string) ([]
 
 func (s *libraryServer) handleHealth(w http.ResponseWriter, r *http.Request) {
 	resp, _ := s.Health(r.Context(), &pb.HealthRequest{})
+
+	// Enrich with Qdrant collection stats (not in proto)
+	var kbPoints, ldPoints uint64
+	if s.qdrant != nil {
+		infoCtx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+		defer cancel()
+		if info, err := s.qdrant.GetCollectionInfo(infoCtx, "knowledge_base"); err == nil && info.PointsCount != nil {
+			kbPoints = *info.PointsCount
+		}
+		if info, err := s.qdrant.GetCollectionInfo(infoCtx, "legal_documents"); err == nil && info.PointsCount != nil {
+			ldPoints = *info.PointsCount
+		}
+	}
+
+	enriched := map[string]any{
+		"status":             resp.Status,
+		"pgvectorConnected":  resp.PgvectorConnected,
+		"qdrantConnected":    resp.QdrantConnected,
+		"redisConnected":     resp.RedisConnected,
+		"embeddingServiceUp": resp.EmbeddingServiceUp,
+		"timestamp":          resp.Timestamp,
+		"indexed_documents":  resp.IndexedDocuments,
+		"indexed_chunks":     resp.IndexedChunks,
+		"qdrant": map[string]any{
+			"legal_documents_points": ldPoints,
+			"knowledge_base_points":  kbPoints,
+		},
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	json.NewEncoder(w).Encode(enriched)
 }
 
 func (s *libraryServer) handleSearch(w http.ResponseWriter, r *http.Request) {

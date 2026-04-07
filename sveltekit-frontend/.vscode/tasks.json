@@ -1,90 +1,6 @@
-{
+	{
 	"version": "2.0.0",
 	"tasks": [
-		{
-			"label": "🧠 Phase 72: RAG/KAG Integration (Full)",
-			"type": "shell",
-			"command": "node",
-			"args": [
-				"scripts/rag-kag-ast-integrator.mjs",
-				"--kb",
-				"project-knowledge-base.tree.json",
-				"--auto-recommendations"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}",
-				"env": {
-					"NODE_OPTIONS": "--max-old-space-size=8192"
-				}
-			},
-			"group": {
-				"kind": "build",
-				"isDefault": false
-			},
-			"detail": "Phase 72: Load AST knowledge base → Qdrant → Generate AI recommendations"
-		},
-		{
-			"label": "🤖 Phase 72: Self-Prompting Agent",
-			"type": "shell",
-			"command": "node",
-			"args": [
-				"--expose-gc",
-				"--max-old-space-size=8192",
-				"scripts/contextual-prompt-engineer.mjs",
-				"--task",
-				"${input:agentTask}",
-				"--iterations",
-				"2"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"group": {
-				"kind": "build",
-				"isDefault": false
-			},
-			"detail": "Phase 72: LangChain-style self-prompting agent with tool calling"
-		},
-		{
-			"label": "🚀 Phase 72: Full RAG Pipeline",
-			"type": "shell",
-			"command": "powershell",
-			"args": [
-				"-NoProfile",
-				"-ExecutionPolicy",
-				"Bypass",
-				"-Command",
-				"Write-Host '🔄 Phase 72: Complete RAG/KAG Pipeline' -ForegroundColor Cyan; Write-Host ''; node scripts/rag-kag-ast-integrator.mjs --auto-recommendations; if ($LASTEXITCODE -eq 0) { Write-Host ''; Write-Host '🤖 Running Self-Prompting Agent...' -ForegroundColor Green; node --expose-gc --max-old-space-size=8192 scripts/contextual-prompt-engineer.mjs --task 'Prioritize fixing high-error files' --iterations 2 }"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"group": {
-				"kind": "build",
-				"isDefault": false
-			},
-			"detail": "Phase 72: Complete pipeline - RAG integration → Self-prompting → Recommendations"
-		},
-		{
-			"label": "📊 Phase 72: Quick Status Check",
-			"type": "shell",
-			"command": "powershell",
-			"args": [
-				"-NoProfile",
-				"-ExecutionPolicy",
-				"Bypass",
-				"-Command",
-				"Write-Host '📊 Phase 72 - RAG/KAG Status Check' -ForegroundColor Cyan; Write-Host ''; Write-Host '1. AST Knowledge Base:' -ForegroundColor Yellow; if (Test-Path 'reports/latest/project-knowledge-base.tree.json') { $kb = Get-Item 'reports/latest/project-knowledge-base.tree.json'; Write-Host \"   ✅ Found: $($kb.Name) ($([math]::Round($kb.Length/1MB, 2)) MB)\" -ForegroundColor Green } else { Write-Host '   ⏳ Not generated yet' -ForegroundColor Yellow }; Write-Host ''; Write-Host '2. Qdrant Collection:' -ForegroundColor Yellow; try { $qdrant = Invoke-RestMethod -Uri 'http://localhost:6333/collections/phase72_ast_knowledge_base' -Method GET -TimeoutSec 5; Write-Host \"   ✅ Collection exists: $($qdrant.result.points_count) vectors\" -ForegroundColor Green } catch { Write-Host '   ⏳ Not loaded yet' -ForegroundColor Yellow }; Write-Host ''; Write-Host '3. Recommendations:' -ForegroundColor Yellow; if (Test-Path 'reports/latest/ast-rag-recommendations.md') { Write-Host '   ✅ Generated' -ForegroundColor Green } else { Write-Host '   ⏳ Not generated yet' -ForegroundColor Yellow }; Write-Host ''"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"group": {
-				"kind": "test",
-				"isDefault": false
-			},
-			"detail": "Phase 72: Check AST KB, Qdrant, and recommendations status"
-		},
 		{
 			"label": "Diagnostics Regression Slice",
 			"type": "shell",
@@ -116,135 +32,9 @@
 			"detail": "Run the focused diagnostics Playwright browser slice"
 		},
 		{
-			"label": "Phase 75: Knowledge Adapter",
-			"type": "shell",
-			"command": "node scripts/phase75-knowledge-adapter.mjs"
-		},
-		{
-			"label": "Phase 75: ACE Agent Analysis",
-			"type": "shell",
-			"command": "node scripts/phase75-ace-agent.mjs"
-		},
-		{
-			"label": "🧠 LLM: Gemini Web Search",
-			"type": "shell",
-			"command": "node",
-			"args": [
-				"scripts/llm-router.mjs",
-				"--provider",
-				"gemini",
-				"--prompt",
-				"${input:llmPrompt}"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}",
-				"env": {
-					"GEMINI_MODEL": "gemini-2.0-flash-exp-1206",
-					"GEMINI_ENABLE_SEARCH": "true"
-				}
-			},
-			"group": "test",
-			"detail": "Test Gemini 3 with Google Search grounding"
-		},
-		{
-			"label": "🔍 LLM: Health Check",
-			"type": "shell",
-			"command": "node",
-			"args": [
-				"scripts/llm-router.mjs",
-				"--health-check"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"group": "test",
-			"detail": "Check status of all LLM providers"
-		},
-		{
-			"label": "⚡ LLM: Compare Providers",
-			"type": "shell",
-			"command": "node",
-			"args": [
-				"scripts/llm-router.mjs",
-				"--compare",
-				"--prompt",
-				"${input:llmPrompt}"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"group": "test",
-			"detail": "Test same prompt across all available LLM providers"
-		},
-		{
-			"label": "🧪 LLM: Test Runner (CLI)",
-			"type": "shell",
-			"command": "node",
-			"args": [
-				"scripts/test-llm.mjs",
-				"--model=${input:llmModel}",
-				"--prompt=${input:llmPrompt}"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"group": "test",
-			"detail": "Run LLM test with specific model"
-		},
-		{
-			"label": "Phase 76: ACE Agent (TS 5.6)",
-			"type": "shell",
-			"command": "node scripts/phase76-ace-prompt-engineer.mjs --task \"Fix TypeScript 5.6 compatibility\" --iterations 2"
-		},
-		{
 			"label": "Run ACE Demo",
 			"type": "shell",
 			"command": "powershell -ExecutionPolicy Bypass -File scripts/run-ace-demo.ps1"
-		},
-		{
-			"label": "🔌 Phase 76: ACP MCP Server",
-			"type": "shell",
-			"command": "node",
-			"args": [
-				"scripts/phase76-acp-server.mjs"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}",
-				"env": {
-					"MCP_PORT": "3003",
-					"ACP_API_URL": "http://localhost:5175/api/acp"
-				}
-			},
-			"isBackground": true,
-			"group": "build",
-			"detail": "Phase 76: Start ACP MCP Server for VS Code integration (14 unified tools)",
-			"problemMatcher": {
-				"pattern": {
-					"regexp": "^$"
-				},
-				"background": {
-					"activeOnStart": true,
-					"beginsPattern": ".*Phase 76.*",
-					"endsPattern": ".*Server running.*"
-				}
-			}
-		},
-		{
-			"label": "🧪 Phase 76: Test ACP Tools",
-			"type": "shell",
-			"command": "powershell",
-			"args": [
-				"-NoProfile",
-				"-ExecutionPolicy",
-				"Bypass",
-				"-Command",
-				"Write-Host '🧪 Phase 76: Testing ACP Tool Registry' -ForegroundColor Cyan; Write-Host ''; Write-Host '1. List all tools:' -ForegroundColor Yellow; $tools = Invoke-RestMethod -Uri 'http://localhost:5175/api/acp/tools'; Write-Host \"   ✅ Found $($tools.count) tools\" -ForegroundColor Green; Write-Host ''; Write-Host '2. Test knowledge:search:' -ForegroundColor Yellow; $body = @{ tool = 'knowledge:search'; args = @{ query = 'Svelte 5 runes'; topK = 3 } } | ConvertTo-Json -Compress; $result = Invoke-RestMethod -Uri 'http://localhost:5175/api/acp/execute' -Method POST -Body $body -ContentType 'application/json'; if ($result.success) { Write-Host \"   ✅ Search successful: $($result.result.results.Count) results\" -ForegroundColor Green } else { Write-Host \"   ❌ Search failed: $($result.error)\" -ForegroundColor Red }; Write-Host ''; Write-Host '3. Test llm:generate:' -ForegroundColor Yellow; $body = @{ tool = 'llm:generate'; args = @{ prompt = 'Hello, world!'; provider = 'ollama'; maxTokens = 50 } } | ConvertTo-Json -Compress; $result = Invoke-RestMethod -Uri 'http://localhost:5175/api/acp/execute' -Method POST -Body $body -ContentType 'application/json'; if ($result.success) { Write-Host \"   ✅ Generation successful\" -ForegroundColor Green; Write-Host \"   Response: $($result.result.text.Substring(0, [Math]::Min(100, $result.result.text.Length)))...\" } else { Write-Host \"   ❌ Generation failed: $($result.error)\" -ForegroundColor Red }; Write-Host ''"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"group": "test",
-			"detail": "Phase 76: Run comprehensive tests on ACP Tool Registry"
 		},
 		{
 			"label": "📚 Svelte 5: Download Docs",
@@ -272,7 +62,7 @@
 				"cwd": "${workspaceFolder}"
 			},
 			"group": "test",
-			"detail": "Phase 76: Query Gemma3 with Svelte docs context (ripgrep-based extraction)"
+			"detail": "Phase 76: Query the current Ollama Svelte-docs context cache for migration guidance"
 		},
 		{
 			"label": "🔧 Svelte 5: Detect Migrations",
@@ -337,227 +127,6 @@
 			"detail": "Phase 76: Run all migration tools (detect + audit + SSR check)"
 		},
 		{
-			"label": "🧠 Phase 79: With Contextual Prompting",
-			"type": "shell",
-			"command": "node",
-			"args": [
-				"scripts/phase79-cognitive-engine.mjs",
-				"--use-context",
-				"--batch-size",
-				"20"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}",
-				"env": {
-					"CONTEXT_ENGINE": "true",
-					"SVELTE_DOCS_PATH": "data/svelte-docs"
-				}
-			},
-			"group": "build",
-			"detail": "Phase 79: Run cognitive engine with Svelte docs context injection"
-		},
-		{
-			"label": "Temp Server",
-			"type": "shell",
-			"command": "npx vite",
-			"args": [
-				"dev",
-				"--port",
-				"5175"
-			],
-			"isBackground": true,
-			"problemMatcher": [],
-			"group": "test"
-		},
-		{
-			"label": "Temp Server 2",
-			"type": "shell",
-			"command": "npx",
-			"args": [
-				"vite",
-				"dev",
-				"--port",
-				"5175"
-			],
-			"isBackground": true,
-			"problemMatcher": [],
-			"group": "test"
-		},
-		{
-			"label": "Temp Test",
-			"type": "shell",
-			"command": "npx",
-			"args": [
-				"playwright",
-				"test",
-				"tests/architecture-demo.spec.ts"
-			],
-			"isBackground": false,
-			"problemMatcher": [],
-			"group": "test"
-		},
-		{
-			"label": "Barrel Store Test",
-			"type": "shell",
-			"command": "npx",
-			"args": [
-				"playwright",
-				"test",
-				"tests/barrel-store.spec.ts"
-			],
-			"isBackground": false,
-			"problemMatcher": [],
-			"group": "test"
-		},
-		{
-			"label": "Barrel Store Test 2",
-			"type": "shell",
-			"command": "npx",
-			"args": [
-				"playwright",
-				"test",
-				"tests/barrel-store.spec.ts"
-			],
-			"isBackground": false,
-			"problemMatcher": [],
-			"group": "test"
-		},
-		{
-			"label": "Barrel Store Test 3",
-			"type": "shell",
-			"command": "npx",
-			"args": [
-				"playwright",
-				"test",
-				"tests/barrel-store.spec.ts"
-			],
-			"isBackground": false,
-			"problemMatcher": [],
-			"group": "test"
-		},
-		{
-			"label": "Barrel Store Test 4",
-			"type": "shell",
-			"command": "npx",
-			"args": [
-				"playwright",
-				"test",
-				"tests/barrel-store.spec.ts"
-			],
-			"isBackground": false,
-			"problemMatcher": [],
-			"group": "test"
-		},
-		{
-			"label": "Barrel Store Test 5",
-			"type": "shell",
-			"command": "npx",
-			"args": [
-				"playwright",
-				"test",
-				"tests/barrel-store.spec.ts"
-			],
-			"isBackground": false,
-			"problemMatcher": [],
-			"group": "test"
-		},
-		{
-			"label": "Run All Tests",
-			"type": "shell",
-			"command": "npx",
-			"args": [
-				"playwright",
-				"test",
-				"tests/barrel-store.spec.ts",
-				"tests/legal-ai.spec.ts"
-			],
-			"isBackground": false,
-			"problemMatcher": [],
-			"group": "test"
-		},
-		{
-			"label": "Barrel Store Test Debug",
-			"type": "shell",
-			"command": "npx",
-			"args": [
-				"playwright",
-				"test",
-				"tests/barrel-store.spec.ts"
-			],
-			"isBackground": false,
-			"problemMatcher": [],
-			"group": "test"
-		},
-		{
-			"label": "🚀 Phase 89: Index All Code Units",
-			"type": "shell",
-			"command": "node",
-			"args": [
-				"scripts/phase89-code-unit-indexer.mjs",
-				"--index"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}",
-				"env": {
-					"PHASE72_PYTHON": "C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\python.exe",
-					"NODE_OPTIONS": "--max-old-space-size=8192"
-				}
-			},
-			"group": "build",
-			"detail": "Phase 89: Index routes + components + modules → Qdrant (SAFE: non-destructive)"
-		},
-		{
-			"label": "📂 Phase 89: Index Routes Only",
-			"type": "shell",
-			"command": "node",
-			"args": [
-				"scripts/phase89-code-unit-indexer.mjs",
-				"--routes"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}",
-				"env": {
-					"PHASE72_PYTHON": "C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\python.exe"
-				}
-			},
-			"group": "build",
-			"detail": "Phase 89: Index SvelteKit routes only (SAFE: non-destructive)"
-		},
-		{
-			"label": "📦 Phase 89: Index Components Only",
-			"type": "shell",
-			"command": "node",
-			"args": [
-				"scripts/phase89-code-unit-indexer.mjs",
-				"--components"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}",
-				"env": {
-					"PHASE72_PYTHON": "C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\python.exe"
-				}
-			},
-			"group": "build",
-			"detail": "Phase 89: Index Svelte components only (SAFE: non-destructive)"
-		},
-		{
-			"label": "🔬 Phase 89: CUDA Clustering",
-			"type": "shell",
-			"command": "powershell",
-			"args": [
-				"-NoProfile",
-				"-ExecutionPolicy",
-				"Bypass",
-				"-Command",
-				"$env:PHASE72_PYTHON = 'C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\python.exe'; & $env:PHASE72_PYTHON scripts/phase89-cuda-clustering.py 2>&1 | Tee-Object -FilePath reports/cuda-clustering-latest.log"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"group": "build",
-			"detail": "Phase 89: GPU-accelerated error clustering on RTX 3060 Ti (SAFE: read-only analysis)"
-		},
-		{
 			"label": "📊 Phase 89: System Status",
 			"type": "shell",
 			"command": "powershell",
@@ -575,24 +144,7 @@
 			"detail": "Phase 89: Check PostgreSQL, Redis, Qdrant, and CUDA status (SAFE: read-only)"
 		},
 		{
-			"label": "🔍 Phase 89: Verify Wiring",
-			"type": "shell",
-			"command": "powershell",
-			"args": [
-				"-NoProfile",
-				"-ExecutionPolicy",
-				"Bypass",
-				"-File",
-				"scripts/phase89-verify-wiring.ps1"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"group": "test",
-			"detail": "Phase 89: Verify all systems are correctly wired (SAFE: read-only)"
-		},
-		{
-			"label": "🌐 Phase 89: Start Topology Explorer",
+			"label": "🌐 Phase 89: Start Analysis Dev Server",
 			"type": "shell",
 			"command": "npm",
 			"args": [
@@ -608,7 +160,7 @@
 			"isBackground": true,
 			"problemMatcher": [],
 			"group": "build",
-			"detail": "Phase 89: Start dev server for AST Topology Explorer at http://localhost:5175/ast-topology"
+			"detail": "Phase 89: Start a secondary dev server on port 5175 for local analysis and indexing flows"
 		},
 		{
 			"label": "🛡️ Phase 89: Safeguard Check",
@@ -628,61 +180,22 @@
 			"detail": "Phase 89: Scan scripts for destructive operations (DROP, DELETE, rm -rf, etc.)"
 		},
 		{
-			"label": "🤖 Phase 89: Agentic Fixer (Auto)",
-			"type": "shell",
-			"command": "node scripts/phase89-agentic-fixer.mjs --limit 50",
-			"group": "build"
-		},
-		{
 			"label": "🧹 Phase 89: Clear Caches (Fix TSServer)",
 			"type": "shell",
 			"command": "Remove-Item -Recurse -Force node_modules/.cache, .svelte-kit, build -ErrorAction SilentlyContinue; echo \"Caches cleared. Please restart VS Code or reload window.\"",
 			"group": "build"
 		},
 		{
-			"label": "🤖 Phase 89: Agentic Fixer (Scale Up)",
-			"type": "shell",
-			"command": "node scripts/phase89-agentic-fixer.mjs --limit 200",
-			"group": "build"
-		},
-		{
 			"label": "🚑 Phase 89: Rescue Indexing",
 			"type": "shell",
-			"command": "node scripts/phase89-code-unit-indexer.mjs --index --rescue",
+			"command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/phase89-corruption-recovery.ps1",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
 			"group": "build"
 		}
 	],
 	"inputs": [
-		{
-			"id": "ripgrepQuery",
-			"type": "promptString",
-			"description": "Enter search query for ripgrep",
-			"default": "on:click"
-		},
-		{
-			"id": "agentTask",
-			"type": "promptString",
-			"description": "Enter task for self-prompting agent",
-			"default": "Fix circular dependencies"
-		},
-		{
-			"id": "llmPrompt",
-			"type": "promptString",
-			"description": "Enter prompt for LLM testing",
-			"default": "What are the latest features in TypeScript 5.6?"
-		},
-		{
-			"id": "llmModel",
-			"type": "pickString",
-			"description": "Select LLM Model",
-			"options": [
-				"ollama",
-				"gemini",
-				"claude",
-				"openai"
-			],
-			"default": "ollama"
-		},
 		{
 			"id": "svelteQuery",
 			"type": "promptString",

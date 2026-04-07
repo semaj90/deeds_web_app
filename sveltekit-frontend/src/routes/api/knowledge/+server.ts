@@ -11,6 +11,8 @@ import { generateSparseVector } from '$lib/server/vector/bm42-sparse.js';
 
 const sql = postgres(getDatabaseUrl());
 const qdrant = new QdrantClient({ url: getQdrantUrl() });
+let knowledgeBaseTableAvailable: boolean | null = null;
+let knowledgeBaseSupportsSparse: boolean | null = null;
 
 /** Scored point returned by Qdrant search/query */
 interface QdrantScoredPoint {
@@ -35,10 +37,18 @@ const GEMINI_API_KEY = ENV.GEMINI_API_KEY;
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
 const LOCAL_LLM = 'gemma4-legal:latest';
 
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
+const MAX_CHUNKS = 500;
+
 /**
  * Extract text from various document formats
  */
 async function extractDocumentText(file: File): Promise<string> {
+  if (file.size > MAX_FILE_SIZE) {
+    throw new Error(
+      `File too large: ${(file.size / 1024 / 1024).toFixed(1)}MB exceeds ${MAX_FILE_SIZE / 1024 / 1024}MB limit`
+    );
+  }
   const buffer = await file.arrayBuffer();
   const ext = file.name.split('.').pop()?.toLowerCase();
 
@@ -66,7 +76,14 @@ function chunkText(text: string, chunkSize = 500, overlap = 100): string[] {
   for (let i = 0; i < text.length; i += chunkSize - overlap) {
     chunks.push(text.slice(i, i + chunkSize));
   }
-  return chunks.filter(c => c.trim().length > 0);
+  const filtered = chunks.filter((c) => c.trim().length > 0);
+  if (filtered.length > MAX_CHUNKS) {
+    console.warn(
+      `[Knowledge] Document produced ${filtered.length} chunks, capping at ${MAX_CHUNKS}`
+    );
+    return filtered.slice(0, MAX_CHUNKS);
+  }
+  return filtered;
 }
 
 /**
@@ -79,15 +96,26 @@ async function generateEmbedding(text: string): Promise<number[]> {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: EMBEDDING_MODEL,
-        prompt: text.substring(0, 8000)
-      })
+        prompt: text.substring(0, 8000),
+      }),
+      signal: AbortSignal.timeout(30_000),
     });
 
+    if (!response.ok) {
+      throw new Error(`Ollama returned ${response.status}`);
+    }
+
     const data = await response.json();
-    return data?.embedding || [];
+    const embedding = data?.embedding;
+    if (!Array.isArray(embedding) || embedding.length === 0) {
+      throw new Error('Empty embedding returned');
+    }
+    return embedding;
   } catch (err) {
-    console.error('Embedding failed:', err);
-    throw new Error('Failed to generate embedding');
+    console.error('[Knowledge] Embedding failed:', err instanceof Error ? err.message : err);
+    throw new Error(
+      `Failed to generate embedding: ${err instanceof Error ? err.message : 'unknown'}`
+    );
   }
 }
 
@@ -96,23 +124,124 @@ async function generateEmbedding(text: string): Promise<number[]> {
  */
 async function ensureQdrantCollection() {
   try {
-    await qdrant.getCollection('knowledge_base');
-    // Ensure sparse vectors configured on existing collection
-    try {
-      await qdrant.updateCollection('knowledge_base', {
-        sparse_vectors: { bm25: {} }
-      });
-    } catch { /* already configured */ }
-  } catch {
-    await qdrant.createCollection('knowledge_base', {
-      vectors: {
-        size: 768,
-        distance: 'Cosine'
-      },
-      sparse_vectors: {
-        bm25: {}
+    const collection = await qdrant.getCollection('knowledge_base');
+    const sparseConfig = (collection as { config?: { sparse_vectors?: Record<string, unknown> } })
+      ?.config?.sparse_vectors;
+    knowledgeBaseSupportsSparse = Boolean(
+      sparseConfig && typeof sparseConfig === 'object' && Object.keys(sparseConfig).length > 0
+    );
+    if (!knowledgeBaseSupportsSparse) {
+      try {
+        await qdrant.updateCollection('knowledge_base', {
+          sparse_vectors: { bm25: {} },
+        });
+        knowledgeBaseSupportsSparse = true;
+      } catch {
+        console.warn(
+          '[Knowledge] Sparse vectors not supported on existing collection; using dense-only'
+        );
       }
-    });
+    }
+  } catch (err) {
+    console.warn(
+      '[Knowledge] Collection not found, creating...',
+      err instanceof Error ? err.message : err
+    );
+    try {
+      await qdrant.createCollection('knowledge_base', {
+        vectors: {
+          size: 768,
+          distance: 'Cosine',
+        },
+        sparse_vectors: {
+          bm25: {},
+        },
+      });
+      knowledgeBaseSupportsSparse = true;
+    } catch (createErr) {
+      console.error(
+        '[Knowledge] Failed to create Qdrant collection:',
+        createErr instanceof Error ? createErr.message : createErr
+      );
+      throw new Error('Qdrant collection unavailable');
+    }
+  }
+}
+
+async function upsertKnowledgePoint(
+  pointId: string,
+  embedding: number[],
+  sparse: ReturnType<typeof generateSparseVector>,
+  payload: Record<string, unknown>
+): Promise<void> {
+  if (knowledgeBaseSupportsSparse !== false) {
+    try {
+      await qd.upsert('knowledge_base', {
+        points: [
+          {
+            id: pointId,
+            vector: {
+              '': embedding,
+              bm25: sparse,
+            },
+            payload: {
+              ...payload,
+              text: String(payload.content ?? '').slice(0, 500),
+            },
+          },
+        ],
+      });
+      knowledgeBaseSupportsSparse = true;
+      return;
+    } catch (error) {
+      knowledgeBaseSupportsSparse = false;
+      console.warn(
+        '[Knowledge] Sparse upsert unavailable for knowledge_base; retrying dense-only.',
+        error
+      );
+    }
+  }
+
+  await qdrant.upsert('knowledge_base', {
+    points: [
+      {
+        id: pointId,
+        vector: embedding,
+        payload: {
+          ...payload,
+          text: String(payload.content ?? '').slice(0, 500),
+        },
+      },
+    ],
+  });
+}
+
+async function persistKnowledgeChunkMetadata(
+  fileName: string,
+  chunkIndex: number,
+  chunk: string,
+  source: string,
+  pointId: string
+): Promise<boolean> {
+  if (knowledgeBaseTableAvailable === false) {
+    return false;
+  }
+
+  try {
+    await sql`
+      INSERT INTO knowledge_base (doc_name, chunk_idx, content, source, embedding_id)
+      VALUES (${fileName}, ${chunkIndex}, ${chunk}, ${source}, ${pointId})
+      ON CONFLICT (embedding_id) DO UPDATE SET content = ${chunk}
+    `;
+    knowledgeBaseTableAvailable = true;
+    return true;
+  } catch (error) {
+    knowledgeBaseTableAvailable = false;
+    console.warn(
+      '[Knowledge] PostgreSQL metadata persistence unavailable; continuing with Qdrant-only ingestion.',
+      error
+    );
+    return false;
   }
 }
 
@@ -139,56 +268,48 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         // Extract text
         const text = await extractDocumentText(file);
         const chunks = chunkText(text);
+        let metadataRows = 0;
 
         // Process chunks
         const pointIds = [];
         for (const [idx, chunk] of chunks.entries()) {
           const embedding = await generateEmbedding(chunk);
 
-          const pointId = Date.now() * 1000 + idx;
+          const pointId = `${file.name}:${idx}:${Date.now()}`;
           const payload = {
             document_name: file.name,
             content: chunk,
             source,
             uploaded_at: new Date().toISOString(),
-            chunk_count: chunks.length
+            chunk_count: chunks.length,
+            chunk_index: idx,
           };
 
           // Generate BM42 sparse vector for hybrid search
           const sparse = generateSparseVector(chunk);
 
-          // Store in Qdrant (dense + sparse vectors)
-          await qd.upsert('knowledge_base', {
-            points: [
-              {
-                id: pointId,
-                vector: {
-                  '': embedding,
-                  'bm25': sparse,
-                },
-                payload: {
-                  ...payload,
-                  text: chunk.slice(0, 500),
-                },
-              }
-            ]
-          });
+          await upsertKnowledgePoint(pointId, embedding, sparse, payload);
 
           pointIds.push(pointId);
 
-          // Store metadata in PostgreSQL
-          await sql`
-            INSERT INTO knowledge_base (doc_name, chunk_idx, content, source, embedding_id)
-            VALUES (${file.name}, ${idx}, ${chunk}, ${source}, ${pointId.toString()})
-            ON CONFLICT (embedding_id) DO UPDATE SET content = ${chunk}
-          `;
+          const persisted = await persistKnowledgeChunkMetadata(
+            file.name,
+            idx,
+            chunk,
+            source,
+            pointId
+          );
+          if (persisted) {
+            metadataRows += 1;
+          }
         }
 
         results.push({
           file: file.name,
           chunks: chunks.length,
           points: pointIds.length,
-          status: 'success'
+          metadata_store: metadataRows > 0 ? 'postgres+qdrant' : 'qdrant-only',
+          status: 'success',
         });
 
       } catch (err) {
@@ -250,8 +371,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
         score_threshold: 0.4,
       });
       results = queryRes.points;
-    } catch {
-      // Fallback to dense-only if sparse not configured
+    } catch (hybridErr) {
+      console.warn('[Knowledge] RRF fusion unavailable, falling back to dense-only:', hybridErr instanceof Error ? hybridErr.message : hybridErr);
       results = await qd.search('knowledge_base', {
         vector: queryEmbedding,
         limit,
@@ -321,7 +442,8 @@ export const PATCH: RequestHandler = async ({ request, locals }) => {
         score_threshold: 0.4,
       });
       searchResults = searchRes.points;
-    } catch {
+    } catch (hybridErr) {
+      console.warn('[Knowledge] PATCH RRF fusion unavailable, falling back to dense-only:', hybridErr instanceof Error ? hybridErr.message : hybridErr);
       searchResults = await qd.search('knowledge_base', {
         vector: queryEmbedding,
         limit: max_context_chunks,
@@ -354,7 +476,7 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
     let response = '';
     let llmUsed = '';
 
-    if (use_gemini && GEMINI_API_KEY) {
+    if (use_gemini && GEMINI_API_KEY && GEMINI_API_KEY.length > 0) {
       llmUsed = 'gemini-2.0-flash-exp';
       const geminiRes = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
@@ -362,9 +484,9 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: augmentedPrompt }] }]
+            contents: [{ parts: [{ text: augmentedPrompt }] }],
           }),
-          signal: AbortSignal.timeout(30_000)
+          signal: AbortSignal.timeout(30_000),
         }
       );
 
@@ -378,10 +500,14 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
         body: JSON.stringify({
           model: LOCAL_LLM,
           prompt: augmentedPrompt,
-          stream: false
-        })
+          stream: false,
+        }),
+        signal: AbortSignal.timeout(60_000),
       });
 
+      if (!ollamaRes.ok) {
+        console.error(`[Knowledge] Ollama generate returned ${ollamaRes.status}`);
+      }
       const ollamaData = await ollamaRes.json();
       response = ollamaData?.response ?? '';
     }

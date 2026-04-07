@@ -1,0 +1,581 @@
+{
+  "timestamp": "2025-11-03T23:04:15.514Z",
+  "filesScanned": 3969,
+  "patterns": {
+    "oldProps": {
+      "count": 8,
+      "files": [
+        {
+          "file": "lib\\components\\ai\\OllamaAutoComplete.svelte",
+          "count": 6
+        },
+        {
+          "file": "lib\\components\\ui\\dialog\\DialogBits.svelte",
+          "count": 1
+        },
+        {
+          "file": "lib\\components\\yorha\\YoRHaNavCard.svelte",
+          "count": 1
+        }
+      ]
+    },
+    "oldReactive": {
+      "count": 40,
+      "files": [
+        {
+          "file": "lib\\components\\ai\\AIChatInterface.svelte",
+          "count": 1
+        },
+        {
+          "file": "lib\\components\\ai\\AIProcessingDashboard.svelte",
+          "count": 1
+        },
+        {
+          "file": "lib\\components\\Chat.svelte",
+          "count": 1
+        },
+        {
+          "file": "lib\\components\\DocumentDetailModal.svelte",
+          "count": 1
+        },
+        {
+          "file": "lib\\components\\editor\\ReportEditor.svelte",
+          "count": 2
+        },
+        {
+          "file": "lib\\components\\EvidenceUpload.svelte",
+          "count": 3
+        },
+        {
+          "file": "lib\\components\\FileUploadSection.svelte",
+          "count": 1
+        },
+        {
+          "file": "lib\\components\\LazyLoader.svelte",
+          "count": 1
+        },
+        {
+          "file": "lib\\components\\legal\\DocumentDetails.svelte",
+          "count": 1
+        },
+        {
+          "file": "lib\\components\\ui\\dialog\\DialogBits.svelte",
+          "count": 1
+        }
+      ]
+    },
+    "oldStore": {
+      "count": 114,
+      "files": [
+        {
+          "file": "lib\\components\\ai\\AIAssistantModal.svelte",
+          "count": 16
+        },
+        {
+          "file": "lib\\components\\ai\\AIChat.svelte",
+          "count": 10
+        },
+        {
+          "file": "lib\\components\\ai\\LocalImageGenerator.svelte",
+          "count": 21
+        },
+        {
+          "file": "lib\\components\\ai\\webgpu\\WebGPUProcessor.svelte",
+          "count": 6
+        },
+        {
+          "file": "lib\\components\\auth\\UserProfileDropdown.svelte",
+          "count": 4
+        },
+        {
+          "file": "lib\\components\\canvas\\RecursiveEvidenceVisualization.svelte",
+          "count": 12
+        },
+        {
+          "file": "lib\\components\\EnhancedLegalAIDemo.svelte",
+          "count": 9
+        },
+        {
+          "file": "lib\\components\\Header.svelte",
+          "count": 1
+        },
+        {
+          "file": "lib\\components\\integration\\LegalAIOrchestrationDemo.svelte",
+          "count": 3
+        },
+        {
+          "file": "lib\\components\\modals\\EvidenceUploadModal.svelte",
+          "count": 2
+        }
+      ]
+    },
+    "svelteComponent": {
+      "count": 44,
+      "files": [
+        {
+          "file": "lib\\components\\ai\\AIServiceStatus.svelte",
+          "count": 4
+        },
+        {
+          "file": "lib\\components\\ai\\EnhancedDocumentUploader.svelte",
+          "count": 4
+        },
+        {
+          "file": "lib\\components\\ai\\EnhancedLegalAIChatWithSynthesis.svelte",
+          "count": 1
+        },
+        {
+          "file": "lib\\components\\ai\\GamingAIButton.svelte",
+          "count": 2
+        },
+        {
+          "file": "lib\\components\\editor\\LegalDocumentEditor.svelte",
+          "count": 1
+        },
+        {
+          "file": "lib\\components\\evidence\\EvidenceUpload.svelte",
+          "count": 1
+        },
+        {
+          "file": "lib\\components\\feedback\\FeedbackAnalyticsDashboard.svelte",
+          "count": 1
+        },
+        {
+          "file": "lib\\components\\forms\\EnhancedFileUpload.svelte",
+          "count": 1
+        },
+        {
+          "file": "lib\\components\\layout\\ProductionLayout.svelte",
+          "count": 2
+        },
+        {
+          "file": "lib\\components\\legal\\EvidenceCustodyFlow.svelte",
+          "count": 1
+        }
+      ]
+    },
+    "slotPattern": {
+      "count": 17,
+      "files": [
+        {
+          "file": "lib\\components\\evidence\\EvidenceCard.svelte",
+          "count": 1
+        },
+        {
+          "file": "lib\\components\\poi\\AddPoiModal.svelte",
+          "count": 1
+        },
+        {
+          "file": "lib\\components\\ui\\dialog\\DialogBits.svelte",
+          "count": 2
+        },
+        {
+          "file": "lib\\components\\ui\\Dropdown.svelte",
+          "count": 1
+        },
+        {
+          "file": "lib\\components\\yorha\\YoRHaNavCard.svelte",
+          "count": 2
+        },
+        {
+          "file": "lib\\ui\\unified\\components\\UnifiedDialog.svelte",
+          "count": 10
+        }
+      ]
+    },
+    "anyType": {
+      "count": 27928,
+      "files": [
+        {
+          "file": "ambient-legacy.d.ts",
+          "count": 1
+        },
+        {
+          "file": "custom-modules.d.ts",
+          "count": 27
+        },
+        {
+          "file": "global.d.ts",
+          "count": 4
+        },
+        {
+          "file": "lib\\actions\\accessibility-actions.ts",
+          "count": 1
+        },
+        {
+          "file": "lib\\actions\\accessibleClick.ts",
+          "count": 1
+        },
+        {
+          "file": "lib\\actors\\embedding-actor.ts",
+          "count": 4
+        },
+        {
+          "file": "lib\\actors\\xstate-actor-wrapper.ts",
+          "count": 11
+        },
+        {
+          "file": "lib\\adapters\\wasm-rabbitmq-bridge.ts",
+          "count": 3
+        },
+        {
+          "file": "lib\\adapters\\webasm-ai-adapter.ts",
+          "count": 14
+        },
+        {
+          "file": "lib\\ai\\accelerated-legal-assistant.ts",
+          "count": 9
+        }
+      ]
+    },
+    "missingType": {
+      "count": 3371,
+      "files": [
+        {
+          "file": "hooks.server.ts",
+          "count": 1
+        },
+        {
+          "file": "lib\\actions\\accessibility-actions.ts",
+          "count": 11
+        },
+        {
+          "file": "lib\\actions\\draggable.ts",
+          "count": 8
+        },
+        {
+          "file": "lib\\adapters\\wasm-rabbitmq-bridge.ts",
+          "count": 1
+        },
+        {
+          "file": "lib\\ai\\enhanced-neo4j-reranker.ts",
+          "count": 1
+        },
+        {
+          "file": "lib\\ai\\ragStreamClient.ts",
+          "count": 14
+        },
+        {
+          "file": "lib\\ai\\unified-llama-examples.ts",
+          "count": 1
+        },
+        {
+          "file": "lib\\api\\services\\embedding-service.ts",
+          "count": 1
+        },
+        {
+          "file": "lib\\api\\utils\\api-helpers.ts",
+          "count": 1
+        },
+        {
+          "file": "lib\\api\\utils\\rate-limiter.ts",
+          "count": 2
+        }
+      ]
+    },
+    "relativeImport": {
+      "count": 460,
+      "files": [
+        {
+          "file": "lib\\adapters\\webasm-ai-adapter.ts",
+          "count": 5
+        },
+        {
+          "file": "lib\\ai\\accelerated-legal-assistant.ts",
+          "count": 4
+        },
+        {
+          "file": "lib\\ai\\cognitive-smart-router.ts",
+          "count": 3
+        },
+        {
+          "file": "lib\\ai\\comprehensive-ai-synthesis-orchestrator.ts",
+          "count": 7
+        },
+        {
+          "file": "lib\\ai\\graph-pattern-autoencoder.ts",
+          "count": 2
+        },
+        {
+          "file": "lib\\ai\\legal-bert-semantic-analyzer.ts",
+          "count": 2
+        },
+        {
+          "file": "lib\\ai\\lod-cache-engine.ts",
+          "count": 3
+        },
+        {
+          "file": "lib\\ai\\pgvector-faiss-bridge.ts",
+          "count": 3
+        },
+        {
+          "file": "lib\\ai\\qlora-topology-predictor.ts",
+          "count": 6
+        },
+        {
+          "file": "lib\\ai\\som-neural-network.ts",
+          "count": 1
+        }
+      ]
+    },
+    "missingImport": {
+      "count": 1142,
+      "files": [
+        {
+          "file": "lib\\ai\\browser-embeddings.ts",
+          "count": 2
+        },
+        {
+          "file": "lib\\ai\\browser-gemma.ts",
+          "count": 2
+        },
+        {
+          "file": "lib\\ai\\browser-rag-chain.ts",
+          "count": 2
+        },
+        {
+          "file": "lib\\ai\\hybrid-embeddings.ts",
+          "count": 2
+        },
+        {
+          "file": "lib\\ai\\unified-llama-examples.ts",
+          "count": 1
+        },
+        {
+          "file": "lib\\caching\\reinforcement-learning-cache.ts",
+          "count": 3
+        },
+        {
+          "file": "lib\\canvas\\AdvancedEvidenceCanvas.svelte",
+          "count": 2
+        },
+        {
+          "file": "lib\\components\\+AddNotesSection.svelte",
+          "count": 3
+        },
+        {
+          "file": "lib\\components\\AdvancedRichTextEditor.svelte",
+          "count": 2
+        },
+        {
+          "file": "lib\\components\\agentic\\AgenticController.svelte",
+          "count": 2
+        }
+      ]
+    },
+    "colonEvent": {
+      "count": 454,
+      "files": [
+        {
+          "file": "lib\\ai\\crewai-legal-agents.ts",
+          "count": 1
+        },
+        {
+          "file": "lib\\ai\\gpu-error-checker.ts",
+          "count": 1
+        },
+        {
+          "file": "lib\\ai\\gpu-inference-examples.ts",
+          "count": 1
+        },
+        {
+          "file": "lib\\ai\\realtime-ui-orchestration.ts",
+          "count": 7
+        },
+        {
+          "file": "lib\\ai\\tensorrt-client.ts",
+          "count": 2
+        },
+        {
+          "file": "lib\\cache\\xstate-cache-integration.ts",
+          "count": 1
+        },
+        {
+          "file": "lib\\client\\actors\\llmStreamActor.ts",
+          "count": 2
+        },
+        {
+          "file": "lib\\components\\ai\\YorhaAIAssistant.svelte",
+          "count": 1
+        },
+        {
+          "file": "lib\\components\\AIAssistant.svelte",
+          "count": 3
+        },
+        {
+          "file": "lib\\components\\editor\\WysiwygEditor.svelte",
+          "count": 1
+        }
+      ]
+    }
+  },
+  "topFiles": [
+    {
+      "file": "lib\\services\\vector-search-service.ts",
+      "patternCount": 1298
+    },
+    {
+      "file": "lib\\components\\ai\\SIMDTextTilingDemo.svelte",
+      "patternCount": 876
+    },
+    {
+      "file": "lib\\server\\search\\vector-search.ts",
+      "patternCount": 705
+    },
+    {
+      "file": "lib\\components\\ai\\cognitive\\CognitiveDocumentationHub.svelte",
+      "patternCount": 622
+    },
+    {
+      "file": "lib\\components\\ai\\SIMDGlyphDemo.svelte",
+      "patternCount": 575
+    },
+    {
+      "file": "lib\\components\\ui\\modular-command\\ModularCommand.svelte",
+      "patternCount": 443
+    },
+    {
+      "file": "routes\\api\\ai\\gpu\\+server.ts",
+      "patternCount": 363
+    },
+    {
+      "file": "routes\\dev\\pgvector-test\\+page.svelte",
+      "patternCount": 334
+    },
+    {
+      "file": "routes\\cuda-streaming\\+page.svelte",
+      "patternCount": 321
+    },
+    {
+      "file": "routes\\api\\ai\\unified-orchestrator\\+server.ts",
+      "patternCount": 320
+    },
+    {
+      "file": "lib\\components\\search\\UniversalSearchBar.svelte",
+      "patternCount": 305
+    },
+    {
+      "file": "lib\\components\\glyph\\GlyphGenerator.svelte",
+      "patternCount": 278
+    },
+    {
+      "file": "lib\\components\\integration\\MipmapOptimizationDemo.svelte",
+      "patternCount": 268
+    },
+    {
+      "file": "lib\\services\\unified-loki-fuzzy-search.ts",
+      "patternCount": 257
+    },
+    {
+      "file": "routes\\dev\\webgpu-diagnostics\\+page.svelte",
+      "patternCount": 244
+    },
+    {
+      "file": "lib\\services\\vertex-buffer-image-analyzer.ts",
+      "patternCount": 243
+    },
+    {
+      "file": "lib\\services\\nvidiaLlamaService.ts",
+      "patternCount": 242
+    },
+    {
+      "file": "lib\\components\\search\\UnifiedSearchBar.svelte",
+      "patternCount": 240
+    },
+    {
+      "file": "routes\\evidence\\hash\\+page.svelte",
+      "patternCount": 233
+    },
+    {
+      "file": "lib\\components\\ai-synthesis-client.svelte",
+      "patternCount": 231
+    }
+  ],
+  "recommendations": [
+    {
+      "pattern": "anyType",
+      "count": 27928,
+      "priority": "MEDIUM",
+      "script": "TypeScript strict mode fixes",
+      "estimatedImpact": 27928,
+      "effort": "HIGH",
+      "description": "Replace 'any' with proper types"
+    },
+    {
+      "pattern": "missingType",
+      "count": 3371,
+      "priority": "MEDIUM",
+      "script": "Manual review",
+      "estimatedImpact": 3371,
+      "effort": "MEDIUM"
+    },
+    {
+      "pattern": "missingImport",
+      "count": 1142,
+      "priority": "MEDIUM",
+      "script": "Manual review",
+      "estimatedImpact": 1142,
+      "effort": "MEDIUM"
+    },
+    {
+      "pattern": "relativeImport",
+      "count": 460,
+      "priority": "MEDIUM",
+      "script": "Manual review",
+      "estimatedImpact": 460,
+      "effort": "MEDIUM"
+    },
+    {
+      "pattern": "colonEvent",
+      "count": 454,
+      "priority": "LOW",
+      "script": "Already migrated (verify)",
+      "estimatedImpact": 454,
+      "effort": "LOW",
+      "description": "Event directives should be onclick/oninput"
+    },
+    {
+      "pattern": "oldStore",
+      "count": 114,
+      "priority": "MEDIUM",
+      "script": "Manual review",
+      "estimatedImpact": 114,
+      "effort": "MEDIUM"
+    },
+    {
+      "pattern": "svelteComponent",
+      "count": 44,
+      "priority": "MEDIUM",
+      "script": "scripts/fix-dynamic-components.mjs (TO BUILD)",
+      "estimatedImpact": 44,
+      "effort": "MEDIUM",
+      "description": "Review <svelte:component> usage"
+    },
+    {
+      "pattern": "oldReactive",
+      "count": 40,
+      "priority": "HIGH",
+      "script": "scripts/migrate-reactive-to-derived.mjs (TO BUILD)",
+      "estimatedImpact": 40,
+      "effort": "HIGH",
+      "description": "Convert '$: derived' to $derived()"
+    },
+    {
+      "pattern": "slotPattern",
+      "count": 17,
+      "priority": "MEDIUM",
+      "script": "Manual review",
+      "estimatedImpact": 17,
+      "effort": "MEDIUM"
+    },
+    {
+      "pattern": "oldProps",
+      "count": 8,
+      "priority": "HIGH",
+      "script": "scripts/migrate-props-to-runes.mjs (TO BUILD)",
+      "estimatedImpact": 8,
+      "effort": "HIGH",
+      "description": "Convert 'export let prop' to $props()"
+    }
+  ]
+}

@@ -178,6 +178,20 @@ if (shouldRunSingletonTasks) {
     )
     .catch((err) => console.warn('[Boot] Chat model warmup: failed:', (err as Error).message));
 
+  // Pre-populate codebase Fuse.js index (avoids cold-start on first search)
+  import('$lib/server/retrieval/codebase-context.js')
+    .then(({ refreshMetadataCache }) => refreshMetadataCache())
+    .then(() => console.log('[Boot] Codebase Fuse index: warmed'))
+    .catch((err) => console.warn('[Boot] Codebase Fuse index: failed:', (err as Error).message));
+
+  // Pre-populate GPU result cache for top 5 recently active cases (avoid cold GPU pass on first query)
+  import('$lib/server/gpu/background-analyzer.js')
+    .then(({ warmupGpuCache }) => warmupGpuCache(5))
+    .then((s) =>
+      console.log(`[Boot] GPU cache warmup: ${s.warmed} warmed, ${s.skipped} cached, ${s.errors} errors`)
+    )
+    .catch((err) => console.warn('[Boot] GPU cache warmup: failed:', (err as Error).message));
+
   // ── VAPID Key Validation ─────────────────────────────────────────────────
   if (ENV.VAPID_PUBLIC_KEY && ENV.VAPID_PRIVATE_KEY) {
     console.log('[Boot] VAPID keys configured — Web Push enabled');

@@ -97,64 +97,125 @@ export interface EvidenceSearchResponse {
 
 const RETRIEVAL_GRPC_URL = ENV.RETRIEVAL_GRPC_URL;
 const RETRIEVAL_GRPC_ENABLED = ENV.RETRIEVAL_GRPC_ENABLED;
+const GO_SEARCH_GRPC_URL = ENV.GO_SEARCH_GRPC_URL;
 
 let grpcClient: any = null;
 let grpcLoadFailed = false;
 let grpcRetryAt = 0; // Timestamp for next retry after failure
 
+let goSearchHealthClient: any = null;
+let goSearchHealthLoadFailed = false;
+let goSearchHealthRetryAt = 0;
+
 async function getGrpcClient(): Promise<any> {
-	if (grpcLoadFailed) {
-		// Retry after 30s instead of permanent disable
-		if (Date.now() < grpcRetryAt) return null;
-		grpcLoadFailed = false;
-		grpcClient = null;
-	}
-	if (grpcClient) return grpcClient;
+  if (grpcLoadFailed) {
+    // Retry after 30s instead of permanent disable
+    if (Date.now() < grpcRetryAt) return null;
+    grpcLoadFailed = false;
+    grpcClient = null;
+  }
+  if (grpcClient) return grpcClient;
 
-	try {
-		const grpc = await import('@grpc/grpc-js');
-		const protoLoader = await import('@grpc/proto-loader');
-		const { resolve } = await import('path');
+  try {
+    const grpc = await import('@grpc/grpc-js');
+    const protoLoader = await import('@grpc/proto-loader');
+    const { resolve } = await import('path');
 
-		const PROTO_PATH = resolve(process.cwd(), 'proto/active/retrieval.proto');
+    const PROTO_PATH = resolve(process.cwd(), 'proto/active/retrieval.proto');
 
-		const packageDefinition = await protoLoader.load(PROTO_PATH, {
-			keepCase: false,
-			longs: Number,
-			enums: String,
-			defaults: true,
-			oneofs: true
-		});
+    const packageDefinition = await protoLoader.load(PROTO_PATH, {
+      keepCase: false,
+      longs: Number,
+      enums: String,
+      defaults: true,
+      oneofs: true,
+    });
 
-		const protoDescriptor = grpc.loadPackageDefinition(packageDefinition) as any;
-		const RetrievalService = protoDescriptor.yorha.retrieval.RetrievalService;
+    const protoDescriptor = grpc.loadPackageDefinition(packageDefinition) as any;
+    const RetrievalService = protoDescriptor.yorha.retrieval.RetrievalService;
 
-		grpcClient = new RetrievalService(
-			RETRIEVAL_GRPC_URL,
-			grpc.credentials.createInsecure(),
-			{
-				// Keepalive: detect dead connections early (10s ping, 5s timeout)
-				'grpc.keepalive_time_ms': 10_000,
-				'grpc.keepalive_timeout_ms': 5_000,
-				'grpc.keepalive_permit_without_calls': 1,
-				// Connection lifecycle: prevent stale connections
-				'grpc.max_connection_idle_ms': 300_000,      // 5min idle disconnect
-				'grpc.max_connection_age_ms': 600_000,       // 10min max age
-				// Message size: 10MB for large retrieval responses
-				'grpc.max_send_message_length': 10 * 1024 * 1024,
-				'grpc.max_receive_message_length': 10 * 1024 * 1024,
-				// HTTP/2: allow pings without active streams
-				'grpc.http2.max_pings_without_data': 0,
-			}
-		);
+    grpcClient = new RetrievalService(RETRIEVAL_GRPC_URL, grpc.credentials.createInsecure(), {
+      // Keepalive: detect dead connections early (10s ping, 5s timeout)
+      'grpc.keepalive_time_ms': 10_000,
+      'grpc.keepalive_timeout_ms': 5_000,
+      'grpc.keepalive_permit_without_calls': 1,
+      // Connection lifecycle: prevent stale connections
+      'grpc.max_connection_idle_ms': 300_000, // 5min idle disconnect
+      'grpc.max_connection_age_ms': 600_000, // 10min max age
+      // Message size: 10MB for large retrieval responses
+      'grpc.max_send_message_length': 10 * 1024 * 1024,
+      'grpc.max_receive_message_length': 10 * 1024 * 1024,
+      // HTTP/2: allow pings without active streams
+      'grpc.http2.max_pings_without_data': 0,
+    });
 
-		return grpcClient;
-	} catch (err) {
-		console.warn('[retrieval-client] gRPC client init failed, will retry in 30s:', (err as Error).message);
-		grpcLoadFailed = true;
-		grpcRetryAt = Date.now() + 30_000;
-		return null;
-	}
+    return grpcClient;
+  } catch (err) {
+    console.warn(
+      '[retrieval-client] gRPC client init failed, will retry in 30s:',
+      (err as Error).message
+    );
+    grpcLoadFailed = true;
+    grpcRetryAt = Date.now() + 30_000;
+    return null;
+  }
+}
+
+async function getGoSearchHealthClient(): Promise<any> {
+  if (goSearchHealthLoadFailed) {
+    if (Date.now() < goSearchHealthRetryAt) return null;
+    goSearchHealthLoadFailed = false;
+    goSearchHealthClient = null;
+  }
+  if (goSearchHealthClient) return goSearchHealthClient;
+
+  try {
+    const grpc = await import('@grpc/grpc-js');
+    const protoLoader = await import('@grpc/proto-loader');
+    const { resolve } = await import('path');
+
+    const protoPath = resolve(process.cwd(), 'proto/active/library_search.proto');
+
+    const packageDefinition = await protoLoader.load(protoPath, {
+      keepCase: true,
+      longs: String,
+      enums: String,
+      defaults: true,
+      oneofs: true,
+    });
+
+    const protoDescriptor = grpc.loadPackageDefinition(packageDefinition) as Record<string, any>;
+    const LibrarySearchService =
+      protoDescriptor.library?.search?.LibrarySearchService ??
+      protoDescriptor.yorha?.legal?.LibrarySearchService ??
+      protoDescriptor.libsearch?.LibrarySearchService ??
+      protoDescriptor.LibrarySearchService;
+
+    if (!LibrarySearchService) {
+      throw new Error('LibrarySearchService not found in library_search.proto');
+    }
+
+    goSearchHealthClient = new LibrarySearchService(
+      GO_SEARCH_GRPC_URL,
+      grpc.credentials.createInsecure(),
+      {
+        'grpc.keepalive_time_ms': 10_000,
+        'grpc.keepalive_timeout_ms': 5_000,
+        'grpc.keepalive_permit_without_calls': 1,
+        'grpc.max_receive_message_length': 10 * 1024 * 1024,
+      }
+    );
+
+    return goSearchHealthClient;
+  } catch (err) {
+    console.warn(
+      '[retrieval-client] go-search gRPC health client init failed, will retry in 30s:',
+      (err as Error).message
+    );
+    goSearchHealthLoadFailed = true;
+    goSearchHealthRetryAt = Date.now() + 30_000;
+    return null;
+  }
 }
 
 // ── gRPC evidence search ────────────────────────────────────────────────
@@ -164,121 +225,121 @@ async function getGrpcClient(): Promise<any> {
  * Returns null if gRPC is disabled/unavailable (caller falls back to inline pipeline).
  */
 export async function searchEvidenceViaGrpc(
-	params: EvidenceSearchParams,
-	timeoutMs = 10_000
+  params: EvidenceSearchParams,
+  timeoutMs = 10_000
 ): Promise<EvidenceSearchResponse | null> {
-	if (!RETRIEVAL_GRPC_ENABLED) return null;
+  if (!RETRIEVAL_GRPC_ENABLED) return null;
 
-	const client = await getGrpcClient();
-	if (!client) return null;
+  const client = await getGrpcClient();
+  if (!client) return null;
 
-	return new Promise((resolve) => {
-		const deadline = new Date(Date.now() + timeoutMs);
+  return new Promise((resolve) => {
+    const deadline = new Date(Date.now() + timeoutMs);
 
-		client.searchEvidence(
-			{
-				query: params.query,
-				caseId: params.caseId ?? '',
-				limit: params.limit ?? 10,
-				expandSections: params.expandSections ?? true,
-				jurisdiction: params.jurisdiction ?? ''
-			},
-			{ deadline },
-			(err: Error | null, response: any) => {
-				if (err) {
-					console.warn('[retrieval-client] gRPC SearchEvidence failed:', err.message);
-					resolve(null);
-					return;
-				}
+    client.searchEvidence(
+      {
+        query: params.query,
+        caseId: params.caseId ?? '',
+        limit: params.limit ?? 10,
+        expandSections: params.expandSections ?? true,
+        jurisdiction: params.jurisdiction ?? '',
+      },
+      { deadline },
+      (err: Error | null, response: any) => {
+        if (err) {
+          console.warn('[retrieval-client] gRPC SearchEvidence failed:', err.message);
+          resolve(null);
+          return;
+        }
 
-				if (!response) {
-					resolve(null);
-					return;
-				}
+        if (!response) {
+          resolve(null);
+          return;
+        }
 
-				// Map proto response to TypeScript interface
-				resolve(mapProtoResponse(response));
-			}
-		);
-	});
+        // Map proto response to TypeScript interface
+        resolve(mapProtoResponse(response));
+      }
+    );
+  });
 }
 
 // ── Response mapping (proto → TS) ───────────────────────────────────────
 
 function mapProtoResult(r: any): SearchResult {
-	return {
-		evidenceId: r.evidenceId ?? '',
-		chunkIndex: r.chunkIndex ?? 0,
-		content: r.content ?? '',
-		score: r.score ?? 0,
-		metadata: {
-			sectionPath: r.metadata?.sectionPath ?? [],
-			heading: r.metadata?.heading ?? '',
-			citations: r.metadata?.citations ?? [],
-			fileName: r.metadata?.fileName ?? '',
-			tokenCount: r.metadata?.tokenCount ?? 0,
-			extractionMethod: r.metadata?.extractionMethod ?? ''
-		},
-		rerank: r.rerank
-			? {
-					cosine: r.rerank.cosine ?? 0,
-					sharedCitations: r.rerank.sharedCitations ?? 0,
-					jurisdictionMatch: r.rerank.jurisdictionMatch ?? 0,
-					sectionProximity: r.rerank.sectionProximity ?? 0,
-					finalScore: r.rerank.finalScore ?? 0
-				}
-			: undefined
-	};
+  return {
+    evidenceId: r.evidenceId ?? '',
+    chunkIndex: r.chunkIndex ?? 0,
+    content: r.content ?? '',
+    score: r.score ?? 0,
+    metadata: {
+      sectionPath: r.metadata?.sectionPath ?? [],
+      heading: r.metadata?.heading ?? '',
+      citations: r.metadata?.citations ?? [],
+      fileName: r.metadata?.fileName ?? '',
+      tokenCount: r.metadata?.tokenCount ?? 0,
+      extractionMethod: r.metadata?.extractionMethod ?? '',
+    },
+    rerank: r.rerank
+      ? {
+          cosine: r.rerank.cosine ?? 0,
+          sharedCitations: r.rerank.sharedCitations ?? 0,
+          jurisdictionMatch: r.rerank.jurisdictionMatch ?? 0,
+          sectionProximity: r.rerank.sectionProximity ?? 0,
+          finalScore: r.rerank.finalScore ?? 0,
+        }
+      : undefined,
+  };
 }
 
 function mapProtoNeighbor(n: any): GraphNeighbor {
-	return {
-		nodeId: n.nodeId ?? '',
-		title: n.title ?? '',
-		evidenceType: n.evidenceType ?? '',
-		connectionType: n.connectionType ?? '',
-		strength: n.strength ?? 0,
-		confidence: n.confidence ?? 0,
-		aiReasoning: n.aiReasoning || undefined,
-	};
+  return {
+    nodeId: n.nodeId ?? '',
+    title: n.title ?? '',
+    evidenceType: n.evidenceType ?? '',
+    connectionType: n.connectionType ?? '',
+    strength: n.strength ?? 0,
+    confidence: n.confidence ?? 0,
+    aiReasoning: n.aiReasoning || undefined,
+  };
 }
 
 function mapProtoDocContext(d: any): DocumentContext | undefined {
-	if (!d) return undefined;
-	return {
-		evidenceId: d.evidenceId ?? '',
-		fileName: d.fileName ?? '',
-		fileType: d.fileType ?? '',
-		description: d.description ?? '',
-		aiSummary: d.aiSummary || undefined,
-		aiTagsJson: d.aiTagsJson || undefined,
-		keyEntitiesJson: d.keyEntitiesJson || undefined,
-	};
+  if (!d) return undefined;
+  return {
+    evidenceId: d.evidenceId ?? '',
+    fileName: d.fileName ?? '',
+    fileType: d.fileType ?? '',
+    description: d.description ?? '',
+    aiSummary: d.aiSummary || undefined,
+    aiTagsJson: d.aiTagsJson || undefined,
+    keyEntitiesJson: d.keyEntitiesJson || undefined,
+  };
 }
 
 function mapProtoResponse(response: any): EvidenceSearchResponse {
-	return {
-		results: (response.results ?? []).map(mapProtoResult),
-		bundles: (response.bundles ?? []).map((b: any) => ({
-			hit: mapProtoResult(b.hit),
-			siblings: (b.siblings ?? []).map(mapProtoResult),
-			sectionPath: b.sectionPath ?? [],
-			heading: b.heading ?? '',
-			citations: b.citations ?? [],
-			graphNeighbors: (b.graphNeighbors ?? []).map(mapProtoNeighbor),
-			documentContext: mapProtoDocContext(b.documentContext),
-		})),
-		timing: {
-			embedMs: Math.round(response.timing?.embedMs ?? 0),
-			searchMs: Math.round(response.timing?.searchMs ?? 0),
-			rerankMs: Math.round(response.timing?.rerankMs ?? 0),
-			hopMs: Math.round(response.timing?.hopMs ?? 0),
-			kagMs: Math.round(response.timing?.kagMs ?? 0),
-			dagMs: Math.round(response.timing?.dagMs ?? 0),
-			totalMs: Math.round(response.timing?.totalMs ?? 0),
-		},
-		cacheSource: response.cacheSource || undefined
-	};
+  return {
+    results: (response.results ?? []).map(mapProtoResult),
+    bundles: (response.bundles ?? []).map((b: any) => ({
+      hit: mapProtoResult(b.hit),
+      siblings: (b.siblings ?? []).map(mapProtoResult),
+      sectionPath: b.sectionPath ?? [],
+      heading: b.heading ?? '',
+      citations: b.citations ?? [],
+      graphNeighbors: (b.graphNeighbors ?? []).map(mapProtoNeighbor),
+      documentContext: mapProtoDocContext(b.documentContext),
+    })),
+    timing: {
+      embedMs: Math.round(response.timing?.embedMs ?? 0),
+      searchMs: Math.round(response.timing?.searchMs ?? 0),
+      rerankMs: Math.round(response.timing?.rerankMs ?? 0),
+      hopMs: Math.round(response.timing?.hopMs ?? 0),
+      kagMs: Math.round(response.timing?.kagMs ?? 0),
+      dagMs: Math.round(response.timing?.dagMs ?? 0),
+      totalMs: Math.round(response.timing?.totalMs ?? 0),
+    },
+    cacheSource: response.cacheSource || undefined,
+  };
 }
 
 // ── Health check ────────────────────────────────────────────────────────
@@ -287,38 +348,72 @@ function mapProtoResponse(response: any): EvidenceSearchResponse {
  * Check gRPC RetrievalService health.
  */
 export async function checkRetrievalHealth(): Promise<{
-	available: boolean;
-	enabled: boolean;
-	url: string;
-	status?: string;
-	pgvectorConnected?: boolean;
-	qdrantConnected?: boolean;
+  available: boolean;
+  enabled: boolean;
+  url: string;
+  status?: string;
+  pgvectorConnected?: boolean;
+  qdrantConnected?: boolean;
+  service?: string;
 }> {
-	const base = { enabled: RETRIEVAL_GRPC_ENABLED, url: RETRIEVAL_GRPC_URL };
+  const base = { enabled: RETRIEVAL_GRPC_ENABLED, url: RETRIEVAL_GRPC_URL };
 
-	if (!RETRIEVAL_GRPC_ENABLED) {
-		return { ...base, available: false };
-	}
+  if (RETRIEVAL_GRPC_ENABLED) {
+    const client = await getGrpcClient();
+    if (!client) {
+      return { ...base, available: false, service: 'retrieval-service' };
+    }
 
-	const client = await getGrpcClient();
-	if (!client) {
-		return { ...base, available: false };
-	}
+    return new Promise((resolve) => {
+      const deadline = new Date(Date.now() + 3000);
+      client.health({ service: 'retrieval' }, { deadline }, (err: any, response: any) => {
+        if (err) {
+          resolve({ ...base, available: false, service: 'retrieval-service' });
+          return;
+        }
+        resolve({
+          ...base,
+          available: response.status === 'healthy',
+          status: response.status,
+          pgvectorConnected: response.pgvectorConnected,
+          qdrantConnected: response.qdrantConnected,
+          service: 'retrieval-service',
+        });
+      });
+    });
+  }
 
-	return new Promise((resolve) => {
-		const deadline = new Date(Date.now() + 3000);
-		client.health({ service: 'retrieval' }, { deadline }, (err: any, response: any) => {
-			if (err) {
-				resolve({ ...base, available: false });
-				return;
-			}
-			resolve({
-				...base,
-				available: response.status === 'healthy',
-				status: response.status,
-				pgvectorConnected: response.pgvectorConnected,
-				qdrantConnected: response.qdrantConnected
-			});
-		});
-	});
+  const goBase = { enabled: false, url: GO_SEARCH_GRPC_URL };
+  const client = await getGoSearchHealthClient();
+  if (!client) {
+    return { ...goBase, available: false, service: 'go-search-library' };
+  }
+
+  return new Promise((resolve) => {
+    const deadline = new Date(Date.now() + 3000);
+    const healthMethod =
+      typeof client.Health === 'function'
+        ? client.Health.bind(client)
+        : client.health?.bind(client);
+
+    if (!healthMethod) {
+      resolve({ ...goBase, available: false, service: 'go-search-library' });
+      return;
+    }
+
+    healthMethod({}, { deadline }, (err: any, response: any) => {
+      if (err) {
+        resolve({ ...goBase, available: false, service: 'go-search-library' });
+        return;
+      }
+      resolve({
+        ...goBase,
+        available: response.status === 'healthy',
+        status: response.status,
+        pgvectorConnected: response.pgvectorConnected,
+        qdrantConnected: response.qdrantConnected,
+        service: 'go-search-library',
+      });
+    });
+  });
 }

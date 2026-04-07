@@ -1,0 +1,141 @@
+{
+  "timestamp": "2025-09-14T23:44:12.134Z",
+  "componentsAnalyzed": 192,
+  "issuesFound": 21,
+  "criticalErrors": 17,
+  "warningsCount": 161,
+  "actionItems": [
+    "Fix 17 critical component errors",
+    "Fix 3 potential memory leaks",
+    "Improve accessibility in 76 components"
+  ],
+  "errors": [
+    {
+      "file": "AdvancedRichTextEditor.svelte",
+      "issues": 1,
+      "critical": true
+    },
+    {
+      "file": "FabricEvidenceCanvas.svelte",
+      "issues": 1,
+      "critical": true
+    },
+    {
+      "file": "CanvasEditor.svelte",
+      "issues": 1,
+      "critical": true
+    },
+    {
+      "file": "ComprehensiveUploadAnalytics.svelte",
+      "issues": 1,
+      "critical": true
+    },
+    {
+      "file": "UploadZone.svelte",
+      "issues": 1,
+      "critical": true
+    },
+    {
+      "file": "ProfessionalEditor.svelte",
+      "issues": 1,
+      "critical": true
+    },
+    {
+      "file": "NierRichTextEditor.svelte",
+      "issues": 1,
+      "critical": true
+    },
+    {
+      "file": "EnhancedCanvasEditor.svelte",
+      "issues": 1,
+      "critical": true
+    },
+    {
+      "file": "EnhancedLegalUploadAnalytics.svelte",
+      "issues": 1,
+      "critical": true
+    },
+    {
+      "file": "EnhancedEvidenceBoard.svelte",
+      "issues": 1,
+      "critical": true
+    },
+    {
+      "file": "EvidenceProcessingWorkflow.svelte",
+      "issues": 1,
+      "critical": true
+    },
+    {
+      "file": "VisualEvidenceEditor.svelte",
+      "issues": 1,
+      "critical": true
+    },
+    {
+      "file": "ReportEditor.svelte",
+      "issues": 2,
+      "critical": true
+    },
+    {
+      "file": "AdvancedRichTextEditor.svelte",
+      "issues": 1,
+      "critical": true
+    },
+    {
+      "file": "UnifiedCanvasIntegration.svelte",
+      "issues": 1,
+      "critical": true
+    },
+    {
+      "file": "N64MinIOUpload.svelte",
+      "issues": 1,
+      "critical": true
+    },
+    {
+      "file": "OptimizedMinIOUpload.svelte",
+      "issues": 1,
+      "critical": true
+    }
+  ],
+  "topWarnings": [
+    {
+      "file": "AdvancedEvidenceCanvas.svelte",
+      "warnings": 4
+    },
+    {
+      "file": "AIAssistantChat.svelte",
+      "warnings": 2
+    },
+    {
+      "file": "AIChat.svelte",
+      "warnings": 1
+    },
+    {
+      "file": "AIChatInput.svelte",
+      "warnings": 2
+    },
+    {
+      "file": "AIChatInterface.svelte",
+      "warnings": 1
+    },
+    {
+      "file": "AIChatWidget.svelte",
+      "warnings": 1
+    },
+    {
+      "file": "ChatInterface.svelte",
+      "warnings": 2
+    },
+    {
+      "file": "ChatMessage.svelte",
+      "warnings": 1
+    },
+    {
+      "file": "ClientSideAIChat.svelte",
+      "warnings": 1
+    },
+    {
+      "file": "DocumentUploadSimulator.svelte",
+      "warnings": 2
+    }
+  ]
+}

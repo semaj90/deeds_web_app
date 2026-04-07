@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "phase76:worker": "tsx workers/ai-processor.ts",
+    "phase76:dev": "npm run phase76:worker & npm run dev",
+    "phase76:test": "playwright test tests/e2e/chat.spec.ts",
+    "phase76:test:headed": "playwright test tests/e2e/chat.spec.ts --headed",
+    "phase76:services": "pwsh -File scripts/start-services.ps1",
+    "phase76:full": "pwsh -File scripts/run-e2e-test.ps1"
+  }
+}

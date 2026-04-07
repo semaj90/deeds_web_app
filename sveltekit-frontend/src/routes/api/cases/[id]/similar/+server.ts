@@ -101,7 +101,7 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 		triggerGraph: url.searchParams.get('triggerGraph') ?? undefined
 	});
 	if (!queryParsed.success) {
-		return json({ error: queryParsed.error.issues[0]?.message ?? 'Invalid query parameters' }, { status: 400 });
+		return json({ error: 'Invalid query parameters' }, { status: 400 });
 	}
 	const { limit, includeEmbedding, triggerGraph } = queryParsed.data;
 	const userId = locals.user.id;
@@ -265,7 +265,7 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 
 		return json(response);
 	} catch (err) {
-		console.error('[Case Similarity] Error:', err);
+		console.error('[Case Similarity] Error:', err instanceof Error ? err.message : err);
 		return json(
       {
         query: { caseId, title: '' },

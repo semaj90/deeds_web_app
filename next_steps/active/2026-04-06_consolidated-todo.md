@@ -47,21 +47,22 @@
 |----------|------|---------|--------|--------|
 | ~~P1~~ | ~~Fix stale comment "Resize to Gemma3 native 896×896"~~ | ~~`vlm-evidence-analyzer.ts:210`~~ | ~~1 min~~ | ~~Clarity~~ ✅ Fixed + all stale Gemma3→Gemma4 refs across 17 files |
 | ~~P1~~ | ~~Wire `SearXNG` as default web search backend for agent~~ | ~~`autonomous-agent.ts` tools~~ | ~~30 min~~ | ~~Agent search quality~~ ✅ Done |
-| ~~P2~~ | ~~Fuse.js cold-start pre-population~~ | ~~`/api/indexing/reindex` trigger~~ | ~~1 hr~~ | ~~Search UX on first load~~ ✅ Done |
+| ~~P2~~ | ~~Fuse.js cold-start pre-population~~ | ~~`hooks.server.ts` boot warmup~~ | ~~1 hr~~ | ~~Search UX on first load~~ ✅ `refreshMetadataCache()` called at boot in hooks.server.ts |
 | ~~P2~~ | ~~DAG/CouchDB production validation~~ | ~~`document-dag.ts`~~ | ~~1 hr~~ | ~~Citation ordering reliability~~ ✅ Validated: CouchDB 3.3.3, dag_cache has 11 docs |
 | ~~P2~~ | ~~Citations schema alignment (Drizzle vs actual DB)~~ | ~~Citations queries using `sql<T>`~~ | ~~1 hr~~ | ~~Query correctness~~ ✅ Already aligned (16/16 columns match) |
 | ~~P3~~ | ~~Langfuse spans in whisper route~~ | ~~`whisper/transcribe/+server.ts`~~ | ~~30 min~~ | ~~Observability~~ ✅ traceLLM wrapper added |
-| P3 | GPU result cache warm-up on app start | `background-analyzer.ts` | 1 hr | Cold-start latency |
+| ~~P3~~ | ~~GPU result cache warm-up on app start~~ | ~~`background-analyzer.ts`~~ | ~~1 hr~~ | ~~Cold-start latency~~ ✅ `warmupGpuCache(5)` added to hooks.server.ts boot tasks |
 
 ### Infrastructure (Requires Setup/Config)
 
 | Priority | Task | Details | Effort |
 |----------|------|---------|--------|
 | ~~P1~~ | ~~Add Neo4j to `docker-compose.yml`~~ | ~~`neo4j:5-community`, ports 7474/7687~~ | ~~15 min~~ ✅ Already in docker-compose.yml + seeded |
-| P2 | Persistent `whisper-server.exe` mode | HTTP server eliminates 2-3s cold start per request | 2 hr |
-| P2 | Go gRPC embedding server reactivation | Unarchive from `deeds_labs/`, update proto, deploy | 3 hr |
+| ~~P2~~ | ~~Persistent `whisper-server.exe` mode~~ | ~~HTTP server eliminates 2-3s cold start per request~~ | ~~2 hr~~ ✅ Route updated with Tier 1 server mode + Tier 2 nodejs-whisper fallback; env vars `WHISPER_SERVER_URL`/`WHISPER_USE_SERVER` in env.server.ts; health check in infrastructure status; startup script at `scripts/whisper-server-start.cmd` |
+| ~~P2~~ | ~~Go gRPC embedding server reactivation~~ | ~~Unarchive from `deeds_labs/`, update proto, deploy~~ | ~~3 hr~~ ✅ New `services/go-embedding-service/` — Ollama proxy + Redis cache, batch embeddings, gRPC :50051 + HTTP :8097, Dockerfile ready |
 | P3 | Benchmark whisper CUDA vs CPU | Compare latency on RTX 3060 Ti | 30 min |
-| P3 | Upgrade whisper model (base → small) | `download-ggml-model.cmd small` (~466 MB) | 30 min |
+| ~~P3~~ | ~~Evaluate whisper model upgrade~~ | ~~Keeping **base** (~142 MB, multilingual — 99 languages). `small`/`small.en` (~466 MB) trades multilingual for ~3% better English WER.~~ | ~~Decision: Keep base~~ ✅ |
+| ~~P2~~ | ~~Wire audio→LangExtract→RAG→LLM pipeline~~ | ~~`enrichTranscription()` in whisper route: (1) LangExtract spaCy NER + LLM entity extraction (parallel), (2) RAG dense search on evidence_items with caseId filter, (3) KAG Neo4j multi-hop graph neighbors, (4) LLM summary via Gemma4 (transcription + context). `enrich` + `caseId` form params added.~~ | ~~Done~~ ✅ |
 
 ### Colab/Training (Requires GPU Cloud)
 
@@ -72,15 +73,21 @@
 
 ### Future Sprint (P3+ Deferred)
 
-| Task | Details |
-|------|---------|
-| Triton/TRT-LLM WSL2 deployment | 10-phase hardware checklist, ~1.5-2x throughput |
-| gRPC ToolCallingService | `tool_calling.proto` → MCP becomes gRPC client |
-| gRPC RetrievalService | `retrieval.proto` → end-to-end RAG over protobuf |
-| Whisper gRPC service | Persistent server → gRPC wrapper → N-API addon |
-| Python FastAPI audio microservice | Gemma4 E4B HF Transformers for audio ASR |
-| simdjson integration | Low priority — gRPC already eliminates 90% JSON overhead |
-| LangChain ReAct agent improvements | `synthesizeAnswer()` canned responses need LLM synthesis |
+| Task | Details | Status |
+|------|---------|--------|
+| Triton/TRT-LLM WSL2 deployment | 10-phase hardware checklist, ~1.5-2x throughput | Blocked on S7/S8 |
+| gRPC ToolCallingService | No `tool_calling.proto` exists yet — need to create. MCP currently uses FastMCP (29 tools). Migration: proto schema → Go/TS service → MCP becomes thin gRPC client | Proto needed |
+| gRPC RetrievalService | `proto/active/retrieval.proto` exists (167 lines) — `SearchEvidence` + `SearchCodebase` + `Health` RPCs fully defined. Needs Go service implementation to replace inline SvelteKit pgvector/Qdrant logic | Proto ready |
+| Whisper gRPC service | Persistent server → gRPC wrapper. Currently have Tier 1 HTTP server + Tier 2 nodejs-whisper | Nice-to-have |
+| ~~Python FastAPI audio microservice~~ | ~~Gemma4 E4B HF Transformers for audio ASR~~ | ~~Superseded by whisper enrichment pipeline~~ ✅ |
+| simdjson integration | Low priority — gRPC already eliminates 90% JSON overhead | Deferred |
+| ~~LangChain ReAct agent improvements~~ | ~~`synthesizeAnswer()` canned responses need LLM synthesis~~ | ~~Deferred~~ |
+| **AutoGen/CrewAI evaluation** | **Decision: KEEP LangChain 1.0.4 + LangGraph 1.2.7.** Production-ready with 32 FastMCP tools, supervisor routing (4-8 subagents), SSE streaming, Ollama gemma4-legal. AutoGen = planning docs only (never wired). CrewAI = 61-line Python demo (isolated). No unique capability gap. Adding AutoGen would require Python sidecar + IPC overhead for zero gain.** | **Resolved — Keep current stack** ✅ |
+| **YOLO vs VLM decision** | **YOLO (`yolo.ts`) handles object detection (bboxes, regions, layout). VLM (`vlm-evidence-analyzer.ts`) handles semantic understanding (summaries, key findings, tags). Both run in evidence pipeline: YOLO Stage 6a → VLM Stage 6b. KEEP BOTH — complementary, not redundant. CLIP not needed (embeddinggemma handles cross-modal search).** | **Evaluated** ✅ |
+| Deeds Labs archival | `deeds_labs/` → separate `semaj90/deeds-labs` private repo (17K+ files) | Manual git task |
+| Setup wizard onboarding | First-run UX wizard for new users | Future sprint |
+| POI face recognition | FaceNet + CLIP cross-collection matching. POI photos VLM pipeline exists (7-step). Face-to-face similarity not wired | Future sprint |
+| LibTorch/CUDA N-API audit | `libtorch_graph.cc` compiles, 3 GPU functions verified (similarity, clustering, case embedding). `tensorrt_bridge.node` fallback chain: 4 paths checked at startup | **Verified** ✅ |
 
 ---
 

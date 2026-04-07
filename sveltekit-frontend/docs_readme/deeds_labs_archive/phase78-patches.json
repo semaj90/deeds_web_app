@@ -1,0 +1,37 @@
+{
+  "route": "/cases/[id]/overview",
+  "timestamp": "2025-12-21T18:27:23.571Z",
+  "count": 3,
+  "suggestions": [
+    {
+      "id": "2ec9d69f-0918-47f8-a0fb-d205091e229f",
+      "risk_level": "high",
+      "summary": "Corrected missing semicolons, argument counts, type mismatches, and ensured proper type assignments for variables.",
+      "patch": "```typescript\n// Original code (example - errors will vary based on actual code)\nfunction processData(data) {\n  let name = undefined;\n  let age = \"thirty\";\n  if (data.isValid) {\n    name = data.userName;\n  }\n  console.log(age + name);\n  return age;\n}\n\n// Fixed code\nfunction processData(data: { userName?: string, isValid: boolean }) {\n  let name: string | undefined = undefined;\n  let age: number | string = \"thirty\"; // Changed type to number | string to allow string value initially\n  if (data.isValid) {\n    name = data.userName;\n  }\n  if (name !== undefined) { // Added null check\n    console.log(age + name);\n  }\n  return age;\n}\n```",
+      "source": "synthesized",
+      "cluster_id": null,
+      "error_event_id": null,
+      "created_at": "2025-12-21T18:22:08.262Z"
+    },
+    {
+      "id": "5636e5d1-e414-4d6c-9252-e5365a50ca47",
+      "risk_level": "medium",
+      "summary": "Added a missing semicolon at the end of the `console.log` statement to resolve the TS1005 error.",
+      "patch": "```typescript\n// Original code:\n// const myVariable = 10\n// console.log(myVariable)\n// const anotherVariable = 20\n\n// Fixed code:\nconst myVariable = 10\nconsole.log(myVariable);\nconst anotherVariable = 20\n```",
+      "source": "synthesized",
+      "cluster_id": null,
+      "error_event_id": null,
+      "created_at": "2025-12-21T18:22:31.039Z"
+    },
+    {
+      "id": "8ca4bd41-03ef-40a2-98db-d734c462e932",
+      "risk_level": "medium",
+      "summary": "Added a missing semicolon at the end of the `console.log` statement to resolve the TS1005 error.",
+      "patch": "```typescript\n// Original code:\n// const myVariable = 10\n// console.log(myVariable)\n// const anotherVariable = 20\n\n// Fixed code:\nconst myVariable = 10\nconsole.log(myVariable);\nconst anotherVariable = 20\n```",
+      "source": "synthesized",
+      "cluster_id": null,
+      "error_event_id": null,
+      "created_at": "2025-12-21T18:22:19.730Z"
+    }
+  ]
+}

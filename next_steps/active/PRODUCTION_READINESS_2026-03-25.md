@@ -101,6 +101,24 @@ This pass moved beyond documentation review into active route hardening after li
 
 ---
 
+## April 7, 2026 Security Hardening
+
+### Fixed In This Pass
+- **SSRF protection module**: `src/lib/server/security/url-validator.ts` — blocks RFC 1918 IPs, cloud metadata, Docker hostnames, octal/hex bypass, numeric IPs, `.internal`/`.local` TLDs
+- **SSRF wired into**: `/api/ace/ingest` (dynamic import), `/api/web/crawl` (static import), `/api/v1/legal/compare-pdf` (uses `validateInternalUrl` for MinIO whitelist)
+- **Auth guards added**: `/api/cache` GET/POST/DELETE, `/api/chat` POST, `/api/agent/investigate` POST, `/api/ml/cluster-status` GET/POST, `/minio/[...path]` GET
+- **compare-pdf SSRF tightened**: Removed `localhost`/`127.0.0.1` from allowed hosts, uses centralized `validateInternalUrl()`
+
+### Remaining Open (from re-audit)
+- [ ] 5 error message leaks remain (similar, synthesis, cluster-summaries, cluster-status, crawl — verified safe but could be tighter). Fixed Apr 7: auth/login, authorities, evidence/search
+- [ ] `.env.example` only has 21 active vars (not 50+ as claimed) — needs `SEARXNG_URL`, `DOCLING_SERVICE_URL`, `WHISPER_MODEL`, `WHISPER_CUDA`
+- [ ] Categorized API audit (GET degraded-shape, write validation, ownership/auth, SSE) still pending
+- [ ] Drizzle schema reconciliation still pending
+- [ ] Redis-backed rate limiting (P1-2) — DEFERRED until horizontal scaling
+- [ ] Audit logging expansion (P2-3) — DEFERRED
+
+---
+
 ## Current Baseline (Post-Audit)
 
 | Metric | Value |
@@ -112,7 +130,7 @@ This pass moved beyond documentation review into active route hardening after li
 | Zod validation | **~96% of write routes** (all top 20 critical routes validated) |
 | Remaining unvalidated | 14 routes (8 LOW = no body, 5 MEDIUM = param-only, 1 HIGH = fixed) |
 | Auth coverage | Global hook (deny-by-default) + ~73 routes with explicit ownership |
-| Rate limiting | In-memory, write + AI tiers, 14 rules |
+| Rate limiting | In-memory, write + AI tiers, 15 rules |
 | CORS | Configured (restrictive in prod) |
 | SQL injection | Protected (Drizzle ORM parameterized) |
 | CSRF | **checkOrigin: true** (enabled this session) |
@@ -158,11 +176,11 @@ Fixed `oimport` → `import` (Phase 99 corruption artifact).
 **File**: `hooks.server.ts`
 Added GET tier: 200 req/min per IP for `/api/` routes.
 
-### P1-4: Error Message Leak Sanitization ✅ (NEW)
-**Scope**: ~80 instances across ~55 files batch-fixed.
-All `err instanceof Error ? err.message : 'fallback'` patterns in client-facing JSON/SSE responses replaced with static generic strings. Server-side `console.error`/`console.warn` logging preserved.
+### P1-4: Error Message Leak Sanitization ⚠️ PARTIAL (NEW)
+**Scope**: ~72 instances across ~48 files batch-fixed.
+Most `err instanceof Error ? err.message : 'fallback'` patterns in client-facing JSON/SSE responses replaced with static generic strings. Server-side `console.error`/`console.warn` logging preserved.
 **Categories fixed**: reports (3), knowledge (6), phase89 (9), cases (4), cartridge (4), auth (1), chat/SSE (8), AI streams (3), graph (3), admin (3), health (7), NLP/misc (9).
-**Verification**: `grep -r 'instanceof Error ? err.message'` → 0 client-facing leaks remaining. Only 5 server-side `console.warn` lines remain (safe).
+**Re-audit April 7**: 8 client-facing leaks remain in: `auth/login`, `cases/[id]/authorities`, `cases/[id]/similar` (x2), `evidence/search`, `synthesis/generate`, `generate-cluster-summaries`. `sanitize-error.ts` utility exists but not integrated into these routes.
 
 ---
 
@@ -198,11 +216,10 @@ All `err instanceof Error ? err.message : 'fallback'` patterns in client-facing 
 **Scope**: Add to all DELETE operations
 **Effort**: Medium
 
-### P2-4: Whisper Transcribe File Validation
-**Status**: NOT STARTED
+### P2-4: Whisper Transcribe File Validation ✅ DONE
 **File**: `api/whisper/transcribe/+server.ts`
-**Scope**: Add file type/size validation for audio uploads
-**Effort**: Small
+**Implemented**: 25MB max size, 9 MIME types, 8 file extensions, auth guard.
+**Note**: Previously marked NOT STARTED here but ✅ in completion tracking — contradiction resolved.
 
 ---
 
@@ -222,8 +239,8 @@ All `err instanceof Error ? err.message : 'fallback'` patterns in client-facing 
 | `evidence/[id]/suggest-summary` | MEDIUM | No body (param-only, AI summary) |
 | `phase89/analysis` | MEDIUM | Stub (returns static JSON, no input) |
 | `reports/[id]/publish` | MEDIUM | No body + has ownership check |
-| `v1/legal/compare-pdf` | MEDIUM | Needs inspection |
-| `whisper/transcribe` | MEDIUM | FormData audio — needs file validation |
+| `v1/legal/compare-pdf` | ✅ DONE | SSRF `validateInternalUrl()` + auth guard (Apr 7) |
+| `whisper/transcribe` | ✅ DONE | 25MB + audio type/ext allowlist + auth (P2-4) |
 
 ---
 
@@ -249,9 +266,9 @@ All `err instanceof Error ? err.message : 'fallback'` patterns in client-facing 
 - [x] P0-5: Defense-in-depth auth (5 critical routes: evidence, POI, notes, case-evidence, whisper)
 - [x] P1-1: Centralized error sanitization helper
 - [ ] P1-2: Redis-backed rate limiting — DEFERRED (single-instance OK)
-- [x] P1-3: GET rate limits (hooks.server.ts)
-- [x] P1-4: Error message leak sanitization (~80 instances, ~55 files)
-- [x] P2-1: .env.example updated
+- [x] P1-3: GET rate limits (hooks.server.ts, 15 rules total)
+- [ ] P1-4: Error message leak sanitization — PARTIAL (~72 fixed, 8 remain in 7 routes)
+- [ ] P2-1: .env.example — PARTIAL (21 active vars, missing SEARXNG_URL, DOCLING_SERVICE_URL, WHISPER_MODEL, WHISPER_CUDA)
 - [x] P2-2: CSRF checkOrigin enabled
 - [ ] P2-3: Audit logging expansion — DEFERRED
 - [x] P2-4: Whisper transcribe file validation (25MB, audio type/ext allowlist)

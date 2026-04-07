@@ -1,0 +1,60 @@
+{
+  "created": "2025-12-18T00:32:07.410Z",
+  "tier": 2,
+  "limit": 100,
+  "strategies": [
+    {
+      "name": "Fix object literal syntax (colon replacement)",
+      "code": "TS1005",
+      "risk": "MEDIUM"
+    },
+    {
+      "name": "Fix function parameter syntax",
+      "code": "TS1005",
+      "risk": "MEDIUM"
+    }
+  ],
+  "errorCount": 18353,
+  "clusters": [
+    {
+      "code": "TS1005",
+      "name": "Syntax - Expected semicolon/comma",
+      "count": 11211
+    },
+    {
+      "code": "TS1109",
+      "name": "Expression expected",
+      "count": 1156
+    },
+    {
+      "code": "TS1434",
+      "name": "Unexpected keyword/identifier",
+      "count": 1190
+    },
+    {
+      "code": "TS1128",
+      "name": "Declaration/statement expected",
+      "count": 2114
+    },
+    {
+      "code": "TS1131",
+      "name": "Property/signature expected",
+      "count": 496
+    },
+    {
+      "code": "TS1442",
+      "name": "Property initializer syntax",
+      "count": 286
+    },
+    {
+      "code": "TS1127",
+      "name": "Invalid character",
+      "count": 438
+    },
+    {
+      "code": "other",
+      "name": "Other errors",
+      "count": 1462
+    }
+  ]
+}

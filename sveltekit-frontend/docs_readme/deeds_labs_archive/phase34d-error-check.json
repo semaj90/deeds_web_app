@@ -1,0 +1,15 @@
+{
+  "summary": {
+    "shorthandPatterns": 53,
+    "parseErrors": 3371,
+    "missingValues": 0,
+    "traverseErrors": 1
+  },
+  "hasCritical": false,
+  "topFiles": {
+    "file": "C",
+    "count": 53
+  },
+  "phase": "34D",
+  "timestamp": "2025-11-03T12:17:08"
+}

@@ -24,10 +24,11 @@
 - `GEMMA4_MODEL` is not overridden in `.env.local` — correct defaults apply
 - **No `ollama pull` or code fix needed for VLM**
 
-### Whisper — FIXED (was returning fake transcription)
-- Route was sending audio filename/size as text to `gemma4-legal` (text LLM, cannot decode audio)
-- Was returning fake "transcription" string — silent failure looked like success
-- **FIXED**: Now returns HTTP 501 with honest error message
+### Whisper — FULLY IMPLEMENTED (re-audit April 7)
+- Previously was sending audio filename/size as text to `gemma4-legal` (silent failure)
+- **NOW FULLY WORKING**: `nodejs-whisper` v0.2.9 installed, CUDA acceleration, multilingual (99 languages)
+- Route: `/api/whisper/transcribe` — 25MB limit, audio type/ext validation, auth guard, Langfuse tracing
+- Features: language detect, translate to English, word-level timestamps, JSON segment output
 - No whisper package in `node_modules`; Ollama GGUF has no audio input support
 - **Path forward**: `npm i nodejs-whisper` (see TODO comment in route file)
 
@@ -211,7 +212,7 @@ Scoring: 100% = fully wired + verified working in production | 0% = not implemen
 ### 🟢 P5 — Robustness Polish
 
 - [ ] **DAG/CouchDB validation**: verify CouchDB is in docker-compose and `document-dag.ts` cache writes succeed in production
-- [ ] **Fuse.js cold-start pre-population**: trigger `/api/indexing/reindex` on first request to avoid initial empty search results
+- [x] **Fuse.js cold-start pre-population**: `refreshMetadataCache()` called at boot in `hooks.server.ts` ✅ (Apr 7)
 - [ ] **Citations schema alignment**: `citations` table has `quoted_text`/`relevance_score` vs Drizzle schema `citationText`/`confidence` — use `sql<T>` for actual columns (see key lessons)
 - [ ] **KAG UUID guard**: `getGraphContext()` must UUID-validate before PG predicate (known issue per repo memory)
 

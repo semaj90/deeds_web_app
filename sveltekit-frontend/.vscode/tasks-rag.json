@@ -89,8 +89,13 @@
     {
       "label": "🧠 Build RAG Knowledge Base",
       "type": "shell",
-      "command": "node",
-      "args": ["scripts/knowledge-base-builder.mjs"],
+      "command": "npx",
+      "args": [
+        "tsx",
+        "scripts/knowledge-base-builder.ts",
+        "--query",
+        "${input:searchQuery}"
+      ],
       "group": "build",
       "presentation": {
         "echo": true,
@@ -104,7 +109,7 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "problemMatcher": [],
-      "detail": "Build comprehensive semantic knowledge base with embeddings"
+      "detail": "Build a web-seeded knowledge base into the live Qdrant collection using SearXNG and Wikipedia"
     },
     {
       "label": "🎯 Test RAG Components",
