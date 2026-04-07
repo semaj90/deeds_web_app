@@ -263,6 +263,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   } finally {
     // Unload vision model to free VRAM, then release lease
     await unloadVisionModel();
-    await releaseGpuLease('tensorrt').catch(() => {});
+    await releaseGpuLease('tensorrt').catch((e) =>
+      console.warn('[vlm] GPU lease release failed:', e)
+    );
   }
 };

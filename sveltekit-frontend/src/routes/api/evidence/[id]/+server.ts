@@ -141,7 +141,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
             console.warn('[neo4j-sync] evidence update:', err)
           )
         )
-        .catch(() => {});
+        .catch((e) => console.warn('[evidence] neo4j sync import failed:', e));
     }
 
     return json(updated);
@@ -156,28 +156,32 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
  * Delete an evidence item
  */
 export const DELETE: RequestHandler = async ({ params, locals }) => {
-	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	try {
-		const [deleted] = await db
-			.delete(evidence)
-			.where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
-			.returning({ id: evidence.id, title: evidence.title, caseId: evidence.caseId });
+  try {
+    const [deleted] = await db
+      .delete(evidence)
+      .where(and(eq(evidence.id, params.id), eq(evidence.userId, locals.user.id)))
+      .returning({ id: evidence.id, title: evidence.title, caseId: evidence.caseId });
 
-		if (!deleted) {
-			return json({ error: 'Evidence not found' }, { status: 404 });
-		}
+    if (!deleted) {
+      return json({ error: 'Evidence not found' }, { status: 404 });
+    }
 
-		// Sync parent case to Neo4j graph (non-blocking)
-		if (deleted.caseId) {
-			import('$lib/server/graph/pg-neo4j-sync.js').then(({ syncCaseToGraph }) =>
-				syncCaseToGraph(deleted.caseId!).catch(err => console.warn('[neo4j-sync] evidence delete:', err))
-			).catch(() => {});
-		}
+    // Sync parent case to Neo4j graph (non-blocking)
+    if (deleted.caseId) {
+      import('$lib/server/graph/pg-neo4j-sync.js')
+        .then(({ syncCaseToGraph }) =>
+          syncCaseToGraph(deleted.caseId!).catch((err) =>
+            console.warn('[neo4j-sync] evidence delete:', err)
+          )
+        )
+        .catch((e) => console.warn('[evidence] neo4j sync import failed:', e));
+    }
 
-		return json({ success: true, deleted });
-	} catch (err) {
-		console.error('[evidence] DELETE error:', err);
-		return json({ error: 'Failed to delete evidence' }, { status: 500 });
-	}
+    return json({ success: true, deleted });
+  } catch (err) {
+    console.error('[evidence] DELETE error:', err);
+    return json({ error: 'Failed to delete evidence' }, { status: 500 });
+  }
 };

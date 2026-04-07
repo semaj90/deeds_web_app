@@ -1634,7 +1634,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                     inferenceBackend = 'tensorrt';
                     streamed = true;
                   } finally {
-                    releaseGpuLease('tensorrt').catch(() => {});
+                    releaseGpuLease('tensorrt').catch((e) =>
+                      console.warn('[sse/chat] GPU lease release failed:', e)
+                    );
                   }
                 }
               }

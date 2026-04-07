@@ -106,7 +106,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	} catch (err) {
 		console.error('[/api/chat]', err);
 		// Release lease on error so TRT-LLM can take over if needed
-		await releaseGpuLease('ollama').catch(() => {});
+		await releaseGpuLease('ollama').catch((e) =>
+      console.warn('[/api/chat] GPU lease release failed:', e)
+    );
 		return json({ message: 'Chat service error', response: '' }, { status: 503 });
 	}
 };

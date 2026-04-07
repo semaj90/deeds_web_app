@@ -123,7 +123,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				const errMsg = 'Stream error';
 				controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: errMsg, done: true })}\n\n`));
 			} finally {
-				await releaseGpuLease('tensorrt').catch(() => {});
+				await releaseGpuLease('tensorrt').catch((e) =>
+          console.warn('[trt/stream] GPU lease release failed:', e)
+        );
 				controller.close();
 			}
 		}

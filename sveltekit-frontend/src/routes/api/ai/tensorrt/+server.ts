@@ -96,6 +96,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		});
 	} finally {
 		// Release lease after inference
-		await releaseGpuLease('tensorrt').catch(() => {});
+		await releaseGpuLease('tensorrt').catch((e) =>
+      console.warn('[trt] GPU lease release failed:', e)
+    );
 	}
 };
