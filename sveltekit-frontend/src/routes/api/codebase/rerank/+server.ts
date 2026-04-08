@@ -67,7 +67,7 @@ async function searchQdrant(
 	};
 	if (filter) body.filter = filter;
 
-	const res = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks/points/search`, {
+	const res = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/search`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify(body),

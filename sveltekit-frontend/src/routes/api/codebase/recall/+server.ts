@@ -44,7 +44,7 @@ async function refreshMetadataCache(): Promise<void> {
 	if (fuseIndex && now - lastRefresh < REFRESH_INTERVAL) return;
 
 	try {
-		const res = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks/points/scroll`, {
+		const res = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/scroll`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

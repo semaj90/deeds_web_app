@@ -17,6 +17,7 @@
 import type { GraphNeighbor } from './graph-context.js';
 import { buildVectorPayload } from '$lib/server/config/vector-config.js';
 import { traceGraph } from '$lib/server/observability/langfuse.js';
+import { gpuRerank, type RerankableDoc } from './gpu-reranker.js';
 
 export interface ContextDoc {
 	content: string;
@@ -130,15 +131,19 @@ export async function graphExpandRetrieval(
 			merged.push(hit);
 		}
 
-		// 5. Re-sort by similarity and cap
-		merged.sort((a, b) => b.similarity - a.similarity);
+		// 5. GPU-accelerated reranking if enough docs, else JS sort
+		const reranked = await gpuRerank<ContextDoc & RerankableDoc>(
+			queryVector,
+			merged as (ContextDoc & RerankableDoc)[],
+			{ minDocsForGpu: 20, gpuWeight: 0.6 }
+		);
 
 		console.log(
 			`[KAG Expand] Merged ${expansionHits.length} expansion chunks → ` +
-				`${merged.length} total (was ${initialDocs.length})`
+				`${merged.length} total (was ${initialDocs.length}), rerank: ${reranked.source} (${reranked.rerankMs}ms)`
 		);
 
-		return merged;
+		return reranked.docs;
 	}); // end traceGraph
 }
 
