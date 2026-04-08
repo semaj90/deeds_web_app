@@ -35,7 +35,6 @@ export async function checkDatabaseHealth(): Promise<HealthCheckResult> {
 	let client;
 	try {
 		// Get a client from the pool with timeout
-		// @ts-ignore - pg types
 		client = await Promise.race([
 			appPool.connect(),
 			new Promise((_, reject) =>
@@ -121,7 +120,6 @@ export async function checkEssentialTables(): Promise<{
 
 	let client;
 	try {
-		// @ts-ignore - pg types
 		client = await appPool.connect();
 
 		const tableQuery = await client.query(`

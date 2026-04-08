@@ -10,7 +10,6 @@ export async function validateDatabaseOnStartup(): Promise<boolean> {
 	let client;
 	try {
 		// Get a client from the pool
-        // @ts-ignore
 		client = await pool.connect();
 
 		// Run a simple query to verify connection

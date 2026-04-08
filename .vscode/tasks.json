@@ -1417,6 +1417,563 @@
         "clear": false
       },
       "problemMatcher": []
+    },
+    // ============================================
+    // 9-Layer Import Audit (Orphan Detection)
+    // ============================================
+    {
+      "label": "🔍 Audit: Single Module (9-Layer)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\scripts\\audit-9layer-imports.ps1",
+        "-Module",
+        "${input:auditModule}"
+      ],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔍 Audit: Orphan Scan (All Components)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\scripts\\audit-9layer-imports.ps1",
+        "-OrphanScan"
+      ],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔍 Audit: Full 10-Layer Scan",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\scripts\\audit-9layer-imports.ps1",
+        "-Full"
+      ],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    // ============================================
+    // Ollama Gemma4 Agentic Tool Calling (GPU)
+    // ============================================
+    {
+      "label": "🤖 Ollama: Gemma4 Agentic Query",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "run",
+        "mcp:agent:ollama",
+        "--",
+        "${input:agentQuery}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🤖 Ollama: Health + Models",
+      "type": "shell",
+      "command": "curl -s http://127.0.0.1:11434/api/tags | jq '.models[] | {name, size, quantization: .details.quantization_level}'",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🤖 Ollama: Pull All Models (GPU)",
+      "type": "shell",
+      "command": "ollama pull gemma4-legal:latest && ollama pull embeddinggemma:latest && ollama list",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🤖 Ollama: Test Embedding (embeddinggemma)",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:11434/api/embed -H \"Content-Type: application/json\" -d \"{\\\"model\\\":\\\"embeddinggemma:latest\\\",\\\"input\\\":\\\"test GPU embedding vector generation\\\"}\" | jq '{model: .model, dim: (.embeddings[0] | length), eval_ms: .total_duration}'",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🤖 Ollama: Test Generate (Gemma4 Legal)",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:11434/api/generate -H \"Content-Type: application/json\" -d \"{\\\"model\\\":\\\"gemma4-legal:latest\\\",\\\"prompt\\\":\\\"Summarize the key legal elements of a breach of contract claim in 3 bullet points.\\\",\\\"stream\\\":false,\\\"options\\\":{\\\"num_gpu\\\":30}}\" | jq '{model: .model, response: .response[:200], eval_count: .eval_count, eval_duration_ms: (.eval_duration / 1000000 | round)}'",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🤖 Ollama: Start with GPU Layers",
+      "type": "shell",
+      "command": "set OLLAMA_GPU_LAYERS=30 && set CUDA_VISIBLE_DEVICES=0 && ollama serve",
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    // ============================================
+    // Qdrant Codebase Indexing + Semantic Search
+    // ============================================
+    {
+      "label": "📊 Qdrant: Index Codebase (Full)",
+      "type": "shell",
+      "command": "npx tsx scripts/codebase-semantic-indexer.ts",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📊 Qdrant: Index Codebase (Dry Run)",
+      "type": "shell",
+      "command": "npx tsx scripts/codebase-semantic-indexer.ts --dry-run",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📊 Qdrant: Index Directory",
+      "type": "shell",
+      "command": "npx tsx scripts/codebase-semantic-indexer.ts --dir ${input:indexDir}",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📊 Qdrant: Index + Gemma4 Tags",
+      "type": "shell",
+      "command": "npx tsx scripts/codebase-semantic-indexer.ts --tags --concurrency 2",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔎 Qdrant: Semantic Code Search",
+      "type": "shell",
+      "command": "npx tsx scripts/codebase-semantic-indexer.ts --query \"${input:codeSearchQuery}\"",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📊 Qdrant: Collection Stats",
+      "type": "shell",
+      "command": "curl -s http://127.0.0.1:6333/collections | jq '.result.collections[] | {name, points_count: .points_count}' && echo '---' && curl -s http://127.0.0.1:6333/collections/codebase_chunks_768 | jq '.result | {status, points_count, vectors_count, indexed_vectors_count}'",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📊 Qdrant: Map All Tags",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:6333/collections/codebase_chunks_768/points/scroll -H \"Content-Type: application/json\" -d \"{\\\"limit\\\":1000,\\\"with_payload\\\":{\\\"include\\\":[\\\"tags\\\",\\\"domain\\\",\\\"file_path\\\"]}}\" | jq '[.result.points[].payload | select(.tags != null)] | group_by(.domain) | map({domain: .[0].domain, count: length, tags: [.[].tags[]] | unique | sort})'",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    // ============================================
+    // GPU Compute + RTX Matrix Acceleration
+    // ============================================
+    {
+      "label": "⚡ GPU: Dev Server (RTX Accelerated)",
+      "type": "shell",
+      "command": "npm run dev:gpu",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": {
+        "owner": "vite-gpu",
+        "pattern": {
+          "regexp": ".",
+          "file": 1,
+          "message": 0
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "ready in"
+        }
+      }
+    },
+    {
+      "label": "⚡ GPU: nvidia-smi (Live Monitor)",
+      "type": "shell",
+      "command": "nvidia-smi -l 2",
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "⚡ GPU: RTX CUDA Compute Test",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:8096/cuda/compute -H \"Content-Type: application/json\" -d \"{\\\"query\\\":\\\"test RTX 3060 matrix computation\\\",\\\"metadata\\\":{\\\"test\\\":true,\\\"gpu_layers\\\":30}}\" | jq",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "⚡ GPU: CUDA Health (All Services)",
+      "type": "shell",
+      "command": "echo '=== nvidia-smi ===' && nvidia-smi --query-gpu=name,memory.used,memory.total,utilization.gpu --format=csv,noheader && echo '--- Ollama GPU ---' && curl -s http://127.0.0.1:11434/api/tags | jq '.models | length' && echo ' models loaded' && echo '--- Go Search ---' && curl -s http://127.0.0.1:8096/health | jq '.status' && echo '--- Qdrant ---' && curl -s http://127.0.0.1:6333/collections | jq '.result.collections | length' && echo ' collections'",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "⚡ GPU: CMake CUDA Build + Test",
+      "type": "shell",
+      "command": "cmake --preset cuda-release && cmake --build --preset cuda-release && node -e \"const b = require('./build/Release/tensorrt_bridge.node'); console.log('GPU functions:', Object.keys(b)); console.log('CUDA test:', b.testCuda?.() ?? 'N/A')\"",
+      "options": {
+        "cwd": "${workspaceFolder}/simd-bridge/cpp"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": "$gcc"
+    },
+    // ============================================
+    // Redis Bifrost Cache + Parallelism
+    // ============================================
+    {
+      "label": "🔴 Redis: Cache Stats",
+      "type": "shell",
+      "command": "redis-cli INFO memory | findstr used_memory_human && redis-cli INFO keyspace && redis-cli DBSIZE",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔴 Redis: Index Cache Keys (idx:*)",
+      "type": "shell",
+      "command": "redis-cli --scan --pattern \"idx:*\" | find /c /v \"\" && echo ' index cache entries' && redis-cli --scan --pattern \"idx:*\" | head -20",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔴 Redis: Monitor (Live Stream)",
+      "type": "shell",
+      "command": "redis-cli MONITOR",
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔴 Redis: Flush Index Cache",
+      "type": "shell",
+      "command": "powershell -NoProfile -Command \"$keys = redis-cli --scan --pattern 'idx:*'; $count = ($keys | Measure-Object -Line).Lines; Write-Host \\\"Flushing $count index cache keys...\\\"; redis-cli --scan --pattern 'idx:*' | ForEach-Object { redis-cli DEL $_ } | Out-Null; Write-Host '✓ Index cache flushed'\"",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔴 Redis: Concurrent Pipeline Test",
+      "type": "shell",
+      "command": "redis-cli --pipe-mode --pipe-timeout 5 < NUL && redis-cli PING && redis-cli SET bifrost:test:parallel \"ok\" EX 60 && redis-cli GET bifrost:test:parallel && redis-cli INFO clients | findstr connected_clients",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    // ============================================
+    // Knowledge Base Builder + Auto-Research
+    // ============================================
+    {
+      "label": "📚 KB: Build Knowledge Base",
+      "type": "shell",
+      "command": "npx tsx scripts/knowledge-base-builder.ts",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📚 KB: YouTube Ingest",
+      "type": "shell",
+      "command": "npx tsx scripts/knowledge-base-builder.ts --no-web --no-wikipedia --youtube \"${input:youtubeUrl}\"",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📚 KB: YouTube Ingest (Dry Run)",
+      "type": "shell",
+      "command": "npx tsx scripts/knowledge-base-builder.ts --no-web --no-wikipedia --dry-run --youtube \"${input:youtubeUrl}\"",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📚 KB: Auto-Research (Karpathy Style)",
+      "type": "shell",
+      "command": "npx tsx scripts/knowledge-base-builder.ts --auto-research --query \"${input:researchQuery}\"",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📚 KB: Semantic Search",
+      "type": "shell",
+      "command": "npx tsx scripts/codebase-semantic-indexer.ts --query \"${input:kbSearchQuery}\"",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📚 KB: Qdrant Knowledge Stats",
+      "type": "shell",
+      "command": "curl -s http://127.0.0.1:6333/collections/knowledge_base | jq '.result | {status, points_count, vectors_count, config: .config.params.vectors}' && echo '---' && curl -s -X POST http://127.0.0.1:6333/collections/knowledge_base/points/scroll -H \"Content-Type: application/json\" -d \"{\\\"limit\\\":5,\\\"with_payload\\\":{\\\"include\\\":[\\\"document_name\\\",\\\"topic\\\",\\\"source_url\\\"]}}\" | jq '.result.points[:5] | map(.payload)'",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    // ============================================
+    // Go Search Service (5-Way Fan-Out)
+    // ============================================
+    {
+      "label": "🔎 Go Search: Start Docker Service",
+      "type": "shell",
+      "command": "docker start go-search-service 2>NUL || docker run -d --name go-search-service -p 8096:8096 -p 50055:50055 -e DATABASE_URL=\"postgresql://legal_admin:123456@host.docker.internal:5432/legal_ai_db\" -e QDRANT_URL=\"http://host.docker.internal:6333\" -e QDRANT_GRPC_HOST=\"host.docker.internal\" -e QDRANT_GRPC_PORT=\"6334\" -e REDIS_URL=\"redis://host.docker.internal:6379\" -e OLLAMA_URL=\"http://host.docker.internal:11434\" go-search-service:latest",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔎 Go Search: Health Check",
+      "type": "shell",
+      "command": "curl -s http://127.0.0.1:8096/health | jq '{status, uptime, qdrant: .qdrant, redis: .redis, postgres: .postgres}'",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔎 Go Search: Test Query",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:8096/search -H \"Content-Type: application/json\" -d \"{\\\"query\\\":\\\"${input:goSearchQuery}\\\",\\\"limit\\\":5}\" | jq '{total: .results | length, results: [.results[:3][] | {score, source: .metadata.source, title: .title[:80]}]}'",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    // ============================================
+    // Full Stack Orchestration
+    // ============================================
+    {
+      "label": "🚀 Full Stack: All Services",
+      "type": "shell",
+      "command": "docker start phase66-postgres phase66-redis phase66-minio phase66-qdrant go-search-service 2>NUL; echo '✓ Docker services started' && timeout /t 3 >NUL && curl -s http://127.0.0.1:6333/collections | jq '.result.collections | length' && echo ' Qdrant collections' && curl -s http://127.0.0.1:8096/health | jq '.status' && redis-cli PING && curl -s http://127.0.0.1:11434/api/tags | jq '.models | length' && echo ' Ollama models'",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 Full Stack: Index + Search Pipeline",
+      "type": "shell",
+      "command": "npm run codebase:index -- --concurrency 4 && echo '--- Index complete. Running test search ---' && npm run codebase:search -- \"authentication middleware\"",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
     }
   ],
   "inputs": [
@@ -1463,6 +2020,48 @@
         "UNDEFINED_VAR"
       ],
       "default": "SYNTAX"
+    },
+    {
+      "id": "auditModule",
+      "type": "promptString",
+      "description": "Module name to audit (e.g., SearchBox, qdrant-manager, redis, webgpu-init)",
+      "default": "SearchBox"
+    },
+    {
+      "id": "indexDir",
+      "type": "promptString",
+      "description": "Directory to index into Qdrant (relative to sveltekit-frontend/)",
+      "default": "src/lib/server"
+    },
+    {
+      "id": "codeSearchQuery",
+      "type": "promptString",
+      "description": "Semantic search query for codebase chunks in Qdrant",
+      "default": "authentication middleware session validation"
+    },
+    {
+      "id": "researchQuery",
+      "type": "promptString",
+      "description": "Auto-research topic (Karpathy-style knowledge building)",
+      "default": "Svelte 5 runes migration patterns"
+    },
+    {
+      "id": "kbSearchQuery",
+      "type": "promptString",
+      "description": "Knowledge base semantic search query",
+      "default": "legal document embedding pipeline"
+    },
+    {
+      "id": "goSearchQuery",
+      "type": "promptString",
+      "description": "Go search service query (5-way fan-out: Citation + FTS + pgvector + Qdrant + KB)",
+      "default": "breach of contract evidence requirements"
+    },
+    {
+      "id": "youtubeUrl",
+      "type": "promptString",
+      "description": "YouTube video URL or ID to ingest into knowledge base",
+      "default": "https://www.youtube.com/watch?v="
     }
   ]
 }

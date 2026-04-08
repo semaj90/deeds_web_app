@@ -1,4 +1,3 @@
-// @ts-nocheck - Complex experimental service with external dependencies
 /**
  * WebGPU Texture Streaming System - Phase 14
  *
@@ -115,10 +114,11 @@ export class WebGPUTextureStreamer {
     }
 
     private async initWebGPU(canvas?: HTMLCanvasElement): Promise<boolean> {
-        if (!navigator.gpu) return false;
+        const gpu = (navigator as unknown as { gpu?: GPU }).gpu;
+        if (!gpu) return false;
 
         try {
-            this.adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
+            this.adapter = await gpu.requestAdapter({ powerPreference: 'high-performance' });
             if (!this.adapter) return false;
 
             this.device = await this.adapter.requestDevice({

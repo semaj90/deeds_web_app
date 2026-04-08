@@ -5,7 +5,7 @@ import { invalidateCaseCache } from '$lib/server/cache/invalidation.js';
 import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
 import { zod4 as zod } from 'sveltekit-superforms/adapters';
-import { and, desc, eq, like } from 'drizzle-orm';
+import { and, desc, eq, inArray, like } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 import {
   caseListCreateSchema,
@@ -178,8 +178,7 @@ export const actions: Actions = {
         .where(
           and(
             eq(cases.userId, locals.user.id),
-            // @ts-expect-error - Drizzle inArray typing
-            cases.id.in(result.data.caseId)
+            inArray(cases.id, result.data.caseId)
           )
         )
         .returning();
@@ -227,8 +226,7 @@ export const actions: Actions = {
         .where(
           and(
             eq(cases.userId, locals.user.id),
-            // @ts-expect-error - Drizzle inArray typing
-            cases.id.in(result.data.caseId)
+            inArray(cases.id, result.data.caseId)
           )
         )
         .returning();

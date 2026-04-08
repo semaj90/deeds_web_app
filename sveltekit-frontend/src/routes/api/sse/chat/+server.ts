@@ -45,6 +45,7 @@ import {
 } from '$lib/server/inference/gpu-arbiter.js';
 import { produceTokenChunk, trimTokenStream } from '$lib/server/redis-streams.js';
 import { z } from 'zod';
+import { shouldBackfill, triggerBackfillAsync } from '$lib/server/retrieval/auto-backfill.js';
 import { determineACEPolicy } from '$lib/server/ace/policy.js';
 import type { ACEContext, ACEPolicyDecision } from '$lib/server/ace/types.js';
 import type { ContextualToolResult } from '$lib/server/ai/contextual-tools.js';
@@ -1073,7 +1074,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       // ── L0.5 Intercept: RAG Retrieval Cache (P2f) ──
       // Cache Qdrant retrieval results by (query, case) to skip embedding + search
       // on repeated queries within 2 minutes. Invalidated on new evidence upload.
-      const ragGlyphKey = `glyph:rag:${createHash('md5').update(message + (caseUuid ?? '')).digest('hex').slice(0, 12)}`;
+      const ragGlyphKey = `glyph:rag:${createHash('md5')
+        .update(message + (caseUuid ?? ''))
+        .digest('hex')
+        .slice(0, 12)}`;
       let ragGlyphHit = false;
       let cachedRagDocs: ContextDoc[] | null = null;
       if (!attachmentScopedDocs.length && !hasInlineAttachmentSource) {
@@ -1109,7 +1113,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       if (!ragGlyphHit && rawContextDocs.length > 0 && !attachmentScopedDocs.length) {
         try {
           const ragJson = JSON.stringify(rawContextDocs);
-          if (ragJson.length < 60000) { // Stay under glyph 65535 byte limit
+          if (ragJson.length < 60000) {
+            // Stay under glyph 65535 byte limit
             setFragment(ragGlyphKey, ragJson, FragmentType.RAG, 2 * 60_000);
           }
         } catch {}
@@ -1128,6 +1133,19 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         reformulated,
         newQuery,
       } = await correctiveRetrieval(message, rawContextDocs);
+
+      // ── Auto-Backfill: if retrieval still returns no useful results, research in background ──
+      if (
+        shouldBackfill(correctedDocs) &&
+        !hasInlineAttachmentSource &&
+        !attachmentScopedDocs.length
+      ) {
+        triggerBackfillAsync({
+          query: reformulated ? (newQuery ?? message) : message,
+          conversationId,
+          caseId: caseUuid,
+        });
+      }
 
       // ── Query-time entity extraction (zero-cost regex) ──
       const queryEntities = extractLegalTags(message);

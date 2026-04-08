@@ -1,4 +1,3 @@
-// @ts-nocheck - Complex experimental service with external dependencies
 // 🚀 WebGPU-Accelerated SOM Semantic Cache
 // Real-time PageRank with loki.js-style IndexDB integration
 import Loki from 'lokijs';
@@ -428,7 +427,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
       );
 
       const bindGroup = this.device.createBindGroup({
-        layout: computePipeline.getBindGroupLayout(0),
+        layout: computePipeline.getBindGroupLayout(0) as GPUBindGroupLayout,
         entries: [
           { binding: 0, resource: { buffer: textBuffer } },
           { binding: 1, resource: { buffer: embeddingBuffer } },
@@ -610,7 +609,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
     );
 
     const bindGroup = this.device.createBindGroup({
-      layout: computePipeline.getBindGroupLayout(0),
+      layout: computePipeline.getBindGroupLayout(0) as GPUBindGroupLayout,
       entries: [
         { binding: 0, resource: { buffer: adjacencyBuffer } },
         { binding: 1, resource: { buffer: scoresBuffer } },

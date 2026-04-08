@@ -16,7 +16,6 @@ export const POST: RequestHandler = async ({ request, fetch, locals }) => {
 		method: 'POST',
 		headers: request.headers,
 		body: request.body,
-		// @ts-expect-error -- SvelteKit internal fetch supports duplex
 		duplex: 'half',
-	});
+	} as RequestInit);
 };

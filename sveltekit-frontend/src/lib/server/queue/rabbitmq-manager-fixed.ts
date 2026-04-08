@@ -71,6 +71,7 @@ export class RabbitMQManager extends EventEmitter {
     ace_evaluate: 'ace.evaluate',
     error_embed: 'error.embed',
     synthesis_generate: 'synthesis.generate',
+    knowledge_backfill: 'knowledge.backfill',
   };
 
   constructor() {
@@ -186,6 +187,7 @@ export class RabbitMQManager extends EventEmitter {
       'ace.evaluate',
       'error.embed',
       'synthesis.generate',
+      'knowledge.backfill',
     ];
     for (const queue of queuesToMigrate) {
       try {
@@ -246,6 +248,11 @@ export class RabbitMQManager extends EventEmitter {
       this.exchanges.document_processing,
       'synthesis.generate'
     );
+    await this.bindQueue(
+      this.queues.knowledge_backfill,
+      this.exchanges.document_processing,
+      'knowledge.backfill'
+    );
 
     console.log('✅ Queue bindings configured (with DLQ)');
   }
@@ -273,8 +280,9 @@ export class RabbitMQManager extends EventEmitter {
     await this.consume(this.queues.ace_evaluate, this.handleACEEvaluate.bind(this)); // slow (LLM call)
     await this.consume(this.queues.error_embed, this.handleErrorEmbed.bind(this)); // medium (embedding)
     await this.consume(this.queues.synthesis_generate, this.handleSynthesisGenerate.bind(this)); // slow (LLM call)
+    await this.consume(this.queues.knowledge_backfill, this.handleKnowledgeBackfill.bind(this)); // medium (web search + embed)
 
-    console.log('👂 All 10 RabbitMQ consumers started (prefetch: 10)');
+    console.log('👂 All 11 RabbitMQ consumers started (prefetch: 10)');
 
     // Start DLQ consumers — drain dead-lettered messages for logging/monitoring
     await this.startDLQConsumers();
@@ -405,7 +413,9 @@ export class RabbitMQManager extends EventEmitter {
           .then(({ syncCaseToGraph }) => syncCaseToGraph(data.caseId))
           .then((r) => {
             if (r.errors.length === 0) {
-              console.log(`🔗 Neo4j sync: case ${data.caseId} (${r.relationships} rels, ${r.durationMs}ms)`);
+              console.log(
+                `🔗 Neo4j sync: case ${data.caseId} (${r.relationships} rels, ${r.durationMs}ms)`
+              );
             }
           })
           .catch(() => {}); // Non-fatal — PG data is sufficient
@@ -814,15 +824,20 @@ export class RabbitMQManager extends EventEmitter {
         await this.redisService.set(
           `synthesis:status:${data.synthesisId}`,
           JSON.stringify({ status: 'generating', startedAt: new Date().toISOString() }),
-          'EX', 3600
+          'EX',
+          3600
         );
       }
 
       const t0 = performance.now();
 
       // Stage 1: ACE context assembly
-      const { assembleACEContext, buildACEPromptCached } = await import('../ace/context-assembler.js');
-      const { orderByDependency, extractCitationRefs } = await import('../retrieval/document-dag.js');
+      const { assembleACEContext, buildACEPromptCached } = await import(
+        '../ace/context-assembler.js'
+      );
+      const { orderByDependency, extractCitationRefs } = await import(
+        '../retrieval/document-dag.js'
+      );
       const context = await assembleACEContext({
         query: data.query,
         userId: data.userId,
@@ -838,11 +853,16 @@ export class RabbitMQManager extends EventEmitter {
         type RAGChunk = { content: string; score: number; source: string };
         const knownIds = new Set(context.ragChunks.map((_: RAGChunk, i: number) => `chunk-${i}`));
         const dagDocs = context.ragChunks.map((c: RAGChunk, i: number) => ({
-          id: `chunk-${i}`, title: c.source, score: c.score,
-          citations: extractCitationRefs(c.content, knownIds), content: c.content,
+          id: `chunk-${i}`,
+          title: c.source,
+          score: c.score,
+          citations: extractCitationRefs(c.content, knownIds),
+          content: c.content,
         }));
         const { ordered } = orderByDependency(dagDocs);
-        const chunkMap = new Map<string, RAGChunk>(context.ragChunks.map((c: RAGChunk, i: number) => [`chunk-${i}`, c]));
+        const chunkMap = new Map<string, RAGChunk>(
+          context.ragChunks.map((c: RAGChunk, i: number) => [`chunk-${i}`, c])
+        );
         context.ragChunks = ordered
           .map((d: { id: string }) => chunkMap.get(d.id))
           .filter((c): c is RAGChunk => c !== undefined);
@@ -929,7 +949,8 @@ export class RabbitMQManager extends EventEmitter {
         },
         cached: false,
         timestamp: new Date().toISOString(),
-        evaluationUrl: data.enableACE !== false ? `/api/synthesis/evaluation/${data.synthesisId}` : null,
+        evaluationUrl:
+          data.enableACE !== false ? `/api/synthesis/evaluation/${data.synthesisId}` : null,
         contextSources: {
           ragChunks: context.ragChunks.length,
           kagNeighbors: context.kagNeighbors.length,
@@ -945,12 +966,18 @@ export class RabbitMQManager extends EventEmitter {
         await this.redisService.set(
           `synthesis:result:${data.synthesisId}`,
           JSON.stringify(result),
-          'EX', 3600
+          'EX',
+          3600
         );
         await this.redisService.set(
           `synthesis:status:${data.synthesisId}`,
-          JSON.stringify({ status: 'complete', completedAt: new Date().toISOString(), totalMs: Math.round(totalMs) }),
-          'EX', 3600
+          JSON.stringify({
+            status: 'complete',
+            completedAt: new Date().toISOString(),
+            totalMs: Math.round(totalMs),
+          }),
+          'EX',
+          3600
         );
       }
 
@@ -971,13 +998,20 @@ export class RabbitMQManager extends EventEmitter {
 
       // Log inference to CouchDB (fire-and-forget)
       import('../observability/inference-log.js')
-        .then(({ logLLMInference }) => logLLMInference({
-          model: MODEL, backend: 'ollama', latencyMs: Math.round(generateMs),
-          tokenCount: tokensUsed, cacheHit: false,
-        }))
+        .then(({ logLLMInference }) =>
+          logLLMInference({
+            model: MODEL,
+            backend: 'ollama',
+            latencyMs: Math.round(generateMs),
+            tokenCount: tokensUsed,
+            cacheHit: false,
+          })
+        )
         .catch(() => {});
 
-      console.log(`✅ Synthesis complete: ${data.synthesisId} (${Math.round(totalMs)}ms, ${tokensUsed} tokens)`);
+      console.log(
+        `✅ Synthesis complete: ${data.synthesisId} (${Math.round(totalMs)}ms, ${tokensUsed} tokens)`
+      );
       this.channel.ack(msg);
     } catch (error) {
       console.error('❌ Synthesis generate error:', this.formatError(error));
@@ -986,11 +1020,18 @@ export class RabbitMQManager extends EventEmitter {
       if (this.redisService) {
         const data = this.parseMessage(msg);
         if (data?.synthesisId) {
-          await this.redisService.set(
-            `synthesis:status:${data.synthesisId}`,
-            JSON.stringify({ status: 'failed', error: this.formatError(error), failedAt: new Date().toISOString() }),
-            'EX', 3600
-          ).catch(() => {});
+          await this.redisService
+            .set(
+              `synthesis:status:${data.synthesisId}`,
+              JSON.stringify({
+                status: 'failed',
+                error: this.formatError(error),
+                failedAt: new Date().toISOString(),
+              }),
+              'EX',
+              3600
+            )
+            .catch(() => {});
         }
       }
 
@@ -1019,10 +1060,65 @@ export class RabbitMQManager extends EventEmitter {
       await this.redisService.set(
         `synthesis:status:${data.synthesisId}`,
         JSON.stringify({ status: 'pending', enqueuedAt: new Date().toISOString() }),
-        'EX', 3600
+        'EX',
+        3600
       );
     }
     await this.publish(this.exchanges.document_processing, 'synthesis.generate', {
+      ...data,
+      enqueuedAt: new Date().toISOString(),
+    });
+    return true;
+  }
+
+  // --- Knowledge Backfill Handler ---
+
+  private async handleKnowledgeBackfill(msg: AmqpMessage): Promise<void> {
+    if (!msg || !this.channel) return;
+    try {
+      const data = this.parseMessage(msg);
+      if (!data?.query) {
+        this.channel.nack(msg, false, false);
+        return;
+      }
+
+      console.log(`📚 Knowledge backfill: "${data.query}"`);
+
+      const { executeBackfill } = await import('../retrieval/auto-backfill.js');
+      const result = await executeBackfill({
+        query: data.query,
+        conversationId: data.conversationId,
+        caseId: data.caseId,
+        maxWebResults: data.maxWebResults ?? 5,
+        wikiLimit: data.wikiLimit ?? 3,
+      });
+
+      if (result.skipped) {
+        console.log(`📚 Knowledge backfill skipped: ${result.reason}`);
+      } else {
+        console.log(
+          `📚 Knowledge backfill complete: ${result.documentsCollected} docs → ${result.chunksIndexed} chunks (${result.durationMs}ms)`
+        );
+      }
+
+      this.channel.ack(msg);
+    } catch (error) {
+      console.error('❌ Knowledge backfill error:', this.formatError(error));
+      this.retryOrDLQ(msg as AmqpMessageObj, error);
+    }
+  }
+
+  // --- Knowledge Backfill Publisher ---
+
+  async publishKnowledgeBackfill(data: {
+    query: string;
+    conversationId?: string;
+    caseId?: string;
+    maxWebResults?: number;
+    wikiLimit?: number;
+  }): Promise<boolean> {
+    if (!this.isReady()) return false;
+    await this.publish(this.exchanges.document_processing, 'knowledge.backfill', {
       ...data,
       enqueuedAt: new Date().toISOString(),
     });
@@ -1039,7 +1135,10 @@ export class RabbitMQManager extends EventEmitter {
         const message = Buffer.from(JSON.stringify(data));
         this.channel!.publish(exchange, routingKey, message, { persistent: true });
       } catch (error) {
-        console.error(`[RabbitMQ] Publish failed (${exchange}/${routingKey}):`, this.formatError(error));
+        console.error(
+          `[RabbitMQ] Publish failed (${exchange}/${routingKey}):`,
+          this.formatError(error)
+        );
         throw error; // Propagate so callers can handle
       }
     });
@@ -1093,7 +1192,7 @@ export class RabbitMQManager extends EventEmitter {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.error(
         `☠️ RabbitMQ: exhausted ${this.maxReconnectAttempts} reconnect attempts — giving up. ` +
-        'Restart process or call initialize() manually to retry.'
+          'Restart process or call initialize() manually to retry.'
       );
       this.emit('connection_failed', {
         attempts: this.reconnectAttempts,

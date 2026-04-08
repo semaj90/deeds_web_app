@@ -65,6 +65,7 @@
     "phase79:simd:stop": "taskkill /F /IM simd-json-accelerator.exe",
     "phase79:simd:health": "curl http://localhost:8103/health",
     "knowledge:build": "npx tsx scripts/knowledge-base-builder.ts",
+    "knowledge:youtube": "npx tsx scripts/knowledge-base-builder.ts --no-web --no-wikipedia --youtube",
     "knowledge:ui": "start http://localhost:5175/knowledge",
     "indexing:ui": "start http://localhost:5175/indexing",
     "rag:docs": "start http://localhost:8000/docs",
@@ -347,7 +348,14 @@
     "phase79:agent:full": "npx tsx scripts/phase79-agentic-repair.mts 50",
     "phase79:enhanced": "npx tsx scripts/phase79-agentic-repair-enhanced.mts 10",
     "phase79:enhanced:dry": "npx tsx scripts/phase79-agentic-repair-enhanced.mts 1",
-    "phase79:enhanced:full": "npx tsx scripts/phase79-agentic-repair-enhanced.mts 50"
+    "phase79:enhanced:full": "npx tsx scripts/phase79-agentic-repair-enhanced.mts 50",
+    "codebase:index": "npx tsx scripts/codebase-semantic-indexer.ts",
+    "codebase:index:dry": "npx tsx scripts/codebase-semantic-indexer.ts --dry-run",
+    "codebase:index:tags": "npx tsx scripts/codebase-semantic-indexer.ts --tags",
+    "codebase:index:dir": "npx tsx scripts/codebase-semantic-indexer.ts --dir",
+    "codebase:search": "npx tsx scripts/codebase-semantic-indexer.ts --query",
+    "knowledge:search": "npx tsx scripts/knowledge-base-builder.ts --search",
+    "knowledge:research": "npx tsx scripts/knowledge-base-builder.ts --auto-research"
   },
   "devDependencies": {
     "@babel/core": "7.28.5",
@@ -468,6 +476,7 @@
     "@langchain/openai": "1.1.0",
     "@langchain/textsplitters": "1.0.0",
     "@lucia-auth/adapter-drizzle": "^1.1.0",
+    "@mendable/firecrawl-js": "4.18.1",
     "@modelcontextprotocol/sdk": "^1.20.0",
     "@node-rs/argon2": "^2.0.2",
     "@paralleldrive/cuid2": "^2.2.2",
@@ -518,6 +527,7 @@
     "sveltekit-superforms": "^2.28.0",
     "uuid": "^10.0.0",
     "web-push": "3.6.7",
+    "youtube-transcript": "1.3.0",
     "zod": "4.3.6"
   },
   "exports": {

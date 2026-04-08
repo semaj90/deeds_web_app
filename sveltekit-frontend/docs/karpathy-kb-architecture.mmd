@@ -1,0 +1,106 @@
+flowchart TB
+    subgraph Sources["📚 Knowledge Sources"]
+        direction TB
+        WS["🔍 Web Search<br/>(Brave/DuckDuckGo)"]
+        WK["📖 Wikipedia API"]
+        SU["🌐 Seed URLs<br/>(Cornell, Justia, CRS)"]
+        PDF["📄 Local PDFs<br/>(lawpdfs/)"]
+    end
+
+    subgraph Builder["🏗️ knowledge-base-builder.ts"]
+        direction TB
+        AR["--auto-research<br/>Topic expansion"]
+        FE["Fetch & Extract<br/>HTML → clean text"]
+        CH["Legal-Aware Chunking<br/>800-token windows<br/>100-token overlap"]
+        EM["Ollama Embed<br/>embeddinggemma:latest<br/>768-dim vectors"]
+        DD["SHA-256 Dedup<br/>Skip duplicate chunks"]
+    end
+
+    subgraph Storage["💾 Persistent Storage"]
+        direction LR
+        QD_KB["🟣 Qdrant<br/>knowledge_base<br/>1,690 points<br/>dense unnamed 768d"]
+        QD_LD["🟣 Qdrant<br/>legal_documents<br/>6,089 points<br/>named: content + bm25"]
+        PG["🐘 PostgreSQL<br/>legal_ai_db<br/>41 docs, 6,075 chunks"]
+    end
+
+    subgraph Indexer["🔬 codebase-semantic-indexer.ts"]
+        direction TB
+        FS["File Discovery<br/>2,121 files in src/"]
+        CK["Code Chunking<br/>19,290 chunks"]
+        RD["Redis Bifrost Cache<br/>idx:hash → pointId<br/>30-day TTL dedup"]
+        CE["Ollama Embed<br/>embeddinggemma:latest"]
+        GT["Optional: Gemma4 Tags<br/>domain, purpose, complexity"]
+    end
+
+    subgraph CodeStore["💾 Code Vector Store"]
+        QD_CB["🟣 Qdrant<br/>codebase_chunks_768<br/>dense unnamed 768d<br/>int8 scalar quantization"]
+        RS["🔴 Redis<br/>Bifrost Cache<br/>Dedup index"]
+    end
+
+    subgraph GoSearch["🚀 Go Search Service (Docker)"]
+        direction TB
+        FO["5-Way Parallel Fan-Out"]
+        S1["① Citation FTS<br/>(PostgreSQL)"]
+        S2["② Full-Text Search<br/>(PostgreSQL)"]
+        S3["③ pgvector<br/>(PostgreSQL)"]
+        S4["④ legal_documents<br/>(Qdrant named)"]
+        S5["⑤ knowledge_base<br/>(Qdrant unnamed)"]
+        RRF["RRF Fusion<br/>Weighted merge<br/>citations:1.0 fts:0.8<br/>pgvec:0.7 qdrant:0.9<br/>kb:0.5"]
+    end
+
+    subgraph Frontend["🖥️ SvelteKit Frontend"]
+        SB["SearchBox.svelte<br/>HTTP :8096 /search"]
+        RC["retrieval-client.ts<br/>gRPC :50055"]
+        SSE["SSE Chat<br/>/api/sse/chat"]
+        GC["Graph Context<br/>KAG pipeline"]
+    end
+
+    %% Knowledge ingestion flow
+    WS --> AR
+    WK --> AR
+    SU --> FE
+    PDF --> FE
+    AR --> FE
+    FE --> CH
+    CH --> EM
+    EM --> DD
+    DD -->|"upsert"| QD_KB
+
+    %% Codebase indexing flow
+    FS --> CK
+    CK --> RD
+    RD -->|"cache miss"| CE
+    CE --> GT
+    GT -->|"upsert"| QD_CB
+    RD <-->|"dedup check"| RS
+
+    %% Search flow
+    SB --> FO
+    RC --> FO
+    FO --> S1 & S2 & S3 & S4 & S5
+    S1 & S2 & S3 --> PG
+    S4 --> QD_LD
+    S5 --> QD_KB
+    S1 & S2 & S3 & S4 & S5 --> RRF
+    RRF -->|"ranked results"| SB
+    RRF -->|"ranked results"| RC
+
+    %% Chat/RAG flow
+    SSE -->|"retrieval context"| GC
+    GC --> QD_LD
+    GC --> QD_KB
+
+    %% Styling
+    classDef source fill:#4a9eff,stroke:#2d7cd6,color:#fff
+    classDef builder fill:#ff9f43,stroke:#e08b3a,color:#fff
+    classDef store fill:#a55eea,stroke:#8e44ad,color:#fff
+    classDef search fill:#26de81,stroke:#20bf6b,color:#fff
+    classDef frontend fill:#fd79a8,stroke:#e84393,color:#fff
+    classDef indexer fill:#fdcb6e,stroke:#f0b429,color:#333
+
+    class WS,WK,SU,PDF source
+    class AR,FE,CH,EM,DD builder
+    class QD_KB,QD_LD,PG,QD_CB,RS store
+    class FO,S1,S2,S3,S4,S5,RRF search
+    class SB,RC,SSE,GC frontend
+    class FS,CK,RD,CE,GT indexer

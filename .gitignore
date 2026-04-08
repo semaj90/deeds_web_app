@@ -760,6 +760,9 @@ scripts/analysis_reports/
 scripts/court_data/
 scripts/tests/screenshots/glossary/
 
+# Temporary diagnostic scripts (root-level throwaway ps1)
+tmp-*.ps1
+
 # Archive directory — all subdirs are archived legacy code
 deeds_labs/
 

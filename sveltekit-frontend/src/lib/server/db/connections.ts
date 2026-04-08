@@ -43,7 +43,6 @@ export const adminPool = new Pool({
 
 export async function testAdminConnection(): Promise<boolean> {
 	try {
-        // @ts-ignore
 		const client = await adminPool.connect();
 		await client.query('SELECT 1');
 		client.release();
@@ -56,7 +55,6 @@ export async function testAdminConnection(): Promise<boolean> {
 
 export async function ensureExtensions(): Promise<void> {
 	try {
-        // @ts-ignore
 		const client = await adminPool.connect();
 		// Enable required extensions with superuser privileges
 		await client.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');

@@ -22,6 +22,7 @@ interface BuilderOptions {
   collection: string;
   dryRun: boolean;
   seedUrls: string[];
+  youtubeUrls: string[];
   useWebSearch: boolean;
   useWikipedia: boolean;
 }
@@ -67,6 +68,7 @@ function parseArgs(argv: string[]): BuilderOptions {
     collection: 'knowledge_base',
     dryRun: false,
     seedUrls: [],
+    youtubeUrls: [],
     useWebSearch: true,
     useWikipedia: true,
   };
@@ -98,6 +100,9 @@ function parseArgs(argv: string[]): BuilderOptions {
       options.dryRun = true;
     } else if (arg === '--seed-url' && next) {
       options.seedUrls.push(next);
+      index += 1;
+    } else if (arg === '--youtube' && next) {
+      options.youtubeUrls.push(next);
       index += 1;
     } else if (arg === '--no-web') {
       options.useWebSearch = false;
@@ -354,8 +359,11 @@ function chunkText(text: string, chunkSize: number, overlap: number): string[] {
 async function ensureKnowledgeCollection(collection: string): Promise<void> {
   try {
     const existing = await qdrant.getCollection(collection);
-    const sparseConfig = (existing as { config?: { sparse_vectors?: Record<string, unknown> } })?.config?.sparse_vectors;
-    collectionSupportsSparse = Boolean(sparseConfig && typeof sparseConfig === 'object' && Object.keys(sparseConfig).length > 0);
+    const sparseConfig = (existing as { config?: { sparse_vectors?: Record<string, unknown> } })
+      ?.config?.sparse_vectors;
+    collectionSupportsSparse = Boolean(
+      sparseConfig && typeof sparseConfig === 'object' && Object.keys(sparseConfig).length > 0
+    );
     if (!collectionSupportsSparse) {
       try {
         await qdrant.updateCollection(collection, {
@@ -408,7 +416,10 @@ async function upsertPoint(
       return;
     } catch (error) {
       collectionSupportsSparse = false;
-      console.warn('[kb-builder] sparse upsert unavailable; retrying dense-only:', error instanceof Error ? error.message : error);
+      console.warn(
+        '[kb-builder] sparse upsert unavailable; retrying dense-only:',
+        error instanceof Error ? error.message : error
+      );
     }
   }
 
@@ -453,7 +464,11 @@ function buildPointId(url: string, chunkIndex: number): string {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
 }
 
-async function collectDocuments(query: string, maxWebResults: number, wikiLimit: number): Promise<SourceDocument[]> {
+async function collectDocuments(
+  query: string,
+  maxWebResults: number,
+  wikiLimit: number
+): Promise<SourceDocument[]> {
   const documents: SourceDocument[] = [];
   const seenUrls = new Set<string>();
 
@@ -477,7 +492,10 @@ async function collectDocuments(query: string, maxWebResults: number, wikiLimit:
         source: result.source,
       });
     } catch (error) {
-      console.warn(`[kb-builder] Skipped ${result.url}:`, error instanceof Error ? error.message : error);
+      console.warn(
+        `[kb-builder] Skipped ${result.url}:`,
+        error instanceof Error ? error.message : error
+      );
     }
   }
 
@@ -501,7 +519,10 @@ async function collectDocuments(query: string, maxWebResults: number, wikiLimit:
         source: 'wikipedia',
       });
     } catch (error) {
-      console.warn(`[kb-builder] Skipped Wikipedia page ${result.title}:`, error instanceof Error ? error.message : error);
+      console.warn(
+        `[kb-builder] Skipped Wikipedia page ${result.title}:`,
+        error instanceof Error ? error.message : error
+      );
     }
   }
 
@@ -525,7 +546,83 @@ async function collectSeedDocuments(seedUrls: string[]): Promise<SourceDocument[
         source: 'seed-url',
       });
     } catch (error) {
-      console.warn(`[kb-builder] Skipped seed URL ${url}:`, error instanceof Error ? error.message : error);
+      console.warn(
+        `[kb-builder] Skipped seed URL ${url}:`,
+        error instanceof Error ? error.message : error
+      );
+    }
+  }
+
+  return documents;
+}
+
+async function collectYouTubeDocuments(urls: string[]): Promise<SourceDocument[]> {
+  if (urls.length === 0) return [];
+  const documents: SourceDocument[] = [];
+
+  // Dynamic import — youtube-transcript.ts uses ENV which may not be available in script context
+  // We use the youtube-transcript npm package directly here
+  let YTTranscript: any;
+  try {
+    YTTranscript = await import('youtube-transcript');
+  } catch {
+    console.warn('[kb-builder] youtube-transcript package not available, skipping YouTube sources');
+    return [];
+  }
+
+  for (const url of urls) {
+    try {
+      // Extract video ID
+      let videoId: string | null = null;
+      const watchMatch = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+      const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+      const bareMatch = url.match(/^([a-zA-Z0-9_-]{11})$/);
+      videoId = watchMatch?.[1] ?? shortMatch?.[1] ?? bareMatch?.[1] ?? null;
+
+      if (!videoId) {
+        console.warn(`[kb-builder] Could not parse video ID from: ${url}`);
+        continue;
+      }
+
+      console.log(`[kb-builder] Fetching YouTube transcript: ${videoId}`);
+      const segments = await YTTranscript.YoutubeTranscript.fetchTranscript(videoId);
+      if (!segments || segments.length === 0) {
+        console.warn(`[kb-builder] No transcript found for ${videoId}`);
+        continue;
+      }
+
+      // Join segments into paragraphs
+      let transcript = '';
+      for (const seg of segments) {
+        const text = String(seg.text ?? '').trim();
+        if (!text) continue;
+        transcript += text + ' ';
+        if (transcript.length > 0 && transcript.length % 500 < text.length) {
+          transcript += '\n\n';
+        }
+      }
+      transcript = transcript.trim();
+
+      if (transcript.length < 100) {
+        console.warn(
+          `[kb-builder] Transcript too short for ${videoId} (${transcript.length} chars)`
+        );
+        continue;
+      }
+
+      const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+      documents.push({
+        title: `YouTube: ${videoId}`,
+        url: videoUrl,
+        content: transcript,
+        source: 'youtube',
+      });
+      console.log(`[kb-builder] YouTube transcript: ${videoId} (${transcript.length} chars)`);
+    } catch (error) {
+      console.warn(
+        `[kb-builder] Skipped YouTube ${url}:`,
+        error instanceof Error ? error.message : error
+      );
     }
   }
 
@@ -534,9 +631,12 @@ async function collectSeedDocuments(seedUrls: string[]): Promise<SourceDocument[
 
 async function main(): Promise<void> {
   const options = parseArgs(process.argv.slice(2));
-  console.log(`[kb-builder] query="${options.query}" collection=${options.collection} dryRun=${options.dryRun}`);
+  console.log(
+    `[kb-builder] query="${options.query}" collection=${options.collection} dryRun=${options.dryRun}`
+  );
 
   const seededDocuments = await collectSeedDocuments(options.seedUrls);
+  const youtubeDocuments = await collectYouTubeDocuments(options.youtubeUrls);
   const searchedDocuments =
     options.useWebSearch || options.useWikipedia
       ? await collectDocuments(
@@ -546,20 +646,18 @@ async function main(): Promise<void> {
         )
       : [];
 
-  const documents = [...seededDocuments, ...searchedDocuments].filter(
+  const documents = [...seededDocuments, ...youtubeDocuments, ...searchedDocuments].filter(
     (document, index, all) => all.findIndex((candidate) => candidate.url === document.url) === index
   );
-  const chunks = documents.flatMap((document) =>
-    {
-      const documentChunks = chunkText(document.content, options.chunkSize, options.overlap);
-      return documentChunks.map((chunk, chunkIndex) => ({
-        document,
-        chunk,
-        chunkIndex,
-        chunkCount: documentChunks.length,
-      }));
-    }
-  );
+  const chunks = documents.flatMap((document) => {
+    const documentChunks = chunkText(document.content, options.chunkSize, options.overlap);
+    return documentChunks.map((chunk, chunkIndex) => ({
+      document,
+      chunk,
+      chunkIndex,
+      chunkCount: documentChunks.length,
+    }));
+  });
 
   console.log(`[kb-builder] documents=${documents.length} chunks=${chunks.length}`);
   if (documents.length === 0 || chunks.length === 0) {
@@ -568,7 +666,9 @@ async function main(): Promise<void> {
 
   if (options.dryRun) {
     for (const preview of chunks.slice(0, 5)) {
-      console.log(`[kb-builder] preview ${preview.document.source} ${preview.document.url} chunk=${preview.chunkIndex} chars=${preview.chunk.length}`);
+      console.log(
+        `[kb-builder] preview ${preview.document.source} ${preview.document.url} chunk=${preview.chunkIndex} chars=${preview.chunk.length}`
+      );
     }
     return;
   }

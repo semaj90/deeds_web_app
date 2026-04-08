@@ -169,9 +169,8 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
 	try {
 		const response = await fetch(url, {
 			...init,
-			// @ts-ignore -- undici dispatcher option (Node.js 18+)
 			dispatcher: ollamaDispatcher,
-		});
+		} as RequestInit);
 		logOllamaDiagnostics('success', meta, Date.now() - startedAt, response.status);
 		return response;
 	} catch (error) {

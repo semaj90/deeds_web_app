@@ -6,11 +6,8 @@ let cachedDriver: Driver | null = null;
 export function getNeo4jDriver(): Driver {
     if (cachedDriver) return cachedDriver;
 
-    // @ts-ignore
     const uri = env.NEO4J_URI ?? env.NEO4J_URL ?? 'bolt://localhost:7687';
-    // @ts-ignore
     const user = env.NEO4J_USER ?? env.NEO4J_USERNAME ?? 'neo4j';
-    // @ts-ignore
     const password = env.NEO4J_PASSWORD ?? env.NEO4J_PASS ?? 'password';
 
     cachedDriver = neo4j.driver(uri, neo4j.auth.basic(user, password), {

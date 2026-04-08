@@ -1,5 +1,3 @@
-// @ts-nocheck - Complex experimental service with external dependencies
-
 /**
  * Legal Document Graph Visualization - WebGPU Implementation
  *
@@ -161,10 +159,11 @@ export class WebGPULegalDocumentGraph {
     if (!this.context) throw new Error('Failed to get WebGPU context');
 
     // prefer GPU-provided canvas format; fall back to a sensible default
-    const format =
+    const format = (
       typeof webgpu.getPreferredCanvasFormat === 'function'
         ? webgpu.getPreferredCanvasFormat()
-        : ('bgra8unorm' as GPUTextureFormat);
+        : 'bgra8unorm'
+    ) as GPUTextureFormat;
     this.preferredFormat = format;
 
     this.context.configure({

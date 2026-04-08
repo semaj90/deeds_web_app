@@ -388,13 +388,16 @@ Answer NO or Ctrl+C immediately. Drizzle marks tables not in schema for deletion
 
 ---
 
-## tsconfig Services Exclude (CRITICAL)
+## tsconfig Services Status (Updated April 7, 2026)
 
-`src/lib/services/**` is **blanket-excluded** — 312 of 564 service files are corrupted (20K+ errors if included).
+`src/lib/services/` is **un-excluded and fully type-checked** — 35 files across 3 subdirectories, **0 errors**.
 
-**Clean services ARE type-checked** — TypeScript's `exclude` only affects file discovery. Files imported by routes/components are checked transitively.
+Previously 312+ corrupted files were blanket-excluded. After archival and cleanup, only 35 clean files remain:
+- **Root**: 7 files (api-client, couchdb-client, qdrant-client, tts, voice-commands, rag/source validation)
+- **error-analysis/**: 17 files (DecisionEngine, FixSynthesizer, GRPOPolicy, KAGTraverser, etc.)
+- **knowledge-search/**: 11 files (ACPToolRegistry, KnowledgeSearcher, KnowledgeIndexer, stores, etc.)
 
-**DO NOT remove the blanket exclude** unless most corrupted files are cleaned first.
+All 35 are actively imported by routes, components, or server modules (25 external consumers, 12 dynamic imports).
 
 ---
 
@@ -410,25 +413,73 @@ See `memory/corruption-patterns.md` for detection patterns and fix strategies.
 
 **Root cause**: Previous audits moved `$lib/webgpu/` as "dead" — but root layout (`+layout.svelte`) imports `$lib/webgpu/webgpu-init` + `$lib/webgpu/webgpu-cpu-fallback` on **every page load**. Moving it would have broken the entire app.
 
-**BEFORE moving ANY directory to `deeds_labs/`, run this checklist:**
+**Automated script**: `bash sveltekit-frontend/scripts/audit/orphan-detector.sh [dir]` — single-pass rg+awk, scans 545 components in ~10s. Results: 492 wired | 50 orphans | 3 edge cases (April 7, 2026).
 
-1. `grep -r "from.*\$lib/MODULE" src/` — check ALL static import consumers
-2. `grep -r "import(.*MODULE" src/` — check ALL dynamic `await import()` consumers **(CRITICAL — 115 files use dynamic imports; `mcp/server.ts` alone has 12)**
-3. `grep -r "require(.*MODULE" src/` — check CommonJS require() calls (rare: proto, OCR, astVectorizer)
-4. Check root layout (`+layout.svelte`) for dynamic imports
-5. Check all `+page.svelte` files for lazy/dynamic imports
-6. Check barrel `index.ts` re-exports and their downstream consumers
-7. Check API routes (`src/routes/api/`) for server-side imports
-8. Check `.svelte.ts` store files for cross-module references
-9. Verify SvelteKit 2 + Drizzle ORM adapter compatibility (schema refs)
+**MSYS/Git Bash glob bug**: Never use `rg $GLOB_VAR` with `--glob *.ts` — shell expands `*`. Use bash arrays: `RG_GLOB=(--glob '*.ts')` → `"${RG_GLOB[@]}"`.
+
+**BEFORE moving ANY directory to `deeds_labs/`, run this 10-layer checklist:**
+
+```bash
+MODULE="ComponentName"
+
+# ── PRIMARY (must check ALL three) ──
+
+# L1: Static ESM imports
+rg "from.*$MODULE" src/ --type ts --type svelte
+
+# L2: Dynamic ESM imports (517 files use await import(); mcp/server.ts has 12+)
+rg "import\(.*$MODULE" src/ --type ts --type svelte
+
+# L3: CJS require (rare: proto, OCR, astVectorizer)
+rg "require\(.*$MODULE" src/ --type ts
+
+# ── HIDDEN DEPENDENCY LAYERS (miss these = break production) ──
+
+# L4: Re-export barrels (57 files) — module may be re-exported via index.ts
+# A barrel importing MODULE means all barrel consumers depend on it transitively
+rg "export.*from.*$MODULE" src/lib/ --type ts
+rg "$MODULE" src/lib/components/*/index.ts src/lib/services/*/index.ts
+
+# L5: SvelteKit load→data binding (88 load fns, 677 data refs)
+# +page.server.ts exports props consumed by +page.svelte via $props().data
+# Renaming/removing a load property breaks the page silently
+# Check: is MODULE a +page.server.ts or +layout.server.ts? → consumers are implicit
+
+# L6: fetch('/api/...') wiring (193 files, 4865 refs)
+# Server routes have 0 file imports but ARE wired via client-side fetch()
+rg "fetch.*$MODULE" src/ --type ts --type svelte
+
+# ── SECONDARY (check for edge cases) ──
+
+# L7: Component registries/maps (50 files) — string-keyed lookups
+rg "componentMap\|registry\|loadComponent" src/ | grep -i "$MODULE"
+
+# L8: Event coupling (2805 occurrences across .svelte files)
+# AnalysisPanel has 0 static imports but IS wired via yorha:open-analysis event
+rg "CustomEvent.*$MODULE\|addEventListener.*$MODULE\|dispatchEvent.*$MODULE" src/
+rg "yorha:" src/  # known event namespace
+
+# L9: .svelte.ts store consumers (37 store files, each has 10+ consumers)
+# Moving a store breaks all components that import it
+rg "from.*$MODULE" src/ --glob "*.svelte" --glob "*.svelte.ts"
+```
+
+Also check:
+- Is it a SvelteKit route file (`+page.svelte`, `+server.ts`)? → NOT an orphan
+- Config references (`unocss.config.ts` safelist, `svelte.config.js`, `vite.config.ts`)
+- `@vite-ignore` variable imports (4 files: drizzle.ts, granite-docling.ts, fastjson.ts, CanvasBoard.svelte)
 
 **Lesson learned (March 22, 2026):** `docling.ts` was incorrectly archived because static grep found 0 consumers. Dynamic grep found 3 active `await import('../lib/server/docling.js')` calls in `mcp/server.ts`, `api/ace/ingest`, and `api/evidence/upload`. Always check both static AND dynamic imports.
 
-**Key directories that LOOK dead but ARE wired:**
+**Key directories/files that LOOK dead but ARE wired:**
 - `$lib/webgpu/` — root layout WebGPU init (every page)
 - `$lib/gpu/` — active compute pipeline (3 WGSL shaders, search reranker)
 - `$lib/ai/onnx/` — client-side ONNX inference (WebGPU → WASM → CPU)
 - `simd-bridge/cpp/` — LibTorch/CUDA N-API addon (3 GPU functions verified)
+- `components/analysis/AnalysisPanel.svelte` — dynamic import in +layout.svelte + `yorha:open-analysis` event (L4+L9)
+- `components/KeyboardShortcutsPanel.svelte` — dynamic-only imports in layout (L2, 0 static)
+- `chr97-builder.ts` / `cartridge-tensor-bridge.ts` — active tensor caching pipeline (4 API endpoints)
+- `lib/server/db/drizzle.ts` cache import — uses `@vite-ignore` variable import (L4)
 
 **`deeds_labs/` is gitignored** — moving files there is effectively permanent deletion. Measure twice, cut once.
 
