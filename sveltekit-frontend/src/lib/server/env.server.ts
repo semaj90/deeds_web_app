@@ -82,6 +82,9 @@ export const ENV = {
   SEARXNG_URL: privateEnv.SEARXNG_URL ?? '', // Free self-hosted: http://localhost:8080 or public instance
   GOOGLE_SEARCH_API_KEY: privateEnv.GOOGLE_SEARCH_API_KEY ?? '',
   GOOGLE_SEARCH_CX: privateEnv.GOOGLE_SEARCH_CX ?? '',
+  // Obsidian Local REST API (optional — vault sync via obsidian-local-rest-api plugin)
+  OBSIDIAN_URL: privateEnv.OBSIDIAN_URL ?? 'https://127.0.0.1:27124',
+  OBSIDIAN_API_KEY: privateEnv.OBSIDIAN_API_KEY ?? '',
   // Firecrawl Web Scraping API (optional — used for YouTube transcript extraction + web crawling)
   FIRECRAWL_API_KEY: privateEnv.FIRECRAWL_API_KEY ?? '',
   // Go Legal Library Search Service (parallel fan-out: citation + FTS + pgvector + Qdrant)
