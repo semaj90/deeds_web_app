@@ -146,7 +146,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 	try {
 		const { ENV } = await import('$lib/server/env.server.js');
-		const res = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks`, { signal: AbortSignal.timeout(5_000) });
+		const res = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768`, { signal: AbortSignal.timeout(5_000) });
 		if (!res.ok) {
 			return json({ indexed: false, message: 'Collection not found' });
 		}

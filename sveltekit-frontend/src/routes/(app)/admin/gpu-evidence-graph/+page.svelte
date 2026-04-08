@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import type { WebGPULegalDocumentGraph, PerformanceStats } from '$lib/webgpu/legal-document-graph.js';
 
 	const { data }: { data: PageData & { connections?: Array<{ source: string; target: string; type: string; strength: number }> } } = $props();
 
@@ -7,6 +8,9 @@
 	let hasWebGPU = $state(false);
 	let selectedNode = $state<string | number | null>(null);
 	let hoveredNode = $state<string | number | null>(null);
+	let gpuGraph = $state<WebGPULegalDocumentGraph | null>(null);
+	let gpuStats = $state<PerformanceStats | null>(null);
+	let useGPURenderer = $state(false);
 
 	// Build graph nodes from server evidence data
 	interface GraphNode {
@@ -274,8 +278,37 @@
 
 	let selectedEvidence = $derived(graphNodes.find(n => n.id === selectedNode) ?? null);
 
+	async function initGPUGraph() {
+		try {
+			const { WebGPULegalDocumentGraph } = await import('$lib/webgpu/legal-document-graph.js');
+			const graph = new WebGPULegalDocumentGraph(canvas, {
+				maxNodes: 10000,
+				maxEdges: 50000,
+				enablePhysics: true,
+			});
+			await graph.initialize();
+			gpuGraph = graph;
+			useGPURenderer = true;
+
+			// Report stats periodically
+			const statsInterval = setInterval(() => {
+				if (gpuGraph) gpuStats = gpuGraph.getPerformanceStats();
+			}, 1000);
+
+			graph.startRenderLoop();
+			return () => {
+				clearInterval(statsInterval);
+				graph.dispose();
+			};
+		} catch (err) {
+			console.warn('[GPU Graph] WebGPU init failed, using Canvas 2D fallback:', (err as Error)?.message);
+			useGPURenderer = false;
+			return null;
+		}
+	}
+
 	$effect(() => {
-		// Check WebGPU
+		// Check WebGPU availability
 		const nav = navigator as any;
 		if (nav.gpu) {
 			nav.gpu.requestAdapter().then((a: any) => {
@@ -284,9 +317,28 @@
 		}
 
 		initNodes();
-		animFrame = requestAnimationFrame(tick);
 
-		return () => cancelAnimationFrame(animFrame);
+		// Try Bifrost WebGPU accelerated renderer, fall back to Canvas 2D
+		let gpuCleanup: (() => void) | null = null;
+		if (hasWebGPU && canvas) {
+			initGPUGraph().then((cleanup) => {
+				gpuCleanup = cleanup;
+			});
+		}
+
+		// Canvas 2D fallback render loop (runs when GPU renderer is not active)
+		if (!useGPURenderer) {
+			animFrame = requestAnimationFrame(tick);
+		}
+
+		return () => {
+			cancelAnimationFrame(animFrame);
+			if (gpuCleanup) gpuCleanup();
+			if (gpuGraph) {
+				gpuGraph.dispose();
+				gpuGraph = null;
+			}
+		};
 	});
 </script>
 
@@ -299,8 +351,11 @@
 	<div class="overlay top-left">
 		<h1>Evidence Graph</h1>
 		<div class="renderer">
-			RENDERER: {hasWebGPU ? 'WebGPU Compute' : 'Canvas 2D'}
+			RENDERER: {useGPURenderer ? 'Bifrost WebGPU' : hasWebGPU ? 'Canvas 2D (GPU available)' : 'Canvas 2D'}
 		</div>
+		{#if gpuStats}
+			<div class="renderer">FPS: {gpuStats.fps.toFixed(0)} | GPU MEM: {(gpuStats.gpuMemoryUsage / 1024).toFixed(0)}KB</div>
+		{/if}
 		{#if data.user}
 			<div class="user-tag">Agent: {data.user.username ?? data.user.email ?? 'Unknown'}</div>
 		{/if}
