@@ -1753,6 +1753,117 @@
       "problemMatcher": "$gcc"
     },
     // ============================================
+    // GPU Graph Analysis + Codebase Auto-Research + Obsidian
+    // ============================================
+    {
+      "label": "🧠 Graph: Analyze (PageRank + Communities)",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:5173/api/graph/analyze -H \"Content-Type: application/json\" -d \"{\\\"maxNodes\\\":${input:graphMaxNodes},\\\"includePageRank\\\":true,\\\"includeCommunities\\\":true,\\\"includeGpuClusters\\\":false}\" | jq '{nodes: .nodeCount, edges: .edgeCount, cached: .cached, duration_ms: .durationMs, top_pagerank: [.pageRank[:5][] | {title: .title[:40], score: (.score*10000|round/10000), label}], communities: (.communities | length)}'",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧠 Graph: Full GPU Analysis (PageRank + Clusters + Similarity)",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:5173/api/graph/analyze -H \"Content-Type: application/json\" -d \"{\\\"maxNodes\\\":${input:graphMaxNodes},\\\"includePageRank\\\":true,\\\"includeCommunities\\\":true,\\\"includeGpuClusters\\\":true,\\\"includeSimilarityMatrix\\\":true,\\\"clusterCount\\\":5}\" | jq '{nodes: .nodeCount, edges: .edgeCount, gpu: .gpu, clusters: (.clusters // [] | length), similarity_dim: (.similarityMatrix // [] | length), cached: .cached, duration_ms: .durationMs}'",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧠 Graph: Capabilities (GET)",
+      "type": "shell",
+      "command": "curl -s http://127.0.0.1:5173/api/graph/analyze | jq",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔬 Codebase: GPU Analysis (K-Means Clusters)",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:5173/api/codebase/analyze -H \"Content-Type: application/json\" -d \"{\\\"mode\\\":\\\"clusters\\\",\\\"limit\\\":50,\\\"clusterCount\\\":5}\" | jq '{mode, vectorCount, clusters: [.clusters[]? | {id: .clusterId, size, center_file: .topFiles[0][:60]}], duration_ms: .durationMs}'",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔬 Codebase: GPU Analysis (Duplicate Detection)",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:5173/api/codebase/analyze -H \"Content-Type: application/json\" -d \"{\\\"mode\\\":\\\"duplicates\\\",\\\"limit\\\":100,\\\"similarityThreshold\\\":0.92}\" | jq '{mode, vectorCount, duplicatePairs: (.duplicatePairs // [] | length), top_dupes: [(.duplicatePairs // [])[:5][] | {score: (.similarity*100|round/100), fileA: .fileA[:40], fileB: .fileB[:40]}], duration_ms: .durationMs}'",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔬 Codebase: Auto-Research (Karpathy Gap-Fill)",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:5173/api/codebase/auto-research -H \"Content-Type: application/json\" -d \"{\\\"query\\\":\\\"${input:autoResearchQuery}\\\",\\\"threshold\\\":0.45,\\\"maxFiles\\\":5,\\\"generateWiki\\\":true}\" | jq '{backfilled, topScore: (.topScore*10000|round/10000), filesAnalyzed, wikiEntries: [(.wikiEntries // [])[] | {path: .path[:50], summary: .summary[:80]}], duration_ms: .durationMs}'",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📓 Obsidian: Status Check",
+      "type": "shell",
+      "command": "curl -s http://127.0.0.1:5173/api/obsidian | jq",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📓 Obsidian: Search Vault",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:5173/api/obsidian -H \"Content-Type: application/json\" -d \"{\\\"action\\\":\\\"search\\\",\\\"query\\\":\\\"${input:obsidianSearchQuery}\\\"}\" | jq '{success, count: .count, results: [(.results // [])[:5][] | {filename, score: (.score*100|round/100)}]}'",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📓 Obsidian: Export Case Analysis",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:5173/api/obsidian -H \"Content-Type: application/json\" -d \"{\\\"action\\\":\\\"export-case\\\",\\\"caseTitle\\\":\\\"${input:obsidianCaseTitle}\\\"}\" | jq",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    // ============================================
     // Redis Bifrost Cache + Parallelism
     // ============================================
     {
@@ -2062,6 +2173,30 @@
       "type": "promptString",
       "description": "YouTube video URL or ID to ingest into knowledge base",
       "default": "https://www.youtube.com/watch?v="
+    },
+    {
+      "id": "graphMaxNodes",
+      "type": "promptString",
+      "description": "Maximum Neo4j nodes to fetch for graph analysis (50-500)",
+      "default": "100"
+    },
+    {
+      "id": "autoResearchQuery",
+      "type": "promptString",
+      "description": "Codebase auto-research topic (Karpathy gap-fill pattern)",
+      "default": "how does the evidence upload pipeline work"
+    },
+    {
+      "id": "obsidianSearchQuery",
+      "type": "promptString",
+      "description": "Search query for Obsidian vault notes",
+      "default": "legal research"
+    },
+    {
+      "id": "obsidianCaseTitle",
+      "type": "promptString",
+      "description": "Case title for Obsidian export (creates Legal AI/Cases/<title>.md)",
+      "default": "Smith v Johnson"
     }
   ]
 }
