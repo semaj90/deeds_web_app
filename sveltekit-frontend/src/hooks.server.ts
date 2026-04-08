@@ -192,6 +192,19 @@ if (shouldRunSingletonTasks) {
     )
     .catch((err) => console.warn('[Boot] GPU cache warmup: failed:', (err as Error).message));
 
+  // CouchDB TTL cleanup: purge inference_log docs >7 days, dag_cache expired docs (6hr interval)
+  import('$lib/server/observability/inference-log.js')
+    .then(({ startInferenceLogCleanup }) => {
+      startInferenceLogCleanup();
+      console.log('[Boot] CouchDB inference_log cleanup: scheduled (7-day retention, 6hr interval)');
+    })
+    .catch((err) => console.warn('[Boot] Inference log cleanup: failed:', (err as Error).message));
+
+  import('$lib/server/cache/dag-cache.js')
+    .then(({ cleanupExpiredDAGCache }) => cleanupExpiredDAGCache())
+    .then((r) => console.log(`[Boot] DAG cache cleanup: ${r.deleted} expired docs removed`))
+    .catch((err) => console.warn('[Boot] DAG cache cleanup: failed:', (err as Error).message));
+
   // ── VAPID Key Validation ─────────────────────────────────────────────────
   if (ENV.VAPID_PUBLIC_KEY && ENV.VAPID_PRIVATE_KEY) {
     console.log('[Boot] VAPID keys configured — Web Push enabled');

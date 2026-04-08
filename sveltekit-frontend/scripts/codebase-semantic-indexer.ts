@@ -167,7 +167,7 @@ async function searchQdrant(query: string, limit = 10): Promise<any[]> {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      vector: embedding,
+      vector: { name: 'content', vector: embedding },
       limit,
       with_payload: true,
     }),
@@ -359,10 +359,10 @@ async function processChunkBatch(
           stats.chunksTagged++;
         }
 
-        // Build point
+        // Build point — collection uses named vectors: content + signature
         const point = {
           id: chunk.id,
-          vector,
+          vector: { content: vector, signature: vector },
           payload: {
             file_path: chunk.filePath,
             file_name: chunk.fileName,

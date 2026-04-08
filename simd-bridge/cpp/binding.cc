@@ -62,6 +62,9 @@ extern "C" int graphSimilarity(const float* embeddings, int n, int dim, float* o
 extern "C" int clusterEmbeddings(const float* embeddings, int n, int dim, int k, int max_iters, int* assignments, int assignments_len);
 extern "C" int computeCaseEmbedding(const float* weights, int n, const float* embeddings, int dim, float* output, int output_len);
 extern "C" int checkCudaAvailable();
+extern "C" int getCudaMemory(int64_t* free_bytes, int64_t* total_bytes);
+extern "C" int batchCosineSimilarity(const float* query, int dim, const float* corpus, int n, float* scores, int scores_len);
+extern "C" int graphSimilarityHalf(const float* embeddings, int n, int dim, float* output, int output_len);
 
 // LSTM bridge (lstm_bridge.cc → lstm_gpu.cu)
 extern "C" int bridge_run_lstm(const float* a, const float* b, float* out, int n);
@@ -411,6 +414,93 @@ static napi_value ReLUWrapper(napi_env env, napi_callback_info info) {
   return result;
 }
 
+// ── GetCudaMemory(BigInt64Array free, BigInt64Array total) → number ──
+
+static napi_value GetCudaMemoryWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 2;
+  napi_value argv[2];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+
+  if (argc < 2) return throw_type_error(env, "getCudaMemory(BigInt64Array free, BigInt64Array total)");
+
+  size_t f_len;
+  void* f_data;
+  napi_get_typedarray_info(env, argv[0], nullptr, &f_len, &f_data, nullptr, nullptr);
+
+  size_t t_len;
+  void* t_data;
+  napi_get_typedarray_info(env, argv[1], nullptr, &t_len, &t_data, nullptr, nullptr);
+
+  if (f_len < 1 || t_len < 1)
+    return throw_type_error(env, "Output arrays must have at least 1 element");
+
+  int rc = getCudaMemory((int64_t*)f_data, (int64_t*)t_data);
+  napi_value result;
+  napi_create_int32(env, rc, &result);
+  return result;
+}
+
+// ── BatchCosineSimilarity(Float32Array query, dim, Float32Array corpus, n, Float32Array scores, scoresLen) → number ─
+
+static napi_value BatchCosineSimilarityWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 6;
+  napi_value argv[6];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+
+  if (argc < 6) return throw_type_error(env, "batchCosineSimilarity(query, dim, corpus, n, scores, scoresLen)");
+
+  void* q_data;
+  napi_get_typedarray_info(env, argv[0], nullptr, nullptr, &q_data, nullptr, nullptr);
+
+  int32_t dim;
+  napi_get_value_int32(env, argv[1], &dim);
+
+  void* c_data;
+  napi_get_typedarray_info(env, argv[2], nullptr, nullptr, &c_data, nullptr, nullptr);
+
+  int32_t n;
+  napi_get_value_int32(env, argv[3], &n);
+
+  void* s_data;
+  napi_get_typedarray_info(env, argv[4], nullptr, nullptr, &s_data, nullptr, nullptr);
+
+  int32_t scores_len;
+  napi_get_value_int32(env, argv[5], &scores_len);
+
+  int rc = batchCosineSimilarity((const float*)q_data, dim, (const float*)c_data, n, (float*)s_data, scores_len);
+  napi_value result;
+  napi_create_int32(env, rc, &result);
+  return result;
+}
+
+// ── GraphSimilarityHalf(Float32Array embeddings, n, dim, Float32Array output, outputLen) → number ─
+
+static napi_value GraphSimilarityHalfWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 5;
+  napi_value argv[5];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+
+  if (argc < 5) return throw_type_error(env, "graphSimilarityHalf(embeddings, n, dim, output, outputLen)");
+
+  void* in_data;
+  napi_get_typedarray_info(env, argv[0], nullptr, nullptr, &in_data, nullptr, nullptr);
+
+  int32_t n, dim;
+  napi_get_value_int32(env, argv[1], &n);
+  napi_get_value_int32(env, argv[2], &dim);
+
+  void* out_data;
+  napi_get_typedarray_info(env, argv[3], nullptr, nullptr, &out_data, nullptr, nullptr);
+
+  int32_t output_len;
+  napi_get_value_int32(env, argv[4], &output_len);
+
+  int rc = graphSimilarityHalf((const float*)in_data, n, dim, (float*)out_data, output_len);
+  napi_value result;
+  napi_create_int32(env, rc, &result);
+  return result;
+}
+
 // ── Module Init ──────────────────────────────────────────────────────
 
 static napi_value Init(napi_env env, napi_value exports) {
@@ -424,6 +514,10 @@ static napi_value Init(napi_env env, napi_value exports) {
   registerFn(env, exports, "dotProduct", DotProductWrapper);
   registerFn(env, exports, "scale", ScaleWrapper);
   registerFn(env, exports, "relu", ReLUWrapper);
+  // GPU memory + advanced graph ops
+  registerFn(env, exports, "getCudaMemory", GetCudaMemoryWrapper);
+  registerFn(env, exports, "batchCosineSimilarity", BatchCosineSimilarityWrapper);
+  registerFn(env, exports, "graphSimilarityHalf", GraphSimilarityHalfWrapper);
   // simdjson functions
   registerFn(env, exports, "simdJsonParse", RegisterSimdJsonParse);
   registerFn(env, exports, "simdJsonValidate", RegisterSimdJsonValidate);

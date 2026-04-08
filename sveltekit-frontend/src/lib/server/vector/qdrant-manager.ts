@@ -433,7 +433,9 @@ export class QdrantManager {
           const pattern = `qdrant:search:*`;
           const keys = await redis.keys(pattern);
           if (keys.length > 0) {
-            await Promise.all(keys.map((k) => redis.del(k)));
+            const delPipeline = redis.pipeline();
+            for (const k of keys) delPipeline.del(k);
+            await delPipeline.exec();
           }
         }
       } catch {

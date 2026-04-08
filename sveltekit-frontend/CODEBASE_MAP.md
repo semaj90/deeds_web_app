@@ -1,5 +1,5 @@
 # Deeds Web App — Codebase Map
-## Last Updated: March 17, 2026 (Verification Audit — corrected counts, clarified historical status)
+## Last Updated: April 8, 2026 (Gemini 10-Layer Audit Integration + API Route Recount)
 
 ## April 3, 2026 Audit Note
 
@@ -22,8 +22,8 @@
 | **Component files (lib/components/*.svelte)** | 541 |
 | **App route groups** | 17 |
 | **Page routes (+page.svelte)** | 86 |
-| **API endpoints (+server.ts)** | 294 |
-| **API route groups** | 80 |
+| **API endpoints (+server.ts)** | 414 |
+| **API route groups** | 80+ |
 | **Server subdirectories (lib/server/)** | 88 |
 | **deeds_labs/ files** | ~80,000 (intentional archive) |
 | **Active compile diagnostics** | **19 import-resolution errors** |
@@ -140,7 +140,7 @@ Status note: `ACTIVE` in this table means the route group is present in `src/rou
 | `system-configuration/` | System config panel | ACTIVE |
 | `terminal/` | 9S AI Chat Interface (voice I/O, streaming) | ACTIVE |
 ---
-## API Routes — src/routes/api/ (80 groups, 294 endpoints)
+## API Routes — src/routes/api/ (80+ groups, 414 endpoints, 58,531 LOC)
 ### Core API Groups
 | API Group | Endpoints | Purpose |
 |-----------|-----------|---------|
@@ -255,7 +255,7 @@ Status note: `ACTIVE` in this table means the route group is present in `src/rou
 | `types/` | TypeScript definitions | Type system |
 | `utils/` | `ollama.ts`, `xstate-svelte5.ts`, etc. | Utility functions (12 active, current inventory) |
 | `shims/` | Browser compatibility | **MUST preserve** |
-| `services/` | 15 active of 312+ total | **blanket-excluded** (312 corrupted) |
+| `services/` | 35 active, 0 errors | **un-excluded** (was 312 corrupted, cleaned Apr 7) |
 ### Component Subdirectories (39)
 | Group | Dirs | Notable |
 |-------|------|---------|
@@ -382,7 +382,7 @@ Tier 3: HTTP Batch (Ollama /api/embed, pLimit(4))
   ↓ fail
 Tier 4: HTTP Sequential (Ollama /api/embed, one-at-a-time)
 ```
-### GPU Pipeline (LibTorch/CUDA N-API)
+### GPU Pipeline (LibTorch/CUDA N-API) — Verified 2026-04-08
 ```
 simd-bridge/cpp/
   ├── binding.cc          ← N-API module init + TypedArray wrappers
@@ -392,11 +392,16 @@ simd-bridge/cpp/
        ↓ builds
   build/Release/tensorrt_bridge.node
        ↓ loaded by
-  lib/server/gpu/libtorch-bridge.ts (graphSimilarity, clusterEmbeddings, computeCaseEmbedding)
+  lib/server/gpu/libtorch-bridge.ts (graphSimilarity, clusterEmbeddings, computeCaseEmbedding, isCudaAvailable)
        ↓ re-exported via
-  lib/server/gpu/cuda-bridge.ts
-       ↓ called by
-  /api/gpu/compute + background-analyzer.ts (post-upload)
+  lib/server/gpu/cuda-bridge.ts + gpu/background-analyzer.ts
+       ↓ consumed by (21 files total — L1 static + L2 dynamic + L6 fetch)
+  Static:  /api/gpu/compute, /api/health/gpu, /api/infrastructure/status
+  Dynamic: hooks.server.ts (boot warmup), mcp/server.ts (gpu:similarity tool),
+           workers/compute-pool.ts (K-means), /api/evidence/upload (post-upload),
+           /api/evidence/[id]/gpu-analysis, /api/persons-of-interest/[id]/gpu-analyze,
+           /api/persons-of-interest/[id]/photos (post-VLM)
+  Fetch:   stores/analysis-panel.svelte.ts → /api/gpu/compute
 ```
 ### Evidence Upload Pipeline (9 stages)
 1. MinIO upload + SHA-256 hash + PostgreSQL record
@@ -451,6 +456,77 @@ SvelteKit ←─ gRPC ──→ Go embedding-server ←─ HTTP ──→ Ollama
     ├── AMQP ──→ RabbitMQ (async jobs)
     └── HTTP ──→ CouchDB (tag catalog)
 ```
+---
+## 10-Layer Import Audit Protocol (Gemini Audit — April 7, 2026)
+
+### Layer Coverage
+| Layer | Pattern | Risk | Files | Detection |
+|-------|---------|------|-------|-----------|
+| L1 | Static ESM (`from '...'`) | Baseline | All | `rg "from.*MODULE" src/` |
+| L2 | Dynamic ESM (`await import()`) | HIGH | 115 files | `rg "import\(.*MODULE" src/` |
+| L3 | CJS require | LOW | ~5 files | `rg "require\(.*MODULE" src/` |
+| L4 | Variable dynamic (`@vite-ignore`) | CRITICAL | 4 files | `rg "@vite-ignore" src/` |
+| L5 | SvelteKit auto-discovery | LOW | 692 route files | Don't flag route files as orphans |
+| L6 | Config/safelist refs | LOW | ~10 files | Check `unocss.config.ts`, `vite.config.ts` |
+| L7 | `{@html}` string refs | LOW | ~20 files | `rg "{@html" src/` |
+| L8 | Barrel re-exports | MODERATE | 24 index.ts | Check if barrel ITSELF is imported |
+| L9 | Event coupling | HIGH | 88 files (192 events) | `rg "CustomEvent\|addEventListener" src/` |
+| L10 | Store subscriptions | LOW | 37 .svelte.ts files | `rg "from.*MODULE" src/ --glob "*.svelte.ts"` |
+
+### L4 — Variable Dynamic Imports (Invisible to Grep)
+| File | Pattern |
+|------|---------|
+| `lib/server/db/drizzle.ts` | `const cachePath = '...'; await import(cachePath)` |
+| `lib/server/analysis/granite-docling.ts` | PDF rendering variable import |
+| `lib/server/json/fastjson.ts` | JSON parser variable import |
+| `lib/components/yorha/_simulations/CanvasBoard.svelte` | Simulation engine variable import |
+
+### L8 — Barrel Re-Exports (24 index.ts files)
+- `shells/index.ts` re-exports 3 components but barrel itself has **0 consumers** — entire chain dead
+- Rule: Always check if the barrel itself is imported, not just its contents
+
+### L9 — Event Coupling (88 files, 192+ event types)
+- `AnalysisPanel.svelte` has 0 static imports but triggered via `yorha:open-analysis` from root layout
+- 27 files use `window.addEventListener` for global event channels
+- `yorha:` event namespace is the primary coupling mechanism
+
+### Dynamic Import Hotspots
+| File | Dynamic Imports | Why |
+|------|----------------|-----|
+| `(app)/+layout.svelte` | ~5 | AnalysisPanel, KeyboardShortcuts, lazy UI |
+| `mcp/server.ts` | 12 | All tool handlers lazy-loaded |
+| `hooks.server.ts` | 3 | Boot tasks (GPU warmup, queue consumers) |
+| API routes (`src/routes/api/`) | 80+ | Service imports on first request |
+| **Total files using `await import()`** | **115** | |
+
+### API Route Consumer Analysis (414 +server.ts, 58,531 LOC)
+| Metric | Count |
+|--------|-------|
+| Total `+server.ts` files | 414 |
+| Total lines of API code | 58,531 |
+| `.svelte` files with `fetch('/api/...')` | 193 |
+| Total `/api/` references (fetch + import) | 4,865 |
+| `.svelte.ts` store files | 37 |
+
+### Internal API-to-API Calls (8 server→server fetch chains)
+| Source Route | Target Route | Method |
+|-------------|-------------|--------|
+| `cases/[id]/similar` | `/api/graph/sync` | POST |
+| `error-brain/diagnose` | `/api/codebase-index/graph` | GET |
+| `evidence/analyze` | `/api/evidence/analysis` | GET+POST |
+| `gpu-wasm-integration` | `/api/gpu/queue` | GET |
+| `knowledge/search` | `/api/glossary/search` | POST |
+| `knowledge/search` | `/api/statutes/search` | POST |
+| `knowledge/search` | `/api/precedents/search` | POST |
+
+### Component Wiring Stats (April 8, 2026)
+| Metric | Count |
+|--------|-------|
+| Wired components (orphan-detector v2) | 537 |
+| Remaining orphans | 8 |
+| Edge cases | 0 |
+| Demo route pages | 50+ |
+
 ---
 ## Client ↔ Server RAG Architecture
 ```
@@ -576,12 +652,12 @@ Status note: percentages below are carried forward from earlier project tracking
 - Only `onnx/` remains — contains gemma3_270m/ and model.onnx/
 ### SvelteKit src/lib/ (22 top-level dirs, 236 nested subdirs)
 - Many single-file directories could be consolidated
-- `lib/services/` — 312 corrupted files blanket-excluded; 15 active files wired
+- `lib/services/` — 35 clean files, 0 errors (was 312 corrupted, cleaned Apr 7, 2026)
 - `lib/types/` — ~65 of 83 files likely dead (only 9 actively imported)
 - `lib/__tests__/`, `lib/error-brain/` — excluded from tsconfig
 ---
 ## Critical Warnings
-- **tsconfig**: `src/lib/services/**` blanket-excluded (312 corrupted)
+- **tsconfig**: `src/lib/services/**` un-excluded — 35 files, 0 errors (cleaned Apr 7, 2026)
 - **Phase 99**: Commit `0a2bd98929` corrupted 83 files — DO NOT rerun
 - **DB migrations**: Always `drizzle-kit migrate`, review SQL for DROPs
 - **SSR routes**: evidence, citations, evidence-library have `ssr = false` (client-heavy)

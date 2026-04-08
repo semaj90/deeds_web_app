@@ -11,6 +11,7 @@
  */
 
 #include <torch/torch.h>
+#include <cuda_runtime_api.h>
 #include <vector>
 #include <cmath>
 #include <cstring>
@@ -23,6 +24,8 @@
  * Pin intra-op threads to min(4, hardware) to avoid starving Node.js event loop.
  */
 static std::once_flag _init_flag;
+static bool _cudnn_available = false;
+
 static void initLibTorch() {
     std::call_once(_init_flag, [] {
         int hw = std::max(1, (int)std::thread::hardware_concurrency());
@@ -34,6 +37,12 @@ static void initLibTorch() {
             torch::set_num_interop_threads(std::min(2, hw));
         } catch (...) {
             // Already set or not supported — ignore
+        }
+
+        // Enable cuDNN benchmarking for optimal kernel selection per input size
+        if (torch::cuda::is_available() && torch::cuda::cudnn_is_available()) {
+            _cudnn_available = true;
+            torch::globalContext().setBenchmarkCuDNN(true);
         }
     });
 }
@@ -116,10 +125,9 @@ extern "C" int clusterEmbeddings(
         auto assign_tensor = torch::zeros({n}, torch::TensorOptions().dtype(torch::kLong).device(device));
 
         for (int iter = 0; iter < max_iters; iter++) {
-            // Compute distances: ||data - centroid||^2 for each centroid
-            // Expand for broadcasting: data[n,1,dim] - centroids[1,k,dim]
-            auto diff = data.unsqueeze(1) - centroids.unsqueeze(0); // [n, k, dim]
-            auto dists = diff.pow(2).sum(2); // [n, k]
+            // Compute pairwise L2 distances: data[n,dim] vs centroids[k,dim] → [n,k]
+            // torch::cdist uses optimized cuBLAS path internally (avoids [n,k,dim] broadcast)
+            auto dists = torch::cdist(data, centroids, 2.0); // [n, k]
 
             // Assign each point to nearest centroid
             auto new_assign = dists.argmin(1); // [n]
@@ -199,10 +207,12 @@ extern "C" int computeCaseEmbedding(
 
 /**
  * Check if CUDA is available for this build.
- * Returns 1 if CUDA available, 0 if CPU only.
+ * Returns 2 if CUDA+cuDNN available, 1 if CUDA only, 0 if CPU only.
  */
 extern "C" int checkCudaAvailable() {
-    return torch::cuda::is_available() ? 1 : 0;
+    if (!torch::cuda::is_available()) return 0;
+    initLibTorch(); // ensure cuDNN detection ran
+    return _cudnn_available ? 2 : 1;
 }
 
 /**

@@ -118,15 +118,22 @@ export class IoRedisDrizzleCache extends Cache {
 				}
 			});
 
-			// For each affected table, find and delete all associated cached queries
+			// Phase 1: batch-fetch all table members in one pipeline
+			const fetchPipeline = redis.pipeline();
 			for (const tableName of tableNames) {
-				const setKey = `${PREFIX}:tbl:${tableName}`;
-				// Get all cached query keys for this table
-				const members = await redis.smembers(setKey);
-				if (members.length > 0) {
-					pipeline.del(...members);
+				fetchPipeline.smembers(`${PREFIX}:tbl:${tableName}`);
+			}
+			const memberResults = await fetchPipeline.exec();
+
+			// Phase 2: batch-delete all cached query keys + table sets
+			if (memberResults) {
+				for (let i = 0; i < tableNames.length; i++) {
+					const [err, members] = memberResults[i] ?? [null, []];
+					if (!err && Array.isArray(members) && members.length > 0) {
+						for (const m of members) pipeline.del(m);
+					}
+					pipeline.del(`${PREFIX}:tbl:${tableNames[i]}`);
 				}
-				pipeline.del(setKey);
 			}
 
 			await pipeline.exec();

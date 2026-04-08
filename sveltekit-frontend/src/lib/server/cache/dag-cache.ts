@@ -116,3 +116,55 @@ export async function setCachedDAG(
 		console.warn('[DAG Cache] Write failed (non-fatal):', (err as Error)?.message ?? err);
 	}
 }
+
+/**
+ * Purge expired DAG cache documents from CouchDB.
+ * Scans all docs, checks cachedAt + ttlMs, bulk-deletes expired ones.
+ * Non-blocking, non-fatal — safe to call from boot tasks or scheduled interval.
+ */
+export async function cleanupExpiredDAGCache(): Promise<{ deleted: number; error?: string }> {
+	try {
+		const { couchdb } = await import('$lib/services/couchdb-client.js');
+		const allDocs = await couchdb.allDocs(DAG_CACHE_DB, { include_docs: true }) as {
+			rows: Array<{ id: string; doc?: Record<string, unknown> & { _rev?: string } }>
+		};
+
+		const now = Date.now();
+		const expired: Array<{ _id: string; _rev: string; _deleted: true }> = [];
+
+		for (const row of allDocs.rows) {
+			if (row.id.startsWith('_design/')) continue;
+			const doc = row.doc;
+			if (!doc?.cachedAt) continue;
+
+			const age = now - new Date(doc.cachedAt as string).getTime();
+			const ttl = (doc.ttlMs as number) || DEFAULT_TTL_MS;
+			// Delete if expired by more than 2x TTL (generous buffer)
+			if (age > ttl * 2 && doc._rev) {
+				expired.push({ _id: row.id, _rev: doc._rev, _deleted: true });
+			}
+		}
+
+		if (expired.length === 0) return { deleted: 0 };
+
+		const baseUrl = process.env.COUCHDB_URL ?? 'http://localhost:5984';
+		const auth = 'Basic ' + Buffer.from(
+			`${process.env.COUCHDB_USER ?? 'admin'}:${process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass'}`
+		).toString('base64');
+
+		const res = await fetch(`${baseUrl}/${DAG_CACHE_DB}/_bulk_docs`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json', Authorization: auth },
+			body: JSON.stringify({ docs: expired }),
+			signal: AbortSignal.timeout(10_000),
+		});
+
+		const deleted = res.ok ? expired.length : 0;
+		console.log(`[DAG Cache] Cleanup: deleted ${deleted} expired docs`);
+		return { deleted };
+	} catch (err) {
+		const msg = (err as Error)?.message ?? String(err);
+		console.warn('[DAG Cache] Cleanup failed (non-fatal):', msg);
+		return { deleted: 0, error: msg };
+	}
+}

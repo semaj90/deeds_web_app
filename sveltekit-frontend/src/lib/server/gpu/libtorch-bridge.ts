@@ -78,22 +78,37 @@ interface NativeAddon {
 let addon: NativeAddon | null = null;
 let loadAttempted = false;
 
-/** Add LibTorch DLL directory to PATH so the addon can find its dependencies */
+/** Add LibTorch + cuDNN DLL directories to PATH so the addon can find its dependencies */
 function ensureLibtorchInPath(): void {
 	const libDirs = [
 		resolve(process.cwd(), '../libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/lib'),
 		'C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/lib',
 	];
+	// cuDNN DLLs (v9.16 for CUDA 13.0) — enables torch::cuda::cudnn_is_available()
+	const cudnnDirs = [
+		'C:/Program Files/NVIDIA/CUDNN/v9.16/bin/13.0',
+		'C:/Program Files/NVIDIA/CUDNN/v9.8/bin/12.8',
+	];
 	const sep = process.platform === 'win32' ? ';' : ':';
-	const currentPath = process.env.PATH ?? '';
+	let currentPath = process.env.PATH ?? '';
 
 	for (const dir of libDirs) {
 		if (existsSync(dir) && !currentPath.includes(dir)) {
-			process.env.PATH = dir + sep + currentPath;
+			currentPath = dir + sep + currentPath;
 			console.log(`[libtorch-bridge] Added to PATH: ${dir}`);
-			return;
+			break;
 		}
 	}
+
+	for (const dir of cudnnDirs) {
+		if (existsSync(dir) && !currentPath.includes(dir)) {
+			currentPath = dir + sep + currentPath;
+			console.log(`[libtorch-bridge] Added cuDNN to PATH: ${dir}`);
+			break;
+		}
+	}
+
+	process.env.PATH = currentPath;
 }
 
 function getAddon(): NativeAddon | null {
@@ -113,8 +128,9 @@ function getAddon(): NativeAddon | null {
 		try {
 			if (!existsSync(p)) continue;
 			addon = esmRequire(p) as NativeAddon;
-			const cuda = addon.checkCudaAvailable?.() === 1;
-			console.log(`[libtorch-bridge] Loaded native addon from ${p} (CUDA: ${cuda})`);
+			const cudaCode = addon.checkCudaAvailable?.() ?? 0;
+			const cudaLabel = cudaCode === 2 ? 'CUDA+cuDNN' : cudaCode === 1 ? 'CUDA' : 'CPU';
+			console.log(`[libtorch-bridge] Loaded native addon from ${p} (${cudaLabel})`);
 			return addon;
 		} catch (err) {
 			console.warn(`[libtorch-bridge] Failed to load ${p}:`, (err as Error).message);
@@ -319,7 +335,17 @@ export async function computeCaseEmbedding(
 export function isCudaAvailable(): boolean {
 	const native = getAddon();
 	if (!native?.checkCudaAvailable) return false;
-	return native.checkCudaAvailable() === 1;
+	return native.checkCudaAvailable() >= 1;
+}
+
+/**
+ * Check if cuDNN is available (CUDA+cuDNN detected at init).
+ * Returns true only if the addon reports cuDNN benchmark mode is active.
+ */
+export function isCudnnAvailable(): boolean {
+	const native = getAddon();
+	if (!native?.checkCudaAvailable) return false;
+	return native.checkCudaAvailable() === 2;
 }
 
 // ── LSTM / SOM types ──────────────────────────────────────────────────

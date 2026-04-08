@@ -1,7 +1,7 @@
 # Codebase Consolidation Audit Report
 
-## Date: March 9, 2026
-## Scope: Full server-side deduplication audit across 5 domains
+## Date: March 9, 2026 (Updated April 8, 2026 — Gemini 10-Layer Audit + API Consumer Analysis)
+## Scope: Full server-side deduplication audit across 6 domains
 
 ---
 
@@ -16,7 +16,8 @@ The codebase has **significant duplication** across server-side infrastructure. 
 | **Embedding Pipeline** | 20+ | 12+ `generateEmbedding()` functions, 7 `embedText()` variants | ~1,500 |
 | **Clustering/Similarity** | 8+ | 5 cosine similarity impls, 3 k-means impls, 2 silhouette impls | ~600 |
 | **GPU Bridge** | 3 | 1 canonical (libtorch-bridge) + 1 re-export (cuda-bridge) | ~50 |
-| **Total** | **72+** | **~35 duplicate function groups** | **~4,450** |
+| **API Route Consumer** | 414 | 8 internal API-to-API chains, 4 @vite-ignore files | ~200 |
+| **Total** | **486+** | **~35 duplicate function groups + 8 API chains** | **~4,650** |
 
 ---
 
@@ -195,17 +196,7 @@ Then find-replace across 41+ files.
 
 **Server files importing client-side cosineSimilarity:** `multi-modal-ranker.ts` and `topic-cluster.ts` both import from `$lib/ai/client-embed.js` — a client-side file. This works but is architecturally wrong.
 
-**Recommendation:**
-1. Make `embedding/knn-helper.ts` the canonical server-side similarity library
-2. Replace `phase72/clusterErrors.ts` inline impl with import from knn-helper
-3. Replace client-embed.js imports in server files with knn-helper import
-4. Delete `pgvector-utils.temp.ts` (exact copy of pgvector-utils.ts)
-
-### 4b. K-Means Clustering (3 implementations)
-
-| File | Function | Features | GPU |
-|------|----------|----------|-----|
-| `ml/topic-cluster.ts` | `KMeansClusterer.fit()` | k-means++ init, silhouette, convergence | Yes (via libtorch-bridge) |
+*eans++ init, silhouette, convergence | Yes (via libtorch-bridge) |
 | `services/clustering/kmeans-service.ts` | `runKMeans()` | k-means++ init, silhouette, cluster stats | Yes (via libtorch-bridge) |
 | `phase72/clusterErrors.ts` | `kmeansCluster()` | Basic k-means, local cosine sim | No |
 | `gpu/libtorch-bridge.ts` | `cpuKMeans()` | Basic k-means (CPU fallback) | N/A (is the fallback) |
@@ -215,7 +206,17 @@ Then find-replace across 41+ files.
 - Both compute silhouette scores
 - Both have GPU-first with CPU fallback
 - `topic-cluster.ts` returns `{clusters, centroids, silhouetteScore, iterations, inertia}`
-- `kmeans-service.ts` returns `KMeansCluster[]` with members
+- `kmeans-service.ts` returns *Recommendation:**
+1. Make `embedding/knn-helper.ts` the canonical server-side similarity library
+2. Replace `phase72/clusterErrors.ts` inline impl with import from knn-helper
+3. Replace client-embed.js imports in server files with knn-helper import
+4. Delete `pgvector-utils.temp.ts` (exact copy of pgvector-utils.ts)
+
+### 4b. K-Means Clustering (3 implementations)
+
+| File | Function | Features | GPU |
+|------|----------|----------|-----|
+| `ml/topic-cluster.ts` | `KMeansClusterer.fit()` | k-m`KMeansCluster[]` with members
 
 **Recommendation:** Consolidate `topic-cluster.ts` and `kmeans-service.ts` into a single k-means module. `topic-cluster.ts` has the more complete implementation (inertia tracking, convergence detection). `kmeans-service.ts` adds cluster member tracking and stats functions. Merge into `topic-cluster.ts` and have `kmeans-service.ts` re-export with member tracking wrapper.
 
@@ -238,23 +239,115 @@ Then find-replace across 41+ files.
 
 ## Domain 5: GPU Bridge
 
-### Current State (Clean)
+### Current State (Clean) — Verified 2026-04-08 (10-layer audit)
 
 | File | Purpose | Status |
 |------|---------|--------|
-| `gpu/libtorch-bridge.ts` | Canonical GPU bridge (graphSimilarity, clusterEmbeddings, computeCaseEmbedding) | PRIMARY |
-| `gpu/cuda-bridge.ts` | Re-export wrapper | THIN WRAPPER |
+| `gpu/libtorch-bridge.ts` | Canonical GPU bridge (graphSimilarity, clusterEmbeddings, computeCaseEmbedding, isCudaAvailable) | PRIMARY |
+| `gpu/cuda-bridge.ts` | Re-export wrapper + getCudaDeviceInfo | THIN WRAPPER |
+| `gpu/background-analyzer.ts` | Fire-and-forget CUDA analysis (warmupGpuCache, triggerEvidenceGpuAnalysis, triggerPoiGpuAnalysis, analyzePoiPhotoGpu) | ACTIVE |
+| `gpu/gpu-monitor.ts` | VRAM/temp/utilization stats (getGpuStats, getRouterStatus) | ACTIVE |
 
-**Consumers (6 files, all wired correctly):**
-- `ml/topic-cluster.ts` — `clusterEmbeddings`
-- `services/clustering/kmeans-service.ts` — `clusterEmbeddings`
-- `vector/qdrant-manager.ts` — `graphSimilarity`
-- `ai/multimodal-fusion.ts` — `computeCaseEmbedding`
-- `ml/multi-modal-ranker.ts` — `graphSimilarity`
-- `services/similar-cases.service.ts` — `graphSimilarity`
-- `graph/evidence-graph-service.ts` — `graphSimilarity`
+**Static Consumers (L1 — 8 files):**
+- `gpu/cuda-bridge.ts` — re-exports graphSimilarity, clusterEmbeddings, computeCaseEmbedding, isCudaAvailable
+- `gpu/background-analyzer.ts` — imports all 3 core functions + isCudaAvailable
+- `api/gpu/compute/+server.ts` — graphSimilarity, clusterEmbeddings, computeCaseEmbedding, isCudaAvailable
+- `api/health/gpu/+server.ts` — isCudaAvailable, graphSimilarity, getCudaDeviceInfo, getGpuStats
+- `api/infrastructure/status/+server.ts` — isCudaAvailable
 
-**Status:** Clean — no consolidation needed. `cuda-bridge.ts` could be deleted (imports redirected to libtorch-bridge) but is harmless.
+**Dynamic Consumers (L2 — 10 files, invisible to simple grep):**
+- `hooks.server.ts:188` — `warmupGpuCache(5)` at boot (pre-populate GPU cache for 5 recent cases)
+- `mcp/server.ts:1190` — `graphSimilarity` via `gpu:similarity` MCP tool (CPU fallback)
+- `workers/compute-pool.ts:188` — `clusterEmbeddings`, `isCudaAvailable` (worker thread K-means routing)
+- `api/evidence/[id]/gpu-analysis/+server.ts:63` — `triggerEvidenceGpuAnalysis` (on-demand evidence GPU)
+- `api/evidence/upload/+server.ts:22` — `triggerEvidenceGpuAnalysis` (fire-and-forget post-upload)
+- `api/persons-of-interest/[id]/gpu-analyze/+server.ts:23` — `analyzePoiPhotoGpu` (on-demand POI GPU)
+- `api/persons-of-interest/[id]/photos/+server.ts:470` — `triggerPoiGpuAnalysis` (fire-and-forget post-VLM)
+
+**Fetch Consumers (L6 — 2 client files):**
+- `stores/analysis-panel.svelte.ts` — `fetch('/api/gpu/compute')` (similarity + cluster operations)
+- `components/yorha/dashboard/GPUMetrics.svelte` — dynamic import of `gpu-compute-pipeline.js`
+
+**Total: 21 files consume GPU Bridge modules**
+
+**Previously listed consumers (DELETED — archived to deeds_labs/):**
+- ~~`ml/topic-cluster.ts`~~, ~~`services/clustering/kmeans-service.ts`~~, ~~`ai/multimodal-fusion.ts`~~
+- ~~`ml/multi-modal-ranker.ts`~~, ~~`services/similar-cases.service.ts`~~, ~~`graph/evidence-graph-service.ts`~~
+- `vector/qdrant-manager.ts` — uses `simdjson-bridge`, NOT libtorch directly
+
+**Status:** Clean — all 3 core functions actively wired. cuda-bridge.ts is harmless thin wrapper.
+
+---
+
+## Domain 6: API Route Consumer Analysis (Gemini Audit — April 7, 2026)
+
+### Overview
+| Metric | Count |
+|--------|-------|
+| Total `+server.ts` files | **414** |
+| Total lines of API code | **58,531** |
+| `.svelte` files with `fetch('/api/...')` | **193** |
+| Total `/api/` references (all file types) | **4,865** |
+| `.svelte.ts` store files | **37** |
+| Internal API-to-API fetch chains | **8** |
+
+### 10-Layer Import Coverage
+| Layer | Pattern | Count | Risk |
+|-------|---------|-------|------|
+| L1 | Static ESM (`from '...'`) | All files | Baseline |
+| L2 | Dynamic ESM (`await import()`) | **115 files** | HIGH — invisible to `from` grep |
+| L3 | CJS require | ~5 files | LOW |
+| L4 | Variable dynamic (`@vite-ignore`) | **4 files** | CRITICAL — invisible to all grep |
+| L5 | SvelteKit auto-discovery | 692 route files | LOW |
+| L8 | Barrel re-exports | **24 index.ts** | MODERATE |
+| L9 | Event coupling | **88 files (192 events)** | HIGH |
+| L10 | Store subscriptions | 37 .svelte.ts files | LOW |
+
+### L4 — Variable Dynamic Imports (Invisible to Grep)
+| File | What It Imports |
+|------|-----------------|
+| `lib/server/db/drizzle.ts` | `const cachePath = '$lib/server/cache/redis'; await import(cachePath)` |
+| `lib/server/analysis/granite-docling.ts` | PDF rendering via variable path |
+| `lib/server/json/fastjson.ts` | JSON parser via variable path |
+| `lib/components/yorha/_simulations/CanvasBoard.svelte` | Simulation engine via variable path |
+
+### Internal API-to-API Calls (Server→Server)
+8 API routes call other `/api/` routes via fetch(), creating invisible dependency chains:
+
+| Source Route | Target Route | Method | Purpose |
+|-------------|-------------|--------|---------|
+| `cases/[id]/similar` | `/api/graph/sync` | POST | Neo4j graph sync after similarity calc |
+| `error-brain/diagnose` | `/api/codebase-index/graph` | GET | Fetch dependency graph for error diagnosis |
+| `evidence/analyze` | `/api/evidence/analysis` | GET+POST | Proxy to analysis handler |
+| `gpu-wasm-integration` | `/api/gpu/queue` | GET | GPU queue status check |
+| `knowledge/search` | `/api/glossary/search` | POST | Fan-out to glossary adapter |
+| `knowledge/search` | `/api/statutes/search` | POST | Fan-out to statutes adapter |
+| `knowledge/search` | `/api/precedents/search` | POST | Fan-out to precedents adapter |
+
+### Dynamic Import Hotspots
+| File | `await import()` Count | Purpose |
+|------|----------------------|---------|
+| `mcp/server.ts` | **12** | All MCP tool handlers lazy-loaded |
+| `(app)/+layout.svelte` | ~5 | AnalysisPanel, KeyboardShortcuts, lazy UI |
+| `hooks.server.ts` | 3 | Boot tasks (GPU warmup, queue consumers, graph sync) |
+| API routes | **80+** | Service imports on first request |
+
+### L8 — Barrel Re-Export Dead Chains
+24 barrel `index.ts` files found. Key finding:
+- `shells/index.ts` re-exports 3 components but the barrel itself has **0 consumers** — entire re-export chain is dead
+- Rule: When auditing, check if the **barrel** is imported, not just its contents
+
+### L9 — Event Coupling
+- **88 files** dispatch or listen for CustomEvents
+- **192+ unique event types** across the codebase
+- **27 files** use `window.addEventListener` for global channels
+- `yorha:` event namespace is primary coupling mechanism
+- Example: `AnalysisPanel.svelte` has 0 static imports but is triggered via `yorha:open-analysis` from root layout
+
+### Consolidation Recommendation
+- API-to-API internal calls should be refactored to direct function imports where possible (eliminates HTTP overhead + auth re-checking)
+- `knowledge/search` → `glossary/statutes/precedents` fan-out is acceptable (adapter pattern) but could use shared internal function instead of HTTP round-trips
+- `evidence/analyze` → `evidence/analysis` proxy is pure redirect — merge into single route
 
 ---
 

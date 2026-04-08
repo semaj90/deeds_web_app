@@ -20,6 +20,8 @@ import { traceCouchDB } from './langfuse.js';
 const INFERENCE_LOG_DB = 'inference_log';
 const FLUSH_INTERVAL_MS = 5_000;
 const FLUSH_THRESHOLD = 50;
+const RETENTION_DAYS = 7;
+const CLEANUP_INTERVAL_MS = 6 * 60 * 60 * 1000; // every 6 hours
 
 export interface InferenceLogEntry {
   type: 'llm' | 'embedding' | 'vector_search' | 'graph_query' | 'dag_ordering' | 'policy';
@@ -50,6 +52,7 @@ interface BufferedEntry extends InferenceLogEntry {
 
 let buffer: BufferedEntry[] = [];
 let flushTimer: ReturnType<typeof setInterval> | null = null;
+let cleanupTimer: ReturnType<typeof setInterval> | null = null;
 let dbEnsured = false;
 
 function ensureFlushTimer(): void {
@@ -181,4 +184,64 @@ export function logVectorSearch(params: {
 		resultCount: params.resultCount,
 		cacheHit: params.cacheHit ?? false,
 	});
+}
+
+/**
+ * Purge inference_log documents older than RETENTION_DAYS.
+ * Uses _all_docs to scan IDs (timestamp-prefixed) and _bulk_docs with _deleted.
+ * Non-blocking, non-fatal — safe to call from boot tasks.
+ */
+export async function cleanupOldInferenceLogs(): Promise<{ deleted: number; error?: string }> {
+	try {
+		const cutoff = new Date(Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000).toISOString().replace(/[:.]/g, '-');
+		const baseUrl = process.env.COUCHDB_URL ?? 'http://localhost:5984';
+		const auth = 'Basic ' + Buffer.from(
+			`${process.env.COUCHDB_USER ?? 'admin'}:${process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass'}`
+		).toString('base64');
+
+		// Fetch all doc IDs up to the cutoff (IDs are timestamp-prefixed, so lexicographic order works)
+		const res = await fetch(
+			`${baseUrl}/${INFERENCE_LOG_DB}/_all_docs?endkey=${JSON.stringify(cutoff)}&limit=1000`,
+			{ headers: { Authorization: auth }, signal: AbortSignal.timeout(10_000) }
+		);
+		if (!res.ok) return { deleted: 0, error: `_all_docs failed: ${res.status}` };
+
+		const data = await res.json() as { rows: Array<{ id: string; value: { rev: string } }> };
+		const rows = data.rows.filter(r => !r.id.startsWith('_design/'));
+		if (rows.length === 0) return { deleted: 0 };
+
+		// Bulk delete
+		const deleteDocs = rows.map(r => ({ _id: r.id, _rev: r.value.rev, _deleted: true }));
+		const delRes = await fetch(
+			`${baseUrl}/${INFERENCE_LOG_DB}/_bulk_docs`,
+			{
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json', Authorization: auth },
+				body: JSON.stringify({ docs: deleteDocs }),
+				signal: AbortSignal.timeout(15_000),
+			}
+		);
+
+		const deleted = delRes.ok ? deleteDocs.length : 0;
+		console.log(`[Inference Log] Cleanup: deleted ${deleted} docs older than ${RETENTION_DAYS} days`);
+		return { deleted };
+	} catch (err) {
+		const msg = (err as Error)?.message ?? String(err);
+		console.warn('[Inference Log] Cleanup failed (non-fatal):', msg);
+		return { deleted: 0, error: msg };
+	}
+}
+
+/**
+ * Start the periodic cleanup timer. Call once from boot tasks.
+ * Runs immediately on first call, then every CLEANUP_INTERVAL_MS.
+ */
+export function startInferenceLogCleanup(): void {
+	if (cleanupTimer) return;
+	// Run first cleanup after a short delay (don't block startup)
+	setTimeout(() => cleanupOldInferenceLogs(), 30_000);
+	cleanupTimer = setInterval(() => cleanupOldInferenceLogs(), CLEANUP_INTERVAL_MS);
+	if (typeof cleanupTimer === 'object' && 'unref' in cleanupTimer) {
+		cleanupTimer.unref();
+	}
 }

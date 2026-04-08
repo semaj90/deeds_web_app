@@ -30,8 +30,10 @@ async function recordCacheMetric(type: 'hit' | 'miss', cacheType: string): Promi
     const key = `metrics:cache:${cacheType}`;
     const field = type === 'hit' ? 'hits' : 'misses';
     try {
-        await redis.hincrby(key, field, 1);
-        await redis.expire(key, 3600);
+        const pipeline = redis.pipeline();
+        pipeline.hincrby(key, field, 1);
+        pipeline.expire(key, 3600);
+        await pipeline.exec();
     } catch {
         // ignore
     }
@@ -56,11 +58,23 @@ export async function getCacheStats(cacheType: string) {
 }
 
 export async function getAllCacheStats() {
-    const [embeddingStats, searchStats] = await Promise.all([
-        getCacheStats('embeddings'),
-        getCacheStats('search')
-    ]);
-    return { embeddings: embeddingStats, search: searchStats };
+    try {
+        const pipeline = redis.pipeline();
+        pipeline.hgetall('metrics:cache:embeddings');
+        pipeline.hgetall('metrics:cache:search');
+        const results = await pipeline.exec();
+        const parse = (r: [Error | null, unknown] | undefined) => {
+            const stats = (r && !r[0] ? r[1] : null) as Record<string, string> | null;
+            const hits = parseInt(stats?.hits ?? '0');
+            const misses = parseInt(stats?.misses ?? '0');
+            const total = hits + misses;
+            return { hits, misses, total, hitRate: total > 0 ? ((hits / total) * 100).toFixed(2) : '0.00' };
+        };
+        return { embeddings: parse(results?.[0]), search: parse(results?.[1]) };
+    } catch {
+        const empty = { hits: 0, misses: 0, total: 0, hitRate: '0.00' };
+        return { embeddings: empty, search: empty };
+    }
 }
 
 // Embedding cache

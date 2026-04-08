@@ -200,16 +200,29 @@ export class CachingLayer {
 			}
 		}
 
-		// Redis tier: use tag sets
+		// Redis tier: use tag sets — pipelined for fewer round-trips
 		try {
 			const redis = getRedis();
+			// Phase 1: batch-fetch all tag members in one pipeline
+			const fetchPipeline = redis.pipeline();
 			for (const tag of tags) {
-				const keys = await redis.smembers(`cl:tag:${tag}`);
-				if (keys.length > 0) {
-					await redis.del(...keys, `cl:tag:${tag}`);
-					invalidated += keys.length;
+				fetchPipeline.smembers(`cl:tag:${tag}`);
+			}
+			const memberResults = await fetchPipeline.exec();
+
+			// Phase 2: batch-delete all keys + tag sets in one pipeline
+			const delPipeline = redis.pipeline();
+			if (memberResults) {
+				for (let i = 0; i < tags.length; i++) {
+					const [err, members] = memberResults[i] ?? [null, []];
+					if (!err && Array.isArray(members) && members.length > 0) {
+						for (const k of members) delPipeline.del(k);
+						invalidated += members.length;
+					}
+					delPipeline.del(`cl:tag:${tags[i]}`);
 				}
 			}
+			await delPipeline.exec();
 		} catch (err) {
 			console.warn('[CachingLayer] Redis invalidateByTags failed:', (err as Error).message ?? err);
 		}
