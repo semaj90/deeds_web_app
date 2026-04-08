@@ -85,6 +85,13 @@
 		{ href: '/demos/dialog-wrapper', label: 'Dialog Components', description: 'DialogWrapper with analytics tracking and close handling, plus AIDialog with accessible modal layout.', icon: 'square', lines: 168, category: 'ui' },
 		{ href: '/demos/hover-card', label: 'UI Primitives', description: 'HoverCard with progressive disclosure, Checkbox with accessible IDs, and LoadingSpinner with size variants.', icon: 'layers', lines: 218, category: 'ui' },
 		{ href: '/demos/svelte5-primitives', label: 'Svelte 5 Primitives Gallery', description: 'Reference implementations: Avatar, Badge, Card, Dialog, Input, Progress, Dropdown, QuickAction, StatsCard, AIButton.', icon: 'component', lines: 1700, category: 'ui' },
+		{ href: '/demos/ai-chat-test', label: 'Enhanced AI Chat Test', description: 'Full-featured AI chat with health checks, streaming responses, bits-ui Dialog, and Ollama endpoint testing.', icon: 'message-square', lines: 513, category: 'ai' },
+		{ href: '/demos/ai-assistant', label: 'AI Chat Assistant', description: 'Simple mock AI assistant with case context, simulated responses, and message history.', icon: 'bot', lines: 142, category: 'ai' },
+		{ href: '/demos/case-form', label: 'Case Form Variants', description: 'Two case creation forms: lightweight UI form with Ctrl+S and Superforms v2 with Zod schema validation.', icon: 'clipboard', lines: 811, category: 'ui' },
+		{ href: '/demos/evidence-form', label: 'Evidence Form', description: 'Evidence submission form with Superforms v2, field validation, and automatic navigation on success.', icon: 'file-plus', lines: 169, category: 'ui' },
+		{ href: '/demos/legal-layout', label: 'Legal AI Layout', description: '3-column legal workspace layout with collapsible nav rail, main content area, and system status panel.', icon: 'columns', lines: 566, category: 'ui' },
+		{ href: '/demos/streaming', label: 'Streaming Response', description: 'AI response streaming display with cursor animation, loading indicator, and role badge.', icon: 'radio', lines: 121, category: 'ai' },
+		{ href: '/demos/modals', label: 'Modal Components', description: 'Two modal implementations: gradient backdrop with keyboard handling, and transitions with size variants.', icon: 'maximize-2', lines: 400, category: 'ui' },
 	];
 
 	const showcases: Demo[] = [

@@ -131,21 +131,21 @@
  <div class="status-item">
  <span class="status-label">Postgres</span>
  <div class="status-bar">
- <div class="bar-fill" style="width, 65%"></div>
+ <div class="bar-fill" style="width: 65%"></div>
  </div>
  <span class="status-value">6.5 GB</span>
  </div>
  <div class="status-item">
  <span class="status-label">Qdrant Vectors</span>
  <div class="status-bar">
- <div class="bar-fill" style="width, 42%"></div>
+ <div class="bar-fill" style="width: 42%"></div>
  </div>
  <span class="status-value">4.2 GB</span>
  </div>
  <div class="status-item">
  <span class="status-label">Neo4j Graph</span>
  <div class="status-bar">
- <div class="bar-fill" style="width, 28%"></div>
+ <div class="bar-fill" style="width: 28%"></div>
  </div>
  <span class="status-value">2.8 GB</span>
  </div>
