@@ -16,6 +16,7 @@
  */
 
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
+import neo4j from 'neo4j-driver';
 import {
 	graphSimilarity,
 	graphSimilarityHalf,
@@ -136,15 +137,15 @@ async function fetchGraphData(
 		try {
 			const nodeQuery = caseId
 				? `MATCH (c:Case {id: $caseId})-[r*1..2]-(n)
-				   RETURN DISTINCT id(n) AS nodeId, labels(n)[0] AS label, COALESCE(n.title, n.name, n.term, n.code, '') AS title
+				   RETURN DISTINCT elementId(n) AS nodeId, labels(n)[0] AS label, COALESCE(n.title, n.name, n.term, n.code, '') AS title
 				   LIMIT $maxNodes`
 				: `MATCH (n)
-				   RETURN DISTINCT id(n) AS nodeId, labels(n)[0] AS label, COALESCE(n.title, n.name, n.term, n.code, '') AS title
+				   RETURN DISTINCT elementId(n) AS nodeId, labels(n)[0] AS label, COALESCE(n.title, n.name, n.term, n.code, '') AS title
 				   LIMIT $maxNodes`;
 
 			const nodeResult = await session.run(nodeQuery, {
 				caseId: caseId ?? '',
-				maxNodes: maxNodes,
+				maxNodes: neo4j.int(maxNodes),
 			});
 
 			const nodes: GraphNode[] = nodeResult.records.map((r) => ({
@@ -154,24 +155,24 @@ async function fetchGraphData(
 			}));
 
 			const edgeQuery = caseId
-				? `MATCH (c:Case {id: $caseId})-[r1*1..2]-(a)-[r2]-(b)
-				   WHERE id(a) IN $nodeIds AND id(b) IN $nodeIds
-				   RETURN DISTINCT id(a) AS from, id(b) AS to, type(r2) AS relType
+				? `MATCH (a)-[r]-(b)
+				   WHERE elementId(a) IN $nodeIds AND elementId(b) IN $nodeIds
+				   RETURN DISTINCT elementId(a) AS fromId, elementId(b) AS toId, type(r) AS relType
 				   LIMIT 5000`
 				: `MATCH (a)-[r]-(b)
-				   WHERE id(a) IN $nodeIds AND id(b) IN $nodeIds
-				   RETURN DISTINCT id(a) AS from, id(b) AS to, type(r) AS relType
+				   WHERE elementId(a) IN $nodeIds AND elementId(b) IN $nodeIds
+				   RETURN DISTINCT elementId(a) AS fromId, elementId(b) AS toId, type(r) AS relType
 				   LIMIT 5000`;
 
-			const nodeIds = nodes.map((n) => parseInt(n.nodeId, 10));
+			const nodeIds = nodes.map((n) => n.nodeId);
 			const edgeResult = await session.run(edgeQuery, {
 				caseId: caseId ?? '',
 				nodeIds,
 			});
 
 			const edges = edgeResult.records.map((r) => ({
-				from: String(r.get('from')),
-				to: String(r.get('to')),
+				from: String(r.get('fromId')),
+				to: String(r.get('toId')),
 				type: String(r.get('relType') ?? 'RELATED'),
 			}));
 
