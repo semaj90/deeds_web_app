@@ -58,20 +58,22 @@ export const GET: RequestHandler = async ({ url }) => {
 		});
 	} catch (err) {
 		console.error('[QdrantHealth] Check failed:', err);
-		return json(
-			{
-				success: false,
-				error: 'Health check failed',
-				healthy: false,
-				collections: [],
-				totalVectors: 0,
-				missingCollections: [],
-				schemaIssues: [],
-				latencyMs: 0,
-				timestamp: new Date().toISOString()
-			},
-			{ status: 500 }
-		);
+		return json({
+      success: false,
+      healthy: false,
+      collections: [],
+      totalVectors: 0,
+      missingCollections: [],
+      schemaIssues: [],
+      latencyMs: 0,
+      timestamp: new Date().toISOString(),
+      server: {
+        version: '',
+        url: ENV.QDRANT_URL,
+        healthy: false,
+        latencyMs: 0,
+      },
+    });
 	}
 };
 

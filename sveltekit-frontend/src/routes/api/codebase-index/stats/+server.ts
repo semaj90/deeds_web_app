@@ -123,19 +123,15 @@ export const GET: RequestHandler = async ({ fetch, locals }) => {
 		});
 	} catch (error) {
 		console.error('Failed to get codebase stats:', error);
-		return json(
-			{
-				totalFiles: 0,
-				indexedFiles: 0,
-				totalErrors: 0,
-				errorClusters: 0,
-				topErrorCodes: [],
-				surfaceBreakdown: {},
-				techBreakdown: {},
-				lastIndexed: null,
-				error: 'Failed to fetch stats'
-			},
-			{ status: 500 }
-		);
+		return json({
+      totalFiles: 0,
+      indexedFiles: 0,
+      totalErrors: 0,
+      errorClusters: 0,
+      topErrorCodes: [],
+      surfaceBreakdown: {},
+      techBreakdown: {},
+      lastIndexed: null,
+    });
 	}
 };

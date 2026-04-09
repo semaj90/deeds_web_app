@@ -76,19 +76,15 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 	} catch (error) {
 		console.error('Topology API error:', error);
-        return json(
-          {
-            components: [],
-            summary: {
-              total_components: 0,
-              total_errors: 0,
-              high_priority: 0,
-              avg_complexity: 0,
-            },
-            error: 'Failed to load topology',
+        return json({
+          components: [],
+          summary: {
+            total_components: 0,
+            total_errors: 0,
+            high_priority: 0,
+            avg_complexity: 0,
           },
-          { status: 500 }
-        );
+        });
 	}
 };
 

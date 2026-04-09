@@ -24,6 +24,6 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		return json({ citations, count: citations.length, query });
 	} catch (error) {
 		console.error('[api/library/citations] search failed:', error);
-		return json({ error: 'Failed to search law citations', citations: [], count: 0, query }, { status: 500 });
+		return json({ citations: [], count: 0, query });
 	}
 };

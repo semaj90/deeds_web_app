@@ -27,19 +27,15 @@ export const GET: RequestHandler = async ({ locals, params, url }) => {
 		return json(detail);
 	} catch (error) {
 		console.error('[api/library/citations/[citation]] detail failed:', error);
-		return json(
-      {
-        citationKey: citation,
-        citationLabel: citation,
-        documentCount: 0,
-        nodeCount: 0,
-        chunkCount: 0,
-        documents: [],
-        nodes: [],
-        chunks: [],
-        error: 'Failed to load law citation page',
-      },
-      { status: 500 }
-    );
+		return json({
+      citationKey: citation,
+      citationLabel: citation,
+      documentCount: 0,
+      nodeCount: 0,
+      chunkCount: 0,
+      documents: [],
+      nodes: [],
+      chunks: [],
+    });
 	}
 };

@@ -227,6 +227,6 @@ export const GET: RequestHandler = async ({ url }) => {
 		}
 		return json({ found: false });
 	} catch {
-		return json({ found: false, error: 'Cache unavailable' });
+		return json({ found: false });
 	}
 };

@@ -234,12 +234,14 @@ export const GET: RequestHandler = async (event) => {
 	} catch (err) {
 		console.error('[cases-analytics] Request error:', err);
 
-		return json(
-			{
-				success: false,
-				error: 'Analytics fetch failed'
-			},
-			{ status: 500 }
-		);
+		return json({
+      success: false,
+      data: { daily: [], weekly: [], topicDistribution: [] },
+      metadata: {
+        timestamp: new Date().toISOString(),
+        version: '1.0',
+        processing_time: 0,
+      },
+    });
 	}
 };

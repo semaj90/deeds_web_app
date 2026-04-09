@@ -108,16 +108,12 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		});
 	} catch (err) {
 		console.error('[fictional-cases] error:', err);
-		return json(
-      {
-        cases: [],
-        total: 0,
-        limit,
-        offset,
-        categoryStats: [],
-        error: 'Failed to load fictional cases',
-      },
-      { status: 500 }
-    );
+		return json({
+      cases: [],
+      total: 0,
+      limit,
+      offset,
+      categoryStats: [],
+    });
 	}
 };

@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { cases, personsOfInterest } from '$lib/server/db/schema-postgres.js';
-import { and, desc, eq, ilike, or, sql } from 'drizzle-orm';
+import { and, desc, eq, ilike, isNull, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
 
@@ -44,7 +44,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
   const offset = (page - 1) * limit;
 
   try {
-    const conditions = [eq(personsOfInterest.createdBy, locals.user.id)];
+    const conditions = [or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))];
     if (status)
       conditions.push(
         eq(personsOfInterest.status, status as (typeof personsOfInterest.status.enumValues)[number])

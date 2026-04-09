@@ -217,31 +217,39 @@ export const POST: RequestHandler = async ({ url, locals }) => {
 };
 
 // ── GET: Index lawpdfs/ via evidence upload pipeline ──
-export const GET: RequestHandler = async ({ url, fetch: svelteFetch }) => {
-	const action = url.searchParams.get('action');
-	if (action !== 'index-pdfs') {
-		return json({ error: 'Use ?action=index-pdfs' }, { status: 400 });
-	}
+export const GET: RequestHandler = async ({ url, fetch: svelteFetch, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const start = performance.now();
-	const lawpdfsDir = join(process.cwd(), '..', 'lawpdfs');
-	const results = { total: 0, success: 0, failed: 0, files: [] as string[], errors: [] as string[] };
+  const action = url.searchParams.get('action');
+  if (action !== 'index-pdfs') {
+    return json({ error: 'Use ?action=index-pdfs' }, { status: 400 });
+  }
 
-	let files: string[];
-	try {
-		const entries = await readdir(lawpdfsDir);
-		files = entries.filter((f) => f.toLowerCase().endsWith('.pdf'));
-		results.total = files.length;
-	} catch {
-		// Try alternate path
-		try {
-			const altDir = join(process.cwd(), 'lawpdfs');
-			const entries = await readdir(altDir);
-			files = entries.filter((f) => f.toLowerCase().endsWith('.pdf'));
-			results.total = files.length;
-		} catch (e) {
-			console.error('[seed-knowledge] Cannot read lawpdfs/:', e);
-			return json(
+  const start = performance.now();
+  const lawpdfsDir = join(process.cwd(), '..', 'lawpdfs');
+  const results = {
+    total: 0,
+    success: 0,
+    failed: 0,
+    files: [] as string[],
+    errors: [] as string[],
+  };
+
+  let files: string[];
+  try {
+    const entries = await readdir(lawpdfsDir);
+    files = entries.filter((f) => f.toLowerCase().endsWith('.pdf'));
+    results.total = files.length;
+  } catch {
+    // Try alternate path
+    try {
+      const altDir = join(process.cwd(), 'lawpdfs');
+      const entries = await readdir(altDir);
+      files = entries.filter((f) => f.toLowerCase().endsWith('.pdf'));
+      results.total = files.length;
+    } catch (e) {
+      console.error('[seed-knowledge] Cannot read lawpdfs/:', e);
+      return json(
         {
           success: false,
           indexed: results,
@@ -250,58 +258,58 @@ export const GET: RequestHandler = async ({ url, fetch: svelteFetch }) => {
         },
         { status: 500 }
       );
-		}
-	}
+    }
+  }
 
-	// Also check for complaint.pdf at root
-	const rootComplaint = join(process.cwd(), '..', 'complaint.pdf');
-	try {
-		await readFile(rootComplaint);
-		files.push('__ROOT__/complaint.pdf');
-		results.total++;
-	} catch {
-		// no complaint.pdf
-	}
+  // Also check for complaint.pdf at root
+  const rootComplaint = join(process.cwd(), '..', 'complaint.pdf');
+  try {
+    await readFile(rootComplaint);
+    files.push('__ROOT__/complaint.pdf');
+    results.total++;
+  } catch {
+    // no complaint.pdf
+  }
 
-	for (const filename of files) {
-		try {
-			const isRoot = filename.startsWith('__ROOT__/');
-			const filePath = isRoot
-				? join(process.cwd(), '..', 'complaint.pdf')
-				: join(lawpdfsDir, filename);
+  for (const filename of files) {
+    try {
+      const isRoot = filename.startsWith('__ROOT__/');
+      const filePath = isRoot
+        ? join(process.cwd(), '..', 'complaint.pdf')
+        : join(lawpdfsDir, filename);
 
-			const buffer = await readFile(filePath);
-			const displayName = isRoot ? 'complaint.pdf' : filename;
+      const buffer = await readFile(filePath);
+      const displayName = isRoot ? 'complaint.pdf' : filename;
 
-			// Build FormData for the upload endpoint
-			const formData = new FormData();
-			formData.append('file', new Blob([buffer], { type: 'application/pdf' }), displayName);
-			formData.append('title', displayName.replace('.pdf', ''));
-			formData.append('evidenceType', 'document');
-			formData.append('description', `Auto-indexed from lawpdfs/ directory`);
+      // Build FormData for the upload endpoint
+      const formData = new FormData();
+      formData.append('file', new Blob([buffer], { type: 'application/pdf' }), displayName);
+      formData.append('title', displayName.replace('.pdf', ''));
+      formData.append('evidenceType', 'document');
+      formData.append('description', `Auto-indexed from lawpdfs/ directory`);
 
-			const res = await svelteFetch('/api/evidence/upload', {
-				method: 'POST',
-				body: formData,
-			});
+      const res = await svelteFetch('/api/evidence/upload', {
+        method: 'POST',
+        body: formData,
+      });
 
-			if (res.ok) {
-				results.success++;
-				results.files.push(displayName);
-			} else {
-				results.failed++;
-				results.errors.push(`${displayName}: upload failed (${res.status})`);
-			}
-		} catch (e) {
-			console.error(`[seed-knowledge] ${filename}:`, e);
-			results.failed++;
-			results.errors.push(`${filename}: failed`);
-		}
-	}
+      if (res.ok) {
+        results.success++;
+        results.files.push(displayName);
+      } else {
+        results.failed++;
+        results.errors.push(`${displayName}: upload failed (${res.status})`);
+      }
+    } catch (e) {
+      console.error(`[seed-knowledge] ${filename}:`, e);
+      results.failed++;
+      results.errors.push(`${filename}: failed`);
+    }
+  }
 
-	return json({
-		success: true,
-		indexed: results,
-		timing_ms: Math.round(performance.now() - start),
-	});
+  return json({
+    success: true,
+    indexed: results,
+    timing_ms: Math.round(performance.now() - start),
+  });
 };

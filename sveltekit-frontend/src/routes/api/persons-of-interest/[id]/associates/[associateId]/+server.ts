@@ -1,7 +1,7 @@
 import { json, error, type RequestHandler } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { auditLog, personsOfInterest } from '$lib/server/db/schema-postgres.js';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, or, isNull } from 'drizzle-orm';
 import { validateUuidParams } from '$lib/server/validation.js';
 
 /**
@@ -22,7 +22,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
     const [poi] = await db
       .select({ id: personsOfInterest.id })
       .from(personsOfInterest)
-      .where(and(eq(personsOfInterest.id, poiId), eq(personsOfInterest.createdBy, locals.user.id)))
+      .where(and(eq(personsOfInterest.id, poiId), or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))))
       .limit(1);
 
     if (!poi) {

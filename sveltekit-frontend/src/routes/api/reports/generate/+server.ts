@@ -4,7 +4,7 @@ import { personsOfInterest } from '$lib/server/db/schema-postgres.js';
 import { savedCitations } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { and, eq, arrayContains } from 'drizzle-orm';
+import { and, eq, or, isNull, arrayContains } from 'drizzle-orm';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
@@ -64,7 +64,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         .where(
           and(
             arrayContains(personsOfInterest.caseIds, [id]),
-            eq(personsOfInterest.createdBy, locals.user.id)
+            or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))!
           )
         );
     } catch {

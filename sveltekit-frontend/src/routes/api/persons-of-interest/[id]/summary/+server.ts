@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { personsOfInterest } from '$lib/server/db/schema-postgres.js';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, isNull, or, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
@@ -31,7 +31,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     })
     .from(personsOfInterest)
     .where(
-      and(eq(personsOfInterest.id, params.id), eq(personsOfInterest.createdBy, locals.user.id))
+      and(eq(personsOfInterest.id, params.id), or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy)))
     )
     .limit(1)
     .then((r) => r[0]);
@@ -60,7 +60,7 @@ export const POST: RequestHandler = async ({ params, locals }) => {
     .select()
     .from(personsOfInterest)
     .where(
-      and(eq(personsOfInterest.id, params.id), eq(personsOfInterest.createdBy, locals.user.id))
+      and(eq(personsOfInterest.id, params.id), or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy)))
     )
     .limit(1)
     .then((r) => r[0]);

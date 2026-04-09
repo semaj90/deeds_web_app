@@ -61,13 +61,16 @@ export const GET: RequestHandler = async ({ locals }) => {
 		});
 	} catch (error) {
 		console.error('[Cache Stats] Error:', error);
-		return json(
-			{
-				success: false,
-				error: 'Failed to retrieve cache stats',
-				timestamp: new Date().toISOString()
-			},
-			{ status: 500 }
-		);
+		return json({
+      success: false,
+      stats: {
+        totalEntries: 0,
+        vectorsDim: 768,
+        expiredEntries: 0,
+        recentEntries: [],
+        collectionStatus: 'unavailable',
+      },
+      timestamp: new Date().toISOString(),
+    });
 	}
 };

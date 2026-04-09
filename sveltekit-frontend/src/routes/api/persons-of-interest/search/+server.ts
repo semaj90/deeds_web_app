@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/client';
 import { personsOfInterest, poiPhotos } from '$lib/server/db/schema-postgres';
 import { json, error } from '@sveltejs/kit';
-import { and, eq, sql, desc } from 'drizzle-orm';
+import { and, eq, isNull, or, sql, desc } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 
@@ -51,7 +51,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
       .from(personsOfInterest)
       .where(
         and(
-          eq(personsOfInterest.createdBy, locals.user.id),
+          or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy)),
           sql`(
 					lower(${personsOfInterest.name}) LIKE ${searchTerm}
 					OR lower(coalesce(${personsOfInterest.description}, '')) LIKE ${searchTerm}

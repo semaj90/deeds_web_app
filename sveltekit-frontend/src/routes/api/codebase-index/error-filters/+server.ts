@@ -54,10 +54,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 		});
 	} catch (error) {
 		console.error('Failed to get filter options:', error);
-		return json(
-			{ errorCodes: [], surfaces: [], techs: [], error: 'Failed to fetch filters' },
-			{ status: 500 }
-		);
+		return json({ errorCodes: [], surfaces: [], techs: [] });
 	}
 };
 

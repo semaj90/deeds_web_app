@@ -69,13 +69,17 @@ export const GET: RequestHandler = async ({ locals }) => {
     });
   } catch (err) {
     console.error('[cluster-status] GET error:', err instanceof Error ? err.message : err);
-    return json(
-      {
-        success: false,
-        error: 'Failed to retrieve clustering status',
+    return json({
+      success: false,
+      job: null,
+      statistics: {
+        totalDocumentsWithTopics: 0,
+        topicCount: 0,
+        topicDistribution: {},
+        qualityMetrics: { silhouetteScore: null, recommendedAction: 'rerun_clustering' },
       },
-      { status: 500 }
-    );
+      timestamp: new Date().toISOString(),
+    });
   }
 };
 

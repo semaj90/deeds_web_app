@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/client';
 import { personsOfInterest } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
-import { eq, ne, and, sql, inArray } from 'drizzle-orm';
+import { eq, ne, and, sql, inArray, or, isNull } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { isUuid } from '$lib/server/validation.js';
 
@@ -19,7 +19,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		const [target] = await db
       .select({ caseIds: personsOfInterest.caseIds })
       .from(personsOfInterest)
-      .where(and(eq(personsOfInterest.id, poiId), eq(personsOfInterest.createdBy, locals.user.id)))
+      .where(and(eq(personsOfInterest.id, poiId), or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))))
       .limit(1);
 
     if (!target || !target.caseIds?.length) {
@@ -34,7 +34,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
       .where(
         and(
           ne(personsOfInterest.id, poiId),
-          eq(personsOfInterest.createdBy, locals.user.id),
+          or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy)),
           sql`${personsOfInterest.caseIds} && ${caseArray}::text[]`
         )
       )

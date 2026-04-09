@@ -28,16 +28,12 @@ export const GET: RequestHandler = async () => {
 	} catch (error: unknown) {
 		console.warn('[Database Health] PostgreSQL unavailable:', error);
 
-		return json(
-      {
-        status: 'unavailable',
-        service: 'database',
-        engine: 'postgresql',
-        pool: poolStatus,
-        message: 'PostgreSQL not configured or unreachable',
-        timestamp,
-      },
-      { status: 503 }
-    );
+		return json({
+      status: 'unavailable',
+      service: 'database',
+      engine: 'postgresql',
+      pool: poolStatus,
+      timestamp,
+    });
 	}
 };

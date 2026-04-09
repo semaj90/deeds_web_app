@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/client';
 import { cases, personsOfInterest } from '$lib/server/db/schema-postgres.js';
 import { error, json } from '@sveltejs/kit';
-import { and, desc, eq, arrayContains, type SQL } from 'drizzle-orm';
+import { and, desc, eq, or, isNull, arrayContains, type SQL } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 
@@ -46,7 +46,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 
   try {
     const filters: SQL[] = [];
-    filters.push(eq(personsOfInterest.createdBy, locals.user.id));
+    filters.push(or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))!);
 
     if (id) {
       // Check if id is in the caseIds array
@@ -92,25 +92,25 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     throw error(401, 'Unauthorized');
   }
 
+  const raw = await request.json();
+  const parsed = personCreateSchema.safeParse(raw);
+  if (!parsed.success) {
+    throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
+  }
+  const body = parsed.data;
+  const id = body.caseId;
+
+  const [targetCase] = await db
+    .select({ id: cases.id })
+    .from(cases)
+    .where(and(eq(cases.id, id), eq(cases.userId, locals.user.id)))
+    .limit(1);
+
+  if (!targetCase) {
+    throw error(404, 'Case not found');
+  }
+
   try {
-    const raw = await request.json();
-    const parsed = personCreateSchema.safeParse(raw);
-    if (!parsed.success) {
-      throw error(400, parsed.error.issues[0]?.message ?? 'Invalid input');
-    }
-    const body = parsed.data;
-    const id = body.caseId;
-
-    const [targetCase] = await db
-      .select({ id: cases.id })
-      .from(cases)
-      .where(and(eq(cases.id, id), eq(cases.userId, locals.user.id)))
-      .limit(1);
-
-    if (!targetCase) {
-      throw error(404, 'Case not found');
-    }
-
     const newPerson = await db
       .insert(personsOfInterest)
       .values({

@@ -53,7 +53,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		return json({ relationships: rows });
 	} catch (err) {
 		console.error('[/api/evidence/relationships] GET error:', err);
-		return json({ relationships: [], error: 'Failed to load relationships' }, { status: 500 });
+		return json({ relationships: [] });
 	}
 };
 

@@ -48,20 +48,17 @@ export const GET: RequestHandler = async ({ locals }) => {
 		});
 	} catch (err) {
 		console.error('[/api/yorha/cluster-health] error:', err);
-		return json(
-			{
-				timestamp: new Date().toISOString(),
-				metrics: {},
-				thresholds: {
-					cpu_warning: 70,
-					cpu_critical: 90,
-					memory_warning: 75,
-					memory_critical: 90,
-					gpu_warning: 80,
-					gpu_critical: 95
-				}
-			},
-			{ status: 500 }
-		);
+		return json({
+      timestamp: new Date().toISOString(),
+      metrics: {},
+      thresholds: {
+        cpu_warning: 70,
+        cpu_critical: 90,
+        memory_warning: 75,
+        memory_critical: 90,
+        gpu_warning: 80,
+        gpu_critical: 95,
+      },
+    });
 	}
 };

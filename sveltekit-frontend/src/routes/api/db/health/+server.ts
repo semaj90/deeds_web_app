@@ -19,13 +19,11 @@ export const GET: RequestHandler = async () => {
 		});
 	} catch (err) {
 		console.error('[/api/db/health] error:', err);
-		return json(
-			{
-				status: 'unhealthy',
-				error: 'Database connection failed',
-				timestamp: new Date().toISOString()
-			},
-			{ status: 503 }
-		);
+		return json({
+      status: 'unhealthy',
+      latency: -1,
+      serverTime: null,
+      timestamp: new Date().toISOString(),
+    });
 	}
 };

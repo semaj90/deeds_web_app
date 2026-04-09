@@ -10,6 +10,7 @@ import { evidence } from '$lib/server/db/schema-postgres.js';
 import { and, eq } from 'drizzle-orm';
 import { getStream, statObject } from '$lib/server/minio-client.js';
 import { ENV } from '$lib/server/env.server.js';
+import { isUuid } from '$lib/server/validation.js';
 
 const EVIDENCE_BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
 
@@ -48,6 +49,7 @@ function extractObjectKey(fileUrl: string): { bucket: string; key: string } | nu
 
 export const GET: RequestHandler = async ({ params, locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
   try {
     const [item] = await db

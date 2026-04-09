@@ -31,7 +31,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       .select({ id: personsOfInterest.id })
       .from(personsOfInterest)
       .where(
-        sql`${personsOfInterest.id} IN (${poiId1}, ${poiId2}) AND ${personsOfInterest.createdBy} = ${locals.user.id}`
+        sql`${personsOfInterest.id} IN (${poiId1}, ${poiId2}) AND (${personsOfInterest.createdBy} = ${locals.user.id} OR ${personsOfInterest.createdBy} IS NULL)`
       );
 
     if (ownedPois.length !== 2) {

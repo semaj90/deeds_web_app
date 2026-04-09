@@ -304,10 +304,10 @@ Redis is already the Bifrost for server-side caching. Monitor via `GET /api/infr
 - [ ] Verify VLM endpoint: `POST /api/ai/tensorrt` with image payload
 
 ### Phase 2: Fix ClickHouse Crashes + Disk Cleanup
-- [ ] Disable WSL2 core dumps: add `kernelCommandLine = core_pattern=|/bin/true` to `%USERPROFILE%\.wslconfig`
-- [ ] Restart WSL: `wsl --shutdown && wsl`
-- [ ] Add ClickHouse memory limit (2GB) in docker-compose.yml for langfuse-clickhouse
-- [ ] Delete `wsl-crashes` (89.9 GB — 10 ELF core dumps, ClickHouse + Node.js)
+- [x] Disable WSL2 core dumps: add `kernelCommandLine = core_pattern=|/bin/true` to `%USERPROFILE%\.wslconfig` ✅ (April 2026)
+- [x] Restart WSL: `wsl --shutdown && wsl` ✅
+- [x] Add ClickHouse memory limit (2GB) in docker-compose.yml for langfuse-clickhouse ✅ (deploy.resources.limits.memory: 2G + CLICKHOUSE_MAX_SERVER_MEMORY_USAGE_RATIO: 0.8)
+- [x] Delete `wsl-crashes` (89.9 GB — 10 ELF core dumps, ClickHouse + Node.js) ✅
 - [ ] Clear Claude CLI cache >30 days (~12 GB)
 - [ ] Delete orphan temp dirs (6.8 GB)
 - [ ] Delete duplicate GGUFs in Downloads (~10 GB) — review first

@@ -23,40 +23,43 @@ const createDocSchema = z.object({
 	metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
-export const GET: RequestHandler = async ({ url }) => {
-	const jurisdiction = url.searchParams.get('jurisdiction');
-	const authorityLevel = url.searchParams.get('authority');
-	const docType = url.searchParams.get('type');
-	const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '50'), 200);
+export const GET: RequestHandler = async ({ url, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	try {
-		const conditions = [];
-		if (jurisdiction) conditions.push(sql`${canonicalDocuments.jurisdiction} = ${jurisdiction}`);
-		if (authorityLevel) conditions.push(sql`${canonicalDocuments.authorityLevel} = ${authorityLevel}`);
-		if (docType) conditions.push(sql`${canonicalDocuments.docType} = ${docType}`);
+  const jurisdiction = url.searchParams.get('jurisdiction');
+  const authorityLevel = url.searchParams.get('authority');
+  const docType = url.searchParams.get('type');
+  const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '50'), 200);
 
-		const docs = await db
-			.select({
-				id: canonicalDocuments.id,
-				title: canonicalDocuments.title,
-				docType: canonicalDocuments.docType,
-				citation: canonicalDocuments.citation,
-				jurisdiction: canonicalDocuments.jurisdiction,
-				authorityLevel: canonicalDocuments.authorityLevel,
-				sourceName: canonicalDocuments.sourceName,
-				licenseTag: canonicalDocuments.licenseTag,
-				createdAt: canonicalDocuments.createdAt,
-			})
-			.from(canonicalDocuments)
-			.where(conditions.length > 0 ? and(...conditions) : undefined)
-			.orderBy(desc(canonicalDocuments.createdAt))
-			.limit(limit);
+  try {
+    const conditions = [];
+    if (jurisdiction) conditions.push(sql`${canonicalDocuments.jurisdiction} = ${jurisdiction}`);
+    if (authorityLevel)
+      conditions.push(sql`${canonicalDocuments.authorityLevel} = ${authorityLevel}`);
+    if (docType) conditions.push(sql`${canonicalDocuments.docType} = ${docType}`);
 
-		return json({ success: true, documents: docs, count: docs.length });
-	} catch (err) {
-		console.error('[canon] GET error:', err);
-		return json({ success: true, documents: [], count: 0 });
-	}
+    const docs = await db
+      .select({
+        id: canonicalDocuments.id,
+        title: canonicalDocuments.title,
+        docType: canonicalDocuments.docType,
+        citation: canonicalDocuments.citation,
+        jurisdiction: canonicalDocuments.jurisdiction,
+        authorityLevel: canonicalDocuments.authorityLevel,
+        sourceName: canonicalDocuments.sourceName,
+        licenseTag: canonicalDocuments.licenseTag,
+        createdAt: canonicalDocuments.createdAt,
+      })
+      .from(canonicalDocuments)
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
+      .orderBy(desc(canonicalDocuments.createdAt))
+      .limit(limit);
+
+    return json({ success: true, documents: docs, count: docs.length });
+  } catch (err) {
+    console.error('[canon] GET error:', err);
+    return json({ success: true, documents: [], count: 0 });
+  }
 };
 
 export const POST: RequestHandler = async ({ request, locals }) => {

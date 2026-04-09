@@ -34,12 +34,12 @@ export async function GET({ locals }) {
         // if the server timeout is long enough (1000s).
         // Since it's a local script, we can just await it.
         const result = await runIngestionPipeline({ documentId, jobId });
-        
+
         console.log('[ingest-constitution] Ingestion complete');
 
         return json({ success: true, result });
     } catch (err) {
         console.error("\n❌ Ingestion Failed:", err);
-        return json({ success: false, error: 'Ingestion failed' }, { status: 500 });
+        return json({ success: false, result: null });
     }
 }

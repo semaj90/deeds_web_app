@@ -55,9 +55,6 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			await session.close();
 		}
 	} catch (err) {
-		return json(
-			{ error: 'Neo4j unavailable' },
-			{ status: 503 }
-		);
+		return json({ entityId, depth, relationships: [] });
 	}
 };

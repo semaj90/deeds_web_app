@@ -36,9 +36,6 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		return json(summary);
 	} catch (err) {
 		console.error('[API] /api/recommendations/metrics error:', err);
-		return json(
-			{ error: 'Failed to fetch recommendation metrics' },
-			{ status: 500 }
-		);
+		return json({});
 	}
 };

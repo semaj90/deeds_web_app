@@ -106,7 +106,29 @@ export const GET: RequestHandler = async ({ locals }) => {
 		});
 	} catch (err) {
 		console.error('Phase 78 API Error:', err);
-		return json({ status: 'error', message: 'Internal Server Error' }, { status: 500 });
+		return json({
+      timestamp: new Date().toISOString(),
+      status: 'error',
+      routes: {
+        stats: { total: 0, healthy: 0, degraded: 0, critical: 0, maintenance: 0 },
+        critical: [],
+      },
+      suggestions: {
+        stats: {
+          total: 0,
+          complete: 0,
+          incomplete: 0,
+          generic: 0,
+          highRisk: 0,
+          mediumRisk: 0,
+          lowRisk: 0,
+          applied: 0,
+        },
+        recent: [],
+      },
+      clusters: { total: 0, active: 0, resolved: 0 },
+      systemHealth: { database: 'unknown', qdrant: 'unknown', ollama: 'unknown' },
+    });
 	}
 };
 

@@ -1,7 +1,7 @@
 # Granite-Docling-258M — Document Understanding Integration Plan
 
 **Created:** 2026-04-05
-**Status:** Active — Not yet implemented (dashboard stage label only)
+**Status:** Active — Phase 1 COMPLETE (Ollama API wired, evidence upload + ACE ingest + MCP + dedicated API endpoint)
 **Priority:** High — fills the document-to-structured-text gap in our evidence pipeline
 
 ---
@@ -150,17 +150,19 @@ Drizzle ORM 0.44 (PostgreSQL storage):
 
 ## Implementation Plan
 
-### Phase 1: Pull Model + Basic Wiring (1 Session)
+### Phase 1: Pull Model + Basic Wiring (1 Session) ✅ COMPLETE
 
-| Step | Action | Files |
-|------|--------|-------|
-| 1 | `ollama pull ibm/granite-docling:258m` (522 MB) | Terminal |
-| 2 | Add `GRANITE_DOCLING_MODEL` to env.server.ts | [env.server.ts](sveltekit-frontend/src/lib/server/env.server.ts) |
-| 3 | Create `granite-docling.ts` — Ollama multimodal API wrapper | `src/lib/server/analysis/granite-docling.ts` |
-| 4 | Wire into evidence upload Stage 2 (before text extraction) | [evidence/upload/+server.ts](sveltekit-frontend/src/routes/api/evidence/upload/+server.ts) |
-| 5 | Parse DocTags output → structured sections + table data | `granite-docling.ts` |
-| 6 | Store DocTags in `evidence.metadata.docTags` (JSONB) | Drizzle schema |
-| 7 | Feed structured text to existing legal-chunker (Stage 3) | No change needed |
+| Step | Action | Files | Status |
+|------|--------|-------|--------|
+| 1 | `ollama pull ibm/granite-docling:258m` (522 MB) | Terminal | ✅ |
+| 2 | Add `GRANITE_DOCLING_MODEL` + `GRANITE_DOCLING_ENABLED` to env.server.ts | [env.server.ts](sveltekit-frontend/src/lib/server/env.server.ts) | ✅ |
+| 3 | Create `granite-docling.ts` — Ollama multimodal API wrapper | `src/lib/server/analysis/granite-docling.ts` | ✅ |
+| 4 | Wire into evidence upload Stage 2 (before text extraction) | [evidence/upload/+server.ts](sveltekit-frontend/src/routes/api/evidence/upload/+server.ts) | ✅ |
+| 5 | Parse DocTags output → structured sections + table data | `granite-docling.ts` | ✅ |
+| 6 | Wire into ACE ingest (scanned PDF fallback) | [ace/ingest/+server.ts](sveltekit-frontend/src/routes/api/ace/ingest/+server.ts) | ✅ |
+| 7 | Dedicated extraction API endpoint | `api/evidence/extract-docling/+server.ts` | ✅ |
+| 8 | MCP tool integration (`transcribeAudio` via docling) | [mcp/server.ts](sveltekit-frontend/src/mcp/server.ts) | ✅ |
+| 9 | Dev UI toggle (Odin dashboard) | [odin/+page.svelte](sveltekit-frontend/src/routes/(dev)/odin/+page.svelte) | ✅ |
 
 ### Phase 2: Enhanced Chunking + Tags (1 Session)
 
@@ -361,7 +363,7 @@ Drizzle ORM 0.44 (PostgreSQL persistence):
 - [ ] Qdrant chunks tagged with element type (`table`, `section_header`, etc.)
 - [ ] RabbitMQ evidence.process queue triggers extraction
 - [ ] XState document-processing machine shows "extracting" state in UI
-- [ ] Dashboard GrpcStatusAdapter shows "Granite-Docling Parsing" stage label (NOT YET WIRED � needs implementation)
+- [ ] Dashboard GrpcStatusAdapter shows "Granite-Docling Parsing" stage label (NOT YET WIRED � needs implementation)
 - [ ] VRAM stays under 8 GB during concurrent Granite-Docling + embeddinggemma
 
 ---

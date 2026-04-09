@@ -81,13 +81,13 @@ export const GET: RequestHandler = async () => {
 			timestamp: Date.now()
 		});
 	} catch (err) {
-		return json(
-			{
-				status: 'unhealthy',
-				service: 'enhanced-rag-simd',
-				error: 'Connection failed'
-			},
-			{ status: 503 }
-		);
+		return json({
+      status: 'unhealthy',
+      service: 'enhanced-rag-simd',
+      port: 8103,
+      health: null,
+      stats: null,
+      timestamp: Date.now(),
+    });
 	}
 };

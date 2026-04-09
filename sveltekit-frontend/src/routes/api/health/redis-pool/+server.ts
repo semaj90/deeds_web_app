@@ -21,13 +21,14 @@ export const GET: RequestHandler = async () => {
 			timestamp: new Date().toISOString()
 		});
 	} catch (err) {
-		return json(
-			{
-				success: false,
-				error: 'Redis pool check failed',
-				timestamp: new Date().toISOString()
-			},
-			{ status: 500 }
-		);
+		return json({
+      success: false,
+      data: {
+        pool: null,
+        healthy: false,
+        utilizationPercent: 0,
+      },
+      timestamp: new Date().toISOString(),
+    });
 	}
 };

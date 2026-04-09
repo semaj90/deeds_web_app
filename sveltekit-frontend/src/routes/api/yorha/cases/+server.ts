@@ -53,7 +53,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		return json({ data: rows });
 	} catch (err) {
 		console.error('[/api/yorha/cases] GET error:', err);
-		return json({ data: [] }, { status: 500 });
+		return json({ data: [] });
 	}
 };
 

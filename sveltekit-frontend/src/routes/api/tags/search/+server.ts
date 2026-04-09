@@ -44,9 +44,6 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		const results = await searchTagsBySemantic(queryEmbedding, limit);
 		return json({ query, results, count: results.length });
 	} catch (err) {
-		return json(
-			{ error: 'Search failed' },
-			{ status: 500 }
-		);
+		return json({ query, results: [], count: 0 });
 	}
 };

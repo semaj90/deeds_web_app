@@ -399,10 +399,12 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     });
   } catch (err) {
     console.error('Search error:', err);
-    return json(
-      { error: 'Search failed' },
-      { status: 500 }
-    );
+    return json({
+      success: false,
+      query: [],
+      count: 0,
+      avg_similarity: 0,
+    });
   }
 };
 

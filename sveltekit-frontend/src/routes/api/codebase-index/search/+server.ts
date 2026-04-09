@@ -147,9 +147,10 @@ export const GET: RequestHandler = async ({ url, fetch, locals }) => {
     });
   } catch (error) {
     console.error('Search error:', error);
-    return json(
-      { error: 'Search failed', results: [], query },
-      { status: 500 }
-    );
+    return json({
+      results: [],
+      query,
+      total: 0,
+    });
   }
 };

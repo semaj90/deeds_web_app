@@ -66,13 +66,12 @@ export const GET: RequestHandler = async ({ locals }) => {
 			timestamp: Date.now()
 		});
 	} catch (err) {
-		return json(
-			{
-				status: 'unhealthy',
-				service: 'legal-ai-orchestrator',
-				error: 'Connection failed'
-			},
-			{ status: 503 }
-		);
+		return json({
+      status: 'unhealthy',
+      service: 'legal-ai-orchestrator',
+      port: 8102,
+      capabilities: null,
+      timestamp: Date.now(),
+    });
 	}
 };

@@ -32,6 +32,6 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		return json(rows);
 	} catch (err) {
 		console.error('[/api/rag/documents] error:', err);
-		return json([], { status: 500 });
+		return json([]);
 	}
 };

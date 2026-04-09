@@ -185,21 +185,24 @@ export const GET: RequestHandler = async () => {
  console.error('❌ OCR health monitoring system failed:', getErrorMessage(err));
 
  return json(
- {
- status: 'unhealthy',
- timestamp: new Date().toISOString(),
- error: 'OCR health check system failure',
- message: getErrorMessage(err),
- metadata: { checkDuration, environment: ENV.NODE_ENV,
- },
- },
- {
- status: 503,
- headers: {
- 'Content-Type': 'application/json',
- 'X-Health-Check': 'failed',
- },
- }
+   {
+     status: 'unhealthy',
+     timestamp: new Date().toISOString(),
+     ocr: {
+       service: 'OCR Service',
+       status: 'offline',
+       endpoint: getOCRBase() + '/status',
+       lastChecked: new Date().toISOString(),
+       responseTime: 0,
+     } as OCRHealthDetails,
+     metadata: { checkDuration, environment: ENV.NODE_ENV },
+   },
+   {
+     headers: {
+       'Content-Type': 'application/json',
+       'X-Health-Check': 'failed',
+     },
+   }
  );
  }
 };

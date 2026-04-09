@@ -44,15 +44,25 @@ const postSchema = z.object({
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const available = await isObsidianAvailable();
+	try {
+    const available = await isObsidianAvailable();
 
-	return json({
-		obsidian: {
-			available,
-			plugin: 'obsidian-local-rest-api',
-			actions: ['read', 'write', 'append', 'search', 'export-case', 'import-research', 'list'],
-		},
-	});
+    return json({
+      obsidian: {
+        available,
+        plugin: 'obsidian-local-rest-api',
+        actions: ['read', 'write', 'append', 'search', 'export-case', 'import-research', 'list'],
+      },
+    });
+  } catch {
+    return json({
+      obsidian: {
+        available: false,
+        plugin: 'obsidian-local-rest-api',
+        actions: ['read', 'write', 'append', 'search', 'export-case', 'import-research', 'list'],
+      },
+    });
+  }
 };
 
 export const POST: RequestHandler = async ({ request, locals }) => {

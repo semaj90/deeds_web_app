@@ -1,0 +1,98 @@
+/**
+ * Codebase Wiki API
+ * GPU-accelerated semantic search with cosine retrieval
+ */
+
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
+import { db } from '$lib/server/db/client';
+import { sql } from 'drizzle-orm';
+import { tryEmbedOllama } from '$lib/server/embeddings/ollama.js';
+
+// GET /api/codebase/wiki - List wiki pages
+export const GET: RequestHandler = async ({ url, locals }) => {
+	if (!locals.user) {
+		return json({ pages: [], total: 0 }, { status: 401 });
+	}
+
+	try {
+		const limit = parseInt(url.searchParams.get('limit') || '20');
+		const category = url.searchParams.get('category');
+
+		const result = await db.execute(
+			category
+				? sql`SELECT * FROM codebase_wiki_pages WHERE category = ${category} ORDER BY pagerank_score DESC LIMIT ${limit}`
+				: sql`SELECT * FROM codebase_wiki_pages ORDER BY pagerank_score DESC LIMIT ${limit}`
+		);
+
+		return json({
+			pages: (result as any).rows,
+			total: (result as any).rows.length
+		});
+	} catch (error) {
+		console.error('Wiki list error:', error);
+		return json({ pages: [], total: 0 }, { status: 500 });
+	}
+};
+
+// POST /api/codebase/wiki - Semantic search
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) {
+		return json({ results: [] }, { status: 401 });
+	}
+
+	try {
+		const { query, limit = 10, domain } = await request.json();
+
+		if (!query || typeof query !== 'string') {
+			return json({ results: [], error: 'Invalid query' }, { status: 400 });
+		}
+
+		// Generate embedding for the search query
+		const embeddingResult = await tryEmbedOllama(query, { timeoutMs: 5000 });
+
+		if (!embeddingResult || !embeddingResult.embedding) {
+			return json({
+				results: [],
+				error: 'Failed to generate embedding',
+				query
+			});
+		}
+
+		// Convert embedding to PostgreSQL vector format
+		const embeddingStr = `[${embeddingResult.embedding.join(',')}]`;
+
+		// Call the semantic search function
+		const searchResult = await db.execute(
+			domain
+				? sql`SELECT * FROM codebase_semantic_search(
+						${embeddingStr}::vector(768),
+						${limit}::integer,
+						0.5::real,
+						${domain}::text
+					)`
+				: sql`SELECT * FROM codebase_semantic_search(
+						${embeddingStr}::vector(768),
+						${limit}::integer,
+						0.5::real,
+						NULL
+					)`
+		);
+
+		const results = (searchResult as any).rows || [];
+
+		return json({
+			results,
+			query,
+			model: embeddingResult.model,
+			totalResults: results.length
+		});
+	} catch (error: any) {
+		console.error('Semantic search error:', error);
+		return json({
+			results: [],
+			error: error.message,
+			query: ''
+		});
+	}
+};

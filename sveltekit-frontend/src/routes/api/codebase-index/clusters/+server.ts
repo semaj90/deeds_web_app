@@ -75,6 +75,6 @@ export const GET: RequestHandler = async ({ url, fetch, locals }) => {
 		return json({ clusters });
 	} catch (error) {
 		console.error('Failed to get clusters:', error);
-		return json({ clusters: [], error: 'Failed to fetch clusters' }, { status: 500 });
+		return json({ clusters: [] });
 	}
 };

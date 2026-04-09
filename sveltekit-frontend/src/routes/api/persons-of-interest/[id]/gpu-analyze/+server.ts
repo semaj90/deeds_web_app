@@ -23,12 +23,12 @@ export const POST: RequestHandler = async ({ params, locals }) => {
 		const { analyzePoiPhotoGpu } = await import('$lib/server/gpu/background-analyzer.js');
 		const { db } = await import('$lib/server/db/client');
 		const { poiPhotos, personsOfInterest } = await import('$lib/server/db/schema-postgres.js');
-    const { and, eq, desc } = await import('drizzle-orm');
+    const { and, eq, desc, or, isNull } = await import('drizzle-orm');
 
     const owners = await db
       .select({ id: personsOfInterest.id })
       .from(personsOfInterest)
-      .where(and(eq(personsOfInterest.id, poiId), eq(personsOfInterest.createdBy, locals.user.id)))
+      .where(and(eq(personsOfInterest.id, poiId), or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))))
       .limit(1);
 
     if (!owners[0]) {

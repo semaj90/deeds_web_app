@@ -20,18 +20,20 @@ const gpuReleaseSchema = z.object({
 	backend: z.enum(['ollama', 'tensorrt'])
 });
 
-export async function GET() {
-	try {
-		const lease = await getGpuLeaseStatus();
-		return json({
-			lease,
-			free: !lease,
-			remainingMs: lease ? Math.max(0, lease.expiresAt - Date.now()) : null
-		});
-	} catch (err) {
-		console.error('GPU lease status error:', err);
-		return json({ lease: null, free: true, remainingMs: null });
-	}
+export async function GET({ locals }: RequestEvent) {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+
+  try {
+    const lease = await getGpuLeaseStatus();
+    return json({
+      lease,
+      free: !lease,
+      remainingMs: lease ? Math.max(0, lease.expiresAt - Date.now()) : null,
+    });
+  } catch (err) {
+    console.error('GPU lease status error:', err);
+    return json({ lease: null, free: true, remainingMs: null });
+  }
 }
 
 export async function POST({ request, locals }: RequestEvent) {

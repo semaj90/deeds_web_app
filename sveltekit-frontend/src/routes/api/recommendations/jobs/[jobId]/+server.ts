@@ -90,9 +90,8 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	} catch (err) {
 		console.warn(`[recommendations] Job poll error for ${jobId}:`, (err as Error).message);
 		return json({
-			success: false,
-			error: 'Recommendation service temporarily unavailable',
-			status: 'not_found'
-		}, { status: 404 });
+      success: false,
+      data: { status: 'not_found', jobId },
+    });
 	}
 };

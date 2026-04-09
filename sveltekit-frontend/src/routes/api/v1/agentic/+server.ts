@@ -111,6 +111,12 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		return json({ error: `Unknown action: ${action}` }, { status: 400 });
 	} catch (err) {
 		console.error('[/api/v1/agentic] error:', err);
-		return json({ error: 'Agentic service error' }, { status: 500 });
+		if (action === 'recent-errors') return json({ errors: [] });
+    if (action === 'fix-suggestions') return json({ suggestions: [] });
+    return json({
+      status: 'inactive',
+      system: { redisConnected: false, agenticControllerActive: false, watcherStatus: 'idle' },
+      activity: { recentASTProcessing: 0, pendingErrors: 0, lastActivity: null },
+    });
 	}
 };

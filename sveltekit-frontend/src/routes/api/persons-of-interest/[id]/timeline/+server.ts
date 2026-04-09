@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { personsOfInterest, timelineEvents } from '$lib/server/db/schema-postgres.js';
-import { and, eq, desc } from 'drizzle-orm';
+import { and, eq, desc, isNull, or } from 'drizzle-orm';
 import { z } from 'zod';
 
 const poiIdSchema = z.string().uuid('Invalid POI id');
@@ -34,7 +34,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
       .where(
         and(
           eq(personsOfInterest.id, parsedId.data),
-          eq(personsOfInterest.createdBy, locals.user.id)
+          or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))
         )
       )
       .limit(1);
@@ -81,7 +81,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
       .where(
         and(
           eq(personsOfInterest.id, parsedId.data),
-          eq(personsOfInterest.createdBy, locals.user.id)
+          or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))
         )
       )
       .limit(1);

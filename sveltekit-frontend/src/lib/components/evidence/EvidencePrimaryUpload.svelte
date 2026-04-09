@@ -2,6 +2,7 @@
 	import { applyAction, enhance } from '$app/forms';
 	import { analytics } from '$lib/stores/analytics.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import EvidenceUploadResults from './EvidenceUploadResults.svelte';
 	import { formatFileSize, getIcon } from './evidence-utils.js';
 
 	let {
@@ -22,6 +23,7 @@
 
 	let isDragging = $state(false);
 	let uploadInput = $state<HTMLInputElement | null>(null);
+	let uploadedEvidence = $state<any | null>(null);
 
 	function handleFileSelect(event: Event) {
 		const input = event.target as HTMLInputElement;
@@ -29,6 +31,12 @@
 			selectedFile = input.files[0];
 			uploadError = null;
 		}
+	}
+
+	function resetToUploadForm() {
+		uploadedEvidence = null;
+		selectedFile = null;
+		uploadError = null;
 	}
 
 	function handleDragOver(event: DragEvent) {
@@ -66,7 +74,18 @@
 </script>
 
 <div class="upload-section">
-	<form
+	{#if uploadedEvidence}
+		<EvidenceUploadResults
+			evidenceId={uploadedEvidence.id}
+			fileName={uploadedEvidence.fileName}
+			extractedText={uploadedEvidence.metadata?.extractedText}
+			chunks={uploadedEvidence.metadata?.chunks ?? []}
+			gpuAnalysis={uploadedEvidence.metadata?.gpuAnalysis}
+			caseId={caseId}
+			onBack={resetToUploadForm}
+		/>
+	{:else}
+		<form
 		method="POST"
 		action="?/upload"
 		use:enhance={() => {
@@ -76,8 +95,9 @@
 				if (result.type === 'failure') {
 					uploadError = result.data?.error as string;
 				} else if (result.type === 'success') {
+					uploadedEvidence = result.data?.evidence ?? null;
 					selectedFile = null;
-					analytics.track('evidence_uploaded', { caseId });
+					analytics.track('evidence_uploaded', { caseId, evidenceId: uploadedEvidence?.id });
 				}
 				await applyAction(result);
 			};
@@ -143,13 +163,14 @@
 			{/if}
 		</div>
 
-		{#if form?.error ?? uploadError}
-			<div class="upload-error">
-				<Icon name="circle-alert" class="w-4 h-4" />
-				<span>{form?.error ?? uploadError}</span>
-			</div>
-		{/if}
-	</form>
+			{#if form?.error ?? uploadError}
+				<div class="upload-error">
+					<Icon name="circle-alert" class="w-4 h-4" />
+					<span>{form?.error ?? uploadError}</span>
+				</div>
+			{/if}
+		</form>
+	{/if}
 </div>
 
 <style>

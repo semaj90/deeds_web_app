@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { personsOfInterest, poiPhotos, timelineEvents } from '$lib/server/db/schema-postgres.js';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, isNull, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
 const poiIdSchema = z.string().uuid('Invalid person of interest id');
@@ -39,7 +39,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
       .where(
         and(
           eq(personsOfInterest.id, parsedId.data),
-          eq(personsOfInterest.createdBy, locals.user.id)
+          or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))
         )
       )
       .limit(1);
@@ -130,7 +130,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
       .where(
         and(
           eq(personsOfInterest.id, parsedId.data),
-          eq(personsOfInterest.createdBy, locals.user.id)
+          or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))
         )
       )
       .returning();
@@ -171,7 +171,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
       .where(
         and(
           eq(personsOfInterest.id, parsedId.data),
-          eq(personsOfInterest.createdBy, locals.user.id)
+          or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))
         )
       )
       .limit(1);
@@ -189,7 +189,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
       .where(
         and(
           eq(personsOfInterest.id, parsedId.data),
-          eq(personsOfInterest.createdBy, locals.user.id)
+          or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))
         )
       )
       .returning({ id: personsOfInterest.id, name: personsOfInterest.name });

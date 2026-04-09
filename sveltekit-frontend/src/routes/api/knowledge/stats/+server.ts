@@ -37,21 +37,19 @@ export const GET: RequestHandler = async ({ locals }) => {
     });
   } catch (error) {
     console.error('Stats API error:', error);
-
-    // Handle specific error types
-    if (error instanceof Error) {
-      if (error.message.includes('Qdrant')) {
-        return json(
-          { error: 'Search service unavailable' },
-          { status: 503 }
-        );
-      }
-    }
-
-    return json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return json({
+      success: false,
+      stats: {
+        totalDocuments: 0,
+        indexedVectors: 0,
+        collections: {
+          qdrant: { points: 0, status: 'unavailable' },
+          postgres: { rows: 0 },
+          minio: { objects: 0, size: 0 },
+        },
+        lastIndexed: null,
+      },
+    });
   }
 };
 

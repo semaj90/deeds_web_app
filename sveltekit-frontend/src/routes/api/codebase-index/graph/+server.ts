@@ -318,9 +318,17 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		return json(result);
 	} catch (error) {
 		console.error('Error building graph:', error);
-		return json(
-			{ error: 'Failed to build graph', nodes: [], edges: [] },
-			{ status: 500 }
-		);
+		return json({
+      nodes: [],
+      edges: [],
+      metadata: {
+        totalNodes: 0,
+        totalEdges: 0,
+        nodesWithErrors: 0,
+        scanTimeMs: 0,
+        maxFiles: 0,
+        generatedAt: new Date().toISOString(),
+      },
+    });
 	}
 };

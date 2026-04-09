@@ -34,45 +34,53 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!parsed.success) return json({ items: [], total: 0 }, { status: 400 });
 
 	const { page, limit, search, category } = parsed.data;
-	const offset = (page - 1) * limit;
 
-	const conditions = [];
-	if (search) {
-		conditions.push(or(ilike(legalGlossary.term, `%${search}%`), ilike(legalGlossary.definition, `%${search}%`)));
-	}
-	if (category) conditions.push(ilike(legalGlossary.category, category));
+	try {
+    const offset = (page - 1) * limit;
 
-	const where = conditions.length > 0 ? conditions.reduce((a, b) => sql`${a} AND ${b}`) : undefined;
+    const conditions = [];
+    if (search) {
+      conditions.push(
+        or(ilike(legalGlossary.term, `%${search}%`), ilike(legalGlossary.definition, `%${search}%`))
+      );
+    }
+    if (category) conditions.push(ilike(legalGlossary.category, category));
 
-	const [items, countResult] = await Promise.all([
-		safe(
-			db
-				.select({
-					id: legalGlossary.id,
-					term: legalGlossary.term,
-					definition: legalGlossary.definition,
-					category: legalGlossary.category,
-					jurisdiction: legalGlossary.jurisdiction,
-					relatedTerms: legalGlossary.relatedTerms,
-				})
-				.from(legalGlossary)
-				.where(where)
-				.orderBy(legalGlossary.term)
-				.limit(limit)
-				.offset(offset),
-			[]
-		),
-		safe(
-			db
-				.select({ count: sql<number>`count(*)` })
-				.from(legalGlossary)
-				.where(where)
-				.then((r) => Number(r[0]?.count ?? 0)),
-			0
-		),
-	]);
+    const where =
+      conditions.length > 0 ? conditions.reduce((a, b) => sql`${a} AND ${b}`) : undefined;
 
-	return json({ items, total: countResult, page, limit });
+    const [items, countResult] = await Promise.all([
+      safe(
+        db
+          .select({
+            id: legalGlossary.id,
+            term: legalGlossary.term,
+            definition: legalGlossary.definition,
+            category: legalGlossary.category,
+            jurisdiction: legalGlossary.jurisdiction,
+            relatedTerms: legalGlossary.relatedTerms,
+          })
+          .from(legalGlossary)
+          .where(where)
+          .orderBy(legalGlossary.term)
+          .limit(limit)
+          .offset(offset),
+        []
+      ),
+      safe(
+        db
+          .select({ count: sql<number>`count(*)` })
+          .from(legalGlossary)
+          .where(where)
+          .then((r) => Number(r[0]?.count ?? 0)),
+        0
+      ),
+    ]);
+
+    return json({ items, total: countResult, page, limit });
+  } catch {
+    return json({ items: [], total: 0, page, limit });
+  }
 };
 
 export const POST: RequestHandler = async ({ request, locals }) => {

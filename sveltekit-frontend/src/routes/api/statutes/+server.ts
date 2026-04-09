@@ -36,49 +36,57 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!parsed.success) return json({ items: [], total: 0 }, { status: 400 });
 
 	const { page, limit, search, jurisdiction, category } = parsed.data;
-	const offset = (page - 1) * limit;
 
-	const conditions = [];
-	if (search) {
-		conditions.push(or(ilike(statutes.title, `%${search}%`), ilike(statutes.section, `%${search}%`)));
-	}
-	if (jurisdiction) conditions.push(ilike(statutes.jurisdiction, `%${jurisdiction}%`));
-	if (category) conditions.push(ilike(statutes.category, category));
+	try {
+    const offset = (page - 1) * limit;
 
-	const where = conditions.length > 0 ? conditions.reduce((a, b) => sql`${a} AND ${b}`) : undefined;
+    const conditions = [];
+    if (search) {
+      conditions.push(
+        or(ilike(statutes.title, `%${search}%`), ilike(statutes.section, `%${search}%`))
+      );
+    }
+    if (jurisdiction) conditions.push(ilike(statutes.jurisdiction, `%${jurisdiction}%`));
+    if (category) conditions.push(ilike(statutes.category, category));
 
-	const [items, countResult] = await Promise.all([
-		safe(
-			db
-				.select({
-					id: statutes.id,
-					title: statutes.title,
-					section: statutes.section,
-					content: statutes.content,
-					jurisdiction: statutes.jurisdiction,
-					category: statutes.category,
-					effectiveDate: statutes.effectiveDate,
-					sourceUrl: statutes.sourceUrl,
-					createdAt: statutes.createdAt,
-				})
-				.from(statutes)
-				.where(where)
-				.orderBy(desc(statutes.updatedAt))
-				.limit(limit)
-				.offset(offset),
-			[]
-		),
-		safe(
-			db
-				.select({ count: sql<number>`count(*)` })
-				.from(statutes)
-				.where(where)
-				.then((r) => Number(r[0]?.count ?? 0)),
-			0
-		),
-	]);
+    const where =
+      conditions.length > 0 ? conditions.reduce((a, b) => sql`${a} AND ${b}`) : undefined;
 
-	return json({ items, total: countResult, page, limit });
+    const [items, countResult] = await Promise.all([
+      safe(
+        db
+          .select({
+            id: statutes.id,
+            title: statutes.title,
+            section: statutes.section,
+            content: statutes.content,
+            jurisdiction: statutes.jurisdiction,
+            category: statutes.category,
+            effectiveDate: statutes.effectiveDate,
+            sourceUrl: statutes.sourceUrl,
+            createdAt: statutes.createdAt,
+          })
+          .from(statutes)
+          .where(where)
+          .orderBy(desc(statutes.updatedAt))
+          .limit(limit)
+          .offset(offset),
+        []
+      ),
+      safe(
+        db
+          .select({ count: sql<number>`count(*)` })
+          .from(statutes)
+          .where(where)
+          .then((r) => Number(r[0]?.count ?? 0)),
+        0
+      ),
+    ]);
+
+    return json({ items, total: countResult, page, limit });
+  } catch {
+    return json({ items: [], total: 0, page, limit });
+  }
 };
 
 export const POST: RequestHandler = async ({ request, locals }) => {

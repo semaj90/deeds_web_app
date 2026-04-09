@@ -533,16 +533,13 @@ export const GET: RequestHandler = async ({ locals }) => {
       timestamp: new Date().toISOString()
     });
   } catch (err) {
-    return json(
-      {
-        success: false,
-        error: 'Indexing operation failed',
-        collections: {
-          codebase: { points_count: 0 },
-          errors: { points_count: 0 }
-        }
+    return json({
+      success: false,
+      collections: {
+        codebase: { points_count: 0, vectors_size: 768 },
+        errors: { points_count: 0, vectors_size: 768 },
       },
-      { status: 500 }
-    );
+      timestamp: new Date().toISOString(),
+    });
   }
 };

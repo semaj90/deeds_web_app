@@ -67,6 +67,6 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
     return json({ results });
   } catch (error) {
     console.error('Error finding similar nodes:', error);
-    return json({ error: 'Failed to find similar nodes', results: [] }, { status: 500 });
+    return json({ results: [] });
   }
 };

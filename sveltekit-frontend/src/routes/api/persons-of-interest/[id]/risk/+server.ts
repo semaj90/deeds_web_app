@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { personsOfInterest, evidence, cases } from '$lib/server/db/schema-postgres.js';
-import { and, eq, sql, arrayContains } from 'drizzle-orm';
+import { and, eq, isNull, or, sql, arrayContains } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
@@ -28,7 +28,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     .select()
     .from(personsOfInterest)
     .where(
-      and(eq(personsOfInterest.id, params.id), eq(personsOfInterest.createdBy, locals.user.id))
+      and(eq(personsOfInterest.id, params.id), or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy)))
     )
     .limit(1)
     .then((r) => r[0]);
@@ -118,7 +118,7 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
     .select()
     .from(personsOfInterest)
     .where(
-      and(eq(personsOfInterest.id, params.id), eq(personsOfInterest.createdBy, locals.user.id))
+      and(eq(personsOfInterest.id, params.id), or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy)))
     )
     .limit(1)
     .then((r) => r[0]);
@@ -175,7 +175,7 @@ Provide a JSON object with: riskScore (0-100), patterns (string[]), recommendati
     .update(personsOfInterest)
     .set({ aiProfile, updatedAt: new Date() })
     .where(
-      and(eq(personsOfInterest.id, params.id), eq(personsOfInterest.createdBy, locals.user.id))
+      and(eq(personsOfInterest.id, params.id), or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy)))
     );
 
   return json({ success: true, aiProfile });

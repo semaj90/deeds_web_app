@@ -110,7 +110,7 @@ This pass moved beyond documentation review into active route hardening after li
 - **compare-pdf SSRF tightened**: Removed `localhost`/`127.0.0.1` from allowed hosts, uses centralized `validateInternalUrl()`
 
 ### Remaining Open (from re-audit)
-- [ ] 5 error message leaks remain (similar, synthesis, cluster-summaries, cluster-status, crawl — verified safe but could be tighter). Fixed Apr 7: auth/login, authorities, evidence/search
+- [x] 5 error message leaks remain (similar, synthesis, cluster-summaries, cluster-status, crawl — verified safe but could be tighter). Fixed Apr 7: auth/login, authorities, evidence/search. ✅ Fixed Apr 9: all 5 now use static messages; cluster-status GET degraded-shape fixed (returns empty job/statistics/timestamp)
 - [ ] `.env.example` only has 21 active vars (not 50+ as claimed) — needs `SEARXNG_URL`, `DOCLING_SERVICE_URL`, `WHISPER_MODEL`, `WHISPER_CUDA`
 - [ ] Categorized API audit (GET degraded-shape, write validation, ownership/auth, SSE) still pending
 - [ ] Drizzle schema reconciliation still pending

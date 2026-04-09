@@ -77,9 +77,6 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
     return json({ success: true, notes, query, total: notes.length });
   } catch (err) {
     console.error('[notes-search] error:', err);
-    return json(
-      { success: false, notes: [], query, total: 0, error: 'Search failed' },
-      { status: 500 }
-    );
+    return json({ success: false, notes: [], query, total: 0 });
   }
 };

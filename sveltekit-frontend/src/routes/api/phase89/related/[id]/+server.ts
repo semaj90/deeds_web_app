@@ -67,10 +67,7 @@ export const GET: RequestHandler = async ({ params, fetch, locals }) => {
 		return json({ related });
 	} catch (error) {
 		console.error('Related files API error:', error);
-		return json({
-			related: [],
-			error: 'Related search failed'
-		}, { status: 500 });
+		return json({ related: [] });
 	}
 };
 

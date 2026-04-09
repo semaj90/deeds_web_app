@@ -64,27 +64,6 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     });
   } catch (error) {
     console.error('Document API error:', error);
-
-    // Handle specific error types
-    if (error instanceof Error) {
-      if (error.message.includes('MinIO')) {
-        return json(
-          { success: false, document: emptyDocument, error: 'Storage service unavailable' },
-          { status: 503 }
-        );
-      }
-
-      if (error.message.includes('Qdrant')) {
-        return json(
-          { success: false, document: emptyDocument, error: 'Search service unavailable' },
-          { status: 503 }
-        );
-      }
-    }
-
-    return json(
-      { success: false, document: emptyDocument, error: 'Internal server error' },
-      { status: 500 }
-    );
+    return json({ success: false, document: emptyDocument });
   }
 };

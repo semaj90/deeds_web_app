@@ -4,6 +4,7 @@ import { db } from '$lib/server/db/client';
 import { cases, evidence } from '$lib/server/db/schema-postgres.js';
 import { and, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { isUuid } from '$lib/server/validation.js';
 
 function parseMetadata(value: unknown): unknown {
   if (typeof value !== 'string') return value;
@@ -31,6 +32,7 @@ const updateEvidenceSchema = z.object({
  */
 export const GET: RequestHandler = async ({ params, locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
   try {
     const [item] = await db

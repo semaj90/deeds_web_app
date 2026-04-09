@@ -105,16 +105,12 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		});
 	} catch (error) {
 		console.error('Failed to get errors:', error);
-		return json(
-			{
-				errors: [],
-				total: 0,
-				page: 1,
-				pageSize: 50,
-				totalPages: 0,
-				error: 'Failed to fetch errors'
-			},
-			{ status: 500 }
-		);
+		return json({
+      errors: [],
+      total: 0,
+      page: 1,
+      pageSize: 50,
+      totalPages: 0,
+    });
 	}
 };

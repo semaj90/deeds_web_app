@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/client';
 import { personsOfInterest, poiPhotos } from '$lib/server/db/schema-postgres';
 import { json } from '@sveltejs/kit';
-import { and, eq, ne, desc, sql } from 'drizzle-orm';
+import { and, eq, isNull, ne, or, desc, sql } from 'drizzle-orm';
 import { generateEmbedding } from '$lib/server/ai/embeddings-simple.js';
 import type { RequestHandler } from './$types';
 import { isUuid } from '$lib/server/validation.js';
@@ -18,7 +18,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     const [target] = await db
       .select()
       .from(personsOfInterest)
-      .where(and(eq(personsOfInterest.id, poiId), eq(personsOfInterest.createdBy, locals.user.id)))
+      .where(and(eq(personsOfInterest.id, poiId), or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))))
       .limit(1);
 
     if (!target) {
@@ -43,7 +43,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				)`.as('photo_url'),
       })
       .from(personsOfInterest)
-      .where(and(ne(personsOfInterest.id, poiId), eq(personsOfInterest.createdBy, locals.user.id)))
+      .where(and(ne(personsOfInterest.id, poiId), or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))))
       .orderBy(desc(personsOfInterest.updatedAt))
       .limit(50);
 

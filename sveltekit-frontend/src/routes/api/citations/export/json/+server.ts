@@ -1,6 +1,6 @@
 import { citations, statutes, db } from '$lib/server/db/client';
 import { error, json } from '@sveltejs/kit';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, or, isNull, inArray } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
@@ -43,18 +43,18 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			citationsData = await db
         .select()
         .from(citations)
-        .where(and(inArray(citations.id, citationIds), eq(citations.createdBy, locals.user.id)));
+        .where(and(inArray(citations.id, citationIds), or(eq(citations.createdBy, locals.user.id), isNull(citations.createdBy))!));
 		} else if (caseId) {
 			citationsData = await db
         .select()
         .from(citations)
-        .where(and(eq(citations.caseId, caseId), eq(citations.createdBy, locals.user.id)));
+        .where(and(eq(citations.caseId, caseId), or(eq(citations.createdBy, locals.user.id), isNull(citations.createdBy))!));
 		} else {
 			// Export all user's citations (limit to 1000 for safety)
 			citationsData = await db
         .select()
         .from(citations)
-        .where(eq(citations.createdBy, locals.user.id))
+        .where(or(eq(citations.createdBy, locals.user.id), isNull(citations.createdBy))!)
         .limit(1000);
 		}
 

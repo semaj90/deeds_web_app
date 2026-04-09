@@ -34,30 +34,23 @@ export const GET: RequestHandler = async () => {
 			}
 		} catch (fetchError: unknown) {
 			// This catches network errors and timeouts.
-			return json(
-				{
-					status: 'unavailable',
-					service: 'ollama',
-					message: 'Ollama service not reachable',
-					details: { url: ollamaUrl,
-						available: false
-					},
-					timestamp: new Date().toISOString()
-				},
-				{ status: 503 }
-			);
+			return json({
+        status: 'unavailable',
+        service: 'ollama',
+        message: 'Ollama service not reachable',
+        details: { url: ollamaUrl, available: false },
+        timestamp: new Date().toISOString(),
+      });
 		}
 	} catch (error: unknown) {
 		// This catches errors from the service itself (e.g., non-200 responses) or other unexpected errors.
-		return json(
-			{
-				status: 'error',
-				service: 'ollama',
-				error: 'Health check failed',
-				timestamp: new Date().toISOString()
-			},
-			{ status: 500 }
-		);
+		return json({
+      status: 'error',
+      service: 'ollama',
+      message: 'Health check failed',
+      details: { url: ollamaUrl, available: false },
+      timestamp: new Date().toISOString(),
+    });
 	}
 };
 
