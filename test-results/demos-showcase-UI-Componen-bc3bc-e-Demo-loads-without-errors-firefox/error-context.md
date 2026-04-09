@@ -1,0 +1,437 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - heading "YORHA DETECTIVE" [level=1] [ref=e6]:
+          - text: YORHA
+          - text: DETECTIVE
+        - paragraph [ref=e7]: Investigation Interface
+      - button "Collapse sidebar" [ref=e8] [cursor=pointer]
+    - navigation [ref=e10]:
+      - link "DASHBOARD" [ref=e11]:
+        - /url: /dashboard
+        - generic [ref=e13]: DASHBOARD
+      - link "COMMAND CENTER" [ref=e14]:
+        - /url: /command-center
+        - generic [ref=e16]: COMMAND CENTER
+      - link "ACTIVE CASES" [ref=e17]:
+        - /url: /active-cases
+        - generic [ref=e19]: ACTIVE CASES
+      - link "CASES" [ref=e20]:
+        - /url: /cases
+        - generic [ref=e22]: CASES
+      - link "EVIDENCE" [ref=e23]:
+        - /url: /evidence
+        - generic [ref=e25]: EVIDENCE
+      - link "EVIDENCE LIBRARY" [ref=e26]:
+        - /url: /evidence-library
+        - generic [ref=e28]: EVIDENCE LIBRARY
+      - link "CITATIONS" [ref=e29]:
+        - /url: /citations
+        - generic [ref=e31]: CITATIONS
+      - link "LEGAL CORPUS" [ref=e32]:
+        - /url: /legal-corpus
+        - generic [ref=e34]: LEGAL CORPUS
+      - link "FICTIONAL CASES" [ref=e35]:
+        - /url: /fictional-cases
+        - generic [ref=e37]: FICTIONAL CASES
+      - link "SIMULATION" [ref=e38]:
+        - /url: /simulation
+        - generic [ref=e40]: SIMULATION
+      - link "COURTROOM SIM" [ref=e41]:
+        - /url: /demos/courtroom-sim
+        - generic [ref=e43]: COURTROOM SIM
+      - link "LEGAL LIBRARY" [ref=e44]:
+        - /url: /library
+        - generic [ref=e46]: LEGAL LIBRARY
+      - link "GLOSSARY" [ref=e47]:
+        - /url: /library/glossary
+        - generic [ref=e49]: GLOSSARY
+      - link "PERSONS OF INTEREST" [ref=e50]:
+        - /url: /persons-of-interest
+        - generic [ref=e52]: PERSONS OF INTEREST
+      - link "ANALYSIS CENTER" [ref=e53]:
+        - /url: /analysis-center
+        - generic [ref=e55]: ANALYSIS CENTER
+      - link "GLOBAL SEARCH" [ref=e56]:
+        - /url: /global-search
+        - generic [ref=e58]: GLOBAL SEARCH
+      - link "AI DASHBOARD" [ref=e59]:
+        - /url: /admin/ai-dashboard
+        - generic [ref=e61]: AI DASHBOARD
+      - link "TERMINAL" [ref=e62]:
+        - /url: /terminal
+        - generic [ref=e64]: TERMINAL
+      - link "MEMORY PALACE" [ref=e65]:
+        - /url: /memory-palace
+        - generic [ref=e67]: MEMORY PALACE
+      - link "ALL ROUTES" [ref=e68]:
+        - /url: /admin/all-routes
+        - generic [ref=e70]: ALL ROUTES
+      - link "DEMOS" [ref=e71]:
+        - /url: /demos
+        - generic [ref=e73]: DEMOS
+      - generic [ref=e75]: SYSTEM
+      - link "ADMIN" [ref=e76]:
+        - /url: /admin
+        - generic [ref=e78]: ADMIN
+      - link "SYSTEM CONFIG" [ref=e79]:
+        - /url: /system-configuration
+        - generic [ref=e81]: SYSTEM CONFIG
+      - link "AST TOPOLOGY" [ref=e82]:
+        - /url: /ast-topology
+        - generic [ref=e84]: AST TOPOLOGY
+      - link "GPU GRAPH" [ref=e85]:
+        - /url: /admin/gpu-evidence-graph
+        - generic [ref=e87]: GPU GRAPH
+      - link "ERROR BRAIN" [ref=e88]:
+        - /url: /admin/error-brain
+        - generic [ref=e90]: ERROR BRAIN
+      - link "AGENTIC ERRORS" [ref=e91]:
+        - /url: /agentic-errors
+        - generic [ref=e93]: AGENTIC ERRORS
+      - link "CODEBASE INDEX" [ref=e94]:
+        - /url: /codebase-index
+        - generic [ref=e96]: CODEBASE INDEX
+    - generic [ref=e97]:
+      - generic [ref=e100]: Online
+      - generic [ref=e101]: "System: Operational"
+      - generic [ref=e102]: 04/08/2026, 20:32:21
+  - main [ref=e104]:
+    - generic [ref=e105]:
+      - generic [ref=e106]: "DEV MODE: Authentication bypassed (DEV_BYPASS_AUTH=true)"
+      - link "Skip to main content" [ref=e107]:
+        - /url: "#main-content"
+      - main [ref=e108]:
+        - navigation "Breadcrumb" [ref=e110]:
+          - list [ref=e111]:
+            - listitem [ref=e112]:
+              - link "Home" [ref=e113]:
+                - /url: /dashboard
+                - generic [ref=e115]: Home
+            - listitem [ref=e116]:
+              - link "Demos" [ref=e119]:
+                - /url: /demos
+                - generic [ref=e120]: Demos
+            - listitem [ref=e121]:
+              - generic [ref=e124]: Ui Components
+        - generic [ref=e125]:
+          - generic [ref=e126]:
+            - heading "UI Components Showcase" [level=1] [ref=e127]
+            - paragraph [ref=e128]: Orphan components — rescued, wired, and alive
+            - paragraph [ref=e129]: 11 components • Svelte 5 runes • Celestial theme
+          - generic [ref=e130]:
+            - generic [ref=e131]:
+              - img [ref=e132]
+              - heading "Badge" [level=2] [ref=e144]
+              - generic [ref=e145]: ui/Badge.svelte
+            - paragraph [ref=e146]: Status labels — 7 variants × 3 sizes
+            - generic [ref=e147]:
+              - heading "Variants" [level=3] [ref=e148]
+              - generic [ref=e149]:
+                - generic [ref=e150]: Default
+                - generic [ref=e151]: Primary
+                - generic [ref=e152]: Secondary
+                - generic [ref=e153]: Success
+                - generic [ref=e154]: Warning
+                - generic [ref=e155]: Danger
+                - generic [ref=e156]: Outline
+            - generic [ref=e157]:
+              - heading "Sizes" [level=3] [ref=e158]
+              - generic [ref=e159]:
+                - generic [ref=e160]: SM
+                - generic [ref=e161]: MD
+                - generic [ref=e162]: LG
+            - generic [ref=e163]:
+              - heading "Contextual" [level=3] [ref=e164]
+              - generic [ref=e165]:
+                - generic [ref=e166]: Verified
+                - generic [ref=e168]: Pending
+                - generic [ref=e170]: Sealed
+                - generic [ref=e172]:
+                  - img [ref=e173]
+                  - text: Legal
+          - generic [ref=e187]:
+            - generic [ref=e188]:
+              - img [ref=e189]
+              - heading "Card" [level=2] [ref=e203]
+              - generic [ref=e204]: ui/Card.svelte
+            - paragraph [ref=e205]: Container component — 4 variants × 4 padding sizes
+            - generic [ref=e206]:
+              - generic [ref=e207]:
+                - heading "Default" [level=4] [ref=e208]
+                - paragraph [ref=e209]: Standard panel background with subtle border.
+              - generic [ref=e210]:
+                - heading "Elevated" [level=4] [ref=e211]
+                - paragraph [ref=e212]: Shadow lift for primary content cards.
+              - generic [ref=e213]:
+                - heading "Outlined" [level=4] [ref=e214]
+                - paragraph [ref=e215]: Transparent with prominent border.
+              - generic [ref=e216]:
+                - heading "Ghost" [level=4] [ref=e217]
+                - paragraph [ref=e218]: Minimal hint — barely there.
+          - generic [ref=e219]:
+            - generic [ref=e220]:
+              - img [ref=e221]
+              - heading "Progress" [level=2] [ref=e237]
+              - generic [ref=e238]: ui/Progress.svelte
+            - paragraph [ref=e239]: Progress bar — 7 variants, interactive value control
+            - generic [ref=e241]:
+              - generic [ref=e242]: "Value: 65%"
+              - slider [ref=e243]: "65"
+            - generic [ref=e244]:
+              - generic [ref=e245]:
+                - generic [ref=e246]: Default
+                - progressbar "Upload progress" [ref=e249]
+              - generic [ref=e250]:
+                - generic [ref=e251]: Success
+                - progressbar "Upload progress" [ref=e254]
+              - generic [ref=e255]:
+                - generic [ref=e256]: Warning
+                - progressbar "Upload progress" [ref=e259]
+              - generic [ref=e260]:
+                - generic [ref=e261]: Error
+                - progressbar "Upload progress" [ref=e264]
+              - generic [ref=e265]:
+                - generic [ref=e266]: Info
+                - progressbar "Upload progress" [ref=e269]
+              - generic [ref=e270]:
+                - generic [ref=e271]: YoRHa
+                - progressbar "Upload progress" [ref=e274]
+              - generic [ref=e275]:
+                - generic [ref=e276]: Legal
+                - generic [ref=e277]:
+                  - progressbar "Upload progress" [ref=e279]
+                  - generic [ref=e280]: 65%
+          - generic [ref=e281]:
+            - generic [ref=e282]:
+              - heading "Skeleton" [level=2] [ref=e284]
+              - generic [ref=e285]: ui/Skeleton.svelte
+            - paragraph [ref=e286]: Loading placeholders — 4 variants with shimmer animation
+            - generic [ref=e287]:
+              - generic [ref=e289]: text
+              - generic [ref=e295]: card
+              - generic [ref=e299]: circle
+              - generic [ref=e305]: rect
+          - generic [ref=e309]:
+            - generic [ref=e310]:
+              - heading "Kbd" [level=2] [ref=e312]
+              - generic [ref=e313]: ui/Kbd.svelte
+            - paragraph [ref=e314]: Keyboard shortcut display — modifier symbols, combo rendering
+            - generic [ref=e315]:
+              - generic [ref=e316]:
+                - 'generic "Keyboard shortcut: Ctrl+K" [ref=e317]':
+                  - generic [ref=e318]: ⌃
+                  - generic [ref=e319]: +
+                  - generic [ref=e320]: K
+                - generic [ref=e321]: Command palette
+              - generic [ref=e322]:
+                - 'generic "Keyboard shortcut: Ctrl+Shift+P" [ref=e323]':
+                  - generic [ref=e324]: ⌃
+                  - generic [ref=e325]: +
+                  - generic [ref=e326]: ⇧
+                  - generic [ref=e327]: +
+                  - generic [ref=e328]: P
+                - generic [ref=e329]: Quick actions
+              - generic [ref=e330]:
+                - 'generic "Keyboard shortcut: Cmd+S" [ref=e331]':
+                  - generic [ref=e332]: ⌘
+                  - generic [ref=e333]: +
+                  - generic [ref=e334]: S
+                - generic [ref=e335]: Save
+              - generic [ref=e336]:
+                - 'generic "Keyboard shortcut: Esc" [ref=e337]':
+                  - generic [ref=e338]: Esc
+                - generic [ref=e339]: Close dialog
+              - generic [ref=e340]:
+                - 'generic "Keyboard shortcut: Tab" [ref=e341]':
+                  - generic [ref=e342]: ⇥
+                - generic [ref=e343]: Next field
+              - generic [ref=e344]:
+                - 'generic "Keyboard shortcut: ?" [ref=e345]':
+                  - generic [ref=e346]: "?"
+                - generic [ref=e347]: Show shortcuts
+              - generic [ref=e348]:
+                - 'generic "Keyboard shortcut: Ctrl+Enter" [ref=e349]':
+                  - generic [ref=e350]: ⌃
+                  - generic [ref=e351]: +
+                  - generic [ref=e352]: ↵
+                - generic [ref=e353]: Submit
+              - generic [ref=e354]:
+                - 'generic "Keyboard shortcut: Alt+Up" [ref=e355]':
+                  - generic [ref=e356]: ⌥
+                  - generic [ref=e357]: +
+                  - generic [ref=e358]: ↑
+                - generic [ref=e359]: Move line up
+          - generic [ref=e360]:
+            - generic [ref=e361]:
+              - heading "Tooltip" [level=2] [ref=e363]
+              - generic [ref=e364]: ui/Tooltip.svelte
+            - paragraph [ref=e365]: Hover-reveal tooltips with bits-ui — 4 positions, auto-arrow
+            - generic [ref=e366]:
+              - button "Top" [ref=e367] [cursor=pointer]:
+                - button "Top" [ref=e368]
+              - button "Right" [ref=e369] [cursor=pointer]:
+                - button "Right" [ref=e370]
+              - button "Bottom" [ref=e371] [cursor=pointer]:
+                - button "Bottom" [ref=e372]
+              - button "Left" [ref=e373] [cursor=pointer]:
+                - button "Left" [ref=e374]
+            - generic [ref=e375]:
+              - button [ref=e376] [cursor=pointer]:
+                - button [ref=e377]
+              - button [ref=e379] [cursor=pointer]:
+                - button [ref=e380]:
+                  - img [ref=e381]
+              - button [ref=e395] [cursor=pointer]:
+                - button [ref=e396]:
+                  - img [ref=e397]
+              - button [ref=e415] [cursor=pointer]:
+                - button [ref=e416]:
+                  - img [ref=e417]
+          - generic [ref=e431]:
+            - generic [ref=e432]:
+              - heading "ChatFeedback" [level=2] [ref=e434]
+              - generic [ref=e435]: ai/ChatFeedback.svelte
+            - paragraph [ref=e436]: AI response rating widget — thumbs up/down with state tracking
+            - generic [ref=e437]:
+              - generic [ref=e439]:
+                - paragraph [ref=e440]: The statute of limitations for fraud under 18 U.S.C. § 1341 is 5 years from the date of the offense.
+                - generic [ref=e441]:
+                  - generic [ref=e442]: gemma4-legal
+                  - generic [ref=e443]:
+                    - button "Helpful" [ref=e444] [cursor=pointer]
+                    - button "Not helpful" [ref=e446] [cursor=pointer]
+              - generic [ref=e449]:
+                - paragraph [ref=e450]: Based on the evidence timeline, the key events cluster around March 2024 with 3 corroborating witnesses.
+                - generic [ref=e451]:
+                  - generic [ref=e452]: rag-pipeline
+                  - generic [ref=e453]:
+                    - button "Helpful" [ref=e454] [cursor=pointer]
+                    - button "Not helpful" [ref=e456] [cursor=pointer]
+          - generic [ref=e458]:
+            - generic [ref=e459]:
+              - img [ref=e460]
+              - heading "BoardMinimap" [level=2] [ref=e480]
+              - generic [ref=e481]: evidence/BoardMinimap.svelte
+            - paragraph [ref=e482]: Evidence board navigator — SVG minimap with viewport tracking. Click to navigate.
+            - generic [ref=e483]:
+              - generic [ref=e485] [cursor=pointer]:
+                - img [ref=e486]
+                - generic: MAP
+              - generic [ref=e498]:
+                - heading "Legend" [level=4] [ref=e499]
+                - generic [ref=e502]: Document
+                - generic [ref=e505]: Photo
+                - generic [ref=e508]: Testimony
+                - generic [ref=e511]: Forensic
+                - generic [ref=e514]: Financial
+                - generic [ref=e515]: "Pan: (-200, -100)"
+          - generic [ref=e516]:
+            - generic [ref=e517]:
+              - heading "Unified Icons" [level=2] [ref=e519]
+              - generic [ref=e520]: ui/Icon.svelte → yorha/ + lucide
+            - paragraph [ref=e521]:
+              - text: Both icon systems through one component —
+              - code [ref=e522]: yorha-*
+              - text: prefix for SVG, everything else via UnoCSS Lucide
+            - generic [ref=e523]:
+              - generic [ref=e524]:
+                - heading "YoRHa Celestial" [level=4] [ref=e525]
+                - generic [ref=e526]:
+                  - button [ref=e527] [cursor=pointer]:
+                    - img [ref=e529]
+                  - button [ref=e543] [cursor=pointer]:
+                    - img [ref=e545]
+                  - button [ref=e559] [cursor=pointer]:
+                    - img [ref=e561]
+                  - button [ref=e574] [cursor=pointer]:
+                    - img [ref=e576]
+                  - button [ref=e590] [cursor=pointer]:
+                    - img [ref=e592]
+                  - button [ref=e606] [cursor=pointer]:
+                    - img [ref=e608]
+                - generic [ref=e620]:
+                  - button [ref=e621] [cursor=pointer]:
+                    - img [ref=e623]
+                  - button [ref=e637] [cursor=pointer]:
+                    - img [ref=e639]
+                  - button [ref=e655] [cursor=pointer]:
+                    - img [ref=e657]
+                  - button [ref=e677] [cursor=pointer]:
+                    - img [ref=e679]
+                  - button [ref=e691] [cursor=pointer]:
+                    - img [ref=e693]
+                  - button [ref=e706] [cursor=pointer]:
+                    - img [ref=e708]
+              - generic [ref=e726]:
+                - heading "Lucide Legal" [level=4] [ref=e727]
+                - generic [ref=e728]:
+                  - button [ref=e729] [cursor=pointer]
+                  - button [ref=e732] [cursor=pointer]
+                  - button [ref=e735] [cursor=pointer]
+                  - button [ref=e738] [cursor=pointer]
+                  - button [ref=e741] [cursor=pointer]
+                  - button [ref=e744] [cursor=pointer]
+                  - button [ref=e747] [cursor=pointer]
+                  - button [ref=e750] [cursor=pointer]
+                  - button [ref=e753] [cursor=pointer]
+                  - button [ref=e756] [cursor=pointer]
+                  - button [ref=e759] [cursor=pointer]
+                  - button [ref=e762] [cursor=pointer]
+          - generic [ref=e765]:
+            - generic [ref=e766]:
+              - heading "TypewriterPrompt" [level=2] [ref=e768]
+              - generic [ref=e769]: ui/TypewriterPrompt.svelte
+            - paragraph [ref=e770]: AI prompt typewriter effect — blinking cursor, auto-advance
+            - generic [ref=e771]:
+              - generic [ref=e772]: 💬
+              - generic [ref=e773]: Analyz |
+              - generic [ref=e774]: "Case #2847"
+            - paragraph [ref=e775]: Auto-cycles through 3 legal prompts
+          - generic [ref=e776]:
+            - generic [ref=e777]:
+              - heading "MarkdownSceneViewer" [level=2] [ref=e779]
+              - generic [ref=e780]: ui/MarkdownSceneViewer.svelte
+            - paragraph [ref=e781]: AI-generated scene summaries with human-in-the-loop validation — validate, edit, or reject
+            - generic [ref=e782]:
+              - generic [ref=e783]:
+                - generic [ref=e784]:
+                  - heading "Financial Transaction Summary" [level=3] [ref=e785]
+                  - generic [ref=e786]: 🤖 AI Generated
+                - generic [ref=e787]:
+                  - generic [ref=e788]: "Confidence: 87%"
+                  - generic [ref=e789]: "Sources: bank_records_q1.pdf, wire_log_march.csv"
+              - generic [ref=e791]:
+                - paragraph [ref=e792]:
+                  - strong [ref=e793]: "Key Finding:"
+                  - text: Three wire transfers totaling
+                  - strong [ref=e794]: $2.4M
+                  - text: were made between March 12-15, 2024.
+                - list [ref=e795]:
+                  - listitem [ref=e796]: "Transfer 1: $800,000 → Offshore Account #4471"
+                  - listitem [ref=e797]: "Transfer 2: $1,100,000 → Shell Corp \"Meridian Holdings\""
+                  - listitem [ref=e798]: "Transfer 3: $500,000 → Personal Account (flagged)"
+                - blockquote [ref=e799]:
+                  - paragraph [ref=e800]: Pattern matches known layering technique per FinCEN guidelines.
+              - generic [ref=e801]:
+                - button "✅ Validate" [ref=e802] [cursor=pointer]
+                - button "❌ Reject" [ref=e803] [cursor=pointer]
+                - button "✏️ Edit" [ref=e804] [cursor=pointer]
+          - generic [ref=e805]:
+            - generic [ref=e806]:
+              - heading "AdaptiveRenderingEngine" [level=2] [ref=e808]
+              - generic [ref=e809]: ui/AdaptiveRenderingEngine.svelte
+            - paragraph [ref=e810]: Canvas-based quality tier renderer — 8-BIT NES / 16-BIT SNES / 64-BIT N64 with live FPS metrics
+            - paragraph [ref=e813]: AdaptiveRenderingEngine encountered an error (effect cycle). Component isolated to prevent page breakage.
+      - text: Write your case document here...
+      - button [ref=e815] [cursor=pointer]
+  - text: Write your case document here...
+  - button "Open assistant" [ref=e817] [cursor=pointer]:
+    - generic [ref=e818]:
+      - generic "connected" [ref=e820]
+      - generic [ref=e821]: "3"
+```

@@ -1,0 +1,14 @@
+CompileFlags:
+  Add:
+    - "-IC:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/include"
+    - "-IC:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/include/torch/csrc/api/include"
+    - "-IC:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/include"
+    - "-IC:/Users/james/Videos/deeds-web-app/sveltekit-frontend/node_modules/node-addon-api"
+    - "-std=c++17"
+    - "-DNAPI_DISABLE_CPP_EXCEPTIONS"
+  Remove:
+    - "--expt-relaxed-constexpr"
+    - "-forward-unknown-to-host-compiler"
+Diagnostics:
+  Suppress:
+    - "drv_unknown_argument"
