@@ -4,6 +4,7 @@
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import EvidenceUploadResults from './EvidenceUploadResults.svelte';
 	import { formatFileSize, getIcon } from './evidence-utils.js';
+	import { onMount } from 'svelte';
 
 	let {
 		form = null,
@@ -24,6 +25,9 @@
 	let isDragging = $state(false);
 	let uploadInput = $state<HTMLInputElement | null>(null);
 	let uploadedEvidence = $state<any | null>(null);
+	let isPolling = $state(false);
+	let processingStage = $state<string | null>(null);
+	let pollingIntervalId: NodeJS.Timeout | null = null;
 
 	function handleFileSelect(event: Event) {
 		const input = event.target as HTMLInputElement;
@@ -37,7 +41,50 @@
 		uploadedEvidence = null;
 		selectedFile = null;
 		uploadError = null;
+		isPolling = false;
+		processingStage = null;
+		if (pollingIntervalId) clearInterval(pollingIntervalId);
 	}
+
+	async function pollForUpdates() {
+		if (!uploadedEvidence?.id) return;
+
+		try {
+			const response = await fetch(`/api/evidence/${uploadedEvidence.id}`);
+			if (!response.ok) return;
+
+			const data = await response.json();
+			if (data.evidence) {
+				uploadedEvidence = data.evidence;
+
+				// Detect processing stages from metadata
+				const metadata = data.evidence.metadata || {};
+				if (metadata.extractedText && !metadata.chunks) {
+					processingStage = 'Chunking document...';
+				} else if (metadata.chunks && !metadata.gpuAnalysis) {
+					processingStage = 'Running GPU analysis...';
+				} else if (metadata.gpuAnalysis) {
+					processingStage = 'Analysis complete!';
+					isPolling = false;
+					if (pollingIntervalId) clearInterval(pollingIntervalId);
+				}
+			}
+		} catch (err) {
+			console.warn('Polling failed:', err);
+		}
+	}
+
+	// Start polling when evidence is uploaded
+	$effect(() => {
+		if (uploadedEvidence?.id && !isPolling) {
+			isPolling = true;
+			processingStage = 'Processing evidence...';
+			pollingIntervalId = setInterval(pollForUpdates, 3000); // Poll every 3 seconds
+			return () => {
+				if (pollingIntervalId) clearInterval(pollingIntervalId);
+			};
+		}
+	});
 
 	function handleDragOver(event: DragEvent) {
 		event.preventDefault();
@@ -75,6 +122,15 @@
 
 <div class="upload-section">
 	{#if uploadedEvidence}
+		{#if isPolling && processingStage}
+			<div class="processing-indicator">
+				<div class="spinner"></div>
+				<div class="processing-text">
+					<p class="stage-label">{processingStage}</p>
+					<p class="stage-hint">This may take a minute...</p>
+				</div>
+			</div>
+		{/if}
 		<EvidenceUploadResults
 			evidenceId={uploadedEvidence.id}
 			fileName={uploadedEvidence.fileName}
@@ -82,6 +138,7 @@
 			chunks={uploadedEvidence.metadata?.chunks ?? []}
 			gpuAnalysis={uploadedEvidence.metadata?.gpuAnalysis}
 			caseId={caseId}
+			previewUrl={form?.previewUrl ?? ''}
 			onBack={resetToUploadForm}
 		/>
 	{:else}
@@ -176,6 +233,44 @@
 <style>
 	.upload-section {
 		padding: 1rem 1.5rem;
+	}
+
+	.processing-indicator {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		padding: 1rem;
+		margin-bottom: 1rem;
+		border-radius: 12px;
+		background: linear-gradient(135deg, rgba(126, 231, 255, 0.08) 0%, rgba(83, 183, 255, 0.04) 100%);
+		border: 1px solid rgba(126, 231, 255, 0.14);
+	}
+
+	.spinner {
+		width: 24px;
+		height: 24px;
+		border: 2px solid rgba(126, 231, 255, 0.2);
+		border-top-color: #7ee7ff;
+		border-radius: 50%;
+		animation: spin 0.6s linear infinite;
+		flex-shrink: 0;
+	}
+
+	.processing-text {
+		flex: 1;
+	}
+
+	.stage-label {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: rgba(240, 248, 255, 0.95);
+		margin: 0;
+	}
+
+	.stage-hint {
+		font-size: 0.75rem;
+		color: rgba(184, 198, 226, 0.64);
+		margin: 0.25rem 0 0;
 	}
 	.upload-zone {
 		position: relative;

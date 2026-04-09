@@ -9,6 +9,7 @@
 		chunks = [],
 		gpuAnalysis = null,
 		caseId = '',
+		previewUrl = '',
 		onBack = () => {},
 	}: {
 		evidenceId?: string;
@@ -17,6 +18,7 @@
 		chunks?: any[];
 		gpuAnalysis?: any;
 		caseId?: string;
+		previewUrl?: string;
 		onBack?: () => void;
 	} = $props();
 
@@ -72,6 +74,11 @@
 			<h3 class="header-title">Evidence Uploaded Successfully</h3>
 			<p class="header-subtitle">{fileName}</p>
 		</div>
+		{#if previewUrl}
+			<a href={previewUrl} target="_blank" rel="noopener noreferrer" class="header-download" title="Download or preview file">
+				<Icon name="download" class="w-4 h-4" />
+			</a>
+		{/if}
 	</div>
 
 	<!-- Extracted Text Preview -->
@@ -203,6 +210,10 @@
 
 	<!-- Actions -->
 	<div class="results-actions">
+		<button class="action-link back-btn" onclick={onBack} type="button">
+			<Icon name="arrow-left" class="w-4 h-4" />
+			Upload More Evidence
+		</button>
 		<a href="/evidence/{evidenceId}" class="action-link">
 			<Icon name="eye" class="w-4 h-4" />
 			View Details
@@ -267,6 +278,27 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+
+	.header-download {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		border-radius: 6px;
+		background: rgba(126, 231, 255, 0.12);
+		border: 1px solid rgba(126, 231, 255, 0.18);
+		color: rgba(240, 248, 255, 0.8);
+		cursor: pointer;
+		transition: all 0.15s ease;
+		flex-shrink: 0;
+	}
+
+	.header-download:hover {
+		background: rgba(126, 231, 255, 0.2);
+		border-color: rgba(126, 231, 255, 0.28);
+		color: rgba(240, 248, 255, 1);
 	}
 
 	.section {
@@ -563,5 +595,15 @@
 		background: rgba(126, 231, 255, 0.18);
 		border-color: rgba(126, 231, 255, 0.28);
 		color: rgba(240, 248, 255, 1);
+	}
+
+	.back-btn {
+		background: rgba(126, 231, 255, 0.16);
+		border-color: rgba(126, 231, 255, 0.24);
+	}
+
+	.back-btn:hover {
+		background: rgba(126, 231, 255, 0.24);
+		border-color: rgba(126, 231, 255, 0.32);
 	}
 </style>

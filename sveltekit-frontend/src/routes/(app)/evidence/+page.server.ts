@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema';
-import { uploadFile } from '$lib/server/minio-client';
+import { uploadFile, getMinioClient } from '$lib/server/minio-client';
 import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
 import { zod4 as zod } from 'sveltekit-superforms/adapters';
@@ -146,9 +146,19 @@ export const actions: Actions = {
           console.error('[evidence/upload] RAG queue publish failed (non-fatal):', err)
         );
 
+      // 4. Generate signed MinIO preview URL (24-hour expiry)
+      let previewUrl = '';
+      try {
+        const client = getMinioClient();
+        previewUrl = await client.presignedGetObject('legal-evidence', objectName, 24 * 60 * 60);
+      } catch (err) {
+        console.warn('[evidence/upload] Failed to generate preview URL (non-fatal):', err);
+      }
+
       return {
         success: true,
         evidence: newEvidence?.[0] ?? null,
+        previewUrl,
       };
     } catch (err) {
       console.error('Upload failed:', err);
