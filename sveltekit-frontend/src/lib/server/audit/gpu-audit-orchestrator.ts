@@ -28,8 +28,8 @@ import {
 	type ClusterResult,
 } from '$lib/server/gpu/libtorch-bridge.js';
 import { ENV } from '$lib/server/env.server.js';
-import { db } from '$lib/server/db/client';
-import { aiReports } from '$lib/server/db/schema-postgres.js';
+import db from '$lib/server/db/client.js';
+import { codebaseAuditReports } from '$lib/server/db/schema-postgres.js';
 import { eq, desc } from 'drizzle-orm';
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -414,20 +414,31 @@ export async function runGpuAudit(req: AuditRequest): Promise<AuditReport> {
 // ── Persist Report to Postgres ────────────────────────────────────────
 
 export async function persistAuditReport(report: AuditReport): Promise<string> {
-	const [row] = await db.insert(aiReports).values({
-		caseId: report.caseId ?? null,
-		createdBy: report.createdBy,
-		reportType: 'gpu_codebase_audit',
-		summary: `GPU Audit: ${report.stats.graphNodeCount} graph nodes, ${report.stats.vectorCount} vectors, ${report.stats.duplicatePairCount} duplicates, ${report.stats.clusterCount} clusters`,
-		fullReport: JSON.stringify(report),
-		metadata: {
-			gpu: report.gpu,
+	const cuda = isCudaAvailable();
+	const mem = getCudaMemoryInfo();
+
+	const [row] = await db.insert(codebaseAuditReports).values({
+		caseId: report.caseId as any,
+		createdBy: report.createdBy as any,
+		reportType: 'codebase',
+		cudaAvailable: cuda,
+		gpuMemoryMb: mem.totalMB,
+		gpuMemoryFreeMb: mem.freeMB,
+		codebaseAnalysis: {
+			centralFiles: report.centralFiles,
+			communities: report.communities,
+			nearDuplicates: report.nearDuplicates,
+			codeClusters: report.codeClusters,
+			orphanRoutes: report.orphanRoutes,
+			eventHubs: report.eventHubs,
+			apiCycles: report.apiCycles,
 			stats: report.stats,
-			timing: report.timing,
-			centralFileCount: report.centralFiles.length,
-			communityCount: report.communities.length,
 		},
-	}).returning({ id: aiReports.id });
+		durationMs: report.timing.totalMs,
+		graphDurationMs: report.timing.graphMs,
+		codebaseDurationMs: report.timing.similarityMs + report.timing.clusteringMs,
+		status: 'completed',
+	}).returning({ id: codebaseAuditReports.id });
 
 	return row.id;
 }
@@ -436,20 +447,40 @@ export async function persistAuditReport(report: AuditReport): Promise<string> {
 
 export async function getLatestAuditReport(caseId?: string): Promise<AuditReport | null> {
 	const query = caseId
-		? db.select().from(aiReports)
-			.where(eq(aiReports.reportType, 'gpu_codebase_audit'))
-			.orderBy(desc(aiReports.generatedAt))
+		? db.select().from(codebaseAuditReports)
+			.where(eq(codebaseAuditReports.caseId, caseId as any))
+			.orderBy(desc(codebaseAuditReports.createdAt))
 			.limit(1)
-		: db.select().from(aiReports)
-			.where(eq(aiReports.reportType, 'gpu_codebase_audit'))
-			.orderBy(desc(aiReports.generatedAt))
+		: db.select().from(codebaseAuditReports)
+			.orderBy(desc(codebaseAuditReports.createdAt))
 			.limit(1);
 
 	const rows = await query;
-	if (!rows[0]?.fullReport) return null;
+	if (!rows[0]?.codebaseAnalysis) return null;
 
 	try {
-		return JSON.parse(rows[0].fullReport) as AuditReport;
+		const analysis = rows[0].codebaseAnalysis as any;
+		return {
+			reportType: 'gpu_codebase_audit',
+			caseId: rows[0].caseId ?? undefined,
+			createdBy: rows[0].createdBy ?? '',
+			centralFiles: analysis.centralFiles ?? [],
+			communities: analysis.communities ?? [],
+			nearDuplicates: analysis.nearDuplicates ?? [],
+			codeClusters: analysis.codeClusters ?? [],
+			orphanRoutes: analysis.orphanRoutes ?? [],
+			eventHubs: analysis.eventHubs ?? [],
+			apiCycles: analysis.apiCycles ?? [],
+			gpu: { cuda: rows[0].cudaAvailable ?? false, freeMB: rows[0].gpuMemoryFreeMb ?? 0, totalMB: rows[0].gpuMemoryMb ?? 0 },
+			stats: analysis.stats ?? {},
+			timing: {
+				graphMs: rows[0].graphDurationMs ?? 0,
+				vectorFetchMs: 0,
+				similarityMs: 0,
+				clusteringMs: rows[0].codebaseDurationMs ?? 0,
+				totalMs: rows[0].durationMs ?? 0,
+			},
+		} as AuditReport;
 	} catch {
 		return null;
 	}

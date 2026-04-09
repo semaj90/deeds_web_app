@@ -740,6 +740,65 @@ export const aiReports = pgTable('ai_reports', {
   updatedAt: timestamp('updatedAt').defaultNow(),
 });
 
+// === GPU AUDIT REPORTS (Codebase + Graph Analysis) ===
+/**
+ * Stores comprehensive GPU-accelerated audit reports combining Neo4j graph analysis,
+ * LibTorch similarity/clustering, and Qdrant vector retrieval results.
+ *
+ * Result schema (JSONB):
+ * {
+ *   graphAnalysis: { nodeCount, edgeCount, pageRank[], communities[], gpuClusters, similarityMatrix, gpu },
+ *   evidenceAnalysis: { totalEvidence, similarityResults, clusterResults, caseEmbedding },
+ *   codebaseAnalysis: { vectorCount, clusters, duplicates, topMatches },
+ *   performance: { graphMs, evidenceMs, codebaseMs, totalMs },
+ *   timestamp: ISO string,
+ *   source: 'gpu' | 'cpu'
+ * }
+ */
+export const codebaseAuditReports = pgTable('codebase_audit_reports', {
+  id: uuid('id')
+    .default(sql`gen_random_uuid()`)
+    .primaryKey()
+    .notNull(),
+  caseId: uuid('case_id').references(() => cases.id, { onDelete: 'cascade' }),
+  createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
+  reportType: varchar('report_type', { length: 50 }).notNull().default('full'), // 'graph', 'evidence', 'codebase', 'full'
+
+  // GPU metrics
+  cudaAvailable: boolean('cuda_available').notNull().default(false),
+  gpuMemoryMb: integer('gpu_memory_mb'),
+  gpuMemoryFreeMb: integer('gpu_memory_free_mb'),
+
+  // Analysis components (JSONB)
+  graphAnalysis: jsonb('graph_analysis'), // Neo4j + GPU clustering results
+  evidenceAnalysis: jsonb('evidence_analysis'), // Evidence similarity + case embeddings
+  codebaseAnalysis: jsonb('codebase_analysis'), // Code duplicate detection + clustering
+
+  // Performance metrics
+  durationMs: integer('duration_ms').notNull(),
+  graphDurationMs: integer('graph_duration_ms'),
+  evidenceDurationMs: integer('evidence_duration_ms'),
+  codebaseDurationMs: integer('codebase_duration_ms'),
+
+  // Status
+  status: varchar('status', { length: 32 }).notNull().default('completed'), // 'queued', 'running', 'completed', 'failed'
+  error: text('error'),
+
+  // Cache key for CouchDB integration
+  cacheKey: varchar('cache_key', { length: 255 }),
+
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => ({
+  caseIdx: index('codebase_audit_reports_case_idx').on(t.caseId),
+  statusIdx: index('codebase_audit_reports_status_idx').on(t.status),
+  typeIdx: index('codebase_audit_reports_type_idx').on(t.reportType),
+  createdIdx: index('codebase_audit_reports_created_idx').on(t.createdAt),
+}));
+
+export type CodebaseAuditReport = typeof codebaseAuditReports.$inferSelect;
+export type NewCodebaseAuditReport = typeof codebaseAuditReports.$inferInsert;
+
 export const citations = pgTable('citations', {
   id: uuid('id')
     .default(sql`gen_random_uuid()`)
@@ -1559,6 +1618,11 @@ export const canvasAutosavesRelations = relations(canvasAutosaves, ({ one }) => 
 export const aiReportsRelations = relations(aiReports, ({ one }) => ({
  case: one(cases, { fields: [aiReports.caseId], references: [cases.id] }),
  createdBy: one(users, { fields: [aiReports.createdBy], references: [users.id] }),
+}));
+
+export const codebaseAuditReportsRelations = relations(codebaseAuditReports, ({ one }) => ({
+ case: one(cases, { fields: [codebaseAuditReports.caseId], references: [cases.id] }),
+ createdBy: one(users, { fields: [codebaseAuditReports.createdBy], references: [users.id] }),
 }));
 
 export const citationsRelations = relations(citations, ({ one, many }) => ({

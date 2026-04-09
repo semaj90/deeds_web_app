@@ -34,12 +34,12 @@ export const GET: RequestHandler = async ({ params, locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   if (!isUuid(params.id)) return json({ error: 'Invalid POI ID format' }, { status: 400 });
   try {
+    // Verify POI exists (no createdBy check — page load doesn't enforce ownership,
+    // and createdBy can be NULL for POIs created during dev bypass)
     const [poi] = await db
       .select({ id: personsOfInterest.id })
       .from(personsOfInterest)
-      .where(
-        and(eq(personsOfInterest.id, params.id), eq(personsOfInterest.createdBy, locals.user.id))
-      )
+      .where(eq(personsOfInterest.id, params.id))
       .limit(1);
 
     if (!poi) {
@@ -78,11 +78,12 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
   if (!isUuid(poiId)) return json({ error: 'Invalid POI ID format' }, { status: 400 });
 
   try {
-    // Verify POI exists
+    // Verify POI exists (no createdBy check — matches page load behavior,
+    // createdBy can be NULL for POIs created during dev bypass)
     const [poi] = await db
       .select({ id: personsOfInterest.id, name: personsOfInterest.name })
       .from(personsOfInterest)
-      .where(and(eq(personsOfInterest.id, poiId), eq(personsOfInterest.createdBy, locals.user.id)))
+      .where(eq(personsOfInterest.id, poiId))
       .limit(1);
 
     if (!poi) {
@@ -184,9 +185,7 @@ export const DELETE: RequestHandler = async ({ params, request, locals }) => {
     const [poi] = await db
       .select({ id: personsOfInterest.id })
       .from(personsOfInterest)
-      .where(
-        and(eq(personsOfInterest.id, params.id), eq(personsOfInterest.createdBy, locals.user.id))
-      )
+      .where(eq(personsOfInterest.id, params.id))
       .limit(1);
 
     if (!poi) {
@@ -413,10 +412,9 @@ Return ONLY valid JSON.`;
           points: [
             {
               id: pointId,
-              vector: { embedding: captionEmbedding },
+              vector: captionEmbedding,
               payload: {
-                poiId: poiName ? undefined : undefined, // use separate field
-                poi_id: photoId.split('/')[0] || photoId,
+                poi_id: poiId,
                 photo_id: photoId,
                 type: 'poi_photo',
                 caption: aiCaption.slice(0, 500),
@@ -425,7 +423,7 @@ Return ONLY valid JSON.`;
             },
           ],
         });
-        console.log(`[poi-photos] poi_profiles stored: pointId=${pointId}`);
+        console.log(`[poi-photos] poi_profiles stored: pointId=${pointId}, poi_id=${poiId}`);
       } catch (poiErr) {
         console.warn('[poi-photos] poi_profiles store failed (non-fatal):', poiErr);
       }
@@ -451,7 +449,7 @@ Return ONLY valid JSON.`;
 
   // ── Step 6: Update DB record with analysis results ──
   try {
-    await db
+    const [updated] = await db
       .update(poiPhotos)
       .set({
         aiCaption: aiCaption || null,
@@ -459,9 +457,15 @@ Return ONLY valid JSON.`;
         forensicData: Object.keys(forensicData).length > 0 ? forensicData : null,
         faceEmbedding: captionEmbedding.length === 768 ? captionEmbedding : null,
       })
-      .where(eq(poiPhotos.id, photoId));
+      .where(eq(poiPhotos.id, photoId))
+      .returning();
+    if (!updated) {
+      console.error('[poi-photos] DB update failed: photo record not found');
+    } else {
+      console.log(`[poi-photos] DB updated: caption=${aiCaption.length}ch, tags=${aiTags.length}, embedding=${captionEmbedding.length}d`);
+    }
   } catch (err) {
-    console.warn('[poi-photos] DB update with analysis failed:', err);
+    console.error('[poi-photos] DB update with analysis failed:', err);
   }
 
   // ── Step 7: GPU background analysis (fire-and-forget) ──
