@@ -5,7 +5,7 @@
  */
 
 import { desc, eq, sql } from 'drizzle-orm';
-import { getDb } from '$lib/db/pool.js';
+import { db } from '$lib/server/db/client';
 import { errorBrainAnalysis, errorBrainPatch } from '$lib/db/schema/route-health-tables.js';
 import { isValidRouteId } from '$lib/server/validation.js';
 import { json } from '@sveltejs/kit';
@@ -25,7 +25,6 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 	try {
 		const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 		const { limit, offset } = parsed.success ? parsed.data : { limit: 20, offset: 0 };
-		const db = getDb();
 
 		// Get analyses with pagination
 		const analyses = await db
