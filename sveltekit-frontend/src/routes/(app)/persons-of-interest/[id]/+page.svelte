@@ -215,6 +215,31 @@
 		}
 	}
 
+	async function faceMatchPhoto(photo: any) {
+		if (!data.poi?.id || !photo?.forensicData?.hasFace) return;
+		faceMatchLoading = true;
+		faceMatchError = null;
+		try {
+			const res = await fetch(`/api/persons-of-interest/${data.poi.id}/face-match`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ photoId: photo.id }),
+			});
+			if (!res.ok) throw new Error(`Face match failed (${res.status})`);
+			const json = await res.json();
+			faceMatches = json.matches ?? [];
+			if (faceMatches.length > 0) {
+				faceMatchOpen = true;
+			} else {
+				faceMatchError = json.message ?? 'No similar faces found';
+			}
+		} catch (err) {
+			faceMatchError = err instanceof Error ? err.message : 'Face match failed';
+		} finally {
+			faceMatchLoading = false;
+		}
+	}
+
 	// Timeline functions
 	async function loadTimeline() {
 		if (!data.poi?.id) return;
@@ -588,10 +613,10 @@
 						<span class="face-match-msg">{faceMatchError}</span>
 					{/if}
 				</div>
-				<POIPhotoGrid {photos} editable={true} ondelete={deletePhoto} onview={viewPhoto} onupload={() => { (document.querySelector('.poi-upload') as HTMLElement)?.click(); }} />
+				<POIPhotoGrid {photos} editable={true} ondelete={deletePhoto} onview={viewPhoto} onfaceMatch={faceMatchPhoto} onupload={() => { (document.querySelector('.poi-upload') as HTMLElement)?.click(); }} />
 				<PoiImageUpload poiId={data.poi?.id} poiName={data.poi?.name} onuploaded={handlePhotoUploaded} />
 				{#if photos.length > 0}
-					<POIPhotoModal {photos} bind:currentIndex={photoModalIndex} bind:open={photoModalOpen} onclose={() => { photoModalOpen = false; }} />
+					<POIPhotoModal {photos} bind:currentIndex={photoModalIndex} bind:open={photoModalOpen} onclose={() => { photoModalOpen = false; }} onFaceMatch={faceMatchPhoto} />
 				{/if}
 				<POIFaceMatchDialog bind:open={faceMatchOpen} matches={faceMatches} onSelect={(selected) => { goto(`/persons-of-interest/${selected.id}`); }} />
 			{:else if activeTab === 'search'}

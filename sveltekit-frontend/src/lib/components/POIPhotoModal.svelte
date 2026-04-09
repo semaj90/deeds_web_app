@@ -6,11 +6,12 @@
 	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
 	// Migrated from createEventDispatcher to callback props;
 
- let { photos = [], currentIndex = $bindable(0), open = $bindable(false), onclose } = $props<{
+ let { photos = [], currentIndex = $bindable(0), open = $bindable(false), onclose, onFaceMatch } = $props<{
  photos?: any[];
  currentIndex?: number;
  open?: boolean;
  onclose?: () => void;
+ onFaceMatch?: (photo: any) => void;
  }>();
 
  // const dispatch = createEventDispatcher(); // Removed in favor of callback props
@@ -18,6 +19,10 @@
  let zoomLevel = $state(1);
  let imageRef = $state<HTMLImageElement | null>(null);
  let currentPhoto = $derived(photos[currentIndex]);
+
+ function handleFaceMatch() {
+ if (currentPhoto) onFaceMatch?.(currentPhoto);
+ }
 
  function close() {
  open = false;
@@ -137,9 +142,16 @@
  <div class="p-6">
  <div class="flex items-center justify-between mb-4">
  <h3 class="text-lg font-semibold">Photo Analysis</h3>
+ <div class="flex gap-2">
+ {#if currentPhoto?.forensicData?.hasFace && onFaceMatch}
+ <Button class="bits-btn" variant="outline" size="sm" onclick={handleFaceMatch} title="Find matching faces">
+ <span class="i-lucide-face w-4 h-4 inline-block"></span>
+ </Button>
+ {/if}
  <Button class="bits-btn" variant="ghost" size="sm" onclick={close}>
  <span class="i-lucide-x w-4 h-4 inline-block"></span>
  </Button>
+ </div>
  </div>
 
  {#if currentPhoto}
@@ -236,13 +248,62 @@
  {#if currentPhoto.forensicData}
  <Card>
  <CardHeader class="pb-3">
- <CardTitle class="text-sm">Forensic Analysis</CardTitle>
+ <CardTitle class="text-sm flex items-center gap-2">
+ <span class="i-lucide-search w-4 h-4 inline-block"></span>
+ Forensic Analysis
+ </CardTitle>
  </CardHeader>
- <CardContent class="space-y-2 text-sm">
+ <CardContent class="space-y-4 text-sm">
+ <!-- VLM Detections -->
+ {#if currentPhoto.forensicData.hasFace || currentPhoto.forensicData.hasText}
+ <div class="bg-accent/10 border border-accent/20 rounded p-3 space-y-1">
+ <p class="font-medium text-accent">Detected Elements:</p>
+ <ul class="list-disc list-inside text-xs text-sand/80 space-y-0.5">
+ {#if currentPhoto.forensicData.hasFace}
+ <li>Face(s) detected</li>
+ {/if}
+ {#if currentPhoto.forensicData.hasText}
+ <li>Text detected</li>
+ {/if}
+ </ul>
+ </div>
+ {/if}
+
+ <!-- Security Flags -->
+ {#if currentPhoto.forensicData.securityFlags && currentPhoto.forensicData.securityFlags.length > 0}
+ <div class="bg-warning/10 border border-warning/20 rounded p-3 space-y-1">
+ <p class="font-medium text-warning flex items-center gap-1">
+ <span class="i-lucide-alert-triangle w-4 h-4 inline-block"></span>
+ Security Flags ({currentPhoto.forensicData.securityFlags.length})
+ </p>
+ <ul class="list-disc list-inside text-xs text-warning/80 space-y-0.5">
+ {#each currentPhoto.forensicData.securityFlags as flag}
+ <li>{flag}</li>
+ {/each}
+ </ul>
+ </div>
+ {/if}
+
+ <!-- Suspicious Elements -->
+ {#if currentPhoto.forensicData.suspiciousElements && currentPhoto.forensicData.suspiciousElements.length > 0}
+ <div class="bg-danger/10 border border-danger/20 rounded p-3 space-y-1">
+ <p class="font-medium text-danger flex items-center gap-1">
+ <span class="i-lucide-alert-circle w-4 h-4 inline-block"></span>
+ Suspicious Elements ({currentPhoto.forensicData.suspiciousElements.length})
+ </p>
+ <ul class="list-disc list-inside text-xs text-danger/80 space-y-0.5">
+ {#each currentPhoto.forensicData.suspiciousElements as element}
+ <li>{element}</li>
+ {/each}
+ </ul>
+ </div>
+ {/if}
+
+ <!-- Legacy forensic data (perceptual hash, lighting) -->
  {#if currentPhoto.forensicData.perceptualHash}
  <div class="flex justify-between">
  <span class="text-sand/60">Perceptual Hash:</span>
- <span class="font-mono text-xs">{currentPhoto.forensicData.perceptualHash}</span>
+ <span class="font-mono text-xs">{currentPhoto.forensicData.perceptualHash.slice(0, 16)}...</span>
  </div>
  {/if}
  {#if currentPhoto.forensicData.lightingConditions}
