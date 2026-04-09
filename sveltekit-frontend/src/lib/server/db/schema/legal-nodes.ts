@@ -7,6 +7,7 @@ export const legalNodeTypeEnum = pgEnum('legal_node_type', [
 	'document',
 	'title',
 	'article',
+	'amendment',
 	'chapter',
 	'part',
 	'section',

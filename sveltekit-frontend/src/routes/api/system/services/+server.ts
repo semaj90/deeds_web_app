@@ -61,7 +61,7 @@ export async function GET({ locals }: { locals: App.Locals }) {
       services.redis = {
         url: getRedisUrl().substring(0, 30) + '...',
         reachable: false,
-        error: e instanceof Error ? e.message : String(e),
+        error: 'Service unreachable',
       };
     }
   }
@@ -79,7 +79,7 @@ export async function GET({ locals }: { locals: App.Locals }) {
       services.qdrant = {
         url: getQdrantUrl(),
         reachable: false,
-        error: e instanceof Error ? e.message : String(e),
+        error: 'Service unreachable',
       };
     }
   }
@@ -99,7 +99,7 @@ export async function GET({ locals }: { locals: App.Locals }) {
       services.ollama = {
         url: getOllamaUrl(),
         reachable: false,
-        error: e instanceof Error ? e.message : String(e),
+        error: 'Service unreachable',
       };
     }
   }
@@ -119,7 +119,7 @@ export async function GET({ locals }: { locals: App.Locals }) {
       services.postgres = {
         url: getDatabaseUrl().substring(0, 40) + '...',
         reachable: false,
-        error: e instanceof Error ? e.message : String(e),
+        error: 'Service unreachable',
       };
     }
   }

@@ -95,6 +95,11 @@ async function refreshMetadataCache(): Promise<void> {
 	}
 }
 
+// Eager warm-up on first import (non-blocking)
+refreshMetadataCache().catch(() => {
+	/* Qdrant may not be ready at startup — first request will retry */
+});
+
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = recallSchema.safeParse(await request.json());

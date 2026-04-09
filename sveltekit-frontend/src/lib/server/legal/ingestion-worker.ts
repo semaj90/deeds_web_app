@@ -271,7 +271,8 @@ async function _runPipeline(documentId: string, jobId: string): Promise<IngestRe
 
 			// Infer node type from heading pattern
 			let nodeType = 'section';
-			if (/^article/i.test(heading)) nodeType = 'article';
+			if (/^amendment\s+[ivxlcdm\d]+/i.test(heading)) nodeType = 'amendment';
+			else if (/^article/i.test(heading)) nodeType = 'article';
 			else if (/^chapter/i.test(heading)) nodeType = 'chapter';
 			else if (/^part|^division/i.test(heading)) nodeType = 'part';
 			else if (/^title/i.test(heading)) nodeType = 'title';

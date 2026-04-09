@@ -1,11 +1,11 @@
 /**
- * NES Command Center Database Schema
+ * Route Health Database Schema
  *
  * Persistent storage for route metadata, error tracking, health status,
  * and user interactions. Enables historical analysis, trend tracking,
  * and integration with Error Brain for AI-powered error resolution.
  *
- * @module schema/nes-command-center
+ * @module schema/route-health-tables
  */
 
 import { relations } from 'drizzle-orm';

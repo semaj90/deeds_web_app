@@ -422,7 +422,7 @@ export async function POST({ request, locals }: RequestEvent) {
     if (uploadedObjectKey) {
       await deleteFile(BUCKET, uploadedObjectKey).catch(() => false);
     }
-    updateJob(jobId, { step: 'error', progress: 0, message: 'Upload failed', error: String(err) });
+    updateJob(jobId, { step: 'error', progress: 0, message: 'Upload failed' });
     return json({ success: false, error: 'Upload failed', jobId, data: null }, { status: 500 });
   }
 }

@@ -1827,6 +1827,68 @@
       },
       "problemMatcher": []
     },
+    // GPU Audit Orchestrator (Neo4j + LibTorch + Qdrant → Unified Report)
+    // ============================================
+    {
+      "label": "🔥 Audit: Full GPU Audit (Neo4j + LibTorch + Qdrant)",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:5173/api/audit/gpu -H \"Content-Type: application/json\" -d \"{\\\"maxNodes\\\":500,\\\"maxVectors\\\":500,\\\"dupThreshold\\\":0.92,\\\"halfPrecision\\\":false,\\\"persist\\\":true}\" | jq '{success, reportId, central_files: [.report.centralFiles[:5][] | {title: .title[:40], score: .pageRankScore, community: .communityId}], communities: (.report.communities | length), near_duplicates: .report.stats.duplicatePairCount, clusters: .report.stats.clusterCount, gpu: .report.gpu, timing: .report.timing}'",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔥 Audit: GPU Audit (Half-Precision / Large Batch)",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:5173/api/audit/gpu -H \"Content-Type: application/json\" -d \"{\\\"maxNodes\\\":1000,\\\"maxVectors\\\":1000,\\\"dupThreshold\\\":0.90,\\\"halfPrecision\\\":true,\\\"persist\\\":true}\" | jq '{success, reportId, vectors: .report.stats.vectorCount, nodes: .report.stats.graphNodeCount, duplicates: .report.stats.duplicatePairCount, clusters: .report.stats.clusterCount, timing: .report.timing}'",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔥 Audit: Latest Report (GET)",
+      "type": "shell",
+      "command": "curl -s http://127.0.0.1:5173/api/audit/gpu | jq '{has_report: (.report != null), central_files: [(.report.centralFiles // [])[:5][] | {title: .title[:40], score: .pageRankScore}], communities: ((.report.communities // []) | length), duplicates: (.report.stats.duplicatePairCount // 0), clusters: (.report.stats.clusterCount // 0)}'",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🤖 Audit: Gemma Planner (Ask About Codebase)",
+      "type": "shell",
+      "command": "curl -s -X POST http://127.0.0.1:5173/api/audit/planner -H \"Content-Type: application/json\" -d \"{\\\"query\\\":\\\"${input:auditPlannerQuery}\\\"}\" | jq '{success, tools_executed: [.toolsExecuted[]? | \"\\(.tool) (\\(.durationMs)ms)\"], total_ms: .totalDurationMs, response: .response[:500]}'",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🤖 Audit: Planner Capabilities (GET)",
+      "type": "shell",
+      "command": "curl -s http://127.0.0.1:5173/api/audit/planner | jq",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
     {
       "label": "📓 Obsidian: Status Check",
       "type": "shell",
@@ -2185,6 +2247,12 @@
       "type": "promptString",
       "description": "Codebase auto-research topic (Karpathy gap-fill pattern)",
       "default": "how does the evidence upload pipeline work"
+    },
+    {
+      "id": "auditPlannerQuery",
+      "type": "promptString",
+      "description": "Ask Gemma 4 about your codebase (triggers GPU audit tools automatically)",
+      "default": "What are the most critical files and are there any near-duplicate code sections?"
     },
     {
       "id": "obsidianSearchQuery",

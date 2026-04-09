@@ -14,6 +14,7 @@
 	import { initTypingDetector } from '$lib/utils/telemetry.js';
 	import { analytics } from '$lib/stores/analytics.svelte.js';
 	import { analysisPanel } from '$lib/stores/analysis-panel.svelte.js';
+	import { Tooltip } from 'bits-ui';
 
 	interface Props {
 		data: LayoutData;
@@ -106,6 +107,7 @@
 
 <svelte:window onkeydown={handleGlobalKeydown} />
 
+<Tooltip.Provider delayDuration={500}>
 {#if data.devBypass}
 	<div class="dev-banner">
 		DEV MODE: Authentication bypassed (DEV_BYPASS_AUTH=true)
@@ -163,6 +165,7 @@
 		{/each}
 	</div>
 {/if}
+</Tooltip.Provider>
 
 <style>
 	.dev-banner {

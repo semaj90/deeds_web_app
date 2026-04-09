@@ -401,6 +401,7 @@ export async function runConstitutionPipeline(
 
 				let nodeType = 'section';
 				if (/^preamble/i.test(heading)) nodeType = 'preamble';
+				else if (/^amendment\s+[ivxlcdm\d]+/i.test(heading)) nodeType = 'amendment';
 				else if (/^article/i.test(heading)) nodeType = 'article';
 				else if (/^chapter/i.test(heading)) nodeType = 'chapter';
 				else if (/^\([a-z]\)/i.test(heading)) nodeType = 'subsection';

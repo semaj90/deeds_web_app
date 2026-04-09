@@ -4,7 +4,7 @@
  * Provides query functions for accessing archived data (error clusters and interaction logs).
  * Archived data is stored in separate tables for long-term retention and historical analysis.
  *
- * @module db/queries/nes-command-center-archive
+ * @module db/queries/route-health-archive
  */
 
 import { sql } from 'drizzle-orm';

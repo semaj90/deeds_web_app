@@ -5,10 +5,10 @@
  */
 
 import {
-	createErrorBrainPatch,
-	getRouteMetadata,
-	upsertRouteMetadata,
-} from '$lib/db/queries/nes-command-center.js';
+  createErrorBrainPatch,
+  getRouteMetadata,
+  upsertRouteMetadata,
+} from '$lib/db/queries/route-health-queries.js';
 import { isValidRouteId } from '$lib/server/validation.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';

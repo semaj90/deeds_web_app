@@ -86,7 +86,8 @@ export const POST: RequestHandler = async ({ url, locals }) => {
 			});
 			results.glossary++;
 		} catch (e) {
-			results.errors.push(`glossary:${entry.term}: ${String(e).slice(0, 100)}`);
+			console.error(`[seed-knowledge] glossary:${entry.term}:`, e);
+			results.errors.push(`glossary:${entry.term}: failed`);
 		}
 	}
 
@@ -124,12 +125,14 @@ export const POST: RequestHandler = async ({ url, locals }) => {
 						});
 						results.chunks++;
 					} catch (e) {
-						results.errors.push(`chunk:${statute.section}[${i}]: ${String(e).slice(0, 100)}`);
+						console.error(`[seed-knowledge] chunk:${statute.section}[${i}]:`, e);
+						results.errors.push(`chunk:${statute.section}[${i}]: failed`);
 					}
 				}
 			}
 		} catch (e) {
-			results.errors.push(`statute:${statute.section}: ${String(e).slice(0, 100)}`);
+			console.error(`[seed-knowledge] statute:${statute.section}:`, e);
+			results.errors.push(`statute:${statute.section}: failed`);
 		}
 	}
 
@@ -151,7 +154,8 @@ export const POST: RequestHandler = async ({ url, locals }) => {
 			});
 			results.precedents++;
 		} catch (e) {
-			results.errors.push(`precedent:${prec.title}: ${String(e).slice(0, 100)}`);
+			console.error(`[seed-knowledge] precedent:${prec.title}:`, e);
+			results.errors.push(`precedent:${prec.title}: failed`);
 		}
 	}
 
@@ -177,7 +181,8 @@ export const POST: RequestHandler = async ({ url, locals }) => {
 				}
 			}
 		} catch (e) {
-			results.errors.push(`embed-glossary: ${String(e).slice(0, 100)}`);
+			console.error('[seed-knowledge] embed-glossary:', e);
+			results.errors.push('embed-glossary: failed');
 		}
 
 		// Embed statute chunks
@@ -197,7 +202,8 @@ export const POST: RequestHandler = async ({ url, locals }) => {
 				}
 			}
 		} catch (e) {
-			results.errors.push(`embed-chunks: ${String(e).slice(0, 100)}`);
+			console.error('[seed-knowledge] embed-chunks:', e);
+			results.errors.push('embed-chunks: failed');
 		}
 	}
 
@@ -283,13 +289,13 @@ export const GET: RequestHandler = async ({ url, fetch: svelteFetch }) => {
 				results.success++;
 				results.files.push(displayName);
 			} else {
-				const errText = await res.text().catch(() => res.statusText);
 				results.failed++;
-				results.errors.push(`${displayName}: ${res.status} ${errText.slice(0, 100)}`);
+				results.errors.push(`${displayName}: upload failed (${res.status})`);
 			}
 		} catch (e) {
+			console.error(`[seed-knowledge] ${filename}:`, e);
 			results.failed++;
-			results.errors.push(`${filename}: ${String(e).slice(0, 100)}`);
+			results.errors.push(`${filename}: failed`);
 		}
 	}
 

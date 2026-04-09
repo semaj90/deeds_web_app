@@ -92,13 +92,14 @@ function astNodeToRouteNode(astNode: Record<string, unknown>): RouteNode {
 // Phase 6: Database Enrichment Functions
 // ─────────────────────────────────────────────────────────
 
-import { getAllEnrichedRouteMetadata } from '$lib/db/queries/nes-command-center';
-
 /**
  * 6.1: Query database for route metadata directly
+ * Uses dynamic import to avoid Rollup chunk naming collision between
+ * schema/nes-command-center.ts and queries/nes-command-center.ts
  */
 async function loadRouteMetadataFromDatabase(): Promise<Map<string, Record<string, unknown>>> {
   try {
+    const { getAllEnrichedRouteMetadata } = await import('$lib/db/queries/route-health-queries');
     const enrichedRoutes = await getAllEnrichedRouteMetadata();
 
     const metadataMap = new Map<string, Record<string, unknown>>();

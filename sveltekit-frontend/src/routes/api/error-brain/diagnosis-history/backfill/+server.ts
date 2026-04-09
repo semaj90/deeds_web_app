@@ -100,8 +100,9 @@ export const POST: RequestHandler = async ({ locals }) => {
 					...(newRootCause !== row.probableRootCauseType ? { newRootCause } : {}),
 				});
 			} catch (e) {
+				console.error('[backfill] Row error:', (e as Error).message);
 				failed++;
-				details.push({ id: row.id, status: `error: ${(e as Error).message.slice(0, 100)}` });
+				details.push({ id: row.id, status: 'failed' });
 			}
 		}
 

@@ -9,9 +9,10 @@
  */
 
 import {
-    getInteractions, getRouteMetadata,
-    logInteraction,
-} from '$lib/db/queries/nes-command-center';
+  getInteractions,
+  getRouteMetadata,
+  logInteraction,
+} from '$lib/db/queries/route-health-queries';
 
 type NewRouteInteractionLog = {
     routeId: string;
@@ -126,7 +127,7 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
         if (includeArchived) {
             // Import archive query helper
             const { getCombinedInteractions } = await import(
-                '$lib/db/queries/nes-command-center-archive.js'
+              '$lib/db/queries/route-health-archive.js'
             );
             result = await getCombinedInteractions(routeId, { limit, offset });
 

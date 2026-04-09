@@ -167,6 +167,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json(result);
 	} catch (e) {
 		console.error('[diagnosis-similar] Error:', e);
-		return json({ similar: [], meta: { error: (e as Error).message, totalMs: Date.now() - startMs } }, { status: 503 });
+		return json({ similar: [], meta: { error: 'Search failed', totalMs: Date.now() - startMs } }, { status: 503 });
 	}
 };

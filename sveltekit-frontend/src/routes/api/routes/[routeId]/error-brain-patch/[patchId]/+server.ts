@@ -4,7 +4,7 @@
  * PUT /api/routes/:routeId/error-brain-patch/:patchId - Update patch verification status
  */
 
-import { updatePatchVerificationStatus } from '$lib/db/queries/nes-command-center.js';
+import { updatePatchVerificationStatus } from '$lib/db/queries/route-health-queries.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { z } from 'zod';

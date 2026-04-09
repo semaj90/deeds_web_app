@@ -6,10 +6,7 @@
 
 import { desc, eq, sql } from 'drizzle-orm';
 import { getDb } from '$lib/db/pool.js';
-import {
-	errorBrainAnalysis,
-	errorBrainPatch,
-} from '$lib/db/schema/nes-command-center.js';
+import { errorBrainAnalysis, errorBrainPatch } from '$lib/db/schema/route-health-tables.js';
 import { isValidRouteId } from '$lib/server/validation.js';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';

@@ -442,6 +442,12 @@ pnpm-store/
 sveltekit-frontend/.env*
 config/environment/.env*
 
+# Allow template/example files to be committed
+!.env.example
+!.env.local.example
+!sveltekit-frontend/.env.example
+!sveltekit-frontend/.env.local.example
+
 ########################################
 # Build outputs
 ########################################

@@ -5,25 +5,25 @@
  * Provides type-safe query functions for route metadata, error tracking,
  * health monitoring, and user interactions. All queries use Drizzle ORM.
  *
- * @module db/queries/nes-command-center
+ * @module db/queries/route-health-queries
  */
 
 import { and, desc, eq, sql } from 'drizzle-orm';
 import { getDb } from '../pool.js';
 import {
-    errorBrainAnalysis,
-    errorBrainPatch,
-    errorCluster,
-    routeHealthEvent,
-    routeInteractionLog,
-    routeMetadata,
-    type NewErrorBrainAnalysis,
-    type NewErrorBrainPatch,
-    type NewErrorCluster,
-    type NewRouteHealthEvent,
-    type NewRouteInteractionLog,
-    type NewRouteMetadata
-} from '../schema/nes-command-center.js';
+  errorBrainAnalysis,
+  errorBrainPatch,
+  errorCluster,
+  routeHealthEvent,
+  routeInteractionLog,
+  routeMetadata,
+  type NewErrorBrainAnalysis,
+  type NewErrorBrainPatch,
+  type NewErrorCluster,
+  type NewRouteHealthEvent,
+  type NewRouteInteractionLog,
+  type NewRouteMetadata,
+} from '../schema/route-health-tables.js';
 
 // ============================================================================
 // Route Metadata Queries

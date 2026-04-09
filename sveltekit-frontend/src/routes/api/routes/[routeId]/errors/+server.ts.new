@@ -17,8 +17,8 @@ import {
   getRouteMetadata,
   updateRouteMetadata,
   createHealthEvent,
-} from '$lib/db/queries/nes-command-center.js';
-import type { NewErrorCluster } from '$lib/db/schema/nes-command-center.js';
+} from '$lib/db/queries/route-health-queries.js';
+import type { NewErrorCluster } from '$lib/db/schema/route-health-tables.js';
 import { broadcastHealthChange, broadcastErrorCountChange } from '../../events/+server.js';
 
 /**

@@ -9,11 +9,14 @@
  */
 
 import {
-    createErrorCluster, createHealthEvent,
-    getErrorClusterCount, getErrorClusters,
-    getRouteMetadata, updateRouteMetadata,
-} from '$lib/db/queries/nes-command-center.js';
-import type { NewErrorCluster } from '$lib/db/schema/nes-command-center.js';
+  createErrorCluster,
+  createHealthEvent,
+  getErrorClusterCount,
+  getErrorClusters,
+  getRouteMetadata,
+  updateRouteMetadata,
+} from '$lib/db/queries/route-health-queries.js';
+import type { NewErrorCluster } from '$lib/db/schema/route-health-tables.js';
 import { error, json } from '@sveltejs/kit';
 import { _broadcastErrorCountChange, _broadcastHealthChange } from '../../events/+server.js';
 import { isValidRouteId } from '$lib/server/validation.js';

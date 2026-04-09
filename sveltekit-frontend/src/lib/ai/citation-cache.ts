@@ -335,6 +335,12 @@ export const citationCache = {
 			const data = await res.json();
 			const citations = (data.citations ?? data.data ?? []) as CachedCitation[];
 			for (const c of citations) await saveCitationLocal(c);
+
+			// Pre-build Fuse index so first search is instant
+			if (citations.length > 0) {
+				await buildFuseIndex();
+			}
+
 			return citations.length;
 		} catch {
 			return 0;

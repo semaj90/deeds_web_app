@@ -101,6 +101,26 @@ const TOPICAL_RULES: Array<{ tag: string; patterns: RegExp[] }> = [
 		tag: 'preamble',
 		patterns: [/^preamble/i, /we.*people/i],
 	},
+	{
+		tag: 'supremacy_clause',
+		patterns: [/supremacy/i, /supreme law of the land/i],
+	},
+	{
+		tag: 'commerce_clause',
+		patterns: [/commerce clause/i, /regulate commerce/i, /interstate commerce/i],
+	},
+	{
+		tag: 'necessary_and_proper',
+		patterns: [/necessary and proper/i, /elastic clause/i],
+	},
+	{
+		tag: 'impeachment',
+		patterns: [/impeach/i, /high crimes/i, /misdemeanors/i],
+	},
+	{
+		tag: 'federalism',
+		patterns: [/reserved to the states/i, /tenth amendment/i, /federal.*power/i],
+	},
 ];
 
 /**
@@ -136,11 +156,12 @@ export function tagNode(
 	}
 
 	// Jurisdiction
-	const jurisdiction: string[] = ['state', stateCode];
+	const isFederal = stateCode === 'us';
+	const jurisdiction: string[] = [isFederal ? 'federal' : 'state', stateCode];
 
 	// Source trust
 	const source_trust: string[] = [
-		isOfficial ? 'official_state' : 'scraped',
+		isOfficial ? (isFederal ? 'official_federal' : 'official_state') : 'scraped',
 		sourceConfidence,
 	];
 
@@ -173,6 +194,7 @@ export function computeRankScore(
 	// Node type boost
 	if (nodeType === 'preamble') score += 0.05;
 	if (nodeType === 'article') score += 0.05;
+	if (nodeType === 'amendment') score += 0.05;
 
 	return Math.max(0, Math.min(1, score));
 }

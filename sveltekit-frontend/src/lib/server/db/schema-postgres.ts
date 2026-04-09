@@ -2835,7 +2835,7 @@ export const corpusTypeEnum = pgEnum('corpus_type', [
 ]);
 
 export const legalNodeTypeEnum = pgEnum('legal_node_type', [
-	'document', 'title', 'article', 'chapter', 'part', 'section',
+	'document', 'title', 'article', 'amendment', 'chapter', 'part', 'section',
 	'subsection', 'paragraph', 'clause', 'definition', 'appendix', 'note',
 ]);
 

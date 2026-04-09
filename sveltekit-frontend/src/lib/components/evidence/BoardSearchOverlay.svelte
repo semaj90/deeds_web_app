@@ -19,15 +19,24 @@
 	let query = $state('');
 	let inputEl: HTMLInputElement;
 
-	const fuse = $derived.by(() => new Fuse(nodes, {
-		keys: [
-			{ name: 'title', weight: 0.6 },
-			{ name: 'evidenceType', weight: 0.3 },
-			{ name: 'description', weight: 0.1 }
-		],
-		threshold: 0.35,
-		includeScore: true
-	}));
+	// Cache Fuse index — only rebuild when nodes array identity changes
+	let cachedNodes: NodeType[] | null = null;
+	let cachedFuse: Fuse<NodeType> | null = null;
+
+	const fuse = $derived.by(() => {
+		if (cachedNodes === nodes && cachedFuse) return cachedFuse;
+		cachedNodes = nodes;
+		cachedFuse = new Fuse(nodes, {
+			keys: [
+				{ name: 'title', weight: 0.6 },
+				{ name: 'evidenceType', weight: 0.3 },
+				{ name: 'description', weight: 0.1 }
+			],
+			threshold: 0.35,
+			includeScore: true
+		});
+		return cachedFuse;
+	});
 
 	let results = $derived.by(() => {
 		if (!query.trim()) {

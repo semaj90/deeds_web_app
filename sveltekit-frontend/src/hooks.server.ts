@@ -483,7 +483,13 @@ export const handle: Handle = async ({ event, resolve }) => {
   }
 
   // === PER-ROUTE RATE LIMITING (Sprint 4 → Sprint 5) ===
-  if (event.url.pathname.startsWith('/api/') && !event.url.pathname.startsWith('/api/health')) {
+  // Skip rate limiting in dev mode to avoid false 429s during rapid testing
+  const skipRateLimit = dev && process.env.DEV_BYPASS_AUTH === 'true';
+  if (
+    !skipRateLimit &&
+    event.url.pathname.startsWith('/api/') &&
+    !event.url.pathname.startsWith('/api/health')
+  ) {
     const tier = getRateTier(event.url.pathname, event.request.method);
     if (tier) {
       const forwarded = event.request.headers.get('x-forwarded-for');

@@ -358,4 +358,4 @@ export const personsOfInterest = pgTable(
 // Commenting out possibly missing exports to be safe, or just exporting standard.
 export * from './schema/yorha.js';
 export * from './schema/cutlass.js';
-export * from './schema/nes-command-center.js';
+export * from './schema/route-health-tables.js';

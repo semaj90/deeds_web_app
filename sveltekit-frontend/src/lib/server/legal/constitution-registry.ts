@@ -23,8 +23,15 @@ export interface StateConstitutionSource {
 	notes?: string;
 }
 
-/** All 50 states + DC, sorted by state code */
+/** All 50 states + DC + Federal US Constitution, sorted by state code */
 export const STATE_CONSTITUTION_SOURCES: StateConstitutionSource[] = [
+	{
+		stateCode: 'us', stateName: 'United States',
+		discoveryUrl: 'https://law.justia.com/constitution/us/',
+		sourceUrl: 'https://constitution.congress.gov/constitution/',
+		format: 'html', isOfficial: true, sourceConfidence: 'high',
+		notes: 'Federal US Constitution — official Congress.gov source (Articles I-VII + 27 Amendments)',
+	},
 	{
 		stateCode: 'al', stateName: 'Alabama',
 		discoveryUrl: 'https://law.justia.com/constitution/alabama/',

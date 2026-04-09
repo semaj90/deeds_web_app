@@ -9,10 +9,10 @@
  */
 
 import {
-    createHealthEvent,
-    getHealthEvents,
-    getRouteMetadata
-} from '$lib/db/queries/nes-command-center';
+  createHealthEvent,
+  getHealthEvents,
+  getRouteMetadata,
+} from '$lib/db/queries/route-health-queries';
 import { isValidRouteId } from '$lib/server/validation.js';
 import { error, json } from '@sveltejs/kit';
 import { _broadcastHealthChange } from '../../events/+server.js';

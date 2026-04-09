@@ -60,6 +60,7 @@ let systemStatus = $state({ rabbitMQ: { connected: false, health: "unknown"
 });
 
 let findModal = $state({ show: false, query: "", results: [] as any[], loading: false, error: "" });
+let findFuseCache: { ref: any; fuse: Fuse<any> } | null = null;
 let miniModal = $state({ show: false, x: 0, y: 0, type: "" });
 let openContextMenuId = $state<string | null>(null);
 
@@ -152,8 +153,11 @@ async function runFindSearch() {
 findModal.loading = true;
 findModal.error = "";
 try {
-const fuse = new Fuse(allEvidence(), { keys: ["title", "tags"] });
-findModal.results = fuse.search(findModal.query).map(r => r.item);
+const items = allEvidence();
+if (!findFuseCache || findFuseCache.ref !== items) {
+	findFuseCache = { ref: items, fuse: new Fuse(items, { keys: ["title", "tags"] }) };
+}
+findModal.results = findFuseCache.fuse.search(findModal.query).map(r => r.item);
 
 const resp = await fetch("/api/vector-search", {
 method: "POST",

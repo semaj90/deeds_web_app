@@ -245,9 +245,9 @@ export default defineConfig(({ mode }) => {
             if (id.includes('node_modules/svelte')) {
               return 'vendor-svelte';
             }
-            if (id.includes('node_modules/@internationalized')) {
-              return 'vendor-i18n';
-            }
+            // @internationalized is small (~5KB) and only used by bits-ui date components
+            // Don't force it into a separate chunk — causes empty chunk warnings when tree-shaken
+
             // drizzle-orm, langchain — server-only (externalized by SvelteKit)
           },
           // Exclude large binary assets from the bundle
@@ -304,7 +304,7 @@ export default defineConfig(({ mode }) => {
     esbuild: {
       target: 'esnext',
       legalComments: 'none',
-      treeShaking: false,
+      treeShaking: true,
       // Work around esbuild issue with scoped packages containing hyphens
       banner: '',
       footer: '',

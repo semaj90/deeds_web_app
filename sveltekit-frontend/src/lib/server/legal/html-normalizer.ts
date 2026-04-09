@@ -14,7 +14,7 @@ import { JSDOM } from 'jsdom';
 export interface NormalizedSection {
 	heading: string;
 	citationLabel: string | null;
-	nodeType: 'preamble' | 'article' | 'section' | 'clause' | 'paragraph';
+	nodeType: 'preamble' | 'article' | 'amendment' | 'section' | 'clause' | 'paragraph';
 	depth: number;
 	text: string;
 	sectionPath: string[];
@@ -46,6 +46,7 @@ const CHROME_SELECTORS = [
 // Heading patterns that signal legal hierarchy
 const HEADING_PATTERNS = [
 	{ pattern: /^preamble$/i,           nodeType: 'preamble' as const, depth: 1 },
+	{ pattern: /^amendment\s+[ivxlcdm\d]+/i, nodeType: 'amendment' as const, depth: 1 },
 	{ pattern: /^article\s+[ivxlcdm\d]+/i,  nodeType: 'article' as const,  depth: 1 },
 	{ pattern: /^article\s+\w+/i,       nodeType: 'article' as const,  depth: 1 },
 	{ pattern: /^§\s*\d+/i,            nodeType: 'section' as const, depth: 2 },
@@ -92,9 +93,10 @@ function classifyHeading(text: string): { nodeType: NormalizedSection['nodeType'
 	return null;
 }
 
-/** Extract citation label from heading (e.g. "Article I", "§ 3", "Section 4"). */
+/** Extract citation label from heading (e.g. "Article I", "Amendment XIV", "§ 3", "Section 4"). */
 function extractCitationLabel(heading: string): string | null {
 	const m =
+		heading.match(/^(amendment\s+[ivxlcdm\d]+)/i) ??
 		heading.match(/^(article\s+[ivxlcdm\d]+)/i) ??
 		heading.match(/^(§\s*[\d\w.-]+)/i) ??
 		heading.match(/^(sec(?:tion)?\.?\s+[\d\w.-]+)/i) ??
