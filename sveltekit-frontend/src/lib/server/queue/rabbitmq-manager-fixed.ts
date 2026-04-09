@@ -568,10 +568,29 @@ export class RabbitMQManager extends EventEmitter {
         return;
       }
       console.log(`📦 Codebase index job received: scope=${data.scope}`);
+
+      // Redis progress helper — updates status for GET polling
+      const updateRedisProgress = async (update: Record<string, unknown>) => {
+        try {
+          if (!this.redisService) return;
+          // Find latest job for this scope
+          const jobId = await this.redisService.get(`codebase:index:latest:${data.scope}`);
+          if (!jobId) return;
+          const key = `codebase:index:${jobId}`;
+          const existing = await this.redisService.get(key);
+          if (!existing) return;
+          const job = JSON.parse(existing);
+          Object.assign(job, update);
+          await this.redisService.set(key, JSON.stringify(job), 'EX', 3600);
+        } catch { /* non-fatal */ }
+      };
+
+      await updateRedisProgress({ status: 'scanning', progress: 5 });
+
       const { chunkFiles } = await import('../indexer/ast-chunker.js');
       const { indexChunks } = await import('../indexer/dual-embedder.js');
       const { resolve } = await import('path');
-      const { readdir, stat } = await import('fs/promises');
+      const { readdir } = await import('fs/promises');
 
       const ROOT = resolve(process.cwd());
       const SCOPE_GLOBS: Record<string, string[]> = {
@@ -580,7 +599,7 @@ export class RabbitMQManager extends EventEmitter {
         tests: ['tests'],
         all: ['src/routes', 'src/lib', 'tests'],
       };
-      const INDEXABLE_EXTENSIONS = new Set(['.ts', '.js', '.mts', '.mjs']);
+      const INDEXABLE_EXTENSIONS = new Set(['.ts', '.js', '.mts', '.mjs', '.svelte']);
       const SKIP_DIRS = new Set([
         'node_modules',
         '.svelte-kit',
@@ -619,14 +638,57 @@ export class RabbitMQManager extends EventEmitter {
         allFiles.push(...(await collectFiles(resolve(ROOT, dir))));
       }
 
+      await updateRedisProgress({
+        status: 'chunking',
+        progress: 20,
+        filesProcessed: allFiles.length,
+      });
+
       const chunks = chunkFiles(allFiles, ROOT);
+
+      await updateRedisProgress({
+        status: 'embedding',
+        progress: 40,
+        chunksTotal: chunks.length,
+      });
+
       const result = await indexChunks(chunks);
+
+      await updateRedisProgress({
+        status: 'completed',
+        progress: 100,
+        chunksProcessed: chunks.length,
+        completedAt: new Date().toISOString(),
+      });
+
       console.log(
         `✅ Codebase index complete: ${allFiles.length} files, ${chunks.length} chunks indexed`
       );
       this.channel.ack(msg);
     } catch (error) {
       console.error('❌ Codebase index error:', this.formatError(error));
+
+      // Update Redis with error status
+      try {
+        if (this.redisService) {
+          const data = this.parseMessage(msg);
+          const jobId = data?.scope
+            ? await this.redisService.get(`codebase:index:latest:${data.scope}`)
+            : null;
+          if (jobId) {
+            const key = `codebase:index:${jobId}`;
+            const existing = await this.redisService.get(key);
+            if (existing) {
+              const job = JSON.parse(existing);
+              job.status = 'failed';
+              job.error = this.formatError(error);
+              job.failedAt = new Date().toISOString();
+              await this.redisService.set(key, JSON.stringify(job), 'EX', 3600);
+            }
+          }
+        }
+      } catch { /* non-fatal */ }
+
       this.retryOrDLQ(msg, error);
     }
   }
