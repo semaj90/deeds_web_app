@@ -43,14 +43,11 @@ export async function submitCudaCompute(request: CudaComputeRequest): Promise<Cu
 	const start = performance.now();
 
 	try {
-		const { rabbitmq } = await import('../queue/rabbitmq-manager-fixed.js');
-
-		if (rabbitmq) {
-			await rabbitmq.publishAnalyticsEvent({
-				eventType: 'gpu.compute',
-				payload: { jobId, operation: request.operation, timestamp: Date.now() }
-			});
-		}
+		const { dispatchOrExecuteInline } = await import('../queue/dispatch-inline.js');
+		await dispatchOrExecuteInline('analytics.track', {
+			eventType: 'gpu.compute',
+			payload: { jobId, operation: request.operation, timestamp: Date.now() }
+		});
 	} catch {
 		// RabbitMQ tracking is non-critical
 	}

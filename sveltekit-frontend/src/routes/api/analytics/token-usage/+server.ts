@@ -15,7 +15,7 @@ const querySchema = z.object({
 
 export const GET: RequestHandler = async ({ locals, url }) => {
 	if (!locals.user) {
-		throw error(401, 'Unauthorized');
+		return json({ success: false, data: null });
 	}
 
 	const parsed = querySchema.safeParse({

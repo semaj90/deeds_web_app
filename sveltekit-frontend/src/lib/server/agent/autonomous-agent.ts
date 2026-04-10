@@ -24,6 +24,7 @@ import { autoTagDocument } from '$lib/server/ace/auto-tagger.js';
 import { ENV } from '$lib/server/env.server.js';
 import { resolve } from 'path';
 
+const AGENT_API_BASE = () => `${ENV.PUBLIC_API_URL}/api`;
 const AGENT_ALLOWED_ROOT = resolve(process.cwd());
 
 /** Validate that a file path resolves within the project directory */
@@ -606,7 +607,7 @@ export class AutonomousAgent {
         }),
         func: async ({ title, description, status, priority }) => {
           try {
-            const response = await fetchWithTimeout('http://127.0.0.1:5173/api/cases', {
+            const response = await fetchWithTimeout(`${AGENT_API_BASE()}/cases`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ title, description, status, priority }),
@@ -633,7 +634,7 @@ export class AutonomousAgent {
         }),
         func: async ({ caseId, ...updates }) => {
           try {
-            const response = await fetchWithTimeout(`http://127.0.0.1:5173/api/cases/${caseId}`, {
+            const response = await fetchWithTimeout(`${AGENT_API_BASE()}/cases/${caseId}`, {
               method: 'PATCH',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(updates),
@@ -662,7 +663,7 @@ export class AutonomousAgent {
             const params = new URLSearchParams({ q: query, limit: String(limit) });
             if (caseId) params.set('caseId', caseId);
             const response = await fetchWithTimeout(
-              `http://127.0.0.1:5173/api/citations?${params}`
+              `${AGENT_API_BASE()}/citations?${params}`
             );
             return JSON.stringify(await response.json());
           } catch (error) {
@@ -689,7 +690,7 @@ export class AutonomousAgent {
         func: async ({ caseId, citationText, sourceTitle, pageNumber }) => {
           try {
             const response = await fetchWithTimeout(
-              `http://127.0.0.1:5173/api/cases/${caseId}/citations`,
+              `${AGENT_API_BASE()}/cases/${caseId}/citations`,
               {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -735,7 +736,7 @@ export class AutonomousAgent {
         }),
         func: async ({ templateType, caseId, customTitle, useAI }) => {
           try {
-            const response = await fetchWithTimeout('http://127.0.0.1:5173/api/reports', {
+            const response = await fetchWithTimeout(`${AGENT_API_BASE()}/reports`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ templateType, caseId, customTitle, useAI }),
@@ -764,7 +765,7 @@ export class AutonomousAgent {
         }),
         func: async ({ text, extraction_passes }) => {
           try {
-            const response = await fetchWithTimeout('http://127.0.0.1:5173/api/extract/legal', {
+            const response = await fetchWithTimeout(`${AGENT_API_BASE()}/extract/legal`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ text, extraction_passes }),
@@ -793,7 +794,7 @@ export class AutonomousAgent {
         }),
         func: async ({ text, extraction_passes }) => {
           try {
-            const response = await fetchWithTimeout('http://127.0.0.1:5173/api/extract/evidence', {
+            const response = await fetchWithTimeout(`${AGENT_API_BASE()}/extract/evidence`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ text, extraction_passes }),
@@ -818,7 +819,7 @@ export class AutonomousAgent {
         }),
         func: async ({ query, limit }) => {
           try {
-            const response = await fetchWithTimeout('http://127.0.0.1:5173/api/search', {
+            const response = await fetchWithTimeout(`${AGENT_API_BASE()}/search`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ query, limit, domain: 'codebase' }),
@@ -847,7 +848,7 @@ export class AutonomousAgent {
         }),
         func: async ({ query, caseId, persona }) => {
           try {
-            const response = await fetchWithTimeout('http://127.0.0.1:5173/api/sse/chat', {
+            const response = await fetchWithTimeout(`${AGENT_API_BASE()}/sse/chat`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ message: query, caseId, persona, useACE: true }),
@@ -880,7 +881,7 @@ export class AutonomousAgent {
             const formData = new FormData();
             formData.append('file', blob, path.basename(safePath));
             const response = await fetchWithTimeout(
-              'http://127.0.0.1:5173/api/whisper/transcribe',
+              `${AGENT_API_BASE()}/whisper/transcribe`,
               {
                 method: 'POST',
                 body: formData as any,
@@ -914,7 +915,7 @@ export class AutonomousAgent {
             const formData = new FormData();
             formData.append('file', blob, path.basename(safePath));
             if (caseId) formData.append('caseId', caseId);
-            const response = await fetchWithTimeout('http://127.0.0.1:5173/api/evidence/upload', {
+            const response = await fetchWithTimeout(`${AGENT_API_BASE()}/evidence/upload`, {
               method: 'POST',
               body: formData as any,
             });
@@ -941,7 +942,7 @@ export class AutonomousAgent {
           try {
             const params = new URLSearchParams({ q: query, limit: String(limit) });
             if (caseId) params.set('caseId', caseId);
-            const response = await fetchWithTimeout(`http://127.0.0.1:5173/api/persons?${params}`);
+            const response = await fetchWithTimeout(`${AGENT_API_BASE()}/persons?${params}`);
             return JSON.stringify(await response.json());
           } catch (error) {
             return JSON.stringify({ error: String(error) });
@@ -972,7 +973,7 @@ export class AutonomousAgent {
             const formData = new FormData();
             formData.append('file', blob, path.basename(safePath));
             if (prompt) formData.append('prompt', prompt);
-            const response = await fetchWithTimeout('http://127.0.0.1:5173/api/vision/analyze', {
+            const response = await fetchWithTimeout(`${AGENT_API_BASE()}/vision/analyze`, {
               method: 'POST',
               body: formData as any,
             });
@@ -999,12 +1000,12 @@ export class AutonomousAgent {
           try {
             if (action === 'list') {
               const response = await fetchWithTimeout(
-                `http://127.0.0.1:5173/api/cases/${caseId}/notes`
+                `${AGENT_API_BASE()}/cases/${caseId}/notes`
               );
               return JSON.stringify(await response.json());
             } else {
               const response = await fetchWithTimeout(
-                `http://127.0.0.1:5173/api/cases/${caseId}/notes`,
+                `${AGENT_API_BASE()}/cases/${caseId}/notes`,
                 {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -1039,7 +1040,7 @@ export class AutonomousAgent {
             const params = new URLSearchParams({ limit: String(limit) });
             if (caseId) params.set('caseId', caseId);
             if (type) params.set('type', type);
-            const response = await fetchWithTimeout(`http://127.0.0.1:5173/api/evidence?${params}`);
+            const response = await fetchWithTimeout(`${AGENT_API_BASE()}/evidence?${params}`);
             return JSON.stringify(await response.json());
           } catch (error) {
             return JSON.stringify({ error: String(error) });
@@ -1060,7 +1061,7 @@ export class AutonomousAgent {
         }),
         func: async ({ text, style }) => {
           try {
-            const response = await fetchWithTimeout('http://127.0.0.1:5173/api/summarize', {
+            const response = await fetchWithTimeout(`${AGENT_API_BASE()}/summarize`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ text, style }),
@@ -1083,7 +1084,7 @@ export class AutonomousAgent {
         func: async () => {
           try {
             const response = await fetchWithTimeout(
-              'http://127.0.0.1:5173/api/infrastructure/status'
+              `${AGENT_API_BASE()}/infrastructure/status`
             );
             return JSON.stringify(await response.json());
           } catch (error) {

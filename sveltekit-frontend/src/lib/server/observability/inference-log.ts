@@ -30,6 +30,7 @@ export interface InferenceLogEntry {
     | 'ollama'
     | 'tensorrt'
     | 'triton'
+    | 'turboquant'
     | 'bifrost'
     | 'qdrant'
     | 'pgvector'
@@ -54,6 +55,9 @@ let buffer: BufferedEntry[] = [];
 let flushTimer: ReturnType<typeof setInterval> | null = null;
 let cleanupTimer: ReturnType<typeof setInterval> | null = null;
 let dbEnsured = false;
+let totalLogged = 0;
+let totalFlushed = 0;
+let flushErrors = 0;
 
 function ensureFlushTimer(): void {
 	if (flushTimer) return;
@@ -70,6 +74,7 @@ function ensureFlushTimer(): void {
  * Log an inference event. Non-blocking, buffered.
  */
 export function logInference(entry: InferenceLogEntry): void {
+	totalLogged++;
 	buffer.push({
 		...entry,
 		timestamp: new Date().toISOString(),
@@ -123,9 +128,13 @@ async function flushBuffer(): Promise<void> {
 
 			if (!res.ok) {
 				console.warn(`[Inference Log] Bulk write failed: ${res.status}`);
+				flushErrors++;
+			} else {
+				totalFlushed += batch.length;
 			}
 		});
 	} catch (err) {
+		flushErrors++;
 		console.warn('[Inference Log] Flush failed (non-fatal):', (err as Error)?.message ?? err);
 		// Don't re-buffer on failure — drop to prevent infinite growth
 	}
@@ -147,7 +156,7 @@ export async function flushInferenceLog(): Promise<void> {
  */
 export function logLLMInference(params: {
 	model: string;
-	backend: 'ollama' | 'tensorrt' | 'triton' | 'bifrost';
+	backend: 'ollama' | 'tensorrt' | 'triton' | 'turboquant' | 'bifrost';
 	latencyMs: number;
 	tokenCount?: number;
 	cacheHit?: boolean;
@@ -230,6 +239,19 @@ export async function cleanupOldInferenceLogs(): Promise<{ deleted: number; erro
 		console.warn('[Inference Log] Cleanup failed (non-fatal):', msg);
 		return { deleted: 0, error: msg };
 	}
+}
+
+/**
+ * Get inference log buffer stats for monitoring.
+ */
+export function getInferenceLogStats() {
+	return {
+		buffered: buffer.length,
+		totalLogged,
+		totalFlushed,
+		flushErrors,
+		cleanupActive: cleanupTimer !== null,
+	};
 }
 
 /**

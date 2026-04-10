@@ -31,10 +31,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       timestamp = new Date().toISOString(),
     } = parsed.success ? parsed.data : searchAnalyticsSchema.parse({});
 
-		// Publish to RabbitMQ analytics.track queue (fire-and-forget)
+		// Dispatch analytics event (queue or inline fallback, fire-and-forget)
 		try {
-			const { rabbitmq } = await import('$lib/server/queue/rabbitmq-manager-fixed.js');
-			rabbitmq.publishAnalyticsEvent({
+			const { dispatchOrExecuteInline } = await import('$lib/server/queue/dispatch-inline.js');
+			dispatchOrExecuteInline('analytics.track', {
 				eventType: 'search',
 				payload: {
 					query: query.slice(0, 500),
@@ -45,7 +45,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				},
 			}).catch(() => {});
 		} catch {
-			// RabbitMQ unavailable — non-fatal
+			// Dispatch unavailable — non-fatal
 		}
 
 		console.log(

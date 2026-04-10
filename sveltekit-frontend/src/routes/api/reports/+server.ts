@@ -167,9 +167,9 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     ]).catch((err) => console.warn('[Reports] Cache invalidation failed:', err));
 
     // Track analytics event (non-blocking)
-    import('$lib/server/queue/rabbitmq-manager-fixed.js')
-      .then(({ rabbitmq }) =>
-        rabbitmq.publishAnalyticsEvent({
+    import('$lib/server/queue/dispatch-inline.js')
+      .then(({ dispatchOrExecuteInline }) =>
+        dispatchOrExecuteInline('analytics.track', {
           eventType: 'report_create',
           payload: { reportId: newReport[0].id, caseId: body.caseId, userId: locals.user.id },
         })

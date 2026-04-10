@@ -29,8 +29,8 @@ const removeTagSchema = z.object({
  * List all tags for a citation (from citation_tag_links table)
  */
 export const GET: RequestHandler = async ({ params, locals }) => {
-  if (!locals.user) throw error(401, 'Unauthorized');
-  if (!isUuid(params.citationId)) return json({ error: 'Invalid ID format' }, { status: 400 });
+  if (!locals.user) return json({ success: true, tags: [] });
+  if (!isUuid(params.citationId)) return json({ success: true, tags: [] });
   try {
     if (!(await userOwnsCitation(params.citationId, locals.user.id))) {
       return json({ success: true, tags: [] });

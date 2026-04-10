@@ -41,7 +41,7 @@ const savedCitationQuerySchema = z.object({
  * List the current user's saved citations
  */
 export const GET: RequestHandler = async ({ locals, url }) => {
-  if (!locals.user?.id) throw error(401, 'Unauthorized');
+  if (!locals.user?.id) return json({ success: false, citations: [] });
   const userId = locals.user.id;
   const parsed = savedCitationQuerySchema.safeParse(Object.fromEntries(url.searchParams));
   if (!parsed.success) {

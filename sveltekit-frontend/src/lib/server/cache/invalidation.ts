@@ -12,7 +12,7 @@
 import { memoryCache } from '$lib/server/cache.js';
 import { getRedis } from '$lib/server/redis.js';
 import { bumpCaseVersion } from '$lib/server/cache-keys.js';
-import type { RabbitMQManager } from '$lib/server/queue/rabbitmq-manager-fixed.js';
+import { dispatchOrExecuteInline } from '$lib/server/queue/dispatch-inline.js';
 
 /**
  * Cache invalidation patterns for different entity types
@@ -65,6 +65,9 @@ export const CACHE_PATTERNS = {
   TEMPLATE_RENDERED: (caseId: string) => `template:rendered:*:${caseId}:*`,
   TEMPLATE_ALL: 'template:*',
 
+  // ACE Chunks
+  ACE_CHUNKS: (caseId: string) => `ace:chunks:${caseId}*`,
+
   // Global
   ALL: '*',
 } as const;
@@ -82,6 +85,7 @@ export type InvalidationType =
   | 'evidence_delete'
   | 'person_update'
   | 'citation_update'
+  | 'ace_invalidate'
   | 'manual';
 
 interface InvalidationOptions {
@@ -132,13 +136,10 @@ function clearMemoryCacheByPattern(pattern: string): number {
  * Core cache invalidation service
  */
 export class CacheInvalidationService {
-  private rabbitMQ: RabbitMQManager | null = null;
-
   /**
-   * Initialize with RabbitMQ connection
+   * Initialize (no-op — dispatch-inline handles RabbitMQ availability automatically)
    */
-  async initialize(rabbitMQManager: RabbitMQManager): Promise<void> {
-    this.rabbitMQ = rabbitMQManager;
+  async initialize(_rabbitMQManager?: unknown): Promise<void> {
     console.log('✅ Cache Invalidation Service initialized');
   }
 
@@ -261,16 +262,11 @@ export class CacheInvalidationService {
    * Publish invalidation event to RabbitMQ
    */
   private async publishInvalidation(data: Record<string, unknown>): Promise<boolean> {
-    if (!this.rabbitMQ) {
-      console.warn('[CacheInvalidation] RabbitMQ not initialized, skipping queue publish');
-      return false;
-    }
-
     try {
-      await this.rabbitMQ.publishCacheInvalidation(data);
-      return true;
+      const result = await dispatchOrExecuteInline('cache.invalidate', data);
+      return result.mode !== 'skipped';
     } catch (err) {
-      console.error('[CacheInvalidation] Failed to publish to RabbitMQ:', err);
+      console.error('[CacheInvalidation] Dispatch failed:', err);
       return false;
     }
   }
@@ -363,6 +359,17 @@ export const invalidateLLMCache = async (query?: string, userId?: string) => {
 	return cacheInvalidation.invalidatePattern(
 		CACHE_PATTERNS.LLM_SEMANTIC,
 		{ type: 'manual', userId }
+	);
+};
+
+export const invalidateACEChunksCache = async (
+	caseId: string,
+	type: InvalidationType,
+	userId?: string
+) => {
+	return cacheInvalidation.invalidatePattern(
+		CACHE_PATTERNS.ACE_CHUNKS(caseId),
+		{ type, userId }
 	);
 };
 

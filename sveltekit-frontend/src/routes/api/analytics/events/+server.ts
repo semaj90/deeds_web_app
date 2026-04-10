@@ -48,9 +48,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			// Fire-and-forget: publish user-associated events to RabbitMQ for async processing
 			const userEvents = events.filter(e => e.userId);
 			if (userEvents.length > 0) {
-				import('$lib/server/queue/rabbitmq-manager-fixed.js').then(({ rabbitmq }) => {
+				import('$lib/server/queue/dispatch-inline.js').then(({ dispatchOrExecuteInline }) => {
 					for (const e of userEvents) {
-						rabbitmq.publishAnalyticsEvent({
+						dispatchOrExecuteInline('analytics.track', {
 							eventType: e.eventType,
 							payload: { ...e.payload, userId: e.userId, sessionId: e.sessionId }
 						}).catch(() => {});

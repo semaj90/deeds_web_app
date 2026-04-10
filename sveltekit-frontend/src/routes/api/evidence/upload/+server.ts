@@ -17,7 +17,7 @@ import { createAnalysisJob, updateAnalysisJob, completeAnalysisJob, failAnalysis
 import { embedGate, entityGate, forensicsGate, summarizeGate, gated, EMBED_BATCH_SIZE } from '$lib/server/analysis/concurrency-gate.js';
 import { heavyRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 import { detectEvidenceType, inferLegalClassification } from '$lib/server/evidence/type-detector.js';
-import { invalidateEvidenceCache, invalidateCaseCache } from '$lib/server/cache/invalidation.js';
+import { invalidateEvidenceCache, invalidateCaseCache, invalidateACEChunksCache } from '$lib/server/cache/invalidation.js';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { triggerEvidenceGpuAnalysis } from '$lib/server/gpu/background-analyzer.js';
 import { extractSectionsFromText, detectSectionsHeuristic, type LangExtractSection } from '$lib/server/services/langextract-service.js';
@@ -369,10 +369,10 @@ export async function POST({ request, locals }: RequestEvent) {
       });
     });
 
-    // 6. Publish to RabbitMQ for async analysis tracking
+    // 6. Dispatch evidence processing (queue or inline fallback)
     try {
-      const { rabbitmq } = await import('$lib/server/queue/rabbitmq-manager-fixed.js');
-      await rabbitmq.publishEvidenceProcess({
+      const { dispatchOrExecuteInline } = await import('$lib/server/queue/dispatch-inline.js');
+      await dispatchOrExecuteInline('evidence.process', {
         evidenceId,
         text: '',
         caseId,
@@ -380,13 +380,14 @@ export async function POST({ request, locals }: RequestEvent) {
         metadata: { fileSize: file.size, mimeType: file.type, hash: fileHash },
       });
     } catch (err) {
-      console.warn('[Upload] RabbitMQ publish failed (non-critical):', (err as Error).message);
+      console.warn('[Upload] Evidence dispatch failed (non-critical):', (err as Error).message);
     }
 
     // 7. Invalidate evidence and case caches
     await Promise.all([
       invalidateEvidenceCache(evidenceId, caseId, 'evidence_create'),
       caseId ? invalidateCaseCache(caseId, 'evidence_create') : Promise.resolve(),
+      caseId ? invalidateACEChunksCache(caseId, 'evidence_create') : Promise.resolve(),
     ]).catch((err) => console.warn('[Upload] Cache invalidation failed:', err));
 
     // 8. Sync case to Neo4j graph (non-blocking) — includes new evidence relationships

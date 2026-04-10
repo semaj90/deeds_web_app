@@ -8,7 +8,7 @@ import { and, eq } from 'drizzle-orm';
 import { Buffer } from 'node:buffer';
 import { randomUUID } from 'node:crypto';
 import type { Actions, PageServerLoad } from './$types';
-import { rabbitmq } from '$lib/server/queue/rabbitmq-manager-fixed.js';
+import { dispatchOrExecuteInline } from '$lib/server/queue/dispatch-inline.js';
 import {
   evidenceUploadSchema,
   evidenceDeleteSchema,
@@ -134,8 +134,7 @@ export const actions: Actions = {
       // 3. Enqueue full RAG pipeline (entity extraction → embedding → Qdrant evidence_items)
       // Fire-and-forget: indexing failure must never block the upload response
       const indexText = [title || file.name, description].filter(Boolean).join('\n\n');
-      rabbitmq
-        .publishEvidenceProcess({
+      dispatchOrExecuteInline('evidence.process', {
           evidenceId: newEvidence?.[0]?.id ?? randomUUID(),
           text: indexText,
           fileName: file.name,
@@ -143,7 +142,7 @@ export const actions: Actions = {
           metadata: { userId: locals.user.id, fileName: file.name, fileType: file.type },
         })
         .catch((err) =>
-          console.error('[evidence/upload] RAG queue publish failed (non-fatal):', err)
+          console.error('[evidence/upload] Evidence dispatch failed (non-fatal):', err)
         );
 
       // 4. Generate signed MinIO preview URL (24-hour expiry)

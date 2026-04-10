@@ -185,6 +185,87 @@ For each extracted route:
 2. Verify `+page.svelte` or `+server.ts` exists at that path
 3. Report ALL broken references in one pass (not file-by-file)
 
+### 5g. SvelteKit error() Misuse Detection (SSR Bug Hunter)
+
+Detect cases where SvelteKit's `error()` function produces hidden 500s or violates layer contracts.
+
+```bash
+# 5g-1. error() thrown inside try/catch in route handlers (swallowed → 500)
+rg -U "try\s*\{[^}]*throw error\(" src/routes/ --multiline --no-heading
+# Expected: 0 matches. Move auth/validation checks OUTSIDE try/catch.
+
+# 5g-2. error() imported in service layer files (layer violation)
+rg "import .*error.*from '@sveltejs/kit'" src/lib/server/ --no-heading
+# Expected: 0 matches. Services throw HttpServiceError subclasses from $lib/server/errors.js:
+#   UnauthorizedError(401), ForbiddenError(403), NotFoundError(404), ServiceUnavailableError(503)
+
+# 5g-3. throw error() in GET handlers (breaks degraded response contract)
+rg "throw error\(40[134]" src/routes/api/ --no-heading -l
+# If this is a GET handler → should return json({...empty defaults...}) not throw.
+# POST/PATCH/DELETE can throw error() safely since clients check response.ok.
+
+# 5g-4. Missing locals.user null check before requireAuth()
+rg "requireAuth\(event\)" src/routes/api/ --no-heading -l
+# Each caller should have `if (!event.locals.user) return json(...)` BEFORE requireAuth()
+```
+
+Flag as:
+- **ERROR_IN_TRYCATCH** (P0): `error()` inside try/catch → hidden 500
+- **LAYER_VIOLATION** (P1): `error()` in `src/lib/server/` → wrong layer
+- **GET_THROWS_ERROR** (P1): GET handler throws instead of degraded response
+- **UNGUARDED_AUTH** (P2): `requireAuth()` without prior `locals.user` check
+
+### 5h. GPU / Analysis Layer Contamination
+
+Detect framework coupling in pure computation layers.
+
+```bash
+# 5h-1. GPU files importing SvelteKit or $app/*
+rg "from '@sveltejs/kit'|from '\$app/" src/lib/server/gpu/ src/lib/server/analysis/ src/lib/server/vector/ --no-heading
+# Expected: 0 matches. These layers must be framework-agnostic.
+
+# 5h-2. Hardcoded service URLs in server code
+rg "http://127\.0\.0\.1|http://localhost:\d" src/lib/server/ --no-heading
+# Expected: 0 matches. Use ENV.* getters from $lib/server/env.server.ts
+
+# 5h-3. Wrong DB client import
+rg "from '\$lib/server/db'" src/ --no-heading | rg -v "/client"
+# Expected: 0 matches. Always: import { db } from '$lib/server/db/client'
+```
+
+Flag as:
+- **GPU_LAYER_VIOLATION** (P1): GPU/analysis code imports SvelteKit
+- **HARDCODED_URL** (P2): Service URL not from ENV getter
+- **WRONG_DB_IMPORT** (P1): postgres.js driver instead of node-postgres Pool
+
+### 5i. DB / Drizzle Safety (DB Bug Hunter)
+
+Detect unsafe database patterns.
+
+```bash
+# 5i-1. Missing isNull() fallback on createdBy ownership checks
+rg "eq\(.*createdBy" src/routes/api/ --no-heading -l
+# Each match: verify or(eq(col.createdBy, userId), isNull(col.createdBy)) pattern
+
+# 5i-2. Unsafe table name interpolation from user input
+rg "\$\{.*table" src/lib/server/ --no-heading | rg -v "readonly|const "
+# Flag if tableName comes from user input (not hardcoded readonly)
+
+# 5i-3. Missing UUID validation on route params
+rg "params\.\w+\b" src/routes/api/ --no-heading -l
+# Cross-reference: does the file call isUuid() before using the param?
+
+# 5i-4. pgvector columns passed as strings
+rg "JSON\.stringify.*embedding\|JSON\.stringify.*vector" src/ --no-heading
+# Expected: 0. Drizzle vector(768) expects number[], not stringified arrays
+```
+
+Flag as:
+- **NULL_OWNERSHIP** (P0): Missing `isNull(createdBy)` → query returns 0 rows for shared records
+- **SQL_INTERPOLATION** (P1): Dynamic table name from non-constant source
+- **MISSING_UUID_CHECK** (P2): Route param used in query without UUID validation
+- **VECTOR_TYPE_MISMATCH** (P1): Embedding passed as string instead of number[]
+
 ## Detection Heuristics
 
 **High-probability shallow wiring patterns:**

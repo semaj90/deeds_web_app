@@ -83,6 +83,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
  */
 export const PATCH: RequestHandler = async ({ params, request, locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
   try {
     const body = await request.json().catch(() => ({}));
@@ -159,6 +160,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
  */
 export const DELETE: RequestHandler = async ({ params, locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
   try {
     const [deleted] = await db

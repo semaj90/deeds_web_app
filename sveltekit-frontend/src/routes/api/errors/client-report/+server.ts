@@ -12,7 +12,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { errorEvents } from '$lib/server/db/schema-postgres.js';
-import { rabbitmq } from '$lib/server/queue/rabbitmq-manager-fixed.js';
+import { dispatchOrExecuteInline } from '$lib/server/queue/dispatch-inline.js';
 
 const clientErrorSchema = z.object({
 	message: z.string().max(5000),
@@ -54,8 +54,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			});
 			stored++;
 
-			// Publish to RabbitMQ for async embedding (fire-and-forget)
-			rabbitmq.publishErrorEmbed({
+			// Dispatch error embedding (queue or inline fallback, fire-and-forget)
+			dispatchOrExecuteInline('error.embed', {
 				errorMessage: err.message,
 				routePath: err.url || '/',
 				stackTrace: err.stack || undefined,

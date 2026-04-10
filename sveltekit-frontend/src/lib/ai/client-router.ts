@@ -1,11 +1,16 @@
 /**
- * Client Inference Router — 4-tier routing: E2B → 270M ONNX → retrieval-hybrid → server.
+ * Client Inference Router — 5-tier routing with Gemma 4 on-device inference.
  *
- * Four routing tiers:
- *   LOCAL-E2B  (score < 0.3, E2B ready):  Gemma 4 E2B 2.3B via Transformers.js
- *   LOCAL-ONNX (score < 0.3, E2B unready): gemma270m ONNX fallback
- *   RETRIEVAL  (0.3–0.6):    Hybrid client+server — factual queries needing search
- *   SERVER     (score > 0.6): gemma4-legal full pipeline — legal reasoning, drafting
+ * Five routing tiers (local → server):
+ *   LOCAL-E2B    (score < 0.3, E2B ready):     Gemma 4 E2B 2.3B via Transformers.js + WebGPU
+ *   LOCAL-LITERT (score < 0.3, LiteRT ready):   Gemma 4 E2B via LiteRT-LM (CPU XNNPACK + MTP heads)
+ *   LOCAL-ONNX   (score < 0.3, both unready):   Gemma 3 270M ONNX (legacy fallback)
+ *   RETRIEVAL    (0.3–0.6):                     Hybrid client+server — factual queries needing search
+ *   SERVER       (score > 0.6):                 gemma4-legal full pipeline — legal reasoning, drafting
+ *
+ * LiteRT-LM advantage over ONNX 270M: Gemma 4 E2B (2.3B) with MTP heads gives
+ * ~1.8x decode speedup and far better quality than 270M. Runs on CPU (AVX2/NEON)
+ * without WebGPU. Falls back to 270M ONNX only when LiteRT isn't installed.
  *
  * Health-aware: polls /api/health/capabilities (30s cache) to know which
  * server services are actually available before escalating.
@@ -14,6 +19,7 @@
  */
 
 import type { InferenceSource } from './model-ids.js';
+import { LITERT_BASE_URL } from './model-ids.js';
 
 // ── Server Capabilities (from /api/health/capabilities) ─────────────────
 
@@ -30,6 +36,7 @@ export interface ServerCapabilities {
 	ts: string;
 	// Extended infrastructure (from /api/health/capabilities)
 	tensorrt?: boolean;
+	turboquant?: boolean;
 	simd?: { healthy: boolean; minioConnected: boolean; latencyMs: number };
 	grpc?: { available: boolean; enabled: boolean; url: string };
 	gpu?: { leaseHolder: string | null; leaseFree: boolean };
@@ -65,6 +72,38 @@ export async function fetchCapabilities(): Promise<ServerCapabilities | null> {
 /** Synchronous access to last-fetched capabilities (may be null or stale). */
 export function getCachedCapabilities(): ServerCapabilities | null {
 	return _cachedCaps;
+}
+
+// ── LiteRT-LM Availability Detection ────────────────────────────────────
+
+let _litertReady: boolean | null = null;
+let _litertCheckExpiry = 0;
+const LITERT_CHECK_TTL = 60_000; // 60s — LiteRT server won't change often
+
+/**
+ * Check if LiteRT-LM sidecar is running and healthy.
+ * LiteRT-LM runs as a local HTTP server (pip install litert-lm && litert-lm serve).
+ * Returns cached result for 60s to avoid hammering the sidecar.
+ */
+export async function isLitertReady(): Promise<boolean> {
+	if (typeof fetch === 'undefined') return false;
+	if (_litertReady !== null && Date.now() < _litertCheckExpiry) return _litertReady;
+
+	try {
+		const res = await fetch(`${LITERT_BASE_URL}/health`, {
+			signal: AbortSignal.timeout(1_000),
+		});
+		_litertReady = res.ok;
+	} catch {
+		_litertReady = false;
+	}
+	_litertCheckExpiry = Date.now() + LITERT_CHECK_TTL;
+	return _litertReady;
+}
+
+/** Synchronous cached LiteRT-LM readiness (may be null if never checked). */
+export function getCachedLitertReady(): boolean {
+	return _litertReady === true;
 }
 
 // ── Keyword Categories (split by routing intent) ────────────────────────
@@ -211,8 +250,20 @@ export interface RouterDecision {
 }
 
 /**
+ * Pick the best available local inference source.
+ * Priority: E2B (WebGPU 2.3B) → LiteRT-LM (CPU 2.3B + MTP) → ONNX (270M legacy)
+ */
+function pickLocalSource(e2bReady?: boolean, litertReady?: boolean): InferenceSource {
+	if (e2bReady) return 'local-e2b';
+	if (litertReady) return 'local-litert';
+	return 'local-onnx';
+}
+
+/**
  * Determine whether a user message should be handled:
- *   - locally (ONNX gemma270m)
+ *   - locally via E2B (Gemma 4 E2B 2.3B, WebGPU)
+ *   - locally via LiteRT-LM (Gemma 4 E2B 2.3B, CPU XNNPACK + MTP heads)
+ *   - locally via ONNX (Gemma 3 270M, legacy fallback)
  *   - via retrieval-hybrid (client embed + server search + local answer)
  *   - via server (Ollama gemma4-legal full RAG pipeline)
  */
@@ -230,15 +281,23 @@ export function shouldEscalateToServer(
 		capabilities?: ServerCapabilities | null;
 		/** Whether E2B model is loaded and ready (avoids async check) */
 		e2bReady?: boolean;
+		/** Whether LiteRT-LM sidecar is running (avoids async check) */
+		litertReady?: boolean;
 	}
 ): RouterDecision {
 	// Classify intent via KAG system
 	const { intent } = classifyIntent(message);
 
+	const litertOk = options?.litertReady ?? getCachedLitertReady();
+
 	// Explicit overrides
 	if (options?.forceLocal) {
-		const localSource = options?.e2bReady ? 'local-e2b' : 'local-onnx';
-		return { source: localSource, reason: 'user-forced-local', confidence: 0.5, intent };
+		return {
+			source: pickLocalSource(options?.e2bReady, litertOk),
+			reason: 'user-forced-local',
+			confidence: 0.5,
+			intent,
+		};
 	}
 
 	const caps = options?.capabilities ?? _cachedCaps;
@@ -246,7 +305,12 @@ export function shouldEscalateToServer(
 	// Force-server with health check
 	if (options?.forceServer) {
 		if (caps && !caps.serverReady) {
-			return { source: 'local-onnx', reason: 'forced-server-but-unavailable', confidence: 0.3, intent };
+			return {
+				source: pickLocalSource(options?.e2bReady, litertOk),
+				reason: 'forced-server-but-unavailable',
+				confidence: 0.3,
+				intent,
+			};
 		}
 		return { source: 'server-ollama', reason: 'user-forced-server', confidence: 1.0, intent };
 	}
@@ -257,8 +321,12 @@ export function shouldEscalateToServer(
 	// Only if message is short (< 200 chars) — prevents "hello, analyze this case" → local
 	const localHit = LOCAL_PATTERNS.some(p => lower.includes(p));
 	if (localHit && message.length < 200) {
-		const localSource = options?.e2bReady ? 'local-e2b' : 'local-onnx';
-		return { source: localSource, reason: 'local-pattern', confidence: 0.9, intent: 'greeting' };
+		return {
+			source: pickLocalSource(options?.e2bReady, litertOk),
+			reason: 'local-pattern',
+			confidence: 0.9,
+			intent: 'greeting',
+		};
 	}
 
 	let serverScore = 0;
@@ -309,47 +377,44 @@ export function shouldEscalateToServer(
 	if (serverScore >= SERVER_THRESHOLD) {
 		// Health check: if server is down, fall to retrieval or local
 		if (caps && !caps.ollama) {
-			const localSource = options?.e2bReady ? 'local-e2b' : 'local-onnx';
 			return {
-				source: localSource,
+				source: pickLocalSource(options?.e2bReady, litertOk),
 				reason: reasonStr + '+server-unavailable',
 				confidence: 0.3,
-				intent
+				intent,
 			};
 		}
 		return {
 			source: 'server-ollama',
 			reason: reasonStr,
 			confidence: Math.min(serverScore, 1.0),
-			intent
+			intent,
 		};
 	}
 
 	if (serverScore >= RETRIEVAL_THRESHOLD) {
 		// Health check: if RAG/server not available, fall to local
 		if (caps && (!caps.ollama || !caps.rag)) {
-			const localSource = options?.e2bReady ? 'local-e2b' : 'local-onnx';
 			return {
-				source: localSource,
+				source: pickLocalSource(options?.e2bReady, litertOk),
 				reason: reasonStr + '+rag-unavailable',
 				confidence: 0.4,
-				intent
+				intent,
 			};
 		}
 		return {
 			source: 'retrieval-hybrid',
 			reason: reasonStr,
 			confidence: 0.7,
-			intent
+			intent,
 		};
 	}
 
-	const localSource = options?.e2bReady ? 'local-e2b' : 'local-onnx';
 	return {
-		source: localSource,
+		source: pickLocalSource(options?.e2bReady, litertOk),
 		reason: reasonStr,
 		confidence: 1.0 - serverScore,
-		intent
+		intent,
 	};
 }
 

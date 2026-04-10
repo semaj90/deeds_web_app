@@ -272,7 +272,98 @@ rg "href:.*'/demos/" src/routes/(app)/demos/+page.svelte
 Flag: **UNLISTED_DEMO** if a demo page exists but is not in the demos index.
 Flag: **DEAD_DEMO_LINK** if demos index links to a route that doesn't exist.
 
-### 5n. Transitive Dependency Chain Verification
+### 5n. Layer Separation Audit (3 Bug Hunters)
+
+Detect architectural layer violations across the codebase. These are categorized into 3 specialized "bug hunters":
+
+#### Bug Hunter 1: SSR / SvelteKit Layer
+Detects request-layer concerns leaking into service code.
+
+```bash
+# 1a. error() imported in service layer (should use HttpServiceError subclasses)
+rg "import .*error.*from '@sveltejs/kit'" src/lib/server/ --no-heading
+# Expected: 0 matches. Service files throw UnauthorizedError/ForbiddenError/NotFoundError/ServiceUnavailableError
+
+# 1b. error() thrown inside try/catch in routes (gets swallowed → 500)
+rg -U "try\s*\{[^}]*throw error\(" src/routes/ --multiline --no-heading
+# Expected: 0 matches. Auth checks go BEFORE try/catch, or use degraded response pattern
+
+# 1c. Missing locals.user check before DB operations with createdBy
+rg "createdBy" src/routes/api/ --no-heading -l
+# For each match: verify locals.user null-check exists before the query
+
+# 1d. throw error() in GET handlers (breaks degraded response contract)
+# GET handlers should return json({...empty defaults...}) not throw error()
+rg "throw error\(40[134]" src/routes/api/ --no-heading -l
+# Cross-reference: is this a GET handler? If yes → should use degraded response
+```
+
+**Error class hierarchy** (defined in `$lib/server/errors.ts`):
+```
+HttpServiceError (base — status, code, context, toJSON())
+├── UnauthorizedError (401)
+├── ForbiddenError (403)
+├── NotFoundError (404)
+└── ServiceUnavailableError (503)
+```
+Routes translate these via `withErrorHandling()` in `$lib/server/api/response-helper.ts`.
+
+#### Bug Hunter 2: GPU / Analysis Layer
+Detects framework coupling in GPU/analysis code that should be pure.
+
+```bash
+# 2a. GPU files importing SvelteKit
+rg "from '@sveltejs/kit'" src/lib/server/gpu/ src/lib/server/analysis/ src/lib/server/vector/ --no-heading
+# Expected: 0 matches
+
+# 2b. GPU files importing $app/* (environment, navigation, state)
+rg "from '\$app/" src/lib/server/gpu/ src/lib/server/analysis/ src/lib/server/vector/ --no-heading
+# Expected: 0 matches
+
+# 2c. Blocking CPU fallbacks (GPU code should be async/non-blocking)
+rg "execSync|spawnSync" src/lib/server/gpu/ --no-heading
+# Expected: 0 matches in production code
+
+# 2d. Hardcoded localhost in service code
+rg "127\.0\.0\.1|localhost:\d" src/lib/server/ --no-heading -l
+# Expected: 0 matches. Use ENV.* getters from env.server.ts
+```
+
+GPU/analysis files must be framework-agnostic: pure input→output functions with no HTTP, SvelteKit, or framework concerns.
+
+#### Bug Hunter 3: DB / Drizzle Layer
+Detects unsafe database patterns.
+
+```bash
+# 3a. Wrong DB client import (postgres.js instead of node-postgres Pool)
+rg "from '\$lib/server/db'" src/lib/server/ src/routes/ --no-heading | rg -v "/client"
+# Expected: 0 matches. Always use import { db } from '$lib/server/db/client'
+
+# 3b. Missing isNull() fallback on createdBy ownership checks
+rg "eq\(.*createdBy" src/routes/api/ --no-heading -l
+# For each match: verify or(eq(col.createdBy, userId), isNull(col.createdBy)) pattern
+
+# 3c. Unsafe table name interpolation from user input
+rg "\$\{.*table" src/lib/server/ --no-heading | rg -v "readonly|const "
+# Flag if tableName comes from user input (not hardcoded readonly)
+
+# 3d. Missing UUID validation on route params
+rg "params\.\w+\b" src/routes/api/ --no-heading -l
+# Cross-reference: does the file call isUuid() before using the param in DB queries?
+
+# 3e. pgvector columns passed as strings instead of number[]
+rg "JSON\.stringify.*embedding\|JSON\.stringify.*vector" src/ --no-heading
+# Expected: 0 matches. Drizzle vector(768) expects number[], not stringified arrays
+```
+
+**Report format:**
+| File | Bug Hunter | Check | Finding | Severity |
+|------|------------|-------|---------|----------|
+| auth-helper.ts | SSR | 1a | `import { error }` in service layer | P1 |
+| gpu-monitor.ts | GPU | 2a | imports `json` from `@sveltejs/kit` | P1 |
+| cases/+server.ts | DB | 3b | missing `isNull(createdBy)` | P0 |
+
+### 5o. Transitive Dependency Chain Verification
 
 Before any file reaches ARCHIVE, verify it is NOT a transitive dependency:
 
@@ -455,5 +546,5 @@ File → Check 7 (empty?) → YES → ARCHIVE
 - **ALWAYS generate/update MANIFEST.md** after archiving
 - Follow the Directory Audit Protocol from CLAUDE.md (7-step checklist)
 - Run `svelte-check` + `vite build` after any changes
-- `src/lib/services/**` is blanket-excluded — 312 corrupted files, DO NOT touch
+- `src/lib/services/**` is un-excluded and clean (35 files, 0 errors as of April 7, 2026)
 - If in doubt about a file → DEFER, never ARCHIVE uncertain files

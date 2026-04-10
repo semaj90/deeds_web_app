@@ -62,24 +62,28 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		// Convert embedding to PostgreSQL vector format
 		const embeddingStr = `[${embeddingResult.embedding.join(',')}]`;
 
-		// Call the semantic search function
+		// Call the semantic search function (0.3 threshold for broader recall)
 		const searchResult = await db.execute(
 			domain
 				? sql`SELECT * FROM codebase_semantic_search(
 						${embeddingStr}::vector(768),
 						${limit}::integer,
-						0.5::real,
+						0.3::real,
 						${domain}::text
 					)`
 				: sql`SELECT * FROM codebase_semantic_search(
 						${embeddingStr}::vector(768),
 						${limit}::integer,
-						0.5::real,
+						0.3::real,
 						NULL
 					)`
 		);
 
-		const results = (searchResult as any).rows || [];
+		// Map similarity_score → similarity for consistent API response
+		const results = ((searchResult as any).rows || []).map((r: any) => ({
+			...r,
+			similarity: r.similarity_score
+		}));
 
 		return json({
 			results,

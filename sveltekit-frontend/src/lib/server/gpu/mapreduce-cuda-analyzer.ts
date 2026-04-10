@@ -5,9 +5,10 @@
 
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
-import { Worker } from 'worker_threads';
+import { fork, type ChildProcess } from 'child_process';
 import { glob } from 'glob';
 import { readFile } from 'fs/promises';
+import { existsSync } from 'fs';
 import path from 'path';
 
 export interface MapReduceJob {
@@ -24,10 +25,12 @@ export class MapReduceCUDAAnalyzer {
 
 	async createJob(patterns: string[]): Promise<string> {
 		const jobId = crypto.randomUUID();
+		// Format patterns as PostgreSQL array literal
+		const patternsArray = `{${patterns.map(p => `"${p.replace(/"/g, '\\"')}"`).join(',')}}`;
 		await db.execute(
 			sql`INSERT INTO codebase_mapreduce_jobs
-			    (id, job_type, status, total_files, batch_size, concurrency)
-			    VALUES (${jobId}, 'embed', 'pending', 0, ${this.config.batchSize}, ${this.config.concurrency})`
+			    (id, job_type, status, total_files, batch_size, concurrency, file_patterns)
+			    VALUES (${jobId}, 'embed', 'pending', 0, ${this.config.batchSize}, ${this.config.concurrency}, ${patternsArray}::text[])`
 		);
 		return jobId;
 	}
@@ -44,7 +47,7 @@ export async function createCodebaseEmbeddingJob(
 	patterns: string[],
 	config?: { batchSize?: number; concurrency?: number }
 ): Promise<string> {
-	const analyzer = new MapReduceCUDAAnalyzer(config);
+	const analyzer = new MapReduceCUDAAnalyzer({ batchSize: config?.batchSize ?? 32, concurrency: config?.concurrency ?? 4 });
 	return await analyzer.createJob(patterns);
 }
 
@@ -78,6 +81,7 @@ export async function processEmbeddingJob(
 		const concurrency = job.concurrency || 4;
 
 		// Scan files using glob patterns
+		// SvelteKit dev server runs from sveltekit-frontend/, so go up to repo root
 		const projectRoot = path.resolve(process.cwd(), '..');
 		const allFiles: string[] = [];
 
@@ -85,6 +89,8 @@ export async function processEmbeddingJob(
 			const files = await glob(pattern, { cwd: projectRoot, absolute: false });
 			allFiles.push(...files.map(f => path.join(projectRoot, f)));
 		}
+
+		console.log(`[MapReduce] Found ${allFiles.length} files from ${patterns.length} patterns`);
 
 		// Update total files count
 		await db.execute(
@@ -120,62 +126,96 @@ export async function processEmbeddingJob(
 
 		console.log(`[MapReduce] Queued ${chunkIndex} chunks for ${allFiles.length} files`);
 
-		// Spawn worker threads
-		const workers: Worker[] = [];
-		const workerPath = path.join(__dirname, 'mapreduce-worker.mjs');
-
-		for (let i = 0; i < concurrency; i++) {
-			const worker = new Worker(workerPath, {
-				workerData: {
-					workerId: i,
-					jobId,
-					batchSize,
-					fp16Mode: false
-				}
-			});
-
-			worker.on('error', (error) => {
-				console.error(`Worker ${i} error:`, error);
-			});
-
-			worker.on('exit', (code) => {
-				console.log(`Worker ${i} exited with code ${code}`);
-			});
-
-			workers.push(worker);
+		// Fork a runner process outside Vite to spawn worker threads
+		// Vite dev server transforms worker_threads internally, causing zombie workers.
+		// child_process.fork() creates a separate Node.js process that bypasses Vite.
+		const runnerPath = path.resolve(process.cwd(), 'src/lib/server/gpu/mapreduce-runner.mjs');
+		if (!existsSync(runnerPath)) {
+			throw new Error(`MapReduce runner not found: ${runnerPath}`);
 		}
 
-		// Poll for job completion
-		const pollInterval = setInterval(async () => {
-			const statusResult = await db.execute(
-				sql`SELECT processed_files, total_files, status FROM codebase_mapreduce_jobs WHERE id = ${jobId}`
-			);
-			const status = (statusResult as any).rows[0];
+		let runner: ChildProcess | null = null;
 
-			if (status) {
-				const progress = (status.processed_files / status.total_files) * 100;
+		await new Promise<void>((resolve, reject) => {
+			runner = fork(runnerPath, [], {
+				stdio: ['pipe', 'inherit', 'inherit', 'ipc'],
+				env: {
+					...process.env,
+					DATABASE_URL: process.env.DATABASE_URL,
+					OLLAMA_URL: process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434'
+				}
+			});
+
+			runner.on('message', (msg: any) => {
+				if (msg.type === 'ready') {
+					console.log('[MapReduce] Runner ready, starting workers...');
+					runner!.send({ type: 'start', jobId, concurrency, batchSize });
+					resolve();
+				} else if (msg.type === 'worker-exit') {
+					console.log(`[MapReduce] Worker ${msg.workerId} exited (code ${msg.code})`);
+				} else if (msg.type === 'worker-error') {
+					console.error(`[MapReduce] Worker ${msg.workerId} error:`, msg.error);
+				} else if (msg.type === 'all-done') {
+					console.log('[MapReduce] All workers finished');
+				}
+			});
+
+			runner.on('error', (err) => {
+				console.error('[MapReduce] Runner error:', err);
+				reject(err);
+			});
+
+			runner.on('exit', (code) => {
+				console.log(`[MapReduce] Runner exited (code ${code})`);
+			});
+
+			// Timeout waiting for ready
+			setTimeout(() => reject(new Error('Runner did not start in 5s')), 5000);
+		});
+
+		// Poll for job completion — derive progress from completed chunks
+		const pollInterval = setInterval(async () => {
+			try {
+				const countsResult = await db.execute(
+					sql`SELECT
+						COUNT(*) FILTER (WHERE status = 'completed') as completed,
+						COUNT(*) FILTER (WHERE status IN ('pending', 'processing')) as remaining,
+						COUNT(DISTINCT file_path) FILTER (WHERE status = 'completed') as files_done
+					FROM mapreduce_map_queue WHERE job_id = ${jobId}`
+				);
+				const counts = (countsResult as any).rows[0];
+				const completed = parseInt(counts.completed || '0');
+				const remaining = parseInt(counts.remaining || '0');
+				const filesDone = parseInt(counts.files_done || '0');
+
+				// Update processed_files count
+				await db.execute(
+					sql`UPDATE codebase_mapreduce_jobs SET processed_files = ${filesDone} WHERE id = ${jobId}`
+				);
+
+				const statusResult = await db.execute(
+					sql`SELECT total_files FROM codebase_mapreduce_jobs WHERE id = ${jobId}`
+				);
+				const totalFiles = (statusResult as any).rows[0]?.total_files || 1;
+				const progress = (filesDone / totalFiles) * 100;
 				onProgress?.(progress);
 
-				// Check if all workers completed
-				const pendingResult = await db.execute(
-					sql`SELECT COUNT(*) as count FROM mapreduce_map_queue WHERE job_id = ${jobId} AND status = 'pending'`
-				);
-				const pendingCount = parseInt((pendingResult as any).rows[0].count);
-
-				if (pendingCount === 0) {
+				if (remaining === 0 && completed > 0) {
 					clearInterval(pollInterval);
 					await db.execute(
-						sql`UPDATE codebase_mapreduce_jobs SET status = 'completed', completed_at = NOW() WHERE id = ${jobId}`
+						sql`UPDATE codebase_mapreduce_jobs SET status = 'completed', processed_files = ${filesDone}, completed_at = NOW() WHERE id = ${jobId}`
 					);
-					workers.forEach(w => w.terminate());
-					console.log(`[MapReduce] Job ${jobId} completed`);
+					if (runner && !runner.killed) runner.kill();
+					console.log(`[MapReduce] Job ${jobId} completed: ${completed} chunks, ${filesDone} files`);
 				}
+			} catch (err) {
+				console.error('[MapReduce] Poll error:', err);
 			}
 		}, 2000);
 	} catch (error) {
 		console.error(`[MapReduce] Job ${jobId} failed:`, error);
 		await db.execute(
-			sql`UPDATE codebase_mapreduce_jobs SET status = 'failed', error = ${String(error)} WHERE id = ${jobId}`
+			sql`UPDATE codebase_mapreduce_jobs SET status = 'failed', error_message = ${String(error)} WHERE id = ${jobId}`
 		);
 		throw error;
 	}

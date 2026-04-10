@@ -20,6 +20,8 @@ import { NODE_RUNTIME_CONFIG, GPU_MARKDOWN_ENV } from '$lib/gpu/runtime-optimiza
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { validateQdrantCollections } from '$lib/server/config/vector-config.js';
 import { getAdapterStatus } from '$lib/server/inference/adapter-manifest.js';
+import { getDispatchStats } from '$lib/server/queue/dispatch-inline.js';
+import { getInferenceLogStats } from '$lib/server/observability/inference-log.js';
 
 export const GET: RequestHandler = async () => {
 	const start = Date.now();
@@ -234,6 +236,8 @@ export const GET: RequestHandler = async () => {
             deliverRate: rabbitmqInfo.deliverRate,
           }
         : null,
+      dispatch: getDispatchStats(),
+      inferenceLog: getInferenceLogStats(),
       runtimeConfig: {
         maxOldSpaceSize: NODE_RUNTIME_CONFIG.maxOldSpaceSize,
         gpuBatchSize: NODE_RUNTIME_CONFIG.gpuBatchSize,

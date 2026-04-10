@@ -13,7 +13,7 @@ export interface SearchResult {
 
 export class PGVectorSearch {
     private pool: Pool;
-    private tableName: string = 'document_chunks';
+    private readonly tableName = 'document_chunks';
 
     constructor(connectionString: string) {
         this.pool = new Pool({

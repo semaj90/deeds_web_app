@@ -172,12 +172,247 @@ export async function assembleACEContext(opts: {
         },
       });
 
-      return {
+      const finalContext = {
         ...baseContext,
         policyDecision,
       };
+
+      // Fire-and-forget: persist top chunks to ace_chunks for future cache hits
+      if (caseId) {
+        persistACEChunks(caseId, finalContext.ragChunks, finalContext.kbChunks, finalContext.caseChunks)
+          .catch((err) => console.warn('[ACE persist] failed:', (err as Error)?.message ?? err));
+      }
+
+      return finalContext;
     }
   ); // end traceGraph ace-assembly
+}
+
+// ── ACE Chunks Configuration ────────────────────────────────────────────
+
+/** Bump this when retrieval logic changes to invalidate stale cached chunks. */
+const ACE_PIPELINE_VERSION = '1.0.0';
+const ACE_EMBEDDING_MODEL = 'embeddinggemma:latest';
+const ACE_CHUNK_TTL_HOURS = 1;
+const ACE_MIN_QUALITY_SCORE = 0.5;
+const ACE_MAX_CACHED_CHUNKS = 8;
+
+// ── ACE Chunks Persistence (Write Path) ─────────────────────────────────
+
+/**
+ * Persist top-scoring retrieval chunks to ace_chunks table.
+ *
+ * Upsert key: ON CONFLICT (case_id, content_hash, chunk_type).
+ * SHA-256 full-content hash (not MD5 of first 500 chars).
+ * Generates embeddings via Ollama (fail-tolerant — stores NULL on failure).
+ * Updates quality_score via GREATEST (only ever improves).
+ * Preserves existing embedding via COALESCE (never overwrites with NULL).
+ */
+export async function persistACEChunks(
+  caseId: string,
+  ragChunks: RAGChunk[],
+  kbChunks: RAGChunk[],
+  caseChunks: RAGChunk[]
+): Promise<void> {
+  const startMs = Date.now();
+  const { pool } = await import('$lib/server/db/client');
+  const { createHash } = await import('crypto');
+
+  // Map chunks to ace_chunks rows with type tagging
+  const rows: Array<{ content: string; chunkType: string; source: string; score: number }> = [];
+
+  for (const c of kbChunks.slice(0, 5)) {
+    if (c.score >= 0.4) rows.push({ content: c.content, chunkType: 'legal', source: c.source, score: c.score });
+  }
+  for (const c of caseChunks.slice(0, 5)) {
+    if (c.score >= 0.4) rows.push({ content: c.content, chunkType: 'evidence', source: c.source, score: c.score });
+  }
+  // Only store merged ragChunks if tiered chunks are empty (backward compat)
+  if (!kbChunks.length && !caseChunks.length) {
+    for (const c of ragChunks.slice(0, 5)) {
+      if (c.score >= 0.4) rows.push({ content: c.content, chunkType: 'analysis', source: c.source, score: c.score });
+    }
+  }
+
+  if (rows.length === 0) return;
+
+  // Generate embeddings in parallel (fail-tolerant: NULL on failure)
+  const embeddings = await Promise.all(
+    rows.map((r) => getQueryEmbedding(r.content).catch(() => null))
+  );
+  const embeddedCount = embeddings.filter(Boolean).length;
+
+  // Build parameterized ON CONFLICT upsert
+  const values: string[] = [];
+  const params: unknown[] = [];
+  let pi = 1;
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const contentHash = createHash('sha256').update(row.content).digest('hex');
+    const emb = embeddings[i];
+
+    // $1=case_id, $2=content, $3=chunk_type, $4=content_hash, $5=embedding_model,
+    // $6=pipeline_version, $7=metadata, $8=quality_score, $9=embedding
+    values.push(
+      `($${pi++}::uuid, $${pi++}, $${pi++}, $${pi++}, $${pi++}, $${pi++}, $${pi++}::jsonb, $${pi++}::real, $${pi++}::vector)`
+    );
+    params.push(
+      caseId,
+      row.content,
+      row.chunkType,
+      contentHash,
+      ACE_EMBEDDING_MODEL,
+      ACE_PIPELINE_VERSION,
+      JSON.stringify({
+        source: row.source,
+        stored_at: new Date().toISOString(),
+      }),
+      row.score,
+      emb ? `[${emb.join(',')}]` : null
+    );
+  }
+
+  const result = await pool.query(
+    `INSERT INTO ace_chunks (case_id, content, chunk_type, content_hash, embedding_model, pipeline_version, metadata, quality_score, embedding)
+     VALUES ${values.join(', ')}
+     ON CONFLICT (case_id, content_hash, chunk_type) DO UPDATE SET
+       quality_score = GREATEST(ace_chunks.quality_score, EXCLUDED.quality_score),
+       embedding = COALESCE(EXCLUDED.embedding, ace_chunks.embedding),
+       metadata = EXCLUDED.metadata,
+       updated_at = NOW()
+     WHERE ace_chunks.quality_score < EXCLUDED.quality_score
+        OR ace_chunks.embedding IS NULL`,
+    params
+  );
+
+  const elapsedMs = Date.now() - startMs;
+  const rowCount = result.rowCount ?? 0;
+  console.log(
+    `[ACE persist] case=${caseId.slice(0, 8)} candidates=${rows.length} upserted=${rowCount} embedded=${embeddedCount} elapsed=${elapsedMs}ms pipeline=${ACE_PIPELINE_VERSION}`
+  );
+  logInference({
+    type: 'vector_search',
+    backend: 'pgvector',
+    collection: 'ace_chunks',
+    latencyMs: elapsedMs,
+    cacheHit: false,
+    resultCount: rowCount,
+    metadata: { op: 'persist', candidates: rows.length, embedded: embeddedCount },
+  });
+}
+
+/**
+ * Invalidate stale ace_chunks when pipeline version changes.
+ * Called lazily on read — deletes chunks with outdated pipeline_version column.
+ */
+async function invalidateStaleACEChunks(
+  pool: import('pg').Pool,
+  caseId: string
+): Promise<number> {
+  const startMs = Date.now();
+  try {
+    const result = await pool.query(
+      `DELETE FROM ace_chunks
+       WHERE case_id = $1
+         AND (pipeline_version IS NULL OR pipeline_version != $2)`,
+      [caseId, ACE_PIPELINE_VERSION]
+    );
+    const deleted = result.rowCount ?? 0;
+    if (deleted > 0) {
+      console.log(`[ACE invalidate] purged ${deleted} stale chunks for case ${caseId.slice(0, 8)} (pipeline != ${ACE_PIPELINE_VERSION})`);
+      logInference({
+        type: 'vector_search',
+        backend: 'pgvector',
+        collection: 'ace_chunks',
+        latencyMs: Date.now() - startMs,
+        cacheHit: false,
+        resultCount: deleted,
+        metadata: { op: 'invalidate', caseId: caseId.slice(0, 8) },
+      });
+    }
+    return deleted;
+  } catch {
+    return 0;
+  }
+}
+
+// ── ACE Chunks Read Path ────────────────────────────────────────────────
+
+/**
+ * Fetch cached ACE chunks from PostgreSQL for a case.
+ * Returns recent, high-quality chunks that supplement Qdrant results.
+ * Used as a fast read-through cache before hitting vector search.
+ *
+ * Invalidation: chunks with stale pipeline_version are purged on read.
+ * TTL: only chunks created within ACE_CHUNK_TTL_HOURS are returned.
+ * All query values are parameterized — no string interpolation.
+ */
+export async function fetchCachedACEChunks(
+  caseId: string,
+  chunkTypes?: string[]
+): Promise<RAGChunk[]> {
+  const startMs = Date.now();
+  try {
+    const { pool } = await import('$lib/server/db/client');
+
+    // Lazy invalidation: purge stale chunks from old pipeline versions
+    await invalidateStaleACEChunks(pool, caseId);
+
+    // Build parameterized query — no template literal injection
+    // $1=caseId, $2=minScore, $3=ttlInterval, $4=pipelineVersion, $5=limit, $6?=chunkTypes
+    const hasTypeFilter = chunkTypes && chunkTypes.length > 0;
+    const typeClause = hasTypeFilter ? `AND chunk_type = ANY($6::text[])` : '';
+    const params: unknown[] = [
+      caseId,
+      ACE_MIN_QUALITY_SCORE,
+      `${ACE_CHUNK_TTL_HOURS} hour`,
+      ACE_PIPELINE_VERSION,
+      ACE_MAX_CACHED_CHUNKS,
+    ];
+    if (hasTypeFilter) params.push(chunkTypes);
+
+    const result = await pool.query(
+      `SELECT content, chunk_type, quality_score, metadata
+       FROM ace_chunks
+       WHERE case_id = $1
+         AND quality_score >= $2
+         AND created_at > NOW() - $3::interval
+         AND pipeline_version = $4
+         ${typeClause}
+       ORDER BY quality_score DESC
+       LIMIT $5`,
+      params
+    );
+
+    const elapsedMs = Date.now() - startMs;
+    const isHit = result.rows.length > 0;
+    if (!isHit) {
+      console.log(`[ACE cache] MISS case=${caseId.slice(0, 8)} elapsed=${elapsedMs}ms`);
+    } else {
+      console.log(
+        `[ACE cache] HIT case=${caseId.slice(0, 8)} chunks=${result.rows.length} elapsed=${elapsedMs}ms pipeline=${ACE_PIPELINE_VERSION}`
+      );
+    }
+    logInference({
+      type: 'vector_search',
+      backend: 'pgvector',
+      collection: 'ace_chunks',
+      latencyMs: elapsedMs,
+      cacheHit: isHit,
+      resultCount: result.rows.length,
+      metadata: { op: 'read', caseId: caseId.slice(0, 8) },
+    });
+
+    return result.rows.map((r: any) => ({
+      content: String(r.content ?? ''),
+      score: Number(r.quality_score ?? 0),
+      source: String(r.metadata?.source ?? `ace:${r.chunk_type}`),
+    }));
+  } catch (err) {
+    console.warn('[ACE cache] read failed:', (err as Error)?.message ?? err);
+    return [];
+  }
 }
 
 /**
@@ -908,13 +1143,26 @@ async function fetchRAGChunks(
     }
   }
 
-  const [kbChunks, caseChunks] = await Promise.all([
+  // Fetch ace_chunks cache + Qdrant tiers in parallel
+  const [kbChunks, caseChunks, aceChunks] = await Promise.all([
     fetchKBChunks(embedding, queryHash, graphFilter),
     fetchCaseChunks(embedding, queryHash, caseId, sectionTypes, graphFilter),
+    caseId ? fetchCachedACEChunks(caseId) : Promise.resolve([]),
   ]);
 
-  // Merge + sort for backward compat (ragChunks = combined)
-  let ragChunks = [...kbChunks, ...caseChunks].sort((a, b) => b.score - a.score).slice(0, 15);
+  // Merge all sources: Qdrant tiers + ace_chunks cache, deduplicate by content prefix
+  const seen = new Set<string>();
+  const dedup = (chunks: RAGChunk[]) =>
+    chunks.filter((c) => {
+      const key = c.content.slice(0, 100);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+  let ragChunks = dedup([...kbChunks, ...caseChunks, ...aceChunks])
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 15);
 
   // Authority chain drill-down: when top results cite statutes/cases,
   // embed those citations and search for their full text (max 2 hops).

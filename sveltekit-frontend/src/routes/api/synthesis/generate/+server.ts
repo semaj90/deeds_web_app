@@ -50,6 +50,7 @@ import { getVectorCache, setVectorCache } from '$lib/server/vector-cache.js';
 import { assembleACEContext, buildACEPromptCached } from '$lib/server/ace/context-assembler.js';
 import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self-prompt.js';
 import { rabbitmq } from '$lib/server/queue/rabbitmq-manager-fixed.js';
+import { dispatchOrExecuteInline } from '$lib/server/queue/dispatch-inline.js';
 import { createHash } from 'crypto';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { routeInference } from '$lib/server/inference/inference-router.js';
@@ -582,8 +583,7 @@ export const POST: RequestHandler = async (event) => {
     const citations = includeCitations ? extractCitations(answer, context.ragChunks) : [];
 
     if (enableACE) {
-      rabbitmq
-        .publishACEEvaluation({
+      dispatchOrExecuteInline('ace.evaluate', {
           responseId: synthesisId,
           query,
           response: answer,

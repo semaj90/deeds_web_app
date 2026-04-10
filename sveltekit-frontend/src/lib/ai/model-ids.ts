@@ -1,16 +1,24 @@
 /**
  * Centralized Model IDs — Single source of truth for all inference paths.
  *
- * Client models (ONNX, browser-side):
- *   - Served from /static/ via SvelteKit
- *   - Loaded by onnxruntime-web with WebGPU EP (Dawn)
+ * Client inference tiers (priority order):
+ *   1. Gemma 4 E2B 2.3B (Q4F16, Transformers.js + WebGPU)        — GPU required
+ *   2. LiteRT-LM Gemma 4 E2B (~1.5 GB, XNNPACK CPU + MTP heads)  — CPU/iGPU ok
+ *   3. Gemma 3 270M ONNX (W8A16, onnxruntime-web fallback)        — any device
+ *
+ * Server inference tiers (priority order):
+ *   1. TensorRT-LLM (INT4 AWQ, :8099)
+ *   2. Triton (:8000)
+ *   3. TurboQuant llama-server (turbo3 KV cache, :8090)
+ *   4. Bifrost/LiteLLM (semantic cache)
+ *   5. Ollama (gemma4-legal, Q4_K_M + Q8_0 KV)
  *
  * Server models (Ollama):
  *   - gemma4-legal:latest for LLM (CUDA RTX)
  *   - embeddinggemma:latest for embeddings (768-dim)
  */
 
-// ── Client-side Gemma 4 E2B (Transformers.js + WebGPU, primary) ──────────
+// ── Client Tier 1: Gemma 4 E2B (Transformers.js + WebGPU, primary) ───────
 
 /** Gemma 4 E2B 2.3B — Q4F16 via @huggingface/transformers v4 */
 export const CLIENT_E2B_MODEL_ID = 'onnx-community/gemma-4-E2B-it-ONNX';
@@ -19,9 +27,41 @@ export const CLIENT_E2B_DEVICE = 'webgpu' as const;
 /** Minimum WebGPU adapter memory (bytes) to attempt E2B loading */
 export const CLIENT_E2B_MIN_GPU_MB = 2048;
 
-// ── Client-side ONNX models (browser inference via Dawn/WebGPU, fallback) ─
+// ── Client Tier 2: LiteRT-LM (Google on-device, CPU/iGPU, MTP heads) ─────
+//
+// LiteRT-LM: Google's on-device LLM runtime (successor to TFLite).
+// - XNNPACK backend: AVX2 (x86), NEON (ARM) — no AVX-512 required
+// - GPU: OpenCL (Intel iGPU), Metal (Apple), WebGPU (experimental)
+// - MTP (Multi-Token Prediction): 4 speculative heads, ~1.8x speedup
+//   MTP heads are ONLY in .litertlm format (stripped from HuggingFace weights)
+// - CPU perf: ~8-12 tok/s E2B on i5-10th (AVX2), ~16.8 tok/s on M4 Mac
+// - Install: pip install litert-lm
+// - CLI: litert-lm gemma-4-E2B-it --prompt "..."
+// - HuggingFace: litert-community/gemma-4-E2B-it-litert-lm (~1.5 GB)
+//                litert-community/gemma-4-E4B-it-litert-lm (~3.65 GB)
 
-/** 270M Gemma3 — W8A16 quantized ONNX for client chat/routing (fallback) */
+/** LiteRT-LM HuggingFace model IDs */
+export const LITERT_E2B_MODEL_ID = 'litert-community/gemma-4-E2B-it-litert-lm';
+export const LITERT_E4B_MODEL_ID = 'litert-community/gemma-4-E4B-it-litert-lm';
+
+/** LiteRT-LM local server endpoint (runs as HTTP sidecar) */
+export const LITERT_BASE_URL = 'http://127.0.0.1:8070';
+
+/** LiteRT-LM model sizes (MB) */
+export const LITERT_E2B_SIZE_MB = 1500;
+export const LITERT_E4B_SIZE_MB = 3650;
+
+/** LiteRT-LM MTP (Multi-Token Prediction) config */
+export const LITERT_MTP_HEADS = 4;
+export const LITERT_MTP_SPEEDUP = 1.8;
+
+/** Minimum RAM (MB) to attempt LiteRT-LM loading */
+export const LITERT_E2B_MIN_RAM_MB = 2048;
+export const LITERT_E4B_MIN_RAM_MB = 5120;
+
+// ── Client Tier 3: ONNX 270M (legacy Gemma 3 fallback) ───────────────────
+
+/** 270M Gemma3 — W8A16 quantized ONNX for client chat/routing (legacy fallback) */
 export const CLIENT_LLM_MODEL = 'gemma3-client-onnx';
 export const CLIENT_LLM_ONNX_PATH = '/gemma3_270m_onnx/gemma3_270m_w8a16.onnx';
 export const CLIENT_LLM_QUANTIZED_PATH = '/gemma3_270m_onnx/gemma3_client_quantized.onnx';
@@ -53,6 +93,33 @@ export const SERVER_EMBEDDING_FALLBACK = 'nomic-embed-text';
 /** IBM Granite-Docling-258M — document understanding VLM via Ollama (522 MB) */
 export const SERVER_GRANITE_DOCLING_MODEL = 'ibm/granite-docling:258m';
 
+// ── Server-side TurboQuant (KV cache compression, llama.cpp fork) ─────────
+//
+// TurboQuant (ICLR 2026): Training-free KV cache quantization.
+// - Compresses KV cache to 3 bits/value (turbo3) via random rotation + codebook
+// - 5x cache compression, 99.5% attention fidelity, 8x GPU attention speedup
+// - turboquant_plus: llama.cpp fork with turbo2/3/4 CUDA+Metal kernels
+// - Usage: llama-server -m model.gguf -ctk turbo3 -ctv turbo3 --port 8090
+// - Build: cmake -B build -DGGML_CUDA=ON && cmake --build build
+// - CPU benefit: KV fits in L3 cache (12MB i5-10th → 256 tokens at turbo3)
+// - GPU benefit: 8x attention speedup, 5x VRAM savings on KV cache
+// - GitHub: TheTom/turboquant_plus (production-ready llama.cpp fork)
+
+/** TurboQuant llama-server endpoint (OpenAI-compatible, runs alongside Ollama) */
+export const TURBOQUANT_BASE_URL = 'http://127.0.0.1:8090';
+export const TURBOQUANT_MODEL = 'gemma4-legal';
+
+/** TurboQuant KV cache quantization levels */
+export type TurboQuantLevel = 'turbo2' | 'turbo3' | 'turbo4';
+export const TURBOQUANT_DEFAULT_LEVEL: TurboQuantLevel = 'turbo3';
+
+/** Context limits per turbo level + VRAM tier */
+export const TURBOQUANT_CONTEXT_LIMITS = {
+	turbo2: { vram4gb: 8192, vram8gb: 16384, cpu_l3_12mb: 128 },
+	turbo3: { vram4gb: 12288, vram8gb: 24576, cpu_l3_12mb: 256 },
+	turbo4: { vram4gb: 16384, vram8gb: 32768, cpu_l3_12mb: 384 },
+} as const;
+
 // ── Qdrant collection names ──────────────────────────────────────────────
 // These MUST match VECTOR_CONFIG.COLLECTIONS in src/lib/server/config/vector-config.ts
 // (server-only file cannot be imported here — keep in sync manually)
@@ -74,6 +141,14 @@ export const ONNX_EXECUTION_PROVIDERS = ['webgpu', 'wasm', 'cpu'] as const;
 
 // ── Inference source tags (for SSE chunk attribution) ────────────────────
 
-export type InferenceSource = 'local-e2b' | 'local-onnx' | 'local-wasm' | 'server-ollama' | 'server-gemini' | 'retrieval-hybrid';
+export type InferenceSource =
+	| 'local-e2b'        // Gemma 4 E2B 2.3B via Transformers.js + WebGPU
+	| 'local-litert'     // Gemma 4 E2B/E4B via LiteRT-LM (CPU XNNPACK + MTP heads)
+	| 'local-onnx'       // Gemma 3 270M via ONNX Runtime (legacy fallback)
+	| 'local-wasm'       // Archived — was llama.cpp WASM
+	| 'server-turboquant' // TurboQuant llama-server (turbo3 KV cache, :8090)
+	| 'server-ollama'    // Ollama gemma4-legal (default server)
+	| 'server-gemini'    // Gemini API (external)
+	| 'retrieval-hybrid'; // Client embed + server RAG search
 
 // WASM llama.cpp worker ARCHIVED → deeds_labs/wasm-archive/ (ONNX Runtime WebGPU is superior path)

@@ -4,6 +4,7 @@
  * Ensures proper HTTP status codes and consistent response format
  */
 import { json } from '@sveltejs/kit';
+import { UnauthorizedError, ForbiddenError, NotFoundError, ServiceUnavailableError, isHttpServiceError } from '$lib/server/errors.js';
 
 export interface APIResponse<T = unknown> {
  success: boolean;
@@ -127,17 +128,16 @@ export function withErrorHandling<T extends ApiHandler>(
  return result as Response;
  } catch (error: Error | unknown) {
  console.error('API Error: ', error);
+ if (error instanceof UnauthorizedError) return apiResponses.unauthorized(error.message);
+ if (error instanceof ForbiddenError) return apiResponses.forbidden(error.message);
+ if (error instanceof NotFoundError) return apiResponses.notFound(error.message);
+ if (error instanceof ServiceUnavailableError) return apiResponses.serviceUnavailable(error.message);
+ if (isHttpServiceError(error)) return apiError(error.message, error.status);
  const err = error as { name?: string; details?: unknown; message?: string };
  if (err.name === 'ValidationError') {
  return apiResponses.validationFailed(
  (err.details as object) ?? { message: err.message ?? 'Validation failed' }
  );
- }
- if (err.name === 'UnauthorizedError') {
- return apiResponses.unauthorized(err.message ?? 'Unauthorized');
- }
- if (err.name === 'NotFoundError') {
- return apiResponses.notFound(err.message ?? 'Not found');
  }
  // Default server error
  return apiResponses.serverError(

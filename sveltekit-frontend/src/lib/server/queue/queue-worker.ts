@@ -345,13 +345,13 @@ export class DocumentEmbedWorker extends QueueWorker<{
 		const embedding = await generateSingleEmbedding(data.text.slice(0, 2048));
 		if (!embedding) throw new Error('Embedding generation failed');
 
-		// Publish to vector.index for Qdrant upsert
-		const { rabbitmq } = await import('./rabbitmq-manager-fixed.js');
-		await rabbitmq.publishVectorIndex({
-			id: data.documentId,
-			vector: embedding,
+		// Chain to vector.index — uses dispatch utility so inline fallback works
+		const { dispatchOrExecuteInline } = await import('./dispatch-inline.js');
+		await dispatchOrExecuteInline('vector.index', {
+			documentId: data.documentId,
+			embedding,
 			collection: data.collection ?? 'legal_documents',
-			payload: {
+			metadata: {
 				documentId: data.documentId,
 				text: data.text.slice(0, 500)
 			}
@@ -384,9 +384,9 @@ export class EvidenceProcessWorker extends QueueWorker<{
 			Promise.resolve(detectForensicPatterns(data.text))
 		]);
 
-		// Chain to document embedding
-		const { rabbitmq } = await import('./rabbitmq-manager-fixed.js');
-		await rabbitmq.publishDocumentEmbed({
+		// Chain to document embedding — uses dispatch utility so inline fallback works
+		const { dispatchOrExecuteInline } = await import('./dispatch-inline.js');
+		await dispatchOrExecuteInline('document.embed', {
 			documentId: data.evidenceId,
 			text: data.text,
 			collection: 'evidence_items',

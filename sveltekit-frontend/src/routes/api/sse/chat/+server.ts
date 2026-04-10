@@ -25,7 +25,7 @@ import { synthesisKey, getCaseVersion, TTL } from '$lib/server/cache-keys.js';
 import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
 import { traceEmbedding, traceLLM } from '$lib/server/observability/langfuse.js';
 import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self-prompt.js';
-import { fetchGlossaryMatches } from '$lib/server/ace/context-assembler.js';
+import { fetchGlossaryMatches, fetchCachedACEChunks, persistACEChunks } from '$lib/server/ace/context-assembler.js';
 import { orderByDependency, extractCitationRefs } from '$lib/server/retrieval/document-dag.js';
 import type { DAGDocument } from '$lib/server/retrieval/document-dag.js';
 import { extractLegalTags } from '$lib/server/rag/tag-extractor.js';
@@ -880,9 +880,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 
   // Publish user message to chat.context queue for embedding indexing (non-blocking)
-  import('$lib/server/queue/rabbitmq-manager-fixed.js')
-    .then(({ rabbitmq }) => {
-      rabbitmq.publishChatContext({
+  import('$lib/server/queue/dispatch-inline.js')
+    .then(({ dispatchOrExecuteInline }) => {
+      dispatchOrExecuteInline('chat.context', {
         sessionId: conversationId,
         message,
         role: 'user',
@@ -890,7 +890,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       });
     })
     .catch(() => {
-      /* RabbitMQ unavailable — non-critical */
+      /* dispatch unavailable — non-critical */
     });
 
   // Load conversation history for multi-turn context
@@ -1091,7 +1091,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         }
       }
 
-      const [rawContextDocs, freshCodebaseResult] = await Promise.all([
+      const [rawContextDocs, freshCodebaseResult, aceChunks] = await Promise.all([
         cachedRagDocs
           ? Promise.resolve(cachedRagDocs)
           : attachmentScopedDocs.length > 0
@@ -1107,6 +1107,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         wantsCode && !codeGlyphHit
           ? loadCodebaseContext(message).catch(() => null)
           : Promise.resolve(null),
+        // ACE chunks: fast PostgreSQL cache read (parallel with Qdrant)
+        caseUuid
+          ? fetchCachedACEChunks(caseUuid).catch(() => [] as Array<{ content: string; score: number; source: string }>)
+          : Promise.resolve([] as Array<{ content: string; score: number; source: string }>),
       ]);
 
       // Cache fresh RAG results for 2 minutes
@@ -1125,6 +1129,22 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         codebaseResult = freshCodebaseResult;
         const codeGlyphKey = `glyph:code:${createHash('md5').update(message).digest('hex').slice(0, 12)}`;
         setFragment(codeGlyphKey, freshCodebaseResult.context, FragmentType.CODE, 5 * 60_000);
+      }
+
+      // ── Merge ACE chunks into context docs (deduplicate by content prefix) ──
+      if (aceChunks.length > 0) {
+        const existingPrefixes = new Set(rawContextDocs.map((d) => d.content.slice(0, 100)));
+        for (const ac of aceChunks) {
+          if (!existingPrefixes.has(ac.content.slice(0, 100))) {
+            rawContextDocs.push({
+              content: ac.content.length > RAG_CHUNK_MAX_CHARS ? ac.content.slice(0, RAG_CHUNK_MAX_CHARS) + '...' : ac.content,
+              similarity: ac.score,
+              documentId: `ace_chunks:${ac.source}`,
+            });
+            existingPrefixes.add(ac.content.slice(0, 100));
+          }
+        }
+        console.log(`[ACE→SSE] Merged ${aceChunks.length} ace_chunks (${rawContextDocs.length} total context docs)`);
       }
 
       // ── Corrective RAG: auto-reformulate query on low retrieval scores ──
@@ -1256,6 +1276,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       const allGraphNeighbors = [...preRetrievalNeighbors, ...(graphContext?.neighbors ?? [])];
       if (allGraphNeighbors.length > 0) {
         contextDocs = applyGraphAuthorityScoring(contextDocs, allGraphNeighbors);
+      }
+
+      // ── Fire-and-forget: persist top context docs to ace_chunks for future cache hits ──
+      if (caseUuid && contextDocs.length > 0) {
+        const aceRows = contextDocs
+          .filter((d) => !d.documentId.startsWith('ace_chunks:'))
+          .map((d) => ({ content: d.content, score: d.similarity, source: d.documentId }));
+        if (aceRows.length > 0) {
+          persistACEChunks(caseUuid, aceRows, [], []).catch((err) =>
+            console.warn('[ACE persist] SSE chat fire-and-forget failed:', (err as Error)?.message ?? err)
+          );
+        }
       }
 
       let systemPrompt =
@@ -2046,9 +2078,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         }
 
         // Publish assistant response to chat.context queue (non-blocking)
-        import('$lib/server/queue/rabbitmq-manager-fixed.js')
-          .then(({ rabbitmq }) => {
-            rabbitmq.publishChatContext({
+        import('$lib/server/queue/dispatch-inline.js')
+          .then(({ dispatchOrExecuteInline }) => {
+            dispatchOrExecuteInline('chat.context', {
               sessionId: conversationId,
               message: fullResponse.slice(0, 5000),
               role: 'assistant',
@@ -2057,7 +2089,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           })
           .catch((err) => {
             console.warn(
-              '[SSE chat] RabbitMQ chat context publish failed:',
+              '[SSE chat] Chat context dispatch failed:',
               (err as Error)?.message ?? err
             );
           });

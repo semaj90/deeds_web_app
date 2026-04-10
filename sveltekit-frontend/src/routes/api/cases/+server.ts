@@ -125,8 +125,8 @@ export const POST: RequestHandler = async (event) => {
 		syncCaseToGraph(newCase[0].id).catch(err => console.warn('[neo4j-sync] case create:', err));
 
 		// Track analytics event (non-blocking)
-		import('$lib/server/queue/rabbitmq-manager-fixed.js').then(({ rabbitmq }) =>
-			rabbitmq.publishAnalyticsEvent({ eventType: 'case_create', payload: { caseId: newCase[0].id, userId: auth.user.id } })
+		import('$lib/server/queue/dispatch-inline.js').then(({ dispatchOrExecuteInline }) =>
+			dispatchOrExecuteInline('analytics.track', { eventType: 'case_create', payload: { caseId: newCase[0].id, userId: auth.user.id } })
 		).catch(() => {});
 
 		return apiResponses.created({

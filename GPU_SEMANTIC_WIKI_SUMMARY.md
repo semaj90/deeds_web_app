@@ -174,11 +174,11 @@ curl -X POST http://localhost:5173/api/codebase/wiki \
 - [x] Dashboard UI (CodebaseWikiDashboard.svelte)
 - [x] Semantic search with cosine retrieval
 - [x] Real-time job progress tracking
+- [x] Documentation (Testing Guide + Test Script)
+- [ ] End-to-end testing (ready to execute)
 - [ ] LibTorch K-Means clustering (reduce phase)
 - [ ] Wiki page auto-generation
 - [ ] Graph visualization (D3.js)
-- [ ] End-to-end testing
-- [ ] Documentation
 
 ---
 
@@ -209,7 +209,11 @@ LIMIT 10;
 
 - **Schema**: [`gpu_codebase_wiki_schema.sql`](sveltekit-frontend/drizzle/manual/gpu_codebase_wiki_schema.sql)
 - **Analyzer**: [`mapreduce-cuda-analyzer.ts`](sveltekit-frontend/src/lib/server/gpu/mapreduce-cuda-analyzer.ts)
+- **Worker**: [`mapreduce-worker.mjs`](sveltekit-frontend/src/lib/server/gpu/mapreduce-worker.mjs)
+- **Dashboard**: [`CodebaseWikiDashboard.svelte`](sveltekit-frontend/src/lib/components/codebase/CodebaseWikiDashboard.svelte)
 - **API**: [`api/codebase/wiki/+server.ts`](sveltekit-frontend/src/routes/api/codebase/wiki/+server.ts)
+- **Testing Guide**: [`GPU_SEMANTIC_WIKI_TESTING_GUIDE.md`](GPU_SEMANTIC_WIKI_TESTING_GUIDE.md) ⭐
+- **Test Script**: [`test-semantic-wiki.mjs`](scripts/test-semantic-wiki.mjs)
 - **Audit Review**: [`AUDIT_INFRASTRUCTURE_REVIEW.md`](AUDIT_INFRASTRUCTURE_REVIEW.md)
 - **Audit Complete**: [`AUDIT_IMPLEMENTATION_COMPLETE.md`](AUDIT_IMPLEMENTATION_COMPLETE.md)
 

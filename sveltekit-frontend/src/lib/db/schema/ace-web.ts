@@ -4,7 +4,7 @@
  */
 
 import { sql } from 'drizzle-orm';
-import { index, integer, jsonb, pgTable, real, text, timestamp, uuid, vector } from 'drizzle-orm/pg-core';
+import { index, integer, jsonb, pgTable, real, text, timestamp, uniqueIndex, uuid, vector } from 'drizzle-orm/pg-core';
 
 /**
  * ace_sources: Tracks discovered URLs from web search
@@ -50,31 +50,43 @@ export const aceSources = pgTable('ace_sources', {
 );
 
 /**
- * ace_chunks: Text chunks with embeddings for RAG
+ * ace_chunks: Cached ACE context chunks with quality scores.
+ * Written by persistACEChunks() in context-assembler.ts (fire-and-forget after RAG retrieval).
+ * Read by fetchCachedACEChunks() as fast cache before Qdrant search (1hr TTL, score≥0.5).
+ * FK to cases(id) enforced at DB level (migration SQL), not in Drizzle to avoid circular imports.
  */
 export const aceChunks = pgTable('ace_chunks', {
     id: uuid('id').primaryKey().defaultRandom(),
-    docId: uuid('doc_id').references(() => aceDocs.id, { onDelete: 'cascade' }),
-    chunkIndex: integer('chunk_index').notNull(),
-    text: text('text').notNull(),
-    embedding: vector('embedding', { dimensions: 768 }),
+    caseId: uuid('case_id'), // FK → cases(id) ON DELETE CASCADE (DB-level constraint)
+    content: text('content').notNull(),
+    chunkType: text('chunk_type'), // 'legal', 'evidence', 'analysis', 'note'
+    sourceDocumentId: uuid('source_document_id'),
+    chunkIndex: integer('chunk_index'),
+    contentHash: text('content_hash'),
+    embeddingModel: text('embedding_model'),
+    pipelineVersion: text('pipeline_version'),
     metadata: jsonb('metadata')
       .$type<{
+        source?: string;
+        stored_at?: string;
         url?: string;
         title?: string;
-        heading?: string;
-        fetchedAt?: string;
-        domain?: string;
-        tags?: string[];
       }>()
       .default(sql`'{}'::jsonb`),
+    embedding: vector('embedding', { dimensions: 768 }),
+    qualityScore: real('quality_score').default(0.0),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
   },
 	(table) => ({
-    docIdx: index('ace_chunks_doc_idx').on(table.docId, table.chunkIndex),
-    // IVFFlat index for vector similarity (created in migration)
-    embeddingIdx: index('ace_chunks_embedding_idx').using(
-      'ivfflat',
-      table.embedding.op('vector_cosine_ops')
+    caseIdx: index('idx_ace_chunks_case_id').on(table.caseId),
+    typeIdx: index('idx_ace_chunks_type').on(table.chunkType),
+    uqCaseHashType: uniqueIndex('uq_ace_chunks_case_hash_type').on(table.caseId, table.contentHash, table.chunkType),
+    pipelineIdx: index('idx_ace_chunks_pipeline_version').on(table.pipelineVersion),
+    readPathIdx: index('idx_ace_chunks_read_path').on(table.caseId, table.pipelineVersion, table.qualityScore, table.createdAt),
+    embeddingIdx: index('idx_ace_chunks_embedding_hnsw').using(
+      'hnsw',
+      sql`(${table.embedding}::halfvec(768)) halfvec_cosine_ops`
     ),
   })
 );

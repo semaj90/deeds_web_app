@@ -31,7 +31,7 @@ const personListSchema = z.object({
  */
 export const GET: RequestHandler = async ({ locals, url }) => {
   if (!locals.user) {
-    throw error(401, 'Unauthorized');
+    return json({ success: false, data: [], pagination: { limit: 20, offset: 0, count: 0 } });
   }
 
   const parsed = personListSchema.safeParse({

@@ -101,6 +101,11 @@ Beyond import resolution, detect infrastructure-level wiring problems:
 | **SCHEMA_DRIFT** | Drizzle schema column type doesn't match actual DB column (detect via `sql<T>` casts or `as any` workarounds) | Update Drizzle schema or migration |
 | **UNLISTED_DEMO** | Demo route exists at `/demos/X` but not listed in demos index page | Add entry to demos/+page.svelte demos or showcases array |
 | **DEAD_DEMO_LINK** | Demos index links to non-existent demo route | Remove link or create the demo page |
+| **LAYER_VIOLATION** | Service file imports `error` from `@sveltejs/kit` instead of using `HttpServiceError` subclasses | Replace with `UnauthorizedError`/`ForbiddenError`/`NotFoundError`/`ServiceUnavailableError` from `$lib/server/errors.js` |
+| **WRONG_DB_IMPORT** | File imports `db` from `$lib/server/db` (postgres.js) instead of `$lib/server/db/client` (node-postgres Pool) | Change to `import { db } from '$lib/server/db/client'`; change `[...rows]` to `(rows as any).rows` |
+| **GPU_LAYER_VIOLATION** | GPU/analysis/vector file imports from `@sveltejs/kit` or `$app/*` | Remove SvelteKit imports; use pure functions with plain Error throws |
+| **NULL_OWNERSHIP** | Query uses `eq(col.createdBy, userId)` without `isNull(col.createdBy)` fallback | Add `or(eq(col.createdBy, userId), isNull(col.createdBy))` to include shared records |
+| **ERROR_IN_TRYCATCH** | `throw error()` from `@sveltejs/kit` inside a try/catch block in a route handler | Move auth/validation checks OUTSIDE try/catch; or re-throw `HttpError` in catch |
 
 ### Detection Commands
 ```bash
@@ -121,6 +126,38 @@ rg "sql<|as any\)\.|\bas unknown as\b" src/routes/api/ --no-heading
 rg "href:.*'/demos/" src/routes/(app)/demos/+page.svelte -o --no-heading
 ```
 
+### Layer Separation Detection Commands
+```bash
+# Layer violations — error() in service layer
+rg "import .*error.*from '@sveltejs/kit'" src/lib/server/ --no-heading
+
+# Wrong DB client — postgres.js instead of node-postgres Pool
+rg "from '\$lib/server/db'" src/ --no-heading | rg -v "/client"
+
+# GPU layer contamination
+rg "from '@sveltejs/kit'|from '\$app/" src/lib/server/gpu/ src/lib/server/analysis/ src/lib/server/vector/ --no-heading
+
+# Hardcoded localhost in server code
+rg "http://127\.0\.0\.1|http://localhost:\d" src/lib/server/ --no-heading
+
+# Missing isNull on createdBy checks
+rg "eq\(.*createdBy" src/routes/api/ --no-heading -l
+
+# error() inside try/catch
+rg -U "try\s*\{[^}]*throw error\(" src/routes/ --multiline --no-heading
+```
+
+### Error Class Reference (Layer Contract)
+Service/middleware layer uses custom errors from `$lib/server/errors.ts`:
+```
+HttpServiceError (base — status, code, context, toJSON())
+├── UnauthorizedError (401)
+├── ForbiddenError (403)
+├── NotFoundError (404)
+└── ServiceUnavailableError (503)
+```
+Routes translate these via `withErrorHandling()` in `$lib/server/api/response-helper.ts`.
+
 ## Rules
 
 - NEVER create files unless the missing module is clearly needed
@@ -130,5 +167,5 @@ rg "href:.*'/demos/" src/routes/(app)/demos/+page.svelte -o --no-heading
 - **Check facade re-exports**: When an import fails, check if the symbol is re-exported by a higher-level module (grep for `export.*symbolName` in the parent directory)
 - Use ripgrep (`rg`) for fast cross-file searches, NOT grep
 - Run `svelte-check` after any fixes
-- Check `src/lib/services/` is excluded (312 corrupted files)
+- `src/lib/services/` is un-excluded and clean (35 files, 0 errors as of April 7, 2026)
 - Follow CLAUDE.md conventions for all new code

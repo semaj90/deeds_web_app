@@ -189,7 +189,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  *
  * Returns agent configuration and available tools.
  */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	return json({
     name: 'Autonomous Investigation Agent',
     architecture: 'LangGraph StateGraph + Supervisor Routing',

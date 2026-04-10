@@ -2,9 +2,17 @@
  * Server-Side Inference Router
  *
  * Routes LLM inference through the best available backend:
- *   1. TensorRT-LLM (OpenAI-compatible service on :8099) — if GPU lease available
- *   2. Triton TensorRT service (:8000) — production GPU fallback before Ollama
- *   3. Ollama (gemma4-legal, FP16) — default local/dev fallback
+ *   1. TensorRT-LLM (INT4 AWQ on :8099) — if GPU lease available
+ *   2. Triton TensorRT service (:8000) — production GPU fallback
+ *   3. TurboQuant llama-server (:8090) — turbo3 KV cache compression (5x VRAM savings)
+ *   4. Bifrost/LiteLLM (semantic cache) — when enabled
+ *   5. Ollama (gemma4-legal, Q4_K_M + Q8_0 KV) — default local/dev fallback
+ *
+ * TurboQuant (ICLR 2026): Training-free KV cache quantization.
+ * Runs same GGUF model as Ollama but with turbo3 compressed KV cache.
+ * 8x attention speedup on GPU, 5x VRAM savings. OpenAI-compatible API.
+ * Build: cmake -B build -DGGML_CUDA=ON && cmake --build build (turboquant_plus fork)
+ * Run: llama-server -m gemma4-legal.gguf -ctk turbo3 -ctv turbo3 --port 8090
  *
  * GPU arbiter ensures TRT-LLM and Ollama don't fight for VRAM.
  * All backends return the same response shape.
@@ -19,6 +27,7 @@ import { inferLLM as inferTritonLLM, healthCheck as tritonHealthCheck, streamLLM
 import { bifrostChat } from '$lib/server/ollama.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { getGpuStats, type GpuMemory } from '$lib/server/gpu/gpu-monitor.js';
+import { TURBOQUANT_BASE_URL } from '$lib/ai/model-ids.js';
 
 /** Minimum free VRAM (MB) required before routing to TensorRT-LLM */
 const TRT_MIN_VRAM_MB = 4000;
@@ -36,7 +45,7 @@ export interface InferenceRequest {
 export interface InferenceResponse {
 	text: string;
 	model: string;
-	backend: 'tensorrt' | 'triton' | 'bifrost' | 'ollama';
+	backend: 'tensorrt' | 'triton' | 'turboquant' | 'bifrost' | 'ollama';
 	usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
 	latencyMs: number;
 	error?: string;
@@ -66,6 +75,14 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
 		console.info(`[inference-router] backend=triton latency=${tritonResult.latencyMs}ms`);
 		logLLMInference({ model: tritonResult.model, backend: 'triton', latencyMs: tritonResult.latencyMs });
 		return tritonResult;
+	}
+
+	// Tier 3: TurboQuant llama-server (turbo3 KV cache, same model, better VRAM usage)
+	const tqResult = await tryTurboQuant(request, start);
+	if (tqResult) {
+		console.info(`[inference-router] backend=turboquant latency=${tqResult.latencyMs}ms`);
+		logLLMInference({ model: tqResult.model, backend: 'turboquant', latencyMs: tqResult.latencyMs, tokenCount: tqResult.usage?.total_tokens });
+		return tqResult;
 	}
 
 	// Try Bifrost gateway (semantic caching) when enabled
@@ -155,6 +172,62 @@ async function tryTriton(request: InferenceRequest): Promise<InferenceResponse |
 			model: ENV.TRITON_LLM_MODEL ?? 'legal-llm',
 			backend: 'triton',
 			latencyMs: 0
+		};
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Try TurboQuant llama-server (turboquant_plus fork of llama.cpp).
+ * OpenAI-compatible API on :8090. Same GGUF model but with turbo3 KV cache
+ * compression — 5x VRAM savings, 8x attention kernel speedup on CUDA.
+ */
+async function tryTurboQuant(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
+	try {
+		// Health check: GET /health returns 200 when server is ready
+		const healthRes = await fetch(`${TURBOQUANT_BASE_URL}/health`, {
+			signal: AbortSignal.timeout(1_000),
+		});
+		if (!healthRes.ok) return null;
+	} catch {
+		return null; // TurboQuant server not running
+	}
+
+	const prompt = request.systemPrompt
+		? `${request.systemPrompt}\n\n${request.prompt}`
+		: request.prompt;
+
+	try {
+		// OpenAI-compatible /v1/completions endpoint
+		const res = await fetch(`${TURBOQUANT_BASE_URL}/v1/completions`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				prompt,
+				max_tokens: request.maxTokens ?? 2048,
+				temperature: request.temperature ?? 0.7,
+				stream: false,
+			}),
+			signal: AbortSignal.timeout(120_000),
+		});
+
+		if (!res.ok) return null;
+
+		const data = await res.json();
+		const text = data.choices?.[0]?.text ?? '';
+		if (!text) return null;
+
+		return {
+			text,
+			model: 'gemma4-legal-turbo3',
+			backend: 'turboquant',
+			usage: data.usage ? {
+				prompt_tokens: data.usage.prompt_tokens ?? 0,
+				completion_tokens: data.usage.completion_tokens ?? 0,
+				total_tokens: data.usage.total_tokens ?? 0,
+			} : undefined,
+			latencyMs: Math.round(performance.now() - startTime),
 		};
 	} catch {
 		return null;
@@ -260,11 +333,11 @@ export interface StreamingInferenceRequest {
 export interface StreamChunk {
 	content: string;
 	done: boolean;
-	backend?: 'tensorrt' | 'triton' | 'ollama';
+	backend?: 'tensorrt' | 'triton' | 'turboquant' | 'ollama';
 }
 
 /**
- * Streaming inference cascade: TRT-LLM → Triton → Ollama.
+ * Streaming inference cascade: TRT-LLM → Triton → TurboQuant → Ollama.
  * Returns an async generator of text chunks.
  * Use for SSE endpoints, streaming chat, etc.
  */
@@ -321,7 +394,51 @@ export async function* routeStreamingInference(
 		// Triton unavailable
 	}
 
-	// Tier 3: Ollama (uses /api/chat if messages provided, /api/generate otherwise)
+	// Tier 3: TurboQuant llama-server (streaming via OpenAI-compatible SSE)
+	try {
+		const tqHealthRes = await fetch(`${TURBOQUANT_BASE_URL}/health`, {
+			signal: AbortSignal.timeout(1_000),
+		}).catch(() => null);
+		if (tqHealthRes?.ok) {
+			const tqRes = await fetch(`${TURBOQUANT_BASE_URL}/v1/completions`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					prompt: flatPrompt,
+					max_tokens: request.maxTokens ?? 2048,
+					temperature: request.temperature ?? 0.7,
+					stream: true,
+				}),
+				signal: AbortSignal.timeout(120_000),
+			});
+			if (tqRes.ok && tqRes.body) {
+				const reader = tqRes.body.getReader();
+				const decoder = new TextDecoder();
+				while (true) {
+					const { done, value } = await reader.read();
+					if (done) break;
+					const text = decoder.decode(value, { stream: true });
+					for (const line of text.split('\n').filter(l => l.startsWith('data: '))) {
+						const payload = line.slice(6).trim();
+						if (payload === '[DONE]') break;
+						try {
+							const parsed = JSON.parse(payload);
+							const chunk = parsed.choices?.[0]?.text ?? '';
+							if (chunk) yield { content: chunk, done: false, backend: 'turboquant' };
+						} catch {
+							// skip malformed SSE
+						}
+					}
+				}
+				yield { content: '', done: true, backend: 'turboquant' };
+				return;
+			}
+		}
+	} catch {
+		// TurboQuant unavailable
+	}
+
+	// Tier 4: Ollama (uses /api/chat if messages provided, /api/generate otherwise)
 	const ollamaUrl = ENV.OLLAMA_BASE_URL;
 	const model = request.model ?? 'gemma4-legal:latest';
 
@@ -366,9 +483,11 @@ export async function* routeStreamingInference(
  * Get current inference router status.
  */
 export async function getRouterStatus() {
-	const [trtOk, tritonOk, lease, gpuStats] = await Promise.all([
+	const [trtOk, tritonOk, tqOk, lease, gpuStats] = await Promise.all([
 		trtHealthCheck(),
 		tritonHealthCheck(),
+		fetch(`${TURBOQUANT_BASE_URL}/health`, { signal: AbortSignal.timeout(1_000) })
+			.then(r => r.ok).catch(() => false),
 		getGpuLeaseStatus().catch(() => null),
 		getGpuStats().catch(() => null)
 	]);
@@ -380,6 +499,7 @@ export async function getRouterStatus() {
 	return {
 		tensorrt: { available: trtOk, url: ENV.TENSORRT_URL, vramSufficient },
 		triton: { available: tritonOk, url: ENV.TRITON_URL, model: ENV.TRITON_LLM_MODEL },
+		turboquant: { available: tqOk, url: TURBOQUANT_BASE_URL, kvCache: 'turbo3' },
 		bifrost: { enabled: ENV.BIFROST_ENABLED, url: ENV.BIFROST_URL },
 		ollama: { url: ENV.OLLAMA_BASE_URL },
 		gpu: {
@@ -390,6 +510,6 @@ export async function getRouterStatus() {
 			utilization: gpuStats?.utilizationPercent ?? null,
 		},
 		preferredBackend:
-			trtReady ? 'tensorrt' : tritonOk ? 'triton' : ENV.BIFROST_ENABLED ? 'bifrost' : 'ollama'
+			trtReady ? 'tensorrt' : tritonOk ? 'triton' : tqOk ? 'turboquant' : ENV.BIFROST_ENABLED ? 'bifrost' : 'ollama'
 	};
 }

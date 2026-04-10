@@ -229,6 +229,50 @@ If the component is used ONLY by a `/demos/*` route:
 2. If not listed → the demo is unreachable from navigation → flag as **UNLISTED_DEMO**
 3. Verify the demo page loads without 500 errors (if dev server is running)
 
+## Gate 8: Layer Contract Violations
+
+After infrastructure wiring (G7), check each file for **architectural layer violations**.
+
+### Layer Contract (enforced April 9, 2026)
+
+| Layer | Allowed Imports | Error Pattern |
+|-------|----------------|---------------|
+| **Routes** (`src/routes/`) | `error()`, `redirect()`, `json()` from `@sveltejs/kit` | SvelteKit `error(401)` etc. |
+| **Services/Middleware** (`src/lib/server/`) | `type RequestEvent` only — NO `error()` | `throw new UnauthorizedError()` etc. from `$lib/server/errors.js` |
+| **GPU/Analysis** (`src/lib/server/gpu/`, `analysis/`, `vector/`) | NO `@sveltejs/kit` imports at all | `throw new Error()` (plain) |
+
+### 8a. SvelteKit error() in Service Layer
+```bash
+rg "import .*error.*from '@sveltejs/kit'" src/lib/server/ --no-heading
+```
+Any match → **LAYER_VIOLATION**. Service files must use `HttpServiceError` subclasses:
+- `UnauthorizedError` (401), `ForbiddenError` (403), `NotFoundError` (404), `ServiceUnavailableError` (503)
+- All defined in `$lib/server/errors.ts`, extend `HttpServiceError` base class
+- Routes catch these via `withErrorHandling()` in `$lib/server/api/response-helper.ts`
+
+### 8b. GPU/Analysis Layer Contamination
+```bash
+rg "from '@sveltejs/kit'|from '\$app/" src/lib/server/gpu/ src/lib/server/analysis/ src/lib/server/vector/ --no-heading
+```
+Any match → **GPU_LAYER_VIOLATION**. GPU code must be framework-agnostic:
+- No SvelteKit imports (error, json, redirect)
+- No `$app/*` imports (environment, navigation, state)
+- No `locals.user` access
+- Pure functions: input data → output results
+
+### 8c. DB Client Import Audit
+```bash
+rg "from '\$lib/server/db'" src/lib/server/ --no-heading
+```
+Wrong import → **WRONG_DB_IMPORT**. Must use `import { db } from '$lib/server/db/client'` (node-postgres Pool with caching), NOT `import db from '$lib/server/db'` (postgres.js driver, no caching).
+
+### 8d. throw error() Inside try/catch
+```bash
+# In route files, check if error() is thrown inside try blocks
+rg -U "try\s*\{[^}]*throw error\(" src/routes/ --multiline --no-heading
+```
+Any match → **ERROR_IN_TRYCATCH**. SvelteKit `error()` thrown inside try/catch gets swallowed → 500 instead of intended status. Move auth/validation checks OUTSIDE try/catch blocks.
+
 ## Pre-Archive "Should Keep?" Checklist
 
 Before archiving ANY file, run this checklist to prevent discarding genuinely useful assets:

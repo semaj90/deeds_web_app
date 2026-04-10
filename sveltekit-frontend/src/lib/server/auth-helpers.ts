@@ -1,8 +1,7 @@
 /**
  * Authentication helpers that trust the user/session already resolved by hooks.server.ts.
  */
-import type { RequestEvent } from '@sveltejs/kit';
-import { error } from '@sveltejs/kit';
+import { error, type RequestEvent } from '@sveltejs/kit';
 
 export interface AuthResult {
 	user: {

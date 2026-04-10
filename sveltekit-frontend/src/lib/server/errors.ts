@@ -1,8 +1,69 @@
 /**
- * Custom Error Classes for Legal AI Authentication System
+ * Custom Error Classes for Legal AI Platform
  * Provides structured, actionable error handling with status codes and error codes
  * for consistent front-end messaging and debugging
+ *
+ * Layer contract:
+ *   - Routes use SvelteKit error()/redirect()/json()
+ *   - Services/middleware throw HttpServiceError subclasses
+ *   - GPU/analysis throw plain Errors (no HTTP concerns)
  */
+
+/**
+ * Base HTTP service error — used by ALL service-layer error classes.
+ * Routes catch these and translate to SvelteKit responses.
+ * NO SvelteKit imports allowed in this file.
+ */
+export class HttpServiceError extends Error {
+	status: number;
+	code: string;
+	context?: Record<string, unknown>;
+
+	constructor(message: string, code: string, status: number, context?: Record<string, unknown>) {
+		super(message);
+		this.name = new.target.name;
+		this.code = code;
+		this.status = status;
+		this.context = context;
+	}
+
+	toJSON() {
+		return {
+			error: this.message,
+			code: this.code,
+			status: this.status,
+			context: this.context
+		};
+	}
+}
+
+export class UnauthorizedError extends HttpServiceError {
+	constructor(message = 'Authentication required', context?: Record<string, unknown>) {
+		super(message, 'UNAUTHORIZED', 401, context);
+	}
+}
+
+export class ForbiddenError extends HttpServiceError {
+	constructor(message = 'Insufficient permissions', context?: Record<string, unknown>) {
+		super(message, 'FORBIDDEN', 403, context);
+	}
+}
+
+export class NotFoundError extends HttpServiceError {
+	constructor(message = 'Resource not found', context?: Record<string, unknown>) {
+		super(message, 'NOT_FOUND', 404, context);
+	}
+}
+
+export class ServiceUnavailableError extends HttpServiceError {
+	constructor(message = 'Service unavailable', context?: Record<string, unknown>) {
+		super(message, 'SERVICE_UNAVAILABLE', 503, context);
+	}
+}
+
+export function isHttpServiceError(error: unknown): error is HttpServiceError {
+	return error instanceof HttpServiceError;
+}
 
 /**
  * Base authentication error class
@@ -189,6 +250,12 @@ export const ERROR_CODES = {
     // Database
     DB_ERROR: 'DB_ERROR',
     DB_CONNECTION_FAILED: 'DB_CONNECTION_FAILED',
+
+    // HTTP service errors
+    UNAUTHORIZED: 'UNAUTHORIZED',
+    FORBIDDEN: 'FORBIDDEN',
+    NOT_FOUND: 'NOT_FOUND',
+    SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
 
     // Generic
     UNKNOWN_ERROR: 'UNKNOWN_ERROR',

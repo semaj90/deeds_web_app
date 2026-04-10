@@ -367,7 +367,7 @@
 				</div>
 
 				<div class="dialog-footer">
-					<Dialog.Close asChild>
+					<Dialog.Close>
 						{#snippet child({ props })}
 							<Button {...props} variant="ghost">Cancel</Button>
 						{/snippet}

@@ -1246,7 +1246,7 @@ export class RabbitMQManager extends EventEmitter {
     return String(err);
   }
 
-  private isReady(): boolean {
+  isReady(): boolean {
     return this?.isInitialized && !!this.channel;
   }
 
