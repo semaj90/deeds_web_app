@@ -93,6 +93,17 @@ export const SERVER_EMBEDDING_FALLBACK = 'nomic-embed-text';
 /** IBM Granite-Docling-258M — document understanding VLM via Ollama (522 MB) */
 export const SERVER_GRANITE_DOCLING_MODEL = 'ibm/granite-docling:258m';
 
+// ── Server-side VLM Server (HF Transformers + NF4, vision + text + audio) ──
+//
+// FastAPI server wrapping the merged Gemma 4 E4B legal VLM checkpoint.
+// Uses bitsandbytes NF4 quantization (~4 GB VRAM on RTX 3060 Ti).
+// This is the ONLY backend that supports vision (image analysis).
+// Text + GGUF runners (TurboQuant, Ollama) are text-only.
+// Run: python scripts/vlm-server/app.py --model gemma4-legal-vlm-merged --port 8085
+
+/** VLM server endpoint (FastAPI + HF Transformers + NF4) */
+export const VLM_BASE_URL = 'http://127.0.0.1:8085';
+
 // ── Server-side TurboQuant (KV cache compression, llama.cpp fork) ─────────
 //
 // TurboQuant (ICLR 2026): Training-free KV cache quantization.
@@ -146,6 +157,7 @@ export type InferenceSource =
 	| 'local-litert'     // Gemma 4 E2B/E4B via LiteRT-LM (CPU XNNPACK + MTP heads)
 	| 'local-onnx'       // Gemma 3 270M via ONNX Runtime (legacy fallback)
 	| 'local-wasm'       // Archived — was llama.cpp WASM
+	| 'server-vlm'       // VLM server (HF Transformers + NF4, vision + text, :8085)
 	| 'server-turboquant' // TurboQuant llama-server (turbo3 KV cache, :8090)
 	| 'server-ollama'    // Ollama gemma4-legal (default server)
 	| 'server-gemini'    // Gemini API (external)

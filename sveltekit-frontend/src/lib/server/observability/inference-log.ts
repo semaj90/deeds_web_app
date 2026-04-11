@@ -32,6 +32,8 @@ export interface InferenceLogEntry {
     | 'triton'
     | 'turboquant'
     | 'bifrost'
+    | 'litert'
+    | 'vlm-hf'
     | 'qdrant'
     | 'pgvector'
     | 'neo4j'
@@ -156,7 +158,7 @@ export async function flushInferenceLog(): Promise<void> {
  */
 export function logLLMInference(params: {
 	model: string;
-	backend: 'ollama' | 'tensorrt' | 'triton' | 'turboquant' | 'bifrost';
+	backend: 'ollama' | 'tensorrt' | 'triton' | 'turboquant' | 'bifrost' | 'litert' | 'vlm-hf';
 	latencyMs: number;
 	tokenCount?: number;
 	cacheHit?: boolean;

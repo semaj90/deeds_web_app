@@ -6,7 +6,9 @@
  *   2. Triton TensorRT service (:8000) — production GPU fallback
  *   3. TurboQuant llama-server (:8090) — turbo3 KV cache compression (5x VRAM savings)
  *   4. Bifrost/LiteLLM (semantic cache) — when enabled
- *   5. Ollama (gemma4-legal, Q4_K_M + Q8_0 KV) — default local/dev fallback
+ *   5. VLM server (:8085) — Gemma 4 E4B HF Transformers + NF4, vision + text
+ *   6. LiteRT-LM (:8070) — CPU sidecar, Gemma 4 E2B with MTP 4-head speculative decode
+ *   7. Ollama (gemma4-legal, Q4_K_M + Q8_0 KV) — default local/dev fallback
  *
  * TurboQuant (ICLR 2026): Training-free KV cache quantization.
  * Runs same GGUF model as Ollama but with turbo3 compressed KV cache.
@@ -27,7 +29,7 @@ import { inferLLM as inferTritonLLM, healthCheck as tritonHealthCheck, streamLLM
 import { bifrostChat } from '$lib/server/ollama.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { getGpuStats, type GpuMemory } from '$lib/server/gpu/gpu-monitor.js';
-import { TURBOQUANT_BASE_URL } from '$lib/ai/model-ids.js';
+import { TURBOQUANT_BASE_URL, LITERT_BASE_URL, VLM_BASE_URL } from '$lib/ai/model-ids.js';
 
 /** Minimum free VRAM (MB) required before routing to TensorRT-LLM */
 const TRT_MIN_VRAM_MB = 4000;
@@ -40,12 +42,14 @@ export interface InferenceRequest {
   systemPrompt?: string;
   preferTensorrt?: boolean;
   stream?: boolean;
+  /** Base64-encoded image for VLM analysis (only VLM server supports this) */
+  imageBase64?: string;
 }
 
 export interface InferenceResponse {
 	text: string;
 	model: string;
-	backend: 'tensorrt' | 'triton' | 'turboquant' | 'bifrost' | 'ollama';
+	backend: 'tensorrt' | 'triton' | 'turboquant' | 'vlm-hf' | 'litert' | 'bifrost' | 'ollama';
 	usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
 	latencyMs: number;
 	error?: string;
@@ -53,10 +57,29 @@ export interface InferenceResponse {
 
 /**
  * Route inference to the best available backend.
- * TRT-LLM is preferred when available and lease is free.
+ * When images are present, routes to VLM server first (only backend with vision).
+ * For text-only: TRT-LLM → Triton → TurboQuant → VLM → Bifrost → LiteRT → Ollama.
  */
 export async function routeInference(request: InferenceRequest): Promise<InferenceResponse> {
 	const start = performance.now();
+
+	// VLM-first: when image is present, only the VLM server can handle it
+	if (request.imageBase64) {
+		const vlmResult = await tryVlmServer(request, start);
+		if (vlmResult) {
+			console.info(`[inference-router] backend=${vlmResult.backend} latency=${vlmResult.latencyMs}ms (vision)`);
+			logLLMInference({ model: vlmResult.model, backend: vlmResult.backend as 'vlm-hf' | 'ollama', latencyMs: vlmResult.latencyMs, tokenCount: vlmResult.usage?.total_tokens });
+			return vlmResult;
+		}
+		// Both HF VLM server and Ollama VLM failed — no vision backend available
+		return {
+			text: '',
+			model: 'gemma4-legal-vlm',
+			backend: 'vlm-hf',
+			latencyMs: Math.round(performance.now() - start),
+			error: 'No VLM backend available — HF server (:8085) and Ollama gemma4:e4b-it-q4_K_M both failed',
+		};
+	}
 
 	// Try TensorRT first if preferred and available
 	if (request.preferTensorrt !== false) {
@@ -73,7 +96,7 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
 	if (tritonResult) {
 		tritonResult.latencyMs = Math.round(performance.now() - start);
 		console.info(`[inference-router] backend=triton latency=${tritonResult.latencyMs}ms`);
-		logLLMInference({ model: tritonResult.model, backend: 'triton', latencyMs: tritonResult.latencyMs });
+		logLLMInference({ model: tritonResult.model, backend: 'triton', latencyMs: tritonResult.latencyMs, tokenCount: tritonResult.usage?.total_tokens });
 		return tritonResult;
 	}
 
@@ -90,9 +113,25 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
 		const bifrostResult = await tryBifrost(request, start);
 		if (bifrostResult) {
 			console.info(`[inference-router] backend=bifrost latency=${bifrostResult.latencyMs}ms`);
-			logLLMInference({ model: bifrostResult.model, backend: 'bifrost', latencyMs: bifrostResult.latencyMs, cacheHit: bifrostResult.latencyMs < 200 });
+			logLLMInference({ model: bifrostResult.model, backend: 'bifrost', latencyMs: bifrostResult.latencyMs, tokenCount: bifrostResult.usage?.total_tokens, cacheHit: bifrostResult.latencyMs < 200 });
 			return bifrostResult;
 		}
+	}
+
+	// Tier 5: VLM server (HF Transformers + NF4, text fallback — also handles images)
+	const vlmResult = await tryVlmServer(request, start);
+	if (vlmResult) {
+		console.info(`[inference-router] backend=vlm-hf latency=${vlmResult.latencyMs}ms`);
+		logLLMInference({ model: vlmResult.model, backend: 'vlm-hf', latencyMs: vlmResult.latencyMs, tokenCount: vlmResult.usage?.total_tokens });
+		return vlmResult;
+	}
+
+	// Tier 6: LiteRT-LM (CPU sidecar, no VRAM needed, Gemma 4 E2B with MTP heads)
+	const litertResult = await tryLiteRT(request, start);
+	if (litertResult) {
+		console.info(`[inference-router] backend=litert latency=${litertResult.latencyMs}ms`);
+		logLLMInference({ model: litertResult.model, backend: 'litert', latencyMs: litertResult.latencyMs, tokenCount: litertResult.usage?.total_tokens });
+		return litertResult;
 	}
 
 	// Fall back to direct Ollama
@@ -194,17 +233,18 @@ async function tryTurboQuant(request: InferenceRequest, startTime: number): Prom
 		return null; // TurboQuant server not running
 	}
 
-	const prompt = request.systemPrompt
-		? `${request.systemPrompt}\n\n${request.prompt}`
-		: request.prompt;
+	const messages: Array<{ role: string; content: string }> = [];
+	if (request.systemPrompt) messages.push({ role: 'system', content: request.systemPrompt });
+	messages.push({ role: 'user', content: request.prompt });
 
 	try {
-		// OpenAI-compatible /v1/completions endpoint
-		const res = await fetch(`${TURBOQUANT_BASE_URL}/v1/completions`, {
+		// OpenAI-compatible /v1/chat/completions — llama-server b8757+
+		// When model uses thinking mode, content may be empty and reasoning in reasoning_content
+		const res = await fetch(`${TURBOQUANT_BASE_URL}/v1/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				prompt,
+				messages,
 				max_tokens: request.maxTokens ?? 2048,
 				temperature: request.temperature ?? 0.7,
 				stream: false,
@@ -215,7 +255,11 @@ async function tryTurboQuant(request: InferenceRequest, startTime: number): Prom
 		if (!res.ok) return null;
 
 		const data = await res.json();
-		const text = data.choices?.[0]?.text ?? '';
+		const msg = data.choices?.[0]?.message;
+		const content = msg?.content ?? '';
+		const reasoning = msg?.reasoning_content ?? '';
+		// Prefer content (the actual answer); fall back to reasoning if model spent all tokens thinking
+		const text = content || reasoning;
 		if (!text) return null;
 
 		return {
@@ -259,6 +303,202 @@ async function tryBifrost(request: InferenceRequest, startTime: number): Promise
 		};
 	} catch {
 		return null; // fall through to direct Ollama
+	}
+}
+
+/**
+ * Try VLM inference for vision+text requests.
+ *
+ * Cascade:
+ *   1. HF Transformers server (:8085) — legal fine-tuned NF4, if running
+ *   2. Ollama native multimodal — gemma4:e4b-it-q4_K_M with /api/chat images field
+ *      (Stock E4B has identical SigLIP vision tower — frozen during GRPO training)
+ *
+ * For text-only requests that reach this function, only try HF server (Ollama
+ * text-only is handled by the main cascade's ollamaInference fallback).
+ */
+async function tryVlmServer(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
+	// ── Attempt 1: HF Transformers VLM server on :8085 ──
+	const hfResult = await tryHfVlmServer(request, startTime);
+	if (hfResult) return hfResult;
+
+	// ── Attempt 2: Ollama native multimodal (only for image requests) ──
+	if (request.imageBase64) {
+		return tryOllamaVlm(request, startTime);
+	}
+
+	return null;
+}
+
+async function tryHfVlmServer(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
+	try {
+		const healthRes = await fetch(`${VLM_BASE_URL}/health`, {
+			signal: AbortSignal.timeout(1_000),
+		});
+		if (!healthRes.ok) return null;
+	} catch {
+		return null;
+	}
+
+	const messages: Array<{ role: string; content: string | Array<{ type: string; text?: string; image_url?: { url: string } }> }> = [];
+	if (request.systemPrompt) messages.push({ role: 'system', content: request.systemPrompt });
+
+	if (request.imageBase64) {
+		messages.push({
+			role: 'user',
+			content: [
+				{ type: 'image_url', image_url: { url: `data:image/jpeg;base64,${request.imageBase64}` } },
+				{ type: 'text', text: request.prompt },
+			],
+		});
+	} else {
+		messages.push({ role: 'user', content: request.prompt });
+	}
+
+	try {
+		const res = await fetch(`${VLM_BASE_URL}/v1/chat/completions`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				model: 'gemma4-legal-vlm',
+				messages,
+				max_tokens: request.maxTokens ?? 512,
+				temperature: request.temperature ?? 0.3,
+				stream: false,
+			}),
+			signal: AbortSignal.timeout(120_000),
+		});
+
+		if (!res.ok) return null;
+
+		const data = await res.json();
+		const text = data.choices?.[0]?.message?.content ?? '';
+		if (!text) return null;
+
+		return {
+			text,
+			model: 'gemma4-legal-vlm',
+			backend: 'vlm-hf',
+			usage: data.usage ? {
+				prompt_tokens: data.usage.prompt_tokens ?? 0,
+				completion_tokens: data.usage.completion_tokens ?? 0,
+				total_tokens: data.usage.total_tokens ?? 0,
+			} : undefined,
+			latencyMs: Math.round(performance.now() - startTime),
+		};
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Ollama native VLM fallback — uses gemma4:e4b-it-q4_K_M with /api/chat images field.
+ * Same SigLIP vision tower as the legal fine-tune (frozen during GRPO training).
+ * No extra VRAM — Ollama manages the model lifecycle.
+ */
+async function tryOllamaVlm(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
+	const model = 'gemma4:e4b-it-q4_K_M';
+	const messages: Array<{ role: string; content: string; images?: string[] }> = [];
+
+	if (request.systemPrompt) {
+		messages.push({ role: 'system', content: request.systemPrompt });
+	}
+	messages.push({
+		role: 'user',
+		content: request.prompt,
+		images: request.imageBase64 ? [request.imageBase64] : undefined,
+	});
+
+	try {
+		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				model,
+				messages,
+				stream: false,
+				keep_alive: '24h',
+				options: {
+					num_predict: request.maxTokens ?? 512,
+					temperature: request.temperature ?? 0.3,
+				},
+			}),
+			signal: AbortSignal.timeout(120_000),
+		});
+
+		if (!res.ok) return null;
+
+		const data = await res.json();
+		const text = data.message?.content ?? '';
+		if (!text) return null;
+
+		return {
+			text,
+			model,
+			backend: 'ollama',
+			usage: {
+				prompt_tokens: data.prompt_eval_count ?? 0,
+				completion_tokens: data.eval_count ?? 0,
+				total_tokens: (data.prompt_eval_count ?? 0) + (data.eval_count ?? 0),
+			},
+			latencyMs: Math.round(performance.now() - startTime),
+		};
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Try LiteRT-LM sidecar (CPU, Gemma 4 E2B, MTP 4-head speculative decode).
+ * OpenAI-compatible on :8070. No VRAM needed — runs on XNNPACK CPU backend.
+ */
+async function tryLiteRT(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
+	try {
+		const healthRes = await fetch(`${LITERT_BASE_URL}/health`, {
+			signal: AbortSignal.timeout(1_000),
+		});
+		if (!healthRes.ok) return null;
+	} catch {
+		return null; // LiteRT server not running
+	}
+
+	const messages: Array<{ role: string; content: string }> = [];
+	if (request.systemPrompt) messages.push({ role: 'system', content: request.systemPrompt });
+	messages.push({ role: 'user', content: request.prompt });
+
+	try {
+		const res = await fetch(`${LITERT_BASE_URL}/v1/chat/completions`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				model: 'litert-lm',
+				messages,
+				max_tokens: request.maxTokens ?? 2048,
+				temperature: request.temperature ?? 0.3,
+				stream: false,
+			}),
+			signal: AbortSignal.timeout(60_000),
+		});
+
+		if (!res.ok) return null;
+
+		const data = await res.json();
+		const text = data.choices?.[0]?.message?.content ?? '';
+		if (!text) return null;
+
+		return {
+			text,
+			model: 'gemma4-e2b-litert',
+			backend: 'litert',
+			usage: data.usage ? {
+				prompt_tokens: data.usage.prompt_tokens ?? 0,
+				completion_tokens: data.usage.completion_tokens ?? 0,
+				total_tokens: data.usage.total_tokens ?? 0,
+			} : undefined,
+			latencyMs: Math.round(performance.now() - startTime),
+		};
+	} catch {
+		return null;
 	}
 }
 
@@ -333,7 +573,7 @@ export interface StreamingInferenceRequest {
 export interface StreamChunk {
 	content: string;
 	done: boolean;
-	backend?: 'tensorrt' | 'triton' | 'turboquant' | 'ollama';
+	backend?: 'tensorrt' | 'triton' | 'turboquant' | 'vlm-hf' | 'litert' | 'ollama';
 }
 
 /**
@@ -400,11 +640,16 @@ export async function* routeStreamingInference(
 			signal: AbortSignal.timeout(1_000),
 		}).catch(() => null);
 		if (tqHealthRes?.ok) {
-			const tqRes = await fetch(`${TURBOQUANT_BASE_URL}/v1/completions`, {
+			const tqMessages: Array<{ role: string; content: string }> = request.messages ?? [];
+			if (!tqMessages.length) {
+				if (request.systemPrompt) tqMessages.push({ role: 'system', content: request.systemPrompt });
+				tqMessages.push({ role: 'user', content: request.prompt });
+			}
+			const tqRes = await fetch(`${TURBOQUANT_BASE_URL}/v1/chat/completions`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					prompt: flatPrompt,
+					messages: tqMessages,
 					max_tokens: request.maxTokens ?? 2048,
 					temperature: request.temperature ?? 0.7,
 					stream: true,
@@ -423,7 +668,9 @@ export async function* routeStreamingInference(
 						if (payload === '[DONE]') break;
 						try {
 							const parsed = JSON.parse(payload);
-							const chunk = parsed.choices?.[0]?.text ?? '';
+							const delta = parsed.choices?.[0]?.delta;
+							// llama-server b8757: streaming thinking in delta.reasoning_content, answer in delta.content
+							const chunk = delta?.content ?? delta?.reasoning_content ?? '';
 							if (chunk) yield { content: chunk, done: false, backend: 'turboquant' };
 						} catch {
 							// skip malformed SSE
@@ -438,7 +685,44 @@ export async function* routeStreamingInference(
 		// TurboQuant unavailable
 	}
 
-	// Tier 4: Ollama (uses /api/chat if messages provided, /api/generate otherwise)
+	// Tier 4: LiteRT-LM (CPU sidecar, fake-streaming — sends full response as SSE)
+	try {
+		const litertHealth = await fetch(`${LITERT_BASE_URL}/health`, {
+			signal: AbortSignal.timeout(1_000),
+		}).catch(() => null);
+		if (litertHealth?.ok) {
+			const messages: Array<{ role: string; content: string }> = request.messages ?? [];
+			if (!messages.length) {
+				if (request.systemPrompt) messages.push({ role: 'system', content: request.systemPrompt });
+				messages.push({ role: 'user', content: request.prompt });
+			}
+			const litertRes = await fetch(`${LITERT_BASE_URL}/v1/chat/completions`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					model: 'litert-lm',
+					messages,
+					max_tokens: request.maxTokens ?? 2048,
+					temperature: request.temperature ?? 0.3,
+					stream: false,
+				}),
+				signal: AbortSignal.timeout(60_000),
+			});
+			if (litertRes.ok) {
+				const data = await litertRes.json();
+				const text = data.choices?.[0]?.message?.content ?? '';
+				if (text) {
+					yield { content: text, done: false, backend: 'litert' };
+					yield { content: '', done: true, backend: 'litert' };
+					return;
+				}
+			}
+		}
+	} catch {
+		// LiteRT unavailable
+	}
+
+	// Tier 5: Ollama (uses /api/chat if messages provided, /api/generate otherwise)
 	const ollamaUrl = ENV.OLLAMA_BASE_URL;
 	const model = request.model ?? 'gemma4-legal:latest';
 
@@ -483,11 +767,20 @@ export async function* routeStreamingInference(
  * Get current inference router status.
  */
 export async function getRouterStatus() {
-	const [trtOk, tritonOk, tqOk, lease, gpuStats] = await Promise.all([
+	const [trtOk, tritonOk, tqOk, vlmOk, litertOk, ollamaVlmOk, lease, gpuStats] = await Promise.all([
 		trtHealthCheck(),
 		tritonHealthCheck(),
 		fetch(`${TURBOQUANT_BASE_URL}/health`, { signal: AbortSignal.timeout(1_000) })
 			.then(r => r.ok).catch(() => false),
+		fetch(`${VLM_BASE_URL}/health`, { signal: AbortSignal.timeout(1_000) })
+			.then(r => r.ok).catch(() => false),
+		fetch(`${LITERT_BASE_URL}/health`, { signal: AbortSignal.timeout(1_000) })
+			.then(r => r.ok).catch(() => false),
+		// Check if Ollama has the VLM model available (list models, check for e4b)
+		ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(2_000) })
+			.then(r => r.ok ? r.json() : null)
+			.then(d => d?.models?.some((m: { name: string }) => m.name.includes('e4b-it')) ?? false)
+			.catch(() => false),
 		getGpuLeaseStatus().catch(() => null),
 		getGpuStats().catch(() => null)
 	]);
@@ -495,12 +788,16 @@ export async function getRouterStatus() {
 	const vram: GpuMemory | null = gpuStats?.available ? gpuStats.memory : null;
 	const vramSufficient = !vram || vram.freeMB >= TRT_MIN_VRAM_MB;
 	const trtReady = trtOk && !lease && vramSufficient;
+	const visionAvailable = vlmOk || ollamaVlmOk;
 
 	return {
 		tensorrt: { available: trtOk, url: ENV.TENSORRT_URL, vramSufficient },
 		triton: { available: tritonOk, url: ENV.TRITON_URL, model: ENV.TRITON_LLM_MODEL },
 		turboquant: { available: tqOk, url: TURBOQUANT_BASE_URL, kvCache: 'turbo3' },
+		vlm: { available: vlmOk, url: VLM_BASE_URL, model: 'gemma4-legal-vlm', backend: 'hf-nf4', visionCapable: true },
+		ollamaVlm: { available: ollamaVlmOk, model: 'gemma4:e4b-it-q4_K_M', visionCapable: true },
 		bifrost: { enabled: ENV.BIFROST_ENABLED, url: ENV.BIFROST_URL },
+		litert: { available: litertOk, url: LITERT_BASE_URL, model: 'gemma-4-E2B-it', backend: 'cpu' },
 		ollama: { url: ENV.OLLAMA_BASE_URL },
 		gpu: {
 			leaseHolder: lease?.backend ?? null,
@@ -509,7 +806,8 @@ export async function getRouterStatus() {
 			temperature: gpuStats?.temperatureCelsius ?? null,
 			utilization: gpuStats?.utilizationPercent ?? null,
 		},
+		visionAvailable,
 		preferredBackend:
-			trtReady ? 'tensorrt' : tritonOk ? 'triton' : tqOk ? 'turboquant' : ENV.BIFROST_ENABLED ? 'bifrost' : 'ollama'
+			trtReady ? 'tensorrt' : tritonOk ? 'triton' : tqOk ? 'turboquant' : vlmOk ? 'vlm-hf' : ENV.BIFROST_ENABLED ? 'bifrost' : litertOk ? 'litert' : 'ollama'
 	};
 }
