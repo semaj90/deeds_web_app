@@ -30,9 +30,89 @@ import { bifrostChat } from '$lib/server/ollama.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { getGpuStats, type GpuMemory } from '$lib/server/gpu/gpu-monitor.js';
 import { TURBOQUANT_BASE_URL, LITERT_BASE_URL, VLM_BASE_URL } from '$lib/ai/model-ids.js';
+import { execSync, spawn } from 'node:child_process';
 
 /** Minimum free VRAM (MB) required before routing to TensorRT-LLM */
 const TRT_MIN_VRAM_MB = 4000;
+
+// ── TurboQuant VRAM Swap ──────────────────────────────────────────────────
+// llama-server (~3.4 GB) and Ollama VLM (~5 GB) can't coexist on 8 GB VRAM.
+// When VLM is needed, we stop llama-server, run VLM, then restart it.
+const TURBOQUANT_EXE = process.env.TURBOQUANT_EXE_PATH ?? 'C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe';
+const TURBOQUANT_GGUF = process.env.TURBOQUANT_MODEL_PATH ?? '';
+const TURBOQUANT_RESTART_DELAY_MS = 3_000;
+
+/** Find the PID of llama-server listening on :8090 and the GGUF model path */
+function findTurboQuantProcess(): { pid: number; modelPath: string } | null {
+	try {
+		// Find PID on port 8090 via netstat
+		const netstat = execSync('netstat -ano | findstr ":8090" | findstr "LISTENING"', {
+			encoding: 'utf8',
+			timeout: 3_000,
+		}).trim();
+		const pidMatch = netstat.match(/(\d+)\s*$/m);
+		if (!pidMatch) return null;
+		const pid = parseInt(pidMatch[1]);
+		if (!pid || pid <= 4) return null;
+
+		// Get the command line to extract the GGUF model path for restart
+		let modelPath = TURBOQUANT_GGUF;
+		try {
+			const wmic = execSync(`wmic process where processid=${pid} get commandline /format:list`, {
+				encoding: 'utf8',
+				timeout: 3_000,
+			});
+			const mMatch = wmic.match(/-m\s+"?([^"]+\.(?:gguf|safetensors|bin))"?/i)
+				?? wmic.match(/-m\s+(\S+)/);
+			if (mMatch?.[1]) modelPath = mMatch[1];
+		} catch {
+			// wmic may fail — use env fallback
+		}
+
+		return { pid, modelPath };
+	} catch {
+		return null;
+	}
+}
+
+/** Stop TurboQuant llama-server by PID */
+function stopTurboQuant(pid: number): boolean {
+	try {
+		execSync(`taskkill /PID ${pid} /F`, { timeout: 5_000 });
+		console.info(`[vram-swap] Stopped llama-server PID ${pid} to free VRAM for VLM`);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+/** Restart TurboQuant llama-server in background (fire-and-forget) */
+function restartTurboQuant(modelPath: string): void {
+	if (!modelPath) {
+		console.warn('[vram-swap] No GGUF model path — cannot restart TurboQuant');
+		return;
+	}
+	try {
+		const args = [
+			'-m', modelPath,
+			'--port', '8090',
+			'-ngl', '99',
+			'--flash-attn', 'on',
+			'-ctk', 'q4_0',
+			'-ctv', 'q4_0',
+			'-c', '4096',
+		];
+		const child = spawn(TURBOQUANT_EXE, args, {
+			detached: true,
+			stdio: 'ignore',
+			windowsHide: true,
+		});
+		child.unref();
+		console.info(`[vram-swap] Restarted llama-server → PID ${child.pid}`);
+	} catch (err) {
+		console.error('[vram-swap] Failed to restart llama-server:', err);
+	}
+}
 
 export interface InferenceRequest {
   prompt: string;
@@ -394,9 +474,48 @@ async function tryHfVlmServer(request: InferenceRequest, startTime: number): Pro
 /**
  * Ollama native VLM fallback — uses gemma4:e4b-it-q4_K_M with /api/chat images field.
  * Same SigLIP vision tower as the legal fine-tune (frozen during GRPO training).
- * No extra VRAM — Ollama manages the model lifecycle.
+ *
+ * VRAM swap: If the first attempt fails (likely VRAM full from llama-server),
+ * stops TurboQuant llama-server, retries VLM, then restarts llama-server.
  */
 async function tryOllamaVlm(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
+	// First attempt — works when VRAM is available (llama-server not running)
+	const result = await _ollamaVlmCall(request, startTime);
+	if (result) return result;
+
+	// VRAM swap: stop TurboQuant, free ~3.4 GB, retry VLM, then restart
+	const tqProcess = findTurboQuantProcess();
+	if (!tqProcess) return null; // No TurboQuant to swap — genuinely unavailable
+
+	console.info(`[vram-swap] Ollama VLM failed — swapping out TurboQuant (PID ${tqProcess.pid}) for VRAM`);
+	const stopped = stopTurboQuant(tqProcess.pid);
+	if (!stopped) return null;
+
+	// Wait for VRAM to actually free up
+	await new Promise(r => setTimeout(r, TURBOQUANT_RESTART_DELAY_MS));
+
+	try {
+		const retryResult = await _ollamaVlmCall(request, startTime);
+		return retryResult;
+	} finally {
+		// Always restart TurboQuant after VLM (whether success or failure)
+		// Delay slightly so Ollama VLM model can unload first
+		setTimeout(() => {
+			// Unload VLM model from Ollama to free VRAM for llama-server
+			ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ model: 'gemma4:e4b-it-q4_K_M', prompt: '', keep_alive: 0 }),
+				signal: AbortSignal.timeout(5_000),
+			}).catch(() => {}).finally(() => {
+				setTimeout(() => restartTurboQuant(tqProcess.modelPath), 2_000);
+			});
+		}, 1_000);
+	}
+}
+
+/** Raw Ollama VLM call — no VRAM swap logic */
+async function _ollamaVlmCall(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
 	const model = 'gemma4:e4b-it-q4_K_M';
 	const messages: Array<{ role: string; content: string; images?: string[] }> = [];
 

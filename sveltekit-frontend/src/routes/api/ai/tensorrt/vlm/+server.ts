@@ -10,8 +10,10 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbiter.js';
+import { routeInference } from '$lib/server/inference/inference-router.js';
 import { ENV } from '$lib/server/env.server.js';
 import { getOllamaUrl } from '$lib/config/env.server.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
 import { resizeForVLM } from '$lib/server/image/resize-for-vlm.js';
 
@@ -139,21 +141,21 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     );
   }
 
-  // Check Triton health — fall back to Ollama if unavailable
+  // Check Triton health — fall back to Ollama VLM cascade if unavailable
   const tritonReady = await checkTritonHealth();
   if (!tritonReady) {
-    // Ollama VLM fallback: gemma4 supports multimodal (image + text)
+    // Fast path: try direct Ollama VLM first (works when VRAM is free)
     try {
       const ollamaUrl = getOllamaUrl();
       const vlmModel = ENV.GEMMA4_MODEL ?? 'gemma4:e4b-it-q4_K_M';
-      const ollamaRes = await fetch(`${ollamaUrl}/api/generate`, {
+      const ollamaRes = await ollamaFetch(`${ollamaUrl}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: vlmModel,
-          prompt,
-          images: [imageBase64],
+          messages: [{ role: 'user', content: prompt, images: [imageBase64] }],
           stream: false,
+          keep_alive: '24h',
           options: { temperature, num_predict: maxTokens },
         }),
         signal: AbortSignal.timeout(120000),
@@ -161,20 +163,33 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       if (ollamaRes.ok) {
         const ollamaData = await ollamaRes.json();
         return json({
-          text: ollamaData.response ?? '',
+          text: ollamaData.message?.content ?? '',
           model: `${vlmModel} (ollama fallback)`,
           pipeline: ['ollama-multimodal'],
           tritonAvailable: false,
         });
       }
     } catch {
-      // Ollama also unavailable
+      // Ollama direct failed — try inference router (has VRAM swap)
     }
+
+    // Slow path: inference router with VRAM swap (stops llama-server, runs VLM, restarts)
+    const routed = await routeInference({ prompt, imageBase64, maxTokens, temperature });
+    if (!routed.error) {
+      return json({
+        text: routed.text,
+        model: `${routed.model} (${routed.backend} fallback)`,
+        pipeline: [routed.backend],
+        tritonAvailable: false,
+        latencyMs: routed.latencyMs,
+      });
+    }
+
     return json(
       {
         error: 'Triton and Ollama VLM both unavailable',
-        fallback: 'ollama',
-        hint: 'Start Ollama with gemma4-legal or start Triton container',
+        fallback: 'inference-router',
+        hint: 'Start Ollama with gemma4 VLM model or start Triton container',
       },
       { status: 503 }
     );
