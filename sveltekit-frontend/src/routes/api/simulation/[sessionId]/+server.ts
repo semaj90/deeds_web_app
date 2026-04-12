@@ -22,11 +22,13 @@ const SESSION_TTL = 60 * 60 * 4;
 const USER_SESSIONS_PREFIX = 'sim:user:';
 
 async function getSession(sessionId: string): Promise<SimulationSession | null> {
+	const redis = getRedis();
 	const raw = await redis.get(SESSION_PREFIX + sessionId);
 	return raw ? JSON.parse(raw) as SimulationSession : null;
 }
 
 async function saveSession(session: SimulationSession): Promise<void> {
+	const redis = getRedis();
 	session.updatedAt = new Date().toISOString();
 	await redis.set(SESSION_PREFIX + session.id, JSON.stringify(session), 'EX', SESSION_TTL);
 }
@@ -215,7 +217,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 
 		session.status = 'abandoned';
 		await saveSession(session);
-		await redis.srem(USER_SESSIONS_PREFIX + locals.user.id, params.sessionId);
+		await getRedis().srem(USER_SESSIONS_PREFIX + locals.user.id, params.sessionId);
 
 		return json({ success: true });
 	} catch (err) {
@@ -497,6 +499,7 @@ async function auditSimulationAction(
 		timestamp: new Date().toISOString(),
 	});
 
+	const redis = getRedis();
 	const key = AUDIT_PREFIX + sessionId;
 	await redis.rpush(key, entry);
 	await redis.expire(key, AUDIT_TTL);

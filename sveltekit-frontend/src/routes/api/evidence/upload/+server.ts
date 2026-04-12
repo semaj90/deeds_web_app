@@ -26,6 +26,7 @@ import {
   type EvidenceMetadataProto,
 } from '$lib/server/evidence/proto-serializer.js';
 import { batchStoreEntities } from '$lib/server/evidence/batch-entity-storer.js';
+import { batchEmbedAndStoreEntities } from '$lib/server/evidence/batch-entity-embedder.js';
 
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
@@ -1154,6 +1155,17 @@ async function processAndEmbed(
         { entityCount: entities.length }
       );
     }
+
+    // 6a-iii. Embed entities and upsert to Qdrant for semantic entity search (non-fatal)
+    batchEmbedAndStoreEntities(entities, evidenceId, caseId)
+      .then((embedResult) => {
+        console.log(
+          `[Upload] Entity embeddings upserted: ${embedResult.inserted} points in ${embedResult.durationMs}ms for ${fileName}`
+        );
+      })
+      .catch((err) => {
+        console.warn('[Upload] Entity embedding to Qdrant failed (non-fatal):', err);
+      });
   }
 
   if (forensicFlags.length > 0) {

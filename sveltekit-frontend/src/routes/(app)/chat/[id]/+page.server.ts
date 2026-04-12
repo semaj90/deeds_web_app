@@ -25,10 +25,9 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			setTimeout(() => reject(new Error('Redis timeout')), 3000)
 		);
 
-		const rawHistory = await Promise.race([
-			redis.get(redisKey),
-			timeoutPromise
-		]) as string | null;
+		const rawHistory = (await Promise.race([getRedis().get(redisKey), timeoutPromise])) as
+      | string
+      | null;
 
 		history = rawHistory ? JSON.parse(rawHistory) : [];
 	} catch (error) {
@@ -67,12 +66,13 @@ export const actions: Actions = {
 		const channel = `updates:${chatId}`;
 		const redisKey = `chat:${chatId}`;
 
+		const redis = getRedis();
 		try {
 			// Publish start event
 			await redis.publish(channel, JSON.stringify({ type: 'start' }));
 
 			// Generate AI response via Ollama (streaming)
-			const aiResponse = await streamOllamaResponse(userMessage.trim(), channel);
+			const aiResponse = await streamOllamaResponse(userMessage.trim(), channel, redis);
 
 			// Save to Redis history
 			try {
@@ -149,101 +149,100 @@ export const actions: Actions = {
  * Stream response from Ollama and publish deltas to Redis
  */
 async function streamOllamaResponse(
-	message: string,
-	channel: string
-): Promise<{ content: string, confidence: number;
-	citations: string[];
-	warnings: string[];
-}> {
-	let fullContent = '';
+  message: string,
+  channel: string,
+  redis: import('ioredis').Redis
+): Promise<{ content: string; confidence: number; citations: string[]; warnings: string[] }> {
+  let fullContent = '';
 
-	try {
-		const response = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: OLLAMA_MODEL,
-				prompt: `You are a legal AI assistant. Answer the following question professionally and accurately:\n\n${message}`,
-				stream: true,
-				options: {
-				temperature: 0.7,
-					top_p: 0.9
-				}
-			})
-		});
+  try {
+    const response = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: OLLAMA_MODEL,
+        prompt: `You are a legal AI assistant. Answer the following question professionally and accurately:\n\n${message}`,
+        stream: true,
+        options: {
+          temperature: 0.7,
+          top_p: 0.9,
+        },
+      }),
+    });
 
-		if (!response.ok) {
-			throw new Error(`Ollama API error: ${response.status}`);
-		}
+    if (!response.ok) {
+      throw new Error(`Ollama API error: ${response.status}`);
+    }
 
-		if (!response.body) {
-			throw new Error('No response body from Ollama');
-		}
+    if (!response.body) {
+      throw new Error('No response body from Ollama');
+    }
 
-		const reader = response.body.getReader();
-		const decoder = new TextDecoder();
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
 
-		let streamDone = false;
-		while (!streamDone) {
-			const { done, value } = await reader.read();
-			if (done) {
-				streamDone = true;
-				continue;
-			}
+    let streamDone = false;
+    while (!streamDone) {
+      const { done, value } = await reader.read();
+      if (done) {
+        streamDone = true;
+        continue;
+      }
 
-			const chunk = decoder.decode(value, { stream: true });
+      const chunk = decoder.decode(value, { stream: true });
 
-			// Ollama streams JSONL lines
-			for (const line of chunk.split('\n')) {
-				if (!line.trim()) continue;
+      // Ollama streams JSONL lines
+      for (const line of chunk.split('\n')) {
+        if (!line.trim()) continue;
 
-				try {
-					const obj = JSON.parse(line);
-					const delta = obj.response ?? '';
+        try {
+          const obj = JSON.parse(line);
+          const delta = obj.response ?? '';
 
-					if (delta) {
-						fullContent += delta;
+          if (delta) {
+            fullContent += delta;
 
-						// Publish delta to Redis for SSE
-						await redis.publish(
-							channel,
-							JSON.stringify({
-								type: 'delta',
-								content: delta
-							})
-						);
-					}
+            // Publish delta to Redis for SSE
+            await redis.publish(
+              channel,
+              JSON.stringify({
+                type: 'delta',
+                content: delta,
+              })
+            );
+          }
 
-					if (obj.done) {
-						// Publish done event
-						await redis.publish(channel, JSON.stringify({ type: 'done' }));
-					}
-				} catch {
-					// Skip malformed JSON lines
-				}
-			}
-		}
+          if (obj.done) {
+            // Publish done event
+            await redis.publish(channel, JSON.stringify({ type: 'done' }));
+          }
+        } catch {
+          // Skip malformed JSON lines
+        }
+      }
+    }
 
-		// Calculate confidence and extract citations
-		const confidence = calculateConfidence(fullContent, message);
-		const citations = extractCitations(fullContent);
-		const warnings = confidence < 0.65 ? ['Low confidence response - please verify with official sources'] : [];
+    // Calculate confidence and extract citations
+    const confidence = calculateConfidence(fullContent, message);
+    const citations = extractCitations(fullContent);
+    const warnings =
+      confidence < 0.65 ? ['Low confidence response - please verify with official sources'] : [];
 
-		return {
-			content: fullContent || 'I apologize, but I was unable to generate a response.',
-			confidence,
-			citations,
-			warnings
-		};
-	} catch (error) {
-		console.error('Ollama streaming failed:', error);
+    return {
+      content: fullContent || 'I apologize, but I was unable to generate a response.',
+      confidence,
+      citations,
+      warnings,
+    };
+  } catch (error) {
+    console.error('Ollama streaming failed:', error);
 
-		// Publish error and done
-		await redis.publish(channel, JSON.stringify({ type: 'error', error: String(error) }));
-		await redis.publish(channel, JSON.stringify({ type: 'done' }));
+    // Publish error and done
+    await redis.publish(channel, JSON.stringify({ type: 'error', error: String(error) }));
+    await redis.publish(channel, JSON.stringify({ type: 'done' }));
 
-		throw error;
-	}
+    throw error;
+  }
 }
 
 /**
