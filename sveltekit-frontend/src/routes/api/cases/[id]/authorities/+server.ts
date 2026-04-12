@@ -8,6 +8,7 @@ import type { RequestHandler } from './$types';
 import { pool } from '$lib/server/db/client';
 import { syncCaseToGraph } from '$lib/server/graph/pg-neo4j-sync.js';
 import { z } from 'zod';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const authorityPostSchema = z.object({
   documentId: z.string().uuid().optional(),
@@ -28,7 +29,7 @@ const authorityDeleteSchema = z.object({
 });
 
 /** GET — list all linked legal authorities for a case */
-export const GET: RequestHandler = async ({ params, locals }) => {
+export const GET: RequestHandler = async ({ params, locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	try {
@@ -69,10 +70,18 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			createdAt: r.created_at,
 		}));
 
-		return json({ authorities, total: res.rowCount });
+		const responseData = { authorities, total: res.rowCount };
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.private, ETag: etag }
+		});
 	} catch (err) {
 		console.error('[authorities] GET error:', err);
-		return json({ authorities: [], total: 0 });
+		return json({ authorities: [], total: 0 }, {
+			headers: cacheControl.private
+		});
 	}
 };
 

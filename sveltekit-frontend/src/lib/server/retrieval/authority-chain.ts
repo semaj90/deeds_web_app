@@ -19,6 +19,7 @@ import { buildVectorPayload } from '$lib/server/config/vector-config.js';
 import { extractLegalTags } from '$lib/server/rag/tag-extractor.js';
 import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
+import { traceEmbedding, traceVectorSearch } from '$lib/server/observability/langfuse.js';
 import { createHash } from 'crypto';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -118,63 +119,69 @@ async function searchAuthorityCollections(
 	timeoutMs: number,
 	chunkMaxChars: number
 ): Promise<ContextDoc[]> {
-	const promises = collections.map(async (collection) => {
-		try {
-			const vectorPayload = buildVectorPayload(collection, vector);
-			const res = await fetch(
-				`${qdrantUrl}/collections/${collection}/points/search`,
-				{
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						vector: vectorPayload,
-						limit,
-						with_payload: true,
-						score_threshold: scoreThreshold,
-					}),
-					signal: AbortSignal.timeout(timeoutMs),
-				}
-			);
-			if (!res.ok) return [];
-			const data = await res.json();
-			return ((data.result ?? []) as Array<Record<string, unknown>>).map(
-				(r) => {
-					const payload = r.payload as Record<string, unknown> | undefined;
-					const raw = String(
-						payload?.text ??
-							payload?.content_preview ??
-							payload?.full_text ??
-							payload?.content ??
-							payload?.title ??
-							''
+	return traceVectorSearch(
+		`authority-${collections.join('+')}`,
+		{ collections: collections.join(','), limit, scoreThreshold },
+		async () => {
+			const promises = collections.map(async (collection) => {
+				try {
+					const vectorPayload = buildVectorPayload(collection, vector);
+					const res = await fetch(
+						`${qdrantUrl}/collections/${collection}/points/search`,
+						{
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({
+								vector: vectorPayload,
+								limit,
+								with_payload: true,
+								score_threshold: scoreThreshold,
+							}),
+							signal: AbortSignal.timeout(timeoutMs),
+						}
 					);
-					return {
-						content:
-							raw.length > chunkMaxChars
-								? raw.slice(0, chunkMaxChars) + '...'
-								: raw,
-						similarity: Number(r.score ?? 0),
-						documentId: `${collection}:${r.id}`,
-						sourceId: resolveSourceId(
-							payload,
-							`${collection}:${String(r.id ?? '')}`
-						),
-						model: payload?.embedding_model as string | undefined,
-					};
+					if (!res.ok) return [];
+					const data = await res.json();
+					return ((data.result ?? []) as Array<Record<string, unknown>>).map(
+						(r) => {
+							const payload = r.payload as Record<string, unknown> | undefined;
+							const raw = String(
+								payload?.text ??
+									payload?.content_preview ??
+									payload?.full_text ??
+									payload?.content ??
+									payload?.title ??
+									''
+							);
+							return {
+								content:
+									raw.length > chunkMaxChars
+										? raw.slice(0, chunkMaxChars) + '...'
+										: raw,
+								similarity: Number(r.score ?? 0),
+								documentId: `${collection}:${r.id}`,
+								sourceId: resolveSourceId(
+									payload,
+									`${collection}:${String(r.id ?? '')}`
+								),
+								model: payload?.embedding_model as string | undefined,
+							};
+						}
+					);
+				} catch {
+					return [];
 				}
-			);
-		} catch {
-			return [];
-		}
-	});
+			});
 
-	const results = await Promise.allSettled(promises);
-	const chunks: ContextDoc[] = [];
-	for (const r of results) {
-		if (r.status === 'fulfilled') chunks.push(...r.value);
-	}
-	chunks.sort((a, b) => b.similarity - a.similarity);
-	return chunks.slice(0, limit);
+			const results = await Promise.allSettled(promises);
+			const chunks: ContextDoc[] = [];
+			for (const r of results) {
+				if (r.status === 'fulfilled') chunks.push(...r.value);
+			}
+			chunks.sort((a, b) => b.similarity - a.similarity);
+			return chunks.slice(0, limit);
+		}
+	);
 }
 
 // ── Main Export ──────────────────────────────────────────────────────────────

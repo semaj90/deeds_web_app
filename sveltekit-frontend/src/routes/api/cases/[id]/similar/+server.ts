@@ -34,6 +34,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { computeCentralityForNodes } from '$lib/server/graph/graph-centrality.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const caseSimilarQuerySchema = z.object({
 	limit: z.coerce.number().int().min(1).max(100).optional().default(10),
@@ -85,7 +86,7 @@ interface SimilarityResponse {
 /**
  * GET /api/cases/[id]/similar?limit=10&includeEmbedding=false&triggerGraph=true
  */
-export const GET: RequestHandler = async ({ params, url, locals }) => {
+export const GET: RequestHandler = async ({ params, url, locals, request }) => {
 	const startTime = performance.now();
 	const caseId = params.id;
 	if (!locals.user?.id) {
@@ -263,7 +264,12 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 			...(graphJobId && { graphJobId })
 		};
 
-		return json(response);
+		const { etag, isMatch } = checkETag(response, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(response, {
+			headers: { ...cacheControl.private, ETag: etag }
+		});
 	} catch (err) {
 		console.error('[Case Similarity] Error:', err instanceof Error ? err.message : err);
 		return json(
@@ -279,7 +285,7 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
           totalMs: Math.round(performance.now() - startTime),
         },
       },
-      { status: 200 }
+      { status: 200, headers: cacheControl.private }
     );
 	}
 };
