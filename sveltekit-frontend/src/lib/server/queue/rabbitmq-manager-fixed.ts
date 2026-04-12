@@ -63,6 +63,7 @@ export class RabbitMQManager extends EventEmitter {
   private readonly queues = {
     cache_invalidate: 'cache.invalidate',
     document_embed: 'document.embed',
+    chat_document_embed: 'chat.document.embed',
     evidence_process: 'evidence.process',
     vector_index: 'vector.index',
     chat_context: 'chat.context',
@@ -179,6 +180,7 @@ export class RabbitMQManager extends EventEmitter {
     const queuesToMigrate = [
       'cache.invalidate',
       'document.embed',
+      'chat.document.embed',
       'evidence.process',
       'vector.index',
       'chat.context',
@@ -219,6 +221,11 @@ export class RabbitMQManager extends EventEmitter {
       this.queues.document_embed,
       this.exchanges.document_processing,
       'document.embed'
+    );
+    await this.bindQueue(
+      this.queues.chat_document_embed,
+      this.exchanges.document_processing,
+      'document.chat.embed'
     );
     await this.bindQueue(
       this.queues.evidence_process,
@@ -288,9 +295,11 @@ export class RabbitMQManager extends EventEmitter {
     await this.startDLQConsumers();
   }
 
-  async consume(queue: string, handler: (msg: AmqpMessage) => Promise<void>) {
+  async consume(queue: string, handler: (msg: AmqpMessage) => Promise<void>, noAck = false) {
     if (this.channel) {
-      await this.channel.consume(queue, (msg) => handler(msg), { noAck: false });
+      await this.channel.consume(queue, (msg) => handler(msg), { noAck });
+    } else {
+      throw new Error(`RabbitMQ channel not ready (queue: ${queue})`);
     }
   }
 
@@ -305,20 +314,25 @@ export class RabbitMQManager extends EventEmitter {
         return;
       }
 
-      await traceQueue('consume', 'cache.invalidate', { type: data.type, key: data.key ?? data.pattern ?? 'unknown' }, async () => {
-        console.log('🗑️ Cache invalidation:', data.type, data.key ?? '');
-        if (this.redisService) {
-          if (data.key) {
-            await this.redisService.del(data.key);
-          } else if (data.pattern) {
-            // Pattern-based invalidation (e.g. "evidence:*")
-            const keys = await this.redisService.keys(data.pattern);
-            if (keys?.length) {
-              await Promise.all(keys.map((k: string) => this.redisService.del(k)));
+      await traceQueue(
+        'consume',
+        'cache.invalidate',
+        { type: data.type, key: data.key ?? data.pattern ?? 'unknown' },
+        async () => {
+          console.log('🗑️ Cache invalidation:', data.type, data.key ?? '');
+          if (this.redisService) {
+            if (data.key) {
+              await this.redisService.del(data.key);
+            } else if (data.pattern) {
+              // Pattern-based invalidation (e.g. "evidence:*")
+              const keys = await this.redisService.keys(data.pattern);
+              if (keys?.length) {
+                await Promise.all(keys.map((k: string) => this.redisService.del(k)));
+              }
             }
           }
         }
-      });
+      );
 
       this.channel.ack(msg);
     } catch (error) {
@@ -336,20 +350,29 @@ export class RabbitMQManager extends EventEmitter {
         return;
       }
 
-      await traceQueue('consume', 'document.embed', { documentId: data.documentId ?? 'unknown', textLength: data.text.length, collection: data.collection ?? 'legal_documents' }, async () => {
-        console.log('📐 Embedding document:', data.documentId ?? 'unknown');
-        const { generateSingleEmbedding } = await import('../grpc/embedding-client.js');
-        const embedding = await generateSingleEmbedding(data.text.slice(0, 2048));
-        // Publish vector for indexing
-        if (embedding?.length && data.documentId) {
-          await this.publish(this.exchanges.vector_updates, 'vector.index.document', {
-            documentId: data.documentId,
-            embedding,
-            collection: data.collection ?? 'legal_documents',
-            metadata: data.metadata ?? {},
-          });
+      await traceQueue(
+        'consume',
+        'document.embed',
+        {
+          documentId: data.documentId ?? 'unknown',
+          textLength: data.text.length,
+          collection: data.collection ?? 'legal_documents',
+        },
+        async () => {
+          console.log('📐 Embedding document:', data.documentId ?? 'unknown');
+          const { generateSingleEmbedding } = await import('../grpc/embedding-client.js');
+          const embedding = await generateSingleEmbedding(data.text.slice(0, 2048));
+          // Publish vector for indexing
+          if (embedding?.length && data.documentId) {
+            await this.publish(this.exchanges.vector_updates, 'vector.index.document', {
+              documentId: data.documentId,
+              embedding,
+              collection: data.collection ?? 'legal_documents',
+              metadata: data.metadata ?? {},
+            });
+          }
         }
-      });
+      );
 
       this.channel.ack(msg);
     } catch (error) {
@@ -446,26 +469,31 @@ export class RabbitMQManager extends EventEmitter {
       }
       const collection = data.collection ?? 'documents';
 
-      await traceQueue('consume', 'vector.index', { documentId: data.documentId, collection, vectorDim: data.embedding?.length ?? 0 }, async () => {
-        console.log('📌 Indexing vector:', data.documentId, '→', collection);
-        const { qdrant } = await import('../vector/qdrant-manager.js');
+      await traceQueue(
+        'consume',
+        'vector.index',
+        { documentId: data.documentId, collection, vectorDim: data.embedding?.length ?? 0 },
+        async () => {
+          console.log('📌 Indexing vector:', data.documentId, '→', collection);
+          const { qdrant } = await import('../vector/qdrant-manager.js');
 
-        await qdrant.batchUpsert({
-          collection: collection as any,
-          points: [
-            {
-              id: data.documentId,
-              vector: data.embedding,
-              payload: {
-                documentId: data.documentId,
-                ...(data.metadata ?? {}),
+          await qdrant.batchUpsert({
+            collection: collection as any,
+            points: [
+              {
+                id: data.documentId,
+                vector: data.embedding,
+                payload: {
+                  documentId: data.documentId,
+                  ...(data.metadata ?? {}),
+                },
               },
-            },
-          ],
-        });
+            ],
+          });
 
-        console.log(`✅ Vector indexed: ${data.documentId} → ${collection}`);
-      });
+          console.log(`✅ Vector indexed: ${data.documentId} → ${collection}`);
+        }
+      );
 
       this.channel.ack(msg);
     } catch (error) {
@@ -594,7 +622,9 @@ export class RabbitMQManager extends EventEmitter {
           const job = JSON.parse(existing);
           Object.assign(job, update);
           await this.redisService.set(key, JSON.stringify(job), 'EX', 3600);
-        } catch { /* non-fatal */ }
+        } catch {
+          /* non-fatal */
+        }
       };
 
       await updateRedisProgress({ status: 'scanning', progress: 5 });
@@ -699,7 +729,9 @@ export class RabbitMQManager extends EventEmitter {
             }
           }
         }
-      } catch { /* non-fatal */ }
+      } catch {
+        /* non-fatal */
+      }
 
       this.retryOrDLQ(msg, error);
     }
@@ -714,33 +746,42 @@ export class RabbitMQManager extends EventEmitter {
         return;
       }
 
-      await traceQueue('consume', 'ace.evaluate', { responseId: data.responseId, queryLength: data.query.length, responseLength: data.response.length }, async () => {
-        console.log('🧠 ACE evaluation:', data.responseId);
-        const { evaluateResponse } = await import('../ace/self-prompt.js');
-        const evaluation = await evaluateResponse({
-          query: data.query,
-          response: data.response,
-          context: data.context ?? { ragChunks: [], kagNeighbors: [], persona: 'neutral' },
-          backend: 'ollama',
-        });
-        // Store result in Redis for async retrieval
-        if (this.redisService) {
-          const key = `ace:result:${data.responseId}`;
-          await this.redisService.set(
-            key,
-            JSON.stringify({
-              responseId: data.responseId,
-              ...evaluation,
-              evaluatedAt: new Date().toISOString(),
-            }),
-            'EX',
-            3600
-          ); // 1 hour TTL
+      await traceQueue(
+        'consume',
+        'ace.evaluate',
+        {
+          responseId: data.responseId,
+          queryLength: data.query.length,
+          responseLength: data.response.length,
+        },
+        async () => {
+          console.log('🧠 ACE evaluation:', data.responseId);
+          const { evaluateResponse } = await import('../ace/self-prompt.js');
+          const evaluation = await evaluateResponse({
+            query: data.query,
+            response: data.response,
+            context: data.context ?? { ragChunks: [], kagNeighbors: [], persona: 'neutral' },
+            backend: 'ollama',
+          });
+          // Store result in Redis for async retrieval
+          if (this.redisService) {
+            const key = `ace:result:${data.responseId}`;
+            await this.redisService.set(
+              key,
+              JSON.stringify({
+                responseId: data.responseId,
+                ...evaluation,
+                evaluatedAt: new Date().toISOString(),
+              }),
+              'EX',
+              3600
+            ); // 1 hour TTL
+          }
+          console.log(
+            `✅ ACE eval complete: ${data.responseId} (quality: ${evaluation.quality.toFixed(2)})`
+          );
         }
-        console.log(
-          `✅ ACE eval complete: ${data.responseId} (quality: ${evaluation.quality.toFixed(2)})`
-        );
-      });
+      );
 
       this.channel.ack(msg);
     } catch (error) {
@@ -750,6 +791,43 @@ export class RabbitMQManager extends EventEmitter {
   }
 
   // --- Publishers ---
+
+  /**
+   * Publish a message, waiting up to `timeoutMs` for RabbitMQ to be fully
+   * initialized (exchanges + queues + bindings declared) before publishing.
+   * Use this instead of the typed publish methods when the caller may run
+   * before RabbitMQ initialization completes (e.g., early HTTP request handlers).
+   */
+  async publishWhenReady(
+    exchange: string,
+    routingKey: string,
+    data: unknown,
+    timeoutMs = 15000
+  ): Promise<void> {
+    if (this.isInitialized && this.channel) {
+      await this.publish(exchange, routingKey, data);
+      return;
+    }
+    // Wait for 'initialized' event (fired after exchanges + queues + bindings are declared)
+    await new Promise<void>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        reject(
+          new Error(
+            `[RabbitMQ] publishWhenReady timeout after ${timeoutMs}ms (${exchange}/${routingKey})`
+          )
+        );
+      }, timeoutMs);
+      this.once('initialized', async () => {
+        clearTimeout(timer);
+        try {
+          await this.publish(exchange, routingKey, data);
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      });
+    });
+  }
 
   async publishCacheInvalidation(data: any): Promise<void> {
     if (!this.isReady()) return;
@@ -896,221 +974,235 @@ export class RabbitMQManager extends EventEmitter {
         return;
       }
 
-      await traceQueue('consume', 'synthesis.generate', {
-        synthesisId: data.synthesisId,
-        queryLength: data.query.length,
-        caseId: data.caseId,
-        persona: data.persona ?? 'neutral'
-      }, async () => {
-        console.log('🧪 Synthesis generate:', data.synthesisId);
+      await traceQueue(
+        'consume',
+        'synthesis.generate',
+        {
+          synthesisId: data.synthesisId,
+          queryLength: data.query.length,
+          caseId: data.caseId,
+          persona: data.persona ?? 'neutral',
+        },
+        async () => {
+          console.log('🧪 Synthesis generate:', data.synthesisId);
 
-        // Update status → generating
-        if (this.redisService) {
-          await this.redisService.set(
-            `synthesis:status:${data.synthesisId}`,
-            JSON.stringify({ status: 'generating', startedAt: new Date().toISOString() }),
-            'EX',
-            3600
+          // Update status → generating
+          if (this.redisService) {
+            await this.redisService.set(
+              `synthesis:status:${data.synthesisId}`,
+              JSON.stringify({ status: 'generating', startedAt: new Date().toISOString() }),
+              'EX',
+              3600
+            );
+          }
+
+          const t0 = performance.now();
+
+          // Stage 1: ACE context assembly
+          const { assembleACEContext, buildACEPromptCached } = await import(
+            '../ace/context-assembler.js'
+          );
+          const { orderByDependency, extractCitationRefs } = await import(
+            '../retrieval/document-dag.js'
+          );
+          const context = await assembleACEContext({
+            query: data.query,
+            userId: data.userId,
+            caseId: data.caseId,
+            conversationId: data.conversationId,
+            persona: data.persona,
+            sectionTypes: data.sectionTypes,
+            enableCodebaseContext: data.enableCodebaseContext,
+          });
+
+          // DAG-order RAG chunks
+          if (context.ragChunks.length > 1) {
+            type RAGChunk = { content: string; score: number; source: string };
+            const knownIds = new Set(
+              context.ragChunks.map((_: RAGChunk, i: number) => `chunk-${i}`)
+            );
+            const dagDocs = context.ragChunks.map((c: RAGChunk, i: number) => ({
+              id: `chunk-${i}`,
+              title: c.source,
+              score: c.score,
+              citations: extractCitationRefs(c.content, knownIds),
+              content: c.content,
+            }));
+            const { ordered } = orderByDependency(dagDocs);
+            const chunkMap = new Map<string, RAGChunk>(
+              context.ragChunks.map((c: RAGChunk, i: number) => [`chunk-${i}`, c])
+            );
+            context.ragChunks = ordered
+              .map((d: { id: string }) => chunkMap.get(d.id))
+              .filter((c): c is RAGChunk => c !== undefined);
+          }
+
+          const acePrompt = await buildACEPromptCached(context, data.query);
+          const contextMs = performance.now() - t0;
+
+          // Stage 2: Direct Ollama LLM call (no Bifrost — single Ollama request)
+          const { ollamaFetch } = await import('../ollama.js');
+          const { ENV } = await import('../env.server.js');
+          const MODEL = 'gemma4-legal:latest';
+          const maxTokens = data.maxTokens ?? 2048;
+          const temperature = data.temperature ?? 0.3;
+
+          const userPrompt = `${acePrompt.contextWindow}\n\nQuestion: ${data.query}\n\nProvide a comprehensive legal analysis. Include [Source N] citations where applicable.`;
+
+          // Stage 2 LLM call with Langfuse tracing
+          const { answer, tokensUsed, generateMs } = await traceLLM(
+            'synthesis-worker',
+            {
+              model: MODEL,
+              backend: 'ollama',
+              synthesisId: data.synthesisId,
+              caseId: data.caseId,
+              ragChunks: context.ragChunks.length,
+              kagNeighbors: context.kagNeighbors?.length ?? 0,
+            },
+            async (gen) => {
+              const llmStart = performance.now();
+              const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  model: MODEL,
+                  messages: [
+                    { role: 'system', content: acePrompt.systemPrompt },
+                    { role: 'user', content: userPrompt },
+                  ],
+                  stream: false,
+                  options: { num_predict: maxTokens, temperature },
+                }),
+                signal: AbortSignal.timeout(300_000), // 5 minutes — worker has no user-facing timeout
+              });
+
+              if (!res.ok) throw new Error(`Ollama ${res.status}: ${res.statusText}`);
+
+              const llmData = await res.json();
+              const answerText = (llmData.message?.content ?? '').trim();
+              const tokens = llmData.eval_count ?? Math.ceil(answerText.length / 4);
+              const durationMs = performance.now() - llmStart;
+
+              gen.end({
+                output: answerText.slice(0, 1000),
+                usage: { promptTokens: llmData.prompt_eval_count, completionTokens: tokens },
+              });
+              return { answer: answerText, tokensUsed: tokens, generateMs: durationMs };
+            }
+          );
+
+          // Stage 3: Extract citations
+          const citations: Array<{ id: string; sourceTitle: string; quote: string }> = [];
+          const refs = answer.match(/\[Source\s+(\d+)[^\]]*\]/g) ?? [];
+          const seen = new Set<string>();
+          for (const ref of refs) {
+            const match = ref.match(/\[Source\s+(\d+)/);
+            if (match && !seen.has(match[1])) {
+              seen.add(match[1]);
+              const idx = parseInt(match[1], 10) - 1;
+              const chunk = context.ragChunks[idx];
+              citations.push({
+                id: crypto.randomUUID(),
+                sourceTitle: chunk?.source ?? `Source ${match[1]}`,
+                quote: ref,
+              });
+            }
+          }
+
+          // Stage 4: Compute confidence
+          let confidence = 0.4;
+          if (answer.length > 100) confidence += 0.15;
+          if (answer.length > 300) confidence += 0.1;
+          if (citations.length > 0) confidence += 0.15;
+          if (citations.length >= 3) confidence += 0.1;
+          confidence = Math.min(0.95, confidence);
+
+          const totalMs = performance.now() - t0;
+
+          // Store full result in Redis
+          const result = {
+            synthesisId: data.synthesisId,
+            query: data.query,
+            answer,
+            citations,
+            evaluation: null, // ACE eval will be separate
+            confidence,
+            model: MODEL,
+            tokensUsed,
+            timing: {
+              contextMs: Math.round(contextMs),
+              generateMs: Math.round(generateMs),
+              evalMs: 0,
+              totalMs: Math.round(totalMs),
+            },
+            cached: false,
+            timestamp: new Date().toISOString(),
+            evaluationUrl:
+              data.enableACE !== false ? `/api/synthesis/evaluation/${data.synthesisId}` : null,
+            contextSources: {
+              ragChunks: context.ragChunks.length,
+              kagNeighbors: context.kagNeighbors.length,
+              codebaseChunks: context.codebaseContext?.length ?? 0,
+              hasEvidence: !!context.evidenceMetadata?.length,
+              hasGlossary: !!context.glossaryMatches?.length,
+              hasCaseContext: !!context.caseContext,
+              hasWebSearch: !!context.webSearchContext,
+            },
+          };
+
+          if (this.redisService) {
+            await this.redisService.set(
+              `synthesis:result:${data.synthesisId}`,
+              JSON.stringify(result),
+              'EX',
+              3600
+            );
+            await this.redisService.set(
+              `synthesis:status:${data.synthesisId}`,
+              JSON.stringify({
+                status: 'complete',
+                completedAt: new Date().toISOString(),
+                totalMs: Math.round(totalMs),
+              }),
+              'EX',
+              3600
+            );
+          }
+
+          // Fire ACE evaluation asynchronously
+          if (data.enableACE !== false) {
+            await this.publish(this.exchanges.document_processing, 'ace.evaluate', {
+              responseId: data.synthesisId,
+              query: data.query,
+              response: answer,
+              context: {
+                ragChunks: context.ragChunks,
+                kagNeighbors: context.kagNeighbors,
+                persona: context.persona,
+              },
+              enqueuedAt: new Date().toISOString(),
+            });
+          }
+
+          // Log inference to CouchDB (fire-and-forget)
+          import('../observability/inference-log.js')
+            .then(({ logLLMInference }) =>
+              logLLMInference({
+                model: MODEL,
+                backend: 'ollama',
+                latencyMs: Math.round(generateMs),
+                tokenCount: tokensUsed,
+                cacheHit: false,
+              })
+            )
+            .catch(() => {});
+
+          console.log(
+            `✅ Synthesis complete: ${data.synthesisId} (${Math.round(totalMs)}ms, ${tokensUsed} tokens)`
           );
         }
-
-        const t0 = performance.now();
-
-      // Stage 1: ACE context assembly
-      const { assembleACEContext, buildACEPromptCached } = await import(
-        '../ace/context-assembler.js'
-      );
-      const { orderByDependency, extractCitationRefs } = await import(
-        '../retrieval/document-dag.js'
-      );
-      const context = await assembleACEContext({
-        query: data.query,
-        userId: data.userId,
-        caseId: data.caseId,
-        conversationId: data.conversationId,
-        persona: data.persona,
-        sectionTypes: data.sectionTypes,
-        enableCodebaseContext: data.enableCodebaseContext,
-      });
-
-      // DAG-order RAG chunks
-      if (context.ragChunks.length > 1) {
-        type RAGChunk = { content: string; score: number; source: string };
-        const knownIds = new Set(context.ragChunks.map((_: RAGChunk, i: number) => `chunk-${i}`));
-        const dagDocs = context.ragChunks.map((c: RAGChunk, i: number) => ({
-          id: `chunk-${i}`,
-          title: c.source,
-          score: c.score,
-          citations: extractCitationRefs(c.content, knownIds),
-          content: c.content,
-        }));
-        const { ordered } = orderByDependency(dagDocs);
-        const chunkMap = new Map<string, RAGChunk>(
-          context.ragChunks.map((c: RAGChunk, i: number) => [`chunk-${i}`, c])
-        );
-        context.ragChunks = ordered
-          .map((d: { id: string }) => chunkMap.get(d.id))
-          .filter((c): c is RAGChunk => c !== undefined);
-      }
-
-      const acePrompt = await buildACEPromptCached(context, data.query);
-      const contextMs = performance.now() - t0;
-
-      // Stage 2: Direct Ollama LLM call (no Bifrost — single Ollama request)
-      const { ollamaFetch } = await import('../ollama.js');
-      const { ENV } = await import('../env.server.js');
-      const MODEL = 'gemma4-legal:latest';
-      const maxTokens = data.maxTokens ?? 2048;
-      const temperature = data.temperature ?? 0.3;
-
-      const userPrompt = `${acePrompt.contextWindow}\n\nQuestion: ${data.query}\n\nProvide a comprehensive legal analysis. Include [Source N] citations where applicable.`;
-
-      // Stage 2 LLM call with Langfuse tracing
-      const { answer, tokensUsed, generateMs } = await traceLLM('synthesis-worker', {
-        model: MODEL,
-        backend: 'ollama',
-        synthesisId: data.synthesisId,
-        caseId: data.caseId,
-        ragChunks: context.ragChunks.length,
-        kagNeighbors: context.kagNeighbors?.length ?? 0,
-      }, async (gen) => {
-        const llmStart = performance.now();
-        const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: MODEL,
-            messages: [
-              { role: 'system', content: acePrompt.systemPrompt },
-              { role: 'user', content: userPrompt },
-            ],
-            stream: false,
-            options: { num_predict: maxTokens, temperature },
-          }),
-          signal: AbortSignal.timeout(300_000), // 5 minutes — worker has no user-facing timeout
-        });
-
-        if (!res.ok) throw new Error(`Ollama ${res.status}: ${res.statusText}`);
-
-        const llmData = await res.json();
-        const answerText = (llmData.message?.content ?? '').trim();
-        const tokens = llmData.eval_count ?? Math.ceil(answerText.length / 4);
-        const durationMs = performance.now() - llmStart;
-
-        gen.end({ output: answerText.slice(0, 1000), usage: { promptTokens: llmData.prompt_eval_count, completionTokens: tokens } });
-        return { answer: answerText, tokensUsed: tokens, generateMs: durationMs };
-      });
-
-      // Stage 3: Extract citations
-      const citations: Array<{ id: string; sourceTitle: string; quote: string }> = [];
-      const refs = answer.match(/\[Source\s+(\d+)[^\]]*\]/g) ?? [];
-      const seen = new Set<string>();
-      for (const ref of refs) {
-        const match = ref.match(/\[Source\s+(\d+)/);
-        if (match && !seen.has(match[1])) {
-          seen.add(match[1]);
-          const idx = parseInt(match[1], 10) - 1;
-          const chunk = context.ragChunks[idx];
-          citations.push({
-            id: crypto.randomUUID(),
-            sourceTitle: chunk?.source ?? `Source ${match[1]}`,
-            quote: ref,
-          });
-        }
-      }
-
-      // Stage 4: Compute confidence
-      let confidence = 0.4;
-      if (answer.length > 100) confidence += 0.15;
-      if (answer.length > 300) confidence += 0.1;
-      if (citations.length > 0) confidence += 0.15;
-      if (citations.length >= 3) confidence += 0.1;
-      confidence = Math.min(0.95, confidence);
-
-      const totalMs = performance.now() - t0;
-
-      // Store full result in Redis
-      const result = {
-        synthesisId: data.synthesisId,
-        query: data.query,
-        answer,
-        citations,
-        evaluation: null, // ACE eval will be separate
-        confidence,
-        model: MODEL,
-        tokensUsed,
-        timing: {
-          contextMs: Math.round(contextMs),
-          generateMs: Math.round(generateMs),
-          evalMs: 0,
-          totalMs: Math.round(totalMs),
-        },
-        cached: false,
-        timestamp: new Date().toISOString(),
-        evaluationUrl:
-          data.enableACE !== false ? `/api/synthesis/evaluation/${data.synthesisId}` : null,
-        contextSources: {
-          ragChunks: context.ragChunks.length,
-          kagNeighbors: context.kagNeighbors.length,
-          codebaseChunks: context.codebaseContext?.length ?? 0,
-          hasEvidence: !!context.evidenceMetadata?.length,
-          hasGlossary: !!context.glossaryMatches?.length,
-          hasCaseContext: !!context.caseContext,
-          hasWebSearch: !!context.webSearchContext,
-        },
-      };
-
-      if (this.redisService) {
-        await this.redisService.set(
-          `synthesis:result:${data.synthesisId}`,
-          JSON.stringify(result),
-          'EX',
-          3600
-        );
-        await this.redisService.set(
-          `synthesis:status:${data.synthesisId}`,
-          JSON.stringify({
-            status: 'complete',
-            completedAt: new Date().toISOString(),
-            totalMs: Math.round(totalMs),
-          }),
-          'EX',
-          3600
-        );
-      }
-
-      // Fire ACE evaluation asynchronously
-      if (data.enableACE !== false) {
-        await this.publish(this.exchanges.document_processing, 'ace.evaluate', {
-          responseId: data.synthesisId,
-          query: data.query,
-          response: answer,
-          context: {
-            ragChunks: context.ragChunks,
-            kagNeighbors: context.kagNeighbors,
-            persona: context.persona,
-          },
-          enqueuedAt: new Date().toISOString(),
-        });
-      }
-
-      // Log inference to CouchDB (fire-and-forget)
-      import('../observability/inference-log.js')
-        .then(({ logLLMInference }) =>
-          logLLMInference({
-            model: MODEL,
-            backend: 'ollama',
-            latencyMs: Math.round(generateMs),
-            tokenCount: tokensUsed,
-            cacheHit: false,
-          })
-        )
-        .catch(() => {});
-
-      console.log(
-        `✅ Synthesis complete: ${data.synthesisId} (${Math.round(totalMs)}ms, ${tokensUsed} tokens)`
-      );
-      }); // End traceQueue
+      ); // End traceQueue
 
       this.channel.ack(msg);
     } catch (error) {

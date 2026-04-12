@@ -15,6 +15,8 @@ import { deleteSessionCookie, setSessionCookie, validateSession } from '$lib/ser
 import { startWorker } from '$lib/server/analysis/worker.js';
 import { productionLogger } from '$lib/server/production-logger.js';
 import { startRabbitMQPipeline } from '$lib/server/queue/rabbitmq-xstate-integration.js';
+import { startAudioQueueConsumer } from '$lib/server/workers/audio-queue-consumer.js';
+import { startDocumentEmbedConsumer } from '$lib/server/workers/document-embed-consumer.js';
 import { initializeQdrant } from '$lib/server/startup/qdrant-init.js';
 import { warmupTemplateCache } from '$lib/server/cache/report-template-cache.js';
 import { startIdleScanner } from '$lib/server/engagement/idle-reengagement.js';
@@ -118,9 +120,24 @@ if (shouldRunSingletonTasks) {
   startRabbitMQPipeline()
     .then(() => {
       console.log('[Boot] RabbitMQ consumers active');
+      // Start additional consumers after RabbitMQ is fully initialized
+      startDocumentEmbedConsumer()
+        .then(() => console.log('[Boot] Document embed consumer active'))
+        .catch((err) =>
+          console.warn('[Boot] Document embed consumer failed (non-fatal):', (err as Error).message)
+        );
     })
     .catch((err) => {
       console.warn('[Boot] RabbitMQ unavailable (non-fatal):', (err as Error).message);
+    });
+
+  // Start audio processing queue consumer (audio.process → Whisper + ACE + Qdrant)
+  startAudioQueueConsumer()
+    .then(() => {
+      console.log('[Boot] Audio queue consumer active');
+    })
+    .catch((err) => {
+      console.warn('[Boot] Audio queue consumer failed (non-fatal):', (err as Error).message);
     });
 
   // Initialize Qdrant collections (Priority #2: auto-create missing collections)
