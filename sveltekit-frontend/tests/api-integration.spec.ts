@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { PORTS } from './helpers/env-ports.js';
 
 /**
  * API Integration Tests
@@ -9,7 +10,7 @@ import { expect, test } from '@playwright/test';
  * Only 404 (route not wired) is treated as a failure.
  */
 
-const BASE = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE = PORTS.APP_BASE;
 
 test.describe('API Integration Tests', () => {
   test.describe('Cases API', () => {
