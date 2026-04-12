@@ -6,6 +6,7 @@ import { and, eq, sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { syncCaseToGraph } from '$lib/server/graph/pg-neo4j-sync.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const CASE_STATUS = ['open', 'in_progress', 'pending_review', 'closed', 'archived'] as const;
 const CASE_PRIORITY = ['low', 'medium', 'high', 'critical', 'urgent'] as const;
@@ -24,7 +25,7 @@ const isUuid = (s: string) =>
  * GET /api/cases/[id]
  * Fetch a single case by ID
  */
-export const GET: RequestHandler = async ({ locals, params }) => {
+export const GET: RequestHandler = async ({ locals, params, request }) => {
   try {
     const id = params.id;
 
@@ -46,10 +47,18 @@ export const GET: RequestHandler = async ({ locals, params }) => {
       return json({ message: 'Case not found' }, { status: 404 });
     }
 
-    return json({ success: true, data: caseData[0] });
+    const responseData = { success: true, data: caseData[0] };
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+
+    return json(responseData, {
+      headers: { ...cacheControl.private, ETag: etag }
+    });
   } catch (err) {
     console.error('[api/cases/[id]] GET failed:', err);
-    return json({ success: false, data: null, _degraded: true });
+    return json({ success: false, data: null, _degraded: true }, {
+      headers: cacheControl.private
+    });
   }
 };
 

@@ -4,12 +4,13 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
 import { getWeeklySummary } from '$lib/server/analytics/event-logger.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const querySchema = z.object({
 	userId: z.string().min(1, 'userId required').max(200)
 });
 
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	if (!parsed.success) {
@@ -17,5 +18,11 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	}
 	const { userId } = parsed.data;
 	const summary = await getWeeklySummary(userId);
-	return json(summary);
+
+	const { etag, isMatch } = checkETag(summary, request.headers);
+	if (isMatch) return notModified(etag);
+
+	return json(summary, {
+		headers: { ...cacheControl.medium, ETag: etag }
+	});
 };

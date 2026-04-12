@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { pool } from '$lib/server/db/client';
 import { z } from 'zod';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const searchQuerySchema = z.object({
 	q: z.string().min(2, 'Query must be at least 2 characters').max(1000),
@@ -512,7 +513,7 @@ async function searchCanon(q: string, limit: number, jurisdiction?: string, auth
 
 // ── Main Handler ──────────────────────────────────────────────────────────
 
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const parsed = searchQuerySchema.safeParse({
 		q: url.searchParams.get('q')?.trim() ?? '',
@@ -535,7 +536,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			groups[hit.entityType] = (groups[hit.entityType] ?? 0) + 1;
 		}
 
-		return json({
+		const cachedResponse = {
 			query: q,
 			type,
 			totalResults: cachedResult.results.length,
@@ -546,6 +547,13 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 				adapters: cachedResult.timings as AdapterTimings,
 				semanticCacheHit: true,
 			},
+		};
+
+		const { etag, isMatch } = checkETag(cachedResponse, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(cachedResponse, {
+			headers: { ...cacheControl.short, ETag: etag }
 		});
 	}
 
@@ -616,13 +624,20 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			console.warn('[search] Cache write failed (non-fatal):', err)
 		);
 
-		return json({
+		const responseData = {
 			query: q,
 			type,
 			totalResults: hits.length,
 			groups,
 			hits,
 			timing,
+		};
+
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.short, ETag: etag }
 		});
 	} catch (err) {
 		console.error('[search] error:', err);
@@ -636,6 +651,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 				totalMs: Math.round(performance.now() - startTime),
 				adapters: adapterTimings,
 			},
+		}, {
+			headers: cacheControl.short
 		});
 	}
 };

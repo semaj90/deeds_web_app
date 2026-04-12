@@ -8,6 +8,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { generateSparseVector } from '$lib/server/vector/bm42-sparse.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const sql = postgres(getDatabaseUrl());
 const qdrant = new QdrantClient({ url: getQdrantUrl() });
@@ -343,7 +344,7 @@ const knowledgeSearchSchema = z.object({
 /**
  * GET /api/knowledge - Search knowledge base with RAG
  */
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const parsed = knowledgeSearchSchema.safeParse(Object.fromEntries(url.searchParams));
   if (!parsed.success) {
@@ -389,13 +390,20 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       source: r.payload?.source
     }));
 
-    return json({
+    const responseData = {
       success: true,
       query: matches,
       count: matches.length,
       avg_similarity: matches.length > 0
         ? (matches.reduce((sum, m) => sum + m.score, 0) / matches.length).toFixed(2)
         : 0
+    };
+
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+
+    return json(responseData, {
+      headers: { ...cacheControl.short, ETag: etag }
     });
   } catch (err) {
     console.error('Search error:', err);
@@ -404,6 +412,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       query: [],
       count: 0,
       avg_similarity: 0,
+    }, {
+      headers: cacheControl.short
     });
   }
 };
