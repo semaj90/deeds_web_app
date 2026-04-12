@@ -7,6 +7,7 @@ import { and, eq } from 'drizzle-orm';
 import { boardSnapshotSchema } from '$lib/schemas/board';
 import { verifyCanvasStatesTable } from '$lib/server/db/verify-canvas-table';
 import { isUuid } from '$lib/server/validation.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 export const POST: RequestHandler = async ({ params, request, locals }) => {
     if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -67,7 +68,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     }
 };
 
-export const GET: RequestHandler = async ({ params, locals }) => {
+export const GET: RequestHandler = async ({ params, locals, request }) => {
   const { id } = params; // Changed from caseId to id
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   if (!id) return json({ error: 'Missing case id' }, { status: 400 });
@@ -88,7 +89,10 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 
     if (!stateEntry) return json(null);
 
-    return json(stateEntry.stateData);
+    const responseData = stateEntry.stateData;
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+    return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
   } catch (e: unknown) {
     console.error('Error loading canvas:', e);
 

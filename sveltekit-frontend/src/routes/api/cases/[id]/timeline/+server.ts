@@ -16,6 +16,7 @@ import {
 } from '$lib/server/db/schema-postgres.js';
 import { eq, desc, sql, and, inArray } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(200).default(50),
@@ -38,7 +39,7 @@ interface TimelineEvent {
  * GET /api/cases/[id]/timeline
  * Aggregated case activity timeline — who, what, why, how
  */
-export const GET: RequestHandler = async ({ params, locals, url }) => {
+export const GET: RequestHandler = async ({ params, locals, url, request }) => {
   if (!locals.user) throw error(401, 'Unauthorized');
 
   const caseId = params.id;
@@ -285,12 +286,15 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
     events.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
     const limited = events.slice(0, limit);
 
-    return json({
+    const responseData = {
       events: limited,
       totalEvents: events.length,
       caseId,
       types: [...allowedTypes],
-    });
+    };
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+    return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
   } catch (err) {
     console.error('[timeline] GET error:', err);
     return json({ events: [], totalEvents: 0, caseId, types: [] });

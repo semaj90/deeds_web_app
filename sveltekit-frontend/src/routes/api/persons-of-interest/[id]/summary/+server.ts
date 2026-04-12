@@ -7,6 +7,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 /** GBNF-constrained response schema for POI summary */
 const poiSummaryResponseSchema = z.object({
@@ -19,7 +20,7 @@ const poiSummaryResponseJsonSchema = z.toJSONSchema(poiSummaryResponseSchema);
  * GET /api/persons-of-interest/[id]/summary
  * Return stored AI summary from personsOfInterest.aiProfile.summary
  */
-export const GET: RequestHandler = async ({ params, locals }) => {
+export const GET: RequestHandler = async ({ params, locals, request }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
@@ -31,7 +32,10 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     })
     .from(personsOfInterest)
     .where(
-      and(eq(personsOfInterest.id, params.id), or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy)))
+      and(
+        eq(personsOfInterest.id, params.id),
+        or(eq(personsOfInterest.createdBy, locals.user.id), isNull(personsOfInterest.createdBy))
+      )
     )
     .limit(1)
     .then((r) => r[0]);
@@ -39,13 +43,16 @@ export const GET: RequestHandler = async ({ params, locals }) => {
   if (!poi) return json({ error: 'Person of interest not found' }, { status: 404 });
 
   const profile = poi.aiProfile as Record<string, unknown> | null;
-  return json({
+  const responseData = {
     poiId: params.id,
     name: poi.name,
     summary: (profile?.summary as string) ?? null,
     riskLevel: poi.threatLevel,
     generatedAt: (profile?.summaryGeneratedAt as string) ?? null,
-  });
+  };
+  const { etag, isMatch } = checkETag(responseData, request.headers);
+  if (isMatch) return notModified(etag);
+  return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
 };
 
 /**

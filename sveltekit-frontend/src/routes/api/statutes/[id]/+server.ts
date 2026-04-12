@@ -10,28 +10,32 @@ import { statutes } from '$lib/server/db/schema-postgres';
 import { eq } from 'drizzle-orm';
 import { isUuid } from '$lib/server/validation.js';
 import { z } from 'zod';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const updateSchema = z.object({
-	title: z.string().trim().min(1).max(500).optional(),
-	section: z.string().max(200).optional(),
-	content: z.string().optional(),
-	jurisdiction: z.string().max(200).optional(),
-	category: z.string().max(200).optional(),
-	effectiveDate: z.string().optional(),
-	sourceUrl: z.string().url().max(2000).optional(),
+  title: z.string().trim().min(1).max(500).optional(),
+  section: z.string().max(200).optional(),
+  content: z.string().optional(),
+  jurisdiction: z.string().max(200).optional(),
+  category: z.string().max(200).optional(),
+  effectiveDate: z.string().optional(),
+  sourceUrl: z.string().url().max(2000).optional(),
 });
 
-export const GET: RequestHandler = async ({ params, locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
-	if (!isUuid(params.id)) return json({ item: null }, { status: 400 });
+export const GET: RequestHandler = async ({ params, locals, request }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!isUuid(params.id)) return json({ item: null }, { status: 400 });
 
-	try {
-		const rows = await db.select().from(statutes).where(eq(statutes.id, params.id)).limit(1);
-		if (!rows[0]) return json({ item: null }, { status: 404 });
-		return json({ item: rows[0] });
-	} catch {
-		return json({ item: null }, { status: 500 });
-	}
+  try {
+    const rows = await db.select().from(statutes).where(eq(statutes.id, params.id)).limit(1);
+    if (!rows[0]) return json({ item: null }, { status: 404 });
+    const responseData = { item: rows[0] };
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+    return json(responseData, { headers: { ...cacheControl.long, ETag: etag } });
+  } catch {
+    return json({ item: null }, { status: 500 });
+  }
 };
 
 export const PUT: RequestHandler = async ({ params, request, locals }) => {

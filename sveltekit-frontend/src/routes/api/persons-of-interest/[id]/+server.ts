@@ -4,6 +4,7 @@ import { db } from '$lib/server/db/client';
 import { personsOfInterest, poiPhotos, timelineEvents } from '$lib/server/db/schema-postgres.js';
 import { and, eq, isNull, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const poiIdSchema = z.string().uuid('Invalid person of interest id');
 
@@ -22,7 +23,7 @@ const updatePoiSchema = z.object({
  * GET /api/persons-of-interest/[id]
  * Retrieve a single person of interest by ID
  */
-export const GET: RequestHandler = async ({ params, locals }) => {
+export const GET: RequestHandler = async ({ params, locals, request }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   const parsedId = poiIdSchema.safeParse(params.id);
   if (!parsedId.success) {
@@ -48,12 +49,15 @@ export const GET: RequestHandler = async ({ params, locals }) => {
       return json({ error: 'Person of interest not found' }, { status: 404 });
     }
 
-    return json({
+    const responseData = {
       ...poi,
       caseId: poi.caseIds?.[0] ?? null,
       createdAt: poi.createdAt?.toISOString() ?? '',
       updatedAt: poi.updatedAt?.toISOString() ?? '',
-    });
+    };
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+    return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
   } catch (err) {
     console.error('[poi] GET error:', err);
     return json({

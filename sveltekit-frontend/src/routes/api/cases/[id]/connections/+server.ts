@@ -4,6 +4,7 @@ import { cases, evidenceBoardConnections } from '$lib/server/db/schema-postgres.
 import { eq, and } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
 import { z } from 'zod';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const connectionCreateSchema = z.object({
   fromEvidenceId: z.string().uuid('Invalid fromEvidenceId'),
@@ -31,7 +32,7 @@ const connectionDeleteSchema = z.object({
  * GET /api/cases/[id]/connections
  * Load all evidence board connections for a case
  */
-export const GET: RequestHandler = async ({ params, locals }) => {
+export const GET: RequestHandler = async ({ params, locals, request }) => {
   if (!locals.user) throw error(401, 'Unauthorized');
 
   const [targetCase] = await db
@@ -47,7 +48,10 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     .from(evidenceBoardConnections)
     .where(eq(evidenceBoardConnections.caseId, params.id));
 
-  return json({ connections });
+  const responseData = { connections };
+  const { etag, isMatch } = checkETag(responseData, request.headers);
+  if (isMatch) return notModified(etag);
+  return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
 };
 
 /**

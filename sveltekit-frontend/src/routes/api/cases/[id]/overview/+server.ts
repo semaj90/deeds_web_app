@@ -4,8 +4,9 @@ import { cases, evidence, personsOfInterest } from '$lib/server/db/schema-postgr
 import { and, arrayContains, eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { isUuid } from '$lib/server/validation.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
-export const GET: RequestHandler = async ({ params, locals }) => {
+export const GET: RequestHandler = async ({ params, locals, request }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}
@@ -85,5 +86,8 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			riskScore: p.threatLevel ?? '—',
 			aiSummary: ((p.aiProfile as Record<string, unknown> | null)?.summary as string) ?? null
 		}))
-	});
+	};
+	const { etag, isMatch } = checkETag(responseData, request.headers);
+	if (isMatch) return notModified(etag);
+	return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
 };

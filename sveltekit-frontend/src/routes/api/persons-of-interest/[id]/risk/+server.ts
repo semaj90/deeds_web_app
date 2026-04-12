@@ -7,6 +7,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 
 /** GBNF-constrained response schema for POI risk assessment */
 const riskResponseSchema = z.object({
@@ -86,24 +87,27 @@ export const GET: RequestHandler = async ({ params, locals }) => {
   const riskLevel =
     riskScore >= 75 ? 'critical' : riskScore >= 50 ? 'high' : riskScore >= 25 ? 'medium' : 'low';
 
-  return json({
-    poiId: poi.id,
-    name: poi.name,
-    riskScore: Math.min(riskScore, 100),
-    riskLevel,
-    signals: {
-      threatLevel: { value: poi.threatLevel, score: threatScore, weight: 0.4 },
-      evidenceVolume: { value: evidenceCount, score: evidenceSignal, weight: 0.2 },
-      caseSeverity: { value: caseSeverity, score: caseSeveritySignal, weight: 0.2 },
-      activeCases: { value: activeCases, score: activeCaseSignal, weight: 0.2 },
+  return json(
+    {
+      poiId: poi.id,
+      name: poi.name,
+      riskScore: Math.min(riskScore, 100),
+      riskLevel,
+      signals: {
+        threatLevel: { value: poi.threatLevel, score: threatScore, weight: 0.4 },
+        evidenceVolume: { value: evidenceCount, score: evidenceSignal, weight: 0.2 },
+        caseSeverity: { value: caseSeverity, score: caseSeveritySignal, weight: 0.2 },
+        activeCases: { value: activeCases, score: activeCaseSignal, weight: 0.2 },
+      },
+      metadata: {
+        totalCases: caseCount,
+        totalEvidence: evidenceCount,
+        existingAiProfile: poi.aiProfile ?? null,
+      },
+      computedAt: new Date().toISOString(),
     },
-    metadata: {
-      totalCases: caseCount,
-      totalEvidence: evidenceCount,
-      existingAiProfile: poi.aiProfile ?? null,
-    },
-    computedAt: new Date().toISOString(),
-  });
+    { headers: cacheControl.short }
+  );
 };
 
 /**

@@ -21,15 +21,16 @@ const personDeleteSchema = z.object({
 });
 
 import { isUuid } from '$lib/server/validation.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 /** GET — list all POI linked to a case with relationship metadata */
-export const GET: RequestHandler = async ({ params, locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
-	if (!isUuid(params.id)) return json({ error: 'Invalid case ID format' }, { status: 400 });
+export const GET: RequestHandler = async ({ params, locals, request }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!isUuid(params.id)) return json({ error: 'Invalid case ID format' }, { status: 400 });
 
-	const caseId = params.id;
+  const caseId = params.id;
 
-	const [targetCase] = await db
+  const [targetCase] = await db
     .select({ id: cases.id })
     .from(cases)
     .where(and(eq(cases.id, caseId), eq(cases.userId, locals.user.id)))
@@ -37,30 +38,33 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 
   if (!targetCase) return json({ error: 'Case not found' }, { status: 404 });
 
-	const rows = await db
-		.select({
-			linkId: casePersons.id,
-			personId: personsOfInterest.id,
-			fullName: personsOfInterest.fullName,
-			role: personsOfInterest.role,
-			riskLevel: personsOfInterest.riskLevel,
-			dob: personsOfInterest.dob,
-			lastKnownLocation: personsOfInterest.lastKnownLocation,
-			notes: personsOfInterest.notes,
-			relationshipType: casePersons.relationshipType,
-			isPrimary: casePersons.isPrimary,
-			linkedAt: casePersons.createdAt,
-		})
-		.from(casePersons)
-		.innerJoin(personsOfInterest, eq(casePersons.personId, personsOfInterest.id))
-		.where(eq(casePersons.caseId, caseId));
+  const rows = await db
+    .select({
+      linkId: casePersons.id,
+      personId: personsOfInterest.id,
+      fullName: personsOfInterest.fullName,
+      role: personsOfInterest.role,
+      riskLevel: personsOfInterest.riskLevel,
+      dob: personsOfInterest.dob,
+      lastKnownLocation: personsOfInterest.lastKnownLocation,
+      notes: personsOfInterest.notes,
+      relationshipType: casePersons.relationshipType,
+      isPrimary: casePersons.isPrimary,
+      linkedAt: casePersons.createdAt,
+    })
+    .from(casePersons)
+    .innerJoin(personsOfInterest, eq(casePersons.personId, personsOfInterest.id))
+    .where(eq(casePersons.caseId, caseId));
 
-	const persons = rows.map(r => ({
-		...r,
-		isPrimary: r.isPrimary === 'true',
-	}));
+  const persons = rows.map((r) => ({
+    ...r,
+    isPrimary: r.isPrimary === 'true',
+  }));
 
-	return json({ persons, total: persons.length });
+  const responseData = { persons, total: persons.length };
+  const { etag, isMatch } = checkETag(responseData, request.headers);
+  if (isMatch) return notModified(etag);
+  return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
 };
 
 /** POST — link a person to a case */
