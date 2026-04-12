@@ -409,156 +409,128 @@ See `memory/corruption-patterns.md` for detection patterns and fix strategies.
 
 ---
 
-## Directory Audit Protocol (MANDATORY before moving/archiving)
+## Unified Audit Gate System (20 Gates)
 
-**Root cause**: Previous audits moved `$lib/webgpu/` as "dead" — but root layout (`+layout.svelte`) imports `$lib/webgpu/webgpu-init` + `$lib/webgpu/webgpu-cpu-fallback` on **every page load**. Moving it would have broken the entire app.
-
-**Automated script**: `bash sveltekit-frontend/scripts/audit/orphan-detector.sh [dir]` — single-pass rg+awk, scans 545 components in ~10s. Results: 492 wired | 50 orphans | 3 edge cases (April 7, 2026).
-
-**MSYS/Git Bash glob bug**: Never use `rg $GLOB_VAR` with `--glob *.ts` — shell expands `*`. Use bash arrays: `RG_GLOB=(--glob '*.ts')` → `"${RG_GLOB[@]}"`.
-
-**BEFORE moving ANY directory to `deeds_labs/`, run this 10-layer checklist:**
+**Use cases:** (a) pre-archive safety, (b) post-wire verification, (c) infrastructure health audit.
+**Automated:** `bash sveltekit-frontend/scripts/audit/orphan-detector.sh [dir]` covers Tier A (~10s).
+**MSYS/Git Bash:** Use bash arrays for globs: `RG_GLOB=(--glob '*.ts')` then `"${RG_GLOB[@]}"`.
 
 ```bash
-MODULE="ComponentName"
+MODULE="ComponentName"   # or filename stem, API path, table name
 
-# ── PRIMARY (must check ALL three) ──
+# ══════════════════════════════════════════════════════════════
+# TIER A: CODE CONNECTIVITY (run ALL for archive decisions)
+# ══════════════════════════════════════════════════════════════
 
-# L1: Static ESM imports
+# G1: Static ESM imports
 rg "from.*$MODULE" src/ --type ts --type svelte
 
-# L2: Dynamic ESM imports (517 files use await import(); mcp/server.ts has 12+)
+# G2: Dynamic ESM imports (mcp/server.ts: 12, hooks.server.ts: 3, API routes: ~80+)
 rg "import\(.*$MODULE" src/ --type ts --type svelte
 
-# L3: CJS require (rare: proto, OCR, astVectorizer)
+# G3: CJS require (rare: proto, OCR, astVectorizer)
 rg "require\(.*$MODULE" src/ --type ts
 
-# ── HIDDEN DEPENDENCY LAYERS (miss these = break production) ──
+# G4: @vite-ignore variable imports (4 files: drizzle.ts, granite-docling.ts, fastjson.ts, CanvasBoard.svelte)
+rg "@vite-ignore" src/ --type ts --type svelte -l
 
-# L4: Re-export barrels (57 files) — module may be re-exported via index.ts
-# A barrel importing MODULE means all barrel consumers depend on it transitively
+# G5: Barrel re-exports (37 index.ts files) — barrel consumers import MODULE transitively
 rg "export.*from.*$MODULE" src/lib/ --type ts
 rg "$MODULE" src/lib/components/*/index.ts src/lib/services/*/index.ts
 
-# L5: SvelteKit load→data binding (88 load fns, 677 data refs)
-# +page.server.ts exports props consumed by +page.svelte via $props().data
-# Renaming/removing a load property breaks the page silently
-# Check: is MODULE a +page.server.ts or +layout.server.ts? → consumers are implicit
+# G6: SvelteKit load→data binding — +page.server.ts props consumed via $props().data (implicit)
+# If MODULE is a route file (+page.svelte, +server.ts, +layout.svelte) → NOT an orphan
 
-# L6: fetch('/api/...') wiring (193 files, 4865 refs)
-# Server routes have 0 file imports but ARE wired via client-side fetch()
+# G7: fetch('/api/...') wiring (193 files, 4865 refs) — server routes wired via client fetch()
 rg "fetch.*$MODULE" src/ --type ts --type svelte
 
-# ── SECONDARY (check for edge cases) ──
-
-# L7: Component registries/maps (50 files) — string-keyed lookups
-rg "componentMap\|registry\|loadComponent" src/ | grep -i "$MODULE"
-
-# L8: Event coupling (2805 occurrences across .svelte files)
-# AnalysisPanel has 0 static imports but IS wired via yorha:open-analysis event
+# G8: Event coupling (yorha: namespace, CustomEvent dispatch/listen)
 rg "CustomEvent.*$MODULE\|addEventListener.*$MODULE\|dispatchEvent.*$MODULE" src/
-rg "yorha:" src/  # known event namespace
+rg "yorha:" src/ --type svelte -l   # 9 files use yorha: events
 
-# L9: .svelte.ts store consumers (37 store files, each has 10+ consumers)
-# Moving a store breaks all components that import it
+# G9: .svelte.ts store consumers (35 store files, 10+ consumers each)
 rg "from.*$MODULE" src/ --glob "*.svelte" --glob "*.svelte.ts"
+
+# ══════════════════════════════════════════════════════════════
+# TIER B: DATA LAYER (run for DB/schema/vector changes)
+# ══════════════════════════════════════════════════════════════
+
+# G10: Drizzle schema refs — tables/enums from schema-postgres.ts (70+ tables, 14 enums)
+rg "from.*schema-postgres" src/ --type ts -l
+rg "$MODULE" src/lib/server/db/schema-postgres.ts
+
+# G11: DB client import — MUST be db/client (node-postgres Pool), NOT db/index (postgres.js)
+rg "from.*db/index" src/ --type ts     # WRONG — should be 0 hits
+rg "from.*db/client" src/ --type ts    # CORRECT
+
+# G12: Vector/Qdrant collection coupling — pgvector tables + Qdrant collection refs
+rg "$MODULE" src/lib/server/vector/ --type ts
+rg "collection.*$MODULE\|$MODULE.*collection" src/ --type ts
+
+# ══════════════════════════════════════════════════════════════
+# TIER C: INFRASTRUCTURE (run for service/infra changes)
+# ══════════════════════════════════════════════════════════════
+
+# G13: Docker service ports (5432 PG, 6379 Redis, 6333 Qdrant, 9000 MinIO, 5672 RabbitMQ)
+rg "5432\|6379\|6333\|9000\|5672\|50051\|4222\|8095" src/lib/server/ --type ts -l
+
+# G14: Native addon — .node binary via createRequire (libtorch-bridge, astVectorizer, simdjson)
+rg "\.node['\")]\|createRequire" src/ --type ts -l   # 3 known consumers
+
+# G15: Proto/gRPC contract — proto file consumers and gRPC client refs
+rg "proto\|grpc\|gRPC" src/lib/server/ --type ts -l
+# If changing a .proto: rg "ProtoEmbedding\|ProtoHealth" src/ --type ts
+
+# G16: Worker thread coupling — compute-pool parent ↔ worker child refs
+rg "worker_threads\|Worker\(\|compute-pool\|compute-worker" src/ --type ts --type js -l
+
+# G17: Env variable / hardcoded URL — should use ENV.* getters, not literals
+rg "localhost\|127\.0\.0\.1" src/lib/server/ --type ts   # should be 0 outside env.server.ts
+
+# ══════════════════════════════════════════════════════════════
+# TIER D: SECURITY + RUNTIME (run for API routes, new features)
+# ══════════════════════════════════════════════════════════════
+
+# G18: Auth guard — API route must check locals.user (358/386 routes covered)
+rg "locals\.user\|requireAuth\|getSession" src/routes/api/$MODULE/ --type ts
+
+# G19: Zod validation — API route should validate input (282/386 routes covered)
+rg "import.*zod\|from.*zod\|z\.\|zodSchema" src/routes/api/$MODULE/ --type ts
+
+# G20: SSR safety — browser-only APIs need onMount/typeof window guard
+rg "window\.\|document\.\|localStorage\|IndexedDB" src/lib/$MODULE --type svelte
+# If hits: verify guarded by onMount() or typeof window !== 'undefined'
+# Or route has export const ssr = false
 ```
 
-Also check:
-- Is it a SvelteKit route file (`+page.svelte`, `+server.ts`)? → NOT an orphan
-- Config references (`unocss.config.ts` safelist, `svelte.config.js`, `vite.config.ts`)
-- `@vite-ignore` variable imports (4 files: drizzle.ts, granite-docling.ts, fastjson.ts, CanvasBoard.svelte)
+Also check: config refs (`unocss.config.ts`, `svelte.config.js`, `vite.config.ts`), SvelteKit route files are NEVER orphans.
 
-**Lesson learned (March 22, 2026):** `docling.ts` was incorrectly archived because static grep found 0 consumers. Dynamic grep found 3 active `await import('../lib/server/docling.js')` calls in `mcp/server.ts`, `api/ace/ingest`, and `api/evidence/upload`. Always check both static AND dynamic imports.
+### Decision Tree (post-gate)
 
-**Key directories/files that LOOK dead but ARE wired:**
+1. **G1-G9 all zero?** → Orphan candidate
+2. **Read the file** — corrupted, <10 lines, garbled? → **ARCHIVE**
+3. **Unique feature?** — superseded by another module? → **ARCHIVE**
+4. **Svelte 4 syntax** (`export let`, `$:`, `on:click`) but valuable? → **REWRITE**
+5. **No integration point?** — no route/layout to host it? → **ARCHIVE**
+6. **< 30 min to wire?** → **WIRE** / else **DEFER**
+7. **After wiring**, verify: import → render → trigger → API routes → props → data flow. Gap? → **SHALLOW**
+
+**Shallow wiring indicators:** no-op `() => {}` callbacks, imported but never rendered, fetch to nonexistent API, props bound to unset `$state`, conditional render that never triggers.
+
+**Automated:** `/audit-components [dir]`, `/prune-codebase [dir]`, `/wire-modules [dir]`
+
+### Known False Negatives (LOOK dead but ARE wired)
+
 - `$lib/webgpu/` — root layout WebGPU init (every page)
 - `$lib/gpu/` — active compute pipeline (3 WGSL shaders, search reranker)
-- `$lib/ai/onnx/` — client-side ONNX inference (WebGPU → WASM → CPU)
-- `simd-bridge/cpp/` — LibTorch/CUDA N-API addon (3 GPU functions verified)
-- `components/analysis/AnalysisPanel.svelte` — dynamic import in +layout.svelte + `yorha:open-analysis` event (L4+L9)
-- `components/KeyboardShortcutsPanel.svelte` — dynamic-only imports in layout (L2, 0 static)
-- `chr97-builder.ts` / `cartridge-tensor-bridge.ts` — active tensor caching pipeline (4 API endpoints)
-- `lib/server/db/drizzle.ts` cache import — uses `@vite-ignore` variable import (L4)
+- `$lib/ai/onnx/` — client ONNX inference (WebGPU → WASM → CPU)
+- `simd-bridge/cpp/` — LibTorch/CUDA N-API addon (3 GPU functions, G14)
+- `AnalysisPanel.svelte` — dynamic import + `yorha:open-analysis` event (G2+G8)
+- `KeyboardShortcutsPanel.svelte` — dynamic-only import in layout (G2, 0 static)
+- `chr97-builder.ts` / `cartridge-tensor-bridge.ts` — tensor caching (4 API endpoints)
+- `lib/server/db/drizzle.ts` — `@vite-ignore` variable import (G4)
 
-**`deeds_labs/` is gitignored** — moving files there is effectively permanent deletion. Measure twice, cut once.
-
----
-
-## Component Wiring Audit Methodology (8-Gate Test)
-
-When auditing orphan components, apply this 8-gate test to decide **wire**, **rewrite**, or **archive**:
-
-| Gate | Question | Pass | Fail |
-|------|----------|------|------|
-| G0: Static imports? | `grep -r "from.*MODULE" src/` finds consumers? | Continue | Continue to G0.5 |
-| G0.5: Dynamic imports? | `grep -r "import(.*MODULE" src/` finds `await import()` consumers? | → HAS CONSUMERS (do not archive) | Continue to G1 |
-| G1: Functional? | Clean code, compiles, Svelte 5 runes? | Continue | → ARCHIVE (corrupted) |
-| G2: Feature gap? | Unique functionality no other component covers? | Continue | → ARCHIVE (redundant) |
-| G3: Rewrite potential? | If broken/Svelte 4, is the feature valuable enough to rewrite? | → REWRITE candidate | Continue to G4 |
-| G4: Integration point? | Natural route or layout that logically hosts it? | Continue | → ARCHIVE (homeless) |
-| G5: Low effort? | Wire in < 30 min (import + render, not deep refactor)? | → WIRE | → DEFER to backlog |
-| G6: Fully wired? | End-to-end: import → render → trigger path → API routes → props → data flow? | FULLY WIRED | → SHALLOW (incomplete) |
-
-**Gate 0.5 — Dynamic Import Detection** (CRITICAL — added March 22, 2026):
-
-115 files in `src/` use `await import()`. Static `grep -r "from.*MODULE"` misses these entirely.
-Key hotspots: `mcp/server.ts` (12 dynamic imports), `hooks.server.ts` (3), `queue-worker.ts` (1), API routes (~80+).
-
-**Before declaring any file "0 consumers":**
-```bash
-grep -r "from.*MODULE" src/           # static imports
-grep -r "import(.*MODULE" src/        # dynamic imports (MUST CHECK)
-grep -r "require(.*MODULE" src/       # CJS require (rare)
-```
-
-**Gate 6 — Deep Wiring Verification** (post-wire check):
-After wiring a component, verify the full chain is connected:
-1. **Import exists** — `grep -r "ComponentName" src/` shows the import (static OR dynamic)
-2. **Render exists** — The importing file actually renders it (`<ComponentName` or `{@render`)
-3. **Trigger reachable** — Rendered UI, `onMount`, form submit, load function, or machine transition actually calls the handler/fetch; no dead helper function or permanently-false branch
-4. **API routes exist** — If component calls `fetch('/api/...')`, verify `+server.ts` exists
-5. **Props connected** — Callback props wired to real handlers, NOT `() => {}` no-ops
-6. **Data flows** — Component receives real data from `$props()`, not placeholders
-
-**Shallow wiring indicators** (G6 fail):
-- `onCallback={() => {}}` or `onCallback={() => console.log()}` — no-op handlers
-- Component imported but never rendered in template
-- Handler or `fetch('/api/...')` exists but no rendered control/state transition can trigger it
-- Trigger only exists behind a branch that never becomes true with current state/data
-- Component rendered but its API endpoints don't exist
-- Dynamic import loaded but conditional render never triggers
-- Props bound to `$state` that's declared but never set
-
-**Automated via slash commands:**
-- `/audit-components [dir]` — Scan for orphans, apply 6-gate test, report + execute
-- `/prune-codebase [dir]` — Full garden audit across `src/lib/` — dead ratios, cross-cutting checks, AI-driven analysis, health report
-- `/wire-modules [dir]` — Find and fix broken imports, missing API routes, stale types
-
-**Rewrite indicators** (G3 pass):
-- Clean logic but Svelte 4 syntax (`export let`, `$:`, `on:click`) — mechanical migration
-- Feature exists nowhere else in codebase
-- Previously imported (check `git log` for removed imports)
-
-**Archive indicators** (any gate fail):
-- Corrupted syntax, < 10 lines, garbled code
-- Superseded by `$lib/services/*.ts` (e.g., `speak.ts` → `tts.ts`)
-- Storybook `.stories.ts` when Storybook is inactive
-- Test files for deleted/archived code
-
-**Examples from Session 100+:**
-- `KeyboardShortcutsPanel.svelte` → WIRE + G6 PASS: All 6 gates pass — clean Svelte 5, unique feature, `?` key in layout (line 58-63), `bind:open` (line 102), fully wired end-to-end
-- `speak.ts` → ARCHIVE: Fails G2 — superseded by `$lib/services/tts.ts` (160-line TTSService)
-- `AIChat.stories.ts` → ARCHIVE: Fails G4 — Storybook not active, references non-existent component
-
-**Process:**
-1. `grep -r "ComponentName" src/routes/ src/lib/` — check static import count
-2. `grep -r "import(.*ComponentName" src/` — check dynamic import count
-3. If 0 static AND 0 dynamic imports → orphan candidate
-4. Read the file — assess code quality
-5. Apply gates G1→G5 in order (stop at first fail)
-6. Execute action: WIRE / REWRITE / ARCHIVE / DEFER
-7. After wiring, apply G6 to verify end-to-end connection
+**`deeds_labs/` is gitignored** — moving files there is permanent deletion. Measure twice, cut once.
 
 ---
 

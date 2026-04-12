@@ -2,19 +2,30 @@
  * Server-Side Inference Router
  *
  * Routes LLM inference through the best available backend:
+ *
+ * TEXT-ONLY CASCADE:
  *   1. TensorRT-LLM (INT4 AWQ on :8099) — if GPU lease available
  *   2. Triton TensorRT service (:8000) — production GPU fallback
- *   3. TurboQuant llama-server (:8090) — turbo3 KV cache compression (5x VRAM savings)
- *   4. Bifrost/LiteLLM (semantic cache) — when enabled
- *   5. VLM server (:8085) — Gemma 4 E4B HF Transformers + NF4, vision + text
+ *   3. Bifrost cache-check (:3040, 500ms deadline) — ε-greedy; cache hits ~5ms (28× speedup)
+ *      Bypassed adaptively for high-temp / long-prompt / vision (MeanCache algorithm)
+ *   4. TurboQuant llama-server (:8090) — turbo3 KV cache compression (5× VRAM savings)
+ *   4b. Bifrost full fallback — Ollama round-trip, only when TurboQuant is also down
+ *   5. VLM server (:8085) — Gemma 4 E4B HF Transformers + NF4, text fallback
  *   6. LiteRT-LM (:8070) — CPU sidecar, Gemma 4 E2B with MTP 4-head speculative decode
  *   7. Ollama (gemma4-legal, Q4_K_M + Q8_0 KV) — default local/dev fallback
  *
- * TurboQuant (ICLR 2026): Training-free KV cache quantization.
- * Runs same GGUF model as Ollama but with turbo3 compressed KV cache.
+ * VISION (IMAGE + TEXT) CASCADE:
+ *   1. TurboQuant with --mmproj (:8090) — unified VLM at ~80 tok/s, NO VRAM swap needed
+ *   2. HF VLM server (:8085) — Gemma 4 E4B Legal fine-tune, NF4 quantization
+ *   3. Ollama VLM (gemma4:e4b-it-q4_K_M) — native multimodal API, stock SigLIP tower
+ *
+ * TurboQuant (ICLR 2026): Training-free KV cache quantization + native multimodal.
+ * With --mmproj, handles vision+text at same speed as text-only (~80 tok/s).
  * 8x attention speedup on GPU, 5x VRAM savings. OpenAI-compatible API.
- * Build: cmake -B build -DGGML_CUDA=ON && cmake --build build (turboquant_plus fork)
- * Run: llama-server -m gemma4-legal.gguf -ctk turbo3 -ctv turbo3 --port 8090
+ *
+ * Startup with vision:
+ *   llama-server -m gemma4-legal.gguf --mmproj siglip.gguf \
+ *     -ctk turbo3 -ctv turbo3 --port 8090 -ngl 99 --flash-attn on
  *
  * GPU arbiter ensures TRT-LLM and Ollama don't fight for VRAM.
  * All backends return the same response shape.
@@ -40,39 +51,45 @@ const TRT_MIN_VRAM_MB = 4000;
 // When VLM is needed, we stop llama-server, run VLM, then restart it.
 const TURBOQUANT_EXE = process.env.TURBOQUANT_EXE_PATH ?? 'C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe';
 const TURBOQUANT_GGUF = process.env.TURBOQUANT_MODEL_PATH ?? '';
+const TURBOQUANT_MMPROJ =
+  process.env.TURBOQUANT_MMPROJ_PATH ??
+  'C:\\Users\\james\\Downloads\\gemma4-mmproj\\mmproj-BF16.gguf';
 const TURBOQUANT_RESTART_DELAY_MS = 3_000;
 
-/** Find the PID of llama-server listening on :8090 and the GGUF model path */
-function findTurboQuantProcess(): { pid: number; modelPath: string } | null {
+/** Find the PID of llama-server listening on :8090 and the GGUF model + mmproj paths */
+function findTurboQuantProcess(): { pid: number; modelPath: string; mmprojPath: string } | null {
 	try {
-		// Find PID on port 8090 via netstat
-		const netstat = execSync('netstat -ano | findstr ":8090" | findstr "LISTENING"', {
-			encoding: 'utf8',
-			timeout: 3_000,
-		}).trim();
-		const pidMatch = netstat.match(/(\d+)\s*$/m);
-		if (!pidMatch) return null;
-		const pid = parseInt(pidMatch[1]);
-		if (!pid || pid <= 4) return null;
+    // Find PID on port 8090 via netstat
+    const netstat = execSync('netstat -ano | findstr ":8090" | findstr "LISTENING"', {
+      encoding: 'utf8',
+      timeout: 3_000,
+    }).trim();
+    const pidMatch = netstat.match(/(\d+)\s*$/m);
+    if (!pidMatch) return null;
+    const pid = parseInt(pidMatch[1]);
+    if (!pid || pid <= 4) return null;
 
-		// Get the command line to extract the GGUF model path for restart
-		let modelPath = TURBOQUANT_GGUF;
-		try {
-			const wmic = execSync(`wmic process where processid=${pid} get commandline /format:list`, {
-				encoding: 'utf8',
-				timeout: 3_000,
-			});
-			const mMatch = wmic.match(/-m\s+"?([^"]+\.(?:gguf|safetensors|bin))"?/i)
-				?? wmic.match(/-m\s+(\S+)/);
-			if (mMatch?.[1]) modelPath = mMatch[1];
-		} catch {
-			// wmic may fail — use env fallback
-		}
+    // Get the command line to extract the GGUF model and mmproj paths for restart
+    let modelPath = TURBOQUANT_GGUF;
+    let mmprojPath = TURBOQUANT_MMPROJ;
+    try {
+      const wmic = execSync(`wmic process where processid=${pid} get commandline /format:list`, {
+        encoding: 'utf8',
+        timeout: 3_000,
+      });
+      const mMatch =
+        wmic.match(/-m\s+"?([^"]+\.(?:gguf|safetensors|bin))"?/i) ?? wmic.match(/-m\s+(\S+)/);
+      if (mMatch?.[1]) modelPath = mMatch[1];
+      const mmMatch = wmic.match(/--mmproj\s+"?([^"]+\.gguf)"?/i);
+      if (mmMatch?.[1]) mmprojPath = mmMatch[1];
+    } catch {
+      // wmic may fail — use env fallback
+    }
 
-		return { pid, modelPath };
-	} catch {
-		return null;
-	}
+    return { pid, modelPath, mmprojPath };
+  } catch {
+    return null;
+  }
 }
 
 /** Stop TurboQuant llama-server by PID */
@@ -87,31 +104,42 @@ function stopTurboQuant(pid: number): boolean {
 }
 
 /** Restart TurboQuant llama-server in background (fire-and-forget) */
-function restartTurboQuant(modelPath: string): void {
-	if (!modelPath) {
-		console.warn('[vram-swap] No GGUF model path — cannot restart TurboQuant');
-		return;
-	}
-	try {
-		const args = [
-			'-m', modelPath,
-			'--port', '8090',
-			'-ngl', '99',
-			'--flash-attn', 'on',
-			'-ctk', 'q4_0',
-			'-ctv', 'q4_0',
-			'-c', '4096',
-		];
-		const child = spawn(TURBOQUANT_EXE, args, {
-			detached: true,
-			stdio: 'ignore',
-			windowsHide: true,
-		});
-		child.unref();
-		console.info(`[vram-swap] Restarted llama-server → PID ${child.pid}`);
-	} catch (err) {
-		console.error('[vram-swap] Failed to restart llama-server:', err);
-	}
+function restartTurboQuant(modelPath: string, mmprojPath?: string): void {
+  if (!modelPath) {
+    console.warn('[vram-swap] No GGUF model path — cannot restart TurboQuant');
+    return;
+  }
+  try {
+    const args = [
+      '-m',
+      modelPath,
+      '--port',
+      '8090',
+      '-ngl',
+      '99',
+      '--flash-attn',
+      'on',
+      '-ctk',
+      'q4_0',
+      '-ctv',
+      'q4_0',
+      '-c',
+      '4096',
+    ];
+    // Include mmproj for unified text+vision on restart
+    if (mmprojPath) {
+      args.push('--mmproj', mmprojPath);
+    }
+    const child = spawn(TURBOQUANT_EXE, args, {
+      detached: true,
+      stdio: 'ignore',
+      windowsHide: true,
+    });
+    child.unref();
+    console.info(`[vram-swap] Restarted llama-server → PID ${child.pid}`);
+  } catch (err) {
+    console.error('[vram-swap] Failed to restart llama-server:', err);
+  }
 }
 
 export interface InferenceRequest {
@@ -122,7 +150,7 @@ export interface InferenceRequest {
   systemPrompt?: string;
   preferTensorrt?: boolean;
   stream?: boolean;
-  /** Base64-encoded image for VLM analysis (only VLM server supports this) */
+  /** Base64-encoded image for VLM analysis (TurboQuant with --mmproj, HF VLM, or Ollama) */
   imageBase64?: string;
 }
 
@@ -137,88 +165,181 @@ export interface InferenceResponse {
 
 /**
  * Route inference to the best available backend.
- * When images are present, routes to VLM server first (only backend with vision).
+ * When images are present: TurboQuant (--mmproj) → HF VLM → Ollama VLM.
  * For text-only: TRT-LLM → Triton → TurboQuant → VLM → Bifrost → LiteRT → Ollama.
  */
 export async function routeInference(request: InferenceRequest): Promise<InferenceResponse> {
-	const start = performance.now();
+  const start = performance.now();
 
-	// VLM-first: when image is present, only the VLM server can handle it
-	if (request.imageBase64) {
-		const vlmResult = await tryVlmServer(request, start);
-		if (vlmResult) {
-			console.info(`[inference-router] backend=${vlmResult.backend} latency=${vlmResult.latencyMs}ms (vision)`);
-			logLLMInference({ model: vlmResult.model, backend: vlmResult.backend as 'vlm-hf' | 'ollama', latencyMs: vlmResult.latencyMs, tokenCount: vlmResult.usage?.total_tokens });
-			return vlmResult;
-		}
-		// Both HF VLM server and Ollama VLM failed — no vision backend available
-		return {
-			text: '',
-			model: 'gemma4-legal-vlm',
-			backend: 'vlm-hf',
-			latencyMs: Math.round(performance.now() - start),
-			error: 'No VLM backend available — HF server (:8085) and Ollama gemma4:e4b-it-q4_K_M both failed',
-		};
-	}
+  // VLM-first: when image is present, try TurboQuant (unified text+vision) first
+  if (request.imageBase64) {
+    // Primary: TurboQuant with --mmproj handles vision natively at ~80 tok/s
+    const tqVlmResult = await tryTurboQuant(request, start);
+    if (tqVlmResult) {
+      console.info(
+        `[inference-router] backend=turboquant latency=${tqVlmResult.latencyMs}ms (vision, mmproj)`
+      );
+      logLLMInference({
+        model: tqVlmResult.model,
+        backend: 'turboquant',
+        latencyMs: tqVlmResult.latencyMs,
+        tokenCount: tqVlmResult.usage?.total_tokens,
+      });
+      return tqVlmResult;
+    }
+    // Fallback: HF VLM server or Ollama native multimodal
+    const vlmResult = await tryVlmServer(request, start);
+    if (vlmResult) {
+      console.info(
+        `[inference-router] backend=${vlmResult.backend} latency=${vlmResult.latencyMs}ms (vision)`
+      );
+      logLLMInference({
+        model: vlmResult.model,
+        backend: vlmResult.backend as 'vlm-hf' | 'ollama',
+        latencyMs: vlmResult.latencyMs,
+        tokenCount: vlmResult.usage?.total_tokens,
+      });
+      return vlmResult;
+    }
+    return {
+      text: '',
+      model: 'gemma4-legal-vlm',
+      backend: 'vlm-hf',
+      latencyMs: Math.round(performance.now() - start),
+      error:
+        'No VLM backend available — TurboQuant (mmproj), HF server (:8085), and Ollama VLM all failed',
+    };
+  }
 
-	// Try TensorRT first if preferred and available
-	if (request.preferTensorrt !== false) {
-		const trtResult = await tryTensorRT(request);
-		if (trtResult) {
-			trtResult.latencyMs = Math.round(performance.now() - start);
-			console.info(`[inference-router] backend=tensorrt latency=${trtResult.latencyMs}ms`);
-			logLLMInference({ model: trtResult.model, backend: 'tensorrt', latencyMs: trtResult.latencyMs, tokenCount: trtResult.usage?.total_tokens });
-			return trtResult;
-		}
-	}
+  // Try TensorRT first if preferred and available
+  if (request.preferTensorrt !== false) {
+    const trtResult = await tryTensorRT(request);
+    if (trtResult) {
+      trtResult.latencyMs = Math.round(performance.now() - start);
+      console.info(`[inference-router] backend=tensorrt latency=${trtResult.latencyMs}ms`);
+      logLLMInference({
+        model: trtResult.model,
+        backend: 'tensorrt',
+        latencyMs: trtResult.latencyMs,
+        tokenCount: trtResult.usage?.total_tokens,
+      });
+      return trtResult;
+    }
+  }
 
-	const tritonResult = await tryTriton(request);
-	if (tritonResult) {
-		tritonResult.latencyMs = Math.round(performance.now() - start);
-		console.info(`[inference-router] backend=triton latency=${tritonResult.latencyMs}ms`);
-		logLLMInference({ model: tritonResult.model, backend: 'triton', latencyMs: tritonResult.latencyMs, tokenCount: tritonResult.usage?.total_tokens });
-		return tritonResult;
-	}
+  const tritonResult = await tryTriton(request);
+  if (tritonResult) {
+    tritonResult.latencyMs = Math.round(performance.now() - start);
+    console.info(`[inference-router] backend=triton latency=${tritonResult.latencyMs}ms`);
+    logLLMInference({
+      model: tritonResult.model,
+      backend: 'triton',
+      latencyMs: tritonResult.latencyMs,
+      tokenCount: tritonResult.usage?.total_tokens,
+    });
+    return tritonResult;
+  }
 
-	// Tier 3: TurboQuant llama-server (turbo3 KV cache, same model, better VRAM usage)
-	const tqResult = await tryTurboQuant(request, start);
-	if (tqResult) {
-		console.info(`[inference-router] backend=turboquant latency=${tqResult.latencyMs}ms`);
-		logLLMInference({ model: tqResult.model, backend: 'turboquant', latencyMs: tqResult.latencyMs, tokenCount: tqResult.usage?.total_tokens });
-		return tqResult;
-	}
+  // Tier 3: Bifrost semantic cache with ε-greedy variance
+  // Cache hits return in <100ms (Qdrant vector lookup). Adaptive bypass probability
+  // prevents stale semantic drift: high-temp, long, or vision requests skip cache.
+  // 500ms abort deadline: miss → TurboQuant; hit → instant return.
+  if (ENV.BIFROST_ENABLED) {
+    const bypassProb = computeCacheBypassProb(request);
+    if (Math.random() >= bypassProb) {
+      const cacheResult = await tryBifrostCacheCheck(request, start);
+      if (cacheResult) {
+        const isCacheHit = cacheResult.latencyMs < 200;
+        console.info(
+          `[inference-router] backend=bifrost latency=${cacheResult.latencyMs}ms${isCacheHit ? ' CACHE_HIT' : ''}`
+        );
+        logLLMInference({
+          model: cacheResult.model,
+          backend: 'bifrost',
+          latencyMs: cacheResult.latencyMs,
+          tokenCount: cacheResult.usage?.total_tokens,
+          cacheHit: isCacheHit,
+        });
+        return cacheResult;
+      }
+      // Cache miss (>500ms timeout) — fall through to TurboQuant
+    } else {
+      console.debug(
+        `[inference-router] bifrost bypassed (ε-exploration p=${bypassProb.toFixed(2)})`
+      );
+    }
+  }
 
-	// Try Bifrost gateway (semantic caching) when enabled
-	if (ENV.BIFROST_ENABLED) {
-		const bifrostResult = await tryBifrost(request, start);
-		if (bifrostResult) {
-			console.info(`[inference-router] backend=bifrost latency=${bifrostResult.latencyMs}ms`);
-			logLLMInference({ model: bifrostResult.model, backend: 'bifrost', latencyMs: bifrostResult.latencyMs, tokenCount: bifrostResult.usage?.total_tokens, cacheHit: bifrostResult.latencyMs < 200 });
-			return bifrostResult;
-		}
-	}
+  // Tier 4: TurboQuant llama-server (turbo3 KV cache, same model, better VRAM usage)
+  const tqResult = await tryTurboQuant(request, start);
+  if (tqResult) {
+    console.info(`[inference-router] backend=turboquant latency=${tqResult.latencyMs}ms`);
+    logLLMInference({
+      model: tqResult.model,
+      backend: 'turboquant',
+      latencyMs: tqResult.latencyMs,
+      tokenCount: tqResult.usage?.total_tokens,
+    });
+    return tqResult;
+  }
 
-	// Tier 5: VLM server (HF Transformers + NF4, text fallback — also handles images)
-	const vlmResult = await tryVlmServer(request, start);
-	if (vlmResult) {
-		console.info(`[inference-router] backend=vlm-hf latency=${vlmResult.latencyMs}ms`);
-		logLLMInference({ model: vlmResult.model, backend: 'vlm-hf', latencyMs: vlmResult.latencyMs, tokenCount: vlmResult.usage?.total_tokens });
-		return vlmResult;
-	}
+  // Tier 4b: Bifrost full fallback (only reached when TurboQuant is also down)
+  if (ENV.BIFROST_ENABLED) {
+    const bifrostResult = await tryBifrost(request, start);
+    if (bifrostResult) {
+      console.info(
+        `[inference-router] backend=bifrost-fallback latency=${bifrostResult.latencyMs}ms`
+      );
+      logLLMInference({
+        model: bifrostResult.model,
+        backend: 'bifrost',
+        latencyMs: bifrostResult.latencyMs,
+        tokenCount: bifrostResult.usage?.total_tokens,
+        cacheHit: bifrostResult.latencyMs < 200,
+      });
+      return bifrostResult;
+    }
+  }
 
-	// Tier 6: LiteRT-LM (CPU sidecar, no VRAM needed, Gemma 4 E2B with MTP heads)
-	const litertResult = await tryLiteRT(request, start);
-	if (litertResult) {
-		console.info(`[inference-router] backend=litert latency=${litertResult.latencyMs}ms`);
-		logLLMInference({ model: litertResult.model, backend: 'litert', latencyMs: litertResult.latencyMs, tokenCount: litertResult.usage?.total_tokens });
-		return litertResult;
-	}
+  // Tier 5: VLM server (HF Transformers + NF4, text fallback — also handles images)
+  const vlmResult = await tryVlmServer(request, start);
+  if (vlmResult) {
+    console.info(`[inference-router] backend=vlm-hf latency=${vlmResult.latencyMs}ms`);
+    logLLMInference({
+      model: vlmResult.model,
+      backend: 'vlm-hf',
+      latencyMs: vlmResult.latencyMs,
+      tokenCount: vlmResult.usage?.total_tokens,
+    });
+    return vlmResult;
+  }
 
-	// Fall back to direct Ollama
-	const result = await ollamaInference(request, start);
-	console.info(`[inference-router] backend=ollama latency=${result.latencyMs}ms${result.error ? ` error=${result.error}` : ''}`);
-	logLLMInference({ model: result.model, backend: 'ollama', latencyMs: result.latencyMs, tokenCount: result.usage?.total_tokens, error: result.error });
-	return result;
+  // Tier 6: LiteRT-LM (CPU sidecar, no VRAM needed, Gemma 4 E2B with MTP heads)
+  const litertResult = await tryLiteRT(request, start);
+  if (litertResult) {
+    console.info(`[inference-router] backend=litert latency=${litertResult.latencyMs}ms`);
+    logLLMInference({
+      model: litertResult.model,
+      backend: 'litert',
+      latencyMs: litertResult.latencyMs,
+      tokenCount: litertResult.usage?.total_tokens,
+    });
+    return litertResult;
+  }
+
+  // Fall back to direct Ollama
+  const result = await ollamaInference(request, start);
+  console.info(
+    `[inference-router] backend=ollama latency=${result.latencyMs}ms${result.error ? ` error=${result.error}` : ''}`
+  );
+  logLLMInference({
+    model: result.model,
+    backend: 'ollama',
+    latencyMs: result.latencyMs,
+    tokenCount: result.usage?.total_tokens,
+    error: result.error,
+  });
+  return result;
 }
 
 async function tryTensorRT(request: InferenceRequest): Promise<InferenceResponse | null> {
@@ -303,59 +424,221 @@ async function tryTriton(request: InferenceRequest): Promise<InferenceResponse |
  * compression — 5x VRAM savings, 8x attention kernel speedup on CUDA.
  */
 async function tryTurboQuant(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
-	try {
-		// Health check: GET /health returns 200 when server is ready
-		const healthRes = await fetch(`${TURBOQUANT_BASE_URL}/health`, {
-			signal: AbortSignal.timeout(1_000),
-		});
-		if (!healthRes.ok) return null;
-	} catch {
-		return null; // TurboQuant server not running
-	}
+  try {
+    // Health check: GET /health returns 200 when server is ready
+    const healthRes = await fetch(`${TURBOQUANT_BASE_URL}/health`, {
+      signal: AbortSignal.timeout(1_000),
+    });
+    if (!healthRes.ok) return null;
+  } catch {
+    return null; // TurboQuant server not running
+  }
 
-	const messages: Array<{ role: string; content: string }> = [];
-	if (request.systemPrompt) messages.push({ role: 'system', content: request.systemPrompt });
-	messages.push({ role: 'user', content: request.prompt });
+  type ChatContent = string | Array<{ type: string; text?: string; image_url?: { url: string } }>;
+  const messages: Array<{ role: string; content: ChatContent }> = [];
+  if (request.systemPrompt) messages.push({ role: 'system', content: request.systemPrompt });
 
-	try {
-		// OpenAI-compatible /v1/chat/completions — llama-server b8757+
-		// When model uses thinking mode, content may be empty and reasoning in reasoning_content
-		const res = await fetch(`${TURBOQUANT_BASE_URL}/v1/chat/completions`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				messages,
-				max_tokens: request.maxTokens ?? 2048,
-				temperature: request.temperature ?? 0.7,
-				stream: false,
-			}),
-			signal: AbortSignal.timeout(120_000),
-		});
+  // Build user message — include image as OpenAI-compatible content parts when present
+  if (request.imageBase64) {
+    messages.push({
+      role: 'user',
+      content: [
+        { type: 'image_url', image_url: { url: `data:image/png;base64,${request.imageBase64}` } },
+        { type: 'text', text: request.prompt },
+      ],
+    });
+  } else {
+    messages.push({ role: 'user', content: request.prompt });
+  }
 
-		if (!res.ok) return null;
+  try {
+    // OpenAI-compatible /v1/chat/completions — llama-server b8757+
+    // When model uses thinking mode, content may be empty and reasoning in reasoning_content
+    // With --mmproj, also handles vision via image_url content parts
+    const res = await fetch(`${TURBOQUANT_BASE_URL}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages,
+        max_tokens: request.maxTokens ?? 2048,
+        temperature: request.temperature ?? 0.7,
+        stream: false,
+      }),
+      signal: AbortSignal.timeout(120_000),
+    });
 
-		const data = await res.json();
-		const msg = data.choices?.[0]?.message;
-		const content = msg?.content ?? '';
-		const reasoning = msg?.reasoning_content ?? '';
-		// Prefer content (the actual answer); fall back to reasoning if model spent all tokens thinking
-		const text = content || reasoning;
-		if (!text) return null;
+    if (!res.ok) return null;
 
-		return {
-			text,
-			model: 'gemma4-legal-turbo3',
-			backend: 'turboquant',
-			usage: data.usage ? {
-				prompt_tokens: data.usage.prompt_tokens ?? 0,
-				completion_tokens: data.usage.completion_tokens ?? 0,
-				total_tokens: data.usage.total_tokens ?? 0,
-			} : undefined,
-			latencyMs: Math.round(performance.now() - startTime),
-		};
-	} catch {
-		return null;
-	}
+    const data = await res.json();
+    const msg = data.choices?.[0]?.message;
+    const content = msg?.content ?? '';
+    const reasoning = msg?.reasoning_content ?? '';
+    // Prefer content (the actual answer); fall back to reasoning if model spent all tokens thinking
+    const text = content || reasoning;
+    if (!text) return null;
+
+    return {
+      text,
+      model: 'gemma4-legal-turbo3',
+      backend: 'turboquant',
+      usage: data.usage
+        ? {
+            prompt_tokens: data.usage.prompt_tokens ?? 0,
+            completion_tokens: data.usage.completion_tokens ?? 0,
+            total_tokens: data.usage.total_tokens ?? 0,
+          }
+        : undefined,
+      latencyMs: Math.round(performance.now() - startTime),
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Compute ε-greedy bypass probability for Bifrost semantic cache.
+ *
+ * Based on MeanCache (arXiv:2403.02694): deterministic semantic caching
+ * degrades over time due to semantic drift. Periodic exploration (ε=10%)
+ * injects fresh responses and keeps cache quality healthy.
+ *
+ * Factors that raise bypass probability (prefer fresh over cached):
+ *  - High temperature (>0.6): stochastic requests → cached answer may diverge
+ *  - Long prompts (>600 chars): unique context → low semantic hit-rate
+ *  - Vision input: image bytes are non-cacheable by embedding alone
+ */
+function computeCacheBypassProb(request: InferenceRequest): number {
+  if (request.imageBase64) return 1.0; // vision: image content can't be semantically hashed
+
+  const temp = request.temperature ?? 0.7;
+  if (temp >= 0.95) return 1.0; // near-max temperature = essentially stochastic output
+
+  const promptLen = request.prompt.length;
+  if (promptLen > 2000) return 1.0; // very long prompts are unique; hit rate is negligible
+
+  // Base ε = 10% exploration (prevents semantic drift accumulating in cache)
+  let p = 0.10;
+  // Temperature ramp: [0.6 → 0.95] contributes up to +0.25
+  if (temp > 0.6) p += 0.25 * ((temp - 0.6) / 0.35);
+  // Prompt length ramp: [600 → 2000 chars] contributes up to +0.15
+  if (promptLen > 600) p += 0.15 * ((promptLen - 600) / 1400);
+
+  return Math.min(p, 1.0);
+}
+
+/**
+ * Fast cache-only Bifrost probe with 500ms hard deadline.
+ *
+ * Bifrost semantic cache hits return in <100ms (Qdrant vector lookup → stored response).
+ * Cache misses trigger a full Ollama round-trip (30-120s for Gemma 4 thinking mode).
+ * Aborting at 500ms means: hit → instant win; miss → hand off to TurboQuant.
+ *
+ * Cache key namespacing: uses a 6-char hash of the system prompt to partition the cache
+ * by legal context (contract-law session won't collide with criminal-law session).
+ * Falls back to 'legal-ai-global' when no system prompt is present.
+ */
+
+/** Cheap FNV-1a 32-bit hash → 6-char hex string for short cache key suffixes. */
+function shortHash(s: string): string {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = (Math.imul(h, 0x01000193) | 0) >>> 0;
+  }
+  return h.toString(16).slice(0, 6);
+}
+
+/**
+ * Normalize the user prompt before embedding to improve semantic cache hit rate.
+ *
+ * Strips filler preambles that hurt embedding similarity ("Can you please explain…"
+ * and "I would like to know…" both reduce to the same semantic core). Normalizes
+ * legal citation formats so variant spellings hit the same cache entry.
+ */
+function normalizePromptForCache(prompt: string): string {
+  return prompt
+    // Strip common filler preambles (case-insensitive)
+    .replace(/^(can you (please )?|could you (please )?|i (want|need|would like) (you )?to |please )/i, '')
+    .replace(/^(help me (understand|with|explain)|tell me (about|how|what|why) )/i, '')
+    // Normalize legal citation variants: § 1234, sec. 1234, section 1234 → §1234
+    .replace(/\bsec(?:tion|\.)?\s*(\d+)/gi, '§$1')
+    .replace(/§\s+(\d)/g, '§$1')
+    // Normalize quotation marks
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .trim();
+}
+
+async function tryBifrostCacheCheck(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
+  const CACHE_HIT_TIMEOUT_MS = 500;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), CACHE_HIT_TIMEOUT_MS);
+
+  const model = 'gemma4-legal';
+  // Normalize prompt to increase semantic cache hit rate
+  const normalizedPrompt = normalizePromptForCache(request.prompt);
+  const messages: Array<{ role: string; content: string }> = [];
+  if (request.systemPrompt) messages.push({ role: 'system', content: request.systemPrompt });
+  messages.push({ role: 'user', content: normalizedPrompt });
+
+  // Namespace cache key by system-prompt hash to avoid cross-context collisions.
+  // Different legal contexts (contract vs. criminal) stay in separate cache partitions.
+  const cacheKey = request.systemPrompt
+    ? `legal-ai-${shortHash(request.systemPrompt)}`
+    : 'legal-ai-global';
+
+  try {
+    const res = await fetch(`${ENV.BIFROST_URL}/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Required: caching only activates when x-bf-cache-key is present.
+        // 500ms timeout means: if Bifrost doesn't return within that window, it is
+        // waiting on Ollama inference (cache miss) — abort and let TurboQuant handle it.
+        'x-bf-cache-key': cacheKey,
+      },
+      body: JSON.stringify({
+        model: `ollama-local/${model}`,
+        messages,
+        max_tokens: request.maxTokens ?? 2048,
+        temperature: request.temperature ?? 0.7,
+        stream: false,
+      }),
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+
+    if (!res.ok) return null;
+    const data = await res.json() as {
+      choices?: Array<{ message?: { content?: string } }>;
+      extra_fields?: { cache_debug?: { cache_hit?: boolean; hit_type?: string; similarity?: number; threshold?: number } };
+    };
+    const content = data.choices?.[0]?.message?.content ?? '';
+    if (!content) return null;
+
+    const debug = data.extra_fields?.cache_debug;
+    const isCacheHit = debug?.cache_hit ?? false;
+    if (!isCacheHit) {
+      // Got a response but Bifrost says it wasn't a cache hit — could be direct inference
+      // on a <500ms model (e.g. gemma3:270m coldstart). Accept it anyway.
+      console.debug('[inference-router] bifrost responded <500ms but cache_hit=false (fast inference?)');
+    } else {
+      console.debug(`[inference-router] bifrost CACHE HIT type=${debug?.hit_type} similarity=${debug?.similarity?.toFixed(3)} threshold=${debug?.threshold}`);
+    }
+
+    return {
+      text: content,
+      model: 'gemma4-legal-bifrost-cache',
+      backend: 'bifrost',
+      latencyMs: Math.round(performance.now() - startTime),
+    };
+  } catch (err: unknown) {
+    clearTimeout(timer);
+    if (err instanceof Error && err.name === 'AbortError') {
+      console.debug('[inference-router] bifrost cache miss (>500ms), routing to TurboQuant');
+    }
+    return null;
+  }
 }
 
 async function tryBifrost(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
@@ -477,6 +760,9 @@ async function tryHfVlmServer(request: InferenceRequest, startTime: number): Pro
  *
  * VRAM swap: If the first attempt fails (likely VRAM full from llama-server),
  * stops TurboQuant llama-server, retries VLM, then restarts llama-server.
+ *
+ * NOTE: With TurboQuant --mmproj, this path is rarely needed. It's a fallback for
+ * when TurboQuant is running WITHOUT --mmproj or is down entirely.
  */
 async function tryOllamaVlm(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
 	// First attempt — works when VRAM is available (llama-server not running)
@@ -508,7 +794,7 @@ async function tryOllamaVlm(request: InferenceRequest, startTime: number): Promi
 				body: JSON.stringify({ model: 'gemma4:e4b-it-q4_K_M', prompt: '', keep_alive: 0 }),
 				signal: AbortSignal.timeout(5_000),
 			}).catch(() => {}).finally(() => {
-				setTimeout(() => restartTurboQuant(tqProcess.modelPath), 2_000);
+				setTimeout(() => restartTurboQuant(tqProcess.modelPath, tqProcess.mmprojPath), 2_000);
 			});
 		}, 1_000);
 	}
@@ -886,47 +1172,77 @@ export async function* routeStreamingInference(
  * Get current inference router status.
  */
 export async function getRouterStatus() {
-	const [trtOk, tritonOk, tqOk, vlmOk, litertOk, ollamaVlmOk, lease, gpuStats] = await Promise.all([
-		trtHealthCheck(),
-		tritonHealthCheck(),
-		fetch(`${TURBOQUANT_BASE_URL}/health`, { signal: AbortSignal.timeout(1_000) })
-			.then(r => r.ok).catch(() => false),
-		fetch(`${VLM_BASE_URL}/health`, { signal: AbortSignal.timeout(1_000) })
-			.then(r => r.ok).catch(() => false),
-		fetch(`${LITERT_BASE_URL}/health`, { signal: AbortSignal.timeout(1_000) })
-			.then(r => r.ok).catch(() => false),
-		// Check if Ollama has the VLM model available (list models, check for e4b)
-		ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(2_000) })
-			.then(r => r.ok ? r.json() : null)
-			.then(d => d?.models?.some((m: { name: string }) => m.name.includes('e4b-it')) ?? false)
-			.catch(() => false),
-		getGpuLeaseStatus().catch(() => null),
-		getGpuStats().catch(() => null)
-	]);
+	const [trtOk, tritonOk, tqProps, vlmOk, litertOk, ollamaVlmOk, lease, gpuStats] =
+    await Promise.all([
+      trtHealthCheck(),
+      tritonHealthCheck(),
+      // Check TurboQuant health AND vision capability (mmproj loaded → modalities.vision: true)
+      fetch(`${TURBOQUANT_BASE_URL}/props`, { signal: AbortSignal.timeout(1_500) })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => ({ available: true, vision: d?.modalities?.vision === true }))
+        .catch(() => ({ available: false, vision: false })),
+      fetch(`${VLM_BASE_URL}/health`, { signal: AbortSignal.timeout(1_000) })
+        .then((r) => r.ok)
+        .catch(() => false),
+      fetch(`${LITERT_BASE_URL}/health`, { signal: AbortSignal.timeout(1_000) })
+        .then((r) => r.ok)
+        .catch(() => false),
+      // Check if Ollama has the VLM model available (list models, check for e4b)
+      ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(2_000) })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => d?.models?.some((m: { name: string }) => m.name.includes('e4b-it')) ?? false)
+        .catch(() => false),
+      getGpuLeaseStatus().catch(() => null),
+      getGpuStats().catch(() => null),
+    ]);
 
+	const tqOk = tqProps.available;
+  const tqVision = tqProps.vision;
 	const vram: GpuMemory | null = gpuStats?.available ? gpuStats.memory : null;
 	const vramSufficient = !vram || vram.freeMB >= TRT_MIN_VRAM_MB;
 	const trtReady = trtOk && !lease && vramSufficient;
-	const visionAvailable = vlmOk || ollamaVlmOk;
+	const visionAvailable = tqVision || vlmOk || ollamaVlmOk;
 
 	return {
-		tensorrt: { available: trtOk, url: ENV.TENSORRT_URL, vramSufficient },
-		triton: { available: tritonOk, url: ENV.TRITON_URL, model: ENV.TRITON_LLM_MODEL },
-		turboquant: { available: tqOk, url: TURBOQUANT_BASE_URL, kvCache: 'turbo3' },
-		vlm: { available: vlmOk, url: VLM_BASE_URL, model: 'gemma4-legal-vlm', backend: 'hf-nf4', visionCapable: true },
-		ollamaVlm: { available: ollamaVlmOk, model: 'gemma4:e4b-it-q4_K_M', visionCapable: true },
-		bifrost: { enabled: ENV.BIFROST_ENABLED, url: ENV.BIFROST_URL },
-		litert: { available: litertOk, url: LITERT_BASE_URL, model: 'gemma-4-E2B-it', backend: 'cpu' },
-		ollama: { url: ENV.OLLAMA_BASE_URL },
-		gpu: {
-			leaseHolder: lease?.backend ?? null,
-			leaseFree: !lease,
-			vram,
-			temperature: gpuStats?.temperatureCelsius ?? null,
-			utilization: gpuStats?.utilizationPercent ?? null,
-		},
-		visionAvailable,
-		preferredBackend:
-			trtReady ? 'tensorrt' : tritonOk ? 'triton' : tqOk ? 'turboquant' : vlmOk ? 'vlm-hf' : ENV.BIFROST_ENABLED ? 'bifrost' : litertOk ? 'litert' : 'ollama'
-	};
+    tensorrt: { available: trtOk, url: ENV.TENSORRT_URL, vramSufficient },
+    triton: { available: tritonOk, url: ENV.TRITON_URL, model: ENV.TRITON_LLM_MODEL },
+    turboquant: {
+      available: tqOk,
+      url: TURBOQUANT_BASE_URL,
+      kvCache: 'turbo3',
+      visionCapable: tqVision,
+    },
+    vlm: {
+      available: vlmOk,
+      url: VLM_BASE_URL,
+      model: 'gemma4-legal-vlm',
+      backend: 'hf-nf4',
+      visionCapable: true,
+    },
+    ollamaVlm: { available: ollamaVlmOk, model: 'gemma4:e4b-it-q4_K_M', visionCapable: true },
+    bifrost: { enabled: ENV.BIFROST_ENABLED, url: ENV.BIFROST_URL },
+    litert: { available: litertOk, url: LITERT_BASE_URL, model: 'gemma-4-E2B-it', backend: 'cpu' },
+    ollama: { url: ENV.OLLAMA_BASE_URL },
+    gpu: {
+      leaseHolder: lease?.backend ?? null,
+      leaseFree: !lease,
+      vram,
+      temperature: gpuStats?.temperatureCelsius ?? null,
+      utilization: gpuStats?.utilizationPercent ?? null,
+    },
+    visionAvailable,
+    preferredBackend: trtReady
+      ? 'tensorrt'
+      : tritonOk
+        ? 'triton'
+        : tqOk
+          ? 'turboquant'
+          : vlmOk
+            ? 'vlm-hf'
+            : ENV.BIFROST_ENABLED
+              ? 'bifrost'
+              : litertOk
+                ? 'litert'
+                : 'ollama',
+  };
 }

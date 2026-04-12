@@ -1,5 +1,36 @@
 {
-  "default_request_timeout": 120,
+  "$schema": "https://www.getbifrost.ai/schema",
+  "vector_store": {
+    "enabled": true,
+    "type": "qdrant",
+    "config": {
+      "host": "host.docker.internal",
+      "port": 6334
+    }
+  },
+  "plugins": [
+    {
+      "enabled": true,
+      "name": "semantic_cache",
+      "config": {
+        "provider": "ollama-local",
+        "embedding_model": "embeddinggemma:latest",
+        "dimension": 768,
+        "cleanup_on_shutdown": true,
+        "ttl": "2h",
+        "threshold": 0.82,
+        "conversation_history_threshold": 3,
+        "exclude_system_prompt": false,
+        "cache_by_model": true,
+        "cache_by_provider": true
+      }
+    }
+  ],
+  "client": {
+    "enable_logging": true,
+    "disable_content_logging": false,
+    "log_retention_days": 7
+  },
   "providers": {
     "ollama-local": {
       "keys": [
@@ -28,6 +59,7 @@
           "embedding": true
         }
       }
+
     }
   }
 }

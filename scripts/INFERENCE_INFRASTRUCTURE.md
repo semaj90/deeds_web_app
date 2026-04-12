@@ -1,6 +1,6 @@
 # Inference Infrastructure — 7-Tier Cascade
 
-**Last verified**: 2026-04-10 22:00 PDT
+**Last verified**: 2026-04-11 (session continued)
 **svelte-check**: 0 errors, 0 warnings
 **vite build**: PASSES (exit 0)
 
@@ -26,17 +26,18 @@ All tiers are OpenAI-compatible (`/v1/chat/completions`). The router health-chec
 
 ---
 
-## Current Status (2026-04-10)
+## Current Status (2026-04-11)
 
 | Tier | Port | Status | Model | Speed | VRAM |
 |------|------|--------|-------|-------|------|
 | TensorRT-LLM | :8099 | OFFLINE | — | — | — |
 | Triton | :8000 | OFFLINE | — | — | — |
-| **llama-server** | **:8090** | **RUNNING** | gemma4-legal 7.5B Q4_K_M | **75.4 tok/s gen, 59 tok/s prompt** | ~5 GB + q4_0 KV |
+| **llama-server** | **:8090** | **RUNNING + VLM** | gemma4-legal Q4_K_M + mmproj-BF16 | **80 tok/s gen, 601 tok/s prompt** | ~5.8 GB (text+vision) |
 | Bifrost/LiteLLM | :3030 | OFFLINE | — (proxy) | — | 0 |
 | VLM HF | :8085 | READY (not started) | google/gemma-4-E4B-it NF4 | ~5-10 tok/s (est) | ~4 GB |
-| **LiteRT-LM** | **:8070** | **RUNNING** | Gemma 4 E2B 2.4B | **~11 tok/s** | **0 MB** |
+| LiteRT-LM | :8070 | OFFLINE | Gemma 4 E2B 2.4B | ~11 tok/s | 0 MB |
 | **Ollama** | **:11434** | **RUNNING** | gemma4-legal 7.5B Q4_K_M | **22 tok/s gen, 83 tok/s prompt** | ~5 GB |
+| Ollama VLM | :11434 | AVAILABLE (fallback) | gemma4:e4b-it-q4_K_M | ~13 tok/s | ~5 GB (VRAM swap) |
 
 ### Benchmark (same query: "List the four elements of negligence")
 
@@ -52,14 +53,20 @@ All tiers are OpenAI-compatible (`/v1/chat/completions`). The router health-chec
 
 ## Startup Commands
 
-### llama-server (Tier 3) — Windows native, CUDA
+### llama-server (Tier 3) — Windows native, CUDA + Vision
 ```bash
 # Pre-built binary: C:\Users\james\Desktop\llama-server-cuda\llama-server.exe
-# GGUF blob: C:\Users\james\.ollama\blobs\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43
+# Text GGUF: C:\Users\james\Downloads\gemma4-legal-vlm-q4_k_m.gguf (5.0 GB, E4B + legal LoRA)
+# Vision mmproj: C:\Users\james\Downloads\gemma4-mmproj/mmproj-BF16.gguf (992 MB, Unsloth stock SigLIP)
+# Total VRAM: ~5.8 GB (fits in 8 GB RTX 3060 Ti with room for KV cache)
 
 C:\Users\james\Desktop\llama-server-cuda\llama-server.exe \
-  -m "C:\Users\james\.ollama\blobs\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43" \
+  -m "C:\Users\james\Downloads\gemma4-legal-vlm-q4_k_m.gguf" \
+  --mmproj "C:\Users\james\Downloads\gemma4-mmproj/mmproj-BF16.gguf" \
   --port 8090 -ngl 99 --flash-attn on -ctk q4_0 -ctv q4_0 -c 4096
+
+# Text-only (without vision): omit --mmproj, or use Ollama blob instead:
+# -m "C:\Users\james\.ollama\blobs\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43"
 ```
 
 ### LiteRT-LM (Tier 6) — WSL, CPU
@@ -110,52 +117,39 @@ ollama serve  # port 11434
 
 ## Next Steps
 
-### Completed (2026-04-10)
+### Completed (2026-04-10 → 2026-04-11)
 - [x] **Ollama VLM fallback wired** — `tryVlmServer()` cascades: HF server (:8085) → Ollama `gemma4:e4b-it-q4_K_M` via `/api/chat` with `images` field
 - [x] **Stock E4B VLM verified** — Ollama reports `capabilities: ['completion', 'vision', 'audio', 'tools', 'thinking']`
 - [x] **Disk cleanup** — freed ~17 GB (unsloth cache 11 GB + gemma-2-2b 891 MB + duplicate ollama dir 5 GB). C: 35 GB free.
-- [x] **`reasoning_content` handling** — `tryTurboQuant()` now reads `msg.reasoning_content` as fallback when `msg.content` is empty (thinking mode)
+- [x] **`reasoning_content` handling** — `tryTurboQuant()` switched from `/v1/completions` to `/v1/chat/completions`, reads `msg.content || msg.reasoning_content`. Streaming reads `delta.content ?? delta.reasoning_content`. **Verified live**: content=202 chars, reasoning=1061 chars, 308 tok @ ~38 tok/s
 - [x] **Model inventory** — all local model files audited, documented below
+- [x] **VRAM swap** — `tryOllamaVlm()` stops llama-server via `findTurboQuantProcess()` → `taskkill`, runs VLM, then fire-and-forget restarts llama-server via `spawn()`. Ollama VLM model unloaded (`keep_alive: 0`) before restart to free VRAM
+- [x] **VLM cascade in VLM endpoint** — `/api/ai/tensorrt/vlm` now tries: Triton ensemble → direct Ollama VLM → inference router (VRAM swap)
+- [x] **`getRouterStatus()` expanded** — now includes `ollamaVlm` availability check + `visionAvailable` field
+- [x] **`logLLMInference` audit** — all 8 call sites pass `tokenCount`; Triton + Bifrost fixed (were missing)
 
-### Immediate (ready to do now)
-- [ ] **Test Ollama VLM** — `curl` image + text to `gemma4:e4b-it-q4_K_M` via Ollama `/api/chat`, verify vision output
-- [ ] **Test through SvelteKit dev server** — start `npm run dev`, hit `/api/infrastructure/status` to see full router status
-- [ ] **Test dispatch-inline.ts** — upload evidence with RabbitMQ stopped to verify inline fallback chain works
+### Immediate
+- [x] **Test Ollama VLM** — 2x2 red PNG → "Red" @ 33 tok/s. VRAM conflict when llama-server loaded (expected); works after VRAM swap
+- [x] **Test through SvelteKit dev server** — `/api/infrastructure/status` returns: `preferredBackend: turboquant`, `visionAvailable: true`, `ollamaVlm: available`, 174ms latency
+- [x] **Model matrix verified** — `gemma4:e4b-it-q4_K_M` (8.0B, vision+audio+tools+thinking) vs `gemma4-legal` (7.5B, text-only). llama-server runs 7.5B text, Ollama VLM loads 8.0B multimodal on demand
+- [x] **Dispatch-inline verified** — `getDispatchStats()` live: 48 queued / 0 inline / 0 skipped / 0 errors. RabbitMQ v4.1.0 healthy (87 queues). Inline fallback not triggered (correct — RabbitMQ is up). Full integration wired to `/api/infrastructure/status`
+- [x] **Unified VLM via mmproj** — Downloaded `gemma4-mmproj/mmproj-BF16.gguf` (992 MB) from `unsloth/gemma-4-E4B-it-GGUF`. llama-server with `--mmproj` handles text+vision in a single process. 80.6 tok/s gen, 601 tok/s prompt. 5.8 GB total VRAM (fits in 8 GB). **No VRAM swap needed.**
+- [x] **Inference router updated** — Vision cascade: TurboQuant (mmproj) → HF VLM → Ollama VLM. `tryTurboQuant()` now sends OpenAI image_url content parts. `getRouterStatus()` checks `/props` for `modalities.vision`.
+- [x] **End-to-end VLM verified** — `/api/ai/tensorrt/vlm` → inference router → TurboQuant → correct document extraction. 6.4s latency for legal document OCR.
 
-### Short-term — Colab: Legal VLM GGUF with vision tensors
-The existing `gemma4-legal-vlm-q4_k_m.gguf` (5 GB) is **text-only** (720 tensors, 0 vision/audio). The Ollama stock `gemma4:e4b-it-q4_K_M` gets vision via Ollama's runtime projector handling — **NOT** from tensors in the GGUF. llama-server/TurboQuant don't have this runtime projector support, so they need vision tensors baked into the GGUF.
+### RESOLVED: Colab VLM GGUF reconversion — NOT NEEDED
+~~The existing `gemma4-legal-vlm-q4_k_m.gguf` (5 GB) is text-only (720 tensors, 0 vision/audio).~~
 
-**Goal**: Create a legal-fine-tuned GGUF with full VLM (vision + audio towers) for llama-server + turbo3 KV cache → ~75 tok/s with vision.
+**Solution**: llama.cpp supports vision via a **separate mmproj GGUF file** (the SigLIP vision encoder + projector). No need to bake vision tensors into the text GGUF.
 
-**Colab notebook steps** (need A100/L4 for RAM):
-```python
-# 1. Load merged VLM checkpoint (the 9.7 GB safetensors with LoRA baked in)
-#    Already on Google Drive: gemma4-e4b-legal-final-gguf (1)/model.safetensors
-
-# 2. Convert to GGUF with multimodal support
-#    llama.cpp's convert_hf_to_gguf.py supports gemma4 multimodal since March 2026
-!git clone https://github.com/ggml-org/llama.cpp
-!pip install -r llama.cpp/requirements/requirements-convert_hf_to_gguf.txt
-!python llama.cpp/convert_hf_to_gguf.py \
-    /content/gemma4-legal-vlm-merged/ \
-    --outfile gemma4-legal-vlm-full.gguf \
-    --outtype q4_K_M
-
-# 3. Verify vision tensors exist in output GGUF
-from gguf import GGUFReader
-reader = GGUFReader("gemma4-legal-vlm-full.gguf")
-vision = [t.name for t in reader.tensors if 'vision' in t.name]
-print(f"Vision tensors: {len(vision)}")  # Should be > 0
-
-# 4. Upload to Google Drive → download to local
-# Then run: llama-server -m gemma4-legal-vlm-full.gguf -ctk turbo3 -ctv turbo3 --port 8090
-```
-
-**Expected result**: ~6-7 GB GGUF with legal fine-tuning + vision tower, runnable on llama-server with turbo3 KV cache at ~75 tok/s.
+- Text GGUF: `gemma4-legal-vlm-q4_k_m.gguf` (5.0 GB) — legal fine-tuned, text-only
+- Vision mmproj: `gemma4-mmproj/mmproj-BF16.gguf` (992 MB) — stock Unsloth SigLIP, compatible with legal fine-tune (LoRA trained with vision tower frozen)
+- Combined: `llama-server -m text.gguf --mmproj mmproj.gguf` → unified text+vision at 80 tok/s
+- VRAM: 5.8 GB total (text + mmproj + q4_0 KV cache) — fits in 8 GB
 
 ### Other short-term
-- [ ] **TurboQuant fork**: Build turboquant_plus with `turbo3` KV cache (needs CUDA toolkit in WSL — `nvidia-cuda-toolkit` install failed, retry with NVIDIA keyring repo)
-- [ ] **VRAM time-sharing**: Add GPU arbiter logic so llama-server (:8090) and VLM (:8085) can share the 8 GB RTX 3060 Ti — unload one before loading the other
+- [ ] **TurboQuant fork**: Build turboquant_plus with `turbo3` KV cache (needs CUDA toolkit in WSL — `nvidia-cuda-toolkit` install failed, retry with NVIDIA keyring repo). Current build uses `q4_0` KV cache (still good — ~4x compression).
+- [x] **VRAM time-sharing**: ~~Add GPU arbiter logic~~ — DONE via `tryOllamaVlm()` VRAM swap. Now largely obsolete since mmproj eliminates VRAM conflicts, but kept as fallback.
 - [ ] **Streaming for LiteRT**: Current LiteRT streaming is fake (full response as single SSE chunk). Implement true token-by-token if litert_lm adds streaming API
 
 ### Medium-term
@@ -172,7 +166,8 @@ print(f"Vision tensors: {len(vision)}")  # Should be > 0
 | Location | Size | Format | VLM? | Purpose |
 |----------|------|--------|------|---------|
 | `Downloads/gemma4-e4b-legal-final-gguf (1)/.../model.safetensors` | **9.7 GB** | HF safetensors (single file) | **YES** — 435 vision + 344 audio + 2 embed keys, LoRA baked in | Merged VLM checkpoint for `app.py` (HF Transformers + NF4) |
-| `Downloads/gemma4-legal-vlm-q4_k_m.gguf` | **5.0 GB** | GGUF Q4_K_M | **No** — 720 tensors, 0 vision/audio (text-only export) | TurboQuant / llama-server (text-only until Colab reconversion) |
+| `Downloads/gemma4-legal-vlm-q4_k_m.gguf` | **5.0 GB** | GGUF Q4_K_M | **No** — 720 tensors, text-only. Vision via separate mmproj | TurboQuant / llama-server text model |
+| `Downloads/gemma4-mmproj/mmproj-BF16.gguf` | **992 MB** | GGUF BF16 | **YES** — SigLIP vision encoder + projector | `--mmproj` for llama-server VLM (stock, compatible with legal fine-tune) |
 | `Downloads/gemma4-e4b-legal-ollama/` | **5.0 GB** | Ollama Modelfile + GGUF | Text-only | Ollama import dir |
 | `Downloads/gemma4-legal-final-adapters/.../gemma4-e4b-legal-grpo-lora/` | **193 MB** | PEFT LoRA (adapter_model.safetensors) | N/A (adapter only) | LoRA adapter for base `google/gemma-4-E4B-it` |
 | `Downloads/model-00002-of-00002-003.safetensors` | **5.6 GB** | HF safetensors (shard 2/2) | **YES** — 658 vision keys | Second shard of 2-shard split (shard 1 not downloaded) |
