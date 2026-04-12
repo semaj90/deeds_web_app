@@ -1,6 +1,7 @@
 import { parse } from '@babel/parser';
 import traverse from '@babel/traverse';
 import { json } from '@sveltejs/kit';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import fs from 'fs/promises';
 import path from 'path';
 import type { RequestHandler } from './$types';
@@ -24,7 +25,7 @@ interface RouteInfo {
 	last_modified: string;
 }
 
-export const GET: RequestHandler = async ({ locals }) => {
+export const GET: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const srcPath = path.join(process.cwd(), 'src');
@@ -63,13 +64,20 @@ export const GET: RequestHandler = async ({ locals }) => {
 			};
 		});
 
-		return json({
+		const responseData = {
 			routes: enrichedRoutes,
 			summary: {
 				total: enrichedRoutes.length,
 				with_errors: enrichedRoutes.filter((r) => r.errors > 0).length,
 				in_kb: enrichedRoutes.filter((r) => r.kb_vectors > 0).length
 			}
+		};
+
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.medium, ETag: etag }
 		});
 
 	} catch (error) {
@@ -84,7 +92,10 @@ export const GET: RequestHandler = async ({ locals }) => {
         },
         error: 'Failed to load routes',
       },
-      { status: 500 }
+      {
+				status: 500,
+				headers: cacheControl.medium
+			}
     );
 	}
 };

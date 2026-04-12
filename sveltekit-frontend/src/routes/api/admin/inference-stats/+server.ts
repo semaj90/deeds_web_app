@@ -10,6 +10,7 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { z } from 'zod';
 
 const inferenceStatsSchema = z.object({
@@ -17,7 +18,7 @@ const inferenceStatsSchema = z.object({
 	limit: z.coerce.number().int().min(1).max(200).default(50),
 });
 
-export const GET: RequestHandler = async ({ locals, url }) => {
+export const GET: RequestHandler = async ({ locals, url, request }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const parsed = inferenceStatsSchema.safeParse({
@@ -81,13 +82,22 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 			}).catch(() => []);
 		}
 
-		return json({ byType, byBackend, byHour, errors, slowest, queriedAt: new Date().toISOString() });
+		const responseData = { byType, byBackend, byHour, errors, slowest, queriedAt: new Date().toISOString() };
+
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.short, ETag: etag }
+		});
 	} catch (err) {
 		console.error('[inference-stats] CouchDB error:', err);
 		return json({
 			byType, byBackend, byHour, errors, slowest,
 			queriedAt: new Date().toISOString(),
 			error: 'CouchDB unavailable',
+		}, {
+			headers: cacheControl.short
 		});
 	}
 };

@@ -84,7 +84,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json(
 			{
 				error: 'Validation failed',
-				details: validation.error.errors,
+				details: validation.error.issues,
 			},
 			{ status: 400 }
 		);
@@ -138,7 +138,7 @@ export const PUT: RequestHandler = async ({ request, locals }) => {
 		return json(
 			{
 				error: 'Validation failed',
-				details: validation.error.errors,
+				details: validation.error.issues,
 			},
 			{ status: 400 }
 		);
