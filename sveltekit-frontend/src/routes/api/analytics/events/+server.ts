@@ -7,6 +7,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { logEvent, logEventBatch, type AnalyticsEvent } from '$lib/server/analytics/event-logger.js';
 import { sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const ANALYTICS_EVENT_TYPES = [
 	'chat_query', 'tool_search', 'codebase_search', 'route_opened',
@@ -84,7 +85,7 @@ const eventListQuerySchema = z.object({
 	limit: z.coerce.number().int().min(1).max(200).default(50),
 });
 
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
 	if (!locals.user?.id) return json({ ok: false, error: 'Unauthorized' }, { status: 401 });
 	const parsed = eventListQuerySchema.safeParse(Object.fromEntries(url.searchParams));
 	if (!parsed.success) {
@@ -101,8 +102,18 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 				ORDER BY created_at DESC
 				LIMIT ${limit}`
 		);
-		return json({ events: (rows as any).rows });
+
+		const responseData = { events: (rows as any).rows };
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.private, ETag: etag }
+		});
 	} catch {
-		return json({ events: [], error: 'Database unavailable' }, { status: 503 });
+		return json({ events: [], error: 'Database unavailable' }, {
+			status: 503,
+			headers: cacheControl.private
+		});
 	}
 };

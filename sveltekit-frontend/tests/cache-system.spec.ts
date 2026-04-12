@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { PORTS } from './helpers/env-ports.js';
 
 /**
  * Cache System Tests
@@ -11,7 +12,7 @@ import { expect, test } from '@playwright/test';
  * this and verify the page doesn't hard-crash.
  */
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE_URL = PORTS.APP_BASE;
 
 test.describe('Cache System - Route Availability', () => {
   test('cache-demo route should respond', async ({ page }) => {

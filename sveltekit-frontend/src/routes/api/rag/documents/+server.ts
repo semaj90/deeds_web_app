@@ -4,13 +4,14 @@ import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { documents } from '$lib/server/db/schema.js';
 import { desc } from 'drizzle-orm';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const querySchema = z.object({
 	limit: z.coerce.number().int().min(1).max(200).default(50)
 });
 
 /** GET /api/rag/documents — List RAG-indexed documents */
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
@@ -29,9 +30,16 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			.orderBy(desc(documents.createdAt))
 			.limit(limit);
 
-		return json(rows);
+		const { etag, isMatch } = checkETag(rows, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(rows, {
+			headers: { ...cacheControl.private, ETag: etag }
+		});
 	} catch (err) {
 		console.error('[/api/rag/documents] error:', err);
-		return json([]);
+		return json([], {
+			headers: cacheControl.private
+		});
 	}
 };

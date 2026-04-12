@@ -64,8 +64,8 @@ export const GET: RequestHandler = async ({ locals, url, request }) => {
             : String(citation.createdAt),
       })),
     };
-    const etag = checkETag(responseData, request.headers);
-    if (etag === null) return notModified();
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
     return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
   } catch (err) {
     console.error('[citations/search] Failed:', err);

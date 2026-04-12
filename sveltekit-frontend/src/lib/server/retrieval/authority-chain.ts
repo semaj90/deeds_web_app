@@ -273,8 +273,8 @@ export async function authorityChainExpansion(
 		// Embed the combined authority citation text
 		const authText = [...newAuth.statutes, ...newAuth.cases].join('; ');
 		const authVector = await traceEmbedding(
-			'authority-chain',
-			{ hop: hop + 1, textLength: authText.length, statuteCount: newAuth.statutes.length, caseCount: newAuth.cases.length },
+			authText.slice(0, 500), // Text sample for tracing (full text embedded via callback)
+			'embeddinggemma',
 			async () => embedFn(authText)
 		);
 		if (!authVector) {

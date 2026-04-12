@@ -55,7 +55,7 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
 	if (caseRow.opposingParty) whoParts.push(`vs. ${caseRow.opposingParty}`);
 	if (personRows.length) whoParts.push(`(${personRows.length} persons of interest)`);
 
-	return json({
+	const responseData = {
 		caseId: id,
 		caseData: {
 			id: caseRow.id,

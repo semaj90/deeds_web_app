@@ -4,8 +4,9 @@
  * Tests the actual end-to-end flow: type → SSE POST → Ollama stream → render
  */
 import { expect, test } from '@playwright/test';
+import { PORTS } from '../helpers/env-ports.js';
 
-const BASE = 'http://127.0.0.1:5173';
+const BASE = PORTS.APP_BASE;
 const SCREENSHOT_DIR = 'test-results/chat-screenshots';
 
 test.describe('Real SSE Chat Pipeline', () => {

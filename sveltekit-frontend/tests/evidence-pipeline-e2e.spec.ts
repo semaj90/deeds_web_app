@@ -25,11 +25,13 @@ import {
 	cleanupSeededCases,
 	type SeedCaseResult,
 } from './utils/seed-cases';
+import { PORTS } from './helpers/env-ports.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE_URL = PORTS.APP_BASE;
 const DB_URL =
-	process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+	process.env.DATABASE_URL ||
+	`postgresql://legal_admin:123456@127.0.0.1:${PORTS.PG_PORT}/legal_ai_db`;
 
 test.describe('Evidence Pipeline E2E', () => {
 	test.describe.configure({ mode: 'serial' });

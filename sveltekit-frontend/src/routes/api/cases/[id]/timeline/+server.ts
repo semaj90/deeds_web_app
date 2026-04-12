@@ -297,6 +297,8 @@ export const GET: RequestHandler = async ({ params, locals, url, request }) => {
     return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
   } catch (err) {
     console.error('[timeline] GET error:', err);
-    return json({ events: [], totalEvents: 0, caseId, types: [] });
+    return json({ events: [], totalEvents: 0, caseId, types: [] }, {
+      headers: cacheControl.private
+    });
   }
 };

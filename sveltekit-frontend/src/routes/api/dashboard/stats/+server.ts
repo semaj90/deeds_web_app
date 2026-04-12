@@ -103,7 +103,7 @@ export const GET: RequestHandler = async ({ locals, request }) => {
     },
     ...(dbErrors > 0 && { _dbDegraded: true, _dbErrors: dbErrors }),
   };
-  const etag = checkETag(responseData, request.headers);
-  if (etag === null) return notModified();
+  const { etag, isMatch } = checkETag(responseData, request.headers);
+  if (isMatch) return notModified(etag);
   return json(responseData, { headers: { ...cacheControl.short, ETag: etag } });
 };

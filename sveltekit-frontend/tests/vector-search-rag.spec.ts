@@ -18,8 +18,9 @@
  */
 import { test, expect, type APIRequestContext } from '@playwright/test';
 import { registerTestUser } from './utils/seed-cases';
+import { PORTS } from './helpers/env-ports.js';
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE_URL = PORTS.APP_BASE;
 
 test.describe('Vector Search & RAG Pipeline', () => {
 	test.describe.configure({ mode: 'serial' });

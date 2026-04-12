@@ -50,8 +50,8 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
     const rows = status ? await baseQuery.where(sql`${cases.status} = ${status}`) : await baseQuery;
 
     const responseData = { data: rows };
-    const etag = checkETag(responseData, request.headers);
-    if (etag === null) return notModified();
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
     return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
   } catch (err) {
     console.error('[/api/yorha/cases] GET error:', err);

@@ -90,8 +90,8 @@ export const GET: RequestHandler = async ({ locals, url, request }) => {
 
     const results = await query;
     const responseData = { success: true, citations: results };
-    const etag = checkETag(responseData, request.headers);
-    if (etag === null) return notModified();
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
     return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
   } catch (err) {
     console.error('Error fetching saved citations:', err);
