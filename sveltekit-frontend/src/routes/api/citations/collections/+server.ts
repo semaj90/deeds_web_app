@@ -4,6 +4,7 @@ import { db } from '$lib/server/db/client';
 import { citationCollections, collectionCitations, citations } from '$lib/server/db/schema-postgres.js';
 import { eq, and, sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const createCollectionSchema = z.object({
 	name: z.string().trim().min(1, 'Missing required field: name').max(500),
@@ -16,7 +17,7 @@ const createCollectionSchema = z.object({
  * GET /api/citations/collections
  * Fetch all citation collections for the current user
  */
-export const GET: RequestHandler = async ({ locals }) => {
+export const GET: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}
@@ -41,10 +42,18 @@ export const GET: RequestHandler = async ({ locals }) => {
 			.groupBy(citationCollections.id)
 			.orderBy(citationCollections.createdAt);
 
-		return json(userCollections);
+		const { etag, isMatch } = checkETag(userCollections, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(userCollections, {
+			headers: { ...cacheControl.private, ETag: etag }
+		});
 	} catch (err) {
 		console.error('Error fetching collections:', err);
-		return json([], { status: 200 });
+		return json([], {
+			status: 200,
+			headers: cacheControl.private
+		});
 	}
 };
 
