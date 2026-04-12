@@ -772,3 +772,4 @@ tmp-*.ps1
 # Archive directory — all subdirs are archived legacy code
 deeds_labs/
 
+*.profraw
