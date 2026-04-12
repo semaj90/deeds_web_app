@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { db } from '$lib/server/db/client';
+import { pool } from '$lib/server/db/client';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	// Auth check (respects DEV_BYPASS_AUTH)
@@ -24,8 +24,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			LIMIT 1
 		`;
 
-		const result = await db.execute(query, [evidenceId]);
-		const rows = (result as any).rows;
+		const result = await pool.query(query, [evidenceId]);
+    const rows = result.rows;
 
 		if (!rows || rows.length === 0) {
 			return { loadError: 'Audio evidence not found', evidenceId: null, title: null };

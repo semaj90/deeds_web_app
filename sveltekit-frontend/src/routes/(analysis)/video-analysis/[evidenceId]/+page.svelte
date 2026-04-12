@@ -381,7 +381,7 @@
 							<div class="empty-state">
 								<Icon name="brain" />
 								<p>No ACE analysis available</p>
-							</div}
+							</div>
 						{/if}
 					</div>
 				{/if}

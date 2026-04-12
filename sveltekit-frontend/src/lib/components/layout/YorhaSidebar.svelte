@@ -4,7 +4,24 @@
 	import { browser } from '$app/environment';
 
 	let collapsed = $state(false);
+	let userToggledManually = $state(false);
 	let currentTime = $state(new Date().toLocaleString());
+
+	// Analysis routes need maximum workspace — auto-collapse on entry
+	const ANALYSIS_ROUTES = ['/audio-analysis/', '/video-analysis/', '/document-analysis/'];
+	let isAnalysisRoute = $derived(ANALYSIS_ROUTES.some(r => page.url.pathname.startsWith(r)));
+
+	$effect(() => {
+		if (!browser) return;
+		if (isAnalysisRoute && !userToggledManually) {
+			collapsed = true;
+		} else if (!isAnalysisRoute) {
+			// Restore persisted state when leaving analysis routes
+			userToggledManually = false;
+			const saved = localStorage.getItem('yorha-sidebar-collapsed');
+			if (saved !== null) collapsed = saved === 'true';
+		}
+	});
 
 	// Update time every second
 	$effect(() => {
@@ -63,16 +80,9 @@
 		return page.url.pathname === href || page.url.pathname.startsWith(href + '/');
 	}
 
-	// Persist collapse state
+	// Persist collapse state (only on non-analysis routes)
 	$effect(() => {
-		if (browser) {
-			const saved = localStorage.getItem('yorha-sidebar-collapsed');
-			if (saved !== null) collapsed = saved === 'true';
-		}
-	});
-
-	$effect(() => {
-		if (browser && collapsed !== undefined) {
+		if (browser && !isAnalysisRoute && collapsed !== undefined) {
 			localStorage.setItem('yorha-sidebar-collapsed', String(collapsed));
 		}
 	});
@@ -87,7 +97,7 @@
 		</div>
 		<button
 			class="collapse-btn"
-			onclick={() => collapsed = !collapsed}
+			onclick={() => { collapsed = !collapsed; userToggledManually = true; }}
 			title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
 		>
 			<Icon name={collapsed ? 'chevron-right' : 'chevron-left'} size={16} />
