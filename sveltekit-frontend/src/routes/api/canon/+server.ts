@@ -8,6 +8,7 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { canonicalDocuments } from '$lib/server/db/schema-postgres.js';
 import { desc, and, sql } from 'drizzle-orm';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { z } from 'zod';
 
 const createDocSchema = z.object({
@@ -23,7 +24,7 @@ const createDocSchema = z.object({
 	metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
   const jurisdiction = url.searchParams.get('jurisdiction');
@@ -55,10 +56,21 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       .orderBy(desc(canonicalDocuments.createdAt))
       .limit(limit);
 
-    return json({ success: true, documents: docs, count: docs.length });
+    const responseData = { success: true, documents: docs, count: docs.length };
+
+    // ETag check for 304 response (canonical documents are stable reference data)
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+
+    return json(responseData, {
+      headers: { ...cacheControl.long, ETag: etag }
+    });
   } catch (err) {
     console.error('[canon] GET error:', err);
-    return json({ success: true, documents: [], count: 0 });
+    return json(
+      { success: true, documents: [], count: 0 },
+      { headers: cacheControl.long }
+    );
   }
 };
 

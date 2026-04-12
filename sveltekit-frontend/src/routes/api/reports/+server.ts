@@ -5,6 +5,7 @@ import { and, desc, eq, inArray } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { auditReportAction, createReportVersion } from '$lib/server/reports/audit';
 import { invalidateReportCache, invalidateCaseCache } from '$lib/server/cache/invalidation.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { z } from 'zod';
 
 const reportCreateSchema = z.object({
@@ -55,7 +56,7 @@ const reportListSchema = z.object({
  * Fetch reports with optional case filtering
  * Query params: caseId, ids (comma-separated), limit, offset
  */
-export const GET: RequestHandler = async ({ locals, url }) => {
+export const GET: RequestHandler = async ({ locals, url, request }) => {
   if (!locals.user) {
     return json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -70,22 +71,21 @@ export const GET: RequestHandler = async ({ locals, url }) => {
   const { caseId, ids: idsParam, limit, offset } = parsed.data;
 
   try {
+    let userReports;
+
     // Filter by specific IDs if provided
     if (idsParam) {
       const ids = idsParam.split(',').filter(Boolean);
-      const userReports = await db
+      userReports = await db
         .select()
         .from(reports)
         .where(and(inArray(reports.id, ids), eq(reports.createdBy, locals.user.id)))
         .orderBy(desc(reports.createdAt))
         .$withCache({ config: { ex: 60 } });
-
-      return json({ success: true, data: userReports });
     }
-
     // Filter by case ID if provided
-    if (caseId) {
-      const userReports = await db
+    else if (caseId) {
+      userReports = await db
         .select()
         .from(reports)
         .where(and(eq(reports.caseId, caseId), eq(reports.createdBy, locals.user.id)))
@@ -93,24 +93,34 @@ export const GET: RequestHandler = async ({ locals, url }) => {
         .limit(limit)
         .offset(offset)
         .$withCache({ config: { ex: 600 } });
-
-      return json({ success: true, data: userReports });
+    }
+    // Otherwise return all user's reports
+    else {
+      userReports = await db
+        .select()
+        .from(reports)
+        .where(eq(reports.createdBy, locals.user.id))
+        .orderBy(desc(reports.createdAt))
+        .limit(limit)
+        .offset(offset)
+        .$withCache({ config: { ex: 600 } });
     }
 
-    // Otherwise return all user's reports
-    const userReports = await db
-      .select()
-      .from(reports)
-      .where(eq(reports.createdBy, locals.user.id))
-      .orderBy(desc(reports.createdAt))
-      .limit(limit)
-      .offset(offset)
-      .$withCache({ config: { ex: 600 } });
+    const responseData = { success: true, data: userReports };
 
-    return json({ success: true, data: userReports });
+    // ETag check for 304 response (user reports are private data)
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+
+    return json(responseData, {
+      headers: { ...cacheControl.private, ETag: etag }
+    });
   } catch (err) {
     console.error('Error fetching reports:', err);
-    return json({ success: false, data: [] });
+    return json(
+      { success: false, data: [] },
+      { headers: cacheControl.private }
+    );
   }
 };
 

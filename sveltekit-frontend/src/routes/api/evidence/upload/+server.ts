@@ -1672,16 +1672,6 @@ async function processAndEmbed(
         ...(yoloDetections?.objects?.map((o) => `detected:${o.class}`) ?? []),
         ...(analysisPipelineResult?.tags ?? []),
       ].filter(Boolean),
-      pipelineStats: analysisPipelineResult
-        ? {
-            llmEscalated: analysisPipelineResult.llmEscalated ?? false,
-            llmSynthesis: analysisPipelineResult.llmSynthesis ?? undefined,
-            graphConnectionsCreated: analysisPipelineResult.graphConnectionsCreated ?? 0,
-            yoloCacheHit: analysisPipelineResult.yoloCacheHit ?? false,
-            cachedToDb: analysisPipelineResult.cachedToDb ?? false,
-            processingTimeMs: analysisPipelineResult.processingTimeMs ?? 0,
-          }
-        : undefined,
       analysisTimestamp: diagnostics.completedAt,
       // Audio transcription metadata (when evidence was audio)
       ...(extractionMethod.startsWith('whisper-') || extractionMethod === 'docling-asr'
