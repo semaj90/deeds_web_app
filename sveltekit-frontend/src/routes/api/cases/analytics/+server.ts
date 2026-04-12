@@ -13,6 +13,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import type { ApiResponse } from '$lib/types/api.js';
 import { db } from '$lib/server/db/client';
 import { cases, documentTopics } from '$lib/server/db/schema-postgres.js';
@@ -219,18 +220,23 @@ export const GET: RequestHandler = async (event) => {
 			topicDistribution
 		};
 
-		return json(
-			{
-				success: true,
-				data: analyticsData,
-				metadata: {
-					timestamp: new Date().toISOString(),
-					version: '1.0',
-					processing_time: processingTime
-				}
-			},
-			{ status: 200 }
-		);
+		const responseData = {
+			success: true,
+			data: analyticsData,
+			metadata: {
+				timestamp: new Date().toISOString(),
+				version: '1.0',
+				processing_time: processingTime
+			}
+		};
+
+		const { etag, isMatch } = checkETag(responseData, event.request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			status: 200,
+			headers: { ...cacheControl.short, ETag: etag }
+		});
 	} catch (err) {
 		console.error('[cases-analytics] Request error:', err);
 
@@ -242,6 +248,8 @@ export const GET: RequestHandler = async (event) => {
         version: '1.0',
         processing_time: 0,
       },
-    });
+    }, {
+			headers: cacheControl.short
+		});
 	}
 };

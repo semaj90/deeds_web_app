@@ -10,6 +10,7 @@ import { couchdb } from '$lib/services/couchdb-client.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const QDRANT_URL = getQdrantUrl();
 
@@ -122,7 +123,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 };
 
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const queryId = url.searchParams.get('query_id');
   const caseId = url.searchParams.get('case_id');
@@ -144,14 +145,23 @@ export const GET: RequestHandler = async ({ url, locals }) => {
         return true;
       });
 
-    return json({
+    const responseData = {
       validations: docs,
       count: docs.length
+    };
+
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+
+    return json(responseData, {
+      headers: { ...cacheControl.short, ETag: etag }
     });
   } catch (error) {
     return json({
       validations: [],
       error: 'Failed to fetch validations'
+    }, {
+      headers: cacheControl.short
     });
   }
 };

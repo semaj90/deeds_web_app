@@ -6,6 +6,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { getTokenUsageStats } from '$lib/server/ai/token-tracker.js';
 
 const querySchema = z.object({
@@ -13,9 +14,11 @@ const querySchema = z.object({
 	userId: z.string().max(100).nullish(),
 });
 
-export const GET: RequestHandler = async ({ locals, url }) => {
+export const GET: RequestHandler = async ({ locals, url, request }) => {
 	if (!locals.user) {
-		return json({ success: false, data: null });
+		return json({ success: false, data: null }, {
+			headers: cacheControl.short
+		});
 	}
 
 	const parsed = querySchema.safeParse({
@@ -31,5 +34,12 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		sinceDaysAgo: parsed.data.days,
 	});
 
-	return json({ success: true, data: stats });
+	const responseData = { success: true, data: stats };
+
+	const { etag, isMatch } = checkETag(responseData, request.headers);
+	if (isMatch) return notModified(etag);
+
+	return json(responseData, {
+		headers: { ...cacheControl.short, ETag: etag }
+	});
 };

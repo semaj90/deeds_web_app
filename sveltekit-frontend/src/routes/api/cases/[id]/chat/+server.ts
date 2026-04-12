@@ -1,4 +1,5 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { db } from '$lib/server/db/client';
 import { cases } from '$lib/server/db/schema-postgres.js';
 import { chatMessages } from '$lib/server/db/schema-postgres';
@@ -109,7 +110,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
  * GET /api/cases/[id]/chat
  * Retrieve chat history for evidence board
  */
-export const GET: RequestHandler = async ({ params, locals, url }) => {
+export const GET: RequestHandler = async ({ params, locals, url, request }) => {
 	try {
 		const { id } = params;
 		const user = locals.user;
@@ -159,14 +160,23 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
       )
       .limit(1);
 
-		return json({
+		const responseData = {
 			success: true,
 			chatId,
 			messages,
 			metadata: meta?.tags ? JSON.parse(meta.tags) : {}
+		};
+
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.private, ETag: etag }
 		});
 	} catch (e) {
 		console.error('[api/cases/[id]/chat] GET failed:', e);
-		return json({ success: false, chatId: null, messages: [], metadata: {} });
+		return json({ success: false, chatId: null, messages: [], metadata: {} }, {
+			headers: cacheControl.private
+		});
 	}
 };
