@@ -1,16 +1,39 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { validateInternalUrl } from '$lib/server/security/url-validator.js';
+import { z } from 'zod';
+
+const comparePdfSchema = z.object({
+	fileUrl: z.string().url().max(2000).optional(),
+	text: z.string().max(50000).optional(),
+	tags: z.string().max(500).optional(),
+	topK: z.coerce.number().int().min(1).max(50).default(8),
+}).refine((data) => data.fileUrl || data.text, {
+	message: 'Either fileUrl or text must be provided',
+});
 
 /** POST /api/v1/legal/compare-pdf — Compare document against legal corpus */
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
     const formData = await request.formData();
-    const fileUrl = formData.get('fileUrl') as string | null;
-    const text = formData.get('text') as string | null;
-    const tagsRaw = formData.get('tags') as string | null;
-    const topK = Math.min(Number(formData.get('topK')) || 8, 50);
+
+    // Validate FormData with Zod
+    const parsed = comparePdfSchema.safeParse({
+      fileUrl: formData.get('fileUrl'),
+      text: formData.get('text'),
+      tags: formData.get('tags'),
+      topK: formData.get('topK'),
+    });
+
+    if (!parsed.success) {
+      return json(
+        { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid request' },
+        { status: 400 }
+      );
+    }
+
+    const { fileUrl, text, tags: tagsRaw, topK } = parsed.data;
 
     // SSRF protection: only allow internal MinIO service URLs
     if (fileUrl) {

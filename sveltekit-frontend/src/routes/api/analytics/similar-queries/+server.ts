@@ -8,18 +8,22 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { generateEmbedding } from '$lib/server/ai/embeddings-simple.js';
+import { similaritySearchSchema, validateSearchParams } from '$lib/server/validation/query-params.js';
 
 export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.user) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
-	const query = url.searchParams.get('q')?.trim();
-	const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '5', 10) || 5, 20);
-
-	if (!query) {
-		return json({ similarQueries: [], total: 0 });
+	// Validate query parameters
+	let params: { q: string; limit: number };
+	try {
+		params = validateSearchParams(url.searchParams, similaritySearchSchema);
+	} catch {
+		return json({ error: 'Invalid query parameters', similarQueries: [], total: 0 }, { status: 400 });
 	}
+
+	const { q: query, limit } = params;
 
 	try {
 		const embedding = await generateEmbedding(query);

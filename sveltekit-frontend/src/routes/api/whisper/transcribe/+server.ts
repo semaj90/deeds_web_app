@@ -9,6 +9,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { extractDocument } from '$lib/server/langextract-client.js';
 import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
 import { generateEmbedding } from '$lib/server/ai/embeddings-simple.js';
+import { z } from 'zod';
 
 interface TranscriptionEnrichment {
 	entities?: Array<{ text: string; label: string; confidence?: number; source?: string }>;
@@ -136,6 +137,25 @@ const ALLOWED_AUDIO_EXTENSIONS = new Set([
 	'.wav', '.mp3', '.ogg', '.webm', '.flac', '.m4a', '.aac', '.opus'
 ]);
 
+// Custom Zod refinement for file validation
+const audioFileSchema = z
+	.custom<File>((v) => v instanceof File, 'Must be a File')
+	.refine((file) => file.size <= MAX_AUDIO_SIZE, `Audio file too large. Maximum ${MAX_AUDIO_SIZE / 1024 / 1024}MB`)
+	.refine((file) => !file.type || ALLOWED_AUDIO_TYPES.has(file.type), 'Invalid audio file type')
+	.refine((file) => {
+		const ext = '.' + (file.name.split('.').pop()?.toLowerCase() ?? '');
+		return ALLOWED_AUDIO_EXTENSIONS.has(ext);
+	}, 'Invalid audio file extension');
+
+const whisperTranscribeSchema = z.object({
+	file: audioFileSchema,
+	language: z.string().toLowerCase().refine((lang) => VALID_LANGUAGES.has(lang), 'Invalid language code').default('auto'),
+	translate: z.enum(['true', 'false']).default('false').transform((v) => v === 'true'),
+	timestamps: z.enum(['true', 'false']).default('false').transform((v) => v === 'true'),
+	enrich: z.enum(['true', 'false']).default('true').transform((v) => v === 'true'),
+	caseId: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, 'Invalid UUID').optional(),
+});
+
 // Valid ISO 639-1 language codes accepted by whisper.cpp
 const VALID_LANGUAGES = new Set([
 	'auto', 'en', 'zh', 'de', 'es', 'ru', 'ko', 'fr', 'ja', 'pt', 'tr', 'pl',
@@ -204,43 +224,27 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   try {
     const formData = await request.formData();
-    const audioFile = formData.get('file') as File | null;
 
-    if (!audioFile) {
-      return json({ error: 'No audio file provided' }, { status: 400 });
-    }
+    // Validate FormData with Zod
+    const parsed = whisperTranscribeSchema.safeParse({
+      file: formData.get('file'),
+      language: formData.get('language'),
+      translate: formData.get('translate'),
+      timestamps: formData.get('timestamps'),
+      enrich: formData.get('enrich'),
+      caseId: formData.get('caseId'),
+    });
 
-    // Validate file size
-    if (audioFile.size > MAX_AUDIO_SIZE) {
+    if (!parsed.success) {
       return json(
-        { error: `Audio file too large. Maximum ${MAX_AUDIO_SIZE / 1024 / 1024}MB.` },
+        { error: parsed.error.issues[0]?.message ?? 'Invalid request' },
         { status: 400 }
       );
     }
 
-    // Validate MIME type
-    if (audioFile.type && !ALLOWED_AUDIO_TYPES.has(audioFile.type)) {
-      return json({ error: 'Invalid audio file type' }, { status: 400 });
-    }
+    const { file: audioFile, language: languageParam, translate, timestamps, enrich, caseId } = parsed.data;
 
-    // Validate extension
     const ext = '.' + (audioFile.name.split('.').pop()?.toLowerCase() ?? '');
-    if (!ALLOWED_AUDIO_EXTENSIONS.has(ext)) {
-      return json({ error: 'Invalid audio file extension' }, { status: 400 });
-    }
-
-    // Parse optional params
-    const languageParam = (formData.get('language') as string | null)?.toLowerCase() ?? 'auto';
-    const translate = formData.get('translate') === 'true';
-    const timestamps = formData.get('timestamps') === 'true';
-    const enrich = formData.get('enrich') !== 'false'; // default: true
-    const caseId = (formData.get('caseId') as string | null) ?? undefined;
-
-    // Validate language code
-    if (!VALID_LANGUAGES.has(languageParam)) {
-      return json({ error: `Invalid language code: ${languageParam}` }, { status: 400 });
-    }
-
     const buffer = Buffer.from(await audioFile.arrayBuffer());
 
     // ── Tier 1: Persistent whisper-server.exe (no cold start) ──

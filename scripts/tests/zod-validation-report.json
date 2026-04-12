@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-04-12T01:22:16.051Z",
+  "timestamp": "2026-04-12T01:39:42.451Z",
   "totalRoutes": 425,
-  "validated": 308,
-  "coverage": 72.5,
+  "validated": 313,
+  "coverage": 73.6,
   "categories": {
     "hasZod": [
       "ace\\ingest\\+server.ts",
@@ -12,6 +12,7 @@
       "acp\\tools\\+server.ts",
       "admin\\agent\\fix\\+server.ts",
       "admin\\audit\\+server.ts",
+      "admin\\inference-stats\\+server.ts",
       "admin\\knowledge\\+server.ts",
       "admin\\qlora\\+server.ts",
       "admin\\seed-knowledge\\+server.ts",
@@ -245,6 +246,7 @@
       "rag\\answer\\+server.ts",
       "rag\\documents\\+server.ts",
       "rag\\enhanced\\+server.ts",
+      "rag\\process\\+server.ts",
       "rag\\search\\+server.ts",
       "rag\\validate\\+server.ts",
       "recommendations\\+server.ts",
@@ -300,6 +302,7 @@
       "v1\\evidence\\advanced-analysis\\+server.ts",
       "v1\\evidence\\analyze\\+server.ts",
       "v1\\evidence\\canvas\\+server.ts",
+      "v1\\legal\\compare-pdf\\+server.ts",
       "v1\\redis\\cache\\+server.ts",
       "v1\\reports\\chat-associations\\+server.ts",
       "v1\\vector\\store\\+server.ts",
@@ -308,6 +311,7 @@
       "web\\crawl\\+server.ts",
       "web\\search\\+server.ts",
       "websearch\\+server.ts",
+      "whisper\\transcribe\\+server.ts",
       "worker\\autotag\\trigger\\+server.ts",
       "yorha\\analytics\\+server.ts",
       "yorha\\cases\\+server.ts",
@@ -315,22 +319,17 @@
     ],
     "jsonButNoZod": [],
     "importedSchema": [
+      "analytics\\similar-queries\\+server.ts",
       "cases\\[id]\\canvas\\+server.ts"
     ],
-    "formData": [
-      "rag\\process\\+server.ts",
-      "v1\\legal\\compare-pdf\\+server.ts",
-      "whisper\\transcribe\\+server.ts"
-    ],
+    "formData": [],
     "getOnly": [
-      "admin\\inference-stats\\+server.ts",
       "admin\\routes\\+server.ts",
       "admin\\routes\\stream\\+server.ts",
       "ai\\models\\+server.ts",
       "ai\\personas\\+server.ts",
       "ai\\stats\\+server.ts",
       "ai\\suggestions\\+server.ts",
-      "analytics\\similar-queries\\+server.ts",
       "auth\\debug\\+server.ts",
       "auth\\health\\+server.ts",
       "auth\\me\\+server.ts",

@@ -10,12 +10,26 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
+
+const inferenceStatsSchema = z.object({
+	view: z.enum(['all', 'by_type', 'by_backend', 'by_hour', 'errors', 'slowest']).default('all'),
+	limit: z.coerce.number().int().min(1).max(200).default(50),
+});
 
 export const GET: RequestHandler = async ({ locals, url }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const view = url.searchParams.get('view') ?? 'all';
-	const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '50', 10), 200);
+	const parsed = inferenceStatsSchema.safeParse({
+		view: url.searchParams.get('view'),
+		limit: url.searchParams.get('limit'),
+	});
+
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid params' }, { status: 400 });
+	}
+
+	const { view, limit } = parsed.data;
 	const wantAll = view === 'all';
 
 	let byType: Record<string, unknown> = {};

@@ -1,5 +1,6 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB per file
 const MAX_FILES = 20;
@@ -10,34 +11,44 @@ const ALLOWED_TYPES = new Set([
 ]);
 const ALLOWED_EXTENSIONS = new Set(['.pdf', '.txt', '.html', '.md', '.docx']);
 
+// Custom Zod refinement for file validation
+const documentFileSchema = z
+	.custom<File>((v) => v instanceof File, 'Must be a File')
+	.refine((file) => file.size <= MAX_FILE_SIZE, `File exceeds 50MB limit`)
+	.refine((file) => {
+		const ext = file.name.includes('.') ? '.' + file.name.split('.').pop()!.toLowerCase() : '';
+		return ALLOWED_EXTENSIONS.has(ext) || ALLOWED_TYPES.has(file.type);
+	}, 'Unsupported file type');
+
+const ragProcessSchema = z.object({
+	files: z.array(documentFileSchema).min(1, 'No files provided').max(MAX_FILES, `Too many files (max ${MAX_FILES})`),
+	enableOCR: z.enum(['true', 'false']).default('false').transform((v) => v === 'true'),
+	enableEmbedding: z.enum(['true', 'false']).default('true').transform((v) => v === 'true'),
+	enableRAG: z.enum(['true', 'false']).default('true').transform((v) => v === 'true'),
+});
+
 /** POST /api/rag/process — Process uploaded files through RAG pipeline */
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const formData = await request.formData();
-		const files = formData.getAll('files') as File[];
-		const enableOCR = formData.get('enableOCR') === 'true';
-		const enableEmbedding = formData.get('enableEmbedding') !== 'false';
-		const enableRAG = formData.get('enableRAG') !== 'false';
 
-		if (!files.length) {
-			return json({ error: 'No files provided' }, { status: 400 });
+		// Validate FormData with Zod
+		const parsed = ragProcessSchema.safeParse({
+			files: formData.getAll('files'),
+			enableOCR: formData.get('enableOCR'),
+			enableEmbedding: formData.get('enableEmbedding'),
+			enableRAG: formData.get('enableRAG'),
+		});
+
+		if (!parsed.success) {
+			return json(
+				{ error: parsed.error.issues[0]?.message ?? 'Invalid request' },
+				{ status: 400 }
+			);
 		}
 
-		if (files.length > MAX_FILES) {
-			return json({ error: `Too many files (max ${MAX_FILES})` }, { status: 400 });
-		}
-
-		// Validate each file
-		for (const file of files) {
-			if (file.size > MAX_FILE_SIZE) {
-				return json({ error: `File "${file.name}" exceeds 50MB limit` }, { status: 400 });
-			}
-			const ext = file.name.includes('.') ? '.' + file.name.split('.').pop()!.toLowerCase() : '';
-			if (!ALLOWED_EXTENSIONS.has(ext) && !ALLOWED_TYPES.has(file.type)) {
-				return json({ error: `Unsupported file type: ${file.name}` }, { status: 400 });
-			}
-		}
+		const { files, enableOCR, enableEmbedding, enableRAG } = parsed.data;
 
 		const results: Array<{
 			filename: string;
