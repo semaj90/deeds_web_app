@@ -216,7 +216,9 @@ test.describe('AI Chat — Live Inference', () => {
       await send.click();
       // Wait for sending to complete: button re-enables (live) or short debounce (mock)
       if (turboAlive || ollamaAlive) {
-        await send.waitFor({ state: 'enabled', timeout: 90000 }).catch(() => {});
+        await expect(send)
+          .toBeEnabled({ timeout: 90000 })
+          .catch(() => {});
       } else {
         await page.waitForTimeout(1500);
       }

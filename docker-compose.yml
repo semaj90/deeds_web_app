@@ -651,7 +651,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     networks:
       - legal-ai-network
     healthcheck:
