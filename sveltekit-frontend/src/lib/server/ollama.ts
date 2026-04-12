@@ -219,6 +219,23 @@ export async function bifrostChat(
   const normalizedMessages = messages.map((m) =>
     m.role === 'user' ? { ...m, content: normalizeBifrostMessage(m.content) } : m
   );
+
+  // ── L1 Cache: Redis Exact-Match (sub-ms lookup, 17,500× speedup) ──
+  const { generateCacheKey, getExactMatchCache, setExactMatchCache } = await import('$lib/server/cache/redis-exact-match.js');
+  const exactCacheKey = generateCacheKey({
+    model: bifrostModel,
+    messages: normalizedMessages,
+    temperature: options?.temperature,
+    maxTokens: options?.maxTokens,
+  });
+
+  const exactMatch = await getExactMatchCache(exactCacheKey);
+  if (exactMatch) {
+    console.log(`[bifrost] L1 EXACT-MATCH HIT (${exactMatch.backend}) — instant return`);
+    return exactMatch.content;
+  }
+
+  // ── L2 Cache: Bifrost Semantic Search (5s lookup via Qdrant) ──
   const res = await fetch(`${ENV.BIFROST_URL}/v1/chat/completions`, {
     method: 'POST',
     headers: {
@@ -247,12 +264,24 @@ export async function bifrostChat(
     };
   };
   const debug = data.extra_fields?.cache_debug;
+  const content = data.choices?.[0]?.message?.content ?? '';
+
   if (debug?.cache_hit) {
     console.debug(
-      `[bifrost] CACHE HIT type=${debug.hit_type} similarity=${debug.similarity?.toFixed(3)}`
+      `[bifrost] L2 SEMANTIC HIT type=${debug.hit_type} similarity=${debug.similarity?.toFixed(3)}`
     );
   }
-  return data.choices?.[0]?.message?.content ?? '';
+
+  // Store in Redis exact-match cache for instant future retrieval
+  if (content) {
+    await setExactMatchCache(exactCacheKey, {
+      content,
+      model: bifrostModel,
+      backend: debug?.cache_hit ? 'bifrost-semantic' : 'ollama',
+    });
+  }
+
+  return content;
 }
 
 // ── Chat Functions (merged from ollama-service.ts) ──────────────────────

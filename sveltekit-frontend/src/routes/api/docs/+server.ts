@@ -5,6 +5,7 @@
  */
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import {
 	API_REGISTRY,
 	getEndpointsByCategory,
@@ -19,7 +20,7 @@ const querySchema = z.object({
 	status: z.string().max(50).optional()
 });
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, request }) => {
 	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
 	const { category, q: query, status } = parsed.success ? parsed.data : { category: undefined, q: undefined, status: undefined };
 
@@ -37,10 +38,17 @@ export const GET: RequestHandler = async ({ url }) => {
 		endpoints = endpoints.filter((e) => e.status === status);
 	}
 
-	return json({
+	const responseData = {
 		endpoints,
 		count: endpoints.length,
 		categories: getCategories(),
 		summary: getRegistrySummary()
+	};
+
+	const { etag, isMatch } = checkETag(responseData, request.headers);
+	if (isMatch) return notModified(etag);
+
+	return json(responseData, {
+		headers: { ...cacheControl.long, ETag: etag }
 	});
 };

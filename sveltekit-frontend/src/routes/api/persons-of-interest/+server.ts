@@ -5,6 +5,7 @@ import { cases, personsOfInterest } from '$lib/server/db/schema-postgres.js';
 import { and, desc, eq, ilike, isNull, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const createPOISchema = z.object({
   name: z.string().trim().min(1, 'Name is required').max(500),
@@ -29,7 +30,7 @@ const poiListSchema = z.object({
  * GET /api/persons-of-interest
  * List all persons of interest with optional filtering and pagination
  */
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const parsed = poiListSchema.safeParse({
     page: url.searchParams.get('page') ?? undefined,
@@ -99,16 +100,25 @@ export const GET: RequestHandler = async ({ url, locals }) => {
         .where(where),
     ]);
 
-    return json({
+    const responseData = {
       persons: items,
       total: countResult[0]?.count ?? 0,
       page,
       limit,
       totalPages: Math.ceil((countResult[0]?.count ?? 0) / limit),
+    };
+
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+
+    return json(responseData, {
+      headers: { ...cacheControl.private, ETag: etag }
     });
   } catch (err) {
     console.error('[poi] GET list error:', err);
-    return json({ persons: [], total: 0, page: 1, limit, totalPages: 0 });
+    return json({ persons: [], total: 0, page: 1, limit, totalPages: 0 }, {
+      headers: cacheControl.private
+    });
   }
 };
 

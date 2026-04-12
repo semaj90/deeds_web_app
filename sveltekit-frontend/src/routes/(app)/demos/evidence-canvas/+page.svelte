@@ -13,8 +13,9 @@
 	import EvidenceConnections from '$lib/components/evidence/EvidenceConnections.svelte';
 	import EvidenceBoardToolbar from '$lib/components/evidence/EvidenceBoardToolbar.svelte';
 	import EvidenceCanvas from '$lib/components/evidence/EvidenceCanvas.svelte';
+	import WebGPUTextureStreamingDemo from '$lib/components/evidence/WebGPUTextureStreamingDemo.svelte';
 
-	let activeView = $state<'canvas-editor' | 'fabric' | 'evidence-canvas' | 'recursive' | 'provenance' | 'evidence-board' | 'canvas-board' | 'yorha-board' | 'draggable-nodes' | 'node-graph' | 'ai-canvas'>('canvas-editor');
+	let activeView = $state<'canvas-editor' | 'fabric' | 'evidence-canvas' | 'recursive' | 'provenance' | 'evidence-board' | 'canvas-board' | 'yorha-board' | 'draggable-nodes' | 'node-graph' | 'ai-canvas' | 'webgpu-streaming'>('canvas-editor');
 	let showSidebar = $state(true);
 	let selectedEvidenceId = $state<string | null>(null);
 	let canvasWidth = $derived(showSidebar ? 920 : 1200);
@@ -143,6 +144,12 @@
 			desc: 'Drag-and-drop evidence workspace with AI-powered cosine similarity analysis via embeddinggemma, connection types (similarity/temporal/causal/reference), SVG path connections, and JSON export.',
 			tech: ['SVG Paths', 'embeddinggemma', 'Cosine Similarity', 'Drag & Drop'],
 			icon: 'brain'
+		},
+		'webgpu-streaming': {
+			title: 'WebGPU Texture Streaming',
+			desc: 'NES-inspired evidence texture management with 2KB RAM constraint, 40KB total budget, legal document context, and GPU-accelerated streaming. Demonstrates WebGPU compute shaders for evidence visualization.',
+			tech: ['WebGPU', 'NES Memory Model', 'Texture Atlas', 'Legal Context'],
+			icon: 'cpu'
 		}
 	};
 
@@ -200,7 +207,7 @@
 			</div>
 			<div>
 				<h1 class="ec-title">Evidence Canvas</h1>
-				<p class="ec-subtitle">11 visualization engines — Canvas API, Fabric.js, D3.js, SVG, YoRHa, Evidence Network, Node Graph, AI Canvas</p>
+				<p class="ec-subtitle">12 visualization engines — Canvas API, Fabric.js, D3.js, SVG, YoRHa, Evidence Network, Node Graph, AI Canvas, WebGPU Streaming</p>
 			</div>
 		</div>
 		<div class="ec-stats">
@@ -366,11 +373,19 @@
 						initialEvidence={sampleEvidence.map((e, i) => ({
 							id: e.id,
 							title: e.title,
-							evidenceType: e.evidenceType,
+			evidenceType: e.evidenceType,
 							content: `Primary ${e.evidenceType} evidence — Chain of custody verified`,
 							x: 50 + (i % 3) * 300,
 							y: 40 + Math.floor(i / 3) * 160
 						}))}
+					/>
+				</div>
+			{:else if activeView === 'webgpu-streaming'}
+				<div class="ec-canvas-frame">
+					<WebGPUTextureStreamingDemo
+						width={canvasWidth}
+						height={500}
+						evidenceItems={sampleEvidence}
 					/>
 				</div>
 			{/if}

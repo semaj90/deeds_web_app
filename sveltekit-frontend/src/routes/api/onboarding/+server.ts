@@ -4,6 +4,7 @@ import { db, pool } from '$lib/server/db/client';
 import { users } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const onboardingPatchSchema = z.object({
   hasCompletedOnboarding: z.boolean().optional(),
@@ -44,13 +45,15 @@ function isMissingColumnError(error: unknown) {
 }
 
 /** GET: Return current onboarding state for the authenticated user */
-export const GET: RequestHandler = async ({ locals }) => {
+export const GET: RequestHandler = async ({ locals, request }) => {
   if (!locals.user) {
     return json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   if (!(await hasOnboardingColumns())) {
-    return json(DEFAULT_ONBOARDING_STATE);
+    const { etag, isMatch } = checkETag(DEFAULT_ONBOARDING_STATE, request.headers);
+    if (isMatch) return notModified(etag);
+    return json(DEFAULT_ONBOARDING_STATE, { headers: { ...cacheControl.private, ETag: etag } });
   }
 
   try {
@@ -63,19 +66,17 @@ export const GET: RequestHandler = async ({ locals }) => {
       .where(eq(users.id, locals.user.id))
       .limit(1);
 
-    if (!row) {
-      return json(DEFAULT_ONBOARDING_STATE);
-    }
-
-    return json(row);
+    const responseData = row ?? DEFAULT_ONBOARDING_STATE;
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+    return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
   } catch (error) {
     if (isMissingColumnError(error)) {
       onboardingColumnsAvailable = false;
-      return json(DEFAULT_ONBOARDING_STATE);
+    } else {
+      console.warn('[api/onboarding] GET fallback:', error);
     }
-
-    console.warn('[api/onboarding] GET fallback:', error);
-    return json(DEFAULT_ONBOARDING_STATE);
+    return json(DEFAULT_ONBOARDING_STATE, { headers: cacheControl.private });
   }
 };
 
