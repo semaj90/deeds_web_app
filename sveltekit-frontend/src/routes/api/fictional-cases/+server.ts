@@ -7,6 +7,7 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { db } from '$lib/server/db/client';
 import { fictionalCases, fictionalCaseCharges } from '$lib/server/db/schema-postgres.js';
 import { eq, ilike, or, desc, sql, and } from 'drizzle-orm';
@@ -20,7 +21,7 @@ const listSchema = z.object({
 	offset: z.coerce.number().int().min(0).default(0),
 });
 
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
 	if (!locals.user?.id) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
@@ -99,12 +100,19 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			.groupBy(fictionalCases.category)
 			.orderBy(desc(sql`count(*)`));
 
-		return json({
+		const responseData = {
 			cases: rows,
 			total: Number(countResult[0]?.count ?? 0),
 			limit,
 			offset,
 			categoryStats,
+		};
+
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.private, ETag: etag }
 		});
 	} catch (err) {
 		console.error('[fictional-cases] error:', err);
@@ -114,6 +122,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       limit,
       offset,
       categoryStats: [],
-    });
+    }, {
+			headers: cacheControl.private
+		});
 	}
 };

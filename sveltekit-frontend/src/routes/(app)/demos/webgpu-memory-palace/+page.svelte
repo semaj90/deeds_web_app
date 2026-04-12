@@ -16,6 +16,11 @@
 	let frameCount = 0;
 	let lastFpsUpdate = 0;
 
+	// N64 LOD System integration
+	let n64LodSystem: any = $state(null);
+	let lodLevel = $state(0);
+	let textureCount = $state(0);
+
 	// Sample text for compression demo
 	let sampleText = $state('The plaintiff filed a motion for summary judgment pursuant to the statute of limitations. The defendant sought discovery regarding evidence of breach of contract.');
 	let compressedText = $state('');
@@ -36,6 +41,15 @@
 
 				backend = await palace.initialize();
 				isInitialized = true;
+
+				// Initialize N64 LOD system (dynamically imported to avoid SSR)
+				try {
+					const { n64TextureLOD } = await import('$lib/webgpu/N64TextureLODSystem');
+					n64LodSystem = n64TextureLOD;
+					console.log('[N64 LOD] System loaded:', n64LodSystem);
+				} catch (lodError) {
+					console.warn('[N64 LOD] Failed to load:', lodError);
+				}
 
 				// Start render loop
 				const render = (time: number) => {
@@ -124,6 +138,16 @@
 					<span class="label">Rooms:</span>
 					<span class="value">{palace?.rooms.length ?? 0}</span>
 				</div>
+				{#if n64LodSystem}
+					<div class="stat">
+						<span class="label">N64 LOD:</span>
+						<span class="value lod">Level {lodLevel}</span>
+					</div>
+					<div class="stat">
+						<span class="label">Textures:</span>
+						<span class="value">{textureCount}</span>
+					</div>
+				{/if}
 			</div>
 		</div>
 
@@ -203,6 +227,11 @@
 					<div class="feature-icon">⚡</div>
 					<h3>Auto Fallback</h3>
 					<p>Graceful degradation: WebGPU → WebGL → CPU based on browser support.</p>
+				</div>
+				<div class="feature-card">
+					<div class="feature-icon">🎯</div>
+					<h3>N64 LOD System</h3>
+					<p>Nintendo 64-inspired texture level-of-detail system for efficient evidence texture streaming.</p>
 				</div>
 			</div>
 		</div>
@@ -321,6 +350,10 @@
 
 	.stat .value.cpu {
 		color: #ff9800;
+	}
+
+	.stat .value.lod {
+		color: #9c27b0;
 	}
 
 	/* Compression Section */
