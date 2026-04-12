@@ -28,7 +28,7 @@ import {
 
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
-import { redis } from '$lib/server/redis.js';
+import { getRedis } from '$lib/server/redis.js';
 import { classifyDocument } from '$lib/server/nlp/analyzer.js';
 import { createYOLOService } from '$lib/server/yolo.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
@@ -181,6 +181,7 @@ async function getCachedExtraction(
   fileHash: string
 ): Promise<{ text: string; method: string; doclingBlocks?: Record<string, unknown>[] } | null> {
   try {
+    const redis = getRedis();
     const cached = await redis.get(`${EXTRACTION_CACHE_PREFIX}${fileHash}`);
     if (cached) return JSON.parse(cached);
   } catch {
@@ -197,6 +198,7 @@ async function setCachedExtraction(
   try {
     // Only cache results with meaningful text (>50 chars)
     if (result.text.length < 50) return;
+    const redis = getRedis();
     await redis.set(
       `${EXTRACTION_CACHE_PREFIX}${fileHash}`,
       JSON.stringify({
@@ -1213,6 +1215,12 @@ async function processAndEmbed(
     suggestedTags?: string[];
     model?: string;
     cached?: boolean;
+    resizeMeta?: {
+      resized: boolean;
+      originalWidth: number;
+      originalHeight: number;
+      vlmSize: number;
+    };
   } | null = null;
   let analysisPipelineResult: Awaited<
     ReturnType<
@@ -1536,7 +1544,7 @@ async function processAndEmbed(
         textLength: fullText.length,
         language: extractionMethod.match(/whisper-\w+-(\w+)/)?.[1] ?? undefined,
         ocrFallbackUsed: extractionMethod.includes('vlm-ocr-fallback'),
-        resize: undefined, // visionAnalysis doesn't have resizeMeta currently
+        resize: visionAnalysis?.resizeMeta
       },
       entities: entities.slice(0, 200).map((e) => ({
         type: e.label,
