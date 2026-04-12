@@ -11,6 +11,8 @@
 	import IconIntegrityShield from '$lib/icons/yorha/IconIntegrityShield.svelte';
 	import IconWarningFlag from '$lib/icons/yorha/IconWarningFlag.svelte';
 	import IconAiAssistant from '$lib/icons/yorha/IconAiAssistant.svelte';
+	import IconPanelClose from '$lib/icons/yorha/IconPanelClose.svelte';
+	import IconPanelOpen from '$lib/icons/yorha/IconPanelOpen.svelte';
 
 	const yorhaMap: Record<string, typeof IconLawBook> = {
 		'yorha-law-book': IconLawBook,
@@ -24,7 +26,9 @@
 		'yorha-network': IconNetworkGraph,
 		'yorha-integrity': IconIntegrityShield,
 		'yorha-warning': IconWarningFlag,
-		'yorha-ai-assistant': IconAiAssistant
+		'yorha-ai-assistant': IconAiAssistant,
+		'yorha-panel-close': IconPanelClose,
+		'yorha-panel-open': IconPanelOpen
 	};
 
 	let { name, size, class: className = '', label }: {

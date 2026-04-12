@@ -100,7 +100,7 @@
 			onclick={() => { collapsed = !collapsed; userToggledManually = true; }}
 			title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
 		>
-			<Icon name={collapsed ? 'chevron-right' : 'chevron-left'} size={16} />
+			<Icon name={collapsed ? 'yorha-panel-open' : 'yorha-panel-close'} size={16} />
 		</button>
 	</div>
 
