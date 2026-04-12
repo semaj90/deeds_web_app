@@ -4,6 +4,7 @@
  * Immutable log — POST/PUT/PATCH/DELETE return 405.
  */
 import { json, type RequestEvent } from '@sveltejs/kit';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { pool } from '$lib/server/db/client';
 import { z } from 'zod';
 
@@ -19,7 +20,7 @@ const querySchema = z.object({
 	until: z.string().datetime().optional(),
 });
 
-export async function GET({ url, locals }: RequestEvent) {
+export async function GET({ url, locals, request }: RequestEvent) {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const raw = Object.fromEntries(url.searchParams);
@@ -81,7 +82,7 @@ export async function GET({ url, locals }: RequestEvent) {
 			),
 		]);
 
-		return json({
+		const responseData = {
 			entries: dataResult.rows,
 			pagination: {
 				page,
@@ -89,10 +90,19 @@ export async function GET({ url, locals }: RequestEvent) {
 				total: parseInt(countResult.rows[0]?.total ?? '0'),
 				pages: Math.ceil(parseInt(countResult.rows[0]?.total ?? '0') / limit),
 			},
+		};
+
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.short, ETag: etag }
 		});
 	} catch (err) {
 		console.error('Audit query error:', err);
-		return json({ entries: [], pagination: { page: 1, limit: 50, total: 0, pages: 0 } });
+		return json({ entries: [], pagination: { page: 1, limit: 50, total: 0, pages: 0 } }, {
+			headers: cacheControl.short
+		});
 	}
 }
 

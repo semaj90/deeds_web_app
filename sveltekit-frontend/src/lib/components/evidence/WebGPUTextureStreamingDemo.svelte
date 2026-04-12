@@ -43,43 +43,48 @@
 	// SSR safety - don't run on server
 	export const ssr = false;
 
-	onMount(async () => {
+	onMount(() => {
 		if (!browser) return;
 
-		try {
-			// Dynamically import the texture-streaming module
-			const module = await import('$lib/webgpu/texture-streaming');
-			const { WebGPUTextureStreamer } = module;
+		let interval: ReturnType<typeof setInterval> | null = null;
 
-			streamer = new WebGPUTextureStreamer();
-			const success = await streamer.initialize();
+		// Use IIFE to handle async operations
+		(async () => {
+			try {
+				// Dynamically import the texture-streaming module
+				const module = await import('$lib/webgpu/texture-streaming');
+				const { WebGPUTextureStreamer } = module;
 
-			if (success) {
-				initialized = true;
-				webgpuAvailable = true;
+				streamer = new WebGPUTextureStreamer();
+				const success = await streamer.initialize();
 
-				// Update memory stats every second
-				const interval = setInterval(() => {
-					if (streamer) {
-						memoryStats = streamer.getMemoryStats();
-					}
-				}, 1000);
+				if (success) {
+					initialized = true;
+					webgpuAvailable = true;
 
-				// Cleanup
-				return () => {
-					clearInterval(interval);
-					if (streamer) {
-						streamer.dispose();
-					}
-				};
-			} else {
-				errorMessage = 'WebGPU initialization failed - falling back to CPU';
-				webgpuAvailable = false;
+					// Update memory stats every second
+					interval = setInterval(() => {
+						if (streamer) {
+							memoryStats = streamer.getMemoryStats();
+						}
+					}, 1000);
+				} else {
+					errorMessage = 'WebGPU initialization failed - falling back to CPU';
+					webgpuAvailable = false;
+				}
+			} catch (error) {
+				console.error('[TextureStreaming] Error:', error);
+				errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
 			}
-		} catch (error) {
-			console.error('[TextureStreaming] Error:', error);
-			errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-		}
+		})();
+
+		// Cleanup function (synchronous return from onMount)
+		return () => {
+			if (interval) clearInterval(interval);
+			if (streamer) {
+				streamer.dispose();
+			}
+		};
 	});
 
 	const ramPercentage = $derived((memoryStats.ram.used / memoryStats.ram.total) * 100);

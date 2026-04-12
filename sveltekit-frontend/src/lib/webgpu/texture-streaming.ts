@@ -393,6 +393,59 @@ export class WebGPUTextureStreamer {
     private formatBytes(bytes: number): string {
         return `${(bytes / 1024).toFixed(2)} KB`;
     }
+
+    /**
+     * Get current memory usage statistics
+     */
+    getMemoryStats() {
+        const ramRegion = this.memoryRegions.get('RAM');
+        const totalUsed = Array.from(this.memoryRegions.values())
+            .reduce((sum, region) => sum + region.used, 0);
+
+        return {
+            ram: {
+                used: ramRegion?.used ?? 0,
+                total: MEMORY_CONSTRAINTS.RAM
+            },
+            total: {
+                used: totalUsed,
+                total: MEMORY_CONSTRAINTS.TOTAL
+            }
+        };
+    }
+
+    /**
+     * Clean up resources
+     */
+    dispose() {
+        // Clear all textures
+        this.textureCache.forEach(texture => texture.destroy());
+        this.textureCache.clear();
+
+        // Clear WebGL textures
+        if (this.gl) {
+            this.webglTextures.forEach(texture => this.gl?.deleteTexture(texture));
+            this.webglTextures.clear();
+        }
+
+        // Terminate compression worker
+        if (this.compressionWorker) {
+            this.compressionWorker.terminate();
+            this.compressionWorker = null;
+        }
+
+        // Clear memory regions
+        this.memoryRegions.forEach(region => region.textures.clear());
+
+        // Release device
+        this.device = null;
+        this.adapter = null;
+        this.context = null;
+        this.gl = null;
+        this.isInitialized = false;
+
+        console.log('🧹 WebGPU texture streaming disposed');
+    }
 }
 
 // Export singleton instance
