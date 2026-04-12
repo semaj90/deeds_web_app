@@ -5,6 +5,7 @@
  * document counts, and Ollama connection status.
  */
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 
@@ -78,15 +79,18 @@ export const GET: RequestHandler = async ({ locals }) => {
 		// DB unavailable — return zeros
 	}
 
-	return json({
-		activeChats,
-		ragQueries: 0,
-		documentsAnalyzed,
-		citationsFound,
-		casesProcessed,
-		assistantSessions: activeChats,
-		embeddingModel,
-		llmModel,
-		ollamaStatus
-	});
+	return json(
+    {
+      activeChats,
+      ragQueries: 0,
+      documentsAnalyzed,
+      citationsFound,
+      casesProcessed,
+      assistantSessions: activeChats,
+      embeddingModel,
+      llmModel,
+      ollamaStatus,
+    },
+    { headers: cacheControl.short }
+  );
 };

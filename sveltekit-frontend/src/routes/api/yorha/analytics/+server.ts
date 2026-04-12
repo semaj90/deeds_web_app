@@ -1,5 +1,6 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
@@ -128,36 +129,40 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     ]).then(([redis, qdrant, ollama]) => ({ ...redis, ...qdrant, ...ollama })),
   ]);
 
-	return json({
-		period,
-		cases: {
-			total: Number(caseStats.total ?? 0),
-			active: Number(caseStats.active ?? 0),
-			closed: Number(caseStats.closed ?? 0),
-			recentCreated: Number(caseStats.recent ?? 0),
-		},
-		evidence: {
-			total: Number(evidenceStats.total ?? 0),
-			recentUploaded: Number(evidenceStats.recent ?? 0),
-			casesWithEvidence: Number(evidenceStats.cases_with_evidence ?? 0),
-			withFiles: Number(evidenceStats.with_files ?? 0),
-		},
-		errorBrain: {
-			totalErrors: Number(errorStats.total_errors ?? 0),
-			fixed: Number(errorStats.fixed ?? 0),
-			affectedFiles: Number(errorStats.affected_files ?? 0),
-			recentErrors: Number(errorStats.recent ?? 0),
-			fixRate: Number(errorStats.total_errors) > 0
-				? Math.round((Number(errorStats.fixed) / Number(errorStats.total_errors)) * 100)
-				: 100,
-		},
-		personsOfInterest: {
-			total: Number(poiStats.total ?? 0),
-			critical: Number(poiStats.critical ?? 0),
-			high: Number(poiStats.high ?? 0),
-			active: Number(poiStats.active ?? 0),
-		},
-		system: systemHealth,
-		generatedAt: new Date().toISOString(),
-	});
+	return json(
+    {
+      period,
+      cases: {
+        total: Number(caseStats.total ?? 0),
+        active: Number(caseStats.active ?? 0),
+        closed: Number(caseStats.closed ?? 0),
+        recentCreated: Number(caseStats.recent ?? 0),
+      },
+      evidence: {
+        total: Number(evidenceStats.total ?? 0),
+        recentUploaded: Number(evidenceStats.recent ?? 0),
+        casesWithEvidence: Number(evidenceStats.cases_with_evidence ?? 0),
+        withFiles: Number(evidenceStats.with_files ?? 0),
+      },
+      errorBrain: {
+        totalErrors: Number(errorStats.total_errors ?? 0),
+        fixed: Number(errorStats.fixed ?? 0),
+        affectedFiles: Number(errorStats.affected_files ?? 0),
+        recentErrors: Number(errorStats.recent ?? 0),
+        fixRate:
+          Number(errorStats.total_errors) > 0
+            ? Math.round((Number(errorStats.fixed) / Number(errorStats.total_errors)) * 100)
+            : 100,
+      },
+      personsOfInterest: {
+        total: Number(poiStats.total ?? 0),
+        critical: Number(poiStats.critical ?? 0),
+        high: Number(poiStats.high ?? 0),
+        active: Number(poiStats.active ?? 0),
+      },
+      system: systemHealth,
+      generatedAt: new Date().toISOString(),
+    },
+    { headers: cacheControl.short }
+  );
 };

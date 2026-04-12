@@ -1,5 +1,6 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
+import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 
 /** GET /api/ai/suggestions — Return suggested queries for the AI assistant */
 export const GET: RequestHandler = async ({ locals }) => {
@@ -19,5 +20,5 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 	// Shuffle and return a subset for variety
 	const shuffled = suggestions.sort(() => Math.random() - 0.5);
-	return json({ suggestions: shuffled.slice(0, 5) });
+	return json({ suggestions: shuffled.slice(0, 5) }, { headers: cacheControl.short });
 };

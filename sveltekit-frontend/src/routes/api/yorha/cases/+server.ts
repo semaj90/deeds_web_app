@@ -1,5 +1,6 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { cases } from '$lib/server/db/schema.js';
@@ -24,37 +25,38 @@ const caseListQuerySchema = z.object({
 });
 
 /** GET /api/yorha/cases — List cases for YoRHa command center */
-export const GET: RequestHandler = async ({ url, locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
-	try {
-		const parsed = caseListQuerySchema.safeParse(Object.fromEntries(url.searchParams));
-		if (!parsed.success) {
-			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
-		}
-		const { limit, status } = parsed.data;
+export const GET: RequestHandler = async ({ url, locals, request }) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const parsed = caseListQuerySchema.safeParse(Object.fromEntries(url.searchParams));
+    if (!parsed.success) {
+      return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
+    }
+    const { limit, status } = parsed.data;
 
-		const baseQuery = db
-			.select({
-				id: cases.id,
-				title: cases.title,
-				status: cases.status,
-				priority: cases.priority,
-				createdAt: cases.createdAt,
-				updatedAt: cases.updatedAt
-			})
-			.from(cases)
-			.orderBy(desc(cases.updatedAt))
-			.limit(limit);
+    const baseQuery = db
+      .select({
+        id: cases.id,
+        title: cases.title,
+        status: cases.status,
+        priority: cases.priority,
+        createdAt: cases.createdAt,
+        updatedAt: cases.updatedAt,
+      })
+      .from(cases)
+      .orderBy(desc(cases.updatedAt))
+      .limit(limit);
 
-		const rows = status
-			? await baseQuery.where(sql`${cases.status} = ${status}`)
-			: await baseQuery;
+    const rows = status ? await baseQuery.where(sql`${cases.status} = ${status}`) : await baseQuery;
 
-		return json({ data: rows });
-	} catch (err) {
-		console.error('[/api/yorha/cases] GET error:', err);
-		return json({ data: [] });
-	}
+    const responseData = { data: rows };
+    const etag = checkETag(responseData, request.headers);
+    if (etag === null) return notModified();
+    return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
+  } catch (err) {
+    console.error('[/api/yorha/cases] GET error:', err);
+    return json({ data: [] });
+  }
 };
 
 const createCaseSchema = z.object({

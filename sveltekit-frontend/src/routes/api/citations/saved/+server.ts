@@ -1,5 +1,6 @@
 import { db, savedCitations, cases } from '$lib/server/db/client';
 import { json, error } from '@sveltejs/kit';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { eq, and, desc } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
@@ -40,7 +41,7 @@ const savedCitationQuerySchema = z.object({
  * GET /api/citations/saved
  * List the current user's saved citations
  */
-export const GET: RequestHandler = async ({ locals, url }) => {
+export const GET: RequestHandler = async ({ locals, url, request }) => {
   if (!locals.user?.id) return json({ success: false, citations: [] });
   const userId = locals.user.id;
   const parsed = savedCitationQuerySchema.safeParse(Object.fromEntries(url.searchParams));
@@ -88,7 +89,10 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     }
 
     const results = await query;
-    return json({ success: true, citations: results });
+    const responseData = { success: true, citations: results };
+    const etag = checkETag(responseData, request.headers);
+    if (etag === null) return notModified();
+    return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
   } catch (err) {
     console.error('Error fetching saved citations:', err);
     return json({ success: false, citations: [], error: 'Failed to fetch saved citations' });

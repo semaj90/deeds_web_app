@@ -5,6 +5,7 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { savedCitations } from '$lib/server/db/schema';
@@ -15,23 +16,23 @@ const querySchema = z.object({
 	limit: z.coerce.number().int().min(1).max(100).default(20)
 });
 
-export const GET: RequestHandler = async ({ locals, url }) => {
-	if (!locals.user) {
-		return json({ error: 'Unauthorized' }, { status: 401 });
-	}
+export const GET: RequestHandler = async ({ locals, url, request }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
-	const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
-	if (!parsed.success) {
-		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
-	}
-	const { q: query, limit } = parsed.data;
+  const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
+  if (!parsed.success) {
+    return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+  }
+  const { q: query, limit } = parsed.data;
 
-	if (!query.trim() || query.trim().length < 2) {
-		return json({ success: true, citations: [] });
-	}
+  if (!query.trim() || query.trim().length < 2) {
+    return json({ success: true, citations: [] });
+  }
 
-	try {
-		const results = await db
+  try {
+    const results = await db
       .select()
       .from(savedCitations)
       .where(
@@ -45,7 +46,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
       .orderBy(desc(savedCitations.createdAt))
       .limit(limit);
 
-		return json({
+    const responseData = {
       success: true,
       citations: results.map((citation) => ({
         id: citation.id,
@@ -62,9 +63,12 @@ export const GET: RequestHandler = async ({ locals, url }) => {
             ? citation.createdAt.toISOString()
             : String(citation.createdAt),
       })),
-    });
-	} catch (err) {
-		console.error('[citations/search] Failed:', err);
-		return json({ success: false, error: 'Search failed', citations: [] });
-	}
+    };
+    const etag = checkETag(responseData, request.headers);
+    if (etag === null) return notModified();
+    return json(responseData, { headers: { ...cacheControl.private, ETag: etag } });
+  } catch (err) {
+    console.error('[citations/search] Failed:', err);
+    return json({ success: false, error: 'Search failed', citations: [] });
+  }
 };
