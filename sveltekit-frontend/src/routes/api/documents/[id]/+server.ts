@@ -5,6 +5,7 @@ import { documents } from '$lib/server/db/schema-postgres.js';
 import { and, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const documentUpdateSchema = z.object({
 	content: z.string().max(5_000_000).optional(),
@@ -15,7 +16,7 @@ const documentUpdateSchema = z.object({
  * GET /api/documents/[id]
  * Fetch a single document by ID
  */
-export const GET: RequestHandler = async ({ params, locals }) => {
+export const GET: RequestHandler = async ({ params, locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const { id } = params;
 

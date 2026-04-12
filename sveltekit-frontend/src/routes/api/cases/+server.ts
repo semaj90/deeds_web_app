@@ -5,6 +5,7 @@ import type { RequestHandler } from './$types';
 import { apiResponses, validateRequest } from '$lib/server/api/response-helper.js';
 import { requireAuth } from '$lib/server/auth-helpers.js';
 import { invalidateCaseCache } from '$lib/server/cache/invalidation.js';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { z } from 'zod';
 import { syncCaseToGraph } from '$lib/server/graph/pg-neo4j-sync.js';
 
@@ -76,10 +77,19 @@ export const GET: RequestHandler = async (event) => {
 			.offset(offset)
 			.$withCache({ config: { ex: 30 } });
 
-		return apiResponses.ok({
+		const responseData = {
 			cases: userCases,
 			pagination: { limit, offset, hasMore: userCases.length === limit }
-		});
+		};
+
+		// ETag check for 304 response
+		const { etag, isMatch } = checkETag(responseData, event.request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(
+			{ success: true, data: responseData, timestamp: Date.now() },
+			{ headers: { ...cacheControl.private, ETag: etag } }
+		);
 	} catch (err) {
 		console.error('Error fetching cases:', err);
 		return apiResponses.ok({
