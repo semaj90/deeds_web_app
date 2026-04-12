@@ -21,6 +21,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import {
 	runGpuAudit,
 	persistAuditReport,
@@ -80,23 +81,27 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 };
 
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url, locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	try {
 		const caseId = url.searchParams.get('caseId') ?? undefined;
 		const report = await getLatestAuditReport(caseId);
 
-		if (!report) {
-			return json({
-				report: null,
-				message: 'No GPU audit reports found. Run POST /api/audit/gpu first.',
-			});
-		}
+		const responseData = report
+			? { report }
+			: { report: null, message: 'No GPU audit reports found. Run POST /api/audit/gpu first.' };
 
-		return json({ report });
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.short, ETag: etag }
+		});
 	} catch (err) {
 		console.error('[/api/audit/gpu] GET failed:', (err as Error)?.message);
-		return json({ report: null, message: 'Failed to retrieve audit report' });
+		return json({ report: null, message: 'Failed to retrieve audit report' }, {
+			headers: cacheControl.short
+		});
 	}
 };

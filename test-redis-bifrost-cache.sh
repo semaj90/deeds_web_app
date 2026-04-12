@@ -37,7 +37,7 @@ RESPONSE1=$(curl -s -X POST http://localhost:3040/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "x-bf-cache-key: redis-bifrost-test-$(date +%s)" \
   -d "{
-    \"model\": \"ollama/gemma3-legal\",
+    \"model\": \"ollama/gemma4-legal\",
     \"messages\": [{\"role\": \"user\", \"content\": \"$TEST_QUERY\"}],
     \"temperature\": 0.3,
     \"max_tokens\": 200
@@ -62,7 +62,7 @@ RESPONSE2=$(curl -s -X POST http://localhost:3040/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "x-bf-cache-key: redis-bifrost-test-$(date +%s)" \
   -d "{
-    \"model\": \"ollama/gemma3-legal\",
+    \"model\": \"ollama/gemma4-legal\",
     \"messages\": [{\"role\": \"user\", \"content\": \"$TEST_QUERY\"}],
     \"temperature\": 0.3,
     \"max_tokens\": 200
@@ -87,7 +87,7 @@ RESPONSE3=$(curl -s -X POST http://localhost:3040/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "x-bf-cache-key: redis-bifrost-test-$(date +%s)" \
   -d "{
-    \"model\": \"ollama/gemma3-legal\",
+    \"model\": \"ollama/gemma4-legal\",
     \"messages\": [{\"role\": \"user\", \"content\": \"$TEST_QUERY\"}],
     \"temperature\": 0.3,
     \"max_tokens\": 200

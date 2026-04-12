@@ -14,6 +14,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { runAuditPlanner } from '$lib/server/audit/gemma-tool-router.js';
 
 const plannerSchema = z.object({
@@ -63,10 +64,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 };
 
-export const GET: RequestHandler = async ({ locals }) => {
+export const GET: RequestHandler = async ({ locals, request }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	return json({
+	const responseData = {
 		description: 'Gemma 4 agentic audit planner — ask questions about your codebase',
 		examples: [
 			'What are the most critical files in this codebase?',
@@ -77,5 +78,12 @@ export const GET: RequestHandler = async ({ locals }) => {
 			'Show me the latest audit report',
 		],
 		tools: ['run_gpu_audit', 'analyze_graph', 'search_codebase', 'get_audit_report', 'gpu_status'],
+	};
+
+	const { etag, isMatch } = checkETag(responseData, request.headers);
+	if (isMatch) return notModified(etag);
+
+	return json(responseData, {
+		headers: { ...cacheControl.long, ETag: etag }
 	});
 };
