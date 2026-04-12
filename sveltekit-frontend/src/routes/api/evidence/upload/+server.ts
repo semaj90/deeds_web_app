@@ -21,6 +21,10 @@ import { invalidateEvidenceCache, invalidateCaseCache, invalidateACEChunksCache 
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { triggerEvidenceGpuAnalysis } from '$lib/server/gpu/background-analyzer.js';
 import { extractSectionsFromText, detectSectionsHeuristic, type LangExtractSection } from '$lib/server/services/langextract-service.js';
+import {
+  serializeEvidenceMetadataBase64,
+  type EvidenceMetadataProto,
+} from '$lib/server/evidence/proto-serializer.js';
 
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
@@ -1521,7 +1525,115 @@ async function processAndEmbed(
       'success',
       'Persisting analysis metadata and processing diagnostics'
     );
+
+    // Build protobuf metadata for compact binary serialization
+    const protoMetadata: EvidenceMetadataProto = {
+      evidenceId,
+      schemaVersion: 1,
+      timestamp: Date.now(),
+      extraction: {
+        method: extractionMethod,
+        textLength: fullText.length,
+        language: extractionMethod.match(/whisper-\w+-(\w+)/)?.[1] ?? undefined,
+        ocrFallbackUsed: extractionMethod.includes('vlm-ocr-fallback'),
+        resize: undefined, // visionAnalysis doesn't have resizeMeta currently
+      },
+      entities: entities.slice(0, 200).map((e) => ({
+        type: e.label,
+        value: e.text,
+        confidence: e.score ?? 0,
+        startOffset: e.start ?? 0,
+        endOffset: e.end ?? 0,
+        source: e.source ?? 'unknown',
+      })),
+      vlm: visionAnalysis
+        ? {
+            summary: visionAnalysis.summary ?? '',
+            keyFindings: visionAnalysis.keyFindings ?? [],
+            suggestedTags: visionAnalysis.suggestedTags ?? [],
+            model: visionAnalysis.model ?? 'unknown',
+            cached: visionAnalysis.cached ?? false,
+          }
+        : undefined,
+      forensics:
+        forensicFlags.length > 0
+          ? {
+              flags: forensicFlags.map((f) => ({
+                type: f.type,
+                description: f.description,
+                severity: f.severity,
+                metadata: f.metadata as Record<string, string> | undefined,
+              })),
+              riskScore:
+                forensicFlags.filter((f) => f.severity === 'high').length > 0
+                  ? 0.8
+                  : forensicFlags.filter((f) => f.severity === 'medium').length > 0
+                    ? 0.5
+                    : 0.2,
+            }
+          : undefined,
+      sections: sectionMap.slice(0, 100).map((s) => ({
+        sectionType: s.section_type,
+        confidence: s.confidence ?? 0,
+        startOffset: s.start_offset,
+        endOffset: s.end_offset,
+      })),
+      yolo: yoloDetections
+        ? {
+            objects:
+              yoloDetections.objects
+                ?.slice(0, 50)
+                .map((o: { class: string; confidence: number }) => ({
+                  className: o.class,
+                  confidence: o.confidence,
+                  bbox: undefined, // bbox not currently available
+                })) ?? [],
+            layout: yoloDetections.layout ? { detectedLayoutElements: [] } : undefined,
+            modelType: yoloDetections.modelType ?? undefined,
+          }
+        : undefined,
+      nlp: nlpClassification
+        ? {
+            documentType: nlpClassification.documentType ?? undefined,
+            practiceArea: nlpClassification.practiceArea ?? undefined,
+            confidence: nlpClassification.confidence ?? 0,
+            keyPhrases: nlpClassification.keyPhrases?.slice(0, 20) ?? [],
+          }
+        : undefined,
+      suggestedTags: [
+        ...(evidenceProfile?.suggested_tags ?? []),
+        ...(visionAnalysis?.suggestedTags ?? []),
+        ...(yoloDetections?.objects?.map((o: { class: string }) => `detected:${o.class}`) ?? []),
+      ].slice(0, 50),
+      pipelineStats: analysisPipelineResult
+        ? {
+            llmEscalated: analysisPipelineResult.llmEscalated ?? false,
+            llmSynthesis: analysisPipelineResult.llmSynthesis
+              ? JSON.stringify(analysisPipelineResult.llmSynthesis)
+              : undefined,
+            graphConnectionsCreated: analysisPipelineResult.graphConnectionsCreated ?? 0,
+            yoloCacheHit: analysisPipelineResult.yoloCacheHit ?? false,
+            cachedToDb: analysisPipelineResult.cachedToDb ?? false,
+            processingTimeMs: analysisPipelineResult.processingTimeMs ?? 0,
+          }
+        : undefined,
+    };
+
+    // Serialize to base64 for JSONB storage (60-70% size reduction vs JSON)
+    let protoBytes: string | null = null;
+    try {
+      protoBytes = serializeEvidenceMetadataBase64(protoMetadata);
+      console.log(
+        `[Upload] Protobuf serialized: ${protoBytes.length} chars (vs JSON ~${JSON.stringify(protoMetadata).length} chars)`
+      );
+    } catch (protoErr) {
+      console.warn('[Upload] Protobuf serialization failed (non-fatal):', protoErr);
+    }
+
     await persistProcessingDiagnostics(evidenceId, diagnostics, {
+      // Protobuf bytes (when serialization succeeded)
+      ...(protoBytes && { proto_bytes: protoBytes, proto_version: 1 }),
+      // Existing JSONB fields for backward compatibility
       entities: entities.slice(0, 200),
       forensicFlags,
       summary: summary.slice(0, 5000),

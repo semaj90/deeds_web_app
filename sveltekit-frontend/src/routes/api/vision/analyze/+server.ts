@@ -1,6 +1,6 @@
 /**
  * POST /api/vision/analyze
- * Pipeline: SHA-256 hash → Redis cache check → YOLO detection → VLM analysis (Triton → Ollama) → cache
+ * Pipeline: SHA-256 hash → Redis cache → YOLO detection → VLM (Triton → TurboQuant → Ollama) → cache
  *
  * GET /api/vision/analyze?hash=<sha256>
  * Check if a cached analysis exists for a given image hash
@@ -9,7 +9,7 @@ import { json } from '@sveltejs/kit';
 import crypto from 'crypto';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { redis } from '$lib/server/redis.js';
+import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 import { uploadFile } from '$lib/server/minio-client.js';
 import { createYOLOService, type YOLOResult } from '$lib/server/yolo.js';
@@ -96,7 +96,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     // 2. Check Redis full-response cache (includes YOLO boxes + VLM analysis)
     if (!skipCache) {
       try {
-        const cached = await redis.get(`vision:${hash}`);
+        const cached = await getRedis().get(`vision:${hash}`);
         if (cached) {
           const result: VisionResponse = JSON.parse(cached);
           result.cacheHit = true;
@@ -202,7 +202,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     // Cache the full response in Redis (24h TTL)
     try {
-      await redis.set(`vision:${hash}`, JSON.stringify(result), 'EX', 24 * 60 * 60);
+      await getRedis().set(`vision:${hash}`, JSON.stringify(result), 'EX', 24 * 60 * 60);
     } catch {
       /* non-fatal */
     }
@@ -221,7 +221,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	}
 
 	try {
-		const cached = await redis.get(`vision:${hash}`);
+		const cached = await getRedis().get(`vision:${hash}`);
 		if (cached) {
 			return json({ found: true, result: JSON.parse(cached) });
 		}

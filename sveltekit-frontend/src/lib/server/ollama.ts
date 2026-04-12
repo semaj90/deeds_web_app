@@ -188,36 +188,71 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
  *
  * Exported so other modules can use it directly.
  */
+/**
+ * Normalize a user message before embedding for Bifrost semantic cache.
+ * Strips filler preambles and normalizes legal citation variants so that
+ * semantically equivalent queries consistently hit the same cache entry.
+ */
+function normalizeBifrostMessage(content: string): string {
+  return content
+    .replace(/^(can you (please )?|could you (please )?|i (want|need|would like) (you )?to |please )/i, '')
+    .replace(/^(help me (understand|with|explain)|tell me (about|how|what|why) )/i, '')
+    .replace(/\bsec(?:tion|\.)?\s*(\d+)/gi, '§$1')
+    .replace(/§\s+(\d)/g, '§$1')
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .trim();
+}
+
 export async function bifrostChat(
-	messages: Array<{ role: string; content: string }>,
-	model: string,
-	options?: { temperature?: number; maxTokens?: number; timeoutMs?: number }
+  messages: Array<{ role: string; content: string }>,
+  model: string,
+  options?: { temperature?: number; maxTokens?: number; timeoutMs?: number; cacheKey?: string }
 ): Promise<string> {
-	const bifrostModel = model.includes('/') ? model : `ollama-local/${model}`;
-	const res = await fetch(`${ENV.BIFROST_URL}/v1/chat/completions`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({
-			model: bifrostModel,
-			messages,
-			temperature: options?.temperature ?? 0.7,
-			max_tokens: options?.maxTokens ?? 2048,
-			stream: false,
-		}),
-		signal: AbortSignal.timeout(options?.timeoutMs ?? REQUEST_TIMEOUT_MS),
-	});
+  const bifrostModel = model.includes('/') ? model : `ollama-local/${model}`;
+  // x-bf-cache-key is REQUIRED for Bifrost semantic caching to activate.
+  // Without it, every request bypasses the cache entirely (Bifrost docs).
+  // 'legal-ai-global' creates a shared namespace: semantically similar questions
+  // from any user hit the same cache entry (ideal for repeatable legal queries).
+  const cacheKey = options?.cacheKey ?? 'legal-ai-global';
+  // Normalize user messages to improve semantic cache hit rate (filler stripping, citation normalization)
+  const normalizedMessages = messages.map((m) =>
+    m.role === 'user' ? { ...m, content: normalizeBifrostMessage(m.content) } : m
+  );
+  const res = await fetch(`${ENV.BIFROST_URL}/v1/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-bf-cache-key': cacheKey,
+    },
+    body: JSON.stringify({
+      model: bifrostModel,
+      messages: normalizedMessages,
+      temperature: options?.temperature ?? 0.7,
+      max_tokens: options?.maxTokens ?? 2048,
+      stream: false,
+    }),
+    signal: AbortSignal.timeout(options?.timeoutMs ?? REQUEST_TIMEOUT_MS),
+  });
 
-	if (!res.ok) {
-		const text = await res.text().catch(() => '');
-		throw new Error(`Bifrost error: ${res.status} ${text.slice(0, 200)}`);
-	}
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Bifrost error: ${res.status} ${text.slice(0, 200)}`);
+  }
 
-	const data = (await res.json()) as {
-		choices?: Array<{ message?: { content?: string } }>;
-	};
-	return data.choices?.[0]?.message?.content ?? '';
+  const data = (await res.json()) as {
+    choices?: Array<{ message?: { content?: string } }>;
+    extra_fields?: {
+      cache_debug?: { cache_hit?: boolean; hit_type?: string; similarity?: number };
+    };
+  };
+  const debug = data.extra_fields?.cache_debug;
+  if (debug?.cache_hit) {
+    console.debug(
+      `[bifrost] CACHE HIT type=${debug.hit_type} similarity=${debug.similarity?.toFixed(3)}`
+    );
+  }
+  return data.choices?.[0]?.message?.content ?? '';
 }
 
 // ── Chat Functions (merged from ollama-service.ts) ──────────────────────

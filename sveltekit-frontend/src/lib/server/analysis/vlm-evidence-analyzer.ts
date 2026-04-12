@@ -7,7 +7,8 @@
  *
  * Inference path:
  *   1. Triton VLM ensemble (SigLIP → Projector → Gemma4) — fastest when available
- *   2. Ollama multimodal (gemma4:e4b + images[]) — always-available fallback
+ *   2. TurboQuant llama-server with --mmproj (:8090) — unified text+vision
+ *   3. Ollama multimodal (gemma4:e4b + images[]) — always-available fallback
  *
  * Resizes images to max 2048px edge (Gemma4 variable token budget) before inference.
  */
@@ -17,6 +18,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { resizeForVLM, GEMMA4_VLM_MAX_EDGE } from '$lib/server/image/resize-for-vlm.js';
 import { getVLMCache, setVLMCache } from '$lib/server/vector-cache.js';
+import { TURBOQUANT_BASE_URL } from '$lib/ai/model-ids.js';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -195,10 +197,52 @@ async function inferOllamaVLM(
 	}
 }
 
+// ── TurboQuant VLM Path (llama-server + mmproj) ───────────────────────────
+
+async function inferTurboQuantVLM(
+	base64Image: string,
+	prompt: string,
+	maxTokens: number
+): Promise<string | null> {
+	try {
+		const healthRes = await fetch(`${TURBOQUANT_BASE_URL}/health`, {
+			signal: AbortSignal.timeout(1_000),
+		});
+		if (!healthRes.ok) return null;
+
+		const res = await fetch(`${TURBOQUANT_BASE_URL}/v1/chat/completions`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				messages: [
+					{
+						role: 'user',
+						content: [
+							{ type: 'image_url', image_url: { url: `data:image/png;base64,${base64Image}` } },
+							{ type: 'text', text: prompt },
+						],
+					},
+				],
+				max_tokens: maxTokens,
+				temperature: 0.1,
+				stream: false,
+			}),
+			signal: AbortSignal.timeout(OLLAMA_TIMEOUT),
+		});
+
+		if (!res.ok) return null;
+		const data = await res.json();
+		const msg = data.choices?.[0]?.message;
+		return msg?.content || msg?.reasoning_content || null;
+	} catch {
+		return null;
+	}
+}
+
 // ── Main Function ──────────────────────────────────────────────────────────
 
 /**
- * Analyze an evidence image using VLM (Triton → Ollama fallback).
+ * Analyze an evidence image using VLM (Triton → TurboQuant → Ollama fallback).
  *
  * Returns structured analysis with summary, key findings, and suggested tags.
  * Results are cached by image SHA-256 hash in Redis (24h TTL).
@@ -263,7 +307,16 @@ export async function analyzeEvidenceImage(input: VLMAnalysisInput): Promise<VLM
 		}
 	}
 
-	// 6. Fallback to Ollama multimodal
+	// 6. Fallback to TurboQuant llama-server (unified VLM via --mmproj)
+	if (!responseText) {
+		responseText = await inferTurboQuantVLM(base64Image, prompt, maxTokens);
+		if (responseText) {
+			model = 'gemma4-legal-turbo3 (turboquant)';
+			console.log(`[VLM] TurboQuant inference complete for ${input.fileName}`);
+		}
+	}
+
+	// 7. Fallback to Ollama multimodal
 	if (!responseText) {
 		responseText = await inferOllamaVLM(base64Image, prompt, maxTokens);
 		if (responseText) {
@@ -272,10 +325,10 @@ export async function analyzeEvidenceImage(input: VLMAnalysisInput): Promise<VLM
 		}
 	}
 
-	// 7. Parse structured response
+	// 8. Parse structured response
 	if (!responseText) {
 		return {
-			summary: 'Image analysis unavailable — both Triton and Ollama unreachable',
+			summary: 'Image analysis unavailable — Triton, TurboQuant, and Ollama all unreachable',
 			keyFindings: [],
 			suggestedTags: [],
 			model: 'none',
@@ -286,7 +339,7 @@ export async function analyzeEvidenceImage(input: VLMAnalysisInput): Promise<VLM
 
 	const parsed = parseVLMResponse(responseText);
 
-	// 8. Cache result
+	// 9. Cache result
 	try {
 		await setVLMCache(imageHash, {
 			labels: parsed.suggestedTags.map((t) => ({ label: t, confidence: 0.8 })),
