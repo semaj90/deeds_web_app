@@ -2,6 +2,7 @@ import { caseStatuteLinks, citations, cases, db } from '$lib/server/db/client';
 import { error, isHttpError, json } from '@sveltejs/kit';
 import { and, eq, sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
 
@@ -39,7 +40,7 @@ async function hasCaseStatuteLinksTable(): Promise<boolean> {
  * GET /api/cases/[id]/citations
  * Fetch all citation links for a case
  */
-export const GET: RequestHandler = async ({ locals, params }) => {
+export const GET: RequestHandler = async ({ locals, params, request }) => {
   if (!locals.user) {
     throw error(401, 'Unauthorized');
   }
@@ -54,13 +55,19 @@ export const GET: RequestHandler = async ({ locals, params }) => {
     .limit(1);
 
   if (!targetCase) {
-    return json({ success: true, data: [] });
+    return json(
+      { success: true, data: [] },
+      { headers: cacheControl.private }
+    );
   }
 
   const hasLinksTable = await hasCaseStatuteLinksTable();
 
   if (!hasLinksTable) {
-    return json({ success: true, data: [] });
+    return json(
+      { success: true, data: [] },
+      { headers: cacheControl.private }
+    );
   }
 
   try {
@@ -80,14 +87,28 @@ export const GET: RequestHandler = async ({ locals, params }) => {
       .leftJoin(citations, eq(caseStatuteLinks.citationId, citations.id))
       .where(eq(caseStatuteLinks.caseId, caseId));
 
-    return json({ success: true, data: links });
+    const responseData = { success: true, data: links };
+
+    // ETag check for 304 response (case citations are user-specific)
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+
+    return json(responseData, {
+      headers: { ...cacheControl.private, ETag: etag }
+    });
   } catch (err) {
     if (hasPgErrorCode(err, '42P01')) {
-      return json({ success: true, data: [] });
+      return json(
+        { success: true, data: [] },
+        { headers: cacheControl.private }
+      );
     }
 
     console.error('Error fetching case citations:', err);
-    return json({ success: false, data: [] });
+    return json(
+      { success: false, data: [] },
+      { headers: cacheControl.private }
+    );
   }
 };
 

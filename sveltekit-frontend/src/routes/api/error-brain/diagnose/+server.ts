@@ -16,12 +16,14 @@ import { z } from 'zod';
 import { createHash } from 'crypto';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { qdrant, deterministicPointId } from '$lib/server/vector/qdrant-manager.js';
-import { callOllamaChat } from '$lib/server/ollama.js';
+import { callOllamaChat, bifrostChat } from '$lib/server/ollama.js';
 import { setCache, cognitiveCache } from '$lib/server/cache.js';
 import { searchSimilarErrors, embedErrorEvent } from '$lib/server/pipeline/error-embedding-pipeline.js';
 import { VECTOR_CONFIG } from '$lib/server/config/vector-config.js';
 import { db } from '$lib/server/db/client';
 import { diagnosisEvents } from '$lib/server/db/schema-postgres.js';
+import { traceLLM } from '$lib/server/observability/langfuse.js';
+import { ENV } from '$lib/server/env.server.js';
 
 const consoleErrorSchema = z.object({
 	message: z.string().max(2000),
@@ -411,6 +413,7 @@ async function generateDiagnosis(
 	subgraphSummary: string,
 	runtimeContext: string,
 	mode: NonNullable<DiagnosisMode>,
+	routePath?: string,
 ): Promise<DiagnosisResult> {
 	const codeContext = topCandidates
 		.filter((c) => c.source === 'semantic' || c.source === 'graph_neighbor')
@@ -465,11 +468,49 @@ ${runtimeContext || 'No runtime evidence available'}
 SIMILAR PAST ERRORS:
 ${errorContext || 'No past error matches'}`;
 
-	const raw = await callOllamaChat(systemPrompt, userPrompt, {
-		format: 'json',
-		num_predict: 2048,
-		temperature: 0.3,
-	});
+	// Call LLM with Langfuse tracing + Bifrost semantic cache (when enabled)
+	const { raw, llmTimeMs } = await traceLLM(
+		'error-diagnosis',
+		{
+			model: 'gemma4-legal:latest',
+			mode,
+			backend: ENV.BIFROST_ENABLED ? 'bifrost' : 'ollama',
+			queryLength: query.length,
+			routePath: routePath,
+		},
+		async (gen) => {
+			const startTime = performance.now();
+
+			let content: string;
+			if (ENV.BIFROST_ENABLED) {
+				// Route through Bifrost gateway for semantic caching (high cache hit rate on error patterns)
+				content = await bifrostChat(
+					[
+						{ role: 'system', content: systemPrompt },
+						{ role: 'user', content: userPrompt },
+					],
+					'gemma4-legal',
+					{
+						temperature: 0.3,
+						maxTokens: 2048,
+						timeoutMs: 45_000, // Error diagnosis can take longer than default 30s
+						cacheKey: `error-brain-${mode}`, // Per-mode cache namespace for better hit rates
+					}
+				);
+			} else {
+				// Direct Ollama (fallback when Bifrost disabled)
+				content = await callOllamaChat(systemPrompt, userPrompt, {
+					format: 'json',
+					num_predict: 2048,
+					temperature: 0.3,
+				});
+			}
+
+			const durationMs = performance.now() - startTime;
+			gen.end({ output: content.slice(0, 1000), usage: { completionTokens: Math.ceil(content.length / 4) } });
+			return { raw: content, llmTimeMs: durationMs };
+		}
+	);
 
 	let cleaned = raw.trim();
 	// Strip markdown fences (triple backticks) if present
@@ -706,7 +747,7 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
 
 		// Stage 4: LLM Diagnosis (now receives runtime context + mode)
 		const llmStart = Date.now();
-		const diagnosis = await generateDiagnosis(query, ranked, subgraphSummary, runtimeContext, mode);
+		const diagnosis = await generateDiagnosis(query, ranked, subgraphSummary, runtimeContext, mode, routePath);
 		timings.llmMs = Date.now() - llmStart;
 
 		// Stage 5: Cache + Store (parallel — Redis, Qdrant, pgvector, DB)

@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { cases, evidence } from '$lib/server/db/schema-postgres.js';
 import { eq, and, desc } from 'drizzle-orm';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
 
@@ -15,7 +16,7 @@ const evidenceDeleteSchema = z.object({
  * GET /api/cases/[id]/evidence
  * List all evidence items linked to a specific case
  */
-export const GET: RequestHandler = async ({ params, locals }) => {
+export const GET: RequestHandler = async ({ params, locals, request }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
   const caseId = params.id;
@@ -58,12 +59,21 @@ export const GET: RequestHandler = async ({ params, locals }) => {
       .orderBy(desc(evidence.createdAt))
       .limit(1000);
 
-    const total = items.length;
+    const responseData = { evidence: items, total: items.length };
 
-    return json({ evidence: items, total });
+    // ETag check for 304 response (case evidence is user-specific)
+    const { etag, isMatch } = checkETag(responseData, request.headers);
+    if (isMatch) return notModified(etag);
+
+    return json(responseData, {
+      headers: { ...cacheControl.private, ETag: etag }
+    });
   } catch (err) {
     console.error(`[cases/${caseId}/evidence] GET error:`, err);
-    return json({ evidence: [], total: 0 });
+    return json(
+      { evidence: [], total: 0 },
+      { headers: cacheControl.private }
+    );
   }
 };
 

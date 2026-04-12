@@ -16,10 +16,12 @@ import {
   TEST_CASE_PREFIX,
   TEST_IDS_FILE,
 } from './fixtures/test-cases.js';
+import { PORTS, env } from './helpers/env-ports.js';
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+const BASE_URL = PORTS.APP_BASE;
 const DB_URL =
-  process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+  process.env.DATABASE_URL ||
+  `postgresql://legal_admin:123456@127.0.0.1:${PORTS.PG_PORT}/legal_ai_db`;
 
 export default async function globalSetup() {
   if (process.env.PLAYWRIGHT_SKIP_GLOBAL_SETUP === 'true') {

@@ -35,6 +35,7 @@ import {
   traceCache,
   tracePolicy,
   traceVectorSearch,
+  traceEmbedding,
 } from '$lib/server/observability/langfuse.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { determineACEPolicy } from './policy.js';
@@ -238,7 +239,9 @@ export async function persistACEChunks(
 
   // Generate embeddings in parallel (fail-tolerant: NULL on failure)
   const embeddings = await Promise.all(
-    rows.map((r) => getQueryEmbedding(r.content).catch(() => null))
+    rows.map((r) =>
+      traceEmbedding(r.content, ACE_EMBEDDING_MODEL, () => getQueryEmbedding(r.content)).catch(() => null)
+    )
   );
   const embeddedCount = embeddings.filter(Boolean).length;
 
@@ -1127,7 +1130,7 @@ async function fetchRAGChunks(
   sectionTypes?: string[],
   caseId?: string
 ): Promise<{ ragChunks: RAGChunk[]; kbChunks: RAGChunk[]; caseChunks: RAGChunk[] }> {
-  const embedding = await getQueryEmbedding(query);
+  const embedding = await traceEmbedding(query, 'embeddinggemma:latest', () => getQueryEmbedding(query));
   if (!embedding) return { ragChunks: [], kbChunks: [], caseChunks: [] };
 
   const { createHash } = await import('crypto');

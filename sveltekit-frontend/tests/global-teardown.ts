@@ -8,8 +8,11 @@ import { readFile, unlink } from 'fs/promises';
 import path from 'path';
 import pg from 'pg';
 import { TEST_CASE_PREFIX, TEST_IDS_FILE } from './fixtures/test-cases.js';
+import { PORTS } from './helpers/env-ports.js';
 
-const DB_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+const DB_URL =
+  process.env.DATABASE_URL ||
+  `postgresql://legal_admin:123456@127.0.0.1:${PORTS.PG_PORT}/legal_ai_db`;
 
 export default async function globalTeardown() {
 	if (process.env.PLAYWRIGHT_SKIP_GLOBAL_SETUP === 'true') {

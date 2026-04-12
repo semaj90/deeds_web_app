@@ -16,10 +16,12 @@ import type { RequestHandler } from './$types';
 import { resolve, relative } from 'path';
 import { readFileSync, statSync } from 'fs';
 import { createHash } from 'crypto';
-import { callOllamaChat } from '$lib/server/ollama.js';
+import { callOllamaChat, bifrostChat } from '$lib/server/ollama.js';
 import { setCache, cognitiveCache } from '$lib/server/cache.js';
 import { fastJsonParse, isSimdJsonAvailable } from '$lib/server/gpu/simdjson-bridge.js';
 import { z } from 'zod';
+import { traceLLM } from '$lib/server/observability/langfuse.js';
+import { ENV } from '$lib/server/env.server.js';
 
 const SRC_ROOT = resolve(process.cwd(), 'src');
 
@@ -106,7 +108,43 @@ ${contentForLLM}
 \`\`\``;
 
 	try {
-		const raw = await callOllamaChat(systemPrompt, userPrompt);
+		// Call LLM with Langfuse tracing + Bifrost semantic cache (when enabled)
+		// Codebase analysis has high cache hit potential — file structure patterns repeat
+		const raw = await traceLLM(
+			'codebase-analysis',
+			{
+				model: 'gemma4-legal:latest',
+				backend: ENV.BIFROST_ENABLED ? 'bifrost' : 'ollama',
+				filePath: relPath,
+				lines: fileStats.lines,
+				truncated,
+			},
+			async (gen) => {
+				let content: string;
+				if (ENV.BIFROST_ENABLED) {
+					// Route through Bifrost for semantic caching
+					content = await bifrostChat(
+						[
+							{ role: 'system', content: systemPrompt },
+							{ role: 'user', content: userPrompt },
+						],
+						'gemma4-legal',
+						{
+							temperature: 0.3,
+							maxTokens: 2048,
+							timeoutMs: 30_000,
+							cacheKey: 'codebase-analysis', // Shared namespace for similar file patterns
+						}
+					);
+				} else {
+					// Direct Ollama fallback
+					content = await callOllamaChat(systemPrompt, userPrompt);
+				}
+
+				gen.end({ output: content.slice(0, 1000), usage: { completionTokens: Math.ceil(content.length / 4) } });
+				return content;
+			}
+		);
 
 		// Parse LLM response — strip markdown fences if present
 		let cleaned = raw.trim();

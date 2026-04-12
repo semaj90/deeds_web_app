@@ -3,6 +3,7 @@ import { caseNotes, cases } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
 import { and, eq, desc } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
+import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { z } from 'zod';
 
 const noteCreateSchema = z.object({
@@ -17,7 +18,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
  * GET /api/cases/[id]/notes
  * List all notes for a case (pinned first, then most recent)
  */
-export const GET: RequestHandler = async ({ params, locals }) => {
+export const GET: RequestHandler = async ({ params, locals, request }) => {
 	if (!locals.user) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
@@ -45,10 +46,21 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			.where(eq(caseNotes.caseId, caseId))
 			.orderBy(desc(caseNotes.isPinned), desc(caseNotes.updatedAt));
 
-		return json({ success: true, notes });
+		const responseData = { success: true, notes };
+
+		// ETag check for 304 response (case notes are user-specific)
+		const { etag, isMatch } = checkETag(responseData, request.headers);
+		if (isMatch) return notModified(etag);
+
+		return json(responseData, {
+			headers: { ...cacheControl.private, ETag: etag }
+		});
 	} catch (err) {
 		console.error('[notes] GET error:', err);
-		return json({ success: true, notes: [] });
+		return json(
+			{ success: true, notes: [] },
+			{ headers: cacheControl.private }
+		);
 	}
 };
 
