@@ -57,6 +57,7 @@ export class RabbitMQManager extends EventEmitter {
     vector_updates: 'vector.updates',
     analytics: 'analytics.events',
     codebase_indexing: 'codebase.indexing',
+    audio_processing: 'audio.processing',
     dlx: 'dlx.dead-letter',
   };
 
@@ -73,6 +74,7 @@ export class RabbitMQManager extends EventEmitter {
     error_embed: 'error.embed',
     synthesis_generate: 'synthesis.generate',
     knowledge_backfill: 'knowledge.backfill',
+    audio_process: 'audio.process',
   };
 
   constructor() {
@@ -190,6 +192,7 @@ export class RabbitMQManager extends EventEmitter {
       'error.embed',
       'synthesis.generate',
       'knowledge.backfill',
+      'audio.process',
     ];
     for (const queue of queuesToMigrate) {
       try {
@@ -259,6 +262,11 @@ export class RabbitMQManager extends EventEmitter {
       this.queues.knowledge_backfill,
       this.exchanges.document_processing,
       'knowledge.backfill'
+    );
+    await this.bindQueue(
+      this.queues.audio_process,
+      this.exchanges.audio_processing,
+      'audio.process'
     );
 
     console.log('✅ Queue bindings configured (with DLQ)');

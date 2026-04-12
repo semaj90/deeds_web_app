@@ -126,18 +126,14 @@ if (shouldRunSingletonTasks) {
         .catch((err) =>
           console.warn('[Boot] Document embed consumer failed (non-fatal):', (err as Error).message)
         );
+      startAudioQueueConsumer()
+        .then(() => console.log('[Boot] Audio queue consumer active'))
+        .catch((err) =>
+          console.warn('[Boot] Audio queue consumer failed (non-fatal):', (err as Error).message)
+        );
     })
     .catch((err) => {
       console.warn('[Boot] RabbitMQ unavailable (non-fatal):', (err as Error).message);
-    });
-
-  // Start audio processing queue consumer (audio.process → Whisper + ACE + Qdrant)
-  startAudioQueueConsumer()
-    .then(() => {
-      console.log('[Boot] Audio queue consumer active');
-    })
-    .catch((err) => {
-      console.warn('[Boot] Audio queue consumer failed (non-fatal):', (err as Error).message);
     });
 
   // Initialize Qdrant collections (Priority #2: auto-create missing collections)
